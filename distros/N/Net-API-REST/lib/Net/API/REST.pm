@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST.pm
-## Version v0.6.2
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Version v0.6.3
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/09/01
-## Modified 2020/12/11
+## Modified 2022/03/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -34,7 +34,8 @@ BEGIN
     use APR::UUID ();
     use JSON::PP ();
     use Regexp::Common;
-    use Nice::Try;
+    # use Nice::Try debug => 6, debug_file => '/usr/local/src/perl/Net-API-REST/dev/debug_nice_try.pl', debug_code => 1;
+    use Nice::Try dont_want => 1;
     use Devel::Confess;
     use Scalar::Util ();
     ## use Crypt::JWT;
@@ -52,7 +53,7 @@ BEGIN
     use Net::API::REST::Response;
     use Net::API::REST::Status;
     our( $VERSION, $DEBUG, $VERBOSE, $API_VERSION );
-    $VERSION = 'v0.6.2';
+    $VERSION = 'v0.6.3';
 };
 
 {
@@ -65,25 +66,30 @@ BEGIN
 sub init
 {
     my $self = shift( @_ );
-    $self->{request} = '';
-    $self->{response} = '';
-    $self->{apache_request} = '' unless( $self->{apache_request} );
-    ## Routes to endpoint to which are attached resources
-    $self->{routes} = {} unless( scalar( keys( %{$self->{routes}} ) ) );
-    $self->{api_version} = 1 if( !length( $self->{api_version} ) );
-    $self->{default_methods} = [qw( GET POST )] unless( $self->{default_methods} );
-    $self->{supported_methods} = [qw( DELETE GET HEAD OPTIONS POST PUT )] unless( $self->{supported_methods} );
+    $self->{request}                = '' unless( $self->{request} );
+    $self->{response}               = '' unless( $self->{response} );
+    $self->{apache_request}         = '' unless( $self->{apache_request} );
+    # Routes to endpoint to which are attached resources
+    $self->{routes}                 = {} unless( scalar( keys( %{$self->{routes}} ) ) );
+    $self->{api_version}            = 1 if( !length( $self->{api_version} ) );
+    $self->{default_methods}        = [qw( GET POST )] unless( $self->{default_methods} );
+    $self->{is_allowed}             = {} unless( $self->{is_allowed} && scalar( keys( %{$self->{is_allowed}} ) ) );
+    $self->{supported_methods}      = [qw( DELETE GET HEAD OPTIONS POST PUT )] unless( $self->{supported_methods} );
     $self->{supported_api_versions} = [qw( 1 )] unless( $self->{supported_api_versions} );
-    $self->{key} = '' unless( length( $self->{key} ) );
-    $self->{jwt_accepted_algo} = [] unless( length( $self->{jwt_accepted_algo} ) );
-    $self->{jwt_accepted_encoding} = [] unless( length( $self->{jwt_accepted_encoding} ) );
-    $self->{jwt_encrypt} = 1 unless( length( $self->{jwt_encrypt} ) );
-    $self->{jwt_algo} = 'HS256' unless( length( $self->{jwt_algo} ) );
-    $self->{jwt_encoding} = 'A128GCM' unless( length( $self->{jwt_encoding} ) );
-    ## 200Kb
-    $self->{compression_threshold} = 204800 unless( length( $self->{compression_threshold} ) );
-    $self->{lang} = '' unless( length( $self->{lang} ) );
-    $self->{api_uri} = '' unless( length( $self->{api_uri} ) );
+    $self->{key}                    = '' unless( length( $self->{key} ) );
+    $self->{jwt_accepted_algo}      = [] unless( length( $self->{jwt_accepted_algo} ) );
+    $self->{jwt_accepted_encoding}  = [] unless( length( $self->{jwt_accepted_encoding} ) );
+    $self->{jwt_encrypt}            = 1 unless( length( $self->{jwt_encrypt} ) );
+    $self->{jwt_algo}               = 'HS256' unless( length( $self->{jwt_algo} ) );
+    $self->{jwt_encoding}           = 'A128GCM' unless( length( $self->{jwt_encoding} ) );
+    # 200Kb
+    $self->{compression_threshold}  = 204800 unless( length( $self->{compression_threshold} ) );
+    $self->{lang}                   = '' unless( length( $self->{lang} ) );
+    $self->{api_uri}                = '' unless( length( $self->{api_uri} ) );
+    $self->{is_allowed}             = {} unless( $self->{is_allowed} && ref( $self->{is_allowed} ) eq 'HASH' );
+    # Default handlers
+    $self->{is_allowed}->{access}   = sub{ return( Apache2::Const::HTTP_OK ); } unless( exists( $self->{is_allowed}->{access} ) && ref( $self->{is_allowed}->{access} ) eq 'CODE' );
+    $self->{is_allowed}->{network}  = sub{ return( Apache2::Const::HTTP_OK ); } unless( exists( $self->{is_allowed}->{network} ) && ref( $self->{is_allowed}->{network} ) eq 'CODE' );
     $self->SUPER::init( @_ );
     if( length( $self->{api_version} ) )
     {
@@ -101,7 +107,7 @@ sub init
     return( $self );
 }
 
-sub apache_request { return( shift->_set_get_object( 'apache_request', 'Apache2::RequestRec', @_ ) ); }
+sub apache_request { return( shift->_set_get_object_without_init( 'apache_request', 'Apache2::RequestRec', @_ ) ); }
 
 sub api_uri { return( shift->_set_get_object( 'api_uri', 'URI', @_ ) ); }
 
@@ -171,6 +177,8 @@ sub bailout
 
 sub base_path { return( shift->_set_get_scalar( 'base_path', @_ ) ); }
 
+sub checkonly { return( shift->_set_get_boolean( 'checkonly', @_ ) ); }
+
 sub compression_threshold { return( shift->_set_get_number( 'compression_threshold', @_ ) ); }
 
 ## https://perl.apache.org/docs/2.0/api/APR/Base64.html#toc_C_decode_
@@ -203,6 +211,12 @@ sub decode_json
         return( $self->error( "An error occurred while trying to decode json payload: $e" ) );
     }
     return( $hash );
+}
+
+sub decode_uri
+{
+    my $self = shift( @_ );
+    return( URI::Escape::uri_unescape( shift( @_ ) ) );
 }
 
 sub decode_url
@@ -245,7 +259,8 @@ sub default_methods { return( shift->_set_get_array( 'default_methods', @_ ) ); 
 sub encode_base64
 {
     my $self = shift( @_ );
-    my $data = shift( @_ ) || return( $self->error( "No valid to base64 encode was provided." ) );
+    my $data = shift( @_ );
+    return( $self->error( "No valid to base64 encode was provided." ) ) if( !length( $data ) );
     try
     {
         return( APR::Base64::encode( $data ) );
@@ -260,7 +275,7 @@ sub encode_json
 {
     my $self = shift( @_ );
     my $hash = shift( @_ ) || return( $self->error( "No perl hash reference was provided to encode." ) );
-    return( $self->error( "Hash provided ($hash) is not a hash reference." ) ) if( ref( $hash ) ne 'HASH' );
+    return( $self->error( "Hash provided ($hash) is not a hash reference." ) ) if( !$self->_is_hash( $hash ) );
     my $json = $self->json;
     my $data;
     try
@@ -274,6 +289,11 @@ sub encode_json
     return( $data );
 }
 
+sub encode_uri
+{
+    my $self = shift( @_ );
+    return( URI::Escape::uri_escape( shift( @_ ) ) );
+}
 sub encode_url
 {
     my $self = shift( @_ );
@@ -324,6 +344,7 @@ sub generate_uuid
     }
 }
 
+## rfc 6750 https://tools.ietf.org/html/rfc6750
 sub get_auth_bearer
 {
     my $self = shift( @_ );
@@ -375,11 +396,13 @@ sub handler : method
     {
         return( Net::API::REST::Request->error->code || Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
     }
+    my $resp = Net::API::REST::Response->new( request => $req, debug => $DEBUG );
     my $self = $class->new(
         apache_request => $r,
         debug       => $DEBUG,
-        versbose    => $VERBOSE,
+        verbose     => $VERBOSE,
         request     => $req,
+        response    => $resp,
     );
     if( my $code = $self->log_handler )
     {
@@ -393,20 +416,64 @@ sub handler : method
     # $self->message( 3, "Set api uri to: ", $uri->scheme . '://' . $uri->host );
     $self->api_uri( URI->new( $uri->scheme . '://' . $uri->host ) );
     $self->message( 3, "Set api uri to: ", $self->api_uri );
+    ## Response content type
     $r->content_type( 'application/json' );
     my $json = JSON->new->relaxed->utf8;
     $self->{json} = $json;
     
-    my $resp = Net::API::REST::Response->new( request => $req, debug => $DEBUG );
-    ## No need to go further if the requested method is not supported
+    # No need to go further if the ip address is not allowed to access the REST api.
+    # Here you could check for IP ban, or whether there is enough authorisation to access the endpoint
+    my $ok_net = $self->is_allowed( 'network' );
+    if( $ok_net && ref( $ok_net ) )
+    {
+        # Get a return code, and possibly a hash containing the message property
+        my( $rc, $rdef ) = $ok_net->( $req->remote_ip );
+        if( $resp->is_error( "$rc" ) )
+        {
+            $self->message( 3, "Remote ip '", $req->remote_ip, "' is not allowed access." );
+            if( $self->_is_a( $rc, 'Net::API::REST::RC' ) )
+            {
+                return( $self->reply({ code => $rc->code, message => $rc->message }) );
+            }
+            elsif( $rdef && $self->_is_hash( $rdef ) && CORE::exists( $rdef->{message} ) )
+            {
+                return( $self->reply({ code => $rc, message => $rdef->{message} }) );
+            }
+            # Net::API::REST::reply will automatically set a json with an error message based on the user language
+            else
+            {
+                return( $self->reply({ code => $rc }) );
+            }
+        }
+    }
+    
+    # No need to go further if the requested method is not supported
     my $ok_methods = $self->supported_methods;
     my $http_meth = $req->method;
     $self->message( 3, "http method is $http_meth" );
-    if( !scalar( grep( /^$http_meth$/i, @$ok_methods ) ) )
+    if( scalar( @$ok_methods ) && !scalar( grep( /^$http_meth$/i, @$ok_methods ) ) )
     {
-        return( Apache2::Const::HTTP_METHOD_NOT_ALLOWED );
+        $self->message( 3, "Method requested '$http_meth' is not among allowed ones: '", join( "', '", @$ok_methods ), "'." );
+        # Net::API::REST::reply will automatically set a json with an error message based on the user language
+        return( $self->reply({ code => Apache2::Const::HTTP_METHOD_NOT_ALLOWED }) );
     }
-    ## Check if there is a required api version and if we support it
+    
+    # Check supported content-type
+    # Ref: <https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html>
+    my $ok_ct = $self->supported_content_types;
+    # Only the content type, ie without the charset. Example: application/json; charset=utf-8
+    my $ct = lc( $req->type );
+    $self->message( 3, "Requested content type is: '$ct'" );
+    # We check if content type is provided at all since it could be missing, such as in 
+    # a POST or GET request with no content or query
+    if( length( $ct ) && scalar( @$ok_ct ) && !scalar( grep( $ct eq $_, @$ok_ct ) ) )
+    {
+        $self->message( 3, "Content type '$ct' is not among allowed content types: '", join( "', '", @$ok_ct ), "'." );
+        # Net::API::REST::reply will automatically set a json with an error message based on the user language
+        return( $self->reply({ code => Apache2::Const::HTTP_NOT_ACCEPTABLE }) );
+    }
+    
+    # Check if there is a required api version and if we support it
     if( $req->client_api_version )
     {
         my $ok_versions = $self->supported_api_versions;
@@ -419,18 +486,20 @@ sub handler : method
                 $client_api_version_is_ok++;
             }
         }
+        $self->message( 3, "Client has requested api version '$client_version', but this is not among our supported api versions '", join( "', '", @$ok_versions ), "'." );
         return( $self->reply( Apache2::Const::HTTP_NOT_ACCEPTABLE, { error => "API version requested ($client_version) is not supported." } ) );
     }
     
-    ## Protection against DNS rebinding attacks
-    ## https://www.w3.org/TR/cors/#list-of-headers
+    # Protection against DNS rebinding attacks
+    # https://www.w3.org/TR/cors/#list-of-headers
     if( my $req_host = $req->headers( 'Host' ) )
     {
         my $req_host_uri = URI->new( $self->api_uri->scheme . '://' . $req_host );
         if( lc( $req_host_uri->host ) ne $self->api_uri->host )
         {
             $self->messagef( 3, "Request host '%s' does not match our server host name '%s'. This is a protection against attack using DNS rebinding.", $req_host_uri->host, $self->api_uri->host );
-            return( Apache2::Const::HTTP_UNAUTHORIZED );
+            # Net::API::REST::reply will automatically set a json with an error message based on the user language
+            return( $self->reply({ code => Apache2::Const::HTTP_UNAUTHORIZED }) );
         }
     }
     
@@ -450,7 +519,7 @@ sub handler : method
     }
     elsif( $http_meth eq 'HEAD' )
     {
-        ## $r->send_http_header;
+        # $r->send_http_header;
         return( Apache2::Const::HTTP_NO_CONTENT );
     }
     
@@ -469,13 +538,15 @@ sub handler : method
     {
         $self->message( 3, "Search for endpoint returned an undefined value, ie an error for uri '$uri'." );
         my $code = $self->error->code || Apache2::Const::HTTP_INTERNAL_SERVER_ERROR;
-        return( $code );
+        # Net::API::REST::reply will automatically set a json with an error message based on the user language
+        return( $self->reply({ code => $code }) );
     }
-    ## No resource found matching the user request, returning a 400
+    # No resource found matching the user request, returning a 400
     elsif( !length( $ep ) )
     {
         $self->message( 3, "No route could be found for uri '$uri'." );
-        return( Apache2::Const::HTTP_BAD_REQUEST );
+        # Net::API::REST::reply will automatically set a json with an error message based on the user language
+        return( $self->reply({ code => Apache2::Const::HTTP_BAD_REQUEST }) );
     }
     else
     {
@@ -488,23 +559,60 @@ sub handler : method
 #       my $deparse = B::Deparse->new( '-p', '-sC' );
 #       my $meth_body = $deparse->coderef2text( $ep->handler );
 #       $self->message( 3, "Deparsed code ref is: $meth_body" );
-        $self->noexec->messagef( 3, <<EOT, $handler, $ep->access, join( ', ', @{$ep->methods} ), join( ', ', @{$ep->path_info} ), $self->dumper( $ep->variables->as_hash ) );
+        $self->noexec->messagef( 3, <<EOT, $handler, $ep->access, join( ', ', @{$ep->methods} ), $ep->path, join( ', ', @{$ep->path_info} ), $self->dumper( $ep->variables->as_hash ) );
 Endpoint information:
 Handler .......: %s
 Access type ...: %s
 Ok methods ....: %s
+Path ..........: %s
 Path info .....: %s
 Variables .....: %s
 EOT
+        # Check access with handler
+        my $ok_access = $self->is_allowed( 'access' );
+        if( $ok_access && ref( $ok_access ) eq 'CODE' )
+        {
+            my( $rc, $rdef ) = $ok_access->( $ep );
+            if( $resp->is_error( "$rc" ) )
+            {
+                $self->message( 3, "User does not have the right to access this endopint '", $ep->path, "'" );
+                # Net::API::REST::reply will automatically set a json with an error message based on the user language
+                # return( $self->reply({ code => $rc }) );
+                if( $self->_is_a( $rc, 'Net::API::REST::RC' ) )
+                {
+                    return( $self->reply({ code => $rc->code, message => $rc->message }) );
+                }
+                elsif( $rdef && $self->_is_hash( $rdef ) && CORE::exists( $rdef->{message} ) )
+                {
+                    return( $self->reply({ code => $rc, message => $rdef->{message} }) );
+                }
+                # Net::API::REST::reply will automatically set a json with an error message based on the user language
+                else
+                {
+                    return( $self->reply({ code => $rc }) );
+                }
+            }
+        }
+        
         $self->message( 3, "Executing code \"$handler\" for uri \"$uri\"." );
+#         use B::Deparse;
+#         my $deparse = B::Deparse->new("-p", "-sC");
+#         my $code_body = $deparse->coderef2text( $handler );
+#         $self->message( 3, "Code to execute is:\n$code_body" );
+        
         try
         {
-            my $rc = $ep->handler->();
+            $self->message( 3, "Executing code now." );
+            # my $rc = $ep->handler->();
+            my $rc = $handler->();
             $self->message( 3, "Handler returned with code '$rc'." );
-            ## Server error
+            # Server error
             if( !defined( $rc ) )
             {
-                return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
+                # Net::API::REST::reply will automatically set a json with an error message based on the user language
+                # It is ok to set a reply ourself here, because if it were a normal response, we would not be getting an undef value
+                return( $self->reply({ code => Apache2::Const::HTTP_INTERNAL_SERVER_ERROR }) );
+                # return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
             }
             elsif( $rc == Apache2::Const::HTTP_OK )
             {
@@ -514,7 +622,7 @@ EOT
             {
                 return( $rc );
             }
-            ## Stop sending data !!
+            # Stop sending data !!
             $self->request->socket->close;
             exit( 0 );
         }
@@ -536,8 +644,8 @@ sub header_datetime
     {
         return( $self->error( "Date time provided ($dt) is not an object." ) ) if( !Scalar::Util::blessed( $_[0] ) );
         return( $self->error( "Object provided (", ref( $_[0] ), ") is not a DateTime object." ) ) if( !$_[0]->isa( 'DateTime' ) );
-        $self->message( 3, "Using the DateTime provided to us ($dt)." );
         $dt = shift( @_ );
+        $self->message( 3, "Using the DateTime provided to us ($dt)." );
     }
     $self->message( 3, "Generating a new DateTime object." ) if( !defined( $dt ) );
     $dt = DateTime->now if( !defined( $dt ) );
@@ -663,6 +771,36 @@ EOT
 ## To be overriden by module inheriting our package
 sub init_headers { return( 1 ); }
 
+# Set or get handlers for various phases to check if the user is allowed access
+# Currently available handlers: network and access
+sub is_allowed
+{
+    my $self = shift( @_ );
+    my $all  = $self->{is_allowed};
+    if( @_ )
+    {
+        return( $self->error( "Wrong number of parameters provided: '", join( "', '", @_ ), "'." ) ) if( scalar( @_ ) > 1 && !( scalar( @_ ) % 2 ) );
+        if( !( scalar( @_ ) % 2 ) )
+        {
+            while( my( $key, $code ) = splice( @_, 0, 2 ) )
+            {
+                if( $code )
+                {
+                    return( $self->error( "I was expecting a code reference for the handler '$key', but instead I got '$code'." ) ) if( ref( $code ) ne 'CODE' );
+                    $all->{ $key } = $code;
+                }
+            }
+            return( $self );
+        }
+        else
+        {
+            my $key = shift( @_ );
+            return( '' ) if( !exists( $all->{ $key } ) );
+            return( $all->{ $key } );
+        }
+    }
+}
+
 sub is_perl_option_enabled { return( shift->_try( 'request', 'is_perl_option_enabled', @_ ) ); }
 
 # sub json
@@ -674,7 +812,8 @@ sub is_perl_option_enabled { return( shift->_try( 'request', 'is_perl_option_ena
 #   }
 #   return( $self->{json} );
 # }
-## We return a new object each time, because if we cached it, some routine might set the utf8 bit flagged on while some other would not want it
+# We return a new object each time, because if we cached it, some routine might set the utf8 bit flagged on while some other would not want it
+# Also, you might wonder why use JSON::PP and not JSON::XS ? Well, JSON::XS has some issues working under Apache2 modperl
 sub json { return( JSON::PP->new->relaxed->convert_blessed ); }
 
 sub jwt_accepted_algo { return( shift->_set_get_array( 'jwt_accepted_algo', @_ ) ); }
@@ -728,7 +867,7 @@ sub jwt_decode
     ## accepted_alg => qr{^(?:PBES2\-HS256\+A128KW|HS256)$},
     if( $opts->{accepted_algo} )
     {
-        return( $self->error( "Accepted alorithm option must be an array reference." ) ) if( ref( $opts->{accepted_algo} ) ne 'ARRAY' );
+        return( $self->error( "Accepted alorithm option must be an array reference." ) ) if( !$self->_is_array( $opts->{accepted_algo} ) );
         if( scalar( @{$opts->{accepted_algo}} ) )
         {
             my $re = join( '|', @{$opts->{accepted_algo}} );
@@ -739,7 +878,7 @@ sub jwt_decode
     ## accepted_enc => qr{^(?:A128GCM)$},
     if( $opts->{accepted_enc} )
     {
-        return( $self->error( "Accepted encoding option must be an array reference." ) ) if( ref( $opts->{accepted_enc} ) ne 'ARRAY' );
+        return( $self->error( "Accepted encoding option must be an array reference." ) ) if( !$self->_is_array( $opts->{accepted_enc} ) );
         if( scalar( @{$opts->{accepted_enc}} ) )
         {
             my $re = join( '|', @{$opts->{accepted_enc}} );
@@ -768,8 +907,7 @@ sub jwt_decode
 sub jwt_encode
 {
     my $self = shift( @_ );
-    my $opts = {};
-    $opts = shift( @_ ) if( @_ && ref( $_[0] ) eq 'HASH' );
+    my $opts = $self->_get_args_as_hash( @_ );
     return( $self->error( "No encryption key was set up in our object or provided." ) ) if( !$self->key && !$opts->{key} );
     $opts->{encrypt} ||= $self->jwt_encrypt if( !length( $opts->{encrypt} ) );
     $opts->{algo} ||= $self->jwt_algo;
@@ -919,7 +1057,7 @@ sub jwt_verify
         return( $self->error( "RSA keys provided with parameter \"rsa_keys\" is not an hash reference." ) ) if( ref( $opts->{rsa_keys} ) ne 'HASH' );
         my $keys = $opts->{rsa_keys};
         return( $self->error( "No \"keys\" property found in the rsa keys provided." ) ) if( !$keys->{keys} );
-        return( $self->error( "Property \"keys\" in rsa eys provided is not an array reference (of rsa keys)." ) ) if( ref( $keys->{keys} ) ne 'ARRAY' );
+        return( $self->error( "Property \"keys\" in rsa eys provided is not an array reference (of rsa keys)." ) ) if( !$self->_is_array( $keys->{keys} ) );
         ## Check all is in order before going further
         my( $e, $n );
         $n = 0;
@@ -1018,14 +1156,15 @@ sub print
     my $r = $self->apache_request;
     my $json = $opts->{data};
     my $bytes = 0;
-    ## Before we use this, we have to make sure all Apache module that deal with content encoding are de-activated because they would interfere
+    # Before we use this, we have to make sure all Apache module that deal with content encoding are de-activated because they would interfere
     my $threshold = $self->compression_threshold || 0;
     $self->messagef( 3, "Data to be returned is %d bytes and the threshold is $threshold. Does it exceed the threshold? %s", CORE::length( $json ), ( CORE::length( $json ) > $threshold ? 'yes' : 'no' ) );
-    ## rfc1952
-    ## https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Encoding
+    # rfc1952
+    # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Encoding
     my $z;
     if( CORE::length( $json ) > $threshold && 
-        $self->request->accepted_encoding =~ /\bgzip\b/i && 
+        $self->request->accept_encoding =~ /\bgzip\b/i && 
+        $self->_load_class( 'IO::Compress::Gzip' ) && 
         ( $z = IO::Compress::Gzip->new( '-', Minimal => 1 ) ) )
     {
         $self->message( 3, "Using gzip compressed content." );
@@ -1034,19 +1173,20 @@ sub print
         # $r->content_encoding( 'gzip' );
         $self->response->content_encoding( 'gzip' );
         $self->response->headers->set( 'Content-Encoding' => 'gzip' );
-        ## Why Vary? https://blog.stackpath.com/accept-encoding-vary-important/
-        ## We use merge, because another value may already be set
+        # Why Vary? https://blog.stackpath.com/accept-encoding-vary-important/
+        # We use merge, because another value may already be set
         $self->response->headers->merge( 'Vary' => 'Accept-Encoding' );
         # $r->send_http_header;
         $z->print( $json );
         $z->close;
     }
     elsif( CORE::length( $json ) > $threshold && 
-        $self->request->accepted_encoding =~ /\bbzip2\b/i &&
+        $self->request->accept_encoding =~ /\bbzip2\b/i &&
+        $self->_load_class( 'IO::Compress::Bzip2' ) &&
         ( $z = IO::Compress::Bzip2->new( '-' ) ) )
     {
         $self->message( 3, "Using bzip2 compressed content." );
-        ## $r->content_encoding( 'bzip2' );
+        # $r->content_encoding( 'bzip2' );
         $self->response->content_encoding( 'bzip2' );
         $self->response->headers->set( 'Content-Encoding' => 'bzip2' );
         $self->response->headers->merge( 'Vary' => 'Accept-Encoding' );
@@ -1055,7 +1195,8 @@ sub print
         $z->close;
     }
     elsif( CORE::length( $json ) > $threshold && 
-        $self->request->accepted_encoding =~ /\bdeflate\b/i && 
+        $self->request->accept_encoding =~ /\bdeflate\b/i && 
+        $self->_load_class( 'IO::Compress::Deflate' ) &&
         ( $z = IO::Compress::Deflate->new( '-' ) ) )
     {
         $self->message( 3, "Using zip compressed content." );
@@ -1098,10 +1239,12 @@ sub reply
 {
     my $self = shift( @_ );
     my( $code, $ref );
+    # $self->reply( Apache2::Const::HTTP_OK, { message => "All is well" } );
     if( scalar( @_ ) == 2 )
     {
         ( $code, $ref ) = @_;
     }
+    # $self->reply({ code => Apache2::Const::HTTP_OK, message => "All is well" } );
     elsif( ref( $_[0] ) eq 'HASH' )
     {
         $ref = shift( @_ );
@@ -1109,17 +1252,11 @@ sub reply
     }
     $self->message( 3, "Code to be returned is '$code'." );
     my $r = $self->apache_request;
-    # $self->message( 2, "Got Apache request object $r" );
     if( $code !~ /^[0-9]+$/ )
     {
-        #$r->custom_response( Apache2::Const::SERVER_ERROR, "Was expecting an organisation id" );
-        #$r->status( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-        #$r->rflush;
         $self->response->code( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
         $self->response->rflush;
-        # $r->send_http_header;
-        #$r->print( $self->json->utf8->encode({ 'error' => 'An unexpected server error occured', 'code' => 500 }) );
-        $self->response->print( $self->json->utf8->encode({ 'error' => 'An unexpected server error occured', 'code' => 500 }) );
+        $self->response->print( $self->json->utf8->encode({ error => 'An unexpected server error occured', code => 500 }) );
         $self->error( "http code to be used '$code' is invalid. It should be only integers." );
         return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
     }
@@ -1128,7 +1265,7 @@ sub reply
         $self->response->code( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
         $self->response->rflush;
         # $r->send_http_header;
-        $self->response->print( $self->json->utf8->encode({ 'error' => 'An unexpected server error occured', 'code' => 500 }) );
+        $self->response->print( $self->json->utf8->encode({ error => 'An unexpected server error occured', code => 500 }) );
         $self->error( "Data provided to send is not an hash ref." );
         return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
     }
@@ -1138,7 +1275,7 @@ sub reply
     {
         $msg = $ref->{success};
     }
-    ## Maybe error is a string, or maybe it is already an error hash like { error => { message => '', code => '' } }
+    # Maybe error is a string, or maybe it is already an error hash like { error => { message => '', code => '' } }
     elsif( CORE::exists( $ref->{error} ) && !Net::API::REST::Status->is_success( $code ) )
     {
         $msg = $ref->{error};
@@ -1151,7 +1288,7 @@ sub reply
     elsif( CORE::exists( $ref->{message} ) )
     {
         $msg = $ref->{message};
-        ## We format the message like in bailout, ie { error => { message => '', code => '' } }
+        # We format the message like in bailout, ie { error => { message => '', code => '' } }
         if( $self->response->is_error( $code ) )
         {
             $ref->{error} = {} if( ref( $ref->{error} ) ne 'HASH' );
@@ -1165,12 +1302,30 @@ sub reply
             $self->message( 3, "Code '$code' is not an error code." );
         }
     }
+    elsif( $self->response->is_error( $code ) )
+    {
+        $ref->{error} = {} if( !CORE::exists( $ref->{error} ) || ref( $ref->{error} ) ne 'HASH' );
+        $ref->{error}->{code} = $code if( !CORE::length( $ref->{error}->{code} ) );
+        CORE::delete( $ref->{code} ) if( CORE::length( $ref->{code} ) );
+    }
+    
     my $frameOffset = 0;
     my $sub = ( caller( $frameOffset + 1 ) )[3];
     $frameOffset++ if( substr( $sub, rindex( $sub, '::' ) + 2 ) eq 'reply' );
     my( $pack, $file, $line ) = caller( $frameOffset );
     $sub = ( caller( $frameOffset + 1 ) )[3];
     $self->message( 2, "Returning http status with code $code, called from package $pack in file $file at line $line within sub $sub" );
+    # Without an Access-Control-Allow-Origin field, this would trigger an erro ron the web browser
+    # So we make sure it is there if not set already
+	unless( $self->response->headers->get( 'Access-Control-Allow-Origin' ) )
+	{
+        $self->response->headers->set( 'Access-Control-Allow-Origin' => '*' );
+    }
+    # As an api, make sure there is no caching by default unless the field has already been set.
+	unless( $self->response->headers->get( 'Cache-Control' ) )
+	{
+        $self->response->headers->set( 'Cache-Control' => 'private, no-cache, no-store, must-revalidate' );
+    }
     $self->response->content_type( 'application/json' );
     # $r->status( $code );
     $self->response->code( $code );
@@ -1185,13 +1340,33 @@ sub reply
         $self->response->custom_response( $code, '' );
         #$r->status( $code );
     }
-    ## We make sure the code is set
-    if( CORE::exists( $ref->{error} ) && !Net::API::REST::Status->is_success( $code ) )
+    
+    # We make sure the code is set
+    if( CORE::exists( $ref->{error} ) && !$self->response->is_success( $code ) )
     {
         $ref->{error}->{code} = $code if( ref( $ref->{error} ) eq 'HASH' && !CORE::length( $ref->{error}->{code} ) );
-        $self->messagef( 3, "Checking for a generic message for error code '$code' and language '%s'.", $self->lang_unix );
+        my $lang = $self->lang_unix;
+        $self->message( 3, "Is a language set already? '$lang'" );
+        unless( length( $lang ) )
+        {
+            $lang = $self->request->preferred_language( Net::API::REST::Status->supported_languages );
+            $self->message( 3, "No language set, guessing a suitable one: '$lang'." );
+            # $self->message( 3, "User best language match is '$lang'." );
+            # Make sure we are dealing with unix style language code
+            $lang =~ tr/-/_/;
+            if( CORE::length( $lang ) == 2 )
+            {
+                $lang = Net::API::REST::Status->convert_short_lang_to_long( $lang );
+            }
+            # We have something weird, like maybe eng?
+            elsif( $lang !~ /^[a-z]{2}_[A-Z]{2}$/ )
+            {
+                $lang = Net::API::REST::Status->convert_short_lang_to_long( substr( $lang, 0, 2 ) );
+            }
+        }
+        $self->messagef( 3, "Checking for a generic message for error code '$code' and language '%s'.", $lang );
         my $err_description;
-        if( !$ref->{error}->{error_description} && ( $err_description = $self->response->get_http_message( $code, $self->lang_unix ) ) )
+        if( !$ref->{error}->{error_description} && ( $err_description = $self->response->get_http_message( $code, $lang ) ) )
         {
             $self->message( 3, "Found error description: '$err_description'." );
             $ref->{error}->{error_description} = $err_description;
@@ -1208,7 +1383,7 @@ sub reply
     }
     
     my $json = $self->json->utf8->relaxed(0)->encode( $ref );
-    $self->message( 3, "Sending back json using encoding '", $self->response->content_encoding, "'" );
+    $self->message( 3, "Sending back json using encoding (if any) '", $self->response->content_encoding, "': $json" );
 #   try
 #   {
 #       my $bytes = $r->print( $json );
@@ -1224,7 +1399,7 @@ sub reply
 #   return( $code );
     
     
-    ## Before we use this, we have to make sure all Apache module that deal with content encoding are de-activated because they would interfere
+    # Before we use this, we have to make sure all Apache module that deal with content encoding are de-activated because they would interfere
     $self->print( $json ) || do
     {
         $self->message( 3, "Net::API::REST::print had an error." );
@@ -1256,7 +1431,7 @@ sub route
         $path =~ s/^\Q$base\E//;
     }
     my @points = split( /\/+/ , $path );
-    ## Clean up empty path
+    # Clean up empty path
     my $parts = [ grep{ length( $_ ) > 0 } @points ];
     my $client_api_version = '';
     if( $parts->[0] =~ /^v?(\d+(?:\.\d+)*)$/ )
@@ -1270,18 +1445,19 @@ sub route
     return( $self->reply( Apache2::Const::HTTP_NOT_ACCEPTABLE, { error => "API version requested ($client_api_version) is not supported." } ) ) if( !CORE::exists( $routes->{ $client_api_version } ) );
     my $req = $self->request;
     my $resp = $self->response;
-    ## Path variables like "/some/path/1234/more/thing/jack" where 1234 and jack are variables
-    ## 2019-11-13: This is set by the caller of route()
+    # Path variables like "/some/path/1234/more/thing/jack" where 1234 and jack are variables
+    # 2019-11-13: This is set by the caller of route()
     # my $vars = $req->variables;
     my $vars = {};
     my $def_methods = $self->default_methods;
-    ## Until proven otherwise; If it is set at a certain point of the path, and nowhere after, then the path below inherit its value set before like a toll gate
+    # Until proven otherwise; If it is set at a certain point of the path, and nowhere after, then the path below inherit its value set before like a toll gate
     my $access = 'public';
     local $check = sub
     {
         my( $pos, $subroutes ) = @_;
         my $part = $parts->[ $pos ];
-        ## reserved words cannot be used in path
+        $self->message( 3, "Checking route part '$part' at position '$pos'." );
+        # reserved words cannot be used in path
         return( '' ) if( $part =~ /^_(access_control|allowed_methods|handler|name|var)$/i );
         if( exists( $subroutes->{ lc( $part ) } ) )
         {
@@ -1289,8 +1465,8 @@ sub route
             ## Code reference
             if( ref( $subroutes->{ $part } ) eq 'CODE' )
             {
-                ## Do we have still more path?
-                ## If we do, we store it as variable _path_info and let the handler deal with it
+                # Do we have still more path?
+                # If we do, we store it as variable _path_info and let the handler deal with it
                 # $vars->{_path_info} = [ splice( @$parts, $pos + 1 ) ] if( $#$parts > $pos );
                 # return( $subroutes->{ $part } );
                 $self->message( 3, "Pattern #1: found a terminal endpoint for '$part'." );
@@ -1299,6 +1475,7 @@ sub route
                     methods => $def_methods,
                     variables => $vars,
                     access => $access,
+                    path => $uri,
                 );
                 $ep->path_info( [ splice( @$parts, $pos + 1 ) ] ) if( $#$parts > $pos );
                 return( $ep );
@@ -1321,36 +1498,70 @@ sub route
                         methods => ( $ref->{_allowed_methods} ? $ref->{_allowed_methods} : $def_methods ),
                         variables => $vars,
                         access => $access,
+                        path => $uri,
                     );
                     return( $ep );
                 }
                 return( $check->( $pos + 1, $ref ) );
             }
-            ## Not a code or a hash reference, so it has got to be a package name
+            # Not a code or a hash reference, so it has got to be a package name
             elsif( $subroutes->{ $part } =~ /^([^\-]+)\-\>(\S+)$/ )
             {
                 my( $cl, $meth ) = ( $1, $2 );
+                $self->message( 3, "Pattern #3: Found $cl->$meth pattern for part '$part'." );
                 try
                 {
-                    ## https://stackoverflow.com/questions/32608504/how-to-check-if-perl-module-is-available#comment53081298_32608860
-                    ## require $cl unless( defined( *{"${cl}::"} ) );
-                    my $rc = eval{ $self->_load_class( $cl ); };
-                    return( $self->error({ code => 500, message => "Unable to load class \"$cl\": $@" }) ) if( $@ );
-                    my $o = $cl->new( request => $req, response => $resp ) || return( $self->pass_error( $cl->error ) );
-                    my $code = $o->can( $meth );
+                    # https://stackoverflow.com/questions/32608504/how-to-check-if-perl-module-is-available#comment53081298_32608860
+                    # require $cl unless( defined( *{"${cl}::"} ) );
+                    $self->message( 3, "Pattern #3: Trying to load class '$cl'." );
+                    # my $rc = eval{ $self->_load_class( $cl ); };
+                    my $rc = $self->_load_class( $cl );
+                    $self->message( 3, "Pattern #3: Loading class '$cl' resulted in rc '$rc' with possible error: ", $self->error );
+                    return( $self->error({ code => 500, message => "Unable to load class \"$cl\": " . $self->error }) ) if( !defined( $rc ) );
+                    $self->message( 3, "Pattern #3: ok, class '$cl' successfully loaded." );
+                    # XXX 2021-09-05 (Jacques): This turned out to be a bad idea to check if a method exists in class, because by merely instantiating an object, it would trigger execution of code that is undesirable when running under OPTIONS, which only aims to check sanity and not actually run the query.
+                    # As it turns out $cl->can( $meth ) works just as well.
+                    # my $o = $cl->new(
+                    #    apache_request => $self->apache_request,
+                    #    debug => $self->debug,
+                    #    request => $req,
+                    #    response => $resp,
+                    #    # Pass the api object here as well
+                    #    api => $self,
+                    # ) || return( $self->pass_error( $cl->error ) );
+                    # my $code = $o->can( $meth );
+                    my $code = $cl->can( $meth );
+                    $self->message( 3, "Pattern #3: Did find method using $cl->can( $meth ) ? -> $code" );
                     return( $self->error({ code => 500, message => "Class \"$cl\" does not have a method \"$meth\"." }) ) if( !$code );
                     # return( sub{ $code->( $o, api => $self, @_ ) } );
                     $self->message( 3, "Pattern #3: found a dynamic class '$cl' and method '$meth' endpoint for '$part'." );
                     my $ep = Net::API::REST::Endpoint->new(
-                        handler => sub{ $code->( $o, api => $self, @_ ) },
+                        handler => sub
+                        {
+                            $self->message( 3, "Pattern #3: Instantiating class $cl object for api method '$meth'." );
+                            my $o = $cl->new(
+                               apache_request => $self->apache_request,
+                               debug => $self->debug,
+                               request => $req,
+                               response => $resp,
+                               # Pass the api object here as well
+                               api => $self,
+                            );
+                            $self->message( 3, "Pattern #3: Handler executed for api method '$meth' using object '$o'." );
+                            return( $self->pass_error( $cl->error ) ) if( !defined( $o ) );
+                            $self->message( 3, "Pattern #3: Executing code with method '$meth' object '$o'." );
+                            $code->( $o, api => $self, @_ );
+                        },
                         methods => $def_methods,
                         variables => $vars,
                         access => $access,
+                        path => $uri,
                     );
                     return( $ep );
                 }
                 catch( $e ) 
                 {
+                    $self->message( 3, "Pattern #3: Got here with error caught '$e'." );
                     return( $self->error({ code => 500, message => $e }) );
                 }
             }
@@ -1359,14 +1570,14 @@ sub route
                 return( $self->error({ code => 500, message => "Found an entry for path part \"$part\" ($subroutes->{ $part }), but I do not know what to do with it. If this was supposed to be a package, the syntax needs to be My::Package->my_sub" }) );
             }
         }
-        elsif( exists( $subroutes->{ '_var' } ) )
+        elsif( exists( $subroutes->{_var} ) )
         {
-            my $ref = $subroutes->{ '_var' };
+            my $ref = $subroutes->{_var};
             return( $self->error({ code => 500, message => "Found a variable, and I was expecting a hash reference, but intsead got '$ref'." }) ) if( ref( $ref ) ne 'HASH' );
             return( $self->error({ code => 500, message => "Found a variable, and I was expecting a key _name to be present in the definition hash reference, but could not find one." }) ) if( !exists( $ref->{_name} ) );
             return( $self->error({ code => 500, message => "Found a variable with name \"$ref->{_name}\" and was expecting a key _handler to be present in the definition hash reference, but could not find one." }) ) if( !exists( $ref->{_handler} ) );
             my $var_name = $ref->{_name};
-            ## For variable type to be array
+            # For variable type to be array
             if( exists( $ref->{_type} ) )
             {
                 if( lc( $ref->{_type} ) eq 'array' || $ref->{_type} eq '[]' )
@@ -1382,7 +1593,7 @@ sub route
                     }
                 }
             }
-            ## Store variable value
+            # Store variable value
             if( exists( $vars->{ $var_name } ) )
             {
                 my $prev = $vars->{ $var_name };
@@ -1394,7 +1605,7 @@ sub route
                 $vars->{ $var_name } = $part;
             }
             
-            ## We reached the end, return the handler
+            # We reached the end, return the handler
             if( $pos == $#$parts )
             {
                 $access = $ref->{_access_control} if( $ref->{_access_control} );
@@ -1407,6 +1618,7 @@ sub route
                         methods => ( $ref->{_allowed_methods} ? $ref->{_allowed_methods} : $def_methods ),
                         variables => $vars,
                         access => $access,
+                        path => $uri,
                     );
                     $ep->access( $ref->{_access_control} ) if( $ref->{_access_control} );
                     return( $ep );
@@ -1414,22 +1626,49 @@ sub route
                 elsif( $ref->{_handler} =~ /^([^\-]+)\-\>(\S+)$/ )
                 {
                     my( $cl, $meth ) = ( $1, $2 );
+                    $self->message( 3, "Pattern #5: Found $cl->$meth pattern for part '$part'." );
                     try
                     {
-                        ## https://stackoverflow.com/questions/32608504/how-to-check-if-perl-module-is-available#comment53081298_32608860
+                        # https://stackoverflow.com/questions/32608504/how-to-check-if-perl-module-is-available#comment53081298_32608860
                         # require $cl unless( defined( *{"${cl}::"} ) );
                         my $rc = eval{ $self->_load_class( $cl ); };
                         return( $self->error({ code => 500, message => "Unable to load class \"$cl\": $@" }) ) if( $@ );
-                        my $o = $cl->new( request => $req, response => $resp ) || return( $self->pass_error( $cl->error ) );
-                        my $code = $o->can( $meth );
+                        # XXX 2021-09-05 (Jacques): See above same comment for the same issue, i.e. we only need to use the class name to check if the method exists, otherwise creating an instance of the object would have undesirable consequences under OPTIONS
+                        # my $o = $cl->new(
+                        #     apache_request => $self->apache_request,
+                        #     debug => $self->debug,
+                        #     request => $req,
+                        #     response => $resp,
+                        #     # Pass the api object here as well
+                        #     api => $self,
+                        # ) || return( $self->pass_error( $cl->error ) );
+                        # my $code = $o->can( $meth );
+                        my $code = $cl->can( $meth );
+                        $self->message( 3, "Pattern #5: Did find method using $cl->can( $meth ) ? -> $code" );
                         return( $self->error({ code => 500, message => "Class \"$cl\" does not have a method \"$meth\"." }) ) if( !$code );
                         # return( sub{ $code->( $o, api => $self, @_ ) } );
                         $self->message( 3, "Pattern #5: found a dynamic endpoint with variable '$var_name' with class '$cl' and method '$meth' for '$part'." );
                         my $ep = Net::API::REST::Endpoint->new(
-                            handler => sub{ $code->( $o, api => $self, @_ ) },
+                            handler => sub
+                            {
+                                $self->message( 3, "Pattern #5: Instantiating class $cl object for api method '$meth'." );
+                                my $o = $cl->new(
+                                    apache_request => $self->apache_request,
+                                    debug => $self->debug,
+                                    request => $req,
+                                    response => $resp,
+                                    # Pass the api object here as well
+                                    api => $self,
+                                );
+                                $self->message( 3, "Pattern #5: Handler executed for api method '$meth' using object '$o'." );
+                                return( $self->pass_error( $cl->error ) ) if( !defined( $o ) );
+                                $self->message( 3, "Pattern #5: Executing code with method '$meth' object '$o'." );
+                                $code->( $o, api => $self, @_ );
+                            },
                             methods => ( $ref->{_allowed_methods} ? $ref->{_allowed_methods} : $def_methods ),
                             variables => $vars,
                             access => $access,
+                            path => $uri,
                         );
                         return( $ep );
                     }
@@ -1445,20 +1684,20 @@ sub route
             }
             return( $check->( $pos + 1, $ref ) );
         }
-        ## Empty means not found
+        # Empty means not found
         else
         {
             return( '' );
         }
     };
-    ## We return empty, not undef if nothing was found
+    # We return empty, not undef if nothing was found
     my $ep = $check->( 0, $routes->{ $client_api_version } );
-    ## An error occurred
+    # An error occurred
     if( !defined( $ep ) )
     {
         return( undef() );
     }
-    ## Nothing found
+    # Nothing found
     elsif( !length( $ep ) )
     {
         return( '' );
@@ -1477,6 +1716,8 @@ sub routes
     {
         my $hash = shift( @_ ) || return( $self->error({ code => 500, message => "No route hash reference was provided." }) );
         return( $self->error({ code => 500, message => "Routes provided ($hash) is not a hash reference." }) ) if( ref( $hash ) ne 'HASH' );
+        my $req = $self->request;
+        my $resp = $self->response;
         ## Walk through the hash to check everything is ok
         ## Returns nothing if all is ok, or self returns an error description
         local $check = sub
@@ -1489,6 +1730,7 @@ sub routes
                 {
                     if( !CORE::exists( $v->{_handler} ) )
                     {
+                        return( "The keyword '_handlers' used is mispelled. It should be '_handler'" ) if( CORE::exists( $this->{_handlers} ) );
                         return( "No handler was specified for the end point \"$k\". I was expecting a key \"_handler\" to be present." );
                     }
                     if( my $err = $check->( $v ) )
@@ -1503,7 +1745,7 @@ sub routes
                 }
                 elsif( ref( $v ) eq 'CODE' )
                 {
-                    ## We're ok
+                    # We're ok
                 }
                 elsif( $v =~ /^([^\:]+)\:{2}[^\:]+/ )
                 {
@@ -1517,18 +1759,35 @@ sub routes
                             ( $cl, $meth ) = ( $1, $2 );
                         }
                         # require $cl unless( defined( *{"${cl}::"} ) );
-                        my $rc = eval{ $self->_load_class( $cl ); };
-                        return( $self->error({ code => 500, message => "Unable to load class \"$cl\": $@" }) ) if( $@ );
-                        my $o = $cl->new( checkonly => 1 ) || return( $self->pass_error( $cl->error ) );
+                        my $rc = $self->_load_class( $cl );
+                        return( $self->error({ code => 500, message => "Unable to load class \"$cl\": ", $self->error }) ) if( !defined( $rc ) );
+                        # 2021-09-06: We do not need to instantiate an object to check if the module 'can' a method, and also this would trigger code which could lead to undesired results, because the instantiated object does not know if this is an actual query and at this stage could be missing authentication tokens to work properly. Yes, I am talking out of experience here :)
+                        #my $o = $cl->new(
+                        #    apache_request => $self->apache_request,
+                        #    debug => $self->debug,
+                        #    request => $req,
+                        #    response => $resp,
+                        #    # Pass the api object here as well
+                        #    api => $self,
+                        #    checkonly => 1
+                        #) || return( $self->pass_error( $cl->error ) );
                         if( defined( $meth ) )
                         {
-                            return( "Class \"$cl\" does not have a method \"$meth\"." ) if( !$o->can( $meth ) );
+                            return( "Class \"$cl\" does not have a method \"$meth\"." ) if( !$cl->can( $meth ) );
                         }
                     }
                     catch( $e ) 
                     {
                         return( $self->error({ code => 500, message => $e }) );
                     }
+                }
+                elsif( $k eq '_allowed_method' )
+                {
+                    return( "The keyword '_allowed_method' used is mispelled. It should be '_allowed_methods'" ) if( !CORE::exists( $this->{_allowed_methods} ) );
+                }
+                elsif( $k eq '_access_controls' )
+                {
+                    return( "The keyword '_access_controls' used is mispelled. It should be '_access_control'" ) if( !CORE::exists( $this->{_access_control} ) );
                 }
                 elsif( $k =~ /^_(allowed_methods|access_control)$/ )
                 {
@@ -1617,6 +1876,8 @@ sub supported_api_versions
     return( $self->{supported_api_versions} );
 }
 
+sub supported_content_types { return( shift->_set_get_array( 'supported_content_types', @_ ) ); }
+
 sub supported_languages { return( shift->_set_get_array( 'supported_languages', @_ ) ); }
 
 sub supported_methods { return( shift->_set_get_array( 'supported_methods', @_ ) ); }
@@ -1661,20 +1922,23 @@ sub _try
     }
 }
 
+# XXX Net::API::REST::Endpoint package
 package Net::API::REST::Endpoint;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Module::Generic );
 };
 
 sub init
 {
     my $self = shift( @_ );
-    ## ACL
+    # ACL
     $self->{access} = 'public';
     $self->{handler} = '';
     $self->{methods} = [];
+    $self->{path} = '';
     $self->{path_info} = [];
     $self->{variables} = {};
     $self->{_init_strict_use_sub} = 1;
@@ -1696,9 +1960,41 @@ sub is_method_allowed
 
 sub methods { return( shift->_set_get_array( 'methods', @_ ) ); }
 
+sub path { return( shift->_set_get_uri( 'path', @_ ) ); }
+
 sub path_info { return( shift->_set_get_array( 'path_info', @_ ) ); }
 
 sub variables { return( shift->_set_get_hash_as_object( 'variables', 'Net::API::REST::Endpoint::Variables', @_ ) ); }
+
+# XXX Net::API::REST::RC package
+package Net::API::REST::RC;
+BEGIN
+{
+    use strict;
+    use warnings;
+    use parent qw( Module::Generic );
+    use overload (
+        '""' => 'as_string',
+    );
+};
+
+sub init
+{
+    my $self = shift( @_ );
+    $self->{code}    = undef();
+    $self->{message} = undef();
+    $self->{_init_strict_use_sub} = 1;
+    $self->SUPER::init( @_ );
+    return( $self );
+}
+
+sub as_string { return( shift->{code} ); }
+
+sub code { return( shift->_set_get_number( 'code', @_ ) ); }
+
+sub message { return( shift->_set_get_scalar_as_object( 'message', @_ ) ); }
+
+sub TO_JSON { return( shift->{code} ); }
 
 1;
 
@@ -1745,6 +2041,8 @@ Net::API::REST - Framework for RESTful APIs
                 },
             },
             stripe => $self->curry::stripe,
+            # Whatever method is fine. Will call the method handle in package MyAPI::Users to handle the endpoint
+            users => 'MyAPI::Users->handle'
         };
         $self->{api_version} = 1;
         $self->{supported_api_versions} = [qw( 1 )];
@@ -1804,7 +2102,7 @@ Net::API::REST - Framework for RESTful APIs
             return( $self->reply({code => $stripe->error->code, message => $stripe->error->message }) );
         }
     
-        ## Ok, if we are here, we passed al checks
+        ## Ok, if we are here, we passed all checks
         ## Don't wait, reply ok back to Stripe so our request does not time out
         $self->response->code( Apache2::Const::HTTP_OK );
         my $json = $self->json->utf8->encode({ code => 200, success => $self->true });
@@ -1819,7 +2117,7 @@ Net::API::REST - Framework for RESTful APIs
 
 =head1 VERSION
 
-    v0.6.2
+    v0.6.3
 
 =head1 DESCRIPTION
 
@@ -1885,6 +2183,12 @@ This decode from utf8 some data into a perl structure.
 
 If an error occurs, it will return undef and set an exception that can be accessed with the B<error> method.
 
+=head2 decode_uri( $string )
+
+Provided with an uri encoded string, and this uses L<URI::Escape> to return its decoded form.
+
+See also L</encode_uri>
+
 =head2 decode_url( $string )
 
 Given a url-encoded string, this returns the decoded string
@@ -1910,6 +2214,12 @@ Given some data, this will encode it using base64 algorithm. It uses L<APR::Base
 Given a hash reference, this will encode it into a json data representation.
 
 However, this will not utf8 encode it, because this is done upon printing the data and returning it to the client.
+
+=head2 encode_uri( $string )
+
+Provided with a string, and this uses L<URI::Escape> to return an uri encoded string.
+
+See also L</decode_uri>
 
 =head2 encode_url( $string )
 
@@ -1969,7 +2279,7 @@ Finally, it will try to find a route for the endpoint sought in the incoming que
 
     /org/jp/llc/123/directors/42/profile
 
-Here the llc property has an id 123 and the directors property has an id 42. Those two variables are stored in the L<net::API::REST::Endpoint> object. This object can then be accessed with the method B<endpoint>
+Here the llc property has an id 123 and the directors property has an id 42. Those two variables are stored in the L<Net::API::REST::Endpoint> object. This object can then be accessed with the method B<endpoint>
 
 Having found a route, B<handler> calls the anonymous subroutine in charge of handling the endpoint.
 
@@ -1992,6 +2302,108 @@ If the request is an OPTIONS request, this method is called. It will do a C<pre-
 =head2 init_headers( code reference )
 
 If this is set, then L<Net::API::REST::handler> will call it.
+
+=head2 is_allowed
+
+Get or set handlers to check permission for various aspects of the api.
+
+Each handler must return a valid HTTP Status code as an L<Apache2::Cons> value and if the returned code is an error, L<Net::API::REST> will stop right there and return it to Apache. See L<Net::API::REST::Status> for more information.
+
+Currently supported handlers types are:
+
+=over 4
+
+=item I<access>
+
+This is called in L</handler> and before it runs the code associated with the endpoint.
+
+For example:
+
+    $self->is_allowed( access => sub
+    {
+        my $req = $self->request;
+        my $ep  = $self->endpoint;
+        my $ref;
+        # See: <https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html>
+        if( $ep->access eq 'restricted' )
+        {
+            if( !$req->headers->get( 'Authorization' ) || !$req->headers->get( 'X-CSRF-Token' ) )
+            {
+                return( Apache2::Const::HTTP_NOT_ACCEPTABLE );
+            }
+            elsif( !( $ref = $self->auth_check ) )
+            {
+                return( Apache2::Const::HTTP_UNAUTHORIZED );
+            }
+        }
+        # To implement the double submit security measure
+        elsif( !$req->headers->get( 'X-CSRF-Token' ) )
+        {
+            return( Apache2::Const::HTTP_NOT_ACCEPTABLE );
+        }
+    });
+
+=item I<content_type>
+
+This handler, if present, is called from L</handler> before executing the code reference associated with the endpoint.
+
+It is designed to check the content type in the request is acceptable as a security measure recommended and described in L<OWASP REST security cheat sheet|https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html>
+
+For example:
+
+    $self->is_allowed( content_type => sub
+    {
+        my $type = shift( @_ );
+        # You can also get the request content type with:
+        # my $type = $self->request->type;
+    });
+
+=item I<method>
+
+This handler, if present, is called with the request method (e.g. GET, POST, etc) to check if it is allowed.
+
+Note that C<OPTIONS> is different and should always be allowed to implement pre-flight check for L<CORS|https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS>
+
+For example:
+
+    $self->is_allowed( method => sub
+    {
+        my $meth = shift( @_ );
+        my $ok_methods = [qw( GET POST )];
+        return( Apache2::Const::HTTP_METHOD_NOT_ALLOWED ) if( !scalar( grep( $meth eq $_, @$ok_methods ) ) );
+    });
+
+Note that this is equivalent to setting the value of L</supported_methods> to an array reference with values C<GET POST>, but provides you with more granularity and control.
+
+=item I<network>
+
+This is called very early in L</handler> and is designed to check if the user's ip is authorised to access the api.
+
+The handler is called with the remote ip address as a string.
+
+This could be a good opportunity to check for api abuse and throttling.
+
+For example:
+
+    $self->is_allowed( network => sub
+    {
+        my $ip = shift( @_ );
+        if( $self->is_banned( $ip ) )
+        {
+            return( Apache2::Const::HTTP_FORBIDDEN );
+        }
+        elsif( $self->is_throttled( $ip ) )
+        {
+            return( Apache2::Const::HTTP_TOO_MANY_REQUESTS );
+        }
+        else
+        {
+            # returning Apache2::Const::OK would work too although it is not the same value
+            return( Apache2::Const::HTTP_OK );
+        }
+    });
+
+=back
 
 =head2 is_perl_option_enabled()
 
@@ -2129,7 +2541,11 @@ Returns the L<Net::API::REST::Response> object. This object is set early during 
 
 =head2 route( URI object )
 
-Given an uri, this will find the route for the endpoint sought. If nothing found, it will return an empty string.
+Given an uri, this will find the route for the endpoint sought and return and L<Net::API::REST::Endpoint> object.
+If nothing found, it will return an empty string.
+If there was an error, it will return C<undef> and set an error object that can be retrieved with the inherited L<Module::Generic/error> method. The error object will also contain a C<code> attribute which will represent an http status code.
+
+L</route> is called from L</handler> to get the endpoint object and related handler, then calls the handler after performing a number of operations. See L</handler> for more information.
 
 Otherwise, a L<Net::API::REST::Endpoint> is returned.
 
@@ -2197,6 +2613,10 @@ Returns an array reference of the methods allowed for this endpoint.
 
 Returns a string for this path info, if any.
 
+=head2 supported_content_types
+
+Sets or gets an array of supported content types
+
 =head2 variables()
 
 Returns a hash reference of name => value pairs for the variables found in the endpoint sought by in the http request. For example:
@@ -2211,15 +2631,17 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 CPAN ID: jdeguest
 
-https://git.deguest.jp/jack/Net-API-REST
+https://gitlab.com/jackdeguest/Net-API-REST
 
 =head1 SEE ALSO
+
+L<Net::API::REST::Cookie>, L<Net::API::REST::DateTime>, L<Net::API::REST::JWT>, L<Net::API::REST::Endpoint>, L<Net::API::REST::Query>, L<Net::API::REST::Request>, L<Net::API::REST::Request::Params>, L<Net::API::REST::Request::Upload>, L<Net::API::REST::Response>, L<Net::API::REST::Status>
 
 L<Apache2::Request>, L<Apache2::RequestRec>, L<Apache2::RequestUtil>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2018-2021 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

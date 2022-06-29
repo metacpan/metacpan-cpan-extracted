@@ -1,4 +1,4 @@
-# Copyright 2018 Jeffrey Kegler
+# Copyright 2022 Jeffrey Kegler
 # This file is part of Marpa::R2.  Marpa::R2 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
@@ -14,16 +14,9 @@
 # http://www.gnu.org/licenses/.
 
 # Temporary
-^ada[.]before$
-^sl_ada[.]t$
+^sl_lib116[.]t$
 ^meta_to_asf[.]pl$
-^marpa-problem[.]pl$
-^code[.]errs$
-^dist[.]errs$
-^modulo_AHFA[.]out$
-^bracket.t$
-^discard.t$
-^sl_evsyn2.t$
+^again.t$
 
 # Permanent
 

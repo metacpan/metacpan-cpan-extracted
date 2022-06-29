@@ -221,8 +221,6 @@ DATA blocks, and it defaults to being configured for POD blocks.
 
   @@ end
 
-=cut
-
 =head2 DATA syntax (nested)
 
   __DATA__
@@ -240,8 +238,6 @@ DATA blocks, and it defaults to being configured for POD blocks.
   +@@ end
 
   @@ end
-
-=cut
 
 =head2 POD syntax
 
@@ -273,8 +269,6 @@ DATA blocks, and it defaults to being configured for POD blocks.
 
   =cut
 
-=cut
-
 =head2 POD syntax (nested)
 
   # pod syntax (nested)
@@ -293,8 +287,6 @@ DATA blocks, and it defaults to being configured for POD blocks.
   previous section demonstrating the topic, obviously from said section.
 
   =cut
-
-=cut
 
 =cut
 
@@ -545,19 +537,5 @@ I<Since C<0.01>>
   # bless({ etag  => '@@ end', from  => 'data', stag  => '@@ ', ... }, "Venus::Data")
 
 =back
-
-=cut
-
-=head1 AUTHORS
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
-
-=head1 LICENSE
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
 
 =cut

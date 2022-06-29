@@ -1,14 +1,7 @@
 Revision history for Perl module HTTP::Promise
 
-v0.1.13 2022-06-20T06:49:24Z +0900
+v0.1.1 2022-06-28T06:38:36+0900
+    - Remove dependency on curry
 
-v0.1.12 2022-05-24T20:40:30Z +0900
-
-v0.1.11 2022-05-24T20:39:00Z +0900
-
-v0.1.8 2022-04-22T17:37:52Z +0900
-
-v0.1.7 2022-04-19T17:12:36Z +0900
-
-v0.1.0 2021-05-02T08:38:40Z
-    - original version; created by ExtUtils::ModuleMaker 0.63
+v0.1.0 2022-06-27T23:01:44+0900
+    - Initial release

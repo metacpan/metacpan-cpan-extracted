@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Duck::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Duck::VERSION   = '1.012005';
+	$Type::Tiny::Duck::VERSION   = '1.014000';
 }
 
 $Type::Tiny::Duck::VERSION =~ tr/_//d;
@@ -79,7 +79,7 @@ sub _build_inlined {
 			? qq{ Scalar::Util::blessed($var) and not do { my \$tmp = $var; grep(!\$tmp->can(\$_), qw/@methods/) } }
 			: qq{ Scalar::Util::blessed($var) and not grep(!$var->can(\$_), qw/@methods/) };
 			
-		return qq{do { package Type::Tiny; use Scalar::Util (); $code }}
+		return qq{do { $Type::Tiny::SafePackage use Scalar::Util (); $code }}
 			if $Type::Tiny::AvoidCallbacks;
 		return "$xsub\($var\)"
 			if $xsub;
@@ -234,7 +234,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2021 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2022 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

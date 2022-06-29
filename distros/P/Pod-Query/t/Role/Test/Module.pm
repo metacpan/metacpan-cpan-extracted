@@ -2,11 +2,20 @@
 
 package Role::Test::Module;
 
-use Mojo::Base -role;
 use Test::More;
+use Role::Tiny;
+use feature qw(say);
 
-use feature    qw(say);
-use Mojo::Util qw(dumper);
+sub _dumper {
+    require Data::Dumper;
+    say Data::Dumper
+      ->new( [@_] )
+      ->Terse( 1 )
+      ->Indent( 1 )
+      ->Sortkeys( 1 )
+      ->Purity( 1 )
+      ->Dump;
+}
 
 requires qw(
   lol
@@ -17,8 +26,15 @@ requires qw(
   define_find_cases
 );
 
+sub new {
+    my ( $class ) = @_;
+    say "$class";
+    bless {}, $class;
+}
+
 sub run {
-    my ( $obj, %parms ) = @_;
+    my ( $test_class, %parms ) = @_;
+    my $obj = new( $test_class );
 
     use_ok( "Pod::Query" ) || print "Bail out!\n";
     diag( "Testing Pod::Query $Pod::Query::VERSION, Perl $], $^X" );
@@ -115,7 +131,7 @@ sub run {
 
         my $struct = Pod::Query->_query_string_to_struct( $find );
 
-        say dumper $struct
+        say _dumper $struct
           unless is_deeply(
             $struct,
             $case->{expected_struct},
@@ -135,7 +151,7 @@ sub run {
         {
             local $Pod::Query::DEBUG_FIND = 1 if $debug eq "find";
             my @list_find = $query->find( $find );
-            say dumper \@list_find
+            say _dumper \@list_find
               unless is_deeply( \@list_find, $expected, "$name - list context",
               );
         };

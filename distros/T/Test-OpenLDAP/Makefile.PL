@@ -28,12 +28,35 @@ WriteMakefile(
     AUTHOR              => q{David Dick <ddick@cpan.org>},
     VERSION_FROM        => 'lib/Test/OpenLDAP.pm',
     ABSTRACT_FROM       => 'lib/Test/OpenLDAP.pm',
-    ($ExtUtils::MakeMaker::VERSION >= 6.3002
-      ? ('LICENSE'=> 'perl')
-      : ()),
+    ( $ExtUtils::MakeMaker::VERSION >= 6.3002
+        ? ( 'LICENSE' => 'perl' )
+        : () ),
+    (
+        $ExtUtils::MakeMaker::VERSION >= 6.48
+        ? ( 'MIN_PERL_VERSION' => '5.006' )
+        : ()
+    ),
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources   => {
+            repository => {
+                url  => 'https://github.com/david-dick/test-openldap',
+                web  => 'https://github.com/david-dick/test-openldap',
+                type => 'git',
+            },
+            bugtracker => {
+                web => 'https://github.com/david-dick/test-openldap/issues'
+            },
+        },
+    },
     PL_FILES            => {},
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker' => 0,
+    },
+    TEST_REQUIRES => {
+        'Test::More'  => 0,
+    },
     PREREQ_PM => {
-        'Test::More' => 0,
 	'Config' => 0,
 	'POSIX' => 0,
 	'Data::UUID' => 0,

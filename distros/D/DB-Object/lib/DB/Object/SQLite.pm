@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/SQLite.pm
-## Version v0.400.5
+## Version v0.400.6
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2021/08/20
+## Modified 2021/08/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -36,7 +36,7 @@ BEGIN
     use Nice::Try;
     our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
     our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH );
-    $VERSION     = 'v0.400.5';
+    $VERSION     = 'v0.400.6';
     use Devel::Confess;
 };
 
@@ -704,7 +704,7 @@ sub _connection_parameters
     my $param = shift( @_ );
     # Even though login, password, server, host are not used, I was hesitating, but decided to leave them as ok, and ignore them
     # Or maybe should I issue an error when they are provided?
-    my $core = [qw( db login passwd host port driver database server opt uri debug )];
+    my $core = [qw( db login passwd host port driver database server opt uri debug cache_connections )];
     my @sqlite_params = grep( /^sqlite_/, keys( %$param ) );
     # See DBD::SQLite for the list of valid parameters
     # E.g.: sqlite_open_flags sqlite_busy_timeout sqlite_use_immediate_transaction sqlite_see_if_its_a_number sqlite_allow_multiple_statements sqlite_unprepared_statements sqlite_unicode sqlite_allow_multiple_statements sqlite_use_immediate_transaction
@@ -1317,6 +1317,10 @@ DB::Object::SQLite - DB Object SQLite Driver
     # Now dump the result to a file
     $login->select->dump( "my_file.txt" );
     
+=head1 VERSION
+
+    v0.400.6
+
 =head1 DESCRIPTION
 
 This package inherits from L<DB::Object>, so any method not here, but there you can use.
@@ -1645,6 +1649,10 @@ This is an inherited method from L<DB::Object/enhance>
 Provided with a table name and a function name and this will call L<DB::SQLite> passing it the table name and the function name.
 
 It returns the value received from the function call.
+
+=head2 get_sql_type
+
+Provided with a data type as a string and this returns a SQLite constant suitable to be passed to L<DBI/bind_param>
 
 =head2 having
 

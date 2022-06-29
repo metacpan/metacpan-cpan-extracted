@@ -45,6 +45,7 @@ sub init
     $self->{limit}          = [] unless( CORE::exists( $self->{limit} ) );
     $self->{local}          = {} unless( CORE::exists( $self->{local} ) );
     $self->{order_by}       = '' unless( CORE::exists( $self->{order_by} ) );
+    $self->{prepare_options}= {} unless( CORE::exists( $self->{prepare_options} ) );
     $self->{reverse}        = '' unless( CORE::exists( $self->{reverse} ) );
     $self->{sorted}         = [] unless( CORE::exists( $self->{sorted} ) );
     $self->{table_alias}    = '' unless( CORE::exists( $self->{table_alias} ) );
@@ -251,26 +252,26 @@ sub format_statement
                 if( $bind )
                 {
                     push( @$binded, $value );
-                    $self->binded_types->push( '' );
                     push( @format_values, $self->format_from_epoch({ value => $value, bind => 1 }) );
                 }
                 else
                 {
                     push( @format_values, $self->format_from_epoch({ value => $value, bind => 0 }) );
                 }
+                $self->binded_types->push( '' );
             }
             elsif( exists( $unixtime->{ $_ } ) )
             {
                 if( $bind )
                 {
                     push( @$binded, $value );
-                    $self->binded_types->push( '' );
                     push( @format_values, $self->format_to_epoch({ value => $value, bind => 1 }) );
                 }
                 else
                 {
                     push( @format_values, $self->format_to_epoch({ value => $value, bind => 0 }) );
                 }
+                $self->binded_types->push( '' );
             }
             elsif( ref( $value ) eq 'SCALAR' )
             {
@@ -815,6 +816,11 @@ sub insert
         $self->message( 3, "Fields formatted are: '$fields' and values are '$values'." );
         ## $self->{binded_values} = $db_data->{binded_values};
     }
+    
+    if( $data && $self->_is_hash( $data ) && $self->binded_types->length )
+    {
+        warn( "You have passed arguments to this insert as hash reference, and you are using placeholders. Using placeholders requires fixed order of arguments which an hash reference cannot guarantee. This will potentially lead to error when executing the query. I recommend you switch to an array of arguments instead, i.e. from { field1 => value1, field2 => value2 } to ( field1 => value1, field2 => value2 )\n" );
+    }
     $self->messagef( 3, "%d binded types set in insert.", $self->binded_types->length );
     my $clauses = $self->_query_components( 'insert' );
     my @query = ( $select ? "INSERT INTO $table $select" : "INSERT INTO $table ($fields) VALUES($values)" );
@@ -896,6 +902,8 @@ sub new_clause
 }
 
 sub order { return( shift->_group_order( 'order', 'order_by', @_ ) ); }
+
+sub prepare_options { return( shift->_set_get_hash_as_mix_object( 'prepare_options', @_ ) ); }
 
 sub query { return( shift->_set_get_scalar( 'query', @_ ) ); }
 
@@ -1770,7 +1778,37 @@ sub _where_having
                             type => 'where',
                         );
                         $self->message( 3, "Is field binded? ", $f->binded ? 'yes' : 'no' );
-                        $cl->bind->types( '' ) if( $f->binded );
+                        # $cl->bind->types->push( '' ) if( $f->binded );
+                        if( $f->binded )
+                        {
+                            my $const = $f->field->constant->constant;
+                            $self->message( 3, "Found constant '$const' (", $f->field->constant->name, ") for field '", $f->field->name, "'." );
+                            if( $const )
+                            {
+                                $cl->bind->types->push( $const );
+                            }
+                            else
+                            {
+                                $self->message( 3, "No constant found for field '", $f->field->constant->name, "', adding blank to let the driver guess." );
+                                $cl->bind->types->push( '' );
+                            }
+                        }
+#                         if( $f->binded )
+#                         {
+#                             $f->types->foreach(sub
+#                             {
+#                                 my $f_type = shift( @_ );
+#                                 # Change this from data type string to a driver constant
+#                                 if( $f_type )
+#                                 {
+#                                     $cl->bind->types->push( $self->database_object->get_sql_type( $f_type ) );
+#                                 }
+#                                 else
+#                                 {
+#                                     $cl->bind->types->push( '' );
+#                                 }
+#                             });
+#                         }
                         push( @list, $cl );
                         
                         # If this field value assignment is followed (as a pair) by just a regular field, this is likely a typo.
@@ -1961,7 +1999,7 @@ sub _where_having
                         }
                         else
                         {
-                            $cl->bind->types( '' );
+                            $cl->bind->types( '' ) if( $value eq '?' );
                         }
                         CORE::push( @list, $cl );
                     }
@@ -2243,6 +2281,10 @@ It will refuse to prepare the query if no C<where> clause has been defined, as t
 If this method is called in void, this will execute the query.
 
 It returns the newly created statement handler as a L<DB::Object::Statement>
+
+=head2 enhance
+
+Enable or disable enhancement mode.
 
 =head2 final
 
@@ -2535,9 +2577,31 @@ Provided with a list of parameter and this will format the C<order> clause by ca
 
 It returns a new L<DB::Object::Query::Clause> object.
 
+=head2 prepare_options
+
+Sets or gets the options that will be used in L<DB::Object/_cache_this>, which is taked with preparing statement when they are not already cached.
+
+This method basically handles an hash reference of properties set by L<DB::Object::Query> and their inheriting packages. Currently only PostgreSQL makes use of this with L<DB::Object::Postgres::Query/dollar_placeholder> and L<DB::Object::Postgres::Query/server_prepare>
+
 =head2 query
 
 Sets or gets the query string. It returns whatever is set as a regular string.
+
+=head2 query_reset
+
+Reset the query object to its nominal value so it can be re-used.
+
+=head2 query_reset_core_keys
+
+Returns an L<Module::Generic::Array> object of core object properties shared with inheriting package.
+
+Those are used to know what properties to reset.
+
+=head2 query_reset_keys
+
+Returns an L<Module::Generic::Array> object of object properties shared with inheriting package.
+
+This contains driver specific properties and together with the ones provided with L</query_reset_core_keys>, they form a whole.
 
 =head2 query_type
 

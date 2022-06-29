@@ -1,5 +1,5 @@
 # Created: Tue 27 Aug 2013 06:12:39 PM IDT
-# Last Changed: Mon 23 Sep 2013 09:00:25 AM IDT
+# Last Changed: Tue 28 Jun 2022 09:50:42 PM IDT
 
 use 5.10.0;
 use warnings;
@@ -8,7 +8,7 @@ use strict;
 
 package Text::Bidi::Array::Long;
 # ABSTRACT: Dual-life long arrays
-$Text::Bidi::Array::Long::VERSION = '2.16';
+$Text::Bidi::Array::Long::VERSION = '2.17';
 
 use Carp;
 
@@ -23,8 +23,8 @@ BEGIN {
 
     if ( $Config{'byteorder'} % 10 == 1 ) {
         # big-endian
-        *big_to_native = sub { @_ };
-        *native_to_big = sub { @_ };
+        *big_to_native = sub { wantarray ? @_ : $_[0] };
+        *native_to_big = sub { wantarray ? @_ : $_[0] };
     } else {
         *big_to_native = sub { unpack('L*', pack('N*', @_)) };
         *native_to_big = sub { unpack('N*', pack('L*', @_)) };
@@ -71,7 +71,7 @@ Text::Bidi::Array::Long - Dual-life long arrays
 
 =head1 VERSION
 
-version 2.16
+version 2.17
 
 =head1 SYNOPSIS
 

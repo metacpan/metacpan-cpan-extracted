@@ -1,14 +1,27 @@
 Revision history for Perl module Net::API::REST
 
-0.6.2 2020-12-11T20:15:03+0900
+v0.6.3 2022-06-28T19:59:22+0900
+    - Added method is_allowed() in Net::API::REST to check early on if an ip is allowed to access the REST api.
+    - Added documentation and added Apache constants to Net::API::REST::Status
+    - Added methods escape, unescape, uri_escape and uri_unescape in Net::API::REST::Response
+    - Added handlers to check allowance for various attributes, such as network, api access before calling endpoint code
+    - Added check for request content-type if provided against supported content-type. See <https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html>
+    - Added an option to set a size limit for payload sent to the server using the perl option Net_API_REST_MAX_SIZE in Apache configuration. See data method in Net::API::REST::Request.
+    - Minor improvement to accept array as object in Net::API::REST, Net::API::REST::Request and Net::API::REST::Response
+    - Improvement in print() in autoloading data-compressing library
+    - Added package Net::API::REST::RC to represent a return code and message
+    - Updated route() and routes() to check for method capability only using class ( $cl->can( $meth) ) rather than object
+    - Added methods parse_date, str2datetime, str2time, time2datetime, time2str pointing to their equivalent in Net::API::REST::DateTime for backward compatibility
+
+v0.6.2 2020-12-11T20:15:03+0900
     - Modified jwt_encode to allow to pass additional parameters accepted by Net::API::REST::JWT::jwt_encode
     - Updated the as_string method in Net::API::REST::Cookies which required a domain to be set
     - Added methods acceptable, dnt, document_uri, gateway_interface, is_secure, mod_perl, mod_perl_version, redirect_error_notes, redirect_query_string, redirect_status, redirect_url, remote_port, request_uri, script_filename, script_name, script_uri, script_url, server_addr, server_protocol, server_signature and server_software to Net::API::REST::Request
     - Correcting an inaccurate, albeit working, call to Encode in encode_utf8 and decode_utf8 in Net::API::REST
 
-0.6.1 2020-10-07T23:22:04+0900
+v0.6.1 2020-10-07T23:22:04+0900
 
-0.6.0 2020-06-15T00:13:42+0900
+v0.6.0 2020-06-15T00:13:42+0900
     - Added Net::API::REST::Request::Params and Net::API::Rest::Request::Upload to handle uploaded data and provide full access to the underlying Apache APR::Request methods
     - Added method decode and encode for url-encoded data in Net::API::REST::Request and Net::API::REST::Response and decode_url and encode_url to Net::API::REST
     - Added new method apr for easy access to Net::API::REST::Request::Params
@@ -16,32 +29,32 @@ Revision history for Perl module Net::API::REST
     - Added method uploads to return an array reference of all Net::API::REST::Request::Upload object matching upload fields
     - Added method subnet_of to check if current connection socket address is a subnet of the provided ip or block of ips
 
-0.5.9 2020-06-13T16:51:22+0900
+v0.5.9 2020-06-13T16:51:22+0900
     - Implemented Net::API::REST::Query to implement a workaround to URI::Query version 0.16 bug RT #132815 for its lack of utf8 decoding on query strings.
 
-0.5.8 2020-06-13T15:54:57+0900
+v0.5.8 2020-06-13T15:54:57+0900
     - Updated Net::API::REST::Request to implement a workaround to URI::Query version 0.16 bug RT #132815 for its lack of utf8 decoding on query strings.
 
-0.5.7 2020-06-04T09:35:53+0900
+v0.5.7 2020-06-04T09:35:53+0900
     - Added method args in Net::API::REST::Request for convenience with Apache2::Request args method for those used to call it.
 
-0.5.6 2020-05-21T08:04:00+0900
+v0.5.6 2020-05-21T08:04:00+0900
     - Change from TryCatch to Nice::Try because TryCatch got broken with release of Devel::Declare version 0.006020
 
-0.5.5 2020-05-16T18:33:00+0900
+v0.5.5 2020-05-16T18:33:00+0900
     - Making minor corrections
     - Changing version numbering
     - Requiring Devel::Declare maximum version 0.006019 because more recent version breaks TryCatch
 
-0.5.4 2020-04-14T16:42:00+0900
+v0.5.4 2020-04-14T16:42:00+0900
 
-0.5.3 2020-03-26T15:17:00+0900
+v0.5.3 2020-03-26T15:17:00+0900
 
-0.5.2 2019-12-13T19:41:00+0900
+v0.5.2 2019-12-13T19:41:00+0900
 
-0.5.1 2020-12-11T23:24:00+0900
+v0.5.1 2020-12-11T23:24:00+0900
 
-0.4.0 2019-11-13T16:25:43+0900
+v0.4.0 2019-11-13T16:25:43+0900
 
-0.1.0 2019-09-07T13:55:17+0900
+v0.1.0 2019-09-07T13:55:17+0900
     - original version; created by ExtUtils::ModuleMaker 0.63

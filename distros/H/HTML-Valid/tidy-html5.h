@@ -1011,7 +1011,8 @@ extern "C" {
     FN(VENDOR_SPECIFIC_CHARS)         \
     FN(WHITE_IN_URI)                  \
     FN(XML_DECLARATION_DETECTED)      \
-    FN(XML_ID_SYNTAX)
+    FN(XML_ID_SYNTAX)                 \
+    FN(BLANK_TITLE_ELEMENT)
 
 
 /** These are report messages added by Tidy's accessibility module. 
@@ -1339,7 +1340,7 @@ typedef enum
     TidyLiteralAttribs,          /**< If true attributes may use newlines */
     TidyLogicalEmphasis,         /**< Replace i by em and b by strong */
     TidyLowerLiterals,           /**< Folds known attribute values to lower case */
-    TidyMakeBare,                /**< Make bare HTML: remove Microsoft cruft */
+    TidyMakeBare,                /**< Replace smart quotes, em dashes, etc with ASCII */
     TidyMakeClean,               /**< Replace presentational clutter by style rules */
     TidyMark,                    /**< Add meta element indicating tidied doc */
     TidyMergeDivs,               /**< Merge multiple DIVs */
@@ -1386,7 +1387,7 @@ typedef enum
     TidyWrapAttVals,             /**< Wrap within attribute values */
     TidyWrapJste,                /**< Wrap within JSTE pseudo elements */
     TidyWrapLen,                 /**< Wrap margin */
-    TidyWrapPhp,                 /**< Wrap within PHP pseudo elements */
+    TidyWrapPhp,                 /**< Wrap consecutive PHP pseudo elements */
     TidyWrapScriptlets,          /**< Wrap within JavaScript string literals */
     TidyWrapSection,             /**< Wrap within <![ ... ]> section tags */
     TidyWriteBack,               /**< If true then output tidied markup */
@@ -1723,6 +1724,7 @@ typedef enum
   TidyTag_TIME,          /**< TIME */
   TidyTag_TRACK,         /**< TRACK */
   TidyTag_VIDEO,         /**< VIDEO */
+  TidyTag_SLOT,          /**< SLOT */
 
   N_TIDY_TAGS            /**< Must be last */
 } TidyTagId;
@@ -1938,6 +1940,7 @@ typedef enum
   TidyAttr_MAX,                    /**< MAX= */
   TidyAttr_MEDIAGROUP,             /**< MEDIAGROUP= */
   TidyAttr_MIN,                    /**< MIN= */
+  TidyAttr_MUTED,                  /**< MUTED= */
   TidyAttr_NOVALIDATE,             /**< NOVALIDATE= */
   TidyAttr_OPEN,                   /**< OPEN= */
   TidyAttr_OPTIMUM,                /**< OPTIMUM= */
@@ -1993,6 +1996,7 @@ typedef enum
   TidyAttr_OnWAITING,              /**< OnWAITING= */
   TidyAttr_PATTERN,                /**< PATTERN= */
   TidyAttr_PLACEHOLDER,            /**< PLACEHOLDER= */
+  TidyAttr_PLAYSINLINE,            /**< PLAYSINLINE= */
   TidyAttr_POSTER,                 /**< POSTER= */
   TidyAttr_PRELOAD,                /**< PRELOAD= */
   TidyAttr_PUBDATE,                /**< PUBDATE= */
@@ -2071,7 +2075,25 @@ typedef enum
   TidyAttr_AS,                     /**< AS= */
    
   TidyAttr_XMLNSXLINK,             /**< svg xmls:xlink="url" */
+  TidyAttr_SLOT,                   /**< SLOT= */
+  TidyAttr_LOADING,                /**< LOADING= */
    
+  /* SVG paint attributes (SVG 1.1) */
+  TidyAttr_FILL,                   /**< FILL= */
+  TidyAttr_FILLRULE,               /**< FILLRULE= */
+  TidyAttr_STROKE,                 /**< STROKE= */
+  TidyAttr_STROKEDASHARRAY,        /**< STROKEDASHARRAY= */
+  TidyAttr_STROKEDASHOFFSET,       /**< STROKEDASHOFFSET= */
+  TidyAttr_STROKELINECAP,          /**< STROKELINECAP= */
+  TidyAttr_STROKELINEJOIN,         /**< STROKELINEJOIN= */
+  TidyAttr_STROKEMITERLIMIT,       /**< STROKEMITERLIMIT= */
+  TidyAttr_STROKEWIDTH,            /**< STROKEWIDTH= */
+  TidyAttr_COLORINTERPOLATION,     /**< COLORINTERPOLATION= */
+  TidyAttr_COLORRENDERING,         /**< COLORRENDERING= */
+  TidyAttr_OPACITY,                /**< OPACITY= */
+  TidyAttr_STROKEOPACITY,          /**< STROKEOPACITY= */
+  TidyAttr_FILLOPACITY,            /**< FILLOPACITY= */
+
   N_TIDY_ATTRIBS                   /**< Must be last */
 } TidyAttrId;
 
@@ -2726,10 +2748,10 @@ TIDY_EXPORT int TIDY_CALL         tidySetOutCharEncoding(TidyDoc tdoc,  /**< The
  ** @note In general, you should expect that options you set should stay set.
  **       This isn't always the case, though, because Tidy will adjust options
  **       for internal use during the lexing, parsing, cleaning, and printing
- **       phases, but will restore them after the printing process. If you
- **       require access to user configuration values at any time between the
- **       tidyParseXXX() process and the tidySaveXXX() process, make sure to
- **       keep your own copy.
+ **       phases. If you require access to user configuration values at any
+ **       time after the tidyParseXXX() process, make sure to keep your own
+ **       copy, or use tidyOptResetToSnapshot() when you no longer need to
+ **       use any other tidy functions.
  ** @{
  ******************************************************************************/
 
@@ -3746,7 +3768,9 @@ TIDY_EXPORT int TIDY_CALL         tidyParseFile(TidyDoc tdoc,    /**< The tidy d
  */
 TIDY_EXPORT int TIDY_CALL         tidyParseStdin( TidyDoc tdoc );
 
-/** Parse markup in given string.
+/** Parse markup in given string. Note that the supplied string is of type
+ ** `ctmbstr` based on `char` and therefore doesn't support the use of
+ ** UTF-16 strings. Use `tidyParseBuffer()` if parsing multibyte strings.
  ** @result Returns the highest of `2` indicating that errors were present in
  **         the document, `1` indicating warnings, and `0` in the case of
  **         everything being okay.
@@ -4092,7 +4116,8 @@ TIDY_EXPORT Bool TIDY_CALL tidyNodeHasText(TidyDoc tdoc, /**< The document to qu
                                            TidyNode tnod /**< The node to query. */
                                            );
 
-/** Gets the text of a node and places it into the given TidyBuffer.
+/** Gets the text of a node and places it into the given TidyBuffer. The text will be terminated with a `TidyNewline`.
+ ** If you want the raw utf-8 stream see `tidyNodeGetValue()`.
  ** @result Returns a bool indicating success or not.
  */
 TIDY_EXPORT Bool TIDY_CALL tidyNodeGetText(TidyDoc tdoc,   /**< The document to query. */
@@ -4545,15 +4570,5 @@ void TagAttributes (unsigned int tag_id, unsigned int version, const char** yes_
 
 #line 94 "/usr/home/ben/projects/html-valid/tools/../extra.c"
 void TagAllAttributes (const char** yes_no);
-
-#line 102 "/usr/home/ben/projects/html-valid/tools/../extra.c"
-
-#if 0
- void get_option_doc (TidyOptionId ti, const char** doc, const TidyOptionId** xrefs);
-
-#line 119 "/usr/home/ben/projects/html-valid/tools/../extra.c"
-void reset_doc (TidyDoc tdoc);
-
-#endif /* 0 */
 
 #endif /* CFH_EXTRA_H */

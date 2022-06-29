@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::AUTHORITY  = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION    = '1.012005';
+	$Type::Tiny::VERSION    = '1.014000';
 	$Type::Tiny::XS_VERSION = '0.016';
 }
 
@@ -20,6 +20,8 @@ $Type::Tiny::XS_VERSION =~ tr/_//d;
 
 use Scalar::Util qw( blessed );
 use Types::TypeTiny ();
+
+our $SafePackage = sprintf 'package %s;', __PACKAGE__;
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
@@ -797,7 +799,8 @@ sub validate_explain {
 		my $deep = $self->parent->deep_explanation->( $self, $value, $varname );
 		return [ $message, @$deep ] if $deep;
 	}
-	
+
+	local $SIG{__WARN__} = sub {};
 	return [
 		$message,
 		sprintf( '"%s" is defined as: %s', $self, $self->_perlcode )
@@ -877,7 +880,7 @@ sub inline_check {
 	}
 	my $r = join " && " => map {
 		/[;{}]/ && !/\Ado \{.+\}\z/
-			? "do { package Type::Tiny; $_ }"
+			? "do { $SafePackage $_ }"
 			: "($_)"
 	} @r;
 	return @r == 1 ? $r : "($r)";
@@ -928,8 +931,8 @@ sub inline_assert {
 	} #/ else [ if ( $typevarname ) ]
 	
 	$do_wrapper
-		? qq[do { no warnings "void"; package Type::Tiny; $inline_check or $inline_throw; $varname };]
-		: qq[     no warnings "void"; package Type::Tiny; $inline_check or $inline_throw; $varname   ];
+		? qq[do { no warnings "void"; $SafePackage $inline_check or $inline_throw; $varname };]
+		: qq[     no warnings "void"; $SafePackage $inline_check or $inline_throw; $varname   ];
 } #/ sub inline_assert
 
 sub _failed_check {
@@ -940,9 +943,11 @@ sub _failed_check {
 	
 	my $exception_class =
 		delete( $attrs{exception_class} ) || "Error::TypeTiny::Assertion";
-		
+	my $callback = delete( $attrs{on_die} );
+
 	if ( $self ) {
-		$exception_class->throw(
+		return $exception_class->throw_cb(
+			$callback,
 			message => $self->get_message( $value ),
 			type    => $self,
 			value   => $value,
@@ -950,9 +955,9 @@ sub _failed_check {
 		);
 	}
 	else {
-		$exception_class->throw(
-			message =>
-				sprintf( '%s did not pass type constraint "%s"', _dd( $value ), $name ),
+		return $exception_class->throw_cb(
+			$callback,
+			message => sprintf( '%s did not pass type constraint "%s"', _dd( $value ), $name ),
 			value => $value,
 			%attrs,
 		);
@@ -2411,6 +2416,15 @@ if it needs to rely on callbacks when asked not to.)
 
 Most normal users can ignore this.
 
+=item C<< $Type::Tiny::SafePackage >>
+
+This is the string "package Type::Tiny;" which is sometimes inserted
+into strings of inlined code to avoid namespace clashes. In most cases,
+you do not need to change this. However, if you are inlining type
+constraint code, saving that code into Perl modules, and uploading them
+to CPAN, you may wish to change it to avoid problems with the CPAN
+indexer. Most normal users of Type::Tiny do not need to be aware of this.
+
 =back
 
 =head2 Environment
@@ -2462,7 +2476,7 @@ Thanks to Matt S Trout for advice on L<Moo> integration.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2021 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2022 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

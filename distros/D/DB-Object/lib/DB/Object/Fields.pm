@@ -30,6 +30,7 @@ sub init
     $self->{table_object} = '';
     ## $self->{fatal} = 1;
     $self->{_init_strict_use_sub} = 1;
+    $self->{_init_params_order} = [qw( table_object query_object prefixed )];
     $self->SUPER::init( @_ );
     return( $self->error( "No table object was provided" ) ) if( !$self->{table_object} );
     return( $self );
@@ -59,9 +60,10 @@ sub prefixed
     return( $self );
 }
 
-sub query_object { return( shift->_set_get_object( 'query_object', 'DB::Object::Query', @_ ) ); }
+# sub query_object { return( shift->_set_get_object_without_init( 'query_object', 'DB::Object::Query', @_ ) ); }
+sub query_object { return( shift->table_object->query_object ); }
 
-sub table_object { return( shift->_set_get_object( 'table_object', 'DB::Object::Tables', @_ ) ); }
+sub table_object { return( shift->_set_get_object_without_init( 'table_object', 'DB::Object::Tables', @_ ) ); }
 
 sub _initiate_field_object
 {

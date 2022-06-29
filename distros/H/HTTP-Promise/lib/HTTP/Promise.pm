@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2022/06/20
+## Modified 2022/06/28
 ## All rights reserved.
 ## 
 ## 
@@ -22,7 +22,6 @@ BEGIN
                  $DEFAULT_PROTOCOL $EXCEPTION_CLASS $EXTENSION_VARY
                  $IS_WIN32 $HTTP_TOKEN $HTTP_QUOTED_STRING $BUFFER_SIZE 
                  $MAX_HEADERS_SIZE $MAX_BODY_IN_MEMORY_SIZE $EXPECT_THRESHOLD $DEFAULT_MIME_TYPE );
-    use curry;
     use Cookie;
     use Cookie::Jar;
     use Errno qw( EAGAIN ECONNRESET EINPROGRESS EINTR EWOULDBLOCK ECONNABORTED EISCONN );
@@ -57,7 +56,7 @@ BEGIN
     our $EXPECT_THRESHOLD = 1024000000;
     our $EXTENSION_VARY = 1;
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 use strict;
@@ -1739,7 +1738,7 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 

@@ -38,7 +38,8 @@
             "Getopt::Long" : "0",
             "HTTP::Date" : "0",
             "IO::Zlib" : "0",
-            "LWP" : "0",
+            "LWP" : "6",
+            "LWP::Protocol::https" : "6",
             "Log::Report" : "0.25",
             "Test::More" : "0.82",
             "Test::TempDir::Tiny" : "0.018",
@@ -58,6 +59,6 @@
          "web" : "https://github.com/markov2/perl5-CPAN-Site"
       }
    },
-   "version" : "1.16",
+   "version" : "1.17",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

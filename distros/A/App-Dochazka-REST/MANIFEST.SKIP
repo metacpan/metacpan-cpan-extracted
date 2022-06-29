@@ -89,3 +89,6 @@
 
 # Avoid "run-tests.sh" script
 \brun-tests.sh$
+
+# Avoid bootstrap scripts
+\bbootstrap.*sh$

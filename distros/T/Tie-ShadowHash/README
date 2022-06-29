@@ -1,15 +1,10 @@
-                       Tie::ShadowHash version 1.0
+                           Tie::ShadowHash 2.00
          (Merge multiple data sources into a hash with overrides)
+                Maintained by Russ Allbery <rra@cpan.org>
 
-  Copyright 1999, 2002, 2010 by Russ Allbery <rra@stanford.edu>.  This
-  program is free software; you may redistribute it and/or modify it under
-  the same terms as Perl itself.
-
-  I welcome all bug reports and patches for this package (and in
-  particular, if you're looking for a project, see TODO).  However, please
-  be aware that I tend to be extremely busy and to get a lot of mail.
-  I'll save your mail and get to it as soon as I can, but depending on how
-  busy I am it may take me a couple of months.
+  Copyright 1999, 2002, 2010, 2022 Russ Allbery <rra@cpan.org>.  This
+  software is distributed under the same terms as Perl itself.  Please see
+  the section LICENSE below for more information.
 
 BLURB
 
@@ -23,79 +18,141 @@ BLURB
 
 DESCRIPTION
 
-  If you have a bunch of separate sources of data in the form of Perl
-  hashes, tied hashes (of whatever type, including on-disk databases tied
-  with DB_File, GDBM_File, or similar modules), or text files that you
-  want to turn into hashes, and you want to be able to query all of those
-  sources of data at once for a particular key without having to check
-  each one of them individually each time, this module is what you're
-  looking for.  If you want to use a hash-like data source, even just one,
-  but make modifications to its data over the course of your program that
-  override its contents while your program runs but which don't have any
-  permanent effect on it, then this module may be what you're looking for.
+  If you have several key/value data sources in the form of Perl hashes,
+  tied hashes (of whatever type, including on-disk databases tied with
+  DB_File, GDBM_File, or similar modules), or text files that you want to
+  turn into hashes, and you want to be able to query all of those sources
+  of data at once for a particular key without having to check each one of
+  them individually, this module may be what you're looking for.  If you
+  want to use a hash-like data source, even just one, but make
+  modifications to its data over the course of your program that override
+  its contents while your program runs but which don't have any permanent
+  effect on it, this module may be what you're looking for.
 
   Tie::ShadowHash lets you create a "shadow hash" that looks like a
-  regular Perl hash to your program but behind the scenes queries a whole
-  list of data sources.  All the data sources underneath have to also
-  behave like Perl hashes, but that's the only constraint.  They can be
-  regular Perl hashes or other tied hashes, including tied DB_File or
-  GDBM_File hashes or the like to access on-disk databases.  All data
-  sources are treated as read-only; modifications to any data is stored in
-  the shadow hash itself, and subsequent accesses reflect any
-  modifications, but none of the data sources are changed.
-
-  See the POD documentation for complete details, features, and usage.
+  regular Perl hash to your program but, behind the scenes, queries a list
+  of data sources.  All the data sources must also behave like Perl
+  hashes, but that's the only constraint.  They can be regular Perl hashes
+  or other tied hashes, including tied DB_File or GDBM_File hashes or the
+  like to access on-disk databases.  All data sources are treated as
+  read-only; modifications to any data is stored in the shadow hash
+  itself, and subsequent accesses reflect any modifications, but none of
+  the data sources are changed.
 
 REQUIREMENTS
 
-  Perl 5.006 or later is the only requirement for this module.
+  The only requirement for this module is Perl 5.024 or later.
 
-  To run the test suite, Test::More is required.  It is available from
-  CPAN and part of Perl core as of 5.6.2.
+BUILDING AND INSTALLATION
 
-  The test suite includes a formatting and spelling check of all of the
-  POD documentation.  To check formatting, Test::Pod is required.  To
-  check spelling, Pod::Spell and either aspell or ispell with the american
-  dictionary are also required.  The user's path is searched for aspell or
-  ispell and aspell is preferred.  Spelling tests are disabled by default
-  since spelling dictionaries differ too much between systems.  To enable
-  those tests, set RRA_MAINTAINER_TESTS to a true value.
+  Tie::ShadowHash uses Module::Build and can be installed using the same
+  process as any other Module::Build module:
 
-INSTALLATION
+      perl Build.PL
+      ./Build
+      ./Build install
 
-  Follow the standard installation procedure for Perl modules, which is to
-  type the following commands:
+  You will have to run the last command as root unless you're installing
+  into a local Perl module tree in your home directory.
 
-      perl Makefile.PL
-      make
-      make test
-      make install
+TESTING
 
-  You'll probably need to do the "make install" as root.  If instead you
-  wish to install the module by hand, simply copy ShadowHash.pm into a
-  directory named Tie in your Perl library directory.
+  Tie::ShadowHash comes with a test suite, which you can run after
+  building with:
 
-HOMEPAGE AND SOURCE REPOSITORY
+      ./Build test
 
-  The podlators web page at:
+  If a test fails, you can run a single test with verbose output via:
 
-      http://www.eyrie.org/~eagle/software/shadowhash/
+      ./Build test --test_files <path-to-test>
+
+  The following additional Perl modules will be used by the test suite if
+  present:
+
+  * Devel::Cover
+  * Perl::Critic::Freenode
+  * Test::CPAN::Changes (part of CPAN-Changes)
+  * Test::Kwalitee
+  * Test::MinimumVersion
+  * Test::Perl::Critic
+  * Test::Pod
+  * Test::Pod::Coverage
+  * Test::Spelling
+  * Test::Strict
+  * Test::Synopsis
+
+  To enable tests that don't detect functionality problems but are used to
+  sanity-check the release, set the environment variable RELEASE_TESTING
+  to a true value.  To enable tests that may be sensitive to the local
+  environment or that produce a lot of false positives without uncovering
+  many problems, set the environment variable AUTHOR_TESTING to a true
+  value.
+
+THANKS
+
+  To Chris Nandor for testing this module on the Mac, pointing out that
+  SDBM_File wasn't available there, mentioning that SDBM was
+  byte-order-dependent anyway, and suggesting using AnyDBM_File instead.
+
+SUPPORT
+
+  The Tie::ShadowHash web page at:
+
+      https://www.eyrie.org/~eagle/software/shadowhash/
 
   will always have the current version of this package, the current
   documentation, and pointers to any additional resources.
 
+  For bug tracking, use the issue tracker on GitHub:
+
+      https://github.com/rra/shadowhash/issues
+
+  However, please be aware that I tend to be extremely busy and work
+  projects often take priority.  I'll save your report and get to it as
+  soon as I can, but it may take me a couple of months.
+
+SOURCE REPOSITORY
+
   Tie::ShadowHash is maintained using Git.  You can access the current
-  source by cloning the repository at:
+  source on GitHub at:
 
-      git://git.eyrie.org/perl/shadowhash.git
+      https://github.com/rra/shadowhash
 
-  or view the repository on the web at:
+  or by cloning the repository at:
 
-      http://git.eyrie.org/?p=perl/shadowhash.git
+      https://git.eyrie.org/git/perl/shadowhash.git
 
-THANKS
+  or view the repository via the web at:
 
-  To Chris Nandor <pudge@pobox.com> for testing this module on the Mac,
-  pointing out that SDBM_File wasn't available there, mentioning that SDBM
-  was byte-order-dependent anyway, and suggesting using AnyDBM_File
-  instead.
+      https://git.eyrie.org/?p=perl/shadowhash.git
+
+  The eyrie.org repository is the canonical one, maintained by the author,
+  but using GitHub is probably more convenient for most purposes.  Pull
+  requests are gratefully reviewed and normally accepted.
+
+LICENSE
+
+  The Tie::ShadowHash package as a whole is covered by the following
+  copyright statement and license:
+
+    Copyright 1999, 2002, 2010, 2022 Russ Allbery <rra@cpan.org>
+
+    This program is free software; you may redistribute it and/or modify
+    it under the same terms as Perl itself.  This means that you may
+    choose between the two licenses that Perl is released under: the GNU
+    GPL and the Artistic License.  Please see your Perl distribution for
+    the details and copies of the licenses.
+
+  Some files in this distribution are individually released under
+  different licenses, all of which are compatible with the above general
+  package license but which may require preservation of additional
+  notices.  All required notices, and detailed information about the
+  licensing of each file, are recorded in the LICENSE file.
+
+  Files covered by a license with an assigned SPDX License Identifier
+  include SPDX-License-Identifier tags to enable automated processing of
+  license information.  See https://spdx.org/licenses/ for more
+  information.
+
+  For any copyright range specified by files in this package as YYYY-ZZZZ,
+  the range specifies every single year in that closed interval.

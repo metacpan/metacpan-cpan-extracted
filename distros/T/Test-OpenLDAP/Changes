@@ -1,5 +1,9 @@
 Revision history for Test-OpenLDAP
 
+0.72  Wed Jun 29 21:02:00 2022
+       HDB was retired in OpenLDAP 2.5. Now using MDB.
+       Moved to github
+
 0.71  Sun Dec 24 21:14:00 2013
        Corrected the schema index when loading core
 

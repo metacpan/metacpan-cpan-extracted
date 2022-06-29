@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Intersection::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Intersection::VERSION   = '1.012005';
+	$Type::Tiny::Intersection::VERSION   = '1.014000';
 }
 
 $Type::Tiny::Intersection::VERSION =~ tr/_//d;
@@ -113,7 +113,7 @@ sub inline_check {
 	
 	my $code = sprintf '(%s)', join " and ", map $_->inline_check( $_[0] ), @$self;
 	
-	return "do { package Type::Tiny; $code }"
+	return "do { $Type::Tiny::SafePackage $code }"
 		if $Type::Tiny::AvoidCallbacks;
 	return "$self->{xs_sub}\($_[0]\)"
 		if $self->{xs_sub};
@@ -318,7 +318,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2021 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2022 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

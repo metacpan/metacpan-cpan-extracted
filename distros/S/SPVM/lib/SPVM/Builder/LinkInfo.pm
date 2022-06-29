@@ -51,6 +51,17 @@ sub object_file_infos {
   }
 }
 
+sub lib_infos {
+  my $self = shift;
+  if (@_) {
+    $self->{lib_infos} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{lib_infos};
+  }
+}
+
 sub class_name {
   my $self = shift;
   if (@_) {
@@ -92,6 +103,10 @@ sub new {
     $self->object_file_infos([]);
   }
 
+  unless (defined $self->lib_infos) {
+    $self->lib_infos([]);
+  }
+
   unless (defined $self->ldflags) {
     $self->ldflags([]);
   }
@@ -101,15 +116,15 @@ sub new {
 
 1;
 
-=head1 NAME
+=head1 Name
 
 SPVM::Builder::LinkInfo - Object file information
 
-=head1 DESCRIPTION
+=head1 Description
 
 B<SPVM::Builder::LinkInfo> is a object file information. This infromation is used by the linker.
 
-=head1 FIELDS
+=head1 Field Methods
 
 Fields of B<SPVM::Builder::LinkInfo>.
 
@@ -139,7 +154,14 @@ Get and set the linker flags.  The default value is C<[]>.
   my $object_file_infos = $link_info->object_file_infos;
   $link_info->object_file_infos($object_file_infos);
 
-Get and set the object file informations to be linked. Each object file is L<SPVM::Builder::ObjectFileInfo>.
+Get and set the object file informations to be linked. Each object file is a L<SPVM::Builder::ObjectFileInfo> object.
+
+=head2 lib_infos
+
+  my $lib_infos = $link_info->lib_infos;
+  $link_info->lib_infos($lib_infos);
+
+Get and set the library informations to be linked. Each object file is a L<SPVM::Builder::LibInfo> object.
 
 =head2 class_name
 
@@ -155,7 +177,7 @@ Get and set the class name.
 
 Get and set the L<config|SPVM::Builder::Config> that is used to link the objects.
 
-=head1 METHODS
+=head1 Methods
 
 Methods of B<SPVM::Builder::LinkInfo>.
 

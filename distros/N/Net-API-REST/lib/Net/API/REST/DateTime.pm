@@ -138,7 +138,7 @@ sub parse_date
 
     ||
     ## unrecognized format
-    return( $self->return( "Unrecognised http date format '$date'." ) );
+    return( $self->error( "Unrecognised http date format '$date'." ) );
     
     ## Translate month name to number
     $mon = $MoY->{ $mon } ||
@@ -435,7 +435,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 CPAN ID: jdeguest
 
-https://git.deguest.jp/jack/Net-API-REST
+L<https://gitlab.com/jackdeguest/Net-API-REST>
 
 =head1 SEE ALSO
 

@@ -89,6 +89,42 @@ subtest 'query information from CODEOWNERS', sub {
     }, 'match double asterisk again') or diag explain $r;
 };
 
+subtest 'CODEOWNERS aliases', sub {
+    my $file = File::Codeowners->parse("$Bin/samples/bitbucket.CODEOWNERS");
+    my $r;
+
+    is_deeply($r = $file->aliases, {
+    }, 'no aliases if not told to parse aliases') or diag explain $r;
+
+    is_deeply($r = $file->patterns, [
+        '@@@whatever',
+        'file.txt',
+    ], 'alias is parsed as a pattern') or diag explain $r;
+
+    $file = File::Codeowners->parse("$Bin/samples/bitbucket.CODEOWNERS", aliases => 1);
+
+    is_deeply($r = $file->aliases, {
+        '@@whatever' => ['@foo', '@bar', '@@"b a z"'],
+    }, 'list all aliases') or diag explain $r;
+
+    is_deeply($r = $file->match('file.txt'), {
+        owners  => [qw(@@whatever @qux)],
+        pattern => 'file.txt',
+    }, 'match file without expanding aliases') or diag explain $r;
+
+    is_deeply($r = $file->match('file.txt', expand => 1), {
+        owners  => ['@foo', '@bar', '@@"b a z"', '@qux'],
+        pattern => 'file.txt',
+    }, 'match file with expanding aliases') or diag explain $r;
+
+    is_deeply($r = $file->write_to_array, [
+        '# This sample uses groups defined in the CODEOWNERS file itself.',
+        '# This is a group:',
+        '@@@whatever  @foo @bar @@"b a z"',
+        'file.txt  @@whatever @qux'
+    ], 'write aliases') or diag explain $r;
+};
+
 subtest 'parse errors', sub {
     eval { File::Codeowners->parse(\q{meh}) };
     like($@, qr/^Parse error on line 1/, 'parse error');
@@ -114,8 +150,8 @@ subtest 'handling projects', sub {
     ], 'renaming project properly modifies lines') or diag explain $r;
 
     $file->update_owners_by_project('Getting Around', '@twoface');
-    ok( scalar grep { $_ eq '@twoface' }      @{$file->owners}, 'updating owner adds new owner');
-    ok(!scalar grep { $_ eq '@"Lucius Fox"' } @{$file->owners}, 'updating owner removes old owner');
+    ok( scalar(grep { $_ eq '@twoface' }      @{$file->owners}), 'updating owner adds new owner');
+    ok(!scalar(grep { $_ eq '@"Lucius Fox"' } @{$file->owners}), 'updating owner removes old owner');
 };
 
 subtest 'editing and writing files', sub {

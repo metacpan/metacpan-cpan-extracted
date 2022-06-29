@@ -118,6 +118,18 @@ sub index {
   return CORE::index($data, $substr, $start);
 }
 
+sub kebabcase {
+  my ($self) = @_;
+
+  my $data = $self->get;
+  my $re = qr/[\W_]+/;
+
+  $data =~ s/$re/-/g;
+  $data =~ s/^$re|$re$//g;
+
+  return $data;
+}
+
 sub lc {
   my ($self) = @_;
 
@@ -1725,6 +1737,28 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 kebabcase
+
+  kebabcase() (Str)
+
+The kebabcase method converts the string to kebabcase.
+
+I<Since C<0.09>>
+
+=over 4
+
+=item kebabcase example 1
+
+  # given: synopsis;
+
+  my $kebabcase = $string->kebabcase;
+
+  # "hello-world"
+
+=back
+
+=cut
+
 =head2 lc
 
   lc() (Str)
@@ -3154,17 +3188,3 @@ B<example 1>
   # 1
 
 =back
-
-=head1 AUTHORS
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
-
-=head1 LICENSE
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-=cut

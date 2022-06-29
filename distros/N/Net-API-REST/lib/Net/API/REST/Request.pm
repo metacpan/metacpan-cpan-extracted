@@ -1,12 +1,15 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST/Request.pm
-## Version v0.9.0
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Version v0.9.2
+## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/09/01
-## Modified 2020/06/15
+## Modified 2022/03/30
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::REST::Request;
 BEGIN
@@ -20,7 +23,7 @@ BEGIN
     use Devel::Confess;
     use Apache2::Request;
     use Scalar::Util;
-    use Apache2::Const;
+    use Apache2::Const qw( :common :http );
     use Apache2::Connection ();
     use Apache2::RequestRec ();
     use Apache2::RequestUtil ();
@@ -30,22 +33,25 @@ BEGIN
     use APR::Pool ();
     use APR::Request ();
     use APR::Socket ();
+    use APR::SockAddr ();
     use APR::Request::Cookie;
     use APR::Request::Apache2;
     # For subnet_of() method
     use APR::IpSubnet ();
-    use Net::API::REST::Cookies;
-    use URI;
-    use Net::API::REST::Query;
-    use URI::Escape;
-    use HTTP::AcceptLanguage;
-    use Net::API::REST::DateTime;
     use DateTime;
     # use DateTime::Format::Strptime;
+    use File::Which ();
+    use HTTP::AcceptLanguage;
     use JSON;
+    use Net::API::REST::Cookies;
+    use Net::API::REST::DateTime;
+    use Net::API::REST::Query;
+    use Net::API::REST::Status;
+    use URI;
+    use URI::Escape;
     use Nice::Try;
     use version;
-    our $VERSION = 'v0.9.0';
+    our $VERSION = 'v0.9.2';
     our @DoW = qw( Sun Mon Tue Wed Thu Fri Sat );
     our @MoY = qw( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
     our $MoY = {};
@@ -82,22 +88,26 @@ sub init
         my $ctype_raw = $self->content_type;
         $self->message( 3, "Content-type of data received is '$ctype_raw'." );
         my $accept_raw = $self->accept;
-        ## Content-Type: application/json; encoding=utf-8
+        ## Content-Type: application/json; charset=utf-8
         my $ctype_def = $self->_split_str( $ctype_raw );
-        ## Accept: application/json; version=1.0; encoding=utf-8
-        my $accept_def = $self->_split_str( $accept_raw );
+        ## Accept: application/json; version=1.0; charset=utf-8
+        my $accept_ref = $self->acceptables;
+        if( $accept_ref && scalar( @$accept_ref ) )
+        {
+            my $accept_def = $accept_ref->[0];
+            $self->accept_type( $accept_def->{value} );
+            my $client_api_version = CORE::exists( $accept_def->{param}->{version} ) 
+                ? $accept_def->{param}->{version}
+                : '';
+            $self->client_api_version( $client_api_version ) if( length( $client_api_version ) );
+        }
         my $ctype = lc( $ctype_def->{value} );
         $self->type( $ctype );
         my $enc   = CORE::exists( $ctype_def->{param}->{charset} ) 
             ? lc( $ctype_def->{param}->{charset} ) 
             : undef();
         $self->message( 3, "Found content type of '$ctype' and charset of '$enc'. \$ctype_def is: ", sub{ $self->dumper( $ctype_def ) } );
-        my $accept = $accept_def->{value};
-        my $client_api_version = CORE::exists( $accept_def->{param}->{version} ) 
-            ? $accept_def->{param}->{version}
-            : undef();
         $self->charset( $enc ) if( length( $enc ) );
-        $self->client_api_version( $client_api_version ) if( length( $client_api_version ) );
     
         my $json = $self->json;
         $self->messagef( 3, "Loading http payload data into buffer \$payload for length %d.", $self->length );
@@ -111,6 +121,8 @@ sub init
 #           1 while( $r->read( $payload, 1096, CORE::length( $payload ) ) );
 #       }
         my $payload = $self->data;
+        ## An error occurred while reading the payload
+        return if( !defined( $payload ) );
         $self->messagef( 3, "Content-type is '$ctype' and length is %d", CORE::length( $payload ) );
         if( $ctype eq 'application/json' && CORE::length( $payload ) )
         {
@@ -150,28 +162,48 @@ sub acceptable
     }
     if( !$self->{acceptable} )
     {
-        my $accept_raw = $self->accept;
-        $self->{acceptable} = [];
-        if( $accept_raw )
+        my $all = $self->acceptables;
+        my $list = [];
+        for( @$all )
         {
-            my $accept_def = $self->_split_str( $accept_raw );
-            ## Typical value from Aja call: application/json, text/javascript, */*
-            my $accept = $accept_def->{value};
-            $self->{acceptable} = [ split( /\,[[:blank:]]+/, $accept ) ];
-            for( @{$self->{acceptable}} )
-            {
-                $_ = lc( $_ );
-            }
+            push( @$list, $_->{value} );
         }
+        $self->{acceptable} = $list;
     }
     return( wantarray() ? @{$self->{acceptable}} : $self->{acceptable}->[0] ) if( $self->{acceptable} );
+    return( wantarray() ? () : '' );
 }
+
+sub acceptables
+{
+    my $self = shift( @_ );
+    return( $self->{acceptables} ) if( $self->{acceptables} );
+    my $accept_raw = $self->accept;
+    if( $accept_raw )
+    {
+        $self->{acceptables} = [];
+        ## Typical value from Ajax call: application/json, text/javascript, */*
+        my $tmp = [ split( /\,[[:blank:]]+/, $accept_raw ) ];
+        for( @$tmp )
+        {
+            my $this = $self->_split_str( $_ );
+            push( @{$self->{acceptables}}, $this ) if( $this && scalar( keys( %$this ) ) );
+        }
+    }
+    return( $self->{acceptables} );
+}
+
+sub accept_charset { return( shift->_set_get_scalar( 'accept_charset', @_ ) ); }
 
 ## e.g. gzip, deflate, br
 sub accept_encoding { return( shift->headers->{ 'Accept-Encoding' } ); }
 
 ## e.g.: en-GB,fr-FR;q=0.8,fr;q=0.6,ja;q=0.4,en;q=0.2
 sub accept_language { return( shift->headers->{ 'Accept-Language' } ); }
+
+sub accept_type { return( shift->_set_get_scalar( 'accept_type', @_ ) ); }
+
+sub accept_version { return( shift->client_api_version( @_ ) ); }
 
 ## The allowed methods, GET, POST, PUT, OPTIONS, HEAD, etc
 sub allowed { return( shift->_try( 'request', 'allowed', @_ ) ); }
@@ -262,13 +294,12 @@ sub content_languages { return( shift->_try( 'request', 'content_languages', @_ 
 
 sub content_length { return( shift->headers( 'Content-Length' ) ); }
 
-# sub content_type { return( shift->_try( 'request', 'content_type' ) ); }
 sub content_type
 {
     my $self = shift( @_ );
     my $ct = $self->headers( 'Content-Type' );
     return( $ct ) if( !scalar( @_ ) );
-    $self->error( "Warning only: caller is trying to use ", ref( $self ), " to set the content-type. Use Net::API::REST::Response for that instead." );
+    $self->error( "Warning only: caller is trying to use ", ref( $self ), " to set the content-type. Use Net::API::REST::Response for that instead." ) if( @_ );
     return( $self->request->content_type( @_ ) );
 }
 
@@ -317,33 +348,6 @@ sub cookie
 # . Data::Dumper::Dumper( $self->r->headers_in() ) );
 # }
 
-sub cookies_v1
-{
-    my $self = shift( @_ );
-    try
-    {
-        $self->message( 3, "Getting Apache pool object." );
-        my $pool = $self->request->pool;
-        $self->message( 3, "Apache pool object is: '$pool'" );
-        $self->message( 3, "Getting an APR Table object instance." );
-        # my $o = APR::Request::Apache2->handle( $self->request->pool );
-        my $o = APR::Request::Apache2->handle( $self->request );
-        if( $o->jar_status =~ /^(?:Missing input data|Success)$/ )
-        {
-            $self->message( 3, "Object is '$o'. Returning the jar. Object has method 'jar'? ", ( $o->can( 'jar' ) ? 'yes' : 'no' ) );
-            return( $o->jar );
-        }
-        else
-        {
-            $self->message( 3, "Malformed cookie found: ", $o->jar_status, "\nOriginal request is: ", $self->as_string );
-        }
-    }
-    catch( $e )
-    {
-        return( $self->error( "An error occurred while trying to get the jar object of the APR::Request::Apache2: $e" ) );
-    }
-}
-
 sub cookies
 {
     my $self = shift( @_ );
@@ -362,15 +366,36 @@ sub data
     my $r = $self->request;
     my $ctype = $self->type;
     my $payload = '';
+    my $max_size = 0;
+    $max_size = $r->dir_config( 'Net_API_REST_MAX_SIZE' ) if( $r->dir_config( 'Net_API_REST_MAX_SIZE' ) );
     if( $self->length > 0 )
     {
+        if( $max_size && $self->length > $max_size )
+        {
+            $self->messagef( 3, "Total data submitted (%d bytes) is bigger than the limit you set in Apache configuration ($max_size).", $self->length );
+            return( $self->error({ code => Apache2::Const::HTTP_REQUEST_ENTITY_TOO_LARGE, message => "Total data submitted (" . $self->length . " bytes) is bigger than the limit you set in Apache configuration ($max_size)." }) );
+        }
         $self->messagef( 3, "Reading %d bytes of data", $self->length );
         $r->read( $payload, $self->length );
     }
     elsif( lc( $ctype ) eq 'application/json' )
     {
         $self->message( 3, "No data length is provided, but type is json so we read until the end." );
-        1 while( $r->read( $payload, 1096, CORE::length( $payload ) ) );
+        if( $max_size )
+        {
+            while( $r->read( $payload, 1096, CORE::length( $payload ) ) )
+            {
+                if( length( $payload ) > $max_size )
+                {
+                    $self->messagef( 3, "Total json payload submitted (%d bytes) is bigger than the limit you set in Apache configuration ($max_size).", $self->length );
+                    return( $self->error({ code => Apache2::Const::HTTP_REQUEST_ENTITY_TOO_LARGE, message => "Total json payload submitted (" . $self->length . " bytes) is bigger than the limit you set in Apache configuration ($max_size)." }) );
+                }
+            }
+        }
+        else
+        {
+            1 while( $r->read( $payload, 1096, CORE::length( $payload ) ) );
+        }
     }
     $self->messagef( 3, "Found %d bytes of data read from http client.", CORE::length( $payload ) );
     try
@@ -392,7 +417,7 @@ sub data
     catch( $e )
     {
         $self->message( 3, "Character decoding failed with error: $e" );
-        return( $self->error( "Error while decoding payload received from http client: $e" ) );
+        return( $self->error({ code => Apache2::Const::HTTP_BAD_REQUEST, message => "Error while decoding payload received from http client: $e" }) );
     }
     $self->{data} = $payload;
     $self->{_data_processed}++;
@@ -500,7 +525,8 @@ sub headers_as_hashref
     {
         if( CORE::exists( $ref->{ $k } ) )
         {
-            if( ref( $ref->{ $k } ) eq 'ARRAY' )
+            # if( ref( $ref->{ $k } ) eq 'ARRAY' )
+            if( $self->_is_array( $ref->{ $k } ) )
             {
                 CORE::push( @{$ref->{ $k }}, $v );
             }
@@ -596,7 +622,7 @@ sub local_ip { return( shift->_try( 'connection', 'local_ip' ) ); }
 
 sub location { return( shift->_try( 'request', 'location' ) ); }
 
-sub log_error { return( shift->_try( 'request', 'log_error' ) ); }
+sub log_error { return( shift->_try( 'request', 'log_error', @_ ) ); }
 
 sub method { return( shift->_try( 'request', 'method' ) ); }
 
@@ -732,7 +758,10 @@ sub params
     return( $form );
 }
 
-## example: /bin:/usr/bin:/usr/local/bin
+# NOTE: parse_date for compatibility
+sub parse_date { return( shift->datetime->parse_date( @_ ) ); }
+
+# example: /bin:/usr/bin:/usr/local/bin
 sub path { return( shift->env( 'PATH', @_ ) ); }
 
 sub path_info { return( shift->_try( 'request', 'path_info', @_ ) ); }
@@ -751,7 +780,7 @@ sub preferred_language
     my $ok_langs = [];
     if( @_ )
     {
-        return( $self->error( "I was expecting a list of supported languages as array reference, but instead I received this '", join( "', '", @_ ), "'." ) ) if( ref( $_[0] ) ne 'ARRAY' );
+        return( $self->error( "I was expecting a list of supported languages as array reference, but instead I received this '", join( "', '", @_ ), "'." ) ) if( !$self->_is_array( $_[0] ) );
         ## Make a copy
         $ok_langs = [ @{$_[0]} ];
         ## Make sure the languages provided are in web format (e.g. en-GB), not unix format (e.g. en_GB)
@@ -822,29 +851,41 @@ sub referer { return( shift->headers->{Referer} ); }
 sub remote_addr
 {
     my $self = shift( @_ );
-    my $vers = $self->server_version;
+    ## my $vers = $self->server_version;
     my $serv = $self->request;
     ## http://httpd.apache.org/docs/2.4/developer/new_api_2_4.html
     ## We have to prepend the version with 'v', because it will faill when there is a dotted decimal with 3 numbers, 
     ## e.g. 2.4.16 > 2.2 will return false !!
     ## but v2.4.16 > v2.2 returns true :(
     ## Already contacted the author about this edge case (2019-09-22)
-    if( version->parse( "v$vers" ) > version->parse( 'v2.2' ) )
+#     if( version->parse( "v$vers" ) > version->parse( 'v2.2' ) )
+#     {
+#         my $addr;
+#         try
+#         {
+#             $addr = $serv->useragent_addr;
+#         }
+#         catch( $e )
+#         {
+#             warn( "Unable to get the remote addr with the method useragent_addr: $e\n" );
+#             return( undef() );
+#         }
+#     }
+#     else
+#     {
+#         return( $self->connection->remote_addr );
+#     }
+    my $c = $self->connection;
+    my $coderef = $c->can( 'client_addr' ) // $c->can( 'remote_addr' );
+    try
     {
-        my $addr;
-        try
-        {
-            $addr = $serv->useragent_addr;
-        }
-        catch( $e )
-        {
-            warn( "Unable to get the remote addr with the method useragent_addr: $e\n" );
-            return( undef() );
-        }
+        $coderef->( $c, shift( @_ ) ) if( @_ );
+        return( $coderef->( $c ) );
     }
-    else
+    catch( $e )
     {
-        return( $self->connection->remote_addr );
+        warn( "Unable to get the remote addr with the method ", ( $c->can( 'client_addr' ) ? 'client_addr' : 'remote_addr' ), ": $e\n" );
+        return;
     }
 }
 
@@ -854,8 +895,8 @@ sub remote_host { return( shift->_try( 'connection', 'remote_host' ) ); }
 sub remote_ip
 {
     my $self = shift( @_ );
-    my $vers = $self->server_version;
-    $self->message( 3, "Checking if server version '$vers' is higher than 2.2" );
+    ## my $vers = $self->server_version;
+    ## $self->message( 3, "Checking if server version '$vers' is higher than 2.2" );
     my $serv = $self->request;
     $self->message( 3, "Is the REMOTE_ADDR environment variable available? (", $self->env( 'REMOTE_ADDR' ), ")" );
     ## http://httpd.apache.org/docs/2.4/developer/new_api_2_4.html
@@ -863,24 +904,39 @@ sub remote_ip
     ## e.g. 2.4.16 > 2.2 will return false !!
     ## but v2.4.16 > v2.2 returns true :(
     ## Already contacted the author about this edge case (2019-09-22)
-    if( version->parse( "v$vers" ) > version->parse( 'v2.2' ) )
+#     if( version->parse( "v$vers" ) > version->parse( 'v2.2' ) )
+#     {
+#         my $ip;
+#         try
+#         {
+#             $ip = $serv->useragent_ip;
+#         }
+#         catch( $e )
+#         {
+#             warn( "Unable to get the remote ip with the method useragent_ip: $e\n" );
+#         }
+#         $ip = $self->env( 'REMOTE_ADDR' ) if( !CORE::length( $ip ) );
+#         return( $ip ) if( CORE::length( $ip ) );
+#         return;
+#     }
+#     else
+#     {
+#         return( $self->connection->remote_addr->ip_get );
+#     }
+    my $c = $self->connection;
+    my $coderef = $c->can( 'client_ip' ) // $c->can( 'remote_ip' );
+    try
     {
-        my $ip;
-        try
-        {
-            $ip = $serv->useragent_ip;
-        }
-        catch( $e )
-        {
-            warn( "Unable to get the remote ip with the method useragent_ip: $e\n" );
-        }
+        $coderef->( $c, shift( @_ ) ) if( @_ );
+        my $ip = $coderef->( $c );
         $ip = $self->env( 'REMOTE_ADDR' ) if( !CORE::length( $ip ) );
         return( $ip ) if( CORE::length( $ip ) );
-        return( undef() );
+        return( '' );
     }
-    else
+    catch( $e )
     {
-        return( $self->connection->remote_ip );
+        warn( "Unable to get the remote addr with the method ", ( $c->can( 'client_ip' ) ? 'client_ip' : 'remote_ip' ), ": $e\n" );
+        return;
     }
 }
 
@@ -943,7 +999,7 @@ sub reply
     }
 }
 
-sub request { return( shift->_set_get_object( 'request', 'Apache2::Request', @_ ) ); }
+sub request { return( shift->_set_get_object_without_init( 'request', 'Apache2::Request', @_ ) ); }
 
 sub request_scheme { return( shift->env( 'REQUEST_SCHEME', @_ ) ); }
 
@@ -993,63 +1049,59 @@ sub server_software { return( shift->env( 'SERVER_SOFTWARE', @_ ) ); }
 
 ## Or maybe the environment variable SERVER_SOFTWARE, e.g. Apache/2.4.18
 ## sub server_version { return( version->parse( Apache2::ServerUtil::get_server_version ) ); }
-sub server_version 
+sub server_version
 {
     my $self = shift( @_ );
-    ## Cached
     $self->{_server_version} = $SERVER_VERSION if( !CORE::length( $self->{_server_version} ) && CORE::length( $SERVER_VERSION ) );
-    return( $self->{_server_version} ) if( CORE::length( $self->{_server_version} ) );
-    ## $self->request->log_error( "Apache version is: " . Apache2::ServerUtil::get_server_description );
-    ## e.g.: Apache version is: Apache/2.4.16 (Unix) PHP/5.5.38 mod_apreq2-20090110/2.8.0 mod_perl/2.0.10 Perl/v5.30.0
-    ## but could also be just 'Apache' depending on server configuration....
-    my $desc = Apache2::ServerUtil::get_server_description;
-    $self->message( 3, "Apache description is: '$desc'" );
-    my $version;
-    if( $desc =~ /\bApache\/([\d\.]+)/ )
+    $self->{_server_version} = shift( @_ ) if( @_ );
+    return( $self->{_server_version} ) if( $self->{_server_version} );
+    my $vers = '';
+    if( $self->mod_perl )
     {
-        $version = $1;
-    }
-    ## XXX to test our alternative approach
-    $self->message( 3, "Found Apache version '$version' from its description" );
-    $version = undef();
-    if( !defined( $version ) )
-    {
-        my $path = $self->env( 'PATH' );
-        $self->message( 3, "PATH is: '$path'." );
-        ## Typical: /bin:/usr/bin:/usr/local/bin
-        if( $path !~ /\/usr\/sbin/ )
+        try
         {
-            my @path = CORE::split( /:/, $path );
-            CORE::push( @path, '/usr/sbin', '/usr/local/sbin' );
-            $path = join( ':', @path );
-            $self->env( 'PATH' => $path );
-            $self->message( 3, "PATH is now: ", $self->env( 'PATH' ) );
+            my $desc = Apache2::ServerUtil::get_server_description();
+            $self->message( 3, "Apache description is: '$desc'" );
+            if( $desc =~ /\bApache\/([\d\.]+)/ )
+            {
+                $vers = $1;
+            }
         }
-        $self->message( 3, "Trying to find out the Apache version from its binary." );
-        my $apache_bin;
+        catch( $e )
+        {
+            $self->message( 3, "Failed getting version from Apache2::ServerUtil::get_server_description()" );
+        }
+        $self->message( 3, "Found Apache version '$vers' from its description" );
+    }
+    
+    ## XXX to test our alternative approach
+    if( !$vers && ( my $apxs = File::Which::which( 'apxs' ) ) )
+    {
+        $vers = qx( $apxs -q -v HTTPD_VERSION );
+        chomp( $vers );
+        $vers = '' unless( $vers =~ /^[\d\.]+$/ );
+    }
+    ## Try apache2
+    if( !$vers )
+    {
         foreach my $bin ( qw( apache2 httpd ) )
         {
-            $apache_bin = $self->_find_bin( $bin );
-            last if( defined( $apache_bin ) );
-        }
-        $self->message( 3, "Found binary at $apache_bin" );
-        if( defined( $apache_bin ) )
-        {
-            ## e.g.:
-            ## Server version: Apache/2.4.16 (Unix)
-            ## Server built:   Jul 22 2015 21:03:09
-            my $ver_str = qx( $apache_bin -v );
-            $self->message( 3, "Version string is '$ver_str'" );
-            if( ( split( /\r?\n/, $ver_str ) )[0] =~ /\bApache\/([\d\.]+)/ )
+            if( ( my $apache2 = File::Which::which( $bin ) ) )
             {
-                $version = $1;
+                my $v_str = qx( $apache2 -v );
+                if( ( split( /\r?\n/, $v_str ) )[0] =~ /\bApache\/([\d\.]+)/ )
+                {
+                    $vers = $1;
+                    chomp( $vers );
+                    last;
+                }
             }
         }
     }
-    $self->message( 3, "Returning version '$version'." );
-    if( $version )
+    $self->message( 3, "Returning version '$vers'." );
+    if( $vers )
     {
-        $self->{_server_version} = $SERVER_VERSION = version->parse( $version );
+        $self->{_server_version} = $SERVER_VERSION = version->parse( $vers );
         return( $self->{_server_version} );
     }
     return( '' );
@@ -1075,6 +1127,12 @@ sub socket { return( shift->_try( 'connection', 'client_socket', @_ ) ); }
 sub status { return( shift->_try( 'request', 'status', @_ ) ); }
 
 sub status_line { return( shift->_try( 'request', 'status_line' ) ); }
+
+# NOTE: str2datetime for compatibility
+sub str2datetime { return( shift->datetime->str2datetime( @_ ) ); }
+
+# NOTE: str2time for compatibility
+sub str2time { return( shift->datetime->str2time( @_ ) ); }
 
 sub subnet_of
 {
@@ -1105,6 +1163,12 @@ sub subnet_of
 
 sub subprocess_env { return( shift->_try( 'request', 'subprocess_env' ) ); }
 
+# NOTE: time2datetime for compatibility
+sub time2datetime { return( shift->datetime->time2datetime( @_ ) ); }
+
+# NOTE: time2str for compatibility
+sub time2str { return( shift->datetime->time2str( @_ ) ); }
+
 sub type
 {
     my $self = shift( @_ );
@@ -1117,9 +1181,9 @@ sub type
     {
         my $ctype_raw = $self->content_type;
         $self->message( 3, "Content-type of data received is '$ctype_raw'." );
-        ## Content-Type: application/json; encoding=utf-8
+        ## Content-Type: application/json; charset=utf-8
         my $ctype_def = $self->_split_str( $ctype_raw );
-        ## Accept: application/json; version=1.0; encoding=utf-8
+        ## Accept: application/json; version=1.0; charset=utf-8
         my $ctype = lc( $ctype_def->{value} );
         $self->{type} = $ctype if( $ctype );
         my $enc   = CORE::exists( $ctype_def->{param}->{charset} ) 
@@ -1182,24 +1246,13 @@ sub user { return( shift->_try( 'request', 'user' ) ); }
 
 sub user_agent { return( shift->headers->{ 'User-Agent' } ); }
 
-sub variables { return( shift->_set_get_hash( 'variables', @_ ) ); }
+sub variables { return( shift->_set_get_object_without_init( 'variables', 'Net::API::REST::Endpoint::Variables', @_ ) ); }
 
 sub _find_bin
 {
     my $self = shift( @_ );
     my $bin  = shift( @_ ) || return( '' );
-    my $path = $self->env( 'PATH' );
-    my @path = split( /\:/, $path );
-    my $full_path;
-    foreach my $dir ( @path )
-    {
-        if( -e( "$dir/$bin" ) && -f( "$dir/$bin" ) )
-        {
-            $full_path = "$dir/$bin";
-            last;
-        }
-    }
-    return( $full_path );
+    return( File::Which::which( $bin ) );
 }
 
 ## Taken from http://www.perlmonks.org/bare/?node_id=319761
@@ -1248,10 +1301,9 @@ sub _try
     my $pack = shift( @_ ) || return( $self->error( "No Apache package name was provided to call method" ) );
     my $meth = shift( @_ ) || return( $self->error( "No method name was provided to try!" ) );
     my $r = Apache2::RequestUtil->request;
-    # $r->log_error( "Net::API::REST::Request::_try to call method \"$meth\" in package \"$pack\"." );
     try
     {
-        return( $self->$pack->$meth ) if( !scalar( @_ ) );
+        return( $self->$pack->$meth() ) if( !scalar( @_ ) );
         return( $self->$pack->$meth( @_ ) );
     }
     catch( $e )
@@ -1260,6 +1312,7 @@ sub _try
     }
 }
 
+# XXX package Net::API::REST::Request::Params
 package Net::API::REST::Request::Params;
 BEGIN
 {
@@ -1377,6 +1430,7 @@ sub uploads
     return( $body->uploads( $self->pool ) );
 }
 
+# XXX package Net::API::REST::Request::Upload
 package Net::API::REST::Request::Upload;
 BEGIN
 {
@@ -1427,6 +1481,7 @@ sub type { return( shift->upload_type( @_ ) ); }
 
 1;
 
+# XXX POD
 __END__
 
 =encoding utf8
@@ -1445,7 +1500,7 @@ Net::API::REST::Request - Apache2 Incoming Request Access and Manipulation
 
 =head1 VERSION
 
-    v0.9.0
+    v0.9.2
 
 =head1 DESCRIPTION
 
@@ -1481,15 +1536,27 @@ Optional. If set with a positive integer, this will activate verbose debugging m
 
 =back
 
-=head2 aborted()
+=head2 aborted
 
 Tells whether the connection has been aborted or not
 
-=head2 accept()
+=head2 accept
 
 Returns the http C<Accept> header value, such as C<text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8>
 
-=head2 acceptable()
+=head2 accept_charset
+
+Sets or gets the acceptable character set.
+
+=head2 accept_type
+
+Sets or gets the acceptable content type.
+
+=head2 accept_version
+
+Sets or gets the version of the api being queried. This is used in building the C<Content-Type>
+
+=head2 acceptable
 
 This method parse the request header C<Accept> which could be, for example:
 
@@ -1497,35 +1564,41 @@ This method parse the request header C<Accept> which could be, for example:
 
 And return a list of acceptable content types in list context, or the first content type of the list in scalar context.
 
-=head2 accept_encoding()
+=head2 acceptables
+
+=head2 accept_encoding
 
 Returns the http C<Accept-Encoding> header value
 
-=head2 accept_language()
+=head2 accept_language
 
 Returns the http C<Accept-Language> header value such as C<en-GB,fr-FR;q=0.8,fr;q=0.6,ja;q=0.4,en;q=0.2>
 
-=head2 allowed()
+=head2 allowed
 
 Returns the allowed methods, such as GET, POST, PUT, OPTIONS, HEAD, etc
 
-=head2 apr()
+=head2 apr
 
 Returns a L<Net::API::REST::Request::Param> object used to access Apache mod_perl methods to manipulate request data.
 
-=head2 as_string()
+=head2 args
+
+Get the parameters data by calling L<Apache2::Request/args>
+
+=head2 as_string
 
 Returns the http request as a string
 
-=head2 auth()
+=head2 auth
 
 Returns the C<Authorization> header value if any. This ill have been processed upo object initiation phase.
 
-=head2 authorization()
+=head2 authorization
 
-Returns the http C<authorization> header value. This is similar to B<auth>().
+Returns the http C<authorization> header value. This is similar to L</auth>.
 
-=head2 auth_type()
+=head2 auth_type
 
 Returns the authentication type
 
@@ -1551,15 +1624,21 @@ An optional name parameter can be passed to return the POST data parameter assoc
 
 This is similar to the C<param> method with slight difference. Check L<Apache2::Request> for more information.
 
-=head2 charset()
+=head2 charset
 
 Returns the charset, if any, found in the http request received and processed upon initialisation of this module object.
 
 So for example, if the http request C<Content-type> is
 
-    Content-Type: application/json; encoding=utf-8
+    Content-Type: application/json; charset=utf-8
 
 Then, L</charset> would return C<utf-8>
+
+See also L</type> to retrieve only the content type, i.e without other information such as charset.
+
+See also L</client_api_version> which would contain the requested api version, if any.
+
+See also L<charset> for the charset provided, if any. For example C<utf-8>
 
 =head2 checkonly( boolean )
 
@@ -1569,23 +1648,23 @@ If true, this will discard the normal processing of incoming http request under 
 
 This is useful and intended when testing this module offline.
 
-=head2 child_terminate()
+=head2 child_terminate
 
 Terminate the current worker process as soon as the current request is over.
 
 See L<Apache::RequestUtil> for more information.
 
-=head2 client_api_version()
+=head2 client_api_version
 
 Returns the client api version requested, if provided. This is set during the object initialisation phase.
 
 An example header to require api version 1.0 would be:
 
-    Accept: application/json; version=1.0; encoding=utf-8
+    Accept: application/json; version=1.0; charset=utf-8
 
 In this case, this would return C<1.0>
 
-=head2 close()
+=head2 close
 
 This close the client connection.
 
@@ -1593,7 +1672,7 @@ This is not implemented in by L<APR::Socket>, so this is an efficient work aroun
 
 However, a word of caution, you most likely do not need or want to close manually the client connection and instea have your method return Apache2::Const::OK or any other constant matching the http code you want to return.
 
-=head2 code()
+=head2 code
 
 Returns the response status code.
 
@@ -1604,45 +1683,55 @@ Usually you will set this value indirectly by returning the status code as the h
     $req->status( $some_code );
     return( Apache2::Const::OK );
 
-=head2 connection()
+=head2 connection
 
 Returns a L<Apache2::Connection> object.
 
-=head2 connection_id()
+=head2 connection_id
 
 Returns the connection id; unique at any point in time. See L<Apache2::Connection> for more information.
 
-=head2 content()
+=head2 content
 
 Returns the content of the file specified with C<$req->filename>. It calls B<slurp_filename> from L<Apache2::Request>, but instead of returning a scalar reference, it returns the data itself.
 
-=head2 content_encoding()
+=head2 content_encoding
 
 Returns the value of the C<Content-Encoding> HTTP response header
 
-=head2 content_languages()
+=head2 content_languages
 
 Retrieves the value of the C<Content-Language> HTTP header
 
-=head2 content_length()
+=head2 content_length
 
 Returns the length in byte of the request body.
 
-=head2 content_type()
+=head2 content_type
 
 Retrieves the value of the Content-type header value. See L<Apache2::RequestRec> for more information.
+
+For example:
+
+    application/json; charset=utf-8
+
+See also L</type> to retrieve only the content type, i.e without other information such as charset.
+
+See also L</client_api_version> which would contain the requested api version, if any.
+
+See also L<charset> for the charset provided, if any. For example C<utf-8>
 
 =head2 cookie( name )
 
 Returns the current value for the given cookie name.
 
-This works by calling the B<cookies> method, which returns a cookie jar object which is a L<Net::API::REST::Cookies> object.
+This works by calling the L</cookies> method, which returns a cookie jar object which is a L<Net::API::REST::Cookies> object.
 
-=head2 cookies()
+=head2 cookies
 
 Returns a L<Net::API::REST::Cookies> object acting as a jar with various methods to access, manipulate and create cookies.
 
-=head2 data()
+=head2 data
 
 Read the incoming data payload and decode it from its encoded charset into perl internal utf8.
 
@@ -1650,13 +1739,32 @@ This is specifically designed for json payload.
 
 It returns a string of data.
 
+You can set a maximum size to read by setting the attribute C<Net_API_REST_MAX_SIZE> in Apache configuration file.
+
+For example:
+
+    <Directory /home/john/www>
+        PerlOptions +GlobalRequest
+        SetHandler modperl
+        # package inheriting from Net::API::REST
+        PerlResponseHandler My::API
+        # 2Mb upload limit
+        PerlSetVar Net_API_REST_MAX_SIZE 2097152
+    </Directory>
+
+This is just an example and not a recommandation. Your mileage may vary.
+
+=head2 datetime
+
+Returns a new L<Net::API::REST::DateTime> object.
+
 =head2 decode( $string )
 
 Given a url-encoded string, this returns the decoded string
 
 This uses L<APR::Request> XS method.
 
-=head2 dnt()
+=head2 dnt
 
 This is an abbreviation for C<Do not track>
 
@@ -1669,6 +1777,10 @@ Retrieve the document root for this server.
 If a value is provided, it sets the document root to a new value only for the duration of the current request.
 
 See L<Apache2::RequestUtil> for more information.
+
+=head2 document_uri
+
+Get the value for the environment variable C<DOCUMENT_URI>.
 
 =head2 encode( $string )
 
@@ -1706,13 +1818,13 @@ Get/set the filename (full file path) on disk corresponding to this request or r
 
 See L<Apache2::RequestRec/filename> for more information.
 
-=head2 finfo()
+=head2 finfo
 
 Get and set the finfo request record member
 
 See L<Apache2::RequestRec/finfo> for more information.
 
-=head2 gateway_interface()
+=head2 gateway_interface
 
 Typical value returned from the environment variable C<GATEWAY_INTERFACE> is C<CGI/1.1>
 
@@ -1740,7 +1852,7 @@ will print:
 
     400 Bad Request
 
-=head2 global_request()
+=head2 global_request
 
 Returns the L<Apache2::RequestRec> object made global with the proper directive in the Apache VirtualHost configuration.
 
@@ -1750,17 +1862,17 @@ This calls the module L<Apache::RequestUtil> to retrieve this value.
 
 Returns a hash reference of headers key => value pairs. If a header name is provided, this will return its value instead.
 
-This calls the method B<headers_in>() behind.
+This calls the method L</headers_in> behind.
 
-=head2 headers_as_hashref()
+=head2 headers_as_hashref
 
 Returns the list of headers as an hash reference.
 
-=head2 headers_as_json()
+=head2 headers_as_json
 
 Returns the list of headers as a json data
 
-=head2 headers_in()
+=head2 headers_in
 
 Returns the list of the headers as hash or the individual value of a header:
 
@@ -1782,23 +1894,23 @@ This is not the machine hostname.
 
 More information at L<Apache2::RequestRec>
 
-=head2 http_host()
+=head2 http_host
 
 Returns an C<URI> object of the http host being accessed. This is created during object initiation phase.
 
-=head2 id()
+=head2 id
 
 Returns the connection id; unique at any point in time. See L<Apache2::Connection> for more information.
 
-This is the same as B<connection_id>()
+This is the same as L</connection_id>()
 
-=head2 if_modified_since()
+=head2 if_modified_since
 
 Returns the value of the http header If-Modified-Since as a C<DateTime> object.
 
 If no such header exists, it returns C<undef()>
 
-=head2 if_none_match()
+=head2 if_none_match
 
 Returns the value of the http header C<If-None-Match>
 
@@ -1857,11 +1969,11 @@ For example instead of using C<$r->read()> to read the POST data, one could use 
 As you can see C<$r->input_filters> gives us a pointer to the last of the top of the incoming filters stack.
 
 
-=head2 is_header_only()
+=head2 is_header_only
 
 Returns a boolean value on whether the request is a C<HEAD> request or not.
 
-=head2 is_perl_option_enabled()
+=head2 is_perl_option_enabled
 
 Check whether a directory level "PerlOptions" flag is enabled or not. This returns a boolean value.
 
@@ -1877,11 +1989,11 @@ See the L<Apache2::RequestUtil> module documentation for more information.
 
 Returns true (1) if the connection is made under ssl, i.e. of the environment variable C<HTTPS> is set to C<on>, other it returns false (0).
 
-=head2 json()
+=head2 json
 
 Returns a C<JSON> object with the C<relaxed> attribute enabled so that it allows more relaxed json data.
 
-=head2 keepalive()
+=head2 keepalive
 
 This method answers the question: Should the the connection be kept alive for another HTTP request after the current request is completed?
 
@@ -1905,7 +2017,7 @@ Notice that new states could be added later by Apache, so your code should make 
 
 See L<Apache2::Connection> for more information.
 
-=head2 keepalives()
+=head2 keepalives
 
 How many requests were already served over the current connection.
 
@@ -1915,27 +2027,27 @@ If you send your own set of HTTP headers with "$r->assbackwards", which includes
 
 See L<Apache2::Connection> for more information.
 
-=head2 languages()
+=head2 languages
 
 This will check the Accept-Languages http headers and derived a list of priority ordered user preferred languages and return an array reference.
 
-See also the B<preferred_language> method.
+See also the L</preferred_language> method.
 
-=head2 length()
+=head2 length
 
 Returns the length in bytes of the request body.
 
-=head2 local_host()
+=head2 local_host
 
 Used for ap_get_server_name when UseCanonicalName is set to DNS (ignores setting of HostnameLookups)
 
-Better to use the B<server_name> instead.
+Better to use the L</server_name> instead.
 
-=head2 local_ip()
+=head2 local_ip
 
 Return our server IP address as string.
 
-=head2 location()
+=head2 location
 
 Get the path of the <Location> section from which the current "Perl*Handler" is being called.
 
@@ -1943,7 +2055,7 @@ Returns a string.
 
 =head2 log_error( string )
 
-=head2 main()
+=head2 main
 
 Get the main request record and returns a L<Apache2::RequestRec> object.
 
@@ -1963,7 +2075,7 @@ Returns the value for the environment variable C<MOD_PERL>.
 
 If a value is provided, it will set the environment variable accordingly.
 
-=head2 mod_perl_version()
+=head2 mod_perl_version
 
 Read-only. This is based on the value returned by L</mod_perl>.
 
@@ -1975,19 +2087,19 @@ This returns a L<version> object of the mod perl version being used, so you can 
         ## ok
     }
 
-=head2 mtime()
+=head2 mtime
 
 Last modified time of the requested resource.
 
 Returns a timestamp in second since epoch.
 
-=head2 next()
+=head2 next
 
 Pointer to the redirected request if this is an external redirect.
 
 Returns a L<Apache2::RequestRec> blessed reference to the next (internal) request structure or C<undef> if there is no next request.
 
-=head2 no_cache()
+=head2 no_cache
 
 Add/remove cache control headers. A true value sets the "no_cache" request record member to a true value and inserts:
 
@@ -2055,7 +2167,15 @@ If the value is an array, this will set multiple entry of the key for each value
 
 This uses Apache L<APR::Table> and works for both POST and GET methods.
 
-If the methods received was a GET method, this method returns the value of the B<query> method instead.
+If the methods received was a GET method, this method returns the value of the L</query> method instead.
+
+=head2 parse_date
+
+Alias to L<Net::API::REST::DateTime/parse_date>
+
+=head2 path
+
+Get the value for the environment variable C<PATH>
 
 =head2 path_info( string )
 
@@ -2063,17 +2183,17 @@ Get/set the C<PATH_INFO>, what is left in the path after the URI --> filename tr
 
 Return a string as the current value.
 
-=head2 payload()
+=head2 payload
 
-Returns the json data decoded into a perl structure. This is set at object initiation phase and calls the B<data> method to read the incoming data and decoded it into perl internal utf8.
+Returns the json data decoded into a perl structure. This is set at object initiation phase and calls the L</data> method to read the incoming data and decoded it into perl internal utf8.
 
-=head2 per_dir_config()
+=head2 per_dir_config
 
 Get the dir config vector. Returns a L<Apache2::ConfVector> object.
 
 For an in-depth discussion, refer to the Apache Server Configuration Customization in Perl chapter.
 
-=head2 pnotes()
+=head2 pnotes
 
 Share Perl variables between Perl HTTP handlers.
 
@@ -2089,7 +2209,7 @@ Note: sharing variables really means it. The variable is not copied.  Only its r
      $v++;                        $v++;
      my $x=$r->pnotes('v');       my $x=$r->pnotes->{v};
      
-=head2 pool()
+=head2 pool
 
 Returns the pool associated with the request as a L<APR::Pool> object.
 
@@ -2099,17 +2219,17 @@ Given an array reference of supported languages, this method will get the client
 
 It returns a string representing a language code.
 
-=head2 prev()
+=head2 prev
 
 Pointer to the previous request if this is an internal redirect.
 
 Returns a L<Apache2::RequestRec> blessed reference to the previous (internal) request structure or "undef" if there is no previous request.
 
-=head2 protocol()
+=head2 protocol
 
 Get a string identifying the protocol that the client speaks, such as C<HTTP/1.0> or C<HTTP/1.1>
 
-=head2 proxyreq()
+=head2 proxyreq
 
 Get/set the proxyrec request record member and optionally adjust other related fields.
 
@@ -2162,17 +2282,17 @@ Anonymous functions:
 
 See L<Apache::RequestUtil> for more information.
 
-=head2 query()
+=head2 query
 
 Check the query string sent in the http request, which obviously should be a GET, but not necessarily, and parse it with L<Net::API::REST::Query> and return a hash reference.
 
 =head2 query_string( query string )
 
-Actually calls B<args> from L<Apache2::RequestRec> behind the scene.
+Actually calls L<Apache2::RequestRec/args> behind the scene.
 
 This get/set the request QUERY string.
 
-=head2 read()
+=head2 read
 
 Read data from the client and returns the number of characters actually read.
 
@@ -2183,21 +2303,37 @@ This method shares a lot of similarities with the Perl core C<read()> function. 
 
 See L<Apache2::RequestIO> for more information.
 
-=head2 referer()
+=head2 redirect_error_notes
+
+Gets or sets the value for the environment variable C<REDIRECT_ERROR_NOTES>
+
+=head2 redirect_query_string
+
+Gets or sets the value for the environment variable C<REDIRECT_QUERY_STRING>
+
+=head2 redirect_status
+
+Gets or sets the value for the environment variable C<REDIRECT_STATUS>
+
+=head2 redirect_url
+
+Gets or sets the value for the environment variable C<REQUEST_URI>
+
+=head2 referer
 
 Returns the value of the Referer http header, if any.
 
-=head2 remote_addr()
+=head2 remote_addr
 
 Returns the remote host socket address as a L<APR::SockAddr> object.
 
 This checks which version of Apache is running, because the Apache2 mod_perl api has changed.
 
-=head2 remote_host()
+=head2 remote_host
 
 Returns the remote client host name.
 
-=head2 remote_ip()
+=head2 remote_ip
 
 Returns the ip address of the client, ie remote host making the request.
 
@@ -2218,13 +2354,17 @@ It takes a http constant integer value representing the http status code and a h
 
 It will convert the perl hash into a json string and return it to the client after setting the http response code.
 
-This method is actually discouraged in favour of the equivalent one B<reply> in L<Net::API::REST>, which is more powerful and versatile.
+This method is actually discouraged in favour of the equivalent of L<Net::API::REST/reply>, which is more powerful and versatile.
 
-=head2 request()
+=head2 request
 
 Returns the embedded L<Apache2::RequestRec> object provided initially at object initiation.
 
-=head2 request_time()
+=head2 request_scheme
+
+Gets or sets the environment variable C<REQUEST_SCHEME>
+
+=head2 request_time
 
 Time when the request started in second since epoch.
 
@@ -2264,7 +2404,7 @@ This returns the current value for the environment variable C<SCRIPT_URL>, or se
 
 The value returned is identical to that of L</request_uri>, i.e, for example: C</cgi-bin/prog.cgi/path/info>
 
-=head2 server()
+=head2 server
 
 Get the L<Apache2::ServerRec> object for the server the request $r is running under.
 
@@ -2274,21 +2414,21 @@ This returns the current value for the environment variable C<SERVER_ADDR>, or s
 
 Typical value is an ip address.
 
-=head2 server_admin()
+=head2 server_admin
 
 Returns the server admin as provided by L<Apache2::ServerRec>
 
-=head2 server_hostname()
+=head2 server_hostname
 
 Returns the server host name as provided by L<Apache2::ServerRec>
 
-=head2 server_name()
+=head2 server_name
 
 Get the current request's server name
 
 See L<Apache2::RequestUtil> for more information.
 
-=head2 server_port()
+=head2 server_port
 
 Get the current server port
 
@@ -2322,7 +2462,7 @@ Populate the incoming request headers table ("headers_in") with authentication h
 
 See L<Apache2::RequestUtil> for more information.
 
-=head2 set_handlers()
+=head2 set_handlers
 
 Set a list of handlers to be called for a given phase. Any previously set handlers are forgotten.
 
@@ -2333,19 +2473,19 @@ See L<Apache2::RequestUtil> for more information.
      $ok = $r->set_handlers($hook_name => []);
      $ok = $r->set_handlers($hook_name => undef);
 
-=head2 slurp_filename()
+=head2 slurp_filename
 
 Slurp the contents of C<$req->filename>:
 
-This returns a scalar reference instead of the actual string. To get the string, use B<content>
+This returns a scalar reference instead of the actual string. To get the string, use L</content>
 
 Note that if you assign to "$req->filename" you need to update its stat record.
 
-=head2 socket()
+=head2 socket
 
 Get/set the client socket and returns a L<APR::Socket> object.
 
-This calls the B<client_socket> method of the L<Apache2::Connection> package.
+This calls L<Apache2::Connection/client_socket> package.
 
 =head2 status( [ integer ] )
 
@@ -2382,6 +2522,14 @@ This method is also handy when you extend the HTTP protocol and add new response
 
 Here 499 is the new response code, and We have been FooBared is the custom response message.
 
+=head2 str2datetime
+
+Alias to L<Net::API::REST::DateTime/str2datetime>
+
+=head2 str2time
+
+Alias to L<Net::API::REST::DateTime/str2time>
+
 =head2 subnet_of( $ip, $mask )
 
 Provided with an ip address (v4 or v6), and optionally a subnet mask, and this will return a boolean value indicating if the current connection ip address is part of the provided subnet.
@@ -2400,7 +2548,7 @@ It uses L<APR::IpSubnet> and performs the test using the object from L<APR::Sock
         print( "Sorry, only local connections allowed\n" );
     }
 
-=head2 subprocess_env()
+=head2 subprocess_env
 
 Get/set the Apache C<subprocess_env> table, or optionally set the value of a named entry.
 
@@ -2434,23 +2582,31 @@ you can then deploy "mod_include" and write in .shtml document:
       Sorry
       <!--#endif -->
 
-=head2 the_request()
+=head2 the_request
 
 Get or set the first HTTP request header as a string. For example:
 
     GET /foo/bar/my_path_info?args=3 HTTP/1.0
 
-=head2 type()
+=head2 time2datetime
+
+Alias to L<Net::API::REST::DateTime/time2datetime>
+
+=head2 time2str
+
+Alias to L<Net::API::REST::DateTime/time2str>
+
+=head2 type
 
 Returns the content type of the request received. This value is set at object initiation phase.
 
 So for example, if the http request C<Content-type> is
 
-    Content-Type: application/json; encoding=utf-8
+    Content-Type: application/json; charset=utf-8
 
 Then, L</type> would return C<application/json>
 
-=head2 unparsed_uri()
+=head2 unparsed_uri
 
 The URI without any parsing performed.
 
@@ -2466,13 +2622,17 @@ whereas "$r->unparsed_uri" returns:
 
      /foo/bar/my_path_info?args=3
 
-=head2 uri()
+=head2 uploads
+
+Returns an array reference of L<Net::API::REST::Request::Upload> objects.
+
+=head2 uri
 
 Returns a C<URI> object representing the full uri of the request.
 
 This is different from the original L<Apache2::RequestRec> which only returns the path portion of the URI.
 
-So, to get the path portion using our B<uri> method, one would simply do C<$req->uri->path()>
+So, to get the path portion using our L</uri> method, one would simply do C<$req->uri->path()>
 
 =head2 url_decode( $string )
 
@@ -2482,7 +2642,7 @@ This is merely a convenient pointer to L</decode>
 
 This is merely a convenient pointer to L</encode>
 
-=head2 user()
+=head2 user
 
 Get the user name, if an authentication process was successful. Or set it.
 
@@ -2492,11 +2652,11 @@ For example, let's print the username passed by the client:
      return( $res ) if( $res != Apache2::Const::OK );
      print( "User: ", $r->user );
 
-=head2 user_agent()
+=head2 user_agent
 
 Returns the user agent, ie the browser signature as provided in the request headers received under the http header C<User-Agent>
 
-=head2 variables()
+=head2 variables
 
 When parsing the endpoint sought by the client request, there may be some variable such as:
 
@@ -2528,7 +2688,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 CPAN ID: jdeguest
 
-https://git.deguest.jp/jack/Net-API-REST
+https://gitlab.com/jackdeguest/Net-API-REST
 
 =head1 SEE ALSO
 

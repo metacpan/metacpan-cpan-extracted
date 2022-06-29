@@ -544,7 +544,7 @@ L<"DATABASE"> for details).
 
 These classes are described in the following sections.
 
-
+=for comment
 ##=head2 Policy
 ##
 ##Dochazka is configurable in a number of ways. Some configuration parameters

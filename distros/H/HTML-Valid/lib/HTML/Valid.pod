@@ -64,11 +64,11 @@ outputs
 
 =head1 VERSION
 
-This documents HTML::Valid version 0.08
-corresponding to git commit L<e5beaaba00502cc4aba10db6bba5b0758f64726d|https://github.com/benkasminbullock/html-valid/commit/e5beaaba00502cc4aba10db6bba5b0758f64726d> released on Thu May 20 08:07:15 2021 +0900.
+This documents HTML::Valid version 0.09
+corresponding to git commit L<0eff27f5da639787969d7ac7787f18df00b6753e|https://github.com/benkasminbullock/html-valid/commit/0eff27f5da639787969d7ac7787f18df00b6753e> released on Wed Jun 29 08:45:38 2022 +0900.
 
 This Perl module is built on top of the L</HTML Tidy> library version
-5.7.28.
+5.8.0.
 
 
 =head1 DESCRIPTION
@@ -1255,14 +1255,66 @@ New W3 Consortium validator.
 =back
 
 =head2 CPAN modules
+ 
+
 
 =over
 
-=item L<HTML::Tidy>
+
+=item L<Alien::TidyHTML5>
+
+
+[⭐ Author: L<RRWO|https://metacpan.org/author/RRWO>; Date: C<2020-07-31>; Version: C<v0.3.2>]
+
+
+
 
 =item L<HTML::Lint>
 
+
+[⭐ Author: L<PETDANCE|https://metacpan.org/author/PETDANCE>; Date: C<2018-06-22>; Version: C<2.32>]
+
+
+
+
 =item L<HTML::Normalize>
+
+
+[Author: L<GRANDPA|https://metacpan.org/author/GRANDPA>; Date: C<2019-08-09>; Version: C<1.0004>]
+
+
+
+
+=item L<HTML::T5>
+
+
+[⭐ Author: L<SHLOMIF|https://metacpan.org/author/SHLOMIF>; Date: C<2020-10-16>; Version: C<0.010>]
+
+
+
+
+=item L<HTML::Tagset>
+
+
+[⭐ Author: L<PETDANCE|https://metacpan.org/author/PETDANCE>; Date: C<2008-03-01>; Version: C<3.20>]
+
+
+
+
+=item L<HTML::Tidy>
+
+
+[⭐ Author: L<PETDANCE|https://metacpan.org/author/PETDANCE>; Date: C<2017-09-13>; Version: C<1.60>]
+
+
+
+
+=item L<HTML::Tidy5>
+
+
+[⭐ Author: L<PETDANCE|https://metacpan.org/author/PETDANCE>; Date: C<2019-10-26>; Version: C<1.06>]
+
+
 
 =item HTML::Validator
 
@@ -1302,8 +1354,8 @@ This is used to read a file of options
 
 This module is built from L</HTML Tidy> source code using a script
 which converts the HTML Tidy library into a single C file. This is
-available in the github repository as L<F<tools/make-c-file.pl>|https://github.com/benkasminbullock/html-valid/blob/e5beaaba00502cc4aba10db6bba5b0758f64726d/tools/make-c-file.pl>, but is not in the CPAN distribution. This also includes extra C
-functions in L<F<extra.c>|https://github.com/benkasminbullock/html-valid/blob/e5beaaba00502cc4aba10db6bba5b0758f64726d/extra.c> into the library to access
+available in the github repository as L<F<tools/make-c-file.pl>|https://github.com/benkasminbullock/html-valid/blob/0eff27f5da639787969d7ac7787f18df00b6753e/tools/make-c-file.pl>, but is not in the CPAN distribution. This also includes extra C
+functions in L<F<extra.c>|https://github.com/benkasminbullock/html-valid/blob/0eff27f5da639787969d7ac7787f18df00b6753e/extra.c> into the library to access
 internals which are not part of the public interface. This is used for
 creating the machine-readable file of option documentation included
 above in L</OPTIONS> and for creating the tables of tags and

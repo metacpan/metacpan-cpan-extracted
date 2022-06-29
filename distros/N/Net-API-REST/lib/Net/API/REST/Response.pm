@@ -1,12 +1,15 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST/Response.pm
-## Version v0.4.11
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Version v0.4.13
+## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/09/01
-## Modified 2020/06/15
+## Modified 2021/09/03
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::REST::Response;
 BEGIN
@@ -30,7 +33,8 @@ BEGIN
     use Scalar::Util;
     use Net::API::REST::Status;
     use Nice::Try;
-    our $VERSION = 'v0.4.11';
+    use URI::Escape ();
+    our $VERSION = 'v0.4.13';
 };
 
 sub init
@@ -52,7 +56,28 @@ sub init
     return( $self );
 }
 
+# Response header: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials>
+sub allow_credentials { return( shift->_set_get_one( 'Access-Control-Allow-Credentials', @_ ) ); }
+
+# Response header <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers>
+sub allow_headers { return( shift->_set_get_one( 'Access-Control-Allow-Headers', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods>
+sub allow_methods { return( shift->_set_get_one( 'Access-Control-Allow-Methods', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin>
+sub allow_origin { return( shift->_set_get_one( 'Access-Control-Allow-Origin', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Alt-Svc>
+sub alt_svc { return( shift->_set_get_multi( 'Alt-Svc', @_ ) ); }
+
 sub bytes_sent { return( shift->_try( '_request', 'bytes_sent' ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control>
+sub cache_control { return( shift->_set_get_one( 'Cache-Control', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Clear-Site-Data>
+sub clear_site_data { return( shift->_set_get_multi( 'Clear-Site-Data', @_ ) ); }
 
 ## Apache2::Connection
 sub connection { return( shift->_try( '_request', 'connection' ) ); }
@@ -60,6 +85,10 @@ sub connection { return( shift->_try( '_request', 'connection' ) ); }
 ## Set the http code to be returned, e.g,:
 ## return( $resp->code( Apache2::Const:HTTP_OK ) );
 sub code { return( shift->_try( '_request', 'status', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition>
+# XXX More work to be done here like create a disposition method to parse its content
+sub content_disposition { return( shift->_set_get_one( 'Content-Disposition', @_ ) ); }
 
 # sub content_encoding { return( shift->_request->content_encoding( @_ ) ); }
 sub content_encoding
@@ -87,6 +116,17 @@ sub content_languages { return( shift->_try( '_request', 'content_languages', @_
 ## https://perl.apache.org/docs/2.0/api/Apache2/Response.html#toc_C_set_content_length_
 sub content_length { return( shift->_try( '_request', 'set_content_length', @_ ) ); }
 
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Location>
+sub content_location { return( shift->_set_get_one( 'Content-Location', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Range>
+sub content_range { return( shift->_set_get_one( 'Content-Range', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy>
+sub content_security_policy { return( shift->_set_get_one( 'Content-Security-Policy', @_ ) ); }
+
+sub content_security_policy_report_only { return( shift->_set_get_one( 'Content-Security-Policy-Report-Only', @_ ) ); }
+
 ## Apache content_type method is special. It does not just set the content type
 sub content_type { return( shift->_try( '_request', 'content_type', @_ ) ); }
 # sub content_type { return( shift->headers( 'Content-Type', @_ ) ); }
@@ -94,8 +134,7 @@ sub content_type { return( shift->_try( '_request', 'content_type', @_ ) ); }
 sub cookie_new_ok_but_hang_on
 {
     my $self = shift( @_ );
-    my $opts = {};
-    $opts = shift( @_ ) if( ref( $_[0] ) eq 'HASH' );
+    my $opts = $self->_get_args_as_hash( @_ );
     return( $self->error( "Cookie name was not provided." ) ) if( !$opts->{name} );
     ## No value is ok to remove a cookie, but it needs to be an empty string, not undef
     return( $self->error( "No value was provided for cookie \"$opts->{name}\"." ) ) if( !length( $opts->{value} ) && !defined( $opts->{value} ) );
@@ -152,72 +191,13 @@ sub cookie_new_ok_but_hang_on
 sub cookie_new
 {
     my $self = shift( @_ );
-    my $opts = {};
-    $opts = shift( @_ ) if( ref( $_[0] ) eq 'HASH' );
+    my $opts = $self->_get_args_as_hash( @_ );
     return( $self->error( "Cookie name was not provided." ) ) if( !$opts->{name} );
     ## No value is ok to remove a cookie, but it needs to be an empty string, not undef
     # return( $self->error( "No value was provided for cookie \"$opts->{name}\"." ) ) if( !length( $opts->{value} ) && !defined( $opts->{value} ) );
     my $c = $self->request->cookies->make( $opts ) || return( $self->pass_error( $self->request->cookies->error ) );
     $self->message( 3, "Success, returning an (", ref( $c ), ") cookie object '$c' with properties: ", sub{ $self->dumper( $opts ) } );
     return( $c );
-}
-
-sub cookie_new_old
-{
-    my $self = shift( @_ );
-    my $opts = {};
-    $opts = shift( @_ ) if( ref( $_[0] ) eq 'HASH' );
-    return( $self->error( "Cookie name was not provided." ) ) if( !$opts->{name} );
-    ## No value is ok to remove a cookie, but it needs to be an empty string, not undef
-    return( $self->error( "No value was provided for cookie \"$opts->{name}\"." ) ) if( !length( $opts->{value} ) && !defined( $opts->{value} ) );
-    my @valid_params = qw( comment commentURL domain expires httponly name path port secure value version );
-    my $hash = {};
-    foreach my $k ( @valid_params )
-    {
-        $hash->{ $k } = $opts->{ $k } if( length( $opts->{ $k } ) );
-    }
-    $hash->{value} = '' if( !CORE::exists( $hash->{value} ) );
-    $hash->{domain} ||= $self->request->server_hostname;
-    $hash->{expires} =~ s/d/D/ if( $hash->{expires} );
-    return( $self->error( "Cookie property \"expires\" should be either a unix timestamp, or a variable expiration such as +3h for in 3 hours or +2M for in 2 month. Was provided with '$hash->{expires}'" ) ) if( $hash->{expires} !~ /^(?:\d{10,}|[\+\-]?(\d+)([YMDhms]))$/ );
-    ## expires:
-    ## Get or set the future expire time for the cookie.  When assigning, the new value ($set) should match /^\+?(\d+)([YMDhms]?)$/ $2 qualifies the number in
-    ## $1 as representing "Y"ears, "M"onths, "D"ays, "h"ours, "m"inutes, or "s"econds (if the qualifier is omitted, the number is interpreted as representing
-    ## seconds).  As a special case, $set = "now" is equivalent to $set = "0".
-    ## Stupidly, APR::Request::Cookie only accept positive relative timestamp, ie +7D is ok, but not -7D :(
-    ## So we have to convert it ourself into a timestamp
-    my $interval =
-    {
-        's' => 1,
-        'm' => 60,
-        'h' => 3600,
-        'D' => 86400,
-        'M' => 86400 * 30,
-        'Y' => 86400 * 365,
-    };
-    ## If this is a negative relative timestamp, we convert it and compute the epoch
-    if( substr( $hash->{expires}, 0, 1 ) eq '-' )
-    {
-        if( $hash->{expires} =~ /^[\+\-]?(\d+)([YMDhms])/ )
-        {
-            my $offset = ( $interval->{$2} || 1 ) * int( $1 );
-            $hash->{expires} = time() - $offset;
-        }
-    }
-    
-    try
-    {
-        $self->message( 3, "Using Apache request pool '" . $self->_request->pool . "'." );
-        my $c = APR::Request::Cookie->new( $self->_request->pool, %$hash );
-        $self->message( 3, "Success, returning an APR::Request::Cookie '$c' (", ref( $c ), ") object with properties: ", sub{ $self->dumper( $hash ) } );
-        return( $self->error( "Unable to create an APR::Request::Cookie object: $@ (" . APR::Request::Error . ")" ) ) if( !$c && $@ );
-        return( $c );
-    }
-    catch( $e )
-    {
-        $self->message( 3, "Failed creating an APR::Request::Cookie object, returning an error." );
-        return( $self->error( "An error occurred while trying to call APR::Request::Cookie method \"new\": $e" ) );
-    }
 }
 
 ## Add or replace a cookie, but because the headers function of Apache2 is based on APR::Table
@@ -278,6 +258,17 @@ sub cookie_set
     return( $cookie );
 }
 
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Embedder-Policy>
+sub cross_origin_embedder_policy { return( shift->_set_get_one( 'Cross-Origin-Embedder-Policy', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy>
+sub cross_origin_opener_policy { return( shift->_set_get_one( 'Cross-Origin-Opener-Policy', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Resource-Policy>
+sub cross_origin_resource_policy { return( shift->_set_get_one( 'Cross-Origin-Resource-Policy', @_ ) ); }
+
+sub cspro { return( shift->content_security_policy_report_only( @_ ) ); }
+
 ## e.g. custom_response( $status, $string );
 ## e.g. custom_response( Apache2::Const::AUTH_REQUIRED, "Authenticate please" );
 #  package MyApache2::MyShop;
@@ -301,6 +292,9 @@ sub decode
     my $self = shift( @_ );
     return( APR::Request::decode( shift( @_ ) ) );
 }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Digest>
+sub digest { return( shift->_set_get_one( 'Digest', @_ ) ); }
 
 sub encode
 {
@@ -363,9 +357,17 @@ sub err_headers
 
 sub err_headers_out { return( shift->_request->err_headers_out( @_ ) ); }
 
+sub escape { return( URI::Escape::uri_escape( @_ ) ); }
+
 sub etag { return( shift->headers( 'ETag', @_ ) ); }
 ## https://perl.apache.org/docs/2.0/api/Apache2/Response.html#toc_C_set_etag_
 ## sub etag { return( shift->_try( '_request', 'set_etag', @_ ) ); }
+
+sub expires { return( shift->headers( 'Expires', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers>
+# e.g.: Access-Control-Expose-Headers: Content-Encoding, X-Kuma-Revision
+sub expose_headers { return( shift->_set_get_multi( 'Access-Control-Expose-Headers', @_ ) ); }
 
 sub flush { return( shift->_try( '_request', 'rflush' ) ); }
 
@@ -461,7 +463,16 @@ sub is_client_error { return( Net::API::REST::Status->is_client_error( $_[1] ) )
 
 sub is_server_error { return( Net::API::REST::Status->is_server_error( $_[1] ) ); }
 
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Keep-Alive>
+sub keep_alive { return( shift->_set_get_one( 'Keep-Alive', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Last-Modified>
+sub last_modified { return( shift->_date_header( 'Last-Modified', @_ ) ); }
+
 sub last_modified_date { return( shift->headers( 'Last-Modified-Date', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Location>
+sub location { return( shift->_set_get_one( 'Location', @_ ) ); }
 
 ## https://perl.apache.org/docs/2.0/api/Apache2/SubRequest.html#toc_C_run_
 sub lookup_uri
@@ -486,7 +497,13 @@ sub lookup_uri
 ## https://perl.apache.org/docs/2.0/api/Apache2/Response.html#C_make_etag_
 sub make_etag { return( shift->_try( '_request', 'make_etag', @_ ) ); }
 
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age>
+sub max_age { return( shift->_set_get_number( 'Access-Control-Max-Age', @_ ) ); }
+
 sub meets_conditions { return( shift->_try( '_request', 'meets_conditions' ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/NEL>
+sub nel { return( shift->_set_get_one( 'NEL', @_ ) ); }
 
 ## This adds the following to the outgoing headers:
 ## Pragma: no-cache
@@ -508,7 +525,13 @@ sub redirect
     return( Apache2::Const::HTTP_MOVED_TEMPORARILY );
 }
 
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy>
+sub referrer_policy { return( shift->_set_get_one( 'Referrer-Policy', @_ ) ); }
+
 sub request { return( shift->_set_get_object( 'request', 'Net::API::REST::Request', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>
+sub retry_after { return( shift->_set_get_one( 'Retry-After', @_ ) ); }
 
 sub rflush { return( shift->_try( '_request', 'rflush' ) ); }
 
@@ -520,8 +543,17 @@ sub send_cgi_header { return( shift->_try( '_request', 'send_cgi_header', @_ ) )
 ## sendfile( $filename, $offset, $len );
 sub sendfile { return( shift->_try( '_request', 'sendfile', @_ ) ); }
 
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Server>
+sub server { return( shift->_set_get_one( 'Server', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Server-Timing>
+sub server_timing { return( shift->_set_get_one( 'Server-Timing', @_ ) ); }
+
 ## e.g set_content_length( 1024 )
 sub set_content_length { return( shift->_try( '_request', 'set_content_length', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie>
+sub set_cookie { return( shift->_set_get_one( 'Set-Cookie', @_ ) ); }
 
 ## https://perl.apache.org/docs/2.0/api/Apache2/Response.html#toc_C_set_last_modified_
 sub set_last_modified { return( shift->_try( '_request', 'set_last_modified', @_ ) ); }
@@ -532,20 +564,126 @@ sub set_keepalive { return( shift->_try( '_request', 'set_keepalive', @_ ) ); }
 ## See Apache2::Connection manual page
 sub socket { return( shift->_try( 'connection', 'client_socket', @_ ) ); }
 
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/SourceMap>
+sub sourcemap { return( shift->_set_get_one( 'SourceMap', @_ ) ); }
+
 sub status { return( shift->_try( '_request', 'status', @_ ) ); }
 
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security>
+sub strict_transport_security { return( shift->_set_get_one( 'Strict-Transport-Security', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Timing-Allow-Origin>
+sub timing_allow_origin { return( shift->_set_get_multi( 'Timing-Allow-Origin', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Trailer>
+sub trailer { return( shift->_set_get_one( 'Trailer', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Transfer-Encoding>
+sub transfer_encoding { return( shift->_set_get_one( 'Transfer-Encoding', @_ ) ); }
+
+sub unescape { return( URI::Escape::uri_unescape( @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Upgrade>
+sub upgrade { return( shift->_set_get_multi( 'Upgrade', @_ ) ); }
+
 sub update_mtime { return( shift->_try( '_request', 'update_mtime', @_ ) ); }
+
+sub uri_escape { return( shift->escape( @_ ) ); }
+
+sub uri_unescape { return( shift->unescape( @_ ) ); }
 
 sub url_decode { return( shift->decode( @_ ) ); }
 
 sub url_encode { return( shift->encode( @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Vary>
+sub vary { return( shift->_set_get_multi( 'Vary', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Via>
+sub via { return( shift->_set_get_multi( 'Via', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Want-Digest>
+sub want_digest { return( shift->_set_get_multi( 'Want-Digest', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Warning>
+sub warning { return( shift->_set_get_one( 'Warning', @_ ) ); }
 
 ## e.g. $cnt = $r->write($buffer);
 ## $cnt = $r->write( $buffer, $len );
 ## $cnt = $r->write( $buffer, $len, $offset );
 sub write { return( shift->_try( '_request', 'write', @_ ) ); }
 
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/WWW-Authenticate>
+sub www_authenticate { return( shift->_set_get_one( 'WWW-Authenticate', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options>
+sub x_content_type_options { return( shift->_set_get_one( 'X-Content-Type-Options', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control>
+sub x_dns_prefetch_control { return( shift->_set_get_one( 'X-DNS-Prefetch-Control', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options>
+sub x_frame_options { return( shift->_set_get_one( 'X-Frame-Options', @_ ) ); }
+
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection>
+sub x_xss_protection { return( shift->_set_get_one( 'X-XSS-Protection', @_ ) ); }
+
 sub _request { return( shift->request->request ); }
+
+sub _set_get_multi
+{
+    my $self = shift( @_ );
+    my $f    = shift( @_ );
+    return( $self->SUPER::error( "No field was provided to set its value." ) ) if( !defined( $f ) || !length( "$f" ) );
+    my $headers = $self->headers;
+    if( @_ )
+    {
+        my $v = shift( @_ );
+        return( $headers->unset( $f ) ) if( !defined( $v ) );
+        if( $self->_is_array( $v ) )
+        {
+            # Take a copy to be safe since this is a reference
+            $headers->set( $f => [@$v] );
+        }
+        else
+        {
+            $headers->set( $f => [split( /\,[[:blank:]\h]*/, $v)] );
+        }
+        return( $self );
+    }
+    else
+    {
+        my $v = $headers->get( $f );
+        unless( $self->_is_array( $v ) )
+        {
+            $v = [split( /\,[[:blank:]\h]*/, $v )];
+        }
+        return( $self->new_array( $v ) );
+    }
+}
+
+sub _set_get_one
+{
+    my $self = shift( @_ );
+    my $f    = shift( @_ );
+    return( $self->SUPER::error( "No field was provided to set its value." ) ) if( !defined( $f ) || !length( "$f" ) );
+    my $headers = $self->headers;
+    if( @_ )
+    {
+        my $v = shift( @_ );
+        return( $headers->unset( $f ) ) if( !defined( $v ) );
+        $headers->set( $f => $v );
+        return( $self );
+    }
+    else
+    {
+        my $v = $headers->get( $f );
+        return( $self->new_scalar( $v ) ) if( !ref( $v ) );
+        return( $self->new_array( $v ) ) if( $self->_is_array( $v ) );
+        # By default
+        return( $v );
+    }
+}
 
 sub _try
 {
@@ -567,6 +705,7 @@ sub _try
 
 1;
 
+# XXX POD
 __END__
 
 =encoding utf8
@@ -585,7 +724,7 @@ Net::API::REST::Response - Apache2 Outgoing Response Access and Manipulation
 
 =head1 VERSION
 
-    v0.4.11
+    v0.4.13
 
 =head1 DESCRIPTION
 
@@ -617,19 +756,65 @@ Optional. If set with a positive integer, this will activate verbose debugging m
 
 =back
 
+=head2 allow_credentials
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials>
+
+=head2 allow_headers
+
+Sets the C<Access-Control-Allow-Headers> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers>
+
+=head2 allow_methods
+
+Sets the C<Access-Control-Allow-Methods> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods>
+
+=head2 allow_origin
+
+Sets the C<Access-Control-Allow-Origin>
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin>
+
+=head2 alt_svc
+
+Sets the C<Alt-Svc> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Alt-Svc>
+
 =head2 bytes_sent()
 
 The number of bytes sent to the client, handy for logging, etc.
 
-=head2 connection()
+=head2 cache_control
 
-Returns a L<Apache2::Connection> object.
+Sets the C<Cache-Control> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control>
+
+=head2 clear_site_data
+
+Sets the C<Clear-Site-Data> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Clear-Site-Data>
 
 =head2 code( integer )
 
 Get/set the reply status for the client request.
 
 Normally you would use some L<Apache2::Const> constant, e.g. L<Apache2::Const::REDIRECT>.
+
+=head2 connection()
+
+Returns a L<Apache2::Connection> object.
+
+=head2 content_disposition
+
+Sets the C<Content-Disposition> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition>
 
 =head2 content_encoding( string )
 
@@ -657,6 +842,30 @@ It returns the current list of content languages, as an array reference.
 Set the content length for this request.
 
 See L<Apache2::Response> for more information.
+
+=head2 content_location
+
+Sets the C<Content-Location> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Location>
+
+=head2 content_range
+
+Sets the C<Content-Range> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Range>
+
+=head2 content_security_policy
+
+Sets the C<Content-Security-Policy> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy>
+
+=head2 content_security_policy_report_only
+
+Sets the C<Content-Security-Policy-Report-Only> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy-Report-Only>
 
 =head2 content_type( mime_type )
 
@@ -706,6 +915,28 @@ Given a cookie object, this set the C<Set-Cookie> http header for this cookie.
 
 However, it does not check if another C<Set-Cookie> header exists for this cookie.
 
+=head2 cross_origin_embedder_policy
+
+Sets the C<Cross-Origin-Embedder-Policy> header
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Embedder-Policy>
+
+=head2 cross_origin_opener_policy
+
+Sets the C<Cross-Origin-Opener-Policy> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy>
+
+=head2 cross_origin_resource_policy
+
+Sets the C<Cross-Origin-Resource-Policy> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Resource-Policy>
+
+=head2 cspro
+
+Alias for L</content_security_policy_report_only>
+
 =head2 custom_response()
 
 Install a custom response handler for a given status.
@@ -753,6 +984,12 @@ Given a url-encoded string, this returns the decoded string
 
 This uses L<APR::Request> XS method.
 
+=head2 digest
+
+Sets the C<Digest> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Digest>
+
 =head2 encode( $string )
 
 Given a string, this returns its url-encoded version
@@ -787,9 +1024,27 @@ the "Set-Cookie" header won't be sent.
 
 See L<Apache2::RequestRec> for more information.
 
+=head2 escape
+
+Provided with a value and this will return it uri escaped by calling L<URI::Escape/uri_escape>.
+
 =head2 etag( string )
 
 Sets the C<Etag> http header.
+
+=head2 expires
+
+Sets the C<expires> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Expires>
+
+=head2 expose_headers
+
+Sets the C<Access-Control-Expose-Headers> header.
+
+e.g.: Access-Control-Expose-Headers: Content-Encoding, X-Kuma-Revision
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers>
 
 =head2 flush()
 
@@ -875,9 +1130,27 @@ Given a http code integer, this will return true if the code is comprised betwee
 
 Given a http code integer, this will return true if the code is comprised between 500 and less than 600, false otherwise.
 
+=head2 keep_alive
+
+Sets the C<Keep-Alive> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Keep-Alive>
+
+=head2 last_modified
+
+Sets the C<Last-Modified> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Last-Modified>
+
 =head2 last_modified_date( http datetime )
 
 Get or set the http datetime for the http header C<Last-Modified-Date>
+
+=head2 location
+
+Sets the C<Location> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Location>
 
 =head2 lookup_uri( URI object | uri path string, [ handler ] )
 
@@ -894,6 +1167,12 @@ Construct an entity tag from the resource information. If it's a real file, buil
 
     $etag = $res->make_etag( $force_weak );
 
+=head2 max_age
+
+Sets the C<Access-Control-Max-Age> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age>
+
 =head2 meets_conditions()
 
 Implements condition C<GET> rules for HTTP/1.1 specification. This function inspects the client headers and determines if the response fulfills the specified requirements.
@@ -901,6 +1180,12 @@ Implements condition C<GET> rules for HTTP/1.1 specification. This function insp
     $status = $res->meets_conditions();
 
 It returns L<Apache2::Const::OK> if the response fulfils the condition GET rules. Otherwise some other status code (which should be returned to Apache).
+
+=head2 nel
+
+Sets the C<NEL> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/NEL>
 
 =head2 no_cache( boolean )
 
@@ -947,9 +1232,21 @@ It should be used like this in your code:
 
     return( $res->redirect( "https://example.com/somewhere/" ) );
 
+=head2 referrer_policy
+
+Sets the C<Referrer-Policy> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy>
+
 =head2 request()
 
 Returns the L<Net::API::REST::Request> object.
+
+=head2 retry_after
+
+Sets the C<Retry-After> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>
 
 =head2 rflush()
 
@@ -987,6 +1284,18 @@ On success, L<APR::Const::SUCCESS> is returned.
 
 In case of a failure -- a failure code is returned, in which case normally it should be returned to the caller
 
+=head2 server
+
+Sets the C<Server> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Server>
+
+=head2 server_timing
+
+Sets the C<Server-Timing> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Server-Timing>
+
 =head2 set_content_length( integer )
 
 Set the content length for this request.
@@ -994,6 +1303,12 @@ Set the content length for this request.
 $res->set_content_length( $length );
 
 It does not return any value.
+
+=head2 set_cookie
+
+Sets the C<Set-Cookie> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie>
 
 =head2 set_last_modified( timestamp in seconds )
 
@@ -1017,6 +1332,12 @@ Get/set the client socket and returns a L<APR::Socket> object.
 
 This calls the B<client_socket> method of the L<Apache2::Connection> package.
 
+=head2 sourcemap
+
+Sets the C<SourceMap> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/SourceMap>
+
 =head2 status( [ integer ] )
 
 Get/set the reply status for the client request.
@@ -1032,11 +1353,85 @@ Usually you will set this value indirectly by returning the status code as the h
 
 See also C<$r->status_line>, which. if set, overrides C<$r->status>.
 
+=head2 strict_transport_security
+
+Sets the C<Strict-Transport-Security> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security>
+
+=head2 timing_allow_origin
+
+Sets the C<Timing-Allow-Origin> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Timing-Allow-Origin>
+
+=head2 trailer
+
+Sets the C<Trailer> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Trailer>
+
+=head2 transfer_encoding
+
+Sets the C<Transfer-Encoding> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Transfer-Encoding>
+
+=head2 unescape
+
+Unescape the given data chunk by calling L<URI::Escape/uri_unescape>
+
 =head2 update_mtime( timestamp in seconds )
 
 Set the C<$res->mtime> field to the specified value if it's later than what's already there.
 
     $res->update_mtime( $mtime );
+
+=head2 upgrade
+
+Sets the C<Upgrade> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Upgrade>
+
+=head2 uri_escape
+
+Provided with a string and this uses L<URI::Escape> to return an uri-escaped string.
+
+=head2 uri_unescape
+
+Provided with an uri-escaped string and this will decode it and return its original string.
+
+=head2 url_decode
+
+Provided with an url-encoded string and this will return its decoded version.
+
+=head2 url_encode
+
+Provided with a string and this will return an url-encoded version.
+
+=head2 vary
+
+Sets the C<Vary> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Vary>
+
+=head2 via
+
+Sets the C<Via> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Via>
+
+=head2 want_digest
+
+Sets the C<Want-Digest> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Want-Digest>
+
+=head2 warning
+
+Sets the C<Warning> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Warning>
 
 =head2 write()
 
@@ -1048,9 +1443,57 @@ Send partial string to the client
 
 See L<Apache2::RequestIO> for more information.
 
+=head2 www_authenticate
+
+Sets the C<WWW-Authenticate> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/WWW-Authenticate>
+
+=head2 x_content_type_options
+
+Sets the C<X-Content-Type-Options> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options>
+
+=head2 x_dns_prefetch_control
+
+Sets the C<X-DNS-Prefetch-Control> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control>
+
+=head2 x_frame_options
+
+Sets the C<X-Frame-Options> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options>
+
+=head2 x_xss_protection
+
+Sets the C<X-XSS-Protection> header.
+
+See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection>
+
 =head2 _request()
 
 Returns the embedded L<Apache2::RequestRec>
+
+=head2 _set_get_multi
+
+    $self->_set_get_multi( 'SomeHeader' => $some_value );
+
+Sets or gets a header with multiple values. The value provided for the header can be either an array reference and it will be used as is (after being copied), or a regular string, which will be converted into an array reference by splitting it by comma.
+
+If the value is undefined, it will remove the corresponding header.
+
+    $self->_set_get_multi( 'SomeHeader' => undef() );
+
+If no value is provided, it returns the current value for this header as a L<Module::Generic::Array> object.
+
+=head2 _set_get_one
+
+Sets or gets a header with the provided value. If the value is undefined, the header will be removed.
+
+If no value is provided, it returns the current value as an array object (L<Module::Generic::Array>) or as a scalar object (L<Module::Generic::Scalar>) if it is not a reference.
 
 =head2 _try( object accessor, method, [ arguments ] )
 
@@ -1064,7 +1507,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 CPAN ID: jdeguest
 
-https://git.deguest.jp/jack/Net-API-REST
+https://gitlab.com/jackdeguest/Net-API-REST
 
 =head1 SEE ALSO
 

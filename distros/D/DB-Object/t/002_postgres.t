@@ -10,7 +10,7 @@ BEGIN
 	use File::Spec;
 	use JSON;
 	use version;
-	our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? 1 : 0;
+	our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
 # BEGIN { use_ok( 'DB::Object::Postgres' ); };
@@ -201,7 +201,21 @@ DELETE FROM orders WHERE id = ? AND cust_id = (SELECT id FROM customers WHERE la
 SQL
 	chomp( $expected );
 	is( $result, $expected, "Checking DELETE query on orders table using sub-query" );
-
+	
+	$orders_tbl->reset;
+	my $P = $dbh->placeholder( type => 'inet' );
+    $orders_tbl->where( $dbh->OR( $orders_tbl->fo->ip_addr == "inet $P", "inet $P" << $orders_tbl->fo->ip_addr ) );
+    my $order_ip_sth = $orders_tbl->select( 'id' ) || fail( "An error has occurred while trying to create a select by ip query for table orders: " . $orders_tbl->error );
+	pass( "Orders select by ip query object" );
+	$result = $order_ip_sth->as_string;
+	diag( "select by ip query in field operation is: $result" ) if( $DEBUG );
+	$expected = <<SQL;
+SELECT id FROM orders WHERE ip_addr = inet ? OR inet ? << ip_addr
+SQL
+	chomp( $expected );
+	is( $result, $expected, "Checking SELECT by ip query on orders table" );
+	
+	
     my $no_trigger_sth = $orders_tbl->disable_trigger || fail( "An error has occurred while trying to create a query to disable trigger: " . $orders_tbl->error );
     pass( "Disable trigger query object" );
 	$result = $no_trigger_sth->as_string;

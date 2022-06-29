@@ -22,6 +22,12 @@ is one example of such a server.
 
 For an introduction to REST and Web Services, see Web::MREST::WebServicesIntro.
 
+Bootstrapping
+=============
+
+The process of "bootstrapping" MREST (successfully running it for the first time
+from source) is documented in the bootstrap scripts included in the git repo.
+
 Documentation
 =============
 

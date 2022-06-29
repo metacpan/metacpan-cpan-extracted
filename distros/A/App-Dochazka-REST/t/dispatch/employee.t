@@ -492,7 +492,7 @@ note( 'incorrigibly attempt to update totally bogus and invalid EIDs' );
 req( $test, 400, 'root', 'POST', $base, '{ "eid" : }' );
 req( $test, 400, 'root', 'POST', $base, '{ "eid" : jj }' );
 $status = req( $test, 500, 'root', 'POST', $base, '{ "eid" : "jj" }' );
-like( $status->text, qr/invalid input syntax for integer/ );
+like( $status->text, qr/invalid input syntax for type integer/ );
 
 note( 'and give it a bogus parameter (on update, bogus parameters cause REST to' );
 note( 'return 200 status code with DISPATCH_UPDATE_NO_CHANGE_OK; on insert, they are ignored)' );

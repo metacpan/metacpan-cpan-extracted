@@ -1,14 +1,14 @@
 package SPVM::Time::Local;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 1;
 
-=head1 NAME
+=head1 Name
 
 SPVM::Time::Local - Reverse Manipulation of localtime and gmtime Functions.
 
-=head1 SYNOPSYS
+=head1 Synopsys
   
   use Time
   use Time::Local;
@@ -23,11 +23,17 @@ SPVM::Time::Local - Reverse Manipulation of localtime and gmtime Functions.
   # Convert a Time::Info object that is UTC to the epoch time
   my $epoch = Time::Local->timegm($time_info_utc);
 
-=head1 DESCRIPTION
+=head1 Description
 
 C<Time::Local> provides reverse manipulations of L<localtime|SPVM::Time/"localtime"> and L<gmtime|SPVM::Time/"gmtime"> functions.
 
-=head1 CLASS METHODS
+This module is a L<SPVM> class.
+
+=head1 Caution
+
+C<Time::Local> is a L<SPVM> class. L<SPVM> itself is yet experimental status.
+
+=head1 Class Methods
 
 =head2 timelocal
 
@@ -52,3 +58,18 @@ This method is the reverse manipulation of L<gmtime|SPVM::Time/"gmtime">.
 This method is the same as C<timegm> function of C<Linux>.
 
   my $epoch = Time::Local->timegm($time_info_utc);
+
+=head1 Repository
+
+L<https://github.com/yuki-kimoto/SPVM-Time-Local>
+
+=head1 Author
+
+Yuki Kimoto C<kimoto.yuki@gmail.com>
+
+=head1 Copyright & License
+
+Copyright 2022-2022 Yuki Kimoto, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

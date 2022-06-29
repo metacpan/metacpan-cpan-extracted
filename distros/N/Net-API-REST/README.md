@@ -1,0 +1,862 @@
+SYNOPSIS
+========
+
+        package MyPackage;
+        BEGIN
+        {
+            use strict;
+            use curry;
+            use parent qw( Net::API::REST );
+            use Net::API::Stripe;
+        };
+        
+        sub init
+        {
+            my $self = shift( @_ );
+            $self->{routes} =
+            {
+            ## API version 1
+            1 =>
+                {
+                'favicon.ico' => $self->curry::noop,
+                auth =>
+                    {
+                    google =>
+                        {
+                        _handler => $self->curry::oauth_google,
+                        callback => $self->curry::oauth_google(callback => 1),
+                        },
+                    linkedin =>
+                        {
+                        _handler => $self->curry::oauth_linkedin,
+                        callback => $self->curry::oauth_linkedin(callback => 1),
+                        },
+                    },
+                },
+                stripe => $self->curry::stripe,
+                # Whatever method is fine. Will call the method handle in package MyAPI::Users to handle the endpoint
+                users => 'MyAPI::Users->handle'
+            };
+            $self->{api_version} = 1;
+            $self->{supported_api_versions} = [qw( 1 )];
+            ## By default, we support the GET and POST to access our endpoints
+            ## It may be adjusted endpoint by endpoint and if nothing is specified this default is used.
+            $self->{default_methods} = [qw( GET POST )];
+            ## This is ALL possible supported methods
+            $self->{supported_methods} = [qw( DELETE GET HEAD OPTIONS POST PUT )];
+            $self->{supported_languages} = [qw( en-GB en fr-FR fr ja-JP )];
+            $self->{key} = 'kAncmaDajnacSnbGmbXamn';
+            ## We want JWE (Json Web Token encrypted). This will affect jwt_encode's behaviour
+            $self->{jwt_encrypt} = 1;
+            ## Because we are encrypting
+            $self->{jwt_algo} = 'PBES2-HS256+A128KW';
+            $self->{jwt_encoding} = 'A128GCM' unless( length( $self->{jwt_encoding} ) );
+            $self->{jwt_accepted_algo} = [qw( PBES2-HS256+A128KW HS256 )];
+            $self->{jwt_accepted_encoding} = [qw( A128GCM )];
+            $self->SUPER::init( @_ );
+            return( $self );
+        }
+        
+        sub stripe
+        {
+            my $self = shift( @_ );
+            my $ep = $self->endpoint;
+            my $pinfo = $ep->path_info;
+            my $remote_ip = $self->request->remote_ip;
+            my $sig = $self->request->headers( 'Stripe-Signature' );
+            return( $self->reply({ code => Apache2::Const::HTTP_BAD_REQUEST, message => "No signature found" }) ) if( !CORE::length( $sig ) );
+            my $payload = $self->request->data || return( $self->reply({ code => Apache2::Const::HTTP_BAD_REQUEST, message => "No payload data received from the client." }) );
+            ## Net::API::Stripe object
+            my $stripe = Net::API::Stripe->new(
+                # Enable debug to get debug data in http server log
+                debug => 0,
+                conf_file => "/home/john_doe/stripe-settings.json",
+            ) || do
+            {
+                $self->message( 3, "Unable to initiate a Net::API::Stripe object using the configuration file /home/john_doe/stripe-settings.json" );
+                return( $self->reply({ code => Apache2::Const::HTTP_INTERNAL_SERVER_ERROR, message => $self->oops }) );
+            };
+        
+            ## Do an IP source check to be sure this is Stripe talking to us
+            if( !defined( my $ip_check = $stripe->webhook_validate_caller_ip({ ip => $remote_ip, ignore_ip => $ignore_ip }) ) )
+            {
+                return( $self->reply({ code => $stripe->error->code, message => $stripe->error->message }) );
+            }
+        
+            ## Now, we make sure this is Stripe sending this by checking the signature of the payload
+            my $check = $stripe->webhook_validate_signature({
+                secret => $signing_secret,
+                signature => $sig,
+                payload => $payload,
+                time_tolerance => $max_time_spread,
+            });
+            if( !defined( $check ) )
+            {
+                return( $self->reply({code => $stripe->error->code, message => $stripe->error->message }) );
+            }
+        
+            ## Ok, if we are here, we passed all checks
+            ## Don't wait, reply ok back to Stripe so our request does not time out
+            $self->response->code( Apache2::Const::HTTP_OK );
+            my $json = $self->json->utf8->encode({ code => 200, success => $self->true });
+            $self->response->print( $json );
+            $self->response->rflush;
+            # Do something with the payload received
+            my $evt = $stripe->event( $payload ) || 
+            return( $self->reply({ code => Apache2::Const::HTTP_INTERNAL_SERVER_ERROR, message => $self->oops }) );
+            printf( STDERR "Received an event from api version %s on %s for Stripe object type %s\n", $evt->api_version, $evt->created->iso8601, $evt->type );
+            return( Apache2::Const::HTTP_OK );
+        }
+
+VERSION
+=======
+
+        v0.6.4
+
+DESCRIPTION
+===========
+
+The purpose of this module is to provide a powerful, yet simple
+framework to implement a RESTful API under Apache2 mod\_perl.
+
+METHODS
+=======
+
+new( hash )
+-----------
+
+This initiates the package and take the following parameters:
+
+*request*
+
+:   This is a required parameter to be sent with a value set to a
+    [Apache2::RequestRec](https://metacpan.org/pod/Apache2::RequestRec){.perl-module}
+    object
+
+*debug*
+
+:   Optional. If set with a positive integer, this will activate verbose
+    debugging message
+
+apache\_request()
+-----------------
+
+Returns the
+[Apache2::RequestRec](https://metacpan.org/pod/Apache2::RequestRec){.perl-module}
+object.
+
+api\_uri()
+----------
+
+Returns the api URI as a `URI` object.
+
+api\_version( integer or decimal )
+----------------------------------
+
+Get or sets the current api version on the server.
+
+bailout( error string )
+-----------------------
+
+Given an error message, this will prepare the http header and response
+accordingly.
+
+It will call **gettext** to get the localised version of the error
+message, so this method is expected to be overriden by inheriting
+package.
+
+If the outgoing content type set is `application/json` then this will
+return a properly formatted standard json error, such as:
+
+        { "error": { "code": 401, "message": "Something went wrong" } }
+
+Otherwise, it will send to the client the message as is.
+
+base\_path( path )
+------------------
+
+If in the Directory directive of the Apache Virtual Host, a
+`Net_API_REST_Base` was set, this method will be set with this value.
+
+compression\_threshold( integer )
+---------------------------------
+
+The number of bytes threshold beyond which, the **reply** method will
+gzip compress the data returned to the client.
+
+decode\_base64( data )
+----------------------
+
+Given some data, this will decode it using base64 algorithm. It uses
+[APR::Base64::decode](https://metacpan.org/pod/APR::Base64::decode){.perl-module}
+in the background, because
+[MIME::Decoder](https://metacpan.org/pod/MIME::Decoder){.perl-module}
+may have some issue under mod\_perl.
+
+decode\_json( data )
+--------------------
+
+This decode from utf8 some data into a perl structure.
+
+If an error occurs, it will return undef and set an exception that can
+be accessed with the **error** method.
+
+decode\_uri( \$string )
+-----------------------
+
+Provided with an uri encoded string, and this uses
+[URI::Escape](https://metacpan.org/pod/URI::Escape){.perl-module} to
+return its decoded form.
+
+See also [\"encode\_uri\"](#encode_uri){.perl-module}
+
+decode\_url( \$string )
+-----------------------
+
+Given a url-encoded string, this returns the decoded string
+
+This uses
+[APR::Request](https://metacpan.org/pod/APR::Request){.perl-module} XS
+method.
+
+decode\_utf8( data )
+--------------------
+
+Decode some data from ut8 into perl internal utf8 representation.
+
+If an error occurs, it will return undef and set an exception that can
+be accessed with the **error** method.
+
+default\_methods( \[ qw( GET POST ... ) \] )
+--------------------------------------------
+
+This sets or gets the default methods supported by an endpoint.
+
+encode\_base64( data )
+----------------------
+
+Given some data, this will encode it using base64 algorithm. It uses
+[APR::Base64::encode](https://metacpan.org/pod/APR::Base64::encode){.perl-module}
+in the background, because
+[MIME::Decoder](https://metacpan.org/pod/MIME::Decoder){.perl-module}
+may have some issue under mod\_perl.
+
+encode\_json( hash reference )
+------------------------------
+
+Given a hash reference, this will encode it into a json data
+representation.
+
+However, this will not utf8 encode it, because this is done upon
+printing the data and returning it to the client.
+
+encode\_uri( \$string )
+-----------------------
+
+Provided with a string, and this uses
+[URI::Escape](https://metacpan.org/pod/URI::Escape){.perl-module} to
+return an uri encoded string.
+
+See also [\"decode\_uri\"](#decode_uri){.perl-module}
+
+encode\_url( \$string )
+-----------------------
+
+Given a string, this returns its url-encoded version
+
+This uses
+[APR::Request](https://metacpan.org/pod/APR::Request){.perl-module} XS
+method.
+
+encode\_utf8( data )
+--------------------
+
+This encode in ut8 the data provided and return it.
+
+If an error occurs, it will return undef and set an exception that can
+be accessed with the **error** method.
+
+endpoint( \[ Net::API::REST::Endpoint object \] )
+-------------------------------------------------
+
+This gets or sets an
+[Net::API::REST::Endpoint](https://metacpan.org/pod/Net::API::REST::Endpoint){.perl-module}
+object.
+
+generate\_uuid()
+----------------
+
+Generates an uuid string and return it.
+
+get\_auth\_bearer()
+-------------------
+
+Checks whether an `Authorization` http header was provided, and get the
+Bearer value.
+
+If no header was found, it returns an empty string.
+
+If an error occurs, it will return undef and set an exception that can
+be accessed with the **error** method.
+
+get\_handlers()
+---------------
+
+Returns a reference to a list of handlers enabled for a given phase.
+
+        $handlers_list = $res->get_handlers( $hook_name );
+
+A list of handlers configured to run at the child\_exit phase:
+
+        @handlers = @{ $res->get_handlers( 'PerlChildExitHandler' ) || []};
+
+gettext( \'string id\' )
+------------------------
+
+Get the localised version of the string passed as an argument.
+
+This is supposed to be superseded by the package inheriting from
+[Net::API::REST](https://metacpan.org/pod/Net::API::REST){.perl-module}
+
+handler()
+---------
+
+This is the main method called by Apache to handle the response. To make
+this work, in the Apache configuration, you must set the handler to your
+package and have your package inherit from
+[Net::API::REST](https://metacpan.org/pod/Net::API::REST){.perl-module}.
+For example:
+
+        PerlResponseHandler MyPackage
+
+When called by Apache, **handler** will initiate a
+[Net::API::REST::Request](https://metacpan.org/pod/Net::API::REST::Request){.perl-module}
+object and a
+[Net::API::REST::Response](https://metacpan.org/pod/Net::API::REST::Response){.perl-module}
+
+If the incoming request is an OPTIONS request such as a typical one
+issued during a javascript Ajax call, it will call the method
+**http\_options**() which will also set the cors policy by calling
+**http\_cors**()
+
+Finally, it will try to find a route for the endpoint sought in the
+incoming query, and construct a
+[Net::API::REST::Endpoint](https://metacpan.org/pod/Net::API::REST::Endpoint){.perl-module}
+object with the context information of the endpoint, including
+information such as variables that could exist in the path. For example:
+
+        /org/jp/llc/123/directors/42/profile
+
+Here the llc property has an id 123 and the directors property has an id
+42. Those two variables are stored in the
+[Net::API::REST::Endpoint](https://metacpan.org/pod/Net::API::REST::Endpoint){.perl-module}
+object. This object can then be accessed with the method **endpoint**
+
+Having found a route, **handler** calls the anonymous subroutine in
+charge of handling the endpoint.
+
+If no route was found, **handler** returns a `400 Bad Request`.
+
+If the endpoint handler returns undef(), **handler** will return a
+`500 Server Error`, otherwise it will pass the return value back to
+Apache. The return value should be an
+[Apache2::Const](https://metacpan.org/pod/Apache2::Const){.perl-module}
+return code.
+
+header\_datetime( DateTime object )
+-----------------------------------
+
+Given a `DateTime` object, this sets it to GMT time zone and set the
+proper formatter
+([Net::API::REST::DateTime](https://metacpan.org/pod/Net::API::REST::DateTime){.perl-module})
+so that the stringification is compliant with http headers standard.
+
+http\_cors()
+------------
+
+Checks http request context and set the proper CORS http headers.
+
+http\_options()
+---------------
+
+If the request is an OPTIONS request, this method is called. It will do
+a `pre-flight check` and look forward to see if the user has access to
+the resource sought and sets the response http headers accordingly.
+
+init\_headers( code reference )
+-------------------------------
+
+If this is set, then
+[Net::API::REST::handler](https://metacpan.org/pod/Net::API::REST::handler){.perl-module}
+will call it.
+
+is\_allowed
+-----------
+
+Get or set handlers to check permission for various aspects of the api.
+
+Each handler must return a valid HTTP Status code as an
+[Apache2::Cons](https://metacpan.org/pod/Apache2::Cons){.perl-module}
+value and if the returned code is an error,
+[Net::API::REST](https://metacpan.org/pod/Net::API::REST){.perl-module}
+will stop right there and return it to Apache. See
+[Net::API::REST::Status](https://metacpan.org/pod/Net::API::REST::Status){.perl-module}
+for more information.
+
+Currently supported handlers types are:
+
+*access*
+
+:   This is called in [\"handler\"](#handler){.perl-module} and before
+    it runs the code associated with the endpoint.
+
+    For example:
+
+            $self->is_allowed( access => sub
+            {
+                my $req = $self->request;
+                my $ep  = $self->endpoint;
+                my $ref;
+                # See: <https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html>
+                if( $ep->access eq 'restricted' )
+                {
+                    if( !$req->headers->get( 'Authorization' ) || !$req->headers->get( 'X-CSRF-Token' ) )
+                    {
+                        return( Apache2::Const::HTTP_NOT_ACCEPTABLE );
+                    }
+                    elsif( !( $ref = $self->auth_check ) )
+                    {
+                        return( Apache2::Const::HTTP_UNAUTHORIZED );
+                    }
+                }
+                # To implement the double submit security measure
+                elsif( !$req->headers->get( 'X-CSRF-Token' ) )
+                {
+                    return( Apache2::Const::HTTP_NOT_ACCEPTABLE );
+                }
+            });
+
+*content\_type*
+
+:   This handler, if present, is called from
+    [\"handler\"](#handler){.perl-module} before executing the code
+    reference associated with the endpoint.
+
+    It is designed to check the content type in the request is
+    acceptable as a security measure recommended and described in [OWASP
+    REST security cheat
+    sheet](https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html){.perl-module}
+
+    For example:
+
+            $self->is_allowed( content_type => sub
+            {
+                my $type = shift( @_ );
+                # You can also get the request content type with:
+                # my $type = $self->request->type;
+            });
+
+*method*
+
+:   This handler, if present, is called with the request method (e.g.
+    GET, POST, etc) to check if it is allowed.
+
+    Note that `OPTIONS` is different and should always be allowed to
+    implement pre-flight check for
+    [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS){.perl-module}
+
+    For example:
+
+            $self->is_allowed( method => sub
+            {
+                my $meth = shift( @_ );
+                my $ok_methods = [qw( GET POST )];
+                return( Apache2::Const::HTTP_METHOD_NOT_ALLOWED ) if( !scalar( grep( $meth eq $_, @$ok_methods ) ) );
+            });
+
+    Note that this is equivalent to setting the value of
+    [\"supported\_methods\"](#supported_methods){.perl-module} to an
+    array reference with values `GET POST`, but provides you with more
+    granularity and control.
+
+*network*
+
+:   This is called very early in [\"handler\"](#handler){.perl-module}
+    and is designed to check if the user\'s ip is authorised to access
+    the api.
+
+    The handler is called with the remote ip address as a string.
+
+    This could be a good opportunity to check for api abuse and
+    throttling.
+
+    For example:
+
+            $self->is_allowed( network => sub
+            {
+                my $ip = shift( @_ );
+                if( $self->is_banned( $ip ) )
+                {
+                    return( Apache2::Const::HTTP_FORBIDDEN );
+                }
+                elsif( $self->is_throttled( $ip ) )
+                {
+                    return( Apache2::Const::HTTP_TOO_MANY_REQUESTS );
+                }
+                else
+                {
+                    # returning Apache2::Const::OK would work too although it is not the same value
+                    return( Apache2::Const::HTTP_OK );
+                }
+            });
+
+is\_perl\_option\_enabled()
+---------------------------
+
+Checks if perl option is enabled in the Virtual Host and returns a
+boolean value
+
+json()
+------
+
+Returns a JSON object.
+
+jwt\_accepted\_algo( string )
+-----------------------------
+
+Get or set the algorithm supported for the JWT tokens.
+
+jwt\_accepted\_encoding( string )
+---------------------------------
+
+Get or set the supported encoding for the JWT tokens.
+
+jwt\_algo( string )
+-------------------
+
+The chosen algorithm to create JWT tokens
+
+jwt\_decode( token )
+--------------------
+
+Given a JWT token, this will decode it and returns a hash reference
+
+jwt\_encode
+-----------
+
+Provided with an hash reference of parameters, and this will prepare the
+token data and call [\"encode\_jwt\" in
+Net::API::REST::JWT](https://metacpan.org/pod/Net::API::REST::JWT#encode_jwt){.perl-module}
+
+It accepts the following arguments and additional arguments recognised
+by
+[Net::API::REST::JWT](https://metacpan.org/pod/Net::API::REST::JWT){.perl-module}
+can also be provided and will be passed to [\"encode\_jwt\" in
+Net::API::REST::JWT](https://metacpan.org/pod/Net::API::REST::JWT#encode_jwt){.perl-module}
+directly.
+
+It returns the encrypted token as a string or `undef` if an error
+occurred which can be retrieved using the [\"error\" in
+Module::Generic](https://metacpan.org/pod/Module::Generic#error){.perl-module}
+method.
+
+*algo*
+
+:   This will set the *alg* property in the token.
+
+*audience*
+
+:   This will set the *aud* property in the token payload.
+
+*encoding*
+
+:   This will set the *enc* property in the token payload.
+
+*encrypt*
+
+:   If true, this will encrypt the token. When provided this will affect
+    the *algo*.
+
+    For example, when not encrypted, by default the algorithm used is
+    `HS256`, but when encryption is activated, the algorithm becomes
+    `PBES2-HS256+A128KW`
+
+*expires*
+
+:   This will set the *exp* property in the token payload.
+
+*issued\_at*
+
+:   This will set the *iat* property in the token payload.
+
+*issuer*
+
+:   This will set the *iss* property in the token payload.
+
+*key*
+
+:   This will set the *key* property in the token payload.
+
+*payload*
+
+:   The hash data to become the token payload. It can contains
+    discretionary elements.
+
+*subject*
+
+:   This will set the *sub* property in the token payload.
+
+*ttl*
+
+:   If provided, this will set the *exp* property to *iat* + *ttl*
+
+jwt\_encoding
+-------------
+
+jwt\_encrypt
+------------
+
+jwt\_extract
+------------
+
+jwt\_verify
+-----------
+
+jwt\_verify\_audience
+---------------------
+
+key
+---
+
+lang( string )
+--------------
+
+Set or get the current language
+
+lang\_unix( string )
+--------------------
+
+Given a language, this returns a language code formatted the unix way,
+ie en-GB would become en\_GB
+
+lang\_web( string )
+-------------------
+
+Given a language, this returns a language code formatted the web way, ie
+en\_GB would become en-GB
+
+log\_error( string )
+--------------------
+
+Given a string, this will log the data into the error log.
+
+When log\_error is accessed with the
+[Apache2::RequestRec](https://metacpan.org/pod/Apache2::RequestRec){.perl-module}
+the error gets logged into the Virtual Host log, but when log\_error
+gets accessed via the
+[Apache2::ServerUtil](https://metacpan.org/pod/Apache2::ServerUtil){.perl-module}
+object, the error get logged into the Apache main error log.
+
+print( list )
+-------------
+
+print out the list of strings and returns the number of bytes sent.
+
+push\_handlers
+--------------
+
+reply( http code, message \| hash reference )
+---------------------------------------------
+
+Given an http code and a message, or just a hash reference, **reply**
+will find out if the code provided is an error and format the replied
+json appropriately like:
+
+        { "error": { "code": 400, "message": "Some error" } }
+
+It will json encode the returned data and print it out back to the
+client after setting the http returned code.
+
+request()
+---------
+
+Returns the
+[Net::API::REST::Request](https://metacpan.org/pod/Net::API::REST::Request){.perl-module}
+object. This object is set early during the instantiation in the
+**handler** method.
+
+response
+--------
+
+Returns the
+[Net::API::REST::Response](https://metacpan.org/pod/Net::API::REST::Response){.perl-module}
+object. This object is set early during the instantiation in the
+**handler** method.
+
+route( URI object )
+-------------------
+
+Given an uri, this will find the route for the endpoint sought and
+return and
+[Net::API::REST::Endpoint](https://metacpan.org/pod/Net::API::REST::Endpoint){.perl-module}
+object. If nothing found, it will return an empty string. If there was
+an error, it will return `undef` and set an error object that can be
+retrieved with the inherited [\"error\" in
+Module::Generic](https://metacpan.org/pod/Module::Generic#error){.perl-module}
+method. The error object will also contain a `code` attribute which will
+represent an http status code.
+
+[\"route\"](#route){.perl-module} is called from
+[\"handler\"](#handler){.perl-module} to get the endpoint object and
+related handler, then calls the handler after performing a number of
+operations. See [\"handler\"](#handler){.perl-module} for more
+information.
+
+Otherwise, a
+[Net::API::REST::Endpoint](https://metacpan.org/pod/Net::API::REST::Endpoint){.perl-module}
+is returned.
+
+routes( hash reference )
+------------------------
+
+This sets the routes for all the endpoints proposed by the RESTful
+server
+
+server()
+--------
+
+Returns a
+[Apache2::Server](https://metacpan.org/pod/Apache2::Server){.perl-module}
+object
+
+server\_version()
+-----------------
+
+Tries hard to find out the version number of the Apache server.
+
+set\_handlers()
+---------------
+
+supported\_api\_versions( array reference )
+-------------------------------------------
+
+Get or set the list of supported api versions
+
+supported\_languages( array reference )
+---------------------------------------
+
+Get or set the list of supported language codes, such as fr\_FR, en\_GB,
+ja\_JP, zh\_TW, etc
+
+supported\_methods( array reference )
+-------------------------------------
+
+Get or set the list of supported http methods.
+
+warn( list )
+------------
+
+Given a list of string, this sends a warning.
+
+well\_known()
+-------------
+
+If the http request is for /.well-know, then we simply decline to
+process it.
+
+This does not mean it won\'t get processed, but just that we pass and
+let Apache handle it directly.
+
+\_try( object type, method name, \@\_ )
+---------------------------------------
+
+Given an object type, a method name and optional parameters, this
+attempts to call it.
+
+Apache2 methods are designed to die upon error, whereas our model is
+based on returning `undef` and setting an exception with
+[Module::Generic::Exception](https://metacpan.org/pod/Module::Generic::Exception){.perl-module},
+because we believe that only the main program should be in control of
+the flow and decide whether to interrupt abruptly the execution, not
+some sub routines.
+
+Net::API::REST::Endpoint methods
+================================
+
+access()
+--------
+
+This specifies the level of access: private or restricted
+
+handler()
+---------
+
+Returns the handler found to handle the endpoint
+
+is\_method\_allowed()
+---------------------
+
+Returns a boolean on whether the given method is allowed.
+
+methods()
+---------
+
+Returns an array reference of the methods allowed for this endpoint.
+
+path\_info()
+------------
+
+Returns a string for this path info, if any.
+
+supported\_content\_types
+-------------------------
+
+Sets or gets an array of supported content types
+
+variables()
+-----------
+
+Returns a hash reference of name =\> value pairs for the variables found
+in the endpoint sought by in the http request. For example:
+
+        /org/jp/llc/12/directors/23/profile
+
+In this case, llc has an id value of 12 and the director an id value of
+23. They will be recorded as variables as instructed by the route map
+set by the package using
+[Net::API::REST](https://metacpan.org/pod/Net::API::REST){.perl-module}
+
+AUTHOR
+======
+
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x55f263a72ef8)"}\>
+
+CPAN ID: jdeguest
+
+https://gitlab.com/jackdeguest/Net-API-REST
+
+SEE ALSO
+========
+
+[Net::API::REST::Cookie](https://metacpan.org/pod/Net::API::REST::Cookie){.perl-module},
+[Net::API::REST::DateTime](https://metacpan.org/pod/Net::API::REST::DateTime){.perl-module},
+[Net::API::REST::JWT](https://metacpan.org/pod/Net::API::REST::JWT){.perl-module},
+[Net::API::REST::Endpoint](https://metacpan.org/pod/Net::API::REST::Endpoint){.perl-module},
+[Net::API::REST::Query](https://metacpan.org/pod/Net::API::REST::Query){.perl-module},
+[Net::API::REST::Request](https://metacpan.org/pod/Net::API::REST::Request){.perl-module},
+[Net::API::REST::Request::Params](https://metacpan.org/pod/Net::API::REST::Request::Params){.perl-module},
+[Net::API::REST::Request::Upload](https://metacpan.org/pod/Net::API::REST::Request::Upload){.perl-module},
+[Net::API::REST::Response](https://metacpan.org/pod/Net::API::REST::Response){.perl-module},
+[Net::API::REST::Status](https://metacpan.org/pod/Net::API::REST::Status){.perl-module}
+
+[Apache2::Request](https://metacpan.org/pod/Apache2::Request){.perl-module},
+[Apache2::RequestRec](https://metacpan.org/pod/Apache2::RequestRec){.perl-module},
+[Apache2::RequestUtil](https://metacpan.org/pod/Apache2::RequestUtil){.perl-module}
+
+COPYRIGHT & LICENSE
+===================
+
+Copyright (c) 2018-2021 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.

@@ -2,7 +2,7 @@
 use v5.16;
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 25;
 
 BEGIN {
     use_ok( 'Pod::Query' ) || print "Bail out!\n";
@@ -151,6 +151,4 @@ for my $case ( @cases ) {
     is_deeply( $query->{tree}, $case->{expected_tree},             "tree", );
     is( $query->find_title(), $case->{expected_find_title}, "find_title" );
 }
-
-done_testing( 25 );
 

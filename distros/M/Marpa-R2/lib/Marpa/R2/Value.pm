@@ -1,4 +1,4 @@
-# Copyright 2018 Jeffrey Kegler
+# Copyright 2022 Jeffrey Kegler
 # This file is part of Marpa::R2.  Marpa::R2 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
@@ -20,7 +20,7 @@ use warnings;
 use strict;
 
 use vars qw($VERSION $STRING_VERSION);
-$VERSION        = '8.000000';
+$VERSION        = '10.000000';
 $STRING_VERSION = $VERSION;
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 $VERSION = eval $VERSION;
@@ -1819,7 +1819,8 @@ sub do_rank_by_rule {
 # INTERNAL OK AFTER HERE _marpa_
 
 sub Marpa::R2::Recognizer::show_bocage {
-    my ($recce)   = @_;
+    my ($recce, $verbose)   = @_;
+    $verbose //= 0;
     my @data      = ();
     my $id        = 0;
     my $recce_c   = $recce->[Marpa::R2::Internal::Recognizer::C];
@@ -1847,10 +1848,8 @@ sub Marpa::R2::Recognizer::show_bocage {
                 $cause_tag = "S$symbol";
             }
             my $cause_id = $bocage->_marpa_b_and_node_cause($and_node_id);
-            my $cause_irl_id;
             if ( defined $cause_id ) {
-                $cause_irl_id = $bocage->_marpa_b_or_node_irl($cause_id);
-                $cause_tag =
+                $cause_tag = "OR#$cause_id=" .
                     Marpa::R2::Recognizer::or_node_tag( $recce, $cause_id );
             }
             my $parent_tag =
@@ -1859,11 +1858,13 @@ sub Marpa::R2::Recognizer::show_bocage {
                 $bocage->_marpa_b_and_node_predecessor($and_node_id);
             my $predecessor_tag = q{-};
             if ( defined $predecessor_id ) {
-                $predecessor_tag = Marpa::R2::Recognizer::or_node_tag( $recce,
-                    $predecessor_id );
+                $predecessor_tag =
+                    $predecessor_tag = "OR#$predecessor_id=" .
+                    Marpa::R2::Recognizer::or_node_tag( $recce, $predecessor_id );
             }
-            my $tag = join q{ }, "$and_node_id:", "$or_node_id=$parent_tag",
-                $predecessor_tag, $cause_tag;
+                 
+            my $tag = join q{ }, "AND#$and_node_id:", "parent=OR#$or_node_id=$parent_tag",
+                "pred=$predecessor_tag", "cause=$cause_tag";
 
             push @data, [ $and_node_id, $tag ];
         } ## end AND_NODE: for my $and_node_id (@and_node_ids)
@@ -1912,7 +1913,8 @@ sub Marpa::R2::Recognizer::and_node_tag {
 } ## end sub Marpa::R2::Recognizer::and_node_tag
 
 sub Marpa::R2::Recognizer::show_and_nodes {
-    my ($recce) = @_;
+    my ($recce, $verbose) = @_;
+    $verbose //= 0;
     my $recce_c = $recce->[Marpa::R2::Internal::Recognizer::C];
     my $bocage  = $recce->[Marpa::R2::Internal::Recognizer::B_C];
     my $text;
@@ -1949,23 +1951,14 @@ sub Marpa::R2::Recognizer::show_and_nodes {
             $desc .= 'S' . $symbol;
         }
         $desc .= q{@} . $middle_earleme;
-        push @data,
-            [
-            $origin_earleme, $current_earleme, $irl_id,
-            $position,       $middle_earleme,  $cause_rule,
-            ( $symbol // -1 ), $desc
-            ];
+        if ($verbose) {
+            $desc .= " parent=" . (defined $parent ?  "OR#$parent" : '-');
+            $desc .= " pred=" . (defined $predecessor ?  "OR#$predecessor" : '-');
+            $desc .= " cause=" . (defined $cause ?  "OR#$cause" : '-');
+        }
+        push @data, $desc;
     } ## end AND_NODE: for ( my $id = 0;; $id++ )
-    my @sorted_data = map { $_->[-1] } sort {
-               $a->[0] <=> $b->[0]
-            or $a->[1] <=> $b->[1]
-            or $a->[2] <=> $b->[2]
-            or $a->[3] <=> $b->[3]
-            or $a->[4] <=> $b->[4]
-            or $a->[5] <=> $b->[5]
-            or $a->[6] <=> $b->[6]
-    } @data;
-    return ( join "\n", @sorted_data ) . "\n";
+    return ( join "\n", @data ) . "\n";
 } ## end sub Marpa::R2::Recognizer::show_and_nodes
 
 sub Marpa::R2::Recognizer::or_node_tag {
@@ -2045,12 +2038,49 @@ sub Marpa::R2::Recognizer::verbose_or_node {
     my $origin_earleme  = $recce_c->earleme($origin);
     my $current_earleme = $recce_c->earleme($set);
     my $text =
-          "OR-node #$or_node_id: R$irl_id" . q{:}
-        . $position . q{@}
-        . $origin_earleme . q{-}
-        . $current_earleme . "\n";
-    $text .= ( q{ } x 4 )
-        . $tracer->show_dotted_irl( $irl_id, $position ) . "\n";
+        "OR-node #$or_node_id: R$irl_id" . q{:}
+      . $position . q{@}
+      . $origin_earleme . q{-}
+      . $current_earleme . "\n";
+    $text .=
+      ( q{ } x 4 ) . $tracer->show_dotted_irl( $irl_id, $position ) . "\n";
+
+    for my $and_node_id ( $bocage->_marpa_b_or_node_first_and($or_node_id)
+        .. $bocage->_marpa_b_or_node_last_and($or_node_id) )
+    {
+        my $parent      = $bocage->_marpa_b_and_node_parent($and_node_id);
+        my $predecessor = $bocage->_marpa_b_and_node_predecessor($and_node_id);
+        my $cause       = $bocage->_marpa_b_and_node_cause($and_node_id);
+        my $symbol      = $bocage->_marpa_b_and_node_symbol($and_node_id);
+        last AND_NODE if not defined $parent;
+        my $origin            = $bocage->_marpa_b_or_node_origin($parent);
+        my $set               = $bocage->_marpa_b_or_node_set($parent);
+        my $irl_id            = $bocage->_marpa_b_or_node_irl($parent);
+        my $position          = $bocage->_marpa_b_or_node_position($parent);
+        my $origin_earleme    = $recce_c->earleme($origin);
+        my $current_earleme   = $recce_c->earleme($set);
+        my $middle_earley_set = $bocage->_marpa_b_and_node_middle($and_node_id);
+        my $middle_earleme    = $recce_c->earleme($middle_earley_set);
+
+#<<<  perltidy introduces trailing space on this
+        my $desc =
+              "And-node #$and_node_id: R"
+            . $irl_id . q{:}
+            . $position . q{@}
+            . $origin_earleme . q{-}
+            . $current_earleme;
+#>>>
+        my $cause_rule = -1;
+        if ( defined $cause ) {
+            my $cause_irl_id = $bocage->_marpa_b_or_node_irl($cause);
+            $desc .= 'C' . $cause_irl_id;
+        }
+        else {
+            $desc .= 'S' . $symbol;
+        }
+        $desc .= q{@} . $middle_earleme;
+        $text .= "    $desc\n";
+    }
     return $text;
 } ## end sub Marpa::R2::Recognizer::verbose_or_node
 

@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS orders (
     ,sku			CHAR(36) COLLATE utf8_general_ci
     ,quantity		INTEGER NOT NULL DEFAULT 0
     ,ordered_on		TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ,ip_addr        VARBINARY(16)
 	,CONSTRAINT pk_orders PRIMARY KEY (id)
 	,CONSTRAINT idx_orders UNIQUE (cust_id,sku)
     ,CONSTRAINT fk_orders_cust_id FOREIGN KEY (cust_id) REFERENCES customers(id) ON DELETE CASCADE

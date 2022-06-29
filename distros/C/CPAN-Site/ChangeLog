@@ -1,6 +1,16 @@
 
 === version history for CPAN::Site
 
+version 1.17: Tue 28 Jun 08:52:03 CEST 2022
+
+	Fixes:
+	- do not run t/20cpan_path.t when there is no network provided
+	  rt.cpan.org#143488 [Slaven Rezic]
+
+	Improvements:
+	- put $VERSION in CPAN::Site
+	- depends on LWP::Protocol::https [Slaven Rezic]
+
 version 1.16: Thu 23 Jun 10:57:25 CEST 2022
 
 	Improvements:

@@ -6,11 +6,10 @@ WriteMakefile(
     VERSION_FROM   => 'lib/JavaScript/Embedded.pm',
     ABSTRACT_FROM  => 'lib/JavaScript/Embedded.pm',
     LICENSE        => 'perl',
-    AUTHOR         => 'Mamod Mehyar <mamod.mehyar@gmail.com>',
+    AUTHOR         => 'Rene Schickbauer <cavac@cpan.org>',
     META_MERGE => {
         resources => {
-            repository => 'git://github.com/mamod/JavaScript-Duktape.git',
-            bugtracker => 'https://github.com/mamod/JavaScript-Duktape/issues',
+            repository => 'https://cavac.at/public/mercurial/JavaScript-Embedded/'
         },
     },
     test              => {TESTS => join( ' ', (glob( 't/*.t'), glob('t/*/*.t'), , glob('t/*/*/*.t')))},

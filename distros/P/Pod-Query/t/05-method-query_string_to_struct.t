@@ -2,7 +2,7 @@
 use v5.16;
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 28;
 
 BEGIN {
     use_ok( 'Pod::Query' ) || print "Bail out!\n";
@@ -374,6 +374,4 @@ for my $case ( @cases ) {
         "query to string: $case->{name}",
       );
 }
-
-done_testing( 28 );
 

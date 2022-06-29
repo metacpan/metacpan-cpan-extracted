@@ -39,3 +39,8 @@ Revision history for Web::MREST::CLI
 0.283 2016-09-04 19:58 CEST
 - MANIFEST: add t/001-noop.t
 
+0.284 2022-06-29 14:18 CEST
+- CLI.pm: add some basic information on using the CLI
+- bootstrap.sh: add bootstrap script
+- MANIFEST.SKIP: do not include bootstrap scripts in Perl distro
+

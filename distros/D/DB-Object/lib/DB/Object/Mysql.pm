@@ -1,14 +1,17 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-# Database Object Interface - ~/lib/DB/Object/Mysql.pm
-# Version v0.3.3
-# Copyright(c) 2020 DEGUEST Pte. Ltd.
-# Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
-# Created 2017/07/19
-# Modified 2020/05/22
-# 
+## Database Object Interface - ~/lib/DB/Object/Mysql.pm
+## Version v0.3.4
+## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
+## Created 2017/07/19
+## Modified 2021/08/30
+## All rights reserved
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
-# This is the subclassable module for driver specific ones.
+## This is the subclassable module for driver specific ones.
 package DB::Object::Mysql;
 BEGIN
 {
@@ -28,7 +31,7 @@ BEGIN
     # DBI->trace( 5 );
     our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
     our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH );
-    $VERSION = 'v0.3.3';
+    $VERSION = 'v0.3.4';
     use Devel::Confess;
 };
 
@@ -428,7 +431,7 @@ sub _connection_parameters
 {
     my $self  = shift( @_ );
     my $param = shift( @_ );
-    my $core = [qw( db login passwd host port driver database server opt uri debug )];
+    my $core = [qw( db login passwd host port driver database server opt uri debug cache_connections )];
     my @mysql_params = grep( /^mysql_/, keys( %$param ) );
     # See DBD::mysql for the list of valid parameters
     # E.g.: mysql_client_found_rows, mysql_compression mysql_connect_timeout mysql_write_timeout mysql_read_timeout mysql_init_command mysql_skip_secure_auth mysql_read_default_file mysql_read_default_group mysql_socket mysql_ssl mysql_ssl_client_key mysql_ssl_client_cert mysql_ssl_ca_file mysql_ssl_ca_path mysql_ssl_cipher mysql_local_infile mysql_multi_statements mysql_server_prepare mysql_server_prepare_disable_fallback mysql_embedded_options mysql_embedded_groups mysql_conn_attrs 
@@ -508,6 +511,7 @@ END
 
 1;
 
+# XXX POD
 __END__
 
 =encoding utf8
@@ -595,63 +599,57 @@ DB::Object::Mysql - Mysql Database Object
     # Now dump the result to a file
     $login->select->dump( "my_file.txt" );
     
+=head1 VERSION
+
+    v0.3.4
+
 =head1 DESCRIPTION
 
-This package inherits from L<DB::Object>, so any method not here, but there you can use.
+This package inherits from L<DB::Object>, so any method not mentioned here, but listed there, you can use.
 
 L<DB::Object> is a SQL API much alike C<DBI>.
 So why use a private module instead of using that great C<DBI> package?
 
-At first, I started to inherit from C<DBI> to conform to C<perlmod> perl 
-manual page and to general perl coding guidlines. It became very quickly a 
-real hassle. Barely impossible to inherit, difficulty to handle error, too 
-much dependent from an API that change its behaviour with new versions.
+At first, I started to inherit from C<DBI> to conform to C<perlmod> perl manual page and to general perl coding guidlines. It became very quickly a real hassle. Barely impossible to inherit, difficulty to handle error, too much dependent from an API that change its behaviour with new versions.
 In short, I wanted a better, more accurate control over the SQL connection.
 
-So, L<DB::Object> acts as a convenient, modifiable wrapper that provide the
-programmer with an intuitive, user-friendly and hassle free interface.
+So, L<DB::Object> acts as a convenient, modifiable wrapper that provide the programmer with an intuitive, user-friendly and hassle free interface.
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>()
+=head2 new
 
 Create a new instance of L<DB::Object>. Nothing much to say.
 
-=item B<connect>( DATABASE, LOGIN, PASSWORD, SERVER, DRIVER )
+=head2 connect
 
-Create a new instance of L<DB::Object>, but also attempts a conection
-to SQL server.
+Create a new instance of L<DB::Object>, but also attempts a connection to SQL server.
 
 You can specify the following arguments:
 
-=over 8
+=over 4
 
-=item I<DATABASE>
+=item I<database>
 
 The database name you wish to connect to
 
-=item I<LOGIN>
+=item I<login>
 
 The login used to access that database
 
-=item I<PASSWORD>
+=item I<password>
 
 The password that goes along
 
-=item I<SERVER>
+=item I<server>
 
 The server, that is hostname of the machine serving a SQL server.
 
-=item I<DRIVER>
+=item I<driver>
 
-The driver you want to use. It needs to be of the same type than the server
-you want to connect to. If you are connecting to a MySQL server, you would use
-C<mysql>, if you would connecto to an Oracle server, you would use C<oracle>.
+The driver you want to use. It needs to be of the same type than the server you want to connect to. If you are connecting to a MySQL server, you would use C<mysql>, if you would connecto to an Oracle server, you would use C<oracle>.
 
-You need to make sure that those driver are properly installed in the system 
-before attempting to connect.
+You need to make sure that those driver are properly installed in the system before attempting to connect.
 
 To install the required driver, you could start with the command line:
 
@@ -661,34 +659,7 @@ which will provide you a special shell to install modules in a convenient way.
 
 =back
 
-=back
-
 =head1 METHODS
-
-=head2 clear
-
-Reset error message.
-
-=head2 debug
-
-Toggle debug mode on/off
-
-=head2 error
-
-Get set error message.
-If an error message is provided, B<error> will pass it to B<warn>.
-
-=head2 get
-
-Get object parameter.
-
-=head2 message
-
-Provided a multi line string, B<message> will display it on the STDERR if either I<verbose> or I<debug> mode is on.
-
-=head2 verbose
-
-Toggle verbose mode on/off
 
 =head2 alias
 
@@ -712,7 +683,7 @@ If multiple arguments in a form of pair => value are provided, it sets the corre
 
 The authorised parameters are:
 
-=over 8
+=over 4
 
 =item I<Warn>
 
@@ -816,45 +787,87 @@ Read-only.
 
 Return the list of available drivers.
 
+=head2 begin_work
+
+Mark the beginning of a transaction.
+
+Any arguments provided are passed along to L<DBD::mysql/begin_work>
+
 =head2 bind
 
-If no values to bind to the underlying query is provided, B<bind> simply activate the bind value feature.
+If no values to bind to the underlying query is provided, L<DB::Object/bind> simply activate the bind value feature.
 
 If values are provided, they are allocated to the statement object and will be applied when the query will be executed.
 
 Example:
 
-  $dbh->bind()
-  # or
-  $dbh->bind->where( "something" )
-  # or
-  $dbh->bind->select->fetchrow_hashref()
-  # and then later
-  $dbh->bind( 'thingy' )->select->fetchrow_hashref()
+    $dbh->bind()
+    # or
+    $dbh->bind->where( "something" )
+    # or
+    $dbh->bind->select->fetchrow_hashref()
+    # and then later
+    $dbh->bind( 'thingy' )->select->fetchrow_hashref()
 
 =head2 cache
 
 Activate caching.
 
-  $tbl->cache->select->fetchrow_hashref();
+    $tbl->cache->select->fetchrow_hashref();
 
 =head2 check_driver
 
 Check that the driver set in I<$SQL_DRIVER> in ~/etc/common.cfg is indeed available.
 
-It does this by calling B<available_drivers>.
+It does this by calling L<DB::Object/available_drivers>.
+
+=head2 commit
+
+Make any change to the database irreversible.
+
+This must be used only after having called L</begin_work>
+
+Any arguments provided are passed along to L<DBD::mysql/commit>
 
 =head2 copy
 
-Provided with either a reference to an hash or an hash of key => value pairs, B<copy> will first execute a select statement on the table object, then fetch the row of data, then replace the key-value pair in the result by the ones provided, and finally will perform an insert.
+Provided with either a reference to an hash or an hash of key => value pairs, L<DB::Object/copy> will first execute a select statement on the table object, then fetch the row of data, then replace the key-value pair in the result by the ones provided, and finally will perform an insert.
 
 Return false if no data to copy were provided, otherwise it always returns true.
+
+=head2 create_db
+
+Provided with a database name and some optional parameters and this will prepare and execute the query to create the database.
+
+Upon failure, this will return an error, and upon success, this will connect to the newly created database and return the database handler.
+
+Possible options are:
+
+=over 4
+
+=item I<charset>
+
+The character encoding.
+
+=item I<collate>
+
+Sets the C<COLLATE> attribute
+
+=item I<if_not_exists>
+
+Add the condition C<IF NOT EXISTS>
+
+=back
+
+See L<MySQL documentation for more information|https://dev.mysql.com/doc/refman/5.7/en/creating-database.html>
 
 =head2 create_table
 
 The idea is to create a table with the givern parameters.
 
-This is currently heavily designed to work for PoPList. It needs to be rewritten.
+=head2 databases
+
+Returns a list of all available databases.
 
 =head2 data_sources
 
@@ -862,7 +875,7 @@ Given an optional list of options, this return the data source of the database h
 
 =head2 data_type
 
-Given a reference to an array or an array of data type, B<data_type> will check their availability in the database driver.
+Given a reference to an array or an array of data type, L<DB::Object/data_type> will check their availability in the database driver.
 
 If nothing found, it return an empty list in list context, or undef in scalar context.
 
@@ -874,65 +887,45 @@ Return the name of the current database.
 
 =head2 delete
 
-B<delete> will format a delete query based on previously set parameters, such as B<where>.
+L<DB::Object/delete> will format a delete query based on previously set parameters, such as L<DB::Object/where>.
 
-B<delete> will refuse to execute a query without a where condition. To achieve this, one must prepare the delete query on his/her own by using the B<do> method and passing the sql query directly.
+L<DB::Object/delete> will refuse to execute a query without a where condition. To achieve this, one must prepare the delete query on his/her own by using the L<DB::Object/do> method and passing the sql query directly.
 
-  $tbl->where( "login" => "jack" );
-  $tbl->limit( 1 );
-  my $rows_affected = $tbl->delete();
-  # or passing the where condition directly to delete
-  my( $sth ) = $tbl->delete( "login" => "jack" );
+    $tbl->where( "login" => "jack" );
+    $tbl->limit( 1 );
+    my $rows_affected = $tbl->delete();
+    # or passing the where condition directly to delete
+    my( $sth ) = $tbl->delete( "login" => "jack" );
 
 =head2 disconnect
 
 Disconnect from database. Returns the return code.
 
-  my $rc = $dbh->disconnect;
+    my $rc = $dbh->disconnect;
 
 =head2 do
 
 Execute a sql query directly passed with possible attributes and values to bind.
 
-The attributes list will be used to B<prepare> the query and the bind values will be used when executing the query.
+The attributes list will be used to L<DB::Object/prepare> the query and the bind values will be used when executing the query.
 
 It returns the statement handler or the number of rows affected.
 
 Example:
 
-  $rc  = $dbh->do( $statement ) || die( $dbh->errstr );
-  $rc  = $dbh->do( $statement, \%attr ) || die( $dbh->errstr );
-  $rv  = $dbh->do( $statement, \%attr, @bind_values ) || die( $dbh->errstr );
-  my( $rows_deleted ) = $dbh->do(
-  q{
+    $rc  = $dbh->do( $statement ) || die( $dbh->errstr );
+    $rc  = $dbh->do( $statement, \%attr ) || die( $dbh->errstr );
+    $rv  = $dbh->do( $statement, \%attr, @bind_values ) || die( $dbh->errstr );
+    my( $rows_deleted ) = $dbh->do(
+    q{
        DELETE FROM table WHERE status = ?
-  }, undef(), 'DONE' ) || die( $dbh->errstr );
+    }, undef(), 'DONE' ) || die( $dbh->errstr );
 
 =head2 enhance
 
 Toggle the enhance mode on/off.
 
 When on, the functions I<from_unixtime> and I<unix_timestamp> will be used on date/time field to translate from and to unix time seamlessly.
-
-=head2 err
-
-Get the currently set error.
-
-=head2 errno
-
-Is just an alias for B<err>.
-
-=head2 errmesg
-
-Is just an alias for B<errstr>.
-
-=head2 errstr
-
-Get the currently set error string.
-
-=head2 fatal
-
-Toggles fatal mode on/off.
 
 =head2 from_unixtime
 
@@ -950,40 +943,39 @@ In list context, it returns 2 strings: one comma-separated list of fields and on
 
 Formats update query based on the following arguments provided:
 
-=over 8
+=over 4
 
 =item I<data>
 
 An array of key-value pairs to be used in the update query. This array can be provided as the prime argument as a reference to an array, an array, or as the I<data> element of a hash or a reference to a hash provided.
 
-Why an array if eventually we build a list of key-value pair? Because the order of the fields may be important, and if the key-value pair list is provided, B<format_update> honors the order in which the fields are provided.
+Why an array if eventually we build a list of key-value pair? Because the order of the fields may be important, and if the key-value pair list is provided, L<DB::Object/format_update> honors the order in which the fields are provided.
 
 =back
 
-B<format_update> will then iterate through each field-value pair, and perform some work:
+L</format_update> will then iterate through each field-value pair, and perform some work:
 
-If the field being reviewed was provided to B<from_unixtime>, then B<format_update> will enclose it in the function FROM_UNIXTIME() as in:
+If the field being reviewed was provided to L<DB::Object/from_unixtime>, then L</format_update> will enclose it in the function FROM_UNIXTIME() as in:
 
-  FROM_UNIXTIME(field_name)
+    FROM_UNIXTIME(field_name)
   
 If the the given value is a reference to a scalar, it will be used as-is, ie. it will not be enclosed in quotes or anything. This is useful if you want to control which function to use around that field.
 
-
 If the given value is another field or looks like a function having parenthesis, or if the value is a question mark, the value will be used as-is.
 
-If B<bind> is off, the value will be escaped and the pair field='value' created.
+If L<DB::Object/bind> is off, the value will be escaped and the pair field='value' created.
 
 If the field is a SET data type and the value is a number, the value will be used as-is without surrounding single quote.
 
-If B<bind> is enabled, a question mark will be used as the value and the original value will be saved as value to bind upon executing the query.
+If L<DB::Object/bind> is enabled, a question mark will be used as the value and the original value will be saved as value to bind upon executing the query.
 
 Finally, otherwise the value is escaped and surrounded by single quotes.
 
-B<format_update> returns a string representing the comma-separated list of fields that will be used.
+L<DB::Object/format_update> returns a string representing the comma-separated list of fields that will be used.
 
 =head2 getdefault
 
-Does some preparation work such as :
+Does some preparation work such as:
 
 =over 4
 
@@ -993,11 +985,11 @@ the date/time field to use the FROM_UNIXTIME and UNIX_TIMESTAMP functions
 
 =item 2
 
-removing from the query the fields to avoid, ie the ones set with the B<avoid> method.
+removing from the query the fields to avoid, ie the ones set with the L<DB::Object/avoid> method.
 
 =item 3
 
-set the fields alias based on the information provided with the B<alias> method.
+set the fields alias based on the information provided with the L<DB::Object/alias> method.
 
 =item 4
 
@@ -1022,15 +1014,19 @@ In list context, it returns: $group_by
 
 In scalar context, it returns: GROUP BY $group_by
 
+=head2 having
+
+A convenient wrapper to L<DB::Object::Mysql::Query/having>
+
 =head2 insert
 
 Prepares an INSERT query using the field-value pairs provided.
 
 If a L<DB::Object::Statement> object is provided as first argument, it will considered as a SELECT query to be used in the INSERT query, as in: INSERT INTO my table SELECT FROM another_table
 
-Otherwise, B<insert> will build the query based on the fields provided.
+Otherwise, L<DB::Object/insert> will build the query based on the fields provided.
 
-In scalar context, it returns the result of B<execute> and in list context, it returns the statement object.
+In scalar context, it returns the result of L<DB::Object/execute> and in list context, it returns the statement object.
 
 =head2 last_insert_id
 
@@ -1057,7 +1053,7 @@ If the lock failed (NULL), it returns undef(), otherwise, it returns the return 
 
 =head2 no_bind
 
-When invoked, B<no_bind> will change any preparation made so far for caching the query with bind parameters, and instead substitute the value in lieu of the question mark placeholder.
+When invoked, L<DB::Object/no_bind> will change any preparation made so far for caching the query with bind parameters, and instead substitute the value in lieu of the question mark placeholder.
 
 =head2 no_cache
 
@@ -1117,21 +1113,25 @@ Evals a SELECT 1 statement and returns 0 if errors occurred or the return value.
 
 =head2 prepare
 
-Prepares the query using the options provided. The options are the same as the one in L<DBI> B<prepare> method.
+Prepares the query using the options provided. The options are the same as the one in L<DBI/prepare> method.
 
-It returns a L<DB::Object::Statement> object upon success or undef if an error occurred. The error can then be retrieved using B<errstr> or B<error>.
+It returns a L<DB::Object::Statement> object upon success or undef if an error occurred. The error can then be retrieved using L<DB::Object/errstr> or L<DB::Object/error>.
 
 =head2 prepare_cached
 
-Same as B<prepare> except the query is cached.
+Same as L<DB::Object/prepare> except the query is cached.
 
 =head2 query
 
 It prepares and executes the given SQL query with the options provided and return undef() upon error or the statement handler upon success.
 
+=head2 query_object
+
+Set or gets the PostgreSQL query object (L<DB::Object::Mysql::Query>) used to process and format queries.
+
 =head2 replace
 
-Just like for the INSERT query, B<replace> takes one optional argument representing a L<DB::Object::Statement> SELECT object or a list of field-value pairs.
+Just like for the INSERT query, L<DB::Object::Mysql::Tables/replace> takes one optional argument representing a L<DB::Object::Statement> SELECT object or a list of field-value pairs.
 
 If a SELECT statement is provided, it will be used to construct a query of the type of REPLACE INTO mytable SELECT FROM other_table
 
@@ -1149,13 +1149,17 @@ It execute an update with the reseted value and return the number of affected ro
 
 Get or set the reverse mode.
 
+=head2 rollback
+
+Will roll back any changes made to the database since the last transaction point marked with L</begin_work>
+
 =head2 select
 
-Given an optional list of fields to fetch, B<select> prepares a SELECT query.
+Given an optional list of fields to fetch, L<DB::Object/select> prepares a SELECT query.
 
-If no field was provided, B<select> will use default value where appropriate like the NOW() for date/time fields.
+If no field was provided, L<DB::Object/select> will use default value where appropriate like the NOW() for date/time fields.
 
-B<select> calls upon B<tie>, B<where>, B<group>, B<order>, B<limit> and B<local> to build the query.
+L<DB::Object/select> calls upon L<DB::Object/tie>, L<DB::Object/where>, L<DB::Object/group>, L<DB::Object/order>, L<DB::Object/limit> and L<DB::Object/local> to build the query.
 
 In scalar context, it execute the query and return it. In list context, it just returns the statement handler.
 
@@ -1181,7 +1185,31 @@ Queries the DBI state and return its value.
 
 =head2 table
 
-Given a table name, B<table> will return a L<DB::Object::Tables> object. The object is cached for re-use.
+Given a table name, L<DB::Object/table> will return a L<DB::Object::Tables> object. The object is cached for re-use.
+
+=head2 table_info
+
+Provided with a table name and some optional parameters and this will retrieve the table information.
+
+It returns an array reference of tables information found if no schema was provided or if I<anywhere> is true.
+
+If a schema was provided, and the table found it returns an hash reference for that table.
+
+Otherwise, if nothing can be found, it returns an empty array reference.
+
+Optional parameters are:
+
+=over 4
+
+=item I<anywhere>
+
+If true, it will search anywhere.
+
+=item I<schema>
+
+A database schema.
+
+=back
 
 =head2 table_push
 
@@ -1194,6 +1222,32 @@ Connects to the database and finds out the list of all available tables.
 Returns undef or empty list in scalar or list context respectively if no table found.
 
 Otherwise, it returns the list of table in list context or a reference of it in scalar context.
+
+=head2 tables_info
+
+Provided with a database name and this returns all the tables information.
+
+Information retrieved from the PostgreSQL system tables for every table found in the given database are:
+
+=over 4
+
+=item I<name>
+
+The object name
+
+=item I<owner>
+
+The object owner (role)
+
+=item I<schema>
+
+Database schema, if any.
+
+=item I<type>
+
+The object type, which may be one of: C<table>, C<view>, C<materialized view>, C<special>, C<foreign table>
+
+=back
 
 =head2 tables_refresh
 
@@ -1213,13 +1267,13 @@ Provided a list of fields or a reference to it, this sets the fields to be treat
 
 =head2 unlock
 
-Given a lock identifier, B<unlock> releases the lock previously set with B<lock>. It executes the underlying sql command and returns undef() if the result is NULL or the value returned otherwise.
+Given a lock identifier, L<DB::Object/unlock> releases the lock previously set with L<DB::Object/lock>. It executes the underlying sql command and returns undef() if the result is NULL or the value returned otherwise.
 
 =head2 update
 
-Given a list of field-value pairs, B<update> prepares a sql update query.
+Given a list of field-value pairs, L<DB::Object/update> prepares a sql update query.
 
-It calls upon B<where> and B<limit> as previously set.
+It calls upon L<DB::Object/where> and L<DB::Object/limit> as previously set.
 
 It returns undef and sets an error if it failed to prepare the update statement. In scalar context, it execute the query. In list context, it simply return the statement handler.
 
@@ -1243,6 +1297,12 @@ Sets or get the I<use_cache> parameter.
 Query the SQL variable $type
 
 It returns a blank string if nothing was found, or the value found.
+
+=head2 version
+
+Returns the MySQL database server version.
+
+This information is cached per object for efficiency.
 
 =head2 where
 
@@ -1276,7 +1336,7 @@ It returns an object of the given $package.
 
 =head2 _reset_query
 
-Being called using a statement handler, this reset the object by removing all the parameters set by various subroutine calls, such as B<where>, B<group>, B<order>, B<avoid>, B<limit>, etc.
+Being called using a statement handler, this reset the object by removing all the parameters set by various subroutine calls, such as L<DB::Object/where>, L<DB::Object/group>, L<DB::Object/order>, L<DB::Object/avoid>, L<DB::Object/limit>, etc.
 
 =head2 _save_bind
 
@@ -1284,11 +1344,13 @@ This saves/cache the bin query and return the object used to call it.
 
 =head2 _value2bind
 
-Given a sql query and a array reference, B<_value2bind> parse the query and interpolate values for placeholder (?).
+Given a sql query and a array reference, L<DB::Object/_value2bind> parse the query and interpolate values for placeholder (?).
 
 It returns true.
 
 =head1 SEE ALSO
+
+L<DB::Object>
 
 L<DBI>, L<Apache::DBI>
 

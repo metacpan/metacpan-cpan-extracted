@@ -49,12 +49,12 @@ my %WriteMakefileArgs = (
         resources => {
         #    homepage    => undef,
             repository  => {
-                url         => 'git@git.deguest.jp:jack/DB-Object.git',
-                web         => 'https://git.deguest.jp/jack/DB-Object',
+                url         => 'git@gitlab.com:jackdeguest/DB-Object.git',
+                web         => 'https://gitlab.com/jackdeguest/DB-Object',
                 type        => 'git',
             },
             bugtracker => {
-                web         => 'https://git.deguest.jp/jack/DB-Object/issues',
+                web         => 'https://gitlab.com/jackdeguest/DB-Object/issues',
             },
         },
     }) : ()),

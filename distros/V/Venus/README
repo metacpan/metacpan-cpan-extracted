@@ -8,7 +8,7 @@ ABSTRACT
 
 VERSION
 
-    0.08
+    0.09
 
 SYNOPSIS
 
@@ -478,6 +478,38 @@ FEATURES
       
         my $vars = Venus::Vars->new;
 
+      example 16
+
+        package main;
+      
+        use Venus::Match;
+      
+        my $match = Venus::Match->new;
+
+      example 17
+
+        package main;
+      
+        use Venus::Process;
+      
+        my $process = Venus::Process->new;
+
+      example 18
+
+        package main;
+      
+        use Venus::Template;
+      
+        my $template = Venus::Template->new;
+
+      example 19
+
+        package main;
+      
+        use Venus::Yaml;
+      
+        my $yaml = Venus::Yaml->new;
+
     package-reflection
 
       This library provides a package reflection class, Venus::Space, which
@@ -598,21 +630,4 @@ FEATURES
 AUTHORS
 
     Cpanery, cpanery@cpan.org
-
-LICENSE
-
-    Copyright (C) 2021, Cpanery
-
-    Read the "license"
-    <https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-PROJECT
-
-    https://venus.cpanery.com
-
-    https://github.com/cpanery/venus/wiki
-
-    https://github.com/cpanery/venus/issues
-
-    https://cpanery.com
 

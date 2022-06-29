@@ -61,6 +61,16 @@ sub binded_types_as_param
     return( $params );
 }
 
+sub dollar_placeholder
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        $self->prepare_options->set( 'pg_placeholder_dollaronly' => shift( @_ ) );
+    }
+    return( $self->prepare_options->get( 'pg_placeholder_dollaronly' ) );
+}
+
 sub format_from_epoch
 {
     my $self = shift( @_ );
@@ -144,6 +154,8 @@ sub format_statement
     my $tables   = CORE::join( '|', @{$tbl_o->database_object->tables} );
     my $struct   = $tbl_o->structure();
     my $types    = $tbl_o->types;
+    my $types_const = $tbl_o->types_const;
+    $self->message( 3, "types_const found for table '", $tbl_o->name, "' are: ", sub{ $self->dump( $types_const ) } );
     my $query_type = $self->{query_type};
     # $self->message( 3, "Fields order is: ", sub{ $self->dumper( $order ) } );
     my @sorted   = ();
@@ -165,6 +177,7 @@ sub format_statement
     foreach( @sorted )
     {
         next if( $struct->{ $_ } =~ /\bSERIAL\b/i );
+        $self->message( 3, "Processing field '$_'" );
         if( exists( $data->{ $_ } ) )
         {
             my $value = $data->{ $_ };
@@ -191,6 +204,17 @@ sub format_statement
                 {
                     # push( @format_values, "FROM_UNIXTIME($value)" );
                     push( @format_values, $self->format_from_epoch({ value => $value, bind => 0 }) );
+                    if( $value eq '?' )
+                    {
+                        if( CORE::exists( $types_const->{ $_ } ) )
+                        {
+                            CORE::push( @types, $types_const->{ $_ }->{constant} );
+                        }
+                        else
+                        {
+                            CORE::push( @types, '' );
+                        }
+                    }
                 }
             }
             elsif( ref( $value ) eq 'SCALAR' )
@@ -200,7 +224,16 @@ sub format_statement
             elsif( $value eq '?' )
             {
                 push( @format_values, '?' );
-                CORE::push( @types, '' );
+                $self->message( 3, "Placeholder found for field '$_'. Constant data type definition found -> ", sub{ $self->dump( $types_const->{ $_ } ) } );
+                # CORE::push( @types, $types_const->{ $_ } ? $types_const->{ $_ }->{constant} : '' );
+                if( CORE::exists( $types_const->{ $_ } ) )
+                {
+                    CORE::push( @types, $types_const->{ $_ }->{constant} );
+                }
+                else
+                {
+                    CORE::push( @types, '' );
+                }
             }
             elsif( $struct->{ $_ } =~ /^\s*\bBLOB\b/i )
             {
@@ -577,6 +610,16 @@ sub returning
     return( $self->{returning} );
 }
 
+sub server_prepare
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        $self->prepare_options->set( 'pg_server_prepare' => shift( @_ ) );
+    }
+    return( $self->prepare_options->get( 'pg_server_prepare' ) );
+}
+
 sub _query_components
 {
     my $self = shift( @_ );
@@ -679,6 +722,12 @@ Sets or gets the array object (L<Module::Generic::Array>) for the binded value i
 =head2 binded_types_as_param
 
 Returns an array object (L<Module::Generic::Array>) of binded params types.
+
+=head2 dollar_placeholder
+
+Provided with a true value, and this will set the placeholder to be a dollar, such as C<$1>, C<$2>, etc for this query only.
+
+It returns the current boolean value.
 
 =head2 format_from_epoch
 
@@ -834,6 +883,28 @@ But don't pass a reference:
 It returns a new L<DB::Object::Postgres::Query::Clause> object.
 
 See L<PostgreSQL documentation for more information|https://www.postgresql.org/docs/9.5/dml-returning.html>
+
+=head2 server_prepare
+
+Sets or gets the boolean value for whether you want the sql statement to be prepared server-side or not.
+
+Please see the warnings about this breaking change implemented since version 9.40 L<DBD::Pg/prepare>.
+
+Since PostgreSQL does not see the parameters that are passed at statement execution, it is possible it misinterpret. Consider this:
+
+    my $ip = '192.168.2.12';
+    my $ip_tbl = $dbh->ip_registry;
+    # Check if the ip match an ip block
+    my $P = $dbh->placeholder( type => 'inet' );
+    $ip_tbl->where( $dbh->OR( $ip_tbl->fo->ip_addr == "INET $P", "INET $P" << $ip_tbl->fo->ip_addr ) );
+    $sth = $ip_tbl->select || die( "An error occurred while trying to format query to check if ip is in the registry." );
+    $sth->exec( $ip, $ip ) || die( "An error occurred while trying to execute query to check if ip is in the registry: ", $sth->error );
+
+This would yield the server error: C<syntax error at or near "$1">
+
+The solution would be to de-activate server prepare for this query only:
+
+    $ip_tbl->query_object->server_prepare(0);
 
 =head2 _query_components
 

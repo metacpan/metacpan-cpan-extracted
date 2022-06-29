@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Fields/Field.pm
-## Version v1.0.0
+## Version v1.0.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/01/01
-## Modified 2021/08/25
+## Modified 2021/09/03
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,6 +18,7 @@ BEGIN
     use common::sense;
     use parent qw( Module::Generic );
     use Devel::Confess;
+    use Module::Generic::Array;
     use overload (
         '""'    => 'as_string',
         '+'     => sub{ &_op_overload( @_, '+' ) },
@@ -39,7 +40,7 @@ BEGIN
         fallback => 1,
     );
     use Want;
-    our( $VERSION ) = 'v1.0.0';
+    our( $VERSION ) = 'v1.0.1';
 };
 
 sub init
@@ -54,7 +55,7 @@ sub init
     $self->{type}           = '';
     $self->{_init_params_order}   = [qw( table_object query_object default pos type prefixed name )];
     $self->{_init_strict_use_sub} = 1;
-    $self->SUPER::init( @_ );
+    $self->SUPER::init( @_ ) || return( $self->pass_error );
     return( $self->error( "No table object was provided." ) ) if( !$self->{table_object} );
     return( $self->error( "Table object provided is not an object." ) ) if( !$self->_is_object( $self->{table_object} ) );
     return( $self->error( "Table object provided is not a DB::Object::Tables object." ) ) if( !$self->{table_object}->isa( 'DB::Object::Tables' ) );
@@ -95,7 +96,7 @@ sub name
     my $name = $self->{name};
     my $trace = $self->_get_stack_trace;
     my $alias = $self->query_object->table_alias;
-    $self->message( 3, "prefixed is set to '$self->{prefixed}' for field name '$name' of table '", $self->table_object->name, "' possibly aliased to '$alias'. Stack trace: ", $trace->as_string );
+    # $self->message( 3, "prefixed is set to '$self->{prefixed}' for field name '$name' of table '", $self->table_object->name, "' possibly aliased to '$alias'. Stack trace: ", $trace->as_string );
     if( $self->{prefixed} )
     {
         my @prefix = ();
@@ -148,7 +149,8 @@ sub prev
     return( $self->_find_siblings( $self->pos - 1 ) );
 }
 
-sub query_object { return( shift->_set_get_object( 'query_object', 'DB::Object::Query', @_ ) ); }
+sub query_object { return( shift->_set_get_object_without_init( 'query_object', 'DB::Object::Query', @_ ) ); }
+# sub query_object { return( shift->table_object->query_object ); }
 
 sub schema { return( shift->table_object->schema ); }
 
@@ -156,7 +158,7 @@ sub table { return( shift->table_object->name ); }
 
 sub table_name { return( shift->table_object->name ); }
 
-sub table_object { return( shift->_set_get_object( 'table_object', 'DB::Object::Tables', @_ ) ); }
+sub table_object { return( shift->_set_get_object_without_init( 'table_object', 'DB::Object::Tables', @_ ) ); }
 
 sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
 
@@ -216,20 +218,47 @@ sub _op_overload
                 $val->isa( 'DB::Object::Fields::Field' ) ||
                 $val->isa( 'DB::Object::Statement' )
               )
-            ) )
+            ) || 
+            $self->database_object->placeholder->has( \$val ) ||
+            $self->_is_scalar( $val ) ||
+            uc( $val ) eq 'NULL' )
     {
-        $val = $self->database_object->quote( $val ) if( $self->database_object );
+        $val = $self->database_object->quote( $val, $self->constant->constant ) if( $self->database_object );
     }
     
+    my $types;
     # If the value is a statement object, stringify it, surround it with parenthesis and use it
     if( $self->_is_a( $val, 'DB::Object::Statement' ) )
     {
         $val = '(' . $val->as_string . ')';
     }
+    elsif( $self->database_object->placeholder->has( $self->_is_scalar( $val ) ? $val : \$val ) )
+    {
+        $types = $self->database_object->placeholder->replace( \$val );
+    }
+    # A placeholder, but don't know the type
+    elsif( $val eq '?' )
+    {
+        $types = Module::Generic::Array->new( [''] );
+    }
+    elsif( $self->_is_scalar( $val ) )
+    {
+        $val = $$val;
+    }
     # XXX Comment out once debugged !
 #     return( DB::Object::Fields::Field::Overloaded->new( $swap ? "${val} ${op} ${field}" : "${field} ${op} ${val}", $self, ( $val eq '?' ? ( binded => 1 ) : () ) ) );
     # $self->message( 3, "swap -> '$swap', value = '$val': ", ( $swap ? "${val} ${op} ${field}" : "${field} ${op} ${val}" ), "\nThis field object for table name '", $self->table_object->name, "' (", $self->table_object, ") was initially instantiated from: ", $self->{trace}->as_string, "\n" );
-    return( DB::Object::Fields::Field::Overloaded->new( $swap ? "${val} ${op} ${field}" : "${field} ${op} ${val}", $self, ( $val eq '?' ? ( binded => 1 ) : () ) ) );
+    return( DB::Object::Fields::Field::Overloaded->new(
+        expression => 
+            (
+                $swap
+                    ? "${val} ${op} ${field}" 
+                    : "${field} ${op} ${val}"
+            ),
+        field => $self,
+        binded => ( $val eq '?' || $types ) ? 1 : 0,
+        # types => $types,
+    ) );
 }
 
 {
@@ -250,15 +279,18 @@ sub _op_overload
     {
         my $this = shift( @_ );
         # This contains the result of the sql field with its operator and value during overloading
-        my $str  = shift( @_ );
-        my $field = shift( @_ );
-        my %other = @_;
-        return( bless( { expression => $str, field => $field, %other } => ref( $this ) || $this ) );
+        # expression, field, binded, types
+        my $opts = { @_ };
+        # So it can be called in chaining whether it contains data or not
+        $opts->{types} //= Module::Generic::Array->new;
+        return( bless( $opts => ref( $this ) || $this ) );
     }
     
     sub binded { return( shift->{binded} ); }
     
     sub field { return( shift->{field} ); }
+
+    sub types { return( shift->{types} ); }
 }
 
 1;
@@ -330,7 +362,7 @@ This would yield:
 
 =head1 VERSION
 
-    v1.0.0
+    v1.0.1
 
 =head1 DESCRIPTION
 

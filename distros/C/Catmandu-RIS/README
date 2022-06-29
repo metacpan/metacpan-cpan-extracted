@@ -5,7 +5,7 @@ NAME
 SYNOPSIS
 
       catmandu convert RIS < input.txt
-      
+    
       # Use the --human option to translate RIS tags into human readable strings
       catmandu convert RIS --human 1 < input.txt
     
@@ -28,11 +28,15 @@ Author
 
     Nicolas Steenlant
 
-CONTRIBUTOR
+CONTRIBUTORS
 
     Vitali Peil
 
     Patrick Hochstenbach
+
+    Nicolas Franck
+
+    Mohammad S Anwar
 
 LICENSE
 

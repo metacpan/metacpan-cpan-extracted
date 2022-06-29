@@ -987,6 +987,7 @@ sub _decode_jws
 
 1;
 
+# XXX POD
 #### URLs
 # https://metacpan.org/pod/JSON::WebToken
 # https://metacpan.org/pod/Mojo::JWT
@@ -1004,15 +1005,20 @@ Net::API::REST::JWT - JSON Web Token (JWT, JWS, JWE) as defined by RFC7519, RFC7
 
 =head1 SYNOPSIS
     
-   # encoding
-   use Net::API::REST::JWT qw(encode_jwt);
-   my $jws_token = encode_jwt(payload=>$data, alg=>'HS256', key=>'secret');
-   my $jwe_token = encode_jwt(payload=>$data, alg=>'PBES2-HS256+A128KW', enc=>'A128GCM', key=>'secret');
+    # encoding
+    use Net::API::REST::JWT qw( encode_jwt );
+    my $jws_token = encode_jwt( payload => $data, alg => 'HS256', key => 'secret' );
+    my $jwe_token = encode_jwt(
+        payload => $data,
+        alg     => 'PBES2-HS256+A128KW',
+        enc     => 'A128GCM',
+        key     => 'secret'
+    );
 
    # decoding
-   use Net::API::REST::JWT qw(decode_jwt);
-   my $data1 = decode_jwt(token=>$jws_token, key=>'secret');
-   my $data2 = decode_jwt(token=>$jwe_token, key=>'secret');
+   use Net::API::REST::JWT qw( decode_jwt );
+   my $data1 = decode_jwt( token => $jws_token, key => 'secret' );
+   my $data2 = decode_jwt( token => $jwe_token, key => 'secret' );
 
 =head1 DESCRIPTION
 

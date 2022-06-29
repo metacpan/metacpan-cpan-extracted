@@ -66,6 +66,9 @@ $out.='		my %options=%opts;
                 for($opts{use}->@*){
 			$out.="use $_;\n";
                 }
+                for($opts{inject}->@*){
+			$out.="$_\n";
+                }
 
 $out.=lexical($href) unless $opts{no_alias};		#add aliased variables	from hash
 $out.='
@@ -176,8 +179,10 @@ sub _prepare_template{
 
 		$error=~s/line (\d+)/do{push @error_lines, $1;"line ".($1-$start)}/eg;
 		$error=~s/\(eval (\d+)\)/"(".$opts{file}.")"/eg;
+
 		my $min=min @error_lines;
-		my $max=max @error_lines;
+		my $max=$min;#max @error_lines;
+		#print  "max: $max\n";
 		$min-=5; $min=$start if $min<$start;
 		$max+=5; $max=$#lines-7 if $max>($#lines-7);
 		my $counter=$min-$start+1;

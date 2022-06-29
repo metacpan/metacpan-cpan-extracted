@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.3601'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.21, Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,17 +26,18 @@ requires:
   Catmandu: '1.10'
   Moo: '0'
   namespace::clean: '0'
-  perl: v5.10.1
+  perl: v5.14.0
 resources:
   bugtracker: https://github.com/LibreCat/Catmandu-RIS/issues
   homepage: https://github.com/LibreCat/Catmandu-RIS
   repository: https://github.com/LibreCat/Catmandu-RIS.git
-version: '0.12'
+version: '0.13'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Nicolas Franck <nicolas.franck@ugent.be>'
   - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
   - 'Vitali Peil <vitali.peil@uni-bielefeld.de>'
-x_generated_by_perl: v5.28.0
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 0

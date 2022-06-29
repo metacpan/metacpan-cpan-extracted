@@ -1,0 +1,56 @@
+=encoding utf8
+
+=head1 NAME
+
+Net::API::REST::RC - Return Code Object for Net::APi::REST
+
+=head1 SYNOPSIS
+
+    my $rc = Net::API::REST::RC->new(
+        code => 401,
+        message => 'Your token has expired',
+    );
+
+In your api, you can return a Return Code object, which provides both the return code and some descriptive message.
+
+Th object stringifies to the L</code> set.
+
+The purpose of this module is to have an object that contains not only the return code, but also some message for the end user.
+
+=head1 METHODS
+
+=head2 as_string
+
+    my $rc = Net::API::REST::RC->new(
+        code => 401,
+        message => 'Your token has expired',
+    );
+    print( "$rc\n" ); # 401
+
+Returns the value for L</code>
+
+=head2 code
+
+Sets or gets the http return code, such as C<200>, or C<401>. See the L<Net::API::REST::Status> module for all possible return code.
+
+=head2 message
+
+A descriptive message that can be passed along to the end user.
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 SEE ALSO
+
+L<Net::API::REST>, L<Net::API::REST::Request>, L<Net::API::REST::Response>, L<Net::API::REST::Query>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2018-2021 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
+

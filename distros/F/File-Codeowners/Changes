@@ -1,5 +1,8 @@
 Revision history for File-Codeowners.
 
+0.54      2022-06-28 16:24:46-06:00 America/Denver
+  * Add support for group alias defined in CODEOWNERS files.
+
 0.53      2021-04-02 19:47:45-06:00 America/Denver
   * Test::File::Codeowners now looks for CODEOWNERS files and repos
     relative to the executing test script (not cwd).

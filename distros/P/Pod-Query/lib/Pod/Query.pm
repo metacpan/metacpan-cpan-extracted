@@ -3,15 +3,12 @@ package Pod::Query;
 use v5.24;    # Postfix defef :)
 use strict;
 use warnings;
+use Pod::Text();
+use Pod::LOL();
 use File::Spec::Functions qw( catfile );
 use List::Util            qw( first );
 use Text::ParseWords      qw( parse_line );
-use Mojo::Base            qw( -base );
-use Mojo::Util            qw( dumper class_to_path );
-use Mojo::ByteStream      qw( b );
 use Term::Size::Any       qw( chars );
-use Pod::Text();
-use Pod::LOL;
 
 =head1 NAME
 
@@ -19,11 +16,11 @@ Pod::Query - Query pod documents
 
 =head1 VERSION
 
-Version 0.24
+Version 0.30
 
 =cut
 
-our $VERSION                   = '0.24';
+our $VERSION                   = '0.30';
 our $DEBUG_LOL_DUMP            = 0;
 our $DEBUG_STRUCT_OVER         = 0;
 our $DEBUG_TREE                = 0;
@@ -36,15 +33,6 @@ our $DEBUG_FIND_DUMP           = 0;
 our $DEBUG_INVERT              = 0;
 our $DEBUG_RENDER              = 0;
 our $MOCK_ROOT                 = 0;
-
-has [
-    qw/
-      path
-      lol
-      tree
-      class_is_path
-      /
-];
 
 =head1 SYNOPSIS
 
@@ -76,6 +64,75 @@ This module takes a class name, extracts the POD
 and provides methods to query specific information.
 
 =head1 SUBROUTINES/METHODS
+
+=cut
+
+#
+# Method maker
+#
+
+=head2 _has
+
+Generates class accessor methods (like Mojo::Base::attr)
+
+=cut
+
+sub _has {
+    no strict 'refs';
+    for my $attr ( @_ ) {
+        *$attr = sub {
+            return $_[0]{$attr} if @_ == 1;    # Get: return $self-<{$attr}
+            $_[0]{$attr} = $_[1];              # Set: $self->{$attr} = $val
+            $_[0];                             # return $self
+        };
+    }
+}
+
+=head2 path
+
+Path to the pod class file
+
+=head2 lol
+
+List of lists (LOL) structure of the pod file.
+Result of Pod::LOL.
+
+=head2 tree
+
+An hierarchy is added to the lol to create a
+tree like structure of the pod file.
+
+=head2 class_is_path
+
+Flag to indicate if the class is really a path to the file.
+
+=cut
+
+sub import {
+    _has qw(
+      path
+      lol
+      tree
+      class_is_path
+    );
+}
+
+#
+# Debug
+#
+
+sub _dumper {
+    require Data::Dumper;
+    my $data = Data::Dumper
+      ->new( [@_] )
+      ->Indent( 1 )
+      ->Sortkeys( 1 )
+      ->Terse( 1 )
+      ->Useqq( 1 )
+      ->Dump;
+    return $data if defined wantarray;
+    say $data;
+}
 
 =head2 new
 
@@ -111,14 +168,14 @@ sub new {
     my $lol = $MOCK_ROOT ? _mock_root() : Pod::LOL->new_root( $s->path );
     $lol = _flatten_for_tags( $lol );
     if ( $DEBUG_LOL_DUMP ) {
-        say "DEBUG_LOL_DUMP: " . dumper $lol;
+        say "DEBUG_LOL_DUMP: " . _dumper $lol;
         exit;
     }
 
     $s->lol( $lol );
     $s->tree( _lol_to_tree( $lol ) );
     if ( $DEBUG_TREE_DUMP ) {
-        say "DEBUG_TREE_DUMP: " . dumper $s->tree();
+        say "DEBUG_TREE_DUMP: " . _dumper $s->tree();
         exit;
     }
 
@@ -146,7 +203,7 @@ sub _class_to_path {
 
     return $path if $path = $CACHE{$pod_class};
 
-    my $partial_path = class_to_path( $pod_class );
+    my $partial_path = catfile( split /::/, $pod_class ) . '.pm';
 
     # Shortcut for files already used.
     $path = $INC{$partial_path};
@@ -160,11 +217,12 @@ sub _class_to_path {
 
     # Check for it in PATH also.
     # Maybe pod_class is the path.
-    for ( split /:/, $ENV{PATH} ) {
-        $path = catfile( $_, $pod_class );
+    for ( "", split /:/, $ENV{PATH} ) {
+
+        # Absolute path or current folder means class is path.
+        $path = ( $_ and $_ ne "." ) ? catfile( $_, $pod_class ) : $pod_class;
         if ( $path and -f $path ) {
-            $path = $pod_class if $_ eq ".";    # Ignore current directory.
-            $s->class_is_path( 1 );
+            $s->class_is_path( 1 ) if ref $s;
             return $CACHE{$pod_class} = $path;
         }
     }
@@ -270,10 +328,10 @@ sub _lol_to_tree {
     say "\n_ROOT_TO_TREE()" if $DEBUG_TREE;
 
     for ( $lol->@* ) {
-        say "\n_=", dumper $_ if $DEBUG_TREE;
+        say "\n_=", _dumper $_ if $DEBUG_TREE;
 
         my $leaf = _make_leaf( $_ );
-        say "\nleaf=", dumper $leaf if $DEBUG_TREE;
+        say "\nleaf=", _dumper $leaf if $DEBUG_TREE;
 
         # Outer tag.
         if ( not $is_in or $leaf->{tag} =~ /$is_out/ ) {
@@ -285,7 +343,7 @@ sub _lol_to_tree {
         }
         else {
             push $node->{kids}->@*, $leaf;
-            say "node: ", dumper $node if $DEBUG_TREE;
+            say "node: ", _dumper $node if $DEBUG_TREE;
         }
     }
 
@@ -370,8 +428,8 @@ sub _structure_over {
     $push->();
 
     if ( $DEBUG_STRUCT_OVER ) {
-        say "DEBUG_STRUCT_OVER-IN: " . dumper $text_list;
-        say "DEBUG_STRUCT_OVER-OUT: " . dumper \@struct;
+        say "DEBUG_STRUCT_OVER-IN: " . _dumper $text_list;
+        say "DEBUG_STRUCT_OVER-OUT: " . _dumper \@struct;
     }
 
     \@struct;
@@ -497,18 +555,18 @@ sub find {
     else {
         $find_conditions = \@raw_conditions;
     }
-    say "DEBUG_FIND_CONDITIONS: " . dumper $find_conditions
+    say "DEBUG_FIND_CONDITIONS: " . _dumper $find_conditions
       if $DEBUG_FIND_CONDITIONS;
 
     _check_conditions( $find_conditions );
     _set_condition_defaults( $find_conditions );
-    say "DEBUG_FIND_AFTER_DEFAULTS " . dumper $find_conditions
+    say "DEBUG_FIND_AFTER_DEFAULTS " . _dumper $find_conditions
       if $DEBUG_FIND_AFTER_DEFAULTS;
 
     my @tree = $s->tree->@*;
     my $kept_all;
     if ( $DEBUG_PRE_FIND_DUMP ) {
-        say "DEBUG_PRE_FIND_DUMP: " . dumper \@tree;
+        say "DEBUG_PRE_FIND_DUMP: " . _dumper \@tree;
         exit;
     }
 
@@ -520,7 +578,7 @@ sub find {
         }
     }
     if ( $DEBUG_FIND_DUMP ) {
-        say "DEBUG_FIND_DUMP: " . dumper \@tree;
+        say "DEBUG_FIND_DUMP: " . _dumper \@tree;
         exit if $DEBUG_FIND_DUMP > 1;
     }
 
@@ -740,8 +798,8 @@ sub _find {
     my ( $need, @groups ) = @_;
     if ( $DEBUG_FIND ) {
         say "\n_FIND()";
-        say "need:   ", dumper $need;
-        say "groups: ", dumper \@groups;
+        say "need:   ", _dumper $need;
+        say "groups: ", _dumper \@groups;
     }
 
     my $nth_p          = $need->{_nth_pos};      # Simplify code by already
@@ -757,13 +815,13 @@ sub _find {
         my $locked_prev = 0;
         my @found_in_group;
         if ( $DEBUG_FIND ) {
-            say "\nprev: ", dumper \@prev;
-            say "group:  ", dumper $group;
+            say "\nprev: ", _dumper \@prev;
+            say "group:  ", _dumper $group;
         }
 
       TRY:
         while ( my $try = shift @tries ) { # Can add to this queue if a sub tag.
-            say "\nTrying: try=", dumper $try if $DEBUG_FIND;
+            say "\nTrying: try=", _dumper $try if $DEBUG_FIND;
 
             if ( defined $try->{text} ) {   # over-text has no text (only kids).
                 if ( $DEBUG_FIND ) {
@@ -790,7 +848,7 @@ sub _find {
 
                     # Specific match (positive)
                     say "nth_p:$nth_p and found_in_group:"
-                      . dumper \@found_in_group
+                      . _dumper \@found_in_group
                       if $DEBUG_FIND;
                     if ( $nth_p and @found + @found_in_group > $nth_p ) {
                         say "ENFORCING: nth=$nth_p" if $DEBUG_FIND;
@@ -817,7 +875,7 @@ sub _find {
                 unshift @tries, $try->{kids}->@*;    # Process kids tags.
                 if ( $try->{keep} and not $locked_prev++ ) {
                     unshift @prev, { %$try{qw/tag text keep/} };
-                    say "prev changed: ", dumper \@prev if $DEBUG_FIND;
+                    say "prev changed: ", _dumper \@prev if $DEBUG_FIND;
                 }
                 say "locked_prev: $locked_prev" if $DEBUG_FIND;
             }
@@ -838,7 +896,7 @@ sub _find {
         @found = $found[$nth_n];
     }
 
-    say "found: ", dumper \@found if $DEBUG_FIND;
+    say "found: ", _dumper \@found if $DEBUG_FIND;
 
     @found;
 }
@@ -857,7 +915,7 @@ sub _invert {
     my ( @groups ) = @_;
     if ( $DEBUG_INVERT ) {
         say "\n_INVERT()";
-        say "groups: ", dumper \@groups;
+        say "groups: ", _dumper \@groups;
     }
 
     my @tree;
@@ -866,21 +924,21 @@ sub _invert {
     for my $group ( @groups ) {
         push @tree, { %$group{qw/ tag text keep kids /} };
         if ( $DEBUG_INVERT ) {
-            say "\nInverting: group=", dumper $group;
-            say "tree: ",              dumper \@tree;
+            say "\nInverting: group=", _dumper $group;
+            say "tree: ",              _dumper \@tree;
         }
 
         my $prevs = $group->{prev} // [];
         for my $prev ( @$prevs ) {
             my $prev_node = $navi{$prev};
             if ( $DEBUG_INVERT ) {
-                say "prev: ",      dumper $prev;
-                say "prev_node: ", dumper $prev_node;
+                say "prev: ",      _dumper $prev;
+                say "prev_node: ", _dumper $prev_node;
             }
             if ( $prev_node ) {
                 push @$prev_node, pop @tree;
                 if ( $DEBUG_INVERT ) {
-                    say "FOUND: prev_node=", dumper $prev_node;
+                    say "FOUND: prev_node=", _dumper $prev_node;
                 }
                 last;
             }
@@ -888,12 +946,12 @@ sub _invert {
                 $prev_node = $navi{$prev} = [ $tree[-1] ];
                 $tree[-1] = { %$prev, kids => $prev_node };
                 if ( $DEBUG_INVERT ) {
-                    say "NEW: prev_node=", dumper $prev_node;
+                    say "NEW: prev_node=", _dumper $prev_node;
                 }
             }
         }
 
-        say "tree end: ", dumper \@tree if $DEBUG_INVERT;
+        say "tree end: ", _dumper \@tree if $DEBUG_INVERT;
     }
 
     @tree;
@@ -912,8 +970,8 @@ sub _render {
     my ( $kept_all, @tree ) = @_;
     if ( $DEBUG_RENDER ) {
         say "\n_RENDER()";
-        say "tree: ",     dumper \@tree;
-        say "kept_all: ", dumper $kept_all;
+        say "tree: ",     _dumper \@tree;
+        say "kept_all: ", _dumper $kept_all;
     }
 
     my $formatter = Pod::Text->new( width => get_term_width(), );
@@ -924,10 +982,10 @@ sub _render {
 
     for my $group ( @tree ) {
         my @tries = ( $group );
-        say "\ngroup:  ", dumper $group if $DEBUG_RENDER;
+        say "\ngroup:  ", _dumper $group if $DEBUG_RENDER;
 
         while ( my $try = shift @tries ) {
-            say "\nTrying: try=", dumper $try if $DEBUG_RENDER;
+            say "\nTrying: try=", _dumper $try if $DEBUG_RENDER;
 
             my $_text = $try->{text};
             say "_text=$_text" if $DEBUG_RENDER;
@@ -949,13 +1007,13 @@ sub _render {
                 unshift @tries, $try->{kids}->@*;
                 if ( $DEBUG_RENDER ) {
                     say "Got kids";
-                    say "tries:  ", dumper \@tries;
+                    say "tries:  ", _dumper \@tries;
                 }
             }
         }
     }
 
-    say "lines: ", dumper \@lines if $DEBUG_RENDER;
+    say "lines: ", _dumper \@lines if $DEBUG_RENDER;
 
     return @lines if wantarray;
     join "\n", @lines;

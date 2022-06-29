@@ -1,7 +1,15 @@
 #!perl
 
 package Test::Mojo::UserAgent;
-use Mojo::Base -base;
+use warnings FATAL => 'all';
+use FindBin();
+use lib $FindBin::RealBin;
+
+use Role::Tiny::With;
+
+with 'Role::Test::Module';
+
+__PACKAGE__->run( module => "Module::Build", tests => 13 );
 
 sub lol {
     [
@@ -2500,12 +2508,4 @@ sub define_find_cases {
         },
     ]
 }
-
-package main;
-use Mojo::Base -strict;
-use FindBin();
-use lib $FindBin::RealBin;
-
-Test::Mojo::UserAgent->with_roles( 'Role::Test::Module' )
-  ->run( module => "Module::Build", tests => 13 );
 

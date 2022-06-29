@@ -124,7 +124,7 @@ my $no_closing_bracket = '{ "copious_turds" : 555, "long_desc" : "wang wang wazo
 req( $test, 400, 'root', 'POST', $base, $no_closing_bracket );
 
 $weirded_object = '{ "aid" : "!!!!!", "long_desc" : "down it goes" }';
-dbi_err( $test, 500, 'root', 'POST', $base, $weirded_object, qr/invalid input syntax for integer/ );
+dbi_err( $test, 500, 'root', 'POST', $base, $weirded_object, qr/invalid input syntax for type integer/ );
 
 note( 'delete the testing activity' );
 delete_testing_activity( $aid_of_foowop );

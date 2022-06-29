@@ -5,10 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
 use Test::More;
-use Test::Venus;
+use Venus::Test;
 
 my $test = test(__FILE__);
 
@@ -40,8 +38,10 @@ $test->for('abstract');
 
 method: print
 method: print_pretty
+method: print_string
 method: say
 method: say_pretty
+method: say_string
 
 =cut
 
@@ -221,6 +221,44 @@ $test->for('example', 2, 'print_pretty', sub {
   $result
 });
 
+=method print_string
+
+The print_string method prints a string representation of the underlying data
+without using a dump. This method supports dispatching, i.e. providing a
+method name and arguments whose return value will be acted on by this method.
+
+=signature print_string
+
+  print_string(Str | CodeRef $method, Any @args) (Any)
+
+=metadata print_string
+
+{
+  since => '0.09',
+}
+
+=example-1 print_string
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $print_string = $example->print_string;
+
+  # 'Example'
+
+  # 1
+
+=cut
+
+$test->for('example', 1, 'print_string', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok @$result == 2;
+
+  $result
+});
+
 =method say
 
 The say method prints a stringified representation of the underlying data, with
@@ -344,19 +382,44 @@ $test->for('example', 2, 'say_pretty', sub {
   $result
 });
 
-=license
+=method say_string
 
-Copyright (C) 2021, Cpanery
+The say_string method prints a string representation of the underlying data
+without using a dump, with a trailing newline. This method supports
+dispatching, i.e. providing a method name and arguments whose return value will
+be acted on by this method.
 
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+=signature say_string
+
+  say_string(Str | CodeRef $method, Any @args) (Any)
+
+=metadata say_string
+
+{
+  since => '0.09',
+}
+
+=example-1 say_string
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $say_string = $example->say_string;
+
+  # "Example\n"
+
+  # 1
 
 =cut
 
-=authors
+$test->for('example', 1, 'say_string', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok @$result == 3;
 
-Cpanery, C<cpanery@cpan.org>
-
-=cut
+  $result
+});
 
 # END
 

@@ -1,10 +1,10 @@
 {
-   "abstract" : "remove indentation and trailing whitespace",
+   "abstract" : "Remove indentation and trailing whitespace from multi-line text",
    "author" : [
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "compression",
       "minify",
@@ -77,7 +77,7 @@
    "provides" : {
       "Text::Minify::XS" : {
          "file" : "lib/Text/Minify/XS.pm",
-         "version" : "v0.6.3"
+         "version" : "v0.6.5"
       }
    },
    "release_status" : "stable",
@@ -92,10 +92,10 @@
          "web" : "https://github.com/robrwo/Text-Minify-XS"
       }
    },
-   "version" : "v0.6.3",
+   "version" : "v0.6.5",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.28",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

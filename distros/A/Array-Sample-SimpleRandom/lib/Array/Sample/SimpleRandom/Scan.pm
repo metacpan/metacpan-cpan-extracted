@@ -9,7 +9,7 @@ use Exporter qw(import);
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-05-20'; # DATE
 our $DIST = 'Array-Sample-SimpleRandom'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our @EXPORT_OK = qw(sample_simple_random_no_replacement);
 
@@ -35,7 +35,7 @@ Array::Sample::SimpleRandom::Scan - Simple random sampling from an array (scan a
 
 =head1 VERSION
 
-This document describes version 0.001 of Array::Sample::SimpleRandom::Scan (from Perl distribution Array-Sample-SimpleRandom), released on 2022-05-20.
+This document describes version 0.002 of Array::Sample::SimpleRandom::Scan (from Perl distribution Array-Sample-SimpleRandom), released on 2022-05-20.
 
 =head1 SYNOPSIS
 
@@ -78,7 +78,8 @@ Source repository is at L<https://github.com/perlancar/perl-Array-Sample-SimpleR
 
 L<Array::Sample::SimpleRandom>
 
-Other sampling methods: L<Array::Sample::Partition>, L<Array::Sample::SysRand>.
+Other sampling methods: L<Array::Sample::Partition>, L<Array::Sample::SysRand>,
+L<Array::Sample::WeightedRandom>.
 
 =head1 AUTHOR
 

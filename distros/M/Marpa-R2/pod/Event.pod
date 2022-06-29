@@ -1,4 +1,4 @@
-# Copyright 2018 Jeffrey Kegler
+# Copyright 2022 Jeffrey Kegler
 # This file is part of Marpa::R2.  Marpa::R2 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
@@ -1354,7 +1354,7 @@ normalize-whitespace: 1
             my ($name) = @{$event};
             if ($name eq 'insert d') {
                my (undef, $length) = $slr->pause_span();
-               $next_lexeme = ['real d', 'd', $length];
+               $next_lexeme = ['real d', undef, $length];
             }
             push @actual_events, $name;
         }
@@ -1424,7 +1424,7 @@ method|Marpa::R2::Scanless::R/"pause_span()">.
 =for Marpa::R2::Display
 ignore: 1
 
-  Copyright 2018 Jeffrey Kegler
+  Copyright 2022 Jeffrey Kegler
   This file is part of Marpa::R2.  Marpa::R2 is free software: you can
   redistribute it and/or modify it under the terms of the GNU Lesser
   General Public License as published by the Free Software Foundation,

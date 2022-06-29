@@ -1,7 +1,10 @@
 Revision history for Test-Mojo-Role-Debug
 
+1.005002  2022-06-27
+    - Fix test suite for newer Mojolicious versions (#2)
+
 1.005001  2020-12-09
-    - Automatically parse Mojolicious error pages 
+    - Automatically parse Mojolicious error pages
         and print only the error test.
 
 1.004001  2020-04-18

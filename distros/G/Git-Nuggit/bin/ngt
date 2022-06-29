@@ -1,0 +1,446 @@
+#!/usr/bin/env perl
+
+#*******************************************************************************
+##                           COPYRIGHT NOTICE
+##      (c) 2019 The Johns Hopkins University Applied Physics Laboratory
+##                         All rights reserved.
+##
+##  Permission is hereby granted, free of charge, to any person obtaining a 
+##  copy of this software and associated documentation files (the "Software"), 
+##  to deal in the Software without restriction, including without limitation 
+##  the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+##  and/or sell copies of the Software, and to permit persons to whom the 
+##  Software is furnished to do so, subject to the following conditions:
+## 
+##     The above copyright notice and this permission notice shall be included 
+##     in all copies or substantial portions of the Software.
+##
+##  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+##  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+##  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+##  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+##  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+##  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+##  DEALINGS IN THE SOFTWARE.
+##
+#*******************************************************************************/
+
+# ngt - The shorter version of nuggit
+
+# Optional Dependencies:
+#   Complete::Program - to enable auto-completion of programs
+
+=head1 SYNOPSIS
+
+Run "ngt --man" or "ngt --help" for details.
+
+=cut
+
+
+use strict;
+use warnings;
+use v5.10; # Adds say function
+use FindBin;
+use lib $FindBin::Bin.'/../lib'; # Add local lib to path
+use Term::ANSIColor;
+
+# Get First Parameter (case-insensitive)
+my $cmd = lc(shift) if @ARGV;
+
+# Command Database (excludes help/doc/env commands defined in this file)
+my %files =
+(
+ # Core Commands
+ add       => {cmd => "nuggit_add.pl",
+            completion_type => "file"},
+ branch    => "nuggit_branch.pl",
+ checkout  => {cmd => "nuggit_ops.pl", args => ['checkout']}, # TODO: Autocomplete known (root-level) branches
+ clone     => "nuggit_clone.pl",
+ commit    => "nuggit_commit.pl",
+ diff      => {cmd => "nuggit_diff.pl", completion_type => "file"},
+ difftool  =>  {cmd => "nuggit_foreach.pl", args => [ qw( --log_level 0 git difftool) ] },
+ fetch     => "nuggit_fetch.pl",
+ history   => "nuggit_history.pl",
+ init      => "nuggit_init.pl",
+ log       => "nuggit_log.pl",
+ merge     => {cmd => "nuggit_ops.pl", args => ['merge']},
+"merge-tree" =>"nuggit_merge_tree.pl",
+ mergetool => {cmd => "nuggit_foreach.pl", args => [ qw( git mergetool) ] },
+ mv        => {cmd => "nuggit_mv.pl", completion_type => "file"},
+ pull => {cmd => "nuggit_ops.pl", args => ['pull']},
+ push      => "nuggit_push.pl",
+ rebase => {cmd => "nuggit_ops.pl", args => ['rebase']},
+ remote    => "nuggit_remote.pl",
+ reset     => {cmd => "nuggit_reset.pl", completion_type => "file"},
+ rm        => {cmd => "nuggit_rm.pl", completion_type => "file"},
+ stash     => {cmd => "nuggit_stash.pl",
+             completion_list => [qw(save pop save list show drop apply branch)]
+            },
+ status    => {cmd => "nuggit_status.pl", completion_type => "file"},
+ tag       => {cmd => "nuggit_foreach.pl", args => [ qw( --no-break-on-error git tag )]},
+ tree      => {cmd => "nuggit_tree.pl" },
+ 
+ foreach => {cmd => "nuggit_foreach.pl", # Run without arguments to list submodule status
+             completion_type => "system" # Use system default completion
+            },
+ 
+);
+
+# Supported Autocompletion Shells:
+#Complete::Bash - provides COMP_LINE and COMP_POINT
+# Complete::Zsh - ?
+# Complete::Tcsh - provides COMMAND_LINE env variable
+if (defined($ENV{'COMP_LINE'}) || defined($ENV{'COMMAND_LINE'}) ) {
+    require Complete::File;
+    Complete::File->import('complete_file');
+    require Complete::Util;
+    Complete::Util->import('complete_array_elem');
+
+    if (defined($ENV{'COMP_LINE'})) {
+        require Complete::Bash;
+        Complete::Bash->import(qw(parse_cmdline format_completion));
+    } elsif (defined($ENV{'COMMAND_LINE'}) ) {
+        require Complete::Tcsh;
+        Complete::Tcsh->import(qw(parse_cmdline format_completion));
+    }
+
+    my( $words, $cword) = @{ parse_cmdline() };
+    my $res;
+    my $word = $words->[$cword];
+    my $def = $files{$words->[1]};
+    if ($cword == 1) {
+        $res = complete_array_elem(array=>[keys(%files)], word=>$word);
+    } elsif (ref($def)) {
+        # Definition available for this command
+        if (defined($def->{completion_type}) && $def->{completion_type} eq "file") {
+            $res = file_complete($word);
+        } elsif (defined($def->{completion_type}) && $def->{completion_type} eq "system") {
+            eval {require Complete::Program; } || exit;
+            Complete::Program->import('complete_program');
+            $res = complete_program(word => $word);
+        } elsif (defined($def->{completion_list})) {
+            $res = complete_array_elem(array => $def->{completion_list},
+                                       word => $word);
+        }
+    } else {
+        # No more auto-completion
+        exit;
+    }
+    print format_completion($res);
+    exit;
+
+} elsif (defined($cmd) && ($cmd eq "check" || $cmd eq "version" || $cmd eq "base"))  {
+    # Check for Nuggit Library
+    eval "use Git::Nuggit::Status";
+    die "Git::Nuggit::Status does not appear to be installed. Did you source nuggit.sh or equivalent?" if $@;
+
+    eval "use Git::Nuggit";
+    die "Git::Nuggit does not appear to be installed. Did you source nuggit.sh or equivalent?" if $@;
+    
+    eval "use IPC::Run3";
+    die "IPC::Run3 does not appear to be installed. Install via cpan, or see README for other options." if $@;
+
+    my $git_version = `git --version`;
+    if ($git_version =~ /git version (\d)\.(\d+)\.?(\d+)?/) {
+        die "Warning: Git 2.24 or later is required for full functionality.\n" unless ( ($1 > 2) || ($1 == 2 && $2 >= 24));
+    } else {
+        die "Unable to find git";
+    }
+
+    my ($root_dir, $relative_path_to_root) = find_root_dir();
+
+    if ($cmd eq "base") {
+        if ($root_dir) {
+            say $root_dir;
+            exit;
+        } else {
+            die "Not a Nuggit!";
+        }
+    }
+
+    say "Using Git::Nuggit version " . $Git::Nuggit::VERSION;
+    
+    my $nuggit_dir = $FindBin::Bin.'/';
+    if (-d File::Spec->catdir($nuggit_dir, '../.git')) {
+        chdir($nuggit_dir);
+        say `git log -n1 --pretty=reference`;
+    }
+
+    if ($root_dir) {
+        say "Nuggit Workspace Root located at $relative_path_to_root (aka $root_dir)";
+    } else {
+        say "Not currently in a Nuggit workspace.";
+    }
+    
+    exit;
+} elsif (defined($cmd) && $cmd =~ /(help|man)$/) {
+    show_help();
+} elsif (defined($cmd) && $cmd eq "generatedocs") {
+    generate_help();
+} elsif (defined($cmd)) {
+    if (defined($files{$cmd})) {
+        # Execute specified file directly
+        my $rawcmd = $FindBin::Bin.'/';
+        my $obj = $files{$cmd};
+        
+        if (ref($obj)) {
+            if ($obj->{'args'}) {
+                my @tmp = @{$obj->{'args'}};
+                push(@tmp, @ARGV);
+                @ARGV = @tmp;
+            }
+            $rawcmd .= $obj->{'cmd'};
+        } else {
+            $rawcmd .= $obj;
+        }
+        
+        unshift(@ARGV, $rawcmd);
+        exec(@ARGV);
+        exit;
+    }
+
+    # Support for user-defined command aliases
+    run_alias();
+    
+    # If we've reached this point, command is not recognized
+    show_help();
+    die colored("ERROR: Unrecognized Command ($cmd)", 'red')."\n";
+    
+} else {
+    show_help();
+    die colored("Please specify a valid command", 'red')."\n";
+}
+
+# Support for user-defined commands
+sub run_alias {
+    # Create Ngt Object
+    require Git::Nuggit;
+    require Cwd;
+
+    my $ngt = Git::Nuggit->new("run_die_on_error" => 0, "echo_always" => 0);
+    
+    # Get Ngt Config 'aliases'
+    my $aliases = $ngt->cfg("aliases");
+    
+    # If alias defined, run it
+    if (ref($aliases) eq "HASH" && defined($aliases->{$cmd})) {
+        # Options may include:
+        #  Same as core:  cmd, args, completion_type -- though auto completion support will have to be handled seperately
+        #  Plus dir, quiet, log
+        #   If dir is omitted (or only a command is specified), always execute from root
+        #  Log can be: off, log as ngt cmd, or a custom filename.  The latter can farther be customized to split stdout and stderr into separate files (useful for wrapping make commands)
+        # NOTE: Logging not enabled for initial implementation
+        
+        my $alias = $aliases->{$cmd};
+       
+        # Enter working directory
+        chdir($ngt->root_dir()) || die("Can't enter root_dir\n");
+
+        # Command
+        my $rawcmd;
+        
+        # Does this alias specify details?
+        if (ref($alias) ) { # VERIFY
+            (chdir($alias->{dir}) || die("Can't enter $alias->{dir}\n")) if $alias->{dir};
+            die "Malformed Alias definition (no cmd specified for $cmd).\n" unless $alias->{cmd};
+            $rawcmd = $alias->{cmd};
+
+            # Build Command
+            if ($alias->{'args'}) {
+                # NOTE: May need to add check to handle/abort if args is not an array
+                my @tmp = @{$alias->{'args'}};
+                push(@tmp, @ARGV);
+                @ARGV = @tmp;
+            }
+            
+        } else {
+            $rawcmd = $alias;
+        }
+
+        unshift(@ARGV, $rawcmd);
+
+        if (ref($alias) && (defined($alias->{log}) || defined($alias->{log_file}))) {
+            my $info = "";
+            my $cwd = Cwd::getcwd();
+            my $cmd = join(' ', @ARGV);
+            $ngt->start(level => $alias->{log} // 0,
+                        verbose => 0); # Open Logger for loggable-command mode
+            $info .= "Output has been logged to the default nuggit logs.  " if $alias->{log};
+            say colored("Running command from $cwd: $cmd", 'info');
+            my ($err, $stdout, $stderr) = $ngt->run($cmd);
+            if ($alias->{log_file}) {
+                require File::Slurp;
+                File::Slurp::write_file($alias->{log_file}."stdout.log", $stdout) if $stdout;
+                File::Slurp::write_file($alias->{log_file}."stderr.log", $stderr) if $stderr;
+                $info .= "Output has been logged to $cwd/$alias->{log_file}.stdout.log and/or stderr.log";
+            }
+            if ($err) {
+                say $stderr if $stderr;
+                say colored("Command exited with error $err. STDERR output is shown above.  $info",'error');
+            }
+            say colored("Command completed.  $info", 'info');
+            exit $err;
+        } else {
+            exec(@ARGV); # Never returns
+        }
+    } elsif (defined($ENV{NGT_ALIASES})) {
+        # Shell defined aliases are always of form: key="value", where value can be any valid shell command
+        my %aliases = $ENV{NGT_ALIASES} =~ /(\w+)[\s]*=[\s]*((?:[^"'\s]+)|'(?:[^']*)'|"(?:[^"]*)")/gx;
+
+        if (defined($aliases{$cmd})) {
+            # Enter working directory
+            chdir($ngt->root_dir()) || die("Can't enter root_dir\n");
+            my $cmd = $aliases{$cmd};
+            $cmd = substr $cmd, 1, -1 if $cmd =~ /^["'].+["']$/; # strip quotes
+            $cmd .= join(' ', @ARGV);
+
+            say colored("Running command from root: '$cmd'", 'info');
+            exec($cmd); # never returns
+        }
+        
+    }
+
+}
+
+sub show_help {
+    say "---------------------------------------------------";
+    say "Nuggit; A Git Utility for Submodule-based workflows";
+    say "---------------------------------------------------";
+    say "Usage: ngt <cmd> <args>\n";
+
+    say "This is a wrapper for available nuggit commands. Internal commands are:";
+    say "  ngt help      Show this help dialog";
+    say "  ngt check     Verify nuggit installation and dependencies and show version\n";
+    say "  ngt version   Alias to ngt check";
+    say "  ngt base      Output full path to nuggit root directory, suitable for inclusion by other scripts\n";
+
+    say "Commands for 'ngt' can be autocompleted by pressing the tab key, while a list";
+    say "  of all matches can be returned by pressing tab twice. This will work";
+    say "  on Bash and CSH terminals only, providing that the nuggit.[c]sh script";
+    say "  has been sourced.\n";
+    
+    say "Most of the commands below have their own help page";
+    say " accessible as 'ngt <cmd> --help' for abbreviated usage";
+    say " or 'ngt <cmd> --man' for detailed usage information.";
+    say "\n";
+    
+    foreach my $file (sort keys %files) {
+        my $obj = $files{$file};
+        print " ".$file." ";
+        if (ref($obj)) {
+            if ($obj->{'completion_list'}) {
+                my $first = 0;
+                foreach my $subcmd (@{$obj->{'completion_list'}}) {
+                    print "|" unless !$first;
+                    print $subcmd;
+                    $first++;
+                }
+            } elsif (defined($obj->{'completion_type'})) {
+                if ($obj->{'completion_type'} eq "file") {
+                    print "<file>";
+                }
+            }
+            print "\t".$obj->{'description'} if defined($obj->{'description'});
+        }
+        print "\n";
+    }
+}
+
+sub generate_help {
+    # Conditionally include (so we don't break other functions if not available)
+    eval "use Pod::Simple::HTMLBatch"; die $@ if $@;
+    eval "use Pod::Simple::XHTML"; die $@ if $@;
+    use List::Util qw(first);
+
+    mkdir './html';
+
+    my $convert = Pod::Simple::HTMLBatch->new;
+    $convert->html_render_class('Pod::Simple::XHTML');
+    $convert->add_css('http://www.perl.org/css/perl.css');
+    $convert->css_flurry(1);
+    $convert->javascript_flurry(1);
+    $convert->contents_file(1);    
+    $convert->batch_convert(['./pod','./bin','./lib/Git'], './html');
+
+    # Open Directory and get list of generated HTML files.
+    chdir('html');
+    my @htmlfiles = glob( '*.html */*.html');
+
+    open(my $idx, '>', "index.html") || die("Can't create index.html");
+    say $idx "<HTML><HEAD><TITLE>Nuggit Help</TITLE></HEAD><BODY>";
+    say $idx "<H1>Nuggit; A Git Utility for submodule-based workflows</H1>";
+    say $idx <<EOF;
+
+    <p><b>Usage:</b> ngt <cmd> <args></p>
+
+    <p>"ngt" is a wrapper for available nuggit commands.  Use "ngt help" to list a version of this help page, or "ngt check" to verify your installation.  "ngt generatedocs" can be used to generate this documentation.</p>
+
+    <p>Commands for 'ngt' can be autocompleted by pressing the tab key, while a list
+  of all matches can be returned by pressing tab twice. This will work
+  on Bash and CSH terminals only, providing that the nuggit.[c]sh script
+  has been sourced.</p>
+
+  <p>Most of the commands below have their own help page accessible
+ from the command line as 'ngt <cmd> --help' for abbreviated usage or
+ 'ngt <cmd> --man' for detailed usage information, with HTML versions
+ linked below.</p>
+
+
+EOF
+
+    say $idx "<h2>Commands:</h2><ul>";
+    foreach my $file (sort keys %files) {
+        my $obj = $files{$file};
+        print $idx "<li><p>";
+
+        # If a matching HTML file exists, link to it.
+        my $index = first { $htmlfiles[$_] eq "nuggit_$file.html" } 0..$#htmlfiles;
+        #my $index = first { $_ eq "nuggit_$file.html" } @htmlfiles;
+        if (defined($index)) {
+            print $idx "<a href=".$htmlfiles[$index].">$file</a> ";
+            splice(@htmlfiles, $index, 1);
+        } else {
+            print $idx $file." ";
+        }
+        
+        if (ref($obj)) {
+            if ($obj->{'completion_list'}) {
+                my $first = 0;
+                foreach my $subcmd (@{$obj->{'completion_list'}}) {
+                    print $idx "|" unless !$first;
+                    print $idx $subcmd;
+                    $first++;
+                }
+            } elsif (defined($obj->{'completion_type'})) {
+                if ($obj->{'completion_type'} eq "file") {
+                    print $idx "<file>";
+                }
+            }
+            print $idx "&mdash;".$obj->{'description'} if defined($obj->{'description'});
+        }
+        say $idx "</p></li>";
+    }
+    say $idx "</ul>";
+        
+    say $idx "<h2>Other Documentation:</h2><ul>";
+    foreach my $file (@htmlfiles) {
+        say $idx "<li><a href=\"$file\">$file</a></li>";
+    }
+    say $idx "</ul>";
+ 
+    say $idx "</BODY>";
+    
+    
+    close($idx);
+    say "Help Pages have been generated";
+}
+
+sub file_complete {
+    my $word = shift;
+    my $rtv;
+
+    return complete_file(word => $word,
+                             file_regex_filter => qr/^\./  # Hide hidden folders
+                            );
+    
+}

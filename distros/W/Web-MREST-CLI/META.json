@@ -4,7 +4,7 @@
       "Nathan Cutler <ncutler@suse.cz>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4205",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "bsd"
    ],
@@ -56,7 +56,7 @@
    "provides" : {
       "Web::MREST::CLI" : {
          "file" : "lib/Web/MREST/CLI.pm",
-         "version" : "0.283"
+         "version" : "0.284"
       },
       "Web::MREST::CLI::Parser" : {
          "file" : "lib/Web/MREST/CLI/Parser.pm"
@@ -68,6 +68,6 @@
          "http://opensource.org/licenses/bsd-license.php"
       ]
    },
-   "version" : "0.283",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.284",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

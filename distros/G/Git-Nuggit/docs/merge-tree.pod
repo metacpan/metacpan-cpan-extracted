@@ -1,0 +1,56 @@
+=head1 NAME
+
+ngt merge-tree  - Three-way diff tool serving as a merge preview.
+
+EXPERIMENTAL - This script should be considered experimental and likely will not handle all cases
+
+=head1 SYNOPSIS
+
+nuggit merge-tree [base-tree] [branch1] branch2
+nuggit merge --preview branch1
+
+This command simulates the probable output of the given merge operation by conducting a 3-way comparison of the source, destination, and common base commits. It may also be invoked manually for a comparison of any arbitrary trio of commits.
+
+This function is a user-friendly expansion of the raw functionality provided by git's merge-tree command, with added submodule recursion.
+
+=head1 Options
+
+=over 4
+
+=item B<--json>
+
+Output results in a JSON format for parsing, or piping to a future UI. This implies '--full'
+
+=item B<--full>
+
+Show all changes if set (default), otherwise only show summary and detected conflicts.
+
+=item B<-verbose>
+
+Dump full internal results object
+
+=item B<-patch>
+
+Output a patch file (note: can't be applied if it contains conflicts)
+
+=back
+
+=head1 DESCRIPTION
+
+ngt merge-tree 
+
+
+This command accepts the nuggit '--strategy' flag.
+- Using the default ref-first strategy, differences will follow submodule references.  Input arguments may be any object reference (branch, tag, or commit) valid for the root repository.
+- Using the branch first strategy (--strategy=branch), the given branches/tags will be compared at all levels. SHA commits are not valid in this mode.
+
+
+branch2 is the source branch.  This argument is required.
+
+branch1 is the destination branch.  If omitted, HEAD will be assummed.
+
+base-tree is the third baese for comparison, typically the common ancestor.  If omitted, this will be calculated using 'git merge-base branch1 branch2'.  
+
+
+
+

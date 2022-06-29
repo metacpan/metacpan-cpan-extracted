@@ -214,6 +214,16 @@ sub last_insert_id
     return( $self->database_object->last_insert_id( undef(), undef(), $self->table_object->name, undef() ) );
 }
 
+sub name
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        $self->{sth}->{pg_prepare_name} = shift( @_ );
+    }
+    return( $self->{sth}->{pg_prepare_name} );
+}
+
 sub only
 {
     my $self     = shift( @_ );
@@ -384,6 +394,12 @@ This returns an error as C<INSERT> | C<UPDATE> | C<ALTER IGNORE> is not supporte
 =head2 last_insert_id
 
 Will call L<DB::Object/last_insert_id> with the necessary parameters to get the last inserted table id.
+
+=head2 name
+
+Sets or gets the name of the prepared statement. The name set will show up in the PostgreSQL server log.
+
+See L<DBD::Pg/prepare>
 
 =head2 only
 

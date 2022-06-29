@@ -1,4 +1,6 @@
-1.5.3  xx.xx.2022
+1.5.4  xx.xx.2022
+           - fix for blead perl 5.37
+1.5.3  22.06.2022
            - fixes for perl 5.36
 1.5.2  26.11.2021
            - upgrade tests for catch-v3

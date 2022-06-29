@@ -8,7 +8,7 @@ use strict;
 
 package Text::Bidi::Array::Byte;
 # ABSTRACT: Dual-life byte arrays
-$Text::Bidi::Array::Byte::VERSION = '2.16';
+$Text::Bidi::Array::Byte::VERSION = '2.17';
 
 use Carp;
 
@@ -55,7 +55,7 @@ Text::Bidi::Array::Byte - Dual-life byte arrays
 
 =head1 VERSION
 
-version 2.16
+version 2.17
 
 =head1 SYNOPSIS
 

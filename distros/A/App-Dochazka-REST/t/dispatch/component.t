@@ -183,7 +183,7 @@ my $no_closing_bracket = '{ "copious_turds" : 555, "source" : "wang wang wazoo",
 req( $test, 400, 'root', 'POST', $base, $no_closing_bracket );
 
 $weirded_object = '{ "cid" : "!!!!!", "source" : "down it goes" }';
-dbi_err( $test, 500, 'root', 'POST', $base, $weirded_object, qr/invalid input syntax for integer/ );
+dbi_err( $test, 500, 'root', 'POST', $base, $weirded_object, qr/invalid input syntax for type integer/ );
 
 my $illegal_acl = '{ "cid" : ' . $cid_of_foowop . ', "path" : "library/machinations.mc", "source" : "wang wang wazoo", "acl" : "puppy" }';
 req( $test, 400, 'root', 'POST', $base, $illegal_acl );

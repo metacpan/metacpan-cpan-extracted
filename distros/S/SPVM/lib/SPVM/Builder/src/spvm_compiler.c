@@ -379,7 +379,7 @@ int32_t SPVM_COMPILER_compile_spvm(SPVM_COMPILER* compiler, const char* class_na
 
   SPVM_LIST_free(compiler->ops);
   compiler->ops = NULL;
-
+  
   assert(compiler->allocator->memory_blocks_count_tmp == compile_start_memory_blocks_count_tmp);
   
   return error_code;
@@ -619,7 +619,7 @@ int32_t* SPVM_COMPILER_create_spvm_32bit_codes(SPVM_COMPILER* compiler, SPVM_ALL
       runtime_class->destructor_method_id = -1;
     }
     
-    if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE || class->category == SPVM_CLASS_C_CATEGORY_CALLBACK) {
+    if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
       assert(class->required_method);
     }
   

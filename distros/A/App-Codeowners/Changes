@@ -1,5 +1,8 @@
 Revision history for App-Codeowners.
 
+0.51      2022-06-28 17:01:43-06:00 America/Denver
+  * Add support for group aliases.
+
 0.50      2021-04-02 17:14:52-06:00 America/Denver
   * Split off File::Codeowners to its own distribution.
 

@@ -5,10 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
 use Test::More;
-use Test::Venus;
+use Venus::Test;
 
 my $test = test(__FILE__);
 
@@ -71,6 +69,13 @@ method: sub_minutes
 method: sub_months
 method: sub_seconds
 method: sub_years
+method: truncate_to_day
+method: truncate_to_hour
+method: truncate_to_minute
+method: truncate_to_month
+method: truncate_to_quarter
+method: truncate_to_second
+method: truncate_to_year
 
 =cut
 
@@ -2500,19 +2505,271 @@ $test->for('example', 1, '(ne)', sub {
   $result
 });
 
-=license
+=method truncate_to_day
 
-Copyright (C) 2021, Cpanery
+The truncate_to_day method truncates the date and time to the C<day>.
 
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+=signature truncate_to_day
+
+  truncate_to_day() (Date)
+
+=metadata truncate_to_day
+
+{
+  since => '0.09',
+}
+
+=example-1 truncate_to_day
+
+  # given: synopsis;
+
+  $date = $date->truncate_to_day;
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
 
 =cut
 
-=authors
+$test->for('example', 1, 'truncate_to_day', sub {
+  if ($] < 5.28000) {
+    diag 'Venus::Date#truncate_to_day requires Perl 5.28+' if $ENV{DEBUG};
+    return 1;
+  }
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->epoch == 570672000;
 
-Cpanery, C<cpanery@cpan.org>
+  $result
+});
+
+=method truncate_to_hour
+
+The truncate_to_hour method truncates the date and time to the C<hour>.
+
+=signature truncate_to_hour
+
+  truncate_to_hour() (Date)
+
+=metadata truncate_to_hour
+
+{
+  since => '0.09',
+}
+
+=example-1 truncate_to_hour
+
+  # given: synopsis;
+
+  $date = $date->truncate_to_hour;
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
 
 =cut
+
+$test->for('example', 1, 'truncate_to_hour', sub {
+  if ($] < 5.28000) {
+    diag 'Venus::Date#truncate_to_hour requires Perl 5.28+' if $ENV{DEBUG};
+    return 1;
+  }
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->epoch == 570672000;
+
+  $result
+});
+
+=method truncate_to_minute
+
+The truncate_to_minute method truncates the date and time to the C<minute>.
+
+=signature truncate_to_minute
+
+  truncate_to_minute() (Date)
+
+=metadata truncate_to_minute
+
+{
+  since => '0.09',
+}
+
+=example-1 truncate_to_minute
+
+  # given: synopsis;
+
+  $date = $date->truncate_to_minute(1);
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
+
+=cut
+
+$test->for('example', 1, 'truncate_to_minute', sub {
+  if ($] < 5.28000) {
+    diag 'Venus::Date#truncate_to_minute requires Perl 5.28+' if $ENV{DEBUG};
+    return 1;
+  }
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->epoch == 570672000;
+
+  $result
+});
+
+=method truncate_to_month
+
+The truncate_to_month method truncates the date and time to the C<month>.
+
+=signature truncate_to_month
+
+  truncate_to_month() (Date)
+
+=metadata truncate_to_month
+
+{
+  since => '0.09',
+}
+
+=example-1 truncate_to_month
+
+  # given: synopsis;
+
+  $date = $date->truncate_to_month(1);
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
+
+=cut
+
+$test->for('example', 1, 'truncate_to_month', sub {
+  if ($] < 5.28000) {
+    diag 'Venus::Date#truncate_to_month requires Perl 5.28+' if $ENV{DEBUG};
+    return 1;
+  }
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->epoch == 570672000;
+
+  $result
+});
+
+=method truncate_to_quarter
+
+The truncate_to_quarter method truncates the date and time to the C<quarter>.
+
+=signature truncate_to_quarter
+
+  truncate_to_quarter() (Date)
+
+=metadata truncate_to_quarter
+
+{
+  since => '0.09',
+}
+
+=example-1 truncate_to_quarter
+
+  # given: synopsis;
+
+  $date = $date->truncate_to_quarter(1);
+
+  # $date->string; # 1988-01-01T00:00:00Z
+
+  # $date->epoch; # 567993600
+
+=cut
+
+$test->for('example', 1, 'truncate_to_quarter', sub {
+  if ($] < 5.28000) {
+    diag 'Venus::Date#truncate_to_quarter requires Perl 5.28+' if $ENV{DEBUG};
+    return 1;
+  }
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->epoch == 567993600;
+
+  $result
+});
+
+=method truncate_to_second
+
+The truncate_to_second method truncates the date and time to the C<second>.
+
+=signature truncate_to_second
+
+  truncate_to_second() (Date)
+
+=metadata truncate_to_second
+
+{
+  since => '0.09',
+}
+
+=example-1 truncate_to_second
+
+  # given: synopsis;
+
+  $date = $date->truncate_to_second(1);
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
+
+=cut
+
+$test->for('example', 1, 'truncate_to_second', sub {
+  if ($] < 5.28000) {
+    diag 'Venus::Date#truncate_to_second requires Perl 5.28+' if $ENV{DEBUG};
+    return 1;
+  }
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->epoch == 570672000;
+
+  $result
+});
+
+=method truncate_to_year
+
+The truncate_to_year method truncates the date and time to the C<year>.
+
+=signature truncate_to_year
+
+  truncate_to_year() (Date)
+
+=metadata truncate_to_year
+
+{
+  since => '0.09',
+}
+
+=example-1 truncate_to_year
+
+  # given: synopsis;
+
+  $date = $date->truncate_to_year(1);
+
+  # $date->string; # 1988-01-01T00:00:00Z
+
+  # $date->epoch; # 567993600
+
+=cut
+
+$test->for('example', 1, 'truncate_to_year', sub {
+  if ($] < 5.28000) {
+    diag 'Venus::Date#truncate_to_year requires Perl 5.28+' if $ENV{DEBUG};
+    return 1;
+  }
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->epoch == 567993600;
+
+  $result
+});
 
 # END
 

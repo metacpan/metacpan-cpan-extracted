@@ -79,3 +79,6 @@
 # Avoid perlcritic, travis config files
 \B\.perlcriticrc\b
 \B\.travis.yml\b
+
+# Avoid bootstrap scripts
+\bbootstrap.*sh$

@@ -2711,7 +2711,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   assert(op_invocant);
                   SPVM_OP_cut_op(compiler, op_invocant);
                   
-                  const char* field_name = call_method->method->accessor_original_name;
+                  const char* field_name = call_method->method->field_method_original_name;
 
                   SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
                 
@@ -2747,7 +2747,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
 
                   op_operand_value->no_need_check = 1;
 
-                  const char* field_name = call_method->method->accessor_original_name;
+                  const char* field_name = call_method->method->field_method_original_name;
                   SPVM_OP* op_name_field_access = SPVM_OP_new_op_name(compiler, field_name, op_cur->file, op_cur->line);
                   SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, op_cur->file, op_cur->line);
                   SPVM_OP_build_field_access(compiler, op_field_access, op_invocant, op_name_field_access);
@@ -2772,7 +2772,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
                   
                   const char* class_name = call_method->method->class->name;
-                  const char* class_var_base_name = call_method->method->accessor_original_name;
+                  const char* class_var_base_name = call_method->method->field_method_original_name;
                   char* class_var_name_tmp = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, 1 + strlen(class_name) + 2 + strlen(class_var_base_name));
                   memcpy(class_var_name_tmp, "$", 1);
                   memcpy(class_var_name_tmp + 1, class_name, strlen(class_name));
@@ -2810,7 +2810,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   op_operand_value->no_need_check = 1;
                   
                   const char* class_name = call_method->method->class->name;
-                  const char* class_var_base_name = call_method->method->accessor_original_name;
+                  const char* class_var_base_name = call_method->method->field_method_original_name;
                   char* class_var_name_tmp = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, 1 + strlen(class_name) + 2 + strlen(class_var_base_name));
                   memcpy(class_var_name_tmp, "$", 1);
                   memcpy(class_var_name_tmp + 1, class_name, strlen(class_name));
@@ -4427,11 +4427,8 @@ void SPVM_OP_CHECKER_resolve_call_method(SPVM_COMPILER* compiler, SPVM_OP* op_ca
     SPVM_METHOD* found_method = NULL;
     SPVM_CLASS* parent_class = NULL;
     if (call_parent_method) {
-      const char* parent_class_name = class->parent_class_name;
-      if (parent_class_name) {
-        parent_class = SPVM_HASH_get(compiler->class_symtable, parent_class_name, strlen(parent_class_name));
-      }
-      else {
+      parent_class = class->parent_class;
+      if (!parent_class) {
         return;
       }
     }
@@ -4448,11 +4445,8 @@ void SPVM_OP_CHECKER_resolve_call_method(SPVM_COMPILER* compiler, SPVM_OP* op_ca
       if (found_method) {
         break;
       }
-      const char* parent_class_name = parent_class->parent_class_name;
-      if (parent_class_name) {
-        parent_class = SPVM_HASH_get(compiler->class_symtable, parent_class_name, strlen(parent_class_name));
-      }
-      else {
+      parent_class = class->parent_class;
+      if (!parent_class) {
         break;
       }
     }
@@ -4620,12 +4614,6 @@ void SPVM_OP_CHECKER_resolve_field_offset(SPVM_COMPILER* compiler, SPVM_CLASS* c
 }
 
 void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
-  
-  // Set class id
-  for (int32_t class_index = compiler->cur_class_base; class_index < compiler->classes->length; class_index++) {
-    SPVM_CLASS* class = SPVM_LIST_get(compiler->classes, class_index);
-    class->id = class_index;
-  }
   
   for (int32_t class_index = compiler->cur_class_base; class_index < compiler->classes->length; class_index++) {
     SPVM_CLASS* class = SPVM_LIST_get(compiler->classes, class_index);
@@ -4826,6 +4814,25 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
         class->is_precompile = anon_method_defined_class->is_precompile;
       }
     }
+    
+    const char* parent_class_name = class->parent_class_name;
+    if (parent_class_name) {
+      SPVM_CLASS* parent_class = SPVM_HASH_get(compiler->class_symtable, parent_class_name, strlen(parent_class_name));
+      SPVM_TYPE* parent_class_type = parent_class->type;
+      if (!SPVM_TYPE_is_class_type(compiler, parent_class_type->basic_type->id, parent_class_type->dimension, parent_class_type->flag)) {
+        SPVM_COMPILER_error(compiler, "The parant class must be a class type at %s line %d", class->op_extends->file, class->op_extends->line);
+        return;
+      }
+      if (parent_class->is_pointer) {
+        SPVM_COMPILER_error(compiler, "The parant class must be a non-pointer type at %s line %d", class->op_extends->file, class->op_extends->line);
+        return;
+      }
+      if (strcmp(class->name, parent_class->name) == 0) {
+        SPVM_COMPILER_error(compiler, "The name of the parant class must be different from the name of the class at %s line %d", class->op_extends->file, class->op_extends->line);
+        return;
+      }
+      class->parent_class = parent_class;
+    }
   }
   
   // Add anon methods
@@ -4957,6 +4964,7 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
   }
   
   // Resove inheritance
+  int32_t compile_error = 0;
   for (int32_t class_index = compiler->cur_class_base; class_index < compiler->classes->length; class_index++) {
     SPVM_CLASS* class = SPVM_LIST_get(compiler->classes, class_index);
     
@@ -4966,13 +4974,17 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
     SPVM_LIST* all_fields = SPVM_LIST_new_list_permanent(compiler->allocator, 0);
     SPVM_LIST* all_interfaces = SPVM_LIST_new_list_permanent(compiler->allocator, 0);
     
-    const char* parent_class_name = class->parent_class_name;
+    SPVM_CLASS* parent_class = class->parent_class;
     while (1) {
-      if (parent_class_name) {
-        SPVM_CLASS* parent_class = SPVM_HASH_get(compiler->class_symtable, parent_class_name, strlen(parent_class_name));
-        assert(parent_class);
+      if (parent_class) {
+        if (strcmp(parent_class->name, class->name) == 0) {
+          SPVM_COMPILER_error(compiler, "The all super classes must be different from its own class. Recursive inheritance isn't allowed at %s line %d", class->op_extends->file, class->op_extends->line);
+          compile_error = 1;
+          break;
+        }
+        
         SPVM_LIST_push(class_stack, parent_class);
-        parent_class_name = parent_class->parent_class_name;
+        parent_class = parent_class->parent_class;
       }
       else {
         break;
@@ -5026,6 +5038,9 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
     }
     
     SPVM_LIST_free(class_stack);
+    if (compile_error) {
+      return;
+    }
   }
 
   // Replace fields
@@ -5041,19 +5056,29 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
     }
   }
   
-  // Resove field
+  // Resove fields
   for (int32_t class_index = compiler->cur_class_base; class_index < compiler->classes->length; class_index++) {
+    // Class
     SPVM_CLASS* class = SPVM_LIST_get(compiler->classes, class_index);
+    
     for (int32_t i = 0; i < class->fields->length; i++) {
+      // Field
       SPVM_FIELD* field = SPVM_LIST_get(class->fields, i);
 
-      // Set field id
+      // Create field id
       field->id = compiler->fields->length;
 
-      // Add the field to the compiler
+      // Add field to compiler
       SPVM_LIST_push(compiler->fields, field);
     }
     
+    // Resove field offset
     SPVM_OP_CHECKER_resolve_field_offset(compiler, class);
+  }
+
+  // Create class id
+  for (int32_t class_index = compiler->cur_class_base; class_index < compiler->classes->length; class_index++) {
+    SPVM_CLASS* class = SPVM_LIST_get(compiler->classes, class_index);
+    class->id = class_index;
   }
 }

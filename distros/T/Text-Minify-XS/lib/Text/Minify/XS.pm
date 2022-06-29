@@ -1,6 +1,6 @@
 package Text::Minify::XS;
 
-# ABSTRACT: remove indentation and trailing whitespace
+# ABSTRACT: Remove indentation and trailing whitespace from multi-line text
 
 use v5.9.3;
 use strict;
@@ -11,7 +11,7 @@ use XSLoader;
 
 our @EXPORT_OK = qw(minify minify_utf8 minify_ascii);
 
-our $VERSION = 'v0.6.3';
+our $VERSION = 'v0.6.5';
 
 XSLoader::load( __PACKAGE__, $VERSION );
 
@@ -30,11 +30,11 @@ __END__
 
 =head1 NAME
 
-Text::Minify::XS - remove indentation and trailing whitespace
+Text::Minify::XS - Remove indentation and trailing whitespace from multi-line text
 
 =head1 VERSION
 
-version v0.6.3
+version v0.6.5
 
 =head1 SYNOPSIS
 
@@ -44,7 +44,7 @@ version v0.6.3
 
 =head1 DESCRIPTION
 
-This is a simple and fast text minifier that removes quickly extra
+This is a simple and fast text minifier that quickly removes extra
 whitespace from multi-line text.
 
 =head1 EXPORTS

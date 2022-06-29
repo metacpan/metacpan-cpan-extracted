@@ -61,7 +61,6 @@
             "URI::Escape::XS" : "0.14",
             "Want" : "0.29",
             "constant" : "0",
-            "curry" : "0",
             "parent" : "0",
             "perl" : "5.026001",
             "strict" : "0",
@@ -90,6 +89,6 @@
          "web" : "https://gitlab.com/jackdeguest/HTTP-Promise"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.1.1",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

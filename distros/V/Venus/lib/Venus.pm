@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 # AUTHORITY
 
@@ -103,7 +103,7 @@ OO Standard Library for Perl 5
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut
 
@@ -652,6 +652,38 @@ B<example 15>
 
   my $vars = Venus::Vars->new;
 
+B<example 16>
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new;
+
+B<example 17>
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+B<example 18>
+
+  package main;
+
+  use Venus::Template;
+
+  my $template = Venus::Template->new;
+
+B<example 19>
+
+  package main;
+
+  use Venus::Yaml;
+
+  my $yaml = Venus::Yaml->new;
+
 =back
 
 =over 4
@@ -794,25 +826,5 @@ B<example 1>
 =head1 AUTHORS
 
 Cpanery, C<cpanery@cpan.org>
-
-=cut
-
-=head1 LICENSE
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-=cut
-
-=head1 PROJECT
-
-L<https://venus.cpanery.com>
-
-L<https://github.com/cpanery/venus/wiki>
-
-L<https://github.com/cpanery/venus/issues>
-
-L<https://cpanery.com>
 
 =cut

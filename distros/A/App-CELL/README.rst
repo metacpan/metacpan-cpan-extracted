@@ -2,8 +2,7 @@
 App::CELL
 =========
 
-.. image:: https://travis-ci.org/smithfarm/cell.svg?branch=master
-    :target: https://travis-ci.org/smithfarm/cell
+.. image:: https://travis-ci.org/smithfarm/cell.svg?branch=master :target: https://travis-ci.org/smithfarm/cell
 
 .. image:: https://badge.fury.io/pl/App-CELL.svg
     :target: https://badge.fury.io/pl/App-CELL
@@ -11,6 +10,7 @@ App::CELL
 --------------------------------------------------------------------
 Configuration, Error-handling, Localization, and Logging "framework"
 --------------------------------------------------------------------
+
 
 General Documentation
 =====================
@@ -26,27 +26,36 @@ General Documentation
 * http://metacpan.org/pod/App::CELL::Test
 * http://metacpan.org/pod/App::CELL::Test::LogToFile
 
+
+Contributor Documentation
+=========================
+
+All would-be contributors should first read ``CONTRIBUTING.rst``.
+
+
 Maintainer Documentation
 ========================
 
 Read on only if you are a maintainer of ``App::CELL``
 
 
-How to run tests
-----------------
+How to build and run tests
+--------------------------
 
-After cloning the git repo, you'll need to install all of the
-dependencies shown in Build.PL -- either using distro packages
-or ``cpanm``.
+First, install build and runtime dependencies. This can be done either by
+installing packages from your favorite Linux distribution or direct from CPAN
+using a tool such as ``cpanm``.
 
-Since ``App::CELL`` needs its configuration files installed
-in the system in order to run, install it::
+Second, build and install the distro:
 
     $ perl Build.PL ; ./Build ; sudo ./Build install
 
-Then::
+Third, run the tests:
 
     $ prove -l t/
+
+To ease the pain, a script called ``bootstrap.sh`` is provided. This script
+automates all three of the steps just described.
 
 To include the "Perl Critic" and "Check Manifest" tests, do::
 

@@ -1,22 +1,22 @@
-# ************************************************************************* 
-# Copyright (c) 2014-2015-2015, SUSE LLC
-# 
+# *************************************************************************
+# Copyright (c) 2014-2022, SUSE LLC
+#
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 # 1. Redistributions of source code must retain the above copyright notice,
 # this list of conditions and the following disclaimer.
-# 
+#
 # 2. Redistributions in binary form must reproduce the above copyright
 # notice, this list of conditions and the following disclaimer in the
 # documentation and/or other materials provided with the distribution.
-# 
+#
 # 3. Neither the name of SUSE LLC nor the names of its contributors may be
 # used to endorse or promote products derived from this software without
 # specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-# ************************************************************************* 
+# *************************************************************************
 
 package Web::MREST;
 
@@ -57,11 +57,11 @@ Web::MREST - Minimalistic REST server
 
 =head1 VERSION
 
-Version 0.288
+Version 0.290
 
 =cut
 
-our $VERSION = '0.288';
+our $VERSION = '0.290';
 
 
 =head2 Development status
@@ -76,7 +76,7 @@ certainly bugs lurking in the code, but all features have been implemented.
 
 To take this module for a spin, execute this command:
 
-    $ mrest Web-MREST Web::MREST::Dispatch
+    $ mrest-standalone
 
 Leave this running, and from another console start the command-line client:
 
@@ -93,6 +93,7 @@ A similar result can be obtained using C<curl>:
 
      curl -v http://localhost:5000/ -X GET -H "Content-Type: application/json"
 
+For more information on using the CLI client, see L<Web::MREST::CLI>.
 
 
 
@@ -245,7 +246,7 @@ executable with the name of your application's distribution and the name of its
 dispatch module, which should be the ultimate module in the chain of
 inheritance.
 
-    $ perl mrest YourApp YourApp::Dispatch
+    $ mrest --distro YourApp --module YourApp::Dispatch
 
 Under the hood the startup script, which can be reviewed at C<bin/mrest>, 
 does essentially this:

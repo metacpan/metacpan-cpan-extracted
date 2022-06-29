@@ -16,8 +16,10 @@ my @files = (
     't/file-codeowners-util.t',
     't/file-codeowners.t',
     't/samples/basic.CODEOWNERS',
+    't/samples/bitbucket.CODEOWNERS',
     't/samples/kitchensink.CODEOWNERS',
     'xt/author/critic.t',
+    'xt/author/distmeta.t',
     'xt/author/eol.t',
     'xt/author/minimum-version.t',
     'xt/author/no-tabs.t',
@@ -26,8 +28,7 @@ my @files = (
     'xt/author/pod-syntax.t',
     'xt/author/portability.t',
     'xt/release/consistent-version.t',
-    'xt/release/cpan-changes.t',
-    'xt/release/distmeta.t'
+    'xt/release/cpan-changes.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

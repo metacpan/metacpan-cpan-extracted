@@ -1,0 +1,35 @@
+=head1 NAME
+
+Nuggit
+
+=head1 DESCRIPTION
+
+Nuggit is a wrapper for git that makes repositories consisting of submodules (or nested submodules) 
+work more like mono-repositories.  This is, in part, achieved by doing work on the same branch across
+all submodules and taking the approproate action when submodules are modified, added, pushed, pulled
+etc. without requring the user to do extra magic just for submodules.
+
+A wrapper script. "ngt" can be used to invoke all of the capabilities
+defined below.  Tab auto-completion is optionally available for this
+wrapper if configured for your shell by sourcing 'nuggit.sh' or 'nuggit.csh' files.  These scripts will explicitly add this repository to your system path.
+
+Sourcing 'nuggit.sh' or 'nuggit.csh' is required if nuggit has not been installed in the default system path.
+
+Usage information for most scripts is available with a "--man" or
+"--help"  parameter.  For example, "ngt --man" or "ngt status --man".  Documentation is also available via the 'man' command on supported systems when installed using cpan.
+
+
+=head1 Color Configuration
+
+The Nuggit scripts utilize ANSI terminal colors to clarify message
+output.  Output generally uses custom alias classes of 'error',
+'warn', 'info', and 'success'.
+
+Environment variables can be used to disable colored output entirely,
+or to customize the color scheme for personal preferences.  See
+https://perldoc.perl.org/Term::ANSIColor#ENVIRONMENT for details.
+
+
+=head1 SEE ALSO
+
+nuggit-clone(1), nuggit-status(1), nuggit-checkout(1), nuggit-merge(1), nuggit-rebase(1), nuggit-ops(1), nuggit-add(1), nuggit-branch(1), nuggit-commit(1), nuggit-diff(1), nuggit-fetch(), nuggit-foreach(1), nuggit-log(1), nuggit-mv(1), nuggit-push(1), nuggit-reset(1), nuggit-rm(1), git(1)

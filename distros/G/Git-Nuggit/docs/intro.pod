@@ -1,0 +1,131 @@
+
+=head1 NAME
+
+Nuggit Introduction - An overview of usage of the nuggit tool in a submodule-based git workflow.
+
+
+=head1 DESCRIPTION
+
+Nuggit is a collection of tools and libraries to aide Git workflows that include active development across multiple submodules.
+
+Commands available in nuggit generally mirror their git equivalents, while providing additional submodule-specific features. Not all git commands or options are available in nuggit.
+
+
+Advanced users may choose to mix and match native git commands with nuggit functions, however should use care to keep submodule references up to date to avoid confusion for other users.
+
+This document describes typical usage scenarios, tips, and background information.
+
+All nuggit scripts can be run with '--help' to display usage information, or '--man' for additional documentation details.  If installed, documentation is also available via the 'man' command on compatible systems.
+
+Refer to the main README for general information, including installation instructions.
+
+
+=head1 Branching Model
+
+It is recommended that all users of nuggit-based projects follow Nuggit's paradigm for branching and submodule reference management.   These norms are generally enforced by the nuggit tools.  Updating submodule references outside of nuggit may cause confusion, particularly for new users, if not following this approach.
+- Consistent branch names shall be used across the root repository and all submodules
+- All submodule references are kept in sync with the branch under development.
+- Exception: The default branch, typically master, may include submodules on varying branches, providing that said branches follow the branch being tracked in your .gitmodules file.
+
+Branch creation (via 'ngt checkout -b') will always create the specified branch in the root repository, and all submodules. (An exclusion list may be added in the future).
+
+Nuggit supports two strategies for managing submodules across a variety of commands.
+
+The default behavior is "ref-first".  In this mode, all operations are performed on the root repository, and the submodule references are followed into each submodule.  This applies to checkout, merge, pull, and rebase commands, and permits reliable checkouts of any object (branch, tag, or SHA) valid to the root repository.   Nuggit will automatically attempt to safely checkout a branch at the referenced commit if one exists, or to create a branch if one matching that of the root repository does not currently exist.  This mode may result in detached HEAD states under certain circumstances.
+
+
+An alternate mode is "branch-first".  In this mode, operations (checkout/pull/merge) are performed independently on each repository.  This effectively ignores any committed submodule references, and requires the specified branch to exist in all submodules.  This mode can be helpful in some cases to resolve issues when submodule references are out of date, however care must be taken to verify desired results in this mode.
+
+
+See man pages of the associated commands for details.
+
+
+=head1 Typical workflow
+
+Assume that some repository exists at http://foo/bar.git that includes one or more nested submodules.
+
+To clone this repository with native Git, one would run: "git clone --recursive http://foo/bar.git". Using Nuggit, this can be abbreviated to "ngt clone http://foo/bar.git".
+
+If a workspace has already been cloned, you may run "ngt init" from the top-level directory of the workspace to setup Nuggit.  NOTE: If you are working in a subset of a larger repository, you may run this command from within a submodule, and all nuggit commands will execute relevant to the first '.nuggit' folder it has when traversing up the directory tree.
+
+
+=head2 Typical Workflow
+
+=over
+
+=item -
+
+ngt clone $url myproj
+
+
+=item -
+
+cd myproj
+
+
+=item -
+
+ngt checkout dev
+
+
+=item -
+
+ngt checkout -b feature/new-for-dev
+
+
+=item -
+
+... make some changes ...
+
+
+=item -
+
+ngt commit -am "This will commit all changes, across all submodules, to already tracked files. Alternatively, use 'ngt add' and 'ngt commit' if desired.  rm and mv commands are also available."
+
+
+=item -
+
+ngt push
+
+
+=item -
+
+ngt checkout dev
+
+
+=item -
+
+ngt pull
+
+
+=item -
+
+ngt merge feature/new-for-dev
+
+
+=item -
+
+ngt fetch
+
+
+=item -
+
+ngt merge origin/master
+
+
+=back
+
+
+=head1 Definitions
+
+=over
+
+=item -
+
+workspace
+
+This refers to the project being worked on.  The top-level folder, which will contain the .nuggit folder, is the folder created by the initial clone command.
+
+
+
+=back

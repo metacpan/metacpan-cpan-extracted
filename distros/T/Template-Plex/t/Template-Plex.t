@@ -3,7 +3,7 @@ use warnings;
 use feature qw<say>;
 
 use Test::More tests => 17;
-
+use Log::OK {sys=>"Log::ger"};
 
 BEGIN { use_ok('Template::Plex') };
 

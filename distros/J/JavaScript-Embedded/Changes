@@ -1,5 +1,11 @@
 Revision history for Perl module JavaScript::Embedded
 
+2.7.1 2022-06-28
+    - Fix POD and Metadata
+
+2.7.0 2022-05-21
+    - Fork and upgrade to duktape 2.7.0
+
 2.4.2 2017 2017-12-17
 	- fix MinGW build (Max Maischein)
 

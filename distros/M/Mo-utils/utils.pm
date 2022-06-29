@@ -6,11 +6,12 @@ use warnings;
 
 use Error::Pure qw(err);
 use Readonly;
+use Scalar::Util qw(blessed);
 
 Readonly::Array our @EXPORT_OK => qw(check_array check_array_object check_bool
 	check_isa check_length check_number check_number_of_items check_required);
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 sub check_array {
 	my ($self, $key) = @_;
@@ -66,9 +67,22 @@ sub check_isa {
 		return;
 	}
 
+	if (! blessed($self->{$key})) {
+		err "Parameter '$key' must be a '$class' object.",
+
+			# Only, if value is scalar.
+			(ref $self->{$key} eq '') ? (
+				'Value', $self->{$key},
+			) : (),
+
+			# Only if value is reference.
+			(ref $self->{$key} ne '') ? (
+				'Reference', (ref $self->{$key}),
+			) : (),
+	}
+
 	if (! $self->{$key}->isa($class)) {
 		err "Parameter '$key' must be a '$class' object.",
-			'Value', $self->{$key},
 			'Reference', (ref $self->{$key}),
 		;
 	}
@@ -647,6 +661,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

@@ -1,5 +1,5 @@
 # ************************************************************************* 
-# Copyright (c) 2014-2015, SUSE LLC
+# Copyright (c) 2014-2022, SUSE LLC
 # 
 # All rights reserved.
 # 
@@ -70,11 +70,11 @@ Web::MREST::CLI - CLI components for Web::MEST-based applications
 
 =head1 VERSION
 
-Version 0.283
+Version 0.284
 
 =cut
 
-our $VERSION = '0.283';
+our $VERSION = '0.284';
 
 
 
@@ -85,7 +85,30 @@ Top-level module of the L<Web::MREST::CLI> distribution. Exports some
 "generalized" functions that are used internally and might also be useful for
 writing CLI clients in general.
 
-=cut
+
+
+=head1 BASIC CLI CLIENT USAGE
+
+Once you have run the CLI client executable (C<mrest-cli>) and assuming it is
+pointing correctly to a running MREST-compatible server, you can begin to
+explore the REST API by issuing the command:
+
+    get /
+
+If the server is running at C<http://localhost:5000>, the same information can
+by obtained by pointing a web browser to that URI.
+
+This will produce a list of top-level resources. To view documentation on
+a resource called C<foo>, issue the following command:
+
+    post docu pod foo
+
+The documentation should include information on which HTTP methods can be used
+to access the resource.
+
+To view documentation on the C<docu/pod> resource itself:
+
+    post docu pod docu/pod
 
 
 

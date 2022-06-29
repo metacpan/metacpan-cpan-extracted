@@ -1,6 +1,6 @@
 package Acme::Mitey::Cards::Card::Face;
 
-our $VERSION   = '0.003';
+our $VERSION   = '0.005';
 our $AUTHORITY = 'cpan:TOBYINK';
 
 use Acme::Mitey::Cards::Mite;

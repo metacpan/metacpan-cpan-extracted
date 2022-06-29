@@ -4,7 +4,7 @@
       "David Dick <ddick@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -40,12 +40,27 @@
             "FileHandle" : "0",
             "Net::LDAP" : "0",
             "POSIX" : "0",
-            "Test::More" : "0",
-            "URI::Escape" : "0"
+            "URI::Escape" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.71",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/david-dick/test-openldap/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/david-dick/test-openldap",
+         "web" : "https://github.com/david-dick/test-openldap"
+      }
+   },
+   "version" : "0.72",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

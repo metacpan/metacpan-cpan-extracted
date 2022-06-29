@@ -19,7 +19,7 @@ name: App-Dochazka-Common
 provides:
   App::Dochazka::Common:
     file: lib/App/Dochazka/Common.pm
-    version: '0.209'
+    version: '0.210'
   App::Dochazka::Common::Model:
     file: lib/App/Dochazka/Common/Model.pm
   App::Dochazka::Common::Model::Activity:
@@ -54,5 +54,5 @@ resources:
   bugtracker: https://github.com/smithfarm/dochazka-common/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/smithfarm/dochazka-common
-version: '0.209'
+version: '0.210'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

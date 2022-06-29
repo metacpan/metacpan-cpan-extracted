@@ -33,8 +33,7 @@ share {
         version => qr/(\d+\.\d+\.\d+)[.]tar[.]gz$/,
     );
 
-    alienfile::_add_modifier(
-        around => prefer => sub {
+    meta->around_hook( prefer => sub {
             my ( $orig, $build, @args ) = @_;
             my $ret  = $build->$orig( @args );
             my $list = $ret->{list};
@@ -50,8 +49,12 @@ share {
     plugin Extract => 'tar.gz';
     patch sub {
         my $build = shift;
+
+        # just in case the distribution doesn't have a patch directory.
+        return unless defined $build->install_prop->{patch};
         my $patch
-          = path( $build->install_prop->{patch}, "cfitsio-@{[ $build->runtime_prop->{version} ]}.patch", );
+          = path( $build->install_prop->{patch},
+                  "cfitsio-@{[ $build->runtime_prop->{version} ]}.patch", );
         return unless $patch->exists;
         Alien::Build::CommandSequence->new( ["%{patch} -p1 <  $patch"] )->execute( $build );
     };

@@ -33,5 +33,5 @@ requires:
   XS::libpanda: v1.5.8
   next::XS: v1.0.7
   perl: '5.022000'
-version: v1.5.3
+version: v1.5.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

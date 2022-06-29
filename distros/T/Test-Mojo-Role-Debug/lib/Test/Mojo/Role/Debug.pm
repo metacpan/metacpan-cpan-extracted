@@ -7,7 +7,7 @@ use Role::Tiny;
 use Carp qw/croak/;
 use Test::More ();
 
-our $VERSION = '1.005001'; # VERSION
+our $VERSION = '1.005002'; # VERSION
 
 sub d {
     my ( $self, $selector, $dump_file ) = @_;

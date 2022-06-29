@@ -1,6 +1,7 @@
 Changes
 CONTRIBUTING.md
 lib/DB/Object.pm
+lib/DB/Object/AND.pod
 lib/DB/Object/Cache/Tables.pm
 lib/DB/Object/Fields.pm
 lib/DB/Object/Fields/Field.pm
@@ -8,6 +9,9 @@ lib/DB/Object/Mysql.pm
 lib/DB/Object/Mysql/Query.pm
 lib/DB/Object/Mysql/Statement.pm
 lib/DB/Object/Mysql/Tables.pm
+lib/DB/Object/NOT.pod
+lib/DB/Object/Operator.pod
+lib/DB/Object/OR.pod
 lib/DB/Object/Postgres.pm
 lib/DB/Object/Postgres/Lo.pm
 lib/DB/Object/Postgres/Query.pm
@@ -32,6 +36,7 @@ t/003_sqlite.t
 t/004_mysql.t
 t/005.field.t
 t/900_pod.t
+t/910.coverage.t
 t/999.kwalitee.t
 t/mysql.sql
 t/pgsql.sql

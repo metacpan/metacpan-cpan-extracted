@@ -1,0 +1,87 @@
+=head1 SYNOPSIS
+
+nuggit merge [options] branch
+
+Perform a submodule-aware merge.
+
+=head1 DESCRIPTION
+
+nuggit merge [options] branch
+
+This script performs a submodule-aware merge, automatically resolving submodule reference-only conflicts in a manner consistent with the nuggit workflow.  
+
+This application defaults to the 'ref-first' strategy for merge operations.  See strategy option below and ngt-ops(1) for additional details on strategy.  
+
+NOTICE: 'branch-first' support is not fully tested in this release.  branch-first is equivalent to the legacy nuggit behavior, but now utilizes an optimized implementation.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--help>
+
+Print a brief help message and exits.
+
+
+=item B<--man>
+
+Print a brief help message and exits.
+
+
+=item B<--ngtstrategy ref|branch>, B<--branch-first>, B<--ref-first>
+
+Nuggit operations default to the 'ref-first' strategy.  
+
+In this mode, the root repository will be merged first.  Nuggit will then recurse into each submodule whose currently checked out HEAD differs from the committed reference, and will attempt to merge the incoming reference.  This is equivalent to "git submodule update --merge".
+
+Using the ref-first strategy, it is possible to merge any branch, tag, or SHA commit that is valid in the root repository.  
+
+Using the 'branch-first' strategy, the specified branch will be merged at the root repository, and again for each submodule.  
+
+In all cases, nuggit will automatically commit any submodule references that have been updated as a result of this operation.
+
+
+See ngt-ops(1) for additional details on nuggit operations strategy.
+
+=item B<--default>
+
+This flag is only valid in conjunction with branch-first strategy (ie: '--branch-first --default').
+
+The default branch is the remote tracking branch defined in the submodule definition (.gitmodules), or the remote repository's default HEAD otherwise.
+
+If specified in place of a branch name, perform a merge against the default branch at all levels.
+
+=item B<--continue>
+
+Resume a merge already in progress.
+
+=item B<--abort>
+
+Abort a merge in progress.
+
+NOTE: This feature is NOT COMPLETE.  The nuggit merge state will be deleted, but your repository may be left in a conflicted state that must be manually reverted at this time.
+
+=item B<--message>
+
+Specify message to use for any commits upon merge
+
+=item B<--skip-status-check>
+
+It is strongly recommended for all outstanding changes to be committed or stashed prior to executing this operation.  Failure to do so may cause undefined behavior if conflicts are detected with the incoming changes.
+
+This check may be bypassed by specifying '--skip-status-check' for cases where the user is confident that no conflicts will occur.  
+
+
+=back
+
+=item B<--squash>
+
+Perform the merge using git's '--squash' argument to flatten history.
+
+LIMITATION: This option does not currently apply to submodules when utilizing the 'ref-first' strategy, though will still apply to the root repository in this case.
+
+=head1 TODO
+
+Consistency in specification of merge message. This may be a limitation of the underlying 'git submodule update' command in the context of ref-first operations.
+
+'ngt merge --preview branch' is an alias for 'ngt merge-tree $branch'.  It provides a preview of the given merge, including a guess on likely conflicts.

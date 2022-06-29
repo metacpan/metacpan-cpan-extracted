@@ -4,7 +4,7 @@ use warnings;
 use Carp;
 use Data::Dumper;
 use Scalar::Util qw( weaken );
-our $VERSION = '2.7.0';
+our $VERSION = '2.7.1';
 
 my $GlobalRef = {};
 
@@ -1033,10 +1033,12 @@ JavaScript::Embedded implements almost all duktape javascript engine api, the c 
 a thin layer that maps duktape api to perl, and all other functions implemented in perl
 it self, so maintaing and contributing to the base code should be easy.
 
-This is a fork of the <JavaScript::Duktape> distribution by Mamod Mehyar. His version uses the
+This is a fork of the L<JavaScript::Duktape> distribution by Mamod Mehyar. His version uses the
 outdated duktape 2.3.0 library. I could not reach the author to submit a patch to upgrade
 to the current version of the duktape library. So i created this fork, to be able to use
 a the newest duktape version with all the latest security fixes.
+
+As far as i can tell, JavaScript::Embedded works well as a drop-in replacement of JavaScript::Duktape.
 
 =head1 JavaScript::Embedded->new(%options)
 
@@ -1484,8 +1486,6 @@ or suggestions
 =item * Slaven Rezić L<@eserte|https://github.com/eserte>
 
 =item * Max Maischein L<@Corion|https://github.com/Corion>
-
-=item * Rene "cavac" Schickbauer L<@cavac|https://github.com/cavac>
 
 =back
 

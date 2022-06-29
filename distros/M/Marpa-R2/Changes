@@ -1,4 +1,4 @@
-# Copyright 2018 Jeffrey Kegler
+# Copyright 2022 Jeffrey Kegler
 # This file is part of Marpa::R2.  Marpa::R2 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
@@ -14,6 +14,15 @@
 # http://www.gnu.org/licenses/.
 
 Revision history for Marpa::R2
+
+10.000000 (libmarpa 9.0.3) Wed 29 Jun 2022 10:56:08 AM EDT
+
+   * Fix bug which causes some parses for some middle recursions
+     to be missed.
+
+9.001_000 (libmarpa 9.0.3) Thu 23 Jun 2022 07:06:55 PM EDT
+
+   * Developer's version
 
 8.000000 (libmarpa 8.6.2) Sun Dec 16 16:02:45 EST 2018
 

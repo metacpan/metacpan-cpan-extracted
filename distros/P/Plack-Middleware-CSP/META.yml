@@ -1,0 +1,31 @@
+---
+abstract: 'Apply L<HTTP::CSPHeader>s to your psgi application.'
+author:
+  - 'and License'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  HTTP::Request::Common: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.19'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-CSP
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  HTTP::CSPHeader: 0
+  Path::Tiny: 0
+  Plack: 0
+  Plack::Middleware: 0
+  perl: 5.14.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'

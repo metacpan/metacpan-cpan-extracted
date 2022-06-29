@@ -16,7 +16,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,34 +32,34 @@ no_index:
 provides:
   App::Codeowners:
     file: lib/App/Codeowners.pm
-    version: '0.50'
+    version: '0.51'
   App::Codeowners::Formatter:
     file: lib/App/Codeowners/Formatter.pm
-    version: '0.50'
+    version: '0.51'
   App::Codeowners::Formatter::CSV:
     file: lib/App/Codeowners/Formatter/CSV.pm
-    version: '0.50'
+    version: '0.51'
   App::Codeowners::Formatter::JSON:
     file: lib/App/Codeowners/Formatter/JSON.pm
-    version: '0.50'
+    version: '0.51'
   App::Codeowners::Formatter::String:
     file: lib/App/Codeowners/Formatter/String.pm
-    version: '0.50'
+    version: '0.51'
   App::Codeowners::Formatter::TSV:
     file: lib/App/Codeowners/Formatter/TSV.pm
-    version: '0.50'
+    version: '0.51'
   App::Codeowners::Formatter::Table:
     file: lib/App/Codeowners/Formatter/Table.pm
-    version: '0.50'
+    version: '0.51'
   App::Codeowners::Formatter::YAML:
     file: lib/App/Codeowners/Formatter/YAML.pm
-    version: '0.50'
+    version: '0.51'
   App::Codeowners::Options:
     file: lib/App/Codeowners/Options.pm
-    version: '0.50'
+    version: '0.51'
   App::Codeowners::Util:
     file: lib/App/Codeowners/Util.pm
-    version: '0.50'
+    version: '0.51'
 recommends:
   Pod::Usage: '0'
   Term::Detect::Software: '0'
@@ -68,7 +68,7 @@ requires:
   Color::ANSI::Util: '0.03'
   Encode: '0'
   Exporter: '0'
-  File::Codeowners: '0'
+  File::Codeowners: '0.54'
   File::Codeowners::Util: '0'
   Getopt::Long: '2.39'
   Module::Load: '0'
@@ -82,7 +82,7 @@ resources:
   bugtracker: https://github.com/chazmcgarvey/git-codeowners/issues
   homepage: https://github.com/chazmcgarvey/git-codeowners
   repository: https://github.com/chazmcgarvey/git-codeowners.git
-version: '0.50'
+version: '0.51'
 x_authority: cpan:CCM
 x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

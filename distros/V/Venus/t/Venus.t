@@ -5,10 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
 use Test::More;
-use Test::Venus;
+use Venus::Test;
 
 my $test = test(__FILE__);
 
@@ -22,7 +20,7 @@ $test->for('name');
 
 =version
 
-0.08
+0.09
 
 =cut
 
@@ -946,6 +944,76 @@ $test->for('example', 15, 'utility-classes', sub {
   $result
 });
 
+=example-16 utility-classes
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new;
+
+=cut
+
+$test->for('example', 16, 'utility-classes', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+
+  $result
+});
+
+=example-17 utility-classes
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+=cut
+
+$test->for('example', 17, 'utility-classes', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+
+  $result
+});
+
+=example-18 utility-classes
+
+  package main;
+
+  use Venus::Template;
+
+  my $template = Venus::Template->new;
+
+=cut
+
+$test->for('example', 18, 'utility-classes', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  ok $result->isa('Venus::Template');
+
+  !$result
+});
+
+=example-19 utility-classes
+
+  package main;
+
+  use Venus::Yaml;
+
+  my $yaml = Venus::Yaml->new;
+
+=cut
+
+$test->for('example', 19, 'utility-classes', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+
+  $result
+})
+if require Venus::Yaml && Venus::Yaml->package;
+
 =feature package-reflection
 
 This library provides a package reflection class, L<Venus::Space>, which can be
@@ -1128,29 +1196,9 @@ $test->for('example', 1, 'template-system', sub {
   $result
 });
 
-=license
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-=cut
-
 =authors
 
 Cpanery, C<cpanery@cpan.org>
-
-=cut
-
-=project
-
-L<https://venus.cpanery.com>
-
-L<https://github.com/cpanery/venus/wiki>
-
-L<https://github.com/cpanery/venus/issues>
-
-L<https://cpanery.com>
 
 =cut
 

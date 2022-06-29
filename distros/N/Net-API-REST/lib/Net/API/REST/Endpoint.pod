@@ -1,0 +1,186 @@
+=encoding utf8
+
+=head1 NAME
+
+Net::API::REST::Endpoint - Endpoint object for Net::APi::REST
+
+=head1 SYNOPSIS
+
+    my $ep = Net::API::REST::Endpoint->new(
+        handler => $code_ref,
+        # could be also restricted.
+        access => 'public',
+        methods => [qw( GET POST )],
+        path_info => '/some/extra/path',
+        variables => { person_id => 123 },
+    );
+
+Then, in the method mapped to the endpoint called from Net::API::REST::handler():
+
+    my $self = shift( @_ );
+    my $ep = $self->endpoint;
+    my $vars = $ep->variables;
+    # For example /users/123/name and assuming an endpoint map with _vars => { _name => user_id }
+    # my $user_id = $vars->{user_id};
+
+The route could look something like the following:
+
+    $self->{routes} =
+    {
+        # API version 1
+        1 =>
+        {
+            # special case ?
+            '.well-known' => $self->curry::well_known,
+            # This inherits the public access
+            csrf_check => $self->curry::csrf_check,
+            users =>
+            {
+                # Nope, cannot stop there, sends back noop
+                _handler => $self->curry::noop,
+                # From now on, all endpoints below will be restricted
+                _access_control => 'restricted',
+                # For example: https://api.example.com/users/123
+                _var =>
+                {
+                    _name => 'user_id',
+                    # Return the user information
+                    _handler => $self->curry::user_info,
+                    # This is a read-only endpoint, query string will be discarded and no POST or PUT allowed
+                    _allowed_methods => [qw( GET )],
+                    # https://api.example.com/users/123/first_name
+                    first_name =>
+                    {
+                        _handler => $self->curry::user_first_name,
+                        _allowed_methods => [qw( GET POST )],
+                    },
+                    payment_method =>
+                    {
+                        # Create, Retrieve, Update, Delete
+                        _allowed_methods => [qw( PUT GET POST DELETE )],
+                        _var =>
+                        {
+                            _handler => $self->curry::user_pm,
+                            _name => 'pm_id',
+                        },
+                    },
+                    # etc...
+                },
+            },
+        },
+        # api version 2, etc.
+        # 2 => {},
+    };
+
+As you can see endpoints below C<https://api.example.com/users> would be restricted, which would mean that your api would check the value provided L</access> and check for user credentials before granting execution of the query.
+
+Note that the api version number is not necessarily part of the path, although it could.
+
+It can also be provided in the Accept header. See L<Net::API::REST::Request/accept> for more details.
+
+For example:
+
+    https://api.example.com/v1/users/123/payment_method/456
+    https://api.example.com/v1.2/users/123/payment_method/456
+    https://api.example.com/1/users/123/payment_method/456
+    https://api.example.com/users/123/payment_method/456
+
+with an http Accept field value of: application/json; charset=utf-8; version=1
+
+If no api version is specified either way, then the latest one provided by L<Net::API::REST/api_version> is used.
+
+See L<Net::API::REST/api_version> for more details.
+
+=head1 METHODS
+
+=head2 access
+
+Sets or gets the accessibility of the endpoint, such as C<public>, or C<restricted> or anything else you want to use.
+
+The access level you set has a cascading effect on all the endpoints below itself as shown in the example in the L</SYNOPSIS> above.
+
+This defaults to C<public>.
+
+=head2 handler
+
+Set or gets the code reference that is called for a given endpoint.
+
+For example, if you have an endpoint route defined as:
+
+    {
+        version => $self->curry::version,
+    }
+
+Then the L</handler> will be a code reference to C<version>.
+
+For handler, L<curry> is very handy and much better than to write a bunch of anonymous routines like:
+
+    {
+        _handler => sub{ $self->user_pm( @_ ) },
+    }
+
+=head2 methods
+
+Sets or gets the array reference of allowed methods for this endpoint. For example C<GET>, C<POST>, C<PUT>, C<DELETE>
+
+=head2 path
+
+The path URI for this endpoint. This sets or get an L<URI> object.
+
+=head2 path_info
+
+Sets or gets possible path info specified when the user made the api call.
+
+For example, assuming an endpoint C</create/file>, and user calling C</create/file/some/where/file.txt>, then C</some/where/file.txt> would be set as path info assuming there is nothing below the endpoint C</create/file> declared in the api route, otherwise, of course, this would trigger a C<404 Not found> error.
+
+=head2 variables
+
+Sets or gets the hash reference containing the variables and their values.
+
+For example, assuming and endpoint call like C</users/123/last_name>, then the route hash reference would look like:
+
+    {
+        users =>
+        {
+            _handler => $self->curry::users,
+            _var =>
+            {
+                _handler => $self->curry::users,
+                _name => 'user_id',
+                first_name => $self->curry::user_first_name,
+                last_name => $self->curry::user_last_name,
+            }
+        }
+    }
+
+Then, L<Net::API::REST/route> would set the variable C<user_id> to C<123>.
+
+If a same variable is declared and found twice in the path, it is automatically switched to an array reference. Thus, if the value of a given variable is an array reference, you know instantly there was more than one value provided in the query.
+
+=head1 WHAT ABOUT QUERY STRING
+
+You can always get the query string, if any, by using L<Net::API::REST::Request/params>:
+
+    my $self = shift( @_ );
+    # $q is not an hash reference
+    my $q = $self->request->params;
+    # or maybe the user sent you a json payload?
+	$q = $self->request->payload if( !scalar( keys( %$q ) ) && $self->request->payload );
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 SEE ALSO
+
+L<Net::API::REST>, L<Net::API::REST::Request>, L<Net::API::REST::Response>, L<Net::API::REST::Query>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2018-2021 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
+

@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Common::String::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Common::String::VERSION   = '1.012005';
+	$Types::Common::String::VERSION   = '1.014000';
 }
 
 $Types::Common::String::VERSION =~ tr/_//d;
@@ -333,7 +333,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2021 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2022 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

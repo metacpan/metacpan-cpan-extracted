@@ -14,10 +14,12 @@ lib/HTML/Valid/Tagset.pod
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+modules.pl
 ppport.h
 README
 script/htmlok
 script/htmltidy
+see-also-info.json
 t/alt-text.t
 t/attributes.t
 t/html-valid.t

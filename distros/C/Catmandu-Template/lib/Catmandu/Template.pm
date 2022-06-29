@@ -1,6 +1,6 @@
 package Catmandu::Template;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 1;
 
@@ -14,7 +14,7 @@ Catmandu::Template - Catmandu modules for working with templates
 
 # STATUS
 
-[![Build Status](https://travis-ci.org/LibreCat/Catmandu-Template.svg?branch=master)](https://travis-ci.org/LibreCat/Catmandu-Template)
+![Test status](https://github.com/LibreCat/Catmandu-RIS/actions/workflows/linux.yml/badge.svg)
 [![Coverage](https://coveralls.io/repos/LibreCat/Catmandu-Template/badge.png?branch=master)](https://coveralls.io/r/LibreCat/Catmandu-Template)
 [![CPANTS kwalitee](http://cpants.cpanauthors.org/dist/Catmandu-Template.png)](http://cpants.cpanauthors.org/dist/Catmandu-Template)
 
@@ -41,6 +41,10 @@ Vitali Peil, C<< <vitali.peil at uni-bielefeld.de> >>
 Jakob Voss, C<< <jakob.voss at gbv.de> >>
 
 Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>
+
+Nicolas Franck, C<< Nicolas.Franck at ugent.be >>
+
+Debabrata Deka
 
 =head1 LICENSE
 

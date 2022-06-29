@@ -21,10 +21,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "9.19",
             "Pod::LOL" : "0.08",
-            "Role::Tiny" : "2.000001",
-            "Term::ReadKey" : "2.38",
+            "Role::Tiny" : "2.002004",
             "Term::Size::Any" : "0.002"
          }
       },
@@ -37,15 +35,15 @@
    "provides" : {
       "Pod::Query" : {
          "file" : "lib/Pod/Query.pm",
-         "version" : "0.24"
+         "version" : "0.30"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://opensource.org/licenses/artistic-license-2.0.php"
+         "http://www.perlfoundation.org/artistic_license_2_0"
       ]
    },
-   "version" : "0.24",
+   "version" : "0.30",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

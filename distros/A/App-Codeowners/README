@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.50
+    version 0.51
 
 SYNOPSIS
 
@@ -105,6 +105,7 @@ COMMANDS
         git-codeowners [show] [--format FORMAT] [--owner OWNER]...
                        [--pattern PATTERN]... [--[no-]patterns]
                        [--project PROJECT]... [--[no-]projects] [PATH...]
+                       [--[no-]expand-aliases]
 
     Show owners of one or more files in a repo.
 
@@ -118,6 +119,9 @@ COMMANDS
     file defines them. You can control this by explicitly using --projects
     or --no-projects to always show or always hide defined projects,
     respectively.
+
+    Use --expand-aliases to show owners that are group aliases defined in
+    the CODEOWNERS file as their aliased owners.
 
  owners
 
@@ -206,6 +210,12 @@ FORMAT
         PERL_TEXT_TABLE=Text::Table::HTML git-codeowners -f table
 
     The list of available modules is at "@BACKENDS" in Text::Table::Any.
+
+ENVIRONMENT
+
+    If you set GIT_CODEOWNERS_ALIASES in the environment to a true value,
+    the parser will parse group aliases which are supported by some
+    applications.
 
 CAVEATS
 

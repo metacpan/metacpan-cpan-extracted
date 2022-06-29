@@ -3,7 +3,7 @@
 Thank you for considering contributing to this distribution.
 I welcome any contribution to DB::Object, including, but not limited to bug reports, feature requests, general comments, and patches.
 
-Feel free to clone it from its gitlab repository at <https://git.deguest.jp/jack/DB-Object> and issue a pull request.
+Feel free to clone it from its gitlab repository at <https://gitlab.com/jackdeguest/DB-Object> and issue a pull request.
 
 I am very flexible to collaboration and always eager to learn from others.
 
@@ -11,7 +11,7 @@ All contributions are assumed to be provided under the terms of [perl5 license](
 
 ### Issues
 
-File [an issue on CPAN bug tracker](https://git.deguest.jp/jack/DB-Object/issues) if you think you've found a bug. Please describe
+File [an issue on bug tracker](https://gitlab.com/jackdeguest/DB-Object/issues) if you think you've found a bug. Please describe
 
 1. How can it be reproduced
 
@@ -39,11 +39,11 @@ You can reach me via e-mail <jdeguest@cpan.org>, or via [Telegram](https://t.me/
 
 ## Issue Tracking
 
-Issues are currently reported using CPAN [bug tracker](https://git.deguest.jp/jack/DB-Object/issues)
+Issues are currently reported using CPAN [bug tracker](https://gitlab.com/jackdeguest/DB-Object/issues)
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/DB-Object-v0.10.0/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/DB-Object-v0.10.3/README.md)
 
 ## Author
 

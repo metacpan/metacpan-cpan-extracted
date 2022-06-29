@@ -1,5 +1,5 @@
 #!perl
-# Copyright 2018 Jeffrey Kegler
+# Copyright 2022 Jeffrey Kegler
 # This file is part of Marpa::R2.  Marpa::R2 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
@@ -45,11 +45,8 @@ use Marpa::R2::Test;
 use Marpa::R2::HTML qw(html);
 
 my $with_table = 'Text<table><tr><td>I am a cell</table> More Text';
-my $no_table   = html(
-    \$with_table,
-    {   table => sub { return q{} }
-    }
-);
+my $no_table   = html( \$with_table,
+    {   table => sub { return q{} } });
 
 # Marpa::R2::Display::End
 
@@ -76,10 +73,8 @@ my $only_bad_table = html( \$with_bad_table, \%handlers_to_keep_only_tables );
 # name: 'HTML Synopsis: Delete Comments'
 
 my $with_comment = 'Text <!-- I am a comment --> I am not a comment';
-my $no_comment   = html(
-    \$with_comment,
-    {   ':COMMENT' => sub { return q{} }
-    }
+my $no_comment   = html( \$with_comment,
+    {   ':COMMENT' => sub { return q{} } }
 );
 
 # Marpa::R2::Display::End
@@ -100,11 +95,8 @@ my $new_title = html(
 # name: 'HTML Synopsis: Delete by Class'
 
 my $stuff_to_be_edited = '<p>A<p class="delete_me">B<p>C';
-my $edited_stuff       = html(
-    \$stuff_to_be_edited,
-    {   '.delete_me' => sub { return q{} }
-    }
-);
+my $edited_stuff       = html( \$stuff_to_be_edited,
+    {   '.delete_me' => sub { return q{} } });
 
 # Marpa::R2::Display::End
 

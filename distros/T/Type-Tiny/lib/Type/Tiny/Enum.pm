@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Enum::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Enum::VERSION   = '1.012005';
+	$Type::Tiny::Enum::VERSION   = '1.014000';
 }
 
 $Type::Tiny::Enum::VERSION =~ tr/_//d;
@@ -174,7 +174,7 @@ sub inline_check {
 		? "(defined and !ref and m{\\A(?:$regexp)\\z})"
 		: "(defined($_[0]) and !ref($_[0]) and $_[0] =~ m{\\A(?:$regexp)\\z})";
 		
-	return "do { package Type::Tiny; $code }"
+	return "do { $Type::Tiny::SafePackage $code }"
 		if $Type::Tiny::AvoidCallbacks;
 	return $code;
 } #/ sub inline_check
@@ -521,7 +521,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2021 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2022 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

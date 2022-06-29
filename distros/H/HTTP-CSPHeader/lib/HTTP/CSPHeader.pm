@@ -16,7 +16,7 @@ use Types::Standard qw/ ArrayRef is_ArrayRef Bool HashRef Str /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.1.2';
+our $VERSION = 'v0.1.3';
 
 
 has _base_policy => (
@@ -86,7 +86,7 @@ sub _build_nonce {
         Math::Random::ISAAC->new( unpack( "C*", $data ) );
     };
 
-    return sprintf( '%x', $rng->irand );
+    return sprintf( '%x', $rng->irand ^ $$ );
 }
 
 
@@ -164,7 +164,7 @@ HTTP::CSPHeader - manage dynamic content security policy headers
 
 =head1 VERSION
 
-version v0.1.2
+version v0.1.3
 
 =head1 SYNOPSIS
 
@@ -310,6 +310,10 @@ If you do not need the nonce, then you might consider using L<Mojolicious::Plugi
 =head1 SEE ALSO
 
 L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy>
+
+L<HTTP::SecureHeaders>
+
+L<Plack::Middleware::CSP>
 
 =head1 SOURCE
 

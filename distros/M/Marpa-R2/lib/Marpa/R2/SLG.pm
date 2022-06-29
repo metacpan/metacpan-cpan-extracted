@@ -1,4 +1,4 @@
-# Copyright 2018 Jeffrey Kegler
+# Copyright 2022 Jeffrey Kegler
 # This file is part of Marpa::R2.  Marpa::R2 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
@@ -20,7 +20,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION $STRING_VERSION);
-$VERSION        = '8.000000';
+$VERSION        = '10.000000';
 $STRING_VERSION = $VERSION;
 ## no critic(BuiltinFunctions::ProhibitStringyEval)
 $VERSION = eval $VERSION;
@@ -1073,6 +1073,11 @@ sub Marpa::R2::Scanless::G::thick_g1_grammar {
 sub Marpa::R2::Scanless::G::show_irls {
     my ($slg, $subgrammar) = @_;
     return thick_subgrammar_by_name($slg, $subgrammar)->show_irls();
+}
+
+sub Marpa::R2::Scanless::G::show_isys {
+    my ($slg, $subgrammar) = @_;
+    return thick_subgrammar_by_name($slg, $subgrammar)->show_isys();
 }
 
 1;

@@ -495,17 +495,3 @@ structurs with the appropriate replacements and returns the result.
 =back
 
 =cut
-
-=head1 AUTHORS
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
-
-=head1 LICENSE
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-=cut

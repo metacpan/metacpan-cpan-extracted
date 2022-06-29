@@ -1,0 +1,59 @@
+{
+   "abstract" : "Git Toolkit for Submodule-Aware workflows",
+   "author" : [
+      "Chris Monaco <chris.monaco@jhuapl.edu>",
+      "David Edell <david.edell@jhuapl.edu>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Git-Nuggit",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Complete::Bash" : "0",
+            "Complete::File" : "0",
+            "File::Slurp" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Getopt::Long" : "0",
+            "IO::Page" : "0",
+            "IPC::Run3" : "0",
+            "JSON" : "0",
+            "Term::ANSIColor" : "4"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::pushd" : "0",
+            "Test2::Plugin::BailOnFail" : "0",
+            "Test2::V0" : "0",
+            "Test::Compile" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : 1
+}

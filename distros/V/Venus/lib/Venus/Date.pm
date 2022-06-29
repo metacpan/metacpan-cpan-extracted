@@ -441,6 +441,48 @@ sub timeseconds {
   return Time::Seconds->new($time // 0);
 }
 
+sub truncate_to_day {
+  my ($self) = @_;
+
+  return $self->restart('day');
+}
+
+sub truncate_to_hour {
+  my ($self) = @_;
+
+  return $self->restart('hour');
+}
+
+sub truncate_to_minute {
+  my ($self) = @_;
+
+  return $self->restart('minute');
+}
+
+sub truncate_to_month {
+  my ($self) = @_;
+
+  return $self->restart('month');
+}
+
+sub truncate_to_quarter {
+  my ($self) = @_;
+
+  return $self->restart('quarter');
+}
+
+sub truncate_to_second {
+  my ($self) = @_;
+
+  return $self->restart('second');
+}
+
+sub truncate_to_year {
+  my ($self) = @_;
+
+  return $self->restart('year');
+}
+
 1;
 
 
@@ -1969,6 +2011,174 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 truncate_to_day
+
+  truncate_to_day() (Date)
+
+The truncate_to_day method truncates the date and time to the C<day>.
+
+I<Since C<0.09>>
+
+=over 4
+
+=item truncate_to_day example 1
+
+  # given: synopsis;
+
+  $date = $date->truncate_to_day;
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
+
+=back
+
+=cut
+
+=head2 truncate_to_hour
+
+  truncate_to_hour() (Date)
+
+The truncate_to_hour method truncates the date and time to the C<hour>.
+
+I<Since C<0.09>>
+
+=over 4
+
+=item truncate_to_hour example 1
+
+  # given: synopsis;
+
+  $date = $date->truncate_to_hour;
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
+
+=back
+
+=cut
+
+=head2 truncate_to_minute
+
+  truncate_to_minute() (Date)
+
+The truncate_to_minute method truncates the date and time to the C<minute>.
+
+I<Since C<0.09>>
+
+=over 4
+
+=item truncate_to_minute example 1
+
+  # given: synopsis;
+
+  $date = $date->truncate_to_minute(1);
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
+
+=back
+
+=cut
+
+=head2 truncate_to_month
+
+  truncate_to_month() (Date)
+
+The truncate_to_month method truncates the date and time to the C<month>.
+
+I<Since C<0.09>>
+
+=over 4
+
+=item truncate_to_month example 1
+
+  # given: synopsis;
+
+  $date = $date->truncate_to_month(1);
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
+
+=back
+
+=cut
+
+=head2 truncate_to_quarter
+
+  truncate_to_quarter() (Date)
+
+The truncate_to_quarter method truncates the date and time to the C<quarter>.
+
+I<Since C<0.09>>
+
+=over 4
+
+=item truncate_to_quarter example 1
+
+  # given: synopsis;
+
+  $date = $date->truncate_to_quarter(1);
+
+  # $date->string; # 1988-01-01T00:00:00Z
+
+  # $date->epoch; # 567993600
+
+=back
+
+=cut
+
+=head2 truncate_to_second
+
+  truncate_to_second() (Date)
+
+The truncate_to_second method truncates the date and time to the C<second>.
+
+I<Since C<0.09>>
+
+=over 4
+
+=item truncate_to_second example 1
+
+  # given: synopsis;
+
+  $date = $date->truncate_to_second(1);
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
+
+=back
+
+=cut
+
+=head2 truncate_to_year
+
+  truncate_to_year() (Date)
+
+The truncate_to_year method truncates the date and time to the C<year>.
+
+I<Since C<0.09>>
+
+=over 4
+
+=item truncate_to_year example 1
+
+  # given: synopsis;
+
+  $date = $date->truncate_to_year(1);
+
+  # $date->string; # 1988-01-01T00:00:00Z
+
+  # $date->epoch; # 567993600
+
+=back
+
+=cut
+
 =head1 OPERATORS
 
 This package overloads the following operators:
@@ -2150,17 +2360,3 @@ B<example 1>
   # 1
 
 =back
-
-=head1 AUTHORS
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
-
-=head1 LICENSE
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-=cut

@@ -18,6 +18,7 @@
          "requires" : {
             "Alien::Base" : "0.009",
             "IO::Socket::SSL" : "2.07",
+            "Net::SSLeay" : "1.49",
             "Test::More" : "1.001014"
          }
       },
@@ -37,7 +38,7 @@
    "provides" : {
       "Alien::ImageMagick" : {
          "file" : "lib/Alien/ImageMagick.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -49,6 +50,6 @@
          "url" : "https://github.com/jeteve/Alien-ImageMagick"
       }
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.10"
 }

@@ -141,7 +141,7 @@
    "provides" : {
       "Alien::CFITSIO" : {
          "file" : "lib/Alien/CFITSIO.pm",
-         "version" : "v4.1.0.4"
+         "version" : "v4.1.0.5"
       }
    },
    "release_status" : "stable",
@@ -156,7 +156,7 @@
          "web" : "https://gitlab.com/djerius/alien-cfitsio"
       }
    },
-   "version" : "v4.1.0.4",
+   "version" : "v4.1.0.5",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {

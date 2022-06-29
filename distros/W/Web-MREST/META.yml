@@ -3,40 +3,40 @@ abstract: 'Minimalistic REST server'
 author:
   - 'Nathan Cutler <ncutler@suse.cz>'
 build_requires:
-  App::CELL: 0.209
-  Cwd: 0
-  Encode: 0
-  File::Basename: 0
-  File::ShareDir: 0
-  File::Spec: 0
-  HTTP::Request: 0
-  HTTP::Request::Common: 0
-  JSON: 0
-  LWP::Protocol::https: 6.04
-  LWP::UserAgent: 6.05
-  Module::Runtime: 0
-  Params::Validate: 0
-  Path::Router: 0.12
-  Plack: 1.0031
-  Plack::Test: 0
-  Pod::Simple::HTML: 0
-  Pod::Simple::Text: 0
-  Test::Deep: 0
-  Test::Fatal: 0
-  Test::JSON: 0
-  Test::More: 0
-  Test::Warnings: 0
-  Try::Tiny: 0
-  URI::Escape: 0
-  Web::Machine: 0.15
+  App::CELL: '0.209'
+  Cwd: '0'
+  Encode: '0'
+  File::Basename: '0'
+  File::ShareDir: '0'
+  File::Spec: '0'
+  HTTP::Request: '0'
+  HTTP::Request::Common: '0'
+  JSON: '0'
+  LWP::Protocol::https: '6.04'
+  LWP::UserAgent: '6.05'
+  Module::Runtime: '0'
+  Params::Validate: '0'
+  Path::Router: '0.12'
+  Plack: '1.0031'
+  Plack::Test: '0'
+  Pod::Simple::HTML: '0'
+  Pod::Simple::Text: '0'
+  Test::Deep: '0'
+  Test::Fatal: '0'
+  Test::JSON: '0'
+  Test::More: '0'
+  Test::Warnings: '0'
+  Try::Tiny: '0'
+  URI::Escape: '0'
+  Web::Machine: '0.15'
 configure_requires:
-  Module::Build: 0
+  Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Web-MREST
 no_index:
   directory:
@@ -44,65 +44,56 @@ no_index:
 provides:
   Web::MREST:
     file: lib/Web/MREST.pm
-    version: 0.288
+    version: '0.290'
   Web::MREST::Dispatch:
     file: lib/Web/MREST/Dispatch.pm
-    version: 0
   Web::MREST::Entity:
     file: lib/Web/MREST/Entity.pm
-    version: 0
   Web::MREST::InitRouter:
     file: lib/Web/MREST/InitRouter.pm
-    version: 0
   Web::MREST::Resource:
     file: lib/Web/MREST/Resource.pm
-    version: 0
   Web::MREST::Test:
     file: lib/Web/MREST/Test.pm
-    version: 0
   Web::MREST::Test::503:
     file: lib/Web/MREST/Test/503.pm
-    version: 0
   Web::MREST::Test::Forbidden:
     file: lib/Web/MREST/Test/Forbidden.pm
-    version: 0
   Web::MREST::Test::Unauthorized:
     file: lib/Web/MREST/Test/Unauthorized.pm
-    version: 0
   Web::MREST::Util:
     file: lib/Web/MREST/Util.pm
-    version: 0
   Web::MREST::WebServicesIntro:
     file: lib/Web/MREST/WebServicesIntro.pm
-    version: 0
 requires:
-  App::CELL: 0.209
-  Encode: 0
-  File::ShareDir: 1.00
-  File::Spec: 0
-  Getopt::Long: 2.32
-  HTTP::Request: 0
-  HTTP::Request::Common: 0
-  JSON: 0
-  LWP::Protocol::https: 6.04
-  LWP::UserAgent: 6.05
-  Module::Runtime: 0
-  Params::Validate: 1.06
-  Path::Router: 0.12
-  Plack::Middleware::LogErrors: 0
-  Plack::Middleware::Session: 0
-  Plack::Middleware::StackTrace: 0
-  Plack::Runner: 0
-  Pod::Simple::HTML: 0
-  Pod::Simple::Text: 0
-  Pod::Usage: 0
-  Term::ReadLine: 0
-  Test::Deep::NoTest: 0
-  Try::Tiny: 0
-  URI::Escape: 0
-  Web::MREST::CLI: 0.276
-  Web::Machine: 0.15
-  perl: 5.012
+  App::CELL: '0.209'
+  Encode: '0'
+  File::ShareDir: '1.00'
+  File::Spec: '0'
+  Getopt::Long: '2.32'
+  HTTP::Request: '0'
+  HTTP::Request::Common: '0'
+  JSON: '0'
+  LWP::Protocol::https: '6.04'
+  LWP::UserAgent: '6.05'
+  Module::Runtime: '0'
+  Params::Validate: '1.06'
+  Path::Router: '0.12'
+  Plack::Middleware::LogErrors: '0'
+  Plack::Middleware::Session: '0'
+  Plack::Middleware::StackTrace: '0'
+  Plack::Runner: '0'
+  Pod::Simple::HTML: '0'
+  Pod::Simple::Text: '0'
+  Pod::Usage: '0'
+  Term::ReadLine: '0'
+  Test::Deep::NoTest: '0'
+  Try::Tiny: '0'
+  URI::Escape: '0'
+  Web::MREST::CLI: '0.276'
+  Web::Machine: '0.15'
+  perl: '5.012'
 resources:
-  license: http://opensource.org/licenses/BSD-3-Clause
-version: 0.288
+  license: http://opensource.org/licenses/bsd-license.php
+version: '0.290'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

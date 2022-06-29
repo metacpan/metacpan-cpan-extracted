@@ -1,4 +1,4 @@
-# Copyright 2018 Jeffrey Kegler
+# Copyright 2022 Jeffrey Kegler
 # This file is part of Marpa::R2.  Marpa::R2 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
@@ -427,7 +427,9 @@ sub do_libmarpa {
 
     # If build directory exists and contains a stamp file more recent than the
     # tar file, we are done.
-    return if  $self->up_to_date( [$dist_stamp_file], [$build_stamp_file, $build_makefile] ) ;
+    if (-e $dist_stamp_file && -e $build_stamp_file) {
+        return if $self->up_to_date( [$dist_stamp_file], [$build_stamp_file, $build_makefile] ) ;
+    }
 
     # Otherwise, rebuild from scratch
     File::Path::rmtree($build_dir);
@@ -697,21 +699,6 @@ sub make_writeable {
     chmod $current_mode | (oct 200), $file;
 }
 
-sub ACTION_licensecheck {
-    my $self = shift;
-
-    require inc::Marpa::R2::License;
-
-    my $manifest = [keys %{ExtUtils::Manifest::maniread()}];
-    my @license_problems =
-        Marpa::R2::License::license_problems( $manifest, $self->verbose() );
-    if (@license_problems) {
-        print {*STDERR} join q{}, @license_problems
-            or die "Cannot print: $ERRNO";
-        die 'Fatal error due to license language issues';
-    }
-} ## end sub ACTION_licensecheck
-
 sub ACTION_metacheck {
     my $self = shift;
 
@@ -745,7 +732,6 @@ sub ACTION_metacheck {
 
 sub ACTION_distcheck {
     my $self = shift;
-    $self->ACTION_licensecheck();
     $self->ACTION_metacheck();
     return $self->SUPER::ACTION_distcheck;
 } ## end sub ACTION_distcheck

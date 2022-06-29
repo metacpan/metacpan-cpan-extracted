@@ -6,6 +6,7 @@ use Config;
 use Carp 'confess';
 use File::Basename 'dirname';
 use SPVM::Builder::Util;
+use SPVM::Builder::LibInfo;
 
 # Fields
 sub file_optional {
@@ -294,17 +295,6 @@ sub output_type {
   }
 }
 
-sub lib_link_abs {
-  my $self = shift;
-  if (@_) {
-    $self->{lib_link_abs} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{lib_link_abs};
-  }
-}
-
 # Methods
 sub new {
   my $class = shift;
@@ -458,13 +448,6 @@ sub new {
     $self->ldflags([]);
   }
   
-  # lib_link_abs
-  unless (defined $self->lib_link_abs) {
-    if ($self->output_type eq 'dynamic_lib') {
-      $self->lib_link_abs(1);
-    }
-  }
-  
   return $self;
 }
 
@@ -579,6 +562,27 @@ sub add_libs {
   push @{$self->{libs}}, @libs;
 }
 
+sub add_static_libs {
+  my ($self, @libs) = @_;
+  
+  my @static_libs;
+  for my $lib (@libs) {
+    my $static_lib;
+    if (ref $lib eq 'SPVM::Builder::LibInfo') {
+      $static_lib = $lib->static(1);
+    }
+    else {
+      my $lib_name = $lib;
+      $static_lib = SPVM::Builder::LibInfo->new;
+      $static_lib->name($lib_name);
+      $static_lib->static(1);
+    }
+    push @static_libs, $static_lib;
+  }
+  
+  $self->add_libs(@static_libs);
+}
+
 sub add_source_files {
   my ($self, @source_files) = @_;
   
@@ -641,22 +645,6 @@ sub load_base_config {
   my $config = $self->load_mode_config($config_file, undef, @args);
 
   return $config;
-}
-
-sub add_static_libs {
-  my ($self, @static_libs) = @_;
-  
-  my @static_lib_infos = map { {type => 'static', name => $_ } } @static_libs;
-  
-  $self->add_libs(@static_lib_infos);
-}
-
-sub add_dynamic_libs {
-  my ($self, @dynamic_libs) = @_;
-  
-  my @dynamic_lib_infos = map { {type => 'dynamic', name => $_ } } @dynamic_libs;
-  
-  $self->add_libs(@dynamic_lib_infos);
 }
 
 sub use_resource {
@@ -723,11 +711,11 @@ sub get_resource_names {
 
 1;
 
-=head1 NAME
+=head1 Name
 
 SPVM::Builder::Config - Configurations of Compile and Link of Native Sources
 
-=head1 SYNOPSYS
+=head1 Synopsys
 
   use SPVM::Builder::Config;
   
@@ -762,11 +750,11 @@ SPVM::Builder::Config - Configurations of Compile and Link of Native Sources
   # Get resouce information
   my $resource = $config->get_resource('TestCase::Resource::Zlib::V1_0_0');
 
-=head1 DESCRIPTION
+=head1 Description
 
 L<SPVM::Builder::Config> is configuration of c/c++ compile and link.
 
-=head1 FIELDS
+=head1 Field Methods
 
 Fields.
 
@@ -1083,21 +1071,7 @@ Not Windows
   my $libs = $config->libs;
   $config->libs($libs);
 
-Get and set libraries. These libraries are linked by the linker.
-
-If a dynamic link library is found from L<"lib_dirs">, this is linked. Otherwise if a static link library is found from L<"lib_dirs">, this is linked.
-
-B<Examples:>
-
-  $config->libs(['gsl', 'png']);
-
-If you want to link only dynamic link library, you can use the following hash reference as the value of the element instead of the library name.
-
-  {type => 'dynamic', name => 'gsl'}
-
-If you want to link only static link library, you can use the following hash reference as the value of the element instead of the library name.
-
-  {type => 'static', name => 'gsl'}
+Get and set library names or L<SPVM::Builder::LibInfo> objects. These libraries are linked by L<SPVM::Builder::CC/"link"> method.
 
 =head2 ldflags
 
@@ -1189,7 +1163,7 @@ The default is C<0>.
   my $output_type = $config->output_type;
   $config->output_type($type);
 
-=head1 CLASS METHODS
+=head1 Class Methods
 
 =head2 new
 
@@ -1229,7 +1203,7 @@ If you want to use the specific C++ version, use C<set_std> method.
 
 Create default build config with C++11 settings. This is L<SPVM::Builder::Config> object.
 
-=head1 INSTANCE METHODS
+=head1 Instance Methods
 
 =head2 set_std
 
@@ -1275,35 +1249,33 @@ Add the values after the last element of C<source_files> field.
 
   $config->add_libs(@libs);
 
-Add the values after the last element of C<libs> field.
+Add library names or L<SPVM::Builder::LibInfo> objects after the last element of L</"libs"> field.
 
 B<Examples:>
 
   $config->add_libs('gsl');
+  $config->add_libs('gsl', 'z');
+  $config->add_libs(
+    SPVM::Builder::LibInfo->new(name => 'gsl'),
+    SPVM::Builder::LibInfo->new(name => 'z', abs => 1),
+  );
 
 =head2 add_static_libs
 
   $config->add_static_libs(@libs);
 
-Add the values that each element is converted to the following hash reference after the last element of C<libs> field.
+Add library names or L<SPVM::Builder::LibInfo> objects after the last element of L</"libs"> field.
 
-  {type => 'static', name => $lib}
+C<static> field is set to a true value.
 
 B<Examples:>
 
   $config->add_static_libs('gsl');
-
-=head2 add_dynamic_libs
-
-  $config->add_dynamic_libs(@libs);
-
-Add the values that each element is converted to the following hash reference after the last element of C<libs> field.
-
-  {type => 'dynamic', name => $lib}
-
-B<Examples:>
-
-  $config->add_dynamic_libs('gsl');
+  $config->add_static_libs('gsl', 'z');
+  $config->add_static_libs(
+    SPVM::Builder::LibInfo->new(name => 'gsl'),
+    SPVM::Builder::LibInfo->new(name => 'z', abs => 1),
+  );
 
 =head2 use_resource
 

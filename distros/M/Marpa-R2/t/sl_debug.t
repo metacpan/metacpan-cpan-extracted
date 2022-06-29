@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Copyright 2018 Jeffrey Kegler
+# Copyright 2022 Jeffrey Kegler
 # This file is part of Marpa::R2.  Marpa::R2 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
@@ -54,8 +54,8 @@ expression ::=
     || expression '+' expression
 <numeric expression> ::=
        variable | number
-    || <numeric expression> '+' <numeric expression>
     || <numeric expression> '*' <numeric expression>
+    || <numeric expression> '+' <numeric expression>
 variable ~ [\w]+
 number ~ [\d]+
 string ~ ['] <string contents> [']
@@ -121,23 +121,30 @@ END_OF_TEXT
 # name: SLIF debug example dump of value
 
 my $value_ref = $recce->value();
-my $expected_output = \bless( [
-                 bless( [
-                          bless( [
-                                   'a',
-                                   '=',
-                                   bless( [
-                                            bless( [
-                                                     '8675309'
-                                                   ], 'My_Nodes::expression' ),
-                                            '+',
-                                            bless( [
-                                                     '42'
-                                                   ], 'My_Nodes::expression' )
-                                          ], 'My_Nodes::expression' )
-                                 ], 'My_Nodes::numeric_assignment' )
-                        ], 'My_Nodes::statement' )
-               ], 'My_Nodes::statements' );
+my $expected_output = \bless(
+    [
+        bless(
+            [
+                bless(
+                    [
+                        'a', '=',
+                        bless(
+                            [
+                                bless( ['8675309'], 'My_Nodes::expression' ),
+                                '+',
+                                bless( ['42'], 'My_Nodes::expression' )
+                            ],
+                            'My_Nodes::expression'
+                        )
+                    ],
+                    'My_Nodes::numeric_assignment'
+                )
+            ],
+            'My_Nodes::statement'
+        )
+    ],
+    'My_Nodes::statements'
+);
 
 # Marpa::R2::Display::End
 
@@ -344,26 +351,31 @@ $recce = Marpa::R2::Scanless::R->new(
 die if not defined $recce->read( \$test_input );
 $value_ref = $recce->value();
 my $expected_value_after_fix = \bless(
-    [   bless(
-            [   bless(
-                    [   'a', '=',
+    [
+        bless(
+            [
+                bless(
+                    [
+                        'a', '=',
                         bless(
-                            [   bless(
-                                    [   bless(
-                                            ['8675309'],
-                                            'My_Nodes::numeric_expression'
-                                        ),
-                                        '+',
+                            [
+                                bless(
+                                    ['8675309'], 'My_Nodes::numeric_expression'
+                                ),
+                                '+',
+                                bless(
+                                    [
                                         bless(
                                             ['42'],
+                                            'My_Nodes::numeric_expression'
+                                        ),
+                                        '*',
+                                        bless(
+                                            ['711'],
                                             'My_Nodes::numeric_expression'
                                         )
                                     ],
                                     'My_Nodes::numeric_expression'
-                                ),
-                                '*',
-                                bless(
-                                    ['711'], 'My_Nodes::numeric_expression'
                                 )
                             ],
                             'My_Nodes::numeric_expression'
@@ -377,7 +389,8 @@ my $expected_value_after_fix = \bless(
     ],
     'My_Nodes::statements'
 );
-Test::More::is_deeply($value_ref, $expected_value_after_fix, 'Value after fix');
+Test::More::is_deeply( $value_ref, $expected_value_after_fix,
+    'Value after fix' );
 
 my $show_rules_output;
 $show_rules_output .= "G1 Rules:\n";
@@ -456,10 +469,10 @@ G1 R15 <numeric expression> ::= variable
 G1 R16 <numeric expression> ::= number
   Symbol IDs: <15> ::= <24>
   Internal symbols: <numeric expression[2]> ::= <number>
-G1 R17 <numeric expression> ::= <numeric expression> '+' <numeric expression>
+G1 R17 <numeric expression> ::= <numeric expression> '*' <numeric expression>
   Symbol IDs: <14> ::= <14> <8> <15>
   Internal symbols: <numeric expression[1]> ::= <numeric expression[1]> <[Lex-7]> <numeric expression[2]>
-G1 R18 <numeric expression> ::= <numeric expression> '*' <numeric expression>
+G1 R18 <numeric expression> ::= <numeric expression> '+' <numeric expression>
   Symbol IDs: <13> ::= <13> <9> <14>
   Internal symbols: <numeric expression[0]> ::= <numeric expression[0]> <[Lex-8]> <numeric expression[1]>
 G1 R19 :start ::= statements
@@ -494,14 +507,14 @@ L0 R6 '+' ::= [\+]
   Internal rule for single-quoted string '+'
   Symbol IDs: <8> ::= <15>
   Internal symbols: <[Lex-6]> ::= <[[\+]]>
-L0 R7 '+' ::= [\+]
-  Internal rule for single-quoted string '+'
-  Symbol IDs: <9> ::= <15>
-  Internal symbols: <[Lex-7]> ::= <[[\+]]>
-L0 R8 '*' ::= [\*]
+L0 R7 '*' ::= [\*]
   Internal rule for single-quoted string '*'
-  Symbol IDs: <10> ::= <14>
-  Internal symbols: <[Lex-8]> ::= <[[\*]]>
+  Symbol IDs: <9> ::= <14>
+  Internal symbols: <[Lex-7]> ::= <[[\*]]>
+L0 R8 '+' ::= [\+]
+  Internal rule for single-quoted string '+'
+  Symbol IDs: <10> ::= <15>
+  Internal symbols: <[Lex-8]> ::= <[[\+]]>
 L0 R9 variable ::= [\w] +
   Symbol IDs: <29> ::= <19>
   Internal symbols: <variable> ::= <[[\w]]>
@@ -553,11 +566,11 @@ L0 R22 :start_lex ::= '+'
   Internal lexical start rule for <[Lex-6]>
   Symbol IDs: <1> ::= <8>
   Internal symbols: <[:start_lex]> ::= <[Lex-6]>
-L0 R23 :start_lex ::= '+'
+L0 R23 :start_lex ::= '*'
   Internal lexical start rule for <[Lex-7]>
   Symbol IDs: <1> ::= <9>
   Internal symbols: <[:start_lex]> ::= <[Lex-7]>
-L0 R24 :start_lex ::= '*'
+L0 R24 :start_lex ::= '+'
   Internal lexical start rule for <[Lex-8]>
   Symbol IDs: <1> ::= <10>
   Internal symbols: <[:start_lex]> ::= <[Lex-8]>
@@ -626,14 +639,14 @@ G1 S7 '+' -- Internal lexical symbol for "'+'"
   /* terminal */
   Internal name: <[Lex-6]>
   SLIF name: '+'
-G1 S8 '+' -- Internal lexical symbol for "'+'"
+G1 S8 '*' -- Internal lexical symbol for "'*'"
   /* terminal */
   Internal name: <[Lex-7]>
-  SLIF name: '+'
-G1 S9 '*' -- Internal lexical symbol for "'*'"
+  SLIF name: '*'
+G1 S9 '+' -- Internal lexical symbol for "'+'"
   /* terminal */
   Internal name: <[Lex-8]>
-  SLIF name: '*'
+  SLIF name: '+'
 G1 S10 expression -- <expression> at priority 0
   Internal name: <expression[0]>
   SLIF name: expression
@@ -699,12 +712,12 @@ L0 S7 ')' -- Internal lexical symbol for "')'"
 L0 S8 '+' -- Internal lexical symbol for "'+'"
   Internal name: <[Lex-6]>
   SLIF name: '+'
-L0 S9 '+' -- Internal lexical symbol for "'+'"
+L0 S9 '*' -- Internal lexical symbol for "'*'"
   Internal name: <[Lex-7]>
-  SLIF name: '+'
-L0 S10 '*' -- Internal lexical symbol for "'*'"
-  Internal name: <[Lex-8]>
   SLIF name: '*'
+L0 S10 '+' -- Internal lexical symbol for "'+'"
+  Internal name: <[Lex-8]>
+  SLIF name: '+'
 L0 S11 ['] -- Character class: [']
   /* terminal */
   Internal name: <[[']]>
@@ -915,8 +928,8 @@ L0 Rule #3: 5 ::= 27 28 26 23 24 22
 L0 Rule #4: 6 ::= 12
 L0 Rule #5: 7 ::= 13
 L0 Rule #6: 8 ::= 15
-L0 Rule #7: 9 ::= 15
-L0 Rule #8: 10 ::= 14
+L0 Rule #7: 9 ::= 14
+L0 Rule #8: 10 ::= 15
 L0 Rule #9: 29 ::= 19
 L0 Rule #10: 30 ::= 17
 L0 Rule #11: 31 ::= 11 32 11
@@ -1013,13 +1026,13 @@ symbol number: 7  description Internal lexical symbol for "'+'"
 symbol number: 7  name in display form: '+'
 symbol number: 7  DSL form: '+'
 symbol number: 8  name: [Lex-7]
-symbol number: 8  description Internal lexical symbol for "'+'"
-symbol number: 8  name in display form: '+'
-symbol number: 8  DSL form: '+'
+symbol number: 8  description Internal lexical symbol for "'*'"
+symbol number: 8  name in display form: '*'
+symbol number: 8  DSL form: '*'
 symbol number: 9  name: [Lex-8]
-symbol number: 9  description Internal lexical symbol for "'*'"
-symbol number: 9  name in display form: '*'
-symbol number: 9  DSL form: '*'
+symbol number: 9  description Internal lexical symbol for "'+'"
+symbol number: 9  name in display form: '+'
+symbol number: 9  DSL form: '+'
 symbol number: 10  name: expression[0]
 symbol number: 10  description <expression> at priority 0
 symbol number: 10  name in display form: expression
@@ -1115,8 +1128,8 @@ expression ::= expression '+' expression
 <numeric expression> ::= <numeric expression>
 <numeric expression> ::= variable
 <numeric expression> ::= number
-<numeric expression> ::= <numeric expression> '+' <numeric expression>
 <numeric expression> ::= <numeric expression> '*' <numeric expression>
+<numeric expression> ::= <numeric expression> '+' <numeric expression>
 :start ::= statements
 END_OF_TEXT
 
@@ -1142,8 +1155,8 @@ Marpa::R2::Test::is( $text, <<'END_OF_TEXT', 'L0 rule_show() by rule id');
 '(' ::= [\(]
 ')' ::= [\)]
 '+' ::= [\+]
-'+' ::= [\+]
 '*' ::= [\*]
+'+' ::= [\+]
 variable ::= [\w] +
 number ::= [\d] +
 string ::= ['] <string contents> [']
@@ -1158,8 +1171,8 @@ whitespace ::= [\s] +
 :start_lex ::= '('
 :start_lex ::= ')'
 :start_lex ::= '+'
-:start_lex ::= '+'
 :start_lex ::= '*'
+:start_lex ::= '+'
 :start_lex ::= number
 :start_lex ::= string
 :start_lex ::= variable
@@ -1244,13 +1257,13 @@ L0 symbol number: 8  description Internal lexical symbol for "'+'"
 L0 symbol number: 8  name in display form: '+'
 L0 symbol number: 8  DSL form: '+'
 L0 symbol number: 9  name: [Lex-7]
-L0 symbol number: 9  description Internal lexical symbol for "'+'"
-L0 symbol number: 9  name in display form: '+'
-L0 symbol number: 9  DSL form: '+'
+L0 symbol number: 9  description Internal lexical symbol for "'*'"
+L0 symbol number: 9  name in display form: '*'
+L0 symbol number: 9  DSL form: '*'
 L0 symbol number: 10  name: [Lex-8]
-L0 symbol number: 10  description Internal lexical symbol for "'*'"
-L0 symbol number: 10  name in display form: '*'
-L0 symbol number: 10  DSL form: '*'
+L0 symbol number: 10  description Internal lexical symbol for "'+'"
+L0 symbol number: 10  name in display form: '+'
+L0 symbol number: 10  DSL form: '+'
 L0 symbol number: 11  name: [[']]
 L0 symbol number: 11  description Character class: [']
 L0 symbol number: 11  name in display form: [']

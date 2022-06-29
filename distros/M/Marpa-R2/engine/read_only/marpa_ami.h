@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Jeffrey Kegler
+ * Copyright 2022 Jeffrey Kegler
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation
@@ -18,7 +18,6 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-
 
 /*
  * DO NOT EDIT DIRECTLY
@@ -60,15 +59,15 @@
 
 #if MARPA_DEBUG
 
-#define MARPA_DEBUG1(a)  (marpa__debug_level && \
+#define MARPA_DEBUG1(a)  (void)(marpa__debug_level && \
     (*marpa__debug_handler)(a)) 
-#define MARPA_DEBUG2(a,b)  (marpa__debug_level && \
+#define MARPA_DEBUG2(a,b)  (void)(marpa__debug_level && \
     (*marpa__debug_handler)((a),(b))) 
-#define MARPA_DEBUG3(a,b,c)  (marpa__debug_level && \
+#define MARPA_DEBUG3(a,b,c)  (void)(marpa__debug_level && \
     (*marpa__debug_handler)((a),(b),(c))) 
-#define MARPA_DEBUG4(a,b,c,d)  (marpa__debug_level && \
+#define MARPA_DEBUG4(a,b,c,d)  (void)(marpa__debug_level && \
     (*marpa__debug_handler)((a),(b),(c),(d))) 
-#define MARPA_DEBUG5(a,b,c,d,e)  (marpa__debug_level && \
+#define MARPA_DEBUG5(a,b,c,d,e)  (void)(marpa__debug_level && \
     (*marpa__debug_handler)((a),(b),(c),(d),(e))) 
 
 #else

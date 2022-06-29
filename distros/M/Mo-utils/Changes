@@ -1,3 +1,11 @@
+0.08 2022-06-29T19:10:33+02:00
+ - Add support for test of errors structure.
+ - Fix error value in case of instance of object.
+ - Fix bless in mock objects in tests.
+ - Improve error in check_isa() like check blessed().
+ - Improve error in check_isa() to not present 'Reference' if ref $value eq
+   ''.
+
 0.07 2022-02-27T12:38:59+01:00
  - Improve errors.
  - Skip undefined value in check_isa().

@@ -26,16 +26,16 @@ produces output
     <moonshines> is not HTML5
 
 
-(This example is included as L<F<tagset-synopsis.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Valid-0.08/examples/tagset-synopsis.pl> in the distribution.)
+(This example is included as L<F<tagset-synopsis.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Valid-0.09/examples/tagset-synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents HTML::Valid::Tagset version 0.08
-corresponding to git commit L<e5beaaba00502cc4aba10db6bba5b0758f64726d|https://github.com/benkasminbullock/html-valid/commit/e5beaaba00502cc4aba10db6bba5b0758f64726d> released on Thu May 20 08:07:15 2021 +0900.
+This documents HTML::Valid::Tagset version 0.09
+corresponding to git commit L<0eff27f5da639787969d7ac7787f18df00b6753e|https://github.com/benkasminbullock/html-valid/commit/0eff27f5da639787969d7ac7787f18df00b6753e> released on Wed Jun 29 08:45:38 2022 +0900.
 
 This Perl module is built on top of the L</HTML Tidy> library version
-5.7.28.
+5.8.0.
 
 
 =head1 DESCRIPTION
@@ -421,7 +421,7 @@ backwards compatibility. See also L</Issues with HTML::Tagset>.
 
 =head1 UNIMPLEMENTED
 
-The following parts of HTML::Tagset are not implemented in version 0.08 of HTML::Valid::Tagset.
+The following parts of HTML::Tagset are not implemented in version 0.09 of HTML::Valid::Tagset.
 
 =head2 %boolean_attr
 

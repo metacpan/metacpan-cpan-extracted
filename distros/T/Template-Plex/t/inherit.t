@@ -6,7 +6,7 @@ use warnings;
 # use Log::ger;                             #
 # use Log::ger::Output "Screen";            #
 #                                           #
-# use Log::OK {opt=>"verbose"};             #
+ use Log::OK {sys=>"Log::ger"};             #
 # use Log::ger::Util;                       #
 # Log::ger::Util::set_level Log::OK::LEVEL; #
 #############################################

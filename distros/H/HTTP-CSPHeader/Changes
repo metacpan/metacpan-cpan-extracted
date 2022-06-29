@@ -1,5 +1,15 @@
 Revision history for HTTP-CSPHeader
 
+v0.1.3    2022-06-29 17:16:15+01:00 Europe/London
+  [Enhancements]
+  - The nonce combined with the PID to ensure it is unique after forking.
+
+  [Documentation]
+  - Added HTTP::SecureHeaders and Plack::Middleware::CSP to SEE ALSO.
+
+  [Toolchain]
+  - Sign release.
+
 v0.1.2    2022-04-20 20:41:14+01:00 Europe/London
   [Documentation]
   - Added example of usage with Mojolicious.

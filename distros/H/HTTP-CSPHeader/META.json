@@ -4,7 +4,7 @@
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "HTTP",
       "security",
@@ -79,7 +79,7 @@
    "provides" : {
       "HTTP::CSPHeader" : {
          "file" : "lib/HTTP/CSPHeader.pm",
-         "version" : "v0.1.2"
+         "version" : "v0.1.3"
       }
    },
    "release_status" : "stable",
@@ -93,10 +93,10 @@
          "web" : "https://github.com/robrwo/perl-HTTP-CSPHeader"
       }
    },
-   "version" : "v0.1.2",
+   "version" : "v0.1.3",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

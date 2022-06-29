@@ -18,26 +18,6 @@ use Mojo::Util            qw( dumper );
 use Term::ANSIColor       qw( colored colorstrip );
 use subs                  qw( _sayt );
 
-has [
-    qw/
-      class
-      args
-      method
-      opts
-      core_flags
-      non_main_flags
-      cache_from_file
-      cache_pod
-      cache_path
-      cache_name_and_summary
-      cache_isa
-      cache_events
-      cache_methods
-      cache_method_and_doc
-      dirty_cache
-      /
-];
-
 =head1 NAME
 
  ~                      __ ~
@@ -51,11 +31,11 @@ App::Pod - Quickly show available class methods and documentation.
 
 =head1 VERSION
 
-Version 0.18
+Version 0.22
 
 =cut
 
-our $VERSION = '0.18';
+our $VERSION = '0.22';
 
 
 =head1 SYNOPSIS
@@ -107,6 +87,66 @@ Basically, this is a tool that can quickly summarize the contents of a perl modu
 
 =head1 SUBROUTINES/METHODS
 
+=cut
+
+#
+# Method maker
+#
+
+=head2 _has
+
+Generates class accessor methods (like Mojo::Base::attr)
+
+=cut
+
+sub _has {
+    no strict 'refs';
+    for my $attr ( @_ ) {
+        *$attr = sub {
+            return $_[0]{$attr} if @_ == 1;    # Get: return $self-<{$attr}
+            $_[0]{$attr} = $_[1];              # Set: $self->{$attr} = $val
+            $_[0];                             # return $self
+        };
+    }
+}
+
+sub import {
+    _has qw(
+        _class
+        _args
+        _method
+        _opts
+        _core_flags
+        _non_main_flags
+        _cache_from_file
+        _cache_pod
+        _cache_path
+        _cache_name_and_summary
+        _cache_isa
+        _cache_events
+        _cache_methods
+        _cache_method_and_doc
+        _dirty_cache
+    );
+}
+
+#
+# Debug
+#
+
+sub _dumper {
+    require Data::Dumper;
+    my $data = Data::Dumper
+      ->new( [@_] )
+      ->Indent( 1 )
+      ->Sortkeys( 1 )
+      ->Terse( 1 )
+      ->Useqq( 1 )
+      ->Dump;
+    return $data if defined wantarray;
+    say $data;
+}
+
 =head2 run
 
 Run the main program.
@@ -130,7 +170,7 @@ sub run {
     return if $self->_process_core_flags;
     return if $self->_abort;
 
-    if ( $self->non_main_flags->@* ) {
+    if ( $self->_non_main_flags->@* ) {
         $self->_process_non_main;
     }
     else {
@@ -138,7 +178,7 @@ sub run {
     }
 
     $self->_dump();
-    $self->store_cache if $self->dirty_cache;
+    $self->store_cache if $self->_dirty_cache;
 }
 
 sub _new {
@@ -159,10 +199,10 @@ sub _init {
     my $o = _get_opts();
     my ( $class, @args ) = @ARGV;
 
-    $self->opts( $o );
-    $self->class( $class );
-    $self->args( \@args );
-    $self->method( $args[0] );
+    $self->_opts( $o );
+    $self->_class( $class );
+    $self->_args( \@args );
+    $self->_method( $args[0] );
 
     my @core_flags;
     my @non_main_flags;
@@ -183,19 +223,19 @@ sub _init {
     # Core flags.
     # These do not need any error checks
     # and will be processed early.
-    $self->core_flags( \@core_flags );
+    $self->_core_flags( \@core_flags );
 
     # Non main flags.
     # These are features separate from the main program.
-    $self->non_main_flags( \@non_main_flags );
+    $self->_non_main_flags( \@non_main_flags );
 
     # Explicitly force getting the real data.
-    $self->dirty_cache( 1 ) if $o->{flush_cache};
+    $self->_dirty_cache( 1 ) if $o->{flush_cache};
 }
 
 sub _dump {
     my ( $self ) = @_;
-    my $dump = $self->opts->{dump} or return;
+    my $dump = $self->_opts->{dump} or return;
     my $data;
 
     if ( $dump >= 2 ) {    # Dump all.
@@ -304,14 +344,14 @@ sub _get_pod {
     my ( $self ) = @_;
 
     # Use in-memory cache if present.
-    my $pod = $self->cache_pod;
+    my $pod = $self->_cache_pod;
     return $pod if $pod;
 
     # Otherwise, make a new Pod::Query object.
-    $pod = Pod::Query->new( $self->class );
+    $pod = Pod::Query->new( $self->_class );
 
     # Cache it in-memory.
-    $self->cache_pod( $pod );
+    $self->_cache_pod( $pod );
 
     $pod;
 }
@@ -323,8 +363,8 @@ sub _get_pod {
 sub _process_core_flags {
     my ( $self ) = @_;
 
-    for ( $self->core_flags->@* ) {
-        say "Processing: $_->{name}" if $self->opts->{dump};
+    for ( $self->_core_flags->@* ) {
+        say "Processing: $_->{name}" if $self->_opts->{dump};
         my $handler = $_->{handler};
         return 1 if $self->$handler;
     }
@@ -447,7 +487,7 @@ sub list_tool_options {
       map { split /\|/ } _get_spec_list();
 
     # Abort if not using also --class_options.
-    not $self->opts->{class_options};
+    not $self->_opts->{class_options};
 }
 
 #
@@ -456,10 +496,10 @@ sub list_tool_options {
 
 sub _abort {
     my ( $self ) = @_;
-    my $class = $self->class;
+    my $class = $self->_class;
 
     if ( not $class ) {
-        if ( not $self->opts->{no_error} ) {
+        if ( not $self->_opts->{no_error} ) {
             say "";
             say _red( "Class name not provided!" );
             say _reset( "" );
@@ -469,7 +509,7 @@ sub _abort {
 
     # No wierd class names.
     if ( $class !~ m{ ^ [-\w_:/. ]+ $ }x ) {
-        if ( not $self->opts->{no_error} ) {
+        if ( not $self->_opts->{no_error} ) {
             say "";
             say _red( "Invalid class name: $class" );
             say _reset( "" );
@@ -479,7 +519,7 @@ sub _abort {
 
     # Make sure the path is not empty (error signal from Pod::Query).
     if ( not $self->_get_path ) {
-        if ( not $self->opts->{no_error} ) {
+        if ( not $self->_opts->{no_error} ) {
             say "";
             say _red( "Class not found: $class" );
             say _reset( "" );
@@ -494,25 +534,25 @@ sub _get_path {
     my ( $self ) = @_;
 
     # Use in-memory cache if present.
-    my $mem_cache = $self->cache_path;
+    my $mem_cache = $self->_cache_path;
     return $mem_cache if $mem_cache;
 
     # Use disk cache if present.
     my $disk_cache = $self->retrieve_cache;
     if ( $disk_cache and $disk_cache->{path} ) {
-        $self->cache_path( $disk_cache->{path} );
+        $self->_cache_path( $disk_cache->{path} );
         return $disk_cache->{path};
     }
 
     # Otherwise, get the class path.
-    local $Pod::Query::DEBUG_FIND_DUMP = 1 if $self->opts->{dump};
+    local $Pod::Query::DEBUG_FIND_DUMP = 1 if $self->_opts->{dump};
     my $path = $self->_get_pod->path;
 
     # Cache it in-memory.
-    $self->cache_path( $path );
+    $self->_cache_path( $path );
 
     # Flag that disk cache should be stored later.
-    $self->dirty_cache( 1 );
+    $self->_dirty_cache( 1 );
 
     $path;
 }
@@ -523,10 +563,10 @@ sub _get_path {
 
 sub _process_non_main {
     my ( $self ) = @_;
-    say "_process_non_main()" if $self->opts->{dump};
+    say "_process_non_main()" if $self->_opts->{dump};
 
-    for ( $self->non_main_flags->@* ) {
-        say "Processing: $_->{name}" if $self->opts->{dump};
+    for ( $self->_non_main_flags->@* ) {
+        say "Processing: $_->{name}" if $self->_opts->{dump};
         my $handler = $_->{handler};
         return 1 if $self->$handler;
     }
@@ -551,7 +591,7 @@ sub list_class_options {
     my $cache = $self->retrieve_cache();
 
     # Make class specific cache if missing.
-    if ( $cache->{class} ne $self->class ) {
+    if ( $cache->{class} ne $self->_class ) {
         $cache = $self->store_cache;
     }
 
@@ -571,7 +611,7 @@ Can optionally just to a specific keyword.
 sub edit_class {
     my ( $self ) = @_;
     my $path     = $self->_get_path;
-    my $method   = $self->method;
+    my $method   = $self->_method;
     my $cmd      = "vim $path";
 
     if ( $method ) {
@@ -597,8 +637,8 @@ Show the documentation for a module using perldoc.
 
 sub doc_class {
     my ( $self ) = @_;
-    my $class    = $self->class;
-    my @args     = $self->args->@*;
+    my $class    = $self->_class;
+    my @args     = $self->_args->@*;
 
     exec "perldoc @args $class";
 }
@@ -617,9 +657,9 @@ Use --dump option to show the data structure.
 sub query_class {
     my ( $self ) = @_;
 
-    local $Pod::Query::DEBUG_FIND_DUMP = 1 if $self->opts->{dump};
+    local $Pod::Query::DEBUG_FIND_DUMP = 1 if $self->_opts->{dump};
 
-    say for $self->_get_pod->find( $self->opts->{query} );
+    say for $self->_get_pod->find( $self->_opts->{query} );
 }
 
 #
@@ -628,11 +668,11 @@ sub query_class {
 
 sub _process_main {
     my ( $self ) = @_;
-    say "_process_main()" if $self->opts->{dump};
+    say "_process_main()" if $self->_opts->{dump};
 
     # Go on.
     $self->show_header;
-    if ( $self->method ) {
+    if ( $self->_method ) {
         $self->show_method_doc;
     }
     else {
@@ -648,26 +688,26 @@ sub _get_name_and_summary {
     my ( $self ) = @_;
 
     # Use in-memory cache if present.
-    my $mem_cache = $self->cache_name_and_summary;
+    my $mem_cache = $self->_cache_name_and_summary;
     return $mem_cache if $mem_cache;
 
     # Use disk cache if present.
     my $disk_cache = $self->retrieve_cache;
     if ( $disk_cache and $disk_cache->{name_and_summary} ) {
-        $self->cache_name_and_summary( $disk_cache->{name_and_summary} );
+        $self->_cache_name_and_summary( $disk_cache->{name_and_summary} );
         return $disk_cache->{name_and_summary};
     }
 
     # Otherwise, get all class events.
-    local $Pod::Query::DEBUG_FIND_DUMP = 1 if $self->opts->{dump};
+    local $Pod::Query::DEBUG_FIND_DUMP = 1 if $self->_opts->{dump};
     my $title            = $self->_get_pod->find_title;
     my $name_and_summary = [ split /\s*-\s*/, $title, 2 ];
 
     # Cache it in-memory.
-    $self->cache_name_and_summary( $name_and_summary );
+    $self->_cache_name_and_summary( $name_and_summary );
 
     # Flag that disk cache should be stored later.
-    $self->dirty_cache( 1 );
+    $self->_dirty_cache( 1 );
 
     $name_and_summary;
 }
@@ -680,7 +720,7 @@ Prints a generic header for a module.
 
 sub show_header {
     my ( $self )      = @_;
-    my $class         = $self->class;
+    my $class         = $self->_class;
     my $version       = $class->VERSION;
     my $class_is_path = $self->_get_pod->class_is_path;
     my $first_release =
@@ -724,21 +764,21 @@ sub _get_isa {
     my ( $self ) = @_;
 
     # Use in-memory cache if present.
-    my $isa_cache = $self->cache_isa;
+    my $isa_cache = $self->_cache_isa;
     return $isa_cache if $isa_cache;
 
     # Use disk cache if present.
     my $disk_cache = $self->retrieve_cache;
     if ( $disk_cache and $disk_cache->{isa} ) {
-        $self->cache_isa( $disk_cache->{isa} );
+        $self->_cache_isa( $disk_cache->{isa} );
         return $disk_cache->{isa};
     }
 
     # Otherwise, get all class inheritance.
-    my @classes = ( $self->class );
+    my @classes = ( $self->_class );
     my @isa;
     my %seen;
-    {
+    if ( not $self->_get_pod->class_is_path ) {
         no strict 'refs';
         while ( my $class = shift @classes ) {
             next if $seen{$class}++;    # Already saw it
@@ -749,10 +789,10 @@ sub _get_isa {
     }
 
     # Cache it in-memory.
-    $self->cache_isa( \@isa );
+    $self->_cache_isa( \@isa );
 
     # Flag that disk cache should be stored later.
-    $self->dirty_cache( 1 );
+    $self->_dirty_cache( 1 );
 
     \@isa;
 }
@@ -779,25 +819,25 @@ sub _get_events {
     my ( $self ) = @_;
 
     # Use in-memory cache if present.
-    my $mem_cache = $self->cache_events;
+    my $mem_cache = $self->_cache_events;
     return $mem_cache if $mem_cache;
 
     # Use disk cache if present.
     my $disk_cache = $self->retrieve_cache;
     if ( $disk_cache and $disk_cache->{events} ) {
-        $self->cache_events( $disk_cache->{events} );
+        $self->_cache_events( $disk_cache->{events} );
         return $disk_cache->{events};
     }
 
     # Otherwise, get all class events.
-    local $Pod::Query::DEBUG_FIND_DUMP = 1 if $self->opts->{dump};
+    local $Pod::Query::DEBUG_FIND_DUMP = 1 if $self->_opts->{dump};
     my %events = $self->_get_pod->find_events;
 
     # Cache it in-memory.
-    $self->cache_events( \%events );
+    $self->_cache_events( \%events );
 
     # Flag that disk cache should be stored later.
-    $self->dirty_cache( 1 );
+    $self->_dirty_cache( 1 );
 
     \%events;
 }
@@ -836,18 +876,18 @@ sub _get_methods {
     my ( $self ) = @_;
 
     # Use in-memory cache if present.
-    my $mem_cache = $self->cache_methods;
+    my $mem_cache = $self->_cache_methods;
     return $mem_cache if $mem_cache;
 
     # Use disk cache if present.
     my $disk_cache = $self->retrieve_cache;
     if ( $disk_cache and $disk_cache->{methods} ) {
-        $self->cache_methods( $disk_cache->{methods} );
+        $self->_cache_methods( $disk_cache->{methods} );
         return $disk_cache->{methods};
     }
 
     # Otherwise, get all class methods.
-    local $Pod::Query::DEBUG_FIND_DUMP = 1 if $self->opts->{dump};
+    local $Pod::Query::DEBUG_FIND_DUMP = 1 if $self->_opts->{dump};
     my $pod = $self->_get_pod;
     my @method_names;
 
@@ -856,24 +896,24 @@ sub _get_methods {
         @method_names = $pod->find( "head2" );
     }
     elsif ( $self->_import_class ) {
-        @method_names = sort ( get_full_functions( $self->class ) );
+        @method_names = sort ( get_full_functions( $self->_class ) );
     }
 
     my @methods =
       map { [ $_, scalar $pod->find_method_summary( $_ ) ] } @method_names;
 
     # Cache it in-memory.
-    $self->cache_methods( \@methods );
+    $self->_cache_methods( \@methods );
 
     # Flag that disk cache should be stored later.
-    $self->dirty_cache( 1 );
+    $self->_dirty_cache( 1 );
 
     \@methods;
 }
 
 sub _import_class {
     my ( $self ) = @_;
-    my $class = $self->class;
+    my $class = $self->_class;
 
     # Since ojo imports its DSL into the current package
     eval { eval "package $class; use $class"; };
@@ -913,11 +953,11 @@ sub show_methods {
     if ( @$all_method_names_and_docs and not @all_method_docs ) {
         say _grey(
             "Warning: All methods are undocumented! (reverting to --all)\n" );
-        $self->opts->{all} = 1;
+        $self->_opts->{all} = 1;
     }
 
     my @methods =
-      $self->opts->{all} ? @$all_method_names_and_docs : @all_method_docs;
+      $self->_opts->{all} ? @$all_method_names_and_docs : @all_method_docs;
     my $max    = max 0, map { length _green( $_->[0] ) } @methods;
     my $format = " %-${max}s%s";
     my $size   = @methods;
@@ -931,7 +971,7 @@ sub show_methods {
     }
 
     say _grey( "\nUse --all (or -a) to see all methods." )
-      unless $self->opts->{all};
+      unless $self->_opts->{all};
     say _reset( "" );
 }
 
@@ -944,8 +984,8 @@ Show documentation for a specific module method.
 sub show_method_doc {
     my ( $self ) = @_;
 
-    local $Pod::Query::DEBUG_FIND_DUMP = 1 if $self->opts->{dump};
-    my $doc = $self->_get_pod->find_method( $self->method );
+    local $Pod::Query::DEBUG_FIND_DUMP = 1 if $self->_opts->{dump};
+    my $doc = $self->_get_pod->find_method( $self->_method );
 
     # Color.
     for ( $doc ) {
@@ -993,7 +1033,7 @@ Saves the last class name and its methods/options.
 sub store_cache {
     my ( $self ) = @_;
     my $cache = {
-        class            => $self->class,
+        class            => $self->_class,
         path             => $self->_get_path,
         name_and_summary => $self->_get_name_and_summary,
         isa              => $self->_get_isa,
@@ -1010,7 +1050,7 @@ sub store_cache {
     $path->spurt( j $cache );
 
     # Reset the flag.
-    $self->dirty_cache( 0 );
+    $self->_dirty_cache( 0 );
 
     $cache;
 }
@@ -1024,16 +1064,16 @@ Returns the last stored class cache and its options.
 sub retrieve_cache {
     my ( $self ) = @_;
     my $empty = { class => "" };
-    return $empty if $self->dirty_cache;
+    return $empty if $self->_dirty_cache;
 
     # Use in-memory cache if present.
-    my $mem_cache = $self->cache_from_file;
+    my $mem_cache = $self->_cache_from_file;
     return $mem_cache if $mem_cache;
 
     # Otherwise, go to the actual file.
     my $file = $self->define_last_run_cache_file;
     if ( not -e $file ) {
-        $self->dirty_cache( 1 );
+        $self->_dirty_cache( 1 );
         return $empty;
     }
 
@@ -1041,13 +1081,13 @@ sub retrieve_cache {
     my $disk_cache = j path( $file )->slurp;
 
     # Wrong class.
-    if ( $disk_cache->{class} ne $self->class ) {
-        $self->dirty_cache( 1 );
+    if ( $disk_cache->{class} ne $self->_class ) {
+        $self->_dirty_cache( 1 );
         return $empty;
     }
 
     # Cache it locally
-    $self->cache_from_file( $disk_cache );
+    $self->_cache_from_file( $disk_cache );
 
     $disk_cache;
 }

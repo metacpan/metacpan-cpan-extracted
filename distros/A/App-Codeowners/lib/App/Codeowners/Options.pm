@@ -9,7 +9,7 @@ use Encode qw(decode);
 use Getopt::Long 2.39 ();
 use Path::Tiny;
 
-our $VERSION = '0.50'; # VERSION
+our $VERSION = '0.51'; # VERSION
 
 sub _pod2usage {
     eval { require Pod::Usage };
@@ -54,11 +54,12 @@ sub _command_options {
         },
         'projects'  => {},
         'show'      => {
-            'owner=s@'      => [],
-            'pattern=s@'    => [],
-            'project=s@'    => [],
-            'patterns!'     => 0,
-            'projects!'     => undef,
+            'owner=s@'          => [],
+            'pattern=s@'        => [],
+            'project=s@'        => [],
+            'patterns!'         => 0,
+            'projects!'         => undef,
+            'expand-aliases!'   => 0,
         },
         'update'    => {},
     };
@@ -306,7 +307,7 @@ App::Codeowners::Options - Getopt and shell completion for App::Codeowners
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 METHODS
 

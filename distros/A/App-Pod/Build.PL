@@ -68,9 +68,8 @@ my $builder = $class->new(
     },
     requires => {
         'Module::Functions' => '2.1.3',
-        'Pod::Query'        => '0.24',
-        'Mojolicious'       => '9.19',
         'File::HomeDir'     => '1.006',
+        'Pod::Query'        => '0.25',
     },
     add_to_cleanup => [ 'App-Pod-*', "$ENV{HOME}/.cache/my_pod*.cache", ],
 );

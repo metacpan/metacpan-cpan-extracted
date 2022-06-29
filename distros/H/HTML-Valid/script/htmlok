@@ -7,7 +7,6 @@ use lib '/home/ben/projects/html-valid/blib/lib';
 use lib '/home/ben/projects/html-valid/blib/arch';
 use HTML::Valid 'sanitize_errors';
 use Path::Tiny;
-#use LWP::UserAgent;
 
 # True if we can use the World Wide Web.
 my $webok;
@@ -20,7 +19,6 @@ eval {
 };
 
 if ($@) {
-#    print "$@\n";
     $webok = 0;
 }
 
@@ -31,32 +29,24 @@ while (@ARGV) {
 	my $option = $1;
 	my $value = shift @ARGV;
 	if (! $value) {
-	    print "$file needs a value";
+	    print "$0: $file needs a value";
+	    next;
 	}
 	$htv->set_option ($option, $value);
 	next;
     }
     my $content;
     if (-f $file) {
-	# Yes, Path::Tiny, there is still no flock for NFS on BSD. Thank
-	# you for the information.
-	local $SIG{__WARN__} = sub {};
 	$content = path ($file)->slurp_utf8 ();
 	$htv->set_filename ($file);
     }
     elsif ($webok && is_web_uri ($file)) {
-	print "Getting $file from web.\n";
+	print "$0: Getting '$file' from web.\n";
 	$content = get ($file);
 	if (! $content) {
-	    #		my $ua = LWP::UserAgent->new (agent => "Jeepers, Creepers, where'd ya get those peepers");
-	    #		my $reply = $ua->get ($file);
-	    #		if (! $reply->is_success ()) {
-	    #		    print $reply->status_line (), "\n";
-	    warn "Could not download '$file', skipping.\n";
+	    warn "$0: Could not download '$file', skipping.\n";
 	    next;
 	}
-	#$content = $reply->decoded_content ();
-	#	    }
     }
     else {
 	warn "$0: Cannot find '$file'.\n";
@@ -66,9 +56,7 @@ while (@ARGV) {
     if ($errors) {
 	print sanitize_errors ($errors);
     }
-    $htv->reset ();
 }
-
 
 # Local variables:
 # mode: perl

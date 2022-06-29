@@ -125,7 +125,7 @@ foreach my $cl (
     $status = $testobj->update( $faux_context );
     is( $status->level, 'ERR' );
     is( $status->code, 'DOCHAZKA_DBI_ERR' );
-    like( $status->text, qr/invalid input syntax for integer/ );
+    like( $status->text, qr/invalid input syntax for type integer/ );
     is( $testobj->{$id_map{$cl}}, '-153jjj*' );   # EID is set wrong
     
     note( 'restore object to pristine state' );

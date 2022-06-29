@@ -93,7 +93,7 @@ sub commit
     return( $self );
 }
 
-sub database_object { return( shift->_set_get_object( 'dbo', 'DB::Object', @_ ) ); }
+sub database_object { return( shift->_set_get_object_without_init( 'dbo', 'DB::Object', @_ ) ); }
 
 sub distinct
 {
@@ -216,10 +216,10 @@ sub execute
     $q->final(1) if( $q );
     my @binded = ();
     my @binded_types = ();
-    if( $q && $q->binded_types_as_param->length )
+    if( $q && $q->binded_types->length )
     {
-        $self->messagef( 3, "Query object has %d binded types params and %d binded types.", $q->binded_types_as_param->length, $q->binded_types->length );
         my $types = $q->binded_types_as_param;
+        $self->messagef( 3, "Query object has %d binded types params and %d binded types.", $types->length, $q->binded_types->length );
         @binded_types = @$types;
     }
     
@@ -289,7 +289,9 @@ sub execute
     
     # If there are any array object of some sort provided, make sure they are transformed into a regular array so DBD::Ph can then transform it into a Postgres array.
     for( @binded )
+    # for( my $i = 0; $i < scalar( @binded ); $i++ )
     {
+        # local $_ = $binded[$i];
         if( $self->_is_array( $_ ) && ref( $_ ) ne 'ARRAY' )
         {
             $_ = [ @$_ ];
@@ -305,7 +307,7 @@ sub execute
         }
     }
     
-    $self->message( 3, "Binding '", CORE::join( ', ', @binded ), "' parameters for query: '$self->{query}'." );
+    $self->message( 3, "Binding '", CORE::join( ', ', @binded ), "' with binded types '", CORE::join( "', '", @binded_types ), "' parameters for query: '$self->{query}'." );
     my $rv = 
     eval
     {
@@ -329,9 +331,10 @@ sub execute
             }
             
             my $data_type = $binded_types[ $i ];
+            $self->message( 3, "\$data_type is '$data_type'" );
             if( CORE::length( $data_type ) && $self->_is_hash( $data_type ) )
             {
-                $self->message( 3, "Found binded param for binded value No $i (starting from 0): ", sub{ $self->dump( $data_type ) } );
+                $self->message( 3, "Found binded param for binded value No $i (starting from 0) -> '", $binded[ $i ], "': ", sub{ $self->SUPER::dump( $data_type ) } );
                 $self->{sth}->bind_param( $i + 1, $binded[ $i ], $data_type );
             }
             else
@@ -1044,7 +1047,7 @@ sub promise
 
 sub query { return( shift->_set_get_scalar( 'query', @_ ) ); }
 
-sub query_object { return( shift->_set_get_object( 'query_object', 'DB::Object::Query', @_ ) ); }
+sub query_object { return( shift->_set_get_object_without_init( 'query_object', 'DB::Object::Query', @_ ) ); }
 
 sub query_time { return( shift->_set_get_datetime( 'query_time', @_ ) ); }
 
@@ -1084,7 +1087,7 @@ sub sth { return( shift->_set_get_scalar( 'sth', @_ ) ); }
 
 sub table { return( shift->{table} ); }
 
-sub table_object { return( shift->_set_get_object( 'table_object', 'DB::Object::Tables', @_ ) ); }
+sub table_object { return( shift->_set_get_object_without_init( 'table_object', 'DB::Object::Tables', @_ ) ); }
 
 sub undo
 {

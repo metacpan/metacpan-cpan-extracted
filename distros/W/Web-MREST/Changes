@@ -520,3 +520,13 @@ t/dispatch/param.t: add test cases for 'param/...' resource
 - build/ops: require latest App::CELL
 - Report MREST_DEBUG_MODE setting at startup
 
+0.289 2022-06-29 14:46 CEST
+- cleanup: tweak whitespace in copyright notices
+- bootstrap: add (hopefully self-explanatory) bootstrap scripts
+- doc: Web/MREST.pm: fix error in POD
+- lib: update copyright year range in source files
+- doc: MREST.pm: point readers to CLI documentation
+
+0.290 2022-06-29 14:49 CEST
+- MANIFEST.SKIP: do not include bootstrap scripts in Perl distro
+

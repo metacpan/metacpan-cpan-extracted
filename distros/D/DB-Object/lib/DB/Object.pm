@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object.pm
-## Version v0.10.1
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.10.2
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2021/08/29
+## Modified 2022/03/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -33,7 +33,7 @@ BEGIN
     our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
     our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH, $CACHE_DIR );
     our( $CONSTANT_QUERIES_CACHE, $QUERIES_CACHE );
-    $VERSION     = 'v0.10.1';
+    $VERSION     = 'v0.10.2';
     use Devel::Confess;
 };
 
@@ -272,12 +272,12 @@ sub cache
     return( $self );
 }
 
-sub cache_connections
-{
-    my $self = shift( @_ );
-    $self->{_cache_connections} = shift( @_ ) if( @_ );
-    return( $self->{_cache_connections} );
-}
+sub cache_connections { return( shift->_set_get_boolean( 'cache_connections', @_ ) ); }
+# {
+#     my $self = shift( @_ );
+#     $self->{_cache_connections} = shift( @_ ) if( @_ );
+#     return( $self->{_cache_connections} );
+# }
 
 sub cache_dir { return( shift->_set_get_scalar( 'cache_dir', @_ ) ); }
 
@@ -322,8 +322,9 @@ sub connect
 {
     my $this  = shift( @_ );
     my $class = ref( $this ) || $this;
+    my $opts  = $this->_get_args_as_hash( @_ );
     # We pass the arguments so that debug and other init parameters can be set early
-    my $that  = ref( $this ) ? $this : $this->Module::Generic::new( @_ );
+    my $that  = ref( $this ) ? $this : $this->Module::Generic::new( debug => $opts->{debug} );
     # my $this  = { @_ };
     # print( STDERR "${class}::connect() DEBUG is $DEBUG\n" );
     my $param = $that->_connection_params2hash( @_ ) || return( $self->error( "No valid connection parameters found" ) );
@@ -334,7 +335,7 @@ sub connect
     Pg     => 'DB::Object::Postgres',
     SQLite => 'DB::Object::SQLite',
     };
-    return( $that->error( "No driver was provided." ) ) if( !exists( $param->{ 'driver' } ) );
+    return( $that->error( "No driver was provided." ) ) if( !exists( $param->{driver} ) );
     if( !exists( $driver2pack->{ $param->{driver} } ) )
     {
         return( $that->error( "Driver $param->{driver} is not supported." ) );
@@ -362,7 +363,7 @@ sub connect
     $self->{debug} = CORE::exists( $param->{debug} ) ? CORE::delete( $param->{debug} ) : CORE::exists( $param->{Debug} ) ? CORE::delete( $param->{Debug} ) : $DEBUG;
     $self->{cache_dir} =  CORE::exists( $param->{cache_dir} ) ? CORE::delete( $param->{cache_dir} ) : CORE::exists( $that->{cache_dir} ) ?  $that->{cache_dir} : $CACHE_DIR;
     
-    $param = $self->_check_connect_param( $param ) || return;
+    $param = $self->_check_connect_param( $param ) || return( $self->pass_error );
     $self->message( 3, "Connection parameters are: ", sub{ $self->dump( $param ) } );
     my $opt = {};
     if( exists( $param->{opt} ) )
@@ -370,7 +371,7 @@ sub connect
         $opt = CORE::delete( $param->{opt} );
         $opt = $self->_check_default_option( $opt );
     }
-    $self->message( 3, "\$param returned from _check_connect_param include: ", sub{ $self->dumper( $param ) } );
+    $self->message( 3, "\$param returned from _check_connect_param include: ", sub{ $self->dump( $param ) } );
     ## print( STDERR ref( $self ), "::connect(): \$param is: ", $self->dumper( $param ), "\n" );
     $self->{database} = CORE::exists( $param->{database} ) ? CORE::delete( $param->{database} ) : CORE::exists( $param->{db} ) ? CORE::delete( $param->{db} ) : undef();
     $self->{host} = CORE::exists( $param->{host} ) ? CORE::delete( $param->{host} ) : CORE::exists( $param->{server} ) ? CORE::delete( $param->{server} ) : undef();
@@ -381,6 +382,9 @@ sub connect
     $self->{driver} = CORE::delete( $param->{driver} );
     $self->{cache} = CORE::exists( $param->{use_cache} ) ? CORE::delete( $param->{use_cache} ) : $USE_CACHE;
     $self->{bind} = CORE::exists( $param->{use_bind} ) ? CORE::delete( $param->{use_bind} ) : $USE_BIND;
+    # Needed to be specified if the user does not want to cache connections
+    # Will be used in _dbi_connect()
+    $self->{cache_connections} = CORE::delete( $param->{cache_connections} ) if( CORE::exists( $param->{cache_connections} ) );
     # $self->message( 3, "\$self contains: ", sub{ $self->dump( $self ) } );
     
     ## If parameters starting with an upper case are provided, they are DBI database parameters
@@ -398,7 +402,7 @@ sub connect
     ## print( DEB "DB::Object::connect( '$driver:$db:$server', '$login', '$passwd', '$opt', 'undef()', '$CONNECT_VIA'\n" );
     ## close( DEB );
     $self->message( 3, "Calling _dbi_connect" );
-    my $dbh = $self->_dbi_connect || return;
+    my $dbh = $self->_dbi_connect || return( $self->pass_error );
     $self->{dbh} = $dbh;
     $self->message( 3, "Database handler is: '$dbh'" );
     ## If we are not running under mod_perl, cleanup the database object handle in case it was not shutdown
@@ -747,6 +751,8 @@ sub NULL { return( 'NULL' ); }
 
 sub OR { shift( @_ ); return( DB::Object::OR->new( @_ ) ); }
 
+sub P { shift( @_ ); return( DB::Object::Placeholder->new( @_ ) ); }
+
 sub param
 {
     my $self = shift( @_ );
@@ -830,6 +836,8 @@ sub ping_select(@)
     };
     return( ($@)  ? 0 : $ret );
 }
+
+sub placeholder { shift( @_ ); return( DB::Object::Placeholder->new( @_ ) ); }
 
 sub port { return( shift->_set_get_number( 'port', @_ ) ); }
 
@@ -970,6 +978,7 @@ sub quote
         }
         else
         {
+            $self->message( 3, "Processing string '$str'" );
             $str =~ s/'/''/g; # iso SQL 2
             return( "'$str'" );
         }
@@ -1094,6 +1103,7 @@ sub table
         @$hash{ @new_keys } = @$self{ @new_keys };
         $hash->{dbo} = $self;
         $tbl = $table_class->new( $table, %$hash ) || return( $self->pass_error( $table_class->error ) );
+        $tbl->reset;
         # $tbl->_query_object_get_or_create;
         # $tbl->_reset_query;
         # $self->message( 3, "Newly instantiated table \"$table\" object has alias set to '", $tbl->as, "'" );
@@ -1252,6 +1262,9 @@ sub tables_refresh
     return( wantarray() ? @$tables : $tables );
 }
 
+# Used to flag this as a transaction when begin_work is triggered
+sub transaction { return( shift->_set_get_boolean( 'transaction', @_ ) ); }
+
 sub TRUE { return( 'TRUE' ); }
 
 sub unlock
@@ -1386,11 +1399,28 @@ sub _cache_this
         # $sth = $prepare->( $self, $self->{ 'query' } ) ||
     
         # $sth = $self->prepare_cached( $query ) ||
-        $sth = $self->prepare( $query ) || do
+        my $prepare_options = {};
+        if( $q && $self->_is_a( $q, 'DB::Object::Query' ) )
         {
-            $self->message( 3, "An error occured while preparing the query '$query': ", $self->error );
-            return;
-        };
+            $prepare_options = $q->prepare_options->as_hash;
+            $self->message( 3, "Prepare options are: ", sub{ $self->dump( $prepare_options ) } );
+        }
+        if( scalar( keys( %$prepare_options ) ) )
+        {
+            $sth = $self->prepare( $query, $prepare_options ) || do
+            {
+                $self->message( 3, "An error occured while preparing the query '$query': ", $self->error );
+                return;
+            };
+        }
+        else
+        {
+            $sth = $self->prepare( $query ) || do
+            {
+                $self->message( 3, "An error occured while preparing the query '$query': ", $self->error );
+                return;
+            };
+        }
         # $sth = $self->prepare( $self->{ 'query' } ) ||
         # return( $self->error( "Error while preparing the query on table '$self->{ 'table' }':\n$self->{ 'query' }\n", $self->errstr() ) );
         # Let the proper method set its error text
@@ -1440,12 +1470,13 @@ sub _check_connect_param
     # my @valid = qw( db login passwd host driver database server debug );
     my $valid = $self->_connection_parameters( $param );
     my $opts = $self->_connection_options( $param );
-    $self->message( 3, "Options returned are: ", sub{ $self->dump( $opts ) } );
+    $self->message( 3, "Options returned are: ", sub{ $self->dump( $opts ) }, ", and valud parameters are: ", sub{ $self->dump( $valid ) } );
     foreach my $k ( keys( %$param ) )
     {
         ## If it is not in the list and it does not start with an upper case; those are like RaiseError, AutoCommit, etc
         if( CORE::length( $param->{ $k } ) && !grep( /^$k$/, @$valid ) && !CORE::exists( $opts->{ $k } ) )
         {
+            $self->message( 3, "Parameter '$k' seems invalid. It is not part of valid ones (", sub{ join( "', '", @$valid ) }, ") and not among connection options." );
             return( $self->error( "Invalid parameter '$k'." ) );
         }
     }
@@ -1481,7 +1512,7 @@ sub _connection_parameters
 {
     my $self  = shift( @_ );
     my $param = shift( @_ );
-    return( [qw( db login passwd host port driver database server opt uri debug )] );
+    return( [qw( db login passwd host port driver database server opt uri debug cache_connections )] );
 }
 
 sub _connection_params2hash
@@ -1499,7 +1530,7 @@ sub _connection_params2hash
     else
     {
         my @keys = qw( database login passwd host driver schema );
-        ## Only add in the $param hash the keys value we were given, so we don't create keys entry when not needed
+        # Only add in the $param hash the keys value we were given, so we don't create keys entry when not needed
         for( my $i = 0; $i < scalar( @_ ); $i++ )
         {
             $param->{ $keys[ $i ] } = $_[ $i ];
@@ -1716,7 +1747,7 @@ sub _dbi_connect
     # print( STDERR ref( $self ) . "::_dbi_connect() Options are: ", $self->dumper( $self->{opt} ), "\n" );
     if( $self->{cache_connections} )
     {
-        ## $self->messagef( 3, "Using DBI->connect_cached to connect with dsn '$dsn', login '$self->{login}', password of %d bytes long, and options: %s", CORE::length( $self->{passwd} ), $self->dump( $self->{opt} ) );
+        # $self->messagef( 3, "Using DBI->connect_cached to connect with dsn '$dsn', login '$self->{login}', password of %d bytes long, and options: %s", CORE::length( $self->{passwd} ), $self->dump( $self->{opt} ) );
         $dbh = DBI->connect_cached(
             $dsn,
             $self->{login},
@@ -1728,7 +1759,7 @@ sub _dbi_connect
     }
     else
     {
-        ## $self->messagef( 3, "Using DBI->connect to connect with dsn '$dsn', login '$self->{login}', password of %d bytes long, and options: %s", CORE::length( $self->{passwd} ), $self->dumper( $self->{opt} ) );
+        # $self->messagef( 3, "Using DBI->connect (not cached) to connect with dsn '$dsn', login '$self->{login}', password of %d bytes long, and options: %s", CORE::length( $self->{passwd} ), $self->dumper( $self->{opt} ) );
         $dbh = DBI->connect(
             $dsn,
             $self->{login},
@@ -1917,7 +1948,7 @@ sub _query_type_old
 # XXX INFO: _reset_query needs to reside in DB::Object (called directly by no_bind)
 sub _reset_query
 {
-    my $self  = shift( @_ );
+    my $self = shift( @_ );
     # $self->message( 3, "Called to reset query for table $self->{table} with 'query_reset' value '$self->{query_reset}'." );
     if( !$self->{query_reset} )
     {
@@ -2217,6 +2248,82 @@ BEGIN
 
 sub operator { return( 'OR' ); }
 
+# XXX package DB::Object::Placeholder
+package DB::Object::Placeholder;
+BEGIN
+{
+    use strict;
+    use Module::Generic::Array;
+    use Scalar::Util ();
+    use overload (
+        '""' => 'as_string',
+    );
+    our $REGISTRY = {};
+};
+
+sub new
+{
+    my $that = shift( @_ );
+    my $args = { @_ };
+    my $self = bless( $args => ( ref( $that ) || $that ) );
+    my $addr = Scalar::Util::refaddr( $self );
+    $REGISTRY->{ $addr } = $self;
+    return( $self );
+}
+
+sub as_string
+{
+    my $self = shift( @_ );
+    my $addr = Scalar::Util::refaddr( $self );
+    return( "__PLACEHOLDER__${addr}__" );
+}
+
+sub has
+{
+    my $self = shift( @_ );
+    my $str  = shift( @_ );
+    $str = Scalar::Util::reftype( $str ) eq 'SCALAR' ? $str : \$str;
+    return( CORE::index( $$str, '__PLACEHOLDER__' ) != -1 );
+}
+
+sub replace
+{
+    my $self = shift( @_ );
+    my $str  = shift( @_ );
+    $str = Scalar::Util::reftype( $str ) eq 'SCALAR' ? $str : \$str;
+    return if( !defined( $$str ) || !length( $$str ) );
+    my $types  = Module::Generic::Array->new( [] );
+    my $values = Module::Generic::Array->new( [] );
+    $$str =~ s
+    {
+        __PLACEHOLDER__(\d+)__
+    }
+    {
+        if( exists( $REGISTRY->{ $1 } ) )
+        {
+            my $p = $REGISTRY->{ $1 };
+            push( @$types, $p->type );
+            push( @$values, $p->value );
+        }
+        "?";
+    }gexm;
+    return( wantarray() ? ( $types, $$str ) : $types );
+}
+
+sub type
+{
+    my $self = shift( @_ );
+    $self->{type} = shift( @_ ) if( @_ );
+    return( $self->{type} );
+}
+
+sub value
+{
+    my $self = shift( @_ );
+    $self->{value} = shift( @_ ) if( @_ );
+    return( $self->{value} );
+}
+
 1;
 
 # XXX POD
@@ -2348,9 +2455,16 @@ Using a promise (L<Promise::Me>) to execute an asynchronous query:
     # Get the My::Module object
     my( $obj ) = await( $p );
 
+Sometimes, having placeholders in expression makes it difficult to work, so you can use placeholder objects to make it work:
+
+	my $P = $dbh->placeholder( type => 'inet' );
+    $orders_tbl->where( $dbh->OR( $orders_tbl->fo->ip_addr == "inet $P", "inet $P" << $orders_tbl->fo->ip_addr ) );
+    my $order_ip_sth = $orders_tbl->select( 'id' ) || fail( "An error has occurred while trying to create a select by ip query for table orders: " . $orders_tbl->error );
+    # SELECT id FROM orders WHERE ip_addr = inet ? OR inet ? << ip_addr
+
 =head1 VERSION
 
-    v0.10.1
+    v0.10.2
 
 =head1 DESCRIPTION
 
@@ -2387,13 +2501,27 @@ Create a new instance of L<DB::Object>. Nothing much to say.
 
 =head2 connect
 
-Provided with a C<database>, C<login>, C<password>, C<server>:[C<port>], C<driver>, C<schema>, and optional hash or hash reference of parameters and this will issue a database connection and return the resulting database handler.
+Provided with a C<database>, C<login>, C<password>, C<server>:[C<port>], C<driver>, C<schema>, and optional hash or hash reference of parameters and this will issue a, possibly cached, database connection and return the resulting database handler.
 
 Create a new instance of L<DB::Object>, but also attempts a connection to SQL server.
 
-It can take either an array of value in the order database name, login, password, host, driver and optionally schema, or it can take a has or hash reference. The hash or hash reference attributes are as follow:
+It can take either an array of value in the order database name, login, password, host, driver and optionally schema, or it can take a has or hash reference. The hash or hash reference attributes are as follow.
+
+Note that if you provide connection options that are not among the followings, this will return an error.
 
 =over 4
+
+=item I<cache_connections>
+
+Defaults to true.
+
+If true, this will instruct L<DBI> to use L<DBI/connect_cached> instead of just L<DBI/connect>
+
+Beware that using cached connections can have some drawbacks, such as if you open a cached connection, enters into a transaction using L<DB::Object/begin_work>, then somewhere else in your code a call to a cached connection using the same parameters, which L<DBI> will provide, but will reset the database handler parameters, including the C<AutoCommit> that will have been temporarily set to false when you called L</begin_work>, and then you close your transaction by calling L</rollback> or L</commit>, but it will trigger an error, because C<AutoCommit> will have been reset on this cached connection to a true value. L</rollback> and L</commit> require that C<AutoCommit> be disabled, which L</begin_work> normally do.
+
+Thus, if you want to avoid using a cached connection, set this to false.
+
+More on this issue at L<DBI documentation|https://metacpan.org/pod/DBI#connect_cached>
 
 =item I<database> or I<DB_NAME>
 
@@ -3012,6 +3140,10 @@ Returns a new L<DB::Object::OR> object, passing it whatever arguments were provi
 
 See L<DB::Object::Tables/order>
 
+=head2 P
+
+Returns a L<DB::Object::Placeholder> object, passing it whatever arguments was provided.
+
 =head2 param
 
 If only a single parameter is provided, its value is return. If a list of parameters is provided they are set accordingly using the C<SET> sql command.
@@ -3067,6 +3199,10 @@ Evals a SELECT 1 statement and returns 0 if errors occurred or the return value.
 =head2 ping_select
 
 Will prepare and execute a simple C<SELECT 1> and return 0 upon failure or return the value returned from calling L<DBI/execute>.
+
+=head2 placeholder
+
+Same as L</P>. Returns a L<DB::Object::Placeholder> object, passing it whatever arguments was provided.
 
 =head2 port
 
@@ -3183,6 +3319,10 @@ Returns the list of table in list context or a reference of it in scalar context
 =head2 tie
 
 See L<DB::Object::Tables/tie>
+
+=head2 transaction
+
+True when a transaction has been started with L</begin_work>, false otherwise.
 
 =head2 TRUE
 

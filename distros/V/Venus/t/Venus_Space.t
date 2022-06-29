@@ -5,10 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
 use Test::More;
-use Test::Venus;
+use Venus::Test;
 use File::Temp;
 
 my $test = test(__FILE__);
@@ -82,6 +80,7 @@ method: scalar
 method: scalars
 method: sibling
 method: siblings
+method: splice
 method: tryload
 method: use
 method: used
@@ -2411,6 +2410,113 @@ $test->for('example', 1, 'siblings', sub {
   $result
 });
 
+=method splice
+
+The splice method perform a Perl L<perlfunc/splice> operation on the package
+namespace.
+
+=signature splice
+
+  splice(Int $offset, Int $length, Any @list) (Space)
+
+=metadata splice
+
+{
+  since => '0.09',
+}
+
+=example-1 splice
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/baz');
+
+  my $splice = $space->splice(1, 0, 'bar');
+
+  # bless({ value => "Foo/Bar/Baz" }, "Venus::Space")
+
+=cut
+
+$test->for('example', 1, 'splice', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Space');
+  ok "$result" eq "Foo::Bar::Baz";
+
+  $result
+});
+
+=example-2 splice
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/baz');
+
+  my $splice = $space->splice(1, 1);
+
+  # bless({ value => "Foo" }, "Venus::Space")
+
+=cut
+
+$test->for('example', 2, 'splice', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Space');
+  ok "$result" eq "Foo";
+
+  $result
+});
+
+=example-3 splice
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/baz');
+
+  my $splice = $space->splice(-2, 1);
+
+  # bless({ value => "Baz" }, "Venus::Space")
+
+=cut
+
+$test->for('example', 3, 'splice', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Space');
+  ok "$result" eq "Baz";
+
+  $result
+});
+
+=example-4 splice
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/baz');
+
+  my $splice = $space->splice(1);
+
+  # bless({ value => "Foo" }, "Venus::Space")
+
+=cut
+
+$test->for('example', 4, 'splice', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Space');
+  ok "$result" eq "Foo";
+
+  $result
+});
+
 =method tryload
 
 The tryload method attempt to C<load> the represented package using the
@@ -2783,20 +2889,6 @@ $test->for('example', 2, 'version', sub {
 
   $result
 });
-
-=license
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-=cut
-
-=authors
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
 
 # END
 

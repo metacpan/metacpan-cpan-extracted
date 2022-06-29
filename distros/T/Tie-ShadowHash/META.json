@@ -1,0 +1,51 @@
+{
+   "abstract" : "Merge multiple data sources into a hash",
+   "author" : [
+      "Russ Allbery <rra@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Tie-ShadowHash",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.024"
+         }
+      }
+   },
+   "provides" : {
+      "Tie::ShadowHash" : {
+         "file" : "lib/Tie/ShadowHash.pm",
+         "version" : "2.00"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rra/shadowhash/issues"
+      },
+      "homepage" : "https://www.eyrie.org/~eagle/software/shadowhash",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/rra/shadowhash.git",
+         "web" : "https://github.com/rra/shadowhash"
+      }
+   },
+   "version" : "2.00",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

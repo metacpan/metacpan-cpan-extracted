@@ -1,21 +1,27 @@
---- #YAML:1.0
-name:               Tie-ShadowHash
-version:            1.00
-abstract:           Merge multiple data sources into a hash
+---
+abstract: 'Merge multiple data sources into a hash'
 author:
-    - Russ Allbery <rra@stanford.edu>
-license:            perl
-distribution_type:  module
+  - 'Russ Allbery <rra@cpan.org>'
+build_requires: {}
 configure_requires:
-    ExtUtils::MakeMaker:  0
-build_requires:
-    ExtUtils::MakeMaker:  0
-requires:  {}
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.55_02
+  Module::Build: '0.28'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-ShadowHash
+provides:
+  Tie::ShadowHash:
+    file: lib/Tie/ShadowHash.pm
+    version: '2.00'
+requires:
+  perl: '5.024'
+resources:
+  bugtracker: https://github.com/rra/shadowhash/issues
+  homepage: https://www.eyrie.org/~eagle/software/shadowhash
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/rra/shadowhash.git
+version: '2.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

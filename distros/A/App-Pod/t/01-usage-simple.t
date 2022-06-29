@@ -5,10 +5,20 @@ use warnings;
 use Test::More;
 use Term::ANSIColor       qw( colorstrip );
 use File::Spec::Functions qw( catfile );
+use FindBin               qw( $RealDir );
 
-#TODO: Remove this debug code !!!
-use feature    qw(say);
-use Mojo::Util qw(dumper);
+sub _dumper {
+    require Data::Dumper;
+    my $data = Data::Dumper
+      ->new( [@_] )
+      ->Indent( 1 )
+      ->Sortkeys( 1 )
+      ->Terse( 1 )
+      ->Useqq( 1 )
+      ->Dump;
+    return $data if defined wantarray;
+    say $data;
+}
 
 BEGIN {
     use_ok( 'App::Pod' ) || print "Bail out!\n";
@@ -26,7 +36,10 @@ diag( "Testing App::Pod $App::Pod::VERSION, Perl $], $^X" );
     *Pod::Query::get_term_width = sub { 56 };    # Match android.
 }
 
-my $sample_pod = catfile( qw( t ex_Mojo_UserAgent.pm ) );
+
+my $sample_pod = catfile( $RealDir, qw( pod Mojo_UserAgent.pm ) );
+
+ok( -f $sample_pod, "pod file exists: $sample_pod" );
 
 my @cases = (
 
@@ -725,9 +738,9 @@ my $is_version    = qr/ \b \d+\.\d+  $ /x;
 my $is_cache_path = qr/ "cache_path" \s+ => \K \s+ ".*" /x;
 
 for my $case ( @cases ) {
-    my $input = join( "", $case->{input}->@* ) // "";
     local @ARGV = ( $case->{input}->@* );
-    my $out = "";
+    my $input = "@ARGV";
+    my $out   = "";
 
     # Capture output.
     {
@@ -750,17 +763,14 @@ for my $case ( @cases ) {
         s/$is_cache_path/ "PATH"/g;
     }
 
-    my $need = $case->{expected_output};
-    my $name = $case->{name};
-
-    # Version check
+    # Normalize Version
     if ( "$input" eq "--version" ) {
         $lines[0] =~ s/$is_version/<VERSION>/;
     }
 
-    say dumper \@lines
-      unless is_deeply \@lines, $need, "$name";
+    say STDERR _dumper \@lines
+      unless is_deeply( \@lines, $case->{expected_output}, $case->{name} );
 }
 
-done_testing( 32 );
+done_testing( 33 );
 

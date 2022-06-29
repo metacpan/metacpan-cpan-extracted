@@ -9,6 +9,13 @@ Web::MREST::CLI
 
 CLI components for Web::MREST
 
+Running from source for the first time
+======================================
+
+To ease the pain of bootstrapping ``Web::MREST::CLI`` (running it for the first
+time from source in a given environment), a set of bootstrap scripts are
+provided in the git repo.
+
 Documentation
 =============
 

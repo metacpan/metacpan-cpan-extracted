@@ -261,6 +261,8 @@ sub fields_object
     my $self = shift( @_ );
     my $o = $self->{fields_object};
     $self->message( 3, "Do we already have a fields object? '$o' for table '$self->{table}'" );
+    # This will make sure we have a query object which DB::Object::Fields and DB::Object::Field need
+    $self->_reset_query;
     if( $o && $self->_is_object( $o ) )
     {
         $o->prefixed( $self->{prefixed} );
@@ -432,6 +434,8 @@ sub prefix
     my $self = shift( @_ );
     my @val = ();
     my $alias = $self->query_object->table_alias;
+    #my $q = $self->query_object || die( "No query object could be created or gotten: ", $self->error );
+    #my $alias = $q->table_alias;
     $self->message( 3, "\"prefixed\" set to '$self->{prefixed}'. Is table alias set for table '$self->{table}'? -> '$alias'." );
     return( $alias ) if( $alias && $self->{prefixed} > 0 );
     CORE::push( @val, $self->database_object->database ) if( $self->{prefixed} > 2 );
@@ -478,6 +482,22 @@ sub primary
 sub qualified_name { return( shift->name ); }
 
 sub query_object { return( shift->_set_get_object_without_init( 'query_object', 'DB::Object::Query', @_ ) ); }
+# sub query_object { return( shift->_query_object_get_or_create ); }
+# sub query_object
+# {
+#     my $self = shift( @_ );
+#     if( @_ )
+#     {
+#         return( $self->_set_get_object_without_init( 'query_object', 'DB::Object::Query', @_ ) );
+#     }
+#     else
+#     {
+#         return( $self->{query_object} ) if( $self->{query_object} );
+#         my $o = $self->_query_object_get_or_create || return( $self->pass_error );
+#         return( $self->{query_object} = $o );
+#     }
+# }
+
 # XXX For debugging purpose, I am temporarily changing the query_object sub to find out who is calling
 # sub query_object
 # {

@@ -1,5 +1,12 @@
 Revision history for Alien-CFITSIO
 
+v4.1.0.5  2022-06-27 17:33:54-04:00 America/New_York
+
+  [BUG FIX]
+
+    * alienfile: don't use privte method to create around hook
+    * alienfile: handle non-existent patch directory
+
 v4.1.0.4  2022-06-22 18:02:23-04:00 America/New_York
 
   [PACKAGING]

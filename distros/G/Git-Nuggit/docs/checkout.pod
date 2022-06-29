@@ -1,0 +1,85 @@
+=head1 NAME
+
+nuggit checkout
+
+=head1 SYNOPSIS
+
+nuggit checkout [options] obj
+
+obj can be any branch, tag, or SHA.  This may be omitted when '--safe' is specified to attempt to resolve detached HEADs and inconsistent branch names only.
+
+ Options:
+   --help            brief help message
+   --man             full documentation
+   --safe            Only checkout branch in submodules if doing so does not move the current HEAD
+   -b                Create a new branch and check it out.
+
+=head1 DESCRIPTION
+
+B<ngt checkout> is a wrapper to 'git checkout' with added functionality for submodule-based workflows.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--help>
+
+Print a brief help message and exits.
+
+=item B<--man>
+
+Print a brief help message and exits.
+
+=item B<-b>, B<--create>
+
+Create a new branch with the specified name. This commmand will abort with an error if the branch already exists at the root repository.  
+
+It will perform a safe checkout of the new branch in all submodules. This will checkout the branch if it already exists at the current HEAD for this submodule, or creates it if the branch does not exist.  Any errors in submodules will be reported, but will not cause this command to abort. 
+
+If this is the case, rerun without the '-b' option to retry after resolving any reported errors as applicable.
+
+
+=item B<--safe>
+
+Checkout the given $branch at the root repository and all submodules, providing that doing so does not affect the currently checked out revision.  If $branch is omitted, the root repository branch name will be assummed.
+
+This flag is used to resolve detached HEADs, or to restore consistency if submodules are not on a consistent branch.  If it is not safe to checkout the specified branch for a submodule in a detached HEAD state, this command will attempt to checkout the first matching branch it identifies pointing to the current HEAD.
+
+A summary will be displayed of any submodules that could not be safely checked out and currently exist in a detached HEAD state, or on a branch differing from the root repository.
+
+
+Note: The safe operation is not valid in conjunction with a filename, tag or SHA commit reference.  Behavior in these conditions is undefined and error detection is not guaranteed.
+
+
+=item B<--no-auto-create>
+
+The default behavior is for branches to be automatically created in all submodules, when it is safe to do so, for all checkout commands.  If no-auto-create is specified, branch creation will be bypassed for 'checkout --safe' operations and during nominal 'checkout $branch' operations (ref-first strategy only).
+
+=item B<--strategy ref|branch>, B<--branch-first>, B<--ref-first>
+
+Strategy applies to all nuggit checkout operations with the exception of branch creation ('checkout -b').
+
+Nuggit operations default to the 'ref-first' strategy.  In this mode, the root repository will be checked out first as requested.  Nuggit will then recurse into each submodule whose currently checked out HEAD differs from the committed reference, and will attempt to checkout the incoming reference.  This is equivalent to "git submodule update --checkout".  The operation will conclude with an automatic 'checkout --safe' to resolve any detached HEADs.  Nuggit will conclude with a summary of any submodules that could not be checked out, or could not be safely swithched to a known branch.
+
+Using the ref-first strategy, it is possible to checkout any branch, tag, or SHA commit that is valid in the root repository.  Note: As with native git commands, it is expected for checkouts of tags or commits to result in detached HEAD states.  In such cases, it is recommended to immediately create a new branch to avoid confusion ('ngt checkout -b newbranch').
+
+Using the 'branch-first' strategy, the specified branch will be checked out at the root repository, and in all submodules.  SHA commits may not be checked out using the branch-first strategy.  Checkout of tags in this mode is possible, but not recommended.
+
+
+See ngt-ops(1) for additional details on nuggit operations strategy.
+
+=item B<--default>
+
+This flag is only valid in conjunction with branch-first strategy (ie: '--branch-first --default').
+
+The default branch is the remote tracking branch defined in the submodule definition (.gitmodules), or the remote repository's default HEAD otherwise.
+
+If specified in place of a branch name, perform a checkout of the default branch at all levels.
+
+=item B<--file>
+
+This flag is intended to assist with restoring deleted or moved files.  For example, "ngt checkout foo/bar/file.txt" will result in ngt cd'ing to 'foo/bar' and performing a 'git checkout file.txt'.  
+
+This flag simulates the nominal check for file existence that would normally proceed this action.  Usage of this flag with a non-file argument may have indeterminate behavior.
+
+=back

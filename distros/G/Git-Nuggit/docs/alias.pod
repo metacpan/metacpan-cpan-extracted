@@ -1,0 +1,58 @@
+=head1 SYNOPSIS
+
+nuggit [user-defined] [args]
+
+FUTURE: 'nuggit alias' command will enable listing and editing of defined nuggit aliases.
+
+=head1 DESCRIPTION
+
+Nuggit now supports user-defined aliases.  These alises will always be executed by nuggit from the project's root directory, or a user-specified folder relative to it.
+
+Aliases are defined in .nuggit/config.json as the "aliases" object.  At present, this file must be edited by hand.
+
+The key in the aliases array is the command given to nuggit, such as 'ngt foo'.  The value is either a string defining the command to be executed, or an object defining 'cmd' and any of the additional options listed below.
+
+=over 4
+
+=item cmd
+
+The command to be executed
+
+=item dir
+
+The directory for the command to be executed from, relative to the top of the root repository. If omitted, the command will always be executed in that root directory.
+
+=item log_file namePrefix
+
+If specified, all output will be saved to log files of the form $namePrefix.stdout.log and $namePrefix.stderr.log in the working directory for this command.  This prefix may specify an alternate relative or absolute path for log files to be saved.
+
+If the command exits with an error code, only the contents of STDERR will be output to the shell.  This is often useful when viewing output to build commands.
+
+At this time, when logging is enabled, ngt is unable to combine stdout and stderr messages.
+
+
+=item log level
+
+This enables logging of the command with the main nuggit logs.  A value of 1 is typical for standard logginc.  A value of 0 will disable logging, while also suppressing output from the shell if the command exits without an error. 
+
+=back
+
+=head1 EXAMPLE
+
+Define a .nuggit.config.json file containing
+
+{
+    "aliases" : {
+        "dkrbuild" : "docker run -it -v ${PWD}:/src:delegated -w /foo/simbar/build gcc make",
+        "build" : {
+            "cmd" : "make",
+            "dir" : "foo/bar/build",
+            "log_file" : "make"
+        }
+    }
+}
+
+
+Using the above example, one could run 'ngt dkrbuild' from any place in the project tree to execute the specified build command through Docker.  In this non-logged form, all command output will be echoed in the shell.
+
+Alternatively, "ngt build" would run a simple 'make' command in the specified folder and output the results to 'make.stdout.log' and 'make.stderr.log'.  In the event of an error, stderr will be output to the shell, otherwise only a status message will be shown indicating the command that has been executed and it's successful completion.

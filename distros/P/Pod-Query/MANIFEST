@@ -15,5 +15,6 @@ t/06-class_to_path.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+t/pod/Mojo_UserAgent.pm
 t/Role/Test/Module.pm
 xt/boilerplate.t

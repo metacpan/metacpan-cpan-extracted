@@ -1,12 +1,15 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Cache/Tables.pm
-## Version v0.100.2
+## Version v0.100.3
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2020/05/22
+## Modified 2021/09/04
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package DB::Object::Cache::Tables;
 BEGIN
@@ -18,7 +21,7 @@ BEGIN
     use Fcntl qw( :flock );
     use Module::Generic::File qw( sys_tmpdir );
     use Devel::Confess;
-    our $VERSION = 'v0.100.2';
+    our $VERSION = 'v0.100.3';
 };
 
 sub init
@@ -165,12 +168,12 @@ sub write
         $fh->autoflush(1);
         eval
         {
-            $tables_cache_file->lock( LOCK_EX );
+            $tables_cache_file->lock( LOCK_SH );
         };
         $fh->print( $j->encode( $hash ) ) || return( $self->error( "Unable to write data to tables cache file \"$tables_cache_file\": $!" ) );
         eval
         {
-            $tables_cache_file->lock( LOCK_UN );
+            $tables_cache_file->unlock;
         };
         $self->updated( $tables_cache_file->finfo->mtime );
         return( -s( $tables_cache_file ) );
@@ -227,7 +230,7 @@ DB::Object::Cache::Tables - Table Cache
     
 =head1 VERSION
 
-    v0.100.2
+    v0.100.3
 
 =head1 DESCRIPTION
 

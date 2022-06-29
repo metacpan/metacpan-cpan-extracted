@@ -48,11 +48,11 @@
    "provides" : {
       "Array::Sample::SimpleRandom" : {
          "file" : "lib/Array/Sample/SimpleRandom.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Array::Sample::SimpleRandom::Scan" : {
          "file" : "lib/Array/Sample/SimpleRandom/Scan.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -67,7 +67,7 @@
          "web" : "https://github.com/perlancar/perl-Array-Sample-SimpleRandom"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

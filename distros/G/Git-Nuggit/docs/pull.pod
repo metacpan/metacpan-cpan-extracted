@@ -1,0 +1,74 @@
+=head1 SYNOPSIS
+
+nuggt pull [options] [remote] [branch]
+
+Perform a submodule-aware merge.
+
+Options:
+   --help            brief help message
+   --man             full documentation
+
+=head1 DESCRIPTION
+
+nuggit pull [options]
+
+This script performs a submodule-aware pull, automatically recursing into and resolving submodule reference-only conflicts as appropriate.
+
+This application defaults to the 'ref-first' strategy for pull operations.  See strategy option below and ngt-ops(1) for additional details on strategy.  
+
+
+Refer to nuggit merge or rebase commands for additional details.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--help>
+
+Print a brief help message and exits.
+
+
+=item B<--man>
+
+Print a brief help message and exits.
+
+
+=item B<--ngtstrategy ref|branch>, B<--branch-first>, B<--ref-first>
+
+Nuggit operations default to the 'ref-first' strategy.  
+
+In this mode, the root repository will be pulled first.  Nuggit will then recurse into each submodule whose currently checked out HEAD differs from the committed reference, and will attempt to merge the incoming reference.  This is equivalent to "git submodule update --merge", or '--rebase' if the '--rebase' flag was specified.
+
+Using the 'branch-first' strategy, 'git pull' will be effectively executed across all submodules.  In this mode, committed submodule references are ignored.
+
+In all cases, nuggit will automatically commit any submodule references that have been updated as a result of this operation.
+
+
+See ngt-ops(1) for additional details on nuggit operations strategy.
+
+
+=item B<--default>
+
+This flag is only valid in conjunction with branch-first strategy (ie: '--branch-first --default').
+
+The default branch is the remote tracking branch defined in the submodule definition (.gitmodules), or the remote repository's default HEAD otherwise.
+
+If specified, explicitly perform a pull of the origin's default branch in each repository.  This is equivalent to running "git pull origin $default" where $default is determined independently for each submodule.
+
+
+=item B<--rebase>
+
+This flag instructs git to utilize rebase instead of merge functionality when bringing in remote changes.
+
+If specified, this flag will be passed to the underlyig 'git pull' command, or as the operation to 'submodule update' for subodules in ref-first mode.
+
+
+=item B<--remote> $remote
+
+Explicitly specify the remote to pull from.
+
+=back
+
+=head1 SEE ALSO
+
+ngt-merge(1), ngt-rebase(1), ngt(1)

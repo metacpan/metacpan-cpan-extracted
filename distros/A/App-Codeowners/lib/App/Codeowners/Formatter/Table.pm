@@ -5,7 +5,7 @@ package App::Codeowners::Formatter::Table;
 use warnings;
 use strict;
 
-our $VERSION = '0.50'; # VERSION
+our $VERSION = '0.51'; # VERSION
 
 use parent 'App::Codeowners::Formatter';
 
@@ -39,7 +39,7 @@ App::Codeowners::Formatter::Table - Format codeowners output as a table
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 DESCRIPTION
 

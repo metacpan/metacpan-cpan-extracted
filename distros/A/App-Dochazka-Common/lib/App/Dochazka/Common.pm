@@ -1,5 +1,5 @@
 # ************************************************************************* 
-# Copyright (c) 2014-2015, SUSE LLC
+# Copyright (c) 2014-2020, SUSE LLC
 # 
 # All rights reserved.
 # 
@@ -55,11 +55,11 @@ App::Dochazka::Common - Dochazka Attendance and Time Tracking System shared modu
 
 =head1 VERSION
 
-Version 0.209
+Version 0.210
 
 =cut
 
-our $VERSION = '0.209';
+our $VERSION = '0.210';
 
 
 
@@ -87,8 +87,8 @@ implemented by this module:
 
 =over
 
-##=item * Policy (parameters set when database is first created)
-##
+=item * Policy (parameters set when database is first created)
+
 =item * Employee (an individual employee)
 
 =item * Privhistory (history of changes in an employee's privilege level)
@@ -110,32 +110,32 @@ implemented by this module:
 These classes are described in the following sections.
 
 
-##=head2 Policy
-##
-##Dochazka is configurable in a number of ways. Some configuration parameters
-##are set once at installation time and, once set, can never be changed --
-##these are referred to as "site policy" parameters.  Others, referred to as
-##"site configuration parameters" or "site params", are set in configuration
-##files such as C<Dochazka_SiteConfig.pm> (see L</SITE CONFIGURATION>) and
-##can be changed more-or-less at will.
-##
-##The key difference between site policy and site configuration is that 
-##site policy parameters cannot be changed, because changing them would
-##compromise the referential integrity of the underlying database. 
-##
-##Site policy parameters are set at installation time and are stored, as a
-##single JSON string, in the C<SitePolicy> table. This table is rendered
-##effectively immutable by a trigger.
-##
-##For details, see L<App::Dochazka::REST::Model::Policy>.
+=head2 Policy
+
+Dochazka is configurable in a number of ways. Some configuration parameters
+are set once at installation time and, once set, can never be changed --
+these are referred to as "site policy" parameters.  Others, referred to as
+"site configuration parameters" or "site params", are set in configuration
+files such as C<Dochazka_SiteConfig.pm> (see L</SITE CONFIGURATION>) and
+can be changed more-or-less at will.
+
+The key difference between site policy and site configuration is that
+site policy parameters cannot be changed, because changing them would
+compromise the referential integrity of the underlying database.
+
+Site policy parameters are set at installation time and are stored, as a
+single JSON string, in the C<Policy> table. This table is rendered
+effectively immutable by a trigger.
+
+For details, see L<App::Dochazka::REST::Model::Policy>.
 
 
 =head2 Employee
 
-Users of Dochazka are referred to as "employees" regardless of their 
+Users of Dochazka are referred to as "employees" regardless of their
 legal status -- in reality they might be independent contractors, or
 students, or even household pets, but as far as Dochazka is concerned they
-are employees. You could say that "employee" is the Dochazka term for "user". 
+are employees. You could say that "employee" is the Dochazka term for "user".
 
 The purpose of the Employee table/object is to store whatever data the site
 is accustomed to use to identify its employees.
@@ -189,7 +189,7 @@ data
 =back
 
 Dochazka's C<privhistory> object is used to track changes in an employee's
-privilege level over time. Each time an employee's privilege level changes, 
+privilege level over time. Each time an employee's privilege level changes,
 a Dochazka administrator (i.e., an employee whose current privilege level is
 'admin'), a record is inserted into the database (in the C<privhistory>
 table). Ordinary employees (i.e. those whose current privilege level is

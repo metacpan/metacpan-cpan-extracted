@@ -120,10 +120,18 @@ execute an asynchronous query:
         # Get the My::Module object
         my( $obj ) = await( $p );
 
+Sometimes, having placeholders in expression makes it difficult to work,
+so you can use placeholder objects to make it work:
+
+            my $P = $dbh->placeholder( type => 'inet' );
+        $orders_tbl->where( $dbh->OR( $orders_tbl->fo->ip_addr == "inet $P", "inet $P" << $orders_tbl->fo->ip_addr ) );
+        my $order_ip_sth = $orders_tbl->select( 'id' ) || fail( "An error has occurred while trying to create a select by ip query for table orders: " . $orders_tbl->error );
+        # SELECT id FROM orders WHERE ip_addr = inet ? OR inet ? << ip_addr
+
 VERSION
 =======
 
-        v0.9.16
+        v0.10.2
 
 DESCRIPTION
 ===========
@@ -183,8 +191,8 @@ connect
 
 Provided with a `database`, `login`, `password`, `server`:\[`port`\],
 `driver`, `schema`, and optional hash or hash reference of parameters
-and this will issue a database connection and return the resulting
-database handler.
+and this will issue a, possibly cached, database connection and return
+the resulting database handler.
 
 Create a new instance of
 [DB::Object](https://metacpan.org/pod/DB::Object){.perl-module}, but
@@ -192,7 +200,46 @@ also attempts a connection to SQL server.
 
 It can take either an array of value in the order database name, login,
 password, host, driver and optionally schema, or it can take a has or
-hash reference. The hash or hash reference attributes are as follow:
+hash reference. The hash or hash reference attributes are as follow.
+
+Note that if you provide connection options that are not among the
+followings, this will return an error.
+
+*cache\_connections*
+
+:   Defaults to true.
+
+    If true, this will instruct
+    [DBI](https://metacpan.org/pod/DBI){.perl-module} to use
+    [\"connect\_cached\" in
+    DBI](https://metacpan.org/pod/DBI#connect_cached){.perl-module}
+    instead of just [\"connect\" in
+    DBI](https://metacpan.org/pod/DBI#connect){.perl-module}
+
+    Beware that using cached connections can have some drawbacks, such
+    as if you open a cached connection, enters into a transaction using
+    [\"begin\_work\" in
+    DB::Object](https://metacpan.org/pod/DB::Object#begin_work){.perl-module},
+    then somewhere else in your code a call to a cached connection using
+    the same parameters, which
+    [DBI](https://metacpan.org/pod/DBI){.perl-module} will provide, but
+    will reset the database handler parameters, including the
+    `AutoCommit` that will have been temporarily set to false when you
+    called [\"begin\_work\"](#begin_work){.perl-module}, and then you
+    close your transaction by calling
+    [\"rollback\"](#rollback){.perl-module} or
+    [\"commit\"](#commit){.perl-module}, but it will trigger an error,
+    because `AutoCommit` will have been reset on this cached connection
+    to a true value. [\"rollback\"](#rollback){.perl-module} and
+    [\"commit\"](#commit){.perl-module} require that `AutoCommit` be
+    disabled, which [\"begin\_work\"](#begin_work){.perl-module}
+    normally do.
+
+    Thus, if you want to avoid using a cached connection, set this to
+    false.
+
+    More on this issue at [DBI
+    documentation](https://metacpan.org/pod/DBI#connect_cached){.perl-module}
 
 *database* or *DB\_NAME*
 
@@ -1566,7 +1613,7 @@ SEE ALSO
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x5573a19393e8)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x557467ec43f8)"}\>
 
 COPYRIGHT & LICENSE
 ===================

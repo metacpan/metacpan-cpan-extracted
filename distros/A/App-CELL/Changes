@@ -906,3 +906,11 @@ later are in the perl-CELL project repo.
 - Qualify all calls to CORE::caller()
 - t/034-status-dump.t: use Test::Output
 
+0.230 2022-06-28 11:18 CEST
+- CONTRIBUTING.rst: add new file
+- bootstrap.sh: add new file and update README.rst
+
+0.231 2022-06-28 12:05 CEST
+- MANIFEST.SKIP: add bootstrap.sh
+- bootstrap.sh: install cpanspec package
+

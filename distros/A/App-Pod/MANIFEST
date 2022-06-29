@@ -10,8 +10,8 @@ META.yml
 README
 t/00-load.t
 t/01-usage-simple.t
-t/ex_Mojo_UserAgent.pm
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+t/pod/Mojo_UserAgent.pm
 xt/boilerplate.t

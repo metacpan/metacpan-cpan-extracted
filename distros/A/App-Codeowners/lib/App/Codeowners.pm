@@ -10,10 +10,10 @@ use App::Codeowners::Formatter;
 use App::Codeowners::Options;
 use App::Codeowners::Util qw(find_codeowners_in_directory run_git git_ls_files git_toplevel);
 use Color::ANSI::Util 0.03 qw(ansifg);
-use File::Codeowners;
+use File::Codeowners 0.54;
 use Path::Tiny;
 
-our $VERSION = '0.50'; # VERSION
+our $VERSION = '0.51'; # VERSION
 
 
 sub main {
@@ -43,7 +43,8 @@ sub _command_show {
 
     my $codeowners_path = find_codeowners_in_directory($toplevel)
         or die "No CODEOWNERS file in $toplevel\n";
-    my $codeowners = File::Codeowners->parse_from_filepath($codeowners_path);
+    local $ENV{GIT_CODEOWNERS_ALIASES} = 1 if $opts->{expand_aliases};
+    my $codeowners = $self->_parse_codeowners($codeowners_path);
 
     my ($proc, $cdup) = run_git(qw{rev-parse --show-cdup});
     $proc->wait and exit 1;
@@ -67,7 +68,8 @@ sub _command_show {
 
     $proc = git_ls_files('.', $opts->args);
     while (my $filepath = $proc->next) {
-        my $match = $codeowners->match(path($filepath)->relative($cdup));
+        my $match = $codeowners->match(path($filepath)->relative($cdup),
+            expand => $opts->{expand_aliases});
         if (%filter_owners) {
             for my $owner (@{$match->{owners}}) {
                 goto ADD_RESULT if $filter_owners{$owner};
@@ -101,7 +103,7 @@ sub _command_owners {
 
     my $codeowners_path = find_codeowners_in_directory($toplevel)
         or die "No CODEOWNERS file in $toplevel\n";
-    my $codeowners = File::Codeowners->parse_from_filepath($codeowners_path);
+    my $codeowners = $self->_parse_codeowners($codeowners_path);
 
     my $results = $codeowners->owners($opts->{pattern});
 
@@ -121,7 +123,7 @@ sub _command_patterns {
 
     my $codeowners_path = find_codeowners_in_directory($toplevel)
         or die "No CODEOWNERS file in $toplevel\n";
-    my $codeowners = File::Codeowners->parse_from_filepath($codeowners_path);
+    my $codeowners = $self->_parse_codeowners($codeowners_path);
 
     my $results = $codeowners->patterns($opts->{owner});
 
@@ -141,7 +143,7 @@ sub _command_projects {
 
     my $codeowners_path = find_codeowners_in_directory($toplevel)
         or die "No CODEOWNERS file in $toplevel\n";
-    my $codeowners = File::Codeowners->parse_from_filepath($codeowners_path);
+    my $codeowners = $self->_parse_codeowners($codeowners_path);
 
     my $results = $codeowners->projects;
 
@@ -190,7 +192,7 @@ END
         }
     }
     else {
-        $codeowners = File::Codeowners->parse_from_filepath($path);
+        $codeowners = $self->_parse_codeowners($path);
     }
 
     if ($repopath) {
@@ -203,6 +205,12 @@ END
 
     $codeowners->write_to_filepath($path);
     print STDERR "Wrote $path\n";
+}
+
+sub _parse_codeowners {
+    my $self = shift;
+    my $path = shift;
+    return File::Codeowners->parse_from_filepath($path, aliases => $ENV{GIT_CODEOWNERS_ALIASES});
 }
 
 1;
@@ -219,7 +227,7 @@ App::Codeowners - A tool for managing CODEOWNERS files
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 DESCRIPTION
 

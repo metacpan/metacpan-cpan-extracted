@@ -10,7 +10,7 @@ use strict;
 
 use App::Codeowners;
 
-our $VERSION = '0.50'; # VERSION
+our $VERSION = '0.51'; # VERSION
 
 App::Codeowners->main(@ARGV);
 
@@ -26,7 +26,7 @@ git-codeowners - A tool for managing CODEOWNERS files
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 SYNOPSIS
 
@@ -133,6 +133,7 @@ Does not yet support Zsh...
     git-codeowners [show] [--format FORMAT] [--owner OWNER]...
                    [--pattern PATTERN]... [--[no-]patterns]
                    [--project PROJECT]... [--[no-]projects] [PATH...]
+                   [--[no-]expand-aliases]
 
 Show owners of one or more files in a repo.
 
@@ -144,6 +145,9 @@ Use C<--patterns> to also show the matching pattern associated with each file.
 By default the output might show associated projects if the C<CODEOWNERS> file
 defines them. You can control this by explicitly using C<--projects> or
 C<--no-projects> to always show or always hide defined projects, respectively.
+
+Use C<--expand-aliases> to show owners that are group aliases defined in the
+F<CODEOWNERS> file as their aliased owners.
 
 =head2 owners
 
@@ -276,6 +280,11 @@ C<PERL_TEXT_TABLE> environment variable if desired, like this:
     PERL_TEXT_TABLE=Text::Table::HTML git-codeowners -f table
 
 The list of available modules is at L<Text::Table::Any/@BACKENDS>.
+
+=head1 ENVIRONMENT
+
+If you set C<GIT_CODEOWNERS_ALIASES> in the environment to a true value, the parser will parse group
+aliases which are supported by some applications.
 
 =head1 CAVEATS
 

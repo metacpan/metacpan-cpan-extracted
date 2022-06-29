@@ -5,14 +5,14 @@
 
 enum {
   SPVM_CLASS_C_CATEGORY_CLASS,
-  SPVM_CLASS_C_CATEGORY_CALLBACK,
-  SPVM_CLASS_C_CATEGORY_MULNUM,
   SPVM_CLASS_C_CATEGORY_INTERFACE,
+  SPVM_CLASS_C_CATEGORY_MULNUM,
 };
 
 struct spvm_class {
   SPVM_OP* op_class;
   SPVM_OP* op_name;
+  SPVM_OP* op_extends;
   const char* name;
   const char* module_file;
   const char* module_dir;
@@ -34,6 +34,7 @@ struct spvm_class {
   SPVM_METHOD* required_method;
   SPVM_METHOD* destructor_method;
   const char* parent_class_name;
+  SPVM_CLASS* parent_class;
   int32_t id;
   int32_t fields_byte_size;
   int8_t has_init_block;

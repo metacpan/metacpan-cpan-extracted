@@ -59,11 +59,11 @@ App::Dochazka::REST - Dochazka REST server
 
 =head1 VERSION
 
-Version 0.558
+Version 0.559
 
 =cut
 
-our $VERSION = '0.558';
+our $VERSION = '0.559';
 
 
 =head2 Development status
@@ -561,7 +561,7 @@ L<https://github.com/smithfarm/dochazka-rest/issues>.
 
 =head1 SUPPORT
 
-The full documentation comes with the distro, and can be comfortable
+The full documentation comes with the distro, and can be comfortably
 perused at metacpan.org:
 
     https://metacpan.org/pod/App::Dochazka::REST

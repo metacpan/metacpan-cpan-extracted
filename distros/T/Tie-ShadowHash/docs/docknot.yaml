@@ -1,0 +1,114 @@
+# Package metadata for Tie::ShadowHash.
+#
+# This file contains configuration for DocKnot used to generate
+# documentation files (like README.md) and web pages.  Other documentation
+# in this package is generated automatically from these files as part of
+# the release process.  For more information, see DocKnot's documentation.
+#
+# DocKnot is available from <https://www.eyrie.org/~eagle/software/docknot/>.
+#
+# Copyright 1999, 2002, 2010, 2022 Russ Allbery <rra@cpan.org>
+#
+# SPDX-License-Identifier: GPL-1.0-or-later OR Artistic-1.0-Perl
+
+format: v1
+
+name: Tie::ShadowHash
+maintainer: Russ Allbery <rra@cpan.org>
+version: '2.00'
+synopsis: Merge multiple data sources into a hash with overrides
+
+license:
+  name: Perl
+copyrights:
+  - holder: Russ Allbery <rra@cpan.org>
+    years: 1999, 2002, 2010, 2022
+
+build:
+  type: Module::Build
+distribution:
+  cpan: Tie-ShadowHash
+  packaging:
+    debian:
+      package: libtie-shadowhash-perl
+      summary: |
+        Tie::ShadowHash is packaged in Debian 6.0 (squeeze) and later as
+        libtie-shadowhash-perl.  Thanks to Stefan Hornburg (Racke) for the
+        packaging.
+  section: perl
+  tarname: Tie-ShadowHash
+  version: tie-shadowhash
+support:
+  email: rra@cpan.org
+  github: rra/shadowhash
+  web: https://www.eyrie.org/~eagle/software/shadowhash/
+vcs:
+  browse: https://git.eyrie.org/?p=perl/shadowhash.git
+  github: rra/shadowhash
+  status:
+    workflow: build
+  type: Git
+  url: https://git.eyrie.org/git/perl/shadowhash.git
+
+docs:
+  api:
+    - name: docs
+      title: Tie::ShadowHash
+
+blurb: |
+  Tie::ShadowHash is a Perl module that lets you stack together multiple
+  hash-like data structures, including tied hashes such as DB_File databases
+  or text files parsed into a hash, and then treat them like a merged hash.
+  Lookups are handled in the order of the added sources.  You can store
+  additional values, change values, and delete values from the hash and those
+  actions will be reflected in later operations, but the underlying objects
+  are not changed.
+
+description: |
+  If you have several key/value data sources in the form of Perl hashes, tied
+  hashes (of whatever type, including on-disk databases tied with DB_File,
+  GDBM_File, or similar modules), or text files that you want to turn into
+  hashes, and you want to be able to query all of those sources of data at
+  once for a particular key without having to check each one of them
+  individually, this module may be what you're looking for.  If you want to
+  use a hash-like data source, even just one, but make modifications to its
+  data over the course of your program that override its contents while your
+  program runs but which don't have any permanent effect on it, this module
+  may be what you're looking for.
+
+  Tie::ShadowHash lets you create a "shadow hash" that looks like a regular
+  Perl hash to your program but, behind the scenes, queries a list of data
+  sources.  All the data sources must also behave like Perl hashes, but that's
+  the only constraint.  They can be regular Perl hashes or other tied hashes,
+  including tied DB_File or GDBM_File hashes or the like to access on-disk
+  databases.  All data sources are treated as read-only; modifications to any
+  data is stored in the shadow hash itself, and subsequent accesses reflect
+  any modifications, but none of the data sources are changed.
+
+requirements: |
+  The only requirement for this module is Perl 5.024 or later.
+
+test:
+  lancaster: true
+  suffix: |
+    The following additional Perl modules will be used by the test suite if
+    present:
+
+    * Devel::Cover
+    * Perl::Critic::Freenode
+    * Test::CPAN::Changes (part of CPAN-Changes)
+    * Test::Kwalitee
+    * Test::MinimumVersion
+    * Test::Perl::Critic
+    * Test::Pod
+    * Test::Pod::Coverage
+    * Test::Spelling
+    * Test::Strict
+    * Test::Synopsis
+
+sections:
+  - title: Thanks
+    body: |
+      To Chris Nandor for testing this module on the Mac, pointing out that
+      SDBM_File wasn't available there, mentioning that SDBM was
+      byte-order-dependent anyway, and suggesting using AnyDBM_File instead.

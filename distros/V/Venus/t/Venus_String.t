@@ -5,10 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
 use Test::More;
-use Test::Venus;
+use Venus::Test;
 
 my $test = test(__FILE__);
 
@@ -53,6 +51,7 @@ method: gt
 method: gtlt
 method: hex
 method: index
+method: kebabcase
 method: lc
 method: lcfirst
 method: le
@@ -1975,6 +1974,38 @@ $test->for('example', 3, 'index', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == -1;
+
+  $result
+});
+
+=method kebabcase
+
+The kebabcase method converts the string to kebabcase.
+
+=signature kebabcase
+
+  kebabcase() (Str)
+
+=metadata kebabcase
+
+{
+  since => '0.09',
+}
+
+=example-1 kebabcase
+
+  # given: synopsis;
+
+  my $kebabcase = $string->kebabcase;
+
+  # "hello-world"
+
+=cut
+
+$test->for('example', 1, 'kebabcase', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "hello-world";
 
   $result
 });
@@ -4180,20 +4211,6 @@ $test->for('example', 1, '(qr)', sub {
 
   $result
 });
-
-=license
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-=cut
-
-=authors
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
 
 # END
 

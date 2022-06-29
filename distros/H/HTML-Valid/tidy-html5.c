@@ -3,6 +3,8 @@
 
    ./tools/make-c-file.pl
 */
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <limits.h>
 #include <locale.h>
 #include "tidy-html5.h"
@@ -29,6 +31,13 @@
 /* Internal symbols are prefixed to avoid clashes with other libraries */
 #define TYDYAPPEND(str1,str2) str1##str2
 #define TY_(str) TYDYAPPEND(prvTidy,str)
+
+/* Internal symbols are prefixed with 'hidden' attr, to avoid exporting */
+#if defined(_WIN32) || defined(__CYGWIN__)
+#define TY_PRIVATE
+#else
+#define TY_PRIVATE __attribute__((__visibility__("hidden")))
+#endif
 
 struct _StreamIn;
 typedef struct _StreamIn StreamIn;
@@ -61,7 +70,7 @@ typedef struct _IStack IStack;
 struct _Lexer;
 typedef struct _Lexer Lexer;
 
-extern TidyAllocator TY_(g_default_allocator);
+TY_PRIVATE extern TidyAllocator TY_(g_default_allocator);
 
 /** Wrappers for easy memory allocation using an allocator */
 #define TidyAlloc(allocator, size) ((allocator)->vtbl->alloc((allocator), (size)))
@@ -158,7 +167,7 @@ struct _TidyAccessImpl
 };
 
 
-void TY_(AccessibilityChecks)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(AccessibilityChecks)( TidyDocImpl* doc );
 
 
 #endif /* __ACCESS_H__ */
@@ -180,143 +189,144 @@ typedef struct _AttrVersion
     unsigned int versions;
 } AttrVersion;
 
-extern const AttrVersion TY_(W3CAttrsFor_A)[];
-extern const AttrVersion TY_(W3CAttrsFor_ABBR)[];
-extern const AttrVersion TY_(W3CAttrsFor_ACRONYM)[];
-extern const AttrVersion TY_(W3CAttrsFor_ADDRESS)[];
-extern const AttrVersion TY_(W3CAttrsFor_APPLET)[];
-extern const AttrVersion TY_(W3CAttrsFor_AREA)[];
-extern const AttrVersion TY_(W3CAttrsFor_B)[];
-extern const AttrVersion TY_(W3CAttrsFor_BASE)[];
-extern const AttrVersion TY_(W3CAttrsFor_BASEFONT)[];
-extern const AttrVersion TY_(W3CAttrsFor_BDO)[];
-extern const AttrVersion TY_(W3CAttrsFor_BIG)[];
-extern const AttrVersion TY_(W3CAttrsFor_BLOCKQUOTE)[];
-extern const AttrVersion TY_(W3CAttrsFor_BODY)[];
-extern const AttrVersion TY_(W3CAttrsFor_BR)[];
-extern const AttrVersion TY_(W3CAttrsFor_BUTTON)[];
-extern const AttrVersion TY_(W3CAttrsFor_CAPTION)[];
-extern const AttrVersion TY_(W3CAttrsFor_CENTER)[];
-extern const AttrVersion TY_(W3CAttrsFor_CITE)[];
-extern const AttrVersion TY_(W3CAttrsFor_CODE)[];
-extern const AttrVersion TY_(W3CAttrsFor_COL)[];
-extern const AttrVersion TY_(W3CAttrsFor_COLGROUP)[];
-extern const AttrVersion TY_(W3CAttrsFor_DD)[];
-extern const AttrVersion TY_(W3CAttrsFor_DEL)[];
-extern const AttrVersion TY_(W3CAttrsFor_DFN)[];
-extern const AttrVersion TY_(W3CAttrsFor_DIR)[];
-extern const AttrVersion TY_(W3CAttrsFor_DIV)[];
-extern const AttrVersion TY_(W3CAttrsFor_DL)[];
-extern const AttrVersion TY_(W3CAttrsFor_DT)[];
-extern const AttrVersion TY_(W3CAttrsFor_EM)[];
-extern const AttrVersion TY_(W3CAttrsFor_FIELDSET)[];
-extern const AttrVersion TY_(W3CAttrsFor_FONT)[];
-extern const AttrVersion TY_(W3CAttrsFor_FORM)[];
-extern const AttrVersion TY_(W3CAttrsFor_FRAME)[];
-extern const AttrVersion TY_(W3CAttrsFor_FRAMESET)[];
-extern const AttrVersion TY_(W3CAttrsFor_H1)[];
-extern const AttrVersion TY_(W3CAttrsFor_H2)[];
-extern const AttrVersion TY_(W3CAttrsFor_H3)[];
-extern const AttrVersion TY_(W3CAttrsFor_H4)[];
-extern const AttrVersion TY_(W3CAttrsFor_H5)[];
-extern const AttrVersion TY_(W3CAttrsFor_H6)[];
-extern const AttrVersion TY_(W3CAttrsFor_HEAD)[];
-extern const AttrVersion TY_(W3CAttrsFor_HR)[];
-extern const AttrVersion TY_(W3CAttrsFor_HTML)[];
-extern const AttrVersion TY_(W3CAttrsFor_I)[];
-extern const AttrVersion TY_(W3CAttrsFor_IFRAME)[];
-extern const AttrVersion TY_(W3CAttrsFor_IMG)[];
-extern const AttrVersion TY_(W3CAttrsFor_INPUT)[];
-extern const AttrVersion TY_(W3CAttrsFor_INS)[];
-extern const AttrVersion TY_(W3CAttrsFor_ISINDEX)[];
-extern const AttrVersion TY_(W3CAttrsFor_KBD)[];
-extern const AttrVersion TY_(W3CAttrsFor_LABEL)[];
-extern const AttrVersion TY_(W3CAttrsFor_LEGEND)[];
-extern const AttrVersion TY_(W3CAttrsFor_LI)[];
-extern const AttrVersion TY_(W3CAttrsFor_LINK)[];
-extern const AttrVersion TY_(W3CAttrsFor_LISTING)[];
-extern const AttrVersion TY_(W3CAttrsFor_MAP)[];
-extern const AttrVersion TY_(W3CAttrsFor_MATHML)[]; /* [i_a]2 */
-extern const AttrVersion TY_(W3CAttrsFor_MENU)[];
-extern const AttrVersion TY_(W3CAttrsFor_META)[];
-extern const AttrVersion TY_(W3CAttrsFor_NEXTID)[];
-extern const AttrVersion TY_(W3CAttrsFor_NOFRAMES)[];
-extern const AttrVersion TY_(W3CAttrsFor_NOSCRIPT)[];
-extern const AttrVersion TY_(W3CAttrsFor_OBJECT)[];
-extern const AttrVersion TY_(W3CAttrsFor_OL)[];
-extern const AttrVersion TY_(W3CAttrsFor_OPTGROUP)[];
-extern const AttrVersion TY_(W3CAttrsFor_OPTION)[];
-extern const AttrVersion TY_(W3CAttrsFor_P)[];
-extern const AttrVersion TY_(W3CAttrsFor_PARAM)[];
-extern const AttrVersion TY_(W3CAttrsFor_PICTURE)[]; /* Issue #151 - html5 */
-extern const AttrVersion TY_(W3CAttrsFor_PLAINTEXT)[];
-extern const AttrVersion TY_(W3CAttrsFor_PRE)[];
-extern const AttrVersion TY_(W3CAttrsFor_Q)[];
-extern const AttrVersion TY_(W3CAttrsFor_RB)[];
-extern const AttrVersion TY_(W3CAttrsFor_RBC)[];
-extern const AttrVersion TY_(W3CAttrsFor_RP)[];
-extern const AttrVersion TY_(W3CAttrsFor_RT)[];
-extern const AttrVersion TY_(W3CAttrsFor_RTC)[];
-extern const AttrVersion TY_(W3CAttrsFor_RUBY)[];
-extern const AttrVersion TY_(W3CAttrsFor_S)[];
-extern const AttrVersion TY_(W3CAttrsFor_SAMP)[];
-extern const AttrVersion TY_(W3CAttrsFor_SCRIPT)[];
-extern const AttrVersion TY_(W3CAttrsFor_SELECT)[];
-extern const AttrVersion TY_(W3CAttrsFor_SMALL)[];
-extern const AttrVersion TY_(W3CAttrsFor_SPAN)[];
-extern const AttrVersion TY_(W3CAttrsFor_STRIKE)[];
-extern const AttrVersion TY_(W3CAttrsFor_STRONG)[];
-extern const AttrVersion TY_(W3CAttrsFor_STYLE)[];
-extern const AttrVersion TY_(W3CAttrsFor_SUB)[];
-extern const AttrVersion TY_(W3CAttrsFor_SUP)[];
-extern const AttrVersion TY_(W3CAttrsFor_SVG)[];
-extern const AttrVersion TY_(W3CAttrsFor_TABLE)[];
-extern const AttrVersion TY_(W3CAttrsFor_TBODY)[];
-extern const AttrVersion TY_(W3CAttrsFor_TD)[];
-extern const AttrVersion TY_(W3CAttrsFor_TEXTAREA)[];
-extern const AttrVersion TY_(W3CAttrsFor_TFOOT)[];
-extern const AttrVersion TY_(W3CAttrsFor_TH)[];
-extern const AttrVersion TY_(W3CAttrsFor_THEAD)[];
-extern const AttrVersion TY_(W3CAttrsFor_TITLE)[];
-extern const AttrVersion TY_(W3CAttrsFor_TR)[];
-extern const AttrVersion TY_(W3CAttrsFor_TT)[];
-extern const AttrVersion TY_(W3CAttrsFor_U)[];
-extern const AttrVersion TY_(W3CAttrsFor_UL)[];
-extern const AttrVersion TY_(W3CAttrsFor_VAR)[];
-extern const AttrVersion TY_(W3CAttrsFor_XMP)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_A)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_ABBR)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_ACRONYM)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_ADDRESS)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_APPLET)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_AREA)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_B)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_BASE)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_BASEFONT)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_BDO)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_BIG)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_BLOCKQUOTE)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_BODY)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_BR)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_BUTTON)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_CAPTION)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_CENTER)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_CITE)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_CODE)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_COL)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_COLGROUP)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_DD)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_DEL)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_DFN)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_DIR)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_DIV)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_DL)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_DT)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_EM)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_FIELDSET)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_FONT)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_FORM)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_FRAME)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_FRAMESET)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_H1)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_H2)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_H3)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_H4)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_H5)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_H6)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_HEAD)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_HR)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_HTML)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_I)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_IFRAME)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_IMG)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_INPUT)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_INS)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_ISINDEX)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_KBD)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_LABEL)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_LEGEND)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_LI)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_LINK)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_LISTING)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_MAP)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_MATHML)[]; /* [i_a]2 */
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_MENU)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_META)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_NEXTID)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_NOFRAMES)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_NOSCRIPT)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_OBJECT)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_OL)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_OPTGROUP)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_OPTION)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_P)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_PARAM)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_PICTURE)[]; /* Issue #151 - html5 */
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_PLAINTEXT)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_PRE)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_Q)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_RB)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_RBC)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_RP)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_RT)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_RTC)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_RUBY)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_S)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_SAMP)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_SCRIPT)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_SELECT)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_SMALL)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_SPAN)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_STRIKE)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_STRONG)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_STYLE)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_SUB)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_SUP)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_SVG)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_TABLE)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_TBODY)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_TD)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_TEXTAREA)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_TFOOT)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_TH)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_THEAD)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_TITLE)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_TR)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_TT)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_U)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_UL)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_VAR)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_XMP)[];
 
-extern const AttrVersion TY_(W3CAttrsFor_TRACK)[];
-extern const AttrVersion TY_(W3CAttrsFor_SUMMARY)[];
-extern const AttrVersion TY_(W3CAttrsFor_FIGCAPTION)[];
-extern const AttrVersion TY_(W3CAttrsFor_HGROUP)[];
-extern const AttrVersion TY_(W3CAttrsFor_FIGURE)[];
-extern const AttrVersion TY_(W3CAttrsFor_ARTICLE)[];
-extern const AttrVersion TY_(W3CAttrsFor_ASIDE)[];
-extern const AttrVersion TY_(W3CAttrsFor_BDI)[];
-extern const AttrVersion TY_(W3CAttrsFor_NAV)[];
-extern const AttrVersion TY_(W3CAttrsFor_SECTION)[];
-extern const AttrVersion TY_(W3CAttrsFor_FOOTER)[];
-extern const AttrVersion TY_(W3CAttrsFor_HEADER)[];
-extern const AttrVersion TY_(W3CAttrsFor_DETAILS)[];
-extern const AttrVersion TY_(W3CAttrsFor_DIALOG)[];
-extern const AttrVersion TY_(W3CAttrsFor_COMMAND)[];
-extern const AttrVersion TY_(W3CAttrsFor_MAIN)[];
-extern const AttrVersion TY_(W3CAttrsFor_MARK)[];
-extern const AttrVersion TY_(W3CAttrsFor_OUTPUT)[];
-extern const AttrVersion TY_(W3CAttrsFor_MENUITEM)[];
-extern const AttrVersion TY_(W3CAttrsFor_METER)[];
-extern const AttrVersion TY_(W3CAttrsFor_PROGRESS)[];
-extern const AttrVersion TY_(W3CAttrsFor_TEMPLATE)[];
-extern const AttrVersion TY_(W3CAttrsFor_TIME)[];
-extern const AttrVersion TY_(W3CAttrsFor_DATA)[];
-extern const AttrVersion TY_(W3CAttrsFor_DATALIST)[];
-extern const AttrVersion TY_(W3CAttrsFor_AUDIO)[];
-extern const AttrVersion TY_(W3CAttrsFor_VIDEO)[];
-extern const AttrVersion TY_(W3CAttrsFor_CANVAS)[];
-extern const AttrVersion TY_(W3CAttrsFor_SOURCE)[];
-extern const AttrVersion TY_(W3CAttrsFor_EMBED)[];
-extern const AttrVersion TY_(W3CAttrsFor_KEYGEN)[];
-extern const AttrVersion TY_(W3CAttrsFor_WBR)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_TRACK)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_SUMMARY)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_FIGCAPTION)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_HGROUP)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_FIGURE)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_ARTICLE)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_ASIDE)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_BDI)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_NAV)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_SECTION)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_FOOTER)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_HEADER)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_DETAILS)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_DIALOG)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_COMMAND)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_MAIN)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_MARK)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_OUTPUT)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_MENUITEM)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_METER)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_PROGRESS)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_SLOT)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_TEMPLATE)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_TIME)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_DATA)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_DATALIST)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_AUDIO)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_VIDEO)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_CANVAS)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_SOURCE)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_EMBED)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_KEYGEN)[];
+TY_PRIVATE extern const AttrVersion TY_(W3CAttrsFor_WBR)[];
 
 #endif /* __ATTRDICT_H__ */
 #ifndef __ATTRS_H__
@@ -400,39 +410,39 @@ typedef struct _TidyAttribImpl TidyAttribImpl;
 
 #define XHTML_NAMESPACE "http://www.w3.org/1999/xhtml"
 
-AttrCheck TY_(CheckUrl);
+TY_PRIVATE AttrCheck TY_(CheckUrl);
 
 /* public method for finding attribute definition by name */
-const Attribute* TY_(CheckAttribute)( TidyDocImpl* doc, Node *node, AttVal *attval );
+TY_PRIVATE const Attribute* TY_(CheckAttribute)( TidyDocImpl* doc, Node *node, AttVal *attval );
 
-const Attribute* TY_(FindAttribute)( TidyDocImpl* doc, AttVal *attval );
+TY_PRIVATE const Attribute* TY_(FindAttribute)( TidyDocImpl* doc, AttVal *attval );
 
-AttVal* TY_(GetAttrByName)( Node *node, ctmbstr name );
+TY_PRIVATE AttVal* TY_(GetAttrByName)( Node *node, ctmbstr name );
 
-void TY_(DropAttrByName)( TidyDocImpl* doc, Node *node, ctmbstr name );
+TY_PRIVATE void TY_(DropAttrByName)( TidyDocImpl* doc, Node *node, ctmbstr name );
 
-AttVal* TY_(AddAttribute)( TidyDocImpl* doc,
+TY_PRIVATE AttVal* TY_(AddAttribute)( TidyDocImpl* doc,
                            Node *node, ctmbstr name, ctmbstr value );
 
-AttVal* TY_(RepairAttrValue)(TidyDocImpl* doc, Node* node, ctmbstr name, ctmbstr value);
+TY_PRIVATE AttVal* TY_(RepairAttrValue)(TidyDocImpl* doc, Node* node, ctmbstr name, ctmbstr value);
 
 /* Add an item to the list of priority attributes to write first. */
-void TY_(DefinePriorityAttribute)(TidyDocImpl* doc, ctmbstr name);
+TY_PRIVATE void TY_(DefinePriorityAttribute)(TidyDocImpl* doc, ctmbstr name);
 
 /* Start an iterator for priority attributes. */
-TidyIterator TY_(getPriorityAttrList)( TidyDocImpl* doc );
+TY_PRIVATE TidyIterator TY_(getPriorityAttrList)( TidyDocImpl* doc );
 
 /* Get the next priority attribute. */
-ctmbstr TY_(getNextPriorityAttr)( TidyDocImpl* doc, TidyIterator* iter );
+TY_PRIVATE ctmbstr TY_(getNextPriorityAttr)( TidyDocImpl* doc, TidyIterator* iter );
 
-Bool TY_(IsUrl)( TidyDocImpl* doc, ctmbstr attrname );
+TY_PRIVATE Bool TY_(IsUrl)( TidyDocImpl* doc, ctmbstr attrname );
 
 /* Bool IsBool( TidyDocImpl* doc, ctmbstr attrname ); */
 
-Bool TY_(IsScript)( TidyDocImpl* doc, ctmbstr attrname );
+TY_PRIVATE Bool TY_(IsScript)( TidyDocImpl* doc, ctmbstr attrname );
 
 /* may id or name serve as anchor? */
-Bool TY_(IsAnchorElement)( TidyDocImpl* doc, Node* node );
+TY_PRIVATE Bool TY_(IsAnchorElement)( TidyDocImpl* doc, Node* node );
 
 /*
   In CSS1, selectors can contain only the characters A-Z, 0-9, and
@@ -448,41 +458,41 @@ Bool TY_(IsAnchorElement)( TidyDocImpl* doc, Node* node );
 
   #508936 - CSS class naming for -clean option
 */
-Bool TY_(IsCSS1Selector)( ctmbstr buf );
+TY_PRIVATE Bool TY_(IsCSS1Selector)( ctmbstr buf );
 
-Bool TY_(IsValidHTMLID)(ctmbstr id);
-Bool TY_(IsValidXMLID)(ctmbstr id);
+TY_PRIVATE Bool TY_(IsValidHTMLID)(ctmbstr id);
+TY_PRIVATE Bool TY_(IsValidXMLID)(ctmbstr id);
 
 /* removes anchor for specific node */
-void TY_(RemoveAnchorByNode)( TidyDocImpl* doc, ctmbstr name, Node *node );
+TY_PRIVATE void TY_(RemoveAnchorByNode)( TidyDocImpl* doc, ctmbstr name, Node *node );
 
 /* free all anchors */
-void TY_(FreeAnchors)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(FreeAnchors)( TidyDocImpl* doc );
 
 
 /* public methods for inititializing/freeing attribute dictionary */
-void TY_(InitAttrs)( TidyDocImpl* doc );
-void TY_(FreeAttrTable)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(InitAttrs)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(FreeAttrTable)( TidyDocImpl* doc );
 
-void TY_(FreeAttrPriorityList)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(FreeAttrPriorityList)( TidyDocImpl* doc );
 
-void TY_(AppendToClassAttr)( TidyDocImpl* doc, AttVal *classattr, ctmbstr classname );
+TY_PRIVATE void TY_(AppendToClassAttr)( TidyDocImpl* doc, AttVal *classattr, ctmbstr classname );
 /*
  the same attribute name can't be used
  more than once in each element
 */
-void TY_(RepairDuplicateAttributes)( TidyDocImpl* doc, Node* node, Bool isXml );
-void TY_(SortAttributes)(TidyDocImpl* doc, Node* node, TidyAttrSortStrategy strat);
+TY_PRIVATE void TY_(RepairDuplicateAttributes)( TidyDocImpl* doc, Node* node, Bool isXml );
+TY_PRIVATE void TY_(SortAttributes)(TidyDocImpl* doc, Node* node, TidyAttrSortStrategy strat);
 
-Bool TY_(IsBoolAttribute)( AttVal* attval );
-Bool TY_(attrIsEvent)( AttVal* attval );
+TY_PRIVATE Bool TY_(IsBoolAttribute)( AttVal* attval );
+TY_PRIVATE Bool TY_(attrIsEvent)( AttVal* attval );
 
-AttVal* TY_(AttrGetById)( Node* node, TidyAttrId id );
+TY_PRIVATE AttVal* TY_(AttrGetById)( Node* node, TidyAttrId id );
 
-unsigned int TY_(NodeAttributeVersions)( Node* node, TidyAttrId id );
+TY_PRIVATE unsigned int TY_(NodeAttributeVersions)( Node* node, TidyAttrId id );
 
-Bool TY_(AttributeIsProprietary)(Node* node, AttVal* attval);
-Bool TY_(AttributeIsMismatched)(Node* node, AttVal* attval, TidyDocImpl* doc);
+TY_PRIVATE Bool TY_(AttributeIsProprietary)(Node* node, AttVal* attval);
+TY_PRIVATE Bool TY_(AttributeIsMismatched)(Node* node, AttVal* attval, TidyDocImpl* doc);
 
 
 /* 0 == TidyAttr_UNKNOWN  */
@@ -636,6 +646,7 @@ Bool TY_(AttributeIsMismatched)(Node* node, AttVal* attval, TidyDocImpl* doc);
 #define attrIsSHOWGRIDX(av)         AttrIsId( av, TidyAttr_SHOWGRIDX  )
 #define attrIsSHOWGRIDY(av)         AttrIsId( av, TidyAttr_SHOWGRIDY  )
 #define attrIsSIZE(av)              AttrIsId( av, TidyAttr_SIZE  )
+#define attrIsSLOT(av)              AttrIsId( av, TidyAttr_SLOT  )
 #define attrIsSPAN(av)              AttrIsId( av, TidyAttr_SPAN  )
 #define attrIsSRC(av)               AttrIsId( av, TidyAttr_SRC  )
 #define attrIsSTANDBY(av)           AttrIsId( av, TidyAttr_STANDBY  )
@@ -695,8 +706,20 @@ Bool TY_(AttributeIsMismatched)(Node* node, AttVal* attval, TidyDocImpl* doc);
 #define attrIsARIA_VALUEMIN(av)         AttrIsId( av,  TidyAttr_ARIA_VALUEMIN  )
 #define attrIsARIA_VALUENOW(av)         AttrIsId( av,  TidyAttr_ARIA_VALUENOW  )
 #define attrIsARIA_VALUETEXT(av)        AttrIsId( av,  TidyAttr_ARIA_VALUETEXT  )
-
-
+#define attrIsSVG_FILL(av)              AttrIsId( av,  TidyAttr_FILL  )
+#define attrIsSVG_FILLRULE(av)          AttrIsId( av,  TidyAttr_FILLRULE  )
+#define attrIsSVG_STROKE(av)            AttrIsId( av,  TidyAttr_STROKE  )
+#define attrIsSVG_STROKEDASHARRAY(av)   AttrIsId( av,  TidyAttr_STROKEDASHARRAY  )
+#define attrIsSVG_STROKEDASHOFFSET(av)  AttrIsId( av,  TidyAttr_STROKEDASHOFFSET  )
+#define attrIsSVG_STROKELINECAP(av)     AttrIsId( av,  TidyAttr_STROKELINECAP  )
+#define attrIsSVG_STROKELINEJOIN(av)    AttrIsId( av,  TidyAttr_STROKELINEJOIN  )
+#define attrIsSVG_STROKEMITERLIMIT(av)  AttrIsId( av,  TidyAttr_STROKEMITERLIMIT  )
+#define attrIsSVG_STROKEWIDTH(av)       AttrIsId( av,  TidyAttr_STROKEWIDTH  )
+#define attrIsSVG_COLORINTERPOLATION(a) AttrIsId(  a,  TidyAttr_COLORINTERPOLATION  )
+#define attrIsSVG_COLORRENDERING(av)    AttrIsId( av,  TidyAttr_COLORRENDERING  )
+#define attrIsSVG_OPACITY(av)           AttrIsId( av,  TidyAttr_OPACITY  )
+#define attrIsSVG_STROKEOPACITY(av)     AttrIsId( av,  TidyAttr_STROKEOPACITY  )
+#define attrIsSVG_FILLOPACITY(av)       AttrIsId( av,  TidyAttr_FILLOPACITY  )
 
 /* Attribute Retrieval macros
 */
@@ -792,19 +815,25 @@ Bool TY_(AttributeIsMismatched)(Node* node, AttVal* attval, TidyDocImpl* doc);
 #define attrGetARIA_VALUETEXT( nod )        TY_(AttrGetById)( nod,  TidyAttr_ARIA_VALUETEXT  )
 
 #endif /* __ATTRS_H__ */
+#ifndef __CHARSETS_H__
+#define __CHARSETS_H__
+
 /* charsets.h -- character set information and mappings
 
-  (c) 1998-2006 (W3C) MIT, ERCIM, Keio University
+  (c) 1998-2021 (W3C) MIT, ERCIM, Keio University
   See tidy.h for the copyright notice.
 
 */
 
-unsigned int TY_(GetEncodingIdFromName)(ctmbstr name);
-unsigned int TY_(GetEncodingIdFromCodePage)(unsigned int cp);
-unsigned int TY_(GetEncodingCodePageFromName)(ctmbstr name);
-unsigned int TY_(GetEncodingCodePageFromId)(unsigned int id);
-ctmbstr TY_(GetEncodingNameFromId)(unsigned int id);
-ctmbstr TY_(GetEncodingNameFromCodePage)(unsigned int cp);
+TY_PRIVATE unsigned int TY_(GetEncodingIdFromName)(ctmbstr name);
+TY_PRIVATE unsigned int TY_(GetEncodingIdFromCodePage)(unsigned int cp);
+TY_PRIVATE unsigned int TY_(GetEncodingCodePageFromName)(ctmbstr name);
+TY_PRIVATE unsigned int TY_(GetEncodingCodePageFromId)(unsigned int id);
+TY_PRIVATE ctmbstr TY_(GetEncodingNameFromId)(unsigned int id);
+TY_PRIVATE ctmbstr TY_(GetEncodingNameFromCodePage)(unsigned int cp);
+
+#endif /* __CHARSETS_H__ */
+
 #ifndef __CLEAN_H__
 #define __CLEAN_H__
 
@@ -815,22 +844,22 @@ ctmbstr TY_(GetEncodingNameFromCodePage)(unsigned int cp);
 
 */
 
-void TY_(FixNodeLinks)(Node *node);
+TY_PRIVATE void TY_(FixNodeLinks)(Node *node);
 
-void TY_(FreeStyles)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(FreeStyles)( TidyDocImpl* doc );
 
 /* Add class="foo" to node
 */
-void TY_(AddStyleAsClass)( TidyDocImpl* doc, Node *node, ctmbstr stylevalue );
-void TY_(AddStyleProperty)(TidyDocImpl* doc, Node *node, ctmbstr property );
+TY_PRIVATE void TY_(AddStyleAsClass)( TidyDocImpl* doc, Node *node, ctmbstr stylevalue );
+TY_PRIVATE void TY_(AddStyleProperty)(TidyDocImpl* doc, Node *node, ctmbstr property );
 
-void TY_(CleanDocument)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(CleanDocument)( TidyDocImpl* doc );
 
 /* simplifies <b><b> ... </b> ...</b> etc. */
-void TY_(NestedEmphasis)( TidyDocImpl* doc, Node* node );
+TY_PRIVATE void TY_(NestedEmphasis)( TidyDocImpl* doc, Node* node );
 
 /* replace i by em and b by strong */
-void TY_(EmFromI)( TidyDocImpl* doc, Node* node );
+TY_PRIVATE void TY_(EmFromI)( TidyDocImpl* doc, Node* node );
 
 /*
  Some people use dir or ul without an li
@@ -839,17 +868,17 @@ void TY_(EmFromI)( TidyDocImpl* doc, Node* node );
  li. This is recursively replaced by an
  implicit blockquote.
 */
-void TY_(List2BQ)( TidyDocImpl* doc, Node* node );
+TY_PRIVATE void TY_(List2BQ)( TidyDocImpl* doc, Node* node );
 
 /*
  Replace implicit blockquote by div with an indent
  taking care to reduce nested blockquotes to a single
  div with the indent set to match the nesting depth
 */
-void TY_(BQ2Div)( TidyDocImpl* doc, Node* node );
+TY_PRIVATE void TY_(BQ2Div)( TidyDocImpl* doc, Node* node );
 
 
-void TY_(DropSections)( TidyDocImpl* doc, Node* node );
+TY_PRIVATE void TY_(DropSections)( TidyDocImpl* doc, Node* node );
 
 
 /*
@@ -859,29 +888,31 @@ void TY_(DropSections)( TidyDocImpl* doc, Node* node );
  declare them as new tags, such as o:p which needs to be declared
  as inline.
 */
-void TY_(CleanWord2000)( TidyDocImpl* doc, Node *node);
+TY_PRIVATE void TY_(CleanWord2000)( TidyDocImpl* doc, Node *node);
 
-Bool TY_(IsWord2000)( TidyDocImpl* doc );
+TY_PRIVATE Bool TY_(IsWord2000)( TidyDocImpl* doc );
 
 /* where appropriate move object elements from head to body */
-void TY_(BumpObject)( TidyDocImpl* doc, Node *html );
+TY_PRIVATE void TY_(BumpObject)( TidyDocImpl* doc, Node *html );
 
-Bool TY_(TidyMetaCharset)(TidyDocImpl* doc);
+TY_PRIVATE Bool TY_(TidyMetaCharset)(TidyDocImpl* doc);
 
-void TY_(DropComments)(TidyDocImpl* doc, Node* node);
-void TY_(DropFontElements)(TidyDocImpl* doc, Node* node, Node **pnode);
-void TY_(WbrToSpace)(TidyDocImpl* doc, Node* node);
-void TY_(DowngradeTypography)(TidyDocImpl* doc, Node* node);
-void TY_(ReplacePreformattedSpaces)(TidyDocImpl* doc, Node* node);
-void TY_(NormalizeSpaces)(Lexer *lexer, Node *node);
-void TY_(ConvertCDATANodes)(TidyDocImpl* doc, Node* node);
+TY_PRIVATE void TY_(DropComments)(TidyDocImpl* doc, Node* node);
+TY_PRIVATE void TY_(DropFontElements)(TidyDocImpl* doc, Node* node, Node **pnode);
+TY_PRIVATE void TY_(WbrToSpace)(TidyDocImpl* doc, Node* node);
+TY_PRIVATE void TY_(DowngradeTypography)(TidyDocImpl* doc, Node* node);
+TY_PRIVATE void TY_(ReplacePreformattedSpaces)(TidyDocImpl* doc, Node* node);
+TY_PRIVATE void TY_(NormalizeSpaces)(Lexer *lexer, Node *node);
+TY_PRIVATE void TY_(ConvertCDATANodes)(TidyDocImpl* doc, Node* node);
 
-void TY_(FixAnchors)(TidyDocImpl* doc, Node *node, Bool wantName, Bool wantId);
-void TY_(FixXhtmlNamespace)(TidyDocImpl* doc, Bool wantXmlns);
-void TY_(FixLanguageInformation)(TidyDocImpl* doc, Node* node, Bool wantXmlLang, Bool wantLang);
+TY_PRIVATE void TY_(FixAnchors)(TidyDocImpl* doc, Node *node, Bool wantName, Bool wantId);
+TY_PRIVATE void TY_(FixXhtmlNamespace)(TidyDocImpl* doc, Bool wantXmlns);
+TY_PRIVATE void TY_(FixLanguageInformation)(TidyDocImpl* doc, Node* node, Bool wantXmlLang, Bool wantLang);
 
 /* Issue #567 - move style elements from body to head */
-void TY_(CleanStyle)(TidyDocImpl* doc, Node *html);
+TY_PRIVATE void TY_(CleanStyle)(TidyDocImpl* doc, Node *html);
+/* Issue #692 - discard multiple titles */
+TY_PRIVATE void TY_(CleanHead)(TidyDocImpl* doc);
 
 #endif /* __CLEAN_H__ */
 #ifndef __FILEIO_H__
@@ -903,24 +934,24 @@ extern "C" {
 #endif
 
 /** Allocate and initialize file input source */
-int TY_(initFileSource)( TidyAllocator *allocator, TidyInputSource* source, FILE* fp );
+TY_PRIVATE int TY_(initFileSource)( TidyAllocator *allocator, TidyInputSource* source, FILE* fp );
 
 /** Free file input source */
-void TY_(freeFileSource)( TidyInputSource* source, Bool closeIt );
+TY_PRIVATE void TY_(freeFileSource)( TidyInputSource* source, Bool closeIt );
 
 #if SUPPORT_POSIX_MAPPED_FILES
 /** Allocate and initialize file input source using Standard C I/O */
-int TY_(initStdIOFileSource)( TidyAllocator *allocator, TidyInputSource* source, FILE* fp );
+TY_PRIVATE int TY_(initStdIOFileSource)( TidyAllocator *allocator, TidyInputSource* source, FILE* fp );
 
 /** Free file input source using Standard C I/O */
-void TY_(freeStdIOFileSource)( TidyInputSource* source, Bool closeIt );
+TY_PRIVATE void TY_(freeStdIOFileSource)( TidyInputSource* source, Bool closeIt );
 #endif
 
 /** Initialize file output sink */
-void TY_(initFileSink)( TidyOutputSink* sink, FILE* fp );
+TY_PRIVATE void TY_(initFileSink)( TidyOutputSink* sink, FILE* fp );
 
 /* Needed for internal declarations */
-void TIDY_CALL TY_(filesink_putByte)( void* sinkData, byte bv );
+TY_PRIVATE void TIDY_CALL TY_(filesink_putByte)( void* sinkData, byte bv );
 
 #ifdef __cplusplus
 }
@@ -1011,17 +1042,17 @@ struct _StreamIn
     TidyDocImpl* doc;
 };
 
-StreamIn* TY_(initStreamIn)( TidyDocImpl* doc, int encoding );
-void TY_(freeStreamIn)(StreamIn* in);
+TY_PRIVATE StreamIn* TY_(initStreamIn)( TidyDocImpl* doc, int encoding );
+TY_PRIVATE void TY_(freeStreamIn)(StreamIn* in);
 
-StreamIn* TY_(FileInput)( TidyDocImpl* doc, FILE* fp, int encoding );
-StreamIn* TY_(BufferInput)( TidyDocImpl* doc, TidyBuffer* content, int encoding );
-StreamIn* TY_(UserInput)( TidyDocImpl* doc, TidyInputSource* source, int encoding );
+TY_PRIVATE StreamIn* TY_(FileInput)( TidyDocImpl* doc, FILE* fp, int encoding );
+TY_PRIVATE StreamIn* TY_(BufferInput)( TidyDocImpl* doc, TidyBuffer* content, int encoding );
+TY_PRIVATE StreamIn* TY_(UserInput)( TidyDocImpl* doc, TidyInputSource* source, int encoding );
 
-int       TY_(ReadBOMEncoding)(StreamIn *in);
-unsigned int      TY_(ReadChar)( StreamIn* in );
-void      TY_(UngetChar)( unsigned int c, StreamIn* in );
-Bool      TY_(IsEOF)( StreamIn* in );
+TY_PRIVATE int       TY_(ReadBOMEncoding)(StreamIn *in);
+TY_PRIVATE unsigned int      TY_(ReadChar)( StreamIn* in );
+TY_PRIVATE void      TY_(UngetChar)( unsigned int c, StreamIn* in );
+TY_PRIVATE Bool      TY_(IsEOF)( StreamIn* in );
 
 
 /************************
@@ -1037,20 +1068,20 @@ struct _StreamOut
     TidyOutputSink sink;
 };
 
-StreamOut* TY_(FileOutput)( TidyDocImpl *doc, FILE* fp, int encoding, unsigned int newln );
-StreamOut* TY_(BufferOutput)( TidyDocImpl *doc, TidyBuffer* buf, int encoding, unsigned int newln );
-StreamOut* TY_(UserOutput)( TidyDocImpl *doc, TidyOutputSink* sink, int encoding, unsigned int newln );
+TY_PRIVATE StreamOut* TY_(FileOutput)( TidyDocImpl *doc, FILE* fp, int encoding, unsigned int newln );
+TY_PRIVATE StreamOut* TY_(BufferOutput)( TidyDocImpl *doc, TidyBuffer* buf, int encoding, unsigned int newln );
+TY_PRIVATE StreamOut* TY_(UserOutput)( TidyDocImpl *doc, TidyOutputSink* sink, int encoding, unsigned int newln );
 
-StreamOut* TY_(StdErrOutput)(void);
+TY_PRIVATE StreamOut* TY_(StdErrOutput)(void);
 /* StreamOut* StdOutOutput(void); */
-void       TY_(ReleaseStreamOut)( TidyDocImpl *doc, StreamOut* out );
+TY_PRIVATE void       TY_(ReleaseStreamOut)( TidyDocImpl *doc, StreamOut* out );
 
-void TY_(WriteChar)( unsigned int c, StreamOut* out );
-void TY_(outBOM)( StreamOut *out );
+TY_PRIVATE void TY_(WriteChar)( unsigned int c, StreamOut* out );
+TY_PRIVATE void TY_(outBOM)( StreamOut *out );
 
-ctmbstr TY_(GetEncodingNameFromTidyId)(unsigned int id);
-ctmbstr TY_(GetEncodingOptNameFromTidyId)(unsigned int id);
-int TY_(GetCharEncodingFromOptName)(ctmbstr charenc);
+TY_PRIVATE ctmbstr TY_(GetEncodingNameFromTidyId)(unsigned int id);
+TY_PRIVATE ctmbstr TY_(GetEncodingOptNameFromTidyId)(unsigned int id);
+TY_PRIVATE int TY_(GetCharEncodingFromOptName)(ctmbstr charenc);
 
 /************************
 ** Misc
@@ -1074,10 +1105,10 @@ int TY_(GetCharEncodingFromOptName)(ctmbstr charenc);
 #define SHIFTJIS    13
 
 /* Function for conversion from Windows-1252 to Unicode */
-unsigned int TY_(DecodeWin1252)(unsigned int c);
+TY_PRIVATE unsigned int TY_(DecodeWin1252)(unsigned int c);
 
 /* Function to convert from MacRoman to Unicode */
-unsigned int TY_(DecodeMacRoman)(unsigned int c);
+TY_PRIVATE unsigned int TY_(DecodeMacRoman)(unsigned int c);
 
 #ifdef __cplusplus
 }
@@ -1242,26 +1273,26 @@ typedef struct {
  ** @param optnam The option name to retrieve.
  ** @returns The instance of the requested option.
  */
-const TidyOptionImpl* TY_(lookupOption)( ctmbstr optnam );
+TY_PRIVATE const TidyOptionImpl* TY_(lookupOption)( ctmbstr optnam );
 
 
 /** Given an option ID, return an instance of an option.
  ** @param optId The option ID to retrieve.
  ** @returns The instance of the requested option.
  */
-const TidyOptionImpl* TY_(getOption)( TidyOptionId optId );
+TY_PRIVATE const TidyOptionImpl* TY_(getOption)( TidyOptionId optId );
 
 /** Given an option ID, indicates whether or not the option is a list.
  ** @param optId The option ID to check.
  ** @returns Returns yes if the option value is a list.
  */
-const Bool TY_(getOptionIsList)( TidyOptionId optId );
+TY_PRIVATE const Bool TY_(getOptionIsList)( TidyOptionId optId );
 
 /** Initiates an iterator to cycle through all of the available options.
  ** @param doc The Tidy document to get options.
  ** @returns An iterator token to be used with TY_(getNextOption)().
  */
-TidyIterator TY_(getOptionList)( TidyDocImpl* doc );
+TY_PRIVATE TidyIterator TY_(getOptionList)( TidyDocImpl* doc );
 
 
 /** Gets the next option provided by the iterator.
@@ -1269,7 +1300,7 @@ TidyIterator TY_(getOptionList)( TidyDocImpl* doc );
  ** @param iter The iterator token initialized by TY_(getOptionList)().
  ** @returns The instance of the next option.
  */
-const TidyOptionImpl* TY_(getNextOption)( TidyDocImpl* doc, TidyIterator* iter );
+TY_PRIVATE const TidyOptionImpl* TY_(getNextOption)( TidyDocImpl* doc, TidyIterator* iter );
 
 
 /** Initiates an iterator to cycle through all of the available picklist
@@ -1277,7 +1308,7 @@ const TidyOptionImpl* TY_(getNextOption)( TidyDocImpl* doc, TidyIterator* iter )
  ** @param option An instance of an option for which to iterate a picklist.
  ** @returns An interator token to be used with TY_(getNextOptionPick)().
  */
-TidyIterator TY_(getOptionPickList)( const TidyOptionImpl* option );
+TY_PRIVATE TidyIterator TY_(getOptionPickList)( const TidyOptionImpl* option );
 
 
 /** Gets the next picklist possibility provided by the iterator.
@@ -1285,7 +1316,7 @@ TidyIterator TY_(getOptionPickList)( const TidyOptionImpl* option );
  ** @param iter The iterator token initialized by TY_(getOptionPickList)().
  ** @returns The next picklist entry.
  */
-ctmbstr TY_(getNextOptionPick)( const TidyOptionImpl* option, TidyIterator* iter );
+TY_PRIVATE ctmbstr TY_(getNextOptionPick)( const TidyOptionImpl* option, TidyIterator* iter );
 
 
 #if SUPPORT_CONSOLE_APP
@@ -1294,20 +1325,20 @@ ctmbstr TY_(getNextOptionPick)( const TidyOptionImpl* option, TidyIterator* iter
  ** @param optId The option ID to get cross-reference information for.
  ** @returns Cross reference information.
  */
-const TidyOptionDoc* TY_(OptGetDocDesc)( TidyOptionId optId );
+TY_PRIVATE const TidyOptionDoc* TY_(OptGetDocDesc)( TidyOptionId optId );
 #endif /* SUPPORT_CONSOLE_APP */
 
 
 /** Initialize the configuration for the given Tidy document.
  ** @param doc The Tidy document.
  */
-void TY_(InitConfig)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(InitConfig)( TidyDocImpl* doc );
 
 
 /** Frees the configuration memory for the given Tidy document.
  ** @param doc The Tidy document.
  */
-void TY_(FreeConfig)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(FreeConfig)( TidyDocImpl* doc );
 
 
 /** Gets the picklist label for a given value.
@@ -1315,7 +1346,7 @@ void TY_(FreeConfig)( TidyDocImpl* doc );
  ** @param pick the picklist item to retrieve.
  ** @returns The label for the pick.
  */
-ctmbstr TY_(GetPickListLabelForPick)( TidyOptionId optId, unsigned int pick );
+TY_PRIVATE ctmbstr TY_(GetPickListLabelForPick)( TidyOptionId optId, unsigned int pick );
 
 
 /** Sets the integer value for the given option Id.
@@ -1324,7 +1355,7 @@ ctmbstr TY_(GetPickListLabelForPick)( TidyOptionId optId, unsigned int pick );
  ** @param val The value to set.
  ** @returns Success or failure.
  */
-Bool TY_(SetOptionInt)( TidyDocImpl* doc, TidyOptionId optId, unsigned int val );
+TY_PRIVATE Bool TY_(SetOptionInt)( TidyDocImpl* doc, TidyOptionId optId, unsigned int val );
 
 
 /** Sets the bool value for the given option Id.
@@ -1333,7 +1364,7 @@ Bool TY_(SetOptionInt)( TidyDocImpl* doc, TidyOptionId optId, unsigned int val )
  ** @param val The value to set.
  ** @returns Success or failure.
  */
-Bool TY_(SetOptionBool)( TidyDocImpl* doc, TidyOptionId optId, Bool val );
+TY_PRIVATE Bool TY_(SetOptionBool)( TidyDocImpl* doc, TidyOptionId optId, Bool val );
 
 
 /** Resets the given option to its default value.
@@ -1341,33 +1372,33 @@ Bool TY_(SetOptionBool)( TidyDocImpl* doc, TidyOptionId optId, Bool val );
  ** @param optId The option ID to set.
  ** @returns Success or failure.
  */
-Bool TY_(ResetOptionToDefault)( TidyDocImpl* doc, TidyOptionId optId );
+TY_PRIVATE Bool TY_(ResetOptionToDefault)( TidyDocImpl* doc, TidyOptionId optId );
 
 
 /** Resets all options in the document to their default values.
  ** @param doc The Tidy document.
  */
-void TY_(ResetConfigToDefault)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(ResetConfigToDefault)( TidyDocImpl* doc );
 
 
 /** Stores a snapshot of all of the configuration values that can be
  ** restored later.
  ** @param doc The Tidy document.
  */
-void TY_(TakeConfigSnapshot)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(TakeConfigSnapshot)( TidyDocImpl* doc );
 
 
 /** Restores all of the configuration values to their snapshotted values.
  ** @param doc The Tidy document.
  */
-void TY_(ResetConfigToSnapshot)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(ResetConfigToSnapshot)( TidyDocImpl* doc );
 
 
 /** Copies the configuration from one document to another.
  ** @param docTo The destination Tidy document.
  ** @param docFrom The source Tidy document.
  */
-void TY_(CopyConfig)( TidyDocImpl* docTo, TidyDocImpl* docFrom );
+TY_PRIVATE void TY_(CopyConfig)( TidyDocImpl* docTo, TidyDocImpl* docFrom );
 
 
 /** Attempts to parse the given config file into the document.
@@ -1375,7 +1406,7 @@ void TY_(CopyConfig)( TidyDocImpl* docTo, TidyDocImpl* docFrom );
  ** @param cfgfil The file to load.
  ** @returns a file system error code.
  */
-int  TY_(ParseConfigFile)( TidyDocImpl* doc, ctmbstr cfgfil );
+TY_PRIVATE int  TY_(ParseConfigFile)( TidyDocImpl* doc, ctmbstr cfgfil );
 
 
 /** Attempts to parse the given config file into the document, using
@@ -1385,7 +1416,7 @@ int  TY_(ParseConfigFile)( TidyDocImpl* doc, ctmbstr cfgfil );
  ** @param charenc The name of the encoding to use for reading the file.
  ** @returns a file system error code.
  */
-int  TY_(ParseConfigFileEnc)( TidyDocImpl* doc,
+TY_PRIVATE int  TY_(ParseConfigFileEnc)( TidyDocImpl* doc,
                               ctmbstr cfgfil, ctmbstr charenc );
 
 
@@ -1395,7 +1426,7 @@ int  TY_(ParseConfigFileEnc)( TidyDocImpl* doc,
  ** @param cfgfil The file to save.
  ** @returns a file system error code.
  */
-int  TY_(SaveConfigFile)( TidyDocImpl* doc, ctmbstr cfgfil );
+TY_PRIVATE int  TY_(SaveConfigFile)( TidyDocImpl* doc, ctmbstr cfgfil );
 
 
 /** Writes the current configuration for options not having default values
@@ -1404,7 +1435,7 @@ int  TY_(SaveConfigFile)( TidyDocImpl* doc, ctmbstr cfgfil );
  ** @param sink The sink to save into.
  ** @returns a file system error code.
  */
-int  TY_(SaveConfigSink)( TidyDocImpl* doc, TidyOutputSink* sink );
+TY_PRIVATE int  TY_(SaveConfigSink)( TidyDocImpl* doc, TidyOutputSink* sink );
 
 
 /** Attempts to parse the provided value for the given option name. Returns
@@ -1415,7 +1446,7 @@ int  TY_(SaveConfigSink)( TidyDocImpl* doc, TidyOutputSink* sink );
  ** @param optVal The string value to attempt to parse.
  ** @returns Success or failure.
  */
-Bool  TY_(ParseConfigOption)( TidyDocImpl* doc, ctmbstr optnam, ctmbstr optVal );
+TY_PRIVATE Bool  TY_(ParseConfigOption)( TidyDocImpl* doc, ctmbstr optnam, ctmbstr optVal );
 
 
 /** Attempts to parse the provided value for the given option id. Returns
@@ -1426,7 +1457,7 @@ Bool  TY_(ParseConfigOption)( TidyDocImpl* doc, ctmbstr optnam, ctmbstr optVal )
  ** @param optVal The string value to attempt to parse.
  ** @returns Success or failure.
  */
-Bool  TY_(ParseConfigValue)( TidyDocImpl* doc, TidyOptionId optId, ctmbstr optVal );
+TY_PRIVATE Bool  TY_(ParseConfigValue)( TidyDocImpl* doc, TidyOptionId optId, ctmbstr optVal );
 
 
 /** Ensure that char encodings are self consistent.
@@ -1434,14 +1465,28 @@ Bool  TY_(ParseConfigValue)( TidyDocImpl* doc, TidyOptionId optId, ctmbstr optVa
  ** @param encoding The encoding being applied.
  ** @returns A bool indicating success or failure.
  */
-Bool  TY_(AdjustCharEncoding)( TidyDocImpl* doc, int encoding );
+TY_PRIVATE Bool  TY_(AdjustCharEncoding)( TidyDocImpl* doc, int encoding );
+
+
+/** Ensure that the configuration options are self consistent.
+ ** THIS PROCESS IS DESTRUCTIVE TO THE USER STATE. It examines
+ ** certain user-specified options and changes other options
+ ** as a result. This means that documented API functions such
+ ** as tidyOptGetValue() won't return the user-set values after
+ ** this is used. As a result, *don't* just use this function
+ ** at every opportunity, but only where needed, which is ONLY
+ ** prior to parsing a stream, and again prior to saving a
+ ** stream (because we reset after parsing.)
+ ** @param doc The Tidy document to adjust.
+ */
+void  TY_(AdjustConfig)( TidyDocImpl* doc );
 
 
 /** Indicates whether or not the current configuration is completely default.
  ** @param doc The Tidy document.
  ** @returns The result.
  */
-Bool  TY_(ConfigDiffThanDefault)( TidyDocImpl* doc );
+TY_PRIVATE Bool  TY_(ConfigDiffThanDefault)( TidyDocImpl* doc );
 
 
 /** Indicates whether or not the current configuration is different from the
@@ -1449,7 +1494,7 @@ Bool  TY_(ConfigDiffThanDefault)( TidyDocImpl* doc );
  ** @param doc The Tidy document.
  ** @returns The result.
  */
-Bool  TY_(ConfigDiffThanSnapshot)( TidyDocImpl* doc );
+TY_PRIVATE Bool  TY_(ConfigDiffThanSnapshot)( TidyDocImpl* doc );
 
 
 /** Returns the character encoding ID for the given character encoding
@@ -1458,21 +1503,21 @@ Bool  TY_(ConfigDiffThanSnapshot)( TidyDocImpl* doc );
  ** @param charenc The name of the character encoding.
  ** @returns The Id of the character encoding.
  */
-int TY_(CharEncodingId)( TidyDocImpl* doc, ctmbstr charenc );
+TY_PRIVATE int TY_(CharEncodingId)( TidyDocImpl* doc, ctmbstr charenc );
 
 
 /** Returns the full name of the encoding for the given ID.
  ** @param encoding The Id of the encoding.
  ** @returns The name of the character encoding.
  */
-ctmbstr TY_(CharEncodingName)( int encoding );
+TY_PRIVATE ctmbstr TY_(CharEncodingName)( int encoding );
 
 
 /** Returns the Tidy command line option name of the encoding for the given ID.
  ** @param encoding The Id of the encoding.
  ** @returns The Tidy command line option representing the encoding.
  */
-ctmbstr TY_(CharEncodingOptName)( int encoding );
+TY_PRIVATE ctmbstr TY_(CharEncodingOptName)( int encoding );
 
 
 /** Coordinates Config update and list data.
@@ -1480,15 +1525,15 @@ ctmbstr TY_(CharEncodingOptName)( int encoding );
  ** @param opt The option the list item is intended for.
  ** @param name The name of the new list item.
  */
-void TY_(DeclareListItem)( TidyDocImpl* doc, const TidyOptionImpl* opt, ctmbstr name );
+TY_PRIVATE void TY_(DeclareListItem)( TidyDocImpl* doc, const TidyOptionImpl* opt, ctmbstr name );
 
 #ifdef _DEBUG
 
 /* Debug lookup functions will be type-safe and assert option type match */
-unsigned int   TY_(_cfgGet)( TidyDocImpl* doc, TidyOptionId optId );
-Bool    TY_(_cfgGetBool)( TidyDocImpl* doc, TidyOptionId optId );
-TidyTriState TY_(_cfgGetAutoBool)( TidyDocImpl* doc, TidyOptionId optId );
-ctmbstr TY_(_cfgGetString)( TidyDocImpl* doc, TidyOptionId optId );
+TY_PRIVATE unsigned int   TY_(_cfgGet)( TidyDocImpl* doc, TidyOptionId optId );
+TY_PRIVATE Bool    TY_(_cfgGetBool)( TidyDocImpl* doc, TidyOptionId optId );
+TY_PRIVATE TidyTriState TY_(_cfgGetAutoBool)( TidyDocImpl* doc, TidyOptionId optId );
+TY_PRIVATE ctmbstr TY_(_cfgGetString)( TidyDocImpl* doc, TidyOptionId optId );
 
 #define cfg(doc, id)            TY_(_cfgGet)( (doc), (id) )
 #define cfgBool(doc, id)        TY_(_cfgGetBool)( (doc), (id) )
@@ -1533,8 +1578,8 @@ ctmbstr TY_(_cfgGetString)( TidyDocImpl* doc, TidyOptionId optId );
 
 /* entity starting with "&" returns zero on error */
 /* unsigned int    EntityCode( ctmbstr name, unsigned int versions ); */
-ctmbstr TY_(EntityName)( unsigned int charCode, unsigned int versions );
-Bool    TY_(EntityInfo)( ctmbstr name, Bool isXml, unsigned int* code, unsigned int* versions );
+TY_PRIVATE ctmbstr TY_(EntityName)( unsigned int charCode, unsigned int versions );
+TY_PRIVATE Bool    TY_(EntityInfo)( ctmbstr name, Bool isXml, unsigned int* code, unsigned int* versions );
 
 #endif /* __ENTITIES_H__ */
 #ifndef __GDOC_H__
@@ -1553,7 +1598,7 @@ Bool    TY_(EntityInfo)( ctmbstr name, Bool isXml, unsigned int* code, unsigned 
 
 */
 
-void TY_(CleanGoogleDocument)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(CleanGoogleDocument)( TidyDocImpl* doc );
 
 #endif /* __GDOC_H__ */
 #ifndef language_h
@@ -1653,7 +1698,7 @@ typedef struct tidyLocaleMapItemImpl {
  **          Returns NULL on failure.
  **  @return The same buffer for convenience.
  */
-tmbstr TY_(tidySystemLocale)(tmbstr result);
+TY_PRIVATE tmbstr TY_(tidySystemLocale)(tmbstr result);
 
 /**
  *  Tells Tidy to use a different language for output.
@@ -1666,12 +1711,12 @@ tmbstr TY_(tidySystemLocale)(tmbstr result);
  *          true. However the opposite is not true; if es is requested but
  *          not present, Tidy will not try to select from the es_XX variants.
  */
-Bool TY_(tidySetLanguage)( ctmbstr languageCode );
+TY_PRIVATE Bool TY_(tidySetLanguage)( ctmbstr languageCode );
 
 /**
  *  Gets the current language used by Tidy.
  */
-ctmbstr TY_(tidyGetLanguage)(void);
+TY_PRIVATE ctmbstr TY_(tidyGetLanguage)(void);
 
 
 /**
@@ -1682,7 +1727,7 @@ ctmbstr TY_(tidyGetLanguage)(void);
  *  @returns Returns yes to indicate that the current language was
  *    specified by an API user.
  */
-Bool TY_(tidyGetLanguageSetByUser)(void);
+TY_PRIVATE Bool TY_(tidyGetLanguageSetByUser)(void);
 
 
 /**
@@ -1690,20 +1735,20 @@ Bool TY_(tidyGetLanguageSetByUser)(void);
  *  selected the current language. This flag prevents subsequently
  *  created instances of TidyDocument from changing the user's language.
  */
-void TY_(tidySetLanguageSetByUser)( void );
+TY_PRIVATE void TY_(tidySetLanguageSetByUser)( void );
 
 
 /**
  *  Provides a string given `messageType` in the current
  *  localization for `quantity`.
  */
-ctmbstr TY_(tidyLocalizedStringN)( unsigned int messageType, unsigned int quantity );
+TY_PRIVATE ctmbstr TY_(tidyLocalizedStringN)( unsigned int messageType, unsigned int quantity );
 
 /**
  *  Provides a string given `messageType` in the current
  *  localization for the single case.
  */
-ctmbstr TY_(tidyLocalizedString)( unsigned int messageType );
+TY_PRIVATE ctmbstr TY_(tidyLocalizedString)( unsigned int messageType );
 
 
 /** @} */
@@ -1715,7 +1760,7 @@ ctmbstr TY_(tidyLocalizedString)( unsigned int messageType );
  *  Provides a string given `messageType` in the default
  *  localization (which is `en`).
  */
-ctmbstr TY_(tidyDefaultString)( unsigned int messageType );
+TY_PRIVATE ctmbstr TY_(tidyDefaultString)( unsigned int messageType );
 
 /*
  *  Initializes the TidyIterator to point to the first item
@@ -1723,7 +1768,7 @@ ctmbstr TY_(tidyDefaultString)( unsigned int messageType );
  *  these are provided for documentation generation purposes
  *  and probably aren't useful for LibTidy implementors.
  */
-TidyIterator TY_(getStringKeyList)(void);
+TY_PRIVATE TidyIterator TY_(getStringKeyList)(void);
 
 /*
  *  Provides the next key value in Tidy's list of localized
@@ -1731,47 +1776,2639 @@ TidyIterator TY_(getStringKeyList)(void);
  *  generation purposes and probably aren't useful to
  *  libtidy implementors.
  */
-unsigned int TY_(getNextStringKey)( TidyIterator* iter );
+TY_PRIVATE unsigned int TY_(getNextStringKey)( TidyIterator* iter );
 
 /**
  *  Initializes the TidyIterator to point to the first item
  *  in Tidy's structure of Windows<->POSIX local mapping.
  *  Items can be retrieved with getNextWindowsLanguage();
  */
-TidyIterator TY_(getWindowsLanguageList)(void);
+TY_PRIVATE TidyIterator TY_(getWindowsLanguageList)(void);
 
 /**
  *  Returns the next record of type `localeMapItem` in
  *  Tidy's structure of Windows<->POSIX local mapping.
  */
-const tidyLocaleMapItemImpl *TY_(getNextWindowsLanguage)( TidyIterator* iter );
+TY_PRIVATE const tidyLocaleMapItemImpl *TY_(getNextWindowsLanguage)( TidyIterator* iter );
 
 /**
  *  Given a `tidyLocaleMapItemImpl, return the Windows name.
  */
-ctmbstr TY_(TidyLangWindowsName)( const tidyLocaleMapItemImpl *item );
+TY_PRIVATE ctmbstr TY_(TidyLangWindowsName)( const tidyLocaleMapItemImpl *item );
 
 /**
  *  Given a `tidyLocaleMapItemImpl, return the POSIX name.
  */
-ctmbstr TY_(TidyLangPosixName)( const tidyLocaleMapItemImpl *item );
+TY_PRIVATE ctmbstr TY_(TidyLangPosixName)( const tidyLocaleMapItemImpl *item );
 
 /**
  *  Initializes the TidyIterator to point to the first item
  *  in Tidy's list of installed language codes.
  *  Items can be retrieved with getNextInstalledLanguage();
  */
-TidyIterator TY_(getInstalledLanguageList)(void);
+TY_PRIVATE TidyIterator TY_(getInstalledLanguageList)(void);
 
 /**
  *  Returns the next installed language.
  */
-ctmbstr TY_(getNextInstalledLanguage)( TidyIterator* iter );
+TY_PRIVATE ctmbstr TY_(getNextInstalledLanguage)( TidyIterator* iter );
 
 
 /** @} */
 
 #endif /* language_h */
+#ifndef language_de_h
+#define language_de_h
+/*
+ * language_de.h
+ * Localization support for HTML Tidy.
+ *
+ *
+ * This file is a localization file for HTML Tidy. It will have been machine
+ * generated or created and/or edited by hand. Both are valid options, but
+ * please help keep our localization efforts simple to maintain by maintaining
+ * the structure of this file, and changing the check box below if you make
+ * changes (so others know the file origin):
+ *
+ * [ ] THIS FILE IS MACHINE GENERATED. It is a localization file for the
+ *     language (and maybe region) "de". The source of
+ *     these strings is a gettext PO file in Tidy's source, probably called 
+ *     "language_de.po".
+ *
+ * [X] THIS FILE WAS HAND MODIFIED. Translators, please feel to edit this file
+ *     directly (and check this box). If you prefer to edit PO files then use
+ *     `poconvert.rb msgunfmt language_de.h` (our own
+ *     conversion tool) to generate a fresh PO from this file first!
+ *
+ * (©) 2020-2020 Michael Uplawski <michael.uplawski@uplawski.eu>
+ * See tidy.h and access.h for the copyright notice.
+ *
+ * Template Created by Jim Derry on 01/14/2016.
+ *
+ */
+#ifdef _MSC_VER
+#pragma execution_character_set("utf-8")
+#endif
+
+
+/**
+ *  This language-specific function returns the correct pluralForm
+ *  to use given n items, and is used as a member of each language
+ *  definition.
+ */
+static unsigned int whichPluralForm_de(unsigned int n) {
+    /* Plural-Forms: nplurals=2; */
+    return (n > 1);
+}
+
+
+/**
+ *  This structure specifies all of the strings needed by Tidy for a
+ *  single language. Static definition in a header file makes it
+ *  easy to include and exclude languages without tinkering with
+ *  the build system.
+ *
+ *  This file serves as the master template for generating `gettext`
+ *  PO and POT files using our `potool.rb` script. Certain comments
+ *  entered below will be included in the PO/POT files as developer
+ *  comments. To enable this, use only standard C-style comments that
+ *  begin immediately after the opening brace without whitespace.
+ */
+
+static languageDefinition language_de = { whichPluralForm_de, {
+    /***************************************
+     ** This MUST be present and first.
+     ** Specify the code for this language.
+     ***************************************/
+    {/* Specify the ll or ll_cc language code here. */
+      TIDY_LANGUAGE,                0,   "de"
+    },
+
+    /*********************************************************************
+     ** Options Documentation
+     **  As of 2016-January these descriptions are used uniquely by the
+     **  console application but are made available for LibTidy users as
+     **  well. Because we generate documentation from these descriptions
+     **  it's important to use ONLY the following tags:
+     **    <code>, <em>, <strong>, <br/>, <p>
+     **  Note that the xslt processor requires <br/> to be self closing!
+     ** @remark enum source is TidyOptionId
+     *********************************************************************/
+    {/* Important notes for translators:
+        - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+          <br/>.
+        - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+        - Option values should be enclosed in <var></var>.
+        - It's very important that <br/> be self-closing!
+        - The strings "Tidy" and "HTML Tidy" are the program name and must not
+          be translated. */
+      TidyAccessibilityCheckLevel,  0,
+        "Diese Option bestimmt, wenn nötig, das Niveau der Überprüfungen der Barrierefreiheit, "
+        "die Tidy durchführen soll. "
+        "<br/>"
+        "Niveau <var>0 (Tiidy Classic)</var> entsprichte dem Niveau der Prüfugen von Tidy Classic."
+        "<br/>"
+        "Auf dieser Seite finden Sie weitere Informationen zur Prüfung der Barrierefreiheit mit Tidy: "
+        "<a href=\"http://www.html-tidy.org/accessibility/\">Barrierefreiheit mit Tidy</a>. "
+    },
+    {/* Important notes for translators:
+        - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+          <br/>.
+        - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+        - Option values should be enclosed in <var></var>.
+        - It's very important that <br/> be self-closing!
+        - The strings "Tidy" and "HTML Tidy" are the program name and must not
+          be translated. */
+      TidyAltText,                  0,
+        "Diese Option bestimmt den Standardwert für das <code>alt=</code> Attribut, "
+        "das von Tidy eingesetzt wird, wo es in <code>&lt;img&gt;</code> Tags fehlt. "
+        "<br/>"
+        "Gehen Sie behutsam damit um; es liegt in Ihrer Verantwortung, Dokumente barrierefrei "
+        " zu gestalten, für Leute die die Bilder nicht sehen können. "
+    },
+    {/* Important notes for translators:
+        - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+          <br/>.
+        - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+        - Option values should be enclosed in <var></var>.
+        - It's very important that <br/> be self-closing!
+        - The strings "Tidy" and "HTML Tidy" are the program name and must not
+          be translated. */
+      TidyAnchorAsName,             0,
+        "Diese Option steuert das Entfernen oder Hinzufügen des <code>name</code> "
+        "Attributs in solchen Elementen, die als Verweisanker dienen können. " 
+        "<br/>"
+        "Wenn hier <var>yes</var> gewählt wird und ein <code>name</code> Attribut "
+        "bisher nicht vorhanden ist, wird es zusammen mit einem <code>id</code> Attribut "
+        "ergänzt, soweit die DTD dies erlaubt. "
+        "<br/>"
+        "Mit dem Wert <var>no</var>, wird ein vorhandenes <code>name</code> Attribut "
+        "entfernt, sofern en <code>id</code> existiert oder hinzugefügt wurde." 
+    },
+    {/* Important notes for translators:
+        - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+          <br/>.
+        - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+        - Option values should be enclosed in <var></var>.
+        - It's very important that <br/> be self-closing!
+        - The strings "Tidy" and "HTML Tidy" are the program name and must not
+          be translated. */
+      TidyAsciiChars,               0,
+        "Kann verwendet werden, um die Wirkung der Option <code>clean</code> "
+        "zu modifizieren, wenn der den Wert <var>yes</var> hat."
+        "<br/>"
+        "Hier <var>yes</var> zusammen mit <code>clean</code> zu verwenden, "
+        "hat zur Folge, dass <code>&amp;emdash;</code>, <code>&amp;rdquo;</code> "
+        "und andere typografische Zeichen in ihre nächstliegenden ASCII-Äquivalente "
+        "umgewandelt werden. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyBlockTags,                0,
+        "Diese Option dient der Einführung neuer Block-Elemente. Der Wert muss "
+        "eine Liste von leerzeichen- oder komma-separierten Tag-Namen sein."
+        "<br/>"
+        "Solange Sie die neuen Tags nicht definieren, wird Tidy keine bereinigte " 
+        "Datei erzeugen, wenn die Eingabe bisher unbekannte Tags enthält. "
+        "<br/>"
+        "Beachten Sie, dass Sie das Content Model für Elemente wie "
+        "<code>&lt;table&gt;</code>, <code>&lt;ul&gt;</code>, "
+        "<code>&lt;ol&gt;</code> and <code>&lt;dl&gt;</code> nicht ändern können. "
+        "<br/>"
+        "Die Option wird im XML Modus ignoriert. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyBodyOnly,                 0,
+        "Die Option legt fest, ob Tidy nur den Inhalt des <code>body</code> "
+        "Elements als HTML-Fragment ausgeben soll. "
+        "<br/>"
+        "Hier <var>auto</var> einzustellen hat zur Folge, dass die Wirkung nur "
+        "eintritt, wenn das <code>body</code> Element hergeleitet wurde."
+        "<br/>"
+        "Die Methode ist nützlich, um ganze Seiten als Teil einer anderen Seite auszugeben. "
+        "<br/>"
+        "Die Option ist wirkungslos, wenn XML Ausgabe gefordert ist. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyBreakBeforeBR,            0,
+        "Diese Option legt fest, ob Tidy einen Zeilenumbruch vor jedem "
+        "<code>&lt;br&gt;</code> Element einfügen soll. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyCharEncoding,             0,
+        "Diese Option bestimmt, welche Zeichenkodierung Tidy für Eingaben annehmen soll und, "
+        "falls zutreffend, dass Tidy für Ausgaben automatisch eine geeignete Zeichenkodierung "
+        "wählt. Die Kodierungen für Ein- und Ausgaben können sich unterscheiden. "
+        "<br/>"
+        "Wird für die Eingabe eine der Kodierungen <var>ascii</var>, <var>latin0</var>, "
+        "<var>ibm858</var>, <var>mac</var> oder <var>win1252</var> gefordert, "
+        "wird die Option <code>output-encoding</code> automatisch auf <var>ascii</var> "
+        "eingestellt. Sie können dies verhindern, indem Sie den Wert für "
+        "<code>output-encoding</code> selbst bestimmen. "
+        "<br/>"
+        "Bei anders kodierten Eingaben wird die Option <code>output-encoding</code> "
+        "automatisch auf den identischen Wert eingestellt. "
+        "<br/>"
+        "Sie können den voreingestellten Wert für <code>output-encoding</code> "
+        "überschreiben, indem Sie die Option selbst setzen. "
+        "<br/>"
+        "Tidy ist kein Konverter für Zeichenkodierungen. Auch, wenn Latin- und "
+        "UTF-Kodierungen frei vermischt sein können, ist es mit Tidy nicht möglich, "
+        "asiatische Kodierungen nach Latin zu konvertieren."
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyCoerceEndTags,            0,
+        "Diese Option bestimmt, ob Tidy ein Start-Tag in ein End-Tag umwandelt, "
+        "wo es wahrscheinlich erscheint, dass ein solches End-Tag eigentlich "
+        "gewünscht war; zum Beispiel kann die Eingabe "
+        "<br/>"
+        "<code>&lt;span&gt;ein &lt;b&gt;wichtiges&lt;b&gt; Wort&lt;/span&gt;</code> "
+        "<br/>"
+        "von Tidy umgewandelt werden in "
+        "<br/>"
+        "<code>&lt;span&gt;ein &lt;b&gt;wichtiges&lt;/b&gt; Wort&lt;/span&gt;</code> "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyCSSPrefix,                0,
+        "Diese Option setzt den Präfix, den Tidy für Style-Regeln verwendet. "
+        "<br/>"
+        "Standardmäßig wird <var>c</var> verwendet. "
+    },
+    {/* Important notes for translators:
+        - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+          <br/>.
+        - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+        - Option values should be enclosed in <var></var>.
+        - It's very important that <br/> be self-closing!
+        - The strings "Tidy" and "HTML Tidy" are the program name and must not
+          be translated. */
+      TidyDecorateInferredUL,       0,
+        "Diese Option legt fest, ob Tidy hergeleitete <code>&lt;ul&gt;</code> "
+        "Elemente mit CSS-Auszeichnungen ausstatten soll, um Einrückungen nach "
+        "rechts zu verhindern. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyDoctype,                  0,
+        "Diese Option setzt die DOCTYPE Deklaration, die von Tidy generiert wird. "
+        "<br/>"
+        "Wenn hier <var>omit</var> eingestellt ist, enthält die Ausgabe keine "
+        "DOCTYPE Deklaration. Beachten Sie, dass damit auch <code>numeric-entities</code> "
+        "auf <var>yes</var> eingestellt wird. "
+        "<br/>"
+        "Mit dem Wert <var>html5</var> wird der DOCTYPE auf "
+        "<code>&lt;!DOCTYPE html&gt;</code> festgelegt."
+        "<br/>"
+        "Wird statt dessen <var>auto</var> (der Standard) verwendet, wird Tidy versuchen, "
+        "einen aufgrund des Dokumentinhalts vermuteten DOCTYPE zu verwenden. "
+        "Beachten Sie, dass auf diese Weise der DOCTYPE des aktuellen Dokuments "
+        "<em>nicht</em> geändert wird. "
+        "<br/>"
+        "Der Wert <var>strict</var> veranlasst Tidy, den DOCTYPE auf HTML4 oder "
+        "XHTML1 strict DTD einzustellen. "
+        "<br/>"
+        "Mit dem Wert <var>loose</var> wird der DOCTYPE HTML4 oder "
+        "XHTML1 loose (transitional) DTD eingestellt. "
+        "<br/>"
+        "Alternatif können Sie eine Zeichenkette für den Formal Public Identifier (FPI) "
+        "angeben."
+        "<br/>"
+        "Zum Beispiel: "
+        "<br/>"
+        "<code>doctype: \"-//ACME//DTD HTML 3.14159//EN\"</code>"
+        "<br/>"
+        "Wenn Sie den FPI für ein XHTML Dokument angeben, erzeugt Tidy eine "
+        "leere Zeichenkette für den System Identifyer. In HTML-Dokumenten "
+        "fügt Tidy einen System Identifier nur dann ein, wenn er schon vorher "
+        "vorhanden war, im Hinblick auf die Verarbeitungsmodi einiger Browser. "
+        "Tidy lässt den DOCTYPE generischer XML-Dokumente unangetastet." 
+        "<br/>"
+        "Die Option bedingt keinerlei Überprüfung der Dokumentkonformität. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyDropEmptyElems,           0,
+        "Diese Option legt fest, ob Tidy leere Elemente verwerfen soll. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyDropEmptyParas,           0,
+        "Diese Option legt fest, ob Tidy leere Absätze verwerfen soll. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyDropPropAttrs,            0,
+        "Mit dieser Option wird bestimmt, ob Tidy proprietäre Attribute "
+        "entfernen soll, wie Microsoft data binding Attribute. Außerdem "
+        "werden solche Attribute, die in der ausgegebenen Version des HTML-"
+        "Codes nicht erlaubt sind, verworfen, wenn gleichzeitig <code>strict-tags-attributes</code> "
+        "gesetzt wurde. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyDuplicateAttrs,           0,
+        "Mit dieser Option wird festgelegt, ob Tidy das erste oder das letzte "
+        "Vorkommen eines wiederholten Attributs übernehmen soll, z.B. bei "
+        "aufeinanderfolgenden <code>align</code> Attributen im selben Tag. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyEmacs,                    0,
+        "Mit dieser Option ändert Tidy das Format von Fehler- und Warnmeldungen "
+        "so, dass sie leichter von GNU Emacs und einigen anderen Programmen geparst "
+        "werden. Aus dem standardmäßigen "
+        "<br/>"
+        "  Zeile &lt;Zeilennummer&gt; Spalte &lt;Spaltennummer&gt; - (Fehler|Warnung): &lt;Meldung&gt; "
+        "<br/>"
+        "wird eine Ausgabe, die den Dateinamen der Eingabe enthält: "
+        "<br/>"
+        "  &lt;Dateiname&gt;:&lt;Zeilennummer&gt;:&lt;Spaltennummer&gt;: (Fehler|Warnung): &lt;Meldung&gt; "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyEmptyTags,                0,
+        "Diese Option führt neue, leere Inline-Elemente ein. Der Wert muss eine leerzeichen- "
+        "oder komma-separierte Lste von Tagnamen sein. "
+        "<br/>"
+        "Sollten Sie neue Elemente nicht deklarieren, verweigert Tidy das Generieren einer "
+        "bereinigten Datei, wenn die Eingabe bisher unbekannte Elemente enthält. "
+        "<br/>"
+        "Achten Sie darauf, auch leere Elemente als entweder Inline- oder Blockelemente "
+        "zu deklarieren. "
+        "<br/>"
+        "Diese Option wird im XML-Modus ignoriert. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyEncloseBlockText,         0,
+        "Diese Option legt fest, ob Tidy ein <code>&lt;p&gt;</code> Element "
+        "einfügen soll, um Text zu umschließen, den es in solchen Elementen findet, "
+        "die gemischten Inhalt für HTML transitional, nicht aber für HTML strict "
+        "erlauben. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyEncloseBodyText,          0,
+        "Diese Option legt fest, ob Text, der im <code>body</code> Element "
+        "gefunden wird, von einem <code>&lt;p&gt;</code> Element umschlossen "
+        "werden soll. "
+        "<br/>"
+        "Das ist sinnvoll, wenn Sie bereits vorhandenen HTML-Code mit einem "
+        "Style-Sheet verwenden wollen. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyErrFile,                  0,
+        "Diese Option nennt die Fehlerdatei, in der Tidy Fehler und Warnungen " 
+        "vermerkt. "
+        "Normalerweise werden Fehler und Warnungen auf <code>stderr</code> "
+        "ausgegeben. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyEscapeCdata,              0,
+        "Mit dieser Option bestimmen Sie, ob Tidy "
+        "<code>&lt;![CDATA[]]&gt;</code> Abschnitte in normlen Text umwandeln "
+        "soll. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyEscapeScripts,          0,
+        "Diese Option bewirkt, dass Zeichen oder Zeichenketten, die wie "
+        "schließende Tags aussehen, wie "
+        "<code>&lt;/g</code> mit backslashes maskiert werden, wie in "
+        "<code>&lt;\\/g</code>. Setzen Sie en Wert <var>no</var>, um dies zu "
+        "verhindern. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyFixBackslash,             0,
+        "Diese Option bestimmt, ob Tidy Backslashes <code>\\</code> in URLs "
+        "durch normale Schrägstriche <code>/</code> ersetzen soll. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyFixComments,              0,
+        "Diese Option bestimmt, ob Tidy unerwartete Bindestriche durch "
+        "<code>=</code> Zeichen ersetzen soll, wenn Bindestriche aufeinanderfolgen. "
+        "<br/>"
+        "Der Standard ist <var>auto</var>, was für HTML5 Dokumente das gleiche wie "
+        "<var>no</var> bedeutet, für alle anderen aber <var>yes</var>. "
+        "<br/>"
+        "Die SGML Kommentarsyntax wurde für HTML aufgegeben, alle Versionen von HTML "
+        "erlauben aufeinanderfolgende Bindestriche, auch wenn das nicht für XML "
+        "und XHTML gilt. Wenn Sie ältere Browser unterstützen wollen, die SGML "
+        "Syntax verlangen, sollten Sie hier den Wert <var>yes</var> setzen."
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyFixUri,                   0,
+        "Diese Option legt fest, ob Tidy Attributwerte mit URIs auf ungültige "
+        "Zeichen überprüft und sie, wenn solche gefunden werden, maskiert, wie "
+        "von HTML4 empfohlen. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyForceOutput,              0,
+        "Diese Option legt fest, ob Tidy auch dann eine Ausgabe erzeugt, "
+        "wenn Fehler auftreten. "
+        "<br/>"
+        "Verwenden Sie diese Einstellung mit Vorsicht; wenn Tidy einen Fehler "
+        "meldet, heißt das, dass Tidy nicht (oder nicht sicher) in der Lage "
+        "ist, den Fehler zu beheben. Die erzeugte Ausgabe kann darum Ihren "
+        "Erwartungen widersprechen. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyGDocClean,                0,
+        "Diese Option bestimmt, ob sich Tidy beim Bereinigen von HTML-Code, "
+        "der aus Google Docs exportiert wurde, speziell verhalten soll. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyHideComments,             0,
+        "Mit dieser Option bestimmen Sie, ob Tidy Kommentare aus der Ausgabe "
+        "entfernt. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyHtmlOut,                  0,
+        "Diese Option bestimmt, ob Tidy eine formatierte Ausgabe als HTML "
+        "schreiben soll. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyInCharEncoding,           0,
+        "Diese Option legt die Zeichenkodierung fest, die Tidy für die Eingabe "
+        "verwendet. "
+        "Tidy geht bei manchen Eingabekodierungen von ein paar Annahmen aus. "
+        "<br/>"
+        "Für <var>ascii</var> akzeptiert Tidy Latin-1 (ISO-8859-1) Zeichenwerte "
+        "und konvertiert sie nötigenfalls in Entities. "
+        "<br/>"
+        "Für <var>raw</var> stellt Tidy keinerlei Vermutungen über die "
+        "Zeichenwerte an und reicht sie unverändert an die Ausgabe weiter. "
+        "<br/>"
+        "Für <var>mac</var> und <var>win1252</var> werden händlerspezifische "
+        "Zeichenwerte akzeptiert und nötigenfalls in Entities umgewandelt. "
+        "<br/>"
+        "Asiatische Zeichenkodierungen, wie <var>iso2022</var>, werden in "
+        "geeigneter Weise behandelt, unter der Annahme, dass auch "
+        "<code>output-encoding</code> entsprechend angegeben ist. "
+        "<br/>"
+        "Tidy ist kein Konverter für Zeichenkodierungen. Auch, wenn Latin- und "
+        "UTF-Kodierungen frei gemischt werden können, ist es nicht möglich, "
+        "asiatische Kodierungen mit Tidy in Latin umzuwandeln. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyIndentAttributes,         0,
+        "Mit dieser Option wird festgelegt, ob Tidy jedes Attribut auf einer "
+        "neuen Zeile beginnen soll.  "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyIndentCdata,              0,
+        "Diese Option bestimmt, ob Tidy "
+        "<code>&lt;![CDATA[]]&gt;</code> Abschnitte einrücken soll. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name is “indent” */
+        TidyIndentContent,            0,
+        "Diese Option bestimmt, ob Tidy Blockelemente einrücken soll. "
+        "<br/>"
+        "Die Einstellung <var>auto</var> bewirkt, dass Tidy selbst bestimmt, ob "
+        "der Inhalt von Tags wie <code>&lt;title&gt;</code>, "
+        "<code>&lt;h1&gt;</code>-<code>&lt;h6&gt;</code>, <code>&lt;li&gt;</code>, "
+        "<code>&lt;td&gt;</code>, oder <code>&lt;p&gt;</code> eingerückt wird, "
+        "abhängig vom Abschnitt der Inhaltsdaten, der solch ein Blockelement enthält. "
+        "<br/>"
+        "Die Einstellung <var>yes</var> für <code>indent</code> kann Layoutfehler "
+        "mancher Browser offenlegen.  "
+        "<br/>"
+        "Verwenden Sie die Option <code>indent-spaces</code> zur Kontrolle der "
+        "Zahl auszugebender Leerzeichen oder Tabulatoren, je nach Einrückungsebene "
+        "und <code>indent-with-tabs</code> um festzulegen, ob entweder Tabulatoren "
+        "oder Leerzeichen verwendet werden."
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyIndentSpaces,             0,
+        "Diese Option bestimmt die Anzahl von Leerzeichen oder Tabulatoren, "
+        "mit denen Tidy Einrückungen vornimmt, wenn <code>indent</code> "
+        "aktiviert ist. "
+        "<br/>"
+        "Beachten Sie, dass der Standardwert für diese Option vom aktuellen Wert "
+        "der Option <code>indent-with-tabs</code> abhängt (siehe dort). "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option name is “new-inline-tags” */
+        TidyInlineTags,               0,
+        "Diese Option definiert neue nicht-leere Inline Elemente. Der Wert muss "
+        "eine leerzeichen- oder kommaseparierte Liste von Tagnamen sein."
+        "<br/>"
+        "Solange Sie neue Tags nicht deklarieren, verweigert Tidy die Erzeugung "
+        "bereinigter Dateien, wenn die Eingabe bisher unbekannte Tags enthält. "
+        "<br/>"
+        "Diese Option wird im XML-Modus ignoriert. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyJoinClasses,              0,
+        "Diese Option bestimmt, ob Tidy mehrere CSS-Klassen zu einer einzigen "
+        "neuen Klasse kombiniert, wo ein Element mit mehrere Klassennamen "
+        "versehen wurde. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyJoinStyles,               0,
+        "Diese Option bestimmt, ob Tidy mehrere style-Attribute zu einem einzigen "
+        "kombiniert, wo ein Element mit mehreren style-Attributen versehen wurde. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: keep-time */
+        TidyKeepFileTimes,            0,
+        "Diese option bestimmt, ob Tidy das Änderungsdatum der originalen Eingabedatei "
+        "erhalten soll, wenn solche Dateien von Tidy mit der bereinigten Fassung " 
+        "überschrieben werden. "
+        "<br/>"
+        "Das Setzen dieser Option mit dem Wert <var>yes</var> erlaubt es Ihnen, "
+        "Dateien mit Tidy zu bereinigen, ohne das Änderungsdatum zu aktualisieren. "
+        "Das kann nützlich sein, wenn andere Werkzeuge dieses Datum verwenden, zum "
+        "Beispiel zum automatisierten Hochladen auf den Server. "
+        "<br/>"
+        "Beachten Sie, dass diese Funktion nicht auf allen Systemen zur Verfügung steht. "
+    },
+    {/* Important notes for translators:
+     - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+     <br/>.
+     - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+     - Option values should be enclosed in <var></var>.
+     - It's very important that <br/> be self-closing!
+     - The strings "Tidy" and "HTML Tidy" are the program name and must not
+     be translated. */
+        TidyKeepTabs,            0,
+        "Der Standardwert dieser Option ist <var>no</var>. Damit ersetzt Tidy alle "
+        "Tabulatoren durch Leerzeichen, entsprechend der Option <code>tab-size</code> und "
+        "dem aktuellen Zeileneinzug. "
+        "Dieser Zwischenraum wird später natürlich auf nur ein Leerzeichen reduziert, mit "
+        "Ausnahme der Abstände, die in den nachfolgend gelisteten Blöcken und Elementen auftreten. "
+        "<br/>"
+        "Wenn der Wert auf <var>yes</var> eingestellt ist, lässt Tidy einige Tabulatoren "
+        "unangetastet, aber nur in präformatierten Blöcken, wie "
+        "<code>&lt;pre&gt;</code> und weiteren CDATA elementen, wie "
+        "<code>&lt;script&gt;</code>, <code>&lt;style&gt;</code>, sowie Pseudo-Elementen "
+        "wie <code>&lt;?php ... ?&gt;</code>. "
+        "Wie immer werden alle anderen Tabulatoren und Tabulatorfolgen im Quelldokument durch "
+        "Leerzeichen ersetzt."
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: literal-attributes*/
+        TidyLiteralAttribs,           0,
+        "Diese Option bestimmt, wie Tidy mit Leerzeichen innerhalb von Attributwerten "
+        "umgeht. "
+        "<br/>"
+        "Wenn der Wert <var>no</var> ist, normalisiert Tidy Attributwerte indem es "
+        "alle Zeilenumbrüche oder Tabulatoren durch ein einziges Leerzeichen ersetzt, "
+        "und außerdem aufeinanderfolgende Leerzeichen auf ein einziges reduziert. "
+        "<br/>"
+        "Um Tidy dazu zu bringen, die ursprünglichen Werte aller Attributwerte buchstabentreu "
+        "zu erhalten und damit alle Leerzeichen innerhalb der Attributwerte unangetastet "
+        "bleiben, setzen Sie diese Option auf <var>yes</var>. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyLogicalEmphasis,          0,
+        "Diese Option bestimmt, ob Tidy jedes "
+        "<code>&lt;i&gt;</code> durch <code>&lt;em&gt;</code> und jedes "
+        "<code>&lt;b&gt;</code> durch <code>&lt;strong&gt;</code> ersetzen soll. "
+        "Attribute dieser Tags bleiben unverändert erhalten. "
+        "<br/>"
+        "Diese Option kann unabhängig von <code>clean</code> aktiviert werden. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyLowerLiterals,            0,
+        "Diese Option legt fest, ob Tidy solche Attributwerte, die aus einer Liste "
+        "vordefinierter Werte bestehen, in Kleinbuchstaben konvertieren soll. "
+        "<br/>"
+        "Für XHTML-Dokumente ist das notwendig. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: bare */
+        TidyMakeBare,                 0,
+        "Diese Option legt fest, ob Tidy typografische Anführungsstriche und " 
+        "Geviertstriche duch ASCII-Zeichen ersetzen soll und eher normale Leerzeichen anstelle "
+        "geschützter Leerzeichen ausgeben soll, wenn sie in der Eingabe "
+        "gefunden werden. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: clean */
+        TidyMakeClean,                0,
+        "Diese Option legt fest, wie Tidy mit einigen veralteten präsentationsbezogenen "
+        "Tags umgehen soll (zur Zeit betrifft das <code>&lt;i&gt;</code>, "
+        "<code>&lt;b&gt;</code>, <code>&lt;center&gt;</code> wenn es von "
+        "geeigneten inline-Tags umschlossen ist und <code>&lt;font&gt;</code>). "
+        "Wenn hier <var>yes</var> eingestellt ist, werden die betroffenen Tags "
+        "durch CSS Formatierung und geeignete Textauszeichnung ersetzt. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name (in deed): tidy-mark */
+        TidyMark,                     0,
+        "Diese Option legt fest, ob Tidy ein <code>meta</code> Element im "
+        "Dokumentenkopf unterbringen soll, mit dem darauf hingewiesen wird, dass "
+        "die Datei mit Tidy bereinigt worden ist. "
+        "<br/>"
+        "Tidy erzeugt kein neues meta-Element, wenn bereits eines vorhanden ist. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyMergeDivs,                0,
+        "Diese Option kann das Verhalten von <code>clean</code> beeinflussen, wenn "
+        "ihr Wert auf <var>yes</var> gesetzt ist. "
+        "<br/>"
+        "Tidy wird dann verschachtelte <code>&lt;div&gt;</code> zu einem einzigen verschmelzen, "
+        "wie <code>&lt;div&gt;&lt;div&gt;...&lt;/div&gt;&lt;/div&gt;</code>. "
+        "<br/>"
+        "Wenn der Wert statt dessen <var>auto</var> ist, werden die Attribute des innersten "
+        "<code>&lt;div&gt;</code> ins äußerste verschoben. Verschachtelte "
+        "<code>&lt;div&gt;</code> mit <code>id</code>-Attributen werden <em>nicht</em> "
+        "verschmolzen. "
+        "<br/>"
+        "Mit <var>yes</var> werden die Attribute des innersten "
+        "<code>&lt;div&gt;</code> verworfen, mit Ausnahme von "
+        "<code>class</code> und <code>style</code>. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyMergeEmphasis,            0,
+        "Diese Option legt fest, ob Tidy verschachtelte <code>&lt;b&gt;</code> "
+        "und <code>&lt;i&gt;</code>-Elemente verschmelzen soll; zum Beispiel würde im Falle von "
+        "<br/>"
+        "<code>&lt;b class=\"rtop-2\"&gt;foo &lt;b class=\"r2-2\"&gt;bar&lt;/b&gt; baz&lt;/b&gt;</code>, "
+        "<br/>"
+        "Tidy diese Ausgabe erzeugen: <code>&lt;b class=\"rtop-2\"&gt;foo bar baz&lt;/b&gt;</code>. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyMergeSpans,               0,
+        "Diese Option kann das Verhalten von <code>clean</code> beeinflussen, wenn "
+        "ihr Wert <var>yes</var> ist."
+        "<br/>"
+        "Dann wird Tidy verschachtelte <code>&lt;span&gt;</code>, "
+        "wie in <code>&lt;span&gt;&lt;span&gt;...&lt;/span&gt;&lt;/span&gt;</code> zu "
+        "einem einzigen verschmelzen."
+        "<br/>"
+        "Der Algorithmus ist identisch mit dem der Option <code>merge-divs</code> (siehe dort). "
+    },
+    {/* Important notes for translators:
+        - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+          <br/>.
+        - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+        - Option values should be enclosed in <var></var>.
+        - It's very important that <br/> be self-closing!
+        - The strings "Tidy" and "HTML Tidy" are the program name and must not
+          be translated. */
+      TidyNCR,                      0,
+        "Diese Option bestimmt, ob Tidy numerische Zeichenreferenzen akzeptieren soll. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: newline */
+        TidyNewline,                  0,
+        "Die Standardeinstellung ist für das aktuelle System geeignet. "
+        "<br/>"
+        "Im Allgemeinen gelten <var>CRLF</var> auf PC-DOS, Windows und OS/2; <var>'\r'</var> "
+        "auf klassischem Mac OS; und <var>'\n'</var> überall sonst (Linux, macOS, "
+        "und Unix). "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: numeric-entities */
+        TidyNumEntities,              0,
+        "Dies Option bestimmt, ob Tidy andere als die HTML-eigenen Entitäten "
+        "(<code>&amp;amp;</code>, <code>&amp;lt;</code>, "
+        "<code>&amp;gt;</code>, and <code>&amp;quot;</code>) in numerischer " 
+        "anstelle der benannten Form ausgeben soll. "
+        "<br/>"
+        "Es werden nur solche Entitäten verwendet, die mit der generierten DOCTYPE Deklaration kompatibel sind. "
+        "<br/>"
+        "Entitäten, die in der Zeichenkodierung der Ausgabe repräsentiert werden können, "
+        "werden entsprechend umgewandelt. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyOmitOptionalTags,         0,
+        "Mit dieser Option können optionale Start- und End-Tags von der Ausgabe "
+        "ausgenommen werden. "
+        "<br/>"
+        "Ist diese Option aktiviert, werden alle Tags der Elemente <code>&lt;html&gt;</code>, "
+        "<code>&lt;head&gt;</code>, und <code>&lt;body&gt;</code> für die Ausgabe verworfen, "
+        "wie auch die End-Tags <code>&lt;/p&gt;</code>, "
+        "<code>&lt;/li&gt;</code>, <code>&lt;/dt&gt;</code>, "
+        "<code>&lt;/dd&gt;</code>, <code>&lt;/option&gt;</code>, "
+        "<code>&lt;/tr&gt;</code>, <code>&lt;/td&gt;</code>, und "
+        "<code>&lt;/th&gt;</code>. "
+        "<br/>"
+        "Diese Option wird für XML-Ausgaben ignoriert. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: output-encoding */
+        TidyOutCharEncoding,          0,
+        "Diese Option setzt die Zeichenkodierung für die Tidy-Ausgabe. "
+        "Einige Kodierungen beeinflussen wie manche Symbole in Entities "
+        "umgewandelt werden, wenn auch die Ausgabe einiger Entities "
+        "immer von weiteren Konfigurationseinstellungen abhängt. "
+        "<br/>"
+        "Mit den Kodierungen <var>ascii</var>, <var>mac</var>, und <var>win1252</var> "
+        "werden alle Zeichen mit Werten über 127 als Entities ausgegeben. "
+        "<br/>"
+        "Wird <var>raw</var> eingestellt, übernimmt Tidy Werte über 127 ohne sie "
+        "in Entities umzuwandeln. "
+        "<br/>"
+        "<var>latin1</var> veranlasst Tidy, Zeichen über 255 als Entities zu schreiben. "
+        "<br/>"
+        "UTF wie <var>utf8</var> bedingt die Ausgabe in der entsprechenden "
+        "UTF-Kodierung"
+        "<br/>"
+        "Asiatische Ausgabekodierungen, wie <var>iso2022</var> erzeugen "
+        "die adäquate Ausgabe unter der Annahme, dass auch "
+        "<code>input-encoding</code> entsprechend gesetzt ist. "
+        "<br/>"
+        "Tidy ist kein Konverter für Zeichenkodierungen. Wenn Latin und UTF-"
+        "Kodierungen auch frei gemischt werden können, ist es doch nicht "
+        "möglich, asiatische Kodierungen mit Tidy in Latin umzuwandeln. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: output-file */
+        TidyOutFile,                  0,
+        "Diese Option bestimmt welche Ausgabedatei von Tidy geschrieben wird. "
+        "Normalerweise schreibt Tidy die Ausgabe auf die Standard-Ausgabe <code>stdout</code>."
+    },
+    {/* Important notes for translators:
+        - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+          <br/>.
+        - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+        - Option values should be enclosed in <var></var>.
+        - It's very important that <br/> be self-closing!
+        - The strings "Tidy" and "HTML Tidy" are the program name and must not
+          be translated. */
+      TidyOutputBOM,                0,
+        "Diese Option bestimmt, ob Tidy eine Byte-Reihenfolge-Markierung (BOM) an den Anfang der Ausgabe schreiben soll. "
+        "Dies betrifft nur UTF-8 und UTF-16 Ausgabekodierungen, wo das BOM-Zeichen entweder den Wert U+EFBBBF (UTF-8) oder "
+        "U+FEFF (UTF-16) hat. "
+        "<br/>"
+        "Wenn die Option den Wert <var>auto</var> hat, wird Tidy die BOM nur dann in die Ausgabe schreiben, "
+        "wenn sie bereits zu Beginn der Eingabedaten vorhanden war. "
+        "<br/>"
+        "XML/XMLHTML-Ausgaben in UTF-16 Kodierung erhalten immer eine BOM. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: indent-with-tabs */
+        TidyPPrintTabs,               0,
+        "Diese Option bestimmt, ob Tidy Einrückungen mit Tabulatoren anstelle von "
+        "Leerzeichen vornimmt, unter der Annahme, dass auch <code>indent</code> den "
+        "Wert <var>yes</var> hat. "
+        "<br/>"
+        "Setzen Sie den Wert <var>yes</var>, um mit Tabulatoren einzurücken, "
+        "anstelle der standardmäßigen Leerzeichen. "
+        "<br/>"
+        "Stellen Sie die Anzal der ausgegebenen Tabulatoren nach Einrückungstiefe "
+        "mit der Option <code>indent-spaces</code> ein. "
+        "Beachten Sie, dass das Setzen der Option <code>indent-with-tabs</code> "
+        "zur Folge hat, dass der Standardwert für <code>indent-spaces</code> auf "
+        "<var>1</var> zurückgesetzt wird. "
+        "<br/>"
+        "Beachten Sie auch, dass die Option <code>tab-size</code> steuert, wie "
+        "Tabulatoren der Eingabe in Leerzeichen umgewandelt werden. "
+        "Setzen Sie hier 0 ein, um die Tabulatoren der Eingabe beizubehalten. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyPreserveEntities,         0,
+        "Diese Option bestimmt, ob Tidy wohlgeformte Entities, wie in der Eingabe vorgefunden, "
+        "beibehält. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: new-pre-tags*/
+        TidyPreTags,                  0,
+        "Mit dieser Option werden neue Tags eingeführt, die in der exakt gleichen "
+        "Weise verarbeitet werden, wie das <code>&lt;pre&gt;</code> Element von HTML. "
+        "Der Wert der Option muss eine leerzeichen- oder kommaseparierte Liste von " 
+        "Tag-Namen sein. "
+        "<br/>"
+        "Solange Sie neue Tags nicht deklarieren, verweigert Tidy das Generieren "
+        "einer bereinigten Datei, wenn die Eingabe bisher unbekannte Tags enthält."
+        "<br/>"
+        "Beachten Sie, dass Sie bis auf weiteres noch keine neuen CDATA-Elemente einführen können. "
+        "<br/>"
+        "Diese Option wird im XML-Modus ignoriert."
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyPriorityAttributes,       0,
+        "Mit dieser Option können Sie bestimmen, dass Attribute Vorrang vor anderen "
+        "haben und, im Ausgabedokument, den anderen Attributen eines Elements " 
+        "vorangestellt werden. Zum Beispiel können Sie festlegen, dass <strong>id</strong> "
+        "und <strong>name</strong> vor allen anderen Attributen genannt werden. "
+        "<br/>"
+        "Die Option erwartet als Wert eine Liste von leerzeichen- oder kommaseparierten "
+        "Attributnamen. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: punctuation-wrap */
+        TidyPunctWrap,                0,
+        "Diese Option bestimmt, ob Tidy nach einigen Unicode- oder chinesischen "
+        "Satzzeichen einen Zeilenumbruch vornimmt. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyQuiet,                    0,
+        "Wenn diese Option aktiv is, beschränkt Tidy andere Ausgaben als die des bereinigten Dokuments "
+        "auf Fehler- und Warnmeldungen. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyQuoteAmpersand,           0,
+        "Diese Option bestimmt, ob Tidy alleinstehende <code>&amp;</code> "
+        "als <code>&amp;amp;</code> ausgeben soll. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyQuoteMarks,               0,
+        "Diese Option bestimmt, ob Tidy <code>&quot;</code> Zeichen als "
+        "<code>&amp;quot;</code> ausgeben soll, wie es manche Redaktionssysteme "
+        "bevorzugen. "
+        "<br/>"
+        "Das Auslassungszeichen <code>'</code> wird als <code>&amp;#39;</code> "
+        "ausgegeben, weil viele Web-Browser <code>&amp;apo;</code> noch nicht "
+        "unterstützen. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyQuoteNbsp,                0,
+        "Diese Option bestimmt, ob Tidy geschützte Leerzeichen als Entities "
+        "und nicht als Unicode-Zeichen 160 (dezimal) ausgeben soll. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyReplaceColor,             0,
+        "Mit dieser Option können Sie Tidy auffordern, numerische Werte in "
+        "Farb-Attributen durch HTML/XHTML Farbnamen zu ersetzen, so weit "
+        "sie definiert sind. Zum Beispiel würde <code>#ffffff</code> zu "
+        "<code>white</code>. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyShowErrors,               0,
+        "Mit dem Wert dieser Option wird gesteuert, ob Tidy weitere Fehler "
+        "meldet. Wenn der Wert <var>0</var> ist, werden gar keine Fehler "
+        "gemeldet. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyShowFilename,             0,
+        "Diese Option legt fest, ob Tidy den Dateinamen in Meldungen anzeigt. z.B.: "
+        "<br/>"
+        " tidy -q -e --show-filename yes index.html<br/>"
+        " index.html: line 43 column 3 - Warning: replacing invalid UTF-8 bytes (char. code U+00A9) "
+    },
+
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyShowInfo,                 0,
+        "Mit dieser Option wird festgelegt, ob Tidy Protokollmeldungen auf dem "
+        "Niveau INFO anzeigen soll."
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: markup*/
+        TidyShowMarkup,               0,
+        "Mit dieser Option kann Tidy aufgefordert werden, eine formatierte Version "
+        "der bereinigten Seite zu generieren. Beachten Sie, dass Tidy keine solche  "
+        "Formatierung vornimmt, wenn schwerwiegende Fehler gefunden werden "
+        "(siehe auch: <code>force-output</code>). "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyShowWarnings,             0,
+        "Diese Option legt fest, ob Tidy Warnungen ausgeben soll oder nicht. "
+        "Es kann nützlich sein, Warnungen zu deaktivieren, wenn wenige Fehler "
+        "in einer Masse von Warnmeldungen untergehen. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidySkipNested,               0,
+        "Diese Option bestimmt, ob Tidy verschachtelte Elemente ausnehmen soll, "
+        "wenn Script- und Style-Daten analysiert werden. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidySortAttributes,           0,
+        "Diese Option legt fest, dass Tidy Attribute innerhalb eines Elements "
+        "anhand eines bestimmten Algorithmus sortieren soll. Wenn hier <var>alpha</var> "
+        "gewählt wird, wird in aufsteigender, alphabetischer Reihenfolge sortiert. "
+        "<br/>"
+        "Wenn dagegen gleichzeitig <code>priority-attributes</code> verwendet wird, "
+        "werden zunächst die priorisierten Attribute ausgegeben, bevor die restlichen sortiert werden. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: mute */
+        TidyMuteReports,           0,
+        "Verwenden Sie diese Option, um zu verhindern, dass Tidy bestimmte "
+        "Meldungen ausgibt, beispielsweise für Situationen, die sie ignorieren möchten. "
+        "<br/>"
+        "Der Wert der Option ist eine Liste von Meldungs-Schlüsseln. Ermitteln Sie "
+        "die Meldungs-Schlüssel, indem Sie die Programmausgaben beobachten, während die "
+        "Option <code>mute-id</code> aktiv ist. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: mute-id */
+        TidyMuteShow,              0,
+        "Diese Option bestimmt, ob Tidy mit jedem seiner Fehler-Protokolle Meldungs-Schlüssel "
+        "ausgeben soll. Das kann nützlich sein, wenn Sie mit Hilfe der Option <code>mute</code> "
+        "einige Meldungen ausfiltern möchten. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name strict-tags-attributes */
+        TidyStrictTagsAttr,           0,
+        "Diese Option stellt sicher, dass Tags und Attribute für die HTML-Version, "
+        "die Tidy ausgibt, geeignet sind. Wenn hier <var>yes</var> eingestellt ist "
+        "und für das Ausgabedokument ein Doctype strict gilt, meldet Tidy Fehler. "
+        "Ist der Dokumenttyp dagegen ein loose- oder transitional Doctype, werden "
+        "Warnungen ausgegeben. "
+        "<br/>"
+        "Wenn zusätzlich noch <code>drop-proprietary-attributes</code> aktiv ist, "
+        "werden ungeeignete Attribute auch entfernt. "
+        "<br/>"
+        "Ist der Wert der Option <var>no</var>, werden diese Prüfungen nicht durchgeführt. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyTabSize,                  0,
+        "Diese Option legt die Anzahl der Spalten fest, die Tidy zwischen aufeinanderfolgenden "
+        "Tabulatorzeichen vorsieht. Damit werden beim Lesen der Eingabe Tabulatoren in Leerzeichen umgewandelt. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: uppercase-attributes */
+        TidyUpperCaseAttrs,           0,
+        "Diese Option legt fest, ob Tidy Attributnamen groß oder klein schreiben "
+        "soll. "
+        "<br/>"
+        "Wenn der Wert <var>no</var> ist, werden Attributnamen klein geschrieben, "
+        "mit <var>ja</var> dagegen groß; der Wert <var>preserve</var> bewirkt, dass "
+        "an der aktuellen Schreibweise keine Änderung vorgenommen wird. "
+        "<br/>"
+        "Bei XML-Ausgabe wird stets die ursprüngliche Schreibung bewahrt. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyUpperCaseTags,            0,
+        "Diese Option legt fest, ob Tidy Tagnamen groß oder klein schreibt. "
+        "<br/>"
+        "Der Standardwert ist <var>no</var> und setzt kleingeschriebene Tagnamen durch, "
+        "außer für die XML-Ausgabe, wo die originale Schreibweise beibehalten wird. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: custom-tags */
+        TidyUseCustomTags,          0,
+        "Diese Option aktiviert die Verwendung von Tags für autonome, benutzerdefinierte "
+        "Elemente, z.B. <code>&lt;flag-icon&gt;</code> mit Tidy. Solche benutzerdefinierten "
+        "Tags werden eliminiert, wenn der Wert der Option <var>no</var> lautet. "
+        "Andere Einstellungen - "
+        "<var>blocklevel</var>, <var>empty</var>, <var>inline</var>, und <var>pre</var> "
+        "bewirken die entsprechende, einheitliche Behandlung aller benutzerdefinierten " 
+        "Tags. "
+        "<br/>"
+        "Die Optionen "
+        "<code>new-blocklevel-tags</code>, <code>new-empty-tags</code>, <code>new-inline-tags</code> "
+        "oder <code>new-pre-tags</code> haben Vorrang vor dieser Option. Das kann nützlich sein, "
+        "wenn Sie verschiedene Arten von benutzerdefinierten Tags einsetzen. "
+        "<br/>"
+        "Bei Aktivierung dieser Option werden die betroffenen, öffnenden Tags in Ihrem Dokument "
+        "während der Vorverarbeitungsphase erkannt, korrespondierende, schließende Tags entsprechend; "
+        "unbekannte, schließende Tags werden beseitigt. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: vertical-space */
+        TidyVertSpace,                0,
+        "Diese Option legt fest, ob Tidy einige zusätzliche Leerzeilen "
+        "zur besseren Lesbarkeit einfügen soll. "
+        "<br/>"
+        "Der Standardwert ist <var>no</var>. "
+        "<br/>"
+        "Bei Verwendung von <var>auto</var>, eliminiert Tidy nahezu alle Zeilenumbrüche. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: warn-proprietary-attributes */
+        TidyWarnPropAttrs,            0,
+        "Diese Option bestimmt, ob Tidy bei benutzerdefinierten Attributen Warnungen ausgibt. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyWord2000,                 0,
+        "Diese Option bestimmt, ob Tidy große Anstrengungen unternehmen soll, "
+        "um all den zusätzlichen Code, den Microsoft Word 2000 beim Speichern als \"Web-Seite\" einfügt, "
+        "wieder zu entfernen. Eingebettete Bilder oder VML werden nicht behandelt. "
+        "<br/>"
+        "Sie sollten in Betracht ziehen, beim Auslösen der Funktion <strong>Speichern als...</strong>, "
+        "dem Dateityp <strong>Web-Seite, gefiltert</strong> Vorrang zu geben."
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyWrapAsp,                  0,
+        "Mit dieser Option können Sie festlegen, ob Tidy Text innerhalb von "
+        "ASP Pseudoelementen, wie <code>&lt;% ... %&gt;</code>, umbrechen soll. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: wrap-attributes */
+        TidyWrapAttVals,              0,
+        "Diese Option legt fest, ob Tidy Attributwerte umbrechen soll, was bedeutet, "
+        "dass Tidy Zeilenumbrüche einfügt, wo der Wert eines Attributs die Zeile so "
+        "verlängert, dass sie über die Weite hinausragt, die mit <code>wrap</code> "
+        "eingestellt wurde."
+        "<br/>"
+        "Beachten Sie, dass diese Option unabhängig von "
+        "<code>wrap-script-literals</code> eingesetzt werden kann. "
+        "Standardmäßig ersetzt Tidy Zeilenumbrüche oder Tabulatoren durch einzelne Leerzeichen "
+        "und aufeinanderfolgende Leerzeichen durch ein einziges. "
+        "<br/>"
+        "Um Tidy dazu zu zwingen, die orginalen Literalwerte aller Attribute zu erhalten "
+        "und sicherzustellen, dass Leerzeichen in Attributwerten unangetastet bleiben, "
+        "setzen Sie den Wert von <code>literal-attributes</code> auf <var>yes</var>. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyWrapJste,                 0,
+        "Mit dieser Option wird bestimmt, ob Tidy den Text innerhalb von "
+        "JSTE Peseudo-Elementen, wie <code>&lt;# ... #&gt;</code>, umbrechen soll. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyWrapLen,                  0,
+        /* option-name: wrap */
+        "Diese Option legt den rechten Rand für Zeilenumbrüche fest. "
+        "<br/>"
+        "Tidy wird versuchen, Zeilen so umzubrechen, dass sie diese Länge nicht überschreiten. "
+        "<br/>"
+        "Setzen Sie <code>wrap</code> auf <var>0</var> (Null), wenn Sie Zeilenumbrüche unterbinden möchten. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyWrapPhp,                  0,
+        "Diese Option legt fest, ob Tidy nach PHP Pseudoelementen, "
+        "wie <code>&lt;?php ... ?&gt;</code> einen Zeilenumbruch einfügen soll. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyWrapScriptlets,           0,
+        /* option-name: wrap-script-literals */
+        "Mit dieser Option wird bestimmt, ob Tidy Literale, die in Skript-Attributen "
+        "auftauchen, umbrechen soll. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: wrap-sections 
+       *
+       *  ATTN. A section-tag exists in maybe-HTML. (5)
+       *  
+       */
+        TidyWrapSection,              0,
+        "Diese Option legt fest, ob Tidy Text in Datenbereichen wie "
+        "<code>&lt;![ ... ]&gt;</code> umbrechen soll. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+        TidyWriteBack,                0,
+        "Mit dieser Option wird bestimmt, ob Tidy den bereinigten Auszeichnungscode "
+        "in die selbe Datei schreiben soll, aus der er gelesen worden ist. "
+        "<br/>"
+        "Sie sollten Kopien wichtiger Dateien anlegen, bevor Sie sie bereinigen, da, "
+        "in Ausnahmefällen, das Ergebnis nicht Ihren Erwartungen entsprechen kann. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: output-xhtml */
+        TidyXhtmlOut,                 0,
+        "Diese Option legt fest, ob Tidy die formatierte Ausgabe als XHTML schreiben "
+        "soll. "
+        "<br/>"
+        "Damit setzt Tidy den zu XHTML passenden DOCTYPE und Namensraum und wird "
+        "eine korrigierte Ausgabe liefern, unabhängig von anderen Eingaben. "
+        "<br/>"
+        "In XHTML können Entities benannt oder nummerisch sein, unabhängig von der "
+        "Einstellung von <code>numeric-entities</code>. "
+        "<br/>"
+        "Die Groß- und Kleinschreibung von Tags und Attributen im Eingangsdokument "
+        "wird beibehalten, unabhängig von den Werten anderer Optionen. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: add-xml-decl */
+        TidyXmlDecl,                  0,
+        "Diese Option bestimmt, ob Tidy eine XML-Deklaration einfügen soll, "
+        "wenn XML oder XHTML ausgegeben wird. "
+        "<br/>"
+        "Beachten Sie, dass die Option ignoriert wird, wenn in der Eingabe bereits eine "
+        "solche Deklaration <code>&lt;?xml ... ?&gt;</code> enthalten ist. "
+        "<br/>"
+        "Sollte die Zeichenkodierung für die Ausgabe eine andere sein als "
+        "<var>ascii</var>, keine aus der <var>utf*</var> Familie und auch nicht "
+        "<var>raw</var>, wird die Deklaration ohnehin immer eingefügt, wie vom "
+        "XML Standard gefordert. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: output-xml */
+        TidyXmlOut,                   0,
+        "Diese Option bestimmt, ob Tidy eine formatierte Ausgabe als XML schreiben "
+        "soll. " 
+        "<br/>"
+        "Alle Entitäten, die in XML 1.0 nicht definiert sind, werden numerisch geschrieben, "
+        "damit sie von einem XML Parser interpretiert werden können. "
+        "<br/>"
+        "Die Groß- und Kleinschreibung von Tags und Attributen wird aus der Eingabe "
+        "übernommen, unabhängig von anderen Einstellungen."
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: assume-xml-procins */
+        TidyXmlPIs,                   0,
+        "Diese Option bestimmt, ob Tidy bei der Auswertung von Verarbeitungsanweisungen "
+        "auf <code>?&gt;</code> als Endezeichen bestehen soll, anstelle von <code>&gt;</code>. "
+        "<br/>"
+        "Diese Option wird automatisch gesetzt, wenn es sich bei der Eingabe um XML handelt. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+      be translated. */
+      /* option-name: add-xml-space */
+        TidyXmlSpace,                 0,
+        "Diese Option bestimmt, ob Tidy beim Generieren von XML <code>xml:space=\"preserve\"</code> "
+        "in Elementen wie <code>&lt;pre&gt;</code>, <code>&lt;style&gt;</code> und "
+        "<code>&lt;script&gt;</code> einfügen soll. "
+        "<br/>"
+        "Dies ist notwendig, wenn ohne Zugriff auf die DTD, Leerzeichen in solchen Elementen richtig interpretiert werden soll. "
+    },
+    {/* Important notes for translators:
+        - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+          <br/>.
+        - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+        - Option values should be enclosed in <var></var>.
+        - It's very important that <br/> be self-closing!
+        - The strings "Tidy" and "HTML Tidy" are the program name and must not
+          be translated. */
+      /* option-name: input-xml */
+      TidyXmlTags,                  0,
+      "Diese Option legt fest, ob Tidy eher den XML-Parser als den fehlerkorrigierenden "
+      "HTML-Parser einsetzen soll. "
+    },
+    {/* Important notes for translators:
+        - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+          <br/>.
+        - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+        - Option values should be enclosed in <var></var>.
+        - It's very important that <br/> be self-closing!
+        - The strings "Tidy" and "HTML Tidy" are the program name and must not
+          be translated. */
+      /* option-name: add-meta-charset */
+      TidyMetaCharset,             0,
+        "Mit diser Option werden ein <code>&lt;meta&gt;</code> Element "
+        "und ein <code>charset</code> Attribut mit der Zeichenkodierung des Dokuments eingefügt. "
+        "Setzen Sie die Option auf den Wert <var>yes</var>, um die Funktion zu aktivieren. "
+    },
+    {/* Important notes for translators:
+      - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+      <br/>.
+      - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+      - Option values should be enclosed in <var></var>.
+      - It's very important that <br/> be self-closing!
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not
+        be translated. */
+      /* option-name: unknown */
+      TidyShowMetaChange,             0,
+        "Durch das Setzen dieser Option auf <var>yes</var> setzt Tidy eine Meldung ab, wann immer "
+        "das <code>content</code> Attribut einer Zeichensatzdeklaration im Meta-Tag "
+        "geändert wird, um sie der Kodierung des Dokuments anzupassen."
+    },
+    {/* Important notes for translators:
+     - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
+     <br/>.
+     - Entities, tags, attributes, etc., should be enclosed in <code></code>.
+     - Option values should be enclosed in <var></var>.
+     - It's very important that <br/> be self-closing!
+     - The strings "Tidy" and "HTML Tidy" are the program name and must not
+       be translated. */
+      /* option-name: fix-style-tags */
+      TidyStyleTags,                  0,
+        "Diese Option bestimmt, ob Tidy alle style-Tags in den Dokumentkopf "
+        "verschieben soll. "
+        "This option specifies if Tidy should move all style tags to the "
+        "head of the document. "
+    },
+
+
+    /********************************************
+     ** Message Severity Level
+     ** @remark enum source TidyConfigCategory
+     ********************************************/
+    { TidyInfo,               0,   "Info: "          },
+    { TidyWarning,            0,   "Warnung: "       },
+    { TidyConfig,             0,   "Config: "        },
+    { TidyAccess,             0,   "Zugriff: "       },
+    { TidyError,              0,   "Fehler: "        },
+    { TidyBadDocument,        0,   "Dokument: "      },
+    { TidyFatal,              0,   "Panik: "         },
+    { TidyDialogueSummary,    0,   "Resümee: "       },
+    { TidyDialogueInfo,       0,   "Information: "   },
+    { TidyDialogueFootnote,   0,   "Fußnote: "       },
+    
+    
+    /********************************************
+     ** Miscellaneous Strings
+     ** @remark enum source TidyStrings
+     ** @remark enum generator FOREACH_MSG_MISC
+     ********************************************/
+    { LINE_COLUMN_STRING,           0,   "Zeile %d Spalte %d - "                                                   },
+    { FN_LINE_COLUMN_STRING,        0,   "%s: Zeile %d Spalte %d - "                                               },
+    {/* For example, "discarding invalid UTF-16 surrogate pair" */
+      STRING_DISCARDING,            0,   "verwerfe"
+    },
+    { STRING_ERROR_COUNT_ERROR,     0,   "Fehler"                                                                  },
+    { STRING_ERROR_COUNT_ERROR,     1,   "Fehler"                                                                  },
+    { STRING_ERROR_COUNT_WARNING,   0,   "Warnung"                                                                 },
+    { STRING_ERROR_COUNT_WARNING,   1,   "Warnungen"                                                               },
+    { STRING_HELLO_ACCESS,          0,   "\nTests der Barrierefreiheit:\n"                                         },
+    {/* This is not a formal name and can be translated. */
+      STRING_HTML_PROPRIETARY,      0,   "HTML Proprietär"
+    },
+    { STRING_XML_DECLARATION,       0,   "XML Deklaration"                                                         },
+    { STRING_PLAIN_TEXT,            0,   "Klartext"                                                                },
+    {/* For example, "replacing invalid UTF-8 bytes" */
+      STRING_REPLACING,             0,   "ersetze"
+    },
+    {/* For example, "you should avoid using the specified encoding." */
+      STRING_SPECIFIED,             0,   "genannte"
+    },
+    { TIDYCUSTOMNO_STRING,          0,   "nein"                                                                    },
+    { TIDYCUSTOMBLOCKLEVEL_STRING,  0,   "Blockniveau"                                                             },
+    { TIDYCUSTOMEMPTY_STRING,       0,   "leer"                                                                    },
+    { TIDYCUSTOMINLINE_STRING,      0,   "inline"                                                                  },
+    { TIDYCUSTOMPRE_STRING,         0,   "pre"                                                                     },
+  
+    
+    /********************************************
+     ** Footnote Strings
+     ** @remark enum source TidyStrings
+     ** @rename enum generator FOREACH_FOOTNOTE_MSG
+     ********************************************/
+    {/* This console output should be limited to 78 characters per line. */
+      TEXT_HTML_T_ALGORITHM,        0,
+        "\n"
+        "      - Zunächst suche links von der Zellenposition nach weiteren Zeilenköpfen.\n"
+        "      - Dann suche oberhalb nach Spaltenköpfen.\n"
+        "      - Die Suche in der angegebenen Richtung wird am Tabellenrand beendet\n"
+        "        oder wenn eine Datenzelle hinter einer Kopfzelle gefunden wird\n"
+        "      - Zeilenköpfe werden in die Liste eingefügt in der Reihenfolge Ihres\n"
+        "        Erscheinens in der Tabelle. \n"
+        "      - Bei links-nach-rechts Tabellen werden Kopfzellen von links nach rechts\n"
+        "        eingefügt"
+        "      - Spaltenköpfe werden nach Zeilenköpfenn eingefügt, in der Reihenfolge\n"
+        "        ihres Erscheinens in der Tabelle, von Oben nach Unten. \n"
+        "      - Wenn eine Kopfzelle ein Attribut headers besitzt, dann werden die\n"
+        "        so bezeichneten Zellen in die Liste eingefügt und die Suche in der\n"
+        "        aktuellen Richtung eingestellt.\n"
+        "        TD-Zellen, die das Attribut axis besitzen, werden ebenfalls als\n"
+        "        Kopfzellen behandelt.\n"
+    },
+    {/* This console output should be limited to 78 characters per line.
+        - %s represents a string-encoding name which may be localized in your language. */
+      TEXT_VENDOR_CHARS,            0,
+        "Es ist unwahrscheinlich, dass händlerspezifische, systemabhängige\n"
+        "Zeichenkodierungen im World Wide Web ausreichend zuverlässig\n"
+        "funktionieren; Sie sollten die Vewendung der Zeichenkodieriung %s\n"
+        "vermeiden und statt dessen benannte Entitäten, z.B. &trade;\n"
+        "verwenden.\n"
+    },
+    {/* This console output should be limited to 78 characters per line.
+        - %s represents a string-encoding name which may be localized in your language.
+        - The strings "Tidy" and "HTML Tidy" are the program name and must not be translated. */
+      TEXT_SGML_CHARS,              0,
+        "Die Zeichencodes zwischen 128 und 159 (U+0080 bis U+009F) sind in HTMl nicht\n" 
+        "erlaubt; selbst wenn sie es wären, wären sie wohl nicht-druckbare\n"
+        "Steuerzeichen. Tidy vermutete dass Sie ein Zeichen mit dem gleichen Bytewert\n" 
+        "in der Kodierung %s meinten und hat darum die Ersetzung durch das\n"
+        "Unicode-Äquivalent vorgenommen.\n"
+    },
+    {/* This console output should be limited to 78 characters per line. */
+      TEXT_INVALID_UTF8,            0,
+        "Zeichencodes für UTF-8 müssen zwischen U+000 und U+10FFFF liegen.\n"
+        "Die UTF-8 Definition erlaubt im Anhang D zu ISO/IEC 10646-1:2000\n"
+        "auch die Benutzung von 6-Byte Sequenzen für die Kodierung von\n"
+        "Buchstaben die außerhalb des Unicode Zeichensatzes liegen;\n"
+        "Diese fünf- und sechs Byte langen Sequencen sind unerlaubt für\n"
+        "UTF-8 als Transformation von Unicode Zeichen. ISO/IEC 10646\n" 
+        "erlaubt kein Mapping nicht paarweise zugeordneter Ersatzzeichen,\n"
+        "auch nicht U+FFFE oder U+FFFF (es erlaubt aber andere\n" 
+        "nichtdruckbare Zeichen). Mehr Informationen, erhalten Sie auf\n"
+        "http://www.unicode.org/ und http://www.cl.cam.ac.uk/~mgk25/unicode.html\n"
+    },
+    {/* This console output should be limited to 78 characters per line. */
+      TEXT_INVALID_UTF16,           0,
+        "Zeichencodes für UTF-16 müssen im Breich U+0000 bis U+10FFFF liegen.\n"
+        "Die UTF-16 Definition im Anhang C zu ISO/IEC 10646-1:2000 erlaubt\n"
+        "kein Mapping nicht paarweise zugeordneter Ersatzzeichen. Weitere\n"
+        "Informationen finden Sie auf\n"
+        "http://www.unicode.org/ und http://www.cl.cam.ac.uk/~mgk25/unicode.html\n"
+    },
+    {/* This console output should be limited to 78 characters per line.
+        - The strings "Tidy" and "HTML Tidy" are the program name and must not be translated. */
+      TEXT_INVALID_URI,             0,
+        "URIs müssen richtig mit Escape-Sequenzen ausgestatten werden\n"
+        "und darf keine unmaskierten Zeichen unter U+0021 einschließlich,\n"
+        "des Leerzeichens und keine Zeichen über U+007E. Tidy fügt,\n"
+        "Escape-Sequenzen in URIs ein wie es von HTML 4.01 im Abschnitt\n"
+        "B.2.1 der Spezifikation und XML 1.0 im Abschnitt 4.2.2 empfohlen\n"
+        "ist. Einige Endbenutzerprogramme verwenden andere Algorithmen\n"
+        "für Escape-Sequenzen in solchen URIs und die Funktion manche\n"
+        "server-seitiger Skripte ist davon abhängig. Wenn Sie damit nicht\n"
+        "einverstanden sind, müssen Sie die Escape-Sequenzuen selbst\n"
+        "schreiben. Dazu gibt es mehr Informationen auf\n"
+        "http://www.w3.org/International/O-URL-and-ident.html\n"
+    },
+    {/* This console output should be limited to 78 characters per line. */
+      TEXT_BAD_FORM,                0,
+        "Es ist vielleicht nötig eines-, oder beide Tags <form> und </form>\n"
+        "zu verschieben. HTML-Elemente sollten richtig verschachtelt sein und\n"
+        "form-Elemente sind keine Ausnahme. Zum Beispiel sollten Sie das\n"
+        "<form> Tag nicht in eine Tabellenzelle und </form> in eine andere\n"
+        "schreiben. Wenn <form> einer Tabelle vorangeht, kann </form> nicht\n"
+        "innerhalb der Tabelle erscheinen! Bachten Sie auch, dass ein\n"
+        "Formular nicht mit einem anderen verschachtelt werden kann."
+    },
+    {/* This console output should be limited to 78 characters per line. */
+      TEXT_BAD_MAIN,                0,
+        "Nur ein einziges <main> Element ist in einem Dokument erlaubt.\n"
+        "Weitere <main> Elemente wurden verworfen, was das Dokument\n"
+        "ungültig machen kann.\n"
+    },
+    {/* This console output should be limited to 78 characters per line. */
+      TEXT_M_SUMMARY,               0,
+        "Das summary-Attribut sollte in Tabellen verwendet werden, \n"
+        "um die Tabellenstruktur zu beschreiben. Es ist sehr hilfreich\n"
+        "für Leute, die nicht-optische Browser verwenden. Die Attribute\n"
+        "scope und header in Tabellenzellen sind nützlich, um zu\n"
+        "präzisieren, welcher Tabellenkopf zu welcher Tabellenzelle\n"
+        "gehört, was nicht-optischen Browsern ermöglicht, sinnvollen\n"
+        "Kontext zu jeder Zelle zu liefern.\n"
+    },
+    {/* This console output should be limited to 78 characters per line. */
+      TEXT_M_IMAGE_ALT,             0,
+          "Das alt-Attribut sollte für die Kurzbeschreibung eines Bildes\n"
+          "verwendet werden; für längere Beschreibungen ist das longdesc-\n"
+          "Attribut gedacht, das die URL zur Beschreibung enthält.\n"
+          "Diese Details helfen Menschen, die nicht-grafische Browser verwenden.\n"
+    },
+    {/* This console output should be limited to 78 characters per line. */
+      TEXT_M_IMAGE_MAP,             0,
+        "Geben Sie client-seitigen Vorrang vor server-seitigen Image maps\n"
+        "weil letztere für Menschen mit nicht-grafischen Browsern unzugänglich\n"
+        "sind. Außerdem werden client-seitige maps leichter erzeugt und\n"
+        "sind reaktiver."
+    },
+    {/* This console output should be limited to 78 characters per line. */
+      TEXT_M_LINK_ALT,              0,
+        "Im Zusammenhang mit client-seitigen Image Maps müssen Sie das\n"
+        "alt-Attribut mit einer textuellen Beschreibung des Links\n"
+        "verwenden, für Leute, die nicht-grafische Browser benutzen.\n"
+    },
+    {/* This console output should be limited to 78 characters per line. */
+      TEXT_USING_FRAMES,            0,
+        "Seiten, die mit Frames gestaltet werden, stellen ein Problem dar\n"
+        "für Leute, die entweder blind sind oder Browser verwenden, die\n"
+        "Frames gar nicht unterstützen. Eine Frame-basierte Seite sollte\n"
+        "stets über ein alternatives Layout innerhalb des NOFRAMES\n" 
+        "Elements verfügen."
+    },
+    {/* This console output should be limited to 78 characters per line. */
+      FOOTNOTE_TRIM_EMPTY_ELEMENT,  0,
+        "Eines oder mehrere leere Elemente waren im Quelldokument vorhanden,\n" 
+        "wurden aber bei der Ausgabe verworfen. Sollten diese Element für Sie\n"
+        "wichtig sein oder wenn Sie ein anderes Vorgehen wünschen,\n" 
+        "ziehen Sie in Betracht, die Option \"drop.empty-elements\" auf\n"
+        "no zu setzen.\n"
+    },
+    {/* This console output should be limited to 78 characters per line.
+        - The URL should not be translated unless you find a matching URL in your language. */
+      TEXT_ACCESS_ADVICE1,          0,
+        "Weitere Ratschläge zur Barrierefreiheit finden Sie auf\n"
+        "http://www.w3.org/WAI/GL."
+    },
+    {/* This console output should be limited to 78 characters per line.
+        - The URL should not be translated unless you find a matching URL in your language. */
+      TEXT_ACCESS_ADVICE2,          0,
+        "Weitere Ratschläge zur Barrierefreiheit finden Sie auf\n"
+        "http://www.w3.org/WAI/GL und http://www.html-tidy.org/accessibility/."
+    },
+    {/* This console output should be limited to 78 characters per line. */
+      TEXT_USING_LAYER,             0,
+        "Es wird empfohlen, dem Positionierungsmechanismus von Cascading\n" 
+        "Style Sheets (CSS) Vorrang vor dem proprietären Element <LAYER>\n"
+        "zu geben, weil LAYER nur beschränkt unterstützt wird."
+    },
+    {/* This console output should be limited to 78 characters per line. */
+      TEXT_USING_SPACER,            0,
+        "Es wird empfohlen, CSS zur Kontrolle von Leerraum zu verwenden,\n"
+        "z.B. für Einrückungen, Ränder und Abständen.\n"
+        "Das proprietäre <SPACER> Element wird nur beschränkt unterstützt.\n"
+    },
+    {/* This console output should be limited to 78 characters per line. */
+      TEXT_USING_FONT,              0,
+        "Es wird empfohlen, CSS zur Festlegung von Schriften und\n"
+        "Schrifteigenschaften zu verwenden, sie Schriftgrad und -Farbe.\n"
+        "Damit wird die Größe der HTML-Datei verringert und sie ist,\n"
+        "verglichen zum <FONT>-Element, leichter zu warten.\n"
+    },
+    {/* This console output should be limited to 78 characters per line. */
+      TEXT_USING_NOBR,              0,
+        "Es wird empfohlen, CSS zur Kontrolle der Zeilenumbrüche zu\n"
+        "verwenden, insbesondere \"white-space: nowrap\" um Zeilenumbrüche\n"
+        "in einem Element zu verhindern, anstelle von <NOBR>...</NOBR>.\n"
+    },
+    {/* This console output should be limited to 78 characters per line. */
+      TEXT_USING_BODY,              0,
+        "Es wird empfohlen, CSS zur Festlegung der Farben von Seiten und\n"
+        "Links zu verwenden.\n"
+    },
+    
+    /********************************************
+     ** Miscellaneous Dialogue Strings
+     ** @remark enum source TidyStrings
+     ** @rename enum generator FOREACH_DIALOG_MSG
+     ********************************************/
+    { STRING_CONTENT_LOOKS,         0,   "Dokumentinhalt scheint %s zu sein"                                      },
+    { STRING_DOCTYPE_GIVEN,         0,   "angegebener Doctype ist \"%s\""                                         },
+    {/* The strings "Tidy" and "HTML Tidy" are the program name and must not be translated. */
+      STRING_ERROR_COUNT,           0,   "Tidy hat %u %s und %u %s gefunden!\n"
+    },
+    {/* This console output should be limited to 78 characters per line.
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not be translated. */
+      STRING_NEEDS_INTERVENTION,    0,
+        "Dieses Dokument hat Fehler, die korrigiert werden müssen,\n"
+        "bevor HTML Tidy eine bereinigte Version generieren kann.\n"
+    },
+    { STRING_NO_ERRORS,             0,   "Es wurden keine Warnungen oder Fehler gefunden.\n"                                             },
+    { STRING_NO_SYSID,              0,   "Kein System-Identifikator im übermittelten doctype"                                            },
+    { STRING_NOT_ALL_SHOWN,         0,   "Tidy hat %u %s und %u %s gefunden! \n"
+                                         "Nicht alle Warnungen oder Fehler wurden angezeigt.\n"       },
+    {/* This console output should be limited to 78 characters per line.
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not be translated. */
+      TEXT_GENERAL_INFO,            0,
+        "Über HTML Tidy: https://github.com/htacg/tidy-html5\n"
+        "Fehlerberichte und Kommentare (in English):\n"
+        "\thttps://github.com/htacg/tidy-html5/issues\n"
+        "Offizielle Mailing-Liste:\n"
+        "\thttps://lists.w3.org/Archives/Public/public-htacg/\n"
+        "Neueste HTML Spezifikation:\n" 
+        "\thttp://dev.w3.org/html5/spec-author-view/\n"
+        "Validieren Sie Ihre HTML-Dokumente:\n"
+        "\tttp://validator.w3.org/nu/\n"
+        "Setzen Sie sich für den Eintritt Ihrer Firma ins W3C ein:\n"
+        "\thttp://www.w3.org/Consortium\n"
+    },
+    {/* This console output should be limited to 78 characters per line. 
+      - The strings "Tidy" and "HTML Tidy" are the program name and must not be translated.
+      - Don't terminate the last line with a newline. */
+      TEXT_GENERAL_INFO_PLEA,       0,
+        "Sprechen Sie eine andere Sprache als Englisch oder eine andere Variante\n"
+        "von Englisch? Überlegen Sie, ob Sie uns helfen möchten, HTML Tidy zu\n"
+        "übersetzen. Details finden Sie auf\n"
+        "https://github.com/htacg/tidy-html5/blob/master/README/LOCALIZE.md"
+    },
+    
+
+    /********************************************
+     ** Report Output
+     ** @remark enum source TidyStrings
+     ** @rename enum generator FOREACH_REPORT_MSG
+     ********************************************/    
+    { ADDED_MISSING_CHARSET,        0,   "Fehlendes <meta charset=...> wurde in %s hinzugefügt"                    },
+    { ANCHOR_NOT_UNIQUE,            0,   "%s Verweisanker \"%s\" ist bereits definiert"                            },
+    { ANCHOR_DUPLICATED,            0,   "impliziter %s Anker \"%s\" von Tidy dupliziert."                         },
+    { APOS_UNDEFINED,               0,   "benannte Entität &apos; nur in XML/XHTML definiert"                      },
+    { ATTR_VALUE_NOT_LCASE,         0,   "%s Attributwert \"%s\" muss für XHTML klein geschrieben sein"            },
+    { ATTRIBUTE_IS_NOT_ALLOWED,     0,   "%s Attribut \"is\" nicht in autonomen, benutzerdefnierten Tags erlaubt." },
+    { ATTRIBUTE_VALUE_REPLACED,     0,   "%s Attribut \"%s\", falscher Wert \"%s\" ersetzt"                        },
+    { BACKSLASH_IN_URI,             0,   "%s URI Referenz enthält Backslash. Eingabefehler?"                       },
+    { BAD_ATTRIBUTE_VALUE_REPLACED, 0,   "%s Attribut \"%s\" hatte den ungültigen Wert \"%s\" und wurde ersetzt"   },
+    { BAD_ATTRIBUTE_VALUE,          0,   "%s Attribut \"%s\" hat den ungültigen Wert \"%s\""                       },
+    { BAD_CDATA_CONTENT,            0,   "'<' + '/' + Zeichen hier nicht erlaubt"                                  },
+    { BAD_SUMMARY_HTML5,            0,   "Das summary Attribute im Element %s ist in HTML5 obsolet"                },
+    { BAD_SURROGATE_LEAD,           0,   "Vorderes (niederes) Surrogat-Paar U+%04X, ohne vordere (obere) Entität, durch U+FFFD ersetzt."               },
+    { BAD_SURROGATE_PAIR,           0,   "Unzulässiges Surrogat-Paar U+%04X:U+%04X wurde durch U+FFFD ersetzt."                                        },
+    { BAD_SURROGATE_TAIL,           0,   "Vorangestelltes (oberes) Surrogat-Paar U+%04X, ohne anschließennde (niedere) Entität, durch U+FFFD ersetzt." },
+    { CANT_BE_NESTED,               0,   "%s kann nicht verschachtelt sein"                                        },
+    { COERCE_TO_ENDTAG,             0,   "<%s> ist wahrscheinlich als </%s> gedacht"                               },
+    { CONTENT_AFTER_BODY,           0,   "Inhalt nach dem Ende von body"                                           },
+    { CUSTOM_TAG_DETECTED,          0,   "Habe autonomes, benutzerdefiniertes Tag %s gefunden; Behandele als %s"   },
+    { DISCARDING_UNEXPECTED,        0,   "Unerwartetes %s verworfen"                                               },
+    { DOCTYPE_AFTER_TAGS,           0,   "<!DOCTYPE> ist nach Elementen nicht erlaubt"                             },
+    { DUPLICATE_FRAMESET,           0,   "Wiederholung des FRAMESET Elements"                                      },
+    { ELEMENT_NOT_EMPTY,            0,   "%s Element nicht leer oder nicht geschlossen"                            },
+    { ELEMENT_VERS_MISMATCH_ERROR,  0,   "%s Element steht in %s nicht zur Verfügung"                              },
+    { ELEMENT_VERS_MISMATCH_WARN,   0,   "%s Element steht in %s nicht zur Verfügung"                              },
+    { ENCODING_MISMATCH,            0,   "genannte Eingabe-Kodierung (%s) stimmt nicht mit der vorgefundenen Kodierung überein (%s)" },
+    { ESCAPED_ILLEGAL_URI,          0,   "%s maskiere falsch formatierten URI Verweis"                             },
+    { FILE_CANT_OPEN,               0,   "Kann \"%s\" nicht öffnen\n"                                              },
+    { FILE_CANT_OPEN_CFG,           0,   "Kann die Konfigurationsdatei \"%s\" nicht öffnen\n"                      },
+    { FILE_NOT_FILE,                0,   "\"%s\" ist keine Datei!\n"                                               },
+    { FIXED_BACKSLASH,              0,   "%s Konvertiere einen Backslash im URI in Schrägstrich"                   },
+    { FOUND_STYLE_IN_BODY,          0,   "<style> Tag in <body>! fix-style-tags: yes, um es zu verschieben"        },
+    { ID_NAME_MISMATCH,             0,   "%s id und name Attribute unterscheiden sich im Wert"                     },
+    { ILLEGAL_NESTING,              0,   "%s sollten nicht verschachtelt sein"                                     },
+    { ILLEGAL_URI_CODEPOINT,        0,   "%s unerlaubte Zeichen im URI"                                            },
+    { ILLEGAL_URI_REFERENCE,        0,   "%s inkorrekt maskierter URI Verweis"                                     },
+    { INSERTING_AUTO_ATTRIBUTE,     0,   "%s füge \"%s\" Attribut mit Wert \"%s\" ein"                             },
+    { INSERTING_TAG,                0,   "füge implizites <%s> ein"                                                },
+    { INVALID_ATTRIBUTE,            0,   "%s Attributname \"%s\" (wert=\"%s\") ist ungültig"                       },
+    { INVALID_NCR,                  0,   "%s ungültiger, numeriascher Zeichencode %s"                              },
+    { INVALID_SGML_CHARS,           0,   "%s ungültiger Zeichencode %s"                                            },
+    { INVALID_UTF8,                 0,   "%s ungültige UTF-8 Bytes (Zeichencode %s)"                               },
+    { INVALID_UTF16,                0,   "%s Ungültiges UTF-16 Ersetzungspaar (Zeichencode %s)"                    },
+    { INVALID_XML_ID,               0,   "%s Kann Attribut name nicht in id kopieren"                              },
+    { JOINING_ATTRIBUTE,            0,   "%s Konsolidiere Werte des wiederholten Attributs \"%s\""                 },
+    { MALFORMED_COMMENT,            0,   "Tidy hat aufeinanderfolgende \"-\" durch \"=\" ersetzt"                  },
+    { MALFORMED_COMMENT_DROPPING,   0,   "Verwerfe eventuellen Kommentar, weil ein Bindestrich fehlt"              },
+    { MALFORMED_COMMENT_EOS,        0,   "Das Ende des Dokuments wurde vor dem Ende des Kommentars erreicht"       },
+    { MALFORMED_COMMENT_WARN,       0,   "Aufeinanderfolgende Bindestriche im Kommentar; erwägen Sie fix-bad-comments zu setzen"  },
+    { MALFORMED_DOCTYPE,            0,   "Verwerfe fehlformatierten <!DOCTYPE>"                                    },
+    { MISMATCHED_ATTRIBUTE_ERROR,   0,   "%s Attribut \"%s\" in %s nicht erlaubt"                                  },
+    { MISMATCHED_ATTRIBUTE_WARN,    0,   "%s Attribut \"%s\" in %s nicht erlaubt"                                  },
+    { MISSING_ATTR_VALUE,           0,   "%s Attribut \"%s\" ohne Wert"                                            },
+    { MISSING_ATTRIBUTE,            0,   "%s Attribut \"%s\" fehlt"                                                },
+    { MISSING_DOCTYPE,              0,   "fehlende <!DOCTYPE> Deklaration"                                         },
+    { MISSING_ENDTAG_BEFORE,        0,   "fehlendes </%s> vor %s"                                                  },
+    { MISSING_ENDTAG_FOR,           0,   "fehlendes </%s>"                                                         },
+    { MISSING_ENDTAG_OPTIONAL,      0,   "fehlendes, optionales Abschlusstag </%s>"                                },
+    { MISSING_IMAGEMAP,             0,   "%s sollte client-seitige Image Map verwenden"                            },
+    { MISSING_QUOTEMARK,            0,   "%s Attribut mit fehlendem, abschließenden Gänsefüßchen"                  },
+    { MISSING_QUOTEMARK_OPEN,       0,   "im Wert des Attributs \"%s\" fehlen Gänsefüßchen"                        },
+    { MISSING_SEMICOLON_NCR,        0,   "numerische Zeichenreferenz \"%s\" endet nicht mit ';'"                   },
+    { MISSING_SEMICOLON,            0,   "Entität \"%s\" endet nicht mit ';'"                                      },
+    { MISSING_STARTTAG,             0,   "fehlendes <%s>"                                                          },
+    { MISSING_TITLE_ELEMENT,        0,   "füge fehlendes 'title' Element ein"                                      },
+    { MOVED_STYLE_TO_HEAD,          0,   "habe <style> Tag in den Kopfbereich (<head>) verschoben! Setzen Sie fix-style-tags: no, um dies zu vermeiden." },
+    { NESTED_EMPHASIS,              0,   "verschachtelte Hervorhebung %s"                                                      },
+    { NESTED_QUOTATION,             0,   "verschachtelte q Elemente, möglicher Tippfehler"                         },
+    { NEWLINE_IN_URI,               0,   "%s verwerfe Zeilenumbruch im URI-Verweis"                                },
+    { NOFRAMES_CONTENT,             0,   "%s nicht im 'noframes' Element"                                          },
+    { NON_MATCHING_ENDTAG,          0,   "ersetze unerwartetes %s durch </%s>"                                     },
+    { OBSOLETE_ELEMENT,             0,   "ersetze obsoletes Element %s durch %s"                                   },
+    { OPTION_REMOVED,               0,   "Option \"%s\" existiert nicht mehr und keine Ersetzung gefunden."        },
+    { OPTION_REMOVED_APPLIED,       0,   "Option \"%s\" ersetzt durch \"%s\", von Tidy auf \"%s\" gesetzt."        },
+    { OPTION_REMOVED_UNAPPLIED,     0,   "Option \"%s\" ersetzt durch \"%s\" aber Tidy konnte sie nicht für sie setzen."  },
+    { PREVIOUS_LOCATION,            0,   "<%s> bereits vermerkt"                                                   },
+    { PROPRIETARY_ATTR_VALUE,       0,   "%s proprietäres Attribut mit Wert \"%s\""                                },
+    { PROPRIETARY_ATTRIBUTE,        0,   "%s proprietäres Attribut \"%s\""                                         },
+    { PROPRIETARY_ELEMENT,          0,   "%s ist vom W3C nicht zugelassen"                                         },
+    { REMOVED_HTML5,                0,   "%s Element aus HTML5 entfernt"                                           },
+    { REPEATED_ATTRIBUTE,           0,   "%s verwerfe Wert \"%s\" für wiederholtes Attribut \"%s\""                },
+    { REPLACING_ELEMENT,            0,   "ersetze %s durch %s"                                                     },
+    { REPLACING_UNEX_ELEMENT,       0,   "ersetze unerwartetes %s durch %s"                                        },
+    { SPACE_PRECEDING_XMLDECL,      0,   "entferne Leerraum vor der XML-Deklaration"                               },
+    { STRING_ARGUMENT_BAD,          0,   "Option \"%s\" mit ungeeignetem Argument \"%s\""                          },
+    { STRING_MISSING_MALFORMED,     0,   "fehlendes oder fehl-formatiertes Argument für Option: %s"                },
+    { STRING_MUTING_TYPE,           0,   "Mitteilungen vom Typ \"%s\" werden nicht ausgegeben"                     },
+
+    { STRING_UNKNOWN_OPTION,        0,   "unbekannte Option: %s"                                                   },
+    { SUSPECTED_MISSING_QUOTE,      0,   "vermute fehlendes Gänsefüßchen im Attributwert"                          },
+    { TAG_NOT_ALLOWED_IN,           0,   "%s ist im Element <%s> nicht erlaubt"                                    },
+    { TOO_MANY_ELEMENTS_IN,         0,   "zu viele %s Elemente in <%s>"                                            },
+    { TOO_MANY_ELEMENTS,            0,   "zu viele %s Elemente"                                                    },
+    { TRIM_EMPTY_ELEMENT,           0,   "kürze leeres %s"                                                         },
+    { UNESCAPED_AMPERSAND,          0,   "unmaskiertes & sollte als &amp; geschrieben werden"                      },
+    { UNEXPECTED_END_OF_FILE_ATTR,  0,   "%s Dateiende erreicht, während noch Attribute ausgewertet werden"        },
+    { UNEXPECTED_END_OF_FILE,       0,   "unerwartetes Dateiende %s"                                               },
+    { UNEXPECTED_ENDTAG_ERR,        0,   "unerwartetes </%s>"                                                      },
+    { UNEXPECTED_ENDTAG_IN,         0,   "unerwartetes </%s> in <%s>"                                              },
+    { UNEXPECTED_ENDTAG,            0,   "unerwartetes </%s>"                                                      },
+    { UNEXPECTED_EQUALSIGN,         0,   "%s unerwartetes '=' anstelle von Attributnamen"                          },
+    { UNEXPECTED_GT,                0,   "%s fehlendes '>' am Ende eines Tags"                                     },
+    { UNEXPECTED_QUOTEMARK,         0,   "%s unerwartetes oder doppeltes Gänsefüßchen"                             },
+    { UNKNOWN_ELEMENT_LOOKS_CUSTOM, 0,   "%s wird nicht erkannt! Wollten Sie die Option custom-tags aktivieren?"   },
+    { UNKNOWN_ELEMENT,              0,   "%s wird nicht erkannt!"                                                  },
+    { UNKNOWN_ENTITY,               0,   "unmaskiertes & oder unbekannte Entität \"%s\""                           },
+    { USING_BR_INPLACE_OF,          0,   "verwende <br> anstelle von %s"                                           },
+    { VENDOR_SPECIFIC_CHARS,        0,   "%s ungültiger Zeichencode %s"                                            },
+    { WHITE_IN_URI,                 0,   "%s verwerfe Leerzeichen in einem URI Verweis"                            },
+    { XML_DECLARATION_DETECTED,     0,   "Eine XML Deklaration wurde entdeckt. Wollten Sie input-xml verwenden?"   },
+    { XML_ID_SYNTAX,                0,   "%s ID \"%s\" verwendet XML ID Syntax"                                    },
+
+    /***************************************
+     ** Report Output -- Accessibility
+     ***************************************/
+    { IMG_MISSING_ALT,                               0,   "[1.1.1.1]: <img> ohne 'alt' Text."                                        },
+    { IMG_ALT_SUSPICIOUS_FILENAME,                   0,   "[1.1.1.2]: suspekter 'alt' Text (Dateiname)."                             },
+    { IMG_ALT_SUSPICIOUS_FILE_SIZE,                  0,   "[1.1.1.3]: suspekter 'alt' Text (Dateigröße)."                            },
+    { IMG_ALT_SUSPICIOUS_PLACEHOLDER,                0,   "[1.1.1.4]: suspekter 'alt' Text (Platzhalter)."                           },
+    { IMG_ALT_SUSPICIOUS_TOO_LONG,                   0,   "[1.1.1.10]: suspekter 'alt' Text (zu lang)."                              },
+    { IMG_MISSING_LONGDESC_DLINK,                    0,   "[1.1.2.1]: <img> Attribute 'longdesc' und d-link fehlen."                 },
+    { IMG_MISSING_DLINK,                             0,   "[1.1.2.2]: <img> Attribut d-link fehlt."                                  },
+    { IMG_MISSING_LONGDESC,                          0,   "[1.1.2.3]: <img> Attribut 'longdesc' fehlt."                              },
+    { IMG_BUTTON_MISSING_ALT,                        0,   "[1.1.3.1]: <img> (Button) fehlender 'alt' Text."                          },
+    { APPLET_MISSING_ALT,                            0,   "[1.1.4.1]: <applet> fehlender alternativer Inhalt."                       },
+    { OBJECT_MISSING_ALT,                            0,   "[1.1.5.1]: <object> fehlender alternativer Inhalt."                       },
+    { AUDIO_MISSING_TEXT_WAV,                        0,   "[1.1.6.1]: Tonausgabe ohne Text-Transkription (wav)."                     },
+    { AUDIO_MISSING_TEXT_AU,                         0,   "[1.1.6.2]: Tonausgabe ohne Text-Transkription (au)."                      },
+    { AUDIO_MISSING_TEXT_AIFF,                       0,   "[1.1.6.3]: Tonausgabe ohne Text-Transkription (aiff)."                    },
+    { AUDIO_MISSING_TEXT_SND,                        0,   "[1.1.6.4]: Tonausgabe ohne Text-Transkription (snd)."                     },
+    { AUDIO_MISSING_TEXT_RA,                         0,   "[1.1.6.5]: Tonausgabe ohne Text-Transkription (ra)."                      },
+    { AUDIO_MISSING_TEXT_RM,                         0,   "[1.1.6.6]: Tonausgabe ohne Text-Transkription (rm)."                      },
+    { FRAME_MISSING_LONGDESC,                        0,   "[1.1.8.1]: <frame> benötigt vielleicht 'longdesc' Attribut."              },
+    { AREA_MISSING_ALT,                              0,   "[1.1.9.1]: <area> fehlender 'alt' Text."                                  },
+    { SCRIPT_MISSING_NOSCRIPT,                       0,   "[1.1.10.1]: <script> fehlender <noscript> Abschnitt."                     },
+    { ASCII_REQUIRES_DESCRIPTION,                    0,   "[1.1.12.1]: ASCII Bild benötigt Beschreibung."                            },
+    { IMG_MAP_SERVER_REQUIRES_TEXT_LINKS,            0,   "[1.2.1.1]: (Server-seitige) Image-Map benötigt Textverweise."             },
+    { MULTIMEDIA_REQUIRES_TEXT,                      0,   "[1.4.1.1]: Multimediadaten benötigen synchronisierte Textentsprechung."   },
+    { IMG_MAP_CLIENT_MISSING_TEXT_LINKS,             0,   "[1.5.1.1]: (Client-seitige) Image-Map benötigt Textverweise."             },
+    { INFORMATION_NOT_CONVEYED_IMAGE,                0,   "[2.1.1.1]: Vermeiden Sie, dass Information nur durch Farbe vermittelt wird (image)."  },
+    { INFORMATION_NOT_CONVEYED_APPLET,               0,   "[2.1.1.2]: Vermeiden Sie, dass Information nur durch Farbe vermittelt wird (applet)." },
+    { INFORMATION_NOT_CONVEYED_OBJECT,               0,   "[2.1.1.3]: Vermeiden Sie, dass Information nur durch Farbe vermittelt wird (object)." },
+    { INFORMATION_NOT_CONVEYED_SCRIPT,               0,   "[2.1.1.4]: Vermeiden Sie, dass Information nur durch Farbe vermittelt wird (script)." },
+    { INFORMATION_NOT_CONVEYED_INPUT,                0,   "[2.1.1.5]: Vermeiden Sie, dass Information nur durch Farbe vermittelt wird (input)."  },
+    { COLOR_CONTRAST_TEXT,                           0,   "[2.2.1.1]: schlechter Farbkontrast (Text)."                               },
+    { COLOR_CONTRAST_LINK,                           0,   "[2.2.1.2]: schlechter Farbkontrast (Link)."                               },
+    { COLOR_CONTRAST_ACTIVE_LINK,                    0,   "[2.2.1.3]: schlechter Farbkontrast (Aktiver Link)."                       },
+    { COLOR_CONTRAST_VISITED_LINK,                   0,   "[2.2.1.4]: schlechter Farbkontrast (Besuchter Link)."                     },
+    { DOCTYPE_MISSING,                               0,   "[3.2.1.1]: <doctype> fehlt."                                              },
+    { STYLE_SHEET_CONTROL_PRESENTATION,              0,   "[3.3.1.1]: Kontrollieren Sie die Präsentation mit Style Sheets."          },
+    { HEADERS_IMPROPERLY_NESTED,                     0,   "[3.5.1.1]: inkorrekt verschachtelte Überschriften."                       },
+    { POTENTIAL_HEADER_BOLD,                         0,   "[3.5.2.1]: potentielle Überschrift (Fettdruck)."                          },
+    { POTENTIAL_HEADER_ITALICS,                      0,   "[3.5.2.2]: potentielle Überschrift (kursiv)."                             },
+    { POTENTIAL_HEADER_UNDERLINE,                    0,   "[3.5.2.3]: potentielle Überschrift (unterstrichen)."                      },
+    { HEADER_USED_FORMAT_TEXT,                       0,   "[3.5.3.1]: Überschrift zur Textformatierung verwendet."                   },
+    { LIST_USAGE_INVALID_UL,                         0,   "[3.6.1.1]: falsche Verwendung von Listenelementen <ul>."                  },
+    { LIST_USAGE_INVALID_OL,                         0,   "[3.6.1.2]: falsche Verwendung von Listenelementen <ol>."                  },
+    { LIST_USAGE_INVALID_LI,                         0,   "[3.6.1.4]: falsche Verwendung von Listenelementen <li>."                  },
+    { LANGUAGE_NOT_IDENTIFIED,                       0,   "[4.3.1.1]: Sprache nicht identifiziert."                                  },
+    { LANGUAGE_INVALID,                              0,   "[4.3.1.2]: ungültiges Attribut language."                                 },
+    { DATA_TABLE_MISSING_HEADERS,                    0,   "[5.1.2.1]: Datentabelle <table> ohne Spalten-/Zeilenköpfe (alle)."        },
+    { DATA_TABLE_MISSING_HEADERS_COLUMN,             0,   "[5.1.2.2]: Datentabelle <table> ohne Spalten-/Zeilenköpfe (1 Spalte)."    },
+    { DATA_TABLE_MISSING_HEADERS_ROW,                0,   "[5.1.2.3]: Datentabelle <table> ohne Spalten-/Zeilenköpfe (1 Zeile)."     },
+    { DATA_TABLE_REQUIRE_MARKUP_COLUMN_HEADERS,      0,   "[5.2.1.1]: Datentabelle <table> benötigt vielleicht Auszeichnung (Spaltenköpfe)."    },
+    { DATA_TABLE_REQUIRE_MARKUP_ROW_HEADERS,         0,   "[5.2.1.2]: Datentabelle <table> benötigt vielleicht Auszeichnung (Zeilenköpfe)."     },
+    { LAYOUT_TABLES_LINEARIZE_PROPERLY,              0,   "[5.3.1.1]: Stellen Sie sicher, dass Layout-Tabellen richtig linearisieren."          },
+    { LAYOUT_TABLE_INVALID_MARKUP,                   0,   "[5.4.1.1]: Ungültige Auszeichnung in der Layout-Tabelle."                 },
+    { TABLE_MISSING_SUMMARY,                         0,   "[5.5.1.1]: <table> ohne Zusammenfassung (summary)."                       },
+    { TABLE_SUMMARY_INVALID_NULL,                    0,   "[5.5.1.2]: Ungültige Zusammenfassung in <table> (null)."                  },
+    { TABLE_SUMMARY_INVALID_SPACES,                  0,   "[5.5.1.3]: Ungültige Zusammenfassung in <table> (Leerzeichen)."           },
+    { TABLE_SUMMARY_INVALID_PLACEHOLDER,             0,   "[5.5.1.6]: Ungültige Zusammenfassung in <table> (Platzhaltertext)."       },
+    { TABLE_MISSING_CAPTION,                         0,   "[5.5.2.1]: <table> ohne Titelzeile (<caption>)."                          },
+    { TABLE_MAY_REQUIRE_HEADER_ABBR,                 0,   "[5.6.1.1]: Kopfdaten in <table> sollten abgekürzt sein."                  },
+    { TABLE_MAY_REQUIRE_HEADER_ABBR_NULL,            0,   "[5.6.1.2]: Abgekürzte Kopfdaten in <table> sind ungültig (null)."         },
+    { TABLE_MAY_REQUIRE_HEADER_ABBR_SPACES,          0,   "[5.6.1.3]: Abgekürzte Kopfdaten in <table> sind ungültig (Leerzeichen)."  },
+    { STYLESHEETS_REQUIRE_TESTING_LINK,              0,   "[6.1.1.1]: Style Sheets sollten getestet werden (Link)."                  },
+    { STYLESHEETS_REQUIRE_TESTING_STYLE_ELEMENT,     0,   "[6.1.1.2]: Style Sheets sollten getestet werden (Style-Element)."         },
+    { STYLESHEETS_REQUIRE_TESTING_STYLE_ATTR,        0,   "[6.1.1.3]: Style Sheets sollten getestet werden (Style-Attribut)."        },
+    { FRAME_SRC_INVALID,                             0,   "[6.2.1.1]: Quelle des Rahmeninhalts in <frame> ist ungültig."             },
+    { TEXT_EQUIVALENTS_REQUIRE_UPDATING_APPLET,      0,   "[6.2.2.1]: Text-Äquivalente müssen getestet werden (applet)."             },
+    { TEXT_EQUIVALENTS_REQUIRE_UPDATING_SCRIPT,      0,   "[6.2.2.2]: Text-Äquivalente müssen getestet werden (script)."             },
+    { TEXT_EQUIVALENTS_REQUIRE_UPDATING_OBJECT,      0,   "[6.2.2.3]: Text-Äquivalente müssen getestet werden (object)."             },
+    { PROGRAMMATIC_OBJECTS_REQUIRE_TESTING_SCRIPT,   0,   "[6.3.1.1]: Programmatische Objekte sollten getestet werden (script)."     },
+    { PROGRAMMATIC_OBJECTS_REQUIRE_TESTING_OBJECT,   0,   "[6.3.1.2]: Programmatische Objekte sollten getestet werden (object)."     },
+    { PROGRAMMATIC_OBJECTS_REQUIRE_TESTING_EMBED,    0,   "[6.3.1.3]: Programmatische Objekte sollten getestet werden (embed)."      },
+    { PROGRAMMATIC_OBJECTS_REQUIRE_TESTING_APPLET,   0,   "[6.3.1.4]: Programmatische Objekte sollten getestet werden (applet)."     },
+    { FRAME_MISSING_NOFRAMES,                        0,   "[6.5.1.1]: <frameset> ohne <noframes> Abschnitt."                         },
+    { NOFRAMES_INVALID_NO_VALUE,                     0,   "[6.5.1.2]: <noframes> Abschnitt ungültig (kein Wert)."                    },
+    { NOFRAMES_INVALID_CONTENT,                      0,   "[6.5.1.3]: <noframes> Abschnitt ungültig (Inhalt)."                       },
+    { NOFRAMES_INVALID_LINK,                         0,   "[6.5.1.4]: <noframes> Abschnitt ungültig (Verweis)."                      },
+    { REMOVE_FLICKER_SCRIPT,                         0,   "[7.1.1.1]: Flimmern entfernen (script)."                                      },
+    { REMOVE_FLICKER_OBJECT,                         0,   "[7.1.1.2]: Flimmern entfernen (object)."                                      },
+    { REMOVE_FLICKER_EMBED,                          0,   "[7.1.1.3]: Flimmern entfernen (embed)."                                       },
+    { REMOVE_FLICKER_APPLET,                         0,   "[7.1.1.4]: Flimmern entfernen (applet)."                                      },
+    { REMOVE_FLICKER_ANIMATED_GIF,                   0,   "[7.1.1.5]: Flimmern etfernen (animated gif)."                                },
+    { REMOVE_BLINK_MARQUEE,                          0,   "[7.2.1.1]: blink/marquee entfernen."                                         },
+    { REMOVE_AUTO_REFRESH,                           0,   "[7.4.1.1]: auto-refresh entfernen."                                          },
+    { REMOVE_AUTO_REDIRECT,                          0,   "[7.5.1.1]: auto-redirect entfernen."                                         },
+    { ENSURE_PROGRAMMATIC_OBJECTS_ACCESSIBLE_SCRIPT, 0,   "[8.1.1.1]: sicherstellen, dass programmatische objekte zugänglich sind (script)."          },
+    { ENSURE_PROGRAMMATIC_OBJECTS_ACCESSIBLE_OBJECT, 0,   "[8.1.1.2]: sicherstellen, dass programmatische objekte zugänglich sind (object)."          },
+    { ENSURE_PROGRAMMATIC_OBJECTS_ACCESSIBLE_APPLET, 0,   "[8.1.1.3]: sicherstellen, dass programmatische objekte zugänglich sind (applet)."          },
+    { ENSURE_PROGRAMMATIC_OBJECTS_ACCESSIBLE_EMBED,  0,   "[8.1.1.4]: sicherstellen, dass programmatische objekte zugänglich sind (embed)."           },
+    { IMAGE_MAP_SERVER_SIDE_REQUIRES_CONVERSION,     0,   "[9.1.1.1]: (serverseitige) image map muss umgewandelt werden."                  },
+    { SCRIPT_NOT_KEYBOARD_ACCESSIBLE_ON_MOUSE_DOWN,  0,   "[9.3.1.1]: <script> für Tastatur ungeeignet (onMouseDown)."               },
+    { SCRIPT_NOT_KEYBOARD_ACCESSIBLE_ON_MOUSE_UP,    0,   "[9.3.1.2]: <script> für Tastatur ungeeignet (onMouseUp)."                 },
+    { SCRIPT_NOT_KEYBOARD_ACCESSIBLE_ON_CLICK,       0,   "[9.3.1.3]: <script> für Tastatur ungeeignet (onClick)."                   },
+    { SCRIPT_NOT_KEYBOARD_ACCESSIBLE_ON_MOUSE_OVER,  0,   "[9.3.1.4]: <script> für Tastatur ungeeignet (onMouseOver)."               },
+    { SCRIPT_NOT_KEYBOARD_ACCESSIBLE_ON_MOUSE_OUT,   0,   "[9.3.1.5]: <script> für Tastatur ungeeignet (onMouseOut)."                },
+    { SCRIPT_NOT_KEYBOARD_ACCESSIBLE_ON_MOUSE_MOVE,  0,   "[9.3.1.6]: <script> für Tastatur ungeeignet (onMouseMove)."               },
+    { NEW_WINDOWS_REQUIRE_WARNING_NEW,               0,   "[10.1.1.1]: neue Fenster benötigen Warnhinweis (_new)."                          },
+    { NEW_WINDOWS_REQUIRE_WARNING_BLANK,             0,   "[10.1.1.2]: neue Fenster benötigen Warnhinweis (_blank)."                        },
+    { REPLACE_DEPRECATED_HTML_APPLET,                0,   "[11.2.1.1]: ersetze veraltetes html <applet>."                            },
+    { REPLACE_DEPRECATED_HTML_BASEFONT,              0,   "[11.2.1.2]: ersetze veraltetes html <basefont>."                          },
+    { REPLACE_DEPRECATED_HTML_CENTER,                0,   "[11.2.1.3]: ersetze veraltetes html <center>."                            },
+    { REPLACE_DEPRECATED_HTML_DIR,                   0,   "[11.2.1.4]: ersetze veraltetes html <dir>."                               },
+    { REPLACE_DEPRECATED_HTML_FONT,                  0,   "[11.2.1.5]: ersetze veraltetes html <font>."                              },
+    { REPLACE_DEPRECATED_HTML_ISINDEX,               0,   "[11.2.1.6]: ersetze veraltetes html <isindex>."                           },
+    { REPLACE_DEPRECATED_HTML_MENU,                  0,   "[11.2.1.7]: ersetze veraltetes html <menu>."                              },
+    { REPLACE_DEPRECATED_HTML_S,                     0,   "[11.2.1.8]: ersetze veraltetes html <s>."                                 },
+    { REPLACE_DEPRECATED_HTML_STRIKE,                0,   "[11.2.1.9]: ersetze veraltetes html <strike>."                            },
+    { REPLACE_DEPRECATED_HTML_U,                     0,   "[11.2.1.10]: ersetze veraltetes html <u>."                                },
+    { FRAME_MISSING_TITLE,                           0,   "[12.1.1.1]: <frame> ohne Titel."                                       },
+    { FRAME_TITLE_INVALID_NULL,                      0,   "[12.1.1.2]: <frame> Titel ungültig (null)."                                },
+    { FRAME_TITLE_INVALID_SPACES,                    0,   "[12.1.1.3]: <frame> Titel ungültig (spaces)."                              },
+    { ASSOCIATE_LABELS_EXPLICITLY,                   0,   "[12.4.1.1]: ordne Beschriftungen explizit Formularelementen zu."              },
+    { ASSOCIATE_LABELS_EXPLICITLY_FOR,               0,   "[12.4.1.2]: ordne Beschriftungen explizit Formularelementen zu (for)."        },
+    { ASSOCIATE_LABELS_EXPLICITLY_ID,                0,   "[12.4.1.3]: ordne Beschriftungen explizit Formularelementen zu (id)."         },
+    { LINK_TEXT_NOT_MEANINGFUL,                      0,   "[13.1.1.1]: Link Text nicht aussagekräftig."                                    },
+    { LINK_TEXT_MISSING,                             0,   "[13.1.1.2]: Link Text fehlt."                                           },
+    { LINK_TEXT_TOO_LONG,                            0,   "[13.1.1.3]: Link Text zu lang."                                          },
+    { LINK_TEXT_NOT_MEANINGFUL_CLICK_HERE,           0,   "[13.1.1.4]: Link Text nicht aussagekräftig (hier klicken)."                       },
+    { METADATA_MISSING,                              0,   "[13.2.1.1]: Metadaten fehlen."                                            },
+    { METADATA_MISSING_REDIRECT_AUTOREFRESH,         0,   "[13.2.1.3]: Metadaten fehlen (redirect/auto-refresh)."                    },
+    { SKIPOVER_ASCII_ART,                            0,   "[13.10.1.1]: Ignoriere Ascii Art."                                        },
+    
+    
+#if SUPPORT_CONSOLE_APP
+    /********************************************************
+     ** Console Application
+     **  Although these strings are not used within LibTidy
+     **  and only for the console application, they are
+     **  provided as part of LibTidy for convenience to
+     **  developers.
+     ********************************************************/
+    { TC_LABEL_COL,                 0,   "Spalte"                                                                  },
+    { TC_LABEL_FILE,                0,   "Datei"                                                                    },
+    { TC_LABEL_LANG,                0,   "Sprache"                                                                    },
+    { TC_LABEL_LEVL,                0,   "Niveau"                                                                   },
+    { TC_LABEL_OPT,                 0,   "Option"                                                                  },
+    { TC_MAIN_ERROR_LOAD_CONFIG,    0,   "Problem beim laden der Konfigurationsdatei \"%s\", Fehler = %d"                             },
+    { TC_OPT_ACCESS,                0,
+        "Führe zusätzliche Prüfungen der Barrierefreiheit durch (<Niveau> = 0, 1, 2, 3). 0 wird "
+        "angenommen, wenn <Niveau> fehlt."
+    },
+    { TC_OPT_ASCII,                 0,   "verwende ISO-8859-1 für Eingaben, US-ASCII für Ausgaben"                           },
+    { TC_OPT_ASHTML,                0,   "erzwinge Umwandlung von XHTML in wohlgeformtes HTML"                                         },
+    { TC_OPT_ASXML,                 0,   "konvertiere HTML zu wohlgeformtem XHTML"                                       },
+    { TC_OPT_BARE,                  0,   "entferne typografische Anführungsstriche, Geviertstriche, etc."                              },
+    { TC_OPT_BIG5,                  0,   "verwende Big5 für Ein- und Ausgaben"                                      },
+    { TC_OPT_CLEAN,                 0,   "ersetze FONT, NOBR und CENTER Tags durch CSS"                             },
+    { TC_OPT_CONFIG,                0,   "setze Konfigurationseinstellungen aus der genannten <Datei>"                     },
+    { TC_OPT_ERRORS,                0,   "nur Fehler und Warnungen anzeigen"                                           },
+    { TC_OPT_FILE,                  0,   "schreibe Fehler und Warnungen in die genannte <Datei>"                       },
+    { TC_OPT_GDOC,                  0,   "erzeuge saubere Version des aus Google Docs exportierten HTML"                   },
+    { TC_OPT_HELP,                  0,   "liste Kommandozeilenoptionen"                                           },
+    { TC_OPT_HELPCFG,               0,   "alle Konfigurationseinstellungen auflisten"                                          },
+    { TC_OPT_HELPENV,               0,   "Informationen zu Umgebung und Laufzeiteinstellungen anzeigen"        },
+    { TC_OPT_HELPOPT,               0,   "zeige eine Beschreibung der <Option>"                                      },
+    { TC_OPT_IBM858,                0,   "verwende IBM-858 (CP850+Euro) für Eingaben, US-ASCII für Ausgaben"                 },
+    { TC_OPT_INDENT,                0,   "Element Inhalt einrücken"                                                  },
+    { TC_OPT_ISO2022,               0,   "Verwende ISO-2022 für Ein- und Ausgaben"                                  },
+
+    {/* The strings "Tidy" and "HTML Tidy" are the program name and must not be translated. */
+      TC_OPT_LANGUAGE,              0,
+        "Sprache für Ausgaben von Tidy auf <Sprache> einstellen. Für weitere Hinweise geben Sie '-language help' ein. "
+        "Verwendung vor Argumenten, die Ausgaben erzeugen, damit die Spracheinstellung beachtet wird, z.B.,"
+        "`tidy -lang es -lang help`."
+    },
+
+    { TC_OPT_LATIN0,                0,   "verwende ISO-8859-15 für Eingaben, US-ASCII für Ausgaben"                          },
+    { TC_OPT_LATIN1,                0,   "verwende ISO-8859-1 für Ein- und Ausgaben"                                },
+    { TC_OPT_MAC,                   0,   "verwende MacRoman für Eingaben, US-ASCII für Ausgaben"                             },
+    { TC_OPT_MODIFY,                0,   "originale Eingabedateien verändern"                                         },
+    { TC_OPT_NUMERIC,               0,   "eher numerische- als benannte Entities ausgeben"                               },
+    { TC_OPT_OMIT,                  0,   "optionale Start- und End-Tags weglassen"                                   },
+    { TC_OPT_OUTPUT,                0,   "Ausgaben in die genannte <Datei> schreiben"                                    },
+    { TC_OPT_QUIET,                 0,   "unwesentliche Ausgaben unterdrücken"                                            },
+    { TC_OPT_RAW,                   0,   "Werte über 127 ausgeben, ohne Konvertierung zu Entities"                  },
+    { TC_OPT_SHIFTJIS,              0,   "verwende Shift_JIS für Ein- und Ausgaben"                                 },
+    { TC_OPT_SHOWCFG,               0,   "Aktuelle Konfigurationseinstellungen auflisten"                                 },
+    { TC_OPT_EXP_CFG,               0,   "Aktuelle Konfigurationseinstellungen so auflisten, wie sie für eine Konfigurationsdatei geeignet sind"     },
+    { TC_OPT_EXP_DEF,               0,   "Standard Konfigurationseinstellungen so auflisten, wie sie für eine Konfigurationsdatei geeignet sind"     },
+    { TC_OPT_UPPER,                 0,   "erzwinge Großschreibung für Tags"                                                },
+    { TC_OPT_UTF16,                 0,   "verwende UTF-16 für Ein- und Ausgaben"                                    },
+    { TC_OPT_UTF16BE,               0,   "verwende UTF-16BE für Ein- und Ausgaben"                                  },
+    { TC_OPT_UTF16LE,               0,   "verwende UTF-16LE für Ein- und Ausgaben"                                  },
+    { TC_OPT_UTF8,                  0,   "verwende UTF-8 für Ein- und Ausgaben"                                     },
+
+    {/* The strings "Tidy" and "HTML Tidy" are the program name and must not be translated. */
+      TC_OPT_VERSION,               0,   "Tidy-Version anzeigen"
+    },
+
+    { TC_OPT_WIN1252,               0,   "verwende Windows-1252 für Eingaben, US-ASCII für Ausgaben"                         },
+    { TC_OPT_WRAP,                  0,
+        "Text an der genannten <Spalte> umbrechen. 0 wird angenommen, wenn <Spalte> fehlt. "
+        "Wenn diese Option fehlt, gilt der Standard für die Option 'wrap'."
+    },
+    { TC_OPT_XML,                   0,   "bestimmen, dass die Eingabe wohlgeformtes XML ist"                                    },
+    { TC_OPT_XMLCFG,                0,   "alle Konfigurationsoptionen im XML Format auflisten"                            },
+    { TC_OPT_XMLHELP,               0,   "Kommandozeilenparameter im XML Format auflisten"                             },
+
+    {/* The strings "Tidy" and "HTML Tidy" are the program name and must not be translated. */
+      TC_OPT_XMLSTRG,               0,   "Alle Zeichenketten als XML ausgeben"
+    },
+
+    { TC_OPT_XMLERRS,               0,   "Fehlerkonstanten und Zeichenketten im XML-Format ausgeben"                        },
+
+    { TC_OPT_XMLOPTS,               0,   "Optionsbeschreibungen in XML ausgeben"                                },
+    
+    { TC_STRING_CONF_HEADER,        0,   "Einstellungen der Konfigurationsdatei:"                                            },
+
+    {/* Must be 27 characters or fewer. */
+      TC_STRING_CONF_NAME,          0,   "Name"
+    },
+
+    {/* Must be 9 characters or fewer. */
+      TC_STRING_CONF_TYPE,          0,   "Typ"
+    },
+    {/* Must be 40 characters or fewer. */
+      TC_STRING_CONF_VALUE,         0,   "Aktueller Wert"
+    },
+
+    { TC_STRING_OPT_NOT_DOCUMENTED, 0,   "Warnung: Option `%s' ist undokumentiert."                                 },
+    { TC_STRING_OUT_OF_MEMORY,      0,   "Speicher voll. Breche ab."                                             },
+    { TC_STRING_FATAL_ERROR,        0,   "Schwerwiegender Fehler: Unmöglicher Wert für id='%d'."                              },
+    { TC_STRING_FILE_MANIP,         0,   "Dateimanipulation"                                                       },
+    { TC_STRING_PROCESS_DIRECTIVES, 0,   "Verarbeite Anweisungen"                                                   },
+    { TC_STRING_CHAR_ENCODING,      0,   "Zeichenkodierung"                                                     },
+    { TC_STRING_LANG_MUST_SPECIFY,  0,   "Ein POSIX- oder Windows Gebietsschema muss angegeben werden."                            },
+
+    {/* The strings "Tidy" and "HTML Tidy" are the program name and must not be translated. */
+      TC_STRING_LANG_NOT_FOUND,     0,   "Tidy beherrscht die Sprache '%s' nicht, werde statt dessen '%s' verwenden."
+    },
+
+    { TC_STRING_MISC,               0,   "Verschiedenes"                                                           },
+    { TC_STRING_XML,                0,   "XML"                                                                     },
+    { TC_STRING_MUST_SPECIFY,       0,   "Eine Option muss angegeben werden."                                   },
+
+    {/* The strings "Tidy" and "HTML Tidy" are the program name and must not be translated. */
+      TC_STRING_UNKNOWN_OPTION,     0,   "HTML Tidy: unbekannte Option: %c"
+    },
+    {/* The strings "Tidy" and "HTML Tidy" are the program name and must not be translated. */
+      TC_STRING_UNKNOWN_OPTION_B,   0,   "HTML Tidy: unbekannte Option."
+    },
+    {/* The strings "Tidy" and "HTML Tidy" are the program name and must not be translated. */
+      TC_STRING_VERS_A,             0,   "HTML Tidy für %s, Version %s"
+    },
+    {/* The strings "Tidy" and "HTML Tidy" are the program name and must not be translated. */
+      TC_STRING_VERS_B,             0,   "HTML Tidy Version %s"
+    },
+
+    {/* This console output should be limited to 78 characters per line.
+        - First %s represents the name of the executable from the file system, and is mostly like going to be "tidy".
+        - Second %s represents a version number, typically x.x.xx.
+        - The strings "Tidy" and "HTML Tidy" are the program name and must not be translated. */
+      TC_TXT_HELP_1,                0,
+        "%s [Optionen...] [Datei...] [Optionen...] [Datei...]\n"
+        "Werkzeug zum Bereinigen und zur formatierten Ausgabe von HTML/XHTML/XML.\n"
+        "\n"
+        "Das ist die moderne HTML Tidy Version %s.\n"
+        "\n"
+    },
+    {/* The strings "Tidy" and "HTML Tidy" are the program name and must not be translated.
+        - %s represents the platform, for example, "Mac OS X" or "Windows". */
+      TC_TXT_HELP_2A,               0,
+        "Kommmandozeilenargumente für HTML Tidy für %s:"
+    },
+    {/* The strings "Tidy" and "HTML Tidy" are the program name and must not be translated. */
+      TC_TXT_HELP_2B,               0,
+        "Kommandozeilenargumente für HTML Tidy:"
+    },
+    {/* This console output should be limited to 78 characters per line. 
+        - The strings "Tidy" and "HTML Tidy" are the program name and must not be translated.
+        - %s represents either a blank line, or TC_TXT_HELP_3A explaining environment options. */
+      TC_TXT_HELP_3,                0,
+        "\n"
+        "Tidy Konfigurationseinstellungen\n"
+        "================================\n"
+        " Verwenden Sie die Konfigurationseinstellungen als Kommandozeilenargumente\n"
+        " in der Form\n"
+        " \"--eine-option <wert>\", zum Beispiel, \"--indent-with-tabs yes\".\n"
+        "\n"
+        " Sie können auch eine Datei nennen, die die Konfigurationseinstellungen enthält. \n"
+        " Verwenden Sie dazu die Anweisung -options <Datei> oder in eine oder mehrere\n"
+        " Dateien gemäß Ihrer Arbeitsumgebung (siehe nächsten Abschnitt). \n"
+        "\n"
+        " Für eine Liste aller Konfigurationseinstellungen verwenden Sie \"-help-config\"\n" 
+        " oder konsultieren Sie die man-page (sofern es für Ihr Betriebssystem eine gibt).\n"
+        "\n"
+        "Konfigurationsdateien\n"
+        "=====================\n"
+        " Wenn in Ihrer Umgebung eine Variable $HTML_TIDY gesetzt ist und sie auf eine \n"
+        " Tidy Konfigurationsdatei verweist, wird Tidy versuchen, sie zu verwenden. \n"
+        "%s"
+        " Benutzen Sie \"-help-env\", um mehr Informationen zur Anzeige weiterer\n" 
+        " Informationen darüber, wie Sie die Umgebung verwenden, um Einstellungen für\n" 
+        " Tidy vorzunehmen. \n"
+        "\n"
+        "Weiteres\n"
+        "========\n"
+        " Die Ein- und Ausgabenkanäle sind standardmäßig stdin und stdout.\n"
+        "\n"
+        " Optionen, die aus einem einzelnen Zeichen bestehen – mit Ausnahme von -f – \n"
+        " können kombiniert werden wie in:  tidy -f errs.txt -imu foo.html\n"
+        "\n"
+        "Information\n"
+        "===========\n"
+        " Für weitere Informationen über HTML Tidy, besuchen Sie\n"
+        "  http://www.html-tidy.org/\n"
+        "\n"
+        " Mehr zu HTML finden Sie auf den folgenden Seiten (in englischer Sprache):\n"
+        "\n"
+        "   HTML: Ausgabe für Web-Autoren (die neueste HTML Spezifikation)\n"
+        "   http://dev.w3.org/html5/spec-author-view\n"
+        "\n"
+        "   HTML: Die Auszeichnungssprache (ein HTML Handbuch)\n"
+        "   http://dev.w3.org/html5/markup/\n"
+        "\n"
+        " Senden Sie Fehlerberichte an https://github.com/htacg/tidy-html5/issues/\n"
+        " oder senden Sie Fragen und Kommentare an public-htacg@w3.org.\n"
+        "\n"
+        " Überprüfen Sie Ihre HTML Dokumente mit dem W3C Nu Validierer:\n"
+        "   http://validator.w3.org/nu/\n"
+        "\n"
+    },
+
+    {/* This console output should be limited to 78 characters per line.
+        - The strings "Tidy" and "HTML Tidy" are the program name and must not be translated.
+        - Both parameters %s reflect file paths and names. */
+      TC_TXT_HELP_3A,               0,
+        "\n"
+        " Außerdem wird Tidy automatisch versuchen, Konfigurationen aus diesen\n" 
+        " Dateien zu verwenden, wenn sie vorhanden sind:\n"
+        "\n"
+        "  %s \n"
+        "  %s \n"
+        "\n"
+    },
+    {/* This console output should be limited to 78 characters per line.
+        - The strings "Tidy" and "HTML Tidy" are the program name and must not be translated. */
+      TC_TXT_HELP_CONFIG,           0,
+        "\n"
+        "HTML Tidy Konfigurationseinstellungen\n"
+        "\n"
+        "Innerhalb einer Datei notieren auf diese Weise:\n"
+        "\n"
+        "wrap: 72\n"
+        "indent: no\n"
+        "\n"
+        "In der Kommandozeile:\n"
+        "\n"
+        "--wrap 72 --indent no\n"
+        "\n"
+    },
+
+    { TC_TXT_HELP_CONFIG_NAME,      0,   "Name"                                                                    },
+    { TC_TXT_HELP_CONFIG_TYPE,      0,   "Typ"                                                                    },
+    { TC_TXT_HELP_CONFIG_ALLW,      0,   "Erlaubte Werte"                                                        },
+    {/* This console output should be limited to 78 characters per line.
+        - The strings "Tidy" and "HTML Tidy" are the program name and must not be translated.
+        - The first %s indicates two more list items, or an empty string.
+        - The second %s indicates a file name, or a message indicating no file name. */
+      TC_TXT_HELP_ENV_1,           0,
+        "\n"
+        " Tidy kann seine Konfigurationswerte aus mehreren Quellen lesen, in der\n" 
+        " nachfolgend beschriebenen Reihenfolge. Wiederholte Verwendung der\n" 
+        " gleichen Option überschreibt die vorhergehende Einstellung \n"
+        "\n"
+        " - In Tidy vordefinierte Standardwerte. \n"
+        "%s" /* rc files */
+        " - Die Datei, die in der Umgebungsvariablen $HTML_TIDY genannt ist: \n"
+        "     %s \n"
+        " - Optionen aus einer Datei, die in der Kommandozeile genannt ist. \n"
+        " - Optionen, die direkt in der Kommandozeile gesetzt werden. \n"
+    },
+    {/* This console output should be limited to 78 characters per line.
+        - The strings "Tidy" and "HTML Tidy" are the program name and must not be translated. */
+      TC_TXT_HELP_ENV_1A,          0,
+        " - Die systemweite Konfigurationsdatei: \n"
+        "     %s \n"
+        " - The benutzerspezifische Konfigurationsdatei: \n"
+        "     %s \n"
+    },
+    {/* This console output should be limited to 78 characters per line.
+        - The strings "Tidy" and "HTML Tidy" are the program name and must not be translated.
+        - This message indicates that a file name is not currently set. */
+      TC_TXT_HELP_ENV_1B,          0,
+        "(augenblicklich nicht gesetzt)"
+    },
+    {/* This console output should be limited to 78 characters per line.
+        - The strings "Tidy" and "HTML Tidy" are the program name and must not be translated. */
+      TC_TXT_HELP_ENV_1C,          0,
+        "\n"
+        "Beachten Sie, dass die benutzerspezifische Konfigurationsdatei %s\n" 
+        "nicht gelesen wird, weil $HTML_TIDY gesetzt ist\n"
+    },
+    {/* This console output should be limited to 78 characters per line.
+        - The strings "Tidy" and "HTML Tidy" are the program name and must not be translated. */
+      TC_TXT_HELP_LANG_1,           0,
+        "\n"
+        "Die Option -language (oder -lang) gibt an, in welcher Sprache Tidy \n"
+        "Ausgaben erzeugen soll. Beachten Sie bitte, dass dies kein \n"
+        "Übersetzungsdienst ist und nur die Mitteilungen betrifft, die Tidy produziert.\n"
+        "\n"
+        "Wenn -language auf der Kommandozeile verwendet wird, muss die Option anderen \n"
+        "Optionen, die Ausgaben bewirken, vorausgehen; anderenfalls erzeugt Tidy \n"
+        "Ausgaben, bevor feststeht, in welcher Sprache dies geschehen soll.\n"
+        "\n"
+        "Abgesehen von den standard POSIX Sprachencodes kann Tidy veraltete\n" 
+        "Windows Sprachencodes verstehen. Beachten Sie bitte, dass diese Liste\n"
+        "die Codes enthält, die Tidy versteht und nichts darüber ausssagt, ob\n"
+        "die Sprache augenblicklich installiert ist.\n"
+        "\n"
+        "Die äußere rechte Spalte zeigt, wie Tidy den alten Windows Namen\n" 
+        "versteht.\n"
+        "\n"
+    },
+
+    /* ---------------- TRANSLATE ------------------ */
+    {/* This console output should be limited to 78 characters per line.
+        - The strings "Tidy" and "HTML Tidy" are the program name and must not be translated. */
+      TC_TXT_HELP_LANG_2,           0,
+        "\n"
+        "Die nachfolgend genannten Sprachen sind momentan in Tidy installiert. \n"
+        "Bitte beachten Sie, dass ihre Vollständigkeit nicht garantiert ist;\n"
+        "lediglich hat ein Entwickler damit begonnen, die betreffende Sprache\n"
+        "hinzuzufügen.\n"
+        "\n"
+        "Wo nötig, wird bei fehlenden Übersetzungen auf \"en\" zurückgegriffen. \n"
+        "Melden Sie bitte inkorrekte Meldungen an das Tidy Team.\n"
+        "\n"
+    },
+    {/* This console output should be limited to 78 characters per line.
+        - The strings "Tidy" and "HTML Tidy" are the program name and must not be translated.
+        - The parameter %s is likely to be two to five characters, e.g., en or en_US. */
+      TC_TXT_HELP_LANG_3,           0,
+        "\n"
+        "Wenn Tidy in der Lage ist, Ihre Regionaleinstellungen zu ermitteln,\n" 
+        "wird es automatisch die zugeornete Sprache verwenden. Unix-ähnliche \n"
+        "Systeme zum Beispiel, besitzen eine Umgebungsvariable $LANG und/oder\n"
+        "$LC_ALL. Entnehmen Sie weitere Informationen der Dokumentation Ihres\n" 
+        "Betriebssystems.\n"
+        "\n"
+        "Im Augenblick verwendet Tidy das Locale %s. \n"
+        "\n"
+    },
+#endif /* SUPPORT_CONSOLE_APP */
+    
+    {/* This MUST be present and last. */
+      TIDY_MESSAGE_TYPE_LAST,      0,   NULL
+    }
+}};
+
+
+#endif /* language_de_h */
 #ifndef language_en_h
 #define language_en_h
 /*
@@ -1852,10 +4489,16 @@ static languageDefinition language_en = { whichPluralForm_en, {
         "This option specifies what level of accessibility checking, if any, "
         "that Tidy should perform. "
         "<br/>"
-        "Level <var>0 (Tidy Classic)</var> is equivalent to Tidy Classic's accessibility "
-        "checking. "
+        "Level <var>0 (Tidy Classic)</var> performs no additional accessibility checking. "
         "<br/>"
-        "For more information on Tidy's accessibility checking, visit "
+        "Level <var>1 (Priority 1 Checks)</var> performs the Priority Level 1 checks."
+        "<br/>"
+        "Level <var>2 (Priority 2 Checks)</var> performs the Priority Level 1 and 2 checks."
+        "<br/>"
+        "Level <var>3 (Priority 3 Checks)</var> performs the Priority Level 1, 2, and 3 checks."
+        "<br/>"
+        "For more information on Tidy's accessibility checking, including the specific "
+        "checks that are made for each Priority Level, please visit "
         "<a href=\"http://www.html-tidy.org/accessibility/\"> Tidy's Accessibility Page</a>. "
     },
     {/* Important notes for translators:
@@ -2259,7 +4902,7 @@ static languageDefinition language_en = { whichPluralForm_en, {
         "for HTML5 document types, and <var>yes</var> for all other document "
         "types. "
         "<br/>"
-        "HTML has abandonded SGML comment syntax, and allows adjacent hypens "
+        "HTML has abandoned SGML comment syntax, and allows adjacent hyphens "
         "for all versions of HTML, although XML and XHTML do not. If you plan "
         "to support older browsers that require SGML comment syntax, then "
         "consider setting this value to <var>yes</var>."
@@ -2560,9 +5203,9 @@ static languageDefinition language_en = { whichPluralForm_en, {
       - The strings "Tidy" and "HTML Tidy" are the program name and must not
       be translated. */
         TidyMakeBare,                 0,
-        "This option specifies if Tidy should strip Microsoft specific HTML "
-        "from Word 2000 documents, and output spaces rather than non-breaking "
-        "spaces where they exist in the input. "
+        "This option specifies if Tidy should replace smart quotes and em dashes with "
+        "ASCII, and output spaces rather than non-breaking "
+        "spaces, where they exist in the input. "
     },
     {/* Important notes for translators:
       - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
@@ -2891,7 +5534,7 @@ static languageDefinition language_en = { whichPluralForm_en, {
       be translated. */
         TidyQuoteAmpersand,           0,
         "This option specifies if Tidy should output unadorned <code>&amp;</code> "
-        "characters as <code>&amp;amp;</code>. "
+        "characters as <code>&amp;amp;</code>, in legacy doctypes only. "
     },
     {/* Important notes for translators:
       - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
@@ -3266,7 +5909,7 @@ static languageDefinition language_en = { whichPluralForm_en, {
       - The strings "Tidy" and "HTML Tidy" are the program name and must not
       be translated. */
         TidyWrapPhp,                  0,
-        "This option specifies if Tidy should line wrap text contained within PHP "
+        "This option specifies if Tidy should add a new line after a PHP "
         "pseudo elements, which look like: <code>&lt;?php ... ?&gt;</code>. "
     },
     {/* Important notes for translators:
@@ -3278,11 +5921,8 @@ static languageDefinition language_en = { whichPluralForm_en, {
       - The strings "Tidy" and "HTML Tidy" are the program name and must not
       be translated. */
         TidyWrapScriptlets,           0,
-        "This option specifies if Tidy should line wrap string literals that "
-        "appear in script attributes. "
-        "<br/>"
-        "Tidy wraps long script string literals by inserting a backslash character "
-        "before the line break. "
+        "This option specifies if Tidy should line wrap string literals assigned "
+        "to element event handler attributes, such as element.onmouseover()."
     },
     {/* Important notes for translators:
       - Use only <code></code>, <var></var>, <em></em>, <strong></strong>, and
@@ -3829,6 +6469,7 @@ static languageDefinition language_en = { whichPluralForm_en, {
     { WHITE_IN_URI,                 0,   "%s discarding whitespace in URI reference"                               },
     { XML_DECLARATION_DETECTED,     0,   "An XML declaration was detected. Did you mean to use input-xml?"         },
     { XML_ID_SYNTAX,                0,   "%s ID \"%s\" uses XML ID syntax"                                         },
+    { BLANK_TITLE_ELEMENT,          0,   "blank 'title' element"                                                   },
 
 
     /***************************************
@@ -4111,7 +6752,7 @@ static languageDefinition language_en = { whichPluralForm_en, {
         " of \"--some-option <value>\", for example, \"--indent-with-tabs yes\".\n"
         "\n"
         " You can also specify a file containing configuration options with the \n"
-        " -options <file> directive, or in one or more files specific to your \n"
+        " -config <file> directive, or in one or more files specific to your \n"
         " environment (see next section). \n"
         "\n"
         " For a list of all configuration options, use \"-help-config\" or refer\n"
@@ -5180,8 +7821,7 @@ static languageDefinition language_fr = { whichPluralForm_fr, {
     },
     { TidyWrapScriptlets,                            0,        
         "Cette option précise si Tidy doit ajouter des sauts de lignes aux chaînes littérales dans les "
-        "attributs de script. <br/>Tidy prend en charge la césure des longues chaînes littérales de scripts "
-        "en ajoutant un caractère de barre oblique arrière (backslash) avant le saut de ligne. "
+        "attributs de script. "
     },
     { TidyWrapSection,                               0,        
         "Cette option précise si Tidy doit ajouter des sauts de ligne pour le texte compris dans des balises "
@@ -6426,9 +9066,7 @@ static languageDefinition language_pt_br = { whichPluralForm_pt_br, {
     },
     { TidyWrapScriptlets,                            0,        
         "Esta opção especifica se Tidy deve efetuar quebra de linha em string "
-        "literais que aparecem em atributos de script. <br/>Tidy efetua essa quebra "
-        "em string literais de scripts longos inserindo um caractere de barra "
-        "invertida antes da quebra de linha. "
+        "literais que aparecem em atributos de script."
     },
     { TidyWrapSection,                               0,        
         "Essa opção especifica se o Tidy deve efetuar quebra de linha de textos "
@@ -7611,32 +10249,32 @@ struct _Lexer
 */
 
 /* choose what version to use for new doctype */
-int TY_(HTMLVersion)( TidyDocImpl* doc );
+TY_PRIVATE int TY_(HTMLVersion)( TidyDocImpl* doc );
 
 /* everything is allowed in proprietary version of HTML */
 /* this is handled here rather than in the tag/attr dicts */
 
-void TY_(ConstrainVersion)( TidyDocImpl* doc, unsigned int vers );
+TY_PRIVATE void TY_(ConstrainVersion)( TidyDocImpl* doc, unsigned int vers );
 
-Bool TY_(IsWhite)(unsigned int c);
-Bool TY_(IsDigit)(unsigned int c);
-Bool TY_(IsLetter)(unsigned int c);
-Bool TY_(IsHTMLSpace)(unsigned int c);
-Bool TY_(IsNewline)(unsigned int c);
-Bool TY_(IsNamechar)(unsigned int c);
-Bool TY_(IsXMLLetter)(unsigned int c);
-Bool TY_(IsXMLNamechar)(unsigned int c);
+TY_PRIVATE Bool TY_(IsWhite)(unsigned int c);
+TY_PRIVATE Bool TY_(IsDigit)(unsigned int c);
+TY_PRIVATE Bool TY_(IsLetter)(unsigned int c);
+TY_PRIVATE Bool TY_(IsHTMLSpace)(unsigned int c);
+TY_PRIVATE Bool TY_(IsNewline)(unsigned int c);
+TY_PRIVATE Bool TY_(IsNamechar)(unsigned int c);
+TY_PRIVATE Bool TY_(IsXMLLetter)(unsigned int c);
+TY_PRIVATE Bool TY_(IsXMLNamechar)(unsigned int c);
 
 /* Bool IsLower(unsigned int c); */
-Bool TY_(IsUpper)(unsigned int c);
-unsigned int TY_(ToLower)(unsigned int c);
-unsigned int TY_(ToUpper)(unsigned int c);
+TY_PRIVATE Bool TY_(IsUpper)(unsigned int c);
+TY_PRIVATE unsigned int TY_(ToLower)(unsigned int c);
+TY_PRIVATE unsigned int TY_(ToUpper)(unsigned int c);
 
-Lexer* TY_(NewLexer)( TidyDocImpl* doc );
-void TY_(FreeLexer)( TidyDocImpl* doc );
+TY_PRIVATE Lexer* TY_(NewLexer)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(FreeLexer)( TidyDocImpl* doc );
 
 /* store character c as UTF-8 encoded byte stream */
-void TY_(AddCharToLexer)( Lexer *lexer, unsigned int c );
+TY_PRIVATE void TY_(AddCharToLexer)( Lexer *lexer, unsigned int c );
 
 /*
   Used for elements and text nodes
@@ -7651,78 +10289,78 @@ void TY_(AddCharToLexer)( Lexer *lexer, unsigned int c );
   list of AttVal nodes which hold the
   strings for attribute/value pairs.
 */
-Node* TY_(NewNode)( TidyAllocator* allocator, Lexer* lexer );
+TY_PRIVATE Node* TY_(NewNode)( TidyAllocator* allocator, Lexer* lexer );
 
 
 /* used to clone heading nodes when split by an <HR> */
-Node* TY_(CloneNode)( TidyDocImpl* doc, Node *element );
+TY_PRIVATE Node* TY_(CloneNode)( TidyDocImpl* doc, Node *element );
 
 /* free node's attributes */
-void TY_(FreeAttrs)( TidyDocImpl* doc, Node *node );
+TY_PRIVATE void TY_(FreeAttrs)( TidyDocImpl* doc, Node *node );
 
 /* doesn't repair attribute list linkage */
-void TY_(FreeAttribute)( TidyDocImpl* doc, AttVal *av );
+TY_PRIVATE void TY_(FreeAttribute)( TidyDocImpl* doc, AttVal *av );
 
 /* detach attribute from node */
-void TY_(DetachAttribute)( Node *node, AttVal *attr );
+TY_PRIVATE void TY_(DetachAttribute)( Node *node, AttVal *attr );
 
 /* detach attribute from node then free it
 */
-void TY_(RemoveAttribute)( TidyDocImpl* doc, Node *node, AttVal *attr );
+TY_PRIVATE void TY_(RemoveAttribute)( TidyDocImpl* doc, Node *node, AttVal *attr );
 
 /*
   Free document nodes by iterating through peers and recursing
   through children. Set next to NULL before calling FreeNode()
   to avoid freeing peer nodes. Doesn't patch up prev/next links.
  */
-void TY_(FreeNode)( TidyDocImpl* doc, Node *node );
+TY_PRIVATE void TY_(FreeNode)( TidyDocImpl* doc, Node *node );
 
-Node* TY_(TextToken)( Lexer *lexer );
+TY_PRIVATE Node* TY_(TextToken)( Lexer *lexer );
 
 /* used for creating preformatted text from Word2000 */
-Node* TY_(NewLineNode)( Lexer *lexer );
+TY_PRIVATE Node* TY_(NewLineNode)( Lexer *lexer );
 
 /* used for adding a &nbsp; for Word2000 */
-Node* TY_(NewLiteralTextNode)(Lexer *lexer, ctmbstr txt );
+TY_PRIVATE Node* TY_(NewLiteralTextNode)(Lexer *lexer, ctmbstr txt );
 
-void TY_(AddStringLiteral)( Lexer* lexer, ctmbstr str );
-/* void AddStringLiteralLen( Lexer* lexer, ctmbstr str, int len ); */
+TY_PRIVATE void TY_(AddStringLiteral)( Lexer* lexer, ctmbstr str );
+/* TY_PRIVATE void AddStringLiteralLen( Lexer* lexer, ctmbstr str, int len ); */
 
 /* find element */
-Node* TY_(FindDocType)( TidyDocImpl* doc );
-Node* TY_(FindHTML)( TidyDocImpl* doc );
-Node* TY_(FindHEAD)( TidyDocImpl* doc );
-Node* TY_(FindTITLE)(TidyDocImpl* doc);
-Node* TY_(FindBody)( TidyDocImpl* doc );
-Node* TY_(FindXmlDecl)(TidyDocImpl* doc);
+TY_PRIVATE Node* TY_(FindDocType)( TidyDocImpl* doc );
+TY_PRIVATE Node* TY_(FindHTML)( TidyDocImpl* doc );
+TY_PRIVATE Node* TY_(FindHEAD)( TidyDocImpl* doc );
+TY_PRIVATE Node* TY_(FindTITLE)(TidyDocImpl* doc);
+TY_PRIVATE Node* TY_(FindBody)( TidyDocImpl* doc );
+TY_PRIVATE Node* TY_(FindXmlDecl)(TidyDocImpl* doc);
 
 /* Returns containing block element, if any */
-Node* TY_(FindContainer)( Node* node );
+TY_PRIVATE Node* TY_(FindContainer)( Node* node );
 
 /* add meta element for Tidy */
-Bool TY_(AddGenerator)( TidyDocImpl* doc );
+TY_PRIVATE Bool TY_(AddGenerator)( TidyDocImpl* doc );
 
-unsigned int TY_(ApparentVersion)( TidyDocImpl* doc );
+TY_PRIVATE unsigned int TY_(ApparentVersion)( TidyDocImpl* doc );
 
-ctmbstr TY_(HTMLVersionNameFromCode)( unsigned int vers, Bool isXhtml );
+TY_PRIVATE ctmbstr TY_(HTMLVersionNameFromCode)( unsigned int vers, Bool isXhtml );
 
-unsigned int TY_(HTMLVersionNumberFromCode)( unsigned int vers );
+TY_PRIVATE unsigned int TY_(HTMLVersionNumberFromCode)( unsigned int vers );
 
-Bool TY_(WarnMissingSIInEmittedDocType)( TidyDocImpl* doc );
+TY_PRIVATE Bool TY_(WarnMissingSIInEmittedDocType)( TidyDocImpl* doc );
 
-Bool TY_(SetXHTMLDocType)( TidyDocImpl* doc );
+TY_PRIVATE Bool TY_(SetXHTMLDocType)( TidyDocImpl* doc );
 
 
 /* fixup doctype if missing */
-Bool TY_(FixDocType)( TidyDocImpl* doc );
+TY_PRIVATE Bool TY_(FixDocType)( TidyDocImpl* doc );
 
 /* ensure XML document starts with <?xml version="1.0"?> */
 /* add encoding attribute if not using ASCII or UTF-8 output */
-Bool TY_(FixXmlDecl)( TidyDocImpl* doc );
+TY_PRIVATE Bool TY_(FixXmlDecl)( TidyDocImpl* doc );
 
-Node* TY_(InferredTag)(TidyDocImpl* doc, TidyTagId id);
+TY_PRIVATE Node* TY_(InferredTag)(TidyDocImpl* doc, TidyTagId id);
 
-void TY_(UngetToken)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(UngetToken)( TidyDocImpl* doc );
 
 
 /*
@@ -7742,23 +10380,23 @@ typedef enum
   CdataContent
 } GetTokenMode;
 
-Node* TY_(GetToken)( TidyDocImpl* doc, GetTokenMode mode );
+TY_PRIVATE Node* TY_(GetToken)( TidyDocImpl* doc, GetTokenMode mode );
 
-void TY_(InitMap)(void);
+TY_PRIVATE void TY_(InitMap)(void);
 
 
 /* create a new attribute */
-AttVal* TY_(NewAttribute)( TidyDocImpl* doc );
+TY_PRIVATE AttVal* TY_(NewAttribute)( TidyDocImpl* doc );
 
 /* create a new attribute with given name and value */
-AttVal* TY_(NewAttributeEx)( TidyDocImpl* doc, ctmbstr name, ctmbstr value,
+TY_PRIVATE AttVal* TY_(NewAttributeEx)( TidyDocImpl* doc, ctmbstr name, ctmbstr value,
                              int delim );
 
 /* insert attribute at the end of attribute list of a node */
-void TY_(InsertAttributeAtEnd)( Node *node, AttVal *av );
+TY_PRIVATE void TY_(InsertAttributeAtEnd)( Node *node, AttVal *av );
 
 /* insert attribute at the start of attribute list of a node */
-void TY_(InsertAttributeAtStart)( Node *node, AttVal *av );
+TY_PRIVATE void TY_(InsertAttributeAtStart)( Node *node, AttVal *av );
 
 /*************************************
   In-line Stack functions
@@ -7766,7 +10404,7 @@ void TY_(InsertAttributeAtStart)( Node *node, AttVal *av );
 
 
 /* duplicate attributes */
-AttVal* TY_(DupAttrs)( TidyDocImpl* doc, AttVal* attrs );
+TY_PRIVATE AttVal* TY_(DupAttrs)( TidyDocImpl* doc, AttVal* attrs );
 
 /*
   push a copy of an inline node onto stack
@@ -7784,13 +10422,13 @@ AttVal* TY_(DupAttrs)( TidyDocImpl* doc, AttVal* attrs );
       <p><em>text</em></p>
       <p><em><em>more text</em></em>
 */
-void TY_(PushInline)( TidyDocImpl* doc, Node* node );
+TY_PRIVATE void TY_(PushInline)( TidyDocImpl* doc, Node* node );
 
 /* pop inline stack */
-void TY_(PopInline)( TidyDocImpl* doc, Node* node );
+TY_PRIVATE void TY_(PopInline)( TidyDocImpl* doc, Node* node );
 
-Bool TY_(IsPushed)( TidyDocImpl* doc, Node* node );
-Bool TY_(IsPushedLast)( TidyDocImpl* doc, Node *element, Node *node );
+TY_PRIVATE Bool TY_(IsPushed)( TidyDocImpl* doc, Node* node );
+TY_PRIVATE Bool TY_(IsPushedLast)( TidyDocImpl* doc, Node *element, Node *node );
 
 /*
   This has the effect of inserting "missing" inline
@@ -7809,18 +10447,18 @@ Bool TY_(IsPushedLast)( TidyDocImpl* doc, Node *element, Node *node );
   where it gets tokens from the inline stack rather than
   from the input stream.
 */
-int TY_(InlineDup)( TidyDocImpl* doc, Node *node );
+TY_PRIVATE int TY_(InlineDup)( TidyDocImpl* doc, Node *node );
 
 /*
  defer duplicates when entering a table or other
  element where the inlines shouldn't be duplicated
 */
-void TY_(DeferDup)( TidyDocImpl* doc );
-Node* TY_(InsertedToken)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(DeferDup)( TidyDocImpl* doc );
+TY_PRIVATE Node* TY_(InsertedToken)( TidyDocImpl* doc );
 
 /* stack manipulation for inline elements */
-Bool TY_(SwitchInline)( TidyDocImpl* doc, Node* element, Node* node );
-Bool TY_(InlineDup1)( TidyDocImpl* doc, Node* node, Node* element );
+TY_PRIVATE Bool TY_(SwitchInline)( TidyDocImpl* doc, Node* element, Node* node );
+TY_PRIVATE Bool TY_(InlineDup1)( TidyDocImpl* doc, Node* node, Node* element );
 
 #ifdef __cplusplus
 }
@@ -7911,12 +10549,12 @@ int TY_(DocParseFileWithMappedFile)( TidyDocImpl* doc, ctmbstr filnam );
 /**
  *  Returns the release date of this instance of HTML Tidy.
  */
-ctmbstr TY_(ReleaseDate)(void);
+TY_PRIVATE ctmbstr TY_(ReleaseDate)(void);
 
 /** 
  *  Returns the release version of this instance of HTML Tidy.
  */
-ctmbstr TY_(tidyLibraryVersion)(void);
+TY_PRIVATE ctmbstr TY_(tidyLibraryVersion)(void);
 
 
 /** @} message_releaseinfo group */
@@ -7950,7 +10588,7 @@ ctmbstr TY_(tidyLibraryVersion)(void);
  *  The designated report writing function. When a proper formatter exists,
  *  this one function can hanle all report output.
  */
-void TY_(Report)(TidyDocImpl* doc, Node *element, Node *node, unsigned int code, ...);
+TY_PRIVATE void TY_(Report)(TidyDocImpl* doc, Node *element, Node *node, unsigned int code, ...);
 
 
 /** @} */
@@ -7962,16 +10600,16 @@ void TY_(Report)(TidyDocImpl* doc, Node *element, Node *node, unsigned int code,
 /** @{ */
 
 
-void TY_(ReportAccessError)( TidyDocImpl* doc, Node* node, unsigned int code );
-void TY_(ReportAttrError)(TidyDocImpl* doc, Node *node, AttVal *av, unsigned int code);
-void TY_(ReportBadArgument)( TidyDocImpl* doc, ctmbstr option );
-void TY_(ReportEntityError)( TidyDocImpl* doc, unsigned int code, ctmbstr entity, int c );
-void TY_(ReportFileError)( TidyDocImpl* doc, ctmbstr file, unsigned int code );
-void TY_(ReportEncodingError)(TidyDocImpl* doc, unsigned int code, unsigned int c, Bool discarded);
-void TY_(ReportEncodingWarning)(TidyDocImpl* doc, unsigned int code, unsigned int encoding);
-void TY_(ReportMissingAttr)( TidyDocImpl* doc, Node* node, ctmbstr name );
-void TY_(ReportSurrogateError)(TidyDocImpl* doc, unsigned int code, unsigned int c1, unsigned int c2);
-void TY_(ReportUnknownOption)( TidyDocImpl* doc, ctmbstr option );
+TY_PRIVATE void TY_(ReportAccessError)( TidyDocImpl* doc, Node* node, unsigned int code );
+TY_PRIVATE void TY_(ReportAttrError)(TidyDocImpl* doc, Node *node, AttVal *av, unsigned int code);
+TY_PRIVATE void TY_(ReportBadArgument)( TidyDocImpl* doc, ctmbstr option );
+TY_PRIVATE void TY_(ReportEntityError)( TidyDocImpl* doc, unsigned int code, ctmbstr entity, int c );
+TY_PRIVATE void TY_(ReportFileError)( TidyDocImpl* doc, ctmbstr file, unsigned int code );
+TY_PRIVATE void TY_(ReportEncodingError)(TidyDocImpl* doc, unsigned int code, unsigned int c, Bool discarded);
+TY_PRIVATE void TY_(ReportEncodingWarning)(TidyDocImpl* doc, unsigned int code, unsigned int encoding);
+TY_PRIVATE void TY_(ReportMissingAttr)( TidyDocImpl* doc, Node* node, ctmbstr name );
+TY_PRIVATE void TY_(ReportSurrogateError)(TidyDocImpl* doc, unsigned int code, unsigned int c1, unsigned int c2);
+TY_PRIVATE void TY_(ReportUnknownOption)( TidyDocImpl* doc, ctmbstr option );
 
 
 /** @} */
@@ -7986,7 +10624,7 @@ void TY_(ReportUnknownOption)( TidyDocImpl* doc, ctmbstr option );
  *  Emits a single dialogue message, and is capable of accepting a variadic
  *  that is passed to the correct message formatter as needed.
  */
-void TY_(Dialogue)( TidyDocImpl* doc, unsigned int code, ... );
+TY_PRIVATE void TY_(Dialogue)( TidyDocImpl* doc, unsigned int code, ... );
 
 
 /** @} */
@@ -8002,7 +10640,7 @@ void TY_(Dialogue)( TidyDocImpl* doc, unsigned int code, ... );
  *  @todo: This name is a bit misleading and should probably be renamed to
  *  indicate its focus on printing footnotes.
  */
-void TY_(ErrorSummary)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(ErrorSummary)( TidyDocImpl* doc );
 
 
 /** 
@@ -8011,7 +10649,7 @@ void TY_(ErrorSummary)( TidyDocImpl* doc );
  *  Called by `tidyRunDiagnostics()`, from console.
  *  Called by `tidyDocReportDoctype()`, currently unused.
  */
-void TY_(ReportMarkupVersion)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(ReportMarkupVersion)( TidyDocImpl* doc );
 
 
 /**
@@ -8019,7 +10657,7 @@ void TY_(ReportMarkupVersion)( TidyDocImpl* doc );
  *  inforation.
  *  Called by `tidyRunDiagnostics()`, from console.
  */
-void TY_(ReportNumWarnings)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(ReportNumWarnings)( TidyDocImpl* doc );
 
 
 /** @} */
@@ -8046,27 +10684,27 @@ typedef struct _mutedMessages {
 /** Frees the list of muted messages.
  ** @param doc The Tidy document.
  */
-void TY_(FreeMutedMessageList)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(FreeMutedMessageList)( TidyDocImpl* doc );
 
 /** Adds a new message ID to the list of muted messages.
  ** @param doc The Tidy document.
  ** @param opt The option that is defining the muted message.
  ** @param name The message code as a string.
  */
-void TY_(DefineMutedMessage)( TidyDocImpl* doc, const TidyOptionImpl* opt, ctmbstr name );
+TY_PRIVATE void TY_(DefineMutedMessage)( TidyDocImpl* doc, const TidyOptionImpl* opt, ctmbstr name );
 
 /** Start an iterator for muted messages.
  ** @param doc The Tidy document.
  ** @returns Returns an iterator token.
  */
-TidyIterator TY_(getMutedMessageList)( TidyDocImpl* doc );
+TY_PRIVATE TidyIterator TY_(getMutedMessageList)( TidyDocImpl* doc );
 
 /** Get the next priority attribute.
  ** @param doc The Tidy document.
  ** @param iter The iterator token.
  ** @returns The next priority attribute.
  */
-ctmbstr TY_(getNextMutedMessage)( TidyDocImpl* doc, TidyIterator* iter );
+TY_PRIVATE ctmbstr TY_(getNextMutedMessage)( TidyDocImpl* doc, TidyIterator* iter );
 
 
 /** @} message_muting group */
@@ -8090,13 +10728,13 @@ ctmbstr TY_(getNextMutedMessage)( TidyDocImpl* doc, TidyIterator* iter );
  *  `TidyReportCallback` will return this general string as the report 
  *  message key.
  */
-ctmbstr TY_(tidyErrorCodeAsKey)(unsigned int code);
+TY_PRIVATE ctmbstr TY_(tidyErrorCodeAsKey)(unsigned int code);
 
 /**
  *  Given an error code string, return the integer value of it, or UINT_MAX
  *  as an error flag.
  */
-unsigned int TY_(tidyErrorCodeFromKey)(ctmbstr code);
+TY_PRIVATE unsigned int TY_(tidyErrorCodeFromKey)(ctmbstr code);
 
 
 /**
@@ -8105,14 +10743,14 @@ unsigned int TY_(tidyErrorCodeFromKey)(ctmbstr code);
  *  `TidyReportFilter3`.
  *  Items can be retrieved with getNextErrorCode();
  */
-TidyIterator TY_(getErrorCodeList)(void);
+TY_PRIVATE TidyIterator TY_(getErrorCodeList)(void);
 
 /**
  *  Returns the next error code having initialized the iterator
  *  with `getErrorCodeList()`. You can use tidyErrorCodeAsKey
  *  to determine the key for this value.
  */
-unsigned int TY_(getNextErrorCode)( TidyIterator* iter );
+TY_PRIVATE unsigned int TY_(getNextErrorCode)( TidyIterator* iter );
 
 
 /** @} message_keydiscovery group */
@@ -8191,7 +10829,7 @@ unsigned int TY_(getNextErrorCode)( TidyIterator* iter );
 /** Creates a TidyMessageImpl, but without line numbers, such as used for
  ** information report output.
  */
-TidyMessageImpl *TY_(tidyMessageCreate)( TidyDocImpl *doc,
+TY_PRIVATE TidyMessageImpl *TY_(tidyMessageCreate)( TidyDocImpl *doc,
                                          unsigned int code,
                                          TidyReportLevel level,
                                          ... );
@@ -8199,7 +10837,7 @@ TidyMessageImpl *TY_(tidyMessageCreate)( TidyDocImpl *doc,
 /** Creates a TidyMessageImpl, using the line and column from the provided
  ** Node as the message position source.
  */
-TidyMessageImpl *TY_(tidyMessageCreateWithNode)( TidyDocImpl *doc,
+TY_PRIVATE TidyMessageImpl *TY_(tidyMessageCreateWithNode)( TidyDocImpl *doc,
                                                  Node *node,
                                                  unsigned int code,
                                                  TidyReportLevel level,
@@ -8208,7 +10846,7 @@ TidyMessageImpl *TY_(tidyMessageCreateWithNode)( TidyDocImpl *doc,
 /** Creates a TidyMessageImpl, using the line and column from the provided
  ** document's Lexer as the message position source.
  */
-TidyMessageImpl *TY_(tidyMessageCreateWithLexer)( TidyDocImpl *doc,
+TY_PRIVATE TidyMessageImpl *TY_(tidyMessageCreateWithLexer)( TidyDocImpl *doc,
                                                   unsigned int code,
                                                   TidyReportLevel level,
                                                   ... );
@@ -8216,7 +10854,7 @@ TidyMessageImpl *TY_(tidyMessageCreateWithLexer)( TidyDocImpl *doc,
 /** Deallocates a TidyMessageImpl in order to free up its allocated memory
  ** when you're done using it.
  */
-void TY_(tidyMessageRelease)( TidyMessageImpl *message );
+TY_PRIVATE void TY_(tidyMessageRelease)( TidyMessageImpl *message );
 
 
 /** @} end messageobj_instantiation group */
@@ -8225,55 +10863,55 @@ void TY_(tidyMessageRelease)( TidyMessageImpl *message );
 
 
 /** get the document the message came from. */
-TidyDocImpl* TY_(getMessageDoc)( TidyMessageImpl message );
+TY_PRIVATE TidyDocImpl* TY_(getMessageDoc)( TidyMessageImpl message );
 
 /** get the message key code. */
-unsigned int TY_(getMessageCode)( TidyMessageImpl message );
+TY_PRIVATE unsigned int TY_(getMessageCode)( TidyMessageImpl message );
 
 /** get the message key string. */
-ctmbstr TY_(getMessageKey)( TidyMessageImpl message );
+TY_PRIVATE ctmbstr TY_(getMessageKey)( TidyMessageImpl message );
 
 /** get the line number the message applies to. */
-int TY_(getMessageLine)( TidyMessageImpl message );
+TY_PRIVATE int TY_(getMessageLine)( TidyMessageImpl message );
 
 /** get the column the message applies to. */
-int TY_(getMessageColumn)( TidyMessageImpl message );
+TY_PRIVATE int TY_(getMessageColumn)( TidyMessageImpl message );
 
 /** get the TidyReportLevel of the message. */
-TidyReportLevel TY_(getMessageLevel)( TidyMessageImpl message );
+TY_PRIVATE TidyReportLevel TY_(getMessageLevel)( TidyMessageImpl message );
 
 /** get whether or not the message was muted by the configuration. */
-Bool TY_(getMessageIsMuted)( TidyMessageImpl message );
+TY_PRIVATE Bool TY_(getMessageIsMuted)( TidyMessageImpl message );
 
 /** the built-in format string */
-ctmbstr TY_(getMessageFormatDefault)( TidyMessageImpl message );
+TY_PRIVATE ctmbstr TY_(getMessageFormatDefault)( TidyMessageImpl message );
 
 /** the localized format string */
-ctmbstr TY_(getMessageFormat)( TidyMessageImpl message );
+TY_PRIVATE ctmbstr TY_(getMessageFormat)( TidyMessageImpl message );
 
 /** the message, formatted, default language */
-ctmbstr TY_(getMessageDefault)( TidyMessageImpl message );
+TY_PRIVATE ctmbstr TY_(getMessageDefault)( TidyMessageImpl message );
 
 /** the message, formatted, localized */
-ctmbstr TY_(getMessage)( TidyMessageImpl message );
+TY_PRIVATE ctmbstr TY_(getMessage)( TidyMessageImpl message );
 
 /** the position part, default language */
-ctmbstr TY_(getMessagePosDefault)( TidyMessageImpl message );
+TY_PRIVATE ctmbstr TY_(getMessagePosDefault)( TidyMessageImpl message );
 
 /** the position part, localized */
-ctmbstr TY_(getMessagePos)( TidyMessageImpl message );
+TY_PRIVATE ctmbstr TY_(getMessagePos)( TidyMessageImpl message );
 
 /** the prefix part, default language */
-ctmbstr TY_(getMessagePrefixDefault)( TidyMessageImpl message );
+TY_PRIVATE ctmbstr TY_(getMessagePrefixDefault)( TidyMessageImpl message );
 
 /** the prefix part, localized */
-ctmbstr TY_(getMessagePrefix)( TidyMessageImpl message );
+TY_PRIVATE ctmbstr TY_(getMessagePrefix)( TidyMessageImpl message );
 
 /** the complete message, as would be output in the CLI */
-ctmbstr TY_(getMessageOutputDefault)( TidyMessageImpl message );
+TY_PRIVATE ctmbstr TY_(getMessageOutputDefault)( TidyMessageImpl message );
 
 /* the complete message, as would be output in the CLI, localized */
-ctmbstr TY_(getMessageOutput)( TidyMessageImpl message );
+TY_PRIVATE ctmbstr TY_(getMessageOutput)( TidyMessageImpl message );
 
 
 /** @} end messageobj_message_api group */
@@ -8285,19 +10923,19 @@ ctmbstr TY_(getMessageOutput)( TidyMessageImpl message );
  *  argument. Use `TY_(getNextMEssageArgument)` to get an opaque instance of
  *  `TidyMessageArgument` for which the subsequent interrogators will be of use.
  */
-TidyIterator TY_(getMessageArguments)( TidyMessageImpl message );
+TY_PRIVATE TidyIterator TY_(getMessageArguments)( TidyMessageImpl message );
 
 /**
  *  Returns the next `TidyMessageArgument`, for the given message, which can
  *  then be interrogated with the API, and advances the iterator.
  */
-TidyMessageArgument TY_(getNextMessageArgument)( TidyMessageImpl message, TidyIterator* iter );
+TY_PRIVATE TidyMessageArgument TY_(getNextMessageArgument)( TidyMessageImpl message, TidyIterator* iter );
 
 
 /**
  *  Returns the `TidyFormatParameterType` of the given message argument.
  */
-TidyFormatParameterType TY_(getArgType)( TidyMessageImpl message, TidyMessageArgument* arg );
+TY_PRIVATE TidyFormatParameterType TY_(getArgType)( TidyMessageImpl message, TidyMessageArgument* arg );
 
 
 /**
@@ -8305,14 +10943,14 @@ TidyFormatParameterType TY_(getArgType)( TidyMessageImpl message, TidyMessageArg
  *  this string is cleared upon termination of the callback, so do be sure to
  *  make your own copy.
  */
-ctmbstr TY_(getArgFormat)( TidyMessageImpl message, TidyMessageArgument* arg );
+TY_PRIVATE ctmbstr TY_(getArgFormat)( TidyMessageImpl message, TidyMessageArgument* arg );
 
 
 /**
  *  Returns the string value of the given message argument. An assertion
  *  will be generated if the argument type is not a string.
  */
-ctmbstr TY_(getArgValueString)( TidyMessageImpl message, TidyMessageArgument* arg );
+TY_PRIVATE ctmbstr TY_(getArgValueString)( TidyMessageImpl message, TidyMessageArgument* arg );
 
 
 /**
@@ -8320,21 +10958,21 @@ ctmbstr TY_(getArgValueString)( TidyMessageImpl message, TidyMessageArgument* ar
  *  assertion will be generated if the argument type is not an unsigned
  *  integer.
  */
-unsigned int TY_(getArgValueUInt)( TidyMessageImpl message, TidyMessageArgument* arg );
+TY_PRIVATE unsigned int TY_(getArgValueUInt)( TidyMessageImpl message, TidyMessageArgument* arg );
 
 
 /**
  *  Returns the integer value of the given message argument. An assertion
  *  will be generated if the argument type is not an integer.
  */
-int TY_(getArgValueInt)( TidyMessageImpl message, TidyMessageArgument* arg );
+TY_PRIVATE int TY_(getArgValueInt)( TidyMessageImpl message, TidyMessageArgument* arg );
 
 
 /**
  *  Returns the double value of the given message argument. An assertion
  *  will be generated if the argument type is not a double.
  */
-double TY_(getArgValueDouble)( TidyMessageImpl message, TidyMessageArgument* arg );
+TY_PRIVATE double TY_(getArgValueDouble)( TidyMessageImpl message, TidyMessageArgument* arg );
 
 
 /** @} end messageobj_args_api group */
@@ -8392,7 +11030,7 @@ double TY_(getArgValueDouble)( TidyMessageImpl message, TidyMessageArgument* arg
  *  @param node The root node for the integrity check.
  *  @returns Returns yes or no indicating integrity of the node structure.
  */
-Bool TY_(CheckNodeIntegrity)(Node *node);
+TY_PRIVATE Bool TY_(CheckNodeIntegrity)(Node *node);
 
 
 /**
@@ -8403,7 +11041,7 @@ Bool TY_(CheckNodeIntegrity)(Node *node);
  *  @param node The node to check.
  *  @returns The result of the check.
  */
-Bool TY_(TextNodeEndWithSpace)( Lexer *lexer, Node *node );
+TY_PRIVATE Bool TY_(TextNodeEndWithSpace)( Lexer *lexer, Node *node );
 
 
 /**
@@ -8413,7 +11051,7 @@ Bool TY_(TextNodeEndWithSpace)( Lexer *lexer, Node *node );
  *  @param node The node to check.
  *  @returns The result of the check.
  */
-Bool TY_(IsNewNode)(Node *node);
+TY_PRIVATE Bool TY_(IsNewNode)(Node *node);
 
 
 /**
@@ -8426,7 +11064,7 @@ Bool TY_(IsNewNode)(Node *node);
  *  @param expected If the old node was not expected to be found in this
  *    particular location, a report will be generated.
  */
-void TY_(CoerceNode)(TidyDocImpl* doc, Node *node, TidyTagId tid, Bool obsolete, Bool expected);
+TY_PRIVATE void TY_(CoerceNode)(TidyDocImpl* doc, Node *node, TidyTagId tid, Bool obsolete, Bool expected);
 
 
 /**
@@ -8434,7 +11072,7 @@ void TY_(CoerceNode)(TidyDocImpl* doc, Node *node, TidyTagId tid, Bool obsolete,
  *  @param node The node to remove.
  *  @returns Returns the removed node.
  */
-Node *TY_(RemoveNode)(Node *node);
+TY_PRIVATE Node *TY_(RemoveNode)(Node *node);
 
 
 /**
@@ -8443,7 +11081,7 @@ Node *TY_(RemoveNode)(Node *node);
  *  @param element The node to discard.
  *  @returns Returns the next node.
  */
-Node *TY_(DiscardElement)( TidyDocImpl* doc, Node *element);
+TY_PRIVATE Node *TY_(DiscardElement)( TidyDocImpl* doc, Node *element);
 
 
 /**
@@ -8451,7 +11089,7 @@ Node *TY_(DiscardElement)( TidyDocImpl* doc, Node *element);
  *  @param element The new destination node.
  *  @param node The node to insert.
  */
-void TY_(InsertNodeAtStart)(Node *element, Node *node);
+TY_PRIVATE void TY_(InsertNodeAtStart)(Node *element, Node *node);
 
 
 /**
@@ -8459,7 +11097,7 @@ void TY_(InsertNodeAtStart)(Node *element, Node *node);
  *  @param element The new destination node.
  *  @param node The node to insert.
  */
-void TY_(InsertNodeAtEnd)(Node *element, Node *node);
+TY_PRIVATE void TY_(InsertNodeAtEnd)(Node *element, Node *node);
 
 
 /**
@@ -8467,7 +11105,7 @@ void TY_(InsertNodeAtEnd)(Node *element, Node *node);
  *  @param element The node before which the node is inserted.
  *  @param node The node to insert.
  */
-void TY_(InsertNodeBeforeElement)(Node *element, Node *node);
+TY_PRIVATE void TY_(InsertNodeBeforeElement)(Node *element, Node *node);
 
 
 /**
@@ -8475,7 +11113,7 @@ void TY_(InsertNodeBeforeElement)(Node *element, Node *node);
  *  @param element The node after which the node is inserted.
  *  @param node The node to insert.
  */
-void TY_(InsertNodeAfterElement)(Node *element, Node *node);
+TY_PRIVATE void TY_(InsertNodeAfterElement)(Node *element, Node *node);
 
 
 /**
@@ -8484,7 +11122,7 @@ void TY_(InsertNodeAfterElement)(Node *element, Node *node);
  *  @param element The element to trim.
  *  @returns Returns the next node.
  */
-Node *TY_(TrimEmptyElement)( TidyDocImpl* doc, Node *element );
+TY_PRIVATE Node *TY_(TrimEmptyElement)( TidyDocImpl* doc, Node *element );
 
 
 /**
@@ -8493,7 +11131,7 @@ Node *TY_(TrimEmptyElement)( TidyDocImpl* doc, Node *element );
  *  @param node The element to trim.
  *  @returns Returns the next node.
  */
-Node* TY_(DropEmptyElements)(TidyDocImpl* doc, Node* node);
+TY_PRIVATE Node* TY_(DropEmptyElements)(TidyDocImpl* doc, Node* node);
 
 
 /**
@@ -8503,7 +11141,7 @@ Node* TY_(DropEmptyElements)(TidyDocImpl* doc, Node* node);
  *  @param node The node to test.
  *  @returns Returns the result of the test.
  */
-Bool TY_(IsBlank)(Lexer *lexer, Node *node);
+TY_PRIVATE Bool TY_(IsBlank)(Lexer *lexer, Node *node);
 
 
 /**
@@ -8512,7 +11150,7 @@ Bool TY_(IsBlank)(Lexer *lexer, Node *node);
  *  @param node The node to test.
  *  @returns Returns the result of the test.
  */
-Bool TY_(IsJavaScript)(Node *node);
+TY_PRIVATE Bool TY_(IsJavaScript)(Node *node);
 
 
 /**
@@ -8521,7 +11159,7 @@ Bool TY_(IsJavaScript)(Node *node);
  *  remaining nodes. HTML is the root node.
  *  @param doc The Tidy document.
  */
-void TY_(ParseDocument)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(ParseDocument)( TidyDocImpl* doc );
 
 
 /**
@@ -8531,14 +11169,14 @@ void TY_(ParseDocument)( TidyDocImpl* doc );
  *  @param element The node to test.
  *  @returns Returns the result of the test.
  */
-Bool TY_(XMLPreserveWhiteSpace)( TidyDocImpl* doc, Node *element );
+TY_PRIVATE Bool TY_(XMLPreserveWhiteSpace)( TidyDocImpl* doc, Node *element );
 
 
 /**
  *  Parses a document after lexing using the XML parser.
  *  @param doc The Tidy document.
  */
-void TY_(ParseXMLDocument)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(ParseXMLDocument)( TidyDocImpl* doc );
 
 
 /** @} end parser_h group */
@@ -8608,10 +11246,10 @@ typedef struct _TidyPrintImpl
 } TidyPrintImpl;
 
 
-void TY_(InitPrintBuf)( TidyDocImpl* doc );
-void TY_(FreePrintBuf)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(InitPrintBuf)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(FreePrintBuf)( TidyDocImpl* doc );
 
-void TY_(PFlushLine)( TidyDocImpl* doc, unsigned int indent );
+TY_PRIVATE void TY_(PFlushLine)( TidyDocImpl* doc, unsigned int indent );
 
 
 /* print just the content of the body element.
@@ -8621,18 +11259,18 @@ void TY_(PFlushLine)( TidyDocImpl* doc, unsigned int indent );
 ** -- Sebastiano Vigna <vigna@dsi.unimi.it>
 */
 
-void TY_(PrintBody)( TidyDocImpl* doc );       /* you can print an entire document */
+TY_PRIVATE void TY_(PrintBody)( TidyDocImpl* doc );       /* you can print an entire document */
                                           /* node as body using PPrintTree() */
 
-void TY_(PPrintTree)( TidyDocImpl* doc, unsigned int mode, unsigned int indent, Node *node );
+TY_PRIVATE void TY_(PPrintTree)( TidyDocImpl* doc, unsigned int mode, unsigned int indent, Node *node );
 
-void TY_(PPrintXMLTree)( TidyDocImpl* doc, unsigned int mode, unsigned int indent, Node *node );
+TY_PRIVATE void TY_(PPrintXMLTree)( TidyDocImpl* doc, unsigned int mode, unsigned int indent, Node *node );
 
 /*\
  * 20150515 - support using tabs instead of spaces
 \*/
-void TY_(PPrintTabs)(void);
-void TY_(PPrintSpaces)(void);
+TY_PRIVATE void TY_(PPrintTabs)(void);
+TY_PRIVATE void TY_(PPrintSpaces)(void);
 
 #endif /* __PPRINT_H__ */
 #ifndef _SPRTF_HXX_
@@ -8856,21 +11494,21 @@ typedef struct _TidyTagImpl
  ** @param opt The option the tag is intended for.
  ** @param name The name of the new tag.
  */
-void TY_(DeclareUserTag)( TidyDocImpl* doc, const TidyOptionImpl* opt, ctmbstr name );
+TY_PRIVATE void TY_(DeclareUserTag)( TidyDocImpl* doc, const TidyOptionImpl* opt, ctmbstr name );
 
 
 /** Interface for finding a tag by TidyTagId.
  ** @param tid The TidyTagId to search for.
  ** @returns An instance of a Tidy tag.
  */
-const Dict* TY_(LookupTagDef)( TidyTagId tid );
+TY_PRIVATE const Dict* TY_(LookupTagDef)( TidyTagId tid );
 
 /** Assigns the node's tag.
  ** @param doc The Tidy document.
  ** @param node The node to assign the tag to.
  ** @returns Returns a bool indicating whether or not the tag was assigned.
  */
-Bool    TY_(FindTag)( TidyDocImpl* doc, Node *node );
+TY_PRIVATE Bool    TY_(FindTag)( TidyDocImpl* doc, Node *node );
 
 
 /** Finds the parser function for a given node.
@@ -8878,7 +11516,7 @@ Bool    TY_(FindTag)( TidyDocImpl* doc, Node *node );
  ** @param node The node to lookup.
  ** @returns The parser for the given node.
  */
-Parser* TY_(FindParser)( TidyDocImpl* doc, Node *node );
+TY_PRIVATE Parser* TY_(FindParser)( TidyDocImpl* doc, Node *node );
 
 
 /** Defines a new user-defined tag.
@@ -8886,7 +11524,7 @@ Parser* TY_(FindParser)( TidyDocImpl* doc, Node *node );
  ** @param tagType The type of user-defined tag to define.
  ** @param name The name of the new tag.
  */
-void    TY_(DefineTag)( TidyDocImpl* doc, UserTagType tagType, ctmbstr name );
+TY_PRIVATE void    TY_(DefineTag)( TidyDocImpl* doc, UserTagType tagType, ctmbstr name );
 
 
 /** Frees user-defined tags of the given type, or all user tags in given
@@ -8895,7 +11533,7 @@ void    TY_(DefineTag)( TidyDocImpl* doc, UserTagType tagType, ctmbstr name );
  ** @param tagType The type of tag to free, or `tagtype_null` to free all
  **        user-defined tags.
  */
-void    TY_(FreeDeclaredTags)( TidyDocImpl* doc, UserTagType tagType );
+TY_PRIVATE void    TY_(FreeDeclaredTags)( TidyDocImpl* doc, UserTagType tagType );
 
 
 /** Initiates an iterator for a list of user-declared tags, including autonomous
@@ -8905,7 +11543,7 @@ void    TY_(FreeDeclaredTags)( TidyDocImpl* doc, UserTagType tagType );
  ** @result Returns a TidyIterator, which is a token used to represent the
  **         current position in a list within LibTidy.
  */
-TidyIterator   TY_(GetDeclaredTagList)( TidyDocImpl* doc );
+TY_PRIVATE TidyIterator   TY_(GetDeclaredTagList)( TidyDocImpl* doc );
 
 
 /** Given a valid TidyIterator initiated with TY_(GetDeclaredTagList)(),
@@ -8920,40 +11558,40 @@ TidyIterator   TY_(GetDeclaredTagList)( TidyDocImpl* doc );
  **        TY_(GetDeclaredTagList)().
  ** @result A string containing the next tag.
  */
-ctmbstr        TY_(GetNextDeclaredTag)( TidyDocImpl* doc, UserTagType tagType,
+TY_PRIVATE ctmbstr        TY_(GetNextDeclaredTag)( TidyDocImpl* doc, UserTagType tagType,
                                         TidyIterator* iter );
 
 
 /** Initializes tags and tag structures for the given Tidy document.
  ** @param doc The Tidy document.
  */
-void TY_(InitTags)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(InitTags)( TidyDocImpl* doc );
 
 
 /** Frees the tags and structures used by Tidy for tags.
  ** @param doc The Tidy document.
  */
-void TY_(FreeTags)( TidyDocImpl* doc );
+TY_PRIVATE void TY_(FreeTags)( TidyDocImpl* doc );
 
 
 /** Tidy defaults to HTML5 mode. If the <!DOCTYPE ...> is found to NOT be
  ** HTML5, then adjust the tags table to HTML4 mode.
  ** @param doc The Tidy document.
  */
-void TY_(AdjustTags)( TidyDocImpl *doc );
+TY_PRIVATE void TY_(AdjustTags)( TidyDocImpl *doc );
 
 
 /** Reset the tags table back to default HTML5 mode.
  ** @param doc The Tidy document.
  */
-void TY_(ResetTags)( TidyDocImpl *doc );
+TY_PRIVATE void TY_(ResetTags)( TidyDocImpl *doc );
 
 
 /** Indicates whether or not the Tidy is procesing in HTML5 mode.
  ** @param doc The Tidy document.
  ** @returns Returns `yes` if processing in HTML5 mode.
  */
-Bool TY_(IsHTML5Mode)( TidyDocImpl *doc );
+TY_PRIVATE Bool TY_(IsHTML5Mode)( TidyDocImpl *doc );
 
 
 /** @} */
@@ -8964,30 +11602,30 @@ Bool TY_(IsHTML5Mode)( TidyDocImpl *doc );
 /** @{ */
 
 
-Parser TY_(ParseHTML);
-Parser TY_(ParseHead);
-Parser TY_(ParseTitle);
-Parser TY_(ParseScript);
-Parser TY_(ParseFrameSet);
-Parser TY_(ParseNoFrames);
-Parser TY_(ParseBody);
-Parser TY_(ParsePre);
-Parser TY_(ParseList);
-Parser TY_(ParseDefList);
-Parser TY_(ParseBlock);
-Parser TY_(ParseInline);
-Parser TY_(ParseEmpty);
-Parser TY_(ParseTableTag);
-Parser TY_(ParseColGroup);
-Parser TY_(ParseRowGroup);
-Parser TY_(ParseRow);
-Parser TY_(ParseSelect);
-Parser TY_(ParseOptGroup);
-Parser TY_(ParseText);
-Parser TY_(ParseDatalist);
-Parser TY_(ParseNamespace);
+TY_PRIVATE Parser TY_(ParseHTML);
+TY_PRIVATE Parser TY_(ParseHead);
+TY_PRIVATE Parser TY_(ParseTitle);
+TY_PRIVATE Parser TY_(ParseScript);
+TY_PRIVATE Parser TY_(ParseFrameSet);
+TY_PRIVATE Parser TY_(ParseNoFrames);
+TY_PRIVATE Parser TY_(ParseBody);
+TY_PRIVATE Parser TY_(ParsePre);
+TY_PRIVATE Parser TY_(ParseList);
+TY_PRIVATE Parser TY_(ParseDefList);
+TY_PRIVATE Parser TY_(ParseBlock);
+TY_PRIVATE Parser TY_(ParseInline);
+TY_PRIVATE Parser TY_(ParseEmpty);
+TY_PRIVATE Parser TY_(ParseTableTag);
+TY_PRIVATE Parser TY_(ParseColGroup);
+TY_PRIVATE Parser TY_(ParseRowGroup);
+TY_PRIVATE Parser TY_(ParseRow);
+TY_PRIVATE Parser TY_(ParseSelect);
+TY_PRIVATE Parser TY_(ParseOptGroup);
+TY_PRIVATE Parser TY_(ParseText);
+TY_PRIVATE Parser TY_(ParseDatalist);
+TY_PRIVATE Parser TY_(ParseNamespace);
 
-CheckAttribs TY_(CheckAttributes);
+TY_PRIVATE CheckAttribs TY_(CheckAttributes);
 
 
 /** @} */
@@ -9011,14 +11649,14 @@ CheckAttribs TY_(CheckAttributes);
  ** @param node The node being interrogated.
  ** @returns The status of the inquiry.
  */
-Bool TY_(nodeIsText)( Node* node );
+TY_PRIVATE Bool TY_(nodeIsText)( Node* node );
 
 
 /** Inquires whether or not the given node is an element node.
  ** @param node The node being interrogated.
  ** @returns The status of the inquiry.
  */
-Bool TY_(nodeIsElement)( Node* node );
+TY_PRIVATE Bool TY_(nodeIsElement)( Node* node );
 
 
 /** Inquires whether or not the given node has any text.
@@ -9026,7 +11664,7 @@ Bool TY_(nodeIsElement)( Node* node );
  ** @param node The node being interrogated.
  ** @returns The status of the inquiry.
  */
-Bool TY_(nodeHasText)( TidyDocImpl* doc, Node* node );
+TY_PRIVATE Bool TY_(nodeHasText)( TidyDocImpl* doc, Node* node );
 
 
 /** Inquires whether the given element looks like it's an autonomous custom
@@ -9034,7 +11672,7 @@ Bool TY_(nodeHasText)( TidyDocImpl* doc, Node* node );
  ** @param element A string to be checked.
  ** @returns The status of the inquiry.
  */
-Bool TY_(elementIsAutonomousCustomFormat)( ctmbstr element );
+TY_PRIVATE Bool TY_(elementIsAutonomousCustomFormat)( ctmbstr element );
 
 
 /** Inquires whether the given node looks like it's an autonomous custom
@@ -9042,7 +11680,7 @@ Bool TY_(elementIsAutonomousCustomFormat)( ctmbstr element );
  ** @param node The node being interrogated.
  ** @returns The status of the inquiry.
  */
-Bool TY_(nodeIsAutonomousCustomFormat)( Node* node );
+TY_PRIVATE Bool TY_(nodeIsAutonomousCustomFormat)( Node* node );
 
 
 /** True if the node looks like it's an autonomous custom element tag, and
@@ -9052,7 +11690,7 @@ Bool TY_(nodeIsAutonomousCustomFormat)( Node* node );
  ** @param node The node being interrogated.
  ** @returns The status of the inquiry.
  */
-Bool TY_(nodeIsAutonomousCustomTag)( TidyDocImpl* doc, Node* node );
+TY_PRIVATE Bool TY_(nodeIsAutonomousCustomTag)( TidyDocImpl* doc, Node* node );
 
 
 /** Does the node have the indicated content model? True if any of the bits
@@ -9061,42 +11699,42 @@ Bool TY_(nodeIsAutonomousCustomTag)( TidyDocImpl* doc, Node* node );
  ** @param contentModel The content model to check against.
  ** @returns The status of the inquiry.
  */
-Bool TY_(nodeHasCM)( Node* node, unsigned int contentModel );
+TY_PRIVATE Bool TY_(nodeHasCM)( Node* node, unsigned int contentModel );
 
 
 /** Does the content model of the node include block?
  ** @param node The node being interrogated.
  ** @returns The status of the inquiry.
  */
-Bool TY_(nodeCMIsBlock)( Node* node );
+TY_PRIVATE Bool TY_(nodeCMIsBlock)( Node* node );
 
 
 /** Does the content model of the node include inline?
  ** @param node The node being interrogated.
  ** @returns The status of the inquiry.
  */
-Bool TY_(nodeCMIsInline)( Node* node );
+TY_PRIVATE Bool TY_(nodeCMIsInline)( Node* node );
 
 
 /** Does the content model of the node include empty?
  ** @param node The node being interrogated.
  ** @returns The status of the inquiry.
  */
-Bool TY_(nodeCMIsEmpty)( Node* node );
+TY_PRIVATE Bool TY_(nodeCMIsEmpty)( Node* node );
 
 
 /** Is the node a header, such as H1, H2, ..., H6?
  ** @param node The node being interrogated.
  ** @returns The status of the inquiry.
  */
-Bool TY_(nodeIsHeader)( Node* node );
+TY_PRIVATE Bool TY_(nodeIsHeader)( Node* node );
 
 
 /** Inquires as to the header level of the given node: 1, 2, ..., 6.
  ** @param node The node being interrogated.
  ** @returns The header level.
  */
-unsigned int TY_(nodeHeaderLevel)( Node* node );
+TY_PRIVATE unsigned int TY_(nodeHeaderLevel)( Node* node );
 
 
 #define nodeIsHTML( node )       TagIsId( node, TidyTag_HTML )
@@ -9188,6 +11826,8 @@ unsigned int TY_(nodeHeaderLevel)( Node* node );
 
 #define nodeIsINS( node )        TagIsId( node, TidyTag_INS )
 #define nodeIsDEL( node )        TagIsId( node, TidyTag_DEL )
+
+#define nodeIsSVG( node )        TagIsId( node, TidyTag_SVG )
 
 /* HTML5 */
 #define nodeIsDATALIST( node )   TagIsId( node, TidyTag_DATALIST )
@@ -9361,7 +12001,7 @@ struct _TidyMessageImpl
 #define TidyDocFree(doc, block) TidyFree((doc)->allocator, block)
 #define TidyDocPanic(doc, msg) TidyPanic((doc)->allocator, msg)
 
-int          TY_(DocParseStream)( TidyDocImpl* impl, StreamIn* in );
+TY_PRIVATE int          TY_(DocParseStream)( TidyDocImpl* impl, StreamIn* in );
 
 /*
    [i_a] generic node tree traversal code; used in several spots.
@@ -9383,7 +12023,7 @@ typedef enum
 
 typedef NodeTraversalSignal NodeTraversalCallBack(TidyDocImpl* doc, Node* node, void *propagate);
 
-NodeTraversalSignal TY_(TraverseNodeTree)(TidyDocImpl* doc, Node* node, NodeTraversalCallBack *cb, void *propagate);
+TY_PRIVATE NodeTraversalSignal TY_(TraverseNodeTree)(TidyDocImpl* doc, Node* node, NodeTraversalCallBack *cb, void *propagate);
 
 #endif /* __TIDY_INT_H__ */
 #ifndef __TMBSTR_H__
@@ -9404,23 +12044,23 @@ extern "C"
 #endif
 
 /* like strdup but using an allocator */
-tmbstr TY_(tmbstrdup)( TidyAllocator *allocator, ctmbstr str );
+TY_PRIVATE tmbstr TY_(tmbstrdup)( TidyAllocator *allocator, ctmbstr str );
 
 /* like strndup but using an allocator */
-tmbstr TY_(tmbstrndup)( TidyAllocator *allocator, ctmbstr str, unsigned int len);
+TY_PRIVATE tmbstr TY_(tmbstrndup)( TidyAllocator *allocator, ctmbstr str, unsigned int len);
 
 /* exactly same as strncpy */
-unsigned int TY_(tmbstrncpy)( tmbstr s1, ctmbstr s2, unsigned int size );
+TY_PRIVATE unsigned int TY_(tmbstrncpy)( tmbstr s1, ctmbstr s2, unsigned int size );
 
-unsigned int TY_(tmbstrcpy)( tmbstr s1, ctmbstr s2 );
+TY_PRIVATE unsigned int TY_(tmbstrcpy)( tmbstr s1, ctmbstr s2 );
 
-unsigned int TY_(tmbstrcat)( tmbstr s1, ctmbstr s2 );
+TY_PRIVATE unsigned int TY_(tmbstrcat)( tmbstr s1, ctmbstr s2 );
 
 /* exactly same as strcmp */
-int TY_(tmbstrcmp)( ctmbstr s1, ctmbstr s2 );
+TY_PRIVATE int TY_(tmbstrcmp)( ctmbstr s1, ctmbstr s2 );
 
 /* returns byte count, not char count */
-unsigned int TY_(tmbstrlen)( ctmbstr str );
+TY_PRIVATE unsigned int TY_(tmbstrlen)( ctmbstr str );
 
 /*
   MS C 4.2 doesn't include strcasecmp.
@@ -9433,35 +12073,35 @@ unsigned int TY_(tmbstrlen)( ctmbstr str );
   we are always comparing to ascii element and
   attribute names defined by HTML specs.
 */
-int TY_(tmbstrcasecmp)( ctmbstr s1, ctmbstr s2 );
+TY_PRIVATE int TY_(tmbstrcasecmp)( ctmbstr s1, ctmbstr s2 );
 
-int TY_(tmbstrncmp)( ctmbstr s1, ctmbstr s2, unsigned int n );
+TY_PRIVATE int TY_(tmbstrncmp)( ctmbstr s1, ctmbstr s2, unsigned int n );
 
-int TY_(tmbstrncasecmp)( ctmbstr s1, ctmbstr s2, unsigned int n );
+TY_PRIVATE int TY_(tmbstrncasecmp)( ctmbstr s1, ctmbstr s2, unsigned int n );
 
 /* return offset of cc from beginning of s1,
 ** -1 if not found.
 */
-/* int TY_(tmbstrnchr)( ctmbstr s1, unsigned int len1, tmbchar cc ); */
+/* TY_PRIVATE int TY_(tmbstrnchr)( ctmbstr s1, unsigned int len1, tmbchar cc ); */
 
-ctmbstr TY_(tmbsubstrn)( ctmbstr s1, unsigned int len1, ctmbstr s2 );
-/* ctmbstr TY_(tmbsubstrncase)( ctmbstr s1, unsigned int len1, ctmbstr s2 ); */
-ctmbstr TY_(tmbsubstr)( ctmbstr s1, ctmbstr s2 );
+TY_PRIVATE ctmbstr TY_(tmbsubstrn)( ctmbstr s1, unsigned int len1, ctmbstr s2 );
+/* TY_PRIVATE ctmbstr TY_(tmbsubstrncase)( ctmbstr s1, unsigned int len1, ctmbstr s2 ); */
+TY_PRIVATE ctmbstr TY_(tmbsubstr)( ctmbstr s1, ctmbstr s2 );
 
 /* transform string to lower case */
-tmbstr TY_(tmbstrtolower)( tmbstr s );
+TY_PRIVATE tmbstr TY_(tmbstrtolower)( tmbstr s );
 
 /* Transform ASCII chars in string to upper case */
-tmbstr TY_(tmbstrtoupper)( tmbstr s );
+TY_PRIVATE tmbstr TY_(tmbstrtoupper)( tmbstr s );
 
-/* Bool TY_(tmbsamefile)( ctmbstr filename1, ctmbstr filename2 ); */
+/* TY_PRIVATE Bool TY_(tmbsamefile)( ctmbstr filename1, ctmbstr filename2 ); */
 
-int TY_(tmbvsnprintf)(tmbstr buffer, size_t count, ctmbstr format, va_list args)
+TY_PRIVATE int TY_(tmbvsnprintf)(tmbstr buffer, size_t count, ctmbstr format, va_list args)
 #ifdef __GNUC__
 __attribute__((format(printf, 3, 0)))
 #endif
 ;
-int TY_(tmbsnprintf)(tmbstr buffer, size_t count, ctmbstr format, ...)
+TY_PRIVATE int TY_(tmbsnprintf)(tmbstr buffer, size_t count, ctmbstr format, ...)
 #ifdef __GNUC__
 __attribute__((format(printf, 3, 4)))
 #endif
@@ -9489,15 +12129,15 @@ __attribute__((format(printf, 3, 4)))
 ** Does not convert character "codepoints", i.e. to/from 10646.
 */
 
-int TY_(DecodeUTF8BytesToChar)( unsigned int* c, unsigned int firstByte, ctmbstr successorBytes,
+TY_PRIVATE int TY_(DecodeUTF8BytesToChar)( unsigned int* c, unsigned int firstByte, ctmbstr successorBytes,
                                 TidyInputSource* inp, int* count );
 
-int TY_(EncodeCharToUTF8Bytes)( unsigned int c, tmbstr encodebuf,
+TY_PRIVATE int TY_(EncodeCharToUTF8Bytes)( unsigned int c, tmbstr encodebuf,
                                 TidyOutputSink* outp, int* count );
 
 
-unsigned int  TY_(GetUTF8)( ctmbstr str, unsigned int *ch );
-tmbstr TY_(PutUTF8)( tmbstr buf, unsigned int c );
+TY_PRIVATE unsigned int  TY_(GetUTF8)( ctmbstr str, unsigned int *ch );
+TY_PRIVATE tmbstr TY_(PutUTF8)( tmbstr buf, unsigned int c );
 
 #define UNICODE_BOM_BE   0xFEFF   /* big-endian (default) UNICODE BOM */
 #define UNICODE_BOM      UNICODE_BOM_BE
@@ -9505,15 +12145,15 @@ tmbstr TY_(PutUTF8)( tmbstr buf, unsigned int c );
 #define UNICODE_BOM_UTF8 0xEFBBBF /* UTF-8 UNICODE BOM */
 
 
-Bool    TY_(IsValidUTF16FromUCS4)( tchar ucs4 );
-Bool    TY_(IsHighSurrogate)( tchar ch );
-Bool    TY_(IsLowSurrogate)( tchar ch );
+TY_PRIVATE Bool    TY_(IsValidUTF16FromUCS4)( tchar ucs4 );
+TY_PRIVATE Bool    TY_(IsHighSurrogate)( tchar ch );
+TY_PRIVATE Bool    TY_(IsLowSurrogate)( tchar ch );
 
-Bool    TY_(IsCombinedChar)( tchar ch );
-Bool    TY_(IsValidCombinedChar)( tchar ch );
+TY_PRIVATE Bool    TY_(IsCombinedChar)( tchar ch );
+TY_PRIVATE Bool    TY_(IsValidCombinedChar)( tchar ch );
 
-tchar   TY_(CombineSurrogatePair)( tchar high, tchar low );
-Bool    TY_(SplitSurrogatePair)( tchar utf16, tchar* high, tchar* low );
+TY_PRIVATE tchar   TY_(CombineSurrogatePair)( tchar high, tchar low );
+TY_PRIVATE Bool    TY_(SplitSurrogatePair)( tchar utf16, tchar* high, tchar* low );
 
 
 
@@ -9607,22 +12247,154 @@ static const ctmbstr frameExtensions[] =
 /* List of possible colour values */
 static const int colorValues[][3] =
 {
-  {  0,  0,  0},
-  {128,128,128},
-  {192,192,192},
-  {255,255,255},
-  {192,  0,  0},
-  {255,  0,  0},
-  {128,  0,128},
-  {255,  0,255},
-  {  0,128,  0},
-  {  0,255,  0},
-  {128,128,  0},
-  {255,255,  0},  
-  {  0,  0,128},
-  {  0,  0,255},
-  {  0,128,128},
-  {  0,255,255}
+  {240, 248, 255 },
+  {250, 235, 215 },
+  {0, 255, 255 },
+  {127, 255, 212 },
+  {240, 255, 255 },
+  {245, 245, 220 },
+  {255, 228, 196 },
+  {0, 0, 0 },
+  {255, 235, 205 },
+  {0, 0, 255 },
+  {138, 43, 226 },
+  {165, 42, 42 },
+  {222, 184, 135 },
+  {95, 158, 160 },
+  {127, 255, 0 },
+  {210, 105, 30 },
+  {255, 127, 80 },
+  {100, 149, 237 },
+  {255, 248, 220 },
+  {220, 20, 60 },
+  {0, 255, 255 },
+  {0, 0, 139 },
+  {0, 139, 139 },
+  {184, 134, 11 },
+  {169, 169, 169 },
+  {0, 100, 0 },
+  {169, 169, 169 },
+  {189, 183, 107 },
+  {139, 0, 139 },
+  {85, 107, 47 },
+  {255, 140, 0 },
+  {153, 50, 204 },
+  {139, 0, 0 },
+  {233, 150, 122 },
+  {143, 188, 143 },
+  {72, 61, 139 },
+  {47, 79, 79 },
+  {47, 79, 79 },
+  {0, 206, 209 },
+  {148, 0, 211 },
+  {255, 20, 147 },
+  {0, 191, 255 },
+  {105, 105, 105 },
+  {105, 105, 105 },
+  {30, 144, 255 },
+  {178, 34, 34 },
+  {255, 250, 240 },
+  {34, 139, 34 },
+  {255, 0, 255 },
+  {220, 220, 220 },
+  {248, 248, 255 },
+  {255, 215, 0 },
+  {218, 165, 32 },
+  {128, 128, 128 },
+  {0, 128, 0 },
+  {173, 255, 47 },
+  {128, 128, 128 },
+  {240, 255, 240 },
+  {255, 105, 180 },
+  {205, 92, 92 },
+  {75, 0, 130 },
+  {255, 255, 240 },
+  {240, 230, 140 },
+  {230, 230, 250 },
+  {255, 240, 245 },
+  {124, 252, 0 },
+  {255, 250, 205 },
+  {173, 216, 230 },
+  {240, 128, 128 },
+  {224, 255, 255 },
+  {250, 250, 210 },
+  {211, 211, 211 },
+  {144, 238, 144 },
+  {211, 211, 211 },
+  {255, 182, 193 },
+  {255, 160, 122 },
+  {32, 178, 170 },
+  {135, 206, 250 },
+  {119, 136, 153 },
+  {119, 136, 153 },
+  {176, 196, 222 },
+  {255, 255, 224 },
+  {0, 255, 0 },
+  {50, 205, 50 },
+  {250, 240, 230 },
+  {255, 0, 255 },
+  {128, 0, 0 },
+  {102, 205, 170 },
+  {0, 0, 205 },
+  {186, 85, 211 },
+  {147, 112, 219 },
+  {60, 179, 113 },
+  {123, 104, 238 },
+  {0, 250, 154 },
+  {72, 209, 204 },
+  {199, 21, 133 },
+  {25, 25, 112 },
+  {245, 255, 250 },
+  {255, 228, 225 },
+  {255, 228, 181 },
+  {255, 222, 173 },
+  {0, 0, 128 },
+  {253, 245, 230 },
+  {128, 128, 0 },
+  {107, 142, 35 },
+  {255, 165, 0 },
+  {255, 69, 0 },
+  {218, 112, 214 },
+  {238, 232, 170 },
+  {152, 251, 152 },
+  {175, 238, 238 },
+  {219, 112, 147 },
+  {255, 239, 213 },
+  {255, 218, 185 },
+  {205, 133, 63 },
+  {255, 192, 203 },
+  {221, 160, 221 },
+  {176, 224, 230 },
+  {128, 0, 128 },
+  {102, 51, 153 },
+  {255, 0, 0 },
+  {188, 143, 143 },
+  {65, 105, 225 },
+  {139, 69, 19 },
+  {250, 128, 114 },
+  {244, 164, 96 },
+  {46, 139, 87 },
+  {255, 245, 238 },
+  {160, 82, 45 },
+  {192, 192, 192 },
+  {135, 206, 235 },
+  {106, 90, 205 },
+  {112, 128, 144 },
+  {112, 128, 144 },
+  {255, 250, 250 },
+  {0, 255, 127 },
+  {70, 130, 180 },
+  {210, 180, 140 },
+  {0, 128, 128 },
+  {216, 191, 216 },
+  {255, 99, 71 },
+  {64, 224, 208 },
+  {238, 130, 238 },
+  {245, 222, 179 },
+  {255, 255, 255 },
+  {245, 245, 245 },
+  {255, 255, 0 },
+  {154, 205, 50 }
 };
 
 #define N_COLOR_VALS (sizeof(colorValues)/(sizeof(int[3]))
@@ -9630,22 +12402,154 @@ static const int colorValues[][3] =
 /* These arrays are used to convert color names to their RGB values */
 static const ctmbstr colorNames[] =
 {
+  "aliceblue",
+  "antiquewhite",
+  "aqua",
+  "aquamarine",
+  "azure",
+  "beige",
+  "bisque",
   "black",
-  "silver",
-  "grey",
-  "white",
-  "maroon",
-  "red",
-  "purple",
-  "fuchsia",
-  "green",
-  "lime",
-  "olive",
-  "yellow", 
-  "navy",
+  "blanchedalmond",
   "blue",
+  "blueviolet",
+  "brown",
+  "burlywood",
+  "cadetblue",
+  "chartreuse",
+  "chocolate",
+  "coral",
+  "cornflowerblue",
+  "cornsilk",
+  "crimson",
+  "cyan",
+  "darkblue",
+  "darkcyan",
+  "darkgoldenrod",
+  "darkgray",
+  "darkgreen",
+  "darkgrey",
+  "darkkhaki",
+  "darkmagenta",
+  "darkolivegreen",
+  "darkorange",
+  "darkorchid",
+  "darkred",
+  "darksalmon",
+  "darkseagreen",
+  "darkslateblue",
+  "darkslategray",
+  "darkslategrey",
+  "darkturquoise",
+  "darkviolet",
+  "deeppink",
+  "deepskyblue",
+  "dimgray",
+  "dimgrey",
+  "dodgerblue",
+  "firebrick",
+  "floralwhite",
+  "forestgreen",
+  "fuchsia",
+  "gainsboro",
+  "ghostwhite",
+  "gold",
+  "goldenrod",
+  "gray",
+  "green",
+  "greenyellow",
+  "grey",
+  "honeydew",
+  "hotpink",
+  "indianred",
+  "indigo",
+  "ivory",
+  "khaki",
+  "lavender",
+  "lavenderblush",
+  "lawngreen",
+  "lemonchiffon",
+  "lightblue",
+  "lightcoral",
+  "lightcyan",
+  "lightgoldenrodyellow",
+  "lightgray",
+  "lightgreen",
+  "lightgrey",
+  "lightpink",
+  "lightsalmon",
+  "lightseagreen",
+  "lightskyblue",
+  "lightslategray",
+  "lightslategrey",
+  "lightsteelblue",
+  "lightyellow",
+  "lime",
+  "limegreen",
+  "linen",
+  "magenta",
+  "maroon",
+  "mediumaquamarine",
+  "mediumblue",
+  "mediumorchid",
+  "mediumpurple",
+  "mediumseagreen",
+  "mediumslateblue",
+  "mediumspringgreen",
+  "mediumturquoise",
+  "mediumvioletred",
+  "midnightblue",
+  "mintcream",
+  "mistyrose",
+  "moccasin",
+  "navajowhite",
+  "navy",
+  "oldlace",
+  "olive",
+  "olivedrab",
+  "orange",
+  "orangered",
+  "orchid",
+  "palegoldenrod",
+  "palegreen",
+  "paleturquoise",
+  "palevioletred",
+  "papayawhip",
+  "peachpuff",
+  "peru",
+  "pink",
+  "plum",
+  "powderblue",
+  "purple",
+  "rebeccapurple",
+  "red",
+  "rosybrown",
+  "royalblue",
+  "saddlebrown",
+  "salmon",
+  "sandybrown",
+  "seagreen",
+  "seashell",
+  "sienna",
+  "silver",
+  "skyblue",
+  "slateblue",
+  "slategray",
+  "slategrey",
+  "snow",
+  "springgreen",
+  "steelblue",
+  "tan",
   "teal",
-  "aqua"
+  "thistle",
+  "tomato",
+  "turquoise",
+  "violet",
+  "wheat",
+  "white",
+  "whitesmoke",
+  "yellow",
+  "yellowgreen",
 };
 
 #define N_COLOR_NAMES (sizeof(colorNames)/sizeof(ctmbstr))
@@ -13040,6 +15944,7 @@ TidyAllocator TY_(g_default_allocator) = {
   { TidyAttr_IS,                    xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50 }, \
   { TidyAttr_LANG,                  xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50 }, \
   { TidyAttr_ROLE,                  xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50 }, \
+  { TidyAttr_SLOT,                  xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50 }, \
   { TidyAttr_SPELLCHECK,            xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50 }, \
   { TidyAttr_STYLE,                 xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50 }, \
   { TidyAttr_TABINDEX,              xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50 }, \
@@ -14575,6 +17480,7 @@ const AttrVersion TY_(W3CAttrsFor_IFRAME)[] =
   { TidyAttr_FRAMEBORDER,           xxxx|xxxx|H40T|H41T|X10T|H40F|H41F|X10F|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx },
   { TidyAttr_HEIGHT,                xxxx|xxxx|H40T|H41T|X10T|H40F|H41F|X10F|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50 },
   { TidyAttr_ID,                    xxxx|xxxx|H40T|H41T|X10T|H40F|H41F|X10F|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50 }, /* CORE override */
+  { TidyAttr_LOADING,               xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50 },
   { TidyAttr_LONGDESC,              xxxx|xxxx|H40T|H41T|X10T|H40F|H41F|X10F|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx },
   { TidyAttr_MARGINHEIGHT,          xxxx|xxxx|H40T|H41T|X10T|H40F|H41F|X10F|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx },
   { TidyAttr_MARGINWIDTH,           xxxx|xxxx|H40T|H41T|X10T|H40F|H41F|X10F|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx },
@@ -14608,6 +17514,7 @@ const AttrVersion TY_(W3CAttrsFor_IMG)[] =
   { TidyAttr_ID,                    xxxx|xxxx|H40T|H41T|X10T|H40F|H41F|X10F|H40S|H41S|X10S|XH11|XB10|HT50|XH50 }, /* CORE override */
   { TidyAttr_ISMAP,                 HT20|HT32|H40T|H41T|X10T|H40F|H41F|X10F|H40S|H41S|X10S|XH11|xxxx|HT50|XH50 },
   { TidyAttr_LANG,                  xxxx|xxxx|H40T|H41T|X10T|H40F|H41F|X10F|H40S|H41S|X10S|xxxx|xxxx|HT50|XH50 }, /* CORE override */
+  { TidyAttr_LOADING,               xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50 },
   { TidyAttr_LONGDESC,              xxxx|xxxx|H40T|H41T|X10T|H40F|H41F|X10F|H40S|H41S|X10S|XH11|XB10|xxxx|xxxx },
   { TidyAttr_NAME,                  xxxx|xxxx|xxxx|H41T|X10T|xxxx|H41F|X10F|xxxx|H41S|xxxx|xxxx|xxxx|xxxx|xxxx },
   { TidyAttr_OnCLICK,               xxxx|xxxx|H40T|H41T|X10T|H40F|H41F|X10F|H40S|H41S|X10S|XH11|xxxx|HT50|XH50 }, /* CORE override */
@@ -15825,6 +18732,17 @@ const AttrVersion TY_(W3CAttrsFor_SMALL)[] =
   { TidyAttr_UNKNOWN,               0                                                                          },
 };
 
+const AttrVersion TY_(W3CAttrsFor_SLOT)[] =
+{
+  INCLUDE_ARIA
+  INCLUDE_MICRODATA
+  { TidyAttr_NAME,                  xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50 },
+  INCLUDE_CORE_ATTRIBS
+  INCLUDE_CORE_EVENTS
+  INCLUDE_RDFA
+  { TidyAttr_UNKNOWN,               0                                                                          },
+};
+
 const AttrVersion TY_(W3CAttrsFor_SOURCE)[] = 
 {
   INCLUDE_ARIA
@@ -16047,6 +18965,21 @@ const AttrVersion TY_(W3CAttrsFor_SVG)[] =
   { TidyAttr_BASEPROFILE,           xxxx|xxxx|H40T|H41T|X10T|H40F|H41F|X10F|xxxx|H41S|X10S|XH11|xxxx|HT50|XH50 },
   { TidyAttr_CONTENTSCRIPTTYPE,     xxxx|xxxx|H40T|H41T|X10T|H40F|H41F|X10F|xxxx|H41S|X10S|XH11|xxxx|HT50|XH50 },
   { TidyAttr_CONTENTSTYLETYPE,      xxxx|xxxx|H40T|H41T|X10T|H40F|H41F|X10F|xxxx|H41S|X10S|XH11|xxxx|HT50|XH50 },
+  { TidyAttr_COLOR,                 xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|XH11|xxxx|HT50|XH50 },
+  { TidyAttr_FILL,                  xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|XH11|xxxx|HT50|XH50 },
+  { TidyAttr_FILLRULE,              xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|XH11|xxxx|HT50|XH50 },
+  { TidyAttr_STROKE,                xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|XH11|xxxx|HT50|XH50 },
+  { TidyAttr_STROKEDASHARRAY,       xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|XH11|xxxx|HT50|XH50 },
+  { TidyAttr_STROKEDASHOFFSET,      xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|XH11|xxxx|HT50|XH50 },
+  { TidyAttr_STROKELINECAP,         xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|XH11|xxxx|HT50|XH50 },
+  { TidyAttr_STROKELINEJOIN,        xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|XH11|xxxx|HT50|XH50 },
+  { TidyAttr_STROKEMITERLIMIT,      xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|XH11|xxxx|HT50|XH50 },
+  { TidyAttr_STROKEWIDTH,           xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|XH11|xxxx|HT50|XH50 },
+  { TidyAttr_COLORINTERPOLATION,    xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|XH11|xxxx|HT50|XH50 },
+  { TidyAttr_COLORRENDERING,        xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|XH11|xxxx|HT50|XH50 },
+  { TidyAttr_OPACITY,               xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|XH11|xxxx|HT50|XH50 },
+  { TidyAttr_STROKEOPACITY,         xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|XH11|xxxx|HT50|XH50 },
+  { TidyAttr_FILLOPACITY,           xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|XH11|xxxx|HT50|XH50 },
   INCLUDE_CORE_ATTRIBS
   INCLUDE_CORE_EVENTS
   INCLUDE_RDFA
@@ -16541,6 +19474,8 @@ const AttrVersion TY_(W3CAttrsFor_VIDEO)[] =
   { TidyAttr_HEIGHT,                xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50 },
   { TidyAttr_LOOP,                  xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50 },
   { TidyAttr_MEDIAGROUP,            xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50 },
+  { TidyAttr_MUTED,                 xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50 },
+  { TidyAttr_PLAYSINLINE,           xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50 },
   { TidyAttr_POSTER,                xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50 },
   { TidyAttr_PRELOAD,               xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50 },
   { TidyAttr_SRC,                   xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50 },
@@ -16630,10 +19565,13 @@ static AttrCheck CheckVType;
 static AttrCheck CheckScroll;
 static AttrCheck CheckTextDir;
 static AttrCheck CheckLang;
+static AttrCheck CheckLoading;
 static AttrCheck CheckType;
 static AttrCheck CheckRDFaSafeCURIE;
 static AttrCheck CheckRDFaTerm;
 static AttrCheck CheckRDFaPrefix;
+static AttrCheck CheckDecimal;
+static AttrCheck CheckSvgAttr;
 
 #define CH_PCDATA      NULL
 #define CH_CHARSET     NULL
@@ -16649,6 +19587,7 @@ static AttrCheck CheckRDFaPrefix;
 #define CH_CLEAR       CheckClear
 #define CH_BORDER      CheckBool     /* kludge */
 #define CH_LANG        CheckLang
+#define CH_LOADING     CheckLoading
 #define CH_BOOL        CheckBool
 #define CH_COLS        NULL
 #define CH_NUMBER      CheckNumber
@@ -16678,7 +19617,14 @@ static AttrCheck CheckRDFaPrefix;
 #define CH_RDFASCURIES CheckRDFaSafeCURIE
 #define CH_RDFATERM    CheckRDFaTerm
 #define CH_RDFATERMS   CheckRDFaTerm
+#define CH_DECIMAL     CheckDecimal
+#define CH_SVG         CheckSvgAttr
 
+/*
+   WARNING: This table /must/ be kept in the EXACT order of the TidyAttrId enum!
+   When running the DEBUG version, this order is checked, in TY_(InitAttrs)(doc),
+   and there is an assert() if any difference found.
+*/
 static const Attribute attribute_defs [] =
 {
   { TidyAttr_UNKNOWN,                 "unknown!",                NULL         }, 
@@ -16889,8 +19835,9 @@ static const Attribute attribute_defs [] =
   { TidyAttr_MAX,                     "max",                     CH_PCDATA   },
   { TidyAttr_MEDIAGROUP,              "mediagroup",              CH_PCDATA   },
   { TidyAttr_MIN,                     "min",                     CH_PCDATA   },
+  { TidyAttr_MUTED,                   "muted",                   CH_BOOL     },
   { TidyAttr_NOVALIDATE,              "novalidate",              CH_PCDATA   },
-  { TidyAttr_OPEN,                    "open",                    CH_PCDATA   },
+  { TidyAttr_OPEN,                    "open",                    CH_BOOL     }, /* Is. #925 PR #932 */
   { TidyAttr_OPTIMUM,                 "optimum",                 CH_PCDATA   },
   { TidyAttr_OnABORT,                 "onabort",                 CH_PCDATA   },
   { TidyAttr_OnAFTERPRINT,            "onafterprint",            CH_PCDATA   },
@@ -16944,6 +19891,7 @@ static const Attribute attribute_defs [] =
   { TidyAttr_OnWAITING,               "onwaiting",               CH_PCDATA   },
   { TidyAttr_PATTERN,                 "pattern",                 CH_PCDATA   },
   { TidyAttr_PLACEHOLDER,             "placeholder",             CH_PCDATA   },
+  { TidyAttr_PLAYSINLINE,             "playsinline",             CH_BOOL     },
   { TidyAttr_POSTER,                  "poster",                  CH_PCDATA   },
   { TidyAttr_PRELOAD,                 "preload",                 CH_PCDATA   },
   { TidyAttr_PUBDATE,                 "pubdate",                 CH_PCDATA   },
@@ -17022,6 +19970,24 @@ static const Attribute attribute_defs [] =
 
   /* for xmlns:xlink in <svg> */
   { TidyAttr_XMLNSXLINK,                "xmlns:xlink",           CH_URL       },
+  { TidyAttr_SLOT,                      "slot",                  CH_PCDATA    },
+  { TidyAttr_LOADING,                   "loading",               CH_LOADING   }, /* IMG, IFRAME */
+
+  /* SVG paint attributes (SVG 1.1) */
+  { TidyAttr_FILL,                     "fill",                  CH_SVG        },
+  { TidyAttr_FILLRULE,                 "fill-rule",             CH_SVG        },
+  { TidyAttr_STROKE,                   "stroke",                CH_SVG        },
+  { TidyAttr_STROKEDASHARRAY,          "stroke-dasharray",      CH_SVG        },
+  { TidyAttr_STROKEDASHOFFSET,         "stroke-dashoffset",     CH_SVG        },
+  { TidyAttr_STROKELINECAP,            "stroke-linecap",        CH_SVG        },
+  { TidyAttr_STROKELINEJOIN,           "stroke-linejoin",       CH_SVG        },
+  { TidyAttr_STROKEMITERLIMIT,         "stroke-miterlimit",     CH_SVG        },
+  { TidyAttr_STROKEWIDTH,              "stroke-width",          CH_SVG        },
+  { TidyAttr_COLORINTERPOLATION,       "color-interpolation",   CH_SVG        },
+  { TidyAttr_COLORRENDERING,           "color-rendering",       CH_SVG        },
+  { TidyAttr_OPACITY,                  "opacity",               CH_SVG        },
+  { TidyAttr_STROKEOPACITY,            "stroke-opacity",        CH_SVG        },
+  { TidyAttr_FILLOPACITY,              "fill-opacity",          CH_SVG        },
 
   /* this must be the final entry */
   { N_TIDY_ATTRIBS,                    NULL,                     NULL         }
@@ -17143,7 +20109,144 @@ static const struct _colors colors[] =
     { NULL,      NULL      }
 };
 
-static ctmbstr GetColorCode(ctmbstr name)
+static const struct _colors extended_colors[] =
+{
+    { "aliceblue", "#f0f8ff" },
+    { "antiquewhite", "#faebd7" },
+    { "aquamarine", "#7fffd4" },
+    { "azure", "#f0ffff" },
+    { "beige", "#f5f5dc" },
+    { "bisque", "#ffe4c4" },
+    { "blanchedalmond", "#ffebcd" },
+    { "blueviolet", "#8a2be2" },
+    { "brown", "#a52a2a" },
+    { "burlywood", "#deb887" },
+    { "cadetblue", "#5f9ea0" },
+    { "chartreuse", "#7fff00" },
+    { "chocolate", "#d2691e" },
+    { "coral", "#ff7f50" },
+    { "cornflowerblue", "#6495ed" },
+    { "cornsilk", "#fff8dc" },
+    { "crimson", "#dc143c" },
+    { "cyan", "#00ffff" },
+    { "darkblue", "#00008b" },
+    { "darkcyan", "#008b8b" },
+    { "darkgoldenrod", "#b8860b" },
+    { "darkgray", "#a9a9a9" },
+    { "darkgreen", "#006400" },
+    { "darkgrey", "#a9a9a9" },
+    { "darkkhaki", "#bdb76b" },
+    { "darkmagenta", "#8b008b" },
+    { "darkolivegreen", "#556b2f" },
+    { "darkorange", "#ff8c00" },
+    { "darkorchid", "#9932cc" },
+    { "darkred", "#8b0000" },
+    { "darksalmon", "#e9967a" },
+    { "darkseagreen", "#8fbc8f" },
+    { "darkslateblue", "#483d8b" },
+    { "darkslategray", "#2f4f4f" },
+    { "darkslategrey", "#2f4f4f" },
+    { "darkturquoise", "#00ced1" },
+    { "darkviolet", "#9400d3" },
+    { "deeppink", "#ff1493" },
+    { "deepskyblue", "#00bfff" },
+    { "dimgray", "#696969" },
+    { "dimgrey", "#696969" },
+    { "dodgerblue", "#1e90ff" },
+    { "firebrick", "#b22222" },
+    { "floralwhite", "#fffaf0" },
+    { "forestgreen", "#228b22" },
+    { "gainsboro", "#dcdcdc" },
+    { "ghostwhite", "#f8f8ff" },
+    { "gold", "#ffd700" },
+    { "goldenrod", "#daa520" },
+    { "greenyellow", "#adff2f" },
+    { "grey", "#808080" },
+    { "honeydew", "#f0fff0" },
+    { "hotpink", "#ff69b4" },
+    { "indianred", "#cd5c5c" },
+    { "indigo", "#4b0082" },
+    { "ivory", "#fffff0" },
+    { "khaki", "#f0e68c" },
+    { "lavender", "#e6e6fa" },
+    { "lavenderblush", "#fff0f5" },
+    { "lawngreen", "#7cfc00" },
+    { "lemonchiffon", "#fffacd" },
+    { "lightblue", "#add8e6" },
+    { "lightcoral", "#f08080" },
+    { "lightcyan", "#e0ffff" },
+    { "lightgoldenrodyellow", "#fafad2" },
+    { "lightgray", "#d3d3d3" },
+    { "lightgreen", "#90ee90" },
+    { "lightgrey", "#d3d3d3" },
+    { "lightpink", "#ffb6c1" },
+    { "lightsalmon", "#ffa07a" },
+    { "lightseagreen", "#20b2aa" },
+    { "lightskyblue", "#87cefa" },
+    { "lightslategray", "#778899" },
+    { "lightslategrey", "#778899" },
+    { "lightsteelblue", "#b0c4de" },
+    { "lightyellow", "#ffffe0" },
+    { "limegreen", "#32cd32" },
+    { "linen", "#faf0e6" },
+    { "magenta", "#ff00ff" },
+    { "mediumaquamarine", "#66cdaa" },
+    { "mediumblue", "#0000cd" },
+    { "mediumorchid", "#ba55d3" },
+    { "mediumpurple", "#9370db" },
+    { "mediumseagreen", "#3cb371" },
+    { "mediumslateblue", "#7b68ee" },
+    { "mediumspringgreen", "#00fa9a" },
+    { "mediumturquoise", "#48d1cc" },
+    { "mediumvioletred", "#c71585" },
+    { "midnightblue", "#191970" },
+    { "mintcream", "#f5fffa" },
+    { "mistyrose", "#ffe4e1" },
+    { "moccasin", "#ffe4b5" },
+    { "navajowhite", "#ffdead" },
+    { "oldlace", "#fdf5e6" },
+    { "olivedrab", "#6b8e23" },
+    { "orange", "#ffa500" },
+    { "orangered", "#ff4500" },
+    { "orchid", "#da70d6" },
+    { "palegoldenrod", "#eee8aa" },
+    { "palegreen", "#98fb98" },
+    { "paleturquoise", "#afeeee" },
+    { "palevioletred", "#db7093" },
+    { "papayawhip", "#ffefd5" },
+    { "peachpuff", "#ffdab9" },
+    { "peru", "#cd853f" },
+    { "pink", "#ffc0cb" },
+    { "plum", "#dda0dd" },
+    { "powderblue", "#b0e0e6" },
+    { "rebeccapurple", "#663399" },
+    { "rosybrown", "#bc8f8f" },
+    { "royalblue", "#4169e1" },
+    { "saddlebrown", "#8b4513" },
+    { "salmon", "#fa8072" },
+    { "sandybrown", "#f4a460" },
+    { "seagreen", "#2e8b57" },
+    { "seashell", "#fff5ee" },
+    { "sienna", "#a0522d" },
+    { "skyblue", "#87ceeb" },
+    { "slateblue", "#6a5acd" },
+    { "slategray", "#708090" },
+    { "slategrey", "#708090" },
+    { "snow", "#fffafa" },
+    { "springgreen", "#00ff7f" },
+    { "steelblue", "#4682b4" },
+    { "tan", "#d2b48c" },
+    { "thistle", "#d8bfd8" },
+    { "tomato", "#ff6347" },
+    { "turquoise", "#40e0d0" },
+    { "violet", "#ee82ee" },
+    { "wheat", "#f5deb3" },
+    { "whitesmoke", "#f5f5f5" },
+    { "yellowgreen", "#9acd32" },
+    { NULL, NULL }
+};
+
+static ctmbstr GetColorCode(ctmbstr name, Bool use_css_colors)
 {
     unsigned int i;
 
@@ -17151,16 +20254,26 @@ static ctmbstr GetColorCode(ctmbstr name)
         if (TY_(tmbstrcasecmp)(name, colors[i].name) == 0)
             return colors[i].hex;
 
+    if (use_css_colors)
+        for (i = 0; extended_colors[i].name; ++i)
+            if (TY_(tmbstrcasecmp)(name, extended_colors[i].name) == 0)
+                return extended_colors[i].hex;
+
     return NULL;
 }
 
-static ctmbstr GetColorName(ctmbstr code)
+static ctmbstr GetColorName(ctmbstr code, Bool use_css_colors)
 {
     unsigned int i;
 
     for (i = 0; colors[i].name; ++i)
         if (TY_(tmbstrcasecmp)(code, colors[i].hex) == 0)
             return colors[i].name;
+
+    if (use_css_colors)
+        for (i = 0; extended_colors[i].name; ++i)
+            if (TY_(tmbstrcasecmp)(code, extended_colors[i].hex) == 0)
+                return extended_colors[i].name;
 
     return NULL;
 }
@@ -18415,13 +21528,19 @@ void CheckLength( TidyDocImpl* doc, Node *node, AttVal *attval)
     }
     else
     {
+        Bool percentFound = no;
         while (*p)
         {
-            if (!TY_(IsDigit)(*p) && *p != '%')
+            if (!percentFound && *p == '%')
+            {
+                percentFound = yes;
+            }
+            else if (percentFound || !TY_(IsDigit)(*p))
             {
                 TY_(ReportAttrError)( doc, node, attval, BAD_ATTRIBUTE_VALUE);
                 break;
             }
+
             ++p;
         }
     }
@@ -18568,7 +21687,7 @@ void CheckColor( TidyDocImpl* doc, Node *node, AttVal *attval)
 
     if (valid && given[0] == '#' && cfgBool(doc, TidyReplaceColor))
     {
-        ctmbstr newName = GetColorName(given);
+        ctmbstr newName = GetColorName(given, TY_(IsHTML5Mode)(doc));
 
         if (newName)
         {
@@ -18579,7 +21698,7 @@ void CheckColor( TidyDocImpl* doc, Node *node, AttVal *attval)
 
     /* if it is not a valid color code, it is a color name */
     if (!valid)
-        valid = GetColorCode(given) != NULL;
+        valid = GetColorCode(given, TY_(IsHTML5Mode)(doc)) != NULL;
 
     if (valid && given[0] == '#')
         attval->value = TY_(tmbstrtoupper)(attval->value);
@@ -18628,6 +21747,13 @@ void CheckLang( TidyDocImpl* doc, Node *node, AttVal *attval)
     }
 }
 
+/* checks loading attribute */
+void CheckLoading( TidyDocImpl* doc, Node *node, AttVal *attval)
+{
+    ctmbstr const values[] = {"lazy", "eager", NULL};
+    CheckAttrValidity( doc, node, attval, values );
+}
+
 /* checks type attribute */
 void CheckType( TidyDocImpl* doc, Node *node, AttVal *attval)
 {
@@ -18669,6 +21795,180 @@ void CheckType( TidyDocImpl* doc, Node *node, AttVal *attval)
             TY_(ReportAttrError)( doc, node, attval, BAD_ATTRIBUTE_VALUE);
     }
     return;
+}
+
+static void CheckDecimal( TidyDocImpl* doc, Node *node, AttVal *attval)
+{
+    tmbstr p;
+    Bool hasPoint = no;
+
+    p  = attval->value;
+
+    /* Allow leading sign */
+    if (*p == '+' || *p == '-')
+        ++p;
+
+    while (*p)
+    {
+        /* Allow a single decimal point */
+        if (*p == '.')
+        {
+            if (!hasPoint)
+                hasPoint = yes;
+            else
+                TY_(ReportAttrError)( doc, node, attval, BAD_ATTRIBUTE_VALUE);
+                break;
+        }
+        
+        if (!TY_(IsDigit)(*p))
+        {
+            TY_(ReportAttrError)( doc, node, attval, BAD_ATTRIBUTE_VALUE);
+            break;
+        }
+        ++p;
+    }
+}
+
+static Bool IsSvgPaintAttr(AttVal *attval)
+{
+    return attrIsCOLOR(attval)
+        || attrIsSVG_FILL(attval)
+        || attrIsSVG_FILLRULE(attval)
+        || attrIsSVG_STROKE(attval)
+        || attrIsSVG_STROKEDASHARRAY(attval)
+        || attrIsSVG_STROKEDASHOFFSET(attval)
+        || attrIsSVG_STROKELINECAP(attval)
+        || attrIsSVG_STROKELINEJOIN(attval)
+        || attrIsSVG_STROKEMITERLIMIT(attval)
+        || attrIsSVG_STROKEWIDTH(attval)
+        || attrIsSVG_COLORINTERPOLATION(attval)
+        || attrIsSVG_COLORRENDERING(attval)
+        || attrIsSVG_OPACITY(attval)
+        || attrIsSVG_STROKEOPACITY(attval)
+        || attrIsSVG_FILLOPACITY(attval);
+}
+
+/* Check SVG attributes */
+static void CheckSvgAttr( TidyDocImpl* doc, Node *node, AttVal *attval)
+{
+    if (!nodeIsSVG(node))
+    {
+        TY_(ReportAttrError)(doc, node, attval, ATTRIBUTE_IS_NOT_ALLOWED);
+        return;
+    }
+
+    /* Issue #903 - check SVG paint attributes */
+    if (IsSvgPaintAttr(attval))
+    {
+        /* all valid paint attributes have values */
+        if (!AttrHasValue(attval))
+        {
+            TY_(ReportAttrError)(doc, node, attval, MISSING_ATTR_VALUE);
+            return;
+        }
+        /* all paint attributes support an 'inherit' value,
+        per https://dev.w3.org/SVG/profiles/1.1F2/publish/painting.html#SpecifyingPaint */
+        if (AttrValueIs(attval, "inherit"))
+        {
+            return;
+        }
+
+        /* check paint datatypes
+        see https://dev.w3.org/SVG/profiles/1.1F2/publish/painting.html#SpecifyingPaint
+        */
+        if (attrIsSVG_FILL(attval) || attrIsSVG_STROKE(attval))
+        {
+            /* TODO: support funciri */
+            static ctmbstr const values[] = {
+                "none", "currentColor", NULL};
+
+            if (AttrValueIsAmong(attval, values))
+                CheckLowerCaseAttrValue(doc, node, attval);
+            else
+                CheckColor(doc, node, attval);
+        } 
+        else if (attrIsSVG_FILLRULE(attval))
+        {
+            static ctmbstr const values[] = {"nonzero", "evenodd", NULL};
+
+            if (AttrValueIsAmong(attval, values))
+                CheckLowerCaseAttrValue(doc, node, attval);
+            else
+                TY_(ReportAttrError)(doc, node, attval, BAD_ATTRIBUTE_VALUE);
+        }
+        else if (attrIsSVG_STROKEDASHARRAY(attval))
+        {
+            static ctmbstr const values[] = {"none", NULL};
+
+            if (AttrValueIsAmong(attval, values))
+                CheckLowerCaseAttrValue(doc, node, attval);
+            else
+            {
+                /* TODO: process dash arrays */
+            }
+        }
+        else if (attrIsSVG_STROKEDASHOFFSET(attval))
+        {
+            CheckLength(doc, node, attval);
+        }
+        else if (attrIsSVG_STROKELINECAP(attval))
+        {
+            static ctmbstr const values[] = {"butt", "round", "square", NULL};
+
+            if (AttrValueIsAmong(attval, values))
+                CheckLowerCaseAttrValue(doc, node, attval);
+            else
+                TY_(ReportAttrError)(doc, node, attval, BAD_ATTRIBUTE_VALUE);
+        }
+        else if (attrIsSVG_STROKELINEJOIN(attval))
+        {
+            static ctmbstr const values[] = {"miter", "round", "bevel", NULL};
+
+            if (AttrValueIsAmong(attval, values))
+                CheckLowerCaseAttrValue(doc, node, attval);
+            else
+                TY_(ReportAttrError)(doc, node, attval, BAD_ATTRIBUTE_VALUE);
+        }
+        else if (attrIsSVG_STROKEMITERLIMIT(attval))
+        {
+            CheckNumber(doc, node, attval);
+        }
+        else if (attrIsSVG_STROKEWIDTH(attval))
+        {
+            CheckLength(doc, node, attval);
+        }
+        else if (attrIsSVG_COLORINTERPOLATION(attval))
+        {
+            static ctmbstr const values[] = {"auto", "sRGB", "linearRGB", NULL};
+
+            if (AttrValueIsAmong(attval, values))
+                CheckLowerCaseAttrValue(doc, node, attval);
+            else
+                TY_(ReportAttrError)(doc, node, attval, BAD_ATTRIBUTE_VALUE);
+        }
+        else if (attrIsSVG_COLORRENDERING(attval))
+        {
+            static ctmbstr const values[] = {
+                "auto", "optimizeSpeed", "optimizeQuality", NULL};
+
+            if (AttrValueIsAmong(attval, values))
+                CheckLowerCaseAttrValue(doc, node, attval);
+            else
+                TY_(ReportAttrError)(doc, node, attval, BAD_ATTRIBUTE_VALUE);
+        }
+        else if(attrIsSVG_OPACITY(attval))
+        {
+            CheckDecimal(doc, node, attval);
+        }
+        else if(attrIsSVG_STROKEOPACITY(attval))
+        {
+            CheckDecimal(doc, node, attval);
+        }
+        else if(attrIsSVG_FILLOPACITY(attval))
+        {
+            CheckDecimal(doc, node, attval);
+        }
+    }
 }
 
 static
@@ -21890,6 +25190,9 @@ static Node* PruneSection( TidyDocImpl* doc, Node *node )
 
     for (;;)
     {
+        if (node == NULL)
+            return NULL;
+        
         ctmbstr lexbuf = lexer->lexbuf + node->start;
         if ( TY_(tmbstrncmp)(lexbuf, "if !supportEmptyParas", 21) == 0 )
         {
@@ -22142,8 +25445,7 @@ void TY_(CleanWord2000)( TidyDocImpl* doc, Node *node)
         if ( nodeIsHTML(node) )
         {
             /* check that it's a Word 2000 document */
-            if ( !TY_(GetAttrByName)(node, "xmlns:o") &&
-                 !cfgBool(doc, TidyMakeBare) )
+            if ( !TY_(IsWord2000) (doc) ) /* Is. #896 */
                 return;
 
             /* Output proprietary attributes to maintain errout compatability
@@ -23033,6 +26335,37 @@ void TY_(CleanStyle)(TidyDocImpl* doc, Node *html)
  */
 
 /*
+ * CleanHead - clean the head node, if it exists, and we
+ * are going to show it in the output.
+ * Issue #692 - Remove multiple title elements
+ */
+void TY_(CleanHead)(TidyDocImpl* doc)
+{
+    Node *head, *node, *next;
+    unsigned int titles = 0;
+    if (cfgAutoBool(doc, TidyBodyOnly) == TidyYesState)
+        return; /* not going to show head, so forget it */
+    head = TY_(FindHEAD)(doc);
+    if (!head)
+        return;
+    node = head->content;
+    while (node)
+    {
+        next = node->next;  /* get any 'next' */
+        if (nodeIsTITLE(node))
+        {
+            titles++;
+            if (titles > 1)
+            {
+                TY_(Report)(doc, head, node, DISCARDING_UNEXPECTED);
+                TY_(DiscardElement)(doc, node); /* delete this node */
+            }
+        }
+        node = next;
+    }
+}
+
+/*
  * DISABLEDLOCALVARIABLES
  * mode: c
  * indent-tabs-mode: nil
@@ -23307,7 +26640,7 @@ static const TidyOptionImpl option_defs[] =
     { TidyWrapAttVals,             PP, "wrap-attributes",             BL, no,              ParsePickList,     &boolPicks          },
     { TidyWrapJste,                PP, "wrap-jste",                   BL, yes,             ParsePickList,     &boolPicks          },
     { TidyWrapLen,                 PP, "wrap",                        IN, 68,              ParseInt,          NULL                },
-    { TidyWrapPhp,                 PP, "wrap-php",                    BL, yes,             ParsePickList,     &boolPicks          },
+    { TidyWrapPhp,                 PP, "wrap-php",                    BL, no,              ParsePickList,     &boolPicks          },
     { TidyWrapScriptlets,          PP, "wrap-script-literals",        BL, no,              ParsePickList,     &boolPicks          },
     { TidyWrapSection,             PP, "wrap-sections",               BL, yes,             ParsePickList,     &boolPicks          },
     { TidyWriteBack,               IO, "write-back",                  BL, no,              ParsePickList,     &boolPicks          },
@@ -23346,7 +26679,6 @@ static const struct {
 
 
 /* forward declarations */
-static void AdjustConfig( TidyDocImpl* doc );
 static Bool GetPickListValue( ctmbstr value, PickListItems* pickList, unsigned int *result );
 
 
@@ -23755,7 +27087,11 @@ void TY_(TakeConfigSnapshot)( TidyDocImpl* doc )
     const TidyOptionValue* value = &doc->config.value[ 0 ];
     TidyOptionValue* snap  = &doc->config.snapshot[ 0 ];
 
-    AdjustConfig( doc );  /* Make sure it's consistent */
+    /* @jsd: do NOT mess with user-specified settings until
+     *       absolutely necessary, and ensure that we can
+     *       can restore them immediately after the need.
+     */
+    // TY_(AdjustConfig)( doc );  /* Make sure it's consistent */
     for ( ixVal=0; ixVal < N_TIDY_OPTIONS; ++option, ++ixVal )
     {
         assert( ixVal == (unsigned int) option->id );
@@ -23804,7 +27140,12 @@ void TY_(CopyConfig)( TidyDocImpl* docTo, TidyDocImpl* docFrom )
         }
         if ( needReparseTagsDecls )
             ReparseTagDecls( docTo, changedUserTags  );
-        AdjustConfig( docTo );  /* Make sure it's consistent */
+        
+        /* @jsd: do NOT mess with user-specified settings until
+         *       absolutely necessary, and ensure that we can
+         *       can restore them immediately after the need.
+         */
+        // TY_(AdjustConfig)( docTo );  /* Make sure it's consistent */
     }
 }
 
@@ -24116,7 +27457,11 @@ int TY_(ParseConfigFileEnc)( TidyDocImpl* doc, ctmbstr file, ctmbstr charenc )
     if ( fname != (tmbstr) file )
         TidyDocFree( doc, fname );
 
-    AdjustConfig( doc );
+    /* @jsd: do NOT mess with user-specified settings until
+     *       absolutely necessary, and ensure that we can
+     *       can restore them immediately after the need.
+     */
+    // TY_(AdjustConfig)( docTo );  /* Make sure it's consistent */
 
     /* any new config errors? If so, return warning status. */
     return (doc->optionErrors > opterrs ? 1 : 0); 
@@ -24256,7 +27601,7 @@ Bool  TY_(AdjustCharEncoding)( TidyDocImpl* doc, int encoding )
 
 
 /* ensure that config is self consistent */
-static void AdjustConfig( TidyDocImpl* doc )
+void TY_(AdjustConfig)( TidyDocImpl* doc )
 {
     if ( cfgBool(doc, TidyEncloseBlockText) )
         TY_(SetOptionBool)( doc, TidyEncloseBodyText, yes );
@@ -27911,6 +31256,7 @@ Bool TY_(InlineDup1)( TidyDocImpl* doc, Node* node, Node* element )
 /* #include "language_pt_br.h" */
 /* #include "language_zh_cn.h" */
 /* #include "language_fr.h" */
+/* #include "language_de.h" */
 #endif
 
 
@@ -27922,7 +31268,7 @@ typedef struct {
     Bool manually_set;
     languageDefinition *currentLanguage;
     languageDefinition *fallbackLanguage;
-    languageDefinition *languages[8];
+    languageDefinition *languages[9];
 } tidyLanguagesType;
 
 
@@ -27945,6 +31291,7 @@ static tidyLanguagesType tidyLanguages = {
         &language_pt_br,
         &language_zh_cn,
         &language_fr,
+        &language_de,
 #endif
         NULL /* This array MUST be null terminated. */
     }
@@ -28198,7 +31545,7 @@ ctmbstr TY_(tidyLocalizedString)( unsigned int messageType )
  *  return it if there's no other match.
  *  @note this routine uses default allocator, see tidySetMallocCall.
  */
-tmbstr TY_(tidyNormalizedLocaleName)( ctmbstr locale )
+static tmbstr TY_(tidyNormalizedLocaleName)( ctmbstr locale )
 {
     unsigned int i;
     unsigned int len;
@@ -28255,7 +31602,7 @@ tmbstr TY_(tidyNormalizedLocaleName)( ctmbstr locale )
  *  Returns the languageDefinition if the languageCode is installed in Tidy,
  *  otherwise return NULL
  */
-languageDefinition *TY_(tidyTestLanguage)( ctmbstr languageCode )
+static languageDefinition *TY_(tidyTestLanguage)( ctmbstr languageCode )
 {
     unsigned int i;
     languageDefinition *testLang;
@@ -28287,7 +31634,7 @@ languageDefinition *TY_(tidyTestLanguage)( ctmbstr languageCode )
  *          true. However the opposite is not true; if es is requested but
  *          not present, Tidy will not try to select from the es_XX variants.
  */
-Bool TY_(tidySetLanguage)( ctmbstr languageCode )
+TY_PRIVATE Bool TY_(tidySetLanguage)( ctmbstr languageCode )
 {
     languageDefinition *dict1 = NULL;
     languageDefinition *dict2 = NULL;
@@ -28340,7 +31687,7 @@ Bool TY_(tidySetLanguage)( ctmbstr languageCode )
 /**
  *  Gets the current language used by Tidy.
  */
-ctmbstr TY_(tidyGetLanguage)()
+TY_PRIVATE ctmbstr TY_(tidyGetLanguage)()
 {
     languageDefinition *langDef = tidyLanguages.currentLanguage;
     languageDictionary *langDict = &langDef->messages;
@@ -28352,7 +31699,7 @@ ctmbstr TY_(tidyGetLanguage)()
  *  Indicates whether or not the current language was set by a
  *  LibTidy user (yes) or internally by the library (no).
  */
-Bool TY_(tidyGetLanguageSetByUser)()
+TY_PRIVATE Bool TY_(tidyGetLanguageSetByUser)()
 {
     return tidyLanguages.manually_set;
 }
@@ -28362,7 +31709,7 @@ Bool TY_(tidyGetLanguageSetByUser)()
  *  Specifies to LibTidy that the user (rather than the library)
  *  selected the current language.
  */
-void TY_(tidySetLanguageSetByUser)( void )
+TY_PRIVATE void TY_(tidySetLanguageSetByUser)( void )
 {
     tidyLanguages.manually_set = yes;
 }
@@ -28372,7 +31719,7 @@ void TY_(tidySetLanguageSetByUser)( void )
  *  Provides a string given `messageType` in the default
  *  localization (which is `en`), for single plural form.
  */
-ctmbstr TY_(tidyDefaultString)( unsigned int messageType )
+TY_PRIVATE ctmbstr TY_(tidyDefaultString)( unsigned int messageType )
 {
     return tidyLocalizedStringImpl( messageType, &language_en, 1);
 }
@@ -28403,7 +31750,7 @@ static const unsigned int tidyStringKeyListSize()
  *  these are provided for documentation generation purposes
  *  and probably aren't useful for LibTidy implementors.
  */
-TidyIterator TY_(getStringKeyList)()
+TY_PRIVATE TidyIterator TY_(getStringKeyList)()
 {
     return (TidyIterator)(size_t)1;
 }
@@ -28414,7 +31761,7 @@ TidyIterator TY_(getStringKeyList)()
  *  generation purposes and probably aren't useful to
  *  libtidy implementors.
  */
-unsigned int TY_(getNextStringKey)( TidyIterator* iter )
+TY_PRIVATE unsigned int TY_(getNextStringKey)( TidyIterator* iter )
 {
     unsigned int item = 0;
     size_t itemIndex;
@@ -28456,7 +31803,7 @@ static const unsigned int tidyLanguageListSize()
  *  in Tidy's structure of Windows<->POSIX local mapping.
  *  Items can be retrieved with getNextWindowsLanguage();
  */
-TidyIterator TY_(getWindowsLanguageList)()
+TY_PRIVATE TidyIterator TY_(getWindowsLanguageList)()
 {
     return (TidyIterator)(size_t)1;
 }
@@ -28465,7 +31812,7 @@ TidyIterator TY_(getWindowsLanguageList)()
  *  Returns the next record of type `localeMapItem` in
  *  Tidy's structure of Windows<->POSIX local mapping.
  */
-const tidyLocaleMapItemImpl *TY_(getNextWindowsLanguage)( TidyIterator *iter )
+TY_PRIVATE const tidyLocaleMapItemImpl *TY_(getNextWindowsLanguage)( TidyIterator *iter )
 {
     const tidyLocaleMapItemImpl *item = NULL;
     size_t itemIndex;
@@ -28487,7 +31834,7 @@ const tidyLocaleMapItemImpl *TY_(getNextWindowsLanguage)( TidyIterator *iter )
 /**
  *  Given a `tidyLocaleMapItemImpl, return the Windows name.
  */
-ctmbstr TY_(TidyLangWindowsName)( const tidyLocaleMapItemImpl *item )
+TY_PRIVATE ctmbstr TY_(TidyLangWindowsName)( const tidyLocaleMapItemImpl *item )
 {
     return item->winName;
 }
@@ -28496,7 +31843,7 @@ ctmbstr TY_(TidyLangWindowsName)( const tidyLocaleMapItemImpl *item )
 /**
  *  Given a `tidyLocaleMapItemImpl, return the POSIX name.
  */
-ctmbstr TY_(TidyLangPosixName)( const tidyLocaleMapItemImpl *item )
+TY_PRIVATE ctmbstr TY_(TidyLangPosixName)( const tidyLocaleMapItemImpl *item )
 {
     return item->POSIXName;
 }
@@ -28524,7 +31871,7 @@ static const unsigned int tidyInstalledLanguageListSize()
  *  in Tidy's list of installed language codes.
  *  Items can be retrieved with getNextInstalledLanguage();
  */
-TidyIterator TY_(getInstalledLanguageList)()
+TY_PRIVATE TidyIterator TY_(getInstalledLanguageList)()
 {
     return (TidyIterator)(size_t)1;
 }
@@ -28532,7 +31879,7 @@ TidyIterator TY_(getInstalledLanguageList)()
 /**
  *  Returns the next installed language.
  */
-ctmbstr TY_(getNextInstalledLanguage)( TidyIterator* iter )
+TY_PRIVATE ctmbstr TY_(getNextInstalledLanguage)( TidyIterator* iter )
 {
     ctmbstr item = NULL;
     size_t itemIndex;
@@ -28549,6 +31896,11 @@ ctmbstr TY_(getNextInstalledLanguage)( TidyIterator* iter )
     *iter = (TidyIterator)( itemIndex <= tidyInstalledLanguageListSize() ? itemIndex : (size_t)0 );
     return item;
 }
+
+/*
+ * end:
+ */
+
 /* lexer.c -- Lexer for html parser
   
   (c) 1998-2008 (W3C) MIT, ERCIM, Keio University
@@ -29498,12 +32850,15 @@ static void AddByte( Lexer *lexer, tmbchar ch )
     {
         tmbstr buf = NULL;
         unsigned int allocAmt = lexer->lexlength;
+        unsigned int prev = allocAmt; /* Is. #761 */
         while ( lexer->lexsize + 2 >= allocAmt )
         {
             if ( allocAmt == 0 )
                 allocAmt = 8192;
             else
                 allocAmt *= 2;
+            if (allocAmt < prev) /* Is. #761 - watch for wrap - and */
+                TidyPanic(lexer->allocator, "\nPanic: out of internal memory!\nDocument input too big!\n");
         }
         buf = (tmbstr) TidyRealloc( lexer->allocator, lexer->lexbuf, allocAmt );
         if ( buf )
@@ -29583,7 +32938,7 @@ static SPStatus GetSurrogatePair(TidyDocImpl* doc, Bool isXml, unsigned int *pch
 {
     Lexer* lexer = doc->lexer;
     unsigned int bufSize = 32;
-    unsigned int c, ch, offset = 0;
+    unsigned int c, ch = 0, offset = 0;
     tmbstr buf = 0;
     SPStatus status = SP_error;  /* assume failed */
     int type = 0;   /* assume numeric */
@@ -29636,13 +32991,15 @@ static SPStatus GetSurrogatePair(TidyDocImpl* doc, Bool isXml, unsigned int *pch
 
     if (c == ';')
     {
+        int scanned;
+
         buf[offset] = 0;
         if (type)
-            sscanf(buf + 2, "%x", &ch);
+            scanned = sscanf(buf + 2, "%x", &ch);
         else
-            sscanf(buf + 1, "%d", &ch);
+            scanned = sscanf(buf + 1, "%d", &ch);
 
-        if (TY_(IsHighSurrogate)(ch))
+        if (scanned == 1 && TY_(IsHighSurrogate)(ch))
         {
             ch = TY_(CombineSurrogatePair)(ch, fch);
             if (TY_(IsValidCombinedChar)(ch))
@@ -30379,7 +33736,11 @@ static unsigned int FindGivenVersion( TidyDocImpl* doc, Node* doctype )
 
     if (!fpi || !fpi->value) 
     {
-        if (doctype->element && (TY_(tmbstrcmp)(doctype->element,"html") == 0))
+        /*\
+         * Is. #815 - change to case-insensitive test
+         * See REC: https://www.w3.org/TR/html5/syntax.html#the-doctype
+        \*/
+        if (doctype->element && (TY_(tmbstrcasecmp)(doctype->element,"html") == 0))
         {
             return VERS_HTML5;  /* TODO: do we need to check MORE? */
         }
@@ -31245,10 +34606,9 @@ static Node* GetTokenFromStream( TidyDocImpl* doc, GetTokenMode mode )
                         }
 
                         /*
-                           We only print this message if there's a missing
-                           starting hyphen; this comment will be dropped.
+                           TY_(Report)(doc, NULL, NULL, MALFORMED_COMMENT_DROPPING );
+                           Warning now done later - see issue #487
                          */
-                        TY_(Report)(doc, NULL, NULL, MALFORMED_COMMENT_DROPPING );
                     }
                     else if (c == 'd' || c == 'D')
                     {
@@ -31321,6 +34681,11 @@ static Node* GetTokenFromStream( TidyDocImpl* doc, GetTokenMode mode )
                     }
 
 
+                    /*
+                       We only print this message if there's a missing
+                       starting hyphen; this comment will be dropped.
+                     */
+                    TY_(Report)(doc, NULL, NULL, MALFORMED_COMMENT_DROPPING ); /* Is. #487 */
 
                     /* else swallow characters up to and including next '>' */
                     while ((c = TY_(ReadChar)(doc->docIn)) != '>')
@@ -31814,6 +35179,22 @@ static Node* GetTokenFromStream( TidyDocImpl* doc, GetTokenMode mode )
 
                     if (!name)
                     {
+                        /* check if attributes are created by ASP markup */
+                        if (asp)
+                        {
+                            av = TY_(NewAttribute)(doc);
+                            av->asp = asp;
+                            AddAttrToList( &attributes, av ); 
+                        }
+
+                        /* check if attributes are created by PHP markup */
+                        if (php)
+                        {
+                            av = TY_(NewAttribute)(doc);
+                            av->php = php;
+                            AddAttrToList( &attributes, av ); 
+                        }
+                      
                         /* fix for http://tidy.sf.net/bug/788031 */
                         lexer->lexsize -= 1;
                         lexer->txtend = lexer->txtstart;
@@ -31868,7 +35249,11 @@ static Node* GetTokenFromStream( TidyDocImpl* doc, GetTokenMode mode )
                     }
                 }
 
-                if (c != ']')
+                if (c == '>')
+                {
+                    /* Is. #462 - reached '>' before ']' */
+                    TY_(UngetChar)(c, doc->docIn);
+                } else if (c != ']')
                     continue;
 
                 /* now look for '>' */
@@ -31991,6 +35376,10 @@ static Node* GetTokenFromStream( TidyDocImpl* doc, GetTokenMode mode )
         GTDBG(doc,"COMMENT", node);
         return node;  /* the COMMENT token */
     }
+
+    /* check attributes before return NULL */
+    if (attributes)
+        TY_(FreeAttribute)( doc, attributes );
 
     DEBUG_LOG(SPRTF("Returning NULL...\n"));
     return NULL;
@@ -33691,6 +37080,7 @@ static struct _dispatchTable {
     { WHITE_IN_URI,                 TidyWarning,     formatAttributeReport   },
     { XML_DECLARATION_DETECTED,     TidyWarning,     formatStandard          },
     { XML_ID_SYNTAX,                TidyWarning,     formatAttributeReport   },
+    { BLANK_TITLE_ELEMENT,          TidyWarning,     formatStandard          },
 
     { APPLET_MISSING_ALT,                            TidyAccess, formatAccessReport },
     { AREA_MISSING_ALT,                              TidyAccess, formatAccessReport },
@@ -34138,6 +37528,7 @@ TidyMessageImpl *formatStandard(TidyDocImpl* doc, Node *element, Node *node, uns
         case NESTED_QUOTATION:
         case SUSPECTED_MISSING_QUOTE:
         case XML_DECLARATION_DETECTED:
+        case BLANK_TITLE_ELEMENT:
             return TY_(tidyMessageCreateWithNode)(doc, rpt, code, level );
 
         case ELEMENT_NOT_EMPTY:
@@ -34172,8 +37563,10 @@ TidyMessageImpl *formatStandard(TidyDocImpl* doc, Node *element, Node *node, uns
 
         case COERCE_TO_ENDTAG:
         case NON_MATCHING_ENDTAG:
-        case TOO_MANY_ELEMENTS_IN:
             return TY_(tidyMessageCreateWithNode)(doc, rpt, code, level, node->element, node->element );
+        case TOO_MANY_ELEMENTS_IN:
+            return TY_(tidyMessageCreateWithNode)(doc, rpt, code, level, node->element, element->element);
+
     }
 
     return NULL;
@@ -34388,7 +37781,7 @@ static struct _dialogueDispatchTable {
 ** every message, because they're not all the complex and there aren't that
 ** many.
 */
-TidyMessageImpl *formatDialogue( TidyDocImpl* doc, unsigned int code, TidyReportLevel level, va_list args )
+static TidyMessageImpl *formatDialogue( TidyDocImpl* doc, unsigned int code, TidyReportLevel level, va_list args )
 {
     switch (code)
     {
@@ -35568,6 +38961,7 @@ static struct printfArg* BuildArgArray( TidyDocImpl *doc, ctmbstr fmt, va_list a
         else
         {
             strncpy(nas[cn].format, fmt + nas[cn].formatStart, nas[cn].formatLength);
+            nas[cn].format[nas[cn].formatLength] = 0; /* Is. #800 - If count <= srcLen, no 0 added! */
         }
         
 
@@ -37130,7 +40524,7 @@ void TY_(ParseNamespace)(TidyDocImpl* doc, Node *basenode, GetTokenMode mode)
 }
 
 
-void TY_(ParseInline)( TidyDocImpl* doc, Node *element, GetTokenMode mode )
+TY_PRIVATE void TY_(ParseInline)( TidyDocImpl* doc, Node *element, GetTokenMode mode )
 {
 #if defined(ENABLE_DEBUG_LOG)
     static int in_parse_inline = 0;
@@ -39332,7 +42726,7 @@ void TY_(ParseHead)(TidyDocImpl* doc, Node *head, GetTokenMode ARG_UNUSED(mode))
  *  Issue #166 - repeated <main> element
  *  But this service is generalised to check for other duplicate elements
 \*/
-Bool TY_(FindNodeWithId)( Node *node, TidyTagId tid )
+static Bool TY_(FindNodeWithId)( Node *node, TidyTagId tid )
 {
     Node *content;
     while (node)
@@ -39362,7 +42756,7 @@ Bool TY_(FindNodeWithId)( Node *node, TidyTagId tid )
  *  Issue #166 - repeated <main> element
  *  Do a global search for an element
 \*/
-Bool TY_(FindNodeById)( TidyDocImpl* doc, TidyTagId tid )
+static Bool TY_(FindNodeById)( TidyDocImpl* doc, TidyTagId tid )
 {
     Node *node = (doc ? doc->root.content : NULL);
     return TY_(FindNodeWithId)(node,tid);
@@ -40307,7 +43701,8 @@ void TY_(ParseDocument)(TidyDocImpl* doc)
         TY_(ParseHTML)(doc, html, IgnoreWhitespace);
     }
 
-    if (!TY_(FindTITLE)(doc))
+    node = TY_(FindTITLE)(doc);
+    if (!node)
     {
         Node* head = TY_(FindHEAD)(doc);
         /* #72, avoid MISSING_TITLE_ELEMENT if show-body-only (but allow InsertNodeAtEnd to avoid new warning) */
@@ -40316,6 +43711,14 @@ void TY_(ParseDocument)(TidyDocImpl* doc)
             TY_(Report)(doc, head, NULL, MISSING_TITLE_ELEMENT);
         }
         TY_(InsertNodeAtEnd)(head, TY_(InferredTag)(doc, TidyTag_TITLE));
+    }
+    else if (!node->content && !showingBodyOnly(doc))
+    {
+        /* Is #839 - warn node is blank in HTML5 */
+        if (TY_(IsHTML5Mode)(doc))
+        {
+            TY_(Report)(doc, node, NULL, BLANK_TITLE_ELEMENT);
+        }
     }
 
     AttributeChecks(doc, &doc->root);
@@ -41226,7 +44629,7 @@ static void PCondFlushLine( TidyDocImpl* doc, unsigned int indent )
  * These need to be used in the right place. In same cases `PFlushLine`
  * and `PCondFlushLine` should still be used.
  */
-void TY_(PFlushLineSmart)( TidyDocImpl* doc, unsigned int indent )
+static void TY_(PFlushLineSmart)( TidyDocImpl* doc, unsigned int indent )
 {
     TidyPrintImpl* pprint = &doc->pprint;
 
@@ -42212,15 +45615,17 @@ static void PPrintPhp( TidyDocImpl* doc, unsigned int indent, Node *node )
 {
     TidyPrintImpl* pprint = &doc->pprint;
     Bool wrapPhp = cfgBool( doc, TidyWrapPhp );
-    unsigned int saveWrap = WrapOffCond( doc, !wrapPhp  );
+    /* unsigned int saveWrap = WrapOffCond( doc, !wrapPhp  ); */
 
     AddString( pprint, "<?" );
-    PPrintText( doc, (wrapPhp ? CDATA : COMMENT),
-                indent, node );
+    PPrintText( doc, CDATA, indent, node );
     AddString( pprint, "?>" );
 
-    /* PCondFlushLine( doc, indent ); */
-    WrapOn( doc, saveWrap );
+    /* Issue #437 - add a new line if 'wrap-php' is on */
+    if (wrapPhp)
+        PCondFlushLine( doc, indent ); 
+       
+    /* WrapOn( doc, saveWrap ); */
 }
 
 static void PPrintCDATA( TidyDocImpl* doc, unsigned int indent, Node *node )
@@ -44095,7 +47500,7 @@ static const unsigned int Mac2Unicode[128] =
 /* Function to convert from MacRoman to Unicode */
 unsigned int TY_(DecodeMacRoman)(unsigned int c)
 {
-    if (127 < c)
+    if (127 < c && c < 256) /* Is. #891 */
         c = Mac2Unicode[c - 128];
     return c;
 }
@@ -44174,7 +47579,7 @@ static void EncodeIbm858( unsigned int c, StreamOut* out )
 /* Convert from Latin0 (aka Latin9, ISO-8859-15) to Unicode */
 static unsigned int DecodeLatin0(unsigned int c)
 {
-    if (159 < c && c < 191)
+    if (163 < c && c < 191)
     {
         switch (c)
         {
@@ -44668,12 +48073,12 @@ static CheckAttribs CheckHTML;
 #define VERS_ELEM_MAIN       (xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50)
 #define VERS_ELEM_MARK       (xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50)
 #define VERS_ELEM_MENUITEM   (xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50)
-#define VERS_ELEM_KEYGEN     (xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50)
 #define VERS_ELEM_METER      (xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50)
 #define VERS_ELEM_NAV        (xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50)
 #define VERS_ELEM_OUTPUT     (xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50)
 #define VERS_ELEM_PROGRESS   (xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50)
 #define VERS_ELEM_SECTION    (xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50)
+#define VERS_ELEM_SLOT       (xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50)
 #define VERS_ELEM_SOURCE     (xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50)
 #define VERS_ELEM_SUMMARY    (xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50)
 #define VERS_ELEM_TEMPLATE   (xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|xxxx|HT50|XH50)
@@ -44844,9 +48249,10 @@ static Dict tag_defs[] =
   { TidyTag_OUTPUT,      "output",       VERS_ELEM_OUTPUT,      &TY_(W3CAttrsFor_OUTPUT)[0],      (CM_INLINE),                   TY_(ParseInline),    NULL           },
   { TidyTag_PROGRESS,    "progress",     VERS_ELEM_PROGRESS,    &TY_(W3CAttrsFor_PROGRESS)[0],    (CM_INLINE),                   TY_(ParseInline),    NULL           },
   { TidyTag_SECTION,     "section",      VERS_ELEM_SECTION,     &TY_(W3CAttrsFor_SECTION)[0],     (CM_BLOCK),                    TY_(ParseBlock),     NULL           },
+  { TidyTag_SLOT,        "slot",         VERS_ELEM_SLOT,        &TY_(W3CAttrsFor_SLOT)[0],        (CM_BLOCK|CM_INLINE|CM_MIXED), TY_(ParseBlock),     NULL           },
   { TidyTag_SOURCE,      "source",       VERS_ELEM_SOURCE,      &TY_(W3CAttrsFor_SOURCE)[0],      (CM_BLOCK|CM_INLINE|CM_EMPTY), TY_(ParseBlock),     NULL           },
-  { TidyTag_SUMMARY,     "summary",      VERS_ELEM_SUMMARY,     &TY_(W3CAttrsFor_SUMMARY)[0],     (CM_BLOCK),                    TY_(ParseInline),    NULL           },
-  { TidyTag_TEMPLATE,    "template",     VERS_ELEM_TEMPLATE,    &TY_(W3CAttrsFor_TEMPLATE)[0],    (CM_BLOCK),                    TY_(ParseBlock),     NULL           },
+  { TidyTag_SUMMARY,     "summary",      VERS_ELEM_SUMMARY,     &TY_(W3CAttrsFor_SUMMARY)[0],     (CM_BLOCK),                    TY_(ParseBlock),     NULL           }, /* Is. #895 */
+  { TidyTag_TEMPLATE,    "template",     VERS_ELEM_TEMPLATE,    &TY_(W3CAttrsFor_TEMPLATE)[0],    (CM_BLOCK|CM_HEAD),            TY_(ParseBlock),     NULL           },
   { TidyTag_TIME,        "time",         VERS_ELEM_TIME,        &TY_(W3CAttrsFor_TIME)[0],        (CM_INLINE),                   TY_(ParseInline),    NULL           },
   { TidyTag_TRACK,       "track",        VERS_ELEM_TRACK,       &TY_(W3CAttrsFor_TRACK)[0],       (CM_BLOCK|CM_EMPTY),           TY_(ParseBlock),     NULL           },
   { TidyTag_VIDEO,       "video",        VERS_ELEM_VIDEO,       &TY_(W3CAttrsFor_VIDEO)[0],       (CM_BLOCK|CM_INLINE),          TY_(ParseBlock),     NULL           },
@@ -46835,19 +50241,26 @@ int TIDY_CALL  tidyParseSource( TidyDoc tdoc, TidyInputSource* source )
     return tidyDocParseSource( doc, source );
 }
 
-
+#ifdef WIN32
+#define M_IS_DIR _S_IFDIR
+#else // !WIN32
+#define M_IS_DIR S_IFDIR
+#endif
 int   tidyDocParseFile( TidyDocImpl* doc, ctmbstr filnam )
 {
     int status = -ENOENT;
-    FILE* fin = fopen( filnam, "r+" );
-
-    if ( !fin )
+    FILE* fin = 0;
+    struct stat sbuf = { 0 }; /* Is. #681 - read-only files */
+    if ( stat(filnam,&sbuf) != 0 )
     {
         TY_(ReportFileError)( doc, filnam, FILE_NOT_FILE );
         return status;
     }
-
-    fclose( fin );
+    if (sbuf.st_mode & M_IS_DIR) /* and /NOT/ if a DIRECTORY */
+    {
+        TY_(ReportFileError)(doc, filnam, FILE_NOT_FILE);
+        return status;
+    }
 
 #ifdef _WIN32
     return TY_(DocParseFileWithMappedFile)( doc, filnam );
@@ -46857,7 +50270,6 @@ int   tidyDocParseFile( TidyDocImpl* doc, ctmbstr filnam )
 
 #if PRESERVE_FILE_TIMES
     {
-        struct stat sbuf = { 0 };
         /* get last modified time */
         TidyClearMemory(&doc->filetimes, sizeof(doc->filetimes));
         if (fin && cfgBool(doc, TidyKeepFileTimes) &&
@@ -47166,8 +50578,9 @@ int         TY_(DocParseStream)( TidyDocImpl* doc, StreamIn* in )
     assert( doc->docIn == NULL );
     doc->docIn = in;
 
-    TY_(ResetTags)(doc);    /* reset table to html5 mode */
-    TY_(TakeConfigSnapshot)( doc );    /* Save config state */
+    TY_(ResetTags)(doc);             /* Reset table to html5 mode */
+    TY_(TakeConfigSnapshot)( doc );  /* Save config state */
+    TY_(AdjustConfig)( doc );        /* Ensure config internal consistency */
     TY_(FreeAnchors)( doc );
 
     TY_(FreeNode)(doc, &doc->root);
@@ -47281,7 +50694,7 @@ static struct _html5Info
     { "tt", TidyTag_TT },
     { 0, 0 }
 };
-Bool inRemovedInfo( unsigned int tid )
+static Bool inRemovedInfo( unsigned int tid )
 {
     int i;
     for (i = 0; ; i++) {
@@ -47329,7 +50742,7 @@ static Bool nodeHasAlignAttr( Node *node )
  *
  *  See also: http://www.whatwg.org/specs/web-apps/current-work/multipage/obsolete.html#obsolete
  */
-void TY_(CheckHTML5)( TidyDocImpl* doc, Node* node )
+static void TY_(CheckHTML5)( TidyDocImpl* doc, Node* node )
 {
     Bool clean = cfgBool( doc, TidyMakeClean );
     Bool already_strict = cfgBool( doc, TidyStrictTagsAttr );
@@ -47515,7 +50928,7 @@ void TY_(CheckHTML5)( TidyDocImpl* doc, Node* node )
  * The propriety checks are *always* run as they have always been an integral
  * part of Tidy. The version checks are controlled by `strict-tags-attributes`.
  */
-void TY_(CheckHTMLTagsAttribsVersions)( TidyDocImpl* doc, Node* node )
+static void TY_(CheckHTMLTagsAttribsVersions)( TidyDocImpl* doc, Node* node )
 {
     unsigned int versionEmitted = doc->lexer->versionEmitted;
     unsigned int declared = doc->lexer->doctype;
@@ -47584,7 +50997,8 @@ void TY_(CheckHTMLTagsAttribsVersions)( TidyDocImpl* doc, Node* node )
                 next_attr = attval->next;
 
                 attrIsProprietary = TY_(AttributeIsProprietary)(node, attval);
-                attrIsMismatched = check_versions ? TY_(AttributeIsMismatched)(node, attval, doc) : no;
+                /* Is. #729 - always check version match if HTML5 */
+                attrIsMismatched = (check_versions | htmlIs5) ? TY_(AttributeIsMismatched)(node, attval, doc) : no;
                 /* Let the PROPRIETARY_ATTRIBUTE warning have precedence. */
                 if ( attrIsProprietary )
                 {
@@ -47593,7 +51007,15 @@ void TY_(CheckHTMLTagsAttribsVersions)( TidyDocImpl* doc, Node* node )
                 }
                 else if ( attrIsMismatched )
                 {
-                    TY_(ReportAttrError)(doc, node, attval, attrReportType);
+                    if (htmlIs5) 
+                    { 
+                        /* Is. #729 - In html5 TidyStrictTagsAttr controls error or warn */
+                        TY_(ReportAttrError)(doc, node, attval,
+                            check_versions ? MISMATCHED_ATTRIBUTE_ERROR : MISMATCHED_ATTRIBUTE_WARN);
+                    }
+                    else
+                        TY_(ReportAttrError)(doc, node, attval, attrReportType);
+
                 }
 
                 /* @todo: do we need a new option to drop mismatches? Or should we
@@ -47873,6 +51295,8 @@ int         tidyDocCleanAndRepair( TidyDocImpl* doc )
         }
     }
 
+    TY_(CleanHead)(doc); /* Is #692 - discard multiple <title> tags */
+
 #if defined(ENABLE_DEBUG_LOG)
     SPRTF("All nodes AFTER clean and repair\n");
     dbg_show_all_nodes( doc, &doc->root, 0  );
@@ -47976,7 +51400,8 @@ int         tidyDocSaveStream( TidyDocImpl* doc, StreamOut* out )
         doc->docOut = NULL;
     }
 
-    TY_(ResetConfigToSnapshot)( doc );
+    /* @jsd: removing this should solve #673, and allow saving of the buffer multiple times. */
+//    TY_(ResetConfigToSnapshot)( doc );
     doc->pConfigChangeCallback = callback;
     
     return tidyDocStatus( doc );
@@ -48975,7 +52400,7 @@ int TY_(DecodeUTF8BytesToChar)( unsigned int* c, unsigned int firstByte, ctmbstr
        fprintf( stderr, "0x%02x ", firstByte );
        for (i = 1; i < bytes; i++)
            fprintf( stderr, "0x%02x ", buf[i - 1] );
-       fprintf( stderr, " = U+%04ulx\n", n );
+       fprintf( stderr, " = U+%04X\n", n );
     }
 #endif
 
@@ -49290,39 +52715,8 @@ void TagAllAttributes (const char ** yes_no)
 	yes_no[i] = attribute_defs[i].name;
     }
 }
-#if 0
-void get_option_doc (TidyOptionId ti, const char ** doc, const TidyOptionId ** xrefs)
-{
-    int i;
-    for (i = 0; i < sizeof (option_defs) / sizeof (TidyOptionDoc); i++) {
-	if (ti == option_defs[i].opt) {
-	    * doc = option_defs[i].doc;
-	    * xrefs = option_defs[i].links;
-	    return;
-	}
-    }
-    * doc = 0;
-    * xrefs = 0;
-    fprintf (stderr, "no doc for id %d\n", ti);
-}
 
-/* Reset the error counters back to zero. This doesn't seem to be
-   available in the API, so after parsing a file with an error, the
-   next file is listed as having an error too. Thus basically a tdoc
-   becomes non-functional after reading a file with an error. It seems
-   too obvious a bug to have been neglected, but I cannot find
-   anywhere in the API which does this trivial task. */
 
-void reset_doc (TidyDoc tdoc)
-{
-    TidyDocImpl* impl = tidyDocToImpl( tdoc );
-    impl->errors = 0;
-    impl->warnings = 0;
-    impl->accessErrors = 0;
-    impl->docErrors = 0;
-}
-
-#endif /* 0 */
 /* This works around compilation problems caused by three layers of
    macros in the original project. */
 

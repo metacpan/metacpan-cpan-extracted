@@ -66,7 +66,6 @@
 \bBuild.COM$
 \bBUILD.COM$
 \bbuild.com$
-^MANIFEST\.SKIP
 
 # Avoid archives of this distribution
 \bApp-Dochazka-Common-[\d\.\_]+
@@ -82,3 +81,6 @@
 # Avoid perlcritic, travis config files
 \B\.perlcriticrc\b
 \B\.travis.yml\b
+
+# Avoid bootstrap.sh
+\bbootstrap.sh$

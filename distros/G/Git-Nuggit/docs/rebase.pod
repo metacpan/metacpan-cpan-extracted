@@ -1,0 +1,17 @@
+=head1 NAME
+
+nuggit rebase 
+
+=head1 SYNOPSIS
+
+WARNING: Nuggit rebase support is untested in this release. Please report any bugs in the tracker.
+
+Usage of 'nuggit rebase' is equivalent to that of 'nuggit merge'.  Please refer to nuggit-merge(1) for usage details, or 'git rebase' for the underlying git commands.
+
+
+nuggit rebase [obj]
+
+ Options:
+   -help            brief help message
+   -man             full documentation
+

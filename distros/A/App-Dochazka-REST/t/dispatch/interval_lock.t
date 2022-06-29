@@ -366,7 +366,7 @@ EOH
     
     note( 'throw a couple curve balls: weirded object 2' );
     $weirded_object = "{ \"$idmap{$il}\" : \"!!!!!\", \"remark\" : \"down it goes\" }";
-    dbi_err( $test, 500, 'root', 'POST', $base, $weirded_object, qr/invalid input syntax for integer/ );
+    dbi_err( $test, 500, 'root', 'POST', $base, $weirded_object, qr/invalid input syntax for type integer/ );
     
     note( 'can a different active employee edit active\'s interval?' );
     note( 'let bubba try it' );

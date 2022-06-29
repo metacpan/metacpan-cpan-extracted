@@ -1,5 +1,8 @@
 Revision history for Catmandu-RIS
 
+0.13  2022-06-28 20:47:58 CEST
+  - refresh distro
+
 0.12  2019-04-25 10:22:42 CEST
   - add test for idempotency of exporter
   - respect more RIS tags
@@ -8,7 +11,7 @@ Revision history for Catmandu-RIS
   - minor pod improvements
   - avoid utf8 double encoding
   - Providing how to create a MARC 2 RIS mapping
- 
+
 0.10  2015-08-18 19:31:45 CEST
   - support for semi-automatic detection of separation characters at import
   - fixing previous_key import bug

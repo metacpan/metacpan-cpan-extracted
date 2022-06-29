@@ -604,6 +604,25 @@ sub siblings {
   ];
 }
 
+sub splice {
+  my ($self, $offset, $length, @list) = @_;
+
+  my $class = $self->class;
+  my $parts = $self->parts;
+
+  if (@list) {
+    CORE::splice(@{$parts}, $offset, $length, @list);
+  }
+  elsif (defined $length) {
+    CORE::splice(@{$parts}, $offset, $length);
+  }
+  elsif (defined $offset) {
+    CORE::splice(@{$parts}, $offset);
+  }
+
+  return $class->new(join '/', @$parts);
+}
+
 sub tryload {
   my ($self) = @_;
 
@@ -2353,6 +2372,81 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 splice
+
+  splice(Int $offset, Int $length, Any @list) (Space)
+
+The splice method perform a Perl L<perlfunc/splice> operation on the package
+namespace.
+
+I<Since C<0.09>>
+
+=over 4
+
+=item splice example 1
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/baz');
+
+  my $splice = $space->splice(1, 0, 'bar');
+
+  # bless({ value => "Foo/Bar/Baz" }, "Venus::Space")
+
+=back
+
+=over 4
+
+=item splice example 2
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/baz');
+
+  my $splice = $space->splice(1, 1);
+
+  # bless({ value => "Foo" }, "Venus::Space")
+
+=back
+
+=over 4
+
+=item splice example 3
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/baz');
+
+  my $splice = $space->splice(-2, 1);
+
+  # bless({ value => "Baz" }, "Venus::Space")
+
+=back
+
+=over 4
+
+=item splice example 4
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/baz');
+
+  my $splice = $space->splice(1);
+
+  # bless({ value => "Foo" }, "Venus::Space")
+
+=back
+
+=cut
+
 =head2 tryload
 
   tryload() (Bool)
@@ -2609,19 +2703,5 @@ I<Since C<0.01>>
   # 0.01
 
 =back
-
-=cut
-
-=head1 AUTHORS
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
-
-=head1 LICENSE
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
 
 =cut

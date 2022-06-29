@@ -4,7 +4,7 @@ HTTP::CSPHeader - manage dynamic content security policy headers
 
 # VERSION
 
-version v0.1.2
+version v0.1.3
 
 # SYNOPSIS
 
@@ -158,6 +158,10 @@ If you do not need the nonce, then you might consider using [Mojolicious::Plugin
 # SEE ALSO
 
 [https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy)
+
+[HTTP::SecureHeaders](https://metacpan.org/pod/HTTP%3A%3ASecureHeaders)
+
+[Plack::Middleware::CSP](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3ACSP)
 
 # SOURCE
 

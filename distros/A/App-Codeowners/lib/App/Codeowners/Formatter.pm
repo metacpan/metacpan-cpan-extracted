@@ -5,7 +5,7 @@ package App::Codeowners::Formatter;
 use warnings;
 use strict;
 
-our $VERSION = '0.50'; # VERSION
+our $VERSION = '0.51'; # VERSION
 
 use Module::Load;
 
@@ -120,7 +120,7 @@ App::Codeowners::Formatter - Base class for formatting codeowners output
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 SYNOPSIS
 
@@ -199,7 +199,7 @@ Destructor calls L</finish>.
 
     $formatter->add_result($result);
 
-Provide an additional lint result to be formatted.
+Provide an additional result to be formatted.
 
 =head2 start
 

@@ -529,6 +529,17 @@ Arguments to this function:
         If this key is present and true, aliasing is disabled and all variables need to
         be accessed via the `%fields`.
 
+    - **use**
+
+        An array ref of packages names (as strings) to use within a template's package.
+        Intended to be utilised by subclasses to add features to a template.
+
+    - **inject**
+
+        An array ref of strings, representing perl code, to be injected into the
+        template package. Intended to be utilised for subclasses to  inject small
+        pieces of code which cannot be otherwise required/used.
+
 - Return value
 
     The return value is `Template::Plex` (or subclass) object which can be

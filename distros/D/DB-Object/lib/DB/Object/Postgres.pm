@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres.pm
-## Version v0.4.11
+## Version v0.4.12
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2021/08/24
+## Modified 2021/08/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -36,7 +36,7 @@ BEGIN
     require DB::Object::Postgres::Lo;
     our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
     our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH );
-    $VERSION     = 'v0.4.11';
+    $VERSION     = 'v0.4.12';
     use Devel::Confess;
 };
 
@@ -214,7 +214,7 @@ sub commit($;$@)
 sub connect
 {
     my $that   = shift( @_ );
-    my $param = $that->_connection_params2hash( @_ ) || return;
+    my $param = $that->_connection_params2hash( @_ ) || return( $self->pass_error );
     $param->{driver} = 'Pg';
     return( $that->SUPER::connect( $param ) );
 }
@@ -674,11 +674,25 @@ sub pg_ping(@)
 # See DB::Object
 # sub prepare_cached
 
-# sub quote will be automatically loaded via AUTOLOADER
-
 # sub query($$)
 
 sub query_object { return( shift->_set_get_object( 'query_object', 'DB::Object::Postgres::Query', @_ ) ); }
+
+# sub quote will be automatically loaded via AUTOLOADER
+
+sub quote
+{
+    my $self = shift( @_ );
+    my( $str, $type ) = @_;
+    # my $dbh = $self->{dbh} || return( $self->error( "No database handler was set." ) );
+    my $dbh;
+    unless( $dbh = $self->{dbh} )
+    {
+        return( $self->SUPER::quote( $str ) );
+    }
+    $type = { pg_type => $type } if( $type && ref( $type ) ne 'HASH' );
+    return( $dbh->quote( $str, $type ) );
+}
 
 sub release
 {
@@ -965,7 +979,7 @@ sub version
 sub _check_connect_param
 {
     my $self  = shift( @_ );
-    my $param = $self->SUPER::_check_connect_param( @_ );
+    my $param = $self->SUPER::_check_connect_param( @_ ) || return( $self->pass_error );
     # This is also what the psql command line tool does
     $param->{login} = ( getpwuid( $> ) )[0] if( !$param->{login} );
     $param->{database} = 'postgres' if( !$param->{database} );
@@ -993,7 +1007,7 @@ sub _connection_options
     my $self  = shift( @_ );
     my $param = shift( @_ );
     my @pg_params = grep( /^pg_/, keys( %$param ) );
-    my $opt = $self->SUPER::_connection_options( $param );
+    my $opt = $self->SUPER::_connection_options( $param ) || return( $self->pass_error );
     $self->message( 3, "Inherited options are: ", sub{ $self->dump( $opt ) } );
     @$opt{ @pg_params } = @$param{ @pg_params };
     return( $opt );
@@ -1004,7 +1018,7 @@ sub _connection_parameters
 {
     my $self  = shift( @_ );
     my $param = shift( @_ );
-    my $core = [qw( db login passwd host port driver database schema server opt uri debug )];
+    my $core = [qw( db login passwd host port driver database schema server opt uri debug cache_connections )];
     my @pg_params = grep( /^pg_/, keys( %$param ) );
     # See DBD::mysql for the list of valid parameters
     # E.g.: mysql_client_found_rows, mysql_compression mysql_connect_timeout mysql_write_timeout mysql_read_timeout mysql_init_command mysql_skip_secure_auth mysql_read_default_file mysql_read_default_group mysql_socket mysql_ssl mysql_ssl_client_key mysql_ssl_client_cert mysql_ssl_ca_file mysql_ssl_ca_path mysql_ssl_cipher mysql_local_infile mysql_multi_statements mysql_server_prepare mysql_server_prepare_disable_fallback mysql_embedded_options mysql_embedded_groups mysql_conn_attrs 
@@ -1148,6 +1162,7 @@ sub _dsn
     my @params = ();
     # $self->message( 3, "\$self contains: ", sub{ $self->dumper( $self ) } );
     # See pg_service.conf
+    $self->message( 3, "Driver is '$self->{driver}'" );
     if( $self->{service} )
     {
         @params = ( sprintf( 'dbi:%s:%s', @$self{ qw( driver service ) } ) );
@@ -1340,6 +1355,10 @@ DB::Object::Postgres - SQL API
     # Now dump the result to a file
     $login->select->dump( "my_file.txt" );
     
+=head1 VERSION
+
+    v0.4.12
+
 =head1 DESCRIPTION
 
 This package inherits from L<DB::Object>, so any method not here, but there you can use.
@@ -1372,7 +1391,11 @@ You can specify the following parameters:
 
 =over 4
 
-=item I<datbase>
+=item I<cache_connections>
+
+See L<DB::Object/connect> for more information
+
+=item I<database>
 
 The database name you wish to connect to
 
@@ -1834,6 +1857,10 @@ Calls L<DBD::Pg/pg_ping>
 =head2 query_object
 
 Set or gets the PostgreSQL query object (L<DB::Object::Postgres::Query>) used to process and format queries.
+
+=head2 quote
+
+Provided with a data and some data type, and this will possibly put surrounding single quotes and return the result.
 
 =head2 release
 

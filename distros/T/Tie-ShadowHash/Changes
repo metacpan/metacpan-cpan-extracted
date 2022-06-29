@@ -1,0 +1,32 @@
+                   Revision history for Tie::ShadowHash
+
+2.00 - 2022-06-27
+
+ - Remove the new() method, since tie should always be used instead.
+ - Convert the build system to Module::Build.
+ - Document the behavior of SCALAR.
+
+1.00 - 2010-04-03
+
+ - Correctly return undef from FETCH if undef was explicitly stored.
+ - Document the add() method.
+ - Do not return shadowed keys from NEXTKEY iteration.
+ - Depend on Perl 5.006 or later and use its syntax.
+ - Change the dist name to Tie-ShadowHash from ShadowHash.
+
+0.07 - 2002-07-27
+
+ - Add SEE ALSO and COPYRIGHT AND LICENSE documentation sections.
+
+0.06 - 1999-06-02
+
+ - Document tagged data sources, particularly the "text" data souce.
+
+0.05 - 1999-04-03
+
+ - Fix skipping of deleted entries in NEXTKEY.
+ - Use AnyDBM_File for the test suite since SDBM isn't built on Mac OS.
+
+0.03 - 1999-03-22
+
+ - Initial public release.

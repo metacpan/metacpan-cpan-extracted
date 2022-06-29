@@ -1,0 +1,33 @@
+This file contains the output of a `git log -n 5`, performed when the
+distribution was created.  It is for convenience in identifying the commit
+for this distribution.
+
+commit 98328761eb1c2de0182c20c30a5c8a296c569329
+Author: Jeffrey Kegler <jeffreykegler@protonmail.com>
+Date:   Thu Jun 23 15:19:11 2022 -0400
+
+    Bump version to 9.0.3
+
+commit fbc2aa819b7209c3e659910cf306d2c7a717ce7e
+Author: Jeffrey Kegler <jeffreykegler@protonmail.com>
+Date:   Thu Jun 23 15:09:27 2022 -0400
+
+    Add LIB_VERSION back to distributions
+
+commit cfe31afc9290a68a5567c7705ff00367271d2638
+Author: Jeffrey Kegler <jeffreykegler@protonmail.com>
+Date:   Thu Jun 23 13:12:56 2022 -0400
+
+    Bump version to 9.0.2
+
+commit 23697d4bfeb4a546e2c3aabd755ad7defebe863f
+Author: Jeffrey Kegler <jeffreykegler@protonmail.com>
+Date:   Thu Jun 23 12:34:27 2022 -0400
+
+    Remove Github CI
+
+commit 6d50d7d6dc71b060dcadc813b54cacd01ea91d8a
+Author: Jeffrey Kegler <jeffreykegler@protonmail.com>
+Date:   Thu Jun 23 12:32:32 2022 -0400
+
+    Remove Github CI

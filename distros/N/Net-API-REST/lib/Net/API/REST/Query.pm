@@ -313,7 +313,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 CPAN ID: jdeguest
 
-https://git.deguest.jp/jack/Net-API-REST
+https://gitlab.com/jackdeguest/Net-API-REST
 
 =head1 CREDITS
 

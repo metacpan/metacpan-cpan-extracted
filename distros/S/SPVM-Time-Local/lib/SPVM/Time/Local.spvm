@@ -1,7 +1,5 @@
 class Time::Local {
   use Time::Info;
-  use Time;
-  use Fn;
   
   native static method timelocal : long ($time_info : Time::Info);
   native static method timegm : long ($time_info : Time::Info);

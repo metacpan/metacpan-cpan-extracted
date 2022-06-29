@@ -1,10 +1,10 @@
 # NAME
 
-Text::Minify::XS - remove indentation and trailing whitespace
+Text::Minify::XS - Remove indentation and trailing whitespace from multi-line text
 
 # VERSION
 
-version v0.6.3
+version v0.6.5
 
 # SYNOPSIS
 
@@ -16,7 +16,7 @@ my $out = minify( $in );
 
 # DESCRIPTION
 
-This is a simple and fast text minifier that removes quickly extra
+This is a simple and fast text minifier that quickly removes extra
 whitespace from multi-line text.
 
 # EXPORTS

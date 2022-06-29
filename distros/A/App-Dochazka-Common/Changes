@@ -245,3 +245,7 @@ Revision history for App-Dochazka-Common distribution
 - Model.pm: address Perl::Critic critique
 - t/model/reset.t: populate scode property of Schedhistory
 
+0.210 2022-06-29 11:48 CEST
+- doc: fix POD of main module and expand copyright date range
+- bootstrap.sh: add new file
+

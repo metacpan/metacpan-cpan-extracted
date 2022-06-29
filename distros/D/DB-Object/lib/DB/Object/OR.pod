@@ -1,0 +1,46 @@
+=encoding utf-8
+
+=head1 NAME
+
+DB::Object::OR - OR Operator Object
+
+=head1 SYNOPSIS
+
+    my $op = $dbh->OR( login => 'joe', login => 'john' );
+    # will produce:
+    WHERE login = 'joe' OR login = 'john'
+
+=head1 DESCRIPTION
+
+This is the C<OR> object class inheriting from L<DB::Object::Operator>
+
+=head1 METHODS
+
+=head2 new
+
+Takes a list of values that are saved in the newly created object returned.
+
+=head2 operator
+
+Returns C<OR>
+
+=head2 value
+
+In list context, returns an array of those values passed to L</new> and in scalar context, it returns those value as array reference.
+
+=head1 SEE ALSO
+
+L<DBI>, L<Apache::DBI>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2019-2021 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut

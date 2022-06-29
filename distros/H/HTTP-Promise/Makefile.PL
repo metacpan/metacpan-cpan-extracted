@@ -10,7 +10,6 @@ my %WriteMakefileArgs = (
     INSTALLDIRS         => ($] < 5.011 ? 'perl' : 'site'),
     PREREQ_PM           => {
         'constant'              => 0,
-        'curry'                 => 0,
         'parent'                => 0,
         'strict'                => 0,
         'warnings'              => 0,

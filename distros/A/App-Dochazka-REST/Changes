@@ -3755,3 +3755,10 @@ SPLIT OFF App::MREST into separate distribution
 - Dispatch: allow supervisor to generate scheduled intervals of supervisee
 - build/ops: drop Makefile.PL, add t/critic.t and t/manifest.t
 
+0.559 2022-06-29 17:49 CEST
+- bootstrap: add bootstrap scripts
+- ext/docker/testing/Makefile: convert from docker to podman
+- bootstrap.sh: run tests recursively
+- Guide.pm: use correct POD comment syntax
+- t/: adapt tests to "invalid input syntax for type integer" error message
+

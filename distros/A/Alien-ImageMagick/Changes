@@ -1,5 +1,8 @@
 Revision history for Alien-ImageMagick
 
+0.09    2022-06-28
+        Update source download link. Thanks to Tim for warning me. 
+
 0.08    2021-04-12
         Run ldconfig after installation, to be sure the test works.
         Instruct ImageMagick to build all modules, or library will get unresolved symbols

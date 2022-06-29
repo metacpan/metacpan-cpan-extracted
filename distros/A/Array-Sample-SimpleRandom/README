@@ -3,7 +3,7 @@ NAME
     replacement)
 
 VERSION
-    This document describes version 0.001 of Array::Sample::SimpleRandom
+    This document describes version 0.002 of Array::Sample::SimpleRandom
     (from Perl distribution Array-Sample-SimpleRandom), released on
     2022-05-20.
 
@@ -65,7 +65,7 @@ SOURCE
 
 SEE ALSO
     Other sampling methods: Array::Sample::SysRand,
-    Array::Sample::Partition.
+    Array::Sample::Partition, Array::Sample::WeightedRandom.
 
     Array::Sample::SimpleRandom::Scan
 

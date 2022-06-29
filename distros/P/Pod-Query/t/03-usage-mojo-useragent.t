@@ -1,7 +1,16 @@
 #!perl
 
 package Test::Mojo::UserAgent;
-use Mojo::Base -base;
+use warnings FATAL => 'all';
+use FindBin();
+use lib $FindBin::RealBin;
+
+use Role::Tiny::With;
+
+with 'Role::Test::Module';
+
+__PACKAGE__->run( module => "Mojo::UserAgent", tests => 69 );
+
 
 sub lol {
     [
@@ -1467,7 +1476,7 @@ sub define_find_cases {
             find            => '~^head\d$=get[0]**',
             expected_struct => [
                 {
-                    tag      => qr/^head\d$/i,
+                    tag      => qr/^head\d$/iu,
                     text     => "get",
                     nth      => 0,
                     keep_all => 1,
@@ -1489,12 +1498,12 @@ sub define_find_cases {
             find            => '~^head\d$=get[0]/~(?:Data|Para)[0]',
             expected_struct => [
                 {
-                    tag  => qr/^head\d$/i,
+                    tag  => qr/^head\d$/iu,
                     text => "get",
                     nth  => 0,
                 },
                 {
-                    tag => qr/(?:Data|Para)/i,
+                    tag => qr/(?:Data|Para)/iu,
                     nth => 0,
                 },
             ],
@@ -1507,12 +1516,12 @@ sub define_find_cases {
             find            => '~^head\d$=EVENTS[0]/~^head\d$*',
             expected_struct => [
                 {
-                    tag  => qr/^head\d$/i,
+                    tag  => qr/^head\d$/iu,
                     text => "EVENTS",
                     nth  => 0,
                 },
                 {
-                    tag  => qr/^head\d$/i,
+                    tag  => qr/^head\d$/iu,
                     keep => 1,
                 },
             ],
@@ -1523,12 +1532,12 @@ sub define_find_cases {
             find            => '~^head\d$=EVENTS[0]/~^head\d$*/(Para)[0]',
             expected_struct => [
                 {
-                    tag  => qr/^head\d$/i,
+                    tag  => qr/^head\d$/iu,
                     text => "EVENTS",
                     nth  => 0,
                 },
                 {
-                    tag  => qr/^head\d$/i,
+                    tag  => qr/^head\d$/iu,
                     keep => 1,
                 },
                 {
@@ -1989,7 +1998,7 @@ sub define_find_cases {
 '~./Para="Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent"',
             expected_struct => [
                 {
-                    tag => qr/./i,
+                    tag => qr/./iu,
                 },
                 {
                     tag  => "Para",
@@ -2011,11 +2020,11 @@ sub define_find_cases {
             find            => '~.[0]/~.[0]',
             expected_struct => [
                 {
-                    tag => qr/./i,
+                    tag => qr/./iu,
                     nth => 0,
                 },
                 {
-                    tag => qr/./i,
+                    tag => qr/./iu,
                     nth => 0,
                 },
             ],
@@ -2028,11 +2037,11 @@ sub define_find_cases {
             find            => '~.[1]/~.[0]',
             expected_struct => [
                 {
-                    tag => qr/./i,
+                    tag => qr/./iu,
                     nth => 1,
                 },
                 {
-                    tag => qr/./i,
+                    tag => qr/./iu,
                     nth => 0,
                 },
             ],
@@ -2049,11 +2058,11 @@ sub define_find_cases {
             find            => '(~.)[1]/~.[0]',
             expected_struct => [
                 {
-                    tag          => qr/./i,
+                    tag          => qr/./iu,
                     nth_in_group => 1,
                 },
                 {
-                    tag          => qr/./i,
+                    tag          => qr/./iu,
                     nth_in_group => 0,
                 },
             ],
@@ -2071,12 +2080,12 @@ sub define_find_cases {
             find            => '~^head\d$=ATTRIBUTES[0]/~^head\d$',
             expected_struct => [
                 {
-                    tag  => qr/^head\d$/i,
+                    tag  => qr/^head\d$/iu,
                     text => "ATTRIBUTES",
                     nth  => 0,
                 },
                 {
-                    tag => qr/^head\d$/i,
+                    tag => qr/^head\d$/iu,
                 },
             ],
             expected_find => [
@@ -2095,12 +2104,12 @@ sub define_find_cases {
             find            => '~head=ATTRIBUTES[0]/~head',
             expected_struct => [
                 {
-                    tag  => qr/head/i,
+                    tag  => qr/head/iu,
                     text => "ATTRIBUTES",
                     nth  => 0,
                 },
                 {
-                    tag => qr/head/i,
+                    tag => qr/head/iu,
                 },
             ],
             expected_find => [
@@ -2119,12 +2128,12 @@ sub define_find_cases {
             find            => '~^head\d$=ATTRIBUTES[0]/~^head\d$*/(Para)[0]',
             expected_struct => [
                 {
-                    tag  => qr/^head\d$/i,
+                    tag  => qr/^head\d$/iu,
                     text => "ATTRIBUTES",
                     nth  => 0,
                 },
                 {
-                    tag  => qr/^head\d$/i,
+                    tag  => qr/^head\d$/iu,
                     keep => 1,
                 },
                 {
@@ -2176,7 +2185,7 @@ sub define_find_cases {
             find            => '~.[0]/Para[0]',
             expected_struct => [
                 {
-                    tag => qr/./i,
+                    tag => qr/./iu,
                     nth => 0,
                 },
                 {
@@ -2201,12 +2210,4 @@ sub define_find_cases {
 
     ]
 }
-
-package main;
-use Mojo::Base -strict;
-use FindBin();
-use lib $FindBin::RealBin;
-
-Test::Mojo::UserAgent->with_roles( 'Role::Test::Module' )
-  ->run( module => "Mojo::UserAgent", tests => 69 );
 

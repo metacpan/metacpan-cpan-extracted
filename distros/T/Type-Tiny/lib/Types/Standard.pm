@@ -12,7 +12,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Standard::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::VERSION   = '1.012005';
+	$Types::Standard::VERSION   = '1.014000';
 }
 
 $Types::Standard::VERSION =~ tr/_//d;
@@ -130,7 +130,8 @@ my $maybe_load_modules = sub {
 	my $code = pop;
 	if ( $Type::Tiny::AvoidCallbacks ) {
 		$code = sprintf(
-			'do { package Type::Tiny; %s; %s }',
+			'do { %s %s; %s }',
+			$Type::Tiny::SafePackage,
 			join( '; ', map "use $_ ()", @_ ),
 			$code,
 		);
@@ -1738,7 +1739,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2021 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2022 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

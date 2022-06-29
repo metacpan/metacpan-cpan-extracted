@@ -1,4 +1,11 @@
 Revision history for Perl extension Template::Plex.
+0.4.3   Tue 28 Jun 14:53:54 AEST 2022
+	- Fixed failing tests... again..
+	- Improved error reporting context on template sytax error (reduced line count)
+	- Added 'inject' option when loading a template
+	- Briefly documented 'use' and 'inject' options when loading templates
+
+
 0.4.2	Thu 23 Jun 2022 14:41:55 AEST
 	- Removed usage of perl-5.36 features isa  and multi-element for loops
 	- Reverted min perl version back to 5.24 for better compatability

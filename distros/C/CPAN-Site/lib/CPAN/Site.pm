@@ -7,8 +7,10 @@ use strict;
 
 package CPAN::Site;
 use vars '$VERSION';
-$VERSION = '1.16';
+$VERSION = '1.17';
 
+
+our $VERSION = '1.17';
 
 
 1;

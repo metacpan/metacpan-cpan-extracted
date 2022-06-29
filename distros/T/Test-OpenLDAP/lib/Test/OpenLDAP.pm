@@ -12,7 +12,7 @@ use URI::Escape();
 use Net::LDAP();
 use English qw( -no_match_vars );
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 our @CARP_NOT = ('Test::OpenLDAP');
 sub OPENLDAP_SLAPD_BINARY_NAME         { return 'slapd' }
@@ -27,9 +27,9 @@ sub new {
     my ( $class, %params ) = @_;
     my $self = {};
     bless $self, $class;
-    $self->{suffix} = $params{suffix} || 'dc=example,dc=com';
-    $self->{debug}  = $params{debug}  || '0';
-    $self->{syslog} = $params{syslog} || '0';
+    $self->{suffix}     = $params{suffix} || 'dc=example,dc=com';
+    $self->{debug}      = $params{debug}  || '0';
+    $self->{syslog}     = $params{syslog} || '0';
     $self->{admin_user} = 'cn=root,' . $self->{suffix};
     my $string = q[];
 
@@ -68,9 +68,14 @@ sub new {
     $self->{olc_database_frontend_path} =
       File::Spec->catfile( $self->{cn_config_directory},
         'olcDatabase={-1}frontend.ldif' );
-    $self->{olc_database_hdb_path} =
+    my $database_type = 'mdb';
+
+    if ( $self->_slapd_may_not_use_mdb() ) {
+        $database_type = 'hdb';
+    }
+    $self->{olc_database_path} =
       File::Spec->catfile( $self->{cn_config_directory},
-        'olcDatabase={1}hdb.ldif' );
+        'olcDatabase={1}' . $database_type . '.ldif' );
 
     mkdir $self->{root_directory},
       Fcntl::S_IRUSR() | Fcntl::S_IWUSR() | Fcntl::S_IXUSR()
@@ -94,12 +99,56 @@ sub new {
     $self->{config_database_rdn} =
       "olcDatabase=$self->{olc_database_for_config}";
     $self->_create_olc_database_config();
-    $self->{olc_database_for_hdb} = '{1}hdb';
-    $self->{database_hdb_rdn}     = "olcDatabase=$self->{olc_database_for_hdb}";
-    $self->_create_olc_database_hdb();
+    $self->{olc_database_index_and_type} = '{1}' . $database_type;
+    $self->{database_rdn} = "olcDatabase=$self->{olc_database_index_and_type}";
+    $self->_create_olc_database_db();
     $self->{uri} = "ldapi://$self->{encoded_socket_path}/$self->{suffix}";
     $self->start();
     return $self;
+}
+
+sub _slapd_may_not_use_mdb {
+    my ($self) = @_;
+    if ( $self->_version() =~ /^2[.]4[.]/smx ) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
+sub _version {
+    my ($self) = @_;
+    my $key = '_slapd_version';
+    if ( defined $self->{$key} ) {
+    }
+    else {
+        my $binary = OPENLDAP_SLAPD_BINARY_NAME();
+        my $handle = FileHandle->new();
+        if ( my $pid = $handle->open(q[-|]) ) {
+            while ( my $line = <$handle> ) {
+                if ( $line =~ /OpenLDAP:[ ]slapd[ ](\d+[.]\d+[.]\d+)[ ]/smx ) {
+                    $self->{$key} = $1;
+                }
+            }
+        }
+        elsif ( defined $pid ) {
+            eval {
+                open STDERR, '<&=', fileno STDOUT
+                  or
+                  Carp::croak("Failed to redirect STDERR:$EXTENDED_OS_ERROR");
+                exec { OPENLDAP_SLAPD_BINARY_NAME() }
+                  OPENLDAP_SLAPD_BINARY_NAME(), '-V'
+                  or Carp::croak("Failed to exec '$binary':$OS_ERROR");
+            } or do {
+                Carp::carp($EVAL_ERROR);
+            };
+        }
+        else {
+            Carp::croak("Failed to fork:$OS_ERROR");
+        }
+    }
+    return $self->{$key};
 }
 
 sub debug_handle {
@@ -183,7 +232,8 @@ sub start {
     if ( my $cookie = $self->get_cookie() ) {
         push @slapd_arguments, '-c' => $cookie;
     }
-    if ( $self->{slapd_pid} = fork ) {
+    if ( my $pid = fork ) {
+        $self->{slapd_pid} = $pid;
         my $ldap;
         while (( kill 0, $self->{slapd_pid} )
             && ( !$ldap ) )
@@ -198,7 +248,7 @@ sub start {
             Carp::croak('Failed to start slapd');
         }
     }
-    else {
+    elsif ( defined $pid ) {
         eval {
             local $ENV{PATH} = "$ENV{PATH}$Config{path_sep}/usr/lib/openldap"
               ;    # adding /usr/lib/openldap for OpenSUSE deployments
@@ -214,6 +264,9 @@ sub start {
             Carp::carp($EVAL_ERROR);
         };
         exit 1;
+    }
+    else {
+        Carp::croak("Failed to fork:$OS_ERROR");
     }
     return $self;
 }
@@ -308,7 +361,7 @@ sub _create_config_ldif {
     my $uuid        = lc $self->_uuid();
     my $entry_csn   = $self->_entry_csn();
     my $create_timestamp = POSIX::strftime( '%Y%m%d%H%M%SZ', gmtime time );
-    my $handle = FileHandle->new( $self->{config_ldif_path},
+    my $handle           = FileHandle->new( $self->{config_ldif_path},
         $write_flags, Fcntl::S_IRUSR() | Fcntl::S_IWUSR() )
       or Carp::croak(
         "Failed to open '$self->{config_ldif_path}' for writing:$OS_ERROR");
@@ -362,7 +415,7 @@ sub _create_schema_ldif {
     my $uuid        = lc $self->_uuid();
     my $entry_csn   = $self->_entry_csn();
     my $create_timestamp = POSIX::strftime( '%Y%m%d%H%M%SZ', gmtime time );
-    my $handle = FileHandle->new( $self->{cn_schema_ldif_path},
+    my $handle           = FileHandle->new( $self->{cn_schema_ldif_path},
         $write_flags, Fcntl::S_IRUSR() | Fcntl::S_IWUSR() )
       or Carp::croak(
         "Failed to open '$self->{cn_schema_ldif_path}' for writing:$OS_ERROR");
@@ -1241,7 +1294,7 @@ sub _create_schema_core_ldif {
     my $uuid        = lc $self->_uuid();
     my $entry_csn   = $self->_entry_csn();
     my $create_timestamp = POSIX::strftime( '%Y%m%d%H%M%SZ', gmtime time );
-    my $handle = FileHandle->new( $self->{cn_schema_core_ldif_path},
+    my $handle           = FileHandle->new( $self->{cn_schema_core_ldif_path},
         $write_flags, Fcntl::S_IRUSR() | Fcntl::S_IWUSR() )
       or Carp::croak(
 "Failed to open '$self->{cn_schema_core_ldif_path}' for writing:$OS_ERROR"
@@ -1505,7 +1558,7 @@ sub _create_olc_database_config {
     my ( $uid, $gid ) =
       ( getpwuid $EFFECTIVE_USER_ID )[ UID_INDEX(), GID_INDEX() ];
     my $create_timestamp = POSIX::strftime( '%Y%m%d%H%M%SZ', gmtime time );
-    my $handle = FileHandle->new( $self->{olc_database_config_path},
+    my $handle           = FileHandle->new( $self->{olc_database_config_path},
         $write_flags, Fcntl::S_IRUSR() | Fcntl::S_IWUSR() )
       or Carp::croak(
 "Failed to open '$self-{olc_database_config_path}' for writing:$OS_ERROR"
@@ -1538,7 +1591,7 @@ __DB_CONFIG_LDIF__
     return;
 }
 
-sub _create_olc_database_hdb {
+sub _create_olc_database_db {
     my ($self)      = @_;
     my $write_flags = Fcntl::O_WRONLY() | Fcntl::O_CREAT() | Fcntl::O_EXCL();
     my $uuid        = lc $self->_uuid();
@@ -1546,20 +1599,21 @@ sub _create_olc_database_hdb {
     my $create_timestamp = POSIX::strftime( '%Y%m%d%H%M%SZ', gmtime time );
     my ( $uid, $gid ) =
       ( getpwuid $EFFECTIVE_USER_ID )[ UID_INDEX(), GID_INDEX() ];
-    my $handle = FileHandle->new( $self->{olc_database_hdb_path},
+    my $handle = FileHandle->new( $self->{olc_database_path},
         $write_flags, Fcntl::S_IRUSR() | Fcntl::S_IWUSR() )
       or Carp::croak(
-        "Failed to open '$self->{olc_database_hdb_path}' for writing:$OS_ERROR"
-      );
+        "Failed to open '$self->{olc_database_path}' for writing:$OS_ERROR");
     my $user     = $self->admin_user();
     my $suffix   = $self->suffix();
     my $password = $self->admin_password();
-    $handle->print(
-        <<"__DB_LDIF__") or Carp::croak("Failed to write to '$self->{olc_database_hdb_path}':$OS_ERROR");
-dn: $self->{database_hdb_rdn}
+
+    if ( $self->_slapd_may_not_use_mdb() ) {
+        $handle->print(
+            <<"__DB_LDIF__") or Carp::croak("Failed to write to '$self->{olc_database_path}':$OS_ERROR");
+dn: $self->{database_rdn}
 objectClass: olcDatabaseConfig
 objectClass: olcHdbConfig
-olcDatabase: $self->{olc_database_for_hdb}
+olcDatabase: $self->{olc_database_index_and_type}
 olcAddContentAcl: FALSE
 olcLastMod: TRUE
 olcMaxDerefDepth: 15
@@ -1590,18 +1644,40 @@ olcAccess: to * by * read
 modifiersName: cn=config
 modifyTimestamp: $create_timestamp
 __DB_LDIF__
+    }
+    else {
+        $handle->print(
+            <<"__DB_LDIF__") or Carp::croak("Failed to write to '$self->{olc_database_path}':$OS_ERROR");
+dn: $self->{database_rdn}
+objectClass: olcDatabaseConfig
+objectClass: olcMdbConfig
+olcDatabase: $self->{olc_database_index_and_type}
+olcDbDirectory: $self->{db_directories}->[0]
+olcSuffix: $suffix
+olcRootDN: $user
+olcRootPW: ${password}
+olcDbIndex: objectClass eq,pres
+olcDbIndex: ou,cn,mail,surname,givenname eq,pres,sub
+structuralObjectClass: olcMdbConfig
+entryUUID: $uuid
+creatorsName: cn=config
+createTimestamp: $create_timestamp
+entryCSN: $entry_csn
+olcAccess: to * by * read
+modifiersName: cn=config
+modifyTimestamp: $create_timestamp
+__DB_LDIF__
+    }
     close $handle
-      or
-      Carp::croak("Failed to close '$self->{olc_database_hdb_path}':$OS_ERROR");
+      or Carp::croak("Failed to close '$self->{olc_database_path}':$OS_ERROR");
     return;
 }
 
 sub _remove_db_directories {
     my ($self) = @_;
-    unlink $self->{olc_database_hdb_path}
+    unlink $self->{olc_database_path}
       or ( $OS_ERROR == POSIX::ENOENT() )
-      or Carp::croak(
-        "Failed to unlink '$self->{olc_database_hdb_path}':$OS_ERROR");
+      or Carp::croak("Failed to unlink '$self->{olc_database_path}':$OS_ERROR");
     foreach my $db_directory ( @{ $self->{db_directories} } ) {
         my $db_handle = DirHandle->new($db_directory);
         if ($db_handle) {
@@ -1769,7 +1845,7 @@ Test::OpenLDAP - Creates a temporary instance of OpenLDAP's slapd daemon to run 
 
 =head1 VERSION
 
-Version 0.71
+Version 0.72
 
 =head1 SYNOPSIS
 

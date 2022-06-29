@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.24.1
+## Version v0.24.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2022/06/24
+## Modified 2022/06/28
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -42,7 +42,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.24.1';
+    our $VERSION     = 'v0.24.2';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -2476,7 +2476,9 @@ sub _set_get_code : lvalue
         $data->{ $field } = $v;
     }
     
-    if( ( !defined( $data->{ $field } ) || !$data->{ $field } ) && !$opts->{return_undef} )
+    if( ( !defined( $data->{ $field } ) || !$data->{ $field } ) && 
+        !$opts->{return_undef} &&
+        want( 'OBJECT' ) )
     {
         return( sub{} ) if( want( 'LVALUE' ) );
         rreturn( sub{} );
@@ -6132,7 +6134,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.24.1
+    v0.24.2
 
 =head1 DESCRIPTION
 

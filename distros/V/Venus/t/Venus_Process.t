@@ -5,10 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
 use Test::More;
-use Test::Venus;
+use Venus::Test;
 
 use Config;
 use Venus::Process;
@@ -1341,20 +1339,6 @@ $test->for('example', 2, 'untrap', sub {
 
   $result
 });
-
-=license
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-=cut
-
-=authors
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
 
 # END
 

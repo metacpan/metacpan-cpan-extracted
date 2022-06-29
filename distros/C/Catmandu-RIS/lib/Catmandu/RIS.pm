@@ -1,6 +1,6 @@
 package Catmandu::RIS;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 1;
 
@@ -16,7 +16,7 @@ Catmandu::RIS -  Catmandu modules for working with RIS data
 
 # STATUS
 
-[![Build Status](https://travis-ci.org/LibreCat/Catmandu-RIS.svg?branch=master)](https://travis-ci.org/LibreCat/Catmandu-RIS)
+![Test status](https://github.com/LibreCat/Catmandu-RIS/actions/workflows/linux.yml/badge.svg)
 [![Coverage](https://coveralls.io/repos/LibreCat/Catmandu-RIS/badge.png?branch=master)](https://coveralls.io/r/LibreCat/Catmandu-RIS)
 [![CPANTS kwalitee](http://cpants.cpanauthors.org/dist/Catmandu-RIS.png)](http://cpants.cpanauthors.org/dist/Catmandu-RIS)
 
@@ -25,7 +25,7 @@ Catmandu::RIS -  Catmandu modules for working with RIS data
 =head1 SYNOPSIS
 
   catmandu convert RIS < input.txt
-  
+
   # Use the --human option to translate RIS tags into human readable strings
   catmandu convert RIS --human 1 < input.txt
 
@@ -44,18 +44,22 @@ Catmandu::RIS -  Catmandu modules for working with RIS data
 
 =head1 MAPPING
 
-See the examples in the package L<https://github.com/LibreCat/Catmandu-RIS/tree/master/examples> 
+See the examples in the package L<https://github.com/LibreCat/Catmandu-RIS/tree/master/examples>
 for some hints how to create a mapping.
 
 =head1 Author
 
 Nicolas Steenlant
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
 Vitali Peil
 
 Patrick Hochstenbach
+
+Nicolas Franck
+
+Mohammad S Anwar
 
 =head1 LICENSE
 

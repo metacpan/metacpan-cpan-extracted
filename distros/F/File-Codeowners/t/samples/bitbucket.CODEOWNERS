@@ -1,0 +1,4 @@
+# This sample uses groups defined in the CODEOWNERS file itself.
+# This is a group:
+@@@whatever  @foo @bar @@"b a z"
+file.txt  @@whatever @qux

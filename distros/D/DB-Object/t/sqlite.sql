@@ -33,6 +33,7 @@ CREATE TABLE orders (
     ,sku			CHAR(36)
     ,quantity		INTEGER NOT NULL DEFAULT 0
     ,ordered_on		TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    ,ip_addr        TEXT
 	,CONSTRAINT pk_orders PRIMARY KEY (id)
 	,CONSTRAINT idx_orders UNIQUE (cust_id,sku)
     ,CONSTRAINT fk_orders_cust_id FOREIGN KEY (cust_id) REFERENCES customers(id) ON DELETE CASCADE

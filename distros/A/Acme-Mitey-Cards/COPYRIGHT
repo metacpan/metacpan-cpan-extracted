@@ -20,7 +20,6 @@ Files: Changes
  lib/Acme/Mitey/Cards/Deck.pm.mite.pm
  lib/Acme/Mitey/Cards/Hand.pm
  lib/Acme/Mitey/Cards/Hand.pm.mite.pm
- lib/Acme/Mitey/Cards/Mite.pm
  lib/Acme/Mitey/Cards/Set.pm
  lib/Acme/Mitey/Cards/Set.pm.mite.pm
  lib/Acme/Mitey/Cards/Suit.pm
@@ -37,17 +36,17 @@ Files: Changes
 Copyright: Copyright 2022 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: COPYRIGHT
- CREDITS
- SIGNATURE
-Copyright: None
-License: public-domain
-
 Files: INSTALL
  LICENSE
  examples/demo.pl
 Copyright: Unknown
 License: Unknown
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
 
 Files: README
  lib/Acme/Mitey/Cards.pm
@@ -56,6 +55,11 @@ License: GPL-1.0+ or Artistic-1.0
 
 Files: Makefile.PL
 Copyright: Copyright 2020 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/Acme/Mitey/Cards/Mite.pm
+Copyright: This software is copyright (c) 2011-2014 by Michael G Schwern.
+ This software is copyright (c) 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
