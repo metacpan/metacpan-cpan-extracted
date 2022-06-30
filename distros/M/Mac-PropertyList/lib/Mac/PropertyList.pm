@@ -27,7 +27,7 @@ our %EXPORT_TAGS = (
 	'all' => \@EXPORT_OK,
 	);
 
-our $VERSION = '1.502';
+our $VERSION = '1.503';
 
 =encoding utf8
 
@@ -993,7 +993,7 @@ use base qw(Mac::PropertyList::Boolean);
 
 This project is in Github:
 
-	git://github.com/briandfoy/mac-propertylist.git
+	https://github.com/briandfoy/mac-propertylist.git
 
 =head1 CREDITS
 

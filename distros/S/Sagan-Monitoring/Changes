@@ -1,5 +1,11 @@
 Revision history for Sagan-Monitoring
 
+1.1.1	2022-06-29/16:40
+		-No longer stomp the slug name and some minor doc fixes.
+
+1.1.0	2022-06-29/15:45
+		-Add in the ability to do other than 5 minutes.
+
 1.0.1	2022-06-26/16:45
 		-Fix a few instances of where it said Suricata instead of Sagan
 

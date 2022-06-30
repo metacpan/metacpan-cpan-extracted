@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP;
 
-our $VERSION = '0.033'; # VERSION
+our $VERSION = '0.034'; # VERSION
 
 use YAML::PP::Schema;
 use YAML::PP::Schema::JSON;
@@ -539,14 +539,40 @@ Options:
 
 =item boolean
 
-Values: C<perl> (currently default), C<JSON::PP>, C<boolean>
+Values: C<perl> (currently default), C<JSON::PP>, C<boolean>, C<perl_experimental>
 
 This option is for loading and dumping.
 
-Note that when dumping, only the chosen boolean style will be recognized.
-So if you choose C<JSON::PP>, C<boolean> objects will not be recognized
-as booleans and will be dumped as ordinary objects (if you enable the
-Perl schema).
+You can also specify more than one class, comma separated.
+This is important for dumping.
+
+Examples:
+
+    boolean => 'JSON::PP,boolean'
+    Booleans will be loaded as JSON::PP::Booleans, but when dumping, also
+    'boolean' objects will be recognized
+
+    boolean => 'JSON::PP,*'
+    Booleans will be loaded as JSON::PP::Booleans, but when dumping, all
+    currently supported boolean classes will be recognized
+
+    boolean => '*'
+    Booleans will be loaded as perl booleans, but when dumping, all
+    currently supported boolean classes will be recognized
+
+If you have perl >= 5.36 then you might want to try out the experimental
+boolean support, see L<builtin>.
+
+YAML::PP supports that by using the C<perl_experimental> value for the boolean
+option. Rules are the same as for the experimental L<builtin> class: It's
+not guaranteed to work in the future.
+
+As soon as the builtin boolean support leaves experimental status, I will
+update YAML::PP to support this via the default C<perl> value.
+
+    boolean => 'perl_experimental'
+    Booleans will be loaded as perl booleans, and they will be recognized
+    as such when dumping also
 
 =item schema
 

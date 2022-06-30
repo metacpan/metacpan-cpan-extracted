@@ -28,6 +28,7 @@ lib/Quiq/ContentProcessor/SubType.pm
 lib/Quiq/ContentProcessor/Type.pm
 lib/Quiq/Converter.pm
 lib/Quiq/Css.pm
+lib/Quiq/Css/Snippets.pm
 lib/Quiq/Database/Api.pm
 lib/Quiq/Database/Api/Dbi/Connection.pm
 lib/Quiq/Database/Api/Dbi/Cursor.pm
@@ -136,6 +137,7 @@ lib/Quiq/JQuery/ContextMenu/Ajax.pm
 lib/Quiq/JQuery/DataTable.pm
 lib/Quiq/JQuery/Form/ViewEdit.pm
 lib/Quiq/JQuery/Function.pm
+lib/Quiq/JQuery/MenuBar.pm
 lib/Quiq/JQuery/Tabs.pm
 lib/Quiq/Json.pm
 lib/Quiq/LaTeX/Code.pm
@@ -261,6 +263,7 @@ t/bin/Quiq/ContentProcessor/SubType.t
 t/bin/Quiq/ContentProcessor/Type.t
 t/bin/Quiq/Converter.t
 t/bin/Quiq/Css.t
+t/bin/Quiq/Css/Snippets.t
 t/bin/Quiq/Database/Api.t
 t/bin/Quiq/Database/Api/Dbi/Connection.t
 t/bin/Quiq/Database/Api/Dbi/Cursor.t
@@ -369,6 +372,7 @@ t/bin/Quiq/JQuery/ContextMenu/Ajax.t
 t/bin/Quiq/JQuery/DataTable.t
 t/bin/Quiq/JQuery/Form/ViewEdit.t
 t/bin/Quiq/JQuery/Function.t
+t/bin/Quiq/JQuery/MenuBar.t
 t/bin/Quiq/JQuery/Tabs.t
 t/bin/Quiq/Json.t
 t/bin/Quiq/LaTeX/Code.t

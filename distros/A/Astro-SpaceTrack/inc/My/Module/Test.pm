@@ -13,7 +13,7 @@ use HTTP::Date;
 use HTTP::Status qw{ :constants };
 use Test::More 0.96;	# For subtest
 
-our $VERSION = '0.153';
+our $VERSION = '0.154';
 
 # Set the following to zero if Space Track (or any other SSL host)
 # starts using a certificate that can not be verified.
@@ -191,8 +191,8 @@ sub not_defined {
     my %skip_site;
     BEGIN {
 	%info = (
-	    'celestrak.com'	=> {
-		url	=> 'https://celestrak.com/',
+	    'celestrak.org'	=> {
+		url	=> 'https://celestrak.org/',
 	    },
 	    'mike.mccants'	=> {
 		url	=> 'http://www.prismnet.com/~mmccants/',
@@ -562,12 +562,12 @@ and represents the skip message, if any.
 
 =head2 site_check
 
- site_check 'spaceflight.nasa.gov', 'celestrak.com';
+ site_check 'spaceflight.nasa.gov', 'celestrak.org';
 
 This subroutine tests a preselected URL on the given sites, and sets the
 skip indicator appropriately. Allowed site names are:
 
- celestrak.com
+ celestrak.org
  mike.mccants
  rod.sladen
  spaceflight.nasa.gov

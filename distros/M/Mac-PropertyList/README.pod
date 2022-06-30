@@ -2,11 +2,11 @@
 
 =encoding utf8
 
-=for HTML <a href="../../actions?query=workflow%3Amacos"><img src="../../workflows/macos/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/mac-propertylist/actions?query=workflow%3Amacos"><img src="https://www.github.com/briandfoy/mac-propertylist/workflows/macos/badge.svg"></a>
 
-=for HTML <a href="../../actions?query=workflow%3Aubuntu"><img src="../../workflows/ubuntu/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/mac-propertylist/actions?query=workflow%3Aubuntu"><img src="https://www.github.com/briandfoy/mac-propertylist/workflows/ubuntu/badge.svg"></a>
 
-=for HTML <a href="../../actions?query=workflow%3Awindows"><img src="../../workflows/windows/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/mac-propertylist/actions?query=workflow%3Awindows"><img src="https://www.github.com/briandfoy/mac-propertylist/workflows/windows/badge.svg"></a>
 
 =for HTML <a href='https://ci.appveyor.com/project/briandfoy/mac-propertylist'><img src='https://ci.appveyor.com/api/projects/status/6cqt6l1vxpjg6tif?svg=true' /></a>
 

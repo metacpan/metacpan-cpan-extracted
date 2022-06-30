@@ -72,6 +72,7 @@ Files: Changes
  lib/Sub/HandlesVia/HandlerLibrary/Number.pm
  lib/Sub/HandlesVia/HandlerLibrary/Scalar.pm
  lib/Sub/HandlesVia/HandlerLibrary/String.pm
+ lib/Sub/HandlesVia/Toolkit/Mite.pm
  lib/Sub/HandlesVia/Toolkit/Moo.pm
  lib/Sub/HandlesVia/Toolkit/Moose.pm
  lib/Sub/HandlesVia/Toolkit/Mouse.pm
@@ -96,6 +97,8 @@ Files: Changes
  t/30egpod/number.t
  t/30egpod/scalar.t
  t/30egpod/string.t
+ t/40mite/lib/MyTest.pm
+ t/40mite/lib/MyTest.pm.mite.pm
  t/94cmp.t
  t/96foreach.t
  t/99headtail.t
@@ -126,16 +129,23 @@ License: public-domain
 
 Files: t/20moosex_extended.t
  t/31egpod_dummy.t
+ t/40mite/basic.t
 Copyright: This software is copyright (c) 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: INSTALL
  LICENSE
+ t/40mite/.mite/config
 Copyright: Unknown
 License: Unknown
 
 Files: t/01basic.t
 Copyright: This software is copyright (c) 2020 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/40mite/lib/MyTest/Mite.pm
+Copyright: This software is copyright (c) 2011-2014 by Michael G Schwern.
+ This software is copyright (c) 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

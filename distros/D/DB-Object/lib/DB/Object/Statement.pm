@@ -21,16 +21,19 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object );
+    use vars qw( $VERSION $VERBOSE $DEBUG );
     use Class::Struct qw( struct );
     use DateTime;
     use Promise::Me;
     use Want;
-    our( $VERSION, $VERBOSE, $DEBUG );
     $VERSION    = 'v0.4.0';
     $VERBOSE    = 0;
     $DEBUG      = 0;
     use Devel::Confess;
 };
+
+use strict;
+use warnings;
 
 sub as_string
 {
@@ -219,7 +222,6 @@ sub execute
     if( $q && $q->binded_types->length )
     {
         my $types = $q->binded_types_as_param;
-        $self->messagef( 3, "Query object has %d binded types params and %d binded types.", $types->length, $q->binded_types->length );
         @binded_types = @$types;
     }
     
@@ -272,14 +274,11 @@ sub execute
     @binded = () if( !@binded );
     if( $q && $q->is_upsert )
     {
-        $self->message( 3, "This statement is an upsert, so let's take the placeholders arguments, if any and double them." );
         if( scalar( @binded_types ) > scalar( @binded ) )
         {
-            $self->messagef( 3, "Pushing %d binded elements to the stack of binded elements.", scalar( @binded ) );
             CORE::push( @binded, @binded );
         }
     }
-    $self->messagef( 3, "Found %d bound values for %d binded column types (%s).", scalar( @binded ), scalar( @binded_types ), join( ',', @binded_types ) );
     if( $q && scalar( @binded ) != scalar( @binded_types ) )
     {
         warn( sprintf( "Warning: total %d bound values does not match the total %d bound types ('%s')! Check the code for query $self->{sth}->{Statement}...\n", scalar( @binded ), scalar( @binded_types ), join( "','", @binded_types ) ) );
@@ -307,17 +306,14 @@ sub execute
         }
     }
     
-    $self->message( 3, "Binding '", CORE::join( ', ', @binded ), "' with binded types '", CORE::join( "', '", @binded_types ), "' parameters for query: '$self->{query}'." );
+    local $_;
     my $rv = 
     eval
     {
-        local( $SIG{__DIE__} )  = sub{ };
-        local( $SIG{__WARN__} ) = sub{ };
+        #local( $SIG{__DIE__} )  = sub{ };
+        #local( $SIG{__WARN__} ) = sub{ };
         local( $SIG{ALRM} )     = sub{ die( "Timeout while processing query $self->{sth}->{Statement}\n" ) };
         ## print( STDERR ref( $self ) . "::execute(): binding parameters '", join( ', ', @$binded ), "' to query:\n$self->{ 'query' }\n" );
-        $self->message( 3, "Executing query '$self->{sth}->{Statement}' with handler '$self->{sth}'." );
-        # $self->message( 3, "Is database handler active? ", ( $self->ping ? 'Yes' : 'No' ) );
-        $self->message( 3, "Statement handler contains the following data: ", $self->dump( $self->{sth} ) );
         ## $self->{ 'sth' }->execute( @binded );
         for( my $i = 0; $i < scalar( @binded ); $i++ )
         {
@@ -331,10 +327,8 @@ sub execute
             }
             
             my $data_type = $binded_types[ $i ];
-            $self->message( 3, "\$data_type is '$data_type'" );
             if( CORE::length( $data_type ) && $self->_is_hash( $data_type ) )
             {
-                $self->message( 3, "Found binded param for binded value No $i (starting from 0) -> '", $binded[ $i ], "': ", sub{ $self->SUPER::dump( $data_type ) } );
                 $self->{sth}->bind_param( $i + 1, $binded[ $i ], $data_type );
             }
             else
@@ -345,7 +339,6 @@ sub execute
         $self->{sth}->execute();
     };
     my $error = $@;
-    $self->message( 3, "execute() returned value '$rv' and \$\@ is '$error'." );
     if( $q )
     {
         if( $q->join_tables->length > 0 )
@@ -353,7 +346,6 @@ sub execute
             $q->join_tables->foreach(sub{
                 my $tbl = shift( @_ );
                 return if( !$tbl || !ref( $tbl ) );
-                $self->message( 3, "Resetting table \"", $tbl->name, "\"." );
                 $tbl->reset;
             });
         }
@@ -377,7 +369,6 @@ sub execute
     }
     if( $error )
     {
-        $self->message( 3, "Got an error: $error" );
         $error =~ s/ at (\S+\s)?line \d+.*$//s;
         ## $err .= ":\n\"$self->{ 'query' }\"";
         $error .= ":\n\"$self->{sth}->{Statement}\"";
@@ -472,9 +463,7 @@ sub fetchall_arrayref($@)
     # return( \@rows );
     return( \@rows ) if( !$dbo->auto_decode_json && !$dbo->auto_convert_datetime_to_object );
     my $data = \@rows;
-    $self->messagef( 3, "Calling _convert_json2hash for %d rows of data with auto_decode_json '%s' and auto_convert_datetime_to_object '%s'.", scalar( @$data ), $dbo->auto_decode_json, $dbo->auto_convert_datetime_to_object );
     $data = $self->_convert_json2hash({ statement => $sth, data => $data }) if( $dbo->auto_decode_json );
-    ## $self->message( 3, "Resulting data is: ", sub{ $self->dumper( $data ) } );
     $data = $self->_convert_datetime2object({ statement => $sth, data => $data }) if( $dbo->auto_convert_datetime_to_object );
     return( $data );
 }
@@ -552,7 +541,6 @@ sub fetchrow_hashref
     my $dbo  = $self->database_object;
     my $deb = {};
     %$deb = %$self;
-    # $self->message( 3, "Statement object contains: ", $self->printer( $deb ) );
     my $sth = $self->{sth};
     if( !$self->executed() )
     {
@@ -560,12 +548,10 @@ sub fetchrow_hashref
     }
     return( $sth->fetchrow_hashref ) if( !$dbo->auto_decode_json && !$dbo->auto_convert_datetime_to_object );
     my $ref = $sth->fetchrow_hashref;
-    ## $self->message( 3, "Decoding json to perl. Before decoding: ", sub{ $self->dumper( $ref ) } );
     ## Convert json to hash for the relevant fields
     # return( $self->_convert_json2hash( $ref ) );
     $ref = $self->_convert_json2hash({ statement => $sth, data => $ref }) if( $dbo->auto_decode_json );
     $ref = $self->_convert_datetime2object({ statement => $sth, data => $ref }) if( $dbo->auto_convert_datetime_to_object );
-    ## $self->message( 3, "Resulting data is: ", sub{ $self->dumper( $ref ) } );
     return( $ref );
 }
 
@@ -580,15 +566,12 @@ sub fetchrow_object
     }
     # $self->_cleanup();
     my $rows = $self->{sth}->rows;
-    # $self->message( 3, "$rows found" );
     my $ref = $self->{sth}->fetchrow_hashref();
-    # $self->message( 3, "Found result data : ", sub{ $self->dump( $ref ) } );
     if( $ref && scalar( keys( %$ref ) ) ) 
     {
         my $struct = { map{ $_ => '$' } keys( %$ref ) };
         my $table  = $self->table;
         my $class  = "DB::Object::${basePack}::Result::${table}";
-        # $self->message( 3, "Building class '$class' with '", scalar( keys( %$ref ) ), "' keys." );
         if( !defined( &{ $class . '::new' } ) )
         {
             struct $class => $struct;
@@ -657,7 +640,6 @@ sub join
     {
         $on = ( scalar( @_ ) == 1 && ref( $_[0] ) ) ? shift( @_ ) : [ @_ ];
     }
-    $self->message( 3, "join condition (\$on) is: $on" );
     my $q = $self->query_object || return( $self->error( "No query formatter object was set" ) );
     my $tbl_o = $q->table_object || return( $self->error( "No table object is set in query object." ) );
     my $query = $q->query ||
@@ -666,7 +648,6 @@ sub join
     {
         return( $self->error( "You may not perform a join on a query other than select." ) );
     }
-    # $self->message( 3, "Table '", $q->table_object->name, "' alias so far is: '", $q->table_alias, "'." );
     my $constant = $q->constant;
     ## Constant is set and query object marked as final, which means this statement has already been processed as a join and so we skip all further processing.
     if( scalar( keys( %$constant ) ) && $q->final )
@@ -677,15 +658,11 @@ sub join
     my $db         = $tbl_o->database();
     my $multi_db   = $tbl_o->prefix_database;
     my $alias      = $tbl_o->as;
-    # $self->message( 3, "Table object is '$tbl_o', original table is '$table' and database '$db'." ); exit;
     my $new_fields = '';
     my $new_table  = '';
     my $new_db     = '';
     my $class      = ref( $self );
     my $q2 = $q->clone;
-    # $self->message( 3, "Creating a clone of \$q ($q) into \$q2 ($q2)" );
-    $self->messagef( 3, "For starter \$q2 has %d binded types.", $q2->binded_types->length );
-    # $self->message( 3, "Clone main object is: '$q2'." );
     my $q1;
     $q2->join_tables( $tbl_o ) if( !$q2->join_tables->length );
     # $data is a DB::Object::Postgres::Statement object - we get all its parameter and merge them with ours
@@ -701,7 +678,6 @@ sub join
         if( $self->_is_object( $data ) && $data->isa( 'DB::Object::Tables' ) )
         {
             $join_tbl = $data;
-            # $self->message( 3, "Joined table '", $data->name, "' alias is '", $data->query_object->table_alias, "' and prefixed property is '", $data->prefixed, "'." );
         }
         elsif( $self->_is_object( $data ) )
         {
@@ -715,15 +691,12 @@ sub join
         }
         $join_tbl->prefixed( $db ne $join_tbl->database_object->database ? 3 : 1 );
         my $sth_tmp = $join_tbl->select || return( $self->pass_error( $join_tbl->error ) );
-        $self->message( 3, "sql query is: ", $sth_tmp->as_string );
         $q1 = $sth_tmp->query_object || return( $self->error( "Could not get a query object out of the dummy select query I made from table \"$data\"." ) );
         $new_fields = $q1->selected_fields;
-        # $self->message( 3, "Got the table object, and group by is? '", $q1->group, "'" );
-        # XXX NOTE: 2021-08-22: If we reset it here, we lose the table aliasing
+        # NOTE: 2021-08-22: If we reset it here, we lose the table aliasing
         # $join_tbl->reset;
         
         # $join_tbl->prefixed( $db ne $join_tbl->database_object->database ? 3 : 1 ) unless( $join_tbl->prefixed );
-        # XXX $new_table  = $data;
         $new_table = $join_tbl->prefix;
         $join_tbl->reset;
         # We assume this table is part of our same database
@@ -732,7 +705,7 @@ sub join
         # $new_fields = $db_data->format_statement();
         $new_fields = '';
     }
-    # XXX
+    # TODO: check this or remove it
     # $q1->table_object->prefixed( $db ne $q1->database_object->database ? 3 : 1 );
     $new_fields = $q1->selected_fields;
     $new_table  = $q1->table_object->name;
@@ -741,16 +714,12 @@ sub join
     $q2->join_tables->push( $q1->table_object );
     if( CORE::length( $q->where ) )
     {
-        $self->message( 3, "Combining previous where condition (", $q->where, ") with new one (", $q1->where, ")." );
         $q2->where( $self->AND( ( $q->where ), $q1->new_clause({ value => '( ' . ( $q1->where ) . ' )' }) ) ) if( CORE::length( $q1->where ) );
     }
     elsif( CORE::length( $q1->where ) )
     {
         $q2->where( $q1->where );
     }
-#     $self->message( 3, "Where clause is no: ", $q2->where );
-#     $self->message( 3, "Group clause is: ", $q2->group, "\n and with \$q1 maybe? ", $q1->group );
-    $self->message( 3, "Merging group, order, and binded where, group and order, and overall binded." );
     $q2->group( $q->group, $q1->group ) if( $q1->group->value->length );
     $q2->order( $q->order, $q1->order ) if( $q1->order->value->length );
     $q2->binded_where->push( @{$q1->binded_where} );
@@ -762,7 +731,6 @@ sub join
         $q2->_limit( $q1->_limit );
         $q2->binded_limit( $q1->binded_limit );
     }
-    $self->messagef( 3, "After merging with clauses from \$q1 ($q1 from table %s) \$q2 has %d binded types.", $q1->table_object->name, $q2->binded_types->length );
     my $prev_fields = length( $q->join_fields ) ? $q->join_fields : $q->selected_fields;
     # Regular express to prepend previous fields by their table name if that's not the case already
     # my $prev_prefix = $new_db ? "$db.$table" : $table;
@@ -777,9 +745,7 @@ sub join
     my $prev_fields_hash = $q->table_object->fields;
     my $prev_fields_list = CORE::join( '|', sort( keys( %$prev_fields_hash ) ) );
     my $re = qr/(?<!\.)\b($prev_fields_list)\b/;
-    $self->message( 3, "Executing regular expression: $re on $prev_fields" );
     $prev_fields =~ s/(?<!\.)\b($prev_fields_list)\b/${prev_prefix}.$1/gs;
-#     $self->message( 3, "Fields now are: '$prev_fields'." );
     my $fields = $new_fields ? CORE::join( ', ', $prev_fields, $new_fields ) : $prev_fields;
     $q2->join_fields( $fields );
     #my $from_table = $q2->from_table;
@@ -793,8 +759,8 @@ sub join
     # $q2->left_join( {} ) if( !$q2->left_join );
     my $left_join = '';
     my $condition = '';
-#     $self->message( 3, "Processing join condiction with '$on'." );
-    local $format_condition = sub
+    my $format_condition;
+    $format_condition = sub
     {
         my @vals = ();
         my $vals = shift( @_ );
@@ -805,7 +771,6 @@ sub join
         {
             if( $self->_is_object( $vals->[0] ) && $vals->[0]->isa( 'DB::Object::Operator' ) )
             {
-                # $self->message( 3, "Next value is another operator object (", $sub_obj->operator, "), drilling down." );
                 my $sub_obj = shift( @$vals );
                 my $sub_op = $sub_obj->operator;
                 my( @sub_vals ) = $sub_obj->value;
@@ -820,7 +785,6 @@ sub join
                 if( $self->_is_object( $vals->[0] ) && $vals->[0]->isa( 'DB::Object::Fields::Field::Overloaded' ) )
                 {
                     my $f1 = shift( @$vals );
-                    $self->message( 3, "Got an overloaded field object '$f1'" );
                     $f1->field->prefixed( $multi_db ? 3 : 1 );
                     CORE::push( @res, "$f1" );
                     $fields_tables->{ $f1->field->table }++ if( !$fields_tables->{ $f1->field->table } );
@@ -828,7 +792,6 @@ sub join
                 }
                 
                 my( $f1, $f2 ) = ( shift( @$vals ), shift( @$vals ) );
-                # $self->message( 3, "Value 1 is '$f1' and value 2 is '$f2'." );
                 my $i_am_negative = 0;
                 if( $self->_is_object( $f2 ) && $f2->isa( 'DB::Object::NOT' ) )
                 {
@@ -857,7 +820,6 @@ sub join
                 {
                     $field2 = $multi_db ? "$new_db.$new_table.$f2" : "$new_table.$f2";
                 }
-#                 $self->message( 3, "Fields to be used are: '$field1' and '$field2'." );
                 CORE::push( @res, $i_am_negative ? "$field1 != $field2" : "$field1 = $field2" );
             }
         }
@@ -867,20 +829,16 @@ sub join
         });
     };
     
-    $self->message( 3, "\$on is '$on' and of type '", ref( $on ), "'." );
     # $on is either a $dbh->AND, or $dbh->OR
     if( defined( $on ) )
     {
         if( $self->_is_object( $on ) && $on->isa( 'DB::Object::Operator' ) )
         {
-            $self->message( 3, "The join condition is defined by a DB::Object::Operator" );
             my $op = $on->operator;
-    #         $self->message( 3, "Operator is '$op'." );
             my( @vals ) = $on->value;
             my $ret = $format_condition->( \@vals, $op );
             my $as = $q1->table_alias ? sprintf( ' AS %s', $q1->table_alias ) : '';
             $left_join = "LEFT JOIN ${new_table}${as} ON $ret->{clause}";
-    #         $self->message( 3, "\$left_join is: '$left_join'." );
         }
         elsif( $self->_is_object( $on ) && $on->isa( 'DB::Object::Fields::Field::Overloaded' ) )
         {
@@ -892,12 +850,10 @@ sub join
             my $ret = $format_condition->( $on, 'AND' );
             my $as = $q1->table_alias ? sprintf( ' AS %s', $q1->table_alias ) : '';
             $left_join = "LEFT JOIN ${new_table}${as} ON $ret->{clause}";
-    #         $self->message( 3, "\$left_join is: '$left_join'." );
         }
         # There is a second parameter - if so this is the condition of the 'LEFT JOIN'
         elsif( $self->_is_hash( $on ) )
         {
-    #         $self->message( 3, "Join condition is made from an hash reference." );
             # Previous join
             my $join_ref = $q2->left_join;
             my $def = { on => $on, table_object => $q1->table_object, query_object => $q1 };
@@ -917,14 +873,12 @@ sub join
                 my $condition = $join_ref->{ $joined }->{on};
                 my $to = $join_ref->{ $joined }->{table_object};
                 my $qo = $join_ref->{ $joined }->{query_object};
-                $self->message( 3, "Processing condition for left join table '", $to->name, "' with alias '", $qo->table_alias, "'." );
                 my $join_table_name = $to->prefix;
                 my $join_table_alias = '';
                 if( length( $join_table_alias = $qo->table_alias ) )
                 {
                     $join_table_alias = " AS $join_table_alias";
                 }
-                # $self->message( 3, "Processing condition: ", sub{ $self->SUPER::dump( $condition )} );
                 push( @join_data, "LEFT JOIN ${join_table_name}${join_table_alias} ON " . CORE::join( ' AND ', map{ "$_=$condition->{ $_ }" } keys( %$condition ) ) );
             }
             $left_join = CORE::join( ' ', @join_data );
@@ -937,7 +891,6 @@ sub join
     # Otherwise, this is a straight JOIN
     else
     {
-        # $self->message( 3, "Dealing with a straight join." );
         # $q2->from_table->push( $multi_db ? "$new_db.$new_table" : $new_table );
         $q2->from_table->push(
             $q1->table_alias
@@ -945,12 +898,9 @@ sub join
                 : ( $q1->table_object->prefixed ? $q1->table_object->prefix : $q1->table_object->name )
         );
     }
-#     $self->message( 3, "Left join formatted is: '$left_join'." );
-    $from = $q2->from_table->join( ', ' );
-    # $self->messagef( 3, "Finally, before calling _query_components, \$q2 has %d binded types.", $q2->binded_types->length );
+    my $from = $q2->from_table->join( ', ' );
     # $q2->from_table( $from_table );
     my $clause = $q2->_query_components( 'select', { no_bind_copy => 1 } );
-    # $self->messagef( 3, "Ultimately, after calling _query_components, \$q2 has %d binded types.", $q2->binded_types->length );
     # You may not sort if there is no order clause
 #     my $table_alias = '';
 #     if( length( $table_alias = $q2->table_alias ) )
@@ -962,7 +912,6 @@ sub join
     push( @query, @$clause ) if( @$clause );
     my $statement = CORE::join( ' ', @query );
     $q2->query( $statement );
-#     $self->messagef( 3, "Join tables are %d: %s.", $q2->join_tables->length, CORE::join( "', '", map( $_->name, @{$q2->join_tables} ) ) );
     # my $sth = $self->prepare( $self->{ 'query' } ) ||
     my $sth = $tbl_o->_cache_this( $q2 ) ||
     return( $self->error( "Error while preparing query to select:\n", $q2->as_string(), $tbl_o->error ) );
@@ -1108,7 +1057,7 @@ DESTROY
 
 1;
 
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8

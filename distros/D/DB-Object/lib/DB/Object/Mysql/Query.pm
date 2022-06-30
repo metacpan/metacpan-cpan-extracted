@@ -17,12 +17,15 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object::Query );
+    use vars qw( $VERSION $DEBUG $VERBOSE );
     use Devel::Confess;
-    our( $VERSION, $DEBUG, $VERBOSE );
     $VERSION = 'v0.3.6';
     $DEBUG = 0;
     $VERBOSE = 0;
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -171,7 +174,7 @@ sub reset_bind
 sub _query_components
 {
     my $self = shift( @_ );
-    my $type = lc( shift( @_ ) ) || $self->_query_type() || return( $self->error( 'You must specify a query type: select, insert, update or delete' ) );
+    my $type = ( @_ > 0 && lc( shift( @_ ) ) ) || $self->_query_type() || return( $self->error( 'You must specify a query type: select, insert, update or delete' ) );
     my $opts = $self->_get_args_as_hash( @_ );
     my( $where, $group, $having, $sort, $order, $limit );
     $where  = $self->where();
@@ -186,25 +189,20 @@ sub _query_components
     elsif( $type eq 'update' || $type eq 'delete' )
     {
         my( @offset_limit ) = $self->limit;
-        ## $self->message( 3, "limit array value received contains: ", sub{ $self->dumper( \@offset_limit ) } );
         ## https://dev.mysql.com/doc/refman/5.7/en/update.html
         ## https://dev.mysql.com/doc/refman/5.7/en/delete.html
         $limit = sprintf( 'LIMIT %d', $offset_limit[0] ) if( scalar( @offset_limit ) );
     }
     my @query = ();
-    ## $self->message( 3, "\$where is '$where', \$group = '$group', \$having = '$having', \$order = '$order', \$limit = '$limit'." );
     push( @query, "WHERE $where" ) if( $where && $type ne 'insert' );
     push( @query, "GROUP BY $group" ) if( $group && $type eq 'select'  );
     push( @query, "HAVING $having" ) if( $having && $type eq 'select'  );
     push( @query, "ORDER BY $order" ) if( $order && $type eq 'select'  );
     push( @query, $sort ) if( $sort && $order && $type eq 'select'  );
     push( @query, "$limit" ) if( $limit && $type eq 'select' );
-#     $self->message( 3, "Query components are:" );
 #     foreach my $this ( @query )
 #     {
-#         $self->message( 3, "Query component: $this" );
 #     }
-#     $self->message( 3, "Returning query components: ", sub{ $self->dump( @query ) } );
     return( \@query );
 }
 

@@ -1,6 +1,6 @@
 use 5.014;
 
-package Plack::Middleware::CSP 0.01 {
+package Plack::Middleware::CSP 0.02 {
     use utf8;
     use strict;
     use warnings;
@@ -9,13 +9,12 @@ package Plack::Middleware::CSP 0.01 {
     use Plack::Util::Accessor qw( nonce_template_token );
     our $AUTHORITY = "cpan:ASHLEY";
 
-    sub csp { +shift->{_csp} }
-    sub nonce { +shift->csp->nonce }
+    sub _csp { +shift->{_csp} }
+    sub _nonce { +shift->_csp->nonce }
 
     sub new {
         my $self = +shift->SUPER::new(@_);
-        # TEST policy and nonces_for are properly formed and HTTP::CSPHeader object can be made.
-        # Refer to HTTP::CSPHeader's tests?
+        # Let HTTP::CSPHeader decide and report on arguments.
         $self->{_csp} = HTTP::CSPHeader->new(
             policy => delete $self->{policy},
             nonces_for => delete $self->{nonces_for},
@@ -27,20 +26,20 @@ package Plack::Middleware::CSP 0.01 {
     sub call {
         my ( $self, $env ) = @_;
 
-        $env->{"CSP_NONCE"} = $self->nonce;
+        $env->{"CSP_NONCE"} = $self->_nonce;
         my $res = $self->app->($env);
 
         Plack::Util::response_cb($res, sub {
             my $res = shift;
-            $self->csp->reset; # Request is done, reset for response.
+            $self->_csp->reset; # Request is done, reset for response.
             my $h = Plack::Util::headers($res->[1]);
             if ( my $token = $self->nonce_template_token )
             {
-                my $nonce = $self->nonce;
+                my $nonce = $self->_nonce;
                 # Content type?!? Restrict to… sane values? text, html…?
                 s/\Q$token/$nonce/g for @{ $res->[2] };
             }
-            $h->set("content-security-protocol" => $self->csp->header );
+            $h->set("content-security-protocol" => $self->_csp->header );
          });
     }
     1;
@@ -54,7 +53,7 @@ __DATA__
 
 =head1 Name
 
-Plack::Middleware::CSP - Apply L<HTTP::CSPHeader>s to your psgi application.
+Plack::Middleware::CSP - Apply L<HTTP::CSPHeader> to your psgi application.
 
 =head1 Synopsis
 
@@ -139,21 +138,28 @@ repo, L<https://github.com/pangyre/Plack-Middleware-CSP/issues>.
 
 =head1 See Also
 
-L<HTTP::CSPHeader>, L<https://metacpan.org/pod/Plack>,
-L<https://metacpan.org/pod/Plack::Middleware>,
-L<https://metacpan.org/module/Plack::Util>.
+The excellent Leon Timmermans took a stab at this quite a few years
+ago: L<https://github.com/Leont/plack-middleware-csp>. I have not made
+any tests or comparisons.
+
+L<HTTP::CSPHeader>, L<Plack>, L<Plack::Middleware>, L<Plack::Util>.
 
 L<https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP>.
 
-=head1 Author and License
+=head1 Author
 
-©2022, Ashley Pond V, C<< <ashley@cpan.org> >>.
+Ashley Pond V, C<< <ashley@cpan.org> >>.
 
-This program is free software; you can redistribute it and modify it
-under the same terms as Perl itself.
+=head1 License
+
+©2022 Ashley Pond V. This program is free software; you can
+redistribute it and modify it under the same terms as Perl itself.
 
 See L<http://dev.perl.org/licenses/artistic.html>.
 
 =cut
 
+To do–
+
+csp-report => {}
 

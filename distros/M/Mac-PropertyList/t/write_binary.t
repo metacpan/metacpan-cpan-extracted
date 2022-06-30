@@ -1,3 +1,54 @@
+#!/usr/bin/env perl
+
+
+=encoding utf8
+
+=head1 NAME
+
+write_binary.t
+
+=head1 SYNOPSIS
+
+	# run all the tests
+	% perl Makefile.PL
+	% make test
+
+	# run all the tests
+	% prove
+
+	# run a single test
+	% perl -Ilib t/write_binary.t
+
+	# run a single test
+	% prove t/write_binary.t
+
+=head1 AUTHORS
+
+Original author: Wim Lewis C<< <wiml@hhhh.org> >>
+
+Contributors:
+
+=over 4
+
+=item trwyant C<< <wyant@cpan.org> >>
+
+=back
+
+=head1 SOURCE
+
+This file was originally in https://github.com/briandfoy/mac-propertylist
+
+=head1 COPYRIGHT
+
+Copyright © 2002-2022, Wim Lewis C<< <wiml@hhhh.org> >>
+
+=head1 LICENSE
+
+This file is licenses under the Artistic License 2.0. You should have
+received a copy of this license with this distribution.
+
+=cut
+
 use strict;
 use warnings;
 use utf8;
@@ -8,16 +59,16 @@ use Math::BigInt;
 
 our($val, $expect);
 
-use Test::More tests => 42;
+use Test::More;
 
 BEGIN {
     my $class = 'Mac::PropertyList::WriteBinary';
-    
-    use_ok( $class, qw( as_string ) );
+
+    use_ok( $class, qw( as_string ) ) or BAIL_OUT( "$class did not compile\n" );
     can_ok( $class, qw( as_string ) );
 }
 
-use Mac::PropertyList ();
+use_ok( 'Mac::PropertyList' ) or BAIL_OUT( "Mac::PropertyList did not compile\n" );
 
 # Test basic (scalar) data types. Make a single-object plist
 # containing each one and compare it to the expected representation.
@@ -27,7 +78,7 @@ sub testrep {
 
     my($val) = "Mac::PropertyList::$tp"->new($arg);
     my($bplist) = as_string($val);
-    my($expected) = "bplist00" . $frag . 
+    my($expected) = "bplist00" . $frag .
         pack('C x6 CC x4N x4N x4N',
              8,    # Offset table: offset of only object
              1, 1, # Byte sizes of offsets and of object IDs
@@ -35,7 +86,7 @@ sub testrep {
              0,    # ID of root (only) object
              8 + length($frag)  # Start offset of offset table
         );
- 
+
      is($bplist, $expected, "basic datatype '$tp', line $ln")
          || diag ( Data::Dumper->Dump([$val, $bplist, $expected], ['value', 'got', 'exp']) );
 }
@@ -206,10 +257,9 @@ isnt($@, '', "writing a subroutine reference should fail");
     my($d1) = { 'A' => 'aye', 'B' => 'bee' };
     my($d2) = { 'A' => 'aye', 'B' => $d1 };
     $d1->{B} = $d2;
-    
+
     eval { $val = as_string($d1); };
     like($@, qr/Recursive/, "recursive data structure should fail");
 }
 
-
-1;
+done_testing();

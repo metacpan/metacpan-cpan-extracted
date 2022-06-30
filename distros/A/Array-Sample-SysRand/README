@@ -2,7 +2,7 @@ NAME
     Array::Sample::SysRand - Systematic random sampling from an array
 
 VERSION
-    This document describes version 0.002 of Array::Sample::SysRand (from
+    This document describes version 0.003 of Array::Sample::SysRand (from
     Perl distribution Array-Sample-SysRand), released on 2022-05-20.
 
 SYNOPSIS
@@ -45,7 +45,7 @@ SEE ALSO
     <https://www.investopedia.com/terms/s/systematic-sampling.asp>
 
     Other sampling methods: Array::Sample::Partition,
-    Array::Sample::SimpleRandom
+    Array::Sample::SimpleRandom, Array::Sample::WeightedRandom
 
 AUTHOR
     perlancar <perlancar@cpan.org>

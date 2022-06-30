@@ -20,8 +20,8 @@ BEGIN
 {
     use strict;
     use warnings;
-    our( $VERSION, $VERBOSE, $DEBUG );
     use parent qw( DB::Object::SQLite DB::Object::Tables );
+    use vars qw( $VERSION $VERBOSE $DEBUG $TYPE_TO_CONSTANT );
     $VERSION    = 'v0.300.0';
     $VERBOSE    = 0;
     $DEBUG      = 0;
@@ -38,6 +38,9 @@ qr/^(CHARACTER\(\d+\)|VARCHAR\(\d+\)|VARYING\s+CHARACTER\(\d+\)|NCHAR\(\d+\)|NAT
     qr/^(NUMERIC|DECIMAL\(\d+,\d+\)|BOOLEAN|DATETIME|DATE)/ => { constant => '', name => 'SQLITE_NULL', type => 'bool' },
     };
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -128,7 +131,6 @@ sub create
         # Trick so other method may follow, such as as_string(), fetchrow(), rows()
         if( !defined( wantarray() ) )
         {
-            $self->message( "wantarray in void context" );
             $new->execute() ||
             return( $self->error( "Error while executing query to create table '$table':\n$query", $new->errstr() ) );
         }
@@ -257,9 +259,9 @@ sub structure
     my $default = $self->{default};
     my $null    = $self->{null};
     my $types   = $self->{types};
+    my $const   = $self->{constant};
     if( !%$fields || !%$struct || !%$default )
     {
-        $self->message( 3, "No structure, field, default values, null or types set yet for this table '$table' object. Populating." );
         # my $query = "SELECT * FROM information_schema.columns WHERE table_name = ?";
         my $query = <<EOT;
 PRAGMA table_info(${table})
@@ -321,13 +323,12 @@ EOT
             $self->{primary} = \@primary;
         }
         # $self->{ '_structure_real' } = $struct;
+        $self->{constant}  = $const;
         $self->{default}   = $default;
         $self->{fields}    = $fields;
         $self->{structure} = $struct;
         $self->{types}     = $types;
-        $self->message( 3, "Fields found: ", sub{ $self->dump( $fields ) } );
     }
-#    $self->message( sprintf( "struct has %d keys", scalar( keys( %$struct ) ) ) );
     return( wantarray() ? () : undef() ) if( !scalar( keys( %$struct ) ) );
     return( wantarray() ? %$struct : \%$struct );
 }
@@ -347,7 +348,7 @@ DESTROY
 
 1;
 
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8

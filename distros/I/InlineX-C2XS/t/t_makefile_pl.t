@@ -36,6 +36,7 @@ my %config_opts = (
                   'LDDLFLAGS' => $Config{lddlflags},
                   'MAKE' =>  $Config{make},
                   'MYEXTLIB' => 'MANIFEST', # this test needs *only* that the file exists
+                  'OBJECT' => '$(O_FILES)',
                   'OPTIMIZE' => '-g',
                   );
 
@@ -194,28 +195,29 @@ if($ok) {
      if ($_ =~ /\-L\/anywhere \-lbogus/) {$res .= 'h'}
      if ($_ =~ /TYPEMAPS/) {$res .= 'i'}
      if ($_ =~ /simple_typemap\.txt/) {$res .= 'j'}
-     if ($_ =~ /VERSION/) {$res .= 'k'}
-     if ($_ =~ /0.42/) {$res .= 'l'}
+     if ($_ =~ /VERSION/)             {$res .= 'k'}
+     if ($_ =~ /0.42/)                {$res .= 'l'}
      if ($_ =~ /WriteMakefile\(%options\);/) {$res .= 'm'}
-     if ($_ =~ /sub MY::makefile \{ '' \}/) {$res .= 'n'}
-     if ($_ =~ /CC/) {$res .= 'o'}
-     if ($_ =~ /\Q$Config{cc}\E/) {$res .= 'p'}
-     if ($_ =~ /CCFLAGS/) {$res .= 'q'}
-     if ($_ =~ /\s\-DMY_DEFINE/) {$res .= 'r'}
-     if ($_ =~ /LD/) {$res .= 's'}
-     if ($_ =~ /\Q$Config{ld}\E/) {$res .= 't'}
-     if ($_ =~ /LDDLFLAGS/) {$res .= 'u'}
-     if ($_ =~ /MAKE/) {$res .= 'v'}
+     if ($_ =~ /sub MY::makefile \{ '' \}/)  {$res .= 'n'}
+     if ($_ =~ /CC/)                {$res .= 'o'}
+     if ($_ =~ /\Q$Config{cc}\E/)   {$res .= 'p'}
+     if ($_ =~ /CCFLAGS/)           {$res .= 'q'}
+     if ($_ =~ /\s\-DMY_DEFINE/)    {$res .= 'r'}
+     if ($_ =~ /LD/)                {$res .= 's'}
+     if ($_ =~ /\Q$Config{ld}\E/)   {$res .= 't'}
+     if ($_ =~ /LDDLFLAGS/)         {$res .= 'u'}
+     if ($_ =~ /MAKE/)              {$res .= 'v'}
      if ($_ =~ /\Q$Config{make}\E/) {$res .= 'w'}
      if ($_ =~ /MYEXTLIB/) {$res .= 'x'}
      if ($_ =~ /MANIFEST/) {$res .= 'y'}
      if ($_ =~ /OPTIMIZE/) {$res .= 'z'}
-     if ($_ =~ /\-g/) {$res .= 'A'}
+     if ($_ =~ /\-g/)      {$res .= 'A'}
+     if ($_ =~ /OBJECT/)   {$res .= 'B'}
   }
 }
 
 if($ok) {
-  for('a' .. 'z', 'A') {
+  for('a' .. 'z', 'A', 'B') {
      if($res !~ $_) {
        warn "'$_' is missing\n";
        $ok2 = 0;

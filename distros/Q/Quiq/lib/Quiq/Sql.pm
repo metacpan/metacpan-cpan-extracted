@@ -68,7 +68,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.202';
+our $VERSION = '1.203';
 
 use Quiq::Hash;
 use Quiq::Option;
@@ -1482,6 +1482,10 @@ sub splitTableName {
 
 =over 4
 
+=item -check => \@expr
+
+Liste von CHECK-Contraints (Bedingungen).
+
 =item -reference => [[\@cols => $refTable,@opt], ...]
 
 Liste von Fremdschlüssel-Verweisen.
@@ -1568,12 +1572,14 @@ sub createTable {
 
     # Optionen
 
+    my $checkA = [];
     my $referenceA = [];
     my $tableSpace = undef;
     my $tableType = 'InnoDB';
 
     if (@_) {
         Quiq::Option->extract(-mode=>'sloppy',\@_,
+             -check => \$checkA,
              -references => \$referenceA,
              -tableSpace => \$tableSpace,
              -tableType => \$tableType,
@@ -1594,6 +1600,11 @@ sub createTable {
     my $stmt = "CREATE TABLE $table (";
     if ($cols) {
         $stmt .= "\n$cols\n";
+    }
+    if (@$checkA) {
+        for (@$checkA) {
+            $stmt .= "    , CHECK($_)\n";
+        }
     }
     if (@$referenceA) {
         for (@$referenceA) {
@@ -1645,6 +1656,34 @@ sub dropTable {
     }
     elsif ($postgresql) {
         $stmt .= ' CASCADE';
+    }
+
+    return $stmt;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 renameTable() - Benenne Tabelle um
+
+=head4 Synopsis
+
+  $stmt = $sql->renameTable($oldName,$newName);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub renameTable {
+    my ($self,$oldName,$newName) = @_;
+
+    my ($oracle,$postgresql,$sqlite,$mysql) = $self->dbmsTestVector;
+
+    my $stmt;
+    if ($sqlite) {
+        $stmt = "ALTER TABLE $oldName RENAME TO $newName";
+    }
+    else {
+        $self->throw;
     }
 
     return $stmt;
@@ -2442,6 +2481,12 @@ B<PostgreSQL Syntax>
       CONSTRAINT <CONSTRAINT_NAME>
       CHECK (<CHECK_CLAUSE>)
 
+B<SQLite Syntax>
+
+  ALTER TABLE <TABLE_NAME> ADD
+      CONSTRAINT <CONSTRAINT_NAME>
+      CHECK (<CHECK_CLAUSE>)
+
 =cut
 
 # -----------------------------------------------------------------------------
@@ -2476,7 +2521,7 @@ sub addCheckConstraint {
     # Statement generieren
 
     my $stmt;
-    if ($oracle || $postgresql) {
+    if ($oracle || $postgresql || $sqlite) {
         $stmt = sprintf "ALTER TABLE %s ADD\n".
             "    CONSTRAINT %s\n".
             "    CHECK (%s)",
@@ -2489,7 +2534,7 @@ sub addCheckConstraint {
         }
     }
     else {
-        die;
+        $self->throw;
     }
 
     return $stmt;
@@ -5649,7 +5694,7 @@ sub diff {
 
 =head1 VERSION
 
-1.202
+1.203
 
 =head1 AUTHOR
 

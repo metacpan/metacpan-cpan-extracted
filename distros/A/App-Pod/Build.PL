@@ -4,6 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Module::Build;
+use File::Spec::Functions qw( catfile );
 Module::Build->VERSION( '0.4004' );
 
 my $class = Module::Build->subclass(
@@ -67,11 +68,19 @@ my $builder = $class->new(
         'Test::More' => '0',
     },
     requires => {
+        'perl'              => '5.024',
         'Module::Functions' => '2.1.3',
         'File::HomeDir'     => '1.006',
-        'Pod::Query'        => '0.25',
+        'Mojo::File'        => '0',
+        'Mojo::JSON'        => '0',
+        'Pod::Query'        => '0.32',
     },
-    add_to_cleanup => [ 'App-Pod-*', "$ENV{HOME}/.cache/my_pod*.cache", ],
+    add_to_cleanup => [
+        'App-Pod-*',
+        sprintf( "%s/.cache/my_pod*.cache",
+            $ENV{HOME} // $ENV{USEPROFILE}
+              // catfile( $ENV{HOMEDRIVE}, $ENV{HOMEPATH}, '' ) ),
+    ],
 );
 
 $builder->create_build_script();

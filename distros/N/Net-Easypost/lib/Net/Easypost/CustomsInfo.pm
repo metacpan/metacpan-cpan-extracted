@@ -1,5 +1,5 @@
 package Net::Easypost::CustomsInfo;
-$Net::Easypost::CustomsInfo::VERSION = '0.21';
+$Net::Easypost::CustomsInfo::VERSION = '0.23';
 use JSON::MaybeXS;
 use Types::Standard qw(ArrayRef Bool Enum InstanceOf Str);
 
@@ -112,7 +112,7 @@ Net::Easypost::CustomsInfo
 
 =head1 VERSION
 
-version 0.21
+version 0.23
 
 =head1 SYNOPSIS
 

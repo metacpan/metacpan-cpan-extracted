@@ -1,3 +1,20 @@
+0.07 2022-06-30
+  [New Features]
+    * Add SPVM::IO::Handle module
+    * Add SPVM::IO::Socket module
+    * Add SPVM::IO::Socket::Fn module
+    * SPVM::IO::Socket::INET extends SPVM::IO::Socket
+  [Bug Fix]
+    * Fix the bug that SPVM::IO don't work on Windows.
+    * Fix broken tests.
+  [Changes]
+    * SPVM::IO::Socket extends SPVM::IO::Handle
+    * SPVM::File extends SPVM::IO::File
+    * Need SPVM 0.9614
+  [Incompatible Changes]
+    * Removed SPVM::IO::Handlable
+    * Removed SPVM::IO::Socketable
+
 0.06  2022-06-22
   * Catch up with SPVM 0.96
 0.05  2022-06-20

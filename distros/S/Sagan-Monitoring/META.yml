@@ -28,5 +28,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/VVelox/Sagan-Monitoring
-version: v1.0.1
+version: v1.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

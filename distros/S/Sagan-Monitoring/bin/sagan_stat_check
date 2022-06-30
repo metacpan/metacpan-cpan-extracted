@@ -6,19 +6,16 @@ sagan_stat_check - LibreNMS JSON SNMP extend and Nagios style check for Sagan st
 
 =head1 SYNOPSIS
 
-sagan_stats_check [B<-m> single] [B<-s> <eve>] [B<-S> <instance name>] [B<-d> <drop percent warn>]
-[B<-D> <drop percent crit>]  [B<-e> <error delta warn>] [B<-E> <error delta crit>]
-[B<-r> <error percent warn>] [B<-r> <error percent crit>]
+sagan_stats_check [B<-a> <age>] [B<-m> single] [B<-s> <eve>] [B<-S> <instance name>] [B<-d> <drop percent warn>]
+[B<-D> <drop percent crit>] [B<-r> <error percent warn>] [B<-r> <error percent crit>]
 
-sagan_stats_check B<-m> slug [B<-s> <slug>] [B<-l> <log dir>]  [B<-d> <drop percent warn>]
-[B<-D> <drop percent crit>]  [B<-e> <error delta warn>] [B<-E> <error delta crit>]
-[B<-r> <error percent warn>] [B<-r> <error percent crit>]
+sagan_stats_check [B<-a> <age>] B<-m> slug [B<-s> <slug>] [B<-l> <log dir>]  [B<-d> <drop percent warn>]
+[B<-D> <drop percent crit>] [B<-r> <error percent warn>] [B<-r> <error percent crit>]
 
-sagan_stats_check B<-m> manual B<-1> <manual>  [B<-d> <drop percent warn>]
-[B<-D> <drop percent crit>]  [B<-e> <error delta warn>] [B<-E> <error delta crit>]
-[B<-r> <error percent warn>] [B<-r> <error percent crit>] [B<-2> <manual>] [B<-3> <manual>]
-[B<-4> <manual>] [B<-5> <manual>] [B<-6> <manual>] [B<-7> <manual>]
-[B<-8> <manual>] [B<-9> <manual>] [B<-0> <manual>]
+sagan_stats_check [B<-a> <age>] B<-m> manual B<-1> <manual>  [B<-d> <drop percent warn>]
+[B<-D> <drop percent crit>] [B<-r> <error percent warn>] [B<-r> <error percent crit>]
+[B<-2> <manual>] [B<-3> <manual>] [B<-4> <manual>] [B<-5> <manual>] [B<-6> <manual>]
+[B<-7> <manual>] [B<-8> <manual>] [B<-9> <manual>] [B<-0> <manual>]
 
 sagan_stats_check -c
 
@@ -41,6 +38,12 @@ for Sagan.
 
 =head1 FLAGS
 
+=head2 -a <age>
+
+How far back to read in the log in seconds.
+
+Default: 360
+
 =head2 -c
 
 Print from cache, '/var/cache/sagan_monitoring.json'.
@@ -51,11 +54,11 @@ Mode to run in.
 
 Default: single
 
-=head2 -s <eve>
+=head2 -e <eve>
 
 Eve file for use with single mode.
 
-Default: /var/log/sagan/eve.json
+Default: /var/log/sagan/stats.json
 
 =head2 -S <instance name>
 
@@ -181,7 +184,7 @@ use File::Slurp;
 use Sagan::Monitoring;
 
 sub version {
-	print "sagan_stat_check v. 0.0.1\n";
+	print "sagan_stat_check v. 0.1.1\n";
 }
 
 sub help {
@@ -192,7 +195,7 @@ sub help {
 -m <mode>                Mode to run in.
                          Default: single
 
--s <stats>               JSON stats file for use with single mode.
+-e <stats>               JSON stats file for use with single mode.
                          Default: /var/log/sagan/stats.json
 -S <instance name>       Instance name to use in single mode.
                          Default: ids
@@ -220,6 +223,9 @@ sub help {
                          Default: 0.75%
 -D <drop percent crit>   Percent of dropped packets to critical on.
                          Default: 1%
+
+-a <seconds>             Max age to look back in seconds.
+                         Default: 360
 
 -n                       Run as a nagios check style instead of LibreNMS.
 
@@ -283,9 +289,10 @@ my $instance_7;
 my $instance_8;
 my $instance_9;
 my $nagios;
-my $drop_percent_warn  = '.75';
-my $drop_percent_crit  = '1';
+my $drop_percent_warn = '.75';
+my $drop_percent_crit = '1';
 my $print_cache;
+my $max_age;
 Getopt::Long::Configure('no_ignore_case');
 Getopt::Long::Configure('bundling');
 GetOptions(
@@ -296,7 +303,7 @@ GetOptions(
 	's=s'     => \$slug,
 	'm=s'     => \$mode,
 	'l=s'     => \$log_dir,
-	's=s'     => \$single_eve,
+	'e=s'     => \$single_eve,
 	'S=s'     => \$single_name,
 	'0=s'     => \$instance_0,
 	'1=s'     => \$instance_1,
@@ -312,6 +319,7 @@ GetOptions(
 	'd=s'     => \$drop_percent_warn,
 	'D=s'     => \$drop_percent_crit,
 	'c'       => \$print_cache,
+	'a=s'     => \$max_age,
 );
 
 # print version or help if requested
@@ -326,7 +334,7 @@ if ($version) {
 
 # prints the cache and exists if requested
 if ($print_cache) {
-	my $cache=read_file('/var/cache/sagan_monitoring.json');
+	my $cache = read_file('/var/cache/sagan_monitoring.json');
 	print $cache;
 	exit;
 }
@@ -517,10 +525,11 @@ else {
 
 # put together the args hash
 my $args = {
-	mode               => 'librenms',
-	drop_percent_warn  => $drop_percent_warn,
-	drop_percent_crit  => $drop_percent_crit,
-	files              => $instances,
+	mode              => 'librenms',
+	drop_percent_warn => $drop_percent_warn,
+	drop_percent_crit => $drop_percent_crit,
+	files             => $instances,
+	max_age           => $max_age,
 };
 
 if ($nagios) {

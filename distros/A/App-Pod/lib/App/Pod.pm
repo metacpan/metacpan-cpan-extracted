@@ -3,19 +3,18 @@ package App::Pod;
 use v5.24;    # Postfix deref :)
 use strict;
 use warnings;
-use Getopt::Long;
-use Module::CoreList;
 use Pod::Query;
+use Module::CoreList();
+use Getopt::Long          qw( GetOptions );
 use Module::Functions     qw( get_full_functions );
 use File::HomeDir         qw( home );
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile  );
 use List::Util            qw( first max );
-use Mojo::Base            qw( -strict base );
 use Mojo::File            qw( path );
 use Mojo::JSON            qw( j );
-use Mojo::Util            qw( dumper );
-use Term::ANSIColor       qw( colored colorstrip );
+use Perl::OSType          qw( os_type );
+use Term::ANSIColor       qw( colored );
 use subs                  qw( _sayt );
 
 =head1 NAME
@@ -31,11 +30,11 @@ App::Pod - Quickly show available class methods and documentation.
 
 =head1 VERSION
 
-Version 0.22
+Version 0.26
 
 =cut
 
-our $VERSION = '0.22';
+our $VERSION = '0.26';
 
 
 =head1 SYNOPSIS
@@ -106,27 +105,28 @@ sub _has {
             return $_[0]{$attr} if @_ == 1;    # Get: return $self-<{$attr}
             $_[0]{$attr} = $_[1];              # Set: $self->{$attr} = $val
             $_[0];                             # return $self
-        };
+          }
+          if not defined &$attr;
     }
 }
 
 sub import {
     _has qw(
-        _class
-        _args
-        _method
-        _opts
-        _core_flags
-        _non_main_flags
-        _cache_from_file
-        _cache_pod
-        _cache_path
-        _cache_name_and_summary
-        _cache_isa
-        _cache_events
-        _cache_methods
-        _cache_method_and_doc
-        _dirty_cache
+      _class
+      _args
+      _method
+      _opts
+      _core_flags
+      _non_main_flags
+      _cache_from_file
+      _cache_pod
+      _cache_path
+      _cache_name_and_summary
+      _cache_isa
+      _cache_events
+      _cache_methods
+      _cache_method_and_doc
+      _dirty_cache
     );
 }
 
@@ -231,6 +231,28 @@ sub _init {
 
     # Explicitly force getting the real data.
     $self->_dirty_cache( 1 ) if $o->{flush_cache};
+
+    # Not sure how to handle colors in windows.
+    $self->_no_colors() if $self->_opts->{no_colors} or os_type eq "Windows";
+}
+
+sub _no_colors {
+    my @colors = qw(
+      _red
+      _yellow
+      _green
+      _grey
+      _neon
+      _reset
+    );
+
+    no strict 'refs';
+    no warnings 'redefine';
+
+    # Pass through the args.
+    for my $color ( @colors ) {
+        *$color = sub { "@_" };
+    }
 }
 
 sub _dump {
@@ -244,11 +266,11 @@ sub _dump {
     elsif ( $dump >= 1 ) {    # Skip lol and tree.
         $data = {%$self};        # Shallow copy.
         for ( keys %$data ) {    # Keep the dump simple.
-            delete $data->{$_} if /^cache_/ and !/path/;
+            delete $data->{$_} if /^_cache_/ and !/path/;
         }
     }
 
-    say "self=" . dumper $data;
+    say "self=" . _dumper $data;
 }
 
 # Spec
@@ -310,6 +332,10 @@ sub _define_spec {
             description => "Show all class functions.",
         },
         {
+            spec        => "no_colors",
+            description => "Do not output colors.",
+        },
+        {
             spec        => "no_error",
             description => "Suppress some error message.",
         },
@@ -317,7 +343,6 @@ sub _define_spec {
             spec        => "flush_cache|f",
             description => "Flush cache file(s).",
         },
-
     );
 
     # Add the name.
@@ -508,7 +533,7 @@ sub _abort {
     }
 
     # No wierd class names.
-    if ( $class !~ m{ ^ [-\w_:/. ]+ $ }x ) {
+    if ( $class !~ m{ ^ [-~\w_:\\/. ]+ $ }x ) {
         if ( not $self->_opts->{no_error} ) {
             say "";
             say _red( "Invalid class name: $class" );
@@ -958,15 +983,18 @@ sub show_methods {
 
     my @methods =
       $self->_opts->{all} ? @$all_method_names_and_docs : @all_method_docs;
-    my $max    = max 0, map { length _green( $_->[0] ) } @methods;
-    my $format = " %-${max}s%s";
-    my $size   = @methods;
+    my $max              = max 0, map { length _green( $_->[0] ) } @methods;
+    my $format_with_desc = " %-${max}s%s";
+    my $format_no_desc   = " %s%s";
+    my $size             = @methods;
     say _neon( "Methods ($size):" );
 
     for my $list ( @methods ) {
         my ( $method, $doc_raw ) = @$list;
         my $doc = $doc_raw ? " - $doc_raw" : "";
         $doc =~ s/\n+/ /g;
+
+        my $format = $doc_raw ? $format_with_desc : $format_no_desc;
         _sayt sprintf $format, _green( $method ), _grey( $doc );
     }
 
@@ -1096,28 +1124,73 @@ sub retrieve_cache {
 # Output
 #
 
-sub _trim {
-    my ( $line )    = @_;
-    my $term_width  = Pod::Query::get_term_width();
-    my $replacement = " ...";
-    my $width = $term_width - length( $replacement ) - 1;    # "-1" for newline
+=head2 trim
 
-    # Trim to terminal width
-    my $colored_length   = length( $line );
-    my $uncolored_length = length( colorstrip( $line ) );
-    my $diff_length      = $colored_length - $uncolored_length;
-    $diff_length = $diff_length - 3 if $diff_length;
+Trim a line to fit the terminal width.
+Handles also escape codes within the line.
 
-    if ( $uncolored_length >= $term_width ) {    # "=" also for newline
-        $line = substr( $line, 0, $width + $diff_length ) . $replacement;
+=cut
+
+sub trim {
+    my ( $line ) = @_;
+    state $esc            = qr{ \033\[ [\d;]+ m    }x;
+    state $data           = qr{ (?: (?!$esc) . )++ }x;
+    state $data_or_escape = qr{ (?<data>$data) | (?<esc>$esc) }x;
+    state $term_width     = Pod::Query::get_term_width();
+    state $replacement    = " ...";
+    state $width_raw      = $term_width - length( $replacement );
+    state $base_width = $width_raw >= 0 ? $width_raw : 0;  # To avoid negatives.
+
+    # Figure out the total len of the line (uncolored).
+    my $total_chars = 0;
+    my @detailed_line_parts;
+    while ( $line =~ /$data_or_escape/g ) {
+        my $part = {%+};
+        $total_chars += $part->{len} = length( $part->{data} // "" );
+        push @detailed_line_parts, $part;
     }
 
-    $line;
+    # No need to trim.
+    return $line if $total_chars <= $term_width;
+
+    # Need to trim.
+    my @parts;
+    my $size_exceeded;
+    my $so_far_len = 0;
+    for my $part ( @detailed_line_parts ) {
+
+        # Handle escape codes.
+        if ( not $part->{len} ) {
+            push @parts, $part->{esc};    # Add escapes back.
+            last if $size_exceeded;       # Done.
+            next;
+        }
+
+        # Handle trailing escapes.
+        last if $size_exceeded;
+
+        # Trim line if it would be too long.
+        if ( $so_far_len + $part->{len} > $base_width ) {
+            $size_exceeded = 1;  # Still need to possibly add a trailing escape.
+
+            # Limit line to allowed width.
+            $part->{data} = substr(
+                $part->{data},
+                0,
+                $base_width - $so_far_len,    # How much space is left.
+            ) . $replacement;
+        }
+
+        $so_far_len += $part->{len};
+        push @parts, $part->{data};
+    }
+
+    join "", @parts;
 }
 
 sub _sayt {
 
-    say _trim( @_ );
+    say trim( @_ );
 }
 
 sub _red {

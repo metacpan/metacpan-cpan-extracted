@@ -7,7 +7,7 @@ package Sub::HandlesVia;
 use Exporter::Shiny qw( delegations );
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.025';
+our $VERSION   = '0.027';
 
 sub _generate_delegations {
 	my ($me, $name, $args, $globals) = (shift, @_);
@@ -77,6 +77,14 @@ sub _detect_framework {
 	and $target->can('meta')
 	and $target->meta->isa('Mouse::Meta::Class')) {
 		return 'Mouse';
+	}
+	
+	{
+		no strict 'refs';
+		no warnings 'once';
+		if ( ${"$target\::USES_MITE"} ) {
+			return 'Mite';
+		}
 	}
 	
 	return 'Plain';
@@ -282,6 +290,27 @@ jump in and handle them before Moose notices!
 
 (If you have a moose in your kitchen, that might be even worse than
 the mouse.)
+
+=head2 Using with Mite
+
+You should be able to use Sub::HandlesVia with L<Mite> 0.001011 or above.
+Your project will still have a dependency on Sub::HandlesVia.
+
+ package MyApp::Kitchen {
+   use MyApp::Mite;
+   use Sub::HandlesVia;
+   
+   has food => (
+     is          => 'ro',
+     isa         => 'ArrayRef[Str]',
+     handles_via => 'Array',
+     default     => sub { [] },
+     handles     => {
+       'add_food'    => 'push',
+       'find_food'   => 'grep',
+     },
+   );
+ }
 
 =head2 Using with Anything
 

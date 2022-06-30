@@ -1,5 +1,9 @@
 Revision history for Perl extension App-optex-xform
 
+1.03 2022-06-30T01:17:14Z
+
+    - Do not use 'autoload' to avoid unexpected behavior.
+
 1.02 2020-11-19T10:20:25Z
 
     - Update to use Text::Conceal.

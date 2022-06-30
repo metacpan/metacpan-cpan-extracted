@@ -4,7 +4,7 @@
       "Charles McGarvey <chazmcgarvey@brokenzipper.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -86,19 +86,19 @@
    "provides" : {
       "File::Codeowners" : {
          "file" : "lib/File/Codeowners.pm",
-         "version" : "0.54"
+         "version" : "0.55"
       },
       "File::Codeowners::Util" : {
          "file" : "lib/File/Codeowners/Util.pm",
-         "version" : "0.54"
+         "version" : "0.55"
       },
       "File::Codeowners::Util::Process" : {
          "file" : "lib/File/Codeowners/Util.pm",
-         "version" : "0.54"
+         "version" : "0.55"
       },
       "Test::File::Codeowners" : {
          "file" : "lib/Test/File/Codeowners.pm",
-         "version" : "0.54"
+         "version" : "0.55"
       }
    },
    "release_status" : "stable",
@@ -113,10 +113,10 @@
          "web" : "https://github.com/chazmcgarvey/File-Codeowners"
       }
    },
-   "version" : "0.54",
+   "version" : "0.55",
    "x_authority" : "cpan:CCM",
-   "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

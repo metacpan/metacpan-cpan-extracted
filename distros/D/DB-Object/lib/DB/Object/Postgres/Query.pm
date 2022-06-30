@@ -17,15 +17,13 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object::Query );
+    use vars qw( $VERSION $VERBOSE $DEBUG );
     use Devel::Confess;
-    our( $VERSION, $DEBUG, $VERBOSE );
     $VERSION = 'v0.1.6';
 };
 
-{
-    $DEBUG   = 0;
-    $VERBOSE = 0;
-}
+use strict;
+use warnings;
 
 sub init
 {
@@ -112,7 +110,6 @@ sub format_statement
     my $tbl_o = $self->table_object || return( $self->error( "No table object is set." ) );
     # Should we use bind statement?
     my $bind   = $tbl_o->use_bind;
-    $self->message( 3, "Formatting statement with table '", $tbl_o->name, "' object '$tbl_o', alias '", $tbl_o->query_object->table_alias, "' and bind value '$bind'." );
     $opts->{data} = $self->{_default} if( !$opts->{data} );
     $opts->{order} = $self->{_fields} if( !$opts->{order} );
     $opts->{table} = $tbl_o->name if( !$opts->{table} );
@@ -126,7 +123,6 @@ sub format_statement
     my $fields = '';
     my $values = '';
     my $base_class = $self->base_class;
-    $self->message( 3, "Saved arguments (never mind the surrounding quotes) are: '", sub{ join( "', '", @$args ) }, "'." );
     $from_unix = $self->{_from_unix};
     if( !%$from_unix )
     {
@@ -139,7 +135,6 @@ sub format_statement
         my %hash = map{ $_ => 1 } @$unixtime;
         $unixtime = \%hash;
     }
-    # $self->message( 3, "Fields found are: ", sub{ $self->printer( $order ) } );
     my @format_fields = ();
     my @format_values = ();
     my $binded   = $self->{binded_values} = [];
@@ -149,15 +144,12 @@ sub format_statement
     my $db       = $tbl_o->database;
     my $field_prefix = $tbl_o->query_object->table_alias ? $tbl_o->query_object->table_alias : $prefix;
     my $fields_ref = $tbl_o->fields();
-    # $self->message( 3, "Other fields found are: ", sub{ $self->printer( $fields_ref ) } );
     my $ok_list  = CORE::join( '|', keys( %$fields_ref ) );
     my $tables   = CORE::join( '|', @{$tbl_o->database_object->tables} );
     my $struct   = $tbl_o->structure();
     my $types    = $tbl_o->types;
     my $types_const = $tbl_o->types_const;
-    $self->message( 3, "types_const found for table '", $tbl_o->name, "' are: ", sub{ $self->dump( $types_const ) } );
     my $query_type = $self->{query_type};
-    # $self->message( 3, "Fields order is: ", sub{ $self->dumper( $order ) } );
     my @sorted   = ();
     my @types    = ();
     if( @$args && !( @$args % 2 ) )
@@ -169,22 +161,18 @@ sub format_statement
         }
     }
     @sorted = sort{ $order->{ $a } <=> $order->{ $b } } keys( %$order ) if( !@sorted );
-    $self->message( 3, "Sorted fields are: '", sub{ join( "', '", @sorted ) }, "'." );
     # Used for insert or update so that execute can take a hash of key => value pair and we would bind the values in the right order
     # But or that we need to know the order of the fields.
     $self->{sorted} = \@sorted;
     
     foreach( @sorted )
     {
-        next if( $struct->{ $_ } =~ /\bSERIAL\b/i );
-        $self->message( 3, "Processing field '$_'" );
+        next if( defined( $struct->{ $_ } ) && $struct->{ $_ } =~ /\bSERIAL\b/i );
         if( exists( $data->{ $_ } ) )
         {
             my $value = $data->{ $_ };
             if( $self->_is_a( $value, "${base_class}::Statement" ) )
             {
-                $self->message( 3, "Found a sub query as parameter value: ", $value->as_string );
-                $self->messagef( 3, "Sub query has %d binded types: '%s'", $value->query_object->binded_types->length, $value->query_object->binded_types->join( "', '" ) );
                 push( @format_values, '(' . $value->as_string . ')' );
                 push( @$binded, $value->query_object->binded_values->list ) if( $value->query_object->binded_values->length );
                 # $self->binded_types->push( $value->query_object->binded_types_as_param );
@@ -224,7 +212,6 @@ sub format_statement
             elsif( $value eq '?' )
             {
                 push( @format_values, '?' );
-                $self->message( 3, "Placeholder found for field '$_'. Constant data type definition found -> ", sub{ $self->dump( $types_const->{ $_ } ) } );
                 # CORE::push( @types, $types_const->{ $_ } ? $types_const->{ $_ }->{constant} : '' );
                 if( CORE::exists( $types_const->{ $_ } ) )
                 {
@@ -353,14 +340,11 @@ sub format_statement
             push( @format_fields, $_ );
         }
     }
-    $self->messagef( 3, "Adding initial %d types to the existing %d binded types.", scalar( @types ), $self->binded_types->length );
     $self->binded_types->push( @types ) if( scalar( @types ) );
-    # $self->message( 3, "Binded types are: ", sub{ $self->dumper( $self->{binded_types} ) } );
     if( !wantarray() && scalar( @{$self->{_extra}} ) )
     {
         push( @format_fields, @{$self->{_extra}} );
     }
-    # $self->message( 3, "Formatted fields are: ", sub{ $self->dump( @format_fields ) });
     $values = CORE::join( ', ', @format_values );
     $fields = CORE::join( ', ', @format_fields );
     wantarray ? return( $fields, $values ) : return( $fields );
@@ -404,8 +388,6 @@ sub on_conflict
             return( $self->error( "PostgreSQL version is $ver, but version 9.5 or higher is required to use this on conflict clause." ) );
         }
         $opts = $self->_get_args_as_hash( @_ );
-        # XXX Comment out once debugged
-        # $self->message( 3, "Option are: ", sub{ $self->dump( $opts ) } );
         my $hash = {};
         my @comp = ( 'ON CONFLICT' );
         if( $opts->{target} )
@@ -446,8 +428,6 @@ sub on_conflict
         # action => update
         if( $opts->{action} )
         {
-            # XXX Comment out or remove once debugged
-            # $self->message( 3, "on conflict action is $opts->{action}." );
             if( $opts->{action} eq 'update' )
             {
                 $hash->{action} = $opts->{action};
@@ -455,37 +435,15 @@ sub on_conflict
                 # No fields provided, so we take it from the initial insert and build the update list instead
                 if( !$opts->{fields} )
                 {
-                    # XXX Comment out or remove once debugged
-                    # $self->message( 3, "No fields explicitly provided, re-using insert's parameters. Setting a callback code to that effect." );
-                    # The insert will have triggered a getdefault() which stores the parameters into a _args object fields
-#                     my $f_ref = $self->{ '_args' };
-#                     $self->message( 3, "Re-using the insert query parameters: ", join( ', ', @$f_ref ) );
-#                     $opts->{inherited_fields} = $self->format_update( $f_ref );
-#                     $self->message( 3, "Update query fields are: ", $opts->{inherited_fields} );
                     $self->{_on_conflict_callback} = sub
                     {
                         my $f_ref = $self->{_args};
-                        $self->message( 3, "Re-using the insert query parameters: ", sub{ join( ', ', @$f_ref ) } );
                         # Need to account for placeholders
                         # Let's check values only
-                        # XXX The format_update call already does add the binded types
-#                         my $binded_types = [];
-#                         for( my $i = 1; $i < scalar( @$f_ref ); $i += 2 )
-#                         {
-#                             if( $f_ref->[$i] eq '?' )
-#                             {
-#                                 # Setting a blank will force the DB::Object::Statement to figure out the type
-#                                 CORE::push( @$binded_types, '' );
-#                             }
-#                         }
-#                         $self->binded_types->push( @$binded_types ) if( scalar( @$binded_types ) );
-                        $self->messagef( 3, "So far, there are %d binded types.", $self->binded_types->length );
                         $self->is_upsert(1);
                         my $inherited_fields = $self->format_update( $f_ref );
-                        $self->message( 3, "Update query fields are: ", $inherited_fields );
                         push( @comp, 'DO UPDATE SET' );
                         push( @comp, $inherited_fields );
-                        # $self->message( 3, "Components are: ", sub{ $self->dump( @comp ) } );
                         $hash->{query} = join( ' ', @comp );
                         $self->{_on_conflict} = $hash;
                         $self->{on_conflict} = join( ' ', @comp );
@@ -493,8 +451,6 @@ sub on_conflict
                         CORE::delete( $self->{_on_conflict_callback} );
                     };
                     # Return empty, not undef; undef is error
-                    # XXX Comment out or remove once debugged
-                    # $self->message( 3, "Returning empty string." );
                     return( '' );
                 }
                 return( $self->error( "Fields property to update for on conflict do update clause is not a hash reference nor an array of fields." ) ) if( !$self->_is_hash( $opts->{fields} ) && !$self->_is_array( $opts->{fields} ) && !$self->{_on_conflict_callback} );
@@ -509,7 +465,6 @@ sub on_conflict
                 
                 if( $self->_is_array( $opts->{fields} ) )
                 {
-                    $self->message( 3, "Provided fields as array, generating the hash." );
                     my $this = $opts->{fields};
                     my $new = {};
                     foreach my $f ( @$this )
@@ -517,7 +472,6 @@ sub on_conflict
                         $new->{ $f } = \( 'EXCLUDED.' . $f );
                     }
                     $opts->{fields} = $new;
-                    $self->message( 3, "fields property is now: ", sub{ $self->dump( $new ) } );
                 }
                 # Here the user will use the special table 'excluded'
                 $hash->{fields} = $opts->{fields};
@@ -552,7 +506,6 @@ sub on_conflict
         {
             return( $self->error( "No action was specified for the on conflict clause." ) );
         }
-        # $self->message( 3, "Components are: ", sub{ $self->dump( @comp ) } );
         $hash->{query} = join( ' ', @comp );
         $self->{_on_conflict} = $hash;
         $self->{on_conflict} = $self->new_clause({ value => join( ' ', @comp ) });
@@ -563,7 +516,6 @@ sub on_conflict
     {
         # This will use the insert components set up to format our on conflict clause properly
         # The callback is needed, because the query formatting occurs after the calling of our method on_conflict()
-        $self->message( 3, "Calling the on_conflict callback." );
         $self->{_on_conflict_callback}->();
     }
     return( $self->{on_conflict} );
@@ -623,7 +575,7 @@ sub server_prepare
 sub _query_components
 {
     my $self = shift( @_ );
-    my $type = lc( shift( @_ ) ) || $self->_query_type() || return( $self->error( "You must specify a query type: select, insert, update or delete" ) );
+    my $type = ( @_ > 0 && lc( shift( @_ ) ) ) || $self->_query_type() || return( $self->error( "You must specify a query type: select, insert, update or delete" ) );
     my $opts = $self->_get_args_as_hash( @_ );
     # ok options:
     # no_bind_copy: because join for example does it already and this would duplicate the binded types, so we use this option to tell this method to set an exception. Kind of a hack that needs clean-up in the future from a design point of view.
@@ -632,7 +584,6 @@ sub _query_components
     if( $self->debug )
     {
         my $trace = $self->_get_stack_trace;
-        $self->message( 3, "Stack trace is: ", $trace->as_string );
     }
     
     $where  = $self->where();
@@ -647,11 +598,9 @@ sub _query_components
     $returning = $self->returning;
     $on_conflict = $self->on_conflict;
     my @query = ();
-    # $self->message( 3, "\$where is '$where', \$group = '$group', \$having = '$having', \$order = '$order', \$limit = '$limit', \$on_conflict = '$on_conflict'." );
     push( @query, "WHERE $where" ) if( $where && $type ne 'insert' );
     if( $where->bind->types->length )
     {
-        $self->messagef( 3, "Adding %d binded type from the where clause ($where) from table '%s' to the overall %d binded types. no_bind_copy value is '$opts->{no_bind_copy}'", $where->bind->types->length, $where->query_object->table_object->name, $self->binded_types->length );
         $self->binded_types->push( $where->bind->types->list ) unless( $opts->{no_bind_copy} );
     }
     push( @query, "GROUP BY $group" ) if( $group && $type eq 'select'  );
@@ -663,7 +612,6 @@ sub _query_components
         push( @query, "$limit" );
         if( $limit->bind->types->length )
         {
-            $self->messagef( 3, "Adding %d binded type from the limit clause to the overall %d binded types. no_bind_copy value is '$opts->{no_bind_copy}'", $limit->bind->types->length, $self->binded_types->length );
             $self->binded_types->push( $limit->bind->types->list ) unless( $opts->{no_bind_copy} );
         }
     }
@@ -679,19 +627,11 @@ sub _query_components
         }
     }
     push( @query, "RETURNING $returning" ) if( $returning && ( $type eq 'insert' || $type eq 'update' || $type eq 'delete' ) );
-#     $self->message( 3, "Query components are:" );
-#     foreach my $this ( @query )
-#     {
-#         $self->message( 3, "Query component: $this" );
-#     }
-#     $self->message( 3, "Returning query components: ", sub{ $self->dump( @query ) } );
     return( \@query );
 }
 
 1;
-
-# XXX POD
-
+# NOTE: POD
 __END__
 
 =encoding utf-8

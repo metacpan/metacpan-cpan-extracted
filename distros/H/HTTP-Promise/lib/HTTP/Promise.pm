@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise.pm
-## Version v0.1.1
+## Version v0.1.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2022/06/28
+## Modified 2022/06/30
 ## All rights reserved.
 ## 
 ## 
@@ -56,7 +56,7 @@ BEGIN
     our $EXPECT_THRESHOLD = 1024000000;
     our $EXTENSION_VARY = 1;
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.2';
 };
 
 use strict;
@@ -1738,13 +1738,13 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 DESCRIPTION
 
 L<HTTP::Promise> provides with a fast and powerful yet memory-friendly API to make true asynchronous HTTP requests using fork using L<Promise::Me>.
 
-It is based on the design of L<HTTP::Message>, but with a much cleaner interface to make requests and manage HTTPP entity bodies.
+It is based on the design of L<HTTP::Message>, but with a much cleaner interface to make requests and manage HTTP entity bodies.
 
 Here are the key features:
 
@@ -2577,7 +2577,7 @@ L<HTTP::Promise>, L<HTTP::Promise::Request>, L<HTTP::Promise::Response>, L<HTTP:
 
 L<Promise::Me>, L<Cookie::Jar>, L<Module::Generic::File>, L<Module::Generic::Scalar>, L<Module::Generic>
 
-L<HTTP::XSHeaders>, L<File::MMagic::XS>, L<CryptX>, L<HTTP::Parser2::XS>, L<URI::Encode::XS>, L<URI::Escape::XS>
+L<HTTP::XSHeaders>, L<File::MMagic::XS>, L<CryptX>, L<HTTP::Parser2::XS>, L<URI::Encode::XS>, L<URI::Escape::XS>, L<URL::Encode::XS>
 
 L<IO::Compress::Bzip2>, L<IO::Compress::Deflate>, L<IO::Compress::Gzip>, L<IO::Compress::Lzf>, L<IO::Compress::Lzip>, L<IO::Compress::Lzma>, L<IO::Compress::Lzop>, L<IO::Compress::RawDeflate>, L<IO::Compress::Xz>, L<IO::Compress::Zip>, L<IO::Compress::Zstd>
 

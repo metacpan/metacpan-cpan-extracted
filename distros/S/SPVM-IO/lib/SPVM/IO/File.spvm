@@ -1,9 +1,7 @@
-class IO::File : precompile {
+class IO::File extends IO::Handle : precompile {
   use IO::FileHandle;
   use Fn;
   use Array;
-
-  interface IO::Handlable;
 
   our $SEEK_SET : ro int;
   our $SEEK_CUR : ro int;
@@ -12,8 +10,6 @@ class IO::File : precompile {
   our $STDOUT : ro int;
   our $STDERR : ro int;
 
-  method is_io_handlable : int () { return 1; }
-  
   has fh : private ro IO::FileHandle;
   has auto_flush : rw byte;
   

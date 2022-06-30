@@ -1,4 +1,0 @@
-class IO::Handlable : interface_t {
-  
-  required method is_io_handlable : int ();
-}

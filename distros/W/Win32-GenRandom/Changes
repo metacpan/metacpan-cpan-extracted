@@ -1,5 +1,9 @@
 Revision history for Perl module Win32::GenRandom
 
+0.06
+ - Extend 04print_error.t to accommodate Japanese language.
+   See https://rt.cpan.org/Ticket/Display.html?id=124244
+
 0.05
  - zero the buffer as soon as the bytes it's holding are no longer needed (in
    accordance with MSDN documentation). Zeroing does not happen if both SecureZeroMemory()

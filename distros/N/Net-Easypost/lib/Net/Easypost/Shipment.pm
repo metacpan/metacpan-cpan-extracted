@@ -1,5 +1,5 @@
 package Net::Easypost::Shipment;
-$Net::Easypost::Shipment::VERSION = '0.21';
+$Net::Easypost::Shipment::VERSION = '0.23';
 use Carp qw/croak/;
 use Types::Standard qw/ArrayRef HashRef InstanceOf Str/;
 
@@ -75,6 +75,9 @@ sub serialize {
 
    # want a hashref of e.g., shipment[to_address][id] => foo from all defined attributes
    return {
+       (defined $self->options
+        ? map { $self->role . "[options][$_]" => $self->options->{$_} } %{$self->options}
+        : ()),
        map { $self->role . "[$_][id]" => $self->$_->id }
        grep { defined $self->$_ }
           qw(to_address from_address parcel customs_info)
@@ -149,7 +152,7 @@ Net::Easypost::Shipment
 
 =head1 VERSION
 
-version 0.21
+version 0.23
 
 =head1 SYNOPSIS
 

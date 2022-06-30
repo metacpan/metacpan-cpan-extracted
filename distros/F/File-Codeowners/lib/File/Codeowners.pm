@@ -10,7 +10,7 @@ use Path::Tiny 0.089;
 use Scalar::Util qw(openhandle);
 use Text::Gitignore qw(build_gitignore_matcher);
 
-our $VERSION = '0.54'; # VERSION
+our $VERSION = '0.55'; # VERSION
 
 my $RE_PATTERN  = qr/.+?(?<!\\)/;
 my $RE_OWNER    = qr/(?:\@+"[^"]*")|(?:\H+)/;
@@ -477,7 +477,7 @@ File::Codeowners - Read and write CODEOWNERS files
 
 =head1 VERSION
 
-version 0.54
+version 0.55
 
 =head1 DESCRIPTION
 

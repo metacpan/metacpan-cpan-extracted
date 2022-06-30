@@ -1,3 +1,33 @@
+1.203 2022-06-30
+================
+
+[Quiq::Css::Snippets]
+* Klasse hinzugefügt
+
+[Quiq::Database::Connection]
+* applyPatches() - Methode hinzugefügt
+* recreateTable() - Methode hinzugefügt
+* renameTable() - Methode hinzugefügt
+* addCheckConstraint() - Methode hinzugefügt
+
+[Quiq::Formatter]
+* geldbetrag() - Methode hinzugefügt
+
+[Quiq::JQuery::MenuBar]
+* Klasse hinzugefügt
+
+[Quiq::Path]
+* detectEncoding() - Alias für encoding() hinzugefügt
+
+[Quiq::Sql]
+* renameTable() - Methode hinzugefügt
+
+[Quiq::Web::Navigation]
+* Zurücknavigation auf Scrollposition hinzugefügt
+
+[Quiq::Url]
+* queryEncode() - Optinalen Parameter $initialChar hinzugefügt
+
 1.202 2022-05-05
 ================
 

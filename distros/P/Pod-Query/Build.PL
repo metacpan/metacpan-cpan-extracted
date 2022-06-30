@@ -19,6 +19,7 @@ my $builder = Module::Build->new(
         'Test::More' => '0',
     },
     requires => {
+        'perl'            => '5.024',
         'Pod::LOL'        => '0.08',
         'Term::Size::Any' => '0.002',
         'Role::Tiny'      => '2.002004',

@@ -1,5 +1,9 @@
 Revision history for Perl module Mac::PropertyList
 
+1.503 2022-06-30T18:16:29Z
+	* Darren Kulp noted an XML error in one of the test strings (GitHub #12)
+	* No other code changes
+
 1.502 2021-01-19T10:17:29Z
 	* freshen distro, dump Travis CI, add Github Actions
 

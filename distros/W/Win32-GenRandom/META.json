@@ -44,6 +44,6 @@
          "web" : "https://github.com/sisyphus/win32-genrandom"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 2.27203"
 }

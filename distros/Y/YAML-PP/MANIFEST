@@ -201,6 +201,10 @@ t/valid/v032/===
 t/valid/v032/in.yaml
 t/valid/v032/out.yaml
 t/valid/v032/test.event
+t/valid/v033/===
+t/valid/v033/in.json
+t/valid/v033/in.yaml
+t/valid/v033/test.event
 test-suite/README.md
 test-suite/yaml-test-suite-data/229Q/===
 test-suite/yaml-test-suite-data/229Q/in.json

@@ -9,7 +9,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(c2xs context);
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 #$VERSION = eval $VERSION;
 
 use InlineX::C2XS::Context;
@@ -19,7 +19,7 @@ my $config_options;
 our @allowable_config_keys = ('AUTOWRAP', 'AUTO_INCLUDE', 'CODE', 'DIST', 'TYPEMAPS', 'LIBS', 'INC',
         'WRITE_MAKEFILE_PL', 'BUILD_NOISY', 'BOOT', 'BOOT_F', 'EXPORT_ALL', 'EXPORT_OK_ALL', 'MANIF',
         'EXPORT_TAGS_ALL', 'MAKE', 'PREFIX', 'PREREQ_PM', 'CCFLAGS', 'CCFLAGSEX', 'LD', 'LDDLFLAGS',
-        'MYEXTLIB', 'OPTIMIZE', 'PRE_HEAD', 'PROTOTYPE', 'PROTOTYPES', 'CC', 'SRC_LOCATION', 'T',
+        'MYEXTLIB', 'OBJECT', 'OPTIMIZE', 'PRE_HEAD', 'PROTOTYPE', 'PROTOTYPES', 'CC', 'SRC_LOCATION', 'T',
         '_TESTING', 'USE', 'USING', 'WRITE_PM', 'VERSION');
 
 ##=========================##
@@ -219,6 +219,8 @@ sub c2xs {
     if($config_options->{AUTO_INCLUDE}) {$o->{ILSM}{AUTO_INCLUDE} .= $config_options->{AUTO_INCLUDE} . "\n"}
 
     if($config_options->{CC}) {$o->{ILSM}{MAKEFILE}{CC} = $config_options->{CC}}
+
+    if($config_options->{OBJECT}) {$o->{ILSM}{MAKEFILE}{OBJECT} = $config_options->{OBJECT}}
 
     if($config_options->{CCFLAGS}) {$o->{ILSM}{MAKEFILE}{CCFLAGS} = " " . $config_options->{CCFLAGS}}
 
@@ -810,6 +812,11 @@ InlineX::C2XS - Convert from Inline C code to XS.
     MYEXTLIB => '/your/path/yourmodule.so',
   ----
 
+  OBJECT
+   As for ExtUtils::MakeMaker option of the same name. eg:
+
+    OBJECT => '$(O_FILES)',
+
   OPTIMIZE
    This controls the MakeMaker OPTIMIZE setting.It makes sense to assign
    this key only when WRITE_MAKEFILE_PL is set to a true value. eg:
@@ -952,7 +959,7 @@ InlineX::C2XS - Convert from Inline C code to XS.
 
   This program is free software; you may redistribute it and/or
   modify it under the same terms as Perl itself.
-  Copyright 2006-2009, 2010-12, 2014, 2016 Sisyphus
+  Copyright 2006-2009, 2010-12, 2014, 2016, 2018 Sisyphus
 
 
 =head1 AUTHOR

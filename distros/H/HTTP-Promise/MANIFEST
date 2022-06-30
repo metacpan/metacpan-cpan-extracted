@@ -89,4 +89,5 @@ t/testin/post-multipart-form-data-02.txt
 t/testin/post-multipart-form-data-07.txt
 t/testin/science-sans-conscience-rabelais.txt
 t/testin/short.txt
+t/testin/tengu.png
 META.json                                Module JSON meta-data (added by MakeMaker)

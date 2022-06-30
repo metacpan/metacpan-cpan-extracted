@@ -1,5 +1,5 @@
 package Net::Easypost::Parcel;
-$Net::Easypost::Parcel::VERSION = '0.21';
+$Net::Easypost::Parcel::VERSION = '0.23';
 use Moo;
 with qw(Net::Easypost::PostOnBuild);
 with qw(Net::Easypost::Resource);
@@ -38,7 +38,7 @@ Net::Easypost::Parcel
 
 =head1 VERSION
 
-version 0.21
+version 0.23
 
 =head1 SYNOPSIS
 

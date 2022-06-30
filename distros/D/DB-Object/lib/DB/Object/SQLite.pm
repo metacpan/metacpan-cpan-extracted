@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/SQLite.pm
-## Version v0.400.6
+## Version v0.400.7
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2021/08/30
+## Modified 2022/06/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,16 +17,15 @@ BEGIN
 {
     use strict;
     use warnings;
+    use vars qw(
+        $VERSION $CACHE_QUERIES $CACHE_SIZE $CACHE_TABLE $CONNECT_VIA $DB_ERRSTR $ERROR $DEBUG
+        $USE_BIND $USE_CACHE $MOD_PERL @DBH
+    );
     use DBI qw( :sql_types );
     # use DBD::SQLite;
-    eval
-    {
-        require DBD::SQLite;
-    };
+    eval { require DBD::SQLite; };
     die( $@ ) if( $@ );
     use parent qw( DB::Object );
-    require DB::Object::SQLite::Statement;
-    require DB::Object::SQLite::Tables;
     use POSIX ();
     use DateTime;
     use DateTime::TimeZone;
@@ -34,74 +33,74 @@ BEGIN
     use Module::Generic::File qw( sys_tmpdir );
     use Number::Format;
     use Nice::Try;
-    our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
-    our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH );
-    $VERSION     = 'v0.400.6';
+    $VERSION     = 'v0.400.7';
     use Devel::Confess;
 };
 
+use strict;
+use warnings;
+require DB::Object::SQLite::Statement;
+require DB::Object::SQLite::Tables;
+$DB_ERRSTR     = '';
+$DEBUG         = 0;
+$CACHE_QUERIES = [];
+$CACHE_SIZE    = 10;
+# The purpose of this cache is to store table object and avoid the penalty of reloading the structure of a table for every object generated.
+# Thus CACHE_TABLE is in no way an exhaustive list of existing table, but existing table object.
+$CACHE_TABLE   = {};
+$USE_BIND      = 0;
+$USE_CACHE     = 0;
+$MOD_PERL      = 0;
+@DBH           = ();
+if( $INC{ 'Apache/DBI.pm' } && 
+    substr( $ENV{ 'GATEWAY_INTERFACE' }|| '', 0, 8 ) eq 'CGI-Perl' )
 {
-    $DB_ERRSTR     = '';
-    $DEBUG         = 0;
-    $CACHE_QUERIES = [];
-    $CACHE_SIZE    = 10;
-    # The purpose of this cache is to store table object and avoid the penalty of reloading the structure of a table for every object generated.
-    # Thus CACHE_TABLE is in no way an exhaustive list of existing table, but existing table object.
-    $CACHE_TABLE   = {};
-    $USE_BIND      = 0;
-    $USE_CACHE     = 0;
-    $MOD_PERL      = 0;
-    @DBH           = ();
-    if( $INC{ 'Apache/DBI.pm' } && 
-        substr( $ENV{ 'GATEWAY_INTERFACE' }|| '', 0, 8 ) eq 'CGI-Perl' )
-    {
-        $CONNECT_VIA = "Apache::DBI::connect";
-        $MOD_PERL++;
-    }
-    
-    our $PRIVATE_FUNCTIONS =
-    {
-        ceiling         =>[1, \&_ceiling],
-        concat          =>[-1, \&_concat],
-        curdate         =>[0, \&_curdate],
-        curtime         =>[0, \&_curtime],
-        dayname         =>[1, \&_dayname],
-        dayofmonth      =>[1, \&_dayofmonth],
-        dayofweek       =>[1, \&_dayofweek],
-        dayofyear       =>[1, \&_dayofyear],
-        distance_miles  =>[4, \&_distance_miles],
-        # from_days     =>[-1, \&_from_days],
-        from_unixtime   =>[1, \&_from_unixtime],
-        hour            =>[1, \&_hour],
-        lcase           =>[1, \&_lcase],
-        left            =>[2, \&_left],
-        locate          =>[2, \&_locate],
-        log10           =>[1, \&_log10],
-        minute          =>[1, \&_minute],
-        month           =>[1, \&_month],
-        monthname       =>[1, \&_monthname],
-        number_format   =>[4, \&_number_format],
-        power           =>[2, \&_power],
-        quarter         =>[1, \&_quarter],
-        rand            =>[0, \&_rand],
-        regexp          =>[2, \&_regexp],
-        replace         =>[3, \&_replace],
-        right           =>[2, \&_right],
-        second          =>[1, \&_second],
-        space           =>[1, \&_space],
-        sprintf         =>[-1, \&_sprintf],
-        to_days         =>[1, \&_to_days],
-        # truncate      =>[-1, \&_truncate],
-        ucase           =>[1, \&_ucase],
-        unix_timestamp  =>[1, \&_unix_timestamp],
-        week            =>[1, \&_week],
-        weekday         =>[1, \&_weekday],
-        year            =>[1, \&_year],
-    };
-    # See compile_options method
-    # This is very useful to know which features can be used
-    our $COMPILE_OPTIONS = [];
+    $CONNECT_VIA = "Apache::DBI::connect";
+    $MOD_PERL++;
 }
+
+our $PRIVATE_FUNCTIONS =
+{
+    ceiling         =>[1, \&_ceiling],
+    concat          =>[-1, \&_concat],
+    curdate         =>[0, \&_curdate],
+    curtime         =>[0, \&_curtime],
+    dayname         =>[1, \&_dayname],
+    dayofmonth      =>[1, \&_dayofmonth],
+    dayofweek       =>[1, \&_dayofweek],
+    dayofyear       =>[1, \&_dayofyear],
+    distance_miles  =>[4, \&_distance_miles],
+    # from_days     =>[-1, \&_from_days],
+    from_unixtime   =>[1, \&_from_unixtime],
+    hour            =>[1, \&_hour],
+    lcase           =>[1, \&_lcase],
+    left            =>[2, \&_left],
+    locate          =>[2, \&_locate],
+    log10           =>[1, \&_log10],
+    minute          =>[1, \&_minute],
+    month           =>[1, \&_month],
+    monthname       =>[1, \&_monthname],
+    number_format   =>[4, \&_number_format],
+    power           =>[2, \&_power],
+    quarter         =>[1, \&_quarter],
+    rand            =>[0, \&_rand],
+    regexp          =>[2, \&_regexp],
+    replace         =>[3, \&_replace],
+    right           =>[2, \&_right],
+    second          =>[1, \&_second],
+    space           =>[1, \&_space],
+    sprintf         =>[-1, \&_sprintf],
+    to_days         =>[1, \&_to_days],
+    # truncate      =>[-1, \&_truncate],
+    ucase           =>[1, \&_ucase],
+    unix_timestamp  =>[1, \&_unix_timestamp],
+    week            =>[1, \&_week],
+    weekday         =>[1, \&_weekday],
+    year            =>[1, \&_year],
+};
+# See compile_options method
+# This is very useful to know which features can be used
+our $COMPILE_OPTIONS = [];
 
 sub init
 {
@@ -310,17 +309,15 @@ sub databases
     {
         try
         {
-            $dbh = $self->connect( $con ) || return;
+            $dbh = $self->connect( @_ ) || return( $self->pass_error );
         }
         catch( $e )
         {
-            $self->message( 3, "An error occurred while trying to connect to get the list of available databases: $e" );
             return;
         }
     }
     else
     {
-        $self->message( 3, "Already have a connection database handler '$self->{dbh}'" );
         $dbh = $self;
     }
     my $temp = $dbh->do( 'PRAGMA database_list' )->fetchall_arrayref( {} );
@@ -357,7 +354,6 @@ sub get_sql_type
 {
     my $self = shift( @_ );
     my $type = shift( @_ ) || return( $self->error( "No sql type was provided to get its constant." ) );
-    $self->message( 3, "Trying constant for '$type' using 'DBD::SQLite::SQLITE_\U${type}\E'" );
     my $const = $self->{dbh}->can( "DBD::SQLite::SQLITE_\U${type}\E" );
     return( '' ) if( !defined( $const ) );
     return( $const->() );
@@ -514,11 +510,11 @@ sub sql_function_register
     my $self = shift( @_ );
     my $opts = shift( @_ ) || return( $self->error( "No private function hash reference provided." ) );
     my $dbh = $self->{dbh} || return( $self->error( "No active database handler available." ) );
+    $opts->{flags} = [] if( !exists( $opts->{flags} ) || ref( $opts->{flags} ) ne 'ARRAY' );
     my $flag;
     my $eval = join( '|', @{$opts->{flags}} );
     $flag = eval( $eval );
     my $code = $opts->{code};
-    $self->message( 3, "Regisering private function name '$opts->{name}', max number of arguments '$opts->{argc}'." );
     if( defined( $flag ) )
     {
         $dbh->sqlite_create_function( $opts->{name}, $opts->{argc}, sub{ my @arg = @_; unshift( @arg, $self ); $code->( @arg ); }, $flag );
@@ -668,13 +664,11 @@ sub _check_connect_param
         $db = "$db.sqlite" if( !-e( $db ) && $db !~ /\.sqlite$/i );
         # ( $filename, $path, $ext ) = File::Basename::fileparse( $db, qr/\.[^\.]+$/ );
         ( $filename, $path, $ext ) = $db->baseinfo( qr/\.[^\.]+$/ );
-        $self->message( 3, "Database file path is '$path', file name '$filename' and extension '$ext'." );
         $param->{database} = $filename;
         $param->{database_file} = $self->{database_file} = $db;
     }
     $param->{host} = 'localhost' if( !length( $param->{host} ) );
     $param->{port} = 0 if( !length( $param->{port} ) );
-    $self->message( 3, "Returning parameters: ", sub{ $self->dump( $param ) } );
     return( $param );
 }
 
@@ -693,7 +687,6 @@ sub _connection_options
     my $param = shift( @_ );
     my @sqlite_params = grep( /^sqlite_/, keys( %$param ) );
     my $opt = $self->SUPER::_connection_options( $param );
-    # $self->message( 3, "Inherited options are: ", sub{ $self->dumper( $opt ) } );
     @$opt{ @sqlite_params } = @$param{ @sqlite_params };
     return( $opt );
 }
@@ -716,7 +709,6 @@ sub _dbi_connect
 {
     my $self = shift( @_ );
     my $dbh  = $self->{dbh} = $self->SUPER::_dbi_connect( @_ );
-    $self->message( 3, "Database handler returned from dbi_connect is '$dbh'" );
     # my $func = $self->{_func};
     my $func = $self->{ '_func' };
     foreach my $k ( sort( keys( %$PRIVATE_FUNCTIONS ) ) )
@@ -730,13 +722,11 @@ sub _dbi_connect
         };
         $func->{ $k } = $ref;
     }
-    $self->messagef( 3, "Declaring %d private functions.", scalar( keys( %$func ) ) );
     foreach my $name ( sort( keys( %$func ) ) )
     {
         my $ref = $func->{ $name };
         if( $ref->{_registered_on} )
         {
-            $self->message( 3, "Function $ref->{name} already added on ", scalar( localtime( $ref->{_registered_on} ) ) );
             next;
         }
         $self->sql_function_register( $ref );
@@ -762,7 +752,15 @@ sub _parse_timestamp
     my $str  = shift( @_ );
     # No value was actually provided
     return if( !length( $str ) );
-    my $tz = DateTime::TimeZone->new( name => 'local' );
+    my $tz;
+    try
+    {
+        $tz = DateTime::TimeZone->new( name => 'local' );
+    }
+    catch( $e )
+    {
+        $tz = DateTime::TimeZone->new( name => 'UTC' );
+    }
     my $error = 0;
     my $opt = 
     {
@@ -771,7 +769,6 @@ sub _parse_timestamp
     time_zone   => $tz->name,
     on_error    => sub{ $error++ },
     };
-    $self->message( 3, "Checking timestamp string '$str' for appropriate pattern" );
     # 2019-06-19 23:23:57.000000000+0900
     # From PostgreSQL: 2019-06-20 11:02:36.306917+09
     # ISO 8601: 2019-06-20T11:08:27
@@ -788,11 +785,9 @@ sub _parse_timestamp
             my $offset_min  = ( $offset_hour - CORE::int( $offset_hour ) ) * 60;
             $zone  = sprintf( '%+03d%02d', $offset_hour, $offset_min );
         }
-        $self->message( 3, "\tMatched pattern #1 with date '$date', time '$time' and time zone '$zone'." );
         $date =~ tr/\//-/;
         $zone .= '00' if( length( $zone ) == 3 );
         $str = "$date $time$zone";
-        $self->message( 3, "\tChanging string to '$str'" );
         $opt->{pattern} = '%Y-%m-%d %T%z';
     }
     # From SQLite: 2019-06-20 02:03:14
@@ -800,7 +795,6 @@ sub _parse_timestamp
     elsif( $str =~ /(\d{4})[-|\/](\d{1,2})[-|\/](\d{1,2})(?:[[:blank:]]+|T)(\d{1,2}:\d{1,2}:\d{1,2})/ )
     {
         my( $date, $time ) = ( "$1-$2-$3", $4 );
-        $self->message( 3, "\tMatched pattern #2 with date '$date', time '$time' and without time zone." );
         my $dt = DateTime->now( time_zone => $tz );
         my $offset = $dt->offset;
         # e.g. 9 or possibly 9.5
@@ -810,13 +804,11 @@ sub _parse_timestamp
         my $offset_str  = sprintf( '%+03d%02d', $offset_hour, $offset_min );
         $date =~ tr/\//-/;
         $str = "$date $time$offset_str";
-        $self->message( 3, "\tAdding time zone '", $tz->name, "' offset of $offset_str with result: '$str'." );
         $opt->{pattern} = '%Y-%m-%d %T%z';
     }
     elsif( $str =~ /^(\d{4})[-|\/](\d{1,2})[-|\/](\d{1,2})$/ )
     {
         $str = "$1-$2-$3";
-        $self->message( 3, "\tMatched pattern #3 with date '$date' only." );
         $opt->{pattern} = '%Y-%m-%d';
     }
     my $strp = DateTime::Format::Strptime->new( %$opt );
@@ -829,7 +821,6 @@ sub _ceiling
 {
     my $self = shift( @_ );
     my @args = @_;
-    $self->message( 3, "Getting ceil for ", sub{ join( ', ', @args ) } );
     return( POSIX::ceil( $args[0] ) );
 }
 
@@ -844,7 +835,15 @@ sub _curdate
 {
     my $self = shift( @_ );
     my @args = @_;
-    my $tz = DateTime::TimeZone->new( name => 'local' );
+    my $tz;
+    try
+    {
+        $tz = DateTime::TimeZone->new( name => 'local' );
+    }
+    catch( $e )
+    {
+        $tz = DateTime::TimeZone->new( name => 'UTC' );
+    }
     my $d = DateTime->from_epoch( epoch => time(), time_zone => $tz->name );
     return( $d->ymd( '-' ) );
 }
@@ -853,7 +852,15 @@ sub _curtime
 {
     my $self = shift( @_ );
     my @args = @_;
-    my $tz = DateTime::TimeZone->new( name => 'local' );
+    my $tz;
+    try
+    {
+        $tz = DateTime::TimeZone->new( name => 'local' );
+    }
+    catch( $e )
+    {
+        $tz = DateTime::TimeZone->new( name => 'UTC' );
+    }
     my $d = DateTime->now( time_zone => $tz->name );
     return( $d->hms( ':' ) );
 }
@@ -910,7 +917,15 @@ sub _from_days
     my $self = shift( @_ );
     my @args = @_;
     my $from_days = $args[0];
-    my $tz = DateTime::TimeZone->new( name => 'local' );
+    my $tz;
+    try
+    {
+        $tz = DateTime::TimeZone->new( name => 'local' );
+    }
+    catch( $e )
+    {
+        $tz = DateTime::TimeZone->new( name => 'UTC' );
+    }
     my $origin = DateTime->new(
         year       => 0,
         month      => 1,
@@ -933,7 +948,16 @@ sub _from_unixtime
     my $self = shift( @_ );
     my @args = @_;
     return if( $args[0] !~ /^\d+$/ );
-    my $dt = DateTime->from_epoch( epoch => $args[0], time_zone => 'local' );
+    my $tz;
+    try
+    {
+        $tz = DateTime::TimeZone->new( name => 'local' );
+    }
+    catch( $e )
+    {
+        $tz = DateTime::TimeZone->new( name => 'UTC' );
+    }
+    my $dt = DateTime->from_epoch( epoch => $args[0], time_zone => $tz->name );
     return( $dt->strftime( '%Y-%m-%d %T%z' ) );
 }
 
@@ -1003,7 +1027,6 @@ sub _number_format
     my $self = shift( @_ );
     my @args = @_;
     my( $num, $tho, $dec, $prec ) = @args;
-    $self->message( 3, "Number to format '$num' with thousand separator '$tho', decimal separator '$dec' and precision '$prec'." );
     my $fmt = Number::Format->new(
         -thousands_sep    => $tho,
         -decimal_point    => $dec,
@@ -1106,15 +1129,12 @@ sub _sprintf
 {
     my $self = shift( @_ );
     my @args = @_;
-    $self->message( 3, "sprintf formatting with parameters: '", sub{ join( "', '", @args ) }, "'" );
     for( my $i = 0; $i < scalar( @args ); $i++ )
     {
         $args[$i] =~ s/'/\\'/g;
     }
     my $eval = "CORE::sprintf( '" . join( "', '", @args ) . "' )";
-    # $self->message( 3, "\t evaluating with '$eval'." );
     my $res = eval( $eval );
-    # $self->message( 3, "\t returning '$res'." );
     # return( CORE::sprintf( @args ) );
     return( $res );
 }
@@ -1124,7 +1144,15 @@ sub _to_days
     my $self = shift( @_ );
     my @args = @_;
     my $dt = $self->_parse_timestamp( $args[0] ) || return;
-    my $tz = DateTime::TimeZone->new( name => 'local' );
+    my $tz;
+    try
+    {
+        $tz = DateTime::TimeZone->new( name => 'local' );
+    }
+    catch( $e )
+    {
+        $tz = DateTime::TimeZone->new( name => 'UTC' );
+    }
     my $origin = DateTime->new(
         year       => 0,
         month      => 1,
@@ -1192,7 +1220,6 @@ DESTROY
     my $class = ref( $self ) || $self;
     if( $self->{sth} )
     {
-        # $self->message( "DETROY(): Terminating sth '$self' for query:\n$self->{ 'query' }\n" );
         # print( STDERR "DESTROY(): Terminating sth '$self' for query:\n$self->{ 'query' }\n" ) if( $DEBUG );
         $self->{sth}->finish();
     }
@@ -1228,7 +1255,7 @@ END
 
 1;
 
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -1319,7 +1346,7 @@ DB::Object::SQLite - DB Object SQLite Driver
     
 =head1 VERSION
 
-    v0.400.6
+    v0.400.7
 
 =head1 DESCRIPTION
 

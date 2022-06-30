@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.202';
+our $VERSION = '1.203';
 
 =encoding utf8
 
@@ -129,6 +129,10 @@ L<Quiq::Converter> - Konvertierung von Werten
 =item *
 
 L<Quiq::Css> - Generiere CSS Code
+
+=item *
+
+L<Quiq::Css::Snippets> - CSS-Code für die Seiten einer Web-Applikation
 
 =item *
 
@@ -560,6 +564,10 @@ L<Quiq::JQuery::Function> - Nützliche Funktionen für jQuery
 
 =item *
 
+L<Quiq::JQuery::MenuBar> - Erzeuge den Code einer jQuery Menüleiste
+
+=item *
+
 L<Quiq::JQuery::Tabs> - Erzeuge HTML einer jQuery UI Tabs Reiterleiste
 
 =item *
@@ -946,7 +954,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.202
+1.203
 
 =head1 AUTHOR
 

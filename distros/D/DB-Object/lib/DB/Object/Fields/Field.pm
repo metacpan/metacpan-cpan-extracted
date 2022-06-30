@@ -17,6 +17,7 @@ BEGIN
     use warnings;
     use common::sense;
     use parent qw( Module::Generic );
+    use vars qw( $VERSION );
     use Devel::Confess;
     use Module::Generic::Array;
     use overload (
@@ -42,6 +43,9 @@ BEGIN
     use Want;
     our( $VERSION ) = 'v1.0.1';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -96,7 +100,6 @@ sub name
     my $name = $self->{name};
     my $trace = $self->_get_stack_trace;
     my $alias = $self->query_object->table_alias;
-    # $self->message( 3, "prefixed is set to '$self->{prefixed}' for field name '$name' of table '", $self->table_object->name, "' possibly aliased to '$alias'. Stack trace: ", $trace->as_string );
     if( $self->{prefixed} )
     {
         my @prefix = ();
@@ -245,9 +248,6 @@ sub _op_overload
     {
         $val = $$val;
     }
-    # XXX Comment out once debugged !
-#     return( DB::Object::Fields::Field::Overloaded->new( $swap ? "${val} ${op} ${field}" : "${field} ${op} ${val}", $self, ( $val eq '?' ? ( binded => 1 ) : () ) ) );
-    # $self->message( 3, "swap -> '$swap', value = '$val': ", ( $swap ? "${val} ${op} ${field}" : "${field} ${op} ${val}" ), "\nThis field object for table name '", $self->table_object->name, "' (", $self->table_object, ") was initially instantiated from: ", $self->{trace}->as_string, "\n" );
     return( DB::Object::Fields::Field::Overloaded->new(
         expression => 
             (
@@ -262,7 +262,7 @@ sub _op_overload
 }
 
 {
-    # XXX package DB::Object::Fields::Field::Overloaded
+    # NOTE: package DB::Object::Fields::Field::Overloaded
     # The purpose of this package is to tag overloaded operation so we can handle them properly later
     # such as in a where clause
     package

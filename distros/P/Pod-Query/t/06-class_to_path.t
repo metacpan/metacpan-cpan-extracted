@@ -3,8 +3,9 @@ use v5.16;
 use strict;
 use warnings;
 use Test::More tests => 6;
-use File::Spec::Functions qw( catfile );
+use File::Spec::Functions qw( catfile catdir );
 use FindBin               qw( $RealDir );
+use lib catdir( $RealDir, "cpan" );
 
 BEGIN {
     use_ok( 'Pod::Query' ) || print "Bail out!\n";
@@ -12,9 +13,10 @@ BEGIN {
 
 diag( "Testing Pod::Query $Pod::Query::VERSION, Perl $], $^X" );
 
-my $sample_pod = catfile( $RealDir, qw( pod Mojo_UserAgent.pm ) );
+my $sample_pod        = catfile( $RealDir, qw( cpan Mojo UserAgent.pm ) );
+my $windows_safe_path = $sample_pod =~ s&(\\)&\\$1&gr;
 
-ok( -f $sample_pod, "pod file exists" );
+ok( -f $sample_pod, "pod file exists: $sample_pod" );
 
 my @cases = (
     {
@@ -37,7 +39,7 @@ my @cases = (
     },
     {
         pod_class => "$sample_pod",
-        expect    => qr{ ^ \Q$sample_pod\E $ }x,    # Empty.
+        expect    => qr{ ^ \Q$windows_safe_path\E $ }x,    # Empty.
     },
 );
 

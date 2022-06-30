@@ -1,0 +1,28 @@
+NAME
+
+    Ingy döt Net's Standard Prelude
+
+SYNOPSIS
+
+        use IngyPrelude;
+    
+        my $text = file_read 'foo.txt';
+        file_write 'FOO.TXT', uc($text);
+
+DESCRIPTION
+
+    This module exports a number of common functions.
+
+AUTHOR
+
+    Ingy döt Net <ingy@ingy.net>
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2022. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

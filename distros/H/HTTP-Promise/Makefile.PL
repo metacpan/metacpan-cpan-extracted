@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
         'IO::File'              => 0,
         'JSON'                  => '4.02',
         'JSON::XS'              => '4.03',
-        'Module::Generic'       => 'v0.24.1',
+        'Module::Generic'       => 'v0.24.2',
         'Nice::Try'             => 'v1.3.0',
         'Promise::Me'           => 'v0.3.0',
         'Regexp::Common'        => '2017060201',
@@ -42,6 +42,7 @@ my %WriteMakefileArgs = (
         'URI'                   => '5.10',
         'URI::Encode::XS'       => '0.11',
         'URI::Escape::XS'       => '0.14',
+        'URL::Encode::XS'       => '0.03',
         'Want'                  => '0.29',
     },
     TEST_REQUIRES =>

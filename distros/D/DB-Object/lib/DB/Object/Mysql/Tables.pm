@@ -17,14 +17,17 @@ BEGIN
 {
     use strict;
     use warnings;
-    our( $VERSION, $VERBOSE, $DEBUG );
     use parent qw( DB::Object::Mysql DB::Object::Tables );
+    use vars qw( $VERSION $VERBOSE $DEBUG );
     $VERSION    = 'v0.300.1';
     $VERBOSE    = 0;
     $DEBUG      = 0;
     use Devel::Confess;
     # <https://dev.mysql.com/doc/refman/8.0/en/data-types.html>
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -157,7 +160,6 @@ sub create
         ## Trick so other method may follow, such as as_string(), fetchrow(), rows()
         if( !defined( wantarray() ) )
         {
-            # $self->message( 3, "create(): wantarray in void context" );
             # print( STDERR "create(): wantarrays in void context.\n" );
             $new->execute() ||
             return( $self->error( "Error while executing query to create table '$table':\n$query", $new->errstr() ) );
@@ -522,7 +524,7 @@ DESTROY
 
 1;
 
-# XXX POD
+# NOTE: POD
 
 __END__
 

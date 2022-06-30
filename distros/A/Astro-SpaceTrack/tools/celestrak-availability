@@ -10,7 +10,7 @@ use Getopt::Long 2.33 qw{ :config auto_version };
 use LWP::UserAgent;
 use Pod::Usage;
 
-our $VERSION = '0.153';
+our $VERSION = '0.154';
 
 my %opt = (
     https	=> 1,
@@ -29,8 +29,8 @@ my $scheme = $opt{https} ? 'https' : 'http';
 foreach my $catalog ( @ARGV ) {
     my @info = $catalog;
     foreach (
-	[ direct	=> '%s://celestrak.com/NORAD/elements/%s.txt' ],
-	[ spacetrack	=> '%s://celestrak.com/SpaceTrack/query/%s.txt' ],
+	[ direct	=> '%s://celestrak.org/NORAD/elements/%s.txt' ],
+	[ spacetrack	=> '%s://celestrak.org/SpaceTrack/query/%s.txt' ],
     ) {
 	my $url = sprintf $_->[1], $scheme, $catalog;
 	$opt{debug}
@@ -102,8 +102,8 @@ these will appear.
 The catalog name is the relevant portion of the URL used to fetch it,
 which is substituted into the URL as follows:
 
- direct     => 'https://celestrak.com/NORAD/elements/%s.txt',
- spacetrack => 'https://celestrak.com/SpaceTrack/query/%s.txt',
+ direct     => 'https://celestrak.org/NORAD/elements/%s.txt',
+ spacetrack => 'https://celestrak.org/SpaceTrack/query/%s.txt',
 
 Only a HEAD request is done, and the Space Track web site is not
 accessed at all.

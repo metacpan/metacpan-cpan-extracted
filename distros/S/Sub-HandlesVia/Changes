@@ -6,6 +6,15 @@ Home page:    <https://metacpan.org/release/Sub-HandlesVia>
 Bug tracker:  <https://github.com/tobyink/p5-sub-handlesvia/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.027	2022-06-30
+
+ [ Test Suite ]
+ - Skip Mite test on Perl < 5.10.1
+
+0.026	2022-06-30
+
+ - Added: Support classes built with Mite.
+
 0.025	2022-06-16
 
  - Internally shift off the method invocant sometimes as benchmarking shows

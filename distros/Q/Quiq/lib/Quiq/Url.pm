@@ -21,7 +21,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.202';
+our $VERSION = '1.203';
 
 use Encode ();
 use Quiq::Array;
@@ -281,10 +281,11 @@ sub queryEncode {
     # @_: '?' oder '&' oder ';'
 
     my $str = '';
+    my $initialChar = '';
     # if (length($_[0]) == 1 && $_[0] =~ /[&;?]/) {
     if (@_%2) {
         # Einleitungszeichen
-        $str = shift;
+        $initialChar = shift;
     }
 
     # Direktiven
@@ -330,7 +331,7 @@ sub queryEncode {
         }
     }
 
-    return $str;
+    return $i? "$initialChar$str": $str;
 }
 
 {
@@ -528,7 +529,7 @@ sub split {
 
 =head1 VERSION
 
-1.202
+1.203
 
 =head1 AUTHOR
 

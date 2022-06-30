@@ -31,7 +31,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.202';
+our $VERSION = '1.203';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -638,11 +638,15 @@ sub edit {
 
 # -----------------------------------------------------------------------------
 
-=head3 encoding() - Liefere das Encoding der Datei
+=head3 detectEncoding() - Liefere das Encoding der Datei
 
 =head4 Synopsis
 
-  $encoding = $class->encoding($path,$altEncoding);
+  $encoding = $class->detectEncoding($path,$altEncoding);
+
+=head4 Alias
+
+encoding()
 
 =head4 Description
 
@@ -675,7 +679,7 @@ Bei großen Dateien kann dies ineffizient sein.
 
 # -----------------------------------------------------------------------------
 
-sub encoding {
+sub detectEncoding {
     my $class = shift;
     my $path = shift;
     my $altEncoding = shift // 'ISO-8859-1';
@@ -696,6 +700,11 @@ sub encoding {
         Path => $path,
         Message => $dec,
     );
+}
+
+{
+    no warnings 'once';
+    *encoding = \&detectEncoding;
 }
 
 # -----------------------------------------------------------------------------
@@ -1851,7 +1860,7 @@ Programmpfad (String)
 
 Suche Programm $program über den Suchpfad der Shell und liefere
 den vollständigen Pfad zurück. Wird das Programm nicht gefunden,
-wird eine Exception geworfen, sofern $sloppy nicht wahr ist.
+wird eine Exception geworfen.
 
 =cut
 
@@ -3711,7 +3720,7 @@ sub uid {
 
 =head1 VERSION
 
-1.202
+1.203
 
 =head1 AUTHOR
 

@@ -56,7 +56,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.202';
+our $VERSION = '1.203';
 
 use Quiq::Path;
 use Quiq::Option;
@@ -883,7 +883,7 @@ sub asStringNL {
 
 =head1 VERSION
 
-1.202
+1.203
 
 =head1 AUTHOR
 

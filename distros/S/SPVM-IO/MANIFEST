@@ -1,4 +1,5 @@
 Changes
+cpanm
 lib/SPVM/IO.pm
 lib/SPVM/IO/File.c
 lib/SPVM/IO/File.config
@@ -8,18 +9,22 @@ lib/SPVM/IO/FileHandle.c
 lib/SPVM/IO/FileHandle.config
 lib/SPVM/IO/FileHandle.pm
 lib/SPVM/IO/FileHandle.spvm
-lib/SPVM/IO/Handlable.pm
-lib/SPVM/IO/Handlable.spvm
+lib/SPVM/IO/Handle.pm
+lib/SPVM/IO/Handle.spvm
 lib/SPVM/IO/Select.c
 lib/SPVM/IO/Select.config
 lib/SPVM/IO/Select.pm
 lib/SPVM/IO/Select.spvm
+lib/SPVM/IO/Socket.pm
+lib/SPVM/IO/Socket.spvm
+lib/SPVM/IO/Socket/Fn.c
+lib/SPVM/IO/Socket/Fn.config
+lib/SPVM/IO/Socket/Fn.pm
+lib/SPVM/IO/Socket/Fn.spvm
 lib/SPVM/IO/Socket/INET.c
 lib/SPVM/IO/Socket/INET.config
 lib/SPVM/IO/Socket/INET.pm
 lib/SPVM/IO/Socket/INET.spvm
-lib/SPVM/IO/Socketable.pm
-lib/SPVM/IO/Socketable.spvm
 Makefile.PL
 MANIFEST			This list of files
 README.md

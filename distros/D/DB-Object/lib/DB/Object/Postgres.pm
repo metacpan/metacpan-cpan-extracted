@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres.pm
-## Version v0.4.12
+## Version v0.4.13
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2021/08/30
+## Modified 2022/06/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,6 +19,9 @@ BEGIN
     use warnings;
     use parent qw( DB::Object );
     use version;
+    use vars qw(
+        $VERSION $CACHE_QUERIES $CACHE_SIZE $CACHE_TABLE $CONNECT_VIA $DB_ERRSTR 
+        @DBH $DEBUG $ERROR $MOD_PERL $USE_BIND $USE_CACHE );
     use DBI;
     # use DBD::Pg qw( :pg_types );
     eval
@@ -31,33 +34,31 @@ BEGIN
     use DateTime::Format::Strptime;
     use Module::Generic::DateTime;
     use Nice::Try;
-    require DB::Object::Postgres::Statement;
-    require DB::Object::Postgres::Tables;
-    require DB::Object::Postgres::Lo;
-    our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
-    our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH );
-    $VERSION     = 'v0.4.12';
+    $VERSION     = 'v0.4.13';
     use Devel::Confess;
 };
 
+use strict;
+use warnings;
+require DB::Object::Postgres::Statement;
+require DB::Object::Postgres::Tables;
+require DB::Object::Postgres::Lo;
+$DB_ERRSTR     = '';
+$DEBUG         = 0;
+$CACHE_QUERIES = [];
+$CACHE_SIZE    = 10;
+# The purpose of this cache is to store table object and avoid the penalty of reloading the structure of a table for every object generated.
+# Thus CACHE_TABLE is in no way an exhaustive list of existing table, but existing table object.
+$CACHE_TABLE   = {};
+$USE_BIND      = 0;
+$USE_CACHE     = 0;
+$MOD_PERL      = 0;
+@DBH           = ();
+if( $INC{ 'Apache/DBI.pm' } && 
+    substr( $ENV{ 'GATEWAY_INTERFACE' }|| '', 0, 8 ) eq 'CGI-Perl' )
 {
-    $DB_ERRSTR     = '';
-    $DEBUG         = 0;
-    $CACHE_QUERIES = [];
-    $CACHE_SIZE    = 10;
-    # The purpose of this cache is to store table object and avoid the penalty of reloading the structure of a table for every object generated.
-    # Thus CACHE_TABLE is in no way an exhaustive list of existing table, but existing table object.
-    $CACHE_TABLE   = {};
-    $USE_BIND      = 0;
-    $USE_CACHE     = 0;
-    $MOD_PERL      = 0;
-    @DBH           = ();
-    if( $INC{ 'Apache/DBI.pm' } && 
-        substr( $ENV{ 'GATEWAY_INTERFACE' }|| '', 0, 8 ) eq 'CGI-Perl' )
-    {
-        $CONNECT_VIA = "Apache::DBI::connect";
-        $MOD_PERL++;
-    }
+    $CONNECT_VIA = "Apache::DBI::connect";
+    $MOD_PERL++;
 }
 
 # sub new is inherited from DB::Object
@@ -214,7 +215,7 @@ sub commit($;$@)
 sub connect
 {
     my $that   = shift( @_ );
-    my $param = $that->_connection_params2hash( @_ ) || return( $self->pass_error );
+    my $param = $that->_connection_params2hash( @_ ) || return( $that->pass_error );
     $param->{driver} = 'Pg';
     return( $that->SUPER::connect( $param ) );
 }
@@ -305,7 +306,6 @@ sub databases
         }
         catch( $e )
         {
-            $self->message( 3, "An error occurred while trying to connect to get the list of available databases: $e" );
             return;
         }
     }
@@ -385,7 +385,6 @@ sub get_sql_type
 {
     my $self = shift( @_ );
     my $type = shift( @_ ) || return( $self->error( "No sql type was provided to get its constant." ) );
-    $self->message( 3, "Trying constant for '$type' using 'DBD::Pg::PG_\U${type}\E'" );
     my $const = $self->{dbh}->can( "DBD::Pg::PG_\U${type}\E" );
     return( '' ) if( !defined( $const ) );
     return( $const->() );
@@ -404,8 +403,10 @@ sub having
 
 sub large_object
 {
+    my $self = shift( @_ );
+    return( $self->error( "large_object() cannot be called as a class function." ) ) if( !ref( $self ) );
     # Parameter is a bitmask mode
-    return( DB::Object::Postgres::Lo->new( $self->{ 'dbh' } ) );
+    return( DB::Object::Postgres::Lo->new( $self->{dbh} ) );
 }
 
 # Must be superseded, or better yet, the one in DB::Object should probably be changed to ours
@@ -439,11 +440,12 @@ sub lock
     return( $self->error( "Error while preparing query to get lock on table '$table': ", $dbh->errstr() ) );
     $sth->execute() ||
     return( $self->error( "Error while executing query to get lock on table '$table': ", $sth->errstr() ) );
+    my $res = $sth->fetchrow;
     $sth->finish();
     # We do not really need to track that information.
     # $self->{ '_locks' } ||= [];
     # push( @{ $self->{ '_locks' } }, $table ) if( $res && $res ne 'NULL' );
-    return( $res eq 'NULL' ? undef() : $res );
+    return( $res eq 'NULL' ? ( wantarray() ? () : undef() ) : $res );
 }
 
 sub make_schema
@@ -830,7 +832,6 @@ sub table_info
     my $self = shift( @_ );
     my $table = shift( @_ ) || 
     return( $self->error( "You must provide a table name to access the table methods." ) );
-    $self->message( 3, "Getting table/view information for '$table'." );
     my $opts = $self->_get_args_as_hash( @_ );
     my $schema = $self->schema || $opts->{schema} || '';
     my $sql = <<'EOT';
@@ -985,7 +986,6 @@ sub _check_connect_param
     $param->{database} = 'postgres' if( !$param->{database} );
     # By default
     $param->{port} = 5432 if( !length( $param->{port} ) );
-    $self->message( 3, "Returning parameters: ", sub{ $self->dump( $param ) } );
     return( $param );
 }
 
@@ -1008,7 +1008,6 @@ sub _connection_options
     my $param = shift( @_ );
     my @pg_params = grep( /^pg_/, keys( %$param ) );
     my $opt = $self->SUPER::_connection_options( $param ) || return( $self->pass_error );
-    $self->message( 3, "Inherited options are: ", sub{ $self->dump( $opt ) } );
     @$opt{ @pg_params } = @$param{ @pg_params };
     return( $opt );
 }
@@ -1036,12 +1035,19 @@ sub _convert_datetime2object
     my $data = $opts->{data};
     my $names = $sth->FETCH('NAME');
     my $types = $sth->FETCH('pg_type');
-    # $self->messagef( 3, "Found %d fields returned.", scalar( @$names ) );
-    # $self->message( 3, "PG_JSON is: '", PG_JSON, "' and PG_JSONB is: '", PG_JSONB, "'." );
     my $pg_types = $sth->{pg_type};
-    # $self->message( 3, "pg_type has following information: ", sub{ $self->printer( $pg_types ) } );
     my $mode = ref( $data );
-    local $convert = sub
+    my $tz;
+    try
+    {
+        $tz = DateTime::TimeZone->new( name => 'local' );
+    }
+    catch( $e )
+    {
+        $tz = DateTime::TimeZone->new( name => 'UTC' );
+    }
+    
+    my $convert = sub
     {
         my $str = shift( @_ ) || return;
         if( $str =~ /^(?<year>\d{4})-(?<month>\d{1,2})-(?<day>\d{1,2})(?:[[:blank:]]+(?<hour>\d{1,2})\:(?<minute>\d{1,2})\:(?<second>\d{1,2}))?/ )
@@ -1056,7 +1062,7 @@ sub _convert_datetime2object
             {
                 $hash->{ $_ } = int( $+{ $_ } ) if( defined( $+{ $_ } ) );
             }
-            $hash->{time_zone} = 'local';
+            $hash->{time_zone} = $tz->name;
 
             try
             {
@@ -1064,7 +1070,7 @@ sub _convert_datetime2object
                 my $fmt = DateTime::Format::Strptime->new(
                     pattern => '%Y-%m-%d %H:%M:%S',
                     locale => 'en_GB',
-                    time_zone => 'local',
+                    time_zone => $tz->name,
                 );
                 $dt->set_formatter( $fmt );
                 # To enable extra features
@@ -1082,10 +1088,8 @@ sub _convert_datetime2object
     };
     for( my $i = 0; $i < scalar( @$names ); $i++ )
     {
-        # $self->messagef( 3, "Checking field '%s' with type '%s'.", $names->[$i], $types->[$i] );
         if( $types->[$i] eq PG_DATE || $types->[$i] eq PG_TIMESTAMP || $types->[$i] eq 'date' || $types->[$i] eq 'timestamp' )
         {
-            $self->messagef( 3, "Found a date(time) field '%s' of type '%s'.", $names->[$i], $types->[$i] );
             if( $mode eq 'ARRAY' )
             {
                 for( my $j = 0; $j < scalar( @$data ); $j++ )
@@ -1111,7 +1115,6 @@ sub _convert_json2hash
 #     $self->debug( 3 );
 #     my( $pack, $file, $line ) = caller( 1 );
 #     my $sub = ( caller( 2 ) )[3];
-#     $self->message( 3, "Called from package '$pack' in file '$file' at line '$line' within sub '$sub'." );
     # $data can be either hash pr array
     my $sth = $opts->{statement} || return( $self->error( "No statement handler was provided to convert data from json to perl." ) );
     # my $data = $opts->{data} || return( $self->error( "No data was provided to convert from json to perl." ) );
@@ -1119,23 +1122,15 @@ sub _convert_json2hash
     my $data = $opts->{data};
     my $names = $sth->FETCH('NAME');
     my $types = $sth->FETCH('pg_type');
-    # $self->messagef( 3, "Found %d fields returned.", scalar( @$names ) );
-    # $self->message( 3, "PG_JSON is: '", PG_JSON, "' and PG_JSONB is: '", PG_JSONB, "'." );
     my $pg_types = $sth->{pg_type};
-    # $self->message( 3, "pg_type has following information: ", sub{ $self->printer( $pg_types ) } );
     my $mode = ref( $data );
-    # $self->messagef( 3, "%d data received.", scalar( @$data ) ) if( $mode eq 'ARRAY' );
-    $self->messagef( 3, "%d data received.", scalar( @$data ) ) if( $self->_is_array( $data ) );
     for( my $i = 0; $i < scalar( @$names ); $i++ )
     {
-        # $self->messagef( 3, "Checking field '%s' with type '%s'.", $names->[$i], $types->[$i] );
         if( $types->[$i] eq PG_JSON || $types->[$i] eq PG_JSONB || $types->[$i] eq 'json' || $types->[$i] eq 'jsonb' )
         {
-            $self->messagef( 3, "Found a json field '%s' of type '%s'.", $names->[$i], $types->[$i] );
             # if( $mode eq 'ARRAY' )
             if( $self->_is_array( $data ) )
             {
-                $self->message( 3, "Value is: '", $data->[0], "'." );
                 for( my $j = 0; $j < scalar( @$data ); $j++ )
                 {
                     next if( !$data->[ $j ]->{ $names->[ $i ] } );
@@ -1146,9 +1141,7 @@ sub _convert_json2hash
             # elsif( $mode eq 'HASH' )
             elsif( $self->_is_hash( $data ) )
             {
-                # $self->message( 3, "Value is: '", $data->{ $names->[ $i ] }, "'." );
                 my $ref = $self->_decode_json( $data->{ $names->[ $i ] } );
-                # $self->message( 3, "Converted value is: ", sub{ $self->dumper( $ref ) } );
                 $data->{ $names->[ $i ] } = $ref if( $ref );
             }
         }
@@ -1160,9 +1153,7 @@ sub _dsn
 {
     my $self = shift( @_ );
     my @params = ();
-    # $self->message( 3, "\$self contains: ", sub{ $self->dumper( $self ) } );
     # See pg_service.conf
-    $self->message( 3, "Driver is '$self->{driver}'" );
     if( $self->{service} )
     {
         @params = ( sprintf( 'dbi:%s:%s', @$self{ qw( driver service ) } ) );
@@ -1215,7 +1206,6 @@ DESTROY
     my $class = ref( $self ) || $self;
     if( $self->{sth} )
     {
-        # $self->message( "DETROY(): Terminating sth '$self' for query:\n$self->{ 'query' }\n" );
         # print( STDERR "DESTROY(): Terminating sth '$self' for query:\n$self->{ 'query' }\n" ) if( $DEBUG );
         $self->{sth}->finish();
     }
@@ -1250,9 +1240,7 @@ END
 };
 
 1;
-
-# XXX POD
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -1357,7 +1345,7 @@ DB::Object::Postgres - SQL API
     
 =head1 VERSION
 
-    v0.4.12
+    v0.4.13
 
 =head1 DESCRIPTION
 

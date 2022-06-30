@@ -27,7 +27,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.202';
+our $VERSION = '1.203';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -44,6 +44,7 @@ use Quiq::Digest;
 use Quiq::Database::Cursor;
 use Time::HiRes ();
 use Quiq::AnsiColor;
+use Quiq::Perl;
 use Quiq::Unindent;
 use Quiq::Database::ResultSet;
 use Quiq::Parameters;
@@ -1667,6 +1668,277 @@ sub execute {
         $str = sprintf "%s\n\n",$a->str('dark green',$stmt);
         my $tmp = sprintf '%s rows affected, %.2f',$cur->hits,$cur->elapsed;
         $str .= $a->str('dark red',$tmp)."\n";
+    }
+
+    return $str;
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Patches
+
+=head3 applyPatches() - Wende offene Patches auf Datenbank an
+
+=head4 Synopsis
+
+  $n = $db->applyPatches($patchClass);
+
+=head4 Arguments
+
+=over 4
+
+=item $patchClass
+
+(String) Klasse, die die Patchmethoden enthält.
+
+=back
+
+=head4 Returns
+
+(Integer) Anzahl der angewandten Patch-Methoden.
+
+=head4 Description
+
+Wende alle offenen Patches auf die Datenbank an. Die Patches sind als
+Methoden in der Klasse $patchClass implementiert. Die Patch-Methoden
+haben das Namensmuster
+
+  patchNNN
+
+Hierbei ist NNN der Patchlevel, den die Methode implementiert. Der
+aktuelle Patchlevel der Datnbank ist der maximale Wert der Kolumne
+PAT_LEVEL in Tabelle PATCH. Es werden alle Patch-Methoden
+angewandt, deren Patchlevel größer ist als der aktuelle Patchlevel.
+Existiert die Tabelle PATCH nicht, wird sie angelegt.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub applyPatches {
+    my ($self,$patchClass) = @_;
+
+    my $exists = $self->tableExists('patch');
+    if (!$exists) {
+        $self->createTable('patch',
+            ['pat_id',type=>'INTEGER',primaryKey=>1,autoIncrement=>1],
+            ['pat_level',type=>'INTEGER',notNull=>1],
+            # FIXME: Portabilität
+            ['pat_time',type=>'DATETIME',notNull=>1,
+                default=>\"(DATETIME('now','localtime'))"],
+            ['pat_description',type=>'TEXT'],
+        );
+    }
+
+    # Ermittele aktuellen Patchlevel der Datenbank
+    my $maxLevel = $self->patchLevel;
+
+    # Wende ausstehende Patchmethoden an
+
+    my $i = 0;
+    for ($self->patchMethods($patchClass)) {
+        my ($name,$sub,$descr) = @$_;
+        my ($n) = map {int} $name =~ /(\d+)/;
+        if ($n > $maxLevel) {
+            $self->begin;
+            $sub->($self,$n);
+            $self->insert('patch',
+                pat_level => $n,
+                pat_description => $descr,
+            );
+            $self->commit;
+            $i++;
+        }
+    }
+
+    return $i;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 maxPatchLevel() - Liefere maximalen Patchlevel der Patch-Klasse
+
+=head4 Synopsis
+
+  $patchLevel = $this->maxPatchLevel($patchClass);
+
+=head4 Arguments
+
+=over 4
+
+=item $patchClass
+
+Name der Klasse, die die Patchmethoden enthält.
+
+=back
+
+=head4 Returns
+
+(Integer) Maximaler Patchlevel.
+
+=head4 Description
+
+Ermittele den maximalen Patchlevel, also die höchste Nummer unter
+allen Patch-Methoden, die in der Klasse $patchClass implementiert sind,
+und liefere diesen zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub maxPatchLevel {
+    my ($this,$patchClass) = @_;
+
+    my $n = 0;
+    my $patchMethodA = $this->patchMethods($patchClass);
+    if (@$patchMethodA) {
+        my $name = $patchMethodA->[-1][0];
+        ($n) = map {int} $name =~ /(\d+)/;
+    }
+
+    return $n;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 patchLevel() - Liefere den aktuellen Patchlevel der Datenbank
+
+=head4 Synopsis
+
+  $patchLevel = $db->patchLevel;
+
+=head4 Returns
+
+(Integer) Patchlevel der Datenbank.
+
+=head4 Description
+
+Ermittele den aktuellen Patchlevel der Datenbank und liefere diesen
+zurück. Existiert die Tabelle PATCH auf der Datenbank nicht oder
+hat sie keinen Eintrag, liefert die Methode 0.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub patchLevel {
+    my $self = shift;
+
+    my $patchLevel = 0;
+
+    my $exists = $self->tableExists('patch');
+    if ($exists) {
+        $patchLevel = $self->value(
+            -select => 'IFNULL(MAX(pat_level), 0)',
+            -from => 'patch',
+        );
+    }
+
+    return $patchLevel;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 patchMethods() - Liefere Liste der Patch-Methoden
+
+=head4 Synopsis
+
+  @patchMethods | $patchMehodA = $this->patchMethods($patchClass);
+
+=head4 Arguments
+
+=over 4
+
+=item $patchClass
+
+Name der Klasse, die die Patchmethoden enthält.
+
+=back
+
+=head4 Returns
+
+(Array of Pairs) Liste der Patch-Methoden der Klasse $patchClass. Im
+Skalarkontext eine Referenz auf die Liste.
+
+=head4 Description
+
+Ermittele die Liste der Patch-Mehoden der Klasse $patchClass und liefere
+diese zurück. Ein Element der Liste ist ein Paar, bestehend aus dem
+Methoden-Namen und einer Glob-Referenz, über die die Patch-Methode
+aufgerufen werden kann. Die Liste ist aufsteigend nach Methodenname
+sortiert.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub patchMethods {
+    my ($this,$patchClass) = @_;
+
+    my @arr;
+    my $refH = Quiq::Perl->stash($patchClass);
+    for my $name (sort keys %$refH) {
+        if ($name =~ /^patch\d+/) {
+            my $descr = Quiq::Perl->getScalarValue($patchClass,$name);
+            push @arr,[$name,$refH->{$name},$descr];
+        }
+    }
+
+    return wantarray? @arr: \@arr;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 patchReport() - Liefere Bericht über den Stand der Patches
+
+=head4 Synopsis
+
+  $report = $db->patchReport($patchClass);
+
+=head4 Arguments
+
+=over 4
+
+=item $patchClass
+
+Name der Klasse, die die Patchmethoden enthält.
+
+=back
+
+=head4 Returns
+
+(String) Patch-Bericht
+
+=head4 Description
+
+Erzeuge einen Bericht über den Stand der Patches auf der Datenbank
+und liefere diesen zurück. Der Bericht hat den Aufbau:
+
+  NAME001() - DESCRIPTION001 (STATUS001)
+  NAME002() - DESCRIPTION002 (STATUS002)
+  ...
+
+Hierbei ist:
+
+  NAMEXXX        - Name der Patchmethode des Patch XXX
+  DESCRIPTIONXXX - Beschreibung des Patch XXX
+  STATUSXXX      - Status des Patch XXX ('applied' oder 'new')
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub patchReport {
+    my ($self,$patchClass) = @_;
+
+    my $l = $self->patchLevel;
+
+    my $str = '';
+    for ($self->patchMethods($patchClass)) {
+        my ($name,$sub,$descr) = @$_;
+        my ($n) = map {int} $name =~ /(\d+)/;
+        $str .= sprintf "%s() - %s %s\n",$name,$descr,
+            $n <= $l? '(applied)': '(new)';
     }
 
     return $str;
@@ -3369,6 +3641,136 @@ sub createTable {
 
 # -----------------------------------------------------------------------------
 
+=head3 recreateTable() - Erzeuge existierende Tabelle neu
+
+=head4 Synopsis
+
+  $cur = $db->recreateTable($table,
+      [$colName,@colOpts],
+      ...
+      @opt,
+  );
+
+=head4 Arguments
+
+=over 4
+
+=item $name
+
+(String) Name der Tabelle, die neu erzeugt wird.
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -mapColumns => \%hash
+
+Abbildung zwischen den Kolumnennamen der alten und der neuen Tabelle.
+Der Schlüssel des Hash ist der alte Name, der Wert des Hash
+der neue Name. Es müssen nur die Kolumennamen angegeben werden,
+die nicht übereinstimmen.
+
+=back
+
+=head4 Returns
+
+(Object) Cursor des INSERT-Statements, das die Daten von der alten
+in die neue Tabelle kopiert hat.
+
+=head4 Description
+
+Erzeuge die auf der Datenbank bereits existierende Tabelle $table neu.
+
+Ablauf:
+
+=over 4
+
+=item 1.
+
+Erzeuge die Tabelle $table unter dem Namen <TABLE>_new
+
+=item 2.
+
+Kopiere die Daten aus der originalen in die neue Tabelle (unter
+Berücksichtigung geänderter Kolumnennamen, siehe Option C<-mapColumns>.
+Kolumen, nicht mehr existieren, entfallen.)
+
+=item 3.
+
+Lösche die Orignaltabelle
+
+=item 4.
+
+Benenne die neue Tabelle in die Originaltabelle $table um
+
+=back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub recreateTable {
+    my $self = shift;
+    my $table = shift;
+    # @_: @cols,@opt
+
+    # Optionen
+
+    my $mapH = undef;
+
+    $self->parameters(1,\@_,
+        -mapColumns => $mapH,
+    );
+
+    # 1. Erzeuge die neue Tabelle
+
+    $self->createTable("${table}_new",@_);
+
+    # 2a. Erstelle Abbildung der Kolumnen
+
+    my @titlesNew = $self->titles($table.'_new');
+
+    my %map; # Kolumnen der neuen Tabelle
+    for (@titlesNew) {
+        $map{$_} = 'NULL';
+    }
+    for my $titleOld ($self->titles($table)) {
+        if (my $titleNew = $mapH->{$titleOld}) {
+            $map{$titleNew} = $titleOld; # Kolumne umbenannt
+        }
+        elsif (exists $map{$titleOld}) {
+            $map{$titleOld} = $titleOld; # Kolumnenname bleibt gleich
+        }
+        else {
+            # kolumne entfällt
+        }
+    }
+
+    my @titlesOld = map {$map{$_}} @titlesNew;
+
+    # 2b. Kopiere die Daten aus der alten in die neue Tabelle
+
+    my $stmt = "INSERT INTO ${table}_new (\n    ".
+        join("\n    , ",@titlesNew)."\n".
+        ")\nSELECT\n    ".
+        join("\n    , ",@titlesOld)."\n".
+        "FROM\n    $table";
+
+    my $cur = $self->sql($stmt);
+
+    # 3. Lösche die alte Tabelle
+    $self->dropTable($table);
+
+    # 4. Benenne die neue Tabelle in die alte um
+    $self->renameTable("${table}_new",$table);
+
+    return $cur;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 dropTable() - Lösche Tabelle
 
 =head4 Synopsis
@@ -3454,6 +3856,27 @@ sub tableExists {
 
 # -----------------------------------------------------------------------------
 
+=head3 renameTable() - Benenne Tabelle um
+
+=head4 Synopsis
+
+  $cur = $sql->renameTable($oldName,$newName);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub renameTable {
+    my ($self,$oldName,$newName) = @_;
+
+    my $stmt = $self->stmt->renameTable($oldName,$newName);
+    my $cur = $self->sqlAtomic($stmt);
+
+    return $cur;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 analyzeTable() - Analysiere Tabelle
 
 =head4 Synopsis
@@ -3471,6 +3894,29 @@ Analysiere Tabelle $table und liefere einen Cursor zurück.
 sub analyzeTable {
     my ($self,$table) = @_;
     my $stmt = $self->stmt->analyzeTable($table);
+    return $self->sql($stmt);
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 addCheckConstraint() - Füge CHECK Constraint zu Tabelle hinzu
+
+=head4 Synopsis
+
+  $cur = $db->addCheckConstraint($tableName,$expr,@opt);
+
+=head4 Description
+
+Siehe Quiq::Sql::addCheckConstraint()
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub addCheckConstraint {
+    my $self = shift;
+    # @_: Argumente
+    my $stmt = $self->stmt->addCheckConstraint(@_);
     return $self->sql($stmt);
 }
 
@@ -5485,7 +5931,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.202
+1.203
 
 =head1 AUTHOR
 

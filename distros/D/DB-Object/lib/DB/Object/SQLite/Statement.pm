@@ -17,14 +17,15 @@ BEGIN
 {
     use strict;
     use warnings;
-    use DB::Object::SQLite;
-    use DB::Object::Statement;
     use parent qw( DB::Object::SQLite DB::Object::Statement );
-    our( $VERSION, $VERBOSE, $DEBUG );
+    use vars qw( $VERSION $VERBOSE $DEBUG );
     $VERSION    = 'v0.300.1';
     $VERBOSE    = 0;
     $DEBUG      = 0;
 };
+
+use strict;
+use warnings;
 
 # Inherited from DB::Object::Statement
 # sub bind_param

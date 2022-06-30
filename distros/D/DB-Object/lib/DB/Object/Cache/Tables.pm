@@ -17,12 +17,16 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
+    use vars qw( $VERSION );
     use JSON;
     use Fcntl qw( :flock );
     use Module::Generic::File qw( sys_tmpdir );
     use Devel::Confess;
     our $VERSION = 'v0.100.3';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -108,7 +112,7 @@ sub read
             my $data = $tables_cache_file->load;
             eval
             {
-                $cache = $j->decode( $data );
+                $hash = $j->decode( $data );
             };
             if( $@ )
             {
@@ -189,7 +193,7 @@ sub write
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8

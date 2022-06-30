@@ -1,0 +1,49 @@
+## name File access tests fail
+## failures 6
+## cut
+
+-r $foo;
+-w $foo;
+-x $foo;
+-R $foo;
+-W $foo;
+-X $foo;
+
+#-----------------------------------------------------------------------------
+
+## name Other file tests pass
+## failures 0
+## cut
+
+-o $foo;
+-O $foo;
+-e $foo;
+-z $foo;
+-s $foo;
+-f $foo;
+-d $foo;
+-l $foo;
+-p $foo;
+-S $foo;
+-b $foo;
+-c $foo;
+-t $foo;
+-u $foo;
+-g $foo;
+-k $foo;
+-T $foo;
+-B $foo;
+-M $foo;
+-A $foo;
+-C $foo;
+
+#-----------------------------------------------------------------------------
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 78
+#   indent-tabs-mode: nil
+#   c-indentation-style: bsd
+# End:
+# ex: set ts=8 sts=4 sw=4 tw=78 ft=perl expandtab shiftround :

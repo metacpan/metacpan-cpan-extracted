@@ -20,7 +20,7 @@ my $can_git = _can_git();
 
 subtest 'git_ls_files' => sub {
     plan skip_all => 'No git' if !$can_git;
-    my $repodir =_setup_git_repo();
+    my $repodir = _setup_git_repo();
 
     my (undef, @r) = File::Codeowners::Util::git_ls_files($repodir);
     is_deeply(\@r, [], 'git ls-files returns [] when no repo files') or diag explain \@r;
@@ -36,19 +36,21 @@ subtest 'git_ls_files' => sub {
 
 subtest 'git_toplevel' => sub {
     plan skip_all => 'No git' if !$can_git;
-    my $repodir =_setup_git_repo();
+    my $repodir = _setup_git_repo();
     my $repodir_fixed = _fix_win32_path($repodir);
 
     my $r = File::Codeowners::Util::git_toplevel($repodir);
-    is($r->canonpath, $repodir_fixed->canonpath, 'found toplevel directory from toplevel');
+    is(_fix_win32_path($r)->canonpath, $repodir_fixed->canonpath,
+        'found toplevel directory from toplevel');
 
     $r = File::Codeowners::Util::git_toplevel($repodir->child('a/b'));
-    is($r->canonpath, $repodir_fixed->canonpath, 'found toplevel directory');
+    is(_fix_win32_path($r)->canonpath, $repodir_fixed->canonpath,
+        'found toplevel directory');
 };
 
 subtest 'find_nearest_codeowners' => sub {
     plan skip_all => 'No git' if !$can_git;
-    my $repodir =_setup_git_repo();
+    my $repodir = _setup_git_repo();
 
     $repodir->child('docs')->mkpath;
     my $filepath = _spew_codeowners($repodir->child('docs/CODEOWNERS'));
@@ -59,7 +61,7 @@ subtest 'find_nearest_codeowners' => sub {
 
 subtest 'find_codeowners_in_directory' => sub {
     plan skip_all => 'No git' if !$can_git;
-    my $repodir =_setup_git_repo();
+    my $repodir = _setup_git_repo();
 
     $repodir->child('docs')->mkpath;
     my $filepath = _spew_codeowners($repodir->child('docs/CODEOWNERS'));
@@ -97,7 +99,6 @@ sub _setup_git_repo {
 
 sub _fix_win32_path {
     my $path = shift;
-    # Git for Windows shows full paths
     if (eval { require Win32 }) {
         $path = path(Win32::GetLongPathName($path));
     }

@@ -1,7 +1,10 @@
 Revision history for Perl module HTTP::Promise
 
-v0.1.1 2022-06-28T06:38:36+0900
+v0.1.2 2022-06-30T13:56:42+0900
+    - Added missing requirement for URL::Encode::XS
+
+v0.1.1 2022-06-28T06:38:36Z +0900
     - Remove dependency on curry
 
-v0.1.0 2022-06-27T23:01:44+0900
+v0.1.0 2022-06-27T23:01:44Z +0900
     - Initial release

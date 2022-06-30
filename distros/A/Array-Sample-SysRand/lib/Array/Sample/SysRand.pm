@@ -9,7 +9,7 @@ use Exporter qw(import);
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-05-20'; # DATE
 our $DIST = 'Array-Sample-SysRand'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our @EXPORT_OK = qw(sample_sysrand);
 
@@ -47,7 +47,7 @@ Array::Sample::SysRand - Systematic random sampling from an array
 
 =head1 VERSION
 
-This document describes version 0.002 of Array::Sample::SysRand (from Perl distribution Array-Sample-SysRand), released on 2022-05-20.
+This document describes version 0.003 of Array::Sample::SysRand (from Perl distribution Array-Sample-SysRand), released on 2022-05-20.
 
 =head1 SYNOPSIS
 
@@ -98,7 +98,7 @@ About systematic (random) sampling:
 L<https://www.investopedia.com/terms/s/systematic-sampling.asp>
 
 Other sampling methods: L<Array::Sample::Partition>,
-L<Array::Sample::SimpleRandom>
+L<Array::Sample::SimpleRandom>, L<Array::Sample::WeightedRandom>
 
 =head1 AUTHOR
 

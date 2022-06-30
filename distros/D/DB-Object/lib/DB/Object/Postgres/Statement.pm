@@ -20,15 +20,16 @@ BEGIN
 {
     use strict;
     use warnings;
-    use DB::Object::Postgres;
-    use DB::Object::Statement;
+    use parent qw( DB::Object::Statement DB::Object::Postgres );
+    use vars qw( $VERSION $VERBOSE $DEBUG );
     use DateTime;
-    our( $VERSION, $VERBOSE, $DEBUG, @ISA );
-    @ISA    = qw( DB::Object::Statement DB::Object::Postgres );
     $VERSION    = 'v0.301.1';
     $VERBOSE    = 0;
     $DEBUG      = 0;
 };
+
+use strict;
+use warnings;
 
 # Inherited from DB::Object::Statement
 # sub bind_param
@@ -125,14 +126,24 @@ sub dump
     $vsep  = $args->{vsep} if( exists( $args->{vsep} ) );
     $hsep  = $args->{hsep} if( exists( $args->{hsep} ) );
     $width = $args->{width} if( exists( $args->{width} ) );
-    my @fields = @{$self->{sth}->FETCH( 'NAME' )};
+    my @fields = ();
+    my $fields_ref = $self->{sth}->FETCH( 'NAME' );
+    if( defined( $fields_ref ) && ref( $fields_ref ) eq 'ARRAY' )
+    {
+        @fields = @{$self->{sth}->FETCH( 'NAME' )};
+    }
+    else
+    {
+        return( $self->error( "No array reference of fields could be retrieved from statement '$self->{sth}'." ) );
+    }
     return( $self->error( "No query to dump." ) ) if( !exists( $self->{sth} ) );
     if( exists( $args->{file} ) )
     {
         # new_file is inherited from Module::Generic and calls Module::Generic::File
         my $file = $self->new_file( $args->{file} );
         $fh = $file->open( '>', { binmode => 'utf8' }) || return( $self->error( "Unable to open file $file in write mode: ", $file->error ) );
-        my @header = sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields );
+        # my @header = sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields );
+        my @header = sort{ $a <=> $b } @fields;
         my $date = DateTime->now;
         my $table = $self->{table};
         $fh->printf( "# Generated on %s for table $table\n", $date->strftime( '%c' ) );
@@ -298,8 +309,7 @@ DESTROY
 };
 
 1;
-
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8

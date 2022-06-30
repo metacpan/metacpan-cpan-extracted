@@ -1,0 +1,97 @@
+Name
+    Plack::Middleware::CSP - Apply HTTP::CSPHeader to your psgi application.
+
+Synopsis
+     use utf8;
+     use strict;
+     use warnings;
+     use Plack::Builder;
+     use Plack::Middleware::CSP;
+
+     my $app = sub {
+         my $env = shift;
+         [ 200,
+           [ "content-type" => "text/plain; charset=utf-8" ],
+           [ "OHAI $env->{CSP_NONCE}" ] ]
+     };
+
+     # CSP middleware takes the arguments for HTTP::CSPHeader.
+     builder {
+         enable "CSP" =>
+             policy => {
+                 'default-src' => q['self'],
+                 'script-src'  => q['self'],
+             }, nonces_for => 'script-src';
+
+         mount "/" => $app;
+     };
+
+    Test it–
+
+     plackup app.psgi
+
+    See the headers–
+
+     curl -I http://0:5000/
+
+  policy, nonces_for
+    Refer to HTTP::CSPHeader’s documentation.
+
+  $env->{CSP_NONCE}
+    The nonce for the response is in the psgi environment as CSP_NONCE.
+
+  nonce_template_token
+    There is an experimental feature to do automatic nonce substitutions in
+    the response body, for example in a template. It is experimental because
+    it might be a terrible idea and even if it's a good idea, it almost
+    certainly needs to be much less liberal with its approach. It should
+    probably require the calling code to declare target content type. Adding
+    it into our synopsis–
+
+     use utf8;
+     use strict;
+     use warnings;
+     use Plack::Builder;
+     use Plack::Middleware::CSP;
+
+     my $app = sub { [ 200,
+                      [ "content-type" => "text/plain; charset=utf-8" ],
+                      [ "DIS IZ MAI NONCE: ::nonce::!" ] ] };
+
+     builder {
+         enable "CSP" =>
+             nonce_template_token => "::nonce::",
+             policy => {
+                 'default-src' => q['self'],
+                 'script-src'  => q['self'],
+             }, nonces_for => 'script-src';
+
+         mount "/" => $app;
+     };
+
+RFC
+    I put this together just to work on some security testing for myself.
+    It's alpha, unreviewed code, only tested on simplistic cases. It almost
+    certainly has bugs.
+
+    Please submit any patches, tests, feedback, or issues through its repo,
+    <https://github.com/pangyre/Plack-Middleware-CSP/issues>.
+
+See Also
+    The excellent Leon Timmermans took a stab at this quite a few years ago:
+    <https://github.com/Leont/plack-middleware-csp>. I have not made any
+    tests or comparisons.
+
+    HTTP::CSPHeader, Plack, Plack::Middleware, Plack::Util.
+
+    <https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP>.
+
+Author
+    Ashley Pond V, "<ashley@cpan.org>".
+
+License
+    ©2022 Ashley Pond V. This program is free software; you can redistribute
+    it and modify it under the same terms as Perl itself.
+
+    See <http://dev.perl.org/licenses/artistic.html>.
+

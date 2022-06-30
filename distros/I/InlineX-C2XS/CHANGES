@@ -1,3 +1,6 @@
+- 0.27 ... Rename filehandles in t.c_pre.t (to avoid test failures under 'j4' HARNESS_OPTIONS).
+           Add OBJECT config option. ( https://rt.cpan.org/Ticket/Update.html?id=93196 )
+
 - 0.26 ... Close RD filehandle in Context.pm (See https://www.perlmonks.org/?node_id=1216930)
 
 - 0.25 ... Escape braces {} in t/t_makefile_pl.t and t/t_makefile_pl_pre.t

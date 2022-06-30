@@ -1,5 +1,5 @@
 package Net::Easypost::CustomsItem;
-$Net::Easypost::CustomsItem::VERSION = '0.21';
+$Net::Easypost::CustomsItem::VERSION = '0.23';
 use Types::Standard qw/Num Str Undef/;
 
 use Moo;
@@ -59,7 +59,7 @@ Net::Easypost::CustomsItem
 
 =head1 VERSION
 
-version 0.21
+version 0.23
 
 =head1 SYNOPSIS
 

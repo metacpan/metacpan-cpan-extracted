@@ -15,7 +15,7 @@ my $ua = LWP::UserAgent->new ();
 
 note 'Celestrak current data';
 
-my $rslt = $ua->get ('https://celestrak.com/NORAD/elements/');
+my $rslt = $ua->get ('https://celestrak.org/NORAD/elements/');
 
 $rslt->is_success()
     or plan skip_all => 'Celestrak inaccessable: ' . $rslt->status_line;
@@ -104,7 +104,7 @@ ok ( ! keys %got, 'The above is all there is' ) or do {
 
 note 'Celestrak supplemental data';
 
-$rslt = $ua->get ('https://celestrak.com/NORAD/elements/supplemental/');
+$rslt = $ua->get ('https://celestrak.org/NORAD/elements/supplemental/');
 
 %got = parse_string( $rslt->content, source => 'celestrak_supplemental' );
 
@@ -116,16 +116,10 @@ foreach my $key ( keys %got ) {
     delete $got{$key};
 }
 
-( undef, $names ) = $st->names( 'celestrak_supplemental' );
+# diag 'Debug - got ', explain \%got;
 
-%expect = ();
-
-foreach ( @{ $names } ) {
-    $expect{$_->[1]} = {
-	name => $_->[0],
-	ignore => 0,
-    };
-}
+%expect = %{ Astro::SpaceTrack->__catalog( 'celestrak_supplemental' ) };
+%{ $_ } = ( %{ $_ }, ignore => 0 ) for values %expect;
 
 foreach my $key ( keys %got ) {
     if ( $got{$key}{name} =~ m/ \b ( pre-launch | post-deployment ) \b /smxi ) {
@@ -135,14 +129,17 @@ foreach my $key ( keys %got ) {
     }
 }
 
+# diag 'Debug - want ', explain \%expect;
+
 foreach my $key (sort keys %expect) {
+    my $source = $expect{$key}{source} || $key;
     if ($expect{$key}{ignore}) {
-	my $presence = delete $got{$key} ? 'present' : 'not present';
-	note "Ignored - $key (@{[($got{$key} ||
+	my $presence = delete $got{$source} ? 'present' : 'not present';
+	note "Ignored - $key (@{[($got{$source} ||
 		$expect{$key})->{name}]}): $presence";
 	$expect{$key}{note} and note( "    $expect{$key}{note}" );
     } else {
-	ok delete $got{$key}, $expect{$key}{name};
+	ok delete $got{$source}, $expect{$key}{name};
 	$expect{$key}{note} and note "    $expect{$key}{note}";
     }
 }
@@ -163,12 +160,12 @@ sub parse_string {
     foreach my $anchor ( $tree->look_down( _tag => 'a' ) ) {
 	my $href = $anchor->attr( 'href' )
 	    or next;
-	if ( $href =~ m/ \b gp\.php \b /smx ) {
+	if ( $href =~ m/ \b (?: sup- )? gp\.php \b /smx ) {
 	    my $uri = URI->new( $href );
 	    # NOTE convenient in this case but technically incorrect as
 	    # it is legal for keys to repeat.
 	    my %query = $uri->query_form();
-	    $href = $query{GROUP}
+	    $href = ( $query{GROUP} || $query{SOURCE} )
 		or next;
 	} else {
 	    $href =~ s/ [.] txt \z //smx

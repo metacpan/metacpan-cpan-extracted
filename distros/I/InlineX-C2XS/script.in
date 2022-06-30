@@ -38,6 +38,7 @@ Valid options are:
 --make=<value>         eg --make=pmake     (Untested)
 --manif=<value>        eg --manif=1 (Default is 0)
 --myextlib=<value>     eg --myextlib=/path/to/some.so
+--object=<value>       eg --object=$(O_FILES)
 --optimize=<value>     eg --optimize=-g -O3
 --prefix=<value>       eg --prefix=FOO_
 --pre_head=<value>     eg --pre_head=/some/file.ext

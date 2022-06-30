@@ -1,20 +1,22 @@
 package SPVM::IO;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 1;
 
-=head1 NAME
+=head1 Name
 
-SPVM::IO - I/O modules for File, Socket, select/polling.
+SPVM::IO - File IO, Socket, Select/Polling.
 
-=head1 DESCRIPTIONS
+=head1 Description
 
-I/O modules for File, Socket, select/polling.
+C<IO> is a L<SPVM> module for File IO, Socket, Select/Polling.
 
-B<SPVM::IO is now development release. The changes without warnings are offten quit will be done.>
+=head1 Caution
 
-=head1 MODULES
+C<IO> is in the early stages of development. So many incompatible changes will be done.
+
+=head1 Modules
 
 =over 2 
 

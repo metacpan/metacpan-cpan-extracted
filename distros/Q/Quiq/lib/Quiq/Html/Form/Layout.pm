@@ -141,7 +141,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.202';
+our $VERSION = '1.203';
 
 use Quiq::Html::Widget::Hidden;
 use Quiq::Template;
@@ -259,7 +259,7 @@ sub html {
 
 =head1 VERSION
 
-1.202
+1.203
 
 =head1 AUTHOR
 

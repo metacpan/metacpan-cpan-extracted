@@ -1,0 +1,5 @@
+---
+compiled_to: lib
+project: MyTest
+shim: MyTest::Mite
+source_from: lib

@@ -1,0 +1,3 @@
+class TestCase::Resource::Re2::V2022_06_01 {
+  native static method test : int ();
+}

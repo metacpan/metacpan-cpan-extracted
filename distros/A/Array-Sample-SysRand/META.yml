@@ -20,7 +20,7 @@ name: Array-Sample-SysRand
 provides:
   Array::Sample::SysRand:
     file: lib/Array/Sample/SysRand.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Exporter: '5.57'
   perl: '5.010001'
@@ -30,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Array-Sample-SysRand
   homepage: https://metacpan.org/release/Array-Sample-SysRand
   repository: git://github.com/perlancar/perl-Array-Sample-SysRand.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

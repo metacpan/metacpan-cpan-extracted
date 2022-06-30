@@ -29,16 +29,16 @@ data.
 
 # EXAMPLE
 
-    $ jot 100 | egrep --color=always .+ | optex -Mxform --xform-ansi column -x
+    $ jot 100 | egrep --color=always .+ | optex column -Mxform --xform-ansi -x
 
 # SEE ALSO
 
-[App::optex::xform](https://metacpan.org/pod/App::optex::xform), [https://github.com/kaz-utashiro/optex-xform](https://github.com/kaz-utashiro/optex-xform),
+[App::optex::xform](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Axform), [https://github.com/kaz-utashiro/optex-xform](https://github.com/kaz-utashiro/optex-xform),
 
-[App::optex](https://metacpan.org/pod/App::optex), [https://github.com/kaz-utashiro/optex](https://github.com/kaz-utashiro/optex),
+[App::optex](https://metacpan.org/pod/App%3A%3Aoptex), [https://github.com/kaz-utashiro/optex](https://github.com/kaz-utashiro/optex),
 [https://qiita.com/kaz-utashiro/items/2df8c7fbd2fcb880cee6](https://qiita.com/kaz-utashiro/items/2df8c7fbd2fcb880cee6)
 
-[Text::Conceal](https://metacpan.org/pod/Text::Conceal)
+[Text::Conceal](https://metacpan.org/pod/Text%3A%3AConceal)
 
 # AUTHOR
 
@@ -46,7 +46,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2020 Kazumasa Utashiro.
+Copyright 2020-2022 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

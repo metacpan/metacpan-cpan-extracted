@@ -55,7 +55,7 @@ Track web site.
 
 =head2 CELESTRAK API
 
-The Celestrak web site, L<https://celestrak.com/>, is in transition from
+The Celestrak web site, L<https://celestrak.org/>, is in transition from
 being simply a file based repository of TLEs to an API-based service
 providing orbital elements in a number of formats. The C<celestrak()>
 and C<celestrak_supplemental()> methods will track this, growing new
@@ -146,7 +146,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.153';
+our $VERSION = '0.154';
 our @EXPORT_OK = qw{
     shell
 
@@ -307,27 +307,77 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	# '2019-006'	=> { name => 'Indian ASAT Test Debris' },
     },
     celestrak_supplemental => {
-	gps		=> { name => 'GPS',		rms => 1, match => 1 },
-	glonass		=> { name => 'Glonass',		rms => 1, match => 1 },
-	meteosat	=> { name => 'Meteosat',	rms => 1, match => 1 },
-	intelsat	=> { name => 'Intelsat',	rms => 1, match => 1 },
-	ses		=> { name => 'SES',		rms => 1, match => 1 },
-	telesat		=> { name => 'Telesat',		rms => 1, match => 1 },
-	orbcomm		=> { name => 'Orbcomm (no RMS or match data)' },
+	gps		=> {
+	    name	=> 'GPS Operational',
+	    source	=> 'GPS-A',
+	    rms		=> 1,
+	    match	=> 1,
+	},
+	glonass		=> {
+	    name	=> 'GLONASS Operational',
+	    source	=> 'GLONASS-RE',
+	    rms		=> 1,
+	    match	=> 1,
+	},
+	meteosat	=> {
+	    name	=> 'METEOSAT',
+	    source	=> 'METEOSAT-SV',
+	    rms		=> 1,
+	    match	=> 1,
+	},
+	intelsat	=> {
+	    name	=> 'Intelsat',
+	    source	=> 'Intelsat-11P',
+	    rms		=> 1,
+	    match	=> 1,
+	},
+	ses		=> {
+	    name	=> 'SES',
+	    source	=> 'SES-11P',
+	    rms		=> 1,
+	    match	=> 1,
+	},
+	telesat		=> {
+	    name	=> 'Telesat',
+	    source	=> 'Telesat-E',
+	    rms		=> 1,
+	    match	=> 1,
+	},
+	orbcomm		=> {
+	    name	=> 'Orbcomm (no RMS or match data)',
+	    source	=> 'Orbcomm-TLE',
+	},
 	iss		=> {
 	    name	=> 'ISS (from NASA, no match data)',
+	    source	=> 'ISS-E',
 	    rms		=> 1,
 	},
-	cpf		=> { name => 'CPF TLEs (no match data)', rms => 1 },
-	starlink	=> { name => 'Starlink TLEs',	rms => 1, match => 1 },
-	oneweb		=> { name => 'OneWeb TLEs',	rms => 1, match => 1 },
+	cpf		=> {
+	    name	=> 'CPF (no match data)',
+	    source	=> 'CPF',
+	    rms		=> 1,
+	},
+	starlink	=> {
+	    name	=> 'Starlink',
+	    source	=> 'SpaceX-E',
+	    rms		=> 1,
+	    match	=> 1,
+	},
+	oneweb		=> {
+	    name	=> 'OneWeb',
+	    source	=> 'OneWeb-E',
+	    rms		=> 1,
+	    match	=> 1,
+	},
 	planet		=> {
-	    name	=> 'Planet TLEs (no, not Mercury etc)',
+	    name	=> 'Planet (no, not Mercury etc)',
+	    source	=> 'Planet-E',
 	    rms		=> 1,
 	    match	=> 1,
 	},
 	iridium		=> {
 	    name	=> 'Iridium Next',
+	    source	=> 'Iridium-E',
 	    rms		=> 1,
 	    match	=> 1,
 	},
@@ -697,7 +747,7 @@ sub new {
 	],
 	space_track_version	=> DEFAULT_SPACE_TRACK_VERSION,
 	url_iridium_status_kelso =>
-	    'https://celestrak.com/SpaceTrack/query/iridium.txt',
+	    'https://celestrak.org/SpaceTrack/query/iridium.txt',
 	url_iridium_status_sladen =>
 	    'http://www.rod.sladen.org.uk/iridium.htm',
 	username => undef,	# Login username.
@@ -1023,6 +1073,16 @@ There are no arguments.
     }
 }
 
+# UNSUPPORTED AND SUBJECT TO CHANGE OR REMOVAL WITHOUT NOTICE!
+# If you have a use for this information, please let me know and I will
+# see about putting together something I believe I can support.
+sub __catalog {
+    my ( undef, $name ) = @_;
+    $catalogs{$name}
+	or confess "Bug - catalog $name does not exist";
+    return $catalogs{$name};
+}
+
 =for html <a name="celestrak"></a>
 
 =item $resp = $st->celestrak ($name);
@@ -1056,10 +1116,10 @@ even if it is not on the list, and if he removes one, being on the list
 won't help.
 
 In general, the data set names are the same as the file names given at
-L<https://celestrak.com/NORAD/elements/>, but without the '.txt' on the
+L<https://celestrak.org/NORAD/elements/>, but without the '.txt' on the
 end; for example, the name of the 'International Space Station' data set
 is 'stations', since the URL for this is
-L<https://celestrak.com/NORAD/elements/stations.txt>.
+L<https://celestrak.org/NORAD/elements/stations.txt>.
 
 The Celestrak web site makes a few items available for direct-fetching
 only (C<< $st->set(direct => 1) >>, see below.) These are typically
@@ -1161,7 +1221,7 @@ sub celestrak {
     $self->{direct}
 	and return $self->_celestrak_direct( $opt, $name );
     my $resp = $self->_get_agent()->get (
-	"https://celestrak.com/SpaceTrack/query/$name.txt");
+	"https://celestrak.org/SpaceTrack/query/$name.txt");
     if ( my $check = $self->_response_check( $resp, celestrak => $name ) ) {
 	return $check;
     }
@@ -1241,7 +1301,7 @@ true, the C<Last-Modified> header of the response will contain the
 modification time of the file.
 
 For more information, see
-L<https://celestrak.com/NORAD/elements/supplemental/>.
+L<https://celestrak.org/NORAD/elements/supplemental/>.
 
 =cut
 
@@ -1272,11 +1332,25 @@ sub celestrak_supplemental {
 		    HTTP_PRECONDITION_FAILED,
 		    "$name does not take the -$key option" );
 	    }
-	    ( $info->{spacetrack_type}, my $sfx ) = $arg->{rms} ?
-		( rms => 'rms.txt' ) :
-		$arg->{match} ? ( match => 'match.txt' ) :
-		( orbit => 'txt' );
-	    $info->{url} = "https://celestrak.com/NORAD/elements/supplemental/$name.$sfx";
+	    my $source = $catalogs{celestrak_supplemental}{$name}{source}
+		|| $name;
+		my $base_url = 'https://celestrak.org/NORAD/elements/supplemental';
+	    if ( $arg->{rms} ) {
+		$info->{spacetrack_type} = 'rms';
+		$info->{url} = "$base_url/$name.rms.txt";
+	    } elsif ( $arg->{match} ) {
+		$info->{spacetrack_type} = 'match';
+		$info->{url} = "$base_url/$name.match.txt";
+
+	    } else {
+		$info->{spacetrack_type} = 'orbit';
+		my $uri = URI->new( "$base_url/sup-gp.php" );
+		$uri->query_form(
+		    SOURCE	=> $source,
+		    FORMAT	=> 'tle',
+		);
+		$info->{url} = $uri;
+	    }
 	    return;
 	},
 	post_process	=> sub {
@@ -1299,17 +1373,27 @@ sub _celestrak_direct {
 =begin comment
 
     my $resp = $self->_get_agent()->get (
-	"https://celestrak.com/NORAD/elements/$name.txt");
+	"https://celestrak.org/NORAD/elements/$name.txt");
 
 =end comment
 
 =cut
 
-    my $uri = URI->new( 'https://celestrak.com/NORAD/elements/gp.php' );
+    my $uri = URI->new( 'https://celestrak.org/NORAD/elements/gp.php' );
     $uri->query_form(
 	GROUP	=> $name,
 	FORMAT	=> 'tle',
     );
+
+    if ( my $resp = $self->_dump_request(
+	    args	=> [ $name ],
+	    method	=> 'GET',
+	    url		=> $uri,
+	    version	=> 2,
+	) ) {
+	return $resp;
+    }
+
     my $resp = $self->_get_agent()->get ( $uri );
 
     if (my $check = $self->_response_check($resp, celestrak => $name, 'direct')) {
@@ -1952,9 +2036,9 @@ results is determined by the optional $format argument, which defaults
 to the value of the C<iridium_status_format> attribute.
 
 If the format is 'kelso', only Dr. Kelso's Celestrak web site
-(L<https://celestrak.com/SpaceTrack/query/iridium.txt>) is queried for
+(L<https://celestrak.org/SpaceTrack/query/iridium.txt>) is queried for
 the data. The possible status values are documented at
-L<https://celestrak.com/satcat/status.php>, and repeated here for
+L<https://celestrak.org/satcat/status.php>, and repeated here for
 convenience:
 
     '[+]' - Operational
@@ -2741,7 +2825,6 @@ sub names {
     }
     return ($resp, \@list);
 }
-
 
 =for html <a name="retrieve"></a>
 
@@ -4421,8 +4504,7 @@ C<'tle_latest'>,
 	if ( my $resp = $self->_dump_request(
 		args	=> \@args,
 		method	=> 'GET',
-#		url	=> $url,
-		url	=> $uri->as_string(),
+		url	=> $uri,
 		version	=> 2,
 	    ) ) {
 	    return $resp;
@@ -5116,6 +5198,8 @@ sub _dump_request {
 	    or next;
 	$args{$key} = $args{$key}->( \%args );
     }
+    ref $args{url}
+	and $args{url} = $args{url}->as_string();
 
     $self->{dump_headers} & DUMP_NO_EXECUTE
 	and return HTTP::Response->new(
@@ -5329,6 +5413,15 @@ sub _get_from_net {
 	    or confess "Programming error - No url defined for $method( '$arg{catalog}' )";
     } else {
 	confess q<Programming error - neither 'url' nor 'catalog' specified>;
+    }
+
+    if ( my $resp = $self->_dump_request(
+	    args	=> { map { $_ => CODE_REF eq ref $arg{$_} ? 'sub { ... }' : $arg{$_} } keys %arg },
+	    method	=> 'GET',
+	    url		=> $url,
+	    version	=> 2,
+	) ) {
+	return $resp;
     }
 
     my $agent = $self->_get_agent();
@@ -6555,12 +6648,12 @@ The default is C<2>.
 
 =item url_iridium_status_kelso (text)
 
-This attribute specifies the location of the celestrak.com Iridium
+This attribute specifies the location of the celestrak.org Iridium
 information. You should normally not change this, but it is provided
 so you will not be dead in the water if Dr. Kelso needs to re-arrange
 his web site.
 
-The default is 'https://celestrak.com/SpaceTrack/query/iridium.txt'
+The default is 'https://celestrak.org/SpaceTrack/query/iridium.txt'
 
 =item url_iridium_status_mccants (text)
 
@@ -6845,7 +6938,7 @@ itself returns them.
 =head1 ACKNOWLEDGMENTS
 
 The author wishes to thank Dr. T. S. Kelso of
-L<https://celestrak.com/> and the staff of L<https://www.space-track.org/>
+L<https://celestrak.org/> and the staff of L<https://www.space-track.org/>
 (whose names are unfortunately unknown to me) for their co-operation,
 assistance and encouragement.
 

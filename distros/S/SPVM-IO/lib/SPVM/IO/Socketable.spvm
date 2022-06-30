@@ -1,9 +1,0 @@
-class IO::Socketable : interface_t {
-  
-  required method is_io_socketable : int ();
-  
-  method read : int ($buffer : byte[]);
-  method write : int ($buffer : string, $length : int);
-  method close : void ();
-  method fileno : int ();
-}

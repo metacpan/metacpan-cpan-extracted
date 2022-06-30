@@ -1,10 +1,13 @@
 ---
-abstract: 'Apply L<HTTP::CSPHeader>s to your psgi application.'
+abstract: 'Apply L<HTTP::CSPHeader> to your psgi application.'
 author:
-  - 'and License'
+  - 'Ashley Pond V, C<< <ashley@cpan.org> >>.'
 build_requires:
   ExtUtils::MakeMaker: 6.59
+  HTTP::CSPHeader: 0
   HTTP::Request::Common: 0
+  Plack::Builder: 0
+  Test::Fatal: 0
   Test::More: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.59
@@ -28,4 +31,4 @@ requires:
   perl: 5.14.0
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'

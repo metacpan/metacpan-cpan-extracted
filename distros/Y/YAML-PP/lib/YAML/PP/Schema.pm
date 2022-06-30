@@ -4,7 +4,7 @@ package YAML::PP::Schema;
 use B;
 use Module::Load qw//;
 
-our $VERSION = '0.033'; # VERSION
+our $VERSION = '0.034'; # VERSION
 
 use YAML::PP::Common qw/ YAML_PLAIN_SCALAR_STYLE /;
 
@@ -21,25 +21,37 @@ sub new {
     }
     my $true;
     my $false;
-    my $bool_class = '';
-    if ($bool eq 'JSON::PP') {
-        require JSON::PP;
-        $true = \&bool_jsonpp_true;
-        $false = \&bool_jsonpp_false;
-        $bool_class = 'JSON::PP::Boolean';
-    }
-    elsif ($bool eq 'boolean') {
-        require boolean;
-        $true = \&bool_booleanpm_true;
-        $false = \&bool_booleanpm_false;
-        $bool_class = 'boolean';
-    }
-    elsif ($bool eq 'perl') {
-        $true = \&bool_perl_true;
-        $false = \&bool_perl_false;
-    }
-    else {
-        die "Invalid value for 'boolean': '$bool'. Allowed: ('perl', 'boolean', 'JSON::PP')";
+    my @bool_class;
+    my @bools = split m/,/, $bool;
+    for my $b (@bools) {
+        if ($b eq '*') {
+            push @bool_class, ('boolean', 'JSON::PP::Boolean');
+            last;
+        }
+        elsif ($b eq 'JSON::PP') {
+            require JSON::PP;
+            $true ||= \&_bool_jsonpp_true;
+            $false ||= \&_bool_jsonpp_false;
+            push @bool_class, 'JSON::PP::Boolean';
+        }
+        elsif ($b eq 'boolean') {
+            require boolean;
+            $true ||= \&_bool_booleanpm_true;
+            $false ||= \&_bool_booleanpm_false;
+            push @bool_class, 'boolean';
+        }
+        elsif ($b eq 'perl') {
+            $true ||= \&_bool_perl_true;
+            $false ||= \&_bool_perl_false;
+        }
+        elsif ($b eq 'perl_experimental') {
+            $true ||= \&_bool_perl_true;
+            $false ||= \&_bool_perl_false;
+            push @bool_class, 'perl_experimental';
+        }
+        else {
+            die "Invalid value for 'boolean': '$b'. Allowed: ('perl', 'boolean', 'JSON::PP')";
+        }
     }
 
     my %representers = (
@@ -62,7 +74,7 @@ sub new {
         representers => \%representers,
         true => $true,
         false => $false,
-        bool_class => $bool_class,
+        bool_class => \@bool_class,
     }, $class;
     return $self;
 }
@@ -72,7 +84,7 @@ sub representers { return $_[0]->{representers} }
 
 sub true { return $_[0]->{true} }
 sub false { return $_[0]->{false} }
-sub bool_class { return $_[0]->{bool_class} }
+sub bool_class { return @{ $_[0]->{bool_class} } ? $_[0]->{bool_class} : undef }
 sub yaml_version { return $_[0]->{yaml_version} }
 
 my %LOADED_SCHEMA = (
@@ -227,6 +239,12 @@ sub add_representer {
         return;
     }
     if (my $class_equals = $args{class_equals}) {
+        if ($] >= 5.036000 and $class_equals eq 'perl_experimental') {
+            $representers->{bool} = {
+                code => $args{code},
+            };
+            return;
+        }
         my $rep = $representers->{class_equals};
         $rep->{ $class_equals } = {
             code => $args{code},
@@ -395,17 +413,17 @@ sub create_mapping {
     return ($data, $on_data);
 }
 
-sub bool_jsonpp_true { JSON::PP::true() }
+sub _bool_jsonpp_true { JSON::PP::true() }
 
-sub bool_booleanpm_true { boolean::true() }
+sub _bool_booleanpm_true { boolean::true() }
 
-sub bool_perl_true { 1 }
+sub _bool_perl_true { !!1 }
 
-sub bool_jsonpp_false { JSON::PP::false() }
+sub _bool_jsonpp_false { JSON::PP::false() }
 
-sub bool_booleanpm_false { boolean::false() }
+sub _bool_booleanpm_false { boolean::false() }
 
-sub bool_perl_false { !1 }
+sub _bool_perl_false { !!0 }
 
 1;
 

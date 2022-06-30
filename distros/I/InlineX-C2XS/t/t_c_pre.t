@@ -19,7 +19,7 @@ if(!rename('Polygon.xs', 'Polygon.txt')) {
 }
 
 if($ok) {
-  if(!open(RD1, "Polygon.txt")) {
+  if(!open(PRE_RD1, "Polygon.txt")) {
     warn "unable to open Polygon.txt for reading: $!\n";
     print "not ok 1\n";
     $ok = 0;
@@ -27,7 +27,7 @@ if($ok) {
 }
 
 if($ok) {
-  if(!open(RD2, "expected_c.txt")) {
+  if(!open(PRE_RD2, "expected_c.txt")) {
     warn "unable to open expected_c.txt for reading: $!\n";
     print "not ok 1\n";
     $ok = 0;
@@ -35,8 +35,8 @@ if($ok) {
 }
 
 if($ok) {
-  @rd1 = <RD1>;
-  @rd2 = <RD2>;
+  @rd1 = <PRE_RD1>;
+  @rd2 = <PRE_RD2>;
 }
 
 if($ok) {
@@ -71,22 +71,22 @@ if(!$ok2) {
 
 elsif($ok) {print "ok 1\n"}
 
-close(RD1) or warn "Unable to close Polygon.txt after reading: $!\n";
-close(RD2) or warn "Unable to close expected_c.txt after reading: $!\n";
+close(PRE_RD1) or warn "Unable to close Polygon.txt after reading: $!\n";
+close(PRE_RD2) or warn "Unable to close expected_c.txt after reading: $!\n";
 if(!unlink('Polygon.txt')) { warn "Couldn't unlink Polygon.txt\n"}
 
 ($ok, $ok2) = (1, 1);
 
 ###########################################################################
 
-if(!open(RD1, "INLINE.h")) {
+if(!open(PRE_RD1, "INLINE.h")) {
   warn "unable to open INLINE.h for reading: $!\n";
   print "not ok 2\n";
   $ok = 0;
 }
 
 if($ok) {
-  if(!open(RD2, "expected.h")) {
+  if(!open(PRE_RD2, "expected.h")) {
     warn "unable to open expected.h for reading: $!\n";
     print "not ok 2\n";
     $ok = 0;
@@ -94,8 +94,8 @@ if($ok) {
 }
 
 if($ok) {
-  @rd1 = <RD1>;
-  @rd2 = <RD2>;
+  @rd1 = <PRE_RD1>;
+  @rd2 = <PRE_RD2>;
 }
 
 if($ok) {
@@ -130,8 +130,8 @@ if(!$ok2) {
 
 elsif($ok) {print "ok 2\n"}
 
-close(RD1) or warn "Unable to close INLINE.h after reading: $!\n";
-close(RD2) or warn "Unable to close expected.h after reading: $!\n";
+close(PRE_RD1) or warn "Unable to close INLINE.h after reading: $!\n";
+close(PRE_RD2) or warn "Unable to close expected.h after reading: $!\n";
 if(!unlink('INLINE.h')) { warn "Couldn't unlink INLINE.h\n"}
 
 eval{c2xs('Math::Geometry::Planar::GPC::Polygon', 'Math::Geometry::Planar::GPC::Polygon', '.', '');};

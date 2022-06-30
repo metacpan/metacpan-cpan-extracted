@@ -32,6 +32,7 @@ lib/Sub/HandlesVia/HandlerLibrary/Scalar.pod
 lib/Sub/HandlesVia/HandlerLibrary/String.pm
 lib/Sub/HandlesVia/HandlerLibrary/String.pod
 lib/Sub/HandlesVia/Toolkit.pm
+lib/Sub/HandlesVia/Toolkit/Mite.pm
 lib/Sub/HandlesVia/Toolkit/Moo.pm
 lib/Sub/HandlesVia/Toolkit/Moose.pm
 lib/Sub/HandlesVia/Toolkit/Mouse.pm
@@ -107,6 +108,11 @@ t/30egpod/number.t
 t/30egpod/scalar.t
 t/30egpod/string.t
 t/31egpod_dummy.t
+t/40mite/.mite/config
+t/40mite/basic.t
+t/40mite/lib/MyTest.pm
+t/40mite/lib/MyTest.pm.mite.pm
+t/40mite/lib/MyTest/Mite.pm
 t/94cmp.t
 t/95any.t
 t/96foreach.t

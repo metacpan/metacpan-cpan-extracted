@@ -16,11 +16,11 @@ Sagan::Monitoring - LibreNMS JSON SNMP extend and Nagios style check for Sagan s
 
 =head1 VERSION
 
-Version 1.0.1
+Version 1.1.1
 
 =cut
 
-our $VERSION = '1.0.1';
+our $VERSION = '1.1.1';
 
 =head1 SYNOPSIS
 
@@ -64,10 +64,17 @@ for Sagan.
       being the Eve files to read. ".total" is not a valid instance name.
       Similarly anything starting with a "." should be considred reserved.
 
+    - max_age :: How far back to read in seconds.
+      - Default :: 360
+
+    - mode :: 'librenms' or 'nagios' as to how to print the output.
+      - Default :: librenms
+
     my $args = {
         drop_percent_warn  => .75;
         drop_percent_crit  => 1,
         mode               => 'librenms',
+        max_age            => 360,
         files=>{
                'ids'=>'/var/log/sagan/stats-ids.json',
                'foo'=>'/var/log/sagan/stats-foo.json',
@@ -94,8 +101,8 @@ sub new {
 	};
 	bless $self;
 
-	# reel in the threshold values
-	my @thresholds = ( 'drop_percent_warn', 'drop_percent_crit' );
+	# reel in the numeric values
+	my @thresholds = ( 'drop_percent_warn', 'drop_percent_crit', 'max_age' );
 	for my $threshold (@thresholds) {
 		if ( defined( $args{$threshold} ) ) {
 			$self->{$threshold} = $args{$threshold};
@@ -150,7 +157,7 @@ sub run {
 
 	# this will be returned
 	my $to_return = {
-		data        => { '.total' => {} },
+		data        => { '.total' => { f_dropped => 0, total => 0, } },
 		version     => 1,
 		error       => '0',
 		errorString => '',
@@ -244,21 +251,21 @@ sub run {
 					my @new_alerts;
 
 					my $new_stats = {
-						uptime              => $json->{stats}{uptime},
-						total         => $json->{stats}{captured}{total},
-						drop          => $json->{stats}{captured}{drop},
-						ignore        => $json->{stats}{captured}{ignore},
-						threshold     => $json->{stats}{captured}{threshold},
-						after         => $json->{stats}{captured}{after},
-						match         => $json->{stats}{captured}{match},
-						bytes         => $json->{stats}{captured}{bytes_total},
-						bytes_ignored => $json->{stats}{captured}{bytes_ignored},
-						max_bytes_log_line  => $json->{stats}{captured}{max_bytes_log_line},
-						eps                 => $json->{stats}{captured}{eps},
-						f_total       => $json->{stats}{flow}{total},
-						f_dropped     => $json->{stats}{flow}{dropped},
-						alert               => 0,
-						alertString         => '',
+						uptime             => $json->{stats}{uptime},
+						total              => $json->{stats}{captured}{total},
+						drop               => $json->{stats}{captured}{drop},
+						ignore             => $json->{stats}{captured}{ignore},
+						threshold          => $json->{stats}{captured}{threshold},
+						after              => $json->{stats}{captured}{after},
+						match              => $json->{stats}{captured}{match},
+						bytes              => $json->{stats}{captured}{bytes_total},
+						bytes_ignored      => $json->{stats}{captured}{bytes_ignored},
+						max_bytes_log_line => $json->{stats}{captured}{max_bytes_log_line},
+						eps                => $json->{stats}{captured}{eps},
+						f_total            => $json->{stats}{flow}{total},
+						f_dropped          => $json->{stats}{flow}{dropped},
+						alert              => 0,
+						alertString        => '',
 					};
 
 					# find the drop percentages

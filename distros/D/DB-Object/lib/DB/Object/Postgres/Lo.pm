@@ -17,11 +17,14 @@ BEGIN
 {
     use strict;
     use warnings;
-    # use parent qw( DB::Object::Postgres );
     use parent qw( Module::Generic );
+    use vars qw( $VERSION );
     our $VERSION = 'v0.300.0';
     use Devel::Confess;
 };
+
+use strict;
+use warnings;
 
 sub new
 {
@@ -178,7 +181,7 @@ sub write
 
 1;
 
-# XXX POD
+# NOTE: POD
 
 __END__
 

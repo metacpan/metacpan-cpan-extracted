@@ -9,9 +9,9 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-$Win32::GenRandom::VERSION = '0.05';
+$Win32::GenRandom::VERSION = '0.06';
 
-DynaLoader::bootstrap Win32::GenRandom $Win32::GenRandom::VERSION;
+Win32::GenRandom->DynaLoader::bootstrap($Win32::GenRandom::VERSION);
 
 use subs qw(
     PROV_FORTEZZA CRYPT_VERIFYCONTEXT CRYPT_DELETEKEYSET PROV_SSL PROV_RSA_SIG PROV_DSS

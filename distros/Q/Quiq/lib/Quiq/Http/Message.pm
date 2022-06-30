@@ -82,7 +82,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.202';
+our $VERSION = '1.203';
 
 use Quiq::Reference;
 use Quiq::Http::Cookie;
@@ -984,7 +984,7 @@ sub asString {
 
 =head1 VERSION
 
-1.202
+1.203
 
 =head1 AUTHOR
 

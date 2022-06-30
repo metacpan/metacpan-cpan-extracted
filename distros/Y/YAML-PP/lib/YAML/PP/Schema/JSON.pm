@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::JSON;
 
-our $VERSION = '0.033'; # VERSION
+our $VERSION = '0.034'; # VERSION
 
 use base 'Exporter';
 our @EXPORT_OK = qw/
@@ -103,10 +103,12 @@ sub register {
     );
 
     if ($schema->bool_class) {
-        $schema->add_representer(
-            class_equals => $schema->bool_class,
-            code => \&represent_bool,
-        );
+        for my $class (@{ $schema->bool_class }) {
+            $schema->add_representer(
+                class_equals => $class,
+                code => \&represent_bool,
+            );
+        }
     }
 
     return;

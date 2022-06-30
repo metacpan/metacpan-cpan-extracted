@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::YAML1_1;
 
-our $VERSION = '0.033'; # VERSION
+our $VERSION = '0.034'; # VERSION
 
 use YAML::PP::Schema::JSON qw/
     represent_int represent_float represent_literal represent_bool
@@ -178,10 +178,12 @@ sub register {
     );
 
     if ($schema->bool_class) {
-        $schema->add_representer(
-            class_equals => $schema->bool_class,
-            code => \&represent_bool,
-        );
+        for my $class (@{ $schema->bool_class }) {
+            $schema->add_representer(
+                class_equals => $class,
+                code => \&represent_bool,
+            );
+        }
     }
 
     return;

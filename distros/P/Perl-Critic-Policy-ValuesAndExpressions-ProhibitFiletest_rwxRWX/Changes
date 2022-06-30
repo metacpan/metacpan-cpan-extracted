@@ -1,0 +1,7 @@
+0.002		2022-06-30	T. R. Wyant
+    Fix issue #1: Wrong abstract.  That's what I get for starting a new
+    policy by copying an old one. Many thanks to Robert Rothenberg for
+    the extremely quick catch.
+
+0.001		2022-06-30	T. R. Wyant
+    First production release to CPAN.

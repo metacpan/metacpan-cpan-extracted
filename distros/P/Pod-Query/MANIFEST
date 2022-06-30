@@ -12,9 +12,12 @@ t/03-usage-mojo-useragent.t
 t/04-usage-module-build.t
 t/05-method-query_string_to_struct.t
 t/06-class_to_path.t
+t/cpan/Module/Build.pm
+t/cpan/Mojo/File.pm
+t/cpan/Mojo/UserAgent.pm
+t/cpan/ojo.pm
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-t/pod/Mojo_UserAgent.pm
 t/Role/Test/Module.pm
 xt/boilerplate.t

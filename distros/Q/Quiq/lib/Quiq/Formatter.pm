@@ -21,8 +21,10 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.202';
+our $VERSION = '1.203';
 
+use Quiq::Math;
+use Quiq::Formatter;
 use Quiq::Epoch;
 
 # -----------------------------------------------------------------------------
@@ -60,6 +62,47 @@ sub new {
 # -----------------------------------------------------------------------------
 
 =head2 Zahlen
+
+=head3 geldbetrag() - Formatiere Zahl als Geldbetrag
+
+=head4 Synopsis
+
+  $str = $class->geldbetrag($x);
+
+=head4 Arguments
+
+=over 4
+
+=item $x
+
+Zahl
+
+=back
+
+=head4 Returns
+
+(String) Zahl als Geldbetrag
+
+=head4 Description
+
+Formatiere eine Zahl $x als deutschen Geldbetrag, d.h. mit Komma
+als Dezimaltrennzeichen, zwei Nachkommastellen, Punkt als
+Tausender-Trennzeichen und liefere das Resultat zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub geldbetrag {
+    my ($class,$x) = @_;
+
+    $x = Quiq::Math->roundTo($x,2);
+    $x = Quiq::Formatter->readableNumber($x);
+
+    return $x;
+}
+
+# -----------------------------------------------------------------------------
 
 =head3 normalizeNumber() - Normalisiere Zahldarstellung
 
@@ -259,7 +302,7 @@ sub reducedIsoTime {
 
 =head1 VERSION
 
-1.202
+1.203
 
 =head1 AUTHOR
 

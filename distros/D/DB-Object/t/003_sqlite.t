@@ -48,7 +48,16 @@ SKIP:
 	# diag( "Testing private functions" );
 	is( $sql->_ceiling( 45.5 ), 46, "Checking ceil()" );
 	is( $sql->_concat( 'Well, ', 'hello ', 'world' ), 'Well, hello world', "Checking concat()" );
-	my $tz = DateTime::TimeZone->new( name => 'local' );
+	my $tz;
+	eval
+	{
+        $tz = DateTime::TimeZone->new( name => 'local' );
+	};
+	if( $@ )
+	{
+        $tz = DateTime::TimeZone->new( name => 'UTC' );
+	}
+	
 	my $fmt = DateTime::Format::Strptime->new(
 		locale => 'en_GB',
 		time_zone => $tz->name,
@@ -76,7 +85,7 @@ SKIP:
 		second => 0,
 		time_zone => 'GMT',
 	);
-	$check_t->set_time_zone( 'local' );
+	$check_t->set_time_zone( $tz->name );
 	## e.g. 1970-03-31T09:00:00
 	is( $sql->_from_days(719617 ), "$check_t", "Checking from_days()" );
 	is( $sql->_from_unixtime( $dt->epoch ), $dt->strftime( '%Y-%m-%d %T%z' ), "Checking from unix_time()" );

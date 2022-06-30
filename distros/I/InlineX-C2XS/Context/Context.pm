@@ -3,7 +3,7 @@ package InlineX::C2XS::Context;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 
 ###################################
 ###################################

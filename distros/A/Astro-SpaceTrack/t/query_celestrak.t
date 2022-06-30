@@ -14,7 +14,7 @@ use My::Module::Test;
 my $st = Astro::SpaceTrack->new();
 
 my $skip;
-$skip = site_check( 'celestrak.com' )
+$skip = site_check( 'celestrak.org' )
     and plan skip_all => $skip;
 
 $st->set(

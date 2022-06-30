@@ -18,39 +18,38 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object );
-    require DB::Object::Mysql::Statement;
-    require DB::Object::Mysql::Tables;
+    use vars qw(
+        $VERSION $CACHE_QUERIES $CACHE_SIZE $CACHE_TABLE $CONNECT_VIA $DB_ERRSTR @DBH 
+        $DEBUG $ERROR $MOD_PERL $USE_BIND $USE_CACHE 
+    );
     # use DBD::mysql;
-    eval
-    {
-        require DBD::mysql;
-    };
+    eval{ require DBD::mysql; };
     die( $@ ) if( $@ );
     use Net::IP;
     use Nice::Try;
     # DBI->trace( 5 );
-    our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
-    our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH );
     $VERSION = 'v0.3.4';
     use Devel::Confess;
 };
 
+use strict;
+use warnings;
+require DB::Object::Mysql::Statement;
+require DB::Object::Mysql::Tables;
+$DB_ERRSTR     = '';
+$DEBUG         = 0;
+$CACHE_QUERIES = [];
+$CACHE_SIZE    = 10;
+$CACHE_TABLE   = {};
+$USE_BIND      = 0;
+$USE_CACHE     = 0;
+$MOD_PERL      = 0;
+@DBH           = ();
+if( $INC{ 'Apache/DBI.pm' } && 
+    substr( $ENV{ 'GATEWAY_INTERFACE' }|| '', 0, 8 ) eq 'CGI-Perl' )
 {
-    $DB_ERRSTR     = '';
-    $DEBUG         = 0;
-    $CACHE_QUERIES = [];
-    $CACHE_SIZE    = 10;
-    $CACHE_TABLE   = {};
-    $USE_BIND      = 0;
-    $USE_CACHE     = 0;
-    $MOD_PERL      = 0;
-    @DBH           = ();
-    if( $INC{ 'Apache/DBI.pm' } && 
-        substr( $ENV{ 'GATEWAY_INTERFACE' }|| '', 0, 8 ) eq 'CGI-Perl' )
-    {
-        $CONNECT_VIA = "Apache::DBI::connect";
-        $MOD_PERL++;
-    }
+    $CONNECT_VIA = "Apache::DBI::connect";
+    $MOD_PERL++;
 }
 
 sub init
@@ -205,7 +204,7 @@ sub databases
         }
         else
         {
-            @$con{ qw( host login passwd ) } = ( $SQL_SERVER, $DB_LOGIN, $DB_PASSWD );
+            @$con{ qw( host login passwd ) } = @_;
         }
         try
         {
@@ -213,7 +212,6 @@ sub databases
         }
         catch( $e )
         {
-            $self->message( 3, "An error occurred while trying to connect to get the list of available databases: $e" );
             return;
         }
     }
@@ -254,9 +252,10 @@ sub lock
     return( $self->error( "Error while preparing query to get lock '$str': ", $self->{dbh}->errstr() ) );
     $sth->execute() ||
     return( $self->error( "Error while executing query to get lock '$str': ", $sth->errstr() ) );
+    my $res = $sth->fetchrow;
     $sth->finish();
     $self->{ '_locks' } ||= [];
-    push( @{ $self->{ '_locks' } }, $str ) if( $res && $res ne 'NULL' );
+    push( @{ $self->{_locks} }, $str ) if( $res && $res ne 'NULL' );
     return( $res eq 'NULL' ? undef() : $res );
 }
 
@@ -301,7 +300,6 @@ sub table_info
     my $self = shift( @_ );
     my $table = shift( @_ ) || 
     return( $self->error( "You must provide a table name to access the table methods." ) );
-    $self->message( 3, "Getting table/view information for '$table'." );
     my $opts = {};
     $opts = shift( @_ ) if( $self->_is_hash( $_[0] ) );
     my $db = $opts->{database} || $self->database;
@@ -313,7 +311,7 @@ sub table_info
     my $all = $sth->fetchall_arrayref( {} );
     $sth->finish;
     return( [] ) if( !scalar( @$all ) );
-    return( $all ) if( !$schema || $opts->{anywhere} );
+    return( $all ) if( $opts->{anywhere} );
     foreach my $ref ( @$all )
     {
         if( $ref->{table_schema} eq $db )
@@ -370,6 +368,7 @@ sub unlock
     return( $self->error( "Error while preparing query to release lock '$str': ", $self->errstr() ) );
     $sth->execute() ||
     return( $self->error( "Error while executing query to release lock '$str': ", $sth->errstr() ) );
+    my $res = $sth->fetchrow;
     $sth->finish();
     # Take out the lock from the saved locks pile (used by DESTROY)
     my $locks = $self->{ '_locks' } ||= [];
@@ -422,7 +421,6 @@ sub _connection_options
     $param->{mysql_enable_utf8} = 1 if( !CORE::exists( $param->{mysql_enable_utf8} ) );
     my @mysql_params = grep( /^mysql_/, keys( %$param ) );
     my $opt = $self->SUPER::_connection_options( $param );
-    $self->message( 3, "Inherited options are: ", sub{ $self->dump( $opt ) } );
     @$opt{ @mysql_params } = @$param{ @mysql_params };
     return( $opt );
 }
@@ -475,7 +473,6 @@ DESTROY
     my $class = ref( $self ) || $self;
     if( $self->{ 'sth' } )
     {
-        # $self->message( "DETROY(): Terminating sth '$self' for query:\n$self->{ 'query' }\n" );
         print( STDERR "DESTROY(): Terminating sth '$self' for query:\n$self->{query}\n" ) if( $DEBUG );
         $self->{ 'sth' }->finish();
     }
@@ -511,7 +508,7 @@ END
 
 1;
 
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf8

@@ -357,7 +357,7 @@ SKIP: {
 	my $number_skipped = 13;
 
 	my $skip;
-	$skip = site_check( 'celestrak.com' )
+	$skip = site_check( 'celestrak.org' )
 	    and skip $skip, $number_skipped;
 
 	SKIP: {

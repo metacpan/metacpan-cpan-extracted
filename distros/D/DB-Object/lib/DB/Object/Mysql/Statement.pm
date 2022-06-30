@@ -20,16 +20,19 @@ BEGIN
 {
     use strict;
     use warnings;
+    use parent qw( DB::Object::Statement DB::Object::Mysql );
+    use vars qw( $VERSION $VERBOSE $DEBUG );
     use DB::Object::Mysql;
     use DB::Object::Statement;
     use DateTime;
-    use parent qw( DB::Object::Statement DB::Object::Mysql );
-    our( $VERSION, $VERBOSE, $DEBUG );
     $VERSION    = 'v0.300.0';
     $VERBOSE    = 0;
     $DEBUG      = 0;
     use Devel::Confess;
 };
+
+use strict;
+use warnings;
 
 # Inherited from DB::Object::Statement
 # sub bind_param
@@ -86,7 +89,7 @@ sub dump
         # new_file is inherited from Module::Generic and uses Module::Generic::File
         my $file = $self->new_file( $args->{file} ) || return( $self->pass_error );
         $fh = $file->open( '>', { binmode => 'utf8' }) || return( $self->error( "Unable to open file $file in write mode: $!" ) );
-        my @header = sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields );
+        my @header = sort{ $a <=> $b } @fields;
         my $date = DateTime->now;
         my $table = $self->{table};
         $fh->printf( "# Generated on %s for table $table\n", $date->strftime( '%c' ) );

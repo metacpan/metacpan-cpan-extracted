@@ -1,0 +1,10 @@
+Revision history for Plack-Middleware-CSP
+
+0.02    20220630
+        - Added reference to older version on github by Leon Timmermans.
+        - Added a test skip for the Win32 boxes that cannot install HTTP::CSPHeader.
+        - Made _csp and _nonce "private" methods to improve kwalitee.
+        - Adding META.json (from MYMETA.json) for the same reason.
+
+0.01    20220628
+        - Alpha release. Looks okay. :P

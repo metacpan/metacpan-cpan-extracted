@@ -29,12 +29,12 @@ requires:
   Devel::Confess: '0.009004'
   Fcntl: '0'
   JSON: '4.02'
-  Module::Generic: v0.15.9
+  Module::Generic: v0.24.2
   Net::IP: '1.26'
-  Nice::Try: v1.1.2
+  Nice::Try: v1.3.0
   Number::Format: '1.75'
   POSIX: 1.53_01
-  Promise::Me: v0.1.1
+  Promise::Me: v0.3.0
   Regexp::Common: '2017060201'
   Scalar::Util: '1.54'
   URI: '1.76'
@@ -47,5 +47,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/DB-Object/issues
   repository: https://gitlab.com/jackdeguest/DB-Object
-version: v0.10.2
+version: v0.10.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

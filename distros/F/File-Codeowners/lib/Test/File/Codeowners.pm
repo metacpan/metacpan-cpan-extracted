@@ -11,7 +11,7 @@ use File::Codeowners;
 use FindBin qw($Bin);
 use Test::Builder;
 
-our $VERSION = '0.54'; # VERSION
+our $VERSION = '0.55'; # VERSION
 
 my $Test = Test::Builder->new;
 
@@ -118,7 +118,7 @@ Test::File::Codeowners - Write tests for CODEOWNERS files
 
 =head1 VERSION
 
-version 0.54
+version 0.55
 
 =head1 SYNOPSIS
 

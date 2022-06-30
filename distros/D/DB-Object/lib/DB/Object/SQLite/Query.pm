@@ -17,11 +17,14 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object::Query );
-    our( $VERSION, $DEBUG, $VERBOSE );
+    use vars qw( $VERSION $DEBUG $VERBOSE );
     $VERSION = 'v0.3.8';
     $DEBUG = 0;
     $VERBOSE = 0;
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -118,7 +121,6 @@ sub on_conflict
             return( $self->error( "SQLite version is $ver, but version 3.24.0 of 2018-06-04 or higher is required to use this on conflict clause." ) );
         }
         $opts = $self->_get_args_as_hash( @_ );
-#         $self->message( 3, "Option are: ", sub{ $self->dump( $opts ) } );
         my $hash = {};
         my @comp = ( 'ON CONFLICT' );
         if( $opts->{target} )
@@ -168,20 +170,14 @@ sub on_conflict
                 {
                     # The insert will have triggered a getdefault() which stores the parameters into a _args object fields
 #                     my $f_ref = $self->{ '_args' };
-#                     $self->message( 3, "Re-using the insert query parameters: ", join( ', ', @$f_ref ) );
 #                     $opts->{inherited_fields} = $self->format_update( $f_ref );
-#                     $self->message( 3, "Update query fields are: ", $opts->{inherited_fields} );
                     $self->{_on_conflict_callback} = sub
                     {
                         my $f_ref = $self->{_args};
-                        # $self->message( 3, "Re-using the insert query parameters: ", join( ', ', @$f_ref ) );
-                        # $self->messagef( 3, "So far, there are %d binded types.", $self->binded_types->length );
                         $self->is_upsert(1);
                         my $inherited_fields = $self->format_update( $f_ref );
-                        $self->message( 3, "Update query fields are: ", $inherited_fields );
                         push( @comp, 'DO UPDATE SET' );
                         push( @comp, $inherited_fields );
-                        $self->message( 3, "Components are: ", sub{ $self->dump( @comp ) } );
                         $hash->{query} = join( ' ', @comp );
                         $self->{_on_conflict} = $hash;
                         $self->{on_conflict} = join( ' ', @comp );
@@ -203,7 +199,6 @@ sub on_conflict
                 
                 if( $self->_is_array( $opts->{fields} ) )
                 {
-                    $self->message( 3, "Provided fields as array, generating the hash." );
                     my $this = $opts->{fields};
                     my $new = {};
                     foreach my $f ( @$this )
@@ -211,7 +206,6 @@ sub on_conflict
                         $new->{ $f } = \( 'EXCLUDED.' . $f );
                     }
                     $opts->{fields} = $new;
-                    $self->message( 3, "fields property is now: ", sub{ $self->dump( $new ) } );
                 }
                 # Here the user will use the special table 'excluded'
                 $hash->{fields} = $opts->{fields};
@@ -246,7 +240,6 @@ sub on_conflict
         {
             return( $self->error( "No action was specified for the on conflict clause." ) );
         }
-        $self->message( 3, "Components are: ", sub{ $self->dump( @comp ) } );
         $hash->{query} = join( ' ', @comp );
         $self->{_on_conflict} = $hash;
         $self->{on_conflict} = $self->new_clause({ value => join( ' ', @comp ) });
@@ -257,7 +250,6 @@ sub on_conflict
     {
         # This will use the insert components set up to format our on conflict clause properly
         # The callback is needed, because the query formatting occurs after the calling of our method on_conflict()
-        $self->message( 3, "Calling the on_conflict callback." );
         $self->{_on_conflict_callback}->();
     }
     return( $self->{on_conflict} );
@@ -312,7 +304,7 @@ sub returning
 sub _query_components
 {
     my $self = shift( @_ );
-    my $type = lc( shift( @_ ) ) || $self->_query_type() || return( $self->error( "You must specify a query type: select, insert, update or delete" ) );
+    my $type = ( @_ > 0 && lc( shift( @_ ) ) ) || $self->_query_type() || return( $self->error( "You must specify a query type: select, insert, update or delete" ) );
     my $opts = $self->_get_args_as_hash( @_ );
     my $tbl_o = $self->{table_object} || return( $self->error( "No table object is set." ) );
     my( $where, $group, $having, $sort, $order, $limit, $returning, $on_conflict );

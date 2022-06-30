@@ -1,6 +1,6 @@
 package App::optex::xform;
 
-our $VERSION = "1.02";
+our $VERSION = "1.03";
 
 =encoding utf-8
 
@@ -38,7 +38,7 @@ recover.
 
 =head1 EXAMPLE
 
-    $ jot 100 | egrep --color=always .+ | optex -Mxform --xform-ansi column -x
+    $ jot 100 | egrep --color=always .+ | optex column -Mxform --xform-ansi -x
 
 =head1 SEE ALSO
 
@@ -55,7 +55,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2020 Kazumasa Utashiro.
+Copyright 2020-2022 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -115,10 +115,8 @@ sub decode {
 
 __DATA__
 
-autoload -Mutil::filter --isub --osub --psub
-
-option --xform-encode --psub __PACKAGE__::encode=mode=$<shift>
-option --xform-decode --osub __PACKAGE__::decode
+option --xform-encode -Mutil::filter --psub __PACKAGE__::encode=mode=$<shift>
+option --xform-decode -Mutil::filter --osub __PACKAGE__::decode
 option --xform --xform-encode $<shift> --xform-decode
 
 option --xform-ansi --xform ansi

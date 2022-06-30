@@ -1,0 +1,77 @@
+{
+   "abstract" : "Prohibit file access tests.",
+   "author" : [
+      "Thomas R. Wyant, III F<wyant at cpan dot org>."
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Perl-Critic-Policy-ValuesAndExpressions-ProhibitFiletest_rwxRWX",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "English" : "0",
+            "Perl::Critic::TestUtils" : "0",
+            "Test::More" : "0.88",
+            "Test::Perl::Critic::Policy" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PPI" : "0",
+            "PPI::Document" : "0",
+            "Perl::Critic::Policy" : "0",
+            "Perl::Critic::Utils" : "0",
+            "Readonly" : "0",
+            "base" : "0",
+            "perl" : "5.006001",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Perl::Critic::Policy::ValuesAndExpressions::ProhibitFiletest_rwxRWX" : {
+         "file" : "lib/Perl/Critic/Policy/ValuesAndExpressions/ProhibitFiletest_rwxRWX.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "wyant@cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-ValuesAndExpressions-ProhibitFiletest_rwxRWX"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/trwyant/perl-Perl-Critic-Policy-ValuesAndExpressions-ProhibitFiletest_rwxRWX.git",
+         "web" : "https://github.com/trwyant/perl-Perl-Critic-Policy-ValuesAndExpressions-ProhibitFiletest_rwxRWX"
+      }
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 4.10"
+}

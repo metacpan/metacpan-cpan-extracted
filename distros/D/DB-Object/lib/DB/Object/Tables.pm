@@ -21,14 +21,17 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object );
+    use vars qw( $VERSION $VERBOSE $DEBUG );
     use DB::Object::Fields;
-    our( $VERSION, $VERBOSE, $DEBUG );
     $VERSION    = 'v0.5.0';
     $VERBOSE    = 0;
     $DEBUG      = 0;
     use Devel::Confess;
     use Want;
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -67,7 +70,6 @@ sub init
     # The table type. It could be table or view
     $self->{type}           = '';
     my $keys = [keys( %arg )];
-    $self->message( 3, "Applying keys: '", join( "', '", @$keys ), "'." );
     @$self{ @$keys } = @arg{ @$keys };
 #     foreach my $k ( keys( %arg ) )
 #     {
@@ -76,7 +78,7 @@ sub init
     # Load table default, fields, structure informations
     # my $db = $self->database();
     my $ref = $self->structure();
-    return( $self->error( "There is no table by the name of $table" ) ) if( !%$ref );
+    return( $self->error( "There is no table by the name of $table" ) ) if( !defined( $ref ) || !%$ref );
     return( $self );
 }
 
@@ -116,7 +118,6 @@ sub as
     if( @_ )
     {
         # my( $p, $f, $l ) = caller;
-        # $self->message( 3, "Setting table alias to '", $_[0], "'. Called from package $p in file $f at line $l" );
         $self->prefixed( length( $_[0] ) > 0 ? 1 : 0 );
     }
     return( $q->table_alias( @_ ) );
@@ -133,7 +134,6 @@ sub constant
 {
     my $self = shift( @_ );
     my( $pack, $file, $line ) = caller;
-    # $self->message( 3, "Called from package '$pack' in file '$file' at line '$line'." );
     my $base_class = $self->database_object->base_class;
     # This does not work for calls made internally
     return( $self ) if( $pack =~ /^${base_class}\b/ );
@@ -142,7 +142,6 @@ sub constant
         file => $file,
         line => $line,
     });
-    # $self->message( 3, "Statement handler returned is: '$sth'." );
     # $sth returned may be void if no cache was found or if the caller's file mod time has changed
     my $q;
     if( $sth )
@@ -260,7 +259,6 @@ sub fields_object
 {
     my $self = shift( @_ );
     my $o = $self->{fields_object};
-    $self->message( 3, "Do we already have a fields object? '$o' for table '$self->{table}'" );
     # This will make sure we have a query object which DB::Object::Fields and DB::Object::Field need
     $self->_reset_query;
     if( $o && $self->_is_object( $o ) )
@@ -278,10 +276,9 @@ sub fields_object
     $new_class =~ tr/-/_/;
     $new_class =~ s/\_{2,}/_/g;
     $new_class = join( '', map( ucfirst( lc( $_ ) ), split( /\_/, $new_class ) ) );
-    $class = ref( $self ) . "\::${db_name}\::${new_class}";
+    my $class = ref( $self ) . "\::${db_name}\::${new_class}";
     if( !$self->_is_class_loaded( $class ) )
     {
-        $self->message( 3, "Creating and loading class '$class'" );
         my $perl = <<EOT;
 package $class;
 BEGIN
@@ -294,16 +291,13 @@ BEGIN
 
 EOT
         # print( STDERR __PACKAGE__, "::_set_get_hash_as_object(): Evaluating\n$perl\n" );
-        $self->message( 3, "Evaluating\n$perl" );
         my $rc = eval( $perl );
         # print( STDERR __PACKAGE__, "::_set_get_hash_as_object(): Returned $rc\n" );
         die( "Unable to dynamically create module $class: $@" ) if( $@ );
     }
     else
     {
-        $self->message( 3, "Class '$class' already exists and is loaded." );
     }
-    $self->message( 3, "Getting a new fields object for class '$class' with prefixed set to '$self->{prefixed}'." );
     $o = $class->new(
         prefixed        => $self->{prefixed},
         # For table alias
@@ -313,7 +307,6 @@ EOT
     );
     $o->prefixed( $self->{prefixed} );
     $self->{fields_object} = $o;
-    $self->message( 3, "Returning newly created fields object '$o' that has debug value '", $o->debug, "'." );
     return( $o );
 }
 
@@ -436,7 +429,6 @@ sub prefix
     my $alias = $self->query_object->table_alias;
     #my $q = $self->query_object || die( "No query object could be created or gotten: ", $self->error );
     #my $alias = $q->table_alias;
-    $self->message( 3, "\"prefixed\" set to '$self->{prefixed}'. Is table alias set for table '$self->{table}'? -> '$alias'." );
     return( $alias ) if( $alias && $self->{prefixed} > 0 );
     CORE::push( @val, $self->database_object->database ) if( $self->{prefixed} > 2 );
     CORE::push( @val, $self->schema ) if( $self->{prefixed} > 1 && $self->schema );
@@ -482,35 +474,6 @@ sub primary
 sub qualified_name { return( shift->name ); }
 
 sub query_object { return( shift->_set_get_object_without_init( 'query_object', 'DB::Object::Query', @_ ) ); }
-# sub query_object { return( shift->_query_object_get_or_create ); }
-# sub query_object
-# {
-#     my $self = shift( @_ );
-#     if( @_ )
-#     {
-#         return( $self->_set_get_object_without_init( 'query_object', 'DB::Object::Query', @_ ) );
-#     }
-#     else
-#     {
-#         return( $self->{query_object} ) if( $self->{query_object} );
-#         my $o = $self->_query_object_get_or_create || return( $self->pass_error );
-#         return( $self->{query_object} = $o );
-#     }
-# }
-
-# XXX For debugging purpose, I am temporarily changing the query_object sub to find out who is calling
-# sub query_object
-# {
-#     my $self = shift( @_ );
-#     if( @_ )
-#     {
-#         my $v = $self->_set_get_object_without_init( 'query_object', 'DB::Object::Query', @_ );
-#         my $trace = $self->_get_stack_trace;
-#         $self->message( 3, "query_object set for table '$self->{table}' with value $v and trace: ", $trace->as_string );
-#         return( $v );
-#     }
-#     return( $self->_set_get_object_without_init( 'query_object', 'DB::Object::Query' ) );
-# }
 
 sub query_reset { return( shift->_set_get_scalar( 'query_reset', @_ ) ); }
 
@@ -560,7 +523,6 @@ sub replace
 sub reset 
 {
     my $self = shift( @_ );
-    ## $self->message( 3, "Resetting query for table \"", $self->name, "\"." );
     CORE::delete( $self->{query_reset} );
     $self->_reset_query( @_ ) || return( $self->pass_error );
     CORE::delete( $self->{fields_object} );
@@ -735,11 +697,9 @@ AUTOLOAD
     no overloading;
     my $self = shift( @_ );
     my $fields = $self->fields;
-    # $self->message( 3, "Table object called for method '$method'. Fields for table '", $self->name, "' are: ", sub{ $self->dump( $fields ) } );
     # User called a field on a table object, instead of using the method fields_object or its shortcut 'fo'
     if( CORE::exists( $fields->{ $method } ) )
     {
-        $self->message( 3, "User called a field name '$method' using a table object, let's issue a warning." );
         warn( "You have called a field name '$method' using a table object. This practice is discouraged, although it works for now. Best to use something like: \$tbl->fo->$method rather than just \$tbl->$method\n" );
         return( $self->fields_object->_initiate_field_object( $method ) );
     }
@@ -760,7 +720,7 @@ DESTROY
 
 1;
 
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf8

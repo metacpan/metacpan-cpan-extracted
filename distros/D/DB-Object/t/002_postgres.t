@@ -32,10 +32,10 @@ SKIP:
 	# DB_CON_URI=http://localhost:5432?database=postgres&login=jack&
 	my $con_params =
 	{
-	'db'		=> 'postgres',
-	'host'		=> ( $ENV{DB_HOST} || 'localhost' ),
-	'driver'	=> 'Pg',
-	#'debug'		=> 3,
+	db		=> 'postgres',
+	host    => ( $ENV{DB_HOST} || 'localhost' ),
+	driver	=> 'Pg',
+	debug   => $DEBUG,
 	};
 	if( $^O eq 'MSWin32' )
 	{
@@ -104,6 +104,7 @@ SKIP:
 	is( scalar( @{$dbh->tables} ), 3, "Total number of tables expected (3)" );
 	is( $dbh->table_exists( 'customers' ), 1, "Checking table_exists with table customers" );
 	my $cust = $dbh->customers || fail( "Cannot get customers object." );
+	diag( "Error trying to get the table object for customers: ", $dbh->error ) if( !defined( $cust ) );
 	pass( sprintf( "Got customers object: %s", ref( $cust ) ) );
 	isa_ok( $cust, 'DB::Object::Postgres::Tables', "Getting customers table object" );
 	is( $cust->name, 'customers', "Checking customers table name" );

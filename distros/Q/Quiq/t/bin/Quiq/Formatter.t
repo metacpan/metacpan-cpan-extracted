@@ -15,6 +15,21 @@ sub test_loadClass : Init(1) {
 
 # -----------------------------------------------------------------------------
 
+sub test_geldbetrag : Test(3) {
+    my $self = shift;
+
+    my $val = Quiq::Formatter->geldbetrag(67);
+    $self->is($val,'67,00');
+
+    $val = Quiq::Formatter->geldbetrag(1234.56);
+    $self->is($val,'1.234,56');
+
+    $val = Quiq::Formatter->geldbetrag(-999.3);
+    $self->is($val,'-999,30');
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_normalizeNumber : Test(6) {
     my $self = shift;
 

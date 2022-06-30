@@ -23,5 +23,5 @@ requires:
   Test::Warn: '0.24'
 resources:
   repository: https://github.com/sisyphus/inlinex-c2xs.git
-version: '0.26'
+version: '0.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

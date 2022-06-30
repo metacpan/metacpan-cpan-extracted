@@ -16,11 +16,15 @@ BEGIN
     use strict;
     use warnings;
     use common::sense;
-    use DB::Object::Fields::Field;
     use parent qw( Module::Generic );
+    use vars qw( $VERSION );
+    use DB::Object::Fields::Field;
     use Devel::Confess;
     our( $VERSION ) = 'v1.0.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -70,11 +74,8 @@ sub _initiate_field_object
     my $self = shift( @_ );
     my $field = shift( @_ ) || return( $self->error( "No field was provided to get its object." ) );
     my $class = ref( $self ) || $self;
-    $self->message( 3, "Instantiating table '", $self->table_object->name, "' field '$field' object using class '$class', prefixed '$self->{prefixed}', query_object '", $self->query_object, "' and table_object '", $self->table_object, "' with table alias '", $self->query_object->table_alias, "'." );
     my $fields = $self->table_object->fields;
-    $self->message( 3, "Table ", $self->table_object->name, " has no such field \"$field\"." ) if( !CORE::exists( $fields->{ $field } ) );
     return( $self->error( "Table ", $self->table_object->name, " has no such field \"$field\"." ) ) if( !CORE::exists( $fields->{ $field } ) );
-    # $self->message( 3, "Evaluating -> package ${class}; sub ${field} { return( shift->_set_get_object( '$field', 'DB::Object::Fields::Field', \@_ ) ); }" );
     # eval( "package ${class}; sub ${field} { return( shift->_set_get_object( '$field', 'DB::Object::Fields::Field', \@_ ) ); }" );
     my $def   = $self->table_object->default;
     my $types = $self->table_object->types;
@@ -96,7 +97,6 @@ package ${class};
 sub ${field}
 {
     my \$self = shift( \@_ );
-    \$self->message( 3, "Does class '$class' already have a '$field' object? ", ( \$self->{$field} ? 'yes' : 'no' ) );
     unless( \$self->{$field} )
     {
         \$self->{$field} = DB::Object::Fields::Field->new(
@@ -111,19 +111,14 @@ sub ${field}
             table_object => \$self->table_object,
         );
     }
-    \$self->message( 3, "Returning field object '\$self->{$field}'" );
     return( \$self->{$field} );
 }
 EOT
-    # $self->message( 3, "Evaluating -> $perl" );
     eval( $perl );
     die( $@ ) if( $@ );
     # my $o = DB::Object::Fields::Field->new( $hash );
     my $o = $self->$field;
-    # $self->message( 3, "Calling $self->$field( $o )" );
     # $self->$field( $o ) || return( $self->error( "Unable to set field '$field' object to '$o': ", $self->error ) );
-    # $self->message( 3, "$self->$field returns '", overload::StrVal( $self->$field ), "'." );
-    $self->message( 3, "Returning field object '$o' (", overload::StrVal( $o ), ")" );
     return( $o );
 }
 
@@ -135,16 +130,13 @@ AUTOLOAD
     my $self = shift( @_ );
     my $fields = $self->table_object->fields;
     # $self->debug(3);
-    $self->message( 3, "Called for method '$method'. Fields for table '", $self->table_object->name, "' are: ", sub{ $self->dump( $fields ) } );
-    if( $code = $self->can( $method ) )
+    if( my $code = $self->can( $method ) )
     {
-        $self->message( 3, "Method \"$method\" already exists in class '", ( ref( $self ) || $self ), "' ($self)." );
         return( $code->( $self, @_ ) );
     }
     ## elsif( CORE::exists( $self->{ $method } ) )
     elsif( exists( $fields->{ $method } ) )
     {
-        $self->message( 3, "Instantiating object for field '$method'." );
         return( $self->_initiate_field_object( $method ) );
     }
     else
@@ -156,7 +148,7 @@ AUTOLOAD
 };
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8

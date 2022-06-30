@@ -20,8 +20,8 @@ BEGIN
 {
     use strict;
     use warnings;
-    our( $VERSION, $VERBOSE, $DEBUG );
     use parent qw( DB::Object::Tables DB::Object::Postgres );
+    use vars qw( $VERSION $VERBOSE $DEBUG $TYPE_TO_CONSTANT );
     $VERSION    = 'v0.5.0';
     $VERBOSE    = 0;
     $DEBUG      = 0;
@@ -74,6 +74,9 @@ BEGIN
     qr/^xml/                            => { constant => '', name => 'PG_XML', type => 'xml' },
     };
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -158,7 +161,6 @@ sub create
         ## Trick so other method may follow, such as as_string(), fetchrow(), rows()
         if( !defined( wantarray() ) )
         {
-            # $self->message( 3, "wantarray in void context" );
             # print( STDERR "create(): wantarrays in void context.\n" );
             $new->execute() ||
             return( $self->error( "Error while executing query to create table '$table':\n$query", $new->errstr() ) );
@@ -397,7 +399,6 @@ sub structure
     my $self  = shift( @_ );
     my $table = shift( @_ ) || $self->{table} ||
         return( $self->error( "No table provided to get its structure." ) );
-    ## $self->message( 3, "Getting table $table structure." );
     ## $self->_reset_query();
     ## delete( $self->{ 'query_reset' } );
     ## my $struct  = $self->{ '_structure_real' } || $self->{ 'struct' }->{ $table };
@@ -411,7 +412,6 @@ sub structure
     # If we have a cache, use it instead of reprocessing it.
     if( !%$fields || !%$struct || !%$default )
     {
-        $self->message( 3, "No structure, field, default values, null or types set yet for this table '$table' object. Populating." );
         ## my $query = "SELECT * FROM information_schema.columns WHERE table_name = ?";
 #         my $query = <<EOT;
 # SELECT 
@@ -541,15 +541,7 @@ EOT
             # $struct->{_primary} = \@primary;
             $self->{primary} = \@primary;
         }
-        # $self->{_structure_real} = $struct;
-        # XXX 2021-08-27: Given those are references in the first place, it is pointless to re-assign it
-        # $self->{default}   = $default;
-        # $self->{fields}    = $fields;
-        # $self->{structure} = $struct;
-        # $self->{types}     = $types;
-        ## $self->message( 3, "Fields found: ", sub{ $self->dumper( $fields ) } );
     }
-    ## $self->messagef( 3, "struct ($struct) has %d keys:\n%s", scalar( keys( %$struct ) ), $self->printer( $struct ) );
     return( wantarray() ? () : undef() ) if( !scalar( keys( %$struct ) ) );
     return( wantarray() ? %$struct : \%$struct );
 }
@@ -574,16 +566,14 @@ sub unlock
 
 DESTROY
 {
-    ## Do nothing
-    ## DB::Object::Tables are never destroyed.
-    ## They are just gateway to tables, and they are cached by DB::Object::Postgres::table()
-    ## print( STDERR "DESTROY'ing table $self ($self->{ 'table' })\n" );
+    # Do nothing
+    # DB::Object::Tables are never destroyed.
+    # They are just gateway to tables, and they are cached by DB::Object::Postgres::table()
+    # print( STDERR "DESTROY'ing table $self ($self->{ 'table' })\n" );
 };
 
 1;
-
-# XXX POD
-
+# NOTE: POD
 __END__
 
 =encoding utf-8

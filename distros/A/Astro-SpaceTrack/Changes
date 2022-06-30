@@ -1,3 +1,9 @@
+0.154		2022-06-30	T. R. Wyant
+    Convert celestrak_supplemental() TLE data to new API.  Additional
+    functionality based on the new API to follow. Of course, this is
+    what I said last year when I converted celestrak(). The RMS and
+    Match data still use the old API.
+
 0.153		2022-05-20	T. R. Wyant
     CelesTrak Indian ASAT Debris data set retired.
 
