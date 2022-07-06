@@ -13,7 +13,7 @@ WWW::Mechanize::FAQ - Frequently Asked Questions about WWW::Mechanize
 
 =head1 VERSION
 
-version 2.09
+version 2.10
 
 =head1 How to get help with WWW::Mechanize
 
@@ -324,6 +324,14 @@ the HTML to a file, and run F<mech-dump> on the file.
 =head2 Why don't https:// URLs work?
 
 You need either L<IO::Socket::SSL> or L<Crypt::SSLeay> installed.
+
+=head2 Why don't file:// URLs to files with a question mark in the name work?
+
+If you have a local file named C<how-are-you?>, the URL for that file is
+C<file:how-are-you%3f>. That's because L<URI::file> is required to be
+url-encoded, just like any URL pointing to somewhere on the internet has to be
+if it contains reserved characters such as C<?>, C</> or C<@>. This is specified
+in RFC 3986. See L<URI::Escape> for a full list of reserved characters.
 
 =head2 Why do I get "Input 'fieldname' is readonly"?
 

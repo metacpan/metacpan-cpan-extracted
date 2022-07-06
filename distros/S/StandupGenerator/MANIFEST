@@ -1,0 +1,29 @@
+# Core functionality
+lib/StandupGenerator.pm
+lib/StandupGenerator/Creator.pm
+lib/StandupGenerator/Accessor.pm
+lib/StandupGenerator/Manipulator.pm
+lib/StandupGenerator/Helper.pm
+
+# Tests
+t/create_standup.t
+t/open_standup.t
+t/view_standups_from_week.t
+t/routines/create_new.t
+t/routines/open_one.t
+t/routines/open_many.t
+t/routines/find_last_file.t
+t/routines/extract_identifiers.t
+
+# Reference files
+data/s1d01.txt
+data/s1d02.txt
+data/s1d03.txt
+
+# Administrative files
+README.md
+MANIFEST
+Changes
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

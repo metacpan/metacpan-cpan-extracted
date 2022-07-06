@@ -4,7 +4,7 @@ Proch::Seqfu - Helper module to support Seqfu tools
 
 # VERSION
 
-version 1.4.8
+version 1.5.0
 
 # Proch::Seqfu
 
@@ -26,7 +26,7 @@ Print a text if $fu\_verbose is set to 1
 
 Return the reverse complement of a string \[degenerate base not supported\]
 
-## is\_seq(name, comment, seq)
+## is\_seq(seq)
 
 Check if a string is a DNA sequence, including degenerate chars.
 

@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackReconciliation;
-$Shipment::FedEx::WSDL::TrackTypes::TrackReconciliation::VERSION = '3.08';
+$Shipment::FedEx::WSDL::TrackTypes::TrackReconciliation::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/track/v9'}
+sub get_xmlns { 'http://fedex.com/ws/track/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,31 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Status_of : ATTR(:get<Status>);
-    my %Description_of : ATTR(:get<Description>);
+my %Status_of :ATTR(:get<Status>);
+my %Description_of :ATTR(:get<Description>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Status
-              Description
+__PACKAGE__->_factory(
+    [ qw(        Status
+        Description
 
-            )
-        ],
-        {   'Status'      => \%Status_of,
-            'Description' => \%Description_of,
-        },
-        {   'Status'      => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'Status' => \%Status_of,
+        'Description' => \%Description_of,
+    },
+    {
+        'Status' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'Status'      => 'Status',
-            'Description' => 'Description',
-        }
-    );
+        'Status' => 'Status',
+        'Description' => 'Description',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -61,7 +67,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackReconciliation
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

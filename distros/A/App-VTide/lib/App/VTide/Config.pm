@@ -15,12 +15,12 @@ use Path::Tiny;
 use YAML::Syck qw/ LoadFile /;
 use Hash::Merge::Simple qw/ merge /;
 
-our $VERSION = version->new('0.1.16');
+our $VERSION = version->new('0.1.17');
 
 has global_config => (
     is      => 'rw',
     default => sub {
-        mkdir path $ENV{HOME}, '.vtide' if ! -d path $ENV{HOME}, '.vtide';
+        mkdir path $ENV{HOME}, '.vtide' if !-d path $ENV{HOME}, '.vtide';
         return path $ENV{HOME}, '.vtide/defaults.yml';
     },
 );
@@ -29,11 +29,12 @@ has history_file => (
     is      => 'rw',
     default => sub {
         if ( $ENV{VTIDE_DIR} && -d $ENV{VTIDE_DIR} ) {
-            mkdir path $ENV{VTIDE_DIR}, '.vtide' if ! -d path $ENV{VTIDE_DIR}, '.vtide';
+            mkdir path $ENV{VTIDE_DIR}, '.vtide'
+                if !-d path $ENV{VTIDE_DIR}, '.vtide';
             return path $ENV{VTIDE_DIR}, '.vtide/history.log';
         }
 
-        mkdir path $ENV{HOME}, '.vtide' if ! -d path $ENV{HOME}, '.vtide';
+        mkdir path $ENV{HOME}, '.vtide' if !-d path $ENV{HOME}, '.vtide';
         return path $ENV{HOME}, '.vtide/history.log';
     },
 );
@@ -50,22 +51,25 @@ has [qw/ global_time local_time /] => (
     default => 0,
 );
 
-has data => (
-    is  => 'rw',
-);
+has data => ( is => 'rw', );
 
 sub get {
     my ($self) = @_;
 
     if ( $self->changed ) {
         my $global_time = ( stat $self->global_config )[9];
-        my $local_time = ( stat $self->local_config )[9];
+        my $local_time  = ( stat $self->local_config )[9];
 
-        $self->global_time( $global_time );
-        $self->local_time( $local_time );
+        $self->global_time($global_time);
+        $self->local_time($local_time);
 
         my $global = eval { LoadFile( $self->global_config ); } || {};
-        my $local  = eval { LoadFile( $self->local_config );  } || {};
+        my $local  = eval { LoadFile( $self->local_config ); }  || {};
+
+        if ( $local->{parent} ) {
+            my $parent = eval { LoadFile( $local->{parent} ); } || {};
+            $local = merge $parent, $local;
+        }
 
         $self->data( merge $global, $local );
     }
@@ -74,28 +78,32 @@ sub get {
 }
 
 sub changed {
-    my ($self) = @_;
+    my ($self)      = @_;
     my $global_orig = $self->global_time;
-    my $local_orig  = $self->local_time ;
+    my $local_orig  = $self->local_time;
 
     my $global_time = ( stat $self->global_config )[9];
     my $local_time  = ( stat $self->local_config )[9];
 
-    $self->global_time( $global_time );
-    $self->local_time ( $local_time  );
+    $self->global_time($global_time);
+    $self->local_time($local_time);
 
-    return ! $self->data
+    return
+           !$self->data
         || ( $global_time && $global_orig < $global_time )
-        || ( $local_time  && $local_orig  < $local_time  );
+        || ( $local_time  && $local_orig < $local_time );
 }
 
 sub history {
-    my ($self, @command) = @_;
+    my ( $self, @command ) = @_;
 
-    return if $command[0] eq 'run' || grep {$_ eq '--auto-complete'} @command;
+    return
+        if $command[0] eq 'run' || grep { $_ eq '--auto-complete' } @command;
 
     my $fh = $self->history_file->opena;
-    print {$fh} '[' . localtime .'] '. (join ' ', map {/[^\w.\/-]/ ? "'$_'" : $_} @command), "\n";
+    print {$fh} '['
+        . localtime . '] '
+        . ( join ' ', map { /[^\w.\/-]/ ? "'$_'" : $_ } @command ), "\n";
     return;
 }
 
@@ -109,7 +117,7 @@ App::VTide::Config - Manage configuration for VTide
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Config version 0.1.16
+This documentation refers to App::VTide::Config version 0.1.17
 
 =head1 SYNOPSIS
 

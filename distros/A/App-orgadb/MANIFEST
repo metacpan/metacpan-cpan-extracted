@@ -8,6 +8,9 @@ Makefile.PL
 README
 dist.ini
 lib/App/orgadb.pm
+lib/App/orgadb/Common.pm
+lib/App/orgadb/Shell.pm
+lib/App/orgadb/Shell/Commands.pm
 script/orgadb
 t/00-compile.t
 t/author-critic.t

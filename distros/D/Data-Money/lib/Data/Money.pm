@@ -1,6 +1,6 @@
 package Data::Money;
 
-$Data::Money::VERSION   = '0.19';
+$Data::Money::VERSION   = '0.20';
 $Data::Money::AUTHORITY = 'cpan:GPHAT';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Data::Money - Money/currency with formatting and overloading.
 
 =head1 VERSION
 
-Version 0.19
+Version 0.20
 
 =cut
 
@@ -579,8 +579,8 @@ sub _to_utf8 {
     my $value = shift;
 
     if ($] >= 5.008) {
-        require utf8;
-        utf8::upgrade($value);
+        use Encode;
+        decode('UTF-8', $value);
     };
 
     return $value;

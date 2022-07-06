@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackNotificationRecipientDetail;
-$Shipment::FedEx::WSDL::TrackTypes::TrackNotificationRecipientDetail::VERSION = '3.08';
+$Shipment::FedEx::WSDL::TrackTypes::TrackNotificationRecipientDetail::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/track/v9'}
+sub get_xmlns { 'http://fedex.com/ws/track/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,27 +20,32 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %NotificationEventsAvailable_of :
-      ATTR(:get<NotificationEventsAvailable>);
+my %NotificationEventsAvailable_of :ATTR(:get<NotificationEventsAvailable>);
 
-    __PACKAGE__->_factory(
-        [   qw(        NotificationEventsAvailable
+__PACKAGE__->_factory(
+    [ qw(        NotificationEventsAvailable
 
-            )
-        ],
-        {'NotificationEventsAvailable' => \%NotificationEventsAvailable_of,},
-        {   'NotificationEventsAvailable' =>
-              'Shipment::FedEx::WSDL::TrackTypes::EMailNotificationEventType',
-        },
-        {
+    ) ],
+    {
+        'NotificationEventsAvailable' => \%NotificationEventsAvailable_of,
+    },
+    {
+        'NotificationEventsAvailable' => 'Shipment::FedEx::WSDL::TrackTypes::EMailNotificationEventType',
+    },
+    {
 
-            'NotificationEventsAvailable' => 'NotificationEventsAvailable',
-        }
-    );
+        'NotificationEventsAvailable' => 'NotificationEventsAvailable',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -57,7 +62,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackNotificationRecipientDetail
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

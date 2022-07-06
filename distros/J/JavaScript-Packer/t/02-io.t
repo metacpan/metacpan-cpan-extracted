@@ -8,7 +8,7 @@
 
 use Test::More;
 
-my $not = 38;
+my $not = 39;
 
 SKIP: {
     eval( 'use JavaScript::Packer' );
@@ -29,7 +29,7 @@ SKIP: {
     fileTest( 's11', 'best',      's11 compression level "best" with long javascript matching _encode62 ord match 57' );
     fileTest( 's12', 'best',      's12 compression level "best" with long javascript matching _encode62 ord match 65' );
     fileTest( "s$_", 'minify',    "s$_ compression level \"minify\" keep sourceMappingURL" )
-		for 13 .. 18;
+		for 13 .. 19;
 
     my $packer = JavaScript::Packer->init();
 
@@ -171,7 +171,7 @@ sub fileTest {
     open( EXPECTEDFILE, 't/scripts/' . $filename . '-expected.js' ) ;#or die( "couldn't open file $filename-expected.js: $!" );
     open( GOTFILE,      't/scripts/' . $filename . '-got.js' )      ;#or die( "couldn't open file $filename-got.js: $!" );
     ok( filesMatch( GOTFILE, EXPECTEDFILE ), $comment )
-		|| BAIL_OUT( "fail" );
+;#		|| BAIL_OUT( "fail" );
     close( EXPECTEDFILE );
     close( GOTFILE );
 }

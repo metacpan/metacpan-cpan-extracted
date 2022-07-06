@@ -9,6 +9,7 @@ require App::Env;
 
 App::Env::import( 'App1' );
 
-ok( $ENV{App1} == 1, 'import func: empty APP_ENV_SITE; override App::Env::Site' );
+ok( $ENV{App1} == 1,
+    'import func: empty APP_ENV_SITE; override App::Env::Site' );
 
 done_testing;

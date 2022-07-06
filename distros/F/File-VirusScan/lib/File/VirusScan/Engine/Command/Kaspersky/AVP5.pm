@@ -21,9 +21,10 @@ sub scan
 {
 	my ($self, $path) = @_;
 
-	if(abs_path($path) ne $path) {
-		return File::VirusScan::Result->error("Path $path is not absolute");
-	}
+        my $abs = abs_path($path);
+        if ($abs && $abs ne $path) {
+                $path = $abs;
+        }
 
 	my ($exitcode, $scan_response) = eval { $self->_run_commandline_scanner(join(' ', $self->{command}, @{ $self->{args} }, $path, '2>&1'), 'INFECTED',); };
 
@@ -136,7 +137,7 @@ L<http://www.kaspersky.com/>
 
 =head1 AUTHORS
 
-Dianne Skoll (dfs@roaringpenguin.com)
+Dianne Skoll (dianne@skoll.ca)
 
 Dave O'Neill (dmo@roaringpenguin.com)
 

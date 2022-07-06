@@ -41,7 +41,7 @@ my $int = {
     color               => [ 0, 1, 2 ],
     search              => [ 0, 1, 2 ],
     include_highlighted => [ 0, 1, 2 ],
-    layout              => [ 0, 1, 2, 3 ],
+    layout              => [ 0, 1, 2 ],
 };
 
 for my $opt ( sort keys %$int ) {
@@ -147,7 +147,7 @@ ok( ! defined( exception {  $d = choose( $choices, {
 ok( ! defined( exception {  $d = choose( [ 'aaa' .. 'zzz' ], {
     no_spacebar => [ 11, 0, 8 ], tabs_prompt => [ 1, 1 ], undef => '', prompt => 'prompt_line', empty => '', pad => 3,
     default => 9, max_width => 19, max_height => 119, ll => 15, keep => 1, page => 1, order => 1, skip_items => qr/^\d+\z/,
-    mouse => 0, layout => 3, alignment => 0, index => 0, hide_cursor => 1,  clear_screen => undef, beep  => 0 } ) } ) );
+    mouse => 0, layout => 2, alignment => 0, index => 0, hide_cursor => 1,  clear_screen => undef, beep  => 0 } ) } ) );
 
 
 done_testing();

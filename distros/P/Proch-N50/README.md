@@ -35,4 +35,4 @@ Telatin A, Fariselli P, Birolo G.
 Bioengineering 2021, 8, 59. [10.3390/bioengineering8050059](https://doi.org/10.3390/bioengineering8050059)
 
 
-Last updated: 2022-06-21
+Last updated: 2022-07-05

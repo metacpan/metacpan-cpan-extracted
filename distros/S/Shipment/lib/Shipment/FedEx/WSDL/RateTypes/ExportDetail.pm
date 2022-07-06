@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::ExportDetail;
-$Shipment::FedEx::WSDL::RateTypes::ExportDetail::VERSION = '3.08';
+$Shipment::FedEx::WSDL::RateTypes::ExportDetail::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,44 +20,47 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %B13AFilingOption_of : ATTR(:get<B13AFilingOption>);
-    my %ExportComplianceStatement_of : ATTR(:get<ExportComplianceStatement>);
-    my %PermitNumber_of : ATTR(:get<PermitNumber>);
-    my %DestinationControlDetail_of : ATTR(:get<DestinationControlDetail>);
+my %B13AFilingOption_of :ATTR(:get<B13AFilingOption>);
+my %ExportComplianceStatement_of :ATTR(:get<ExportComplianceStatement>);
+my %PermitNumber_of :ATTR(:get<PermitNumber>);
+my %DestinationControlDetail_of :ATTR(:get<DestinationControlDetail>);
 
-    __PACKAGE__->_factory(
-        [   qw(        B13AFilingOption
-              ExportComplianceStatement
-              PermitNumber
-              DestinationControlDetail
+__PACKAGE__->_factory(
+    [ qw(        B13AFilingOption
+        ExportComplianceStatement
+        PermitNumber
+        DestinationControlDetail
 
-            )
-        ],
-        {   'B13AFilingOption'          => \%B13AFilingOption_of,
-            'ExportComplianceStatement' => \%ExportComplianceStatement_of,
-            'PermitNumber'              => \%PermitNumber_of,
-            'DestinationControlDetail'  => \%DestinationControlDetail_of,
-        },
-        {   'B13AFilingOption' =>
-              'Shipment::FedEx::WSDL::RateTypes::B13AFilingOptionType',
-            'ExportComplianceStatement' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'PermitNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'DestinationControlDetail' =>
-              'Shipment::FedEx::WSDL::RateTypes::DestinationControlDetail',
-        },
-        {
+    ) ],
+    {
+        'B13AFilingOption' => \%B13AFilingOption_of,
+        'ExportComplianceStatement' => \%ExportComplianceStatement_of,
+        'PermitNumber' => \%PermitNumber_of,
+        'DestinationControlDetail' => \%DestinationControlDetail_of,
+    },
+    {
+        'B13AFilingOption' => 'Shipment::FedEx::WSDL::RateTypes::B13AFilingOptionType',
+        'ExportComplianceStatement' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'PermitNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'DestinationControlDetail' => 'Shipment::FedEx::WSDL::RateTypes::DestinationControlDetail',
+    },
+    {
 
-            'B13AFilingOption'          => 'B13AFilingOption',
-            'ExportComplianceStatement' => 'ExportComplianceStatement',
-            'PermitNumber'              => 'PermitNumber',
-            'DestinationControlDetail'  => 'DestinationControlDetail',
-        }
-    );
+        'B13AFilingOption' => 'B13AFilingOption',
+        'ExportComplianceStatement' => 'ExportComplianceStatement',
+        'PermitNumber' => 'PermitNumber',
+        'DestinationControlDetail' => 'DestinationControlDetail',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -74,7 +77,7 @@ Shipment::FedEx::WSDL::RateTypes::ExportDetail
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

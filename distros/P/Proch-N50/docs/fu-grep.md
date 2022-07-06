@@ -4,7 +4,7 @@ fu-grep - Extract sequences using patterns
 
 # VERSION
 
-version 1.4.8
+version 1.5.0
 
 # USAGE
 

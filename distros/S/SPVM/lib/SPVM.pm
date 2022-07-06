@@ -1,6 +1,6 @@
 package SPVM;
 
-our $VERSION = '0.9614';
+our $VERSION = '0.9618';
 
 use 5.008007;
 use strict;
@@ -78,10 +78,10 @@ sub import {
       next if $added_class_name =~ /::anon/;
       
       # Build Precompile classs - Compile C source codes and link them to SPVM precompile method
-      $BUILDER->build_and_bind_dynamic_lib($added_class_name, 'precompile');
+      $BUILDER->build_and_bind_dynamic_lib_at_runtime($added_class_name, 'precompile');
       
       # Build native classs - Compile C source codes and link them to SPVM native method
-      $BUILDER->build_and_bind_dynamic_lib($added_class_name, 'native');
+      $BUILDER->build_and_bind_dynamic_lib_at_runtime($added_class_name, 'native');
     }
   }
 }

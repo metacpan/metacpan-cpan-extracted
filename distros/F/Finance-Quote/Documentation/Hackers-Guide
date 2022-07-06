@@ -15,7 +15,7 @@ $Version$
 		3.4. Currency
                 3.5. Development & Debugging Code
                 3.6. Dates
-		3.7. Thngs to avoid
+		3.7. Things to avoid
 		3.8. Using your new module
         4. How to write a Finance::Quote::CurrencyRates module
                 4.1. The package name
@@ -466,6 +466,7 @@ Check list:
   o Added the module name in alphabetical order in the SEE ALSO section of the Quote.pm POD
   o Created a well-named test file in the t/ directory, including a test that succeeds and a test that fails
   o Ensure tests 00-store-date.t, 01-pod.t, 02-pod-coverage.t, 03-kwalitee.t, 04-critic.t, 05-data-dumper.t pass
+  o Added module information in alphabetical order to the Modules-README.yml file
 
 Contributions to Finance-Quote are best presented as pull requests on GitHub.com.  
 

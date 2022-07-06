@@ -1,0 +1,30 @@
+0.04 2022-07-04
+  * Imrpve document
+  * Add MIME::QuotedPrint class
+  * Need SPVM 0.9616.
+  * Implement the following methods to MIME::Base64
+  
+    static method encode_base64_opt : string ($str : string, $eol : string)
+    static method encode_base64 : string ($str : string)
+    static method decode_base64 : string ($str : string)
+    static method encoded_base64_length_opt : int ($str : string, $eol : string)
+    static method encoded_base64_length : int ($str : string)
+    static method decoded_base64_length : int ($str : string)
+  
+  * Implement the following methods to MIME::QuotedPrint
+  
+    static method encode_qp_opt : string ($str : string, $eol : string, $binmode : int)
+    static method encode_qp : string ($str : string)
+    static method decode_qp : string ($str : string)
+
+0.03 2022-06-21
+
+  * Catch up with SPVM 0.9610.
+
+0.02 2022-06-13
+
+  * Catch up with latest SPVM.
+  
+0.01 2022-05-10
+
+  * First development release

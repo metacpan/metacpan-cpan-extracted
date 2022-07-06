@@ -13,7 +13,7 @@ use HTTP::Date;
 use LWP::UserAgent;
 use Pod::Usage;
 
-our $VERSION = '0.125';
+our $VERSION = '0.126';
 
 my %opt;
 
@@ -37,7 +37,7 @@ foreach my $code (
     sub {
 	return (
 	    'Celestrak visual',
-	    $ua->get( 'http://celestrak.com/SpaceTrack/query/visual.txt'),
+	    $ua->get( 'http://celestrak.org/SpaceTrack/query/visual.txt'),
 	);
     },
     sub {

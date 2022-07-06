@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4208, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,12 +16,12 @@ name: Lingua-EN-Sentence
 provides:
   Lingua::EN::Sentence:
     file: lib/Lingua/EN/Sentence.pm
-    version: '0.31'
+    version: '0.33'
 requires:
-  perl: '5.1'
-  warnings: '1.12'
+  perl: v5.10.0
+  warnings: '1.06'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/kimryan/Lingua-EN-Sentence
-version: '0.31'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+version: '0.33'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

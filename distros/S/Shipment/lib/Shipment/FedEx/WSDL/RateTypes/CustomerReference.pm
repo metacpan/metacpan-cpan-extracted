@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::CustomerReference;
-$Shipment::FedEx::WSDL::RateTypes::CustomerReference::VERSION = '3.08';
+$Shipment::FedEx::WSDL::RateTypes::CustomerReference::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %CustomerReferenceType_of : ATTR(:get<CustomerReferenceType>);
-    my %Value_of : ATTR(:get<Value>);
+my %CustomerReferenceType_of :ATTR(:get<CustomerReferenceType>);
+my %Value_of :ATTR(:get<Value>);
 
-    __PACKAGE__->_factory(
-        [   qw(        CustomerReferenceType
-              Value
+__PACKAGE__->_factory(
+    [ qw(        CustomerReferenceType
+        Value
 
-            )
-        ],
-        {   'CustomerReferenceType' => \%CustomerReferenceType_of,
-            'Value'                 => \%Value_of,
-        },
-        {   'CustomerReferenceType' =>
-              'Shipment::FedEx::WSDL::RateTypes::CustomerReferenceType',
-            'Value' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'CustomerReferenceType' => \%CustomerReferenceType_of,
+        'Value' => \%Value_of,
+    },
+    {
+        'CustomerReferenceType' => 'Shipment::FedEx::WSDL::RateTypes::CustomerReferenceType',
+        'Value' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'CustomerReferenceType' => 'CustomerReferenceType',
-            'Value'                 => 'Value',
-        }
-    );
+        'CustomerReferenceType' => 'CustomerReferenceType',
+        'Value' => 'Value',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -62,7 +67,7 @@ Shipment::FedEx::WSDL::RateTypes::CustomerReference
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

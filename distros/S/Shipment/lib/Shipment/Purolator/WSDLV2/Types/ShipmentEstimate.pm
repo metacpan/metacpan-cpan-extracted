@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::ShipmentEstimate;
-$Shipment::Purolator::WSDLV2::Types::ShipmentEstimate::VERSION = '3.08';
+$Shipment::Purolator::WSDLV2::Types::ShipmentEstimate::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,69 +20,72 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %ServiceID_of : ATTR(:get<ServiceID>);
-    my %ShipmentDate_of : ATTR(:get<ShipmentDate>);
-    my %ExpectedDeliveryDate_of : ATTR(:get<ExpectedDeliveryDate>);
-    my %EstimatedTransitDays_of : ATTR(:get<EstimatedTransitDays>);
-    my %BasePrice_of : ATTR(:get<BasePrice>);
-    my %Surcharges_of : ATTR(:get<Surcharges>);
-    my %Taxes_of : ATTR(:get<Taxes>);
-    my %OptionPrices_of : ATTR(:get<OptionPrices>);
-    my %TotalPrice_of : ATTR(:get<TotalPrice>);
+my %ServiceID_of :ATTR(:get<ServiceID>);
+my %ShipmentDate_of :ATTR(:get<ShipmentDate>);
+my %ExpectedDeliveryDate_of :ATTR(:get<ExpectedDeliveryDate>);
+my %EstimatedTransitDays_of :ATTR(:get<EstimatedTransitDays>);
+my %BasePrice_of :ATTR(:get<BasePrice>);
+my %Surcharges_of :ATTR(:get<Surcharges>);
+my %Taxes_of :ATTR(:get<Taxes>);
+my %OptionPrices_of :ATTR(:get<OptionPrices>);
+my %TotalPrice_of :ATTR(:get<TotalPrice>);
 
-    __PACKAGE__->_factory(
-        [   qw(        ServiceID
-              ShipmentDate
-              ExpectedDeliveryDate
-              EstimatedTransitDays
-              BasePrice
-              Surcharges
-              Taxes
-              OptionPrices
-              TotalPrice
+__PACKAGE__->_factory(
+    [ qw(        ServiceID
+        ShipmentDate
+        ExpectedDeliveryDate
+        EstimatedTransitDays
+        BasePrice
+        Surcharges
+        Taxes
+        OptionPrices
+        TotalPrice
 
-            )
-        ],
-        {   'ServiceID'            => \%ServiceID_of,
-            'ShipmentDate'         => \%ShipmentDate_of,
-            'ExpectedDeliveryDate' => \%ExpectedDeliveryDate_of,
-            'EstimatedTransitDays' => \%EstimatedTransitDays_of,
-            'BasePrice'            => \%BasePrice_of,
-            'Surcharges'           => \%Surcharges_of,
-            'Taxes'                => \%Taxes_of,
-            'OptionPrices'         => \%OptionPrices_of,
-            'TotalPrice'           => \%TotalPrice_of,
-        },
-        {   'ServiceID'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ShipmentDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ExpectedDeliveryDate' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'EstimatedTransitDays' => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
-            'BasePrice'  => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
-            'Surcharges' =>
-              'Shipment::Purolator::WSDLV2::Types::ArrayOfSurcharge',
-            'Taxes'        => 'Shipment::Purolator::WSDLV2::Types::ArrayOfTax',
-            'OptionPrices' =>
-              'Shipment::Purolator::WSDLV2::Types::ArrayOfOptionPrice',
-            'TotalPrice' => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
-        },
-        {
+    ) ],
+    {
+        'ServiceID' => \%ServiceID_of,
+        'ShipmentDate' => \%ShipmentDate_of,
+        'ExpectedDeliveryDate' => \%ExpectedDeliveryDate_of,
+        'EstimatedTransitDays' => \%EstimatedTransitDays_of,
+        'BasePrice' => \%BasePrice_of,
+        'Surcharges' => \%Surcharges_of,
+        'Taxes' => \%Taxes_of,
+        'OptionPrices' => \%OptionPrices_of,
+        'TotalPrice' => \%TotalPrice_of,
+    },
+    {
+        'ServiceID' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ShipmentDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ExpectedDeliveryDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'EstimatedTransitDays' => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
+        'BasePrice' => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
+        'Surcharges' => 'Shipment::Purolator::WSDLV2::Types::ArrayOfSurcharge',
+        'Taxes' => 'Shipment::Purolator::WSDLV2::Types::ArrayOfTax',
+        'OptionPrices' => 'Shipment::Purolator::WSDLV2::Types::ArrayOfOptionPrice',
+        'TotalPrice' => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
+    },
+    {
 
-            'ServiceID'            => 'ServiceID',
-            'ShipmentDate'         => 'ShipmentDate',
-            'ExpectedDeliveryDate' => 'ExpectedDeliveryDate',
-            'EstimatedTransitDays' => 'EstimatedTransitDays',
-            'BasePrice'            => 'BasePrice',
-            'Surcharges'           => 'Surcharges',
-            'Taxes'                => 'Taxes',
-            'OptionPrices'         => 'OptionPrices',
-            'TotalPrice'           => 'TotalPrice',
-        }
-    );
+        'ServiceID' => 'ServiceID',
+        'ShipmentDate' => 'ShipmentDate',
+        'ExpectedDeliveryDate' => 'ExpectedDeliveryDate',
+        'EstimatedTransitDays' => 'EstimatedTransitDays',
+        'BasePrice' => 'BasePrice',
+        'Surcharges' => 'Surcharges',
+        'Taxes' => 'Taxes',
+        'OptionPrices' => 'OptionPrices',
+        'TotalPrice' => 'TotalPrice',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -99,7 +102,7 @@ Shipment::Purolator::WSDLV2::Types::ShipmentEstimate
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

@@ -1,66 +1,71 @@
 
 package Shipment::UPS::WSDL::ShipElements::ShipAcceptRequest;
-$Shipment::UPS::WSDL::ShipElements::ShipAcceptRequest::VERSION = '3.08';
+$Shipment::UPS::WSDL::ShipElements::ShipAcceptRequest::VERSION = '3.09';
 use strict;
 use warnings;
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' }
 
-    __PACKAGE__->__set_name('ShipAcceptRequest');
-    __PACKAGE__->__set_nillable();
-    __PACKAGE__->__set_minOccurs();
-    __PACKAGE__->__set_maxOccurs();
-    __PACKAGE__->__set_ref();
+__PACKAGE__->__set_name('ShipAcceptRequest');
+__PACKAGE__->__set_nillable();
+__PACKAGE__->__set_minOccurs();
+__PACKAGE__->__set_maxOccurs();
+__PACKAGE__->__set_ref();
 
-    use base qw(
-      SOAP::WSDL::XSD::Typelib::Element
-      SOAP::WSDL::XSD::Typelib::ComplexType
-    );
+use base qw(
+    SOAP::WSDL::XSD::Typelib::Element
+    SOAP::WSDL::XSD::Typelib::ComplexType
+);
 
-    our $XML_ATTRIBUTE_CLASS;
-    undef $XML_ATTRIBUTE_CLASS;
+our $XML_ATTRIBUTE_CLASS;
+undef $XML_ATTRIBUTE_CLASS;
 
-    sub __get_attr_class {
-        return $XML_ATTRIBUTE_CLASS;
+sub __get_attr_class {
+    return $XML_ATTRIBUTE_CLASS;
+}
+
+use Class::Std::Fast::Storable constructor => 'none';
+use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+Class::Std::initialize();
+
+{ # BLOCK to scope variables
+
+my %Request_of :ATTR(:get<Request>);
+my %ShipmentDigest_of :ATTR(:get<ShipmentDigest>);
+
+__PACKAGE__->_factory(
+    [ qw(        Request
+        ShipmentDigest
+
+    ) ],
+    {
+        'Request' => \%Request_of,
+        'ShipmentDigest' => \%ShipmentDigest_of,
+    },
+    {
+        'Request' => 'Shipment::UPS::WSDL::ShipElements::Request',
+
+        'ShipmentDigest' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
+
+        'Request' => '',
+        'ShipmentDigest' => 'ShipmentDigest',
     }
+);
 
-    use Class::Std::Fast::Storable constructor => 'none';
-    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-    Class::Std::initialize();
-
-    {    # BLOCK to scope variables
-
-        my %Request_of : ATTR(:get<Request>);
-        my %ShipmentDigest_of : ATTR(:get<ShipmentDigest>);
-
-        __PACKAGE__->_factory(
-            [   qw(        Request
-                  ShipmentDigest
-
-                )
-            ],
-            {   'Request'        => \%Request_of,
-                'ShipmentDigest' => \%ShipmentDigest_of,
-            },
-            {   'Request' => 'Shipment::UPS::WSDL::ShipElements::Request',
-
-                'ShipmentDigest' =>
-                  'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            },
-            {
-
-                'Request'        => '',
-                'ShipmentDigest' => 'ShipmentDigest',
-            }
-        );
-
-    }    # end BLOCK
+} # end BLOCK
 
 
-}    # end of BLOCK
+
+
+
+
+} # end of BLOCK
+
 
 
 1;
@@ -77,7 +82,7 @@ Shipment::UPS::WSDL::ShipElements::ShipAcceptRequest
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

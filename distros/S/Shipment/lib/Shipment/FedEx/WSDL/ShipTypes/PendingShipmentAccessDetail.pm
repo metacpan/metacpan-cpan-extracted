@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::PendingShipmentAccessDetail;
-$Shipment::FedEx::WSDL::ShipTypes::PendingShipmentAccessDetail::VERSION = '3.08';
+$Shipment::FedEx::WSDL::ShipTypes::PendingShipmentAccessDetail::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +20,47 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %EmailLabelUrl_of : ATTR(:get<EmailLabelUrl>);
-    my %UserId_of : ATTR(:get<UserId>);
-    my %Password_of : ATTR(:get<Password>);
-    my %ExpirationTimestamp_of : ATTR(:get<ExpirationTimestamp>);
+my %EmailLabelUrl_of :ATTR(:get<EmailLabelUrl>);
+my %UserId_of :ATTR(:get<UserId>);
+my %Password_of :ATTR(:get<Password>);
+my %ExpirationTimestamp_of :ATTR(:get<ExpirationTimestamp>);
 
-    __PACKAGE__->_factory(
-        [   qw(        EmailLabelUrl
-              UserId
-              Password
-              ExpirationTimestamp
+__PACKAGE__->_factory(
+    [ qw(        EmailLabelUrl
+        UserId
+        Password
+        ExpirationTimestamp
 
-            )
-        ],
-        {   'EmailLabelUrl'       => \%EmailLabelUrl_of,
-            'UserId'              => \%UserId_of,
-            'Password'            => \%Password_of,
-            'ExpirationTimestamp' => \%ExpirationTimestamp_of,
-        },
-        {   'EmailLabelUrl' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'UserId'        => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Password'      => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ExpirationTimestamp' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-        },
-        {
+    ) ],
+    {
+        'EmailLabelUrl' => \%EmailLabelUrl_of,
+        'UserId' => \%UserId_of,
+        'Password' => \%Password_of,
+        'ExpirationTimestamp' => \%ExpirationTimestamp_of,
+    },
+    {
+        'EmailLabelUrl' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'UserId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Password' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ExpirationTimestamp' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
+    },
+    {
 
-            'EmailLabelUrl'       => 'EmailLabelUrl',
-            'UserId'              => 'UserId',
-            'Password'            => 'Password',
-            'ExpirationTimestamp' => 'ExpirationTimestamp',
-        }
-    );
+        'EmailLabelUrl' => 'EmailLabelUrl',
+        'UserId' => 'UserId',
+        'Password' => 'Password',
+        'ExpirationTimestamp' => 'ExpirationTimestamp',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -72,7 +77,7 @@ Shipment::FedEx::WSDL::ShipTypes::PendingShipmentAccessDetail
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

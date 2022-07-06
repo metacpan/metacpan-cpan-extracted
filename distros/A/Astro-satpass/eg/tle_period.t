@@ -20,7 +20,7 @@ unless ( -f $tle_file ) {
 
 Because I do not have authority to distribute TLE data, I have not
 included sgp4-ver.tle in this kit. A copy is contained in
-http://celestrak.com/publications/AIAA/2006-6753/AIAA-2006-6753.zip
+http://celestrak.org/publications/AIAA/2006-6753/AIAA-2006-6753.zip
 
 If you wish to run this test, obtain and unzip the file, and place
 sgp4-ver.tle in the t directory.

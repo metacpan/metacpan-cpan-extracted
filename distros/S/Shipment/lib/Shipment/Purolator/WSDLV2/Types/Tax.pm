@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::Tax;
-$Shipment::Purolator::WSDLV2::Types::Tax::VERSION = '3.08';
+$Shipment::Purolator::WSDLV2::Types::Tax::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,36 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Amount_of : ATTR(:get<Amount>);
-    my %Type_of : ATTR(:get<Type>);
-    my %Description_of : ATTR(:get<Description>);
+my %Amount_of :ATTR(:get<Amount>);
+my %Type_of :ATTR(:get<Type>);
+my %Description_of :ATTR(:get<Description>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Amount
-              Type
-              Description
+__PACKAGE__->_factory(
+    [ qw(        Amount
+        Type
+        Description
 
-            )
-        ],
-        {   'Amount'      => \%Amount_of,
-            'Type'        => \%Type_of,
-            'Description' => \%Description_of,
-        },
-        {   'Amount'      => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
-            'Type'        => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'Amount' => \%Amount_of,
+        'Type' => \%Type_of,
+        'Description' => \%Description_of,
+    },
+    {
+        'Amount' => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
+        'Type' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'Amount'      => 'Amount',
-            'Type'        => 'Type',
-            'Description' => 'Description',
-        }
-    );
+        'Amount' => 'Amount',
+        'Type' => 'Type',
+        'Description' => 'Description',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -66,7 +72,7 @@ Shipment::Purolator::WSDLV2::Types::Tax
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

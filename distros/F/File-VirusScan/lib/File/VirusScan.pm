@@ -7,7 +7,7 @@ use 5.008;
 use File::VirusScan::Result;
 use File::VirusScan::ResultSet;
 
-our $VERSION = '0.103';
+our $VERSION = '0.105';
 
 # We don't use Module::Pluggable.  Most users of this module will have
 # one or two virus scanners, with the other half-dozen or so plugins
@@ -269,7 +269,7 @@ L<File::VirusScan::Engine>, L<File::VirusScan::Result>
 
 Dave O'Neill (dmo@roaringpenguin.com)
 
-Dianne Skoll  (dfs@roaringpenguin.com>
+Dianne Skoll  (dianne@skoll.ca>
 
 =head1 LICENCE AND COPYRIGHT
 

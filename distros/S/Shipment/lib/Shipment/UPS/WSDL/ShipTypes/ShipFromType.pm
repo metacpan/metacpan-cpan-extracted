@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::ShipFromType;
-$Shipment::UPS::WSDL::ShipTypes::ShipFromType::VERSION = '3.08';
+$Shipment::UPS::WSDL::ShipTypes::ShipFromType::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -17,59 +17,63 @@ sub __get_attr_class {
 
 
 use base qw(Shipment::UPS::WSDL::ShipTypes::CompanyInfoType);
-
 # Variety: sequence
 use Class::Std::Fast::Storable constructor => 'none';
 use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Name_of : ATTR(:get<Name>);
-    my %AttentionName_of : ATTR(:get<AttentionName>);
-    my %TaxIdentificationNumber_of : ATTR(:get<TaxIdentificationNumber>);
-    my %Phone_of : ATTR(:get<Phone>);
-    my %FaxNumber_of : ATTR(:get<FaxNumber>);
-    my %Address_of : ATTR(:get<Address>);
+my %Name_of :ATTR(:get<Name>);
+my %AttentionName_of :ATTR(:get<AttentionName>);
+my %TaxIdentificationNumber_of :ATTR(:get<TaxIdentificationNumber>);
+my %Phone_of :ATTR(:get<Phone>);
+my %FaxNumber_of :ATTR(:get<FaxNumber>);
+my %Address_of :ATTR(:get<Address>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Name
-              AttentionName
-              TaxIdentificationNumber
-              Phone
-              FaxNumber
-              Address
+__PACKAGE__->_factory(
+    [ qw(        Name
+        AttentionName
+        TaxIdentificationNumber
+        Phone
+        FaxNumber
+        Address
 
-            )
-        ],
-        {   'Name'                    => \%Name_of,
-            'AttentionName'           => \%AttentionName_of,
-            'TaxIdentificationNumber' => \%TaxIdentificationNumber_of,
-            'Phone'                   => \%Phone_of,
-            'FaxNumber'               => \%FaxNumber_of,
-            'Address'                 => \%Address_of,
-        },
-        {   'Name'          => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'AttentionName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'TaxIdentificationNumber' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Phone'     => 'Shipment::UPS::WSDL::ShipTypes::ShipPhoneType',
-            'FaxNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Address'   => 'Shipment::UPS::WSDL::ShipTypes::ShipAddressType',
-        },
-        {
+    ) ],
+    {
+        'Name' => \%Name_of,
+        'AttentionName' => \%AttentionName_of,
+        'TaxIdentificationNumber' => \%TaxIdentificationNumber_of,
+        'Phone' => \%Phone_of,
+        'FaxNumber' => \%FaxNumber_of,
+        'Address' => \%Address_of,
+    },
+    {
+        'Name' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'AttentionName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'TaxIdentificationNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Phone' => 'Shipment::UPS::WSDL::ShipTypes::ShipPhoneType',
+        'FaxNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Address' => 'Shipment::UPS::WSDL::ShipTypes::ShipAddressType',
+    },
+    {
 
-            'Name'                    => 'Name',
-            'AttentionName'           => 'AttentionName',
-            'TaxIdentificationNumber' => 'TaxIdentificationNumber',
-            'Phone'                   => 'Phone',
-            'FaxNumber'               => 'FaxNumber',
-            'Address'                 => 'Address',
-        }
-    );
+        'Name' => 'Name',
+        'AttentionName' => 'AttentionName',
+        'TaxIdentificationNumber' => 'TaxIdentificationNumber',
+        'Phone' => 'Phone',
+        'FaxNumber' => 'FaxNumber',
+        'Address' => 'Address',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -86,7 +90,7 @@ Shipment::UPS::WSDL::ShipTypes::ShipFromType
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

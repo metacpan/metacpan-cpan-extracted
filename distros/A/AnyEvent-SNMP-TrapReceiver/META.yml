@@ -1,0 +1,46 @@
+---
+abstract: 'SNMP trap receiver by help of AnyEvent'
+author:
+  - 'Bojan Ramšak <bojanr@gmx.net>'
+build_requires:
+  IO::Socket::INET: '0'
+  Socket: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-SNMP-TrapReceiver
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  AnyEvent::SNMP::TrapReceiver:
+    file: lib/AnyEvent/SNMP/TrapReceiver.pm
+    version: '0.16'
+requires:
+  AnyEvent: '7.15'
+  AnyEvent::Handle::UDP: '0'
+  AnyEvent::Socket: '0'
+  Convert::ASN1: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/bojanra/AnyEvent-SNMP-TrapReceiver/issues
+  homepage: https://github.com/bojanra/AnyEvent-SNMP-TrapReceiver
+  repository: https://github.com/bojanra/AnyEvent-SNMP-TrapReceiver.git
+version: '0.16'
+x_contributors:
+  - 'Bojan Ramšak <bojan.ramsak@rtvslo.si>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

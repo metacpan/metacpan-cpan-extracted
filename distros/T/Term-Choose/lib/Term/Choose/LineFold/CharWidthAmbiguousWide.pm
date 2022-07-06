@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.754';
+our $VERSION = '1.755';
 
 use Exporter qw( import );
 

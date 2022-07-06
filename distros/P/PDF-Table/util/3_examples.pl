@@ -8,8 +8,8 @@
 use strict;
 use warnings;
 
-our $VERSION = '1.002'; # VERSION
-my $LAST_UPDATE = '1.000'; # manually update whenever code is changed
+our $VERSION = '1.003'; # VERSION
+our $LAST_UPDATE = '1.003'; # manually update whenever code is changed
 
 # dependent on optional packages:
 
@@ -44,6 +44,9 @@ my (@example_list, @example_results);
 
   push @example_list, "border_rules.pl";
   push @example_results, "illustrate borders and rules effects.\n";
+
+  push @example_list, "size.pl";
+  push @example_results, "illustrate using size setting for column widths.\n";
 
 # run with perl examples/<file> [args]
 

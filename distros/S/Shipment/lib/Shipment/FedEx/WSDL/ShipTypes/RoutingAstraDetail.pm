@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::RoutingAstraDetail;
-$Shipment::FedEx::WSDL::ShipTypes::RoutingAstraDetail::VERSION = '3.08';
+$Shipment::FedEx::WSDL::ShipTypes::RoutingAstraDetail::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +20,47 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %TrackingId_of : ATTR(:get<TrackingId>);
-    my %Barcode_of : ATTR(:get<Barcode>);
-    my %AstraHandlingText_of : ATTR(:get<AstraHandlingText>);
-    my %AstraLabelElements_of : ATTR(:get<AstraLabelElements>);
+my %TrackingId_of :ATTR(:get<TrackingId>);
+my %Barcode_of :ATTR(:get<Barcode>);
+my %AstraHandlingText_of :ATTR(:get<AstraHandlingText>);
+my %AstraLabelElements_of :ATTR(:get<AstraLabelElements>);
 
-    __PACKAGE__->_factory(
-        [   qw(        TrackingId
-              Barcode
-              AstraHandlingText
-              AstraLabelElements
+__PACKAGE__->_factory(
+    [ qw(        TrackingId
+        Barcode
+        AstraHandlingText
+        AstraLabelElements
 
-            )
-        ],
-        {   'TrackingId'         => \%TrackingId_of,
-            'Barcode'            => \%Barcode_of,
-            'AstraHandlingText'  => \%AstraHandlingText_of,
-            'AstraLabelElements' => \%AstraLabelElements_of,
-        },
-        {   'TrackingId' => 'Shipment::FedEx::WSDL::ShipTypes::TrackingId',
-            'Barcode'    => 'Shipment::FedEx::WSDL::ShipTypes::StringBarcode',
-            'AstraHandlingText' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'AstraLabelElements' =>
-              'Shipment::FedEx::WSDL::ShipTypes::AstraLabelElement',
-        },
-        {
+    ) ],
+    {
+        'TrackingId' => \%TrackingId_of,
+        'Barcode' => \%Barcode_of,
+        'AstraHandlingText' => \%AstraHandlingText_of,
+        'AstraLabelElements' => \%AstraLabelElements_of,
+    },
+    {
+        'TrackingId' => 'Shipment::FedEx::WSDL::ShipTypes::TrackingId',
+        'Barcode' => 'Shipment::FedEx::WSDL::ShipTypes::StringBarcode',
+        'AstraHandlingText' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'AstraLabelElements' => 'Shipment::FedEx::WSDL::ShipTypes::AstraLabelElement',
+    },
+    {
 
-            'TrackingId'         => 'TrackingId',
-            'Barcode'            => 'Barcode',
-            'AstraHandlingText'  => 'AstraHandlingText',
-            'AstraLabelElements' => 'AstraLabelElements',
-        }
-    );
+        'TrackingId' => 'TrackingId',
+        'Barcode' => 'Barcode',
+        'AstraHandlingText' => 'AstraHandlingText',
+        'AstraLabelElements' => 'AstraLabelElements',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -72,7 +77,7 @@ Shipment::FedEx::WSDL::ShipTypes::RoutingAstraDetail
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

@@ -21,11 +21,11 @@ sub defaults {
     my ( $sf, $section, $key ) = @_;
     my $defaults = {
         G => {
-            max_rows             => 200_000,
+            auto_limit           => 0,
             menu_memory          => 1,
             metadata             => 0,
             operators            => [ "REGEXP", "REGEXP_i", " = ", " != ", " < ", " > ", "IS NULL", "IS NOT NULL" ],
-            plugins              => [ 'SQLite', 'mysql', 'Pg' ],
+            plugins              => [ 'SQLite', 'mysql', 'Pg', 'Firebird' ],
             qualified_table_name => 0,
             quote_identifiers    => 1,
             thsd_sep             => ',',

@@ -78,7 +78,7 @@ my $star = do {
 #
 # 31 December 1988
 #
-# obtained from http://celestrak.com/
+# obtained from http://celestrak.org/
 
 # There is no need to call Astro::Coord::ECI::TLE::Set->aggregate()
 # because we know we have exactly one data set.

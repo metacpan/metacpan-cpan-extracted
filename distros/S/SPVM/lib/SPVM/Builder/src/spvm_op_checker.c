@@ -4963,7 +4963,7 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
     }
   }
   
-  // Resove inheritance
+  // Resolve inheritance
   int32_t compile_error = 0;
   for (int32_t class_index = compiler->cur_class_base; class_index < compiler->classes->length; class_index++) {
     SPVM_CLASS* class = SPVM_LIST_get(compiler->classes, class_index);
@@ -4992,6 +4992,7 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
     }
     
     SPVM_CLASS* cur_class = class;
+    SPVM_HASH* all_field_symtable = SPVM_HASH_new(compiler->allocator, 0, SPVM_ALLOCATOR_C_ALLOC_TYPE_TMP);
     for (int32_t class_index = class_stack->length - 1; class_index >= 0; class_index--) {
       SPVM_CLASS* class = SPVM_LIST_get(class_stack, class_index);
       
@@ -5001,18 +5002,28 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
       int32_t fields_length = fields->length;
       for (int32_t field_index = 0; field_index < fields_length; field_index++) {
         SPVM_FIELD* field = SPVM_LIST_get(fields, field_index);
+        SPVM_FIELD* new_field;
         if (strcmp(field->class->name, cur_class->name) == 0) {
-          SPVM_LIST_push(all_fields, field);
+          new_field = field;
         }
         // Clone field
         else {
-          SPVM_FIELD* new_field = SPVM_FIELD_new(compiler);
+          new_field = SPVM_FIELD_new(compiler);
           new_field->name = field->name;
           new_field->signature = field->signature;
           new_field->class = cur_class;
           new_field->type = field->type;
           new_field->access_control_type = field->access_control_type;
-          SPVM_LIST_push(all_fields, new_field);
+        }
+        SPVM_LIST_push(all_fields, new_field);
+        SPVM_FIELD* found_field = SPVM_HASH_get(all_field_symtable, new_field->name, strlen(new_field->name));
+        if (found_field) {
+          SPVM_COMPILER_error(compiler, "The field that name is the same as the field of the super class can't be defined at %s line %d", class->op_extends->file, class->op_extends->line);
+          compile_error = 1;
+          break;
+        }
+        else {
+          SPVM_HASH_set(all_field_symtable, new_field->name, strlen(new_field->name), new_field);
         }
       }
       
@@ -5025,6 +5036,7 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
     }
     
     class->tmp_merged_fields = all_fields;
+    SPVM_HASH_free(all_field_symtable);
     
     // Add parent interfaces
     class->interfaces = all_interfaces;
@@ -5056,7 +5068,7 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
     }
   }
   
-  // Resove fields
+  // Resolve fields
   for (int32_t class_index = compiler->cur_class_base; class_index < compiler->classes->length; class_index++) {
     // Class
     SPVM_CLASS* class = SPVM_LIST_get(compiler->classes, class_index);

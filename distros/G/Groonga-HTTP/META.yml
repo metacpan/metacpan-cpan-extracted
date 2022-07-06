@@ -31,7 +31,7 @@ provides:
     file: lib/Groonga/Commands/Status.pm
   Groonga::HTTP:
     file: lib/Groonga/HTTP.pm
-    version: '1.06'
+    version: '1.07'
   Groonga::HTTP::Client:
     file: lib/Groonga/HTTP/Client.pm
   Groonga::ResultSet:
@@ -43,6 +43,6 @@ resources:
   bugtracker: https://github.com/groonga/Groonga-HTTP/issues
   homepage: https://github.com/groonga/Groonga-HTTP
   repository: https://github.com/groonga/Groonga-HTTP.git
-version: '1.06'
+version: '1.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentStorageDetail;
-$Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentStorageDetail::VERSION = '3.08';
+$Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentStorageDetail::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/close/v2'}
+sub get_xmlns { 'http://fedex.com/ws/close/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %FilePath_of : ATTR(:get<FilePath>);
-    my %FileNaming_of : ATTR(:get<FileNaming>);
-    my %FileSuffix_of : ATTR(:get<FileSuffix>);
+my %FilePath_of :ATTR(:get<FilePath>);
+my %FileNaming_of :ATTR(:get<FileNaming>);
+my %FileSuffix_of :ATTR(:get<FileSuffix>);
 
-    __PACKAGE__->_factory(
-        [   qw(        FilePath
-              FileNaming
-              FileSuffix
+__PACKAGE__->_factory(
+    [ qw(        FilePath
+        FileNaming
+        FileSuffix
 
-            )
-        ],
-        {   'FilePath'   => \%FilePath_of,
-            'FileNaming' => \%FileNaming_of,
-            'FileSuffix' => \%FileSuffix_of,
-        },
-        {   'FilePath'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'FileNaming' =>
-              'Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentNamingType',
-            'FileSuffix' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'FilePath' => \%FilePath_of,
+        'FileNaming' => \%FileNaming_of,
+        'FileSuffix' => \%FileSuffix_of,
+    },
+    {
+        'FilePath' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'FileNaming' => 'Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentNamingType',
+        'FileSuffix' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'FilePath'   => 'FilePath',
-            'FileNaming' => 'FileNaming',
-            'FileSuffix' => 'FileSuffix',
-        }
-    );
+        'FilePath' => 'FilePath',
+        'FileNaming' => 'FileNaming',
+        'FileSuffix' => 'FileSuffix',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -67,7 +72,7 @@ Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentStorageDetail
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

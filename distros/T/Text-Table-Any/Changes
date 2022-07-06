@@ -1,3 +1,12 @@
+0.115   2022-07-03  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Update features for Text::Table::Org backend (caption =>
+          1).
+
+        - [doc] Remove copy-pasted text from Text::Table::Tiny
+          documentation.
+
+
 0.114   2022-05-27  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

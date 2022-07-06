@@ -1,5 +1,9 @@
 Revision history for Data::Money
 
+0.20  2022-07-04 MANWAR
+      - Updated link to bugtracker and to homepage, thanks @szabgab.
+      - Added .gitignore thanks @szabgab.
+
 0.19  2021-01-05 MANWAR
       - Applied patch to resolve issue #6 by @mrenvoize.
         "Clone is either mis-documented or mis-coded"

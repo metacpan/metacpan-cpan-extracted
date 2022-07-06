@@ -4,6 +4,22 @@ use strict;
 use warnings;
 use Config;
 use SPVM::Builder::Util::API;
+use SPVM::Builder::Config;
+use File::Temp();
+
+# Check supported environment
+{
+  # Need a compiler supporting c++11
+  my $config = SPVM::Builder::Config->new_cpp(file_optional => 1);
+  my $cc = $config->cc;
+  
+  my $tmp_dir = File::Temp->newdir;
+  
+  unless (system("$cc -o $tmp_dir/cpp11_check.o --std=c++11 t/support/cpp11_check.cpp") == 0) {
+    warn "Need a compiler supporting c++11\n";
+    die "OS unsupported\n";
+  }
+}
 
 WriteMakefile(
   NAME              => 'SPVM::Resource::Re2::V2022_06_01',

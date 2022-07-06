@@ -13,11 +13,27 @@ Lingua::EN::Sentence - split text into sentences
 =head1 SYNOPSIS
 
 	use Lingua::EN::Sentence qw( get_sentences add_acronyms );
-
+	
 	add_acronyms('lt','gen');		## adding support for 'Lt. Gen.'
-	my $sentences=get_sentences($text);	## Get the sentences.
-	foreach my $sentence (@$sentences) {
-		## do something with $sentence
+	my $text = q{
+	A sentence usually ends with a dot, exclamation or question mark optionally followed by a space!
+	A string followed by 2 carriage returns denotes a sentence, even though it doesn't end in a dot
+	
+	Dots after single letters such as U.S.A. or in numbers like -12.34 will not cause a split
+	as well as common abbreviations such as Dr. I. Smith, Ms. A.B. Jones, Apr. Calif. Esq.
+	and (some text) ellipsis such as ... or . . are ignored.
+	Some valid cases canot be deteected, such as the answer is X. It cannot easily be
+	differentiated from the single letter-dot sequence to abbreviate a person's given name.
+	Numbered points within a sentence will not cause a split 1. Like this one.
+	See the code for all the rules that apply.
+	This string has 7 sentences.
+	};
+	
+	my $sentences=get_sentences($text);	# Get the sentences.
+	foreach my $sent (@$sentences)
+	{
+		$i++;
+		print("SENTENCE $i:$sent\n");
 	}
 
 
@@ -31,18 +47,32 @@ Certain well know exceptions, such as abbreviations, may cause incorrect
 segmentations. But some of them are already integrated into this code and are
 being taken care of. Still, if you see that there are words causing the
 get_sentences function to fail, you can add those to the module, so it notices them.
+Note that abbreviations are case sensitive, so 'Mrs.' is recognised but not 'mrs.'
 
 =head1 ALGORITHM
+
+The first step is to mark  the dot ending an abbreviation by changing it to a special
+character. Now it won't cause a sentence split. The original dot is restored after
+the sentences are split
 
 Basically, I use a 'brute' regular expression to split the text into sentences.
 (Well, nothing is yet split - I just mark the end-of-sentence). Then I look into
 a set of rules which decide when an end-of-sentence is justified and when it's a
-mistake. In case of a mistake, the end-of-sentence mark is removed.
+mistake. In case of a mistake, the end-of-sentence mark is removed. What are
+such mistakes?
 
-What are such mistakes? Cases of abbreviations, for example. I have a list of
-such abbreviations (Please see public globals belwo for a list), and more
-general rules (for example, the abbreviations 'i.e.' and '.e.g.' need not to be
-in the list as a special rule takes care of all single letter abbreviations).
+Letter-dot sequences:  U.S.A. ,  i.e. , e.g.
+Dot sequences: '..' or '...'  or 'text . . more text'
+Two carriage returns denote the end of a sentence even if it doesn't end with a dot
+
+=head1 LIMITATIONS
+
+1) John F. Kennedy was a former president
+2) The answer is F. That ends the quiz
+
+In the first sentence, F. is detected as a persons initial and not the end of a sentence.
+But this means we cannot detect the true end of sentence 2, which is after the 'F'. This
+case is not common though.
 
 =head1 FUNCTIONS
 
@@ -133,6 +163,8 @@ Feel free to suggest such lists.
 =head1 SEE ALSO
 
 	Text::Sentence
+	Lingua::Sentence
+	Raku port of Lingua::EN::Sentence
 	
 =head1 REPOSITORY
 
@@ -148,7 +180,7 @@ Currently being maintained by Kim Ryan, kimryan at CPAN d o t org
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (c) 2001-2016 Shlomo Yona. All rights reserved.
-Copyright (c) 2018 Kim Ryan. All rights reserved.
+Copyright (c) 2022 Kim Ryan. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -187,7 +219,7 @@ use vars qw/$VERSION @ISA @EXPORT_OK $EOS $LOC $AP $P $PAP @ABBREVIATIONS/;
 use Carp qw/cluck/;
 use English;
 
-our $VERSION = '0.31';
+our $VERSION = '0.33';
 
 our $LOC;
 if ($OSNAME ne 'android') {
@@ -201,34 +233,36 @@ use locale;
 @ISA = qw( Exporter );
 @EXPORT_OK = qw( get_sentences add_acronyms get_acronyms set_acronyms get_EOS set_EOS set_locale);		
 
-our $EOS="\001";
+our $VERBOSE = 0; # echo intermediate data transforms, useful for debugging
+our $EOS = "\001"; #"__EOS__";
+our $EOA = '__EOA__';
 
 our $P = q/[\.!?]/;			    # PUNCTUATION
 
 $AP =  q/(?:'|"|\?|\)|\]|\})?/;	# AFTER PUNCTUATION
 our $PAP = $P.$AP;
 
-my @PEOPLE = qw( mr mrs ms dr prof mme ms?gr sens? reps? gov attys? supt insp const det revd? ald rt hon);
-my @TITLE_SUFFIXES = qw(PhD jn?r sn?r esq md llb);
-my @MILITARY = qw( col gen lt cdr cmdr adm capt sgt cpl maj pte);
-my @INSTITUTES = qw( dept univ assn bros);
-my @COMPANIES = qw( inc ltd co corp);
+# ACRONYMS AND ABBREVIATIONS
+my @PEOPLE = qw( Mr Mrs Ms Dr Prof Mme Ms?gr Sens? Reps? Gov Attys? Supt Insp Const Det Revd? Ald Rt Hon);
+my @TITLE_SUFFIXES = qw(PhD Jn?r Sn?r Esq MD LLB);
+my @MILITARY = qw( Col Gen Lt Cm?dr Adm Capt Sgt Cpl Maj Pte);
+my @INSTITUTES = qw( Dept Univ Assn Bros);
+my @COMPANIES = qw( Inc Pty Ltd Co Corp);
 my @PLACES =
 qw(
-	arc al ave blv?d cl ct cres dr expy? fw?y hwa?y la pde? pl plz rd st tce 
+	Arc Al Ave Blv?d Cl Ct Cres Dr Expy? Fw?y Hwa?y La Pde? Pl Plz Rd St Tce 
 	dist mt km in ft 	
 	Ala  Ariz Ark Cal Calif Col Colo Conn Del Fed  Fla Ga Ida Id Ill Ind Ia Kan Kans Ken Ky
-	La Me Md Is Mass Mich Minn Miss Mo Mont Neb Nebr  Nev Mex Okla Ok Ore Penna Penn Pa  Dak 
-	Tenn Tex Ut Vt Va Wash Wis Wisc Wy Wyo USAFA Alta  Man Ont Qu? Sask Yuk
+	La Me Md Is Mass Mich Minn Miss Mo Mont Neb Nebr Nev Mex Okla Ok Ore Penna Penn Pa Dak 
+	Tenn Tex Ut Vt Va Wash Wis Wisc Wy Wyo USAFA Alta Man Ont Qu? Sask Yuk
 	Aust Vic Qld Tas
 );
-my @MONTHS = qw(jan feb mar apr may jun jul aug sep sept oct nov dec);
+my @MONTHS = qw(Jan Feb Mar Apr May Jun Jul Aug Sept? Oct Nov Dec);
 my @MISC = qw(no esp est);  # Established
 my @LATIN = qw(vs etc al ibid sic);
+my @MATH = qw(fig eq sec cf Thm Def Conj resp);
 
-our @ABBREVIATIONS = (@PEOPLE, @TITLE_SUFFIXES, @MILITARY, @INSTITUTES, @COMPANIES, @PLACES, @MONTHS, @MISC, @LATIN );
-my $abbreviation_regex;
-_set_abbreviations_regex();
+our @ABBREVIATIONS = (@PEOPLE, @TITLE_SUFFIXES, @MILITARY, @INSTITUTES, @COMPANIES, @PLACES, @MONTHS, @MISC,@LATIN, @MATH);
 
 
 #==============================================================================
@@ -245,13 +279,31 @@ _set_abbreviations_regex();
 # places which are not indeed end-of-sentence.
 #------------------------------------------------------------------------------
 sub get_sentences {
-	my ($text)=@_;
+	my ($text) = @_;
 	return [] unless defined $text;
-	my $marked_text = first_sentence_breaking($text);
-	my $fixed_marked_text = remove_false_end_of_sentence($marked_text);
-	$fixed_marked_text = split_unsplit_stuff($fixed_marked_text);
-	my @sentences = split(/$EOS/,$fixed_marked_text);
+	$VERBOSE and print("ORIGINAL\n$text\n");
+	
+	$text = mark_up_abbreviations($text);
+	$VERBOSE and print("mark_up_abbreviations\n$text\n");
+	
+	$text = first_sentence_breaking($text);
+	$VERBOSE and print("first_sentence_breaking\n$text\n");
+	
+	$text = remove_false_end_of_sentence($text);
+	$VERBOSE and print("remove_false_end_of_sentence\n$text\n");
+	
+	$text = split_unsplit_stuff($text);
+	$VERBOSE and print("split_unsplit_stuff\n$text\n");
+	
+	my @sentences = split(/$EOS/,$text);
 	my $cleaned_sentences = clean_sentences(\@sentences);
+	if ($VERBOSE) {
+		my $i;
+		foreach my $sent (@$cleaned_sentences) {
+			$i++;
+			print("SENTENCE $i >>>$sent<<<\n");
+		}
+	}
 	return $cleaned_sentences;
 }
 
@@ -260,7 +312,6 @@ sub get_sentences {
 #------------------------------------------------------------------------------
 sub add_acronyms {
 	push @ABBREVIATIONS, @_;
-	_set_abbreviations_regex();
 }
 
 #------------------------------------------------------------------------------
@@ -275,7 +326,6 @@ sub get_acronyms {
 #------------------------------------------------------------------------------
 sub set_acronyms {
 	@ABBREVIATIONS=@_;
-	_set_abbreviations_regex();
 }
 
 #------------------------------------------------------------------------------
@@ -295,7 +345,6 @@ sub set_EOS {
 		return $EOS;
 	}
     $EOS = $new_EOS;
-    _set_abbreviations_regex();
     return $EOS;	
 }
 
@@ -341,24 +390,19 @@ sub set_locale {
 	}	
 }
 
-
 #==============================================================================
 #
 # Private methods
 #
 #==============================================================================
 
-# save some time by pre-compiling a regex used for working with abbreviations
-sub _set_abbreviations_regex {
-    my $abbreviations = join '|', @ABBREVIATIONS;
-    $abbreviation_regex = qr[(\b(?:$abbreviations)$PAP\s)$EOS]is;
-    return;
-}
 
 ## Please email me any suggestions for optimizing these RegExps.
 sub remove_false_end_of_sentence {
 	my ($marked_segment) = @_;
-##	## don't do u.s.a.
+	
+	
+##	## don't do U.S.A., U.K.
 ##	$marked_segment=~s/(\.\w$PAP)$EOS/$1/sg; 
 	$marked_segment=~s/([^-\w]\w$PAP\s)$EOS/$1/sg;
 	$marked_segment=~s/([^-\w]\w$P)$EOS/$1/sg;         
@@ -368,13 +412,12 @@ sub remove_false_end_of_sentence {
 	# Note: will fail for 12. Point 12
 	$marked_segment=~s/(\s[\w\d]\.\s+)$EOS/$1/sg; 
 
-	# fix: bla bla... yada yada
-	$marked_segment=~s/(\.\.\. )$EOS([[:lower:]])/$1$2/sg; 
-	# fix "." "?" "!"
-	$marked_segment=~s/(['"]$P['"]\s+)$EOS/$1/sg;
-	## fix where abbreviations exist
-	$marked_segment=~s/$abbreviation_regex/$1/g;
+	# fix ellipsis: bla bla... yada yada
+	$marked_segment=~s/(\.\.\. )$EOS([[:lower:]])/$1$2/sg;
 	
+	# fix quoted EOS such as "." "?" "!"
+	$marked_segment=~s/(['"]$P['"]\s+)$EOS/$1/sg;
+		
 	# don't break after quote unless its a capital letter.
 	$marked_segment=~s/(["']\s*)$EOS(\s*[[:lower:]])/$1$2/sg;
 
@@ -382,34 +425,42 @@ sub remove_false_end_of_sentence {
 	$marked_segment=~s/(\s\.\s)$EOS(\s*)/$1$2/sg;
     $marked_segment=~s/(["']\s*)$EOS(\s*[[:lower:]])/$1$2/sg;
 
-
 	$marked_segment=~s/(\s$PAP\s)$EOS/$1/sg;
+	
 	return $marked_segment;
 }
 
 sub split_unsplit_stuff {
 	my ($text) = @_;
+	
 
 	# $text=~s/(\D\d+)($P)(\s+)/$1$2$EOS$3/sg; # breaks numbered points, such as {EOL}1. point one
 
-	$text=~s/([\w $P]\d)($P)(\s+)/$1$2$EOS$3/sg; 
-	$text=~s/($PAP\s)(\s*\()/$1$EOS$2/gs;
+	$text=~s/([\w $P]\d)($P)(\s+)/$1$2$EOS$3/sg;
+	
+	# eg 'end. (' -> 'end. $EOS ('
+	$text=~s/($PAP\s)(\s*\()/$1$EOS$2/gs; # open bracket
+	
 	$text=~s/('\w$P)(\s)/$1$EOS$2/gs;
 
 
 	$text=~s/(\sno\.)(\s+)(?!\d)/$1$EOS$2/gis;
 
-##	# split where single capital letter followed by dot makes sense to break.
-##	# notice these are exceptions to the general rule NOT to split on single
-##	# letter.
-##	# notice also that sibgle letter M is missing here, due to French 'mister'
-##	# which is represented as M.
-##	#
-##	# the rule will not split on names begining or containing 
-##	# single capital letter dot in the first or second name
-##	# assuming 2 or three word name.
-##	$text=~s/(\s[[:lower:]]\w+\s+[^[[:^upper:]M]\.)(?!\s+[[:upper:]]\.)/$1$EOS/sg;
-
+	# split where single capital letter followed by dot makes sense to break.
+	# notice these are exceptions to the general rule NOT to split on single
+	# letter.
+	# notice also that single letter M is missing here, due to French 'mister'
+	# which is represented as M.
+	#
+	# the rule will not split on names beginning or containing 
+	# single capital letter dot in the first or second name
+	# assuming 2 or three word name.
+	
+	# NOT WORKING , it breaks up U.S.A. after U.
+	# Valid cases if single letter thrn dot are rare, such as 'The answer is F'.
+	# Can't decipher meaning of this regex
+	# $text=~s/(\s[[:lower:]]\w+\s+[^[[:^upper:]M]\.)(?!\s+[[:upper:]]\.)/$1$EOS/sg;
+	
 
 	# add EOS when you see "a.m." or "p.m." followed by a capital letter.
 	$text=~s/([ap]\.m\.\s+)([[:upper:]])/$1$EOS$2/gs;
@@ -426,16 +477,39 @@ sub clean_sentences {
 			$s=~s/^\s*//;
 			$s=~s/\s*$//;
 ##			$s=~s/\s+/ /g;
+			# replace end of abbrev marker with a dot
+			$s=~s/$EOA/\./g;
 			push @$cleaned_sentences,$s;
 		}
 	return $cleaned_sentences;
+}
+
+# Replace seuence such as Mr. A. Smith Jnr. with Mr__EOA__ A__EOA__ etc
+# This simplifies the code that detects end of sentnees. The marker is
+# replaced with the original dot adter sentence slitting
+
+sub mark_up_abbreviations {
+	my ($text) = @_;
+	
+	my %found_abbrevs;	
+	foreach my $abbrev (@ABBREVIATIONS) {
+		if ($text=~/\b($abbrev)\./i) {
+			$found_abbrevs{$abbrev} = 1;
+         }		
+	}
+
+	foreach my $abbrev (keys %found_abbrevs) {
+		$text=~s/($abbrev)\./$1$EOA/gs;
+	}
+	
+	return $text;
 }
 
 sub first_sentence_breaking {
 	my ($text) = @_;
 	$text=~s/\n\s*\n/$EOS/gs;	## double new-line means a different sentence.
 	$text=~s/($PAP\s)/$1$EOS/gs;
-	$text=~s/(\s\w$P)/$1$EOS/gs; # breake also when single letter comes before punc.
+	$text=~s/(\s\w$P)/$1$EOS/gs; # break also when single letter comes before punc.
 	return $text;
 }
 

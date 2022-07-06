@@ -1,0 +1,204 @@
+July 2019.
+
+1. Plug-in filters.
+
+Sendmail and other Mail Transfer Agents provide ways to 'plug in' a
+filter or filters to process mail.  Such filters are called milters.
+
+The things which a milter can do for an MTA are limited mainly by the
+imagination of the milter's author.
+
+
+2. The MTA - milter interface, and languages for writing milters.
+
+An interface is needed between a milter and the MTA which it assists.
+Milters can be written in a number of different programming languages;
+sometimes mixed languages are used.
+
+The Sendmail::PMilter package provides an interface between the MTA
+and milters which may be written in pure Perl.  This package handles
+all inter-process communications between the MTA and the milter, it
+exposes the information which is provided to the milter by the MTA as
+ordinary Perl variables, and it handles the tasks of converting Perl
+variables in the milter which contain things like function arguments
+and reply codes into a form which the MTA can digest, as well as, in
+certain cases, checking for validity.  All this greatly simplifies the
+task of writing a milter in Perl.  If milter processing should happen
+to produce errors, SIG{__WARN__} and SIG{__DIE__} can be used to catch
+(and for example log, or even ignore) the errors, so that the milter
+doesn't exit and mail continues to flow,
+
+
+3. Uses for milters.
+
+A common use of milters is to reject unwanted mail.  Others include
+
+  adding 'boilerplate' text, images, whatever to all messages;
+  signing outgoing mail, signature verification for incoming mail;
+  encrypting/decrypting mail;
+  adding, deleting, inspecting, and/or modifying message headers;
+  automatic replies;
+  preventing accidental disclosure of confidential information e.g.
+      credit card, social security and bank account numbers;
+  converting mail text to other formats;
+  copying all mail to backup storage;
+  rate or size limiting;
+  collecting and reporting statistics;
+  you can probably think of others.
+
+
+4. Milter capabilities.
+
+The interface to the running MTA follows the 'Milter Protocol'.  Over
+the years the Milter Protocol has progressed through several versions.
+It seems now to be well settled at Version 6, which supports more or
+less everything anyone might reasonably want to do to a message.
+
+Perl milters have full access to Perl libraries, modules etc. and all
+the facilities and utilities made available by the operating system.
+Use with caution.
+
+
+5. Communications between MTA and a milter.
+
+Inter-process communication can be a bit of a minefield.  One of the
+aiims of this module is to remove all the complexity.  All you need to
+do is to specify the socket which the MTA and a milter will use.  Then
+you can get on with the mail filtering itself withouth worrying about
+the communication, which is necessary, but secondary to the main task.
+
+A milter process is normally run as a daemon.  It communicates with a
+Mail Transfer Agent (and MTA - which is normally another daemon) over
+a socket connection.  A single MTA may have more than one milter with
+which it exchanges information.  In the Sendmail Milter Protocol, the
+MTA sends commands to and receives responses from its milters over a
+socket connection.  The details of the socket are configured in both
+the configuration of the MTA and in the configurations of the milters
+and these must of course agree.  The socket can be a local Unix domain
+socket or a TCP socket.  For Sendmail, this is defined by a line in
+the configuration file which begins with an 'X'.  Sendmail::PMilter
+uses this information to set up the necessary communication between
+Perl milters (which "use" it) and the MTA itself.  Because processes
+which handle mail are at least time-sensitive even if not necessarily
+time-critical, when it hands over to a milter the MTA sets timeouts
+and then waits.  If a timeout is reached without an expected response
+from the filter, the MTA may decide to ignore the filter and press on.
+
+5.1. Sendmail configuration.
+
+A typical configuration in 'sendmail.cf' might be
+
+O InputMailFilters=x-milter
+Xx-milter, S=local:/var/run/x-milter/x-milter.sock, F=T, T=C:10m;S:10m;R:10m;E:20m
+
+This tells Sendmail that there is one milter called 'x-milter'; its
+communication will be via a local Unix domain socket; what to do if
+the milter fails; and some timeout values.  You may wish to use the M4
+processor to create sendmail.cf from 'sendmail.mc', this should do in
+the '.mc' file:
+
+INPUT_MAIL_FILTER(`x-milter', `S=local:/var/run/x-milter/x-milter.sock, F=T, T=C:10m;S:10m;R:10m;E:20m')
+
+5.2. Milter configuration.
+
+In the milter itself the socket is configured like this:
+
+$milter_object->setconn('local:/var/run/x-milter/x-milter.sock');
+
+so that the milter and the MTA are on the same page.
+
+5.3. The mechanics of MTA - milter communication.
+
+All messages are passed between the MTA and the milter(s) encoded in
+simple 'packets'.  The packets are in fact (and you do not really need
+to know this) strings of the very general form "LCS1\0S2\0", where 'L'
+is a 32-bit integer (the length of the following data, INCLUDING the
+command byte), 'C' is the command byte (a single ASCII character) and
+(in this example) S1 and S2 are ASCII text strings each terminated by
+ASCII NUL characters (which are of course included when calculating
+the length of the packet).
+
+Sendmail::PMilter handles all the packet processing, the milter need
+concern itself only with Perl-style scalar variables, arrays etc. and
+there's no need to worry about stack bashing, use-after-free, memory
+leaks, threads, and those other things that 'C' programmers have to
+wrestle with.  This leaves the coder relatively free to concentrate on
+the mail processing itself.
+
+
+6. Mail processing takes place in stages.
+
+Mail processing by milters takes place at several well-defined stages
+('connect', 'helo', etc.) during the transmission of the message.  At
+each stage the sets of data available ('macros', connected IP address,
+sending server's HELO name, sender address etc.) and the permissible
+actions (e.g. rewrite a message header, add a header, modify message
+parts) are also well-defined and are to some extent configurable.
+
+Filters built to use Sendmail::PMilter can examine any information
+made available by the MTA, and can take any of the actions permitted
+at any stage of mail processing.  Generally the MTA is looking for a
+result (ACCEPT mail, TEMPFAIL, REJECT, DISCARD, CONTINUE processing)
+which is returned by the final statement of the milter code for the
+current SMTP stage.  For each SMTP stage there is a separate section
+of code which is called a 'callback'.  Here it's just a Perl sub, it
+differs from the other subs in the milter in that it is 'registered'
+with the MTA in a call to Sendmail::PMilter::register() so that the
+MTA knows how to call it.
+
+The MTA initiates all communications by a strict sequence of commands
+sent from the MTA to the milter via the socket; by default the milter
+must reply, but it is possible to negotiate at the beginning of every
+connection, for each separate step in the processing if you wish, for
+the milter to make no reply to the MTA.
+
+If several milters are used, at each stage of the SMTP conversation
+the MTA consults each milter (connect, helo, etc.) in turn, the order
+being defined in the MTA configuration file.  If at any stage any one
+of the milters replies with REJECT then the message will be rejected,
+the remaining steps for this and other milters will not be completed.
+If a milter does not wish to be consulted further about a particular
+message it can reply with ACCEPT.  If it has reached no conclusion it
+can return CONTINUE so that it will be consulted at the next stage of
+the conversation (assuming that the MTA does not decide to reject or
+tempfail, and the next stage is actually reached).  This is a slight
+simplification but it will do for now.
+
+
+7. Advantages and disadvantages.
+
+Filters can be implemented much more quickly in Perl than for example
+in a low-level language like C, and the Perl code does not necessarily
+need to be thread-safe.  All mail is essentially text, and Perl is an
+extremely powerful tool for text processing.  A milter coded in Perl
+can do more or less anything that one reasonably might want to do with
+a message.  The milter has full access to all Perl library functions,
+standard modules, modules installed from CPAN, many system utilities,
+modules of your own, etc. etc.
+
+One of the prices of the power and flexibility of Perl is that the
+processes can be large, and processor-intensive; you may need to keep
+an eye on that when you're developing.  The current maintainer's all-
+singing all-dancing milter generally runs a few 200MByte processes, of
+which ~60% is shared, so each process consumes about 80MBytes of RAM.
+Typically, processing a short mail message on modest hardware might
+consume 50ms-500ms of CPU time; an accepted message which is examined
+at every Protocol stage will likely cost significantly more than one
+that is disposed of (ACCEPT, REJECT, TEMPFAIL, DISCARD) early in the
+Milter Protocol.  Timings are heavily dependent on the configuration,
+the code, and the hardware of course.
+
+8. Complexity is an enemy of security.
+
+Enough said.
+
+
+9. Sendmail::Milter (Obsolete)
+==============================
+
+Ancient and very flawed module which has been unmaintained since the
+end of the 20th century but which Sendmail::PMilter originally used.
+Sendmail::Milter supported only Version 2 of the Milter Protocol, has
+a poor reputation with its users, and its author has been unhelpful.
+In view of the shortcomings its use cannot be recommended; versions of
+Sendmail::PMilter later than 1.2x do not use it.

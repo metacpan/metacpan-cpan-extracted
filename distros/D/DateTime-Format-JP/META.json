@@ -4,7 +4,7 @@
       "Jacques Deguest (jack@deguest.jp)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -53,13 +53,13 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://git.deguest.jp/jack/DateTime-Format-JP/issues"
+         "web" : "https://gitlab.com/jackdeguest/DateTime-Format-JP/issues"
       },
       "repository" : {
          "type" : "git",
-         "web" : "https://git.deguest.jp/jack/DateTime-Format-JP"
+         "web" : "https://gitlab.com/jackdeguest/DateTime-Format-JP"
       }
    },
-   "version" : "v0.1.1",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "v0.1.2",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

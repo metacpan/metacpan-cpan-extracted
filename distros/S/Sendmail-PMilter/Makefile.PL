@@ -1,32 +1,54 @@
-# $Id: Makefile.PL,v 1.11 2004/08/10 21:10:36 tvierling Exp $
-
-use 5.006;
+use 5.014;
 use ExtUtils::MakeMaker;
 
-my $install = ( ExtUtils::MakeMaker::prompt(<<EOT . 'Do you wish to install the Sendmail::Milter interface?' => 'yes' ) =~ /^\s*(y)/i );
+my $install = ( ExtUtils::MakeMaker::prompt(<<EOT . 'Do you wish to install the Sendmail::PMilter package?' => 'yes' ) );
 
-The Sendmail::PMilter distribution includes a module that supplies a 
-compatibility interface emulating the standard Sendmail::Milter API,
-rather than using the native libmilter (which is not compatible
-with modern Perl threads).
+Sendmail::PMilter provides access to the message processing hooks in a
+running Mail Transfer Agent (Sendmail or Postfix), so that filters
+('milters') which process mail can be written entirely in Perl.  Mail
+processing according to SMTP takes place at a number of well-defined
+stages ('connect', 'helo', etc.) during the exchange of the message
+between client and server.  At each stage, the sets of data available
+(the connecting IP, sender address etc.) and the permissible actions
+(rewrite a message header, ACCEPT a message, REJECT it etc.) are also
+well-defined and are to some extent configurable.
 
-Choose "no" below ONLY IF the standard Sendmail::Milter package is
-installed or will be installed.  Otherwise, the compatibility
-interface MUST be installed, as it is needed for Sendmail::PMilter
-to function properly.
+Filters built to use Sendmail::PMilter can examine all the information
+made available by the MTA and can take any of the permitted actions at
+any stage of mail processing.  Filters can be implemented much more
+quickly in Perl than in a low-level language like C, and the Perl code
+does not necessarily need to be thread-safe.  All mail is essentially
+text, and Perl is a very powerful tool for text processing.  A milter
+coded in Perl has full access to all Perl library functions, system
+utilities, standard modules, modules installed from CPAN, modules of
+your own; a Perl milter can do with a message more or less anything
+that you might reasonably want to do.
+
+The interface to the running MTA follows the 'milter protocol'.  This
+protocol is driven by the MTA.  It is effected by messages of a simple
+structure which are passed between the MTA and the milter via a socket
+connection.  Over the years the Milter Protocol has progressed through
+several versions, and seems now (July 2019) to be fairly well settled
+at Milter Protocol Version 6.
+
+Choose "yes" below to install Sendmail::PMilter from this package.
 
 EOT
+
+if( $install ne 'yes' ) { print "Not installing.\n"; exit; }
 
 my %PM = (
         'lib/Sendmail/PMilter.pm'           =>  '$(INST_LIBDIR)/PMilter.pm',
         'lib/Sendmail/PMilter/Context.pm'   =>  '$(INST_LIBDIR)/PMilter/Context.pm'
 );
-$PM{'lib/Sendmail/Milter.pm'} = '$(INST_LIBDIR)/Milter.pm' if $install;
+
 
 WriteMakefile(
     ABSTRACT_FROM	=> 'lib/Sendmail/PMilter.pm',
-    AUTHOR		=> 'Todd Vierling <tv@duh.org>',
+    AUTHOR		=> 'Ged Haywood <pause.2022.07@fixmymail.uk>',
     PM			=>  \%PM,
     NAME		=> 'Sendmail::PMilter',
     VERSION_FROM	=> 'lib/Sendmail/PMilter.pm',
+    MIN_PERL_VERSION	=> 5.14.0,
+    LICENSE		=> 'perl_5'
 );

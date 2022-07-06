@@ -3,19 +3,23 @@ NAME
     without duplicates
 
 VERSION
-    This document describes version 0.004 of Array::Pick::Scan (from Perl
-    distribution Array-Pick-Scan), released on 2022-05-20.
+    This document describes version 0.005 of Array::Pick::Scan (from Perl
+    distribution Array-Pick-Scan), released on 2022-05-21.
 
 SYNOPSIS
-     use Array::Pick::Scan qw(random_item);
+     use Array::Pick::Scan qw(pick);
 
-     my $item  = random_item(\@ary);
-     my @items = random_line(\@ary, 3);
+     my $item  = pick(\@ary);
+     my @items = pick(\@ary, 3);
 
     or:
 
-     my $item  = random_item(\&iterator);
-     my @items = random_line(\&iterator, 3);
+     my $item  = pick(\&iterator);
+     my @items = pick(\&iterator, 3);
+
+    To return array indexes instead of the items:
+
+     my @item  = pick($source, $n, {pos=>1});
 
 DESCRIPTION
     This module can return random items from an array (or iterator), without
@@ -31,13 +35,24 @@ DESCRIPTION
     first.
 
 FUNCTIONS
-  random_item
+  pick
     Usage:
 
-     my @items = random_item(\@ary      [ , $num_samples ]);
-     my @items = random_item(\&iterator [ , $num_samples ]);
+     my @items = pick(\@ary      [ , $num_samples [ , \%opts ] ]);
+     my @items = pick(\&iterator [ , $num_samples [ , \%opts ] ]);
 
     Number of samples defaults to 1.
+
+    Options:
+
+    *   pos
+
+        Bool. If set to true, will return array indexes instead of the
+        items.
+
+  random_item
+    Older name for "pick", deprecated and will be removed in future
+    releases.
 
 HOMEPAGE
     Please visit the project's homepage at

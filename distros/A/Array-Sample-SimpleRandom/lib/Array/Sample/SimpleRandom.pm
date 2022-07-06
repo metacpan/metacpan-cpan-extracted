@@ -7,9 +7,9 @@ use warnings;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-20'; # DATE
+our $DATE = '2022-05-21'; # DATE
 our $DIST = 'Array-Sample-SimpleRandom'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our @EXPORT_OK = qw(sample_simple_random_with_replacement
                     sample_simple_random_no_replacement);
@@ -63,7 +63,7 @@ Array::Sample::SimpleRandom - Sample elements randomly (with or without replacem
 
 =head1 VERSION
 
-This document describes version 0.002 of Array::Sample::SimpleRandom (from Perl distribution Array-Sample-SimpleRandom), released on 2022-05-20.
+This document describes version 0.003 of Array::Sample::SimpleRandom (from Perl distribution Array-Sample-SimpleRandom), released on 2022-05-21.
 
 =head1 SYNOPSIS
 

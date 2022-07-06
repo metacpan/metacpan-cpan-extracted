@@ -170,7 +170,7 @@ fu-uniq - Dereplicate sequences
 
 =head1 VERSION
 
-version 1.4.10
+version 1.5.0
 
 =head1 SYNOPSIS
 

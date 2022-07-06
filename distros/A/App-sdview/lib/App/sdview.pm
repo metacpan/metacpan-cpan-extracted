@@ -8,7 +8,7 @@ use utf8;
 
 use Object::Pad;
 
-package App::sdview 0.06;
+package App::sdview 0.07;
 class App::sdview :strict(params);
 
 use List::Keywords qw( first );
@@ -26,9 +26,9 @@ C<App::sdview> - a terminal document viewer for POD and other syntaxes
 =head1 DESCRIPTION
 
 This module implements a terminal-based program for viewing structured
-documents. It currently understands POD and some simple Markdown formatting,
-though future versions are expected to handle nroff (for manpages) and other
-styles.
+documents. It currently understands POD, some simple Markdown formatting, and
+a basic understanding of nroff (for manpages). Future versions may expand on
+these abilities, extending them or adding new formats.
 
 To actually use it, you likely wanted wanted to see the F<bin/sdview> script.
 

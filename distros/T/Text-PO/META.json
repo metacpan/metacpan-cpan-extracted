@@ -4,7 +4,7 @@
       "Jacques Deguest (jack@deguest.jp)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -33,22 +33,25 @@
       "runtime" : {
          "requires" : {
             "Class::Struct" : "0.65",
-            "DateTime" : "1.54",
+            "DateTime" : "1.58",
+            "DateTime::TimeZone" : "2.52",
             "Encode" : "3.08",
             "Fcntl" : "1.13",
-            "I18N::Langinfo" : "0.18",
+            "I18N::Langinfo" : "0.19",
             "IO::File" : "1.41",
-            "JSON" : "4.03",
-            "Module::Generic" : "v0.15.4",
-            "Nice::Try" : "v1.1.2",
+            "JSON" : "4.07",
+            "JSON::XS" : "4.03",
+            "Module::Generic" : "v0.24.2",
+            "Nice::Try" : "v1.3.0",
             "POSIX" : "1.53_01",
             "Scalar::Util" : "1.50",
-            "Text::Wrap" : "2013.0523",
+            "Text::Wrap" : "2021.0814",
             "open" : "1.11",
             "overload" : "1.30",
             "parent" : "0",
             "perl" : "5.014000",
             "strict" : "0.238",
+            "vars" : "0",
             "warnings" : "1.44"
          }
       },
@@ -65,13 +68,13 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://git.deguest.jp/jack/Text-PO/issues"
+         "web" : "https://gitlab.com/jackdeguest/Text-PO/issues"
       },
       "repository" : {
          "type" : "git",
-         "web" : "https://git.deguest.jp/jack/Text-PO"
+         "web" : "https://gitlab.com/jackdeguest/Text-PO"
       }
    },
-   "version" : "v0.1.6",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "v0.2.1",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

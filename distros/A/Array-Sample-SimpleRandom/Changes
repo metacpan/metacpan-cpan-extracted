@@ -1,3 +1,10 @@
+0.003   2022-05-21  Released-By: PERLANCAR; Urgency: medium
+
+        - Adjust to Array::Pick::Scan 0.005 ('pos' option).
+
+        - [doc] Add FAQ.
+
+
 0.002   2022-05-20  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

@@ -32,9 +32,10 @@ sub scan
 {
 	my ($self, $path) = @_;
 
-	if(abs_path($path) ne $path) {
-		return File::VirusScan::Result->error("Path $path is not absolute");
-	}
+        my $abs = abs_path($path);
+        if ($abs && $abs ne $path) {
+                $path = $abs;
+        }
 
 	my @files = eval { $self->list_files($path) };
 	if($@) {
@@ -303,7 +304,7 @@ L<http://www.f-prot.com/>
 
 =head1 AUTHOR
 
-Dianne Skoll (dfs@roaringpenguin.com)
+Dianne Skoll (dianne@skoll.ca)
 
 Dave O'Neill (dmo@roaringpenguin.com)
 

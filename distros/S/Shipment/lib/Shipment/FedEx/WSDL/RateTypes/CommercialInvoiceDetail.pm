@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::CommercialInvoiceDetail;
-$Shipment::FedEx::WSDL::RateTypes::CommercialInvoiceDetail::VERSION = '3.08';
+$Shipment::FedEx::WSDL::RateTypes::CommercialInvoiceDetail::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,33 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Format_of : ATTR(:get<Format>);
-    my %CustomerImageUsages_of : ATTR(:get<CustomerImageUsages>);
+my %Format_of :ATTR(:get<Format>);
+my %CustomerImageUsages_of :ATTR(:get<CustomerImageUsages>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Format
-              CustomerImageUsages
+__PACKAGE__->_factory(
+    [ qw(        Format
+        CustomerImageUsages
 
-            )
-        ],
-        {   'Format'              => \%Format_of,
-            'CustomerImageUsages' => \%CustomerImageUsages_of,
-        },
-        {   'Format' =>
-              'Shipment::FedEx::WSDL::RateTypes::ShippingDocumentFormat',
-            'CustomerImageUsages' =>
-              'Shipment::FedEx::WSDL::RateTypes::CustomerImageUsage',
-        },
-        {
+    ) ],
+    {
+        'Format' => \%Format_of,
+        'CustomerImageUsages' => \%CustomerImageUsages_of,
+    },
+    {
+        'Format' => 'Shipment::FedEx::WSDL::RateTypes::ShippingDocumentFormat',
+        'CustomerImageUsages' => 'Shipment::FedEx::WSDL::RateTypes::CustomerImageUsage',
+    },
+    {
 
-            'Format'              => 'Format',
-            'CustomerImageUsages' => 'CustomerImageUsages',
-        }
-    );
+        'Format' => 'Format',
+        'CustomerImageUsages' => 'CustomerImageUsages',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -63,7 +67,7 @@ Shipment::FedEx::WSDL::RateTypes::CommercialInvoiceDetail
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

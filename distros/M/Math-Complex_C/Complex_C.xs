@@ -16,6 +16,12 @@
 
 #define MATH_COMPLEX double _Complex
 
+#ifdef USE_CPOWL
+#define MY_CPOW (MATH_COMPLEX)cpowl
+#else
+#define MY_CPOW cpow
+#endif
+
 int nnum = 0;
 
 void d_set_prec(pTHX_ int x) {
@@ -376,7 +382,7 @@ void proj_c(pTHX_ SV * rop, SV * op) {
 }
 
 void pow_c(pTHX_ SV * rop, SV * op, SV * exp) {
-     *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(rop)))) = cpow(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(op)))),
+     *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(rop)))) = MY_CPOW(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(op)))),
                                                         *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(exp)))));
 }
 
@@ -486,10 +492,10 @@ SV * _overload_pow(pTHX_ SV * a, SV * b, SV * third) {
        __real__ t = (double)SvUVX(b);
        __imag__ t = 0.0;
        if(SWITCH_ARGS) {
-         *pc = cpow( t, *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) );
+         *pc = MY_CPOW( t, *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) );
          return obj_ref;
        }
-       *pc = cpow(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))), t);
+       *pc = MY_CPOW(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))), t);
        return obj_ref;
      }
 
@@ -497,10 +503,10 @@ SV * _overload_pow(pTHX_ SV * a, SV * b, SV * third) {
        __real__ t = (double)SvIVX(b);
        __imag__ t = 0.0;
        if(SWITCH_ARGS) {
-         *pc = cpow( t, *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) );
+         *pc = MY_CPOW( t, *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) );
          return obj_ref;
        }
-       *pc = cpow(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))), t);
+       *pc = MY_CPOW(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))), t);
        return obj_ref;
      }
 
@@ -508,10 +514,10 @@ SV * _overload_pow(pTHX_ SV * a, SV * b, SV * third) {
        __real__ t = (double)SvNVX(b);
        __imag__ t = 0.0;
        if(SWITCH_ARGS) {
-         *pc = cpow( t, *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) );
+         *pc = MY_CPOW( t, *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) );
          return obj_ref;
        }
-       *pc = cpow(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))), t);
+       *pc = MY_CPOW(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))), t);
        return obj_ref;
      }
 
@@ -520,16 +526,16 @@ SV * _overload_pow(pTHX_ SV * a, SV * b, SV * third) {
        __real__ t = strtod(SvPV_nolen(b), NULL);
        __imag__ t = 0.0;
        if(SWITCH_ARGS) {
-         *pc = cpow( t, *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) );
+         *pc = MY_CPOW( t, *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) );
          return obj_ref;
        }
-       *pc = cpow(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))), t);
+       *pc = MY_CPOW(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))), t);
        return obj_ref;
      }
      else if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::Complex_C")) {
-         *pc = cpow(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))), *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(b)))));
+         *pc = MY_CPOW(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))), *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(b)))));
          return obj_ref;
        }
      }
@@ -740,32 +746,32 @@ SV * _overload_pow_eq(pTHX_ SV * a, SV * b, SV * third) {
      if(SvUOK(b)) {
        __real__ t = (double)SvUVX(b);
        __imag__ t = 0.0;
-       *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) = cpow(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))), t);
+       *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) = MY_CPOW(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))), t);
        return a;
      }
      if(SvIOK(b)) {
        __real__ t = (double)SvIVX(b);
        __imag__ t = 0.0;
-       *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) = cpow(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))), t);
+       *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) = MY_CPOW(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))), t);
        return a;
      }
      if(SvNOK(b)) {
        __real__ t = (double)SvNVX(b);
        __imag__ t = 0.0;
-       *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) = cpow(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))), t);
+       *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) = MY_CPOW(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))), t);
        return a;
      }
      if(SvPOK(b)) {
        if(!looks_like_number(b)) nnum++;
        __real__ t = strtod(SvPV_nolen(b), NULL);
        __imag__ t = 0.0;
-       *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) = cpow(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))), t);
+       *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) = MY_CPOW(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))), t);
        return a;
      }
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::Complex_C")) {
-       *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) = cpow(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))),
+       *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) = MY_CPOW(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))),
                                                         *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(b)))));
          return a;
        }

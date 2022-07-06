@@ -1,9 +1,9 @@
 package Acme::Mitey::Cards::Card::Joker;
 
-our $VERSION   = '0.005';
+our $VERSION   = '0.008';
 our $AUTHORITY = 'cpan:TOBYINK';
 
-use Acme::Mitey::Cards::Mite;
+use Acme::Mitey::Cards::Mite qw( -bool -is );
 extends 'Acme::Mitey::Cards::Card';
 
 sub to_string {

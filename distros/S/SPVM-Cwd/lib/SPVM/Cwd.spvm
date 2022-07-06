@@ -1,0 +1,3 @@
+class Cwd {
+  native static method getcwd : string ();
+}

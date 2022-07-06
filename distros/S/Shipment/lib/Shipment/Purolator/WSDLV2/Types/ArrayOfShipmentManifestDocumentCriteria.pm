@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::ArrayOfShipmentManifestDocumentCriteria;
-$Shipment::Purolator::WSDLV2::Types::ArrayOfShipmentManifestDocumentCriteria::VERSION = '3.08';
+$Shipment::Purolator::WSDLV2::Types::ArrayOfShipmentManifestDocumentCriteria::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,30 +20,32 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %ShipmentManifestDocumentCriteria_of :
-      ATTR(:get<ShipmentManifestDocumentCriteria>);
+my %ShipmentManifestDocumentCriteria_of :ATTR(:get<ShipmentManifestDocumentCriteria>);
 
-    __PACKAGE__->_factory(
-        [   qw(        ShipmentManifestDocumentCriteria
+__PACKAGE__->_factory(
+    [ qw(        ShipmentManifestDocumentCriteria
 
-            )
-        ],
-        {   'ShipmentManifestDocumentCriteria' =>
-              \%ShipmentManifestDocumentCriteria_of,
-        },
-        {   'ShipmentManifestDocumentCriteria' =>
-              'Shipment::Purolator::WSDLV2::Types::ShipmentManifestDocumentCriteria',
-        },
-        {
+    ) ],
+    {
+        'ShipmentManifestDocumentCriteria' => \%ShipmentManifestDocumentCriteria_of,
+    },
+    {
+        'ShipmentManifestDocumentCriteria' => 'Shipment::Purolator::WSDLV2::Types::ShipmentManifestDocumentCriteria',
+    },
+    {
 
-            'ShipmentManifestDocumentCriteria' =>
-              'ShipmentManifestDocumentCriteria',
-        }
-    );
+        'ShipmentManifestDocumentCriteria' => 'ShipmentManifestDocumentCriteria',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -60,7 +62,7 @@ Shipment::Purolator::WSDLV2::Types::ArrayOfShipmentManifestDocumentCriteria
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

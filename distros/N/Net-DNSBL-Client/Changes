@@ -1,3 +1,11 @@
+0.207   Wed, 06 Jul 2022 10:00:00 -0400 dfs
+
+        Update author contact info
+
+0.206	Wed, 24 Jun 2015 11:17:00 -0400 dfs
+
+	Add support for "X" wildcard matches in 'match'-type DNSBLs.
+
 0.205	Mon, 28 Oct 2013 10:19:00 -0400 dfs
 
 	Use explicit TXT and A queries rather than "ANY" queries.  Some

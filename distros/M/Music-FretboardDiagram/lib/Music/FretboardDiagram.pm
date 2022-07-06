@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Draw fretboard chord diagrams
 
-our $VERSION = '0.1308';
+our $VERSION = '0.1312';
 
 use Moo;
 use strictures 2;
@@ -291,7 +291,7 @@ sub draw {
                     r     => $SPACE / 5,
                     x     => $SPACE + ($self->strings - $string) * $SPACE,
                     y     => $y,
-                ) if $y > $SPACE && $y < $SPACE * $frets;
+                ) if $y >= $SPACE && $y <= $SPACE * $frets;
             }
 
             # Decrement the current string number
@@ -449,7 +449,7 @@ sub _draw_horiz {
                     r     => $SPACE / 5,
                     x     => $x,
                     y     => $SPACE + ($string - 1) * $SPACE,
-                ) if $x > $SPACE && $x < $SPACE * $frets;
+                ) if $x >= $SPACE && $x <= $SPACE * $frets;
             }
 
             # Increment the current string number
@@ -530,7 +530,7 @@ Music::FretboardDiagram - Draw fretboard chord diagrams
 
 =head1 VERSION
 
-version 0.1308
+version 0.1312
 
 =head1 SYNOPSIS
 

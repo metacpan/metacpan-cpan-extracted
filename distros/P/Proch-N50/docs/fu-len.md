@@ -4,7 +4,7 @@ fu-len - A demo implementation to filter fastx files by length
 
 # VERSION
 
-version 1.4.8
+version 1.5.0
 
 # USAGE
 

@@ -1,0 +1,95 @@
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Test::YAFT::Test::Exception - Test::YAFT - Test::Exception comparison
+
+=head1 DESCRIPTION
+
+L<Test::YAFT> doesn't provide dedicated asserts like L<Test::Exception>.
+
+Instead it uses C<it> and C<got { }> block to achieve same result.
+
+=head2 dies_ok
+
+Behaviour of C<dies_ok> is achieved by expecting any exception
+
+	# Test::Exception
+	dies_ok { $foo->method } "should die";
+
+	# Test::YAFT
+	it "should die"
+		=> got { $foo->method }
+		=> throws => ignore
+		;
+
+=head2 lives_ok
+
+Behaviour of C<lives_ok> is achieved by expecting anything
+
+	# Test::Exception
+	lives_ok { $foo->method } "should not die";
+
+	# Test::YAFT
+	it "should not die"
+		=> got { $foo->method }
+		=> expect => ignore
+		;
+
+=head2 lives_and
+
+Behaviour of C<lives_and> implicit behaviour when C<got { }> block is used.
+
+	# Test::Exception
+	lives_and { is $foo->method, 42 } "should not die and result is 42";
+
+	# Test::YAFT
+	it "should not die and result is 42"
+		=> got { $foo->method }
+		=> expect => 42
+		;
+
+=head2 throws_ok
+
+Behaviour of C<throws_ok> is achieved by providing exception expectations.
+Unline L<Test::Exception> this library uses L<Test::Deep> base expectations
+so instead of C<REGEX> and C<CLASS> one have to use C<expect_re>
+and C<expect_obj_isa>
+
+Stringy exceptions
+
+	# Test::Exception
+	throws_ok { $foo->method } qr/division by zero/, "should test string exception";
+
+	# Test::YAFT
+	it "should test string exception"
+		=> got { $foo->method }
+		=> throws => expect_re (qr/division by zero/)
+		;
+
+OOP exceptions
+
+	# Test::Exception
+	throws_ok { $foo->method } My::X::Division::By::Zero::, "should test OOP exception";
+
+	# Test::YAFT
+	it "should test OOP exception"
+		=> got { $foo->method }
+		=> throws =>
+			& expect_obj_isa (My::X::Division::By::Zero::)
+			& expect_methods (http_status  => HTTP::Status::BAD_REQUEST)
+			& expect_methods (json_content => +{ error => ignore })
+		;
+
+=head1 AUTHOR
+
+Branislav Zahradník <barney@cpan.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+This file is part of L<Test::YAFT> distribution.
+
+=cut

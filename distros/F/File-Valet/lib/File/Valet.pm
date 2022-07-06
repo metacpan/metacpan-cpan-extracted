@@ -11,7 +11,7 @@ use vars qw(@EXPORT @EXPORT_OK @ISA $VERSION);
 BEGIN {
     require Exporter;
     @ISA = qw(Exporter);
-    $VERSION = '1.08';
+    $VERSION = '1.09';
     @EXPORT = @EXPORT_OK = qw(rd_f wr_f ap_f find_home find_temp find_bin lockafile unlockafile unlock_all_the_files);
 }
 
@@ -105,11 +105,8 @@ sub rd_f {
         return undef;
     }
     binmode($fh);
-    my $file_size = -s $fn;
-    if (defined $file_size && $file_size == 0) {
-        $buf = '';
-    }
-    elsif (defined $file_size) {
+    my $file_size = (stat($fn))[7];
+    if ($file_size) {
         my $n_bytes = sysread($fh, $buf, $file_size);
         if (!defined($n_bytes)) {
             ($OK, $ERROR, $ERRNO, $ERRNUM) = ('ERROR', 'read failed', $!, 0+$!);

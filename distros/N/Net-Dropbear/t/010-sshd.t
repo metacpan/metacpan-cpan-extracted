@@ -30,6 +30,8 @@ $sshd->run;
 $planned++;
 cmp_ok( waitpid( $sshd->child->pid, WNOHANG ), '>=', 0, 'SSHd started' );
 
+# Give SSHd some time to come up, incase the stop signal is ineffective
+sleep 0.1;
 $sshd->stop;
 $sshd->wait;
 

@@ -20,14 +20,16 @@ use Algorithm::Cron;
 
 extends 'App::VTide::Command';
 
-our $VERSION = version->new('0.1.16');
+our $VERSION = version->new('0.1.17');
 our $NAME    = 'run';
 our $OPTIONS = [
     'name|n=s',
     'test|T!',
+    'save|s=s',
     'verbose|v+',
 ];
-sub details_sub { return ( $NAME, $OPTIONS )};
+our $LOCAL   = 1;
+sub details_sub { return ( $NAME, $OPTIONS, $LOCAL ) }
 
 has first => (
     is      => 'rw',
@@ -306,8 +308,15 @@ sub command {
 
     my @globs = ref $params->{edit} ? @{ $params->{edit} } : ( $params->{edit} );
 
+    my $title = $params->{title} || $globs[0];
+    my $max = 15;
+    if (length $title > $max) {
+        $title = substr $title, (length $title) - $max, $max + 1;
+    }
+
     eval { require Term::Title; }
-        and Term::Title::set_titlebar($params->{title} || $globs[0]);
+        and Term::Title::set_titlebar($title);
+    system 'tmux', 'rename-window', $title;
 
     my $helper_text = $self->config->get->{editor}{helper};
     my $helper;
@@ -435,7 +444,7 @@ App::VTide::Command::Run - Run a terminal command
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Run version 0.1.16
+This documentation refers to App::VTide::Command::Run version 0.1.17
 
 =head1 SYNOPSIS
 

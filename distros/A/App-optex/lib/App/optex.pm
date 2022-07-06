@@ -2,7 +2,7 @@ package App::optex;
 use strict;
 use warnings;
 
-our $VERSION = "v0.5.3";
+our $VERSION = "v0.5.4";
 
 1;
 
@@ -22,7 +22,8 @@ or make symbolic link to B<optex> in the name of target command.
 
 =head1 DESCRIPTION
 
-This directory contains modules for B<optex> command.
+This directory contains modules for B<optex> command.  Manual for
+B<optex> command is included in the script itself.
 
 =head1 SEE ALSO
 
@@ -32,13 +33,13 @@ L<Getopt::EX>
 
 =head1 LICENSE
 
-Copyright (C) Kazumasa Utashiro.
+Copyright 2017- Kazumasa Utashiro.
 
 You can redistribute it and/or modify it under the same terms
 as Perl itself.
 
 =head1 AUTHOR
 
-Kazumasa Utashiro E<lt>kaz@utashiro.comE<gt>
+Kazumasa Utashiro
 
 =cut

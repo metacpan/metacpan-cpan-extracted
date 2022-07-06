@@ -14,7 +14,7 @@ use Getopt::Long 2.33;
 use Pod::Usage;
 use XML::Writer;
 
-our $VERSION = '0.125';
+our $VERSION = '0.126';
 
 my %opt = (
     latitude => 52.069858,	# Degrees north of Equator
@@ -310,7 +310,7 @@ If you specify a time zone, it must be acceptable to
 L<DateTime|DateTime>.
 
 The orbital data needed to make the prediction are downloaded from
-Celestrak (L<http://celestrak.com/>) using
+Celestrak (L<http://celestrak.org/>) using
 L<Astro::SpaceTrack|Astro::SpaceTrack>.
 
 Passes are reported on the entrance/exit scheme. That is, a pass is held

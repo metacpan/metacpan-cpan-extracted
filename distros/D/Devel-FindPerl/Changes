@@ -1,5 +1,8 @@
 Revision history for Devel-FindPerl
 
+0.016     2022-07-01 12:37:45+02:00 Europe/Amsterdam
+          Delete %ENV entries after localizing them to bypass taint
+
 0.015     2018-10-15 13:00:25+02:00 Europe/Amsterdam
           Import splitpath before using it
 

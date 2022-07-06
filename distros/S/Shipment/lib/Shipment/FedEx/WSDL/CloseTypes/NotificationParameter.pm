@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::CloseTypes::NotificationParameter;
-$Shipment::FedEx::WSDL::CloseTypes::NotificationParameter::VERSION = '3.08';
+$Shipment::FedEx::WSDL::CloseTypes::NotificationParameter::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/close/v2'}
+sub get_xmlns { 'http://fedex.com/ws/close/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,31 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Id_of : ATTR(:get<Id>);
-    my %Value_of : ATTR(:get<Value>);
+my %Id_of :ATTR(:get<Id>);
+my %Value_of :ATTR(:get<Value>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Id
-              Value
+__PACKAGE__->_factory(
+    [ qw(        Id
+        Value
 
-            )
-        ],
-        {   'Id'    => \%Id_of,
-            'Value' => \%Value_of,
-        },
-        {   'Id'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Value' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'Id' => \%Id_of,
+        'Value' => \%Value_of,
+    },
+    {
+        'Id' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Value' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'Id'    => 'Id',
-            'Value' => 'Value',
-        }
-    );
+        'Id' => 'Id',
+        'Value' => 'Value',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -61,7 +67,7 @@ Shipment::FedEx::WSDL::CloseTypes::NotificationParameter
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

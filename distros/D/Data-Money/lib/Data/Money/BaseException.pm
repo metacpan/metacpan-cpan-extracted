@@ -1,6 +1,6 @@
 package Data::Money::BaseException;
 
-$Data::Money::BaseException::VERSION   = '0.19';
+$Data::Money::BaseException::VERSION   = '0.20';
 $Data::Money::BaseException::AUTHORITY = 'cpan:GPHAT';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Data::Money::BaseException - Exception handler for Data::Money.
 
 =head1 VERSION
 
-Version 0.19
+Version 0.20
 
 =cut
 

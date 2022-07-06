@@ -26,10 +26,10 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://git.deguest.jp/jack/Text-PO.git"
+        "url": "https://gitlab.com/jackdeguest/Text-PO.git"
     },
     "bugs": {
-        "url": "https://git.deguest.jp/jack/Text-PO/issues"
+        "url": "https://gitlab.com/jackdeguest/Text-PO/issues"
     },
-    "homepage": "https://git.deguest.jp/jack/Text-PO"
+    "homepage": "https://gitlab.com/jackdeguest/Text-PO"
 }

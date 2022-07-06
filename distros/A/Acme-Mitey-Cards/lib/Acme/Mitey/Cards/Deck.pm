@@ -1,9 +1,9 @@
 package Acme::Mitey::Cards::Deck;
 
-our $VERSION   = '0.005';
+our $VERSION   = '0.008';
 our $AUTHORITY = 'cpan:TOBYINK';
 
-use Acme::Mitey::Cards::Mite;
+use Acme::Mitey::Cards::Mite qw( -bool -is );
 extends 'Acme::Mitey::Cards::Set';
 
 use Acme::Mitey::Cards::Suit;
@@ -14,14 +14,14 @@ use Acme::Mitey::Cards::Hand;
 use Carp qw( croak );
 
 has reverse => (
-	is => 'ro',
-	isa => 'Str',
-	default => 'plain',
+	is       => ro,
+	isa      => 'NonEmptyStr',
+	default  => 'plain',
 );
 
 has original_cards => (
-	is => 'lazy',
-	isa => 'ArrayRef[InstanceOf["Acme::Mitey::Cards::Card"]]',
+	is       => lazy,
+	isa      => 'CardArray',
 );
 
 sub _build_cards {
@@ -38,9 +38,9 @@ sub _build_original_cards {
 	for my $suit ( Acme::Mitey::Cards::Suit->standard_suits ) {
 		for my $number ( 1 .. 10 ) {
 			push @cards, Acme::Mitey::Cards::Card::Numeric->new(
-				suit => $suit,
+				suit   => $suit,
 				number => $number,
-				deck => $self,
+				deck   => $self,
 			);
 		}
 		for my $face ( 'Jack', 'Queen', 'King' ) {
@@ -80,7 +80,7 @@ sub discard_jokers {
 sub deal_hand {
 	my ( $self, %args ) = ( shift, @_ );
 
-	my $n = delete( $args{count} ) // 7;
+	my $n = defined( $args{count} ) ? delete( $args{count} ) : 7;
 	croak "Not enough cards" if $n > $self->count;
 
 	my $took = $self->take( $n );

@@ -19,11 +19,11 @@ no_index:
     - t
     - inc
 requires:
-  Carp: '0'
+  Carp: '1.22'
   Math::BigInt: '1.999819'
   Scalar::Util: '0'
-  perl: '5.006002'
+  perl: '5.006001'
 resources:
   repository: https://github.com/pjacklam/p5-Math-BigInt-Lite.git
-version: '0.25'
+version: '0.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

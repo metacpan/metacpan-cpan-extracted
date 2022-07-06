@@ -1,5 +1,8 @@
 Revision history for Data-ResultSet
 
+1.002   Wed, 06 Jul 2022 09:38:00 -0400
+        Update author contact information
+
 1.001	Mon, 10 Mar 2008 14:07:08 -0400
 	Add missing test dependencies to Makefile.PL
 

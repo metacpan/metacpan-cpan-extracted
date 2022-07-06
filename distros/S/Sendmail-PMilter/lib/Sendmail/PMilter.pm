@@ -1,38 +1,47 @@
-# $Id: PMilter.pm,v 1.28 2004/08/04 17:08:34 tvierling Exp $
-#
-# Copyright (c) 2002-2004 Todd Vierling <tv@pobox.com> <tv@duh.org>
-# All rights reserved.
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-# 
-# 1. Redistributions of source code must retain the above copyright notice,
-# this list of conditions and the following disclaimer.
-# 
-# 2. Redistributions in binary form must reproduce the above copyright
-# notice, this list of conditions and the following disclaimer in the
-# documentation and/or other materials provided with the distribution.
-# 
-# 3. Neither the name of the author nor the names of contributors may be used
-# to endorse or promote products derived from this software without specific
-# prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
+=pod
+
+=head1 LICENSE
+
+Copyright (c) 2016-2022 G.W. Haywood.  All rights reserved.
+  With thanks to all those who have trodden these paths before,
+  including
+Copyright (c) 2002-2004 Todd Vierling.  All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notices,
+this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright
+notices, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+3. Neither the name of the author nor the names of contributors may be used
+to endorse or promote products derived from this software without specific
+prior written permission.  In the case of G.W. Haywood this permission is
+hereby now granted.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+
+=cut
 
 package Sendmail::PMilter;
 
-use 5.006;
-use base Exporter;
+use 5.014;	# Don't use 5.016 yet.  That would enable feature 'unicode_strings', and we
+		# probably aren't quite ready for that.  We're counting *characters* passed
+		# between us and Sendmail, and Sendmail thinks that they're *bytes*.
+use parent 'Exporter';
 
 use strict;
 use warnings;
@@ -41,12 +50,13 @@ use Carp;
 use Errno;
 use IO::Select;
 use POSIX;
-use Sendmail::Milter 0.18; # get needed constants
 use Socket;
 use Symbol;
 use UNIVERSAL;
 
-our $VERSION = '1.00';
+our $VERSION = '1.21';
+$VERSION = eval $VERSION;
+
 our $DEBUG = 0;
 
 =pod
@@ -62,59 +72,229 @@ Sendmail::PMilter - Perl binding of Sendmail Milter protocol
     my $milter = new Sendmail::PMilter;
 
     $milter->auto_setconn(NAME);
-    $milter->register(NAME, { CALLBACKS }, FLAGS);
+    $milter->register(NAME, { CALLBACKS }[, FLAGS]);
     $milter->main();
 
 =head1 DESCRIPTION
 
 Sendmail::PMilter is a mail filtering API implementing the Sendmail
-milter protocol in pure Perl.  This allows Sendmail servers (and perhaps
-other MTAs implementing milter) to filter and modify mail in transit
-during the SMTP connection, all in Perl.
+Milter Protocol in Perl.  This allows the administrator of Sendmail
+(and perhaps other MTAs which implement the Milter Protocol) to use
+pure Perl code to filter and modify mail during an SMTP connection.
 
-It should be noted that PMilter 0.90 and later is NOT compatible with
-scripts written for PMilter 0.5 and earlier.  The API has been reworked
-significantly, and the enhanced APIs and rule logic provided by PMilter
-0.5 and earlier has been factored out for inclusion in a separate package
-to be called Mail::Milter.
+Over the years, the protocol which governs the communication between
+qSendmail and its milters has passed through a number of revisions.
+
+This documentation is for Sendmail::PMilter versions 1.21 and later,
+which now supports Milter Protocol Version 6.  This is a substantial
+upgrade from earlier versions, which at best supported up to Milter
+Protocol Version 2 - this was first seen in Sendmail version 8.14.0
+which was released on January 31st 2007.
+
+Sendmail::PMilter now uses neither the original Sendmail::Milter (it
+is obsolete, badly flawed and unmaintained) nor the Sendmail::Milter
+which was packaged with earlier versions of Sendmail::PMilter as a
+temporary workaround for the broken original.
+
+For communications between the MTA and the milter, a 'dispatcher' acts
+as a go-between.  This must be chosen when the milter is initialized,
+before it serves requests.  Several dispatchers are provided within
+the Sendmail::PMilter module, but in versions before 1.20 all the
+dispatchers suffered from issues of varying gravity.  The 'prefork'
+dispatcher (see DISPATCHERS below) has now been extensively exercised
+by the current maintainer, but although the others have been patched
+from issue reports going back more than a decade from the time of
+writing (June 2019) THEY HAVE NOT BEEN TESTED.  Feedback via the CPAN
+issue tracking system is encouraged.  If you have developed your own
+dispatcher you can either pass a code reference to set_dispatcher() or
+set an environment variable to point to it.  Sendmail::PMilter will
+then use it instead of a built-in dispatcher.
 
 =head1 METHODS
 
-=over 4
-
 =cut
+
+##### Protocol constants
+# The SMFIS_* values here are not the same as those used in the Sendmail sources
+# (see mfapi.h) so that hopefully "0" and "1" won't be used as response codes by
+# mistake.  The other protocol constants below are unchanged from those used in
+# the Sendmail sources.
+
+use constant SMFIS_CONTINUE	=> 100;
+use constant SMFIS_REJECT	=> 101;
+use constant SMFIS_DISCARD	=> 102;
+use constant SMFIS_ACCEPT	=> 103;
+use constant SMFIS_TEMPFAIL	=> 104;
+use constant SMFIS_ALL_OPTS	=> 110;
+
+# Milter progessing 'places' (see mfapi.h, values are the same).
+use constant SMFIM_CONNECT	=> 0;	# connect
+use constant SMFIM_HELO		=> 1;	# HELO/EHLO
+use constant SMFIM_ENVFROM	=> 2;	# MAIL FROM
+use constant SMFIM_ENVRCPT	=> 3;	# RCPT TO
+use constant SMFIM_DATA		=> 4;	# DATA
+use constant SMFIM_EOM		=> 5;	# END OF MESSAGE (final dot)
+use constant SMFIM_EOH		=> 6;	# END OF HEADER
+
+# Some of these things have been switched around from their order of
+# presentation in the Sendmail sources but the values are the same.
+######################################################################
+# Taken from .../sendmail-8.15.2/include/libmilter/mfdef.h
+######################################################################
+#if _FFR_MDS_NEGOTIATE
+# define MILTER_MDS_64K ((64 * 1024) - 1)
+# define MILTER_MDS_256K ((256 * 1024) - 1)
+# define MILTER_MDS_1M  ((1024 * 1024) - 1)
+#endif /* _FFR_MDS_NEGOTIATE */
+######################################################################
+# These so-called 'protocols' apply to the SMFIP_* flags:
+#define SMFI_V1_PROT    0x0000003FL     The protocol of V1 filter.  We won't bother with V1, it's obsolete.
+#define SMFI_V2_PROT    0x0000007FL     The protocol of V2 filter
+use constant SMFI_V2_PROT	=> 0x0000007F;	# The protocol flags available in Milter Protocol Version 2.
+#use constant SMFI_V4_PROT	=> 0x000003FF;	# The protocol flags available in Milter Protocol Version 4.
+use constant SMFI_V6_PROT	=> 0x001FFFFF;	# The protocol flags available in Milter Protocol Version 6.
+use constant SMFI_CURR_PROT	=> 0x001FFFFF;	# The protocol flags available in the current Milter Protocol Version (which at July 2019 is Version 6).
+######################################################################
+# What the MTA can send/filter wants in protocol
+use constant SMFIP_NOCONNECT	=> 0x00000001;	# MTA should not send connect info
+use constant SMFIP_NOHELO	=> 0x00000002;	# MTA should not send HELO info
+use constant SMFIP_NOMAIL	=> 0x00000004;	# MTA should not send MAIL info
+use constant SMFIP_NORCPT	=> 0x00000008;	# MTA should not send RCPT info
+use constant SMFIP_NOBODY	=> 0x00000010;	# MTA should not send body
+use constant SMFIP_NOHDRS	=> 0x00000020;	# MTA should not send headers
+use constant SMFIP_NOEOH	=> 0x00000040;	# MTA should not send EOH
+use constant SMFIP_NR_HDR	=> 0x00000080;	# No reply for headers
+use constant SMFIP_NOHREPL	=> 0x00000080;  # No reply for headers (backward compatibility, do not use, same as SMFIP_NR_HDR)
+use constant SMFIP_NOUNKNOWN	=> 0x00000100;	# MTA should not send unknown commands
+use constant SMFIP_NODATA	=> 0x00000200;	# MTA should not send DATA
+use constant SMFIP_SKIP		=> 0x00000400;	# MTA understands SMFIS_SKIP called from EOM callback.
+use constant SMFIP_RCPT_REJ	=> 0x00000800;	# MTA should also send rejected RCPTs
+use constant SMFIP_NR_CONN	=> 0x00001000;	# No reply for connect
+use constant SMFIP_NR_HELO	=> 0x00002000;	# No reply for HELO
+use constant SMFIP_NR_MAIL	=> 0x00004000;	# No reply for MAIL
+use constant SMFIP_NR_RCPT	=> 0x00008000;	# No reply for RCPT
+use constant SMFIP_NR_DATA	=> 0x00010000;	# No reply for DATA
+use constant SMFIP_NR_UNKN	=> 0x00020000;	# No reply for UNKN
+use constant SMFIP_NR_EOH	=> 0x00040000;	# No reply for eoh
+use constant SMFIP_NR_BODY	=> 0x00080000;	# No reply for body chunk
+use constant SMFIP_HDR_LEADSPC	=> 0x00100000;	# header value leading space
+use constant SMFIP_MDS_256K	=> 0x10000000;	# MILTER_MAX_DATA_SIZE=256K
+use constant SMFIP_MDS_1M	=> 0x20000000;	# MILTER_MAX_DATA_SIZE=1M
+######################################################################
+# Taken from .../sendmail-8.15.2/include/libmilter/mfapi.h, and
+# reformatted a little.
+######################################################################
+# These so-called 'actions' apply to the SMFIF_* flags:
+#define SMFI_V1_ACTS    0x0000000FL	The actions of V1 filter
+#define SMFI_V2_ACTS    0x0000003FL	The actions of V2 filter
+#define SMFI_CURR_ACTS  0x000001FFL	actions of current version
+######################################################################
+#define SMFIF_NONE        0x00000000L	no flags
+#define SMFIF_ADDHDRS     0x00000001L	filter may add headers
+#define SMFIF_CHGBODY     0x00000002L	filter may replace body
+#define SMFIF_MODBODY   SMFIF_CHGBODY	backwards compatible
+#define SMFIF_ADDRCPT     0x00000004L	filter may add recipients
+#define SMFIF_DELRCPT     0x00000008L	filter may delete recipients
+#define SMFIF_CHGHDRS     0x00000010L	filter may change/delete headers
+#define SMFIF_QUARANTINE  0x00000020L	filter may quarantine envelope		<<========= "envelope"???
+#define SMFIF_CHGFROM	  0x00000040L	filter may change "from" (envelope sender)
+#define SMFIF_ADDRCPT_PAR 0x00000080L	add recipients incl. args
+#define SMFIF_SETSYMLIST  0x00000100L	filter can send set of symbols (macros) that it wants
+######################################################################
+#		Capability	FLAG value		Available in milter protocol version (*)
+use constant SMFIF_NONE		=> 0x0000;		# Unused	(*) There's a bit of a muddle about V3,
+use constant SMFIF_ADDHDRS	=> 0x0001;		# V1 Add headers	but nobody's using it any more.
+use constant SMFIF_MODBODY	=> 0x0002;		# V1 Change body (for compatibility with old code, use SMFIF_CHGBODY in new code)
+use constant SMFIF_CHGBODY	=> SMFIF_MODBODY;	# V2 Change body
+use constant SMFIF_ADDRCPT	=> 0x0004;		# V1 Add recipient
+use constant SMFIF_DELRCPT	=> 0x0008;		# V1 Delete recipient
+use constant SMFIF_CHGHDRS	=> 0x0010;		# V2 Change headers
+use constant SMFIF_QUARANTINE	=> 0x0020;		# V2 quarantine entire message - last of the V2 flags
+use constant SMFIF_CHGFROM	=> 0x0040;		# V6 Change envelope sender
+use constant SMFIF_ADDRCPT_PAR	=> 0x0080;		# V6 Add recipients incl. args
+use constant SMFIF_SETSYMLIST	=> 0x0100;		# V6 Filter can send set of symbols (macros) that it wants
+
+use constant SMFI_V1_ACTS	=> SMFIF_ADDHDRS|SMFIF_CHGBODY|SMFIF_ADDRCPT|SMFIF_DELRCPT;
+use constant SMFI_V2_ACTS	=> SMFI_V1_ACTS|SMFIF_CHGHDRS|SMFIF_QUARANTINE;
+use constant SMFI_V6_ACTS	=> SMFI_V2_ACTS|SMFIF_CHGFROM|SMFIF_ADDRCPT_PAR|SMFIF_SETSYMLIST;
+use constant SMFI_CURR_ACTS	=> SMFI_V6_ACTS;	# All capabilities.  See mfapi.h and mfdef.h
+
+# See libmilter/smfi.c
+use constant MAXREPLYLEN	=> 980;
+use constant MAXREPLIES		=> 32;
 
 ##### Symbols exported to the caller
 
 my @smflags = qw(
+	SMFIP_NOCONNECT
+	SMFIP_NOHELO
+	SMFIP_NOMAIL
+	SMFIP_NORCPT
+	SMFIP_NOBODY
+	SMFIP_NOHDRS
+	SMFIP_NOEOH
+	SMFIP_NOUNKNOWN
+	SMFIP_NODATA
+	SMFIP_RCPT_REJ
+	SMFIP_SKIP
+	SMFIP_NR_CONN
+	SMFIP_NR_HELO
+	SMFIP_NR_MAIL
+	SMFIP_NR_RCPT
+	SMFIP_NR_DATA
+	SMFIP_NR_HDR
+	SMFIP_NR_EOH
+	SMFIP_NR_BODY
+	SMFIP_NR_UNKN
+	SMFIP_HDR_LEADSPC
+	SMFIP_MDS_256K
+	SMFIP_MDS_1M
+
+	SMFIM_CONNECT
+	SMFIM_HELO
+	SMFIM_ENVFROM
+	SMFIM_ENVRCPT
+	SMFIM_DATA
+	SMFIM_EOM
+	SMFIM_EOH
+
 	SMFIS_CONTINUE
 	SMFIS_REJECT
 	SMFIS_DISCARD
 	SMFIS_ACCEPT
 	SMFIS_TEMPFAIL
+	SMFIS_ALL_OPTS
 
+	SMFIF_NONE
 	SMFIF_ADDHDRS
 	SMFIF_CHGBODY
 	SMFIF_ADDRCPT
 	SMFIF_DELRCPT
 	SMFIF_CHGHDRS
-	SMFIF_MODBODY
 	SMFIF_QUARANTINE
-	SMFIF_SETSENDER
+	SMFIF_CHGFROM
+	SMFIF_ADDRCPT_PAR
+	SMFIF_SETSYMLIST
 
-	SMFI_V1_ACTS
 	SMFI_V2_ACTS
+	SMFI_V6_ACTS
 	SMFI_CURR_ACTS
+
+	SMFI_V2_PROT
+	SMFI_V6_PROT
+	SMFI_CURR_PROT
+
+	MAXREPLYLEN
+	MAXREPLIES
 );
 our @EXPORT_OK = (@smflags, qw(
 	%DEFAULT_CALLBACKS
 ));
 our %EXPORT_TAGS = ( all => [ @smflags ] );
+our $enable_chgfrom = 0;
 
-use constant SMFIF_QUARANTINE	=> 0x20;
-use constant SMFIF_SETSENDER	=> 0x40;
-
-our $enable_setsender = 0;
+my @callback_names = qw(negotiate connect helo envfrom envrcpt data header eoh body eom close abort unknown);
+our %DEFAULT_CALLBACKS = map { $_ => $_.'_callback' } @callback_names;
 
 ##### Methods
 
@@ -123,6 +303,8 @@ sub new ($) {
 }
 
 =pod
+
+=over 4
 
 =item get_max_interpreters()
 
@@ -166,11 +348,12 @@ MAXCHILDREN (default 0, meaning unlimited) specifies the maximum number of
 connections that may be serviced simultaneously.  If a connection arrives
 with the number of active connections above this limit, the milter will
 immediately return a temporary failure condition and close the connection.
+Passing a value for MAXCHILDREN is optional.
 
 MAXREQ (default 0, meaning unlimited) is the maximum number of requests that
 a child may service before being recycled.  It is not guaranteed that the
 interpreter will service this many requests, only that it will not go over
-the limit.
+the limit.  MAXCHILDREN must be given if MAXREQ is to be set.
 
 Any callback which C<die>s will have its output sent to C<warn>, followed by
 a clean shutdown of the milter connection.  To catch any warnings generated
@@ -179,19 +362,19 @@ C<$SIG{__WARN__}> to a user-defined subroutine.  (See L<perlvar>.)
 
 =cut
 
-sub main ($;$$) {
+sub main ($;$$$) {
 	require Sendmail::PMilter::Context;
 
 	my $this = shift;
-
 	croak 'main: socket not bound' unless defined($this->{socket});
 	croak 'main: callbacks not registered' unless defined($this->{callbacks});
+	croak 'main: milter protocol version not defined' unless defined($this->{'milter protocol version'});
 
 	my $max_interpreters = shift;
 	my $max_requests = shift;
 
-	$this->{max_interpreters} = $max_interpreters if (defined($max_interpreters) && $max_interpreters !~ /\D/);
-	$this->{max_requests} = $max_requests if (defined($max_requests) && $max_requests !~ /\D/);
+	$this->{max_interpreters} = $max_interpreters if (defined($max_interpreters) && $max_interpreters =~ /^\d+$/); # This test doesn't permit an empty string.
+	$this->{max_requests} = $max_requests if (defined($max_requests) && $max_requests =~ /^\d+$/);
 
 	my $dispatcher = $this->{dispatcher};
 
@@ -201,7 +384,7 @@ sub main ($;$$) {
 	}
 
 	my $handler = sub {
-		my $ctx = new Sendmail::PMilter::Context(shift, $this->{callbacks}, $this->{callback_flags});
+		my $ctx = new Sendmail::PMilter::Context(shift, $this->{callbacks}, $this->{callback_flags}, $this->{'milter protocol version'});
 
 		$ctx->main();
 	};
@@ -216,26 +399,42 @@ sub main ($;$$) {
 
 Sets up the main milter loop configuration.
 
-NAME is the name of the milter.  For compatibility with the official
-Sendmail::Milter distribution, this should be the same name as passed to
+NAME is the name of the milter.  This should be the same name as passed to
 auto_getconn() or auto_setconn(), but this PMilter implementation does not
 enforce this.
 
-CALLBACKS is a hash reference containing one or more callback subroutines.  
+CALLBACKS is a hash reference containing one or more callback subroutines.
+For example
+
+  my %callbacks = 
+  (
+    'negotiate' => \&my_negotiate_callback,
+    'connect'   => \&my_connect_callback,
+    'helo'      => \&my_helo_callback,
+    'envfrom'   => \&my_envfrom_callback,
+    'close'     => \&my_close_callback,
+    'abort'     => \&my_abort_callback,
+  );
+  $milter->register( $milter_name, \%callbacks );
+
 If a callback is not named in this hashref, the caller's package will be
 searched for subroutines named "CALLBACK_callback", where CALLBACK is the
 name of the callback function.
 
-FLAGS, if specified, is a bitmask of message modification actions (a bitwise
-OR of the SMFIF_* constants, or SMFI_CURR_ACTS to ask for all capabilities)
-that are requested by the callback object for use during message processing.  
-If any bit is not set in this mask, its corresponding action will not be
-allowed during message processing.
+FLAGS is accepted for backward compatibility with older versions of
+this module.  Consider it deprecated.  Set it to SMFI_V6_PROT for all
+available 'actions' in any recent (last few years) Sendmail version.
+
+If no C<negotiate> callback is registered, then by default the protocol
+steps available are as described in .../libmilter/engine.c in the
+Sendmail sources.  This means all the registered CALLBACKS plus the
+SKIP function call which is allowed in the End Of Message callback.
+Note that SMFIP_RCPT_REJ is specifically not included.
 
 C<register()> must be called successfully exactly once.  If called a second
 time, the previously registered callbacks will be erased.
 
-Returns a true value on success, undef on failure.
+Returns 1 on success, undef on failure.
 
 =cut
 
@@ -255,21 +454,22 @@ sub register ($$$;$) {
 	# make internal copy, and convert to code references
 	$callbacks = { %$callbacks };
 
-	foreach my $cbname (keys %Sendmail::Milter::DEFAULT_CALLBACKS) {
-		my $cb = $callbacks->{$cbname};
-
-		if (defined($cb) && !UNIVERSAL::isa($cb, 'CODE')) {
-			$cb = qualify_to_ref($cb, $pkg);
-			if (exists(&$cb)) {
-				$callbacks->{$cbname} = \&$cb;
-			} else {
-				delete $callbacks->{$cbname};
-			}
+	foreach my $cbname (keys %DEFAULT_CALLBACKS) {
+	    my $cb = $callbacks->{$cbname};
+	    if (defined($cb) && !UNIVERSAL::isa($cb, 'CODE')) {
+		$cb = qualify_to_ref($cb, $pkg);
+		if (exists(&$cb)) {
+		    $callbacks->{$cbname} = \&$cb;
+		} else {
+		    delete $callbacks->{$cbname};
 		}
+	    }
 	}
 
 	$this->{callbacks} = $callbacks;
 	$this->{callback_flags} = shift || 0;
+	# MILTER PROTOCOL VERSION
+	$this->{'milter protocol version'} = ($this->{callback_flags} & ~0x3F) ? 6 : 2;
 	1;
 }
 
@@ -470,10 +670,6 @@ these methods would not be useful with them.
 
 =over 4
 
-=cut
-
-=pod
-
 =item auto_getconn(NAME[, CONFIG])
 
 Returns the connection descriptor for milter NAME in Sendmail configuration
@@ -542,8 +738,9 @@ sub auto_setconn ($$;$) {
 
 =item get_sendmail_cf()
 
-Returns the pathname of the Sendmail configuration file set by
-C<set_sendmail_cf()>, else the default of C</etc/mail/sendmail.cf>.
+Returns the pathname of the Sendmail configuration file.  If this has
+been set by C<set_sendmail_cf()>, then that is the value returned.
+Otherwise the default pathname C</etc/mail/sendmail.cf> is returned.
 
 =cut
 
@@ -606,11 +803,39 @@ sub get_sendmail_class ($$;$) {
 
 =pod
 
+=item get_sendmail_option(OPTION[, CONFIG])
+
+Returns a list containing the first occurrence of Sendmail option
+OPTION in Sendmail configuration file CONFIG (default C</etc/mail/sendmail.cf>,
+or whatever has been set by C<set_sendmail_cf()>).  Returns the
+value of the option or undef if it is not found.  This can be used
+to learn configuration parameters such as Milter.maxdatasize.
+
+=cut
+
+sub get_sendmail_option ($$;$) {
+	my $this = shift;
+	my $option = shift;
+	my $cf = shift || $this->get_sendmail_cf();
+	my %entries;
+	local *CF;
+	open(CF, '<'.$cf) || croak "get_sendmail_option: open $cf: $!";
+	while (<CF>) {
+		s/\s+$//; # also trims newlines
+		if (/^O\s*$option=(\d+)/) { return $1; }
+	}
+	close(CF);
+	undef;
+}
+
+=pod
+
 =item set_sendmail_cf(FILENAME)
 
 Set the default filename used by C<auto_getconn>, C<auto_setconn>, and
 C<sendmail_class> to find Sendmail-specific configuration data.  If not
 explicitly set by this method, it defaults to C</etc/mail/sendmail.cf>.
+Returns 1.
 
 =cut
 
@@ -643,6 +868,8 @@ that may be passed directly to C<set_dispatcher()>.
 
 =item (environment) PMILTER_DISPATCHER=ithread
 
+June 2019: This dispatcher has not been tested adequately.
+
 The C<ithread> dispatcher spins up a new thread upon each connection to
 the milter socket.  This provides a thread-based model that may be more
 resource efficient than the similar C<postfork> dispatcher.  This requires
@@ -654,6 +881,7 @@ C<threads> module (available on Perl 5.8 or later only).
 sub ithread_dispatcher {
 	require threads;
 	require threads::shared;
+	require Thread::Semaphore;
 
 	my $nchildren = 0;
 
@@ -664,7 +892,12 @@ sub ithread_dispatcher {
 		my $lsocket = shift;
 		my $handler = shift;
 		my $maxchildren = $this->get_max_interpreters();
+		my $child_sem;
 
+		if ($maxchildren) {
+		    $child_sem = Thread::Semaphore->new($maxchildren);
+		}
+		
 		my $siginfo = exists($SIG{INFO}) ? 'INFO' : 'USR1';
 		local $SIG{$siginfo} = sub {
 			warn "Number of active children: $nchildren\n";
@@ -681,6 +914,9 @@ sub ithread_dispatcher {
 
 			lock($nchildren);
 			$nchildren--;
+			if ($child_sem) {
+			    $child_sem->up();
+			}
 			warn $died if $died;
 		};
 
@@ -690,27 +926,19 @@ sub ithread_dispatcher {
 
 			warn "$$: incoming connection\n" if ($DEBUG > 0);
 
-			# If the load's too high, fail and go back to top of loop.
-			if ($maxchildren) {
-				my $cnchildren = $nchildren; # make constant
-
-				if ($cnchildren >= $maxchildren) {
-					warn "load too high: children $cnchildren >= max $maxchildren";
-
-					$socket->autoflush(1);
-					$socket->print(pack('N/a*', 't')); # SMFIR_TEMPFAIL
-					$socket->close();
-					next;
-				}
+			if ($child_sem and ! $child_sem->down_nb()) {
+			    warn "pausing for high load: children $nchildren >= max $maxchildren";
+			    my $start = time();
+			    $child_sem->down();
+			    my $end = time();
+			    warn sprintf("paused for %.1f seconds due to high load", $end - $start); 
 			}
 
 			# scoping block for lock()
 			{
 				lock($nchildren);
-
-				die "thread creation failed: $!\n"
-					unless (threads->create($child_sub, $socket));
-
+				my $t = threads->create($child_sub, $socket) || die "thread creation failed: $!\n";
+				$t->detach;
 				threads->yield();
 				$nchildren++;
 			}
@@ -724,6 +952,8 @@ sub ithread_dispatcher {
 
 =item (environment) PMILTER_DISPATCHER=prefork
 
+June 2019: This dispatcher has been tested extensively by the maintainer.
+
 The C<prefork> dispatcher forks the main Perl process before accepting
 connections, and uses the main process to monitor the children.  This
 should be appropriate for steady traffic flow sites.  Note that if
@@ -731,9 +961,8 @@ MAXINTERP is not set in the call to C<main()> or in PARAMS, an internal
 default of 10 processes will be used; similarly, if MAXREQ is not set, 100
 requests will be served per child.
 
-Currently the child process pool is fixed-size:  discarded children will
-be immediately replaced.  This may change to use a dynamic sizing method
-in the future, more like the Apache webserver's fork-based model.
+Currently the child process pool is fixed in size:  discarded children will
+be replaced immediately.
 
 PARAMS, if specified, is a hash of key-value pairs defining parameters for
 the dispatcher.  The available parameters that may be set are:
@@ -859,13 +1088,18 @@ sub prefork_dispatcher (@) {
 
 =item (environment) PMILTER_DISPATCHER=postfork
 
-In this release, this is the default dispatcher for PMilter if no explicit
-dispatcher is set.
+June 2019: This dispatcher has not been tested adequately.
+
+This is the default dispatcher for PMilter if no explicit dispatcher is set.
 
 The C<postfork> dispatcher forks the main Perl process upon each connection
 to the milter socket.  This is adequate for machines that get bursty but
 otherwise mostly idle mail traffic, as the idle-time resource consumption is
 very low.
+
+If the maximum number of interpreters is running when a new connection
+comes in, this dispatcher blocks until a slot becomes available for a
+new interpreter.
 
 =cut
 
@@ -900,17 +1134,21 @@ sub postfork_dispatcher () {
 			warn "$$: incoming connection\n" if ($DEBUG > 0);
 
 			# If the load's too high, fail and go back to top of loop.
-			if ($maxchildren) {
-				my $cnchildren = $nchildren; # make constant
+			my $paused = undef;
+			while ($maxchildren) {
+			    my $cnchildren = $nchildren; # make constant
 
-				if ($cnchildren >= $maxchildren) {
-					warn "load too high: children $cnchildren >= max $maxchildren";
-
-					$socket->autoflush(1);
-					$socket->print(pack('N/a*', 't')); # SMFIR_TEMPFAIL
-					$socket->close();
-					next;
-				}
+			    if ($cnchildren >= $maxchildren) {
+				warn "pausing for high load: children $cnchildren >= max $maxchildren";
+				if ( ! $paused ) { $paused = time(); }
+				pause();
+			    }
+			    else {
+				last;
+			    }
+			}
+			if ($paused) {
+			    warn sprintf( "paused for %.1f seconds due to high load", time() - $paused );
 			}
 
 			my $pid = fork();
@@ -925,6 +1163,7 @@ sub postfork_dispatcher () {
 				undef $lsocket;
 				undef $@;
 				$SIG{PIPE} = 'IGNORE'; # so close_callback will be reached
+				$SIG{CHLD} = 'DEFAULT';
 				$SIG{$siginfo} = 'DEFAULT';
 
 				&$handler($socket);
@@ -941,14 +1180,16 @@ sub postfork_dispatcher () {
 
 =item (environment) PMILTER_DISPATCHER=sequential
 
+June 2019: This dispatcher has not been tested adequately.
+
 The C<sequential> dispatcher forces one request to be served at a time,
 making other requests wait on the socket for the next pass through the loop.
 This is not suitable for most production installations, but may be quite
 useful for milter debugging or other software development purposes.
 
-Note that, because the default socket backlog is 5 connections, it may be
-wise to increase this backlog by calling C<set_listen()> before entering
-C<main()> if using this dispatcher.
+Note that, because the default socket backlog is 5 connections, if you
+use this dispatcher it may be wise to increase this backlog by calling
+C<set_listen()> before entering C<main()>.
 
 =cut
 
@@ -976,6 +1217,8 @@ __END__
 
 =pod
 
+=back
+
 =head1 EXPORTS
 
 Each of these symbols may be imported explicitly, imported with tag C<:all>,
@@ -985,62 +1228,21 @@ or referenced as part of the C<Sendmail::PMilter::> package.
 
 =item Callback Return Values
 
-Of these, SMFIS_CONTINUE will allow the milter to continue being called for
-the remainder of the message phases.  All others will terminate processing
-of the current message and take the noted action.
-
-As a special exception, SMFIS_REJECT and SMFIS_TEMPFAIL in the C<envrcpt>
-callback will reject only the current recipient, otherwise continuing
-message processing as if SMFIS_CONTINUE were returned.
-
   SMFIS_CONTINUE - continue processing the message
   SMFIS_REJECT - reject the message with a 5xx error
   SMFIS_DISCARD - accept, but discard the message
-  SMFIS_ACCEPT - accept the whole message as-is
+  SMFIS_ACCEPT - accept the message without further processing
   SMFIS_TEMPFAIL - reject the message with a 4xx error
 
-=item Milter Capability Request Flags
+In the C<envrcpt> callback, SMFIS_REJECT and SMFIS_TEMPFAIL will reject
+only the current recipient.  Message processing will continue for any
+other recipients as if SMFIS_CONTINUE had been returned.
 
-These values are bitmasks passed as the FLAGS argument to C<register()>.  
-Some MTAs may choose different methods of resource allocation, so keeping
-this list short may help the MTA's memory usage.  If the needed capabilities
-are not known, however, C<SMFI_CURR_ACTS> should be used.
-
-  SMFIF_ADDHDRS - allow $ctx->addheader()
-  SMFIF_CHGBODY - allow $ctx->replacebody()
-  SMFIF_MODBODY - (compatibility synonym for SMFIF_CHGBODY)
-  SMFIF_ADDRCPT - allow $ctx->addrcpt()
-  SMFIF_DELRCPT - allow $ctx->delrcpt()
-  SMFIF_CHGHDRS - allow $ctx->chgheader()
-
-  SMFIF_QUARANTINE - allow $ctx->quarantine()
-    (requires Sendmail 8.13; not defined in Sendmail::Milter)
-
-  SMFIF_SETSENDER - allow $ctx->setsender()
-    (requires special Sendmail patch; see below[*])
-
-  SMFI_V1_ACTS - SMFIF_ADDHDRS through SMFIF_DELRCPT
-    (Sendmail 8.11 _FFR_MILTER capabilities)
-
-  SMFI_V2_ACTS - SMFIF_ADDHDRS through SMFIF_CHGHDRS
-  SMFI_CURR_ACTS - (compatibility synonym for SMFI_V2_ACTS)
-    (Sendmail 8.12 capabilities)
-
-  (Currently no combined macro includes SMFIF_QUARANTINE or
-  SMFIF_SETSENDER.)
-
-[*] NOTE: SMFIF_SETSENDER is not official as of Sendmail 8.13.x. To enable
-this flag, Sendmail must be patched with the diff available from:
-
-  C<http://www.sourceforge.net/projects/mlfi-setsender>
-
-Additionally, the following statement must appear after the "use"
-statements in your milter program; otherwise, setsender() will always fail
-when called:
-
-  local $Sendmail::PMilter::enable_setsender = 1;
-
-=back
+In all callbacks, SMFIS_CONTINUE tells the MTA to continue calling the
+milter (and any other milters which may be installed), for the remaining
+message steps.  Except as noted for the C<envrcpt> callback, all the
+other return values terminate processing of the message by all the
+installed milters.  Message disposal is according to the return value.
 
 =back
 
@@ -1069,41 +1271,23 @@ in detail here.
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Todd Vierling, E<lt>tv@duh.orgE<gt> E<lt>tv@pobox.comE<gt>
+Todd Vierling, Ged Haywood.
 
 =head1 Maintenance
 
-Since 0.96 Sendmail::Pmilter is no longer maintained on
-sourceforge.net, cpan:AVAR took it over in version 0.96 to fix a minor
-bug and currently owns the module in PAUSE.
+cpan:GWHAYWOOD now maintains Sendmail::PMilter.  Use the CPAN issue
+tracking system to request more information, or to comment.  Private
+mail is fine but you'll need to use the right email address, it should
+be obvious.  This module is NOT maintained on Sourceforge/Github/etc..
 
-However this module is effectively orphaned and looking for a new
-maintainer. The current maintainer doesn't use Sendmail and probably
-never will again. If this code is important to you and you find a bug
-in it or want something new implemented please:
+=head1 See also
 
-=over
+L<Sendmail::PMilter::Context>
 
-=item *
-
-Fork it & fix it on GitHub at
-L<http://github.com/avar/sendmail-pmilter>
-
-=item *
-
-Send AVAR an E-Mail requesting upload permissions so you can upload
-the fixed version to the CPAN.
-
-=back
-
-=head1 SEE ALSO
-
-L<Sendmail::PMilter::Context> for a description of the arguments
-passed to each callback function
-
-The project homepage:  http://pmilter.sourceforge.net/
+The Sendmail documentation, especially libmilter/docs/* in the sources
+of Sendmail version 8.15.2 and later.
 
 =head1 THANKS
 

@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::PhoneNumber;
-$Shipment::Purolator::WSDLV2::Types::PhoneNumber::VERSION = '3.08';
+$Shipment::Purolator::WSDLV2::Types::PhoneNumber::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,41 +20,47 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %CountryCode_of : ATTR(:get<CountryCode>);
-    my %AreaCode_of : ATTR(:get<AreaCode>);
-    my %Phone_of : ATTR(:get<Phone>);
-    my %Extension_of : ATTR(:get<Extension>);
+my %CountryCode_of :ATTR(:get<CountryCode>);
+my %AreaCode_of :ATTR(:get<AreaCode>);
+my %Phone_of :ATTR(:get<Phone>);
+my %Extension_of :ATTR(:get<Extension>);
 
-    __PACKAGE__->_factory(
-        [   qw(        CountryCode
-              AreaCode
-              Phone
-              Extension
+__PACKAGE__->_factory(
+    [ qw(        CountryCode
+        AreaCode
+        Phone
+        Extension
 
-            )
-        ],
-        {   'CountryCode' => \%CountryCode_of,
-            'AreaCode'    => \%AreaCode_of,
-            'Phone'       => \%Phone_of,
-            'Extension'   => \%Extension_of,
-        },
-        {   'CountryCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'AreaCode'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Phone'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Extension'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'CountryCode' => \%CountryCode_of,
+        'AreaCode' => \%AreaCode_of,
+        'Phone' => \%Phone_of,
+        'Extension' => \%Extension_of,
+    },
+    {
+        'CountryCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'AreaCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Phone' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Extension' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'CountryCode' => 'CountryCode',
-            'AreaCode'    => 'AreaCode',
-            'Phone'       => 'Phone',
-            'Extension'   => 'Extension',
-        }
-    );
+        'CountryCode' => 'CountryCode',
+        'AreaCode' => 'AreaCode',
+        'Phone' => 'Phone',
+        'Extension' => 'Extension',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -71,7 +77,7 @@ Shipment::Purolator::WSDLV2::Types::PhoneNumber
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

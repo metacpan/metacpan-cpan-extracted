@@ -37,6 +37,9 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
+use AsposeSlidesCloud::Object::EffectFormat;
+use AsposeSlidesCloud::Object::FillFormat;
+use AsposeSlidesCloud::Object::LineFormat;
 use AsposeSlidesCloud::Object::ResourceBase;
 use AsposeSlidesCloud::Object::ResourceUri;
 
@@ -192,30 +195,30 @@ __PACKAGE__->method_documentation({
     	read_only => '',
     		},
     'background_styles' => {
-    	datatype => 'ARRAY[ResourceUri]',
+    	datatype => 'ARRAY[FillFormat]',
     	base_name => 'BackgroundStyles',
-    	description => 'Background style links.',
+    	description => 'Background styles.',
     	format => '',
     	read_only => '',
     		},
     'effect_styles' => {
-    	datatype => 'ARRAY[ResourceUri]',
+    	datatype => 'ARRAY[EffectFormat]',
     	base_name => 'EffectStyles',
-    	description => 'Effect style links.',
+    	description => 'Effect styles.',
     	format => '',
     	read_only => '',
     		},
     'fill_styles' => {
-    	datatype => 'ARRAY[ResourceUri]',
+    	datatype => 'ARRAY[FillFormat]',
     	base_name => 'FillStyles',
-    	description => 'Fill style links.',
+    	description => 'Fill styles.',
     	format => '',
     	read_only => '',
     		},
     'line_styles' => {
-    	datatype => 'ARRAY[ResourceUri]',
+    	datatype => 'ARRAY[LineFormat]',
     	base_name => 'LineStyles',
-    	description => 'Line style links.',
+    	description => 'Line style.',
     	format => '',
     	read_only => '',
     		},
@@ -224,10 +227,10 @@ __PACKAGE__->method_documentation({
 __PACKAGE__->swagger_types( {
     'self_uri' => 'ResourceUri',
     'alternate_links' => 'ARRAY[ResourceUri]',
-    'background_styles' => 'ARRAY[ResourceUri]',
-    'effect_styles' => 'ARRAY[ResourceUri]',
-    'fill_styles' => 'ARRAY[ResourceUri]',
-    'line_styles' => 'ARRAY[ResourceUri]'
+    'background_styles' => 'ARRAY[FillFormat]',
+    'effect_styles' => 'ARRAY[EffectFormat]',
+    'fill_styles' => 'ARRAY[FillFormat]',
+    'line_styles' => 'ARRAY[LineFormat]'
 } );
 
 __PACKAGE__->attribute_map( {

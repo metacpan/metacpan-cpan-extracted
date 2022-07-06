@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::ArrayOfSurcharge;
-$Shipment::Purolator::WSDL::Types::ArrayOfSurcharge::VERSION = '3.08';
+$Shipment::Purolator::WSDL::Types::ArrayOfSurcharge::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,24 +20,32 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Surcharge_of : ATTR(:get<Surcharge>);
+my %Surcharge_of :ATTR(:get<Surcharge>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Surcharge
+__PACKAGE__->_factory(
+    [ qw(        Surcharge
 
-            )
-        ],
-        {'Surcharge' => \%Surcharge_of,},
-        {'Surcharge' => 'Shipment::Purolator::WSDL::Types::Surcharge',},
-        {
+    ) ],
+    {
+        'Surcharge' => \%Surcharge_of,
+    },
+    {
+        'Surcharge' => 'Shipment::Purolator::WSDL::Types::Surcharge',
+    },
+    {
 
-            'Surcharge' => 'Surcharge',
-        }
-    );
+        'Surcharge' => 'Surcharge',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -54,7 +62,7 @@ Shipment::Purolator::WSDL::Types::ArrayOfSurcharge
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

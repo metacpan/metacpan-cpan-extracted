@@ -119,3 +119,7 @@ install_command = cpanm .
 [AutoPrereqs]
 
 [Prereqs::Plugins]
+phase = runtime
+
+[Prereqs]
+Code::TidyAll::Plugin::Test::Vars = 0

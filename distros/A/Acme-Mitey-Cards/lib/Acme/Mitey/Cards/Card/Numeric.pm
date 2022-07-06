@@ -1,23 +1,25 @@
 package Acme::Mitey::Cards::Card::Numeric;
 
-our $VERSION   = '0.005';
+our $VERSION   = '0.008';
 our $AUTHORITY = 'cpan:TOBYINK';
 
-use Acme::Mitey::Cards::Mite;
+use Acme::Mitey::Cards::Mite qw( -bool -is );
 extends 'Acme::Mitey::Cards::Card';
 
 use Acme::Mitey::Cards::Suit;
 
 has suit => (
-	is => 'ro',
-	isa => 'InstanceOf["Acme::Mitey::Cards::Suit"]',
-	required => 1,
+	is       => ro,
+	isa      => 'Suit',
+	required => true,
+	coerce   => true,
 );
 
 has number => (
-	is => 'ro',
-	isa => 'Int',
-	required => 1,
+	is       => ro,
+	isa      => 'CardNumber',
+	required => true,
+	coerce   => true,
 );
 
 sub number_or_a {

@@ -10,7 +10,7 @@ my $app1 = App::Env->new( 'App1' );
 ok( defined $app1, 'create env' );
 
 # make sure that worked
-is( $app1->env('Site1_App1'), 1, "check env" );
+is( $app1->env( 'Site1_App1' ), 1, "check env" );
 
 # and brand it
 $app1->setenv( 'AppEnvTestID' => $$ );
@@ -21,14 +21,14 @@ $app1->setenv( 'AppEnvTestID' => $$ );
 
     ok( defined $app2, 'retrieve env' );
 
-    is( $app2->env('AppEnvTestID'), $$, "retrieve env" );
+    is( $app2->env( 'AppEnvTestID' ), $$, "retrieve env" );
 }
 
 {
     # try retrieving something that doesn't exist
     my $app2 = App::Env::retrieve( 'Say What?' );
 
-    ok( ! defined $app2, 'retrieve non-existent env' );
+    ok( !defined $app2, 'retrieve non-existent env' );
 }
 
 done_testing;

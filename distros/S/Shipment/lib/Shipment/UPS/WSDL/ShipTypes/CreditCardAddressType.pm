@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::CreditCardAddressType;
-$Shipment::UPS::WSDL::ShipTypes::CreditCardAddressType::VERSION = '3.08';
+$Shipment::UPS::WSDL::ShipTypes::CreditCardAddressType::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,46 +20,52 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %AddressLine_of : ATTR(:get<AddressLine>);
-    my %City_of : ATTR(:get<City>);
-    my %StateProvinceCode_of : ATTR(:get<StateProvinceCode>);
-    my %PostalCode_of : ATTR(:get<PostalCode>);
-    my %CountryCode_of : ATTR(:get<CountryCode>);
+my %AddressLine_of :ATTR(:get<AddressLine>);
+my %City_of :ATTR(:get<City>);
+my %StateProvinceCode_of :ATTR(:get<StateProvinceCode>);
+my %PostalCode_of :ATTR(:get<PostalCode>);
+my %CountryCode_of :ATTR(:get<CountryCode>);
 
-    __PACKAGE__->_factory(
-        [   qw(        AddressLine
-              City
-              StateProvinceCode
-              PostalCode
-              CountryCode
+__PACKAGE__->_factory(
+    [ qw(        AddressLine
+        City
+        StateProvinceCode
+        PostalCode
+        CountryCode
 
-            )
-        ],
-        {   'AddressLine'       => \%AddressLine_of,
-            'City'              => \%City_of,
-            'StateProvinceCode' => \%StateProvinceCode_of,
-            'PostalCode'        => \%PostalCode_of,
-            'CountryCode'       => \%CountryCode_of,
-        },
-        {   'AddressLine'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'City'              => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'StateProvinceCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'PostalCode'        => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'CountryCode'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'AddressLine' => \%AddressLine_of,
+        'City' => \%City_of,
+        'StateProvinceCode' => \%StateProvinceCode_of,
+        'PostalCode' => \%PostalCode_of,
+        'CountryCode' => \%CountryCode_of,
+    },
+    {
+        'AddressLine' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'City' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'StateProvinceCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'PostalCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'CountryCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'AddressLine'       => 'AddressLine',
-            'City'              => 'City',
-            'StateProvinceCode' => 'StateProvinceCode',
-            'PostalCode'        => 'PostalCode',
-            'CountryCode'       => 'CountryCode',
-        }
-    );
+        'AddressLine' => 'AddressLine',
+        'City' => 'City',
+        'StateProvinceCode' => 'StateProvinceCode',
+        'PostalCode' => 'PostalCode',
+        'CountryCode' => 'CountryCode',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -76,7 +82,7 @@ Shipment::UPS::WSDL::ShipTypes::CreditCardAddressType
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

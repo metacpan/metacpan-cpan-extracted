@@ -1,22 +1,22 @@
 
 package Shipment::Purolator::WSDLV2::Elements::Document;
-$Shipment::Purolator::WSDLV2::Elements::Document::VERSION = '3.08';
+$Shipment::Purolator::WSDLV2::Elements::Document::VERSION = '3.09';
 use strict;
 use warnings;
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' }
 
-    __PACKAGE__->__set_name('Document');
-    __PACKAGE__->__set_nillable(1);
-    __PACKAGE__->__set_minOccurs();
-    __PACKAGE__->__set_maxOccurs();
-    __PACKAGE__->__set_ref();
-    use base qw(
-      SOAP::WSDL::XSD::Typelib::Element
-      Shipment::Purolator::WSDLV2::Types::Document
-    );
+__PACKAGE__->__set_name('Document');
+__PACKAGE__->__set_nillable(1);
+__PACKAGE__->__set_minOccurs();
+__PACKAGE__->__set_maxOccurs();
+__PACKAGE__->__set_ref();
+use base qw(
+    SOAP::WSDL::XSD::Typelib::Element
+    Shipment::Purolator::WSDLV2::Types::Document
+);
 
 }
 
@@ -34,7 +34,7 @@ Shipment::Purolator::WSDLV2::Elements::Document
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

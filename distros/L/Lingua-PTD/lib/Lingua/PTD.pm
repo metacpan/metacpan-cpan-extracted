@@ -1,5 +1,5 @@
 package Lingua::PTD;
-$Lingua::PTD::VERSION = '1.16';
+$Lingua::PTD::VERSION = '1.17';
 use 5.010;
 
 use parent 'Exporter';
@@ -18,6 +18,7 @@ use Lingua::PTD::BzDmp;
 use Lingua::PTD::XzDmp;
 use Lingua::PTD::SQLite;
 use Lingua::PTD::TSV;
+use Lingua::PTD::JSON;
 use Lingua::PTD::StarDict;
 
 =encoding UTF-8
@@ -77,6 +78,7 @@ sub new {
     $self = Lingua::PTD::BzDmp ->new($filename) if $filename =~ /\.dmp\.bz2$/i;
     $self = Lingua::PTD::XzDmp ->new($filename) if $filename =~ /\.dmp\.xz$/i;
     $self = Lingua::PTD::SQLite->new($filename) if $filename =~ /\.sqlite$/i;
+    $self = Lingua::PTD::JSON  ->new($filename) if $filename =~ /\.json$/i;
 
     # default
     $self = Lingua::PTD::Dumper->new($filename) unless $self;
@@ -689,6 +691,7 @@ sub saveAs {
 
     my $done = undef;
     # switch
+    Lingua::PTD::JSON::_save($self => $filename) and $done = 1 if $type =~ /json/i;
     Lingua::PTD::Dumper::_save($self => $filename) and $done = 1 if $type =~ /dmp/i;
     Lingua::PTD::BzDmp::_save( $self => $filename) and $done = 1 if $type =~ /bz2/i;
     Lingua::PTD::XzDmp::_save( $self => $filename) and $done = 1 if $type =~ /xz/i;
@@ -1112,7 +1115,7 @@ Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2014 by Alberto Manuel Brandão Simões
+Copyright (C) 2008-2022 by Alberto Manuel Brandão Simões
 
 =cut
 

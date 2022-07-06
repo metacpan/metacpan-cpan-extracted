@@ -30,8 +30,8 @@ use App::Env;
 
     # import nested alias, which also sets AppOpts
     App::Env::import( 'App4', { Force => 1 } );
-    is( $ENV{Site1_App1}, 3, "import nested alias" );
-    is( $ENV{Alias}, 'App4', "alias w/ AppOpts" );
+    is( $ENV{Site1_App1}, 3,      "import nested alias" );
+    is( $ENV{Alias},      'App4', "alias w/ AppOpts" );
 }
 
 {
@@ -40,8 +40,8 @@ use App::Env;
     # import nested alias, which also sets AppOpts,
     # but override AppOpts
     App::Env::import( 'App4', { Force => 1, AppOpts => { Alias => 'None' } } );
-    is( $ENV{Site1_App1}, 4, "import nested alias" );
-    is( $ENV{Alias}, 'None', "alias w/ overridden AppOpts" );
+    is( $ENV{Site1_App1}, 4,      "import nested alias" );
+    is( $ENV{Alias},      'None', "alias w/ overridden AppOpts" );
 }
 
 

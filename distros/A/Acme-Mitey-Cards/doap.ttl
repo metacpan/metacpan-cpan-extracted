@@ -13,8 +13,8 @@
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
-	doap-deps:develop-requirement [ doap-deps:on "Mite v0.0.4"^^doap-deps:CpanId ];
-	doap-deps:runtime-requirement [ doap-deps:on "perl 5.010001"^^doap-deps:CpanId ];
+	doap-deps:develop-requirement [ doap-deps:on "Mite 0.002004"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008001"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
 	doap:bug-database    <https://github.com/tobyink/p5-mite/issues>;
 	doap:created         "2022-06-22"^^xsd:date;
@@ -25,7 +25,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Acme-Mitey-Cards";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-005>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-008>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-mite>;
@@ -96,6 +96,51 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-Mitey-Cards-0.005.tar.gz>;
 	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "Acme-Mitey-Cards-0.006"^^xsd:string;
+	dc:issued            "2022-07-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Now works on Perl 5.8.";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Rebuild using Mite 0.002004.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-Mitey-Cards-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "Acme-Mitey-Cards-0.007"^^xsd:string;
+	dc:issued            "2022-07-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Rebuild using Mite 0.004000, including using some newer features.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-Mitey-Cards-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "Acme-Mitey-Cards-0.008"^^xsd:string;
+	dc:issued            "2022-07-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Rebuild using Mite 0.005000, including using the new type library feature.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-Mitey-Cards-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

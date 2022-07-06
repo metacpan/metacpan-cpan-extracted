@@ -14,10 +14,11 @@ t/alias.inc
 t/bigintpm.inc
 t/bigintpm.t
 t/bnok-mbil.t
+t/interop-mbi-mbf-mbr-mbil.t
 t/lite.t
 t/mbi_ali.t
-t/with.t
 TODO
+xt/author/band-bior-bxor-mbil.t
 xt/author/bdstr-mbil.t
 xt/author/bestr-mbil.t
 xt/author/bfstr-mbil.t

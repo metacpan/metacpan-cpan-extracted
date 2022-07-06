@@ -12,7 +12,7 @@ my $defines = $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL";
 # Try to detect some common fatal linking errors ahead of time. If we detect
 # that any of these linking problems exist, we then abort the Makefile.PL then
 # and there. This doesn't do anything useful beyond avoiding cpan-tester FAIL reports.
-# To avoid being subjected to the abort, just comment out line 35 below (which is "exit 0;")
+# To avoid being subjected to the abort, just comment out line 38 below (which is "exit 0;")
 
 my $cc;
 
@@ -33,13 +33,30 @@ print "output: $out\n";
 # No linking problem at all if try.exe exists.
 unless(-e 'try.exe') {
   if($out =~ /(`|'|"|\s)_?cpow('|`|"|\s)/) {
-    print "Aborting:\n$out\n";
-    exit 0; # abort the build
+    # check whether cpowl is usable, as is the case with
+    # Strawberry Perl versions 5.12.x
+
+    my $out2 = `$cc -o try2.exe -x c try2.in -lm 2>&1`;
+
+    print "output: $out2\n";
+
+    # No linking problem at all if try2.exe exists.
+    unless(-e 'try2.exe') {
+      if($out2 =~ /(`|'|"|\s)_?cpowl('|`|"|\s)/) {
+        print "Aborting now, both cpow() and cpowl() are unavailable:\n$out2\n";
+        exit 0;
+      }
+    }
   }
+  $defines .= ' -DUSE_CPOWL';
 }
-# Remove the test executable
+# Remove the test executables
 if(-e 'try.exe' && !unlink('./try.exe')) {
   warn "Failed to unlink try.exe";
+}
+
+if(-e 'try2.exe' && !unlink('./try2.exe')) {
+  warn "Failed to unlink try2.exe";
 }
 
 ###############################################

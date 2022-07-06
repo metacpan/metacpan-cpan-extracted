@@ -1,90 +1,91 @@
 
 package Shipment::UPS::WSDL::XAVElements::XAVResponse;
-$Shipment::UPS::WSDL::XAVElements::XAVResponse::VERSION = '3.08';
+$Shipment::UPS::WSDL::XAVElements::XAVResponse::VERSION = '3.09';
 use strict;
 use warnings;
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/xav/v1.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/xav/v1.0' }
 
-    __PACKAGE__->__set_name('XAVResponse');
-    __PACKAGE__->__set_nillable();
-    __PACKAGE__->__set_minOccurs();
-    __PACKAGE__->__set_maxOccurs();
-    __PACKAGE__->__set_ref();
+__PACKAGE__->__set_name('XAVResponse');
+__PACKAGE__->__set_nillable();
+__PACKAGE__->__set_minOccurs();
+__PACKAGE__->__set_maxOccurs();
+__PACKAGE__->__set_ref();
 
-    use base qw(
-      SOAP::WSDL::XSD::Typelib::Element
-      SOAP::WSDL::XSD::Typelib::ComplexType
-    );
+use base qw(
+    SOAP::WSDL::XSD::Typelib::Element
+    SOAP::WSDL::XSD::Typelib::ComplexType
+);
 
-    our $XML_ATTRIBUTE_CLASS;
-    undef $XML_ATTRIBUTE_CLASS;
+our $XML_ATTRIBUTE_CLASS;
+undef $XML_ATTRIBUTE_CLASS;
 
-    sub __get_attr_class {
-        return $XML_ATTRIBUTE_CLASS;
+sub __get_attr_class {
+    return $XML_ATTRIBUTE_CLASS;
+}
+
+use Class::Std::Fast::Storable constructor => 'none';
+use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+Class::Std::initialize();
+
+{ # BLOCK to scope variables
+
+my %Response_of :ATTR(:get<Response>);
+my %ValidAddressIndicator_of :ATTR(:get<ValidAddressIndicator>);
+my %AmbiguousAddressIndicator_of :ATTR(:get<AmbiguousAddressIndicator>);
+my %NoCandidatesIndicator_of :ATTR(:get<NoCandidatesIndicator>);
+my %AddressClassification_of :ATTR(:get<AddressClassification>);
+my %Candidate_of :ATTR(:get<Candidate>);
+
+__PACKAGE__->_factory(
+    [ qw(        Response
+        ValidAddressIndicator
+        AmbiguousAddressIndicator
+        NoCandidatesIndicator
+        AddressClassification
+        Candidate
+
+    ) ],
+    {
+        'Response' => \%Response_of,
+        'ValidAddressIndicator' => \%ValidAddressIndicator_of,
+        'AmbiguousAddressIndicator' => \%AmbiguousAddressIndicator_of,
+        'NoCandidatesIndicator' => \%NoCandidatesIndicator_of,
+        'AddressClassification' => \%AddressClassification_of,
+        'Candidate' => \%Candidate_of,
+    },
+    {
+        'Response' => 'Shipment::UPS::WSDL::XAVElements::Response',
+
+        'ValidAddressIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'AmbiguousAddressIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'NoCandidatesIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'AddressClassification' => 'Shipment::UPS::WSDL::XAVTypes::AddressClassificationType',
+        'Candidate' => 'Shipment::UPS::WSDL::XAVTypes::CandidateType',
+    },
+    {
+
+        'Response' => '',
+        'ValidAddressIndicator' => 'ValidAddressIndicator',
+        'AmbiguousAddressIndicator' => 'AmbiguousAddressIndicator',
+        'NoCandidatesIndicator' => 'NoCandidatesIndicator',
+        'AddressClassification' => 'AddressClassification',
+        'Candidate' => 'Candidate',
     }
+);
 
-    use Class::Std::Fast::Storable constructor => 'none';
-    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-    Class::Std::initialize();
-
-    {    # BLOCK to scope variables
-
-        my %Response_of : ATTR(:get<Response>);
-        my %ValidAddressIndicator_of : ATTR(:get<ValidAddressIndicator>);
-        my %AmbiguousAddressIndicator_of :
-          ATTR(:get<AmbiguousAddressIndicator>);
-        my %NoCandidatesIndicator_of : ATTR(:get<NoCandidatesIndicator>);
-        my %AddressClassification_of : ATTR(:get<AddressClassification>);
-        my %Candidate_of : ATTR(:get<Candidate>);
-
-        __PACKAGE__->_factory(
-            [   qw(        Response
-                  ValidAddressIndicator
-                  AmbiguousAddressIndicator
-                  NoCandidatesIndicator
-                  AddressClassification
-                  Candidate
-
-                )
-            ],
-            {   'Response'                  => \%Response_of,
-                'ValidAddressIndicator'     => \%ValidAddressIndicator_of,
-                'AmbiguousAddressIndicator' => \%AmbiguousAddressIndicator_of,
-                'NoCandidatesIndicator'     => \%NoCandidatesIndicator_of,
-                'AddressClassification'     => \%AddressClassification_of,
-                'Candidate'                 => \%Candidate_of,
-            },
-            {   'Response' => 'Shipment::UPS::WSDL::XAVElements::Response',
-
-                'ValidAddressIndicator' =>
-                  'SOAP::WSDL::XSD::Typelib::Builtin::string',
-                'AmbiguousAddressIndicator' =>
-                  'SOAP::WSDL::XSD::Typelib::Builtin::string',
-                'NoCandidatesIndicator' =>
-                  'SOAP::WSDL::XSD::Typelib::Builtin::string',
-                'AddressClassification' =>
-                  'Shipment::UPS::WSDL::XAVTypes::AddressClassificationType',
-                'Candidate' => 'Shipment::UPS::WSDL::XAVTypes::CandidateType',
-            },
-            {
-
-                'Response'                  => '',
-                'ValidAddressIndicator'     => 'ValidAddressIndicator',
-                'AmbiguousAddressIndicator' => 'AmbiguousAddressIndicator',
-                'NoCandidatesIndicator'     => 'NoCandidatesIndicator',
-                'AddressClassification'     => 'AddressClassification',
-                'Candidate'                 => 'Candidate',
-            }
-        );
-
-    }    # end BLOCK
+} # end BLOCK
 
 
-}    # end of BLOCK
+
+
+
+
+} # end of BLOCK
+
 
 
 1;
@@ -101,7 +102,7 @@ Shipment::UPS::WSDL::XAVElements::XAVResponse
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

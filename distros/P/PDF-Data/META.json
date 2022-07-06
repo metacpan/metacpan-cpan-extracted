@@ -83,11 +83,11 @@
    "provides" : {
       "PDF::Data" : {
          "file" : "lib/PDF/Data.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.0",
+   "version" : "v1.0.1",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.035001"
@@ -320,7 +320,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.0.0",
+                  "tag" : "v1.0.1",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
@@ -355,6 +355,11 @@
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "AutoPrereqs",
+            "version" : "6.025"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneFiles",
+            "name" : "PruneFiles",
             "version" : "6.025"
          },
          {

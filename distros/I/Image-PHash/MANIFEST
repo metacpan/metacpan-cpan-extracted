@@ -1,4 +1,5 @@
 Changes
+bench/benchmark.pl
 images/M31_mirr.jpg
 images/M31_s.jpg
 images/M31_th.jpg
@@ -10,6 +11,7 @@ MANIFEST            This list of files
 MANIFEST.SKIP
 README
 t/00-load.t
+t/error.t
 t/phash.t
 t/reduced.t
 t/util.t

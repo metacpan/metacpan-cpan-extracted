@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::ArrayOfShortAddress;
-$Shipment::Purolator::WSDLV2::Types::ArrayOfShortAddress::VERSION = '3.08';
+$Shipment::Purolator::WSDLV2::Types::ArrayOfShortAddress::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,26 +20,32 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %ShortAddress_of : ATTR(:get<ShortAddress>);
+my %ShortAddress_of :ATTR(:get<ShortAddress>);
 
-    __PACKAGE__->_factory(
-        [   qw(        ShortAddress
+__PACKAGE__->_factory(
+    [ qw(        ShortAddress
 
-            )
-        ],
-        {'ShortAddress' => \%ShortAddress_of,},
-        {   'ShortAddress' =>
-              'Shipment::Purolator::WSDLV2::Types::ShortAddress',
-        },
-        {
+    ) ],
+    {
+        'ShortAddress' => \%ShortAddress_of,
+    },
+    {
+        'ShortAddress' => 'Shipment::Purolator::WSDLV2::Types::ShortAddress',
+    },
+    {
 
-            'ShortAddress' => 'ShortAddress',
-        }
-    );
+        'ShortAddress' => 'ShortAddress',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -56,7 +62,7 @@ Shipment::Purolator::WSDLV2::Types::ArrayOfShortAddress
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

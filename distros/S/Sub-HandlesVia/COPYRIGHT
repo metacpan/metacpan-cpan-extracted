@@ -3,8 +3,84 @@ Upstream-Name: Sub-HandlesVia
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Sub-HandlesVia
 
-Files: Makefile.PL
+Files: Changes
+ META.json
+ META.yml
  dist.ini
+ doap.ttl
+ lib/Sub/HandlesVia/HandlerLibrary.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Array.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Bool.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Code.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Counter.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Hash.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Number.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Scalar.pm
+ lib/Sub/HandlesVia/HandlerLibrary/String.pm
+ lib/Sub/HandlesVia/Toolkit/Mite.pm
+ lib/Sub/HandlesVia/Toolkit/Moo.pm
+ lib/Sub/HandlesVia/Toolkit/Moose.pm
+ lib/Sub/HandlesVia/Toolkit/Mouse.pm
+ lib/Sub/HandlesVia/Toolkit/Plain.pm
+ t/02moo.t
+ t/04moose/trait_array.t
+ t/04moose/trait_bool.t
+ t/04moose/trait_code.t
+ t/04moose/trait_counter.t
+ t/04moose/trait_hash.t
+ t/04moose/trait_number.t
+ t/04moose/trait_string.t
+ t/05moose_nativetypes/trait_array.t
+ t/06mouse/trait_hash.t
+ t/10barebones_eagerbuilder.t
+ t/11delegation.t
+ t/30egpod/array.t
+ t/30egpod/bool.t
+ t/30egpod/code.t
+ t/30egpod/counter.t
+ t/30egpod/hash.t
+ t/30egpod/number.t
+ t/30egpod/scalar.t
+ t/30egpod/string.t
+ t/40mite/array.t
+ t/40mite/bool.t
+ t/40mite/code.t
+ t/40mite/counter.t
+ t/40mite/hash.t
+ t/40mite/lib/MyTest.pm
+ t/40mite/lib/MyTest.pm.mite.pm
+ t/40mite/lib/MyTest/Class1.pm
+ t/40mite/lib/MyTest/Class1.pm.mite.pm
+ t/40mite/lib/MyTest/Role1.pm
+ t/40mite/lib/MyTest/Role1.pm.mite.pm
+ t/40mite/lib/MyTest/Role2.pm
+ t/40mite/lib/MyTest/Role2.pm.mite.pm
+ t/40mite/lib/MyTest/TestClass/Array.pm
+ t/40mite/lib/MyTest/TestClass/Array.pm.mite.pm
+ t/40mite/lib/MyTest/TestClass/Bool.pm
+ t/40mite/lib/MyTest/TestClass/Bool.pm.mite.pm
+ t/40mite/lib/MyTest/TestClass/Code.pm
+ t/40mite/lib/MyTest/TestClass/Code.pm.mite.pm
+ t/40mite/lib/MyTest/TestClass/Counter.pm
+ t/40mite/lib/MyTest/TestClass/Counter.pm.mite.pm
+ t/40mite/lib/MyTest/TestClass/Hash.pm
+ t/40mite/lib/MyTest/TestClass/Hash.pm.mite.pm
+ t/40mite/lib/MyTest/TestClass/Number.pm
+ t/40mite/lib/MyTest/TestClass/Number.pm.mite.pm
+ t/40mite/lib/MyTest/TestClass/Scalar.pm
+ t/40mite/lib/MyTest/TestClass/Scalar.pm.mite.pm
+ t/40mite/lib/MyTest/TestClass/String.pm
+ t/40mite/lib/MyTest/TestClass/String.pm.mite.pm
+ t/40mite/number.t
+ t/40mite/scalar.t
+ t/40mite/string.t
+ t/94cmp.t
+ t/96foreach.t
+ t/99headtail.t
+Copyright: Copyright 2022 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Makefile.PL
  t/00begin.t
  t/02moo/role.t
  t/02moo/trait_array.t
@@ -59,52 +135,6 @@ Files: Makefile.PL
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: Changes
- META.json
- META.yml
- doap.ttl
- lib/Sub/HandlesVia/HandlerLibrary.pm
- lib/Sub/HandlesVia/HandlerLibrary/Array.pm
- lib/Sub/HandlesVia/HandlerLibrary/Bool.pm
- lib/Sub/HandlesVia/HandlerLibrary/Code.pm
- lib/Sub/HandlesVia/HandlerLibrary/Counter.pm
- lib/Sub/HandlesVia/HandlerLibrary/Hash.pm
- lib/Sub/HandlesVia/HandlerLibrary/Number.pm
- lib/Sub/HandlesVia/HandlerLibrary/Scalar.pm
- lib/Sub/HandlesVia/HandlerLibrary/String.pm
- lib/Sub/HandlesVia/Toolkit/Mite.pm
- lib/Sub/HandlesVia/Toolkit/Moo.pm
- lib/Sub/HandlesVia/Toolkit/Moose.pm
- lib/Sub/HandlesVia/Toolkit/Mouse.pm
- lib/Sub/HandlesVia/Toolkit/Plain.pm
- t/02moo.t
- t/04moose/trait_array.t
- t/04moose/trait_bool.t
- t/04moose/trait_code.t
- t/04moose/trait_counter.t
- t/04moose/trait_hash.t
- t/04moose/trait_number.t
- t/04moose/trait_string.t
- t/05moose_nativetypes/trait_array.t
- t/06mouse/trait_hash.t
- t/10barebones_eagerbuilder.t
- t/11delegation.t
- t/30egpod/array.t
- t/30egpod/bool.t
- t/30egpod/code.t
- t/30egpod/counter.t
- t/30egpod/hash.t
- t/30egpod/number.t
- t/30egpod/scalar.t
- t/30egpod/string.t
- t/40mite/lib/MyTest.pm
- t/40mite/lib/MyTest.pm.mite.pm
- t/94cmp.t
- t/96foreach.t
- t/99headtail.t
-Copyright: Copyright 2022 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: README
  lib/Sub/HandlesVia.pm
  lib/Sub/HandlesVia/CodeGenerator.pm
@@ -121,15 +151,10 @@ Files: README
 Copyright: This software is copyright (c) 2020, 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: COPYRIGHT
- CREDITS
- SIGNATURE
-Copyright: None
-License: public-domain
-
 Files: t/20moosex_extended.t
  t/31egpod_dummy.t
- t/40mite/basic.t
+ t/40mite/00-basic.t
+ t/40mite/01-roles.t
 Copyright: This software is copyright (c) 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
@@ -139,13 +164,19 @@ Files: INSTALL
 Copyright: Unknown
 License: Unknown
 
-Files: t/01basic.t
-Copyright: This software is copyright (c) 2020 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
 
 Files: t/40mite/lib/MyTest/Mite.pm
 Copyright: This software is copyright (c) 2011-2014 by Michael G Schwern.
  This software is copyright (c) 2022 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/01basic.t
+Copyright: This software is copyright (c) 2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

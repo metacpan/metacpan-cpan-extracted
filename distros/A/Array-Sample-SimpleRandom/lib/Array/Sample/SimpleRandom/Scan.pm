@@ -7,17 +7,17 @@ use warnings;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-20'; # DATE
+our $DATE = '2022-05-21'; # DATE
 our $DIST = 'Array-Sample-SimpleRandom'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our @EXPORT_OK = qw(sample_simple_random_no_replacement);
 
 sub sample_simple_random_no_replacement {
     require Array::Pick::Scan;
 
-    my ($ary, $n) = @_;
-    Array::Pick::Scan::random_item($ary, $n);
+    my ($ary, $n, $opts) = @_;
+    Array::Pick::Scan::random_item($ary, $n, $opts);
 }
 
 1;
@@ -35,7 +35,7 @@ Array::Sample::SimpleRandom::Scan - Simple random sampling from an array (scan a
 
 =head1 VERSION
 
-This document describes version 0.002 of Array::Sample::SimpleRandom::Scan (from Perl distribution Array-Sample-SimpleRandom), released on 2022-05-20.
+This document describes version 0.003 of Array::Sample::SimpleRandom::Scan (from Perl distribution Array-Sample-SimpleRandom), released on 2022-05-21.
 
 =head1 SYNOPSIS
 
@@ -55,7 +55,7 @@ This document describes version 0.002 of Array::Sample::SimpleRandom::Scan (from
 
 Usage:
 
- my @items = sample_simple_random_no_replacement(\@ary, $n);
+ my @items = sample_simple_random_no_replacement(\@ary, $n [ , \%opts ]);
 
 This function takes an array reference (C<\@ary>) and the number of samples
 requested (C<$n>) and will return a list of elements. Samples will be picked
@@ -65,6 +65,20 @@ duplicate values).
 
 This function is the same as the one in L<Array::Sample::SimpleRandom>, except
 that it uses a scan algorithm from L<Array::Pick::Scan>.
+
+=over
+
+=item * pos
+
+Bool. If set to true, function will return positions instead of the items.
+
+=back
+
+=head1 FAQ
+
+=head2 Why no sample_simple_random_with_replacement?
+
+This kind of sampling does not require scanning algorithm.
 
 =head1 HOMEPAGE
 

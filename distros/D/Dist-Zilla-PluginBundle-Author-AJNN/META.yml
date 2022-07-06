@@ -19,22 +19,22 @@ name: Dist-Zilla-PluginBundle-Author-AJNN
 provides:
   Dist::Zilla::PluginBundle::Author::AJNN:
     file: lib/Dist/Zilla/PluginBundle/Author/AJNN.pm
-    version: '0.02'
+    version: '0.03'
   Dist::Zilla::PluginBundle::Author::AJNN::PruneAliases:
     file: lib/Dist/Zilla/PluginBundle/Author/AJNN/PruneAliases.pm
-    version: '0.02'
+    version: '0.03'
   Dist::Zilla::PluginBundle::Author::AJNN::Readme:
     file: lib/Dist/Zilla/PluginBundle/Author/AJNN/Readme.pm
-    version: '0.02'
+    version: '0.03'
   Pod::Weaver::PluginBundle::Author::AJNN:
     file: lib/Pod/Weaver/PluginBundle/Author/AJNN.pm
-    version: '0.02'
+    version: '0.03'
   Pod::Weaver::PluginBundle::Author::AJNN::Author:
     file: lib/Pod/Weaver/PluginBundle/Author/AJNN/Author.pm
-    version: '0.02'
+    version: '0.03'
   Pod::Weaver::PluginBundle::Author::AJNN::License:
     file: lib/Pod/Weaver/PluginBundle/Author/AJNN/License.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Dist::Zilla: '0'
   Dist::Zilla::File::FromCode: '0'
@@ -43,6 +43,7 @@ requires:
   Dist::Zilla::Plugin::GithubMeta: '0'
   Dist::Zilla::Plugin::MetaProvides::Package: '0'
   Dist::Zilla::Plugin::PodWeaver: '0'
+  Dist::Zilla::Plugin::PruneAliases: '0'
   Dist::Zilla::Plugin::RunExtraTests: '0'
   Dist::Zilla::Plugin::Test::MinimumVersion: '0'
   Dist::Zilla::Role::FileGatherer: '0'
@@ -57,12 +58,13 @@ requires:
   Pod::Weaver: '4.009'
   Pod::Weaver::Config::Assembler: '0'
   Pod::Weaver::Role::Section: '0'
+  Software::License: '0.103014'
   namespace::autoclean: '0'
   perl: '5.026'
 resources:
   bugtracker: https://github.com/johannessen/dzil-pluginbundle/issues
   repository: https://github.com/johannessen/dzil-pluginbundle.git
-version: '0.02'
-x_generated_by_perl: v5.34.0
+version: '0.03'
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: CC0-1.0

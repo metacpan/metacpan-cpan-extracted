@@ -11,6 +11,7 @@ t/20_cmp_excel.t
 t/30_compare_excel.t
 t/40_unit_test.t
 t/50_spec_test.t
+t/60_regex_test.t
 t/foo_bar.xls
 t/hello_world.xls
 t/hello_world.xlsx
@@ -36,10 +37,17 @@ t/exp-9.xls
 t/got-9.xls
 t/exp-10.xls
 t/got-10.xls
+t/exp-11.xls
+t/got-11.xls
+t/exp-12.xls
+t/got-12.xls
 t/spec-1.txt
 t/spec-2.txt
 t/spec-3.txt
 t/spec-4.txt
+t/spec-5.txt
+t/spec-6.txt
+t/spec-7.txt
 xt/pod.t
 xt/manifest.t
 xt/meta-json.t

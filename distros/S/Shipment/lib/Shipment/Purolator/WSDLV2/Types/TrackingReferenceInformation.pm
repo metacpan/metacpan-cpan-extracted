@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::TrackingReferenceInformation;
-$Shipment::Purolator::WSDLV2::Types::TrackingReferenceInformation::VERSION = '3.08';
+$Shipment::Purolator::WSDLV2::Types::TrackingReferenceInformation::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,41 +20,47 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Reference1_of : ATTR(:get<Reference1>);
-    my %Reference2_of : ATTR(:get<Reference2>);
-    my %Reference3_of : ATTR(:get<Reference3>);
-    my %Reference4_of : ATTR(:get<Reference4>);
+my %Reference1_of :ATTR(:get<Reference1>);
+my %Reference2_of :ATTR(:get<Reference2>);
+my %Reference3_of :ATTR(:get<Reference3>);
+my %Reference4_of :ATTR(:get<Reference4>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Reference1
-              Reference2
-              Reference3
-              Reference4
+__PACKAGE__->_factory(
+    [ qw(        Reference1
+        Reference2
+        Reference3
+        Reference4
 
-            )
-        ],
-        {   'Reference1' => \%Reference1_of,
-            'Reference2' => \%Reference2_of,
-            'Reference3' => \%Reference3_of,
-            'Reference4' => \%Reference4_of,
-        },
-        {   'Reference1' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Reference2' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Reference3' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Reference4' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'Reference1' => \%Reference1_of,
+        'Reference2' => \%Reference2_of,
+        'Reference3' => \%Reference3_of,
+        'Reference4' => \%Reference4_of,
+    },
+    {
+        'Reference1' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Reference2' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Reference3' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Reference4' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'Reference1' => 'Reference1',
-            'Reference2' => 'Reference2',
-            'Reference3' => 'Reference3',
-            'Reference4' => 'Reference4',
-        }
-    );
+        'Reference1' => 'Reference1',
+        'Reference2' => 'Reference2',
+        'Reference3' => 'Reference3',
+        'Reference4' => 'Reference4',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -71,7 +77,7 @@ Shipment::Purolator::WSDLV2::Types::TrackingReferenceInformation
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

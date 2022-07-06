@@ -23,6 +23,13 @@
       "develop" : {
          "requires" : {
             "Code::TidyAll" : "0",
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Code::TidyAll::Plugin::Test::Vars" : "0",
             "Dist::Zilla" : "0",
             "Dist::Zilla::Plugin::Authority" : "0",
             "Dist::Zilla::Plugin::AutoPrereqs" : "0",
@@ -62,6 +69,7 @@
             "Dist::Zilla::Plugin::NextVersion::Semantic" : "0",
             "Dist::Zilla::Plugin::OurPkgVersion" : "0",
             "Dist::Zilla::Plugin::PodWeaver" : "0",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
             "Dist::Zilla::Plugin::Prereqs::Plugins" : "0",
             "Dist::Zilla::Plugin::PreviousVersion::Changelog" : "0",
             "Dist::Zilla::Plugin::ReadmeMarkdownFromPod" : "0",
@@ -73,13 +81,6 @@
             "Dist::Zilla::Plugin::TestRelease" : "0",
             "Dist::Zilla::Plugin::TidyAll" : "0",
             "Dist::Zilla::Plugin::UploadToCPAN" : "0",
-            "Test::More" : "0.96",
-            "Test::Vars" : "0"
-         }
-      },
-      "runtime" : {
-         "requires" : {
-            "Dist::Zilla" : "0",
             "Dist::Zilla::Role::PluginBundle::Config::Slicer" : "0",
             "Dist::Zilla::Role::PluginBundle::Easy" : "0",
             "Dist::Zilla::Role::PluginBundle::PluginRemover" : "0",
@@ -109,11 +110,14 @@
    "provides" : {
       "Dist::Zilla::PluginBundle::Author::GEEKRUTH" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/GEEKRUTH.pm",
-         "version" : "1.0201"
+         "version" : "1.0202"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/GeekRuthie/Dist-Zilla-PluginBundle-Author-GEEKRUTH/-/issues"
+      },
       "homepage" : "https://p3rl.org/Dist::Zilla::PluginBundle::Author::GEEKRUTH",
       "repository" : {
          "type" : "git",
@@ -121,11 +125,12 @@
          "web" : "https://gitlab.com/GeekRuthie/Dist-Zilla-PluginBundle-Author-GEEKRUTH"
       }
    },
-   "version" : "1.0201",
+   "version" : "1.0202",
    "x_BuiltWith" : {
       "modules" : {
          "CPAN::Meta" : "2.150010",
          "Code::TidyAll" : "0.82",
+         "Code::TidyAll::Plugin::Test::Vars" : "0.04",
          "Dist::Zilla" : "6.025",
          "Dist::Zilla::Plugin::Authority" : "1.009",
          "Dist::Zilla::Plugin::AutoPrereqs" : "6.025",
@@ -165,6 +170,7 @@
          "Dist::Zilla::Plugin::NextVersion::Semantic" : "0.2.6",
          "Dist::Zilla::Plugin::OurPkgVersion" : "0.21",
          "Dist::Zilla::Plugin::PodWeaver" : "4.009",
+         "Dist::Zilla::Plugin::Prereqs" : "6.025",
          "Dist::Zilla::Plugin::Prereqs::Plugins" : "1.003003",
          "Dist::Zilla::Plugin::PreviousVersion::Changelog" : "0.2.6",
          "Dist::Zilla::Plugin::ReadmeMarkdownFromPod" : "0.141140",

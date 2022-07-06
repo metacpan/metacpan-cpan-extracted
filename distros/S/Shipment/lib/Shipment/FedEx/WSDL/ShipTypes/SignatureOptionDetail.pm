@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::SignatureOptionDetail;
-$Shipment::FedEx::WSDL::ShipTypes::SignatureOptionDetail::VERSION = '3.08';
+$Shipment::FedEx::WSDL::ShipTypes::SignatureOptionDetail::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,33 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %OptionType_of : ATTR(:get<OptionType>);
-    my %SignatureReleaseNumber_of : ATTR(:get<SignatureReleaseNumber>);
+my %OptionType_of :ATTR(:get<OptionType>);
+my %SignatureReleaseNumber_of :ATTR(:get<SignatureReleaseNumber>);
 
-    __PACKAGE__->_factory(
-        [   qw(        OptionType
-              SignatureReleaseNumber
+__PACKAGE__->_factory(
+    [ qw(        OptionType
+        SignatureReleaseNumber
 
-            )
-        ],
-        {   'OptionType'             => \%OptionType_of,
-            'SignatureReleaseNumber' => \%SignatureReleaseNumber_of,
-        },
-        {   'OptionType' =>
-              'Shipment::FedEx::WSDL::ShipTypes::SignatureOptionType',
-            'SignatureReleaseNumber' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'OptionType' => \%OptionType_of,
+        'SignatureReleaseNumber' => \%SignatureReleaseNumber_of,
+    },
+    {
+        'OptionType' => 'Shipment::FedEx::WSDL::ShipTypes::SignatureOptionType',
+        'SignatureReleaseNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'OptionType'             => 'OptionType',
-            'SignatureReleaseNumber' => 'SignatureReleaseNumber',
-        }
-    );
+        'OptionType' => 'OptionType',
+        'SignatureReleaseNumber' => 'SignatureReleaseNumber',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -63,7 +67,7 @@ Shipment::FedEx::WSDL::ShipTypes::SignatureOptionDetail
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

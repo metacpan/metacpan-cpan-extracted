@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackEvent;
-$Shipment::FedEx::WSDL::TrackTypes::TrackEvent::VERSION = '3.08';
+$Shipment::FedEx::WSDL::TrackTypes::TrackEvent::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/track/v9'}
+sub get_xmlns { 'http://fedex.com/ws/track/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,64 +20,67 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Timestamp_of : ATTR(:get<Timestamp>);
-    my %EventType_of : ATTR(:get<EventType>);
-    my %EventDescription_of : ATTR(:get<EventDescription>);
-    my %StatusExceptionCode_of : ATTR(:get<StatusExceptionCode>);
-    my %StatusExceptionDescription_of : ATTR(:get<StatusExceptionDescription>);
-    my %Address_of : ATTR(:get<Address>);
-    my %StationId_of : ATTR(:get<StationId>);
-    my %ArrivalLocation_of : ATTR(:get<ArrivalLocation>);
+my %Timestamp_of :ATTR(:get<Timestamp>);
+my %EventType_of :ATTR(:get<EventType>);
+my %EventDescription_of :ATTR(:get<EventDescription>);
+my %StatusExceptionCode_of :ATTR(:get<StatusExceptionCode>);
+my %StatusExceptionDescription_of :ATTR(:get<StatusExceptionDescription>);
+my %Address_of :ATTR(:get<Address>);
+my %StationId_of :ATTR(:get<StationId>);
+my %ArrivalLocation_of :ATTR(:get<ArrivalLocation>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Timestamp
-              EventType
-              EventDescription
-              StatusExceptionCode
-              StatusExceptionDescription
-              Address
-              StationId
-              ArrivalLocation
+__PACKAGE__->_factory(
+    [ qw(        Timestamp
+        EventType
+        EventDescription
+        StatusExceptionCode
+        StatusExceptionDescription
+        Address
+        StationId
+        ArrivalLocation
 
-            )
-        ],
-        {   'Timestamp'                  => \%Timestamp_of,
-            'EventType'                  => \%EventType_of,
-            'EventDescription'           => \%EventDescription_of,
-            'StatusExceptionCode'        => \%StatusExceptionCode_of,
-            'StatusExceptionDescription' => \%StatusExceptionDescription_of,
-            'Address'                    => \%Address_of,
-            'StationId'                  => \%StationId_of,
-            'ArrivalLocation'            => \%ArrivalLocation_of,
-        },
-        {   'Timestamp' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-            'EventType' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'EventDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'StatusExceptionCode' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'StatusExceptionDescription' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Address'         => 'Shipment::FedEx::WSDL::TrackTypes::Address',
-            'StationId'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ArrivalLocation' =>
-              'Shipment::FedEx::WSDL::TrackTypes::ArrivalLocationType',
-        },
-        {
+    ) ],
+    {
+        'Timestamp' => \%Timestamp_of,
+        'EventType' => \%EventType_of,
+        'EventDescription' => \%EventDescription_of,
+        'StatusExceptionCode' => \%StatusExceptionCode_of,
+        'StatusExceptionDescription' => \%StatusExceptionDescription_of,
+        'Address' => \%Address_of,
+        'StationId' => \%StationId_of,
+        'ArrivalLocation' => \%ArrivalLocation_of,
+    },
+    {
+        'Timestamp' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
+        'EventType' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'EventDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'StatusExceptionCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'StatusExceptionDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Address' => 'Shipment::FedEx::WSDL::TrackTypes::Address',
+        'StationId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ArrivalLocation' => 'Shipment::FedEx::WSDL::TrackTypes::ArrivalLocationType',
+    },
+    {
 
-            'Timestamp'                  => 'Timestamp',
-            'EventType'                  => 'EventType',
-            'EventDescription'           => 'EventDescription',
-            'StatusExceptionCode'        => 'StatusExceptionCode',
-            'StatusExceptionDescription' => 'StatusExceptionDescription',
-            'Address'                    => 'Address',
-            'StationId'                  => 'StationId',
-            'ArrivalLocation'            => 'ArrivalLocation',
-        }
-    );
+        'Timestamp' => 'Timestamp',
+        'EventType' => 'EventType',
+        'EventDescription' => 'EventDescription',
+        'StatusExceptionCode' => 'StatusExceptionCode',
+        'StatusExceptionDescription' => 'StatusExceptionDescription',
+        'Address' => 'Address',
+        'StationId' => 'StationId',
+        'ArrivalLocation' => 'ArrivalLocation',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -94,7 +97,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackEvent
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

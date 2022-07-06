@@ -7,7 +7,7 @@ use v5.26;
 
 use Object::Pad 0.43;  # :strict(params), ADJUST
 
-package App::sdview::Parser::Pod 0.06;
+package App::sdview::Parser::Pod 0.07;
 class App::sdview::Parser::Pod
    isa Pod::Simple
    does App::sdview::Parser
@@ -22,11 +22,18 @@ use constant format => "POD";
 
 sub find_file ( $class, $name )
 {
-   open my $f, "-|", "perldoc", "-l", $name;
-   my $file = <$f>; chomp $file if defined $file;
-   close $f;
-   $? == 0 or return undef;
-   return $file;
+   # We could use `perldoc -l` but it's slow and noisy when it fails
+
+   my $filebase = $name =~ s(::)(/)gr;
+
+   foreach my $dir ( @INC ) {
+      # .pod should take precedence over .pm
+      foreach my $file ( "$dir/$filebase.pod", "$dir/$filebase.pm" ) {
+         -r $file and return $file;
+      }
+   }
+
+   return undef;
 }
 
 sub can_parse_file ( $class, $file )

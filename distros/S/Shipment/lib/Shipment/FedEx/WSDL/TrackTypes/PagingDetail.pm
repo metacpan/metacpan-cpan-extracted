@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::PagingDetail;
-$Shipment::FedEx::WSDL::TrackTypes::PagingDetail::VERSION = '3.08';
+$Shipment::FedEx::WSDL::TrackTypes::PagingDetail::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/track/v9'}
+sub get_xmlns { 'http://fedex.com/ws/track/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %PagingToken_of : ATTR(:get<PagingToken>);
-    my %NumberOfResultsPerPage_of : ATTR(:get<NumberOfResultsPerPage>);
+my %PagingToken_of :ATTR(:get<PagingToken>);
+my %NumberOfResultsPerPage_of :ATTR(:get<NumberOfResultsPerPage>);
 
-    __PACKAGE__->_factory(
-        [   qw(        PagingToken
-              NumberOfResultsPerPage
+__PACKAGE__->_factory(
+    [ qw(        PagingToken
+        NumberOfResultsPerPage
 
-            )
-        ],
-        {   'PagingToken'            => \%PagingToken_of,
-            'NumberOfResultsPerPage' => \%NumberOfResultsPerPage_of,
-        },
-        {   'PagingToken' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'NumberOfResultsPerPage' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-        },
-        {
+    ) ],
+    {
+        'PagingToken' => \%PagingToken_of,
+        'NumberOfResultsPerPage' => \%NumberOfResultsPerPage_of,
+    },
+    {
+        'PagingToken' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'NumberOfResultsPerPage' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+    },
+    {
 
-            'PagingToken'            => 'PagingToken',
-            'NumberOfResultsPerPage' => 'NumberOfResultsPerPage',
-        }
-    );
+        'PagingToken' => 'PagingToken',
+        'NumberOfResultsPerPage' => 'NumberOfResultsPerPage',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -62,7 +67,7 @@ Shipment::FedEx::WSDL::TrackTypes::PagingDetail
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

@@ -46,7 +46,7 @@ use vars qw/@ISA @EXPORT @EXPORT_OK @EXPORT_TAGS
             $TIMEOUT @MODULES %MODULES %METHODS $AUTOLOAD
             @CURRENCY_RATES_MODULES $USE_EXPERIMENTAL_UA/;
 
-our $VERSION = '1.51'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 @CURRENCY_RATES_MODULES = qw/
     AlphaVantage
@@ -81,6 +81,7 @@ our $VERSION = '1.51'; # VERSION
     IndiaMutual
     MStaruk
     MorningstarAU
+    MorningstarCH
     MorningstarJP
     NSEIndia
     NZX
@@ -92,6 +93,7 @@ our $VERSION = '1.51'; # VERSION
     TSP
     TMX
     Tiaacref
+    TesouroDireto
     Troweprice
     USFedBonds
     Union
@@ -391,6 +393,10 @@ sub new {
   # Honor FQ_LOAD_QUOTELET if @load_modules is empty
   if ($ENV{FQ_LOAD_QUOTELET} and !@load_modules) {
     @load_modules = split(' ',$ENV{FQ_LOAD_QUOTELET});
+    if ($load_modules[0] eq '-defaults') {
+      shift @load_modules;
+      push(@load_modules, @MODULES);
+    }
   }
   elsif (@load_modules == 0) {
     push(@load_modules, @MODULES);
@@ -1588,6 +1594,7 @@ Finance::Quote::IEXCloud,
 Finance::Quote::IndiaMutual,
 Finance::Quote::MStaruk,
 Finance::Quote::MorningstarAU,
+Finance::Quote::MorningstarCH,
 Finance::Quote::MorningstarJP,
 Finance::Quote::NSEIndia,
 Finance::Quote::NZX,
@@ -1599,6 +1606,7 @@ Finance::Quote::Tradeville,
 Finance::Quote::TSP,
 Finance::Quote::TMX,
 Finance::Quote::Tiaacref,
+Finance::Quote::TesouroDireto,
 Finance::Quote::Troweprice,
 Finance::Quote::USFedBonds,
 Finance::Quote::Union,

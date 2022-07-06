@@ -2,8 +2,6 @@
 
 use strict;
 use warnings;
-use FindBin qw/$Bin/;
-use lib qq{$Bin/../lib};
 
 use Weather::NHC::TropicalCyclone ();
 
@@ -40,7 +38,9 @@ while ( not $DONE ) {
   STORMS:
     foreach my $storm (@$storms_ref) {
         my $advNum   = $storm->publicAdvisory->{advNum};
+	print qq{$advNum\n};
         my $imgs_ref = $storm->fetch_forecastGraphics_urls;
+	next;
         if ( not $stormsAdvCache->{ $storm->id }->{$advNum} ) {
             my $advisory_file = sprintf( "%s.fst", $storm->id );
             my ( $text, $advNum, $local_file ) = $storm->fetch_forecastAdvisory($advisory_file);

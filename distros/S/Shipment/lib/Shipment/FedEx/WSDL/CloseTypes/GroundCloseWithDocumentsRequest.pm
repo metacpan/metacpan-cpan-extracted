@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::CloseTypes::GroundCloseWithDocumentsRequest;
-$Shipment::FedEx::WSDL::CloseTypes::GroundCloseWithDocumentsRequest::VERSION = '3.08';
+$Shipment::FedEx::WSDL::CloseTypes::GroundCloseWithDocumentsRequest::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/close/v2'}
+sub get_xmlns { 'http://fedex.com/ws/close/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,55 +20,57 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %WebAuthenticationDetail_of : ATTR(:get<WebAuthenticationDetail>);
-    my %ClientDetail_of : ATTR(:get<ClientDetail>);
-    my %TransactionDetail_of : ATTR(:get<TransactionDetail>);
-    my %Version_of : ATTR(:get<Version>);
-    my %CloseDate_of : ATTR(:get<CloseDate>);
-    my %CloseDocumentSpecification_of : ATTR(:get<CloseDocumentSpecification>);
+my %WebAuthenticationDetail_of :ATTR(:get<WebAuthenticationDetail>);
+my %ClientDetail_of :ATTR(:get<ClientDetail>);
+my %TransactionDetail_of :ATTR(:get<TransactionDetail>);
+my %Version_of :ATTR(:get<Version>);
+my %CloseDate_of :ATTR(:get<CloseDate>);
+my %CloseDocumentSpecification_of :ATTR(:get<CloseDocumentSpecification>);
 
-    __PACKAGE__->_factory(
-        [   qw(        WebAuthenticationDetail
-              ClientDetail
-              TransactionDetail
-              Version
-              CloseDate
-              CloseDocumentSpecification
+__PACKAGE__->_factory(
+    [ qw(        WebAuthenticationDetail
+        ClientDetail
+        TransactionDetail
+        Version
+        CloseDate
+        CloseDocumentSpecification
 
-            )
-        ],
-        {   'WebAuthenticationDetail'    => \%WebAuthenticationDetail_of,
-            'ClientDetail'               => \%ClientDetail_of,
-            'TransactionDetail'          => \%TransactionDetail_of,
-            'Version'                    => \%Version_of,
-            'CloseDate'                  => \%CloseDate_of,
-            'CloseDocumentSpecification' => \%CloseDocumentSpecification_of,
-        },
-        {   'WebAuthenticationDetail' =>
-              'Shipment::FedEx::WSDL::CloseTypes::WebAuthenticationDetail',
-            'ClientDetail' =>
-              'Shipment::FedEx::WSDL::CloseTypes::ClientDetail',
-            'TransactionDetail' =>
-              'Shipment::FedEx::WSDL::CloseTypes::TransactionDetail',
-            'Version'   => 'Shipment::FedEx::WSDL::CloseTypes::VersionId',
-            'CloseDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
-            'CloseDocumentSpecification' =>
-              'Shipment::FedEx::WSDL::CloseTypes::CloseDocumentSpecification',
-        },
-        {
+    ) ],
+    {
+        'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
+        'ClientDetail' => \%ClientDetail_of,
+        'TransactionDetail' => \%TransactionDetail_of,
+        'Version' => \%Version_of,
+        'CloseDate' => \%CloseDate_of,
+        'CloseDocumentSpecification' => \%CloseDocumentSpecification_of,
+    },
+    {
+        'WebAuthenticationDetail' => 'Shipment::FedEx::WSDL::CloseTypes::WebAuthenticationDetail',
+        'ClientDetail' => 'Shipment::FedEx::WSDL::CloseTypes::ClientDetail',
+        'TransactionDetail' => 'Shipment::FedEx::WSDL::CloseTypes::TransactionDetail',
+        'Version' => 'Shipment::FedEx::WSDL::CloseTypes::VersionId',
+        'CloseDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
+        'CloseDocumentSpecification' => 'Shipment::FedEx::WSDL::CloseTypes::CloseDocumentSpecification',
+    },
+    {
 
-            'WebAuthenticationDetail'    => 'WebAuthenticationDetail',
-            'ClientDetail'               => 'ClientDetail',
-            'TransactionDetail'          => 'TransactionDetail',
-            'Version'                    => 'Version',
-            'CloseDate'                  => 'CloseDate',
-            'CloseDocumentSpecification' => 'CloseDocumentSpecification',
-        }
-    );
+        'WebAuthenticationDetail' => 'WebAuthenticationDetail',
+        'ClientDetail' => 'ClientDetail',
+        'TransactionDetail' => 'TransactionDetail',
+        'Version' => 'Version',
+        'CloseDate' => 'CloseDate',
+        'CloseDocumentSpecification' => 'CloseDocumentSpecification',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -85,7 +87,7 @@ Shipment::FedEx::WSDL::CloseTypes::GroundCloseWithDocumentsRequest
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

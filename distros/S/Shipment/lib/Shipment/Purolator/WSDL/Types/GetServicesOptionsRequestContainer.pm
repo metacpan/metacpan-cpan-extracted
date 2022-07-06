@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::GetServicesOptionsRequestContainer;
-$Shipment::Purolator::WSDL::Types::GetServicesOptionsRequestContainer::VERSION = '3.08';
+$Shipment::Purolator::WSDL::Types::GetServicesOptionsRequestContainer::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -17,46 +17,48 @@ sub __get_attr_class {
 
 
 use base qw(Shipment::Purolator::WSDL::Types::RequestContainer);
-
 # Variety: sequence
 use Class::Std::Fast::Storable constructor => 'none';
 use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %BillingAccountNumber_of : ATTR(:get<BillingAccountNumber>);
-    my %SenderAddress_of : ATTR(:get<SenderAddress>);
-    my %ReceiverAddress_of : ATTR(:get<ReceiverAddress>);
+my %BillingAccountNumber_of :ATTR(:get<BillingAccountNumber>);
+my %SenderAddress_of :ATTR(:get<SenderAddress>);
+my %ReceiverAddress_of :ATTR(:get<ReceiverAddress>);
 
-    __PACKAGE__->_factory(
-        [   qw(        BillingAccountNumber
-              SenderAddress
-              ReceiverAddress
+__PACKAGE__->_factory(
+    [ qw(        BillingAccountNumber
+        SenderAddress
+        ReceiverAddress
 
-            )
-        ],
-        {   'BillingAccountNumber' => \%BillingAccountNumber_of,
-            'SenderAddress'        => \%SenderAddress_of,
-            'ReceiverAddress'      => \%ReceiverAddress_of,
-        },
-        {   'BillingAccountNumber' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'SenderAddress' =>
-              'Shipment::Purolator::WSDL::Types::ShortAddress',
-            'ReceiverAddress' =>
-              'Shipment::Purolator::WSDL::Types::ShortAddress',
-        },
-        {
+    ) ],
+    {
+        'BillingAccountNumber' => \%BillingAccountNumber_of,
+        'SenderAddress' => \%SenderAddress_of,
+        'ReceiverAddress' => \%ReceiverAddress_of,
+    },
+    {
+        'BillingAccountNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'SenderAddress' => 'Shipment::Purolator::WSDL::Types::ShortAddress',
+        'ReceiverAddress' => 'Shipment::Purolator::WSDL::Types::ShortAddress',
+    },
+    {
 
-            'BillingAccountNumber' => 'BillingAccountNumber',
-            'SenderAddress'        => 'SenderAddress',
-            'ReceiverAddress'      => 'ReceiverAddress',
-        }
-    );
+        'BillingAccountNumber' => 'BillingAccountNumber',
+        'SenderAddress' => 'SenderAddress',
+        'ReceiverAddress' => 'ReceiverAddress',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -73,7 +75,7 @@ Shipment::Purolator::WSDL::Types::GetServicesOptionsRequestContainer
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

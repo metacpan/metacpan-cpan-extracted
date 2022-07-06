@@ -1,6 +1,9 @@
 Revision history for Term::Choose
 
 
+1.755   2022-07-01
+    - layout set to 3 now causes choose to die;
+
 1.754   2022-06-04
     - Update documentation.
     - Update defaults 'tabs_prompt' and 'tabs_info'.

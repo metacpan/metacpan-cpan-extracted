@@ -43,10 +43,10 @@ msgstr ""
 "  <p>\n"
 "    <a href=\"tutorial/\"\n"
 "       class=\"btn btn-primary btn-lg\"\n"
-"       role=\"button\">Try tutorial</a>\n"
+"       role=\"button\">チュートリアルをやってみる</a>\n"
 "    <a href=\"install/\"\n"
 "       class=\"btn btn-primary btn-lg\"\n"
-"       role=\"button\">Install</a>\n"
+"       role=\"button\">インストール</a>\n"
 "  </p>\n"
 "</div>"
 
@@ -79,6 +79,9 @@ msgid ""
 "sses and methods."
 msgstr "  * [リファレンス][reference]: クラスやメソッドの使い方などの個別の機能の詳細な説明。"
 
+msgid "  * [Development][development]: It describes how to develop Groonga-HTTP."
+msgstr "  * [開発][development]: Groonga-HTTPの開発方法の説明。"
+
 msgid "## License {#license}"
 msgstr "## ライセンス {#license}"
 
@@ -99,6 +102,9 @@ msgid "[tutorial]:tutorial/"
 msgstr ""
 
 msgid "[reference]:reference/"
+msgstr ""
+
+msgid "[development]:development/"
 msgstr ""
 
 msgid "[lgpl3.0-license]:https://opensource.org/licenses/LGPL-3.0"

@@ -704,9 +704,9 @@ sub limit_offset {
         }
         if ( $choice eq $offset ) {
             if ( ! $sql->{limit_stmt} ) {
-                $sql->{limit_stmt} = "LIMIT " . ( $sf->{o}{G}{max_rows} || '9223372036854775807'  ) if $sf->{i}{driver} eq 'SQLite';   # 2 ** 63 - 1
+                $sql->{limit_stmt} = "LIMIT " . ( $sf->{o}{G}{auto_limit} || '9223372036854775807'  ) if $sf->{i}{driver} eq 'SQLite';   # 2 ** 63 - 1
                 # MySQL 5.7 Reference Manual - SELECT Syntax - Limit clause: SELECT * FROM tbl LIMIT 95,18446744073709551615;
-                $sql->{limit_stmt} = "LIMIT " . ( $sf->{o}{G}{max_rows} || '18446744073709551615' ) if $sf->{i}{driver} eq 'mysql';    # 2 ** 64 - 1
+                $sql->{limit_stmt} = "LIMIT " . ( $sf->{o}{G}{auto_limit} || '18446744073709551615' ) if $sf->{i}{driver} eq 'mysql';    # 2 ** 64 - 1
             }
             $sql->{offset_stmt} = "OFFSET";
             my $info = $ax->get_sql_info( $sql );

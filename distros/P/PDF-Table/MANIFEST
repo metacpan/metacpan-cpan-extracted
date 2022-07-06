@@ -10,10 +10,15 @@ examples/header_repeat_with_cell_props.pl
 examples/PDFpref
 examples/row_height.pl
 examples/sample1.pl
+examples/size.pl
 INFO/Changes_2019
 INFO/Deprecated
 INFO/Table.html
 lib/PDF/Table.pm
+lib/PDF/Table/Table.pod
+lib/PDF/Table/ColumnWidth.pm
+lib/PDF/Table/Settings.pm
+LICENSE
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP

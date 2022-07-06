@@ -15,48 +15,76 @@ use Pod::Usage;
 
 extends 'App::VTide::Command::Run';
 
-our $VERSION = version->new('0.1.16');
+our $VERSION = version->new('0.1.17');
 our $NAME    = 'help';
-our $OPTIONS = [
-    'test|T!',
-    'verbose|v+',
-];
-sub details_sub { return ( $NAME, $OPTIONS )};
+our $OPTIONS = [ 'test|T!', 'verbose|v+', ];
+sub details_sub { return ( $NAME, $OPTIONS ) }
 
 sub run {
     my ($self) = @_;
     my $command = shift @ARGV;
 
-    my $sub = $self->vtide->_generate_sub_command;
+    my $sub = $self->vtide->_sub_commands;
 
     if ($command) {
-        # show the help for the command
-        my $title  = ucfirst $command;
-        my $module = 'App/VTide/Command/' . $title . '.pm';
+        my $module = $self->cmd2module($command);
+        if ( !$INC{$module} ) {
+            require "$module";
+        }
+
         pod2usage(
-            -verbose  => 1,
-            -input    => $INC{$module},
+            -verbose => 1,
+            -input   => $INC{$module},
         );
     }
     else {
+        my $max = 0;
+        for my $cmd ( keys %$sub ) {
+            my $file = $self->cmd2module($cmd);
+
+            if ( !$INC{$file} ) {
+                require "$file";
+            }
+            if ( length $cmd > $max ) {
+                $max = length $cmd;
+            }
+            my $module = $file;
+            $module =~ s{/}{::}g;
+            $module =~ s{[.]pm$}{};
+            my ( $name, $options, $local ) = $module->details_sub();
+            $sub->{$cmd} = {
+                module => $file,
+                local  => $local || 0,
+            };
+        }
+
+        my $last = -1;
+
         # show the list of commands and their descriptions
-        for my $cmd (sort keys %$sub) {
-            my $title  = ucfirst $cmd;
-            my $module = 'App/VTide/Command/' . $title . '.pm';
+        for my $cmd (
+            sort { $sub->{$a}{local} <=> $sub->{$b}{local} || $a cmp $b }
+            keys %$sub
+        ) {
             require Tie::Handle::Scalar;
             my $out = '';
             tie *FH, 'Tie::Handle::Scalar', \$out;
 
             pod2usage(
                 -verbose  => 99,
-                -input    => $INC{$module},
+                -input    => $INC{ $sub->{$cmd}{module} },
                 -exitval  => 'NOEXIT',
                 -output   => \*FH,
                 -sections => [qw/ NAME /],
             );
 
-            $out =~ s/Name.*?$title/$cmd/xms;
+            if ( $sub->{$cmd}{local} ne $last ) {
+                print +( $sub->{$cmd}{local} ? "\nLocal" : 'Global' ), "\n";
+                $last = $sub->{$cmd}{local};
+            }
+
             $out =~ s/\s\s+/ /gxms;
+            $out
+                =~ s/Name:\s+App::VTide::Command::\w+/sprintf "%-${max}s", $cmd/exms;
             print "$out\n";
         }
     }
@@ -64,11 +92,19 @@ sub run {
     return;
 }
 
+sub cmd2module {
+    my ( $self, $cmd ) = @_;
+
+    my $title = join '', map { ucfirst $_ } split /-/, $cmd;
+
+    return 'App/VTide/Command/' . $title . '.pm';
+}
+
 sub auto_complete {
     my ($self) = @_;
 
     my $env = $self->options->files->[-1];
-    my $sub = $self->vtide->_generate_sub_command;
+    my $sub = $self->vtide->_sub_commands;
 
     print join ' ', grep { $env ne 'help' ? /^$env/xms : 1 } sort keys %$sub;
 
@@ -85,7 +121,7 @@ App::VTide::Command::Help - Show help for vtide commands
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Help version 0.1.16
+This documentation refers to App::VTide::Command::Help version 0.1.17
 
 =head1 SYNOPSIS
 

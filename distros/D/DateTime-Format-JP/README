@@ -23,7 +23,7 @@ SYNOPSIS
         print "$str\n";
 
 VERSION
-        v0.1.1
+        v0.1.2
 
 DESCRIPTION
     This module is used to parse and format Japanese date and time. It is
@@ -70,7 +70,8 @@ METHODS
 
     *time_zone* string
         The time zone to use when creating a DateTime object. Defaults to
-        "local"
+        "local" if DateTime::TimeZone supports it, otherwise it will
+        fallback on "UTC"
 
   error
     Returns the latest error set, if any.

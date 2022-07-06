@@ -6,6 +6,14 @@ Home page:    <https://metacpan.org/release/Sub-HandlesVia>
 Bug tracker:  <https://github.com/tobyink/p5-sub-handlesvia/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.028	2022-07-02
+
+ [ Test Suite ]
+ - Lots more tests for using Sub::HandlesVia with Mite.
+
+ [ Other ]
+ - Updated: Support for Mite roles.
+
 0.027	2022-06-30
 
  [ Test Suite ]

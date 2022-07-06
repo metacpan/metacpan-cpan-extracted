@@ -1,3 +1,15 @@
+0.27 2022-07-03
+
+ * Correct band(), bior(), and bxor() cf. CPAN RT #79923. These methods didn't
+   return the same result as the corresponding Perl binary operators "&", "|",
+   and "^" even for non-negative integers.
+
+0.26 2022-07-01
+
+ * Better testing of the interoperability between Math::BigInt, Math::BigFloat,
+   Math::BigRat, and Math::BigInt::Lite. When incompatibility is detected, a
+   warning is issued and the tests are skipped.
+
 0.25 2022-06-27
 
  * Add new methods as_int(), bdstr(), bestr(), bfstr(), bnstr(), dparts(),

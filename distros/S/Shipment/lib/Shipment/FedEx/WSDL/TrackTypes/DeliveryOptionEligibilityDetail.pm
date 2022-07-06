@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::DeliveryOptionEligibilityDetail;
-$Shipment::FedEx::WSDL::TrackTypes::DeliveryOptionEligibilityDetail::VERSION = '3.08';
+$Shipment::FedEx::WSDL::TrackTypes::DeliveryOptionEligibilityDetail::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/track/v9'}
+sub get_xmlns { 'http://fedex.com/ws/track/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,33 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Option_of : ATTR(:get<Option>);
-    my %Eligibility_of : ATTR(:get<Eligibility>);
+my %Option_of :ATTR(:get<Option>);
+my %Eligibility_of :ATTR(:get<Eligibility>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Option
-              Eligibility
+__PACKAGE__->_factory(
+    [ qw(        Option
+        Eligibility
 
-            )
-        ],
-        {   'Option'      => \%Option_of,
-            'Eligibility' => \%Eligibility_of,
-        },
-        {   'Option' =>
-              'Shipment::FedEx::WSDL::TrackTypes::DeliveryOptionType',
-            'Eligibility' =>
-              'Shipment::FedEx::WSDL::TrackTypes::EligibilityType',
-        },
-        {
+    ) ],
+    {
+        'Option' => \%Option_of,
+        'Eligibility' => \%Eligibility_of,
+    },
+    {
+        'Option' => 'Shipment::FedEx::WSDL::TrackTypes::DeliveryOptionType',
+        'Eligibility' => 'Shipment::FedEx::WSDL::TrackTypes::EligibilityType',
+    },
+    {
 
-            'Option'      => 'Option',
-            'Eligibility' => 'Eligibility',
-        }
-    );
+        'Option' => 'Option',
+        'Eligibility' => 'Eligibility',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -63,7 +67,7 @@ Shipment::FedEx::WSDL::TrackTypes::DeliveryOptionEligibilityDetail
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

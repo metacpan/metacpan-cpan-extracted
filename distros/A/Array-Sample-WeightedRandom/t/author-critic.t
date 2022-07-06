@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Array/Sample/WeightedRandom.pm'];
+my $filenames = ['lib/Array/Sample/WeightedRandom.pm','lib/Array/Sample/WeightedRandom/Scan.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

@@ -22,11 +22,11 @@ DESCRIPTION
     or to another role.
 
   Compatibility
-    It should work with Role::Tiny, Moo::Role, Moose::Role, Mouse::Role, and
-    Role::Basic. Not all class builders work well with all role builders (for
-    example, a Moose class consuming a Mouse role). But when they do work
-    together, Role::Hooks should be able to run the callbacks. (The only
-    combination I've tested is Moo with Moose though.)
+    It should work with Role::Tiny, Moo::Role, Moose::Role, Mouse::Role,
+    Role::Basic, and Mite. Not all class builders work well with all role
+    builders (for example, a Moose class consuming a Mouse role). But when
+    they do work together, Role::Hooks should be able to run the callbacks.
+    (The only combination I've tested is Moo with Moose though.)
 
     Some other role implementations (such as Moos::Role, exact::role, and
     OX::Role) are just wrappers around one of the supported role builders, so
@@ -37,6 +37,11 @@ DESCRIPTION
     been copied into the target package, but before handling `requires`, and
     before patching the `DOES` method in the target package. If you are using
     Role::Basic, consider switching to Role::Tiny.
+
+    With Mite, the `before_apply` hook is called fairly late; after the role
+    is fully loaded and attributes and methods have been copied into the
+    target package, after `DOES` has been patched, but before method modifiers
+    from the role have been applied to the target package.
 
     Apart from Role::Tiny/Moo::Role, a hashref of additional arguments (things
     like "-excludes" and "-alias") can be passed when consuming a role.
@@ -132,9 +137,9 @@ DESCRIPTION
         otherwise.
 
         (In fact, returns a string representing which role builder the role
-        seems to be using -- "Role::Tiny", "Moose::Role", "Mouse::Role", or
-        "Role::Basic"; roles built using Moo::Role are detected as
-        "Role::Tiny".)
+        seems to be using -- "Role::Tiny", "Moose::Role", "Mouse::Role",
+        "Role::Basic", or "Mite::Role"; roles built using Moo::Role are
+        detected as "Role::Tiny".)
 
 ENVIRONMENT
     The environment variable `PERL_ROLE_HOOKS_DEBUG` may be set to true to

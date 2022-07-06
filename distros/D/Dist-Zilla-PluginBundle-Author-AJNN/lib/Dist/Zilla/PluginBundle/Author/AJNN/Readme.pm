@@ -3,7 +3,7 @@ use warnings;
 
 package Dist::Zilla::PluginBundle::Author::AJNN::Readme;
 # ABSTRACT: Build a README file for AJNN's distributions
-$Dist::Zilla::PluginBundle::Author::AJNN::Readme::VERSION = '0.02';
+$Dist::Zilla::PluginBundle::Author::AJNN::Readme::VERSION = '0.03';
 
 use Dist::Zilla;
 use Dist::Zilla::File::FromCode;
@@ -16,6 +16,14 @@ use Pod::Text;
 use Pod::Weaver::PluginBundle::Author::AJNN::License;
 
 with 'Dist::Zilla::Role::FileGatherer';
+
+
+has cpan_release => (
+	is => 'ro',
+	isa => 'Str',
+	lazy => 1,
+	default => sub { '1' },
+);
 
 
 sub gather_files {
@@ -52,13 +60,16 @@ sub _readme_header {
 	my $description = $self->_main_module_description;
 	$description =~ s/\n\n.*$//;  # only keep the first paragraph
 	
+	my $link = $self->zilla->distmeta->{resources}{repository}{web};
+	$link = "https://metacpan.org/release/$dist_name" if $self->cpan_release;
+	
 	return <<END;
 $main_module $dist_version$trial_rel
 
 $description
 
 More information about this software:
-https://metacpan.org/release/$dist_name
+$link
 END
 }
 
@@ -67,10 +78,14 @@ sub _readme_install {
 	my ($self) = @_;
 	
 	my $main_module = $self->_main_module_name;
+	my $archive = $self->zilla->name . '-' . $self->zilla->version . '.tar.gz';
 	
-	return <<END;
+	my $text = <<END;
 INSTALLATION
 
+END
+	if ($self->cpan_release) {
+		$text .= <<END;
 The recommended way to install this Perl module distribution is directly
 from CPAN with whichever tool you use to manage your installation of Perl.
 For example:
@@ -80,7 +95,18 @@ For example:
 If you already have downloaded the distribution, you can alternatively
 point your tool directly at the archive file or the directory:
 
-  cpanm .
+END
+	}
+	else {
+		$text .= <<END;
+To install this Perl module distribution, point whichever tool you use
+to manage your installation of Perl directly at the archive file or the
+directory. For example:
+
+END
+	}
+	$text .= <<END;
+  cpanm $archive
 
 You can also install the module manually by following these steps:
 
@@ -92,6 +118,8 @@ You can also install the module manually by following these steps:
 See https://www.cpan.org/modules/INSTALL.html for general information
 on installing CPAN modules.
 END
+	
+	return $text;
 }
 
 
@@ -158,7 +186,7 @@ Dist::Zilla::PluginBundle::Author::AJNN::Readme - Build a README file for AJNN's
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 
@@ -199,6 +227,17 @@ Identification of the module, on the other hand, may be kept very brief.
 A license file is included with the distribution, so stating the license
 is generally not required; however, this plugin will pick up any mangling
 done by L<Pod::Weaver::PluginBundle::Author::AJNN::License>.
+
+=head1 ATTRIBUTES
+
+=head2 cpan_release
+
+Whether the distribution is available on L<https://www.cpan.org/ CPAN>.
+The default is yes. If set to no, the link in the readme will be changed
+to GitHub and CPAN will no longer be mentioned in the installation
+instructions.
+
+ cpan_release = 0
 
 =head1 SEE ALSO
 

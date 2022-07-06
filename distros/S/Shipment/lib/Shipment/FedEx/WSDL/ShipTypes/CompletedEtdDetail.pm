@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::CompletedEtdDetail;
-$Shipment::FedEx::WSDL::ShipTypes::CompletedEtdDetail::VERSION = '3.08';
+$Shipment::FedEx::WSDL::ShipTypes::CompletedEtdDetail::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,35 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %FolderId_of : ATTR(:get<FolderId>);
-    my %UploadDocumentReferenceDetails_of :
-      ATTR(:get<UploadDocumentReferenceDetails>);
+my %FolderId_of :ATTR(:get<FolderId>);
+my %UploadDocumentReferenceDetails_of :ATTR(:get<UploadDocumentReferenceDetails>);
 
-    __PACKAGE__->_factory(
-        [   qw(        FolderId
-              UploadDocumentReferenceDetails
+__PACKAGE__->_factory(
+    [ qw(        FolderId
+        UploadDocumentReferenceDetails
 
-            )
-        ],
-        {   'FolderId'                       => \%FolderId_of,
-            'UploadDocumentReferenceDetails' =>
-              \%UploadDocumentReferenceDetails_of,
-        },
-        {   'FolderId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'UploadDocumentReferenceDetails' =>
-              'Shipment::FedEx::WSDL::ShipTypes::UploadDocumentReferenceDetail',
-        },
-        {
+    ) ],
+    {
+        'FolderId' => \%FolderId_of,
+        'UploadDocumentReferenceDetails' => \%UploadDocumentReferenceDetails_of,
+    },
+    {
+        'FolderId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'UploadDocumentReferenceDetails' => 'Shipment::FedEx::WSDL::ShipTypes::UploadDocumentReferenceDetail',
+    },
+    {
 
-            'FolderId'                       => 'FolderId',
-            'UploadDocumentReferenceDetails' =>
-              'UploadDocumentReferenceDetails',
-        }
-    );
+        'FolderId' => 'FolderId',
+        'UploadDocumentReferenceDetails' => 'UploadDocumentReferenceDetails',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -65,7 +67,7 @@ Shipment::FedEx::WSDL::ShipTypes::CompletedEtdDetail
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

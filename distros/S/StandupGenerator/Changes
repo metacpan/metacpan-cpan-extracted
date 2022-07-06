@@ -1,0 +1,11 @@
+0.3     2022-07-05
+    - Ensure open command can handle file paths containing spaces
+
+0.3     2022-07-05
+    - Update instructions for executing perl scripts in CLI
+
+0.2     2022-07-04
+    - Eliminate errant hyphen in package name in Makefile
+
+0.1     2022-07-04
+    - Initialize project

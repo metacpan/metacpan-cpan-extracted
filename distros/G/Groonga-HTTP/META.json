@@ -63,7 +63,7 @@
       },
       "Groonga::HTTP" : {
          "file" : "lib/Groonga/HTTP.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Groonga::HTTP::Client" : {
          "file" : "lib/Groonga/HTTP/Client.pm"
@@ -84,7 +84,7 @@
          "web" : "https://github.com/groonga/Groonga-HTTP"
       }
    },
-   "version" : "1.06",
+   "version" : "1.07",
    "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1
 }

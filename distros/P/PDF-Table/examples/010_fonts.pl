@@ -69,8 +69,8 @@ if (!$rcA && !$rcB) {
 }
 # -------------
 
-our $VERSION = '1.002'; # VERSION
-my $LAST_UPDATE = '1.002'; # manually update whenever code is changed
+our $VERSION = '1.003'; # VERSION
+our $LAST_UPDATE = '1.002'; # manually update whenever code is changed
 
 my $outfile = $0;
 $outfile =~ s/\.pl$/.pdf/;

@@ -30,12 +30,12 @@ our @EXPORT = qw(
    wordpress
 );
 
-our $VERSION = 'v0.8.0';
+our $VERSION = 'v0.8.1';
 
 
 
 sub archive_extensions {
-    my $re = qr{\.(?:iso|rar|tar|u?zip|[7glx]?z|tgz)\b};
+    my $re = qr{\.(?:bz2|iso|rar|tar|u?zip|[7glx]?z|tgz)\b};
     return (
         PATH_INFO    => $re,
         QUERY_STRING => $re,
@@ -46,7 +46,7 @@ sub archive_extensions {
 sub backup_files {
     return (
         misc_extensions(),
-        PATH_INFO =>  qr{(?:backup|database|db|dump)\.},
+        PATH_INFO =>  qr{(?:backup|database|db|dump|localhost)\.},
     );
 }
 
@@ -153,7 +153,7 @@ sub script_extensions {
 
 
 sub system_dirs {
-    my $re = qr{/(?:s?bin|etc|usr|var|srv|opt)/};
+    my $re = qr{/(?:s?bin|etc|usr|var|srv|opt|__MACOSX|META-INF)/};
     return (
         PATH_INFO    => $re,
         QUERY_STRING => $re,
@@ -196,7 +196,7 @@ Plack::Middleware::Security::Common - A simple security filter for Plack with co
 
 =head1 VERSION
 
-version v0.8.0
+version v0.8.1
 
 =head1 SYNOPSIS
 
@@ -349,8 +349,8 @@ that refer to these scripts in the query string.
 
 =head2 system_dirs
 
-This blocks requests that refer to system directories in the path or
-query string.
+This blocks requests that refer to system or metadata directories in
+the path or query string.
 
 =head2 unexpected_content
 

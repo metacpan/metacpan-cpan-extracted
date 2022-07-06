@@ -1,5 +1,32 @@
 Revision history for Alien-PGPLOT
 
+v5.2.2.4  2022-07-05 14:33:18-04:00 America/New_York
+
+  [RELEASE]
+
+   * promote to release
+   * no changes from 5.2.2.3
+
+  [BUGS]
+
+   * Tests pass on  GitHub Windows MSYS2 runners, but not on CPAN Windows Strawberry Perl:
+     e.g http://matrix.cpantesters.org/?dist=Alien-PGPLOT+v5.2.2.3-TRIAL
+
+v5.2.2.3  2022-06-15 18:09:10-04:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD FIX]
+
+   * incorrect header directory specification in test file
+
+
+v5.2.2.2  2022-06-15 13:47:26-04:00 America/New_York
+
+  [BUILD FIXES]
+
+   * clean up alienfile
+   * add compilation test
+   * use latest version of pgplot-autotool which solves some build issues
+
 0.01      2021-09-24 22:32:42-04:00 America/New_York
 
-* First release upon an unsuspecting world.
+    * First release upon an unsuspecting world.

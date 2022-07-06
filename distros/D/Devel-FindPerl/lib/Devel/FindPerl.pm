@@ -1,5 +1,5 @@
 package Devel::FindPerl;
-$Devel::FindPerl::VERSION = '0.015';
+$Devel::FindPerl::VERSION = '0.016';
 use strict;
 use warnings;
 
@@ -117,6 +117,7 @@ sub _capture_command {
 	my (@command) = @_;
 
 	local @ENV{qw/PATH IFS CDPATH ENV BASH_ENV/};
+	delete @ENV{qw/PATH IFS CDPATH ENV BASH_ENV/};
 	my $pid = open2(my($in, $out), @command);
 	binmode $in, ':crlf' if $^O eq 'MSWin32';
 	my $ret = do { local $/; <$in> };
@@ -145,7 +146,7 @@ Devel::FindPerl - Find the path to your perl
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

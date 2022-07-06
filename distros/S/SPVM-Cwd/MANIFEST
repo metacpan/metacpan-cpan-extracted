@@ -1,0 +1,16 @@
+.gitignore
+Changes
+lib/SPVM/Cwd.c
+lib/SPVM/Cwd.config
+lib/SPVM/Cwd.native/include/.gitkeep
+lib/SPVM/Cwd.native/src/.gitkeep
+lib/SPVM/Cwd.pm
+lib/SPVM/Cwd.spvm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/basic.t
+t/lib/SPVM/TestCase/Cwd.spvm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

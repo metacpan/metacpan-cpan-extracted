@@ -1,0 +1,338 @@
+# PODNAME: Mac::Alias::Format
+# ABSTRACT: Notes on the macOS alias file format
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Mac::Alias::Format - Notes on the macOS alias file format
+
+=head1 VERSION
+
+version 1.01
+
+=head1 OVERVIEW
+
+The file format used for Finder aliases by current versions of macOS
+is apparently not publicly documented. Unlike in earlier versions,
+aliases are now wholly contained in the data fork and contain a
+series of typed chunks with binary data. The chunks vary somewhat
+between Finder versions.
+
+This document describes what is currently known about this format.
+
+=head1 DATA FORK ALIASES
+
+=head2 File structure
+
+ magic number "book\0\0\0\0mark\0\0\0\0"
+ header section
+ data section
+
+The alias files I have access to all use little-endian integers,
+which seems like an odd choice for Apple to have made before the
+Intel transition. If data fork aliases were created on PowerPC
+machines (not sure), they may have used big-endian.
+
+There might exist some old data fork alias files that use a
+different magic number (C<"alis">) and a different header section
+format, but the same data section format. I have never seen such
+a file in the wild.
+
+=head2 Header section
+
+ offset from start of file to start of data section (4 bytes)
+ offset from start of file to start of data section (4 bytes)
+ total length of data section (4 bytes)
+ unknown header data, possibly format version (4 bytes)
+ unknown header data (4 bytes)
+ unknown header data (4 bytes)
+ unknown header data, possibly checksum (8 bytes)
+ unknown header data, possibly reserved space (8 bytes)
+
+The reason for the duplication of the data section offset is not known.
+
+=head2 Data section
+
+The data section begins with a 4 byte offset to the primary table
+of contents, which usually is the -2 type chunk at the end of the
+file. After that, the rest of the file consists of data chunks.
+Unless noted otherwise, offsets to chunks in the data section are
+always to be seen from the start of the data section.
+
+Each data chunk is built like this:
+
+ size of chunk data (4 bytes, unsigned int)
+ chunk type (4 bytes, signed int)
+ chunk data
+ zero padding (0-3 bytes)
+   \ so that the next chunk has the proper word-size alignment;
+     brings the total length of a chunk to an even multiple of 4
+
+Chunk types represent the format (syntax) of the data. The
+following chunk types have been seen. Note that the chunk
+description is based on reverse engineering and is not
+necessarily correct. Corrections are welcome, as are any
+other additions that could possibly be useful.
+
+=over
+
+=item 0x0101 (257)
+
+An UTF-8 encoded string, usually in NFD. Primarily used for POSIX
+path components and UUID.
+
+=item 0x0201 (513)
+
+Structured data, the kind of which is determined by the item type
+entry in the alias file's table of contents.
+
+=item 0x0303 (771)
+
+An integer number, 32 bit or shorter.
+
+=item 0x0304 (772)
+
+An integer number, longer than 32 bit. Primarily used for inode
+numbers / file IDs.
+
+=item 0x0400 (1024)
+
+A timestamp, apparently a CFDate "absolute time" value in
+big-endian double format.
+
+=item 0x0500 (1280)
+
+Boolean false, size is always empty.
+
+=item 0x0501 (1281)
+
+Boolean true, size is always empty.
+
+=item 0x0601 (1537)
+
+Represents path information. The path elements are defined in
+other chunks, usually immediately before this one in the file.
+The chunk simply contains a list of 32-bit integers, each of
+which is the offset (from the start of the data section) to
+the chunk that represents the respective path element.
+
+Aliases with targets on the same volume usually have two such
+paths, with the first giving the POSIX path to the target, the
+other listing the inodes of the path elements. For targets on
+network volumes or removable drives, there is a third path
+for C<volInfoDepths>; its purpose is not currently known.
+
+=item 0x0901 (2305)
+
+Contains an URL. Aliases usually have at least one such chunk
+containing the URL C<file:///>, possibly as a base to define
+the root of the target's POSIX path.
+
+For network drives and targets on removable drives, an additional
+C<file:> URL chunk is present, pointing to the drive's mount point.
+Network drives additionally have a third URL that points to the
+network drive (for example, C<smb://...>).
+
+=item 0x0a01 (2561)
+
+Used as part of an inode path for files residing on a removable
+drive, and possibly other cases where an inode number would not
+necessarily be available or meaningful. Replaces one or more
+0x0304-type chunks when used. The size of this chunk is always
+zero. Possibly represents a NULL value.
+
+=item Table of contents (-2)
+
+The tables of contents in an alias file represent an index of
+all substantive data it contains. Their chunk type code is -2.
+
+Aliases with targets on the same volume have exactly one of
+these, at the very end of the file. Aliases with targets on
+other volumes may have more than one. The primary table of
+contents is identified by the offset given at the start of
+the data section before the first chunk.
+
+The chunk data of the table of contents begins like this:
+
+ unknown data, possibly "level" (4 bytes)
+ offset to next table of contents chunk (4 bytes)
+   \ zero if this is the last (or only) TOC
+ count of table of contents items (4 bytes)
+
+This is followed by the table of contents items, each of which
+is built like this:
+
+ item type (4 bytes)
+ offset to chunk (4 bytes)
+ unknown, possibly flags (4 bytes)
+
+The following item types have been seen. They are listed here
+together with their description as reported by the output of the
+Precize tool (using the C<NSURLBookmarkDetailedDescription> key).
+
+ %item_types = (
+   0x1004 => 'pathComponents',  # POSIX path
+   0x1005 => 'fileIDs',         # inode path
+   0x1010 => 'resourceProps',
+   0x1020 => 'fileName',
+   0x1040 => 'creationDate',
+   0x1054 => 'relativeDirsUp',
+   0x1055 => 'relativeDirsDown',
+   0x1056 => 'createdWithRelativeURL',
+   0x2000 => 'volInfoDepths',
+   0x2002 => 'volPath',
+   0x2005 => 'volURL',
+   0x2010 => 'volName',
+   0x2011 => 'volUUID',
+   0x2012 => 'volCapacity',
+   0x2013 => 'volCreationDate',
+   0x2020 => 'volProps',
+   0x2030 => 'volWasBoot',
+   0x2050 => 'volMountURL',
+   0xc001 => 'volHomeDirRelativePathComponentCount',
+   0xc011 => 'userName',
+   0xc012 => 'userUID',
+   0xd001 => 'wasFileIDFormat',
+   0xd010 => 'creationOptions',
+   0xf017 => 'displayName',
+   0xf020 => 'effectiveIconData',
+   0xf022 => 'typeBindingData',
+   0xfe00 => 'aliasData',       # 'alis' resource
+ );
+
+=back
+
+The precise order of chunks in an alias file varies slightly,
+depending on the Finder version used to create the alias and
+the kind of the alias's target.
+
+Typically, one of the first chunks in the file begins the POSIX
+path to the target. This is immediately followed by the inode
+path.
+
+At this point, various timestamps, flags and structured property
+data will usually appear, followed by various chunks including
+identification of a network location or removable drive, if
+applicable. In the latter case, a second table of contents
+should also be expected.
+
+After that comes a root identifier, consisting of the URL
+C<file:///>, the root volume name (often Macintosh HD), an inode
+value, a volume timestamp, a UUID, and the string C</>.
+
+Before the table of contents at the end of the file, additional
+structured chunks may include icons, file type information and
+other data. Older aliases also include a structured chunk
+containing data in the format of a traditional C<alis> resource,
+which can be read using L<Mac::Alias::Parse>.
+
+=head2 Differences between Finder versions
+
+The observed differences may be influenced by the available
+selection of test files. This section may not be reliable.
+
+=over
+
+=item Snow Leopard
+
+Aliases created in Mac OS X 10.6 (and thereabouts) have a chunk
+order that differs significantly from later OS versions. They
+don't include the volume URL C<file:///>. They always include
+an C<alis> record and icons.
+
+=item El Capitan
+
+Aliases created in Mac OS X 10.11 (and thereabouts) include the
+volume URL C<file:///>. They also still include icons and an
+C<alis> record.
+
+=item High Sierra
+
+Aliases created in Mac OS X 10.13 (and thereabouts) no longer
+contain icons or an C<alis> record.
+
+=item Catalina
+
+Aliases created in macOS 10.15 (and thereabouts) look identical
+to those created in 10.13.
+
+=back
+
+=head1 RESOURCE FORK ALIASES
+
+Traditionally, aliases were simply files with an C<alis> resource.
+To designate these files as aliases, the C<kIsAlias> Finder flag
+was set in the file system.
+
+Aliases used the same type and creator codes as the original
+they point to. This enabled applications to determine which
+treatment they should give to aliases without having to resolve
+their targets. It also ensured that aliases showed up with the
+icons of their targets in the Finder. For targets without type
+and creator codes, aliases used special codes reserved for this
+purpose (for example, aliases of folders used type C<fdrp> and
+creator C<MACS>). In S<Mac OS X,> regular alias files sometimes
+have had special type codes as well.
+
+It used to be possible to access the resource fork from Perl
+through the Carbon API by using the L<Mac::Resources> module.
+Since Carbon was removed from the operating system beginning
+with macOS 10.15, you would instead need to parse the resource
+fork yourself if you wanted to access this type of alias.
+The resource fork of a file on the Mac can be read from Perl
+by appending C</..namedfork/rsrc> to its file name, and the
+format of a compiled resource fork is documented in I<Inside
+Macintosh: More Macintosh Toolbox,> Resource Manager Reference,
+beginning on page 1-121. Once the C<alis> resource has been
+retrieved from the resource fork, it can be accessed using the
+L<Mac::Alias::Parse> module. This would also work on non-Mac
+operating systems in principle, provided you can decode the
+resource fork from the format it is preserved in (possibly
+using L<Mac::AppleSingleDouble>, L<Mac::Macbinary>, or
+L<Convert::BinHex>).
+
+Resource fork alias files were introduced in Macintosh
+S<System 7> and were used at least until S<Mac OS X 10.1>.
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+L<https://developer.apple.com/library/archive/documentation/MacOSX/Conceptual/BPFileSystem/Articles/Aliases.html>
+
+=item *
+L<https://developer.apple.com/library/archive/documentation/mac/pdf/MoreMacintoshToolbox.pdf>
+
+=item *
+L<https://metacpan.org/release/BDFOY/MacOSX-Alias-0.11/view/lib/Alias.pm>
+
+=item *
+L<https://eclecticlight.co/2019/01/11/aliases-and-bookmarks-are-smarter-than-you-think/>
+
+=item *
+L<https://michaellynn.github.io/2015/10/24/apples-bookmarkdata-exposed/>
+
+=back
+
+=head1 AUTHOR
+
+Arne Johannessen <ajnn@cpan.org>
+
+If you contact me by email, please make sure you include the word
+"Perl" in your subject header to help beat the spam filters.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2022 by Arne Johannessen.
+
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0 or (at your option) the same terms
+as the Perl 5 programming language system itself.
+
+=cut

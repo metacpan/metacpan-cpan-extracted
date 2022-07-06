@@ -202,9 +202,9 @@ sub __selected_statement_result {
     if ( $#{$sf->{i}{history}{ $sf->{d}{db} }{print}} > 50 ) {
         $#{$sf->{i}{history}{ $sf->{d}{db} }{print}} = 50;
     }
-    if ( $sf->{o}{G}{max_rows} && ! $sql->{limit_stmt} ) {
-        $statement .= $ax->sql_limit( $sf->{o}{G}{max_rows} );
-        $sf->{o}{table}{max_rows} = $sf->{o}{G}{max_rows};
+    if ( $sf->{o}{G}{auto_limit} && ! $sql->{limit_stmt} ) {
+        $statement .= $ax->sql_limit( $sf->{o}{G}{auto_limit} );
+        $sf->{o}{table}{max_rows} = $sf->{o}{G}{auto_limit};
     }
     else {
         $sf->{o}{table}{max_rows} = 0;

@@ -40,7 +40,8 @@ my @select_arguments = (
     'drilldown_sort_keys',
     'dynamic_columns',
     'match_columns',
-    'query_expander'
+    'query_expander',
+    'post_filter'
 );
 
 sub new {
@@ -172,6 +173,10 @@ sub _parse_arguments {
     if (exists($args->{'query_expander'})) {
         $parsed_arguments .= '&';
         $parsed_arguments .= "query_expander=" . $args->{'query_expander'};
+    }
+    if (exists($args->{'post_filter'})) {
+        $parsed_arguments .= '&';
+        $parsed_arguments .= "post_filter=" . $args->{'post_filter'};
     }
 
     return $parsed_arguments;

@@ -1,17 +1,14 @@
 package Shipment::Temando::WSDL::Types::CarrierCreatorId;
-$Shipment::Temando::WSDL::Types::CarrierCreatorId::VERSION = '3.08';
+$Shipment::Temando::WSDL::Types::CarrierCreatorId::VERSION = '3.09';
 use strict;
 use warnings;
 
-sub get_xmlns {
-    'http://'
-      . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
-      . '/schema/2009_06/common.xsd';
-}
+sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/common.xsd'};
 
 # derivation by restriction
 use base qw(
-  SOAP::WSDL::XSD::Typelib::Builtin::string);
+    SOAP::WSDL::XSD::Typelib::Builtin::string);
+
 
 
 1;
@@ -28,7 +25,7 @@ Shipment::Temando::WSDL::Types::CarrierCreatorId
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

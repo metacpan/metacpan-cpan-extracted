@@ -15,7 +15,7 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/appexec'
+    'script/appexec'
 );
 
 # no fake home requested

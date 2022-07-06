@@ -6,7 +6,7 @@ build_requires:
   Test::More: '0.96'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
-dynamic_config: 0
+dynamic_config: 1
 generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
 keywords: []
 license: perl
@@ -25,41 +25,42 @@ optional_features: {}
 provides:
   Acme::Mitey::Cards:
     file: lib/Acme/Mitey/Cards.pm
-    version: '0.005'
+    version: '0.008'
   Acme::Mitey::Cards::Card:
     file: lib/Acme/Mitey/Cards/Card.pm
-    version: '0.005'
+    version: '0.008'
   Acme::Mitey::Cards::Card::Face:
     file: lib/Acme/Mitey/Cards/Card/Face.pm
-    version: '0.005'
+    version: '0.008'
   Acme::Mitey::Cards::Card::Joker:
     file: lib/Acme/Mitey/Cards/Card/Joker.pm
-    version: '0.005'
+    version: '0.008'
   Acme::Mitey::Cards::Card::Numeric:
     file: lib/Acme/Mitey/Cards/Card/Numeric.pm
-    version: '0.005'
+    version: '0.008'
   Acme::Mitey::Cards::Deck:
     file: lib/Acme/Mitey/Cards/Deck.pm
-    version: '0.005'
+    version: '0.008'
   Acme::Mitey::Cards::Hand:
     file: lib/Acme/Mitey/Cards/Hand.pm
-    version: '0.005'
+    version: '0.008'
   Acme::Mitey::Cards::Mite:
     file: lib/Acme/Mitey/Cards/Mite.pm
   Acme::Mitey::Cards::Set:
     file: lib/Acme/Mitey/Cards/Set.pm
-    version: '0.005'
+    version: '0.008'
   Acme::Mitey::Cards::Suit:
     file: lib/Acme/Mitey/Cards/Suit.pm
-    version: '0.005'
+    version: '0.008'
+  Acme::Mitey::Cards::Types:
+    file: lib/Acme/Mitey/Cards/Types.pm
 requires:
-  perl: '5.010001'
+  perl: '5.008001'
 resources:
   Identifier: http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/project
   bugtracker: https://github.com/tobyink/p5-mite/issues
   homepage: https://metacpan.org/release/Acme-Mitey-Cards
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-mite.git
-version: '0.005'
+version: '0.008'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
-x_static_install: 1

@@ -6,8 +6,7 @@ use warnings;
 # track the number of times this is invoked
 our $cnt = 0;
 
-sub envs
-{
+sub envs {
     my ( $opt ) = @_;
 
     $cnt++;

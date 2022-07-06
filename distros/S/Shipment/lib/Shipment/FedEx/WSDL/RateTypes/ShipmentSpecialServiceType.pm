@@ -1,13 +1,14 @@
 package Shipment::FedEx::WSDL::RateTypes::ShipmentSpecialServiceType;
-$Shipment::FedEx::WSDL::RateTypes::ShipmentSpecialServiceType::VERSION = '3.08';
+$Shipment::FedEx::WSDL::RateTypes::ShipmentSpecialServiceType::VERSION = '3.09';
 use strict;
 use warnings;
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9'};
 
 # derivation by restriction
 use base qw(
-  SOAP::WSDL::XSD::Typelib::Builtin::string);
+    SOAP::WSDL::XSD::Typelib::Builtin::string);
+
 
 
 1;
@@ -24,7 +25,7 @@ Shipment::FedEx::WSDL::RateTypes::ShipmentSpecialServiceType
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

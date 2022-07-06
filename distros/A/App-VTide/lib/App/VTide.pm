@@ -18,7 +18,7 @@ use Path::Tiny;
 use File::Touch;
 use YAML::Syck qw/ LoadFile DumpFile /;
 
-our $VERSION = version->new('0.1.16');
+our $VERSION = version->new('0.1.17');
 
 has config => (
     is      => 'rw',
@@ -41,16 +41,13 @@ sub run {
     $self->config->history(@ARGV);
     my @sub_commands = keys %{ $self->sub_commands };
 
-    my ($options, $cmd, $opt) = get_options(
-        {
-            name        => 'vtide',
-            conf_prefix => '.',
-            helper      => 1,
-            default     => {
-                test => 0,
-            },
+    my ( $options, $cmd, $opt ) = get_options(
+        {   name          => 'vtide',
+            conf_prefix   => '.',
+            helper        => 1,
+            default       => { test => 0, },
             auto_complete => sub {
-                my ($option, $auto, $errors) = @_;
+                my ( $option, $auto, $errors ) = @_;
                 my $sub_command = $option->files->[0] || '';
                 if ( $sub_command eq '--' ) {
                     print join ' ', sort @sub_commands;
@@ -60,30 +57,32 @@ sub run {
                     print join ' ', sort grep {/^$sub_command/} @sub_commands;
                     return;
                 }
-                elsif ( ! $self->sub_commands->{$sub_command} ) {
-                    unshift @{$option->files}, $sub_command;
+                elsif ( !$self->sub_commands->{$sub_command} ) {
+                    unshift @{ $option->files }, $sub_command;
                     $sub_command = $ENV{VTIDE_DIR} ? 'edit' : 'start';
                 }
                 eval {
-                    $self->load_subcommand( $sub_command, $option )->auto_complete($auto);
+                    $self->load_subcommand( $sub_command, $option )
+                        ->auto_complete($auto);
                     1;
                 } or do {
-                    print join ' ', grep {/$sub_command/xms} sort @sub_commands;
+                    print join ' ',
+                        grep {/$sub_command/xms} sort @sub_commands;
                 }
             },
             auto_complete_shortener => sub {
-                my ($getopt, @args) = @_;
+                my ( $getopt, @args ) = @_;
                 my $sub_command = shift @args || '';
 
                 if ( grep {/^$sub_command./} @sub_commands ) {
                     $getopt->cmd($sub_command);
                 }
-                elsif ( ! $self->sub_commands->{$sub_command} ) {
+                elsif ( !$self->sub_commands->{$sub_command} ) {
                     $getopt->cmd( $ENV{VTIDE_DIR} ? 'edit' : 'start' );
                     unshift @args, $sub_command;
                 }
                 else {
-                    $getopt->cmd($sub_command) if ! $getopt->cmd;
+                    $getopt->cmd($sub_command) if !$getopt->cmd;
                 }
 
                 return @args;
@@ -91,27 +90,28 @@ sub run {
             sub_command   => $self->sub_commands,
             help_package  => __PACKAGE__,
             help_packages => {
-                map {$_ => __PACKAGE__ . '::Command::' . ucfirst $_}
-                @sub_commands,
+                map { $_ => __PACKAGE__ . '::Command::' . ucfirst $_ }
+                    @sub_commands,
             },
         },
-        [
-            'name|n=s',
+        [   'name|n=s',
             'test|T!',
             'verbose|v+',
         ],
     );
 
-    if ( ! $self->sub_commands->{ $opt->cmd } ) {
+    if ( !$self->sub_commands->{ $opt->cmd } ) {
         unshift @ARGV, $opt->cmd;
         $opt->cmd( $ENV{VTIDE_DIR} ? 'edit' : 'start' );
-        $opt->files(\@ARGV);
+        $opt->files( \@ARGV );
     }
 
     my $subcommand = eval { $self->load_subcommand( $opt->cmd, $opt ) };
-    if ( ! $subcommand ) {
-        $subcommand = $self->load_subcommand( $ENV{VTIDE_DIR} ? 'edit' : 'start', $opt );
-        my (undef, $dir) = $subcommand->session_dir($opt->cmd);
+    if ( !$subcommand ) {
+        $subcommand
+            = $self->load_subcommand( $ENV{VTIDE_DIR} ? 'edit' : 'start',
+            $opt );
+        my ( undef, $dir ) = $subcommand->session_dir( $opt->cmd );
         if ( !$dir ) {
             my $error = $@;
             warn $@ if $opt->opt->verbose;
@@ -149,7 +149,7 @@ sub _sub_commands {
     my ($self)   = @_;
     my $sub_file = path $ENV{HOME}, '.vtide', 'sub-commands.yml';
 
-    mkdir $sub_file->parent if ! -d $sub_file->parent;
+    mkdir $sub_file->parent if !-d $sub_file->parent;
 
     if ( -f $sub_file && path($0)->stat->mtime ne $sub_file->stat->mtime ) {
         unlink $sub_file;
@@ -165,17 +165,20 @@ sub _generate_sub_command {
     my $sub_file = path $ENV{HOME}, '.vtide', 'sub-commands.yml';
 
     require Module::Pluggable;
-    Module::Pluggable->import( require => 1, search_path => ['App::VTide::Command'] );
+    Module::Pluggable->import(
+        require     => 1,
+        search_path => ['App::VTide::Command']
+    );
     my @commands = __PACKAGE__->plugins;
 
     my $sub_commands = {};
-    for my $command (reverse sort @commands) {
-        my ($name, $conf) = $command->details_sub;
+    for my $command ( reverse sort @commands ) {
+        my ( $name, $conf ) = $command->details_sub;
         $sub_commands->{$name} = $conf;
     }
 
-    DumpFile($sub_file, $sub_commands);
-    File::Touch->new(reference => $0)->touch($sub_file);
+    DumpFile( $sub_file, $sub_commands );
+    File::Touch->new( reference => $0 )->touch($sub_file);
 
     return $sub_commands;
 }
@@ -190,7 +193,7 @@ App::VTide - A vim/tmux based IDE for the terminal
 
 =head1 VERSION
 
-This documentation refers to App::VTide version 0.1.16
+This documentation refers to App::VTide version 0.1.17
 
 =head1 SYNOPSIS
 

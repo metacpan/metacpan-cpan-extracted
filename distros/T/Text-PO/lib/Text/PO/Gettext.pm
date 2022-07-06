@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO/Gettext.pm
-## Version v0.1.1
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/12
-## Modified 2021/07/30
+## Modified 2022/07/06
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,11 +17,11 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
+    use vars qw( $VERSION $L10N $DOMAIN_RE $LOCALE_RE );
     use I18N::Langinfo qw( langinfo );
-    use Nice::Try;
     use POSIX ();
     use Text::PO;
-    ## l10n_id => lang => string => local string
+    # l10n_id => lang => string => local string
     our $L10N = {};
     our $DOMAIN_RE = qr/^[a-z]+(\.[a-zA-Z0-9\_\-]+)*$/;
     our $LOCALE_RE = qr/^
@@ -35,8 +35,11 @@ BEGIN
             (?:\.(?<locale_encoding>[\w-]+))?
         )
     $/x;
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -56,7 +59,6 @@ sub init
     {
         return( $self->error( "No directory path was provided for localisation" ) );
     }
-    $self->message( 3, "Calling textdomain()" );
     $self->textdomain( $self->{domain} ) || return( $self->pass_error );
     return( $self );
 }
@@ -97,7 +99,7 @@ sub dngettext
     my( $domain, $msgid, $msgidPlural, $count ) = @_;
     my $default;
     my $index;
-    if( $count !~ /^\d+$/ )
+    if( !defined( $count ) || $count !~ /^\d+$/ )
     {
         $default = $msgidPlural || $msgid;
     }
@@ -116,23 +118,19 @@ sub dngettext
     my $dict = $l10n->{ $msgid };
     if( $dict )
     {
-        $self->message( 3, "Plural is: ", sub{ $self->dump( $plural ) });
         if( $plural->length == 0 )
         {
             $plural = $self->getPlural();
-            $self->message( 3, "Plural is now: ", sub{ $self->dump( $plural ) });
         }
         if( ref( $dict->{msgstr} ) eq 'ARRAY' )
         {
-            $self->message( 3, "msgid localised value is a plural aware text -> ", sub{ $self->dump( $dict->{msgstr} ) });
             if( $self->_is_number( $count ) &&
                 int( $plural->[0] ) > 0 )
             {
                 no warnings 'once';
-                local $n = $count;
+                my $n = $count;
                 my $expr = $plural->[1];
                 $expr =~ s/(?:^|\b)(?<!\$)(n)(?:\b|$)/\$$1/g;
-                $self->message( 3, "Evaluating '$plural->[1]'" );
                 $index = eval( $expr );
                 $index = int( $index );
             }
@@ -140,9 +138,6 @@ sub dngettext
             {
                 $index = 0;
             }
-            $self->message( 3, "Count is \"${count}\" and plural offset computed is ${index}" );
-            $self->message( 3, "msgstr contains: ", sub{ $self->dump( $dict->{msgstr} ) });
-            $self->message( 3, "Returning '", $dict->{msgstr}->[ $index ]->[0] || $default, "'" );
             return( join( '', @{$dict->{msgstr}->[ $index ]} ) || $default );
         }
         return( $dict->{msgstr} || $default );
@@ -260,14 +255,12 @@ sub getDomainHash
         defined( $opts->{locale} ) )
     {
         $opts->{locale} = $self->locale_unix( $opts->{locale} );
-        # $self->message( 3, "Returning domain hash for domain \"$opts->{domain}\" and locale \"$opts->{locale}\" -> ", sub{ $self->dump( $l10n ) });
         if( length( $opts->{locale} ) == 0 )
         {
             return( $self->error( "Locale was provided, but is empty." ) );
         }
         return( $l10n->{ $opts->{locale} } );
     }
-    # $self->message( 3, "Returning domain hash -> ", sub{ $self->dump( $l10n ) });
     return( $l10n );
 }
 
@@ -282,14 +275,12 @@ sub getLanguageDict
         return( $self->error( "Locale provided (${lang}) is in an unsupported format." ) );
     }
     $lang = $self->locale_unix( $lang );
-    $self->message( 3, "Using locale '$lang'" );
     
     if( !$self->isSupportedLanguage( $lang ) )
     {
         return( $self->error( "Language provided (${lang}), to get its dictionary, is unsupported." ) );
     }
     my $hash = $self->getDomainHash();
-    $self->message( 3, "$lang is supported. domain hash is '$hash'" );
     if( !exists( $hash->{ $lang } ) )
     {
         return( $self->error( "Language provided (${lang}), to get its dictionary, could not be found. This is weird. Most likely a configuration mistake." ) );
@@ -410,6 +401,8 @@ sub gettext
     return( $self->dngettext( $self->domain, shift( @_ ) ) );
 }
 
+sub gettextf { return( shift->getTextf( @_ ) ); }
+
 sub isSupportedLanguage
 {
     my $self = shift( @_ );
@@ -512,7 +505,6 @@ sub plural
         if( !scalar( @{$self->{plural}} ) )
         {
             $self->{plural} = $self->getPlural();
-            $self->message( 3, "getPlural returned: ", sub{ $self->dump( $self->{plural} ) });
         }
         return( $self->_set_get_array_as_object( 'plural' ) );
     }
@@ -542,7 +534,6 @@ sub textdomain
     my $file;
     my $po;
     
-    $self->message( 3, "Checking '$path_json', then '$path_po' and finally '$path_mo'" );
     
     if( $self->use_json && $path_json->exists )
     {
@@ -597,15 +588,17 @@ sub _get_days
 
     for (my $i = 1; $i <= 7; $i++)
     {
-        my $const = "I18N::Langinfo::ABDAY_${i}";
-        $self->message( 3, "ABDAY_${i} -> ", &$const, "\n" );
-        $short->[$i-1] = langinfo( &$const );
+        # my $const = "I18N::Langinfo::ABDAY_${i}";
+        my $const = I18N::Langinfo->can( "ABDAY_${i}" );
+        # $short->[$i-1] = langinfo( &$const );
+        $short->[$i-1] = langinfo( $const->() );
     }
     for (my $i = 1; $i <= 7; $i++)
     {
-        my $const = "I18N::Langinfo::DAY_${i}";
-        $self->message( 3, "DAY_${i} -> ", &$const, "\n" );
-        $long->[$i-1] = langinfo( &$const );
+        # my $const = "I18N::Langinfo::DAY_${i}";
+        my $const = I18N::Langinfo->can( "DAY_${i}" );
+        # $long->[$i-1] = langinfo( &$const );
+        $long->[$i-1] = langinfo( $const->() );
     }
 
     POSIX::setlocale( &POSIX::LC_ALL, $oldlocale) if( defined( $locale ) );
@@ -625,15 +618,17 @@ sub _get_months
 
     for (my $i = 1; $i <= 12; $i++)
     {
-        my $const = "I18N::Langinfo::ABMON_${i}";
-        $self->message( 3, "ABMON_${i} -> ", &$const, "\n" );
-        $short->[$i-1] = langinfo( &$const );
+        # my $const = "I18N::Langinfo::ABMON_${i}";
+        # $short->[$i-1] = langinfo( &$const );
+        my $const = I18N::Langinfo->can( "ABMON_${i}" );
+        $short->[$i-1] = langinfo( $const->() );
     }
     for (my $i = 1; $i <= 12; $i++)
     {
-        my $const = "I18N::Langinfo::MON_${i}";
-        $self->message( 3, "MON_${i} -> ", &$const, "\n" );
-        $long->[$i-1] = langinfo( &$const );
+        # my $const = "I18N::Langinfo::MON_${i}";
+        # $long->[$i-1] = langinfo( &$const );
+        my $const = I18N::Langinfo->can( "MON_${i}" );
+        $long->[$i-1] = langinfo( $const->() );
     }
 
     POSIX::setlocale( &POSIX::LC_ALL, $oldlocale) if( defined( $locale ) );
@@ -669,9 +664,7 @@ sub _get_po
 }
 
 1;
-
-# XXX POD
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -684,7 +677,7 @@ Text::PO::Gettext - A GNU Gettext implementation
 
     use Text::PO::Gettext;
     my $po = Text::PO::Gettext->new || die( Text::PO::Gettext->error, "\n" );
-    my $po = new Gettext({
+    my $po = Text::PO::GettextGettext->new({
         category => 'LC_MESSAGES',
         debug    => 3,
         domain   => "com.example.api",
@@ -695,7 +688,7 @@ Text::PO::Gettext - A GNU Gettext implementation
 
 =head1 VERSION
 
-    v0.1.1
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -1167,6 +1160,10 @@ Provided with a C<msgid> represented by a string, and this return a localised ve
     # With locale of fr_FR, this would return "Bonjour"
 
 See the global function L</_> for more information.
+
+=head2 gettextf
+
+This is an alias to L</getTextf>
 
 =head2 isSupportedLanguage
 

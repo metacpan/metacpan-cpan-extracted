@@ -251,9 +251,13 @@ SPVM::$class_name - $class_name is a SPVM module
   
 =head1 Description
 
-$class_name is a SPVM module.
+C<$class_name> is a L<SPVM> module.
 
-=head1 Static Methods
+=head1 Field Methods
+
+
+
+=head1 Class Methods
 
 
 
@@ -265,19 +269,11 @@ $class_name is a SPVM module.
 
 
 
-=head1 Bug Report
-
-
-
-=head1 Support
-
-
-
 =head1 Author
 
 
 
-=head1 Copyright & LICENSE
+=head1 Copyright & License
 
 Copyright YYYY-YYYY AUTHOR_NAME, all rights reserved.
 
@@ -314,9 +310,9 @@ use strict;
 use warnings;
 use SPVM::Builder::Config;
 
-my \$native_config = SPVM::Builder::Config->$new_method(file => __FILE__);
+my \$config = SPVM::Builder::Config->$new_method(file => __FILE__);
 
-\$native_config;
+\$config;
 EOS
 
   # Generate file
@@ -612,6 +608,7 @@ EOS
   else {
     $basic_test_spvm_module_content = <<"EOS";
 class TestCase::$class_name {
+  use $class_name;
   static method test : int () {
     
     return 1;

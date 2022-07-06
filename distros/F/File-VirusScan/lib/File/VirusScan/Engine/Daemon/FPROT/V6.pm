@@ -63,9 +63,10 @@ sub scan
 {
 	my ($self, $path) = @_;
 
-	if(abs_path($path) ne $path) {
-		return File::VirusScan::Result->error("Path $path is not absolute");
-	}
+        my $abs = abs_path($path);
+        if ($abs && $abs ne $path) {
+                $path = $abs;
+        }
 
 	# The F-Prot demon cannot scan directories, but files only
 	# hence, we recurse any directories manually

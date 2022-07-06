@@ -33,12 +33,12 @@ my %WriteMakefileArgs = (
         resources => {
         #    homepage    => undef,
             repository  => {
-                url         => 'git@git.deguest.jp:jack/DateTime-Format-JP.git',
-                web         => 'https://git.deguest.jp/jack/DateTime-Format-JP',
+                url         => 'git@gitlab.com:jackdeguest/DateTime-Format-JP.git',
+                web         => 'https://gitlab.com/jackdeguest/DateTime-Format-JP',
                 type        => 'git',
             },
             bugtracker => {
-                web         => 'https://git.deguest.jp/jack/DateTime-Format-JP/issues',
+                web         => 'https://gitlab.com/jackdeguest/DateTime-Format-JP/issues',
             },
         },
     }) : ()),

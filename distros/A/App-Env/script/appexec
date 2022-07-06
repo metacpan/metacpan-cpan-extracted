@@ -1,0 +1,463 @@
+#!perl
+
+use v5.10;
+use strict;
+use warnings;
+
+# ABSTRACT: execute a command under a specified environment
+# PODNAME: appexec
+
+use Getopt::Long qw( :config require_order );
+
+use File::Basename;
+use File::Spec::Functions qw( file_name_is_absolute );
+use File::Which;
+use App::Env;
+
+our $VERSION = '0.36';
+our $prog    = basename( $0, '.pl' );
+
+our %ShellMap = (
+    ksh  => 'korn',
+    bash => 'bash',
+    tcsh => 'tc',
+    sh   => 'bourne',
+    csh  => 'c'
+);
+
+# program options; see parse_args();
+our %opt;
+
+eval { main() };
+
+if ( $@ ) {
+    print STDERR "# $prog: $_\n" foreach split /\n/, $@;
+    exit 1;
+}
+
+exit 0;
+
+sub main {
+    parse_args();
+
+    help( 1 ) if $opt{help};
+    help( 2 ) if $opt{usage};
+
+    do { print "$prog $VERSION\n"; return }
+      if $opt{version};
+
+    die "please specify an environment\n"
+      unless defined $opt{env};
+
+    if ( $opt{clear} ) {
+        %ENV = map { $_ => $ENV{$_} }
+          grep { exists $ENV{$_} } qw[ HOME LOGNAME SHELL ];
+    }
+
+    my @envs = split( ',', $opt{env} );
+
+  # if more than one environment, sort out possible environment specific appopts
+    my %appopts;
+    @appopts{@envs} = map { {} } 1 .. @envs;
+
+    if ( @envs > 1 ) {
+
+        while ( my ( $k, $value ) = each %{ $opt{appopts} } ) {
+            my ( $env, $key ) = $k =~ /^([^:]*):(.*)$/;
+
+            die(
+                "appopts ($key) not specific to one of the specified environments"
+            ) unless exists $appopts{$env};
+
+            $appopts{$env}{$key} = $value;
+        }
+    }
+
+    else {
+        $appopts{ $envs[0] } = $opt{appopts};
+    }
+
+    my $env = eval {
+        App::Env->new(
+            ( map { [ $_ => { AppOpts => $appopts{$_} } ] } @envs ),
+            { ( defined $opt{site} ? ( Site => $opt{site} ) : () ), } );
+    };
+    die( "error setting up environment `$opt{env}': $@\n" )
+      if $@;
+
+    $env->setenv( $_ ) for @{ $opt{delete} };
+    $env->setenv( $_, $opt{define}{$_} ) for keys %{ $opt{define} };
+
+    dumpenv( $env, $opt{dumpenv}, $opt{dumpvar} ) if $opt{dumpenv};
+
+    if ( @ARGV ) {
+        print join( ' ', @ARGV ), "\n"
+          if $opt{verbose};
+
+        %ENV = %$env;
+
+        die( "$ARGV[0] does not exist, is not executable, or is not in PATH\n" )
+          unless ( file_name_is_absolute( $ARGV[0] ) && -e $ARGV[0] )
+          || defined which( $ARGV[0] );
+
+        exec { $ARGV[0] } @ARGV
+          or die( "can't exec $ARGV[0]: not in path?\n" );
+    }
+}
+
+
+sub dumpenv {
+    my ( $env, $fmt, $vars ) = @_;
+
+    $vars = [ keys %$env ] unless @$vars;
+
+    if ( $fmt eq 'raw' ) {
+        say "$_=",
+          (
+            length $env->{$_}
+            ? App::Env::_shell_escape( $env->{$_} )
+            : ''
+          ) for @$vars;
+    }
+
+    elsif ( $fmt eq 'unquoted' ) {
+        say "$_=$env->{$_}" for @$vars;
+    }
+
+    elsif ( $fmt eq 'values' ) {
+        say $env->{$_} for @$vars;
+    }
+
+    elsif ( $fmt eq 'json' ) {
+        require JSON::PP;
+        say JSON::PP::encode_json( { map { $_ => $env->{$_} } @$vars } );
+    }
+
+    elsif ( $fmt eq 'delta-json' ) {
+        my ( $delete, $add ) = delta( $env );
+        require JSON::PP;
+        say JSON::PP::encode_json( {
+            delete => $delete,
+            add    => { map { $_ => $env->{$_} } @$add },
+        } );
+    }
+
+    elsif ( $fmt eq 'delta-args' ) {
+        my ( $delete, $add ) = delta( $env );
+        say join q{ }, ( map { "-X $_" } @$delete ),
+          ( map { "-D $_=" . App::Env::_shell_escape( $env->{$_} ) } @$add );
+    }
+
+    else {
+        require Shell::Guess;
+
+        if ( $fmt eq 'auto' ) {
+            $fmt = Shell::Guess->running_shell;
+        }
+        else {
+            die( "unknown dump format: $fmt\n" )
+              unless my $mth
+              = Shell::Guess->can( ( $ShellMap{$fmt} // $fmt ) . '_shell' );
+            $fmt = Shell::Guess->$mth;
+        }
+        require Shell::Config::Generate;
+        my $config = Shell::Config::Generate->new;
+        $config->set( $_, $env->{$_} ) for @$vars;
+        print $config->generate( $fmt );
+    }
+}
+
+sub delta {
+    my ( $env ) = @_;
+    my @delete = grep { !exists $env->{$_} } keys %ENV;
+
+    my @add = grep {
+            !exists $ENV{$_}
+          || exists $ENV{$_}
+          && exists $env->{$_}
+          && $ENV{$_} ne $env->{$_}
+    } keys %$env;
+    return ( \@delete, \@add );
+}
+
+sub parse_args {
+
+    %opt = (
+        appopts => {},
+        clear   => 0,
+        define  => {},
+        delete  => [],
+        dumpvar => [],
+        verbose => 0,
+        version => 0,
+        usage   => 0,
+        help    => 0,
+    );
+
+    eval {
+        local $SIG{__WARN__} = sub { die $_[0] };
+
+        Getopt::Long::Configure( 'no_ignore_case' );
+
+        GetOptions(
+            \%opt,
+            qw/
+              env=s
+              appopts|o=s%
+              define|D=s%
+              delete|X=s@
+              usage
+              help
+              clear|c
+              dumpenv|d=s
+              dumpvar|V=s@
+              site=s
+              verbose
+              version
+              /,
+        );
+    };
+
+    die $@ if $@;
+
+    return if $opt{version} || $opt{help} || $opt{usage};
+
+    my @notset = grep { !defined $opt{$_} } keys %opt;
+    die( 'parameters `', join( "`, `", @notset ), "' are not set\n" )
+      if @notset;
+
+    # ensure that the dumpenv option is correct
+    if ( exists $opt{dumpenv} ) {
+        die( "unsupported dumpenv format: $opt{dumpenv}\n" )
+          unless grep { $opt{dumpenv} eq $_ } keys %ShellMap,
+          qw( auto delta-args delta-json json raw unquoted values );
+    }
+
+    # if --env wasn't specified, the first argument is the application
+    # name
+    $opt{env} = shift( @ARGV ) unless defined $opt{env};
+}
+
+
+sub help {
+    my ( $verbose ) = @_;
+
+    require Pod::Usage;
+    Pod::Usage::pod2usage( { -exitval => 0, -verbose => $verbose } );
+}
+
+#
+# This file is part of App-Env
+#
+# This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
+__END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
+=head1 NAME
+
+appexec - execute a command under a specified environment
+
+=head1 VERSION
+
+version 0.36
+
+=head1 SYNOPSIS
+
+B<appexec> --env environment I<[options]> program [I<program arguments>]
+
+B<appexec> I<[options]> environment program [I<program arguments>]
+
+=head1 DESCRIPTION
+
+B<appexec> will execute a program with the specified arguments in the
+specified environment.  The environment is generated by B<App::Env>,
+so an appropriate B<App::Env> application module must exist.
+
+=head1 OPTIONS AND ARGUMENTS
+
+B<appexec> uses long options. Options may be abbreviated, and the "="
+character shown below in the option templates may be replaced by
+whitespace.
+
+The environment to use may be specified either via the B<--env> option,
+or as the first non-option argument.
+
+The following options are available:
+
+=over
+
+=item C<--clear> | C<-c>
+
+Clear out the environment prior to loading the specified ones.  This is equivalent
+to deleting all environment variables except for
+
+  HOME
+  SHELL
+  LOGNAME
+
+=item C<--env>=I<name>
+
+A comma separated list of environments (or I<applications> in
+B<App::Env> terminology) in which to run the program.  The Perl modules
+defining the environments (e.g. B<App::Env::<environment name>> ) must exist.
+
+If this option is not specified, the first non-option argument should
+contain the environment name(s).
+
+=item C<--appopts> I<key>=I<value> | C<-o> I<key>=I<value>
+
+Specify a option key and value to be passed via B<AppOpts> to the
+B<App::Env> application module.  This option may be specified multiple times.
+
+If multiple environments will be loaded, then each key must be prefixed with
+an environment name followed by a colon, e.g.:
+
+  appexec --env env1,env2 -o env1:opt1=val1 -o env2:opt2=val2
+
+=item C<--site>=I<site>
+
+Specify a site. (See B<App::Env> for more information.)
+
+=item C<--define>|C<-D> I<variable>=I<value>
+
+Specify an environment variable to be added to the
+application environment.  This option may be repeated.
+
+=item C<--delete>|C<-X> I<variable>
+
+Specify an environment variable to be removed from the
+application environment.  This option may be repeated.
+
+=item C<--dumpenv>=I<format> | B<-d> I<format>
+
+Output the environmental variables to the standard output stream with
+the specified format.  To specify a subset of the variables to output,
+use L</--dumpvar>.
+
+The possible formats are:
+
+=over
+
+=item C<auto>
+
+Guess the current shell using L<Shell::Guess> and output commands to set
+the environment
+
+=item C<bash>
+
+=item C<csh>
+
+=item C<ksh>
+
+=item C<tcsh>
+
+Output commands to set the environment appropriate to the specified shell.
+
+=item C<raw>
+
+Output C<key=value> where C<value> has shell metacharacters and spaces escaped
+
+=item C<unquoted>
+
+Output C<key=value>.
+
+=item C<values>
+
+Output only the values one per line.  Only eally useful with L<--dumpvar>.
+
+=item C<json>
+
+Output the values as C<JSON>.
+
+=back
+
+=item C<--dumpvar>|C<-V> I<variable>
+
+Specify an environment variable to dump if L</--dumpenv> is specified.
+May be repeated.  If not specified, all environment variables are
+dumped.
+
+=item C<--verbose>
+
+Print the command to be run to the standard output stream before running it.
+
+=item C<--help>
+
+Print a short help summary and exit.
+
+=item C<--usage>
+
+Print full documentation and exit.
+
+=back
+
+=head1 EXAMPLES
+
+Real-life examples:
+
+=over
+
+=item 1
+
+Run the B<fhelp> tool from the HEADAS FTOOLS application suite:
+
+  appexec HEADAS fhelp fparkey
+
+=item 2
+
+Run the B<dmlist> tool from the CIAO version 3.4 application suite:
+
+  appexec -o version=3.4 CIAO dmlist
+
+=back
+
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-app-env@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Env
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/App-Env
+
+and may be cloned from
+
+  https://gitlab.com/djerius/App-Env.git
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<App::Env|App::Env>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

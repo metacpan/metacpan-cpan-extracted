@@ -10,8 +10,12 @@ package PDF::Table;
 use Carp;
 use List::Util qw[min max];  # core
 
-our $VERSION = '1.002'; # fixed, read by Makefile.PL
-my $LAST_UPDATE = '1.002'; # manually update whenever code is changed
+use PDF::Table::ColumnWidth;
+use PDF::Table::Settings;
+# can't move text_block() b/c many globals referenced
+
+our $VERSION = '1.003'; # fixed, read by Makefile.PL
+our $LAST_UPDATE = '1.003'; # manually update whenever code is changed
 # don't forget to update VERSION down in POD area
 
 my $compat_mode = 0; # 0 = new behaviors, 1 = compatible with old
@@ -31,7 +35,7 @@ if ($compat_mode) {  # 1: be compatible with older PDF::Table behavior
 
 # ================ OTHER GLOBAL DEFAULTS =========================== per #7
 my $fg_color_default   = 'black';   # foreground text color
-# no bg_color_default (defaults to transparent background)
+#  no bg_color_default (defaults to transparent background)
 my $h_fg_color_default = '#000066'; # fg text color for header
 my $h_bg_color_default = '#FFFFAA'; # bg color for header
 my $font_size_default  = 12; # base font size
@@ -40,6 +44,7 @@ my $border_w_default   = 1;  # line width for borders
 my $max_wordlen_default = 20; # split any run of 20 non-space chars
 my $empty_cell_text    = '-'; # something to put in an empty cell
 my $dashed_rule_default = 2;  # dash/space pattern length for broken rows
+my $min_col_width      = 2;  # absolute minimum width of a column, > 0
 # ==================================================================
 
 print __PACKAGE__.' is version: '.$VERSION.$/ if ($ENV{'PDF_TABLE_DEBUG'});
@@ -90,6 +95,7 @@ sub set_defaults {
     my $self = shift;
 
     $self->{'font_size'} = $font_size_default;
+    $min_col_width = max($min_col_width, 1);  # minimum width
     return;
 }
 
@@ -149,7 +155,7 @@ sub table {
     #=====================================
     unless ($pdf and $page and $data) {
         carp "Error: Mandatory parameter is missing PDF/page/data object!\n";
-        return;
+        return ($page, 0, 0);
     }
 
     # Validate mandatory argument data type
@@ -185,10 +191,10 @@ sub table {
         'leading'               => 1,  #         text_block
           'lead'                => 1,  #  deprecated
         'padding'               => 1,  # global
-        'padding_right'         => 1,  # global
-        'padding_left'          => 1,  # global
-        'padding_top'           => 1,  # global
-        'padding_bottom'        => 1,  # global
+         'padding_right'        => 1,  # global
+         'padding_left'         => 1,  # global
+         'padding_top'          => 1,  # global
+         'padding_bottom'       => 1,  # global
         'bg_color'              => 1,  # global, header, row, column, cell
           'background_color'    => 1,  #  deprecated
         'bg_color_odd'          => 1,  # global, column, cell
@@ -211,11 +217,11 @@ sub table {
           'border_color'        => 1,  #  deprecated
         # possibly in future, separate h_border_c and v_border_c
         'rule_w'                => 1,  # global, row, column, cell
-        'h_rule_w'              => 1,  # global, row, column, cell
-        'v_rule_w'              => 1,  # global, row, column, cell
+         'h_rule_w'             => 1,  # global, row, column, cell
+         'v_rule_w'             => 1,  # global, row, column, cell
         'rule_c'                => 1,  # global, row, column, cell
-        'h_rule_c'              => 1,  # global, row, column, cell
-        'v_rule_c'              => 1,  # global, row, column, cell
+         'h_rule_c'             => 1,  # global, row, column, cell
+         'v_rule_c'             => 1,  # global, row, column, cell
         'font'                  => 1,  # global, header, row, column, cell
         'font_size'             => 1,  # global, header, row, column, cell
         'underline'             => 1,  # global, header, row, column, cell
@@ -240,6 +246,7 @@ sub table {
       # 'flindent'                     #         text_block
       # 'fpindent'                     #         text_block
       # 'indent'                       #         text_block
+        'size'                  => 1,  # global
     );
     foreach my $key (keys %arg) {
         # Provide backward compatibility
@@ -261,19 +268,19 @@ sub table {
     # Global geometry parameters are also mandatory.
     unless ( $xbase  > 0 ) {
         carp "Error: Left Edge of Table is NOT defined!\n";
-        return;
+        return ($page, 0, $ybase);
     }
     unless ( $ybase  > 0 ) {
         carp "Error: Base Line of Table is NOT defined!\n";
-        return;
+        return ($page, 0, $ybase);
     }
     unless ( $width  > 0 ) {
         carp "Error: Width of Table is NOT defined!\n";
-        return;
+        return ($page, 0, $ybase);
     }
     unless ( $height > 0 ) {
         carp "Error: Height of Table is NOT defined!\n";
-        return;
+        return ($page, 0, $ybase);
     }
 
     my $pg_cnt      = 1;
@@ -289,6 +296,7 @@ sub table {
     # Ensure default values for next_y and next_h 
     my $next_y  = $arg{'next_y'} || undef;
     my $next_h  = $arg{'next_h'} || undef;
+    my $size    = $arg{'size'}   || undef;
 
     # Create Text Object
     my $txt     = $page->text();
@@ -329,9 +337,10 @@ sub table {
     my $row_props = $arg{'row_props'} || [];
 
     # deprecated setting (globals) names, copy to new names
-    deprecated_settings($data, $row_props, $col_props, $cell_props, $header_props, \%arg);
+    PDF::Table::Settings::deprecated_settings(
+         $data, $row_props, $col_props, $cell_props, $header_props, \%arg);
     # check settings values as much as possible
-    check_settings(%arg);
+    PDF::Table::Settings::check_settings(%arg);
 
     #=====================================
     # Set Global Default Properties
@@ -358,7 +367,7 @@ sub table {
     my $underline       = $arg{'underline'       } || 
                           undef; # merely stating undef is the intended default
     my $max_word_len    = $arg{'max_word_length' } || $max_wordlen_default;
-    my $default_text    = $arg{'default_text'  } // $empty_cell_text;
+    my $default_text    = $arg{'default_text'  } || $empty_cell_text;
 
     # An array ref of arrayrefs whose values are
     # the actual widths of the column/row intersection
@@ -394,9 +403,10 @@ sub table {
     #
     # $rows_height->[$row_idx] array overall height of each row
     # $calc_column_widths overall width of each column
-    my $col_min_width = []; # holds the running width of each column
-    my $col_max_width = []; #  min and max (min_w & longest word, max_w &
-                            #  length of content
+    my $col_min_width   = []; # holds the running width of each column
+    my $col_max_content = []; #  min and max (min_w & longest word,
+                              #  length of content)
+    my $max_w           = []; # each column's max_w, if defined
     for ( my $row_idx = 0; $row_idx < scalar(@$data) ; $row_idx++ ) {
         $GLOBALS->[3] = $row_idx;
         my $column_widths = []; # holds the width of each column
@@ -407,8 +417,9 @@ sub table {
               $col_idx < scalar(@{$data->[$row_idx]}); 
               $col_idx++ ) {
             $GLOBALS->[4] = $col_idx;
+            # initialize min and max column content widths to 0
             $col_min_width->[$col_idx]=0 if !defined $col_min_width->[$col_idx];
-            $col_max_width->[$col_idx]=0 if !defined $col_max_width->[$col_idx];
+            $col_max_content->[$col_idx]=0 if !defined $col_max_content->[$col_idx];
 
             if ( !$row_idx && $do_headers ) {
                 # header row
@@ -590,16 +601,20 @@ sub table {
 
             # for cell, minimum width is longest word, maximum is entire text
             # treat header row like any data row for this
+            # increase minimum width to (optional) specified column min width
+            # keep (optional) specified column max width separate
             # NOTE that cells with only blanks will be treated as empty (no
             #   words) and have only L+R padding for a width!
             foreach ( @words ) {
                 unless ( exists $word_widths->{$_} ) {
                     # Calculate the width of every word and add the space width to it
+                    # caching each word so only figure width once
                     $word_widths->{$_} = $txt->advancewidth($_);
                 }
 
                 # minimum width is longest word or fragment
                 $min_col_w = max($min_col_w, $word_widths->{$_});
+                # maximum width is total text in cell 
                 if ($max_col_w) {
                     # already have text, so add a space first
                     # note that multiple spaces between words become one!
@@ -616,21 +631,22 @@ sub table {
 
             # at this point we have longest word (min_col_w), overall length
             # (max_col_w) of this cell. add L+R padding
+            # cell_min/max_w are optional settings
             # TBD what if $cell_def_text is longer?
             $min_col_w                 += $cell_pad_left + $cell_pad_right;
             $min_col_w = max($min_col_w, $cell_min_w) if defined $cell_min_w;
             $max_col_w                 += $cell_pad_left + $cell_pad_right;
-            $max_col_w = min($max_col_w, $cell_max_w) if defined $cell_max_w;
             $max_col_w = max($min_col_w, $max_col_w);
-            $col_min_width->[$col_idx] = max($col_min_width->[$col_idx], $min_col_w);
-            $col_max_width->[$col_idx] = max($col_max_width->[$col_idx], $max_col_w);
-            $column_widths->[$col_idx] = $max_col_w;
+            $col_min_width->[$col_idx] = max($col_min_width->[$col_idx], 
+                                             $min_col_w);
+            $col_max_content->[$col_idx] = max($col_max_content->[$col_idx], 
+                                             $max_col_w);
 
+            if (!defined $max_w->[$col_idx]) { $max_w->[$col_idx] = -1; }
+            $max_w->[$col_idx] = max($max_w->[$col_idx], $cell_max_w) if
+                defined $cell_max_w; # otherwise -1
+            $column_widths->[$col_idx] = $col_max_content->[$col_idx];
 
-            # not sure what point of "maximum width" is, as a long line will
-            # usually be folded into several lines
-            # TBD what we need is how many lines of text will be produced, to
-            # get the cell height
         } # (End of cols) for (my $col_idx....
 
         $row_col_widths->[$row_idx] = $column_widths;
@@ -642,8 +658,18 @@ sub table {
 
     # Calc real column widths and expand table width if needed.
     my $calc_column_widths;
-    ($calc_column_widths, $width) = 
-        CalcColumnWidths( $width, $col_min_width, $col_max_width );
+    my $em_size = $txt->advancewidth('M');
+    my $ex_size = $txt->advancewidth('x');
+
+    if (defined $size) {
+        ($calc_column_widths, $width) = 
+            PDF::Table::ColumnWidth::SetColumnWidths( 
+                   $width, $size, $em_size, $ex_size );
+    } else {
+        ($calc_column_widths, $width) = 
+            PDF::Table::ColumnWidth::CalcColumnWidths( 
+                   $width, $col_min_width, $col_max_content, $max_w );
+    }
 
     # ----------------------------------------------------------------------
     # Let's draw what we have!
@@ -724,15 +750,22 @@ sub table {
         # ----------------------------------------------------------------
         # should be at top of table for current page
         # either start of table, or continuation
+        # pg_cnt >= 1
+        # do_headers = 0 not doing headers
+        #              1 non-repeating header
+        #              2 repeating header
 
-        # check if enough vertical space for first data row, AND for header
-        # if doing a header row! increase height, decrease bot_margin.
-        # possible that bot_margin goes < 0 (warning message).
+        # check if enough vertical space for first data row (row 0 or 1), AND 
+        # for header (0) if doing a header row! increase height, decrease 
+        # bot_margin. possible that bot_margin goes < 0 (warning message).
         # TBD if first page (pg_cnt==1), and sufficient space on next page,
         # just skip first page and go on to second
+        # For degenerate cases where there is only a header row and no data
+        # row(s), don't try to make use of missing rows height [1]
         my $min_height = $rows_height->[0]; 
-        $min_height += $rows_height->[1] if $do_headers && $pg_cnt==1 ||
-                                             $do_headers==2 && $pg_cnt>1;
+        $min_height += $rows_height->[1] if 
+            ($do_headers && $pg_cnt==1 || $do_headers==2 && $pg_cnt>1) &&
+            defined $rows_height->[1];
         if ($min_height >= $table_top_y - $bot_margin) {
             # Houston, we have a problem. height isn't enough
             my $delta = $min_height - ($table_top_y - $bot_margin) + 1;
@@ -761,7 +794,8 @@ sub table {
         $gfx = $page->gfx();  # for borders, rules, etc.
         $gfx->strokecolor($border_c);
 
-        # Draw the top line (border)
+        # Draw the top line (border), only if h_border_w > 0, as we
+        # don't know what rules are doing
         if ($h_border_w) {
             if      ($next_top_border == 0) {
                 # first top border (page 1), use specified border
@@ -770,7 +804,7 @@ sub table {
                 # solid thin line at start of a row
                 $gfx->linewidth($border_w_default);
             } else {  # == 2
-                # dashed thin line at contination in middle of row
+                # dashed thin line at continuation in middle of row
                 $gfx->linewidth($border_w_default);
                 $gfx->linedash($dashed_rule_default);
             }
@@ -1047,6 +1081,7 @@ sub table {
                         $colspanned{$row_idx.'_'.($col_idx + $offset)} = 1;
                     }
                 }
+                $this_cell_width = max($this_cell_width, $min_col_width);
                 $actual_column_widths[$row_idx][$col_idx] = $this_cell_width;
 
                 my %text_options;
@@ -1058,6 +1093,8 @@ sub table {
                 # we need to add the text as a text block
                 # Otherwise just use the $page->text() method
                 my $content = $data_row->[$col_idx];
+                $content = $cell_def_text if $content eq '';
+                # empty content? doesn't seem to do any harm
                 if ( $content !~ m/(.\n.)/ and
                      $data_row_widths->[$col_idx] and
                      $data_row_widths->[$col_idx] <= 
@@ -1086,6 +1123,7 @@ sub table {
                       = $self->text_block(
                           $txt,
                           $content,
+                          $row_idx, $col_idx,
                           # mandatory args
                           'x'         => $cur_x + $cell_pad_left,
                           'y'         => $text_start_y,
@@ -1265,227 +1303,6 @@ sub table {
     return ($page, --$pg_cnt, $cur_y);
 } # end of table()
 
-###################################################################
-# calculate the column widths
-#   minimum: any specified min_w, increased to longest word in column
-#   maximum: largest total length of content, reduced to any spec. max_w
-#   maximum must be at least as large as minimum
-#   TBD: rules and borders? currently overlay cells. consider 
-#        expanding h and w by width of rules and borders. would involve
-#        mucking with cell background fill dimensions? remember that
-#        rule widths could vary by cell. perhaps could just increase cell
-#        dimensions (and padding) by rule widths, and continue to overlay?
-#   expand min widths to fill to desired total width, try not to
-#     exceed maximum widths
-###################################################################
-
-sub CalcColumnWidths {
-    my $avail_width   = shift;  # specified table width
-    my $col_min_width = shift;  # content-driven min widths incl. min_w
-    my $col_max_width = shift;  # content-driven max widths incl. max_w
-
-    my $min_width   = 0;     # calculate minimum overall table width needed
-    my $calc_widths ;        # each column's calculated width
-
-    # total requested minimum width (min_w property) plus min for content
-    for (my $j = 0; $j < scalar(@$col_min_width); $j++) {
-        # min_w requested minimum AND longest word
-        $calc_widths->[$j] = $col_min_width->[$j];
-        # overall table minimum width
-        $min_width += $calc_widths->[$j];
-    }
-
-    # minimum possible width for each column results in wider table?
-    # I think this is the optimal variant when a good view can be guaranteed
-    if ($avail_width < $min_width) {
-        carp "!!! Warning !!!\n Table width expanded from $avail_width to ",int($min_width)+1,".\n",
-        $avail_width = int($min_width) + 1;
-    }
-
-    # Calculate how much can be added to every column to fit the available width
-    # Allow columns to expand to max_w before applying extra space equally.
-    # $col_max_width is SMALLER of max_w and content length, but at least as
-    #   large as $col_min_width
-    my $is_last_iter;
-    my $num_cols = scalar(@$calc_widths);
-    while (1) {
-        # amount to widen each cell (equally)
-        my $span = ($avail_width - $min_width) / $num_cols;
-        last if $span <= 0.1; # have filled out all columns to sum to desired w?
-
-        $min_width = 0;
-        my $next_will_be_last_iter = 1; # at least two iterations
-        for (my $j = 0; $j < $num_cols; $j++) {
-
-            # add extra to be distributed to each, reduce to desired max
-            # EXCEPT on the last time around (break the 'max' limit)
-            my $new_w = $calc_widths->[$j] + $span;
-            if (!$is_last_iter) { 
-                $new_w = min($new_w, $col_max_width->[$j]);
-            }
-
-            # if any widths changed, go around again
-            if ($calc_widths->[$j] != $new_w) {
-                $calc_widths->[$j] = $new_w;
-                $next_will_be_last_iter = 0;
-            }
-            $min_width += $new_w;
-        }
-        last if $is_last_iter;
-        $is_last_iter = $next_will_be_last_iter;
-    }
-
-    return ($calc_widths,$avail_width);
-} # End of CalcColumnWidths()
-
-############################################################
-# move deprecated settings names to current names, and delete old
-# assume any leading '-' already removed
-# warning if both deprecated and new name given (use new)
-# release at T-6 months, consider issuing warning to remind update needed
-# release at T-0 months, give warning on use of deprecated items
-# release at T+12 months, remove deprecated names
-############################################################
-
-sub deprecated_settings {
-    my ($data, $row_props, $col_props, $cell_props, $header_props, $argref) = @_;
-# 1 $row_props, 2 $col_props, 3 $cell_props, 4 $header_props
-# need to use $_[n] form so that its call be reference, not value
-#my $data = $_[0]; 
-#my $argref = $_[5];
-#my %arg = %{$argref};
-
-    my %cur_names = (
-        # old deprecated name        new current name
-        #  (old_key)
-        'start_y'               => 'y',
-        'start_h'               => 'h',
-        'row_height'            => 'min_rh',
-        'background_color'      => 'bg_color',
-        'background_color_odd'  => 'bg_color_odd',
-        'background_color_even' => 'bg_color_even',
-        'font_color'            => 'fg_color',
-        'font_color_odd'        => 'fg_color_odd',
-        'font_color_even'       => 'fg_color_even',
-        'font_underline'        => 'underline',
-       #'justify'               => 'align',  # different set of values allowed
-        'lead'                  => 'leading',
-        'border'                => 'border_w',
-        'horizontal_borders'    => 'h_border_w',
-        'vertical_borders'      => 'v_border_w',
-        'border_color'          => 'border_c',
-        # currently same color for H and V borders
-    );
-
-    # global arg
-    foreach my $old_key (keys %cur_names) {
-        if (defined $argref->{$old_key}) {
-            # set deprecated name setting (need to transfer to new name).
-            # did we also set new name setting?
-            if (defined $argref->{$cur_names{$old_key}}) {
-                carp "!! Warning !! both deprecated global name '$old_key' and current name '$cur_names{$old_key}' given, current name's value used.";
-            } else {
-                $argref->{$cur_names{$old_key}} = $argref->{$old_key};
-                delete $argref->{$old_key};
-                # eventually given warning to stop using $old_key
-            }
-        }
-    }
-
-    # row properties
-    foreach my $old_key (keys %cur_names) {
-        for (my $row = 0; $row < scalar(@$data); $row++) {
-            if (defined $row_props->[$row]->{$old_key}) {
-                # set deprecated name setting (need to transfer to new name).
-                if (defined $row_props->[$row]->{$cur_names{$old_key}}) {
-                    # did we also set new name setting?
-                    carp "!! Warning !! both deprecated name '$old_key' and current name '$cur_names{$old_key}' given in row_props[$row], current name's value used.";
-                } else {
-                    # transfer deprecated setting to new
-                    $row_props->[$row]->{$cur_names{$old_key}} = $row_props->[$row]->{$old_key};
-                    delete $row_props->[$row]->{$old_key};
-                    # eventually given warning to stop using $old_key
-                }
-            }
-        }
-    }
-
-    # column properties
-    foreach my $old_key (keys %cur_names) {
-        for (my $col = 0; $col < scalar(@{$col_props}); $col++) {
-            if (defined $col_props->[$col]->{$old_key}) {
-                # set deprecated name setting (need to transfer to new name).
-                if (defined $col_props->[$col]->{$cur_names{$old_key}}) {
-                    # did we also set new name setting?
-                    carp "!! Warning !! both deprecated name '$old_key' and current name '$cur_names{$old_key}' given in column_props[$col], current name's value used.";
-                } else {
-                    # transfer deprecated setting to new
-                    $col_props->[$col]->{$cur_names{$old_key}} = $col_props->[$col]->{$old_key};
-                    delete $col_props->[$col]->{$old_key};
-                    # eventually given warning to stop using $old_key
-                }
-            }
-        }
-    }
-
-    # cell properties
-    foreach my $old_key (keys %cur_names) {
-        for (my $row = 0; $row < scalar(@$data); $row++) {
-            for ( my $col = 0; 
-              $col < scalar(@{$data->[$row]}); 
-              $col++ ) {
-                if (defined $cell_props->[$row][$col]->{$old_key}) {
-                    # set deprecated name setting (need to transfer to new name).
-                    if (defined $cell_props->[$row][$col]->{$cur_names{$old_key}}) {
-                        # did we also set new name setting?
-                        carp "!! Warning !! both deprecated name '$old_key' and current name '$cur_names{$old_key}' given in cell_props[$row][$col], current name's value used.";
-                    } else {
-                        # transfer deprecated setting to new
-                        $cell_props->[$row][$col]->{$cur_names{$old_key}} = $cell_props->[$row][$col]->{$old_key};
-                        delete $cell_props->[$row][$col]->{$old_key};
-                        # eventually given warning to stop using $old_key
-                    }
-                }
-            }
-        }
-    }
-
-    # header properties
-    if ($header_props) {
-        foreach my $old_key (keys %cur_names) {
-            if (defined $header_props->{$old_key}) {
-                # set deprecated name setting (need to transfer to new name).
-                # did we also set new name setting?
-                if (defined $header_props->{$cur_names{$old_key}}) {
-                    carp "!! Warning !! both deprecated header name '$old_key' and current name '$cur_names{$old_key}' given, current name's value used.";
-                } else {
-                    $header_props->{$cur_names{$old_key}} = $header_props->{$old_key};
-                    delete $header_props->{$old_key};
-                    # eventually given warning to stop using $old_key
-                }
-            }
-        }
-    }
-
-    return;
-}
-
-############################################################
-# validate/fix up settings and parameters as much as possible     TBD per #12
-############################################################
-
-sub check_settings {
-    my (%arg) = @_;
-
-    # TBD $arg{} values, some col, row, cell, header?
-    # x, y >= 0; w, h >= 0; x+w < page width; y+h < page height
-    # next_h (if def) > 0, next_y (if def) >= 0; next_y+next_h < page height
-    # line widths >= 0, min_rh > 0
-    # TBD in general, validate integer values and possibly some
-    #     other values, per #12
-    return;
-}
-
 ############################################################
 # find a value that might be set in a default or in a global
 # or column/row/cell specific parameter. fixed order of search
@@ -1514,14 +1331,22 @@ sub find_value {
 
     # upon entry, $cell_val is usually either undefined (data row) or 
     # header property setting (in which case, already set and we're done here)
-    $cell_val = $cell_props->[$row_idx][$col_idx]->{$name} if !defined $cell_val;
-    $cell_val = $cell_props->[$row_idx][$col_idx]->{$fallback} if !defined $cell_val && $fallback ne '';
-    $cell_val = $col_props->[$col_idx]->{$name} if !defined $cell_val;
-    $cell_val = $col_props->[$col_idx]->{$fallback} if !defined $cell_val && $fallback ne '';
-    $cell_val = $row_props->[$row_idx]->{$name} if !defined $cell_val;
-    $cell_val = $row_props->[$row_idx]->{$fallback} if !defined $cell_val && $fallback ne '';
-    $cell_val = $arg{$name} if !defined $cell_val;
-    $cell_val = $arg{$fallback} if !defined $cell_val && $fallback ne '';
+    $cell_val = $cell_props->[$row_idx][$col_idx]->{$name} if 
+        !defined $cell_val;
+    $cell_val = $cell_props->[$row_idx][$col_idx]->{$fallback} if 
+        !defined $cell_val && $fallback ne '';
+    $cell_val = $col_props->[$col_idx]->{$name} if 
+        !defined $cell_val;
+    $cell_val = $col_props->[$col_idx]->{$fallback} if 
+        !defined $cell_val && $fallback ne '';
+    $cell_val = $row_props->[$row_idx]->{$name} if 
+        !defined $cell_val;
+    $cell_val = $row_props->[$row_idx]->{$fallback} if 
+        !defined $cell_val && $fallback ne '';
+    $cell_val = $arg{$name} if 
+        !defined $cell_val;
+    $cell_val = $arg{$fallback} if 
+        !defined $cell_val && $fallback ne '';
 
     # final court of appeal is the global default (usually defined)
     if (!defined $cell_val) {
@@ -1529,7 +1354,7 @@ sub find_value {
     }
 
     return $cell_val;
-}
+} # end of find_value()
 
 ############################################################
 # text_block - utility method to build multi-paragraph blocks of text
@@ -1565,6 +1390,8 @@ sub text_block {
     my $self        = shift;
     my $text_object = shift;
     my $text        = shift;    # The text to be displayed
+    my $row_idx     = shift;    # cell row,col for debug
+    my $col_idx     = shift;
     my %arg         = @_;       # Additional Arguments
 
     my  ( $align, $xpos, $ypos, $xbase, $ybase, $line_width, $wordspace, $endw , $width, $height) =
@@ -1592,27 +1419,28 @@ sub text_block {
     $height = $arg{'h'} || -1;
     unless ( $xbase  > 0 ) {
         carp "Error: Left Edge of Block is NOT defined!\n";
-        return;
+        return (0, $ybase, '');
     }
     unless ( $ybase  > 0 ) {
         carp "Error: Base Line of Block is NOT defined!\n";
-        return;
+        return (0, $ybase, '');
     }
     unless ( $width  > 0 ) {
         carp "Error: Width of Block is NOT defined!\n";
-        return;
+        return (0, $ybase, '');
     }
     unless ( $height > 0 ) {
         carp "Error: Height of Block is NOT defined!\n";
-        return;
+        return (0, $ybase, '');
     }
 
     # Check if any text to display. If called from table(), should have
     # default text by the time of the call, so this is really as a failsafe
     # for standalone text_block() calls. Note that '' won't work!
     unless ( defined( $text) and length($text) > 0 ) {
-        carp "Warning: No input text found. Use dummy '-'.\n";
-        $text = $empty_cell_text;
+   #    carp "Warning: No input text found. Use dummy '-'.\n";
+   #    $text = $empty_cell_text;
+$text = ' ';
     }
 
     # Strip any <CR> and Split the text into paragraphs
@@ -1716,14 +1544,15 @@ sub text_block {
                 # first time through, @line is empty
                 # first word in paragraph SHOULD fit!!
                 # TBD: what if $line_width > 0??? due to indent, etc.?
+                # add 0.01 as safety
                 if ( $text_object->advancewidth( $paragraph[0] ) +
-                     $line_width <= $width ) {
+                     $line_width <= $width+0.01 ) {
                     push(@line, shift(@paragraph));
                     next if @paragraph;
                 } else {
                     # this should never happen, but just in case, to
                     # prevent an infinite loop...
-                    die("!!! Error !!! first word in paragraph ($paragraph[0]) doesn't fit into empty line!");
+                    die("!!! Error !!! first word in paragraph for row $row_idx, col $col_idx '$paragraph[0]' doesn't fit into empty line!");
                 }
             } else {
                 # @line has text in it already
@@ -1798,1146 +1627,6 @@ __END__
 
 =pod
 
-=head1 NAME
-
-PDF::Table - A utility class for building table layouts in a PDF::Builder 
-(or PDF::API2) object.
-
-=head1 SYNOPSIS
-
-Rather than cluttering up the following documentation with B<(or PDF::API2)>
-additions, wherever it refers to C<PDF::Builder>, understand that you can 
-substitute C<PDF::API2> to use that product instead.
-
- use PDF::Builder;
- use PDF::Table;
-
- my $pdftable = new PDF::Table;
- my $pdf = new PDF::Builder(-file => "table_of_lorem.pdf");
- my $page = $pdf->page();
-
- # some data to lay out
- my $some_data =[
-    ["1 Lorem ipsum dolor",
-    "Donec odio neque, faucibus vel",
-    "consequat quis, tincidunt vel, felis."],
-    ["Nulla euismod sem eget neque.",
-    "Donec odio neque",
-    "Sed eu velit."],
-    # ... and so on
- ];
-
- $left_edge_of_table = 50;
- # build the table layout
- $pdftable->table(
-     # required parameters
-     $pdf,
-     $page,
-     $some_data,
-     'x' => $left_edge_of_table,
-     'w' => 495,
-     'y' => 500,
-     'h' => 300,
-     # some optional parameters
-     'next_y'          => 750,
-     'next_h'          => 500,
-     'padding'         => 5,
-     'padding_right'   => 10,
-     'bg_color_odd'    => "gray",
-     'bg_color_even'   => "lightblue", # cell bg color for even rows
-     'max_word_length' => 50, # 50 between forced splits
-  );
-
- # do other stuff with $pdf
- $pdf->save();
-...
-
-=head2 EXAMPLE
-
-For a complete working example or initial script look into distribution's 
-'examples' folder.
-
-=head1 DESCRIPTION
-
-This class is a utility for use with the PDF::Builder (or PDF::API2, see
-note above) module from CPAN.
-It can be used to display text data in a table layout within a PDF.
-The text data must be in a 2D array (such as returned by a DBI statement 
-handle C<fetchall_arrayref()> call).
-PDF::Table will automatically add as many new pages as necessary to display 
-all of the data.
-Various layout properties, such as font, font size, cell padding, and 
-background color can be specified for each column and/or for even/odd rows.
-Also a (non)repeated header row with different layout properties can be 
-specified.
-
-See the L</METHODS> section for complete documentation of every parameter.
-
-=head1 COMPATIBILITY
-
-Starting with version 1.000, several behaviors have changed (for the better, I
-believe). Nevertheless, there may be some users who prefer the old behaviors.
-To keep everybody happy, it is possible to easily revert to the old behaviors.
-Near the top of Table.pm, look for a section labeled C<COMPATIBILITY WITH OLDER 
-VERSIONS>. You can change settings here to match old behaviors:
-
-=over
-
-=item repeating headers
-
-The old default for the C<repeat> setting for a header was '0' (do not repeat
-after a table has been split across a page). I believe that most users will
-want to automatically repeat a header row at the start of each table fragment, 
-but you can change this behavior if you wish. Change C<$repeat_default> from 1
-to 0 to get the old behavior (or, explicitly give C<repeat => 0> in the header
-properties settings).
-
-=item which rows are 'odd' (and which are 'even')
-
-PDF::Table decided which rows were odd/even (background and foreground colors,
-etc) in an inconsistent manner, especially if a header was used (whether 
-repeated or not). Now, the first data row (excluding headers) is "odd", and
-all rows after that alternate "even", "odd", etc., even across page breaks. If 
-you want the old behavior, it can be requested. Change C<$oddeven_default> from
-1 to 0 to get the old behavior.
-
-=item default cell padding
-
-The old default for padding around the contents of a cell was 0. It is now
-2pt. Change C<$padding_default> from 2 to 0 to get the old behavior.
-
-=item behavior of borders
-
-The old behavior was calling both the frame around the table I<and> the
-cell-divider rules as "border", and using the same settings for both. This has
-been changed to separate the two classes, with "border" referring to the outside
-framework, and "rules" referring to the dividers. Note that "rules" still
-inherit from "border", so an explicit definition of C<rules =E<gt> 0> (to hide
-interior rules) or another width (line weight) may still be needed to override 
-the "border" setting for interior dividers.
-
-=back
-
-=head2 Maintaining compatibility
-
-Near the top of file Table.pm, look for C<my $compat_mode = 0;>.
-PDF::Table is shipped with a flag of C<0> to use the new features of the 
-library. If you have a pressing need to maintain compatibility with older
-versions of the library, you may change the value to C<1>.
-Note that a flag of C<1> will break some of the t-tests, because of different
-padding defaults resulting in different text locations on the page.
-
-=head2 Run-time changes
-
-If you do not wish to change the PDF::Table code section to permanently change
-old-versus-new behavior, you can use the I<compatibility> flag in the settings
-to temporarily change the variables listed above.
-
-    compatibility => [ 0, 0, 0 ]
-
-will restore all behaviors to the old style, while 
-
-    compatibility => [ 1, 0, 2 ]
-
-will change only the designation of "odd/even" rows (element 1) to the old 
-behavior, while leaving header repeat (element 0) and default padding (element
-2) in the new behavior.
-
-=head1 METHODS
-
-=head2 new()
-
-    my $pdf_table = new PDF::Table;
-       or
-    my $pdf_table = PDF::Table->new();
-
-=over
-
-=item Description
-
-Creates a new instance of the class.
-
-=item Parameters
-
-There are no required parameters. You may pass $pdf, $page, $data, and
-%options; or can defer this until the table() method invocation (the usual
-technique).
-
-=item Returns
-
-Reference to the new instance
-
-=back
-
-=head2 table()
-
-    my ($final_page, $number_of_pages, $final_y) = table($pdf, $page, $data, %settings)
-
-=over
-
-=item Description
-
-Generates a multi-row, multi-column table into an existing PDF document, based 
-on provided data set and settings.
-
-=item Parameters
-
-    $pdf      - a PDF::Builder instance representing the document being created
-    $page     - a PDF::Builder::Page instance representing the current page of 
-                the document
-    $data     - an ARRAY reference to a 2D data structure that will be used 
-                to build the table
-    %settings - HASH with geometry and formatting parameters
-
-For full C<%settings> description see section L</Table settings> below.
-
-This method will add more pages to the PDF instance as required, based on the 
-formatting options and the amount of data.
-
-=item Returns
-
-The return value is a 3 item list where
-
-    $final_page - A PDF::Builder::Page instance that the table ends on
-    $number_of_pages - The count of pages that the table spans
-    $final_y - The Y coordinate of the table bottom, so that additional 
-               content can be added on the same page ($final_page)
-
-=item Example
-
-    my $pdf  = new PDF::Builder;
-    my $page = $pdf->page();
-    my $data = [
-        ['foo1','bar1','baz1'],
-        ['foo2','bar2','baz2']
-    ];
-    my %settings = (
-        'x' => 10,
-        'w' => 570,
-        'y' => 220,
-        'h' => 180,
-    );
-
-    my ($final_page, $number_of_pages, $final_y) = 
-        $pdftable->table( $pdf, $page, $data, %options );
-
-=back
-
-=head3 Table settings
-
-Unless otherwise specified, all dimensional and geometry units used are 
-measured in I<points>. Line counts are not used anywhere.
-
-"Even" rows start with the first data (non-header) row. Think of this first
-row as number zero (an I<even> number). Even rows alternate with odd rows.
-The odd/even flag is B<not> reset when a table is split across pages. If a
-table fragment ends on an odd row, the next fragment (on the next page),
-starting the next row, will
-start with an even row. If a I<row> is split across pages, it will resume with
-the same odd/even setting as on the previous page. If you desire to have the
-old (previous) odd/even behavior, see L</COMPATIBILITY>.
-
-The name (key) of any table setting hash element may be given with or
-without a leading dash (hyphen). A leading dash is allowed for compatibility
-with older versions of PDF::Table, but is B<DEPRECATED!> It is recommended 
-that the dash be omitted in new code, and removed from old code before
-November 2022.
-
-B<Note:> if you use a deprecated setting name, or a setting beginning with a 
-hyphen '-', PDF::Table will update the settings list with the preferred name.
-It does this by inserting the item using the preferred, non-hyphen name, and 
-then deletes the deprecated one. Due to peculiarities in the way Perl copies
-arrays, hashes, and references; it is possible that your input settings hash
-may end up being modified! This normally will not be a cause for concern, but
-you should be aware of this behavior in case you wish to reuse all or part of
-a PDF::Table settings list (hash) for other purposes (or another table) -- 
-it may have been slightly modified.
-
-Note that any "Color specifier" is not limited to a name (e.g., 'black') or
-a 6-digit hex specification (e.g., '#3366CC'). See the PDF::Builder 
-writeup on specifying colors for CMYK, L*a*b, HSV, and other methods.
-
-=head4 Mandatory global settings
-
-There are some mandatory parameters for setting table geometry and position 
-on the first (initial) or only page of the table. It is up to you to tell
-PDF::Table where to start (upper left corner) the table, and its width and
-maximum height on this page.
-
-=over
-
-=item B<x> - X coordinate of upper left corner of the table. 
-
-The left edge of the sheet (media) is 0. 
-B<Note> that this C<X> will be used for any spillover of the table to 
-additional page(s), so you cannot have spillover (continuation) rows 
-starting at a different C<X>.
-
-B<Value:> can be any number satisfying C<0 E<le> X < PageWidth>
-
-B<Default:> No default value
-
-    'x' => 10,
-
-=item B<y> - Y coordinate of upper left corner of the table on the 
-initial page.
-
-B<Value:> can be any number satisfying C<0 < y < PageHeight> 
-(depending on space availability when embedding a table)
-
-B<Default:> No default value
-
-    'y' => 327,
-
-B<Deprecated name:> I<start_y> (will go away in the future!)
-
-=item B<w> - width of the table starting from C<x>.
-
-B<Note> that this C<width> will be used for any spillover of the table to 
-additional page(s), so you cannot have spillover (continuation) rows with a 
-different C<width>.
-
-B<Value:> can be any number satisfying C<0 < w < PageWidth - x>
-
-B<Default:> No default value
-
-    'w'  => 570,
-
-B<NOTE:> If PDF::Table finds that the table width needs to be increased to
-accommodate the requested text and formatting, it will output a warning. This
-could lead to undesired results. Possible solutions to keep the table from
-being widened include:
-
-    1) Increase table width (w)
-    2) Decrease font size (font_size)
-    3) Choose a narrower font
-    4) Decrease "max_word_length" parameter, so long words are split into
-        shorter chunks
-    5) Rotate media to landscape (if it is portrait)
-    6) Use a larger (wider) media size
-
-=item B<h> - Height of the table on the initial (current) page.
-
-Think of this as the I<maximum height> (Y dimension) of the start of the
-table on this page. This would be the current C<Y> location less any bottom
-margin. Normally you would let as much as possible fit on the page,
-but it's possible that you might want to split the table at an earlier point,
-to put more on the next (spill) page.
-
-B<Value:> can be any number satisfying C<0 < h < PageHeight - Current Y position>
-
-B<Default:> No default value
-
-    'h' => 250,
-
-B<Deprecated name:> I<start_h> (will go away in the future!)
-
-=back
-
-=head4 Optional settings
-
-These are settings which are not absolutely necessary, although their use may
-result in a much more pleasing appearance for the table. They all have a
-"reasonable" default (or inheritance from another setting).
-
-=head4 Optional Global Settings
-
-These settings apply only to the entire table, and cannot be used to specify
-cell, column, or row properties. A global setting may only occur once.
-
-=over
-
-=item B<next_h> - Height of the table on any additional page.
-
-Think of this as the I<maximum height> (Y dimension) of any overflow 
-(spill) table portions on following pages.
-I<It is highly recommended that you
-explicitly specify this setting as the full (body content) height of a page,
-rather than having PDF::Table try to figure out a good value and B<give a
-warning>.>
-
-B<Value:> can be any number satisfying C<0 < next_h < PageHeight - y>
-
-You need to leave a non-negative amount of space at the bottom of the page.
-
-B<Default:> Media height * 80% (80% of the paper height)
-You will receive a warning if C<next_h> is needed for a spill page and you
-did not provide it!
-
-    'next_h'  => 700,
-
-=item B<next_y> - Y coordinate of upper left corner of the table at any 
-additional page.
-
-Think of this as the starting C<Y> position of any overflow 
-(spill or continuation) table portions on following pages.
-I<It is highly recommended that you
-explicitly specify this setting to be at the top of the body content of a page,
-rather than having PDF::Table try to figure out a good value and B<give a
-warning>.>
-
-B<Value:> can be any number satisfying C<0 < next_y < PageHeight>
-
-B<Default:> Media height * 90% (10% down from the top of the paper)
-You will receive a warning if C<next_y> is needed for a spill page and you
-did not provide it!
-
-    'next_y'  => 750,
-
-=item B<new_page_func> - CODE reference to a function that returns a 
-PDF::Builder::Page instance. See section L<New Page Function Hook> below.
-
-    'new_page_func'  => $code_ref,
-
-=item B<cell_render_hook> - CODE reference to a function called with the 
-current cell coordinates. See section L<Cell Render Hook> below.
-
-    'cell_render_hook'  => $code_ref,
-
-=item B<header_props> - HASH reference to specific settings for the Header row 
-of the table. See section L</Header Row Properties> below.
-
-    'header_props' => $hdr_props,
-
-=item B<row_props> - HASH reference to specific settings for each row of 
-the table. See section L</Row Properties> below.
-
-    'row_props' => $my_row_props,
-
-=item B<column_props> - HASH reference to specific settings for each column of 
-the table. See section L</Column Properties> below.
-
-    'column_props' => $col_props,
-
-=item B<cell_props> - HASH reference to specific settings for each column of 
-the table. See section L</Cell Properties> below.
-
-    'cell_props' => $cell_props,
-
-=item B<border_w> - Width of table border lines.
-
-=item B<h_border_w> - Width of horizontal border lines (top and bottom of the
-table). Overrides 'border_w' value for horizontal usage. Note that if the
-table spills over onto following pages, only the very first top and very last 
-bottom table border will be full width. Dividers on row boundaries will be
-1pt wide ($border_w_default) solid lines, and where a row is divided within 
-its content, a dashed (pattern $dashed_rule_default) 1pt wide line is used.
-
-=item B<v_border_w> -  Width of vertical border lines. Overrides 
-'border_w' value for vertical usage.
-
-B<Value:> can be any positive number. When set to 0, it will disable 
-border lines. This is the line thickness for drawing a border.
-
-B<Default:> C<1>  ($border_w_default)
-
-The I<border> is the B<outside> frame around the table. It does not enter into
-table height or width calculations, so be sure to set your C<x> and C<w>
-settings to allow for the width of vertical borders, and your C<y> or C<next_y>
-and C<h> or C<next_h> settings to allow for the width (thickness or height) of 
-the horizontal borders, especially if you make them more than a Point or two 
-in thickness (line width).
-
-    'border_w'     => 3,     # border width is 3
-    'h_border_w'   => 1,     # horizontal borders will be 1, overriding 3
-    'v_border_w'   => undef, # vertical borders will be 3, as it will 
-                             # fall back to 'border_w'
-
-Note that both borders and rules overlay the exact boundary between two cells
-(i.e., the centerline). That is, one half of a rule or border will overlay the
-adjoining cells. Rules do not expand the size of the table, although
-borders will (by a total of their thickness/width). If you set particularly
-thick (wide) rules, pay attention to adding some padding on the appropriate
-side(s), so that valuable content is not overlaid. For cells along the outer
-border, one half the width of a border will overlay the cell, so account for
-this in the padding specification.
-
-B<Deprecated names:> I<border> (now 'border_w'), 
-I<horizontal_borders> (now 'h_border_w'), 
-and I<vertical_borders> (now 'v_border_w'); will go away in the future!
-
-=item B<border_c> -  Border color for all borders.
-
-B<Value:> Color specifier as 'name' or '#rrggbb'
-
-B<Default:> C<'black'> ($fg_color_default)
-
-    'border_c' => 'red',
-
-B<Deprecated name:> I<border_color> (will go away in the future!)
-
-The same color is used for both the horizontal and vertical borders.
-
-=back
-
-=head4 Optional Cell, Column, Row, or Global Settings
-
-These settings can be specified to apply to the entire table, or more
-narrowly applied to the header row (in header_props hash), one or more rows
-(in row_props array), one or more columns (in column_props array), or one
-or more individual cells (in cell_props hash).
-
-If a setting is specified in more than one place, the order of precedence is
-as follows: a header property (header row only), followed by a cell property, 
-followed by a column property, followed by a row property, followed by a 
-global setting, and finally, any hard-coded default value (if required).
-
-A global setting may only occur once (although it may be overridden by cell,
-column, or row usage of the same setting).
-
-=over
-
-=item B<default_text> - A string to use if no content (text) is defined for
-a cell.
-
-B<Value:> any string (can be a blank)
-
-B<Default:> '-'  ($empty_cell_text)
-
-=item B<max_word_length> - Breaks long words 
-
-It may be necessary to break up long words (like serial numbers, hashes, 
-etc.) to fit within a column, by adding a space after every Nth symbol, 
-unless a space (x20) is found already in the text. 
-
-B<Note> that this does I<not> add a hyphen (dash)!
-It merely ensures that there will be no runs of non-space characters longer
-than I<N> characters, reducing the chance of forcing an overly wide column.
-
-B<Value:> can be any positive integer number (character count)
-
-B<Default:> C<20>
-
-    'max_word_length' => 25,    # Will add a space after every 25 symbols
-                                # unless there is a natural break (space)
-
-=item B<padding> - Padding applied to every cell
-
-=item B<padding_top>    - top cell padding, overrides 'padding'
-
-=item B<padding_right>  - right cell padding, overrides 'padding'
-
-=item B<padding_left>   - left cell padding, overrides 'padding'
-
-=item B<padding_bottom> - bottom padding, overrides 'padding'
-
-B<Value:> can be any non-negative number (E<ge> 0)
-
-B<Default padding:> C<2>.  ($padding_default)
-
-See L</COMPATIBILITY> for returning to the old value of C<0>.
-
-B<Default padding_*> C<'padding'>
-
-    'padding'        => 5,     # all sides cell padding
-    'padding_top'    => 8,     # top cell padding, overrides 'padding'
-    'padding_right'  => 6,     # right cell padding, overrides 'padding'
-    'padding_left'   => 2,     # left cell padding, overrides 'padding'
-    'padding_bottom' => undef, # bottom padding will be 5, as it will fall
-                               # back to 'padding' value
-
-=item B<font> - instance of PDF::Builder::Resource::Font defining the font to 
-be used in the table (or a subsection of it).
-
-B<Value:> can be any PDF::Builder::Resource::* type of font
-
-B<Default:> C<'Times'> core font with I<latin1> encoding
-
-    'font' => $pdf->corefont("Helvetica", -encoding => "latin1"),
-
-B<CAUTION:> Only TrueType and OpenType fonts (ttfont call) can make use of
-multibyte encodings such as 'utf8'. Errors will result if you attempt to use
-'utf8', etc. with corefont, psfont, etc. font types! For these, you I<must>
-only specify a single-byte encoding.
-
-=item B<font_size> - Size of the font that will be used in the table (or a
-subsection of it).
-
-B<Value:> can be any positive number
-
-B<Default:> C<12>  ($font_size_default)
-
-    'font_size' => 16,
-
-=item B<fg_color> - Font color for all text.
-
-=item B<bg_color> - Background color for all text.
-
-B<Value:> Color specifier as 'name' or '#rrggbb' (or other suitable color 
-specification format)
-
-B<Default:> C<'black'> text on (transparent) background. In other words, there
-is no default background color. The exception is for any B<header> row, where 
-the default colors are C<#000066> (dark blue, $h_fg_color_default) on 
-C<#FFFFAA> (light yellow, $h_bg_color_default).
-
-    'fg_color'      => '#333333',
-
-B<Deprecated names:> I<font_color, background_color>
-(both will go away in the future!)
-
-=item B<fg_color_odd> - Font color for odd rows (override C<fg_color>).
-
-=item B<fg_color_even> - Font color for even rows (override C<fg_color>).
-
-=item B<bg_color_odd> - Background color for odd rows (override C<bg_color>).
-
-=item B<bg_color_even> - Background color for even rows (override C<bg_color>).
-
-B<Value:> Color specifier as 'name' or '#rrggbb' (or other suitable color 
-specification format)
-
-    'fg_color_odd'  => 'purple',
-    'fg_color_even' => '#00FF00',
-    'bg_color_odd'  => 'gray',
-    'bg_color_even' => 'lightblue',
-
-B<Deprecated names:> I<font_color_odd, font_color_even, 
-background_color_odd, background_color_even> (all will go away in the future!)
-
-Note that *_color_odd/even usually make the most sense as global settings,
-although it I<is> possible to use them within columns (see chess.pl example),
-and even rows and cells, but not header rows.
-
-=item B<underline> - Underline specifications for text in the table.
-
-B<Value:> 'auto', integer of distance (below baseline), or arrayref of 
-distance & thickness (more than one pair will provide multiple underlines). 
-Negative distance gives strike-through. C<[]> ('none' also works for 
-PDF::Builder) gives no underline.
-
-Note that it is unwise to underline all content in the table! It should be
-used selectively to I<emphasize> important text, such as header content, or
-certain cells. Unfortunately, there is currently no way to turn underlining
-off and on I<within> a cell.
-
-B<Default:> none
-
-B<Deprecated name:> I<font_underline> (will go away in the future!)
-
-=item B<min_rh> - Desired minimum row height.
-
-This setting will be honored only if 
-C<min_rh E<gt> font_size + padding_top + padding_bottom> (i.e., it is
-taller than the calculated minimum value).
-
-This setting doesn't usually make sense when used in a column_props or a
-cell_props, but it I<is> possible to do, and may be useful in certain
-situations.
-
-B<Value:> can be any positive number
-
-B<Default:> C<font_size + padding_top + padding_bottom>
-
-    'min_rh' => 24,
-
-B<Deprecated name:> I<row_height> (will go away in the future!)
-
-=item B<justify> - Alignment of text in a cell.
-
-B<Value:> One of 'left', 'right', 'center'
-
-B<Default:> C<'left'>
-
-=item B<min_w> - Minimum width of this cell or column. 
-
-PDF::Table will set a cell (and the column it's in) minimum width to fit the
-longest word (after splitting on C<max_word_length>) found in the text. This
-amount may be increased to C<min_w>. A column should be no narrower than its
-widest minimum width, but could be larger in order to fill out the table width.
-
-B<Value:> can be any number satisfying C<0 < min_w < w>
-
-B<Default:> Auto calculated
-
-Note that C<min_w> is usually used for a column_props to set the column
-minimum width. If used in a row_props, it will act as a I<global> setting; if
-used in a cell_props, that will force the minimum width for the cell's column.
-
-=item B<max_w> - Maximum width of this column. 
-
-PDF::Table will set a cell (and the column it's in) maximum width to fit the
-total length of the text content. This will seldom be actually used, but 
-C<max_w> may be used to I<reduce> this maximum. When columns are being widened
-in order to meet the desired table width, it will try to honor the maximum
-width setting and avoid adding any width to a column already at its maximum
-width (but this cannot be guaranteed).
-
-B<Value:> can be any number satisfying C<0 < min_w E<le> max_w < w>
-
-B<Default:> Auto calculated
-
-=item B<rule_w> - Width of table rule lines (internal table dividers).
-
-=item B<h_rule_w> - Width of horizontal rules (bottom of a cell).
-Overrides 'rule_w' value for horizontal usage.
-
-=item B<v_rule_w> -  Width of vertical rules (left side of a cell). 
-Overrides 'rule_w' value for vertical usage.
-
-B<Value:> can be any positive number. When set to 0, it will disable 
-rules. This is the line thickness for drawing a rule.
-
-B<Default:> C<1>  (corresponding border value)
-
-A I<rule> is a line bordering a I<cell> in the table. While it does not enter 
-into table height or width calculations, be sure to set your C<padding> 
-settings to allow sufficient clearance of cell content, especially if you make 
-the rules more than a Point or two in thickness (line width). Note that a
-cell only defines and draws its left and bottom rules -- the top rule is 
-defined in the cell or row above, and the right rule is defined in the cell
-or column to the right of this one.
-
-    'rule_w'     => 3,     # rule width is 3
-    'h_rule_w'   => 1,     # horizontal rules will be 1, overriding 3
-    'v_rule_w'   => undef, # vertical rules will be 3, as it will 
-                           # fall back to 'rule_w'
-
-Note that both borders and rules overlay the exact boundary between two cells
-(i.e., the centerline). That is, one half of a rule or border will overlay the
-adjoining cells. Rules do not expand the size of the table. If you set 
-particularly thick (wide) rules, pay attention to adding some padding on the 
-appropriate side(s), so that valuable content is not overlaid. For cells along 
-the outer border, a I<border> will be drawn instead of a I<rule>.
-
-Cell rules inherit thickness and color from the border settings, so if you want
-no internal rules, you need to set 
-
-    'rule_w'     => 0,     # no rules
-    
-=item B<rule_c> -  Rule color for all rules.
-
-=item B<h_rule_c> -  Rule color for horizontal (bottom) rules, overriding C<rule_c> for this usage.
-
-=item B<v_rule_c> -  Rule color for vertical (left) rules, overriding C<rule_c> for this usage.
-
-B<Value:> Color specifier as 'name' or '#rrggbb'
-
-B<Default:> C<'black'> (corresponding border value)
-
-    'rule_c' => 'red',
-
-=back
-
-=head4 New Page Function Hook
-
-B<new_page_func> is a CODE reference to a function that returns a 
-PDF::Builder::Page instance.
-
-If used, the parameter 'C<new_page_func>' must be a function reference which, 
-when executed, will create a new page and will return the object to the module.
-For example, you can use it to put Page Title, Page Frame, Page Numbers and 
-other content that you need.
-Also if you need a different paper size and orientation than the default 
-US-Letter, e.g., B2-Landscape, you can use this function ref to set it up for 
-you. For more info about creating pages, refer to PDF::Builder PAGE METHODS 
-Section.
-Don't forget that your function must return a page object created with the
-PDF::Builder page() method. C<$code_ref> can be something like C<\&new_page>.
-
-    'new_page_func'  => $code_ref,
-
-The C<$code_ref> may be an inline sub definition (as show below), or a regular
-named C<sub> (e.g., 'new_page()') referenced as C<\&new_page>. The latter may 
-be cleaner than inlining, if the routine is quite long.
-
-An example of reusing a saved PDF page as a I<template>:
-
-    my $pdf      = PDF::API2->new();
-    my $template = PDF::API2->open('pdf/template.pdf');
-    my $new_page_func = sub { return $pdf->import_page($template, 1); }
-
-    table(
-        ...
-        new_page_func => $new_page_func,
-        ...
-
-This will call a function to grab a copy of a template PDF's page 1 and
-insert it as the new last page of the PDF, as the starting point for the next
-I<overflow> (continuation) page of the table, if needed. Note that the
-C<$template-E<gt>openpage(1)> call is B<unsuitable> for this purpose, as it does
-not insert the page into the current PDF.
-
-You can also create a blank page and prefill it with desired content:
-
-    my $pdf      = PDF::API2->new();
-    my $new_page_func = sub { 
-        my $page = $pdf->page(); # so far, no difference from default behavior
-        $page->mediaBox(...);  # set page size/orientation, etc.
-        my $text = $page->text();
-        # set font, placement, etc.
-        $text->text(...);  # write header, footer, etc.
-        ...
-        return $page;
-    }
-
-    table(
-        ...
-        new_page_func => $new_page_func,
-        ...
-
-If C<new_page_func> is not defined, PDF::Table will simply call 
-C<$pdf-E<gt>page()> to generate a new, blank, "next" page.
-
-Note that this function is B<not> called for the first page of a table. That 
-one uses the current C<$page> parameter passed to the C<table()> call. It is
-only called when needed for overflow (C<next_y> and C<next_h>) pages, where
-it replaces the C<$page> parameter with a new page framework. You may 
-want to consider using the same function to create your other (non-table) 
-pages, assuming you want the same format (PDF content) across all pages of the
-table.
-
-=head4 Cell Render Hook
-
-B<cell_render_hook> is a CODE reference to a function called with the 
-current cell coordinates. If used, the parameter C<cell_render_hook> must be a 
-function reference. It is most useful for creating special items within a
-text block, such as a URL link inside of a cell. 
-The following example adds a link in the first column of each non-header row:
-
-    'cell_render_hook'  => sub {
-        my ($page, $first_row, $row, $col, $x, $y, $w, $h) = @_;
-
-        # Do nothing except for first column (and not a header row)
-        return unless ($col == 0);
-        return if ($first_row);
-
-        # Create link
-        my $value = $list_of_vals[$row-1];
-        my $url = "https://${hostname}/app/${value}";
-
-        my $annot = $page->annotation();
-        $annot->url( $url, -rect => [$x, $y, $x+$w, $y+$h] );
-    },
-
-=head4 Header Row Properties
-
-If the 'header_props' parameter is used, it should be a hashref. Passing an 
-empty HASH will trigger a header row initialized with Default values.
-There is no 'data' variable for the content, because the module asumes that the
-first table row will become the header row. It will copy this row and put it on 
-every new page if the 'repeat' parameter is set.
-
-=over
-
-=item B<repeat> - Flag showing if header row should be repeated on every new 
-page.
-
-B<Value:> 0,1   1-Yes/True, 0-No/False
-
-B<Default:> C<1> ($repeat_default)
-
-See L</COMPATIBILITY> if you wish to change it back to the old behavior 
-of C<0>.
-
-    my $hdr_props = {
-        'font'       => $pdf->corefont("Helvetica", -encoding => "latin1"),
-        'font_size'  => 18,
-        'fg_color'   => '#004444',
-        'bg_color'   => 'yellow',
-        'repeat'     => 0,
-        'justify'    => 'center',
-    };
-
-=back
-
-=head4 Row Properties
-
-If the 'row_props' parameter is used, it should be an arrayref of hashrefs,
-with one hashref for each row of the table. The rows are counted from 
-top to bottom, so the hash reference at C<$row_props[0]> will hold properties 
-for the first row (from top to bottom).
-If you DO NOT want to give properties for a row, but to give for another, 
-just insert an empty hash reference into the array for the row that you want 
-to skip. This will cause the counting to proceed as expected and the properties 
-to be applied at the right rows.
-
-Each hashref can contain any of the keys shown below:
-
-=over
-
-Example:
-
-    my $row_props = [
-        # This is an empty hash to indicate default properties for first row
-        {},
-        # the next hash will hold the properties for the second row from 
-        # top to bottom.
-        {
-            'min_rh'    => 75,        # Minimum row height of 75
-            'justify'   => 'right',   # Right text alignment
-            'font'      => $pdf->corefont("Helvetica", 
-                                          -encoding => "latin1"),
-            'font_size' => 10,
-            'fg_color'  => 'blue',
-            'bg_color'  => '#FFFF00',
-        },
-        # etc.
-    ];
-
-There are no settings unique to rows. Do be aware of when "row 0" may refer
-to I<header> row properties!
-
-=back
-
-=head4 Column Properties
-
-If the 'column_props' parameter is used, it should be an arrayref of hashrefs,
-with one hashref for each column of the table. The columns are counted from 
-left to right, so the hash reference at C<$col_props[0]> will hold properties 
-for the first column (from left to right).
-If you DO NOT want to give properties for a column, but to give for another, 
-just insert an empty hash reference into the array for the column that you want 
-to skip. This will cause the counting to proceed as expected and the properties 
-to be applied at the right columns.
-
-Each hashref can contain any of the keys shown below:
-
-=over
-
-Example:
-
-    my $col_props = [
-        # This is an empty hash to indicate default properties for first col.
-        {},
-        # the next hash will hold the properties for the second column from 
-        # left to right.
-        {
-            'min_w'     => 100,       # Minimum column width of 100
-            'max_w'     => 150,       # Maximum column width of 150
-            'justify'   => 'right',   # Right text alignment
-            'font'      => $pdf->corefont("Helvetica", 
-                                          -encoding => "latin1"),
-            'font_size' => 10,
-            'fg_color'  => 'blue',
-            'bg_color'  => '#FFFF00',
-        },
-        # etc.
-    ];
-
-There are no settings unique to columns.
-
-=back
-
-NOTE: If 'min_w' and/or 'max_w' parameter is used in 'col_props', keep in mind 
-that it may be overridden by the calculated minimum/maximum cell width so that 
-the table can be created.
-When this happens, a warning will be issued with some suggestions on what can 
-be done.
-In cases of a conflict between column formatting and odd/even row formatting, 
-'col_props' will override odd/even.
-
-=head4 Cell Properties
-
-If the 'cell_props' parameter is used, it should be an arrayref with arrays of 
-hashrefs (of the same dimension as the data array) with one hashref for each 
-cell of the table.
-
-Each hashref can contain any of the keys shown below:
-
-=over
-
-=item B<colspan> - Span this cell over multiple columns to the right.
-
-B<Value:> can be any positive number less than the number of columns to the 
-right of the current column
-
-B<Default:> undef
-
-NOTE: If you want to have regular columns B<after> a colspan, you have to 
-provide C<undef> for the columns that should be spanned
-
-NOTE: If you use C<colspan> to span a column, but provide data for it, your 
-table will be mangled: the spanned-but-data-provided-column will be rendered! 
-But, as HTML works the same way, we do not consider this a bug.
-
-Example:
-
-    # row0 col1 should span 2 cols:
-    @data = ( [ 'r1c1', 'r1c2', 'r1c3' ], ['r2c1+',undef,'r2c3'] );
-    $tab->table( $pdf, $page, \@data, %TestData::required,
-      'cell_props' => [
-          [],
-          [{'colspan' => 2}]
-      ]
-    );
-
-=back
-
-See the file C<examples/colspan.pl> for detailed usage.
-
-Example:
-
-    my $cell_props = [
-        [ # This array is for the first row (0). 
-          # If header_props is defined, it will override these settings.
-            {    # Row 0 cell 0
-                'bg_color'  => '#AAAA00',
-                'fg_color'  => 'yellow',
-                'underline' => [ 2, 2 ],
-            },
-
-            # etc.
-        ],
-        [ # Row 1 (first data row, if header_props given)
-            {    # Row 1 cell 0
-                'bg_color' => '#CCCC00',
-                'fg_color' => 'blue',
-            },
-            {    # Row 1 cell 1
-                'bg_color' => '#BBBB00',
-                'fg_color' => 'red',
-            },
-            # etc.
-        ],
-        [ # Row 2
-            {    # Row 2 cell 0 span cell 1
-                'colspan' => 2
-            },
-            # etc.
-        ],
-        # etc.
-    ];
-
-    OR
-
-    my $cell_props = [];
-    $cell_props->[1][0] = {
-        # Row 2 cell 1
-        'bg_color' => '#CCCC00',
-        'fg_color' => 'blue',
-    };
-
-=head2 text_block()
-
-    my ($width_of_last_line, $ypos_of_last_line, $left_over_text) = 
-        text_block( $txt, $data, %settings)
-
-=over
-
-=item Description
-
-Utility method to create a block of text. The block may contain multiple 
-paragraphs (input C<$data> separated by implicit or explicit newlines C<\n>).
-It is mainly used internally, but you can use it from outside for placing 
-formatted text anywhere on the sheet.
-
-NOTE: This method will NOT add more pages to the PDF instance if the space is 
-not enough to place the string inside the block.
-Leftover text will be returned and has to be handled by the caller - i.e., add 
-a new page and a new block with the leftover.
-
-=item Parameters
-
-    $txt  - a PDF::Builder::Page::Text instance representing the text tool.
-    $data - a string that will be placed inside the block, broken up into
-            lines that fit within the indicated width.
-    %settings - HASH with geometry and formatting parameters. Note that
-                several parameters are mandatory.
-
-=item Returns
-
-The return value is a 3 item list where
-
-    $width_of_last_line - Width of last line in the block
-    $final_y - The Y coordinate of the block bottom so that additional 
-               content can be added after it
-    $left_over_text - Text that did not fit in the provided box geometry.
-
-=item Example
-
-    # PDF::Builder objects
-    my $page = $pdf->page();
-    my $txt  = $page->text();
-
-    my %settings = (
-        # MANDATORY position and table size
-        'x' => 10,
-        'y' => 570,
-        'w' => 220,
-        'h' => 180,
-
-        # OPTIONAL PARAMETERS
-        'leading'  => $font_size*1.15 | $distance_between_lines,
-        'align'    => "left|right|center|justify|fulljustify",
-                        default: left
-        'max_word_length' => $optional_max_word_chars_between_splits
-                        default: 20
-        'parspace' => $optional_vertical_space_before_paragraph,
-                        default: 0 extra vertical space
-
-        # Only one of the following parameters can be given.
-        # They override each other, in the order given. C<hang> is the 
-        # highest weight.
-        'hang'     => $optional_hanging_text_to_lead_a_paragraph,
-        'flindent' => $optional_indent_of_first_line,
-        'fpindent' => $optional_indent_of_first_paragraph,
-        'indent'   => $optional_indent_of_text_to_every_non_first_line,
-    );
-
-    my ( $width_of_last_line, $final_y, $left_over_text ) = 
-         $pdftable->text_block( $txt, $data, %settings );
-
-=back
-
-=head1 VERSION
-
-1.002
-
-=head1 AUTHOR
-
-Daemmon Hughes
-
-=head1 DEVELOPMENT
-
-Further development Versions 0.02 -- 0.11 - Desislav Kamenov
-
-Further development since Ver: 0.12 - Phil Perry
-
-=head1 COPYRIGHT AND LICENSE
-
-Copyright (C) 2006 by Daemmon Hughes, portions Copyright 2004 Stone
-Environmental Inc. (www.stone-env.com) All Rights Reserved.
-
-Copyright (C) 2020 by Phil M Perry.
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.7 or,
-at your option, any later version of Perl 5 you may have available.
-Note that Perl 5.10 is the minimum supported level.
-
-=head1 PLUGS
-
-=over
-
-=item by Daemmon Hughes
-
-Much of the original development work on this module was sponsered by
-Stone Environmental Inc. (www.stone-env.com).
-
-The text_block() method is a slightly modified copy of the one from
-Rick Measham's PDF::API2 tutorial at
-http://pdfapi2.sourceforge.net/cgi-bin/view/Main/YourFirstDocument
-
-=item by Desislav Kamenov (@deskata on Twitter)
-
-The development of this module was supported by SEEBURGER AG (www.seeburger.com) till year 2007
-
-Thanks to my friends Krasimir Berov and Alex Kantchev for helpful tips and QA during development of versions 0.9.0 to 0.9.5
-
-Thanks to all GitHub contributors!
-
-=back
-
-=head1 CONTRIBUTION
-
-PDF::Table is on GitHub. You are more than welcome to contribute!
-
-https://github.com/PhilterPaper/PDF-Table
-
-=head1 SEE ALSO
-
-L<PDF::API2>, L<PDF::Builder>
-
-=cut
-
+For documentation, see Table/Table.pod. A copy of table.html is included in
+the library for your convenience, or you can use a tool such as pod2html to
+create the HTML.

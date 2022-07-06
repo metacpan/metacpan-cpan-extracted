@@ -31,6 +31,7 @@ t/MirrorTest.txt
 t/get_mirror_char.t
 t/is_bidi.t
 t/known.txt
+t/license.txt
 t/shape.t
 t/ucd.t
 weaver.ini

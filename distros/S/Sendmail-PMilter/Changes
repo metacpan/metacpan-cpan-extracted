@@ -1,86 +1,45 @@
-Revision history for Perl extension Sendmail::PMilter.
+Revision history for Perl extension Sendmail::PMilter V1.1x and later.
 
-1.00  Sat Apr 16 13:10:16 UTC 2011
-    - Avoid infinite loop: signal handler modifies errno
-    - Added support for SMFIC_UNKNOWN
+[numbers] in square brackets refer to the issue tracking system at
 
-0.99  Sun Feb  6 21:32:30 UTC 2011
-    - RT#65499: Handle IPv6 addresses in SMFIC_CONNECT in
-      Sendmail::PMilter::Context
+https://rt.cpan.org/Public/Dist/Display.html?Name=Sendmail-PMilter
 
-0.98  Fri Mar 12 21:36:18 GMT 2010
-    - RT#51759: added child_init and child_exit parameters to prefork
-      dispatcher -Michael Schout
-    - RT#51713: fixed POD errors for embedded '>' -Michael Schout
-    - Note in the POD that the module is orphaned and is looking for a
-      proper maintainer.
+1.21
+    Sun 03 Jul 11:00:00 BST 2022
+    - Released
 
-0.97  Mon Feb 23 23:39:15 2009 UTC
-    - RT#43327: Changed protocol testing condition from ($ver == 2) to ($ver >= 2 && $ver <= 6)
-      to make the milter work with Sendmail 8.14
-    - Removed CVS Id from Changes file
+1.20_03
+    Wed 17 Jul 09:42:32 BST 2019 developer release
+    - Added file COPYRIGHT
 
-0.96  Sat Jul 07 18:27:25 2007 UTC
-    - Changed threads::shared::share(\$nchildren) to
-      threads::shared::share($nchildren), this should fix some failing smokes
+1.20_02
+    Tue 16 Jul 18:17:53 BST 2019 developer release
+    - Added file CONTRIBUTING
 
-0.95  Tue Aug 10 21:10:35 2004 UTC
-	- fixed installation location of Sendmail::Milter; it was quite wrong
-		(reported by SL <milter@free.fr>)
-	- fixed manifest (0.94 was missing some metadata files)
+1.20_01
+    Fri 12 Jul 14:40:35 BST 2019 developer release
+    - [23921] Removed requirement for Sendmail::Milter
+    - Full support for protocol negotiation, including
+        support for setting milter data buffer sizes
+    - get_sendmail_option() to read configuration file options
+    - Documentation updates
+    - Test suite updates
+    - Propose to insist on Milter Protocol Version 6 in V1.21
+    - Removed enable_chgfrom and some other some cruft
+    - Comments invited via CPAN issues
 
-0.94  Wed Aug 04 17:10:00 2004 UTC
-	- [923158] made installation of Sendmail::Milter layer optional
-	- [925579] added support for experimental setsender() operation
-	- fixed usage of max_interpreters and max_requests values
-		(they were being ignored previously)
-	- allowed for named configuration variables to prefork_dispatcher()
-	- [1002122] fixed symbol table to return symbols from earlier
-		callbacks as appropriate (reported by <s.barnes@uni-koeln.de>)
-	- [1003308] changed "EOF in stream" handling to exit as if a normal
-		SMFIC_CLOSE had been received from the MTA
-	- fixed warning in Context.pm wrt <= on an undefined value
-	- [1003307] fixed ithread_dispatcher share() usage and warning
-		appearing when $@ was defined but empty
-	- [1003304] changed SIGINFO/SIGUSR1 handler to use warn() rather
-		than raw prints to STDERR (requested by <andrewr@iagu.net>)
-	- [925577, 1003351] added support for quarantine(), progress(),
-		and shutdown() (Sendmail 8.13 special case)
-	- moved SMFIF_* constants not in the standard Sendmail::Milter
-		into only Sendmail::PMilter
-
-----  Wed Jul 07 21:50:00 2004 EDT
-	- Marcia Lynell May, mother of Todd Vierling's partner Adam May,
-		passed away of complications related to spina bifida.
-
-0.93  Thu Mar 25 19:15:00 2004 UTC
-	- fixed call to threads::shared::share() to pass varglob, not
-		reference (reported by <schaefer@zanshin.com>)
-		(also fixed in 0.92_01)
-	- [910599] fixed SIGINFO handler to use only a valid signal; will use
-		SIGUSR1 if SIGINFO doesn't exist
-		(also fixed in 0.92_01)
-	- [910602] always send a response to the close packet if the socket
-		is still valid (was doing this for failures, but not for
-		successful closing of the session)
-	- [923156] moved constants from Sendmail::PMilter to Sendmail::Milter
-		to allow the libmilter implementation to coexist
-
-0.92  Fri Feb 27 15:15:00 2004 UTC
-	- added INET6 and UNIX socket support to sockaddr argument passed
-		to the "connect" callback
-	- fixed bug where a setreply() value was held beyond one callback
-		(also fixed in 0.91_02)
-	- implemented Sendmail::Milter::settimeout() and
-		Sendmail::Milter::setdbg() as no-ops; needed for completeness
-		(also fixed in 0.91_03)
-	- fixed signal handling in prefork dispatcher
-
-0.91  Sun Feb 22 15:20:00 2004 UTC
-	- added PMILTER_DISPATCHER env var
-	- added "ithread" and "prefork" dispatchers
-	- major doc overhaul
-	- moved sources to "lib"
-
-0.90  Thu Feb 19 16:20:00 2004 UTC
-	- first release of new architecture based on legacy codebase
+1.10  Sun 15 Apr 15:05:24 BST 2018 TRIAL1, not released
+    - New maintainership (CPAN/GWHAYWOOD)
+    - Test suite updates
+    - [125090] Implement set multi-line reply function
+    - [125040] Documentation updates
+                   Fix POD errors
+                   Add COPYRIGHT->LICENCE (file,link,=head1)
+                   Remove obsolete doc/
+    - [115352] SETSENDER->CHGFROM etc.
+    -  [85833] ithread and postfork dispatcher fixes
+    -  [85826] sig{CHLD}='DEFAULT';
+    -  [84941] Theoretically fixed, needs thorough exercise
+    -  [78865] Define constant SMFIF_NONE
+    -  [50144] Dummy functions setdbg() & settimeout() return 1
+    -  [54794] Fix memory leak in ithread dispatcher

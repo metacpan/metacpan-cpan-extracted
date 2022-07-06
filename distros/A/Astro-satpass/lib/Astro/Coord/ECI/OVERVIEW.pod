@@ -349,7 +349,7 @@ satellite or other body in orbit around the Earth. This representation
 is in terms of one of a number of related computational models, defined
 in I<Space Track Report Number 3> and
 I<Revisiting Spacetrack Report #3>, both of which are available at
-L<http://celestrak.com/NORAD/documentation/>.
+L<http://celestrak.org/NORAD/documentation/>.
 
 It is possible to construct an
 L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> object by setting the
@@ -501,7 +501,7 @@ that adequately supports the new interface.
 
 =head2 CelesTrak
 
-Dr. T. S. Kelso's L<http://celestrak.com/> is a good source for the more
+Dr. T. S. Kelso's L<http://celestrak.org/> is a good source for the more
 popular satellites. It redistributes data from L<Space Track>,
 but you can get Dr. Kelso's data without registering.
 L<Astro::SpaceTrack|Astro::SpaceTrack> will retrieve data from this

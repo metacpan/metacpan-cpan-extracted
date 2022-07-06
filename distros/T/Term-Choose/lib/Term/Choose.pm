@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.754';
+our $VERSION = '1.755';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -61,9 +61,9 @@ sub _valid_options {
         alignment           => '[ 0 1 2 ]',
         color               => '[ 0 1 2 ]',
         include_highlighted => '[ 0 1 2 ]',
+        layout              => '[ 0 1 2 ]',
         page                => '[ 0 1 2 ]',
         search              => '[ 0 1 2 ]',
-        layout              => '[ 0 1 2 3 ]', # '[ 0 1 2 ]'
         keep                => '[ 1-9 ][ 0-9 ]*',
         ll                  => '[ 1-9 ][ 0-9 ]*',
         max_cols            => '[ 1-9 ][ 0-9 ]*',
@@ -232,18 +232,6 @@ sub __get_key {
 
 sub __modify_options {
     my ( $self ) = @_;
-
-    ############################## remove this with the next release
-    if ( $self->{layout} == 3 ) {
-        my @caller = caller( 2 );
-        print "@caller[1,2]\n";
-        print "Term::Choose::choose\n";
-        print "Option 'layout': 3 is not a valid value.\n";
-        print "Press ENTER to continue:";
-        my $dummy = <>;
-        $self->{layout} = 2;
-    }
-    ##############################
     if ( defined $self->{max_cols} && $self->{max_cols} == 1 ) {
         $self->{layout} = 2;
     }
@@ -1267,7 +1255,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.754
+Version 1.755
 
 =cut
 

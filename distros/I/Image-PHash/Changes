@@ -1,5 +1,10 @@
 Revision history for Image-PHash
 
+0.2     2022-07-01
+        - Faster subsequent diff calls.
+        - Fix for log method.
+        - Test coverage, simple bench added.
+
 0.1     2022-06-22
         First release.
 

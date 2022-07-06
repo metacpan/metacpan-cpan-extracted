@@ -1,5 +1,12 @@
 Revision history for Task::BeLik::GEEKRUTH
 
+1.0200 2022-07-02T13:27:52-04:00 America/New_York
+ [ENHANCEMENTS]
+ - Add a couple of modules that I use a lot, and remove nonexistent module
+
+ [STATISTICS]
+ - code churn: 2 files changed, 6 insertions(+), 1 deletion(-)
+
 1.0100 2022-06-16T08:56:23-04:00 America/New_York
  [ENHANCEMENTS]
  - Added a few things, removed a few things

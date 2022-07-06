@@ -1,5 +1,13 @@
 Revision history for Dist-Zilla-PluginBundle-GEEKRUTH
 
+1.0202 2022-07-02T13:16:40-04:00 America/New_York
+ [BUG FIXES]
+ - Ensure prereqs are in runtime group
+ - Explicitly add a TidyAll plugin I use
+
+ [STATISTICS]
+ - code churn: 2 files changed, 12 insertions(+), 2 deletions(-)
+
 1.0201 2022-06-16T08:48:22-04:00 America/New_York
  [STATISTICS]
  - code churn: 1 file changed, 7 insertions(+), 1 deletion(-)

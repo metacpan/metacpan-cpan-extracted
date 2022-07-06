@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::DutyInformation;
-$Shipment::Purolator::WSDLV2::Types::DutyInformation::VERSION = '3.08';
+$Shipment::Purolator::WSDLV2::Types::DutyInformation::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,38 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %BillDutiesToParty_of : ATTR(:get<BillDutiesToParty>);
-    my %BusinessRelationship_of : ATTR(:get<BusinessRelationship>);
-    my %Currency_of : ATTR(:get<Currency>);
+my %BillDutiesToParty_of :ATTR(:get<BillDutiesToParty>);
+my %BusinessRelationship_of :ATTR(:get<BusinessRelationship>);
+my %Currency_of :ATTR(:get<Currency>);
 
-    __PACKAGE__->_factory(
-        [   qw(        BillDutiesToParty
-              BusinessRelationship
-              Currency
+__PACKAGE__->_factory(
+    [ qw(        BillDutiesToParty
+        BusinessRelationship
+        Currency
 
-            )
-        ],
-        {   'BillDutiesToParty'    => \%BillDutiesToParty_of,
-            'BusinessRelationship' => \%BusinessRelationship_of,
-            'Currency'             => \%Currency_of,
-        },
-        {   'BillDutiesToParty' =>
-              'Shipment::Purolator::WSDLV2::Types::BillDutiesToParty',
-            'BusinessRelationship' =>
-              'Shipment::Purolator::WSDLV2::Types::BusinessRelationship',
-            'Currency' => 'Shipment::Purolator::WSDLV2::Types::DutyCurrency',
-        },
-        {
+    ) ],
+    {
+        'BillDutiesToParty' => \%BillDutiesToParty_of,
+        'BusinessRelationship' => \%BusinessRelationship_of,
+        'Currency' => \%Currency_of,
+    },
+    {
+        'BillDutiesToParty' => 'Shipment::Purolator::WSDLV2::Types::BillDutiesToParty',
+        'BusinessRelationship' => 'Shipment::Purolator::WSDLV2::Types::BusinessRelationship',
+        'Currency' => 'Shipment::Purolator::WSDLV2::Types::DutyCurrency',
+    },
+    {
 
-            'BillDutiesToParty'    => 'BillDutiesToParty',
-            'BusinessRelationship' => 'BusinessRelationship',
-            'Currency'             => 'Currency',
-        }
-    );
+        'BillDutiesToParty' => 'BillDutiesToParty',
+        'BusinessRelationship' => 'BusinessRelationship',
+        'Currency' => 'Currency',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -68,7 +72,7 @@ Shipment::Purolator::WSDLV2::Types::DutyInformation
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

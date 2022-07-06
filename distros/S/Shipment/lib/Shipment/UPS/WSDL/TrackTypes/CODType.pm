@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::TrackTypes::CODType;
-$Shipment::UPS::WSDL::TrackTypes::CODType::VERSION = '3.08';
+$Shipment::UPS::WSDL::TrackTypes::CODType::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,36 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Amount_of : ATTR(:get<Amount>);
-    my %Status_of : ATTR(:get<Status>);
-    my %ControlNumber_of : ATTR(:get<ControlNumber>);
+my %Amount_of :ATTR(:get<Amount>);
+my %Status_of :ATTR(:get<Status>);
+my %ControlNumber_of :ATTR(:get<ControlNumber>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Amount
-              Status
-              ControlNumber
+__PACKAGE__->_factory(
+    [ qw(        Amount
+        Status
+        ControlNumber
 
-            )
-        ],
-        {   'Amount'        => \%Amount_of,
-            'Status'        => \%Status_of,
-            'ControlNumber' => \%ControlNumber_of,
-        },
-        {   'Amount' => 'Shipment::UPS::WSDL::TrackTypes::AmountType',
-            'Status' => 'Shipment::UPS::WSDL::TrackTypes::CODStatusType',
-            'ControlNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'Amount' => \%Amount_of,
+        'Status' => \%Status_of,
+        'ControlNumber' => \%ControlNumber_of,
+    },
+    {
+        'Amount' => 'Shipment::UPS::WSDL::TrackTypes::AmountType',
+        'Status' => 'Shipment::UPS::WSDL::TrackTypes::CODStatusType',
+        'ControlNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'Amount'        => 'Amount',
-            'Status'        => 'Status',
-            'ControlNumber' => 'ControlNumber',
-        }
-    );
+        'Amount' => 'Amount',
+        'Status' => 'Status',
+        'ControlNumber' => 'ControlNumber',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -66,7 +72,7 @@ Shipment::UPS::WSDL::TrackTypes::CODType
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

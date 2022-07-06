@@ -1,6 +1,6 @@
 package Task::BeLike::GEEKRUTH;
 use Modern::Perl;
-our $VERSION = '1.0100'; # VERSION
+our $VERSION = '1.0200'; # VERSION
 our $AUTHORITY = 'cpan:GEEKRUTH'; # AUTHORITY
 # ABSTRACT: TIMTOWTDI, but this works for GeekRuthie
 
@@ -18,7 +18,7 @@ Task::BeLike::GEEKRUTH - TIMTOWTDI, but this works for GeekRuthie
 
 =head1 VERSION
 
-version 1.0100
+version 1.0200
 
 =head1 NAME
 
@@ -26,7 +26,7 @@ Task::BeLike::GEEKRUTH - TIMTOWTDI, but this works for GeekRuthie
 
 =head1 VERSION
 
-version 1.0100
+version 1.0200
 
 =head1 TASK CONTENTS
 
@@ -52,7 +52,11 @@ version 1.0100
 
 =head3 L<Dist::Zilla::App::Command::lsplugins>
 
+=head3 L<Dist::Zilla::Plugin::TaskWeaver>
+
 =head3 L<Dist::Zilla::PluginBundle::Author::GEEKRUTH>
+
+=head3 L<Dist::Zilla::PluginBundle::GitLab>
 
 =head3 L<OrePAN2>
 
@@ -61,8 +65,6 @@ version 1.0100
 =head3 L<Perl::Critic::Bangs>
 
 =head3 L<Perl::Critic::Community>
-
-=head3 L<Perl::Critic::Dancer2>
 
 =head3 L<Perl::Critic::StricterSubs>
 
@@ -73,6 +75,8 @@ version 1.0100
 =head3 L<Pod::Coverage::TrustPod>
 
 =head2 Database Wrangling
+
+=head3 L<DBD::Pg>
 
 =head3 L<DBIx::Class>
 
@@ -115,6 +119,10 @@ version 1.0100
 =head3 L<Modern::Perl>
 
 =head3 L<Moo>
+
+=head3 L<Plack::Handler::Starman>
+
+=head3 L<Template::Plugin::JSON::Escape>
 
 =head3 L<Try::Tiny>
 

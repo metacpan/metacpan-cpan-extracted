@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO/Element.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/23
-## Modified 2021/07/23
+## Modified 2022/07/06
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,15 +16,16 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
+    use vars qw( $VERSION );
     use Text::Wrap ();
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
     use open ':std' => ':utf8';
 };
 
-INIT
-{
-    $Text::Wrap::columns = 80;
-};
+use strict;
+use warnings;
+
+$Text::Wrap::columns = 80;
 
 sub init
 {
@@ -36,15 +37,15 @@ sub init
     $self->{fuzzy}          = '';
     $self->{comment}        = [];
     $self->{auto_comment}   = [];
-    ## e.g.: c-format
+    # e.g.: c-format
     $self->{flags}          = [];
-    ## Is it plural?
+    # Is it plural?
     $self->{plural}         = 0;
-    ## reference
+    # reference
     $self->{file}           = '';
     $self->{line}           = '';
     $self->{encoding}       = '';
-    ## Parent po object
+    # Parent po object
     $self->{po}             = '';
     $self->{is_meta}        = 0;
     $self->{_po_line}       = 0;
@@ -259,7 +260,6 @@ sub normalise
     my $self = shift( @_ );
     my $type = shift( @_ );
     my $text = shift( @_ );
-    $self->message( 2, "Got type '$type' with string '$text'" );
     my @res  = ();
     my $lines;
     if( ref( $text ) && scalar( @$text ) )
@@ -385,7 +385,6 @@ sub _add
     #chomp( @_ );
     $self->{ $what } = [] if( !ref( $self->{ $what } ) );
     push( @{$self->{ $what }}, @_ );
-    # $self->message( 4, "$what property now contains: ", sub{ $self->SUPER::dump( $self->{ $what } ) } );
     return( $self );
 }
 
@@ -421,8 +420,7 @@ sub _set_get_msg_property
 }
 
 1;
-
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -440,7 +438,7 @@ Text::PO::Element - PO Element
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

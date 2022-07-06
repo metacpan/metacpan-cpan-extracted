@@ -1,26 +1,26 @@
 package Acme::Mitey::Cards::Suit;
 
-our $VERSION   = '0.005';
+our $VERSION   = '0.008';
 our $AUTHORITY = 'cpan:TOBYINK';
 
-use Acme::Mitey::Cards::Mite;
+use Acme::Mitey::Cards::Mite qw( -bool -is );
 
 has name => (
-	is => 'ro',
-	isa => 'Str',
-	required => 1,
+	is       => ro,
+	isa      => 'NonEmptyStr',
+	required => true,
 );
 
 has abbreviation => (
-	is => 'lazy',
-	isa => 'Str',
-	builder => sub { uc substr( shift->name, 0, 1 ) },
+	is       => lazy,
+	isa      => 'Str',
+	builder  => sub { uc substr( shift->name, 0, 1 ) },
 );
 
 has colour => (
-	is => 'ro',
-	isa => 'Str',
-	required => 1,
+	is       => ro,
+	isa      => 'Str',
+	required => true,
 );
 
 {

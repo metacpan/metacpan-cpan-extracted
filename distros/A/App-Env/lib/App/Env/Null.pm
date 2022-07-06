@@ -5,17 +5,17 @@ package App::Env::Null;
 use strict;
 use warnings;
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
-#pod =pod
-#pod
-#pod =begin making_pod_coverage_shut_up
-#pod
-#pod =item envs
-#pod
-#pod =end making_pod_coverage_shut_up
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
 
 sub envs { return \%ENV }
 
@@ -35,13 +35,15 @@ __END__
 
 =pod
 
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
 =head1 NAME
 
 App::Env::Null - return a snapshot of the current environment
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 SYNOPSIS
 

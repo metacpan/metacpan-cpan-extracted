@@ -1,14 +1,12 @@
 package Shipment::Purolator::WSDL::Types::ValidationFault;
-$Shipment::Purolator::WSDL::Types::ValidationFault::VERSION = '3.08';
+$Shipment::Purolator::WSDL::Types::ValidationFault::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {
-    'http://www.microsoft.com/practices/EnterpriseLibrary/2007/01/wcf/validation';
-}
+sub get_xmlns { 'http://www.microsoft.com/practices/EnterpriseLibrary/2007/01/wcf/validation' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -22,26 +20,32 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Details_of : ATTR(:get<Details>);
+my %Details_of :ATTR(:get<Details>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Details
+__PACKAGE__->_factory(
+    [ qw(        Details
 
-            )
-        ],
-        {'Details' => \%Details_of,},
-        {   'Details' =>
-              'Shipment::Purolator::WSDL::Types::ArrayOfValidationDetail',
-        },
-        {
+    ) ],
+    {
+        'Details' => \%Details_of,
+    },
+    {
+        'Details' => 'Shipment::Purolator::WSDL::Types::ArrayOfValidationDetail',
+    },
+    {
 
-            'Details' => 'Details',
-        }
-    );
+        'Details' => 'Details',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -58,7 +62,7 @@ Shipment::Purolator::WSDL::Types::ValidationFault
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

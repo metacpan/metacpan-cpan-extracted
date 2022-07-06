@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::ShipmentDryIceDetail;
-$Shipment::FedEx::WSDL::ShipTypes::ShipmentDryIceDetail::VERSION = '3.08';
+$Shipment::FedEx::WSDL::ShipTypes::ShipmentDryIceDetail::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %PackageCount_of : ATTR(:get<PackageCount>);
-    my %TotalWeight_of : ATTR(:get<TotalWeight>);
+my %PackageCount_of :ATTR(:get<PackageCount>);
+my %TotalWeight_of :ATTR(:get<TotalWeight>);
 
-    __PACKAGE__->_factory(
-        [   qw(        PackageCount
-              TotalWeight
+__PACKAGE__->_factory(
+    [ qw(        PackageCount
+        TotalWeight
 
-            )
-        ],
-        {   'PackageCount' => \%PackageCount_of,
-            'TotalWeight'  => \%TotalWeight_of,
-        },
-        {   'PackageCount' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-            'TotalWeight' => 'Shipment::FedEx::WSDL::ShipTypes::Weight',
-        },
-        {
+    ) ],
+    {
+        'PackageCount' => \%PackageCount_of,
+        'TotalWeight' => \%TotalWeight_of,
+    },
+    {
+        'PackageCount' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+        'TotalWeight' => 'Shipment::FedEx::WSDL::ShipTypes::Weight',
+    },
+    {
 
-            'PackageCount' => 'PackageCount',
-            'TotalWeight'  => 'TotalWeight',
-        }
-    );
+        'PackageCount' => 'PackageCount',
+        'TotalWeight' => 'TotalWeight',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -62,7 +67,7 @@ Shipment::FedEx::WSDL::ShipTypes::ShipmentDryIceDetail
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

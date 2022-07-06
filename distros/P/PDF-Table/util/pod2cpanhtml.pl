@@ -8,8 +8,8 @@ use strict;
 use warnings;
 use Pod::Simple::HTML;
 
-our $VERSION = '1.002'; # VERSION
-my $LAST_UPDATE = '1.000'; # manually update whenever code is changed
+our $VERSION = '1.003'; # VERSION
+our $LAST_UPDATE = '1.000'; # manually update whenever code is changed
 
 my $parser = Pod::Simple::HTML->new();
 

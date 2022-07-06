@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-24'; # DATE
+our $DATE = '2022-07-04'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use Perinci::CmdLine::Any;
 
@@ -43,7 +43,7 @@ orgadb - Select entries and fields from Org addressbook
 
 =head1 VERSION
 
-This document describes version 0.002 of orgadb (from Perl distribution App-orgadb), released on 2022-06-24.
+This document describes version 0.004 of orgadb (from Perl distribution App-orgadb), released on 2022-07-04.
 
 =head1 SYNOPSIS
 
@@ -62,6 +62,11 @@ written using breadcrumb-style notation with ">" separator):
  ** iwan
  - home phone :: 555-1234-567
  - cell :: 555-8765-432
+ - address ::
+   + street :: Jl Mangga 123
+   + city :: Bandung
+   + postcode :: 40123
+   + country :: Indonesia
  ** restu
  - cell :: 555-1234-568
  ** satya
@@ -84,7 +89,7 @@ written using breadcrumb-style notation with ">" separator):
  - cell :: 555-1234-710
  - home phone :: 555-1234-712
  - note ::
-   + do not call after office hours
+   + [2022-07-03] :: do not call after office hours
  ** joe
  - cell :: 555-1234-569
  - cell :: 555-1234-570
@@ -98,101 +103,173 @@ written using breadcrumb-style notation with ">" separator):
 To list all entries (categories will be shown as path prefix):
 
  % orgadb
- family/iwan
- family/restu
- family/satya
- family > wife's/roger
- family > wife's/emily
- family > wife's/cynthia
- work > acme inc/bugs
- work > acme inc/daffy
- work > acme inc > ex/ marvin
- work > newsradio/dave
- work > newsradio/lisa
- work > newsradio/joe
- work > newsradio/beth
- work > newsradio > ex/matthew
+ ** family/iwan
+ ** family/restu
+ ** family/satya
+ ** family > wife's/roger
+ ** family > wife's/emily
+ ** family > wife's/cynthia
+ ** work > acme inc/bugs
+ ** work > acme inc/daffy
+ ** work > acme inc > ex/ marvin
+ ** work > newsradio/dave
+ ** work > newsradio/lisa
+ ** work > newsradio/joe
+ ** work > newsradio/beth
+ ** work > newsradio > ex/matthew
 
 =head2 Searching entries
 
 To list entries that match the string 'sa':
 
  % orgadb sa
- family/satya
- work > newsradio/lisa
+ ** family/satya
+ ** work > newsradio/lisa
 
 To hide the category prefix, use C<-C> (C<--hide-category>):
 
  % orgadb -C sa
- satya
- lisa
+ ** satya
+ ** lisa
 
 =head2 Searching categories
 
 To search against the category, use the C<-c> option:
 
  % orgadb sa -c work; # search for 'sa' from work
- work > newsradio/lisa
+ ** work > newsradio/lisa
 
  % orgadb -c work; # list all entries from work
- work > newsradio/dave
- work > newsradio/lisa
- work > newsradio/joe
- work > newsradio/beth
- work > newsradio > ex/matthew
+ ** work > newsradio/dave
+ ** work > newsradio/lisa
+ ** work > newsradio/joe
+ ** work > newsradio/beth
+ ** work > newsradio > ex/matthew
 
 To display Lisa's full entry:
 
  % orgadb lisa -l
- work > newsradio/lisa
- ** lisa
+ ** work > newsradio/lisa
  - cell :: 555-1234-710
  - home phone :: 555-1234-712
  - note ::
-   + do not call cell after office hours
+   + [2022-07-03] :: do not call after office hours
 
  % orgadb lisa -Cl  ;# do not show the category
- lisa
  ** lisa
  - cell :: 555-1234-710
  - home phone :: 555-1234-712
  - note ::
-   + do not call cell after office hours
+   + [2022-07-03] :: do not call after office hours
 
  % orgadb lisa -El  ;# do not show the entry line
- ** lisa
  - cell :: 555-1234-710
  - home phone :: 555-1234-712
  - note ::
-   + do not call cell after office hours
+   + [2022-07-03] :: do not call after office hours
 
 =head2 Searching fields
 
 To get Lisa's cell phone number (search against field):
 
  % orgadb lisa cell
- work > newsradio/lisa
-   - cell :: 555-1234-710
+ ** work > newsradio/lisa
+ - cell :: 555-1234-710
 
-(NOT YET IMPLEMENTED) To get Lisa's cell phone number (only the number, without
-the field namae):
+To get Lisa's cell phone number (only the number, without the entry headline or
+the field name):
 
- % orgadb lisa cell -F
+ % orgadb lisa cell -E -N
  555-1234-710
 
 To get all Lisa's phone numbers:
 
- % orgadb lisa -F '/phone|cell/'
+ % orgadb lisa -E '/phone|cell/'
  - cell :: 555-1234-710
  - home phone :: 555-1234-712
 
+You can also search subfields. For example, to show Iwan's postcode field value
+under the address field:
+
+ % orgadb iwan address postcode -EN
+ 40123
+
 =head2 Formatting
 
-NOT YET IMPLEMENTED
+You can apply one or more formatters to field values:
+
+ % orgadb lisa cell --formatter Str::remove_non_digit -EN
+ 5551234710
+
+=head2 Shell mode
+
+Instead of selecting one time and exiting, you can instruct B<orgadb> to enter
+shell mode, where you can issue multiple select commands without re-reading the
+Org addressbook files repeatedly. For example:
+
+ % orgadb -s
+ > select lisa
+ ...
+ > select lisa -l
+ ...
+ > select lisa cell -E -N
+ ...
+ > exit
+
+ % _
+
+When the addressbook files change on disk, the files will be re-read.
+
+=head2 Password book
+
+Aside from a regular addressbook, you can also use B<orgadb> with password books
+(a file you store passwords in). B<orgadb> can read GnuPG-encrypted files, where
+the decrypted content is read into memory and not stored in temporary files. You
+can then use shell mode (C<-s>) to repeatedly query the password book without
+re-reading and re-decrypting everytime. For example, suppose you have a password
+book like this:
+
+ # -*- Mode: org -*-
+ * persona > perlancar
+ ** google (perlancar)
+ - username :: perlancar
+ - pass :: secret1
+ - security question :: favorite dog in the whole wide world?
+ - security answer :: impossible to pick one
+ - log ::
+   + [2022-07-04 Mon] :: change password
+   + [2017-08-01] :: create
+ ** twitter (perlancar)
+ - username :: perlancar
+ - pass :: secret2
+ * persona > steven
+ ** google (steven123123)
+ - username :: steven123123
+ - phone :: 555-123-2345
+ - pass :: secret3
+
+and you store it in C<~/passwords.gpg>. Then to query passwords:
+
+ # What's my (perlancar)'s google password?
+ % orgadb -f ~/passwords.gpg /google.+perlancar/ pass -EN
+ secret1
+
+ # What's my (steven)'s phone used in the google account?
+ % orgadb -f ~/passwords.gpg /google.+steven/ '/phone|cell/' -EN
+ 555-123-2345
+
+Or, in shell mode:
+
+ % orgadb -f ~/passwords.gpg -s
+ > select /google.+perlancar/ pass -EN
+ secret1
+ > select /google.+steven/ '/phone|cell/' -EN
+ 555-123-2345
+ > exit
+
+ % _
 
 =head1 DESCRIPTION
-
-B<EARLY RELEASE, MANY OPTIONS ARE NOT YET ADDED OR IMPLEMETED.>
 
 B<App::orgadb> is a tool for your addressbook written in Org format. It
 currently contains:
@@ -217,7 +294,13 @@ C<*> marks required options.
 
 =over
 
-=item B<--category>=I<s>, B<-c>
+=item B<--no-reload-files-on-change>
+
+=back
+
+=head2 Color options
+
+=over
 
 =item B<--color-theme-json>=I<s>
 
@@ -236,28 +319,6 @@ Default value:
 Valid values:
 
  ["auto","always","never"]
-
-=item B<--detail>, B<-l>
-
-=item B<--entry>=I<s>
-
-Find entry by string or regex search against its title.
-
-Can also be specified as the 1st command-line argument.
-
-=item B<--field>=I<s>
-
-Find field by string or regex search.
-
-Can also be specified as the 2nd command-line argument.
-
-=item B<--hide-category>, B<-C>
-
-Do not show category.
-
-=item B<--hide-entry>, B<-E>
-
-Do not entry headline.
 
 =back
 
@@ -305,6 +366,53 @@ file.
 
 =back
 
+=head2 Display options
+
+=over
+
+=item B<--detail>, B<-l>
+
+=item B<--formatter>=I<s@>
+
+Add one or more formatters to display field value.
+
+Specify one or more formatters to apply to the field value before displaying.
+
+A formatter is name of C<Data::Sah::Filter::perl::*> module, without the prefix.
+For example: C<Str::uc> will convert the field value to uppercase. Another
+formatter, C<Str::remove_comment> can remove comment.
+
+A formatter can have arguments, which is specified using this format:
+
+ [FORMATTER_NAME, {ARG1NAME => ARG1VAL, ...}]
+
+If formatter name begins with C<[> character, it will be parsed as JSON. Example:
+
+ ['Str::remove_comment', {'style':'cpp'}]
+
+
+Can be specified multiple times.
+
+=item B<--formatters-json>=I<s>
+
+Add one or more formatters to display field value (JSON-encoded).
+
+See C<--formatter>.
+
+=item B<--hide-category>, B<-C>
+
+Do not show category.
+
+=item B<--hide-entry>, B<-E>
+
+Do not show entry headline.
+
+=item B<--hide-field-name>, B<-N>
+
+Do not show field names, just show field values.
+
+=back
+
 =head2 Environment options
 
 =over
@@ -319,11 +427,43 @@ variable.
 
 =back
 
+=head2 Filter options
+
+=over
+
+=item B<--category>=I<s>, B<-c>
+
+Find entry by string or regex search against the category title.
+
+=item B<--entry>=I<s>
+
+Find entry by string or regex search against its title.
+
+Can also be specified as the 1st command-line argument.
+
+=item B<--field>=I<s@>
+
+Find (sub)fields by string or regex search.
+
+Can also be specified as the 2nd command-line argument and onwards.
+
+Can be specified multiple times.
+
+=item B<--fields-json>=I<s>
+
+Find (sub)fields by string or regex search (JSON-encoded).
+
+See C<--field>.
+
+Can also be specified as the 2nd command-line argument and onwards.
+
+=back
+
 =head2 Input options
 
 =over
 
-=item B<--file>=I<s@>
+=item B<--file>=I<s@>, B<-f>
 
 Path to addressbook file.
 
@@ -371,6 +511,14 @@ Shortcut for --log-level=trace.
 =item B<--verbose>
 
 Shortcut for --log-level=info.
+
+=back
+
+=head2 Mode options
+
+=over
+
+=item B<--shell>, B<-s>
 
 =back
 
@@ -433,6 +581,20 @@ This option will first save the output to a temporary file, then open a viewer
 program to view the temporary file. If a viewer program is not chosen, a
 suitable default, e.g. the browser, is chosen.
 
+
+=back
+
+=head2 Result options
+
+=over
+
+=item B<--num-entries>=I<s>
+
+Specify maximum number of entries to return (0 means unlimited).
+
+=item B<--num-fields>=I<s>
+
+Specify maximum number of fields (per entry) to return (0 means unlimited).
 
 =back
 
@@ -546,7 +708,7 @@ by two colons, followed by another space) as the separator:
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/S2iHHrTD2a.conf>, F</home/u1/S2iHHrTD2a.conf>, or F</etc/S2iHHrTD2a.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/orgadb.conf>, F</home/u1/orgadb.conf>, or F</etc/orgadb.conf>.
 
 All found files will be read and merged.
 
@@ -580,27 +742,46 @@ List of available configuration parameters:
  color_theme (see --color-theme)
  detail (see --detail)
  entry (see --entry)
- field (see --field)
+ fields (see --field)
  files (see --file)
  format (see --format)
+ formatters (see --formatter)
  hide_category (see --hide-category)
  hide_entry (see --hide-entry)
+ hide_field_name (see --hide-field-name)
  log_level (see --log-level)
  naked_res (see --naked-res)
+ num_entries (see --num-entries)
+ num_fields (see --num-fields)
+ reload_files_on_change (see --no-reload-files-on-change)
+ shell (see --shell)
 
 =head1 ENVIRONMENT
 
-=head2 S2IHHRTD2A_OPT => str
+=head2 ORGADB_OPT
 
-Specify additional command-line options.
+String. Specify additional command-line options.
+
+=head2 ORGADB_COLOR_THEME
+
+perl::colortheme::modname_with_optional_args. Set default color theme.
+
+Color theme is Perl module name under the C<ColorTheme::Search::> namespace,
+without the namespace prefix. The default is C<Light>. You can set color theme
+using the C<--color-theme> command-line option as well as this environment
+variable.
 
 =head1 FILES
 
-F</home/u1/.config/S2iHHrTD2a.conf>
+=head2 /home/u1/.config/orgadb.conf
 
-F</home/u1/S2iHHrTD2a.conf>
+=head2 /home/u1/orgadb.conf
 
-F</etc/S2iHHrTD2a.conf>
+=head2 /etc/orgadb.conf
+
+=head2 ~/.orgadb_history
+
+Store shell's command history.
 
 =head1 HOMEPAGE
 

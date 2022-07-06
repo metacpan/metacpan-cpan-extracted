@@ -12,7 +12,7 @@ my $app1 = App::Env->new( 'App1' );
 ok( defined $app1, 'create env' );
 
 # make sure that worked
-is( $app1->env('Site1_App1'), 1, "check env" );
+is( $app1->env( 'Site1_App1' ), 1, "check env" );
 
 # and brand it
 $app1->setenv( 'AppEnvTestID' => $$ );
@@ -24,16 +24,16 @@ $app1->setenv( 'AppEnvTestID' => $$ );
 
     ok( defined $clone, 'cloned env' );
 
-    is( $clone->env('AppEnvTestID'), $$, "check cloned env" );
+    is( $clone->env( 'AppEnvTestID' ), $$, "check cloned env" );
 
     # change cloned environment
     $clone->setenv( 'CloneTest' => 1 );
 
-    is( $clone->env('CloneTest'), 1, "check updated cloned env" );
+    is( $clone->env( 'CloneTest' ), 1, "check updated cloned env" );
 
     # and ensure that the parent environment has not been changed
 
-    is( $app1->env('CloneTest'), undef, "check parent env" );
+    is( $app1->env( 'CloneTest' ), undef, "check parent env" );
 
     # and ensure that the clone has a new object id
     isnt( $app1->lobject_id, $clone->lobject_id, "clone object id" );
@@ -50,7 +50,7 @@ $app1->setenv( 'AppEnvTestID' => $$ );
     $clone->setenv( 'CloneTest' => 2 );
 
     # and ensure that the parent environment has not been changed
-    is( $app1->env('CloneTest'), undef, "check parent env" );
+    is( $app1->env( 'CloneTest' ), undef, "check parent env" );
 
     # and make sure that the cache id is different
     ok( $clone->cacheid ne $app1->cacheid, "clone cache id" );
@@ -61,7 +61,7 @@ $app1->setenv( 'AppEnvTestID' => $$ );
     ok( defined $retrieve, "retrieve cached clone" );
 
     # and make sure its the correct one.
-    is( $retrieve->env('CloneTest'), 2, "check cached cloned env" );
+    is( $retrieve->env( 'CloneTest' ), 2, "check cached cloned env" );
 }
 
 done_testing;

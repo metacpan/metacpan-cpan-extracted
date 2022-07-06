@@ -45,6 +45,7 @@ our %command =
    filter    => [\&filter    => 'Filters a PTD (or PTD pair).'],
    help      => [\&help      => 'Lists available commands.'],
    stats     => [\&stats     => 'Shows basic PTD statistics.'],
+   toJson    => [\&toJson    => 'Converts a PTD to JSON format.'],
    toDmp     => [\&toDmp     => 'Converts a PTD to Dumper format.'],
    toDmpBz   => [\&toDmpBz   => 'Converts a PTD to Bzipped Dumper format.'],
    toDmpXz   => [\&toDmpXz   => 'Converts a PTD to XZipped Dumper format.'],
@@ -199,6 +200,26 @@ sub toDmp {
     $ptd->saveAs("dmp", $optd);
 }
 
+=head2 toJson
+
+This option can be used to convert a PTD to a JSON File.
+First argument is the PTD filename. Second, optional, argument
+can be specified as the output filename.
+
+=cut
+
+sub toJson {
+    my ($my_opts, $ptd, $optd) = @_;
+    $optd ||= $ptd;
+    $optd = _get_output_filename("json", $optd);
+
+    _DEBUG_ "loading PTD [$ptd].";
+    $ptd = Lingua::PTD->new($ptd);
+
+    _DEBUG_ "writing file [$optd].";
+    $ptd->saveAs("json", $optd);
+}
+
 =head2 toDmpBz
 
 This option can be used to convert a PTD to a Bzipped Dumper
@@ -218,6 +239,7 @@ sub toDmpBz {
     _DEBUG_ "writing file [$optd].";
     $ptd->saveAs("bz2", $optd);
 }
+
 
 =head2 toDmpXz
 

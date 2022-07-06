@@ -8,7 +8,7 @@ use v5.16;
 use warnings;
 
 # Program version.
-use version; our $version = version->declare('v1.0.0');
+use version; our $version = version->declare('v1.0.1');
 
 # Initialize modules.
 use File::Basename qw[basename dirname];
@@ -28,23 +28,23 @@ our $program = basename $0;
 
 # List of command-line options.
 our @option_list = (
-  "output_file|o=s" => \( our $output_file   = "" ),
+  "output_file|o=s" => \( our $output_file   = "-" ),
 
-  "verbose|v"       => \( our $verbose       = "" ),
-  "inplace|i"       => \( our $inplace       = "" ),
+  "verbose|v"       => \( our $verbose       = ""  ),
+  "inplace|i"       => \( our $inplace       = ""  ),
 
-  "dump"            => \( our $dump          = "" ),
-  "outline"         => \( our $outline       = "" ),
+  "dump"            => \( our $dump          = ""  ),
+  "outline"         => \( our $outline       = ""  ),
 
-  "find_bbox"       => \( our $find_bbox     = "" ),
-  "new_bbox"        => \( our $new_bbox      = "" ),
+  "find_bbox"       => \( our $find_bbox     = ""  ),
+  "new_bbox"        => \( our $new_bbox      = ""  ),
 
-  "compress"        => \( our $compress      = 0  ),
-  "decompress"      => \( our $decompress    = "" ),
-  "minify"          => \( our $minify        = 0  ),
+  "compress"        => \( our $compress      = 0   ),
+  "decompress"      => \( our $decompress    = ""  ),
+  "minify"          => \( our $minify        = 0   ),
 
-  "help|h|?"        => \( our $print_help    = "" ),
-  "version|V"       => \( our $print_version = "" ),
+  "help|h|?"        => \( our $print_help    = ""  ),
+  "version|V"       => \( our $print_version = ""  ),
 );
 
 # Help message.

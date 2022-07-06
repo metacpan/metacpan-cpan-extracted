@@ -192,6 +192,7 @@ my %determiners = (
     'Camera' => {  },
     'ChartCategory' => {  },
     'ChartLinesFormat' => {  },
+    'ChartSeriesGroup' => {  },
     'ChartTitle' => {  },
     'ChartWall' => {  },
     'CommonSlideViewProperties' => {  },

@@ -52,6 +52,7 @@ sub set_attributes {
         { name => 'mysql_enable_utf8',        default => 0, values => [ 0, 1 ] },
         { name => 'mysql_enable_utf8mb4',     default => 1, values => [ 0, 1 ] },
         { name => 'mysql_bind_type_guessing', default => 1, values => [ 0, 1 ] },
+        { name => 'ChopBlanks',               default => 0, values => [ 0, 1 ] },
     ];
 }
 
@@ -90,7 +91,7 @@ sub get_db_handle {
         AutoCommit => 1,
         ShowErrorStatement => 1,
         %$set_attributes,
-    } ) or die DBI->errstr;
+    } );
     return $dbh;
 }
 

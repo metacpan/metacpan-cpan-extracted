@@ -4,56 +4,66 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"         => "demo of Mite",
-  "author"           => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
-  "dynamic_config"   => 0,
-  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
-  "keywords"         => [],
-  "license"          => ["perl_5"],
-  "meta-spec"        => {
-                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                          version => 2,
-                        },
-  "name"             => "Acme-Mitey-Cards",
-  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"          => {
-                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                          develop   => {
-                                         recommends => { "Dist::Inkt" => 0.001 },
-                                         requires   => { Mite => "v0.0.4" },
-                                       },
-                          runtime   => { requires => { perl => 5.010001 } },
-                          test      => { requires => { "Test::More" => 0.96 } },
-                        },
-  "provides"         => {
-                          "Acme::Mitey::Cards"                => { file => "lib/Acme/Mitey/Cards.pm", version => 0.005 },
-                          "Acme::Mitey::Cards::Card"          => { file => "lib/Acme/Mitey/Cards/Card.pm", version => 0.005 },
-                          "Acme::Mitey::Cards::Card::Face"    => { file => "lib/Acme/Mitey/Cards/Card/Face.pm", version => 0.005 },
-                          "Acme::Mitey::Cards::Card::Joker"   => { file => "lib/Acme/Mitey/Cards/Card/Joker.pm", version => 0.005 },
-                          "Acme::Mitey::Cards::Card::Numeric" => { file => "lib/Acme/Mitey/Cards/Card/Numeric.pm", version => 0.005 },
-                          "Acme::Mitey::Cards::Deck"          => { file => "lib/Acme/Mitey/Cards/Deck.pm", version => 0.005 },
-                          "Acme::Mitey::Cards::Hand"          => { file => "lib/Acme/Mitey/Cards/Hand.pm", version => 0.005 },
-                          "Acme::Mitey::Cards::Mite"          => { file => "lib/Acme/Mitey/Cards/Mite.pm" },
-                          "Acme::Mitey::Cards::Set"           => { file => "lib/Acme/Mitey/Cards/Set.pm", version => 0.005 },
-                          "Acme::Mitey::Cards::Suit"          => { file => "lib/Acme/Mitey/Cards/Suit.pm", version => 0.005 },
-                        },
-  "release_status"   => "stable",
-  "resources"        => {
-                          bugtracker   => { web => "https://github.com/tobyink/p5-mite/issues" },
-                          homepage     => "https://metacpan.org/release/Acme-Mitey-Cards",
-                          license      => ["http://dev.perl.org/licenses/"],
-                          repository   => {
-                                            type => "git",
-                                            url  => "git://github.com/tobyink/p5-mite.git",
-                                            web  => "https://github.com/tobyink/p5-mite",
-                                          },
-                          x_identifier => "http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/project",
-                        },
-  "version"          => 0.005,
-  "x_static_install" => 1,
+  "abstract"       => "demo of Mite",
+  "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
+  "dynamic_config" => 1,
+  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "keywords"       => [],
+  "license"        => ["perl_5"],
+  "meta-spec"      => {
+                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                        version => 2,
+                      },
+  "name"           => "Acme-Mitey-Cards",
+  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"        => {
+                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                        develop   => {
+                                       recommends => { "Dist::Inkt" => 0.001 },
+                                       requires   => { Mite => 0.002004 },
+                                     },
+                        runtime   => { requires => { perl => 5.008001 } },
+                        test      => { requires => { "Test::More" => 0.96 } },
+                      },
+  "provides"       => {
+                        "Acme::Mitey::Cards"                => { file => "lib/Acme/Mitey/Cards.pm", version => 0.008 },
+                        "Acme::Mitey::Cards::Card"          => { file => "lib/Acme/Mitey/Cards/Card.pm", version => 0.008 },
+                        "Acme::Mitey::Cards::Card::Face"    => { file => "lib/Acme/Mitey/Cards/Card/Face.pm", version => 0.008 },
+                        "Acme::Mitey::Cards::Card::Joker"   => { file => "lib/Acme/Mitey/Cards/Card/Joker.pm", version => 0.008 },
+                        "Acme::Mitey::Cards::Card::Numeric" => { file => "lib/Acme/Mitey/Cards/Card/Numeric.pm", version => 0.008 },
+                        "Acme::Mitey::Cards::Deck"          => { file => "lib/Acme/Mitey/Cards/Deck.pm", version => 0.008 },
+                        "Acme::Mitey::Cards::Hand"          => { file => "lib/Acme/Mitey/Cards/Hand.pm", version => 0.008 },
+                        "Acme::Mitey::Cards::Mite"          => { file => "lib/Acme/Mitey/Cards/Mite.pm" },
+                        "Acme::Mitey::Cards::Set"           => { file => "lib/Acme/Mitey/Cards/Set.pm", version => 0.008 },
+                        "Acme::Mitey::Cards::Suit"          => { file => "lib/Acme/Mitey/Cards/Suit.pm", version => 0.008 },
+                        "Acme::Mitey::Cards::Types"         => { file => "lib/Acme/Mitey/Cards/Types.pm" },
+                      },
+  "release_status" => "stable",
+  "resources"      => {
+                        bugtracker   => { web => "https://github.com/tobyink/p5-mite/issues" },
+                        homepage     => "https://metacpan.org/release/Acme-Mitey-Cards",
+                        license      => ["http://dev.perl.org/licenses/"],
+                        repository   => {
+                                          type => "git",
+                                          url  => "git://github.com/tobyink/p5-mite.git",
+                                          web  => "https://github.com/tobyink/p5-mite",
+                                        },
+                        x_identifier => "http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/project",
+                      },
+  "version"        => 0.008,
 };
 
 my %dynamic_config;
+do {
+if ($] < 5.010000) {
+	$meta->{prereqs}{runtime}{requires}{'MRO::Compat'} = 0;
+}
+
+if ($] < 5.014000) {
+        $meta->{prereqs}{runtime}{requires}{'Devel::GlobalDestruction'} = 0;
+}
+
+};
 
 my %WriteMakefileArgs = (
 	ABSTRACT   => $meta->{abstract},

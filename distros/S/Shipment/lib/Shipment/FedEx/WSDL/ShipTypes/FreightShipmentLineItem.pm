@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::FreightShipmentLineItem;
-$Shipment::FedEx::WSDL::ShipTypes::FreightShipmentLineItem::VERSION = '3.08';
+$Shipment::FedEx::WSDL::ShipTypes::FreightShipmentLineItem::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,94 +20,92 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %FreightClass_of : ATTR(:get<FreightClass>);
-    my %ClassProvidedByCustomer_of : ATTR(:get<ClassProvidedByCustomer>);
-    my %HandlingUnits_of : ATTR(:get<HandlingUnits>);
-    my %Packaging_of : ATTR(:get<Packaging>);
-    my %Pieces_of : ATTR(:get<Pieces>);
-    my %NmfcCode_of : ATTR(:get<NmfcCode>);
-    my %HazardousMaterials_of : ATTR(:get<HazardousMaterials>);
-    my %BillOfLadingNumber_of : ATTR(:get<BillOfLadingNumber>);
-    my %PurchaseOrderNumber_of : ATTR(:get<PurchaseOrderNumber>);
-    my %Description_of : ATTR(:get<Description>);
-    my %Weight_of : ATTR(:get<Weight>);
-    my %Dimensions_of : ATTR(:get<Dimensions>);
-    my %Volume_of : ATTR(:get<Volume>);
+my %FreightClass_of :ATTR(:get<FreightClass>);
+my %ClassProvidedByCustomer_of :ATTR(:get<ClassProvidedByCustomer>);
+my %HandlingUnits_of :ATTR(:get<HandlingUnits>);
+my %Packaging_of :ATTR(:get<Packaging>);
+my %Pieces_of :ATTR(:get<Pieces>);
+my %NmfcCode_of :ATTR(:get<NmfcCode>);
+my %HazardousMaterials_of :ATTR(:get<HazardousMaterials>);
+my %BillOfLadingNumber_of :ATTR(:get<BillOfLadingNumber>);
+my %PurchaseOrderNumber_of :ATTR(:get<PurchaseOrderNumber>);
+my %Description_of :ATTR(:get<Description>);
+my %Weight_of :ATTR(:get<Weight>);
+my %Dimensions_of :ATTR(:get<Dimensions>);
+my %Volume_of :ATTR(:get<Volume>);
 
-    __PACKAGE__->_factory(
-        [   qw(        FreightClass
-              ClassProvidedByCustomer
-              HandlingUnits
-              Packaging
-              Pieces
-              NmfcCode
-              HazardousMaterials
-              BillOfLadingNumber
-              PurchaseOrderNumber
-              Description
-              Weight
-              Dimensions
-              Volume
+__PACKAGE__->_factory(
+    [ qw(        FreightClass
+        ClassProvidedByCustomer
+        HandlingUnits
+        Packaging
+        Pieces
+        NmfcCode
+        HazardousMaterials
+        BillOfLadingNumber
+        PurchaseOrderNumber
+        Description
+        Weight
+        Dimensions
+        Volume
 
-            )
-        ],
-        {   'FreightClass'            => \%FreightClass_of,
-            'ClassProvidedByCustomer' => \%ClassProvidedByCustomer_of,
-            'HandlingUnits'           => \%HandlingUnits_of,
-            'Packaging'               => \%Packaging_of,
-            'Pieces'                  => \%Pieces_of,
-            'NmfcCode'                => \%NmfcCode_of,
-            'HazardousMaterials'      => \%HazardousMaterials_of,
-            'BillOfLadingNumber'      => \%BillOfLadingNumber_of,
-            'PurchaseOrderNumber'     => \%PurchaseOrderNumber_of,
-            'Description'             => \%Description_of,
-            'Weight'                  => \%Weight_of,
-            'Dimensions'              => \%Dimensions_of,
-            'Volume'                  => \%Volume_of,
-        },
-        {   'FreightClass' =>
-              'Shipment::FedEx::WSDL::ShipTypes::FreightClassType',
-            'ClassProvidedByCustomer' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-            'HandlingUnits' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-            'Packaging' =>
-              'Shipment::FedEx::WSDL::ShipTypes::PhysicalPackagingType',
-            'Pieces' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-            'NmfcCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'HazardousMaterials' =>
-              'Shipment::FedEx::WSDL::ShipTypes::HazardousCommodityOptionType',
-            'BillOfLadingNumber' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'PurchaseOrderNumber' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Weight'      => 'Shipment::FedEx::WSDL::ShipTypes::Weight',
-            'Dimensions'  => 'Shipment::FedEx::WSDL::ShipTypes::Dimensions',
-            'Volume'      => 'Shipment::FedEx::WSDL::ShipTypes::Volume',
-        },
-        {
+    ) ],
+    {
+        'FreightClass' => \%FreightClass_of,
+        'ClassProvidedByCustomer' => \%ClassProvidedByCustomer_of,
+        'HandlingUnits' => \%HandlingUnits_of,
+        'Packaging' => \%Packaging_of,
+        'Pieces' => \%Pieces_of,
+        'NmfcCode' => \%NmfcCode_of,
+        'HazardousMaterials' => \%HazardousMaterials_of,
+        'BillOfLadingNumber' => \%BillOfLadingNumber_of,
+        'PurchaseOrderNumber' => \%PurchaseOrderNumber_of,
+        'Description' => \%Description_of,
+        'Weight' => \%Weight_of,
+        'Dimensions' => \%Dimensions_of,
+        'Volume' => \%Volume_of,
+    },
+    {
+        'FreightClass' => 'Shipment::FedEx::WSDL::ShipTypes::FreightClassType',
+        'ClassProvidedByCustomer' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        'HandlingUnits' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+        'Packaging' => 'Shipment::FedEx::WSDL::ShipTypes::PhysicalPackagingType',
+        'Pieces' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+        'NmfcCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'HazardousMaterials' => 'Shipment::FedEx::WSDL::ShipTypes::HazardousCommodityOptionType',
+        'BillOfLadingNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'PurchaseOrderNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Weight' => 'Shipment::FedEx::WSDL::ShipTypes::Weight',
+        'Dimensions' => 'Shipment::FedEx::WSDL::ShipTypes::Dimensions',
+        'Volume' => 'Shipment::FedEx::WSDL::ShipTypes::Volume',
+    },
+    {
 
-            'FreightClass'            => 'FreightClass',
-            'ClassProvidedByCustomer' => 'ClassProvidedByCustomer',
-            'HandlingUnits'           => 'HandlingUnits',
-            'Packaging'               => 'Packaging',
-            'Pieces'                  => 'Pieces',
-            'NmfcCode'                => 'NmfcCode',
-            'HazardousMaterials'      => 'HazardousMaterials',
-            'BillOfLadingNumber'      => 'BillOfLadingNumber',
-            'PurchaseOrderNumber'     => 'PurchaseOrderNumber',
-            'Description'             => 'Description',
-            'Weight'                  => 'Weight',
-            'Dimensions'              => 'Dimensions',
-            'Volume'                  => 'Volume',
-        }
-    );
+        'FreightClass' => 'FreightClass',
+        'ClassProvidedByCustomer' => 'ClassProvidedByCustomer',
+        'HandlingUnits' => 'HandlingUnits',
+        'Packaging' => 'Packaging',
+        'Pieces' => 'Pieces',
+        'NmfcCode' => 'NmfcCode',
+        'HazardousMaterials' => 'HazardousMaterials',
+        'BillOfLadingNumber' => 'BillOfLadingNumber',
+        'PurchaseOrderNumber' => 'PurchaseOrderNumber',
+        'Description' => 'Description',
+        'Weight' => 'Weight',
+        'Dimensions' => 'Dimensions',
+        'Volume' => 'Volume',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -124,7 +122,7 @@ Shipment::FedEx::WSDL::ShipTypes::FreightShipmentLineItem
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

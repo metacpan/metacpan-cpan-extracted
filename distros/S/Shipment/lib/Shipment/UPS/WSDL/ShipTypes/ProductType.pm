@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::ProductType;
-$Shipment::UPS::WSDL::ShipTypes::ProductType::VERSION = '3.08';
+$Shipment::UPS::WSDL::ShipTypes::ProductType::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/IF/v1.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/IF/v1.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,113 +20,112 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Description_of : ATTR(:get<Description>);
-    my %Unit_of : ATTR(:get<Unit>);
-    my %CommodityCode_of : ATTR(:get<CommodityCode>);
-    my %PartNumber_of : ATTR(:get<PartNumber>);
-    my %OriginCountryCode_of : ATTR(:get<OriginCountryCode>);
-    my %JointProductionIndicator_of : ATTR(:get<JointProductionIndicator>);
-    my %NetCostCode_of : ATTR(:get<NetCostCode>);
-    my %NetCostDateRange_of : ATTR(:get<NetCostDateRange>);
-    my %PreferenceCriteria_of : ATTR(:get<PreferenceCriteria>);
-    my %ProducerInfo_of : ATTR(:get<ProducerInfo>);
-    my %MarksAndNumbers_of : ATTR(:get<MarksAndNumbers>);
-    my %NumberOfPackagesPerCommodity_of :
-      ATTR(:get<NumberOfPackagesPerCommodity>);
-    my %ProductWeight_of : ATTR(:get<ProductWeight>);
-    my %VehicleID_of : ATTR(:get<VehicleID>);
-    my %ScheduleB_of : ATTR(:get<ScheduleB>);
-    my %ExportType_of : ATTR(:get<ExportType>);
-    my %SEDTotalValue_of : ATTR(:get<SEDTotalValue>);
+my %Description_of :ATTR(:get<Description>);
+my %Unit_of :ATTR(:get<Unit>);
+my %CommodityCode_of :ATTR(:get<CommodityCode>);
+my %PartNumber_of :ATTR(:get<PartNumber>);
+my %OriginCountryCode_of :ATTR(:get<OriginCountryCode>);
+my %JointProductionIndicator_of :ATTR(:get<JointProductionIndicator>);
+my %NetCostCode_of :ATTR(:get<NetCostCode>);
+my %NetCostDateRange_of :ATTR(:get<NetCostDateRange>);
+my %PreferenceCriteria_of :ATTR(:get<PreferenceCriteria>);
+my %ProducerInfo_of :ATTR(:get<ProducerInfo>);
+my %MarksAndNumbers_of :ATTR(:get<MarksAndNumbers>);
+my %NumberOfPackagesPerCommodity_of :ATTR(:get<NumberOfPackagesPerCommodity>);
+my %ProductWeight_of :ATTR(:get<ProductWeight>);
+my %VehicleID_of :ATTR(:get<VehicleID>);
+my %ScheduleB_of :ATTR(:get<ScheduleB>);
+my %ExportType_of :ATTR(:get<ExportType>);
+my %SEDTotalValue_of :ATTR(:get<SEDTotalValue>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Description
-              Unit
-              CommodityCode
-              PartNumber
-              OriginCountryCode
-              JointProductionIndicator
-              NetCostCode
-              NetCostDateRange
-              PreferenceCriteria
-              ProducerInfo
-              MarksAndNumbers
-              NumberOfPackagesPerCommodity
-              ProductWeight
-              VehicleID
-              ScheduleB
-              ExportType
-              SEDTotalValue
+__PACKAGE__->_factory(
+    [ qw(        Description
+        Unit
+        CommodityCode
+        PartNumber
+        OriginCountryCode
+        JointProductionIndicator
+        NetCostCode
+        NetCostDateRange
+        PreferenceCriteria
+        ProducerInfo
+        MarksAndNumbers
+        NumberOfPackagesPerCommodity
+        ProductWeight
+        VehicleID
+        ScheduleB
+        ExportType
+        SEDTotalValue
 
-            )
-        ],
-        {   'Description'                  => \%Description_of,
-            'Unit'                         => \%Unit_of,
-            'CommodityCode'                => \%CommodityCode_of,
-            'PartNumber'                   => \%PartNumber_of,
-            'OriginCountryCode'            => \%OriginCountryCode_of,
-            'JointProductionIndicator'     => \%JointProductionIndicator_of,
-            'NetCostCode'                  => \%NetCostCode_of,
-            'NetCostDateRange'             => \%NetCostDateRange_of,
-            'PreferenceCriteria'           => \%PreferenceCriteria_of,
-            'ProducerInfo'                 => \%ProducerInfo_of,
-            'MarksAndNumbers'              => \%MarksAndNumbers_of,
-            'NumberOfPackagesPerCommodity' =>
-              \%NumberOfPackagesPerCommodity_of,
-            'ProductWeight' => \%ProductWeight_of,
-            'VehicleID'     => \%VehicleID_of,
-            'ScheduleB'     => \%ScheduleB_of,
-            'ExportType'    => \%ExportType_of,
-            'SEDTotalValue' => \%SEDTotalValue_of,
-        },
-        {   'Description'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Unit'              => 'Shipment::UPS::WSDL::ShipTypes::UnitType',
-            'CommodityCode'     => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'PartNumber'        => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'OriginCountryCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'JointProductionIndicator' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'NetCostCode'      => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'NetCostDateRange' =>
-              'Shipment::UPS::WSDL::ShipTypes::NetCostDateType',
-            'PreferenceCriteria' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ProducerInfo'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'MarksAndNumbers' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'NumberOfPackagesPerCommodity' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ProductWeight' =>
-              'Shipment::UPS::WSDL::ShipTypes::ProductWeightType',
-            'VehicleID'     => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ScheduleB'     => 'Shipment::UPS::WSDL::ShipTypes::ScheduleBType',
-            'ExportType'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'SEDTotalValue' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'Description' => \%Description_of,
+        'Unit' => \%Unit_of,
+        'CommodityCode' => \%CommodityCode_of,
+        'PartNumber' => \%PartNumber_of,
+        'OriginCountryCode' => \%OriginCountryCode_of,
+        'JointProductionIndicator' => \%JointProductionIndicator_of,
+        'NetCostCode' => \%NetCostCode_of,
+        'NetCostDateRange' => \%NetCostDateRange_of,
+        'PreferenceCriteria' => \%PreferenceCriteria_of,
+        'ProducerInfo' => \%ProducerInfo_of,
+        'MarksAndNumbers' => \%MarksAndNumbers_of,
+        'NumberOfPackagesPerCommodity' => \%NumberOfPackagesPerCommodity_of,
+        'ProductWeight' => \%ProductWeight_of,
+        'VehicleID' => \%VehicleID_of,
+        'ScheduleB' => \%ScheduleB_of,
+        'ExportType' => \%ExportType_of,
+        'SEDTotalValue' => \%SEDTotalValue_of,
+    },
+    {
+        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Unit' => 'Shipment::UPS::WSDL::ShipTypes::UnitType',
+        'CommodityCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'PartNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'OriginCountryCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'JointProductionIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'NetCostCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'NetCostDateRange' => 'Shipment::UPS::WSDL::ShipTypes::NetCostDateType',
+        'PreferenceCriteria' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ProducerInfo' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'MarksAndNumbers' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'NumberOfPackagesPerCommodity' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ProductWeight' => 'Shipment::UPS::WSDL::ShipTypes::ProductWeightType',
+        'VehicleID' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ScheduleB' => 'Shipment::UPS::WSDL::ShipTypes::ScheduleBType',
+        'ExportType' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'SEDTotalValue' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'Description'                  => 'Description',
-            'Unit'                         => 'Unit',
-            'CommodityCode'                => 'CommodityCode',
-            'PartNumber'                   => 'PartNumber',
-            'OriginCountryCode'            => 'OriginCountryCode',
-            'JointProductionIndicator'     => 'JointProductionIndicator',
-            'NetCostCode'                  => 'NetCostCode',
-            'NetCostDateRange'             => 'NetCostDateRange',
-            'PreferenceCriteria'           => 'PreferenceCriteria',
-            'ProducerInfo'                 => 'ProducerInfo',
-            'MarksAndNumbers'              => 'MarksAndNumbers',
-            'NumberOfPackagesPerCommodity' => 'NumberOfPackagesPerCommodity',
-            'ProductWeight'                => 'ProductWeight',
-            'VehicleID'                    => 'VehicleID',
-            'ScheduleB'                    => 'ScheduleB',
-            'ExportType'                   => 'ExportType',
-            'SEDTotalValue'                => 'SEDTotalValue',
-        }
-    );
+        'Description' => 'Description',
+        'Unit' => 'Unit',
+        'CommodityCode' => 'CommodityCode',
+        'PartNumber' => 'PartNumber',
+        'OriginCountryCode' => 'OriginCountryCode',
+        'JointProductionIndicator' => 'JointProductionIndicator',
+        'NetCostCode' => 'NetCostCode',
+        'NetCostDateRange' => 'NetCostDateRange',
+        'PreferenceCriteria' => 'PreferenceCriteria',
+        'ProducerInfo' => 'ProducerInfo',
+        'MarksAndNumbers' => 'MarksAndNumbers',
+        'NumberOfPackagesPerCommodity' => 'NumberOfPackagesPerCommodity',
+        'ProductWeight' => 'ProductWeight',
+        'VehicleID' => 'VehicleID',
+        'ScheduleB' => 'ScheduleB',
+        'ExportType' => 'ExportType',
+        'SEDTotalValue' => 'SEDTotalValue',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -143,7 +142,7 @@ Shipment::UPS::WSDL::ShipTypes::ProductType
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

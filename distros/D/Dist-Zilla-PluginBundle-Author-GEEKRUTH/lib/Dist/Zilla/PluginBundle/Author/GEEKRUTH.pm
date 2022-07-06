@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::Author::GEEKRUTH;
 use Modern::Perl;
-our $VERSION   = '1.0201';           # VERSION
+our $VERSION   = '1.0202';           # VERSION
 our $AUTHORITY = 'cpan:GEEKRUTH';    # AUTHORITY
 
 # ABSTRACT: Be like GeekRuthie when you build your dists
@@ -189,7 +189,7 @@ Dist::Zilla::PluginBundle::Author::GEEKRUTH - Be like GeekRuthie when you build 
 
 =head1 VERSION
 
-version 1.0201
+version 1.0202
 
 =head1 DESCRIPTION
 

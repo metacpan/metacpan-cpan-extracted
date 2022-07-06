@@ -17,7 +17,9 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Array::Sample::WeightedRandom",
   "PREREQ_PM" => {
+    "Array::Iter" => 0,
     "Exporter" => "5.57",
+    "List::Util" => "1.54",
     "strict" => 0,
     "warnings" => 0
   },
@@ -27,7 +29,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,10 +37,12 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Array::Iter" => 0,
   "Exporter" => "5.57",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "List::Util" => "1.54",
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

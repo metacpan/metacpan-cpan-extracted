@@ -7,10 +7,10 @@ use Test::More 0.88;
 use Test::NoTabs;
 
 my @files = (
-    'bin/appexec',
     'lib/App/Env.pm',
     'lib/App/Env/Example.pm',
     'lib/App/Env/Null.pm',
+    'script/appexec',
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',

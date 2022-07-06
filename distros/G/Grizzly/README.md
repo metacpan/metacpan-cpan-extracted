@@ -10,15 +10,12 @@ Grizzly will output the stock quote of the given symbol.
 
     grizzly [options]
 
-    Options:
+        Options:
 
-    news [stock symbol]
-
-    quote [stock symbol]
-
-    help
-
-    version
+            news [stock symbol]
+            quote [stock symbol]
+            help
+            version
 
 ## Options
 
@@ -34,18 +31,17 @@ version - Displays Grizzly's version number.
 
 ## Installation
 
+### Through cpanm
+
     cpanm Grizzly
+
+### Through the Project Directory
+
+    cpanm --installdeps .
+    perl Makefile.PL
+    make
+    make install
 
 ## API Key
 
 You will need to get a free API key from [NewsAPI](https://newsapi.org/). Afterwards you will need to set the NEWS\_API\_KEY environment variable to the API key.
-
-# AUTHOR
-
-Nobunaga <nobunaga@cpan.org>
-
-# COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021 by Nobunaga.
-
-MIT License

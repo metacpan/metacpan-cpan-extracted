@@ -16,7 +16,7 @@ meta-spec:
   version: '1.4'
 name: Catalyst-TraitFor-Request-StructuredParameters
 requires:
-  CatalystX::Errors: '0.001006'
+  CatalystX::Errors: '0.001008'
   Moose: '2.1403'
   Scalar::Util: '1.55'
   Storable: '3.25'
@@ -24,7 +24,7 @@ resources:
   bugtracker: https://github.com/jjn1056/Catalyst-TraitFor-Request-StructuredParameters/issues
   homepage: https://github.com/jjn1056/Catalyst-TraitFor-Request-StructuredParameters
   repository: https://github.com/jjn1056/Catalyst-TraitFor-Request-StructuredParameters.git
-version: '0.008'
+version: '0.009'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

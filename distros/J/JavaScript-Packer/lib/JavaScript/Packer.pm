@@ -8,7 +8,7 @@ use Regexp::RegGrp;
 
 # =========================================================================== #
 
-our $VERSION = "2.08";
+our $VERSION = "2.09";
 
 our @BOOLEAN_ACCESSORS = ( 'no_compress_comment', 'remove_copyright' );
 
@@ -52,7 +52,7 @@ our $DICTIONARY = {
     CONDITIONAL => qr~\/\*\@\w*|\w*\@\*\/|\/\/\@\w*|\@(?>\w+)~,
 
     # single line comments
-    COMMENT1    => qr~\/\/([\@#])?([^\n]*)?\n~,
+    COMMENT1    => qr~(:?)\/\/([\@#])?([^\n]*)?\n~,
 
     # multline comments
     COMMENT2    => qr~\/\*[^*]*\*+(?:[^\/][^*]*\*+)*\/~
@@ -302,22 +302,28 @@ sub init {
 
     @{ $self->{comments}->{reggrp_data} } = ( @$DATA[ 0, 1, 3 ], @$COMMENTS );
 
+    # single line comment
     $self->{comments}->{reggrp_data}->[-2]->{replacement} = sub {
         my $submatches = $_[0]->{submatches};
-        if ( $submatches->[0] eq '#' ) {
-            my $cmnt = sprintf( "//%s%s__NEW_LINE__", @{$submatches}[0 .. 1] );
+
+        if ( $submatches->[0] eq ':' ) {
+            return sprintf( "://%s", $submatches->[2] );
+        }
+        elsif ( $submatches->[1] eq '#' ) {
+            my $cmnt = sprintf( "%s//%s%s__NEW_LINE__", @{$submatches}[0 .. 2] );
             return $cmnt;
         }
-        elsif ( $submatches->[0] eq '@' ) {
-            $reggrp_comments->exec( \$submatches->[1] );
-            $reggrp_clean->exec( \$submatches->[1] );
-            $reggrp_whitespace->exec( \$submatches->[1] );
+        elsif ( $submatches->[1] eq '@' ) {
+            $reggrp_comments->exec( \$submatches->[2] );
+            $reggrp_clean->exec( \$submatches->[2] );
+            $reggrp_whitespace->exec( \$submatches->[2] );
 
-            return sprintf( "//%s%s\n%s", @{$submatches}[0 .. 2] );
+            return sprintf( "%s//%s%s\n%s", @{$submatches}[0 .. 3] );
         }
-        return sprintf( "\n%s", $submatches->[2] );
+        return sprintf( "\n%s", $submatches->[3] );
     };
 
+    # multi line comments
     $self->{comments}->{reggrp_data}->[-1]->{replacement} = sub {
         my $submatches = $_[0]->{submatches};
         if ( $submatches->[0] =~ /^\/\*\@(.*)\@\*\/$/sm ) {
@@ -747,7 +753,7 @@ JavaScript::Packer - Perl version of Dean Edwards' Packer.js
 
 =head1 VERSION
 
-Version 2.08
+Version 2.09
 
 =head1 DESCRIPTION
 

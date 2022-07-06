@@ -22,6 +22,8 @@ subtest "printbitmatrix" => sub {
     is($bits, " 101\n101 \n01  \n1   \n", 'Reduced bits');
     $bits = $iph->printbitmatrix(geometry=>'8');
     is($bits, " 101\n101\n01\n", 'Geometry 8 bits');
+    $bits = $iph->printbitmatrix(geometry=>'8',separator=>'|',filler=>'x');
+    is($bits, "x|1|0|1|\n1|0|1|\n0|1|\n", 'Geometry 8 bits');
 };
 
 subtest "diff" => sub {

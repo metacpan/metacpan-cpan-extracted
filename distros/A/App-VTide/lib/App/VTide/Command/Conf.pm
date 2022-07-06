@@ -16,16 +16,10 @@ use Array::Utils qw/intersect/;
 
 extends 'App::VTide::Command';
 
-our $VERSION = version->new('0.1.16');
+our $VERSION = version->new('0.1.17');
 our $NAME    = 'conf';
-our $OPTIONS = [
-    'env|e',
-    'terms|t',
-    'which|w=s',
-    'test|T!',
-    'verbose|v+',
-];
-sub details_sub { return ( $NAME, $OPTIONS )};
+our $OPTIONS = [ 'env|e', 'terms|t', 'which|w=s', 'test|T!', 'verbose|v+', ];
+sub details_sub { return ( $NAME, $OPTIONS ) }
 
 sub _alphanum {
     my $A = $a;
@@ -39,8 +33,13 @@ sub run {
     my ($self) = @_;
 
     if ( $self->defaults->{env} ) {
-        for my $env (sort keys %ENV ) {
-            next if $env !~ /VTIDE/;
+        my %env = (
+            %{ $self->config->get->{default}{env} || {} },
+            %{  $self->config->get->{terminals}{ $ENV{VTIDE_TERM} }{env} || {}
+            }
+        );
+        for my $env ( sort keys %ENV ) {
+            next if $env !~ /VTIDE/ && !exists $env{$env};
             printf "%-12s : %s\n", $env, $ENV{$env};
         }
         print "\n";
@@ -50,12 +49,15 @@ sub run {
         return $self->which( $self->defaults->{which} );
     }
 
-    my $data  = $self->defaults->{terms}
+    my $data
+        = $self->defaults->{terms}
         ? $self->config->get->{terminals}
         : $self->config->get->{editor}{files};
-    my @files = sort _alphanum keys %{ $data };
+    my @files = sort _alphanum keys %{$data};
 
-    print $self->defaults->{terms} ? "Terminals configured:\n" : "File groups:\n";
+    print $self->defaults->{terms}
+        ? "Terminals configured:\n"
+        : "File groups:\n";
     if ( $self->defaults->{verbose} ) {
         for my $file (@files) {
             my $data = Dump( $data->{$file} );
@@ -74,9 +76,9 @@ sub which {
     my ( $self, $which ) = @_;
     my $term = $self->config->get->{terminals};
     my $file = $self->config->get->{editor}{files};
-    my (%files, %groups, %terms);
+    my ( %files, %groups, %terms );
 
-    for my $group (keys %$file) {
+    for my $group ( keys %$file ) {
         my @found = grep {/$which/}
             @{ $file->{$group} },
             map { $self->_dglob($_) } @{ $file->{$group} };
@@ -91,23 +93,22 @@ sub which {
     my @files  = sort keys %files;
     my @groups = sort keys %groups;
     my @terms;
-    for my $terminal (sort keys %$term) {
-        my $edit = !$term->{$terminal}{edit} ? []
-            : ! ref $term->{$terminal}{edit} ? [ $term->{$terminal}{edit} ]
-            :                                  $term->{$terminal}{edit};
+    for my $terminal ( sort keys %$term ) {
+        my $edit
+            = !$term->{$terminal}{edit}     ? []
+            : !ref $term->{$terminal}{edit} ? [ $term->{$terminal}{edit} ]
+            :                                 $term->{$terminal}{edit};
 
-        my @found = (
-            ( intersect @files , @$edit ),
-            ( intersect @groups, @$edit ),
-        );
+        my @found = ( ( intersect @files, @$edit ),
+            ( intersect @groups, @$edit ), );
         next if !@found;
         push @terms, $terminal;
     }
 
     if (@files) {
-        print "Files:     " . ( join ', ', @files )  . "\n";
+        print "Files:     " . ( join ', ', @files ) . "\n";
         print "Groups:    " . ( join ', ', @groups ) . "\n";
-        print "Terminals: " . ( join ', ', @terms )  . "\n" if @terms;
+        print "Terminals: " . ( join ', ', @terms ) . "\n" if @terms;
     }
     else {
         print "Not found\n";
@@ -119,7 +120,7 @@ sub which {
 sub auto_complete {
     my ($self) = @_;
 
-    my $env = $self->options->files->[-1];
+    my $env   = $self->options->files->[-1];
     my @files = sort keys %{ $self->config->get->{editor}{files} };
 
     print join ' ', grep { $env ne 'conf' ? /^$env/xms : 1 } @files;
@@ -137,7 +138,7 @@ App::VTide::Command::Conf - Show the current VTide configuration and environment
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Conf version 0.1.16
+This documentation refers to App::VTide::Command::Conf version 0.1.17
 
 =head1 SYNOPSIS
 

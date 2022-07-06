@@ -30,6 +30,7 @@ lib/Acme/Mitey/Cards/Set.pm
 lib/Acme/Mitey/Cards/Set.pm.mite.pm
 lib/Acme/Mitey/Cards/Suit.pm
 lib/Acme/Mitey/Cards/Suit.pm.mite.pm
+lib/Acme/Mitey/Cards/Types.pm
 t/00-cards.t
 t/card-face.t
 t/card-joker.t

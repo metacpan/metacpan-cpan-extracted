@@ -1,16 +1,16 @@
 {
    "abstract" : "Tools to manipulate MIME messages",
    "author" : [
-      "Eryq <eryq@zeegee.com>, Dianne Skoll <dfs@roaringpenguin.com>, Dave O'Neill <dmo@roaringpenguin.com>"
+      "Eryq <eryq@zeegee.com>, David F. Skoll <dfs@roaringpenguin.com>, Dave O'Neill <dmo@roaringpenguin.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Install version 1.14, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "Module::Install version 1.00, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MIME-tools",
    "no_index" : {
@@ -58,6 +58,7 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "5.508",
-   "x_module_name" : "MIME::Tools"
+   "version" : "5.503",
+   "x_module_name" : "MIME::Tools",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

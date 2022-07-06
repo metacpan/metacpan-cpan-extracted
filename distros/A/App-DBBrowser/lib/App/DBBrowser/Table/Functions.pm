@@ -233,7 +233,7 @@ sub __func_with_col_and_arg {
         my $info = join "\n", @tmp_info;
         my $readline = $tr->readline(
             $prompt,
-            { info => $info, history => [ @local_history, @$history ] }
+            { info => $info, history => [ @local_history, @{$history//[]} ] }
         );
         if ( ! length $readline ) {
             if ( $i == 0 ) {

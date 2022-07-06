@@ -4,8 +4,7 @@ use strict;
 use warnings;
 use Date::Calc;
 use Getopt::Long;
-
-use Object::Tiny qw/input_file input_text output_file as_atcf/;
+use Util::H2O::More qw/baptise/;
 
 sub new {
     my ( $pkg, %self ) = @_;
@@ -14,7 +13,8 @@ sub new {
     if ( not( exists $self{input_file} or exists $self{input_text} ) or ( exists $self{input_file} and exists $self{input_text} ) or not exists $self{output_file} ) {
         die qq{Constructor requires specifying the 'input_file' xor 'input_text', and 'output_file' parameters.\n};
     }
-    my $self = bless \%self, $pkg;
+    my @fields = (qw/input_file input_text output_file as_atcf/);
+    my $self = baptise -recurse, \%self, $pkg, @fields;
     return $self;
 }
 

@@ -452,6 +452,10 @@ The guest was restarted after crashing
 
 The guest is running but post-copy is taking place
 
+=item Sys::Virt::Domain::STATE_RUNNING_POSTCOPY_FAILED
+
+The guest is running, but migration failed in post-copy
+
 =item Sys::Virt::Domain::STATE_BLOCKED_UNKNOWN
 
 The guest is blocked for an unknown reason
@@ -1793,9 +1797,18 @@ The guest is performing a block backup
 
 =back
 
-=item $dom->abort_job()
+=item $dom->abort_job($flags=0)
 
-Aborts the currently executing job
+Aborts the currently executing job. Valid C<$flags> incude:
+
+=over 4
+
+=item Sys::Virt::Domain::DOMAIN_ABORT_JOB_POSTCOPY
+
+Interrupt post-copy migration. It can later be resumed using
+migrate APIs with C<MIGRATE_POSTCOPY_RESUME> flag.
+
+=back
 
 =item my $info = $dom->get_block_job_info($path, $flags=0)
 
@@ -2873,6 +2886,16 @@ non-shared storage migration to be synchronously written to the
 destination. This ensures the storage migration converges for VMs
 doing heavy I/O on fast local storage and slow mirror.
 
+=item Sys::Virt::Domain::MIGRATE_POSTCOPY_RESUME
+
+Resume migration which failed in post-copy phase.
+
+=item Sys::Virt::Domain::MIGRATE_ZEROCOPY
+
+Attempt to avoid copying data. This is a request, not a guarantee
+and may apply to either one or both directions of data transfer
+at discretion of the hypervisor implementation.
+
 =back
 
 =head2 UNDEFINE CONSTANTS
@@ -3395,6 +3418,21 @@ This provides a value for the dynamic polling adjustment algorithm to
 use to shrink its polling interval when the polling interval exceeds
 the poll_max_ns value.
 
+=item Sys::Virt::Domain::IOTHREAD_PARAM_THREAD_POOL_MIN
+
+Sets the lower bound for thread pool size. A value of -1 disables this bound
+leaving hypervisor use its default value, though this value is not accepted
+for running domains. Due to internal implementation it's recommended to set
+lower and upper bounds separately.
+
+=item Sys::Virt::Domain::IOTHREAD_PARAM_THREAD_POOL_MAX
+
+Sets the upper bound for thread pool size. A value of -1 disables this bound
+leaving hypervisor use its default value, though this value is not accepted
+for running domains. Since the upper band has to be equal to or greater than
+lower bound value of 0 is not accepted. Due to internal implementation it's
+recommended to set lower and upper bounds separately.
+
 =back
 
 =head2 VCPU FLAGS
@@ -3485,6 +3523,10 @@ The domain resumed because it was restored from a snapshot
 =item Sys::Virt::Domain::EVENT_RESUMED_POSTCOPY
 
 The domain resumed but post-copy is running in background
+
+=item Sys::Virt::Domain::EVENT_RESUMED_POSTCOPY_FAILED
+
+The domain is running, but migration failed in post-copy.
 
 =back
 

@@ -1,16 +1,22 @@
+1.5.0	2022-06-23
+	* Fix: fu-cat length selection, added test
+	* Fix: fu-count supports STDIN input
+	* Added case insensitive option in fu-extract
+	* Added tests for fu-count, fu-grep, fu-extract
+	
 1.4.10	2022-06-22
-    * Testing external scripts with the right interpreter (thanks to ANDK)
+	* Testing external scripts with the right interpreter (thanks to ANDK)
 
 1.4.9	2022-06-22
 	* Adding PerlIO::encoding as requisite (core since 5.8)
-	* Investigating tests failing for some users
+	* Investigating tests failing for some users (special thanks to SREZIC)
 
 1.4.8	2022-06-22
 	* Updated binaries from Seqfu 0.x
 	
 1.4.7	2022-06-21
-	* Preparing for 5.32 (unescaped braces will be fatal in regexes)
-    * Documentation fixes
+	* Preparing for 5.32
+	* Documentation fixes
 	* Updated Windows tests
 
 1.4.6	2022-06-20
@@ -36,8 +42,8 @@
 	* Skip Windows support test when older FASTX::Reader is in use
 
 1.4.0	2021-08-05
-        * Testing support for Windows newlines
-        * Updating documentation 
+	* Testing support for Windows newlines
+	* Updating documentation 
 
 1.3.0	2020-04-11
 	* checking that the input files contains sequences

@@ -1,0 +1,8 @@
+Revision history for Perl extension AnyEvent-SNMP-TrapReceiver
+
+0.16 2022-07-05T20:44:42Z
+    - Modify test to use random port.
+
+0.15 2022-07-04T00:29:46Z
+    - First release with support for v1 and v2c traps.
+

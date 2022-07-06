@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::ContentDetail;
-$Shipment::Purolator::WSDLV2::Types::ContentDetail::VERSION = '3.08';
+$Shipment::Purolator::WSDLV2::Types::ContentDetail::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,87 +20,87 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Description_of : ATTR(:get<Description>);
-    my %HarmonizedCode_of : ATTR(:get<HarmonizedCode>);
-    my %CountryOfManufacture_of : ATTR(:get<CountryOfManufacture>);
-    my %ProductCode_of : ATTR(:get<ProductCode>);
-    my %UnitValue_of : ATTR(:get<UnitValue>);
-    my %Quantity_of : ATTR(:get<Quantity>);
-    my %NAFTADocumentIndicator_of : ATTR(:get<NAFTADocumentIndicator>);
-    my %FDADocumentIndicator_of : ATTR(:get<FDADocumentIndicator>);
-    my %FCCDocumentIndicator_of : ATTR(:get<FCCDocumentIndicator>);
-    my %SenderIsProducerIndicator_of : ATTR(:get<SenderIsProducerIndicator>);
-    my %TextileIndicator_of : ATTR(:get<TextileIndicator>);
-    my %TextileManufacturer_of : ATTR(:get<TextileManufacturer>);
+my %Description_of :ATTR(:get<Description>);
+my %HarmonizedCode_of :ATTR(:get<HarmonizedCode>);
+my %CountryOfManufacture_of :ATTR(:get<CountryOfManufacture>);
+my %ProductCode_of :ATTR(:get<ProductCode>);
+my %UnitValue_of :ATTR(:get<UnitValue>);
+my %Quantity_of :ATTR(:get<Quantity>);
+my %NAFTADocumentIndicator_of :ATTR(:get<NAFTADocumentIndicator>);
+my %FDADocumentIndicator_of :ATTR(:get<FDADocumentIndicator>);
+my %FCCDocumentIndicator_of :ATTR(:get<FCCDocumentIndicator>);
+my %SenderIsProducerIndicator_of :ATTR(:get<SenderIsProducerIndicator>);
+my %TextileIndicator_of :ATTR(:get<TextileIndicator>);
+my %TextileManufacturer_of :ATTR(:get<TextileManufacturer>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Description
-              HarmonizedCode
-              CountryOfManufacture
-              ProductCode
-              UnitValue
-              Quantity
-              NAFTADocumentIndicator
-              FDADocumentIndicator
-              FCCDocumentIndicator
-              SenderIsProducerIndicator
-              TextileIndicator
-              TextileManufacturer
+__PACKAGE__->_factory(
+    [ qw(        Description
+        HarmonizedCode
+        CountryOfManufacture
+        ProductCode
+        UnitValue
+        Quantity
+        NAFTADocumentIndicator
+        FDADocumentIndicator
+        FCCDocumentIndicator
+        SenderIsProducerIndicator
+        TextileIndicator
+        TextileManufacturer
 
-            )
-        ],
-        {   'Description'               => \%Description_of,
-            'HarmonizedCode'            => \%HarmonizedCode_of,
-            'CountryOfManufacture'      => \%CountryOfManufacture_of,
-            'ProductCode'               => \%ProductCode_of,
-            'UnitValue'                 => \%UnitValue_of,
-            'Quantity'                  => \%Quantity_of,
-            'NAFTADocumentIndicator'    => \%NAFTADocumentIndicator_of,
-            'FDADocumentIndicator'      => \%FDADocumentIndicator_of,
-            'FCCDocumentIndicator'      => \%FCCDocumentIndicator_of,
-            'SenderIsProducerIndicator' => \%SenderIsProducerIndicator_of,
-            'TextileIndicator'          => \%TextileIndicator_of,
-            'TextileManufacturer'       => \%TextileManufacturer_of,
-        },
-        {   'Description'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'HarmonizedCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'CountryOfManufacture' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ProductCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'UnitValue'   => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
-            'Quantity'    => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
-            'NAFTADocumentIndicator' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-            'FDADocumentIndicator' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-            'FCCDocumentIndicator' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-            'SenderIsProducerIndicator' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-            'TextileIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-            'TextileManufacturer' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'Description' => \%Description_of,
+        'HarmonizedCode' => \%HarmonizedCode_of,
+        'CountryOfManufacture' => \%CountryOfManufacture_of,
+        'ProductCode' => \%ProductCode_of,
+        'UnitValue' => \%UnitValue_of,
+        'Quantity' => \%Quantity_of,
+        'NAFTADocumentIndicator' => \%NAFTADocumentIndicator_of,
+        'FDADocumentIndicator' => \%FDADocumentIndicator_of,
+        'FCCDocumentIndicator' => \%FCCDocumentIndicator_of,
+        'SenderIsProducerIndicator' => \%SenderIsProducerIndicator_of,
+        'TextileIndicator' => \%TextileIndicator_of,
+        'TextileManufacturer' => \%TextileManufacturer_of,
+    },
+    {
+        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'HarmonizedCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'CountryOfManufacture' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ProductCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'UnitValue' => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
+        'Quantity' => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
+        'NAFTADocumentIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        'FDADocumentIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        'FCCDocumentIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        'SenderIsProducerIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        'TextileIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        'TextileManufacturer' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'Description'               => 'Description',
-            'HarmonizedCode'            => 'HarmonizedCode',
-            'CountryOfManufacture'      => 'CountryOfManufacture',
-            'ProductCode'               => 'ProductCode',
-            'UnitValue'                 => 'UnitValue',
-            'Quantity'                  => 'Quantity',
-            'NAFTADocumentIndicator'    => 'NAFTADocumentIndicator',
-            'FDADocumentIndicator'      => 'FDADocumentIndicator',
-            'FCCDocumentIndicator'      => 'FCCDocumentIndicator',
-            'SenderIsProducerIndicator' => 'SenderIsProducerIndicator',
-            'TextileIndicator'          => 'TextileIndicator',
-            'TextileManufacturer'       => 'TextileManufacturer',
-        }
-    );
+        'Description' => 'Description',
+        'HarmonizedCode' => 'HarmonizedCode',
+        'CountryOfManufacture' => 'CountryOfManufacture',
+        'ProductCode' => 'ProductCode',
+        'UnitValue' => 'UnitValue',
+        'Quantity' => 'Quantity',
+        'NAFTADocumentIndicator' => 'NAFTADocumentIndicator',
+        'FDADocumentIndicator' => 'FDADocumentIndicator',
+        'FCCDocumentIndicator' => 'FCCDocumentIndicator',
+        'SenderIsProducerIndicator' => 'SenderIsProducerIndicator',
+        'TextileIndicator' => 'TextileIndicator',
+        'TextileManufacturer' => 'TextileManufacturer',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -117,7 +117,7 @@ Shipment::Purolator::WSDLV2::Types::ContentDetail
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

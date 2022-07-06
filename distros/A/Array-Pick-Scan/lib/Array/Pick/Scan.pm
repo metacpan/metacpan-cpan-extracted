@@ -7,17 +7,18 @@ use warnings;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-20'; # DATE
+our $DATE = '2022-05-21'; # DATE
 our $DIST = 'Array-Pick-Scan'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
-our @EXPORT_OK = qw(random_item);
+our @EXPORT_OK = qw(random_item pick);
 
 sub random_item {
-    my ($src, $num_items) = @_;
+    my ($src, $num_items, $opts) = @_;
     my $ref = ref $src;
 
     $num_items //= 1;
+    $opts //= {};
 
     if ($ref eq 'ARRAY') {
         my $ary = $src;
@@ -26,19 +27,23 @@ sub random_item {
         if (!$ary_size) {
             return ();
         } elsif ($num_items == 1) {
-            return $ary->[rand() * $ary_size];
+            my $idx = int(rand() * $ary_size);
+            return $opts->{pos} ? $idx : $ary->[$idx];
         } else {
             my @items;
             for my $i (0..$ary_size-1) {
                 if (@items < $num_items) {
                     # we haven't reached $num_items, insert item to array in a
                     # random position
-                    splice @items, rand(@items+1), 0, $ary->[$i];
+                    my $idx = int(rand(@items+1));
+                    splice @items, $idx, 0, ($opts->{pos} ? $i : $ary->[$i]);
                 } else {
                     # we have reached $num_items, just replace an item randomly,
                     # using algorithm from Learning Perl, slightly modified
-                    rand($i+1) < @items and
-                        splice @items, rand(@items), 1, $ary->[$i];
+                    if (rand($i+1) < @items) {
+                        my $idx = int(rand(@items));
+                        splice @items, $idx, 1, ($opts->{pos} ? $i : $ary->[$i]);
+                    }
                 }
             }
             return @items;
@@ -52,17 +57,26 @@ sub random_item {
             if (@items < $num_items) {
                 # we haven't reached $num_items, insert item to array in a
                 # random position
-                splice @items, rand(@items+1), 0, $item;
+                    my $idx = int(rand(@items+1));
+                splice @items, $idx, 0, ($opts->{pos} ? $i : $item);
             } else {
                 # we have reached $num_items, just replace an item randomly,
                 # using algorithm from Learning Perl, slightly modified
-                rand($i+1) < @items and splice @items, rand(@items), 1, $item;
+                if (rand($i+1) < @items) {
+                    my $idx = int(rand(@items));
+                    splice @items, $idx, 1, $opts->{pos} ? $i : $item;
+                }
             }
         }
         return @items;
     } else {
         die "Please specify arrayref or coderef iterator as source of items";
     }
+}
+
+{
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
+    *pick = \&random_item;
 }
 
 1;
@@ -80,19 +94,23 @@ Array::Pick::Scan - Pick random items from an array (or iterator), without dupli
 
 =head1 VERSION
 
-This document describes version 0.004 of Array::Pick::Scan (from Perl distribution Array-Pick-Scan), released on 2022-05-20.
+This document describes version 0.005 of Array::Pick::Scan (from Perl distribution Array-Pick-Scan), released on 2022-05-21.
 
 =head1 SYNOPSIS
 
- use Array::Pick::Scan qw(random_item);
+ use Array::Pick::Scan qw(pick);
 
- my $item  = random_item(\@ary);
- my @items = random_line(\@ary, 3);
+ my $item  = pick(\@ary);
+ my @items = pick(\@ary, 3);
 
 or:
 
- my $item  = random_item(\&iterator);
- my @items = random_line(\&iterator, 3);
+ my $item  = pick(\&iterator);
+ my @items = pick(\&iterator, 3);
+
+To return array indexes instead of the items:
+
+ my @item  = pick($source, $n, {pos=>1});
 
 =head1 DESCRIPTION
 
@@ -108,14 +126,28 @@ iterator and do not want to put all the iterator's items into memory first.
 
 =head1 FUNCTIONS
 
-=head2 random_item
+=head2 pick
 
 Usage:
 
- my @items = random_item(\@ary      [ , $num_samples ]);
- my @items = random_item(\&iterator [ , $num_samples ]);
+ my @items = pick(\@ary      [ , $num_samples [ , \%opts ] ]);
+ my @items = pick(\&iterator [ , $num_samples [ , \%opts ] ]);
 
 Number of samples defaults to 1.
+
+Options:
+
+=over
+
+=item * pos
+
+Bool. If set to true, will return array indexes instead of the items.
+
+=back
+
+=head2 random_item
+
+Older name for L</pick>, deprecated and will be removed in future releases.
 
 =head1 HOMEPAGE
 

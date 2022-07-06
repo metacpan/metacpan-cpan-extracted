@@ -1,5 +1,9 @@
 Revision history for Perl extension App-optex-xform
 
+1.04 2022-07-04T03:40:03Z
+
+    - Support nested encode and decode.
+
 1.03 2022-06-30T01:17:14Z
 
     - Do not use 'autoload' to avoid unexpected behavior.

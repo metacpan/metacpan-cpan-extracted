@@ -3,13 +3,14 @@ use warnings;
 
 package Pod::Weaver::PluginBundle::Author::AJNN::License;
 # ABSTRACT: Pod section for copyright and license statement
-$Pod::Weaver::PluginBundle::Author::AJNN::License::VERSION = '0.02';
+$Pod::Weaver::PluginBundle::Author::AJNN::License::VERSION = '0.03';
 
 use Carp qw(croak);
 use Moose;
 use namespace::autoclean;
 use Pod::Elemental::Element::Nested;
 use Pod::Elemental::Element::Pod5::Ordinary;
+use Software::License 0.103014;  # for spdx_expression
 
 with 'Pod::Weaver::Role::Section';
 
@@ -78,7 +79,7 @@ Pod::Weaver::PluginBundle::Author::AJNN::License - Pod section for copyright and
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

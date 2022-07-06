@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::Surcharge;
-$Shipment::FedEx::WSDL::ShipTypes::Surcharge::VERSION = '3.08';
+$Shipment::FedEx::WSDL::ShipTypes::Surcharge::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +20,47 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %SurchargeType_of : ATTR(:get<SurchargeType>);
-    my %Level_of : ATTR(:get<Level>);
-    my %Description_of : ATTR(:get<Description>);
-    my %Amount_of : ATTR(:get<Amount>);
+my %SurchargeType_of :ATTR(:get<SurchargeType>);
+my %Level_of :ATTR(:get<Level>);
+my %Description_of :ATTR(:get<Description>);
+my %Amount_of :ATTR(:get<Amount>);
 
-    __PACKAGE__->_factory(
-        [   qw(        SurchargeType
-              Level
-              Description
-              Amount
+__PACKAGE__->_factory(
+    [ qw(        SurchargeType
+        Level
+        Description
+        Amount
 
-            )
-        ],
-        {   'SurchargeType' => \%SurchargeType_of,
-            'Level'         => \%Level_of,
-            'Description'   => \%Description_of,
-            'Amount'        => \%Amount_of,
-        },
-        {   'SurchargeType' =>
-              'Shipment::FedEx::WSDL::ShipTypes::SurchargeType',
-            'Level' => 'Shipment::FedEx::WSDL::ShipTypes::SurchargeLevelType',
-            'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Amount'      => 'Shipment::FedEx::WSDL::ShipTypes::Money',
-        },
-        {
+    ) ],
+    {
+        'SurchargeType' => \%SurchargeType_of,
+        'Level' => \%Level_of,
+        'Description' => \%Description_of,
+        'Amount' => \%Amount_of,
+    },
+    {
+        'SurchargeType' => 'Shipment::FedEx::WSDL::ShipTypes::SurchargeType',
+        'Level' => 'Shipment::FedEx::WSDL::ShipTypes::SurchargeLevelType',
+        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Amount' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
+    },
+    {
 
-            'SurchargeType' => 'SurchargeType',
-            'Level'         => 'Level',
-            'Description'   => 'Description',
-            'Amount'        => 'Amount',
-        }
-    );
+        'SurchargeType' => 'SurchargeType',
+        'Level' => 'Level',
+        'Description' => 'Description',
+        'Amount' => 'Amount',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -72,7 +77,7 @@ Shipment::FedEx::WSDL::ShipTypes::Surcharge
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

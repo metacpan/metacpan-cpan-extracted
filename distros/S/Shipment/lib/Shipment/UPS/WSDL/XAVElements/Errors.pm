@@ -1,66 +1,70 @@
 
 package Shipment::UPS::WSDL::XAVElements::Errors;
-$Shipment::UPS::WSDL::XAVElements::Errors::VERSION = '3.08';
+$Shipment::UPS::WSDL::XAVElements::Errors::VERSION = '3.09';
 use strict;
 use warnings;
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Error/v1.1'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Error/v1.1' }
 
-    __PACKAGE__->__set_name('Errors');
-    __PACKAGE__->__set_nillable();
-    __PACKAGE__->__set_minOccurs();
-    __PACKAGE__->__set_maxOccurs();
-    __PACKAGE__->__set_ref();
+__PACKAGE__->__set_name('Errors');
+__PACKAGE__->__set_nillable();
+__PACKAGE__->__set_minOccurs();
+__PACKAGE__->__set_maxOccurs();
+__PACKAGE__->__set_ref();
 
-    use base qw(
-      SOAP::WSDL::XSD::Typelib::Element
-      SOAP::WSDL::XSD::Typelib::ComplexType
-    );
+use base qw(
+    SOAP::WSDL::XSD::Typelib::Element
+    SOAP::WSDL::XSD::Typelib::ComplexType
+);
 
-    our $XML_ATTRIBUTE_CLASS;
-    undef $XML_ATTRIBUTE_CLASS;
+our $XML_ATTRIBUTE_CLASS;
+undef $XML_ATTRIBUTE_CLASS;
 
-    sub __get_attr_class {
-        return $XML_ATTRIBUTE_CLASS;
+sub __get_attr_class {
+    return $XML_ATTRIBUTE_CLASS;
+}
+
+use Class::Std::Fast::Storable constructor => 'none';
+use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+Class::Std::initialize();
+
+{ # BLOCK to scope variables
+
+my %ErrorDetail_of :ATTR(:get<ErrorDetail>);
+my %TransactionReference_of :ATTR(:get<TransactionReference>);
+
+__PACKAGE__->_factory(
+    [ qw(        ErrorDetail
+        TransactionReference
+
+    ) ],
+    {
+        'ErrorDetail' => \%ErrorDetail_of,
+        'TransactionReference' => \%TransactionReference_of,
+    },
+    {
+        'ErrorDetail' => 'Shipment::UPS::WSDL::XAVTypes::ErrorDetailType',
+        'TransactionReference' => 'Shipment::UPS::WSDL::XAVTypes::TransactionReferenceType',
+    },
+    {
+
+        'ErrorDetail' => 'ErrorDetail',
+        'TransactionReference' => 'TransactionReference',
     }
+);
 
-    use Class::Std::Fast::Storable constructor => 'none';
-    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-    Class::Std::initialize();
-
-    {    # BLOCK to scope variables
-
-        my %ErrorDetail_of : ATTR(:get<ErrorDetail>);
-        my %TransactionReference_of : ATTR(:get<TransactionReference>);
-
-        __PACKAGE__->_factory(
-            [   qw(        ErrorDetail
-                  TransactionReference
-
-                )
-            ],
-            {   'ErrorDetail'          => \%ErrorDetail_of,
-                'TransactionReference' => \%TransactionReference_of,
-            },
-            {   'ErrorDetail' =>
-                  'Shipment::UPS::WSDL::XAVTypes::ErrorDetailType',
-                'TransactionReference' =>
-                  'Shipment::UPS::WSDL::XAVTypes::TransactionReferenceType',
-            },
-            {
-
-                'ErrorDetail'          => 'ErrorDetail',
-                'TransactionReference' => 'TransactionReference',
-            }
-        );
-
-    }    # end BLOCK
+} # end BLOCK
 
 
-}    # end of BLOCK
+
+
+
+
+} # end of BLOCK
+
 
 
 1;
@@ -77,7 +81,7 @@ Shipment::UPS::WSDL::XAVElements::Errors
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

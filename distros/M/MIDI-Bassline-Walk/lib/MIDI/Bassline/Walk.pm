@@ -3,10 +3,11 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate walking basslines
 
-our $VERSION = '0.0312';
+our $VERSION = '0.0502';
 
 use Data::Dumper::Compact qw(ddc);
 use Carp qw(croak);
+use List::SomeUtils qw(first_index);
 use List::Util qw(any min uniq);
 use Music::Chord::Note;
 use Music::Note;
@@ -22,8 +23,29 @@ with('Music::PitchNum');
 
 has guitar => (
     is      => 'ro',
-    isa     => sub { croak 'not a boolean' unless $_[0] =~ /^[01]$/ },
+    isa     => \&_boolean,
     default => sub { 0 },
+);
+
+
+has modal => (
+    is      => 'ro',
+    isa     => \&_boolean,
+    default => sub { 0 },
+);
+
+
+has chord_notes => (
+    is      => 'ro',
+    isa     => \&_boolean,
+    default => sub { 1 },
+);
+
+
+has keycenter => (
+    is      => 'ro',
+    isa     => sub { croak 'not a valid key' unless $_[0] =~ /^[A-G][#b]?$/ },
+    default => sub { 'C' },
 );
 
 
@@ -44,22 +66,45 @@ has octave => (
 has scale => (
     is      => 'ro',
     isa     => sub { croak 'not a code reference' unless ref $_[0] eq 'CODE' },
-    default => sub { sub { $_[0] =~ /^[A-G][#b]?m/ ? 'minor' : 'major' } },
+    builder => 1,
 );
+
+sub _build_scale {
+    my ($self) = @_;
+    if ($self->modal) {
+        return sub {
+            my ($chord) = @_;
+            my ($chord_note) = _parse_chord($chord);
+            my @modes = qw( ionian dorian phrygian lydian mixolydian aeolian locrian );
+            my @key_notes = get_scale_notes($self->keycenter, $modes[0]);
+            my $position = first_index { $_ eq $chord_note } @key_notes;
+            my $scale = $position >= 0 ? $modes[$position] : $modes[0];
+            return $scale;
+        };
+    }
+    else {
+        return sub { $_[0] =~ /^[A-G][#b]?m/ ? 'minor' : 'major' };
+    }
+}
 
 
 has tonic => (
     is      => 'ro',
-    isa     => sub { croak 'not a boolean' unless $_[0] =~ /^[01]$/ },
+    isa     => \&_boolean,
     default => sub { 0 },
 );
 
 
 has verbose => (
     is      => 'ro',
-    isa     => sub { croak 'not a boolean' unless $_[0] =~ /^[01]$/ },
+    isa     => \&_boolean,
     default => sub { 0 },
 );
+
+sub _boolean {
+    my ($arg) = @_;
+    croak 'not a boolean' unless $arg =~ /^[01]$/;
+}
 
 
 sub generate {
@@ -71,22 +116,14 @@ sub generate {
     print "CHORD: $chord\n" if $self->verbose;
     print "NEXT: $next_chord\n" if $self->verbose && $next_chord;
 
+    my ($chord_note, $flavor) = _parse_chord($chord);
+
+    my $next_chord_note;
+    ($next_chord_note) = _parse_chord($next_chord)
+        if $next_chord;
+
     my $scale = $self->scale->($chord);
     my $next_scale = defined $next_chord ? $self->scale->($next_chord) : '';
-
-    # Parse the chord
-    my $chord_note;
-    my $flavor;
-    if ($chord =~ /^([A-G][#b]?)(.*)$/) {
-        $chord_note = $1;
-        $flavor = $2;
-    }
-
-    # Parse the next chord
-    my $next_chord_note;
-    if ($next_chord && $next_chord =~ /^([A-G][#b]?).*$/) {
-        $next_chord_note = $1;
-    }
 
     my $cn = Music::Chord::Note->new;
 
@@ -97,12 +134,15 @@ sub generate {
     my @next_pitches = $next_scale ? get_scale_MIDI($next_chord_note, $self->octave, $next_scale) : ();
 
     # Add unique chord notes to the pitches
-    for my $n (@notes) {
-        if (not any { $_ == $n } @pitches) {
-            push @pitches, $n;
-            if ($self->verbose) {
-                my $x = $self->pitchname($n);
-                print "\tADD: $x\n";
+    if ($self->chord_notes) {
+        print "CHORD NOTES\n" if $self->verbose;
+        for my $n (@notes) {
+            if (not any { $_ == $n } @pitches) {
+                push @pitches, $n;
+                if ($self->verbose) {
+                    my $x = $self->pitchname($n);
+                    print "\tADD: $x\n";
+                }
             }
         }
     }
@@ -110,12 +150,12 @@ sub generate {
 
     # Determine if we should skip certain notes given the chord flavor
     my @tones = get_scale_notes($chord_note, $scale);
-    print "\tSCALE: ", ddc(\@tones) if $self->verbose;
+    print "\t$scale SCALE: ", ddc(\@tones) if $self->verbose;
     my @fixed;
     for my $p (@pitches) {
         my $n = Music::Note->new($p, 'midinum');
         my $x = $n->format('isobase');
-        # TODO Why?
+        # Inspect both # & b
         if ($x =~ /#/) {
             $n->en_eq('flat');
         }
@@ -123,9 +163,7 @@ sub generate {
             $n->en_eq('sharp');
         }
         my $y = $n->format('isobase');
-        if (($scale eq 'major' || $scale eq 'minor')
-            && (
-            ($flavor =~ /[#b]5/ && ($x eq $tones[4] || $y eq $tones[4]))
+        if (($flavor =~ /[#b]5/ && ($x eq $tones[4] || $y eq $tones[4]))
             ||
             ($flavor =~ /7/ && $flavor !~ /[Mm]7/ && ($x eq $tones[6] || $y eq $tones[6]))
             ||
@@ -136,7 +174,6 @@ sub generate {
             ($flavor =~ /dim/ && ($x eq $tones[6] || $y eq $tones[6]))
             ||
             ($flavor =~ /aug/ && ($x eq $tones[6] || $y eq $tones[6]))
-            )
         ) {
             print "\tDROP: $x\n" if $self->verbose;
             next;
@@ -150,7 +187,6 @@ sub generate {
 
     # Make sure there are no duplicate pitches
     @fixed = uniq @fixed;
-
     $self->_verbose_notes('NOTES', @fixed) if $self->verbose;
 
     my $voice = Music::VoiceGen->new(
@@ -164,12 +200,13 @@ sub generate {
     # Get a passage of quasi-random pitches
     my @chosen = map { $voice->rand } 1 .. $num;
 
+    # Choose the right note given the scale if the tonic is set
     if ($self->tonic) {
-        if ($scale eq 'major' || $scale eq 'minor') {
-            $chosen[0] = _closest($chosen[1], [ @fixed[0,2,4] ])
-        }
-        elsif ($scale eq 'pentatonic' || $scale eq 'pminor') {
+        if ($scale eq 'pentatonic' || $scale eq 'pminor') {
             $chosen[0] = _closest($chosen[1], [ @fixed[0,1,2] ])
+        }
+        elsif (@fixed == 7) { # standard, 7-note Western scale
+            $chosen[0] = _closest($chosen[1], [ @fixed[0,2,4] ])
         }
     }
 
@@ -181,7 +218,7 @@ sub generate {
         $self->_verbose_notes('INTERSECT', @intersect) if $self->verbose;
         # Anticipate the next chord
         if (@intersect) {
-            if (my $closest = _closest($chosen[-2], \@intersect)) {
+            if (my $closest = _closest($chosen[-2] || $chosen[-1], \@intersect)) {
                 $chosen[-1] = $closest;
             }
         }
@@ -191,6 +228,17 @@ sub generate {
     $self->_verbose_notes('CHOSEN', @chosen) if $self->verbose;
 
     return \@chosen;
+}
+
+sub _parse_chord {
+  my ($chord) = @_;
+    my $chord_note;
+    my $flavor;
+    if ($chord =~ /^([A-G][#b]?)(.*)$/) {
+        $chord_note = $1;
+        $flavor = $2;
+    }
+    return $chord_note, $flavor;
 }
 
 # Show a phrase of midinums as ISO notes
@@ -233,7 +281,7 @@ MIDI::Bassline::Walk - Generate walking basslines
 
 =head1 VERSION
 
-version 0.0312
+version 0.0502
 
 =head1 SYNOPSIS
 
@@ -241,8 +289,13 @@ version 0.0312
 
   my $bassline = MIDI::Bassline::Walk->new(verbose => 1);
 
-  my $notes = $bassline->generate('C7b5', 8);
+  $bassline = MIDI::Bassline::Walk->new(
+    guitar    => 1,
+    modal     => 1,
+    keycenter => 'Bb',
+  );
 
+  my $notes = $bassline->generate('F7b5', 8);
   # MIDI:
   # $score->n('qn', $_) for @$notes;
 
@@ -250,17 +303,20 @@ version 0.0312
 
 C<MIDI::Bassline::Walk> generates randomized, walking basslines.
 
-The logic and music theory implemented here, can generate some
-possibly sour notes.  This is an approximate composition tool, and not
-a drop-in bass player.  Import rendered MIDI into a DAW and alter
-notes until they sound suitable.
+Chords and the key use C<#> and C<b> for accidentals.
 
 The "formula" implemented by this module is basically: "Play any notes
-of the chord, or chord-root scale."
+of the chord, modal chord scale, or chord-root scale (and drop any
+notes replaced by extended jazz chords)."
 
 The chords recognized by this module, are those known to
 L<Music::Chord::Note>.  Please see the source of that module for the
 list.
+
+The logic and music theory implemented here, can generate some
+possibly sour notes.  This is an approximate composition tool, and not
+a drop-in bass player.  Import rendered MIDI into a DAW and alter
+notes until they sound suitable.
 
 =head1 ATTRIBUTES
 
@@ -268,17 +324,42 @@ list.
 
   $guitar = $bassline->guitar;
 
-Transpose notes below C<E2> (C<40>) up an octave.
+Transpose notes below C<E2> (midinum C<40>) up an octave.
 
 Default: C<0>
 
+=head2 modal
+
+  $modal = $bassline->modal;
+
+Maintain the key-center and only choose notes within a mode.
+
+Default: C<0>
+
+=head2 chord_notes
+
+  $chord_notes = $bassline->chord_notes;
+
+Use unique chord notes that may possibly lie outside of the scale
+(e.g. C<b5> "flavor") for note choices.
+
+Default: C<1>
+
+=head2 keycenter
+
+  $keycenter = $bassline->keycenter;
+
+The key-center for B<modal> accompaniment.
+
+Default: C<C>
+
 =head2 intervals
 
-  $verbose = $bassline->intervals;
+  $intervals = $bassline->intervals;
 
 Allowed intervals passed to L<Music::VoiceGen>.
 
-Default: C<-3 -2 -1 1 2 3>
+Default: C<[ -3 -2 -1 1 2 3 ]>
 
 =head2 octave
 
@@ -290,11 +371,17 @@ Default: C<2>
 
 =head2 scale
 
-  $scale = $bassline->scale;
+  $scale = $bassline->scale->($chord);
 
 The musical scale to use, based on a given chord (i.e. C<$_[0]> here).
 
-Default: C<sub { $_[0] =~ /^[A-G][#b]?m/ ? 'minor' : 'major' }>
+Default if not B<modal>:
+
+  sub { $_[0] =~ /^[A-G][#b]?m/ ? 'minor' : 'major' }
+
+Otherwise, select the appropriate mode (ionian, dorian, phrygian,
+lydian, mixolydian, aeolian, locrian) given the named B<chord> and the
+modal B<keycenter>.
 
 Alternatives:
 
@@ -306,8 +393,8 @@ Alternatives:
 
 The first walks the chromatic scale no matter what the chord.  The
 second walks either the major or minor pentatonic scale, plus the
-notes of the chord.  The last walks only the notes of the chord (no
-scale).
+notes of the chord (unless the B<chord_notes> attribute is C<0>).
+The last walks only the notes of the chord (no scale).
 
 =head2 tonic
 
@@ -332,11 +419,14 @@ Default: C<0>
 
   $bassline = MIDI::Bassline::Walk->new;
   $bassline = MIDI::Bassline::Walk->new(
-      guitar    => $guitar,
-      intervals => $intervals,
-      octave    => $octave,
-      scale     => $scale,
-      verbose   => $verbose,
+      guitar      => $guitar,
+      intervals   => $intervals,
+      octave      => $octave,
+      scale       => $scale,
+      chord_notes => $chord_notes,
+      modal       => $modal,
+      keycenter   => $key_center,
+      verbose     => $verbose,
   );
 
 Create a new C<MIDI::Bassline::Walk> object.
@@ -353,6 +443,11 @@ Generate B<n> MIDI pitch numbers given the B<chord>.
 If given a B<next_chord>, perform an intersection of the two scales,
 and replace the final note of the generated phrase with a note of the
 intersection, if there are notes in common.
+
+If the B<modal> attribute is set, then the chosen notes will be within
+the modal scale given the B<keycenter> setting.  If it is not set (the
+default), notes will be chosen as if the key has changed to the
+current chord!
 
 Defaults:
 

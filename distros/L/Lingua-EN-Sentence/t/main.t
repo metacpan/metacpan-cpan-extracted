@@ -17,20 +17,25 @@ BEGIN {
 use Lingua::EN::Sentence qw( get_sentences add_acronyms get_acronyms);
 
 my $par = q{
-Returns the number of sentences in string.
-A sentence ends with a dot, exclamation or question mark followed by a space! 
-Dots after single letters such as U.S.A or e.g. are ignored,
-  as well as common abbreviations such as Dr. Ms. esp. Apr. Calif. and Ave.,
-  initials such as 'Mr. A. Smith'.
-This string has 4 sentences.
+A sentence usually ends with a dot, exclamation or question mark optionally followed by a space!
+A string followed by 2 carriage returns denotes a sentence, even though it doesn't end in a dot
+
+Dots after single letters such as U.S.A. or in numbers like -12.34 will not cause a split
+as well as common abbreviations such as Dr. I. Smith, Ms. A.B. Jones, Apr. Calif. Esq.
+and (some text) ellipsis such as ... or . . are ignored.
+Some valid cases canot be deteected, such as the answer is X. It cannot easily be
+differentiated from the single letter-dot sequence to abbreviate a person's given name.
+Numbered points within a sentence will not cause a split 1. Like this one.
+See the code for all the rules that apply.
+This string has 7 sentences.
 };
 
 my $sentences=get_sentences($par);     
-is( @$sentences, 4,'sub sentence_count');
+is( @$sentences, 7,'sub sentence_count');
 
-$par .= 'Now add an acronym, such as ret. for retired.';
+$par .= 'Now add an acronym, such as Ret. for retired.';
 add_acronyms('Ret');
 $sentences=get_sentences($par);
-is( @$sentences, 5,'sub add_acronyms');
+is( @$sentences, 8,'sub add_acronyms');
 
 

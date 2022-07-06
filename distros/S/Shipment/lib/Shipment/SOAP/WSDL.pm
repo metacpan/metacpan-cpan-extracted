@@ -1,10 +1,9 @@
 package Shipment::SOAP::WSDL;
-$Shipment::SOAP::WSDL::VERSION = '3.08';
-
+$Shipment::SOAP::WSDL::VERSION = '3.09';
 BEGIN {
-    my %fatpacked;
+my %fatpacked;
 
-    $fatpacked{"5.10/version.pm"} = <<'5.10_VERSION';
+$fatpacked{"5.10/version.pm"} = <<'5.10_VERSION';
   #!perl -w
   package
     version;
@@ -233,7 +232,7 @@ BEGIN {
   1;
 5.10_VERSION
 
-    $fatpacked{"5.10/version/vxs.pm"} = <<'5.10_VERSION_VXS';
+$fatpacked{"5.10/version/vxs.pm"} = <<'5.10_VERSION_VXS';
   #!perl -w
   package
     version::vxs;
@@ -264,7 +263,7 @@ BEGIN {
   1;
 5.10_VERSION_VXS
 
-    $fatpacked{"SOAP/WSDL.pm"} = <<'SOAP_WSDL';
+$fatpacked{"SOAP/WSDL.pm"} = <<'SOAP_WSDL';
   package
     SOAP::WSDL;
   use strict;
@@ -289,7 +288,7 @@ BEGIN {
   
 SOAP_WSDL
 
-    $fatpacked{"SOAP/WSDL/Base.pm"} = <<'SOAP_WSDL_BASE';
+$fatpacked{"SOAP/WSDL/Base.pm"} = <<'SOAP_WSDL_BASE';
   package
     SOAP::WSDL::Base;
   use SOAP::WSDL;
@@ -487,7 +486,7 @@ SOAP_WSDL
   
 SOAP_WSDL_BASE
 
-    $fatpacked{"SOAP/WSDL/Binding.pm"} = <<'SOAP_WSDL_BINDING';
+$fatpacked{"SOAP/WSDL/Binding.pm"} = <<'SOAP_WSDL_BINDING';
   package
     SOAP::WSDL::Binding;
   use strict;
@@ -506,7 +505,7 @@ SOAP_WSDL_BASE
   1;
 SOAP_WSDL_BINDING
 
-    $fatpacked{"SOAP/WSDL/Build.pm"} = <<'SOAP_WSDL_BUILD';
+$fatpacked{"SOAP/WSDL/Build.pm"} = <<'SOAP_WSDL_BUILD';
   package
     SOAP::WSDL::Build;
   {
@@ -894,7 +893,7 @@ SOAP_WSDL_BINDING
   =cut
 SOAP_WSDL_BUILD
 
-    $fatpacked{"SOAP/WSDL/Client.pm"} = <<'SOAP_WSDL_CLIENT';
+$fatpacked{"SOAP/WSDL/Client.pm"} = <<'SOAP_WSDL_CLIENT';
   package
     SOAP::WSDL::Client;
   use strict;
@@ -1318,7 +1317,7 @@ SOAP_WSDL_BUILD
   
 SOAP_WSDL_CLIENT
 
-    $fatpacked{"SOAP/WSDL/Client/Base.pm"} = <<'SOAP_WSDL_CLIENT_BASE';
+$fatpacked{"SOAP/WSDL/Client/Base.pm"} = <<'SOAP_WSDL_CLIENT_BASE';
   package
     SOAP::WSDL::Client::Base;
   use strict;
@@ -1371,7 +1370,7 @@ SOAP_WSDL_CLIENT
   
 SOAP_WSDL_CLIENT_BASE
 
-    $fatpacked{"SOAP/WSDL/Definitions.pm"} = <<'SOAP_WSDL_DEFINITIONS';
+$fatpacked{"SOAP/WSDL/Definitions.pm"} = <<'SOAP_WSDL_DEFINITIONS';
   package
     SOAP::WSDL::Definitions;
   use strict;
@@ -1499,8 +1498,7 @@ SOAP_WSDL_CLIENT_BASE
   
 SOAP_WSDL_DEFINITIONS
 
-    $fatpacked{"SOAP/WSDL/Deserializer/Hash.pm"} =
-      <<'SOAP_WSDL_DESERIALIZER_HASH';
+$fatpacked{"SOAP/WSDL/Deserializer/Hash.pm"} = <<'SOAP_WSDL_DESERIALIZER_HASH';
   package
     SOAP::WSDL::Deserializer::Hash;
   use strict;
@@ -1675,8 +1673,7 @@ SOAP_WSDL_DEFINITIONS
   =cut
 SOAP_WSDL_DESERIALIZER_HASH
 
-    $fatpacked{"SOAP/WSDL/Deserializer/SOM.pm"} =
-      <<'SOAP_WSDL_DESERIALIZER_SOM';
+$fatpacked{"SOAP/WSDL/Deserializer/SOM.pm"} = <<'SOAP_WSDL_DESERIALIZER_SOM';
   package
     SOAP::WSDL::Deserializer::SOM;
   use strict;
@@ -1828,8 +1825,7 @@ SOAP_WSDL_DESERIALIZER_HASH
   =cut
 SOAP_WSDL_DESERIALIZER_SOM
 
-    $fatpacked{"SOAP/WSDL/Deserializer/XSD.pm"} =
-      <<'SOAP_WSDL_DESERIALIZER_XSD';
+$fatpacked{"SOAP/WSDL/Deserializer/XSD.pm"} = <<'SOAP_WSDL_DESERIALIZER_XSD';
   package
     SOAP::WSDL::Deserializer::XSD;
   use strict;
@@ -2009,7 +2005,7 @@ SOAP_WSDL_DESERIALIZER_SOM
   =cut
 SOAP_WSDL_DESERIALIZER_XSD
 
-    $fatpacked{"SOAP/WSDL/Expat/Base.pm"} = <<'SOAP_WSDL_EXPAT_BASE';
+$fatpacked{"SOAP/WSDL/Expat/Base.pm"} = <<'SOAP_WSDL_EXPAT_BASE';
   package
     SOAP::WSDL::Expat::Base;
   use strict;
@@ -2155,8 +2151,7 @@ SOAP_WSDL_DESERIALIZER_XSD
    $HeadURL: https://soap-wsdl.svn.sourceforge.net/svnroot/soap-wsdl/SOAP-WSDL/trunk/lib/SOAP/WSDL/Expat/MessageParser.pm $
 SOAP_WSDL_EXPAT_BASE
 
-    $fatpacked{"SOAP/WSDL/Expat/Message2Hash.pm"} =
-      <<'SOAP_WSDL_EXPAT_MESSAGE2HASH';
+$fatpacked{"SOAP/WSDL/Expat/Message2Hash.pm"} = <<'SOAP_WSDL_EXPAT_MESSAGE2HASH';
   #!/usr/bin/perl
   package
     SOAP::WSDL::Expat::Message2Hash;
@@ -2292,8 +2287,7 @@ SOAP_WSDL_EXPAT_BASE
   
 SOAP_WSDL_EXPAT_MESSAGE2HASH
 
-    $fatpacked{"SOAP/WSDL/Expat/MessageParser.pm"} =
-      <<'SOAP_WSDL_EXPAT_MESSAGEPARSER';
+$fatpacked{"SOAP/WSDL/Expat/MessageParser.pm"} = <<'SOAP_WSDL_EXPAT_MESSAGEPARSER';
   #!/usr/bin/perl
   package
     SOAP::WSDL::Expat::MessageParser;
@@ -2884,8 +2878,7 @@ SOAP_WSDL_EXPAT_MESSAGE2HASH
   
 SOAP_WSDL_EXPAT_MESSAGEPARSER
 
-    $fatpacked{"SOAP/WSDL/Expat/MessageStreamParser.pm"} =
-      <<'SOAP_WSDL_EXPAT_MESSAGESTREAMPARSER';
+$fatpacked{"SOAP/WSDL/Expat/MessageStreamParser.pm"} = <<'SOAP_WSDL_EXPAT_MESSAGESTREAMPARSER';
   #!/usr/bin/perl
   package
     SOAP::WSDL::Expat::MessageStreamParser;
@@ -2966,8 +2959,7 @@ SOAP_WSDL_EXPAT_MESSAGEPARSER
   =cut
 SOAP_WSDL_EXPAT_MESSAGESTREAMPARSER
 
-    $fatpacked{"SOAP/WSDL/Expat/WSDLParser.pm"} =
-      <<'SOAP_WSDL_EXPAT_WSDLPARSER';
+$fatpacked{"SOAP/WSDL/Expat/WSDLParser.pm"} = <<'SOAP_WSDL_EXPAT_WSDLPARSER';
   package
     SOAP::WSDL::Expat::WSDLParser;
   use strict;
@@ -3349,8 +3341,7 @@ SOAP_WSDL_EXPAT_MESSAGESTREAMPARSER
   
 SOAP_WSDL_EXPAT_WSDLPARSER
 
-    $fatpacked{"SOAP/WSDL/Factory/Deserializer.pm"} =
-      <<'SOAP_WSDL_FACTORY_DESERIALIZER';
+$fatpacked{"SOAP/WSDL/Factory/Deserializer.pm"} = <<'SOAP_WSDL_FACTORY_DESERIALIZER';
   package
     SOAP::WSDL::Factory::Deserializer;
   use strict;
@@ -3386,8 +3377,7 @@ SOAP_WSDL_EXPAT_WSDLPARSER
   
 SOAP_WSDL_FACTORY_DESERIALIZER
 
-    $fatpacked{"SOAP/WSDL/Factory/Generator.pm"} =
-      <<'SOAP_WSDL_FACTORY_GENERATOR';
+$fatpacked{"SOAP/WSDL/Factory/Generator.pm"} = <<'SOAP_WSDL_FACTORY_GENERATOR';
   package
     SOAP::WSDL::Factory::Generator;
   use strict;
@@ -3426,8 +3416,7 @@ SOAP_WSDL_FACTORY_DESERIALIZER
   
 SOAP_WSDL_FACTORY_GENERATOR
 
-    $fatpacked{"SOAP/WSDL/Factory/Serializer.pm"} =
-      <<'SOAP_WSDL_FACTORY_SERIALIZER';
+$fatpacked{"SOAP/WSDL/Factory/Serializer.pm"} = <<'SOAP_WSDL_FACTORY_SERIALIZER';
   package
     SOAP::WSDL::Factory::Serializer;
   use strict;
@@ -3463,8 +3452,7 @@ SOAP_WSDL_FACTORY_GENERATOR
   
 SOAP_WSDL_FACTORY_SERIALIZER
 
-    $fatpacked{"SOAP/WSDL/Factory/Transport.pm"} =
-      <<'SOAP_WSDL_FACTORY_TRANSPORT';
+$fatpacked{"SOAP/WSDL/Factory/Transport.pm"} = <<'SOAP_WSDL_FACTORY_TRANSPORT';
   package
     SOAP::WSDL::Factory::Transport;
   use strict;
@@ -3555,8 +3543,7 @@ SOAP_WSDL_FACTORY_SERIALIZER
   
 SOAP_WSDL_FACTORY_TRANSPORT
 
-    $fatpacked{"SOAP/WSDL/Generator/Iterator/WSDL11.pm"} =
-      <<'SOAP_WSDL_GENERATOR_ITERATOR_WSDL11';
+$fatpacked{"SOAP/WSDL/Generator/Iterator/WSDL11.pm"} = <<'SOAP_WSDL_GENERATOR_ITERATOR_WSDL11';
   package
     SOAP::WSDL::Generator::Iterator::WSDL11;
   use strict; use warnings;
@@ -3832,8 +3819,7 @@ SOAP_WSDL_FACTORY_TRANSPORT
   =cut
 SOAP_WSDL_GENERATOR_ITERATOR_WSDL11
 
-    $fatpacked{"SOAP/WSDL/Generator/PrefixResolver.pm"} =
-      <<'SOAP_WSDL_GENERATOR_PREFIXRESOLVER';
+$fatpacked{"SOAP/WSDL/Generator/PrefixResolver.pm"} = <<'SOAP_WSDL_GENERATOR_PREFIXRESOLVER';
   package
     SOAP::WSDL::Generator::PrefixResolver;
   use strict; use warnings;
@@ -3868,8 +3854,7 @@ SOAP_WSDL_GENERATOR_ITERATOR_WSDL11
 
 SOAP_WSDL_GENERATOR_PREFIXRESOLVER
 
-    $fatpacked{"SOAP/WSDL/Generator/Template.pm"} =
-      <<'SOAP_WSDL_GENERATOR_TEMPLATE';
+$fatpacked{"SOAP/WSDL/Generator/Template.pm"} = <<'SOAP_WSDL_GENERATOR_TEMPLATE';
   package
     SOAP::WSDL::Generator::Template;
   use strict; use warnings;
@@ -3982,8 +3967,7 @@ SOAP_WSDL_GENERATOR_PREFIXRESOLVER
   
 SOAP_WSDL_GENERATOR_TEMPLATE
 
-    $fatpacked{"SOAP/WSDL/Generator/Template/Plugin/XSD.pm"} =
-      <<'SOAP_WSDL_GENERATOR_TEMPLATE_PLUGIN_XSD';
+$fatpacked{"SOAP/WSDL/Generator/Template/Plugin/XSD.pm"} = <<'SOAP_WSDL_GENERATOR_TEMPLATE_PLUGIN_XSD';
   package
     SOAP::WSDL::Generator::Template::Plugin::XSD;
   use strict;
@@ -4213,8 +4197,7 @@ SOAP_WSDL_GENERATOR_TEMPLATE
   
 SOAP_WSDL_GENERATOR_TEMPLATE_PLUGIN_XSD
 
-    $fatpacked{"SOAP/WSDL/Generator/Template/XSD.pm"} =
-      <<'SOAP_WSDL_GENERATOR_TEMPLATE_XSD';
+$fatpacked{"SOAP/WSDL/Generator/Template/XSD.pm"} = <<'SOAP_WSDL_GENERATOR_TEMPLATE_XSD';
   package
     SOAP::WSDL::Generator::Template::XSD;
   use strict; use warnings;
@@ -4559,8 +4542,7 @@ SOAP_WSDL_GENERATOR_TEMPLATE_PLUGIN_XSD
   
 SOAP_WSDL_GENERATOR_TEMPLATE_XSD
 
-    $fatpacked{"SOAP/WSDL/Generator/Visitor.pm"} =
-      <<'SOAP_WSDL_GENERATOR_VISITOR';
+$fatpacked{"SOAP/WSDL/Generator/Visitor.pm"} = <<'SOAP_WSDL_GENERATOR_VISITOR';
   package
     SOAP::WSDL::Generator::Visitor;
   use strict;
@@ -4609,8 +4591,7 @@ SOAP_WSDL_GENERATOR_TEMPLATE_XSD
 
 SOAP_WSDL_GENERATOR_VISITOR
 
-    $fatpacked{"SOAP/WSDL/Generator/Visitor/Typemap.pm"} =
-      <<'SOAP_WSDL_GENERATOR_VISITOR_TYPEMAP';
+$fatpacked{"SOAP/WSDL/Generator/Visitor/Typemap.pm"} = <<'SOAP_WSDL_GENERATOR_VISITOR_TYPEMAP';
   package
     SOAP::WSDL::Generator::Visitor::Typemap;
   use strict;
@@ -4834,7 +4815,7 @@ SOAP_WSDL_GENERATOR_VISITOR
   
 SOAP_WSDL_GENERATOR_VISITOR_TYPEMAP
 
-    $fatpacked{"SOAP/WSDL/Message.pm"} = <<'SOAP_WSDL_MESSAGE';
+$fatpacked{"SOAP/WSDL/Message.pm"} = <<'SOAP_WSDL_MESSAGE';
   package
     SOAP::WSDL::Message;
   use strict;
@@ -4849,7 +4830,7 @@ SOAP_WSDL_GENERATOR_VISITOR_TYPEMAP
   1;
 SOAP_WSDL_MESSAGE
 
-    $fatpacked{"SOAP/WSDL/OpMessage.pm"} = <<'SOAP_WSDL_OPMESSAGE';
+$fatpacked{"SOAP/WSDL/OpMessage.pm"} = <<'SOAP_WSDL_OPMESSAGE';
   package
     SOAP::WSDL::OpMessage;
   use strict;
@@ -4867,7 +4848,7 @@ SOAP_WSDL_MESSAGE
   1;
 SOAP_WSDL_OPMESSAGE
 
-    $fatpacked{"SOAP/WSDL/Operation.pm"} = <<'SOAP_WSDL_OPERATION';
+$fatpacked{"SOAP/WSDL/Operation.pm"} = <<'SOAP_WSDL_OPERATION';
   package
     SOAP::WSDL::Operation;
   use strict;
@@ -4889,7 +4870,7 @@ SOAP_WSDL_OPMESSAGE
   1;
 SOAP_WSDL_OPERATION
 
-    $fatpacked{"SOAP/WSDL/Part.pm"} = <<'SOAP_WSDL_PART';
+$fatpacked{"SOAP/WSDL/Part.pm"} = <<'SOAP_WSDL_PART';
   package
     SOAP::WSDL::Part;
   use strict;
@@ -4939,7 +4920,7 @@ SOAP_WSDL_OPERATION
   1;
 SOAP_WSDL_PART
 
-    $fatpacked{"SOAP/WSDL/Port.pm"} = <<'SOAP_WSDL_PORT';
+$fatpacked{"SOAP/WSDL/Port.pm"} = <<'SOAP_WSDL_PORT';
   package
     SOAP::WSDL::Port;
   use strict;
@@ -4955,7 +4936,7 @@ SOAP_WSDL_PART
   1;
 SOAP_WSDL_PORT
 
-    $fatpacked{"SOAP/WSDL/PortType.pm"} = <<'SOAP_WSDL_PORTTYPE';
+$fatpacked{"SOAP/WSDL/PortType.pm"} = <<'SOAP_WSDL_PORTTYPE';
   package
     SOAP::WSDL::PortType;
   use strict;
@@ -4986,7 +4967,7 @@ SOAP_WSDL_PORT
   1;
 SOAP_WSDL_PORTTYPE
 
-    $fatpacked{"SOAP/WSDL/SOAP/Address.pm"} = <<'SOAP_WSDL_SOAP_ADDRESS';
+$fatpacked{"SOAP/WSDL/SOAP/Address.pm"} = <<'SOAP_WSDL_SOAP_ADDRESS';
   package
     SOAP::WSDL::SOAP::Address;
   use strict;
@@ -5000,7 +4981,7 @@ SOAP_WSDL_PORTTYPE
   1;
 SOAP_WSDL_SOAP_ADDRESS
 
-    $fatpacked{"SOAP/WSDL/SOAP/Body.pm"} = <<'SOAP_WSDL_SOAP_BODY';
+$fatpacked{"SOAP/WSDL/SOAP/Body.pm"} = <<'SOAP_WSDL_SOAP_BODY';
   package
     SOAP::WSDL::SOAP::Body;
   use strict;
@@ -5018,7 +4999,7 @@ SOAP_WSDL_SOAP_ADDRESS
   1;
 SOAP_WSDL_SOAP_BODY
 
-    $fatpacked{"SOAP/WSDL/SOAP/Header.pm"} = <<'SOAP_WSDL_SOAP_HEADER';
+$fatpacked{"SOAP/WSDL/SOAP/Header.pm"} = <<'SOAP_WSDL_SOAP_HEADER';
   package
     SOAP::WSDL::SOAP::Header;
   use strict;
@@ -5038,8 +5019,7 @@ SOAP_WSDL_SOAP_BODY
   1;
 SOAP_WSDL_SOAP_HEADER
 
-    $fatpacked{"SOAP/WSDL/SOAP/HeaderFault.pm"} =
-      <<'SOAP_WSDL_SOAP_HEADERFAULT';
+$fatpacked{"SOAP/WSDL/SOAP/HeaderFault.pm"} = <<'SOAP_WSDL_SOAP_HEADERFAULT';
   package
     SOAP::WSDL::SOAP::HeaderFault;
   use strict;
@@ -5051,7 +5031,7 @@ SOAP_WSDL_SOAP_HEADER
   1;
 SOAP_WSDL_SOAP_HEADERFAULT
 
-    $fatpacked{"SOAP/WSDL/SOAP/Operation.pm"} = <<'SOAP_WSDL_SOAP_OPERATION';
+$fatpacked{"SOAP/WSDL/SOAP/Operation.pm"} = <<'SOAP_WSDL_SOAP_OPERATION';
   package
     SOAP::WSDL::SOAP::Operation;
   use strict;
@@ -5067,8 +5047,7 @@ SOAP_WSDL_SOAP_HEADERFAULT
   1;
 SOAP_WSDL_SOAP_OPERATION
 
-    $fatpacked{"SOAP/WSDL/SOAP/Typelib/Fault.pm"} =
-      <<'SOAP_WSDL_SOAP_TYPELIB_FAULT';
+$fatpacked{"SOAP/WSDL/SOAP/Typelib/Fault.pm"} = <<'SOAP_WSDL_SOAP_TYPELIB_FAULT';
   package
     SOAP::WSDL::SOAP::Typelib::Fault;
   use strict;
@@ -5080,8 +5059,7 @@ SOAP_WSDL_SOAP_OPERATION
   1;
 SOAP_WSDL_SOAP_TYPELIB_FAULT
 
-    $fatpacked{"SOAP/WSDL/SOAP/Typelib/Fault11.pm"} =
-      <<'SOAP_WSDL_SOAP_TYPELIB_FAULT11';
+$fatpacked{"SOAP/WSDL/SOAP/Typelib/Fault11.pm"} = <<'SOAP_WSDL_SOAP_TYPELIB_FAULT11';
   package
     SOAP::WSDL::SOAP::Typelib::Fault11;
   {
@@ -5257,7 +5235,7 @@ SOAP_WSDL_SOAP_TYPELIB_FAULT
   
 SOAP_WSDL_SOAP_TYPELIB_FAULT11
 
-    $fatpacked{"SOAP/WSDL/Serializer/XSD.pm"} = <<'SOAP_WSDL_SERIALIZER_XSD';
+$fatpacked{"SOAP/WSDL/Serializer/XSD.pm"} = <<'SOAP_WSDL_SERIALIZER_XSD';
   #!/usr/bin/perl -w
   package
     SOAP::WSDL::Serializer::XSD;
@@ -5407,7 +5385,7 @@ SOAP_WSDL_SOAP_TYPELIB_FAULT11
   
 SOAP_WSDL_SERIALIZER_XSD
 
-    $fatpacked{"SOAP/WSDL/Server.pm"} = <<'SOAP_WSDL_SERVER';
+$fatpacked{"SOAP/WSDL/Server.pm"} = <<'SOAP_WSDL_SERVER';
   package
     SOAP::WSDL::Server;
   use strict;
@@ -5681,7 +5659,7 @@ SOAP_WSDL_SERIALIZER_XSD
   =cut
 SOAP_WSDL_SERVER
 
-    $fatpacked{"SOAP/WSDL/Server/CGI.pm"} = <<'SOAP_WSDL_SERVER_CGI';
+$fatpacked{"SOAP/WSDL/Server/CGI.pm"} = <<'SOAP_WSDL_SERVER_CGI';
   package
     SOAP::WSDL::Server::CGI;
   use strict;
@@ -5852,8 +5830,7 @@ SOAP_WSDL_SERVER
   =cut
 SOAP_WSDL_SERVER_CGI
 
-    $fatpacked{"SOAP/WSDL/Server/Mod_Perl2.pm"} =
-      <<'SOAP_WSDL_SERVER_MOD_PERL2';
+$fatpacked{"SOAP/WSDL/Server/Mod_Perl2.pm"} = <<'SOAP_WSDL_SERVER_MOD_PERL2';
   package
     SOAP::WSDL::Server::Mod_Perl2;
   use strict;
@@ -6142,7 +6119,7 @@ SOAP_WSDL_SERVER_CGI
   =cut
 SOAP_WSDL_SERVER_MOD_PERL2
 
-    $fatpacked{"SOAP/WSDL/Server/Simple.pm"} = <<'SOAP_WSDL_SERVER_SIMPLE';
+$fatpacked{"SOAP/WSDL/Server/Simple.pm"} = <<'SOAP_WSDL_SERVER_SIMPLE';
   package
     SOAP::WSDL::Server::Simple;
   use strict;
@@ -6240,7 +6217,7 @@ SOAP_WSDL_SERVER_MOD_PERL2
   
 SOAP_WSDL_SERVER_SIMPLE
 
-    $fatpacked{"SOAP/WSDL/Service.pm"} = <<'SOAP_WSDL_SERVICE';
+$fatpacked{"SOAP/WSDL/Service.pm"} = <<'SOAP_WSDL_SERVICE';
   package
     SOAP::WSDL::Service;
   use strict;
@@ -6255,7 +6232,7 @@ SOAP_WSDL_SERVER_SIMPLE
   1;
 SOAP_WSDL_SERVICE
 
-    $fatpacked{"SOAP/WSDL/Starter.pm"} = <<'SOAP_WSDL_STARTER';
+$fatpacked{"SOAP/WSDL/Starter.pm"} = <<'SOAP_WSDL_STARTER';
   package
     SOAP::WSDL::Starter;
   {
@@ -6336,7 +6313,7 @@ SOAP_WSDL_SERVICE
   1;
 SOAP_WSDL_STARTER
 
-    $fatpacked{"SOAP/WSDL/Transport/HTTP.pm"} = <<'SOAP_WSDL_TRANSPORT_HTTP';
+$fatpacked{"SOAP/WSDL/Transport/HTTP.pm"} = <<'SOAP_WSDL_TRANSPORT_HTTP';
   package
     SOAP::WSDL::Transport::HTTP;
   use strict; use warnings;
@@ -6444,8 +6421,7 @@ SOAP_WSDL_STARTER
   
 SOAP_WSDL_TRANSPORT_HTTP
 
-    $fatpacked{"SOAP/WSDL/Transport/Loopback.pm"} =
-      <<'SOAP_WSDL_TRANSPORT_LOOPBACK';
+$fatpacked{"SOAP/WSDL/Transport/Loopback.pm"} = <<'SOAP_WSDL_TRANSPORT_LOOPBACK';
   package
     SOAP::WSDL::Transport::Loopback;
   use strict;
@@ -6525,7 +6501,7 @@ SOAP_WSDL_TRANSPORT_HTTP
   =cut
 SOAP_WSDL_TRANSPORT_LOOPBACK
 
-    $fatpacked{"SOAP/WSDL/Transport/Test.pm"} = <<'SOAP_WSDL_TRANSPORT_TEST';
+$fatpacked{"SOAP/WSDL/Transport/Test.pm"} = <<'SOAP_WSDL_TRANSPORT_TEST';
   package
     SOAP::WSDL::Transport::Test;
   use strict;
@@ -6658,7 +6634,7 @@ SOAP_WSDL_TRANSPORT_LOOPBACK
   =cut
 SOAP_WSDL_TRANSPORT_TEST
 
-    $fatpacked{"SOAP/WSDL/TypeLookup.pm"} = <<'SOAP_WSDL_TYPELOOKUP';
+$fatpacked{"SOAP/WSDL/TypeLookup.pm"} = <<'SOAP_WSDL_TYPELOOKUP';
   package
     SOAP::WSDL::TypeLookup;
   use strict;
@@ -6900,7 +6876,7 @@ SOAP_WSDL_TRANSPORT_TEST
   1;
 SOAP_WSDL_TYPELOOKUP
 
-    $fatpacked{"SOAP/WSDL/Types.pm"} = <<'SOAP_WSDL_TYPES';
+$fatpacked{"SOAP/WSDL/Types.pm"} = <<'SOAP_WSDL_TYPES';
   package
     SOAP::WSDL::Types;
   use strict;
@@ -6956,7 +6932,7 @@ SOAP_WSDL_TYPELOOKUP
   1;
 SOAP_WSDL_TYPES
 
-    $fatpacked{"SOAP/WSDL/XSD/Annotation.pm"} = <<'SOAP_WSDL_XSD_ANNOTATION';
+$fatpacked{"SOAP/WSDL/XSD/Annotation.pm"} = <<'SOAP_WSDL_XSD_ANNOTATION';
   package
     SOAP::WSDL::XSD::Annotation;
   use strict;
@@ -6980,7 +6956,7 @@ SOAP_WSDL_TYPES
   1;
 SOAP_WSDL_XSD_ANNOTATION
 
-    $fatpacked{"SOAP/WSDL/XSD/Attribute.pm"} = <<'SOAP_WSDL_XSD_ATTRIBUTE';
+$fatpacked{"SOAP/WSDL/XSD/Attribute.pm"} = <<'SOAP_WSDL_XSD_ATTRIBUTE';
   package
     SOAP::WSDL::XSD::Attribute;
   use strict;
@@ -7021,8 +6997,7 @@ SOAP_WSDL_XSD_ANNOTATION
   1;
 SOAP_WSDL_XSD_ATTRIBUTE
 
-    $fatpacked{"SOAP/WSDL/XSD/AttributeGroup.pm"} =
-      <<'SOAP_WSDL_XSD_ATTRIBUTEGROUP';
+$fatpacked{"SOAP/WSDL/XSD/AttributeGroup.pm"} = <<'SOAP_WSDL_XSD_ATTRIBUTEGROUP';
   package
     SOAP::WSDL::XSD::AttributeGroup;
   use strict;
@@ -7053,7 +7028,7 @@ SOAP_WSDL_XSD_ATTRIBUTE
   1;
 SOAP_WSDL_XSD_ATTRIBUTEGROUP
 
-    $fatpacked{"SOAP/WSDL/XSD/Builtin.pm"} = <<'SOAP_WSDL_XSD_BUILTIN';
+$fatpacked{"SOAP/WSDL/XSD/Builtin.pm"} = <<'SOAP_WSDL_XSD_BUILTIN';
   package
     SOAP::WSDL::XSD::Builtin;
   use strict;
@@ -7098,7 +7073,7 @@ SOAP_WSDL_XSD_ATTRIBUTEGROUP
   1;
 SOAP_WSDL_XSD_BUILTIN
 
-    $fatpacked{"SOAP/WSDL/XSD/ComplexType.pm"} = <<'SOAP_WSDL_XSD_COMPLEXTYPE';
+$fatpacked{"SOAP/WSDL/XSD/ComplexType.pm"} = <<'SOAP_WSDL_XSD_COMPLEXTYPE';
   package
     SOAP::WSDL::XSD::ComplexType;
   use strict;
@@ -7266,7 +7241,7 @@ SOAP_WSDL_XSD_BUILTIN
   
 SOAP_WSDL_XSD_COMPLEXTYPE
 
-    $fatpacked{"SOAP/WSDL/XSD/Element.pm"} = <<'SOAP_WSDL_XSD_ELEMENT';
+$fatpacked{"SOAP/WSDL/XSD/Element.pm"} = <<'SOAP_WSDL_XSD_ELEMENT';
   package
     SOAP::WSDL::XSD::Element;
   use strict;
@@ -7379,7 +7354,7 @@ SOAP_WSDL_XSD_COMPLEXTYPE
   
 SOAP_WSDL_XSD_ELEMENT
 
-    $fatpacked{"SOAP/WSDL/XSD/Enumeration.pm"} = <<'SOAP_WSDL_XSD_ENUMERATION';
+$fatpacked{"SOAP/WSDL/XSD/Enumeration.pm"} = <<'SOAP_WSDL_XSD_ENUMERATION';
   package
     SOAP::WSDL::XSD::Enumeration;
   use strict;
@@ -7401,8 +7376,7 @@ SOAP_WSDL_XSD_ELEMENT
   1;
 SOAP_WSDL_XSD_ENUMERATION
 
-    $fatpacked{"SOAP/WSDL/XSD/FractionDigits.pm"} =
-      <<'SOAP_WSDL_XSD_FRACTIONDIGITS';
+$fatpacked{"SOAP/WSDL/XSD/FractionDigits.pm"} = <<'SOAP_WSDL_XSD_FRACTIONDIGITS';
   package
     SOAP::WSDL::XSD::FractionDigits;
   use strict;
@@ -7423,7 +7397,7 @@ SOAP_WSDL_XSD_ENUMERATION
   1;
 SOAP_WSDL_XSD_FRACTIONDIGITS
 
-    $fatpacked{"SOAP/WSDL/XSD/Group.pm"} = <<'SOAP_WSDL_XSD_GROUP';
+$fatpacked{"SOAP/WSDL/XSD/Group.pm"} = <<'SOAP_WSDL_XSD_GROUP';
   package
     SOAP::WSDL::XSD::Group;
   use strict;
@@ -7465,7 +7439,7 @@ SOAP_WSDL_XSD_FRACTIONDIGITS
   1;
 SOAP_WSDL_XSD_GROUP
 
-    $fatpacked{"SOAP/WSDL/XSD/Length.pm"} = <<'SOAP_WSDL_XSD_LENGTH';
+$fatpacked{"SOAP/WSDL/XSD/Length.pm"} = <<'SOAP_WSDL_XSD_LENGTH';
   package
     SOAP::WSDL::XSD::Length;
   use strict;
@@ -7487,8 +7461,7 @@ SOAP_WSDL_XSD_GROUP
   1;
 SOAP_WSDL_XSD_LENGTH
 
-    $fatpacked{"SOAP/WSDL/XSD/MaxExclusive.pm"} =
-      <<'SOAP_WSDL_XSD_MAXEXCLUSIVE';
+$fatpacked{"SOAP/WSDL/XSD/MaxExclusive.pm"} = <<'SOAP_WSDL_XSD_MAXEXCLUSIVE';
   package
     SOAP::WSDL::XSD::MaxExclusive;
   use strict;
@@ -7510,8 +7483,7 @@ SOAP_WSDL_XSD_LENGTH
   1;
 SOAP_WSDL_XSD_MAXEXCLUSIVE
 
-    $fatpacked{"SOAP/WSDL/XSD/MaxInclusive.pm"} =
-      <<'SOAP_WSDL_XSD_MAXINCLUSIVE';
+$fatpacked{"SOAP/WSDL/XSD/MaxInclusive.pm"} = <<'SOAP_WSDL_XSD_MAXINCLUSIVE';
   package
     SOAP::WSDL::XSD::MaxInclusive;
   use strict;
@@ -7533,7 +7505,7 @@ SOAP_WSDL_XSD_MAXEXCLUSIVE
   1;
 SOAP_WSDL_XSD_MAXINCLUSIVE
 
-    $fatpacked{"SOAP/WSDL/XSD/MaxLength.pm"} = <<'SOAP_WSDL_XSD_MAXLENGTH';
+$fatpacked{"SOAP/WSDL/XSD/MaxLength.pm"} = <<'SOAP_WSDL_XSD_MAXLENGTH';
   package
     SOAP::WSDL::XSD::MaxLength;
   use strict;
@@ -7556,8 +7528,7 @@ SOAP_WSDL_XSD_MAXINCLUSIVE
   1;
 SOAP_WSDL_XSD_MAXLENGTH
 
-    $fatpacked{"SOAP/WSDL/XSD/MinExclusive.pm"} =
-      <<'SOAP_WSDL_XSD_MINEXCLUSIVE';
+$fatpacked{"SOAP/WSDL/XSD/MinExclusive.pm"} = <<'SOAP_WSDL_XSD_MINEXCLUSIVE';
   package
     SOAP::WSDL::XSD::MinExclusive;
   use strict;
@@ -7579,8 +7550,7 @@ SOAP_WSDL_XSD_MAXLENGTH
   1;
 SOAP_WSDL_XSD_MINEXCLUSIVE
 
-    $fatpacked{"SOAP/WSDL/XSD/MinInclusive.pm"} =
-      <<'SOAP_WSDL_XSD_MININCLUSIVE';
+$fatpacked{"SOAP/WSDL/XSD/MinInclusive.pm"} = <<'SOAP_WSDL_XSD_MININCLUSIVE';
   package
     SOAP::WSDL::XSD::MinInclusive;
   use strict;
@@ -7602,7 +7572,7 @@ SOAP_WSDL_XSD_MINEXCLUSIVE
   1;
 SOAP_WSDL_XSD_MININCLUSIVE
 
-    $fatpacked{"SOAP/WSDL/XSD/MinLength.pm"} = <<'SOAP_WSDL_XSD_MINLENGTH';
+$fatpacked{"SOAP/WSDL/XSD/MinLength.pm"} = <<'SOAP_WSDL_XSD_MINLENGTH';
   package
     SOAP::WSDL::XSD::MinLength;
   use strict;
@@ -7624,7 +7594,7 @@ SOAP_WSDL_XSD_MININCLUSIVE
   1;
 SOAP_WSDL_XSD_MINLENGTH
 
-    $fatpacked{"SOAP/WSDL/XSD/Pattern.pm"} = <<'SOAP_WSDL_XSD_PATTERN';
+$fatpacked{"SOAP/WSDL/XSD/Pattern.pm"} = <<'SOAP_WSDL_XSD_PATTERN';
   package
     SOAP::WSDL::XSD::Pattern;
   use strict;
@@ -7646,7 +7616,7 @@ SOAP_WSDL_XSD_MINLENGTH
   1;
 SOAP_WSDL_XSD_PATTERN
 
-    $fatpacked{"SOAP/WSDL/XSD/Schema.pm"} = <<'SOAP_WSDL_XSD_SCHEMA';
+$fatpacked{"SOAP/WSDL/XSD/Schema.pm"} = <<'SOAP_WSDL_XSD_SCHEMA';
   package
     SOAP::WSDL::XSD::Schema;
   use strict;
@@ -7729,8 +7699,7 @@ SOAP_WSDL_XSD_PATTERN
   1;
 SOAP_WSDL_XSD_SCHEMA
 
-    $fatpacked{"SOAP/WSDL/XSD/Schema/Builtin.pm"} =
-      <<'SOAP_WSDL_XSD_SCHEMA_BUILTIN';
+$fatpacked{"SOAP/WSDL/XSD/Schema/Builtin.pm"} = <<'SOAP_WSDL_XSD_SCHEMA_BUILTIN';
   package
     SOAP::WSDL::XSD::Schema::Builtin;
   use strict;
@@ -7847,7 +7816,7 @@ SOAP_WSDL_XSD_SCHEMA
   
 SOAP_WSDL_XSD_SCHEMA_BUILTIN
 
-    $fatpacked{"SOAP/WSDL/XSD/SimpleType.pm"} = <<'SOAP_WSDL_XSD_SIMPLETYPE';
+$fatpacked{"SOAP/WSDL/XSD/SimpleType.pm"} = <<'SOAP_WSDL_XSD_SIMPLETYPE';
   package
     SOAP::WSDL::XSD::SimpleType;
   use strict;
@@ -7970,7 +7939,7 @@ SOAP_WSDL_XSD_SCHEMA_BUILTIN
   1;
 SOAP_WSDL_XSD_SIMPLETYPE
 
-    $fatpacked{"SOAP/WSDL/XSD/TotalDigits.pm"} = <<'SOAP_WSDL_XSD_TOTALDIGITS';
+$fatpacked{"SOAP/WSDL/XSD/TotalDigits.pm"} = <<'SOAP_WSDL_XSD_TOTALDIGITS';
   package
     SOAP::WSDL::XSD::TotalDigits;
   use strict;
@@ -7992,8 +7961,7 @@ SOAP_WSDL_XSD_SIMPLETYPE
   1;
 SOAP_WSDL_XSD_TOTALDIGITS
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Attribute.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_ATTRIBUTE';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Attribute.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_ATTRIBUTE';
   package
     SOAP::WSDL::XSD::Typelib::Attribute;
   use strict;
@@ -8020,8 +7988,7 @@ SOAP_WSDL_XSD_TOTALDIGITS
   1;
 SOAP_WSDL_XSD_TYPELIB_ATTRIBUTE
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/AttributeSet.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_ATTRIBUTESET';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/AttributeSet.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_ATTRIBUTESET';
   package
     SOAP::WSDL::XSD::Typelib::AttributeSet;
   use strict;
@@ -8041,8 +8008,7 @@ SOAP_WSDL_XSD_TYPELIB_ATTRIBUTE
   1;
 SOAP_WSDL_XSD_TYPELIB_ATTRIBUTESET
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN';
   package
     SOAP::WSDL::XSD::Typelib::Builtin;
   use strict;
@@ -8104,8 +8070,7 @@ SOAP_WSDL_XSD_TYPELIB_ATTRIBUTESET
   
 SOAP_WSDL_XSD_TYPELIB_BUILTIN
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/ENTITY.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_ENTITY';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/ENTITY.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_ENTITY';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::ENTITY;
   use strict;
@@ -8116,8 +8081,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_ENTITY
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/ID.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_ID';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/ID.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_ID';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::ID;
   use strict;
@@ -8128,8 +8092,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_ENTITY
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_ID
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/IDREF.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_IDREF';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/IDREF.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_IDREF';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::IDREF;
   use strict;
@@ -8140,8 +8103,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_ID
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_IDREF
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/IDREFS.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_IDREFS';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/IDREFS.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_IDREFS';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::IDREFS;
   use strict;
@@ -8154,8 +8116,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_IDREF
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_IDREFS
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/NCName.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_NCNAME';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/NCName.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_NCNAME';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::NCName;
   use strict;
@@ -8166,8 +8127,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_IDREFS
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_NCNAME
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/NMTOKEN.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_NMTOKEN';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/NMTOKEN.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_NMTOKEN';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::NMTOKEN;
   use strict;
@@ -8178,8 +8138,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_NCNAME
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_NMTOKEN
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/NMTOKENS.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_NMTOKENS';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/NMTOKENS.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_NMTOKENS';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::NMTOKENS;
   use strict;
@@ -8194,8 +8153,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_NMTOKEN
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_NMTOKENS
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/NOTATION.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_NOTATION';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/NOTATION.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_NOTATION';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::NOTATION;
   use strict;
@@ -8206,8 +8164,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_NMTOKENS
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_NOTATION
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/Name.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_NAME';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/Name.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_NAME';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::Name;
   use strict;
@@ -8218,8 +8175,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_NOTATION
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_NAME
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/QName.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_QNAME';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/QName.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_QNAME';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::QName;
   use strict;
@@ -8231,8 +8187,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_NAME
   
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_QNAME
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/anySimpleType.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_ANYSIMPLETYPE';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/anySimpleType.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_ANYSIMPLETYPE';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::anySimpleType;
   use strict;
@@ -8309,8 +8264,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_QNAME
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_ANYSIMPLETYPE
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/anyType.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_ANYTYPE';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/anyType.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_ANYTYPE';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::anyType;
   use strict;
@@ -8399,8 +8353,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_ANYSIMPLETYPE
   
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_ANYTYPE
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/anyURI.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_ANYURI';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/anyURI.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_ANYURI';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::anyURI;
   use strict;
@@ -8412,8 +8365,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_ANYTYPE
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_ANYURI
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/base64Binary.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_BASE64BINARY';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/base64Binary.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_BASE64BINARY';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::base64Binary;
   use strict;
@@ -8426,8 +8378,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_ANYURI
   
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_BASE64BINARY
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/boolean.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_BOOLEAN';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/boolean.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_BOOLEAN';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::boolean;
   use strict;
@@ -8474,8 +8425,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_BASE64BINARY
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_BOOLEAN
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/byte.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_BYTE';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/byte.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_BYTE';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::byte;
   use strict;
@@ -8486,8 +8436,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_BOOLEAN
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_BYTE
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/date.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_DATE';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/date.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_DATE';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::date;
   use strict;
@@ -8551,8 +8500,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_BYTE
   
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_DATE
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/dateTime.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_DATETIME';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/dateTime.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_DATETIME';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::dateTime;
   
@@ -8612,8 +8560,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_DATE
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_DATETIME
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/decimal.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_DECIMAL';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/decimal.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_DECIMAL';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::decimal;
   use strict;
@@ -8630,8 +8577,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_DATETIME
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_DECIMAL
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/double.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_DOUBLE';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/double.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_DOUBLE';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::double;
   use strict;
@@ -8648,8 +8594,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_DECIMAL
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_DOUBLE
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/duration.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_DURATION';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/duration.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_DURATION';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::duration;
   use strict;
@@ -8660,8 +8605,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_DOUBLE
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_DURATION
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/float.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_FLOAT';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/float.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_FLOAT';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::float;
   use strict;
@@ -8679,8 +8623,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_DURATION
   
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_FLOAT
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/gDay.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_GDAY';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/gDay.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_GDAY';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::gDay;
   use strict;
@@ -8691,8 +8634,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_FLOAT
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_GDAY
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/gMonth.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_GMONTH';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/gMonth.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_GMONTH';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::gMonth;
   use strict;
@@ -8705,8 +8647,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_GDAY
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_GMONTH
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/gMonthDay.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_GMONTHDAY';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/gMonthDay.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_GMONTHDAY';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::gMonthDay;
   use strict;
@@ -8717,8 +8658,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_GMONTH
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_GMONTHDAY
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/gYear.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_GYEAR';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/gYear.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_GYEAR';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::gYear;
   use strict;
@@ -8729,8 +8669,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_GMONTHDAY
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_GYEAR
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/gYearMonth.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_GYEARMONTH';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/gYearMonth.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_GYEARMONTH';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::gYearMonth;
   use strict;
@@ -8741,8 +8680,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_GYEAR
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_GYEARMONTH
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/hexBinary.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_HEXBINARY';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/hexBinary.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_HEXBINARY';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::hexBinary;
   use strict;
@@ -8753,8 +8691,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_GYEARMONTH
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_HEXBINARY
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/int.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_INT';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/int.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_INT';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::int;
   use strict;
@@ -8765,8 +8702,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_HEXBINARY
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_INT
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/integer.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_INTEGER';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/integer.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_INTEGER';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::integer;
   use strict;
@@ -8777,8 +8713,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_INT
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_INTEGER
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/language.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_LANGUAGE';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/language.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_LANGUAGE';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::language;
   use strict;
@@ -8789,8 +8724,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_INTEGER
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_LANGUAGE
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/list.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_LIST';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/list.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_LIST';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::list;
   use strict;
@@ -8837,8 +8771,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_LANGUAGE
   =cut
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_LIST
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/long.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_LONG';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/long.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_LONG';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::long;
   use strict;
@@ -8849,8 +8782,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_LIST
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_LONG
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/negativeInteger.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_NEGATIVEINTEGER';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/negativeInteger.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_NEGATIVEINTEGER';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::negativeInteger;
   use strict;
@@ -8861,8 +8793,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_LONG
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_NEGATIVEINTEGER
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/nonNegativeInteger.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_NONNEGATIVEINTEGER';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/nonNegativeInteger.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_NONNEGATIVEINTEGER';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger;
   use strict;
@@ -8873,8 +8804,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_NEGATIVEINTEGER
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_NONNEGATIVEINTEGER
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/nonPositiveInteger.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_NONPOSITIVEINTEGER';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/nonPositiveInteger.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_NONPOSITIVEINTEGER';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::nonPositiveInteger;
   use strict;
@@ -8885,8 +8815,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_NONNEGATIVEINTEGER
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_NONPOSITIVEINTEGER
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/normalizedString.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_NORMALIZEDSTRING';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/normalizedString.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_NORMALIZEDSTRING';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::normalizedString;
   use strict;
@@ -8904,8 +8833,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_NONPOSITIVEINTEGER
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_NORMALIZEDSTRING
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/positiveInteger.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_POSITIVEINTEGER';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/positiveInteger.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_POSITIVEINTEGER';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger;
   use strict;
@@ -8916,8 +8844,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_NORMALIZEDSTRING
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_POSITIVEINTEGER
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/short.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_SHORT';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/short.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_SHORT';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::short;
   use strict;
@@ -8928,8 +8855,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_POSITIVEINTEGER
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_SHORT
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/string.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_STRING';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/string.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_STRING';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::string;
   use strict;
@@ -8972,8 +8898,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_SHORT
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_STRING
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/time.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_TIME';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/time.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_TIME';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::time;
   use strict;
@@ -9020,8 +8945,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_STRING
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_TIME
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/token.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_TOKEN';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/token.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_TOKEN';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::token;
   use strict;
@@ -9032,8 +8956,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_TIME
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_TOKEN
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/unsignedByte.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_UNSIGNEDBYTE';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/unsignedByte.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_UNSIGNEDBYTE';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::unsignedByte;
   use strict;
@@ -9044,8 +8967,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_TOKEN
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_UNSIGNEDBYTE
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/unsignedInt.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_UNSIGNEDINT';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/unsignedInt.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_UNSIGNEDINT';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::unsignedInt;
   use strict;
@@ -9056,8 +8978,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_UNSIGNEDBYTE
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_UNSIGNEDINT
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/unsignedLong.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_UNSIGNEDLONG';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/unsignedLong.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_UNSIGNEDLONG';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::unsignedLong;
   use strict;
@@ -9068,8 +8989,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_UNSIGNEDINT
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_UNSIGNEDLONG
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/unsignedShort.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_UNSIGNEDSHORT';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Builtin/unsignedShort.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_BUILTIN_UNSIGNEDSHORT';
   package
     SOAP::WSDL::XSD::Typelib::Builtin::unsignedShort;
   use strict;
@@ -9080,8 +9000,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_UNSIGNEDLONG
   1;
 SOAP_WSDL_XSD_TYPELIB_BUILTIN_UNSIGNEDSHORT
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/ComplexType.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_COMPLEXTYPE';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/ComplexType.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_COMPLEXTYPE';
   #!/usr/bin/perl
   package
     SOAP::WSDL::XSD::Typelib::ComplexType;
@@ -9563,8 +9482,7 @@ SOAP_WSDL_XSD_TYPELIB_BUILTIN_UNSIGNEDSHORT
   
 SOAP_WSDL_XSD_TYPELIB_COMPLEXTYPE
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/Element.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_ELEMENT';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/Element.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_ELEMENT';
   package
     SOAP::WSDL::XSD::Typelib::Element;
   use strict; use warnings;
@@ -9663,8 +9581,7 @@ SOAP_WSDL_XSD_TYPELIB_COMPLEXTYPE
   
 SOAP_WSDL_XSD_TYPELIB_ELEMENT
 
-    $fatpacked{"SOAP/WSDL/XSD/Typelib/SimpleType.pm"} =
-      <<'SOAP_WSDL_XSD_TYPELIB_SIMPLETYPE';
+$fatpacked{"SOAP/WSDL/XSD/Typelib/SimpleType.pm"} = <<'SOAP_WSDL_XSD_TYPELIB_SIMPLETYPE';
   package
     SOAP::WSDL::XSD::Typelib::SimpleType;
   use strict; use warnings;
@@ -9686,7 +9603,7 @@ SOAP_WSDL_XSD_TYPELIB_ELEMENT
   
 SOAP_WSDL_XSD_TYPELIB_SIMPLETYPE
 
-    $fatpacked{"SOAP/WSDL/XSD/WhiteSpace.pm"} = <<'SOAP_WSDL_XSD_WHITESPACE';
+$fatpacked{"SOAP/WSDL/XSD/WhiteSpace.pm"} = <<'SOAP_WSDL_XSD_WHITESPACE';
   package
     SOAP::WSDL::XSD::WhiteSpace;
   use strict;
@@ -9708,17 +9625,16 @@ SOAP_WSDL_XSD_TYPELIB_SIMPLETYPE
   1;
 SOAP_WSDL_XSD_WHITESPACE
 
-    s/^  //mg for values %fatpacked;
+s/^  //mg for values %fatpacked;
 
-    unshift @INC, sub {
-        if (my $fat = $fatpacked{$_[1]}) {
-            open my $fh, '<', \$fat
-              or die
-              "FatPacker error loading $_[1] (could be a perl installation issue?)";
-            return $fh;
-        }
-        return;
-    };
+unshift @INC, sub {
+  if (my $fat = $fatpacked{$_[1]}) {
+    open my $fh, '<', \$fat
+      or die "FatPacker error loading $_[1] (could be a perl installation issue?)";
+    return $fh;
+  }
+  return
+};
 
 }
 
@@ -9738,7 +9654,7 @@ Shipment::SOAP::WSDL
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 AUTHOR
 

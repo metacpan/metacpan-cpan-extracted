@@ -1,0 +1,15 @@
+0.04 2022-07-06T16:24:12+02:00
+ - Add example for is_json_type() to doc.
+ - Regen README file.
+
+0.03 2022-07-06T00:47:32+02:00
+ [API change]
+ - Rename is_json_type() to cmp_json_types().
+ - Rename is_json_type_struct() to is_json_type().
+
+0.02 2022-07-05T19:05:07+02:00
+ - Add is_json_type_struct() test subroutine.
+ - Fix minimal dependency to Cpanel::JSON::XS.
+
+0.01 2022-07-04T13:18:39+02:00
+ - First version.

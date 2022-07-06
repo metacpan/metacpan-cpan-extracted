@@ -20,9 +20,10 @@ my %WriteMakefileArgs = (
         'ExtUtils::MakeMaker' => '0',
     },
     TEST_REQUIRES => {
-        'Test2::V0'  => '0',
-        'Test::More' => '0',
-        'GD'        => '0' # Any library would do actually...
+        'Test2::V0'               => '0',
+        'Test2::Tools::Exception' => '0',
+        'Test::More'              => '0',
+        'GD'                      => '0'    # Any library would do actually...
     },
     PREREQ_PM => {
         'Math::DCT' => '0'
@@ -47,7 +48,7 @@ my %WriteMakefileArgs = (
             repository => {
                 type => 'git',
                 url  => 'git://github.com/dkechag/Image-PHash.git',
-                web  => 'https://github.com/SpareRoom/Image-PHash',
+                web  => 'https://github.com/dkechag/Image-PHash',
             },
         },
     },

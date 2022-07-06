@@ -1,0 +1,84 @@
+{
+   "abstract" : "SNMP trap receiver by help of AnyEvent",
+   "author" : [
+      "Bojan Ramšak <bojanr@gmx.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.19",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-SNMP-TrapReceiver",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "7.15",
+            "AnyEvent::Handle::UDP" : "0",
+            "AnyEvent::Socket" : "0",
+            "Convert::ASN1" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IO::Socket::INET" : "0",
+            "Socket" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "AnyEvent::SNMP::TrapReceiver" : {
+         "file" : "lib/AnyEvent/SNMP/TrapReceiver.pm",
+         "version" : "0.16"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bojanra/AnyEvent-SNMP-TrapReceiver/issues"
+      },
+      "homepage" : "https://github.com/bojanra/AnyEvent-SNMP-TrapReceiver",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bojanra/AnyEvent-SNMP-TrapReceiver.git",
+         "web" : "https://github.com/bojanra/AnyEvent-SNMP-TrapReceiver"
+      }
+   },
+   "version" : "0.16",
+   "x_contributors" : [
+      "Bojan Ramšak <bojan.ramsak@rtvslo.si>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
+}

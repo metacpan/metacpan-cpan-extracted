@@ -74,7 +74,7 @@ sub write_parl {
 
     system(Cwd::abs_path($tfile), @libs, qw( -q -B ), "-O$file");
     unless ($? == 0) {
-        warn "Failed to execute temporary parl (class $class) in file '$tfile': $!";
+        warn "Failed to execute temporary parl (class $class) '$tfile': \$?=$?";
         return;
     }
     return 1;
@@ -121,22 +121,22 @@ Returns true on success and the empty list on failure.
 =cut
 
 sub write_raw {
-    my $class = shift;
-    my $file = shift;
+    my ($class, $file) = @_;
     if (not defined $file) {
         warn "${class}->write_raw() needs a file name as argument";
-        return();
+        return;
     }
     my $binary = $class->get_raw();
     if (not defined $binary) {
         warn "${class}->get_raw() did not return the raw binary data for a PAR loader";
-        return();
+        return;
     }
 
-    open my $fh, '>', $file or die "Could not open file '$file' for writing: $!";
-    binmode $fh;
-    print $fh $binary;
-    close $fh;
+    my $fh;
+    (open $fh, '>:raw', $file) 
+    && (print $fh $binary)
+    && (close $fh)
+        or die "Could not write file '$file': $!";
 
     return 1;
 }

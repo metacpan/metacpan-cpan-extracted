@@ -642,23 +642,20 @@ A MIME PRIMER
 
 TERMS AND CONDITIONS
     Eryq (eryq@zeegee.com), ZeeGee Software Inc (http://www.zeegee.com).
-    Dianne Skoll (dfs@roaringpenguin.com) http://www.roaringpenguin.com
+    Dianne Skoll (dianne@skoll.ca)
 
     Copyright (c) 1998, 1999 by ZeeGee Software Inc (www.zeegee.com).
     Copyright (c) 2004 by Roaring Penguin Software Inc (www.roaringpenguin.com)
+    Copyright (c) 2022 by Dianne Skoll
 
     All rights reserved. This program is free software; you can redistribute
     it and/or modify it under the same terms as Perl itself. See the COPYING
     file in the distribution for details.
 
 SUPPORT
-    Please email me directly with questions/problems (see AUTHOR below).
 
-    If you want to be placed on an email distribution list (not a mailing
-    list!) for MIME-tools, and receive bug reports, patches, and updates as
-    to when new MIME-tools releases are planned, just email me and say so.
-    If your project is using MIME-tools, it might not be a bad idea to find
-    out about those bugs *before* they become problems...
+    Please file bug reports via rt.cpan.org.
+
 
 AUTHOR
     MIME-tools was created by:
@@ -672,6 +669,8 @@ AUTHOR
     Released as MIME-parser (1.0): 28 April 1996. Released as MIME-tools
     (2.0): Halloween 1996. Released as MIME-tools (4.0): Christmas 1997.
     Released as MIME-tools (5.0): Mother's Day 2000.
+
+    MIME-tools is currently maintained by Dianne Skoll <dfs@roaringoenguin.com>
 
 ACKNOWLEDGMENTS
     This kit would not have been possible but for the direct contributions
@@ -711,9 +710,7 @@ ACKNOWLEDGMENTS
     me, and I'll put you in.
 
 SEE ALSO
-    At the time of this writing the MIME-tools homepage was
-    http://www.mimedefang.org/static/mime-tools.php.
-    Check there for updates and support.
+    Search CPAN for MIME::tools.
 
     Users of this toolkit may wish to read the documentation of Mail::Header
     and Mail::Internet.

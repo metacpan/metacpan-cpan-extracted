@@ -6,9 +6,9 @@
 use v5.26;
 use utf8;
 
-use Object::Pad 0.55;  # :reader on array
+use Object::Pad 0.57;  # :isa
 
-package App::sdview::Parser 0.06;
+package App::sdview::Parser 0.07;
 role App::sdview::Parser;
 
 use String::Tagged;
@@ -67,7 +67,7 @@ class App::sdview::Para::Table :strict(params) {
    }
 }
 
-class App::sdview::Para::TableCell isa App::sdview::Para::Plain :strict(params) {
+class App::sdview::Para::TableCell :isa(App::sdview::Para::Plain) :strict(params) {
    has $align :param :reader;
 
    method type { "table-cell" }

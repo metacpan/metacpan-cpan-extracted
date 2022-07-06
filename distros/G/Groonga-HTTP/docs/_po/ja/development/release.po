@@ -1,0 +1,64 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=; plural=;\n"
+
+msgid ""
+"---\n"
+"title: Release\n"
+"---"
+msgstr ""
+
+msgid "# Requirements"
+msgstr ""
+
+msgid "# How to release"
+msgstr ""
+
+msgid "## 1.Update change log"
+msgstr ""
+
+msgid ""
+"```console\n"
+"$ editor Chnages\n"
+"```"
+msgstr ""
+
+msgid "We write summarized the changes for this release under the ``{{$NEXT}}``."
+msgstr ""
+
+msgid "## 2. Check whether we can make packages or not"
+msgstr ""
+
+msgid "We confirm below CIs green or not."
+msgstr ""
+
+msgid "* [GitHub Actions][github-actions]"
+msgstr ""
+
+msgid "[github-actions]: https://github.com/groonga/Groonga-HTTP/actions"
+msgstr ""
+
+msgid "## 3. Upload module to CPAN"
+msgstr ""
+
+msgid ""
+"```console\n"
+"$ minil release\n"
+"```"
+msgstr ""
+
+msgid "We need to get the \"PAUSE\" account to succeed in this procedure."
+msgstr ""
+
+msgid "## 4. Update latest release in document"
+msgstr ""
+
+msgid ""
+"We update `docs/_config.yml` like https://github.com/groonga/Groonga-HTTP/comm"
+"it/1c6b9cacb72306f62dce296ed15ddd6a2514b9cf."
+msgstr ""

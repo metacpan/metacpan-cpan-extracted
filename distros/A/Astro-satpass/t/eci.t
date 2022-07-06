@@ -286,7 +286,7 @@ EOD
 # geodetic -> eci
 # Tests: eci() (and geodetic() and geocentric())
 
-# Standard is from http://celestrak.com/columns/v02n03/ (Kelso)
+# Standard is from http://celestrak.org/columns/v02n03/ (Kelso)
 
 {
     my $time = greg_time_gm( 0, 0, 9, 1, 9, 1995 );

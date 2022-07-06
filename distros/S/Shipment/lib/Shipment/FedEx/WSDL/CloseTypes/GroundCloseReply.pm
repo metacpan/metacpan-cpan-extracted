@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::CloseTypes::GroundCloseReply;
-$Shipment::FedEx::WSDL::CloseTypes::GroundCloseReply::VERSION = '3.08';
+$Shipment::FedEx::WSDL::CloseTypes::GroundCloseReply::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/close/v2'}
+sub get_xmlns { 'http://fedex.com/ws/close/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,66 +20,67 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %HighestSeverity_of : ATTR(:get<HighestSeverity>);
-    my %Notifications_of : ATTR(:get<Notifications>);
-    my %TransactionDetail_of : ATTR(:get<TransactionDetail>);
-    my %Version_of : ATTR(:get<Version>);
-    my %CodReport_of : ATTR(:get<CodReport>);
-    my %HazMatCertificate_of : ATTR(:get<HazMatCertificate>);
-    my %Manifest_of : ATTR(:get<Manifest>);
-    my %MultiweightReport_of : ATTR(:get<MultiweightReport>);
+my %HighestSeverity_of :ATTR(:get<HighestSeverity>);
+my %Notifications_of :ATTR(:get<Notifications>);
+my %TransactionDetail_of :ATTR(:get<TransactionDetail>);
+my %Version_of :ATTR(:get<Version>);
+my %CodReport_of :ATTR(:get<CodReport>);
+my %HazMatCertificate_of :ATTR(:get<HazMatCertificate>);
+my %Manifest_of :ATTR(:get<Manifest>);
+my %MultiweightReport_of :ATTR(:get<MultiweightReport>);
 
-    __PACKAGE__->_factory(
-        [   qw(        HighestSeverity
-              Notifications
-              TransactionDetail
-              Version
-              CodReport
-              HazMatCertificate
-              Manifest
-              MultiweightReport
+__PACKAGE__->_factory(
+    [ qw(        HighestSeverity
+        Notifications
+        TransactionDetail
+        Version
+        CodReport
+        HazMatCertificate
+        Manifest
+        MultiweightReport
 
-            )
-        ],
-        {   'HighestSeverity'   => \%HighestSeverity_of,
-            'Notifications'     => \%Notifications_of,
-            'TransactionDetail' => \%TransactionDetail_of,
-            'Version'           => \%Version_of,
-            'CodReport'         => \%CodReport_of,
-            'HazMatCertificate' => \%HazMatCertificate_of,
-            'Manifest'          => \%Manifest_of,
-            'MultiweightReport' => \%MultiweightReport_of,
-        },
-        {   'HighestSeverity' =>
-              'Shipment::FedEx::WSDL::CloseTypes::NotificationSeverityType',
-            'Notifications' =>
-              'Shipment::FedEx::WSDL::CloseTypes::Notification',
-            'TransactionDetail' =>
-              'Shipment::FedEx::WSDL::CloseTypes::TransactionDetail',
-            'Version'   => 'Shipment::FedEx::WSDL::CloseTypes::VersionId',
-            'CodReport' => 'SOAP::WSDL::XSD::Typelib::Builtin::base64Binary',
-            'HazMatCertificate' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::base64Binary',
-            'Manifest' => 'Shipment::FedEx::WSDL::CloseTypes::ManifestFile',
-            'MultiweightReport' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::base64Binary',
-        },
-        {
+    ) ],
+    {
+        'HighestSeverity' => \%HighestSeverity_of,
+        'Notifications' => \%Notifications_of,
+        'TransactionDetail' => \%TransactionDetail_of,
+        'Version' => \%Version_of,
+        'CodReport' => \%CodReport_of,
+        'HazMatCertificate' => \%HazMatCertificate_of,
+        'Manifest' => \%Manifest_of,
+        'MultiweightReport' => \%MultiweightReport_of,
+    },
+    {
+        'HighestSeverity' => 'Shipment::FedEx::WSDL::CloseTypes::NotificationSeverityType',
+        'Notifications' => 'Shipment::FedEx::WSDL::CloseTypes::Notification',
+        'TransactionDetail' => 'Shipment::FedEx::WSDL::CloseTypes::TransactionDetail',
+        'Version' => 'Shipment::FedEx::WSDL::CloseTypes::VersionId',
+        'CodReport' => 'SOAP::WSDL::XSD::Typelib::Builtin::base64Binary',
+        'HazMatCertificate' => 'SOAP::WSDL::XSD::Typelib::Builtin::base64Binary',
+        'Manifest' => 'Shipment::FedEx::WSDL::CloseTypes::ManifestFile',
+        'MultiweightReport' => 'SOAP::WSDL::XSD::Typelib::Builtin::base64Binary',
+    },
+    {
 
-            'HighestSeverity'   => 'HighestSeverity',
-            'Notifications'     => 'Notifications',
-            'TransactionDetail' => 'TransactionDetail',
-            'Version'           => 'Version',
-            'CodReport'         => 'CodReport',
-            'HazMatCertificate' => 'HazMatCertificate',
-            'Manifest'          => 'Manifest',
-            'MultiweightReport' => 'MultiweightReport',
-        }
-    );
+        'HighestSeverity' => 'HighestSeverity',
+        'Notifications' => 'Notifications',
+        'TransactionDetail' => 'TransactionDetail',
+        'Version' => 'Version',
+        'CodReport' => 'CodReport',
+        'HazMatCertificate' => 'HazMatCertificate',
+        'Manifest' => 'Manifest',
+        'MultiweightReport' => 'MultiweightReport',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -96,7 +97,7 @@ Shipment::FedEx::WSDL::CloseTypes::GroundCloseReply
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

@@ -14,26 +14,23 @@ use English qw/ -no_match_vars /;
 
 extends 'App::VTide::Command::Run';
 
-our $VERSION = version->new('0.1.16');
+our $VERSION = version->new('0.1.17');
 our $NAME    = 'edit';
-our $OPTIONS = [
-    'test|T!',
-    'save|s=s',
-    'verbose|v+',
-];
-sub details_sub { return ( $NAME, $OPTIONS )};
+our $OPTIONS = [ 'test|T!', 'save|s=s', 'verbose|v+', ];
+our $LOCAL   = 1;
+sub details_sub { return ( $NAME, $OPTIONS, $LOCAL ) }
 
 sub run {
     my ($self) = @_;
 
-    my ( $name ) = $self->env;
+    my ($name) = $self->env;
     my $cmd = $self->options->files->[0];
     print "Running $name - $cmd\n";
 
-    my $params = $self->params( $cmd );
-    $params->{edit} = $self->options->files;
+    my $params = $self->params($cmd);
+    $params->{edit}  = $self->options->files;
     $params->{title} = $cmd;
-    my @cmd = $self->command( $params );
+    my @cmd = $self->command($params);
 
     if ( $params->{env} && ref $params->{env} eq 'HASH' ) {
         for my $env ( keys %{ $params->{env} } ) {
@@ -44,15 +41,15 @@ sub run {
     }
 
     $self->load_env( $params->{env} );
-    $self->hooks->run('edit_editing', \@cmd);
-    $self->runit( @cmd );
+    $self->hooks->run( 'edit_editing', \@cmd );
+    $self->runit(@cmd);
 
-    $params = $self->params($ENV{VTIDE_TERM} || '1');
+    $params = $self->params( $ENV{VTIDE_TERM} || '1' );
 
     my $title = $params->{title} || 'bash';
-    my $max = 15;
-    if (length $title > $max) {
-        $title = substr $title, (length $title) - $max, $max + 1;
+    my $max   = 15;
+    if ( length $title > $max ) {
+        $title = substr $title, ( length $title ) - $max, $max + 1;
     }
 
     eval { require Term::Title; }
@@ -63,17 +60,17 @@ sub run {
 }
 
 sub auto_complete {
-    my ($self, $auto) = @_;
+    my ( $self, $auto ) = @_;
 
-    my $env = $self->options->files->[-1];
+    my $env   = $self->options->files->[-1];
     my @files = sort keys %{ $self->config->get->{editor}{files} };
 
     eval {
         my $helper = $self->config->get->{editor}{helper_autocomplete};
         if ($helper) {
-            my $helper_sub = eval $helper;  ## no critic
+            my $helper_sub = eval $helper;    ## no critic
             if ($helper_sub) {
-                push @files, $helper_sub->($auto, $self->options->files);
+                push @files, $helper_sub->( $auto, $self->options->files );
             }
             elsif ($@) {
                 warn "Errored parsing '$@':\n$helper\n";
@@ -85,7 +82,8 @@ sub auto_complete {
         1;
     } or do { warn $@ };
 
-    print join ' ', grep { $env ne 'vtide' && $env ne 'edit' ? /^$env/xms : 1 } @files;
+    print join ' ',
+        grep { $env ne 'vtide' && $env ne 'edit' ? /^$env/xms : 1 } @files;
 
     return;
 }
@@ -100,7 +98,7 @@ App::VTide::Command::Edit - Run an edit command (like Run but without a terminal
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Edit version 0.1.16
+This documentation refers to App::VTide::Command::Edit version 0.1.17
 
 =head1 SYNOPSIS
 

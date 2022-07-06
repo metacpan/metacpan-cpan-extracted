@@ -1,5 +1,63 @@
 Change history for Perl extension PDF::Table.
 
+=== Version 1.003 (2022-07-05)
+
+ lib/PDF/Table/ColumnWidth.pm, lib/PDF/Table/Table.pod, examples/size.pl,
+   MANIFEST, util/3_examples.pl
+  Add the ability to specify fixed and relative sizes for column widths, 
+   rather than having to accept system-calculated widths. You give a string
+   to the 'size' optional global setting specifying the absolute width of
+   a column (in, pt, cm, mm, em, or ex units), and/or a unit of '*' to 
+   indicate remaining space is to be split up among these columns.
+
+ lib/PDF/Table.pm, lib/PDF/Table/Settings.pm, MANIFEST
+  Split out deprecated_settings and check_settings functions into new file.
+
+ lib/PDF/Table.pm, lib/PDF/Table/ColumnWidth.pm, MANIFEST, t/PDF-Table.t
+  Split out CalcColumnWidths function into new file.
+
+ examples/chess.pl
+  PDF::API2 work-around added for font-handling change in 2.043. The problem
+  is being investigated, but the chess example almost works for now.
+
+ lib/PDF/Table.pm, lib/PDF/Table/Table.pod, MANIFEST
+  Split out documentation into separate POD file.
+
+ lib/PDF/Table.pm  
+  Fix handling of degenerate case of header-only, without data rows (#71).
+
+ lib/PDF/Table.pm, t/PDF-Table.t  
+  Finish cleanup of column width calculations (#68, #72).
+
+ Makefile.PL, LICENSE, MANIFEST.SKIP
+  Build (at install) META.* with "provides" member. Add separate license file.
+  Add some items to MANIFEST SKIP file to clean up.
+
+ lib/PDF/Table.pm
+  $LAST_UPDATE changed from 'my' storage class to 'our', so can be accessed
+   programmatically.
+
+ lib/PDF/Table.pm 
+   Absolute minimum with of a column reset to at least $min_col_width (a new 
+    global default) to prevent text_block() width errors.
+
+ Update build process to ensure consistent "unix" formatting of most 
+   human-readable files. Some non-CPAN builds were complaining
+   about MS-DOS format (CRLF line ends) on some files.
+
+ lib/PDF/Table.pm, examples/chess.pl, t/PDF-Table.t
+   Fix handling of max_w [GitHub #68], rewrite column width calculations. This
+    may result in some noticable changes in column widths from before.
+
+ lib/PDF/Table.pm   Remove requirement that "empty cell" text not be an
+   empty string (allow $empty_cell_text to be ''), permitting completely
+   empty cells.
+
+ lib/PDF/Table.pm   minor comment updates
+
+ README.md, lib/PDF/Table.pm, INFO/Table.html
+  2022 copyright. NOT archiving Changes yet.
+
 === Version 1.002 (2020-12-27)
 
  README.md, lib/PDF/Table.pm, Makefile.PL

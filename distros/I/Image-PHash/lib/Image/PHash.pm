@@ -9,7 +9,7 @@ use Carp;
 use Config;
 use Math::DCT 'dct2d';
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 =head1 NAME
 
@@ -284,7 +284,8 @@ Will convert a bit value string to a hex string.
 Will calculate the bit difference of two hex string hashes (their Hamming distance
 of their bit stream form). On 64 bit systems (checking C<$Config{ivsize}>) it will
 actually call C<_diff64> which can calculate the difference of up to 64bit hashes in
-a single operation (using C<%064b>).
+a single operation (using C<%064b>). You can call C<_diff64> directly if you prefer
+in that scenario.
 
 =head1 NOTES
 
@@ -371,6 +372,8 @@ positives close to 0%. For the small pHash7 and pHash6 probably not more than 3 
 respectively are useful for lookups (and still with lots of false positives as noted above).
 
 =cut
+
+my $_64bit;
 
 sub pHash7 {
     my ($self, %opt) = @_;
@@ -494,10 +497,15 @@ sub b2h {
     return $hex;
 }
 
+sub _is_64bit {
+    $_64bit //= $Config{ivsize} >= 8;
+    return $_64bit;
+}
+
 # Difference in bits between two hex strings
 # About 30% slower than using %064b directly, but this is portable to 32 bits
 sub diff {
-    return _diff64(@_) if length($_[0]) <= 16 && $Config{ivsize} >= 8;
+    return _diff64(@_) if length($_[0]) <= 16 && ($_64bit || &_is_64bit);
     my $diff;
     for (my $i = 0; $i < length($_[0]); $i += 8) {
         my $d =
@@ -668,13 +676,13 @@ sub dctdump {
 }
 
 sub printbitmatrix {
-    my ($self, %opt) = @_;
-
+    my $self  = shift;
+    my %opt   = $self->_validate_options(@_);
     my @array = $self->pHash(%opt);
     my $sep   = $opt{separator} || '';
     my $fill  = $opt{filler} || ' ';
 
-    my ($xs, $ys) = split(/x/, $opt{geometry} || '8x8');
+    my ($xs, $ys) = split(/x/, $opt{geometry});
     my $str = '';
     if ($ys) {
         for (my $i = 0; $i < $xs; $i++) {
@@ -683,7 +691,7 @@ sub printbitmatrix {
             $str .= "\n";
         }        
     } else {
-        my @matrix = ($fill);
+        my @matrix = ("$fill$sep");
         OUTER:
         for (my $i = 1; $i < $self->{dct_size}; $i++) {
             for (my $j = 0; $j <= $i; $j++) {
@@ -719,7 +727,9 @@ sub _validate_options {
         method      => 1,
         mirror      => 1,
         mirrorproof => 1,
-        reduce      => 1
+        reduce      => 1,
+        separator   => 1,
+        filler      => 1
     );
 
     foreach (keys %opt) {
@@ -810,8 +820,8 @@ sub _dct_mirrorproof {
 
 sub _apply_average {
     my $array   = shift;
-    my $skip    = shift || 0;
-    my $extra   = shift || [];
+    my $skip    = shift;
+    my $extra   = shift;
     my $average = 0;
     $average += $array->[$_] foreach $skip .. $#$array;
     $average += $_           foreach @$extra;
@@ -821,7 +831,7 @@ sub _apply_average {
 
 sub _apply_log_average {
     my $array   = shift;
-    my $skip    = shift || 0;
+    my $skip    = shift;
     my $exp     = 1 + (scalar(@$array)**(1 / 6));
     my $average = 0;
     foreach ($skip .. $#$array) {
@@ -829,7 +839,7 @@ sub _apply_log_average {
         $average += $array->[$_] < 0 ? -$add : $add;
     }
     $average /= scalar(@$array) - $skip;
-    my $thres = $average**$exp;
+    my $thres = abs($average)**$exp;
     $thres *= -1 if $average < 0;
     $array->[$_] = $array->[$_] >= $thres ? '1' : '0' foreach 0 .. $#$array;
 }
@@ -846,8 +856,8 @@ sub _apply_diff {
 
 sub _apply_median {
     my $array = shift;
-    my $skip  = shift || 0;
-    my $extra = shift || [];
+    my $skip  = shift;
+    my $extra = shift;
     my @vals  = sort {$a <=> $b} @$array, @$extra;
     my $len   = scalar @vals - $skip;
     my $thresh =

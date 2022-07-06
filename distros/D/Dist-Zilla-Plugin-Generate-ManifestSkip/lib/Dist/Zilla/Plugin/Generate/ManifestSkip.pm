@@ -19,7 +19,7 @@ use Types::Standard -types;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.1.6';
+our $VERSION = 'v0.1.7';
 
 
 sub mvp_multivalue_args { qw/ add remove / }
@@ -62,6 +62,7 @@ sub gather_files {
     $mms->add( '\.mailmap$' );
     $mms->add( 'perltidy\.(LOG|ERR)' );
     $mms->add( 'fatlib/' );
+    $mms->add( '^\.mite$' );
 
     $mms->remove('^MANIFEST\.SKIP$');
     $mms->remove('^dist.ini$');
@@ -112,7 +113,7 @@ Dist::Zilla::Plugin::Generate::ManifestSkip - Generate a MANIFEST.SKIP file for 
 
 =head1 VERSION
 
-version v0.1.6
+version v0.1.7
 
 =head1 SYNOPSIS
 

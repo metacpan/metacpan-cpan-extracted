@@ -1,0 +1,79 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# Show 2-octave scales by mode
+
+# For author testing only:
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(Music-FretboardDiagram);
+
+use Music::FretboardDiagram;
+
+my $settings = {
+    frets    => 16,
+    absolute => 1,
+    horiz    => 1,
+    size     => 50,
+#    verbose  => 1,
+};
+
+set($settings, 'F-mode-01', 'F ionian',
+    [ [1, '-000-0'],
+      [1, '11--11'],
+      [1, '--22--'],
+      [1, '33333-'], ]
+);
+
+set($settings, 'F-mode-02', 'G dorian',
+    [ [1, '--22--'],
+      [1, '333333'],
+      [1, '55555-'],
+      [1, '6---6-'], ]
+);
+
+set($settings, 'F-mode-03', 'A phrygian',
+    [ [5, '111111'],
+      [5, '2---2-'],
+      [5, '-333--'],
+      [5, '444-4-'], ]
+);
+
+set($settings, 'F-mode-04', 'Bb lydian',
+    [ [5, '-11111'],
+      [5, '2---22'],
+      [5, '-333--'],
+      [5, '444-4-'], ]
+);
+
+set($settings, 'F-mode-05', 'C mixolydian',
+    [ [7, '-111--'],
+      [7, '222-22'],
+      [7, '---3--'],
+      [7, '44444-'],
+      [7, '----5-'], ]
+);
+
+set($settings, 'F-mode-06', 'D aeolian',
+    [ [9, '---1--'],
+      [9, '222222'],
+      [9, '----3-'],
+      [9, '4444--'],
+      [9, '55--5-'], ]
+);
+
+set($settings, 'F-mode-07', 'E locrian',
+    [ [12, '1111-1'],
+      [12, '22--2-'],
+      [12, '--33--'],
+      [12, '44444-'], ]
+);
+
+
+sub set {
+    my ($set, $file, $name, $chords) = @_;
+    $set->{outfile} = $file;
+    $set->{showname} = $name;
+    $set->{chord} = $chords;
+    my $dia = Music::FretboardDiagram->new($set);
+    $dia->draw;
+}

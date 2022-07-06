@@ -1,197 +1,208 @@
 
 package Shipment::Temando::WSDL::Elements::updateRequest;
-$Shipment::Temando::WSDL::Elements::updateRequest::VERSION = '3.08';
+$Shipment::Temando::WSDL::Elements::updateRequest::VERSION = '3.09';
 use strict;
 use warnings;
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    sub get_xmlns {
-        'http://'
-          . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
-          . '/schema/2009_06/server.xsd';
-    }
+sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/server.xsd' }
 
-    __PACKAGE__->__set_name('updateRequest');
-    __PACKAGE__->__set_nillable();
-    __PACKAGE__->__set_minOccurs();
-    __PACKAGE__->__set_maxOccurs();
-    __PACKAGE__->__set_ref();
+__PACKAGE__->__set_name('updateRequest');
+__PACKAGE__->__set_nillable();
+__PACKAGE__->__set_minOccurs();
+__PACKAGE__->__set_maxOccurs();
+__PACKAGE__->__set_ref();
 
-    use base qw(
-      SOAP::WSDL::XSD::Typelib::Element
-      SOAP::WSDL::XSD::Typelib::ComplexType
-    );
+use base qw(
+    SOAP::WSDL::XSD::Typelib::Element
+    SOAP::WSDL::XSD::Typelib::ComplexType
+);
 
-    our $XML_ATTRIBUTE_CLASS;
-    undef $XML_ATTRIBUTE_CLASS;
+our $XML_ATTRIBUTE_CLASS;
+undef $XML_ATTRIBUTE_CLASS;
 
-    sub __get_attr_class {
-        return $XML_ATTRIBUTE_CLASS;
-    }
+sub __get_attr_class {
+    return $XML_ATTRIBUTE_CLASS;
+}
 
-    use Class::Std::Fast::Storable constructor => 'none';
-    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+use Class::Std::Fast::Storable constructor => 'none';
+use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
-    Class::Std::initialize();
+Class::Std::initialize();
 
-    {    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-        my %action_of : ATTR(:get<action>);
-        my %requestId_of : ATTR(:get<requestId>);
-        my %reference_of : ATTR(:get<reference>);
-        my %anythings_of : ATTR(:get<anythings>);
-        my %articles_of : ATTR(:get<articles>);
-        my %general_of : ATTR(:get<general>);
-        my %payment_of : ATTR(:get<payment>);
-        my %clientId_of : ATTR(:get<clientId>);
-        my %labelPrinterType_of : ATTR(:get<labelPrinterType>);
-        my %detail_of : ATTR(:get<detail>);
+my %action_of :ATTR(:get<action>);
+my %requestId_of :ATTR(:get<requestId>);
+my %reference_of :ATTR(:get<reference>);
+my %anythings_of :ATTR(:get<anythings>);
+my %articles_of :ATTR(:get<articles>);
+my %general_of :ATTR(:get<general>);
+my %payment_of :ATTR(:get<payment>);
+my %clientId_of :ATTR(:get<clientId>);
+my %labelPrinterType_of :ATTR(:get<labelPrinterType>);
+my %detail_of :ATTR(:get<detail>);
 
-        __PACKAGE__->_factory(
-            [   qw(        action
-                  requestId
-                  reference
-                  anythings
-                  articles
-                  general
-                  payment
-                  clientId
-                  labelPrinterType
-                  detail
+__PACKAGE__->_factory(
+    [ qw(        action
+        requestId
+        reference
+        anythings
+        articles
+        general
+        payment
+        clientId
+        labelPrinterType
+        detail
 
-                )
-            ],
-            {   'action'           => \%action_of,
-                'requestId'        => \%requestId_of,
-                'reference'        => \%reference_of,
-                'anythings'        => \%anythings_of,
-                'articles'         => \%articles_of,
-                'general'          => \%general_of,
-                'payment'          => \%payment_of,
-                'clientId'         => \%clientId_of,
-                'labelPrinterType' => \%labelPrinterType_of,
-                'detail'           => \%detail_of,
-            },
-            {   'action'    => 'Shipment::Temando::WSDL::Types::UpdateAction',
-                'requestId' =>
-                  'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
-                'reference' =>
-                  'Shipment::Temando::WSDL::Types::ClientReference',
-
-                'anythings' =>
-                  'Shipment::Temando::WSDL::Elements::updateRequest::_anythings',
-
-                'articles' =>
-                  'Shipment::Temando::WSDL::Elements::updateRequest::_articles',
-                'general'  => 'Shipment::Temando::WSDL::Types::General',
-                'payment'  => 'Shipment::Temando::WSDL::Types::Payment',
-                'clientId' => 'Shipment::Temando::WSDL::Types::ClientId',
-                'labelPrinterType' =>
-                  'Shipment::Temando::WSDL::Types::LabelPrinterType',
-                'detail' => 'Shipment::Temando::WSDL::Types::Detail',
-            },
-            {
-
-                'action'           => 'action',
-                'requestId'        => 'requestId',
-                'reference'        => 'reference',
-                'anythings'        => 'anythings',
-                'articles'         => 'articles',
-                'general'          => 'general',
-                'payment'          => 'payment',
-                'clientId'         => 'clientId',
-                'labelPrinterType' => 'labelPrinterType',
-                'detail'           => 'detail',
-            }
-        );
-
-    }    # end BLOCK
-
-
-    package Shipment::Temando::WSDL::Elements::updateRequest::_anythings;
-    $Shipment::Temando::WSDL::Elements::updateRequest::_anythings::VERSION =
-      '3.08';
-    use strict;
-    use warnings;
+    ) ],
     {
-        our $XML_ATTRIBUTE_CLASS;
-        undef $XML_ATTRIBUTE_CLASS;
-
-        sub __get_attr_class {
-            return $XML_ATTRIBUTE_CLASS;
-        }
-
-        use Class::Std::Fast::Storable constructor => 'none';
-        use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-        Class::Std::initialize();
-
-        {    # BLOCK to scope variables
-
-            my %anything_of : ATTR(:get<anything>);
-
-            __PACKAGE__->_factory(
-                [   qw(        anything
-
-                    )
-                ],
-                {'anything' => \%anything_of,},
-                {'anything' => 'Shipment::Temando::WSDL::Types::Anything',},
-                {
-
-                    'anything' => 'anything',
-                }
-            );
-
-        }    # end BLOCK
-
-
-    }
-
-
-    package Shipment::Temando::WSDL::Elements::updateRequest::_articles;
-    $Shipment::Temando::WSDL::Elements::updateRequest::_articles::VERSION =
-      '3.08';
-    use strict;
-    use warnings;
+        'action' => \%action_of,
+        'requestId' => \%requestId_of,
+        'reference' => \%reference_of,
+        'anythings' => \%anythings_of,
+        'articles' => \%articles_of,
+        'general' => \%general_of,
+        'payment' => \%payment_of,
+        'clientId' => \%clientId_of,
+        'labelPrinterType' => \%labelPrinterType_of,
+        'detail' => \%detail_of,
+    },
     {
-        our $XML_ATTRIBUTE_CLASS;
-        undef $XML_ATTRIBUTE_CLASS;
+        'action' => 'Shipment::Temando::WSDL::Types::UpdateAction',
+        'requestId' => 'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
+        'reference' => 'Shipment::Temando::WSDL::Types::ClientReference',
 
-        sub __get_attr_class {
-            return $XML_ATTRIBUTE_CLASS;
-        }
+        'anythings' => 'Shipment::Temando::WSDL::Elements::updateRequest::_anythings',
 
-        use Class::Std::Fast::Storable constructor => 'none';
-        use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+        'articles' => 'Shipment::Temando::WSDL::Elements::updateRequest::_articles',
+        'general' => 'Shipment::Temando::WSDL::Types::General',
+        'payment' => 'Shipment::Temando::WSDL::Types::Payment',
+        'clientId' => 'Shipment::Temando::WSDL::Types::ClientId',
+        'labelPrinterType' => 'Shipment::Temando::WSDL::Types::LabelPrinterType',
+        'detail' => 'Shipment::Temando::WSDL::Types::Detail',
+    },
+    {
 
-        Class::Std::initialize();
-
-        {    # BLOCK to scope variables
-
-            my %article_of : ATTR(:get<article>);
-
-            __PACKAGE__->_factory(
-                [   qw(        article
-
-                    )
-                ],
-                {'article' => \%article_of,},
-                {'article' => 'Shipment::Temando::WSDL::Types::Article',},
-                {
-
-                    'article' => 'article',
-                }
-            );
-
-        }    # end BLOCK
-
-
+        'action' => 'action',
+        'requestId' => 'requestId',
+        'reference' => 'reference',
+        'anythings' => 'anythings',
+        'articles' => 'articles',
+        'general' => 'general',
+        'payment' => 'payment',
+        'clientId' => 'clientId',
+        'labelPrinterType' => 'labelPrinterType',
+        'detail' => 'detail',
     }
+);
+
+} # end BLOCK
 
 
-}    # end of BLOCK
+
+
+package Shipment::Temando::WSDL::Elements::updateRequest::_anythings;
+$Shipment::Temando::WSDL::Elements::updateRequest::_anythings::VERSION = '3.09';
+use strict;
+use warnings;
+{
+our $XML_ATTRIBUTE_CLASS;
+undef $XML_ATTRIBUTE_CLASS;
+
+sub __get_attr_class {
+    return $XML_ATTRIBUTE_CLASS;
+}
+
+use Class::Std::Fast::Storable constructor => 'none';
+use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+Class::Std::initialize();
+
+{ # BLOCK to scope variables
+
+my %anything_of :ATTR(:get<anything>);
+
+__PACKAGE__->_factory(
+    [ qw(        anything
+
+    ) ],
+    {
+        'anything' => \%anything_of,
+    },
+    {
+        'anything' => 'Shipment::Temando::WSDL::Types::Anything',
+    },
+    {
+
+        'anything' => 'anything',
+    }
+);
+
+} # end BLOCK
+
+
+
+
+
+
+}
+
+
+
+package Shipment::Temando::WSDL::Elements::updateRequest::_articles;
+$Shipment::Temando::WSDL::Elements::updateRequest::_articles::VERSION = '3.09';
+use strict;
+use warnings;
+{
+our $XML_ATTRIBUTE_CLASS;
+undef $XML_ATTRIBUTE_CLASS;
+
+sub __get_attr_class {
+    return $XML_ATTRIBUTE_CLASS;
+}
+
+use Class::Std::Fast::Storable constructor => 'none';
+use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+Class::Std::initialize();
+
+{ # BLOCK to scope variables
+
+my %article_of :ATTR(:get<article>);
+
+__PACKAGE__->_factory(
+    [ qw(        article
+
+    ) ],
+    {
+        'article' => \%article_of,
+    },
+    {
+        'article' => 'Shipment::Temando::WSDL::Types::Article',
+    },
+    {
+
+        'article' => 'article',
+    }
+);
+
+} # end BLOCK
+
+
+
+
+
+
+}
+
+
+
+
+
+} # end of BLOCK
+
 
 
 1;
@@ -208,7 +219,7 @@ Shipment::Temando::WSDL::Elements::updateRequest
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

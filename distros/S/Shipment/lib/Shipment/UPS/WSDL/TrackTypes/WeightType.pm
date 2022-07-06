@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::TrackTypes::WeightType;
-$Shipment::UPS::WSDL::TrackTypes::WeightType::VERSION = '3.08';
+$Shipment::UPS::WSDL::TrackTypes::WeightType::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %UnitOfMeasurement_of : ATTR(:get<UnitOfMeasurement>);
-    my %Weight_of : ATTR(:get<Weight>);
+my %UnitOfMeasurement_of :ATTR(:get<UnitOfMeasurement>);
+my %Weight_of :ATTR(:get<Weight>);
 
-    __PACKAGE__->_factory(
-        [   qw(        UnitOfMeasurement
-              Weight
+__PACKAGE__->_factory(
+    [ qw(        UnitOfMeasurement
+        Weight
 
-            )
-        ],
-        {   'UnitOfMeasurement' => \%UnitOfMeasurement_of,
-            'Weight'            => \%Weight_of,
-        },
-        {   'UnitOfMeasurement' =>
-              'Shipment::UPS::WSDL::TrackTypes::UnitOfMeasurementType',
-            'Weight' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'UnitOfMeasurement' => \%UnitOfMeasurement_of,
+        'Weight' => \%Weight_of,
+    },
+    {
+        'UnitOfMeasurement' => 'Shipment::UPS::WSDL::TrackTypes::UnitOfMeasurementType',
+        'Weight' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'UnitOfMeasurement' => 'UnitOfMeasurement',
-            'Weight'            => 'Weight',
-        }
-    );
+        'UnitOfMeasurement' => 'UnitOfMeasurement',
+        'Weight' => 'Weight',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -62,7 +67,7 @@ Shipment::UPS::WSDL::TrackTypes::WeightType
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

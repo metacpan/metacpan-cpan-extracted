@@ -39,6 +39,7 @@ use DateTime;
 
 use AsposeSlidesCloud::Object::Axes;
 use AsposeSlidesCloud::Object::ChartCategory;
+use AsposeSlidesCloud::Object::ChartSeriesGroup;
 use AsposeSlidesCloud::Object::ChartTitle;
 use AsposeSlidesCloud::Object::ChartWall;
 use AsposeSlidesCloud::Object::EffectFormat;
@@ -393,6 +394,20 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'has_rounded_corners' => {
+    	datatype => 'boolean',
+    	base_name => 'HasRoundedCorners',
+    	description => 'Specifies the chart area shall have rounded corners.',
+    	format => '',
+    	read_only => '',
+    		},
+    'series_groups' => {
+    	datatype => 'ARRAY[ChartSeriesGroup]',
+    	base_name => 'SeriesGroups',
+    	description => 'Gets groups of series. ',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -424,7 +439,9 @@ __PACKAGE__->swagger_types( {
     'floor' => 'ChartWall',
     'legend' => 'Legend',
     'axes' => 'Axes',
-    'plot_area' => 'PlotArea'
+    'plot_area' => 'PlotArea',
+    'has_rounded_corners' => 'boolean',
+    'series_groups' => 'ARRAY[ChartSeriesGroup]'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -456,7 +473,9 @@ __PACKAGE__->attribute_map( {
     'floor' => 'Floor',
     'legend' => 'Legend',
     'axes' => 'Axes',
-    'plot_area' => 'PlotArea'
+    'plot_area' => 'PlotArea',
+    'has_rounded_corners' => 'HasRoundedCorners',
+    'series_groups' => 'SeriesGroups'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

@@ -1,0 +1,28 @@
+class TestCase::MIME::Base64 {
+  use MIME::Base64;
+
+  private static method round_trip : string ($string : string) {
+    return MIME::Base64->decode_base64(MIME::Base64->encode_base64($string));
+  }
+
+  static method test_basic : int () {
+    unless (&round_trip("example") eq "example") {
+      return 0;
+    }
+    return 1;
+  }
+
+  static method test_all : int () {
+    for (my $case_index = 0; $case_index < 300; $case_index++) {
+      my $bytes = new byte[$case_index];
+      for (my $c = 0; $c < $case_index; $c++) {
+        $bytes->[$c] = (byte)($c % 127 + 1);
+      }
+      my $test = (string)$bytes;
+      unless (&round_trip($test) eq $test) {
+        return 0;
+      }
+    }
+    return 1;
+  }
+}

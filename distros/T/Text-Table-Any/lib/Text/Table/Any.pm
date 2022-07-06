@@ -8,9 +8,9 @@ use Exporter qw(import);
 our @EXPORT_OK = qw(generate_table);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-27'; # DATE
+our $DATE = '2022-07-03'; # DATE
 our $DIST = 'Text-Table-Any'; # DIST
-our $VERSION = '0.114'; # VERSION
+our $VERSION = '0.115'; # VERSION
 
 our %BACKEND_FEATURES = (
     "Term::Table" => {
@@ -130,7 +130,7 @@ our %BACKEND_FEATURES = (
         rows => 1,
         header_row => 1,
         separate_rows => 1,
-        caption => 0,
+        caption => 1,
         backend_opts => 1,
         backend_opts_note => "Backend-specific options (backend_opts) will be passed to table() or generate_table() directly",
         align => 0,
@@ -617,7 +617,7 @@ Text::Table::Any - Generate text table using one of several backends
 
 =head1 VERSION
 
-This document describes version 0.114 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2022-05-27.
+This document describes version 0.115 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2022-07-03.
 
 =head1 SYNOPSIS
 
@@ -868,7 +868,7 @@ Support matrix for each backend:
  | Text::Table::LTSV             | 0     |                                                              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 0          | 1    | 0             |
  | Text::Table::Manifold         | 1     |                                                              |              |                                                                                                | 0       | 1          | 1    | 0             |
  | Text::Table::More             | 1     |                                                              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
- | Text::Table::Org              | 0     |                                                              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
+ | Text::Table::Org              | 0     |                                                              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 1       | 1          | 1    | 1             |
  | Text::Table::Paragraph        | 0     |                                                              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 0             |
  | Text::Table::Sprintf          | 0     |                                                              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
  | Text::Table::TSV              | 0     |                                                              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 0          | 1    | 0             |
@@ -912,7 +912,7 @@ Optional. Array of Str or Str.
 
 This takes an array ref with one entry per column, to specify the alignment of
 that column. Legal values are 'l', 'c', and 'r'. You can also specify a single
-alignment for all columns. ANSI escape codes are handled.
+alignment for all columns.
 
 Note that some backends like L<Text::ANSITable> and L<Text::Table::More> support
 per-row or per-cell or even conditional alignment. Some backends like
@@ -964,13 +964,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

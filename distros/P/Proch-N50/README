@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution Proch-N50,
-version 1.4.10:
+version 1.5.0:
 
   a small module to calculate N50 (total size, and total number of sequences) for a FASTA or FASTQ file. It's easy to install, with minimal dependencies.
 

@@ -13,7 +13,7 @@ my $app1 = App::Env->new( 'App1' );
 ok( defined $app1, 'create env' );
 
 # make sure that worked
-is( $app1->env('Site1_App1'), 1, "check env" );
+is( $app1->env( 'Site1_App1' ), 1, "check env" );
 
 # and brand it
 $app1->setenv( 'AppEnvTestID' => $$ );
@@ -24,16 +24,16 @@ $app1->setenv( 'AppEnvTestID' => $$ );
 
     ok( defined $app2, 'temp clone' );
 
-    is( $app2->env('AppEnvTestID'), $$, "verify parent" );
+    is( $app2->env( 'AppEnvTestID' ), $$, "verify parent" );
 
     # and brand it
     $app2->setenv( 'AppEnvTestID' => -$$ );
 
-    is( $app2->env('AppEnvTestID'), -$$, "verify clone" );
-    is( $app1->env('AppEnvTestID'), $$, "verify untouched parent" );
+    is( $app2->env( 'AppEnvTestID' ), -$$, "verify clone" );
+    is( $app1->env( 'AppEnvTestID' ), $$,  "verify untouched parent" );
 
     # make sure it hasn't been cached
-    ok( ! defined App::Env::retrieve( $app2->cacheid ), 'uncached clone' );
+    ok( !defined App::Env::retrieve( $app2->cacheid ), 'uncached clone' );
 
 }
 

@@ -1,5 +1,39 @@
 Revision history for MIDI-Bassline-Walk
 
+0.0502 2022-07-06 05:34:15
+    - Specify minimum version for L::U.
+
+0.0501 2022-07-04 15:40:56
+    - Improve documentation a bit.
+
+0.0500 2022-07-03 19:52:17
+    - Build the default scale subroutine for either major/minor or modal.
+    - Use the List::SomeUtils module.
+    - Allow the tonic attribute to apply to any Western 7-note scale.
+    - Fix-up eg/solitude a bit.
+
+0.0404 2022-07-03 08:14:01
+    - Fix variable naming in eg/.
+    - Improve documentation slightly.
+
+0.0403 2022-07-03 06:47:37
+    - Drop "flavor-clashing" scale notes for *any* scale.
+
+0.0402 2022-07-02 10:25:06
+    - Improve tests slightly.
+    - Add the eg/solitude program.
+
+0.0401 2022-07-02 00:11:29
+    - Optionally toggle inclusion of non-scale chord notes in the choices.
+    - Make sure the _closest() function has arguments.
+    - Modularize boolean isa code.
+    - Improve documentation slightly.
+    - Improve tests.
+
+0.0400 2022-07-01 12:08:47
+    - Enable modal accompaniment, instead of playing non-key, sour notes.
+    - Improve documentation.
+
 0.0312 2022-06-16 20:10:09
     - Improve documentation.
     - Use Music::PitchNum instead of doing Music::Note gymnastics.
@@ -19,7 +53,7 @@ Revision history for MIDI-Bassline-Walk
     - Whoops - Incremented the version number twice. :\
 
 0.0306 2022-01-26 07:47:22
-    - I *think* that voice->context takes an arrayref, but I'm not sure. thrig?
+    - I *think* that voice->context takes an arrayref, but I'm not sure... thrig?
     - If tonic is set, replace the first note with the I, III, or V notes.
 
 0.0305 2022-01-25 12:23:59

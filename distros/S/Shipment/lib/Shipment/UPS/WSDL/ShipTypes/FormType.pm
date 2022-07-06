@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::FormType;
-$Shipment::UPS::WSDL::ShipTypes::FormType::VERSION = '3.08';
+$Shipment::UPS::WSDL::ShipTypes::FormType::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,46 +20,52 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Code_of : ATTR(:get<Code>);
-    my %Description_of : ATTR(:get<Description>);
-    my %Image_of : ATTR(:get<Image>);
-    my %FormGroupId_of : ATTR(:get<FormGroupId>);
-    my %FormGroupIdName_of : ATTR(:get<FormGroupIdName>);
+my %Code_of :ATTR(:get<Code>);
+my %Description_of :ATTR(:get<Description>);
+my %Image_of :ATTR(:get<Image>);
+my %FormGroupId_of :ATTR(:get<FormGroupId>);
+my %FormGroupIdName_of :ATTR(:get<FormGroupIdName>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Code
-              Description
-              Image
-              FormGroupId
-              FormGroupIdName
+__PACKAGE__->_factory(
+    [ qw(        Code
+        Description
+        Image
+        FormGroupId
+        FormGroupIdName
 
-            )
-        ],
-        {   'Code'            => \%Code_of,
-            'Description'     => \%Description_of,
-            'Image'           => \%Image_of,
-            'FormGroupId'     => \%FormGroupId_of,
-            'FormGroupIdName' => \%FormGroupIdName_of,
-        },
-        {   'Code'        => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Image'       => 'Shipment::UPS::WSDL::ShipTypes::FormImageType',
-            'FormGroupId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'FormGroupIdName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'Code' => \%Code_of,
+        'Description' => \%Description_of,
+        'Image' => \%Image_of,
+        'FormGroupId' => \%FormGroupId_of,
+        'FormGroupIdName' => \%FormGroupIdName_of,
+    },
+    {
+        'Code' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Image' => 'Shipment::UPS::WSDL::ShipTypes::FormImageType',
+        'FormGroupId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'FormGroupIdName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'Code'            => 'Code',
-            'Description'     => 'Description',
-            'Image'           => 'Image',
-            'FormGroupId'     => 'FormGroupId',
-            'FormGroupIdName' => 'FormGroupIdName',
-        }
-    );
+        'Code' => 'Code',
+        'Description' => 'Description',
+        'Image' => 'Image',
+        'FormGroupId' => 'FormGroupId',
+        'FormGroupIdName' => 'FormGroupIdName',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -76,7 +82,7 @@ Shipment::UPS::WSDL::ShipTypes::FormType
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

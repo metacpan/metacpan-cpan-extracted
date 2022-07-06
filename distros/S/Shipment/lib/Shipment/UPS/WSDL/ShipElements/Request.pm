@@ -1,22 +1,22 @@
 
 package Shipment::UPS::WSDL::ShipElements::Request;
-$Shipment::UPS::WSDL::ShipElements::Request::VERSION = '3.08';
+$Shipment::UPS::WSDL::ShipElements::Request::VERSION = '3.09';
 use strict;
 use warnings;
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Common/v1.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Common/v1.0' }
 
-    __PACKAGE__->__set_name('Request');
-    __PACKAGE__->__set_nillable();
-    __PACKAGE__->__set_minOccurs();
-    __PACKAGE__->__set_maxOccurs();
-    __PACKAGE__->__set_ref();
-    use base qw(
-      SOAP::WSDL::XSD::Typelib::Element
-      Shipment::UPS::WSDL::ShipTypes::RequestType
-    );
+__PACKAGE__->__set_name('Request');
+__PACKAGE__->__set_nillable();
+__PACKAGE__->__set_minOccurs();
+__PACKAGE__->__set_maxOccurs();
+__PACKAGE__->__set_ref();
+use base qw(
+    SOAP::WSDL::XSD::Typelib::Element
+    Shipment::UPS::WSDL::ShipTypes::RequestType
+);
 
 }
 
@@ -34,7 +34,7 @@ Shipment::UPS::WSDL::ShipElements::Request
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

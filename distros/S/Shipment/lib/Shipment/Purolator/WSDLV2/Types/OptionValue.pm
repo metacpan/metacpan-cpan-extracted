@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::OptionValue;
-$Shipment::Purolator::WSDLV2::Types::OptionValue::VERSION = '3.08';
+$Shipment::Purolator::WSDLV2::Types::OptionValue::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,31 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Value_of : ATTR(:get<Value>);
-    my %Description_of : ATTR(:get<Description>);
+my %Value_of :ATTR(:get<Value>);
+my %Description_of :ATTR(:get<Description>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Value
-              Description
+__PACKAGE__->_factory(
+    [ qw(        Value
+        Description
 
-            )
-        ],
-        {   'Value'       => \%Value_of,
-            'Description' => \%Description_of,
-        },
-        {   'Value'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'Value' => \%Value_of,
+        'Description' => \%Description_of,
+    },
+    {
+        'Value' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'Value'       => 'Value',
-            'Description' => 'Description',
-        }
-    );
+        'Value' => 'Value',
+        'Description' => 'Description',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -61,7 +67,7 @@ Shipment::Purolator::WSDLV2::Types::OptionValue
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

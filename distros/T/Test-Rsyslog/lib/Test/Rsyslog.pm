@@ -11,7 +11,7 @@ use Carp();
 use POSIX();
 use Config;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub _USER_READ_WRITE_PERMISSIONS         { return 600 }
 sub _USER_READ_WRITE_EXECUTE_PERMISSIONS { return 700 }
@@ -56,8 +56,8 @@ sub find {
 }
 
 sub new {
-    my ($class) = @_;
-    my $self = bless {}, $class;
+    my ($class)        = @_;
+    my $self           = bless {}, $class;
     my $root_directory = File::Temp::mktemp(
         File::Spec->catfile(
             File::Spec->tmpdir(), 'perl_test_rsyslog_XXXXXXXXXXX'
@@ -130,7 +130,7 @@ sub start {
         eval {
             # clear any possible tainted environment variables
             local %ENV = %ENV;
-            local $ENV{'PATH'} = '/usr/bin:/usr/sbin:/sbin:/bin:';
+            local $ENV{'PATH'} = '/usr/bin:/usr/sbin:/sbin:/bin';
             delete $ENV{'BASH_ENV'};
             delete $ENV{'ENV'};
             delete $ENV{'IFS'};
@@ -215,7 +215,7 @@ Test::Rsyslog - Creates a temporary instance of rsyslog to run tests against
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
  
@@ -374,7 +374,7 @@ David Dick, C<< <ddick at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 David Dick.
+Copyright 2022 David Dick.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

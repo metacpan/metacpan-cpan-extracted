@@ -48,6 +48,7 @@ sub set_attributes {
     return [
         { name => 'sqlite_string_mode',         default => 3, values => $values }, # $values->[3] == DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK (5)
         { name => 'sqlite_see_if_its_a_number', default => 1, values => [ 0, 1 ] },
+        { name => 'ChopBlanks',                 default => 0, values => [ 0, 1 ] },
     ];
 }
 
@@ -64,7 +65,7 @@ sub get_db_handle {
         AutoCommit => 1,
         ShowErrorStatement => 1,
         %$set_attributes,
-    } ) or die DBI->errstr;
+    } );
     return $dbh;
 }
 

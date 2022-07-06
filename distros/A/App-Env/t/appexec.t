@@ -3,45 +3,88 @@
 use Test2::V0;
 use Test::Lib;
 
-use File::Temp;
 use File::Spec::Functions qw[ catfile ];
+use Capture::Tiny 'capture_stdout';
 
 
 my $exe    = catfile( qw[ blib script appexec ] );
 my $lib    = catfile( qw[ t lib ] );
 my $script = catfile( qw [ t bin appexec.pl ] );
 
-{
-    my $fh = File::Temp->new;
+subtest 'direct' => sub {
+    my ( $stdout, $exit ) = capture_stdout {
+        system( $^X, '-Mblib', "-I${lib}", $exe, 'App1', $^X, $script,
+            'Site1_App1', );
+    };
 
-  SKIP: {
-        ok(
-            system( $^X, '-Mblib', "-I${lib}", $exe,
-                'App1', $^X, $script, $fh->filename
-              ) == 0,
-            'run appexec for App1'
-        ) or skip( "error running appexec", 1 );
 
-        chomp( my $res = <$fh> );
-        is( $res, '1', 'direct' );
-    }
-}
+    is( $exit, 0, 'run appexec for App1' )
+      or bail_out( "error running appexec" );
 
-{
-    my $fh = File::Temp->new;
+    chomp $stdout;
+    is( $stdout, '1', 'result' );
+};
 
-  SKIP: {
+subtest 'alias' => sub {
+    my ( $stdout, $exit ) = capture_stdout {
+        system( $^X, '-Mblib', "-I${lib}", $exe, 'App3', $^X, $script,
+            'Site1_App1', );
+    };
 
-        ok(
-            system( $^X, '-Mblib', "-I${lib}", $exe,
-                'App3', $^X, $script, $fh->filename
-              ) == 0,
-            'run appexec for App3'
-        ) or skip( "error running appexec", 1 );
+    is( $exit, 0, 'run appexec for App1' )
+      or bail_out( "error running appexec" );
 
-        chomp( my $res = <$fh> );
-        is( $res, '1', 'alias' );
-    }
-}
+    chomp $stdout;
+    is( $stdout, '1', 'result' );
+};
+
+subtest 'define' => sub {
+    my ( $stdout, $exit ) = capture_stdout {
+        system( $^X, '-Mblib',
+            "-I${lib}", $exe,
+            '-D',       'TEST_APPEXEC_DEFINE=got_three_please',
+            '--env',    'App1',
+            $^X,        $script,
+            'TEST_APPEXEC_DEFINE',
+        );
+    };
+
+    is( $exit, 0, 'run appexec for App1' )
+      or bail_out( "error running appexec" );
+
+    chomp $stdout;
+    is( $stdout, 'got_three_please', 'result' );
+};
+
+subtest 'dumpvar' => sub {
+    my ( $stdout, $exit ) = capture_stdout {
+        system( $^X, '-Mblib',
+            "-I${lib}",  $exe,
+            '-D',        'TEST_APPEXEC_DEFINE0=got_three_please',
+            '-D',        'TEST_APPEXEC_DEFINE1=got_four_please',
+            '--env',     'App1',
+            '--dumpenv', 'values',
+            '--dumpvar', 'TEST_APPEXEC_DEFINE0',
+            '--dumpvar', 'TEST_APPEXEC_DEFINE1',
+        );
+    };
+
+    is( $exit, 0, 'run appexec for App1' )
+      or bail_out( "error running appexec" );
+
+    chomp $stdout;
+    my @output = split /\n/, $stdout;
+
+    is(
+        \@output,
+        bag {
+            item 'got_three_please';
+            item 'got_four_please';
+            end;
+        },
+        'result'
+    );
+};
+
 
 done_testing;

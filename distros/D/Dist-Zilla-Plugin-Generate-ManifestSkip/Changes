@@ -1,5 +1,12 @@
 Revision history for Dist-Zilla-Plugin-Generate-ManifestSkip
 
+v0.1.7    2022-07-05 12:10:13+01:00 Europe/London
+  [Enhancements]
+  - Add a rule to skip .mite directory.
+
+  [Toolchain]
+  - Sign release.
+
 v0.1.6    2022-02-28 23:28:45+00:00 Europe/London
   [Bug Fixes]
   - Remove bad rule that caused conflicts with Module::CPANS::Analyse

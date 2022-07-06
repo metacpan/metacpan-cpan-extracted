@@ -194,20 +194,19 @@ sub build_dynamic_lib_dist {
   my $cc_native = SPVM::Builder::CC->new(
     build_dir => $self->{build_dir},
     builder => $self,
-    quiet => 0,
   );
   
   my $method_names = $self->get_method_names($class_name, $category);
   $cc_native->build_dist($class_name, {category => $category});
 }
 
-sub build_and_bind_dynamic_lib {
+sub build_and_bind_dynamic_lib_at_runtime {
   my ($self, $class_name, $category) = @_;
   
   my $cc = SPVM::Builder::CC->new(
     build_dir => $self->{build_dir},
     builder => $self,
-    quiet => 1,
+    runtime => 1,
   );
   
   my $method_names = $self->get_method_names($class_name, $category);

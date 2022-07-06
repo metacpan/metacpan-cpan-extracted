@@ -4,22 +4,23 @@
 
 package Math::BigInt::Lite;
 
-require 5.006002;
+require 5.006001;
 
 use strict;
 use warnings;
 
+require Exporter;
 use Scalar::Util qw< blessed >;
 
 use Math::BigInt;
 
 our ($_trap_inf, $_trap_nan);
 
-our @ISA = qw(Math::BigInt);
+our @ISA = qw(Math::BigInt Exporter);
 our @EXPORT_OK = qw/objectify/;
 my $class = 'Math::BigInt::Lite';
 
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 
 ##############################################################################
 # global constants, flags and accessory
@@ -1026,13 +1027,12 @@ sub blsft {
 
 sub band {
     # AND two objects
-    my ($x, $y, @r) = @_;   #objectify(2, @_);
+    my ($class, $x, $y, @r) = ref($_[0]) && ref($_[0]) eq ref($_[1])
+                            ? (ref($_[0]), @_) : objectify(2, @_);
 
-    $x = $class->new($x) unless ref($x);
-    $y = $class->new($x) unless ref($y);
+    return $upgrade -> band($x, $y, @r)
+      unless $x -> isa($class) && $y -> isa($class);
 
-    return $x->band($y, @r) unless $x->isa($class);
-    return $upgrade->band($x, $y, @r) unless $y->isa($class);
     use integer;
     $$x = ($$x+0) & ($$y+0);    # +0 to avoid string-context
     $x;
@@ -1040,13 +1040,12 @@ sub band {
 
 sub bxor {
     # XOR two objects
-    my ($x, $y, @r) = @_;   #objectify(2, @_);
+    my ($class, $x, $y, @r) = ref($_[0]) && ref($_[0]) eq ref($_[1])
+                            ? (ref($_[0]), @_) : objectify(2, @_);
 
-    $x = $class->new($x) unless ref($x);
-    $y = $class->new($x) unless ref($y);
+    return $upgrade -> bxor($x, $y, @r)
+      unless $x -> isa($class) && $y -> isa($class);
 
-    return $x->bxor($y, @r) unless $x->isa($class);
-    return $upgrade->bxor($x, $y, @r) unless $y->isa($class);
     use integer;
     $$x = ($$x+0) ^ ($$y+0);    # +0 to avoid string-context
     $x;
@@ -1054,13 +1053,12 @@ sub bxor {
 
 sub bior {
     # OR two objects
-    my ($x, $y, @r) = @_;   #objectify(2, @_);
+    my ($class, $x, $y, @r) = ref($_[0]) && ref($_[0]) eq ref($_[1])
+                            ? (ref($_[0]), @_) : objectify(2, @_);
 
-    $x = $class->new($x) unless ref($x);
-    $y = $class->new($x) unless ref($y);
+    return $upgrade -> bior($x, $y, @r)
+      unless $x -> isa($class) && $y -> isa($class);
 
-    return $x->bior($y, @r) unless $x->isa($class);
-    return $upgrade->bior($x, $y, @r) unless $y->isa($class);
     use integer;
     $$x = ($$x+0) | ($$y+0);    # +0 to avoid string-context
     $x;

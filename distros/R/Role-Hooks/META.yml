@@ -26,7 +26,7 @@ optional_features: {}
 provides:
   Role::Hooks:
     file: lib/Role/Hooks.pm
-    version: '0.005'
+    version: '0.008'
 requires:
   Class::Method::Modifiers: '0'
   List::Util: '1.45'
@@ -37,6 +37,6 @@ resources:
   homepage: https://metacpan.org/release/Role-Hooks
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-role-hooks.git
-version: '0.005'
+version: '0.008'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackInterfaces::TrackService::TrackServicePort;
-$Shipment::FedEx::WSDL::TrackInterfaces::TrackService::TrackServicePort::VERSION = '3.08';
+$Shipment::FedEx::WSDL::TrackInterfaces::TrackService::TrackServicePort::VERSION = '3.09';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -8,146 +8,119 @@ use base qw(SOAP::WSDL::Client::Base);
 
 # only load if it hasn't been loaded before
 require Shipment::FedEx::WSDL::TrackTypemaps::TrackService
-  if not Shipment::FedEx::WSDL::TrackTypemaps::TrackService->can('get_class');
+    if not Shipment::FedEx::WSDL::TrackTypemaps::TrackService->can('get_class');
 
 sub START {
     my $proxy_domain = $_[2]->{proxy_domain} || 'wsbeta.fedex.com:443';
 
-    $_[0]->set_proxy('https://' . $proxy_domain . '/web-services/track')
-      if not $_[2]->{proxy};
+    $_[0]->set_proxy('https://' . $proxy_domain . '/web-services/track') if not $_[2]->{proxy};
 
-    $_[0]->set_class_resolver(
-        'Shipment::FedEx::WSDL::TrackTypemaps::TrackService')
-      if not $_[2]->{class_resolver};
+    $_[0]->set_class_resolver('Shipment::FedEx::WSDL::TrackTypemaps::TrackService')
+        if not $_[2]->{class_resolver};
 
     $_[0]->set_prefix($_[2]->{use_prefix}) if exists $_[2]->{use_prefix};
 }
 
 sub retrieveSignatureProofOfDeliveryLetter {
     my ($self, $body, $header) = @_;
-    die
-      "retrieveSignatureProofOfDeliveryLetter must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'retrieveSignatureProofOfDeliveryLetter',
-            soap_action =>
-              'http://fedex.com/ws/track/v9/retrieveSignatureProofOfDeliveryLetter',
-            style => 'document',
-            body  => {
+    die "retrieveSignatureProofOfDeliveryLetter must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'retrieveSignatureProofOfDeliveryLetter',
+        soap_action => 'http://fedex.com/ws/track/v9/retrieveSignatureProofOfDeliveryLetter',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         => [
-                    qw( Shipment::FedEx::WSDL::TrackElements::SignatureProofOfDeliveryLetterRequest )
-                ],
-            },
-            header => {
-
-            },
-            headerfault => {
-
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::FedEx::WSDL::TrackElements::SignatureProofOfDeliveryLetterRequest )],
         },
-        $body,
-        $header
-    );
+        header => {
+            
+        },
+        headerfault => {
+            
+        }
+    }, $body, $header);
 }
 
 
 sub track {
     my ($self, $body, $header) = @_;
-    die "track must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'track',
-            soap_action => 'http://fedex.com/ws/track/v9/track',
-            style       => 'document',
-            body        => {
+    die "track must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'track',
+        soap_action => 'http://fedex.com/ws/track/v9/track',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::FedEx::WSDL::TrackElements::TrackRequest )],
-            },
-            header => {
-
-            },
-            headerfault => {
-
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::FedEx::WSDL::TrackElements::TrackRequest )],
         },
-        $body,
-        $header
-    );
+        header => {
+            
+        },
+        headerfault => {
+            
+        }
+    }, $body, $header);
 }
 
 
 sub sendSignatureProofOfDeliveryFax {
     my ($self, $body, $header) = @_;
-    die
-      "sendSignatureProofOfDeliveryFax must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'sendSignatureProofOfDeliveryFax',
-            soap_action =>
-              'http://fedex.com/ws/track/v9/sendSignatureProofOfDeliveryFax',
-            style => 'document',
-            body  => {
+    die "sendSignatureProofOfDeliveryFax must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'sendSignatureProofOfDeliveryFax',
+        soap_action => 'http://fedex.com/ws/track/v9/sendSignatureProofOfDeliveryFax',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         => [
-                    qw( Shipment::FedEx::WSDL::TrackElements::SignatureProofOfDeliveryFaxRequest )
-                ],
-            },
-            header => {
-
-            },
-            headerfault => {
-
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::FedEx::WSDL::TrackElements::SignatureProofOfDeliveryFaxRequest )],
         },
-        $body,
-        $header
-    );
+        header => {
+            
+        },
+        headerfault => {
+            
+        }
+    }, $body, $header);
 }
 
 
 sub sendNotifications {
     my ($self, $body, $header) = @_;
-    die "sendNotifications must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'sendNotifications',
-            soap_action => 'http://fedex.com/ws/track/v9/sendNotifications',
-            style       => 'document',
-            body        => {
+    die "sendNotifications must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'sendNotifications',
+        soap_action => 'http://fedex.com/ws/track/v9/sendNotifications',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         => [
-                    qw( Shipment::FedEx::WSDL::TrackElements::SendNotificationsRequest )
-                ],
-            },
-            header => {
-
-            },
-            headerfault => {
-
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::FedEx::WSDL::TrackElements::SendNotificationsRequest )],
         },
-        $body,
-        $header
-    );
+        header => {
+            
+        },
+        headerfault => {
+            
+        }
+    }, $body, $header);
 }
+
+
 
 
 1;
@@ -164,7 +137,7 @@ Shipment::FedEx::WSDL::TrackInterfaces::TrackService::TrackServicePort
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 SYNOPSIS
 

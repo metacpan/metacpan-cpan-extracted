@@ -43,7 +43,7 @@ $clipboard_unavailable = $IO::Clipboard::clipboard_unavailable;
 #	Initialization
 #
 
-our $VERSION = '0.125';
+our $VERSION = '0.126';
 
 use constant LINFMT => <<eod;
 %s %s %8.4f %9.4f %7.1f %-4s %s
@@ -3905,7 +3905,7 @@ satellites. It also provides the following bells and whistles:
 
 * The ability to acquire the NORAD element sets directly from
 L<https://www.space-track.org/>, L<https://spaceflight.nasa.gov/>,
-or L<http://celestrak.com/> (or, indeed, any source supported by
+or L<http://celestrak.org/> (or, indeed, any source supported by
 Astro::SpaceTrack), provided the user has an Internet connection
 and the relevant site is functional. The Space Track site also
 requires registration. You will need to install B<Astro::SpaceTrack>

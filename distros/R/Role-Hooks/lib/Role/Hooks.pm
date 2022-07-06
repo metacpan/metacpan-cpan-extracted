@@ -7,7 +7,7 @@ package Role::Hooks;
 use Class::Method::Modifiers qw( install_modifier );
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.005';
+our $VERSION   = '0.008';
 
 our %CALLBACKS_BEFORE_APPLY;
 our %CALLBACKS_AFTER_APPLY;
@@ -70,6 +70,13 @@ sub is_role {
 		return 'Role::Basic';
 	}
 	
+	no strict 'refs';
+	no warnings 'once';
+	my $UM = ${"$target\::USES_MITE"};
+	if ( defined $UM and $UM eq 'Mite::Role' ) {
+		return 'Mite::Role';
+	}
+	
 	return undef;
 }
 
@@ -126,6 +133,11 @@ sub after_inflate {
 		}
 		if ($INC{'Role/Basic.pm'}) {
 			$patched{'Role::Basic'} ||= $me->_install_patches_rolebasic;
+		}
+		
+		my $is_role = $me->is_role($target);
+		if ( defined $is_role and $is_role eq 'Mite::Role' ) {
+			$patched{'Mite::Role'}{$target} ||= $me->_install_patches_miterole($target);
 		}
 	}
 	
@@ -356,6 +368,38 @@ sub after_inflate {
 		
 		return 1;
 	}
+	
+	sub _install_patches_miterole {
+		my ($me, $target) = @_;
+		return 1 if $ENV{MITE_COMPILE};
+		install_modifier $target, around => '__FINALIZE_APPLICATION__', sub {
+			my ($orig, $role, $to, $modifiers) = @_;
+			local *ARGS = $modifiers || {};
+			my $indirect = ( $modifiers || {} )->{-indirect};
+			if ( not $indirect ) {
+				$me->_debug("Calling role hooks for $role before application to $to") if DEBUG;
+				my @callbacks = @{ $CALLBACKS_BEFORE_APPLY{$role} || [] };
+				for my $cb (@callbacks) {
+					$cb->($role, $to);
+				}
+			}
+			$role->$orig($to, $modifiers);
+			if ( not $indirect ) {
+				$me->_debug("Calling role hooks for $role after application to $to") if DEBUG;
+				my @callbacks = @{ $CALLBACKS_AFTER_APPLY{$role} || [] };
+				for my $cb (@callbacks) {
+					$cb->($role, $to);
+				}
+			}
+			my $to_type = $me->is_role($to);
+			if (defined $to_type and $to_type eq 'Mite::Role') {
+				$me->_debug("Copying role hooks for $role to $to") if DEBUG;
+				$me->before_apply($to, @{ $CALLBACKS_BEFORE_APPLY{$role} || [] });
+				$me->after_apply($to, @{ $CALLBACKS_AFTER_APPLY{$role} || [] });
+			}
+		};
+		1;
+	}
 }
 
 1;
@@ -395,10 +439,10 @@ to another role.
 =head2 Compatibility
 
 It should work with L<Role::Tiny>, L<Moo::Role>, L<Moose::Role>,
-L<Mouse::Role>, and L<Role::Basic>. Not all class builders work well with
-all role builders (for example, a Moose class consuming a Mouse role). But
-when they do work together, Role::Hooks should be able to run the callbacks.
-(The only combination I've tested is Moo with Moose though.)
+L<Mouse::Role>, L<Role::Basic>, and L<Mite>. Not all class builders work well
+with all role builders (for example, a Moose class consuming a Mouse role).
+But when they do work together, Role::Hooks should be able to run the
+callbacks. (The only combination I've tested is Moo with Moose though.)
 
 Some other role implementations (such as L<Moos::Role>, L<exact::role>,
 and L<OX::Role>) are just wrappers around one of the supported role builders,
@@ -409,6 +453,11 @@ would be ideal; after the role has been fully loaded and its methods have
 been copied into the target package, but before handling C<requires>, and
 before patching the C<DOES> method in the target package. If you are using
 Role::Basic, consider switching to Role::Tiny.
+
+With Mite, the C<before_apply> hook is called fairly late; after the role
+is fully loaded and attributes and methods have been copied into the target
+package, after C<DOES> has been patched, but before method modifiers from the
+role have been applied to the target package.
 
 Apart from Role::Tiny/Moo::Role, a hashref of additional arguments (things
 like "-excludes" and "-alias") can be passed when consuming a role. Although
@@ -506,8 +555,8 @@ get called if any packages that role was applied to get inflated.
 Will return true if the given package seems to be a role, false otherwise.
 
 (In fact, returns a string representing which role builder the role seems
-to be using -- "Role::Tiny", "Moose::Role", "Mouse::Role", or "Role::Basic";
-roles built using Moo::Role are detected as "Role::Tiny".)
+to be using -- "Role::Tiny", "Moose::Role", "Mouse::Role", "Role::Basic",
+or "Mite::Role"; roles built using Moo::Role are detected as "Role::Tiny".)
 
 =back
 

@@ -190,16 +190,25 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'invert_if_negative' => {
+    	datatype => 'boolean',
+    	base_name => 'InvertIfNegative',
+    	description => 'True if the data point shall invert its colors if the value is negative. Applies to bar, column and bubble series.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
     'value' => 'double',
-    'set_as_total' => 'boolean'
+    'set_as_total' => 'boolean',
+    'invert_if_negative' => 'boolean'
 } );
 
 __PACKAGE__->attribute_map( {
     'value' => 'Value',
-    'set_as_total' => 'SetAsTotal'
+    'set_as_total' => 'SetAsTotal',
+    'invert_if_negative' => 'InvertIfNegative'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

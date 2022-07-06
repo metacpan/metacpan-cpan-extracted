@@ -1,5 +1,5 @@
 package Lingua::PTD::Dumper;
-$Lingua::PTD::Dumper::VERSION = '1.16';
+$Lingua::PTD::Dumper::VERSION = '1.17';
 use warnings;
 use strict;
 

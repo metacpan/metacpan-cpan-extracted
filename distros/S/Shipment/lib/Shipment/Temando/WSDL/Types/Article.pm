@@ -1,16 +1,12 @@
 package Shipment::Temando::WSDL::Types::Article;
-$Shipment::Temando::WSDL::Types::Article::VERSION = '3.08';
+$Shipment::Temando::WSDL::Types::Article::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(0);
 
-sub get_xmlns {
-    'http://'
-      . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
-      . '/schema/2009_06/common.xsd';
-}
+sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/common.xsd' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -24,42 +20,47 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %anythingIndex_of : ATTR(:get<anythingIndex>);
-    my %articleNumber_of : ATTR(:get<articleNumber>);
-    my %labelDocument_of : ATTR(:get<labelDocument>);
-    my %labelDocumentType_of : ATTR(:get<labelDocumentType>);
+my %anythingIndex_of :ATTR(:get<anythingIndex>);
+my %articleNumber_of :ATTR(:get<articleNumber>);
+my %labelDocument_of :ATTR(:get<labelDocument>);
+my %labelDocumentType_of :ATTR(:get<labelDocumentType>);
 
-    __PACKAGE__->_factory(
-        [   qw(        anythingIndex
-              articleNumber
-              labelDocument
-              labelDocumentType
+__PACKAGE__->_factory(
+    [ qw(        anythingIndex
+        articleNumber
+        labelDocument
+        labelDocumentType
 
-            )
-        ],
-        {   'anythingIndex'     => \%anythingIndex_of,
-            'articleNumber'     => \%articleNumber_of,
-            'labelDocument'     => \%labelDocument_of,
-            'labelDocumentType' => \%labelDocumentType_of,
-        },
-        {   'anythingIndex' => 'Shipment::Temando::WSDL::Types::AnythingIndex',
-            'articleNumber' => 'Shipment::Temando::WSDL::Types::ArticleNumber',
-            'labelDocument' => 'Shipment::Temando::WSDL::Types::LabelDocument',
-            'labelDocumentType' =>
-              'Shipment::Temando::WSDL::Types::LabelDocumentType',
-        },
-        {
+    ) ],
+    {
+        'anythingIndex' => \%anythingIndex_of,
+        'articleNumber' => \%articleNumber_of,
+        'labelDocument' => \%labelDocument_of,
+        'labelDocumentType' => \%labelDocumentType_of,
+    },
+    {
+        'anythingIndex' => 'Shipment::Temando::WSDL::Types::AnythingIndex',
+        'articleNumber' => 'Shipment::Temando::WSDL::Types::ArticleNumber',
+        'labelDocument' => 'Shipment::Temando::WSDL::Types::LabelDocument',
+        'labelDocumentType' => 'Shipment::Temando::WSDL::Types::LabelDocumentType',
+    },
+    {
 
-            'anythingIndex'     => 'anythingIndex',
-            'articleNumber'     => 'articleNumber',
-            'labelDocument'     => 'labelDocument',
-            'labelDocumentType' => 'labelDocumentType',
-        }
-    );
+        'anythingIndex' => 'anythingIndex',
+        'articleNumber' => 'articleNumber',
+        'labelDocument' => 'labelDocument',
+        'labelDocumentType' => 'labelDocumentType',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -76,7 +77,7 @@ Shipment::Temando::WSDL::Types::Article
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

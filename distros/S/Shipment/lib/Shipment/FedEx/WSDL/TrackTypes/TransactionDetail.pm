@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::TransactionDetail;
-$Shipment::FedEx::WSDL::TrackTypes::TransactionDetail::VERSION = '3.08';
+$Shipment::FedEx::WSDL::TrackTypes::TransactionDetail::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/track/v9'}
+sub get_xmlns { 'http://fedex.com/ws/track/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,33 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %CustomerTransactionId_of : ATTR(:get<CustomerTransactionId>);
-    my %Localization_of : ATTR(:get<Localization>);
+my %CustomerTransactionId_of :ATTR(:get<CustomerTransactionId>);
+my %Localization_of :ATTR(:get<Localization>);
 
-    __PACKAGE__->_factory(
-        [   qw(        CustomerTransactionId
-              Localization
+__PACKAGE__->_factory(
+    [ qw(        CustomerTransactionId
+        Localization
 
-            )
-        ],
-        {   'CustomerTransactionId' => \%CustomerTransactionId_of,
-            'Localization'          => \%Localization_of,
-        },
-        {   'CustomerTransactionId' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Localization' =>
-              'Shipment::FedEx::WSDL::TrackTypes::Localization',
-        },
-        {
+    ) ],
+    {
+        'CustomerTransactionId' => \%CustomerTransactionId_of,
+        'Localization' => \%Localization_of,
+    },
+    {
+        'CustomerTransactionId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Localization' => 'Shipment::FedEx::WSDL::TrackTypes::Localization',
+    },
+    {
 
-            'CustomerTransactionId' => 'CustomerTransactionId',
-            'Localization'          => 'Localization',
-        }
-    );
+        'CustomerTransactionId' => 'CustomerTransactionId',
+        'Localization' => 'Localization',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -63,7 +67,7 @@ Shipment::FedEx::WSDL::TrackTypes::TransactionDetail
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

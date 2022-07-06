@@ -6,7 +6,7 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = '2.09';
+our $VERSION = '2.10';
 
 use Tie::RefHash;
 use HTTP::Request 1.30;
@@ -667,6 +667,24 @@ sub form_number {
     }
 
     return wantarray ? () : undef;
+}
+
+
+sub form_action {
+    my ($self, $action) = @_;
+
+    my $temp;
+    my @matches = grep {defined($temp = $_->action) and ($temp =~ m/$action/msx) } $self->forms;
+
+    my $nmatches = @matches;
+    if ( $nmatches > 0 ) {
+        if ( $nmatches > 1 ) {
+            $self->warn( "There are $nmatches forms with action matching $action. The first one was used." )
+        }
+        return $self->{current_form} = $matches[0];
+    }
+
+    return;
 }
 
 
@@ -1800,7 +1818,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 2.09
+version 2.10
 
 =head1 SYNOPSIS
 
@@ -2706,6 +2724,19 @@ Emits a warning and returns undef if no form is found.
 
 The first form is number 1, not zero.
 
+=head2 $mech->form_action( $action )
+
+Selects a form by action, using a regex containing C<$action>.
+If there is more than one form on the page matching that action,
+then the first one is used, and a warning is generated.
+
+If it is found, the form is returned as an L<HTML::Form> object and
+set internally for later use with Mech's form methods such as
+C<L<< field()|/"$mech->field( $name, $value, $number )" >>> and
+C<L<< click()|/"$mech->click( $button [, $x, $y] )" >>>.
+
+Returns C<undef> if no form is found.
+
 =head2 $mech->form_name( $name )
 
 Selects a form by name.  If there is more than one form on the page
@@ -2767,7 +2798,8 @@ All matching forms (perhaps none) are returned as a list of L<HTML::Form> object
 Searches for forms with arbitrary attribute/value pairs within the E<lt>formE<gt>
 tag.
 (Currently does not work for attribute C<action> due to implementation details
-of L<HTML::Form>.)
+of L<HTML::Form>. Use C<L<< form_action()|/"$mech->form_action( $action )" >>>
+instead.)
 When given more than one pair, all criteria must match.
 Using C<undef> as value means that the attribute in question must not be present.
 

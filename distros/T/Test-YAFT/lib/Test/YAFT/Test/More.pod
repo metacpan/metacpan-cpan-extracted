@@ -1,0 +1,146 @@
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Test::YAFT::Test::More - Test::YAFT - Test::More comparison
+
+=head1 DESCRIPTION
+
+L<Test::YAFT> supports most of L<Test::More> features
+
+=head2 Import Parameters
+
+L<Test::YAFT> doesn't support plan specification via import statement.
+
+L<Test::YAFT> exports via L<Exporter::Tiny>.
+
+=head2 Exported Functions
+
+=over
+
+=item $TODO
+
+Not supported
+
+=item BAIL_OUT
+
+Reexported
+
+=item can_ok
+
+Not supported
+
+=item cmp_ok
+
+Implemented as an expectation C<expect_compare>.
+
+=item diag
+
+Reexported
+
+=item done_testing
+
+Reexported
+
+=item eq_array
+
+Replaced with C<it>
+
+=item eq_hash
+
+Replaced with C<it>
+
+=item eq_set
+
+Replaced with C<it>
+
+=item explain
+
+Reexported
+
+=item fail
+
+Extended with C<diag> option
+
+=item is
+
+Replaced with C<it>
+
+=item is_deeply
+
+Replaced with C<it>
+
+=item isa_ok
+
+Replaced with L<Test::Deep> based comparators C<expect_isa>, C<expect_obj_isa>
+
+=item isnt
+
+Implemented via expectation C<expect_complement>
+
+=item like
+
+Replaced with C<it>
+
+=item new_ok
+
+Not supported
+
+=item note
+
+Reexported
+
+=item ok
+
+Replaced with C<it>
+
+=item pass
+
+Reexported
+
+=item plan
+
+Reexported
+
+=item require_ok
+
+Not supported
+
+=item skip
+
+Reexported
+
+=item subtest
+
+Reimplemented, every C<subtest> creates new L<Context::Singleton> frame
+
+=item todo
+
+Reexported
+
+=item todo_skip
+
+Reexported
+
+=item unlike
+
+Implemented via comparator C<expect_complement>
+
+=item use_ok
+
+Not supported
+
+=back
+
+=head1 AUTHOR
+
+Branislav Zahradník <barney@cpan.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+This file is part of L<Test::YAFT> distribution.
+
+=cut

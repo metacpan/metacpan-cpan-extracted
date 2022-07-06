@@ -50,6 +50,7 @@ sub set_attributes {
     my ( $sf ) = @_;
     return [
         { name => 'pg_enable_utf8', default => 2, values => [ 0, 1, -1 ] },
+        { name => 'ChopBlanks',     default => 0, values => [ 0, 1 ]     },
     ];
 }
 
@@ -88,7 +89,7 @@ sub get_db_handle {
         AutoCommit => 1,
         ShowErrorStatement => 1,
         %$set_attributes,
-    } ) or die DBI->errstr;
+    } );
     return $dbh;
 }
 

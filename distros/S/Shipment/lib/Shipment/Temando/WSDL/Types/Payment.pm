@@ -1,16 +1,12 @@
 package Shipment::Temando::WSDL::Types::Payment;
-$Shipment::Temando::WSDL::Types::Payment::VERSION = '3.08';
+$Shipment::Temando::WSDL::Types::Payment::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(0);
 
-sub get_xmlns {
-    'http://'
-      . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
-      . '/schema/2009_06/common.xsd';
-}
+sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/common.xsd' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -24,57 +20,62 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %paymentType_of : ATTR(:get<paymentType>);
-    my %cardType_of : ATTR(:get<cardType>);
-    my %cardExpiryDate_of : ATTR(:get<cardExpiryDate>);
-    my %cardNumber_of : ATTR(:get<cardNumber>);
-    my %cardName_of : ATTR(:get<cardName>);
-    my %paypalPayerId_of : ATTR(:get<paypalPayerId>);
-    my %paypalToken_of : ATTR(:get<paypalToken>);
+my %paymentType_of :ATTR(:get<paymentType>);
+my %cardType_of :ATTR(:get<cardType>);
+my %cardExpiryDate_of :ATTR(:get<cardExpiryDate>);
+my %cardNumber_of :ATTR(:get<cardNumber>);
+my %cardName_of :ATTR(:get<cardName>);
+my %paypalPayerId_of :ATTR(:get<paypalPayerId>);
+my %paypalToken_of :ATTR(:get<paypalToken>);
 
-    __PACKAGE__->_factory(
-        [   qw(        paymentType
-              cardType
-              cardExpiryDate
-              cardNumber
-              cardName
-              paypalPayerId
-              paypalToken
+__PACKAGE__->_factory(
+    [ qw(        paymentType
+        cardType
+        cardExpiryDate
+        cardNumber
+        cardName
+        paypalPayerId
+        paypalToken
 
-            )
-        ],
-        {   'paymentType'    => \%paymentType_of,
-            'cardType'       => \%cardType_of,
-            'cardExpiryDate' => \%cardExpiryDate_of,
-            'cardNumber'     => \%cardNumber_of,
-            'cardName'       => \%cardName_of,
-            'paypalPayerId'  => \%paypalPayerId_of,
-            'paypalToken'    => \%paypalToken_of,
-        },
-        {   'paymentType' => 'Shipment::Temando::WSDL::Types::PaymentType',
-            'cardType'    => 'Shipment::Temando::WSDL::Types::CreditCardType',
-            'cardExpiryDate' =>
-              'Shipment::Temando::WSDL::Types::CreditCardExpiryDate',
-            'cardNumber' => 'Shipment::Temando::WSDL::Types::CreditCardNumber',
-            'cardName'   => 'Shipment::Temando::WSDL::Types::CreditCardName',
-            'paypalPayerId' => 'Shipment::Temando::WSDL::Types::PaypalPayerId',
-            'paypalToken'   => 'Shipment::Temando::WSDL::Types::PaypalToken',
-        },
-        {
+    ) ],
+    {
+        'paymentType' => \%paymentType_of,
+        'cardType' => \%cardType_of,
+        'cardExpiryDate' => \%cardExpiryDate_of,
+        'cardNumber' => \%cardNumber_of,
+        'cardName' => \%cardName_of,
+        'paypalPayerId' => \%paypalPayerId_of,
+        'paypalToken' => \%paypalToken_of,
+    },
+    {
+        'paymentType' => 'Shipment::Temando::WSDL::Types::PaymentType',
+        'cardType' => 'Shipment::Temando::WSDL::Types::CreditCardType',
+        'cardExpiryDate' => 'Shipment::Temando::WSDL::Types::CreditCardExpiryDate',
+        'cardNumber' => 'Shipment::Temando::WSDL::Types::CreditCardNumber',
+        'cardName' => 'Shipment::Temando::WSDL::Types::CreditCardName',
+        'paypalPayerId' => 'Shipment::Temando::WSDL::Types::PaypalPayerId',
+        'paypalToken' => 'Shipment::Temando::WSDL::Types::PaypalToken',
+    },
+    {
 
-            'paymentType'    => 'paymentType',
-            'cardType'       => 'cardType',
-            'cardExpiryDate' => 'cardExpiryDate',
-            'cardNumber'     => 'cardNumber',
-            'cardName'       => 'cardName',
-            'paypalPayerId'  => 'paypalPayerId',
-            'paypalToken'    => 'paypalToken',
-        }
-    );
+        'paymentType' => 'paymentType',
+        'cardType' => 'cardType',
+        'cardExpiryDate' => 'cardExpiryDate',
+        'cardNumber' => 'cardNumber',
+        'cardName' => 'cardName',
+        'paypalPayerId' => 'paypalPayerId',
+        'paypalToken' => 'paypalToken',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -91,7 +92,7 @@ Shipment::Temando::WSDL::Types::Payment
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

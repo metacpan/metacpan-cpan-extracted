@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Japanese DateTime Parser/Formatter - ~/lib/DateTime/Format/JP.pm
-## Version v0.1.1
+## Version v0.1.2
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/18
-## Modified 2021/07/22
+## Modified 2022/07/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,8 +17,13 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Exporter );
+    use vars qw(
+        $VERSION $DATETIME_PATTERN_1_RE $DATETIME_PATTERN_2_RE $DATETIME_PATTERN_3_RE $DICT
+        $ZENKAKU_NUMBERS $KANJI_NUMBERS $ZENKAKU_TO_ROMAN $KANJI_TO_ROMAN $WEEKDAYS
+        $WEEKDAYS_RE $TIME_RE $TIME_ZENKAKU_RE $TIME_KANJI_RE $ERROR
+    );
     use Nice::Try;
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.2';
     our $DICT = [];
     our $ZENKAKU_NUMBERS = [];
     our $KANJI_NUMBERS   = [];
@@ -30,7 +35,9 @@ BEGIN
     our( $DATETIME_PATTERN_1_RE, $DATETIME_PATTERN_2_RE, $DATETIME_PATTERN_3_RE )
 };
 
-INIT
+use strict;
+use warnings;
+
 {
     use utf8;
     $ZENKAKU_NUMBERS = [qw(０ １ ２ ３ ４ ５ ６ ７ ８ ９)];
@@ -442,7 +449,7 @@ sub format_datetime
     my $pat  = length( $self->{pattern} ) ? $self->{pattern} : '%c';
     use utf8;
     
-    local $japanised_value_for = sub
+    my $japanised_value_for = sub
     {
         my $method_name = shift( @_ );
         my $opts = {};
@@ -467,7 +474,7 @@ sub format_datetime
         }
         return( $n );
     };
-    local $japanised_strftime = sub
+    my $japanised_strftime = sub
     {
         my $token = shift( @_ );
         my $opts = {};
@@ -1221,8 +1228,15 @@ sub _set_get_zenkaku
         use strict;
         use warnings;
         use parent qw( Exporter );
+        use vars qw( $ERROR );
         use DateTime;
+        use DateTime::TimeZone;
         use Nice::Try;
+        eval
+        {
+            my $tz = DateTime::TimeZone->new( name => 'local' );
+        };
+        use constant HAS_LOCAL_TZ => ( $@ ? 0 : 1 );
     };
     
     # my $era = DateTime::Format::JP::Era->new( $era_dictionary_hash_ref );
@@ -1273,12 +1287,12 @@ sub _set_get_zenkaku
                 my $opts = {};
                 @$opts{qw( year month day )} = @$ref;
                 @$opts{qw( hour minute second )} = (0,0,0);
-                $opts->{time_zone} = 'local';
+                $opts->{time_zone} = ( HAS_LOCAL_TZ ? 'local' : 'UTC' );
                 return( DateTime->new( %$opts ) );
             }
             else
             {
-                return( DateTime->now( time_zone => 'local' ) );
+                return( DateTime->now( time_zone => ( HAS_LOCAL_TZ ? 'local' : 'UTC' ) ) );
             }
         }
         catch( $e )
@@ -1322,7 +1336,7 @@ DateTime::Format::JP - Japanese DateTime Parser and Formatter
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 DESCRIPTION
 
@@ -1368,7 +1382,7 @@ If true, this will use full-width, ie double-byte Japanese numbers that still lo
 
 =item I<time_zone> string
 
-The time zone to use when creating a L<DateTime> object. Defaults to C<local>
+The time zone to use when creating a L<DateTime> object. Defaults to C<local> if L<DateTime::TimeZone> supports it, otherwise it will fallback on C<UTC>
 
 =back
 

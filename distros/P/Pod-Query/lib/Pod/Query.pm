@@ -16,11 +16,11 @@ Pod::Query - Query pod documents
 
 =head1 VERSION
 
-Version 0.32
+Version 0.33
 
 =cut
 
-our $VERSION                   = '0.32';
+our $VERSION                   = '0.33';
 our $DEBUG_LOL_DUMP            = 0;
 our $DEBUG_STRUCT_OVER         = 0;
 our $DEBUG_TREE                = 0;

@@ -20,7 +20,7 @@ All it really does is to check file dates on the relevant files.
 EOD
 
 is_last_modified(
-    'http://celestrak.com/SpaceTrack/query/visual.txt',
+    'http://celestrak.org/SpaceTrack/query/visual.txt',
     Astro::Coord::ECI::TLE->_CELESTRAK_VISUAL(),
     'Celestrak visual.txt',
 );

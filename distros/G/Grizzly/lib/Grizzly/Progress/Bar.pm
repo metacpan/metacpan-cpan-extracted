@@ -2,12 +2,17 @@ package Grizzly::Progress::Bar;
 
 # ABSTRACT: Runs a progress bar when called
 
-use strict;
-use warnings;
+use v5.36;
+use parent qw(Exporter);
 
 use Term::Clear ();
 use Term::ProgressBar 2.00;
 use constant MAX => 100_000;
+
+require Exporter;
+our @ISA = ("Exporter");
+
+our @EXPORT = qw(progressbar);
 
 sub progressbar {
     my ($self) = @_;
@@ -47,7 +52,7 @@ Grizzly::Progress::Bar - Runs a progress bar when called
 
 =head1 VERSION
 
-version 0.104
+version 0.111
 
 =head1 DESCRIPTION
 

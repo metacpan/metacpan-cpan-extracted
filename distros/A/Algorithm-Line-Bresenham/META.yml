@@ -1,18 +1,27 @@
 ---
-name: Algorithm-Line-Bresenham
-version: 0.11
-author: []
-abstract: simple pixellated line-drawing algorithm
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-requires:
-  perl: 5.6.1
-provides:
-  Algorithm::Line::Bresenham:
-    file: lib/Algorithm/Line/Bresenham.pm
-    version: 0.11
-generated_by: Module::Build version 0.2805
+abstract: 'simple pixellated line-drawing algorithm'
+author:
+  - 'Saif Ahmed'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: artistic
 meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-Line-Bresenham
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.008004'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/saiftynet/Algorithm-Line-Bresenham.git
+version: 0.13
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

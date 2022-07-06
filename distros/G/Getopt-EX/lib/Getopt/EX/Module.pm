@@ -1,5 +1,5 @@
 package Getopt::EX::Module;
-use version; our $VERSION = version->declare("v1.27.1");
+use version; our $VERSION = version->declare("v1.28.0");
 
 use v5.14;
 use warnings;
@@ -73,7 +73,10 @@ sub configure {
 	    $obj->define('__PACKAGE__' => $mod);
 	    local *data = "$mod\::DATA";
 	    if (not eof *data) {
+		my $pos = tell *data;
 		$obj->readrc(*data);
+		# recover position in case called multiple times
+		seek *data, $pos, 0 or die "seek: $!" if $pos >= 0;
 	    }
 	    last;
 	}

@@ -12,10 +12,10 @@ title: none
   <p>
     <a href="tutorial/"
        class="btn btn-primary btn-lg"
-       role="button">Try tutorial</a>
+       role="button">チュートリアルをやってみる</a>
     <a href="install/"
        class="btn btn-primary btn-lg"
-       role="button">Install</a>
+       role="button">インストール</a>
   </p>
 </div>
 
@@ -35,6 +35,8 @@ Groonga-HTTPは、低レベルのGroongaWeb APIの代わりに使いやすいWeb
 
   * [リファレンス][reference]: クラスやメソッドの使い方などの個別の機能の詳細な説明。
 
+  * [開発][development]: Groonga-HTTPの開発方法の説明。
+
 ## ライセンス {#license}
 
 Groonga-HTTPのライセンスは [the GNU Lesser General Public License version 3 or later][lgpl3.0-license] です。
@@ -46,5 +48,7 @@ Groonga-HTTPのライセンスは [the GNU Lesser General Public License version
 [tutorial]:tutorial/
 
 [reference]:reference/
+
+[development]:development/
 
 [lgpl3.0-license]:https://opensource.org/licenses/LGPL-3.0

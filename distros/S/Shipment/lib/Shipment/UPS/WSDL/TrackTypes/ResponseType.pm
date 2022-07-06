@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::TrackTypes::ResponseType;
-$Shipment::UPS::WSDL::TrackTypes::ResponseType::VERSION = '3.08';
+$Shipment::UPS::WSDL::TrackTypes::ResponseType::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Common/v1.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Common/v1.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,38 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %ResponseStatus_of : ATTR(:get<ResponseStatus>);
-    my %Alert_of : ATTR(:get<Alert>);
-    my %TransactionReference_of : ATTR(:get<TransactionReference>);
+my %ResponseStatus_of :ATTR(:get<ResponseStatus>);
+my %Alert_of :ATTR(:get<Alert>);
+my %TransactionReference_of :ATTR(:get<TransactionReference>);
 
-    __PACKAGE__->_factory(
-        [   qw(        ResponseStatus
-              Alert
-              TransactionReference
+__PACKAGE__->_factory(
+    [ qw(        ResponseStatus
+        Alert
+        TransactionReference
 
-            )
-        ],
-        {   'ResponseStatus'       => \%ResponseStatus_of,
-            'Alert'                => \%Alert_of,
-            'TransactionReference' => \%TransactionReference_of,
-        },
-        {   'ResponseStatus' =>
-              'Shipment::UPS::WSDL::TrackTypes::CodeDescriptionType',
-            'Alert' => 'Shipment::UPS::WSDL::TrackTypes::CodeDescriptionType',
-            'TransactionReference' =>
-              'Shipment::UPS::WSDL::TrackTypes::TransactionReferenceType',
-        },
-        {
+    ) ],
+    {
+        'ResponseStatus' => \%ResponseStatus_of,
+        'Alert' => \%Alert_of,
+        'TransactionReference' => \%TransactionReference_of,
+    },
+    {
+        'ResponseStatus' => 'Shipment::UPS::WSDL::TrackTypes::CodeDescriptionType',
+        'Alert' => 'Shipment::UPS::WSDL::TrackTypes::CodeDescriptionType',
+        'TransactionReference' => 'Shipment::UPS::WSDL::TrackTypes::TransactionReferenceType',
+    },
+    {
 
-            'ResponseStatus'       => 'ResponseStatus',
-            'Alert'                => 'Alert',
-            'TransactionReference' => 'TransactionReference',
-        }
-    );
+        'ResponseStatus' => 'ResponseStatus',
+        'Alert' => 'Alert',
+        'TransactionReference' => 'TransactionReference',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -68,7 +72,7 @@ Shipment::UPS::WSDL::TrackTypes::ResponseType
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

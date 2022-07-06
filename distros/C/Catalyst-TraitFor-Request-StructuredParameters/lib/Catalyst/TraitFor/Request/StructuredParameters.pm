@@ -1,6 +1,6 @@
 package Catalyst::TraitFor::Request::StructuredParameters;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 use Moose::Role;
 use Catalyst::Utils::StructuredParameters;

@@ -1,5 +1,16 @@
 Revision history for Plack-Middleware-Security-Simple:
 
+v0.8.1    2022-07-05 12:06:58+01:00 Europe/London
+  [Enhancements]
+  - Added .bz2 to archive_extensions rule.
+
+  - Updated backup_files rule.
+
+  - Added Windows META-INF and OS/X __MAXOSX to system_dirs rule.
+
+  [Toolchain]
+  - Sign release.
+
 v0.8.0    2022-06-21 16:36:30+01:00 Europe/London
   [Enhancements]
   - Added .bkp, .backup, .npb, .old, .psb and .psc to the misc_extensions rule.

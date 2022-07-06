@@ -1,5 +1,17 @@
 Revision history for perl module Sys::Virt
 
+8.5.0 2022-07-01
+
+ - Fix parameter detection for save/restore_domain
+ - Add support for virDomainAbortJobFlags and associated
+   VIR_DOMAIN_ABORT_JOB_POSTCOPY constant
+ - Add support for VIR_DOMAIN_IOTHREAD_THREAD_POOL_MIN and
+   VIR_DOMAIN_IOTHREAD_THREAD_POOL_MAX constants
+ - Add VIR_DOMAIN_RUNNING_POSTCOPY_FAILED,
+   VIR_MIGRATE_POSTCOPY_RESUME and
+   VIR_DOMAIN_EVENT_RESUMED_POSTCOPY_FAILED constants
+ - Add VIR_MIGRATE_ZEROCOPY constant
+
 8.4.0 2022-06-09
 
  - Add VIR_NODE_SEV_CPU0_ID constant

@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::TrackTypes::StatusType;
-$Shipment::UPS::WSDL::TrackTypes::StatusType::VERSION = '3.08';
+$Shipment::UPS::WSDL::TrackTypes::StatusType::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,36 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Type_of : ATTR(:get<Type>);
-    my %Description_of : ATTR(:get<Description>);
-    my %Code_of : ATTR(:get<Code>);
+my %Type_of :ATTR(:get<Type>);
+my %Description_of :ATTR(:get<Description>);
+my %Code_of :ATTR(:get<Code>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Type
-              Description
-              Code
+__PACKAGE__->_factory(
+    [ qw(        Type
+        Description
+        Code
 
-            )
-        ],
-        {   'Type'        => \%Type_of,
-            'Description' => \%Description_of,
-            'Code'        => \%Code_of,
-        },
-        {   'Type'        => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Code'        => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'Type' => \%Type_of,
+        'Description' => \%Description_of,
+        'Code' => \%Code_of,
+    },
+    {
+        'Type' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Code' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'Type'        => 'Type',
-            'Description' => 'Description',
-            'Code'        => 'Code',
-        }
-    );
+        'Type' => 'Type',
+        'Description' => 'Description',
+        'Code' => 'Code',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -66,7 +72,7 @@ Shipment::UPS::WSDL::TrackTypes::StatusType
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

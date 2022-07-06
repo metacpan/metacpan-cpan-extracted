@@ -1,5 +1,15 @@
 Revision history for App-VTide
 
+0.1.17   2022-07-03
+        Updating for release of version 0.1.17
+        Updated (Ivan Wills)
+        Showing other custom environment variables (Ivan Wills)
+        Removing odd return (Ivan Wills)
+        Fixing help to be more helpful (Ivan Wills)
+        Adding support for 1 level parent configs (Ivan Wills)
+        Trying harder to set title (Ivan Wills)
+        Adding logging exit times (Ivan Wills)
+
 0.1.16   2021-09-05
         Updating for release of version 0.1.16
         Future note (Ivan Wills)

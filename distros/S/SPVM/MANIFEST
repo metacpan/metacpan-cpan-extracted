@@ -313,12 +313,13 @@ solo/SPVM/TestCase/Simple.spvm
 solo/SPVM/TestCase/Weaken.spvm
 solo/SPVM/TestCase/Weaken2.spvm
 SPVM.xs
-t/builder_config.t
-t/builder_config/libpng.def
-t/builder_config/zlib.def
-t/builder_config_exe.t
-t/builder_link_info.pl
-t/builder_object_file_info.t
+t/builder/builder_util.t
+t/builder/cc.t
+t/builder/config.t
+t/builder/config_exe.t
+t/builder/link_info.pl
+t/builder/object_file_info.t
+t/builder_cc.t
 t/compile_error/definition.t
 t/compile_error/dist.pl
 t/compile_error/extra.t
@@ -444,7 +445,6 @@ t/compile_error/operator.t
 t/compile_error/perl_program.pl
 t/compile_error/statement.t
 t/compile_error/type.t
-t/copy_default_to_precompile.pl
 t/default/000_use_spvm.t
 t/default/001_use_empty_class.t
 t/default/002_use_minimal_method_class.t
@@ -760,11 +760,6 @@ t/exe/myexe.no_precompile_no_compiler_api.config
 t/exe/myexe.pl
 t/exe/SPVM_Builder_Exe.t
 t/exe/spvmcc.t
-t/get_native_api_indexes.pl
-t/sort_method_name_native.pl
-t/sort_method_name_pod.pl
-t/sort_method_name_spvm.pl
-t/SPVM_Build_Util.t
 t/spvmdist/command.t
 t/spvmdist/module.t
 t/test_files/file_eof.txt
@@ -774,6 +769,11 @@ t/test_files/long_line.txt
 t/test_files/SPVM/Foo.config
 t/testlib/TestAuto.pm
 t/testlib/TestFile.pm
+t/utils/copy_default_to_precompile.pl
+t/utils/get_native_api_indexes.pl
+t/utils/sort_method_name_native.pl
+t/utils/sort_method_name_pod.pl
+t/utils/sort_method_name_spvm.pl
 yacc/bison.sh
 yacc/spvm_yacc.y
 META.yml                                 Module YAML meta-data (added by MakeMaker)

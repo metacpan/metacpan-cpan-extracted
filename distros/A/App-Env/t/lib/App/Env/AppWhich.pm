@@ -1,8 +1,7 @@
 package App::Env::AppWhich;
 
 # track the number of times this is invoked
-sub envs
-{
+sub envs {
     my ( $opt ) = @_;
     return { PATH => 't/bin' };
 }

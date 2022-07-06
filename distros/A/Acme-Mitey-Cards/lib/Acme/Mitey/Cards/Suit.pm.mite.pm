@@ -1,11 +1,23 @@
 {
 
     package Acme::Mitey::Cards::Suit;
+    our $USES_MITE = "Mite::Class";
+    our $MITE_SHIM = "Acme::Mitey::Cards::Mite";
     use strict;
     use warnings;
 
+    BEGIN {
+        *bare  = \&Acme::Mitey::Cards::Mite::bare;
+        *false = \&Acme::Mitey::Cards::Mite::false;
+        *lazy  = \&Acme::Mitey::Cards::Mite::lazy;
+        *ro    = \&Acme::Mitey::Cards::Mite::ro;
+        *rw    = \&Acme::Mitey::Cards::Mite::rw;
+        *rwp   = \&Acme::Mitey::Cards::Mite::rwp;
+        *true  = \&Acme::Mitey::Cards::Mite::true;
+    }
+
     sub new {
-        my $class = shift;
+        my $class = ref( $_[0] ) ? ref(shift) : shift;
         my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
         my $self  = bless {}, $class;
         my $args =
@@ -15,61 +27,67 @@
         my $no_build = delete $args->{__no_BUILD__};
 
         # Initialize attributes
-        if ( exists( $args->{q[abbreviation]} ) ) {
+        if ( exists $args->{"name"} ) {
+            (
+                (
+                    do {
+
+                        package Acme::Mitey::Cards::Mite;
+                        defined( $args->{"name"} ) and do {
+                            ref( \$args->{"name"} ) eq 'SCALAR'
+                              or ref( \( my $val = $args->{"name"} ) ) eq
+                              'SCALAR';
+                        }
+                    }
+                )
+                  && do {
+
+                    package Acme::Mitey::Cards::Mite;
+                    length( $args->{"name"} ) > 0;
+                }
+              )
+              or require Carp
+              && Carp::croak(
+                sprintf "Type check failed in constructor: %s should be %s",
+                "name", "NonEmptyStr" );
+            $self->{"name"} = $args->{"name"};
+        }
+        else { require Carp; Carp::croak("Missing key in constructor: name") }
+        if ( exists $args->{"abbreviation"} ) {
             do {
 
                 package Acme::Mitey::Cards::Mite;
-                defined( $args->{q[abbreviation]} ) and do {
-                    ref( \$args->{q[abbreviation]} ) eq 'SCALAR'
-                      or ref( \( my $val = $args->{q[abbreviation]} ) ) eq
+                defined( $args->{"abbreviation"} ) and do {
+                    ref( \$args->{"abbreviation"} ) eq 'SCALAR'
+                      or ref( \( my $val = $args->{"abbreviation"} ) ) eq
                       'SCALAR';
                 }
               }
               or require Carp
               && Carp::croak(
-                q[Type check failed in constructor: abbreviation should be Str]
-              );
-            $self->{q[abbreviation]} = $args->{q[abbreviation]};
+                sprintf "Type check failed in constructor: %s should be %s",
+                "abbreviation", "Str" );
+            $self->{"abbreviation"} = $args->{"abbreviation"};
         }
-        if ( exists( $args->{q[colour]} ) ) {
+        if ( exists $args->{"colour"} ) {
             do {
 
                 package Acme::Mitey::Cards::Mite;
-                defined( $args->{q[colour]} ) and do {
-                    ref( \$args->{q[colour]} ) eq 'SCALAR'
-                      or ref( \( my $val = $args->{q[colour]} ) ) eq 'SCALAR';
+                defined( $args->{"colour"} ) and do {
+                    ref( \$args->{"colour"} ) eq 'SCALAR'
+                      or ref( \( my $val = $args->{"colour"} ) ) eq 'SCALAR';
                 }
               }
               or require Carp
               && Carp::croak(
-                q[Type check failed in constructor: colour should be Str]);
-            $self->{q[colour]} = $args->{q[colour]};
+                sprintf "Type check failed in constructor: %s should be %s",
+                "colour", "Str" );
+            $self->{"colour"} = $args->{"colour"};
         }
         else { require Carp; Carp::croak("Missing key in constructor: colour") }
-        if ( exists( $args->{q[name]} ) ) {
-            do {
-
-                package Acme::Mitey::Cards::Mite;
-                defined( $args->{q[name]} ) and do {
-                    ref( \$args->{q[name]} ) eq 'SCALAR'
-                      or ref( \( my $val = $args->{q[name]} ) ) eq 'SCALAR';
-                }
-              }
-              or require Carp
-              && Carp::croak(
-                q[Type check failed in constructor: name should be Str]);
-            $self->{q[name]} = $args->{q[name]};
-        }
-        else { require Carp; Carp::croak("Missing key in constructor: name") }
 
         # Enforce strict constructor
-        my @unknown = grep not(
-            do {
-
-                package Acme::Mitey::Cards::Mite;
-                ( defined and !ref and m{\A(?:(?:abbreviation|colour|name))\z} );
-            }
-          ),
+        my @unknown = grep not(/\A(?:abbreviation|colour|name)\z/),
           keys %{$args};
         @unknown
           and require Carp
@@ -77,19 +95,41 @@
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         # Call BUILD methods
-        !$no_build and @{ $meta->{BUILD} || [] } and $self->BUILDALL($args);
+        $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
 
         return $self;
     }
 
     sub BUILDALL {
-        $_->(@_) for @{ $Mite::META{ ref( $_[0] ) }{BUILD} || [] };
+        my $class = ref( $_[0] );
+        my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
+        $_->(@_) for @{ $meta->{BUILD} || [] };
+    }
+
+    sub DESTROY {
+        my $self  = shift;
+        my $class = ref($self) || $self;
+        my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
+        my $in_global_destruction =
+          defined ${^GLOBAL_PHASE}
+          ? ${^GLOBAL_PHASE} eq 'DESTRUCT'
+          : Devel::GlobalDestruction::in_global_destruction();
+        for my $demolisher ( @{ $meta->{DEMOLISH} || [] } ) {
+            my $e = do {
+                local ( $?, $@ );
+                eval { $demolisher->( $self, $in_global_destruction ) };
+                $@;
+            };
+            no warnings 'misc';    # avoid (in cleanup) warnings
+            die $e if $e;          # rethrow
+        }
+        return;
     }
 
     sub __META__ {
         no strict 'refs';
-        require mro;
-        my $class      = shift;
+        my $class = shift;
+        $class = ref($class) || $class;
         my $linear_isa = mro::get_linear_isa($class);
         return {
             BUILD => [
@@ -98,22 +138,35 @@
             ],
             DEMOLISH => [
                 map   { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-                  map { "$_\::DEMOLISH" } reverse @$linear_isa
+                  map { "$_\::DEMOLISH" } @$linear_isa
             ],
-            HAS_BUILDARGS => $class->can('BUILDARGS'),
+            HAS_BUILDARGS        => $class->can('BUILDARGS'),
+            HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
         };
+    }
+
+    sub DOES {
+        my ( $self, $role ) = @_;
+        our %DOES;
+        return $DOES{$role} if exists $DOES{$role};
+        return 1            if $role eq __PACKAGE__;
+        return $self->SUPER::DOES($role);
+    }
+
+    sub does {
+        shift->DOES(@_);
     }
 
     my $__XS = !$ENV{MITE_PURE_PERL}
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
     # Accessors for abbreviation
-    *abbreviation = sub {
+    sub abbreviation {
         @_ > 1 ? require Carp
           && Carp::croak(
             "abbreviation is a read-only attribute of @{[ref $_[0]]}") : (
-            exists( $_[0]{q[abbreviation]} ) ? $_[0]{q[abbreviation]} : (
-                $_[0]{q[abbreviation]} = do {
+            exists( $_[0]{"abbreviation"} ) ? $_[0]{"abbreviation"} : (
+                $_[0]{"abbreviation"} = do {
                     my $default_value = $_[0]->_build_abbreviation;
                     do {
 
@@ -127,20 +180,22 @@
                       or do {
                         require Carp;
                         Carp::croak(
-q[Type check failed in default: abbreviation should be Str]
+                            sprintf
+                              "Type check failed in default: %s should be %s",
+                            "abbreviation", "Str"
                         );
                       };
                     $default_value;
                 }
             )
             );
-    };
+    }
 
     # Accessors for colour
     if ($__XS) {
         Class::XSAccessor->import(
-            chained => 1,
-            getters => { q[colour] => q[colour] },
+            chained   => 1,
+            "getters" => { "colour" => "colour" },
         );
     }
     else {
@@ -148,15 +203,15 @@ q[Type check failed in default: abbreviation should be Str]
             @_ > 1
               ? require Carp && Carp::croak(
                 "colour is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{q[colour]};
+              : $_[0]{"colour"};
         };
     }
 
     # Accessors for name
     if ($__XS) {
         Class::XSAccessor->import(
-            chained => 1,
-            getters => { q[name] => q[name] },
+            chained   => 1,
+            "getters" => { "name" => "name" },
         );
     }
     else {
@@ -164,7 +219,7 @@ q[Type check failed in default: abbreviation should be Str]
             @_ > 1
               ? require Carp
               && Carp::croak("name is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{q[name]};
+              : $_[0]{"name"};
         };
     }
 

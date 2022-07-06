@@ -1,0 +1,122 @@
+# NAME
+
+DBIx::Class::Schema::ResultSetNames - Create resultset accessors from schema result class names
+
+# VERSION
+
+version 1.0301
+
+# SYNOPSIS
+
+     # in MyApp::Schema
+     __PACKAGE__->load_components('Schema::ResultSetNames');
+
+    sub override_rsnames {
+       return {
+          'Widget' => {               # Your schema's result class name
+             singular => 'block',     # singular word you wish to use
+             plural => 'clocks'       # plural word
+          }
+       };
+    }
+
+# DESCRIPTION
+
+DBIx::Class::Schema::ResultSetNames adds both singular and plural method accessors for all resultsets.
+
+So, instead of this:
+
+    my $schema = MyApp::Schema->connect(...);
+    my $result = $schema->resultset('Author')->search({...});
+
+you may choose to this:
+
+    my $schema = MyApp::Schema->connect(...);
+    my $result = $schema->authors->search({...});
+
+And instead of this:
+
+    my $schema = MyApp::Schema->connect(...);
+    my $result = $schema->resultset('Author')->find($id);
+
+you may choose to this:
+
+    my $schema = MyApp::Schema->connect(...);
+    my $result = $schema->author($id)
+
+## What is returned?
+
+If you call the plural form of the resultset (e.g. \`authors\`), you will get a [DBIx::Class::ResultSet](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AResultSet),
+which may be empty, if no rows satisfy whatever criteria you've chained behind it.
+
+For the singular form (\`author\`), you'll get a [DBIx::Class::Row](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ARow), or \`undef\`, if the selected row does not exist.
+
+Don't worry if your ResultSet schema class name is already plural (e.g. 'Authors'). This module will
+Do The Right Thing, according to the behavior of [Lingua::EN::Inflect::Phrase](https://metacpan.org/pod/Lingua%3A%3AEN%3A%3AInflect%3A%3APhrase)
+
+## Optional overriding of terms
+
+If your schema set name is a word that is the same term in both singular and plural forms (in English), then
+the module will `croak`.  You can create an otherwise-optional subroutine named `override_rsnames` to give
+the terms you wish to use to the module.  You do not need to define both, as was done in the Synopsis above;
+if one is missing, the default behavior will be used.  So in the case of, for instance, a 
+[DBIx::Class::ResultSet](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AResultSet) named "Moose" (no, not \*that\* [Moose](https://metacpan.org/pod/Moose)!), the module will `croak`; you can do
+something like this to overcome the problem:
+
+    package MyApp::Schema;
+    __PACKAGE__->load_components('Schema::ResultSetNames');
+
+    sub override_rsnames {
+       return {
+          'Moose' => { 
+             plural => 'm00ses'   # singular will be 'moose'
+          },
+          # other RSes that you want to override ... 
+       };
+    }
+
+## A note about \`find\`.
+
+It is perfectly permissible to use find (or the singular accessor, in this module) to locate something
+by including a hashref of search terms:
+
+    my $result = $schema->resultSet('Author')->find({ name => 'John Smith });  # Old way
+    my $result = $schema->author({ name => 'John Smith' });                    # New way 
+
+However, be aware that \`find()\` and this module will both complain if your request will return multiple
+rows, and throw a warning. \`find()\` expects to return one row or undef, which is why it is best used on unique keys.
+
+## "Let not your heart be troubled..." about relationships.
+
+This doesn't tamper with relationship accessors in any way. If you have a table of Authors and a table of Books,
+the usual sort of \`book($id)->author()\`, and \`author($id)->books()\` relationship tools will still work just fine.
+
+# SEE ALSO
+
+- [DBIx::Class::ResultSet](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AResultSet)
+- [DBIx::Class::Row](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ARow)
+
+# CREDIT WHERE CREDIT IS DUE
+
+Practically all of this code is the work of [Matt S Trout (mst)](https://metacpan.org/author/MSTROUT). It was
+created alongside a Dancer2 plugin that he has helped greatly with. I just tidied things up and wrote
+documentation.
+
+# SOURCE
+
+[https://gitlab.com/geekruthie/DBIx-Class-Schema-ResultSetNames](https://gitlab.com/geekruthie/DBIx-Class-Schema-ResultSetNames)
+
+# HOMEPAGE
+
+[https://metacpan.org/release/DBIx-Class-Schema-ResultSetNames](https://metacpan.org/release/DBIx-Class-Schema-ResultSetNames)
+
+# AUTHOR
+
+D Ruth Holloway <ruth@hiruthie.me>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2021 by D Ruth Holloway.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

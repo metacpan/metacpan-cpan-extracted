@@ -5,7 +5,7 @@ package App::Env::Example;
 use strict;
 use warnings;
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 # This example uses Shell::GetEnv to illustrate how to source a shell
 # script which defines the environment for an application.  Other
@@ -14,14 +14,12 @@ our $VERSION = '0.35';
 use Shell::GetEnv;
 
 
-sub envs
-{
+sub envs {
     #     my ( $opt ) = @_;
 
     # source the shell script and return the changed environment
-    return Shell::GetEnv->new( 'tcsh',
-                               'source /usr/local/mypkg/setup.csh'
-                             )->envs;
+    return Shell::GetEnv->new( 'tcsh', 'source /usr/local/mypkg/setup.csh' )
+      ->envs;
 }
 
 1;
@@ -40,13 +38,15 @@ __END__
 
 =pod
 
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
 =head1 NAME
 
 App::Env::Example - example application environment module for App::Env.
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 

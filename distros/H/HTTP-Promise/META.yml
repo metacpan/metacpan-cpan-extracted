@@ -62,5 +62,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/HTTP-Promise/issues
   repository: https://gitlab.com/jackdeguest/HTTP-Promise
-version: v0.1.2
+version: v0.1.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

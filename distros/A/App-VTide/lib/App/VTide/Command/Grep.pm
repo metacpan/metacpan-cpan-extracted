@@ -14,24 +14,22 @@ use English qw/ -no_match_vars /;
 
 extends 'App::VTide::Command::Run';
 
-our $VERSION = version->new('0.1.16');
+our $VERSION = version->new('0.1.17');
 our $NAME    = 'grep';
-our $OPTIONS = [
-    'test|T!',
-    'verbose|v+',
-];
-sub details_sub { return ( $NAME, $OPTIONS )};
+our $OPTIONS = [ 'test|T!', 'verbose|v+', ];
+our $LOCAL   = 1;
+sub details_sub { return ( $NAME, $OPTIONS, $LOCAL ) }
 
 sub run {
     my ($self) = @_;
 
-    my ( $name ) = $self->env;
+    my ($name) = $self->env;
     my $cmd = $self->options->files->[0];
 
-    my $params = $self->params( $cmd );
-    my (@files, @grep, $start);
+    my $params = $self->params($cmd);
+    my ( @files, @grep, $start );
     $start = 1;
-    for my $file (@{ $self->options->files }) {
+    for my $file ( @{ $self->options->files } ) {
         if ( $file eq '--' ) {
             $start = 0;
         }
@@ -45,7 +43,7 @@ sub run {
 
     $params->{editor}{command} = [];
     $params->{edit} = \@files;
-    my @cmd    = $self->command( $params );
+    my @cmd = $self->command($params);
 
     if ( $params->{env} && ref $params->{env} eq 'HASH' ) {
         for my $env ( keys %{ $params->{env} } ) {
@@ -56,8 +54,8 @@ sub run {
     }
 
     $self->load_env( $params->{env} );
-    $self->hooks->run('grepping', \@cmd);
-    $self->runit( ($params->{grep} || 'grep'), @grep, @cmd );
+    $self->hooks->run( 'grepping', \@cmd );
+    $self->runit( ( $params->{grep} || 'grep' ), @grep, @cmd );
 
     return;
 }
@@ -65,13 +63,13 @@ sub run {
 sub auto_complete {
     my ($self) = @_;
 
-    my $env = $self->options->files->[-1];
+    my $env   = $self->options->files->[-1];
     my @files = sort keys %{ $self->config->get->{editor}{files} };
 
     eval {
         my $helper = $self->config->get->{editor}{helper_autocomplete};
         if ($helper) {
-            $helper = eval $helper;  ## no critic
+            $helper = eval $helper;    ## no critic
             push @files, $helper->();
         }
         1;
@@ -92,7 +90,7 @@ App::VTide::Command::Grep - Run a grep command on vtide editor globs
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Grep version 0.1.16
+This documentation refers to App::VTide::Command::Grep version 0.1.17
 
 =head1 SYNOPSIS
 

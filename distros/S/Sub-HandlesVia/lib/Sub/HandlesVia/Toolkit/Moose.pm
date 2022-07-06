@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::Toolkit::Moose;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.027';
+our $VERSION   = '0.028';
 
 use Sub::HandlesVia::Toolkit;
 our @ISA = 'Sub::HandlesVia::Toolkit';
@@ -156,7 +156,7 @@ sub code_generator_for_attribute {
 package Sub::HandlesVia::Toolkit::Moose::PackageTrait;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.027';
+our $VERSION   = '0.028';
 
 use Role::Tiny;
 
@@ -194,7 +194,7 @@ around add_attribute => sub {
 package Sub::HandlesVia::Toolkit::Moose::RoleTrait;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.027';
+our $VERSION   = '0.028';
 
 use Role::Tiny;
 

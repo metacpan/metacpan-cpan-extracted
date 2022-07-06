@@ -3,7 +3,7 @@
    "author" : [
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],
-   "dynamic_config" : 0,
+   "dynamic_config" : 1,
    "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [],
    "license" : [
@@ -35,12 +35,12 @@
             "Dist::Inkt" : "0.001"
          },
          "requires" : {
-            "Mite" : "v0.0.4"
+            "Mite" : "0.002004"
          }
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.010001"
+            "perl" : "5.008001"
          }
       },
       "test" : {
@@ -52,42 +52,45 @@
    "provides" : {
       "Acme::Mitey::Cards" : {
          "file" : "lib/Acme/Mitey/Cards.pm",
-         "version" : "0.005"
+         "version" : "0.008"
       },
       "Acme::Mitey::Cards::Card" : {
          "file" : "lib/Acme/Mitey/Cards/Card.pm",
-         "version" : "0.005"
+         "version" : "0.008"
       },
       "Acme::Mitey::Cards::Card::Face" : {
          "file" : "lib/Acme/Mitey/Cards/Card/Face.pm",
-         "version" : "0.005"
+         "version" : "0.008"
       },
       "Acme::Mitey::Cards::Card::Joker" : {
          "file" : "lib/Acme/Mitey/Cards/Card/Joker.pm",
-         "version" : "0.005"
+         "version" : "0.008"
       },
       "Acme::Mitey::Cards::Card::Numeric" : {
          "file" : "lib/Acme/Mitey/Cards/Card/Numeric.pm",
-         "version" : "0.005"
+         "version" : "0.008"
       },
       "Acme::Mitey::Cards::Deck" : {
          "file" : "lib/Acme/Mitey/Cards/Deck.pm",
-         "version" : "0.005"
+         "version" : "0.008"
       },
       "Acme::Mitey::Cards::Hand" : {
          "file" : "lib/Acme/Mitey/Cards/Hand.pm",
-         "version" : "0.005"
+         "version" : "0.008"
       },
       "Acme::Mitey::Cards::Mite" : {
          "file" : "lib/Acme/Mitey/Cards/Mite.pm"
       },
       "Acme::Mitey::Cards::Set" : {
          "file" : "lib/Acme/Mitey/Cards/Set.pm",
-         "version" : "0.005"
+         "version" : "0.008"
       },
       "Acme::Mitey::Cards::Suit" : {
          "file" : "lib/Acme/Mitey/Cards/Suit.pm",
-         "version" : "0.005"
+         "version" : "0.008"
+      },
+      "Acme::Mitey::Cards::Types" : {
+         "file" : "lib/Acme/Mitey/Cards/Types.pm"
       }
    },
    "release_status" : "stable",
@@ -106,7 +109,6 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/project"
    },
-   "version" : "0.005",
-   "x_serialization_backend" : "JSON::PP version 4.09",
-   "x_static_install" : 1
+   "version" : "0.008",
+   "x_serialization_backend" : "JSON::PP version 4.09"
 }

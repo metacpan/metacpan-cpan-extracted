@@ -11,9 +11,9 @@ use FindBin qw($RealBin);
 use Digest::MD5 qw(md5_base64);
 use FASTX::Reader;
 use Proch::Seqfu;
-
-my $PROGRAM = basename($0);
 my $VERSION = $Proch::Seqfu::VERSION // "<Dev>";
+my $PROGRAM = basename($0);
+
 my ($opt_force_fasta, $opt_force_fastq, $opt_upper, $opt_help, $opt_verbose, $opt_version);
 my ($opt_minlen, $opt_maxlen, $opt_dereplicate, $opt_rename_md5);
 my $opt_separator = '.';
@@ -115,11 +115,11 @@ for my $filename (@ARGV) {
 
 
         # Skip short sequences
-        if (defined $opt_minlen and length($s->{seq} < $opt_minlen)) {
+        if (defined $opt_minlen and length($s->{seq}) < $opt_minlen) {
             next;
         }
         # Skip long sequences
-        if (defined $opt_maxlen and length($s->{seq} > $opt_maxlen)) {
+        if (defined $opt_maxlen and length($s->{seq}) > $opt_maxlen) {
             next;
         }
 
@@ -174,7 +174,7 @@ fu-cat - Concatenate FASTA or FASTQ files
 
 =head1 VERSION
 
-version 1.4.10
+version 1.5.0
 
 =head1 SYNOPSIS
 

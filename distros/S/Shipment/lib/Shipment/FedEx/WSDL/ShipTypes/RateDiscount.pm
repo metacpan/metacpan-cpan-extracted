@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::RateDiscount;
-$Shipment::FedEx::WSDL::ShipTypes::RateDiscount::VERSION = '3.08';
+$Shipment::FedEx::WSDL::ShipTypes::RateDiscount::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +20,47 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %RateDiscountType_of : ATTR(:get<RateDiscountType>);
-    my %Description_of : ATTR(:get<Description>);
-    my %Amount_of : ATTR(:get<Amount>);
-    my %Percent_of : ATTR(:get<Percent>);
+my %RateDiscountType_of :ATTR(:get<RateDiscountType>);
+my %Description_of :ATTR(:get<Description>);
+my %Amount_of :ATTR(:get<Amount>);
+my %Percent_of :ATTR(:get<Percent>);
 
-    __PACKAGE__->_factory(
-        [   qw(        RateDiscountType
-              Description
-              Amount
-              Percent
+__PACKAGE__->_factory(
+    [ qw(        RateDiscountType
+        Description
+        Amount
+        Percent
 
-            )
-        ],
-        {   'RateDiscountType' => \%RateDiscountType_of,
-            'Description'      => \%Description_of,
-            'Amount'           => \%Amount_of,
-            'Percent'          => \%Percent_of,
-        },
-        {   'RateDiscountType' =>
-              'Shipment::FedEx::WSDL::ShipTypes::RateDiscountType',
-            'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Amount'      => 'Shipment::FedEx::WSDL::ShipTypes::Money',
-            'Percent'     => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
-        },
-        {
+    ) ],
+    {
+        'RateDiscountType' => \%RateDiscountType_of,
+        'Description' => \%Description_of,
+        'Amount' => \%Amount_of,
+        'Percent' => \%Percent_of,
+    },
+    {
+        'RateDiscountType' => 'Shipment::FedEx::WSDL::ShipTypes::RateDiscountType',
+        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Amount' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
+        'Percent' => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
+    },
+    {
 
-            'RateDiscountType' => 'RateDiscountType',
-            'Description'      => 'Description',
-            'Amount'           => 'Amount',
-            'Percent'          => 'Percent',
-        }
-    );
+        'RateDiscountType' => 'RateDiscountType',
+        'Description' => 'Description',
+        'Amount' => 'Amount',
+        'Percent' => 'Percent',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -72,7 +77,7 @@ Shipment::FedEx::WSDL::ShipTypes::RateDiscount
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

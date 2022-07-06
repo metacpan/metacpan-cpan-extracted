@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::GetShipmentManifestDocumentRequestContainer;
-$Shipment::Purolator::WSDLV2::Types::GetShipmentManifestDocumentRequestContainer::VERSION = '3.08';
+$Shipment::Purolator::WSDLV2::Types::GetShipmentManifestDocumentRequestContainer::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -17,37 +17,38 @@ sub __get_attr_class {
 
 
 use base qw(Shipment::Purolator::WSDLV2::Types::RequestContainer);
-
 # Variety: sequence
 use Class::Std::Fast::Storable constructor => 'none';
 use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %ShipmentManifestDocumentCriterium_of :
-      ATTR(:get<ShipmentManifestDocumentCriterium>);
+my %ShipmentManifestDocumentCriterium_of :ATTR(:get<ShipmentManifestDocumentCriterium>);
 
-    __PACKAGE__->_factory(
-        [   qw(        ShipmentManifestDocumentCriterium
+__PACKAGE__->_factory(
+    [ qw(        ShipmentManifestDocumentCriterium
 
-            )
-        ],
-        {   'ShipmentManifestDocumentCriterium' =>
-              \%ShipmentManifestDocumentCriterium_of,
-        },
-        {   'ShipmentManifestDocumentCriterium' =>
-              'Shipment::Purolator::WSDLV2::Types::ArrayOfShipmentManifestDocumentCriteria',
-        },
-        {
+    ) ],
+    {
+        'ShipmentManifestDocumentCriterium' => \%ShipmentManifestDocumentCriterium_of,
+    },
+    {
+        'ShipmentManifestDocumentCriterium' => 'Shipment::Purolator::WSDLV2::Types::ArrayOfShipmentManifestDocumentCriteria',
+    },
+    {
 
-            'ShipmentManifestDocumentCriterium' =>
-              'ShipmentManifestDocumentCriterium',
-        }
-    );
+        'ShipmentManifestDocumentCriterium' => 'ShipmentManifestDocumentCriterium',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -64,7 +65,7 @@ Shipment::Purolator::WSDLV2::Types::GetShipmentManifestDocumentRequestContainer
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

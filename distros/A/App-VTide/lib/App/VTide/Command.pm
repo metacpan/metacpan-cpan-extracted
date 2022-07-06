@@ -15,7 +15,7 @@ use File::chdir;
 use Path::Tiny;
 use YAML::Syck;
 
-our $VERSION = version->new('0.1.16');
+our $VERSION = version->new('0.1.17');
 
 has [qw/ defaults options /] => (
     is => 'rw',
@@ -150,7 +150,7 @@ App::VTide::Command - Base class for VTide sub commands
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command version 0.1.16
+This documentation refers to App::VTide::Command version 0.1.17
 
 =head1 SYNOPSIS
 

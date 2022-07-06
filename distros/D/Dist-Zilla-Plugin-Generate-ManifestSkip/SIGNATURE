@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 9eca8875acb2505076e2096446088707c0a1d4329cd80556132aecb3371c7b2d Changes
+SHA256 11d35a2744272e11679f589ac2367460b2ed7c90222fee3075250eb3be37ec1a INSTALL
+SHA256 9821aa96470112b8da8ac2fee550a1f11c88f37bdeb0373f3c177bc325de73c8 LICENSE
+SHA256 14db9a4e16b6627cd778c77d651a575b4e3f995ea909cfa14b601b49800f4855 MANIFEST
+SHA256 2810f9104f0e1f55f16beaee263446c24e5b9f5b6e69c0b7643825b3c6d72fbe MANIFEST.SKIP
+SHA256 739074dd47f4426c069ab9897b7d9bb5c86cb112fcc792fcfe0658a6c31ffbc6 META.json
+SHA256 6f8cb2da5769b08698576d18bb5bb504eb9013b65d9592908bbae00140733634 META.yml
+SHA256 2de8bfe8178faeabd1b2b398e4663383d374349b298650ab1b154197d7b4d713 Makefile.PL
+SHA256 b9ce10adbfd364af8242e361a71cef1663054ff8c5ef879336633c5ac7fc20e0 README.md
+SHA256 bfbcc0a4cf28c858c67c1fe429a180efd6d8764b4903fbbcb853977291bef241 cpanfile
+SHA256 9dc49a09ce7d261bc6ed9330c440187a5badf8e2b3572a195a9fc0248dcab99a dist.ini
+SHA256 42d8ab64b3c268c3a1584c471b1d1533dacd34f938babb2f4cec16fb51214587 lib/Dist/Zilla/Plugin/Generate/ManifestSkip.pm
+SHA256 0a19a334311017fbeb0a09fa8f5f266a632ef456b78bff06ebe1648a91fa10cf t/00-report-prereqs.dd
+SHA256 66fb112d30424ac9787706db3791b750a2509ee554833eca0f06cd5e16673d85 t/00-report-prereqs.t
+SHA256 b786d9159cc9ba3618f55c621174549a9d72e2dd8be4676c4ae562c4b9ea04a9 t/01-basic.t
+SHA256 72b1fd92691fbf47ba031bd3c386e3b26a525f3625b573417a85ea99422bec2c t/author-clean-namespaces.t
+SHA256 e5bab84ea3bf87c793fd33295c79e6a96f9286dfb61e95658fc07f77323c6d11 t/author-critic.t
+SHA256 fbe6cdd54a8c2e95b5eb624cdc1799f9ea3d28e4fca551e23738cf9a0a829e32 t/author-eof.t
+SHA256 3f3495fa30709e4af891d6406177163f47ef7e19d86ae1dbeee6df86144f350d t/author-eol.t
+SHA256 914bde9f0ea3cadd6afb992b32d87f5027d1a0921b6b8fec75db045bac31956e t/author-minimum-version.t
+SHA256 8fc655d7d10bfadf6a0584e5a14ba4cbb84479b6074bdea90f39858558aaa47b t/author-no-tabs.t
+SHA256 8835ccb71da79a1b53a576dd349e188d444fce139e1f9f62976458c066b8edf9 t/author-pod-linkcheck.t
+SHA256 305c657c6b73f10767a0ea286b8a73d693940f4cbb8b6a0a4d34e2b5a1c04635 t/author-pod-syntax.t
+SHA256 c1f29c0000903a78a9a6f6d4d84f375740d5bb333d532c0502bedbe613918127 t/author-portability.t
+SHA256 c70b1897a2294be1de4363e650e077dc00c7c82b7ab8a1b56e9824d3479d87bb t/release-changes_has_content.t
+SHA256 b5232d273bbe74d423210cfa2a2a12e583900fa420f1c093e1147e9625db790c t/release-check-manifest.t
+SHA256 6817b484798f726a44e9aee17da6e80979b4ace77349f0d0b4a13cd935172cba t/release-fixme.t
+SHA256 426c441a368792fa6be6a2e35ff0ac997faa48575d090646e9570e056109bb32 t/release-kwalitee.t
+SHA256 6157040bb26db4ca06dd9c19043099fe31004612d27961308558fa2e3e6a7bbe t/release-trailing-space.t
+SHA256 4792d4526e25f15e1311d93e7cb8cfe70f13bcae14ffb713d3813db5d494ffdb weaver.ini
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEEeIwq7Pfyfxtssr5nHmWrcYGDC6wFAmLEHBgACgkQHmWrcYGD
+C6xYXwv+LATg2tgBf1h9vQ9ix8mpzpkjMPP4Xmg5jIYFSqJA1Cu+2yvv3Oyl1T+d
+U4Uf7pcSfYntSRWr2H0vFDYNLrWkLjlLMSdoIeWnY2mQwViFtq7rI2IWPxUFLokU
+T62ui7+fMtLRGVoxdK5l6vguNtkF1PMDvB+bYBbV5BFcpuKKL6aAtp8iaMWaRF55
+96xZBhiZcDewLifPnS12pZBL+plxTzd3lRIIu8N9DmJwd4y0+XS5HvF3FYuNu1mh
+dznlRsilTnvmotkLIvXL/s/QugGbwf1O2tXOWKX1k+xEvg5NPIL7gWn/RTMP2R8c
+CnItjYg7f9LS/Lq19UpO5DBHKrRiV7uOYSTPYApRMf313Bp8QmU4vhQUMouq4GcG
+W61gMhMZMZ6zo1C3QLaEspC34bQOQYXBKdW4pTkMB9bNDpjM+IX525w3ZArxHpCq
+3B/WaQPAF9cEGaGLwlI7njzNlgoQXiYwq1gZofyPJ4TZNZ51w23/EBJzE5JOnsmJ
+WacR+N5J
+=lfTW
+-----END PGP SIGNATURE-----

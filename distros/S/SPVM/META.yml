@@ -22,5 +22,5 @@ requires:
   ExtUtils::CBuilder: '0.2602'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM.git
-version: '0.9614'
+version: '0.9618'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

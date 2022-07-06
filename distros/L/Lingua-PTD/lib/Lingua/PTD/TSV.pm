@@ -1,5 +1,5 @@
 package Lingua::PTD::TSV;
-$Lingua::PTD::TSV::VERSION = '1.16';
+$Lingua::PTD::TSV::VERSION = '1.17';
 use warnings;
 use strict;
 

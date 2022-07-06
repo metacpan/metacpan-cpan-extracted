@@ -8,6 +8,13 @@ do { my $x = {
        'develop' => {
                       'requires' => {
                                       'Code::TidyAll' => '0',
+                                      'Test::More' => '0.96',
+                                      'Test::Vars' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Code::TidyAll::Plugin::Test::Vars' => '0',
                                       'Dist::Zilla' => '0',
                                       'Dist::Zilla::Plugin::Authority' => '0',
                                       'Dist::Zilla::Plugin::AutoPrereqs' => '0',
@@ -47,6 +54,7 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::NextVersion::Semantic' => '0',
                                       'Dist::Zilla::Plugin::OurPkgVersion' => '0',
                                       'Dist::Zilla::Plugin::PodWeaver' => '0',
+                                      'Dist::Zilla::Plugin::Prereqs' => '0',
                                       'Dist::Zilla::Plugin::Prereqs::Plugins' => '0',
                                       'Dist::Zilla::Plugin::PreviousVersion::Changelog' => '0',
                                       'Dist::Zilla::Plugin::ReadmeMarkdownFromPod' => '0',
@@ -58,13 +66,6 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::TestRelease' => '0',
                                       'Dist::Zilla::Plugin::TidyAll' => '0',
                                       'Dist::Zilla::Plugin::UploadToCPAN' => '0',
-                                      'Test::More' => '0.96',
-                                      'Test::Vars' => '0'
-                                    }
-                    },
-       'runtime' => {
-                      'requires' => {
-                                      'Dist::Zilla' => '0',
                                       'Dist::Zilla::Role::PluginBundle::Config::Slicer' => '0',
                                       'Dist::Zilla::Role::PluginBundle::Easy' => '0',
                                       'Dist::Zilla::Role::PluginBundle::PluginRemover' => '0',

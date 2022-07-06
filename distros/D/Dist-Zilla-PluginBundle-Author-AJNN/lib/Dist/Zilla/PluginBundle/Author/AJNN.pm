@@ -3,7 +3,7 @@ use warnings;
 
 package Dist::Zilla::PluginBundle::Author::AJNN;
 # ABSTRACT: Dist::Zilla configuration the way AJNN does it
-$Dist::Zilla::PluginBundle::Author::AJNN::VERSION = '0.02';
+$Dist::Zilla::PluginBundle::Author::AJNN::VERSION = '0.03';
 
 use Dist::Zilla;
 use Moose;
@@ -15,9 +15,26 @@ use Dist::Zilla::PluginBundle::Author::AJNN::PruneAliases;
 use Dist::Zilla::PluginBundle::Author::AJNN::Readme;
 use Pod::Weaver::PluginBundle::Author::AJNN;
 
+use List::Util 1.33 'any';
+
 
 my @mvp_multivalue_args;
 sub mvp_multivalue_args { @mvp_multivalue_args }
+
+has cpan_release => (
+	is => 'ro',
+	isa => 'Str',
+	lazy => 1,
+	default => sub { $_[0]->payload->{'cpan_release'} // '1' },
+);
+
+has gatherdir_exclude_match => (
+	is => 'ro',
+	isa => 'ArrayRef[Str]',
+	lazy => 1,
+	default => sub { $_[0]->payload->{'GatherDir.exclude_match'} || [] },
+);
+push @mvp_multivalue_args, 'GatherDir.exclude_match';
 
 has max_target_perl => (
 	is => 'ro',
@@ -34,12 +51,13 @@ has podweaver_skip => (
 );
 push @mvp_multivalue_args, 'PodWeaver.skip';
 
-has readme => (
+has filter_remove => (
 	is => 'ro',
-	isa => 'Str',
+	isa => 'ArrayRef[Str]',
 	lazy => 1,
-	default => sub { $_[0]->payload->{'readme'} || '' },
+	default => sub { $_[0]->payload->{'-remove'} || [] },
 );
+push @mvp_multivalue_args, '-remove';
 
 
 sub configure {
@@ -47,14 +65,15 @@ sub configure {
 	
 	my $AJNN = '=' . __PACKAGE__;
 	
-	my @prune_aliases = ( $^O eq 'darwin' ? [ $AJNN . '::PruneAliases' => 'PruneAliases' ] : () );
+	my @gatherdir_exclude_match = $self->gatherdir_exclude_match->@*;
 	$self->add_plugins(
 		[ 'GatherDir' => {
 			exclude_filename => [qw(
 				README.md
 				cpanfile
+				dist.ini
 			)],
-			exclude_match => [qw(
+			exclude_match => [ @gatherdir_exclude_match, qw(
 				~
 				\.webloc$
 			)],
@@ -65,7 +84,7 @@ sub configure {
 			)],
 		}],
 		[ 'PruneCruft' ],
-		@prune_aliases,
+		[ 'PruneAliases' ],
 	);
 	
 	$self->add_plugins(
@@ -90,20 +109,19 @@ sub configure {
 		[ 'CheckChangeLog' ],
 		[ 'TestRelease' ],
 		[ 'ConfirmRelease' ],
-		#[ 'FakeRelease' ],
-		[ 'UploadToCPAN' ],
+		[ $self->cpan_release ? 'UploadToCPAN' : 'FakeRelease' ],
 		[ 'Git::Tag' => {
 			tag_format => '%V',
 			tag_message => '%V%t  %{yyyy-MM-dd}d%n%c',
 		}],
 	);
 	
-	my @readme = ( $AJNN . '::Readme' => 'Readme' );
-	@readme = ( $self->readme ) if $self->readme;
 	$self->add_plugins(
 		[ 'MakeMaker' ],
 		#[ 'StaticInstall' => { mode => 'on' } ],
-		[ @readme ],
+		[ $AJNN . '::Readme' => 'Readme', {
+			cpan_release => $self->cpan_release,
+		}],
 		[ 'Manifest' ],
 	);
 	
@@ -137,6 +155,18 @@ sub configure {
 }
 
 
+around add_plugins => sub {
+    my ($orig, $self, @plugins) = @_;
+	
+	my @remove = $self->filter_remove->@*;
+	$self->$orig( grep {
+		my $plugin = $_;
+		my $moniker = ref $_ ? $_->[1] // $_->[0] : $_;
+		(any { $_ eq $moniker } @remove) ? () : ($plugin)
+	} @plugins );
+};
+
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -153,7 +183,7 @@ Dist::Zilla::PluginBundle::Author::AJNN - Dist::Zilla configuration the way AJNN
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -176,8 +206,8 @@ in F<dist.ini>:
 
 skip some parts if required:
 
- [@Filter]
- -bundle = @Author::AJNN
+ [@Author::AJNN]
+ -remove = CheckChangeLog
  -remove = Git::Check
 
 =head1 DESCRIPTION
@@ -193,10 +223,11 @@ This plugin bundle is nearly equivalent to the following C<dist.ini> config:
  [GatherDir]
  exclude_filename = README.md
  exclude_filename = cpanfile
+ exclude_filename = dist.ini
  exclude_match = ~|\.webloc$
  prune_directory = ^cover_db$|^Stuff$|\.bbprojectd$
  [PruneCruft]
- [@Author::AJNN::PruneAliases]
+ [PruneAliases]
  
  [CPANFile]
  [MetaJSON]
@@ -236,6 +267,32 @@ This plugin bundle is nearly equivalent to the following C<dist.ini> config:
 
 =head1 ATTRIBUTES
 
+=head2 -remove
+
+Moniker of a plugin that is to be removed from this bundle. May
+be given multiple times. See L<Dist::Zilla::PluginBundle::Filter>.
+Offered here as a workaround for
+L<RT 81958|https://github.com/rjbs/Dist-Zilla/issues/695>.
+
+ -remove = Git::Check
+
+=head2 cpan_release
+
+Whether or not this distribution is meant to be released to
+L<https://www.cpan.org/ CPAN>. The default is yes, but for software
+of low quality or little interest to others, it can be set to no.
+
+ cpan_release = 0
+
+=head2 GatherDir.exclude_match
+
+Files or directories that match any of these regular expressions
+will not be included in the build. May be given multiple times.
+See L<Dist::Zilla::Plugin::GatherDir/"exclude_match">.
+
+ GatherDir.exclude_match = private_dir
+ GatherDir.exclude_match = \.data$
+
 =head2 PodWeaver.skip
 
 L<PodWeaver> will not be applied to a file that matches any of these
@@ -244,13 +301,6 @@ See L<Dist::Zilla::Plugin::FileFinder::Filter/"skip">.
 
  PodWeaver.skip = \.pod$
  PodWeaver.skip = Net/(?:SSL|TLS)
-
-=head2 readme
-
-The plugin name to be used to generate a readme. The default is to use
-L<Dist::Zilla::PluginBundle::Author::AJNN::Readme>.
-
- readme = Readme::Brief
 
 =head2 Test::MinimumVersion.max_target_perl
 

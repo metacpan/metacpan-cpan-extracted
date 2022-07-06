@@ -1,18 +1,11 @@
 #!/usr/bin/env perl
 
-# $Id$
-
 use 5.10.0;
 use warnings;
 use integer;
 use open qw[:encoding(utf-8) :std];
 use charnames qw(:full :short);
 use version 0.77;
-BEGIN {
-binmode STDOUT => ':utf8';
-binmode STDERR => ':utf8';
-}
-
 use Test::More;
 
 plan skip_all => "'\$TEXT_BIDI_SKIP_UCD' set to $ENV{TEXT_BIDI_SKIP_UCD}"
@@ -82,14 +75,14 @@ sub escape {
 
 open my $fh, '<', 't/BidiTest.txt' 
     or plan skip_all => "can't open UCD datafile: $!";
-open my $err, '<', 't/known.txt' 
-    or plan skip_all => "Can't open known errors file: $!";
+#open my $err, '<', 't/known.txt' or plan skip_all => "Can't open known 
+#errors file: $!";
 
-our %known;
-foreach ( <$err> ) {
-    next unless /^(.*): (.*)$/;
-    $known{$1} = $2;
-}
+#our %known;
+#foreach ( <$err> ) {
+#    next unless /^(.*): (.*)$/;
+#    $known{$1} = $2;
+#}
 
 # we don't reorder NSM
 my $flags = $Text::Bidi::Flags::DEFAULT & ~$Text::Bidi::Flag::REORDER_NSM;
@@ -115,8 +108,8 @@ foreach ( <$fh> ) {
         for my $pdir ( dirs($bits) ) {
         SKIP: {
             my $pdname = get_bidi_type_name($pdir);
-            skip 'Test fails in libfribidi', 2
-                if defined $known{"$ing;$pdname"};
+            #skip 'Test fails in libfribidi', 2
+            #    if defined $known{"$ing;$pdname"};
             my ($p, $vis) = log2vis($in, length($in), $pdir, $flags);
             my $lev = $p->levels;
             my @olev = @$lev;

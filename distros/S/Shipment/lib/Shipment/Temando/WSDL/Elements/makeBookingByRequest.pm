@@ -1,181 +1,184 @@
 
 package Shipment::Temando::WSDL::Elements::makeBookingByRequest;
-$Shipment::Temando::WSDL::Elements::makeBookingByRequest::VERSION = '3.08';
+$Shipment::Temando::WSDL::Elements::makeBookingByRequest::VERSION = '3.09';
 use strict;
 use warnings;
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    sub get_xmlns {
-        'http://'
-          . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
-          . '/schema/2009_06/server.xsd';
-    }
+sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/server.xsd' }
 
-    __PACKAGE__->__set_name('makeBookingByRequest');
-    __PACKAGE__->__set_nillable();
-    __PACKAGE__->__set_minOccurs();
-    __PACKAGE__->__set_maxOccurs();
-    __PACKAGE__->__set_ref();
+__PACKAGE__->__set_name('makeBookingByRequest');
+__PACKAGE__->__set_nillable();
+__PACKAGE__->__set_minOccurs();
+__PACKAGE__->__set_maxOccurs();
+__PACKAGE__->__set_ref();
 
-    use base qw(
-      SOAP::WSDL::XSD::Typelib::Element
-      SOAP::WSDL::XSD::Typelib::ComplexType
-    );
+use base qw(
+    SOAP::WSDL::XSD::Typelib::Element
+    SOAP::WSDL::XSD::Typelib::ComplexType
+);
 
-    our $XML_ATTRIBUTE_CLASS;
-    undef $XML_ATTRIBUTE_CLASS;
+our $XML_ATTRIBUTE_CLASS;
+undef $XML_ATTRIBUTE_CLASS;
 
-    sub __get_attr_class {
-        return $XML_ATTRIBUTE_CLASS;
-    }
+sub __get_attr_class {
+    return $XML_ATTRIBUTE_CLASS;
+}
 
-    use Class::Std::Fast::Storable constructor => 'none';
-    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+use Class::Std::Fast::Storable constructor => 'none';
+use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
-    Class::Std::initialize();
+Class::Std::initialize();
 
-    {    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-        my %anythings_of : ATTR(:get<anythings>);
-        my %anywhere_of : ATTR(:get<anywhere>);
-        my %anytime_of : ATTR(:get<anytime>);
-        my %general_of : ATTR(:get<general>);
-        my %origin_of : ATTR(:get<origin>);
-        my %destination_of : ATTR(:get<destination>);
-        my %quote_of : ATTR(:get<quote>);
-        my %quoteFilter_of : ATTR(:get<quoteFilter>);
-        my %payment_of : ATTR(:get<payment>);
-        my %instructions_of : ATTR(:get<instructions>);
-        my %comments_of : ATTR(:get<comments>);
-        my %reference_of : ATTR(:get<reference>);
-        my %promotionCode_of : ATTR(:get<promotionCode>);
-        my %clientId_of : ATTR(:get<clientId>);
-        my %labelPrinterType_of : ATTR(:get<labelPrinterType>);
+my %anythings_of :ATTR(:get<anythings>);
+my %anywhere_of :ATTR(:get<anywhere>);
+my %anytime_of :ATTR(:get<anytime>);
+my %general_of :ATTR(:get<general>);
+my %origin_of :ATTR(:get<origin>);
+my %destination_of :ATTR(:get<destination>);
+my %quote_of :ATTR(:get<quote>);
+my %quoteFilter_of :ATTR(:get<quoteFilter>);
+my %payment_of :ATTR(:get<payment>);
+my %instructions_of :ATTR(:get<instructions>);
+my %comments_of :ATTR(:get<comments>);
+my %reference_of :ATTR(:get<reference>);
+my %promotionCode_of :ATTR(:get<promotionCode>);
+my %clientId_of :ATTR(:get<clientId>);
+my %labelPrinterType_of :ATTR(:get<labelPrinterType>);
 
-        __PACKAGE__->_factory(
-            [   qw(        anythings
-                  anywhere
-                  anytime
-                  general
-                  origin
-                  destination
-                  quote
-                  quoteFilter
-                  payment
-                  instructions
-                  comments
-                  reference
-                  promotionCode
-                  clientId
-                  labelPrinterType
+__PACKAGE__->_factory(
+    [ qw(        anythings
+        anywhere
+        anytime
+        general
+        origin
+        destination
+        quote
+        quoteFilter
+        payment
+        instructions
+        comments
+        reference
+        promotionCode
+        clientId
+        labelPrinterType
 
-                )
-            ],
-            {   'anythings'        => \%anythings_of,
-                'anywhere'         => \%anywhere_of,
-                'anytime'          => \%anytime_of,
-                'general'          => \%general_of,
-                'origin'           => \%origin_of,
-                'destination'      => \%destination_of,
-                'quote'            => \%quote_of,
-                'quoteFilter'      => \%quoteFilter_of,
-                'payment'          => \%payment_of,
-                'instructions'     => \%instructions_of,
-                'comments'         => \%comments_of,
-                'reference'        => \%reference_of,
-                'promotionCode'    => \%promotionCode_of,
-                'clientId'         => \%clientId_of,
-                'labelPrinterType' => \%labelPrinterType_of,
-            },
-            {
-
-                'anythings' =>
-                  'Shipment::Temando::WSDL::Elements::makeBookingByRequest::_anythings',
-                'anywhere'    => 'Shipment::Temando::WSDL::Types::Anywhere',
-                'anytime'     => 'Shipment::Temando::WSDL::Types::Anytime',
-                'general'     => 'Shipment::Temando::WSDL::Types::General',
-                'origin'      => 'Shipment::Temando::WSDL::Types::Location',
-                'destination' => 'Shipment::Temando::WSDL::Types::Location',
-                'quote' => 'Shipment::Temando::WSDL::Types::BookingQuote',
-                'quoteFilter' => 'Shipment::Temando::WSDL::Types::QuoteFilter',
-                'payment'     => 'Shipment::Temando::WSDL::Types::Payment',
-                'instructions' =>
-                  'Shipment::Temando::WSDL::Types::Instructions',
-                'comments'  => 'Shipment::Temando::WSDL::Types::Comments',
-                'reference' =>
-                  'Shipment::Temando::WSDL::Types::ClientReference',
-                'promotionCode' =>
-                  'Shipment::Temando::WSDL::Types::PromotionCode',
-                'clientId' => 'Shipment::Temando::WSDL::Types::ClientId',
-                'labelPrinterType' =>
-                  'Shipment::Temando::WSDL::Types::LabelPrinterType',
-            },
-            {
-
-                'anythings'        => 'anythings',
-                'anywhere'         => 'anywhere',
-                'anytime'          => 'anytime',
-                'general'          => 'general',
-                'origin'           => 'origin',
-                'destination'      => 'destination',
-                'quote'            => 'quote',
-                'quoteFilter'      => 'quoteFilter',
-                'payment'          => 'payment',
-                'instructions'     => 'instructions',
-                'comments'         => 'comments',
-                'reference'        => 'reference',
-                'promotionCode'    => 'promotionCode',
-                'clientId'         => 'clientId',
-                'labelPrinterType' => 'labelPrinterType',
-            }
-        );
-
-    }    # end BLOCK
-
-
-    package Shipment::Temando::WSDL::Elements::makeBookingByRequest::_anythings;
-    $Shipment::Temando::WSDL::Elements::makeBookingByRequest::_anythings::VERSION
-      = '3.08';
-    use strict;
-    use warnings;
+    ) ],
     {
-        our $XML_ATTRIBUTE_CLASS;
-        undef $XML_ATTRIBUTE_CLASS;
+        'anythings' => \%anythings_of,
+        'anywhere' => \%anywhere_of,
+        'anytime' => \%anytime_of,
+        'general' => \%general_of,
+        'origin' => \%origin_of,
+        'destination' => \%destination_of,
+        'quote' => \%quote_of,
+        'quoteFilter' => \%quoteFilter_of,
+        'payment' => \%payment_of,
+        'instructions' => \%instructions_of,
+        'comments' => \%comments_of,
+        'reference' => \%reference_of,
+        'promotionCode' => \%promotionCode_of,
+        'clientId' => \%clientId_of,
+        'labelPrinterType' => \%labelPrinterType_of,
+    },
+    {
 
-        sub __get_attr_class {
-            return $XML_ATTRIBUTE_CLASS;
-        }
+        'anythings' => 'Shipment::Temando::WSDL::Elements::makeBookingByRequest::_anythings',
+        'anywhere' => 'Shipment::Temando::WSDL::Types::Anywhere',
+        'anytime' => 'Shipment::Temando::WSDL::Types::Anytime',
+        'general' => 'Shipment::Temando::WSDL::Types::General',
+        'origin' => 'Shipment::Temando::WSDL::Types::Location',
+        'destination' => 'Shipment::Temando::WSDL::Types::Location',
+        'quote' => 'Shipment::Temando::WSDL::Types::BookingQuote',
+        'quoteFilter' => 'Shipment::Temando::WSDL::Types::QuoteFilter',
+        'payment' => 'Shipment::Temando::WSDL::Types::Payment',
+        'instructions' => 'Shipment::Temando::WSDL::Types::Instructions',
+        'comments' => 'Shipment::Temando::WSDL::Types::Comments',
+        'reference' => 'Shipment::Temando::WSDL::Types::ClientReference',
+        'promotionCode' => 'Shipment::Temando::WSDL::Types::PromotionCode',
+        'clientId' => 'Shipment::Temando::WSDL::Types::ClientId',
+        'labelPrinterType' => 'Shipment::Temando::WSDL::Types::LabelPrinterType',
+    },
+    {
 
-        use Class::Std::Fast::Storable constructor => 'none';
-        use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-        Class::Std::initialize();
-
-        {    # BLOCK to scope variables
-
-            my %anything_of : ATTR(:get<anything>);
-
-            __PACKAGE__->_factory(
-                [   qw(        anything
-
-                    )
-                ],
-                {'anything' => \%anything_of,},
-                {'anything' => 'Shipment::Temando::WSDL::Types::Anything',},
-                {
-
-                    'anything' => 'anything',
-                }
-            );
-
-        }    # end BLOCK
-
-
+        'anythings' => 'anythings',
+        'anywhere' => 'anywhere',
+        'anytime' => 'anytime',
+        'general' => 'general',
+        'origin' => 'origin',
+        'destination' => 'destination',
+        'quote' => 'quote',
+        'quoteFilter' => 'quoteFilter',
+        'payment' => 'payment',
+        'instructions' => 'instructions',
+        'comments' => 'comments',
+        'reference' => 'reference',
+        'promotionCode' => 'promotionCode',
+        'clientId' => 'clientId',
+        'labelPrinterType' => 'labelPrinterType',
     }
+);
+
+} # end BLOCK
 
 
-}    # end of BLOCK
+
+
+package Shipment::Temando::WSDL::Elements::makeBookingByRequest::_anythings;
+$Shipment::Temando::WSDL::Elements::makeBookingByRequest::_anythings::VERSION = '3.09';
+use strict;
+use warnings;
+{
+our $XML_ATTRIBUTE_CLASS;
+undef $XML_ATTRIBUTE_CLASS;
+
+sub __get_attr_class {
+    return $XML_ATTRIBUTE_CLASS;
+}
+
+use Class::Std::Fast::Storable constructor => 'none';
+use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+Class::Std::initialize();
+
+{ # BLOCK to scope variables
+
+my %anything_of :ATTR(:get<anything>);
+
+__PACKAGE__->_factory(
+    [ qw(        anything
+
+    ) ],
+    {
+        'anything' => \%anything_of,
+    },
+    {
+        'anything' => 'Shipment::Temando::WSDL::Types::Anything',
+    },
+    {
+
+        'anything' => 'anything',
+    }
+);
+
+} # end BLOCK
+
+
+
+
+
+
+}
+
+
+
+
+
+} # end of BLOCK
+
 
 
 1;
@@ -192,7 +195,7 @@ Shipment::Temando::WSDL::Elements::makeBookingByRequest
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

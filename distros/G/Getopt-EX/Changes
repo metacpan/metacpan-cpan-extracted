@@ -1,5 +1,9 @@
 Revision history for Perl extension Getopt-EX
 
+v1.28.0 2022-07-01T03:06:38Z
+
+    - Recover __DATA__ position in case called multiple times from different object.
+
 v1.27.1 2022-03-17T11:21:36Z
 
     - Revert EraseLine handling introduced by previous update.

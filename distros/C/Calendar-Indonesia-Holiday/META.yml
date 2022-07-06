@@ -19,7 +19,7 @@ name: Calendar-Indonesia-Holiday
 provides:
   Calendar::Indonesia::Holiday:
     file: lib/Calendar/Indonesia/Holiday.pm
-    version: '0.346'
+    version: '0.347'
 requires:
   DateTime: '0'
   Exporter: '5.57'
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Calendar-Indonesia-Holiday
   homepage: https://metacpan.org/release/Calendar-Indonesia-Holiday
   repository: git://github.com/perlancar/perl-Calendar-Indonesia-Holiday.git
-version: '0.346'
+version: '0.347'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -130,8 +130,12 @@ x_Dist_Zilla:
       version: '0.02'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.062'
+      version: '0.064'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
@@ -321,7 +325,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.780'
+              version: '0.783'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

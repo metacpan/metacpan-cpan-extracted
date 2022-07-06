@@ -16,7 +16,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Catalyst::TraitFor::Request::StructuredParameters",
   "PREREQ_PM" => {
-    "CatalystX::Errors" => "0.001006",
+    "CatalystX::Errors" => "0.001008",
     "Moose" => "2.1403",
     "Scalar::Util" => "1.55",
     "Storable" => "3.25"
@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "HTTP::Request::Common" => 0,
     "Test::Most" => "0.34"
   },
-  "VERSION" => "0.008",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Catalyst::Test" => 0,
-  "CatalystX::Errors" => "0.001006",
+  "CatalystX::Errors" => "0.001008",
   "HTTP::Request::Common" => 0,
   "Moose" => "2.1403",
   "Scalar::Util" => "1.55",

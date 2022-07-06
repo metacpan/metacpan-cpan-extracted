@@ -1,0 +1,21 @@
+NAME
+
+    YAMLScript - Programming in YAML
+
+SYNOPSIS
+
+        #!/usr/bin/env yamlscript
+        - $greetee: world
+        - +say: Hello, $greetee!
+
+DESCRIPTION
+
+    YAMLScript is a programming language encoded in YAML.
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2022 by Ingy döt Net
+
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

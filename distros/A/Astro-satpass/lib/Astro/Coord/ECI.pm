@@ -92,7 +92,7 @@ package Astro::Coord::ECI;
 use strict;
 use warnings;
 
-our $VERSION = '0.125';
+our $VERSION = '0.126';
 
 use Astro::Coord::ECI::Utils qw{ @CARP_NOT :mainstream };
 use Carp;
@@ -303,7 +303,7 @@ The algorithm for position is the author's, but he confesses to having
 to refer to T. S. Kelso's "Computers and Satellites"
 column in "Satellite Times", November/December 1995, titled "Orbital
 Coordinate Systems, Part II" and available at
-F<http://celestrak.com/columns/v02n02/> to get the signs right.
+F<http://celestrak.org/columns/v02n02/> to get the signs right.
 
 If velocities are available for both bodies involved in the calculation,
 they will be returned after the position (i.e. you get a six-element
@@ -660,7 +660,7 @@ The algorithm for converting from ECI to geocentric coordinates and
 back is based on the description of ECI coordinates in T. S. Kelso's
 "Computers and Satellites" column in "Satellite Times",
 September/October 1995, titled "Orbital Coordinate Systems, Part I"
-and available at F<http://celestrak.com/columns/v02n01/>.
+and available at F<http://celestrak.org/columns/v02n01/>.
 
 =item ($x, $y, $z, $xdot, $ydot, $zdot) = $coord->eci($time);
 
@@ -4097,7 +4097,7 @@ REPORT NO. 3 - Models for Propagation of NORAD Element Sets,"
 which provided the basis for the Astro::Coord::ECI::TLE module.
 
 T. S. Kelso, who compiled this report and made it available at
-L<http://celestrak.com/>, whose "Computers and Satellites" columns
+L<http://celestrak.org/>, whose "Computers and Satellites" columns
 in "Satellite Times" magazine were invaluable to an understanding
 and implementation of satellite tracking software, whose support,
 encouragement, patience, and willingness to provide answers on arcane

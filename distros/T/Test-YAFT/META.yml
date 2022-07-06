@@ -1,0 +1,71 @@
+---
+abstract: 'Yet another testing framework'
+author:
+  - 'Branislav Zahradník <barney@cpan.org>'
+build_requires:
+  HTTP::Response: '0'
+  HTTP::Status: '0'
+  JSON: '0'
+  Module::Build: '0.28'
+  Test::Tester: '1.302107'
+  Type::Tiny: '0'
+  Types::Common::Numeric: '0'
+  require::relative: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-YAFT
+provides:
+  Test::YAFT:
+    file: lib/Test/YAFT.pm
+    version: v1.0.1
+  Test::YAFT::Arrange:
+    file: lib/Test/YAFT/Arrange.pm
+    version: v1.0.1
+  Test::YAFT::Attributes:
+    file: lib/Test/YAFT/Attributes.pm
+    version: v1.0.1
+  Test::YAFT::Cmp:
+    file: lib/Test/YAFT/Cmp.pm
+    version: v1.0.1
+  Test::YAFT::Cmp::Compare:
+    file: lib/Test/YAFT/Cmp/Compare.pm
+    version: v1.0.1
+  Test::YAFT::Cmp::Complement:
+    file: lib/Test/YAFT/Cmp/Complement.pm
+    version: v1.0.1
+  Test::YAFT::Got:
+    file: lib/Test/YAFT/Got.pm
+    version: v1.0.1
+requires:
+  Attribute::Handlers: '0'
+  Context::Singleton: '0'
+  Devel::StackTrace: '0'
+  Exporter::Tiny: '0'
+  Ref::Util: '0'
+  Safe::Isa: '0'
+  Scalar::Util: '0'
+  Sub::Install: '0'
+  Syntax::Construct: '0'
+  Test::Deep: '0'
+  Test::Deep::Cmp: '0'
+  Test::Differences: '0'
+  Test::More: v0.970.0
+  Test::Warnings: '0'
+  overload: '0'
+  parent: '0'
+  perl: '5.014'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/happy-barney/perl-Test-YAFT/issues
+  repository: git://github.com/happy-barney/perl-Test-YAFT.git
+version: 1.0.1
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

@@ -26,7 +26,7 @@ use Web::Scraper;
 use String::Util qw(trim);
 use DateTime;
 
-our $VERSION = '1.51'; # VERSION
+our $VERSION = '1.52'; # VERSION
 my $TREASURY_MAINURL = ("http://www.treasurydirect.gov/");
 my $TREASURY_URL = ($TREASURY_MAINURL."indiv/tools/");
 

@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::HandlerLibrary::String;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.027';
+our $VERSION   = '0.028';
 
 use Sub::HandlesVia::HandlerLibrary;
 our @ISA = 'Sub::HandlesVia::HandlerLibrary';
@@ -264,7 +264,7 @@ sub contains_i {
 		name      => 'String:contains_i',
 		args      => 1,
 		signature => [ Str ],
-		usage     => '$tail',
+		usage     => '$str',
 		template  => sprintf( 'index(%s($GET), %s($ARG)) != -1', $fold, $fold ),
 		documentation => "Returns true iff the string contains C<< \$str >> case-insensitvely.",
 }

@@ -1,9 +1,9 @@
 This archive contains the distribution Weather-NHC-TropicalCyclone,
-version 0.31:
+version 0.32:
 
   Provides a convenient interface to NHC's Tropical Cyclone JSON format.
 
-This software is copyright (c) 2021 by public domain.
+This software is copyright (c) 2022 by public domain.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

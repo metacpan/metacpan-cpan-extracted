@@ -42,9 +42,9 @@
       },
       "runtime" : {
          "requires" : {
-            "App::optex" : "v0.5.3",
+            "App::optex" : "v0.5.4",
             "Text::ANSI::Fold::Util" : "0.06",
-            "Text::Conceal" : "0.99",
+            "Text::Conceal" : "0.9901",
             "Text::VisualWidth::PP" : "0.05",
             "perl" : "v5.14.0"
          }
@@ -58,7 +58,7 @@
    "provides" : {
       "App::optex::xform" : {
          "file" : "lib/App/optex/xform.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,7 @@
          "web" : "https://github.com/kaz-utashiro/optex-xform"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

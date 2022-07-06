@@ -31,7 +31,7 @@ no_index:
 provides:
   PDF::Data:
     file: lib/PDF/Data.pm
-    version: v1.0.0
+    version: v1.0.1
 requires:
   Carp: '0'
   Clone: '0'
@@ -54,7 +54,7 @@ requires:
   utf8: '0'
   version: '0'
   warnings: '0'
-version: v1.0.0
+version: v1.0.1
 x_Dist_Zilla:
   perl:
     version: '5.035001'
@@ -234,7 +234,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.0.0
+          tag: v1.0.1
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -259,6 +259,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs
+      version: '6.025'
+    -
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: PruneFiles
       version: '6.025'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod

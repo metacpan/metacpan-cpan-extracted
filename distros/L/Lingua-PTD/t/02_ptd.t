@@ -1,5 +1,5 @@
 # -*- cperl -*-
-use Test::More tests => 22 + 5*32;
+use Test::More tests => 23 + 6*32;
 
 use utf8;
 use Lingua::PTD;
@@ -10,6 +10,7 @@ isa_ok $ptd => "Lingua::PTD";
 isa_ok $ptd => "Lingua::PTD::Dumper";
 
 # save it before messing with its contents
+$ptd->saveAs(json   => "t/_out.json");
 $ptd->saveAs(dmp    => "t/_out.dmp");
 $ptd->saveAs(bz2    => "t/_out.dmp.bz2");
 $ptd->saveAs(xz     => "t/_out.dmp.xz");
@@ -63,6 +64,16 @@ isa_ok $xzptd => "Lingua::PTD::XzDmp";
 test_contents($xzptd, "xzipped ptd");
 unlink "t/_out.dmp.xz";
 
+# test JSON PTD
+ok -f "t/_out.json";
+
+my $jsptd = Lingua::PTD->new("t/_out.json");
+
+isa_ok $jsptd => "Lingua::PTD";
+isa_ok $jsptd => "Lingua::PTD::JSON";
+
+test_contents($jsptd, "json ptd");
+unlink "t/_out.json";
 
 ## Reset things...
 my $ptd1 = Lingua::PTD->new("t/02_ptd.dmp");

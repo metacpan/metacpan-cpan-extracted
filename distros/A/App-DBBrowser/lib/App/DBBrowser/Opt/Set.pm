@@ -38,16 +38,16 @@ sub new {
 
 sub _groups {
     my $groups = [
-        { name => 'group_help',     text => "  HELP"        },
-        { name => 'group_path',     text => "  Path"        },
-        { name => 'group_plugins',  text => "- DB Plugins"  },
-        { name => 'group_database', text => "- DB Settings"  },
-        { name => 'group_behavior', text => "- Behavior"    },
-        { name => 'group_enable',   text => "- Extensions"  },
-        { name => 'group_sql',      text => "- SQL",        },
-        { name => 'group_output',   text => "- Output"      },
-        { name => 'group_insert',   text => "- Insert Data" },
-        { name => 'group_export',   text => "- Export to CSV"      },
+        { name => 'group_help',     text => "  HELP"          },
+        { name => 'group_path',     text => "  Path"          },
+        { name => 'group_plugins',  text => "- DB Plugins"    },
+        { name => 'group_database', text => "- DB Settings"   },
+        { name => 'group_behavior', text => "- Behavior"      },
+        { name => 'group_enable',   text => "- Extensions"    },
+        { name => 'group_sql',      text => "- SQL",          },
+        { name => 'group_output',   text => "- Output"        },
+        { name => 'group_insert',   text => "- Insert Data"   },
+        { name => 'group_export',   text => "- Export to CSV" },
     ];
     return $groups;
 }
@@ -90,7 +90,7 @@ sub _options {
             { name => '_view_name_prefix',       text => "- View prefix",      section => 'create' },
             { name => '_autoincrement_col_name', text => "- Auto increment",   section => 'create' },
             { name => '_data_type_guessing',     text => "- Guess data types", section => 'create' },
-            { name => 'max_rows',                text => "- Max rows",         section => 'G'      },
+            { name => 'auto_limit',              text => "- Auto Limit",       section => 'G'      },
         ],
         group_output => [
             { name => 'min_col_width',       text => "- Trunc col threshold", section => 'table' },
@@ -105,17 +105,17 @@ sub _options {
             { name => '_file_find_warnings', text => "- Warnings",            section => 'G'     },
         ],
         group_insert => [
-            { name => '_data_source_type',  text => "- Source type of input data",     section => 'insert' },
-            { name => '_parse_file',        text => "- Parse tool for 'file'",         section => 'insert' },
-            { name => '_csv_char',          text => "- Settings: csv-a",               section => 'csv'    },
-            { name => '_csv_options',       text => "- Settings: csv-b",               section => 'csv'    },
-            { name => '_split_config',      text => "- Settings: split",               section => 'split'  },
-            { name => '_input_filter',      text => "- Enable input filter",           section => 'insert' },
-            { name => '_empty_to_null',     text => "- Empty to NULL",                 section => 'insert' },
-            { name => '_file_encoding',     text => "- File encoding",                 section => 'insert' },
-            { name => 'history_dirs',       text => "- Directory history",             section => 'insert' },
-            { name => '_file_filter',       text => "- File filter",                   section => 'insert' },
-            { name => '_show_hidden_files', text => "- Show hidden files",             section => 'insert' },
+            { name => '_data_source_type',  text => "- Data source menu",      section => 'insert' },
+            { name => '_parse_file',        text => "- Parse tool for 'file'", section => 'insert' },
+            { name => '_csv_char',          text => "- Settings: csv-a",       section => 'csv'    },
+            { name => '_csv_options',       text => "- Settings: csv-b",       section => 'csv'    },
+            { name => '_split_config',      text => "- Settings: split",       section => 'split'  },
+            { name => '_input_filter',      text => "- Enable input filter",   section => 'insert' },
+            { name => '_empty_to_null',     text => "- Empty to NULL",         section => 'insert' },
+            { name => '_file_encoding',     text => "- File encoding",         section => 'insert' },
+            { name => 'history_dirs',       text => "- Directory history",     section => 'insert' },
+            { name => '_file_filter',       text => "- File filter",           section => 'insert' },
+            { name => '_show_hidden_files', text => "- Show hidden files",     section => 'insert' },
         ],
         group_export => [
             { name => 'export_dir',           text => "- Destination folder",  section => 'export' },
@@ -351,7 +351,7 @@ sub set_options {
                 my $prompt = 'Set the threshold for the progress bar ';
                 $sf->__choose_a_number_wrap( $section, $opt, $prompt, $digits, 0 );
             }
-            elsif ( $opt eq 'max_rows' ) {
+            elsif ( $opt eq 'auto_limit' ) {
                 my $digits = 7;
                 my $prompt = 'Set the SQL auto LIMIT ';
                 $sf->__choose_a_number_wrap( $section, $opt, $prompt, $digits, 0 );

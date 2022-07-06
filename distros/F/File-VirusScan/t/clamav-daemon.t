@@ -17,8 +17,10 @@ sub required_arguments
 	my @possible_sock = qw(
 		/var/run/clamav/clamd.ctl
 		/var/spool/MIMEDefang/clamd.sock
-	);
-	return { socket_name => (grep { -S $_ } @possible_sock)[0] }
+            );
+        my $possible = (grep { -S $_ } @possible_sock)[0];
+        $possible = '/tmp' unless defined($possible);
+	return { socket_name => $possible };
 }
 
 sub testable_live

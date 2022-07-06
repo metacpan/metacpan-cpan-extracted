@@ -20,7 +20,7 @@ no_index:
 provides:
   Test::Excel:
     file: lib/Test/Excel.pm
-    version: '1.50'
+    version: '1.53'
 requires:
   File::Spec: '0'
   Scalar::Util: '0'
@@ -33,5 +33,5 @@ requires:
   perl: '5.01'
 resources:
   repository: https://github.com/manwar/Test-Excel.git
-version: '1.50'
+version: '1.53'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

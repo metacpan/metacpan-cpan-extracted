@@ -84,7 +84,7 @@ subtest 'CacheID' => sub {
 
     # and now try for foo again
     App::Env::import( 'App1', { CacheID => 'foo' } );
-    is( $ENV{Site1_App1}, 2, "re-import App1, id => 'foo'"  );
+    is( $ENV{Site1_App1}, 2, "re-import App1, id => 'foo'" );
 
 
     # merge.  should pull in fresh App1
@@ -109,12 +109,14 @@ subtest 'CacheID' => sub {
 
     # now check merge.  should be same as above as it was cached
     App::Env::import( 'App1', 'App2' );
-    ok( $ENV{Site1_App1} == 3, "re-import App1 & App2, id => default; check App1" );
-    ok( $ENV{Site1_App2} == 1, "re-import App1 & App2, id => default; check App2" );
+    ok( $ENV{Site1_App1} == 3,
+        "re-import App1 & App2, id => default; check App1" );
+    ok( $ENV{Site1_App2} == 1,
+        "re-import App1 & App2, id => default; check App2" );
 
 
     # now explicitly delete CacheID foo, and import it to increment counter
-    App::Env::uncache( {CacheID => 'foo'} );
+    App::Env::uncache( { CacheID => 'foo' } );
     App::Env::import( 'App1', { CacheID => 'foo' } );
     is( $ENV{Site1_App1}, 4, "uncache App1/'foo', import App1/'foo'" );
 

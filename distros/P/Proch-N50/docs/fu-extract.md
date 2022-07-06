@@ -1,14 +1,56 @@
 # NAME
 
-fu-extract - Filter DNA sequences by pattern and/or length
+fu-extract - Get sequences by name (also using lists)
 
 # VERSION
 
-version 1.4.8
+version 1.5.0
+
+# PARAMETERS
+
+- `-p, --pattern` PATTERN
+
+    Print only sequences containing the given pattern in their name
+
+- `-l, --list` FILE
+
+    Print only sequences in the given list file (full name must match)
+
+- `-c, --column` COLUMN
+
+    In the list file, consider the name as the column COLUMN (default: 1)
+
+- `-h, --header` CHAR
+
+    Ignore lines starting with CHAR in the list (default: "#")
+
+- `-s, --separator` CHAR
+
+    Split the lines in the list file by CHAR (default: "\\\\t")
+
+- `-i, --case-insensitive`
+
+    Ignore case in the name	(works both with `-p` and `-l`)
+
+- `-m, --minlen` MINLEN
+
+    Print only sequences with a length greater than MINLEN
+
+- `-x, --maxlen` MAXLEN
+
+    Print only sequences with a length less than MAXLEN
+
+- `-v, --verbose`
+
+    Print more information
 
 # EXAMPLES
 
+Search by sequence name:
+
     fu-extract -p 'BamHI' test.fa
+
+Use a list to extract sequences:
 
     fu-extract -l list.txt test.Fasta
 

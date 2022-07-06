@@ -81,7 +81,7 @@ SKIP: {
     }
 }
 
-open my $dh, q{<}, qq{$Bin/../../data/CurrentStorms.json} or die $!;
+open my $dh, q{<}, qq{$Bin/../../data/2020/CurrentStorms.json} or die $!;
 local $/;
 my $json     = <$dh>;
 my $json_ref = JSON::XS::decode_json $json;

@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use open qw[:encoding(UTF-8) :std];
 use charnames ":full";
 use Test::More tests => 3;
 use Text::Bidi qw(log2vis);

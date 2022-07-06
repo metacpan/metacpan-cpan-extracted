@@ -1,0 +1,53 @@
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Test::YAFT::Test::Spec - Test::YAFT - Test::Spec comparison
+
+=head1 DESCRIPTION
+
+L<Test::YAFT> allows approach similar to one provided by L<Test::Spec>
+with small but significant differences
+
+=over
+
+=item code is executed as/when it appears in the source code
+
+=item assert's test message is not concatenated
+
+=back
+
+=head2 after
+
+Not supported directly, only via L<Context::Singleton> context expiration
+
+=head2 before
+
+Use C<arrange {}> block instead.
+
+C<before all> behaviour can be achieved by using C<arrange {}> block in (subtest)
+context.
+
+C<before each> behaviour can be achieved only by putting C<arrange {}> block
+into each assert's arguments.
+
+=head2 context
+
+Use C<subtest> instead
+
+=head2 describe
+
+Use C<subtest> instead
+
+=head1 AUTHOR
+
+Branislav Zahradník <barney@cpan.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+This file is part of L<Test::YAFT> distribution.
+
+=cut

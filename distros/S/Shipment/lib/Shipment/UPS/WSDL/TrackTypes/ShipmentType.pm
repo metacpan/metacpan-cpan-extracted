@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::TrackTypes::ShipmentType;
-$Shipment::UPS::WSDL::TrackTypes::ShipmentType::VERSION = '3.08';
+$Shipment::UPS::WSDL::TrackTypes::ShipmentType::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,187 +20,177 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %InquiryNumber_of : ATTR(:get<InquiryNumber>);
-    my %ShipmentType_of : ATTR(:get<ShipmentType>);
-    my %CandidateBookmark_of : ATTR(:get<CandidateBookmark>);
-    my %ShipperNumber_of : ATTR(:get<ShipperNumber>);
-    my %ShipmentAddress_of : ATTR(:get<ShipmentAddress>);
-    my %ShipmentWeight_of : ATTR(:get<ShipmentWeight>);
-    my %Service_of : ATTR(:get<Service>);
-    my %ReferenceNumber_of : ATTR(:get<ReferenceNumber>);
-    my %CurrentStatus_of : ATTR(:get<CurrentStatus>);
-    my %PickupDate_of : ATTR(:get<PickupDate>);
-    my %ServiceCenter_of : ATTR(:get<ServiceCenter>);
-    my %DeliveryDetail_of : ATTR(:get<DeliveryDetail>);
-    my %Volume_of : ATTR(:get<Volume>);
-    my %BillToName_of : ATTR(:get<BillToName>);
-    my %NumberOfPackagingUnit_of : ATTR(:get<NumberOfPackagingUnit>);
-    my %ShipmentServiceOption_of : ATTR(:get<ShipmentServiceOption>);
-    my %COD_of : ATTR(:get<COD>);
-    my %SignedForByName_of : ATTR(:get<SignedForByName>);
-    my %Activity_of : ATTR(:get<Activity>);
-    my %OriginPortDetail_of : ATTR(:get<OriginPortDetail>);
-    my %DestinationPortDetail_of : ATTR(:get<DestinationPortDetail>);
-    my %DescriptionOfGoods_of : ATTR(:get<DescriptionOfGoods>);
-    my %CargoReady_of : ATTR(:get<CargoReady>);
-    my %Manifest_of : ATTR(:get<Manifest>);
-    my %CarrierActivityInformation_of : ATTR(:get<CarrierActivityInformation>);
-    my %Document_of : ATTR(:get<Document>);
-    my %FileNumber_of : ATTR(:get<FileNumber>);
-    my %Appointment_of : ATTR(:get<Appointment>);
-    my %Package_of : ATTR(:get<Package>);
-    my %AdditionalAttribute_of : ATTR(:get<AdditionalAttribute>);
+my %InquiryNumber_of :ATTR(:get<InquiryNumber>);
+my %ShipmentType_of :ATTR(:get<ShipmentType>);
+my %CandidateBookmark_of :ATTR(:get<CandidateBookmark>);
+my %ShipperNumber_of :ATTR(:get<ShipperNumber>);
+my %ShipmentAddress_of :ATTR(:get<ShipmentAddress>);
+my %ShipmentWeight_of :ATTR(:get<ShipmentWeight>);
+my %Service_of :ATTR(:get<Service>);
+my %ReferenceNumber_of :ATTR(:get<ReferenceNumber>);
+my %CurrentStatus_of :ATTR(:get<CurrentStatus>);
+my %PickupDate_of :ATTR(:get<PickupDate>);
+my %ServiceCenter_of :ATTR(:get<ServiceCenter>);
+my %DeliveryDetail_of :ATTR(:get<DeliveryDetail>);
+my %Volume_of :ATTR(:get<Volume>);
+my %BillToName_of :ATTR(:get<BillToName>);
+my %NumberOfPackagingUnit_of :ATTR(:get<NumberOfPackagingUnit>);
+my %ShipmentServiceOption_of :ATTR(:get<ShipmentServiceOption>);
+my %COD_of :ATTR(:get<COD>);
+my %SignedForByName_of :ATTR(:get<SignedForByName>);
+my %Activity_of :ATTR(:get<Activity>);
+my %OriginPortDetail_of :ATTR(:get<OriginPortDetail>);
+my %DestinationPortDetail_of :ATTR(:get<DestinationPortDetail>);
+my %DescriptionOfGoods_of :ATTR(:get<DescriptionOfGoods>);
+my %CargoReady_of :ATTR(:get<CargoReady>);
+my %Manifest_of :ATTR(:get<Manifest>);
+my %CarrierActivityInformation_of :ATTR(:get<CarrierActivityInformation>);
+my %Document_of :ATTR(:get<Document>);
+my %FileNumber_of :ATTR(:get<FileNumber>);
+my %Appointment_of :ATTR(:get<Appointment>);
+my %Package_of :ATTR(:get<Package>);
+my %AdditionalAttribute_of :ATTR(:get<AdditionalAttribute>);
 
-    __PACKAGE__->_factory(
-        [   qw(        InquiryNumber
-              ShipmentType
-              CandidateBookmark
-              ShipperNumber
-              ShipmentAddress
-              ShipmentWeight
-              Service
-              ReferenceNumber
-              CurrentStatus
-              PickupDate
-              ServiceCenter
-              DeliveryDetail
-              Volume
-              BillToName
-              NumberOfPackagingUnit
-              ShipmentServiceOption
-              COD
-              SignedForByName
-              Activity
-              OriginPortDetail
-              DestinationPortDetail
-              DescriptionOfGoods
-              CargoReady
-              Manifest
-              CarrierActivityInformation
-              Document
-              FileNumber
-              Appointment
-              Package
-              AdditionalAttribute
+__PACKAGE__->_factory(
+    [ qw(        InquiryNumber
+        ShipmentType
+        CandidateBookmark
+        ShipperNumber
+        ShipmentAddress
+        ShipmentWeight
+        Service
+        ReferenceNumber
+        CurrentStatus
+        PickupDate
+        ServiceCenter
+        DeliveryDetail
+        Volume
+        BillToName
+        NumberOfPackagingUnit
+        ShipmentServiceOption
+        COD
+        SignedForByName
+        Activity
+        OriginPortDetail
+        DestinationPortDetail
+        DescriptionOfGoods
+        CargoReady
+        Manifest
+        CarrierActivityInformation
+        Document
+        FileNumber
+        Appointment
+        Package
+        AdditionalAttribute
 
-            )
-        ],
-        {   'InquiryNumber'              => \%InquiryNumber_of,
-            'ShipmentType'               => \%ShipmentType_of,
-            'CandidateBookmark'          => \%CandidateBookmark_of,
-            'ShipperNumber'              => \%ShipperNumber_of,
-            'ShipmentAddress'            => \%ShipmentAddress_of,
-            'ShipmentWeight'             => \%ShipmentWeight_of,
-            'Service'                    => \%Service_of,
-            'ReferenceNumber'            => \%ReferenceNumber_of,
-            'CurrentStatus'              => \%CurrentStatus_of,
-            'PickupDate'                 => \%PickupDate_of,
-            'ServiceCenter'              => \%ServiceCenter_of,
-            'DeliveryDetail'             => \%DeliveryDetail_of,
-            'Volume'                     => \%Volume_of,
-            'BillToName'                 => \%BillToName_of,
-            'NumberOfPackagingUnit'      => \%NumberOfPackagingUnit_of,
-            'ShipmentServiceOption'      => \%ShipmentServiceOption_of,
-            'COD'                        => \%COD_of,
-            'SignedForByName'            => \%SignedForByName_of,
-            'Activity'                   => \%Activity_of,
-            'OriginPortDetail'           => \%OriginPortDetail_of,
-            'DestinationPortDetail'      => \%DestinationPortDetail_of,
-            'DescriptionOfGoods'         => \%DescriptionOfGoods_of,
-            'CargoReady'                 => \%CargoReady_of,
-            'Manifest'                   => \%Manifest_of,
-            'CarrierActivityInformation' => \%CarrierActivityInformation_of,
-            'Document'                   => \%Document_of,
-            'FileNumber'                 => \%FileNumber_of,
-            'Appointment'                => \%Appointment_of,
-            'Package'                    => \%Package_of,
-            'AdditionalAttribute'        => \%AdditionalAttribute_of,
-        },
-        {   'InquiryNumber' =>
-              'Shipment::UPS::WSDL::TrackTypes::CodeDescriptionValueType',
-            'ShipmentType' =>
-              'Shipment::UPS::WSDL::TrackTypes::RefShipmentType',
-            'CandidateBookmark' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ShipperNumber'     => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ShipmentAddress'   =>
-              'Shipment::UPS::WSDL::TrackTypes::ShipmentAddressType',
-            'ShipmentWeight' => 'Shipment::UPS::WSDL::TrackTypes::WeightType',
-            'Service'        => 'Shipment::UPS::WSDL::TrackTypes::ServiceType',
-            'ReferenceNumber' =>
-              'Shipment::UPS::WSDL::TrackTypes::ShipmentReferenceNumberType',
-            'CurrentStatus' =>
-              'Shipment::UPS::WSDL::TrackTypes::CommonCodeDescriptionType',
-            'PickupDate'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ServiceCenter' =>
-              'Shipment::UPS::WSDL::TrackTypes::ServiceCenterType',
-            'DeliveryDetail' =>
-              'Shipment::UPS::WSDL::TrackTypes::DeliveryDetailType',
-            'Volume'     => 'Shipment::UPS::WSDL::TrackTypes::VolumeType',
-            'BillToName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'NumberOfPackagingUnit' =>
-              'Shipment::UPS::WSDL::TrackTypes::NumberOfPackagingUnitType',
-            'ShipmentServiceOption' =>
-              'Shipment::UPS::WSDL::TrackTypes::ServiceOptionType',
-            'COD'             => 'Shipment::UPS::WSDL::TrackTypes::CODType',
-            'SignedForByName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Activity'        =>
-              'Shipment::UPS::WSDL::TrackTypes::ShipmentActivityType',
-            'OriginPortDetail' =>
-              'Shipment::UPS::WSDL::TrackTypes::OriginPortDetailType',
-            'DestinationPortDetail' =>
-              'Shipment::UPS::WSDL::TrackTypes::DestinationPortDetailType',
-            'DescriptionOfGoods' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'CargoReady' => 'Shipment::UPS::WSDL::TrackTypes::DateTimeType',
-            'Manifest'   => 'Shipment::UPS::WSDL::TrackTypes::DateTimeType',
-            'CarrierActivityInformation' =>
-              'Shipment::UPS::WSDL::TrackTypes::CarrierActivityInformationType',
-            'Document'    => 'Shipment::UPS::WSDL::TrackTypes::DocumentType',
-            'FileNumber'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Appointment' =>
-              'Shipment::UPS::WSDL::TrackTypes::AppointmentType',
-            'Package' => 'Shipment::UPS::WSDL::TrackTypes::PackageType',
-            'AdditionalAttribute' =>
-              'Shipment::UPS::WSDL::TrackTypes::AdditionalCodeDescriptionValueType',
-        },
-        {
+    ) ],
+    {
+        'InquiryNumber' => \%InquiryNumber_of,
+        'ShipmentType' => \%ShipmentType_of,
+        'CandidateBookmark' => \%CandidateBookmark_of,
+        'ShipperNumber' => \%ShipperNumber_of,
+        'ShipmentAddress' => \%ShipmentAddress_of,
+        'ShipmentWeight' => \%ShipmentWeight_of,
+        'Service' => \%Service_of,
+        'ReferenceNumber' => \%ReferenceNumber_of,
+        'CurrentStatus' => \%CurrentStatus_of,
+        'PickupDate' => \%PickupDate_of,
+        'ServiceCenter' => \%ServiceCenter_of,
+        'DeliveryDetail' => \%DeliveryDetail_of,
+        'Volume' => \%Volume_of,
+        'BillToName' => \%BillToName_of,
+        'NumberOfPackagingUnit' => \%NumberOfPackagingUnit_of,
+        'ShipmentServiceOption' => \%ShipmentServiceOption_of,
+        'COD' => \%COD_of,
+        'SignedForByName' => \%SignedForByName_of,
+        'Activity' => \%Activity_of,
+        'OriginPortDetail' => \%OriginPortDetail_of,
+        'DestinationPortDetail' => \%DestinationPortDetail_of,
+        'DescriptionOfGoods' => \%DescriptionOfGoods_of,
+        'CargoReady' => \%CargoReady_of,
+        'Manifest' => \%Manifest_of,
+        'CarrierActivityInformation' => \%CarrierActivityInformation_of,
+        'Document' => \%Document_of,
+        'FileNumber' => \%FileNumber_of,
+        'Appointment' => \%Appointment_of,
+        'Package' => \%Package_of,
+        'AdditionalAttribute' => \%AdditionalAttribute_of,
+    },
+    {
+        'InquiryNumber' => 'Shipment::UPS::WSDL::TrackTypes::CodeDescriptionValueType',
+        'ShipmentType' => 'Shipment::UPS::WSDL::TrackTypes::RefShipmentType',
+        'CandidateBookmark' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ShipperNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ShipmentAddress' => 'Shipment::UPS::WSDL::TrackTypes::ShipmentAddressType',
+        'ShipmentWeight' => 'Shipment::UPS::WSDL::TrackTypes::WeightType',
+        'Service' => 'Shipment::UPS::WSDL::TrackTypes::ServiceType',
+        'ReferenceNumber' => 'Shipment::UPS::WSDL::TrackTypes::ShipmentReferenceNumberType',
+        'CurrentStatus' => 'Shipment::UPS::WSDL::TrackTypes::CommonCodeDescriptionType',
+        'PickupDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ServiceCenter' => 'Shipment::UPS::WSDL::TrackTypes::ServiceCenterType',
+        'DeliveryDetail' => 'Shipment::UPS::WSDL::TrackTypes::DeliveryDetailType',
+        'Volume' => 'Shipment::UPS::WSDL::TrackTypes::VolumeType',
+        'BillToName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'NumberOfPackagingUnit' => 'Shipment::UPS::WSDL::TrackTypes::NumberOfPackagingUnitType',
+        'ShipmentServiceOption' => 'Shipment::UPS::WSDL::TrackTypes::ServiceOptionType',
+        'COD' => 'Shipment::UPS::WSDL::TrackTypes::CODType',
+        'SignedForByName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Activity' => 'Shipment::UPS::WSDL::TrackTypes::ShipmentActivityType',
+        'OriginPortDetail' => 'Shipment::UPS::WSDL::TrackTypes::OriginPortDetailType',
+        'DestinationPortDetail' => 'Shipment::UPS::WSDL::TrackTypes::DestinationPortDetailType',
+        'DescriptionOfGoods' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'CargoReady' => 'Shipment::UPS::WSDL::TrackTypes::DateTimeType',
+        'Manifest' => 'Shipment::UPS::WSDL::TrackTypes::DateTimeType',
+        'CarrierActivityInformation' => 'Shipment::UPS::WSDL::TrackTypes::CarrierActivityInformationType',
+        'Document' => 'Shipment::UPS::WSDL::TrackTypes::DocumentType',
+        'FileNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Appointment' => 'Shipment::UPS::WSDL::TrackTypes::AppointmentType',
+        'Package' => 'Shipment::UPS::WSDL::TrackTypes::PackageType',
+        'AdditionalAttribute' => 'Shipment::UPS::WSDL::TrackTypes::AdditionalCodeDescriptionValueType',
+    },
+    {
 
-            'InquiryNumber'              => 'InquiryNumber',
-            'ShipmentType'               => 'ShipmentType',
-            'CandidateBookmark'          => 'CandidateBookmark',
-            'ShipperNumber'              => 'ShipperNumber',
-            'ShipmentAddress'            => 'ShipmentAddress',
-            'ShipmentWeight'             => 'ShipmentWeight',
-            'Service'                    => 'Service',
-            'ReferenceNumber'            => 'ReferenceNumber',
-            'CurrentStatus'              => 'CurrentStatus',
-            'PickupDate'                 => 'PickupDate',
-            'ServiceCenter'              => 'ServiceCenter',
-            'DeliveryDetail'             => 'DeliveryDetail',
-            'Volume'                     => 'Volume',
-            'BillToName'                 => 'BillToName',
-            'NumberOfPackagingUnit'      => 'NumberOfPackagingUnit',
-            'ShipmentServiceOption'      => 'ShipmentServiceOption',
-            'COD'                        => 'COD',
-            'SignedForByName'            => 'SignedForByName',
-            'Activity'                   => 'Activity',
-            'OriginPortDetail'           => 'OriginPortDetail',
-            'DestinationPortDetail'      => 'DestinationPortDetail',
-            'DescriptionOfGoods'         => 'DescriptionOfGoods',
-            'CargoReady'                 => 'CargoReady',
-            'Manifest'                   => 'Manifest',
-            'CarrierActivityInformation' => 'CarrierActivityInformation',
-            'Document'                   => 'Document',
-            'FileNumber'                 => 'FileNumber',
-            'Appointment'                => 'Appointment',
-            'Package'                    => 'Package',
-            'AdditionalAttribute'        => 'AdditionalAttribute',
-        }
-    );
+        'InquiryNumber' => 'InquiryNumber',
+        'ShipmentType' => 'ShipmentType',
+        'CandidateBookmark' => 'CandidateBookmark',
+        'ShipperNumber' => 'ShipperNumber',
+        'ShipmentAddress' => 'ShipmentAddress',
+        'ShipmentWeight' => 'ShipmentWeight',
+        'Service' => 'Service',
+        'ReferenceNumber' => 'ReferenceNumber',
+        'CurrentStatus' => 'CurrentStatus',
+        'PickupDate' => 'PickupDate',
+        'ServiceCenter' => 'ServiceCenter',
+        'DeliveryDetail' => 'DeliveryDetail',
+        'Volume' => 'Volume',
+        'BillToName' => 'BillToName',
+        'NumberOfPackagingUnit' => 'NumberOfPackagingUnit',
+        'ShipmentServiceOption' => 'ShipmentServiceOption',
+        'COD' => 'COD',
+        'SignedForByName' => 'SignedForByName',
+        'Activity' => 'Activity',
+        'OriginPortDetail' => 'OriginPortDetail',
+        'DestinationPortDetail' => 'DestinationPortDetail',
+        'DescriptionOfGoods' => 'DescriptionOfGoods',
+        'CargoReady' => 'CargoReady',
+        'Manifest' => 'Manifest',
+        'CarrierActivityInformation' => 'CarrierActivityInformation',
+        'Document' => 'Document',
+        'FileNumber' => 'FileNumber',
+        'Appointment' => 'Appointment',
+        'Package' => 'Package',
+        'AdditionalAttribute' => 'AdditionalAttribute',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -217,7 +207,7 @@ Shipment::UPS::WSDL::TrackTypes::ShipmentType
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

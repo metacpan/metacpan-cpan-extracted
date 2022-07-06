@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::ResponseInformation;
-$Shipment::Purolator::WSDL::Types::ResponseInformation::VERSION = '3.08';
+$Shipment::Purolator::WSDL::Types::ResponseInformation::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Errors_of : ATTR(:get<Errors>);
-    my %InformationalMessages_of : ATTR(:get<InformationalMessages>);
+my %Errors_of :ATTR(:get<Errors>);
+my %InformationalMessages_of :ATTR(:get<InformationalMessages>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Errors
-              InformationalMessages
+__PACKAGE__->_factory(
+    [ qw(        Errors
+        InformationalMessages
 
-            )
-        ],
-        {   'Errors'                => \%Errors_of,
-            'InformationalMessages' => \%InformationalMessages_of,
-        },
-        {   'Errors' => 'Shipment::Purolator::WSDL::Types::ArrayOfError',
-            'InformationalMessages' =>
-              'Shipment::Purolator::WSDL::Types::ArrayOfInformationalMessage',
-        },
-        {
+    ) ],
+    {
+        'Errors' => \%Errors_of,
+        'InformationalMessages' => \%InformationalMessages_of,
+    },
+    {
+        'Errors' => 'Shipment::Purolator::WSDL::Types::ArrayOfError',
+        'InformationalMessages' => 'Shipment::Purolator::WSDL::Types::ArrayOfInformationalMessage',
+    },
+    {
 
-            'Errors'                => 'Errors',
-            'InformationalMessages' => 'InformationalMessages',
-        }
-    );
+        'Errors' => 'Errors',
+        'InformationalMessages' => 'InformationalMessages',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -62,7 +67,7 @@ Shipment::Purolator::WSDL::Types::ResponseInformation
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

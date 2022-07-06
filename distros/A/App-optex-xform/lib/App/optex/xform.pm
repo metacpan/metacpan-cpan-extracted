@@ -1,6 +1,6 @@
 package App::optex::xform;
 
-our $VERSION = "1.03";
+our $VERSION = "1.04";
 
 =encoding utf-8
 
@@ -73,40 +73,44 @@ use Text::Conceal;
 use Text::VisualWidth::PP qw(vwidth);
 use Text::ANSI::Fold::Util qw(ansi_width);
 
-my @concealer;
+my %concealer;
 
 my %param = (
     ansi => {
-	length => \&ansi_width,
-	match  => qr/\e\[.*?(?:\e\[0*m)+(?:\e\[0*K)*/,
+	length  => \&ansi_width,
+	match   => qr/\e\[.*?(?:\e\[0*m)+(?:\e\[0*K)*/,
 	visible => 2,
     },
     utf8 => {
-	length => \&vwidth,
-	match  => qr/\P{ASCII}+/,
+	length  => \&vwidth,
+	match   => qr/\P{ASCII}+/,
 	visible => 2,
     },
     );
 
 sub encode {
     my %arg = @_;
-    my $param = $param{$arg{mode}} or die "$arg{mode}: unkown mode";
+    my $mode = $arg{mode};
+    my $param = $param{$mode} or die "$mode: unkown mode\n";
     my $conceal = Text::Conceal->new(%$param);
+    $concealer{$mode} and die "$mode: encoding repeated\n";
     local $_ = do { local $/; <> };
     if ($conceal) {
 	$conceal->encode($_);
-	push @concealer, $conceal;
+	$concealer{$mode} = $conceal;
     }
     return $_;
 }
 
 sub decode {
     my %arg = @_;
+    my $mode = $arg{mode};
+    $param{$mode} or die "$arg{mode}: unkown mode\n";
     local $_ = do { local $/; <> };
-    if (my $conceal = pop @concealer) {
+    if (my $conceal = $concealer{$mode}) {
 	$conceal->decode($_);
     } else {
-	die "Not encoded.\n";
+	die "$mode: not encoded\n";
     }
     print $_;
 }
@@ -116,8 +120,8 @@ sub decode {
 __DATA__
 
 option --xform-encode -Mutil::filter --psub __PACKAGE__::encode=mode=$<shift>
-option --xform-decode -Mutil::filter --osub __PACKAGE__::decode
-option --xform --xform-encode $<shift> --xform-decode
+option --xform-decode -Mutil::filter --osub __PACKAGE__::decode=mode=$<shift>
+option --xform --xform-encode $<copy(0,1)> --xform-decode $<move(0,1)>
 
 option --xform-ansi --xform ansi
 option --xform-utf8 --xform utf8

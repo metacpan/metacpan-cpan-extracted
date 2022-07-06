@@ -1,22 +1,22 @@
 
 package Shipment::FedEx::WSDL::CloseElements::GroundCloseReportsReprintReply;
-$Shipment::FedEx::WSDL::CloseElements::GroundCloseReportsReprintReply::VERSION = '3.08';
+$Shipment::FedEx::WSDL::CloseElements::GroundCloseReportsReprintReply::VERSION = '3.09';
 use strict;
 use warnings;
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    sub get_xmlns {'http://fedex.com/ws/close/v2'}
+sub get_xmlns { 'http://fedex.com/ws/close/v2' }
 
-    __PACKAGE__->__set_name('GroundCloseReportsReprintReply');
-    __PACKAGE__->__set_nillable();
-    __PACKAGE__->__set_minOccurs();
-    __PACKAGE__->__set_maxOccurs();
-    __PACKAGE__->__set_ref();
-    use base qw(
-      SOAP::WSDL::XSD::Typelib::Element
-      Shipment::FedEx::WSDL::CloseTypes::GroundCloseReportsReprintReply
-    );
+__PACKAGE__->__set_name('GroundCloseReportsReprintReply');
+__PACKAGE__->__set_nillable();
+__PACKAGE__->__set_minOccurs();
+__PACKAGE__->__set_maxOccurs();
+__PACKAGE__->__set_ref();
+use base qw(
+    SOAP::WSDL::XSD::Typelib::Element
+    Shipment::FedEx::WSDL::CloseTypes::GroundCloseReportsReprintReply
+);
 
 }
 
@@ -34,7 +34,7 @@ Shipment::FedEx::WSDL::CloseElements::GroundCloseReportsReprintReply
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

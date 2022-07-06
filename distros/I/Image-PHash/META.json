@@ -47,6 +47,7 @@
          },
          "requires" : {
             "GD" : "0",
+            "Test2::Tools::Exception" : "0",
             "Test2::V0" : "0",
             "Test::More" : "0"
          }
@@ -57,9 +58,9 @@
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/dkechag/Image-PHash.git",
-         "web" : "https://github.com/SpareRoom/Image-PHash"
+         "web" : "https://github.com/dkechag/Image-PHash"
       }
    },
-   "version" : "0.1",
+   "version" : "0.2",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -17,7 +17,7 @@ use YAML::Syck;
 
 extends 'App::VTide::Command';
 
-our $VERSION = version->new('0.1.16');
+our $VERSION = version->new('0.1.17');
 our $NAME    = 'start';
 our $OPTIONS = [
     'windows|w=i',
@@ -93,9 +93,11 @@ sub tmux {
 
     mkdir '.vtide' if !-d '.vtide';
     my $fh = path('.vtide', 'start.log')->opena;
-    print {$fh} '[' . localtime . "] TMUX $tmux\n";
+    print {$fh} '[' . localtime . "] START TMUX $tmux\n";
 
-    exec $tmux;
+    system $tmux;
+
+    print {$fh} '[' . localtime . "] END   TMUX $tmux\n";
 }
 
 sub tmux_window {
@@ -158,7 +160,7 @@ App::VTide::Command::Start - Start a session
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Start version 0.1.16
+This documentation refers to App::VTide::Command::Start version 0.1.17
 
 =head1 SYNOPSIS
 

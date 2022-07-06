@@ -1,0 +1,374 @@
+NAME
+
+    Earth - FP Library
+
+ABSTRACT
+
+    FP Standard Library for Perl 5
+
+VERSION
+
+    0.01
+
+SYNOPSIS
+
+      package main;
+    
+      use Earth;
+    
+      wrap 'Venus::String', 'String';
+    
+      # call(String, 'function', @args);
+    
+      true;
+
+DESCRIPTION
+
+    Earth is a functional-programming framework with standard library for
+    Perl 5, built on top of Venus which provides the underlying
+    object-oriented standard library. Perl is a multi-paradigm programming
+    language that also supports functional programming, but, Perl has an
+    intentionally limited standard library with an emphasis on providing
+    library support via the CPAN which is overwhelmingly object-oriented.
+    This makes developing in a functional style difficult as you'll
+    eventually need to rely on a CPAN library that requires you to switch
+    over to object-oriented programming.Earth facilitates functional
+    programming for Perl 5 by providing keyword functions which enable
+    indirect routine dispatching, allowing the execution of both functional
+    and object-oriented code.
+
+FUNCTIONS
+
+    This package provides the following functions:
+
+ call
+
+      call(Str | Object | CodeRef $self, Any @args) (Any)
+
+    The call function dispatches function and method calls to a package and
+    returns the result.
+
+    Since 0.01
+
+    call example 1
+
+        # given: synopsis
+      
+        my $string = call(String('hello'), 'titlecase');
+      
+        # "Hello"
+
+    call example 2
+
+        # given: synopsis
+      
+        my $default = call(String('hello'), 'default');
+      
+        # ""
+
+    call example 3
+
+        # given: synopsis
+      
+        my $space = call(String('hello'), 'space');
+      
+        # bless( {value => "Venus::String"}, 'Venus::Space' )
+
+ catch
+
+      catch(CodeRef $block) (Error, Any)
+
+    The catch function executes the code block trapping errors and
+    returning the caught exception in scalar context, and also returning
+    the result as a second argument in list context.
+
+    Since 0.01
+
+    catch example 1
+
+        package main;
+      
+        use Earth;
+      
+        my $error = catch {die};
+      
+        $error; # 'Died at ...'
+
+    catch example 2
+
+        package main;
+      
+        use Earth;
+      
+        my ($error, $result) = catch {error};
+      
+        $error; # Venus::Error
+
+    catch example 3
+
+        package main;
+      
+        use Earth;
+      
+        my ($error, $result) = catch {true};
+      
+        $result; # 1
+
+ chain
+
+      chain(Str | Object | CodeRef $self, Str | ArrayRef[Str] @args) (Any)
+
+    The chain function chains function and method calls to a package (and
+    return values) and returns the result.
+
+    Since 0.01
+
+    chain example 1
+
+        # given: synopsis
+      
+        my $string = chain(String('hello world'), ['replace', 'world', 'cosmos'], 'get');
+      
+        # "hello cosmos"
+
+    chain example 2
+
+        # given: synopsis
+      
+        my $string = chain(String('hELLO  World'), 'box', 'lowercase', 'kebabcase', 'unbox');
+      
+        # "hello-world"
+
+    chain example 3
+
+        # given: synopsis
+      
+        my $string = chain(String('hello'), 'space', 'inherits');
+      
+        # ["Venus::Kind::Value"]
+
+ error
+
+      error(Maybe[HashRef] $args) (Error)
+
+    The error function throws a Venus::Error exception object using the
+    exception object arguments provided.
+
+    Since 0.01
+
+    error example 1
+
+        package main;
+      
+        use Earth;
+      
+        my $error = error;
+      
+        # bless( {...}, 'Venus::Error' )
+
+    error example 2
+
+        package main;
+      
+        use Earth;
+      
+        my $error = error {
+          message => 'Something failed!',
+        };
+      
+        # bless( {...}, 'Venus::Error' )
+
+ false
+
+      false() (Bool)
+
+    The false function returns a falsy boolean value which is designed to
+    be practically indistinguishable from the conventional numerical 0
+    value.
+
+    Since 0.01
+
+    false example 1
+
+        package main;
+      
+        use Earth;
+      
+        my $false = false;
+      
+        # 0
+
+    false example 2
+
+        package main;
+      
+        use Earth;
+      
+        my $true = !false;
+      
+        # 1
+
+ make
+
+      make(Str $package, Any @args) (Any)
+
+    The make function "call" in "calls" the new routine on the invocant and
+    returns the result which should be a package string or an object.
+
+    Since 0.01
+
+    make example 1
+
+        # given: synopsis
+      
+        my $string = make('Venus::String');
+      
+        # bless( {value => ""}, 'Venus::String' )
+
+    make example 2
+
+        # given: synopsis
+      
+        my $string = make('Venus::String', 'hello world');
+      
+        # bless( {value => "hello world"}, 'Venus::String' )
+
+ raise
+
+      raise(Str $class | Tuple[Str, Str] $class, Maybe[HashRef] $args) (Error)
+
+    The raise function generates and throws a named exception object
+    derived from Venus::Error, or provided base class, using the exception
+    object arguments provided.
+
+    Since 0.01
+
+    raise example 1
+
+        package main;
+      
+        use Earth;
+      
+        my $error = raise 'MyApp::Error';
+      
+        # bless( {...}, 'Venus::Error' )
+
+    raise example 2
+
+        package main;
+      
+        use Earth;
+      
+        my $error = raise ['MyApp::Error', 'Venus::Error'];
+      
+        # bless( {...}, 'Venus::Error' )
+
+    raise example 3
+
+        package main;
+      
+        use Earth;
+      
+        my $error = raise ['MyApp::Error', 'Venus::Error'], {
+          message => 'Something failed!',
+        };
+      
+        # bless( {...}, 'Venus::Error' )
+
+ true
+
+      true() (Bool)
+
+    The true function returns a truthy boolean value which is designed to
+    be practically indistinguishable from the conventional numerical 1
+    value.
+
+    Since 0.01
+
+    true example 1
+
+        package main;
+      
+        use Earth;
+      
+        my $true = true;
+      
+        # 1
+
+    true example 2
+
+        package main;
+      
+        use Earth;
+      
+        my $false = !true;
+      
+        # 0
+
+ wrap
+
+      wrap(Str $package, Str $alias) (CodeRef)
+
+    The wrap function installs a wrapper function in the calling package
+    which when called either returns the package string if no arguments are
+    provided, or calls "make" on the package with whatever arguments are
+    provided and returns the result. Unless an alias is provided as a
+    second argument, special characters are stripped from the package to
+    create the function name.
+
+    Since 0.01
+
+    wrap example 1
+
+        # given: synopsis
+      
+        my $coderef = wrap('Venus::Space');
+      
+        # my $space = VenusSpace();
+      
+        # "Venus::Space"
+
+    wrap example 2
+
+        # given: synopsis
+      
+        my $coderef = wrap('Venus::Space');
+      
+        # my $space = VenusSpace({});
+      
+        # bless( {value => "Venus"}, 'Venus::Space' )
+
+    wrap example 3
+
+        # given: synopsis
+      
+        my $coderef = wrap('Venus::Space', 'Space');
+      
+        # my $space = Space();
+      
+        # "Venus::String"
+
+    wrap example 4
+
+        # given: synopsis
+      
+        my $coderef = wrap('Venus::Space', 'Space');
+      
+        # my $space = Space({});
+      
+        # bless( {value => "Venus"}, 'Venus::Space' )
+
+    wrap example 5
+
+        # given: synopsis
+      
+        my $coderef = wrap('Venus::Space', 'Space');
+      
+        # my $space = Space('Earth');
+      
+        # bless( {value => "Earth"}, 'Venus::Space' )
+
+AUTHORS
+
+    Awncorp, awncorp@cpan.org
+

@@ -263,7 +263,7 @@ __DATA__
 # Richard Hujsak, and T. S. Kelso, presented at the 2006 AIAA/AAS
 # Astrodynamics Specialist Conference.
 # This report was obtained from the Celestrak web site, specifically
-# http://celestrak.com/publications/AIAA/2006-6753/
+# http://celestrak.org/publications/AIAA/2006-6753/
 
 #   ------------------ Verification test cases ----------------------
 #                       # TEME example
@@ -371,7 +371,7 @@ __DATA__
 # Richard Hujsak, and T. S. Kelso, presented at the 2006 AIAA/AAS
 # Astrodynamics Specialist Conference.
 # This report was obtained from the Celestrak web site, specifically
-# http://celestrak.com/publications/AIAA/2006-6753/
+# http://celestrak.org/publications/AIAA/2006-6753/
 
   5  xx
 -period 133.101

@@ -1,7 +1,7 @@
 {
    "abstract" : "optex command module direcrtory",
    "author" : [
-      "Kazumasa Utashiro <kaz@utashiro.com>"
+      "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.1.12",
@@ -42,8 +42,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Getopt::EX" : "v1.20.0",
-            "Getopt::EX::Hashed" : "0.9918",
+            "Getopt::EX" : "v1.28.0",
+            "Getopt::EX::Hashed" : "1.03",
             "Hash::Util" : "0",
             "List::Util" : "1.45",
             "TOML" : "0.95",
@@ -65,7 +65,7 @@
    "provides" : {
       "App::optex" : {
          "file" : "lib/App/optex.pm",
-         "version" : "v0.5.3"
+         "version" : "v0.5.4"
       },
       "App::optex::Tmpfile" : {
          "file" : "lib/App/optex/Tmpfile.pm"
@@ -97,9 +97,10 @@
          "web" : "https://github.com/kaz-utashiro/optex"
       }
    },
-   "version" : "v0.5.3",
+   "version" : "v0.5.4",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
+      "Kazumasa Utashiro <kaz@utashiro.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.07",

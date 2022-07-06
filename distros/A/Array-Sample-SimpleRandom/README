@@ -3,9 +3,9 @@ NAME
     replacement)
 
 VERSION
-    This document describes version 0.002 of Array::Sample::SimpleRandom
+    This document describes version 0.003 of Array::Sample::SimpleRandom
     (from Perl distribution Array-Sample-SimpleRandom), released on
-    2022-05-20.
+    2022-05-21.
 
 SYNOPSIS
      use Array::Sample:: qw(sample_simple_random_with_replacement sample_simple_random_no_replacement);

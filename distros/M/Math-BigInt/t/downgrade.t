@@ -43,18 +43,21 @@ Math::BigFloat -> div_scale(20);        # make it a bit faster
 
 my ($x, $y, $z);
 subtest '$x = Math::BigFloat -> new(2);' => sub {
+    plan tests => 2;
     $x = Math::BigFloat -> new(2);     # downgrades
     is(ref($x), 'Math::BigInt', '$x is downgraded to a Math::BigInt');
     cmp_ok($x, "==", 2, 'value of $x');
 };
 
 subtest '$y = Math::BigFloat -> bpow("2", "0.5");' => sub {
+    plan tests => 2;
     $y = Math::BigFloat -> bpow("2", "0.5");
     is(ref($y), 'Math::BigFloat', '$y is a Math::BigFloat');
     cmp_ok($y, "==", "1.4142135623730950488", 'value of $y');
 };
 
 subtest '$z = $x -> bsqrt();' => sub {
+    plan tests => 2;
     $z = $x -> bsqrt();
     is(ref($z), 'Math::BigFloat', '$y is a Math::BigFloat');
     cmp_ok($z, "==", "1.4142135623730950488", 'value of $z');
@@ -63,6 +66,7 @@ subtest '$z = $x -> bsqrt();' => sub {
 # log_2(16) = 4
 
 subtest '$x = Math::BigFloat -> new(16); $y = $x -> blog(2);' => sub {
+    plan tests => 4;
     $x = Math::BigFloat -> new(16);
     is(ref($x), 'Math::BigInt', '$x is downgraded to a Math::BigInt');
     cmp_ok($x, "==", 16, 'value of $x');
@@ -74,6 +78,7 @@ subtest '$x = Math::BigFloat -> new(16); $y = $x -> blog(2);' => sub {
 # log_16(2) = 1/4
 
 subtest '$x = Math::BigFloat -> new(2); $y = $x -> blog(16);' => sub {
+    plan tests => 4;
     $x = Math::BigFloat -> new(2);
     is(ref($x), 'Math::BigInt', '$x is downgraded to a Math::BigInt');
     cmp_ok($x, "==", 2, 'value of $x');
@@ -618,24 +623,28 @@ note("testing Add tests for rounding a non-integer to an integer. Fixme!");
 
 $x = $zero -> copy() -> bround();
 subtest '$x = $zero -> copy() -> bround();' => sub {
+    plan tests => 2;
     cmp_ok($x, '==', 0, 'bround(0)');
     is(ref($x), 'Math::BigInt', 'bround(0) => Math::BigInt');
 };
 
 $x = $four -> copy() -> bround();
 subtest '$x = $four -> copy() -> bround();' => sub {
+    plan tests => 2;
     cmp_ok($x, '==', 4, 'bround(4)');
     is(ref($x), 'Math::BigInt', 'bround(4) => Math::BigInt');
 };
 
 $x = $inf -> copy() -> bround();
 subtest '$x = $inf -> copy() -> bround();' => sub {
+    plan tests => 2;
     cmp_ok($x, '==', 'inf', 'bround(Inf)');
     is(ref($x), 'Math::BigInt', 'bround(Inf) => Math::BigInt');
 };
 
 $x = $nan -> copy() -> bround();
 subtest '$x = $nan -> copy() -> bround();' => sub {
+    plan tests => 2;
     is($x, 'NaN', 'bround(NaN)');
     is(ref($x), 'Math::BigInt', 'bround(NaN) => Math::BigInt');
 };
@@ -646,24 +655,28 @@ note("testing Add tests for rounding a non-integer to an integer. Fixme!");
 
 $x = $zero -> copy() -> bfround();
 subtest '$x = $zero -> copy() -> bfround();' => sub {
+    plan tests => 2;
     cmp_ok($x, '==', 0, 'bfround(0)');
     is(ref($x), 'Math::BigInt', 'bfround(0) => Math::BigInt');
 };
 
 $x = $four -> copy() -> bfround();
 subtest '$x = $four -> copy() -> bfround();' => sub {
+    plan tests => 2;
     cmp_ok($x, '==', 4, 'bfround(4)');
     is(ref($x), 'Math::BigInt', 'bfround(4) => Math::BigInt');
 };
 
 $x = $inf -> copy() -> bfround();
 subtest '$x = $inf -> copy() -> bfround();' => sub {
+    plan tests => 2;
     cmp_ok($x, '==', 'inf', 'bfround(Inf)');
     is(ref($x), 'Math::BigInt', 'bfround(Inf) => Math::BigInt');
 };
 
 $x = $nan -> copy() -> bfround();
 subtest '$x = $nan -> copy() -> bfround();' => sub {
+    plan tests => 2;
     is($x, 'NaN', 'bfround(NaN)');
     is(ref($x), 'Math::BigInt', 'bfround(NaN) => Math::BigInt');
 };
@@ -672,18 +685,21 @@ note("testing bfloor()");
 
 $x = $half -> copy() -> bfloor();
 subtest '$x = $half -> copy() -> bfloor();' => sub {
+    plan tests => 2;
     cmp_ok($x, '==', 0, 'bfloor(0)');
     is(ref($x), 'Math::BigInt', 'bfloor(0) => Math::BigInt');
 };
 
 $x = $inf -> copy() -> bfloor();
 subtest '$x = $inf -> copy() -> bfloor();' => sub {
+    plan tests => 2;
     cmp_ok($x, '==', 'Inf', 'bfloor(Inf)');
     is(ref($x), 'Math::BigInt', 'bfloor(Inf) => Math::BigInt');
 };
 
 $x = $nan -> copy() -> bfloor();
 subtest '$x = $nan -> copy() -> bfloor();' => sub {
+    plan tests => 2;
     is($x, 'NaN', 'bfloor(NaN)');
     is(ref($x), 'Math::BigInt', 'bfloor(NaN) => Math::BigInt');
 };
@@ -692,18 +708,21 @@ note("testing bceil()");
 
 $x = $half -> copy() -> bceil();
 subtest '$x = $half -> copy() -> bceil();' => sub {
+    plan tests => 2;
     cmp_ok($x, '==', 1, 'bceil(0)');
     is(ref($x), 'Math::BigInt', 'bceil(0) => Math::BigInt');
 };
 
 $x = $inf -> copy() -> bceil();
 subtest '$x = $inf -> copy() -> bceil();' => sub {
+    plan tests => 2;
     cmp_ok($x, '==', 'Inf', 'bceil(Inf)');
     is(ref($x), 'Math::BigInt', 'bceil(Inf) => Math::BigInt');
 };
 
 $x = $nan -> copy() -> bceil();
 subtest '$x = $nan -> copy() -> bceil();' => sub {
+    plan tests => 2;
     is($x, 'NaN', 'bceil(NaN)');
     is(ref($x), 'Math::BigInt', 'bceil(NaN) => Math::BigInt');
 };
@@ -712,18 +731,21 @@ note("testing bint()");
 
 $x = $half -> copy() -> bint();
 subtest '$x = $half -> copy() -> bint();' => sub {
+    plan tests => 2;
     cmp_ok($x, '==', 0, 'bint(0)');
     is(ref($x), 'Math::BigInt', 'bint(0) => Math::BigInt');
 };
 
 $x = $inf -> copy() -> bint();
 subtest '$x = $inf -> copy() -> bint();' => sub {
+    plan tests => 2;
     cmp_ok($x, '==', 'Inf', 'bint(Inf)');
     is(ref($x), 'Math::BigInt', 'bint(Inf) => Math::BigInt');
 };
 
 $x = $nan -> copy() -> bint();
 subtest '$x = $nan -> copy() -> bint();' => sub {
+    plan tests => 2;
     is($x, 'NaN', 'bint(NaN)');
     is(ref($x), 'Math::BigInt', 'bint(NaN) => Math::BigInt');
 };

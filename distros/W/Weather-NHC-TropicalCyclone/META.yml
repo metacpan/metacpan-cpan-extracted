@@ -19,16 +19,16 @@ name: Weather-NHC-TropicalCyclone
 provides:
   Weather::NHC::TropicalCyclone:
     file: lib/Weather/NHC/TropicalCyclone.pm
-    version: '0.31'
+    version: '0.32'
   Weather::NHC::TropicalCyclone::ForecastAdvisory:
     file: lib/Weather/NHC/TropicalCyclone/ForecastAdvisory.pm
-    version: '0.31'
+    version: '0.32'
   Weather::NHC::TropicalCyclone::Storm:
     file: lib/Weather/NHC/TropicalCyclone/Storm.pm
-    version: '0.31'
+    version: '0.32'
   Weather::NHC::TropicalCyclone::StormTable:
     file: lib/Weather/NHC/TropicalCyclone/StormTable.pm
-    version: '0.31'
+    version: '0.32'
 requires:
   Date::Calc: '0'
   File::Temp: '0'
@@ -40,7 +40,7 @@ requires:
   Object::Tiny: '0'
   Util::H2O: '0'
   Validate::Tiny: '0'
-version: '0.31'
-x_generated_by_perl: v5.32.0
+version: '0.32'
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

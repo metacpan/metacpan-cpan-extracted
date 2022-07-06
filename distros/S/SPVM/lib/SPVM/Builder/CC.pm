@@ -51,6 +51,17 @@ sub quiet {
   }
 }
 
+sub runtime {
+  my $self = shift;
+  if (@_) {
+    $self->{runtime} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{runtime};
+  }
+}
+
 sub debug {
   my $self = shift;
   if (@_) {
@@ -319,6 +330,66 @@ sub create_precompile_config {
   return $config;
 }
 
+sub detect_force {
+  my ($self, $config) = @_;
+  
+  my $force;
+  
+  if (defined $self->force) {
+    $force = $self->force;
+  }
+  elsif (defined $config && defined $config->force) {
+    $force = $config->force;
+  }
+  else {
+    $force = 0;
+  }
+  
+  return $force;
+}
+
+sub detect_quiet {
+  my ($self, $config) = @_;
+  
+  my $quiet;
+  
+  if (defined $self->debug) {
+    $quiet = 0;
+  }
+  elsif (defined $self->quiet) {
+    $quiet = $self->quiet;
+  }
+  elsif (defined $config && defined $config->quiet) {
+    $quiet = $config->quiet;
+  }
+  elsif ($self->runtime) {
+    $quiet = 1;
+  }
+  else {
+    $quiet = 0;
+  }
+  
+  return $quiet;
+}
+
+sub compile_single {
+  my ($self, $compile_info, $config) = @_;
+
+  # Quiet output
+  my $quiet = $self->detect_quiet($config);
+  
+  my $source_file = $compile_info->{source_file};
+
+  # Execute compile command
+  my $cbuilder = ExtUtils::CBuilder->new(quiet => 1);
+  my $cc_cmd = $self->create_compile_command($compile_info);
+  $cbuilder->do_system(@$cc_cmd)
+    or confess "Can't compile $source_file: @$cc_cmd";
+  unless ($quiet) {
+    warn "@$cc_cmd\n";
+  }
+}
+
 sub compile {
   my ($self, $class_name, $options) = @_;
   
@@ -348,19 +419,9 @@ sub compile {
   # Config
   my $config = $options->{config};
   
-  # Quiet output
-  my $quiet = $config->quiet;
+  # Force compile
+  my $force = $self->detect_force($config);
 
-  # Debug mode
-  if ($self->debug) {
-    $quiet = 0;
-  }
-  else {
-    if (defined $self->quiet) {
-      $quiet = $self->quiet;
-    }
-  }
-  
   my $ignore_use_resource = $options->{ignore_use_resource};
   my $ignore_native_module = $options->{ignore_native_module};
   
@@ -451,7 +512,7 @@ sub compile {
         push @$input_files, $module_file;
       }
       $need_generate = SPVM::Builder::Util::need_generate({
-        force => $self->force || $config->force,
+        force => $force,
         output_file => $object_file,
         input_files => $input_files,
       });
@@ -473,14 +534,7 @@ sub compile {
       my $work_output_dir = "$output_dir/$class_rel_dir";
       mkpath dirname $object_file;
       
-      # Execute compile command
-      my $cbuilder = ExtUtils::CBuilder->new(quiet => 1);
-      my $cc_cmd = $self->create_compile_command($compile_info);
-      $cbuilder->do_system(@$cc_cmd)
-        or confess "Can't compile $source_file: @$cc_cmd";
-      unless ($quiet) {
-        print "@$cc_cmd\n";
-      }
+      $self->compile_single($compile_info, $config);
     }
     
     # Object file information
@@ -668,6 +722,17 @@ sub create_dl_func_list {
   return $dl_func_list;
 }
 
+# This is used only for linker output for debug
+sub create_link_command {
+  my ($self, $ld, $output_file, $object_files, $cbuilder_extra_linker_flags) = @_;
+  
+  my @link_command = ($ld, '-o', $output_file, @$object_files, $cbuilder_extra_linker_flags);
+  
+  my $link_command = join(' ', @link_command);
+  
+  return $link_command;
+}
+
 sub link {
   my ($self, $class_name, $object_file_infos, $options) = @_;
   
@@ -688,18 +753,8 @@ sub link {
     confess "Need config option";
   }
 
-  # Quiet output
-  my $quiet = $config->quiet;
-
-  # If quiet field exists, overwrite it
-  if ($self->debug) {
-    $quiet = 0;
-  }
-  else {
-    if (defined $self->quiet) {
-      $quiet = $self->quiet;
-    }
-  }
+  # Force link
+  my $force = $self->detect_force($config);
   
   # Link information
   my $link_info = $self->create_link_info($class_name, $object_file_infos, $config, $options);
@@ -719,7 +774,7 @@ sub link {
     push @$input_files, $config->file;
   }
   my $need_generate = SPVM::Builder::Util::need_generate({
-    force => $self->force || $config->force,
+    force => $force,
     output_file => $output_file,
     input_files => $input_files,
   });
@@ -743,6 +798,9 @@ sub link {
       # For the reason, libm is linked which seems to have no effect.
       perllibs => '-lm',
     };
+
+    # Quiet output
+    my $quiet = $self->detect_quiet($config);
 
     # ExtUtils::CBuilder object
     my $cbuilder = ExtUtils::CBuilder->new(quiet => $quiet, config => $cbuilder_config);
@@ -779,6 +837,10 @@ sub link {
         extra_linker_flags => $cbuilder_extra_linker_flags,
         dl_func_list => $dl_func_list,
       );
+      unless ($quiet) {
+        my $link_command = $self->create_link_command($ld, $link_info_output_file, $link_info_object_files, $cbuilder_extra_linker_flags);
+        warn "$link_command\n";
+      }
     }
     # Create a static library
     elsif ($output_type eq 'static_lib') {
@@ -786,6 +848,9 @@ sub link {
       my @ar_cmd = ('ar', 'rc', $link_info_output_file, @object_files);
       $cbuilder->do_system(@ar_cmd)
         or confess "Can't execute command @ar_cmd";
+      unless ($quiet) {
+        warn "@ar_cmd\n";
+      }
     }
     # Create an executable file
     elsif ($output_type eq 'exe') {
@@ -795,6 +860,10 @@ sub link {
         exe_file => $link_info_output_file,
         extra_linker_flags => $cbuilder_extra_linker_flags,
       );
+      unless ($quiet) {
+        my $link_command = $self->create_link_command($ld, $link_info_output_file, $link_info_object_files, $cbuilder_extra_linker_flags);
+        warn "$link_command\n";
+      }
     }
     else {
       confess "Unknown output_type \"$output_type\"";
@@ -818,11 +887,11 @@ sub link {
         }
         if (defined $def_file && -f $def_file) {
           my $def_content = SPVM::Builder::Util::slurp_binary($def_file);
-          print "[$def_file]\n$def_content\n";
+          warn "[$def_file]\n$def_content\n";
         }
         if (defined $lds_file && -f $lds_file) {
           my $lds_content = SPVM::Builder::Util::slurp_binary($lds_file);
-          print "[$lds_file]\n$lds_content\n";
+          warn "[$lds_file]\n$lds_content\n";
         }
       }
     }
@@ -946,8 +1015,6 @@ sub create_link_info {
     my $builder_cc_resource = SPVM::Builder::CC->new(
       build_dir => $self->builder->build_dir,
       builder => $self->builder,
-      quiet => $self->quiet,
-      force => $self->force,
     );
     
     my $resource_src_dir = $self->resource_src_dir_from_class_name($resource);
@@ -1032,6 +1099,12 @@ sub create_link_info {
 sub create_precompile_source_file {
   my ($self, $class_name, $options) = @_;
   
+  # Config
+  my $config = $options->{config};
+  
+  # Force
+  my $force = $self->detect_force($config);
+  
   # Output - Precompile C source file
   my $output_dir = $options->{output_dir};
   my $source_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name, 'precompile.c');
@@ -1047,7 +1120,7 @@ sub create_precompile_source_file {
     confess "Can't find $spvm_precompile_soruce_file";
   }
   my $need_generate = SPVM::Builder::Util::need_generate({
-    force => $self->force,
+    force => $force,
     output_file => $source_file,
     input_files => [$module_file, $spvm_precompile_soruce_file],
   });

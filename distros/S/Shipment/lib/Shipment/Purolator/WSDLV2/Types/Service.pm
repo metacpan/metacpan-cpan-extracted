@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::Service;
-$Shipment::Purolator::WSDLV2::Types::Service::VERSION = '3.08';
+$Shipment::Purolator::WSDLV2::Types::Service::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,47 +20,52 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %ID_of : ATTR(:get<ID>);
-    my %Description_of : ATTR(:get<Description>);
-    my %PackageType_of : ATTR(:get<PackageType>);
-    my %PackageTypeDescription_of : ATTR(:get<PackageTypeDescription>);
-    my %Options_of : ATTR(:get<Options>);
+my %ID_of :ATTR(:get<ID>);
+my %Description_of :ATTR(:get<Description>);
+my %PackageType_of :ATTR(:get<PackageType>);
+my %PackageTypeDescription_of :ATTR(:get<PackageTypeDescription>);
+my %Options_of :ATTR(:get<Options>);
 
-    __PACKAGE__->_factory(
-        [   qw(        ID
-              Description
-              PackageType
-              PackageTypeDescription
-              Options
+__PACKAGE__->_factory(
+    [ qw(        ID
+        Description
+        PackageType
+        PackageTypeDescription
+        Options
 
-            )
-        ],
-        {   'ID'                     => \%ID_of,
-            'Description'            => \%Description_of,
-            'PackageType'            => \%PackageType_of,
-            'PackageTypeDescription' => \%PackageTypeDescription_of,
-            'Options'                => \%Options_of,
-        },
-        {   'ID'          => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'PackageType' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'PackageTypeDescription' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Options' => 'Shipment::Purolator::WSDLV2::Types::ArrayOfOption',
-        },
-        {
+    ) ],
+    {
+        'ID' => \%ID_of,
+        'Description' => \%Description_of,
+        'PackageType' => \%PackageType_of,
+        'PackageTypeDescription' => \%PackageTypeDescription_of,
+        'Options' => \%Options_of,
+    },
+    {
+        'ID' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'PackageType' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'PackageTypeDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Options' => 'Shipment::Purolator::WSDLV2::Types::ArrayOfOption',
+    },
+    {
 
-            'ID'                     => 'ID',
-            'Description'            => 'Description',
-            'PackageType'            => 'PackageType',
-            'PackageTypeDescription' => 'PackageTypeDescription',
-            'Options'                => 'Options',
-        }
-    );
+        'ID' => 'ID',
+        'Description' => 'Description',
+        'PackageType' => 'PackageType',
+        'PackageTypeDescription' => 'PackageTypeDescription',
+        'Options' => 'Options',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -77,7 +82,7 @@ Shipment::Purolator::WSDLV2::Types::Service
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

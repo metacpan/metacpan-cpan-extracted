@@ -88,11 +88,12 @@ The program's exit value is the number of DNSBLs that were hit.
 
 =head1 AUTHOR
 
-Dianne Skoll <dfs@roaringpenguin.com>
+Dianne Skoll <dianne@skoll.ca>
 
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (c) 2010 Roaring Penguin Software
+Copyright (c) 2022 Dianne Skoll
 
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

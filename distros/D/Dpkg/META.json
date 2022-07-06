@@ -334,7 +334,7 @@
       },
       "Dpkg::Substvars" : {
          "file" : "lib/Dpkg/Substvars.pm",
-         "version" : "2.00"
+         "version" : "2.01"
       },
       "Dpkg::Vars" : {
          "file" : "lib/Dpkg/Vars.pm",
@@ -379,6 +379,6 @@
          "web" : "https://git.dpkg.org/cgit/dpkg/dpkg.git"
       }
    },
-   "version" : "v1.21.5",
+   "version" : "v1.21.9",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

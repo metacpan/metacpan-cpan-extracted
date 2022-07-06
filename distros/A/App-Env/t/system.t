@@ -3,64 +3,70 @@
 use Test2::V0;
 use Test::Lib;
 
+use Capture::Tiny 'capture', 'capture_stdout';
 use File::Temp;
 use File::Spec::Functions qw[ catfile ];
 
 use App::Env;
 
-my $script = catfile( qw [ t bin appexec.pl ] );
+my $script    = catfile( qw [ t bin appexec.pl ] );
 my $badscript = catfile( qw [ t bin script_no_exist ] );
 
 {
     my $app1 = App::Env->new( 'App1', { Cache => 0 } );
-    my $tmp = File::Temp->new;
+    my $tmp  = File::Temp->new;
 
-    my $res = $app1->system( $^X,  $script, $tmp->filename );
-    is( $res, 0, 'successful system call' );
+    my ( $stdout, $exit )
+      = capture_stdout { $app1->system( $^X, $script, 'Site1_App1' ) };
+    is( $exit, 0, 'successful system call' )
+      or bail_out;
 
-    chomp( my $output = <$tmp> );
-    is( $output, '1', 'successful system results' );
+    chomp $stdout;
+    is( $stdout, '1', 'successful system results' );
     App::Env::Site1::App1::reset();
 }
 
 {
     my $app1 = App::Env->new( 'App1', { Cache => 0, SysFatal => 1 } );
-    my $tmp = File::Temp->new;
+    my $tmp  = File::Temp->new;
 
-    eval {
-        $app1->system( $^X,  $script, $tmp->filename );
-    };
+    my ( $stdout, $exit );
 
-    is( $@, '', 'successful system call: SysFatal' );
+    ok(
+        lives {
+            ( $stdout, $exit )
+              = capture_stdout { $app1->system( $^X, $script, 'Site1_App1' ) };
+        },
+        'successful system call: SysFatal'
+    ) or bail_out( $@ );
 
-    chomp( my $output = <$tmp> );
-    is( $output, '1', 'successful system results: SysFatal' );
+    chomp $stdout;
+    is( $stdout, '1', 'successful system results: SysFatal' );
     App::Env::Site1::App1::reset();
 }
 
 {
     my $app1 = App::Env->new( 'App1', { Cache => 0 } );
-    my $tmp = File::Temp->new;
-
-    my $res = $app1->system( $^X,  $badscript, $tmp->filename );
+    my $res
+      = ( capture { $app1->system( $^X, $badscript ) } )[-1];
     isnt( $res, 0, 'unsuccessful system call' );
     App::Env::Site1::App1::reset();
 }
 
 {
     my $app1 = App::Env->new( 'App1', { Cache => 0, SysFatal => 1 } );
-    my $tmp = File::Temp->new;
-
-    eval {
-        $app1->system( $^X,  $badscript, $tmp->filename );
-    };
-
-    isnt( $@, '', 'unsuccessful system call: SysFatal' );
+    like(
+        dies {
+            capture { $app1->system( $^X, $badscript ) }
+        },
+        qr/.+/,
+        'unsuccessful system call: SysFatal',
+    );
     App::Env::Site1::App1::reset();
 }
 
 {
-    my $app1 = App::Env->new( 'App1', { Cache => 0 } );
+    my $app1   = App::Env->new( 'App1', { Cache => 0 } );
     my $output = $app1->qexec( $^X, '-e', 'print $ENV{Site1_App1}' );
     chomp( $output );
 
@@ -69,7 +75,7 @@ my $badscript = catfile( qw [ t bin script_no_exist ] );
 }
 
 {
-    my $app1 = App::Env->new( 'App1', { Cache => 0 } );
+    my $app1   = App::Env->new( 'App1', { Cache => 0 } );
     my $output = $app1->qexec( $badscript );
 
     is( $output, undef, 'qexec: bad script' );

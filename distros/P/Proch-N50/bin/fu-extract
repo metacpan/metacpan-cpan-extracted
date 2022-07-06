@@ -1,5 +1,5 @@
 #!/usr/bin/env perl 
-# ABSTRACT: Filter DNA sequences by pattern and/or length
+# ABSTRACT: Get sequences by name (also using lists)
 # PODNAME: fu-extract
 use 5.012;
 use warnings;
@@ -18,12 +18,14 @@ my $opt_separator = "\t";
 my $opt_header_char = '#';
 my $opt_column    = 1;
 my %seq_names     = ();
+my $opt_case_insensitive = 0;
 my $_opt          = GetOptions(
 	'l|list=s'      => \$opt_list,
 	'p|pattern=s'   => \$opt_pattern,
 	'x|maxlen=i'    => \$opt_maxlen,
 	'm|minlen=i'    => \$opt_minlen,
 	'c|column=i'    => \$opt_column,
+	'i|case-insensitive' => \$opt_case_insensitive,
 	'h|header=s'    => \$opt_header_char,
 	'v|verbose'     => \$opt_verbose,
 	'd|debug'		=> \$opt_debug,
@@ -36,7 +38,11 @@ if (defined $opt_list) {
 		chomp($line);
 		next if ($line =~/^$opt_header_char/);
 		my @fields = split /$opt_separator/, $line;
-		$seq_names{ $fields[ $opt_column -1 ]} = 1;
+		my $name = $fields[$opt_column - 1];
+		if ($opt_case_insensitive) {
+			$name = lc($name);
+		}
+		$seq_names{ $name } = 1;
 	}
 	say STDERR Dumper \%seq_names if $opt_debug;
 }
@@ -52,10 +58,11 @@ for my $file (@ARGV) {
 	while (my $seq = $Fasta->getRead() ) {
 		$tot++;
 		my $l = length( $seq->{seq} );
+		my $seq_name = $opt_case_insensitive ? lc($seq->{name}) : $seq->{name};
 		next if (defined $opt_maxlen and $l > $opt_maxlen);
 		next if (defined $opt_minlen and $l < $opt_minlen);
-		next if (defined $opt_pattern and $seq->{name} !~/$opt_pattern/);
-		next if (defined $opt_list and not $seq_names{ $seq->{name} });
+		next if (defined $opt_pattern and $seq_name !~/$opt_pattern/);
+		next if (defined $opt_list and not $seq_names{ $seq_name });
 		my $comment = $seq->{comment} ? " $seq->{comment}" : '';
 
 		say '>', $seq->{name}, $comment, "\n", $seq->{seq};
@@ -69,7 +76,7 @@ sub usage {
 	Usage:
 	$BASENAME [options] InputFile.fa [...]
 
-	-p, --pattern   STRING
+	-p, --pattern   STRING (searched in sequence names)
 	-m, --minlen    INT
 	-x, --maxlen    INT
 	-l, --list      FILE
@@ -99,15 +106,61 @@ __END__
 
 =head1 NAME
 
-fu-extract - Filter DNA sequences by pattern and/or length
+fu-extract - Get sequences by name (also using lists)
 
 =head1 VERSION
 
-version 1.4.10
+version 1.5.0
+
+=head1 PARAMETERS
+
+=over 4
+
+=item C<-p, --pattern> PATTERN
+
+Print only sequences containing the given pattern in their name
+
+=item C<-l, --list> FILE
+
+Print only sequences in the given list file (full name must match)
+
+=item C<-c, --column> COLUMN
+
+In the list file, consider the name as the column COLUMN (default: 1)
+
+=item C<-h, --header> CHAR
+
+Ignore lines starting with CHAR in the list (default: "#")
+
+=item C<-s, --separator> CHAR
+
+Split the lines in the list file by CHAR (default: "\\t")
+
+=item C<-i, --case-insensitive>
+
+Ignore case in the name	(works both with C<-p> and C<-l>)
+
+=item C<-m, --minlen> MINLEN
+
+Print only sequences with a length greater than MINLEN
+
+=item C<-x, --maxlen> MAXLEN
+
+Print only sequences with a length less than MAXLEN
+
+=item C<-v, --verbose>
+
+Print more information
+
+=back
 
 =head1 EXAMPLES
 
+Search by sequence name:
+
   fu-extract -p 'BamHI' test.fa
+
+Use a list to extract sequences:
 
   fu-extract -l list.txt test.Fasta
 

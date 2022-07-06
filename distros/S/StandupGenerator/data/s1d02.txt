@@ -1,0 +1,11 @@
+STANDUP: SPRINT 1 - DAY 02
+
+YESTERDAY
+- 576: Designed
+
+TODAY
+- 576: Build out functionality
+- 432: Begin designing
+
+BLOCKERS
+- 576: Another developer needs to build out a dependency

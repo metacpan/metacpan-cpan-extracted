@@ -2,10 +2,9 @@ package Grizzly;
 
 # ABSTRACT: Grizzly - A command-line interface for looking up stock quote.
 
-our $VERSION = '0.104';
+our $VERSION = '0.111';
 
-use strict;
-use warnings;
+use v5.36;
 
 use App::Cmd::Setup -app;
 1;
@@ -22,21 +21,18 @@ Grizzly - Grizzly - A command-line interface for looking up stock quote.
 
 =head1 VERSION
 
-version 0.104
+version 0.111
 
 =head1 SYNOPSIS
 
     grizzly [options]
 
-    Options:
+        Options:
 
-    news [stock symbol]
-
-    quote [stock symbol]
-
-    help
-
-    version
+            news [stock symbol]
+            quote [stock symbol]
+            help
+            version
 
 =head2 Options
 
@@ -60,21 +56,20 @@ Grizzly - A command-line interface for looking up stock quote.
 
 =head2 Installation
 
+=head3 Through cpanm
+
     cpanm Grizzly
+
+=head3 Through the Project Directory
+
+    cpanm --installdeps .
+    perl Makefile.PL
+    make
+    make install
 
 =head2 API Key
 
 You will need to get a free API key from L<NewsAPI|https://newsapi.org/>. Afterwards you will need to set the NEWS_API_KEY environment variable to the API key.
-
-=head1 AUTHOR
-
-Nobunaga <nobunaga@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021 by Nobunaga.
-
-MIT License
 
 =head1 AUTHOR
 

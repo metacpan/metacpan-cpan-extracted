@@ -14,9 +14,9 @@ use Perinci::Sub::Util qw(err gen_modified_sub);
 require Exporter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-10'; # DATE
+our $DATE = '2022-07-05'; # DATE
 our $DIST = 'Calendar-Indonesia-Holiday'; # DIST
-our $VERSION = '0.346'; # VERSION
+our $VERSION = '0.347'; # VERSION
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = (
@@ -1188,6 +1188,9 @@ our %year_holidays;
 #
 # ref:
 # - https://www.kemenkopmk.go.id/sites/default/files/pengumuman/2021-09/SKB%20Libnas%20%26%20Cuti%20Bersama%20Tahun%202022.pdf
+#
+# Eid Al-Adha is changed from 9 jul to 10 jul, ref:
+# - https://www.kemenag.go.id/read/pemerintah-tetapkan-iduladha-1443-h-jatuh-pada-10-juli-2022
 {
     $year_holidays{2022} = [
         # - new year
@@ -1201,7 +1204,7 @@ our %year_holidays;
         _h_vesakha   ({_expand_dm("16-05")}, {hyear=>2566}),
         _h_ascension ({_expand_dm("26-05")}),
         # - pancasila day
-        _h_eidula    ({_expand_dm("09-07")}, {hyear=>1443}),
+        _h_eidula    ({_expand_dm("10-07")}, {hyear=>1443}),
         _h_hijra     ({_expand_dm("30-07")}, {hyear=>1444}),
         # - independence day
         _h_mawlid({_expand_dm("08-10")}, {hyear=>1444}),
@@ -1628,7 +1631,7 @@ Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 =head1 VERSION
 
-This document describes version 0.346 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2022-01-10.
+This document describes version 0.347 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2022-07-05.
 
 =head1 SYNOPSIS
 

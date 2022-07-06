@@ -12,10 +12,14 @@ build_requires:
   Test2::V0: '0'
   Test::More: '0'
   Try::Tiny: '0'
+  lib: '0'
+  perl: '5.006'
+  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+  perl: '5.006'
+dynamic_config: '0'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,17 +28,103 @@ name: DBIx-Class-Schema-ResultSetNames
 provides:
   DBIx::Class::Schema::ResultSetNames:
     file: lib/DBIx/Class/Schema/ResultSetNames.pm
-    version: '1.03'
+    version: '1.0301'
 requires:
   Carp: '0'
   DBIx::Class::Schema: '0'
   Lingua::EN::Inflect::Phrase: '0'
   Modern::Perl: '0'
-  perl: '5.012'
+  base: '0'
+  perl: '5.006'
+  strict: '0'
 resources:
   bugtracker: https://gitlab.com/GeekRuthie/DBIx-Class-Schema-ResultSetNames/-/issues
+  homepage: https://p3rl.org/DBIx::Class::Schema::ResultSetNames
   repository: https://gitlab.com/GeekRuthie/DBIx-Class-Schema-ResultSetNames.git
-version: '1.03'
-x_generated_by_perl: v5.32.0
+version: '1.0301'
+x_BuiltWith:
+  failures:
+    DBIx::Class::Core: 'Module::MetaData could not parse a version from /opt/perl5/perls/perl-5.34.1/lib/site_perl/5.34.1/DBIx/Class/Core.pm'
+    DBIx::Class::Schema: 'Module::MetaData could not parse a version from /opt/perl5/perls/perl-5.34.1/lib/site_perl/5.34.1/DBIx/Class/Schema.pm'
+  modules:
+    CPAN::Meta: '2.150010'
+    Carp: '1.52'
+    DBD::SQLite: '1.70'
+    Dist::Zilla: '6.025'
+    Dist::Zilla::Plugin::Authority: '1.009'
+    Dist::Zilla::Plugin::AutoPrereqs: '6.025'
+    Dist::Zilla::Plugin::CPANFile: '6.025'
+    Dist::Zilla::Plugin::ChangeStats::Git: 0.6.0
+    Dist::Zilla::Plugin::CheckChangesHasContent: '0.011'
+    Dist::Zilla::Plugin::CoalescePod: 0.3.0
+    Dist::Zilla::Plugin::ConfirmRelease: '6.025'
+    Dist::Zilla::Plugin::ContributorCovenant: '2.000000'
+    Dist::Zilla::Plugin::ContributorsFile: 0.3.0
+    Dist::Zilla::Plugin::CopyFilesFromBuild: '0.170880'
+    Dist::Zilla::Plugin::CopyrightYearFromGit: '0.009'
+    Dist::Zilla::Plugin::Covenant: 0.1.2
+    Dist::Zilla::Plugin::Encoding: '6.025'
+    Dist::Zilla::Plugin::ExecDir: '6.025'
+    Dist::Zilla::Plugin::Git::Check: '2.048'
+    Dist::Zilla::Plugin::Git::Commit: '2.048'
+    Dist::Zilla::Plugin::Git::CommitBuild: '2.048'
+    Dist::Zilla::Plugin::Git::Contributors: '0.036'
+    Dist::Zilla::Plugin::Git::GatherDir: '2.048'
+    Dist::Zilla::Plugin::Git::Push: '2.048'
+    Dist::Zilla::Plugin::Git::Tag: '2.048'
+    Dist::Zilla::Plugin::GitLab::Meta: '1.0002'
+    Dist::Zilla::Plugin::GitLab::Update: '1.0002'
+    Dist::Zilla::Plugin::INI::Baked: '0.002002'
+    Dist::Zilla::Plugin::InstallGuide: '1.200014'
+    Dist::Zilla::Plugin::InstallRelease: '0.008'
+    Dist::Zilla::Plugin::License: '6.025'
+    Dist::Zilla::Plugin::MakeMaker: '6.025'
+    Dist::Zilla::Plugin::Manifest: '6.025'
+    Dist::Zilla::Plugin::ManifestSkip: '6.025'
+    Dist::Zilla::Plugin::MetaData::BuiltWith: '1.004005'
+    Dist::Zilla::Plugin::MetaJSON: '6.025'
+    Dist::Zilla::Plugin::MetaProvides::Package: '2.004003'
+    Dist::Zilla::Plugin::MetaYAML: '6.025'
+    Dist::Zilla::Plugin::MinimumPerl: '1.006'
+    Dist::Zilla::Plugin::NextRelease: '6.025'
+    Dist::Zilla::Plugin::NextVersion::Semantic: 0.2.6
+    Dist::Zilla::Plugin::OurPkgVersion: '0.21'
+    Dist::Zilla::Plugin::PodWeaver: '4.009'
+    Dist::Zilla::Plugin::Prereqs::Plugins: '1.003003'
+    Dist::Zilla::Plugin::PreviousVersion::Changelog: 0.2.6
+    Dist::Zilla::Plugin::ReadmeMarkdownFromPod: '0.141140'
+    Dist::Zilla::Plugin::RunExtraTests: '0.029'
+    Dist::Zilla::Plugin::SchwartzRatio: 0.3.4
+    Dist::Zilla::Plugin::Test::Compile: '2.058'
+    Dist::Zilla::Plugin::Test::ReportPrereqs: '0.028'
+    Dist::Zilla::Plugin::TestRelease: '6.025'
+    Dist::Zilla::Plugin::UploadToCPAN: '6.025'
+    ExtUtils::MakeMaker: '7.62'
+    File::Spec: '3.80'
+    IO::Handle: '1.46'
+    IPC::Open3: '1.21'
+    Lingua::EN::Inflect::Phrase: '0.20'
+    Modern::Perl: '1.20220515'
+    Test2::V0: '0.000145'
+    Test::More: '1.302183'
+    Try::Tiny: '0.31'
+    base: '2.27'
+    lib: '0.65'
+    strict: '1.12'
+    warnings: '1.51'
+  perl:
+    original: v5.34.1
+    qv: 1
+    version:
+      - 5
+      - 34
+      - 1
+  platform: linux
+x_author_pledge:
+  version: '1'
+x_authority: cpan:GEEKRUTH
+x_contributor_covenant:
+  version: '0.02'
+x_generated_by_perl: v5.34.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

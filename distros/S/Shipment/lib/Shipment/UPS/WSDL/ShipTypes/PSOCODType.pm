@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::PSOCODType;
-$Shipment::UPS::WSDL::ShipTypes::PSOCODType::VERSION = '3.08';
+$Shipment::UPS::WSDL::ShipTypes::PSOCODType::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %CODFundsCode_of : ATTR(:get<CODFundsCode>);
-    my %CODAmount_of : ATTR(:get<CODAmount>);
+my %CODFundsCode_of :ATTR(:get<CODFundsCode>);
+my %CODAmount_of :ATTR(:get<CODAmount>);
 
-    __PACKAGE__->_factory(
-        [   qw(        CODFundsCode
-              CODAmount
+__PACKAGE__->_factory(
+    [ qw(        CODFundsCode
+        CODAmount
 
-            )
-        ],
-        {   'CODFundsCode' => \%CODFundsCode_of,
-            'CODAmount'    => \%CODAmount_of,
-        },
-        {   'CODFundsCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'CODAmount'    =>
-              'Shipment::UPS::WSDL::ShipTypes::CurrencyMonetaryType',
-        },
-        {
+    ) ],
+    {
+        'CODFundsCode' => \%CODFundsCode_of,
+        'CODAmount' => \%CODAmount_of,
+    },
+    {
+        'CODFundsCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'CODAmount' => 'Shipment::UPS::WSDL::ShipTypes::CurrencyMonetaryType',
+    },
+    {
 
-            'CODFundsCode' => 'CODFundsCode',
-            'CODAmount'    => 'CODAmount',
-        }
-    );
+        'CODFundsCode' => 'CODFundsCode',
+        'CODAmount' => 'CODAmount',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -62,7 +67,7 @@ Shipment::UPS::WSDL::ShipTypes::PSOCODType
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

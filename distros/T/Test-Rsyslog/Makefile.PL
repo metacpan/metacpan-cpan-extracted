@@ -14,6 +14,27 @@ WriteMakefile(
     AUTHOR           => q{David Dick <ddick@cpan.org>},
     VERSION_FROM     => 'lib/Test/Rsyslog.pm',
     ABSTRACT_FROM    => 'lib/Test/Rsyslog.pm',
+    ( $ExtUtils::MakeMaker::VERSION >= 6.3002
+        ? ( 'LICENSE' => 'perl' )
+        : () ),
+    (
+        $ExtUtils::MakeMaker::VERSION >= 6.48
+        ? ( 'MIN_PERL_VERSION' => '5.006' )
+        : ()
+    ),
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources   => {
+            repository => {
+                url  => 'https://github.com/david-dick/test-rsyslog',
+                web  => 'https://github.com/david-dick/test-rsyslog',
+                type => 'git',
+            },
+            bugtracker => {
+                web => 'https://github.com/david-dick/test-rsyslog/issues'
+            },
+        },
+    },
     LICENSE          => 'perl_5',
     PL_FILES         => {},
     MIN_PERL_VERSION => 5.006,

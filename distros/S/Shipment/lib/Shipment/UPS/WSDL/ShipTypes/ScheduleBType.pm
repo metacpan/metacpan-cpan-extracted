@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::ScheduleBType;
-$Shipment::UPS::WSDL::ShipTypes::ScheduleBType::VERSION = '3.08';
+$Shipment::UPS::WSDL::ShipTypes::ScheduleBType::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/IF/v1.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/IF/v1.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Number_of : ATTR(:get<Number>);
-    my %Quantity_of : ATTR(:get<Quantity>);
-    my %UnitOfMeasurement_of : ATTR(:get<UnitOfMeasurement>);
+my %Number_of :ATTR(:get<Number>);
+my %Quantity_of :ATTR(:get<Quantity>);
+my %UnitOfMeasurement_of :ATTR(:get<UnitOfMeasurement>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Number
-              Quantity
-              UnitOfMeasurement
+__PACKAGE__->_factory(
+    [ qw(        Number
+        Quantity
+        UnitOfMeasurement
 
-            )
-        ],
-        {   'Number'            => \%Number_of,
-            'Quantity'          => \%Quantity_of,
-            'UnitOfMeasurement' => \%UnitOfMeasurement_of,
-        },
-        {   'Number'            => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Quantity'          => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'UnitOfMeasurement' =>
-              'Shipment::UPS::WSDL::ShipTypes::UnitOfMeasurementType',
-        },
-        {
+    ) ],
+    {
+        'Number' => \%Number_of,
+        'Quantity' => \%Quantity_of,
+        'UnitOfMeasurement' => \%UnitOfMeasurement_of,
+    },
+    {
+        'Number' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Quantity' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'UnitOfMeasurement' => 'Shipment::UPS::WSDL::ShipTypes::UnitOfMeasurementType',
+    },
+    {
 
-            'Number'            => 'Number',
-            'Quantity'          => 'Quantity',
-            'UnitOfMeasurement' => 'UnitOfMeasurement',
-        }
-    );
+        'Number' => 'Number',
+        'Quantity' => 'Quantity',
+        'UnitOfMeasurement' => 'UnitOfMeasurement',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -67,7 +72,7 @@ Shipment::UPS::WSDL::ShipTypes::ScheduleBType
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

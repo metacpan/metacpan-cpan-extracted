@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.299';
+our $VERSION = '2.300';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -53,7 +53,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.299
+Version 2.300
 
 =head1 SYNOPSIS
 
@@ -933,12 +933,12 @@ when creating a table. The value set here is then used as the default name for t
 If this option is enabled and a table is created, C<SQL::Type::Guess> is used to detect the data types. These data types
 are then used as default values when the user is asked for the data types.
 
-=head3 Max Rows
+=head3 Auto Limit
 
-Sets C<LIMIT> automatically to I<Max Rows>. This can be overwritten by setting a SQL C<LIMIT> statement manually.
+Sets C<LIMIT> automatically to I<Auto Limit>. This can be overwritten by setting a SQL C<LIMIT> statement manually.
 Fetched table rows are kept in memory.
 
-To disable the automatic limit set I<Max Rows> to C<0>.
+To disable the automatic limit set I<Auto Limit> to C<0>.
 
 =head2 Output
 
@@ -1003,6 +1003,13 @@ to the default value (dot).
 Enable/disable C<File::Find> warnings when searching for C<SQLite> databases.
 
 =head2 Insert Data
+
+=head3 Data source menu
+
+Set the data source type to C<plain>, C<file> or C<menu> for C<Insert Into> and for C<Create Table>.
+
+If this option is set to C<menu>, a menu is offered where the user can choose the type of the data source. If this
+option is set to C<plain> or C<file>, the respective setting is used directly without any menu.
 
 =head3 Parse tool for 'file'
 
@@ -1190,12 +1197,6 @@ Set the I<empty_to_null> defaults for the different data source types.
 =head3 File encoding
 
 How to decode text files.
-
-=head3 Source type of input data
-
-Set the data source type to C<plain>, C<file> or C<menu> for C<Insert Into> and for C<Create Table>.
-
-If this option is set to C<menu>, a menu is offered where the user can choose the type of the data source.
 
 =head3 Directory history
 

@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::CloseTypes::CustomerImageUsage;
-$Shipment::FedEx::WSDL::CloseTypes::CustomerImageUsage::VERSION = '3.08';
+$Shipment::FedEx::WSDL::CloseTypes::CustomerImageUsage::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/close/v2'}
+sub get_xmlns { 'http://fedex.com/ws/close/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,43 +20,47 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Type_of : ATTR(:get<Type>);
-    my %Id_of : ATTR(:get<Id>);
-    my %InternalId_of : ATTR(:get<InternalId>);
-    my %InternalImageType_of : ATTR(:get<InternalImageType>);
+my %Type_of :ATTR(:get<Type>);
+my %Id_of :ATTR(:get<Id>);
+my %InternalId_of :ATTR(:get<InternalId>);
+my %InternalImageType_of :ATTR(:get<InternalImageType>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Type
-              Id
-              InternalId
-              InternalImageType
+__PACKAGE__->_factory(
+    [ qw(        Type
+        Id
+        InternalId
+        InternalImageType
 
-            )
-        ],
-        {   'Type'              => \%Type_of,
-            'Id'                => \%Id_of,
-            'InternalId'        => \%InternalId_of,
-            'InternalImageType' => \%InternalImageType_of,
-        },
-        {   'Type' =>
-              'Shipment::FedEx::WSDL::CloseTypes::CustomerImageUsageType',
-            'Id'         => 'Shipment::FedEx::WSDL::CloseTypes::ImageId',
-            'InternalId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'InternalImageType' =>
-              'Shipment::FedEx::WSDL::CloseTypes::InternalImageType',
-        },
-        {
+    ) ],
+    {
+        'Type' => \%Type_of,
+        'Id' => \%Id_of,
+        'InternalId' => \%InternalId_of,
+        'InternalImageType' => \%InternalImageType_of,
+    },
+    {
+        'Type' => 'Shipment::FedEx::WSDL::CloseTypes::CustomerImageUsageType',
+        'Id' => 'Shipment::FedEx::WSDL::CloseTypes::ImageId',
+        'InternalId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'InternalImageType' => 'Shipment::FedEx::WSDL::CloseTypes::InternalImageType',
+    },
+    {
 
-            'Type'              => 'Type',
-            'Id'                => 'Id',
-            'InternalId'        => 'InternalId',
-            'InternalImageType' => 'InternalImageType',
-        }
-    );
+        'Type' => 'Type',
+        'Id' => 'Id',
+        'InternalId' => 'InternalId',
+        'InternalImageType' => 'InternalImageType',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -73,7 +77,7 @@ Shipment::FedEx::WSDL::CloseTypes::CustomerImageUsage
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

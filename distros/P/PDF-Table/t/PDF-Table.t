@@ -13,32 +13,39 @@ BEGIN {
    use_ok('PDF::Table')
 }
 my ($col_widths);
-($col_widths, undef) = PDF::Table::CalcColumnWidths(
+($col_widths, undef) = PDF::Table::ColumnWidth::CalcColumnWidths(
         400,
 	[  50,  50,  50,  50 ],
-	[ 200, 200, 200, 200 ]
+	[ 200, 200, 200, 200 ],
+	[ -1, -1, -1, -1 ]
 );
 
 is_deeply( $col_widths, [ 100, 100, 100, 100 ], 'CalcColumnWidths - even');
 
-($col_widths, undef) = PDF::Table::CalcColumnWidths(
+($col_widths, undef) = PDF::Table::ColumnWidth::CalcColumnWidths(
 	400,
 	[ 41,  58,  48 ],
-	[ 51, 600,  48 ]
+	[ 51, 600,  48 ],
+	[ -1, -1, -1 ]
 );
 
-# round 300.758... value to small number of decimal places, so no difference
+# some float values round to small number of decimal places, so no difference
 # between regular, long double, and quad math Perls
+$col_widths->[0] = int(1000*$col_widths->[0] + 0.5)/1000;
 $col_widths->[1] = int(1000*$col_widths->[1] + 0.5)/1000;
+$col_widths->[2] = int(1000*$col_widths->[2] + 0.5)/1000;
 
-is_deeply( $col_widths, [ 51, 300.758, 48 ], 'CalcColumnWidths - uneven');
+# was 125.333, 142.333, 132.333
+is_deeply( $col_widths, [ 41, 311, 48 ], 'CalcColumnWidths - uneven');
 
-($col_widths, undef) = PDF::Table::CalcColumnWidths(
+($col_widths, undef) = PDF::Table::ColumnWidth::CalcColumnWidths(
 	400,
 	[ 50,     0 ],  # undef min_w value
-	[ 50,    50 ]
+	[ 50,    50 ],
+	[ -1,    -1 ]
 );
 
+# was 225, 175
 is_deeply( $col_widths, [ 200, 200 ], 'CalcColumnWidths - undef');
 
 my ($pdf, $page, $tab, @data, @required);

@@ -1,0 +1,13 @@
+BLAKE3.xs
+lib/Digest/BLAKE3.pm
+Makefile.PL
+MANIFEST
+ppport.h
+t/00basic.t
+t/01errors.t
+t/02vectors.t
+t/03addfile.t
+t/03addfile.tin
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

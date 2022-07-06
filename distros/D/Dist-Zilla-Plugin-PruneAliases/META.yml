@@ -1,0 +1,38 @@
+---
+abstract: 'Prune macOS aliases from your dist'
+author:
+  - 'Arne Johannessen <ajnn@cpan.org>'
+build_requires:
+  Dist::Zilla::File::OnDisk: '0'
+  List::Util: '0'
+  Test::DZil: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Warnings: '0'
+  perl: v5.26.0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-PruneAliases
+provides:
+  Dist::Zilla::Plugin::PruneAliases:
+    file: lib/Dist/Zilla/Plugin/PruneAliases.pm
+    version: '1.00'
+requires:
+  Dist::Zilla: '0'
+  Dist::Zilla::Role::FilePruner: '0'
+  Moose: '0'
+  namespace::autoclean: '0'
+  perl: v5.26.0
+resources:
+  bugtracker: https://github.com/johannessen/dzil-prunealiases/issues
+  repository: https://github.com/johannessen/dzil-prunealiases.git
+version: '1.00'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

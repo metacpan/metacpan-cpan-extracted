@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackOtherIdentifierDetail;
-$Shipment::FedEx::WSDL::TrackTypes::TrackOtherIdentifierDetail::VERSION = '3.08';
+$Shipment::FedEx::WSDL::TrackTypes::TrackOtherIdentifierDetail::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/track/v9'}
+sub get_xmlns { 'http://fedex.com/ws/track/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %PackageIdentifier_of : ATTR(:get<PackageIdentifier>);
-    my %TrackingNumberUniqueIdentifier_of :
-      ATTR(:get<TrackingNumberUniqueIdentifier>);
-    my %CarrierCode_of : ATTR(:get<CarrierCode>);
+my %PackageIdentifier_of :ATTR(:get<PackageIdentifier>);
+my %TrackingNumberUniqueIdentifier_of :ATTR(:get<TrackingNumberUniqueIdentifier>);
+my %CarrierCode_of :ATTR(:get<CarrierCode>);
 
-    __PACKAGE__->_factory(
-        [   qw(        PackageIdentifier
-              TrackingNumberUniqueIdentifier
-              CarrierCode
+__PACKAGE__->_factory(
+    [ qw(        PackageIdentifier
+        TrackingNumberUniqueIdentifier
+        CarrierCode
 
-            )
-        ],
-        {   'PackageIdentifier'              => \%PackageIdentifier_of,
-            'TrackingNumberUniqueIdentifier' =>
-              \%TrackingNumberUniqueIdentifier_of,
-            'CarrierCode' => \%CarrierCode_of,
-        },
-        {   'PackageIdentifier' =>
-              'Shipment::FedEx::WSDL::TrackTypes::TrackPackageIdentifier',
-            'TrackingNumberUniqueIdentifier' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'CarrierCode' =>
-              'Shipment::FedEx::WSDL::TrackTypes::CarrierCodeType',
-        },
-        {
+    ) ],
+    {
+        'PackageIdentifier' => \%PackageIdentifier_of,
+        'TrackingNumberUniqueIdentifier' => \%TrackingNumberUniqueIdentifier_of,
+        'CarrierCode' => \%CarrierCode_of,
+    },
+    {
+        'PackageIdentifier' => 'Shipment::FedEx::WSDL::TrackTypes::TrackPackageIdentifier',
+        'TrackingNumberUniqueIdentifier' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'CarrierCode' => 'Shipment::FedEx::WSDL::TrackTypes::CarrierCodeType',
+    },
+    {
 
-            'PackageIdentifier'              => 'PackageIdentifier',
-            'TrackingNumberUniqueIdentifier' =>
-              'TrackingNumberUniqueIdentifier',
-            'CarrierCode' => 'CarrierCode',
-        }
-    );
+        'PackageIdentifier' => 'PackageIdentifier',
+        'TrackingNumberUniqueIdentifier' => 'TrackingNumberUniqueIdentifier',
+        'CarrierCode' => 'CarrierCode',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -72,7 +72,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackOtherIdentifierDetail
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,7 @@ fu-rename - rename sequences
 
 # VERSION
 
-version 1.4.8
+version 1.5.0
 
 # SYNOPSIS
 

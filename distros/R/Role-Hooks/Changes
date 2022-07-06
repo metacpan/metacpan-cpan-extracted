@@ -6,6 +6,25 @@ Home page:    <https://metacpan.org/release/Role-Hooks>
 Bug tracker:  <https://github.com/tobyink/p5-role-hooks/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.008	2022-07-04
+
+ [ Bug Fixes ]
+ - Fix accidental dependency on Role::Tiny.
+   Tina Müller++
+
+0.007	2022-07-04
+
+ [ Bug Fixes ]
+ - Eliminate 'used only once' warnings.
+   Alexander Hartmaier++
+
+ [ Test Suite ]
+ - Include a test that a known non-role returns false from is_role.
+
+0.006	2022-07-01
+
+ - Updated: Support for roles built using Mite.
+
 0.005	2022-06-17
 
  - Added: Add after_inflate hook.

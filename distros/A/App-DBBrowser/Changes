@@ -1,6 +1,12 @@
 Revision history for App-DBBrowser
 
 
+2.300    2022-07-02
+        - Renamed option 'Max rows' to 'Auto Limit'.
+        - 'Auto Limit' defaults to 0.
+        - Update database-plugins.
+        - Update documentation.
+
 2.299    2022-06-25
         - Update Functions.pm.
         - Term::Form minimum version is '0.551'.

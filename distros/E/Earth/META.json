@@ -1,0 +1,45 @@
+{
+   "abstract" : "FP Library for Perl 5",
+   "author" : [
+      "AWNCORP <awncorp@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Earth",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Venus" : "0.09",
+            "perl" : "5.018"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Venus" : "0.09",
+            "perl" : "5.018"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://metacpan.org/dist/Earth"
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:AWNCORP",
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

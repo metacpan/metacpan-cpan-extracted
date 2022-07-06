@@ -1,8 +1,9 @@
 package Data::ResultSet;
 use warnings;
 use strict;
+use 5.006;
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 sub new
 {
@@ -90,7 +91,7 @@ sub make_wrappers_for_all
 
 sub _generate_methods
 {
-	my ($class, $prefix, $generator, @methods) = @_; 
+	my ($class, $prefix, $generator, @methods) = @_;
 
 	no strict 'refs';  ## no critic (ProhibitNoStrict)
 	foreach my $name (@methods) {
@@ -122,7 +123,7 @@ sub clear
 
 sub count
 {
-	my ($self) = @_; 
+	my ($self) = @_;
 	return scalar @{$self};
 }
 
@@ -136,9 +137,9 @@ sub contents
 __END__
 
 =head1 NAME
- 
+
 Data::ResultSet - Container for aggregating and examining multiple results
- 
+
 =head1 SYNOPSIS
 
     # Subclass the module
@@ -182,7 +183,7 @@ Data::ResultSet - Container for aggregating and examining multiple results
                 # Do something with each failed result
         }
     }
-  
+
 =head1 DESCRIPTION
 
 Data::ResultSet is a container object for aggregating and examining
@@ -238,11 +239,11 @@ Generates the C<get_not_> wrapper method for each provided name.
 
 =head1 INSTANCE METHODS
 
-=head2 add ( $object ) 
+=head2 add ( $object )
 
 Adds an object to the result set.  Returns $self.
 
-=head2 count ( ) 
+=head2 count ( )
 
 Returns number of objects in the set.
 
@@ -250,7 +251,7 @@ Returns number of objects in the set.
 
 Returns contents of set.
 
-=head2 clear ( ) 
+=head2 clear ( )
 
 Clears contents of set.  Returns true.
 
@@ -259,23 +260,23 @@ Clears contents of set.  Returns true.
 Generated method that returns true if the METHOD called on every object
 within the set returns true.
 
-=head2 has_METHOD ( ) 
+=head2 has_METHOD ( )
 
 Generated method that returns true if one object within the set returns
 true for METHOD.
 
-=head2 get_METHOD ( ) 
+=head2 get_METHOD ( )
 
 Generated method that returns all objects for which METHOD returns true.
 
-=head2 get_not_METHOD ( ) 
+=head2 get_not_METHOD ( )
 
 Generated method that returns all objects for which METHOD returns false.
- 
+
 =head1 INCOMPATIBILITIES
 
 There are no known incompatibilities with this module.
- 
+
 =head1 BUGS AND LIMITATIONS
 
 =over 4
@@ -288,7 +289,7 @@ any real work, particularly anything that changes state or has
 side-effects, is a bad idea.
 
 =back
- 
+
 Please report any new problems to the author.  Patches are welcome.
 
 =head1 SEE ALSO
@@ -305,14 +306,19 @@ polymorphic return values.  You may wish to use one of these instead:
 =item * L<Contextual::Return>
 
 =back
- 
+
 =head1 AUTHOR
- 
-Dave O'Neill (dmo@roaringpenguin.com)
- 
+
+Dave O'Neill
+
+=head1 MAINTAINER
+
+Dianne Skoll (dianne@skoll.ca)
+
 =head1 LICENCE AND COPYRIGHT
 
 Copyright (c) 2007 Roaring Penguin Software, Inc.
+Copyright (c) 2022 Dianne Skoll
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

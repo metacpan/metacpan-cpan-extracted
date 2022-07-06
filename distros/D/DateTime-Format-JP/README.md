@@ -24,7 +24,7 @@ SYNOPSIS
 VERSION
 =======
 
-        v0.1.1
+        v0.1.2
 
 DESCRIPTION
 ===========
@@ -89,7 +89,9 @@ The constructor accepts the following parameters:
 
 :   The time zone to use when creating a
     [DateTime](https://metacpan.org/pod/DateTime){.perl-module} object.
-    Defaults to `local`
+    Defaults to `local` if
+    [DateTime::TimeZone](https://metacpan.org/pod/DateTime::TimeZone){.perl-module}
+    supports it, otherwise it will fallback on `UTC`
 
 error
 -----
@@ -220,35 +222,35 @@ DateTime](https://metacpan.org/pod/DateTime#strftime Patterns){.perl-module}),
 except that the formatter object parameters provided upon instantiation
 alter the values used.
 
--   \%%
+-   %%
 
     The % character.
 
--   \%a
+-   %a
 
     The weekday name in abbreviated form such as: 月, 火, 水, 木, 金,
     土, 日
 
--   \%A
+-   %A
 
     The weekday name in its long form such as: 月曜日, 火曜日, 水曜日,
     木曜日, 金曜日, 土曜日, 日曜日
 
--   \%b
+-   %b
 
     The month name, such as 1月, 2月, etc... 12月 using regular digits.
 
--   \%B
+-   %B
 
     The month name using full width (全角) digits, such as １月, ２月,
     etc... １２月
 
--   \%h
+-   %h
 
     The month name using kanjis for numbers, such as 一月, 二月, etc...
     十二月
 
--   \%c
+-   %c
 
     The datetime format in the Japanese standard most usual form. For
     example for `12th July 2021 14:17:30` this would be:
@@ -267,13 +269,13 @@ alter the values used.
 
             令和三年七月十二日午後二時十七分三十秒
 
--   \%C
+-   %C
 
     The century number (year/100) as a 2-digit integer. This is the same
     as [\"strftime\" in
     DateTime](https://metacpan.org/pod/DateTime#strftime){.perl-module}
 
--   \%d or %e
+-   %d or %e
 
     The day of month (1-31).
 
@@ -283,7 +285,7 @@ alter the values used.
     And if *kanji\_number* is true, it will then be with numbers in
     kanji: 一, 二, etc.. 十, 十一, etc..
 
--   \%D
+-   %D
 
     Equivalent to `%E%y年%m月%d日`
 
@@ -296,12 +298,12 @@ alter the values used.
     See %F for an equivalent date using the Gregorian years rather than
     the Japanese era.
 
--   \%E
+-   %E
 
     This extension is the Japanese era, such as `令和` (i.e. \"reiwa\":
     the current era)
 
--   \%F
+-   %F
 
     Equivalent to `%Y年%m月%d日`
 
@@ -314,14 +316,14 @@ alter the values used.
     numerals. For example `2021` would become `二〇二一` and not
     `二千二十一`
 
--   \%g
+-   %g
 
     The year corresponding to the ISO week number, but without the
     century (0-99). This uses regular digits and is the same as
     [\"strftime\" in
     DateTime](https://metacpan.org/pod/DateTime#strftime){.perl-module}
 
--   \%G
+-   %G
 
     The ISO 8601 year with century as a decimal number. The 4-digit year
     corresponding to the ISO week number. This has the same format and
@@ -332,7 +334,7 @@ alter the values used.
     This uses regular digits and is the same as [\"strftime\" in
     DateTime](https://metacpan.org/pod/DateTime#strftime){.perl-module}
 
--   \%H
+-   %H
 
     The hour: 0-23
 
@@ -344,27 +346,27 @@ alter the values used.
     And if *kanji\_number* is true, it will then be something like
     `十時`
 
--   \%I
+-   %I
 
     The hour on a 12-hour clock (1-12).
 
     If *zenkaku* is true, it will use full width numbers and if
     *kanji\_number* is true, it will use numbers in kanji instead.
 
--   \%j
+-   %j
 
     The day number in the year (1-366). This uses regular digits and is
     the same as [\"strftime\" in
     DateTime](https://metacpan.org/pod/DateTime#strftime){.perl-module}
 
--   \%m
+-   %m
 
     The month number (1-12).
 
     If *zenkaku* is true, it will use full width numbers and if
     *kanji\_number* is true, it will use numbers in kanji instead.
 
--   \%M
+-   %M
 
     The minute: 0-59
 
@@ -376,26 +378,26 @@ alter the values used.
     And if *kanji\_number* is true, it will then be something like
     `十分`
 
--   \%n
+-   %n
 
     Arbitrary whitespace. Same as in [\"strftime\" in
     DateTime](https://metacpan.org/pod/DateTime#strftime){.perl-module}
 
--   \%N
+-   %N
 
     Nanoseconds. For other sub-second values use `%[number]N`.
 
     This is a pass-through directly to [\"strftime\" in
     DateTime](https://metacpan.org/pod/DateTime#strftime){.perl-module}
 
--   \%p or %P
+-   %p or %P
 
     Either produces the same result.
 
     Either AM (午前) or PM (午後) according to the given time value.
     Noon is treated as pm \"午後\" and midnight as am \"午前\".
 
--   \%r
+-   %r
 
     Equivalent to `%p%I:%M:%S`
 
@@ -407,7 +409,7 @@ alter the values used.
 
             午後二：十四：三十 # 2:14:30 in this example
 
--   \%R
+-   %R
 
     Equivalent to `%H:%M`
 
@@ -417,14 +419,14 @@ alter the values used.
     Juste like for `%r`, avoid enabling *kanji\_number* if you use this
     token.
 
--   \%s
+-   %s
 
     Number of seconds since the Epoch.
 
     If *zenkaku* is enabled, this will return the value as double-byte
     number.
 
--   \%S
+-   %S
 
     The second: `0-60`
 
@@ -439,12 +441,12 @@ alter the values used.
     (60 may occur for leap seconds. See
     [DateTime::LeapSecond](https://metacpan.org/pod/DateTime::LeapSecond){.perl-module}).
 
--   \%t
+-   %t
 
     Arbitrary whitespace. Same as in [\"strftime\" in
     DateTime](https://metacpan.org/pod/DateTime#strftime){.perl-module}
 
--   \%T
+-   %T
 
     Equivalent to `%H:%M:%S`
 
@@ -454,7 +456,7 @@ alter the values used.
 
             １４：２０：３０
 
--   \%U
+-   %U
 
     The week number with Sunday (日曜日) the first day of the week
     (0-53). The first Sunday of January is the first day of week 1.
@@ -462,7 +464,7 @@ alter the values used.
     If *zenkaku* is enabled, it will return a double-byte number
     instead.
 
--   \%u
+-   %u
 
     The weekday number (1-7) with Monday (月曜日) = 1, 火曜日 = 2,
     水曜日 = 3, 木曜日 = 4, 金曜日 = 5, 土曜日 = 6, 日曜日 = 7
@@ -472,14 +474,14 @@ alter the values used.
 
     This is the `DateTime` standard.
 
--   \%w
+-   %w
 
     The weekday number (0-6) with Sunday = 0.
 
     If *zenkaku* is enabled, it will return a double-byte number
     instead.
 
--   \%W
+-   %W
 
     The week number with Monday (月曜日) the first day of the week
     (0-53). The first Monday of January is the first day of week 1.
@@ -487,7 +489,7 @@ alter the values used.
     If *zenkaku* is enabled, it will return a double-byte number
     instead.
 
--   \%x
+-   %x
 
     The date format in the standard most usual form. For example for
     12th July 2021 this would be:
@@ -502,7 +504,7 @@ alter the values used.
 
             令和三年七月十二日
 
--   \%X
+-   %X
 
     The time format in the standard most usual form. For example for
     `14:17:30` this would be:
@@ -522,7 +524,7 @@ alter the values used.
 
             午後二時十七分三十秒
 
--   \%y
+-   %y
 
     The year of the era. For example `2021-07-12` would be
     `令和3年7月12日` and thus the year value would be `3`
@@ -530,7 +532,7 @@ alter the values used.
     If *zenkaku* is true, it will use full width numbers and if
     *kanji\_number* is true, it will use numbers in kanji instead.
 
--   \%Y
+-   %Y
 
     A 4-digit year, including century (for example, 1991).
 
@@ -543,7 +545,7 @@ alter the values used.
     numerals. For example `2021` would become `二〇二一` and not
     `二千二十一`
 
--   \%z
+-   %z
 
     An RFC-822/ISO 8601 standard time zone specification. (For example
     +1100)
@@ -553,7 +555,7 @@ alter the values used.
     will be used instead. However, no numeral will be used. Thus a time
     zone offset such as `+0900` would be returned as `＋〇九〇〇`
 
--   \%Z
+-   %Z
 
     The timezone name. (For example EST \-- which is ambiguous). This is
     the same as [\"strftime\" in
@@ -594,7 +596,7 @@ More on this
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x55a47c0a87d0)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x55fc45a5a250)"}\>
 
 SEE ALSO
 ========

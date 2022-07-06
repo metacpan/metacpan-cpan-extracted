@@ -30,4 +30,10 @@ WriteMakefile(
             repository => 'https://github.com/PhilterPaper/PDF-Table',
         },
     },
+    PROVIDES          => {
+	'PDF::Table'  => {
+	    'file' =>  'lib/PDF/Table.pm',
+	    'version' => '1.003',
+	}
+    }
 );

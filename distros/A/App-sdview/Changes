@@ -1,5 +1,12 @@
 Revision history for App-sdview
 
+0.07    2022-07-05
+        [CHANGES]
+         * Use :isa() attribute of Object::Pad 0.57 instead of 'isa' keyword
+         * Search @INC for .pod or .pm files directly rather than asking
+           `perldoc -l`, so that failure does not print annoying error
+           messages
+
 0.06    2022-02-10
         [CHANGES]
          * Updates for perl 5.35.9:

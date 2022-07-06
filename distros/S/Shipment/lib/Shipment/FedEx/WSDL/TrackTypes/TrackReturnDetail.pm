@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackReturnDetail;
-$Shipment::FedEx::WSDL::TrackTypes::TrackReturnDetail::VERSION = '3.08';
+$Shipment::FedEx::WSDL::TrackTypes::TrackReturnDetail::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/track/v9'}
+sub get_xmlns { 'http://fedex.com/ws/track/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,43 +20,47 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %MovementStatus_of : ATTR(:get<MovementStatus>);
-    my %LabelType_of : ATTR(:get<LabelType>);
-    my %Description_of : ATTR(:get<Description>);
-    my %AuthorizationName_of : ATTR(:get<AuthorizationName>);
+my %MovementStatus_of :ATTR(:get<MovementStatus>);
+my %LabelType_of :ATTR(:get<LabelType>);
+my %Description_of :ATTR(:get<Description>);
+my %AuthorizationName_of :ATTR(:get<AuthorizationName>);
 
-    __PACKAGE__->_factory(
-        [   qw(        MovementStatus
-              LabelType
-              Description
-              AuthorizationName
+__PACKAGE__->_factory(
+    [ qw(        MovementStatus
+        LabelType
+        Description
+        AuthorizationName
 
-            )
-        ],
-        {   'MovementStatus'    => \%MovementStatus_of,
-            'LabelType'         => \%LabelType_of,
-            'Description'       => \%Description_of,
-            'AuthorizationName' => \%AuthorizationName_of,
-        },
-        {   'MovementStatus' =>
-              'Shipment::FedEx::WSDL::TrackTypes::TrackReturnMovementStatusType',
-            'LabelType' =>
-              'Shipment::FedEx::WSDL::TrackTypes::TrackReturnLabelType',
-            'Description'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'AuthorizationName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'MovementStatus' => \%MovementStatus_of,
+        'LabelType' => \%LabelType_of,
+        'Description' => \%Description_of,
+        'AuthorizationName' => \%AuthorizationName_of,
+    },
+    {
+        'MovementStatus' => 'Shipment::FedEx::WSDL::TrackTypes::TrackReturnMovementStatusType',
+        'LabelType' => 'Shipment::FedEx::WSDL::TrackTypes::TrackReturnLabelType',
+        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'AuthorizationName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'MovementStatus'    => 'MovementStatus',
-            'LabelType'         => 'LabelType',
-            'Description'       => 'Description',
-            'AuthorizationName' => 'AuthorizationName',
-        }
-    );
+        'MovementStatus' => 'MovementStatus',
+        'LabelType' => 'LabelType',
+        'Description' => 'Description',
+        'AuthorizationName' => 'AuthorizationName',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -73,7 +77,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackReturnDetail
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

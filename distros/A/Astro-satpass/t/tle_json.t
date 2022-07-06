@@ -30,7 +30,7 @@ my $version = Astro::Coord::ECI::TLE->VERSION();
 # Astrodynamics Specialist Conference.
 
 # This report was obtained from the Celestrak web site, specifically
-# http://celestrak.com/publications/AIAA/2006-6753/
+# http://celestrak.org/publications/AIAA/2006-6753/
 
 # The common name, RCS and effective date were added by me for testing
 # purposes. The RCS and effective date are fictional, and any

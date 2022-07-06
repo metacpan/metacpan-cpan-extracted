@@ -21,6 +21,7 @@ lib/Catalyst/View/Errors/JSON.pm
 lib/Catalyst/View/Errors/Text.pm
 lib/CatalystX/Errors.pm
 lib/CatalystX/Utils/ContentNegotiation.pm
+lib/CatalystX/Utils/DoesHttpException.pm
 lib/CatalystX/Utils/ErrorMessages.pm
 lib/CatalystX/Utils/HttpException.pm
 t/use.t

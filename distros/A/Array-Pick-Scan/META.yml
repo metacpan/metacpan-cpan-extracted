@@ -21,7 +21,7 @@ name: Array-Pick-Scan
 provides:
   Array::Pick::Scan:
     file: lib/Array/Pick/Scan.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Exporter: '5.57'
   perl: '5.010001'
@@ -31,7 +31,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Array-Pick-Scan
   homepage: https://metacpan.org/release/Array-Pick-Scan
   repository: git://github.com/perlancar/perl-Array-Pick-Scan.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

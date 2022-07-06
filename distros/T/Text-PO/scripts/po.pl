@@ -75,7 +75,7 @@ BEGIN
     pot                 => { type => 'string', class => [qw( init )] },
     project             => { type => 'string', class => [qw( init meta )] },
     revised_on          => { type => 'datetime', class => [qw( init meta )] },
-    team                => { type => 'string', class => [qw( init meta )] },
+    team                => { type => 'string', class => [qw( init meta )], alias => [qw( language-team )] },
     settings            => { type => 'string' },
     translator          => { type => 'string', class => [qw( init meta )] },
     tz                  => { type => 'string', alias => [qw( time_zone timezone )], class => [qw( init meta )] },

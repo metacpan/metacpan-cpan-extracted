@@ -1,0 +1,7 @@
+Postfix support.
+Document supporting modules needed.
+Dispatcher testing.
+Example milters.
+Add more tests:
+    Test export of symbols into the caller's namespace.
+    Tests with an MTA (and/or an MTA simulator - provide one)?

@@ -1,17 +1,17 @@
 ---
 abstract: 'Client code for querying multiple DNSBLs'
 author:
-  - 'Dianne Skoll <dfs@roaringpenguin.com>,'
+  - 'Dianne Skoll <dianne@skoll.ca>'
 build_requires:
   ExtUtils::MakeMaker: 6.59
   Test::Deep: 0
   Test::Exception: 0
-  Test::More: 0.82
+  Test::More: '0.82'
 configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.06'
+generated_by: 'Module::Install version 1.19'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,4 +27,4 @@ requires:
   perl: 5.8.0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.206
+version: '0.207'

@@ -1,0 +1,12 @@
+~$
+\.old$
+^.hg
+^MYMETA
+^cover_db/
+^[.]plx/
+^devel/
+^local/
+^[.]dir-locals[.]el
+^blib/
+^_build_params
+^Build$

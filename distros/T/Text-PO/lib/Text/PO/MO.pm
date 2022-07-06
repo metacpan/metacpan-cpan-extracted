@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO/MO.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/06/25
-## Modified 2021/06/28
+## Modified 2022/07/06
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,19 +17,19 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
+    use vars qw( $VERSION @META $DEF_META );
     use Encode ();
     use IO::File;
     use Nice::Try;
-    use Scalar::Util;
     use Text::PO;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
 
-INIT
-{
-    our @META = @Text::PO::META;
-    our $DEF_META = $Text::PO::DEF_META;
-};
+use strict;
+use warnings;
+
+our @META = @Text::PO::META;
+our $DEF_META = $Text::PO::DEF_META;
 
 sub init
 {
@@ -67,7 +67,6 @@ sub as_object
         {
             my( $k, $v ) = ( lc( $1 ), $2 );
             $meta->{ $k } = $v;
-            # $self->message( 3, "Adding meta key '$k' with value '$v'" );
             push( @$meta_keys, $k );
         }
     }
@@ -82,7 +81,6 @@ sub as_object
     foreach my $k ( @$order )
     {
         next if( !length( $k ) );
-        # $self->message( 3, "Adding localised string '", $ref->{ $k }, "'." );
         my $e = $po->new_element({
             msgid => $k,
             msgstr => $ref->{ $k },
@@ -103,16 +101,13 @@ sub decode
     return( $self->error( "No character encoding was provided to decode the mo file data." ) ) if( !CORE::length( $enc ) );
     try
     {
-        $self->message( 3, "Decoding data using encoding '$enc'." );
         foreach my $k ( sort( keys( %$hash ) ) )
         {
             my $v = $hash->{ $k };
-            # $self->message( 3, "Encoding msgid '$k' with value '$v'" );
             my $k2 = Encode::decode( $enc, $k, Encode::FB_CROAK );
             my $v2 = Encode::decode( $enc, $v, Encode::FB_CROAK );
             CORE::delete( $hash->{ $k } ) if( CORE::length( $k ) );
             $hash->{ $k2 } = $v2;
-            # $self->message( 3, "\tkey is now '$k2' and value '$v2'" );
         }
     }
     catch( $e )
@@ -135,7 +130,6 @@ sub encode
     return( $self->error( "No character encoding was provided to encode data." ) ) if( !CORE::length( $enc ) );
     try
     {
-        # $self->message( 3, "Encoding data using encoding '$enc' -> ", sub{ $self->dump( $hash ) });
         foreach my $k ( keys( %$hash ) )
         {
             my $v = $hash->{ $k };
@@ -210,7 +204,6 @@ sub read
 
     # Total messages
     my $total = unpack( $tmpl, substr( $data, 8, 4 ) );
-    # $self->message( 3, "$total strings in this file \"$file\"." );
     # Offset to the beginning of the original messages
     my $off_msgid = unpack( $tmpl, substr( $data, 12, 4 ) );
     # Offset to the beginning of the translated messages
@@ -234,34 +227,29 @@ sub read
         # Translated message
         $msgstr = substr( $data, $off, $len );
         
-        # $self->message( 3, "Found msgid '$msgid' and msgstr '$msgstr'" );
         $hash->{ $msgid } = $msgstr;
         push( @$order, $msgid );
     }
     
     if( $self->auto_decode || $opts->{auto_decode} )
     {
-        unless( $enc = $self->encoding )
+        unless( my $enc = $self->encoding )
         {
-            # $self->message( 3, "auto_decode is enabled, but no encoding provided. Trying to get it from the meta information." );
             # Find the encoding of that MO file
             if( $hash->{ '' } =~ /Content-Type:[[:blank:]\h]*text\/plain;[[:blank:]\h]*charset[[:blank:]\h]*=[[:blank:]\h]*(?<quote>["'])?(?<encoding>[\w\-]+)\g{quote}?/is )
             {
                 $enc = $+{encoding};
-                # $self->message( 3, "Found encoding: '$enc'." );
                 $self->encoding( $enc );
             }
             # Default to US-ASCII
             else
             {
                 $enc = $self->default_encoding || $opts->{default_encoding};
-                # $self->message( 3, "Using default encoding '$enc'." );
             }
             $self->encoding( $enc );
         }
         $self->decode( $hash );
     }
-    # $self->message( 3, "Returning hash of strings: ", sub{ $self->dump( $hash ) });
     $self->{_last_modified} = [CORE::stat( $file )]->[9];
     $self->{_cache} = [ $hash, $order ];
     return( wantarray() ? ( $hash, $order ) : $hash );
@@ -289,14 +277,13 @@ sub write
     my $keys = [];
     $opts->{encoding} //= '';
     my $enc  = $opts->{encoding} || $self->encoding || $self->default_encoding || 'utf-8';
-    local $add = sub
+    my $add = sub
     {
         my $this = shift( @_ );
         $self->encode( $this => $enc ) || do
         {
-            warnings::warn( "An error occurred trying to encode value for key '$k': ", $self->error, "\n" ) if( warnings::enabled() );
+            warnings::warn( "An error occurred trying to encode value for key '${this}': ", $self->error, "\n" ) if( warnings::enabled() );
         };
-        # $self->message( 3, "Processing data -> ", sub{ $self->dump( $this ) });
         my $msgstr;
         if( $this->{msgid_plural} )
         {
@@ -331,18 +318,14 @@ sub write
     my $metaKeys = [@Text::PO::META];
     my $metas = [];
     my $meta = $po->meta;
-    # $self->message( 3, "Meta data has ", $meta->length, " elements -> ", sub{ $self->dump( { %$meta } ) });
-    # $self->message( 3, "\$DEF_META contains: ", sub{ $self->dump( $DEF_META ) });
     if( scalar( @$metaKeys ) )
     {
-        # $self->messagef( 3, "%d meta keys to print out.", scalar( @$metaKeys ) );
         foreach my $k ( @$metaKeys )
         {
             my $k2 = lc( $k );
             $k2 =~ tr/-/_/;
             next if( !CORE::exists( $meta->{ $k2 } ) );
             my $v2 = $po->meta( $k );
-            # $self->message( 3, "Adding to meta, key $k with value $v2" );
             push( @$metas, sprintf( "\"%s: %s\\n\"\n", $po->normalise_meta( $k ), $v2 ) );
         }
         $add->({
@@ -353,11 +336,9 @@ sub write
         });
     }
     
-    # $self->messagef( 3, "Adding %d strings.", scalar( @$elems ) );
     foreach my $e ( @$elems )
     {
         next if( $e->is_meta );
-        # $self->message( 3, "Adding id '", $e->msgid, "' -> '", $e->msgstr, "'." );
         $add->({
             context => $e->context,
             msgid   => $e->msgid,
@@ -369,7 +350,6 @@ sub write
     my $cnt = scalar( keys( %$ref ) );
     my $mem = 28 + ( $cnt * 16 );
     my $l10n = [map( $ref->{ $_ }, @$keys )];
-    $self->messagef( 3, "There are $cnt items for %d msgid and %d msgstr.", scalar( @$keys ), scalar( @$l10n ) );
 
     my $fh;
     my $file = ( CORE::exists( $opts->{file} ) && length( $opts->{file} ) )
@@ -411,20 +391,18 @@ sub write
     }
     foreach my $k ( @$keys )
     {
-        # $self->message( 3, "Adding msgid '$k' -> '", null_terminate( $k ), "'." );
         $fh->print( null_terminate( $k ) );
     }
     foreach my $v ( @$l10n )
     {
-        # $self->message( 3, "Adding msgstr '$v' -> '", null_terminate( $v ), "'." );
         $fh->print( null_terminate( $v ) );
     }
 
-    $fh->close unless( $opts->{file} eq '-' );
+    $fh->close unless( CORE::exists( $opts->{file} ) && defined( $opts->{file} ) && $opts->{file} eq '-' );
     return( $self );
 }
 
-# XXX helper functions
+# NOTE: helper functions
 # Credits to Ryan Niebur
 sub character
 {
@@ -487,7 +465,7 @@ sub _from_string
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =head1 NAME
@@ -513,7 +491,7 @@ Text::PO::MO - Machine Object File Read, Write
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

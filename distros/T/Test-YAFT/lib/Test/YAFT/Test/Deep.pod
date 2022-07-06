@@ -1,0 +1,232 @@
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Test::YAFT::Test::Deep - Test::YAFT - Test::Deep comparison
+
+=head1 DESCRIPTION
+
+L<Test::YAFT> supports almost all of L<Test::Deep> features
+
+=head2 Import Parameters
+
+L<Test::YAFT> exports via L<Exporter::Tiny>.
+
+=head2 Exported Functions
+
+=over
+
+=item Isa
+
+Reexported as C<expect_isa>
+
+=item all
+
+Reexported as C<expect_all>
+
+=item any
+
+Reexported as C<expect_any>
+
+=item array
+
+Reexported as C<expect_array>
+
+=item array_each
+
+Reexported as C<expect_array_each>
+
+=item arrayelementsonly
+
+Reexported as C<expect_array_elements_only>
+
+=item arraylength
+
+Reexported as C<expect_array_length>
+
+=item arraylengthonly
+
+Reexported as C<expect_array_length_only>
+
+=item bag
+
+Reexported as C<expect_bag>
+
+=item blessed
+
+Reexported as C<expect_blessed>
+
+=item bool
+
+Reexported as C<expect_bool>
+
+=item cmp_bag
+
+Not provided, use C<it> with C<expect_bag>
+
+=item cmp_deeply
+
+Replaced with C<it> (which btw internally uses it)
+
+=item cmp_details
+
+Reexportable (tag plumbing)
+
+=item cmp_methods
+
+Not provided, use C<it> with C<expect_methods>
+
+=item cmp_set
+
+Not provided, use C<it> with C<expect_set>
+
+=item code
+
+Reexported as C<expect_code>
+
+=item deep_diag
+
+Reexportable (tag plumbing)
+
+=item eq_deeply
+
+Reexportable (tag plumbing)
+
+=item hash
+
+Reexported as C<expect_hash>
+
+=item hash_each
+
+Reexported as C<expect_hash_each>
+
+=item hashkeys
+
+Reexported as C<expect_hash_keys>
+
+=item hashkeysonly
+
+Reexported as C<expect_hash_keys_only>
+
+=item ignore
+
+Reexported
+
+=item isa
+
+Only its C<Isa> part available via C<expect_isa>
+
+=item listmethods
+
+Reexported as C<expect_listmethods>
+
+=item methods
+
+Reexported as C<expect_methods>
+
+=item noclass
+
+Reexported as C<expect_no_class>
+
+=item none
+
+Reexported as C<expect_none>
+
+=item noneof
+
+Reexported as C<expect_none_of>
+
+=item num
+
+Reexported as C<expect_num>
+
+=item obj_isa
+
+Reexported as C<expect_obj_isa>
+
+=item re
+
+Reexported as C<expect_re>
+
+=item reftype
+
+Reexported as C<expect_ref_type>
+
+=item regexpmatches
+
+Reexported as C<expect_regexpmatches>
+
+=item regexponly
+
+Reexported as C<expect_regexp_only>
+
+=item regexpref
+
+Reexported as C<expect_regexp_ref>
+
+=item regexprefonly
+
+Reexported as C<expect_regexpref_only>
+
+=item scalarrefonly
+
+Reexported as C<expect_scalarref_only>
+
+=item scalref
+
+Reexported as C<expect_scalarref>
+
+=item set
+
+Reexported as C<expect_set>
+
+=item shallow
+
+Reexported as C<expect_shallow>
+
+=item str
+
+Reexported as C<expect_str>
+
+=item subbagof
+
+Reexported as C<expect_subbag_of>
+
+=item subhashof
+
+Reexported as C<expect_subhash_of>
+
+=item subsetof
+
+Reexported as C<expect_subset_of>
+
+=item superbagof
+
+Reexported as C<expect_superbag_of>
+
+=item superhashof
+
+Reexported as C<expect_superhash_of>
+
+=item supersetof
+
+Reexported as C<expect_superset_of>
+
+=item useclass
+
+Reexported as C<expect_use_class>
+
+=back
+
+=head1 AUTHOR
+
+Branislav Zahradník <barney@cpan.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+This file is part of L<Test::YAFT> distribution.
+
+=cut

@@ -1,0 +1,33 @@
+---
+abstract: 'Read or create macOS alias files'
+author:
+  - 'Arne Johannessen <ajnn@cpan.org>'
+build_requires:
+  File::Copy: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Warnings: '0'
+  Unicode::Normalize: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mac-Alias
+provides:
+  Mac::Alias:
+    file: lib/Mac/Alias.pm
+    version: '1.01'
+requires:
+  Path::Tiny: '0'
+  perl: v5.26.0
+resources:
+  bugtracker: https://github.com/johannessen/perl-mac-alias/issues
+  repository: https://github.com/johannessen/perl-mac-alias.git
+version: '1.01'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

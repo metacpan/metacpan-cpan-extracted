@@ -1,6 +1,12 @@
 https://github.com/amaltsev/XAO-Web
 -----------------------------------
 
+commit 6d0c6f422dab440d3bddd084e9b6a7c2a5be5f08
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Fri Jul 1 16:44:50 2022 -0700
+
+    1.89 Minor old changes to FilloutForm
+
 commit e5655b72472e3e9b899270b4729df7f240558ade
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Fri Apr 8 19:04:06 2022 -0700
@@ -72,12 +78,4 @@ Date:   Wed Aug 26 15:24:55 2020 -0700
     Setting SameSite and optionally a compatibility setting for browsers
     that have not caught up yet. Can be set in a global configuration or for
     specific cookies.
-
-commit e10b79ed77c610040da91d83f93b0431772173b8
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Mon Jul 20 19:13:39 2020 -0700
-
-    v1.81 Test case fix for XAO::Base 1.27
-    
-    Single quote is now encoded differently.
 

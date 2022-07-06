@@ -8,7 +8,7 @@ use Test::More;
 use_ok q{Weather::NHC::TropicalCyclone};
 use_ok q{Weather::NHC::TropicalCyclone::Storm};
 
-open my $dh, q{<}, qq{$Bin/../../data/CurrentStorms.json} or die $!;
+open my $dh, q{<}, qq{$Bin/../../data/2020/CurrentStorms.json} or die $!;
 local $/;
 my $json = <$dh>;
 

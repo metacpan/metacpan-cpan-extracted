@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::CustomsClearanceDetail;
-$Shipment::FedEx::WSDL::RateTypes::CustomsClearanceDetail::VERSION = '3.08';
+$Shipment::FedEx::WSDL::RateTypes::CustomsClearanceDetail::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,101 +20,97 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Broker_of : ATTR(:get<Broker>);
-    my %ClearanceBrokerage_of : ATTR(:get<ClearanceBrokerage>);
-    my %ImporterOfRecord_of : ATTR(:get<ImporterOfRecord>);
-    my %RecipientCustomsId_of : ATTR(:get<RecipientCustomsId>);
-    my %DutiesPayment_of : ATTR(:get<DutiesPayment>);
-    my %DocumentContent_of : ATTR(:get<DocumentContent>);
-    my %CustomsValue_of : ATTR(:get<CustomsValue>);
-    my %FreightOnValue_of : ATTR(:get<FreightOnValue>);
-    my %InsuranceCharges_of : ATTR(:get<InsuranceCharges>);
-    my %PartiesToTransactionAreRelated_of :
-      ATTR(:get<PartiesToTransactionAreRelated>);
-    my %CommercialInvoice_of : ATTR(:get<CommercialInvoice>);
-    my %Commodities_of : ATTR(:get<Commodities>);
-    my %ExportDetail_of : ATTR(:get<ExportDetail>);
-    my %RegulatoryControls_of : ATTR(:get<RegulatoryControls>);
+my %Broker_of :ATTR(:get<Broker>);
+my %ClearanceBrokerage_of :ATTR(:get<ClearanceBrokerage>);
+my %ImporterOfRecord_of :ATTR(:get<ImporterOfRecord>);
+my %RecipientCustomsId_of :ATTR(:get<RecipientCustomsId>);
+my %DutiesPayment_of :ATTR(:get<DutiesPayment>);
+my %DocumentContent_of :ATTR(:get<DocumentContent>);
+my %CustomsValue_of :ATTR(:get<CustomsValue>);
+my %FreightOnValue_of :ATTR(:get<FreightOnValue>);
+my %InsuranceCharges_of :ATTR(:get<InsuranceCharges>);
+my %PartiesToTransactionAreRelated_of :ATTR(:get<PartiesToTransactionAreRelated>);
+my %CommercialInvoice_of :ATTR(:get<CommercialInvoice>);
+my %Commodities_of :ATTR(:get<Commodities>);
+my %ExportDetail_of :ATTR(:get<ExportDetail>);
+my %RegulatoryControls_of :ATTR(:get<RegulatoryControls>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Broker
-              ClearanceBrokerage
-              ImporterOfRecord
-              RecipientCustomsId
-              DutiesPayment
-              DocumentContent
-              CustomsValue
-              FreightOnValue
-              InsuranceCharges
-              PartiesToTransactionAreRelated
-              CommercialInvoice
-              Commodities
-              ExportDetail
-              RegulatoryControls
+__PACKAGE__->_factory(
+    [ qw(        Broker
+        ClearanceBrokerage
+        ImporterOfRecord
+        RecipientCustomsId
+        DutiesPayment
+        DocumentContent
+        CustomsValue
+        FreightOnValue
+        InsuranceCharges
+        PartiesToTransactionAreRelated
+        CommercialInvoice
+        Commodities
+        ExportDetail
+        RegulatoryControls
 
-            )
-        ],
-        {   'Broker'                         => \%Broker_of,
-            'ClearanceBrokerage'             => \%ClearanceBrokerage_of,
-            'ImporterOfRecord'               => \%ImporterOfRecord_of,
-            'RecipientCustomsId'             => \%RecipientCustomsId_of,
-            'DutiesPayment'                  => \%DutiesPayment_of,
-            'DocumentContent'                => \%DocumentContent_of,
-            'CustomsValue'                   => \%CustomsValue_of,
-            'FreightOnValue'                 => \%FreightOnValue_of,
-            'InsuranceCharges'               => \%InsuranceCharges_of,
-            'PartiesToTransactionAreRelated' =>
-              \%PartiesToTransactionAreRelated_of,
-            'CommercialInvoice'  => \%CommercialInvoice_of,
-            'Commodities'        => \%Commodities_of,
-            'ExportDetail'       => \%ExportDetail_of,
-            'RegulatoryControls' => \%RegulatoryControls_of,
-        },
-        {   'Broker'             => 'Shipment::FedEx::WSDL::RateTypes::Party',
-            'ClearanceBrokerage' =>
-              'Shipment::FedEx::WSDL::RateTypes::ClearanceBrokerageType',
-            'ImporterOfRecord'   => 'Shipment::FedEx::WSDL::RateTypes::Party',
-            'RecipientCustomsId' =>
-              'Shipment::FedEx::WSDL::RateTypes::RecipientCustomsId',
-            'DutiesPayment'   => 'Shipment::FedEx::WSDL::RateTypes::Payment',
-            'DocumentContent' =>
-              'Shipment::FedEx::WSDL::RateTypes::InternationalDocumentContentType',
-            'CustomsValue'   => 'Shipment::FedEx::WSDL::RateTypes::Money',
-            'FreightOnValue' =>
-              'Shipment::FedEx::WSDL::RateTypes::FreightOnValueType',
-            'InsuranceCharges' => 'Shipment::FedEx::WSDL::RateTypes::Money',
-            'PartiesToTransactionAreRelated' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-            'CommercialInvoice' =>
-              'Shipment::FedEx::WSDL::RateTypes::CommercialInvoice',
-            'Commodities'  => 'Shipment::FedEx::WSDL::RateTypes::Commodity',
-            'ExportDetail' => 'Shipment::FedEx::WSDL::RateTypes::ExportDetail',
-            'RegulatoryControls' =>
-              'Shipment::FedEx::WSDL::RateTypes::RegulatoryControlType',
-        },
-        {
+    ) ],
+    {
+        'Broker' => \%Broker_of,
+        'ClearanceBrokerage' => \%ClearanceBrokerage_of,
+        'ImporterOfRecord' => \%ImporterOfRecord_of,
+        'RecipientCustomsId' => \%RecipientCustomsId_of,
+        'DutiesPayment' => \%DutiesPayment_of,
+        'DocumentContent' => \%DocumentContent_of,
+        'CustomsValue' => \%CustomsValue_of,
+        'FreightOnValue' => \%FreightOnValue_of,
+        'InsuranceCharges' => \%InsuranceCharges_of,
+        'PartiesToTransactionAreRelated' => \%PartiesToTransactionAreRelated_of,
+        'CommercialInvoice' => \%CommercialInvoice_of,
+        'Commodities' => \%Commodities_of,
+        'ExportDetail' => \%ExportDetail_of,
+        'RegulatoryControls' => \%RegulatoryControls_of,
+    },
+    {
+        'Broker' => 'Shipment::FedEx::WSDL::RateTypes::Party',
+        'ClearanceBrokerage' => 'Shipment::FedEx::WSDL::RateTypes::ClearanceBrokerageType',
+        'ImporterOfRecord' => 'Shipment::FedEx::WSDL::RateTypes::Party',
+        'RecipientCustomsId' => 'Shipment::FedEx::WSDL::RateTypes::RecipientCustomsId',
+        'DutiesPayment' => 'Shipment::FedEx::WSDL::RateTypes::Payment',
+        'DocumentContent' => 'Shipment::FedEx::WSDL::RateTypes::InternationalDocumentContentType',
+        'CustomsValue' => 'Shipment::FedEx::WSDL::RateTypes::Money',
+        'FreightOnValue' => 'Shipment::FedEx::WSDL::RateTypes::FreightOnValueType',
+        'InsuranceCharges' => 'Shipment::FedEx::WSDL::RateTypes::Money',
+        'PartiesToTransactionAreRelated' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        'CommercialInvoice' => 'Shipment::FedEx::WSDL::RateTypes::CommercialInvoice',
+        'Commodities' => 'Shipment::FedEx::WSDL::RateTypes::Commodity',
+        'ExportDetail' => 'Shipment::FedEx::WSDL::RateTypes::ExportDetail',
+        'RegulatoryControls' => 'Shipment::FedEx::WSDL::RateTypes::RegulatoryControlType',
+    },
+    {
 
-            'Broker'                         => 'Broker',
-            'ClearanceBrokerage'             => 'ClearanceBrokerage',
-            'ImporterOfRecord'               => 'ImporterOfRecord',
-            'RecipientCustomsId'             => 'RecipientCustomsId',
-            'DutiesPayment'                  => 'DutiesPayment',
-            'DocumentContent'                => 'DocumentContent',
-            'CustomsValue'                   => 'CustomsValue',
-            'FreightOnValue'                 => 'FreightOnValue',
-            'InsuranceCharges'               => 'InsuranceCharges',
-            'PartiesToTransactionAreRelated' =>
-              'PartiesToTransactionAreRelated',
-            'CommercialInvoice'  => 'CommercialInvoice',
-            'Commodities'        => 'Commodities',
-            'ExportDetail'       => 'ExportDetail',
-            'RegulatoryControls' => 'RegulatoryControls',
-        }
-    );
+        'Broker' => 'Broker',
+        'ClearanceBrokerage' => 'ClearanceBrokerage',
+        'ImporterOfRecord' => 'ImporterOfRecord',
+        'RecipientCustomsId' => 'RecipientCustomsId',
+        'DutiesPayment' => 'DutiesPayment',
+        'DocumentContent' => 'DocumentContent',
+        'CustomsValue' => 'CustomsValue',
+        'FreightOnValue' => 'FreightOnValue',
+        'InsuranceCharges' => 'InsuranceCharges',
+        'PartiesToTransactionAreRelated' => 'PartiesToTransactionAreRelated',
+        'CommercialInvoice' => 'CommercialInvoice',
+        'Commodities' => 'Commodities',
+        'ExportDetail' => 'ExportDetail',
+        'RegulatoryControls' => 'RegulatoryControls',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -131,7 +127,7 @@ Shipment::FedEx::WSDL::RateTypes::CustomsClearanceDetail
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

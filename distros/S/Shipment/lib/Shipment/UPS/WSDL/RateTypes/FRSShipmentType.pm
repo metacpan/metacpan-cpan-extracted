@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::RateTypes::FRSShipmentType;
-$Shipment::UPS::WSDL::RateTypes::FRSShipmentType::VERSION = '3.08';
+$Shipment::UPS::WSDL::RateTypes::FRSShipmentType::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,26 +20,32 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %TransportationCharges_of : ATTR(:get<TransportationCharges>);
+my %TransportationCharges_of :ATTR(:get<TransportationCharges>);
 
-    __PACKAGE__->_factory(
-        [   qw(        TransportationCharges
+__PACKAGE__->_factory(
+    [ qw(        TransportationCharges
 
-            )
-        ],
-        {'TransportationCharges' => \%TransportationCharges_of,},
-        {   'TransportationCharges' =>
-              'Shipment::UPS::WSDL::RateTypes::TransportationChargesType',
-        },
-        {
+    ) ],
+    {
+        'TransportationCharges' => \%TransportationCharges_of,
+    },
+    {
+        'TransportationCharges' => 'Shipment::UPS::WSDL::RateTypes::TransportationChargesType',
+    },
+    {
 
-            'TransportationCharges' => 'TransportationCharges',
-        }
-    );
+        'TransportationCharges' => 'TransportationCharges',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -56,7 +62,7 @@ Shipment::UPS::WSDL::RateTypes::FRSShipmentType
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

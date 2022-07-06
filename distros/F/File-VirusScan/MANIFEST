@@ -2,7 +2,6 @@
 Changes
 COPYING
 inc/Module/Install.pm
-inc/Module/Install/AuthorTests.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
 inc/Module/Install/Fetch.pm
@@ -40,7 +39,6 @@ lib/File/VirusScan/ResultSet.pm
 Makefile.PL
 MANIFEST
 META.yml
-MYMETA.yml
 README
 t/00-load.t
 t/authentium-command-antivirus.t

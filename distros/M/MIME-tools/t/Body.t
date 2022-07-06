@@ -89,6 +89,10 @@ foreach my $body ( @bodies ) {
 {
 
 	my $cwd = cwd();
+        # Untaint
+        if ($cwd =~ /^(.*)$/) {
+                $cwd = $1;
+        }
 	ok( chdir './testout', 'chdir to ./testout to avoid clutter');
 	eval {
 		my $body = MIME::Body::File->new(" bad file ");

@@ -25,7 +25,6 @@ Observatory
 Smithsonian
 SysFatal
 appexec
-bin
 cacheid
 djerius
 dmlist
@@ -35,5 +34,6 @@ fhelp
 lib
 qexec
 sandboxing
+script
 str
 uncache

@@ -1,5 +1,11 @@
+.github/workflows/linux-ubuntu-latest-32bit.yml
+.github/workflows/linux-ubuntu-latest-perl-5.8.9.yml
+.github/workflows/linux-ubuntu-latest.yml
+.github/workflows/macos-latest.yml
+.github/workflows/windows-2019.yml
 .gitignore
 Changes
+cpanm
 lib/SPVM/Resource/Re2/V2022_06_01.config
 lib/SPVM/Resource/Re2/V2022_06_01.native/include/.gitkeep
 lib/SPVM/Resource/Re2/V2022_06_01.native/include/Makefile
@@ -165,5 +171,7 @@ t/basic.t
 t/lib/SPVM/TestCase/Resource/Re2/V2022_06_01.config
 t/lib/SPVM/TestCase/Resource/Re2/V2022_06_01.cpp
 t/lib/SPVM/TestCase/Resource/Re2/V2022_06_01.spvm
+t/support/cpp11_check.cpp
+t/support/work/.gitkeep
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

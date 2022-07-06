@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::GetDocumentsResponseContainer;
-$Shipment::Purolator::WSDL::Types::GetDocumentsResponseContainer::VERSION = '3.08';
+$Shipment::Purolator::WSDL::Types::GetDocumentsResponseContainer::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -17,39 +17,43 @@ sub __get_attr_class {
 
 
 use base qw(Shipment::Purolator::WSDL::Types::ResponseContainer);
-
 # Variety: sequence
 use Class::Std::Fast::Storable constructor => 'none';
 use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %ResponseInformation_of : ATTR(:get<ResponseInformation>);
-    my %Documents_of : ATTR(:get<Documents>);
+my %ResponseInformation_of :ATTR(:get<ResponseInformation>);
+my %Documents_of :ATTR(:get<Documents>);
 
-    __PACKAGE__->_factory(
-        [   qw(        ResponseInformation
-              Documents
+__PACKAGE__->_factory(
+    [ qw(        ResponseInformation
+        Documents
 
-            )
-        ],
-        {   'ResponseInformation' => \%ResponseInformation_of,
-            'Documents'           => \%Documents_of,
-        },
-        {   'ResponseInformation' =>
-              'Shipment::Purolator::WSDL::Types::ResponseInformation',
-            'Documents' => 'Shipment::Purolator::WSDL::Types::ArrayOfDocument',
-        },
-        {
+    ) ],
+    {
+        'ResponseInformation' => \%ResponseInformation_of,
+        'Documents' => \%Documents_of,
+    },
+    {
+        'ResponseInformation' => 'Shipment::Purolator::WSDL::Types::ResponseInformation',
+        'Documents' => 'Shipment::Purolator::WSDL::Types::ArrayOfDocument',
+    },
+    {
 
-            'ResponseInformation' => 'ResponseInformation',
-            'Documents'           => 'Documents',
-        }
-    );
+        'ResponseInformation' => 'ResponseInformation',
+        'Documents' => 'Documents',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -66,7 +70,7 @@ Shipment::Purolator::WSDL::Types::GetDocumentsResponseContainer
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

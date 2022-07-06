@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::TrackTypes::AppointmentType;
-$Shipment::UPS::WSDL::TrackTypes::AppointmentType::VERSION = '3.08';
+$Shipment::UPS::WSDL::TrackTypes::AppointmentType::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,41 +20,47 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Made_of : ATTR(:get<Made>);
-    my %Requested_of : ATTR(:get<Requested>);
-    my %BeginTime_of : ATTR(:get<BeginTime>);
-    my %EndTime_of : ATTR(:get<EndTime>);
+my %Made_of :ATTR(:get<Made>);
+my %Requested_of :ATTR(:get<Requested>);
+my %BeginTime_of :ATTR(:get<BeginTime>);
+my %EndTime_of :ATTR(:get<EndTime>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Made
-              Requested
-              BeginTime
-              EndTime
+__PACKAGE__->_factory(
+    [ qw(        Made
+        Requested
+        BeginTime
+        EndTime
 
-            )
-        ],
-        {   'Made'      => \%Made_of,
-            'Requested' => \%Requested_of,
-            'BeginTime' => \%BeginTime_of,
-            'EndTime'   => \%EndTime_of,
-        },
-        {   'Made'      => 'Shipment::UPS::WSDL::TrackTypes::DateTimeType',
-            'Requested' => 'Shipment::UPS::WSDL::TrackTypes::DateTimeType',
-            'BeginTime' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'EndTime'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'Made' => \%Made_of,
+        'Requested' => \%Requested_of,
+        'BeginTime' => \%BeginTime_of,
+        'EndTime' => \%EndTime_of,
+    },
+    {
+        'Made' => 'Shipment::UPS::WSDL::TrackTypes::DateTimeType',
+        'Requested' => 'Shipment::UPS::WSDL::TrackTypes::DateTimeType',
+        'BeginTime' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'EndTime' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'Made'      => 'Made',
-            'Requested' => 'Requested',
-            'BeginTime' => 'BeginTime',
-            'EndTime'   => 'EndTime',
-        }
-    );
+        'Made' => 'Made',
+        'Requested' => 'Requested',
+        'BeginTime' => 'BeginTime',
+        'EndTime' => 'EndTime',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -71,7 +77,7 @@ Shipment::UPS::WSDL::TrackTypes::AppointmentType
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

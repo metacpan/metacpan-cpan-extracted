@@ -6,7 +6,7 @@ use inc::Module::Install;
 name            'MIME-tools';
 module_name     'MIME::Tools';
 version_from    'lib/MIME/Tools.pm';
-author          q{Eryq <eryq@zeegee.com>, Dianne Skoll <dfs@roaringpenguin.com>, Dave O'Neill <dmo@roaringpenguin.com>};
+author          q{Eryq <eryq@zeegee.com>, Dianne Skoll <dianne@skoll.ca>, Dave O'Neill <dmo@dmo.ca>};
 abstract        'Tools to manipulate MIME messages';
 license         'perl';
 

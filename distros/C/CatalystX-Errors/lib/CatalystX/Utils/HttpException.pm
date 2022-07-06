@@ -3,44 +3,26 @@ package CatalystX::Utils::HttpException;
 use Moose;
 use Carp;
 
-with 'Catalyst::Exception::Interface';
-
-has 'info' => (is=>'ro', predicate=>'has_info');
-has 'status' => (is=>'ro', isa=>'Int', lazy=>1, required=>1, default=>sub { 500 } );
-has 'errors' => (is=>'ro', isa=>'ArrayRef', lazy=>1, required=>1, default=>sub {['The system has generated unspecifed errors.']} );
+with 'CatalystX::Utils::DoesHttpException';
 
 sub import {
   my $class = shift;
+  my @imports = @_;
   my $target = caller;
-  unless($target->can('throw_http')) {
-    eval qq[
-      package $target;
-      use Carp;
 
-      sub throw_http {
-        my (\$status, \%args) = \@_;
-        croak \$class->new(\%args, status => \$status);
-      }
-    ];
+  foreach my $import_sub (@imports) {
+    if( ($import_sub eq 'throw_http') && (!$target->can('throw_http')) ) {
+        eval qq[
+          package $target;
+          use Carp;
+
+          sub throw_http {
+            my (\$status, \%args) = \@_;
+            croak \$class->new(\%args, status_code => \$status);
+          }
+        ];
+    }
   }
-}
-
-sub as_string {
-    my ($self) = @_;
-    return join '; ', @{$self->errors};
-}
-
-sub throw {
-    my $class = shift;
-    my (%args) = @_;
-    my $error = $class->new(%args);
-    local $Carp::CarpLevel = 1;
-    croak $error;
-}
- 
-sub rethrow {
-    my ($self) = @_;
-    croak $self;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -51,7 +33,7 @@ CatalystX::Utils::HttpException - A basic way to throw exceptions
 
 =head1 SYNOPSIS
 
-  use CatalystX::Utils::HttpException;
+  use CatalystX::Utils::HttpException 'throw_http';
 
   throw_http $code, %extra;
 
@@ -59,15 +41,17 @@ CatalystX::Utils::HttpException - A basic way to throw exceptions
   
   CatalystX::Utils::HttpException->throw(500, %extra);
 
-  ## OR Subclass for your use case ##
+  ## OR Subclass for your use case (although just consuming the role 'CatalystX::Utils::DoesHttpException'
+  ## is probably cleaner
   
   package MyApp::Exception::Custom;
 
   use Moose;
   extends 'CatalystX::Utils::HttpException';
 
-  has '+status' => (init_arg=>undef, default=>sub {418});
-  has '+errors' => (init_arg=>undef, default=>sub {['Coffee not allowed!']});
+  sub status_code { 418 }
+  sub error { 'Coffee not allowed' }
+
 
 =head1 DESCRIPTION
 
@@ -75,6 +59,10 @@ If you need to throw an exception from code called by L<Catalyst>, such as code 
 inside your L<DBIx::Class> classes and you want to signal how to handle the issue
 you an use this. You can also use this to subclass your own custom messages that will
 get properly handled in a web context.
+
+This class is semi deprecated (not recommended anymore for creating custom exception classes
+and you should use the role L<CatalystX::Utils::DoesHttpException> which this consumes
+directly.
 
 =head1 SEE ALSO
  

@@ -49,7 +49,8 @@ do { my $x = {
                                       'warnings' => '0'
                                     },
                       'suggests' => {
-                                      'Business::ISBN' => '3.005'
+                                      'Business::ISBN' => '3.005',
+                                      'Regexp::IPv6' => '0.03'
                                     }
                     },
        'test' => {

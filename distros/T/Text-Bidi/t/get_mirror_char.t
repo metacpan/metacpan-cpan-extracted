@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use open qw[:encoding(UTF-8) :std];
 use Test::More;
 use Text::Bidi qw(get_mirror_char);
 
@@ -11,10 +12,9 @@ foreach ( <$fh> ) {
     next if /^\s*(#|$)/;
     chomp;
     if ( /^(....); (....) # (.*$)/ ) {
-        my $chr = "0x$1";
-        my $mir = "0x$2";
-        my $desc = $3;
-        is chr(hex($chr)), get_mirror_char(chr(hex($mir))), "Wrong mirror for $mir ($desc)";
+        my ($chr, $mir, $desc) = ($1, $2, $3);
+        is chr(hex($chr)), get_mirror_char(chr(hex($mir))),
+            "Wrong mirror for $mir ($desc)";
     }
 }
 

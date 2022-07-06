@@ -131,7 +131,7 @@ use Test::More;
       }
       {
         my $source = 'class MyClass { our $FOO : public private int; }';
-        compile_not_ok($source, qr/Only one of "private", "protected", or "public" class variable descriptors can be specified/);
+        compile_not_ok($source, qr/Only one of "private" or "public" class variable descriptors can be specified/);
       }
       {
         my $source = 'class MyClass { our $FOO : int; our $FOO : int; }';
@@ -156,6 +156,10 @@ use Test::More;
       {
         my $source = ['class MyClass extends MyClass2 {}', 'class MyClass2 extends MyClass {}'];
         compile_not_ok($source, qr/The all super classes must be different from its own class. Recursive inheritance isn't allowed/);
+      }
+      {
+        my $source = ['class MyClass extends MyParentClass { has x : int; }', 'class MyParentClass { has x : int; }'];
+        compile_not_ok($source, qr/The field that name is the same as the field of the super class can't be defined/);
       }
     }
   }
@@ -222,7 +226,7 @@ use Test::More;
     }
     {
       my $source = q|class MyClass { public private enum { ONE } }|;
-      compile_not_ok($source, qr/Only one of "private", "protected", or "public" enumeration descriptors can be specified/);
+      compile_not_ok($source, qr/Only one of "private" or "public" enumeration descriptors can be specified/);
     }
   }
 }

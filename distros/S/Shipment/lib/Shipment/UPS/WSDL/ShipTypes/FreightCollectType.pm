@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::FreightCollectType;
-$Shipment::UPS::WSDL::ShipTypes::FreightCollectType::VERSION = '3.08';
+$Shipment::UPS::WSDL::ShipTypes::FreightCollectType::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,26 +20,32 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %BillReceiver_of : ATTR(:get<BillReceiver>);
+my %BillReceiver_of :ATTR(:get<BillReceiver>);
 
-    __PACKAGE__->_factory(
-        [   qw(        BillReceiver
+__PACKAGE__->_factory(
+    [ qw(        BillReceiver
 
-            )
-        ],
-        {'BillReceiver' => \%BillReceiver_of,},
-        {   'BillReceiver' =>
-              'Shipment::UPS::WSDL::ShipTypes::BillReceiverType',
-        },
-        {
+    ) ],
+    {
+        'BillReceiver' => \%BillReceiver_of,
+    },
+    {
+        'BillReceiver' => 'Shipment::UPS::WSDL::ShipTypes::BillReceiverType',
+    },
+    {
 
-            'BillReceiver' => 'BillReceiver',
-        }
-    );
+        'BillReceiver' => 'BillReceiver',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -56,7 +62,7 @@ Shipment::UPS::WSDL::ShipTypes::FreightCollectType
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

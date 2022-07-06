@@ -19,12 +19,12 @@ name: Array-Sample-SimpleRandom
 provides:
   Array::Sample::SimpleRandom:
     file: lib/Array/Sample/SimpleRandom.pm
-    version: '0.002'
+    version: '0.003'
   Array::Sample::SimpleRandom::Scan:
     file: lib/Array/Sample/SimpleRandom/Scan.pm
-    version: '0.002'
+    version: '0.003'
 requires:
-  Array::Pick::Scan: '0.002'
+  Array::Pick::Scan: '0.005'
   Exporter: '5.57'
   perl: '5.010001'
   strict: '0'
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Array-Sample-SimpleRandom
   homepage: https://metacpan.org/release/Array-Sample-SimpleRandom
   repository: git://github.com/perlancar/perl-Array-Sample-SimpleRandom.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

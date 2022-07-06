@@ -25,6 +25,7 @@ t/004_gettext.t
 t/090_pod.t
 t/091_pod_coverage.t
 t/099_kwalitee.t
+t/en_GB/LC_MESSAGES/com.example.api.mo
 t/fr_FR/LC_MESSAGES/com.example.api.json
 t/fr_FR/LC_MESSAGES/com.example.api.mo
 t/fr_FR/LC_MESSAGES/com.example.api.po

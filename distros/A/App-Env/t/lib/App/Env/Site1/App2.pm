@@ -6,8 +6,7 @@ use warnings;
 # track the number of times this is invoked
 my $cnt = 0;
 
-sub envs
-{
+sub envs {
     my ( $opt ) = @_;
 
     $cnt++;
@@ -16,8 +15,7 @@ sub envs
     return { %ENV, Site1_App2 => $cnt };
 }
 
-sub reset
-{
+sub reset {
     $cnt = 0;
 }
 

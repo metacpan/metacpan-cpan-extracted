@@ -6,6 +6,7 @@ MANIFEST
 math_complex_c_include.h
 README
 try.in
+try2.in
 t/01load.t
 t/abs_arg.t
 t/arith.t

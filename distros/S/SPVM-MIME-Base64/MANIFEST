@@ -1,0 +1,25 @@
+Changes
+lib/SPVM/MIME/Base64.config
+lib/SPVM/MIME/Base64.cpp
+lib/SPVM/MIME/Base64.pm
+lib/SPVM/MIME/Base64.spvm
+lib/SPVM/MIME/QuotedPrint.config
+lib/SPVM/MIME/QuotedPrint.cpp
+lib/SPVM/MIME/QuotedPrint.pm
+lib/SPVM/MIME/QuotedPrint.spvm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-report-prereqs.dd
+t/00-report-prereqs.t
+t/base64.t
+t/base64url.t
+t/length.t
+t/lib/MIME/Base64.pm
+t/lib/MIME/QuotedPrint.pm
+t/lib/SPVM/TestCase/MIME/Base64.spvm
+t/quoted-print.t
+t/SPVM-MIME-Base64.t
+t/unicode.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

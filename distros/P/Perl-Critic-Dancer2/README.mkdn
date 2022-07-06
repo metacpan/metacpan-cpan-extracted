@@ -1,0 +1,58 @@
+# NAME
+
+Perl::Critic::Dancer2 - A collection of handy perlcritic modules for Dancer2
+
+# VERSION
+
+version 0.4000
+
+# SYNOPSIS
+
+[Perl::Critic](https://metacpan.org/pod/Perl%3A%3ACritic) policies for use with [Dancer2](https://metacpan.org/pod/Dancer2).
+
+# DESCRIPTION
+
+The included policies are:
+
+- [Perl::Critic::Policy::Dancer2::ProhibitDeprecatedKeywords](https://metacpan.org/pod/Perl%3A%3ACritic%3A%3APolicy%3A%3ADancer2%3A%3AProhibitDeprecatedKeywords)
+
+    Complains about usage of deprecated keywords \[Default severity: 4\] 
+
+- [Perl::Critic::Policy::Dancer2::ProhibitUnrecommendedKeywords](https://metacpan.org/pod/Perl%3A%3ACritic%3A%3APolicy%3A%3ADancer2%3A%3AProhibitUnrecommendedKeywords)
+
+    Complains about usage of unrecommended keywords \[Default severity: 2\] 
+
+# AFFILIATION
+
+This module has no functionality, but instead contains documentation
+for this distribution and acts as a means of pulling other modules
+into a bundle.  All of the Policy modules contained herein will have
+an "AFFILIATION" section announcing their participation in this
+grouping.
+
+# CONFIGURATION AND ENVIRONMENT
+
+All policies included are in the "dancer2" theme.  See the
+[Perl::Critic](https://metacpan.org/pod/Perl%3A%3ACritic) documentation for how to make use of this.
+
+# ACKNOWLEDGEMENTS
+
+Special thanks to [Jason Crome](https://metacpan.org/author/CROMEDOME), who
+is always encouraging me to indulge and write tools like this one. And to
+[Sawyer X](https://metacpan.org/author/XSAWYERX), who discussed the need for
+such a module on a Dancer2 issue a loooooong time back.
+
+# SEE ALSO
+
+[Perl::Critic](https://metacpan.org/pod/Perl%3A%3ACritic),[Dancer2](https://metacpan.org/pod/Dancer2)
+
+# AUTHOR
+
+D Ruth Holloway <ruth@hiruthie.me>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022 by D Ruth Holloway.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

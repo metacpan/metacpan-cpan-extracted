@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::GetServiceRulesResponseContainer;
-$Shipment::Purolator::WSDLV2::Types::GetServiceRulesResponseContainer::VERSION = '3.08';
+$Shipment::Purolator::WSDLV2::Types::GetServiceRulesResponseContainer::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -17,52 +17,53 @@ sub __get_attr_class {
 
 
 use base qw(Shipment::Purolator::WSDLV2::Types::ResponseContainer);
-
 # Variety: sequence
 use Class::Std::Fast::Storable constructor => 'none';
 use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %ResponseInformation_of : ATTR(:get<ResponseInformation>);
-    my %ServiceRules_of : ATTR(:get<ServiceRules>);
-    my %ServiceOptionRules_of : ATTR(:get<ServiceOptionRules>);
-    my %OptionRules_of : ATTR(:get<OptionRules>);
+my %ResponseInformation_of :ATTR(:get<ResponseInformation>);
+my %ServiceRules_of :ATTR(:get<ServiceRules>);
+my %ServiceOptionRules_of :ATTR(:get<ServiceOptionRules>);
+my %OptionRules_of :ATTR(:get<OptionRules>);
 
-    __PACKAGE__->_factory(
-        [   qw(        ResponseInformation
-              ServiceRules
-              ServiceOptionRules
-              OptionRules
+__PACKAGE__->_factory(
+    [ qw(        ResponseInformation
+        ServiceRules
+        ServiceOptionRules
+        OptionRules
 
-            )
-        ],
-        {   'ResponseInformation' => \%ResponseInformation_of,
-            'ServiceRules'        => \%ServiceRules_of,
-            'ServiceOptionRules'  => \%ServiceOptionRules_of,
-            'OptionRules'         => \%OptionRules_of,
-        },
-        {   'ResponseInformation' =>
-              'Shipment::Purolator::WSDLV2::Types::ResponseInformation',
-            'ServiceRules' =>
-              'Shipment::Purolator::WSDLV2::Types::ArrayOfServiceRule',
-            'ServiceOptionRules' =>
-              'Shipment::Purolator::WSDLV2::Types::ArrayOfServiceOptionRules',
-            'OptionRules' =>
-              'Shipment::Purolator::WSDLV2::Types::ArrayOfOptionRule',
-        },
-        {
+    ) ],
+    {
+        'ResponseInformation' => \%ResponseInformation_of,
+        'ServiceRules' => \%ServiceRules_of,
+        'ServiceOptionRules' => \%ServiceOptionRules_of,
+        'OptionRules' => \%OptionRules_of,
+    },
+    {
+        'ResponseInformation' => 'Shipment::Purolator::WSDLV2::Types::ResponseInformation',
+        'ServiceRules' => 'Shipment::Purolator::WSDLV2::Types::ArrayOfServiceRule',
+        'ServiceOptionRules' => 'Shipment::Purolator::WSDLV2::Types::ArrayOfServiceOptionRules',
+        'OptionRules' => 'Shipment::Purolator::WSDLV2::Types::ArrayOfOptionRule',
+    },
+    {
 
-            'ResponseInformation' => 'ResponseInformation',
-            'ServiceRules'        => 'ServiceRules',
-            'ServiceOptionRules'  => 'ServiceOptionRules',
-            'OptionRules'         => 'OptionRules',
-        }
-    );
+        'ResponseInformation' => 'ResponseInformation',
+        'ServiceRules' => 'ServiceRules',
+        'ServiceOptionRules' => 'ServiceOptionRules',
+        'OptionRules' => 'OptionRules',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -79,7 +80,7 @@ Shipment::Purolator::WSDLV2::Types::GetServiceRulesResponseContainer
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::RateTypes::ShipmentServiceOptionsType;
-$Shipment::UPS::WSDL::RateTypes::ShipmentServiceOptionsType::VERSION = '3.08';
+$Shipment::UPS::WSDL::RateTypes::ShipmentServiceOptionsType::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,62 +20,62 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %SaturdayPickupIndicator_of : ATTR(:get<SaturdayPickupIndicator>);
-    my %SaturdayDeliveryIndicator_of : ATTR(:get<SaturdayDeliveryIndicator>);
-    my %OnCallPickup_of : ATTR(:get<OnCallPickup>);
-    my %COD_of : ATTR(:get<COD>);
-    my %DeliveryConfirmation_of : ATTR(:get<DeliveryConfirmation>);
-    my %ReturnOfDocumentIndicator_of : ATTR(:get<ReturnOfDocumentIndicator>);
-    my %UPScarbonneutralIndicator_of : ATTR(:get<UPScarbonneutralIndicator>);
+my %SaturdayPickupIndicator_of :ATTR(:get<SaturdayPickupIndicator>);
+my %SaturdayDeliveryIndicator_of :ATTR(:get<SaturdayDeliveryIndicator>);
+my %OnCallPickup_of :ATTR(:get<OnCallPickup>);
+my %COD_of :ATTR(:get<COD>);
+my %DeliveryConfirmation_of :ATTR(:get<DeliveryConfirmation>);
+my %ReturnOfDocumentIndicator_of :ATTR(:get<ReturnOfDocumentIndicator>);
+my %UPScarbonneutralIndicator_of :ATTR(:get<UPScarbonneutralIndicator>);
 
-    __PACKAGE__->_factory(
-        [   qw(        SaturdayPickupIndicator
-              SaturdayDeliveryIndicator
-              OnCallPickup
-              COD
-              DeliveryConfirmation
-              ReturnOfDocumentIndicator
-              UPScarbonneutralIndicator
+__PACKAGE__->_factory(
+    [ qw(        SaturdayPickupIndicator
+        SaturdayDeliveryIndicator
+        OnCallPickup
+        COD
+        DeliveryConfirmation
+        ReturnOfDocumentIndicator
+        UPScarbonneutralIndicator
 
-            )
-        ],
-        {   'SaturdayPickupIndicator'   => \%SaturdayPickupIndicator_of,
-            'SaturdayDeliveryIndicator' => \%SaturdayDeliveryIndicator_of,
-            'OnCallPickup'              => \%OnCallPickup_of,
-            'COD'                       => \%COD_of,
-            'DeliveryConfirmation'      => \%DeliveryConfirmation_of,
-            'ReturnOfDocumentIndicator' => \%ReturnOfDocumentIndicator_of,
-            'UPScarbonneutralIndicator' => \%UPScarbonneutralIndicator_of,
-        },
-        {   'SaturdayPickupIndicator' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'SaturdayDeliveryIndicator' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'OnCallPickup' =>
-              'Shipment::UPS::WSDL::RateTypes::OnCallPickupType',
-            'COD' => 'Shipment::UPS::WSDL::RateTypes::CODType',
-            'DeliveryConfirmation' =>
-              'Shipment::UPS::WSDL::RateTypes::DeliveryConfirmationType',
-            'ReturnOfDocumentIndicator' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'UPScarbonneutralIndicator' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'SaturdayPickupIndicator' => \%SaturdayPickupIndicator_of,
+        'SaturdayDeliveryIndicator' => \%SaturdayDeliveryIndicator_of,
+        'OnCallPickup' => \%OnCallPickup_of,
+        'COD' => \%COD_of,
+        'DeliveryConfirmation' => \%DeliveryConfirmation_of,
+        'ReturnOfDocumentIndicator' => \%ReturnOfDocumentIndicator_of,
+        'UPScarbonneutralIndicator' => \%UPScarbonneutralIndicator_of,
+    },
+    {
+        'SaturdayPickupIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'SaturdayDeliveryIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'OnCallPickup' => 'Shipment::UPS::WSDL::RateTypes::OnCallPickupType',
+        'COD' => 'Shipment::UPS::WSDL::RateTypes::CODType',
+        'DeliveryConfirmation' => 'Shipment::UPS::WSDL::RateTypes::DeliveryConfirmationType',
+        'ReturnOfDocumentIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'UPScarbonneutralIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'SaturdayPickupIndicator'   => 'SaturdayPickupIndicator',
-            'SaturdayDeliveryIndicator' => 'SaturdayDeliveryIndicator',
-            'OnCallPickup'              => 'OnCallPickup',
-            'COD'                       => 'COD',
-            'DeliveryConfirmation'      => 'DeliveryConfirmation',
-            'ReturnOfDocumentIndicator' => 'ReturnOfDocumentIndicator',
-            'UPScarbonneutralIndicator' => 'UPScarbonneutralIndicator',
-        }
-    );
+        'SaturdayPickupIndicator' => 'SaturdayPickupIndicator',
+        'SaturdayDeliveryIndicator' => 'SaturdayDeliveryIndicator',
+        'OnCallPickup' => 'OnCallPickup',
+        'COD' => 'COD',
+        'DeliveryConfirmation' => 'DeliveryConfirmation',
+        'ReturnOfDocumentIndicator' => 'ReturnOfDocumentIndicator',
+        'UPScarbonneutralIndicator' => 'UPScarbonneutralIndicator',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -92,7 +92,7 @@ Shipment::UPS::WSDL::RateTypes::ShipmentServiceOptionsType
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO.pm
-## Version v0.1.6
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2018/06/21
-## Modified 2021/08/03
+## Modified 2022/07/06
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,52 +17,59 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
+    use vars qw( $VERSION @META $DEF_META );
     use open ':std' => ':utf8';
     use Class::Struct;
     use DateTime;
+    use DateTime::TimeZone;
     use Encode ();
     use Fcntl qw( :DEFAULT );
     use JSON ();
     use Nice::Try;
     use Scalar::Util;
     use Text::PO::Element;
-    our $VERSION = 'v0.1.6';
+    eval
+    {
+        my $tz = DateTime::TimeZone->new( name => 'local' );
+    };
+    use constant HAS_LOCAL_TZ => ( $@ ? 0 : 1 );
+    our $VERSION = 'v0.2.1';
 };
 
-INIT
+use strict;
+use warnings;
+
+struct 'Text::PO::Comment' => 
 {
-    struct Text::PO::Comment => 
-    {
-    'text'  => '@',
-    };
-    our @META = qw(
-    Project-Id-Version
-    Report-Msgid-Bugs-To
-    POT-Creation-Date
-    PO-Revision-Date
-    Last-Translator
-    Language-Team
-    Language
-    Plural-Forms
-    MIME-Version
-    Content-Type
-    Content-Transfer-Encoding
-    );
-    our $DEF_META =
-    {
-    'Project-Id-Version'    => 'Project 0.1',
-    'Report-Msgid-Bugs-To'  => 'bugs@example.com',
-    ## 2011-07-02 20:53+0900
-    'POT-Creation-Date'     => DateTime->from_epoch( 'epoch' => time(), 'time_zone' => 'Asia/Tokyo' )->strftime( '%Y-%m-%d %H:%M%z' ),
-    'PO-Revision-Date'      => DateTime->from_epoch( 'epoch' => time(), 'time_zone' => 'Asia/Tokyo' )->strftime( '%Y-%m-%d %H:%M%z' ),
-    'Last-Translator'       => 'Unknown <hello@example.com>',
-    'Language-Team'         => 'Unknown <hello@example.com>',
-    'Language'              => '',
-    'Plural-Forms'          => 'nplurals=1; plural=0;',
-    'MIME-Version'          => '1.0',
-    'Content-Type'          => 'text/plain; charset=utf-8',
-    'Content-Transfer-Encoding' => '8bit',
-    };
+'text'  => '@',
+};
+our @META = qw(
+Project-Id-Version
+Report-Msgid-Bugs-To
+POT-Creation-Date
+PO-Revision-Date
+Last-Translator
+Language-Team
+Language
+Plural-Forms
+MIME-Version
+Content-Type
+Content-Transfer-Encoding
+);
+our $DEF_META =
+{
+'Project-Id-Version'    => 'Project 0.1',
+'Report-Msgid-Bugs-To'  => 'bugs@example.com',
+# 2011-07-02 20:53+0900
+'POT-Creation-Date'     => DateTime->from_epoch( 'epoch' => time(), 'time_zone' => ( HAS_LOCAL_TZ ? 'local' : 'UTC' ) )->strftime( '%Y-%m-%d %H:%M%z' ),
+'PO-Revision-Date'      => DateTime->from_epoch( 'epoch' => time(), 'time_zone' => ( HAS_LOCAL_TZ ? 'local' : 'UTC' ) )->strftime( '%Y-%m-%d %H:%M%z' ),
+'Last-Translator'       => 'Unknown <hello@example.com>',
+'Language-Team'         => 'Unknown <hello@example.com>',
+'Language'              => '',
+'Plural-Forms'          => 'nplurals=1; plural=0;',
+'MIME-Version'          => '1.0',
+'Content-Type'          => 'text/plain; charset=utf-8',
+'Content-Transfer-Encoding' => '8bit',
 };
 
 sub init
@@ -92,25 +99,22 @@ sub add_element
     my $id;
     my $opt = {};
     my $e;
-    if( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'Text::PO::Element' ) )
+    if( $self->_is_a( $_[0] => 'Text::PO::Element' ) )
     {
         $e = shift( @_ );
         $id = $e->msgid;
-        $self->message( 3, "Adding element using an Text::PO::Element object created at line $e->{_po_line}. msgid is '$id'" );
     }
     elsif( scalar( @_ ) == 1 && ref( $_[0] ) eq 'HASH' )
     {
         $opt = shift( @_ );
         $id = $opt->{msgid} || return( $self->error( "No msgid was provided" ) );
         $e = Text::PO::Element->new( %$opt );
-        $self->message( 3, "Adding element using an hash reference. msgid is '$id'" );
     }
     elsif( !( @_ % 2 ) )
     {
         $opt = { @_ };
         $id = $opt->{msgid} || return( $self->error( "No msgid was provided" ) );
         $e = Text::PO::Element->new( %$opt );
-        $self->message( 3, "Adding element using an hash. msgid is '$id'" );
     }
     else
     {
@@ -118,7 +122,6 @@ sub add_element
         $opt = { @_ } if( !( @_ % 2 ) );
         $opt->{msgid} = $id;
         $e = Text::PO::Element->new( %$opt );
-        $self->message( 3, "Adding element using a msgid => hash reference. msgid is '$id'" );
     }
     return( $self->error( "No msgid was provided." ) ) if( !length( $id ) );
     my $elem = $self->elements;
@@ -151,7 +154,6 @@ sub as_json
     $hash->{meta} = {};
     $hash->{meta_keys} = [];
     $hash->{elements}  = [];
-    $self->message( 3, "Meta keys found: ", sub{ $self->SUPER::dump( $metaKeys ) } );
     foreach my $k ( @$metaKeys )
     {
         my $key = $self->normalise_meta( $k );
@@ -242,11 +244,11 @@ sub content_encoding { return( shift->_set_get_meta_value( 'Content-Transfer-Enc
 
 sub content_type { return( shift->_set_get_meta_value( 'Content-Type' ) ); }
 
+# <https://superuser.com/questions/392439/lang-and-language-environment-variable-in-debian-based-systems>
 sub current_lang
 {
     my $self = shift( @_ );
-    $self->message( 3, "Returning '", ( $ENV{LANGUAGE} || $ENV{LANG} ), "'." );
-    return( $ENV{LANGUAGE} || $ENV{LANG} );
+    return( ( $ENV{LANGUAGE} || $ENV{LANG} ) ? [split( /:/, ( $ENV{LANGUAGE} || $ENV{LANG} ) )]->[0] : '' );
 }
 
 sub decode
@@ -298,12 +300,10 @@ sub dump
         $fh->print( "\n#\n# domain \"${domain}\"" ) || return( $self->error( "Unable to print po data to file handle: $!" ) );
     }
     $fh->print( "\n\n" ) || return( $self->error( "Unable to print po data to file handle: $!" ) );
-    $self->message( 1, "Meta information:" );
     ## my $metaKeys = $self->meta_keys;
     my $metaKeys = [@META];
     if( scalar( @$metaKeys ) )
     {
-        $self->messagef( 3, "%d meta keys to print out.", scalar( @$metaKeys ) );
         $fh->printf( "msgid \"\"\n" ) || return( $self->error( "Unable to print po data to file handle: $!" ) );
         $fh->printf( "msgstr \"\"\n" ) || return( $self->error( "Unable to print po data to file handle: $!" ) );
         foreach my $k ( @$metaKeys )
@@ -313,14 +313,12 @@ sub dump
             if( !exists( $self->{meta}->{ $k2 } ) && 
                 length( $DEF_META->{ $k } ) )
             {
-                $self->message( 3, "Using default value for \"$k2\" as I cannot find it." );
                 $self->{meta}->{ $k2 } = $DEF_META->{ $k };
             }
             $fh->printf( "\"%s: %s\\n\"\n", $self->normalise_meta( $k ), $self->meta( $k ) ) || return( $self->error( "Unable to print po data to file handle: $!" ) );
         }
         $fh->print( "\n" ) || return( $self->error( "Unable to print po data to file handle: $!" ) );
     }
-    $self->messagef( 3, "%d elements to dump.", scalar( @$elem ) );
     foreach my $e ( @$elem )
     {
         next if( $e->is_meta || !CORE::length( $e->msgid ) );
@@ -438,7 +436,6 @@ sub meta
                 $self->{meta}->{ $k2 } = CORE::delete( $self->{meta}->{ $k } );
             }
         }
-        # $self->message( 3, "Meta now contains: ", sub{ $self->SUPER::dump( $self->{meta} ) });
     }
     return( $self->_set_get_hash_as_mix_object( 'meta' ) );
 }
@@ -529,7 +526,6 @@ sub parse
         }
         elsif( $ignoring_leading_blanks && /^[[:blank:]\h]*$/ )
         {
-            $self->message( 3, "Skiping leading blank line at line $n" );
             next;
         }
         #( 1 .. /^[^\#]+$/ ) or last;
@@ -560,11 +556,9 @@ sub parse
     {
         $n++;
         chomp( $_ );
-        $self->message( 2, "Checking line: '$_'" );
         if( !$foundFirstLine && /^\S/ )
         {
             $foundFirstLine++;
-            $self->message( 1, "Found first line at line $n" );
         }
         if( /^[[:blank:]]*$/ )
         {
@@ -583,7 +577,6 @@ sub parse
                 {
                     if( ++$seen->{ $e->id } > 1 )
                     {
-                        $self->messagef( 3, "Skipping duplicate message id \"%s\" at line $n", $e->id );
                         next;
                     }
                     push( @$elem, $e );
@@ -596,23 +589,18 @@ sub parse
             ## special treatment for first item that contains the meta information
             if( scalar( @$elem ) == 1 )
             {
-                $self->message( 2, "Processing meta information" );
                 my $this = $elem->[0];
                 my $def = $this->msgstr;
-                $self->message( 3, "Meta data collected are: ", sub{ $self->SUPER::dump( $def ) });
-                # $self->message( 3, "Pre-processing meta for multilines" );
                 $def = [split( /\n/, join( '', @$def ) )];
                 
                 my $meta = {};
                 foreach my $s ( @$def )
                 {
                     chomp( $s );
-                    $self->message( 3, "Checking meta line '$s'" );
                     if( $s =~ /^([^\x00-\x1f\x80-\xff :=]+):[[:blank:]]*(.*?)$/ )
                     {
                         my( $k, $v ) = ( lc( $1 ), $2 );
                         $meta->{ $k } = $v;
-                        $self->message( 3, "Adding meta key '$k' with value '$v'" );
                         push( @{$self->{meta_keys}}, $k );
                         if( $k eq 'content-type' )
                         {
@@ -631,7 +619,6 @@ sub parse
                                 {
                                     return( $self->error( "Unable to set binmode to charset \"$enc\": $e" ) );
                                 }
-                                $self->message( 2, "\tFound encoding $enc" );
                             }
                         }
                     }
@@ -649,7 +636,6 @@ sub parse
         elsif( /^\#\.[[:blank:]]*(.*?)$/ )
         {
             my $c = $1;
-            $self->message( 2, "\tadding line as an auto comment." );
             $e->add_auto_comment( $c );
         }
         ## #: finddialog.cpp:38
@@ -657,14 +643,12 @@ sub parse
         elsif( /^\#\:[[:blank:]]+(.*?)$/ )
         {
             my $c = $1;
-            $self->message( 2, "\tadding line as a reference." );
             $e->reference( $c );
         }
         ## #, c-format
         elsif( /^\#\,[[:blank:]]+(.*?)$/ )
         {
             my $c = $1;
-            $self->message( 2, "\tadding line as a c-format flags." );
             $e->flags( [ split( /[[:blank:]]*,[[:blank:]]*/, $c ) ] ) if( $c );
         }
         elsif( /^\#+[[:blank:]]+(.*?)$/ )
@@ -672,18 +656,15 @@ sub parse
             my $c = $1;
             if( !$self->meta->length && $c =~ /^domain[[:blank:]\h]+\"(.*?)\"/ )
             {
-                $self->message( 3, "\tAdding domain definition '$1'" );
                 $self->domain( $1 );
             }
             else
             {
-                $self->message( 2, "\tadding line as a comment => '$c'" );
                 $e->add_comment( $c);
             }
         }
         elsif( /^msgid[[:blank:]]+"(.*?)"$/ )
         {
-            $self->message( 1, "Found msgid at line $n" );
             $e->msgid( $self->unquote( $1 ) ) if( length( $1 ) );
             $lastSeen = 'msgid';
         }
@@ -717,7 +698,6 @@ sub parse
         elsif( /^msgstr[[:blank:]]+"(.*?)"[[:blank:]]*$/ )
         {
             $e->msgstr( $self->unquote( $1 ) ) if( length( $1 ) );
-            $self->message( 1, "Found msgstr at line $n" );
             $lastSeen = 'msgstr';
         }
         elsif( /^msgstr\[(\d+)\][[:blank:]]+"(.*?)"[[:blank:]]*$/ )
@@ -731,7 +711,6 @@ sub parse
         }
         elsif( /^[[:blank:]]*"(.*?)"[[:blank:]]*$/ )
         {
-            $self->message( 1, "Found multiline string for $lastSeen at line $n: $_" );
             my $sub = "add_${lastSeen}";
             if( $e->can( $sub ) )
             {
@@ -750,7 +729,6 @@ sub parse
     $io->close unless( $fh_was_open );
     push( @$elem, $e ) if( $elem->[-1] ne $e && CORE::length( $e->msgid ) && ++$seen->{ $e->msgid } < 2 );
     shift( @$elem ) if( scalar( @$elem ) && $elem->[0]->is_meta );
-    $self->messagef( 3, "%d duplicates found.", scalar( grep( $_ > 1, values( %$seen ) ) ) );
     return( $self );
 }
 
@@ -761,7 +739,6 @@ sub parse_date_to_object
     my $d = $self->_parse_timestamp( $str ) || 
         return( $self->error( "Date time string provided is unsupported: \"${str}\"." ) );
     my $strp = $d->formatter;
-    $self->message( 3, "_parse_timestamp returned DateTime object '$d' (", overload::StrVal( $d ), ") with formatter '$strp'." );
     unless( $strp )
     {
         $strp = DateTime::Format::Strptime->new(
@@ -786,7 +763,6 @@ sub parse_header_value
     {
         defined( $_ ) ? do{ $parts[$i] .= $_ } : do{ $i++ };
     }
-    # $self->message( 3, "Field parts are: ", sub{ $self->dumper( \@parts ) } );
     my $header_val = shift( @parts );
     my $obj = Text::PO::HeaderValue->new( $header_val );
     
@@ -795,7 +771,6 @@ sub parse_header_value
     {
         $frag =~ s/^[[:blank:]]+|[[:blank:]]+$//g;
         my( $attribute, $value ) = split( /[[:blank:]]*\=[[:blank:]]*/, $frag, 2 );
-        # $self->message( 3, "\tAttribute is '$attribute' and value '$value'. Fragment processed was '$frag'" );
         $value =~ s/^\"|\"$//g;
         ## Check character string and length. Should not be more than 255 characters
         ## http://tools.ietf.org/html/rfc1341
@@ -820,8 +795,7 @@ sub parse2hash
     if( $self->{use_json} && ( -e( "${this}.json" ) || $this =~ /\.json$/ ) )
     {
         my $file =  -e( "${this}.json" ) ? "${this}.json" : $this;
-        $self->message( 3, "Found a json po file for \"$this\", using it." );
-        $io = IO::File->new( "$file" ) || return( $self->error( "Unable to open json po file \"${file}\" in read mode: $!" ) );
+        my $io = IO::File->new( "$file" ) || return( $self->error( "Unable to open json po file \"${file}\" in read mode: $!" ) );
         $io->binmode( ':utf8' );
         $io->read( $buff, -s( $file ) );
         $io->close;
@@ -844,8 +818,7 @@ sub parse2hash
     }
     else
     {
-        $self->message( 3, "No json po file found for \"$this\". Using a regular po file instead." );
-        $self->parse( $this ) || return;
+        $self->parse( $this ) || return( $self->pass_error );
         return( $self->hash );
     }
 }
@@ -858,8 +831,7 @@ sub parse2object
     if( $self->{use_json} && ( -e( "${this}.json" ) || $this =~ /\.json$/ ) )
     {
         my $file =  -e( "${this}.json" ) ? "${this}.json" : $this;
-        $self->message( 3, "Found a json po file for \"$this\", using it." );
-        $io = IO::File->new( $file ) || return( $self->error( "Unable to open json po file \"${file}\" in read mode: $!" ) );
+        my $io = IO::File->new( $file ) || return( $self->error( "Unable to open json po file \"${file}\" in read mode: $!" ) );
         $io->binmode( ':utf8' );
         $io->read( $buff, -s( $file ) );
         $io->close;
@@ -940,7 +912,6 @@ sub parse2object
     }
     else
     {
-        $self->message( 3, "No json po file found for \"$this\". Using a regular po file instead." );
         return( $self->parse( $this ) );
     }
 }
@@ -958,20 +929,16 @@ sub plural
     {
         return( [@{$self->{plural}}] ) if( $self->{plural} && scalar( @{$self->{plural}} ) );
         my $meta = $self->meta;
-        $self->message( 3, "Meta data hash found for domain \"", $self->domain, "\" is: ", sub{ $self->SUPER::dump( $meta ) });
         my $pluralDef = $self->meta( 'Plural-Forms' );
-        $self->message( 3, "Plural definition is: '$pluralDef'" );
         if( $pluralDef )
         {
             if( $pluralDef =~ /^[[:blank:]\h]*nplurals[[:blank:]\h]*=[[:blank:]\h]*(\d+)[[:blank:]\h]*\;[[:blank:]\h]*plural[[:blank:]\h]*=[[:blank:]\h]*(.*?)\;?$/i )
             {
                 $self->{plural} = [ $1, $2 ];
-                $self->message( 3, "Found plural '$1' and expression '$2'." );
                 return( $self->{plural} );
             }
             else
             {
-                $self->message( 3, "Plural value '$pluralDef' failed the regular expression." );
                 return( $self->error( "Malformed plural definition found in po data in meta field \"Plural-Forms\": " . $pluralDef ) );
             }
         }
@@ -1051,7 +1018,7 @@ sub sync
         }
         return( $self->error( "No writable file handle or file set to sync our data against." ) ) if( !$this );
         $fh->binmode( ':utf8' );
-        $self->dump( $fh ) || return;
+        $self->dump( $fh ) || return( $self->pass_error );
         $fh->close;
         return( $self );
     }
@@ -1072,21 +1039,17 @@ sub sync
         {
             return( $self->error( "File '$this' is not a file." ) );
         }
-        $self->message( 3, "Opening up file \"$this\" in read/write mode." );
         my $fh = IO::File->new( "+<$this" ) || return( $self->error( "Unable to open file '$this' in read/write mode: $!" ) );
-        $self->message( 3, "Synchronising against it." );
         my $po = $self->sync_fh( $fh, $opts );
         $fh->close;
         return( $po );
     }
-    ## Does not exist yet
+    # Does not exist yet
     else
     {
-        $self->message( 3, "Writing to po file \"$this\"." );
         my $fh = IO::File->new( ">$this" ) || return( $self->error( "Unable to write to file '$this': $!" ) );
-        $self->dump( $fh ) || return;
+        $self->dump( $fh ) || return( $self->pass_error );
         $fh->close;
-        $self->message( 3, "Done writing to file \"$this\"." );
     }
     return( $self );
 }
@@ -1097,11 +1060,11 @@ sub sync_fh
     my $fh   = shift( @_ );
     return( $self->error( "Filehandle provided $fh is not a valid file handle" ) ) if( !Scalar::Util::openhandle( $fh ) );
     my $opts = $self->_get_args_as_hash( @_ );
-    ## Parse file
+    # Parse file
     my $po = $self->new;
     $po->debug( $self->debug );
     $po->parse( $fh );
-    ## Remove the ones that do not exist
+    # Remove the ones that do not exist
     my $elems = $po->elements;
     my @removed = ();
     for( my $i = 0; $i < scalar( @$elems ); $i++ )
@@ -1113,7 +1076,7 @@ sub sync_fh
             push( @removed, $removedObj ) if( $removedObj );
         }
     }
-    ## Now check each one of ours against this parsed file and add our items if missing
+    # Now check each one of ours against this parsed file and add our items if missing
     $elems = $self->elements;
     my @added = ();
     foreach my $e ( @$elems )
@@ -1124,11 +1087,10 @@ sub sync_fh
             push( @added, $e );
         }
     }
-    ## Now, rewind and rewrite the file
+    # Now, rewind and rewrite the file
     $fh->seek(0,0) || return( $self->error( "Unable to seek file handle!: $!" ) );
-    $self->message( 3, "Printing the dump to file handle." );
     # $fh->print( $po->dump );
-    $po->dump( $fh );
+    $po->dump( $fh ) || return( $self->pass_error );
     $fh->truncate( $fh->tell );
     $po->added( \@added );
     $po->removed( \@removed );
@@ -1166,9 +1128,9 @@ sub _can_write_fh
     my $flags = fcntl( $fh, F_GETFL, 0 );
     if( ( $flags & O_ACCMODE ) & ( O_WRONLY|O_RDWR ) )
     {
-        return( 1 );
+        return(1);
     }
-    return( 0 );
+    return(0);
 }
 
 sub _set_get_meta_date
@@ -1183,7 +1145,7 @@ sub _set_get_meta_date
             my $strp = DateTime::Format::Strptime->new(
                 pattern => '%F %H:%M%z',
                 locale  => 'en_GB',
-                time_zone => 'local',
+                time_zone => ( HAS_LOCAL_TZ ? 'local' : 'UTC' ),
             );
             $v->set_formatter( $strp );
         }
@@ -1213,7 +1175,7 @@ sub _set_get_meta_value
     return( $self->meta( $field ) );
 }
 
-# XXX Text::PO::HeaderValue class
+# NOTE: Text::PO::HeaderValue class
 {
     package
         Text::PO::HeaderValue;
@@ -1222,6 +1184,7 @@ sub _set_get_meta_value
         use strict;
         use warnings;
         use parent qw( Module::Generic );
+        use vars qw( $VERSION $QUOTE_REGEXP $TYPE_REGEXP $TOKEN_REGEXP $TEXT_REGEXP );
         our $VERSION = 'v0.1.0';
         use overload (
             '""' => 'as_string',
@@ -1327,8 +1290,7 @@ sub _set_get_meta_value
 }
 
 1;
-
-# XXX POD
+# NOTE: POD
 __END__
 
 =head1 NAME
@@ -1371,7 +1333,7 @@ Text::PO - Read and write PO files
 
 =head1 VERSION
 
-    v0.1.6
+    v0.2.1
 
 =head1 DESCRIPTION
 
@@ -1385,7 +1347,7 @@ Also, this distribution provides a way to export the C<po> files in json format 
 
 Also, there is a script in C<scripts> that can be used to transcode C<.po> or C<mo> files into json format and vice versa.
 
-=head2 CONSTRUCTOR
+=head1 CONSTRUCTOR
 
 =head2 new
 

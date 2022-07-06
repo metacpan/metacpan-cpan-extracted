@@ -9,6 +9,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Package::Stash: '0'
   Test2::V0: '0'
   Test::Alien: '2.3901'
   Test::More: '0'
@@ -18,7 +19,7 @@ configure_requires:
   Alien::Build::MM: '0.32'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,7 +36,7 @@ no_index:
 provides:
   Alien::PGPLOT:
     file: lib/Alien/PGPLOT.pm
-    version: '0.01'
+    version: v5.2.2.4
 requires:
   Alien::Base: '0'
   base: '0'
@@ -44,7 +45,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Alien-PGPLOT
   repository: https://gitlab.com/djerius/alien-pgplot.git
-version: '0.01'
+version: v5.2.2.4
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
@@ -52,16 +53,15 @@ x_alienfile:
       Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
       Archive::Tar: '0'
       Config: '0'
+      HTML::LinkExtor: '0'
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'
       IO::Zlib: '0'
-      Mojo::DOM: '0'
-      Mojolicious: '7.00'
       Net::SSLeay: '1.49'
       Sort::Versions: '0'
       URI: '0'
       URI::Escape: '0'
     system: {}
-x_generated_by_perl: v5.30.0
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: GPL-3.0-only

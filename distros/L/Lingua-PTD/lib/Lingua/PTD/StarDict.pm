@@ -1,5 +1,5 @@
 package Lingua::PTD::StarDict;
-$Lingua::PTD::StarDict::VERSION = '1.16';
+$Lingua::PTD::StarDict::VERSION = '1.17';
 use warnings;
 use strict;
 

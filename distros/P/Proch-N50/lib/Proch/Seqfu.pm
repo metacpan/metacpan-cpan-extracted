@@ -90,7 +90,7 @@ Proch::Seqfu - Helper module to support Seqfu tools
 
 =head1 VERSION
 
-version 1.4.10
+version 1.5.0
 
 =head1 Proch::Seqfu
 
@@ -112,7 +112,7 @@ Print a text if $fu_verbose is set to 1
 
 Return the reverse complement of a string [degenerate base not supported]
 
-=head2 is_seq(name, comment, seq)
+=head2 is_seq(seq)
 
 Check if a string is a DNA sequence, including degenerate chars.
 

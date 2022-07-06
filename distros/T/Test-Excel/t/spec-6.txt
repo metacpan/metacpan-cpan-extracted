@@ -1,0 +1,3 @@
+sheet ALL
+range B2:B4
+regex 2022\-\d\d\-\d\d

@@ -36,7 +36,8 @@
          "requires" : {
             "Carp" : "0",
             "Data::Dumper::Compact" : "0",
-            "List::Util" : "0",
+            "List::SomeUtils" : "0",
+            "List::Util" : "1.44",
             "Moo" : "2",
             "Music::Chord::Note" : "0.10",
             "Music::Note" : "0",
@@ -54,9 +55,12 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "List::Util" : "1.44",
             "Moo" : "2",
             "Music::Chord::Note" : "0.10",
+            "Test::Exception" : "0",
             "Test::More" : "0.88",
+            "constant" : "0",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
@@ -72,7 +76,7 @@
          "web" : "https://github.com/ology/MIDI-Bassline-Walk"
       }
    },
-   "version" : "0.0312",
+   "version" : "0.0502",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"
@@ -303,9 +307,18 @@
                   "spell_cmd" : "aspell list",
                   "stopwords" : [
                      "DAW",
+                     "aeolian",
                      "bassline",
                      "basslines",
-                     "pentatonic"
+                     "dorian",
+                     "ionian",
+                     "keycenter",
+                     "locrian",
+                     "lydian",
+                     "midinum",
+                     "mixolydian",
+                     "pentatonic",
+                     "phrygian"
                   ],
                   "wordlist" : "Pod::Wordlist"
                }

@@ -6,6 +6,21 @@ Home page:    <https://metacpan.org/release/Acme-Mitey-Cards>
 Bug tracker:  <https://github.com/tobyink/p5-mite/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.008	2022-07-05
+
+ - Updated: Rebuild using Mite 0.005000, including using the new type
+   library feature.
+
+0.007	2022-07-04
+
+ - Updated: Rebuild using Mite 0.004000, including using some newer
+   features.
+
+0.006	2022-07-03
+
+ - Now works on Perl 5.8.
+ - Updated: Rebuild using Mite 0.002004.
+
 0.005	2022-06-29
 
  - Updated: Rebuild using Mite 0.001003.

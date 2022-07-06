@@ -1,5 +1,5 @@
 package Getopt::EX::Func;
-use version; our $VERSION = version->declare("v1.27.1");
+use version; our $VERSION = version->declare("v1.28.0");
 
 use v5.14;
 use warnings;

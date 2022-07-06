@@ -19,9 +19,14 @@ name: Array-Sample-WeightedRandom
 provides:
   Array::Sample::WeightedRandom:
     file: lib/Array/Sample/WeightedRandom.pm
-    version: '0.001'
+    version: '0.004'
+  Array::Sample::WeightedRandom::Scan:
+    file: lib/Array/Sample/WeightedRandom/Scan.pm
+    version: '0.004'
 requires:
+  Array::Iter: '0'
   Exporter: '5.57'
+  List::Util: '1.54'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -29,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Array-Sample-WeightedRandom
   homepage: https://metacpan.org/release/Array-Sample-WeightedRandom
   repository: git://github.com/perlancar/perl-Array-Sample-WeightedRandom.git
-version: '0.001'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

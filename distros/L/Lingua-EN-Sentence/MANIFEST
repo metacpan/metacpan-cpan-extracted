@@ -3,6 +3,7 @@ README
 MANIFEST
 LICENCE
 Makefile.PL
+Build.PL
 lib/Lingua/EN/Sentence.pm
 t/main.t
 examples/demo.pl

@@ -1,0 +1,22 @@
+name: linux-ubuntu-latest
+
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: perl -V
+      - run: perl -MConfig -MData::Dumper -e 'local $Data::Dumper::Sortkeys = 1;warn Dumper \%Config;'
+      - run: perl cpanm -L ~/mylib -n SPVM
+      - run: echo "PERL5LIB=$HOME/mylib/lib/perl5/"$(perl -MConfig -e 'print $Config{archname}') >> $GITHUB_ENV
+      - run: perl Makefile.PL
+      - run: make
+      - run: make disttest

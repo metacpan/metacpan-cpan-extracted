@@ -1,13 +1,14 @@
 package Shipment::Purolator::WSDL::Types::Language;
-$Shipment::Purolator::WSDL::Types::Language::VERSION = '3.08';
+$Shipment::Purolator::WSDL::Types::Language::VERSION = '3.09';
 use strict;
 use warnings;
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v1'};
 
 # derivation by restriction
 use base qw(
-  SOAP::WSDL::XSD::Typelib::Builtin::string);
+    SOAP::WSDL::XSD::Typelib::Builtin::string);
+
 
 
 1;
@@ -24,7 +25,7 @@ Shipment::Purolator::WSDL::Types::Language
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

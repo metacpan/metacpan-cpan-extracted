@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port;
-$Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::VERSION = '3.08';
+$Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::VERSION = '3.09';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -10,876 +10,742 @@ our $ns_url;
 
 # only load if it hasn't been loaded before
 require Shipment::Temando::WSDL::Typemaps::quoting_Service
-  if not Shipment::Temando::WSDL::Typemaps::quoting_Service->can('get_class');
+    if not Shipment::Temando::WSDL::Typemaps::quoting_Service->can('get_class');
 
 
 sub START {
-
+ 
     my $service_address;
     if ($_[2]->{live}) {
-        $service_address = 'https://api.temando.com/soapServer.html';
-        $ns_url          = 'api.temando.com';
+    	$service_address = 'https://api.temando.com/soapServer.html';
+	$ns_url = 'api.temando.com';
     }
     else {
-        $service_address = 'http://training-api.temando.com/soapServer.html';
-        $ns_url          = 'training-api.temando.com';
+    	$service_address = 'http://training-api.temando.com/soapServer.html';
+	$ns_url = 'training-api.temando.com';
     }
-
+	
     $_[0]->set_proxy($service_address) if not $_[2]->{proxy};
 
-    $_[0]->set_class_resolver(
-        'Shipment::Temando::WSDL::Typemaps::quoting_Service')
-      if not $_[2]->{class_resolver};
+    $_[0]->set_class_resolver('Shipment::Temando::WSDL::Typemaps::quoting_Service')
+        if not $_[2]->{class_resolver};
 
     $_[0]->set_prefix($_[2]->{use_prefix}) if exists $_[2]->{use_prefix};
 }
 
 sub getQuotesByRequest {
     my ($self, $body, $header) = @_;
-    die
-      "getQuotesByRequest must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'getQuotesByRequest',
-            soap_action => '',
-            style       => 'document',
-            body        => {
+    die "getQuotesByRequest must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'getQuotesByRequest',
+        soap_action => '',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         => [
-                    qw( Shipment::Temando::WSDL::Elements::getQuotesByRequest )
-                ],
-            },
-            header => {
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::Temando::WSDL::Elements::getQuotesByRequestResponse )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::getQuotesByRequest )],
         },
-        $body,
-        $header
-    );
+        header => {
+
+            'use' => 'literal',
+            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle => '',
+            parts => [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
+            
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::getQuotesByRequestResponse )],
+            },
+        }
+    }, $body, $header);
 }
 
 
 sub makeBookingByRequest {
     my ($self, $body, $header) = @_;
-    die
-      "makeBookingByRequest must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'makeBookingByRequest',
-            soap_action => '',
-            style       => 'document',
-            body        => {
+    die "makeBookingByRequest must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'makeBookingByRequest',
+        soap_action => '',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         => [
-                    qw( Shipment::Temando::WSDL::Elements::makeBookingByRequest )
-                ],
-            },
-            header => {
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::Temando::WSDL::Elements::makeBookingByRequestResponse )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::makeBookingByRequest )],
         },
-        $body,
-        $header
-    );
+        header => {
+
+            'use' => 'literal',
+            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle => '',
+            parts => [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
+
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::makeBookingByRequestResponse )],
+            },
+        }
+    }, $body, $header);
 }
 
 
 sub getRequest {
     my ($self, $body, $header) = @_;
-    die "getRequest must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'getRequest',
-            soap_action => '',
-            style       => 'document',
-            body        => {
+    die "getRequest must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'getRequest',
+        soap_action => '',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts => [qw( Shipment::Temando::WSDL::Elements::getRequest )],
-            },
-            header => {
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::Temando::WSDL::Elements::getRequestResponse )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::getRequest )],
         },
-        $body,
-        $header
-    );
+        header => {
+
+            'use' => 'literal',
+            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle => '',
+            parts => [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
+            
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::getRequestResponse )],
+            },
+        }
+    }, $body, $header);
 }
 
 
 sub getRequestsRequiringBooking {
     my ($self, $body, $header) = @_;
-    die
-      "getRequestsRequiringBooking must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'getRequestsRequiringBooking',
-            soap_action => '',
-            style       => 'document',
-            body        => {
+    die "getRequestsRequiringBooking must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'getRequestsRequiringBooking',
+        soap_action => '',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         => [
-                    qw( Shipment::Temando::WSDL::Elements::getRequestsRequiringBooking )
-                ],
-            },
-            header => {
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::Temando::WSDL::Elements::getRequestsRequiringBookingResponse )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::getRequestsRequiringBooking )],
         },
-        $body,
-        $header
-    );
+        header => {
+
+            'use' => 'literal',
+            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle => '',
+            parts => [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
+            
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::getRequestsRequiringBookingResponse )],
+            },
+        }
+    }, $body, $header);
 }
 
 
 sub addBookingDetails {
     my ($self, $body, $header) = @_;
-    die "addBookingDetails must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'addBookingDetails',
-            soap_action => '',
-            style       => 'document',
-            body        => {
+    die "addBookingDetails must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'addBookingDetails',
+        soap_action => '',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::addBookingDetails )],
-            },
-            header => {
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::Temando::WSDL::Elements::addBookingDetailsResponse )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::addBookingDetails )],
         },
-        $body,
-        $header
-    );
+        header => {
+
+            'use' => 'literal',
+            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle => '',
+            parts => [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
+            
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::addBookingDetailsResponse )],
+            },
+        }
+    }, $body, $header);
 }
 
 
 sub createClient {
     my ($self, $body, $header) = @_;
-    die "createClient must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'createClient',
-            soap_action => '',
-            style       => 'document',
-            body        => {
+    die "createClient must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'createClient',
+        soap_action => '',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::createClient )],
-            },
-            header => {
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::Temando::WSDL::Elements::createClientResponse )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::createClient )],
         },
-        $body,
-        $header
-    );
+        header => {
+
+            'use' => 'literal',
+            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle => '',
+            parts => [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
+            
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::createClientResponse )],
+            },
+        }
+    }, $body, $header);
 }
 
 
 sub updateClient {
     my ($self, $body, $header) = @_;
-    die "updateClient must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'updateClient',
-            soap_action => '',
-            style       => 'document',
-            body        => {
+    die "updateClient must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'updateClient',
+        soap_action => '',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::updateClient )],
-            },
-            header => {
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::Temando::WSDL::Elements::updateClientResponse )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::updateClient )],
         },
-        $body,
-        $header
-    );
+        header => {
+
+            'use' => 'literal',
+            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle => '',
+            parts => [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
+            
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::updateClientResponse )],
+            },
+        }
+    }, $body, $header);
 }
 
 
 sub getClient {
     my ($self, $body, $header) = @_;
-    die "getClient must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'getClient',
-            soap_action => '',
-            style       => 'document',
-            body        => {
+    die "getClient must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'getClient',
+        soap_action => '',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts => [qw( Shipment::Temando::WSDL::Elements::getClient )],
-            },
-            header => {
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::Temando::WSDL::Elements::getClientResponse )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::getClient )],
         },
-        $body,
-        $header
-    );
+        header => {
+
+            'use' => 'literal',
+            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle => '',
+            parts => [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
+            
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::getClientResponse )],
+            },
+        }
+    }, $body, $header);
 }
 
 
 sub lodgeDispatch {
     my ($self, $body, $header) = @_;
-    die "lodgeDispatch must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'lodgeDispatch',
-            soap_action => '',
-            style       => 'document',
-            body        => {
+    die "lodgeDispatch must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'lodgeDispatch',
+        soap_action => '',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::lodgeDispatch )],
-            },
-            header => {
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::Temando::WSDL::Elements::lodgeDispatchResponse )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::lodgeDispatch )],
         },
-        $body,
-        $header
-    );
+        header => {
+
+            'use' => 'literal',
+            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle => '',
+            parts => [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
+            
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::lodgeDispatchResponse )],
+            },
+        }
+    }, $body, $header);
 }
 
 
 sub cancelRequest {
     my ($self, $body, $header) = @_;
-    die "cancelRequest must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'cancelRequest',
-            soap_action => '',
-            style       => 'document',
-            body        => {
+    die "cancelRequest must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'cancelRequest',
+        soap_action => '',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::cancelRequest )],
-            },
-            header => {
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::Temando::WSDL::Elements::cancelRequestResponse )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::cancelRequest )],
         },
-        $body,
-        $header
-    );
+        header => {
+
+            'use' => 'literal',
+            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle => '',
+            parts => [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
+            
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::cancelRequestResponse )],
+            },
+        }
+    }, $body, $header);
 }
 
 
 sub updateTrackingDetails {
     my ($self, $body, $header) = @_;
-    die
-      "updateTrackingDetails must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'updateTrackingDetails',
-            soap_action => '',
-            style       => 'document',
-            body        => {
+    die "updateTrackingDetails must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'updateTrackingDetails',
+        soap_action => '',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         => [
-                    qw( Shipment::Temando::WSDL::Elements::updateTrackingDetails )
-                ],
-            },
-            header => {
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::Temando::WSDL::Elements::updateTrackingDetailsResponse )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::updateTrackingDetails )],
         },
-        $body,
-        $header
-    );
+        header => {
+
+            'use' => 'literal',
+            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle => '',
+            parts => [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
+            
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::updateTrackingDetailsResponse )],
+            },
+        }
+    }, $body, $header);
 }
 
 
 sub getManifest {
     my ($self, $body, $header) = @_;
-    die "getManifest must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'getManifest',
-            soap_action => '',
-            style       => 'document',
-            body        => {
+    die "getManifest must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'getManifest',
+        soap_action => '',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::getManifest )],
-            },
-            header => {
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::Temando::WSDL::Elements::getManifestResponse )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::getManifest )],
         },
-        $body,
-        $header
-    );
+        header => {
+
+            'use' => 'literal',
+            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle => '',
+            parts => [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
+            
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::getManifestResponse )],
+            },
+        }
+    }, $body, $header);
 }
 
 
 sub confirmManifest {
     my ($self, $body, $header) = @_;
-    die "confirmManifest must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'confirmManifest',
-            soap_action => '',
-            style       => 'document',
-            body        => {
+    die "confirmManifest must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'confirmManifest',
+        soap_action => '',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::confirmManifest )],
-            },
-            header => {
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::Temando::WSDL::Elements::confirmManifestResponse )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::confirmManifest )],
         },
-        $body,
-        $header
-    );
+        header => {
+
+            'use' => 'literal',
+            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle => '',
+            parts => [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
+            
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::confirmManifestResponse )],
+            },
+        }
+    }, $body, $header);
 }
 
 
 sub getLocations {
     my ($self, $body, $header) = @_;
-    die "getLocations must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'getLocations',
-            soap_action => '',
-            style       => 'document',
-            body        => {
+    die "getLocations must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'getLocations',
+        soap_action => '',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::getLocations )],
-            },
-            header => {
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::Temando::WSDL::Elements::getLocationsResponse )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::getLocations )],
         },
-        $body,
-        $header
-    );
+        header => {
+
+            'use' => 'literal',
+            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle => '',
+            parts => [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
+            
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::getLocationsResponse )],
+            },
+        }
+    }, $body, $header);
 }
 
 
 sub createLocation {
     my ($self, $body, $header) = @_;
-    die "createLocation must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'createLocation',
-            soap_action => '',
-            style       => 'document',
-            body        => {
+    die "createLocation must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'createLocation',
+        soap_action => '',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::createLocation )],
-            },
-            header => {
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::Temando::WSDL::Elements::createLocationResponse )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::createLocation )],
         },
-        $body,
-        $header
-    );
+        header => {
+
+            'use' => 'literal',
+            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle => '',
+            parts => [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
+            
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::createLocationResponse )],
+            },
+        }
+    }, $body, $header);
 }
 
 
 sub updateLocation {
     my ($self, $body, $header) = @_;
-    die "updateLocation must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'updateLocation',
-            soap_action => '',
-            style       => 'document',
-            body        => {
+    die "updateLocation must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'updateLocation',
+        soap_action => '',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::updateLocation )],
-            },
-            header => {
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::Temando::WSDL::Elements::updateLocationResponse )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::updateLocation )],
         },
-        $body,
-        $header
-    );
+        header => {
+
+            'use' => 'literal',
+            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle => '',
+            parts => [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
+            
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Temando::WSDL::Elements::updateLocationResponse )],
+            },
+        }
+    }, $body, $header);
 }
+
+
+
 
 
 sub _get_name_resolver {
 
     my $prefix_1 = {
-        'attribute' => 'Shipment::Temando::WSDL::Attributes',
-        'typemap'   => 'Shipment::Temando::WSDL::Typemaps',
-        'interface' => 'Shipment::Temando::WSDL::Interfaces',
-        'type'      => 'Shipment::Temando::WSDL::Types',
-        'server'    => 'Shipment::Temando::WSDL::Server',
-        'element'   => 'Shipment::Temando::WSDL::Elements'
-    };
+              'attribute' => 'Shipment::Temando::WSDL::Attributes',
+              'typemap' => 'Shipment::Temando::WSDL::Typemaps',
+              'interface' => 'Shipment::Temando::WSDL::Interfaces',
+              'type' => 'Shipment::Temando::WSDL::Types',
+              'server' => 'Shipment::Temando::WSDL::Server',
+              'element' => 'Shipment::Temando::WSDL::Elements'
+            };
 
 
-    return SOAP::WSDL::Generator::Template::Plugin::XSD->new(
-        {   prefix_resolver => SOAP::WSDL::Generator::PrefixResolver->new(
-                {   namespace_prefix_map => {
-                        'http://www.w3.org/2001/XMLSchema' =>
-                          'SOAP::WSDL::XSD::Typelib::Builtin',
-                    },
-                    namespace_map => {},
-                    prefix        => $prefix_1,
-                }
-            )
-        }
-    );
+    return SOAP::WSDL::Generator::Template::Plugin::XSD->new({
+        prefix_resolver => SOAP::WSDL::Generator::PrefixResolver->new({
+            namespace_prefix_map => {
+                'http://www.w3.org/2001/XMLSchema' => 'SOAP::WSDL::XSD::Typelib::Builtin',
+            },
+            namespace_map => {
+            },
+            prefix => $prefix_1,
+        })
+    });
 }
 
 1;
@@ -896,7 +762,7 @@ Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 SYNOPSIS
 

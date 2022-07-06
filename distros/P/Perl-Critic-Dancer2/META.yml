@@ -1,0 +1,138 @@
+---
+abstract: 'A collection of handy perlcritic modules for Dancer2'
+author:
+  - 'D Ruth Holloway <ruth@hiruthie.me>'
+build_requires:
+  Dancer2: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Slurp: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Perl::Critic::TestUtils: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+  lib: '0'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006001'
+dynamic_config: '0'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-Dancer2
+provides:
+  Perl::Critic::Dancer2:
+    file: lib/Perl/Critic/Dancer2.pm
+    version: '0.4000'
+  Perl::Critic::Policy::Dancer2::ProhibitDeprecatedKeywords:
+    file: lib/Perl/Critic/Policy/Dancer2/ProhibitDeprecatedKeywords.pm
+    version: '0.4000'
+  Perl::Critic::Policy::Dancer2::ProhibitUnrecommendedKeywords:
+    file: lib/Perl/Critic/Policy/Dancer2/ProhibitUnrecommendedKeywords.pm
+    version: '0.4000'
+requires:
+  Carp: '0'
+  Modern::Perl: '0'
+  Perl::Critic::Policy: '0'
+  Perl::Critic::Utils: '0'
+  Perl::Critic::Utils::PPI: '0'
+  Readonly: '0'
+  base: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://gitlab.com/GeekRuthie/Perl-Critic-Dancer2/-/issues
+  homepage: https://p3rl.org/Perl::Critic::Dancer2
+  repository: https://gitlab.com/GeekRuthie/Perl-Critic-Dancer2.git
+version: '0.4000'
+x_BuiltWith:
+  modules:
+    CPAN::Meta: '2.150010'
+    Carp: '1.52'
+    Dancer2: '0.400000'
+    Dist::Zilla: '6.025'
+    Dist::Zilla::Plugin::Authority: '1.009'
+    Dist::Zilla::Plugin::AutoPrereqs: '6.025'
+    Dist::Zilla::Plugin::CPANFile: '6.025'
+    Dist::Zilla::Plugin::ChangeStats::Git: 0.6.0
+    Dist::Zilla::Plugin::CheckChangesHasContent: '0.011'
+    Dist::Zilla::Plugin::CoalescePod: 0.3.0
+    Dist::Zilla::Plugin::ConfirmRelease: '6.025'
+    Dist::Zilla::Plugin::ContributorCovenant: '2.000000'
+    Dist::Zilla::Plugin::ContributorsFile: 0.3.0
+    Dist::Zilla::Plugin::CopyFilesFromBuild: '0.170880'
+    Dist::Zilla::Plugin::CopyrightYearFromGit: '0.009'
+    Dist::Zilla::Plugin::Covenant: 0.1.2
+    Dist::Zilla::Plugin::ExecDir: '6.025'
+    Dist::Zilla::Plugin::Git::Check: '2.048'
+    Dist::Zilla::Plugin::Git::Commit: '2.048'
+    Dist::Zilla::Plugin::Git::CommitBuild: '2.048'
+    Dist::Zilla::Plugin::Git::Contributors: '0.036'
+    Dist::Zilla::Plugin::Git::GatherDir: '2.048'
+    Dist::Zilla::Plugin::Git::Push: '2.048'
+    Dist::Zilla::Plugin::Git::Tag: '2.048'
+    Dist::Zilla::Plugin::GitLab::Meta: '1.0002'
+    Dist::Zilla::Plugin::GitLab::Update: '1.0002'
+    Dist::Zilla::Plugin::INI::Baked: '0.002002'
+    Dist::Zilla::Plugin::InstallGuide: '1.200014'
+    Dist::Zilla::Plugin::InstallRelease: '0.008'
+    Dist::Zilla::Plugin::License: '6.025'
+    Dist::Zilla::Plugin::MakeMaker: '6.025'
+    Dist::Zilla::Plugin::Manifest: '6.025'
+    Dist::Zilla::Plugin::ManifestSkip: '6.025'
+    Dist::Zilla::Plugin::MetaData::BuiltWith: '1.004005'
+    Dist::Zilla::Plugin::MetaJSON: '6.025'
+    Dist::Zilla::Plugin::MetaProvides::Package: '2.004003'
+    Dist::Zilla::Plugin::MetaYAML: '6.025'
+    Dist::Zilla::Plugin::MinimumPerl: '1.006'
+    Dist::Zilla::Plugin::NextRelease: '6.025'
+    Dist::Zilla::Plugin::NextVersion::Semantic: 0.2.6
+    Dist::Zilla::Plugin::OurPkgVersion: '0.21'
+    Dist::Zilla::Plugin::PodWeaver: '4.009'
+    Dist::Zilla::Plugin::Prereqs::Plugins: '1.003003'
+    Dist::Zilla::Plugin::PreviousVersion::Changelog: 0.2.6
+    Dist::Zilla::Plugin::ReadmeMarkdownFromPod: '0.141140'
+    Dist::Zilla::Plugin::RunExtraTests: '0.029'
+    Dist::Zilla::Plugin::SchwartzRatio: 0.3.4
+    Dist::Zilla::Plugin::Test::Compile: '2.058'
+    Dist::Zilla::Plugin::Test::ReportPrereqs: '0.028'
+    Dist::Zilla::Plugin::TestRelease: '6.025'
+    Dist::Zilla::Plugin::UploadToCPAN: '6.025'
+    ExtUtils::MakeMaker: '7.62'
+    File::Slurp: '9999.32'
+    File::Spec: '3.80'
+    IO::Handle: '1.46'
+    IPC::Open3: '1.21'
+    Modern::Perl: '1.20220515'
+    Perl::Critic::Policy: '1.140'
+    Perl::Critic::TestUtils: '1.140'
+    Perl::Critic::Utils: '1.140'
+    Perl::Critic::Utils::PPI: '1.140'
+    Readonly: '2.05'
+    Test2::V0: '0.000145'
+    Test::More: '1.302183'
+    base: '2.27'
+    lib: '0.65'
+    strict: '1.12'
+    warnings: '1.51'
+  perl:
+    original: v5.34.1
+    qv: 1
+    version:
+      - 5
+      - 34
+      - 1
+  platform: linux
+x_author_pledge:
+  version: '1'
+x_authority: cpan:GEEKRUTH
+x_contributor_covenant:
+  version: '0.02'
+x_generated_by_perl: v5.34.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

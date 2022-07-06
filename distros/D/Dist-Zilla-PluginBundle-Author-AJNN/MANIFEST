@@ -7,7 +7,6 @@ META.yml
 Makefile.PL
 README
 cpanfile
-dist.ini
 lib/Dist/Zilla/PluginBundle/Author/AJNN.pm
 lib/Dist/Zilla/PluginBundle/Author/AJNN/PruneAliases.pm
 lib/Dist/Zilla/PluginBundle/Author/AJNN/Readme.pm
@@ -15,6 +14,7 @@ lib/Pod/Weaver/PluginBundle/Author/AJNN.pm
 lib/Pod/Weaver/PluginBundle/Author/AJNN/Author.pm
 lib/Pod/Weaver/PluginBundle/Author/AJNN/License.pm
 t/corpus/lib/DZT.pm
+t/multivalue.t
 t/plugins.t
 t/syntax.t
 xt/author/minimum-version.t

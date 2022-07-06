@@ -7,8 +7,9 @@ WriteMakefile(
     'VERSION_FROM'	=> 'lib/Lingua/EN/Sentence.pm', # finds $VERSION
     'PREREQ_PM'    =>
     {
-        'warnings'  => 1.12
-      },    
+        'perl' => '5.10.0',
+        'warnings' => '1.06'
+     },    
     'AUTHOR'        => 'Shlomo Yona, Kim Ryan',
     'LICENSE'       => 'perl',
     META_MERGE => {
@@ -16,8 +17,8 @@ WriteMakefile(
      resources => {
          repository => {
              type => 'git',
-             url  => 'https://github.com/dwimperl/Task-DWIM.git',
-             web  => 'https://github.com/dwimperl/Task-DWIM',
+             url  => 'https://github.com/kimryan/Lingua-EN-Sentence.git',
+             web  => 'https://github.com/kimryan/Lingua-EN-Sentence'
          },
      },
     }        

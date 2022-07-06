@@ -81,7 +81,7 @@ use Encode qw(decode);
 use JSON qw( decode_json );
 use utf8;
 
-our $VERSION = '1.51'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 my $Bourso_URL = 'https://www.boursorama.com/cours/';
 
@@ -162,10 +162,10 @@ sub bourso {
           $info{$stock, 'net'}      = $net if $net;
 
           # 2020-07-17 17:03:45
-          $quoter->store_date(\%info, $symbol, {isodate => $1}) if $date =~ m|([0-9]{4}-[0-9]{2}-[0-9]{2})|;
+          $quoter->store_date(\%info, $stock, {isodate => $1}) if $date =~ m|([0-9]{4}-[0-9]{2}-[0-9]{2})|;
 
           # dd/mm/yyyy
-          $quoter->store_date(\%info, $symbol, {eurodate => $1}) if $date =~ m|([0-9]{2}/[0-9]{2}/[0-9]{4})|;
+          $quoter->store_date(\%info, $stock, {eurodate => $1}) if $date =~ m|([0-9]{2}/[0-9]{2}/[0-9]{4})|;
 
           $info{$stock, 'method' } = 'bourso'; 
           $info{$stock, 'success'} = 1;

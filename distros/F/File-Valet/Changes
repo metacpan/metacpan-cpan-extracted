@@ -1,4 +1,7 @@
 Revision history for perl-file-valet
+1.09 Tue Jul 05 12:51:42
+	- Fixed rd_f for dynamic files which return 0-byte size in stat() (eg: /proc/self/mstat).
+
 1.08 Fri Oct 09 17:45:09
 	- Added Data::Munge to SEE ALSO section.
         - Added documentation for find_home.

@@ -28,7 +28,7 @@ use LWP::UserAgent;
 use JSON qw( decode_json encode_json );
 use String::Util qw(trim);
 
-our $VERSION = '1.51'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 our @labels = qw/name cap year_range currency exchange symbol ask bid high last low open close isodate date/;
 

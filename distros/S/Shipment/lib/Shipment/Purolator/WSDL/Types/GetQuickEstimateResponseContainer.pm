@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::GetQuickEstimateResponseContainer;
-$Shipment::Purolator::WSDL::Types::GetQuickEstimateResponseContainer::VERSION = '3.08';
+$Shipment::Purolator::WSDL::Types::GetQuickEstimateResponseContainer::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -17,40 +17,43 @@ sub __get_attr_class {
 
 
 use base qw(Shipment::Purolator::WSDL::Types::ResponseContainer);
-
 # Variety: sequence
 use Class::Std::Fast::Storable constructor => 'none';
 use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %ResponseInformation_of : ATTR(:get<ResponseInformation>);
-    my %ShipmentEstimates_of : ATTR(:get<ShipmentEstimates>);
+my %ResponseInformation_of :ATTR(:get<ResponseInformation>);
+my %ShipmentEstimates_of :ATTR(:get<ShipmentEstimates>);
 
-    __PACKAGE__->_factory(
-        [   qw(        ResponseInformation
-              ShipmentEstimates
+__PACKAGE__->_factory(
+    [ qw(        ResponseInformation
+        ShipmentEstimates
 
-            )
-        ],
-        {   'ResponseInformation' => \%ResponseInformation_of,
-            'ShipmentEstimates'   => \%ShipmentEstimates_of,
-        },
-        {   'ResponseInformation' =>
-              'Shipment::Purolator::WSDL::Types::ResponseInformation',
-            'ShipmentEstimates' =>
-              'Shipment::Purolator::WSDL::Types::ArrayOfShipmentEstimate',
-        },
-        {
+    ) ],
+    {
+        'ResponseInformation' => \%ResponseInformation_of,
+        'ShipmentEstimates' => \%ShipmentEstimates_of,
+    },
+    {
+        'ResponseInformation' => 'Shipment::Purolator::WSDL::Types::ResponseInformation',
+        'ShipmentEstimates' => 'Shipment::Purolator::WSDL::Types::ArrayOfShipmentEstimate',
+    },
+    {
 
-            'ResponseInformation' => 'ResponseInformation',
-            'ShipmentEstimates'   => 'ShipmentEstimates',
-        }
-    );
+        'ResponseInformation' => 'ResponseInformation',
+        'ShipmentEstimates' => 'ShipmentEstimates',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -67,7 +70,7 @@ Shipment::Purolator::WSDL::Types::GetQuickEstimateResponseContainer
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

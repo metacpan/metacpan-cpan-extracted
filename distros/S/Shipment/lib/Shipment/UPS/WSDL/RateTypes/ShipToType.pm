@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::RateTypes::ShipToType;
-$Shipment::UPS::WSDL::RateTypes::ShipToType::VERSION = '3.08';
+$Shipment::UPS::WSDL::RateTypes::ShipToType::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,35 +20,41 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Name_of : ATTR(:get<Name>);
-    my %Address_of : ATTR(:get<Address>);
-    my %Phone_of : ATTR(:get<Phone>);
+my %Name_of :ATTR(:get<Name>);
+my %Address_of :ATTR(:get<Address>);
+my %Phone_of :ATTR(:get<Phone>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Name
-              Address
-              Phone
-            )
-        ],
-        {   'Name'    => \%Name_of,
-            'Address' => \%Address_of,
-            'Phone'   => \%Phone_of,
-        },
-        {   'Name'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Address' => 'Shipment::UPS::WSDL::RateTypes::ShipToAddressType',
-            'Phone'   => 'Shipment::UPS::WSDL::RateTypes::ShipToPhoneType',
-        },
-        {
+__PACKAGE__->_factory(
+    [ qw(        Name
+        Address
+        Phone
+    ) ],
+    {
+        'Name' => \%Name_of,
+        'Address' => \%Address_of,
+        'Phone' => \%Phone_of,
+    },
+    {
+        'Name' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Address' => 'Shipment::UPS::WSDL::RateTypes::ShipToAddressType',
+        'Phone' => 'Shipment::UPS::WSDL::RateTypes::ShipToPhoneType',
+    },
+    {
 
-            'Name'    => 'Name',
-            'Address' => 'Address',
-            'Phone'   => 'Phone',
-        }
-    );
+        'Name' => 'Name',
+        'Address' => 'Address',
+        'Phone' => 'Phone',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -65,7 +71,7 @@ Shipment::UPS::WSDL::RateTypes::ShipToType
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

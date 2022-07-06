@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::GetFullEstimateResponseContainer;
-$Shipment::Purolator::WSDLV2::Types::GetFullEstimateResponseContainer::VERSION = '3.08';
+$Shipment::Purolator::WSDLV2::Types::GetFullEstimateResponseContainer::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -17,46 +17,48 @@ sub __get_attr_class {
 
 
 use base qw(Shipment::Purolator::WSDLV2::Types::ResponseContainer);
-
 # Variety: sequence
 use Class::Std::Fast::Storable constructor => 'none';
 use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %ResponseInformation_of : ATTR(:get<ResponseInformation>);
-    my %ShipmentEstimates_of : ATTR(:get<ShipmentEstimates>);
-    my %ReturnShipmentEstimates_of : ATTR(:get<ReturnShipmentEstimates>);
+my %ResponseInformation_of :ATTR(:get<ResponseInformation>);
+my %ShipmentEstimates_of :ATTR(:get<ShipmentEstimates>);
+my %ReturnShipmentEstimates_of :ATTR(:get<ReturnShipmentEstimates>);
 
-    __PACKAGE__->_factory(
-        [   qw(        ResponseInformation
-              ShipmentEstimates
-              ReturnShipmentEstimates
+__PACKAGE__->_factory(
+    [ qw(        ResponseInformation
+        ShipmentEstimates
+        ReturnShipmentEstimates
 
-            )
-        ],
-        {   'ResponseInformation'     => \%ResponseInformation_of,
-            'ShipmentEstimates'       => \%ShipmentEstimates_of,
-            'ReturnShipmentEstimates' => \%ReturnShipmentEstimates_of,
-        },
-        {   'ResponseInformation' =>
-              'Shipment::Purolator::WSDLV2::Types::ResponseInformation',
-            'ShipmentEstimates' =>
-              'Shipment::Purolator::WSDLV2::Types::ArrayOfShipmentEstimate',
-            'ReturnShipmentEstimates' =>
-              'Shipment::Purolator::WSDLV2::Types::ArrayOfShipmentEstimate',
-        },
-        {
+    ) ],
+    {
+        'ResponseInformation' => \%ResponseInformation_of,
+        'ShipmentEstimates' => \%ShipmentEstimates_of,
+        'ReturnShipmentEstimates' => \%ReturnShipmentEstimates_of,
+    },
+    {
+        'ResponseInformation' => 'Shipment::Purolator::WSDLV2::Types::ResponseInformation',
+        'ShipmentEstimates' => 'Shipment::Purolator::WSDLV2::Types::ArrayOfShipmentEstimate',
+        'ReturnShipmentEstimates' => 'Shipment::Purolator::WSDLV2::Types::ArrayOfShipmentEstimate',
+    },
+    {
 
-            'ResponseInformation'     => 'ResponseInformation',
-            'ShipmentEstimates'       => 'ShipmentEstimates',
-            'ReturnShipmentEstimates' => 'ReturnShipmentEstimates',
-        }
-    );
+        'ResponseInformation' => 'ResponseInformation',
+        'ShipmentEstimates' => 'ShipmentEstimates',
+        'ReturnShipmentEstimates' => 'ReturnShipmentEstimates',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -73,7 +75,7 @@ Shipment::Purolator::WSDLV2::Types::GetFullEstimateResponseContainer
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

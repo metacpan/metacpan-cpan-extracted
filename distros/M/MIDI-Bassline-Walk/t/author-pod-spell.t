@@ -24,8 +24,17 @@ DAW
 Gene
 MIDI
 Walk
+aeolian
 bassline
 basslines
+dorian
 gene
+ionian
+keycenter
 lib
+locrian
+lydian
+midinum
+mixolydian
 pentatonic
+phrygian

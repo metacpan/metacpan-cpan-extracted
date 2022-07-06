@@ -1,3 +1,8 @@
+1.999837 2022-07-02
+
+ * Improve the interoperability between objects of different classes for the
+   methods that are still used as functions.
+
 1.999836 2022-06-24
 
  * Improve compatibility with older versions of the Math-BigRat distribution.

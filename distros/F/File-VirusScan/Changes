@@ -1,5 +1,18 @@
 Revision history for File-VirusScan
 
+0.105   Wed, 06 Jul 2022 10:00:00 -0400
+
+        Update author contact info
+
+0.104   Tue, 24 May 2022 13:44:12 -0400
+
+        Fix test failure if TMPDIR is not /tmp
+
+        Fix test failure in non-English locales
+
+        Make daemonized scanners accept a relative pathname and
+        convert it to absolute, rather than failing with an error
+
 0.103	Wed, 22 Apr 2015 13:37:43 -0400
 
 	Update co-maintainer's name to "Dianne Skoll"

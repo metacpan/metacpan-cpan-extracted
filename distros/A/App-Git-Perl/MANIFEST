@@ -1,0 +1,13 @@
+ChangeLog
+CONTRIBUTING.md
+lib/App/Git/Perl.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+script/git-perl
+t/0-start.t
+t/1-external-programs.t
+t/2-script.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

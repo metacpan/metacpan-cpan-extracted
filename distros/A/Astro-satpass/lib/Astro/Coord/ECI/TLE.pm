@@ -133,7 +133,7 @@ reports.
 
 In other words, this module turns the two- or three-line element sets
 available from such places as L<https://www.space-track.org/> or
-L<http://celestrak.com/> into predictions of where the relevant orbiting
+L<http://celestrak.org/> into predictions of where the relevant orbiting
 bodies will be. Additionally, the pass() method implements an actual
 visibility prediction system.
 
@@ -186,7 +186,7 @@ by the object.
 As of release 0.016, the recommended model to use is SGP4R, which was
 added in that release. The SGP4R model, described in "Revisiting
 Spacetrack Report #3"
-(L<http://celestrak.com/publications/AIAA/2006-6753/>), combines SGP4
+(L<http://celestrak.org/publications/AIAA/2006-6753/>), combines SGP4
 and SDP4, and updates them. For the details of the changes, see the
 report.
 
@@ -229,7 +229,7 @@ package Astro::Coord::ECI::TLE;
 use strict;
 use warnings;
 
-our $VERSION = '0.125';
+our $VERSION = '0.126';
 
 use base qw{ Astro::Coord::ECI Exporter };
 
@@ -1385,12 +1385,12 @@ sub __parse_name {
 
 # Parse information for the above from
 # CelesTrak "FAQs: Two-Line Element Set Format", by Dr. T. S. Kelso,
-# http://celestrak.com/columns/v04n03/
+# http://celestrak.org/columns/v04n03/
 # Per this, all data are for the NORAD SGP4/SDP4 model, except for the
 # first and second time derivative, which are for the simpler SGP model.
 # The actual documentation of the algorithms, along with a reference
 # implementation in FORTRAN, is available at
-# http://celestrak.com/NORAD/documentation/spacetrk.pdf
+# http://celestrak.org/NORAD/documentation/spacetrk.pdf
 
 =item @passes = $tle->pass ($station, $start, $end, \@sky)
 
@@ -8145,12 +8145,12 @@ sub _next_elevation_screen {
 #
 #   $ tools/heavens-above-mag --celestrak
 #
-# Last-Modified: Sun, 24 Apr 2022 19:21:48 GMT
+# Last-Modified: Thu, 16 Jun 2022 22:49:00 GMT
 
 # The following constants are unsupported, and may be modified or
 # revoked at any time. They exist to support
 # xt/author/magnitude_status.t
-use constant _CELESTRAK_VISUAL => 'Sun, 24 Apr 2022 19:21:48 GMT';
+use constant _CELESTRAK_VISUAL => 'Thu, 16 Jun 2022 22:49:00 GMT';
 use constant _MCCANTS_VSNAMES  => undef;
 use constant _MCCANTS_QUICKSAT => undef;
 
@@ -8274,7 +8274,6 @@ use constant _MCCANTS_QUICKSAT => undef;
   '25977' =>   5.7, # HELIOS 1B
   '25994' =>   2.7, # TERRA
   '26070' =>   2.7, # SL-16 R/B
-# '26102' => undef, # MTI has no recorded magnitude
   '26474' =>   2.7, # TITAN 4B R/B
   '26905' =>   3.7, # USA 160
   '26907' =>   3.7, # USA 160 DEB
@@ -8319,6 +8318,7 @@ use constant _MCCANTS_QUICKSAT => undef;
 # '43641' => undef, # SAOCOM 1-A has no recorded magnitude
 # '46265' => undef, # SAOCOM 1-B has no recorded magnitude
   '48274' =>   3.2, # CSS (TIANHE-1)
+# '51842' => undef, # OBJECT U has no recorded magnitude
 );
 
 1;
@@ -8748,12 +8748,12 @@ authors of "Revisiting Spacetrack Report #3", presented at the 2006
 AIAA/AAS Astrodynamics Specialist Conference.
 
 Dr. T. S. Kelso, who made these two key reports available at
-L<http://celestrak.com/NORAD/documentation/spacetrk.pdf> and
-L<http://celestrak.com/publications/AIAA/2006-6753/> respectively. Dr.
+L<http://celestrak.org/NORAD/documentation/spacetrk.pdf> and
+L<http://celestrak.org/publications/AIAA/2006-6753/> respectively. Dr.
 Kelso's Two-Line Element Set Format FAQ
-(L<http://celestrak.com/columns/v04n03/>) was also extremely helpful, as
+(L<http://celestrak.org/columns/v04n03/>) was also extremely helpful, as
 was his discussion of the coordinate system used
-(L<http://celestrak.com/columns/v02n01/>) and (indirectly) his Pascal
+(L<http://celestrak.org/columns/v02n01/>) and (indirectly) his Pascal
 implementation of these models.
 
 The TLE data used in testing the C<sgp4r> model are from "Revisiting

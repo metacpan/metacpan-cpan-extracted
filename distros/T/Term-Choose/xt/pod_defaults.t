@@ -1,8 +1,8 @@
 use 5.10.0;
 use strict;
 use warnings;
-no if $] >= 5.018, warnings => "experimental::smartmatch";
 use Test::More;
+use List::Util qw( any );
 
 
 my @long = qw( pad empty undef ll default max_cols max_height max_width keep no_spacebar mark footer skip_items margin );
@@ -23,8 +23,7 @@ while ( my $line = <$fh> ) {
     if ( $line =~ /^sub _defaults \{/ .. $line =~ /^\}/ ) {
         if ( $line =~ m|^\s+#?\s*(\w+)\s+=>\s(\S+),| ) {
             my $op = $1;
-            #next if $op eq 'prompt';
-            next if $op ~~ @skip;
+            next if any { $op eq $_ } @skip;
             $option_default{$op} = $2;
             $option_default{$op} =~ s/^undef\z/undefined/;
             $option_default{$op} =~ s/^["']([^'"]+)["']\z/$1/;
@@ -38,7 +37,7 @@ my %pod_default;
 my %pod;
 
 for my $key ( @all ) {
-    next if $key ~~ @skip;
+    next if any { $key eq $_ } @skip;
     open $fh, '<', $file or die $!;
     while ( my $line = <$fh> ) {
         if ( $line =~ /^=head3\s\Q$key\E/ ... $line =~ /^=head/ ) { #head2
@@ -51,7 +50,7 @@ for my $key ( @all ) {
 }
 
 for my $key ( @simple ) {
-    next if $key ~~ @skip;
+    next if any { $key eq $_ } @skip;
     my $opt;
     for my $line ( @{$pod{$key}} ) {
         if ( $line =~ /(\d).*\(default\)/ || $line =~ /(\d) - default/ ) {
@@ -62,7 +61,7 @@ for my $key ( @simple ) {
 }
 
 for my $key ( @long ) {
-    next if $key ~~ @skip;
+    next if any { $key eq $_ } @skip;
     for my $line ( @{$pod{$key}} ) {
         if ( $line =~ /default:\s["']([^'"]+)["'](?:\)|\s*)/ ) {
             $pod_default{$key} = $1;
@@ -81,6 +80,6 @@ is( scalar keys %pod_default, scalar keys %option_default, 'scalar keys %pod_def
 
 
 for my $key ( sort keys %option_default ) {
-    next if $key ~~ @skip;
+    next if any { $key eq $_ } @skip;
     is( $option_default{$key}, $pod_default{$key}, "option $key: default value in pod matches default value in code" );
 }

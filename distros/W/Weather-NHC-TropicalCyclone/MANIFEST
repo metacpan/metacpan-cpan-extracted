@@ -15,7 +15,8 @@ lib/Weather/NHC/TropicalCyclone/Storm.pm
 lib/Weather/NHC/TropicalCyclone/StormTable.pm
 t/data/017.al202020.fst
 t/data/017.al202020.fst.txt
-t/data/CurrentStorms.json
+t/data/2020/CurrentStorms.json
+t/data/2022/CurrentStorms.json
 t/release-kwalitee.t
 t/unit/lib-Weather-NHC-TropicalCyclone-ForecastAdvisory/01-basic.t
 t/unit/lib-Weather-NHC-TropicalCyclone-Storm/01-basic.t

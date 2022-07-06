@@ -28,3 +28,14 @@ The following logs changes for the CPAN distribution Valiant
             an extra request to look for it.  Just something that annoys me :)
           - Documentation and example of subclassing the exception classes to play nice with th
             RenderError plugin.
+
+0.001008 2022-07-05
+          - Refactored to move most of the content negotiation into the plugin, so we can simplify
+          the views.
+          - JSON view changed to return its data more like the Text and HTML views
+          - HTTP Exception object refactored to use a role (which is now preferred for custom exceptions)
+          - You can now add additional headers in the exception object, and pass headers via the dispatch
+          and detach errors methods.
+          - using status_code instead of jsut status.  This is a break change but needed because I found
+          'status' was just too generic and was causing namespace conflicts.
+          - improved the docs a bit.

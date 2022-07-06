@@ -1,0 +1,253 @@
+NAME
+    Test::JSON::Type - Test JSON data with types.
+
+SYNOPSIS
+     use Test::JSON::Type;
+
+     cmp_json_types($json, $json_expected, $test_name);
+     is_json_type($json, $expected_type_hr, $test_name);
+
+SUBROUTINES
+  "cmp_json_types"
+     cmp_json_types($json, $json_expected, $test_name);
+
+    This decodes $json and $json_expected JSON strings to Perl structure and
+    return data type structure defined by Cpanel::JSON::XS::Type. And
+    compare these structures, if are same.
+
+    Result is success or failure of this comparison. In case of failure
+    print difference in test.
+
+  "is_json_type"
+     is_json_type($json, $expected_type_hr, $test_name);
+
+    This decoded $json JSON string to Perl structure and return data type
+    structure defined by Cpanel::JSON::XS::Type. Compare this structure with
+    $expected_type_hr, if are same.
+
+    Result is success or failure of this comparison. In case of failure
+    print difference in test.
+
+ERRORS
+     cmp_json_types():
+             JSON string isn't valid.
+                     Error: %s
+             JSON string to compare is required.
+             Expected JSON string isn't valid.
+                     Error: %s
+             Expected JSON string to compare is required.
+     is_json_type():
+             JSON string isn't valid.
+                     Error: %s
+             JSON string to compare is required.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Test::JSON::Type;
+     use Test::More 'tests' => 2;
+
+     my $json_blank1 = '{}';
+     my $json_blank2 = '{}';
+     cmp_json_types($json_blank1, $json_blank2, 'Blank JSON strings.');
+
+     my $json_struct1 = <<'END';
+     {
+       "bool": true,
+       "float": 0.23,
+       "int": 1,
+       "null": null,
+       "string": "bar"
+     }
+     END
+     my $json_struct2 = <<'END';
+     {
+       "bool": false,
+       "float": 1.23,
+       "int": 2,
+       "null": null,
+       "string": "foo"
+     }
+     END
+     cmp_json_types($json_struct1, $json_struct2, 'Structured JSON strings.');
+
+     # Output:
+     # 1..2
+     # ok 1 - Blank JSON strings.
+     # ok 2 - Structured JSON strings.
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Test::JSON::Type;
+     use Test::More 'tests' => 1;
+
+     my $json_struct_err1 = <<'END';
+     {
+       "int": 1,
+       "string": "1"
+     }
+     END
+     my $json_struct_err2 = <<'END';
+     {
+       "int": 1,
+       "string": 1
+     }
+     END
+     cmp_json_types($json_struct_err1, $json_struct_err2, 'Structured JSON strings with error.');
+
+     # Output:
+     # 1..1
+     # not ok 1 - Structured JSON strings with error.
+     # #   Failed test 'Structured JSON strings with error.'
+     # #   at ./ex2.pl line 21.
+     # # +----+--------------------------------+-----------------------------+
+     # # | Elt|Got                             |Expected                     |
+     # # +----+--------------------------------+-----------------------------+
+     # # |   0|{                               |{                            |
+     # # |   1|  int => 'JSON_TYPE_INT',       |  int => 'JSON_TYPE_INT',    |
+     # # *   2|  string => 'JSON_TYPE_STRING'  |  string => 'JSON_TYPE_INT'  *
+     # # |   3|}                               |}                            |
+     # # +----+--------------------------------+-----------------------------+
+     # # Looks like you failed 1 test of 1.
+
+EXAMPLE3
+     use strict;
+     use warnings;
+
+     use Test::JSON::Type;
+     use Test::More 'tests' => 1;
+
+     my $json_struct_err1 = <<'END';
+     {
+       "int": 1,
+       "array": ["1", 1]
+     }
+     END
+     my $json_struct_err2 = <<'END';
+     {
+       "int": 1,
+       "array": 1
+     }
+     END
+     cmp_json_types($json_struct_err1, $json_struct_err2, 'Structured JSON strings with error.');
+
+     # Output:
+     # 1..1
+     # not ok 1 - Structured JSON strings with error.
+     # #   Failed test 'Structured JSON strings with error.'
+     # #   at ./ex3.pl line 21.
+     # # +----+--------------------------+----+-----------------------------+
+     # # | Elt|Got                       | Elt|Expected                     |
+     # # +----+--------------------------+----+-----------------------------+
+     # # |   0|{                         |   0|{                            |
+     # # *   1|  array => [              *   1|  array => 'JSON_TYPE_INT',  *
+     # # *   2|    'JSON_TYPE_STRING',   *    |                             |
+     # # *   3|    'JSON_TYPE_INT'       *    |                             |
+     # # *   4|  ],                      *    |                             |
+     # # |   5|  int => 'JSON_TYPE_INT'  |   2|  int => 'JSON_TYPE_INT'     |
+     # # |   6|}                         |   3|}                            |
+     # # +----+--------------------------+----+-----------------------------+
+     # # Looks like you failed 1 test of 1.
+
+EXAMPLE4
+     use strict;
+     use warnings;
+
+     use Cpanel::JSON::XS::Type;
+     use Test::JSON::Type;
+     use Test::More 'tests' => 2;
+
+     my $json_struct1 = <<'END';
+     {
+       "bool": true,
+       "float": 0.23,
+       "int": 1,
+       "null": null,
+       "string": "bar"
+     }
+     END
+     my $json_struct2 = <<'END';
+     {
+       "bool": false,
+       "float": 1.23,
+       "int": 2,
+       "null": null,
+       "string": "foo"
+     }
+     END
+     my $expected_type_hr = {
+       'bool' => JSON_TYPE_BOOL,
+       'float' => JSON_TYPE_FLOAT,
+       'int' => JSON_TYPE_INT,
+       'null' => JSON_TYPE_NULL,
+       'string' => JSON_TYPE_STRING,
+     };
+     is_json_type($json_struct1, $expected_type_hr, 'Test JSON type #1.');
+     is_json_type($json_struct2, $expected_type_hr, 'Test JSON type #2.');
+
+     # Output:
+     # 1..2
+     # ok 1 - Test JSON type \#1.
+     # ok 2 - Test JSON type \#2.
+
+EXAMPLE5
+     use strict;
+     use warnings;
+
+     use Cpanel::JSON::XS::Type;
+     use Test::JSON::Type;
+     use Test::More 'tests' => 2;
+
+     my $json_struct = <<'END';
+     {
+       "array": [1,2,3]
+     }
+     END
+     my $expected_type1_hr = {
+       'array' => json_type_arrayof(JSON_TYPE_INT),
+     };
+     my $expected_type2_hr = {
+       'array' => [
+         JSON_TYPE_INT,
+         JSON_TYPE_INT,
+         JSON_TYPE_INT,
+       ],
+     };
+     is_json_type($json_struct, $expected_type1_hr, 'Test JSON type (multiple integers).');
+     is_json_type($json_struct, $expected_type2_hr, 'Test JSON type (three integers)');
+
+     # Output:
+     # 1..2
+     # ok 1 - Test JSON type (multiple integers).
+     # ok 2 - Test JSON type (three integers)
+
+DEPENDENCIES
+    Cpanel::JSON::XS, Cpanel::JSON::XS::Type, English, Error::Pure,
+    Readonly, Test::Builder::Module, Test::Differences.
+
+SEE ALSO
+    Test::JSON
+        Test JSON data
+
+    Test::JSON::More
+        JSON Test Utility
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Test-JSON-Type>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2021-2022 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.04
+

@@ -1,3 +1,15 @@
+0.05 2022-07-06
+  [Changes]
+    * Nothing to change. Because pause indexer failed, the version is upgraded.
+0.04 2022-07-06
+  [Changes]
+    * Need a compiler supporing C++17 on only Windows/MinGW.
+    * Required library "stdc++" is added.
+0.03 2022-07-04
+  [Changes]
+    * Need a compiler supporing C++11.
+    * Add pthread require library.
+
 0.02 2022-07-01
   [Changes]
     * Improve document.

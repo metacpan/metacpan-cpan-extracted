@@ -1,22 +1,22 @@
 
 package Shipment::FedEx::WSDL::TrackElements::SignatureProofOfDeliveryLetterRequest;
-$Shipment::FedEx::WSDL::TrackElements::SignatureProofOfDeliveryLetterRequest::VERSION = '3.08';
+$Shipment::FedEx::WSDL::TrackElements::SignatureProofOfDeliveryLetterRequest::VERSION = '3.09';
 use strict;
 use warnings;
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    sub get_xmlns {'http://fedex.com/ws/track/v9'}
+sub get_xmlns { 'http://fedex.com/ws/track/v9' }
 
-    __PACKAGE__->__set_name('SignatureProofOfDeliveryLetterRequest');
-    __PACKAGE__->__set_nillable();
-    __PACKAGE__->__set_minOccurs();
-    __PACKAGE__->__set_maxOccurs();
-    __PACKAGE__->__set_ref();
-    use base qw(
-      SOAP::WSDL::XSD::Typelib::Element
-      Shipment::FedEx::WSDL::TrackTypes::SignatureProofOfDeliveryLetterRequest
-    );
+__PACKAGE__->__set_name('SignatureProofOfDeliveryLetterRequest');
+__PACKAGE__->__set_nillable();
+__PACKAGE__->__set_minOccurs();
+__PACKAGE__->__set_maxOccurs();
+__PACKAGE__->__set_ref();
+use base qw(
+    SOAP::WSDL::XSD::Typelib::Element
+    Shipment::FedEx::WSDL::TrackTypes::SignatureProofOfDeliveryLetterRequest
+);
 
 }
 
@@ -34,7 +34,7 @@ Shipment::FedEx::WSDL::TrackElements::SignatureProofOfDeliveryLetterRequest
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

@@ -360,7 +360,6 @@ sub path
     $status->msg( "Unknown local file name" );
   } else {
     my $path = $wdir. '/' . "$1.$2";
-    $path .= '.gz' if $encoding eq 'gzip';
     $status->{ url } = $url;
     $status->{ path } = $path;
   }
@@ -429,8 +428,14 @@ sub download
         );
       # Handle errors
       if( ! $status->error() ) {
-        $status->{ path } = $self->encoding() eq 'gzip' ?
-          $self->unzip( $path ) : $path;
+        my $encoding = $status->{ 'encoding' };
+        
+        if( defined( $encoding ) && ( $encoding == 'gzip' ) ) {
+          rename $path, "$path.gz";
+          $status->{ path } = $self->unzip( "$path.gz" );
+        } else {
+          $status->{ path } = $path;
+        }
       }
     }
 

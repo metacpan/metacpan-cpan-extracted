@@ -1,0 +1,55 @@
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Test::YAFT::Test::Warnings - Test::YAFT - Test::Warnings comparison
+
+=head1 DESCRIPTION
+
+L<Test::YAFT> reexports only C<had_warnings>.
+
+=head2 Import Parameters
+
+L<Test::YAFT> turns off L<Test::Warnings>'s end test.
+
+L<Test::YAFT> exports via L<Exporter::Tiny>.
+
+=head2 Exported Functions
+
+=over
+
+=item allow_warnings
+
+Not supported
+
+=item allowing_warnings
+
+Not supported
+
+=item had_no_warnings
+
+Reexported
+
+=item warnings
+
+Not supported
+
+=item warning
+
+Not supported
+
+=back
+
+=head1 AUTHOR
+
+Branislav Zahradník <barney@cpan.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+This file is part of L<Test::YAFT> distribution.
+
+=cut
+

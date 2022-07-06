@@ -1,3 +1,24 @@
+0.004   2022-05-21  Released-By: PERLANCAR; Urgency: medium
+
+        - [func sample_weighted_random_no_replacement] Add 'algo' option
+          and add 'nocopy' algorithm.
+
+
+0.003   2022-05-21  Released-By: PERLANCAR; Urgency: medium
+
+        - Add 'shuffle' option.
+
+        - Add Array::Sample::WeightedRandom::Scan, although the current
+          algorithm is biased.
+
+
+0.002   2022-05-20  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention Data::Random::Weighted.
+
+
 0.001   2022-05-20  Released-By: PERLANCAR
 
         - First release.

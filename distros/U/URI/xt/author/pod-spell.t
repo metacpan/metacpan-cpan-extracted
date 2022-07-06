@@ -64,6 +64,7 @@ Olaf
 OpenLDAP
 Parkhurst
 Perl
+Perlbotics
 Peter
 Piotr
 Punycode
@@ -145,6 +146,7 @@ nntp
 nntps
 oid
 olaf
+perlbotix
 piotr
 pop
 relativize

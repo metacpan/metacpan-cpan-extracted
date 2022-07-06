@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::NMFCType;
-$Shipment::UPS::WSDL::ShipTypes::NMFCType::VERSION = '3.08';
+$Shipment::UPS::WSDL::ShipTypes::NMFCType::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,31 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %PrimeCode_of : ATTR(:get<PrimeCode>);
-    my %SubCode_of : ATTR(:get<SubCode>);
+my %PrimeCode_of :ATTR(:get<PrimeCode>);
+my %SubCode_of :ATTR(:get<SubCode>);
 
-    __PACKAGE__->_factory(
-        [   qw(        PrimeCode
-              SubCode
+__PACKAGE__->_factory(
+    [ qw(        PrimeCode
+        SubCode
 
-            )
-        ],
-        {   'PrimeCode' => \%PrimeCode_of,
-            'SubCode'   => \%SubCode_of,
-        },
-        {   'PrimeCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'SubCode'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'PrimeCode' => \%PrimeCode_of,
+        'SubCode' => \%SubCode_of,
+    },
+    {
+        'PrimeCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'SubCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'PrimeCode' => 'PrimeCode',
-            'SubCode'   => 'SubCode',
-        }
-    );
+        'PrimeCode' => 'PrimeCode',
+        'SubCode' => 'SubCode',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -61,7 +67,7 @@ Shipment::UPS::WSDL::ShipTypes::NMFCType
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

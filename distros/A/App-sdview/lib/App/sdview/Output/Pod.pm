@@ -7,7 +7,7 @@ use v5.26;
 
 use Object::Pad;
 
-package App::sdview::Output::Pod 0.06;
+package App::sdview::Output::Pod 0.07;
 class App::sdview::Output::Pod
    does App::sdview::Output
    :strict(params);

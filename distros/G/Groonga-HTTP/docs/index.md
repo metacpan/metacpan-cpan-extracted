@@ -35,6 +35,8 @@ Groonga-HTTP provides user-friendly Web API instead of low-level Groonga Web API
 
   * [Reference][reference]: It describes details for each features such as classes and methods.
 
+  * [Development][development]: It describes how to develop Groonga-HTTP.
+
 ## License {#license}
 
 Groonga-HTTP is released under [the GNU Lesser General Public License version 3 or later][lgpl3.0-license].
@@ -46,5 +48,7 @@ Groonga-HTTP is released under [the GNU Lesser General Public License version 3 
 [tutorial]:tutorial/
 
 [reference]:reference/
+
+[development]:development/
 
 [lgpl3.0-license]:https://opensource.org/licenses/LGPL-3.0

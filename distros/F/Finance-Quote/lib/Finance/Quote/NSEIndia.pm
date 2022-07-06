@@ -11,7 +11,7 @@ use strict;
 use POSIX qw(strftime);
 use IO::Uncompress::Unzip qw(unzip $UnzipError);
 
-our $VERSION = '1.51'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 use vars qw($NSE_MAIN_URL $NSE_URL);
 $NSE_MAIN_URL = "https://www.nseindia.com";

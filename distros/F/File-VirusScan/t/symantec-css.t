@@ -45,7 +45,7 @@ sub bogus_socket : Test(2)
 	$s->{port} = 1;
 
 	dies_ok { $s->_get_socket() } '_get_socket() dies (invalid port given)';
-	like( $@, qr/Error: Could not connect to CarrierScan Server on 127.0.0.1, port 1: Connection refused/, '... error as expected');
+	like( $@, qr/Error: Could not connect to CarrierScan Server on 127.0.0.1, port 1:/, '... error as expected');
 }
 
 sub good_socket : Test(1)

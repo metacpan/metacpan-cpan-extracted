@@ -1,5 +1,8 @@
-package DBIx::Class::Schema::ResultSetNames 1.03;
+package DBIx::Class::Schema::ResultSetNames;
 use Modern::Perl;
+our $VERSION = '1.0301'; # VERSION
+our $AUTHORITY = 'cpan:GEEKRUTH'; # AUTHORITY
+# ABSTRACT: Create resultset accessors from schema result class names
 use base qw(DBIx::Class::Schema);
 use Carp;
 use Lingua::EN::Inflect::Phrase;
@@ -9,83 +12,84 @@ __PACKAGE__->mk_group_accessors( inherited => 'resultset_name_methods' );
 __PACKAGE__->resultset_name_methods( {} );
 
 sub register_source {
-    my ( $class, $source_name, @rest ) = @_;
-    my $source = $class->next::method( $source_name, @rest );
-    $class->_register_resultset_name_methods($source_name);
-    return $source;
+   my ( $class, $source_name, @rest ) = @_;
+   my $source = $class->next::method( $source_name, @rest );
+   $class->_register_resultset_name_methods($source_name);
+   return $source;
 }
 
 sub _ensure_resultset_name_method {
-    my ( $class, $name, $sub ) = @_;
-    return if $class->can($name);
-    {
-        no strict 'refs';
-        *{"${class}::${name}"} = $sub;
-    }
-    $class->resultset_name_methods(
-        { %{ $class->resultset_name_methods }, $name => 1 }, );
-    return;
+   my ( $class, $name, $sub ) = @_;
+   return if $class->can($name);
+   {
+      no strict 'refs';
+      *{"${class}::${name}"} = $sub;
+   }
+   $class->resultset_name_methods( { %{ $class->resultset_name_methods }, $name => 1 }, );
+   return;
 }
 
 sub _register_resultset_name_methods {
-    my ( $class, $source_name ) = @_;
-    my $rsname_overrides = {};
-    if ( $class->can('override_rsnames') ) {
-        $rsname_overrides = $class->override_rsnames;
-    }
-    my $method_name = $rsname_overrides->{$source_name}->{singular}
-        || $class->_source_name_to_method_name($source_name);
-    my $plural_name = $rsname_overrides->{$source_name}->{plural}
-        || $class->_source_name_to_plural_name($source_name);
-    if ( $method_name eq $plural_name ) {
-        croak << "END_MESSAGE";
+   my ( $class, $source_name ) = @_;
+   my $rsname_overrides = {};
+   if ( $class->can('override_rsnames') ) {
+      $rsname_overrides = $class->override_rsnames;
+   }
+   my $method_name = $rsname_overrides->{$source_name}->{singular}
+       || $class->_source_name_to_method_name($source_name);
+   my $plural_name = $rsname_overrides->{$source_name}->{plural}
+       || $class->_source_name_to_plural_name($source_name);
+   if ( $method_name eq $plural_name ) {
+      croak << "END_MESSAGE";
 The ResultSet $source_name is the same word in both singular and
 plural forms. Use an override to choose different words for one
 or the other, or both.  Consult the documentation for assistance
 in doing this.
 
 END_MESSAGE
-    }
-    $class->_ensure_resultset_name_method(
-        $method_name => sub {
-            my ( $self, @args ) = @_;
-            die "Can't call ${method_name} without arguments" unless @args;
-            $self->resultset($source_name)->find(@args);
-        }
-    );
-    $class->_ensure_resultset_name_method(
-        $plural_name => sub {
-            my ( $self, @args ) = @_;
-            my $rs = $self->resultset($source_name);
-            return $rs unless @args;
-            return $rs->search_rs(@args);
-        }
-    );
-    return;
+   }
+   $class->_ensure_resultset_name_method(
+      $method_name => sub {
+         my ( $self, @args ) = @_;
+         die "Can't call ${method_name} without arguments" unless @args;
+         $self->resultset($source_name)->find(@args);
+      }
+   );
+   $class->_ensure_resultset_name_method(
+      $plural_name => sub {
+         my ( $self, @args ) = @_;
+         my $rs = $self->resultset($source_name);
+         return $rs unless @args;
+         return $rs->search_rs(@args);
+      }
+   );
+   return;
 }
 
 sub _source_name_to_method_name {
-    my ( $class, $source_name ) = @_;
-    my $phrase       = $class->_source_name_to_phrase($source_name);
-    my $singularised = Lingua::EN::Inflect::Phrase::to_S($phrase);
-    return join '_', split q{ }, $singularised;
+   my ( $class, $source_name ) = @_;
+   my $phrase       = $class->_source_name_to_phrase($source_name);
+   my $singularised = Lingua::EN::Inflect::Phrase::to_S($phrase);
+   return join '_', split q{ }, $singularised;
 }
 
 sub _source_name_to_phrase {
-    my ( $class, $source_name ) = @_;
-    join q{ }, map {
-        join( q{ }, map {lc} grep {length} split /([A-Z]{1}[^A-Z]*)/ )
-    } split /::/, $source_name;
+   my ( $class, $source_name ) = @_;
+   join q{ }, map {
+      join( q{ }, map { lc } grep { length } split /([A-Z]{1}[^A-Z]*)/ )
+   } split /::/, $source_name;
 }
 
 sub _source_name_to_plural_name {
-    my ( $class, $source_name ) = @_;
-    my $phrase     = $class->_source_name_to_phrase($source_name);
-    my $pluralised = Lingua::EN::Inflect::Phrase::to_PL($phrase);
-    return join '_', split q{ }, $pluralised;
+   my ( $class, $source_name ) = @_;
+   my $phrase     = $class->_source_name_to_phrase($source_name);
+   my $pluralised = Lingua::EN::Inflect::Phrase::to_PL($phrase);
+   return join '_', split q{ }, $pluralised;
 }
 
 1;
+
+__END__
 
 =pod
 
@@ -97,7 +101,7 @@ DBIx::Class::Schema::ResultSetNames - Create resultset accessors from schema res
 
 =head1 VERSION
 
-version 1.03
+version 1.0301
 
 =head1 SYNOPSIS
 
@@ -214,14 +218,9 @@ D Ruth Holloway <ruth@hiruthie.me>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by D Ruth Holloway.
+This software is copyright (c) 2022, 2021 by D Ruth Holloway.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-__END__
-
-# ABSTRACT: Create resultset accessors from schema result class names
-

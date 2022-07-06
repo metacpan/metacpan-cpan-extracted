@@ -1,16 +1,12 @@
 package Shipment::Temando::WSDL::Types::LoginDetails;
-$Shipment::Temando::WSDL::Types::LoginDetails::VERSION = '3.08';
+$Shipment::Temando::WSDL::Types::LoginDetails::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(0);
 
-sub get_xmlns {
-    'http://'
-      . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
-      . '/schema/2009_06/common.xsd';
-}
+sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/common.xsd' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -24,31 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %loginId_of : ATTR(:get<loginId>);
-    my %password_of : ATTR(:get<password>);
+my %loginId_of :ATTR(:get<loginId>);
+my %password_of :ATTR(:get<password>);
 
-    __PACKAGE__->_factory(
-        [   qw(        loginId
-              password
+__PACKAGE__->_factory(
+    [ qw(        loginId
+        password
 
-            )
-        ],
-        {   'loginId'  => \%loginId_of,
-            'password' => \%password_of,
-        },
-        {   'loginId'  => 'Shipment::Temando::WSDL::Types::LoginId',
-            'password' => 'Shipment::Temando::WSDL::Types::Password',
-        },
-        {
+    ) ],
+    {
+        'loginId' => \%loginId_of,
+        'password' => \%password_of,
+    },
+    {
+        'loginId' => 'Shipment::Temando::WSDL::Types::LoginId',
+        'password' => 'Shipment::Temando::WSDL::Types::Password',
+    },
+    {
 
-            'loginId'  => 'loginId',
-            'password' => 'password',
-        }
-    );
+        'loginId' => 'loginId',
+        'password' => 'password',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -65,7 +67,7 @@ Shipment::Temando::WSDL::Types::LoginDetails
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

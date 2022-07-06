@@ -16,37 +16,53 @@ use Path::Tiny;
 
 extends 'App::VTide::Command::Run';
 
-our $VERSION = version->new('0.1.16');
+our $VERSION = version->new('0.1.17');
 our $NAME    = 'who';
-our $OPTIONS = [
-    'set|s=s',
-    'verbose|v+',
-];
-sub details_sub { return ( $NAME, $OPTIONS )};
+our $OPTIONS = [ 'set|s=s', 'term|t=i', 'verbose|v+', ];
+our $LOCAL   = 1;
+sub details_sub { return ( $NAME, $OPTIONS, $LOCAL ) }
 
 sub run {
     my ($self) = @_;
 
-    if ($self->defaults->{set}) {
-        my $file = path($self->defaults->{set})->absolute;
-        my $dir = $file->parent;
+    if ( $self->defaults->{set} ) {
+        my $file   = path( $self->defaults->{set} )->absolute;
+        my $dir    = $file->parent;
         my $config = LoadFile($file);
+        my $term   = $self->defaults->{term} || 99;
         print <<"EXPORTS";
 export VTIDE_NAME="$config->{name}"
 export VTIDE_CONFIG="$file"
 export VTIDE_DIR="$dir"
-export VTIDE_TERM=99
+export VTIDE_TERM=$term
 EXPORTS
+        $self->config->local_config($file);
+        my $conf = $self->config->get();
+
+        if ( $conf->{default}{env} ) {
+            print "\n";
+            for my $key ( sort keys %{ $conf->{default}{env} } ) {
+                print "export $key=\"$conf->{default}{env}{$key}\"\n";
+            }
+        }
+        if ( $conf->{terminals}{$term}{env} ) {
+            for my $key ( sort keys %{ $conf->{terminals}{$term}{env} } ) {
+                print
+                    "export $key=\"$conf->{terminals}{$term}{env}{$key}\"\n";
+            }
+        }
+
         return;
     }
 
-    if ( ! $ENV{VTIDE_NAME} ) {
+    if ( !$ENV{VTIDE_NAME} ) {
         print "Not in a VTide session\n";
     }
     else {
         print "Session $ENV{VTIDE_NAME}\n";
         print "Term    $ENV{VTIDE_TERM}\n" if $ENV{VTIDE_TERM};
     }
+
     #VTIDE_CONFIG
     #VTIDE_DIR
     #VTIDE_NAME
@@ -69,7 +85,7 @@ App::VTide::Command::Who - Tells you about the terminal you are in
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Who version 0.1.16
+This documentation refers to App::VTide::Command::Who version 0.1.17
 
 =head1 SYNOPSIS
 

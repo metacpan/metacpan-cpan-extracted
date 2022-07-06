@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::ShipmentServiceOptionsType;
-$Shipment::UPS::WSDL::ShipTypes::ShipmentServiceOptionsType::VERSION = '3.08';
+$Shipment::UPS::WSDL::ShipTypes::ShipmentServiceOptionsType::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,93 +20,87 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %SaturdayDeliveryIndicator_of : ATTR(:get<SaturdayDeliveryIndicator>);
-    my %OnCall_of : ATTR(:get<OnCall>);
-    my %COD_of : ATTR(:get<COD>);
-    my %Notification_of : ATTR(:get<Notification>);
-    my %LabelDelivery_of : ATTR(:get<LabelDelivery>);
-    my %InternationalForms_of : ATTR(:get<InternationalForms>);
-    my %DeliveryConfirmation_of : ATTR(:get<DeliveryConfirmation>);
-    my %ReturnOfDocumentIndicator_of : ATTR(:get<ReturnOfDocumentIndicator>);
-    my %ImportControlIndicator_of : ATTR(:get<ImportControlIndicator>);
-    my %LabelMethod_of : ATTR(:get<LabelMethod>);
-    my %CommercialInvoiceRemovalIndicator_of :
-      ATTR(:get<CommercialInvoiceRemovalIndicator>);
-    my %UPScarbonneutralIndicator_of : ATTR(:get<UPScarbonneutralIndicator>);
+my %SaturdayDeliveryIndicator_of :ATTR(:get<SaturdayDeliveryIndicator>);
+my %OnCall_of :ATTR(:get<OnCall>);
+my %COD_of :ATTR(:get<COD>);
+my %Notification_of :ATTR(:get<Notification>);
+my %LabelDelivery_of :ATTR(:get<LabelDelivery>);
+my %InternationalForms_of :ATTR(:get<InternationalForms>);
+my %DeliveryConfirmation_of :ATTR(:get<DeliveryConfirmation>);
+my %ReturnOfDocumentIndicator_of :ATTR(:get<ReturnOfDocumentIndicator>);
+my %ImportControlIndicator_of :ATTR(:get<ImportControlIndicator>);
+my %LabelMethod_of :ATTR(:get<LabelMethod>);
+my %CommercialInvoiceRemovalIndicator_of :ATTR(:get<CommercialInvoiceRemovalIndicator>);
+my %UPScarbonneutralIndicator_of :ATTR(:get<UPScarbonneutralIndicator>);
 
-    __PACKAGE__->_factory(
-        [   qw(        SaturdayDeliveryIndicator
-              OnCall
-              COD
-              Notification
-              LabelDelivery
-              InternationalForms
-              DeliveryConfirmation
-              ReturnOfDocumentIndicator
-              ImportControlIndicator
-              LabelMethod
-              CommercialInvoiceRemovalIndicator
-              UPScarbonneutralIndicator
+__PACKAGE__->_factory(
+    [ qw(        SaturdayDeliveryIndicator
+        OnCall
+        COD
+        Notification
+        LabelDelivery
+        InternationalForms
+        DeliveryConfirmation
+        ReturnOfDocumentIndicator
+        ImportControlIndicator
+        LabelMethod
+        CommercialInvoiceRemovalIndicator
+        UPScarbonneutralIndicator
 
-            )
-        ],
-        {   'SaturdayDeliveryIndicator' => \%SaturdayDeliveryIndicator_of,
-            'OnCall'                    => \%OnCall_of,
-            'COD'                       => \%COD_of,
-            'Notification'              => \%Notification_of,
-            'LabelDelivery'             => \%LabelDelivery_of,
-            'InternationalForms'        => \%InternationalForms_of,
-            'DeliveryConfirmation'      => \%DeliveryConfirmation_of,
-            'ReturnOfDocumentIndicator' => \%ReturnOfDocumentIndicator_of,
-            'ImportControlIndicator'    => \%ImportControlIndicator_of,
-            'LabelMethod'               => \%LabelMethod_of,
-            'CommercialInvoiceRemovalIndicator' =>
-              \%CommercialInvoiceRemovalIndicator_of,
-            'UPScarbonneutralIndicator' => \%UPScarbonneutralIndicator_of,
-        },
-        {   'SaturdayDeliveryIndicator' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'OnCall'       => 'Shipment::UPS::WSDL::ShipTypes::OnCallType',
-            'COD'          => 'Shipment::UPS::WSDL::ShipTypes::CODType',
-            'Notification' =>
-              'Shipment::UPS::WSDL::ShipTypes::NotificationType',
-            'LabelDelivery' =>
-              'Shipment::UPS::WSDL::ShipTypes::LabelDeliveryType',
-            'InternationalForms' =>
-              'Shipment::UPS::WSDL::ShipTypes::InternationalFormType',
-            'DeliveryConfirmation' =>
-              'Shipment::UPS::WSDL::ShipTypes::DeliveryConfirmationType',
-            'ReturnOfDocumentIndicator' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ImportControlIndicator' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'LabelMethod' => 'Shipment::UPS::WSDL::ShipTypes::LabelMethodType',
-            'CommercialInvoiceRemovalIndicator' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'UPScarbonneutralIndicator' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'SaturdayDeliveryIndicator' => \%SaturdayDeliveryIndicator_of,
+        'OnCall' => \%OnCall_of,
+        'COD' => \%COD_of,
+        'Notification' => \%Notification_of,
+        'LabelDelivery' => \%LabelDelivery_of,
+        'InternationalForms' => \%InternationalForms_of,
+        'DeliveryConfirmation' => \%DeliveryConfirmation_of,
+        'ReturnOfDocumentIndicator' => \%ReturnOfDocumentIndicator_of,
+        'ImportControlIndicator' => \%ImportControlIndicator_of,
+        'LabelMethod' => \%LabelMethod_of,
+        'CommercialInvoiceRemovalIndicator' => \%CommercialInvoiceRemovalIndicator_of,
+        'UPScarbonneutralIndicator' => \%UPScarbonneutralIndicator_of,
+    },
+    {
+        'SaturdayDeliveryIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'OnCall' => 'Shipment::UPS::WSDL::ShipTypes::OnCallType',
+        'COD' => 'Shipment::UPS::WSDL::ShipTypes::CODType',
+        'Notification' => 'Shipment::UPS::WSDL::ShipTypes::NotificationType',
+        'LabelDelivery' => 'Shipment::UPS::WSDL::ShipTypes::LabelDeliveryType',
+        'InternationalForms' => 'Shipment::UPS::WSDL::ShipTypes::InternationalFormType',
+        'DeliveryConfirmation' => 'Shipment::UPS::WSDL::ShipTypes::DeliveryConfirmationType',
+        'ReturnOfDocumentIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ImportControlIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'LabelMethod' => 'Shipment::UPS::WSDL::ShipTypes::LabelMethodType',
+        'CommercialInvoiceRemovalIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'UPScarbonneutralIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'SaturdayDeliveryIndicator'         => 'SaturdayDeliveryIndicator',
-            'OnCall'                            => 'OnCall',
-            'COD'                               => 'COD',
-            'Notification'                      => 'Notification',
-            'LabelDelivery'                     => 'LabelDelivery',
-            'InternationalForms'                => 'InternationalForms',
-            'DeliveryConfirmation'              => 'DeliveryConfirmation',
-            'ReturnOfDocumentIndicator'         => 'ReturnOfDocumentIndicator',
-            'ImportControlIndicator'            => 'ImportControlIndicator',
-            'LabelMethod'                       => 'LabelMethod',
-            'CommercialInvoiceRemovalIndicator' =>
-              'CommercialInvoiceRemovalIndicator',
-            'UPScarbonneutralIndicator' => 'UPScarbonneutralIndicator',
-        }
-    );
+        'SaturdayDeliveryIndicator' => 'SaturdayDeliveryIndicator',
+        'OnCall' => 'OnCall',
+        'COD' => 'COD',
+        'Notification' => 'Notification',
+        'LabelDelivery' => 'LabelDelivery',
+        'InternationalForms' => 'InternationalForms',
+        'DeliveryConfirmation' => 'DeliveryConfirmation',
+        'ReturnOfDocumentIndicator' => 'ReturnOfDocumentIndicator',
+        'ImportControlIndicator' => 'ImportControlIndicator',
+        'LabelMethod' => 'LabelMethod',
+        'CommercialInvoiceRemovalIndicator' => 'CommercialInvoiceRemovalIndicator',
+        'UPScarbonneutralIndicator' => 'UPScarbonneutralIndicator',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -123,7 +117,7 @@ Shipment::UPS::WSDL::ShipTypes::ShipmentServiceOptionsType
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

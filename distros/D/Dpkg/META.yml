@@ -226,7 +226,7 @@ provides:
     version: '0.02'
   Dpkg::Substvars:
     file: lib/Dpkg/Substvars.pm
-    version: '2.00'
+    version: '2.01'
   Dpkg::Vars:
     file: lib/Dpkg/Vars.pm
     version: '0.03'
@@ -258,5 +258,5 @@ resources:
   homepage: https://wiki.debian.org/Teams/Dpkg
   license: http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
   repository: https://git.dpkg.org/git/dpkg/dpkg.git
-version: v1.21.5
+version: v1.21.9
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

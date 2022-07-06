@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::RateTypes::AdditionalInfoType;
-$Shipment::UPS::WSDL::RateTypes::AdditionalInfoType::VERSION = '3.08';
+$Shipment::UPS::WSDL::RateTypes::AdditionalInfoType::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Error/v1.1'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Error/v1.1' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Type_of : ATTR(:get<Type>);
-    my %Value_of : ATTR(:get<Value>);
+my %Type_of :ATTR(:get<Type>);
+my %Value_of :ATTR(:get<Value>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Type
-              Value
+__PACKAGE__->_factory(
+    [ qw(        Type
+        Value
 
-            )
-        ],
-        {   'Type'  => \%Type_of,
-            'Value' => \%Value_of,
-        },
-        {   'Type'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Value' =>
-              'Shipment::UPS::WSDL::RateTypes::AdditionalCodeDescType',
-        },
-        {
+    ) ],
+    {
+        'Type' => \%Type_of,
+        'Value' => \%Value_of,
+    },
+    {
+        'Type' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Value' => 'Shipment::UPS::WSDL::RateTypes::AdditionalCodeDescType',
+    },
+    {
 
-            'Type'  => 'Type',
-            'Value' => 'Value',
-        }
-    );
+        'Type' => 'Type',
+        'Value' => 'Value',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -62,7 +67,7 @@ Shipment::UPS::WSDL::RateTypes::AdditionalInfoType
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

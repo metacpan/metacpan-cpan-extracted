@@ -1,4 +1,9 @@
 Changes
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
@@ -9,19 +14,13 @@ inc/Module/Install/Scripts.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 lib/Net/DNSBL/Client.pm
-Makefile.PL
-MANIFEST			This list of files
-MANIFEST.SKIP
-META.yml
-README
 script/dnsblcheck
 t/00-load.t
 t/failures.t
 t/live_dnswl.t
+t/live_dwl_spamhaus.t
 t/live_psbl.t
 t/live_spamcop.t
-t/live_spamhaus.t
-t/live_virbl.t
 t/pod-coverage.t
 t/pod.t
 t/revip.t

@@ -3,7 +3,7 @@ use warnings;
 
 package Pod::Weaver::PluginBundle::Author::AJNN::Author;
 # ABSTRACT: Pod section naming the author
-$Pod::Weaver::PluginBundle::Author::AJNN::Author::VERSION = '0.02';
+$Pod::Weaver::PluginBundle::Author::AJNN::Author::VERSION = '0.03';
 
 use Carp qw(croak);
 use Moose;
@@ -26,10 +26,10 @@ sub weave_section {
 
 	if ( $author =~ m/<ajnn\@cpan\.org>/ ) {
 		$author .= <<~END;
-\n
-If you contact me by email, please make sure you include the word
-"Perl" in your subject header to help beat the spam filters.
-END
+			\n
+			If you contact me by email, please make sure you include the word
+			"Perl" in your subject header to help beat the spam filters.
+			END
 	}
 	
 	push $document->children->@*, Pod::Elemental::Element::Nested->new({
@@ -58,7 +58,7 @@ Pod::Weaver::PluginBundle::Author::AJNN::Author - Pod section naming the author
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

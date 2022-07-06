@@ -39,7 +39,7 @@
             "Class::Accessor::Fast" : "0",
             "Exporter::AutoClean" : "0",
             "parent" : "0",
-            "perl" : "5.008005",
+            "perl" : "5.006001",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -63,6 +63,6 @@
          "url" : "https://github.com/typester/object-container-perl/"
       }
    },
-   "version" : "0.15",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.16",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

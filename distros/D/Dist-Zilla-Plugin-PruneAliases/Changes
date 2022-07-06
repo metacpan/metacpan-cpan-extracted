@@ -1,0 +1,11 @@
+Revision history for Dist-Zilla-Plugin-PruneAliases
+
+1.00  2022-07-03
+
+ - Better tests
+ - Unbundled release
+
+0.01  2022-03-03
+
+ - Initial release, bundled as
+   Dist::Zilla::PluginBundle::Author::AJNN::PruneAliases

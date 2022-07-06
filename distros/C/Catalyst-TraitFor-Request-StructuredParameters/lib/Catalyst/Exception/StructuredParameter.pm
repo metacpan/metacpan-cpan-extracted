@@ -1,11 +1,10 @@
 package Catalyst::Exception::StructuredParameter;
 
 use Moose;
-use namespace::clean -except => 'meta';
  
-extends 'CatalystX::Utils::HttpException';
+with 'CatalystX::Utils::DoesHttpException';
 
-has '+status' => (is=>'ro', init_arg=>undef, default=>sub {400});
-has '+errors' => (is=>'ro', init_arg=>undef, default=>sub { ["General error with structured parameters."] });
+sub status { 400 }
+sub error { "General error with structured parameters." }
 
 __PACKAGE__->meta->make_immutable;

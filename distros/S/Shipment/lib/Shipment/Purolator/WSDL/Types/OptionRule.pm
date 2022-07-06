@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::OptionRule;
-$Shipment::Purolator::WSDL::Types::OptionRule::VERSION = '3.08';
+$Shipment::Purolator::WSDL::Types::OptionRule::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,39 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %OptionIDValuePair_of : ATTR(:get<OptionIDValuePair>);
-    my %Exclusions_of : ATTR(:get<Exclusions>);
-    my %Inclusions_of : ATTR(:get<Inclusions>);
+my %OptionIDValuePair_of :ATTR(:get<OptionIDValuePair>);
+my %Exclusions_of :ATTR(:get<Exclusions>);
+my %Inclusions_of :ATTR(:get<Inclusions>);
 
-    __PACKAGE__->_factory(
-        [   qw(        OptionIDValuePair
-              Exclusions
-              Inclusions
+__PACKAGE__->_factory(
+    [ qw(        OptionIDValuePair
+        Exclusions
+        Inclusions
 
-            )
-        ],
-        {   'OptionIDValuePair' => \%OptionIDValuePair_of,
-            'Exclusions'        => \%Exclusions_of,
-            'Inclusions'        => \%Inclusions_of,
-        },
-        {   'OptionIDValuePair' =>
-              'Shipment::Purolator::WSDL::Types::OptionIDValuePair',
-            'Exclusions' =>
-              'Shipment::Purolator::WSDL::Types::ArrayOfOptionIDValuePair',
-            'Inclusions' =>
-              'Shipment::Purolator::WSDL::Types::ArrayOfOptionIDValuePair',
-        },
-        {
+    ) ],
+    {
+        'OptionIDValuePair' => \%OptionIDValuePair_of,
+        'Exclusions' => \%Exclusions_of,
+        'Inclusions' => \%Inclusions_of,
+    },
+    {
+        'OptionIDValuePair' => 'Shipment::Purolator::WSDL::Types::OptionIDValuePair',
+        'Exclusions' => 'Shipment::Purolator::WSDL::Types::ArrayOfOptionIDValuePair',
+        'Inclusions' => 'Shipment::Purolator::WSDL::Types::ArrayOfOptionIDValuePair',
+    },
+    {
 
-            'OptionIDValuePair' => 'OptionIDValuePair',
-            'Exclusions'        => 'Exclusions',
-            'Inclusions'        => 'Inclusions',
-        }
-    );
+        'OptionIDValuePair' => 'OptionIDValuePair',
+        'Exclusions' => 'Exclusions',
+        'Inclusions' => 'Inclusions',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -69,7 +72,7 @@ Shipment::Purolator::WSDL::Types::OptionRule
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

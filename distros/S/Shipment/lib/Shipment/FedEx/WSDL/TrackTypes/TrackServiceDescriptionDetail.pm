@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackServiceDescriptionDetail;
-$Shipment::FedEx::WSDL::TrackTypes::TrackServiceDescriptionDetail::VERSION = '3.08';
+$Shipment::FedEx::WSDL::TrackTypes::TrackServiceDescriptionDetail::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/track/v9'}
+sub get_xmlns { 'http://fedex.com/ws/track/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,36 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Type_of : ATTR(:get<Type>);
-    my %Description_of : ATTR(:get<Description>);
-    my %ShortDescription_of : ATTR(:get<ShortDescription>);
+my %Type_of :ATTR(:get<Type>);
+my %Description_of :ATTR(:get<Description>);
+my %ShortDescription_of :ATTR(:get<ShortDescription>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Type
-              Description
-              ShortDescription
+__PACKAGE__->_factory(
+    [ qw(        Type
+        Description
+        ShortDescription
 
-            )
-        ],
-        {   'Type'             => \%Type_of,
-            'Description'      => \%Description_of,
-            'ShortDescription' => \%ShortDescription_of,
-        },
-        {   'Type'        => 'Shipment::FedEx::WSDL::TrackTypes::ServiceType',
-            'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ShortDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'Type' => \%Type_of,
+        'Description' => \%Description_of,
+        'ShortDescription' => \%ShortDescription_of,
+    },
+    {
+        'Type' => 'Shipment::FedEx::WSDL::TrackTypes::ServiceType',
+        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ShortDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'Type'             => 'Type',
-            'Description'      => 'Description',
-            'ShortDescription' => 'ShortDescription',
-        }
-    );
+        'Type' => 'Type',
+        'Description' => 'Description',
+        'ShortDescription' => 'ShortDescription',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -66,7 +72,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackServiceDescriptionDetail
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

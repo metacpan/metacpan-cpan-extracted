@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::ArrayOfSuggestedAddress;
-$Shipment::Purolator::WSDL::Types::ArrayOfSuggestedAddress::VERSION = '3.08';
+$Shipment::Purolator::WSDL::Types::ArrayOfSuggestedAddress::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,26 +20,32 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %SuggestedAddress_of : ATTR(:get<SuggestedAddress>);
+my %SuggestedAddress_of :ATTR(:get<SuggestedAddress>);
 
-    __PACKAGE__->_factory(
-        [   qw(        SuggestedAddress
+__PACKAGE__->_factory(
+    [ qw(        SuggestedAddress
 
-            )
-        ],
-        {'SuggestedAddress' => \%SuggestedAddress_of,},
-        {   'SuggestedAddress' =>
-              'Shipment::Purolator::WSDL::Types::SuggestedAddress',
-        },
-        {
+    ) ],
+    {
+        'SuggestedAddress' => \%SuggestedAddress_of,
+    },
+    {
+        'SuggestedAddress' => 'Shipment::Purolator::WSDL::Types::SuggestedAddress',
+    },
+    {
 
-            'SuggestedAddress' => 'SuggestedAddress',
-        }
-    );
+        'SuggestedAddress' => 'SuggestedAddress',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -56,7 +62,7 @@ Shipment::Purolator::WSDL::Types::ArrayOfSuggestedAddress
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

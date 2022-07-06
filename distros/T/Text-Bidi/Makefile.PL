@@ -56,47 +56,47 @@ Text/Bidi/Array/Long.pm
 );
 
 my %WriteMakefileArgs = (
-                       'VERSION' => '2.17',
-                       'test' => {
-                                   'TESTS' => 't/*.t'
-                                 },
-                       'DISTNAME' => 'Text-Bidi',
-                       'CONFIGURE_REQUIRES' => {
-                                                 'ExtUtils::MakeMaker' => '0'
-                                               },
-                       'NAME' => 'Text::Bidi::private',
-                       'LICENSE' => 'perl',
-                       'PREREQ_PM' => {
-                                        'strict' => '0',
-                                        'integer' => '0',
-                                        'Encode' => '0',
-                                        'DynaLoader' => '0',
-                                        'warnings' => '0',
-                                        'open' => '0',
-                                        'overload' => '0',
-                                        'Getopt::Long' => '0',
-                                        'base' => '0',
-                                        'Tie::Array' => '0',
-                                        'Exporter' => '0',
-                                        'Carp' => '0'
-                                      },
-                       'AUTHOR' => 'Moshe Kamensky <kamensky@cpan.org>',
                        'MIN_PERL_VERSION' => '5.010000',
-                       'TEST_REQUIRES' => {
-                                            'Test::More' => '0',
-                                            'ExtUtils::MakeMaker' => '0',
-                                            'IPC::Open3' => '0',
-                                            'Data::Dumper' => '0',
-                                            'charnames' => '0',
-                                            'version' => '0.77',
-                                            'File::Spec' => '0',
-                                            'File::Temp' => '0',
-                                            'IO::Handle' => '0'
-                                          },
                        'EXE_FILES' => [
                                         'bin/fribidi.pl'
                                       ],
-                       'ABSTRACT' => 'Unicode bidi algorithm using libfribidi'
+                       'LICENSE' => 'perl',
+                       'PREREQ_PM' => {
+                                        'Getopt::Long' => '0',
+                                        'overload' => '0',
+                                        'Encode' => '0',
+                                        'integer' => '0',
+                                        'base' => '0',
+                                        'Exporter' => '0',
+                                        'warnings' => '0',
+                                        'Tie::Array' => '0',
+                                        'open' => '0',
+                                        'DynaLoader' => '0',
+                                        'strict' => '0',
+                                        'Carp' => '0'
+                                      },
+                       'CONFIGURE_REQUIRES' => {
+                                                 'ExtUtils::MakeMaker' => '0'
+                                               },
+                       'test' => {
+                                   'TESTS' => 't/*.t'
+                                 },
+                       'ABSTRACT' => 'Unicode bidi algorithm using libfribidi',
+                       'NAME' => 'Text::Bidi::private',
+                       'VERSION' => '2.18',
+                       'TEST_REQUIRES' => {
+                                            'File::Temp' => '0',
+                                            'version' => '0.77',
+                                            'ExtUtils::MakeMaker' => '0',
+                                            'charnames' => '0',
+                                            'IPC::Open3' => '0',
+                                            'Data::Dumper' => '0',
+                                            'IO::Handle' => '0',
+                                            'File::Spec' => '0',
+                                            'Test::More' => '0'
+                                          },
+                       'AUTHOR' => 'Moshe Kamensky <kamensky@cpan.org>',
+                       'DISTNAME' => 'Text-Bidi'
                      );
 
 

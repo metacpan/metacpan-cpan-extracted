@@ -1,0 +1,58 @@
+{
+   "abstract" : "adds custom git command \"git perl\" to make it easier to monitor latest changes in perl modules, and make you collaborate faster.",
+   "author" : [
+      "Nedzad Hrnjica"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Git-Perl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.014"
+         }
+      }
+   },
+   "provides" : {
+      "App::Git::Perl" : {
+         "file" : "lib/App/Git/Perl.pm",
+         "version" : "v0.1.12"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nedzadhrnjica/App-Git-Perl/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/nedzadhrnjica/App-Git-Perl.git",
+         "web" : "https://github.com/nedzadhrnjica/App-Git-Perl"
+      }
+   },
+   "version" : "v0.1.12",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

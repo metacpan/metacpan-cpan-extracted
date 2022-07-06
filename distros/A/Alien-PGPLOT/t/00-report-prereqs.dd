@@ -99,6 +99,7 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
+                                   'Package::Stash' => '0',
                                    'Test2::V0' => '0',
                                    'Test::Alien' => '2.3901',
                                    'Test::More' => '0',

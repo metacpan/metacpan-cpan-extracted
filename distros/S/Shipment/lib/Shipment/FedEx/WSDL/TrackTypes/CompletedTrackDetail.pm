@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::CompletedTrackDetail;
-$Shipment::FedEx::WSDL::TrackTypes::CompletedTrackDetail::VERSION = '3.08';
+$Shipment::FedEx::WSDL::TrackTypes::CompletedTrackDetail::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/track/v9'}
+sub get_xmlns { 'http://fedex.com/ws/track/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,59 +20,62 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %HighestSeverity_of : ATTR(:get<HighestSeverity>);
-    my %Notifications_of : ATTR(:get<Notifications>);
-    my %DuplicateWaybill_of : ATTR(:get<DuplicateWaybill>);
-    my %MoreData_of : ATTR(:get<MoreData>);
-    my %PagingToken_of : ATTR(:get<PagingToken>);
-    my %TrackDetailsCount_of : ATTR(:get<TrackDetailsCount>);
-    my %TrackDetails_of : ATTR(:get<TrackDetails>);
+my %HighestSeverity_of :ATTR(:get<HighestSeverity>);
+my %Notifications_of :ATTR(:get<Notifications>);
+my %DuplicateWaybill_of :ATTR(:get<DuplicateWaybill>);
+my %MoreData_of :ATTR(:get<MoreData>);
+my %PagingToken_of :ATTR(:get<PagingToken>);
+my %TrackDetailsCount_of :ATTR(:get<TrackDetailsCount>);
+my %TrackDetails_of :ATTR(:get<TrackDetails>);
 
-    __PACKAGE__->_factory(
-        [   qw(        HighestSeverity
-              Notifications
-              DuplicateWaybill
-              MoreData
-              PagingToken
-              TrackDetailsCount
-              TrackDetails
+__PACKAGE__->_factory(
+    [ qw(        HighestSeverity
+        Notifications
+        DuplicateWaybill
+        MoreData
+        PagingToken
+        TrackDetailsCount
+        TrackDetails
 
-            )
-        ],
-        {   'HighestSeverity'   => \%HighestSeverity_of,
-            'Notifications'     => \%Notifications_of,
-            'DuplicateWaybill'  => \%DuplicateWaybill_of,
-            'MoreData'          => \%MoreData_of,
-            'PagingToken'       => \%PagingToken_of,
-            'TrackDetailsCount' => \%TrackDetailsCount_of,
-            'TrackDetails'      => \%TrackDetails_of,
-        },
-        {   'HighestSeverity' =>
-              'Shipment::FedEx::WSDL::TrackTypes::NotificationSeverityType',
-            'Notifications' =>
-              'Shipment::FedEx::WSDL::TrackTypes::Notification',
-            'DuplicateWaybill' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-            'MoreData'         => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-            'PagingToken'      => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'TrackDetailsCount' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-            'TrackDetails' => 'Shipment::FedEx::WSDL::TrackTypes::TrackDetail',
-        },
-        {
+    ) ],
+    {
+        'HighestSeverity' => \%HighestSeverity_of,
+        'Notifications' => \%Notifications_of,
+        'DuplicateWaybill' => \%DuplicateWaybill_of,
+        'MoreData' => \%MoreData_of,
+        'PagingToken' => \%PagingToken_of,
+        'TrackDetailsCount' => \%TrackDetailsCount_of,
+        'TrackDetails' => \%TrackDetails_of,
+    },
+    {
+        'HighestSeverity' => 'Shipment::FedEx::WSDL::TrackTypes::NotificationSeverityType',
+        'Notifications' => 'Shipment::FedEx::WSDL::TrackTypes::Notification',
+        'DuplicateWaybill' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        'MoreData' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        'PagingToken' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'TrackDetailsCount' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+        'TrackDetails' => 'Shipment::FedEx::WSDL::TrackTypes::TrackDetail',
+    },
+    {
 
-            'HighestSeverity'   => 'HighestSeverity',
-            'Notifications'     => 'Notifications',
-            'DuplicateWaybill'  => 'DuplicateWaybill',
-            'MoreData'          => 'MoreData',
-            'PagingToken'       => 'PagingToken',
-            'TrackDetailsCount' => 'TrackDetailsCount',
-            'TrackDetails'      => 'TrackDetails',
-        }
-    );
+        'HighestSeverity' => 'HighestSeverity',
+        'Notifications' => 'Notifications',
+        'DuplicateWaybill' => 'DuplicateWaybill',
+        'MoreData' => 'MoreData',
+        'PagingToken' => 'PagingToken',
+        'TrackDetailsCount' => 'TrackDetailsCount',
+        'TrackDetails' => 'TrackDetails',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -89,7 +92,7 @@ Shipment::FedEx::WSDL::TrackTypes::CompletedTrackDetail
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

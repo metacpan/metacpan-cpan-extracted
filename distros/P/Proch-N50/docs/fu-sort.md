@@ -4,7 +4,7 @@ fu-sort - Sort sequences by size
 
 # VERSION
 
-version 1.4.8
+version 1.5.0
 
 # EXAMPLES
 

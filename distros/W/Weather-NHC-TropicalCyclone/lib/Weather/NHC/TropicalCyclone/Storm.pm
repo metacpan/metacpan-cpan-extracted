@@ -5,11 +5,9 @@ use warnings;
 
 use HTTP::Tiny ();
 use HTTP::Status qw/:constants/;
+use Util::H2O::More qw/baptise/;
 use Validate::Tiny    ();
 use HTML::TreeBuilder ();
-
-# specify accessors
-use Object::Tiny qw/id binNumber name classification intensity pressure latitude longitude latitude_numberic movementDir movementSpeed lastUpdate publicAdvisory forecastAdvisory windSpeedProbabilities forecastDiscussion forecastGraphics forecastTrack windWatchesWarnings trackCone initialWindExtent forecastWindRadiiGIS bestTrackGIS earliestArrivalTimeTSWindsGIS mostLikelyTimeTSWindsGIS windSpeedProbabilitiesGIS kmzFile34kt kmzFile50kt kmzFile64kt stormSurgeWatchWarningGIS potentialStormSurgeFloodingGIS/;
 
 our $DEFAULT_GRAPHICS_ROOT = q{https://www.nhc.noaa.gov/storm_graphics};
 our $DEFAULT_BTK_ROOT      = q{https://ftp.nhc.noaa.gov/atcf/btk};
@@ -34,7 +32,9 @@ sub new {
         die qq{Field validation errors found creating package instance for: } . join( q{, }, keys %{ $validation->error } ) . qq{\n};
     }
 
-    return bless $self, $pkg;
+    my @fields = (qw/id binNumber name classification intensity pressure latitudelongitude latitude_numberic movementDir movementSpeed lastUpdate publicAdvisory forecastAdvisory windSpeedProbabilities forecastDiscussion forecastGraphics forecastTrack windWatchesWarnings trackCone initialWindExtent forecastWindRadiiGIS bestTrackGIS earliestArrivalTimeTSWindsGIS mostLikelyTimeTSWindsGIS windSpeedProbabilitiesGIS kmzFile34kt kmzFile50kt kmzFile64kt stormSurgeWatchWarningGIS potentialStormSurgeFloodingGIS/);
+
+    return baptise -recurse, $self, $pkg, @fields;
 }
 
 sub _get_validation_rules {
@@ -291,7 +291,7 @@ sub _get_file {
     die qq{'$urlKey' is not a valid type provided by '$resource'.\n} if not grep { /$resource/ } ( @{ $types->{$urlKey} } );
 
     # check to make sure $resource is not 'null'
-    return undef if ref $self->$resource ne q{HASH} or not $self->$resource->{$urlKey};
+    return undef if ref $self->$resource ne q{HASH} and not $self->$resource->{$urlKey};
 
     my $url = $self->$resource->{$urlKey};
 
@@ -314,7 +314,10 @@ sub _get_file {
 
     # bestTrackGIS resource doesn't provide "advNum" per specification
     # so it doesn't try to deref an method that may not exist
-    return ( $local_file, $self->$resource->{advNum} // q{N/A} );
+
+    # 'can($method)' is a limitation of what Util:H2O::h2o gives us, unfortunately
+    my $advNum = ($self->$resource->can('advNum')) ? $self->$resource->advNum // q{N/A} : q{N/A};
+    return ( $local_file, $advNum );
 }
 
 # auxillary methods to fetch the best track ".dat" file via NHC's FTP over HTTPS

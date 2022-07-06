@@ -89,12 +89,27 @@ BEGIN {
 
   sub select3 :Local {
     my ($self, $c) = @_;
-    my %clean = $c->structured_body(['person'], +{ 'roles' => [ 'id' ] }  )->to_hash;
+    my %clean = $c->structured_body(['person'], +{ 'roles' => [ 'id', '_nop' ] }  )->to_hash;
     my $dumped = Dumper(\%clean);
     $c->res->body($dumped);
   }
 
   sub select2 :Local {
+    my ($self, $c) = @_;
+    my %clean = $c->structured_body(['person'], +{ 'person_roles' => [ 'role' => ['id'] ] } )->to_hash;
+    my $dumped = Dumper(\%clean);
+    $c->res->body($dumped);
+  }
+
+  # 'person.role_ids[]' => 1,
+  # 'person.role_ids[]' => 2,
+  # 'person.role_ids[]' => 3,
+
+  # {
+  #   role_ids => [1,2,3],
+  # }
+  #     
+  sub array :Local {
     my ($self, $c) = @_;
     my %clean = $c->structured_body(['person'], +{ 'person_roles' => [ 'role' => ['id'] ] } )->to_hash;
     my $dumped = Dumper(\%clean);
@@ -394,6 +409,7 @@ SKIP: {
 
 {
   ok my $body_parameters = [
+    'person.roles[0]._nop' => '1',
     'person.roles[].id' => '',
     'person.roles[].id' => '1',
     'person.roles[].id' => '2',
@@ -404,6 +420,9 @@ SKIP: {
 
     is_deeply $data, +{
       roles => [
+        {
+          _nop => "1",
+        },
         {
           id => "",
         },

@@ -1,3 +1,8 @@
+0.126		2022-07-03	T. R. Wyant
+    Kelso drops OID 26102, adds 51842 to his visible objects lists,
+    which forms the basis for the canned magnitude table. The latter has
+    no magnitude yet.
+
 0.125		2022-06-14	T. R. Wyant
     Add canned magnitude of 26102 (MTI)
 

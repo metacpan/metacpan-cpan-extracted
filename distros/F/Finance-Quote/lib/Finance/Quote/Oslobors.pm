@@ -4,7 +4,7 @@ use strict;
 use JSON qw( decode_json );
 use HTTP::Request::Common;
 
-our $VERSION = '1.51'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 use vars qw( $OSLOBORS_COMPONENTS_URL );
 

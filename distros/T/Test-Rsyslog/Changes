@@ -1,5 +1,9 @@
 Revision history for Test-Rsyslog
 
+0.07   Sun Jul 03 20:15:00 2022
+        Removing empty directory in PATH for taint mode in RT#143631.
+        Moving to github
+
 0.06   Fri Mar 31 18:46:00 2017
         Lowering minimum perl version
  

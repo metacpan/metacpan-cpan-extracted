@@ -2,8 +2,8 @@ use 5.026;
 use warnings;
 
 package Dist::Zilla::PluginBundle::Author::AJNN::PruneAliases;
-# ABSTRACT: Prune macOS aliases
-$Dist::Zilla::PluginBundle::Author::AJNN::PruneAliases::VERSION = '0.02';
+# ABSTRACT: DEPRECATED (replaced by Dist::Zilla::Plugin::PruneAliases)
+$Dist::Zilla::PluginBundle::Author::AJNN::PruneAliases::VERSION = '0.03';
 
 use Dist::Zilla;
 use Moose;
@@ -47,23 +47,22 @@ __END__
 
 =head1 NAME
 
-Dist::Zilla::PluginBundle::Author::AJNN::PruneAliases - Prune macOS aliases
+Dist::Zilla::PluginBundle::Author::AJNN::PruneAliases - DEPRECATED (replaced by Dist::Zilla::Plugin::PruneAliases)
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 
 This plugin prunes all macOS alias files.
+It has been replaced by L<Dist::Zilla::Plugin::PruneAliases>.
 
 =head1 SEE ALSO
 
 L<Dist::Zilla::PluginBundle::Author::AJNN>
 
-L<Dist::Zilla::Plugin::PruneCruft>
-
-L<https://en.wikipedia.org/wiki/Alias_(Mac_OS)>
+L<Dist::Zilla::Plugin::PruneAliases>
 
 =head1 AUTHOR
 

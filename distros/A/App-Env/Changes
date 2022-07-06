@@ -1,5 +1,43 @@
 Revision history for App-Env
 
+0.36      2022-07-05 16:38:55-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * appexec:
+
+        * new option, --define, which specifies extra environment
+          variables to be addto to the application environment.
+
+        * new option, --delete, which specifies environment variables
+          to be deleted from the application environment.
+
+        * --dumpenv:
+
+            * new format, 'auto', which outputs the environment as
+              commands for the current shell
+
+            * now uses Shell::Config::Generate to generate commands
+              to set environment variables for shells
+
+            * new format, 'values', which outputs only environment
+              variable values
+
+            * new format, 'json', which outputs in JSON
+
+            * new format, 'delta-json', which outputs in JSON the
+              differences between the current and application
+              environments
+
+            * new format, 'delta-args', which outputs via appexec -D
+              and -X options the differences between the current and
+              application environments
+
+
+        * new option, --dumpvar, which specifies which environment
+          variables to dump
+
+
 0.35      2020-05-04 11:14:40-04:00 America/New_York
 
   [ENHANCMENT]

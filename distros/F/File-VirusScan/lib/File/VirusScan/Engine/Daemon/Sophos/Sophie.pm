@@ -41,9 +41,10 @@ sub scan
 {
 	my ($self, $path) = @_;
 
-	if(abs_path($path) ne $path) {
-		return File::VirusScan::Result->error("Path $path is not absolute");
-	}
+        my $abs = abs_path($path);
+        if ($abs && $abs ne $path) {
+                $path = $abs;
+        }
 
 	my $sock = eval { $self->_get_socket };
 	if($@) {
@@ -151,7 +152,7 @@ L<http://www.sophos.com>
 
 =head1 AUTHOR
 
-Dianne Skoll (dfs@roaringpenguin.com)
+Dianne Skoll (dianne@skoll.ca)
 
 Dave O'Neill (dmo@roaringpenguin.com)
 

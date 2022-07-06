@@ -517,6 +517,12 @@ sub display ($;%) {
             $self->throw("display - unknown style '$style'");
         }
 
+        # If the form is not filled at all we empty the errstr
+        #
+        if($newerr && (!$have_submit || !$have_cgivalues)) {
+            $newerr = '';
+        }
+
         # Generating HTML for some field styles.
         #
         my $param=$fdata->{'param'} || uc($name);
@@ -572,6 +578,7 @@ sub display ($;%) {
                 VALUE   => $fdata->{'value'} || '',
                 CHECKED => $value ? ' checked' : '',
                 HTMLID  => $fdata->{'htmlid'} || $name,
+                ERRSTR  => $newerr || ''
             );
         }
         elsif($style eq 'selection') {
@@ -588,6 +595,7 @@ sub display ($;%) {
                 VALUE   => defined($value) ? $value : '',
                 MAXLENGTH => $fdata->{'maxlength'} || 100,
                 SIZE    => $fdata->{'size'} || 30,
+                ERRSTR  => defined($newerr) ? $newerr : ''
             );
         }
         elsif($style eq 'textarea') {
@@ -597,6 +605,7 @@ sub display ($;%) {
                 VALUE   => defined($value) ? $value : '',
                 SIZE    => $fdata->{'size'} || 30,
                 ROWS    => $fdata->{'rows'} || 8,
+                ERRSTR  => defined($newerr) ? $newerr : ''
             );
         }
         elsif($style eq 'file') {
@@ -604,6 +613,7 @@ sub display ($;%) {
                 path    => '/bits/fillout-form/html-file',
                 NAME    => $name,
                 SIZE    => $fdata->{'size'} || 30,
+                ERRSTR  => defined($newerr) ? $newerr : ''
             );
         }
         elsif($style eq 'password') {
@@ -613,6 +623,7 @@ sub display ($;%) {
                 VALUE   => defined $value ? $value : '',
                 MAXLENGTH => $fdata->{'maxlength'} || 100,
                 SIZE    => $fdata->{'size'} || 30,
+                ERRSTR  => $newerr || ''
             );
         }
 
@@ -685,6 +696,7 @@ sub display ($;%) {
                 NAME    => $name,
                 VALUE   => defined $value ? $value : '',
                 OPTIONS => $html,
+                ERRSTR  => $newerr || ''
             );
         }
 

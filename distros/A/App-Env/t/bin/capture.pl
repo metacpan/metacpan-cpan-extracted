@@ -1,7 +1,7 @@
 
 if ( @ARGV ) {
 
-    exit(1) if $ARGV[0] eq 'exit';
+    exit( 1 ) if $ARGV[0] eq 'exit';
 
     print STDOUT "$_\n" foreach @ARGV;
 

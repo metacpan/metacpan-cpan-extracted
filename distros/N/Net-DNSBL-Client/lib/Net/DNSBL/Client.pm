@@ -7,7 +7,7 @@ use Carp;
 use Net::DNS::Resolver;
 use IO::Select;
 
-our $VERSION = '0.206';
+our $VERSION = '0.207';
 
 =head1 NAME
 
@@ -89,6 +89,20 @@ sub new
 	return $self;
 }
 
+sub _matches
+{
+	my ($self, $addr, $match) = @_;
+	my ($a1, $b1, $c1, $d1) = split(/\./, $addr);
+	my ($a2, $b2, $c2, $d2) = split(/\./, lc($match));
+
+	return (
+		($a2 eq 'x' || $a1 == $a2) &&
+		($b2 eq 'x' || $b1 == $b2) &&
+		($c2 eq 'x' || $c1 == $c2) &&
+		($d2 eq 'x' || $d1 == $d2)
+	    );
+}
+
 =head2 Instance Methods
 
 =over 4
@@ -146,6 +160,11 @@ required match or the bitwise-AND mask.  In the case of a I<mask> type,
 the data can be something like "0.0.0.4", or an integer like "8".  In the
 latter case, the integer I<n> must range from 1 to 255 and is equivalent
 to 0.0.0.I<n>.
+
+For I<match>-type lookups, one or more of the octets can be specified
+as "x" or "X".  For example, specifying a match against
+127.0.X.3 will match a return code whose first octet is 127, second is zero,
+third is anything, and fourth is 3.
 
 =item userdata
 
@@ -453,7 +472,7 @@ sub _process_reply
 				$this_rr_hit = 1;
 			} elsif ($dnsbl->{type} eq 'match') {
 				next unless $rr->type eq 'A';
-				next unless $rr->address eq $dnsbl->{data};
+				next unless $self->_matches($rr->address, $dnsbl->{data});
 				$this_rr_hit = 1;
 			} elsif ($dnsbl->{type} eq 'mask') {
 				next unless $rr->type eq 'A';
@@ -547,12 +566,13 @@ L<Net::DNS::Resolver>, L<IO::Select>
 
 =head1 AUTHOR
 
-Dianne Skoll <dfs@roaringpenguin.com>,
-Dave O'Neill <dmo@roaringpenguin.com>
+Dianne Skoll <dianne@skoll.ca>
+Dave O'Neill <dmo@dmo.ca>
 
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (c) 2010 Roaring Penguin Software
+Copyright (c) 2022 Dianne Skoll
 
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

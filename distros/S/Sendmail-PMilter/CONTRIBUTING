@@ -1,0 +1,17 @@
+This distribution is maintained only on CPAN.
+
+For contributions please use the issue tracking system at rt.cpan.org:
+
+https://rt.cpan.org/Dist/Display.html?Name=Sendmail-PMilter
+
+All the outstanding issues shown at
+
+https://rt.cpan.org/Dist/Display.html?Status=Resolved;Queue=Sendmail-PMilter
+
+should be fixed in this release, please test if you can.
+
+Please feel free to send email about this modules to the address
+below, but be aware that my mail filters are unforgiving.
+
+Ged Haywood.
+<pause.2022.07@fixmymail.uk>

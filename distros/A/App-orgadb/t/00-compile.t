@@ -6,10 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'App/orgadb.pm'
+    'App/orgadb.pm',
+    'App/orgadb/Common.pm',
+    'App/orgadb/Shell.pm',
+    'App/orgadb/Shell/Commands.pm'
 );
 
 my @scripts = (

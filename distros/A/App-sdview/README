@@ -11,9 +11,10 @@ SYNOPSIS
 DESCRIPTION
 
     This module implements a terminal-based program for viewing structured
-    documents. It currently understands POD and some simple Markdown
-    formatting, though future versions are expected to handle nroff (for
-    manpages) and other styles.
+    documents. It currently understands POD, some simple Markdown
+    formatting, and a basic understanding of nroff (for manpages). Future
+    versions may expand on these abilities, extending them or adding new
+    formats.
 
     To actually use it, you likely wanted wanted to see the bin/sdview
     script.

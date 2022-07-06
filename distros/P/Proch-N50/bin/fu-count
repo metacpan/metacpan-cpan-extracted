@@ -11,6 +11,8 @@ use File::Basename;
 use FASTX::Reader;
 use Data::Dumper;
 use JSON::PP;
+use Proch::Seqfu;
+my $VERSION = $Proch::Seqfu::VERSION // "<Dev>";
 
 die "ERROR: FASTX::Reader required version is >= 0.6 [$FASTX::Reader::VERSION found]\n"
  if ($FASTX::Reader::VERSION !~/^[1-9]\./ and $FASTX::Reader::VERSION < 0.6);
@@ -57,8 +59,8 @@ foreach my $input_file (@ARGV) {
   }
   $output{$abs_path}{name} = $print_name;
   $output{$abs_path}{order} = $counter;
-
-  if (! -e "$input_file") {
+  $input_file = "{{STDIN}}" if ($input_file eq '-');
+  if (! -e "$input_file" and $input_file ne '{{STDIN}}') {
 
     $output{$abs_path}{count} = $opt_invalid;
     $output{$abs_path}{print_count} = $opt_invalid;
@@ -148,12 +150,12 @@ sub init {
 
   if (! defined $ARGV[0]) {
     print STDERR<<END;
-    fqc - FASTA/FASTQ counter $FASTX::Reader::VERSION
+    fu-count - FASTA/FASTQ counter $FASTX::Reader::VERSION
     ---------------------------------------------------------------
     USAGE:
-    fqc [options] FILE1 FILE2 ... FILEn
+    fu-count [options] FILE1 FILE2 ... FILEn
 
-    fqc --help for full manual
+    fu-count --help for full manual
 
 END
   }
@@ -217,7 +219,7 @@ fu-count - A FASTA/FASTQ sequence counter
 
 =head1 VERSION
 
-version 1.4.10
+version 1.5.0
 
 =head1 SYNOPSIS
 

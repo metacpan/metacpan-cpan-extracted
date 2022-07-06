@@ -18,6 +18,8 @@ docs/_includes/navbar-content.html
 docs/_includes/navbar-content.ja.html
 docs/_includes/site-description.html
 docs/_layouts/base.html
+docs/_po/ja/development/index.po
+docs/_po/ja/development/release.po
 docs/_po/ja/index.po
 docs/_po/ja/install/index.po
 docs/_po/ja/news/index.po
@@ -139,9 +141,12 @@ docs/assets/stylesheets/font-awesome/_rotated-flipped.scss
 docs/assets/stylesheets/font-awesome/_stacked.scss
 docs/assets/stylesheets/font-awesome/_variables.scss
 docs/assets/stylesheets/syntax.css
+docs/development/index.md
 docs/development/release.md
 docs/index.md
 docs/install/index.md
+docs/ja/development/index.md
+docs/ja/development/release.md
 docs/ja/index.md
 docs/ja/install/index.md
 docs/ja/news/index.md

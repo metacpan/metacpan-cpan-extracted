@@ -2,8 +2,8 @@ NAME
     App::orgadb - An opinionated Org addressbook tool
 
 VERSION
-    This document describes version 0.002 of App::orgadb (from Perl
-    distribution App-orgadb), released on 2022-06-24.
+    This document describes version 0.004 of App::orgadb (from Perl
+    distribution App-orgadb), released on 2022-07-04.
 
 SYNOPSIS
 FUNCTIONS
@@ -12,13 +12,15 @@ FUNCTIONS
 
      select_addressbook_entries(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-    Select Org document elements using CSel (CSS-selector-like) syntax.
+    Select Org addressbook entries/fields/subfields.
 
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
 
     *   category => *str_or_re*
+
+        Find entry by string or regex search against the category title.
 
     *   color => *str* (default: "auto")
 
@@ -32,13 +34,35 @@ FUNCTIONS
 
         Find entry by string or regex search against its title.
 
-    *   field => *str_or_re*
+    *   fields => *array[str_or_re]*
 
-        Find field by string or regex search.
+        Find (sub)fields by string or regex search.
 
     *   files => *array[filename]*
 
         Path to addressbook files.
+
+    *   formatters => *array[str]*
+
+        Add one or more formatters to display field value.
+
+        Specify one or more formatters to apply to the field value before
+        displaying.
+
+        A formatter is name of "Data::Sah::Filter::perl::*" module, without
+        the prefix. For example: "Str::uc" will convert the field value to
+        uppercase. Another formatter, "Str::remove_comment" can remove
+        comment.
+
+        A formatter can have arguments, which is specified using this
+        format:
+
+         [FORMATTER_NAME, {ARG1NAME => ARG1VAL, ...}]
+
+        If formatter name begins with "[" character, it will be parsed as
+        JSON. Example:
+
+         ['Str::remove_comment', {'style':'cpp'}]
 
     *   hide_category => *true*
 
@@ -46,7 +70,24 @@ FUNCTIONS
 
     *   hide_entry => *true*
 
-        Do not entry headline.
+        Do not show entry headline.
+
+    *   hide_field_name => *true*
+
+        Do not show field names, just show field values.
+
+    *   num_entries => *uint*
+
+        Specify maximum number of entries to return (0 means unlimited).
+
+    *   num_fields => *uint*
+
+        Specify maximum number of fields (per entry) to return (0 means
+        unlimited).
+
+    *   reload_files_on_change => *bool* (default: 1)
+
+    *   shell => *true*
 
     Returns an enveloped result (an array).
 

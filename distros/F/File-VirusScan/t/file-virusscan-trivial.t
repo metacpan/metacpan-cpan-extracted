@@ -46,5 +46,5 @@ $fh->close;
 $result = $s->scan( $filename );
 isa_ok( $result, 'File::VirusScan::ResultSet');
 ok( $result->has_error(), 'Result is an error' );
-like( ($result->get_error)[0]->get_data, qr{^bogus scanner looking at /tmp/(?:[A-Za-z0-9]+)$}, 'Error string is what we expected');
+like( ($result->get_error)[0]->get_data, qr{^bogus scanner looking at /.*/(?:[A-Za-z0-9_]+)$}, 'Error string is what we expected');
 1;

@@ -1,0 +1,7 @@
+Revision history for Perl-Critic-Dancer2
+
+0.4000 2022-07-02T17:36:02-04:00 America/New_York
+ - First version.
+
+ [STATISTICS]
+ - code churn: 9 files changed, 299 insertions(+), 14 deletions(-)

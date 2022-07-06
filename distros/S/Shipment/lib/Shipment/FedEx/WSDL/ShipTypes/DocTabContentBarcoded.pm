@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::DocTabContentBarcoded;
-$Shipment::FedEx::WSDL::ShipTypes::DocTabContentBarcoded::VERSION = '3.08';
+$Shipment::FedEx::WSDL::ShipTypes::DocTabContentBarcoded::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,33 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Symbology_of : ATTR(:get<Symbology>);
-    my %Specification_of : ATTR(:get<Specification>);
+my %Symbology_of :ATTR(:get<Symbology>);
+my %Specification_of :ATTR(:get<Specification>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Symbology
-              Specification
+__PACKAGE__->_factory(
+    [ qw(        Symbology
+        Specification
 
-            )
-        ],
-        {   'Symbology'     => \%Symbology_of,
-            'Specification' => \%Specification_of,
-        },
-        {   'Symbology' =>
-              'Shipment::FedEx::WSDL::ShipTypes::BarcodeSymbologyType',
-            'Specification' =>
-              'Shipment::FedEx::WSDL::ShipTypes::DocTabZoneSpecification',
-        },
-        {
+    ) ],
+    {
+        'Symbology' => \%Symbology_of,
+        'Specification' => \%Specification_of,
+    },
+    {
+        'Symbology' => 'Shipment::FedEx::WSDL::ShipTypes::BarcodeSymbologyType',
+        'Specification' => 'Shipment::FedEx::WSDL::ShipTypes::DocTabZoneSpecification',
+    },
+    {
 
-            'Symbology'     => 'Symbology',
-            'Specification' => 'Specification',
-        }
-    );
+        'Symbology' => 'Symbology',
+        'Specification' => 'Specification',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -63,7 +67,7 @@ Shipment::FedEx::WSDL::ShipTypes::DocTabContentBarcoded
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

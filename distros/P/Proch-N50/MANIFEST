@@ -23,6 +23,8 @@ data/big.fa
 data/encodings/test-cr.fa.fa
 data/encodings/test-crlf.fa
 data/encodings/test-lf.fa
+data/list.txt
+data/list_lc.txt
 data/sim1.fa
 data/sim2.fa
 data/small_test.fa
@@ -52,6 +54,7 @@ t/10-FASTX-reader-seq.t
 t/10_FASTX-reader.t
 t/10_basic_test.t
 t/11_calculateN50.t
+t/11_seqfu.t
 t/12_new_stats.t
 t/12_stats.t
 t/13_json.t
@@ -61,6 +64,11 @@ t/30_Windows.t
 t/49-prebins.t
 t/50-bin.t
 t/50-other-bins.t
+t/51-grep.t
+t/52-cat.t
+t/53-count.t
+t/54-extract.t
+t/55-uniq.t
 t/release-00-pod.t
 t/release-01-pod-coverage.t
 t/release-03-minimum-standards.t

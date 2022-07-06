@@ -1,3 +1,15 @@
+0.005   2022-05-21  Released-By: PERLANCAR; Urgency: medium
+
+        [Deprecation]
+
+        - Rename random_item() to pick(), the old name is deprecated.
+
+        [Enhancements]
+
+        - Add option 'pos' to return positions instead of the items, like in
+          Array::Sample::*.
+
+
 0.004   2022-05-20  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

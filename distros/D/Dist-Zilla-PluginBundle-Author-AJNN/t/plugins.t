@@ -2,20 +2,20 @@
 
 use 5.026;
 use warnings;
+use lib 'lib';
 
 use Test::More;
 use Test::Exception;
 use Test::Warnings;
 use Test::DZil;
 
-plan tests => 3 + 3+6+4+3+1+3 + 1;
+plan tests => 3 + 3+6+5+3+1+3 + 1;
 
 
 my $tzil = Builder->from_config(
 	{ dist_root => "t/corpus" },
 	{ add_files => { 'source/dist.ini' => simple_ini( {},
-		[ '@Filter' => {
-			'-bundle' => '@Author::AJNN',
+		[ '@Author::AJNN' => {
 			'-remove' => 'CheckChangeLog',
 		}],
 	)}},
@@ -37,7 +37,7 @@ sub has_plugin {
 
 ok has_plugin('::GatherDir'), 'plugin GatherDir';
 ok has_plugin('::PruneCruft'), 'plugin PruneCruft';
-is !! has_plugin('Bundle::Author::AJNN::PruneAliases'), $^O eq 'darwin', 'plugin PruneAliases';
+ok has_plugin('::PruneAliases'), 'plugin PruneAliases';
 
 ok has_plugin('::CPANFile'), 'plugin CPANFile';
 ok has_plugin('::MetaJSON'), 'plugin MetaJSON';
@@ -47,6 +47,7 @@ ok has_plugin('::PkgVersion'), 'plugin PkgVersion';
 ok has_plugin('::GithubMeta'), 'plugin GithubMeta';
 
 ok has_plugin('::Git::Check'), 'plugin Git::Check';
+ok ! has_plugin('CheckChangeLog'), 'no plugin CheckChangeLog';
 ok has_plugin('::TestRelease'), 'plugin TestRelease';
 ok has_plugin('::ConfirmRelease'), 'plugin ConfirmRelease';
 ok has_plugin('::Git::Tag'), 'plugin Git::Tag';

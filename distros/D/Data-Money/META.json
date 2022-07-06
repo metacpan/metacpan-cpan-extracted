@@ -4,13 +4,13 @@
       "Corey Watson <gphat@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Data-Money",
    "no_index" : {
@@ -48,37 +48,41 @@
    "provides" : {
       "Data::Money" : {
          "file" : "lib/Data/Money.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Data::Money::BaseException" : {
          "file" : "lib/Data/Money/BaseException.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Data::Money::BaseException::ExcessivePrecision" : {
          "file" : "lib/Data/Money/BaseException/ExcessivePrecision.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Data::Money::BaseException::InvalidCurrencyCode" : {
          "file" : "lib/Data/Money/BaseException/InvalidCurrencyCode.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Data::Money::BaseException::InvalidCurrencyFormat" : {
          "file" : "lib/Data/Money/BaseException/InvalidCurrencyFormat.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Data::Money::BaseException::MismatchCurrencyType" : {
          "file" : "lib/Data/Money/BaseException/MismatchCurrencyType.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/manwar/Data-Money/issues"
+      },
+      "homepage" : "https://github.com/manwar/Data-Money",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/manwar/Data-Money.git",
          "web" : "https://github.com/manwar/Data-Money"
       }
    },
-   "version" : "0.19",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.20",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

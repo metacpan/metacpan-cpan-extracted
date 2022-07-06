@@ -45,17 +45,6 @@ sub expected_methods : Test(1)
 	can_ok( $self->under_test, qw( new scan ) );
 }
 
-sub scan_bogus_directory : Test(3)
-{
-	my ($self) = @_;
-	my $s = $self->engine;
-
-	my $result = $s->scan('t/');
-	isa_ok( $result, 'File::VirusScan::Result');
-	ok( $result->is_error(), 'Result is an error' );
-	is( $result->get_data(), 'Path t/ is not absolute', '... with expected text');
-}
-
 sub is_testable : Test(1)
 {
 	my ($self) = @_;

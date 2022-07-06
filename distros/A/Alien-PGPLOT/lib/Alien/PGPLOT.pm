@@ -5,7 +5,7 @@ package Alien::PGPLOT;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = 'v5.2.2.4';
 
 use base qw( Alien::Base );
 
@@ -33,7 +33,7 @@ Alien::PGPLOT - Build and Install the PGPLOT library
 
 =head1 VERSION
 
-version 0.01
+version v5.2.2.4
 
 =head1 SYNOPSIS
 

@@ -8,7 +8,7 @@ use utf8;
 
 use Object::Pad;
 
-package App::sdview::Output::Plain 0.06;
+package App::sdview::Output::Plain 0.07;
 class App::sdview::Output::Plain isa App::sdview::Output::Formatted :strict(params);
 
 use constant format => "plain";

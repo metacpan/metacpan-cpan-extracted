@@ -52,9 +52,10 @@ sub read_login_data {
 sub read_attributes {
     my ( $sf ) = @_;
     return [
-        { name => 'ib_dialect',                   },
-        { name => 'ib_role',                      },
-        { name => 'ib_charset', default => 'UTF8' },
+        { name => 'ib_dialect',                    },
+        { name => 'ib_role',                       },
+        { name => 'ib_charset',  default => 'UTF8' },
+        { name => 'LongReadLen', default => 80     },
     ];
 }
 
@@ -63,6 +64,8 @@ sub set_attributes {
     my ( $sf ) = @_;
     return [
         { name => 'ib_enable_utf8', default => 1, values => [ 0, 1 ] },
+        { name => 'LongTruncOk',    default => 0, values => [ 0, 1 ] },
+        { name => 'ChopBlanks',     default => 0, values => [ 0, 1 ] },
     ];
 }
 
@@ -93,9 +96,16 @@ sub get_db_handle {
             $dsn .= ";port=$port" if length $port;
         }
     }
+    my $dbh_attributes = $set_attributes;
+
     for my $key ( keys %$read_attributes ) {
-        #$show_sofar .= "\n" . $key . ': ' . $read_attributes->{$key};
-        $dsn .= ";$key=$read_attributes->{$key}";
+        if ( $key =~ /^(?:ib_dialect|ib_role|ib_charset)\z/ ) {
+            #$show_sofar .= "\n" . $key . ': ' . $read_attributes->{$key};
+            $dsn .= ";$key=$read_attributes->{$key}";
+        }
+        else {
+            $dbh_attributes->{$key} = $read_attributes->{$key};
+        }
     }
     my $user = $cred->get_login( 'user', $show_sofar, $settings );
     $show_sofar .= "\n" . 'User: ' . $user if defined $user;
@@ -105,8 +115,8 @@ sub get_db_handle {
         RaiseError => 1,
         AutoCommit => 1,
         ShowErrorStatement => 1,
-        %$set_attributes,
-    } ) or die DBI->errstr;
+        %$dbh_attributes,
+    } );
     return $dbh;
 }
 

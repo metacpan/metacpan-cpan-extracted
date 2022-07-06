@@ -4,7 +4,7 @@
       "Nobunaga <nobunaga@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -19,10 +19,17 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Config::INI::Reader" : "0",
+            "Test::More" : "0"
+         }
+      },
       "runtime" : {
          "requires" : {
             "App::Cmd::Setup" : "0",
             "Carp" : "0",
+            "Exporter" : "0",
             "Finance::Quote" : "0",
             "FindBin" : "0",
             "Term::ANSIColor" : "0",
@@ -30,8 +37,11 @@
             "Term::ProgressBar" : "2.00",
             "Web::NewsAPI" : "0",
             "constant" : "0",
+            "feature" : "0",
             "lib" : "0",
             "open" : "0",
+            "parent" : "0",
+            "perl" : "v5.36.0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -47,13 +57,13 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/iamllcoolray/grizzly.git",
-         "web" : "https://github.com/iamllcoolray/grizzly"
+         "url" : "https://github.com/iamllcoolray/grizzly-cli.git",
+         "web" : "https://github.com/iamllcoolray/grizzly-cli"
       }
    },
-   "version" : "0.104",
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "version" : "0.111",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
    "x_spdx_expression" : "MIT"
 }
 

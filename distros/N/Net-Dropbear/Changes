@@ -1,5 +1,9 @@
 Revision history for Net-Dropbear
 
+0.15  2022-07-01 00:46:49 EDT
+        * Make sure that Dropbear.xs is also friendly to the -fno-common
+          default (GH#5)
+
 0.14  2021-05-28 00:04:42 EDT
         * Move global variables out of headers into c files to fix allow it to
           be correctly compiled with new default -fno-common in GCC 10 (GH#5)

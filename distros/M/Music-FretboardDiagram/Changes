@@ -1,5 +1,18 @@
 Revision history for Music-FretboardDiagram
 
+0.1312 2022-07-05 16:08:11
+    - Wow. Fix diagramming logic in eg/modes yet again. :\
+
+0.1311 2022-07-05 14:58:36
+    - Arrgh! Fix args in the modes program!
+
+0.1310 2022-07-05 14:56:15
+    - Whoops. Fix the diagram rendering in the modes program.
+
+0.1309 2022-07-05 14:48:58
+    - Fix dot-fretboard bounds condition.
+    - Add the eg modes program to render each mode in 2-octaves.
+
 0.1308 2022-06-14 18:22:28
     - Don't draw dots before the fretboard please.
     - Add the eg/relatives program to show major/relative-minor.

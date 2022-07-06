@@ -7,5 +7,5 @@ use App::Env;
 
 my $app = App::Env->new( 'AppWhich' );
 
-ok ( $app->which( 'appwhich' ), 'found our app!' );
+ok( $app->which( 'appwhich' ), 'found our app!' );
 done_testing;

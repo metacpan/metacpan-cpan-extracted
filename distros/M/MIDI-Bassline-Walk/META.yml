@@ -6,9 +6,12 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  List::Util: '1.44'
   Moo: '2'
   Music::Chord::Note: '0.10'
+  Test::Exception: '0'
   Test::More: '0.88'
+  constant: '0'
   perl: '5.006'
   strict: '0'
   warnings: '0'
@@ -25,7 +28,8 @@ name: MIDI-Bassline-Walk
 requires:
   Carp: '0'
   Data::Dumper::Compact: '0'
-  List::Util: '0'
+  List::SomeUtils: '0'
+  List::Util: '1.44'
   Moo: '2'
   Music::Chord::Note: '0.10'
   Music::Note: '0'
@@ -39,7 +43,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-Bassline-Walk
   repository: https://github.com/ology/MIDI-Bassline-Walk.git
-version: '0.0312'
+version: '0.0502'
 x_Dist_Zilla:
   perl:
     version: '5.032001'
@@ -221,9 +225,18 @@ x_Dist_Zilla:
           spell_cmd: 'aspell list'
           stopwords:
             - DAW
+            - aeolian
             - bassline
             - basslines
+            - dorian
+            - ionian
+            - keycenter
+            - locrian
+            - lydian
+            - midinum
+            - mixolydian
             - pentatonic
+            - phrygian
           wordlist: Pod::Wordlist
       name: Test::PodSpelling
       version: '2.007005'

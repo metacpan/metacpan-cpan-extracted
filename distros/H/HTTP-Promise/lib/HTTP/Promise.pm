@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise.pm
-## Version v0.1.2
+## Version v0.1.3
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2022/06/30
+## Modified 2022/07/01
 ## All rights reserved.
 ## 
 ## 
@@ -56,7 +56,7 @@ BEGIN
     our $EXPECT_THRESHOLD = 1024000000;
     our $EXTENSION_VARY = 1;
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
-    our $VERSION = 'v0.1.2';
+    our $VERSION = 'v0.1.3';
 };
 
 use strict;
@@ -1694,7 +1694,7 @@ __END__
 
 =encoding utf-8
 
-=head2 NAME
+=head1 NAME
 
 HTTP::Promise - Asynchronous HTTP Request and Promise
 
@@ -1738,7 +1738,7 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
 
 =head1 VERSION
 
-    v0.1.2
+    v0.1.3
 
 =head1 DESCRIPTION
 

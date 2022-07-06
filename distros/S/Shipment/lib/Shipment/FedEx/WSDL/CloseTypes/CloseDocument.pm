@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::CloseTypes::CloseDocument;
-$Shipment::FedEx::WSDL::CloseTypes::CloseDocument::VERSION = '3.08';
+$Shipment::FedEx::WSDL::CloseTypes::CloseDocument::VERSION = '3.09';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/close/v2'}
+sub get_xmlns { 'http://fedex.com/ws/close/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,61 +20,62 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Type_of : ATTR(:get<Type>);
-    my %ShippingCycle_of : ATTR(:get<ShippingCycle>);
-    my %ShippingDocumentDisposition_of :
-      ATTR(:get<ShippingDocumentDisposition>);
-    my %AccessReference_of : ATTR(:get<AccessReference>);
-    my %Resolution_of : ATTR(:get<Resolution>);
-    my %CopiesToPrint_of : ATTR(:get<CopiesToPrint>);
-    my %Parts_of : ATTR(:get<Parts>);
+my %Type_of :ATTR(:get<Type>);
+my %ShippingCycle_of :ATTR(:get<ShippingCycle>);
+my %ShippingDocumentDisposition_of :ATTR(:get<ShippingDocumentDisposition>);
+my %AccessReference_of :ATTR(:get<AccessReference>);
+my %Resolution_of :ATTR(:get<Resolution>);
+my %CopiesToPrint_of :ATTR(:get<CopiesToPrint>);
+my %Parts_of :ATTR(:get<Parts>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Type
-              ShippingCycle
-              ShippingDocumentDisposition
-              AccessReference
-              Resolution
-              CopiesToPrint
-              Parts
+__PACKAGE__->_factory(
+    [ qw(        Type
+        ShippingCycle
+        ShippingDocumentDisposition
+        AccessReference
+        Resolution
+        CopiesToPrint
+        Parts
 
-            )
-        ],
-        {   'Type'                        => \%Type_of,
-            'ShippingCycle'               => \%ShippingCycle_of,
-            'ShippingDocumentDisposition' => \%ShippingDocumentDisposition_of,
-            'AccessReference'             => \%AccessReference_of,
-            'Resolution'                  => \%Resolution_of,
-            'CopiesToPrint'               => \%CopiesToPrint_of,
-            'Parts'                       => \%Parts_of,
-        },
-        {   'Type' => 'Shipment::FedEx::WSDL::CloseTypes::CloseDocumentType',
-            'ShippingCycle' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ShippingDocumentDisposition' =>
-              'Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentDispositionType',
-            'AccessReference' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Resolution'      =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-            'CopiesToPrint' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
-            'Parts' =>
-              'Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentPart',
-        },
-        {
+    ) ],
+    {
+        'Type' => \%Type_of,
+        'ShippingCycle' => \%ShippingCycle_of,
+        'ShippingDocumentDisposition' => \%ShippingDocumentDisposition_of,
+        'AccessReference' => \%AccessReference_of,
+        'Resolution' => \%Resolution_of,
+        'CopiesToPrint' => \%CopiesToPrint_of,
+        'Parts' => \%Parts_of,
+    },
+    {
+        'Type' => 'Shipment::FedEx::WSDL::CloseTypes::CloseDocumentType',
+        'ShippingCycle' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ShippingDocumentDisposition' => 'Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentDispositionType',
+        'AccessReference' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Resolution' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+        'CopiesToPrint' => 'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
+        'Parts' => 'Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentPart',
+    },
+    {
 
-            'Type'                        => 'Type',
-            'ShippingCycle'               => 'ShippingCycle',
-            'ShippingDocumentDisposition' => 'ShippingDocumentDisposition',
-            'AccessReference'             => 'AccessReference',
-            'Resolution'                  => 'Resolution',
-            'CopiesToPrint'               => 'CopiesToPrint',
-            'Parts'                       => 'Parts',
-        }
-    );
+        'Type' => 'Type',
+        'ShippingCycle' => 'ShippingCycle',
+        'ShippingDocumentDisposition' => 'ShippingDocumentDisposition',
+        'AccessReference' => 'AccessReference',
+        'Resolution' => 'Resolution',
+        'CopiesToPrint' => 'CopiesToPrint',
+        'Parts' => 'Parts',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -91,7 +92,7 @@ Shipment::FedEx::WSDL::CloseTypes::CloseDocument
 
 =head1 VERSION
 
-version 3.08
+version 3.09
 
 =head1 DESCRIPTION
 

@@ -3,6 +3,22 @@ Upstream-Name: Role-Hooks
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Role-Hooks
 
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+ t/07mite.t
+ t/30inflate.t
+ t/99nonrole.t
+ t/mite/lib/Local/Class1.pm
+ t/mite/lib/Local/Class1.pm.mite.pm
+ t/mite/lib/Local/Role1.pm
+ t/mite/lib/Local/Role1.pm.mite.pm
+ t/mite/lib/Local/Role2.pm
+ t/mite/lib/Local/Role2.pm.mite.pm
+Copyright: Copyright 2022 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: Makefile.PL
  dist.ini
  t/02roletiny.t
@@ -15,24 +31,17 @@ Files: Makefile.PL
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: Changes
- META.json
- META.yml
- doap.ttl
- t/30inflate.t
-Copyright: Copyright 2022 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
+Files: INSTALL
+ LICENSE
+ t/mite/.mite/config
+Copyright: Unknown
+License: Unknown
 
 Files: COPYRIGHT
  CREDITS
  SIGNATURE
 Copyright: None
 License: public-domain
-
-Files: INSTALL
- LICENSE
-Copyright: Unknown
-License: Unknown
 
 Files: README
  lib/Role/Hooks.pm
@@ -43,12 +52,17 @@ Files: t/20packagevariant.t
 Copyright: This software is copyright (c) 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/rt-133595.t
-Copyright: This software is copyright (c) 2020 by Gianni Ceccarelli.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: t/01basic.t
 Copyright: This software is copyright (c) 2020 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/mite/lib/Local/Mite.pm
+Copyright: This software is copyright (c) 2011-2014 by Michael G Schwern.
+ This software is copyright (c) 2022 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/rt-133595.t
+Copyright: This software is copyright (c) 2020 by Gianni Ceccarelli.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

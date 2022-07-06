@@ -1,6 +1,7 @@
 use Test::More tests => 5;
 use App::Cmd::Tester;
 
+use v5.36;
 use Grizzly;
 
 my $result = test_app( Grizzly => [qw(quote ibm)] );

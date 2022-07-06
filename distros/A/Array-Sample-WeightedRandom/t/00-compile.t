@@ -6,10 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Array/Sample/WeightedRandom.pm'
+    'Array/Sample/WeightedRandom.pm',
+    'Array/Sample/WeightedRandom/Scan.pm'
 );
 
 

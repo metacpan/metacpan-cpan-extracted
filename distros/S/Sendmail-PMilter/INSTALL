@@ -1,0 +1,61 @@
+Read the file README.
+
+Recommended installation method:
+================================
+
+The canonical installation method is to unpack the tarball into some
+convenient directory in an ordinary user's home directory tree, build
+the Makefile using 'perl Makefile.PL', then run 'make' three times as
+shown in the following example:
+
+$  cd ~/sources
+$  tar xzvf sendmail-pmilter-1.21.tgz
+$  cd sendmail-pmilter-1.21
+$  perl Makefile.PL
+$  make
+$  make test
+$  su
+#  make install
+#  exit
+$
+
+On any Unix-like operating system you will of course probably need to
+have root permissions for the 'make install' step, hence the 'su' step
+(followed by giving root's password) before the 'make install' step.
+
+Some systems are set up to use 'sudo', and instead of 'su' to the root
+user followed by giving the 'make install' command as root you may for
+example be able to do a single step such as
+
+$ sudo make install
+
+Your prompts may or may not look like the prompts shown above, and the
+output of the commands shown above is NOT shown - there will probably
+be quite a lot of output in a successful installation, consider use of
+the 'script' utility for example if you want to capture it.
+
+Alternative installation method:
+================================
+
+If (a) you know what you're doing and (b) you have no need to run the
+tests automatically and install the examples, it is sufficient instead
+of the canonical installation method simply to copy the two modules
+
+PMilter.pm
+PMilter/Context.pm
+
+into a directory such as
+
+/usr/local/lib/site-perl/Sendmail/
+
+which you have ensured that Perl can find on the system when needed.
+
+After copying the files you should have them stored as
+
+/usr/local/lib/site-perl/Sendmail/PMilter.pm
+
+and
+
+/usr/local/lib/site-perl/Sendmail/PMilter/Context.pm
+
+Take great care with the file permissions if you do this.

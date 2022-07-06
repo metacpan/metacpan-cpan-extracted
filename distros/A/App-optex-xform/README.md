@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/kaz-utashiro/optex-xform.svg?branch=master)](https://travis-ci.com/kaz-utashiro/optex-xform)
+[![Actions Status](https://github.com/kaz-utashiro/optex-xform/workflows/test/badge.svg)](https://github.com/kaz-utashiro/optex-xform/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-optex-xform.svg)](https://metacpan.org/release/App-optex-xform)
 # NAME
 
 xform - data transform filter module for optex

@@ -16,7 +16,7 @@ use Types::Standard qw/ ArrayRef is_ArrayRef Bool HashRef Str /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.1.3';
+our $VERSION = 'v0.1.4';
 
 
 has _base_policy => (
@@ -164,7 +164,7 @@ HTTP::CSPHeader - manage dynamic content security policy headers
 
 =head1 VERSION
 
-version v0.1.3
+version v0.1.4
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,13 @@
+0.010   2022-07-04  Released-By: PERLANCAR; Urgency: medium
+
+        - Add perl filter: remove_nondigit.
+
+
+0.009   2022-07-04  Released-By: PERLANCAR; Urgency: medium
+
+        - Add perl filters: Str::remove_comment, Str::wrap, Str::oneline.
+
+
 0.008   2020-06-04  Released-By: PERLANCAR; Urgency: medium
 
 	- Add filters: Float::check_int, Float::check_has_fraction (currently
