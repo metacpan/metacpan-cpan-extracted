@@ -10,9 +10,9 @@ my $obj = Tags::Output::Structure->new;
 $obj->put(
 	['r', '<?xml version="1.1"?>'."\n"],
 );
-my $ret = $obj->flush;
+my $ret_ar = $obj->flush;
 is_deeply(
-	$ret,
+	$ret_ar,
 	[
 		['r', '<?xml version="1.1"?>'."\n"],
 	],

@@ -5,7 +5,7 @@ use warnings;
 package Acme::Marvel::CinematicUniverse::Characters;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002';
+our $VERSION   = '0.003';
 
 use Module::Pluggable (
 	search_path => [ 'Acme::Marvel::CinematicUniverse::Character::Instance' ],
@@ -27,15 +27,17 @@ sub characters {
 
 sub find {
 	my ( $class, $search ) = ( shift, @_ );
-	my $re = ref($search)
+	my $re =
+		ref( $search )
 		? $search
 		: do { my $q = quotemeta( $search ); qr/$q/i };
 	my @found = grep /$re/, @characters;
 	wantarray ? @found : $found[0];
 }
 
-$_->init( __PACKAGE__ )
-	for __PACKAGE__->instance_modules;
+unless ( $ENV{MITE_COMPILE} ) {
+	$_->init( __PACKAGE__ ) for __PACKAGE__->instance_modules;
+}
 
 1;
 
@@ -124,4 +126,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

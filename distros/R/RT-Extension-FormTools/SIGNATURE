@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.87.
+signed via the Module::Signature module, version 0.88.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,13 +12,13 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: RIPEMD160
+Hash: SHA256
 
-SHA256 2082727e86da376fb6dd7e823ed60d51a2da0d050d384540e7dac41d6b13cc98 Changes
+SHA256 fc4fc9b0df777840ef874d52db711f12ec6fe16c8f394ab18f094478d2598f60 Changes
 SHA256 2a35f584a37498ad718250a07dc0546c4b565bb1eadeeef7a2c2f83dbc17cac6 MANIFEST
-SHA256 4ee07ae7e40a837ed2f054a346307d307b2aaf53c38f629624c5adcd9579bb05 META.yml
-SHA256 4bb357dc545f638a892e828cf0b067ee7f5e7ad54aaf2c79b2c5c789eada7a8b Makefile.PL
-SHA256 77cb006f5b19b6c6e05a1209c71e88d04605b3c353f62c80e9ceb5c7dcfcdbc5 README
+SHA256 5a1a0b77459c717441425fa05093f6a22b64549c806996cc0a1f45c2d7a654b0 META.yml
+SHA256 48a6313f40f39c76964606182cb16ff8879e73f26ef573c08197dec0159a8f2a Makefile.PL
+SHA256 a0688b42d364b39d36b9d7ec9e58c9e075dc0fd1104ffdc9b5002faddef72107 README
 SHA256 ddb7479d7d363b25db78624e061fcaa4b88f2d7630e576544fa021a91777cb22 ex/RT-Example-FormTools/Makefile.PL
 SHA256 c55b58eaa473b81cfd6753cc19ae723576d0bb3b3227db5fa6e6bd81678d6a07 ex/RT-Example-FormTools/etc/initialdata
 SHA256 3a865f69e73e17b56778fb208a691c7d825188e1f691ebc383e5e5b48da49712 ex/RT-Example-FormTools/html/Example/autohandler
@@ -26,12 +26,12 @@ SHA256 6ad40bd76cf63392865645af6dd003f6444a361280c7fcee222b5acc55176dda ex/RT-Ex
 SHA256 25274e08178a93a44dddbf7ea3e4a3834dd7da24d760817b7c7e92313f45cf47 ex/RT-Example-FormTools/html/Example/index.html
 SHA256 0a33ae5165b1f6be1e3d0f79d1d25a967159fec5cfd285c10bde339172b7ed5a ex/RT-Example-FormTools/html/Example/submit
 SHA256 6293bee4d5920f8fffbf8b6033d09bffff8b3a324c31caba8a1184c6db9a8116 ex/RT-Example-FormTools/html/Example/user_info
-SHA256 5f0cca403473718a176b9c0e652b15642456f8caf6906c6fd29940aa4508598a ex/RT-Example-FormTools/lib/RT/Example/FormTools.pm
+SHA256 11a20e737bb90eeba614f494633af87e625fd1ff40c1c2fa838dfd0e6bf0fbbe ex/RT-Example-FormTools/lib/RT/Example/FormTools.pm
 SHA256 0d9ef06684bdaab6b99a759d8b8e55ba5658cf3578bc66abc21755d67a6ed50b html/Callbacks/FormTools/Elements/Header/Head
-SHA256 18d0c3c37a1c6abfdf529d526ff574502ce13e36140348e03ac9260649bcf993 html/FormTools/Field
+SHA256 6fb89cdb0225e5d076d20ad33755456a9a6de0971ad0ea17f916b16e5a7f930f html/FormTools/Field
 SHA256 3794b42e27760968c3e1705dd45404747e81fec99909c63659493a3adc25cb90 html/FormTools/Form
-SHA256 3f9c86261f4084f2d64d6cfe4d74aec5e617daa993cc5b8849269f386d5e0e04 html/FormTools/Next
-SHA256 038c3f82920b6639cb22e68b98b4cb8a12b19efcb430988be14c9c7f47abf2e5 html/FormTools/ShowChoices
+SHA256 ede5a704d32f4d51853bb9e5188db3434d9bf2cbf7ca4008a09ef4de5ca95620 html/FormTools/Next
+SHA256 2775dcd08f62b91006fc73388180255637585d6aae290bfdfb54a3a398f4adcc html/FormTools/ShowChoices
 SHA256 1d1f1620e577f1b12492885dc4c1c0381070023b48e9f5db03c296ea2ef38f79 html/NoAuth/js/form_tools.js
 SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
 SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
@@ -46,14 +46,15 @@ SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Modu
 SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
 SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
 SHA256 3164c32202bf4604ab1f90b926a81e15493b191e0bc2f90ae42d8358f18259d6 inc/YAML/Tiny.pm
-SHA256 fce82b9bba4ac552db543e4127516846270ab2819e29e3d454b5c71a5a17d27f lib/RT/Extension/FormTools.pm
+SHA256 6da5beb02819e38eca1aede99a345b2c5c9037769dd2e3a3b4df5d02f747182f lib/RT/Extension/FormTools.pm
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAwAGBQJicYFTAAoJEA3wooP+rICyJ/kH/iWpeDtAu7zMkEpNDu6iyJYa
-Th2oU52VNbp9OcjliqUzyrkTzzYixfbSxD+F02bEXOflraWsldL1B+8PKrQav2q9
-tRXZ2HGmhgtxbFM/NNaVEvjHXe/ym1Kjfz5A5sRt8jEq3aVtvAnfHoEJq8lbMrwJ
-HT6gBzE19v9ik+34XWP1Dij7AsgXnLRJu2WHNMSXcH6iouLY1/oJiihNIUNBq+gL
-KHbEstUdtwGBNaOEHpoBNnhTOrpZYIQKFXYP6Lxfa22rTpC46jlFfj4M4YU7bOHW
-RcgHfjLpJ7dr5uxnhGlPw1M6tFjvlaChSFgRrx9Fpr4caghTP7/lemb7yFEvs3k=
-=8sCu
+iQEzBAEBCAAdFiEExJs3Lyv4ShkBFmAnDfCig/6sgLIFAmLF7BAACgkQDfCig/6s
+gLLPwwf/bFad/BC+WQP1Ngz79zSvy/8KvOYyut6IENyCgVmyKH23TwQYZPpn7ABd
+zYvE+wi0dxiRLU08b+wru8O6M7nnIaB4xZMowmd0Py1OfNUElUWPvd5vW4A7usVX
+vHX6RTXWwPdoyKEe9jYsxsei5sEHravQrBny2dYE2h+FErWM2PybRRtVgyY94XGl
+VaIEsLSFlOSEmItnIbtZxEAcE7ulb3XCZQ8ACYvaPLtOK4zQ+ypAqz+TVdq1NGPM
+LqsxvbqaZT0U/aLZ4yEsXizfpHt3mOPOW1ky6Dx8OozFHyWXvb9mYujM61kHHJ5V
+G/FQzxfmyDHSE1CucGuAvyZwd+RGDw==
+=ZMKw
 -----END PGP SIGNATURE-----

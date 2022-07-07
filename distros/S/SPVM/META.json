@@ -32,7 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "ExtUtils::CBuilder" : "0.2602"
+            "ExtUtils::CBuilder" : "0.2602",
+            "Time::Piece" : "1.12"
          }
       },
       "test" : {
@@ -49,6 +50,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM"
       }
    },
-   "version" : "0.9618",
+   "version" : "0.9619",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

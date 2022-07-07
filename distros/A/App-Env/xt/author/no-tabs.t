@@ -40,6 +40,7 @@ my @files = (
     't/lib/App/Env/Site2/App1.pm',
     't/null.t',
     't/regressions/capture_tiny.t',
+    't/regressions/disappearing_site.t',
     't/retrieve.t',
     't/setenv.t',
     't/site1.t',

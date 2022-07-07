@@ -86,7 +86,7 @@ t/81async-method+dynamically.t
 t/82devel-mat-dumper-helper.t
 t/90leak.t
 t/91rt141483.t
-t/92legacy-class-keywords.t
+t/92legacy.t
 t/95utf8.t
 t/99pod.t
 t/lib/91rt141483Role.pm

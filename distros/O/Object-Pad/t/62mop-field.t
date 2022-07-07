@@ -78,12 +78,12 @@ is_deeply( [ $classmeta->fields ], [ $fieldmeta ],
 # RT136869
 {
    class A {
-      has @arr;
+      field @arr;
       BUILD { @arr = (1,2,3) }
       method m { @arr }
    }
    role R {
-      has $data :param;
+      field $data :param;
    }
    class B :isa(A) :does(R) {}
 
@@ -94,7 +94,7 @@ is_deeply( [ $classmeta->fields ], [ $fieldmeta ],
 # Forbid writing to non-scalar fields via ->value
 {
    class List {
-      has @values :reader;
+      field @values :reader;
    }
 
    my $list = List->new;

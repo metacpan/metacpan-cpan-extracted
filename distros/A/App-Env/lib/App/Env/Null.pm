@@ -5,7 +5,7 @@ package App::Env::Null;
 use strict;
 use warnings;
 
-our $VERSION = '0.36';
+our $VERSION = '1.01';
 
 
 
@@ -43,7 +43,7 @@ App::Env::Null - return a snapshot of the current environment
 
 =head1 VERSION
 
-version 0.36
+version 1.01
 
 =head1 SYNOPSIS
 

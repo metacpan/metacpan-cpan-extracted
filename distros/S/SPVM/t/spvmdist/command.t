@@ -11,6 +11,7 @@ use File::Spec;
 use SPVM::Builder::Util;
 use File::Temp();
 use Cwd 'getcwd';
+use Time::Piece();
 
 use SPVM::Builder;
 
@@ -37,6 +38,11 @@ my $include_blib = "-I$blib_arch -I$blib_lib";
   ok(-f $perl_module_file);
   ok(SPVM::Builder::Util::file_contains($perl_module_file, "package SPVM::Foo;"));
   ok(SPVM::Builder::Util::file_contains($perl_module_file, q(our $VERSION = '0.01')));
+  my $today_tp = Time::Piece::localtime;
+  my $year = $today_tp->year;
+  ok(SPVM::Builder::Util::file_contains($perl_module_file, $year));
+  ok(SPVM::Builder::Util::file_contains($perl_module_file, '[--user-name]'));
+  ok(SPVM::Builder::Util::file_contains($perl_module_file, '[--user-email]'));
   
   my $spvm_module_file = "$tmp_dir/SPVM-Foo/lib/SPVM/Foo.spvm";
   ok(-f $spvm_module_file);
@@ -54,6 +60,8 @@ my $include_blib = "-I$blib_arch -I$blib_lib";
   my $changes_file = "$tmp_dir/SPVM-Foo/Changes";
   ok(-f $changes_file);
   ok(SPVM::Builder::Util::file_contains($changes_file, "0.01 "));
+  my $today = $today_tp->strftime('%Y-%m-%d');
+  ok(SPVM::Builder::Util::file_contains($changes_file, $today));
   
   my $gitignore_file = "$tmp_dir/SPVM-Foo/.gitignore";
   ok(-f $gitignore_file);
@@ -131,13 +139,13 @@ my $include_blib = "-I$blib_arch -I$blib_lib";
   chdir($save_cur_dir) or die;
 }
 
-# Foo::Bar::Baz
+# Foo::Bar::Baz, --user-name, --user-email
 {
   my $spvmdist_path = File::Spec->rel2abs('blib/script/spvmdist');
   my $blib = File::Spec->rel2abs('blib/lib');
   
   my $tmp_dir = File::Temp->newdir;
-  my $spvmdist_cmd = qq($^X $include_blib $spvmdist_path Foo::Bar::Baz);
+  my $spvmdist_cmd = qq($^X $include_blib $spvmdist_path --user-name Yuki --user-email yuki.com Foo::Bar::Baz);
   my $save_cur_dir = getcwd();
   chdir($tmp_dir) or die;
   system($spvmdist_cmd) == 0
@@ -146,6 +154,9 @@ my $include_blib = "-I$blib_arch -I$blib_lib";
   my $perl_module_file = "$tmp_dir/SPVM-Foo-Bar-Baz/lib/SPVM/Foo/Bar/Baz.pm";
   ok(-f $perl_module_file);
   ok(SPVM::Builder::Util::file_contains($perl_module_file, "package SPVM::Foo::Bar::Baz;"));
+  ok(SPVM::Builder::Util::file_contains($perl_module_file, "Yuki C<"));
+  ok(SPVM::Builder::Util::file_contains($perl_module_file, "Yuki,"));
+  ok(SPVM::Builder::Util::file_contains($perl_module_file, 'yuki.com'));
   
   my $spvm_module_file = "$tmp_dir/SPVM-Foo-Bar-Baz/lib/SPVM//Foo/Bar/Baz.spvm";
   ok(-f $spvm_module_file);

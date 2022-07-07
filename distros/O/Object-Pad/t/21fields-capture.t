@@ -8,7 +8,7 @@ use Test::More;
 use Object::Pad;
 
 class Counter {
-   has $count;
+   field $count;
 
    method inc { $count++ };
    method make_incrsub {
@@ -31,7 +31,7 @@ class Counter {
 # RT132249
 {
    class Widget {
-      has $_menu;
+      field $_menu;
       method popup_menu {
          my $on_activate = sub { undef $_menu };
       }

@@ -27,7 +27,7 @@ EOPERL
 }
 
 {
-   role BRole { requires bmeth; }
+   role BRole { method bmeth; }
 
    ok( !eval <<'EOPERL',
       class BClass does BRole { }
@@ -39,7 +39,7 @@ EOPERL
 
 {
    ok( !eval <<'EOPERL',
-      role CRole :compat(invokable) { has $field; }
+      role CRole :compat(invokable) { field $field; }
 EOPERL
       'invokable role with field fails' );
    like( $@, qr/^Cannot add field data to an invokable role /,

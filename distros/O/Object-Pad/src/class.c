@@ -398,33 +398,16 @@ void ObjectPad_mop_class_add_BUILD(pTHX_ ClassMeta *meta, CV *cv)
 void ObjectPad_mop_class_add_ADJUST(pTHX_ ClassMeta *meta, CV *cv)
 {
   if(meta->sealed)
-    croak("Cannot add an ADJUST block to an already-sealed class");
+    croak("Cannot add an ADJUST(PARAMS) block to an already-sealed class");
   if(!meta->adjustblocks)
     meta->adjustblocks = newAV();
 
   AdjustBlock *block;
   Newx(block, 1, struct AdjustBlock);
 
-  block->is_adjustparams = false;
   block->cv = cv;
 
-  av_push(meta->adjustblocks, (SV *)block);
-}
-
-void ObjectPad_mop_class_add_ADJUSTPARAMS(pTHX_ ClassMeta *meta, CV *cv)
-{
-  if(meta->sealed)
-    croak("Cannot add an ADJUSTPARAMS block to an already-sealed class");
-  if(!meta->adjustblocks)
-    meta->adjustblocks = newAV();
-
-  AdjustBlock *block;
-  Newx(block, 1, struct AdjustBlock);
-
-  block->is_adjustparams = true;
-  block->cv = cv;
-
-  meta->has_adjustparams = true;
+  meta->has_adjust = true;
 
   av_push(meta->adjustblocks, (SV *)block);
 }
@@ -514,14 +497,11 @@ static RoleEmbedding *S_embed_role(pTHX_ ClassMeta *classmeta, ClassMeta *roleme
 
     CV *embedded_cv = embed_cv(block->cv, embedding);
 
-    if(block->is_adjustparams)
-      mop_class_add_ADJUSTPARAMS(classmeta, embedded_cv);
-    else
-      mop_class_add_ADJUST(classmeta, embedded_cv);
+    mop_class_add_ADJUST(classmeta, embedded_cv);
   }
 
-  if(rolemeta->has_adjustparams)
-    classmeta->has_adjustparams = true;
+  if(rolemeta->has_adjust)
+    classmeta->has_adjust = true;
 
   U32 nmethods = av_count(rolemeta->direct_methods);
   for(i = 0; i < nmethods; i++) {
@@ -1290,7 +1270,7 @@ XS_INTERNAL(injected_constructor)
   }
 
   HV *paramhv = NULL;
-  if(meta->parammap || meta->has_adjustparams || meta->strict_params) {
+  if(meta->parammap || meta->has_adjust || meta->strict_params) {
     paramhv = newHV();
     SAVEFREESV((SV *)paramhv);
 
@@ -1380,7 +1360,7 @@ XS_INTERNAL(injected_constructor)
 
       PUSHMARK(SP);
       PUSHs(self);
-      if(paramhv && block->is_adjustparams)
+      if(paramhv)
         mPUSHs(newRV_inc((SV *)paramhv));
       PUTBACK;
 
@@ -1517,7 +1497,7 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name)
   meta->sealed = false;
   meta->role_is_invokable = false;
   meta->strict_params = false;
-  meta->has_adjustparams = false;
+  meta->has_adjust = false;
   meta->has_superclass = false;
   meta->start_fieldix = 0;
   meta->next_fieldix = -1;
@@ -1709,8 +1689,8 @@ void ObjectPad_mop_class_set_superclass(pTHX_ ClassMeta *meta, SV *superclassnam
       }
     }
 
-    if(supermeta->has_adjustparams)
-      meta->has_adjustparams = true;
+    if(supermeta->has_adjust)
+      meta->has_adjust = true;
 
     U32 nroles;
     RoleEmbedding **embeddings = mop_class_get_all_roles(supermeta, &nroles);
@@ -1949,16 +1929,4 @@ void ObjectPad__boot_classes(pTHX)
 #ifdef HAVE_DMD_HELPER
   DMD_ADD_ROOT((SV *)&vtbl_backingav, "the Object::Pad backing AV VTBL");
 #endif
-}
-
-
-/* back-compat */
-SV *ObjectPad_get_obj_slotsav(pTHX_ SV *self, enum ReprType repr, bool create)
-{
-  return ObjectPad_get_obj_backingav(aTHX_ self, repr, create);
-}
-
-FieldMeta *ObjectPad_mop_class_add_slot(pTHX_ ClassMeta *meta, SV *fieldname)
-{
-  return ObjectPad_mop_class_add_field(aTHX_ meta, fieldname);
 }

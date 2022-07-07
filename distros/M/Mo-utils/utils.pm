@@ -11,7 +11,7 @@ use Scalar::Util qw(blessed);
 Readonly::Array our @EXPORT_OK => qw(check_array check_array_object check_bool
 	check_isa check_length check_number check_number_of_items check_required);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 sub check_array {
 	my ($self, $key) = @_;
@@ -114,6 +114,10 @@ sub check_number {
 	my ($self, $key) = @_;
 
 	if (! exists $self->{$key}) {
+		return;
+	}
+
+	if (! defined $self->{$key}) {
 		return;
 	}
 
@@ -661,6 +665,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

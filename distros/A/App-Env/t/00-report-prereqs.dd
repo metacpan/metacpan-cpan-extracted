@@ -93,6 +93,7 @@ do { my $x = {
                                       'Shell::GetEnv' => '0',
                                       'Shell::Guess' => '0',
                                       'Storable' => '0',
+                                      'constant' => '0',
                                       'overload' => '0',
                                       'perl' => 'v5.10.0',
                                       'strict' => '0',

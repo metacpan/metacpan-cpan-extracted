@@ -18,7 +18,7 @@ use Object::Pad;
 {
    class Example {
        # Needs at least one field member to trigger failures
-       has $thing;
+       field $thing;
        # ... and we need to refer to it in a method as well
        BUILD { $thing }
    }
@@ -28,8 +28,8 @@ use Object::Pad;
 
 {
    class WithContainerFields {
-      has @array;
-      has %hash;
+      field @array;
+      field %hash;
 
       BUILD {
          @array = ();

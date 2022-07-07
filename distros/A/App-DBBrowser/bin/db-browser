@@ -3,34 +3,28 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.300';
+our $VERSION = '2.301';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
 use App::DBBrowser;
 
-binmode STDIN,  ':encoding(utf-8)';
-binmode STDOUT, ':encoding(utf-8)';
-binmode STDERR, ':encoding(utf-8)';
+use Encode::Locale;
 
-my $old_out_codepage;
+binmode STDIN,  ':encoding(console_in)';
+binmode STDOUT, ':encoding(console_out)';
+binmode STDERR, ':encoding(console_out)';
 
 BEGIN {
     print hide_cursor();
     $ENV{TC_RESET_AUTO_UP} = 0;
     if ( $^O eq "MSWin32" ) {
-        require Win32::Console;
         require Win32::Console::ANSI;
-        $old_out_codepage = Win32::Console::OutputCP();
-        Win32::Console::OutputCP( 65001 );
         print "\e(U";
     }
 }
 
 END {
-    if ( $^O eq "MSWin32" && $old_out_codepage ) {
-        Win32::Console::OutputCP( $old_out_codepage );
-    }
     delete $ENV{TC_RESET_AUTO_UP};
     print clear_to_end_of_screen();
     print show_cursor();
@@ -53,7 +47,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.300
+Version 2.301
 
 =head1 SYNOPSIS
 

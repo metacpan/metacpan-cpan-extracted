@@ -1,3 +1,12 @@
+0.08 2022-07-06T23:32:50+02:00
+ - Add blank link after arguments and before return in methods.
+ - Add test for flush().
+
+0.07 2022-07-06T23:02:59+02:00
+ - Add Error::Pure::Utils::clean() to tests for cleanup of errors stack.
+ - Rewrite $ret variable to $ret_ar to better understanding of what it is.
+ - Update copyright years.
+
 0.06 2021-02-03T23:10:07+01:00
  - Fix bugtracker.
  - Rewrite doc to use =head2 in METHODS section.

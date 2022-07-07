@@ -35,13 +35,13 @@ no_index:
 provides:
   App::Env:
     file: lib/App/Env.pm
-    version: '0.36'
+    version: '1.01'
   App::Env::Example:
     file: lib/App/Env/Example.pm
-    version: '0.36'
+    version: '1.01'
   App::Env::Null:
     file: lib/App/Env/Null.pm
-    version: '0.36'
+    version: '1.01'
 requires:
   Capture::Tiny: '0'
   Carp: '0'
@@ -60,6 +60,7 @@ requires:
   Shell::GetEnv: '0'
   Shell::Guess: '0'
   Storable: '0'
+  constant: '0'
   overload: '0'
   perl: v5.10.0
   strict: '0'
@@ -67,7 +68,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Env
   repository: https://gitlab.com/djerius/App-Env.git
-version: '0.36'
+version: '1.01'
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: GPL-3.0-only

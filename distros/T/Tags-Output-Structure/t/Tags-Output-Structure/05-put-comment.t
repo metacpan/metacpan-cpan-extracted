@@ -11,9 +11,9 @@ $obj->put(
 	['c', 'comment'],
 	['c', ' comment '],
 );
-my $ret = $obj->flush;
+my $ret_ar = $obj->flush;
 is_deeply(
-	$ret,
+	$ret_ar,
 	[
 		['c', 'comment'],
 		['c', ' comment '],

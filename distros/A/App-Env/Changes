@@ -1,6 +1,66 @@
 Revision history for App-Env
 
-0.36      2022-07-05 16:38:55-04:00 America/New_York
+1.01      2022-07-06 18:59:44-04:00 America/New_York
+
+  [BUGFIX]
+
+    * The Site parameter to import() or new() can ignore (rather than
+      replace) the default Site specification if it is set to undef or
+      ''; this was not properly documented or implemented.
+
+1.00      2022-07-06 18:08:33-04:00 America/New_York
+
+  [API BREAKAGE]
+
+    * Documentation of how the APP_ENV_SITE environment
+      variable interacted with the Site parameter was
+      incomplete and incorrect.
+
+    * The Site parameter was used to *add* to the list of modules to
+      try, not to replace what was specified via $ENV{APP_ENV_SITE}.
+      So, if
+
+        $ENV{APP_ENV_SITE} = 'Site1';
+
+      and Site => 'Site2', then loading the MyApp environment would
+      scan for the first of
+
+        App::Env::Site1::MyApp;
+        App::Env::Site2::MyApp;
+        App::Env::MyApp;
+
+      rather than the expected
+
+        App::Env::Site2::MyApp;
+        App::Env::MyApp;
+
+    * App::Env::Site was loaded when App::Env is loaded if
+      $ENV{APP_ENV_SITE} was not set, but the resultant
+      $ENV{APP_ENV_SITE} was not cached. This resulted
+      in action-at-a-distance weirdness.  Assume that
+      the App::Env::Site package exists and sets
+
+         $ENV{APP_ENV_SITE} = 'Site1';
+
+      Then this code causes hard to debug bugs:
+
+        {
+          local %ENV = %ENV;
+          require App::Env;
+          # This will load App::Env::Site and thus load App::Env::Site1::MyApp1
+          App::Env::import( 'MyApp1' );
+        }
+        # This will NOT load App::Env::Site, as it has already been loaded,
+        # but the environment no longer contains $ENV{APP_ENV_SITE}, this
+        # this will load App::Env::MyApp2, not App::Env::Site1::MyApp2
+        App::Env::import( 'MyApp2' );
+
+     This is just too fragile.  Now when App::Env is loaded, it caches
+     the final version of $ENV{APP_ENV_SITE}.  Code which needs to change
+     the site in mid-program, can use the Site parameter.
+
+
+0.36 2022-07-05 16:38:55-04:00 America/New_York
 
   [ENHANCEMENT]
 

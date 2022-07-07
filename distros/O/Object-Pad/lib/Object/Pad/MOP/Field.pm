@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Field 0.65;
+package Object::Pad::MOP::Field 0.66;
 
 use v5.14;
 use warnings;
@@ -90,6 +90,20 @@ Note that most core-defined attributes will either store no data at all, or
 a method name string. This accessor method is provided largely for the benefit
 of obtaining data defined by third-party attributes, which may more clearly
 define how that data is generated and used.
+
+=head2 get_attribute_values
+
+   @values = $metafield->get_attribute_values( $name )
+
+I<Since version 0.66.>
+
+Returns all the stored values of an attached attribute, if one exists. If the
+attribute has not been attached then an exception is thrown.
+
+This allows inspection of stored attribute values if it makes meaningful sense
+for the attribute to be applied multiple times to the same field. This is
+unlikely to be useful for core-defined attributes, but may be meaningful for
+third-party attributes.
 
 =cut
 

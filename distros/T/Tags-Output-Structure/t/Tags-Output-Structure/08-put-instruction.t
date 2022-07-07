@@ -8,13 +8,15 @@ use Test::NoWarnings;
 # Test.
 my $obj = Tags::Output::Structure->new;
 $obj->put(
-	['cd', '<tag attr="value">'],
+	['i', 'perl'],
+	['i', 'perl', 'print "1";'],
 );
-my $ret = $obj->flush;
+my $ret_ar = $obj->flush;
 is_deeply(
-	$ret,
+	$ret_ar,
 	[
-		['cd', '<tag attr="value">'],
+		['i', 'perl'],
+		['i', 'perl', 'print "1";'],
 	],
-	'Simple CData test.',
+	'Simple instruction test.',
 );

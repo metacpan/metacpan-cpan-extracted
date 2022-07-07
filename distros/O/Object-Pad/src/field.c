@@ -18,6 +18,10 @@
 #include "make_argcheck_ops.c.inc"
 #include "newOP_CUSTOM.c.inc"
 
+#if HAVE_PERL_VERSION(5,36,0)
+#  define HAVE_OP_WEAKEN
+#endif
+
 #define need_PLparser()  ObjectPad__need_PLparser(aTHX)
 void ObjectPad__need_PLparser(pTHX); /* in Object/Pad.xs */
 
@@ -143,37 +147,38 @@ void ObjectPad_mop_field_apply_attribute(pTHX_ FieldMeta *fieldmeta, const char 
        (!hints || !hv_fetch(hints, reg->funcs->permit_hintkey, reg->permit_hintkeylen, 0)))
       continue;
 
-    if((reg->funcs->flags & OBJECTPAD_FLAG_ATTR_NO_VALUE) && value)
-      croak("Attribute :%s does not permit a value", name);
-    if((reg->funcs->flags & OBJECTPAD_FLAG_ATTR_MUST_VALUE) && !value)
-      croak("Attribute :%s requires a value", name);
-
-    SV *hookdata = value;
-
-    if(reg->funcs->apply) {
-      if(!(*reg->funcs->apply)(aTHX_ fieldmeta, value, &hookdata, reg->funcdata))
-        return;
-    }
-
-    if(hookdata && hookdata == value)
-      SvREFCNT_inc(hookdata);
-
-    if(!fieldmeta->hooks)
-      fieldmeta->hooks = newAV();
-
-    struct FieldHook *hook;
-    Newx(hook, 1, struct FieldHook);
-
-    hook->funcs = reg->funcs;
-    hook->hookdata = hookdata;
-    hook->funcdata = reg->funcdata;
-
-    av_push(fieldmeta->hooks, (SV *)hook);
-
-    return;
+    break;
   }
 
-  croak("Unrecognised field attribute :%s", name);
+  if(!reg)
+    croak("Unrecognised field attribute :%s", name);
+
+  if((reg->funcs->flags & OBJECTPAD_FLAG_ATTR_NO_VALUE) && value)
+    croak("Attribute :%s does not permit a value", name);
+  if((reg->funcs->flags & OBJECTPAD_FLAG_ATTR_MUST_VALUE) && !value)
+    croak("Attribute :%s requires a value", name);
+
+  SV *hookdata = value;
+
+  if(reg->funcs->apply) {
+    if(!(*reg->funcs->apply)(aTHX_ fieldmeta, value, &hookdata, reg->funcdata))
+      return;
+  }
+
+  if(hookdata && hookdata == value)
+    SvREFCNT_inc(hookdata);
+
+  if(!fieldmeta->hooks)
+    fieldmeta->hooks = newAV();
+
+  struct FieldHook *hook;
+  Newx(hook, 1, struct FieldHook);
+
+  hook->funcs = reg->funcs;
+  hook->hookdata = hookdata;
+  hook->funcdata = reg->funcdata;
+
+  av_push(fieldmeta->hooks, (SV *)hook);
 }
 
 struct FieldHook *ObjectPad_mop_field_get_attribute(pTHX_ FieldMeta *fieldmeta, const char *name)
@@ -213,6 +218,50 @@ struct FieldHook *ObjectPad_mop_field_get_attribute(pTHX_ FieldMeta *fieldmeta, 
   return NULL;
 }
 
+AV *ObjectPad_mop_field_get_attribute_values(pTHX_ FieldMeta *fieldmeta, const char *name)
+{
+  COPHH *cophh = CopHINTHASH_get(PL_curcop);
+
+  /* First, work out what hookfuncs the name maps to */
+
+  FieldAttributeRegistration *reg;
+  for(reg = fieldattrs; reg; reg = reg->next) {
+    if(!strEQ(name, reg->name))
+      continue;
+
+    if(reg->funcs->permit_hintkey &&
+        !cophh_fetch_pvn(cophh, reg->funcs->permit_hintkey, reg->permit_hintkeylen, 0, 0))
+      continue;
+
+    break;
+  }
+
+  if(!reg)
+    return NULL;
+
+  /* Now lets see if fieldmeta has one */
+
+  if(!fieldmeta->hooks)
+    return NULL;
+
+  AV *ret = NULL;
+
+  U32 hooki;
+  for(hooki = 0; hooki < av_count(fieldmeta->hooks); hooki++) {
+    struct FieldHook *hook = (struct FieldHook *)AvARRAY(fieldmeta->hooks)[hooki];
+
+    if(hook->funcs != reg->funcs)
+      continue;
+
+    if(!ret)
+      ret = newAV();
+
+    av_push(ret, newSVsv(hook->hookdata));
+  }
+
+  return ret;
+}
+
 void ObjectPad_mop_field_seal(pTHX_ FieldMeta *fieldmeta)
 {
   MOP_FIELD_RUN_HOOKS_NOARGS(fieldmeta, seal);
@@ -229,6 +278,7 @@ static void fieldhook_weak_post_construct(pTHX_ FieldMeta *fieldmeta, SV *_hookd
   sv_rvweaken(field);
 }
 
+#ifndef HAVE_OP_WEAKEN
 static XOP xop_weaken;
 static OP *pp_weaken(pTHX)
 {
@@ -236,6 +286,7 @@ static OP *pp_weaken(pTHX)
   sv_rvweaken(POPs);
   return NORMAL;
 }
+#endif
 
 static void fieldhook_weak_gen_accessor(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *_funcdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
 {
@@ -243,7 +294,12 @@ static void fieldhook_weak_gen_accessor(pTHX_ FieldMeta *fieldmeta, SV *hookdata
     return;
 
   ctx->post_bodyops = op_append_list(OP_LINESEQ, ctx->post_bodyops,
-    newUNOP_CUSTOM(&pp_weaken, 0, newPADxVOP(OP_PADSV, 0, ctx->padix)));
+#ifdef HAVE_OP_WEAKEN
+    newUNOP(OP_WEAKEN, 0,
+#else
+    newUNOP_CUSTOM(&pp_weaken, 0,
+#endif
+      newPADxVOP(OP_PADSV, 0, ctx->padix)));
 }
 
 static struct FieldHookFuncs fieldhooks_weak = {
@@ -573,10 +629,12 @@ void ObjectPad_register_field_attribute(pTHX_ const char *name, const struct Fie
 
 void ObjectPad__boot_fields(pTHX)
 {
+#ifndef HAVE_OP_WEAKEN
   XopENTRY_set(&xop_weaken, xop_name, "weaken");
   XopENTRY_set(&xop_weaken, xop_desc, "weaken an RV");
   XopENTRY_set(&xop_weaken, xop_class, OA_UNOP);
   Perl_custom_op_register(aTHX_ &pp_weaken, &xop_weaken);
+#endif
 
   register_field_attribute("weak",     &fieldhooks_weak,     NULL);
   register_field_attribute("param",    &fieldhooks_param,    NULL);
@@ -584,52 +642,4 @@ void ObjectPad__boot_fields(pTHX)
   register_field_attribute("writer",   &fieldhooks_writer,   NULL);
   register_field_attribute("mutator",  &fieldhooks_mutator,  NULL);
   register_field_attribute("accessor", &fieldhooks_accessor, NULL);
-}
-
-
-/* back-compat */
-FieldMeta *ObjectPad_mop_create_slot(pTHX_ SV *fieldname, ClassMeta *classmeta)
-{
-  return ObjectPad_mop_create_field(aTHX_ fieldname, classmeta);
-}
-
-void ObjectPad_mop_slot_seal(pTHX_ FieldMeta *fieldmeta)
-{
-  return ObjectPad_mop_field_seal(aTHX_ fieldmeta);
-}
-
-SV *ObjectPad_mop_slot_get_name(pTHX_ FieldMeta *fieldmeta)
-{
-  return ObjectPad_mop_field_get_name(aTHX_ fieldmeta);
-}
-
-char ObjectPad_mop_slot_get_sigil(pTHX_ FieldMeta *fieldmeta)
-{
-  return ObjectPad_mop_field_get_sigil(aTHX_ fieldmeta);
-}
-
-void ObjectPad_mop_slot_apply_attribute(pTHX_ FieldMeta *fieldmeta, const char *name, SV *value)
-{
-  ObjectPad_mop_field_apply_attribute(aTHX_ fieldmeta, name, value);
-}
-
-struct FieldHook *ObjectPad_mop_slot_get_attribute(pTHX_ FieldMeta *fieldmeta, const char *name)
-{
-  return ObjectPad_mop_field_get_attribute(aTHX_ fieldmeta, name);
-}
-
-SV *ObjectPad_mop_slot_get_default_sv(pTHX_ FieldMeta *fieldmeta)
-{
-  return ObjectPad_mop_field_get_default_sv(aTHX_ fieldmeta);
-}
-
-void ObjectPad_mop_slot_set_default_sv(pTHX_ FieldMeta *fieldmeta, SV *sv)
-{
-  ObjectPad_mop_field_set_default_sv(aTHX_ fieldmeta, sv);
-}
-
-void ObjectPad_register_slot_attribute(pTHX_ const char *name, const struct SlotHookFuncs *funcs, void *funcdata)
-{
-  Perl_warn(aTHX_ "register_slot_attribute() is now deprecated; use register_field_attribute() instead");
-  ObjectPad_register_field_attribute(aTHX_ name, (const struct FieldHookFuncs *)funcs, funcdata);
 }

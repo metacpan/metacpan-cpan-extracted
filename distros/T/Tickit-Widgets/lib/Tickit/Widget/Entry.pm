@@ -5,7 +5,7 @@
 
 use Object::Pad 0.57;
 
-package Tickit::Widget::Entry 0.34;
+package Tickit::Widget::Entry 0.35;
 class Tickit::Widget::Entry
    :isa(Tickit::Widget);
 

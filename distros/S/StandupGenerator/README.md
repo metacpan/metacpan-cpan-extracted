@@ -59,7 +59,7 @@ If you have trouble downloading the package or just want to play around with the
 3. Execute any of the methods from this package from within your local version of the directory with a version of this command:
 
 ```
-perl -Ilib -e 'require "./lib/StandupGenerator.pm"; StandupGenerator::create_standup("/Users/johndoe/projects/super-important-project/standups")'
+perl -Ilib -e 'use StandupGenerator; create_standup("/Users/johndoe/projects/super-important-project/standups")'
 ```
 
 Replace `create_standup` with whichever top-level method you want to use, and replace the inner string with the full file path to the directory in which you plan to store standups.
@@ -97,7 +97,7 @@ csu
 This method **o**pens an existing **s**tand**u**p. It is a shortcut for the `open_standup` method. It takes two arguments: a number for the sprint and two-digit string for the day. It will open the corresponding file from the already aliased folder in your default text editor (e.g., TextEdit). If you want to open *s1d03.txt*, then merely run:
 
 ```
-osu 1 '03'
+osu 1 03
 ```
 
 #### `wsu`
@@ -130,7 +130,7 @@ Use the short approach. Let's say you have a new project called Project Ultra. Y
 4. Create the first standup for this project by running `csu`
 5. Fill in data about what you did yesterday, what you plan to do today, and what blockers you currently have in their respective sections
 6. When you need to create the standup for tomorrow, merely run `csu` again; note that the content from yesterday's standup's *Today* section will be stored in the new standup's *Yesterday* and *Today* sections, and that yesterday's blockers will be mapped over to today's (under the assumption that this will probably be a time-saving hack)
-7. If you ever need to view an earlier standup, use the `osu` shortcut; for instance, if on Thursday you want to view your standup from Tuesday, execute `osu 1 '02'`
+7. If you ever need to view an earlier standup, use the `osu` shortcut; for instance, if on Thursday you want to view your standup from Tuesday, execute `osu 1 02`
 8. At the end of the week, if you want to see all your standups for the past week, just run `wsu`; this is helpful if you need to fill in your activities on your timesheet for work
 
 ## Code Examples
@@ -178,6 +178,9 @@ Adjust file path appropriately.
 - Check config file for existence of shortcuts before inserting them when using the `save_script_shortcuts` method, and delete the existing ones before adding the new ones, to avoid adding redundant shortcuts to the user's config file
 - Make Windows compatible, possibly with a separate version of this package
 - Add fallback config file options to `save_script_shortcuts` method in case user uses neither zsh nor bash
-- Allow user to enter days as numbers instead of two-digit strings in the `open_one` method
+- Allow user to enter days without leading 0s in the `open_one` method
+- Include dates in addition to sprint/day notation to indicate time
+- Consider adding a feature to handle holidays
+- Allow users to initiate standups in a file midway through a project (e.g., starting in sprint 3 without needing to backfill the other standup files)
 - Error handling for cases like attempting to open a file that doesn't exist, especially in the context of the `open_many` method, and for running `find_last_file` in a directory with non-standup files (either *.txt* or otherwise)
 - More tests for edge cases, along with a way to test the `save_script_shortcuts` method

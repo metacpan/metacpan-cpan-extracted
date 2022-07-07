@@ -22,7 +22,7 @@
       "runtime" : {
          "requires" : {
             "List::Util" : "1.33",
-            "Object::Pad" : "0.57",
+            "Object::Pad" : "0.63",
             "Parser::MGC" : "0",
             "Syntax::Keyword::Dynamically" : "0",
             "Tickit::Event" : "0.66",
@@ -43,7 +43,7 @@
    "provides" : {
       "Tickit::ContainerWidget" : {
          "file" : "lib/Tickit/ContainerWidget.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "Tickit::SingleChildWidget" : {
          "file" : "lib/Tickit/SingleChildWidget.pm",
@@ -63,7 +63,7 @@
       },
       "Tickit::Widget::Border" : {
          "file" : "lib/Tickit/Widget/Border.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "Tickit::Widget::Box" : {
          "file" : "lib/Tickit/Widget/Box.pm",
@@ -71,19 +71,19 @@
       },
       "Tickit::Widget::Button" : {
          "file" : "lib/Tickit/Widget/Button.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "Tickit::Widget::CheckButton" : {
          "file" : "lib/Tickit/Widget/CheckButton.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "Tickit::Widget::Entry" : {
          "file" : "lib/Tickit/Widget/Entry.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "Tickit::Widget::Fill" : {
          "file" : "lib/Tickit/Widget/Fill.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "Tickit::Widget::Frame" : {
          "file" : "lib/Tickit/Widget/Frame.pm",
@@ -91,7 +91,7 @@
       },
       "Tickit::Widget::GridBox" : {
          "file" : "lib/Tickit/Widget/GridBox.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "Tickit::Widget::HBox" : {
          "file" : "lib/Tickit/Widget/HBox.pm",
@@ -99,27 +99,27 @@
       },
       "Tickit::Widget::HSplit" : {
          "file" : "lib/Tickit/Widget/HSplit.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "Tickit::Widget::LinearBox" : {
          "file" : "lib/Tickit/Widget/LinearBox.pm",
-         "version" : "0.51"
+         "version" : "0.52"
       },
       "Tickit::Widget::LinearSplit" : {
          "file" : "lib/Tickit/Widget/LinearSplit.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "Tickit::Widget::Placegrid" : {
          "file" : "lib/Tickit/Widget/Placegrid.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "Tickit::Widget::RadioButton" : {
          "file" : "lib/Tickit/Widget/RadioButton.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "Tickit::Widget::Spinner" : {
          "file" : "lib/Tickit/Widget/Spinner.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "Tickit::Widget::Static" : {
          "file" : "lib/Tickit/Widget/Static.pm",
@@ -131,11 +131,11 @@
       },
       "Tickit::Widget::VSplit" : {
          "file" : "lib/Tickit/Widget/VSplit.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "Tickit::WidgetRole" : {
          "file" : "lib/Tickit/WidgetRole.pm",
-         "version" : "0.51"
+         "version" : "0.52"
       },
       "Tickit::WidgetRole::Alignable" : {
          "file" : "lib/Tickit/WidgetRole/Alignable.pm",
@@ -143,11 +143,11 @@
       },
       "Tickit::WidgetRole::SingleChildContainer" : {
          "file" : "lib/Tickit/WidgetRole/SingleChildContainer.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "Tickit::Widgets" : {
          "file" : "lib/Tickit/Widgets.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       }
    },
    "release_status" : "stable",
@@ -156,6 +156,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.34",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.35",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

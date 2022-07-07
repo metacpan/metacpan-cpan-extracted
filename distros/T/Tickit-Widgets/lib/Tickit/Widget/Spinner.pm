@@ -5,7 +5,7 @@
 
 use Object::Pad 0.57;
 
-package Tickit::Widget::Spinner 0.34;
+package Tickit::Widget::Spinner 0.35;
 class Tickit::Widget::Spinner
    :isa(Tickit::Widget);
 

@@ -13,6 +13,7 @@ inc/Module/Install/Metadata.pm
 inc/Module/Install/ReadmeFromPod.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 META.yml
@@ -21,5 +22,6 @@ Redirect.pm
 SIGNATURE
 t/Plack-App-Redirect/01-use.t
 t/Plack-App-Redirect/02-version.t
+t/Plack-App-Redirect/03-general.t
 xt/Plack-App-Redirect/01-pod_coverage.t
 xt/Plack-App-Redirect/02-pod.t

@@ -6,11 +6,12 @@ use warnings;
 
 use Error::Pure qw(err);
 
-our $VERSION = 0.06;
+our $VERSION = 0.08;
 
 # Flush.
 sub flush {
 	my ($self, $reset_flag) = @_;
+
 	my $ouf = $self->{'output_handler'};
 
 	# Text output.
@@ -41,72 +42,90 @@ sub flush {
 # Attributes.
 sub _put_attribute {
 	my ($self, $attr, $value) = @_;
+
 	$self->_put_structure('a', $attr, $value);
+
 	return;
 }
 
 # Begin of tag.
 sub _put_begin_of_tag {
 	my ($self, $tag) = @_;
+
 	$self->_put_structure('b', $tag);
 	unshift @{$self->{'printed_tags'}}, $tag;
+
 	return;
 }
 
 # CData.
 sub _put_cdata {
 	my ($self, @cdata) = @_;
+
 	$self->_put_structure('cd', @cdata);
+
 	return;
 }
 
 # Comment.
 sub _put_comment {
 	my ($self, @comments) = @_;
+
 	$self->_put_structure('c', @comments);
+
 	return;
 }
 
 # Data.
 sub _put_data {
 	my ($self, @data) = @_;
+
 	$self->_put_structure('d', @data);
+
 	return;
 }
 
 # End of tag.
 sub _put_end_of_tag {
 	my ($self, $tag) = @_;
+
 	my $printed = shift @{$self->{'printed_tags'}};
 	if ($printed ne $tag) {
 		err "Ending bad tag: '$tag' in block of tag '$printed'.";
 	}
 	$self->_put_structure('e', $tag);
+
 	return;
 }
 
 # Instruction.
 sub _put_instruction {
 	my ($self, $target, $code) = @_;
+
 	my @instruction = ('i', $target);
 	if ($code) {
 		push @instruction, $code;
 	}
 	$self->_put_structure(@instruction);
+
 	return;
 }
 
 # Raw data.
 sub _put_raw {
 	my ($self, @raw_data) = @_;
+
 	$self->_put_structure('r', @raw_data);
+
 	return;
 }
 
 # Put common structure.
 sub _put_structure {
 	my ($self, @struct) = @_;
+
 	push @{$self->{'flush_code'}}, \@struct;
+
 	return;
 }
 
@@ -375,12 +394,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2012-2021 Michal Josef Špaček
+© 2012-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.08
 
 =cut

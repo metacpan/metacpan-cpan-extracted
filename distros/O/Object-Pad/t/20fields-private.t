@@ -8,7 +8,7 @@ use Test::More;
 use Object::Pad;
 
 class Base::Class {
-   has $data;
+   field $data;
    method data { $data }
 
    BUILD {
@@ -17,7 +17,7 @@ class Base::Class {
 }
 
 class Derived::Class :isa(Base::Class) {
-   has $data;
+   field $data;
    method data { $data }
 
    BUILD {

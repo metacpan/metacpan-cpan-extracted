@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.65;
+package Object::Pad 0.66;
 
 use v5.14;
 use warnings;
@@ -159,20 +159,16 @@ not need to chain to the C<SUPER> class first; this is handled automatically.
 
 =head3 The ADJUST phase
 
-Next, the C<ADJUST> and C<ADJUSTPARAMS> block of every component class is
-invoked. This happens after the fields are assigned their initial values and
-the C<BUILD> blocks have been run.
-
-Note also that both C<ADJUST> and C<ADJUSTPARAMS> blocks happen at the same
-time, in declaration order. The C<ADJUSTPARAMS> blocks do not form their own
-separate phase.
+Next, the C<ADJUST> block of every component class is invoked. This happens
+after the fields are assigned their initial values and the C<BUILD> blocks
+have been run.
 
 =head3 The strict-checking phase
 
 Finally, before the object is returned, if the L</:strict(params)> class
 attribute is present, then the constructor will throw an exception if there
 are any remaining named arguments left over after assigning them to fields as
-per C<:param> declarations, and running any C<ADJUSTPARAMS> blocks.
+per C<:param> declarations, and running any C<ADJUST> blocks.
 
 =head1 KEYWORDS
 
@@ -214,7 +210,7 @@ I<Since version 0.41.>
 
 Prior to version 0.41 this was called C<extends>, which is currently
 recognised as a compatibility synonym. Both C<extends> and C<isa> keywords are
-now discouraged, in favour of the L</:isa> attribute which is preferred
+now deprecated, in favour of the L</:isa> attribute which is preferred
 because it follows a more standard grammar without this special-case.
 
 One or more roles can be composed into the class by the keyword C<does>
@@ -227,7 +223,7 @@ I<Since version 0.41.>
 
 Prior to version 0.41 this was called C<implements>, which is currently
 recognised as a compatibility synonym. Both C<implements> and C<does> keywords
-are now discouraged, in favour of the L</:does> attribute which is preferred
+are now deprecated, in favour of the L</:does> attribute which is preferred
 because it follows a more standard grammar without this special-case.
 
 An optional list of attributes may be supplied in similar syntax as for subs
@@ -345,7 +341,7 @@ I<Since version 0.43.>
 Can only be applied to classes that contain no C<BUILD> blocks. If set, then
 the constructor will complain about any unrecognised named arguments passed to
 it (i.e. names that do not correspond to the C<:param> of any defined field
-and left unconsumed by any C<ADJUSTPARAMS> block).
+and left unconsumed by any C<ADJUST> block).
 
 Since C<BUILD> blocks can inspect the arguments arbitrarily, the presence of
 any such block means the constructor cannot determine which named arguments
@@ -392,7 +388,7 @@ or methods provided by that role.
 I<Since version 0.33.>
 
    role Name {
-      has $field;
+      field $field;
 
       BUILD { $field = "a value" }
 
@@ -439,17 +435,17 @@ upgrade of existing classical Perl code into using C<Object::Pad>. When all
 existing code is using C<Object::Pad> then this attribute can be removed from
 the role.
 
-=head2 has
+=head2 field
 
-   has $var;
-   has @var;
-   has %var;
+   field $var;
+   field @var;
+   field %var;
 
-   has $var :ATTR ATTR...;
+   field $var :ATTR ATTR...;
 
-   has $var = EXPR;
+   field $var { BLOCK }
 
-   has $var { BLOCK }
+I<Since version 0.66.>
 
 Declares that the instances of the class or role have a member field of the
 given name. This member field will be accessible as a lexical variable within
@@ -464,40 +460,6 @@ to. In order to provide access to them a class may wish to use L</method> to
 create an accessor, or use the attributes such as L</:reader> to get one
 generated.
 
-A scalar field may provide a expression that gives an initialisation value,
-which will be assigned into the field of every instance during the constructor
-before the C<BUILD> blocks are invoked. I<Since version 0.29> this expression
-does not have to be a compiletime constant, though it is evaluated exactly
-once, at runtime, after the class definition has been parsed. It is not
-evaluated individually for every object instance of that class. I<Since
-version 0.54> this is also permitted on array and hash fields.
-
-=head3 Field Initialiser Blocks
-
-I<Since version 0.54> a deferred statement block is also permitted, on any
-field variable type. This permits code to be executed as part of the instance
-constructor, rather than running just once when the class is set up. Code in a
-field initialisation block is roughly equivalent to being placed in a C<BUILD>
-or C<ADJUST> block.
-
-This feature should be considered B<experimental>, and will emit warnings to
-that effect. They can be silenced with
-
-   use Object::Pad qw( :experimental(init_expr) );
-
-Control flow that attempts to leave a field initialiser block is not
-permitted. This includes any C<return> expression, any C<next/last/redo>
-outside of a loop, with a dynamically-calculated label expression, or with a
-label that it doesn't appear in. C<goto> statements are also currently
-forbidden, though known-safe ones may be permitted in future.
-
-Loop control expressions that are known at compiletime to affect a loop that
-they appear within are permitted.
-
-   has $field { foreach(@list) { next; } }       # this is fine
-
-   has $field { LOOP: while(1) { last LOOP; } }  # this is fine too
-
 The following field attributes are supported:
 
 =head3 :reader, :reader(NAME)
@@ -508,10 +470,10 @@ Generates a reader method to return the current value of the field. If no name
 is given, the name of the field is used. A single prefix character C<_> will
 be removed if present.
 
-   has $field :reader;
+   field $field :reader;
 
    # equivalent to
-   has $field;  method field { return $field }
+   field $field;  method field { return $field }
 
 I<Since version 0.55> these are permitted on any field type, but prior
 versions only allowed them on scalar fields. The reader method behaves
@@ -519,7 +481,7 @@ identically to how a lexical variable would behave in the same context; namely
 returning a list of values from an array or key/value pairs from a hash when
 in list context, or the number of items or keys when in scalar context.
 
-   has @items :reader;
+   field @items :reader;
 
    foreach my $item ( $obj->items ) { ... }   # iterates the list of items
 
@@ -533,10 +495,10 @@ Generates a writer method to set a new value of the field from its arguments.
 If no name is given, the name of the field is used prefixed by C<set_>. A
 single prefix character C<_> will be removed if present.
 
-   has $field :writer;
+   field $field :writer;
 
    # equivalent to
-   has $field;  method set_field { $field = shift; return $self }
+   field $field;  method set_field { $field = shift; return $self }
 
 I<Since version 0.28> a generated writer method will return the object
 invocant itself, allowing a chaining style.
@@ -558,10 +520,10 @@ Generates an lvalue mutator method to return or set the value of the field.
 These are only permitted for scalar fields. If no name is given, the name of
 the field is used. A single prefix character C<_> will be removed if present.
 
-   has $field :mutator;
+   field $field :mutator;
 
    # equivalent to
-   has $field;  method field :lvalue { $field }
+   field $field;  method field :lvalue { $field }
 
 I<Since version 0.28> all of these generated accessor methods will include
 argument checking similar to that used by subroutine signatures, to ensure the
@@ -583,10 +545,10 @@ C<undef>). If no argument is passed (i.e. C<scalar @_> is false) then the
 field is not modified. In either case, the value of the field is then
 returned.
 
-   has $field :accessor;
+   field $field :accessor;
 
    # equivalent to
-   has $field;
+   field $field;
 
    method field {
       $field = shift if @_;
@@ -628,6 +590,55 @@ executed.
 
 Values for fields are assigned by the constructor before any C<BUILD> blocks
 are invoked.
+
+=head3 Field Initialiser Blocks
+
+I<Since version 0.54> a deferred statement block is also permitted, on any
+field variable type. This permits code to be executed as part of the instance
+constructor, rather than running just once when the class is set up. Code in a
+field initialisation block is roughly equivalent to being placed in a C<BUILD>
+or C<ADJUST> block.
+
+This feature should be considered B<experimental>, and will emit warnings to
+that effect. They can be silenced with
+
+   use Object::Pad qw( :experimental(init_expr) );
+
+Control flow that attempts to leave a field initialiser block is not
+permitted. This includes any C<return> expression, any C<next/last/redo>
+outside of a loop, with a dynamically-calculated label expression, or with a
+label that it doesn't appear in. C<goto> statements are also currently
+forbidden, though known-safe ones may be permitted in future.
+
+Loop control expressions that are known at compiletime to affect a loop that
+they appear within are permitted.
+
+   field $field { foreach(@list) { next; } }       # this is fine
+
+   field $field { LOOP: while(1) { last LOOP; } }  # this is fine too
+
+=head2 has
+
+   has $var;
+   has @var;
+   has %var;
+
+   has $var = EXPR;
+
+   has $var { BLOCK }
+
+An older version of the L</field> keyword.
+
+This generally behaves like C<field>, except that inline expressions are also
+permitted.
+
+A scalar field may provide a expression that gives an initialisation value,
+which will be assigned into the field of every instance during the constructor
+before the C<BUILD> blocks are invoked. I<Since version 0.29> this expression
+does not have to be a compiletime constant, though it is evaluated exactly
+once, at runtime, after the class definition has been parsed. It is not
+evaluated individually for every object instance of that class. I<Since
+version 0.54> this is also permitted on array and hash fields.
 
 =head2 method
 
@@ -672,7 +683,7 @@ is C<:lvalue>, allowing easy creation of read-write accessors for fields (but
 see also the C<:reader>, C<:writer> and C<:mutator> field attributes).
 
    class Counter {
-      has $count;
+      field $count;
 
       method count :lvalue { $count }
    }
@@ -719,7 +730,7 @@ subsequent method code in the same block by using C<< $self->$var(...) >>
 method call syntax.
 
    class WithPrivate {
-      has $var;
+      field $var;
 
       # Lexical methods can still see instance fields as normal
       method $inc_var { $var++; say "Var was incremented"; }
@@ -773,13 +784,30 @@ will fail with a compiletime error, to avoid this confusion.
       ...
    }
 
+   ADJUST ( $params ) {    # on perl 5.26 onwards
+      ...
+   }
+
+   ADJUST {
+      my $params = shift;
+      ...
+   }
+
 I<Since version 0.43.>
 
 Declares an adjust block for this component class. This block of code runs
 within the constructor, after any C<BUILD> blocks and automatic field value
 assignment. It can make any final adjustments to the instance (such as
-initialising fields from calculated values). No additional parameters are
-passed.
+initialising fields from calculated values).
+
+I<Since version 0.66> it receives a reference to the hash containing the
+current constructor parameters. This hash will not contain any constructor
+parameters already consumed by L</:param> declarations on any fields, but only
+the leftovers once those are processed.
+
+The code in the block should C<delete> from this hash any parameters it wishes
+to consume. Once all the C<ADJUST> blocks have run, any remaining keys in the
+hash will be considered errors, subject to the L</:strict(params)> check.
 
 An adjust block is not a subroutine and thus is not permitted to use
 subroutine attributes. Note that an C<ADJUST> block is a named phaser block
@@ -787,28 +815,14 @@ and not a method; it does not use the C<sub> or C<method> keyword.
 
 =head2 ADJUSTPARAMS
 
-   ADJUSTPARAMS ( $params ) {    # on perl 5.26 onwards
-      ...
-   }
-
-   ADJUSTPARAMS {
-      my $params = shift;
-      ...
-   }
-
 I<Since version 0.51.>
 
-Declares an adjust block for this component class that receives the parameters
-hash reference. This block of code runs within the constructor at the same
-time as L</ADJUST> blocks, but receives in addition a reference to the hash
-containing the current constructor parameters. This hash will not contain any
-constructor parameters already consumed by L</:param> declarations on any
-fields, but only the leftovers once those are processed.
+A synonym for C<ADJUST>.
 
-The code in the block should C<delete> from this hash any parameters it wishes
-to consume. Once all the C<ADJUSTPARAMS> blocks have run, any remaining keys
-in the hash will be considered errors, subject to the L</:strict(params)>
-check.
+Prior to version 0.66, the C<ADJUSTPARAMS> keyword created a different kind of
+adjust block that receives a reference to the parameters hash. Since version
+0.66, regular C<ADJUST> blocks also receive this, so the two keywords are now
+synonyms.
 
 =head2 requires
 
@@ -963,8 +977,8 @@ lowercase, name components separated by underscores. For tiny examples such as
 "dumb record" structures this may be sufficient.
 
    class Tag {
-      has $name  :mutator;
-      has $value :mutator;
+      field $name  :mutator;
+      field $value :mutator;
    }
 
 In larger examples with lots of non-trivial method bodies, it can get
@@ -974,7 +988,7 @@ suggested to prefix the field names with a leading underscore, to make them
 more visually distinct.
 
    class Spudger {
-      has $_grapefruit;
+      field $_grapefruit;
 
       ...
 
@@ -1026,6 +1040,31 @@ sub _import_experimental
    croak "Unrecognised :experimental features @{[ keys %enabled ]}" if keys %enabled;
 }
 
+sub _import_configuration
+{
+   shift;
+   my ( $syms ) = @_;
+
+   # Undocumented options, purely to support Feature::Compat::Class adjusting
+   # the behaviour to closer match core's  use feature 'class'
+
+   my $i = 0;
+   while( $i < @$syms ) {
+      my $sym = $syms->[$i];
+
+      if( $sym =~ m/^:config\((.*)\)$/ ) {
+         my $opts = $1 =~ s/^\s+|\s+$//gr; # trim
+         $^H{"Object::Pad/configure($_)"}++ for split m/\s+/, $opts;
+      }
+      else {
+         $i++;
+         next;
+      }
+
+      splice @$syms, $i, 1, ();
+   }
+}
+
 sub import_into
 {
    my $class = shift;
@@ -1033,14 +1072,16 @@ sub import_into
 
    $class->_import_experimental( \@_, qw( init_expr mop custom_field_attr ) );
 
+   $class->_import_configuration( \@_ );
+
    my %syms = map { $_ => 1 } @_;
 
    # Default imports
    unless( %syms ) {
-      $syms{$_}++ for qw( class role method has requires );
+      $syms{$_}++ for qw( class role method field has requires BUILD ADJUST );
    }
 
-   delete $syms{$_} and $^H{"Object::Pad/$_"}++ for qw( class role method has requires );
+   delete $syms{$_} and $^H{"Object::Pad/$_"}++ for qw( class role method field has requires BUILD ADJUST );
 
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }
@@ -1177,7 +1218,7 @@ L<Syntax::Keyword::Dynamically> instead:
 
    use Syntax::Keyword::Dynamically;
 
-   has $loglevel;
+   field $loglevel;
 
    method quietly {
       dynamically $loglevel = LOG_ERROR;

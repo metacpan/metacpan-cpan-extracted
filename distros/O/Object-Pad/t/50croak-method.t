@@ -8,7 +8,7 @@ use Test::More;
 use Object::Pad;
 
 class Point {
-   has $x;
+   field $x;
    method clear { $x = 0 }
 }
 

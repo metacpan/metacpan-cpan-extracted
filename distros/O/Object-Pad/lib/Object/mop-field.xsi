@@ -118,3 +118,26 @@ get_attribute_value(self, name)
   }
   OUTPUT:
     RETVAL
+
+void
+get_attribute_values(self, name)
+    SV *self
+    SV *name
+  PPCODE:
+  {
+    FieldMeta *meta = NUM2PTR(FieldMeta *, SvUV(SvRV(self)));
+
+    AV *values = mop_field_get_attribute_values(meta, SvPV_nolen(name));
+    if(!values)
+      croak("Field does not have an attribute called %" SVf, SVfARG(name));
+
+    Size_t count = av_count(values);
+
+    EXTEND(SP, count);
+    for(Size_t i = 0; i < count; i++)
+      PUSHs(SvREFCNT_inc(AvARRAY(values)[i]));
+
+    SvREFCNT_dec(values);
+
+    XSRETURN(count);
+  }

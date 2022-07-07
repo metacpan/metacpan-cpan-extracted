@@ -4,6 +4,8 @@ author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: 6.59
+  HTTP::Request: 0
+  Plack::Test: 0
   Test::More: 0
   Test::NoWarnings: 0
 configure_requires:
@@ -18,14 +20,18 @@ meta-spec:
 name: Plack-App-Redirect
 no_index:
   directory:
+    - examples
     - inc
     - t
     - xt
 requires:
+  Plack::Request: 0
+  Plack::Response: 0
+  Plack::Util::Accessor: 0
   perl: 5.8.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Plack-App-Redirect/issues
   homepage: https://github.com/michal-josef-spacek/Plack-App-Redirect
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Plack-App-Redirect
-version: '0.01'
+version: '0.02'

@@ -21,7 +21,7 @@ class AClass :does(ARole) {
 }
 
 role BRole {
-   has $data :reader :param;
+   field $data :reader :param;
 }
 
 class BClass :does(BRole) {

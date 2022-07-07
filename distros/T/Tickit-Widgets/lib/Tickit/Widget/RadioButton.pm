@@ -1,13 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
 use Object::Pad 0.57;
 
-package Tickit::Widget::RadioButton 0.34;
+package Tickit::Widget::RadioButton 0.35;
 class Tickit::Widget::RadioButton
    :isa(Tickit::Widget);
+
+use Object::Pad qw( :experimental(init_expr) );
 
 use Tickit::Style;
 
@@ -197,7 +199,7 @@ Returns or sets the label text of the button.
 
 method set_label
 {
-   $_label = $_[0];
+   ( $_label ) = @_;
    $self->reshape;
    $self->redraw;
 }

@@ -134,21 +134,16 @@ DESCRIPTION
 
   The ADJUST phase
 
-    Next, the ADJUST and ADJUSTPARAMS block of every component class is
-    invoked. This happens after the fields are assigned their initial
-    values and the BUILD blocks have been run.
-
-    Note also that both ADJUST and ADJUSTPARAMS blocks happen at the same
-    time, in declaration order. The ADJUSTPARAMS blocks do not form their
-    own separate phase.
+    Next, the ADJUST block of every component class is invoked. This
+    happens after the fields are assigned their initial values and the
+    BUILD blocks have been run.
 
   The strict-checking phase
 
     Finally, before the object is returned, if the ":strict(params)" class
     attribute is present, then the constructor will throw an exception if
     there are any remaining named arguments left over after assigning them
-    to fields as per :param declarations, and running any ADJUSTPARAMS
-    blocks.
+    to fields as per :param declarations, and running any ADJUST blocks.
 
 KEYWORDS
 
@@ -190,7 +185,7 @@ KEYWORDS
 
     Prior to version 0.41 this was called extends, which is currently
     recognised as a compatibility synonym. Both extends and isa keywords
-    are now discouraged, in favour of the ":isa" attribute which is
+    are now deprecated, in favour of the ":isa" attribute which is
     preferred because it follows a more standard grammar without this
     special-case.
 
@@ -204,7 +199,7 @@ KEYWORDS
 
     Prior to version 0.41 this was called implements, which is currently
     recognised as a compatibility synonym. Both implements and does
-    keywords are now discouraged, in favour of the ":does" attribute which
+    keywords are now deprecated, in favour of the ":does" attribute which
     is preferred because it follows a more standard grammar without this
     special-case.
 
@@ -327,7 +322,7 @@ KEYWORDS
     Can only be applied to classes that contain no BUILD blocks. If set,
     then the constructor will complain about any unrecognised named
     arguments passed to it (i.e. names that do not correspond to the :param
-    of any defined field and left unconsumed by any ADJUSTPARAMS block).
+    of any defined field and left unconsumed by any ADJUST block).
 
     Since BUILD blocks can inspect the arguments arbitrarily, the presence
     of any such block means the constructor cannot determine which named
@@ -375,7 +370,7 @@ KEYWORDS
     Since version 0.33.
 
        role Name {
-          has $field;
+          field $field;
     
           BUILD { $field = "a value" }
     
@@ -423,17 +418,17 @@ KEYWORDS
     all existing code is using Object::Pad then this attribute can be
     removed from the role.
 
- has
+ field
 
-       has $var;
-       has @var;
-       has %var;
+       field $var;
+       field @var;
+       field %var;
     
-       has $var :ATTR ATTR...;
+       field $var :ATTR ATTR...;
     
-       has $var = EXPR;
-    
-       has $var { BLOCK }
+       field $var { BLOCK }
+
+    Since version 0.66.
 
     Declares that the instances of the class or role have a member field of
     the given name. This member field will be accessible as a lexical
@@ -448,41 +443,6 @@ KEYWORDS
     to use "method" to create an accessor, or use the attributes such as
     ":reader" to get one generated.
 
-    A scalar field may provide a expression that gives an initialisation
-    value, which will be assigned into the field of every instance during
-    the constructor before the BUILD blocks are invoked. Since version 0.29
-    this expression does not have to be a compiletime constant, though it
-    is evaluated exactly once, at runtime, after the class definition has
-    been parsed. It is not evaluated individually for every object instance
-    of that class. Since version 0.54 this is also permitted on array and
-    hash fields.
-
-  Field Initialiser Blocks
-
-    Since version 0.54 a deferred statement block is also permitted, on any
-    field variable type. This permits code to be executed as part of the
-    instance constructor, rather than running just once when the class is
-    set up. Code in a field initialisation block is roughly equivalent to
-    being placed in a BUILD or ADJUST block.
-
-    This feature should be considered experimental, and will emit warnings
-    to that effect. They can be silenced with
-
-       use Object::Pad qw( :experimental(init_expr) );
-
-    Control flow that attempts to leave a field initialiser block is not
-    permitted. This includes any return expression, any next/last/redo
-    outside of a loop, with a dynamically-calculated label expression, or
-    with a label that it doesn't appear in. goto statements are also
-    currently forbidden, though known-safe ones may be permitted in future.
-
-    Loop control expressions that are known at compiletime to affect a loop
-    that they appear within are permitted.
-
-       has $field { foreach(@list) { next; } }       # this is fine
-    
-       has $field { LOOP: while(1) { last LOOP; } }  # this is fine too
-
     The following field attributes are supported:
 
   :reader, :reader(NAME)
@@ -493,10 +453,10 @@ KEYWORDS
     no name is given, the name of the field is used. A single prefix
     character _ will be removed if present.
 
-       has $field :reader;
+       field $field :reader;
     
        # equivalent to
-       has $field;  method field { return $field }
+       field $field;  method field { return $field }
 
     Since version 0.55 these are permitted on any field type, but prior
     versions only allowed them on scalar fields. The reader method behaves
@@ -505,7 +465,7 @@ KEYWORDS
     a hash when in list context, or the number of items or keys when in
     scalar context.
 
-       has @items :reader;
+       field @items :reader;
     
        foreach my $item ( $obj->items ) { ... }   # iterates the list of items
     
@@ -519,10 +479,10 @@ KEYWORDS
     arguments. If no name is given, the name of the field is used prefixed
     by set_. A single prefix character _ will be removed if present.
 
-       has $field :writer;
+       field $field :writer;
     
        # equivalent to
-       has $field;  method set_field { $field = shift; return $self }
+       field $field;  method set_field { $field = shift; return $self }
 
     Since version 0.28 a generated writer method will return the object
     invocant itself, allowing a chaining style.
@@ -545,10 +505,10 @@ KEYWORDS
     the name of the field is used. A single prefix character _ will be
     removed if present.
 
-       has $field :mutator;
+       field $field :mutator;
     
        # equivalent to
-       has $field;  method field :lvalue { $field }
+       field $field;  method field :lvalue { $field }
 
     Since version 0.28 all of these generated accessor methods will include
     argument checking similar to that used by subroutine signatures, to
@@ -570,10 +530,10 @@ KEYWORDS
     false) then the field is not modified. In either case, the value of the
     field is then returned.
 
-       has $field :accessor;
+       field $field :accessor;
     
        # equivalent to
-       has $field;
+       field $field;
     
        method field {
           $field = shift if @_;
@@ -617,6 +577,56 @@ KEYWORDS
 
     Values for fields are assigned by the constructor before any BUILD
     blocks are invoked.
+
+  Field Initialiser Blocks
+
+    Since version 0.54 a deferred statement block is also permitted, on any
+    field variable type. This permits code to be executed as part of the
+    instance constructor, rather than running just once when the class is
+    set up. Code in a field initialisation block is roughly equivalent to
+    being placed in a BUILD or ADJUST block.
+
+    This feature should be considered experimental, and will emit warnings
+    to that effect. They can be silenced with
+
+       use Object::Pad qw( :experimental(init_expr) );
+
+    Control flow that attempts to leave a field initialiser block is not
+    permitted. This includes any return expression, any next/last/redo
+    outside of a loop, with a dynamically-calculated label expression, or
+    with a label that it doesn't appear in. goto statements are also
+    currently forbidden, though known-safe ones may be permitted in future.
+
+    Loop control expressions that are known at compiletime to affect a loop
+    that they appear within are permitted.
+
+       field $field { foreach(@list) { next; } }       # this is fine
+    
+       field $field { LOOP: while(1) { last LOOP; } }  # this is fine too
+
+ has
+
+       has $var;
+       has @var;
+       has %var;
+    
+       has $var = EXPR;
+    
+       has $var { BLOCK }
+
+    An older version of the "field" keyword.
+
+    This generally behaves like field, except that inline expressions are
+    also permitted.
+
+    A scalar field may provide a expression that gives an initialisation
+    value, which will be assigned into the field of every instance during
+    the constructor before the BUILD blocks are invoked. Since version 0.29
+    this expression does not have to be a compiletime constant, though it
+    is evaluated exactly once, at runtime, after the class definition has
+    been parsed. It is not evaluated individually for every object instance
+    of that class. Since version 0.54 this is also permitted on array and
+    hash fields.
 
  method
 
@@ -662,7 +672,7 @@ KEYWORDS
     attributes).
 
        class Counter {
-          has $count;
+          field $count;
     
           method count :lvalue { $count }
        }
@@ -711,7 +721,7 @@ KEYWORDS
     $self->$var(...) method call syntax.
 
        class WithPrivate {
-          has $var;
+          field $var;
     
           # Lexical methods can still see instance fields as normal
           method $inc_var { $var++; say "Var was incremented"; }
@@ -765,14 +775,32 @@ KEYWORDS
        ADJUST {
           ...
        }
+    
+       ADJUST ( $params ) {    # on perl 5.26 onwards
+          ...
+       }
+    
+       ADJUST {
+          my $params = shift;
+          ...
+       }
 
     Since version 0.43.
 
     Declares an adjust block for this component class. This block of code
     runs within the constructor, after any BUILD blocks and automatic field
     value assignment. It can make any final adjustments to the instance
-    (such as initialising fields from calculated values). No additional
-    parameters are passed.
+    (such as initialising fields from calculated values).
+
+    Since version 0.66 it receives a reference to the hash containing the
+    current constructor parameters. This hash will not contain any
+    constructor parameters already consumed by ":param" declarations on any
+    fields, but only the leftovers once those are processed.
+
+    The code in the block should delete from this hash any parameters it
+    wishes to consume. Once all the ADJUST blocks have run, any remaining
+    keys in the hash will be considered errors, subject to the
+    ":strict(params)" check.
 
     An adjust block is not a subroutine and thus is not permitted to use
     subroutine attributes. Note that an ADJUST block is a named phaser
@@ -780,29 +808,14 @@ KEYWORDS
 
  ADJUSTPARAMS
 
-       ADJUSTPARAMS ( $params ) {    # on perl 5.26 onwards
-          ...
-       }
-    
-       ADJUSTPARAMS {
-          my $params = shift;
-          ...
-       }
-
     Since version 0.51.
 
-    Declares an adjust block for this component class that receives the
-    parameters hash reference. This block of code runs within the
-    constructor at the same time as "ADJUST" blocks, but receives in
-    addition a reference to the hash containing the current constructor
-    parameters. This hash will not contain any constructor parameters
-    already consumed by ":param" declarations on any fields, but only the
-    leftovers once those are processed.
+    A synonym for ADJUST.
 
-    The code in the block should delete from this hash any parameters it
-    wishes to consume. Once all the ADJUSTPARAMS blocks have run, any
-    remaining keys in the hash will be considered errors, subject to the
-    ":strict(params)" check.
+    Prior to version 0.66, the ADJUSTPARAMS keyword created a different
+    kind of adjust block that receives a reference to the parameters hash.
+    Since version 0.66, regular ADJUST blocks also receive this, so the two
+    keywords are now synonyms.
 
  requires
 
@@ -954,8 +967,8 @@ STYLE SUGGESTIONS
     examples such as "dumb record" structures this may be sufficient.
 
        class Tag {
-          has $name  :mutator;
-          has $value :mutator;
+          field $name  :mutator;
+          field $value :mutator;
        }
 
     In larger examples with lots of non-trivial method bodies, it can get
@@ -965,7 +978,7 @@ STYLE SUGGESTIONS
     them more visually distinct.
 
        class Spudger {
-          has $_grapefruit;
+          field $_grapefruit;
     
           ...
     
@@ -1074,7 +1087,7 @@ IMPLEMENTATION TODOs
 
          use Syntax::Keyword::Dynamically;
       
-         has $loglevel;
+         field $loglevel;
       
          method quietly {
             dynamically $loglevel = LOG_ERROR;

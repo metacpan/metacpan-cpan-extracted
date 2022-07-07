@@ -20,7 +20,6 @@ struct FieldMeta {
         (*h->funcs->func)(aTHX_ fieldmeta, h->hookdata, h->funcdata);                     \
     }                                                                                     \
   }
-#define MOP_SLOT_RUN_HOOKS_NOARGS MOP_FIELD_RUN_HOOKS_NOARGS /* back-compat */
 
 #define MOP_FIELD_RUN_HOOKS(fieldmeta, func, ...)                                         \
   {                                                                                       \
@@ -31,7 +30,6 @@ struct FieldMeta {
         (*h->funcs->func)(aTHX_ fieldmeta, h->hookdata, h->funcdata, __VA_ARGS__);        \
     }                                                                                     \
   }
-#define MOP_SLOT_RUN_HOOKS MOP_FIELD_RUN_HOOKS /* back-compat */
 
 void ObjectPad__boot_fields(pTHX);
 

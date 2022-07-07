@@ -14,7 +14,7 @@ sub new {
         die qq{Constructor requires specifying the 'input_file' xor 'input_text', and 'output_file' parameters.\n};
     }
     my @fields = (qw/input_file input_text output_file as_atcf/);
-    my $self = baptise -recurse, \%self, $pkg, @fields;
+    my $self   = baptise -recurse, \%self, $pkg, @fields;
     return $self;
 }
 

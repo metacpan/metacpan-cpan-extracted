@@ -9,6 +9,7 @@ use Encode                qw( encode decode );
 use File::Find            qw( find );
 use File::Spec::Functions qw( catfile );
 
+use DBD::SQLite 1.68;    # dbd_sqlite_string_mode intruced with 1.67_05
 use DBD::SQLite::Constants ':dbd_sqlite_string_mode';
 use DBI            qw();
 use Encode::Locale qw();
@@ -39,11 +40,11 @@ sub get_db_driver {
 sub set_attributes {
     my ( $sf ) = @_;
     my $values = [
-        DBD_SQLITE_STRING_MODE_PV               . ' DBD_SQLITE_STRING_MODE_PV',
-        DBD_SQLITE_STRING_MODE_BYTES            . ' DBD_SQLITE_STRING_MODE_BYTES',
-        DBD_SQLITE_STRING_MODE_UNICODE_NAIVE    . ' DBD_SQLITE_STRING_MODE_UNICODE_NAIVE',
-        DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK . ' DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK',
-        DBD_SQLITE_STRING_MODE_UNICODE_STRICT   . ' DBD_SQLITE_STRING_MODE_UNICODE_STRICT',
+        DBD_SQLITE_STRING_MODE_PV               . ' DBD_SQLITE_STRING_MODE_PV',               # 0
+        DBD_SQLITE_STRING_MODE_BYTES            . ' DBD_SQLITE_STRING_MODE_BYTES',            # 1
+        DBD_SQLITE_STRING_MODE_UNICODE_NAIVE    . ' DBD_SQLITE_STRING_MODE_UNICODE_NAIVE',    # 4
+        DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK . ' DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK', # 5
+        DBD_SQLITE_STRING_MODE_UNICODE_STRICT   . ' DBD_SQLITE_STRING_MODE_UNICODE_STRICT',   # 6
     ];
     return [
         { name => 'sqlite_string_mode',         default => 3, values => $values }, # $values->[3] == DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK (5)

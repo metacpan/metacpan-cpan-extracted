@@ -32,7 +32,8 @@ sub new {
         die qq{Field validation errors found creating package instance for: } . join( q{, }, keys %{ $validation->error } ) . qq{\n};
     }
 
-    my @fields = (qw/id binNumber name classification intensity pressure latitudelongitude latitude_numberic movementDir movementSpeed lastUpdate publicAdvisory forecastAdvisory windSpeedProbabilities forecastDiscussion forecastGraphics forecastTrack windWatchesWarnings trackCone initialWindExtent forecastWindRadiiGIS bestTrackGIS earliestArrivalTimeTSWindsGIS mostLikelyTimeTSWindsGIS windSpeedProbabilitiesGIS kmzFile34kt kmzFile50kt kmzFile64kt stormSurgeWatchWarningGIS potentialStormSurgeFloodingGIS/);
+    my @fields =
+      (qw/id binNumber name classification intensity pressure latitudelongitude latitude_numberic movementDir movementSpeed lastUpdate publicAdvisory forecastAdvisory windSpeedProbabilities forecastDiscussion forecastGraphics forecastTrack windWatchesWarnings trackCone initialWindExtent forecastWindRadiiGIS bestTrackGIS earliestArrivalTimeTSWindsGIS mostLikelyTimeTSWindsGIS windSpeedProbabilitiesGIS kmzFile34kt kmzFile50kt kmzFile64kt stormSurgeWatchWarningGIS potentialStormSurgeFloodingGIS/);
 
     return baptise -recurse, $self, $pkg, @fields;
 }
@@ -316,7 +317,7 @@ sub _get_file {
     # so it doesn't try to deref an method that may not exist
 
     # 'can($method)' is a limitation of what Util:H2O::h2o gives us, unfortunately
-    my $advNum = ($self->$resource->can('advNum')) ? $self->$resource->advNum // q{N/A} : q{N/A};
+    my $advNum = ( $self->$resource->can('advNum') ) ? $self->$resource->advNum // q{N/A} : q{N/A};
     return ( $local_file, $advNum );
 }
 
@@ -326,7 +327,7 @@ sub fetch_best_track {
     my ( $self, $local_file ) = @_;
 
     my $btk_file = sprintf( "b%s.dat", $self->id );
-    my $url = sprintf( "%s/%s", $DEFAULT_BTK_ROOT, $btk_file );
+    my $url      = sprintf( "%s/%s",   $DEFAULT_BTK_ROOT, $btk_file );
 
     $local_file //= $btk_file;
 

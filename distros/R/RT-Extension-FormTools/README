@@ -9,7 +9,7 @@ DESCRIPTION
     their own forms in Mason.
 
 RT VERSION
-    Works with RT 4.2.3+
+    Works with RT 5.
 
 INSTALLATION
     perl Makefile.PL
@@ -17,13 +17,13 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+    Edit your /opt/rt5/etc/RT_SiteConfig.pm
         Add this line:
 
             Plugin('RT::Extension::FormTools');
 
     Clear your mason cache
-            rm -rf /opt/rt4/var/mason_data/obj
+            rm -rf /opt/rt5/var/mason_data/obj
 
     Restart your webserver
 

@@ -1,1 +1,5 @@
-<& /Elements/Submit, %ARGS &>
+<div class="form-row">
+  <div class="col-12">
+    <& /Elements/Submit, %ARGS &>
+  </div>
+</div>

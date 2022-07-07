@@ -3281,7 +3281,7 @@ of the C<storm.table> if the data seems to be out of date.
    
    foreach my $basin ( @{ $obj->basins } ) {
        print qq{$basin\n};
-   }
+   }}
    
    foreach my $name ( @{ $obj->names } ) {
        print qq{$name\n};

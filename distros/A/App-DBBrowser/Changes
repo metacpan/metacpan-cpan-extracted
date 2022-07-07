@@ -1,6 +1,11 @@
 Revision history for App-DBBrowser
 
 
+2.301    2022-07-06
+        - Use Encode::Locale to get STDIN/STDOUT encodings.
+        - Win32: don't alter the terminal code page.
+        - Use at least DBD::SQLite 1.68.
+
 2.300    2022-07-02
         - Renamed option 'Max rows' to 'Auto Limit'.
         - 'Auto Limit' defaults to 0.

@@ -1,5 +1,18 @@
 Revision history for Tickit-Widgets
 
+0.35    2022-07-07
+        [CHANGES]
+         * Updates for Object::Pad 0.63
+            + Quiet the `:experimental(init_expr)` warning
+         * Avoid uses of $_[N] by unpacking args from @_
+         * Try to find `set_subname` from Sub::Util before falling back on
+           other alternatives
+
+        [BUGFIXES]
+         * Tickit::Widget::Border should invoke ->resized when children
+           change, not ->reshape
+         * Various bugfixes to bundled example scripts
+
 0.34    2021-11-20
         [CHANGES]
          * Updates for Object::Pad 0.57

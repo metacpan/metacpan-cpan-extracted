@@ -1,5 +1,8 @@
 Revision history for RT-Extension-FormTools
 
+0.60 2022-07-06
+ - Migrate to RT 5
+
 0.53 2022-05-03
 
  - Update example to render radio using RT core feature

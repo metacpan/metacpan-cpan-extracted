@@ -1,4 +1,7 @@
-0.3     2022-07-05
+0.5     2022-07-06
+    - Update documentation
+
+0.4     2022-07-05
     - Ensure open command can handle file paths containing spaces
 
 0.3     2022-07-05

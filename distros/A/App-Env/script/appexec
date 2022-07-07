@@ -14,7 +14,7 @@ use File::Spec::Functions qw( file_name_is_absolute );
 use File::Which;
 use App::Env;
 
-our $VERSION = '0.36';
+our $VERSION = '1.01';
 our $prog    = basename( $0, '.pl' );
 
 our %ShellMap = (
@@ -268,7 +268,7 @@ appexec - execute a command under a specified environment
 
 =head1 VERSION
 
-version 0.36
+version 1.01
 
 =head1 SYNOPSIS
 

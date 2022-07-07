@@ -12,6 +12,7 @@ SIGNATURE
 dist.ini
 doap.ttl
 lib/Acme/Marvel/CinematicUniverse/Character.pm
+lib/Acme/Marvel/CinematicUniverse/Character.pm.mite.pm
 lib/Acme/Marvel/CinematicUniverse/Character/Instance/Bruce_Banner.pm
 lib/Acme/Marvel/CinematicUniverse/Character/Instance/Clint_Barton.pm
 lib/Acme/Marvel/CinematicUniverse/Character/Instance/Natasha_Romanoff.pm
@@ -19,4 +20,5 @@ lib/Acme/Marvel/CinematicUniverse/Character/Instance/Steve_Rogers.pm
 lib/Acme/Marvel/CinematicUniverse/Character/Instance/Thor_Odinson.pm
 lib/Acme/Marvel/CinematicUniverse/Character/Instance/Tony_Stark.pm
 lib/Acme/Marvel/CinematicUniverse/Characters.pm
+lib/Acme/Marvel/CinematicUniverse/Mite.pm
 t/01basic.t

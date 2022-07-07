@@ -4,6 +4,7 @@ author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
   English: 0
+  Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.36
   Test::More: 0
   Test::NoWarnings: 0
@@ -32,4 +33,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Tags-Output-Structure
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-Output-Structure
-version: '0.06'
+version: '0.08'

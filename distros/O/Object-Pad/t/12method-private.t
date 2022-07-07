@@ -8,7 +8,7 @@ use Test::More;
 use Object::Pad;
 
 class AClass {
-   has $data :param;
+   field $data :param;
 
    my $priv = method {
       "data<$data>";
@@ -23,7 +23,7 @@ class AClass {
 }
 
 class BClass {
-   has $data :param;
+   field $data :param;
 
    method $priv {
       "data<$data>";

@@ -3,7 +3,7 @@ use strict;
 
 package RT::Extension::FormTools;
 
-our $VERSION = '0.53';
+our $VERSION = '0.60';
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ their own forms in Mason.
 
 =head1 RT VERSION
 
-Works with RT 4.2.3+
+Works with RT 5.
 
 =head1 INSTALLATION
 
@@ -33,7 +33,7 @@ Works with RT 4.2.3+
 
 May need root permissions
 
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
 
 Add this line:
 
@@ -41,7 +41,7 @@ Add this line:
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt4/var/mason_data/obj
+    rm -rf /opt/rt5/var/mason_data/obj
 
 =item Restart your webserver
 

@@ -1,0 +1,11 @@
+*~
+/*.tar.gz
+/Makefile
+/*.old
+/pm_to_blib
+/blib
+/MD5.c
+/MD5.o
+/MD5.bs
+/MYMETA.*
+/MANIFEST.bak

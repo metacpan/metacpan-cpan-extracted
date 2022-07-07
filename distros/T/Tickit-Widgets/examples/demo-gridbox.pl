@@ -18,7 +18,7 @@ foreach my $row ( 0 .. 9 ) {
       $gridbox->add( $row, $col, Tickit::Widget::Static->new(
             text => chr( 65 + rand 26 ) x ( 2 + rand 12 ),
             align => 0.5, valign => 0.5,
-            bg => (qw( red blue green yellow ))[($row+$col) % 4],
+            style => { bg => (qw( red blue green yellow ))[($row+$col) % 4] },
       ),
          row_expand => 1,
          col_expand => 1,

@@ -19,7 +19,7 @@ $outh->print( scalar do {
    <$in_h> } );
 
 __DATA__
-package Object::Pad::ExtensionBuilder_data 0.65;
+package Object::Pad::ExtensionBuilder_data 0.66;
 
 use v5.14;
 use warnings;

@@ -16,7 +16,8 @@ my $hbox = Tickit::Widget::HBox->new(
 foreach ( 1 .. 6 ) {
    $hbox->add(
       Tickit::Widget::Static->new(
-         text => "$_", bg => $_, fg => "hi-white",
+         text => "$_",
+         style => { bg => $_, fg => "hi-white" },
          align => "centre", valign => "middle",
       ),
       expand => 1,

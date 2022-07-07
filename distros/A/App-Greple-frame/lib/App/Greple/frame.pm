@@ -1,5 +1,5 @@
 package App::Greple::frame;
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 =encoding utf-8
 
@@ -51,6 +51,10 @@ want.
 
 =end html
 
+=head1 SEE ALSO
+
+L<App::ansifold>
+
 =head1 AUTHOR
 
 Kazumasa Utashiro
@@ -89,7 +93,7 @@ sub initialize {
     ($mod, $argv) = @_;
     $width = terminal_width;
     
-    my $frame_top    = '──────┬─' . ('─' x ($width - 8));
+    my $frame_top    = '      ┌─' . ('─' x ($width - 8));
     my $frame_middle = '    ⋮ ├╶' . ('╶' x ($width - 8));
     my $frame_bottom = '──────┴─' . ('─' x ($width - 8));
 
@@ -110,6 +114,7 @@ option --frame \
 	--colormap=LINE= \
 	--filestyle=once \
 	--format=LINE='%5d │ ' \
+	--format=FILE='%s' \
 	--blockend= \
 	--show-frame
 

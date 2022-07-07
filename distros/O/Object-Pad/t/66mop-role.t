@@ -8,6 +8,8 @@ use Test::More;
 use Object::Pad ':experimental(mop)';
 
 role Example {
+   no warnings 'deprecated';
+
    method a_method;
    requires b_method;
 }

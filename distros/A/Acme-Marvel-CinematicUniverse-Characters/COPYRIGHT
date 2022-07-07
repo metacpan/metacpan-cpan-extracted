@@ -6,16 +6,16 @@ Source: https://metacpan.org/release/Acme-Marvel-CinematicUniverse-Characters
 Files: Changes
  META.json
  META.yml
- Makefile.PL
  dist.ini
  doap.ttl
+ lib/Acme/Marvel/CinematicUniverse/Character.pm.mite.pm
  lib/Acme/Marvel/CinematicUniverse/Character/Instance/Bruce_Banner.pm
  lib/Acme/Marvel/CinematicUniverse/Character/Instance/Clint_Barton.pm
  lib/Acme/Marvel/CinematicUniverse/Character/Instance/Natasha_Romanoff.pm
  lib/Acme/Marvel/CinematicUniverse/Character/Instance/Steve_Rogers.pm
  lib/Acme/Marvel/CinematicUniverse/Character/Instance/Thor_Odinson.pm
  lib/Acme/Marvel/CinematicUniverse/Character/Instance/Tony_Stark.pm
-Copyright: Copyright 2020 Toby Inkster.
+Copyright: Copyright 2022 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: README
@@ -33,18 +33,24 @@ License: public-domain
 
 Files: INSTALL
  LICENSE
+ Makefile.PL
 Copyright: Unknown
 License: Unknown
 
+Files: lib/Acme/Marvel/CinematicUniverse/Mite.pm
+Copyright: This software is copyright (c) 2011-2014 by Michael G Schwern.
+ This software is copyright (c) 2022 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2020 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2020 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  

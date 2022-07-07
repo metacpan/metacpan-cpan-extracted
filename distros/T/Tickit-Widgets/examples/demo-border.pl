@@ -8,12 +8,12 @@ use Tickit::Widgets qw( Border Static );
 
 my $border = Tickit::Widget::Border->new(
    h_border => 4, v_border => 2,
-   bg => "green",
+   style => { bg => "green" },
 )
    ->set_child( Tickit::Widget::Static->new(
       text => "Hello, world!",
       align => "centre", valign => "middle",
-      bg => "black",
+      style => { bg => "black" },
    ) );
 
 Tickit->new( root => $border )->run;

@@ -6,7 +6,7 @@ use warnings;
 
 use Error::Pure qw(err);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub flush {
 	my ($self, $reset_flag) = @_;
@@ -106,15 +106,6 @@ sub _put_structure {
 	my ($self, @struct) = @_;
 
 	push @{$self->{'flush_code'}}, \@struct;
-
-	return;
-}
-
-# Reset flush code.
-sub _reset_flush_code {
-	my $self = shift;
-
-	$self->{'flush_code'} = undef;
 
 	return;
 }
@@ -349,12 +340,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021 Michal Josef Špaček
+© 2021-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

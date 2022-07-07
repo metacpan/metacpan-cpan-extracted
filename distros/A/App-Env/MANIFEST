@@ -8,6 +8,7 @@ MANIFEST.SKIP
 META.json
 META.yml
 README
+README.md.orig
 README.mkdn
 dev/pre-commit.sh
 dist.ini
@@ -46,6 +47,7 @@ t/lib/App/Env/Site1/App4.pm
 t/lib/App/Env/Site2/App1.pm
 t/null.t
 t/regressions/capture_tiny.t
+t/regressions/disappearing_site.t
 t/retrieve.t
 t/setenv.t
 t/site1.t

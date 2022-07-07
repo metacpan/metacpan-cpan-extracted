@@ -4,7 +4,6 @@
 #include "suspended_compcv.h"
 
 typedef struct AdjustBlock {
-  unsigned int is_adjustparams : 1;
   CV *cv;
 } AdjustBlock;
 
@@ -16,7 +15,7 @@ struct ClassMeta {
   unsigned int sealed : 1;
   unsigned int role_is_invokable : 1;
   unsigned int strict_params : 1;
-  unsigned int has_adjustparams : 1; /* has at least one ADJUSTPARAMS block */
+  unsigned int has_adjust : 1; /* has at least one ADJUST(PARAMS) block */
   unsigned int has_superclass : 1;
 
   FIELDOFFSET start_fieldix; /* first field index of this partial within its instance */

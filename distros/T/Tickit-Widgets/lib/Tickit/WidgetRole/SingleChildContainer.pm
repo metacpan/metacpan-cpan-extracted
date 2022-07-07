@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
 use Object::Pad 0.32;
 
-package Tickit::WidgetRole::SingleChildContainer 0.34;
+package Tickit::WidgetRole::SingleChildContainer 0.35;
 role Tickit::WidgetRole::SingleChildContainer;
 
 use Carp;
@@ -80,7 +80,7 @@ method add
 {
    croak "Already have a child; cannot add another" if $_child;
    ( $_child ) = @_;
-   $self->next::method( $_[0] );
+   $self->next::method( @_ );
 }
 
 method remove

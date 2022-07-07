@@ -80,7 +80,6 @@ class WithBuildargs {
 
       ADJUST {
          push @called, "ADJUST";
-         Test::More::ok( !scalar @_, 'ADJUST block received no arguments' );
       }
    }
 

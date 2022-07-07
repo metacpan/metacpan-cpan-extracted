@@ -1,0 +1,5 @@
+class Digest::MD5 {
+  native static method md5 : string ($data : string);
+  native static method md5_hex : string ($data : string);
+  native static method md5_base64 : string ($data : string);
+}

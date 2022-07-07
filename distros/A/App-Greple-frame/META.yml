@@ -26,17 +26,17 @@ no_index:
 provides:
   App::Greple::frame:
     file: lib/App/Greple/frame.pm
-    version: '0.02'
+    version: '0.03'
 requires:
-  App::Greple: '8.5702'
-  App::ansifold: '1.14'
+  App::Greple: '8.58'
+  App::ansifold: '1.15'
   Term::ReadKey: '0'
   perl: '5.016'
 resources:
   bugtracker: https://github.com/kaz-utashiro/greple-frame/issues
   homepage: https://github.com/kaz-utashiro/greple-frame
   repository: git://github.com/kaz-utashiro/greple-frame.git
-version: '0.02'
+version: '0.03'
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

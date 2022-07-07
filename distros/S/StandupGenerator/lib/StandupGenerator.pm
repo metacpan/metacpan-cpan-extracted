@@ -5,7 +5,7 @@ use StandupGenerator::Creator;
 use StandupGenerator::Accessor;
 use StandupGenerator::Manipulator;
 
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 our @EXPORT = qw( 
     create_standup 
     open_standup 
@@ -91,7 +91,7 @@ C<$day> -- A string containing a two-digit representation of the day of the stan
 
 Executing the below command from the CLI will open the file I<s3d07.txt>, stored within the I<standups> directory within the I<super-important-project> directory.
 
-    perl -e 'use StandupGenerator; open_standup("/Users/johndoe/projects/super-important-project/standups", 3, "07")'
+    perl -e 'use StandupGenerator; open_standup("/Users/johndoe/projects/super-important-project/standups", 3, 07)'
 
 =head2 C<view_standups_from_week>
 

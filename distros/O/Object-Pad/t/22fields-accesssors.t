@@ -12,10 +12,10 @@ my $MATCH_ARGCOUNT =
    $] >= 5.033006 ? qr/ \(got \d+; expected \d+\)/ : "";
 
 class Colour {
-   has $red   :reader            :writer;
-   has $green :reader(get_green) :writer;
-   has $blue  :mutator;
-   has $white :accessor;
+   field $red   :reader            :writer;
+   field $green :reader(get_green) :writer;
+   field $blue  :mutator;
+   field $white :accessor;
 
    BUILD {
       ( $red, $green, $blue, $white ) = @_;
@@ -43,8 +43,8 @@ class Colour {
       'exception message from too many arguments to reader' );
 
    class AllTheTypesReader {
-      has @av :reader;
-      has %hv :reader;
+      field @av :reader;
+      field %hv :reader;
       ADJUST {
          @av = qw( one two three );
          %hv = (one => 1, two => 2);
@@ -83,8 +83,8 @@ class Colour {
       'exception message from too few arguments to writer' );
 
    class AllTheTypesWriter {
-      has @av :writer;
-      has %hv :writer;
+      field @av :writer;
+      field %hv :writer;
       method test
       {
          Test::More::is_deeply( \@av, [qw( four five six )], ':writer on array field' );

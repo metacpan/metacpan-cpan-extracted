@@ -24,7 +24,7 @@ package Base::Class {
 
 my $opcount;
 class Derived::Class :isa(Base::Class) {
-   has $field;
+   field $field;
    BUILD {
       my ( $args ) = @_;
       Test::More::is_deeply( $args, { arg => "value" }, '@_ to Derived::Class BUILD' );

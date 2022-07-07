@@ -24,10 +24,12 @@ requires 'Plack::Util::Accessor' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Plack-App-Redirect/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Plack-App-Redirect';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Plack-App-Redirect';
+test_requires 'HTTP::Request' => 0;
+test_requires 'Plack::Test' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.01';
+version '0.02';
 
 # Run.
 WriteAll();

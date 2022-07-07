@@ -8,11 +8,9 @@
 
 /* A FIELDOFFSET is an offset within the AV of an object instance */
 typedef IV FIELDOFFSET;
-typedef IV SLOTOFFSET; /* back-compat */
 
 typedef struct ClassMeta ClassMeta;
 typedef struct FieldMeta FieldMeta;
-typedef struct FieldMeta SlotMeta; /* back-compat */
 typedef struct MethodMeta MethodMeta;
 
 enum AccessorType {
@@ -44,10 +42,7 @@ struct ClassHookFuncs {
   bool (*apply)(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr, void *funcdata);
 
   /* called by mop_class_add_field() */
-  union {
-    void (*post_add_field)(pTHX_ ClassMeta *classmeta, SV *hookdata, void *funcdata, FieldMeta *fieldmeta);
-    void (*post_add_slot)(pTHX_ ClassMeta *classmeta, SV *hookdata, void *funcdata, FieldMeta *fieldmeta); /* back-compat */
-  };
+  void (*post_add_field)(pTHX_ ClassMeta *classmeta, SV *hookdata, void *funcdata, FieldMeta *fieldmeta);
 };
 
 struct ClassHook {
@@ -164,9 +159,6 @@ void ObjectPad_mop_class_add_BUILD(pTHX_ ClassMeta *meta, CV *cv);
 #define mop_class_add_ADJUST(class, cv)  ObjectPad_mop_class_add_ADJUST(aTHX_ class, cv)
 void ObjectPad_mop_class_add_ADJUST(pTHX_ ClassMeta *meta, CV *cv);
 
-#define mop_class_add_ADJUSTPARAMS(class, cv)  ObjectPad_mop_class_add_ADJUSTPARAMS(aTHX_ class, cv)
-void ObjectPad_mop_class_add_ADJUSTPARAMS(pTHX_ ClassMeta *meta, CV *cv);
-
 #define mop_class_add_required_method(class, methodname)  ObjectPad_mop_class_add_required_method(aTHX_ class, methodname)
 void ObjectPad_mop_class_add_required_method(pTHX_ ClassMeta *meta, SV *methodname);
 
@@ -195,6 +187,9 @@ void ObjectPad_mop_field_apply_attribute(pTHX_ FieldMeta *fieldmeta, const char 
 #define mop_field_get_attribute(fieldmeta, name)  ObjectPad_mop_field_get_attribute(aTHX_ fieldmeta, name)
 struct FieldHook *ObjectPad_mop_field_get_attribute(pTHX_ FieldMeta *fieldmeta, const char *name);
 
+#define mop_field_get_attribute_values(fieldmeta, name)  ObjectPad_mop_field_get_attribute_values(aTHX_ fieldmeta, name)
+AV *ObjectPad_mop_field_get_attribute_values(pTHX_ FieldMeta *fieldmeta, const char *name);
+
 #define mop_field_get_default_sv(fieldmeta)  ObjectPad_mop_field_get_default_sv(aTHX_ fieldmeta)
 SV *ObjectPad_mop_field_get_default_sv(pTHX_ FieldMeta *fieldmeta);
 
@@ -204,36 +199,5 @@ void ObjectPad_mop_field_set_default_sv(pTHX_ FieldMeta *fieldmeta, SV *sv);
 #define register_field_attribute(name, funcs, funcdata)  ObjectPad_register_field_attribute(aTHX_ name, funcs, funcdata)
 void ObjectPad_register_field_attribute(pTHX_ const char *name, const struct FieldHookFuncs *funcs, void *funcdata);
 
-
-/* back-compat */
-
-struct SlotHookFuncs {
-  U32 ver;
-  U32 flags;
-  const char *permit_hintkey;
-  bool (*apply)(pTHX_ FieldMeta *fieldmeta, SV *value, SV **hookdata_ptr, void *funcdata);
-  void (*seal_slot)(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *funcdata);
-  void (*gen_accessor_ops)(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *funcdata,
-          enum AccessorType type, struct AccessorGenerationCtx *ctx);
-  void (*post_initslot)(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *funcdata, SV *slot);
-  void (*post_construct)(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *funcdata, SV *slot);
-};
-
-#define get_obj_slotsav           get_obj_backingav
-
-#define mop_class_add_slot        mop_class_add_field
-#define mop_create_slot           mop_create_field
-#define mop_slot_seal             mop_field_seal
-#define mop_slot_get_name         mop_field_get_name
-#define mop_slot_get_sigil        mop_field_get_sigil
-#define mop_slot_apply_attribute  mop_field_apply_attribute
-#define mop_slot_get_attribute    mop_field_get_attribute
-#define mop_slot_get_default_sv   mop_field_get_default_sv
-#define mop_slot_set_default_sv   mop_field_set_default_sv
-/* Don't redirect this one to register_field_attribute, so we still get the
- * deprecation warning on newly-compiled code
- */
-#define register_slot_attribute(name, funcs, funcdata)  ObjectPad_register_slot_attribute(aTHX_ name, funcs, funcdata)
-void ObjectPad_register_slot_attribute(pTHX_ const char *name, const struct SlotHookFuncs *funcs, void *funcdata);
 
 #endif

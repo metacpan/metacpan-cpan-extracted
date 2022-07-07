@@ -36,9 +36,21 @@
 #  define HAVE_UNOP_AUX_PV
 #endif
 
+#ifdef HAVE_UNOP_AUX
+#  define METHSTART_CONTAINS_FIELD_BINDINGS
+
+/* We'll reserve the top two bits of a UV for storing the `type` value for a
+ * fieldpad operation; the remainder stores the fieldix itself */
+#  define UVBITS (UVSIZE*8)
+#  define FIELDIX_TYPE_SHIFT  (UVBITS-2)
+#  define FIELDIX_MASK        ((1LL<<FIELDIX_TYPE_SHIFT)-1)
+#endif
+
 #include "object_pad.h"
 #include "class.h"
 #include "field.h"
+
+#define warn_deprecated(...)  Perl_ck_warner(aTHX_ packWARN(WARN_DEPRECATED), __VA_ARGS__)
 
 typedef void MethodAttributeHandler(pTHX_ MethodMeta *meta, const char *value, void *data);
 
@@ -120,6 +132,31 @@ static PADOFFSET S_find_padix_for_field(pTHX_ FieldMeta *fieldmeta)
 #endif
 }
 
+#define bind_field_to_pad(sv, fieldix, private, padix)  S_bind_field_to_pad(aTHX_ sv, fieldix, private, padix)
+static void S_bind_field_to_pad(pTHX_ SV *sv, FIELDOFFSET fieldix, U8 private, PADOFFSET padix)
+{
+  SV *val;
+  switch(private) {
+    case OPpFIELDPAD_SV:
+      val = sv;
+      break;
+    case OPpFIELDPAD_AV:
+      if(!SvROK(sv) || SvTYPE(val = SvRV(sv)) != SVt_PVAV)
+        croak("ARGH: expected to find an ARRAY reference at field index %ld", (long int)fieldix);
+      break;
+    case OPpFIELDPAD_HV:
+      if(!SvROK(sv) || SvTYPE(val = SvRV(sv)) != SVt_PVHV)
+        croak("ARGH: expected to find a HASH reference at field index %ld", (long int)fieldix);
+      break;
+    default:
+      croak("ARGH: unsure what to do with this field type");
+  }
+
+  SAVESPTR(PAD_SVl(padix));
+  PAD_SVl(padix) = SvREFCNT_inc(val);
+  save_freesv(val);
+}
+
 static XOP xop_methstart;
 static OP *pp_methstart(pTHX)
 {
@@ -168,7 +205,7 @@ static OP *pp_methstart(pTHX)
   save_clearsv(&PAD_SVl(PADIX_SELF));
   sv_setsv(PAD_SVl(PADIX_SELF), self);
 
-  SV *backingav;
+  AV *backingav;
 
   if(is_role) {
     if(embedding == &embedding_standalone) {
@@ -178,11 +215,11 @@ static OP *pp_methstart(pTHX)
       SV *instancedata = get_obj_backingav(self, embedding->classmeta->repr, create);
 
       if(create) {
-        backingav = instancedata;
-        SvREFCNT_inc(backingav);
+        backingav = (AV *)instancedata;
+        SvREFCNT_inc((SV *)backingav);
       }
       else {
-        backingav = (SV *)newAV();
+        backingav = newAV();
         /* MASSIVE CHEAT */
         AvARRAY(backingav) = AvARRAY(instancedata) + offset;
         AvFILLp(backingav) = AvFILLp(instancedata) - offset;
@@ -192,22 +229,52 @@ static OP *pp_methstart(pTHX)
   }
   else {
     /* op_private contains the repr type so we can extract backing */
-    backingav = get_obj_backingav(self, PL_op->op_private, create);
+    backingav = (AV *)get_obj_backingav(self, PL_op->op_private, create);
     SvREFCNT_inc(backingav);
   }
 
   if(backingav) {
     SAVESPTR(PAD_SVl(PADIX_SLOTS));
-    PAD_SVl(PADIX_SLOTS) = backingav;
-    save_freesv(backingav);
+    PAD_SVl(PADIX_SLOTS) = (SV *)backingav;
+    save_freesv((SV *)backingav);
   }
+
+#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
+  UNOP_AUX_item *aux = cUNOP_AUX->op_aux;
+  if(aux) {
+    U32 fieldcount  = (aux++)->uv;
+    U32 max_fieldix = (aux++)->uv;
+    SV **fieldsvs = AvARRAY(backingav);
+
+    if(max_fieldix > av_top_index(backingav))
+      croak("ARGH: instance does not have a field at index %ld", (long int)max_fieldix);
+
+    while(fieldcount) {
+      PADOFFSET padix   = (aux++)->uv;
+      UV        fieldix = (aux++)->uv;
+
+      U8 private = fieldix >> FIELDIX_TYPE_SHIFT;
+      fieldix &= FIELDIX_MASK;
+
+      bind_field_to_pad(fieldsvs[fieldix], fieldix, private, padix);
+
+      fieldcount--;
+    }
+  }
+#endif
 
   return PL_op->op_next;
 }
 
 OP *ObjectPad_newMETHSTARTOP(pTHX_ U32 flags)
 {
+#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
+  /* We know we're on 5.22 or above, so no worries about assert failures */
+  OP *op = newUNOP_AUX(OP_CUSTOM, flags, NULL, NULL);
+  op->op_ppaddr = &pp_methstart;
+#else
   OP *op = newOP_CUSTOM(&pp_methstart, flags);
+#endif
   op->op_private = (U8)(flags >> 8);
   return op;
 }
@@ -253,30 +320,7 @@ static OP *pp_fieldpad(pTHX)
   if(fieldix > av_top_index(backingav))
     croak("ARGH: instance does not have a field at index %ld", (long int)fieldix);
 
-  SV **fieldsvs = AvARRAY(backingav);
-
-  SV *sv = fieldsvs[fieldix];
-
-  SV *val;
-  switch(PL_op->op_private) {
-    case OPpFIELDPAD_SV:
-      val = sv;
-      break;
-    case OPpFIELDPAD_AV:
-      if(!SvROK(sv) || SvTYPE(val = SvRV(sv)) != SVt_PVAV)
-        croak("ARGH: expected to find an ARRAY reference at field index %ld", (long int)fieldix);
-      break;
-    case OPpFIELDPAD_HV:
-      if(!SvROK(sv) || SvTYPE(val = SvRV(sv)) != SVt_PVHV)
-        croak("ARGH: expected to find a HASH reference at field index %ld", (long int)fieldix);
-      break;
-    default:
-      croak("ARGH: unsure what to do with this field type");
-  }
-
-  SAVESPTR(PAD_SVl(targ));
-  PAD_SVl(targ) = SvREFCNT_inc(val);
-  save_freesv(val);
+  bind_field_to_pad(AvARRAY(backingav)[fieldix], fieldix, PL_op->op_private, targ);
 
   return PL_op->op_next;
 }
@@ -367,7 +411,7 @@ static bool S_is_valid_ident_utf8(pTHX_ const U8 *s)
   return true;
 }
 
-void inplace_trim_whitespace(SV *sv)
+static void inplace_trim_whitespace(SV *sv)
 {
   if(!SvPOK(sv) || !SvCUR(sv))
     return;
@@ -436,9 +480,7 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
 
   if(args[argi++]->i) {
     /* extends */
-    if(!args[argi]->i) {
-      warn("'extends' is deprecated; use :isa instead");
-    }
+    warn_deprecated("'%s' modifier keyword is deprecated; use :isa() attribute instead", args[argi]->i ? "isa" : "extends");
     argi++; /* ignore the XPK_CHOICE() integer; `extends` and `isa` are synonyms */
     if(type != METATYPE_CLASS)
       croak("Only a class may extend another");
@@ -476,9 +518,7 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
   if(nimplements) {
     int i;
     for(i = 0; i < nimplements; i++) {
-      if(!args[argi]->i) {
-        warn("'implements' is deprecated; use :does instead");
-      }
+      warn_deprecated("'%s' modifier keyword is deprecated; use :does() attribute instead", args[argi]->i ? "does" : "implements");
       argi++; /* ignore the XPK_CHOICE() integer; `implements` and `does` are synonyms */
       int nroles = args[argi++]->i;
       while(nroles--) {
@@ -498,6 +538,9 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
 
   int nattrs = args[argi++]->i;
   if(nattrs) {
+    if(hv_fetchs(GvHV(PL_hintgv), "Object::Pad/configure(no_class_attrs)", 0))
+      croak("Class/role attributes are not permitted");
+
     int i;
     for(i = 0; i < nattrs; i++) {
       SV *attrname = args[argi]->attr.name;
@@ -509,6 +552,10 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
 
       argi++;
     }
+  }
+
+  if(hv_fetchs(GvHV(PL_hintgv), "Object::Pad/configure(always_strict)", 0)) {
+    mop_class_apply_attribute(meta, "strict", sv_2mortal(newSVpvs("params")));
   }
 
   mop_class_begin(meta);
@@ -622,10 +669,12 @@ static const struct XSParseKeywordHooks kwhooks_role = {
   .build = &build_classlike,
 };
 
-static void check_has(pTHX_ void *hookdata)
+static void check_field(pTHX_ void *hookdata)
 {
+  char *kwname = hookdata;
+
   if(!have_compclassmeta)
-    croak("Cannot 'has' outside of 'class'");
+    croak("Cannot '%s' outside of 'class'", kwname);
 
   if(compclassmeta->role_is_invokable)
     croak("Cannot add field data to an invokable role");
@@ -635,7 +684,7 @@ static void check_has(pTHX_ void *hookdata)
       PL_curstname, compclassmeta->name);
 }
 
-static int build_has(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
+static int build_field(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
 {
   int argi = 0;
 
@@ -647,6 +696,9 @@ static int build_has(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, 
 
   int nattrs = args[argi++]->i;
   if(nattrs) {
+    if(hv_fetchs(GvHV(PL_hintgv), "Object::Pad/configure(no_field_attrs)", 0))
+      croak("Field attributes are not permitted");
+
     SV *fieldmetasv = newSV(0);
     sv_setref_uv(fieldmetasv, "Object::Pad::MOP::Field", PTR2UV(fieldmeta));
     SAVEFREESV(fieldmetasv);
@@ -743,7 +795,7 @@ field_array_hash_common:
   return KEYWORD_PLUGIN_STMT;
 }
 
-static void setup_parse_has_initexpr(pTHX_ void *hookdata)
+static void setup_parse_field_initexpr(pTHX_ void *hookdata)
 {
   CV *was_compcv = PL_compcv;
   HV *hints = GvHV(PL_hintgv);
@@ -763,23 +815,40 @@ static void setup_parse_has_initexpr(pTHX_ void *hookdata)
   CvOUTSIDE_SEQ(PL_compcv) = PL_cop_seqmax;
 }
 
+static const struct XSParseKeywordHooks kwhooks_field = {
+  .flags = XPK_FLAG_STMT,
+  .permit_hintkey = "Object::Pad/field",
+
+  .check = &check_field,
+
+  .pieces = (const struct XSParseKeywordPieceType []){
+    XPK_LEXVARNAME(XPK_LEXVAR_ANY),
+    XPK_ATTRIBUTES,
+    XPK_TAGGEDCHOICE(
+      /* An optional choice of only one item; for compat. with kwhooks_has */
+      XPK_PREFIXED_BLOCK_ENTERLEAVE(XPK_SETUP(&setup_parse_field_initexpr)), XPK_TAG(1)
+    ),
+    {0}
+  },
+  .build = &build_field,
+};
 static const struct XSParseKeywordHooks kwhooks_has = {
   .flags = XPK_FLAG_STMT,
   .permit_hintkey = "Object::Pad/has",
 
-  .check = &check_has,
+  .check = &check_field,
 
   .pieces = (const struct XSParseKeywordPieceType []){
     XPK_LEXVARNAME(XPK_LEXVAR_ANY),
     XPK_ATTRIBUTES,
     XPK_CHOICE(
       XPK_SEQUENCE(XPK_EQUALS, XPK_TERMEXPR, XPK_AUTOSEMI),
-      XPK_PREFIXED_BLOCK_ENTERLEAVE(XPK_SETUP(&setup_parse_has_initexpr)),
+      XPK_PREFIXED_BLOCK_ENTERLEAVE(XPK_SETUP(&setup_parse_field_initexpr)),
       {0}
     ),
     {0}
   },
-  .build = &build_has,
+  .build = &build_field,
 };
 
 /* We use the method-like keyword parser to parse phaser blocks as well as
@@ -791,13 +860,11 @@ enum PhaserType {
   PHASER_NONE, /* A normal `method`; i.e. not a phaser */
   PHASER_BUILD,
   PHASER_ADJUST,
-  PHASER_ADJUSTPARAMS,
 };
 
 static const char *phasertypename[] = {
-  [PHASER_BUILD]        = "BUILD",
-  [PHASER_ADJUST]       = "ADJUST",
-  [PHASER_ADJUSTPARAMS] = "ADJUSTPARAMS",
+  [PHASER_BUILD]  = "BUILD",
+  [PHASER_ADJUST] = "ADJUST",
 };
 
 static bool parse_method_permit(pTHX_ void *hookdata)
@@ -845,7 +912,6 @@ static void parse_method_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, v
 
     case PHASER_BUILD:
     case PHASER_ADJUST:
-    case PHASER_ADJUSTPARAMS:
       break;
   }
 
@@ -973,7 +1039,6 @@ static void parse_method_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, v
   I32 nfields = av_count(compclassmeta->direct_fields);
   PADNAME **snames = PadnamelistARRAY(fieldnames);
   PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(CvPADLIST(PL_compcv)));
-  OP *fieldops = NULL;
 
   MethodMeta *compmethodmeta = NUM2PTR(MethodMeta *, SvUV(*hv_fetchs(ctx->moddata, "Object::Pad/compmethodmeta", 0)));
 
@@ -981,8 +1046,16 @@ static void parse_method_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, v
    * declaration; a required method for a role
    */
   if(ctx->body && !compmethodmeta->is_common) {
+    OP *fieldops = NULL, *methstartop;
 #if HAVE_PERL_VERSION(5, 22, 0)
     U32 cop_seq_low = COP_SEQ_RANGE_LOW(padnames[PADIX_SELF]);
+#endif
+
+#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
+    AV *fieldmap = newAV();
+    U32 fieldcount = 0, max_fieldix = 0;
+
+    SAVEFREESV((SV *)fieldmap);
 #endif
 
     {
@@ -1015,9 +1088,9 @@ static void parse_method_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, v
     fieldops = op_append_list(OP_LINESEQ, fieldops,
       newSTATEOP(0, NULL, NULL));
     fieldops = op_append_list(OP_LINESEQ, fieldops,
-      newMETHSTARTOP(0 |
+      (methstartop = newMETHSTARTOP(0 |
         (compclassmeta->type == METATYPE_ROLE ? OPf_SPECIAL : 0) |
-        (compclassmeta->repr << 8)));
+        (compclassmeta->repr << 8))));
 
     int i;
     for(i = 0; i < nfields; i++) {
@@ -1047,9 +1120,17 @@ static void parse_method_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, v
         case '%': private = OPpFIELDPAD_HV; break;
       }
 
+#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
+      assert((fieldix & ~FIELDIX_MASK) == 0);
+      av_store(fieldmap, padix, newSVuv(((UV)private << FIELDIX_TYPE_SHIFT) | fieldix));
+      fieldcount++;
+      if(fieldix > max_fieldix)
+        max_fieldix = fieldix;
+#else
       fieldops = op_append_list(OP_LINESEQ, fieldops,
         /* alias the padix from the field */
         newFIELDPADOP(private << 8, padix, fieldix));
+#endif
 
 #if HAVE_PERL_VERSION(5, 22, 0)
       /* Unshare the padname so the one in the methodscope pad returns to refcount 1 */
@@ -1065,6 +1146,24 @@ static void parse_method_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, v
 #endif
     }
 
+#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
+    if(fieldcount) {
+      UNOP_AUX_item *aux;
+      Newx(aux, 2 + fieldcount*2, UNOP_AUX_item);
+      cUNOP_AUXx(methstartop)->op_aux = aux;
+
+      (aux++)->uv = fieldcount;
+      (aux++)->uv = max_fieldix;
+
+      for(Size_t i = 0; i < av_count(fieldmap); i++) {
+        if(!AvARRAY(fieldmap)[i] || !SvOK(AvARRAY(fieldmap)[i]))
+          continue;
+
+        (aux++)->uv = i;
+        (aux++)->uv = SvUV(AvARRAY(fieldmap)[i]);
+      }
+    }
+#endif
     ctx->body = op_append_list(OP_LINESEQ, fieldops, ctx->body);
   }
   else if(ctx->body && compmethodmeta->is_common) {
@@ -1153,10 +1252,6 @@ static void parse_method_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, voi
     case PHASER_ADJUST:
       mop_class_add_ADJUST(compclassmeta, ctx->cv); /* steal CV */
       break;
-
-    case PHASER_ADJUSTPARAMS:
-      mop_class_add_ADJUSTPARAMS(compclassmeta, ctx->cv); /* steal CV */
-      break;
   }
 
   SV **varnamep;
@@ -1214,8 +1309,13 @@ static int parse_phaser(pTHX_ OP **out, void *hookdata)
   return xs_parse_sublike(&parse_phaser_hooks, hookdata, out);
 }
 
-static const struct XSParseKeywordHooks kwhooks_phaser = {
-  .permit_hintkey = "Object::Pad/method",
+static const struct XSParseKeywordHooks kwhooks_BUILD = {
+  .permit_hintkey = "Object::Pad/BUILD",
+  .parse = &parse_phaser,
+};
+
+static const struct XSParseKeywordHooks kwhooks_ADJUST = {
+  .permit_hintkey = "Object::Pad/ADJUST",
   .parse = &parse_phaser,
 };
 
@@ -1231,6 +1331,8 @@ static void check_requires(pTHX_ void *hookdata)
 static int build_requires(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
 {
   SV *mname = args[0]->sv;
+
+  warn_deprecated("'requires' is now discouraged; use an empty 'method NAME;' declaration instead");
 
   mop_class_add_required_method(compclassmeta, mname);
 
@@ -1284,7 +1386,6 @@ static void dump_adjustblock(pTHX_ DMDContext *ctx, AdjustBlock *adjustblock)
 {
   DMD_DUMP_STRUCT(ctx, "Object::Pad/AdjustBlock", adjustblock, sizeof(AdjustBlock),
     2, ((const DMDNamedField []){
-      {"is_adjustparams", DMD_FIELD_BOOL, .b   = adjustblock->is_adjustparams},
       {"the CV",          DMD_FIELD_PTR,  .ptr = adjustblock->cv},
     })
   );
@@ -1525,7 +1626,11 @@ register(class, name, ...)
 BOOT:
   XopENTRY_set(&xop_methstart, xop_name, "methstart");
   XopENTRY_set(&xop_methstart, xop_desc, "enter method");
+#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
+  XopENTRY_set(&xop_methstart, xop_class, OA_UNOP_AUX);
+#else
   XopENTRY_set(&xop_methstart, xop_class, OA_BASEOP);
+#endif
   Perl_custom_op_register(aTHX_ &pp_methstart, &xop_methstart);
 
   XopENTRY_set(&xop_commonmethstart, xop_name, "commonmethstart");
@@ -1552,15 +1657,16 @@ BOOT:
   register_xs_parse_keyword("class", &kwhooks_class, (void *)METATYPE_CLASS);
   register_xs_parse_keyword("role",  &kwhooks_role,  (void *)METATYPE_ROLE);
 
-  register_xs_parse_keyword("has", &kwhooks_has, NULL);
+  register_xs_parse_keyword("field", &kwhooks_field, "field");
+  register_xs_parse_keyword("has",   &kwhooks_has,   "has");
 
-  register_xs_parse_keyword("BUILD", &kwhooks_phaser, (void *)PHASER_BUILD);
-  register_xs_parse_keyword("ADJUST", &kwhooks_phaser, (void *)PHASER_ADJUST);
-  register_xs_parse_keyword("ADJUSTPARAMS", &kwhooks_phaser, (void *)PHASER_ADJUSTPARAMS);
+  register_xs_parse_keyword("BUILD",        &kwhooks_BUILD, (void *)PHASER_BUILD);
+  register_xs_parse_keyword("ADJUST",       &kwhooks_ADJUST, (void *)PHASER_ADJUST);
+  register_xs_parse_keyword("ADJUSTPARAMS", &kwhooks_ADJUST, (void *)PHASER_ADJUST);
 
   register_xs_parse_keyword("requires", &kwhooks_requires, NULL);
 
-  boot_xs_parse_sublike(0.15); /* dymamic actions */
+  boot_xs_parse_sublike(0.15); /* dynamic actions */
 
   register_xs_parse_sublike("method", &parse_method_hooks, (void *)PHASER_NONE);
 

@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
 use Object::Pad 0.57;
 
-package Tickit::ContainerWidget 0.55;
+package Tickit::ContainerWidget 0.56;
 class Tickit::ContainerWidget
    :isa(Tickit::Widget);
 
@@ -204,9 +204,10 @@ method window_lost
 
 method _on_win_focus
 {
+   my ( $win, $evtype, $childwin ) = @_;
    $self->SUPER::_on_win_focus( @_ );
 
-   $self->set_style_tag( "focus-child" => $_[1] ) if $_[2];
+   $self->set_style_tag( "focus-child" => $evtype ) if $childwin;
 }
 
 =head2 find_child

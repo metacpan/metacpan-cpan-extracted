@@ -12,7 +12,7 @@ BEGIN {
 use Object::Pad;
 
 class List {
-   has @values;
+   field @values;
 
    method push ( @more ) { push @values, @more }
    method nshift ( $n )  { splice @values, 0, $n }
@@ -27,7 +27,7 @@ class List {
 }
 
 class Greeter {
-   has $_who;
+   field $_who;
 
    BUILD ( %args ) {
       $_who = $args{who};

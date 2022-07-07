@@ -5,7 +5,7 @@
 
 use Object::Pad 0.57;
 
-package Tickit::Widget::Button 0.34;
+package Tickit::Widget::Button 0.35;
 class Tickit::Widget::Button
    :isa(Tickit::Widget);
 

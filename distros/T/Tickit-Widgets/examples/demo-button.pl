@@ -17,7 +17,7 @@ my $border = Tickit::Widget::Border->new(
    h_border => 10,
    v_border => 2,
 )
-   ->set_child( my $vbox = Tickit::Widget::VBox->new( spacing => 2, bg => "black" ) );
+   ->set_child( my $vbox = Tickit::Widget::VBox->new( spacing => 2, style => { bg => "black" } ) );
 
 my @buttons;
 foreach my $colour (qw( red blue green yellow )) {

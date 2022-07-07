@@ -9,7 +9,7 @@ use Object::Pad;
 
 {
    class Counter {
-      has $count;
+      field $count;
       my $allcount = 0;
 
       method inc { $count++; $allcount++ }

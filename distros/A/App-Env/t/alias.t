@@ -53,15 +53,7 @@ use App::Env;
     is( $ENV{Site1_App1}, 5, "import lower case alias" );
 }
 
-{
-    local %ENV = %ENV;
-
-    # try this with Site ignored
-    # import lowercased alias
-    delete $ENV{APP_ENV_SITE};
-    App::Env::import( 'app1', { Force => 1 } );
-    is( $ENV{App1}, 1, "import lower case alias" );
-}
-
+is( App::Env->new( 'app1', { Force => 1, Site => '' } )->env( 'App1' ),
+    1, 'lower case alias, no Site' );
 
 done_testing;

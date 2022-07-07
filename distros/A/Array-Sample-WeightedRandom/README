@@ -3,9 +3,9 @@ NAME
     (with or without replacement)
 
 VERSION
-    This document describes version 0.004 of Array::Sample::WeightedRandom
+    This document describes version 0.005 of Array::Sample::WeightedRandom
     (from Perl distribution Array-Sample-WeightedRandom), released on
-    2022-05-21.
+    2022-05-22.
 
 SYNOPSIS
      use Array::Sample::WeightedRandom qw(sample_weighted_random_with_replacement sample_weighted_random_no_replacement);
@@ -48,6 +48,11 @@ FUNCTIONS
         a shallow (1-level) copy of the input array. The 'nocopy' algorithm
         is generally a bit slower but could save memory usage *if* your
         array is very very large (e.g. tens of millions of elements).
+
+    *   with_weight => bool
+
+        If set to true, will return the original elements (values with
+        weights) instead of just the values.
 
     The function takes an array reference ("\@ary") and number of samples to
     take ($n). The array must be structured as follow: each element is a

@@ -5,25 +5,27 @@ use warnings;
 package Acme::Marvel::CinematicUniverse::Character::Instance::Thor_Odinson;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002';
+our $VERSION   = '0.003';
 
 use Acme::Marvel::CinematicUniverse::Character;
 
-my $thor = Acme::Marvel::CinematicUniverse::Character->new(
-	real_name           => 'Thor Odinson',
-	hero_name           => 'Thor',
-	intelligence        => 2,
-	strength            => 7,
-	speed               => 7,
-	durability          => 6,
-	energy_projection   => 6,
-	fighting_ability    => 4,
-);
+my $instance;
+sub get {
+	$instance ||= 'Acme::Marvel::CinematicUniverse::Character'->new(
+		real_name         => 'Thor Odinson',
+		hero_name         => 'Thor',
+		intelligence      => 2,
+		strength          => 7,
+		speed             => 7,
+		durability        => 6,
+		energy_projection => 6,
+		fighting_ability  => 4,
+	);
+}
 
 sub init {
 	my ( $me, $collector ) = ( shift, @_ );
-	$collector->load_character( $thor );
+	$collector->load_character( $me->get );
 }
 
 1;
-

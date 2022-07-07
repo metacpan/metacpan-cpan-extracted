@@ -49,11 +49,11 @@
    "provides" : {
       "Array::Sample::WeightedRandom" : {
          "file" : "lib/Array/Sample/WeightedRandom.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Array::Sample::WeightedRandom::Scan" : {
          "file" : "lib/Array/Sample/WeightedRandom/Scan.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -68,7 +68,7 @@
          "web" : "https://github.com/perlancar/perl-Array-Sample-WeightedRandom"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

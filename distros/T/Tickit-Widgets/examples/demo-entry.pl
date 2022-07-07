@@ -14,7 +14,7 @@ $vbox->add(
    Tickit::Widget::Border->new(
       h_border => 2,
       v_border => 1,
-      bg => 'blue',
+      style => { bg => 'blue' },
    )
    ->set_child( my $entry = Tickit::Widget::Entry->new ),
 );
@@ -22,8 +22,9 @@ $vbox->add(
 $vbox->add( my $label = Tickit::Widget::Static->new( text => "" ) );
 
 $entry->set_on_enter( sub {
-   $label->set_text( "You entered: $_[1]" );
-   $_[0]->set_text( "" );
+   my ( $entry, $text ) = @_;
+   $label->set_text( "You entered: $text" );
+   $entry->set_text( "" );
 } );
 
 Tickit->new( root => $vbox )->run;

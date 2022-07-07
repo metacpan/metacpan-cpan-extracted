@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 7;
+use Test::More 'tests' => 8;
 use Test::NoWarnings;
 use Mo::utils qw(check_number);
 
@@ -50,3 +50,10 @@ is($ret, undef, 'Right number is present (negative number).');
 $self = {};
 $ret = check_number($self, 'key');
 is($ret, undef, 'No key, everything is ok.');
+
+# Test.
+$self = {
+	'key' => undef,
+};
+$ret = check_number($self, 'key', 'Foo');
+is($ret, undef, "Value is undefined, that's ok.");

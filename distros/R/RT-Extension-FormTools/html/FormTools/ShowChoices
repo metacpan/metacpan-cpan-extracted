@@ -3,18 +3,28 @@ my $queue = $m->notes('queue');
 
 my %all_fields = $m->request_args;
 </%init>
-<table>
 % foreach my $field (keys %all_fields) {
 % next if $field =~ /-Magic/;
 % my $cf = RT::CustomField->new($session{'CurrentUser'});
 % if ($field =~ /CustomField-(\d+)/) {
 % my $id = $1;
 %$cf->Load($id);
-<tr><td><b><%$cf->Name%></b></td><td><% ref ($all_fields{$field}) ? join(', ',@{$all_fields{$field}}) : $all_fields{$field}%></td></tr>
+<div class="form-row">
+  <div class="col-3 label"><%$cf->Name%></div>
+  <div class="col-9 value">
+    <span class="current-value">
+      <% ref ($all_fields{$field}) ? join(', ',@{$all_fields{$field}}) : $all_fields{$field}%>
+    </span>
+  </div>
+</div>
 % } elsif (RT::Extension::FormTools::is_core_field($field)) {
-
-<tr><td><b><%$field%></b></td><td><% $all_fields{$field} %></td></tr>
+<div class="form-row">
+  <div class="col-3 label"><%$field%></div>
+  <div class="col-9 value">
+    <span class="current-value">
+      <% $all_fields{$field} %>
+    </span>
+  </div>
+</div>
 %}
-
 % }
-</table>

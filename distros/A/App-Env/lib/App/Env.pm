@@ -9,24 +9,25 @@ use warnings;
 use Scalar::Util;
 use Storable ();
 
-use Carp();
 use Params::Validate ();
 
 # need to distinguish between a non-existent module
 # and one which has compile errors.
 use Module::Find qw( );
 
-
-our $VERSION = '0.36';
+our $VERSION = '1.01';
 
 use overload
   '%{}'    => '_envhash',
   '""'     => 'str',
   fallback => 1;
 
-
 #-------------------------------------------------------
 
+sub _croak {
+    require Carp;
+    goto &Carp::croak;
+}
 
 my %existsModule;
 
@@ -43,7 +44,6 @@ sub _loadModuleList {
 
     return;
 }
-
 
 sub _existsModule {
     my ( $path ) = @_;
@@ -64,24 +64,45 @@ sub _existsModule {
 #-------------------------------------------------------
 
 # allow site specific site definition
-BEGIN {
-
+use constant APP_ENV_SITE => do {
     if ( !exists $ENV{APP_ENV_SITE} && _existsModule( 'App::Env::Site' ) ) {
         eval { require App::Env::Site };
-        Carp::croak( ref $@ ? $@ : "Error loading App::Env::Site: $@\n" ) if $@;
+        _croak( ref $@ ? $@ : "Error loading App::Env::Site: $@\n" ) if $@;
     }
+
+    # only use the environment variable if defined and not empty.
+    defined $ENV{APP_ENV_SITE}
+      && length $ENV{APP_ENV_SITE} ? $ENV{APP_ENV_SITE} : undef;
+};
+
+# _App_Env_Site ( [$alt_site] );
+# if $alt_site is non-empty, return it.
+# if $alt_site is empty or undefined return ().
+# otherwise return APP_ENV_SITE
+sub _App_Env_Site {
+
+    @_ || return APP_ENV_SITE;
+
+    my $site = shift;
+
+    return () if !defined $site || $site eq '';
+    return $site;
+
+# _croak( "Environment variable APP_ENV_SITE is only obeyed at the time that ${ \__PACKAGE__ } is loaded" )
+#   if ( defined( APP_ENV_SITE ) xor defined $ENV{APP_ENV_SITE} )
+#   || ( defined( APP_ENV_SITE ) && defined $ENV{APP_ENV_SITE} && APP_ENV_SITE ne $ENV{APP_ENV_SITE} );
 }
 
 #-------------------------------------------------------
 
 # Options
 my %SharedOptions = (
-    Force    => { default => 0 },
-    Cache    => { default => 1 },
-    Site     => { default => undef },
-    CacheID  => { default => undef },
-    Temp     => { default => 0 },
-    SysFatal => { default => 0, type => Params::Validate::BOOLEAN },
+    Force    => { default  => 0 },
+    Cache    => { default  => 1 },
+    Site     => { optional => 1 },
+    CacheID  => { default  => undef },
+    Temp     => { default  => 0 },
+    SysFatal => { default  => 0, type => Params::Validate::BOOLEAN },
 );
 
 my %ApplicationOptions = (
@@ -133,7 +154,7 @@ sub import {
     # object method?
     if ( Scalar::Util::blessed $this && $this->isa( __PACKAGE__ ) ) {
         my $self = shift;
-        die( __PACKAGE__, "->import: too many arguments\n" )
+        _croak( __PACKAGE__, "->import: too many arguments\n" )
           if @_;
 
         while ( my ( $key, $value ) = each %{$self} ) {
@@ -165,15 +186,12 @@ sub import {
 sub retrieve {
 
     my ( $cacheid ) = @_;
-
     my $self;
 
     if ( defined $EnvCache{$cacheid} ) {
         $self = __PACKAGE__->new();
-
         $self->_var( app => $EnvCache{$cacheid} );
     }
-
 
     return $self;
 }
@@ -181,11 +199,8 @@ sub retrieve {
 #-------------------------------------------------------
 
 sub config {
-
     my %default = Params::Validate::validate( @_, \%OptionDefaults );
-
     $OptionDefaults{$_}{default} = $default{$_} for keys %default;
-
     return;
 }
 
@@ -286,7 +301,7 @@ sub _load_envs {
         # handle application specific options.
         if ( 'ARRAY' eq ref( $app ) ) {
             ( $app, my $opts ) = @$app;
-            Carp::croak( "$app: application options must be a hashref\n" )
+            _croak( "$app: application options must be a hashref\n" )
               unless 'HASH' eq ref $opts;
 
             %app_opt = ( %app_opt, %$opts );
@@ -294,7 +309,7 @@ sub _load_envs {
             if ( @apps > 1 ) {
                 for my $iopt ( qw( Cache Force ) ) {
                     if ( exists $app_opt{$iopt} ) {
-                        Carp::croak(
+                        _croak(
                             "$app: do not specify the $iopt option for individual applications in a merge\n"
                         );
                         delete $app_opt{$iopt};
@@ -451,7 +466,7 @@ sub cache {
     my ( $self, $cache ) = @_;
 
     defined $cache
-      or Carp::croak( "missing or undefined cache argument\n" );
+      or _croak( "missing or undefined cache argument\n" );
 
     if ( $cache ) {
         $self->_app->cache;
@@ -465,15 +480,15 @@ sub uncache {
     my %opt = Params::Validate::validate(
         @_,
         {
-            All     => { default => undef, type => Params::Validate::SCALAR },
-            App     => { default => undef, type => Params::Validate::SCALAR },
-            Site    => { default => undef, type => Params::Validate::SCALAR },
-            CacheID => { default => undef, type => Params::Validate::SCALAR },
+            All     => { default  => undef, type => Params::Validate::SCALAR },
+            App     => { default  => undef, type => Params::Validate::SCALAR },
+            Site    => { optional => 1,     type => Params::Validate::SCALAR },
+            CacheID => { default  => undef, type => Params::Validate::SCALAR },
         } );
 
     if ( $opt{All} ) {
         delete $opt{All};
-        Carp::croak( "can't specify All option with other options\n" )
+        _croak( "can't specify All option with other options\n" )
           if grep { defined $_ } values %opt;
 
         delete $EnvCache{$_} foreach keys %EnvCache;
@@ -481,20 +496,21 @@ sub uncache {
 
     elsif ( defined $opt{CacheID} ) {
         my $cacheid = delete $opt{CacheID};
-        Carp::croak( "can't specify CacheID option with other options\n" )
+        _croak( "can't specify CacheID option with other options\n" )
           if grep { defined $_ } values %opt;
 
         delete $EnvCache{$cacheid};
     }
     else {
-        Carp::croak( "must specify App or CacheID options\n" )
+        _croak( "must specify App or CacheID options\n" )
           unless defined $opt{App};
-
-        $opt{Site} ||= _App_Env_Site();
 
         # don't use normal rules for Site specification as we're trying
         # to delete a specific one.
-        delete $EnvCache{ _modulename( $opt{Site}, $opt{App} ) };
+        delete $EnvCache{
+            _modulename(
+                _App_Env_Site( exists $opt{Site} ? ( $opt{Site} ) : () ),
+                $opt{App} ) };
     }
 
     return;
@@ -503,7 +519,7 @@ sub uncache {
 #-------------------------------------------------------
 
 sub _modulename {
-    return join( '::', 'App::Env', @_ );
+    return join( '::', 'App::Env', grep { defined $_ } @_ );
 }
 
 
@@ -514,17 +530,15 @@ sub _modulename {
 # found, false if not, die's if require fails
 
 sub _require_module {
-    my ( $app, $usite, $loop, $app_opts ) = @_;
+    my ( $app, %par ) = @_;
 
-    $app_opts ||= {};
+    my $app_opts = $par{app_opts} ||= {};
+    my $loop     = $par{loop}     ||= 1;
 
-    $loop ||= 1;
-    die( "too many alias loops for $app\n" )
+    _croak( "too many alias loops for $app\n" )
       if $loop == 10;
 
-    my @sites = _App_Env_Site();
-    push @sites, $usite
-      if defined $usite && $usite ne '';
+    my @sites = _App_Env_Site( exists $par{site} ? $par{site} : () );
 
     # check possible sites, in turn.
     my ( $module )
@@ -535,14 +549,18 @@ sub _require_module {
     if ( defined $module ) {
         ## no critic ( ProhibitStringyEval );
         eval "require $module"
-          or die $@;
+          or _croak $@;
 
         # see if this is an alias
         if ( my $alias = $module->can( 'alias' ) ) {
             ( $app, my $napp_opts ) = $alias->();
             @{$app_opts}{ keys %$napp_opts } = @{$napp_opts}{ keys %$napp_opts }
               if $napp_opts;
-            return _require_module( $app, $usite, ++$loop, $app_opts );
+            return _require_module(
+                $app, %par,
+                loop     => ++$loop,
+                app_opts => $app_opts
+            );
         }
     }
 
@@ -554,19 +572,6 @@ sub _require_module {
 }
 
 #-------------------------------------------------------
-
-# consolidate handling of APP_ENV_SITE environment variable
-
-sub _App_Env_Site {
-
-    return $ENV{APP_ENV_SITE}
-      if exists $ENV{APP_ENV_SITE} && $ENV{APP_ENV_SITE} ne '';
-
-    return;
-}
-
-#-------------------------------------------------------
-
 
 sub _exclude_param_check {
     !ref $_[0]
@@ -594,7 +599,7 @@ sub env {
     # Exclude is only allowed in scalar calling context where
     # @_ is empty, has more than one element, or the first element
     # is not a scalar.
-    die( "Cannot use Exclude in this calling context\n" )
+    _croak( "Cannot use Exclude in this calling context\n" )
       if $opt{Exclude} && ( wantarray() || ( @_ == 1 && !ref $_[0] ) );
 
 
@@ -620,12 +625,11 @@ sub env {
 #-------------------------------------------------------
 
 sub setenv {
-
     my $self = shift;
     my $var  = shift;
 
     defined $var
-      or Carp::croak( "missing variable name argument\n" );
+      or _croak( "missing variable name argument\n" );
 
     if ( @_ ) {
         $self->_envhash->{$var} = $_[0];
@@ -633,7 +637,6 @@ sub setenv {
     else {
         delete $self->_envhash->{$var};
     }
-
 }
 
 #-------------------------------------------------------
@@ -714,7 +717,7 @@ sub _match_var {
             push @keys, grep { $spec->( $_, $env->{$_} ) } keys %$env;
         }
         else {
-            die( "match specification is of unsupported type: ",
+            _croak( "match specification is of unsupported type: ",
                 ref $spec, "\n" );
         }
     }
@@ -746,15 +749,13 @@ sub _shell_escape {
 sub system {
     my $self = shift;
 
-    {
-        local %ENV = %{$self};
-        if ( $self->_opt->{SysFatal} ) {
-            require IPC::System::Simple;
-            return IPC::System::Simple::system( @_ );
-        }
-        else {
-            return CORE::system( @_ );
-        }
+    local %ENV = %{$self};
+    if ( $self->_opt->{SysFatal} ) {
+        require IPC::System::Simple;
+        return IPC::System::Simple::system( @_ );
+    }
+    else {
+        return CORE::system( @_ );
     }
 }
 
@@ -775,9 +776,8 @@ sub qexec {
         $res = eval { IPC::System::Simple::capture( @_ ) }
     }
 
-    if ( $@ ) {
-
-        die( $@ ) if $self->_opt->{SysFatal};
+    if ( $@ ne '' ) {
+        _croak( $@ ) if $self->_opt->{SysFatal};
         return;
     }
 
@@ -819,7 +819,7 @@ sub capture {
         $stdout = eval { &Capture::Tiny::capture( $sub ) };
     }
 
-    die( $@ ) if $@;
+    _croak( $@ ) if $@ ne '';
 
     return wantarray ? ( $stdout, $stderr ) : $stdout;
 }
@@ -829,10 +829,8 @@ sub capture {
 sub exec {
     my $self = shift;
 
-    {
-        local %ENV = %{$self};
-        exec( @_ );
-    }
+    local %ENV = %{$self};
+    exec( @_ );
 }
 
 
@@ -874,17 +872,23 @@ sub new {
     }
     else {
 
-        ( $self->{module}, my $app_opts )
-          = eval { App::Env::_require_module( $self->{app}, $self->{opt}{Site} ) };
+        ( $self->{module}, my $app_opts ) = eval {
+            App::Env::_require_module(
+                $self->{app},
+                (
+                    exists $self->{opt}{Site}
+                    ? ( site => $self->{opt}{Site} )
+                    : () ) );
+        };
 
-        Carp::croak(
+        _croak(
             ref $@
             ? $@
             : "error loading application environment module for $self->{app}:\n",
             $@
         ) if $@;
 
-        die(
+        _croak(
             "application environment module for $self->{app} does not exist\n" )
           unless defined $self->{module};
 
@@ -904,7 +908,6 @@ sub new {
         $self->load unless $self->{NoLoad};
         delete $self->{NoLoad};
     }
-
 
     return $self;
 }
@@ -945,12 +948,9 @@ sub mk_cacheid {
                     last;
                 }
             }
-
         }
-
         push @elements, $self->{module}, $digest;
     }
-
 
     $self->cacheid( join( $;, grep { defined $_ } @elements ) );
 }
@@ -969,12 +969,12 @@ sub load {
     my $envs;
     my $fenvs = $module->can( 'envs' );
 
-    Carp::croak( "$module does not have an 'envs' function\n" )
+    _croak( "$module does not have an 'envs' function\n" )
       unless $fenvs;
 
     $envs = eval { $fenvs->( $self->{opt}{AppOpts} ) };
 
-    Carp::croak( ref $@ ? $@ : "error in ${module}::envs: $@\n" )
+    _croak( ref $@ ? $@ : "error in ${module}::envs: $@\n" )
       if $@;
 
     # make copy of environment
@@ -990,7 +990,6 @@ sub load {
 
 sub cache {
     my ( $self ) = @_;
-
     $App::Env::EnvCache{ $self->cacheid } = $self;
 }
 
@@ -998,7 +997,6 @@ sub cache {
 
 sub uncache {
     my ( $self ) = @_;
-
     my $cacheid = $self->cacheid;
 
     delete $App::Env::EnvCache{$cacheid}
@@ -1011,7 +1009,6 @@ sub uncache {
 sub _opt    { @_ > 1 ? $_[0]->{opt}     = $_[1] : $_[0]->{opt} }
 sub cacheid { @_ > 1 ? $_[0]->{cacheid} = $_[1] : $_[0]->{cacheid} }
 sub module  { $_[0]->{module} }
-
 
 #-------------------------------------------------------
 
@@ -1039,7 +1036,7 @@ App::Env - manage application specific environments
 
 =head1 VERSION
 
-version 0.36
+version 1.01
 
 =head1 SYNOPSIS
 
@@ -1191,13 +1188,14 @@ module names:
   App::Env::$SITE::$app
   App::Env::$app
 
-The C<$SITE> variable is taken from the environment variable
-B<APP_ENV_SITE> if it exists, or from the B<Site> option to the class
-B<import()> function or the B<new()> object constructor.
-Additionally, if the B<APP_ENV_SITE> environment variable does I<not
-exist> (it is not merely empty), B<App::Env> will first attempt to
-load the B<App::Env::Site> module, which can set the B<APP_ENV_SITE>
-environment variable.
+The default value for C<$SITE> is determined when C<App::Env> is first
+loaded. If the environment variable C<APP_ENV_SITE> exists it is set to that,
+otherwise if the C<App::Env::Site> module exists, that is loaded.  It should
+set the C<APP_ENV_SITE> variable.  After this, modifications to C<APP_ENV_SITE>
+are ignored.
+
+The default value may be overridden via the L<Site> option passed to
+the class B<import()> function or the B<new()> object constructor.
 
 Take as an example the situation where an application's environment is
 stored in F</usr/local/myapp/setup> on one host and
@@ -1313,7 +1311,12 @@ Don't use the cached environment for this application.
 
 =item Site
 
-Specify a site.  See L</Application Environments> for more information
+Specify a site.  See L</Application Environments> for more
+information.  Set this to C<undef> or the empty string C<''> to ignore
+(rather than replace) the default site.  For example, if the default
+site is C<Site1>, then setting C<< $application = 'MyApp' >> and C<<
+Site => undef >> will clear load C<App::Env::MyApp>, not
+C<App::Env::Site1::MyApp>.
 
 =item Cache I<boolean>
 
@@ -1394,6 +1397,12 @@ specified.
 If the B<Site> option was used when first loading the environment,
 it must be specified here in order to delete the correct cache entry.
 Do not specify this option if B<CacheID> is specified.
+
+Setting C<Site> to C<undef> or the empty string C<''> will
+ignore (rather than replace) the default site setting.  For example, if the default site is
+C<Site1>, then setting C<< App => 'MyApp', Site => undef >> will clear
+the cache for C<App::Env::MyApp> rather than
+C<App::Env::Site1::MyApp>.
 
 =item CacheID
 

@@ -9,14 +9,15 @@ use Tickit::Widget::Box;
 use Tickit::Widget::Static;
 
 my $box = Tickit::Widget::Box->new(
-   bg => "green",
+   style => { bg => "green" },
    child_lines => '80%',
    child_cols => '80%',
-   child => Tickit::Widget::Static->new(
+)->set_child(
+   Tickit::Widget::Static->new(
       text => "Hello, world!",
       align => "centre", valign => "middle",
-      bg => "black",
-   ),
+      style => { bg => "black" },
+   )
 );
 
 Tickit->new( root => $box )->run;

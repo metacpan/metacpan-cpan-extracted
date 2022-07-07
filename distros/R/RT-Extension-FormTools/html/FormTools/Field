@@ -123,14 +123,18 @@ $default = '' unless defined $default;
 % } else {
 
 % if ($render_as ne 'hidden' && $show_label) { # no label if hidden
-<table style="display: inline; "><tr><th valign="top"><label><%$field_label%></label><% $after_label |n %></th><td style="display:block;">
+<div class="form-row">
+  <div class="label col-3"><%$field_label%><% $after_label |n %></div>
+  <div class="value col-9">
 % }
 
 % if ($field_type eq 'core') {
 
 % if ($name eq 'Attach') {
-
-<input name="<%$name%>" type="file" />
+<div class="custom-file">
+  <input type="file" id="<% $name %>" name="<% $name %>" class="custom-file-input" />
+  <label class="custom-file-label" for="<% $name %>"><&|/l&>Choose file</&></label>
+</div>
 <input type="hidden" class="hidden" name="UpdateAttach" value="1" />
 
 % } elsif ($render_as eq 'hidden') {
@@ -140,16 +144,16 @@ $default = '' unless defined $default;
 % } elsif ($render_as eq 'readonly' or $render_as eq 'readonly_plus_values') {
 
 % if (@values > 1) {
-    <ul>
+    <ul class="list-group list-group-borderless list-group-compact">
 % for (@values) {
-    <li class="readonly"><% $_ %></span>
+    <li class="readonly list-group-item"><% $_ %></span>
 %   if ($render_as eq 'readonly_plus_values') {
     <input type="hidden" name="<% $input_name %>" value="<% $_ %>"/>
 %   }
 % }
     </ul>
 % } else {
-    <span class="readonly"><% $default %></span>
+    <span class="readonly form-control current-value"><% $default %></span>
 %   if ($render_as eq 'readonly_plus_values') {
     <input type="hidden" name="<% $input_name %>" value="<% $default %>"/>
 %   }
@@ -165,7 +169,7 @@ $default = '' unless defined $default;
 % } elsif ( $name eq "Due" ) {
 <& /Elements/SelectDate, Name => $name, Default => $default, current => 0, (defined $cols ? (Size => $cols) : ()) &>
 % } else {
-<input type="text" name="<%$name%>" size="<% $cols || 20 %>" value="<%$default%>">
+<input class="form-control" type="text" name="<%$name%>" size="<% $cols || 20 %>" value="<%$default%>">
 % }
 
 % } else { # CF
@@ -189,20 +193,23 @@ $default = '' unless defined $default;
             ($default ? (Default => $default) : ())
             &>
 % if ($show_validation && $cf->FriendlyPattern) {
-    <% loc("Input must match [_1]", $cf->FriendlyPattern) %>
+    <span class="cfhints"><% loc("Input must match [_1]", $cf->FriendlyPattern) %></span>
 %}
 % } elsif ($render_as =~  /^boolean/i)  {
 %       my $value = 'Yes';
-        <input type="checkbox" name="<% $input_name %>"  value="<% $value %>"
+<div class="custom-control custom-checkbox" style="margin-top: 5px">
+  <input class="custom-control-input" type="checkbox" name="<% $input_name %>" id="<% $input_name %>" value="<% $value %>"
 % my $checked = 0;
 %  if ($default) {
 %       $checked = ref $default? (grep { $_ eq $value} @$default) : $default eq $value;
 % }
-        <% $checked? 'CHECKED' : '' %>
+        <% $checked? 'checked="checked"' : '' |n %>
 % if ( my $disable = $disables->{$value} ) {
         onclick="disable_form_field(this.checked, '<% $disable %>');"
 % }
         />
+  <label class="custom-control-label" for="<% $input_name %>"><% $value %></label>
+</div>
 
 % if ( $checked and my $disable = $disables->{$value} ) {
     <script>
@@ -212,9 +219,9 @@ $default = '' unless defined $default;
 % } elsif ($render_as eq 'readonly' or $render_as eq 'readonly_plus_values') {
 
 % if (@values > 1) {
-    <ul>
+    <ul class="list-group list-group-borderless list-group-compact">
 % for (@values) {
-    <li name="<% $input_name %>" class="readonly"><% $_ %></li>
+    <li name="<% $input_name %>" class="readonly list-group-item"><% $_ %></li>
 %   if ($render_as eq 'readonly_plus_values') {
     <input type="hidden" name="<% $input_name %>" value="<% $_ %>"/>
 %   }
@@ -227,7 +234,7 @@ $default = '' unless defined $default;
     </script>
 
 % } else {
-    <span name="<% $input_name %>" class="readonly"><% $default %></span>
+    <span name="<% $input_name %>" class="form-control current-value readonly"><% $default %></span>
 %   if ($render_as eq 'readonly_plus_values') {
     <input type="hidden" name="<% $input_name %>" value="<% $default %>"/>
 %   }
@@ -244,6 +251,6 @@ $default = '' unless defined $default;
 
 % }
 % if ($render_as ne 'hidden' && $show_label) {
-</td><% $after_input |n %></tr></table>
+<% $after_input |n %></div></div>
 % }
 % }

@@ -6,6 +6,10 @@ Home page:    <https://metacpan.org/release/Acme-Marvel-CinematicUniverse-Charac
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Acme-Marvel-CinematicUniverse-Characters>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.003	2020-11-23
+
+ - Port from Class::Tiny to Mite.
+
 0.002	2020-11-23
 
  [ Documentation ]

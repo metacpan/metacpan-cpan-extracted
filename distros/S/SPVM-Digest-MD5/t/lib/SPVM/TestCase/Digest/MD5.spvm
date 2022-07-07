@@ -1,0 +1,7 @@
+class TestCase::Digest::MD5 {
+  use Digest::MD5;
+  static method test : int () {
+    
+    return 1;
+  }
+}

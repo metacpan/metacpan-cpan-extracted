@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use English qw(-no_match_vars);
+use Error::Pure::Utils qw(clean);
 use Tags::Output::Structure;
 use Test::More 'tests' => 7;
 use Test::NoWarnings;
@@ -13,9 +14,9 @@ $obj->put(
 	['d', 'data'],
 	['e', 'MAIN'],
 );
-my $ret = $obj->flush;
+my $ret_ar = $obj->flush;
 is_deeply(
-	$ret,
+	$ret_ar,
 	[
 		['b', 'MAIN'],
 		['d', 'data'],
@@ -32,9 +33,9 @@ $obj->put(
 	['d', 'data'],
 	['e', 'MAIN'],
 );
-$ret = $obj->flush;
+$ret_ar = $obj->flush;
 is_deeply(
-	$ret,
+	$ret_ar,
 	[
 		['b', 'MAIN'],
 		['a', 'id', 'id_value'],
@@ -56,9 +57,9 @@ $obj->put(
 	['d', 'data'],
 	['e', 'MAIN'],
 );
-$ret = $obj->flush;
+$ret_ar = $obj->flush;
 is_deeply(
-	$ret,
+	$ret_ar,
 	[
 		['b', 'MAIN'],
 		['a', 'id', 'id_value'],
@@ -80,9 +81,9 @@ $obj->put(
 	['d', $long_data],
 	['e', 'MAIN'],
 );
-$ret = $obj->flush;
+$ret_ar = $obj->flush;
 is_deeply(
-	$ret,
+	$ret_ar,
 	[
 		['b', 'MAIN'],
 		['d', $long_data],
@@ -99,9 +100,9 @@ $obj->put(
 	['d', $long_data],
 	['e', 'MAIN'],
 );
-$ret = $obj->flush;
+$ret_ar = $obj->flush;
 is_deeply(
-	$ret,
+	$ret_ar,
 	[
 		['b', 'MAIN'],
 		['d', $long_data],
@@ -120,3 +121,4 @@ eval {
 };
 is($EVAL_ERROR, "Ending bad tag: 'MAIN2' in block of tag 'MAIN'.\n",
 	"Ending bad tag: 'MAIN2' in block of tag 'MAIN'.");
+clean();

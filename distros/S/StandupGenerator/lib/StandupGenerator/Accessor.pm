@@ -80,7 +80,7 @@ C<$day> -- A string containing a two-digit representation of the day of the stan
 The below command will open the file I<s3d07.txt>, stored within the I<standups> directory within the I<super-important-project> directory.
 
     use StandupGenerator::Accessor;
-    StandupGenerator::Accessor::open_one('/Users/johndoe/projects/super-important-project/standups', 3, '07');
+    StandupGenerator::Accessor::open_one('/Users/johndoe/projects/super-important-project/standups', 3, 07);
 
 =head2 C<open_many>
 

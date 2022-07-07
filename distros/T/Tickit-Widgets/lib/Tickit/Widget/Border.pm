@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
 
 use Object::Pad 0.57;
 
-package Tickit::Widget::Border 0.34;
+package Tickit::Widget::Border 0.35;
 class Tickit::Widget::Border
    :isa(Tickit::SingleChildWidget);
 
@@ -112,7 +112,7 @@ Return or set the number of lines of border at the top of the widget
 
 method set_top_border
 {
-   $_top_border = $_[0];
+   ( $_top_border ) = @_;
    $self->resized;
 }
 
@@ -132,7 +132,7 @@ Return or set the number of lines of border at the bottom of the widget
 
 method set_bottom_border
 {
-   $_bottom_border = $_[0];
+   ( $_bottom_border ) = @_;
    $self->resized;
 }
 
@@ -152,7 +152,7 @@ Return or set the number of cols of border at the left of the widget
 
 method set_left_border
 {
-   $_left_border = $_[0];
+   ( $_left_border ) = @_;
    $self->resized;
 }
 
@@ -172,7 +172,7 @@ Return or set the number of cols of border at the right of the widget
 
 method set_right_border
 {
-   $_right_border = $_[0];
+   ( $_right_border ) = @_;
    $self->resized;
 }
 
@@ -186,7 +186,8 @@ Set the number of cols of both horizontal (left and right) borders simultaneousl
 
 method set_h_border
 {
-   $_left_border = $_right_border = $_[0];
+   my ( $border ) = @_;
+   $_left_border = $_right_border = $border;
    $self->resized;
 }
 
@@ -200,7 +201,8 @@ Set the number of lines of both vertical (top and bottom) borders simultaneously
 
 method set_v_border
 {
-   $_top_border = $_bottom_border = $_[0];
+   my ( $border ) = @_;
+   $_top_border = $_bottom_border = $border;
    $self->resized;
 }
 
@@ -214,12 +216,13 @@ Set the number of cols or lines in all four borders simultaneously
 
 method set_border
 {
-   $_top_border = $_bottom_border = $_left_border = $_right_border = $_[0];
+   my ( $border ) = @_;
+   $_top_border = $_bottom_border = $_left_border = $_right_border = $border;
    $self->resized;
 }
 
 ## This should come from Tickit::ContainerWidget
-method children_changed { $self->reshape }
+method children_changed { $self->resized }
 
 method reshape
 {

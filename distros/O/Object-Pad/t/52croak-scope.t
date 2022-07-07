@@ -9,21 +9,21 @@ use Object::Pad;
 
 {
    ok( !eval <<'EOPERL',
-      has $field;
+      field $field;
 EOPERL
-      'has outside class fails' );
-   like( $@, qr/^Cannot 'has' outside of 'class' at /,
-      'message from failure of has' );
+      'field outside class fails' );
+   like( $@, qr/^Cannot 'field' outside of 'class' at /,
+      'message from failure of field' );
 }
 
 # RT132337
 {
    ok( !eval <<'EOPERL',
       class AClass { }
-      has $field;
+      field $field;
 EOPERL
-      'has after closed class block fails' );
-   like( $@, qr/^Cannot 'has' outside of 'class' at /);
+      'field after closed class block fails' );
+   like( $@, qr/^Cannot 'field' outside of 'class' at /);
 }
 
 {

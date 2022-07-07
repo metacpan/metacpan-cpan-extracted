@@ -68,9 +68,9 @@ class Counter {
 
 {
    class AllTheTypesByBlock {
-      has $scalar { "one" }
-      has @array  { "two", "three" }
-      has %hash   { four => "five" }
+      field $scalar { "one" }
+      field @array  { "two", "three" }
+      field %hash   { four => "five" }
 
       method test {
          Test::More::is( $scalar, "one", '$scalar field' );
@@ -84,7 +84,7 @@ class Counter {
 
 # Variant of RT132228 about individual field lexicals
 class Holder {
-   has $field;
+   field $field;
    method field :lvalue { $field }
 }
 
@@ -100,7 +100,7 @@ class Holder {
    is_oneref( $datum, '$datum finally' );
 }
 
-# Sequencing order of expressions
+# Sequencing order of `has` expressions
 {
    my @order;
    sub seq
@@ -135,7 +135,7 @@ Sequencing->new->test;
 # Fields are visible to string-eval()
 {
    class Evil {
-      has $field;
+      field $field;
 
       method test {
          $field = "the value";

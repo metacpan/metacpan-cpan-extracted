@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
 use Object::Pad 0.57;
 
-package Tickit::Widget::LinearBox 0.51;
+package Tickit::Widget::LinearBox 0.52;
 class Tickit::Widget::LinearBox
    :isa(Tickit::ContainerWidget);
 
@@ -110,13 +110,14 @@ method children
 
 method _any2index
 {
-   if( ref $_[0] ) {
-      my $child = shift;
+   my ( $target ) = @_;
+   if( ref $target ) {
+      my $child = $target;
       $_children[$_] == $child and return $_ for 0 .. $#_children;
       croak "Unable to find child $child";
    }
    else {
-      my $index = shift;
+      my $index = $target;
       return $index if $index >= 0 and $index < scalar @_children;
       croak "Index $index out of bounds";
    }
@@ -133,7 +134,8 @@ reference or by index.
 
 method child_opts
 {
-   my $child = ref $_[0] ? shift : $_children[shift];
+   my ( $target ) = @_;
+   my $child = ref $target ? $target : $_children[$target];
 
    return unless $child;
 
@@ -179,11 +181,12 @@ index. Any options whose value is given as C<undef> are deleted.
 
 method set_child_opts
 {
-   my $child = ref $_[0] ? shift : $_children[shift];
+   my ( $target, @opts ) = @_;
+   my $child = ref $target ? $target : $_children[$target];
 
    return unless $child;
 
-   return $self->SUPER::set_child_opts( $child, @_ );
+   return $self->SUPER::set_child_opts( $child, @opts );
 }
 
 method render_to_rb

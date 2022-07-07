@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     "JSON::XS" => 0,
     "Object::Tiny" => 0,
     "Util::H2O" => 0,
+    "Util::H2O::More" => 0,
     "Validate::Tiny" => 0
   },
   "TEST_REQUIRES" => {
@@ -33,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.32",
+  "VERSION" => "0.33",
   "test" => {
     "TESTS" => "t/*.t t/unit/lib-Weather-NHC-TropicalCyclone-ForecastAdvisory/*.t t/unit/lib-Weather-NHC-TropicalCyclone-Storm/*.t t/unit/lib-Weather-NHC-TropicalCyclone-StormHistory/*.t t/unit/lib-Weather-NHC-TropicalCyclone/*.t"
   }
@@ -53,6 +54,7 @@ my %FallbackPrereqs = (
   "Test::Exception" => 0,
   "Test::More" => 0,
   "Util::H2O" => 0,
+  "Util::H2O::More" => 0,
   "Validate::Tiny" => 0
 );
 

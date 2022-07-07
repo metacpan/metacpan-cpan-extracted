@@ -1,5 +1,21 @@
 Revision history for Object-Pad
 
+0.66    2022-07-07
+        [CHANGES]
+         * Improved performance on perl 5.22 onwards, by merging the operation
+           of the individual pp_fieldpad ops into the main pp_methstart op
+         * Prepare compatibility with core's `use feature 'class'`:
+            + Support `field` keyword as a synonym of `has`, though without
+              immediate EXPR version
+            + Merge meaning of `ADJUST` and `ADJUSTPARAMS`; give all such blocks
+              a params hashref. `ADJUSTPARAMS` is now just a synonym
+         * Print "discouraged" warnings on `requires` keyword
+         * Print deprecation warnings on `isa` and `does` subkeywords
+         * Added list-returning ->get_attribute_values() accessor to
+           Object::Pad::MOP::Field
+         * Deleted legacy XS symbols relating to "slot" from before it was
+           renamed to "field"
+
 0.65    2022-05-10
         [CHANGES]
          * Document the required version for :experimental tags

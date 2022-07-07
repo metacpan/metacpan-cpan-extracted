@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-frame
 
+0.03 2022-07-07T07:55:46Z
+
+    - update frame format
+
 0.02 2022-03-27T02:23:00Z
 
     - implement --frame-fold option

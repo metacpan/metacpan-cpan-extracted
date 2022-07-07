@@ -5,7 +5,7 @@
 
 use Object::Pad 0.57;
 
-package Tickit::Widget::GridBox 0.34;
+package Tickit::Widget::GridBox 0.35;
 class Tickit::Widget::GridBox
    :isa(Tickit::ContainerWidget);
 

@@ -104,12 +104,14 @@ names:
   App::Env::$SITE::$app
   App::Env::$app
 
-The $SITE variable is taken from the environment variable APP_ENV_SITE
-if it exists, or from the Site option to the class import() function or
-the new() object constructor. Additionally, if the APP_ENV_SITE
-environment variable does *not exist* (it is not merely empty), App::Env
-will first attempt to load the App::Env::Site module, which can set the
-APP_ENV_SITE environment variable.
+The default value for $SITE is determined when "App::Env" is first
+loaded. If the environment variable "APP_ENV_SITE" exists it is set to
+that, otherwise if the "App::Env::Site" module exists, that is loaded.
+It should set the "APP_ENV_SITE" variable. After this, modifications to
+"APP_ENV_SITE" are ignored.
+
+The default value may be overridden via the Site option passed to the
+class import() function or the new() object constructor.
 
 Take as an example the situation where an application's environment is
 stored in /usr/local/myapp/setup on one host and /opt/local/myapp/setup
