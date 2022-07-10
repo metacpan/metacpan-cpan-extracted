@@ -12,9 +12,9 @@ use String::ShellQuote;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-14'; # DATE
+our $DATE = '2022-05-28'; # DATE
 our $DIST = 'Perinci-CmdLine-POD'; # DIST
-our $VERSION = '0.027'; # VERSION
+our $VERSION = '0.028'; # VERSION
 
 our @EXPORT_OK = qw(gen_pod_for_pericmd_script);
 
@@ -67,7 +67,10 @@ sub _fmt_opt {
         $main_opt =~ s/=.+//;
         push @res, "See C<$main_opt>.\n\n";
     } else {
-        push @res, "$ospec->{description}\n\n" if $ospec->{description};
+        require Markdown::To::POD;
+
+        push @res, Markdown::To::POD::markdown_to_pod($ospec->{description}), "\n\n"
+            if $ospec->{description};
     }
 
     if (defined $arg_spec->{pos}) {
@@ -1025,7 +1028,7 @@ Perinci::CmdLine::POD - Generate POD for Perinci::CmdLine-based CLI script
 
 =head1 VERSION
 
-This document describes version 0.027 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2022-05-14.
+This document describes version 0.028 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2022-05-28.
 
 =head1 SYNOPSIS
 

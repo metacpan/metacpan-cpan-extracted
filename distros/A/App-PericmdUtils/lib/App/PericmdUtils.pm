@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-14'; # DATE
+our $DATE = '2022-05-27'; # DATE
 our $DIST = 'App-PericmdUtils'; # DIST
-our $VERSION = '0.053'; # VERSION
+our $VERSION = '0.054'; # VERSION
 
 our %SPEC;
 
@@ -26,6 +26,10 @@ _
             cmdline_aliases => {l=>{}},
         },
     },
+    examples => [
+        {argv=>[]},
+        {argv=>['-l'], summary=>'Show details'},
+    ],
 };
 sub list_pericmd_plugins {
     require Module::List::Tiny;
@@ -88,7 +92,7 @@ App::PericmdUtils - Some utilities related to Perinci::CmdLine
 
 =head1 VERSION
 
-This document describes version 0.053 of App::PericmdUtils (from Perl distribution App-PericmdUtils), released on 2022-05-14.
+This document describes version 0.054 of App::PericmdUtils (from Perl distribution App-PericmdUtils), released on 2022-05-27.
 
 =head1 DESCRIPTION
 
@@ -117,6 +121,130 @@ Usage:
  list_pericmd_plugins(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List Perinci::CmdLine plugins.
+
+Examples:
+
+=over
+
+=item * Example #1:
+
+ list_pericmd_plugins();
+
+Result:
+
+ [
+   200,
+   "OK",
+   [
+     "Debug::DumpArgs",
+     "Debug::DumpR",
+     "Debug::DumpRes",
+     "Flow::Exit",
+     "Plugin::Disable",
+     "Plugin::DisablePlugin",
+     "Run::Completion",
+     "Run::DebugCompletion",
+     "Run::DumpObject",
+     "Run::Normal",
+   ],
+   {},
+ ]
+
+=item * Show details:
+
+ list_pericmd_plugins(detail => 1);
+
+Result:
+
+ [
+   200,
+   "OK",
+   [
+     {
+       name    => "Debug::DumpArgs",
+       summary => "Dump command-line arguments (\$r->{args}), by default after argument validation",
+       tags    => "category:debugging",
+       conf    => "",
+       hooks   => "after_validate_args",
+       dist    => "Perinci-CmdLine-Lite",
+     },
+     {
+       name    => "Debug::DumpR",
+       summary => "Dump request stash (\$r), by default after action",
+       dist    => "Perinci-CmdLine-Lite",
+       conf    => "",
+       hooks   => "after_action",
+       tags    => "category:debugging",
+     },
+     {
+       name    => "Debug::DumpRes",
+       summary => "Dump result (\$r->{res}), by default after action",
+       tags    => "category:debugging",
+       conf    => "",
+       hooks   => "after_action",
+       dist    => "Perinci-CmdLine-Lite",
+     },
+     {
+       name    => "Flow::Exit",
+       summary => "Exit program",
+       dist    => "Perinci-CmdLine-Lite",
+       conf    => "exit_code",
+       hooks   => "after_action",
+       tags    => "category:flow-control, category:debugging",
+     },
+     {
+       name    => "Plugin::Disable",
+       summary => "Prevent the loading (activation) of other plugins",
+       tags    => "category:plugin",
+       hooks   => "before_activate_plugin",
+       conf    => "plugins",
+       dist    => "Perinci-CmdLine-Lite",
+     },
+     {
+       name    => "Plugin::DisablePlugin",
+       summary => "Prevent the loading (activation) of other plugins",
+       dist    => "Perinci-CmdLine-Lite",
+       hooks   => "before_activate_plugin",
+       conf    => "plugins",
+       tags    => "category:plugin",
+     },
+     {
+       name    => "Run::Completion",
+       summary => "Shell completion mode",
+       dist    => "Perinci-CmdLine-Lite",
+       hooks   => "on_run",
+       conf    => "",
+       tags    => "category:run-handler, category:completion",
+     },
+     {
+       name    => "Run::DebugCompletion",
+       summary => "Debug completion",
+       dist    => "Perinci-CmdLine-Lite",
+       conf    => "log_file",
+       hooks   => "on_run",
+       tags    => "category:run-handler, category:debugging",
+     },
+     {
+       name    => "Run::DumpObject",
+       summary => "Dump object mode",
+       tags    => "category:run-handler, category:debugging",
+       hooks   => "on_run",
+       conf    => "",
+       dist    => "Perinci-CmdLine-Lite",
+     },
+     {
+       name    => "Run::Normal",
+       summary => "Normal run",
+       tags    => "category:run-handler",
+       dist    => "Perinci-CmdLine-Lite",
+       conf    => "",
+       hooks   => "on_run",
+     },
+   ],
+   { "table.fields" => ["name", "summary"] },
+ ]
+
+=back
 
 This utility lists Perl modules in the C<Perinci::CmdLine::Plugin::*> namespace.
 

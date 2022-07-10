@@ -1,5 +1,11 @@
 Revision history for Perl extension RPC::Switch::Client::Tiny.
 
+1.58  2022-07-08
+	- fixed sigpipe handling for async worker childs
+	- use shutdown to signal EOF to child - close is not sufficient
+	- added max_user_session option to limit session cache per optional user field
+	- added client_encoding_utf8 option to avoid double encoding for utf8 safe clients
+
 1.55  2022-04-15
 	- fixed cpantester strawberry perl JSON::PP & POSIX problems
 	- fixed cpantester strawberry perl negative pids

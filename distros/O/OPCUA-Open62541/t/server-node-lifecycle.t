@@ -6,7 +6,7 @@ use OPCUA::Open62541::Test::Server;
 use Test::More;
 BEGIN {
     if (OPCUA::Open62541::Server->can('setAdminSessionContext')) {
-	plan tests => OPCUA::Open62541::Test::Server::planning_nofork() + 121;
+	plan tests => OPCUA::Open62541::Test::Server::planning_nofork() + 123;
     } else {
 	plan skip_all => "No UA_Server_setAdminSessionContext in open62541";
     }
@@ -19,6 +19,13 @@ use Test::Warn;
 my $server = OPCUA::Open62541::Test::Server->new();
 $server->start();
 my %nodes = $server->setup_complex_objects();
+
+ok(my $buildinfo = $server->{config}->getBuildInfo());
+note explain $buildinfo;
+my $no_destructor;
+if ($buildinfo->{BuildInfo_softwareVersion} =~ /^1\.[0-2]\./) {
+    $no_destructor = "destructor is not called if construction failed";
+}
 
 sub addNodeStatus {
     return $server->{server}->addVariableNode(
@@ -297,12 +304,13 @@ $server->{config}->setGlobalNodeLifecycle({
     },
     GlobalNodeLifecycle_destructor => sub {
 	my ($srv, $sid, $sctx, $nid, $nctx) = @_;
-	fail("fail destructor node context in");
+	fail("fail destructor node context in") if $no_destructor;
 	$$nctx = "bye";
     },
 });
 addNodeBad(\$context);
-is($context, "hello", "constructor node fail context out");
+is($context, $no_destructor ? "hello" : "bye",
+    "constructor node fail context out");
 
 undef $context;
 no_leaks_ok {
@@ -328,13 +336,13 @@ my $node;
 $server->{config}->setGlobalNodeLifecycle({
     GlobalNodeLifecycle_constructor => sub {
 	my ($srv, $sid, $sctx, $nid, $nctx) = @_;
-	is($$$nctx, undef, "constructor node context undef");
+	is($$nctx, undef, "constructor node context undef");
 	$node =  $nid;
 	return STATUSCODE_GOOD;
     },
     GlobalNodeLifecycle_destructor => sub {
 	my ($srv, $sid, $sctx, $nid, $nctx) = @_;
-	is($$nctx, undef, "destructor node context undef");
+	is($nctx, undef, "destructor node context undef");
 	$node =  $nid;
     },
 });
@@ -378,13 +386,18 @@ $server->{config}->setGlobalNodeLifecycle({
     },
     GlobalNodeLifecycle_destructor => sub {
 	my ($srv, $sid, $sctx, $nid, $nctx) = @_;
-	fail("fail destructor out node context undef");
+	fail("fail destructor out node context undef") if $no_destructor;
 	$node =  $nid;
     },
 });
 addNodeBad(undef, \$outnode);
 is($outnode, undef, "out node fail");
-is($node, undef, "constructor out node fail");
+if ($no_destructor) {
+    is($node, undef, "constructor out node fail");
+} else {
+    is_deeply($node, $nodes{some_variable_0}{nodeId},
+	"constructor out node fail");
+}
 
 undef $outnode;
 undef $node;
@@ -409,12 +422,14 @@ $server->{config}->setGlobalNodeLifecycle({
     GlobalNodeLifecycle_constructor => sub {
 	my ($srv, $sid, $sctx, $nid, $nctx) = @_;
 	is($$nctx, undef, "constructor node context empty");
-	$$nctx = "constructed";
+	eval { $$nctx = "constructed" };
+	like($@, qr/read-only value/, "constructor node context read-only");
 	return STATUSCODE_GOOD;
     },
     GlobalNodeLifecycle_destructor => sub {
 	my ($srv, $sid, $sctx, $nid, $nctx) = @_;
-	is($nctx, "constructed", "destructor node context constructed");
+	is($nctx, undef, "destructor node context constructed");
+	$nctx = "destructed";
     },
 });
 addNodeGood();
@@ -424,11 +439,12 @@ no_leaks_ok {
     $server->{config}->setGlobalNodeLifecycle({
 	GlobalNodeLifecycle_constructor => sub {
 	    my ($srv, $sid, $sctx, $nid, $nctx) = @_;
-	    $$nctx = "constructed";
+	    eval { $$nctx = "constructed" };
 	    return STATUSCODE_GOOD;
 	},
 	GlobalNodeLifecycle_destructor => sub {
 	    my ($srv, $sid, $sctx, $nid, $nctx) = @_;
+	    $nctx = "destructed";
 	},
     });
     addNodeStatus();

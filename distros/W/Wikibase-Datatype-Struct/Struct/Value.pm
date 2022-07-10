@@ -6,7 +6,6 @@ use warnings;
 
 use Error::Pure qw(err);
 use Readonly;
-use Wikibase::Datatype::Value;
 use Wikibase::Datatype::Struct::Value::Globecoordinate;
 use Wikibase::Datatype::Struct::Value::Item;
 use Wikibase::Datatype::Struct::Value::Monolingual;
@@ -14,10 +13,11 @@ use Wikibase::Datatype::Struct::Value::Property;
 use Wikibase::Datatype::Struct::Value::Quantity;
 use Wikibase::Datatype::Struct::Value::String;
 use Wikibase::Datatype::Struct::Value::Time;
+use Wikibase::Datatype::Value;
 
 Readonly::Array our @EXPORT_OK => qw(obj2struct struct2obj);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 sub obj2struct {
 	my ($obj, $base_uri) = @_;
@@ -285,12 +285,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020-2021
+© 2020-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

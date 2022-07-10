@@ -28,7 +28,7 @@ name: Task-Date-Holidays
 provides:
   Task::Date::Holidays:
     file: lib/Task/Date/Holidays.pm
-    version: '0.11'
+    version: '0.12'
 requires:
   Date::Holidays::AT: '0'
   Date::Holidays::AU: '0'
@@ -62,7 +62,7 @@ resources:
   bugtracker: https://github.com/jonasbn/perl-task-date-holidays/issues
   homepage: https://github.com/jonasbn/perl-task-date-holidays
   repository: https://github.com/jonasbn/perl-task-date-holidays.git
-version: '0.11'
+version: '0.12'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

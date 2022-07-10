@@ -5,39 +5,18 @@ use Imager;
 use Imager::File::PNG;
 use vars qw($VERSION);
 
-our $VERSION = "0.001";
+our $VERSION = "0.002";
 
 my $png_header = "\x89PNG\x0d\x0A\cZ\x0A";
 
-# looks behind the curtain
-# I expect I'll give Imager::File::PNG a separate API, so don't do
-# this because I'll break your code
-
-sub do_write_png {
-  my ($im, $io, %hsh) = @_;
-
-  $im->_set_opts(\%hsh, "i_", $im);
-  $im->_set_opts(\%hsh, "png_", $im);
-
-  unless (Imager::File::PNG::i_writepng_wiol($im->{IMG}, $io)) {
-    $im->_set_error(Imager->_error_as_msg);
-    return;
-  }
-  return $im;
-}
-
-sub do_read_png {
+sub _read_png_data {
   my ($data, $frame) = @_;
 
-  open my $fh, ">", "foo.png" or die;
-  binmode $fh;
-  print $fh $data;
-  close $fh;
-
-  my $io = Imager::IO->new_buffer($data);
+  my $io = Imager::IO->new_buffer($data)
+    or die;
   my $im = Imager->new;
-  unless ($im->{IMG} = Imager::File::PNG::i_readpng_wiol($io, 0)) {
-    Imager->_set_error("APNG: " . Imager->_error_as_msg . " decoding frame $frame");
+  unless (Imager::File::PNG->read($im, $io)) {
+    Imager->_set_error("APNG: " . $im->_error_as_msg . " decoding frame $frame");
     return;
   }
   return $im;
@@ -47,7 +26,7 @@ sub do_read_png {
 sub write_apng {
   my ($im, $io, %hsh) = @_;
 
-  return return do_write_png($im, $io, %hsh);
+  return return Imager::File::PNG->write($im, $io, %hsh);
 };
 
 sub _make_actl {
@@ -164,11 +143,23 @@ sub write_multi_apng  {
   my $type = $ims[0]->type;
   my $bits = $ims[0]->bits;
   my $chans = $ims[0]->colorchannels;
+  my $allchans = $ims[0]->getchannels;
+  my $palette = $type eq "paletted" && $chans == 3
+    ? join "", map { chr } map { ($_->rgba)[0..($allchans-1)] } $ims[0]->getcolors
+    : "";
   my $need_alpha = 0;
   for my $im (@ims) {
-    if ($type eq 'palette' && $im->type eq 'direct') {
-      # FIXME: look for a common palette
-      $type = 'direct';
+    if ($type eq 'paletted') {
+      if ($im->type eq 'direct' || $im->getchannels() != $allchans) {
+        $type = 'direct';
+      }
+      else {
+        # check we have a common palette and channels is 3
+        my $npalette = join "", map { chr } map { ($_->rgba)[0..($allchans-1)] } $im->getcolors;
+        if ($im->colorchannels != 3 || $palette ne $npalette) {
+          $type = 'direct';
+        }
+      }
     }
     if ($im->bits eq 'double' || ($bits ne 'double' && $im->bits > $bits)) {
       $bits = $im->bits;
@@ -179,11 +170,7 @@ sub write_multi_apng  {
     }
   }
 
-  if ($type eq 'palette' && $chans == 3) {
-    # FIXME - we shouldn't get here yet
-  }
-  else {
-    $type = 'direct';
+  if ($type eq 'direct') {
     if ($bits eq 'double' || $bits > 8) {
       $bits = 16;
     }
@@ -228,20 +215,23 @@ sub write_multi_apng  {
     my $orig = $im;
 
     # convert each frame to a common form
-    if ($bits > 8 && $im->bits == 8) {
-      $im = $im->to_rgb16;
-    }
-    elsif ($im->type eq "paletted") {
-      $im = $im->to_rgb8;
-    }
-    if ($im->colorchannels != $chans) {
-      $im = $im->convert(preset => "rgb");
-    }
-    if ($need_alpha && !$im->alphachannel) {
-      $im = $im->convert(preset => "addalpha");
+    # paletted are already in common form
+    unless ($type eq 'paletted') {
+      if ($bits > 8 && $im->bits == 8) {
+        $im = $im->to_rgb16;
+      }
+      elsif ($im->type eq "paletted") {
+        $im = $im->to_rgb8;
+      }
+      if ($im->colorchannels != $chans) {
+        $im = $im->convert(preset => "rgb");
+      }
+      if ($need_alpha && !$im->alphachannel) {
+        $im = $im->convert(preset => "addalpha");
+      }
     }
     my $dio = Imager::IO->new_bufchain;
-    do_write_png($im, $dio, %$opts)
+    Imager::File::PNG->write($im, $dio, %$opts)
       or return;
     my $data = Imager::io_slurp($dio);
     undef $dio;
@@ -419,9 +409,15 @@ sub _parse_apng_parts {
   my $sequence = -1;
   my $frame = -1;
   while (my ($dlen, $data, $len, $type, $payload, $crc) = _read_chunk($io)) {
-    # FIXME: crc checks?
-    # FIXME: ordering checks
-    # chunks we need to duplicate from image to image
+    if ($strict) {
+      my $ncrc = unpack("N", $crc);
+      my $ccrc = _crc($type . $payload);
+      if ($ncrc != $ccrc) {
+        Imager->_set_error(sprintf("APNG: CRC mismatch for $type chunk %#x vs %#x (strict)",
+                                   $ncrc, $ccrc));
+        return;
+      }
+    }
     if ($type eq 'IHDR') {
       my ($w, $h, $d, $ct, $comp, $filter, $inter) =
         unpack("NNCCCCC", $payload);
@@ -437,6 +433,7 @@ sub _parse_apng_parts {
           data => $data,
          };
     }
+    # chunks we need to duplicate from image to image
     elsif ($type =~ /\A(PLTE|tRNS|sRGB|cHRM|gAMA|iCCP|sBIT|pHYs|tIME)\z/) {
       push @headers, $data;
     }
@@ -515,7 +512,7 @@ sub _from_idat {
     @{$parsed->{headers}},
     @{$parsed->{frames}[0]{idat}},
     $parsed->{end};
-  my $im = do_read_png($data, 0)
+  my $im = _read_png_data($data, 0)
     or return;
 
   return $im;
@@ -557,7 +554,7 @@ sub _from_fdat {
     ( map { _make_idat($_) } @{$parsed->{frames}[$frame]{fdat}} ),
     $parsed->{end};
 
-  my $im = do_read_png($data, $frame)
+  my $im = _read_png_data($data, $frame)
     or return;
 
   return $im;
@@ -704,9 +701,14 @@ To write an APNG image the type parameter needs to be explicitly supplied.
 =item *
 
 Due to the limitations of C<APNG> all images are written as the same
-type, eg. all RGBA, or all Grayscale, or all paletted with the same
+type, e.g. all RGBA, or all grayscale, or all paletted with the same
 palette.  C<Imager::File::APNG> will upgrade all supplied images to
-the greatest common layout.
+the greatest common layout.  If all images are paletted, but do not
+have exactly the same palette the file will use direct color.
+
+=item *
+
+Single images are written without animation chunks.
 
 =back
 
@@ -728,7 +730,7 @@ be hidden from the animation.
 =item *
 
 C<apng_num_plays> - set on all images when reading, only used from the
-fisrt image when writing.  Specifies the number of time to repeat the
+first image when writing.  Specifies the number of time to repeat the
 animation.  If zero repeat forever.  Default: 0.
 
 =item *
@@ -768,10 +770,7 @@ are set on read.
 
 =head1 TODO
 
-Support paletted images.  This will require that all the images have
-the same palette.
-
-Optionally optimize frame generation from the source images, eg,
+Optionally optimize frame generation from the source images, e.g.,
 trimming common pixels between the canvas at that point.
 
 Optionally generate a common palette across all the frames.  This
@@ -786,6 +785,6 @@ Tony Cook <tonyc@cpan.org>
 
 =head1 SEE ALSO
 
-L<Imager>, <Imager::Files>.
+L<Imager>, L<Imager::Files>.
 
 =cut

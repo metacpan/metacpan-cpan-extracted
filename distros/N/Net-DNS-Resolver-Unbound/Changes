@@ -1,6 +1,10 @@
 Revision history for Perl extension Net::DNS::Resolver::Unbound.
 
 
+**** 1.14  Jul 10, 2022
+	Emulate Net::DNS resolver->send(packet) behaviour.
+
+
 **** 1.13  Jun 11, 2022
 	Add test for undefined ub_result->answer_packet.
 
@@ -15,7 +19,7 @@ Revision history for Perl extension Net::DNS::Resolver::Unbound.
 
 **** 1.10  Mar 24, 2022
 	Apply Net::DNS IPv4/IPv6 preference to Unbound context.
-	Report DNSSEC status via resolver->errorstring().
+	Report adverse DNSSEC status via resolver->errorstring().
 
 
 **** 1.09  Mar 17, 2022

@@ -35,12 +35,13 @@ Apache::Solr::Result - Apache Solr (Lucene) result container
 
 =item Apache::Solr::Result-E<gt>B<new>(%options)
 
- -Option  --Default
-  core      undef
-  endpoint  <required>
-  params    <required>
-  request   undef
-  response  undef
+ -Option    --Default
+  core        undef
+  endpoint    <required>
+  params      <required>
+  request     undef
+  response    undef
+  sequential  undef
 
 =over 2
 
@@ -53,6 +54,16 @@ Apache::Solr::Result - Apache Solr (Lucene) result container
 =item request => HTTP::Request object
 
 =item response => HTTP::Response object
+
+=item sequential => BOOLEAN
+
+[1.06] By setting this, you indicate that you will process the documents
+in (numeric) sequential order; that you have no intention to go back to
+a lower number.  This implies that those cached results can be cleaned-up
+in the client early, reducing memory consumption.
+
+However: you are allowed to go back to lower numbers, with the penalty
+of a repeat of a message exchange between this client and the database.
 
 =back
 
@@ -89,6 +100,10 @@ List of (expanded) parameters used to call the solr server.
 =item $obj-E<gt>B<request>( [$request] )
 
 =item $obj-E<gt>B<response>( [$response] )
+
+=item $obj-E<gt>B<sequential>()
+
+[1.06] Shows whether the results are only read in numeric order.
 
 =item $obj-E<gt>B<serverError>()
 
@@ -128,9 +143,11 @@ example:
 
 Return information which relates to the selected $document.
 
-=item $obj-E<gt>B<nextSelected>()
+=item $obj-E<gt>B<nextSelected>(%options)
 
-[0.95] Produces the next document, or C<undef> when all have been produced.
+[0.95] Produces the next document, or C<undef> when there are none
+left.  [1.06] Use L<selected()|Apache::Solr::Result/"in response to a select()"> or Apache::Solr::Result subroutine new option start to give a starting
+point.  [1.06]  The C<%options> are passed to L<selected()|Apache::Solr::Result/"in response to a select()">.
 
 example: 
 
@@ -156,10 +173,10 @@ example:
   # easier:
   while(my $doc = $result->nextSelected) ...
 
-=item $obj-E<gt>B<selected>($rank)
+=item $obj-E<gt>B<selected>($rank, %options)
 
 Returns information about the query by L<Apache::Solr::select()|Apache::Solr/"Search"> on
-position $rank (count starts at 0)  Returned is a L<Apache::Solr::Document|Apache::Solr::Document>
+position $rank (count starts at 0!)  Returned is an L<Apache::Solr::Document|Apache::Solr::Document>
 object.
 
 The first request will take a certain number of "rows".  This routine
@@ -167,13 +184,15 @@ will automatically collect more of the selected answers, when you address
 results outside the first "page" of "rows".  The results of these other
 requests are cached as well.
 
+This method has no C<%options> at the moment.
+
 example: 
 
    my $r = $solr->select(rows => 10, ...);
    $r or die $r->errors;
 
    if(my $last = $r->selected(9)) {...}
-   my $elf = $r->selected(11);         # auto-request more
+   my $doc = $r->selected(11);         # auto-request more
 
 =back
 
@@ -201,6 +220,8 @@ So: their sort order is lost.
 
 =item $obj-E<gt>B<selectedPageLoad>($rank, $client)
 
+Query the database for the next page of results.
+
 =item $obj-E<gt>B<selectedPageNr>($rank)
 
 =item $obj-E<gt>B<selectedPageSize>()
@@ -224,12 +245,12 @@ file-handle (probably STDOUT).
 
 =head1 SEE ALSO
 
-This module is part of Apache-Solr distribution version 1.05,
-built on January 11, 2019. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Apache-Solr distribution version 1.06,
+built on July 08, 2022. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2012-2019 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2012-2022 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

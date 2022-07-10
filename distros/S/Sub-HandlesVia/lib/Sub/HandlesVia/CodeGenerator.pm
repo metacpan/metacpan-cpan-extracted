@@ -5,79 +5,142 @@ use warnings;
 package Sub::HandlesVia::CodeGenerator;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.028';
+our $VERSION   = '0.031';
 
-use Scope::Guard ();
-use Class::Tiny (
-	qw(
-		toolkit
-		target
-		attribute
-		attribute_spec
-		generator_for_slot
-		generator_for_get
-		generator_for_set
-		generator_for_default
-		isa
-		coerce
-		method_installer
-		_override
-	),
-	{
-		env => sub {
-			return {};
-		},
-		is_method => sub {
-			return !!1;
-		},
-		get_is_lvalue => sub {
-			return !!0;
-		},
-		set_checks_isa => sub {
-			return !!0;
-		},
-		set_strictly => sub {
-			return !!1;
-		},
-		generator_for_args => sub {
-			return sub {
-				'@_[1..$#_]';
-			};
-		},
-		generator_for_arg => sub {
-			return sub {
-				@_==2 or die;
-				my $n = pop;
-				"\$_[$n]";
-			};
-		},
-		generator_for_argc => sub {
-			return sub {
-				'(@_-1)';
-			};
-		},
-		generator_for_currying => sub {
-			return sub {
-				@_==2 or die;
-				my $arr = pop;
-				"splice(\@_,1,0,$arr);";
-			};
-		},
-		generator_for_usage_string => sub {
-			return sub {
-				@_==3 or die;
-				shift;
-				my $method_name = shift;
-				my $guts = shift;
-				"\$instance->$method_name($guts)";
-			};
-		},
-		generator_for_self => sub {
-			return sub {
-				'$_[0]';
-			};
-		},
+use Sub::HandlesVia::Mite -all;
+
+has toolkit => (
+	is => ro,
+);
+
+has target => (
+	is => ro,
+);
+
+has attribute => (
+	is => ro,
+);
+
+has attribute_spec => (
+	is => ro,
+	isa => 'HashRef',
+);
+
+has isa => (
+	is => ro,
+);
+
+has coerce => (
+	is => ro,
+	isa => 'Bool',
+);
+
+has env => (
+	is => rw,
+	default => \ '{}',
+);
+
+has [ 'generator_for_slot', 'generator_for_get', 'generator_for_set', 'generator_for_default' ] => (
+	is => ro,
+	isa => 'CodeRef',
+);
+
+has generator_for_args => (
+	is => lazy,
+	isa => 'CodeRef',
+	builder => sub {
+		return sub {
+			'@_[1..$#_]';
+		};
 	},
+);
+
+has generator_for_arg => (
+	is => lazy,
+	isa => 'CodeRef',
+	builder => sub {
+		return sub {
+			@_==2 or die;
+			my $n = pop;
+			"\$_[$n]";
+		};
+	},
+);
+
+has generator_for_argc => (
+	is => lazy,
+	isa => 'CodeRef',
+	builder => sub {
+		return sub {
+			'(@_-1)';
+		};
+	},
+);
+
+has generator_for_currying => (
+	is => lazy,
+	isa => 'CodeRef',
+	builder => sub {
+		return sub {
+			@_==2 or die;
+			my $arr = pop;
+			"splice(\@_,1,0,$arr);";
+		};
+	},
+);
+
+has generator_for_usage_string => (
+	is => lazy,
+	isa => 'CodeRef',
+	builder => sub {
+		return sub {
+			@_==3 or die;
+			shift;
+			my $method_name = shift;
+			my $guts = shift;
+			"\$instance->$method_name($guts)";
+		};
+	},
+);
+
+has generator_for_self => (
+	is => lazy,
+	isa => 'CodeRef',
+	builder => sub {
+		return sub {
+			'$_[0]';
+		};
+	},
+);
+
+has method_installer => (
+	is => rw,
+	isa => 'CodeRef',
+);
+
+has _override => (
+	is => rw,
+	init_arg => undef,
+);
+
+has is_method => (
+	is => rw,
+	default => true,
+);
+
+has get_is_lvalue => (
+	is => rw,
+	default => false,
+);
+
+has set_checks_isa => (
+	is => rw,
+	default => false,
+);
+
+has set_strictly => (
+	is => rw,
+	default => true,
 );
 
 my $REASONABLE_SCALAR = qr/^
@@ -106,9 +169,9 @@ for my $thing ( @generatable_things ) {
 		
 		if ( @{ $gen->_override->{$thing} || [] } ) {
 			my $coderef = pop @{ $gen->_override->{$thing} };
-			my $guard   = Scope::Guard::scope_guard( sub {
+			my $guard   = guard {
 				push @{ $gen->_override->{$thing} ||= [] }, $coderef;
-			} );
+			};
 			return $gen->$coderef( @_ );
 		}
 		
@@ -121,9 +184,9 @@ for my $thing ( @generatable_things ) {
 sub _start_overriding_generators {
 	my $self = shift;
 	$self->_override( {} );
-	return Scope::Guard::scope_guard( sub {
+	return guard {
 		$self->_override( {} );
-	} );
+	};
 }
 
 {

@@ -97,7 +97,7 @@ is($d2->_subject, '1 2 3');
 
 my $t3 = $solr->select(q => 'text:tac', rows => 1, hl => {fl => 'content'});
 #warn Dumper $t3->decoded;
-ok($t3, 'select was successfull');
+ok($t3, 'select was successful');
 isa_ok($t3, 'Apache::Solr::Result');
 is($t3->endpoint, "$server/select?wt=$format&q=text%3Atac&rows=1&hl=true&hl.fl=content");
 

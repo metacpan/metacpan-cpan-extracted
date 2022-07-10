@@ -11,7 +11,7 @@ use File::KDBX::Constants qw(:history :icon);
 use File::KDBX::Error;
 use File::KDBX::Util qw(:assert :class :coercion :erase :function :uri generate_uuid load_optional);
 use Hash::Util::FieldHash;
-use List::Util qw(first sum0);
+use List::Util qw(any first sum0);
 use Ref::Util qw(is_coderef is_hashref is_plain_hashref);
 use Scalar::Util qw(blessed looks_like_number);
 use Storable qw(dclone);
@@ -21,7 +21,7 @@ use namespace::clean;
 
 extends 'File::KDBX::Object';
 
-our $VERSION = '0.903'; # VERSION
+our $VERSION = '0.904'; # VERSION
 
 my $PLACEHOLDER_MAX_DEPTH = 10;
 my %PLACEHOLDERS;
@@ -301,7 +301,7 @@ sub hmac_otp {
     $params{secret} = encode_b32r($params{secret}) if !$params{base32};
     $params{base32} = 1;
 
-    my $otp = eval {Pass::OTP::otp(%params, @_) };
+    my $otp = eval { Pass::OTP::otp(%params, @_) };
     if (my $err = $@) {
         throw 'Unable to generate HOTP', error => $err;
     }
@@ -322,7 +322,7 @@ sub time_otp {
     $params{secret} = encode_b32r($params{secret}) if !$params{base32};
     $params{base32} = 1;
 
-    my $otp = eval {Pass::OTP::otp(%params, @_) };
+    my $otp = eval { Pass::OTP::otp(%params, @_) };
     if (my $err = $@) {
         throw 'Unable to generate TOTP', error => $err;
     }
@@ -377,8 +377,8 @@ sub _hotp_params {
 
     my %params = (
         type    => 'hotp',
-        issuer  => $self->title     || 'KDBX',
-        account => $self->username  || 'none',
+        issuer  => $self->expand_title      || 'KDBX',
+        account => $self->expand_username   || 'none',
         digits  => 6,
         counter => $self->string_value('HmacOtp-Counter') // 0,
         $self->_otp_secret_params('Hmac'),
@@ -403,8 +403,8 @@ sub _totp_params {
     );
     my %params = (
         type        => 'totp',
-        issuer      => $self->title     || 'KDBX',
-        account     => $self->username  || 'none',
+        issuer      => $self->expand_title      || 'KDBX',
+        account     => $self->expand_username   || 'none',
         digits      => $self->string_value('TimeOtp-Length') // 6,
         algorithm   => $algorithms{$self->string_value('TimeOtp-Algorithm') || ''} || 'sha1',
         period      => $self->string_value('TimeOtp-Period') // 30,
@@ -681,7 +681,7 @@ File::KDBX::Entry - A KDBX database entry
 
 =head1 VERSION
 
-version 0.903
+version 0.904
 
 =head1 DESCRIPTION
 
@@ -1269,7 +1269,7 @@ An array of window title / keystroke sequence associations.
         keystroke_sequence  => '{USERNAME}{TAB}{PASSWORD}{ENTER}',
     }
 
-Keystroke sequences can have </Placeholders>, most commonly C<{USERNAME}> and C<{PASSWORD}>.
+Keystroke sequences can have L</Placeholders>, most commonly C<{USERNAME}> and C<{PASSWORD}>.
 
 =head2 quality_check
 
@@ -1336,26 +1336,6 @@ Alias for the B<URL> string value.
 
 Aliases for the B<UserName> string value.
 
-=head2 expand_notes
-
-Shortcut equivalent to C<< ->expand_string_value('Notes') >>.
-
-=head2 expand_password
-
-Shortcut equivalent to C<< ->expand_string_value('Password') >>.
-
-=head2 expand_title
-
-Shortcut equivalent to C<< ->expand_string_value('Title') >>.
-
-=head2 expand_url
-
-Shortcut equivalent to C<< ->expand_string_value('URL') >>.
-
-=head2 expand_username
-
-Shortcut equivalent to C<< ->expand_string_value('UserName') >>.
-
 =head1 METHODS
 
 =head2 string
@@ -1399,7 +1379,7 @@ is not set or is currently memory-protected. This is just a shortcut for:
 
 =head2 expand_string_value
 
-    $string = $entry->expand_string_value;
+    $string = $entry->expand_string_value($string_key);
 
 Same as L</string_value> but will substitute placeholders and resolve field references. Any placeholders that
 do not expand to values are left as-is.
@@ -1408,6 +1388,26 @@ See L</Placeholders>.
 
 Some placeholders (notably field references) require the entry be connected to a database and will throw an
 error if it is not.
+
+=head2 expand_notes
+
+Shortcut equivalent to C<< ->expand_string_value('Notes') >>.
+
+=head2 expand_password
+
+Shortcut equivalent to C<< ->expand_string_value('Password') >>.
+
+=head2 expand_title
+
+Shortcut equivalent to C<< ->expand_string_value('Title') >>.
+
+=head2 expand_url
+
+Shortcut equivalent to C<< ->expand_string_value('URL') >>.
+
+=head2 expand_username
+
+Shortcut equivalent to C<< ->expand_string_value('UserName') >>.
 
 =head2 other_strings
 

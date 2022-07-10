@@ -1,7 +1,12 @@
 Revision history for Dancer2-Plugin-Auth-OAuth
 
+0.20  2022-07-08 16:29:05 WEST
+
+        - merged github PR #25 (thanks Pero Moretti!)
+
 0.18  2022-04-28 12:45:17 CEST
         - merged github PR #23 (thanks Pero Moretti!)
+        - $dsl is now sent along with the new call to the provider as a new argument, in order to allow provider to use app->log. This might break code written by users writing their own providers or subclasses.
 
 0.17  2020-06-07 16:30:17 CEST
         - merged github PR #21 (thanks SysPete!)

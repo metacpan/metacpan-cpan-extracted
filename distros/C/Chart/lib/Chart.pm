@@ -1,7 +1,7 @@
 use v5.12;
 
 package Chart;
-our $VERSION = 'v2.402.3';
+our $VERSION = 'v2.403.0';
 
 use Chart::Points;
 use Chart::Lines;
@@ -68,17 +68,18 @@ Chart - a series of charting modules
 
 =head1 DESCRIPTION
 
-These man-pages give you the most important information about Chart.
-There is also a complete documentation (Documentation.pdf) within
-the Chart package. Look at it to get more information.
-This module is an attempt to build a general purpose graphing module
-that is easily modified and expanded.  I borrowed most of the API
-from Martien Verbruggen's GIFgraph module.  I liked most of GIFgraph,
-but I thought it was to difficult to modify, and it was missing a few
-things that I needed, most notably legends.  So I decided to write
-a new module from scratch, and I've designed it from the bottom up
-to be easy to modify.  Like GIFgraph, Chart uses Lincoln Stein's GD 
-module for all of its graphics primitives calls.
+This page gives you a summary how to use Chart. For more details
+please visit the L<Chart::Manual>.
+
+
+=for HTML <p>
+<img src="https://github.com/lichtkind/Chart/blob/main/dev/test/samples/stackedbars.png" alt="stacked bars">
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/bars_2.png" alt="multi bar chart">
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/hbars_2.png" alt="horizontal bar chart">
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/direction_4.png" alt="polar chart">
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/pie_4.png" alt="pie chart">
+<img src="https://github.com/lichtkind/Chart/blob/main/dev/test/samples/split_2.png" alt="multi chart">
+</p>
 
 =head2 use-ing Chart
 
@@ -123,460 +124,9 @@ or you can try just constructing the hash inside the set call, like
 
   $obj->set ('title' => 'Foo Bar');
 
-The following are all of the currently supported options:
 
-=over 4
+L<Chart::Manual::Settings> lists all currently supported keys and values.
 
-=item 'transparent'
-
-Makes the background of the image transparent if set to 'true'.  Useful
-for making web page images.  Default is 'false'.
-
-=item 'png_border'
-
-Sets the number of pixels used as a border between the graph
-and the edges of the png/j-peg.  Defaults to 10.
-
-=item 'graph_border'
-
-Sets the number of pixels used as a border between the title/labels
-and the actual graph within the png.  Defaults to 10.
-
-=item 'text_space'
-
-Sets the amount of space left on the sides of text, to make it more
-readable.  Defaults to 2.
-
-=item 'title'
-
-Tells GD graph what to use for the title of the graph.  If empty,
-no title is drawn.  It recognizes '\n' as a newline, and acts accordingly.
-Remember, if you want to use normal quotation marks instead of single 
-quotation marks then you have to quote "\\n". Default is empty.
-
-=item 'sub_title'
-
-Write a sub-title under the title in smaller letters.
- 
-=item 'x_label'
-
-Tells Chart what to use for the x-axis label.  If empty, no label
-is drawn.  Default is empty.
-
-=item 'y_label', 'y_label2'
-
-Tells Chart what to use for the y-axis labels.  If empty, no label
-is drawn.  Default is empty.
-
-=item 'legend'
-
-Specifies the placement of the legend.  Valid values are 'left', 'right',
-'top', 'bottom'.  Setting this to 'none' tells chart not to draw a
-legend.  Default is 'right'.
-
-=item 'legend_labels'
-
-Sets the values for the labels for the different data sets.  Should
-be assigned a reference to an array of labels.  For example,
-
-  @labels = ('foo', 'bar');
-  $obj->set ('legend_labels' => \@labels);
-
-Default is empty, in which case 'Dataset 1', 'Dataset 2', etc. are
-used as the labels.  
-
-
-=item 'tick_len'
-
-Sets the length of the x- and y-ticks in pixels.  Default is 4. 
-
-=item 'x_ticks'
-
-Specifies how to draw the x-tick labels.  Valid values are 'normal',
-'staggered' (staggers the labels vertically), and 'vertical' (the
-labels are draw upwards).  Default is 'normal'.
-
-=item 'xy_plot'
-
-Forces Chart to plot a x-y-graph, which means, that the x-axis is also
-numeric if set to 'true'. Very useful for mathematical graphs.
-Works for Lines, Points, LinesPoints and ErrorBars. Split makes always a 
-xy_plot. Defaults to 'false'.
-
-=item 'min_y_ticks'
-
-Sets the minimum number of y_ticks to draw when generating a scale.
-Default is 6, The minimum is 2.
-
-=item 'max_y_ticks'
-
-Sets the maximum number of y_ticks to draw when generating a scale.
-Default is 100. This limit is used to avoid plotting an unreasonable
-large number of ticks if non-round values are used for the min_val
-and max_val.
-
-The value for 'max_y_ticks' should be at least 5 times larger than
-'min_y_ticks'.
-
-=item 'max_x_ticks', 'min_x_ticks'
-
-Work similar as 'max_y_ticks' and 'min_y_ticks'. Of course, only for a 
-xy_plot.
-
-=item 'integer_ticks_only'
-
-Specifies how to draw the x- and y-ticks: as floating point 
-('false', '0') or as integer numbers ('true', 1). Default: 'false'
-
-=item 'skip_int_ticks'
-
-If 'integer_ticks_only' was set to 'true' the labels and ticks will 
-be drawn every nth tick. Of course in horizontalBars it affects the
-x-axis. Default to 1, no skipping. 
-
-=item 'precision'
-
-Sets the number of numerals after the decimal point. Affects in most
-cases the y-axis. But also the x-axis if 'xy_plot' was set and also
-the labels in a pie chart. Defaults to 3. 
-
-=item 'max_val'
-
-Sets the maximum y-value on the graph, overriding the normal auto-scaling.
-Default is undef.
-
-=item 'min_val'
-
-Sets the minimum y-value on the graph, overriding the normal auto-scaling.
-Default is undef.
-
-Caution should be used when setting 'max_val' and 'min_val' to floating
-point or non-round numbers. This is because the scale must start & end
-on a tick, ticks must have round-number intervals, and include round
-numbers.
-
-Example: Suppose your data set has a range of 35-114 units. If you specify
-them as the 'min_val' & 'max_val', the y_axis will be plotted with 80 ticks
-every 1 unit.. If no 'min_val' & 'max_val', the system will auto scale the
-range to 30-120 with 10 ticks every 10 units.
-
-If the 'min_val' & 'max_val' are specified to excessive precision, they may
-be overridden by the system, plotting a maximum 'max_y_ticks' ticks.
-
-=item 'include_zero'
-
-If 'true', forces the y-axis to include zero if it is not in the dataset
-range. Default is 'false'.
-
-In general, it is better to use this, than to set the 'min_val' if that
-is all you want to achieve.
-
-=item 'pt_size'
-
-Sets the radius of the points (for Chart::Points, etc.) in pixels.  
-Default is 18.
-
-=item 'brush_size'
-
-Sets the width of the lines (for Chart::Lines, etc.) in pixels.
-Default is 6.
-
-=item 'brushStyle'
-
-Sets the shape of points for Chart::Points, Chart::LinesPoints.
-The possibilities are 'FilledCircle', 'circle', 'donut',
-'OpenCircle', 'fatPlus', 'triangle', 'upsidedownTriangle',
-'square', 'hollowSquare', 'OpenRectangle', 'FilledDiamond',
-'OpenDiamond', 'Star', 'OpenStar'.
-Default: 'FilledCircle
-
-=item 'skip_x_ticks'
-
-Sets the number of x-ticks and x-tick labels to skip.  (ie.  
-if 'skip_x_ticks' was set to 4, Chart would draw every 4th x-tick
-and x-tick label).  Default is undef.
-
-=item 'custom_x_ticks'
-
-Used in points, lines, linespoints, errorbars and bars charts, this option
-allows you to you to specify exactly which x-ticks and x-tick labels should
-be drawn.  It should be assigned a reference to an array of desired
-ticks.  Just remember that I'm counting from the 0th element of the
-array.  (ie., if 'custom_x_ticks' is assigned [0,3,4], then the 0th,
-3rd, and 4th x-ticks will be displayed)
-
-=item 'f_x_tick'
-
-Needs a reference to a function which uses the x-tick labels generated by
-the '@data[0]' as the argument. The result of this function can reformat
-the labels. For instance
-
-   $obj -> set ('f_x_tick' => \&formatter );
-
-An example for the function formatter: x labels are seconds since an event. 
-The referenced function can transform this seconds to hour, minutes and seconds.
- 
-=item 'f_y_tick'
-
-The same situation as for 'f_x_tick' but now used for y labels.
- 
-=item 'colors'
-
-This option lets you control the colors the chart will use.  It takes
-a reference to a hash.  The hash should contain keys mapped to references
-to arrays of rgb values.  For instance,
-
-    $obj->set('colors' => {'background' => [255,255,255]});
-
-sets the background color to white (which is the default).  Valid keys for
-this hash are
-
-    'background' (background color for the png)
-    'title' (color of the title)
-    'text' (all the text in the chart)
-    'x_label' (color of the x-axis label)
-    'y_label' (color of the first y axis label)
-    'y_label2' (color of the second y axis label)
-    'grid_lines' (color of the grid lines)
-    'x_grid_lines' (color of the x grid lines - for x axis ticks)
-    'y_grid_lines' (color of the y grid lines - for to left y axis ticks)
-    'y2_grid_lines' (color of the y2 grid lines - for right y axis ticks)
-    'dataset0'..'dataset63' (the different datasets)
-    'misc' (everything else, ie. ticks, box around the legend)
-
-NB. For composite charts, there is a limit of 8 datasets per component.
-The colors for 'dataset8' through 'dataset15' become the colors
-for 'dataset0' through 'dataset7' for the second component chart.
-More options how to define colors are described under L<Chart::Color>.
-
-=item 'title_font'
-
-This option changes the font of the title. The key has to be a GD font. 
-eg. GD::Font->Large
-
-=item 'label_font'
-
-This option changes the font of the labels. The key has to be a GD font. 
-
-=item 'legend_font'
-
-This option changes the font of the text in the legend. 
-The key has to be a GD font. 
-
-=item 'tick_label_font' 
-
-This is the font for the tick labels. It also needs 
-a GD font object as an argument.
-
-=item 'grey_background'
-
-Puts a nice soft grey background on the actual data plot when
-set to 'true'.  Default is 'true'.
-
-=item 'y_axes'
-
-Tells Chart where to place the y-axis. Has no effect on Composite and Pie.
-Valid values are 'left', 'right' and 'both'. Defaults to 'left'.
-
-=item 'x_grid_lines'
-
-Draws grid lines matching up to x ticks if set to 'true'. Default is false.
-
-=item 'y_grid_lines'
-
-Draws grid lines matching up to y ticks if set to 'true'. Default is false.
-
-=item 'grid_lines'
-
-Draws grid lines matching up to x and y ticks. 
-
-=item 'spaced_bars'
-
-Leaves space between the groups of bars at each data point when set
-to 'true'.  This just makes it easier to read a bar chart.  Default
-is 'true'.
-
-=item 'imagemap'
-
-Lets Chart know you're going to ask for information about the placement
-of the data for use in creating an image map from the png.  This information
-can be retrieved using the imagemap_dump() method.  NB. that the 
-imagemap_dump() method cannot be called until after the Chart has been
-generated (ie. using the png() or cgi_png() methods).
-
-=item 'sort'
-
-In a xy-plot, the data will be sorted ascending if set to 'true'.
-(Should be set if the data isn't sorted, especially in Lines, Split 
-and LinesPoints) In a Pareto Chart the data will be sorted descending. 
-Defaults to 'false'.
-
-=item 'composite_info'
-
-This option is only used for composite charts.  It contains the
-information about which types to use for the two component charts,
-and which datasets belong to which component chart. It should be
-a reference to an array of array references, containing information 
-like the following
-
-    $obj->set ('composite_info' => [ ['Bars', [1,2]],
-                     ['Lines', [3,4] ] ]);
-
-This example would set the two component charts to be a bar chart and
-a line chart.  It would use the first two data sets for the bar 
-chart (note that the numbering starts at 1, not zero like most of
-the other numbered things in Chart), and the second two data sets
-for the line chart.  The default is undef.
-
-NB. Chart::Composite can only do two component charts.
-
-=item 'min_val1', 'min_val2'
-
-Only for composite charts, these options specify the minimum y-value
-for the first and second components respectively.  Both default to
-undef.
-
-=item 'max_val1', 'max_val2'
-
-Only for composite charts, these options specify the maximum y-value
-for the first and second components respectively.  Both default to
-undef.
-
-=item 'ylabel2'
-
-The label for the right y-axis (the second component chart) on a composite
-chart.  Default is undef.
-
-=item 'y_ticks1', 'y_ticks2'
-
-Only for composite charts, the number of y ticks to use on the first and
-second y-axis on a composite chart.  Please note that if you just set the
-'y_ticks' option, both axes will use that number of y ticks.
-Both default to undef.
-
-=item 'f_y_tick1', 'f_y_tick2'
-
-Only for composite charts, needs a reference to a function 
-which has one argument and has to return
-a string which labels the first resp. second y axis.
-Both default to undef.
-
-=item 'same_y_axes'
-
-Forces both component charts in a composite chart to use the same maximum 
-and minimum y-values if set to 'true'.  This helps to keep the composite 
-charts from being too confusing.  Default is undef.
-
-=item 'no_cache'
-
-Adds Pragma: no-cache to the http header.  Be careful with this one, as
-Netscape 4.5 is unfriendly with POST using this method.
-
-=item 'legend_example_size'
-
-Sets the length of the example line in the legend in pixels. Defaults to 20.
-
-=item 'same_error'
-
-This is a option only for ErrorBars. It tells chart that you want use the same 
-error value of a data point if set to 'true'. Look at the documentation
-to see how the module ErrorBars works. Default: 'false'.
-
-=item 'skip_y_ticks'
-
-Does the same for the y-axis at a HorizontalBars chart as 'skip_x_ticks'
-does for other charts. Defaults to 1.
-
-=item 'label_values' 
-
-Tells a pie chart what labels to draw beside the pie. Valid values are
-'percent', 'value', 'both' and 'none'. Defaults to 'percent'.
-
-=item 'legend_label_values'
-
-Tells a pie chart what labels to draw in the legend. Valid values are
-'percent', 'value', 'both' and 'none'. Defaults to 'value'.
-
-=item 'start'
-
-Required value for a split chart. Sets the start value of the first interval.
-If the x coordinate of the first data point is zero, you should 'set' to
-zero. Default is 'undef'.
-
-=item 'interval'
-
-Also a required value for a split chart. It sets the interval of one line
-to plot. Defaults 'undef'.
-
-=item 'interval_ticks'
-
-Sets the number of ticks for the x-axis of a Split chart. Defaults to 5.
-
-=item 'scale'
-
-Every y-value of a split chart will be multiplied with that value, but
-the scale won't change. Which means that split allows one to overdraw certain 
-rows! Only useful if you want to give prominence to the maximal amplitudes
-of the data. Defaults to 1. 
-
-=item 'point'
-
-Indicates to draw points in a direction chart. 'true' or 'false' possible. 
-Defaults to 'true'.
-
-=item 'line'
-
-If you turn this option to 'true', then direction will connect the points 
-with lines. Defaults to 'false'.
-
-=item 'arrow'
-
-This is also an option for the direction module. If set to 'true', chart 
-will draw a arrow from the center to the point. Defaults to 'false'.
-
-=item 'angle_interval'
-
-This option tells direction, how many angle lines should be drawn. The
-default value is 30, which means that a line will be drawn every
-30 degrees. Valid Values are: 0, 5, 10, 15, 20, 30, 45 and 60. If you
-choose 0, direction will draw no line.
-
-=item 'min_circles'
-
-Sets the minimum number of circles when generating a scale for direction.
-Default is 4, minimum is 2.
-
-=item 'max_circles'
-
-Sets the maximum number of circles when generating a scale for direction.
-Default is 100. This limit is used to avoid plotting  an unreasonable 
-large number of ticks if non-round values are used for the min_val and
-max_val.
-
-=item 'pairs'
-
-Only used for direction how to handle more datasets. 
-               If 'pairs' is set to 'true', 
-               Chart uses the first dataset as a set of degrees and 
-               the second dataset as a set of values. 
-               Then, the third set is a set of degrees and the fourth a set of values \dots. \\
-               If 'pairs' is set to 'false', 
-               Chart uses the first dataset as a set of angels 
-               and all following datasets as sets of values.
-               Defaults to 'false'.
-
-Sets the maximum number of circles when generating a scale for direction.
-Default is 100. This limit is used to avoid plotting  an unreasonable 
-large number of ticks if non-round values are used for the min_val and
-max_val.
-
-=item 'ring'
-
-Only for pie charts: sets the "thickness" of the pie, the percentage of
-the radius, which is visible. Defaults to 1 (normal pie chart).
-Good values are between 0.2 and 0.4.
-
-=back
 
 =head2 GIFgraph.pm-style API
 
@@ -786,9 +336,16 @@ since that's the place in the @data array for the data point labels.
 
 =head1 PLAN
 
-This module is under currently under a complete rewrite. Version will 
-bump to 3 when rewrite is completed, without breaking any compatibility.
-The old API stays as it is, the new will be through a new central API.
+This module is currently under a complete rebuild, that will take place 
+in two phases. First: rewrite all functionality within a modular
+architecture and hierarchical property system. This will be accessed
+via a central API using the so far unutilized Chart module
+(C<my $c = Chart->new(...);>). This API will have in part different 
+method and property names, but the old API will not be touched.
+In a second phase we will see hoch much new code can be used by the old
+modules and which new features can be brought to the legacy parts,
+which will be than discouraged, but not scrapped.
+
 
 =head1 TO DO
 

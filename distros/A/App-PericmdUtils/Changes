@@ -1,3 +1,14 @@
+0.054   2022-05-27  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        [cli list-pericmd-plugins]
+
+        - [ux] Add examples.
+
+        - No need to read config files & env.
+
+
 0.053   2022-05-14  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

@@ -13,7 +13,7 @@ if ( !-e $text_dir ) {
 
 my $text = Test::Text->new($text_dir, "/usr/share/hunspell/"); #dummy dir for now
 is( $text->dir, $text_dir, "Text directory");
-is( scalar( @{$text->files} ), 3, "Files");
+is( scalar( @{$text->files} ), 4, "Files");
 
 $text = Test::Text->new($text_dir, , "/usr/share/hunspell/", 'en_US', 'text.md');
 is( scalar( @{$text->files} ), 1, "Files");

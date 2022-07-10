@@ -6,12 +6,13 @@ use warnings;
 
 use CSS::Struct::Output::Raw;
 use Plack::Util::Accessor qw(css generator login_link login_title tags title);
+use Tags::HTML::Login::Button;
 use Tags::HTML::Page::Begin;
 use Tags::HTML::Page::End;
 use Tags::Output::Raw;
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub call {
 	my ($self, $env) = @_;
@@ -41,7 +42,7 @@ sub prepare_app {
 	}
 
 	if (! $self->generator) {
-		$self->generator('Login');
+		$self->generator(__PACKAGE__.'; Version: '.$VERSION);
 	}
 
 	if (! $self->title) {
@@ -56,32 +57,21 @@ sub prepare_app {
 		$self->login_title('LOGIN');
 	}
 
+	# Tags helper for login button.
+	$self->{'_login_button'} = Tags::HTML::Login::Button->new(
+		'css' => $self->css,
+		'link' => $self->login_link,
+		'tags' => $self->tags,
+		'title' => $self->login_title,
+	);
+
 	return;
 }
 
 sub _css {
 	my $self = shift;
 
-	$self->css->put(
-		['s', '.outer'],
-		['d', 'position', 'fixed'],
-		['d', 'top', '50%'],
-		['d', 'left', '50%'],
-		['d', 'transform', 'translate(-50%, -50%)'],
-		['e'],
-
-		['s', '.login'],
-		['d', 'text-align', 'center'],
-		['d', 'background-color', 'blue'],
-		['d', 'padding', '1em'],
-		['e'],
-
-		['s', '.login a'],
-		['d', 'text-decoration', 'none'],
-		['d', 'color', 'white'],
-		['d', 'font-size', '3em'],
-		['e'],
-	);
+	$self->{'_login_button'}->process_css;
 
 	return;
 }
@@ -99,17 +89,7 @@ sub _tags {
 		},
 		'tags' => $self->tags,
 	)->process;
-	$self->tags->put(
-		['a', 'class', 'outer'],
-
-		['b', 'div'],
-		['a', 'class', 'login'],
-		['b', 'a'],
-		['a', 'href', $self->login_link],
-		['d', $self->login_title],
-		['e', 'a'],
-		['e', 'div'],
-	);
+	$self->{'_login_button'}->process;
 	Tags::HTML::Page::End->new(
 		'tags' => $self->tags,
 	)->process;
@@ -159,7 +139,7 @@ Default value is CSS::Struct::Output::Raw instance.
 
 HTML generator string.
 
-Default value is 'Login'.
+Default value is 'Plack::App::Login; Version: __VERSION__'.
 
 =item * C<login_link>
 
@@ -213,7 +193,7 @@ Returns Plack::Component object.
  use Plack::Runner;
  use Tags::Output::Indent;
 
- # Run application with one PYX file.
+ # Run application.
  my $app = Plack::App::Login->new(
          'css' => CSS::Struct::Output::Indent->new,
          'tags' => Tags::Output::Indent->new(
@@ -269,6 +249,7 @@ Returns Plack::Component object.
 
 L<CSS::Struct::Output::Raw>,
 L<Plack::Util::Accessor>,
+L<Tags::HTML::Login::Button>,
 L<Tags::HTML::Page::Begin>,
 L<Tags::HTML::Page::End>,
 L<Tags::Output::Raw>,
@@ -286,12 +267,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020 Michal Josef Špaček
+© 2020-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

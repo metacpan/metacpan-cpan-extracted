@@ -6,14 +6,14 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   Imager: '1.013'
-  Imager::File::PNG: '0'
+  Imager::File::PNG: '0.99'
   Test::More: '0.47'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   Imager: '1.013'
-  Imager::File::PNG: '0'
+  Imager::File::PNG: '0.99'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,10 +25,10 @@ no_index:
     - inc
 requires:
   Imager: '1.013'
-  Imager::File::PNG: '0'
+  Imager::File::PNG: '0.99'
 resources:
   bugtracker: https://github.com/tonycoz/imager-file-apng/issues
   homepage: http://imager.perl.org/
   repository: https://github.com/tonycoz/imager-file-apng.git
-version: '0.001'
+version: '0.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -40,7 +40,7 @@ is( $po->charset, 'utf-8', 'charset' );
 is( $po->content_encoding, '8bit', 'content_encoding' );
 is( $po->content_type, 'text/plain; charset=utf-8', 'content_type' );
 # <https://superuser.com/questions/392439/lang-and-language-environment-variable-in-debian-based-systems>
-is( $po->current_lang, ( ( $ENV{LANGUAGE} || $ENV{LANG} ) ? [split( /:/, ( $ENV{LANGUAGE} || $ENV{LANG} ) )]->[0] : '' ), 'current_lang' );
+is( $po->current_lang, ( ( defined( $ENV{LANGUAGE} ) || defined( $ENV{LANG} ) ) ? [split( /:/, ( $ENV{LANGUAGE} || $ENV{LANG} ) )]->[0] : '' ), 'current_lang' );
 is( $po->domain, 'com.example.api', 'domain' );
 is( $po->encoding, 'utf8', 'encoding' );
 my $temp = tempfile({ suffix => '.po', unlink => 0 });

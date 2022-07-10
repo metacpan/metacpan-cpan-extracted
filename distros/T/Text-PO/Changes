@@ -1,6 +1,12 @@
 Revision history for Perl module Text::PO
 
-v0.2.1 2022-07-06T15:41:53+0900
+v0.2.3 2022-07-11T00:01:25+0900
+    - Trapped lack of local time zone support.
+
+v0.2.2 2022-07-08T08:19:53Z +0900
+    - More test units correction.
+
+v0.2.1 2022-07-06T15:41:53Z +0900
     - Corrected error in test unit.
 
 v0.2.0 2022-07-06T06:25:56Z +0900

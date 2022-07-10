@@ -8,5 +8,6 @@ t/00environ.t
 t/01load.t
 t/10apng.t
 t/91manifest.t
+t/92spell.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

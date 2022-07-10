@@ -9,14 +9,21 @@ use warnings;
 use XML::TMX;
 use XML::TMX::Reader;
 
-our ($icons);
+our ($icons,$o,$ff,$v);
 
 my $tmx = shift;
 my $tmx_obj = XML::TMX::Reader->new($tmx);
+my $OUT ;
 
-binmode(STDOUT,":utf8");
+$o //= "__.html" if $v;
+if ($v and $v eq "1"){ $v="firefox" }
 
-print qq{
+if($o){ open($OUT, ">", $o ) or die("Cant create $o\n") }
+else  { $OUT = \*STDOUT }
+
+binmode($OUT,":utf8");
+
+print $OUT qq{
 <html>
 <head>
   <style>
@@ -24,6 +31,9 @@ tr {
     background-color: #e0e0e0;
     vertical-align: top;
 } 
+tr:nth-child(even) {background-color: #f0f0f0;}
+/* tr:hover           {background-color: #c8c8c8;} */
+tr:hover           {background-color: #ffe0e0;}
  </style>
   <title>    </title>
   <meta charset="UTF-8"/>
@@ -35,6 +45,8 @@ tr {
 qq{</body>
 </html>
 };
+
+if ($v){system("$v $o") }
 
 __END__
 
@@ -48,11 +60,14 @@ tmx2html - Converts a TMX to an HTML formatted page
 
 =head1 VERSION
 
-version 0.36
+version 0.39
 
 =head1 SYNOPSIS
 
    tmx2html [-icons] file.tmx > file.html
+      -o=out-html      -- def: __.html
+      -v               -- show with firefox
+      -v=chromium      -- show with chromium
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,6 @@
 package Acme::Mitey::Cards::Suit;
 
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 our $AUTHORITY = 'cpan:TOBYINK';
 
 use Acme::Mitey::Cards::Mite qw( -bool -is );

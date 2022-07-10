@@ -11,6 +11,7 @@ use OPCUA::Open62541::Test::Client;
 use Test::More tests =>
     OPCUA::Open62541::Test::Server::planning() +
     OPCUA::Open62541::Test::Client::planning() * 4 + 9;
+use Test::Deep;
 use Test::Exception;
 use Test::NoWarnings;
 use Test::LeakTrace;
@@ -219,17 +220,11 @@ if ($async) {
 	"client bad connection");
 } else {
     # API 1.2 disambiguates fresh from closed.
-    my ($channel, $status);
-    if (defined &SECURECHANNELSTATE_FRESH) {
-	$channel = SECURECHANNELSTATE_FRESH;
-	$status = STATUSCODE_BADDISCONNECT;
-    } else {
-	$channel = SECURECHANNELSTATE_CLOSED;
-	# API 1.1 seem to ignore the error
-	$status = STATUSCODE_GOOD;
-    }
-    is_deeply([$client->{client}->getState()],
-	[$channel, SESSIONSTATE_CLOSED, $status],
+    my $channel = defined &SECURECHANNELSTATE_FRESH ?
+	SECURECHANNELSTATE_FRESH : SECURECHANNELSTATE_CLOSED;
+    cmp_deeply([$client->{client}->getState()],
+	[$channel, SESSIONSTATE_CLOSED, any(STATUSCODE_GOOD,
+	STATUSCODE_BADDISCONNECT, STATUSCODE_BADCONNECTIONCLOSED)],
 	"client bad connection");
 }
 

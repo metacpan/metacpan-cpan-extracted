@@ -1,4 +1,19 @@
+0.04 2022-07-08
+  [Changes]
+    * perl_impl directory is not indexed.
+0.03 2022-07-08
+  [Changes]
+    * Hide subdirectory's Digest::MD5 from ExtUtils::MakeMaker.
+0.02 2022-07-08
+  [New Features]
+    * Add the following methods.
+      static method new : Digest::MD5 ();
+      method add : Digest::MD5 ($data : string);
+      method digest : string ();
+      method hexdigest : string ();
+      method b64digest : string ();
+  [Fix Tests]
+    * Remove unused thread, context, files, clone, bits tests.
 0.01 2022-07-07
   [Changes]
     * First release.
-  

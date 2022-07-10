@@ -1,0 +1,88 @@
+{
+   "abstract" : "generate VBA patch script from diff output",
+   "author" : [
+      "Kazumasa Utashiro"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.12",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-diff2vba",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Greple::msdoc" : "0",
+            "App::Greple::subst" : "0",
+            "App::sdif" : "0",
+            "Data::Section::Simple" : "0",
+            "Encode" : "0",
+            "Getopt::EX::Hashed" : "1.03",
+            "Getopt::EX::Long" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Pod::Usage" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::diff2vba" : {
+         "file" : "lib/App/diff2vba.pm",
+         "version" : "0.99"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kaz-utashiro/App-diff2vba/issues"
+      },
+      "homepage" : "https://github.com/kaz-utashiro/App-diff2vba",
+      "repository" : {
+         "url" : "git://github.com/kaz-utashiro/App-diff2vba.git",
+         "web" : "https://github.com/kaz-utashiro/App-diff2vba"
+      }
+   },
+   "version" : "0.99",
+   "x_authority" : "cpan:UTASHIRO",
+   "x_contributors" : [
+      "Kazumasa Utashiro <kaz@utashiro.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_static_install" : 0
+}

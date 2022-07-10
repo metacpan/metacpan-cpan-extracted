@@ -6,9 +6,14 @@
 ## use utf8::all;
 use Data::Dumper;
 
-our ($all,$w,$max,$pdf, $o, $n, $a,$debug, $i);
+our ($all,$w,$max,$pdf, $o, $n, $a,$debug, $i, $html);
+
+$a //= "p" if $pdf || $html;
 
 my ($ab,$ae); ## emphatise marker
+my $browser="";
+$browser = "=$html" if ($html and $html ne "1");
+
 if($a){
   if($a eq "1"){
     $ab="=(";
@@ -20,6 +25,16 @@ if($a){
   }
 }
 
+if($html){
+  if($html eq "1"){
+    $ab="<b>";
+    $ae="</b>";
+  }
+  elsif($html){
+    $ab="<$html>";
+    $ae="</$html>";
+  }
+}
 
 $max //= 500;
 $max = 1000000000 if ($max == 0 or $all);
@@ -27,21 +42,36 @@ $max = 1000000000 if ($max == 0 or $all);
 use strict;
 use warnings;
 
-my $p = shift;
-
-if($i and $w){ $p = qr{(?i)\b$p\b} }
-elsif($i)    { $p = qr{(?i)$p} }
-elsif($w)    { $p = qr{\b$p\b} }
+my $p = shift or die("Usage: $0 [options] pattern f.tmx\n");
+if   ($p =~ m{(\w+):(.+?);(\w+):(.+)}){ 
+     if($i and $w){ $p = +{$1=> qr{(?i)\b$2\b}, $3 => qr{(?i)\b$4\b}} }
+     elsif($i)    { $p = +{$1=> qr{(?i)$2},     $3 => qr{(?i)$4}} }
+     elsif($w)    { $p = +{$1=> qr{\b$2\b},     $3 => qr{\b$4\b}} }
+     else         { $p = +{$1=> $2,             $3 => $4}  }       
+}
+elsif($p =~ m{(\w+):(.+)}            ){ 
+     if($i and $w){ $p = +{$1=> qr{(?i)\b$2\b}} }
+     elsif($i)    { $p = +{$1=> qr{(?i)$2}} }
+     elsif($w)    { $p = +{$1=> qr{\b$2\b}} }
+     else         { $p = +{$1=> $2}  }       
+}
+else{
+     if($i and $w){ $p = qr{(?i)\b$p\b} }
+     elsif($i)    { $p = qr{(?i)$p} }
+     elsif($w)    { $p = qr{\b$p\b} }
+}
 
 use XML::TMX;
 use XML::TMX::Reader;
 
-$o //= "__.tmx" if $pdf;
+$o //= "__.tmx" if $pdf || $html;
 
 our ($icons);
 
 my $tmx = shift;
 my $tmx_obj = XML::TMX::Reader->new($tmx);
+
+print STDERR  Dumper($p) if $main::debug; 
 
  $tmx_obj->for_tu( 
     { patt => $p, 
@@ -49,20 +79,29 @@ my $tmx_obj = XML::TMX::Reader->new($tmx);
       n => $n || 0,
       output => $o || undef }, #### "__tmxgrep.tmx" 
     sub { my($tu,$at) = @_;
-          print STDERR  Dumper($tu,$at) if $main::debug; 
+          print STDERR  Dumper($tu,$at,$p) if $main::debug; 
 #         print STDERR  "."; 
-          if($main::a){
-            for my $k(keys %$tu){
-              for(keys %{$tu->{$k}}){
-                $tu->{$k}{$_} =~ s!($p)!$ab$1$ae!g;
+          if($main::a ){
+            for my $li(keys %$tu){
+              next if $li =~ /^-/;
+              for(keys %{$tu->{$li}}){
+                if(ref($p)){
+                  my $pli = $p->{lc($li)} or next;
+                  $tu->{$li}{$_} =~ s!($pli)!$ab$1$ae!g;
+                }
+                else{
+                  $tu->{$li}{$_} =~ s!($p)!$ab$1$ae!g;
+                }
               }
             }
           }
+
           return $tu;
     }
  );
 
 if($pdf){ system("tmx2pdf-prince -v  $o");}
+if($html){ system("tmx2html -v$browser $o");}
 
 __END__
 
@@ -76,20 +115,30 @@ tmxgrep - grep translation units in a TMX file
 
 =head1 VERSION
 
-version 0.36
+version 0.39
 
 =head1 SYNOPSIS
 
- tmxgrep <perlregexp> file.tmx
+ tmxgrep patt file.tmx
  options:
-   -pdf        -- output is transformed in a PDF file 
    -max=300    -- extract up to 300 TU (def=500)
    -max=0      -- all matches
    -all        -- all matches
    -a          -- annotate matches with '=(...)='
+   -a=xx       -- annotate matches with '<xx>...</xx>'
    -o=out.tmx  -- define output file (defaut= STDOUT)
    -n          -- print original TU number (eg: <tu n="35">)
    -i          -- ignore case
+   -w          -- whole words
+   -pdf        -- output is transformed in a PDF file and show
+   -html       -- output is transformed in a HTML file and show
+   -html=chromium  -- idem and show it with chromium (def:firefox)
+
+Where patt can be:
+
+  RegExp
+  l1:RegExp
+  l1:RegExp;l2:RegExp
 
 =head1 DESCRIPTION
 

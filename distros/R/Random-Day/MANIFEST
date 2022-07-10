@@ -27,6 +27,7 @@ t/Random-Day/06-random_day.t
 t/Random-Day/07-random_day_month.t
 t/Random-Day/08-random_day_month_year.t
 t/Random-Day/09-random_month.t
-t/Random-Day/10-random_year.t
+t/Random-Day/10-random_month_year.t
+t/Random-Day/11-random_year.t
 xt/Random-Day/01-pod_coverage.t
 xt/Random-Day/02-pod.t

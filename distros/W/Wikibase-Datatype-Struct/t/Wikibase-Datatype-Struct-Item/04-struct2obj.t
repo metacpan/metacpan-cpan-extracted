@@ -230,7 +230,7 @@ $struct_hr = {
 $ret = Wikibase::Datatype::Struct::Item::struct2obj($struct_hr);
 isa_ok($ret, 'Wikibase::Datatype::Item');
 is($ret->id, 'Q42', 'Method id().');
-is($ret->lastrevid, '534820', 'Method lastrevid().');
+is($ret->lastrevid, 534820, 'Method lastrevid().');
 is($ret->modified, '2020-12-02T13:39:18Z', 'Method modified().');
 is($ret->ns, 0, 'Method ns().');
 is($ret->page_id, 123, 'Method page_id().');
@@ -265,7 +265,6 @@ isa_ok($ret, 'Wikibase::Datatype::Item');
 is($ret->id, undef, 'Method id().');
 is($ret->lastrevid, undef, 'Method lastrevid().');
 is($ret->modified, undef, 'Method modified().');
-# XXX Is it right?
-is($ret->ns, 0, 'Method ns() (undefined).');
+is($ret->ns, 0, 'Method ns() (0).');
 is($ret->page_id, undef, 'Method page_id().');
 is($ret->title, undef, 'Method title().');

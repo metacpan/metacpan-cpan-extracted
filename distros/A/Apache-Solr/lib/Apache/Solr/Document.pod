@@ -154,12 +154,12 @@ usual C<id>, you have to set it via global value C<$Apache::Solr::uniqueKey>
 
 =head1 SEE ALSO
 
-This module is part of Apache-Solr distribution version 1.05,
-built on January 11, 2019. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Apache-Solr distribution version 1.06,
+built on July 08, 2022. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2012-2019 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2012-2022 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

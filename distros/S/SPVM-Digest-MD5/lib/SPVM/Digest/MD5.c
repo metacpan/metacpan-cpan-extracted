@@ -514,3 +514,117 @@ int32_t SPVM__Digest__MD5__md5_base64(SPVM_ENV* env, SPVM_VALUE* stack) {
         
         return 0;
 }
+
+int32_t SPVM__Digest__MD5__new(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t e;
+  
+  void* obj_self = env->new_object_by_name(env, stack, "Digest::MD5", &e, FILE_NAME, __LINE__);
+  if (e) { return e; }
+  
+  MD5_CTX* ctx = env->alloc_memory_block_zero(env, sizeof(MD5_CTX));
+
+  MD5Init(ctx);
+  
+  void* obj_ctx = env->new_object_by_name(env, stack, "Digest::MD5::Context", &e, FILE_NAME, __LINE__);
+  
+  env->set_pointer(env, stack, obj_ctx, ctx);
+  
+  env->set_field_object_by_name(env, stack, obj_self, "Digest::MD5", "context", "Digest::MD5::Context", obj_ctx, &e, FILE_NAME, __LINE__);
+  if (e) { return e; }
+  
+  stack[0].oval = obj_self;
+  
+  return 0;
+}
+
+int32_t SPVM__Digest__MD5__add(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t e;
+  void* obj_self = stack[0].oval;
+
+  void* obj_string = stack[1].oval;
+  
+  if (!obj_string) {
+    return env->die(env, stack, "The input must be defined", FILE_NAME, __LINE__);
+  }
+
+  const char* data = (unsigned char *)env->get_chars(env, stack, obj_string);
+  int32_t len = env->length(env, stack, obj_string);
+  
+  void* obj_ctx = env->get_field_object_by_name(env, stack, obj_self, "Digest::MD5", "context", "Digest::MD5::Context", &e, FILE_NAME, __LINE__);
+  if (e) { return e; }
+  
+  MD5_CTX* ctx = env->get_pointer(env, stack, obj_ctx);
+
+  MD5Update(ctx, data, len);
+  
+  stack[0].oval = obj_self;
+  
+  return 0;
+}
+
+int32_t SPVM__Digest__MD5__digest(SPVM_ENV* env, SPVM_VALUE* stack) {
+  int32_t e;
+  void* obj_self = stack[0].oval;
+  
+  void* obj_ctx = env->get_field_object_by_name(env, stack, obj_self, "Digest::MD5", "context", "Digest::MD5::Context", &e, FILE_NAME, __LINE__);
+  if (e) { return e; }
+  
+  MD5_CTX* ctx = env->get_pointer(env, stack, obj_ctx);
+  
+  unsigned char digeststr[16];
+  MD5Final(digeststr, ctx);
+  void* output = make_output(env, stack, digeststr, F_BIN);
+  stack[0].oval = output;
+  return 0;
+}
+
+int32_t SPVM__Digest__MD5__hexdigest(SPVM_ENV* env, SPVM_VALUE* stack) {
+  int32_t e;
+  void* obj_self = stack[0].oval;
+  
+  void* obj_ctx = env->get_field_object_by_name(env, stack, obj_self, "Digest::MD5", "context", "Digest::MD5::Context", &e, FILE_NAME, __LINE__);
+  if (e) { return e; }
+  
+  MD5_CTX* ctx = env->get_pointer(env, stack, obj_ctx);
+  
+  unsigned char digeststr[16];
+  MD5Final(digeststr, ctx);
+  void* output = make_output(env, stack, digeststr, F_HEX);
+  stack[0].oval = output;
+  return 0;
+}
+
+int32_t SPVM__Digest__MD5__b64digest(SPVM_ENV* env, SPVM_VALUE* stack) {
+  int32_t e;
+  void* obj_self = stack[0].oval;
+  
+  void* obj_ctx = env->get_field_object_by_name(env, stack, obj_self, "Digest::MD5", "context", "Digest::MD5::Context", &e, FILE_NAME, __LINE__);
+  if (e) { return e; }
+  
+  MD5_CTX* ctx = env->get_pointer(env, stack, obj_ctx);
+  
+  unsigned char digeststr[16];
+  MD5Final(digeststr, ctx);
+  void* output = make_output(env, stack, digeststr, F_B64);
+  stack[0].oval = output;
+  
+  return 0;
+}
+
+int32_t SPVM__Digest__MD5__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
+  int32_t e;
+  
+  void* obj_self = stack[0].oval;
+  
+  void* obj_ctx = env->get_field_object_by_name(env, stack, obj_self, "Digest::MD5", "context", "Digest::MD5::Context", &e, FILE_NAME, __LINE__);
+  if (e) { return e; }
+  
+  MD5_CTX* ctx = env->get_pointer(env, stack, obj_ctx);
+  assert(ctx);
+  
+  env->free_memory_block(env, ctx);
+  
+  return 0;
+}

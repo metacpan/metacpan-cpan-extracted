@@ -4,6 +4,19 @@
 All modifications are made by Mark Overmeer, unless explicitly stated
 differently.
 
+version 1.06:
+
+	Fixes:
+	- do no warn for long lists of pages, deep recursion.
+	  Detected by [Andy Beverley]
+	- search with 'start' does not work with nextSelected()
+	  Fixed by [Andy Beverley]
+
+	Improvements:
+	- nextSelected() plays well with selected()
+	- $core->select now may have options
+	- $core->select option 'sequential'
+
 version 1.05: Fri 11 Jan 17:53:40 CET 2019
 
 	Fixes:

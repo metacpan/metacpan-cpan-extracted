@@ -6,6 +6,9 @@ use warnings;
 use FindBin ();
 use lib "$FindBin::Bin/../lib";
 
+# cpantester: strawberry perl defaults to JSON::PP and has blessing problem with JSON::true objects
+BEGIN { $ENV{PERL_JSON_BACKEND} = 'JSON::backportPP' if ($^O eq 'MSWin32'); }
+
 use Test::More;
 use JSON;
 use Data::Dumper;
@@ -13,7 +16,7 @@ use Time::HiRes qw(time);
 use POSIX qw(strftime);
 use RPC::Switch::Client::Tiny::SessionCache;
 
-plan tests => 6;
+plan tests => 7;
 
 # test session expire list
 #
@@ -73,4 +76,25 @@ is($lru, '3 4 5', "test session lru");
 
 my $rem = join(' ', map { $_->{id} } @removed);
 is($rem, '1 2', "test session lru removed");
+
+# test session per_user
+#
+$cache = RPC::Switch::Client::Tiny::SessionCache->new(trace_cb => \&trace_cb, max_session => 4, max_user_session => 2);
+@removed = ();
+
+foreach my $v (1, 2, 3, 4) {
+	my $session = $cache->session_new({id => "SESS$v", user => "user1"});
+	my $child = {pid => $$, id => $v, start => time(), session => $session};
+	if ($cache->session_put($child)) {
+		my $cnt = scalar keys %{$cache->{active}};
+		if ($cnt > $cache->{max_session}) {
+			if ($child = $cache->lru_dequeue()) {
+				push(@removed, $child);
+			}
+		}
+	}
+}
+
+my $active = join(' ', sort keys %{$cache->{active}});
+is($active, 'SESS1 SESS2', "test session per user");
 

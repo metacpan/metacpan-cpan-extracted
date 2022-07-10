@@ -56,6 +56,6 @@
          "url" : "http://github.com/toddr/Crypt-OpenSSL-RSA"
       }
    },
-   "version" : "0.32",
+   "version" : "0.33",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

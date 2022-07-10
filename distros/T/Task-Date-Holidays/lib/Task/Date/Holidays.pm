@@ -5,13 +5,15 @@ use warnings;
 use vars qw($VERSION);
 use 5.006;
 
-$VERSION = '0.11';
+$VERSION = '0.12';
 
 1;
 
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =begin markdown
 
@@ -28,9 +30,9 @@ Task::Date::Holidays - Work distribution for holiday modules in the Date::Holida
 
 =head1 SYNOPSIS
 
-    $ tar xvzf Task-Date-Holidays-0.11.tgz
+    $ tar xvzf Task-Date-Holidays-0.12.tgz
 
-    $ cd Task-Date-Holidays-0.11
+    $ cd Task-Date-Holidays-0.12
 
     $ perl Build.PL
 
@@ -149,6 +151,8 @@ Jonas B., (jonasbn) - C<< <jonasbn@cpan.org> >>
 =head1 ACKNOWLEDGEMENTS
 
 =over
+
+=item * Slaven Rezić (SREZIC), reporting broken tests for 0.11 release
 
 =item * Alexander Nalobin (NALOBIN), patch for inclusion of Date::Holidays::RU, 0.04
 

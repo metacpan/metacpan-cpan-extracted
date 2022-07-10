@@ -36,6 +36,8 @@ examples/ex4.pl
 examples/ex40.pl
 examples/ex41.pl
 examples/ex42.pl
+examples/ex43.pl
+examples/ex44.pl
 examples/ex5.pl
 examples/ex6.pl
 examples/ex7.pl
@@ -66,6 +68,7 @@ Struct/Lexeme.pm
 Struct/Mediainfo.pm
 Struct/MediainfoSnak.pm
 Struct/MediainfoStatement.pm
+Struct/Property.pm
 Struct/Reference.pm
 Struct/Sense.pm
 Struct/Sitelink.pm
@@ -106,6 +109,10 @@ t/Wikibase-Datatype-Struct-MediainfoSnak/03-obj2struct.t
 t/Wikibase-Datatype-Struct-MediainfoSnak/04-struct2obj.t
 t/Wikibase-Datatype-Struct-MediainfoStatement/01-use.t
 t/Wikibase-Datatype-Struct-MediainfoStatement/02-version.t
+t/Wikibase-Datatype-Struct-Property/01-use.t
+t/Wikibase-Datatype-Struct-Property/02-version.t
+t/Wikibase-Datatype-Struct-Property/03-obj2struct.t
+t/Wikibase-Datatype-Struct-Property/04-struct2obj.t
 t/Wikibase-Datatype-Struct-Reference/01-use.t
 t/Wikibase-Datatype-Struct-Reference/02-version.t
 t/Wikibase-Datatype-Struct-Reference/03-obj2struct.t
@@ -178,6 +185,8 @@ xt/Wikibase-Datatype-Struct-MediainfoSnak/01-pod_coverage.t
 xt/Wikibase-Datatype-Struct-MediainfoSnak/02-pod.t
 xt/Wikibase-Datatype-Struct-MediainfoStatement/01-pod_coverage.t
 xt/Wikibase-Datatype-Struct-MediainfoStatement/02-pod.t
+xt/Wikibase-Datatype-Struct-Property/01-pod_coverage.t
+xt/Wikibase-Datatype-Struct-Property/02-pod.t
 xt/Wikibase-Datatype-Struct-Reference/01-pod_coverage.t
 xt/Wikibase-Datatype-Struct-Reference/02-pod.t
 xt/Wikibase-Datatype-Struct-Sense/01-pod_coverage.t

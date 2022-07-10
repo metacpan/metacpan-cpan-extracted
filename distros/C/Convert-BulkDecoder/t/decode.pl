@@ -1,6 +1,4 @@
-#!/usr/bin/perl -w
-
-# $Id: decode.pl,v 1.1 2003-01-31 21:56:06+01 jv Exp $
+#! perl
 
 use strict;
 use Test::More;
@@ -12,13 +10,11 @@ if ( @files ) {
     plan tests => 33;
 }
 else {
-    plan skip_all => "No data for test";
+    plan skip_all => "No data for test $type$sub";
     exit;
 }
 
 require_ok('Convert::BulkDecoder');
-
-require "t/differ.pl";
 
 my $ref = "data/${type}ref";
 $ref = "data/Zref" unless -s $ref;
@@ -45,7 +41,7 @@ ok(@art == $lines, scalar(@art) . " lines of raw data");
 # Plain unpacking.
 my @tst = (lc($tst), $tst, lc($tst)."1", $tst."1");
 unlink(@tst);
-my $e = new Convert::BulkDecoder (destdir => ".", md5 => 0, verbose => 0);
+my $e = new Convert::BulkDecoder (destdir => ".", md5 => 0, verbose => 1);
 $e->decode(\@art);
 ok($e->{type} eq $type, "type is " . $e->{type});
 ok($e->{name} eq $tst, "name is " . $e->{name});
@@ -118,5 +114,27 @@ ok($e->{size} == -s $ref, "size is " . $e->{size});
 
 # Clean up.
 unlink(@tst);
+
+sub differ {
+    # Perl version of the 'cmp' program.
+    # Returns 1 if the files differ, 0 if the contents are equal.
+    my ($old, $new) = @_;
+    unless ( open (F1, $old) ) {
+	print STDERR ("$old: $!\n");
+	return 1;
+    }
+    unless ( open (F2, $new) ) {
+	print STDERR ("$new: $!\n");
+	return 1;
+    }
+    my ($buf1, $buf2);
+    my ($len1, $len2);
+    while ( 1 ) {
+	$len1 = sysread (F1, $buf1, 10240);
+	$len2 = sysread (F2, $buf2, 10240);
+	return 0 if $len1 == $len2 && $len1 == 0;
+	return 1 if $len1 != $len2 || ( $len1 && $buf1 ne $buf2 );
+    }
+}
 
 1;

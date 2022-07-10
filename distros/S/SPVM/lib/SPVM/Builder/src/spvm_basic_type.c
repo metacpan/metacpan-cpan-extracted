@@ -31,6 +31,7 @@ const char* const* SPVM_NATIVE_C_BASIC_TYPE_ID_NAMES(void) {
     "Float",
     "Double",
     "Bool",
+    "Error",
   };
   
   return id_names;
@@ -266,7 +267,7 @@ int32_t SPVM_BASIC_TYPE_is_not_found_class_type(SPVM_COMPILER* compiler, int32_t
 int32_t SPVM_BASIC_TYPE_is_numeric_object_type(SPVM_COMPILER* compiler, int32_t basic_type_id) {
   (void)compiler;
   
-  if (basic_type_id >= SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE_OBJECT && basic_type_id <= SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE_OBJECT) {
+  if (basic_type_id >= SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE_CLASS && basic_type_id <= SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE_CLASS) {
     return 1;
   }
   else {

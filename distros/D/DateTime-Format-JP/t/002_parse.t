@@ -4,10 +4,11 @@ BEGIN
     use strict;
     use warnings;
     use open ':std' => ':utf8';
+    use vars qw( $DEBUG );
     use Test::More qw( no_plan );
     use lib './lib';
     use DateTime::Format::JP;
-    our $DEBUG = 0;
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
 use utf8;
@@ -100,17 +101,23 @@ my $tests =
     { test => "令和三年七月十二日（月）午後二時七分三十秒", year => 2021, month => 7, day => 12, hour => 14, minute => 7, second => 30 },
 ];
 
+my $n = 0;
 for my $ref ( @$tests )
 {
+    $n++;
     my $dt = $fmt->parse_datetime( $ref->{test} );
     isa_ok( $dt, 'DateTime', "parse_datetime -> $ref->{test}" );
     diag( "Error for $ref->{test} -> ", $fmt->error ) if( !defined( $dt ) );
-    subtest "Properties values for \"$ref->{test}\"" => sub
+    SKIP:
     {
-        foreach my $f ( qw( year month day hour minute second ) )
+        skip( "Failed test for test No $n", 1 ) if( !defined( $dt ) );
+        subtest "Properties values for \"$ref->{test}\"" => sub
         {
-            is( $dt->$f, $ref->{ $f }, "$f = " . $ref->{ $f } );
-        }
+            foreach my $f ( qw( year month day hour minute second ) )
+            {
+                is( $dt->$f, $ref->{ $f }, "$f = " . $ref->{ $f } );
+            }
+        };
     };
 }
 

@@ -1,5 +1,23 @@
 Imager release history.  Older releases can be found in Changes.old
 
+Imager 1.019 - 9 Jul 2022
+============
+
+ - fix palette/transparency table generation when writing paletted PNG
+   images with tranparency.  This happened to work for the test case,
+   but the mechanism used to generate the palette order preserved most
+   palette index positions, which hid the problem with actually
+   generating the PLTE and tRNS chunks.
+   https://github.com/tonycoz/imager/issues/499
+
+ - added lowish-level read() and write() class methods to
+   Imager::File::PNG, these are mostly intended for
+   Imager::File::APNG, but are documented and usable elsewhere.
+
+ - document in Imager::Install how to install Imager without any of
+   the bundled-but-also-on-CPAN modules being installed.
+   https://github.com/tonycoz/imager/issues/498
+
 Imager 1.018 - 19 Jun 2022
 ============
 

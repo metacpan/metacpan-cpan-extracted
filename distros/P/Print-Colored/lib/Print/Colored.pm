@@ -8,7 +8,7 @@ use Exporter 'import';
 use IO::Prompter;
 use Term::ANSIColor qw|colored coloralias|;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @EXPORT      = ();
 our @EXPORT_OK   = ();
@@ -355,7 +355,7 @@ Prints a text with appended newline colored as C<warn>.
 
 =head1 AUTHOR & COPYRIGHT
 
-© 2019-2020 by Tekki (Rolf Stöckli).
+© 2019-2022 by Tekki (Rolf Stöckli).
 
 This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version 2.0.
 

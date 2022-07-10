@@ -10,13 +10,13 @@ use Crypt::OpenSSL::Guess qw(openssl_inc_paths openssl_lib_paths);
 
 WriteMakefile(
     'NAME'             => 'Crypt::OpenSSL::RSA',
-    AUTHOR             => 'Ian Robertson <iroberts@cpan.org>',
+    'AUTHOR'           => 'Ian Robertson <iroberts@cpan.org>',
     'VERSION_FROM'     => 'RSA.pm',                              # finds $VERSION
     'DISTNAME'         => 'Crypt-OpenSSL-RSA',
     'ABSTRACT_FROM'    => 'RSA.pm',
     'MIN_PERL_VERSION' => 5.006,
     'PL_FILES'         => {},
-    ( $ExtUtils::MakeMaker::VERSION >= 6.3002 ? ( 'LICENSE' => 'perl', ) : () ),
+    'LICENSE'          => 'perl',
     'PREREQ_PM' => {
         'Crypt::OpenSSL::Random' => 0,
         'Test::More'             => 0,
@@ -30,29 +30,21 @@ WriteMakefile(
 
     'dist'  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     'clean' => { FILES    => 'Crypt-OpenSSL-RSA-*' },
-    ( $ExtUtils::MakeMaker::VERSION >= 6.3002 ? ( 'LICENSE' => 'perl', ) : () ),
-    (
-        $ExtUtils::MakeMaker::VERSION >= 6.46
-        ? (
-            'META_MERGE' => {
-                recommends => {
-                    'Crypt::OpenSSL::Bignum' => 0,
-                },
-                configure_requires => {
-                    'Crypt::OpenSSL::Guess' => '0.11',
-                },
-                build_requires => {
-                    'Test' => 0,    # For testing
-                },
-                resources => {
-                    'license'    => 'http://dev.perl.org/licenses/',
-                    'homepage'   => 'http://github.com/toddr/Crypt-OpenSSL-RSA',
-                    'bugtracker' => 'https://github.com/toddr/Crypt-OpenSSL-RSA/issues',
-                    'repository' => 'http://github.com/toddr/Crypt-OpenSSL-RSA',
-                }
-            }
-          )
-        : ()
-    ),
+    'META_MERGE' => {
+        recommends => {
+            'Crypt::OpenSSL::Bignum' => 0,
+        },
+        configure_requires => {
+            'Crypt::OpenSSL::Guess' => '0.11',
+        },
+        build_requires => {
+            'Test' => 0,    # For testing
+        },
+        resources => {
+            'license'    => 'http://dev.perl.org/licenses/',
+            'homepage'   => 'http://github.com/toddr/Crypt-OpenSSL-RSA',
+            'bugtracker' => 'https://github.com/toddr/Crypt-OpenSSL-RSA/issues',
+            'repository' => 'http://github.com/toddr/Crypt-OpenSSL-RSA',
+        }
+    }
 );
-

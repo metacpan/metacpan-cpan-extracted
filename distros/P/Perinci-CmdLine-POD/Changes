@@ -1,3 +1,9 @@
+0.028   2022-05-28  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Option description was not formatted (from Markdown) to
+          POD yet.
+
+
 0.027   2022-05-14  Released-By: PERLANCAR; Urgency: medium
 
         - Remove superfluous paragraph 'Usage:' in the generated SYNOPSIS

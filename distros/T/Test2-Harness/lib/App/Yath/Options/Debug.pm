@@ -2,7 +2,7 @@ package App::Yath::Options::Debug;
 use strict;
 use warnings;
 
-our $VERSION = '1.000124';
+our $VERSION = '1.000125';
 
 use Test2::Harness::Util::JSON qw/encode_pretty_json/;
 use Test2::Util::Table qw/table/;
@@ -210,7 +210,7 @@ sub _post_process_interactive {
 
         while(1) {
             $SIG{PIPE} = sub { exit 0 };
-            exit 0 if waitpid($pid, POSIX::WNOHANG);
+            exit 0 if waitpid($pid, &POSIX::WNOHANG);
             exit 0 unless kill(0, $pid);
             my $data = <STDIN>;
             if (defined($data) && length($data)) {

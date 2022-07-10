@@ -1,5 +1,10 @@
 Revision history for WebService-ValidSign
 
+0.004     2022-07-08 12:25:05Z
+
+    * Allow URI ending with / or not to be the same
+    * Fix CPAN testers issues
+
 0.003     2019-03-19 12:23:07Z
 
     * Failure is mandatory: CPAN-testers still report issues with

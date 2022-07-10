@@ -173,7 +173,7 @@ no_leaks_ok {
 
 no_leaks_ok {
     $response = $client->{client}->Subscriptions_create($request, undef, undef, undef);
-} "Subscriptions_create leak";
+} "Subscriptions create leak";
 
 is($response->{CreateSubscriptionResponse_responseHeader}{ResponseHeader_serviceResult},
    "Good",
@@ -263,7 +263,7 @@ no_leaks_ok {
     );
     $subid = $response->{CreateSubscriptionResponse_subscriptionId};
     $status = $client->{client}->Subscriptions_deleteSingle($subid);
-} "Subscriptions_create callbacks leak";
+} "Subscriptions create delete callback leak";
 
 is($deleted,
    1,
@@ -282,20 +282,30 @@ is($response->{CreateSubscriptionResponse_responseHeader}{ResponseHeader_service
    "BadTooManySubscriptions",
    "subscription create response too many");
 
+($deleted, $context) = (undef, undef);
+$response = $client->{client}->Subscriptions_create(
+    $request,
+    $context,
+    sub {},
+    sub {$deleted = 1; $context = "foo"},
+);
+is($response->{CreateSubscriptionResponse_responseHeader}{ResponseHeader_serviceResult},
+   "BadTooManySubscriptions",
+   "subscription create response too many");
+
+$client->stop();
 
 ($deleted, $context) = (undef, undef);
 no_leaks_ok {
+    $client->{client}->connect($client->{url});
     $response = $client->{client}->Subscriptions_create(
 	$request,
 	$context,
 	sub {},
 	sub {$deleted = 1; $context = "foo"},
     );
-} "Subscriptions_create callbacks leak";
+    # open52651 1.3 disconnect calls the callback that frees the context
+    $client->{client}->disconnect();
+} "Subscriptions create too many callback leak";
 
-is($response->{CreateSubscriptionResponse_responseHeader}{ResponseHeader_serviceResult},
-   "BadTooManySubscriptions",
-   "subscription create response too many");
-
-$client->stop();
 $server->stop();

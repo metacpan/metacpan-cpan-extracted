@@ -1,5 +1,17 @@
 class Digest::MD5 {
+  use Digest::MD5::Context;
+  has context : Digest::MD5::Context;
+  
   native static method md5 : string ($data : string);
   native static method md5_hex : string ($data : string);
   native static method md5_base64 : string ($data : string);
+  
+  native static method new : Digest::MD5 ();
+
+  native method add : Digest::MD5 ($data : string);
+  native method digest : string ();
+  native method hexdigest : string ();
+  native method b64digest : string ();
+  
+  native method DESTROY : void ();
 }

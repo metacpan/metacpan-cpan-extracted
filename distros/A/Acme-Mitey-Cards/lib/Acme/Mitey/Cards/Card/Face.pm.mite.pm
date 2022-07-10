@@ -34,7 +34,7 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Initialize attributes
+        # Attribute: deck
         if ( exists $args->{"deck"} ) {
             (
                 do {
@@ -43,13 +43,15 @@
                       and $args->{"deck"}->isa(q[Acme::Mitey::Cards::Deck]);
                 }
               )
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
-                "deck", "Deck" );
+              or Acme::Mitey::Cards::Mite::croak
+              "Type check failed in constructor: %s should be %s", "deck",
+              "Deck";
             $self->{"deck"} = $args->{"deck"};
         }
-        require Scalar::Util && Scalar::Util::weaken( $self->{"deck"} );
+        require Scalar::Util && Scalar::Util::weaken( $self->{"deck"} )
+          if exists $self->{"deck"};
+
+        # Attribute: reverse
         if ( exists $args->{"reverse"} ) {
             do {
 
@@ -59,14 +61,17 @@
                       or ref( \( my $val = $args->{"reverse"} ) ) eq 'SCALAR';
                 }
               }
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
-                "reverse", "Str" );
+              or Acme::Mitey::Cards::Mite::croak
+              "Type check failed in constructor: %s should be %s", "reverse",
+              "Str";
             $self->{"reverse"} = $args->{"reverse"};
         }
-        if ( exists $args->{"suit"} ) {
-            my $value = do {
+
+        # Attribute: suit
+        Acme::Mitey::Cards::Mite::croak "Missing key in constructor: suit"
+          unless exists $args->{"suit"};
+        do {
+            my $coerced_value = do {
                 my $to_coerce = $args->{"suit"};
                 (
                     (
@@ -100,38 +105,35 @@
             (
                 do {
                     use Scalar::Util ();
-                    Scalar::Util::blessed($value)
-                      and $value->isa(q[Acme::Mitey::Cards::Suit]);
+                    Scalar::Util::blessed($coerced_value)
+                      and $coerced_value->isa(q[Acme::Mitey::Cards::Suit]);
                 }
               )
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
-                "suit", "Suit" );
-            $self->{"suit"} = $value;
-        }
-        else { require Carp; Carp::croak("Missing key in constructor: suit") }
-        if ( exists $args->{"face"} ) {
-            do {
+              or Acme::Mitey::Cards::Mite::croak
+              "Type check failed in constructor: %s should be %s", "suit",
+              "Suit";
+            $self->{"suit"} = $coerced_value;
+        };
 
-                package Acme::Mitey::Cards::Mite;
-                (         defined( $args->{"face"} )
-                      and !ref( $args->{"face"} )
-                      and $args->{"face"} =~ m{\A(?:(?:Jack|King|Queen))\z} );
-              }
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
-                "face", "Character" );
-            $self->{"face"} = $args->{"face"};
-        }
-        else { require Carp; Carp::croak("Missing key in constructor: face") }
+        # Attribute: face
+        Acme::Mitey::Cards::Mite::croak "Missing key in constructor: face"
+          unless exists $args->{"face"};
+        do {
+
+            package Acme::Mitey::Cards::Mite;
+            (         defined( $args->{"face"} )
+                  and !ref( $args->{"face"} )
+                  and $args->{"face"} =~ m{\A(?:(?:Jack|King|Queen))\z} );
+          }
+          or Acme::Mitey::Cards::Mite::croak
+          "Type check failed in constructor: %s should be %s", "face",
+          "Character";
+        $self->{"face"} = $args->{"face"};
 
         # Enforce strict constructor
         my @unknown = grep not(/\A(?:deck|face|reverse|suit)\z/), keys %{$args};
         @unknown
-          and require Carp
-          and Carp::croak(
+          and Acme::Mitey::Cards::Mite::croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         # Call BUILD methods
@@ -210,8 +212,8 @@
     else {
         *face = sub {
             @_ > 1
-              ? require Carp
-              && Carp::croak("face is a read-only attribute of @{[ref $_[0]]}")
+              ? Acme::Mitey::Cards::Mite::croak(
+                "face is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"face"};
         };
     }
@@ -226,8 +228,8 @@
     else {
         *suit = sub {
             @_ > 1
-              ? require Carp
-              && Carp::croak("suit is a read-only attribute of @{[ref $_[0]]}")
+              ? Acme::Mitey::Cards::Mite::croak(
+                "suit is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"suit"};
         };
     }

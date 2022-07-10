@@ -98,7 +98,7 @@ SpeedyFxResult *result_addr (SV *self) {
 #define ChrCode(u, v, len) (U32) utf8_to_uvchr(u, len)
 #endif
 
-#if PERL_VERSION >= 32
+#if PERL_VERSION >= 26
 #define ChrIsAlphanum(s, end) isWORDCHAR_utf8_safe(s, end)
 #define ChrToLower(p, e, s, lenp) toLOWER_utf8_safe(p, e, s, lenp)
 #else

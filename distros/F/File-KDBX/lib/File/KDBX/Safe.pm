@@ -14,7 +14,7 @@ use Ref::Util qw(is_arrayref is_coderef is_hashref is_scalarref);
 use Scalar::Util qw(refaddr);
 use namespace::clean;
 
-our $VERSION = '0.903'; # VERSION
+our $VERSION = '0.904'; # VERSION
 
 
 sub new {
@@ -217,7 +217,7 @@ File::KDBX::Safe - Keep strings encrypted while in memory
 
 =head1 VERSION
 
-version 0.903
+version 0.904
 
 =head1 SYNOPSIS
 

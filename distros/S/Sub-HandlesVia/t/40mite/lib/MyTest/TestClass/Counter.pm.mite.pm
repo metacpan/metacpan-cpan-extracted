@@ -1,6 +1,7 @@
 {
 package MyTest::TestClass::Counter;
-our $USES_MITE = q[Mite::Class];
+our $USES_MITE = "Mite::Class";
+our $MITE_SHIM = "MyTest::Mite";
 use strict;
 use warnings;
 
@@ -12,21 +13,24 @@ sub new {
     my $args  = $meta->{HAS_BUILDARGS} ? $class->BUILDARGS( @_ ) : { ( @_ == 1 ) ? %{$_[0]} : @_ };
     my $no_build = delete $args->{__no_BUILD__};
 
-    # Initialize attributes
-    if ( exists($args->{q[attr]}) ) { (do { my $tmp = $args->{q[attr]}; defined($tmp) and !ref($tmp) and $tmp =~ /\A-?[0-9]+\z/ }) or require Carp && Carp::croak(q[Type check failed in constructor: attr should be Int]); $self->{q[attr]} = $args->{q[attr]};  } else { my $value = do { my $default_value = do { my $method = $MyTest::TestClass::Counter::__attr_DEFAULT__; $self->$method }; (do { my $tmp = $default_value; defined($tmp) and !ref($tmp) and $tmp =~ /\A-?[0-9]+\z/ }) or do { require Carp; Carp::croak(q[Type check failed in default: attr should be Int]) }; $default_value }; $self->{q[attr]} = $value;  }
+        # Attribute: attr
+    do { my $value = exists( $args->{"attr"} ) ? $args->{"attr"} : do { my $method = $MyTest::TestClass::Counter::__attr_DEFAULT__; $self->$method }; (do { my $tmp = $value; defined($tmp) and !ref($tmp) and $tmp =~ /\A-?[0-9]+\z/ }) or MyTest::Mite::croak "Type check failed in constructor: %s should be %s", "attr", "Int"; $self->{"attr"} = $value; }; 
+
 
     # Enforce strict constructor
-    my @unknown = grep not( do { package MyTest::Mite; (defined and !ref and m{\A(?:attr)\z}) } ), keys %{$args}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));
+    my @unknown = grep not( /\Aattr\z/ ), keys %{$args}; @unknown and MyTest::Mite::croak( "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
     # Call BUILD methods
-    unless ( $no_build ) { $_->($self, $args) for @{ $meta->{BUILD} || [] } };
+    $self->BUILDALL( $args ) if ( ! $no_build and @{ $meta->{BUILD} || [] } );
 
     return $self;
 }
 
-defined ${^GLOBAL_PHASE}
-    or eval { require Devel::GlobalDestruction; 1 }
-    or do   { *Devel::GlobalDestruction::in_global_destruction = sub { undef; } };
+sub BUILDALL {
+    my $class = ref( $_[0] );
+    my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
+    $_->( @_ ) for @{ $meta->{BUILD} || [] };
+}
 
 sub DESTROY {
     my $self  = shift;
@@ -49,7 +53,6 @@ sub DESTROY {
 
 sub __META__ {
     no strict 'refs';
-    require mro;
     my $class      = shift; $class = ref($class) || $class;
     my $linear_isa = mro::get_linear_isa( $class );
     return {
@@ -62,6 +65,7 @@ sub __META__ {
             map { "$_\::DEMOLISH" } @$linear_isa
         ],
         HAS_BUILDARGS => $class->can('BUILDARGS'),
+        HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
     };
 }
 
@@ -83,13 +87,13 @@ my $__XS = !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor; Class::XSA
 if ( $__XS ) {
     Class::XSAccessor->import(
         chained => 1,
-        getters => { q[attr] => q[attr] },
+        "getters" => { "attr" => "attr" },
     );
 }
 else {
-    *attr = sub { @_ > 1 ? require Carp && Carp::croak("attr is a read-only attribute of @{[ref $_[0]]}") : $_[0]{q[attr]} };
+    *attr = sub { @_ > 1 ? MyTest::Mite::croak( "attr is a read-only attribute of @{[ref $_[0]]}" ) : $_[0]{"attr"} };
 }
-*_set_attr = sub { (do { my $tmp = $_[1]; defined($tmp) and !ref($tmp) and $tmp =~ /\A-?[0-9]+\z/ }) or require Carp && Carp::croak(q[Type check failed in writer: value should be Int]); $_[0]{q[attr]} = $_[1]; $_[0]; };
+sub _set_attr { (do { my $tmp = $_[1]; defined($tmp) and !ref($tmp) and $tmp =~ /\A-?[0-9]+\z/ }) or MyTest::Mite::croak( "Type check failed in %s: value should be %s", "writer", "Int" ); $_[0]{"attr"} = $_[1]; $_[0]; }
 
 
 1;

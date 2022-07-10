@@ -4,13 +4,12 @@ use strict;
 use warnings;
 
 use Data::Printer;
-use Wikibase::Datatype::Value::Monolingual;
-use Wikibase::Datatype::Struct::Value::Monolingual qw(obj2struct);
+use Wikibase::Datatype::Value::String;
+use Wikibase::Datatype::Struct::Value::String qw(obj2struct);
 
 # Object.
-my $obj = Wikibase::Datatype::Value::Monolingual->new(
-        'language' => 'en',
-        'value' => 'English text',
+my $obj = Wikibase::Datatype::Value::String->new(
+        'value' => 'foo',
 );
 
 # Get structure.
@@ -21,9 +20,6 @@ p $struct_hr;
 
 # Output:
 # \ {
-#     type    "monolingualtext",
-#     value   {
-#         language   "en",
-#         text       "English text"
-#     }
+#     type    "string",
+#     value   "foo"
 # }

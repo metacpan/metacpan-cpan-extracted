@@ -1,5 +1,5 @@
 package WebService::ValidSign;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use Moo;
 use namespace::autoclean;
 
@@ -85,7 +85,7 @@ WebService::ValidSign - A REST API client for ValidSign
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -141,8 +141,6 @@ version 0.003
 =head1 DESCRIPTION
 
 A module that uses the ValidSign API to create/upload and sign documents.
-This module is in ALPHA state and is subject to change at any given moment
-without notice.
 
 =head1 ATTRIBUTES
 

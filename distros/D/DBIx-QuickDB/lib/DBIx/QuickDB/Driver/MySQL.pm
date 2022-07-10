@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::MySQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000021';
+our $VERSION = '0.000022';
 
 use IPC::Cmd qw/can_run/;
 use DBIx::QuickDB::Util qw/strip_hash_defaults/;
@@ -31,9 +31,13 @@ my ($MYSQLD, $MYSQL, $DBDMYSQL, $DBDMARIA, $INSTALLDB);
 BEGIN {
     local $@;
 
-    $MYSQLD = can_run('mysqld');
-    $MYSQL  = can_run('mysql');
+    $MYSQLD    = can_run('mysqld');
+    $MYSQL     = can_run('mysql');
     $INSTALLDB = can_run('mysql_install_db');
+    if ($INSTALLDB = can_run('mysql_install_db')) {
+        my $output = `$INSTALLDB 2>&1`;
+        $INSTALLDB = undef if $output =~ m/mysql_install_db is deprecated/;
+    }
 
     $DBDMYSQL = eval { require DBD::mysql;   'DBD::mysql' };
     $DBDMARIA = eval { require DBD::MariaDB; 'DBD::MariaDB' };
@@ -199,7 +203,10 @@ sub init {
                 my $binary = $self->{+MYSQLD} || $MYSQLD;
                 my $help = `$binary --help --verbose 2>&1`;
 
-                if ($help =~ m/--bootstrap/) {
+                if ($help =~ m/--initialize/) {
+                    $self->{+USE_BOOTSTRAP} = 0;
+                }
+                elsif ($help =~ m/--bootstrap/) {
                     $self->{+USE_BOOTSTRAP} = 1;
 
                     $self->{+USE_INSTALLDB} = $INSTALLDB ? 1 : 0;
@@ -242,12 +249,14 @@ sub init {
     $self->{$_} ||= $defaults{$_} for keys %defaults;
 
     my %cfg_defs = $self->_default_config;
-    my $cfg = $self->{+CONFIG} ||= {};
+    my $cfg = { %{$self->{+CONFIG} || {}} };
+    $self->{+CONFIG} = $cfg;
 
     for my $key (keys %cfg_defs) {
         if (defined $cfg->{$key}) {
             my $subdft = $cfg_defs{$key};
-            my $subcfg = $cfg->{$key};
+            my $subcfg = { %{$cfg->{$key}} };
+            $cfg->{$key} = $subcfg;
 
             for my $skey (%$subdft) {
                 next if defined $subcfg->{$skey};

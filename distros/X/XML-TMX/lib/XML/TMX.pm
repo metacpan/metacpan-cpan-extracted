@@ -1,5 +1,5 @@
 package XML::TMX;
-$XML::TMX::VERSION = '0.36';
+$XML::TMX::VERSION = '0.39';
 # ABSTRACT: Perl extensions for managing TMX files
 
 use 5.010;
@@ -26,7 +26,7 @@ XML::TMX - Perl extensions for managing TMX files
 
 =head1 VERSION
 
-version 0.36
+version 0.39
 
 =head1 SYNOPSIS
 

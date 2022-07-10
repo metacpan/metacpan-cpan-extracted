@@ -3,32 +3,36 @@
 use strict;
 use warnings;
 
-use Wikibase::Datatype::MediainfoSnak;
+use Unicode::UTF8 qw(decode_utf8 encode_utf8);
+use Wikibase::Datatype::Sitelink;
 use Wikibase::Datatype::Value::Item;
 
 # Object.
-my $obj = Wikibase::Datatype::MediainfoSnak->new(
-        'datavalue' => Wikibase::Datatype::Value::Item->new(
-                'value' => 'Q14946043',
-        ),
-        'property' => 'P275',
+my $obj = Wikibase::Datatype::Sitelink->new(
+        'badges' => [
+                 Wikibase::Datatype::Value::Item->new(
+                         'value' => 'Q123',
+                 ),
+        ],
+        'site' => 'cswiki',
+        'title' => decode_utf8('Hlavní strana'),
 );
 
-# Get value.
-my $datavalue = $obj->datavalue->value;
+# Get badges.
+my $badges_ar = [map { $_->value } @{$obj->badges}];
 
-# Get property.
-my $property = $obj->property;
+# Get site.
+my $site = $obj->site;
 
-# Get snak type.
-my $snaktype = $obj->snaktype;
+# Get title.
+my $title = $obj->title;
 
 # Print out.
-print "Property: $property\n";
-print "Value: $datavalue\n";
-print "Snak type: $snaktype\n";
+print 'Badges: '.(join ', ', @{$badges_ar})."\n";
+print "Site: $site\n";
+print 'Title: '.encode_utf8($title)."\n";
 
 # Output:
-# Property: P275
-# Value: Q14946043
-# Snak type: value
+# Badges: Q123
+# Site: cswiki
+# Title: Hlavní strana

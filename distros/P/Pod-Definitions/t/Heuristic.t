@@ -37,9 +37,29 @@ use_ok( 'Pod::Definitions::Heuristic' );
     is($t->clean, 'Pockets on the port, Where are the');
 }
 {
+    my $t = Pod::Definitions::Heuristic->new(text => 'ts1 => TIMESTAMP ELEMENT');
+    is($t->clean, 'ts1');
+}
+{
+    my $t = Pod::Definitions::Heuristic->new(text => 'is_block => bool (1)');
+    is($t->clean, 'is_block');
+}
+{
+    my $t = Pod::Definitions::Heuristic->new(text => '$el->clear_parse_result');
+    is($t->clean, 'clear_parse_result');
+}
+{
+    my $t = Pod::Definitions::Heuristic->new(text => '$el->headlines() => ELEMENTS');
+    is($t->clean, 'headlines');
+}
+{
     my $t = Pod::Definitions::Heuristic->new(text => '');
     is($t->clean, '');
 }
+
+
+
+
 
 # # Various ways to say "ok"
 # ok($got eq $expected, $test_name);

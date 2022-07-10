@@ -1,0 +1,282 @@
+Sub Patch()
+
+With Selection.Find
+    .MatchCase = True
+    .MatchByte = True
+    .IgnoreSpace = False
+    .IgnorePunct = False
+End With
+
+Options.AutoFormatAsYouTypeReplaceQuotes = False
+
+' # 1-1
+
+With Selection.Find
+    .Text             = "　我が国においては、平成23年３月11日の東日本大震災以降、政府、地方公共団体や事業者等が保有するデータの公開・活用に対する意識が高まった。"
+    .Replacement.Text = "　わが国においては、平成23年３月11日の東日本大震災以降、政府、地方公共団体や事業者等が保有するデータの公開・活用に対する意識が高まった。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 2-1
+
+With Selection.Find
+    .Text             = "　「新たなオープンデータの展開に向けて」（平成27年６月30日 高度情報通信ネットワーク社会推進戦略本部決定）及び「オープンデータ2.0」（平成28年５月20日 高度情報通信ネットワーク社会推進戦略本部決定）では、データの公開を中心とした取組から、データの活用を前提とした「課題解決型のオープンデータの推進」に発想を転換するという方向が示された。"
+    .Replacement.Text = "　「新たなオープンデータの展開に向けて」（平成27年６月30日 高度情報通信ネットワーク社会推進戦略本部決定）および「オープンデータ2.0」（平成28年５月20日 高度情報通信ネットワーク社会推進戦略本部決定）では、データの公開を中心とした取組から、データの活用を前提とした「課題解決型のオープンデータの推進」に発想を転換するという方向が示された。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 3-1
+
+With Selection.Find
+    .Text             = "　平成28年12月14日に公布・施行された「官民データ活用推進基本法」（以下「官民データ法」と言う。）は、官民データ活用の推進により国民が安全で安心して暮らせる社会及び快適な生活環境の実現に寄与することを目的としており、国、地方公共団体、事業者が保有する官民データの容易な利用等について規定されている。"
+    .Replacement.Text = "　平成28年12月14日に公布・施行された「官民データ活用推進基本法」（以下「官民データ法」と言う。）は、官民データ活用の推進により国民が安全で安心して暮らせる社会および快適な生活環境の実現に寄与することを目的としており、国、地方公共団体、事業者が保有する官民データの容易な利用等について規定されている。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 4-1
+
+With Selection.Find
+    .Text             = "　本文書は、これまでの取組を踏まえ、オープンデータ・バイ・デザインの考えに基づき、今後、国、地方公共団体、事業者が公共データの公開及び活用に取り組む上での基本指針をまとめたものである。"
+    .Replacement.Text = "　本文書は、これまでの取組を踏まえ、オープンデータ・バイ・デザインの考えに基づき、今後、国、地方公共団体、事業者が公共データの公開および活用に取り組むうえでの基本指針をまとめたものである。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 5-1
+
+With Selection.Find
+    .Text             = "　広範な主体による公共データの活用が進展することで、創意工夫を活かした多様なサービスの迅速かつ効率的な提供、官民の協働による公共サービスの提供や改善が実現し、ニーズや価値観の多様化、技術革新等の環境変化への適切な対応とともに、厳しい財政状況、急速な少子高齢化の進展等の我が国が直面する諸課題の解決に貢献することができる。"
+    .Replacement.Text = "　広範な主体による公共データの活用が進展することで、創意工夫を活かした多様なサービスの迅速かつ効率的な提供、官民の協働による公共サービスの提供や改善が実現し、ニーズや価値観の多様化、技術革新等の環境変化への適切な対応とともに、厳しい財政状況、急速な少子高齢化の進展等のわが国が直面する諸課題の解決に貢献することができる。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 6-1
+
+With Selection.Find
+    .Text             = "　また、ベンチャー企業等による多様な新サービスやビジネスの創出、企業活動の効率化等が促され、我が国全体の経済活性化にもつながる。"
+    .Replacement.Text = "　また、ベンチャー企業等による多様な新サービスやビジネスの創出、企業活動の効率化等が促され、わが国全体の経済活性化にもつながる。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 7-1
+
+With Selection.Find
+    .Text             = "　国や地方公共団体においてデータ活用により得られた情報を根拠として政策や施策の企画及び立案が行われることで（ＥＢＰＭ：Evidence Based Policy Making）、効果的かつ効率的な行政の推進につながる。"
+    .Replacement.Text = "　国や地方公共団体においてデータ活用により得られた情報を根拠として政策や施策の企画および立案が行われることで（ＥＢＰＭ：Evidence Based Policy Making）、効果的かつ効率的な行政の推進につながる。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 8-1
+
+With Selection.Find
+    .Text             = "　国、地方公共団体及び事業者が保有する官民データのうち、国民誰もがインターネット等を通じて容易に利用（加工、編集、再配布等）できるよう、次のいずれの項目にも該当する形で公開されたデータをオープンデータと定義する。"
+    .Replacement.Text = "　国、地方公共団体および事業者が保有する官民データのうち、国民誰もがインターネット等を通じて容易に利用（加工、編集、再配布等）できるよう、次のいずれの項目にも該当する形で公開されたデータをオープンデータと定義する。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 9-1
+
+With Selection.Find
+    .Text             = "各府省庁のウェブサイト上で公開されるデータについては、原則、政府標準利用規約を適用し、具体的かつ合理的な根拠により二次利用が認められないものを除き、公開データの二次利用を積極的に促進する。"
+    .Replacement.Text = "各府省庁のウェブサイトうえで公開されるデータについては、原則、政府標準利用規約を適用し、具体的かつ合理的な根拠により二次利用が認められないものを除き、公開データの二次利用を積極的に促進する。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 10-1
+
+With Selection.Find
+    .Text             = "　各府省庁は、ウェブサイトで容易に検索・利用できる形でデータを公開する。特にニーズが高いと想定されるデータについては、利用者の利便性に加え、システムの負荷及び効率性の観点から、一括ダウンロードを可能とする仕組みの導入や、APIを通じた提供を推進する。"
+    .Replacement.Text = "　各府省庁は、ウェブサイトで容易に検索・利用できる形でデータを公開する。特にニーズが高いと想定されるデータについては、利用者の利便性に加え、システムの負荷および効率性の観点から、一括ダウンロードを可能とする仕組みの導入や、APIを通じた提供を推進する。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 11-1
+
+With Selection.Find
+    .Text             = "更に、政府のオープンデータ全体の横断的検索を可能とし、データの活用を促進するため、データの概要及び形式等のメタ情報をクリエイティブ・コモンズで定められている「CC0 1.0 全世界」として取り扱った上で政府のデータカタログサイト「DATA.GO.JP」に登録し、公開する。"
+    .Replacement.Text = "さらに、政府のオープンデータ全体の横断的検索を可能とし、データの活用を促進するため、データの概要および形式等のメタ情報をクリエーティブ・コモンズで定められている「CC0 1.0 全世界」として取り扱ったうえで政府のデータカタログサイト「DATA.GO.JP」に登録し、公開する。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 12-1
+
+With Selection.Find
+    .Text             = "　公開するデータについては、機械判読に適した構造及びデータ形式で掲載することを原則とする。共通語彙基盤等やオープンデータの達成度の評価指標として用いられている「５つ星」の指標を参考に、より活用がしやすい用語や形式での公開に努める。"
+    .Replacement.Text = "　公開するデータについては、機械判読に適した構造およびデータ形式で掲載することを原則とする。共通語彙基盤等やオープンデータの達成度の評価指標として用いられている「５つ星」の指標を参考に、より活用がしやすい用語や形式での公開に努める。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 13-1
+
+With Selection.Find
+    .Text             = "　２．に示した定義のとおり、データ提供システムの維持管理に要するコストを限定された利用者からの料金徴収でまかなう場合は、オープンデータとは言えないが、その取扱いに準じ、二次利用可能なルールを適用することが望ましい（具体的かつ合理的な根拠により二次利用が認められないものを除く）。また、当該料金については、提供に係る経費の算出根拠と一定の検討のタイミングを明示した上で、以下のような観点で、見直しを図ることとする。"
+    .Replacement.Text = "　２．に示した定義のとおり、データ提供システムの維持管理に要するコストを限定された利用者からの料金徴収でまかなう場合は、オープンデータとは言えないが、その取扱いに準じ、二次利用可能なルールを適用することが望ましい（具体的かつ合理的な根拠により二次利用が認められないものを除く）。また、当該料金については、提供に係る経費の算出根拠と一定の検討のタイミングを明示したうえで、以下のような観点で、見直しを図ることとする。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 14-1
+
+With Selection.Find
+    .Text             = "　データの迅速な公開やその鮮度の維持が重要なデータについては、可能な限り迅速に公開するとともに適時適切な更新を行う。また、データ更新の周期等を明示し、利用者が予め更新の時期を把握できるようにしていく。"
+    .Replacement.Text = "　データの迅速な公開やその鮮度の維持が重要なデータについては、可能な限り迅速に公開するとともに適時適切な更新を行う。また、データ更新の周期等を明示し、利用者があらかじめ更新の時期を把握できるようにしていく。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 15-1
+
+With Selection.Find
+    .Text             = "各府省庁は、オープンデータ・バイ・デザインの考えに基づき、行政保有データを利用者が活用しやすい形で公開するために行政手続き及び情報システムの企画・設計段階から必要な措置を講じる。内閣官房IT総合戦略室は政府CIOの下、各府省庁の取組について必要な助言を行う。"
+    .Replacement.Text = "各府省庁は、オープンデータ・バイ・デザインの考えに基づき、行政保有データを利用者が活用しやすい形で公開するために行政手続きおよび情報システムの企画・設計段階から必要な措置を講じる。内閣官房IT総合戦略室は政府CIOの下、各府省庁の取組について必要な助言を行う。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 16-1
+
+With Selection.Find
+    .Text             = "　地方公共団体は、官民データ法の趣旨及び本基本指針を踏まえてオープンデータを推進することが求められる。"
+    .Replacement.Text = "　地方公共団体は、官民データ法の趣旨および本基本指針を踏まえてオープンデータを推進することが求められる。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 17-1
+
+With Selection.Find
+    .Text             = "　推進に際しては、国や地方公共団体が公開するデータを横断的に活用することができるよう、標準的な形式及びルールに基づいた公開に努めることが望ましい。また、複数団体が共同でオープンデータポータルサイトを立ち上げるといった取組も有効である。"
+    .Replacement.Text = "　推進に際しては、国や地方公共団体が公開するデータを横断的に活用することができるよう、標準的な形式およびルールに基づいた公開に努めることが望ましい。また、複数団体が共同でオープンデータポータルサイトを立ち上げるといった取組も有効である。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 18-1
+
+With Selection.Find
+    .Text             = "　独立行政法人や大学等においては、国費によって運営されていること又は実施している事業や研究があることに鑑み、本基本指針に準拠してオープンデータの取組を推進することが望ましい。"
+    .Replacement.Text = "　独立行政法人や大学等においては、国費によって運営されていることまたは実施している事業や研究があることに鑑み、本基本指針に準拠してオープンデータの取組を推進することが望ましい。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 19-1
+
+With Selection.Find
+    .Text             = "　また、電力・ガス、通信・放送、交通等の公益事業分野の事業者については、その公益性に鑑み、本基本指針及び利用者ニーズを踏まえてオープンデータを推進することが望ましい。"
+    .Replacement.Text = "　また、電力・ガス、通信・放送、交通等の公益事業分野の事業者については、その公益性に鑑み、本基本指針および利用者ニーズを踏まえてオープンデータを推進することが望ましい。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 20-1
+
+With Selection.Find
+    .Text             = " 公共データについて、オープンデータを前提として情報システムや業務プロセス全体の企画、整備及び運用を行うことである。"
+    .Replacement.Text = " 公共データについて、オープンデータを前提として情報システムや業務プロセス全体の企画、整備および運用を行うことである。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 21-1
+
+With Selection.Find
+    .Text             = " 但し、セキュリティの理由により、利用者に対し、事前登録を求めたり、データへのアクセス方法に制限を設けたりといった措置が講じられることがあり得る。"
+    .Replacement.Text = " ただし、セキュリティーの理由により、利用者に対し、事前登録を求めたり、データへのアクセス方法に制限を設けたりといった措置が講じられることがあり得る。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 22-1
+
+With Selection.Find
+    .Text             = " 「機械判読」とは、コンピュータプログラムが自動的にデータを加工、編集等できることを指す。"
+    .Replacement.Text = " 「機械判読」とは、コンピュータープログラムが自動的にデータを加工、編集等できることを指す。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 23-1
+
+With Selection.Find
+    .Text             = " 法令又は合理的な根拠によりオープンデータとして公開できない場合（二次利用に制限がある場合を含む）は、その旨を具体的に示す。"
+    .Replacement.Text = " 法令または合理的な根拠によりオープンデータとして公開できない場合（二次利用に制限がある場合を含む）は、その旨を具体的に示す。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 24-1
+
+With Selection.Find
+    .Text             = " 「CC0 1.0 全世界」の定義等は「クリエイティブ・コモンズ・リーガル・コード」を参照。(https://creativecommons.org/publicdomain/zero/1.0/legalcode.ja)"
+    .Replacement.Text = " 「CC0 1.0 全世界」の定義等は「クリエーティブ・コモンズ・リーガル・コード」を参照。(https://creativecommons.org/publicdomain/zero/1.0/legalcode.ja)"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 25-1
+
+With Selection.Find
+    .Text             = " 「機械判読に適した度合」には、人手をどれだけ要さずに、コンピュータがデータを再利用できるかにより、いくつかの段階がある。コンピュータが自動的にデータを再利用するためには、当該データの論理的な構造を識別（判読）でき、構造中の値（表の中に入っている数値、テキスト等）が処理できるようになっている必要がある。"
+    .Replacement.Text = " 「機械判読に適した度合」には、人手をどれだけ要さずに、コンピューターがデータを再利用できるかにより、いくつかの段階がある。コンピューターが自動的にデータを再利用するためには、当該データの論理的な構造を識別（判読）でき、構造中の値（表の中に入っている数値、テキスト等）が処理できるようになっている必要がある。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 26-1
+
+With Selection.Find
+    .Text             = " 「二次利用の促進のための府省のデータ公開に関する基本的考え方（ガイドライン）」の「３ 機械判読が容易なデータ形式による公開の拡大の考え方」及び別添２「数値（表）、文章、地理空間情報のデータ作成に当たっての留意事項」を参照。"
+    .Replacement.Text = " 「二次利用の促進のための府省のデータ公開に関する基本的考え方（ガイドライン）」の「３ 機械判読が容易なデータ形式による公開の拡大の考え方」および別添２「数値（表）、文章、地理空間情報のデータ作成に当たっての留意事項」を参照。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 27-1
+
+With Selection.Find
+    .Text             = " 既に紙によるものを含め、利用者の求めに応じて情報公開を含め公開されている情報については対象外とする。なお、限定公開の対象となるデータの考え方や運用（限定公開の決定プロセスや進捗状況を把握・評価する体制等）については必要に応じ、今後さらに検討する。"
+    .Replacement.Text = " すでに紙によるものを含め、利用者の求めに応じて情報公開を含め公開されている情報については対象外とする。なお、限定公開の対象となるデータの考え方や運用（限定公開の決定プロセスや進捗状況を把握・評価する体制等）については必要に応じ、今後さらに検討する。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 28-1
+
+With Selection.Find
+    .Text             = " 例えば、一部のデータは有償だが、残りのデータは無償とすること等も考えらえる。"
+    .Replacement.Text = " たとえば、一部のデータは有償だが、残りのデータは無償とすること等も考えらえる。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 29-1
+
+With Selection.Find
+    .Text             = " このようなリストを作成するため平成29年度中に各府省庁が保有するデータの棚卸しを行い、当該リストを公開した上でニーズの高い分野等について官民（民には、事業者、研究者、市民等を含む）でデータの公開・活用の在り方を対話するラウンドテーブルを開催する試みを実施する。ラウンドテーブルでは、地方公共団体、事業者（独立行政法人を含む）が保有するデータを含め官民データの公開と活用の在り方について議論する。"
+    .Replacement.Text = " このようなリストを作成するため平成29年度中に各府省庁が保有するデータの棚卸しを行い、当該リストを公開したうえでニーズの高い分野等について官民（民には、事業者、研究者、市民等を含む）でデータの公開・活用の在り方を対話するラウンドテーブルを開催する試みを実施する。ラウンドテーブルでは、地方公共団体、事業者（独立行政法人を含む）が保有するデータを含め官民データの公開と活用の在り方について議論する。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+' # 30-1
+
+With Selection.Find
+    .Text             = " 「我が国におけるオープンサイエンス推進のあり方について」（平成27年３月30日）では、公的研究資金による研究成果のうち、論文および論文のエビデンスとしての研究データは、原則公開とし、その他研究開発成果としての研究データについても可能な範囲で公開することが望ましい。」とされている。"
+    .Replacement.Text = " 「わが国におけるオープンサイエンス推進のあり方について」（平成27年３月30日）では、公的研究資金による研究成果のうち、論文および論文のエビデンスとしての研究データは、原則公開とし、その他研究開発成果としての研究データについても可能な範囲で公開することが望ましい。」とされている。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+End Sub

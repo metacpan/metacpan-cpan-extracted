@@ -1,5 +1,5 @@
 package WebService::ValidSign::Object;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use Moo;
 
 # ABSTRACT: A ValidSign object in use for the API
@@ -72,7 +72,7 @@ WebService::ValidSign::Object - A ValidSign object in use for the API
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 

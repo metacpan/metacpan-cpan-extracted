@@ -1,5 +1,8 @@
 Revision history for Perl module Mac::PropertyList
 
+1.504 2022-07-08T03:16:18Z
+	* @trwyant fixed some stray debugging output (#14 and #15)
+
 1.503 2022-06-30T18:16:29Z
 	* Darren Kulp noted an XML error in one of the test strings (GitHub #12)
 	* No other code changes

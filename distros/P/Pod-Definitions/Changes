@@ -1,3 +1,10 @@
+0.04      2022-07-08 15:56:02 EDT
+
+  - Handle -> and => in headings
+  - Clarify section information; conform more to Perl documentation
+    recommendations.
+  - Move repository to Gitlab
+
 0.03      2020-10-27 14:52:20 EDT
 
   - Maintain sequence numbers.

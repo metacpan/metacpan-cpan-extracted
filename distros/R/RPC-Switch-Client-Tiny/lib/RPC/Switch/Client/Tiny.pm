@@ -17,7 +17,7 @@ use RPC::Switch::Client::Tiny::Netstring;
 use RPC::Switch::Client::Tiny::Async;
 use RPC::Switch::Client::Tiny::SessionCache;
 
-our $VERSION = '1.55';
+our $VERSION = '1.58';
 
 sub new {
 	my ($class, %args) = @_;
@@ -42,6 +42,7 @@ sub new {
 	} else {
 		$self->{auth_method} = 'password' unless exists $self->{auth_method};
 	}
+	$self->{json_utf8} = $self->{client_encoding_utf8} ? {} : {utf8 => 1};
 	return $self;
 }
 
@@ -53,7 +54,7 @@ sub rpc_send {
 	my ($self, $msg) = @_;
 	my $s = $self->{sock};
 	$msg->{jsonrpc} = '2.0';
-	my $str = to_json($msg, {canonical => 1});
+	my $str = to_json($msg, {canonical => 1, %{$self->{json_utf8}}});
 	$self->{trace_cb}->('SND', $msg) if $self->{trace_cb};
 	return netstring_write($s, $str);
 }
@@ -345,6 +346,8 @@ sub child_handler {
 	}
 	$self->{sock} = $wr;
 	delete $self->{trace_cb};
+	local $SIG{INT} = 'DEFAULT';
+	local $SIG{PIPE} = 'IGNORE'; # handle sigpipe via print/write result
 
 	# When session handling is enabled a child might process
 	# more than one request with the same session_id.
@@ -356,7 +359,7 @@ sub child_handler {
 			die "worker child: $@" if $@;
 			last; # EOF
 		}
-		my $msg = eval { from_json($b) };
+		my $msg = eval { from_json($b, {%{$self->{json_utf8}}}) };
 		die "worker child: $@" if $@;
 
 		# The client catches all possible die() calls, so that it is
@@ -364,13 +367,17 @@ sub child_handler {
 		#
 		my $params;
 		my $callback = $self->{methods}{$msg->{method}}{cb};
-		my @resp = eval { $callback->($msg->{params}, $msg->{rpcswitch}) };
+		my @resp;
+		eval {
+			local $SIG{PIPE} = 'DEFAULT'; # reenable sigpipe for worker code
+			@resp = $callback->($msg->{params}, $msg->{rpcswitch});
+		};
 		if (my $err = $@) {
 			$params = ['RES_ERROR', $msg->{id}, $err];
 		} else {
 			$params = ['RES_OK', $msg->{id}, @resp];
 		}
-		$b = eval { to_json($params) };
+		$b = eval { to_json($params, {%{$self->{json_utf8}}}) };
 		return 1 if $@; # signal die from json encode
 		my $res = netstring_write($self->{sock}, $b);
 		return 2 unless $res; # signal socket error
@@ -384,7 +391,7 @@ sub child_handler {
 sub _worker_child_write {
 	my ($self, $child, $msg) = @_;
 
-	my $b = to_json($msg, {canonical => 1});
+	my $b = to_json($msg, {canonical => 1, %{$self->{json_utf8}}});
 	my $res = netstring_write($child->{reader}, $b); # forward request to worker child
 	die rpc_error('io', 'netstring_write') unless $res;
 	return;
@@ -437,7 +444,7 @@ sub _worker_child_read_and_finish {
 		$res = $self->rpc_send({method => 'rpcswitch.result', params => ['RES_ERROR', $child->{id}, $err], rpcswitch => $child->{rpcswitch}});
 		$self->{async}->child_finish($child, 'error');
 	} else {
-		my $params = eval { from_json($b) };
+		my $params = eval { from_json($b, {%{$self->{json_utf8}}}) };
 		if ($@) {
 			$res = $self->rpc_send({method => 'rpcswitch.result', params => ['RES_ERROR', $child->{id}, $@], rpcswitch => $child->{rpcswitch}});
 			$self->{async}->child_finish($child, 'error');
@@ -546,7 +553,7 @@ sub rpc_handler {
 			die rpc_error('io', $@) if $@;
 			return; # EOF
 		}
-		my $msg = eval { from_json($b) };
+		my $msg = eval { from_json($b, {%{$self->{json_utf8}}}) };
 		die rpc_error('jsonrpc', $@) if $@;
 		$self->{trace_cb}->('RCV', $msg) if $self->{trace_cb};
 		my $res = eval { $handler->($self, $msg, @handler_params) };
@@ -771,13 +778,18 @@ on the error type:
 
 =head2 Encoding
 
-All methods expect and return strings in utf8-format.
+All methods expect and return strings in utf8-format, when the option
+client_encoding_utf8 is enabled.
 
 To pass latin1-strings as parameter, a caller would have to convert
 the input first. (see: $utf8 = Encode::encode('utf8', $latin1)).
 
 The json-rpc messages are also utf8-encoded when they are transmitted.
 (see: L<https://metacpan.org/pod/JSON#utf8>)
+
+Without the client_encoding_utf8 option, all passed strings are utf8-encoded
+for the json-rpc transmission, because the client character-encoding is
+assumed to be unknown. This might transmit doubly utf8-encoded strings.
 
 =head2 Async handling
 
@@ -891,6 +903,8 @@ The accepted arguments are:
 
 =item token: token for auth_method 'password' (optional for 'clientcert')
 
+=item client_encoding_utf8: all client strings are in utf8-format
+
 =item timeout: optional rpc-request timeout (defaults to 0 (unlimited))
 
 =item trace_cb: optional handler to log SND/RCV output
@@ -956,6 +970,8 @@ connection, and there are no outstanding requests ($@ == '' for eval).
 =item options->{max_session}: enable session cache for async worker childs
 
 =item options->{session_expire}: default session expire time in seconds
+
+=item options->{max_user_session}: limit session cache per optional user field
 
 =back
 

@@ -1,7 +1,7 @@
 package Pod::Definitions::Heuristic;
 
 use Pod::Headings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use v5.20;
 
@@ -53,6 +53,11 @@ sub clean ($self) {
     $original =~ s/^\s+//;
     $original =~ s/\s(?:mean|go)\?$//;
     $original =~ s/\?$//;
+
+    # Remove arrows
+    $original =~ s/\s*=>.*//;
+    $original =~ s/^\s*\w+\s*->\s*//;
+
     # Which versions are supported -> Versions supported
     # How much does... How well is... How many...
     $original =~ s/^(?:(what|which|how|many|much|well|is|are|do)\s+)+(\S.*?)?\s+(?:is|are|do)\s+(.+)\z/\u$2, $3/i;
@@ -126,7 +131,7 @@ Pod, presumably in English, for indexing and cross-referencing
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -136,10 +141,28 @@ version 0.03
 
 =head1 DESCRIPTION
 
-This class assumes that headings are written in the English language,
+This class assumes that headings are written in American English
+(c.f., L<perldocstyle/Choice-of-language:-American-English>)
 and in a style typical of Pod pages written for CPAN. A set of
 heuristics are applied to select keywords and place them at the start
 of the heading.
+
+For example:
+
+    What is the Q function?               -> Q function
+    How can I blip the blop?              -> Blip the blop
+    Why doesn't my socket have a packet?  -> Socket have a packet
+    Where are the pockets on the port?    -> Pockets on the port
+    I need to reap the zombie             -> Reap the zombie
+    What does the error "Disk full" mean? -> Disk full
+    What about backwards compatibility?   -> Backwards compatibility
+    Reaping the zombie from proctab       -> Zombie, reaping from proctab
+    $c = Mojo::Path->new()                -> new
+    $el->clear_parse_result               -> clear_parse_result
+    is_block => bool (1)                  -> is_block
+
+Currently, captialization (other than rewrites of type type shown
+above) is mostly left for the caller to handle.
 
 =head1 METHODS
 
@@ -161,16 +184,17 @@ The content of the text to be parsed.
 =head1 SEE ALSO
 
 L<Pod::Headings>
+L<Pod::Definitions>
 
 =head1 SUPPORT
 
-This module is managed in an open GitHub repository,
-L<https://github.com/lindleyw/Pod-Definitions>. Feel free to fork and
+This module is managed in an open GitLab repository,
+L<https://gitlab.com/wlindley/Pod-Definitions>. Feel free to fork and
 contribute, or to clone and send patches.
 
 =head1 AUTHOR
 
 This module was written and is maintained by William Lindley
-<wlindley@cpan.org>.
+E<lt>wlindley@cpan.orgE<gt>.
 
 =cut

@@ -11,10 +11,11 @@ use XML::TMX::Reader;
 
 our (
      $junk, # remove if one of the languages just have junk
-     $output,  # output filename
+     $o , $output,  # output filename
      $eq ,  # remove if seg(l1) = seg(l2)
      $len , # remove if len(li) > 50 ∧ len(lj) > 2len(li)
-     $v, $verbose
+     $v, $verbose,
+     $all,
     );
 
 my $cleaned = 0;
@@ -23,7 +24,10 @@ my $tmx = shift or help();
 my $reader = XML::TMX::Reader->new($tmx);
 
 $junk//=1;
-$output ||= "_cleaned_$tmx";
+$len //=1 if $all;
+$eq //=1 if $all;
+
+$output ||= $o || "_cleaned_$tmx";
 
 print STDERR "loading..." if $v;
 
@@ -48,7 +52,7 @@ sub cleaner {
         push(@len, length($langs->{$k}{-seg}));
     }
     @len = sort{$a <=> $b} @len;
-    $remove = 1 if $len && $len[0] > 50 && $len[0]*2< $len[-1];
+    $remove = 1 if $len && $len[-1] > 50 && $len[0]*2< $len[-1];
 
     $cleaned++ if $remove;
     printf STDERR "\rRemoved %d/%d (%.3f%%)...", $cleaned, $processed,
@@ -73,15 +77,21 @@ tmxclean - Simple tool to clean TMX files
 
 =head1 VERSION
 
-version 0.36
+version 0.39
 
 =head1 SYNOPSIS
 
   $ tmx-clean file.tmx
+    -junk     remove if one of the languages just have junk (def: True)
+    -eq       remove if seg(l1) = seg(l2)
+    -len      remove if len(li) > 50 ∧ len(lj) > 2len(li)
+    -output=out.tmx
+    -v, -verbose
+    -all             same as -junk -eq -len
 
 =head1 DESCRIPTION
 
-Removes the Translation units that
+Removes the translation units (TU) that
 
  1. have no letters...  (unless -junk=0)
  2. seg(L1) = seg(L2)   (if -eq)

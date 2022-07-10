@@ -1486,10 +1486,10 @@ static MGVTBL server_run_mgvtbl = { 0, server_run_mgset, 0, 0, 0, 0, 0, 0 };
  * This code is not needed for open62541 1.1 as upstream has fixed the bug.
  */
 static UA_StatusCode
-UA_Server_readContainsNoLoops(UA_Server *server, const UA_NodeId nodeId,
+UA_Server_readContainsNoLoops(UA_Server *ua_server, const UA_NodeId nodeId,
     UA_Boolean *outContainsNoLoops)
 {
-    return UA_Server_readContainsNoLoop(server, nodeId, outContainsNoLoops);
+    return UA_Server_readContainsNoLoop(ua_server, nodeId, outContainsNoLoops);
 }
 
 #endif /* HAVE_UA_SERVER_READCONTAINSNOLOOPS */
@@ -1594,10 +1594,13 @@ serverGlobalNodeLifecycleConstructor(UA_Server *ua_server,
 		XS_pack_UA_NodeId(sv, *nodeId);
 	}
 	PUSHs(sv);
+	/* Setting *nodeContext is broken, use generic undef to avoid leak. */
+	sv = &PL_sv_undef;
+	if (*nodeContext != NULL) {
+		DPRINTF("node context %p", *nodeContext);
+		sv = *nodeContext;
+	}
 	/* Constructor uses reference to context, pass a reference to Perl. */
-	if (*nodeContext == NULL)
-		*nodeContext = newSV(0);
-	sv = *nodeContext;
 	mPUSHs(newRV_inc(sv));
 	PUTBACK;
 
@@ -1620,7 +1623,8 @@ serverGlobalNodeLifecycleConstructor(UA_Server *ua_server,
 static void
 serverGlobalNodeLifecycleDestructor(UA_Server *ua_server,
     const UA_NodeId *sessionId, void *sessionContext,
-    const UA_NodeId *nodeId, void *nodeContext) {
+    const UA_NodeId *nodeId, void *nodeContext)
+{
 	dTHX;
 	dSP;
 	SV *sv;
@@ -1636,6 +1640,7 @@ serverGlobalNodeLifecycleDestructor(UA_Server *ua_server,
 	/* C destructor is always called to destroy node context. */
 	if (server->sv_config.svc_lifecycle.gnl_destructor == NULL) {
 		/* Reference count has been increased in server add...Node. */
+		DPRINTF("node context %p", nodeContext);
 		sv = nodeContext;
 		SvREFCNT_dec(sv);
 		return;
@@ -1669,6 +1674,7 @@ serverGlobalNodeLifecycleDestructor(UA_Server *ua_server,
 	sv = &PL_sv_undef;
 	if (nodeContext != NULL) {
 		/* Make node context mortal, destroy it at function return. */
+		DPRINTF("node context %p", nodeContext);
 		sv = nodeContext;
 		sv_2mortal(sv);
 	}
@@ -1845,6 +1851,66 @@ serverGlobalNodeLifecycleGenerateChildNodeId(UA_Server *ua_server,
 	return status;
 }
 
+static void
+addNodeProlog(pTHX_ OPCUA_Open62541_Server server, SV **nodeContext)
+{
+	UA_GlobalNodeLifecycle *lc;
+	SV *nc;
+
+	lc = &server->sv_config.svc_serverconfig->nodeLifecycle;
+	if (*nodeContext == NULL || !SvOK(*nodeContext) ||
+	    (lc->constructor == NULL && lc->destructor == NULL)) {
+		*nodeContext = NULL;
+		DPRINTF("node context %p", *nodeContext);
+		return;
+	}
+
+	nc = newSVsv(*nodeContext);
+	SvREFCNT_inc_NN(nc);
+	sv_2mortal(nc);
+	*nodeContext = nc;
+	DPRINTF("node context %p", *nodeContext);
+}
+
+static void
+addNodeEpilog(pTHX_ OPCUA_Open62541_Server server, SV *nodeContext,
+    OPCUA_Open62541_NodeId outoptNewNodeId, SV *outStack,
+    UA_StatusCode statusCode)
+{
+	UA_GlobalNodeLifecycle *lc;
+
+	DPRINTF("node context %p, status %s",
+	    nodeContext, UA_StatusCode_name(statusCode));
+
+	/* You never know when open62541 chooses to call the destructor. */
+	lc = &server->sv_config.svc_serverconfig->nodeLifecycle;
+	if (nodeContext != NULL && SvREFCNT(nodeContext) == 2 &&
+	    (statusCode != UA_STATUSCODE_GOOD || lc->destructor == NULL)) {
+		SvREFCNT_dec_NN(nodeContext);
+	}
+	if (statusCode == UA_STATUSCODE_GOOD && outoptNewNodeId != NULL) {
+		XS_pack_UA_NodeId(SvRV(outStack), *outoptNewNodeId);
+	}
+}
+
+#else
+
+static void
+addNodeProlog(pTHX_ OPCUA_Open62541_Server server, SV **nodeContext)
+{
+	*nodeContext = NULL;
+}
+
+static void
+addNodeEpilog(pTHX_ OPCUA_Open62541_Server server, SV *nodeContext,
+    OPCUA_Open62541_NodeId outoptNewNodeId, SV *outStack,
+    UA_StatusCode statusCode)
+{
+	if (statusCode == UA_STATUSCODE_GOOD && outoptNewNodeId != NULL) {
+		XS_pack_UA_NodeId(SvRV(outStack), *outoptNewNodeId);
+	}
+}
+
 #endif /* HAVE_UA_SERVER_SETADMINSESSIONCONTEXT */
 
 /* Open62541 C callback handling */
@@ -1985,7 +2051,7 @@ clientStateCallback(UA_Client *ua_client,
 #ifndef HAVE_UA_CLIENT_CONNECTASYNC
 
 static void
-clientAsyncServiceCallback(UA_Client *client, void *userdata,
+clientAsyncServiceCallback(UA_Client *ua_client, void *userdata,
     UA_UInt32 requestId, void *response)
 {
 	dTHX;
@@ -1995,13 +2061,13 @@ clientAsyncServiceCallback(UA_Client *client, void *userdata,
 	if (response != NULL)
 		XS_pack_UA_StatusCode(sv, *(UA_StatusCode *)response);
 
-	clientCallbackPerl(client, userdata, requestId, sv);
+	clientCallbackPerl(ua_client, userdata, requestId, sv);
 }
 
 #endif /* HAVE_UA_CLIENT_CONNECTASYNC */
 
 static void
-clientAsyncBrowseCallback(UA_Client *client, void *userdata,
+clientAsyncBrowseCallback(UA_Client *ua_client, void *userdata,
     UA_UInt32 requestId, UA_BrowseResponse *response)
 {
 	dTHX;
@@ -2011,11 +2077,11 @@ clientAsyncBrowseCallback(UA_Client *client, void *userdata,
 	if (response != NULL)
 		XS_pack_UA_BrowseResponse(sv, *response);
 
-	clientCallbackPerl(client, userdata, requestId, sv);
+	clientCallbackPerl(ua_client, userdata, requestId, sv);
 }
 
 static void
-clientAsyncBrowseNextCallback(UA_Client *client, void *userdata,
+clientAsyncBrowseNextCallback(UA_Client *ua_client, void *userdata,
     UA_UInt32 requestId, UA_BrowseNextResponse *response)
 {
 	dTHX;
@@ -2025,13 +2091,13 @@ clientAsyncBrowseNextCallback(UA_Client *client, void *userdata,
 	if (response != NULL)
 		XS_pack_UA_BrowseNextResponse(sv, *response);
 
-	clientCallbackPerl(client, userdata, requestId, sv);
+	clientCallbackPerl(ua_client, userdata, requestId, sv);
 }
 
 #include "Open62541-client-read-callback.xsh"
 
 static void
-clientAsyncReadDataTypeCallback(UA_Client *client, void *userdata,
+clientAsyncReadDataTypeCallback(UA_Client *ua_client, void *userdata,
     UA_UInt32 requestId,
 #ifdef HAVE_UA_CLIENTASYNCOPERATIONCALLBACK
     UA_StatusCode status,
@@ -2057,11 +2123,11 @@ clientAsyncReadDataTypeCallback(UA_Client *client, void *userdata,
 	}
 
 	/* XXX we do not propagate the status code */
-	clientCallbackPerl(client, userdata, requestId, sv);
+	clientCallbackPerl(ua_client, userdata, requestId, sv);
 }
 
 static void
-clientAsyncReadCallback(UA_Client *client, void *userdata,
+clientAsyncReadCallback(UA_Client *ua_client, void *userdata,
     UA_UInt32 requestId, UA_ReadResponse *response)
 {
 	dTHX;
@@ -2071,19 +2137,19 @@ clientAsyncReadCallback(UA_Client *client, void *userdata,
 	if (response != NULL)
 		XS_pack_UA_ReadResponse(sv, *response);
 
-	clientCallbackPerl(client, userdata, requestId, sv);
+	clientCallbackPerl(ua_client, userdata, requestId, sv);
 }
 
 static void
-clientDeleteSubscriptionCallback(UA_Client *client, UA_UInt32 subId,
+clientDeleteSubscriptionCallback(UA_Client *ua_client, UA_UInt32 subId,
     void *subContext)
 {
 	dTHX;
 	dSP;
 	SubscriptionContext sub = subContext;
 
-	DPRINTF("client %p, sub %p, sc_change %p, sc_delete %p",
-	    client, sub, sub->sc_change, sub->sc_delete);
+	DPRINTF("ua_client %p, sub %p, sc_change %p, sc_delete %p",
+	    ua_client, sub, sub->sc_change, sub->sc_delete);
 
 	if (sub->sc_delete) {
 		ENTER;
@@ -2112,7 +2178,7 @@ clientDeleteSubscriptionCallback(UA_Client *client, UA_UInt32 subId,
 }
 
 static void
-clientStatusChangeNotificationCallback(UA_Client *client, UA_UInt32 subId,
+clientStatusChangeNotificationCallback(UA_Client *ua_client, UA_UInt32 subId,
     void *subContext, UA_StatusChangeNotification *notification)
 {
 	dTHX;
@@ -2120,8 +2186,8 @@ clientStatusChangeNotificationCallback(UA_Client *client, UA_UInt32 subId,
 	SubscriptionContext sub = subContext;
 	SV *notificationPerl;
 
-	DPRINTF("client %p, sub %p, sc_change %p, sc_delete %p",
-	    client, sub, sub->sc_change, sub->sc_delete);
+	DPRINTF("ua_client %p, sub %p, sc_change %p, sc_delete %p",
+	    ua_client, sub, sub->sc_change, sub->sc_delete);
 
 	if (sub->sc_change == NULL)
 		return;
@@ -2149,7 +2215,7 @@ clientStatusChangeNotificationCallback(UA_Client *client, UA_UInt32 subId,
 }
 
 static void
-clientDeleteMonitoredItemCallback(UA_Client *client, UA_UInt32 subId,
+clientDeleteMonitoredItemCallback(UA_Client *ua_client, UA_UInt32 subId,
     void *subContext, UA_UInt32 monId, void *monContext)
 {
 	dTHX;
@@ -2157,8 +2223,8 @@ clientDeleteMonitoredItemCallback(UA_Client *client, UA_UInt32 subId,
 	SubscriptionContext sub = subContext;
 	MonitoredItemContext mon = monContext;
 
-	DPRINTF("client %p, sub %p, mon %p, mc_change %p, mc_delete %p",
-	    client, sub, mon, mon->mc_change, mon->mc_delete);
+	DPRINTF("ua_client %p, sub %p, mon %p, mc_change %p, mc_delete %p",
+	    ua_client, sub, mon, mon->mc_change, mon->mc_delete);
 
 	if (mon->mc_delete) {
 		ENTER;
@@ -2193,7 +2259,7 @@ clientDeleteMonitoredItemCallback(UA_Client *client, UA_UInt32 subId,
 }
 
 static void
-clientDataChangeNotificationCallback(UA_Client *client, UA_UInt32 subId,
+clientDataChangeNotificationCallback(UA_Client *ua_client, UA_UInt32 subId,
     void *subContext, UA_UInt32 monId, void *monContext, UA_DataValue *value)
 {
 	dTHX;
@@ -2202,9 +2268,9 @@ clientDataChangeNotificationCallback(UA_Client *client, UA_UInt32 subId,
 	MonitoredItemContext mon = monContext;
 	SV *valuePerl;
 
-	DPRINTF("client %p, sub %p, sc_change %p, sc_delete %p, "
+	DPRINTF("ua_client %p, sub %p, sc_change %p, sc_delete %p, "
 	    "mon %p, mc_change %p, mc_delete %p",
-	    client, sub, sub->sc_change, sub->sc_delete,
+	    ua_client, sub, sub->sc_change, sub->sc_delete,
 	    mon, mon->mc_change, mon->mc_delete);
 
 	if (mon->mc_change == NULL)
@@ -2239,112 +2305,112 @@ clientDataChangeNotificationCallback(UA_Client *client, UA_UInt32 subId,
 /* 16.3 Access Control Plugin API */
 
 static UA_UInt32
-getUserRightsMask_default(UA_Server *server, UA_AccessControl *ac,
+getUserRightsMask_default(UA_Server *ua_server, UA_AccessControl *ac,
     const UA_NodeId *sessionId, void *sessionContext, const UA_NodeId *nodeId,
     void *nodeContext) {
 	return 0xFFFFFFFF;
 }
 
 static UA_UInt32
-getUserRightsMask_readonly(UA_Server *server, UA_AccessControl *ac,
+getUserRightsMask_readonly(UA_Server *ua_server, UA_AccessControl *ac,
     const UA_NodeId *sessionId, void *sessionContext, const UA_NodeId *nodeId,
     void *nodeContext) {
 	return 0x00000000;
 }
 
 static UA_Byte
-getUserAccessLevel_default(UA_Server *server, UA_AccessControl *ac,
+getUserAccessLevel_default(UA_Server *ua_server, UA_AccessControl *ac,
     const UA_NodeId *sessionId, void *sessionContext, const UA_NodeId *nodeId,
     void *nodeContext) {
 	return 0xFF;
 }
 
 static UA_Byte
-getUserAccessLevel_readonly(UA_Server *server, UA_AccessControl *ac,
+getUserAccessLevel_readonly(UA_Server *ua_server, UA_AccessControl *ac,
     const UA_NodeId *sessionId, void *sessionContext, const UA_NodeId *nodeId,
     void *nodeContext) {
 	return UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_HISTORYREAD;
 }
 
 static UA_Boolean
-getUserExecutable_default(UA_Server *server, UA_AccessControl *ac,
+getUserExecutable_default(UA_Server *ua_server, UA_AccessControl *ac,
     const UA_NodeId *sessionId, void *sessionContext, const UA_NodeId *methodId,
     void *methodContext) {
 	return true;
 }
 
 static UA_Boolean
-getUserExecutable_false(UA_Server *server, UA_AccessControl *ac,
+getUserExecutable_false(UA_Server *ua_server, UA_AccessControl *ac,
     const UA_NodeId *sessionId, void *sessionContext, const UA_NodeId *methodId,
     void *methodContext) {
 	return false;
 }
 
 static UA_Boolean
-getUserExecutableOnObject_default(UA_Server *server, UA_AccessControl *ac,
+getUserExecutableOnObject_default(UA_Server *ua_server, UA_AccessControl *ac,
     const UA_NodeId *sessionId, void *sessionContext, const UA_NodeId *methodId,
     void *methodContext, const UA_NodeId *objectId, void *objectContext) {
 	return true;
 }
 
 static UA_Boolean
-getUserExecutableOnObject_false(UA_Server *server, UA_AccessControl *ac,
+getUserExecutableOnObject_false(UA_Server *ua_server, UA_AccessControl *ac,
     const UA_NodeId *sessionId, void *sessionContext, const UA_NodeId *methodId,
     void *methodContext, const UA_NodeId *objectId, void *objectContext) {
 	return false;
 }
 
 static UA_Boolean
-allowAddNode_default(UA_Server *server, UA_AccessControl *ac,
+allowAddNode_default(UA_Server *ua_server, UA_AccessControl *ac,
     const UA_NodeId *sessionId, void *sessionContext,
     const UA_AddNodesItem *item) {
 	return true;
 }
 
 static UA_Boolean
-allowAddNode_false(UA_Server *server, UA_AccessControl *ac,
+allowAddNode_false(UA_Server *ua_server, UA_AccessControl *ac,
     const UA_NodeId *sessionId, void *sessionContext,
     const UA_AddNodesItem *item) {
 	return false;
 }
 
 static UA_Boolean
-allowAddReference_default(UA_Server *server, UA_AccessControl *ac,
+allowAddReference_default(UA_Server *ua_server, UA_AccessControl *ac,
     const UA_NodeId *sessionId, void *sessionContext,
     const UA_AddReferencesItem *item) {
 	return true;
 }
 
 static UA_Boolean
-allowAddReference_false(UA_Server *server, UA_AccessControl *ac,
+allowAddReference_false(UA_Server *ua_server, UA_AccessControl *ac,
     const UA_NodeId *sessionId, void *sessionContext,
     const UA_AddReferencesItem *item) {
 	return false;
 }
 
 static UA_Boolean
-allowDeleteNode_default(UA_Server *server, UA_AccessControl *ac,
+allowDeleteNode_default(UA_Server *ua_server, UA_AccessControl *ac,
     const UA_NodeId *sessionId, void *sessionContext,
     const UA_DeleteNodesItem *item) {
 	return true;
 }
 
 static UA_Boolean
-allowDeleteNode_false(UA_Server *server, UA_AccessControl *ac,
+allowDeleteNode_false(UA_Server *ua_server, UA_AccessControl *ac,
     const UA_NodeId *sessionId, void *sessionContext,
     const UA_DeleteNodesItem *item) {
 	return false;
 }
 
 static UA_Boolean
-allowDeleteReference_default(UA_Server *server, UA_AccessControl *ac,
+allowDeleteReference_default(UA_Server *ua_server, UA_AccessControl *ac,
     const UA_NodeId *sessionId, void *sessionContext,
     const UA_DeleteReferencesItem *item) {
 	return true;
 }
 
 static UA_Boolean
-allowDeleteReference_false(UA_Server *server, UA_AccessControl *ac,
+allowDeleteReference_false(UA_Server *ua_server, UA_AccessControl *ac,
     const UA_NodeId *sessionId, void *sessionContext,
     const UA_DeleteReferencesItem *item) {
 	return false;
@@ -2353,21 +2419,21 @@ allowDeleteReference_false(UA_Server *server, UA_AccessControl *ac,
 #ifdef UA_ENABLE_HISTORIZING
 
 static UA_Boolean
-allowHistoryUpdateUpdateData_default(UA_Server *server, UA_AccessControl *ac,
+allowHistoryUpdateUpdateData_default(UA_Server *ua_server, UA_AccessControl *ac,
     const UA_NodeId *sessionId, void *sessionContext, const UA_NodeId *nodeId,
     UA_PerformUpdateType performInsertReplace, const UA_DataValue *value) {
 	return true;
 }
 
 static UA_Boolean
-allowHistoryUpdateUpdateData_false(UA_Server *server, UA_AccessControl *ac,
+allowHistoryUpdateUpdateData_false(UA_Server *ua_server, UA_AccessControl *ac,
     const UA_NodeId *sessionId, void *sessionContext, const UA_NodeId *nodeId,
     UA_PerformUpdateType performInsertReplace, const UA_DataValue *value) {
 	return false;
 }
 
 static UA_Boolean
-allowHistoryUpdateDeleteRawModified_default(UA_Server *server,
+allowHistoryUpdateDeleteRawModified_default(UA_Server *ua_server,
     UA_AccessControl *ac, const UA_NodeId *sessionId, void *sessionContext,
     const UA_NodeId *nodeId, UA_DateTime startTimestamp,
     UA_DateTime endTimestamp, bool isDeleteModified) {
@@ -2375,7 +2441,7 @@ allowHistoryUpdateDeleteRawModified_default(UA_Server *server,
 }
 
 static UA_Boolean
-allowHistoryUpdateDeleteRawModified_false(UA_Server *server,
+allowHistoryUpdateDeleteRawModified_false(UA_Server *ua_server,
     UA_AccessControl *ac, const UA_NodeId *sessionId, void *sessionContext,
     const UA_NodeId *nodeId, UA_DateTime startTimestamp,
     UA_DateTime endTimestamp, bool isDeleteModified) {
@@ -2431,7 +2497,7 @@ XS_unpack_UA_LogCategory(SV *in)
 	return SvIV(in);
 }
 
-#define LOG_CATEGORY_COUNT	7
+#define LOG_CATEGORY_COUNT	8
 const char *logCategoryNames[LOG_CATEGORY_COUNT] = {
 	"network",
 	"channel",
@@ -2440,6 +2506,7 @@ const char *logCategoryNames[LOG_CATEGORY_COUNT] = {
 	"client",
 	"userland",
 	"securitypolicy",
+	"eventloop",
 };
 
 static void
@@ -3076,23 +3143,13 @@ UA_Server_addVariableNode(server, requestedNewNodeId, parentNodeId, referenceTyp
 	OPCUA_Open62541_VariableAttributes	attr
 	SV *				nodeContext
 	OPCUA_Open62541_NodeId		outoptNewNodeId
-    PREINIT:
-	SV *				nc = NULL;
     CODE:
-	if (!SvOK(nodeContext))
-		nodeContext = NULL;
-#ifndef HAVE_UA_SERVER_SETADMINSESSIONCONTEXT
-	nodeContext = NULL;
-#endif
-	if (nodeContext != NULL)
-		nc = newSVsv(nodeContext);
+	addNodeProlog(aTHX_ server, &nodeContext);
 	RETVAL = UA_Server_addVariableNode(server->sv_server,
 	    *requestedNewNodeId, *parentNodeId, *referenceTypeId, *browseName,
-	    *typeDefinition, *attr, nc, outoptNewNodeId);
-	if (RETVAL != UA_STATUSCODE_GOOD)
-		SvREFCNT_dec(nc);
-	else if (outoptNewNodeId != NULL)
-		XS_pack_UA_NodeId(SvRV(ST(8)), *outoptNewNodeId);
+	    *typeDefinition, *attr, nodeContext, outoptNewNodeId);
+	addNodeEpilog(aTHX_ server, nodeContext, outoptNewNodeId, ST(8),
+	    RETVAL);
     OUTPUT:
 	RETVAL
 
@@ -3107,23 +3164,13 @@ UA_Server_addVariableTypeNode(server, requestedNewNodeId, parentNodeId, referenc
 	OPCUA_Open62541_VariableTypeAttributes	attr
 	SV *				nodeContext
 	OPCUA_Open62541_NodeId		outoptNewNodeId
-    PREINIT:
-	SV *				nc = NULL;
     CODE:
-	if (!SvOK(nodeContext))
-		nodeContext = NULL;
-#ifndef HAVE_UA_SERVER_SETADMINSESSIONCONTEXT
-	nodeContext = NULL;
-#endif
-	if (nodeContext != NULL)
-		nc = newSVsv(nodeContext);
+	addNodeProlog(aTHX_ server, &nodeContext);
 	RETVAL = UA_Server_addVariableTypeNode(server->sv_server,
 	    *requestedNewNodeId, *parentNodeId, *referenceTypeId, *browseName,
-	    *typeDefinition, *attr, nc, outoptNewNodeId);
-	if (RETVAL != UA_STATUSCODE_GOOD)
-		SvREFCNT_dec(nc);
-	else if (outoptNewNodeId != NULL)
-		XS_pack_UA_NodeId(SvRV(ST(8)), *outoptNewNodeId);
+	    *typeDefinition, *attr, nodeContext, outoptNewNodeId);
+	addNodeEpilog(aTHX_ server, nodeContext, outoptNewNodeId, ST(8),
+	    RETVAL);
     OUTPUT:
 	RETVAL
 
@@ -3138,23 +3185,13 @@ UA_Server_addObjectNode(server, requestedNewNodeId, parentNodeId, referenceTypeI
 	OPCUA_Open62541_ObjectAttributes	attr
 	SV *				nodeContext
 	OPCUA_Open62541_NodeId		outoptNewNodeId
-    PREINIT:
-	SV *				nc = NULL;
     CODE:
-	if (!SvOK(nodeContext))
-		nodeContext = NULL;
-#ifndef HAVE_UA_SERVER_SETADMINSESSIONCONTEXT
-	nodeContext = NULL;
-#endif
-	if (nodeContext != NULL)
-		nc = newSVsv(nodeContext);
+	addNodeProlog(aTHX_ server, &nodeContext);
 	RETVAL = UA_Server_addObjectNode(server->sv_server,
 	    *requestedNewNodeId, *parentNodeId, *referenceTypeId, *browseName,
-	    *typeDefinition, *attr, nc, outoptNewNodeId);
-	if (RETVAL != UA_STATUSCODE_GOOD)
-		SvREFCNT_dec(nc);
-	else if (outoptNewNodeId != NULL)
-		XS_pack_UA_NodeId(SvRV(ST(8)), *outoptNewNodeId);
+	    *typeDefinition, *attr, nodeContext, outoptNewNodeId);
+	addNodeEpilog(aTHX_ server, nodeContext, outoptNewNodeId, ST(8),
+	    RETVAL);
     OUTPUT:
 	RETVAL
 
@@ -3168,23 +3205,13 @@ UA_Server_addObjectTypeNode(server, requestedNewNodeId, parentNodeId, referenceT
 	OPCUA_Open62541_ObjectTypeAttributes	attr
 	SV *				nodeContext
 	OPCUA_Open62541_NodeId		outoptNewNodeId
-    PREINIT:
-	SV *				nc = NULL;
     CODE:
-	if (!SvOK(nodeContext))
-		nodeContext = NULL;
-#ifndef HAVE_UA_SERVER_SETADMINSESSIONCONTEXT
-	nodeContext = NULL;
-#endif
-	if (nodeContext != NULL)
-		nc = newSVsv(nodeContext);
+	addNodeProlog(aTHX_ server, &nodeContext);
 	RETVAL = UA_Server_addObjectTypeNode(server->sv_server,
 	    *requestedNewNodeId, *parentNodeId, *referenceTypeId, *browseName,
-	    *attr, nc, outoptNewNodeId);
-	if (RETVAL != UA_STATUSCODE_GOOD)
-		SvREFCNT_dec(nc);
-	else if (outoptNewNodeId != NULL)
-		XS_pack_UA_NodeId(SvRV(ST(7)), *outoptNewNodeId);
+	    *attr, nodeContext, outoptNewNodeId);
+	addNodeEpilog(aTHX_ server, nodeContext, outoptNewNodeId, ST(7),
+	    RETVAL);
     OUTPUT:
 	RETVAL
 
@@ -3198,23 +3225,13 @@ UA_Server_addViewNode(server, requestedNewNodeId, parentNodeId, referenceTypeId,
 	OPCUA_Open62541_ViewAttributes	attr
 	SV *				nodeContext
 	OPCUA_Open62541_NodeId		outoptNewNodeId
-    PREINIT:
-	SV *				nc = NULL;
     CODE:
-	if (!SvOK(nodeContext))
-		nodeContext = NULL;
-#ifndef HAVE_UA_SERVER_SETADMINSESSIONCONTEXT
-	nodeContext = NULL;
-#endif
-	if (nodeContext != NULL)
-		nc = newSVsv(nodeContext);
+	addNodeProlog(aTHX_ server, &nodeContext);
 	RETVAL = UA_Server_addViewNode(server->sv_server,
 	    *requestedNewNodeId, *parentNodeId, *referenceTypeId, *browseName,
-	    *attr, nc, outoptNewNodeId);
-	if (RETVAL != UA_STATUSCODE_GOOD)
-		SvREFCNT_dec(nc);
-	else if (outoptNewNodeId != NULL)
-		XS_pack_UA_NodeId(SvRV(ST(7)), *outoptNewNodeId);
+	    *attr, nodeContext, outoptNewNodeId);
+	addNodeEpilog(aTHX_ server, nodeContext, outoptNewNodeId, ST(7),
+	    RETVAL);
     OUTPUT:
 	RETVAL
 
@@ -3228,23 +3245,13 @@ UA_Server_addReferenceTypeNode(server, requestedNewNodeId, parentNodeId, referen
 	OPCUA_Open62541_ReferenceTypeAttributes	attr
 	SV *				nodeContext
 	OPCUA_Open62541_NodeId		outoptNewNodeId
-    PREINIT:
-	SV *				nc = NULL;
     CODE:
-	if (!SvOK(nodeContext))
-		nodeContext = NULL;
-#ifndef HAVE_UA_SERVER_SETADMINSESSIONCONTEXT
-	nodeContext = NULL;
-#endif
-	if (nodeContext != NULL)
-		nc = newSVsv(nodeContext);
+	addNodeProlog(aTHX_ server, &nodeContext);
 	RETVAL = UA_Server_addReferenceTypeNode(server->sv_server,
 	    *requestedNewNodeId, *parentNodeId, *referenceTypeId, *browseName,
-	    *attr, nc, outoptNewNodeId);
-	if (RETVAL != UA_STATUSCODE_GOOD)
-		SvREFCNT_dec(nc);
-	else if (outoptNewNodeId != NULL)
-		XS_pack_UA_NodeId(SvRV(ST(7)), *outoptNewNodeId);
+	    *attr, nodeContext, outoptNewNodeId);
+	addNodeEpilog(aTHX_ server, nodeContext, outoptNewNodeId, ST(7),
+	    RETVAL);
     OUTPUT:
 	RETVAL
 
@@ -3258,23 +3265,13 @@ UA_Server_addDataTypeNode(server, requestedNewNodeId, parentNodeId, referenceTyp
 	OPCUA_Open62541_DataTypeAttributes	attr
 	SV *				nodeContext
 	OPCUA_Open62541_NodeId		outoptNewNodeId
-    PREINIT:
-	SV *				nc = NULL;
     CODE:
-	if (!SvOK(nodeContext))
-		nodeContext = NULL;
-#ifndef HAVE_UA_SERVER_SETADMINSESSIONCONTEXT
-	nodeContext = NULL;
-#endif
-	if (nodeContext != NULL)
-		nc = newSVsv(nodeContext);
+	addNodeProlog(aTHX_ server, &nodeContext);
 	RETVAL = UA_Server_addDataTypeNode(server->sv_server,
 	    *requestedNewNodeId, *parentNodeId, *referenceTypeId, *browseName,
-	    *attr, nc, outoptNewNodeId);
-	if (RETVAL != UA_STATUSCODE_GOOD)
-		SvREFCNT_dec(nc);
-	else if (outoptNewNodeId != NULL)
-		XS_pack_UA_NodeId(SvRV(ST(7)), *outoptNewNodeId);
+	    *attr, nodeContext, outoptNewNodeId);
+	addNodeEpilog(aTHX_ server, nodeContext, outoptNewNodeId, ST(7),
+	    RETVAL);
     OUTPUT:
 	RETVAL
 
@@ -3956,6 +3953,7 @@ UA_Client_DESTROY(client)
 	DPRINTF("client %p, cl_client %p, cl_callbackdata %p, "
 	    "config %p, logger %p",
 	    client, client->cl_client, client->cl_callbackdata, config, logger);
+	client->cl_config.clc_clientconfig->clientContext = ST(0);
 	UA_Client_delete(client->cl_client);
 	/* SvREFCNT_dec checks for NULL pointer. */
 	SvREFCNT_dec(config->clc_clientcontext);
@@ -3991,6 +3989,7 @@ UA_Client_connect(client, endpointUrl)
 	OPCUA_Open62541_Client		client
 	char *				endpointUrl
     CODE:
+	client->cl_config.clc_clientconfig->clientContext = ST(0);
 	RETVAL = UA_Client_connect(client->cl_client, endpointUrl);
     OUTPUT:
 	RETVAL
@@ -4002,6 +4001,7 @@ UA_Client_connectAsync(client, endpointUrl)
 	OPCUA_Open62541_Client		client
 	char *				endpointUrl
     CODE:
+	client->cl_config.clc_clientconfig->clientContext = ST(0);
 	RETVAL = UA_Client_connectAsync(client->cl_client, endpointUrl);
     OUTPUT:
 	RETVAL
@@ -4015,6 +4015,7 @@ UA_Client_connect_async(client, endpointUrl, callback, data)
 	SV *				callback
 	SV *				data
     CODE:
+	client->cl_config.clc_clientconfig->clientContext = ST(0);
 	/*
 	 * If the client is already connecting, it will immediately return
 	 * a good status code.  In this case, the callback is never called.
@@ -4054,6 +4055,7 @@ UA_Client_run_iterate(client, timeout)
 	OPCUA_Open62541_Client		client
 	UA_UInt32			timeout
     CODE:
+	client->cl_config.clc_clientconfig->clientContext = ST(0);
 	/* open62541 1.0 had UA_UInt16 timeout, it is implicitly casted */
 	RETVAL = UA_Client_run_iterate(client->cl_client, timeout);
     OUTPUT:
@@ -4063,6 +4065,7 @@ UA_StatusCode
 UA_Client_disconnect(client)
 	OPCUA_Open62541_Client		client
     CODE:
+	client->cl_config.clc_clientconfig->clientContext = ST(0);
 	RETVAL = UA_Client_disconnect(client->cl_client);
     OUTPUT:
 	RETVAL
@@ -4073,6 +4076,7 @@ UA_StatusCode
 UA_Client_disconnectAsync(client)
 	OPCUA_Open62541_Client		client
     CODE:
+	client->cl_config.clc_clientconfig->clientContext = ST(0);
 	RETVAL = UA_Client_disconnectAsync(client->cl_client);
     OUTPUT:
 	RETVAL
@@ -4084,6 +4088,7 @@ UA_Client_disconnect_async(client, outoptReqId)
 	OPCUA_Open62541_Client		client
 	OPCUA_Open62541_UInt32		outoptReqId
     CODE:
+	client->cl_config.clc_clientconfig->clientContext = ST(0);
 	RETVAL = UA_Client_disconnect_async(client->cl_client, outoptReqId);
 	if (outoptReqId != NULL)
 		XS_pack_UA_UInt32(SvRV(ST(1)), *outoptReqId);
@@ -4317,11 +4322,24 @@ UA_Client_Subscriptions_create(client, request, subscriptionContext, statusChang
 		sub->sc_delete = newClientCallbackData(
 		    deleteCallback, ST(0), subscriptionContext);
 
+	DPRINTF("client %p, sub %p, sc_change %p, sc_delete %p",
+	    client, sub, sub->sc_change, sub->sc_delete);
+
 	RETVAL = UA_Client_Subscriptions_create(client->cl_client, *request,
 	    sub, clientStatusChangeNotificationCallback,
 	    clientDeleteSubscriptionCallback);
 
+	/*
+	 * Old open62541 1.0 did not call callback on failure.  The logic
+	 * introduced in 2d5355b7be11233e67d5ff6be6b2a34e971e1814 does
+	 * it in most cases.
+	 */
+#ifdef HAVE_UA_CLIENT_SUBSCRIPTIONS_CREATE_ASYNC
+	if (RETVAL.responseHeader.serviceResult ==
+	    UA_STATUSCODE_BADOUTOFMEMORY) {
+#else
 	if (RETVAL.responseHeader.serviceResult != UA_STATUSCODE_GOOD) {
+#endif
 		if (sub->sc_delete)
 			deleteClientCallbackData(sub->sc_delete);
 		if (sub->sc_change)

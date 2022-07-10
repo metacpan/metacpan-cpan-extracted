@@ -75,6 +75,6 @@
          "web" : "https://gitlab.com/jackdeguest/Text-PO"
       }
    },
-   "version" : "v0.2.1",
+   "version" : "v0.2.3",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -3,14 +3,19 @@
 use strict;
 use warnings;
 
-use Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::Image::Dog;;
-use Wikibase::Datatype::Print::Snak;
+use Test::Shared::Fixture::Wikibase::Datatype::Form::Wikidata::DogCzechSingular;
+use Unicode::UTF8 qw(encode_utf8);
+use Wikibase::Datatype::Print::Form;
 
 # Object.
-my $obj = Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::Image::Dog->new;
+my $obj = Test::Shared::Fixture::Wikibase::Datatype::Form::Wikidata::DogCzechSingular->new;
 
 # Print out.
-print scalar Wikibase::Datatype::Print::Snak::print($obj);
+print encode_utf8(scalar Wikibase::Datatype::Print::Form::print($obj));
 
 # Output:
-# P18: Canadian Inuit Dog.jpg
+# Id: L469-F1
+# Representation: pes (cs)
+# Grammatical features: Q110786, Q131105
+# Statements:
+#   P898: pɛs (normal)

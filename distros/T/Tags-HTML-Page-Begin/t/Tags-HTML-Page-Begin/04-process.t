@@ -34,6 +34,11 @@ is_deeply(
 			$Tags::HTML::Page::Begin::VERSION],
 		['e', 'meta'],
 
+		['b', 'meta'],
+		['a', 'name', 'viewport'],
+		['a', 'content', 'width=device-width, initial-scale=1.0'],
+		['e', 'meta'],
+
 		['b', 'title'],
 		['d', 'Page title'],
 		['e', 'title'],
@@ -49,6 +54,7 @@ $tags = Tags::Output::Structure->new;
 $obj = Tags::HTML::Page::Begin->new(
 	'http_equiv_content_type' => undef,
 	'tags' => $tags,
+	'viewport' => undef,
 );
 $obj->process;
 $ret_ar = $tags->flush(1);
@@ -86,6 +92,7 @@ $tags = Tags::Output::Structure->new;
 $obj = Tags::HTML::Page::Begin->new(
 	'generator' => undef,
 	'tags' => $tags,
+	'viewport' => undef,
 );
 $obj->process;
 $ret_ar = $tags->flush(1);
@@ -119,6 +126,7 @@ $obj = Tags::HTML::Page::Begin->new(
 	'css' => $css,
 	'generator' => undef,
 	'tags' => $tags,
+	'viewport' => undef,
 );
 $css->put(
 	['s', 'body'],
@@ -161,6 +169,7 @@ is_deeply(
 $obj = Tags::HTML::Page::Begin->new(
 	'refresh' => 30,
 	'tags' => $tags,
+	'viewport' => undef,
 );
 $obj->process;
 $ret_ar = $tags->flush(1);
@@ -203,6 +212,7 @@ is_deeply(
 $obj = Tags::HTML::Page::Begin->new(
 	'base_href' => 'https://skim.cz',
 	'tags' => $tags,
+	'viewport' => undef,
 );
 $obj->process;
 $ret_ar = $tags->flush(1);
@@ -245,6 +255,7 @@ $obj = Tags::HTML::Page::Begin->new(
 	'base_href' => 'https://skim.cz',
 	'base_target' => '_blank',
 	'tags' => $tags,
+	'viewport' => undef,
 );
 $obj->process;
 $ret_ar = $tags->flush(1);
@@ -287,6 +298,7 @@ is_deeply(
 $obj = Tags::HTML::Page::Begin->new(
 	'robots' => 'index, follow',
 	'tags' => $tags,
+	'viewport' => undef,
 );
 $obj->process;
 $ret_ar = $tags->flush(1);
@@ -329,6 +341,7 @@ is_deeply(
 $obj = Tags::HTML::Page::Begin->new(
 	'favicon' => 'favicon.ico',
 	'tags' => $tags,
+	'viewport' => undef,
 );
 $obj->process;
 $ret_ar = $tags->flush(1);
@@ -372,6 +385,7 @@ is_deeply(
 $obj = Tags::HTML::Page::Begin->new(
 	'favicon' => 'favicon.gif',
 	'tags' => $tags,
+	'viewport' => undef,
 );
 $obj->process;
 $ret_ar = $tags->flush(1);
@@ -415,6 +429,7 @@ is_deeply(
 $obj = Tags::HTML::Page::Begin->new(
 	'favicon' => 'favicon.jpg',
 	'tags' => $tags,
+	'viewport' => undef,
 );
 $obj->process;
 $ret_ar = $tags->flush(1);
@@ -458,6 +473,7 @@ is_deeply(
 $obj = Tags::HTML::Page::Begin->new(
 	'favicon' => 'favicon.svg',
 	'tags' => $tags,
+	'viewport' => undef,
 );
 $obj->process;
 $ret_ar = $tags->flush(1);
@@ -501,6 +517,7 @@ is_deeply(
 $obj = Tags::HTML::Page::Begin->new(
 	'favicon' => 'favicon.png',
 	'tags' => $tags,
+	'viewport' => undef,
 );
 $obj->process;
 $ret_ar = $tags->flush(1);
@@ -550,6 +567,7 @@ $obj = Tags::HTML::Page::Begin->new(
 		},
 	],
 	'tags' => $tags,
+	'viewport' => undef,
 );
 $obj->process;
 $ret_ar = $tags->flush(1);
@@ -600,6 +618,7 @@ is_deeply(
 $obj = Tags::HTML::Page::Begin->new(
 	'rss' => 'https://example.com/rss',
 	'tags' => $tags,
+	'viewport' => undef,
 );
 $obj->process;
 $ret_ar = $tags->flush(1);
@@ -647,6 +666,7 @@ $obj = Tags::HTML::Page::Begin->new(
 		'bar();',
 	],
 	'tags' => $tags,
+	'viewport' => undef,
 );
 $obj->process;
 $ret_ar = $tags->flush(1);
@@ -697,6 +717,7 @@ $obj = Tags::HTML::Page::Begin->new(
 		'https://example.com/js/bar.js',
 	],
 	'tags' => $tags,
+	'viewport' => undef,
 );
 $obj->process;
 $ret_ar = $tags->flush(1);
@@ -744,6 +765,7 @@ is_deeply(
 $obj = Tags::HTML::Page::Begin->new(
 	'html_lang' => 'cs',
 	'tags' => $tags,
+	'viewport' => undef,
 );
 $obj->process;
 $ret_ar = $tags->flush(1);
@@ -783,6 +805,7 @@ $obj = Tags::HTML::Page::Begin->new(
 	'css' => $css,
 	'generator' => undef,
 	'tags' => $tags,
+	'viewport' => undef,
 );
 $css->put;
 $obj->process;
@@ -815,6 +838,7 @@ is_deeply(
 $obj = Tags::HTML::Page::Begin->new(
 	'lang' => {},
 	'tags' => $tags,
+	'viewport' => undef,
 );
 $obj->process;
 $ret_ar = $tags->flush(1);

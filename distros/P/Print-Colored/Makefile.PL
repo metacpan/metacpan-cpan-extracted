@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   PREREQ_PM      => {
   'IO::Prompter' => 'v0.4.15',
   'Term::ANSIColor' => '4',
+  'Term::ReadKey' => '2.38',
   'perl' => 'v5.24.0'
 }
 ,

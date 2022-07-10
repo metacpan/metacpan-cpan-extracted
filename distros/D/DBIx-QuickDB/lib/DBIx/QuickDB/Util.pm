@@ -2,7 +2,7 @@ package DBIx::QuickDB::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.000021';
+our $VERSION = '0.000022';
 
 use IPC::Cmd qw/can_run/;
 use Carp qw/confess/;

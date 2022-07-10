@@ -19,6 +19,7 @@ share/desumasu.dict
 share/reorder.pl
 t/00_compile.t
 t/01_run.t
+t/Makefile
 t/Util.pm
 t/t1-s.txt
 t/t2-r.txt

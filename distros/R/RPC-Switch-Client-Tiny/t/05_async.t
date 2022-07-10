@@ -6,6 +6,9 @@ use warnings;
 use FindBin ();
 use lib "$FindBin::Bin/../lib";
 
+# cpantester: strawberry perl defaults to JSON::PP and has blessing problem with JSON::true objects
+BEGIN { $ENV{PERL_JSON_BACKEND} = 'JSON::backportPP' if ($^O eq 'MSWin32'); }
+
 use Test::More;
 use JSON;
 use Data::Dumper;

@@ -5,7 +5,9 @@ use warnings;
 package Sub::HandlesVia::Toolkit;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.028';
+our $VERSION   = '0.031';
+
+use Sub::HandlesVia::Mite;
 
 use Type::Params qw(compile_named_oo);
 use Types::Standard qw( ArrayRef HashRef Str Num Int CodeRef Bool Item );

@@ -2,7 +2,7 @@ package App::Yath::Options::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000124';
+our $VERSION = '1.000125';
 
 use Test2::Util qw/IS_WIN32/;
 use Test2::Harness::Util qw/clean_path/;
@@ -39,10 +39,20 @@ option_group {prefix => 'runner', category => "Runner Options"} => sub {
         type           => 's',
         short          => 'j',
         alt            => ['jobs'],
-        description    => 'Set the number of concurrent jobs to run (Default: 1)',
+        description    => 'Set the number of concurrent jobs to run',
         env_vars       => [qw/YATH_JOB_COUNT T2_HARNESS_JOB_COUNT HARNESS_JOB_COUNT/],
         clear_env_vars => 1,
-        default        => 1,
+        default        => undef,
+
+        action => sub {
+            my ($prefix, $field, $raw, $norm, $slot, $settings, $handler) = @_;
+
+            $$slot = $norm;
+
+            require Test2::Harness::Runner::Resource::JobCount;
+            unshift @{$settings->runner->resources} => ('Test2::Harness::Runner::Resource::JobCount')
+                unless grep { $_ eq 'Test2::Harness::Runner::Resource::JobCount' } @{$settings->runner->resources};
+        },
     );
 
     option dump_depmap => (
@@ -299,7 +309,7 @@ Can be specified multiple times
 
 =item --no-job-count
 
-Set the number of concurrent jobs to run (Default: 1)
+Set the number of concurrent jobs to run
 
 Can also be set with the following environment variables: C<YATH_JOB_COUNT>, C<T2_HARNESS_JOB_COUNT>, C<HARNESS_JOB_COUNT>
 

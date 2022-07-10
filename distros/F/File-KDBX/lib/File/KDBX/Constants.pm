@@ -15,7 +15,7 @@ use File::KDBX::Util qw(int64);
 use Scalar::Util qw(dualvar);
 use namespace::clean -except => 'import';
 
-our $VERSION = '0.903'; # VERSION
+our $VERSION = '0.904'; # VERSION
 
 BEGIN {
     my %CONSTANTS = (
@@ -348,7 +348,7 @@ File::KDBX::Constants - All the KDBX-related constants you could ever want
 
 =head1 VERSION
 
-version 0.903
+version 0.904
 
 =head1 SYNOPSIS
 

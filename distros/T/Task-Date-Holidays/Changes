@@ -1,5 +1,9 @@
 Changes file for Task-Date-Holidays
 
+0.12 2022-07-08 Bug fix release, update not required
+
+- Corrected tests, which had not been updated accordingly
+
 0.11 2022-03-08 Feature release, update not required
 
 - Specified requirement for Date::Holidays::FR to be version 0.04

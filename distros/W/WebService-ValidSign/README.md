@@ -52,12 +52,10 @@
 # DESCRIPTION
 
 A module that uses the ValidSign API to create/upload and sign documents.
-This module is in ALPHA state and is subject to change at any given moment
-without notice.
 
 # ATTRIBUTES
 
-This module extends [WebService::ValidSign::API::Constructor](https://metacpan.org/pod/WebService::ValidSign::API::Constructor) and all of its
+This module extends [WebService::ValidSign::API::Constructor](https://metacpan.org/pod/WebService%3A%3AValidSign%3A%3AAPI%3A%3AConstructor) and all of its
 attributes.
 
 - secret
@@ -70,23 +68,23 @@ attributes.
 
 - lwp
 
-    An [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) object.
+    An [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) object.
 
 - auth
 
-    An [WebService::ValidSign::API::Auth](https://metacpan.org/pod/WebService::ValidSign::API::Auth) object. Build for you.
+    An [WebService::ValidSign::API::Auth](https://metacpan.org/pod/WebService%3A%3AValidSign%3A%3AAPI%3A%3AAuth) object. Build for you.
 
 - package
 
-    An [WebService::ValidSign::API::DocumentPackage](https://metacpan.org/pod/WebService::ValidSign::API::DocumentPackage) object. Build for you.
+    An [WebService::ValidSign::API::DocumentPackage](https://metacpan.org/pod/WebService%3A%3AValidSign%3A%3AAPI%3A%3ADocumentPackage) object. Build for you.
 
 - account
 
-    An [WebService::ValidSign::API::Account](https://metacpan.org/pod/WebService::ValidSign::API::Account) object. Build for you.
+    An [WebService::ValidSign::API::Account](https://metacpan.org/pod/WebService%3A%3AValidSign%3A%3AAPI%3A%3AAccount) object. Build for you.
 
 # BUGS
 
-[JSON::XS](https://metacpan.org/pod/JSON::XS) 4.01 has a bug that causes JSON serialization errors. Please
+[JSON::XS](https://metacpan.org/pod/JSON%3A%3AXS) 4.01 has a bug that causes JSON serialization errors. Please
 upgrade or downgrade JSON::XS where needed.
 
 # ACKNOWLEDGEMENTS

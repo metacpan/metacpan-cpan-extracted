@@ -3,12 +3,12 @@
 use strict;
 use warnings;
 
-use Wikibase::Datatype::Utils qw(check_lexeme);
+use Wikibase::Datatype::Utils qw(check_entity);
 
 my $self = {
-        'key' => 'L123',
+        'key' => 'Q123',
 };
-check_lexeme($self, 'key');
+check_entity($self, 'key');
 
 # Print out.
 print "ok\n";

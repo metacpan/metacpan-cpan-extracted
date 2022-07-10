@@ -5,10 +5,10 @@ use warnings;
 package Sub::HandlesVia::Toolkit::Moo;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.028';
+our $VERSION   = '0.031';
 
-use Sub::HandlesVia::Toolkit;
-our @ISA = 'Sub::HandlesVia::Toolkit';
+use Sub::HandlesVia::Mite;
+extends 'Sub::HandlesVia::Toolkit';
 
 use Types::Standard qw( is_ArrayRef is_Str assert_HashRef is_CodeRef is_Undef );
 use Types::Standard qw( ArrayRef HashRef Str Num Int CodeRef Bool );

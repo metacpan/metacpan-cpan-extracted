@@ -1,3 +1,13 @@
+ROADMAP:
+-------
+    2.403: true type fonts
+    2.404: better documentation in package Chart::Setting::Legacy.pod
+    2.405: better legend drawing with additional settings and logos
+
+    2.5  smooth graphics
+    3.0: SVG backend
+
+
 TODO's:
 -------
 
@@ -17,6 +27,10 @@ General:
 - 3-D charts
 
 - add optional desciption text maybe with a picture (logo) ?
+
+- svg, html and webp backend?
+
+
 
 Plottype specific:
 ------------------

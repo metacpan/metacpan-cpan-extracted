@@ -1,5 +1,13 @@
 Revision history for Perl extension App-Greple-subst-desumasu
 
+0.04 2022-07-08T03:28:03Z
+
+    - 「です -> だ」より「です -> である」を優先
+
+0.03 2022-07-08T01:06:57Z
+
+    - 「である -> です」ルールを追加
+
 0.02 2022-04-29T07:11:30Z
 
     - update test and workflow

@@ -5,13 +5,17 @@ use warnings;
 
 use Error::Pure qw(err);
 use Mo qw(build default is);
-use Mo::utils qw(check_array_object);
+use Mo::utils qw(check_array_object check_number);
 use Wikibase::Datatype::Utils qw(check_entity);
 
-our $VERSION = 0.16;
+our $VERSION = 0.19;
 
 has forms => (
 	default => [],
+	is => 'ro',
+);
+
+has id => (
 	is => 'ro',
 );
 
@@ -38,6 +42,10 @@ has modified => (
 
 has ns => (
 	default => 146,
+	is => 'ro',
+);
+
+has page_id => (
 	is => 'ro',
 );
 
@@ -72,6 +80,9 @@ sub BUILD {
 	# Check language.
 	check_entity($self, 'language');
 
+	# Check page id.
+	check_number($self, 'page_id');
+
 	# Check senses.
 	check_array_object($self, 'senses', 'Wikibase::Datatype::Sense',
 		'Sense');
@@ -101,12 +112,14 @@ Wikibase::Datatype::Lexeme - Wikibase lexeme datatype.
 
  my $obj = Wikibase::Datatype::Lexeme->new(%params);
  my $forms_ar = $obj->forms;
+ my $id = $obj->id;
  my $language = $obj->language;
  my $lastrevid = $obj->lastrevid;
  my $lemmas_ar = $obj->lemmas;
  my $lexical_category = $obj->lexical_category;
  my $modified = $obj->modified;
  my $ns = $obj->ns;
+ my $page_id = $obj->page_id;
  my $senses_ar = $obj->senses;
  my $statements_ar = $obj->statements;
  my $title = $obj->title;
@@ -131,6 +144,11 @@ Returns instance of object.
 
 Forms.
 Reference to array with Wikibase::Datatype::Form instances.
+Parameter is optional.
+
+=item * C<id>
+
+Id.
 Parameter is optional.
 
 =item * C<language>
@@ -164,6 +182,11 @@ Parameter is optional.
 Namespace.
 Default value is 146.
 
+=item * C<page_id>
+
+Page id. Numeric value.
+Parameter is optional.
+
 =item * C<senses>
 
 Senses.
@@ -190,6 +213,14 @@ Parameter is optional.
 Get forms.
 
 Returns reference to array with Wikibase::Datatype::Form instances.
+
+=head2 C<id>
+
+ my $id = $obj->id;
+
+Get id.
+
+Returns string.
 
 =head2 C<language>
 
@@ -236,6 +267,14 @@ Returns string.
  my $ns = $obj->ns;
 
 Get namespace.
+
+Returns number.
+
+=head2 C<page_id>
+
+ my $page_id = $obj->page_id;
+
+Get page id.
 
 Returns number.
 
@@ -391,6 +430,7 @@ Returns string.
 
  # Main item.
  my $obj = Wikibase::Datatype::Lexeme->new(
+         'id' => 'L469',
          'lemmas' => [
                  Wikibase::Datatype::Value::Monolingual->new(
                          'language' => 'cs',
@@ -406,6 +446,7 @@ Returns string.
 
  # Print out.
  print "Title: ".$obj->title."\n";
+ print 'Id: '.$obj->id."\n";
  print "Statements:\n";
  foreach my $statement (@{$obj->statements}) {
          print "\tStatement:\n";
@@ -427,6 +468,7 @@ Returns string.
 
  # Output:
  # Title: Lexeme:L469
+ # Id: L469
  # Statements:
  #         Statement:
  #                 P31 -> Q5
@@ -475,12 +517,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020-2022
+© 2020-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.16
+0.19
 
 =cut

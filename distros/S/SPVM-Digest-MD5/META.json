@@ -16,7 +16,8 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "perl_impl"
       ]
    },
    "prereqs" : {
@@ -35,11 +36,6 @@
       }
    },
    "release_status" : "stable",
-   "resources" : {
-      "repository" : {
-         "type" : "git"
-      }
-   },
-   "version" : "0.01",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

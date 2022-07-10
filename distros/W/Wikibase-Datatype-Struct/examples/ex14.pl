@@ -3,57 +3,60 @@
 use strict;
 use warnings;
 
-use Wikibase::Datatype::Struct::Utils qw(struct2snaks_array_ref);
+use Wikibase::Datatype::Struct::MediainfoStatement qw(struct2obj);
 
+# Item structure.
 my $struct_hr = {
-        'snaks' => {
-                'P31' => [{
-                        'datatype' => 'wikibase-item',
+        'id' => 'M123$00C04D2A-49AF-40C2-9930-C551916887E8',
+        'mainsnak' => {
+                'datavalue' => {
+                        'type' => 'wikibase-entityid',
+                        'value' => {
+                                'entity-type' => 'item',
+                                'id' => 'Q5',
+                                'numeric-id' => 5,
+                        },
+                },
+                'property' => 'P31',
+                'snaktype' => 'value',
+        },
+        'qualifiers' => {
+                'P642' => [{
                         'datavalue' => {
                                 'type' => 'wikibase-entityid',
                                 'value' => {
                                         'entity-type' => 'item',
-                                        'id' => 'Q5',
-                                        'numeric-id' => 5,
+                                        'id' => 'Q474741',
+                                        'numeric-id' => 474741,
                                 },
                         },
-                        'property' => 'P31',
-                        'snaktype' => 'value',
-
-                }],
-                'P2534' => [{
-                        'datatype' => 'math',
-                        'datavalue' => {
-                                'type' => 'string',
-                                'value' => 'E = m c^2',
-                        },
-                        'property' => 'P2534',
+                        'property' => 'P642',
                         'snaktype' => 'value',
                 }],
         },
-        'snaks-order' => [
-                'P31',
-                'P2534',
+        'qualifiers-order' => [
+                'P642',
         ],
+        'rank' => 'normal',
+        'type' => 'statement',
 };
 
-# Convert snaks structure to list of Snak objects.
-my $snaks_ar = struct2snaks_array_ref($struct_hr, 'snaks');
+# Get object.
+my $obj = struct2obj($struct_hr);
 
-# Print out. 
-foreach my $snak (@{$snaks_ar}) {
-        print 'Property: '.$snak->property."\n";
-        print 'Type: '.$snak->datatype."\n";
-        print 'Value: '.$snak->datavalue->value."\n";
-        print "\n";
+# Print out.
+print 'Id: '.$obj->id."\n";
+print 'Statements: '.$obj->snak->property.' -> '.$obj->snak->datavalue->value."\n";
+print "Qualifiers:\n";
+foreach my $property_snak (@{$obj->property_snaks}) {
+        print "\t".$property_snak->property.' -> '.
+                $property_snak->datavalue->value."\n";
 }
+print 'Rank: '.$obj->rank."\n";
 
 # Output:
-# Property: P31
-# Type: wikibase-item
-# Value: Q5
-#
-# Property: P2534
-# Type: math
-# Value: E = m c^2
-#
+# Id: M123$00C04D2A-49AF-40C2-9930-C551916887E8
+# Statements: P31 -> Q5
+# Qualifiers:
+#         P642 -> Q474741
+# Rank: normal

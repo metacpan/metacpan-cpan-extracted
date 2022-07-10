@@ -29,7 +29,8 @@ no_index:
 requires:
   CSS::Struct::Output::Raw: 0
   Plack::Util::Accessor: 0
-  Tags::HTML::Page::Begin: 0.1
+  Tags::HTML::Login::Button: 0
+  Tags::HTML::Page::Begin: 0.13
   Tags::HTML::Page::End: 0.04
   Tags::Output::Raw: 0
   Unicode::UTF8: 0
@@ -39,4 +40,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Plack-App-Login
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Plack-App-Login
-version: '0.03'
+version: '0.04'

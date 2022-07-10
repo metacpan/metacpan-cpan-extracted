@@ -1,5 +1,9 @@
 NetAddr::MAC - A MAC address object
 
+0.98    2022-07-08
+        - Relicense to MIT
+        - No other changes
+
 0.97    2020-06-28
         - Set minimum perl version to 5.10
         - No other changes

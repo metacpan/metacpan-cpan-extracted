@@ -19,7 +19,7 @@ is_deeply(
 	{
 		'value' => {
 			'amount' => '+10',
-			'unit' => 1,
+			'unit' => '1',
 		},
 		'type' => 'quantity',
 	},

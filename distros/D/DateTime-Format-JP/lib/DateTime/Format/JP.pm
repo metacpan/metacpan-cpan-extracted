@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Japanese DateTime Parser/Formatter - ~/lib/DateTime/Format/JP.pm
-## Version v0.1.2
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.1.3
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/18
-## Modified 2022/07/05
+## Modified 2022/07/07
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -23,7 +23,7 @@ BEGIN
         $WEEKDAYS_RE $TIME_RE $TIME_ZENKAKU_RE $TIME_KANJI_RE $ERROR
     );
     use Nice::Try;
-    our $VERSION = 'v0.1.2';
+    our $VERSION = 'v0.1.3';
     our $DICT = [];
     our $ZENKAKU_NUMBERS = [];
     our $KANJI_NUMBERS   = [];
@@ -826,7 +826,6 @@ sub kanji_to_romaji
         my $n = $self->_get_pos_in_array( $KANJI_NUMBERS, $num );
         $rv += $n;
     }
-    $self->message( 3, "Returning '$rv'." );
     return( $rv );
 }
 
@@ -956,11 +955,9 @@ sub parse_datetime
     my $self = shift( @_ );
     my $str  = shift( @_ );
     use utf8;
-    $self->message( 3, "Checking datetime '$str'." );
     if( $str =~ /$DATETIME_PATTERN_1_RE/ )
     {
         my $re = { %+ };
-        $self->message( 3, "Pattern type 1 matched for '$str'." );
         if( $re->{era} )
         {
             my $era = $self->lookup_era( $re->{era} ) || 
@@ -994,7 +991,6 @@ sub parse_datetime
     elsif( $str =~ /$DATETIME_PATTERN_2_RE/ )
     {
         my $re = { %+ };
-        $self->message( 3, "Pattern type 2 matched for '$str'." );
         if( $re->{era} )
         {
             my $era = $self->lookup_era( $re->{era} ) || 
@@ -1005,7 +1001,6 @@ sub parse_datetime
         {
             $re->{year} = delete( $re->{gregorian_year} );
         }
-        $self->message( 3, "Got here." );
         $self->_dump( $re );
         return( $self->make_datetime( $re ) );
     }
@@ -1013,7 +1008,6 @@ sub parse_datetime
     elsif( $str =~ /$DATETIME_PATTERN_3_RE/ )
     {
         my $re = { %+ };
-        $self->message( 3, "Pattern type 3 matched for '$str'." );
         if( $re->{era} )
         {
             my $era = $self->lookup_era( $re->{era} ) || 
@@ -1043,7 +1037,6 @@ sub parse_datetime
     }
     else
     {
-        $self->message( 3, "Nothing matched for '$str'." );
         return( $self->error( "Unknown datetime pattern \"$str\"" ) );
     }
 }
@@ -1053,13 +1046,11 @@ sub romaji_to_kanji
     my $self = shift( @_ );
     my $num  = shift( @_ );
     return( $num ) if( !defined( $num ) || !length( $num ) );
-    # $self->message( 3, "Converting '$num'." );
     use utf8;
     my $buff = [];
     $num =~ s/[^0-9]+//g;
     if( $num =~ s/^(\d)(\d{3})$/$2/ )
     {
-        # $self->message( 3, "Adding '", $KANJI_NUMBERS->[ $1 ], "千'. String is now '$num'" );
         push( @$buff, ( $1 > 1 ? $KANJI_NUMBERS->[ $1 ] : () ), '千' );
     }
     $num =~ s/^0+([1-9][0-9]*)$/$1/;
@@ -1068,7 +1059,6 @@ sub romaji_to_kanji
     {
         if( $num =~ s/^(\d)(\d{2})$/$2/ )
         {
-            # $self->message( 3, "Adding '", $KANJI_NUMBERS->[ $1 ], "百'. String is now '$num'" );
             push( @$buff, ( $1 > 1 ? $KANJI_NUMBERS->[ $1 ] : () ), '百' );
         }
         $num =~ s/^0+([1-9][0-9]*)$/$1/;
@@ -1077,11 +1067,9 @@ sub romaji_to_kanji
         {
             if( $num =~ s/^(\d)(\d)$/$2/ )
             {
-                # $self->message( 3, "Adding '", $KANJI_NUMBERS->[ $1 ], "十'. String is now '$num'" );
                 push( @$buff, ( $1 > 1 ? $KANJI_NUMBERS->[ $1 ] : () ), '十' );
             }
             $num = '' if( $num == 0 );
-            # $self->message( 3, "Remains '$num'" );
 
             unless( !length( $num ) || $num =~ /^0+$/ )
             {
@@ -1163,13 +1151,11 @@ sub _get_pos_in_array
     my $self  = shift( @_ );
     my $array = shift( @_ );
     my $num   = shift( @_ );
-    $self->message( 3, "Checking '$num' among '", join( "', '", @$array ), "'." );
     return( $self->error( "I was expecting an array reference, but I got \"$array\"." ) ) if( ref( $array ) ne 'ARRAY' );
     return( $self->error( "Array provided is empty!" ) ) if( !scalar( @$array ) );
     return( $self->error( "No value provided to transcode!" ) ) if( !defined( $num ) || !length( $num ) );
     my $buff  = [];
     my( $index1 ) = grep{ $num eq $array->[$_] } 0..$#$array;
-    $self->message( 3, "    Searching for '$num' resulted in offset '$index1'." ) if( length( $index1 ) );
     return( $index1 ) if( length( $index1 ) );
     
     for my $c ( split( //, $num ) )
@@ -1180,11 +1166,9 @@ sub _get_pos_in_array
             next;
         }
         my( $index ) = grep{ $c eq $array->[$_] } 0..$#$array;
-        $self->message( 3, "    Searching for '$c' resulted in offset '$index'." );
         return( $self->error( "Failed to find the corresponding entry for \"$c\"." ) ) if( !length( $index ) );
         push( @$buff, $index );
     }
-    $self->message( 3, "Returning '", join( '', @$buff ), "'." );
     return( join( '', @$buff ) );
 }
 
@@ -1219,7 +1203,7 @@ sub _set_get_zenkaku
     return( $self->{ $field } );
 }
 
-# XXX DateTime::Format::JP::Era class
+# NOTE: DateTime::Format::JP::Era class
 {
     package
         DateTime::Format::JP::Era;
@@ -1232,12 +1216,11 @@ sub _set_get_zenkaku
         use DateTime;
         use DateTime::TimeZone;
         use Nice::Try;
-        eval
-        {
-            my $tz = DateTime::TimeZone->new( name => 'local' );
-        };
-        use constant HAS_LOCAL_TZ => ( $@ ? 0 : 1 );
+        use constant HAS_LOCAL_TZ => ( eval( qq{DateTime::TimeZone->new( name => 'local' );} ) ? 1 : 0 );
     };
+
+    use strict;
+    use warnings;
     
     # my $era = DateTime::Format::JP::Era->new( $era_dictionary_hash_ref );
     sub new { return( bless( $_[1] => ( ref( $_[0] ) || $_[0] ) ) ); }
@@ -1248,7 +1231,7 @@ sub _set_get_zenkaku
         if( @_ )
         {
             $self->{error} = $ERROR = join( '', map( ( ref( $_ ) eq 'CODE' ) ? $_->() : $_, @_ ) );
-            warnings::warn( $ERROR, "\n" ) if( warnings::enabled() );
+            warnings::warn( $ERROR, "\n" ) if( warnings::enabled( 'DateTime::Format::JP' ) );
             return;
         }
         return( ref( $self ) ? $self->{error} : $ERROR );
@@ -1336,7 +1319,7 @@ DateTime::Format::JP - Japanese DateTime Parser and Formatter
 
 =head1 VERSION
 
-    v0.1.2
+    v0.1.3
 
 =head1 DESCRIPTION
 

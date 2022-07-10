@@ -6,11 +6,10 @@ use warnings;
 
 use Test::Shared::Fixture::Wikibase::Datatype::Form::Wikidata::DogCzechSingular;
 use Test::Shared::Fixture::Wikibase::Datatype::Sense::Wikidata::Dog;
-use Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::InstanceOf::Human;
-use Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::SexOrGender::Male;
+use Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::GrammaticalGender::Masculine;
 use Wikibase::Datatype::Value::Monolingual;
 
-our $VERSION = 0.16;
+our $VERSION = 0.19;
 
 sub new {
 	my $class = shift;
@@ -19,6 +18,7 @@ sub new {
 		'forms' => [
 			Test::Shared::Fixture::Wikibase::Datatype::Form::Wikidata::DogCzechSingular->new,
 		],
+		'id' => 'L469',
 		'language' => 'Q9056',
 		'lastrevid' => 1428556087,
 		'lexical_category' => 'Q1084',
@@ -30,12 +30,12 @@ sub new {
 		],
 		'modified' => '2022-06-24T12:42:10Z',
 		'ns' => 146,
+		'page_id' => 54393954,
 		'senses' => [
 			Test::Shared::Fixture::Wikibase::Datatype::Sense::Wikidata::Dog->new,
 		],
 		'statements' => [
-			Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::InstanceOf::Human->new,
-			Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::SexOrGender::Male->new,
+			Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::GrammaticalGender::Masculine->new,
 		],
 		'title' => 'Lexeme:L469',
 	);

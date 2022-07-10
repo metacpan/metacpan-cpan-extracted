@@ -47,6 +47,7 @@ print $tags->flush;
 #     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 #     <meta name="generator" content=
 #       "Perl module: Tags::HTML::Page::Begin, Version: 0.06" />
+#     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 #     <title>
 #       Page title
 #     </title>

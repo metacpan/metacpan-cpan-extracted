@@ -3,11 +3,11 @@
 use strict;
 use warnings;
 
-use Wikibase::Datatype::Value::Item;
+use Wikibase::Datatype::Value::Property;
 
 # Object.
-my $obj = Wikibase::Datatype::Value::Item->new(
-        'value' => 'Q123',
+my $obj = Wikibase::Datatype::Value::Property->new(
+        'value' => 'P123',
 );
 
 # Get value.
@@ -21,5 +21,5 @@ print "Type: $type\n";
 print "Value: $value\n";
 
 # Output:
-# Type: item
-# Value: Q123
+# Type: property
+# Value: P123

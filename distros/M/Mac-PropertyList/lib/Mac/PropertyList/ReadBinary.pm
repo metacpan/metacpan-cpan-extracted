@@ -13,7 +13,9 @@ use MIME::Base64      qw(decode_base64);
 use POSIX             qw(SEEK_END SEEK_SET);
 use XML::Entities     ();
 
-our $VERSION = '1.503';
+our $VERSION = '1.504';
+
+my $Debug = $ENV{PLIST_DEBUG} || 0;
 
 __PACKAGE__->_run( @ARGV ) unless caller;
 
@@ -366,25 +368,25 @@ my $type_readers = {
 
 sub _read_object {
 	my $self = shift;
-say "Reading object!";
+    say "Reading object!" if $Debug;
     my $buffer;
-    say "\tTELL: ", tell( $self->_fh );
+    say "\tTELL: ", tell( $self->_fh ) if $Debug;
     croak "read() failed while trying to get type byte! $!"
     	unless read( $self->_fh, $buffer, 1) == 1;
 
     my $length = unpack( "C*", $buffer ) & 0x0F;
-say "\tlength is $length";
+    say "\tlength is $length" if $Debug;
     $buffer    = unpack "H*", $buffer;
-    say "\t", join '', map { sprintf '%02x', ord } split //, $buffer;
+    say "\t", join '', map { sprintf '%02x', ord } split //, $buffer if $Debug;
     my $type   = substr $buffer, 0, 1;
-say "\ttype is $type";
+    say "\ttype is $type" if $Debug;
 
 	$length = $self->_read_object->value if $type ne "0" && $length == 15;
 
 	my $sub = $type_readers->{ $type };
 	my $result = eval { $sub->( $self, $length ) };
 	croak "$@" if $@;
-say "RESULT: ", Dumper($result);
+    say "RESULT: ", Dumper($result) if $Debug;
     return $result;
 	}
 

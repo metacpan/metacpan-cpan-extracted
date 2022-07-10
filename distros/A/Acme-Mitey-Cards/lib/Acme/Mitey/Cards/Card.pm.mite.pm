@@ -8,6 +8,7 @@
 
     BEGIN {
         *bare  = \&Acme::Mitey::Cards::Mite::bare;
+        *carp  = \&Acme::Mitey::Cards::Mite::carp;
         *false = \&Acme::Mitey::Cards::Mite::false;
         *lazy  = \&Acme::Mitey::Cards::Mite::lazy;
         *ro    = \&Acme::Mitey::Cards::Mite::ro;
@@ -26,7 +27,7 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Initialize attributes
+        # Attribute: deck
         if ( exists $args->{"deck"} ) {
             (
                 do {
@@ -35,13 +36,15 @@
                       and $args->{"deck"}->isa(q[Acme::Mitey::Cards::Deck]);
                 }
               )
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
-                "deck", "Deck" );
+              or Acme::Mitey::Cards::Mite::croak
+              "Type check failed in constructor: %s should be %s", "deck",
+              "Deck";
             $self->{"deck"} = $args->{"deck"};
         }
-        require Scalar::Util && Scalar::Util::weaken( $self->{"deck"} );
+        require Scalar::Util && Scalar::Util::weaken( $self->{"deck"} )
+          if exists $self->{"deck"};
+
+        # Attribute: reverse
         if ( exists $args->{"reverse"} ) {
             do {
 
@@ -51,18 +54,16 @@
                       or ref( \( my $val = $args->{"reverse"} ) ) eq 'SCALAR';
                 }
               }
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
-                "reverse", "Str" );
+              or Acme::Mitey::Cards::Mite::croak
+              "Type check failed in constructor: %s should be %s", "reverse",
+              "Str";
             $self->{"reverse"} = $args->{"reverse"};
         }
 
         # Enforce strict constructor
         my @unknown = grep not(/\A(?:deck|reverse)\z/), keys %{$args};
         @unknown
-          and require Carp
-          and Carp::croak(
+          and Acme::Mitey::Cards::Mite::croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         # Call BUILD methods
@@ -141,8 +142,8 @@
     else {
         *deck = sub {
             @_ > 1
-              ? require Carp
-              && Carp::croak("deck is a read-only attribute of @{[ref $_[0]]}")
+              ? Acme::Mitey::Cards::Mite::croak(
+                "deck is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"deck"};
         };
     }
@@ -150,8 +151,8 @@
     # Accessors for reverse
     sub reverse {
         @_ > 1
-          ? require Carp
-          && Carp::croak("reverse is a read-only attribute of @{[ref $_[0]]}")
+          ? Acme::Mitey::Cards::Mite::croak(
+            "reverse is a read-only attribute of @{[ref $_[0]]}")
           : (
             exists( $_[0]{"reverse"} ) ? $_[0]{"reverse"} : (
                 $_[0]{"reverse"} = do {
@@ -165,14 +166,9 @@
                               'SCALAR';
                         }
                       }
-                      or do {
-                        require Carp;
-                        Carp::croak(
-                            sprintf
-                              "Type check failed in default: %s should be %s",
-                            "reverse", "Str"
-                        );
-                      };
+                      or Acme::Mitey::Cards::Mite::croak(
+                        "Type check failed in default: %s should be %s",
+                        "reverse", "Str" );
                     $default_value;
                 }
             )

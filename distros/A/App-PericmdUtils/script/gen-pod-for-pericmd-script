@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-14'; # DATE
+our $DATE = '2022-05-27'; # DATE
 our $DIST = 'App-PericmdUtils'; # DIST
-our $VERSION = '0.053'; # VERSION
+our $VERSION = '0.054'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Perinci/CmdLine/POD/gen_pod_for_pericmd_script",
@@ -36,7 +36,7 @@ gen-pod-for-pericmd-script - Generate POD for Perinci::CmdLine-based CLI script
 
 =head1 VERSION
 
-This document describes version 0.053 of gen-pod-for-pericmd-script (from Perl distribution App-PericmdUtils), released on 2022-05-14.
+This document describes version 0.054 of gen-pod-for-pericmd-script (from Perl distribution App-PericmdUtils), released on 2022-05-27.
 
 =head1 SYNOPSIS
 
@@ -96,13 +96,37 @@ generated.
 
 Set path to configuration file.
 
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
 =item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+    [profile=dev]
+    username=foo
+    pass=beaver
+
+    [profile=production]
+    username=bar
+    pass=honey
+
+When you specify `--config-profile=dev`, `username` will be set to `foo` and
+`password` to `beaver`. When you specify `--config-profile=production`,
+`username` will be set to `bar` and `password` to `honey`.
+
+
 =item B<--no-config>, B<-C>
 
 Do not use any configuration file.
+
+If you specify `--no-config`, the application will not read any configuration
+file.
+
 
 =back
 
@@ -113,6 +137,10 @@ Do not use any configuration file.
 =item B<--no-env>
 
 Do not read environment for default options.
+
+If you specify `--no-env`, the application wil not read any environment
+variable.
+
 
 =back
 
@@ -127,6 +155,12 @@ Choose output format, e.g. json, text.
 Default value:
 
  undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
 
 =item B<--gen-subcommand>=I<s>
 
@@ -173,9 +207,18 @@ this option for the main CLI POD, then generate each subcommand's POD with the
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. `less` is chosen.
+
+
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 

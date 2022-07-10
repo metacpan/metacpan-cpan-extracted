@@ -1,14 +1,14 @@
-# Copyrights 2012-2019 by [Mark Overmeer].
+# Copyrights 2012-2022 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
+# Pod stripped from pm file by OODoc 2.03.
 # This code is part of distribution Apache-Solr.  Meta-POD processed with
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Apache::Solr;
 use vars '$VERSION';
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 
 use warnings;
@@ -83,13 +83,15 @@ sub server(;$)
     $self->{AS_server} = $uri;
 }
 
+
 #--------------------------
 
 sub select(@)
 {   my $self = shift;
-    $self->_select(scalar $self->expandSelect(@_));
+    my $args = @_ && ref $_[0] eq 'HASH' ? shift : {};
+    $self->_select($args, scalar $self->expandSelect(@_));
 }
-sub _select(@) {panic "not extended"}
+sub _select($$) {panic "not extended"}
 
 
 sub queryTerms(@)

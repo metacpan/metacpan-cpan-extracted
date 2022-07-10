@@ -1,5 +1,11 @@
 Revision history for Perl extension Convert::BulkDecoder.
 
+1.04  Sat Jul 09 23:11:57 2022
+
+        * Release 1.04
+
+	* Fiddled with tests to make them succeed,
+
 1.03  Sun Jun 19 17:23:00 2005
 
         * Release 1.03

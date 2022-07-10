@@ -151,7 +151,8 @@ for my $r (
 	DataValue_status => 'Good',
 	DataValue_hasValue => 1,
 	DataValue_hasStatus => '',
-	DataValue_hasSourceTimestamp => '',
+	DataValue_hasSourceTimestamp =>
+	    ($r->{attribute} == ATTRIBUTEID_VALUE ? re(qr/^(1|)$/) : ''),
 	DataValue_hasServerTimestamp => '',
 	DataValue_hasSourcePicoseconds => '',
 	DataValue_hasServerPicoseconds => '',

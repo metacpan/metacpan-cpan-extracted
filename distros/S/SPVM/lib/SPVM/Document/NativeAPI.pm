@@ -2046,7 +2046,7 @@ L<SPVM::Document::NativeAPI::Allocator>
 
 =head1 Constant Values
 
-=head2 Constant Values of Basic Type IDs
+=head2 Basic Type IDs
 
   0  SPVM_NATIVE_C_BASIC_TYPE_ID_UNKNOWN
   1  SPVM_NATIVE_C_BASIC_TYPE_ID_UNDEF
@@ -2059,13 +2059,14 @@ L<SPVM::Document::NativeAPI::Allocator>
   8  SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE
   9  SPVM_NATIVE_C_BASIC_TYPE_ID_STRING
   10 SPVM_NATIVE_C_BASIC_TYPE_ID_ANY_OBJECT
-  11 SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE_OBJECT
-  12 SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT_OBJECT
-  13 SPVM_NATIVE_C_BASIC_TYPE_ID_INT_OBJECT
-  14 SPVM_NATIVE_C_BASIC_TYPE_ID_LONG_OBJECT
-  15 SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT_OBJECT
-  16 SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE_OBJECT
-  17 SPVM_NATIVE_C_BASIC_TYPE_ID_TYPE_CONVERSION_CONDITINAL_OBJECT
+  11 SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE_CLASS
+  12 SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT_CLASS
+  13 SPVM_NATIVE_C_BASIC_TYPE_ID_INT_CLASS
+  14 SPVM_NATIVE_C_BASIC_TYPE_ID_LONG_CLASS
+  15 SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT_CLASS
+  16 SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE_CLASS
+  17 SPVM_NATIVE_C_BASIC_TYPE_ID_BOOL_CLASS
+  18 SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS
 
 These IDs are permanently same for the binary compatibility after the future release C<v1.0>.
 
@@ -2113,33 +2114,37 @@ The basic type ID of C<string> type.
 
 The basic type ID of C<object> type.
 
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE_OBJECT
+=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE_CLASS
 
 The basic type ID of L<Byte|SPVM::Byte> type.
 
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT_OBJECT
+=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT_CLASS
 
 The basic type ID of L<Short|SPVM::Short> type.
 
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_INT_OBJECT
+=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_INT_CLASS
 
 The basic type ID of L<Int|SPVM::Int> type.
 
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_LONG_OBJECT
+=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_LONG_CLASS
 
 The basic type ID of L<Long|SPVM::Long> type.
 
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT_OBJECT
+=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT_CLASS
 
 The basic type ID of L<Float|SPVM::Float> type.
 
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE_OBJECT
+=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE_CLASS
 
 The basic type ID of L<Double|SPVM::Double> type.
 
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_TYPE_CONVERSION_CONDITINAL_OBJECT
+=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_BOOL_CLASS
 
 The basic type ID of L<BOOL|SPVM::BOOL> type.
+
+=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS
+
+The basic type ID of L<Error|SPVM::Error> type.
 
 =head2 Constant Values of Basic Type Categories
 
@@ -2195,6 +2200,20 @@ The basic type category for the interface types.
 =head3 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_ANY_OBJECT
 
 The basic type category for the any object type.
+
+=head2 Class IDs
+
+  1  SPVM_NATIVE_C_CLASS_ID_ERROR
+
+These IDs are permanently same for the binary compatibility after the future release C<v1.0>.
+
+=head3 SPVM_NATIVE_C_CLASS_ID_ERROR
+
+The class id of L<Error|SPVM::Error> class.
+
+=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_UNKNOWN
+
+The basic type is unknown.
 
 =head1 Utility Functions
 

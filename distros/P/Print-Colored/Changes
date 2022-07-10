@@ -1,5 +1,8 @@
 Revision history for perl distribution Print-Colored
 
+0.03 2022-07-09T09:23:06+0200
+  - Add Term::ReadKey to cpanfile
+
 0.02 2020-01-31T08:19:08+0100
   - New functions for password prompts
 

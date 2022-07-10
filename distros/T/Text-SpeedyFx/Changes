@@ -1,6 +1,11 @@
 Changelog for Text-SpeedyFx
 
-0.013 2021-06-13T05:44:35
+0.014 2022-07-08T10:06:05
+ - isWORDCHAR_utf8_safe() / toLOWER_utf8_safe() are actually available
+   since Perl v5.26 (Stanislaw Pusep)
+ - eg/benchmark.pl improvements (Stanislaw Pusep)
+
+0.013 2021-06-13T05:43:30
  - Drop the dependency on List::MoreUtils (Stanislaw Pusep)
  - Regenerated README.pod (Stanislaw Pusep)
  - Bump copyright year (Stanislaw Pusep)

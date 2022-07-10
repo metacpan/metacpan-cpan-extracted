@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '1.13';
+$VERSION = '1.14';
 
 use Carp;
 use Net::DNS;
@@ -111,9 +111,10 @@ sub send {
 	$self->_finalise_config;
 	$self->_reset_errorstring;
 
-	my ($query) = $self->_make_query_packet(@_)->question;
-	my $result = $self->{ub_ctx}->ub_resolve( $query->name, $query->{qtype}, $query->{qclass} );
-	return $self->_decode_result($result);
+	my $query = $self->_make_query_packet(@_);
+	my ($q)	  = $query->question;
+	my $reply = $self->{ub_ctx}->ub_resolve( $q->name, $q->{qtype}, $q->{qclass} );
+	return $self->_decode_result( $reply, $query->header->id );
 }
 
 sub bgsend {
@@ -121,8 +122,9 @@ sub bgsend {
 	$self->_finalise_config;
 	$self->_reset_errorstring;
 
-	my ($query) = $self->_make_query_packet(@_)->question;
-	return $self->{ub_ctx}->ub_resolve_async( $query->name, $query->{qtype}, $query->{qclass} );
+	my $query = $self->_make_query_packet(@_);
+	my ($q) = $query->question;
+	return $self->{ub_ctx}->ub_resolve_async( $q->name, $q->{qtype}, $q->{qclass}, $query->header->id );
 }
 
 sub bgbusy {
@@ -143,7 +145,7 @@ sub bgread {
 	my $async_id = $handle->async_id;
 	$self->errorstring( $handle->err );
 	my $result = $handle->result;
-	return $self->_decode_result($result);
+	return $self->_decode_result( $result, $async_id );
 }
 
 
@@ -400,7 +402,7 @@ sub print {
 
 
 sub _decode_result {
-	my ( $self, $result ) = @_;
+	my ( $self, $result, $qid ) = @_;
 
 	my $packet;
 	if ($result) {
@@ -408,6 +410,7 @@ sub _decode_result {
 		$self->errorstring( $result->why_bogus ) if $result->bogus;
 
 		my $buffer = $result->answer_packet || return;
+		substr( $buffer, 0, 2 ) = pack 'n', $qid;	# emulate Net::DNS resolver->send(packet)
 		$packet = Net::DNS::Packet->decode( \$buffer, $self->debug );
 		$self->errorstring($@);
 	}

@@ -64,7 +64,7 @@ needed_output(
   needed_output(
     undef, {
       $ok_str => 'Got into the passwd hook',
-      "Pubkey auth succeeded for '$port' with key" =>
+      "Pubkey auth succeeded for '$port' with " =>
           'Can login with public key auth',
     }
   );

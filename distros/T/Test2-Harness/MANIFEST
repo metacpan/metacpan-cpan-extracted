@@ -91,6 +91,7 @@ lib/Test2/Harness/Runner/Preloader.pm
 lib/Test2/Harness/Runner/Preloader/Stage.pm
 lib/Test2/Harness/Runner/Reloader.pm
 lib/Test2/Harness/Runner/Resource.pm
+lib/Test2/Harness/Runner/Resource/JobCount.pm
 lib/Test2/Harness/Runner/Run.pm
 lib/Test2/Harness/Runner/Spawn.pm
 lib/Test2/Harness/Runner/State.pm

@@ -1,5 +1,14 @@
 Revision history for JSON-Schema-Tiny
 
+0.017     2022-07-10 04:09:23Z
+         - fix 'experimental' prereq for older perls
+
+0.016     2022-07-09 18:29:49Z
+         - avoid new experimental warning on 5.35.9
+         - the "specification_version" configuration option now accepts
+           values without "draft" in the name, to facilitate a new naming
+           convention used for future specification versions
+
 0.015     2022-01-29 17:52:15Z
          - pod fixes
 

@@ -1,0 +1,49 @@
+Revision history for Perl extension App-diff2vba
+
+0.99 2022-07-08T05:27:23Z
+
+    - Release to CPAN.
+
+0.09 2021-11-20T04:25:18Z
+
+    - Use Getopt::EX::Hashed.
+
+0.08 2021-03-08T06:56:03Z
+
+    - Add --adjust option to set border adjustment width.
+    - Add --reverse option to generate reverse patch.
+    - Code is totally updated.
+
+0.07 2021-03-04T07:53:58Z
+
+    - Fix insane behavior of Options.AutoFormatAsYouTypeReplaceQuotes.
+
+0.06 2021-03-04T05:00:59Z
+
+    - Arrange off-by-one or two strings.
+
+0.05 2021-03-04T04:26:16Z
+
+    - Update document.
+    - Produce count numbers.
+
+0.04 2021-03-04T02:36:40Z
+
+    - Remove all pretty formatting portion.
+    - Produce dumb output only.
+    - Add some options.
+
+0.03 2021-02-12T03:46:32Z
+
+    - Move to Github Actions.
+    - Add --[no-]pretty option.
+    - Include sample docx in t/.
+
+0.02 2021-02-10T10:35:48Z
+
+    - Fix file handling error.
+
+0.01 2021-02-10T09:36:51Z
+
+    - initial release
+

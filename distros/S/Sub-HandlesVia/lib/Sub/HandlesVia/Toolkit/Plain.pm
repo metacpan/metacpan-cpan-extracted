@@ -5,10 +5,10 @@ use warnings;
 package Sub::HandlesVia::Toolkit::Plain;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.028';
+our $VERSION   = '0.031';
 
-use Sub::HandlesVia::Toolkit;
-our @ISA = 'Sub::HandlesVia::Toolkit';
+use Sub::HandlesVia::Mite;
+extends 'Sub::HandlesVia::Toolkit';
 
 1;
 

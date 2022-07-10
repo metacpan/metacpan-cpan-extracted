@@ -55,7 +55,7 @@ foreach my $name ( @subs ) {
 	ok( ! defined( &$name ), "$name is not defined yet" );
 	}
 
-Mac::PropertyList->import( ":all" );
+$class->import( ":all" );
 
 foreach my $name ( @subs ) {
 	ok( defined( &$name ), "$name is now defined yet" );

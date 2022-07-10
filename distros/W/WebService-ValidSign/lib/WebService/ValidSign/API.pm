@@ -1,6 +1,6 @@
 package WebService::ValidSign::API;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use Moo::Role;
 use namespace::autoclean;
 with 'WebService::ValidSign::API::Constructor';
@@ -39,7 +39,7 @@ sub get_endpoint {
     my ($self, @misc) = @_;
     my $uri = $self->endpoint->clone;
     my @path = $uri->path_segments;
-    @path = grep { defined $_ } @path, @misc;
+    @path = grep { defined $_ && length $_ } @path, @misc;
     $uri->path_segments(@path);
     return $uri;
 }
@@ -123,7 +123,7 @@ WebService::ValidSign::API - A REST API client for ValidSign
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

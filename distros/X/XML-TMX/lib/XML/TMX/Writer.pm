@@ -1,5 +1,5 @@
 package XML::TMX::Writer;
-$XML::TMX::Writer::VERSION = '0.36';
+$XML::TMX::Writer::VERSION = '0.39';
 # ABSTRACT: Perl extension for writing TMX files
 
 use 5.010;
@@ -126,7 +126,7 @@ sub add_tu {
         return;
     }
 
-    for my $key (qw'id datatype segtype srclang creationid creationdate') {
+    for my $key (qw'id datatype segtype srclang creationid creationdate changedate changeid') {
         if (exists($tuv{$key})) {
             $opt{$key} = $tuv{$key};
             delete $tuv{$key};
@@ -253,7 +253,7 @@ XML::TMX::Writer - Perl extension for writing TMX files
 
 =head1 VERSION
 
-version 0.36
+version 0.39
 
 =head1 SYNOPSIS
 

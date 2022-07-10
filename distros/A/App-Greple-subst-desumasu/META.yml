@@ -26,7 +26,7 @@ no_index:
 provides:
   App::Greple::subst::desumasu:
     file: lib/App/Greple/subst/desumasu.pm
-    version: '0.02'
+    version: '0.04'
 requires:
   App::Greple::subst: '0'
   File::Share: '0'
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/greple-subst-desumasu/issues
   homepage: https://github.com/kaz-utashiro/greple-subst-desumasu
   repository: git://github.com/kaz-utashiro/greple-subst-desumasu.git
-version: '0.02'
+version: '0.04'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

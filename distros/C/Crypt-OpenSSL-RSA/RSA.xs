@@ -13,6 +13,7 @@
 #include <openssl/rsa.h>
 #include <openssl/sha.h>
 #include <openssl/ssl.h>
+#include <openssl/evp.h>
 
 typedef struct
 {
@@ -28,6 +29,8 @@ typedef struct
 #define HASH_KEY "_Hash_Mode"
 
 #define PACKAGE_NAME "Crypt::OpenSSL::RSA"
+
+#define OLD_CRUFTY_SSL_VERSION (OPENSSL_VERSION_NUMBER < 0x10100000L || (defined(LIBRESSL_VERSION_NUMBER) && LIBRESSL_VERSION_NUMBER < 0x03050000fL))
 
 void croakSsl(char* p_file, int p_line)
 {
@@ -50,7 +53,7 @@ void croakSsl(char* p_file, int p_line)
 char _is_private(rsaData* p_rsa)
 {
     const BIGNUM *d;
-#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined LIBRESSL_VERSION_NUMBER
+#if OLD_CRUFTY_SSL_VERSION
     d = p_rsa->rsa->d;
 #else
     RSA_get0_key(p_rsa->rsa, NULL, NULL, &d);
@@ -174,19 +177,25 @@ SV* extractBioString(BIO* p_stringBio)
 }
 
 RSA* _load_rsa_key(SV* p_keyStringSv,
-                   RSA*(*p_loader)(BIO*, RSA**, pem_password_cb*, void*))
+                   RSA*(*p_loader)(BIO*, RSA**, pem_password_cb*, void*),
+                   SV* p_passphaseSv)
 {
     STRLEN keyStringLength;
     char* keyString;
+    char* passphase = NULL;
 
     RSA* rsa;
     BIO* stringBIO;
 
     keyString = SvPV(p_keyStringSv, keyStringLength);
 
+    if (SvPOK(p_passphaseSv)) {
+        passphase = SvPV_nolen(p_passphaseSv);
+    }
+
     CHECK_OPEN_SSL(stringBIO = BIO_new_mem_buf(keyString, keyStringLength));
 
-    rsa = p_loader(stringBIO, NULL, NULL, NULL);
+    rsa = p_loader(stringBIO, NULL, NULL, passphase);
 
     CHECK_OPEN_SSL(BIO_set_close(stringBIO, BIO_CLOSE) == 1);
     BIO_free(stringBIO);
@@ -227,15 +236,23 @@ MODULE = Crypt::OpenSSL::RSA		PACKAGE = Crypt::OpenSSL::RSA
 PROTOTYPES: DISABLE
 
 BOOT:
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+    # might introduce memory leak without calling EVP_cleanup() on exit
+    # see https://wiki.openssl.org/index.php/Library_Initialization
     ERR_load_crypto_strings();
+    OpenSSL_add_all_algorithms();
+#else
+    # NOOP
+#endif
 
 SV*
-new_private_key(proto, key_string_SV)
+new_private_key(proto, key_string_SV, passphase_SV=&PL_sv_undef)
     SV* proto;
     SV* key_string_SV;
+    SV* passphase_SV;
   CODE:
     RETVAL = make_rsa_obj(
-        proto, _load_rsa_key(key_string_SV, PEM_read_bio_RSAPrivateKey));
+        proto, _load_rsa_key(key_string_SV, PEM_read_bio_RSAPrivateKey, passphase_SV));
   OUTPUT:
     RETVAL
 
@@ -245,7 +262,7 @@ _new_public_key_pkcs1(proto, key_string_SV)
     SV* key_string_SV;
   CODE:
     RETVAL = make_rsa_obj(
-        proto, _load_rsa_key(key_string_SV, PEM_read_bio_RSAPublicKey));
+        proto, _load_rsa_key(key_string_SV, PEM_read_bio_RSAPublicKey, &PL_sv_undef));
   OUTPUT:
     RETVAL
 
@@ -255,7 +272,7 @@ _new_public_key_x509(proto, key_string_SV)
     SV* key_string_SV;
   CODE:
     RETVAL = make_rsa_obj(
-        proto, _load_rsa_key(key_string_SV, PEM_read_bio_RSA_PUBKEY));
+        proto, _load_rsa_key(key_string_SV, PEM_read_bio_RSA_PUBKEY, &PL_sv_undef));
   OUTPUT:
     RETVAL
 
@@ -267,14 +284,37 @@ DESTROY(p_rsa)
     Safefree(p_rsa);
 
 SV*
-get_private_key_string(p_rsa)
+get_private_key_string(p_rsa, passphase_SV=&PL_sv_undef, cipher_name_SV=&PL_sv_undef)
     rsaData* p_rsa;
+    SV* passphase_SV;
+    SV* cipher_name_SV;
   PREINIT:
     BIO* stringBIO;
+    char* passphase = NULL;
+    STRLEN passphaseLength = 0;
+    char* cipher_name;
+    const EVP_CIPHER* enc = NULL;
   CODE:
+    if (SvPOK(cipher_name_SV) && !SvPOK(passphase_SV)) {
+        croak("Passphrase is required for cipher");
+    }
+    if (SvPOK(passphase_SV)) {
+        passphase = SvPV(passphase_SV, passphaseLength);
+        if (SvPOK(cipher_name_SV)) {
+            cipher_name = SvPV_nolen(cipher_name_SV);
+        }
+        else {
+            cipher_name = "des3";
+        }
+        enc = EVP_get_cipherbyname(cipher_name);
+        if (enc == NULL) {
+            croak("Unsupported cipher: %s", cipher_name);
+        }
+    }
+
     CHECK_OPEN_SSL(stringBIO = BIO_new(BIO_s_mem()));
     PEM_write_bio_RSAPrivateKey(
-        stringBIO, p_rsa->rsa, NULL, NULL, 0, NULL, NULL);
+        stringBIO, p_rsa->rsa, enc, passphase, passphaseLength, NULL, NULL);
     RETVAL = extractBioString(stringBIO);
 
   OUTPUT:
@@ -357,7 +397,7 @@ _new_key_from_parameters(proto, n, e, d, p, q)
         croak("At least a modulus and public key must be provided");
     }
     CHECK_OPEN_SSL(rsa = RSA_new());
-#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined LIBRESSL_VERSION_NUMBER
+#if OLD_CRUFTY_SSL_VERSION
     rsa->n = n;
     rsa->e = e;
 #endif
@@ -375,7 +415,7 @@ _new_key_from_parameters(proto, n, e, d, p, q)
             q = BN_new();
             THROW(BN_div(q, NULL, n, p, ctx));
         }
-#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined LIBRESSL_VERSION_NUMBER
+#if OLD_CRUFTY_SSL_VERSION
         rsa->p = p;
         rsa->q = q;
 #else
@@ -391,7 +431,7 @@ _new_key_from_parameters(proto, n, e, d, p, q)
             THROW(BN_mul(d, p_minus_1, q_minus_1, ctx));
             THROW(BN_mod_inverse(d, e, d, ctx));
         }
-#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined LIBRESSL_VERSION_NUMBER
+#if OLD_CRUFTY_SSL_VERSION
         rsa->d = d;
 #else
         THROW(RSA_set0_key(rsa, n, e, d));
@@ -402,7 +442,7 @@ _new_key_from_parameters(proto, n, e, d, p, q)
         THROW(BN_mod(dmq1, d, q_minus_1, ctx));
         THROW(iqmp = BN_new());
         THROW(BN_mod_inverse(iqmp, q, p, ctx));
-#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined LIBRESSL_VERSION_NUMBER
+#if OLD_CRUFTY_SSL_VERSION
         rsa->dmp1 = dmp1;
         rsa->dmq1 = dmq1;
         rsa->iqmp = iqmp;
@@ -426,7 +466,7 @@ _new_key_from_parameters(proto, n, e, d, p, q)
     }
     else
     {
-#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined LIBRESSL_VERSION_NUMBER
+#if OLD_CRUFTY_SSL_VERSION
         rsa->d = d;
 #else
         CHECK_OPEN_SSL(RSA_set0_key(rsa, n, e, d));
@@ -453,7 +493,7 @@ PPCODE:
 {
     RSA* rsa;
     rsa = p_rsa->rsa;
-#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined LIBRESSL_VERSION_NUMBER
+#if OLD_CRUFTY_SSL_VERSION
     n = rsa->n;
     e = rsa->e;
     d = rsa->d;
@@ -640,11 +680,15 @@ use_pkcs1_oaep_padding(p_rsa)
   CODE:
     p_rsa->padding = RSA_PKCS1_OAEP_PADDING;
 
+#if OPENSSL_VERSION_NUMBER < 0x30000000L
+
 void
 use_sslv23_padding(p_rsa)
     rsaData* p_rsa;
   CODE:
     p_rsa->padding = RSA_SSLV23_PADDING;
+
+#endif
 
 # Sign text. Returns the signature.
 

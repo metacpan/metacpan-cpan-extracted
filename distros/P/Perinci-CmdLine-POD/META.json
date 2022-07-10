@@ -64,7 +64,7 @@
    "provides" : {
       "Perinci::CmdLine::POD" : {
          "file" : "lib/Perinci/CmdLine/POD.pm",
-         "version" : "0.027"
+         "version" : "0.028"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-CmdLine-POD"
       }
    },
-   "version" : "0.027",
+   "version" : "0.028",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

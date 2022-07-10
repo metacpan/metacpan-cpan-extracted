@@ -4,7 +4,7 @@ List::Lazy - Generate lists lazily
 
 # VERSION
 
-version 0.3.2
+version 0.3.3
 
 # SYNOPSIS
 
@@ -22,7 +22,7 @@ say $_ for $range->next(3); # prints ! !!! !!!!!
 
 # EXPORTED FUNCTIONS
 
-Lazy::List doesn't export any function by default, but will export the three following 
+Lazy::List doesn't export any function by default, but will export the three following
 functions on request.
 
 ## lazy\_list
@@ -54,9 +54,9 @@ my $list = lazy_range( 1, undef )->map(sub { lazy_range( 1, $_ ) });
 my $range = lazy_range $min, $max, $iterator;
 ```
 
-Creates a list iterating over a range of values. `$min` and `$max` are required, but `$max`  can be 
-`undef` (meaning no upper limit). The `$iterator` is optional and defaults to the value `1`. 
-The `$iterator` can be a number, which will be the step at which the numbers are increased, or a coderef that will 
+Creates a list iterating over a range of values. `$min` and `$max` are required, but `$max`  can be
+`undef` (meaning no upper limit). The `$iterator` is optional and defaults to the value `1`.
+The `$iterator` can be a number, which will be the step at which the numbers are increased, or a coderef that will
 be passed the previous value as `$_`, and is expected to return the next value.
 
 ```perl
@@ -71,7 +71,7 @@ say join ' ', $palinumbers->next(3); # 99 101 111
 my $list = lazy_fixed_list @some_array;
 ```
 
-Creates a lazy list that will returns the values of the given array. 
+Creates a lazy list that will returns the values of the given array.
 
 # CLASS
 
@@ -124,7 +124,7 @@ my $value = $list->reduce( $reducing_sub, $initial_value );
 ```
 
 Iterates through the list and reduces its values via the `$reducing_sub`, which
-will be passed the cumulative value and the next item via `$a` and `$b`. 
+will be passed the cumulative value and the next item via `$a` and `$b`.
 If `$initial_value` is not given, it defaults to the first element of the list.
 
 ```perl
@@ -154,7 +154,7 @@ my $new_list = $list->map( $mapper_sub );
 
 Creates a new list by applying the transformation given by `$mapper_sub` to the
 original list. The sub ill be passed the original next item via `$_`
-and is expected to return its transformation, which 
+and is expected to return its transformation, which
 can modify the item, explode it into many items, or suppress it,
 
 Note that the new list do a deep clone of the original list's state, so reading
@@ -189,7 +189,7 @@ my $new_list = $list->spy( $sub );
 ```
 
 Creates a new list that will execute the spy `$sub` for
-every value it sees (with the value assigned to `$_`). 
+every value it sees (with the value assigned to `$_`).
 
 If `$sub` is not given, it'll `carp` the values.
 
@@ -213,7 +213,7 @@ my $new_list = $list->append( @other_lists );
 ```
 
 Creates a new list that will return first the elements of `$list`,
-and those of the `@other_lists`. 
+and those of the `@other_lists`.
 
 Note that the new list do a deep clone of the original lists's state, so reading
 from the new list won't affect the original lists.
@@ -240,7 +240,7 @@ from the new list won't affect the original lists.
 my @rest = $list->all;
 ```
 
-Returns all the remaining values of the list. Be careful: if the list is unbounded, 
+Returns all the remaining values of the list. Be careful: if the list is unbounded,
 calling `all()` on it will result into an infinite loop.
 
 # AUTHOR
@@ -249,7 +249,7 @@ Yanick Champoux <yanick@babyl.dyndns.org> [![endorse](http://api.coderwall.com/y
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016 by Yanick Champoux.
+This software is copyright (c) 2022 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

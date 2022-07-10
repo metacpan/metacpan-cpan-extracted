@@ -28,6 +28,4 @@ for my $i (1 .. $#data) {
     splice @data, $match, 0 => splice @data, $i, 1;
 }
 
-for my $data (@data) {
-    print $data->{line};
-}
+print $_->{line} for @data;

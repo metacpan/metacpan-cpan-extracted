@@ -33,7 +33,7 @@ resources:
   bugtracker: https://github.com/atrodo/Net-Dropbear/issues
   homepage: https://github.com/atrodo/Net-Dropbear
   repository: https://github.com/atrodo/Net-Dropbear.git
-version: '0.15'
+version: '0.16'
 x_contributors:
   - 'Jon Gentle <atrodo@atrodo.org>'
   - 'Slaven Rezic <slaven@rezic.de>'

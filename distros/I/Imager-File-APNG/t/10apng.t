@@ -157,7 +157,7 @@ use constant PI => 3.14159265358979;
   }
 }
 
-# paletted image
+# mixed paletted image
 {
   my $im1 = test_image;
   my $im2 = test_image()->to_paletted;
@@ -169,6 +169,55 @@ use constant PI => 3.14159265358979;
   my @im = Imager->read_multi(type => "apng", data => $data)
     or diag(Imager->errstr);
   is(@im, 2, "read both back");
+}
+
+# only paletted
+{
+  my $im1 = test_image()->to_paletted;
+  my $data;
+  ok(Imager->write_multi({ type => "apng", data => \$data }, $im1, $im1),
+     "write with only paletteed images (which are the same image)")
+    or diag(Imager->errstr);
+  my @im = Imager->read_multi(type => "apng", data => $data)
+    or diag(Imager->errstr);
+  is($im[0]->type, "paletted", "check paletted round-tripped");
+  is_image($im[0], $im1, "check image matches");
+}
+
+# mixed paletted
+{
+  my $im1 = test_image();
+  my $im2 = $im1->to_paletted;
+  my $data;
+  ok(Imager->write_multi({ type => "apng", data => \$data }, $im1, $im2),
+     "write with only paletteed images (which are the same image)")
+    or diag(Imager->errstr);
+  my @im = Imager->read_multi(type => "apng", data => $data)
+    or diag(Imager->errstr);
+  is($im[1]->type, "direct", "check paletted converted");
+  is_image($im[1], $im2, "check image matches");
+}
+
+# paletted with transparency
+{
+  my @pal = map { Imager::Color->new($_) } "#F00", "#00000000", "#00F";
+  my $im1 = Imager->new(xsize => 100, ysize => 100, channels => 4, type => "paletted");
+  $im1->addcolors(colors => \@pal);
+  $im1->box(filled => 1, color => "#F00", box => [ 0, 0, 49, 49 ]);
+  is($im1->type, "paletted", "ensure im1 still paletted");
+  my $im2 = Imager->new(xsize => 100, ysize => 100, channels => 4, type => "paletted");
+  $im2->addcolors(colors => \@pal);
+  $im2->box(filled => 1, color => $pal[2], box => [ 50, 50, 99, 99 ]);
+  is($im2->type, "paletted", "ensure im2 still paletted");
+  my $data;
+  ok(Imager->write_multi({ type => "apng", data => \$data }, $im1, $im2),
+     "write paletted images with transparency");
+  my @im = Imager->read_multi(type => "apng", data => $data);
+  is(@im, 2, "read back both");
+  is($im[0]->type, "paletted", "im1 paletted round-tripped");
+  is_image($im[0], $im1, "check im1 matches");
+  is($im[1]->type, "paletted", "im2 paletted round-tripped");
+  is_image($im[1], $im2, "check im2 matches");
 }
 
 done_testing();

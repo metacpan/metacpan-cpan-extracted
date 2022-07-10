@@ -5,15 +5,14 @@
 use v5.12;
 
 package Chart::Base;
-our $VERSION = 'v2.402.3';
+our $VERSION = 'v2.403.0';
 
 use FileHandle;
 use Carp;
 use GD;
 use GD::Image;
-use Chart::Constants;
 use Chart::Color;
-use Chart::Font;
+#use Chart::Font;
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>#
 #  public methods          #
@@ -103,8 +102,7 @@ sub set {
 #
 # @param data Dataset to add
 #
-sub add_pt
-{
+sub add_pt {
     my $self = shift;
     my @data = ();
 
@@ -115,15 +113,8 @@ sub add_pt
     }
     elsif ( ( ref \$_[0] ) =~ /^SCALAR/ )
     {
-        if ( defined $_[0] )
-        {
-            @data = @_;
-        }
-    }
-    else
-    {
-        croak "Not an array or reference to array";
-    }
+        @data = @_ if defined $_[0];
+    } else { croak "Not an array or reference to array" }
 
     # error check the data (carp, don't croak)
     if ( $self->{'dataref'} && ( $#{ $self->{'dataref'} } != $#data ) )
@@ -133,11 +124,8 @@ sub add_pt
     }
 
     # copy it into the dataref
-    for ( 0 .. $#data )
-    {
-        push @{ $self->{'dataref'}->[$_] }, $data[$_];
-    }
-
+    push @{ $self->{'dataref'}->[$_] }, $data[$_] for 0 .. $#data;
+    
     # now return
     return 1;
 }
@@ -201,8 +189,7 @@ sub add_dataset
 # @param[in] filename Name of file which contents is to be added
 # @param[in] format 'pt' or 'set' to distiguish between function add_pt() in case of 'pt'
 #                 or function add_dataset() in case of 'set'
-sub add_datafile
-{
+sub add_datafile {
     my $self     = shift;
     my $filename = shift;
     my $format   = shift;
@@ -663,8 +650,7 @@ sub imagemap_dump
 # determine minimum of an array of values
 # @param array List of numerical values (\@array)
 # @return Minimal value of list of values
-sub minimum
-{
+sub minimum {
     my $self  = shift;
     my @array = @_;
 
@@ -681,8 +667,7 @@ sub minimum
 # determine maximum of an array of values
 # @param array List of numerical values (@array)
 # @return Maximal value of list of values
-sub maximum
-{
+sub maximum {
     my $self  = shift;
     my @array = @_;
 
@@ -699,8 +684,7 @@ sub maximum
 # Function arccos(a)
 # @param a Value
 # @return arccos(a)
-sub arccos
-{
+sub arccos {
     my $self = shift;
     my $a    = shift;
 
@@ -723,8 +707,7 @@ sub arcsin
 # determine true value of argument
 # @param[in] arg Bool value to check for true
 # @return 1 if argument is equal to TRUE, true, 1, t, T, and defined
-sub true
-{
+sub true {
     my $pkg = shift;
     my $arg = shift;
 
@@ -749,8 +732,7 @@ sub true
 # determine false value of argument
 # @param[in] arg Bool value to check for true
 # @return 1 if argument is equal to false, FALSE, 0, f, F or undefined
-sub false
-{
+sub false {
     my $pkg = shift;
     my $arg = shift;
 
@@ -778,8 +760,7 @@ sub false
 # @param[in] a a in a%b
 # @param[in] b b in a%b
 # @return $a % $b in float
-sub modulo
-{
+sub modulo {
     my $pkg = shift;
     my $a   = shift;
     my $b   = shift;
@@ -809,8 +790,7 @@ sub modulo
 # @param[in] x   Width of the final image in pixels (Default: 400)
 # @param[in] y   Height of the final image in pixels (Default: 300)
 #
-sub _init
-{
+sub _init {
     my $self = shift;
     my $x    = shift || 400;    # give them a 400x300 image
     my $y    = shift || 300;    # unless they say otherwise
@@ -1090,8 +1070,7 @@ sub _copy_data
 #  and collect some basic info about it\n
 # Not logical data is 'carp'ed.\n
 # @return status of check
-sub _check_data
-{
+sub _check_data {
     my $self   = shift;
     my $length = 0;
 
@@ -1166,8 +1145,7 @@ sub _check_data
 # @see _plot
 #
 # @return status
-sub _draw
-{
+sub _draw {
     my $self = shift;
 
     # leave the appropriate border on the png
@@ -1199,8 +1177,7 @@ sub _draw
 ## @fn private int _set_colors
 #  specify my colors
 # @return status
-sub _set_colors
-{
+sub _set_colors {
     my $self = shift;
 
     my $index = $self->_color_role_to_index('background');    # allocate GD color
@@ -1279,23 +1256,9 @@ sub _color_spec_to_rgb {
 # @param list_of_roles List of roles (\\\@list_of_roles)
 # @return (list of) brushStyle(s) corresponding to the (list of) role(s) in \\\@_.
 #
-sub _brushStyles_of_roles
-{
+sub _brushStyles_of_roles {
     my $self  = shift;
-    my @roles = @_;
-
-    my @results = ();
-    foreach my $role (@roles)
-    {
-        my $brushStyle = $self->{'brushStyles'}->{$role};
-
-        if ( !defined($brushStyle) )
-        {
-            $brushStyle = $self->{'brushStyle'};
-        }
-        push( @results, $brushStyle );
-    }
-    @results;
+    map {exists $self->{'brushStyles'}{$_} ? $self->{'brushStyles'}{$_} : $self->{'brushStyle'}} @_;
 }
 
 ## @fn private int _draw_title
@@ -1308,28 +1271,26 @@ sub _brushStyles_of_roles
 # based on 'title' or 'text'\n
 # @see _color_role_to_index
 # @return status
-sub _draw_title
-{
+sub draw_text {
+    my ($self, $text, $font, $color) = @_;
+    # !!!
+    1;
+}
+
+sub _draw_title {
     my $self = shift;
     my $font = $self->{'title_font'};
     my $color;
     my ( $h, $w, @lines, $x, $y );
 
     #get the right color
-    if ( defined $self->{'colors'}{'title'} )
-    {
-        $color = $self->_color_role_to_index('title');
-    }
-    else
-    {
-        $color = $self->_color_role_to_index('text');
-    }
+    $color = ( defined $self->{'colors'}{'title'} )
+           ? $self->_color_role_to_index('title')
+           : $self->_color_role_to_index('text');
 
     # make sure we're actually using a real font
-    unless ( ( ref $font ) eq 'GD::Font' )
-    {
-        croak "The title font you specified isn\'t a GD Font object";
-    }
+    croak "The title font you specified isn\'t a GD Font object" unless ref $font eq 'GD::Font'
+                                                                    or  ref $font eq 'Chart::Font';
 
     # get the height and width of the font
     ( $h, $w ) = ( $font->height, $font->width );
@@ -1440,8 +1401,7 @@ sub _draw_sub_title
 ## @fn private int _sort_data()
 #  sort the data nicely (mostly for the pareto charts and xy-plots)
 # @return status
-sub _sort_data
-{
+sub _sort_data {
     my $self     = shift;
     my $data_ref = $self->{'dataref'};
     my @data     = @{ $self->{'dataref'} };
@@ -1463,8 +1423,7 @@ sub _sort_data
 # For a xy-plot do the same for the x values, as '_find_y_scale' does for the y values!
 # @see _find_y_scale
 # @return status
-sub _find_x_scale
-{
+sub _find_x_scale {
     my $self = shift;
     my @data = @{ $self->{'dataref'} };
     my ( $i,     $j );
@@ -2463,8 +2422,7 @@ sub _draw_bottom_legend {
 ## @fn private int _draw_right_legend()
 # put the legend on the right of the chart
 # @return status
-sub _draw_right_legend
-{
+sub _draw_right_legend {
     my $self   = shift;
     my @labels = @{ $self->{'legend_labels'} };
     my ( $x1, $x2, $x3, $y1, $y2, $width, $color, $misccolor, $w, $h, $brush );
@@ -2551,8 +2509,7 @@ sub _draw_right_legend
 ## @fn private int _draw_top_legend()
 # put the legend on top of the chart
 # @return status
-sub _draw_top_legend
-{
+sub _draw_top_legend {
     my $self   = shift;
     my @labels = @{ $self->{'legend_labels'} };
     my ( $x1, $y1, $x2, $x3, $y2, $empty_width, $max_label_width );
@@ -2754,8 +2711,7 @@ sub _draw_left_legend
 # Just return in this case. This routine may be overwritten by
 # subclasses.
 # @return 1
-sub _draw_none_legend
-{
+sub _draw_none_legend {
     my $self   = shift;
     my $status = 1;
 
@@ -3169,8 +3125,7 @@ sub _draw_x_number_ticks
 ## @fn private int _draw_x_ticks()
 # draw the x-ticks and their labels
 # @return status
-sub _draw_x_ticks
-{
+sub _draw_x_ticks {
     my $self      = shift;
     my $data      = $self->{'dataref'};
     my $font      = $self->{'tick_label_font'};
@@ -3483,8 +3438,7 @@ sub _draw_x_ticks
 ## @fn private int _draw_y_ticks()
 #  draw the y-ticks and their labels
 # @return status
-sub _draw_y_ticks
-{
+sub _draw_y_ticks {
     my $self      = shift;
     my $side      = shift || 'left';
     my $data      = $self->{'dataref'};
@@ -3558,16 +3512,12 @@ sub _draw_y_ticks
         $y1 -= $h / 2;
 
         # now draw the labels
-        for ( 0 .. $#labels )
-        {
+        for ( 0 .. $#labels ) {
             $y2 = $y1 - ( $delta * $_ );
             $self->{'gd_obj'}->string( $font, $x1, $y2, $self->{'y_tick_labels'}[$_], $textcolor );
         }
-    }
-    elsif ( $side eq 'both' )
-    {    # put the ticks on the both sides
-        ## left side first
-
+    } elsif ( $side eq 'both' ) {
+        # put the ticks on the both sides, left side first
         # get the base x-y values
         $x1 = $self->{'curr_x_min'} + $self->{'text_space'};
         $y1 = $self->{'curr_y_max'} - $h / 2;
@@ -3575,8 +3525,7 @@ sub _draw_y_ticks
         # now draw the labels
         $height = $self->{'curr_y_max'} - $self->{'curr_y_min'};
         $delta = $height / ( $self->{'y_ticks'} - 1 );
-        for ( 0 .. $#labels )
-        {
+        for ( 0 .. $#labels ) {
             $label = $self->{'y_tick_labels'}[$_];
             $y2    = $y1 - ( $delta * $_ );
             $x2    = $x1 + ( $w * $self->{'y_tick_label_length'} ) - ( $w * length($label) );
@@ -3590,13 +3539,11 @@ sub _draw_y_ticks
         $x1 = $self->{'curr_x_min'};
         $x2 = $self->{'curr_x_min'} + $self->{'tick_len'};
         $y1 += $h / 2;
-        for ( $s .. $f )
-        {
+        for ( $s .. $f ) {
             $y2 = $y1 - ( $delta * $_ );
             $self->{'gd_obj'}->line( $x1, $y2, $x2, $y2, $misccolor );
             if (   $self->true( $self->{grid_lines} )
-                or $self->true( $self->{'y_grid_lines'} ) )
-            {
+                or $self->true( $self->{'y_grid_lines'} ) ) {
                 $self->{'grid_data'}->{'y'}->[$_] = $y2;
             }
         }
@@ -3618,13 +3565,11 @@ sub _draw_y_ticks
         # now draw the ticks (skipping the one at zero);
         $x2 = $x1 + $self->{'tick_len'};
 
-        for ( $s .. $f )
-        {
+        for ( $s .. $f ) {
             $y2 = $y1 - ( $delta * $_ );
             $self->{'gd_obj'}->line( $x1, $y2, $x2, $y2, $misccolor );    # draw tick_line
             if (   $self->true( $self->{grid_lines} )
-                or $self->true( $self->{'y2_grid_lines'} ) )
-            {
+                or $self->true( $self->{'y2_grid_lines'} ) ) {
                 $self->{'grid_data'}->{'y2'}->[$_] = $y2;
             }
         }
@@ -3634,15 +3579,12 @@ sub _draw_y_ticks
         $y1 -= $h / 2;
 
         # now draw the labels
-        for ( 0 .. $#labels )
-        {
+        for ( 0 .. $#labels ) {
             $y2 = $y1 - ( $delta * $_ );
             $self->{'gd_obj'}->string( $font, $x1, $y2, $self->{'y_tick_labels'}[$_], $textcolor );
         }
-    }
-    else
-    {    # just the left side
-            # get the base x-y values
+    } else {    # just the left side
+        # get the base x-y values
         $x1 = $self->{'curr_x_min'} + $self->{'text_space'};
         $y1 = $self->{'curr_y_max'} - $h / 2;
 
@@ -3650,8 +3592,7 @@ sub _draw_y_ticks
         $height = $self->{'curr_y_max'} - $self->{'curr_y_min'};
         $self->{'y_ticks'} = 2 if $self->{'y_ticks'} < 2;
         $delta = $height / ( $self->{'y_ticks'} - 1 );
-        for ( 0 .. $#labels )
-        {
+        for ( 0 .. $#labels ) {
             $label = $self->{'y_tick_labels'}[$_];
             $y2    = $y1 - ( $delta * $_ );
             $x2    = $x1 + ( $w * $self->{'y_tick_label_length'} ) - ( $w * length($label) );
@@ -3665,13 +3606,11 @@ sub _draw_y_ticks
         $x1 = $self->{'curr_x_min'};
         $x2 = $self->{'curr_x_min'} + $self->{'tick_len'};
         $y1 += $h / 2;
-        for ( $s .. $f )
-        {
+        for ( $s .. $f ) {
             $y2 = $y1 - ( $delta * $_ );
             $self->{'gd_obj'}->line( $x1, $y2, $x2, $y2, $misccolor );
             if (   $self->true( $self->{'grid_lines'} )
-                or $self->true( $self->{'y_grid_lines'} ) )
-            {
+                or $self->true( $self->{'y_grid_lines'} ) ) {
                 $self->{'grid_data'}->{'y'}->[$_] = $y2;
             }
         }
@@ -3687,8 +3626,7 @@ sub _draw_y_ticks
 ## @fn private int _grey_background()
 #  put a grey background on the plot of the data itself
 # @return status
-sub _grey_background
-{
+sub _grey_background {
     my $self = shift;
 
     # draw it
@@ -3703,8 +3641,7 @@ sub _grey_background
 ## @fn private int _draw_grid_lines()
 # draw grid_lines
 # @return status
-sub _draw_grid_lines
-{
+sub _draw_grid_lines {
     my $self = shift;
     $self->_draw_x_grid_lines();
     $self->_draw_y_grid_lines();
@@ -3715,17 +3652,14 @@ sub _draw_grid_lines
 ## @fn private int _draw_x_grid_lines()
 # draw grid_lines for x
 # @return status
-sub _draw_x_grid_lines
-{
+sub _draw_x_grid_lines {
     my $self      = shift;
     my $grid_role = shift || 'x_grid_lines';
     my $gridcolor = $self->_color_role_to_index($grid_role);
     my ( $x, $y, $i );
 
-    foreach $x ( @{ $self->{grid_data}->{'x'} } )
-    {
-        if ( defined $x )
-        {
+    foreach $x ( @{ $self->{grid_data}->{'x'} } ) {
+        if ( defined $x ) {
             $self->{gd_obj}->line( ( $x, $self->{'curr_y_min'} + 1 ), $x, ( $self->{'curr_y_max'} - 1 ), $gridcolor );
         }
     }
@@ -3735,24 +3669,20 @@ sub _draw_x_grid_lines
 ## @fn private int _draw_y_grid_lines()
 # draw grid_lines for y
 # @return status
-sub _draw_y_grid_lines
-{
+sub _draw_y_grid_lines {
     my $self      = shift;
     my $grid_role = shift || 'y_grid_lines';
     my $gridcolor = $self->_color_role_to_index($grid_role);
     my ( $x, $y, $i );
 
     #Look if I'm an HorizontalBars object
-    if ( $self->isa('Chart::HorizontalBars') )
-    {
+    if ( $self->isa('Chart::HorizontalBars') ) {
         for ( $i = 0 ; $i < ( $#{ $self->{grid_data}->{'y'} } ) + 1 ; $i++ )
         {
             $y = $self->{grid_data}->{'y'}->[$i];
             $self->{gd_obj}->line( ( $self->{'curr_x_min'} + 1 ), $y, ( $self->{'curr_x_max'} - 1 ), $y, $gridcolor );
         }
-    }
-    else
-    {
+    } else {
 
         # loop for y values is a little different. This is to discard the first
         # and last values we were given - the top/bottom of the chart area.
@@ -3768,29 +3698,23 @@ sub _draw_y_grid_lines
 ## @fn private int _draw_y2_grid_lines()
 # draw grid_lines for y
 # @return status
-sub _draw_y2_grid_lines
-{
+sub _draw_y2_grid_lines {
     my $self      = shift;
     my $grid_role = shift || 'y2_grid_lines';
     my $gridcolor = $self->_color_role_to_index($grid_role);
     my ( $x, $y, $i );
 
     #Look if I'm an HorizontalBars object
-    if ( $self->isa('Chart::HorizontalBars') )
-    {
-        for ( $i = 0 ; $i < ( $#{ $self->{grid_data}->{'y'} } ) + 1 ; $i++ )
-        {
+    if ( $self->isa('Chart::HorizontalBars') ) {
+        for ( $i = 0 ; $i < ( $#{ $self->{grid_data}->{'y'} } ) + 1 ; $i++ ) {
             $y = $self->{grid_data}->{'y'}->[$i];
             $self->{gd_obj}->line( ( $self->{'curr_x_min'} + 1 ), $y, ( $self->{'curr_x_max'} - 1 ), $y, $gridcolor );
         }
-    }
-    else
-    {
+    } else {
 
         # loop for y2 values is a little different. This is to discard the first
         # and last values we were given - the top/bottom of the chart area.
-        for ( $i = 1 ; $i < $#{ $self->{grid_data}->{'y2'} } ; $i++ )
-        {
+        for ( $i = 1 ; $i < $#{ $self->{grid_data}->{'y2'} } ; $i++ ) {
             $y = $self->{grid_data}->{'y2'}->[$i];
             $self->{gd_obj}->line( ( $self->{'curr_x_min'} + 1 ), $y, ( $self->{'curr_x_max'} - 1 ), $y, $gridcolor );
         }
@@ -3812,16 +3736,14 @@ sub _draw_y2_grid_lines
 # @param role
 #
 # @return status
-sub _prepare_brush
-{
+sub _prepare_brush {
     my $self  = shift;
     my $color = shift;
     my $type  = shift;
     my $role  = shift || 'default';
 
     my $brushStyle = $self->{'brushStyle'};
-    if ( defined $role )
-    {
+    if ( defined $role ) {
         my (@brushStyles) = $self->_brushStyles_of_roles($role);
         $brushStyle = $brushStyles[0];
     }
@@ -3835,8 +3757,7 @@ sub _prepare_brush
     if ( !defined($type) ) { $type = 'point'; }
 
     if (   ( !length($type) )
-        || ( !grep { $type eq $_ } ( 'line', 'point' ) ) )
-    {
+        || ( !grep { $type eq $_ } ( 'line', 'point' ) ) ) {
         $brushStyle = $self->{'brushStyle'};
         $type       = 'line' if ref $self eq 'Chart::Lines';
         $type       = 'point' if ref $self eq 'Chart::Points';
@@ -3848,12 +3769,9 @@ sub _prepare_brush
     @rgb = $self->{'gd_obj'}->rgb($color);
 
     # get the appropriate brush size
-    if ( $type eq 'line' )
-    {
+    if ( $type eq 'line' ) {
         $radius = $self->{'brush_size'} / 2;
-    }
-    elsif ( $type eq 'point' )
-    {
+    } elsif ( $type eq 'point' ) {
         $radius = $self->{'pt_size'} / 2;
     }
 
@@ -3866,8 +3784,7 @@ sub _prepare_brush
     $brush->transparent($white);
 
     # draw the circle
-    if ( $type eq 'line' )
-    {
+    if ( $type eq 'line' ) {
         $brush->arc( $radius - 1, $radius - 1, $radius, $radius, 0, 360, $newcolor );
         $brush->fill( $radius - 1, $radius - 1, $newcolor );
 
@@ -3882,8 +3799,7 @@ sub _prepare_brush
 
     }
 
-    if ( $type eq 'point' )
-    {
+    if ( $type eq 'point' ) {
         $brushStyle = $self->{'brushStyle'}
           unless grep { $brushStyle eq $_ } (
             'FilledCircle',  'circle',             'donut',  'OpenCircle',
@@ -3894,8 +3810,7 @@ sub _prepare_brush
 
         my ( $xc, $yc ) = ( $radius, $radius );
 
-        if ( grep { $brushStyle eq $_ } ( 'default', 'circle', 'donut', 'OpenCircle', 'FilledCircle' ) )
-        {
+        if ( grep { $brushStyle eq $_ } ( 'default', 'circle', 'donut', 'OpenCircle', 'FilledCircle' ) ) {
             $brush->arc( $xc, $yc, $radius, $radius, 0, 360, $newcolor );
             $brush->fill( $xc, $yc, $newcolor );
 
@@ -3909,8 +3824,7 @@ sub _prepare_brush
             }
         }
 
-        if ( grep { $brushStyle eq $_ } ( 'triangle', 'upsidedownTriangle' ) )
-        {
+        if ( grep { $brushStyle eq $_ } ( 'triangle', 'upsidedownTriangle' ) ) {
             my $poly = new GD::Polygon;
             my $sign = ( $brushStyle eq 'triangle' ) ? 1 : (-1);
             my $z    = int( 0.8 * $radius );                       # scaling factor
@@ -3924,8 +3838,7 @@ sub _prepare_brush
             $brush->filledPolygon( $poly, $newcolor );
         }
 
-        if ( $brushStyle eq 'fatPlus' )
-        {
+        if ( $brushStyle eq 'fatPlus' )  {
             my $poly = new GD::Polygon;
             my $z = int( 0.3 * $radius );
 
@@ -3947,8 +3860,7 @@ sub _prepare_brush
             $brush->filledPolygon( $poly, $newcolor );
         }
 
-        if ( $brushStyle eq 'Star' || $brushStyle eq 'OpenStar' )
-        {
+        if ( $brushStyle eq 'Star' || $brushStyle eq 'OpenStar' ) {
             my $poly = new GD::Polygon;
 
             my $z  = int($radius);
@@ -4002,19 +3914,15 @@ sub _prepare_brush
         if ( grep { $brushStyle eq $_ } ( 'square', 'hollowSquare', 'OpenRectangle' ) )
         {
             my $z = int( 0.5 * $radius );
-
             $brush->filledRectangle( $xc - $z, $yc - $z, $xc + $z, $yc + $z, $newcolor );
 
-            if ( $brushStyle eq 'hollowSquare' || $brushStyle eq 'OpenRectangle' )
-            {
+            if ( $brushStyle eq 'hollowSquare' || $brushStyle eq 'OpenRectangle' ) {
                 $z = int( $z / 2 );
-
                 $brush->filledRectangle( $xc - $z, $yc - $z, $xc + $z, $yc + $z, $white );
             }
         }
 
-        if ( grep { $brushStyle eq $_ } ( 'FilledDiamond', 'OpenDiamond' ) )
-        {
+        if ( grep { $brushStyle eq $_ } ( 'FilledDiamond', 'OpenDiamond' ) ) {
             my $z = int( 0.75 * $radius );
 
             $brush->line( $xc + $z, $yc,      $xc,      $yc + $z, $newcolor );
@@ -4022,9 +3930,7 @@ sub _prepare_brush
             $brush->line( $xc - $z, $yc,      $xc,      $yc - $z, $newcolor );
             $brush->line( $xc,      $yc - $z, $xc + $z, $yc,      $newcolor );
 
-            if ( $brushStyle eq 'FilledDiamond' )
-            {
-
+            if ( $brushStyle eq 'FilledDiamond' ) {
                 # and fill it
                 $brush->fill( $radius - 1, $radius - 1, $newcolor );
             }
@@ -4043,7 +3949,7 @@ sub _prepare_brush
 # @return status
 sub _default_f_tick {
     my $label = shift;
-
+    
     return $label;
 }
 

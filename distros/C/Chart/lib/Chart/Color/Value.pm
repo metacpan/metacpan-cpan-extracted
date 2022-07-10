@@ -3,9 +3,8 @@ use v5.12;
 # check, convert and measure color values
 
 package Chart::Color::Value;
-our $VERSION = 'v2.402.3';
+our $VERSION = 'v2.403.0';
 use Carp;
-use POSIX ();
 
 sub check_rgb { # carp returns 1
     my (@rgb) = @_;
@@ -152,8 +151,8 @@ sub _rgb_from_hsl { # float conversion
 my $half = 0.50000000000008;
 
 sub round {
-  $_[0] >= 0 ? POSIX::floor($_[0] + $half)
-             : POSIX::ceil($_[0] - $half)
+    $_[0] >= 0 ? int ($_[0] + $half)
+               : int ($_[0] - $half)
 }
 
 

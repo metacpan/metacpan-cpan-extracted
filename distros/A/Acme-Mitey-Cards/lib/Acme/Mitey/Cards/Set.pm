@@ -1,11 +1,10 @@
 package Acme::Mitey::Cards::Set;
 
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 our $AUTHORITY = 'cpan:TOBYINK';
 
-use Acme::Mitey::Cards::Mite qw( -bool -is );
+use Acme::Mitey::Cards::Mite qw( -bool -is croak );
 
-use Carp qw( croak );
 use List::Util ();
 
 has cards => (
@@ -34,7 +33,8 @@ sub count {
 sub take {
 	my ( $self, $n ) = ( shift, @_ );
 
-	croak "Not enough cards" if $n > $self->count;
+	croak "Not enough cards: wanted %d but only have %d", $n, $self->count
+		if $n > $self->count;
 
 	my @taken = splice( @{ $self->cards }, 0, $n );
 	return __PACKAGE__->new( cards => \@taken );

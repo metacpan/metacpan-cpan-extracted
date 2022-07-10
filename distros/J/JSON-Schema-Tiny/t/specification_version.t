@@ -65,6 +65,32 @@ use Helper;
   );
 };
 
+subtest 'specification aliases' => sub {
+  local $JSON::Schema::Tiny::SPECIFICATION_VERSION = '2020-12';
+  ok(evaluate(1, {}), 'evaluate with 2020-12');
+  is(
+    $JSON::Schema::Tiny::SPECIFICATION_VERSION,
+    'draft2020-12',
+    '2020-12 is accepted as an alias for draft2020-12',
+  );
+
+  local $JSON::Schema::Tiny::SPECIFICATION_VERSION = '2019-09';
+  ok(evaluate(1, {}), 'evaluate with 2019-09');
+  is(
+    $JSON::Schema::Tiny::SPECIFICATION_VERSION,
+    'draft2019-09',
+    '2019-09 is accepted as an alias for draft2019-09',
+  );
+
+  local $JSON::Schema::Tiny::SPECIFICATION_VERSION = '7';
+  ok(evaluate(1, {}), 'evaluate with 7');
+  is(
+    $JSON::Schema::Tiny::SPECIFICATION_VERSION,
+    'draft7',
+    '7 is accepted as an alias for draft7',
+  );
+};
+
 subtest '$ref and older specification versions' => sub {
   cmp_deeply(
     evaluate(

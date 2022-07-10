@@ -14,7 +14,7 @@ use Ref::Util qw(is_arrayref is_coderef is_hashref is_ref is_scalarref);
 use Scalar::Util qw(blessed openhandle);
 use namespace::clean;
 
-our $VERSION = '0.903'; # VERSION
+our $VERSION = '0.904'; # VERSION
 
 fieldhashes \my %SAFE;
 
@@ -140,7 +140,7 @@ File::KDBX::Key - A credential that can protect a KDBX file
 
 =head1 VERSION
 
-version 0.903
+version 0.904
 
 =head1 DESCRIPTION
 

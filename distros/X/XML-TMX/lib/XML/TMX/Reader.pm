@@ -1,5 +1,5 @@
 package XML::TMX::Reader;
-$XML::TMX::Reader::VERSION = '0.36';
+$XML::TMX::Reader::VERSION = '0.39';
 # ABSTRACT: Perl extension for reading TMX files
 
 use 5.010;
@@ -261,7 +261,23 @@ sub for_tu {
         print STDERR "\r$i" if $conf->{-verbose} && !($i % 10);
         last if defined $conf->{proc_tu} && $i > $conf->{proc_tu} ;
         last if defined $conf->{gen_tu}  && $gen > $conf->{gen_tu};
-        next if defined $conf->{patt}    && !m/$conf->{patt}/     ;
+#       next if defined $conf->{patt}    && !m/$conf->{patt}/     ;
+
+        if (defined $conf->{patt}){      ## FIXME untested
+           if(ref($conf->{patt})){       ## EN=>/cat/ PT=>/gato/
+              my $ok = 1;
+              my $textli = "";
+              for my $li (keys %{$conf->{patt}}){
+                 my $patli= $conf->{patt}{$li};
+                 if (m!lang=["']$li['"](.*?)</tuv>!is ) { $textli = $1 };
+                 $ok &&= ($textli =~ /$patli/)
+              }
+              next unless $ok
+           }
+           else {                        ## /cat.*/
+              next if not m/$conf->{patt}/    ;
+           }
+        }
         ####
         # This can't be done. Not sure why it was being done.
         # So, please, unless you know the implications for tagged crpora
@@ -295,7 +311,14 @@ sub to_html {
   $self->for_tu(sub {
       my ($langs, $opts) = @_;
       my $ret = ""; # "<table>";
-      for (@ls) { $ret .= "\n\t<td l='$_'>$langs->{$_}{-seg}</td>"} 
+      for (@ls) { 
+         if( defined $langs->{$_}){
+            $ret .= "\n\t<td l='$_'>$langs->{$_}{-seg}</td>"
+         }
+         else {
+            $ret .= "\n\t<td l='$_'></td>"
+         }
+      } 
 
         #if ($opt{icons}) {
         #                    $ret .= "<img src=\"/icons/flags/".lc($_).".png\" alt=\"$_\"/>"
@@ -330,7 +353,7 @@ XML::TMX::Reader - Perl extension for reading TMX files
 
 =head1 VERSION
 
-version 0.36
+version 0.39
 
 =head1 SYNOPSIS
 

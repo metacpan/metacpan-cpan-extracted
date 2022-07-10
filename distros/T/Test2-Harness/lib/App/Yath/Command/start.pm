@@ -2,7 +2,7 @@ package App::Yath::Command::start;
 use strict;
 use warnings;
 
-our $VERSION = '1.000124';
+our $VERSION = '1.000125';
 
 use App::Yath::Util qw/find_pfile/;
 use App::Yath::Options;
@@ -703,7 +703,7 @@ Can be specified multiple times
 
 =item --no-job-count
 
-Set the number of concurrent jobs to run (Default: 1)
+Set the number of concurrent jobs to run
 
 Can also be set with the following environment variables: C<YATH_JOB_COUNT>, C<T2_HARNESS_JOB_COUNT>, C<HARNESS_JOB_COUNT>
 

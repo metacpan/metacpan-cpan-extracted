@@ -1,8 +1,15 @@
+2.403.0 2022-08-07 lichtkind
+-------
+    * = test release to check metacpan POD parser
+    * + added Chart::Manual + property sub page
+    * - drop PDF and HTML documentation
+    * - drop dependency on module: POSIX
+
 2.402.3 2022-07-18 lichtkind
 -------
-    * + string method to color objects
-    * ? document that y_ticks1, y_ticks2 is composite only
-    * ! fixed (not returning from Color::Value even sub sub carped) 
+    * + string method to Color objects
+    * ? fixed #18891 : document that y_ticks1, y_ticks2 is composite only
+    * ! fixed (not interrupting Color::Value::distance_rgb even sub sub carped) 
 
 2.402.2 2022-06-15 lichtkind
 -------

@@ -4,65 +4,73 @@ use strict;
 use warnings;
 
 use Data::Printer;
-use Wikibase::Datatype::Snak;
-use Wikibase::Datatype::Struct::Utils qw(obj_array_ref2struct);
+use Wikibase::Datatype::MediainfoSnak;
+use Wikibase::Datatype::MediainfoStatement;
+use Wikibase::Datatype::Struct::MediainfoStatement qw(obj2struct);
 use Wikibase::Datatype::Value::Item;
-use Wikibase::Datatype::Value::String;
 
-my $snak1 = Wikibase::Datatype::Snak->new(
-        'datatype' => 'wikibase-item',
-        'datavalue' => Wikibase::Datatype::Value::Item->new(
-                'value' => 'Q5',
+# Object.
+my $obj = Wikibase::Datatype::MediainfoStatement->new(
+        'id' => 'M123$00C04D2A-49AF-40C2-9930-C551916887E8',
+
+        # instance of (P31) human (Q5)
+        'snak' => Wikibase::Datatype::MediainfoSnak->new(
+                 'datavalue' => Wikibase::Datatype::Value::Item->new(
+                         'value' => 'Q5',
+                 ),
+                 'property' => 'P31',
         ),
-        'property' => 'P31',
-);
-my $snak2 = Wikibase::Datatype::Snak->new(
-        'datatype' => 'math',
-        'datavalue' => Wikibase::Datatype::Value::String->new(
-                'value' => 'E = m c^2',
-        ),
-        'property' => 'P2534',
+        'property_snaks' => [
+                # of (P642) alien (Q474741)
+                Wikibase::Datatype::MediainfoSnak->new(
+                         'datavalue' => Wikibase::Datatype::Value::Item->new(
+                                 'value' => 'Q474741',
+                         ),
+                         'property' => 'P642',
+                ),
+        ],
 );
 
-# Convert list of snak objects to structure.
-my $snaks_ar = obj_array_ref2struct([$snak1, $snak2], 'snaks',
-        'http://test.wikidata.org/entity/');
+# Get structure.
+my $struct_hr = obj2struct($obj, 'http://test.wikidata.org/entity/');
 
 # Dump to output.
-p $snaks_ar;
+p $struct_hr;
 
 # Output:
 # \ {
-#     snaks         {
-#         P31     [
+#     id                 "M123$00C04D2A-49AF-40C2-9930-C551916887E8",
+#     mainsnak           {
+#         datavalue   {
+#             type    "wikibase-entityid",
+#             value   {
+#                 entity-type   "item",
+#                 id            "Q5",
+#                 numeric-id    5
+#             }
+#         },
+#         property    "P31",
+#         snaktype    "value"
+#     },
+#     qualifiers         {
+#         P642   [
 #             [0] {
-#                 datatype    "wikibase-item",
 #                 datavalue   {
 #                     type    "wikibase-entityid",
 #                     value   {
 #                         entity-type   "item",
-#                         id            "Q5",
-#                         numeric-id    5
+#                         id            "Q474741",
+#                         numeric-id    474741
 #                     }
 #                 },
-#                 property    "P31",
-#                 snaktype    "value"
-#             }
-#         ],
-#         P2534   [
-#             [0] {
-#                 datatype    "math",
-#                 datavalue   {
-#                     type    "string",
-#                     value   "E = m c^2"
-#                 },
-#                 property    "P2534",
+#                 property    "P642",
 #                 snaktype    "value"
 #             }
 #         ]
 #     },
-#     snaks-order   [
-#         [0] "P31",
-#         [1] "P2534"
-#     ]
+#     qualifiers-order   [
+#         [0] "P642"
+#     ],
+#     rank               "normal",
+#     type               "statement"
 # }

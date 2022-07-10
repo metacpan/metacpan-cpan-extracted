@@ -5,7 +5,7 @@
 use v5.12;
 
 package Chart::Color;
-our $VERSION = 'v2.402.3';
+our $VERSION = 'v2.403.0';
 
 use Carp;
 use Chart::Color::Constant;
@@ -14,6 +14,8 @@ my $new_help = 'constructor of Chart::Color object needs either:'.
         ' 1. RGB or HSL hash or ref: ->new(r => 255, g => 0, b => 0), ->new({ h => 0, s => 100, l => 50 })'.
         ' 2. RGB array or ref: ->new( [255, 0, 0 ]) or >new( 255, 0, 0 )'.
         ' 3. hex form "#FF0000" or "#f00" 4. a name: "red" or "SVG:red".';
+
+## constructor #########################################################
         
 sub new {
     my ($pkg, @args) = @_;
@@ -76,6 +78,8 @@ sub _rgb_from_name_or_hex {
     }
 }
 
+## getter ##############################################################
+
 sub name        { $_[0][0] }
 sub red         { $_[0][1] }
 sub green       { $_[0][2] }
@@ -88,6 +92,8 @@ sub string      { $_[0][0] ? $_[0][0] : "[ $_[0][1], $_[0][2], $_[0][3] ]" }
 sub hsl         { @{$_[0]}[4 .. 6] }
 sub rgb         { @{$_[0]}[1 .. 3] }
 sub rgb_hex     { Chart::Color::Value::hex_from_rgb( $_[0]->rgb() ) }
+
+## methods ##############################################################
 
 sub distance_to {
     my ($self, $c2, $metric) = @_;

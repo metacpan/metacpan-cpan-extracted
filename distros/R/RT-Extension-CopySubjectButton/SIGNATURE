@@ -1,0 +1,31 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEE/Cq28emdVa0NH9j6A89Wd7nc1qIFAmLIKHAACgkQA89Wd7nc
+1qIb7Qv+MuNbz7XOEdeoGCSL7sZ6v7lC0wb5Y5simZvRu/sYy1LNzpIYae+yOVPJ
+UUJUZNAUeYVeCUD3J/1fboM0Hj1ksruBFXp2XhS/5y4UjZ/l39l4pMJ8tysjRrsw
+ZDgtBdzPxk+xB65QNXP0h0IVkcTrziBwjKMqyqEG5JcMYhXpe/rC+NNKcxL+NHgr
+AxhIl5wrVtLR+eR1hT/HSFQkYmJZZMWsCUZyDsaQRbOLPexOz9cNYkgUpZ4wFnIO
+ixukVNIRxSjAmVZec8fdEOiT8P8BYm/wsr14aWOghr5dtPEZqsdbXXcW95RhY25O
+ybKKgkHQ2m65dnjXiSlIFL8TgaAtqSzENsj2GZrOl+ZG0qmYMjoHo316hMwlwbq4
+iVkL4NjTOkulocmovCbY3E7IXrjWTH+0LbgqgFSH27kkzu7rruxTGxyE+UnXis+Q
+MdEZI3EjzMLa9TiFDRTgSP4TVKYSegSlYzUpRAOSAyCV2kOLYA/Fh5yQTZwXqddo
+4xkHfxJl
+=em21
+-----END PGP SIGNATURE-----

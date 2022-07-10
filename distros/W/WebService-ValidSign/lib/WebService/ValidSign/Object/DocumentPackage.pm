@@ -1,6 +1,6 @@
 ## Please see file perltidy.ERR
 package WebService::ValidSign::Object::DocumentPackage;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use Moo;
 
 extends 'WebService::ValidSign::Object';
@@ -143,7 +143,7 @@ WebService::ValidSign::Object::DocumentPackage - A ValidSign DocumentPackage obj
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 

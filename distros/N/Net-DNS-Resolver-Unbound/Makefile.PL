@@ -22,19 +22,19 @@ my %metadata = (
 	AUTHOR		   => 'Dick Franks',
 	LICENSE		   => 'mit',
 	MIN_PERL_VERSION   => 5.008009,
-	CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => 6.66},
+	CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => 6.48},
 	TEST_REQUIRES	   => {
-		'ExtUtils::MakeMaker' => 6.66,
-		'File::Find'	      => 1.05,
-		'File::Spec'	      => 0.86,
-		'IO::File'	      => 1.08,
-		'Test::More'	      => 0.47,
+		'ExtUtils::MakeMaker' => 0,
+		'File::Find'	      => 1.13,
+		'File::Spec'	      => 3.29,
+		'IO::File'	      => 1.14,
+		'Test::More'	      => 0.80,
 		} );
 
 
 my %prerequisite = (
 	'Carp'	     => 1.10,
-	'DynaLoader' => 1.04,
+	'DynaLoader' => 1.09,
 	'Net::DNS'   => 1.19,
 	);
 
@@ -51,8 +51,8 @@ if ( my $dir = $ENV{UNBOUND_PREFIX} ) {
 	$lib = "-L$dir/lib -lunbound";
 
 } elsif (`pkg-config --modversion libunbound 2>$nul`) {
-	$inc = `pkg-config --cflags libunbound 2>$nul`;
-	$lib = `pkg-config --libs   libunbound 2>$nul`;
+	$inc = `pkg-config --cflags --keep-system-cflags libunbound 2>$nul`;
+	$lib = `pkg-config --libs   --keep-system-libs	 libunbound 2>$nul`;
 
 } elsif ( $^O eq 'MSWin32' ) {
 	$lib = '-llibunbound' if $Config{cc} =~ /cl/;

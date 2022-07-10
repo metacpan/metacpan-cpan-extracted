@@ -1,0 +1,51 @@
+---
+abstract: 'generate VBA patch script from diff output'
+author:
+  - 'Kazumasa Utashiro'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-diff2vba
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::diff2vba:
+    file: lib/App/diff2vba.pm
+    version: '0.99'
+requires:
+  App::Greple::msdoc: '0'
+  App::Greple::subst: '0'
+  App::sdif: '0'
+  Data::Section::Simple: '0'
+  Encode: '0'
+  Getopt::EX::Hashed: '1.03'
+  Getopt::EX::Long: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Pod::Usage: '0'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/kaz-utashiro/App-diff2vba/issues
+  homepage: https://github.com/kaz-utashiro/App-diff2vba
+  repository: git://github.com/kaz-utashiro/App-diff2vba.git
+version: '0.99'
+x_authority: cpan:UTASHIRO
+x_contributors:
+  - 'Kazumasa Utashiro <kaz@utashiro.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

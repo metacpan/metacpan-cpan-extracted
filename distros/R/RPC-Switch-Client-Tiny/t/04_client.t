@@ -32,11 +32,11 @@ sub new_client_pipe_test_out {
 }
 
 sub new_client_pipe_test_in {
-	my ($msg) = @_;
+	my ($msg, $opts) = @_;
 	socketpair(my $out, my $in, AF_UNIX, SOCK_STREAM, PF_UNSPEC) or die "socketpair: $!";
 	RPC::Switch::Client::Tiny::Netstring::netstring_write($out, $msg);
 	$out->close();
-	my $client = RPC::Switch::Client::Tiny->new(sock => $in, who => $who, token => $token, auth_method => $auth_method, timeout => 1);
+	my $client = RPC::Switch::Client::Tiny->new(sock => $in, who => $who, token => $token, auth_method => $auth_method, timeout => 1, %$opts);
 	return ($in, $client);
 }
 
@@ -57,7 +57,7 @@ $in->close();
 # test bad msg
 #
 $msg = "{bad_json}";
-($in, $client) = new_client_pipe_test_in($msg);
+($in, $client) = new_client_pipe_test_in($msg, {});
 $res = eval { $client->work('name', {}) };
 $err = $@;
 isnt($err, '', 'test client bad json result');
@@ -70,7 +70,7 @@ my $ue_utf8 = "\xC3\xBC"; # utf8 input
 my $ue_latin1 = "\xfc";   # latin1 needs conversion first
 
 socketpair($out, $in, AF_UNIX, SOCK_STREAM, PF_UNSPEC) or die "socketpair: $!";
-$client = RPC::Switch::Client::Tiny->new(sock => $out, who => $who, token => $token, auth_method => $auth_method);
+$client = RPC::Switch::Client::Tiny->new(sock => $out, who => $who, token => $token, auth_method => $auth_method, client_encoding_utf8 => 1);
 $msg = {val => $ue_utf8};
 $res = eval { $client->rpc_send_call('rpcswitch.ping', $msg, undef) };
 $err = $@;
@@ -84,7 +84,7 @@ $in->close();
 #
 my $msgid = '777';
 $msg = '{"id": "'.$msgid.'", "jsonrpc": "2.0", "result": {"val1": "'.$ue_utf8.'", "val2": "'.encode('utf8', $ue_latin1).'"}}';
-($in, $client) = new_client_pipe_test_in($msg);
+($in, $client) = new_client_pipe_test_in($msg, {client_encoding_utf8 => 1});
 $client->{reqs}{$msgid} = 'rpcswitch.ping'; # hack: set status to wait for response
 $res = eval { $client->call($method, {}) };
 $err = $@;

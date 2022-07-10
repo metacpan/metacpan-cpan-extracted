@@ -8,6 +8,7 @@
 
     BEGIN {
         *bare  = \&Acme::Mitey::Cards::Mite::bare;
+        *croak = \&Acme::Mitey::Cards::Mite::croak;
         *false = \&Acme::Mitey::Cards::Mite::false;
         *lazy  = \&Acme::Mitey::Cards::Mite::lazy;
         *ro    = \&Acme::Mitey::Cards::Mite::ro;
@@ -26,7 +27,7 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Initialize attributes
+        # Attribute: cards
         if ( exists $args->{"cards"} ) {
             (
                 do {
@@ -49,18 +50,15 @@
                     $ok;
                 }
               )
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
-                "cards", "CardArray" );
+              or croak "Type check failed in constructor: %s should be %s",
+              "cards", "CardArray";
             $self->{"cards"} = $args->{"cards"};
         }
 
         # Enforce strict constructor
         my @unknown = grep not(/\Acards\z/), keys %{$args};
         @unknown
-          and require Carp
-          and Carp::croak(
+          and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         # Call BUILD methods
@@ -131,10 +129,7 @@
 
     # Accessors for cards
     sub cards {
-        @_ > 1
-          ? require Carp
-          && Carp::croak("cards is a read-only attribute of @{[ref $_[0]]}")
-          : (
+        @_ > 1 ? croak("cards is a read-only attribute of @{[ref $_[0]]}") : (
             exists( $_[0]{"cards"} ) ? $_[0]{"cards"} : (
                 $_[0]{"cards"} = do {
                     my $default_value = $_[0]->_build_cards;
@@ -157,18 +152,12 @@
                             $ok;
                         }
                       }
-                      or do {
-                        require Carp;
-                        Carp::croak(
-                            sprintf
-                              "Type check failed in default: %s should be %s",
-                            "cards", "CardArray"
-                        );
-                      };
+                      or croak( "Type check failed in default: %s should be %s",
+                        "cards", "CardArray" );
                     $default_value;
                 }
             )
-          );
+        );
     }
 
     1;

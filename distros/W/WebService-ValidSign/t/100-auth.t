@@ -6,7 +6,6 @@ use LWP::UserAgent;
 
 {
     my $client = WebService::ValidSign->new(
-        endpoint => 'https://try.validsign.nl/api',
         secret   => 'Foo',
     );
 
@@ -27,6 +26,25 @@ use LWP::UserAgent;
     is($token, "a very secret token", "Got a token from the API");
     is($client->token, $token, "... client->token also works");
     is($call_count, 1, "... and the token is cached");
+
+    is(
+        $auth->get_endpoint("foo"),
+        'https://try.validsign.nl/api/foo',
+        "Got the correct endpoint"
+    );
+
+    {
+        # Test to see if multiple empty path sections are stripped off
+        my $client = WebService::ValidSign->new(
+            secret   => 'Foo',
+            endpoint => 'https://foo.bar.nl/bar//',
+        );
+        is(
+            $client->auth->get_endpoint("foo"),
+            'https://foo.bar.nl/bar/foo',
+            "Got the correct endpoint"
+        );
+    }
 }
 
 SKIP: {

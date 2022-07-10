@@ -67,7 +67,7 @@
    "provides" : {
       "App::PericmdUtils" : {
          "file" : "lib/App/PericmdUtils.pm",
-         "version" : "0.053"
+         "version" : "0.054"
       }
    },
    "release_status" : "stable",
@@ -82,7 +82,7 @@
          "web" : "https://github.com/perlancar/perl-App-PericmdUtils"
       }
    },
-   "version" : "0.053",
+   "version" : "0.054",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

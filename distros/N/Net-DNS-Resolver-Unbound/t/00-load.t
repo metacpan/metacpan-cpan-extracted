@@ -3,29 +3,45 @@
 
 use strict;
 use warnings;
+use IO::File;
 use Test::More tests => 2;
 
 my @module = qw(
 		Net::DNS
 		Net::DNS::Resolver::Unbound
 		Net::DNS::Resolver::libunbound
-		ExtUtils::MakeMaker
-		File::Find
-		File::Spec
-		IO::File
-		Test::More
 		);
 
+my %metadata;
+my $handle = IO::File->new('MYMETA.json') || IO::File->new('META.json');
+if ($handle) {
+	my $json = join '', (<$handle>);
+	for ($json) {
+		s/\s:\s/ => /g;					# Perl? en voilà!
+		my $hashref = eval $_;
+		%metadata = %$hashref;
+	}
+	close $handle;
+}
 
-my @diag = "\nThese tests were run using:";
-foreach my $module (@module) {
+my %prerequisite;
+foreach ( values %{$metadata{prereqs}} ) {			# build, runtime, etc.
+	foreach ( values %$_ ) {				# requires
+		$prerequisite{$_}++ for keys %$_;
+	}
+	delete @prerequisite{@module};
+	delete $prerequisite{perl};
+}
+
+my @diag;
+foreach my $module ( @module, sort keys %prerequisite ) {
 	eval "require $module";		## no critic
 	for ( eval { $module->VERSION || () } ) {
 		s/^(\d+\.\d)$/${1}0/;
 		push @diag, sprintf "%-30s  %s", $module, $_;
 	}
 }
-diag join "\n\t", @diag;
+diag join "\n\t", "\nThese tests were run using:", @diag;
 
 
 unless ( ok( eval { Net::DNS::Resolver::libunbound->VERSION }, 'XS component Unbound.xs loaded' ) ) {

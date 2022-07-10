@@ -31,10 +31,10 @@ BOUNDARY_REGEX=(?=\\pP)
 endif
 
 dearu.base: $(ORIGINAL) reorder.pl Makefile
-	awk '{ print $$1 "  " $$2 }' $< | column -t | $(PERL) reorder.pl > $@
+	awk '$$3 != "<" { print $$1 "  " $$2 }' $< | column -t | $(PERL) reorder.pl > $@
 
 desumasu.base: $(ORIGINAL) reorder.pl Makefile
-	awk 'length($$3)==0 { print $$2 "  " $$1 }' $< | column -t | $(PERL) reorder.pl > $@
+	awk '$$3 != ">" { print $$2 "  " $$1 }' $< | column -t | $(PERL) reorder.pl > $@
 
 %.dict: %.base Makefile
 	$(PERL) -p -E 's/(?=\s)/ね?$(BOUNDARY_REGEX)/' $< > $@

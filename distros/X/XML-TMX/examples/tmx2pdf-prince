@@ -30,11 +30,14 @@ if(not -f "$ENV{HOME}/.gwb/tmx.css"){
   close F;
 }
 system("prince -s $ENV{HOME}/.gwb/tmx.css '$tmx' -o '$tmp' 2> /dev/null"); 
-if($v){ system("xpdf -z width -cont -g 1500x1050 $tmp")} ;
+if($v){ system("xpdf -z width -cont -g 1500x1050 '$tmp'")} ;
 unlink (@u);
 
 __DATA__
 @charset "UTF-8";
+
+prop { display: none; 
+}
 
 tu { display: block; 
      border-top: solid red 1px;
@@ -50,19 +53,26 @@ tuv { display: block;
 
 tuv            {color:orange; font-size:70% ; }
 
-tuv:lang(pt)   {color:green; }
-tuv:lang(pt_pt){color:green; }
-tuv:lang(pt-pt){color:green; }
-tuv:lang(PT_PT){color:green; }
-tuv:lang(PT-PT){color:green; }
+/* tuv:lang(pt)   {color:olive; } */
+tuv:lang(pt)   {color:LightSeaGreen; }
+tuv:lang(pt_pt){color:LightSeaGreen; }
+tuv:lang(pt-pt){color:LightSeaGreen; }
+tuv:lang(PT_PT){color:LightSeaGreen; }
+tuv:lang(PT-PT){color:LightSeaGreen; }
+tuv:lang(en)   {color:DarkCyan; }
+tuv:lang(fr)   {color:OrangeRed; }
 
 strong, emph, b { font-weight: bold; }
 
 tuv::before    {color: black; font-size:70%;  }
 
-tuv[lang]::before    { content:counter(num) " " attr(lang) " "; }
-tuv:lang(pt)::before { content:counter(num) " PT ";             }
-tuv:lang(en)::before { content:counter(num) " EN ";             }
+tuv[lang]::before     { content:counter(num) " " attr(lang) " "; }
+tuv[xml\:lang]::before { content:counter(num) " " attr(xml\:lang) " "; }
+tuv:lang(pt)::before  { content:counter(num) " PT ";             }
+tuv:lang(en)::before  { content:counter(num) " EN ";             }
+tuv:lang(es)::before  { content:counter(num) " ES ";             }
+tuv:lang(fr)::before  { content:counter(num) " FR ";             }
+tuv:lang(de)::before  { content:counter(num) " DE ";             }
 tuv:lang(en_GB)::before { content:counter(num) " EN ";             }
 tuv:lang(en_US)::before { content:counter(num) " EN ";             }
 
@@ -80,8 +90,8 @@ header{ display:none;     }
      columns:2;
      size:screen; 
 }
-/* END */
 
+/* END */
 
 =head1 NAME
 
@@ -93,6 +103,12 @@ tmx2pdf-prince - convert TMX files to PDF
  tmx2pdf-prince -v file.tmx
 
 =head1 DESCRIPTION
+
+=head2 Options
+
+ -v            show generated PDF
+ -m=20         just process first 20 lines
+ -o=file.pdf   define outour file (def: "__file.pdf")
 
 =head2 Dependencies
 

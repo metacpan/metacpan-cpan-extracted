@@ -6,7 +6,7 @@
 ^MANIFEST\.bak$
 ^MYMETA\.
 ^Imager-File-APNG
-^Makefile$
+^Makefile(\.old)?$
 ^testout/
 \.zip$
 \#

@@ -6,12 +6,12 @@ use utf8; # Files and dictionaries might use utf8
 use Encode;
 
 use Carp;
-use File::Slurp::Tiny 'read_file';
+use Path::Tiny;
 use Text::Hunspell;
 use Test::Text::Sentence qw(split_sentences);
 use v5.22;
 
-use version; our $VERSION = qv('0.6.4'); # Works with UTF8 and includes Text::Sentence
+use version; our $VERSION = qv('0.6.7'); # Really works with RMarkdown
 
 use parent 'Test::Builder::Module'; # Included in Test::Simple
 
@@ -31,7 +31,7 @@ sub new {
   my $language = shift || "en_US"; # Defaults to English
   my @files = @_ ; # Use all appropriate files in dir by default
   if (!@files ) {
-    @files = glob("$dir/*.md $dir/*.tex $dir/*.txt $dir/*.markdown)");
+    @files = glob("$dir/*.md $dir/*.tex $dir/*.txt $dir/*.markdown $dir/*.Rmd $dir/*.Rmarkdown)");
   } else {
     @files = map( "$dir/$_", @files );
   }
@@ -68,8 +68,8 @@ sub check {
   my %vocabulary;
   my @sentences;
   for my $f ( @{$self->files}) {
-    my $file_content= read_file($f, binmode => ':utf8');
-    if ( $f =~ /(\.md|\.markdown)/ ) {
+    my $file_content= path($f)->slurp_utf8;
+    if ( $f =~ /(\.md|\.markdown|\.Rmd|\.Rmarkdown)/ ) {
       $file_content = _strip_urls( $file_content);
       $file_content = _strip_code( $file_content);
     }
@@ -95,6 +95,7 @@ sub _strip_urls {
 
 sub _strip_code {
   my $text = shift || carp "No text in _strip_code";
+  $text =~ s/---[\w\W]*?---//g;
   $text =~ s/~~~[\w\W]*?~~~//g;
   $text =~ s/```[\w\W]+?```//g;
   $text =~ s/`[^`]+?`//g;
@@ -126,7 +127,7 @@ __END__
 
 =head1 NAME
 
-Test::Text - A module for testing text files for spelling and (maybe) more. 
+Test::Text - A module for testing text files for spelling and (maybe) more.
 
 =head1 VERSION
 
@@ -136,8 +137,9 @@ This document describes Test::Text version 0.5.0
 
     use Test::Text;
 
-    my $dir = "path/to/text_dir"; 
-    my $data = "path/to/data_dir"; 
+    # This directory will include .md, .Rmd, and text files
+    my $dir = "path/to/text_dir";
+    my $data = "path/to/data_dir";
 
     my $tesxt = Test::Text->new($text_dir, $dict_dir); # Defaults to English: en_US and all files
 

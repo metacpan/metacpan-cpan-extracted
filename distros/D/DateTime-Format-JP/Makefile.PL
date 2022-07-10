@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
         'utf8'          => 0,
         'warnings'      => '1.44',
         'DateTime'      => '1.54',
+        'DateTime::TimeZone' => '2.52',
         'Nice::Try'     => 'v1.1.2',
     },
     TEST_REQUIRES =>
@@ -25,8 +26,9 @@ my %WriteMakefileArgs = (
     },
     LICENSE             => 'perl_5',
     MIN_PERL_VERSION    => 'v5.14.0',
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'Text-PO-*' },
+    (MM->can('signature_target') ? (SIGN => 1) : ()),
+    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', PREOP => './dev/cleanup.pl' },
+    clean               => { FILES => 'DateTime-Format-JP-*' },
     ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
         'meta-spec' => { version => 2 },
         dynamic_config => 1,

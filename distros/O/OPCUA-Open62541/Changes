@@ -1,5 +1,21 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+1.02 2022-07-09
+    - Fix reference counting with server node lifecycle callbacks.
+      The behaviour in open62541 has changed, use heuristic to free
+      Perl SV.  Use common code for all server add node functions.
+    - Adapt client subscription callback to open62541 API 1.1.
+    - Test for source timestamps and async read value accept also
+      behavior of newer open62541.
+    - Behavior of Perl node context in constructor and destructor
+      has changed so that it can work with both old and new open62541.
+    - Connect and disconnect behavior has changed in subtle ways,
+      especially in the async case.  Tests tolerate more variations.
+    - To call the client state callback with a valid Perl client
+      variable, update the client context more often to current SV.
+      Due to different callback behavior, this became an issue with
+      newer open62541.
+
 1.01 2022-06-17
     - Adapt client iterate timeout to 32 bit for open62541 API 1.1.
     - Use the SECURECHANNELSTATE constants from API 1.1 and 1.2.

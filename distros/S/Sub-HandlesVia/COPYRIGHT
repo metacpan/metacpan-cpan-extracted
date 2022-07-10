@@ -8,6 +8,8 @@ Files: Changes
  META.yml
  dist.ini
  doap.ttl
+ lib/Sub/HandlesVia/CodeGenerator.pm.mite.pm
+ lib/Sub/HandlesVia/Handler.pm.mite.pm
  lib/Sub/HandlesVia/HandlerLibrary.pm
  lib/Sub/HandlesVia/HandlerLibrary/Array.pm
  lib/Sub/HandlesVia/HandlerLibrary/Bool.pm
@@ -17,11 +19,17 @@ Files: Changes
  lib/Sub/HandlesVia/HandlerLibrary/Number.pm
  lib/Sub/HandlesVia/HandlerLibrary/Scalar.pm
  lib/Sub/HandlesVia/HandlerLibrary/String.pm
+ lib/Sub/HandlesVia/Toolkit.pm.mite.pm
  lib/Sub/HandlesVia/Toolkit/Mite.pm
+ lib/Sub/HandlesVia/Toolkit/Mite.pm.mite.pm
  lib/Sub/HandlesVia/Toolkit/Moo.pm
+ lib/Sub/HandlesVia/Toolkit/Moo.pm.mite.pm
  lib/Sub/HandlesVia/Toolkit/Moose.pm
+ lib/Sub/HandlesVia/Toolkit/Moose.pm.mite.pm
  lib/Sub/HandlesVia/Toolkit/Mouse.pm
+ lib/Sub/HandlesVia/Toolkit/Mouse.pm.mite.pm
  lib/Sub/HandlesVia/Toolkit/Plain.pm
+ lib/Sub/HandlesVia/Toolkit/Plain.pm.mite.pm
  t/02moo.t
  t/04moose/trait_array.t
  t/04moose/trait_bool.t
@@ -80,8 +88,7 @@ Files: Changes
 Copyright: Copyright 2022 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: Makefile.PL
- t/00begin.t
+Files: t/00begin.t
  t/02moo/role.t
  t/02moo/trait_array.t
  t/02moo/trait_bool.t
@@ -160,6 +167,7 @@ License: GPL-1.0+ or Artistic-1.0
 
 Files: INSTALL
  LICENSE
+ Makefile.PL
  t/40mite/.mite/config
 Copyright: Unknown
 License: Unknown
@@ -170,7 +178,8 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: t/40mite/lib/MyTest/Mite.pm
+Files: lib/Sub/HandlesVia/Mite.pm
+ t/40mite/lib/MyTest/Mite.pm
 Copyright: This software is copyright (c) 2011-2014 by Michael G Schwern.
  This software is copyright (c) 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0

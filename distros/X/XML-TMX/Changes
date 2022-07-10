@@ -1,5 +1,16 @@
 Revision history for Perl extension XML::TMX.
 
+0.39   2022-07-05
+       - tmxsplit defaults to utf8
+       - tmxgrep 'pt:terra;en:land' file.tmx
+       - tmxgrep -html 'pt:terra;en:land' file.tmx
+          (grep + converts to html + open in browser)
+       - tmx2html 
+          -v     (converts to html + open in browser)
+          -v=chromium   (idem and open in Chromium)
+       - tmxclean
+          some documtnation added
+
 0.36   2017-09-08
        - Minor package Fixes (Nuno Smash Carvalho)
 

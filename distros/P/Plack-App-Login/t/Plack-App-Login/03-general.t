@@ -13,9 +13,9 @@ use Test::NoWarnings;
 my $app = Plack::App::Login->new;
 my $test = Plack::Test->create($app);
 my $res = $test->request(HTTP::Request->new(GET => '/'));
-my $right_ret = <<'END';
+my $right_ret = <<"END";
 <!DOCTYPE html>
-<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="generator" content="Login" /><title>Login page</title><style type="text/css">.outer{position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);}.login{text-align:center;background-color:blue;padding:1em;}.login a{text-decoration:none;color:white;font-size:3em;}
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="generator" content="Plack::App::Login; Version: $Plack::App::Login::VERSION" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Login page</title><style type="text/css">.outer{position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);}.login{text-align:center;background-color:blue;padding:1em;}.login a{text-decoration:none;color:white;font-size:3em;}
 </style></head><body class="outer"><div class="login"><a href="login">LOGIN</a></div></body></html>
 END
 chomp $right_ret;
@@ -32,12 +32,13 @@ $app = Plack::App::Login->new(
 );
 $test = Plack::Test->create($app);
 $res = $test->request(HTTP::Request->new(GET => '/'));
-$right_ret = <<'END';
+$right_ret = <<"END";
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="generator" content="Login" />
+    <meta name="generator" content="Plack::App::Login; Version: $Plack::App::Login::VERSION" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
       Login page
     </title>
@@ -93,6 +94,7 @@ $right_ret = <<'END';
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="generator" content="Foo" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
       Foo
     </title>

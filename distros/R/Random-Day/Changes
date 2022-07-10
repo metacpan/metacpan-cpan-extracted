@@ -1,3 +1,10 @@
+0.11 2022-07-09T17:13:47+02:00
+ - Add blank lines to code after arguments processing and before return.
+ - Add tests for random_month_year() method.
+ - Fix random_month_year() method. There were issue with creating before
+   date. e.g. for February 2022.
+ - Update copyright years.
+
 0.10 2021-01-27T19:21:56+01:00
  - Fix bugtracker.
  - Update copyright years.

@@ -1,6 +1,12 @@
 Revision history for Term::Choose
 
 
+1.756   2022-07-08
+    - Cache character widths in a hash instead of in an array.
+    - Code refactoring.
+    - Bugfix: _reset_term if changed term size width set option 'll'.
+    - Update documentation.
+
 1.755   2022-07-01
     - layout set to 3 now causes choose to die;
 

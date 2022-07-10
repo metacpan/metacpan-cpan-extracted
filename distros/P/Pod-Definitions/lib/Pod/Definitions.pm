@@ -1,6 +1,6 @@
 package Pod::Definitions;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use strict;
 use warnings;
@@ -153,7 +153,7 @@ Pod::Definitions -- extract main sections and contained definitions from Pod
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -167,21 +167,8 @@ top-level (head1) headings, and the names of the functions, methods,
 events, or such as documented therein.
 
 Heading names, presumed to be written in the English language, are
-simplifed for indexing purposes. (See L<Pod::Headings::Heuristic> for
-details.)  For example:
-
-    What is the Q function?               -> Q function
-    How can I blip the blop?              -> Blip the blop
-    Why doesn't my socket have a packet?  -> Socket have a packet
-    Where are the pockets on the port?    -> Pockets on the port
-    I need to reap the zombie             -> Reap the zombie
-    What does the error "Disk full" mean? -> Disk full
-    What about backwards compatibility?   -> Backwards compatibility
-    Reaping the zombie from proctab       -> Zombie, reaping from proctab
-    $c = Mojo::Path->new()                -> new
-
-Currently, captialization (other than rewrites of type type shown
-above) is mostly left for the caller to handle.
+simplifed for indexing purposes. (See L<Pod::Definitions::Heuristic>
+for details.)
 
 =head1 METHODS
 
@@ -189,7 +176,7 @@ above) is mostly left for the caller to handle.
 
 Creates a new object of type Pod::Definitions
 
-=head2 parse_file ($filename)
+=head2 parse_file
 
 Parse a podfile, or Perl source file. Returns the Pod::Headings
 object, which, as a subclass of Pod::Simple, may give various useful
@@ -213,22 +200,50 @@ Module leaf name (e.g., 'Path')
 =head2 sections
 
 Hash (with the key being the toplevel section, e.g., "FUNCTIONS") of
-arrays of section names, or undef if no sections (other than the
-standard NAME and SEE ALSO) were given in the Pod file
+arrays of section information hashes.  If no sections (other than the
+standard NAME and SEE ALSO) were given in the Pod file, C<sections>
+will be undef.
+
+Section information hashes contain the following:
+
+=over
+
+=item raw
+
+The text of the heading as it occurs in the source file
+
+=item cooked
+
+The 'cleaned' text of the heading, from L<Pod::Definitions::Heuristic>
+
+=item sequence
+
+The sequential number of the heading, from L<Pod::Headings>
+
+=item link
+
+The C<manpage> value of the file
+
+=item link_fragment
+
+The heading text, converted to an href compatible with
+metacpan and other displays.
+
+=back
 
 =head1 SEE ALSO
 
-L<Pod::Simple>, L<Pod::Headings>
+L<Pod::Simple>, L<Pod::Headings>, L<Pod::Definitions::Heuristic>
 
 =head1 SUPPORT
 
-This module is managed in an open GitHub repository,
-L<https://github.com/lindleyw/Pod-Definitions>. Feel free to fork and
+This module is managed in an open GitLab repository,
+L<https://gitlab.com/wlindley/Pod-Definitions>. Feel free to fork and
 contribute, or to clone and send patches.
 
 =head1 AUTHOR
 
 This module was written and is maintained by William Lindley
-<wlindley@cpan.org>.
+E<lt>wlindley@cpan.orgE<gt>.
 
 =cut

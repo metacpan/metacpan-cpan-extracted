@@ -11,7 +11,7 @@ use vars qw(@EXPORT @EXPORT_OK @ISA $VERSION);
 BEGIN {
     require Exporter;
     @ISA = qw(Exporter);
-    $VERSION = '1.09';
+    $VERSION = '1.10';
     @EXPORT = @EXPORT_OK = qw(rd_f wr_f ap_f find_home find_temp find_bin lockafile unlockafile unlock_all_the_files);
 }
 
@@ -118,7 +118,7 @@ sub rd_f {
         }
     }
     else {
-        my $res = sysread($fh, $buf, 0xFFFFFFFF);
+        my $res = sysread($fh, $buf, 0x7FFFFFFF);
         if (!defined $res) {
             ($OK, $ERROR, $ERRNO, $ERRNUM) = ('ERROR', 'read failed', $!, 0+$!);
             return undef;

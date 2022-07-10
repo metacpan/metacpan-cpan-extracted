@@ -5,34 +5,104 @@ use warnings;
 package Sub::HandlesVia::Handler;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.028';
+our $VERSION   = '0.031';
 
-use Class::Tiny (
-	qw(
-		template
-		lvalue_template
-		args
-		name
-		signature
-		curried
-		is_chainable
-		no_validation_needed
-		additional_validation
-		default_for_reset
-		documentation
-		_examples
-		prefer_shift_self
-	),
-	{
-		is_mutator   => sub { defined $_[0]{lvalue_template} or $_[0]{template} =~ /«/ },
-		min_args     => sub { shift->args },
-		max_args     => sub { shift->args },
-		usage        => sub { shift->_build_usage },
-		allow_getter_shortcuts => sub { 1 },
-	},
+use Sub::HandlesVia::Mite -all;
+
+has name => (
+	is => ro,
+	isa => 'Str',
 );
+
+has template => (
+	is => ro,
+	isa => 'Str',
+);
+
+has lvalue_template => (
+	is => ro,
+	isa => 'Str',
+);
+
+has args => (
+	is => ro,
+	isa => 'Int|Undef',
+	default => undef,
+);
+
+has [ 'min_args', 'max_args' ] => (
+	is => lazy,
+	isa => 'Int|Undef',
+	builder => sub { shift->args },
+);
+
+# Not proper predicates because they check definedness
 sub has_min_args { defined shift->min_args }
 sub has_max_args { defined shift->max_args }
+
+has signature => (
+	is => ro,
+	isa => 'ArrayRef|Undef',
+);
+
+has usage => (
+	is => lazy,
+	isa => 'Str',
+	builder => true,
+);
+
+has curried => (
+	is => ro,
+	isa => 'ArrayRef',
+);
+
+has [ 'is_chainable', 'no_validation_needed' ] => (
+	is => ro,
+	isa => 'Bool',
+	coerce => true,
+);
+
+has is_mutator => (
+	is => lazy,
+	isa => 'Bool',
+	coerce => true,
+	default => sub { defined $_[0]{lvalue_template} or $_[0]{template} =~ /«/ }
+);
+
+has allow_getter_shortcuts => (
+	is => ro,
+	isa => 'Bool',
+	coerce => true,
+	default => true,
+);
+
+has prefer_shift_self => (
+	is => ro,
+	isa => 'Bool',
+	coerce => true,
+	default => false,
+);
+
+has additional_validation => (
+	is => ro,
+	isa => 'CodeRef|Str|Undef',
+);
+
+has default_for_reset => (
+	is => ro,
+	isa => 'CodeRef',
+);
+
+has documentation => (
+	is => ro,
+	isa => 'Str',
+);
+
+has _examples => (
+	is => ro,
+	isa => 'CodeRef',
+);
+
 sub _build_usage {
 	no warnings 'uninitialized';
 	my $self = shift;
@@ -203,13 +273,12 @@ sub _generate_handler {
 package Sub::HandlesVia::Handler::Traditional;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.028';
+our $VERSION   = '0.031';
 
-BEGIN { our @ISA = 'Sub::HandlesVia::Handler' };
+use Sub::HandlesVia::Mite -all;
+extends 'Sub::HandlesVia::Handler';
 
-sub BUILD {
-	$_[1]{name} or die 'name required';
-}
+has '+name' => ( required => true );
 
 sub is_mutator { 0 }
 
@@ -225,11 +294,16 @@ sub template {
 package Sub::HandlesVia::Handler::CodeRef;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.028';
+our $VERSION   = '0.031';
 
-BEGIN { our @ISA = 'Sub::HandlesVia::Handler' };
+use Sub::HandlesVia::Mite -all;
+extends 'Sub::HandlesVia::Handler';
 
-use Class::Tiny qw( delegated_coderef );
+has delegated_coderef => (
+	is => 'ro',
+	isa => 'CodeRef',
+	required => true,
+);
 
 sub is_mutator { 0 }
 

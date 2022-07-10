@@ -147,7 +147,7 @@ vs-upload.pl - Create a ValidSign document package from the command line
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

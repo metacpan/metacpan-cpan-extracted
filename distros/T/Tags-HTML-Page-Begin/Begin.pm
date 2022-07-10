@@ -13,7 +13,7 @@ Readonly::Hash my %LANG => (
 	'title' => 'Page title',
 );
 
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 
 # Constructor.
 sub new {
@@ -84,7 +84,7 @@ sub new {
 	$self->{'tags'} = undef;
 
 	# Viewport.
-	$self->{'viewport'} = undef;
+	$self->{'viewport'} = 'width=device-width, initial-scale=1.0';
 
 	# Process params.
 	set_params($self, @params);
@@ -502,7 +502,9 @@ Default value is undef.
 
 Document viewport.
 
-Default value is undef.
+It's optional.
+
+Default value is 'width=device-width, initial-scale=1.0'.
 
 =back
 
@@ -577,6 +579,7 @@ Returns undef.
  #     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
  #     <meta name="generator" content=
  #       "Perl module: Tags::HTML::Page::Begin, Version: 0.06" />
+ #     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
  #     <title>
  #       Page title
  #     </title>
@@ -629,6 +632,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.12
+0.13
 
 =cut

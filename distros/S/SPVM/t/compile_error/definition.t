@@ -202,7 +202,7 @@ use Test::More;
 
   # Method definition
   {
-    compile_not_ok_file('CompileError::Method::INIT');
+    compile_not_ok_file('CompileError::Method::INIT', qr/"INIT" can't be used as a method name/);
     compile_not_ok_file('CompileError::Method::TooManyArguments', qr/Too many arguments/i);
     compile_not_ok_file('CompileError::Method::TooManyArgumentsMulnum'. qr/Too many arguments/i);
     
@@ -214,6 +214,10 @@ use Test::More;
         my $source = 'class MyClass { static method foo::main : void () { } }';
         compile_not_ok($source, qr/The method name "foo::main" can't contain "::"/);
       }
+    }
+    {
+      my $source = 'class MyClass { static method main : void (); }';
+      compile_not_ok($source, qr/Non-native method must have its block/);
     }
   }
 

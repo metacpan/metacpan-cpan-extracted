@@ -1,3 +1,14 @@
+Imager-File-APNG 0.002
+================
+
+ - support writing paletted images, all the supplied images must have
+   the same palette, and the same number of channels.
+
+ - removed some leftover debug code
+   https://github.com/tonycoz/imager-file-apng/pull/1
+
+ - use the new low level read/write API from Imager::File::PNG
+
 Imager-File-APNG 0.001
 ================
 

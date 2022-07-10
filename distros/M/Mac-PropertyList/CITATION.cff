@@ -1,0 +1,47 @@
+# This CITATION.cff file was generated with /Users/brian/bin/bmt
+# Thu Jun 30 14:26:30 2022
+
+abstract: Mac::PropertyList - work with Mac plists at a low level
+authors:
+- alias: briandfoy
+  email: bdfoy@cpan.org
+  family-names: foy
+  given-names: brian d
+  orcid: 0000-0002-0283-8283
+- alias: petdance
+  email: andy@petdance.com
+  family-names: Lester
+  given-names: Andy
+- alias: wiml
+  email: wiml@hhhh.org
+  family-names: Lewis
+  given-names: Wim
+- alias: omega
+  email: andreas.marienborg@gmail.com
+  family-names: Marienborg
+  given-names: Andreas
+- alias: preaction
+  email: madcityzen@gmail.com
+  family-names: Bell
+  given-names: Doug
+- alias: trwyant
+  email: wyant@cpan.org
+  family-names: Wyant
+  given-names: Tom
+- alias: bram-stappers
+  email: bram.stappers@tiobe.com
+  family-names: Stappers
+  given-names: Bram
+- alias: chris.lloyd@storyshareplatform.com
+  family-names: Lloyd
+  given-names: Chris
+cff-version: 1.2.0
+date-released: 2022-06-30
+license: artistic_2
+license-url: https://github.com/briandfoy/mac-propertylist/blob/master/LICENSE
+message: The GitHub page for this module provides formatted citations
+repository-code: https://github.com/briandfoy/mac-propertylist
+title: The Mac::PropertyList Perl module
+type: software
+version: '1.503'
+

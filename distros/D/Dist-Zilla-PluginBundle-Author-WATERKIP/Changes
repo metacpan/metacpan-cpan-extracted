@@ -3,7 +3,16 @@ Revision history for Dist::Zilla::PluginBundle::Author::WATERKIP
 TODO:
 * Get dual license to work with dzil
 
+3.2       2022-07-08 12:22:50Z
+
+    * Fix typo in Dockerfile
+    * Add 'use constants' to skip for prereqs
+    * Add 'use Exporter' to skip for prereqs
+
+
 3.1       2022-06-10 13:46:57Z
+
+    * Update Dockerfile for minting
 
 3.0       2022-06-07 03:34:26Z
 

@@ -4,9 +4,40 @@
 use v5.12;
 
 package Chart::Font;
-our $VERSION = 'v2.402.3';
+our $VERSION = 'v2.403.0';
 
 use Carp;
+
+## constructor #########################################################
+
+sub new {
+    my $pkg = shift;
+    my $def = shift;
+    return unless ref $def eq 'HASH';
+    bless {};
+}
+
+## getter ##############################################################
+
+sub name {
+
+}
+
+sub bold {
+
+}
+
+sub size {
+
+}
+
+sub unicode {
+}
+
+sub truetype {
+
+}
+
 
 1;
 
@@ -44,3 +75,16 @@ Herbert Breunung, <lichtkind@cpan.org>
 
 =cut
 
+
+__END__
+$im->string( GD::Font->Tiny ,       20,  20, 'Tiny',       2);
+$im->string( GD::Font->Small ,      20,  50, 'Small',      1);
+$im->string( GD::Font->MediumBold , 20,  80, 'MediumBold', 2);
+$im->string( GD::Font->Large ,      20, 110, 'Large',      1);
+$im->string( GD::Font->Giant ,      20, 140, 'Giant',      2);
+
+gdTinyFont
+gdSmallFont
+gdMediumBoldFont
+gdLargeFont
+gdGiantFont

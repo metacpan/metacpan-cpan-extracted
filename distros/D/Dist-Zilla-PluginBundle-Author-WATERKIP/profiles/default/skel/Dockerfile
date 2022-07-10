@@ -4,7 +4,7 @@
 # but it is intended to be easy to go into an environment and poke
 # around and edit and less things
 #
-FROM registry.gitlab.com/opndev/perl5/docker-p5/mmoosy-development:latest
+FROM registry.gitlab.com/opndev/perl5/docker-p5/moosy-development:latest
 
 COPY cpanfile .
 RUN docker-cpanm --installdeps --test-only . \

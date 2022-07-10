@@ -26,7 +26,7 @@ METHODS
 
             HTML generator string.
 
-            Default value is 'Login'.
+            Default value is 'Plack::App::Login; Version: __VERSION__'.
 
     *       "login_link"
 
@@ -75,7 +75,7 @@ EXAMPLE
      use Plack::Runner;
      use Tags::Output::Indent;
 
-     # Run application with one PYX file.
+     # Run application.
      my $app = Plack::App::Login->new(
              'css' => CSS::Struct::Output::Indent->new,
              'tags' => Tags::Output::Indent->new(
@@ -129,8 +129,8 @@ EXAMPLE
 
 DEPENDENCIES
     CSS::Struct::Output::Raw, Plack::Util::Accessor,
-    Tags::HTML::Page::Begin, Tags::HTML::Page::End, Tags::Output::Raw,
-    Unicode::UTF8.
+    Tags::HTML::Login::Button, Tags::HTML::Page::Begin,
+    Tags::HTML::Page::End, Tags::Output::Raw, Unicode::UTF8.
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/Plack-App-Login>
@@ -141,10 +141,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2020 Michal Josef Špaček
+    © 2020-2022 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

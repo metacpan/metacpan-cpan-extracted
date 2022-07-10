@@ -1,5 +1,5 @@
 package XML::TMX::FromPO;
-$XML::TMX::FromPO::VERSION = '0.36';
+$XML::TMX::FromPO::VERSION = '0.39';
 # ABSTRACT: Generates a TMX file from a group of PO files
 
 use 5.010;
@@ -308,7 +308,7 @@ XML::TMX::FromPO - Generates a TMX file from a group of PO files
 
 =head1 VERSION
 
-version 0.36
+version 0.39
 
 =head1 SYNOPSIS
 

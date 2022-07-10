@@ -389,17 +389,19 @@ sub test_fr : Test(6) {
         eval { require Date::Holidays::FR };
         skip "Date::Holidays::FR not installed", 6 if $@;
 
+        print STDERR "We have a french holiday\n";
+
         ok(Date::Holidays::FR->can('holidays'));
         ok(Date::Holidays::FR->can('is_holiday'));
 
         ok( my $dh = Date::Holidays->new( countrycode => 'fr' ),
             'Testing Date::Holidays::FR' );
 
-        dies_ok { $dh->holidays(); }
-            'Testing holidays with no arguments for Date::Holidays::FR';
+        ok($dh->holidays(),
+            'Testing holidays with no arguments for Date::Holidays::FR');
 
-        dies_ok { $dh->holidays( year => 2017 ); }
-            'Testing holidays with argument for Date::Holidays::FR';
+        ok($dh->holidays( year => 2017 ),
+            'Testing holidays with argument for Date::Holidays::FR');
 
         my $holidays_hashref = Date::Holidays->is_holiday(
             year  => 2017,

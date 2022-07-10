@@ -34,6 +34,7 @@ t/client-browsenext-async.t
 t/client-config-context.t
 t/client-config-default.t
 t/client-config.t
+t/client-connect-async-refcount.t
 t/client-connect-async.t
 t/client-connect.t
 t/client-disconnect-async.t

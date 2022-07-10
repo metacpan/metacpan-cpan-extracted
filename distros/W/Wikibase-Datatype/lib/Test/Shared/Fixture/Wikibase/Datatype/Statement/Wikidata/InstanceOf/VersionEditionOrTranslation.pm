@@ -4,11 +4,11 @@ use base qw(Wikibase::Datatype::Statement);
 use strict;
 use warnings;
 
-use Test::Shared::Fixture::Wikibase::Datatype::Reference::Wikidata::Fixture1;
+use Test::Shared::Fixture::Wikibase::Datatype::Reference::Wikidata::VIAF;
 use Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::InstanceOf::VersionEditionOrTranslation;
 use Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::Of::Poem;
 
-our $VERSION = 0.16;
+our $VERSION = 0.19;
 
 sub new {
 	my $class = shift;
@@ -19,7 +19,7 @@ sub new {
 			Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::Of::Poem->new,
 		],
 		'references' => [
-			Test::Shared::Fixture::Wikibase::Datatype::Reference::Wikidata::Fixture1->new,
+			Test::Shared::Fixture::Wikibase::Datatype::Reference::Wikidata::VIAF->new,
 		],
 	);
 

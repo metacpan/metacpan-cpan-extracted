@@ -28,7 +28,7 @@ diag( Text::PO::Gettext->error ) if( !defined( $po ) );
 is( $po->charset, 'utf-8', 'charset' );
 is( $po->contentEncoding, '8bit', 'contentEncoding' );
 is( $po->contentType, 'text/plain; charset=utf-8', 'contentType' );
-is( $po->currentLang, ( $ENV{LANGUAGE} || $ENV{LANG} ), 'currentLang' );
+is( $po->currentLang, ( ( defined( $ENV{LANGUAGE} ) || defined( $ENV{LANG} ) ) ? [split( /:/, ( $ENV{LANGUAGE} || $ENV{LANG} ) )]->[0] : '' ), 'currentLang' );
 is( $po->dgettext( 'com.example.api', 'Bad Request' ), 'Mauvaise requête', 'dgettext' );
 is( $po->dngettext( 'com.example.api', 'You have %d message', 'You have %d messages', 1 ), 'Vous avez %d message', 'dngettext with count of 1' );
 is( $po->dngettext( 'com.example.api', 'You have %d message', 'You have %d messages', 2 ), 'Vous avez %d messages', 'dngettext with count of 2' );

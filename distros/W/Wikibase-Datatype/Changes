@@ -1,3 +1,21 @@
+0.19 2022-07-09T16:32:51+02:00
+ - Add page_id to Lexeme.
+ - Add page_id to Lexeme::Wikidata::DogCzechNoun fixture.
+
+0.18 2022-07-09T16:16:36+02:00
+ - Add id to Lexeme.
+ - Add id to Lexeme::Wikidata::DogCzechNoun fixture.
+ - Add alias in another language to Datatype::Item::Wikidata::Dog fixture.
+ - Unify LICENSE AND COPYRIGHT section in doc.
+
+0.17 2022-07-07T21:33:43+02:00
+ - Add doc for Snak::Wikidata::GivenName::Douglas fixture.
+ - Add fixture for GrammaticalGender::Masculine.
+ - Improve Lexeme::Wikidata::DogCzechNoun fixture to reality.
+ - Improve Property::Wikidata::InstanceOf object.
+ - Remove ';;' from example.
+ - Rename Reference::Wikidata::Fixture1 fixture to VIAF.
+
 0.16 2022-06-25T16:25:54+02:00
  - Add Dog item fixture.
  - Add InstanceOf::CommonLivingOrganism statement fixture.

@@ -2,8 +2,8 @@
 use warnings;
 use strict;
 
-# ABSTRACT: Create a ValidSign document package from the command line
-# PODNAME: vs-upload.pl
+# ABSTRACT: Download ValidSign documents from the command line
+# PODNAME: vs-download.pl
 
 use Config::Any;
 use File::Temp;
@@ -83,11 +83,11 @@ __END__
 
 =head1 NAME
 
-vs-upload.pl - Create a ValidSign document package from the command line
+vs-download.pl - Download ValidSign documents from the command line
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

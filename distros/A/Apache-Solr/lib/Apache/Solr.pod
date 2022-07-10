@@ -168,7 +168,7 @@ example:
   if(my $r = $self->queryTerms(fl => 'subject', limit => 100))
      ...
 
-=item $obj-E<gt>B<select>($parameters)
+=item $obj-E<gt>B<select>( [\%options], @parameters )
 
 Find information in the document collection.
 
@@ -176,6 +176,10 @@ This method has a HUGE number of parameters.  These values are passed in
 the uri of the http query to the solr server.  See L<expandSelect()|Apache::Solr/"Parameter pre-processing"> for
 all the simplifications offered here.  Sets of there parameters
 may need configuration help in the server as well.
+
+[1.06] You may pass some options to process the selected results.  For
+backwards compatability reasons, they have to be passed in a HASH as
+optional first parameter.
 
 =back
 
@@ -604,12 +608,12 @@ differences is that C<Apache::Solr> has much more abstraction.
 
 =head1 SEE ALSO
 
-This module is part of Apache-Solr distribution version 1.05,
-built on January 11, 2019. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Apache-Solr distribution version 1.06,
+built on July 08, 2022. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2012-2019 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2012-2022 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

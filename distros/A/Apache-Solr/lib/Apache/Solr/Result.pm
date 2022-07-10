@@ -1,17 +1,19 @@
-# Copyrights 2012-2019 by [Mark Overmeer].
+# Copyrights 2012-2022 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
+# Pod stripped from pm file by OODoc 2.03.
 # This code is part of distribution Apache-Solr.  Meta-POD processed with
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Apache::Solr::Result;
 use vars '$VERSION';
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 
 use warnings;
+no warnings 'recursion';  # linked list of pages can get deep
+
 use strict;
 
 use Log::Report    qw(solr);
@@ -34,24 +36,30 @@ use overload
 sub new(@) { my $c = shift; (bless {}, $c)->init({@_}) }
 sub init($)
 {   my ($self, $args) = @_;
-    $self->{ASR_params}   = $args->{params}   or panic;
-    $self->{ASR_endpoint} = $args->{endpoint} or panic;
+    my $p = $self->{ASR_params} = $args->{params} or panic;
+    $self->{ASR_endpoint} = $args->{endpoint}     or panic;
+
+    my %params            = @$p;
 
     $self->{ASR_start}    = time;
     $self->request($args->{request});
     $self->response($args->{response});
 
-    $self->{ASR_pages}    = [$self];
-    weaken $self->{ASR_pages}[0];            # no reference loop!
+    $self->{ASR_pages}    = [ $self ];   # first has non-weak page-table
+    weaken $self->{ASR_pages}[0];        # no reference loop!
 
     if($self->{ASR_core} = $args->{core}) { weaken $self->{ASR_core} }
-    $self->{ASR_next}    = 0;
+    $self->{ASR_next}    = $params{start} || 0;
 
+	$self->{ASR_seq}     = $args->{sequential} || 0;
     $self;
 }
 
 # replace the pageset with a shared set.
-sub _pageset($) { $_[0]->{ASR_pages} = $_[1] }
+sub _pageset($)
+{   $_[0]->{ASR_pages} = $_[1];
+    weaken $_[0]->{ASR_pages};           # otherwise memory leak
+}
 
 #---------------
 
@@ -59,6 +67,7 @@ sub start()    {shift->{ASR_start}}
 sub endpoint() {shift->{ASR_endpoint}}
 sub params()   {@{shift->{ASR_params}}}
 sub core()     {shift->{ASR_core}}
+sub sequential() {shift->{ASR_seq}}
 
 sub request(;$) 
 {   my $self = shift;
@@ -157,16 +166,22 @@ sub nrSelected()
 }
 
 
-sub selected($;$)
-{   my ($self, $rank, $client) = @_;
+sub selected($%)
+{   my ($self, $rank, %options) = @_;
     my $result   = $self->_getResults
         or panic __x"there are no results in the answer";
+
+	# start for next
+    $self->{ASR_next} = $rank +1;
 
     # in this page?
     my $startnr  = $result->{start};
     if($rank >= $startnr)
     {   my $docs = $result->{doc} // $result->{docs} // [];
-        $docs    = [$docs] if ref $docs eq 'HASH'; # when only one result
+
+        # Decoding XML without schema may give unexpect results
+        $docs    = [ $docs ] if ref $docs eq 'HASH'; # when only one result
+
         if($rank - $startnr < @$docs)
         {   my $doc = $docs->[$rank - $startnr];
             return Apache::Solr::Document->fromResult($doc, $rank);
@@ -183,10 +198,9 @@ sub selected($;$)
 }
 
 
-sub nextSelected()
+sub nextSelected(%)
 {   my $self = shift;
-    my $nr   = $self->{ASR_next}++;
-    $self->selected($nr);
+    $self->selected($self->{ASR_next}, @_);
 }
 
 
@@ -276,11 +290,18 @@ sub selectedPageLoad($;$)
       ( {start => $pagenr * $pz, rows => $pz}, $self->params);
 
     my $page   = $client->select(@params);
-    $page->_pageset($self->{ASR_pages});
+    my $pages  = $self->{ASR_pages};
 
     # put new page in shared table of pages
-    # no weaken here?  only the first request is captured in the main program.
-    $self->{ASR_pages}[$pagenr] = $page;
+    $pages->[$pagenr] = $page;
+    $page->_pageset($pages);
+
+	# purge cached previous pages when in sequential mode
+	if($pagenr != 0 && $self->sequential)
+    {   $pages->[$_] = undef for 0..$pagenr-1;
+    }
+
+	$page;
 }
 
 

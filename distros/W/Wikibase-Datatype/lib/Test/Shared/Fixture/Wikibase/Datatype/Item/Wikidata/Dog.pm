@@ -11,13 +11,17 @@ use Wikibase::Datatype::Statement;
 use Wikibase::Datatype::Value::Item;
 use Wikibase::Datatype::Value::Monolingual;
 
-our $VERSION = 0.16;
+our $VERSION = 0.19;
 
 sub new {
 	my $class = shift;
 
 	my @params = (
 		'aliases' => [
+			Wikibase::Datatype::Value::Monolingual->new(
+				'language' => 'cs',
+				'value' => 'pes',
+			),
 			Wikibase::Datatype::Value::Monolingual->new(
 				'language' => 'en',
 				'value' => 'domestic dog',

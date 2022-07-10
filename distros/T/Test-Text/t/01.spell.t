@@ -1,4 +1,4 @@
-use lib qw( ../lib ); # -*- cperl -*- 
+use lib qw( ../lib ); # -*- cperl -*-
 
 use strict;
 use warnings;

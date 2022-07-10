@@ -3,8 +3,8 @@ NAME
     script
 
 VERSION
-    This document describes version 0.027 of Perinci::CmdLine::POD (from
-    Perl distribution Perinci-CmdLine-POD), released on 2022-05-14.
+    This document describes version 0.028 of Perinci::CmdLine::POD (from
+    Perl distribution Perinci-CmdLine-POD), released on 2022-05-28.
 
 SYNOPSIS
     Please see the included CLI script gen-pod-for-pericmd-script.

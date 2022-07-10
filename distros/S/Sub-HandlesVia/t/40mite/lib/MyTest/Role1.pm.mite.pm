@@ -1,6 +1,7 @@
 {
 package MyTest::Role1;
-our $USES_MITE = q[Mite::Role];
+our $USES_MITE = "Mite::Role";
+our $MITE_SHIM = "MyTest::Mite";
 use strict;
 use warnings;
 
@@ -28,19 +29,21 @@ sub __FINALIZE_APPLICATION__ {
     $CONSUMERS{$target} = 1;
 
     my $type = do { no strict 'refs'; ${"$target\::USES_MITE"} };
-    if ( $type ne 'Mite::Class' ) {
-        return;
-    }
+    return if $type ne 'Mite::Class';
+
+    my @missing_methods;
+    @missing_methods = ()
+        and MyTest::Mite::croak( "$me requires $target to implement methods: " . join q[, ], @missing_methods );
 
     my @roles = (  );
     my %nextargs = %{ $args || {} };
     ( $nextargs{-indirect} ||= 0 )++;
-    die "PANIC!" if $nextargs{-indirect} > 100;
+    MyTest::Mite::croak( "PANIC!" ) if $nextargs{-indirect} > 100;
     for my $role ( @roles ) {
         $role->__FINALIZE_APPLICATION__( $target, { %nextargs } );
     }
 
-    my $shim = q[MyTest::Mite];
+    my $shim = "MyTest::Mite";
     for my $modifier_rule ( @METHOD_MODIFIERS ) {
         my ( $modification, $names, $coderef ) = @$modifier_rule;
         $shim->$modification( $target, $names, $coderef );

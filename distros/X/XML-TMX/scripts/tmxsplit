@@ -10,6 +10,8 @@ use XML::DT;
 
 our ($twente,$latin1,$utf8,$q,$cutmaxlen);
 
+$utf8 = 1 unless $latin1;
+
 my $filename = $ARGV[0];
 
 my %files;
@@ -113,7 +115,7 @@ tmxsplit - Splits a TMX file several files, one for each language
 
 =head1 VERSION
 
-version 0.36
+version 0.39
 
 =head1 SYNOPSIS
 

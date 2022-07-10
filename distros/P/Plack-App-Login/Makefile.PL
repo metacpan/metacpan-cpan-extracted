@@ -20,7 +20,8 @@ readme_from 'Login.pm';
 recursive_author_tests('xt');
 requires 'CSS::Struct::Output::Raw' => 0;
 requires 'Plack::Util::Accessor' => 0;
-requires 'Tags::HTML::Page::Begin' => 0.10;
+requires 'Tags::HTML::Login::Button' => 0;
+requires 'Tags::HTML::Page::Begin' => 0.13;
 requires 'Tags::HTML::Page::End' => 0.04;
 requires 'Tags::Output::Raw' => 0;
 requires 'Unicode::UTF8' => 0;
@@ -34,7 +35,7 @@ test_requires 'Tags::Output::Indent' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.03';
+version '0.04';
 
 # Run.
 WriteAll();

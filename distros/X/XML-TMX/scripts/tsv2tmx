@@ -7,25 +7,24 @@ use warnings;
 use strict;
 use Getopt::Long;
 use Pod::Usage;
+use utf8::all;
 
-### Option varialbes
+### Option variables
 my $man = 0;
 my $help = 0;
 my ($sl, $tl);
 our $verbose = 1;
 my $header = 1;
-my $columns = "1,2";
+my $columns = "0,1";
+my $fs = qr'\t';
 #### ------
 
-binmode STDIN, ":utf8";
-binmode STDOUT, ":utf8";
-
-
 GetOptions ('help|h' => \$help, 'man' => \$man,
-			"source=s" => \$sl,    
-            "target=s" => \$tl,  
+			"source|sl=s" => \$sl,    
+            "target|tl=s" => \$tl,  
             "header"   => \$header,
-            "columns=s" => \$columns,
+            "columns|c=s" => \$columns,
+            "fs=s" => \$fs,
             "verbose|v"  => \$verbose)
 or pod2usage(2);
 
@@ -33,20 +32,24 @@ pod2usage(1) if $help;
 pod2usage(-exitval => 0, -verbose => 2) if $man;
 
 ##
+sub strip { my $v=shift; 
+  $v =~ s/^\s*//;
+  $v =~ s/\s*$//;
+  $v;
+}
 
 our ($c1, $c2);
 if ($columns =~ /^(\d+),(\d+)$/) {
 	($c1,$c2) = ($1,$2);
 } else {
-	die "Columns definition should be a pair of integers: 1,2\n";
+	die "Columns definition should be a pair of integers. Ex: 1,2\n";
 }
 
 if (!$sl || !$tl) {
 	if ($header) {
-		_log ("No source language or target language defined. Guessing!");
-		my ($l1, $l2) = readLine();
-		$sl = $l1 unless defined $sl;
-		$tl = $l2 unless defined $tl;
+		my ($l1, $l2) = readLine("find langs in header");
+		$sl = strip($l1) unless defined $sl;
+		$tl = strip($l2) unless defined $tl;
 	} else {
 		die "No header, and one of the source or target languages not defined!\n";
 	}
@@ -71,12 +74,27 @@ sub _log {
 }
 
 sub readLine {
-	my $line = <STDIN>;
-	if ($line) {
-		chomp $line;
-		return (split /\t/, $line)[$c1,$c2]
-	} else {
-		return ();
+    my $isheader = shift || 0;
+	my $line = <>;
+	return () unless $line;
+
+	chomp $line;
+    $line =~ s{&((\w+;)?)}{ if ($1){ "&$1" } else { "&amp;"} }ge;
+    if    ($line =~ /^\s*$/ ){ return readLine() }
+    elsif ($line =~ /^#/    ){ return readLine() }
+	else { 
+       my @fields = split /$fs/, $line;
+       if ($isheader and scalar @fields <2 ){ 
+          die("Invalid header:$line\n") }
+       my $sl = strip($fields[$c1] or "");
+       my $tl = strip($fields[$c2] or "");
+
+       if ($isheader){ 
+          if( $sl and $tl){ _log ("From header:$sl - $tl");}
+          else { die("Invalid header: $line\n") }
+       }
+       if ($sl or $tl){ return ($sl,$tl)  }
+       else           { return readLine() }
 	}
 }
 
@@ -92,11 +110,11 @@ tsv2tmx - Create a TMX from a TSV file
 
 =head1 VERSION
 
-version 0.36
+version 0.39
 
 =head1 SYNOPSIS
 
-tsv2tmx [options]
+tsv2tmx [options] file.tsv ...
 
  Options:
    --help            brief help message
@@ -105,11 +123,12 @@ tsv2tmx [options]
    --sl=EN --tl=PT   describe source and target language names
    --header          treat first line as a heading
    --columns=1,2     specify which columns to extract
+   --fs='::'         set field separator. (separated by '::')
 
 =head1 DESCRIPTION
 
 Useful to create translation memories from TSV files, that can be
-easily exported from spreadsheet software.
+easily exported from spreadsheets or other applications.
 
 =head1 OPTIONS
 
@@ -143,7 +162,7 @@ guess them.
 
 Specify which columns should be extracted. Needs to be a pair
 of integers, separated by a comma. Columns indexes start at 0.
-Default to C<1,2>.
+Default to C<0,1>.
 
 =back
 

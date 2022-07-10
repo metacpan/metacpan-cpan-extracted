@@ -1,14 +1,14 @@
 use strict;
 use warnings;
-package JSON::Schema::Tiny; # git description: v0.014-6-g7d8d955
+package JSON::Schema::Tiny; # git description: v0.016-2-g931de61
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema, minimally
 # KEYWORDS: JSON Schema data validation structure specification tiny
 
-our $VERSION = '0.015';
+our $VERSION = '0.017';
 
 use 5.020;  # for unicode_strings, signatures, postderef features
-use experimental qw(signatures postderef);
+use experimental 0.026 qw(signatures postderef args_array_with_signatures);
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
@@ -58,8 +58,12 @@ sub evaluate {
   shift
     if blessed($_[0]) and blessed($_[0])->isa(__PACKAGE__);
 
-  croak '$SPECIFICATION_VERSION value is invalid'
-    if defined $SPECIFICATION_VERSION and none { $SPECIFICATION_VERSION eq $_ } values %version_uris;
+  if (defined $SPECIFICATION_VERSION) {
+    $SPECIFICATION_VERSION = 'draft'.$SPECIFICATION_VERSION
+      if $SPECIFICATION_VERSION !~ /^draft/ and any { 'draft'.$SPECIFICATION_VERSION eq $_ } values %version_uris;
+
+    croak '$SPECIFICATION_VERSION value is invalid' if none { $SPECIFICATION_VERSION eq $_ } values %version_uris;
+  }
 
   croak 'insufficient arguments' if @_ < 2;
   my ($data, $schema) = @_;
@@ -1270,7 +1274,7 @@ JSON::Schema::Tiny - Validate data against a schema, minimally
 
 =head1 VERSION
 
-version 0.015
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -1387,15 +1391,15 @@ Supported values for this option, and the corresponding values for the C<$schema
 
 =item *
 
-L<C<draft2020-12>|https://json-schema.org/specification-links.html#2020-12>, corresponding to metaschema C<https://json-schema.org/draft/2020-12/schema>
+L<C<draft2020-12> or C<2020-12>|https://json-schema.org/specification-links.html#2020-12>, corresponding to metaschema C<https://json-schema.org/draft/2020-12/schema>
 
 =item *
 
-L<C<draft2019-09>|https://json-schema.org/specification-links.html#2019-09-formerly-known-as-draft-8>, corresponding to metaschema C<https://json-schema.org/draft/2019-09/schema>.
+L<C<draft2019-09> or C<2019-09>|https://json-schema.org/specification-links.html#2019-09-formerly-known-as-draft-8>, corresponding to metaschema C<https://json-schema.org/draft/2019-09/schema>
 
 =item *
 
-L<C<draft7>|https://json-schema.org/specification-links.html#draft-7>, corresponding to metaschema C<http://json-schema.org/draft-07/schema#>
+L<C<draft7> or C<7>|https://json-schema.org/specification-links.html#draft-7>, corresponding to metaschema C<http://json-schema.org/draft-07/schema#>
 
 =back
 
@@ -1470,7 +1474,7 @@ representation in an attempt to derive the true "intended" type of the value. Ho
 used in another context (for example, a numeric value is concatenated into a string, or a numeric
 string is used in an arithmetic operation), additional flags can be added onto the variable causing
 it to resemble the other type. This should not be an issue if data validation is occurring
-immediately after decoding a JSON payload.
+immediately after decoding a JSON (or YAML) payload.
 
 For more information, see L<Cpanel::JSON::XS/MAPPING>.
 

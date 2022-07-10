@@ -1,0 +1,16 @@
+name           = "App-diff2vba"
+readme_from    = "script/diff2vba"
+badges         = [ 'github-actions/test', 'metacpan' ]
+authority      = "cpan:UTASHIRO"
+
+module_maker   = "ModuleBuildTiny"
+static_install = "auto"
+
+[unsupported]
+os = [
+    "MSWin32",
+]
+
+[release]
+do_not_upload_to_cpan = 0
+

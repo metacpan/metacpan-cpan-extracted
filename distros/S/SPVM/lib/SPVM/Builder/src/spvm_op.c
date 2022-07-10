@@ -2223,7 +2223,24 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
       
       SPVM_OP* op_name_method = method->op_name;
       const char* method_name = op_name_method->uv.name;
-
+      
+      int32_t must_have_block;
+      if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
+        must_have_block = 0;
+      }
+      else {
+        if (method->is_native) {
+          must_have_block = 0;
+        }
+        else {
+          must_have_block = 1;
+        }
+      }
+      
+      if (must_have_block && !method->op_block) {
+        SPVM_COMPILER_error(compiler, "Non-native method must have its block at %s line %d", op_name_method->file, op_name_method->line);
+      }
+      
       // Method check
       
       // Set first argument type if not set
@@ -2588,7 +2605,7 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
   
   method->is_init = is_init;
   if (!is_init && strcmp(method_name, "INIT") == 0) {
-    SPVM_COMPILER_error(compiler, "\"INIT\" is reserved for INIT block at %s line %d", op_name_method->file, op_name_method->line);
+    SPVM_COMPILER_error(compiler, "\"INIT\" can't be used as a method name at %s line %d", op_name_method->file, op_name_method->line);
   }
 
   method->access_control_type = SPVM_DESCRIPTOR_C_ID_PUBLIC;

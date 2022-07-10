@@ -41,7 +41,7 @@ if (eval { ExtUtils::MakeMaker->VERSION('6.46'); 1 }) {
 my @req =
   (
     Imager => "1.013",
-    "Imager::File::PNG" => 0,
+    "Imager::File::PNG" => "0.99",
   );
 if (eval { ExtUtils::MakeMaker->VERSION('6.46'); 1 }) {
   $opts{META_MERGE}{prereqs} =

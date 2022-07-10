@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10;
 package NetAddr::MAC;
-$NetAddr::MAC::VERSION = '0.97';
+$NetAddr::MAC::VERSION = '0.98';
 
 use Carp qw( croak );
 use List::Util qw( first );
@@ -984,7 +984,7 @@ NetAddr::MAC - MAC hardware address functions and object (EUI48 and EUI64)
 
 =head1 VERSION
 
-version 0.97
+version 0.98
 
 =head1 SYNOPSIS
 
@@ -1582,13 +1582,14 @@ have done so far and endeavour to incorporate new patches ASAP.
 
 =head1 AUTHOR
 
-Dean Hamstead <dean@bytefoundry.com.au>
+Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Dean Hamstad.
+This software is Copyright (c) 2022 by Dean Hamstad.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

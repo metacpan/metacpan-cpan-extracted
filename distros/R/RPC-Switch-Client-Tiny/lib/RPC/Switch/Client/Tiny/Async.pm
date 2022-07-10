@@ -8,7 +8,7 @@ use IO::Socket;
 use Time::HiRes qw(time);
 use POSIX ":sys_wait_h"; # WNOHANG
 
-our $VERSION = 1.15;
+our $VERSION = 1.16;
 
 sub new {
 	my ($class, %args) = @_;
@@ -118,6 +118,7 @@ sub child_finish {
 	# The pipe close raises a sigpipe in the child
 	# when the child is still alive and tries to write.
 	#
+	shutdown($child->{reader}, 2) or warn "worker child $child->{pid}: shutdown pipe failed: $!\n";
 	close($child->{reader}) or warn "worker child $child->{pid}: close pipe failed: $!\n";
 	delete $child->{reader};
 

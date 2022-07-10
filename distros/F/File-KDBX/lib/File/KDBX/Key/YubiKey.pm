@@ -14,7 +14,7 @@ use namespace::clean;
 
 extends 'File::KDBX::Key::ChallengeResponse';
 
-our $VERSION = '0.903'; # VERSION
+our $VERSION = '0.904'; # VERSION
 
 # It can take some time for the USB device to be ready again, so we can retry a few times.
 our $RETRY_COUNT    = 5;
@@ -296,7 +296,7 @@ File::KDBX::Key::YubiKey - A Yubico challenge-response key
 
 =head1 VERSION
 
-version 0.903
+version 0.904
 
 =head1 SYNOPSIS
 

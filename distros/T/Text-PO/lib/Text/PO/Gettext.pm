@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO/Gettext.pm
-## Version v0.2.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/12
-## Modified 2022/07/06
+## Modified 2022/07/08
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -35,7 +35,7 @@ BEGIN
             (?:\.(?<locale_encoding>[\w-]+))?
         )
     $/x;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -616,14 +616,14 @@ sub _get_months
 
     POSIX::setlocale( &POSIX::LC_ALL, $locale ) if( defined( $locale ) );
 
-    for (my $i = 1; $i <= 12; $i++)
+    for( my $i = 1; $i <= 12; $i++ )
     {
         # my $const = "I18N::Langinfo::ABMON_${i}";
         # $short->[$i-1] = langinfo( &$const );
         my $const = I18N::Langinfo->can( "ABMON_${i}" );
         $short->[$i-1] = langinfo( $const->() );
     }
-    for (my $i = 1; $i <= 12; $i++)
+    for( my $i = 1; $i <= 12; $i++ )
     {
         # my $const = "I18N::Langinfo::MON_${i}";
         # $long->[$i-1] = langinfo( &$const );
@@ -648,10 +648,10 @@ sub _get_numeric_dict
     @$def{qw( currency decimal int_currency negative_sign thousand precision )} = 
     @$lconv{qw( currency_symbol decimal_point int_curr_symbol negative_sign thousands_sep frac_digits )};
     use utf8;
-    $def->{currency} = '€' if( $def->{currency} eq 'EUR' );
-    $lconv->{currency_symbol} = '€' if( $lconv->{currency_symbol} eq 'EUR' );
-    $lconv->{grouping} = unpack( "C*", $lconv->{grouping} );
-    $lconv->{mon_grouping} = unpack( "C*", $lconv->{mon_grouping} );
+    $def->{currency} = '€' if( CORE::exists( $def->{currency} ) && defined( $def->{currency} ) && $def->{currency} eq 'EUR' );
+    $lconv->{currency_symbol} = '€' if( CORE::exists( $lconv->{currency_symbol} ) && defined( $lconv->{currency_symbol} ) && $lconv->{currency_symbol} eq 'EUR' );
+    $lconv->{grouping} = unpack( "C*", $lconv->{grouping} ) if( CORE::exists( $lconv->{grouping} ) && defined( $lconv->{grouping} ) );
+    $lconv->{mon_grouping} = unpack( "C*", $lconv->{mon_grouping} ) if( CORE::exists( $lconv->{mon_grouping} ) && defined( $lconv->{mon_grouping} ) );
     $lconv = $self->new_hash( $lconv );
     return( [ $def, $lconv ] );
 }
@@ -688,7 +688,7 @@ Text::PO::Gettext - A GNU Gettext implementation
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

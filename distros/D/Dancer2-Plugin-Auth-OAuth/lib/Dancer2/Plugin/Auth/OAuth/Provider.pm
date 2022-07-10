@@ -14,7 +14,7 @@ use URI::Query;
 use Hash::Merge;
 
 sub new {
-    my ($class, $settings) = @_;
+    my ($class, $settings, $dsl) = @_;
     my $self = bless {
         settings => $settings,
     }, $class;
@@ -29,6 +29,8 @@ sub new {
 
     $self->{ua} ||= LWP::UserAgent->new();
     $self->{ua}->env_proxy; # c'mon make this default behaviour already!
+
+    $self->{dsl} = $dsl;
 
     return $self;
 }
@@ -136,9 +138,35 @@ sub authentication_url {
         return $uri->as_string;
     }
 }
+sub refresh {
+  my ($self, $request, $session) = @_;
 
+  my $provider = lc $self->_provider;
+  my $session_data = $session->read('oauth') || {};
+
+  if( $self->protocol_version < 2 || !defined $session_data->{$provider} || !defined $session_data->{$provider}{refresh_token}) {
+    if (defined defined $session_data->{$provider}) {
+      $session_data->{$provider} = { };
+      $session->write('oauth', $session_data);
+    }
+    $self->{dsl}->app->log(debug => "Auth::OAuth::Provider::".$self->_provider.": Failed to action call to token refresh, refresh_token is not present in session data.");
+    return undef;
+  }
+  my $retval = _get_token(@_, { "refresh_token" => $session_data->{$provider}{refresh_token}, grant_type => 'refresh_token' });
+  if (!$retval) {
+    if (defined defined $session_data->{$provider}) {
+      $session_data->{$provider} = {};
+      $session->write('oauth', $session_data);
+    }
+  }
+  return $retval;
+}
 sub callback {
-    my ($self, $request, $session) = @_;
+  my ($self, $request, $session) = @_;
+  _get_token(@_, { "code" => $request->param('code'), grant_type => 'authorization_code' });
+}
+sub _get_token {
+    my ($self, $request, $session, $v2opts) = @_;
 
     # this code may be called before authentication_url()
     # (multiple processes), so we must make sure the base
@@ -177,13 +205,10 @@ sub callback {
         }
     } else {
         my $uri  = URI->new( $self->provider_settings->{urls}{access_token_url} );
-        my %args = (
-                client_id     => $self->provider_settings->{tokens}{client_id},
-                client_secret => $self->provider_settings->{tokens}{client_secret},
-                code          => $request->param('code'),
-                grant_type    => 'authorization_code',
-                redirect_uri  => $self->_callback_url,
-       );
+        my %args = %{$v2opts};
+        $args{client_id} = $self->provider_settings->{tokens}{client_id};
+        $args{client_secret} = $self->provider_settings->{tokens}{client_secret};
+        $args{redirect_uri} = $self->_callback_url;
         my $response = $self->{ua}->request( POST $uri->as_string, \%args );
 
         if( $response->is_success ) {
@@ -195,10 +220,35 @@ sub callback {
                 $params = URI::Query->new( $response->content )->hash;
             }
 
+            # Error checking on the response from the server. If this is a refresh that failed we need to catch and return that fact
+            my $keys_found = 0;
             for my $key (qw/access_token email user_id expires expires_in id_token token_type id issued_at scope instance_url refresh_token signature x_mailru_vid error/) {
-                $session_data->{$provider}{$key} = $params->{$key}
-                    if $params->{$key};
+              if ($params->{$key}) {
+                $keys_found++;
+              }
             }
+            if (!$keys_found) {
+              $self->{dsl}->app->log(debug => "Auth::OAuth::Provider::".$self->_provider.": Token request for grant_type ".$args{grant_type}." didn't return any known ID data. Assuming failed, and returning failed response.");
+              return undef;
+            }
+
+            # Some servers don't return an issued_at or expires; Dancer app authors might need this to check if a refresh is required
+            if (!defined $params->{"issued_at"}) {
+              $params->{"issued_at"} = DateTime->now->epoch;
+            }
+            if ($params->{"expires_in"} && !defined $params->{"expires"}) {
+              $params->{"expires"} = $params->{"issued_at"} + $params->{"expires_in"};
+            }
+
+            for my $key (qw/access_token email user_id expires expires_in id_token token_type id issued_at scope instance_url refresh_token signature x_mailru_vid error/) {
+              if ($params->{$key}) {
+                $session_data->{$provider}{$key} = $params->{$key};
+              }
+            }
+
+        } else {
+          $self->{dsl}->app->log(debug => "Auth::OAuth::Provider::".$self->_provider.": Token request for grant_type ".$args{grant_type}." failed with ".$response->status_line);
+          return undef;
         }
     }
     $session->write('oauth', $session_data);

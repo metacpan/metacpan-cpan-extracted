@@ -4,7 +4,7 @@
       "Menno Blom <blom@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.21, Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.21, Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -64,16 +64,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/b10m/p5-Dancer2-Plugin-Auth-OAuth/issues"
+         "web" : "https://github.com/biafra/perl-Dancer2-Plugin-Auth-OAuth/issues"
       },
-      "homepage" : "https://github.com/b10m/p5-Dancer2-Plugin-Auth-OAuth",
+      "homepage" : "https://github.com/biafra/perl-Dancer2-Plugin-Auth-OAuth",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/b10m/p5-Dancer2-Plugin-Auth-OAuth.git",
-         "web" : "https://github.com/b10m/p5-Dancer2-Plugin-Auth-OAuth"
+         "url" : "https://github.com/biafra/perl-Dancer2-Plugin-Auth-OAuth.git",
+         "web" : "https://github.com/biafra/perl-Dancer2-Plugin-Auth-OAuth"
       }
    },
-   "version" : "0.18",
+   "version" : "0.20",
    "x_contributors" : [
       "B10m <menno@b10m.net>",
       "Biafra <paulo.a.ferreira@gmail.com>",
@@ -81,12 +81,14 @@
       "Keith Broughton <keithbro256@gmail.com>",
       "Menno Blom <menno.blom@booking.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Paulo A Ferreira <biafra@cpan.org>",
       "Paulo Ferreira <biafra@moosaico.com>",
+      "Pero-Moretti <86256669+Pero-Moretti@users.noreply.github.com>",
       "Pero Moretti <pero.g.moretti@gmail.com>",
       "Peter Mottram (SysPete) <peter@sysnix.com>"
    ],
-   "x_generated_by_perl" : "v5.32.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }

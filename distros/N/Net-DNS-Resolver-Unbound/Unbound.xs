@@ -279,14 +279,14 @@ ub_resolve(struct ub_ctx* ctx, SV* name, int rrtype, int rrclass)
 
 
 Net::DNS::Resolver::Unbound::Handle
-ub_resolve_async(struct ub_ctx* ctx, SV* name, int rrtype, int rrclass)
+ub_resolve_async(struct ub_ctx* ctx, SV* name, int rrtype, int rrclass, int query_id=0)
     INIT:
 	int async_id = 0;
     CODE:
 	RETVAL = newAV();
 	checkerr( ub_resolve_async(ctx, (const char*) SvPVX(name), rrtype, rrclass,
 					(void*) RETVAL, async_callback, &async_id) );
-	av_push(RETVAL, newSViv(async_id) );
+	av_push(RETVAL, newSViv(query_id) );
     OUTPUT:
 	RETVAL
 

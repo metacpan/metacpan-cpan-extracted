@@ -1,9 +1,9 @@
 package Acme::Mitey::Cards::Deck;
 
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 our $AUTHORITY = 'cpan:TOBYINK';
 
-use Acme::Mitey::Cards::Mite qw( -bool -is );
+use Acme::Mitey::Cards::Mite qw( -bool -is croak );
 extends 'Acme::Mitey::Cards::Set';
 
 use Acme::Mitey::Cards::Suit;
@@ -11,7 +11,6 @@ use Acme::Mitey::Cards::Card::Numeric;
 use Acme::Mitey::Cards::Card::Face;
 use Acme::Mitey::Cards::Card::Joker;
 use Acme::Mitey::Cards::Hand;
-use Carp qw( croak );
 
 has reverse => (
 	is       => ro,
@@ -81,7 +80,8 @@ sub deal_hand {
 	my ( $self, %args ) = ( shift, @_ );
 
 	my $n = defined( $args{count} ) ? delete( $args{count} ) : 7;
-	croak "Not enough cards" if $n > $self->count;
+	croak "Not enough cards: wanted %d but only have %d", $n, $self->count
+		if $n > $self->count;
 
 	my $took = $self->take( $n );
 	return Acme::Mitey::Cards::Hand->new(

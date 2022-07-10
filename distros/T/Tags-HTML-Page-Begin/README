@@ -160,7 +160,9 @@ METHODS
 
             Document viewport.
 
-            Default value is undef.
+            It's optional.
+
+            Default value is 'width=device-width, initial-scale=1.0'.
 
   "process"
      $obj->process;
@@ -268,5 +270,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.12
+    0.13
 

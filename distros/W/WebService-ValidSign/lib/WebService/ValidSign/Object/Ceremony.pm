@@ -1,5 +1,5 @@
 package WebService::ValidSign::Object::Ceremony;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use Moo;
 extends 'WebService::ValidSign::Object';
 
@@ -29,7 +29,7 @@ WebService::ValidSign::Object::Ceremony - A ceremony object
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 

@@ -1,3 +1,6 @@
+0.06 2022-07-08T00:21:53+02:00
+ - Update Tags::HTML::Page::Begin to 0.13.
+
 0.05 2022-05-13T18:01:38+02:00
  - Add test for app without title.
  - Fix minimal dependency for Tags::HTML::Page::Begin. With optional title

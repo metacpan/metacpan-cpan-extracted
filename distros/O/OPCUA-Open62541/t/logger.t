@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use OPCUA::Open62541;
 
-use Test::More tests => 46;
+use Test::More tests => 47;
 use Test::Exception;
 use Test::LeakTrace;
 use Test::NoWarnings;
@@ -100,19 +100,20 @@ $logger->logFatal(  0, "level name");
 sub log_category_name {
     my ($context, $level, $category, $message) = @_;
 
-    is($category, "network",        "$message network")  if $category == 0;
-    is($category, "channel",        "$message channel")  if $category == 1;
-    is($category, "session",        "$message session")  if $category == 2;
-    is($category, "server",         "$message server")   if $category == 3;
-    is($category, "client",         "$message client")   if $category == 4;
-    is($category, "userland",       "$message userland") if $category == 5;
-    is($category, "securitypolicy", "$message security") if $category == 6;
-    is($category, 7,                "$message bad")      if $category == 7;
+    is($category, "network",        "$message network")   if $category == 0;
+    is($category, "channel",        "$message channel")   if $category == 1;
+    is($category, "session",        "$message session")   if $category == 2;
+    is($category, "server",         "$message server")    if $category == 3;
+    is($category, "client",         "$message client")    if $category == 4;
+    is($category, "userland",       "$message userland")  if $category == 5;
+    is($category, "securitypolicy", "$message security")  if $category == 6;
+    is($category, "eventloop",      "$message eventloop") if $category == 7;
+    is($category, 8,                "$message bad")       if $category == 8;
 }
 
 $logger->setCallback(\&log_category_name, undef, undef);
 
-foreach my $category (0..7) {
+foreach my $category (0..8) {
     $logger->logInfo($category, "category name");
 }
 

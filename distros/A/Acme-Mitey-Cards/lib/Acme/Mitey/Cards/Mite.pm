@@ -2,13 +2,44 @@ use 5.008001;
 use strict;
 use warnings;
 
-package Acme::Mitey::Cards::Mite;
-
 # NOTE: Since the intention is to ship this file with a project, this file
 # cannot have any non-core dependencies.
 
-use strict;
-use warnings;
+package Acme::Mitey::Cards::Mite;
+
+# Constants
+sub true  () { !!1 }
+sub false () { !!0 }
+sub ro    () { 'ro' }
+sub rw    () { 'rw' }
+sub rwp   () { 'rwp' }
+sub lazy  () { 'lazy' }
+sub bare  () { 'bare' }
+
+sub _error_handler {
+    my ( $func, $message, @args ) = @_;
+    if ( @args ) {
+        require Data::Dumper;
+        local $Data::Dumper::Terse  = 1;
+        local $Data::Dumper::Indent = 0;
+        $message = sprintf $message, map {
+            ref($_) ? Data::Dumper::Dumper($_) : defined($_) ? $_ : '(undef)'
+        } @args;
+    }
+    my $next = do { no strict 'refs'; require Carp; \&{"Carp::$func"} };
+    @_ = ( $message );
+    goto $next;
+}
+
+sub carp    { unshift @_, 'carp'   ; goto \&_error_handler }
+sub croak   { unshift @_, 'croak'  ; goto \&_error_handler }
+sub confess { unshift @_, 'confess'; goto \&_error_handler }
+
+BEGIN {
+    *_HAS_AUTOCLEAN = eval { require namespace::autoclean }
+        ? \&true
+        : \&false
+};
 
 if ( $] < 5.009005 ) {
     require MRO::Compat;
@@ -20,18 +51,9 @@ else {
 defined ${^GLOBAL_PHASE}
 or eval { require Devel::GlobalDestruction; 1 }
 or do {
-    warn "WARNING: Devel::GlobalDestruction recommended!\n";
+    carp( "WARNING: Devel::GlobalDestruction recommended!" );
     *Devel::GlobalDestruction::in_global_destruction = sub { undef; };
 };
-
-# Constants
-sub true  () { !!1 }
-sub false () { !!0 }
-sub ro    () { 'ro' }
-sub rw    () { 'rw' }
-sub rwp   () { 'rwp' }
-sub lazy  () { 'lazy' }
-sub bare  () { 'bare' }
 
 my $parse_mm_args = sub {
     my $coderef = pop;
@@ -40,12 +62,12 @@ my $parse_mm_args = sub {
 };
 
 sub _is_compiling {
-    return $ENV{MITE_COMPILE} ? 1 : 0;
+    return !! $ENV{MITE_COMPILE};
 }
 
 sub import {
     my $class = shift;
-    my %arg = map { lc($_) => 1 } @_;
+    my %arg = map { lc($_) => true } @_;
     my ( $caller, $file ) = caller;
 
     # Turn on warnings and strict in the caller
@@ -65,15 +87,10 @@ sub import {
         );
     }
     else {
-        # Work around Test::Compile's tendency to 'use' modules.
-        # Mite.pm won't stand for that.
-        return if $ENV{TEST_COMPILE};
-
         # Changes to this filename must be coordinated with Mite::Compiled
         my $mite_file = $file . ".mite.pm";
         if( !-e $mite_file ) {
-            require Carp;
-            Carp::croak("Compiled Mite file ($mite_file) for $file is missing");
+            croak "Compiled Mite file ($mite_file) for $file is missing";
         }
 
         {
@@ -83,30 +100,34 @@ sub import {
 
         $class->_inject_mite_functions( $caller, $file, $kind, \%arg );
     }
+
+    if ( _HAS_AUTOCLEAN and not $arg{'-unclean'} ) {
+        'namespace::autoclean'->import( -cleanee => $caller );
+    }
 }
 
 sub _inject_mite_functions {
     my ( $class, $caller, $file, $kind, $arg ) = ( shift, @_ );
-    my $requested = sub { $arg->{$_[0]} ? 1 : $arg->{'!'.$_[0]} ? 0 : $_[1]; };
+    my $requested = sub { $arg->{$_[0]} ? true : $arg->{'!'.$_[0]} ? false : $arg->{'-all'} ? true : $_[1]; };
 
     no strict 'refs';
     my $has = $class->_make_has( $caller, $file, $kind );
-    *{"$caller\::has"}   = $has if $requested->( has   => 1 );
-    *{"$caller\::param"} = $has if $requested->( param => 0 );
-    *{"$caller\::field"} = $has if $requested->( field => 0 );
+    *{"$caller\::has"}   = $has if $requested->( has   => true  );
+    *{"$caller\::param"} = $has if $requested->( param => false );
+    *{"$caller\::field"} = $has if $requested->( field => false );
 
-    *{ $caller .'::with' } = $class->_make_with( $caller, $file, $kind )
-        if $requested->( with => 1 );
+    *{"$caller\::with"} = $class->_make_with( $caller, $file, $kind )
+        if $requested->( with => true );
 
-    *{ $caller .'::extends'} = sub {}
-        if $kind eq 'class' && $requested->( extends => 1 );
-    *{ $caller .'::requires'} = sub {}
-        if $kind eq 'role' && $requested->( requires => 1 );
+    *{"$caller\::extends"} = sub {}
+        if $kind eq 'class' && $requested->( extends => true );
+    *{"$caller\::requires"} = sub {}
+        if $kind eq 'role' && $requested->( requires => true );
 
-    my $MM = ( $kind eq 'role' ) ? \@{"$caller\::METHOD_MODIFIERS"} : [];
+    my $MM = ( $kind eq 'class' ) ? [] : \@{"$caller\::METHOD_MODIFIERS"};
 
     for my $modifier ( qw/ before after around / ) {
-        next unless $requested->( $modifier => 1 );
+        next unless $requested->( $modifier => true );
 
         if ( $kind eq 'class' ) {
             *{"$caller\::$modifier"} = sub {
@@ -127,30 +148,20 @@ sub _inject_mite_functions {
 sub _make_has {
     my ( $class, $caller, $file, $kind ) = @_;
 
+    no strict 'refs';
     return sub {
-        my $names = shift;
-        $names = [$names] unless ref $names;
-        my %args = @_;
-        for my $name ( @$names ) {
+        my ( $names, %args, $code ) = @_;
+        for my $name ( ref($names) ? @$names : $names ) {
            $name =~ s/^\+//;
 
-           my $default = $args{default};
-           if ( ref $default eq 'CODE' ) {
-               no strict 'refs';
-               ${$caller .'::__'.$name.'_DEFAULT__'} = $default;
-           }
+           'CODE' eq ref( $code = $args{default} )
+               and ${"$caller\::__$name\_DEFAULT__"} = $code;
 
-           my $builder = $args{builder};
-           if ( ref $builder eq 'CODE' ) {
-               no strict 'refs';
-               *{"$caller\::_build_$name"} = $builder;
-           }
+           'CODE' eq ref( $code = $args{builder} )
+               and *{"$caller\::_build_$name"} = $code;
 
-           my $trigger = $args{trigger};
-           if ( ref $trigger eq 'CODE' ) {
-               no strict 'refs';
-               *{"$caller\::_trigger_$name"} = $trigger;
-           }
+           'CODE' eq ref( $code = $args{trigger} )
+               and *{"$caller\::_trigger_$name"} = $code;
         }
 
         return;
@@ -209,11 +220,10 @@ sub _make_with {
     my $get_orig = sub {
         my ( $caller, $name ) = @_;
 
-        my $orig = $caller->can($name);
+        my $orig = $caller->can( $name );
         return $orig if $orig;
 
-        require Carp;
-        Carp::croak( "Cannot modify method $name in $caller: no such method" );
+        croak "Cannot modify method $name in $caller: no such method";
     };
 
     sub before {
@@ -285,7 +295,6 @@ AROUND
 }
 
 1;
-
 __END__
 
 =pod

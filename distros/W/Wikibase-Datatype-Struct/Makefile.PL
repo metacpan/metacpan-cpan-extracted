@@ -24,7 +24,7 @@ requires 'Exporter' => 0;
 requires 'List::MoreUtils' => 0;
 requires 'Readonly' => 0;
 requires 'URI' => 0;
-requires 'Wikibase::Datatype' => 0.07;
+requires 'Wikibase::Datatype' => 0.12;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Wikibase-Datatype-Struct/issues',
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Wikibase-Datatype-Struct';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Wikibase-Datatype-Struct';
@@ -32,10 +32,14 @@ test_requires 'English' => 0;
 test_requires 'Error::Pure::Utils' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
+test_requires 'Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun' => 0.19;
+test_requires 'Test::Shared::Fixture::Wikibase::Datatype::Property::Wikidata::InstanceOf' => 0.17;
 test_requires 'Unicode::UTF8' => 0;
 test_requires 'Wikibase::Datatype' => 0.03;
+test_requires 'Wikibase::Datatype::Lexeme' => 0.19;
+test_requires 'Wikibase::Datatype::Property' => 0.12;
 tests_recursive;
-version '0.08';
+version '0.09';
 
 # Run.
 WriteAll();

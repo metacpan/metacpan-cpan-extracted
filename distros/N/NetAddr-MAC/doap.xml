@@ -11,7 +11,7 @@
   <developer>
     <foaf:Person>
       <foaf:name>Dean Hamstead</foaf:name>
-      <foaf:mbox rdf:resource="mailto:dean@bytefoundry.com.au" />
+      <foaf:mbox rdf:resource="mailto:dean@fragfest.com.au" />
     </foaf:Person>
   </developer>
   <helper>
@@ -32,7 +32,7 @@
       <foaf:mbox rdf:resource="mailto:oliver@cpan.org" />
     </foaf:Person>
   </helper>
-  <license rdf:resource="http://dev.perl.org/licenses/" />
+  <license rdf:resource="http://www.opensource.org/licenses/mit-license.php" />
   <homepage rdf:resource="https://github.com/djzort/NetAddr-MAC" />
   <repository>
     <GitRepository>

@@ -7,7 +7,7 @@ use warnings;
 use Time::HiRes qw(time);
 use Time::Local;
 
-our $VERSION = 1.15;
+our $VERSION = 1.16;
 
 sub new {
 	my ($class, %args) = @_;
@@ -16,9 +16,11 @@ sub new {
 		active    => {}, # active async sessions
 		lru       => {}, # lru list for sessions
 		expiring  => [], # sorted session expire list
+		per_user  => {}, # active sessions per user (optional)
 	}, $class;
 	$self->{lru}{prev} = $self->{lru}{next} = $self->{lru};
 	$self->{session_expire} = 60 unless $self->{session_expire};
+	$self->{max_user_session} = 0 unless $self->{max_user_session};
 	return $self;
 }
 
@@ -119,6 +121,16 @@ sub session_put {
 	if ($diff < 0) {
 		return; # session expired
 	}
+	if ($self->{max_user_session} && exists $child->{session}{user}) {
+		my $user = $child->{session}{user};
+		if (exists $self->{per_user}{$user}) {
+			my $cnt = scalar keys %{$self->{per_user}{$user}};
+			if ($cnt >= $self->{max_user_session}) {
+				return; # too many user sessions
+			}
+		}
+		$self->{per_user}{$user}{$child->{session}{id}} = 1;
+	}
 	$self->{trace_cb}->('PUT', {pid => $child->{pid}, id => $child->{id}, session => $child->{session}{id}, runtime => $runtime}) if $self->{trace_cb};
 	$self->{active}{$child->{session}{id}} = $child;
 	list_add($self->{lru}{prev}, $child);
@@ -132,6 +144,13 @@ sub session_get {
 	if (exists $self->{active}{$session_id}) {
 		my $child = delete $self->{active}{$session_id};
 		list_del($child);
+
+		if ($self->{max_user_session} && exists $child->{session}{user}) {
+			my $user = $child->{session}{user};
+			if (exists $self->{per_user}{$user}) {
+				delete $self->{per_user}{$user}{$child->{session}{id}};
+			}
+		}
 
 		my $stoptime = sprintf "%.02f", time() - $child->{start};
 		$self->{trace_cb}->('GET', {pid => $child->{pid}, %id, session => $session_id, stoptime => $stoptime}) if $self->{trace_cb};
@@ -159,7 +178,9 @@ sub session_new {
 	}
 	# set default expire in seconds
 	$expiretime = time() + $self->{session_expire} unless $expiretime;
-	return {id => $set_session->{id}, expiretime => $expiretime};
+	my $session = {id => $set_session->{id}, expiretime => $expiretime};
+	$session->{user} = $set_session->{user} if exists $set_session->{user};
+	return $session;
 }
 
 sub lru_list {

@@ -1,14 +1,14 @@
-# Copyrights 2012-2019 by [Mark Overmeer].
+# Copyrights 2012-2022 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
+# Pod stripped from pm file by OODoc 2.03.
 # This code is part of distribution Apache-Solr.  Meta-POD processed with
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Apache::Solr::XML;
 use vars '$VERSION';
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 use base 'Apache::Solr';
 
@@ -51,8 +51,8 @@ sub xmlsimple() {shift->{ASX_simple}}
 
 #--------------------------
 
-sub _select($)
-{   my ($self, $params) = @_;
+sub _select($$)
+{   my ($self, $args, $params) = @_;
     my @params   = @$params;
 
     # select can be called automatically, more than once.  We do not
@@ -61,8 +61,8 @@ sub _select($)
     unshift @params, wt => 'xml' unless $params{wt};
 
     my $endpoint = $self->endpoint('select', params => \@params);
-    my $result   = Apache::Solr::Result->new(params => \@params
-      , endpoint => $endpoint, core => $self);
+    my $result   = Apache::Solr::Result->new(%$args,
+        params => \@params , endpoint => $endpoint, core => $self);
     $self->request($endpoint, $result);
     $result;
 }

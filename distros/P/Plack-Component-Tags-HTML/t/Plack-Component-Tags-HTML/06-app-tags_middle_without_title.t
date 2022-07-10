@@ -33,7 +33,8 @@ test_psgi($app, sub {
 	is($res->code, 200, 'HTTP code (200).');
 	is($res->header('Content-Type'), 'text/html; charset=utf-8', 'Content type (HTML).');
 	my $expected_content = '<!DOCTYPE html>'."\n".'<html lang="en"><head><meta http-equiv="Content-Type" '.
-		'content="text/html; charset=utf-8" /></head>'.
-		'<body>Hello world</body></html>';
+		'content="text/html; charset=utf-8" />'.
+		'<meta name="viewport" content="width=device-width, initial-scale=1.0" />'.
+		'</head><body>Hello world</body></html>';
 	is($res->content, $expected_content, 'Content (real HTML content).');
 });

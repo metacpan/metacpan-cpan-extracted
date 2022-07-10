@@ -44,16 +44,16 @@ jv my_jv_input(pTHX_ void * arg) {
         return jv_bool((bool)SvTRUE(SvRV(p_sv)));
     }
     else if (SvIOK(p_sv)) {
-        // integer
-        return jv_number((int)SvIV(p_sv));
+        // integer, use perl's 'native size', see https://perldoc.perl.org/perlguts#What-is-an-%22IV%22?
+        return jv_number(SvIV(p_sv));
     }
     else if (SvUOK(p_sv)) {
         // unsigned int
-        return jv_number((unsigned int)SvUV(p_sv));
+        return jv_number(SvUV(p_sv));
     }
     else if (SvNOK(p_sv)) {
         // double
-        return jv_number((double)SvNV(p_sv));
+        return jv_number(SvNV(p_sv));
     }
     else if (SvPOK(p_sv)) {
         // string
@@ -121,7 +121,7 @@ void * my_jv_output(pTHX_ jv jval) {
         double val = jv_number_value(jval);
         SV * p_sv = newSV(0);
         if (jv_is_integer(jval)) {
-            sv_setiv(p_sv, (int)val);
+            sv_setiv(p_sv, val);
         }
         else {
             sv_setnv(p_sv, val);

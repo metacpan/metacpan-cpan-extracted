@@ -7,9 +7,12 @@ use Test::More tests => OPCUA::Open62541::Test::Server::planning_nofork() + 17;
 use Test::Exception;
 use Test::NoWarnings;
 
-my $server = OPCUA::Open62541::Test::Server->new();
-$server->start();
-ok(my $buildinfo = $server->{config}->getBuildInfo());
+my $buildinfo;
+{
+    my $server = OPCUA::Open62541::Test::Server->new();
+    $server->start();
+    ok($buildinfo = $server->{config}->getBuildInfo(), "buildinfo");
+}
 note explain $buildinfo;
 
 my $log_calls = 0;
@@ -23,10 +26,16 @@ sub log {
 	is($category, "client", "log category");
 	is($message, "Connecting to endpoint opc.tcp://localhost:",
 	    "log message");
-    } else {
+    } elsif ($buildinfo->{BuildInfo_softwareVersion} =~ /^1\.[1-3]\./) {
 	is($level, "warn", "log level");
 	is($category, "network", "log category");
 	is($message, "Server url is invalid: opc.tcp://localhost:",
+	    "log message");
+    } else {
+	is($level, "warn", "log level");
+	is($category, "client", "log category");
+	is($message, "skip verifying ApplicationURI for the SecurityPolicy ".
+	    "http://opcfoundation.org/UA/SecurityPolicy#None",
 	    "log message");
     }
 }

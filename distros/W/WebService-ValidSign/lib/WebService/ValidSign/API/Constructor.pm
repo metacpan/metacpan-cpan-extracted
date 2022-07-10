@@ -1,6 +1,6 @@
 package WebService::ValidSign::API::Constructor;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use Moo::Role;
 use namespace::autoclean;
 
@@ -73,7 +73,7 @@ WebService::ValidSign::API::Constructor - A REST API client for ValidSign
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

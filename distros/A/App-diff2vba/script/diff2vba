@@ -1,0 +1,111 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use  App::diff2vba;
+exit App::diff2vba->new->run(splice @ARGV);
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+diff2vba - generate VBA patch script from diff output
+
+=head1 SYNOPSIS
+
+  optex -Mtextconv diff -u A.docx B.docx | diff2vba > patch.vba
+
+  greple -Mmsdoc -Msubst \
+      --all-sample-dict --diff some.docx | diff2vba > patch.vba
+
+=head1 VERSION
+
+Version 0.99
+
+=head1 DESCRIPTION
+
+B<diff2vba> is a command to generate VBA patch script from diff output.
+
+=head1 OPTIONS
+
+=over 7
+
+=item B<--maxlen>=I<n>
+
+Because VBA script does not accept string longer than 255 characters,
+longer string have to be splitted into shorter ones.  This option
+specifies maximum length.  Default is 250.
+
+=item B<--adjust>=I<n>
+
+Adjust border when the splitted strings are slightly different.
+Default value is 2, so they are adjusted upto two characters.  Set
+zero to disable it.
+
+=begin comment
+
+=item B<--format>=I<format>
+
+Set format of VBA script.
+Default is C<dumb>.
+
+=end comment
+
+=item B<--subname>=I<name>
+
+Set subroutine name in the VBA script.
+Default is C<Patch>.
+
+=item B<--identical>
+
+Produce patch script for identical string.
+Default is false.
+
+=item B<--reverse>
+
+Generate reverse order patch.
+
+=back
+
+=head1 INSTALL
+
+=head2 CPANMINUS
+
+Install from CPAN
+
+    cpanm App::diff2vba
+
+or
+
+    cpanm https://github.com/kaz-utashiro/App-diff2vba.git
+
+=head1 SEE ALSO
+
+L<App::diff2vba>, L<https://github.com/kaz-utashiro/App-diff2vba>
+
+L<App::Greple>, L<https://github.com/kaz-utashiro/greple>
+
+L<App::Greple::msdoc>, L<https://github.com/kaz-utashiro/greple-msdoc>
+
+L<App::Greple::subst>, L<https://github.com/kaz-utashiro/greple-subst>
+
+L<App::optex::textconv>, L<https://github.com/kaz-utashiro/optex-textconv>
+
+L<https://qiita.com/kaz-utashiro/items/06c60843213b0f024df7>,
+L<https://qiita.com/kaz-utashiro/items/85add653a71a7e01c415>
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright 2021-2022 Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

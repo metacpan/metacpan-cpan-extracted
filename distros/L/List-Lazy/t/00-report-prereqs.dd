@@ -19,7 +19,8 @@ do { my $x = {
                                       'Moo' => '0',
                                       'MooX::HandlesVia' => '0',
                                       'experimental' => '0',
-                                      'perl' => 'v5.22.0'
+                                      'perl' => 'v5.22.0',
+                                      'warnings' => '0'
                                     }
                     },
        'test' => {
@@ -33,9 +34,7 @@ do { my $x = {
                                    'IPC::Open3' => '0',
                                    'Test::More' => '0',
                                    'Test::Warn' => '0',
-                                   'blib' => '1.01',
-                                   'strict' => '0',
-                                   'warnings' => '0'
+                                   'strict' => '0'
                                  }
                  }
      };

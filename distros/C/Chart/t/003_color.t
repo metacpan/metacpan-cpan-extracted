@@ -19,13 +19,13 @@ warning_like {Chart::Color->new('#232321f')     }     {carped => qr/hex color de
 warning_like {Chart::Color->new('#23232g')       }    {carped => qr/hex color definition/},    "hex definition has forbidden chars";
 warning_like {Chart::Color->new('#2322%E')       }    {carped => qr/hex color definition/},    "hex definition has forbidden chars";
 warning_like {Chart::Color->new(1,1)}                 {carped => qr/constructor of/},  "too few positional args";
-warning_like {Chart::Color->new(1,1,1,1)}             {carped => qr/constructor of/},  "too many positional args";
+warning_like {Chart::Color->new(1,1,1,1,1)}           {carped => qr/constructor of/},  "too many positional args";
 warning_like {Chart::Color->new([1,1])}               {carped => qr/need exactly 3/},  "too few positional args in ref";
 warning_like {Chart::Color->new([1,1,1,1])}           {carped => qr/need exactly 3/},  "too many positional args in ref";
 warning_like {Chart::Color->new({ r=>1, g=>1})}       {carped => qr/constructor of/},  "too few named args in ref";
 warning_like {Chart::Color->new({r=>1,g=>1,b=>1,h=>1,})} {carped => qr/constructor of/},"too many name args in ref";
-warning_like {Chart::Color->new( r=>1, g=>1)}         {carped => qr/constructor of/},  "too few named args";
-warning_like {Chart::Color->new(r=>1,g=>1,b=>1,h=>1)} {carped => qr/constructor of/},  "too many name args";
+warning_like {Chart::Color->new( r=>1)}               {carped => qr/constructor of/},  "too few named args";
+warning_like {Chart::Color->new(r=>1,g=>1,b=>1,h=>1,a=>1)} {carped => qr/constructor of/},  "too many name args";
 warning_like {Chart::Color->new(r=>1,g=>1,h=>1)}      {carped => qr/argument keys/},   "don't mix named args";
 warning_like {Chart::Color->new(r=>1,g=>1,t=>1)}      {carped => qr/argument keys/},   "don't invent named args";
 

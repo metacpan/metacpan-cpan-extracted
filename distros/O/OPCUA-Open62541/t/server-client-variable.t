@@ -107,7 +107,8 @@ is($client->{client}->readValueAttribute_async(
 	is($$d, "foo", "readValueAttribute_async data in");
 	$$d = "bar";
 	is($i, $reqid, "readValueAttribute_async reqid");
-	is_deeply($v, $attr{VariableAttributes_value},
+	my $value = $v->{DataValue_value} // $v;
+	is_deeply($value, $attr{VariableAttributes_value},
 	    "readValueAttribute_async value");
 
 	$read = 1;

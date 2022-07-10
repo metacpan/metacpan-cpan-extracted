@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.755';
+our $VERSION = '1.756';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -332,6 +332,7 @@ sub __choose {
         my ( $new_width, $new_height ) = get_term_size();
         if ( $new_width != $self->{term_width} || $new_height != $self->{term_height} ) {
             if ( $self->{ll} ) {
+                $self->__reset_term( 0 );
                 return -1;
             }
             ( $self->{term_width}, $self->{term_height} ) = ( $new_width, $new_height );
@@ -1255,7 +1256,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.755
+Version 1.756
 
 =cut
 
@@ -1621,6 +1622,9 @@ Allowed values: 1 or greater
  '----------------------'   '----------------------'   '----------------------'   '----------------------'
 
 =back
+
+If I<layout> is set to C<0> or C<1> and the unformatted list items fit in one row,  the list items are placed in one row
+without column formatting. This behavior can be disabled by setting I<max_cols>.
 
 =head3 ll
 

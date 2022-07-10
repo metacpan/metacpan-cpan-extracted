@@ -5,10 +5,10 @@ use warnings;
 package Sub::HandlesVia::Toolkit::Mouse;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.028';
+our $VERSION   = '0.031';
 
-use Sub::HandlesVia::Toolkit;
-our @ISA = 'Sub::HandlesVia::Toolkit';
+use Sub::HandlesVia::Mite;
+extends 'Sub::HandlesVia::Toolkit';
 
 sub setup_for {
 	my $me = shift;
@@ -155,7 +155,7 @@ sub code_generator_for_attribute {
 package Sub::HandlesVia::Toolkit::Mouse::PackageTrait;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.028';
+our $VERSION   = '0.031';
 
 use Role::Tiny;
 
@@ -193,7 +193,7 @@ around add_attribute => sub {
 package Sub::HandlesVia::Toolkit::Mouse::RoleTrait;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.028';
+our $VERSION   = '0.031';
 
 use Role::Tiny;
 

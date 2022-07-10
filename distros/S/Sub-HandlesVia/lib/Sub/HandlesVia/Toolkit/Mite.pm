@@ -5,11 +5,12 @@ use warnings;
 package Sub::HandlesVia::Toolkit::Mite;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.028';
+our $VERSION   = '0.031';
+
+use Sub::HandlesVia::Mite;
+extends 'Sub::HandlesVia::Toolkit';
 
 use Types::Standard -types, -is;
-use Sub::HandlesVia::Toolkit;
-our @ISA = 'Sub::HandlesVia::Toolkit';
 
 sub setup_for {
 	my $me = shift;

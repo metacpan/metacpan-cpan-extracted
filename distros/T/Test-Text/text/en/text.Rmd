@@ -1,0 +1,17 @@
+---
+title: This is a Rmarkdown file foobar
+---
+
+# Introducing Rmarkdown files
+
+Here is a chunk
+
+```{r foo, BAR baz}
+library(ggplot2)
+```
+
+It includes also some `code foo bar` here and there.
+
+```text
+        And some more code quux
+```

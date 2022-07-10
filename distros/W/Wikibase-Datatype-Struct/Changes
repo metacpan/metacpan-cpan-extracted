@@ -1,3 +1,15 @@
+0.09 2022-07-09T16:51:15+02:00
+ - Add complex test to Lexeme.
+ - Add missing id and page_id Lexeme values to obj2struct().
+ - Add Property object.
+ - Fix Lexeme default ns.
+ - Fix Lexeme language conversion.
+ - Fix Lexeme lexical category conversion.
+ - Fix Lexeme struct2obj(), was very bad.
+ - Fix sentence in doc in Value::Globecoordinate.
+ - Unify LICENSE AND COPYRIGHT section in doc.
+ - Update copyright years.
+
 0.08 2021-02-09T18:12:14+01:00
  - Add tests for Value::Item.
  - Improve check in Value::Item::struct2obj().

@@ -3,7 +3,7 @@ NAME
     Pod
 
 VERSION
-    version 0.03
+    version 0.04
 
 SYNOPSIS
         my $pod_file = Pod::Definitions->new();
@@ -15,27 +15,14 @@ DESCRIPTION
     events, or such as documented therein.
 
     Heading names, presumed to be written in the English language, are
-    simplifed for indexing purposes. (See Pod::Headings::Heuristic for
-    details.) For example:
-
-        What is the Q function?               -> Q function
-        How can I blip the blop?              -> Blip the blop
-        Why doesn't my socket have a packet?  -> Socket have a packet
-        Where are the pockets on the port?    -> Pockets on the port
-        I need to reap the zombie             -> Reap the zombie
-        What does the error "Disk full" mean? -> Disk full
-        What about backwards compatibility?   -> Backwards compatibility
-        Reaping the zombie from proctab       -> Zombie, reaping from proctab
-        $c = Mojo::Path->new()                -> new
-
-    Currently, captialization (other than rewrites of type type shown above)
-    is mostly left for the caller to handle.
+    simplifed for indexing purposes. (See Pod::Definitions::Heuristic for
+    details.)
 
 METHODS
   new
     Creates a new object of type Pod::Definitions
 
-  parse_file ($filename)
+  parse_file
     Parse a podfile, or Perl source file. Returns the Pod::Headings object,
     which, as a subclass of Pod::Simple, may give various useful information
     about the parsed document (e.g., the line_count() or pod_para_count()
@@ -54,15 +41,33 @@ METHODS
 
   sections
     Hash (with the key being the toplevel section, e.g., "FUNCTIONS") of
-    arrays of section names, or undef if no sections (other than the
-    standard NAME and SEE ALSO) were given in the Pod file
+    arrays of section information hashes. If no sections (other than the
+    standard NAME and SEE ALSO) were given in the Pod file, "sections" will
+    be undef.
+
+    Section information hashes contain the following:
+
+    raw The text of the heading as it occurs in the source file
+
+    cooked
+        The 'cleaned' text of the heading, from Pod::Definitions::Heuristic
+
+    sequence
+        The sequential number of the heading, from Pod::Headings
+
+    link
+        The "manpage" value of the file
+
+    link_fragment
+        The heading text, converted to an href compatible with metacpan and
+        other displays.
 
 SEE ALSO
-    Pod::Simple, Pod::Headings
+    Pod::Simple, Pod::Headings, Pod::Definitions::Heuristic
 
 SUPPORT
-    This module is managed in an open GitHub repository,
-    <https://github.com/lindleyw/Pod-Definitions>. Feel free to fork and
+    This module is managed in an open GitLab repository,
+    <https://gitlab.com/wlindley/Pod-Definitions>. Feel free to fork and
     contribute, or to clone and send patches.
 
 AUTHOR

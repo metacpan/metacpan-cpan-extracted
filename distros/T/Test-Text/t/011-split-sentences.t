@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 
 use Test::More;
-use File::Slurp::Tiny 'read_file';
+use Path::Tiny;
 use Test::Text::Sentence qw(split_sentences);
 
 my $dir = 'text/en';
@@ -16,7 +16,7 @@ if ( !-e $dir ) {
 my @files = glob("$dir/*.md $dir/*.tex $dir/*.txt $dir/*.markdown)");
 
 for my $f ( @files ) {
-  my @sentences = split_sentences( read_file($f) );
+  my @sentences = split_sentences( path($f)->slurp_utf8 );
   ok( @sentences, "Splits in sentences" );
   cmp_ok( $#sentences, ">=", 0, "There's at least one sentence");
 }

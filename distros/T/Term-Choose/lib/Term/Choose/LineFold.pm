@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.755';
+our $VERSION = '1.756';
 
 use Exporter qw( import );
 
@@ -28,23 +28,23 @@ BEGIN {
 
 my $table = table_char_width();
 
-my $cache = [];
+my $cache = {};
 
 
-sub char_width {
-    my $c = $_[0];
+sub _char_width {
+    #my $c = $_[0];
     my $min = 0;
     my $mid;
     my $max = $#$table;
-    if ($c < $table->[0][0] || $c > $table->[$max][1] ) {
+    if ( $_[0] < $table->[0][0] || $_[0] > $table->[$max][1] ) {
         return 1;
     }
     while ( $max >= $min ) {
         $mid = int( ( $min + $max ) / 2 );
-        if ( $c > $table->[$mid][1] ) {
+        if ( $_[0] > $table->[$mid][1] ) {
             $min = $mid + 1;
         }
-        elsif ( $c < $table->[$mid][0] ) {
+        elsif ( $_[0] < $table->[$mid][0] ) {
             $max = $mid - 1;
         }
         else {
@@ -56,14 +56,20 @@ sub char_width {
 
 
 sub print_columns {
-    my $str = $_[0];
+    #my $str = $_[0];
     my $width = 0;
-    for my $i ( 0 .. ( length( $str ) - 1 ) ) {
-        my $c = ord substr $str, $i, 1;
-        if ( ! defined $cache->[$c] ) {
-            $cache->[$c] = char_width( $c );
-        }
-        $width = $width + $cache->[$c];
+    my $c;
+    for my $i ( 0 .. ( length( $_[0] ) - 1 ) ) {
+        $c = ord substr $_[0], $i, 1;
+        #if ( ! defined $cache->{$c} ) {
+        #    $cache->{$c} = _char_width( $c );
+        #}
+        #$width = $width + $cache->{$c};
+        $width = $width + (
+            defined $cache->{$c}
+            ? $cache->{$c}
+            : ( $cache->{$c} = _char_width( $c ) )
+        );
     }
     return $width;
 }
@@ -73,13 +79,14 @@ sub cut_to_printwidth {
     my ( $str, $avail_width, $return_remainder ) = @_;
     my $count = 0;
     my $total = 0;
+    my $c;
     for my $i ( 0 .. ( length( $str ) - 1 ) ) {
-        my $c = ord substr $str, $i, 1;
-        if ( ! defined $cache->[$c] ) {
-            $cache->[$c] = char_width( $c )
+        $c = ord substr $str, $i, 1;
+        if ( ! defined $cache->{$c} ) {
+            $cache->{$c} = _char_width( $c )
         }
-        if ( ( $total = $total + $cache->[$c] ) > $avail_width ) {
-            if ( ( $total - $cache->[$c] ) < $avail_width ) {
+        if ( ( $total = $total + $cache->{$c} ) > $avail_width ) {
+            if ( ( $total - $cache->{$c} ) < $avail_width ) {
                 return substr( $str, 0, $count ) . ' ', substr( $str, $count ) if $return_remainder;
                 return substr( $str, 0, $count ) . ' ';
             }
@@ -96,11 +103,11 @@ sub cut_to_printwidth {
 
 sub line_fold {
     my ( $str, $avail_width, $opt ) = @_; #copy $str
-    if ( ! defined $str || ! length $str ) {
+    if ( ! length $str ) {
         return $str;
     }
     for ( $opt->{init_tab}, $opt->{subseq_tab} ) {
-        if ( defined $_ && length $_ ) {
+        if ( length ) {
             s/\t/ /g;
             s/\v+/\ \ /g;
             s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;

@@ -1,5 +1,17 @@
 Revision history for Perl extension Crypt::OpenSSL::RSA.
 
+0.33 July 7 2022
+    - Update for windows github CI
+    - Remove duplicit 'LICENSE' key
+    - Remove EUMM Remove version check
+    - #31 by removing reference to RSA_SSLV23_PADDING (removed from OpenSSL starting from v3.0.0)
+    - support passphase protected private key load
+    - fix 'unsupported encryption' error on old library versions
+    - Clarify croak message for missing passphrase on older cyphers
+    - More structs opaqued in LibreSSL 3.5
+    - Use a macro for dealing with older SSL lacking macros
+    - more CI fixups. Drop testing for 5.10 and 5.8. Something is broken upstream.
+
 0.32 Wed Sep 8 2021
     - Prefix internal bn2sv function so it doesn't collide with Net::SSLeay
     - Ensure that verify() leaves openssl error stack clean on failure

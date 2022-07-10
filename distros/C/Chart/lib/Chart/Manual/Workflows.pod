@@ -1,0 +1,10 @@
+
+=encoding UTF-8
+
+=head1 NAME
+
+Chart::Manual::Workflows - document the ways to create charts
+
+=head1 OVERVIEW
+
+=cut

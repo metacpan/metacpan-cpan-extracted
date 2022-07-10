@@ -19,7 +19,7 @@ use namespace::clean;
 
 extends 'File::KDBX::Dumper';
 
-our $VERSION = '0.903'; # VERSION
+our $VERSION = '0.904'; # VERSION
 
 
 has allow_protection => 1;
@@ -563,7 +563,7 @@ File::KDBX::Dumper::XML - Dump unencrypted XML KeePass files
 
 =head1 VERSION
 
-version 0.903
+version 0.904
 
 =head1 ATTRIBUTES
 

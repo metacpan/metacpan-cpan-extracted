@@ -133,7 +133,7 @@ test_psgi
                     }
                 },
                 'facebook' => {
-                    'expires' => 666, 'access_token' => 'accesstoken',
+                    'expires' => 666, 'access_token' => 'accesstoken', 'issued_at' => 1,
                     'user_info' => {
                         'email' => 'blom\\u0040cpan.org', 'first_name' => 'Menno',
                         'id' => '666', 'last_name' => 'Blom',
@@ -144,7 +144,7 @@ test_psgi
                     }
                 },
                 'google' => {
-                    'id_token' => 'id_token', 'token_type' => 'Bearer',
+                    'id_token' => 'id_token', 'token_type' => 'Bearer', 'issued_at' => 1, 'expires' => 3601,
                     'expires_in' => 3600, 'access_token' => 'accesstoken',
                     'user_info' => {
                          'family_name' => 'Blom', 'id' => '666', 'verified_email' => 1,
@@ -154,7 +154,7 @@ test_psgi
                      }
                 },
                 github => {
-                    access_token => 'jhj5j4j44jh29dn',
+                    access_token => 'jhj5j4j44jh29dn', 'issued_at' => 1,
                     token_type => 'bearer',
                     scope => 'user,gist',
                     user_info => {
@@ -198,7 +198,7 @@ test_psgi
                     },
                 },
                 stackexchange => {
-                    access_token => '9813893ejsndsn93783',
+                    access_token => '9813893ejsndsn93783', 'issued_at' => 1,
                     expires => 1234,
                     user_info => {
                         has_more => 0,
@@ -226,7 +226,7 @@ test_psgi
                     },
                 },
                 linkedin => {
-                    access_token => 'accesstoken',
+                    access_token => 'accesstoken', 'issued_at' => 1, 'expires' => 5184001,
                     expires_in => 5184000,
                     user_info => {
                         pictureUrl => 'https://media.licdn.com/mpr/mprx/hash',

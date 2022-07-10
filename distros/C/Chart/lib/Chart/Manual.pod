@@ -1,0 +1,62 @@
+
+=encoding UTF-8
+
+=head1 NAME
+
+Chart::Manual - Chart user manual
+
+=head1 SYNOPSIS
+
+Chart is a collection of modules for visualizing numerical data.
+Its design goals are feature richness, maximal flexibility, and minimal 
+dependencies. It writes PNG and JPG images into files or STDOUT 
+(for web usage).
+
+The early API is mostly borrowed from Martien Verbruggen's L<GIFgraph> module.
+
+=head1 TYPES
+
+The module currently suports xycharts with points, lines, mountains,
+bar charts, stacked bars, error bars, pie and ring charts with split and
+polar coordinate systems. Also composite charts are possible.
+All types are in detail:
+
+L<Chart::Manual::Types>
+
+=head1 WORKFLOWS
+
+Chart can be used in several ways, which are broadly described under: 
+
+L<Chart::Manual::Workflows>
+
+=head1 METHODS
+
+A complete explanation of all methods geared toward the user:
+
+L<Chart::Manual::Methods>
+
+
+=head1 PROPERTIES
+
+The method C<set> allows to directly change particular chart properties.
+All of these explained in detail with their acceptable and default values
+are sorted there by name or topic or type:
+
+L<Chart::Manual::Properties>
+
+
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2022 David Bonner, Herbert Breunung.
+
+This program is free software; you can redistribute it and/or modify it 
+under same terms as Perl itself.
+
+=head1 AUTHOR
+
+David Bonner, <chartgrp@web.de>
+Herbert Breunung, <lichtkind@cpan.org>
+
+
+=cut

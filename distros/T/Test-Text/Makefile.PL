@@ -26,7 +26,7 @@ WriteMakefile(
     PREREQ_PM => {
 		  'Test::More' => 0,
 		  'version'    => 0,
-		  'File::Slurp::Tiny' => 0,
+		  'Path::Tiny' => 0.111,
 		  'Text::Hunspell' => 2.08,
 		  'Encode' => 0,
 		  'Test::Simple' => 1.0 #base class 

@@ -1,91 +1,68 @@
-use 5.010001;
+use 5.008001;
 use strict;
 use warnings;
-
-package MyTest::Mite;
 
 # NOTE: Since the intention is to ship this file with a project, this file
 # cannot have any non-core dependencies.
 
-use strict;
-use warnings;
+package MyTest::Mite;
 
-sub _is_compiling {
-    return $ENV{MITE_COMPILE} ? 1 : 0;
+# Constants
+sub true  () { !!1 }
+sub false () { !!0 }
+sub ro    () { 'ro' }
+sub rw    () { 'rw' }
+sub rwp   () { 'rwp' }
+sub lazy  () { 'lazy' }
+sub bare  () { 'bare' }
+
+sub _error_handler {
+    my ( $func, $message, @args ) = @_;
+    if ( @args ) {
+        require Data::Dumper;
+        local $Data::Dumper::Terse  = 1;
+        local $Data::Dumper::Indent = 0;
+        $message = sprintf $message, map {
+            ref($_) ? Data::Dumper::Dumper($_) : defined($_) ? $_ : '(undef)'
+        } @args;
+    }
+    my $next = do { no strict 'refs'; require Carp; \&{"Carp::$func"} };
+    @_ = ( $message );
+    goto $next;
 }
 
-sub _make_has {
-    my ( $class, $caller, $file, $kind ) = @_;
+sub carp    { unshift @_, 'carp'   ; goto \&_error_handler }
+sub croak   { unshift @_, 'croak'  ; goto \&_error_handler }
+sub confess { unshift @_, 'confess'; goto \&_error_handler }
 
-    return sub {
-        my $names = shift;
-        $names = [$names] unless ref $names;
-        my %args = @_;
-        for my $name ( @$names ) {
-           $name =~ s/^\+//;
+BEGIN {
+    *_HAS_AUTOCLEAN = eval { require namespace::autoclean }
+        ? \&true
+        : \&false
+};
 
-           my $default = $args{default};
-           if ( ref $default eq 'CODE' ) {
-               no strict 'refs';
-               ${$caller .'::__'.$name.'_DEFAULT__'} = $default;
-           }
-
-           my $builder = $args{builder};
-           if ( ref $builder eq 'CODE' ) {
-               no strict 'refs';
-               *{"$caller\::_build_$name"} = $builder;
-           }
-
-           my $trigger = $args{trigger};
-           if ( ref $trigger eq 'CODE' ) {
-               no strict 'refs';
-               *{"$caller\::_trigger_$name"} = $trigger;
-           }
-        }
-
-        return;
-    };
+if ( $] < 5.009005 ) {
+    require MRO::Compat;
+}
+else {
+    require mro;
 }
 
-sub import {
-    my ( $class, $kind ) = @_;
-    my ( $caller, $file ) = caller;
+defined ${^GLOBAL_PHASE}
+or eval { require Devel::GlobalDestruction; 1 }
+or do {
+    carp( "WARNING: Devel::GlobalDestruction recommended!" );
+    *Devel::GlobalDestruction::in_global_destruction = sub { undef; };
+};
 
-    # Turn on warnings and strict in the caller
-    warnings->import;
-    strict->import;
-
-    $kind ||= 'class';
-    $kind = ( $kind =~ /role/i ) ? 'role' : 'class';
-
-    if( _is_compiling() ) {
-        require Mite::Project;
-        my $method = "inject_mite_$kind\_functions";
-        Mite::Project->default->$method(
-            package     => $caller,
-            file        => $file,
-        );
-    }
-    else {
-        # Work around Test::Compile's tendency to 'use' modules.
-        # Mite.pm won't stand for that.
-        return if $ENV{TEST_COMPILE};
-
-        # Changes to this filename must be coordinated with Mite::Compiled
-        my $mite_file = $file . ".mite.pm";
-        if( !-e $mite_file ) {
-            require Carp;
-            Carp::croak("Compiled Mite file ($mite_file) for $file is missing");
-        }
-
-        {
-            local @INC = ('.', @INC);
-            require $mite_file;
-        }
-
-        my $method = "_inject_mite_$kind\_functions";
-        $class->$method( $caller, $file );
-    }
+{
+    no strict 'refs';
+    my $GUARD_PACKAGE = __PACKAGE__ . '::Guard';
+    *{"$GUARD_PACKAGE\::DESTROY"} = sub { $_[0][1]->() unless $_[0][0] };
+    *{"$GUARD_PACKAGE\::restore"} = sub { $_[0]->DESTROY; $_[0][0] = 1 };
+    *{"$GUARD_PACKAGE\::dismiss"} = sub {                 $_[0][0] = 1 };
+    *{"$GUARD_PACKAGE\::peek"}    = sub { $_[0][2] };
+    *guard = sub (&) { bless [ 0, @_ ] => $GUARD_PACKAGE };
 }
 
 my $parse_mm_args = sub {
@@ -94,10 +71,169 @@ my $parse_mm_args = sub {
     ( $names, $coderef );
 };
 
+sub _is_compiling {
+    return !! $ENV{MITE_COMPILE};
+}
+
+sub import {
+    my $class = shift;
+    my %arg = map { lc($_) => true } @_;
+    my ( $caller, $file ) = caller;
+
+    # Turn on warnings and strict in the caller
+    warnings->import;
+    strict->import;
+
+    my $kind = $arg{'-role'} ? 'role' : 'class';
+
+    if( _is_compiling() ) {
+        require Mite::Project;
+        Mite::Project->default->inject_mite_functions(
+            package     => $caller,
+            file        => $file,
+            arg         => \%arg,
+            kind        => $kind,
+            shim        => $class,
+        );
+    }
+    else {
+        # Changes to this filename must be coordinated with Mite::Compiled
+        my $mite_file = $file . ".mite.pm";
+        if( !-e $mite_file ) {
+            croak "Compiled Mite file ($mite_file) for $file is missing";
+        }
+
+        {
+            local @INC = ('.', @INC);
+            require $mite_file;
+        }
+
+        $class->_inject_mite_functions( $caller, $file, $kind, \%arg );
+    }
+
+    if ( _HAS_AUTOCLEAN and not $arg{'-unclean'} ) {
+        'namespace::autoclean'->import( -cleanee => $caller );
+    }
+}
+
+sub _inject_mite_functions {
+    my ( $class, $caller, $file, $kind, $arg ) = ( shift, @_ );
+    my $requested = sub { $arg->{$_[0]} ? true : $arg->{'!'.$_[0]} ? false : $arg->{'-all'} ? true : $_[1]; };
+
+    no strict 'refs';
+    my $has = $class->_make_has( $caller, $file, $kind );
+    *{"$caller\::has"}   = $has if $requested->( has   => true  );
+    *{"$caller\::param"} = $has if $requested->( param => false );
+    *{"$caller\::field"} = $has if $requested->( field => false );
+
+    *{"$caller\::with"} = $class->_make_with( $caller, $file, $kind )
+        if $requested->( with => true );
+
+    *{"$caller\::extends"} = sub {}
+        if $kind eq 'class' && $requested->( extends => true );
+    *{"$caller\::requires"} = sub {}
+        if $kind eq 'role' && $requested->( requires => true );
+
+    my $MM = ( $kind eq 'class' ) ? [] : \@{"$caller\::METHOD_MODIFIERS"};
+
+    for my $modifier ( qw/ before after around / ) {
+        next unless $requested->( $modifier => true );
+
+        if ( $kind eq 'class' ) {
+            *{"$caller\::$modifier"} = sub {
+                $class->$modifier( $caller, @_ );
+                return;
+            };
+        }
+        else {
+            *{"$caller\::$modifier"} = sub {
+                my ( $names, $coderef ) = &$parse_mm_args;
+                push @$MM, [ $modifier, $names, $coderef ];
+                return;
+            };
+        }
+    }
+}
+
+sub _make_has {
+    my ( $class, $caller, $file, $kind ) = @_;
+
+    no strict 'refs';
+    return sub {
+        my ( $names, %args, $code ) = @_;
+        for my $name ( ref($names) ? @$names : $names ) {
+           $name =~ s/^\+//;
+
+           'CODE' eq ref( $code = $args{default} )
+               and ${"$caller\::__$name\_DEFAULT__"} = $code;
+
+           'CODE' eq ref( $code = $args{builder} )
+               and *{"$caller\::_build_$name"} = $code;
+
+           'CODE' eq ref( $code = $args{trigger} )
+               and *{"$caller\::_trigger_$name"} = $code;
+        }
+
+        return;
+    };
+}
+
+sub _make_with {
+    my ( $class, $caller, $file, $kind ) = @_;
+
+    return sub {
+        while ( @_ ) {
+            my $role = shift;
+            my $args = ref($_[0]) ? shift : undef;
+            if ( $INC{'Role/Tiny.pm'} and 'Role::Tiny'->is_role( $role ) ) {
+                $class->_finalize_application_roletiny( $role, $caller, $args );
+            }
+            else {
+                $role->__FINALIZE_APPLICATION__( $caller, $args );
+            }
+        }
+        return;
+    };
+}
+
+{
+    my ( $cb_before, $cb_after );
+    sub _finalize_application_roletiny {
+        my ( $class, $role, $caller, $args ) = @_;
+
+        if ( $INC{'Role/Hooks.pm'} ) {
+            $cb_before ||= \%Role::Hooks::CALLBACKS_BEFORE_APPLY;
+            $cb_after  ||= \%Role::Hooks::CALLBACKS_AFTER_APPLY;
+        }
+        if ( $cb_before ) {
+            $_->( $role, $caller ) for @{ $cb_before->{$role} || [] };
+        }
+
+        'Role::Tiny'->_check_requires( $caller, $role );
+
+        my $info = $Role::Tiny::INFO{$role};
+        for ( @{ $info->{modifiers} || [] } ) {
+            my @args = @$_;
+            my $kind = shift @args;
+            $class->$kind( $caller, @args );
+        }
+
+        if ( $cb_after ) {
+            $_->( $role, $caller ) for @{ $cb_after->{$role} || [] };
+        }
+
+        return;
+    }
+}
+
 {
     my $get_orig = sub {
         my ( $caller, $name ) = @_;
-        \&{ "$caller\::$name" };
+
+        my $orig = $caller->can( $name );
+        return $orig if $orig;
+
+        croak "Cannot modify method $name in $caller: no such method";
     };
 
     sub before {
@@ -168,52 +304,7 @@ AROUND
     }
 }
 
-
-sub _inject_mite_class_functions {
-    my ( $class, $caller, $file ) = ( shift, @_ );
-
-    no strict 'refs';
-    *{ $caller .'::has' } = $class->_make_has( $caller, $file, 'class' );
-    *{ $caller .'::with' } = sub {
-        while ( @_ ) {
-            my $role = shift;
-            my $args = ref($_[0]) ? shift : undef;
-            $role->__FINALIZE_APPLICATION__( $caller, $args );
-        }
-    };
-    *{ $caller .'::extends'} = sub {};
-    for my $mm ( qw/ before after around / ) {
-        *{"$caller\::$mm"} = sub {
-            $class->$mm( $caller, @_ );
-            return;
-        };
-    }
-}
-
-sub _inject_mite_role_functions {
-    my ( $class, $caller, $file ) = ( shift, @_ );
-
-    no strict 'refs';
-    *{ $caller .'::has' } = $class->_make_has( $caller, $file, 'role' );
-    *{ $caller .'::with' } = sub {
-        while ( @_ ) {
-            my $role = shift;
-            my $args = ref($_[0]) ? shift : undef;
-            $role->__FINALIZE_APPLICATION__( $caller, $args );
-        }
-    };
-
-    my $MM = \@{"$caller\::METHOD_MODIFIERS"};
-    for my $modifier ( qw/ before after around / ) {
-        *{ $caller .'::'. $modifier } = sub {
-            my ( $names, $coderef ) = &$parse_mm_args;
-            push @$MM, [ $modifier, $names, $coderef ];
-        };
-    }
-}
-
 1;
-
 __END__
 
 =pod

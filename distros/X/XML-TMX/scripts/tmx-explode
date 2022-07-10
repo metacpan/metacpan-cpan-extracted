@@ -54,7 +54,7 @@ tmx-explode - Explodes tmx files in a file per language
 
 =head1 VERSION
 
-version 0.36
+version 0.39
 
 =head1 SYNOPSIS
 

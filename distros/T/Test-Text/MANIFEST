@@ -12,12 +12,13 @@ text/en/words.dic
 text/en/text.md
 text/en/README.md
 text/en/code.md
+text/en/text.Rmd
 text/es/words.dic
 text/es/texto.md
 text/README.md
-data/en_US.aff		English affixes 
+data/en_US.aff		English affixes
 data/en_US.dic		... and dicts
-data/Spanish.aff		Spanish affixes 
+data/Spanish.aff		Spanish affixes
 data/Spanish.dic		... and dictionnary
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

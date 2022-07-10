@@ -1,6 +1,6 @@
 package SPVM::Digest::MD5;
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 1;
 
@@ -15,6 +15,16 @@ SPVM::Digest::MD5 - SPVM interface to the MD5 Algorithm
   my $digest = Digest::MD5->md5($data);
   my $digest = Digest::MD5->md5_hex($data);
   my $digest = Digest::MD5->md5_base64($data);
+  
+  # OO interface
+  my $md5 = Digest::MD5->new;
+  
+  $md5->add($data1);
+  $md5->add($data2);
+  
+  my $digest = $md5->digest;
+  my $digest = $md5->hexdigest;
+  my $digest = $md5->b64digest;
 
 =head1 Description
 
@@ -62,6 +72,58 @@ Note that the base64 encoded string returned is not padded to be a
 multiple of 4 bytes long.  If you want interoperability with other
 base64 encoded md5 digests you might want to append the redundant
 string "==" to the result.
+
+=head2 new
+
+  static method new : Digest::MD5 ();
+
+The constructor returns a new C<Digest::MD5> object which encapsulate
+the state of the MD5 message-digest algorithm.
+
+=head1 Instance Methods
+
+=head2 add
+
+  method add : Digest::MD5 ($data : string);
+
+The $data provided as argument are appended to the message we
+calculate the digest for.  The return value is the $md5 object itself.
+
+All these lines will have the same effect on the state of the $md5
+object:
+
+    $md5->add("a"); $md5->add("b"); $md5->add("c");
+    $md5->add("a")->add("b")->add("c");
+    $md5->add("abc");
+
+=head2 digest
+
+  method digest : string ();
+
+Return the binary digest for the message.  The returned string will be
+16 bytes long.
+
+=head2 hexdigest
+
+  method hexdigest : string ();
+
+Same as $md5->digest, but will return the digest in hexadecimal
+form. The length of the returned string will be 32 and it will only
+contain characters from this set: '0'..'9' and 'a'..'f'.
+
+=head2 b64digest
+
+  method b64digest : string ();
+
+Same as $md5->digest, but will return the digest as a base64 encoded
+string.  The length of the returned string will be 22 and it will only
+contain characters from this set: 'A'..'Z', 'a'..'z', '0'..'9', '+'
+and '/'.
+
+
+The base64 encoded string returned is not padded to be a multiple of 4
+bytes long.  If you want interoperability with other base64 encoded
+md5 digests you might want to append the string "==" to the result.
 
 =head1 Repository
 

@@ -6,7 +6,7 @@ use warnings;
 
 use Wikibase::Datatype::Value::String;
 
-our $VERSION = 0.16;
+our $VERSION = 0.19;
 
 sub new {
 	my $class = shift;
@@ -93,7 +93,7 @@ Returns string.
  use strict;
  use warnings;
 
- use Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::Image::Dog;;
+ use Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::Image::Dog;
  use Wikibase::Datatype::Print::Snak;
 
  # Object.
@@ -141,6 +141,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.16
+0.19
 
 =cut

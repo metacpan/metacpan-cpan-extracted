@@ -1,0 +1,637 @@
+
+=encoding UTF-8
+
+=head1 NAME
+
+Chart::Manual::Properties - Complete Guide to Chart's changeable Properties
+
+=head1 INTRO
+
+Individual properties of a chart can be changed via method C<set>:
+
+    $chart->set( %properties);
+    $chart->set( key => 'value', ... );
+
+This page documents all viable keys and values for this operation.
+
+
+=head1 DATA TYPES
+
+Every key expects values of a certain data type. The more often occurring
+types are listed in this section.
+
+=head2 boolean
+
+Yes or no decisions you can answer with the perlish C<0> or C<1> as well
+as with C<'true'> or C<'false'>, which might be shortened to C<'f'>, C<'F'>,
+C<'t'> or C<'T'>. C<'none'> as an alias of C<'false'> is also an option.
+
+=head2 color
+
+To defined colors you have several options: names ('blue'),
+RGB triplets ([0,255,255]) or HSL hashes 
+({ hue => 240, saturation => 100, lightness => 50 }) are the usual ones.
+Detailed explanation and even more options you find under
+L<Chart::Color>.
+
+=head2 font
+
+There are a handful GD built in font object, than can be referenced:
+
+    GD::Font->Tiny
+    GD::Font->Small
+    GD::Font->MediumBold 
+    GD::Font->Large
+    GD::Font->Giant
+
+
+=head2 integer
+
+=head2 positive integer
+
+=head2 real
+
+=head2 string
+
+=head1 SORTED ALPHABETICALLY
+
+=head2 angle_interval
+
+L</Direction> only: how many radial lines should be drawn. 
+The default value is 30, which means that a line will be drawn every
+30 degrees. Valid Values are: 0, 5, 10, 15, 20, 30, 45 and 60. 
+If you choose 0, direction will draw no line.
+
+=head2 arrow
+
+L</Direction> only: L<Bool|/boolean> that if C<'true'>, chart will draw a
+arrow from the center to the point. Defaults to C<'false'>.
+
+=head2 brush_size
+
+L</Lines> only: Integer sets the width of the lines in pixels. Default is 6.
+
+=head2 background
+
+see L</color>
+
+=head2 brushStyle
+
+Sets the shape of points for Chart::Points, Chart::LinesPoints.
+The possibilities are 'FilledCircle', 'circle', 'donut',
+'OpenCircle', 'fatPlus', 'triangle', 'upsidedownTriangle',
+'square', 'hollowSquare', 'OpenRectangle', 'FilledDiamond',
+'OpenDiamond', 'Star', 'OpenStar'.
+Default: 'FilledCircle
+
+=head2 brush_style1
+
+Composite only: brush style of points associated with left y-axis.
+
+=head2 brush_style2
+
+Composite only: brush style of points associated with right y-axis.
+ 
+=head2 colors
+
+The key C<color> is special, because its value has to be a hash
+the name of 
+This option lets you control the C</color>s the chart will use.  It takes
+a reference to a hash.  The hash should contain keys mapped to references
+to arrays of rgb values.  For instance,
+
+    $obj->set('colors' => {'background' => [255,255,255]});
+
+sets the background color to white (which is the default).  Valid keys for
+this hash are
+
+    'background' (background color for the image)
+    'title' (color of the title)
+    'text' (all the text in the chart)
+    'x_label' (color of the x-axis label)
+    'y_label' (color of the first y axis label)
+    'y_label2' (color of the second y axis label)
+    'grid_lines' (color of the grid lines)
+    'x_grid_lines' (color of the x grid lines - for x axis ticks)
+    'y_grid_lines' (color of the y grid lines - for to left y axis ticks)
+    'y2_grid_lines' (color of the y2 grid lines - for right y axis ticks)
+    'dataset0'..'dataset63' (the different datasets)
+    'misc' (everything else, ie. ticks, box around the legend)
+
+NB. For composite charts, there is a limit of 8 datasets per component.
+The colors for 'dataset8' through 'dataset15' become the colors
+for 'dataset0' through 'dataset7' for the second component chart.
+More options how to define colors are described under L<Chart::Color>.
+
+=head2 composite_info
+
+This option is only used for composite charts.  It contains the
+information about which types to use for the two component charts,
+and which datasets belong to which component chart. It should be
+a reference to an array of array references, containing information 
+like the following
+
+    $obj->set ('composite_info' => [ ['Bars', [1,2]],
+                     ['Lines', [3,4] ] ]);
+
+This example would set the two component charts to be a bar chart and
+a line chart.  It would use the first two data sets for the bar 
+chart (note that the numbering starts at 1, not zero like most of
+the other numbered things in Chart), and the second two data sets
+for the line chart.  The default is undef.
+
+NB. Chart::Composite can only do two component charts.
+
+=head2 custom_x_ticks
+
+Used in points, lines, linespoints, errorbars and bars charts, this option
+allows you to you to specify exactly which x-ticks and x-tick labels should
+be drawn.  It should be assigned a reference to an array of desired
+ticks.  Just remember that I'm counting from the 0th element of the
+array.  (ie., if 'custom_x_ticks' is assigned [0,3,4], then the 0th,
+3rd, and 4th x-ticks will be displayed)
+
+=head2 datasetx
+
+see L</color>
+
+=head2 f_x_tick
+
+Needs a reference to a function which uses the x-tick labels generated by
+the '@data[0]' as the argument. The result of this function can reformat
+the labels. For instance
+
+   $obj -> set ('f_x_tick' => \&formatter );
+
+An example for the function formatter: x labels are seconds since an event. 
+The referenced function can transform this seconds to hour, minutes and seconds.
+
+=head2 f_y_tick
+
+The same situation as for 'f_x_tick' but now used for y labels.
+
+=head2 f_y_tick1
+
+Only for composite charts, needs a reference to a function 
+which has one argument and has to return
+a string which labels the first resp. second y axis.
+Both default to undef.
+
+=head2 f_y_tick2
+
+Only for composite charts, needs a reference to a function 
+which has one argument and has to return
+a string which labels the first resp. second y axis.
+Both default to undef.
+
+=head2 graph_border
+
+Sets the number of pixels used as a border between the title/labels
+and the actual graph within the image.  Defaults to 10.
+
+=head2 grey_background
+
+Puts a nice soft grey background on the actual data plot when
+set to 'true'.  Default is 'true'.
+
+=head2 grid_lines
+
+Draws grid lines matching up to x and y ticks. 
+
+=head2 imagemap
+
+Lets Chart know you're going to ask for information about the placement
+of the data for use in creating an image map from the png.  This information
+can be retrieved using the imagemap_dump() method.  NB. that the 
+imagemap_dump() method cannot be called until after the Chart has been
+generated (ie. using the png() or cgi_png() methods).
+
+=head2 include_zero
+
+If 'true', forces the y-axis to include zero if it is not in the dataset
+range. Default is 'false'.
+
+In general, it is better to use this, than to set the 'min_val' if that
+is all you want to achieve.
+
+=head2 integer_ticks_only
+
+Specifies how to draw the x- and y-ticks: as floating point 
+('false', '0') or as integer numbers ('true', 1). Default: 'false'
+
+=head2 interval
+
+Also a required value for a split chart. It sets the interval of one line
+to plot. Defaults 'undef'.
+
+=head2 interval_ticks
+
+Sets the number of ticks for the x-axis of a Split chart. Defaults to 5.
+
+=head2 label_font
+
+This option changes the font of the labels. The key has to be a GD font. 
+
+=head2 legend
+
+Specifies the placement of the legend.  Valid values are 'left', 'right',
+'top', 'bottom'.  Setting this to 'none' tells chart not to draw a
+legend.  Default is 'right'.
+
+=head2 legend_example_size
+
+Sets the length of the example line in the legend in pixels. Defaults to 20.
+
+=head2 legend_font
+
+This option changes the font of the text in the legend. 
+The key has to be a GD font. 
+
+=head2 legend_labels
+
+Sets the values for the labels for the different data sets.  Should
+be assigned a reference to an array of labels.  For example,
+
+  @labels = ('foo', 'bar');
+  $obj->set ('legend_labels' => \@labels);
+
+Default is empty, in which case 'Dataset 1', 'Dataset 2', etc. are
+used as the labels.  
+
+=head2 legend_label_values
+
+Tells a pie chart what labels to draw in the legend. Valid values are
+'percent', 'value', 'both' and 'none'. Defaults to 'value'.
+
+=head2 label_values
+
+Tells a pie chart what labels to draw beside the pie. Valid values are
+'percent', 'value', 'both' and 'none'. Defaults to 'percent'.
+
+=head2 line
+
+If you turn this option to 'true', then direction will connect the points 
+with lines. Defaults to 'false'.
+
+=head2 max_circles
+
+Sets the maximum number of circles when generating a scale for direction.
+Default is 100. This limit is used to avoid plotting  an unreasonable 
+large number of ticks if non-round values are used for the min_val and
+max_val.
+
+=head2 max_val
+
+Sets the maximum y-value on the graph, overriding the normal auto-scaling.
+Default is undef.
+
+
+=head2 max_val1
+
+Only for composite charts, these options specify the maximum y-value
+for the first and second components respectively.  Both default to
+undef.
+
+=head2 max_val2
+
+Only for composite charts, these options specify the maximum y-value
+for the first and second components respectively.  Both default to
+undef.
+
+
+=head2 max_x_ticks
+
+Work similar as 'max_y_ticks' and 'min_y_ticks'. Of course, only for a 
+xy_plot.
+
+=head2 max_y_ticks
+
+Sets the maximum number of y_ticks to draw when generating a scale.
+Default is 100. This limit is used to avoid plotting an unreasonable
+large number of ticks if non-round values are used for the min_val
+and max_val.
+
+The value for 'max_y_ticks' should be at least 5 times larger than
+'min_y_ticks'.
+
+=head2 min_circles
+
+Sets the minimum number of circles when generating a scale for direction.
+Default is 4, minimum is 2.
+
+=head2 min_val
+
+Sets the minimum y-value on the graph, overriding the normal auto-scaling.
+Default is undef.
+
+Caution should be used when setting 'max_val' and 'min_val' to floating
+point or non-round numbers. This is because the scale must start & end
+on a tick, ticks must have round-number intervals, and include round
+numbers.
+
+Example: Suppose your data set has a range of 35-114 units. If you specify
+them as the 'min_val' & 'max_val', the y_axis will be plotted with 80 ticks
+every 1 unit.. If no 'min_val' & 'max_val', the system will auto scale the
+range to 30-120 with 10 ticks every 10 units.
+
+If the 'min_val' & 'max_val' are specified to excessive precision, they may
+be overridden by the system, plotting a maximum 'max_y_ticks' ticks.
+
+=head2 min_val1
+
+Only for composite charts, these options specify the minimum y-value
+for the first and second components respectively.  Both default to
+undef.
+
+=head2 min_val2
+
+Only for composite charts, these options specify the minimum y-value
+for the first and second components respectively.  Both default to
+undef.
+
+=head2 min_x_ticks
+
+Work similar as 'max_y_ticks' and 'min_y_ticks'. Of course, only for a 
+xy_plot.
+
+=head2 min_y_ticks
+
+Sets the minimum number of y_ticks to draw when generating a scale.
+Default is 6, The minimum is 2.
+
+=head2 no_cache
+
+Adds Pragma: no-cache to the http header.  Be careful with this one, as
+Netscape 4.5 is unfriendly with POST using this method.
+
+=head2 pairs
+
+Only used for direction how to handle more datasets. 
+               If 'pairs' is set to 'true', 
+               Chart uses the first dataset as a set of degrees and 
+               the second dataset as a set of values. 
+               Then, the third set is a set of degrees and the fourth a set of values \dots. \\
+               If 'pairs' is set to 'false', 
+               Chart uses the first dataset as a set of angels 
+               and all following datasets as sets of values.
+               Defaults to 'false'.
+
+Sets the maximum number of circles when generating a scale for direction.
+Default is 100. This limit is used to avoid plotting  an unreasonable 
+large number of ticks if non-round values are used for the min_val and
+max_val.
+
+=head2 png_border
+
+Sets the number of pixels used as a border between the graph
+and the edges of the image.  Defaults to 10.
+
+=head2 point
+
+Indicates to draw points in a direction chart. 'true' or 'false' possible. 
+Defaults to 'true'.
+
+=head2 polar
+
+Direction only: If set C<true>, the maximum x value is in the center
+of the coordinate system. Defaults to 'false'.
+
+=head2 precision
+
+Sets the number of numerals after the decimal point. Affects in most
+cases the y-axis. But also the x-axis if 'xy_plot' was set and also
+the labels in a pie chart. Defaults to 3. 
+
+=head2 pt_size
+
+Sets the radius of the points (for Chart::Points, etc.) in pixels.  
+Default is 18.
+
+=head2 ring
+
+Pie charts only: sets the "thickness" of the pie, the percentage of
+the radius, which is visible. Defaults to 1 (normal pie chart).
+Good values are between 0.2 and 0.4.
+
+=head2 scale
+
+Every y-value of a split chart will be multiplied with that value, but
+the scale won't change. Which means that split allows one to overdraw certain 
+rows! Only useful if you want to give prominence to the maximal amplitudes
+of the data. Defaults to 1. 
+
+
+=head2 same_error
+
+This is a option only for ErrorBars. It tells chart that you want use the same 
+error value of a data point if set to 'true'. Look at the documentation
+to see how the module ErrorBars works. Default: 'false'.
+
+=head2 same_y_axes
+
+Forces both component charts in a composite chart to use the same maximum 
+and minimum y-values if set to 'true'.  This helps to keep the composite 
+charts from being too confusing.  Default is undef.
+
+=head2 skip_int_ticks
+
+If 'integer_ticks_only' was set to 'true' the labels and ticks will 
+be drawn every nth tick. Of course in horizontalBars it affects the
+x-axis. Default to 1, no skipping. 
+
+=head2 skip_x_ticks
+
+Sets the number of x-ticks and x-tick labels to skip.  (ie.  
+if 'skip_x_ticks' was set to 4, Chart would draw every 4th x-tick
+and x-tick label).  Default is undef.
+
+=head2 sort
+
+In a xy-plot, the data will be sorted ascending if set to 'true'.
+(Should be set if the data isn't sorted, especially in Lines, Split 
+and LinesPoints) In a Pareto Chart the data will be sorted descending. 
+Defaults to 'false'.
+
+=head2 skip_y_ticks
+
+Does the same for the y-axis at a HorizontalBars chart as 'skip_x_ticks'
+does for other charts. Defaults to 1.
+
+=head2 spaced_bars
+
+Leaves space between the groups of bars at each data point when set
+to 'true'.  This just makes it easier to read a bar chart.  Default
+is 'true'.
+
+=head2 start
+
+Split only: Sets the start value of the first interval.
+If the x coordinate of the first data point is zero, you should 'set' to
+zero. Default is 'undef'.
+
+=head2 sub_title
+
+Write a sub-title under the L</title> in smaller letters. 
+Default is empty.
+
+=head2 text_space
+
+Sets the amount of space left on the sides of text, to make it more
+readable.  Defaults to 2.
+
+
+=head2 tick_label_font
+
+This is the font for the tick labels. It also needs 
+a GD font object as an argument.
+
+=head2 tick_len
+
+Sets the length of the x- and y-ticks in pixels.  Default is 4. 
+
+=head2 title
+
+Content of title text. If empty, no title is drawn.  
+It recognizes '\n' as a newline, and acts accordingly.
+Remember, if you want to use normal quotation marks instead of single 
+quotation marks then you have to quote "\\n". Default is empty.
+
+
+=head2 title_font
+
+This option changes the font of the title. The key has to be a GD font. 
+eg. GD::Font->Large
+
+
+=head2 transparent
+
+Makes the background of the image transparent if set to 'true'.  Useful
+for making web page images.  Default is 'false'.
+
+=head2 x_grid_lines
+
+Draws grid lines matching up to x ticks if set to 'true'. Default is false.
+
+=head2 x_label
+
+Tells Chart what to use for the x-axis label.  If empty, no label
+is drawn.  Default is empty.
+
+=head2 x_ticks
+
+Specifies how to draw the x-tick labels.  Valid values are 'normal',
+'staggered' (staggers the labels vertically), and 'vertical' (the
+labels are draw upwards).  Default is 'normal'.
+
+=head2 xy_plot
+
+Forces Chart to plot a x-y-graph, which means, that the x-axis is also
+numeric if set to 'true'. Very useful for mathematical graphs.
+Works for Lines, Points, LinesPoints and ErrorBars. Split makes always a 
+xy_plot. Defaults to 'false'.
+
+=head2 y_label
+
+Tells Chart what to use for labels on the standard, left y-axis.
+If empty, no label is drawn.  Default is empty.
+
+=head2 y_label2
+
+Tells Chart what to use for labels on the second, 
+right y-axis (if different from left).
+If empty, no label is drawn.  Default is empty.
+
+=head2 y_ticks2
+
+Only for composite charts, the number of y ticks to use on the first and
+second y-axis on a composite chart.  Please note that if you just set the
+'y_ticks' option, both axes will use that number of y ticks.
+Both default to undef.
+
+=head2 y_axes
+
+Tells Chart where to place the y-axis. Has no effect on Composite and Pie.
+Valid values are 'left', 'right' and 'both'. Defaults to 'left'.
+
+=head2 y_grid_lines
+
+Draws grid lines matching up to y ticks if set to 'true'. Default is false.
+
+=head2 ylabel2
+
+The label for the right y-axis (the second component chart) on a composite
+chart.  Default is undef.
+
+=head2 y_ticks1
+
+Only for composite charts, the number of y ticks to use on the first and
+second y-axis on a composite chart.  Please note that if you just set the
+'y_ticks' option, both axes will use that number of y ticks.
+Both default to undef.
+
+=head1 SORTED BY TOPIC
+
+=head2 Color
+
+
+=head1 SORTED BY TYPE
+
+Summary of all properties, grouped by chart type where there applicable. 
+The format is: name, L<type|/"DATA TYPE">, description, default value
+
+=head2 ALL
+
+Properties available in all chart types:
+
+L</grey_background>  L<bool|/boolean>: image background set to grey; C<'true'>
+
+L</title>            L</string>: text on top of a chart; C<''>
+
+L</transparent>      L<bool|/boolean>: image background transparency; C<'false'>
+
+
+
+=head2 Bars
+
+=head2 Composite
+
+=head2 Direction
+
+L</angle_interval>    L<pos_int|/"positive integer">: angle between radial lines; C<30>
+
+L</arrow>             L<bool|/boolean>: paint points as arrows; C<'false'>
+
+L</polar>             L<bool|/boolean>: reverse x axis; C<false>
+
+
+=head2 ErrorBars
+
+=head2 HorizontalBars
+
+=head2 Lines
+
+=head2 LinesPoints
+
+=head2 Mountain
+
+=head2 Pareto
+
+=head2 Pie
+
+L</ring>              L</real>: percentage of visible radius; C<1> (full pie)
+
+
+=head2 Points
+
+=head2 Split
+
+L</start>   Split only: Sets the start value of the first interval.
+If the x coordinate of the first data point is zero, you should 'set' to
+zero. Default is 'undef'.
+
+
+=head2 StackedBars
+
+
+
+=cut
