@@ -5,7 +5,7 @@ RTx     'RT-Extension-CopySubjectButton';
 license 'gpl_2';
 repository 'https://github.com/averkios/RT-Extension-CopySubjectButton';
 
-requires_rt '4.4.0';
+requires_rt '5.0.1';
 rt_too_new '5.2.0';
 
 sign;

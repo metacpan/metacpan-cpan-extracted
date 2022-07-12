@@ -25,24 +25,30 @@ no_index:
     - author
     - builder
 provides:
+  Groonga::Commands::Delete:
+    file: lib/Groonga/Commands/Delete.pm
+  Groonga::Commands::Load:
+    file: lib/Groonga/Commands/Load.pm
   Groonga::Commands::Select:
     file: lib/Groonga/Commands/Select.pm
   Groonga::Commands::Status:
     file: lib/Groonga/Commands/Status.pm
   Groonga::HTTP:
     file: lib/Groonga/HTTP.pm
-    version: '1.07'
+    version: '1.09'
   Groonga::HTTP::Client:
     file: lib/Groonga/HTTP/Client.pm
   Groonga::ResultSet:
     file: lib/Groonga/ResultSet.pm
 requires:
+  JSON: '0'
   JSON::PP: '0'
   LWP::UserAgent: '0'
+  URI: '0'
 resources:
   bugtracker: https://github.com/groonga/Groonga-HTTP/issues
   homepage: https://github.com/groonga/Groonga-HTTP
   repository: https://github.com/groonga/Groonga-HTTP.git
-version: '1.07'
+version: '1.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

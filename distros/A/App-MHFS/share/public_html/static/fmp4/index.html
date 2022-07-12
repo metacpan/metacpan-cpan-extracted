@@ -1,0 +1,255 @@
+<html>
+<head>
+<link rel="stylesheet" href="music.css">
+<title>MHFS FMP4</title>
+</head>
+<body>
+<div class="header row">
+    <h1>MHFS FMP4</h1>
+</div>
+<div class="body row scroll-y">
+    <div id="musicdb">
+        <h1 id="videotitle"></h1>
+        <video id="mainvideo">
+
+        </video>
+    </div>
+</div>
+<div class="footer row">
+    <input type="button" value="PREV" id="prevbtn" class="controlbtns">
+    <button id="ppbtn" type="button" class="controlbtns">PLAY</button>
+    <input id="curtime" type="text" class="timedisplay" name="curseconds" value="0:00">
+    <input type="range" step="any" id="seekbar" value="0">
+    <input id="endtime" type="text" class="timedisplay" name="endseconds" value="0:00">
+    <input type="button" value="NEXT" id="nextbtn" class="controlbtns">
+    <input type="range" min="0" max="1" value="1.0" step="any" id="volslider">
+	<!-- <label><input name="repeattrack" id="repeattrack" type="checkbox">Repeat Track</label> -->
+    <input type="button" value="FULLSCREEN" id="fullscreen" class="controlbtns">
+</div>
+<script>
+    const mainvideo = document.getElementById('mainvideo');
+    const ppbtn = document.getElementById('ppbtn');
+    const volslider = document.getElementById("volslider");
+    const seekbar = document.getElementById("seekbar");
+    const curtime = document.getElementById('curtime');
+    const endtime = document.getElementById('endtime');
+    const fullscreen = document.getElementById('fullscreen');
+    const videotitle = document.getElementById('videotitle');
+
+    // currently unused
+    const prevbtn = document.getElementById('prevbtn');
+    const nextbtn = document.getElementById('nextbtn');
+
+    let BaseTime = 0;
+    let SBAR_UPDATING = 0;
+
+    fullscreen.addEventListener('click', function() {
+        if (mainvideo.requestFullscreen) {
+          mainvideo.requestFullscreen();
+        } else if (mainvideo.mozRequestFullScreen) {
+          mainvideo.mozRequestFullScreen();
+        } else if (mainvideo.webkitRequestFullscreen) {
+          mainvideo.webkitRequestFullscreen();
+        } else if (mainvideo.msRequestFullscreen) {
+          mainvideo.msRequestFullscreen();
+        }
+    });
+
+    mainvideo.addEventListener('play', function() {
+        ppbtn.textContent = "PAUSE";
+    });
+
+    mainvideo.addEventListener('pause', function() {
+        ppbtn.textContent = "PLAY";
+    });
+
+    ppbtn.addEventListener('click', function(){
+        if(mainvideo.paused) {
+            mainvideo.play();
+        }
+        else {
+            mainvideo.pause();
+        }
+    });
+
+    volslider.addEventListener('input', function(e) {
+        mainvideo.volume = e.target.value;
+    });
+
+    seekbar.addEventListener('mousedown', function (e) {
+        if(!SBAR_UPDATING) {
+
+        }
+        SBAR_UPDATING = 1;
+    });
+
+    const seekVideo = function(rawurl, seektime, onload) {
+        console.log('seeking to ' + seektime);
+        BaseTime = seektime;
+        UpdateCurTime();
+        const jsonurl = new URL(rawurl);
+        jsonurl.searchParams.append('fmt', 'mkvinfo');
+        jsonurl.searchParams.append('mkvinfo_time', seektime);
+
+        doJSON(jsonurl, function(gopjson) {
+            console.log('gopjson goptime' + gopjson.goptime);
+            BaseTime = Number(gopjson.goptime);
+            UpdateCurTime();
+            const videourl = new URL(rawurl);
+            videourl.searchParams.append('fmt', 'fmp4');
+            videourl.searchParams.append('fmp4_time', gopjson.goptime);
+            console.log('videourl ' + videourl);
+            mainvideo.src =  videourl;
+            onload();
+        });
+    }
+
+    seekbar.addEventListener('change', function (e) {
+        if(!SBAR_UPDATING) {
+            return;
+        }
+        SBAR_UPDATING = 0;
+
+        const seektime = Number(seekbar.value);
+        const rawurl = new URL(mainvideo.currentSrc);
+        rawurl.searchParams.delete('fmt');
+        rawurl.searchParams.delete('fmp4_time');
+        console.log('rawurl ' + rawurl);
+
+        seekVideo(rawurl, seektime, function() {
+            mainvideo.play();
+        });
+    });
+
+    document.addEventListener('keydown', function(event) {
+        if(event.key === ' ') {
+            event.preventDefault();
+            event.stopPropagation();
+            ppbtn.click();
+        }
+        else if(event.key === 'ArrowRight') {
+            event.preventDefault();
+            event.stopPropagation();
+            nextbtn.click();
+        }
+        else if(event.key === 'ArrowLeft') {
+            event.preventDefault();
+            event.stopPropagation();
+            prevbtn.click();
+        }
+        else if(event.key === '+') {
+            event.preventDefault();
+            event.stopPropagation();
+            volslider.stepUp(5);
+            mainvideo.volume = volslider.value;
+        }
+        else if(event.key === '-') {
+            event.preventDefault();
+            event.stopPropagation();
+            volslider.stepDown(5);
+            mainvideo.volume = volslider.value;
+        }
+    });
+
+    document.addEventListener('keyup', function(event) {
+       if((event.key === ' ') || (event.key === 'ArrowRight') ||(event.key === 'ArrowLeft') || (event.key === '+') || (event.key === '-')) {
+           event.preventDefault();
+           event.stopPropagation();
+       }
+    });
+
+
+    const SetSeekbarValue = function(seconds) {
+        seekbar.value = seconds;
+    }
+
+    Number.prototype.toHHMMSS = function () {
+        var sec_num = Math.floor(this); //parseInt(this, 10); // don't forget the second param
+        var hours = Math.floor(sec_num / 3600);
+        var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+        var seconds = sec_num - (hours * 3600) - (minutes * 60);
+        var str;
+        if (hours > 0) {
+            if (hours < 10) { hours = "0" + hours; }
+            str = hours + ':'
+        }
+        else {
+            str = '';
+        }
+        if (minutes < 10) {minutes = "0"+minutes;}
+        if (seconds < 10) { seconds = "0" + seconds; }
+        return str + minutes + ':' + seconds;
+    }
+
+    const UpdateCurTime = function() {
+        const curTime = BaseTime + mainvideo.currentTime;
+        curtime.value = curTime.toHHMMSS();
+        SetSeekbarValue(curTime);
+    };
+
+
+    const GraphicsLoop = function() {
+        if(SBAR_UPDATING) {
+
+        }
+        // display the tracktime
+        else if(!mainvideo.paused) {
+            UpdateCurTime();
+        }
+        window.requestAnimationFrame(GraphicsLoop);
+    };
+    window.requestAnimationFrame(GraphicsLoop);
+
+    const doJSON = function(url, onload) {
+        let xhr = new XMLHttpRequest();
+        xhr.open('GET', url);
+        xhr.responseType = 'json';
+        xhr.send();
+        xhr.onload = function() {
+            if (xhr.status != 200) {
+                console.log(`Error ${xhr.status}: ${xhr.statusText}`);
+            }
+            else {
+                onload(xhr.response);
+            }
+        }
+    };
+
+    let pageurl = new URL(window.location);
+    const videoname = pageurl.searchParams.get('name');
+    const sid = pageurl.searchParams.get('sid');
+    console.log(videoname);
+    if(videoname && sid) {
+        videotitle.textContent = videoname;
+
+        const rawurl = new URL("../../get_video", pageurl);
+        rawurl.searchParams.append('name', videoname);
+        rawurl.searchParams.append('sid', sid);
+
+        const mp4url = new URL(rawurl);
+        mp4url.searchParams.append('fmt', 'fmp4');
+
+        const starttime = pageurl.searchParams.get('t');
+        if(starttime) {
+            console.log(starttime);
+            seekVideo(rawurl, Number(starttime), function(){});
+        }
+        else {
+            mainvideo.src = mp4url.href;
+        }
+
+        // load the metadata
+        const jsonurl = new URL(rawurl);
+        jsonurl.searchParams.append('fmt', 'mkvinfo');
+        doJSON(jsonurl, function(meta) {
+            console.log('duration ' + meta.duration);
+            seekbar.min = 0;
+            seekbar.max = meta.duration;
+            endtime.value = meta.duration.toHHMMSS();
+        });
+
+    }
+
+</script>
+</body>
+</html>

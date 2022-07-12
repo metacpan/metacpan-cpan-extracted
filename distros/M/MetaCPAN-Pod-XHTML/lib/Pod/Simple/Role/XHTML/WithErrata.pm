@@ -1,10 +1,12 @@
 package Pod::Simple::Role::XHTML::WithErrata;
-use HTML::Entities qw(encode_entities);
 use Moo::Role;
-use namespace::clean;
 
-our $VERSION = '0.002001';
+our $VERSION = '0.003001';
 $VERSION =~ tr/_//d;
+
+use HTML::Entities qw(encode_entities);
+
+use namespace::clean;
 
 around _gen_errata => sub {
   return;    # override the default errata formatting

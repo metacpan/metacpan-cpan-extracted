@@ -13,6 +13,8 @@ In your app source directory and start building.
 
 ```console
 ./configure --prefix=$HOME/opt/<%= ${filename} %>
+# You may want to specify a non standard perl installation
+# --perl=$HOME/.plenv/versions/<your_version>/bin
 make
 ```
 
@@ -34,7 +36,7 @@ using the built-in Mojo webserver.
 
 You can now connect to the CallBackery app with your web browser.
 
-If you need any additional perl modules, write their names into the PERL_MODULES
+If you need any additional perl modules, write their names into the `cpanfile`
 file and run ./bootstrap.
 
 Installation

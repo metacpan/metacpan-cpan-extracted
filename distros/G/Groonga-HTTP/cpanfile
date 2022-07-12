@@ -1,5 +1,7 @@
+requires 'JSON';
 requires 'JSON::PP';
 requires 'LWP::UserAgent';
+requires 'URI';
 
 on configure => sub {
     requires 'Module::Build::Tiny', '0.035';

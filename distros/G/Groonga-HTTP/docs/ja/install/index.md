@@ -29,7 +29,7 @@ Groonga-HTTP のインストールに Carton を使いたい場合は、 Groonga
 requires 'Groonga::HTTP'
 ```
 
-次に、以下のコマンドを実行します。
+Second, we execute the following commands
 
 ```console
 % sudo dnf install -y perl-App-cpanminus

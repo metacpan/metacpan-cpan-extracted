@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '1.14';
+$VERSION = '1.15';
 
 use Carp;
 use Net::DNS;
@@ -402,7 +402,7 @@ sub print {
 
 
 sub _decode_result {
-	my ( $self, $result, $qid ) = @_;
+	my ( $self, $result, $query_id ) = @_;
 
 	my $packet;
 	if ($result) {
@@ -410,7 +410,7 @@ sub _decode_result {
 		$self->errorstring( $result->why_bogus ) if $result->bogus;
 
 		my $buffer = $result->answer_packet || return;
-		substr( $buffer, 0, 2 ) = pack 'n', $qid;	# emulate Net::DNS resolver->send(packet)
+		substr( $buffer, 0, 2 ) = pack 'n', $query_id;	# emulate Net::DNS resolver->send(packet)
 		$packet = Net::DNS::Packet->decode( \$buffer, $self->debug );
 		$self->errorstring($@);
 	}

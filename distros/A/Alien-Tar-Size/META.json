@@ -1,0 +1,74 @@
+{
+   "abstract" : "tar LD_PRELOAD hack to compute size of tar file without reading and writing, provided as Alien package",
+   "author" : [
+      "Gavin Hayes <gahayes@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-Tar-Size",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build::MM" : "0.25",
+            "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "1.19",
+            "Alien::Build::MM" : "0.25",
+            "Alien::Build::Plugin::Build::Make" : "0.99",
+            "Alien::Build::Plugin::Fetch::LocalDir" : "0.72",
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0",
+            "Alien::Build" : "0.25",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/G4Vi/MHFS/issues"
+      },
+      "homepage" : "https://github.com/G4Vi/MHFS",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/G4Vi/MHFS.git",
+         "web" : "https://github.com/G4Vi/MHFS"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_alienfile" : {
+      "generated_by" : "Alien::Build::MM version 2.50",
+      "requires" : {
+         "share" : {
+            "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48"
+         },
+         "system" : {}
+      }
+   },
+   "x_serialization_backend" : "JSON::PP version 4.10"
+}

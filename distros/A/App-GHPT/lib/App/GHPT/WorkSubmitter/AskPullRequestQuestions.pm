@@ -2,11 +2,11 @@ package App::GHPT::WorkSubmitter::AskPullRequestQuestions;
 
 use App::GHPT::Wrapper::OurMoose;
 
-our $VERSION = '2.000000';
+our $VERSION = '2.000001';
 
-use App::GHPT::Types qw( ArrayRef Str );
-use Module::Pluggable::Object;
-use App::GHPT::WorkSubmitter::ChangedFilesFactory;
+use App::GHPT::Types                              qw( ArrayRef Str );
+use Module::Pluggable::Object                     ();
+use App::GHPT::WorkSubmitter::ChangedFilesFactory ();
 
 has merge_to_branch_name => (
     is       => 'ro',
@@ -72,7 +72,7 @@ App::GHPT::WorkSubmitter::AskPullRequestQuestions - Ask questions to go in the p
 
 =head1 VERSION
 
-version 2.000000
+version 2.000001
 
 =head1 SYNOPSIS
 

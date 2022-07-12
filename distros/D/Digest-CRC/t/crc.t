@@ -59,7 +59,7 @@ open(F,"<README")||die "Cannot open README";
 $ctx->addfile(F);
 close(F);
 my $y = $ctx->digest;
-ok($y == 2682625271, 'OO crc32 with addfile '.$y); 
+ok($y == 2527249122, 'OO crc32 with addfile '.$y); 
 
 # start at offset >0 with previous checksum result
 $ctx = Digest::CRC->new(type=>"crc32",cont=>1,init=>460478609); 

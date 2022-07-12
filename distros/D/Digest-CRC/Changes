@@ -74,3 +74,8 @@ Revision history for Perl extension Digest::CRC.
 
 0.23  Thu Apr 15 13:02:04 2021
           - added wrapper for CRC-SAE-J1850
+
+0.24  Tue Jul 12 12:42:41 2021
+          - fixed issue with clone-method and addfile
+            Thanks to Dirk Joos <dirk@tdmail.de>
+

@@ -1,0 +1,36 @@
+---
+
+port: 3000
+
+#logger: File
+#engines:
+#  logger:
+#    File:
+#      log_level: debug
+#      file_name: example_log.log
+#      log_dir: .
+
+logger: log4perl
+log: core
+engines:
+  logger:
+    log4perl:
+      config_watch_interval: 60
+      config_file: log4perl.cfg
+
+plugins:
+  'RPC::RESTRPC':
+    '/metacpan':
+      'Example::API::MetaCpan':
+          search: mc_search
+  'RPC::JSONRPC':
+    '/metacpan':
+      'Example::API::MetaCpan':
+        search: mc_search
+  'RPC::XMLRPC':
+    '/metacpan':
+      'Example::API::MetaCpan':
+        search: mc_search
+
+metacpan:
+  base_uri: https://fastapi.metacpan.org/v1/release/_search

@@ -1,8 +1,8 @@
 <script type="text/javascript">
     var originalsubject = document.getElementById("header").getElementsByTagName("h1")[0].innerText;
     var oldsubject = originalsubject.slice(originalsubject.indexOf(':') + 1);
-    if (window.location.href.includes("Ticket")){
-        document.getElementById('header').getElementsByTagName("h1")[0].innerHTML+='&nbsp;<button class="button btn btn-primary float-right" onclick="copier()">Copy</button>';
+    if (window.location.href.includes("Ticket/Display.html")){
+        document.getElementById('header').getElementsByTagName("h1")[0].innerHTML+='&nbsp;<button class="button form-control btn btn-primary float-right" onclick="copier()">Copy</button>';
     }
 
 	function copier(){

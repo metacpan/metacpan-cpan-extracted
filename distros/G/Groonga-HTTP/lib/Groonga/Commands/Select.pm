@@ -72,66 +72,55 @@ sub _is_valid_arguments {
 sub _parse_arguments {
     my $args = shift;
 
-    my $parsed_arguments = "";
+    my %parsed_arguments = ();
 
     _is_valid_arguments($args);
 
     if (exists($args->{'table'})) {
-        $parsed_arguments .= "table=" . $args->{'table'};
+        $parsed_arguments{'table'} = $args->{'table'};
     }
     if (exists($args->{'output_columns'})) {
-        $parsed_arguments .= '&';
-        $parsed_arguments .= "output_columns=";
-
+        my $parsed_output_columns = "";
         my $output_columns = $args->{'output_columns'};
         foreach my $output_column (@$output_columns) {
-            $parsed_arguments .= $output_column . ',';
+            $parsed_output_columns .= $output_column . ',';
         }
-        chop($parsed_arguments);
+        chop($parsed_output_columns);
+        $parsed_arguments{'output_columns'} = $parsed_output_columns;
     }
     if (exists($args->{'query'})) {
-        $parsed_arguments .= '&';
-        $parsed_arguments .= "query=" . $args->{'query'};
+        $parsed_arguments{'query'} = $args->{'query'};
     }
     if (exists($args->{'filter'})) {
-        $parsed_arguments .= '&';
-        $parsed_arguments .= "filter=" . $args->{'filter'};
+        $parsed_arguments{'filter'} = $args->{'filter'};
     }
     if (exists($args->{'columns'})) {
-        $parsed_arguments .= '&';
-        $parsed_arguments .= "match_columns=" . $args->{'columns'};
+        $parsed_arguments{'match_columns'} = $args->{'columns'};
     }
     if (exists($args->{'sort_keys'})) {
-        $parsed_arguments .= '&';
-        $parsed_arguments .= "sort_keys=" . $args->{'sort_keys'};
+        $parsed_arguments{'sort_keys'} = $args->{'sort_keys'};
     }
     if (exists($args->{'limit'})) {
-        $parsed_arguments .= '&';
-        $parsed_arguments .= "limit=" . $args->{'limit'};
+        $parsed_arguments{'limit'} = $args->{'limit'};
     }
     if (exists($args->{'synonym'})) {
-        $parsed_arguments .= '&';
-        $parsed_arguments .= "query_expander=" . $args->{'synonym'};
+        $parsed_arguments{'query_expander'} = $args->{'synonym'};
     }
     if (exists($args->{'drilldown'})) {
         $use_drilldown = 1;
-        $parsed_arguments .= '&';
-        $parsed_arguments .= "drilldown=" . $args->{'drilldown'};
+        $parsed_arguments{'drilldown'} = $args->{'drilldown'};
     }
     if (exists($args->{'drilldown_filter'})) {
         $use_drilldown = 1;
-        $parsed_arguments .= '&';
-        $parsed_arguments .= "drilldown_filter=" . $args->{'drilldown_filter'};
+        $parsed_arguments{'drilldown_filter'} = $args->{'drilldown_filter'};
     }
     if (exists($args->{'drilldown_output_columns'})) {
         $use_drilldown = 1;
-        $parsed_arguments .= '&';
-        $parsed_arguments .= "drilldown_output_columns=" . $args->{'drilldown_output_columns'};
+        $parsed_arguments{'drilldown_output_columns'} = $args->{'drilldown_output_columns'};
     }
     if (exists($args->{'drilldown_sort_keys'})) {
         $use_drilldown = 1;
-        $parsed_arguments .= '&';
-        $parsed_arguments .= "drilldown_sort_keys=" . $args->{'drilldown_sort_keys'};
+        $parsed_arguments{'drilldown_sort_keys'} = $args->{'drilldown_sort_keys'};
     }
     if (exists($args->{'dynamic_columns'})) {
         my $dynamic_columns = $args->{'dynamic_columns'};
@@ -149,37 +138,30 @@ sub _parse_arguments {
 
             my $name = $dynamic_columns->[$i]->{'name'};
 
-            $parsed_arguments .= '&';
-            $parsed_arguments .=
-                "columns[" . $name . "].stage=". $dynamic_columns->[$i]->{'stage'};
-            $parsed_arguments .= '&';
-            $parsed_arguments .=
-                "columns[" . $name . "].type=". $dynamic_columns->[$i]->{'type'};
-            $parsed_arguments .= '&';
-            $parsed_arguments .=
-                "columns[" . $name . "].value=". $dynamic_columns->[$i]->{'value'};
+            $parsed_arguments{'columns[' . $name . '].stage'} =
+                $dynamic_columns->[$i]->{'stage'};
+            $parsed_arguments{'columns[' . $name . '].type'} =
+                $dynamic_columns->[$i]->{'type'};
+            $parsed_arguments{'columns[' . $name . '].value'} =
+                $dynamic_columns->[$i]->{'value'};
 
             if (exists($dynamic_columns->[$i]->{'flags'})) {
-                $parsed_arguments .= '&';
-                $parsed_arguments .=
-                    "columns[" . $name . "].flags=". $dynamic_columns->[$i]->{'flags'};
+                $parsed_arguments{'columns[' . $name . '].flags'} =
+                    $dynamic_columns->[$i]->{'flags'};
             }
         }
     }
     if (exists($args->{'match_columns'})) {
-        $parsed_arguments .= '&';
-        $parsed_arguments .= "match_columns=" . $args->{'match_columns'};
+        $parsed_arguments{'match_columns'} = $args->{'match_columns'};
     }
     if (exists($args->{'query_expander'})) {
-        $parsed_arguments .= '&';
-        $parsed_arguments .= "query_expander=" . $args->{'query_expander'};
+        $parsed_arguments{'query_expander'} = $args->{'query_expander'};
     }
     if (exists($args->{'post_filter'})) {
-        $parsed_arguments .= '&';
-        $parsed_arguments .= "post_filter=" . $args->{'post_filter'};
+        $parsed_arguments{'post_filter'} = $args->{'post_filter'};
     }
 
-    return $parsed_arguments;
+    return \%parsed_arguments;
 }
 
 sub _parse_result {
@@ -225,14 +207,9 @@ sub _parse_result {
     return \%result_set;
 }
 
-sub _make_command {
-    return 'select' . '?' . $command_args;
-}
-
 sub execute {
     if (defined $groonga_http_client) {
-        my $command = _make_command;
-        return _parse_result($groonga_http_client->send($command));
+        return _parse_result($groonga_http_client->send('select', $command_args));
     }
     return;
 }

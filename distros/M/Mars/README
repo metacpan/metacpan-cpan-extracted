@@ -1,0 +1,119 @@
+NAME
+
+    Mars - OO Framework
+
+ABSTRACT
+
+    OO Framework for Perl 5
+
+VERSION
+
+    0.02
+
+SYNOPSIS
+
+      package User;
+    
+      use Mars::Class;
+    
+      base 'Person';
+    
+      with 'Identity';
+    
+      attr 'email';
+      attr 'login';
+      attr 'password';
+      attr 'trust';
+    
+      test 'Authenticable';
+    
+      sub BUILD {
+        shift->{trust} = true;
+      }
+    
+      package main;
+    
+      my $user = User->new(
+        fname => 'Elliot',
+        lname => 'Alderson',
+      );
+    
+      # bless({fname => 'Elliot', lname => 'Alderson'}, 'User')
+
+DESCRIPTION
+
+    Mars is a simple yet powerful framework for object-oriented programming
+    which lets you hook into all aspects of the "class", "role",
+    "interface", and object "lifecycle", from class declaration and object
+    "construction", to object "deconstruction".
+
+FUNCTIONS
+
+    This package provides the following functions:
+
+ false
+
+      false() (Bool)
+
+    The false function returns a falsy boolean value which is designed to
+    be practically indistinguishable from the conventional numerical 0
+    value. This function is always exported unless a routine of the same
+    name already exists.
+
+    Since 0.01
+
+    false example 1
+
+        package main;
+      
+        use Mars;
+      
+        my $false = false;
+      
+        # 0
+
+    false example 2
+
+        package main;
+      
+        use Mars;
+      
+        my $true = !false;
+      
+        # 1
+
+ true
+
+      true() (Bool)
+
+    The true function returns a truthy boolean value which is designed to
+    be practically indistinguishable from the conventional numerical 1
+    value. This function is always exported unless a routine of the same
+    name already exists.
+
+    Since 0.01
+
+    true example 1
+
+        package main;
+      
+        use Mars;
+      
+        my $true = true;
+      
+        # 1
+
+    true example 2
+
+        package main;
+      
+        use Mars;
+      
+        my $false = !true;
+      
+        # 0
+
+AUTHORS
+
+    Awncorp, awncorp@cpan.org
+

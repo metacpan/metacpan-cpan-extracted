@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +21,8 @@ requires:
   HTML::Entities: '3.69'
   Moo: '2.003000'
   Moo::Role: '2.003000'
-  Pod::Simple::XHTML: '3.23'
+  Pod::Simple::Role::XHTML::WithHighlightConfig: '0'
+  Pod::Simple::XHTML: '3.40'
   URL::Encode: '0.03'
   namespace::clean: '0.27'
 resources:
@@ -29,5 +30,5 @@ resources:
   bugtracker: https://github.com/metacpan/MetaCPAN-Pod-XHTML/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/metacpan/MetaCPAN-Pod-XHTML.git
-version: '0.002001'
+version: '0.003001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

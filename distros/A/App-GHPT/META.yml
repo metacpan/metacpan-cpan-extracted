@@ -11,16 +11,15 @@ build_requires:
   File::pushd: '0'
   Hash::Objectify: '0'
   Test::Class::Moose: '0.82'
-  Test::Class::Moose::AttributeRegistry: '0'
   Test::Class::Moose::CLI: '0'
   Test::Differences: '0'
   Test::More: '0.96'
+  Test::Needs: '0'
   Test::Output: '0'
-  Try::Tiny: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,43 +28,43 @@ name: App-GHPT
 provides:
   App::GHPT:
     file: lib/App/GHPT.pm
-    version: '2.000000'
+    version: '2.000001'
   App::GHPT::Types:
     file: lib/App/GHPT/Types.pm
-    version: '2.000000'
+    version: '2.000001'
   App::GHPT::WorkSubmitter:
     file: lib/App/GHPT/WorkSubmitter.pm
-    version: '2.000000'
+    version: '2.000001'
   App::GHPT::WorkSubmitter::AskPullRequestQuestions:
     file: lib/App/GHPT/WorkSubmitter/AskPullRequestQuestions.pm
-    version: '2.000000'
+    version: '2.000001'
   App::GHPT::WorkSubmitter::ChangedFiles:
     file: lib/App/GHPT/WorkSubmitter/ChangedFiles.pm
-    version: '2.000000'
+    version: '2.000001'
   App::GHPT::WorkSubmitter::ChangedFilesFactory:
     file: lib/App/GHPT/WorkSubmitter/ChangedFilesFactory.pm
-    version: '2.000000'
+    version: '2.000001'
   App::GHPT::WorkSubmitter::Role::FileInspector:
     file: lib/App/GHPT/WorkSubmitter/Role/FileInspector.pm
-    version: '2.000000'
+    version: '2.000001'
   App::GHPT::WorkSubmitter::Role::Question:
     file: lib/App/GHPT/WorkSubmitter/Role/Question.pm
-    version: '2.000000'
+    version: '2.000001'
   App::GHPT::Wrapper::OurMoose:
     file: lib/App/GHPT/Wrapper/OurMoose.pm
-    version: '2.000000'
+    version: '2.000001'
   App::GHPT::Wrapper::OurMoose::Role:
     file: lib/App/GHPT/Wrapper/OurMoose/Role.pm
-    version: '2.000000'
+    version: '2.000001'
   App::GHPT::Wrapper::OurMooseX::Role::Parameterized:
     file: lib/App/GHPT/Wrapper/OurMooseX/Role/Parameterized.pm
-    version: '2.000000'
+    version: '2.000001'
   App::GHPT::Wrapper::OurMooseX::Role::Parameterized::Meta::Trait::Parameterizable::Strict:
     file: lib/App/GHPT/Wrapper/OurMooseX/Role/Parameterized/Meta/Trait/Parameterizable/Strict.pm
-    version: '2.000000'
+    version: '2.000001'
   App::GHPT::Wrapper::Ourperl:
     file: lib/App/GHPT/Wrapper/Ourperl.pm
-    version: '2.000000'
+    version: '2.000001'
 requires:
   File::HomeDir: '0'
   FindBin: '0'
@@ -79,7 +78,6 @@ requires:
   Moose: '0'
   Moose::Exporter: '0'
   Moose::Role: '0'
-  Moose::Util: '0'
   MooseX::Getopt::Dashes: '0'
   MooseX::Role::Parameterized: '0'
   MooseX::Role::Parameterized::Meta::Trait::Parameterizable: '0'
@@ -111,18 +109,18 @@ resources:
   bugtracker: https://github.com/maxmind/App-GHPT/issues
   homepage: http://metacpan.org/release/App-GHPT
   repository: git://github.com/maxmind/App-GHPT.git
-version: '2.000000'
+version: '2.000001'
 x_Dist_Zilla:
   perl:
-    version: '5.034000'
+    version: '5.036000'
   plugins:
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
-          default_jobs: 1
+          default_jobs: '8'
       name: '@MAXMIND/MakeMaker'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -146,23 +144,23 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@MAXMIND/ManifestSkip'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::License
       name: '@MAXMIND/License'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@MAXMIND/ExecDir'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@MAXMIND/ShareDir'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@MAXMIND/Manifest'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::CheckVersionIncrement
       name: '@MAXMIND/CheckVersionIncrement'
@@ -170,11 +168,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@MAXMIND/TestRelease'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@MAXMIND/ConfirmRelease'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::MAXMIND::VersionProvider
       name: '@MAXMIND/MAXMIND::VersionProvider'
@@ -186,7 +184,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@MAXMIND/AutoPrereqs'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromBuild
       name: '@MAXMIND/CopyFilesFromBuild'
@@ -205,7 +203,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@MAXMIND/MetaResources'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -214,13 +212,13 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@MAXMIND/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.024'
+              version: '6.025'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
-          inherit_missing: '1'
-          inherit_version: '1'
-          meta_noindex: '1'
+          inherit_missing: 1
+          inherit_version: 1
+          meta_noindex: 1
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000037'
           version: '0.006'
@@ -233,19 +231,19 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@MAXMIND/MetaConfig'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@MAXMIND/MetaJSON'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@MAXMIND/MetaYAML'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@MAXMIND/NextRelease'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -253,7 +251,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: '@MAXMIND/Test::More with subtest'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -261,7 +259,7 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: '@MAXMIND/Modules for use with tidyall'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -269,7 +267,7 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: '@MAXMIND/Test::Version which fixes https://github.com/plicease/Test-Version/issues/7'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -338,12 +336,12 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@MAXMIND/PodSyntaxTests'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
         Dist::Zilla::Role::TestRunner:
-          default_jobs: 1
+          default_jobs: '8'
       name: '@MAXMIND/RunExtraTests'
       version: '0.029'
     -
@@ -407,7 +405,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::Compile
       config:
         Dist::Zilla::Plugin::Test::Compile:
-          bail_out_on_fail: '0'
+          bail_out_on_fail: 0
           fail_on_warning: author
           fake_home: 0
           filename: xt/author/00-compile.t
@@ -437,7 +435,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.36.1
+          git_version: 2.37.0
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -570,7 +568,7 @@ x_Dist_Zilla:
           destination_filename: CONTRIBUTING.md
           dist: Dist-Zilla-PluginBundle-MAXMIND
           encoding: UTF-8
-          has_xs: '0'
+          has_xs: 0
           location: build
           source_filename: CONTRIBUTING.md
         Dist::Zilla::Role::RepoFileInjector:
@@ -590,7 +588,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CPANFile
       name: '@MAXMIND/CPANFile'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::MAXMIND::License
       name: '@MAXMIND/MAXMIND::License'
@@ -622,7 +620,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.36.1
+          git_version: 2.37.0
           repo_root: .
       name: '@MAXMIND/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -633,7 +631,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@MAXMIND/UploadToCPAN'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -651,7 +649,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.36.1
+          git_version: 2.37.0
           repo_root: .
       name: '@MAXMIND/Git::Check'
       version: '2.048'
@@ -661,7 +659,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
           commit_msg: v%V%n%n%c
-          signoff: '0'
+          signoff: 0
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - CONTRIBUTING.md
@@ -674,7 +672,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.36.1
+          git_version: 2.37.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -687,11 +685,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v2.000000
+          tag: v2.000001
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.36.1
+          git_version: 2.37.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -705,7 +703,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.36.1
+          git_version: 2.37.0
           repo_root: .
       name: '@MAXMIND/Git::Push'
       version: '2.048'
@@ -726,7 +724,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
           commit_msg: 'Bump version after release'
-          signoff: '0'
+          signoff: 0
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -735,7 +733,7 @@ x_Dist_Zilla:
             - (?^:.+)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.36.1
+          git_version: 2.37.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -749,62 +747,79 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.36.1
+          git_version: 2.37.0
           repo_root: .
       name: '@MAXMIND/Push version bump'
       version: '2.048'
     -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: TestRequires
+      version: '6.025'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: recommends
+      name: TestRecommends
+      version: '6.025'
+    -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@MAXMIND/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.024'
+      version: '6.025'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
-      is_trial: '0'
-    version: '6.024'
+      is_trial: 0
+    version: '6.025'
 x_authority: cpan:MAXMIND
 x_contributors:
   - 'Dave Rolsky <drolsky@maxmind.com>'
+  - 'faktas2 <104642023+faktas2@users.noreply.github.com>'
   - 'Florian Ragwitz <rafl@debian.org>'
   - 'gabe <gpacuilla@maxmind.com>'
   - 'Greg Oschwald <goschwald@maxmind.com>'
@@ -812,8 +827,9 @@ x_contributors:
   - 'Mark Fowler <mfowler@maxmind.com>'
   - 'Narsimham Chelluri <nchelluri@maxmind.com>'
   - 'Nick Logan <nlogan@gmail.com>'
+  - 'Olaf Alders <oalders@maxmind.com>'
   - 'Patrick Cronin <pcronin@maxmind.com>'
   - 'William Storey <wstorey@maxmind.com>'
-x_generated_by_perl: v5.34.0
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

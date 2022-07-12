@@ -153,6 +153,8 @@ docs/ja/news/index.md
 docs/ja/tutorial/index.md
 docs/news/index.md
 docs/tutorial/index.md
+lib/Groonga/Commands/Delete.pm
+lib/Groonga/Commands/Load.pm
 lib/Groonga/Commands/Select.pm
 lib/Groonga/Commands/Status.pm
 lib/Groonga/HTTP.pm

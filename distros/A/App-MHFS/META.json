@@ -1,0 +1,66 @@
+{
+   "abstract" : "A Media HTTP File Server. Stream your own music and video library via your browser and standard media players.",
+   "author" : [
+      "Gavin Hayes <gahayes@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-MHFS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.13"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Alien::Tar::Size" : "0",
+            "MHFS::XS" : "0"
+         },
+         "requires" : {
+            "File::ShareDir" : "0",
+            "HTML::Template" : "2.97",
+            "URI::Escape" : "5.09",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/G4Vi/MHFS/issues"
+      },
+      "homepage" : "https://github.com/G4Vi/MHFS",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/G4Vi/MHFS.git",
+         "web" : "https://github.com/G4Vi/MHFS"
+      }
+   },
+   "version" : "v0.4.0",
+   "x_serialization_backend" : "JSON::PP version 4.10"
+}

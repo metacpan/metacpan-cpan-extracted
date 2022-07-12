@@ -2,7 +2,7 @@ package App::GHPT::Types;
 
 use App::GHPT::Wrapper::Ourperl;
 
-our $VERSION = '2.000000';
+our $VERSION = '2.000001';
 
 use parent 'MooseX::Types::Combine';
 

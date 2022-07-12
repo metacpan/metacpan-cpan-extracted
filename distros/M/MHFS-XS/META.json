@@ -1,0 +1,53 @@
+{
+   "abstract" : "XS extension module for Media HTTP File Server, for server side media encoding.",
+   "author" : [
+      "Gavin Hayes <gahayes@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MHFS-XS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Base::Wrapper" : "1.97",
+            "Alien::libFLAC" : "0",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "runtime" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/G4Vi/MHFS/issues"
+      },
+      "homepage" : "https://github.com/G4Vi/MHFS",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/G4Vi/MHFS.git",
+         "web" : "https://github.com/G4Vi/MHFS"
+      }
+   },
+   "version" : "v0.2.0",
+   "x_serialization_backend" : "JSON::PP version 4.10"
+}

@@ -1,0 +1,20 @@
+# Example application (excluding the plugin)
+requires 'Bread::Board'                     => '0.33';
+requires 'Daemon::Control'                  => '0.001';
+requires 'Dancer2'                          => '0.20';
+requires 'Dancer2::Logger::Log4perl'        => '0.00';
+requires 'HTTP::Tiny'                       => '0.070';
+requires 'IO::Socket::SSL'                  => '1.42';
+requires 'JSON'                             => '2.90';
+requires 'Moo'                              => '2.0';
+requires 'MooX::Params::CompiledValidators' => '0.05';
+requires 'Params::ValidationCompiler'       => '0.24';
+requires 'RPC::XML'                         => '0.57';
+requires 'Starman'                          => '0.40';
+requires 'Type::Tiny'                       => '1.00';
+requires 'URI'                              => '1.60';
+
+# do-rpc
+requires 'Log::Log4perl'               => '1.49';
+requires 'MooseX::Log::Log4perl::Easy' => '0.47';
+requires 'UUID::Tiny'                  => '1.04';

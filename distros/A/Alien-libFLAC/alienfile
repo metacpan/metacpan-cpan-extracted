@@ -1,0 +1,31 @@
+use alienfile;
+
+probe [ 'pkg-config --exists flac' ];
+
+share {
+    start_url 'https://downloads.xiph.org/releases/flac/';
+    plugin 'Download' => (
+        filter => qr/^flac-.*\.tar\.xz$/,
+        version => qr/([0-9\.]+)/,
+    );
+    plugin 'Extract' => 'tar.xz';
+    plugin 'Build::Autoconf';
+    build [
+        '%{configure} --enable-shared --enable-static',
+        '%{make}',
+        '%{make} install',
+    ];
+    gather sub {
+        my($build) = @_;
+        $build->runtime_prop->{$_} = "-I@{[ $build->runtime_prop->{prefix} ]}/include " for qw( cflags cflags_static );
+        $build->runtime_prop->{$_} = "-L@{[ $build->runtime_prop->{prefix} ]}/lib -lFLAC " for qw( libs libs_static );
+    };
+    plugin 'Gather::IsolateDynamic';
+};
+
+sys {
+    gather sub {
+        my($build) = @_;
+        $build->runtime_prop->{$_} = '-lFLAC' for qw( libs );
+    };
+};

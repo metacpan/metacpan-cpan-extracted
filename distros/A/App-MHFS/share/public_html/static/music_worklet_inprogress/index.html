@@ -1,0 +1,344 @@
+<html>
+<head>
+<link rel="stylesheet" href="music.css">
+<title>MHFS/Music</title>
+</head>
+<body>
+<div class="header">
+    <h1>MHFS/Music</h1>
+    <ul class="navbar"><li id="navlibrary" class="navbarleft navbaractive"><a href="#">Library View</a></li><li id="navart" class="navbarright"><a href="#">Playback View</a></li></ul>
+</div>
+<div class="mainview" id="libraryview">
+    <div id="musicdb"></div>
+</div>
+<div class="mainview" id="artview">
+    <img class="artviewimg" alt="album art">
+</div>
+<div class="footer">
+    <div class="ptdiv">
+        <div class="scol">
+            <div class="colheader">Playlist Previous</div>
+            <div id="prev_text" class="newtracktext">&nbsp;</div>
+        </div>
+        <div class="mcol">
+            <div class="colheader">Playlist Cursor</div>
+            <div id="play_text" class="newtracktext">&nbsp;</div>
+        </div>
+        <div class="scol">
+            <div class="colheader">Playlist Next</div>
+            <div id="next_text" class="newtracktext">&nbsp;</div>
+        </div>
+    </div>
+    <div class="acontrols">
+        <input type="button" value="PREV" id="prevbtn" class="controlbtns">
+        <button id="ppbtn" type="button" class="controlbtns">PLAY</button>
+        <input id="curtime" type="text" class="timedisplay" name="curseconds" value="0:00">
+        <input type="range" step="any" id="seekbar" value="0">
+        <input id="endtime" type="text" class="timedisplay" name="endseconds" value="0:00">
+        <input type="button" value="NEXT" id="nextbtn" class="controlbtns">
+        <input type="range" min="0" max="1" value="1.0" step="0.01" id="volslider">
+        <select id="playback_order">
+            <option value="pborder_default">Default</option>
+            <option value="pborder_rptrack">Repeat (Track)</option>
+            <option value="pborder_rpplaylist">Repeat (Playlist)</option>
+            <option value="pborder_random">Random</option>
+            <option value="pborder_reverse">Reverse</option>
+        </select>
+    </div>
+</div>
+<audio id="silentaudio" src="15-seconds-of-silence.mp3" loop></audio>
+<link rel="modulepreload" href="decoder/bin/_mhfscl.js">
+<link rel="modulepreload" href="decoder/mhfscl.js">
+<link rel="modulepreload" href="player/AudioWriterReader.js">
+<link rel="modulepreload" href='player/mhfsplayer.js'>
+<script src="music_inc_module.js" type="module" async> </script>
+<script>
+    // load the DB
+    let urlParams = new URLSearchParams(window.location.search);
+    /*
+    urlParams.append('fmt', 'musicdbhtml');
+    let myRequest = new Request('../../music?'+urlParams.toString());
+    fetch(myRequest).then(function(response) {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text();        
+    }).then((html) => {
+        document.getElementById("musicdb").innerHTML = html;
+    });
+    */
+
+    function escapeHTML(unsafe) {
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+    }
+
+    function dlurl(apiroot, namestack, name) {
+        let str = apiroot + '/music_dl?action=dl&name=';
+        let fullname = '';
+        namestack.forEach(function(elm) {
+            fullname += elm + '/';
+        });
+        fullname += name;
+        return str+encodeURIComponent(fullname);        
+    }
+
+    function trackHTML(apiroot, namestack, name) {
+        let text = '<tr class="track"><td>' + escapeHTML(name) + '</td>';        
+        text += '<td><a href="#">Play</a></td><td><a href="#">Queue</a></td><td><a href="';
+        text += dlurl(apiroot, namestack, name) + '">DL</a></td></tr>'; 
+        return text;
+    }
+
+    const OldDB2HTML = function(json) {
+        let text = '';
+        let namestack = [];
+        let files = json.files;        
+        while(files.length > 0) {
+            let file = files.shift();
+            // end of dir
+            if(!file) {
+                namestack.length = namestack.length-1;
+                text += '</tbody></table></td></tr>';
+                if((namestack.length === 0)) {
+                    text += '<br>';
+                }
+
+                continue;
+            }
+            // is directory
+            else if(file.files) {
+                text += '<tr><td><table border="1" class="tbl_track"><tbody><tr class="track"><th>';
+                text += escapeHTML(file.name) + '</th><th><a href="#">Play</a></th><th><a href="#">Queue</a></th><th><a href="';
+                text += dlurl(apiroot, namestack, file.name) + '">DL</a></th></tr>';
+                namestack.push(file.name);     
+                file.files.push(null);
+                file.files.push(...files);
+                files = file.files;
+            }
+            else {
+                // single track without dir
+                if(namestack.length === 0) {
+                    text += '<table border="1" class="tbl_track"><tbody>';                    
+                    text += trackHTML(apiroot, namestack, file.name);
+                    text += '</tbody></table><br>'
+                }
+                // its a track
+                else {
+                    text += trackHTML(apiroot, namestack, file.name);
+                }
+            }
+        }
+        document.getElementById("musicdb").innerHTML = text;
+    };
+
+    const DB2HTMLURL = function(filepath) {
+        return '../../music_dl?action=dl&name=' + encodeURIComponent(filepath);
+    };
+
+    const DB2HTML = function(node, currentPath) {
+        let text = '';
+        let tiopen = '<td>';
+        let ticlose = '</td>';
+        if(!currentPath || node.files) {
+            text += '<table border="1" class="tbl_track"><tbody>';
+            tiopen = '<th>';
+            ticlose = '</th>';
+        }
+        text += '<tr class="track">';
+        text += tiopen +escapeHTML(node.name) + ticlose + tiopen + '<a href="#">Play</a>' + ticlose + tiopen + '<a href="#">Queue</a>' + ticlose + tiopen + '<a href="';
+        text += DB2HTMLURL(currentPath+node.name) + '">DL</a>' + ticlose + '</tr>';
+        if(node.files) {
+            for(const file of node.files) {
+                text += DB2HTML(file, currentPath+node.name);
+            }
+        }
+        if(!currentPath || node.files) {
+            text += '</tbody></table>';
+        }
+        return text;
+    };
+
+    const DB2HTMLRunner = function(json) {
+        let text = '';
+        for( const file of json.files) {
+            text += DB2HTML(file, '') + '<br>';
+        }
+        document.getElementById("musicdb").innerHTML = text;
+    };
+
+    const DB2HTMLDom = function(node, currentPath) {
+        let ti = 'td';
+        if(!currentPath || node.files) {
+            ti= 'th';
+        }
+
+        const namecell = document.createElement(ti);
+        namecell.textContent = node.name;
+
+        const playcell = document.createElement(ti);
+        const playlink = playcell.appendChild(document.createElement('a'));
+        playlink.href = "#";
+        playlink.textContent = 'Play';
+
+        const queuecell = document.createElement(ti);
+        const queuelink = queuecell.appendChild(document.createElement('a'));
+        queuelink.href = "#";
+        queuelink.textContent = 'Queue';
+
+        const dlcell = document.createElement(ti);
+        const dllink = dlcell.appendChild(document.createElement('a'));
+        dllink.href = DB2HTMLURL(currentPath ? (currentPath +'/'+node.name) : node.name);
+        dllink.textContent = 'DL';
+
+        let tablerow = document.createElement("tr");
+        tablerow.setAttribute("class", "track");
+        tablerow.appendChild(namecell);
+        tablerow.appendChild(playcell);
+        tablerow.appendChild(queuecell);
+        tablerow.appendChild(dlcell);
+
+        if(currentPath && !node.files) {
+            return tablerow;
+        }
+
+        const tbody = document.createElement("tbody");
+        tbody.appendChild(tablerow);
+        if(node.files) {
+            for(const file of node.files) {
+                tbody.appendChild(DB2HTMLDom(file, currentPath+node.name));
+            }
+        }
+
+        const table = document.createElement("table");
+        table.setAttribute("border", "1");
+        table.setAttribute("class", "tbl_track");
+        table.appendChild(tbody);
+        return table;
+    };
+
+    const DB2HTMLDomRunner = function(json) {
+        const newmdb = document.createElement("div");
+        newmdb.setAttribute("id", 'musicdb');
+        for( const file of json.files) {
+            newmdb.appendChild(DB2HTMLDom(file, ''));
+            newmdb.appendChild(document.createElement("br"));
+        }
+        const oldmdb = document.getElementById("musicdb");
+        oldmdb.parentNode.replaceChild(newmdb, oldmdb);
+    };
+
+    async function* JSONArrayStreamer(fetchResource, options) {
+        const startStr = options?.startStr ?? '[';
+        const endStr = options?.endStr ?? ']';
+        const dbRes = await fetch(fetchResource);
+        const reader = dbRes.body.getReader();
+        const decoder = new TextDecoder('utf-8', {'fatal' : true});
+
+        let foundStart;
+        let existingData = '';
+        do {
+            const { value: chunk, done: readerDone } = await reader.read();
+            if(chunk) {
+                existingData += decoder.decode(chunk, {'stream' : true});
+                // find the start token and exclude it and before from the string
+                if(!foundStart) {
+                    const startStrIndex = existingData.indexOf(startStr);
+                    if(startStrIndex === -1) {
+                        console.log('existingData does not start with ' + startStr);
+                        continue;
+                    }
+                    existingData = existingData.slice(startStrIndex + startStr.length);
+                    foundStart = 1;
+                }
+                // array items are seperated by ','.
+                // attempt parse the input as an array each time it's found
+                let toSearch = existingData;
+                do {
+                    const seperatorIndex = toSearch.lastIndexOf(',');
+                    if(seperatorIndex === -1) break;
+                    toSearch = toSearch.slice(0, seperatorIndex);
+                    try {
+                        const records = JSON.parse('['+toSearch+']');
+                        yield records;
+                        existingData = existingData.slice(toSearch.length+1);
+                        break;
+                    }
+                    catch {
+                    }
+                } while(1);
+            }
+            if(readerDone) break;
+        } while(1);
+        // search backwards for the end token
+        // attempting to parse the input as an array each time it's found
+        do {
+            const endIndex = existingData.lastIndexOf(endStr);
+            if(endIndex === -1) {
+                throw("Failed to find json end!");
+            }
+            existingData = existingData.slice(0, endIndex);
+            try {
+                const records = JSON.parse('['+existingData + ']');
+                yield records;
+                return;
+            }
+            catch {
+            }
+        } while(1);
+    };
+
+    urlParams.append('fmt', 'musicdbjson');
+    const apiroot = '../..';
+    const jsonurl = apiroot + '/music?'+urlParams.toString();
+    //fetch(jsonurl).then(function(response) {
+    //    if (!response.ok) {
+    //        throw new Error(`HTTP error! status: ${response.status}`);
+    //    }
+    //    return response.json();
+    ////}).then(DB2HTMLRunner);
+    ////}).then(OldDB2HTML);
+    //}).then(DB2HTMLDomRunner);
+
+    //const newmdb = document.createElement("div");
+    ///newmdb.setAttribute("id", 'musicdb');
+    const oldmdb = document.getElementById("musicdb");
+    const jsonReader = JSONArrayStreamer(jsonurl);
+    (async function(){
+        for await (const json of jsonReader) {
+            for( const file of json) {
+                //newmdb.appendChild(DB2HTMLDom(file, ''));
+                //newmdb.appendChild(document.createElement("br"));
+                oldmdb.appendChild(DB2HTMLDom(file, ''));
+                oldmdb.appendChild(document.createElement("br"));
+            }
+        }
+        //oldmdb.parentNode.replaceChild(newmdb, oldmdb);
+    })();
+
+    // views
+    const libraryview = document.getElementById("libraryview");
+    const artview = document.getElementById("artview");
+
+    const navlibrary = document.getElementById("navlibrary");
+    const navart = document.getElementById("navart");
+
+    const navbaractiveclass = "navbaractive";
+    navlibrary.addEventListener('click', function(){
+        navart.classList.remove(navbaractiveclass);
+        navlibrary.classList.add(navbaractiveclass);
+        artview.style.display = "none";
+    });
+
+    navart.addEventListener('click', function(){
+        navlibrary.classList.remove(navbaractiveclass);
+        navart.classList.add(navbaractiveclass);
+        artview.style.display = "block";
+    });
+</script>
+</body>
+</html>

@@ -5,6 +5,7 @@ LICENSE
 Makefile.PL
 MANIFEST
 README.md
+lib/Mojolicious/Command/Author/generate/automake_app/.perlcriticrc
 lib/Mojolicious/Command/Author/generate/automake_app/cpanfile
 lib/Mojolicious/Command/Author/generate/automake_app/Makefile.am
 lib/Mojolicious/Command/Author/generate/automake_app/AUTHORS

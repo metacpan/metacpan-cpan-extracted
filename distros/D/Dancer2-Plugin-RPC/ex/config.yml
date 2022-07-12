@@ -1,0 +1,8 @@
+plugins:
+    'RPC::XML':
+        '/system':
+            'MyApp':
+                ping: do_ping
+    'RPC::JSON':
+        '/system':
+

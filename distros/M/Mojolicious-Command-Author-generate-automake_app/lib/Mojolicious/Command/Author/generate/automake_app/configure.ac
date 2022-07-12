@@ -63,22 +63,21 @@ else
   AC_MSG_ERROR(could not find perl)
 fi
 
+% if ($package eq 'callbackery' ) {
+
 ac_node_version="10"
 
 if test -x "$NODE"; then
   AC_MSG_CHECKING(make sure we have at least node ${ac_node_version})
   case `$NODE --version` in
-  v10*)
-    AC_MSG_RESULT(ok v10)
+  v14*)
+    AC_MSG_RESULT(ok v14)
     ;;
-  v11*)
-    AC_MSG_RESULT(ok v11)
+  v16*)
+    AC_MSG_RESULT(ok v16)
     ;;
-  v12*)
-    AC_MSG_RESULT(ok v12)
-    ;;
-  v13*)
-    AC_MSG_RESULT(ok v13)
+  v18*)
+    AC_MSG_RESULT(ok v18)
     ;;
   *)
     AC_MSG_RESULT(no);
@@ -86,7 +85,6 @@ if test -x "$NODE"; then
   esac
 fi
 
-% if ($package eq 'callbackery' ) {
 AM_CONDITIONAL(BUILD_QOOXDOO_APP,[test -x $NODE])
 % }
 

@@ -35,7 +35,7 @@ plan tests => scalar @modules;
 
 my %trustme = (
              'DBIx::Class::ResultDDL' => [
-                                           qr/^(swp|autoclean|V\d|enable_inflate_.*)$/
+                                           qr/^(swp|autoclean|V\d|enable_inflate.*|enable_retrieve_defaults)$/
                                          ]
            );
 

@@ -1,7 +1,7 @@
 use v5.12;
 
 package Chart;
-our $VERSION = 'v2.403.0';
+our $VERSION = 'v2.403.1';
 
 use Chart::Points;
 use Chart::Lines;
@@ -68,17 +68,18 @@ Chart - a series of charting modules
 
 =head1 DESCRIPTION
 
-This page gives you a summary how to use Chart. For more details
-please visit the L<Chart::Manual>.
+Chart help you to create PNG and JPG images with visualizations of numeric data.
+This page gives you a summary how to use it. 
+For a more thorough documentation please visit the L<Chart::Manual>.
 
 
 =for HTML <p>
-<img src="https://github.com/lichtkind/Chart/blob/main/dev/test/samples/stackedbars.png" alt="stacked bars">
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/blob/main/dev/test/samples/stackedbars.png" alt="stacked bars">
 <img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/bars_2.png" alt="multi bar chart">
 <img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/hbars_2.png" alt="horizontal bar chart">
 <img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/direction_4.png" alt="polar chart">
 <img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/pie_4.png" alt="pie chart">
-<img src="https://github.com/lichtkind/Chart/blob/main/dev/test/samples/split_2.png" alt="multi chart">
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/blob/main/dev/test/samples/split_2.png" alt="multi chart">
 </p>
 
 =head2 use-ing Chart
@@ -125,7 +126,7 @@ or you can try just constructing the hash inside the set call, like
   $obj->set ('title' => 'Foo Bar');
 
 
-L<Chart::Manual::Settings> lists all currently supported keys and values.
+L<Chart::Manual::Properties> lists all currently supported keys and values.
 
 
 =head2 GIFgraph.pm-style API

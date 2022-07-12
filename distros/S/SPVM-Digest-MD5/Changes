@@ -1,3 +1,9 @@
+0.06 2022-07-11
+  [Fix Testing Bugs]
+    * Fix the testing bug that "perl_impl" doesn't use the same perl as SPVM::Digest::MD5.
+0.05 2022-07-11
+  [Fix Testing Bugs]
+    * Fix the bug that distribution have "perl_impl/blib" and unneeded files.
 0.04 2022-07-08
   [Changes]
     * perl_impl directory is not indexed.

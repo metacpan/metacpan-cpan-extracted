@@ -27,6 +27,7 @@ sub file {
         'README.md' => 'README.md',
         'AUTHORS' => 'AUTHORS',
         '.gitignore' => '.gitignore',
+        '.perlcritic' => '.perlcritic',
         '.github/workflows/unit-tests.yaml' => '.github/workflows/unit-tests.yaml',
         'LICENSE' => 'LICENSE',
         'COPYRIGHT' => 'COPYRIGHT',

@@ -124,7 +124,7 @@ if (scalar @hostlist > 512) {
 
 foreach my $host (@hostlist) {
   my $dev = $host ? get_device($host->addr) : undef;
-  if ($dev and not (blessed $dev and $dev->in_storage) and $action !~ m/^discover/) {
+  if ($dev and not (blessed $dev and $dev->in_storage) and $action !~ m/^(?:discover|addpseudodevice)/) {
     info sprintf "%s: error - Don't know device: %s", $action, $host->addr;
     next;
   }
@@ -440,6 +440,17 @@ data is also saved into the Netdisco database for web browsing (under
 Device->SNMP tab).
 
  ~/bin/netdisco-do snapshot -d 192.0.2.1 -e yes
+
+=head2 addpseudodevice
+
+Adds a Pseudo Device which can be used to connect together unconnected parts
+of your network or to gather ARP via CLI/API when SNMP is not available.
+
+Pass the Pseudo Device IP in the L<-d> parameter. Pass the Pseudo Device name
+in the L<-e> parameter. Pass the number of ports (one or more) in the L<-p>
+parameter. All parameters are required. For example:
+
+ ~/bin/netdisco-do addpseudodevice -d 192.0.2.1 -e fakerouter -p 10
 
 =head1 DEBUG OPTIONS
 

@@ -1,0 +1,258 @@
+html, body{
+    padding: 0px;
+    margin: 0px;
+}
+
+body {
+    color: #ababab;
+    background: #000;
+    font-family: Segoe UI, Helvetica, Arial, Sans-Serif;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    padding-left: 2%;
+    background-color: #000;
+    height: 10%;
+    width: 100%;
+    min-height: 110px;
+    display: block;
+}
+
+.navbar {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.navbar li {
+    float: left;
+    background-color: blue;
+    border-style: solid solid solid solid;
+    border-color: blue;
+    border-bottom-color: #ababab;
+}
+
+.navbar li a {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    padding-right: 16px;
+    color: #ababab;
+}
+
+.navbar li:hover {
+    background-color: #666666;
+    border-top-color: #666666;
+}
+
+.navbaractive {
+    background-color: #000 !important;
+    border-color: #ababab !important;
+    border-style: solid hidden hidden hidden !important;
+    font-weight: bold;
+}
+
+.navbarright {
+    border-left-color: #ababab !important;
+    border-right-style: hidden !important;
+}
+
+.navbarleft {
+    border-right-color: #ababab !important;
+    border-left-style: hidden !important;
+}
+
+/* The main views, music library, art view, etc*/
+.mainview {
+    position: fixed;
+    top: max(10%, 110px);
+    overflow: auto;
+    box-sizing: border-box;
+    padding-left: 2%;
+    width: 100%;
+    height: calc(100% - max(20%, 250px) - max(10%, 110px)); /*the whole page minus the header and footer*/
+    background-color: #000;
+}
+
+.track:hover {
+    background-color: #00796b;
+}
+
+#artview {
+    display: none;
+}
+
+.artviewimg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: left;
+    max-height: inherit;
+}
+
+.movableWindow {
+    position: absolute;
+    z-index: 9;
+    background-color: #f1f1f1;
+    border: 1px solid #d3d3d3;
+    text-align: center;
+    box-sizing: border-box;
+    resize: both;
+    overflow: hidden;
+}
+
+.movableWindowCloseButton {
+    color: #f1f1f1;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    line-height: 16px;
+}
+
+.movableWindowCloseButton:hover,
+.movableWindowCloseButton:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+    background-color: #e81123
+}
+
+.movableWindowTitleBar {
+    height: 20px;
+    cursor: move;
+    z-index: 10;
+    background-color: blue;/*#2196F3;*/
+    color: #f1f1f1;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+}
+
+.movableWindowTitleText {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.movableWindowContent {
+    height: calc(100% - 20px);
+}
+
+/* music player is always shown at the bottom */
+.footer {
+    position: fixed;
+    box-sizing: border-box;
+    bottom: 0;
+    width: 100%;
+    height: max(20%, 250px);
+    padding-left: 2%;
+    padding-top: 10px;
+    background-color:blue;    
+}
+
+/* First the prev, current, and next tracks*/
+.ptdiv {
+    position: absolute;
+    height: 70%;
+    width: 80%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    border: 1px solid #ababab;
+}
+
+.scol {
+    border: 1px solid #ababab;
+    width: 20%;
+    display: flex;
+    flex-direction: column;
+}
+
+.mcol {
+    border: 1px solid #ababab;
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+}
+
+.colheader {
+    padding: 3px 10px;
+    border: 1px solid #ababab;
+    font-weight: bold;
+}
+
+.newtracktext {
+    padding: 3px 10px;
+    border: 1px solid #ababab;
+    overflow: hidden;
+    flex: 1;
+    align-self: stretch;
+}
+
+.trackdiv {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    overflow: hidden;
+}
+
+.albumart {
+    display: inline-block;
+    max-width: 10%;
+    max-height: 100%;
+    padding-right: 5px;
+    min-width: 40px;
+}
+
+.trackmetadata {
+    display: flex;
+    /*align-items: center;*/
+    padding-left: 5px;
+    height: 100%;
+    white-space: normal;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.trackmetadatainner {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.trackmetadatatrackname {
+    font-weight: bold;
+}
+
+/* Then the controls */
+.acontrols {
+    position: absolute;
+    top: 70%;
+    width: 100%;
+    height: 30%;
+    display: inline-block;
+    overflow: hidden;
+}
+
+.controlbtns {
+    padding: 0;
+    border-width: thick;
+}
+
+#seekbar {
+    width: 60%;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 30px;
+}
+
+.timedisplay {
+    width: 55px;
+}
+
+.boldlbl {
+    font-weight: bold;
+}

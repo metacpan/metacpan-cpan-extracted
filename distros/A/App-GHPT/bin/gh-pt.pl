@@ -2,12 +2,12 @@
 
 use App::GHPT::Wrapper::Ourperl;
 
-our $VERSION = '2.000000';
+our $VERSION = '2.000001';
 
-use FindBin qw($Bin);
+use FindBin qw( $Bin );
 use lib "$Bin/../../lib", "$Bin/../../../lib";
 
-use App::GHPT::WorkSubmitter;
+use App::GHPT::WorkSubmitter ();
 
 exit App::GHPT::WorkSubmitter->new_with_options->run;
 

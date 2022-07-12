@@ -60,6 +60,7 @@ t/Fragment-Annotation.t
 t/_template.tabular
 t/_template-phytohub.tabular
 t/_template-peakforest.tabular
+t/_template_pforest_peaklist_lcms.tmpl
 t/_template_v2.tabular
 t/_template_db_frag_peaks.tmpl
 t/_template_db_met_peaks.tmpl
@@ -70,6 +71,7 @@ t/PhytoHUB__dump.tsv
 t/Knapsack__dump.csv
 t/MaConDa__v1_0.xml
 t/MaConDa__v1_0__extensive.xml
+t/MS_fragments-adducts-isotopes__V1.1.txt
 t/MS_fragments-adducts-isotopes-test.txt
 t/MS_fragments-adducts-isotopes.txt
 t/Cmpd_4.4-Methylguanosine-298.1146.TSV

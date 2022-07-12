@@ -44,8 +44,10 @@
       },
       "runtime" : {
          "requires" : {
+            "JSON" : "0",
             "JSON::PP" : "0",
-            "LWP::UserAgent" : "0"
+            "LWP::UserAgent" : "0",
+            "URI" : "0"
          }
       },
       "test" : {
@@ -55,6 +57,12 @@
       }
    },
    "provides" : {
+      "Groonga::Commands::Delete" : {
+         "file" : "lib/Groonga/Commands/Delete.pm"
+      },
+      "Groonga::Commands::Load" : {
+         "file" : "lib/Groonga/Commands/Load.pm"
+      },
       "Groonga::Commands::Select" : {
          "file" : "lib/Groonga/Commands/Select.pm"
       },
@@ -63,7 +71,7 @@
       },
       "Groonga::HTTP" : {
          "file" : "lib/Groonga/HTTP.pm",
-         "version" : "1.07"
+         "version" : "1.09"
       },
       "Groonga::HTTP::Client" : {
          "file" : "lib/Groonga/HTTP/Client.pm"
@@ -84,7 +92,7 @@
          "web" : "https://github.com/groonga/Groonga-HTTP"
       }
    },
-   "version" : "1.07",
+   "version" : "1.09",
    "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1
 }

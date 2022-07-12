@@ -1,3 +1,8 @@
+2.00 - 2022-07-11
+  - Fix timezone bug in 'datetime' and 'timestamp' methods.
+  - New use option -retrieve_defaults applies retrieve_on_insert
+    to all columns having default_value.
+
 1.01 - 2021-02-17
   - No functional changes; fix dist dependency version requirements
 

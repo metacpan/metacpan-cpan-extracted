@@ -2,19 +2,19 @@ package App::GHPT::WorkSubmitter;
 
 use App::GHPT::Wrapper::OurMoose;
 
-our $VERSION = '2.000000';
+our $VERSION = '2.000001';
 
-use App::GHPT::Types qw( ArrayRef Bool PositiveInt Str );
-use App::GHPT::WorkSubmitter::AskPullRequestQuestions;
-use File::HomeDir       ();
-use IPC::Run3           qw( run3 );
-use Lingua::EN::Inflect qw( PL PL_V );
-use List::AllUtils      qw( part );
-use Pithub              ();
-use Term::CallEditor    qw( solicit );
-use Term::Choose        qw( choose );
-use WebService::PivotalTracker 0.10;
-use YAML::PP;
+use App::GHPT::Types qw( ArrayRef Bool HashRef PositiveInt Str );
+use App::GHPT::WorkSubmitter::AskPullRequestQuestions ();
+use File::HomeDir                                     ();
+use IPC::Run3                                         qw( run3 );
+use Lingua::EN::Inflect                               qw( PL PL_V );
+use List::AllUtils                                    qw( first part );
+use Pithub                                            ();
+use Term::CallEditor                                  qw( solicit );
+use Term::Choose                                      qw( choose );
+use WebService::PivotalTracker 0.10                   ();
+use YAML::PP                                          ();
 
 with 'MooseX::Getopt::Dashes';
 
@@ -23,6 +23,22 @@ has create_story => (
     isa           => Bool,
     documentation =>
         'If true, will create a new story instead of finding an existing one.',
+);
+
+has _env_keys => (
+    traits  => ['Array'],
+    is      => 'ro',
+    isa     => ArrayRef,
+    lazy    => 1,
+    builder => '_build_env_keys',
+    handles => { _all_env_keys => 'elements', _get_env_key => 'get', },
+);
+
+has _is_ghe => (
+    is      => 'ro',
+    isa     => Bool,
+    lazy    => 1,
+    default => sub ($self) { lc( $self->_host ) eq 'github.com' ? 0 : 1; },
 );
 
 has project => (
@@ -161,6 +177,22 @@ has _git_config => (
     handles => { _config_val => 'get' },
 );
 
+has _git_remote => (
+    traits  => ['Hash'],
+    is      => 'ro',
+    isa     => HashRef,
+    lazy    => 1,
+    builder => '_build_git_remote',
+    handles => { _remote_val => 'get' },
+);
+
+has _host => (
+    is      => 'ro',
+    isa     => Str,
+    lazy    => 1,
+    default => sub ($self) { $self->_remote_val('host') },
+);
+
 has _project_ids => (
     is      => 'ro',
     isa     => ArrayRef [PositiveInt],
@@ -168,21 +200,27 @@ has _project_ids => (
     builder => '_build_project_ids',
 );
 
-sub _build_github_api ($self) {
-    my ( $host, $user, $repo ) = $self->_github_info;
-    my $hub_config = $self->_hub_config->{$host}[0] // {};
+has _pithub_args => (
+    is      => 'ro',
+    isa     => HashRef,
+    lazy    => 1,
+    builder => '_build_pithub_args',
+);
 
-    my $protocol = $self->_github_protocol($hub_config);
+sub _build_pithub_args ($self) {
+    my $hub_config = $self->_hub_config->{ $self->_host }[0] // {};
+    my $protocol   = $self->_github_protocol($hub_config);
 
-    return Pithub->new(
-        user  => $user,
-        repo  => $repo,
+    return {
+        user  => $self->_remote_val('user'),
+        repo  => $self->_remote_val('repo'),
         head  => $self->_git_current_branch,
         token => $self->_github_token($hub_config),
         (
-            $host eq 'github.com' ? () : (
-                api_uri => "$protocol://$host/api/v3/",
-            )
+            $self->_is_ghe
+            ? ( api_uri =>
+                    sprintf( '%s://%s/api/v3/', $protocol, $self->_host ) )
+            : ()
         ),
         (
             $self->_has_github_ua
@@ -191,7 +229,11 @@ sub _build_github_api ($self) {
                 )
             : (),
         ),
-    );
+    };
+}
+
+sub _build_github_api ($self) {
+    return Pithub->new( $self->_pithub_args );
 }
 
 sub _github_protocol ( $self, $hub_config ) {
@@ -205,11 +247,36 @@ sub _github_protocol ( $self, $hub_config ) {
 sub _github_token ( $self, $hub_config ) {
     return $self->github_token if $self->_has_github_token;
 
-    my $env_key = 'GITHUB_TOKEN';
-    my $key     = 'submit-work.github.token';
-    return $ENV{$env_key} // $self->_config_val($key)
+    my $key = 'submit-work.github.token';
+    return $self->_token_from_env // $self->_config_val($key)
         // $hub_config->{oauth_token}
-        // $self->_require_env_or_git_config( $env_key, $key );
+        // $self->_require_env_or_git_config( $self->_get_env_key(0), $key );
+}
+
+# Use order of precedence for env vars as defined at
+# https://cli.github.com/manual/gh_help_environment:w
+#
+# Add GITHUB_TOKEN to enterprise list for backwards compatibility.
+sub _build_env_keys ($self) {
+    return $self->_is_ghe
+        ? [
+        qw(
+            GH_ENTERPRISE_TOKEN
+            GITHUB_ENTERPRISE_TOKEN
+            GITHUB_TOKEN
+        )
+        ]
+        : [
+        qw(
+            GH_TOKEN
+            GITHUB_TOKEN
+        )
+        ];
+}
+
+sub _token_from_env ($self) {
+    my $key = first { $ENV{$_} } $self->_all_env_keys;
+    return $key ? $ENV{$key} : undef;
 }
 
 sub _build_pivotaltracker_token ($self) {
@@ -452,19 +519,19 @@ sub _format_github_error ($res) {
     return $res->raw_content;
 }
 
-sub _github_info ($self) {
+sub _build_git_remote ($self) {
     my $git_url = $self->_git_config->{'remote.origin.url'} // q{};
 
     if ( my ( $host, $user, $repo )
         = $git_url =~ m{^git@([^:]+):([^/]+)/([^/]+?)(?:\.git)?$} ) {
-        return ( $host, $user, $repo );
+        return { host => $host, user => $user, repo => $repo };
     }
 
     my $uri = URI->new($git_url);
     if ( $uri->can('host') && $uri->can('path') ) {
         if ( my ( $user, $repo )
             = $uri->path =~ m{/([^/]+)/([^/]+?)(?:\.git)?$} ) {
-            return ( $uri->host, $user, $repo );
+            return { host => $uri->host, user => $user, repo => $repo };
         }
     }
 
@@ -531,5 +598,4 @@ sub _require_env_or_git_config ( $self, $env, $key ) {
 }
 
 __PACKAGE__->meta->make_immutable;
-
 1;

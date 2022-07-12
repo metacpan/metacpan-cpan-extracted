@@ -40,6 +40,14 @@ my $voices = [
     B => 'Bass',
 ];
 
+my $decades = [
+    { tilte => '   ', key => '0' }, # The entry with key `0` appears first
+    { title => 'Sixites', key => '60s' },
+    { title => 'Eighties', key => '80s' },
+    { title => 'Nineties', key => '90s' },
+    { title => 'Post Vinyl', key => '20+' },
+];
+
 my %VOICE;
 my @VOICES;
 
@@ -88,8 +96,33 @@ has formCfg => sub {
             }
         } @VOICES),
         {
-            key => 'song_composer',
-            label => trm('Composer'),
+            key              => 'song_decade',
+            label            => trm('Song Decade'),
+            widget           => 'selectBox',
+            triggerFormReset => true,
+            set              => {
+                required => false
+            },
+            cfg              => {
+                structure => $decades
+            }
+        },
+       {
+            key               => 'song_decade_addional',
+            label             => trm('Addional Decade info'),
+            widget            => 'text',
+            reloadOnFormReset => true,
+            set               => $self->args->{currentFormData}{song_decade} ?  {
+                readOnly    => false,
+                placeholder => 'Type something extra',
+            } : {
+                readOnly    => true,
+                placeholder => 'This field becomes available as soon you select a decade',
+            },
+        },
+        {
+            key    => 'song_composer',
+            label  => trm('Composer'),
             widget => 'text',
         },
         {
@@ -126,7 +159,7 @@ has actionCfg => sub {
 
         $args->{song_voices} = join "", map { $args->{'song_voice_'.$_} ? ($_) : () } @VOICES;
 
-        my @fields = qw(title voices composer page note);
+        my @fields = qw(title voices decade decade_addional composer page note);
 
         my $db = $self->user->db;
 
@@ -168,6 +201,13 @@ has grammar => sub {
 sub getAllFieldValues {
     my $self = shift;
     my $args = shift;
+    my $formData = shift;
+
+    # we can also update field values based on the current form data
+    if ($formData->{currentFormData}{song_decade} eq '20+' && !$formData->{currentFormData}{song_decade_addional}) {
+        return {song_decade_addional => 'We most certainly need more info here!'};
+    }
+    
     return {} if $self->config->{type} ne 'edit';
     my $id = $args->{selection}{song_id};
     return {} unless $id;

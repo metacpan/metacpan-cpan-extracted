@@ -1,0 +1,15 @@
+use alienfile;
+
+probe sub { 'share' };
+
+share {
+    start_url 'tarsize/';
+    plugin 'Fetch::LocalDir';
+    plugin 'Extract::Directory';
+    plugin 'Build::Make' => 'gmake';
+    build [
+        ['%{make}', 'CC=%{perl.config.cc}', 'OPTIMIZE=%{perl.config.optimize}', 'tarsize.so'],
+        ['cp', 'tarsize.so', '%{.install.prefix}/libtarsize.so']
+    ];
+    plugin 'Gather::IsolateDynamic';
+}

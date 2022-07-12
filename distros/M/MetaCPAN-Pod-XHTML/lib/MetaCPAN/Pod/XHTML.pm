@@ -1,17 +1,25 @@
 package MetaCPAN::Pod::XHTML;
 use Moo;
-use namespace::clean;
 
-our $VERSION = '0.002001';
+our $VERSION = '0.003001';
 $VERSION =~ tr/_//d;
+
+use namespace::clean;
 
 extends 'Pod::Simple::XHTML';
 with qw(
   Pod::Simple::Role::XHTML::WithLinkMappings
+  Pod::Simple::Role::XHTML::WithExtraTargets
   Pod::Simple::Role::XHTML::WithAccurateTargets
   Pod::Simple::Role::XHTML::WithErrata
+  Pod::Simple::Role::XHTML::WithHighlightConfig
   Pod::Simple::Role::StripVerbatimIndent
 );
+
+sub BUILD {
+  my $self = shift;
+  $self->anchor_items(1);
+}
 
 1;
 __END__
@@ -46,6 +54,10 @@ L<Pod::Simple::Role::XHTML::WithLinkMappings>
 
 =item *
 
+L<Pod::Simple::Role::XHTML::WithExtraTargets>
+
+=item *
+
 L<Pod::Simple::Role::XHTML::WithAccurateTargets>
 
 =item *
@@ -54,7 +66,21 @@ L<Pod::Simple::Role::XHTML::WithErrata>
 
 =item *
 
+L<Pod::Simple::Role::XHTML::WithHighlightConfig>
+
+=item *
+
 L<Pod::Simple::Role::StripVerbatimIndent>
+
+=back
+
+=head1 DEFAULTS
+
+=over 4
+
+=item anchor_items
+
+By default, anchor_items is set to true.
 
 =back
 

@@ -2,11 +2,10 @@ package App::GHPT::Wrapper::OurMooseX::Role::Parameterized;
 
 use App::GHPT::Wrapper::Ourperl;
 
-our $VERSION = '2.000000';
+our $VERSION = '2.000001';
 
 use Import::Into;
 use Moose::Exporter;
-use Moose::Util                    qw( find_meta );
 use MooseX::Role::Parameterized    ();
 use MooseX::SemiAffordanceAccessor ();
 use

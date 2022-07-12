@@ -6,7 +6,6 @@ use File::pushd qw( pushd );
 use File::Temp  qw( tempdir );
 use File::Which qw( which );
 use IPC::Run3   qw( run3 );
-use Try::Tiny;
 
 has _tempdir => (
     is      => 'ro',

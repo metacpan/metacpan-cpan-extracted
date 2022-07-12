@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.151';
+our $VERSION = '0.152';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -18,7 +18,7 @@ use Term::Choose::Constants       qw( WIDTH_CURSOR );
 use Term::Choose::LineFold        qw( line_fold cut_to_printwidth print_columns );
 use Term::Choose::Screen          qw( hide_cursor show_cursor );
 use Term::Choose::ValidateOptions qw( validate_options );
-use Term::Choose::Util            qw( get_term_width insert_sep unicode_sprintf );
+use Term::Choose::Util            qw( get_term_width insert_sep );
 use Term::TablePrint::ProgressBar qw();
 
 
@@ -183,56 +183,33 @@ sub print_table {
         }
         $data_row_count = $self->{max_rows};
     }
-    my $progress = Term::TablePrint::ProgressBar->new( {
-        data_row_count => $data_row_count,
-        col_count => scalar @{$tbl_orig->[0]},
-        threshold => $self->{progress_bar},
-        count_progress_bars => 3,
-    } );
-
-    my $tbl_copy = $self->__copy_table( $tbl_orig, $progress );
-    my $ds = quotemeta( $self->{decimal_separator} );
-    my $regex_digits = "^([-+]?[0-9]*)(${ds}[0-9]+)?\\z";
-    my ( $w_head, $w_cols, $w_int, $w_fract ) = $self->__calc_col_width( $tbl_copy, $progress, $regex_digits );
-    my $cc = {  # These values don't change.
+    my $const = {
         extra_w        => $^O eq 'MSWin32' || $^O eq 'cygwin' ? 0 : WIDTH_CURSOR,
-        regex_digits   => $regex_digits,
         data_row_count => $data_row_count,
         info_row       => $info_row,
-        w_head         => $w_head,
-        w_cols         => $w_cols,
-        w_int          => $w_int,
-        w_fract        => $w_fract,
+        regex_number   => "^([^.EeIiNn]*)(\Q$self->{decimal_separator}\E[0-9]+)?\\z",
     };
-    my $vw = { # These values change when the screen width changes. The values have to survive the write_table loops.
-        term_w      => 0,
-        tbl_print => [],
-        header      => [],
-        table_w     => 0,
-        w_cols_calc => [],
-    };
-    my $vs = {  # These values change when Ctrl-F is pressed
+    my $search = {
         filter => '',
         map_indexes => [],
     };
-    my $mr = { # Map `__write_table` return values
+    my $mr = {
         last                         => 0,
         window_width_changed         => 1,
         enter_search_string          => 2,
         returned_from_filtered_table => 3,
     };
-    my $next;
+
+    my ( $term_w, $tbl_print, $tbl_w, $header_rows, $w_col_names ) = $self->__get_data( $tbl_orig, $const );
+    if ( ! defined $term_w ) {
+        $self->__reset();
+        return;
+    }
 
     WRITE_TABLE: while ( 1 ) {
-        if ( defined $next ) {
-            $progress = Term::TablePrint::ProgressBar->new( {
-                data_row_count => $data_row_count,
-                col_count => scalar @{$tbl_orig->[0]},
-                threshold => $self->{progress_bar},
-                count_progress_bars => 2,
-            } );
-        }
-        $next = $self->__write_table( $tbl_orig, $tbl_copy, $cc, $vs, $vw, $mr, $progress );
+        my $next = $self->__write_table(
+            $term_w, $tbl_orig, $tbl_print, $tbl_w, $header_rows, $w_col_names, $const, $search, $mr
+        );
         if ( ! defined $next ) {
             die;
         }
@@ -240,14 +217,18 @@ sub print_table {
             last WRITE_TABLE;
         }
         elsif ( $next == $mr->{window_width_changed} ) {
+            ( $term_w, $tbl_print, $tbl_w, $header_rows, $w_col_names ) = $self->__get_data( $tbl_orig, $const );
+            if ( ! defined $term_w ) {
+                last WRITE_TABLE;
+            }
             next WRITE_TABLE;
         }
         elsif ( $next == $mr->{enter_search_string} ) {
-            $self->__search( $tbl_orig, $cc, $vs );
+            $self->__search( $tbl_orig, $const, $search );
             next WRITE_TABLE;
         }
         elsif ( $next == $mr->{returned_from_filtered_table} ) {
-            $self->__reset_search( $vs );
+            $self->__reset_search( $search );
             next WRITE_TABLE;
         }
     }
@@ -256,72 +237,84 @@ sub print_table {
 }
 
 
-sub __write_table {
-    my ( $self, $tbl_orig, $tbl_copy, $cc, $vs, $vw, $mr, $progress ) = @_;
-    if ( ! $vw->{term_w} || $vw->{term_w} != get_term_width() + $cc->{extra_w} ) {
-        if ( $vw->{term_w} ) {
-            # If term_w is set, __write_table has been called more than once and $tbl_copy has been overwritten.
-            $tbl_copy = $self->__copy_table( $tbl_orig, $progress );
+sub __get_data {
+    my ( $self, $tbl_orig, $const ) = @_;
+    my $term_w = get_term_width();
+    if ( ! defined $term_w ) { #
+        die "Term width not defined!";
+    }
+    $term_w += $const->{extra_w};
+    my $progress = Term::TablePrint::ProgressBar->new( {
+        data_row_count => $const->{data_row_count},
+        col_count => scalar @{$tbl_orig->[0]},
+        threshold => $self->{progress_bar},
+        count_progress_bars => 3,
+    } );
+    my $tbl_copy = $self->__copy_table( $tbl_orig, $progress );
+    my ( $w_col_names, $w_cols, $w_int, $w_fract ) = $self->__calc_col_width( $tbl_copy, $const, $progress );
+    my $w_cols_calc = $self->__calc_avail_col_width( $term_w, $tbl_copy, $w_col_names, $w_cols, $w_int, $w_fract );
+    if ( ! defined $w_cols_calc ) {
+        return;
+    }
+    my $tbl_w = sum( @{$w_cols_calc}, $self->{tab_w} * $#{$w_cols_calc} );
+    my $tbl_print = $self->__cols_to_string( $tbl_orig, $tbl_copy, $w_cols_calc, $w_fract, $const, $progress );
+    my @tmp_header_rows;
+    if ( length $self->{prompt} ) {
+        push @tmp_header_rows, $self->{prompt};
+    }
+    if ( length $self->{info} || length $self->{prompt} ) {
+        push @tmp_header_rows, $self->__header_sep( $w_cols_calc );
+    }
+    my $col_names = shift @{$tbl_print};
+    push @tmp_header_rows, $col_names, $self->__header_sep( $w_cols_calc );
+    my $header_rows = join "\n", @tmp_header_rows;
+    if ( $const->{info_row} ) {
+        if ( print_columns( $const->{info_row} ) > $tbl_w ) {
+            push @{$tbl_print}, cut_to_printwidth( $const->{info_row}, $tbl_w - 3 ) . '...';
         }
-        $vw->{term_w} = get_term_width() + $cc->{extra_w};
-        $vw->{w_cols_calc} = $self->__calc_avail_col_width( $tbl_copy, $cc, $vw );
-        if ( ! defined $vw->{w_cols_calc} ) {
-            return $mr->{last};
-        }
-        $vw->{table_w} = sum( @{$vw->{w_cols_calc}}, $self->{tab_w} * $#{$vw->{w_cols_calc}} );
-        $vw->{tbl_print} = $self->__cols_to_string( $tbl_orig, $tbl_copy, $cc, $vw, $progress );
-        $vw->{header} = [];
-        if ( length $self->{prompt} ) {
-            push @{$vw->{header}}, $self->{prompt};
-        }
-        if ( length $self->{info} || length $self->{prompt} ) {
-            push @{$vw->{header}}, $self->__header_sep( $vw );
-        }
-        my $col_names = shift @{$vw->{tbl_print}};
-        push @{$vw->{header}}, $col_names, $self->__header_sep( $vw );
-        if ( $cc->{info_row} ) {
-            if ( print_columns( $cc->{info_row} ) > $vw->{table_w} ) {
-                push @{$vw->{tbl_print}}, cut_to_printwidth( $cc->{info_row}, $vw->{table_w} - 3 ) . '...';
-            }
-            else {
-                push @{$vw->{tbl_print}}, $cc->{info_row};
-            }
+        else {
+            push @{$tbl_print}, $const->{info_row};
         }
     }
+    return $term_w, $tbl_print, $tbl_w, $header_rows, $w_col_names;
+}
+
+
+sub __write_table {
+    my ( $self, $term_w, $tbl_orig, $tbl_print, $tbl_w, $header_rows, $w_col_names, $const, $search, $mr ) = @_;
     my @idxs_tbl_print;
     my $return = $mr->{last};
-    if ( $vs->{filter} ) {
-        @idxs_tbl_print = map { $_ - 1 } @{$vs->{map_indexes}}; # because of the removed header row from tbl_print
+    if ( $search->{filter} ) {
+        @idxs_tbl_print = map { $_ - 1 } @{$search->{map_indexes}}; # because of the removed tbl_print header row
         $return = $mr->{returned_from_filtered_table};
     }
-    my $prompt = join( "\n", @{$vw->{header}} );
     my $footer;
     if ( $self->{footer} ) {
         $footer = $self->{footer};
-        if ( $vs->{filter} ) {
-            $footer .= $vs->{filter};
+        if ( $search->{filter} ) {
+            $footer .= $search->{filter};
         }
     }
-    my $old_row = exists $ENV{TC_POS_AT_SEARCH} && ! $vs->{filter} ? delete( $ENV{TC_POS_AT_SEARCH} ) : 0;
+    my $old_row = exists $ENV{TC_POS_AT_SEARCH} && ! $search->{filter} ? delete( $ENV{TC_POS_AT_SEARCH} ) : 0;
     my $auto_jumped_to_first_row = 2;
     my $row_is_expanded = 0;
 
     while ( 1 ) {
-        if ( $vw->{term_w} != get_term_width() + $cc->{extra_w} ) {
+        if ( $term_w != get_term_width() + $const->{extra_w} ) {
             return $mr->{window_width_changed};
         }
-        if ( ! @{$vw->{tbl_print}} ) {
-            push @{$vw->{tbl_print}}, ''; # so that going back requires always the same amount of keystrokes
+        if ( ! @{$tbl_print} ) {
+            push @{$tbl_print}, ''; # so that going back requires always the same amount of keystrokes
         }
         $ENV{TC_RESET_AUTO_UP} = 0;
         # Choose
         my $row = choose(
-            @idxs_tbl_print ? [ @{$vw->{tbl_print}}[@idxs_tbl_print] ]
-                            :     $vw->{tbl_print},
-            { info => $self->{info}, prompt => $prompt, index => 1, default => $old_row, ll => $vw->{table_w},
-              layout => 2, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0, footer => $footer,
-              color => $self->{color}, codepage_mapping => $self->{codepage_mapping}, search => $self->{search},
-              keep => $self->{keep}, page => $self->{page} }
+            @idxs_tbl_print ? [ @{$tbl_print}[@idxs_tbl_print] ]
+                            :     $tbl_print,
+            { info => $self->{info}, prompt => $header_rows, index => 1, default => $old_row, ll => $tbl_w, layout => 2,
+              clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0, footer => $footer, color => $self->{color},
+              codepage_mapping => $self->{codepage_mapping}, search => $self->{search}, keep => $self->{keep},
+              page => $self->{page} }
         );
         if ( ! defined $row ) {
             return $return;
@@ -331,8 +324,8 @@ sub __write_table {
                 return $mr->{window_width_changed};
             }
             elsif ( $row == -13 ) { # with option `ll` set `choose` returns -13 if `Ctrl-F` was pressed
-                if ( $vs->{filter} ) {
-                    $self->__reset_search( $vs );
+                if ( $search->{filter} ) {
+                    $self->__reset_search( $search );
                 }
                 return $mr->{enter_search_string};
             }
@@ -371,22 +364,22 @@ sub __write_table {
             }
             $old_row = $row;
             $row_is_expanded = 1;
-            if ( $cc->{info_row} && $row == $#{$vw->{tbl_print}} ) {
+            if ( $const->{info_row} && $row == $#{$tbl_print} ) {
                 # Choose
                 choose(
                     [ 'Close' ],
-                    { prompt => $cc->{info_row}, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0 }
+                    { prompt => $const->{info_row}, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0 }
                 );
                 next;
             }
             my $orig_row;
-            if ( @{$vs->{map_indexes}} ) {
-                $orig_row = $vs->{map_indexes}[$row];
+            if ( @{$search->{map_indexes}} ) {
+                $orig_row = $search->{map_indexes}[$row];
             }
             else {
                 $orig_row = $row + 1; # because $tbl_print has no header row while $tbl_orig has a header row
             }
-            $self->__print_single_row( $tbl_orig, $cc, $orig_row, $footer );
+            $self->__print_single_row( $tbl_orig, $orig_row, $w_col_names, $footer );
         }
         delete $ENV{TC_RESET_AUTO_UP};
     }
@@ -439,18 +432,18 @@ sub __copy_table {
 
 
 sub __calc_col_width {
-    my ( $self, $tbl_copy, $progress, $regex_digits ) = @_;
+    my ( $self, $tbl_copy, $const, $progress ) = @_;
     my $count = $progress->set_progress_bar();            #
     my @col_idx = ( 0 .. $#{$tbl_copy->[0]} );
     my $col_count = @col_idx;
-    my $w_head = [];
+    my $w_col_names = [];
     my $w_cols = [ ( 1 ) x $col_count ];
     my $w_int   = [ ( 0 ) x $col_count ];
     my $w_fract = [ ( 0 ) x $col_count ];
-    my $ds = quotemeta( $self->{decimal_separator} );
+    my $regex_number = $const->{regex_number};
     my $col_names = shift @$tbl_copy;
     for my $col ( @col_idx ) {
-        $w_head->[$col] = print_columns( $col_names->[$col] );
+        $w_col_names->[$col] = print_columns( $col_names->[$col] );
     }
 
     for my $row ( 0 .. $#$tbl_copy ) {
@@ -458,12 +451,20 @@ sub __calc_col_width {
             if ( ! length $tbl_copy->[$row][$col] ) {
                 # nothing to do
             }
-            elsif ( $tbl_copy->[$row][$col] =~ /$regex_digits/ ) {
-                if ( defined $1 && length $1 > $w_int->[$col] ) {
-                    $w_int->[$col] = length $1;
+            elsif ( looks_like_number $tbl_copy->[$row][$col] ) {
+                if ( $tbl_copy->[$row][$col] =~ /$regex_number/ ) {
+                    if ( ( length $1 // 0 ) > $w_int->[$col] ) {
+                        $w_int->[$col] = length $1;
+                    }
+                    if ( ( length $2 // 0 ) > $w_fract->[$col] ) {
+                        $w_fract->[$col] = length $2;
+                    }
                 }
-                if ( defined $2 && length $2 > $w_fract->[$col] ) {
-                    $w_fract->[$col] = length $2;
+                else {
+                    # scientific notation, NaN, Inf, Infinity
+                    if ( length $tbl_copy->[$row][$col] > $w_cols->[$col] ) {
+                        $w_cols->[$col] = length $tbl_copy->[$row][$col];
+                    }
                 }
             }
             else {
@@ -489,22 +490,21 @@ sub __calc_col_width {
     if ( $progress->{count_progress_bars} ) {             #
         $progress->last_update_progress_bar( $count );    #
     }                                                     #
-    return $w_head, $w_cols, $w_int, $w_fract;
+    return $w_col_names, $w_cols, $w_int, $w_fract;
 }
 
 
 sub __calc_avail_col_width {
-    my ( $self, $tbl_copy, $cc, $vw ) = @_;
-    my $w_head = [ @{$cc->{w_head}} ];
-    my $w_cols_calc = [ @{$cc->{w_cols}} ];
-    my $avail_w = $vw->{term_w} - $self->{tab_w} * $#$w_cols_calc;
+    my ( $self, $term_w, $tbl_copy, $w_col_names, $w_cols, $w_int, $w_fract ) = @_;
+    my $w_cols_calc = [ @{$w_cols} ];
+    my $avail_w = $term_w - $self->{tab_w} * $#$w_cols_calc;
     my $sum = sum( @$w_cols_calc );
     if ( $sum < $avail_w ) {
 
         HEAD: while ( 1 ) {
             my $prev_sum = $sum;
-            for my $col ( 0 .. $#$w_head ) {
-                if ( $w_head->[$col] > $w_cols_calc->[$col] ) {
+            for my $col ( 0 .. $#$w_col_names ) {
+                if ( $w_col_names->[$col] > $w_cols_calc->[$col] ) {
                     ++$w_cols_calc->[$col];
                     ++$sum;
                     if ( $sum == $avail_w ) {
@@ -523,12 +523,12 @@ sub __calc_avail_col_width {
             TRUNC_FRACT: while ( $sum > $avail_w ) {
                 my $prev_sum = $sum;
                 for my $col ( 0 .. $#$w_cols_calc ) {
-                    if (   $cc->{w_fract}[$col] && $cc->{w_fract}[$col] > 3
+                    if (   $w_fract->[$col] && $w_fract->[$col] > 3
                         # 3 == 1 decimal separator + 2 decimal places
-                        && $cc->{w_int}[$col] + $cc->{w_fract}[$col] == $w_cols_calc->[$col]
-                        # the column width could be larger than w_int + w_fract, if the column contains non-digit strings
+                       # && $w_int->[$col] + $w_fract->[$col] == $w_cols_calc->[$col]
+                       # # the column width could be larger than w_int + w_fract, if the column contains non-digit strings
                     ) {
-                        --$cc->{w_fract}[$col];
+                        --$w_fract->[$col];
                         --$w_cols_calc->[$col];
                         --$sum;
                         if ( $sum == $avail_w ) {
@@ -550,11 +550,22 @@ sub __calc_avail_col_width {
                 if ( $w_cols_calc->[$col] > $min_col_width ) {
                     my $reduced_col_w = _minus_x_percent( $w_cols_calc->[$col], $percent );
                     if ( $reduced_col_w < $min_col_width ) {
-                        $w_cols_calc->[$col] = $min_col_width;
+                        $reduced_col_w = $min_col_width;
                     }
-                    else {
-                        $w_cols_calc->[$col] = $reduced_col_w;
+                    if ( $w_fract->[$col] > 2 ) {
+                        $w_fract->[$col] -= $w_cols_calc->[$col] - $reduced_col_w;
+                        if ( $w_fract->[$col] < 2 ) {
+                            $w_fract->[$col] = 2;
+                        }
                     }
+                    #if ( $w_fract->[$col] > 0 ) {
+                    #     $w_fract->[$col] -= $w_cols_calc->[$col] - $reduced_col_w;
+                    #     if ( $w_fract->[$col] < 1 ) {
+                    #         $w_fract->[$col] = "0 but true";
+                    #         # keep it true eaven if it is 0 for __cols_to_string to work properly.
+                    #     }
+                    #}
+                    $w_cols_calc->[$col] = $reduced_col_w;
                 }
             }
             my $prev_sum = $sum;
@@ -573,7 +584,7 @@ sub __calc_avail_col_width {
             REMAINDER_W: while ( 1 ) {
                 my $prev_remainder_w = $remainder_w;
                 for my $col ( 0 .. $#$w_cols_calc ) {
-                    if ( $w_cols_calc->[$col] < $cc->{w_cols}[$col] ) {
+                    if ( $w_cols_calc->[$col] < $w_cols->[$col] ) {
                         ++$w_cols_calc->[$col];
                         --$remainder_w;
                         if ( $remainder_w == 0 ) {
@@ -588,18 +599,17 @@ sub __calc_avail_col_width {
         }
     }
     #else {
-    #    #$sum == $avail_w
+    #    #$sum == $avail_w, nothing to do
     #}
     return $w_cols_calc;
 }
 
-
 sub __cols_to_string {
-    my ( $self, $tbl_orig, $tbl_copy, $cc, $vw, $progress ) = @_;
+    my ( $self, $tbl_orig, $tbl_copy, $w_cols_calc, $w_fract, $const, $progress ) = @_;
     my $count = $progress->set_progress_bar();            #
     my $tab = ( ' ' x int( $self->{tab_w} / 2 ) ) . '|' . ( ' ' x int( $self->{tab_w} / 2 ) );
-    my $w_cols_calc = $vw->{w_cols_calc};
-    my $regex_digits = $cc->{regex_digits};
+    my $regex_number = $const->{regex_number};
+    my $one_precision_w = length sprintf "%.1e", 123;
 
     ROW: for my $row ( 0 .. $#{$tbl_copy} ) {
         my $str = '';
@@ -607,33 +617,76 @@ sub __cols_to_string {
             if ( ! length $tbl_copy->[$row][$col] ) {
                 $str = $str . ' ' x $w_cols_calc->[$col];
             }
-            elsif ( $tbl_copy->[$row][$col] =~ /$regex_digits/ ) {
-                my $all = '';
-                if ( $cc->{w_fract}[$col] ) {
-                    if ( defined $2 ) {
-                        if ( length $2 > $cc->{w_fract}[$col] ) {
-                            $all = substr( $2, 0, $cc->{w_fract}[$col] );
+            elsif ( looks_like_number $tbl_copy->[$row][$col] ) {
+                my $number = '';
+                if ( $w_fract->[$col] ) {
+                    my $fract = '';
+                    if ( $tbl_copy->[$row][$col] =~ /$regex_number/ ) {
+                        if ( length $2 ) {
+                            if ( length $2 > $w_fract->[$col] ) {
+                                $fract = substr( $2, 0, $w_fract->[$col] );
+                            }
+                            elsif ( length $2 < $w_fract->[$col] ) {
+                                $fract = $2 . ' ' x ( $w_fract->[$col] - length $2 );
+                            }
+                            else {
+                                $fract = $2;
+                            }
                         }
                         else {
-                            $all = $2 . ' ' x ( $cc->{w_fract}[$col] - length $2 );
+                            $fract = ' ' x $w_fract->[$col];
                         }
+                        $number = ( length $1 ? $1 : '' ) . $fract;
                     }
                     else {
-                        $all = ' ' x $cc->{w_fract}[$col];
+                        # scientific notation, NaN, Inf, Infinity
+                        $number = $tbl_copy->[$row][$col] + 0;
+                        # $1 + 0: infinity -> Inf (else messed output)
                     }
                 }
-                if ( defined $1 ) {
-                    $all = $1 . $all;
+                else {
+                    $number = $tbl_copy->[$row][$col];
                 }
-                if ( length $all > $w_cols_calc->[$col] ) {
-                    $str = $str . substr( $all, 0, $w_cols_calc->[$col] );
+                if ( length $number > $w_cols_calc->[$col] ) {
+                    my $signed_1_precision_w = $one_precision_w + ( $number =~ /^-/ ? 1 : 0 );
+                    my $precision;
+                    if ( $w_cols_calc->[$col] < $signed_1_precision_w ) {
+                        # special treatment because zero precision has no dot
+                        $precision = 0;
+                    }
+                    else {
+                        $precision = $w_cols_calc->[$col] - ( $signed_1_precision_w - 1 );
+                    }
+                    $number = sprintf "%.*e", $precision, $number;
+                    if ( length( $number ) > $w_cols_calc->[$col] ) {
+                        $str = $str . ( '-' x $w_cols_calc->[$col] );
+                    }
+                    elsif ( length $number < $w_cols_calc->[$col] ) {
+                        # if $w_cols_calc->[$col] == zero_precision_w + 1
+                        $str = $str . ' ' . $number;
+                    }
+                    else {
+                        $str = $str . $number;
+                    }
+                }
+                elsif ( length $number < $w_cols_calc->[$col] ) {
+                    $str = $str . ' ' x ( $w_cols_calc->[$col] - length $number ) . $number;
                 }
                 else {
-                    $str = $str . ' ' x ( $w_cols_calc->[$col] - length $all ) . $all;
+                    $str = $str . $number;
                 }
             }
             else {
-                $str = $str . unicode_sprintf( $tbl_copy->[$row][$col], $w_cols_calc->[$col] );
+                my $width = print_columns( $tbl_copy->[$row][$col] );
+                if ( $width > $w_cols_calc->[$col] ) {
+                    $str = $str . cut_to_printwidth( $tbl_copy->[$row][$col], $w_cols_calc->[$col] );
+                }
+                elsif ( $width < $w_cols_calc->[$col] ) {
+                    $str =  $str . $tbl_copy->[$row][$col] . ' ' x ( $w_cols_calc->[$col] - $width );
+                }
+                else {
+                    $str = $str . $tbl_copy->[$row][$col];
+                }
             }
             if ( $self->{color} ) {
                 if ( defined $tbl_orig->[$row][$col] ) {
@@ -667,9 +720,9 @@ sub __cols_to_string {
 
 
 sub __print_single_row {
-    my ( $self, $tbl_orig, $cc, $row, $footer ) = @_;
+    my ( $self, $tbl_orig, $row, $w_col_names, $footer ) = @_;
     my $term_w = get_term_width();
-    my $len_key = max( @{$cc->{w_head}} ) + 1;
+    my $len_key = max( @{$w_col_names} ) + 1;
     if ( $len_key > int( $term_w / 100 * 33 ) ) {
         $len_key = int( $term_w / 100 * 33 );
     }
@@ -720,7 +773,7 @@ sub __print_single_row {
 
 
 sub __search {
-    my ( $self, $tbl_orig, $cc, $vs ) = @_;
+    my ( $self, $tbl_orig, $const, $search ) = @_;
     if ( ! $self->{search} ) {
         return;
     }
@@ -742,8 +795,8 @@ sub __search {
         }
         print "\r${prompt}${string}";
         if ( ! eval {
-            $vs->{filter} = $self->{search} == 1 ? qr/$string/i : qr/$string/;
-            'Teststring' =~ $vs->{filter};
+            $search->{filter} = $self->{search} == 1 ? qr/$string/i : qr/$string/;
+            'Teststring' =~ $search->{filter};
             1
         } ) {
             $default = $default eq $string ? '' : $string;
@@ -756,22 +809,22 @@ sub __search {
     my @col_idx = ( 0 .. $#{$tbl_orig->[0]} );
     # begin: "1" to skipp the header row
     # end: "data_row_count" as it its because +1 for the header row and -1 to get the 0-based index
-    for my $idx_row ( 1 .. $cc->{data_row_count} ) {
+    for my $idx_row ( 1 .. $const->{data_row_count} ) {
         for ( @col_idx ) {
-            if ( $tbl_orig->[$idx_row][$_] =~ /$vs->{filter}/ ) {
-                push @{$vs->{map_indexes}}, $idx_row;
+            if ( $tbl_orig->[$idx_row][$_] =~ /$search->{filter}/ ) {
+                push @{$search->{map_indexes}}, $idx_row;
                 last;
             }
         }
     }
-    if ( ! @{$vs->{map_indexes}} ) {
-        my $message = '/' . $vs->{filter} . '/: No matches found.';
+    if ( ! @{$search->{map_indexes}} ) {
+        my $message = '/' . $search->{filter} . '/: No matches found.';
         # Choose
         choose(
             [ 'Continue with ENTER' ],
             { prompt => $message, layout => 0, clear_screen => 1 }
         );
-        $vs->{filter} = '';
+        $search->{filter} = '';
         return;
     }
     return;
@@ -779,17 +832,16 @@ sub __search {
 
 
 sub __reset_search {
-    my ( $self, $vs ) = @_;
-    $vs->{map_indexes} = [];
-    $vs->{filter} = '';
+    my ( $self, $search ) = @_;
+    $search->{map_indexes} = [];
+    $search->{filter} = '';
 }
 
 
 sub __header_sep {
-    my ( $self, $vw ) = @_;
+    my ( $self, $w_cols_calc ) = @_;
     my $tab = ( '-' x int( $self->{tab_w} / 2 ) ) . '|' . ( '-' x int( $self->{tab_w} / 2 ) );
     my $header_sep = '';
-    my $w_cols_calc= $vw->{w_cols_calc};
     for my $col ( 0 .. $#$w_cols_calc ) {
         $header_sep .= '-' x $w_cols_calc->[$col];
         if ( $col != $#$w_cols_calc ) {
@@ -853,7 +905,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.151
+Version 0.152
 
 =cut
 

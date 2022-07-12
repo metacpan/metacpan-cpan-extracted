@@ -1,7 +1,7 @@
 package TestFor::App::GHPT::WorkSubmitter::ChangedFiles;
 
 use App::GHPT::Wrapper::OurTest::Class::Moose;
-use App::GHPT::WorkSubmitter::ChangedFilesFactory;
+use App::GHPT::WorkSubmitter::ChangedFilesFactory ();
 
 ########################################################################
 

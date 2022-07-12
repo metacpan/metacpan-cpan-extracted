@@ -12,367 +12,390 @@ use SPVM 'Errno';
 
 use Errno();
 
-ok(SPVM::TestCase::Errno->test);
+sub errno_ok {
+  my ($errno_func_name) = @_;
+  
+  my (undef, $file, $line) = caller;
+  
+  my $errno_perl_func = "Errno::$errno_func_name";
+  
+  my $success;
+  if (exists $!{$errno_func_name}) {
+    no strict 'refs';
+    $success = is(SPVM::Errno->$errno_func_name, &$errno_perl_func);
+  }
+  else {
+    eval { SPVM::Errno->$errno_func_name };
+    my $error = $@;
+    $success = like($error, qr/not defined/);
+  }
+  
+  unless ($success) {
+    warn "$errno_func_name test failed at $file $line\n";
+  }
+}
+
+ok(SPVM::TestCase::Errno->errno);
 
 {
-  my $errno_value = Errno->E2BIG;
+  errno_ok('E2BIG');
 }
 {
-  is(SPVM::Errno->EACCES, Errno::EACCES);
+  errno_ok('EACCES');
 }
 {
-  is(SPVM::Errno->EADDRINUSE, Errno::EADDRINUSE);
+  errno_ok('EADDRINUSE');
 }
 {
-  is(SPVM::Errno->EADDRNOTAVAIL, Errno::EADDRNOTAVAIL);
+  errno_ok('EADDRNOTAVAIL');
 }
 {
-  is(SPVM::Errno->EAFNOSUPPORT, Errno::EAFNOSUPPORT);
+  errno_ok('EAFNOSUPPORT');
 }
 {
-  is(SPVM::Errno->EAGAIN, Errno::EAGAIN);
+  errno_ok('EAGAIN');
 }
 {
-  is(SPVM::Errno->EALREADY, Errno::EALREADY);
+  errno_ok('EALREADY');
 }
 {
-  is(SPVM::Errno->EBADE, Errno::EBADE);
+  errno_ok('EBADE');
 }
 {
-  is(SPVM::Errno->EBADF, Errno::EBADF);
+  errno_ok('EBADF');
 }
 {
-  is(SPVM::Errno->EBADFD, Errno::EBADFD);
+  errno_ok('EBADFD');
 }
 {
-  is(SPVM::Errno->EBADMSG, Errno::EBADMSG);
+  errno_ok('EBADMSG');
 }
 {
-  is(SPVM::Errno->EBADR, Errno::EBADR);
+  errno_ok('EBADR');
 }
 {
-  is(SPVM::Errno->EBADRQC, Errno::EBADRQC);
+  errno_ok('EBADRQC');
 }
 {
-  is(SPVM::Errno->EBADSLT, Errno::EBADSLT);
+  errno_ok('EBADSLT');
 }
 {
-  is(SPVM::Errno->EBUSY, Errno::EBUSY);
+  errno_ok('EBUSY');
 }
 {
-  is(SPVM::Errno->ECANCELED, Errno::ECANCELED);
+  errno_ok('ECANCELED');
 }
 {
-  is(SPVM::Errno->ECHILD, Errno::ECHILD);
+  errno_ok('ECHILD');
 }
 {
-  is(SPVM::Errno->ECHRNG, Errno::ECHRNG);
+  errno_ok('ECHRNG');
 }
 {
-  is(SPVM::Errno->ECOMM, Errno::ECOMM);
+  errno_ok('ECOMM');
 }
 {
-  is(SPVM::Errno->ECONNABORTED, Errno::ECONNABORTED);
+  errno_ok('ECONNABORTED');
 }
 {
-  is(SPVM::Errno->ECONNREFUSED, Errno::ECONNREFUSED);
+  errno_ok('ECONNREFUSED');
 }
 {
-  is(SPVM::Errno->ECONNRESET, Errno::ECONNRESET);
+  errno_ok('ECONNRESET');
 }
 {
-  is(SPVM::Errno->EDEADLK, Errno::EDEADLK);
+  errno_ok('EDEADLK');
 }
 {
-  is(SPVM::Errno->EDEADLOCK, Errno::EDEADLOCK);
+  errno_ok('EDEADLOCK');
 }
 {
-  is(SPVM::Errno->EDESTADDRREQ, Errno::EDESTADDRREQ);
+  errno_ok('EDESTADDRREQ');
 }
 {
-  is(SPVM::Errno->EDOM, Errno::EDOM);
+  errno_ok('EDOM');
 }
 {
-  is(SPVM::Errno->EDQUOT, Errno::EDQUOT);
+  errno_ok('EDQUOT');
 }
 {
-  is(SPVM::Errno->EEXIST, Errno::EEXIST);
+  errno_ok('EEXIST');
 }
 {
-  is(SPVM::Errno->EFAULT, Errno::EFAULT);
+  errno_ok('EFAULT');
 }
 {
-  is(SPVM::Errno->EFBIG, Errno::EFBIG);
+  errno_ok('EFBIG');
 }
 {
-  is(SPVM::Errno->EHOSTDOWN, Errno::EHOSTDOWN);
+  errno_ok('EHOSTDOWN');
 }
 {
-  is(SPVM::Errno->EHOSTUNREACH, Errno::EHOSTUNREACH);
+  errno_ok('EHOSTUNREACH');
 }
 {
-  is(SPVM::Errno->EIDRM, Errno::EIDRM);
+  errno_ok('EIDRM');
 }
 {
-  is(SPVM::Errno->EILSEQ, Errno::EILSEQ);
+  errno_ok('EILSEQ');
 }
 {
-  is(SPVM::Errno->EINPROGRESS, Errno::EINPROGRESS);
+  errno_ok('EINPROGRESS');
 }
 {
-  is(SPVM::Errno->EINTR, Errno::EINTR);
+  errno_ok('EINTR');
 }
 {
-  is(SPVM::Errno->EINVAL, Errno::EINVAL);
+  errno_ok('EINVAL');
 }
 {
-  is(SPVM::Errno->EIO, Errno::EIO);
+  errno_ok('EIO');
 }
 {
-  is(SPVM::Errno->EISCONN, Errno::EISCONN);
+  errno_ok('EISCONN');
 }
 {
-  is(SPVM::Errno->EISDIR, Errno::EISDIR);
+  errno_ok('EISDIR');
 }
 {
-  is(SPVM::Errno->EISNAM, Errno::EISNAM);
+  errno_ok('EISNAM');
 }
 {
-  is(SPVM::Errno->EKEYEXPIRED, Errno::EKEYEXPIRED);
+  errno_ok('EKEYEXPIRED');
 }
 {
-  is(SPVM::Errno->EKEYREJECTED, Errno::EKEYREJECTED);
+  errno_ok('EKEYREJECTED');
 }
 {
-  is(SPVM::Errno->EKEYREVOKED, Errno::EKEYREVOKED);
+  errno_ok('EKEYREVOKED');
 }
 {
-  my $errno_value = Errno->EL2HLT;
+  errno_ok('EL2HLT');
 }
 {
-  my $errno_value = Errno->EL2NSYNC;
+  errno_ok('EL2NSYNC');
 }
 {
-  my $errno_value = Errno->EL3HLT;
+  errno_ok('EL3HLT');
 }
 {
-  my $errno_value = Errno->EL3RST;
+  errno_ok('EL3RST');
 }
 {
-  is(SPVM::Errno->ELIBACC, Errno::ELIBACC);
+  errno_ok('ELIBACC');
 }
 {
-  is(SPVM::Errno->ELIBBAD, Errno::ELIBBAD);
+  errno_ok('ELIBBAD');
 }
 {
-  is(SPVM::Errno->ELIBMAX, Errno::ELIBMAX);
+  errno_ok('ELIBMAX');
 }
 {
-  is(SPVM::Errno->ELIBSCN, Errno::ELIBSCN);
+  errno_ok('ELIBSCN');
 }
 {
-  is(SPVM::Errno->ELIBEXEC, Errno::ELIBEXEC);
+  errno_ok('ELIBEXEC');
 }
 {
-  is(SPVM::Errno->ELOOP, Errno::ELOOP);
+  errno_ok('ELOOP');
 }
 {
-  is(SPVM::Errno->EMEDIUMTYPE, Errno::EMEDIUMTYPE);
+  errno_ok('EMEDIUMTYPE');
 }
 {
-  is(SPVM::Errno->EMFILE, Errno::EMFILE);
+  errno_ok('EMFILE');
 }
 {
-  is(SPVM::Errno->EMLINK, Errno::EMLINK);
+  errno_ok('EMLINK');
 }
 {
-  is(SPVM::Errno->EMSGSIZE, Errno::EMSGSIZE);
+  errno_ok('EMSGSIZE');
 }
 {
-  is(SPVM::Errno->EMULTIHOP, Errno::EMULTIHOP);
+  errno_ok('EMULTIHOP');
 }
 {
-  is(SPVM::Errno->ENAMETOOLONG, Errno::ENAMETOOLONG);
+  errno_ok('ENAMETOOLONG');
 }
 {
-  is(SPVM::Errno->ENETDOWN, Errno::ENETDOWN);
+  errno_ok('ENETDOWN');
 }
 {
-  is(SPVM::Errno->ENETRESET, Errno::ENETRESET);
+  errno_ok('ENETRESET');
 }
 {
-  is(SPVM::Errno->ENETUNREACH, Errno::ENETUNREACH);
+  errno_ok('ENETUNREACH');
 }
 {
-  is(SPVM::Errno->ENFILE, Errno::ENFILE);
+  errno_ok('ENFILE');
 }
 {
-  is(SPVM::Errno->ENOBUFS, Errno::ENOBUFS);
+  errno_ok('ENOBUFS');
 }
 {
-  is(SPVM::Errno->ENODATA, Errno::ENODATA);
+  errno_ok('ENODATA');
 }
 {
-  is(SPVM::Errno->ENODEV, Errno::ENODEV);
+  errno_ok('ENODEV');
 }
 {
-  is(SPVM::Errno->ENOENT, Errno::ENOENT);
+  errno_ok('ENOENT');
 }
 {
-  is(SPVM::Errno->ENOEXEC, Errno::ENOEXEC);
+  errno_ok('ENOEXEC');
 }
 {
-  is(SPVM::Errno->ENOKEY, Errno::ENOKEY);
+  errno_ok('ENOKEY');
 }
 {
-  is(SPVM::Errno->ENOLCK, Errno::ENOLCK);
+  errno_ok('ENOLCK');
 }
 {
-  is(SPVM::Errno->ENOLINK, Errno::ENOLINK);
+  errno_ok('ENOLINK');
 }
 {
-  is(SPVM::Errno->ENOMEDIUM, Errno::ENOMEDIUM);
+  errno_ok('ENOMEDIUM');
 }
 {
-  is(SPVM::Errno->ENOMEM, Errno::ENOMEM);
+  errno_ok('ENOMEM');
 }
 {
-  is(SPVM::Errno->ENOMSG, Errno::ENOMSG);
+  errno_ok('ENOMSG');
 }
 {
-  is(SPVM::Errno->ENONET, Errno::ENONET);
+  errno_ok('ENONET');
 }
 {
-  is(SPVM::Errno->ENOPKG, Errno::ENOPKG);
+  errno_ok('ENOPKG');
 }
 {
-  is(SPVM::Errno->ENOPROTOOPT, Errno::ENOPROTOOPT);
+  errno_ok('ENOPROTOOPT');
 }
 {
-  is(SPVM::Errno->ENOSPC, Errno::ENOSPC);
+  errno_ok('ENOSPC');
 }
 {
-  is(SPVM::Errno->ENOSR, Errno::ENOSR);
+  errno_ok('ENOSR');
 }
 {
-  is(SPVM::Errno->ENOSTR, Errno::ENOSTR);
+  errno_ok('ENOSTR');
 }
 {
-  is(SPVM::Errno->ENOSYS, Errno::ENOSYS);
+  errno_ok('ENOSYS');
 }
 {
-  is(SPVM::Errno->ENOTBLK, Errno::ENOTBLK);
+  errno_ok('ENOTBLK');
 }
 {
-  is(SPVM::Errno->ENOTCONN, Errno::ENOTCONN);
+  errno_ok('ENOTCONN');
 }
 {
-  is(SPVM::Errno->ENOTDIR, Errno::ENOTDIR);
+  errno_ok('ENOTDIR');
 }
 {
-  is(SPVM::Errno->ENOTEMPTY, Errno::ENOTEMPTY);
+  errno_ok('ENOTEMPTY');
 }
 {
-  is(SPVM::Errno->ENOTSOCK, Errno::ENOTSOCK);
+  errno_ok('ENOTSOCK');
 }
 {
-  is(SPVM::Errno->ENOTSUP, Errno::ENOTSUP);
+  errno_ok('ENOTSUP');
 }
 {
-  is(SPVM::Errno->ENOTTY, Errno::ENOTTY);
+  errno_ok('ENOTTY');
 }
 {
-  is(SPVM::Errno->ENOTUNIQ, Errno::ENOTUNIQ);
+  errno_ok('ENOTUNIQ');
 }
 {
-  is(SPVM::Errno->ENXIO, Errno::ENXIO);
+  errno_ok('ENXIO');
 }
 {
-  is(SPVM::Errno->EOPNOTSUPP, Errno::EOPNOTSUPP);
+  errno_ok('EOPNOTSUPP');
 }
 {
-  is(SPVM::Errno->EOVERFLOW, Errno::EOVERFLOW);
+  errno_ok('EOVERFLOW');
 }
 {
-  is(SPVM::Errno->EPERM, Errno::EPERM);
+  errno_ok('EPERM');
 }
 {
-  is(SPVM::Errno->EPFNOSUPPORT, Errno::EPFNOSUPPORT);
+  errno_ok('EPFNOSUPPORT');
 }
 {
-  is(SPVM::Errno->EPIPE, Errno::EPIPE);
+  errno_ok('EPIPE');
 }
 {
-  is(SPVM::Errno->EPROTO, Errno::EPROTO);
+  errno_ok('EPROTO');
 }
 {
-  is(SPVM::Errno->EPROTONOSUPPORT, Errno::EPROTONOSUPPORT);
+  errno_ok('EPROTONOSUPPORT');
 }
 {
-  is(SPVM::Errno->EPROTOTYPE, Errno::EPROTOTYPE);
+  errno_ok('EPROTOTYPE');
 }
 {
-  is(SPVM::Errno->ERANGE, Errno::ERANGE);
+  errno_ok('ERANGE');
 }
 {
-  is(SPVM::Errno->EREMCHG, Errno::EREMCHG);
+  errno_ok('EREMCHG');
 }
 {
-  is(SPVM::Errno->EREMOTE, Errno::EREMOTE);
+  errno_ok('EREMOTE');
 }
 {
-  is(SPVM::Errno->EREMOTEIO, Errno::EREMOTEIO);
+  errno_ok('EREMOTEIO');
 }
 {
-  is(SPVM::Errno->ERESTART, Errno::ERESTART);
+  errno_ok('ERESTART');
 }
 {
-  is(SPVM::Errno->EROFS, Errno::EROFS);
+  errno_ok('EROFS');
 }
 {
-  is(SPVM::Errno->ESHUTDOWN, Errno::ESHUTDOWN);
+  errno_ok('ESHUTDOWN');
 }
 {
-  is(SPVM::Errno->ESPIPE, Errno::ESPIPE);
+  errno_ok('ESPIPE');
 }
 {
-  is(SPVM::Errno->ESOCKTNOSUPPORT, Errno::ESOCKTNOSUPPORT);
+  errno_ok('ESOCKTNOSUPPORT');
 }
 {
-  is(SPVM::Errno->ESRCH, Errno::ESRCH);
+  errno_ok('ESRCH');
 }
 {
-  is(SPVM::Errno->ESTALE, Errno::ESTALE);
+  errno_ok('ESTALE');
 }
 {
-  is(SPVM::Errno->ESTRPIPE, Errno::ESTRPIPE);
+  errno_ok('ESTRPIPE');
 }
 {
-  is(SPVM::Errno->ETIME, Errno::ETIME);
+  errno_ok('ETIME');
 }
 {
-  is(SPVM::Errno->ETIMEDOUT, Errno::ETIMEDOUT);
+  errno_ok('ETIMEDOUT');
 }
 {
-  is(SPVM::Errno->ETXTBSY, Errno::ETXTBSY);
+  errno_ok('ETXTBSY');
 }
 {
-  is(SPVM::Errno->EUCLEAN, Errno::EUCLEAN);
+  errno_ok('EUCLEAN');
 }
 {
-  is(SPVM::Errno->EUNATCH, Errno::EUNATCH);
+  errno_ok('EUNATCH');
 }
 {
-  is(SPVM::Errno->EUSERS, Errno::EUSERS);
+  errno_ok('EUSERS');
 }
 {
-  is(SPVM::Errno->EWOULDBLOCK, Errno::EWOULDBLOCK);
+  errno_ok('EWOULDBLOCK');
 }
 {
-  is(SPVM::Errno->EXDEV, Errno::EXDEV);
+  errno_ok('EXDEV');
 }
 {
-  is(SPVM::Errno->EXFULL, Errno::EXFULL);
+  errno_ok('EXFULL');
 }
 
 done_testing;

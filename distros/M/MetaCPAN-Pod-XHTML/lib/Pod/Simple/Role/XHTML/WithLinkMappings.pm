@@ -1,11 +1,13 @@
 package Pod::Simple::Role::XHTML::WithLinkMappings;
+use Moo::Role;
+
+our $VERSION = '0.003001';
+$VERSION =~ tr/_//d;
+
 use HTML::Entities qw(decode_entities encode_entities);
 use URL::Encode qw(url_encode_utf8);
-use Moo::Role;
-use namespace::clean;
 
-our $VERSION = '0.002001';
-$VERSION =~ tr/_//d;
+use namespace::clean;
 
 has link_mappings => ( is => 'rw' );
 
@@ -32,6 +34,8 @@ Pod::Simple::Role::XHTML::WithLinkMappings - Map module links to alternate URLs
 =head1 SYNOPSIS
 
   package MyPodParser;
+  use Moo;
+  extends 'Pod::Simple::XHTML';
   with 'Pod::Simple::Role::XHTML::WithLinkMappings';
 
   my $parser = MyPodParser->new;
@@ -45,11 +49,6 @@ Pod::Simple::Role::XHTML::WithLinkMappings - Map module links to alternate URLs
 
 This role will allow mapping links in Pod to alternate locations, rather than
 using the module name directly.
-
-Headings will be given multiple link targets.  The primary ID will have very
-miminal filters.  An additional target will be generated to match the behavior
-of L<Pod::Simple::XHTML>.  Also, a link will be generated using the first word
-of the target.
 
 =head1 ATTRIBUTES
 

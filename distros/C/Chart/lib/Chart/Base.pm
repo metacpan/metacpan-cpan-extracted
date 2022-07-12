@@ -5,7 +5,7 @@
 use v5.12;
 
 package Chart::Base;
-our $VERSION = 'v2.403.0';
+our $VERSION = 'v2.403.1';
 
 use FileHandle;
 use Carp;
@@ -987,7 +987,7 @@ sub _init {
         y_label         => 'black',
         y_label2        => 'black',
         grid_lines      => 'black',
-        grey_background => 'grey',
+        grey_background => 'gray90',
         (
             map { 'dataset' . $d++ => $_ }
               qw (flamescarlet forestgreen navy olive lightseagreen purple
@@ -996,10 +996,10 @@ sub _init {
               
               PaleGreen1 DarkBlue  orange2 chocolate1 LightGreen
               pink light_purple light_blue plum yellow turquoise light_green brown
-              pink PaleGreen2 MediumPurple PeachPuff1 orange3 chocolate2
-              olive pink light_purple light_blue plum yellow turquoise light_green brown
+              PaleGreen2 MediumPurple PeachPuff1 orange3 chocolate2
+              olive light_purple light_blue yellow turquoise light_green brown
               DarkOrange PaleGreen3 SlateBlue BlueViolet PeachPuff2 orange4
-              chocolate3 LightGreen pink light_purple light_blue plum yellow turquoise light_green brown
+              chocolate3 LightGreen light_purple light_blue light_green 
               snow1 honeydew3 SkyBlue1 cyan3 DarkOliveGreen1 IndianRed3
               orange1 LightPink3 MediumPurple1 snow3 LavenderBlush1 SkyBlue3
               DarkSlateGray1 DarkOliveGreen3 sienna1 orange3 PaleVioletRed1
@@ -1213,23 +1213,17 @@ sub _color_role_to_index {
         my $role  = $_;
         my $index = $self->{'color_table'}->{$role};
 
-        #print STDERR "Role = $_\n";
-
-        unless ( defined $index )
-        {
+        unless ( defined $index ) {
             my $spec =
                  $self->{'colors'}->{$role}
               || $self->{'colors_default_spec'}->{$role}
               || $self->{'colors_default_spec'}->{ $self->{'colors_default_role'}->{$role} };
-
             my @rgb = $self->_color_spec_to_rgb( $role, $spec );
-            #print STDERR "spec = $spec\n";
 
             my $string = sprintf " RGB(%d,%d,%d)", map { $_ + 0 } @rgb;
 
             $index = $self->{'color_table'}->{$string};
-            unless ( defined $index )
-            {
+            unless ( defined $index ) {
                 $index = $self->{'gd_obj'}->colorAllocate(@rgb);
                 $self->{'color_table'}->{$string} = $index;
             }
@@ -1239,7 +1233,6 @@ sub _color_role_to_index {
         $index;
     } @_;
 
-    #print STDERR "Result= ".$result[0]."\n";
     ( wantarray && @_ > 1 ? @result : $result[0] );
 }
 
@@ -1353,8 +1346,7 @@ sub _draw_title {
 # by writing more than one line as the title.
 # Both use decreased width and height of the font by one.
 # @return status
-sub _draw_sub_title
-{
+sub _draw_sub_title {
     my $self = shift;
 
     my $font = $self->{'sub_title_font'};
@@ -2223,8 +2215,7 @@ sub _plot
 # 'legend' to 'top', 'bottom', 'left', 'right' or 'none'.
 # The legend is positioned at the defined place, respectively.
 # @return status
-sub _draw_legend
-{
+sub _draw_legend {
     my $self = shift;
     my $length;
     # check to see if legend type is none..
@@ -3628,7 +3619,6 @@ sub _draw_y_ticks {
 # @return status
 sub _grey_background {
     my $self = shift;
-
     # draw it
     $self->{'gd_obj'}
       ->filledRectangle( $self->{'curr_x_min'}, $self->{'curr_y_min'}, $self->{'curr_x_max'}, $self->{'curr_y_max'},

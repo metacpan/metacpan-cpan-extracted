@@ -1,6 +1,10 @@
 Revision history for Perl extension Net::DNS::Resolver::Unbound.
 
 
+**** 1.15  Jul 11, 2022
+	pkg-config --keep-system-libs flag  non-portable.
+
+
 **** 1.14  Jul 10, 2022
 	Emulate Net::DNS resolver->send(packet) behaviour.
 

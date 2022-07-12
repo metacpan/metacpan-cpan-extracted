@@ -5,8 +5,9 @@ use warnings;
 
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
+use Scalar::Util qw(blessed);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -29,13 +30,15 @@ sub new {
 
 	# Check to 'CSS::Struct::Output' object.
 	if (! $self->{'no_css'} && defined $self->{'css'}
-		&& ! $self->{'css'}->isa('CSS::Struct::Output')) {
+		&& (! blessed($self->{'css'}) || ! $self->{'css'}->isa('CSS::Struct::Output'))) {
 
 		err "Parameter 'css' must be a 'CSS::Struct::Output::*' class.";
 	}
 
 	# Check to 'Tags' object.
-	if (defined $self->{'tags'} && ! $self->{'tags'}->isa('Tags::Output')) {
+	if (defined $self->{'tags'}
+		&& (! blessed($self->{'tags'}) || ! $self->{'tags'}->isa('Tags::Output'))) {
+
 		err "Parameter 'tags' must be a 'Tags::Output::*' class.";
 	}
 
@@ -245,7 +248,8 @@ Returns undef.
 =head1 DEPENDENCIES
 
 L<Class::Utils>,
-L<Error::Pure>.
+L<Error::Pure>,
+L<Scalar::Util>.
 
 =head1 SEE ALSO
 
@@ -279,6 +283,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

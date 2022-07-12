@@ -73,6 +73,8 @@ CREATE TABLE song (
     song_id    INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     song_title TEXT NOT NULL,
     song_voices TEXT,
+    song_decade TEXT,
+    song_decade_addional TEXT,
     song_composer TEXT,
     song_page INTEGER,
     song_note TEXT

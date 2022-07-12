@@ -1,3 +1,11 @@
+0.300   2022-06-03  Released-By: PERLANCAR; Urgency: medium
+
+        - In generating usage line, tweak grouping again: now all arg-based
+          options are grouped together, previously singular and plural
+          options (e.g. --files & --files-json and --file=s+) were not
+          grouped.
+
+
 0.299   2022-05-08  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux][bugfix] In usage, --foo (ospec: foo=s) and its

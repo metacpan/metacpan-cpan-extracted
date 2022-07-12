@@ -5,11 +5,11 @@ package Convert::BulkDecoder;
 # Author          : Johan Vromans
 # Created On      : Wed Jan 29 16:59:58 2003
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Jul  9 23:12:45 2022
-# Update Count    : 89
+# Last Modified On: Mon Jul 11 11:18:53 2022
+# Update Count    : 91
 # Status          : Unknown, Use with caution!
 
-$VERSION = "1.04";
+$VERSION = "1.041";
 
 use strict;
 use integer;

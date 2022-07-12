@@ -1,30 +1,10 @@
-lib/Convert/BulkDecoder.pm
 Changes
-Makefile.PL
 MANIFEST
+Makefile.PL
 README.md
-t/data/MS00
-t/data/MS01
-t/data/UM00
-t/data/UM01
-t/data/UM02
-t/data/UM03
-t/data/US00
-t/data/US01
-t/data/YM00
-t/data/YM01
-t/data/YM02
-t/data/YM03
-t/data/YS00
-t/data/YS01
-t/data/Zref
-t/decode.pl
+examples/mfetch.pl
+lib/Convert/BulkDecoder.pm
 t/00_load.t
 t/01_prereq.t
-t/13_umdecode.t
-t/12_usdecode.t
-t/15_ymdecode.t
-t/14_ysdecode.t
-examples/mfetch.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

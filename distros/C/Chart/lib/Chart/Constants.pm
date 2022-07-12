@@ -4,7 +4,7 @@
 use v5.12;
 
 package Chart::Constants;
-our $VERSION = 'v2.403.0';
+our $VERSION = 'v2.403.1';
 
 use constant PI => 4 * atan2( 1, 1 );
 

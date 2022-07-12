@@ -1,0 +1,115 @@
+<html>
+
+<head>
+        <meta charset="utf-8"/>
+        <style>
+            body {
+                width: 60%;
+            }
+            .results {
+                /*width: 100%;*/
+            }
+        .result {
+            /*width: 100%;*/           
+           
+  padding: 0;
+        }
+        .resultinfo {
+    float: left;
+    width: 80%;
+}
+
+        .resultimage {
+    float: left;
+    width: 20%;    
+}
+
+.resultimage img {
+    max-width:100%;
+    max-height:100%;
+}
+
+/* Clear floats after the columns */
+.result:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+        </style>
+</head>
+
+<body>
+    <div id="results">
+    
+    </div>
+    <script>
+        //let url = 'red.json';
+        var resultdiv = document.getElementById('results');
+
+        function dirsplayjson(json) {
+            if(json.status === 'success') {
+                //console.log(Object.keys(json.response.results[0]));
+                var html = '';
+                json.response.results.forEach(function(element) {
+                    html += '<div class="result"><div class="resultinfo"><table>'
+                    html += '<tr><th>' + element.artist + ' - ' + element.groupName + ' (' + element.groupYear + ') ' + element.releaseType + '</th></tr>';
+                    var editionId = -1;
+                    var editionString;
+                    element.torrents.forEach(function(torrent) {
+                        html += '<tr><td>';
+                        if(torrent.editionId !== editionId) {
+
+                            if(editionId !== -1) {
+                                //html += '</table>';
+                            }
+                            editionId = torrent.editionId;
+                            //html += '<table>';
+                            
+                            if(torrent.remastered) {
+                                editionString = torrent.remasterTitle;
+                                if(torrent.remasterCatalogueNumber !== '') {
+                                    if (editionString !== '') editionString += '/';
+                                    editionString += torrent.remasterCatalogueNumber;
+                                }                                
+                                if(torrent.remasterYear !== element.groupYear) {
+                                    if (editionString !== '') editionString += '/';
+                                    editionString += torrent.remasterYear;
+                                }
+                            }
+                            else {
+                                editionString = '';
+                            }
+                            editionString += ' [' + torrent.media  + ']';
+                            html += '<tr><th>' + editionString + '</th></tr>';
+                        }
+                        html += '<tr><td>' + torrent.format + '/' + torrent.encoding;                       
+                        if(torrent.scene) html += '/SCENE';
+                        if(torrent.hasLog) html += '/' + torrent.logScore  + 'LOG' ;
+                        if(torrent.hasCue) html += '/CUE';
+                        html += '</td><td><a href="dlext?id=' + torrent.torrentId + '">DL</a> </td><td>' + (torrent.size / 1048576).toFixed(2) + 'MB</td>';
+                        html += '<td>' + torrent.snatches;
+                        html += '</td></tr>';
+                    });                    
+
+                    html += '</table></div><div class="resultimage">';
+                    html += '<img src="' + element.cover + '" alt="coverimage">';
+                    
+                    html += '</div></div>';
+                });
+                resultdiv.innerHTML = html;
+            }
+            
+        }
+		
+		function get_browse(url) {
+		    fetch(url)
+            .then(res => res.json())
+            .then((out) => {
+                console.log('Checkout this JSON! ', out);
+                dirsplayjson(out);
+            })
+            .catch(err => { throw err });		
+		}
+
+        
+    </script>

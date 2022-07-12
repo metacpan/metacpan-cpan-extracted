@@ -1,0 +1,25 @@
+<script type="module">
+    //import {default as NetworkDrFlac} from './music_drflac_module.js'
+    import {default as NetworkDrFlac} from './music_drflac_module.cache.js'
+
+    
+function CreateAudioContext(options) {
+    let mycontext = (window.hasWebKit) ? new webkitAudioContext(options) : (typeof AudioContext != "undefined") ? new AudioContext(options) : null;
+    GainNode = mycontext.createGain();
+    GainNode.connect(mycontext.destination);
+    return mycontext;
+}
+    let MainAudioContext = CreateAudioContext({'sampleRate' : 44100 });
+    
+    let ab = new AbortController();
+    let mysignal = ab.signal;
+    (async function() {
+    let nwdrflac = await NetworkDrFlac('/stream/music_dl?name=Alien Ant Farm - ANThology (2001) [FLAC]/12 - Smooth Criminal.flac&max_sample_rate=48000', mysignal);
+    let AB = await nwdrflac.read_pcm_frames_to_AudioBuffer(0, nwdrflac.totalPCMFrameCount, mysignal, MainAudioContext);
+    let chanzero = AB.getChannelData(0);
+    let tarr =  new Uint8Array(chanzero);
+    var blob = new Blob([tarr], {type: "application/octet-stream"});
+    var objectUrl = URL.createObjectURL(blob);
+    window.open(objectUrl);
+    })();
+</script>

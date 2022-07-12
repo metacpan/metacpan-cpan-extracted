@@ -1,0 +1,52 @@
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+      <center>
+          <h1>Player (HLS)</h1>
+          <video height="600" id="video" controls></video>
+      </center>
+      <script>
+        
+ function _SetVideo(queryString) {
+        
+        if(Hls.isSupported()) {     
+          var video = document.getElementById('video');
+
+
+var config = {
+debug: true,
+maxBufferLength: 3600,
+maxMaxBufferLength: 3600,
+xhrSetup: function (xhr,url) {
+//xhr.withCredentials = true; // do send cookie
+//xhr.setRequestHeader("Access-Control-Allow-Headers","Content-Type, Accept, X-Requested-With");
+ //   xhr.setRequestHeader("Access-Control-Allow-Origin","https://computoid.com");
+//xhr.setRequestHeader("Access-Control-Allow-Credentials","true");
+//var user = gapi.auth2.getAuthInstance().currentUser.get();
+//var oauthToken = user.getAuthResponse().access_token;
+//xhr.setRequestHeader('Authorization', 'Bearer ' + oauthToken);
+
+
+}
+};
+          var hls = new Hls(config);
+          hls.loadSource(queryString);
+          hls.attachMedia(video);
+          hls.on(Hls.Events.MANIFEST_PARSED,function() {
+	    console.log('subs:');
+	    console.log(hls.subtitleTracks);
+            video.play();
+        });
+       }
+       // hls.js is not supported on platforms that do not have Media Source Extensions (MSE) enabled.
+       // When the browser has built-in HLS support (check using `canPlayType`), we can provide an HLS manifest (i.e. .m3u8 URL) directly to the video element throught the `src` property.
+       // This is using the built-in support of the plain video element, without using hls.js.
+        else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          video.src = queryString;
+          video.addEventListener('canplay',function() {
+            video.play();
+          });
+        }
+        }
+      
+      
+</script>
+	  

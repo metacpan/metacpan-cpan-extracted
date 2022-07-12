@@ -28,62 +28,62 @@ no_index:
 provides:
   Chart:
     file: lib/Chart.pm
-    version: v2.403.0
+    version: v2.403.1
   Chart::Bars:
     file: lib/Chart/Bars.pm
-    version: v2.403.0
+    version: v2.403.1
   Chart::Color:
     file: lib/Chart/Color.pm
-    version: v2.403.0
+    version: v2.403.1
   Chart::Composite:
     file: lib/Chart/Composite.pm
-    version: v2.403.0
+    version: v2.403.1
   Chart::Direction:
     file: lib/Chart/Direction.pm
-    version: v2.403.0
+    version: v2.403.1
   Chart::ErrorBars:
     file: lib/Chart/ErrorBars.pm
-    version: v2.403.0
+    version: v2.403.1
   Chart::Font:
     file: lib/Chart/Font.pm
-    version: v2.403.0
+    version: v2.403.1
   Chart::HorizontalBars:
     file: lib/Chart/HorizontalBars.pm
-    version: v2.403.0
+    version: v2.403.1
   Chart::Lines:
     file: lib/Chart/Lines.pm
-    version: v2.403.0
+    version: v2.403.1
   Chart::LinesPoints:
     file: lib/Chart/LinesPoints.pm
-    version: v2.403.0
+    version: v2.403.1
   Chart::Mountain:
     file: lib/Chart/Mountain.pm
-    version: v2.403.0
+    version: v2.403.1
   Chart::Pareto:
     file: lib/Chart/Pareto.pm
-    version: v2.403.0
+    version: v2.403.1
   Chart::Pie:
     file: lib/Chart/Pie.pm
-    version: v2.403.0
+    version: v2.403.1
   Chart::Points:
     file: lib/Chart/Points.pm
-    version: v2.403.0
-  Chart::Setting:
-    file: lib/Chart/Setting.pm
-    version: v2.403.0
+    version: v2.403.1
+  Chart::Property:
+    file: lib/Chart/Property.pm
+    version: v2.403.1
   Chart::Split:
     file: lib/Chart/Split.pm
-    version: v2.403.0
+    version: v2.403.1
   Chart::StackedBars:
     file: lib/Chart/StackedBars.pm
-    version: v2.403.0
+    version: v2.403.1
 requires:
   Carp: '1.35'
   GD: '2'
   perl: v5.12.0
 resources:
   repository: git://github.com/lichtkind/Chart.git
-version: v2.403.0
+version: v2.403.1
 x_generated_by_perl: v5.30.0
 x_maintainers:
   - 'Herbert Breunung <lichtkind@cpan.org>'

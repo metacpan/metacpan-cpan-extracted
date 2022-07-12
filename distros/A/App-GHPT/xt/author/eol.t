@@ -24,6 +24,7 @@ my @files = (
     'lib/App/GHPT/Wrapper/Ourperl.pm',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
+    't/enterprise.t',
     't/lib/App/GHPT/Wrapper/OurTest/Class/Moose.pm',
     't/lib/Helper/MockPTAPI.pm',
     't/lib/Helper/QuestionNamespace1/Question.pm',

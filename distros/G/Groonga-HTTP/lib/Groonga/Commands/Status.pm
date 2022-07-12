@@ -31,14 +31,9 @@ sub new {
     return bless $self, $class;
 }
 
-sub _make_command {
-    return "status";
-}
-
 sub execute {
     if (defined $groonga_http_client) {
-        my $command = _make_command;
-        return $groonga_http_client->send($command);
+        return $groonga_http_client->send('status');
     }
     return;
 }

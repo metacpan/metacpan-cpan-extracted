@@ -1,0 +1,17 @@
+alienfile
+Changes
+lib/Alien/Tar/Size.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+tarsize/Makefile
+tarsize/README.md
+tarsize/tarsize.c
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

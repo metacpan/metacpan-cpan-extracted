@@ -1,0 +1,46 @@
+
+=encoding UTF-8
+
+=head1 NAME
+
+Chart::Manual::Methods - user API listing
+
+=head1 OVERVIEW
+
+=head1 SORTED ALPHABETICALLY
+
+
+=head2 add_datafile
+
+=head2 add_dataset
+
+=head2 add_pt
+
+=head2 cgi_jpeg
+
+=head2 cgi_png
+
+=head2 clear_data
+
+=head2 get_data
+
+=head2 jpeg
+
+=head2 new
+
+=head2 png
+
+=head2 set
+
+
+=head1 SORTED THEMATICALLY
+
+=head2 Data
+
+=head2 Output
+
+=head2 Properties
+
+
+
+=cut

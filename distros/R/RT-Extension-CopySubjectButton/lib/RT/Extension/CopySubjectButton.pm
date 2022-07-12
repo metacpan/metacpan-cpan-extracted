@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::CopySubjectButton;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -15,8 +15,6 @@ Adds a button next to the subject header, of a ticket, that copies the subject i
 =head1 RT VERSION
 
 Works with RT 5.0.2
-
-[Make sure to use requires_rt and rt_too_new in Makefile.PL]
 
 =head1 INSTALLATION
 

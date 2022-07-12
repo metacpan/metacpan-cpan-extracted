@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w
+use strict;
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Split;
-use strict;
 use File::Temp 0.19;
 my $samples = File::Temp->newdir();
 print "1..1\n";
@@ -10,8 +10,7 @@ print "1..1\n";
 my ( $x, $y, @x, @y, %hash );
 my $g = Chart::Split->new();
 
-for ( my $i = 0 ; $i < 60 ; $i += .05 )
-{
+for ( my $i = 0 ; $i < 60 ; $i += .05 ){
     $y = sin($i);
     $x = $i;
     push @x, $x;

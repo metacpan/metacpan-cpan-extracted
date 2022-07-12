@@ -1,0 +1,46 @@
+---
+abstract: 'find or build and install libFLAC with development dependencies'
+author:
+  - 'Gavin Hayes <gahayes@cpan.org>'
+build_requires:
+  Alien::Build::MM: '0.25'
+  Test::More: '0'
+configure_requires:
+  Alien::Build: '1.19'
+  Alien::Build::MM: '0.25'
+  ExtUtils::MakeMaker: '0'
+  Sort::Versions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-libFLAC
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::Build: '0.25'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/G4Vi/MHFS/issues
+  homepage: https://github.com/G4Vi/MHFS
+  repository: https://github.com/G4Vi/MHFS.git
+version: v0.1.0
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 2.50'
+  requires:
+    share:
+      Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
+      Config: '0'
+      HTML::LinkExtor: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      Net::SSLeay: '1.49'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

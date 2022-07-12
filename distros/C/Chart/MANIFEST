@@ -34,7 +34,7 @@ lib/Chart/Mountain.pm
 lib/Chart/Pareto.pm
 lib/Chart/Pie.pm
 lib/Chart/Points.pm
-lib/Chart/Setting.pm
+lib/Chart/Property.pm
 lib/Chart/Split.pm
 lib/Chart/StackedBars.pm
 t/001_color_value.t

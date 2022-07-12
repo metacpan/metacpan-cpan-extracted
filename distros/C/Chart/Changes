@@ -1,3 +1,10 @@
+2.403.1 2022-08-12 lichtkind
+-------
+    * = POD fix release
+    * ? completed most pod on properties
+    * ? all names in Constants.POD
+    * ! linkfixes on landing POD of Chart.pm
+
 2.403.0 2022-08-07 lichtkind
 -------
     * = test release to check metacpan POD parser

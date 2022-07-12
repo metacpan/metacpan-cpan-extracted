@@ -1,0 +1,46 @@
+      <center>
+          <h1>Player (MP4)</h1>
+          <video height="600" id="video" controls preload></video>
+      </center>
+      <script>
+	    function playEasy(qs) {
+            console.log('qs ' + qs);
+		    var video = document.getElementById('video');
+		    video.src = qs;
+		  video.addEventListener('canplaythrough',function() {		   
+		      video.play();		  
+		  });
+		}
+		
+		function pad(n, width, z) {
+		    z = z || '0';
+            n = n + '';
+            return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+        }
+		
+	
+        function _SetVideo(path){		    
+			playEasy(path);			
+		}
+		
+		function get(url, callback) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.responseType = 'arraybuffer';
+            xhr.send(); 
+            xhr.onload = function() {
+            if ((xhr.status !== 200)) {
+              alert('Unexpected status code ' + xhr.status + ' for ' + url);
+              return false;
+            }
+            callback(new Uint8Array(xhr.response));	
+          };
+       }
+
+
+
+    
+      
+      
+      </script>
+	  

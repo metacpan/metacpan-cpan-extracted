@@ -5,7 +5,7 @@ use v5.12;
 
 package Chart::Direction;
 our @ISA     = qw(Chart::Base);
-our $VERSION = 'v2.403.0';
+our $VERSION = 'v2.403.1';
 
 use Chart::Base;
 use GD;

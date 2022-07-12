@@ -1,6 +1,10 @@
 Revision history for Term::TablePrint
 
 
+0.152   2022-07-12
+        - Formatting numbers: bugfixes and updates.
+        - Code refactoring.
+
 0.151   2022-05-14
         - Search function: use the qr// operator.
         - Removed warnings for removed options.

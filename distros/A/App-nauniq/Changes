@@ -1,18 +1,25 @@
-0.10    2017-07-11 (PERLANCAR)
+0.110   2022-06-02  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+        - Refactor: move main subroutine to module.
+
+
+0.10    2017-07-11  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [test] Replace File::Slurp::Tiny with File::Slurper.
 
 
-0.09    2015-07-30 (PERLANCAR)
+0.09    2015-07-30  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Tweak example awk code.
 
 
-0.08    2015-07-30 (PERLANCAR)
+0.08    2015-07-30  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -20,21 +27,21 @@
 	  incantation.
 
 
-0.07    2015-01-03 (PERLANCAR)
+0.07    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (Generate TODO.md).
 
 
-0.06    2014-05-17 (SHARYANTO)
+0.06    2014-05-17  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Replace File::Slurp with File::Slurp::Tiny.
 
 
-0.05    2014-05-05 (SHARYANTO)
+0.05    2014-05-05  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -42,14 +49,14 @@
           run_forked()).
 
 
-0.04    2014-03-25 (SHARYANTO)
+0.04    2014-03-25  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Skip testing on win because run_forked() is not available [CT].
 
 
-0.03    2014-03-19 (SHARYANTO)
+0.03    2014-03-19  Released-By: SHARYANTO
 
         [REMOVED FEATURES]
 
@@ -61,7 +68,7 @@
         - Add tests.
 
 
-0.02    2014-03-18 (SHARYANTO)
+0.02    2014-03-18  Released-By: SHARYANTO
 
         [REMOVED FEATURES]
 
@@ -74,6 +81,6 @@
           functionality.
 
 
-0.01    2014-03-14 (SHARYANTO)
+0.01    2014-03-14  Released-By: SHARYANTO
 
         - First release, no tests yet.

@@ -41,12 +41,12 @@ like $output, qr{(?:>|^)    Guff}m;
 
 $parser = $class->new;
 $parser->output_string( \($output = '') );
-$pod = <<'END_POD';
+$pod = <<"END_POD";
   =head1 SYNOPSIS
 
       Foo
-      Bar	Bar
-      Guff	Guff
+      Bar\tBar
+      Guff\tGuff
 
   =cut
 END_POD
@@ -54,7 +54,26 @@ $pod =~ s/^  //mg;
 $parser->parse_string_document("$pod");
 
 like $output, qr{(?:>|^)Foo}m;
-like $output, qr{(?:>|^)Bar Bar}m;
-like $output, qr{(?:>|^)Guff        Guff}m;
+like $output, qr{(?:>|^)Bar	Bar}m;
+like $output, qr{(?:>|^)Guff	Guff}m;
+
+$parser = $class->new;
+$parser->output_string( \($output = '') );
+$parser->expand_verbatim_tabs(8);
+$pod = <<"END_POD";
+  =head1 SYNOPSIS
+
+      Foo
+  \tBar\tBar
+      Guff\tGuff
+
+  =cut
+END_POD
+$pod =~ s/^  //mg;
+$parser->parse_string_document("$pod");
+
+like $output, qr{(?:>|^)Foo}m;
+like $output, qr{(?:>|^)    Bar Bar}m;
+like $output, qr{(?:>|^)Guff    Guff}m;
 
 done_testing;

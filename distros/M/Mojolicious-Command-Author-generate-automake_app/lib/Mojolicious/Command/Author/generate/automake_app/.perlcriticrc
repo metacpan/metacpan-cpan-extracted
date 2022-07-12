@@ -1,0 +1,4 @@
+allow-unsafe = 0
+severity = stern
+verbose = 11
+[-Perl::Critic::Policy::Subroutines::ProhibitSubroutinePrototypes]

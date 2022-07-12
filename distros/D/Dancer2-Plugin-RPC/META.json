@@ -1,0 +1,61 @@
+{
+   "abstract" : "Namespace for XMLRPC, JSONRPC2 and RESTRPC plugins",
+   "author" : [
+      "Abe Timmerman <abeltje@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dancer2-Plugin-RPC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Fatal" : "0.01",
+            "Test::MockObject" : "1.20",
+            "Test::Simple" : "0.88",
+            "Test::Warnings" : "0.030"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.55_02"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cpanel::JSON::XS" : "4.29",
+            "Dancer2" : "0.20",
+            "JSON" : "2.0",
+            "JSON::PP" : "4.09",
+            "MooX::Params::CompiledValidators" : "0.05",
+            "RPC::XML" : "0.56",
+            "Type::Tiny" : "1.01",
+            "namespace::autoclean" : "0.16",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/abeltje/Dancer2-Plugin-RPC",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/abeltje/Dancer2-Plugin-RPC.git",
+         "web" : "https://github.com/abeltje/Dancer2-Plugin-RPC"
+      }
+   },
+   "version" : "2.01",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

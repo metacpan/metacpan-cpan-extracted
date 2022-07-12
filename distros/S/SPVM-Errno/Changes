@@ -1,3 +1,9 @@
+0.04 2022-07-12
+  [Fix Testing Bugs]
+    * Fix the testing bug that when a errno doesn't eixsts in the system, the test fails.
+0.03 2022-07-11
+  [Fix Testing Bugs]
+    * Fix the testing bug that when a errno doesn't eixsts in the system, the test fails.
 0.02 2022-07-07
   [Changes]
     * Add tests.

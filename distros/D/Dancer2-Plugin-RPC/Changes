@@ -1,0 +1,164 @@
+Changes on 2022-07-11 for repository at:
+  Fetch URL: git@github.com:abeltje/Dancer2-Plugin-RPC.git
+  Push  URL: git@github.com:abeltje/Dancer2-Plugin-RPC.git
+
+Enjoy!
+
+2.01 2022-07-11T09:55:40+02:00 (4be5d93 => Abe Timmerman)
+ - (Abe Timmerman, Mon, 11 Jul 2022 09:55:40 +0200) Autocommit for
+   distribution Dancer2::Plugin::RPC 2.01 (minor)
+
+1.99_06 2022-07-01T13:56:39+02:00 (d60d234 => Abe Timmerman)
+ - (Abe Timmerman, Fri, 1 Jul 2022 13:56:39 +0200) Autocommit for
+   distribution Dancer2::Plugin::RPC 1.99_06 (same)
+
+ - (Abe Timmerman, Mon, 11 Jul 2022 09:51:05 +0200) I screwed up the
+   versioning
+ -     The next release will be 2.01
+
+1.99_05 2022-06-29T12:07:48+02:00 (a52ce25 => Abe Timmerman)
+ - (Abe Timmerman, Wed, 29 Jun 2022 12:07:48 +0200) Autocommit for
+   distribution Dancer2::Plugin::RPC 1.99_05 (same)
+
+ - (Abe Timmerman, Fri, 1 Jul 2022 13:55:46 +0200) It looks like we always
+   need JSON::PP >= 4.09
+
+1.99_04 2022-06-28T08:31:27+02:00 (b958ba7 => Abe Timmerman)
+ - (Abe Timmerman, Tue, 28 Jun 2022 08:31:27 +0200) Autocommit for
+   distribution Dancer2::Plugin::RPC 1.99_04 (same)
+
+ - (Abe Timmerman, Wed, 29 Jun 2022 12:03:22 +0200) Attempt to	fix the
+   PREREQ_PM stuff
+ -     This is what I have deduced from the cpan-testers reports:
+ -     - When Cpanel::JSON::XS is available the versions of that and
+   JSON::PP
+ -	 can interfere and produce a warning from the overload module.
+ -     - In some cases Cookie::Baker and Cookie::Baker::XS produce a
+   warning,
+ -	 when the XS version is there, set a high enough version in
+   PREREQ_PM
+
+1.99_03 2022-06-25T16:23:09+02:00 (51e6f6b => Abe Timmerman)
+ - (Abe Timmerman, Sat, 25 Jun 2022 16:23:09 +0200) Autocommit for
+   distribution Dancer2::Plugin::RPC 1.99_03 (same)
+
+ - (Abe Timmerman, Mon, 27 Jun 2022 09:56:20 +0200) Fix typo
+
+ - (Abe Timmerman, Mon, 27 Jun 2022 15:46:48 +0200) Add JSON::PP 4.09 as
+   dependency
+ -     There is some problem with JSON::PP 4.08 with redefine warnings,
+   list
+ -     JSON::PP in the requirements and I can see what happens in the
+ -     smoke-reports.
+
+1.99_02 2022-06-24T14:16:37+02:00 (e039b3b => Abe Timmerman)
+ - (Abe Timmerman, Fri, 24 Jun 2022 14:16:37 +0200) Autocommit for
+   distribution Dancer2::Plugin::RPC 1.99_02 (same)
+
+ - (Abe Timmerman, Sat, 25 Jun 2022 16:22:40 +0200) Fix some dependencies.
+
+0.00 2017-04-18T21:45:07+02:00 (0206403 => abeltje)
+ - (abeltje, Tue, 18 Apr 2017 21:45:07 +0200) Initial commit => port of
+   Dancer::Plugin::RPC
+
+ - (abeltje, Mon, 24 Apr 2017 22:12:28 +0200) Arrange for a clean dump of
+   the dispatch-table.
+ -     Dancer2 gives a warning for items logged that are CODE-refs, we know
+ -     this data-structure contains them, so resolve by dumpering te
+   structure
+ -     ourself.
+
+ - (abeltje, Wed, 14 Jun 2017 22:08:33 +0200) Help the example application
+   and my development
+ -     carton (lock/snapshot) shouldn't be diffed
+ -     ignore the carton stuff for version control
+
+ - (abeltje, Mon, 19 Jun 2017 21:24:00 +0200) Add 'Test::NoWarnings' to
+   'BUILD_REQUIRES'
+
+ - (abeltje, Mon, 19 Jun 2017 21:50:10 +0200) Update the example app.
+
+ - (abeltje, Mon, 19 Jun 2017 21:55:53 +0200) Objects returned by the
+   codewrapper will be serialised
+ -     Blessed variables will be (recursively) flattend into a single
+ -     data-structure.
+ -     fix tests, amend tests, add tests
+
+ - (abeltje, Mon, 26 Jun 2017 22:01:01 +0200) Changes must be part of any
+   distribution
+
+ - (abeltje, Mon, 26 Jun 2017 22:03:14 +0200) Keep the example in sync with
+   Dancer::Plugin::RPC
+
+ - (abeltje, Thu, 10 Aug 2017 11:56:15 +0200) More syncing between the two
+   versions (Dancer1.3 and Dancer2)
+
+ - (abeltje, Thu, 10 Aug 2017 12:00:17 +0200) More bookkeeping...
+
+ - (abeltje, Wed, 16 Aug 2017 20:04:46 +0200) Fix regex for argument
+   validation
+
+ - (abeltje, Wed, 6 Sep 2017 18:54:12 +0200) Documentation fixes, complete
+   RESTRPC stuff
+
+ - (abeltje, Wed, 6 Sep 2017 20:12:50 +0200) Introduce explicit endpoints
+   for POD-publishing
+ -     - The Dancer2::RPCPlugin::DispatchFromPod class has a new attribute
+ -	 'endpoint', this will be used with the new optional item for
+   endpoint
+ -	 in the POD directive
+ -	- Renamed the 'label' attribute to plugin (sync with the Dancer
+ -	  version) in the Dancer2::RPCPlugin::DispatchFrom* classes
+ -     - Had to rename the 'plugin' attribute to 'plugin_object' in those
+ -	 classes
+
+ - (abeltje, Wed, 6 Sep 2017 20:21:54 +0200) Fix agent-identifier in
+   http-client.
+
+ - (abeltje, Wed, 6 Sep 2017 21:50:01 +0200) Use Params::ValidationCompiler
+   rather than Params::Validate
+ -     As of June 2017 the author recommends this change.
+
+ - (abeltje, Wed, 6 Sep 2017 21:59:00 +0200) Update MANIFEST/MANIFEST.SKIP
+
+ - (abeltje, Wed, 6 Sep 2017 22:32:30 +0200) Rename the Plugins back to the
+   Dancer version
+
+ - (abeltje, Wed, 6 Sep 2017 22:35:57 +0200) Autocommit for distribution
+   Dancer2::Plugin::RPC 2.00_01 (test)
+
+ - (Abe Timmerman, Thu, 9 Jun 2022 17:19:29 +0200) Rename the plugin-role
+   test
+
+ - (Abe Timmerman, Thu, 9 Jun 2022 22:51:35 +0200) Refactor CallbackResult.
+
+ - (Abe Timmerman, Fri, 10 Jun 2022 14:38:59 +0200) Upgrade to
+   t::Test::abeltje 1.06
+
+ - (Abe Timmerman, Mon, 13 Jun 2022 09:26:27 +0200) Add the
+   Dancer2::RPCPlugin::PluginNames helper
+ -     Part of making the RPC-plugin system extensible.
+
+ - (Abe Timmerman, Mon, 13 Jun 2022 09:35:18 +0200) Add the
+   Dancer2::RPCPlugin::ValidationTemplates helper
+ -     Part of making the RPC-plugin system extensible.
+
+ - (Abe Timmerman, Mon, 13 Jun 2022 09:40:25 +0200) Add the
+   Dancer2::RPCPlugin::DefaultRoute helper
+ -     This helper will set a default route in order to not return a plain
+   old
+ -     404 in HTML but, either an error for the rpc-protocol or a 404 in
+   plain-text.
+
+ - (Abe Timmerman, Thu, 16 Jun 2022 11:19:25 +0200) Update the example app.
+ -     A bit more structure to the files
+ -     Use Bread::Board
+
+ - (Abe Timmerman, Thu, 16 Jun 2022 12:07:09 +0200) Update the plugin after
+   porting to Dancer2
+ -     - implement lessons learned from the Dancer version
+
+ - (Abe Timmerman, Thu, 23 Jun 2022 10:34:36 +0200) Update to
+   t::Test::abeltje 1.07
+
+ - (Abe Timmerman, Fri, 24 Jun 2022 13:39:48 +0200) Rewrite to use Moo

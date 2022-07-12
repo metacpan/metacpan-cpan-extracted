@@ -12,7 +12,7 @@ title: Release
 $ editor Chnages
 ```
 
-We write summarized the changes for this release under the ``{{$NEXT}}``.
+We write summarized the changes for this release under the "\{\{$NEXT\}\}".
 
 ## 2. Check whether we can make packages or not
 

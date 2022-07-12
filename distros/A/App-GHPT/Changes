@@ -1,7 +1,15 @@
+2.000001 2022-07-12
+
+- Prefer GH_ENTERPRISE_TOKEN and GITHUB_ENTERPRISE_TOKEN if not a public GitHub
+  host (GH#36) (Olaf Alders)
+
 2.000000 2022-06-23
 
-- The default branch is now C<main> instead of C<master>.
-- Remove C<Path::Class> dependency.
+- The "hub" CLI tool is no longer used for created pull requests. The GitHub
+  API is now used directly.
+- The default branch is now "main" instead of "master".
+- Remove "Path::Class" dependency.
+
 
 1.001000 2021-01-19
 

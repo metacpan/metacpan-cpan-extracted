@@ -19,11 +19,19 @@ ROLES
 
     *   Pod::Simple::Role::XHTML::WithLinkMappings
 
+    *   Pod::Simple::Role::XHTML::WithExtraTargets
+
     *   Pod::Simple::Role::XHTML::WithAccurateTargets
 
     *   Pod::Simple::Role::XHTML::WithErrata
 
+    *   Pod::Simple::Role::XHTML::WithHighlightConfig
+
     *   Pod::Simple::Role::StripVerbatimIndent
+
+DEFAULTS
+    anchor_items
+        By default, anchor_items is set to true.
 
 AUTHOR
     haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>

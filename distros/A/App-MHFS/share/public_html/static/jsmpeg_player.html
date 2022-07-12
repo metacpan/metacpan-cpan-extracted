@@ -1,0 +1,19 @@
+    <script src="static/jsmpeg.min.js"></script>
+    <div id="vidouter">  
+    </div>
+    <script> function _SetVideo(path){
+        var vparent = document.getElementById("vidouter");
+        vidouter.innerHTML = "";
+        //var vplayer = document.getElementById("vidplayer");       
+        //vplayer.setAttribute("data-url", "get_video?name=" + path);
+        var newNode = document.createElement('div');
+        newNode.className = "jsmpeg";
+        newNode.setAttribute("data-url", path);
+        newNode.setAttribute("id", "video");
+        vparent.appendChild(newNode);       
+        JSMpeg.CreateVideoElements();
+        
+        
+    };
+    </script>
+	

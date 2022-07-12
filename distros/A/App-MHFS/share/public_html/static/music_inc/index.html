@@ -1,0 +1,49 @@
+<html>
+<head>
+<link rel="stylesheet" href="music.css">
+<title>Music</title>
+</head>
+<body>
+<div class="header row">
+    <h1>Music</h1>
+</div>
+<div class="body row scroll-y">
+    <div id="musicdb">
+        
+    </div>
+</div>
+<div class="footer row">  
+    <table border="1" width="80%">
+    <tr><th>Previous</th><th>Now Playing</th><th>Next</th></tr>
+	<tr><td><div id="prev_text"></div></td><td><div id="play_text"></div></td><td><div id="next_text"></div></td></tr>  
+	</table> 
+    <input type="button" value="PREV" id="prevbtn" class="controlbtns">
+    <button id="ppbtn" type="button" class="controlbtns">IDLE</button> 
+    <input id="curtime" type="text" class="timedisplay" name="curseconds" value="0:00">
+    <input type="range" step="any" id="seekbar" value="0">
+    <input id="endtime" type="text" class="timedisplay" name="endseconds" value="0:00">
+    <input type="button" value="NEXT" id="nextbtn" class="controlbtns">
+    <input type="range" min="0" max="1" value="1.0" step="any" id="volslider">
+	<label><input name="repeattrack" id="repeattrack" type="checkbox">Repeat Track</label>
+</div>
+<script>
+    window.NetworkDrFlac_startPath = '';
+</script>
+<script src="music_drflac_module.cache.js" type="module"></script>
+<script src="music_inc_module.js" type="module" async> </script>
+<script>
+    // load the DB
+    let urlParams = new URLSearchParams(window.location.search);
+    urlParams.append('fmt', 'musicdbhtml');
+    let myRequest = new Request('../../music?'+urlParams.toString());
+    fetch(myRequest).then(function(response) {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text();        
+    }).then((html) => {
+        document.getElementById("musicdb").innerHTML = html;
+    });   
+</script>
+</body>
+</html>

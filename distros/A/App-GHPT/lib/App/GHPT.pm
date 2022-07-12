@@ -4,7 +4,7 @@ use App::GHPT::Wrapper::Ourperl;
 
 use v5.20;
 
-our $VERSION = '2.000000';
+our $VERSION = '2.000001';
 
 1;
 
@@ -22,7 +22,7 @@ App::GHPT - A command line tool to simplify using Github and Pivotal Tracker for
 
 =head1 VERSION
 
-version 2.000000
+version 2.000001
 
 =head1 SYNOPSIS
 
@@ -195,13 +195,17 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Dave Rolsky Florian Ragwitz gabe Greg Oschwald Kevin Phair Mark Fowler Narsimham Chelluri Nick Logan Patrick Cronin William Storey
+=for stopwords Dave Rolsky faktas2 Florian Ragwitz gabe Greg Oschwald Kevin Phair Mark Fowler Narsimham Chelluri Nick Logan Olaf Alders Patrick Cronin William Storey
 
 =over 4
 
 =item *
 
 Dave Rolsky <drolsky@maxmind.com>
+
+=item *
+
+faktas2 <104642023+faktas2@users.noreply.github.com>
 
 =item *
 
@@ -230,6 +234,10 @@ Narsimham Chelluri <nchelluri@maxmind.com>
 =item *
 
 Nick Logan <nlogan@gmail.com>
+
+=item *
+
+Olaf Alders <oalders@maxmind.com>
 
 =item *
 

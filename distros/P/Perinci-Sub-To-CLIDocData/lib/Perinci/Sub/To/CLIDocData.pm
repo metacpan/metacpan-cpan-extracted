@@ -8,9 +8,9 @@ use Perinci::Object;
 use Perinci::Sub::Util qw(err);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-08'; # DATE
+our $DATE = '2022-06-03'; # DATE
 our $DIST = 'Perinci-Sub-To-CLIDocData'; # DIST
-our $VERSION = '0.299'; # VERSION
+our $VERSION = '0.300'; # VERSION
 
 our %SPEC;
 
@@ -490,15 +490,15 @@ sub gen_cli_doc_data_from_meta {
             if ($copt && defined $copt->{key}) {
                 # group common options by key.
                 $key = "00common:" . $copt->{key};
-            } elsif ($ospecmeta->{is_alias} || $ospecmeta->{is_neg} || $ospecmeta->{is_json} || $ospecmeta->{is_yaml}) {
-                # put option from arg and its cmdline aliases or its json/yaml
-                # version and its negation version together as alternates.
+            } elsif (defined $ospecmeta->{arg}) {
                 $key = $ospecmeta->{arg};
             } else {
                 $key = $ospec;
                 $key =~ s/[=:].+\z//;
             }
             $key =~ s/_/-/g;
+
+            #say "D:ospec=$ospec -> key=$key, ospecmeta->{arg}=$ospecmeta->{arg}";
 
             $opt_locations{$key} //= scalar @plain_opts;
             push @{ $plain_opts[ $opt_locations{$key} ] }, $plain_opt;
@@ -592,7 +592,7 @@ Perinci::Sub::To::CLIDocData - From Rinci function metadata, generate structure 
 
 =head1 VERSION
 
-This document describes version 0.299 of Perinci::Sub::To::CLIDocData (from Perl distribution Perinci-Sub-To-CLIDocData), released on 2022-05-08.
+This document describes version 0.300 of Perinci::Sub::To::CLIDocData (from Perl distribution Perinci-Sub-To-CLIDocData), released on 2022-06-03.
 
 =head1 SYNOPSIS
 
@@ -847,7 +847,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2019, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

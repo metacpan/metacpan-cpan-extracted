@@ -1,5 +1,5 @@
 package DBIx::Class::ResultDDL::V0;
-use DBIx::Class::ResultDDL -exporter_setup => 1;
+use DBIx::Class::ResultDDL::V1 -exporter_setup => 1;
 use Carp;
 
 # ABSTRACT: Back-compat for version 0 of this module
@@ -82,7 +82,7 @@ DBIx::Class::ResultDDL::V0 - Back-compat for version 0 of this module
 
 =head1 VERSION
 
-version 1.01
+version 2.00
 
 =head1 DESCRIPTION
 
@@ -396,7 +396,7 @@ Michael Conrad <mconrad@intellitree.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Michael Conrad, IntelliTree Solutions llc.
+This software is copyright (c) 2022 by Michael Conrad, IntelliTree Solutions llc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

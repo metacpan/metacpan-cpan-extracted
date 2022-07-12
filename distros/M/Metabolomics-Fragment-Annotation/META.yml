@@ -35,5 +35,5 @@ requires:
   URI::Query: '0.16'
   XML::Twig: '3.48'
   perl: '5.006'
-version: v0.6.6
+version: v0.6.8
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

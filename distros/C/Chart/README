@@ -36,8 +36,9 @@ SYNOPSIS
         $imagemap_ref = $obj->imagemap_dump ();
 
 DESCRIPTION
-    This page gives you a summary how to use Chart. For more details please
-    visit the Chart::Manual.
+    Chart help you to create PNG and JPG images with visualizations of
+    numeric data. This page gives you a summary how to use it. For a more
+    thorough documentation please visit the Chart::Manual.
 
   use-ing Chart
     Okay, so you caught me. There's really no Chart::type module. All of the
@@ -77,7 +78,7 @@ DESCRIPTION
 
       $obj->set ('title' => 'Foo Bar');
 
-    Chart::Manual::Settings lists all currently supported keys and values.
+    Chart::Manual::Properties lists all currently supported keys and values.
 
   GIFgraph.pm-style API
     Sending the image to a file

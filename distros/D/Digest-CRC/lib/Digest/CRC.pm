@@ -18,7 +18,7 @@ require Exporter;
  crc64_hex crc64_base64
 );
 
-$VERSION    = '0.23';
+$VERSION    = '0.24';
 $XS_VERSION = $VERSION;
 #$VERSION    = eval $VERSION;
 
@@ -260,7 +260,8 @@ sub clone {
     refout => $self->{refout},
     _data => $self->{_data},
     cont => $self->{cont},
-    _tab => $self->{_tab}
+    _tab => $self->{_tab},
+    _crc => $self->{_crc}
   };
   bless $clone, ref $self || $self;
 }

@@ -4,7 +4,7 @@
 use v5.12;
 
 package Chart::Font;
-our $VERSION = 'v2.403.0';
+our $VERSION = 'v2.403.1';
 
 use Carp;
 

@@ -46,19 +46,23 @@ my $inc = '';
 my $lib = '-lunbound';
 my $nul = $^O eq 'MSWin32' ? 'nul' : '/dev/null';
 
-if ( my $dir = $ENV{UNBOUND_PREFIX} ) {
-	$inc = "-I$dir/include";
-	$lib = "-L$dir/lib -lunbound";
+if ( my $cfg = `pkg-config --libs --keep-system-libs libunbound 2>$nul` ) {
+	$inc = `pkg-config --cflags --keep-system-cflags libunbound 2>$nul`;
+	$lib = $cfg;
 
 } elsif (`pkg-config --modversion libunbound 2>$nul`) {
-	$inc = `pkg-config --cflags --keep-system-cflags libunbound 2>$nul`;
-	$lib = `pkg-config --libs   --keep-system-libs	 libunbound 2>$nul`;
+	$inc = `pkg-config --cflags libunbound 2>$nul`;
+	$lib = `pkg-config --libs   libunbound 2>$nul`;
 
 } elsif ( $^O eq 'MSWin32' ) {
 	$lib = '-llibunbound' if $Config{cc} =~ /cl/;
 	$lib = '-lunbound'    if $Config{cc} =~ /gcc/;
 }
 
+if ( my $dir = $ENV{UNBOUND_PREFIX} ) {
+	$inc = "-I$dir/include";
+	$lib = "-L$dir/lib -lunbound";
+}
 $inc = $ENV{UNBOUND_INCLUDE} if $ENV{UNBOUND_INCLUDE};
 $lib = $ENV{UNBOUND_LIB}     if $ENV{UNBOUND_LIB};
 

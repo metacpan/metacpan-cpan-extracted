@@ -1,0 +1,75 @@
+html, body{
+    padding: 0px;
+    margin: 0px;
+}
+
+body {
+    color: #ababab;
+    background: #000;
+    font-family: Segoe UI, Helvetica, Arial, Sans-Serif;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    padding-left: 25px;
+    background-color: #000; 
+    width: 100%;    
+}
+
+.body {    
+    /*margin-top: 90px;
+    margin-bottom: 200px;
+    padding-left: 25px;*/
+    position:absolute;
+    top:90px;
+    bottom: 200px;    
+    left: 25px;
+    right: 0px;
+    overflow: auto;    
+}
+
+#musicdb {
+    background-color:gray;
+    padding: 20px;
+    text-align: center;
+}
+
+#videotitle {
+    color: #000;
+}
+
+.track:hover {
+    background-color: yellow;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 200px;
+    padding-left: 25px;
+    background-color:blue;    
+}
+
+audio {
+    width: 80%; margin:20px;
+}
+
+#seekbar {
+    width: 60%; margin:20px;
+}
+
+.timedisplay {
+    width: 55px;
+}
+
+.controlbtns {
+    /*margin-right: 10px;
+    margin-left: 10px;*/
+    /*padding-right: 0px;    
+    padding-left: 0px;*/
+    padding: 0;
+    border-width: thick;
+}
+

@@ -58,9 +58,6 @@ msgid ""
 "```"
 msgstr ""
 
-msgid "Second, we execute the following commands."
-msgstr "次に、以下のコマンドを実行します。"
-
 msgid ""
 "```console\n"
 "% sudo dnf install -y perl-App-cpanminus\n"

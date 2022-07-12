@@ -1,0 +1,14 @@
+Changes
+lib/MHFS/XS.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+miniaudio/LICENSE
+miniaudio/miniaudio.h
+ppport.h
+README
+t/MHFS-XS.t
+typemap
+XS.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

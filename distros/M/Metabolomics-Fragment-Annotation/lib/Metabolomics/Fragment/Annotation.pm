@@ -62,13 +62,15 @@ Metabolomics::Fragment::Annotation - Perl extension for fragment annotation in m
 
 =head1 VERSION
 
-Version 0.6.4 - POD Update, multiAnnotation support in matching algo and writers, PeakForest REST API integration, supporting CSV and TSV as inputs (sniffer), HTML outputs
-Version 0.6.5 - Package architecture modification (PeakForest Part), POD improvement, Annotation results filtering based on scores
-Version 0.6.6 - Fix cpan bugs (#24) and fix several templates and properties issues (rel int, peakforest compliance, ...)
+	Version 0.6.4 - POD Update, multiAnnotation support in matching algo and writers, PeakForest REST API integration, supporting CSV and TSV as inputs (sniffer), HTML outputs
+	Version 0.6.5 - Package architecture modification (PeakForest Part), POD improvement, Annotation results filtering based on scores
+	Version 0.6.6 - Fix cpan bugs (#24) and fix several templates and properties issues (rel int, peakforest compliance, ...)
+	Version 0.6.7 - Fix tests issues + pod alignment
+	Version 0.6.8 - Version in progress (Plan is PeakForest LCMS + GCMS full compliance)
 
 =cut
 
-our $VERSION = '0.6.6';
+our $VERSION = '0.6.8';
 
 
 =head1 SYNOPSIS
@@ -551,7 +553,7 @@ sub compareExpMzToTheoMzListAllMatches {
     				$annotSpectralId = $theoFrag->_getPeak_ANNOTATION_SPECTRA_ID() if $theoFrag->_getPeak_ANNOTATION_SPECTRA_ID()  ;
     				# Get Cluster if exists in exp peak
     				$annotClusterId = $expFrag->_getPeak_CLUSTER_ID() if $expFrag->_getPeak_CLUSTER_ID()  ;
-#    				warn "\tMATCH! -> with $annotID\n " ;
+#    				warn "\tMATCH! -> with $annotID and $annotInchikey\n " ;
     				# compute error 
     				$deltaErrorMmu = _computeMzDeltaInMmu($fragMz, $motifMz) ;
     				$deltaErrorPpm = _computeMzDeltaInPpm($fragMz, $deltaErrorMmu) ;
@@ -2045,7 +2047,7 @@ sub _computeMzDeltaInMmu {
 
 =item PRIVATE_ONLY computeMzDeltaInPpm
 
-	## Description : compute a delta (PPM) between exp. mz and calc. mz - Δm/Monoisotopic calculated exact mass ×106 
+	## Description : compute a delta (PPM) between exp. mz and calc. mz - Delta m/Monoisotopic calculated exact mass * 100 
 	## Input : $expMz, $calcMz
 	## Output : $mzDeltaPpm
 	## Usage : my ( $mzDeltaPpm ) = computeMzDeltaInPpm ( $expMz, $calcMz ) ;
@@ -2091,7 +2093,7 @@ INRAE - UMR 1019 Human Nutrition Unit – Metabolism Exploration Platform Metabo
 
 =head1 SEE ALSO
 
-All information about FragNot should be find here: https://services.pfem.clermont.inra.fr/gitlab/fgiacomoni/fragnot
+All information about FragNot should be find here: https://services.pfem.clermont.inrae.fr/gitlab/fgiacomoni/metabolomics-fragment-annotation
 
 =head1 BUGS
 

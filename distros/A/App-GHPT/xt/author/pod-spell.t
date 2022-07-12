@@ -10,6 +10,7 @@ use Pod::Wordlist;
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+104642023
 Alders
 Alders'
 App
@@ -40,6 +41,7 @@ Meta
 Narsimham
 Nick
 OAuth
+Olaf
 Oschwald
 Oschwald's
 OurMoose
@@ -67,6 +69,7 @@ Wrapper
 autarch
 bin
 drolsky
+faktas2
 gabe
 gh
 goschwald
@@ -77,6 +80,7 @@ mark
 mfowler
 nchelluri
 nlogan
+oalders
 pcronin
 phair
 rafl

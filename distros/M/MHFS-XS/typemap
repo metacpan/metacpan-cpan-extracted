@@ -1,0 +1,5 @@
+TYPEMAP
+P_MHFS_XS_Track      T_PTROBJ
+
+
+

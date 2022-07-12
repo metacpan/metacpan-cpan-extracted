@@ -1,0 +1,79 @@
+{
+   "abstract" : "find or build and install libFLAC with development dependencies",
+   "author" : [
+      "Gavin Hayes <gahayes@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-libFLAC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build::MM" : "0.25"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "1.19",
+            "Alien::Build::MM" : "0.25",
+            "ExtUtils::MakeMaker" : "0",
+            "Sort::Versions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Build" : "0.25",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/G4Vi/MHFS/issues"
+      },
+      "homepage" : "https://github.com/G4Vi/MHFS",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/G4Vi/MHFS.git",
+         "web" : "https://github.com/G4Vi/MHFS"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_alienfile" : {
+      "generated_by" : "Alien::Build::MM version 2.50",
+      "requires" : {
+         "share" : {
+            "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
+            "Config" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "Net::SSLeay" : "1.49",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_serialization_backend" : "JSON::PP version 4.10"
+}

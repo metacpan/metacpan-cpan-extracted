@@ -1,0 +1,14 @@
+MYMETA\.
+Makefile$
+\..*\.swp
+\.git/
+\.gitattribute
+\.gitignore
+blib/
+cover_db/
+example/example.+
+example/local
+example/logs
+example/cpanfile.snapshot
+pm_to_blib
+tags

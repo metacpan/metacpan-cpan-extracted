@@ -1,0 +1,306 @@
+<html>
+<head>
+<style type="text/css">
+
+html, body{
+    padding: 0px;
+    margin: 0px;
+}
+
+body {
+    color: #ababab;
+    background: #000;
+    font-family: Segoe UI, Helvetica, Arial, Sans-Serif;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    padding-left: 25px;
+    background-color: #000; 
+    width: 100%;    
+}
+
+.body {    
+    margin-top: 90px;
+    margin-bottom: 200px;
+    padding-left: 25px;
+}
+
+.track:hover {
+    background-color: yellow;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 200px;
+    padding-left: 25px;    
+}
+
+audio {
+    width: 80%; margin:20px;
+}
+
+#seekbar {
+    width: 60%; margin:20px;
+}
+
+</style>
+<title>Music</title>
+</head>
+<body>
+<div class="header row">
+<h1>Music</h1>
+</div>
+<div class="body row scroll-y">
+<div id="musicdb">
+    <TMPL_VAR NAME="musicdb">
+    <br><br><br><br><br><br><br><br><br><br><br>
+</div>
+</div>
+<div class="footer row" style="background-color:blue;">    
+  
+    <table border="1" width="80%">
+    <tr><th>Previous</th><th>Now Playing</th><th>Next</th></tr>
+	<tr><td><div id="prev_text"></div></td><td><div id="play_text"></div></td><td><div id="next_text"></div></td></tr>  
+	</table> 
+    <input type="button" value="PREV" onclick="playPreviousTrack();"><audio id="mainplayer" controls="controls" preload="none"> <source id="audio_src" src=""></source></audio><input type="button" value="NEXT" onclick="playNextTrack()">
+	
+    <iframe src="static/250ms_silence.mp3" allow="autoplay" id="audio" style="display:none"></iframe>
+</div>
+    <script>
+        function GetItemPath(elm) {
+            var els = [];
+            var lastitem;
+            do {                        
+                var elmtemp = elm;
+                while(elmtemp.firstChild)
+                {
+                    elmtemp = elmtemp.firstChild;
+                }
+                if(elmtemp.textContent != lastitem) {                    
+                    lastitem = elmtemp.textContent;                   
+                    els.unshift(elmtemp.textContent);
+                }                       
+                
+                elm = elm.parentNode;                        
+            }while(elm.id != 'musicdb');
+            var path = '';
+            //console.log(els);
+            els.forEach(function(part) {
+                path += part + '/';
+            });
+            path = path.slice(0, -1);
+            return path;
+        }        
+
+        function GetChildTracks(path, nnodes) {
+            path += '/';
+            var nodes = [];        
+            for(var i = nnodes.length; i--; nodes.unshift(nnodes[i]));       
+            var tracks = [];            
+            nodes.splice(0, 1);
+            nodes.forEach( function ( node) {
+                if(node.childNodes.length == 1) {
+                    var newnodes = node.childNodes[0].childNodes[0].childNodes[0].childNodes;
+                    var nodearr = [];
+                    for(var i = newnodes.length; i--; nodearr.unshift(newnodes[i])); 
+                    var felm = nodearr[0].childNodes[0].textContent;       
+                    var ttracks = GetChildTracks(path + felm, nodearr);
+                    tracks = tracks.concat(ttracks);                                 
+                }
+                else {                    
+                    tracks.push(path + node.childNodes[0].childNodes[0].textContent);
+                }                
+                        
+            });            
+            return tracks;
+        }         
+           
+        var dbarea = document.getElementById('musicdb');
+        dbarea.addEventListener('click', function(e) {
+            if(e.target !== e.currentTarget) {
+                console.log(e.target + ' clicked with text ' + e.target.textContent);
+                if(e.target.textContent == 'Queue') {
+                    path = GetItemPath(e.target.parentNode.parentNode);                    
+                    console.log("Queuing - " + path);
+                    if(e.target.parentNode.tagName == 'TD') {
+                        queueTrack(path);
+                    }
+                    else {                                  
+                        var tracks = GetChildTracks(path, e.target.parentNode.parentNode.parentNode.childNodes);                        
+                        queueTracks(tracks);                        
+                    }
+                    e.preventDefault();
+                }
+                else if(e.target.textContent == 'Play') {
+                    path = GetItemPath(e.target.parentNode.parentNode);                    
+                    console.log("Playing - " + path);
+                    if(e.target.parentNode.tagName == 'TD') {
+                        playTrackNow(path);
+                    }
+                    else {
+                        var tracks = GetChildTracks(path, e.target.parentNode.parentNode.parentNode.childNodes);
+                        playTracksNow(tracks);                    
+                    }
+                    e.preventDefault();
+                }                
+            }
+            e.stopPropagation();        
+        });
+
+		const urlParams = new URLSearchParams(window.location.search);
+        const MAX_SAMPLE_RATE = urlParams.get('max_sample_rate');
+        const BITDEPTH = urlParams.get('bitdepth');        
+        var PTrackUrlParams;
+        var TrackQueue = []; 
+        var QueueIndex = 0;       
+		var finished = true;
+        
+        
+        
+        function AddPTrack(track) {
+            PTrackUrlParams.append('ptrack', track);            
+            window.history.replaceState('playlist', 'Title', 'music?' + PTrackUrlParams.toString());      
+        }
+        
+        
+        
+        
+        function play_track(track_index) { 
+            
+            var track = TrackQueue[track_index] || '';
+            			
+			if((track_index-1) >= 0) {
+			    document.getElementById('prev_text').innerHTML = '<span>' + TrackQueue[track_index-1] + '</span>';
+			}
+			else {
+                document.getElementById('prev_text').innerHTML = '<span></span>';
+			}
+			
+	        document.getElementById('play_text').innerHTML = '<span>' + track + '</span>';
+			
+			if((track_index+1) <= (TrackQueue.length - 1)) {
+			    document.getElementById('next_text').innerHTML = '<span>' + TrackQueue[track_index+1]+ '</span>';
+			}
+			else {
+				document.getElementById('next_text').innerHTML = '<span></span>';
+			}
+            
+            QueueIndex = track_index;
+            if(track != '') {   
+                var url = 'music_dl?name=' +  encodeURIComponent(track);
+                if(MAX_SAMPLE_RATE) url += '&max_sample_rate=' + MAX_SAMPLE_RATE; 
+                if(BITDEPTH) url += '&bitdepth=' + BITDEPTH;                
+	            document.getElementById('audio_src').src = url;	            
+                finished = false;                
+            }
+            else {
+                document.getElementById('audio_src').src = "";
+                finished = true;
+            }
+            document.getElementById('mainplayer').load();
+	        document.getElementById('mainplayer').play(); 			
+			
+        }        
+        
+        function onTrackEnd() {           
+            play_track(QueueIndex+1);            
+        }
+        document.getElementById('mainplayer').addEventListener("ended", onTrackEnd);
+        
+        
+          
+        function _queueTrack(track) {			           
+            TrackQueue.push(track);
+			if(finished) {
+				play_track(TrackQueue.length - 1);				
+			}            
+            else if(QueueIndex <= (TrackQueue.length - 2)) {
+                document.getElementById('next_text').innerHTML = '<span>' + TrackQueue[QueueIndex+1] + '</span>';
+            }            			
+        }
+        
+        function queueTrack(track) {
+            _queueTrack(track);
+            AddPTrack(track);
+        }
+        
+        function queueTracks(tracks) {
+            tracks.forEach(function(track) {
+                _queueTrack(track);
+                PTrackUrlParams.append('ptrack', track);  
+            });                      
+            window.history.replaceState('playlist', 'Title', 'music?' + PTrackUrlParams.toString());                        
+        }
+        
+
+        function playPreviousTrack() {
+			if(QueueIndex > 0) {
+                document.getElementById('mainplayer').pause();
+                play_track(QueueIndex-1);
+			}
+        }
+
+        function playNextTrack() {
+			if(QueueIndex <= (TrackQueue.length - 2)) {
+                document.getElementById('mainplayer').pause();
+                play_track(QueueIndex+1);
+			}
+        }
+
+        function playTrackNow(track) {
+			if(finished) {
+				queueTrack(track);
+			}
+			else {                           
+                TrackQueue.splice(QueueIndex+1, 0, track);           
+                playNextTrack();
+                BuildPTrack();                
+			}
+        }
+        
+        function playTracksNow(tracks) {
+            if(finished) {
+                queueTracks(tracks);                
+            }
+            else {
+                var i = 1;
+                tracks.forEach(function(track) {
+                    TrackQueue.splice(QueueIndex+i, 0, track);
+                    i++;                    
+                });
+                playNextTrack();
+                BuildPTrack();
+            }        
+        }
+        
+        function _BuildPTrack() {
+            PTrackUrlParams = new URLSearchParams();
+            if(MAX_SAMPLE_RATE) PTrackUrlParams.append('max_sample_rate', MAX_SAMPLE_RATE);
+            if(BITDEPTH) PTrackUrlParams.append('bitdepth', BITDEPTH);
+            TrackQueue.forEach(function(track) {
+                PTrackUrlParams.append('ptrack', track); 
+            });                  
+        }
+        
+        function BuildPTrack() {
+            _BuildPTrack();
+            var urlstring = PTrackUrlParams.toString();
+            if(urlstring != '') {
+                window.history.replaceState('playlist', 'Title', 'music_gapless?' + urlstring);
+            }
+        }
+        
+        _BuildPTrack();        
+        var orig_ptracks = urlParams.getAll('ptrack');
+        if(orig_ptracks.length > 0) {
+            queueTracks(orig_ptracks);
+        }    
+ 
+        
+    </script>   
+</body>
+</html>
