@@ -1,0 +1,74 @@
+{
+   "abstract" : "install all the new builtins from the builtin namespace (Perl 5.36+), and try our best on older versions of Perl",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "builtins-compat",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "builtins::compat" : {
+         "file" : "lib/builtins/compat.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tobyink/p5-builtins-compat/issues"
+      },
+      "homepage" : "https://metacpan.org/release/builtins-compat",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-builtins-compat.git",
+         "web" : "https://github.com/tobyink/p5-builtins-compat"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/builtins-compat/project"
+   },
+   "version" : "0.004",
+   "x_serialization_backend" : "JSON::PP version 4.09"
+}

@@ -1,24 +1,24 @@
-Revision history for Perl module YAMLScript
+0.0.7 Wed 13 Jul 2022 10:13:34 AM PDT
+ - Regenerate docs with fixed generator
+ - Add Use Cases to docs
 
-0.0.5 2022-07-05 17:21:40-07:00
+0.0.6 Tue 12 Jul 2022 09:25:45 PM PDT
+ - Complete rewrite of most Perl code
+ - Added initial documentation
 
-    - Refactor yamlscript modules into YS namespace
+0.0.5 Tue  5 Jul 2022 17:21:40 PM PDT
+ - Refactor yamlscript modules into YS namespace
 
-0.0.4 2022-07-04 11:27:15-07:00
+0.0.4 Mon  4 Jul 2022 11:27:00 PM PDT
+ - Add Mo::xx to dependencies
+ - Add blib/script to PATH at cpan test time
 
-    - Add Mo::xx to dependencies
-    - Add blib/script to PATH at cpan test time
+0.0.3 Mon  4 Jul 2022 00:38:00 PM PDT
+ - Add library module loading
+ - Support usage for writing YS tests
 
-0.0.3 2022-07-04 00:38:00-07:00
+0.0.2 Sun  3 Jul 2022 15:37:00 PM PDT
+ - Fix bin shebang lines
 
-    - Add library module loading
-    - Support usage for writing YS tests
-
-0.0.2 2022-07-03 15:37:00-07:00
-
-    - Fix bin shebang lines
-
-0.0.1 2022-07-03 14:33:00-07:00
-
-    - Initial release
-
+0.0.1 Sun  3 Jul 2022 14:33:00 PM PDT
+ - Initial release

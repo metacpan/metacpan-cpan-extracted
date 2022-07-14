@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 a26ac3ee50623a9e99af0bf23bcc8d6a9a0358c25c48c94d3ebae742605231c7 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 7359445ea121a7589571699083a1cf42074d7c87430b20b3ff54ff247d9a1474 Changes
+SHA256 5d89eb61b174978df55f82b6c2e26e68979fe8f33db4eeed40bacc5420f3d946 INSTALL
+SHA256 a4f85c6f4d6e8bdd37b7ab08013e3e3bee1fe8e910e20f8f54d5025ffe40f384 LICENSE
+SHA256 51637735716a08333320ba8e944135fa94c5a1613eb63ddccbd8af92e5151a42 MANIFEST
+SHA256 9db536a2e7d2de1b014391b9b81aaac2c7c6e65058f53589fe2fcc2201837d54 META.json
+SHA256 e9dad3519a876b2ebfc3dace46ae105093c839cc09bc9aecd61393ef6678b163 META.yml
+SHA256 0b59f2a9f4eb5bf9d8686b4826a3d44e1ede0afc138dd741132a94dd1d3a0f52 Makefile.PL
+SHA256 d5ee6e82cd8e177db07dc4b59b0830e5752b1866e568a4758b7de7ad3087863c README
+SHA256 06e361f51fde635451ba9b548f959357c0a599a98f3a76ff07e88ad65106430e bin/type-library-compile
+SHA256 cc708bc8a2e0fe57b89c565ba409a30a75c2e081d400f723e23bdd27be37ea32 dist.ini
+SHA256 8bdf01e53a5c3a2b3743434e7df1569fc3c3f7e735a3d171a7d1228c2ceb40dc doap.ttl
+SHA256 1814aa2b375193fd13f2fb4fcc849ea770768a661018d16e01a539cdf38504fe examples/Example.pm
+SHA256 5e49e4da446cd18495ce63e8493842d52e94ddfbeb75d5846b77cc42f2390aa2 examples/make-example.pl
+SHA256 e17d6e997ecc72f4ee2d8cb7ec191f1427d9787859a77d805f6e2048e89ac4ce lib/Type/Library/Compiler.pm
+SHA256 ae99d77d2c146edd1ff69e2afae7b0a646ebc1334d7b5eddab55634fa9d0b3ae lib/Type/Library/Compiler.pm.mite.pm
+SHA256 6e4ff60f5cd9de968bd981dd2ce34ea6801c1064edb0da6d8f104f42c5114b09 lib/Type/Library/Compiler/Mite.pm
+SHA256 e3c968a2cf53ad85938ec7cc79fe8ecad0d37c1ca20d726663a0f98ca15c7000 t/01basic.t
+SHA256 c46d17d95c2bed49780d2776d7b00fa5de0aa25d4cffe6c0f17e7a7ec24fce8a t/02example-library.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCYs70DQAKCRDOv4Eoaip9
+OSMPAJ41DH/vJE/+0mJqlNAc6iwLVqxY9gCfai38O5X749fqX0pNOP8atiEhQ9A=
+=RXat
+-----END PGP SIGNATURE-----

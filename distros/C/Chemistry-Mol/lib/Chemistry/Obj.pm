@@ -1,6 +1,6 @@
 package Chemistry::Obj;
 
-our $VERSION = '0.38'; # VERSION
+our $VERSION = '0.39'; # VERSION
 # $Id$
 
 use 5.006;

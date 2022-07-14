@@ -1,0 +1,45 @@
+---
+abstract: 'compile a bunch of type constraints into a library with no non-core dependencies'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test2::V0: '0'
+  Test::Requires: '0'
+  Types::Standard: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Type-Library-Compiler
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Type::Library::Compiler:
+    file: lib/Type/Library/Compiler.pm
+    version: '0.005'
+  Type::Library::Compiler::Mite:
+    file: lib/Type/Library/Compiler/Mite.pm
+requires:
+  perl: '5.008001'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Type-Library-Compiler/project
+  bugtracker: https://github.com/tobyink/p5-type-library-compiler/issues
+  homepage: https://metacpan.org/release/Type-Library-Compiler
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-type-library-compiler.git
+version: '0.005'
+x_provides_scripts:
+  type-library-compile:
+    file: bin/type-library-compile
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

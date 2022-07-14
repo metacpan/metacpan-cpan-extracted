@@ -1,0 +1,1 @@
+<& /Callbacks/RT-Extension-MandatoryOnTransition/Ticket/Update.html/AfterWorked, LabelCols => 2, ExcludeCustomFields => 'Resolution', %ARGS &>

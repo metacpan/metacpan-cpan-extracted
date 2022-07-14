@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,16 +24,16 @@ no_index:
 provides:
   Amazon::S3:
     file: lib/Amazon/S3.pm
-    version: '0.53'
+    version: '0.54'
   Amazon::S3::Bucket:
     file: lib/Amazon/S3/Bucket.pm
-    version: '0.53'
+    version: '0.54'
   Amazon::S3::Constants:
     file: lib/Amazon/S3/Constants.pm
-    version: '0.53'
+    version: '0.54'
   Amazon::S3::Logger:
     file: lib/Amazon/S3/Logger.pm
-    version: '0.53'
+    version: '0.54'
 requires:
   Class::Accessor::Fast: '0.51'
   Digest::HMAC_SHA1: '1.04'
@@ -41,15 +41,16 @@ requires:
   HTTP::Date: '6.02'
   LWP::UserAgent::Determined: '1.07'
   List::Util: '1.5'
+  Net::Amazon::Signature::V4: '0'
   Readonly: '2.05'
   Test::Output: '1.033'
   URI: '5.10'
   URI::Escape: '5.10'
-  XML::Simple: '2.25'
+  XML::LibXML: '0'
   perl: '5.01'
 resources:
   bugtracker: http://github.com/rlauer6/perl-amazon-s3/issues
   homepage: http://github.com/rlauer6/perl-amazon-s3
   repository: git://github.com/rlauer6/perl-amazon-s3.git
-version: '0.53'
+version: '0.54'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

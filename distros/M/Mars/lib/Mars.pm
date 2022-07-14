@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # AUTHORITY
 
@@ -60,7 +60,7 @@ OO Framework for Perl 5
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut
 
@@ -70,16 +70,10 @@ OO Framework for Perl 5
 
   use Mars::Class;
 
-  base 'Person';
-
-  with 'Identity';
-
+  attr 'fname';
+  attr 'lname';
   attr 'email';
-  attr 'login';
-  attr 'password';
   attr 'trust';
-
-  test 'Authenticable';
 
   sub BUILD {
     shift->{trust} = true;
@@ -92,7 +86,11 @@ OO Framework for Perl 5
     lname => 'Alderson',
   );
 
-  # bless({fname => 'Elliot', lname => 'Alderson'}, 'User')
+  # bless({
+  #   'fname' => 'Elliot',
+  #   'lname' => 'Alderson',
+  #   'trust' => 1
+  # }, 'User')
 
 =cut
 

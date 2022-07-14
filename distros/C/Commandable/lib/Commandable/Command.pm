@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Commandable::Command 0.07;
+package Commandable::Command 0.08;
 
 use v5.14;
 use warnings;
@@ -119,6 +119,13 @@ sub parse_invocation
    foreach my $argspec ( $self->arguments ) {
       my $val = $cinv->pull_token;
       if( defined $val ) {
+         if( $argspec->slurpy ) {
+            my @vals = ( $val );
+            while( defined( $val = $cinv->pull_token ) ) {
+               push @vals, $val;
+            }
+            $val = \@vals;
+         }
          push @args, $val;
       }
       elsif( !$argspec->optional ) {
@@ -140,12 +147,13 @@ sub new
 {
    my $class = shift;
    my %args = @_;
-   bless [ @args{qw( name description optional )} ], $class;
+   bless [ @args{qw( name description optional slurpy )} ], $class;
 }
 
 sub name        { shift->[0] }
 sub description { shift->[1] }
 sub optional    { shift->[2] }
+sub slurpy      { shift->[3] }
 
 package # hide
    Commandable::Command::_Option;

@@ -7,7 +7,7 @@ use alienfile;
 use Path::Tiny;
 
 my $pkg_name = 'cpgplot';
-my $pkg_version = '5.2.2-8';
+my $pkg_version = '5.2.2-9';
 
 plugin 'Gather::IsolateDynamic';
 

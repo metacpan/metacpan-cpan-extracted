@@ -1,0 +1,29 @@
+---
+abstract: 'Provide builtin functions for older perl versions'
+author:
+  - 'haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: builtin-compat
+no_index:
+  directory:
+    - t
+    - xt
+requires:
+  namespace::clean: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=builtin-compat
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/haarg/builtin-compat.git
+version: '0.001001'
+x_authority: cpan:HAARG
+x_breaks: {}
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,5 @@
 package App::Greple::frame;
-our $VERSION = "0.03";
+our $VERSION = "0.05";
 
 =encoding utf-8
 
@@ -28,28 +28,54 @@ B<--no-join-blocks> option.
 
 =item B<--frame>
 
-Set frame options.
-
+=for comment
 =item B<--frame-fold>
 
 Set frame and fold long lines with frame-friendly prefix string.
-Folding width is taken from terminal.  If you want to use different
-width, use B<ansifold> command by yourself.
+Folding width is taken from the terminal.  Or you can specify the
+width by calling B<set> function with module option.
+
+=begin comment
+
+=item B<--frame-simple>
+
+Set frame without folding.
+
+=end comment
 
 =back
 
 Put next line in your F<~/.greplerc> to autoload B<App::Greple::frame> module.
 
-    autoload -Mframe --frame --frame-fold
+    autoload -Mframe --frame
 
-Then you can use B<--frame> and B<--frame-fold> option whenever you
-want.
+Then you can use B<--frame> option whenever you want.
 
 =begin html
 
-<p><img width="75%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-frame/main/images/terminal-small.png">
+<p><img width="75%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-frame/main/images/terminal-2.png">
 
 =end html
+
+=head1 FUNCTION
+
+=over 7
+
+=item B<set>(B<width>=I<n>)
+
+Set terminal width to I<n>.  Use like this:
+
+    greple -Mframe::set(width=80) ...
+
+    greple -Mframe::set=width=80 ...
+
+If non-digit character is found in the value part, it is considered as
+a Reverse Polish Notation, starting terminal width pushed on the
+stack.  Next command set C<terminal-width / 2 - 3>.
+
+    greple -Mframe::set=width=2/3- ...
+
+=back
 
 =head1 SEE ALSO
 
@@ -76,6 +102,10 @@ my($mod, $argv);
 my $width;
 my($head, $blockend, $file_start, $file_end);
 
+my %param = (
+    width => undef,
+);
+
 sub terminal_width {
     use Term::ReadKey;
     my $default = 80;
@@ -89,9 +119,14 @@ sub terminal_width {
     $size[0] or $default;
 }
 
-sub initialize {
+sub finalize {
     ($mod, $argv) = @_;
-    $width = terminal_width;
+    $width = $param{width} || terminal_width;
+    if ($width =~ /\D/) {
+	require App::Greple::frame::RPN
+	    and App::Greple::frame::RPN->import('rpn_calc');
+	$width = int(rpn_calc(terminal_width, $width)) or die "$width: format error\n";
+    }
     
     my $frame_top    = '      ┌─' . ('─' x ($width - 8));
     my $frame_middle = '    ⋮ ├╶' . ('╶' x ($width - 8));
@@ -103,21 +138,33 @@ sub initialize {
 	'--frame-middle' => "'$frame_middle'",
 	'--frame-bottom' => "'$frame_bottom'",
 	);
+    $mod->setopt(
+	'--ansifold',
+	'--pf' => "'ansifold -x --width=$width --prefix \"      │ \"'",
+	);
+}
+
+sub set {
+    while (my($k, $v) = splice(@_, 0, 2)) {
+	exists $param{$k} or next;
+	$param{$k} = $v;
+    }
+    ();
 }
 
 1;
 
 __DATA__
 
-option --frame \
+option --frame-simple \
 	-n --join-blocks \
-	--colormap=LINE= \
 	--filestyle=once \
-	--format=LINE='%5d │ ' \
-	--format=FILE='%s' \
+	--colormap LINE=       --format LINE='%5d │ ' \
+	--colormap FILE=555/CE --format FILE=' 📂 %s' \
 	--blockend= \
 	--show-frame
 
 option --frame-fold \
-	--frame \
-	--pf 'ansifold --width=term --prefix "      │ "'
+	--frame-simple --ansifold
+
+option --frame --frame-fold

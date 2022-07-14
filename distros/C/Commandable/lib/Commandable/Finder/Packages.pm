@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::Packages 0.07;
+package Commandable::Finder::Packages 0.08;
 
 use v5.14;
 use warnings;
@@ -131,6 +131,11 @@ to generate a list of argument specifications. Default C<COMMAND_ARGS>.
 Optional. Gives the name of the method inside each command package to invoke
 to generate a list of option specifications. Default C<COMMAND_OPTS>.
 
+=item code_method => STR
+
+Optional. Gives the name of the method inside each command package which
+implements the actual command behaviour. Default C<run>.
+
 =item named_by_package => BOOL
 
 Optional. If true, the name of each command will be taken from its package
@@ -142,6 +147,9 @@ C<name_method> will be used instead.
 If either name or description method are missing from a package, that package
 is silently ignored.
 
+Any additional arguments are passed to the C<configure> method to be used as
+configuration options.
+
 =cut
 
 sub new
@@ -149,21 +157,22 @@ sub new
    my $class = shift;
    my %args = @_;
 
-   my $base = $args{base} or croak "Require 'base'";
+   my $base = ( delete $args{base} ) or croak "Require 'base'";
 
-   my $name_method        = $args{name_method}        // "COMMAND_NAME";
-   my $description_method = $args{description_method} // "COMMAND_DESC";
-   my $arguments_method   = $args{arguments_method}   // "COMMAND_ARGS";
-   my $options_method     = $args{options_method}     // "COMMAND_OPTS";
+   my $name_method        = ( delete $args{name_method} )        // "COMMAND_NAME";
+   my $description_method = ( delete $args{description_method} ) // "COMMAND_DESC";
+   my $arguments_method   = ( delete $args{arguments_method} )   // "COMMAND_ARGS";
+   my $options_method     = ( delete $args{options_method} )     // "COMMAND_OPTS";
+   my $code_method        = ( delete $args{code_method} )        // "run"; # App-csvtool
 
-   undef $name_method if $args{named_by_package};
+   undef $name_method if delete $args{named_by_package};
 
    my $mp = Module::Pluggable::Object->new(
       search_path => $base,
       require     => 1,
    );
 
-   return bless {
+   my $self = bless {
       mp      => $mp,
       base    => $base,
       methods => {
@@ -171,8 +180,13 @@ sub new
          desc => $description_method,
          args => $arguments_method,
          opts => $options_method,
+         code => $code_method,
       },
    }, $class;
+
+   $self->configure( %args ) if %args;
+
+   return $self;
 }
 
 sub packages
@@ -200,21 +214,23 @@ sub _commands
             ? $pkg->$name_method
             : ( $pkg =~ s/\Q$self->{base}\E:://r );
 
+         my $code = $pkg->can( $self->{methods}{code} ) or next;
+
          my $desc = ( $pkg->can( $self->{methods}{desc} ) or next )->( $pkg );
 
          my $args;
-         if( my $code = $pkg->can( $self->{methods}{args} ) ) {
+         if( my $argsmeth = $pkg->can( $self->{methods}{args} ) ) {
             $args = [
-               map { Commandable::Command::_Argument->new( %$_ ) } $code->( $pkg )
+               map { Commandable::Command::_Argument->new( %$_ ) } $pkg->$argsmeth
             ];
          }
 
          my $opts;
-         if( my $code = $pkg->can( $self->{methods}{opts} ) ) {
+         if( my $optsmeth = $pkg->can( $self->{methods}{opts} ) ) {
             $opts = {
                map { my $o = Commandable::Command::_Option->new( %$_ );
                      map { ( $_ => $o ) } $o->names
-                   } $code->( $pkg )
+                   } $pkg->$optsmeth
             };
          }
 
@@ -225,6 +241,7 @@ sub _commands
             options     => $opts,
 
             package => $pkg,
+            code    => $code,
          );
       }
 

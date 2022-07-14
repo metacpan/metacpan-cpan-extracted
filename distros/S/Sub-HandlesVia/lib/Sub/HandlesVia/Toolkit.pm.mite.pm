@@ -1,10 +1,12 @@
 {
 
     package Sub::HandlesVia::Toolkit;
-    our $USES_MITE = "Mite::Class";
-    our $MITE_SHIM = "Sub::HandlesVia::Mite";
     use strict;
     use warnings;
+
+    our $USES_MITE    = "Mite::Class";
+    our $MITE_SHIM    = "Sub::HandlesVia::Mite";
+    our $MITE_VERSION = "0.006011";
 
     sub new {
         my $class = ref( $_[0] ) ? ref(shift) : shift;

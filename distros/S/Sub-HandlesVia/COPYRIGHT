@@ -158,19 +158,19 @@ Files: README
 Copyright: This software is copyright (c) 2020, 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/20moosex_extended.t
- t/31egpod_dummy.t
- t/40mite/00-basic.t
- t/40mite/01-roles.t
-Copyright: This software is copyright (c) 2022 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: INSTALL
  LICENSE
  Makefile.PL
  t/40mite/.mite/config
 Copyright: Unknown
 License: Unknown
+
+Files: t/20moosex_extended.t
+ t/31egpod_dummy.t
+ t/40mite/00-basic.t
+ t/40mite/01-roles.t
+Copyright: This software is copyright (c) 2022 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
  CREDITS

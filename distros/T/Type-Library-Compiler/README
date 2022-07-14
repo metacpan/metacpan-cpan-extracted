@@ -1,0 +1,63 @@
+NAME
+    Type::Library::Compiler - compile a bunch of type constraints into a
+    library with no non-core dependencies
+
+SYNOPSIS
+      type-library-compiler --module=MyApp::Types Types::Standard=-all
+
+DESCRIPTION
+    This class performs the bulk of the work for type-library-compiler.
+
+  Constructor
+   `new( %attributes )`
+  Attributes
+   `types` Map[ NonEmptyStr => Object ]
+    Required hash of Type::Tiny objects. Hash keys are the names the types
+    will have in the generated library.
+
+   `pod` Bool
+    Should the generated module include pod? Defaults to true.
+
+   `destination_module` NonEmptyStr
+    Required Perl module name to produce.
+
+   `constraint_module` NonEmptyStr
+    Leave this as the default.
+
+   `destination_filename` NonEmptyStr
+    Leave this as the default.
+
+  Object Methods
+   `compile_to_file()`
+    Writes the module to `destination_filename`.
+
+   `compile_to_string()`
+    Returns the module as a string of Perl code.
+
+  Class Methods
+   `parse_list( @argv )`
+    Parses a list of strings used to specify type constraints on the command
+    line, and returns a hashref of Type::Tiny objects, suitable for the
+    `types` attribute.
+
+BUGS
+    Please report any bugs to
+    <https://github.com/tobyink/p5-type-library-compiler/issues>.
+
+SEE ALSO
+    Mite, Type::Library, Type::Tiny.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2022 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

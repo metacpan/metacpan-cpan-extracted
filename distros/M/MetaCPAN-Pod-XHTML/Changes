@@ -1,5 +1,8 @@
 Revision history for MetaCPAN-Pod-XHTML
 
+0.003002 - 2022-07-13
+  - fix links to sections with characters that must be encoded
+
 0.003001 - 2022-07-12
   - fix StripVerbatimIndent when applied to classes using BUILD, such as
     MetaCPAN::Pod::XHTML

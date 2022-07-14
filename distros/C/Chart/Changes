@@ -1,9 +1,16 @@
+2.403.2 2022-08-13 lichtkind
+-------
+    * = POD fix release
+    * ? completed properties page in manual
+    * ? started types page in manual with first test example
+    * ! linkfixes on landing POD of Chart.pm
+    * ! linkfixes on Color::Constants.pm POD 
+
 2.403.1 2022-08-12 lichtkind
 -------
     * = POD fix release
-    * ? completed most pod on properties
-    * ? all names in Constants.POD
-    * ! linkfixes on landing POD of Chart.pm
+    * ? completed most of properties
+    * ? all names listed in Color::Constants.POD
 
 2.403.0 2022-08-07 lichtkind
 -------

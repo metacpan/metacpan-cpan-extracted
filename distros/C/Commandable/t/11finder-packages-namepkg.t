@@ -9,10 +9,12 @@ use Commandable::Finder::Packages;
 
 package MyTest::Command::one {
    use constant COMMAND_DESC => "the one command";
+   sub run {}
 }
 
 package MyTest::Command::two {
    use constant COMMAND_DESC => "the two command";
+   sub run {}
 }
 
 package MyTest::Command::nothing {

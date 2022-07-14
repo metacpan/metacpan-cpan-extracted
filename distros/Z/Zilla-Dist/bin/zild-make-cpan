@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-set -e
+set -e -u -o pipefail
 
-main() {
+main() (
   setup
   (
     set -x
@@ -12,14 +12,14 @@ main() {
     add-test-000
     add-dist-ini
   )
-  [ -x tool/make-cpan ] && tool/make-cpan
+  [[ -x tool/make-cpan ]] && tool/make-cpan
   make-doc
   make-alias
 
-  if [ -e pkg/make-cpan ]; then
+  if [[ -e pkg/make-cpan ]]; then
     ./pkg/make-cpan
   fi
-}
+)
 
 setup() {
   : "${PERL:=$(which perl)}"
@@ -29,95 +29,106 @@ setup() {
   mkdir cpan
 
   CP_RL='cp -rL'
-  if [[ "$OSTYPE" =~ ^darwin|^freebsd ]]; then
+  if [[ $OSTYPE =~ ^darwin|^freebsd ]]; then
     CP_RL='cp -r'
   fi
 }
 
-add-test() {
-  if [ -d test ]; then
-    cp -r test cpan/t
+add-test() (
+  if [[ -d test ]]; then
+    cp -r -L test cpan/t
   else
     mkdir cpan/t
   fi
-  if [ -d cpan/t/extra ]; then
+
+  if [[ -d cpan/t/extra ]]; then
     mv cpan/t/extra cpan/xt
-  elif [ -d cpan/t/devel ]; then
+  elif [[ -d cpan/t/devel ]]; then
     mv cpan/t/devel cpan/xt
   fi
-  rm -fr cpan/t/misc cpan/t/fail
-}
 
-add-standard-files() {
+  rm -fr cpan/t/misc cpan/t/fail
+)
+
+add-standard-files() (
   cp Changes cpan
+
   # XXX Maybe should be CONTRIBUTING.pod
-  $PERL -S zild-render-template \
+  "$PERL" -S zild-render-template \
     Contributing \
     cpan/CONTRIBUTING
-  [ -e bin ] && cp -r bin cpan
-  [ -e eg ] && cp -r eg cpan/example
+
+  [[ -e bin ]] && cp -r bin cpan
+  [[ -e eg ]] && cp -r eg cpan/example
+
   cp -r lib cpan
-  if [ -e share ]; then
+
+  if [[ -e share ]]; then
     $CP_RL share cpan
   fi
-}
+)
 
-fix-hashbangs() {
-  if [ "`echo cpan/bin/*`" != 'cpan/bin/*' ]; then
-    $PERL -spi -e 's{^#!/usr/bin/env perl}{#!/usr/bin/perl}' cpan/bin/*
+fix-hashbangs() (
+  if [[ $(echo cpan/bin/*) != 'cpan/bin/*' ]]; then
+    "$PERL" -spi -e 's{^#!/usr/bin/env perl}{#!/usr/bin/perl}' cpan/bin/*
   fi
-}
+)
 
-add-test-000() {
-  if [ "$($ZILD meta =zild/test-000)" == require ]; then
-    $PERL -S zild-render-template \
+add-test-000() (
+  if [[ $($ZILD meta =zild/test-000) == require ]]; then
+    "$PERL" -S zild-render-template \
       test/000-require-modules.t \
       cpan/t/000-require-modules.t
-  elif [ "$($ZILD meta =zild/test-000)" == none ]; then
+  elif [[ $($ZILD meta =zild/test-000) == none ]]; then
     true  # Nothing
   else
-    $PERL -S zild-render-template \
+    "$PERL" -S zild-render-template \
       test/000-compile-modules.t \
       cpan/t/000-compile-modules.t
   fi
-}
+)
 
-add-dist-ini() {
-  $PERL -S zild-render-template dist.ini cpan/dist.ini
-}
+add-dist-ini() (
+  "$PERL" -S zild-render-template dist.ini cpan/dist.ini
+)
 
-make-doc() {
-  for swim in $(find doc -type f -name '*.swim'); do
-    pod="${swim/doc/cpan/lib}"
-    pod="${pod/.swim/.pod}"
+make-doc() (
+  for doc in $(
+    find doc \( -type f -o -type l \) -a \( -name '*.md' -o -name '*.swim' \)
+  ); do
+    pod=${doc/doc/cpan/lib}
+    pod=${pod/.md/.pod}
+    pod=${pod/.swim/.pod}
     mkdir -p "$(dirname "$pod")"
-    if (grep -E '^=+$' "$swim" &> /dev/null) ||
-       (grep -E '^<<<cpan-head>>>$' "$swim" &> /dev/null)
-    then
-      (
-        set -x
-        swim --to=pod --meta=Meta --pod-cpan "$swim" > "$pod"
-      )
+    if [[ $doc == *.md ]]; then
+      zild-pandoc-json-to-pod < "$doc" > "$pod"
     else
-      (
-        set -x
-        swim --to=pod --meta=Meta --complete --wrap "$swim" > "$pod"
-      )
+      if (grep -E '^=+$' "$doc" &> /dev/null) ||
+        (grep -E '^<<<cpan-head>>>$' "$doc" &> /dev/null)
+      then
+        (
+          set -x
+          swim --to=pod --meta=Meta --pod-cpan "$doc" > "$pod"
+        )
+      else
+        (
+          set -x
+          swim --to=pod --meta=Meta --complete --wrap "$doc" > "$pod"
+        )
+      fi
     fi
   done
-}
+)
 
-make-alias() {
-  alias="$($PERL -S zild meta =zild/alias)"
-  if [ -n "$alias" ]; then
+make-alias() (
+  alias=$($PERL -S zild meta =zild/alias)
+  if [[ $alias ]]; then
     for a in "${alias[@]}"; do
-      $PERL -S zild-render-template
+      "$PERL" -S zild-render-template
     done
   fi
-}
+)
 
-[ "${BASH_SOURCE[0]}" == "$0" ] && main "$@"
-
-true
+[[ ${BASH_SOURCE[0]} != "$0" ]] || main "$@"
 
 # vim: set ft=sh sw=2 lisp:

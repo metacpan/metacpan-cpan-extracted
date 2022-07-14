@@ -1,3 +1,8 @@
+0.106   2022-06-04  Released-By: PERLANCAR; Urgency: medium
+
+        - [actions uniq, nauniq] Add option --case-insensitive (-i).
+
+
 0.105   2022-06-02  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
         - [incompatible change] Change shortcut for --exclude-columns from -e to

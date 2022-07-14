@@ -29,6 +29,9 @@ sub import {
   if (!*{"${from}::false"}{"CODE"}) {
     *{"${from}::false"} = sub {require Mars; Mars::false()};
   }
+  if (!*{"${from}::from"}{"CODE"}) {
+    *{"${from}::from"} = sub {@_ = ($from, @_); goto \&from};
+  }
   if (!*{"${from}::role"}{"CODE"}) {
     *{"${from}::role"} = sub {@_ = ($from, @_); goto \&role};
   }
@@ -39,7 +42,7 @@ sub import {
     *{"${from}::true"} = sub {require Mars; Mars::true()};
   }
   if (!*{"${from}::with"}{"CODE"}) {
-    *{"${from}::with"} = sub {@_ = ($from, @_); goto \&role};
+    *{"${from}::with"} = sub {@_ = ($from, @_); goto \&test};
   }
 
   ${"${from}::META"} = {};
@@ -59,6 +62,14 @@ sub base {
   my ($from, @args) = @_;
 
   $from->BASE(@args);
+
+  return $from;
+}
+
+sub from {
+  my ($from, @args) = @_;
+
+  $from->FROM(@args);
 
   return $from;
 }
@@ -114,7 +125,7 @@ Class Declaration for Perl 5
 
   sub EXPORT {
     # explicitly declare routines to be consumed
-    return ['id', 'login', 'password'];
+    ['id', 'login', 'password']
   }
 
   package Authenticable;
@@ -127,12 +138,14 @@ Class Declaration for Perl 5
 
   sub AUDIT {
     my ($self, $from) = @_;
-    die "${from} missing Identity role" if !$from->does('Identity');
+    # ensure the caller has a login and password when consumed
+    die "${from} missing the login attribute" if !$from->can('login');
+    die "${from} missing the password attribute" if !$from->can('password');
   }
 
   sub EXPORT {
     # explicitly declare routines to be consumed
-    return ['authenticate'];
+    ['authenticate']
   }
 
   package User;
@@ -140,6 +153,7 @@ Class Declaration for Perl 5
   use Mars::Class;
 
   base 'Person';
+
   with 'Identity';
 
   attr 'email';
@@ -270,6 +284,45 @@ I<Since C<0.01>>
   my $true = !false;
 
   # 1
+
+=back
+
+=cut
+
+=head2 from
+
+  from(Str $name) (Str)
+
+The from function registers one or more base classes for the calling package
+and performs an L<"audit"|Mars::Kind/AUDIT>. This function is always exported
+unless a routine of the same name already exists.
+
+I<Since C<0.03>>
+
+=over 4
+
+=item from example 1
+
+  package Entity;
+
+  use Mars::Class;
+
+  sub AUDIT {
+    my ($self, $from) = @_;
+    die "Missing startup" if !$from->can('startup');
+    die "Missing shutdown" if !$from->can('shutdown');
+  }
+
+  package Example;
+
+  use Mars::Class;
+
+  attr 'startup';
+  attr 'shutdown';
+
+  from 'Entity';
+
+  # "Example"
 
 =back
 
@@ -432,8 +485,9 @@ I<Since C<0.01>>
   with(Str $name) (Str)
 
 The with function registers and consumes roles for the calling package. This
-function is an alias of the L</role> function. This function is always exported
-unless a routine of the same name already exists.
+function is an alias of the L</test> function and will perform an
+L<"audit"|Mars::Kind/AUDIT> if present. This function is always exported unless
+a routine of the same name already exists.
 
 I<Since C<0.01>>
 

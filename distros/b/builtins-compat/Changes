@@ -1,0 +1,31 @@
+builtins-compat
+===============
+
+Created:      2022-07-14
+Home page:    <https://metacpan.org/release/builtins-compat>
+Bug tracker:  <https://github.com/tobyink/p5-builtins-compat/issues>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.004	2022-07-14
+
+ [ Bug Fixes ]
+ - Minor fixes for created_as_number, bool, and trim.
+
+ [ Other ]
+ - Minor speed improvement for indexed.
+
+0.003	2022-07-14
+
+ [ Documentation ]
+ - Improved SYNOPSIS.
+
+ [ Other ]
+ - Smarter import function allowing you to select which functions to
+   import.
+
+0.002	2022-07-14
+
+ [ Documentation ]
+ - Fix link to issue tracker.
+
+0.001	2022-07-14	Initial release

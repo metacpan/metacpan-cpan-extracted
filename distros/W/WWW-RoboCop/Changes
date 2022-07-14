@@ -1,5 +1,8 @@
 Revision history for WWW-RoboCop
 
+0.000101  2022-07-14 16:16:48Z
+    - Make examples/crawl-host.pl more flexible (GH#3) (Olaf Alders)
+
 0.000100  2020-07-08 22:46:45Z
     - Replace 'whitelist' term with 'allowed' (GH#1) (Andy Jack)
       is_url_whitelisted has now been superceded by is_url_allowed. No major

@@ -1,10 +1,12 @@
 {
 
     package Sub::HandlesVia::CodeGenerator;
-    our $USES_MITE = "Mite::Class";
-    our $MITE_SHIM = "Sub::HandlesVia::Mite";
     use strict;
     use warnings;
+
+    our $USES_MITE    = "Mite::Class";
+    our $MITE_SHIM    = "Sub::HandlesVia::Mite";
+    our $MITE_VERSION = "0.006011";
 
     BEGIN {
         require Scalar::Util;
@@ -79,10 +81,7 @@
         }
 
         # Attribute: env
-        do {
-            my $value = exists( $args->{"env"} ) ? $args->{"env"} : {};
-            $self->{"env"} = $value;
-        };
+        $self->{"env"} = ( exists( $args->{"env"} ) ? $args->{"env"} : {} );
 
         # Attribute: generator_for_slot
         if ( exists $args->{"generator_for_slot"} ) {
@@ -219,36 +218,24 @@
         }
 
         # Attribute: is_method
-        do {
-            my $value =
-              exists( $args->{"is_method"} ) ? $args->{"is_method"} : "1";
-            $self->{"is_method"} = $value;
-        };
+        $self->{"is_method"} =
+          ( exists( $args->{"is_method"} ) ? $args->{"is_method"} : "1" );
 
         # Attribute: get_is_lvalue
-        do {
-            my $value =
-              exists( $args->{"get_is_lvalue"} )
-              ? $args->{"get_is_lvalue"}
-              : "";
-            $self->{"get_is_lvalue"} = $value;
-        };
+        $self->{"get_is_lvalue"} = (
+            exists( $args->{"get_is_lvalue"} )
+            ? $args->{"get_is_lvalue"}
+            : "" );
 
         # Attribute: set_checks_isa
-        do {
-            my $value =
-              exists( $args->{"set_checks_isa"} )
-              ? $args->{"set_checks_isa"}
-              : "";
-            $self->{"set_checks_isa"} = $value;
-        };
+        $self->{"set_checks_isa"} = (
+            exists( $args->{"set_checks_isa"} )
+            ? $args->{"set_checks_isa"}
+            : "" );
 
         # Attribute: set_strictly
-        do {
-            my $value =
-              exists( $args->{"set_strictly"} ) ? $args->{"set_strictly"} : "1";
-            $self->{"set_strictly"} = $value;
-        };
+        $self->{"set_strictly"} =
+          ( exists( $args->{"set_strictly"} ) ? $args->{"set_strictly"} : "1" );
 
         # Enforce strict constructor
         my @unknown = grep not(

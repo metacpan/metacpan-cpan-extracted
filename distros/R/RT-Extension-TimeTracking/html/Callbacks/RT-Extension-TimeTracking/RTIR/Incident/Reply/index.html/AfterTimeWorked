@@ -1,0 +1,29 @@
+<div class="form-row">
+  <div class="label col-2">
+    <span class="name <% $cf->EntryHint ? 'prev-icon-helper' : '' %>"><% $cf->Name %>:</span>\
+% if ( $cf->EntryHint ) {
+<span class="far fa-question-circle icon-helper" data-toggle="tooltip" data-placement="top" data-original-title="<% $cf->EntryHint %>"></span>
+% }
+  </div>
+  <div class="value col-8">
+    <& /Elements/EditCustomField,
+      %ARGS,
+      CustomField => $cf,
+      Object => RT::Transaction->new( $session{'CurrentUser'} ),
+    &>
+%   if (my $msg = $m->notes('InvalidField-' . $cf->Id)) {
+    <br />
+    <span class="cfinvalidfield"><% $msg %></span>
+%   }
+</div>
+
+<%INIT>
+my $cfs = $TicketObj->TransactionCustomFields();
+$cfs->Limit( FIELD => 'Name', VALUE => 'Worked Date', CASESENSITIVE => 0 );
+my $cf = $cfs->First or return;
+return unless $cf->CurrentUserHasRight('ModifyCustomField');
+</%INIT>
+
+<%ARGS>
+$TicketObj
+</%ARGS>

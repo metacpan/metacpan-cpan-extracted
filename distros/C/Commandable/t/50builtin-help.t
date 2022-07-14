@@ -18,11 +18,13 @@ package MyTest::Command::one {
       { name => "verbose|v", description => "verbose option" },
       { name => "target|t:", description => "target option" },
    );
+   sub run {}
 }
 
 package MyTest::Command::two {
    use constant COMMAND_NAME => "two";
    use constant COMMAND_DESC => "the two command";
+   sub run {}
 }
 
 my $finder = Commandable::Finder::Packages->new(

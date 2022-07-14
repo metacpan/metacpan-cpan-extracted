@@ -3,7 +3,7 @@ use v5.12;
 # named colors from X11, HTML (SVG) standard and Pantone report
 
 package Chart::Color::Constant;
-our $VERSION = 'v2.403.1';
+our $VERSION = 'v2.403.2';
 use Carp;
 use Chart::Color::Value;
 
@@ -1118,10 +1118,10 @@ frenchblue, greenash, burntcoral, mint, amethystorchid, raspberrysorbet,
 inkwell, ultimategray, buttercream, desertmist, willow
 
 =for HTML <p>
-<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/color/table/color_table0.png" alt="color table 1">
-<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/color/table/color_table1.png" alt="color table 2">
-<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/color/table/color_table2.png" alt="color table 3">
-<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/color/table/color_table3.png" alt="color table 4">
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/function/color/table/color_table0.png" alt="color table 1">
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/function/color/table/color_table1.png" alt="color table 2">
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/function/color/table/color_table2.png" alt="color table 3">
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/function/color/table/color_table3.png" alt="color table 4">
 </p>
 
 =head1 COPYRIGHT & LICENSE

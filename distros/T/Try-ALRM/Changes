@@ -1,0 +1,18 @@
+Revision history for Perl extension Try::ALRM. 
+
+0.1  Wed Jul 13 11:05:09 2022
+	- original version, released as 0.1
+        - super basic unit test, will add more for bugs
+          and regressions
+
+0.2  Wed Jul 13 11:05:10 2022
+        - added tests
+        - fixed some POD
+
+0.3  Wed Jul 13 11:05:11 2022
+        - added some POD to acknowledge Try::Tiny's
+          exported 'try' keyword and early thoughs
+          regarding the clobbering of this keyword.
+          The TLDR; is to not export Tiny::ALRM::try
+          and to reference it using the full namespace.
+        - added example script using both modules

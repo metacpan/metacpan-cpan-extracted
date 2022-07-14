@@ -1,11 +1,14 @@
 use strict; use warnings;
 package Zilla::Dist;
-our $VERSION = '0.1.5';
+our $VERSION = '0.1.8';
 
-use YAML::XS;
-use File::Share;
-use IO::All;
 use version;
+use File::Share;
+use Hash::Merge 'merge';
+use IO::All;
+use YAML::PP;
+
+use XXX;
 
 sub new {
     my $class = shift;
@@ -27,10 +30,20 @@ sub run {
     }
     my $method = "do_$cmd";
     $self->usage, return unless $self->can($method);
-    $self->{meta} = -f 'Meta'
-      ? YAML::XS::LoadFile('Meta')
-      : {};
+    $self->{meta} = $self->get_meta;
     $self->$method(@args);
+}
+
+sub get_meta {
+    my ($self) = @_;
+    my $meta = -f 'Meta'
+      ? YAML::PP::LoadFile('Meta')
+      : {};
+    if (my $base_file = delete($meta->{base})) {
+        my $base = YAML::PP::LoadFile($base_file);
+        $meta = merge($base, $meta);
+    }
+    return $meta;
 }
 
 sub do_make {
@@ -105,7 +118,7 @@ sub do_meta {
 sub do_changes {
     my ($self, $key, $value) = @_;
     return if $self->{meta}{'=zild'}{no_changes_yaml};
-    my @changes = YAML::XS::LoadFile('Changes');
+    my @changes = YAML::PP::LoadFile('Changes');
     $self->validate_changes(\@changes);
     return unless @changes;
     if ($value) {
@@ -231,7 +244,7 @@ sub do_years {
         map {($_ => 1)} grep {$_} map {
             $_->{date} =~ /(\d{4})/;
             $1;
-        } (YAML::XS::LoadFile('Changes'));
+        } (YAML::PP::LoadFile('Changes'));
     };
     return if $@;
     print join(' ', sort keys %hash) . "\n";

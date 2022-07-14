@@ -1,5 +1,8 @@
 Revision history for Perl module JavaScript::Embedded
 
+2.7.2 2022-07-14
+    - Implement compile install time (Sisyphus)
+
 2.7.1 2022-06-28
     - Fix POD and Metadata
 

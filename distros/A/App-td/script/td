@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-02'; # DATE
+our $DATE = '2022-06-05'; # DATE
 our $DIST = 'App-td'; # DIST
-our $VERSION = '0.105'; # VERSION
+our $VERSION = '0.106'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/td/td",
@@ -38,11 +38,11 @@ td - Manipulate table data
 
 =head1 VERSION
 
-This document describes version 0.105 of td (from Perl distribution App-td), released on 2022-06-02.
+This document describes version 0.106 of td (from Perl distribution App-td), released on 2022-06-05.
 
 =head1 SYNOPSIS
 
-% B<td> [B<--detail>|B<-l>|B<--no-detail>|B<--nodetail>] [(B<--exclude-column>=I<str>)+] [B<--format>=I<name>|B<--json>] [(B<--include-column>=I<str>)+] [B<--lines>=I<str>] [B<--(no)naked-res>] [B<--no-header-column>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--repeat>|B<-r>|B<--no-repeat>|B<--norepeat>] [B<--weight-column>=I<str>] [B<--exclude-columns-json>=I<json>|(B<-E>=I<str>)+] [B<--include-columns-json>=I<json>|(B<-I>=I<str>)+] [B<-n>=I<str>] -- E<lt>I<action>E<gt> [I<argv>] ...
+% B<td> [B<--case-insensitive>|B<-i>] [B<--detail>|B<-l>|B<--no-detail>|B<--nodetail>] [(B<--exclude-column>=I<str>)+|B<--exclude-columns-json>=I<json>|(B<-E>=I<str>)+] [B<--format>=I<name>|B<--json>] [(B<--include-column>=I<str>)+|B<--include-columns-json>=I<json>|(B<-I>=I<str>)+] [B<--lines>=I<str>|B<-n>=I<str>] [B<--(no)naked-res>] [B<--no-header-column>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--repeat>|B<-r>|B<--no-repeat>|B<--norepeat>] [B<--weight-column>=I<str>] -- E<lt>I<action>E<gt> [I<argv>] ...
 
 =head1 DESCRIPTION
 
@@ -270,6 +270,8 @@ Can be specified multiple times.
 
 =over
 
+=item B<--case-insensitive>, B<-i>
+
 =item B<--exclude-column>=I<s@>, B<-E>
 
 Can be specified multiple times.
@@ -423,6 +425,8 @@ Don't make the first column as column names of the transposed table; instead cre
 =head2 Uniq action options
 
 =over
+
+=item B<--case-insensitive>, B<-i>
 
 =item B<--exclude-column>=I<s@>, B<-E>
 

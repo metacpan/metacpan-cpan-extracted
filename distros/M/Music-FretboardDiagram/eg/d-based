@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# Show top 3-string triads with D in the bass
+
+# For author testing only:
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Chord-Guitar Music-FretboardDiagram);
+
+use Algorithm::Combinatorics qw(variations_with_repetition);
+use Data::Dumper::Compact qw(ddc);
+use MIDI::Chord::Guitar;
+use Music::FretboardDiagram;
+
+my $frets = shift || 5;   # number of frets to display
+
+my $mcg = MIDI::Chord::Guitar->new(
+    # For author testing only:
+    voicing_file => '/home/gene/sandbox/MIDI-Chord-Guitar/share/midi-guitar-chord-voicings.csv'
+);
+
+my @specs;
+my $iter = variations_with_repetition([0 .. 4], 3);
+while (my $v = $iter->next) {
+    my $string = join '', @$v;
+    push @specs, [ 1, 'xx0' . $string ];
+}
+
+my $i = 0;
+
+for my $spec (@specs) {
+    $i++;
+
+    my $dia = Music::FretboardDiagram->new(
+      frets    => $frets,
+      chord    => [ $spec ],
+      absolute => 1,
+      outfile  => sprintf('%s-%02d', $0, $i),
+      horiz    => 1,
+      size     => 50,
+      verbose  => 1,
+    );
+
+    $dia->draw;
+}

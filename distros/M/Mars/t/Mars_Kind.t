@@ -571,6 +571,77 @@ EOF
   ok $result->DOES('Admin');
 });
 
+subtest('example-1 FROM', sub {
+  my $result = eval <<'EOF';
+  package Entity;
+
+  use base 'Mars::Kind';
+
+  sub AUDIT {
+    my ($self, $from) = @_;
+    die "Missing startup" if !$from->can('startup');
+    die "Missing shutdown" if !$from->can('shutdown');
+  }
+
+  package User;
+
+  use base 'Mars::Kind';
+
+  User->ATTR('startup');
+  User->ATTR('shutdown');
+
+  User->FROM('Entity');
+
+  package main;
+
+  my $user = User->BLESS;
+
+  # bless({}, 'User')
+EOF
+  ok $result->isa('User');
+  ok $result->isa('Entity');
+  ok $result->can('startup');
+  ok $result->can('shutdown');
+});
+
+subtest('example-2 FROM', sub {
+  my $result = eval <<'EOF';
+  package Entity;
+
+  use base 'Mars::Kind';
+
+  sub AUDIT {
+    my ($self, $from) = @_;
+    die "Missing startup" if !$from->can('startup');
+    die "Missing shutdown" if !$from->can('shutdown');
+  }
+
+  package User;
+
+  use base 'Mars::Kind';
+
+  User->FROM('Entity');
+
+  sub startup {
+    return;
+  }
+
+  sub shutdown {
+    return;
+  }
+
+  package main;
+
+  my $user = User->BLESS;
+
+  # bless({}, 'User')
+EOF
+  ok $result->isa('User');
+  ok $result->isa('Entity');
+  ok $result->can('startup');
+  ok $result->can('shutdown');
+});
+
 subtest('example-1 IMPORT', sub {
   no warnings 'once';
   my $result = eval <<'EOF';
@@ -629,7 +700,7 @@ subtest('example-1 META', sub {
 EOF
   ok $result->isa('Mars::Meta');
   ok $result->{name} eq 'User';
-  is_deeply $result->bases, ['Engineer', 'Entity', 'Mars::Kind'];
+  is_deeply $result->bases, ['Entity', 'Engineer', 'Mars::Kind'];
   is_deeply [sort @{$result->roles}], ['Admin', 'HasType'];
 });
 

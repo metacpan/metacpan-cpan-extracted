@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Draw fretboard chord diagrams
 
-our $VERSION = '0.1312';
+our $VERSION = '0.1313';
 
 use Moo;
 use strictures 2;
@@ -530,7 +530,7 @@ Music::FretboardDiagram - Draw fretboard chord diagrams
 
 =head1 VERSION
 
-version 0.1312
+version 0.1313
 
 =head1 SYNOPSIS
 

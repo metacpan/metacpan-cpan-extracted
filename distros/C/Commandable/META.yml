@@ -18,32 +18,32 @@ name: Commandable
 provides:
   Commandable:
     file: lib/Commandable.pm
-    version: '0.07'
+    version: '0.08'
   Commandable::Command:
     file: lib/Commandable/Command.pm
-    version: '0.07'
+    version: '0.08'
   Commandable::Finder:
     file: lib/Commandable/Finder.pm
-    version: '0.07'
+    version: '0.08'
   Commandable::Finder::Packages:
     file: lib/Commandable/Finder/Packages.pm
-    version: '0.07'
+    version: '0.08'
   Commandable::Finder::SubAttributes:
     file: lib/Commandable/Finder/SubAttributes.pm
-    version: '0.07'
+    version: '0.08'
   Commandable::Finder::SubAttributes::Attrs:
     file: lib/Commandable/Finder/SubAttributes/Attrs.pm
-    version: '0.07'
+    version: '0.08'
   Commandable::Invocation:
     file: lib/Commandable/Invocation.pm
-    version: '0.07'
+    version: '0.08'
   Commandable::Output:
     file: lib/Commandable/Output.pm
-    version: '0.07'
+    version: '0.08'
 requires:
   Module::Pluggable::Object: '0'
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

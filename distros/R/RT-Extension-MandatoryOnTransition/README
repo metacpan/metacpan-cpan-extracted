@@ -8,6 +8,8 @@ RT VERSION
     RT 4.0 and 4.2 are now end-of-life, so compatibility with newer versions
     of this extension is unknown.
 
+    Also works with RTIR 5.0.3 and later
+
 DESCRIPTION
     This RT extension enforces that certain fields have values before
     tickets are explicitly moved to or from specified statuses. If you list
@@ -85,6 +87,12 @@ INSTALLATION
             rm -rf /opt/rt5/var/mason_data/obj
 
     Restart your webserver
+
+    If running with RTIR, the Plugin line for RTIR must come first in your
+    configuration as shown below.
+
+        Plugin('RT::IR');
+        Plugin('RT::Extension::MandatoryOnTransition');
 
 CONFIGURATION
     To define which fields should be mandatory on certain status changes
@@ -322,7 +330,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-MandatoryOnTransition>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2012-2020 by Best Pracical Solutions,
+    This software is Copyright (c) 2012-2022 by Best Pracical Solutions,
     LLC.
 
     This is free software, licensed under:

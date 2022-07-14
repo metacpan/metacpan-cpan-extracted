@@ -25,5 +25,5 @@ requires:
   Inline::C: '0.75'
 resources:
   repository: https://cavac.at/public/mercurial/JavaScript-Embedded/
-version: v2.7.1
+version: v2.7.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

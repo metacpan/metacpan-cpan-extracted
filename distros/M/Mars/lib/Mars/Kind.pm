@@ -106,6 +106,16 @@ sub EXPORT {
   return [];
 }
 
+sub FROM {
+  my ($self, $base) = @_;
+
+  $self->BASE($base);
+
+  $base->AUDIT($self->NAME) if $base->can('AUDIT');
+
+  return $self;
+}
+
 sub IMPORT {
   my ($self, $into) = @_;
 
@@ -202,9 +212,11 @@ Kind Base Class for Perl 5
     lname => 'Alderson',
   );
 
-  # i.e. User->BUILD(bless(User->ARGS(User->BUILDARGS(@args) || User->DATA), 'User'))
-
   # bless({fname => 'Elliot', lname => 'Alderson'}, 'User')
+
+  # i.e. BLESS is somewhat equivalent to writing
+
+  # User->BUILD(bless(User->ARGS(User->BUILDARGS(@args) || User->DATA), 'User'))
 
 =cut
 
@@ -371,7 +383,7 @@ I<Since C<0.01>>
 
   my $user = User->BLESS;
 
-  # bless({}, 'User')
+  # Exception! Consumer missing "type" attribute
 
 =back
 
@@ -408,7 +420,8 @@ I<Since C<0.01>>
   BASE(Str $name) (Str | Object)
 
 The BASE method is a class building lifecycle hook which registers a base class
-for the calling package.
+for the calling package. B<Note:> Unlike the L</FROM> hook, this hook doesn't
+invoke the L</AUDIT> hook.
 
 I<Since C<0.01>>
 
@@ -849,6 +862,85 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 from
+
+  FROM(Str $name) (Str | Object)
+
+The FROM method is a class building lifecycle hook which registers a base class
+for the calling package, automatically invoking the L</AUDIT> hook on the base
+class.
+
+I<Since C<0.03>>
+
+=over 4
+
+=item FROM example 1
+
+  package Entity;
+
+  use base 'Mars::Kind';
+
+  sub AUDIT {
+    my ($self, $from) = @_;
+    die "Missing startup" if !$from->can('startup');
+    die "Missing shutdown" if !$from->can('shutdown');
+  }
+
+  package User;
+
+  use base 'Mars::Kind';
+
+  User->ATTR('startup');
+  User->ATTR('shutdown');
+
+  User->FROM('Entity');
+
+  package main;
+
+  my $user = User->BLESS;
+
+  # bless({}, 'User')
+
+=back
+
+=over 4
+
+=item FROM example 2
+
+  package Entity;
+
+  use base 'Mars::Kind';
+
+  sub AUDIT {
+    my ($self, $from) = @_;
+    die "Missing startup" if !$from->can('startup');
+    die "Missing shutdown" if !$from->can('shutdown');
+  }
+
+  package User;
+
+  use base 'Mars::Kind';
+
+  User->FROM('Entity');
+
+  sub startup {
+    return;
+  }
+
+  sub shutdown {
+    return;
+  }
+
+  package main;
+
+  my $user = User->BLESS;
+
+  # bless({}, 'User')
+
+=back
+
+=cut
+
 =head2 import
 
   IMPORT(Str $into, Any @args) (Str | Object)
@@ -977,7 +1069,8 @@ I<Since C<0.01>>
   ROLE(Str $name) (Str | Object)
 
 The ROLE method is a class building lifecycle hook which consumes the role
-provided, automatically invoking the role's L</IMPORT> hook.
+provided, automatically invoking the role's L</IMPORT> hook. B<Note:> Unlike
+the L</TEST> and L</WITH> hooks, this hook doesn't invoke the L</AUDIT> hook.
 
 I<Since C<0.01>>
 
@@ -1083,36 +1176,38 @@ I<Since C<0.01>>
 
   use base 'Mars::Kind';
 
-  package IsAdmin;
-
-  use base 'Mars::Kind';
-
-  sub shutdown {
-    return;
-  }
-
   sub AUDIT {
     my ($self, $from) = @_;
-    die "${from} is not a super-user" if !$from->DOES('Admin');
+    die "Missing startup" if !$from->can('startup');
+    die "Missing shutdown" if !$from->can('shutdown');
   }
 
-  sub EXPORT {
-    ['shutdown']
+  sub AUDIT_BUILD {
+    my ($self, $data) = @_;
+    die "Attribute 'startup' can't be undefined" if !$self->startup;
+    die "Attribute 'shutdown' can't be undefined" if !$self->shutdown;
   }
 
   package User;
 
   use base 'Mars::Kind';
 
-  User->ROLE('Admin');
+  User->ATTR('startup');
+  User->ATTR('shutdown');
 
-  User->TEST('IsAdmin');
+  User->TEST('Admin');
+
+  sub BUILD {
+    my ($self, $data) = @_;
+    # Using AUDIT_BUILD as a callback
+    $self->Admin::AUDIT_BUILD($data);
+  }
 
   package main;
 
-  my $user = User->BLESS;
+  my $user = User->BLESS(startup => 'hello');
 
-  # bless({}, 'User')
+  # Exception! Attribute 'shutdown' can't be undefined
 
 =back
 

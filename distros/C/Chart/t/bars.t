@@ -29,7 +29,6 @@ $g->add_dataset( 50000, 70000, 20200,  80000.8, 40000 );
     'tick_len'     => '3',
     'x_ticks'      => 'vertical',
     'include_zero' => 'true',
-    'pt_size'      => '7',
     'skip_x_ticks' => '1',
     'grid_lines'   => 'true',
     'colors'       => {

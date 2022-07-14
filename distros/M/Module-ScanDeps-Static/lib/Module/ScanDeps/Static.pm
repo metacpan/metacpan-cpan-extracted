@@ -3,7 +3,7 @@ package Module::ScanDeps::Static;
 use strict;
 use warnings;
 
-our $VERSION = '0.5';
+our $VERSION = '0.6';
 
 use 5.010;
 
@@ -161,7 +161,8 @@ sub is_core {
 
     # print {*STDERR} "$first_release_version $min_core_version";
 
-    $core = $first_release_version <= $min_core_version;
+    $core = version->parse($first_release_version)
+      <= version->parse($min_core_version) ? 1 : 0;
 
   } ## end if (@ms)
 

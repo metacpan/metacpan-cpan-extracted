@@ -10,6 +10,10 @@ my $build = Module::Build->new(
     configure_requires => {
         'Alien::Base::Wrapper' => '0',
         'Alien::LibJQ'         => '>= 0.04',
+        'Module::Build'        => '0.42',
+    },
+    test_requires  => {
+        'Test::Number::Delta'  => '0',
     },
     requires       => {
         'Alien::LibJQ'         => '>= 0.04',

@@ -22,24 +22,35 @@ lines into a single block.  If you don't like this, override it by
 
 - **--frame**
 
-    Set frame options.
-
-- **--frame-fold**
-
     Set frame and fold long lines with frame-friendly prefix string.
-    Folding width is taken from terminal.  If you want to use different
-    width, use **ansifold** command by yourself.
+    Folding width is taken from the terminal.  Or you can specify the
+    width by calling **set** function with module option.
 
 Put next line in your `~/.greplerc` to autoload **App::Greple::frame** module.
 
-    autoload -Mframe --frame --frame-fold
+    autoload -Mframe --frame
 
-Then you can use **--frame** and **--frame-fold** option whenever you
-want.
+Then you can use **--frame** option whenever you want.
 
 <div>
-    <p><img width="75%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-frame/main/images/terminal-small.png">
+    <p><img width="75%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-frame/main/images/terminal-2.png">
 </div>
+
+# FUNCTION
+
+- **set**(**width**=_n_)
+
+    Set terminal width to _n_.  Use like this:
+
+        greple -Mframe::set(width=80) ...
+
+        greple -Mframe::set=width=80 ...
+
+    If non-digit character is found in the value part, it is considered as
+    a Reverse Polish Notation, starting terminal width pushed on the
+    stack.  Next command set `terminal-width / 2 - 3`.
+
+        greple -Mframe::set=width=2/3- ...
 
 # SEE ALSO
 

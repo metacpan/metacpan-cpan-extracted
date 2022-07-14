@@ -1,0 +1,7 @@
+class TestCase::Digest::SHA {
+  use Digest::SHA;
+  static method test : int () {
+    
+    return 1;
+  }
+}

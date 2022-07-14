@@ -4,7 +4,7 @@
       "Ingy d\u00f6t Net <ingy@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -35,28 +35,30 @@
       },
       "runtime" : {
          "requires" : {
+            "Archive::Tar::Wrapper" : "0.38",
             "CPAN::Uploader" : "0.103007",
-            "Dist::Zilla" : "6.012",
-            "Dist::Zilla::Plugin::ChangesFromYaml" : "0.004",
-            "Dist::Zilla::Plugin::GithubMeta" : "0.46",
-            "Dist::Zilla::Plugin::ReadmeFromPod" : "0.30",
+            "Capture::Tiny" : "0.48",
+            "Dist::Zilla" : "6.025",
+            "Dist::Zilla::Plugin::ChangesFromYaml" : "0.005",
+            "Dist::Zilla::Plugin::GithubMeta" : "0.58",
+            "Dist::Zilla::Plugin::ReadmeFromPod" : "0.37",
             "Dist::Zilla::Plugin::TestBaseIncluder" : "0.09",
-            "Dist::Zilla::Plugin::TestML1Includer" : "v0.0.1",
-            "Dist::Zilla::Plugin::TestMLIncluder" : "0.12",
-            "Dist::Zilla::PluginBundle::Git" : "2.029",
+            "Dist::Zilla::Plugin::TestML1Includer" : "v0.0.2",
+            "Dist::Zilla::Plugin::TestMLIncluder" : "0.19",
+            "Dist::Zilla::PluginBundle::Git" : "2.048",
             "ExtUtils::MakeMaker" : "6.98",
             "File::Share" : "0.25",
-            "Hash::Merge" : "0.200",
-            "IO::All" : "0.86",
-            "JSON" : "2.90",
-            "Swim" : "v0.1.35",
+            "Hash::Merge" : "0.302",
+            "IO::All" : "0.87",
+            "JSON::PP" : "4.1",
+            "Swim" : "v0.1.48",
             "Swim::Plugin::badge" : "v0.1.8",
-            "Swim::Plugin::cpan" : "v0.0.5",
+            "Swim::Plugin::cpan" : "v0.0.7",
             "Template::Toolkit::Simple" : "0.31",
-            "Test::Pod" : "1.48",
-            "YAML::XS" : "0.55",
+            "Test::Pod" : "1.52",
+            "YAML::PP" : "0.034",
             "perl" : "v5.8.1",
-            "version" : "0.9908"
+            "version" : "0.9929"
          }
       }
    },
@@ -72,8 +74,9 @@
          "web" : "https://github.com/ingydotnet/zilla-dist-pm"
       }
    },
-   "version" : "0.1.5",
+   "version" : "0.1.8",
    "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

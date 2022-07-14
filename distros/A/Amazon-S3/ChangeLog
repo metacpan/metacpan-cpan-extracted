@@ -1,3 +1,10 @@
+Wed Jul 13 13:09:04 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.54 - merge timmullin changes]:
+	* src/main/perl/lib/Amazon/S3.pm.in: see commit history
+	- use XML::LibXML
+	* src/main/perl/lib/Amazon/Bucket.pm.in: see commit history
+
 Tue Jun 21 12:57:31 2022  Rob Lauer  <rlauer6@comcast.net>
 
 	[0.53 - unit test perl > 5.010]:

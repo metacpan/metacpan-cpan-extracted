@@ -1,7 +1,7 @@
 package Pod::Simple::Role::XHTML::RepairLinkEncoding;
 use Moo::Role;
 
-our $VERSION = '0.003001';
+our $VERSION = '0.003002';
 $VERSION =~ tr/_//d;
 
 use HTML::Entities qw(decode_entities encode_entities);
@@ -42,7 +42,7 @@ around idify => sub {
   my ($text, $not_unique) = @_;
 
   $text = decode_entities($text)
-    if $self->{__in_end_item_text} || $self->{__in_end_head};
+    if $self->{__in_end_item_text} || $self->{__in_end_head} || $self->{__resolving_link};
   $text =~ s/<[^>]+>//g
     if $self->{__in_end_item_text};
 

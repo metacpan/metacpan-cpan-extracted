@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{mb},
-    'VERSION'   => q{0.44},
+    'VERSION'   => q{0.45},
     'ABSTRACT'  => q{Can easy script in Big5, Big5-HKSCS, GBK, Sjis, UHC, UTF-8, ...},
     'PREREQ_PM' => {
         'Cwd' => '0',

@@ -55,6 +55,16 @@ or do {
     *Devel::GlobalDestruction::in_global_destruction = sub { undef; };
 };
 
+{
+    no strict 'refs';
+    my $GUARD_PACKAGE = __PACKAGE__ . '::Guard';
+    *{"$GUARD_PACKAGE\::DESTROY"} = sub { $_[0][1]->() unless $_[0][0] };
+    *{"$GUARD_PACKAGE\::restore"} = sub { $_[0]->DESTROY; $_[0][0] = 1 };
+    *{"$GUARD_PACKAGE\::dismiss"} = sub {                 $_[0][0] = 1 };
+    *{"$GUARD_PACKAGE\::peek"}    = sub { $_[0][2] };
+    *guard = sub (&) { bless [ 0, @_ ] => $GUARD_PACKAGE };
+}
+
 my $parse_mm_args = sub {
     my $coderef = pop;
     my $names   = [ map { ref($_) ? @$_ : $_ } @_ ];
@@ -150,18 +160,30 @@ sub _make_has {
 
     no strict 'refs';
     return sub {
-        my ( $names, %args, $code ) = @_;
+        my $names = shift;
+        if ( @_ % 2 ) {
+            my $default = shift;
+            unshift @_, ( 'CODE' eq ref( $default ) )
+                ? ( is => lazy, builder => $default )
+                : ( is => ro, default => $default );
+        }
+        my %spec = @_;
+        my $code;
+
         for my $name ( ref($names) ? @$names : $names ) {
            $name =~ s/^\+//;
 
-           'CODE' eq ref( $code = $args{default} )
+           'CODE' eq ref( $code = $spec{default} )
                and ${"$caller\::__$name\_DEFAULT__"} = $code;
 
-           'CODE' eq ref( $code = $args{builder} )
+           'CODE' eq ref( $code = $spec{builder} )
                and *{"$caller\::_build_$name"} = $code;
 
-           'CODE' eq ref( $code = $args{trigger} )
+           'CODE' eq ref( $code = $spec{trigger} )
                and *{"$caller\::_trigger_$name"} = $code;
+
+           'CODE' eq ref( $code = $spec{clone} )
+               and *{"$caller\::_clone_$name"} = $code;
         }
 
         return;

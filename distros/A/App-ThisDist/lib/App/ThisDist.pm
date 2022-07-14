@@ -8,9 +8,9 @@ use Exporter qw(import);
 use File::chdir;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-03'; # DATE
+our $DATE = '2022-06-05'; # DATE
 our $DIST = 'App-ThisDist'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 our @EXPORT_OK = qw(this_dist this_mod);
 
@@ -211,7 +211,7 @@ App::ThisDist - Print Perl {distribution,module,author,...} associated with curr
 
 =head1 VERSION
 
-This document describes version 0.015 of App::ThisDist (from Perl distribution App-ThisDist), released on 2022-05-03.
+This document describes version 0.016 of App::ThisDist (from Perl distribution App-ThisDist), released on 2022-06-05.
 
 =head1 DESCRIPTION
 
@@ -279,7 +279,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

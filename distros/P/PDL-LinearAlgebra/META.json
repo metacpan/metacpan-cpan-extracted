@@ -55,7 +55,7 @@
          "web" : "https://github.com/PDLPorters/pdl-linearalgebra"
       }
    },
-   "version" : "0.32",
+   "version" : "0.33",
    "x_IRC" : "irc://irc.perl.org/#pdl",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

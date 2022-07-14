@@ -1,5 +1,8 @@
 Revision history for RT-Extension-MandatoryOnTransition
 
+0.22 2022-07-13
+ - Add RTIR support
+
 0.21 2021-10-29
  - Call RT method CustomFieldValueIsEmpty to perform additional custom
    field checks. This specifically improves checks for date custom fields

@@ -7,7 +7,6 @@ use Hash::Merge 'merge';
 use IO::All;
 use JSON;
 use Template::Toolkit::Simple;
-use YAML::XS;
 use Zilla::Dist;
 
 my ($template, $target, $json) = @ARGV;
@@ -20,9 +19,8 @@ if (-e "pkg/$template") {
   io->file($target)->print($text);
 }
 else {
-  my $meta = Load io->file('Meta')->all;
-  my $cpan = delete($meta->{'=zild'}) || {};
-  my $data = merge($cpan, $meta);
+  my $meta = Zilla::Dist->get_meta;
+  my $data = merge((delete($meta->{'=zild'}) || {}), $meta);
   $data->{zilla_dist}{version} = $Zilla::Dist::VERSION;
   $data->{layout} = +{
     map {
@@ -41,22 +39,13 @@ else {
   }
   $data->{RequiredModules} = [];
   if (my $r = $data->{requires}) {
-    while (my ($key, $value) = (each %$r)) {
-      push @{$data->{RequiredModules}},
-        $key . ($key ne 'perl' and $value eq '0' ? '' : "~$value");
-    }
+    push @{$data->{RequiredModules}}, keys %$r;
   }
   if (my $r = $data->{test}{requires}) {
-    while (my ($key, $value) = (each %$r)) {
-      push @{$data->{RequiredModules}},
-        $key . ($key ne 'perl' and $value eq '0' ? '' : "~$value");
-    }
+    push @{$data->{RequiredModules}}, keys %$r;
   }
   if (my $r = $data->{recommends}) {
-    while (my ($key, $value) = (each %$r)) {
-      push @{$data->{RequiredModules}},
-        $key . ($key ne 'perl' and $value eq '0' ? '' : "~$value");
-    }
+    push @{$data->{RequiredModules}}, keys %$r;
   }
   ($data->{namepath} = $data->{libname} || $data->{name})
     =~ s/(?:-|::)/\//g;

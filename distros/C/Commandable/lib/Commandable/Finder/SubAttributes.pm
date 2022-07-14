@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::SubAttributes 0.07;
+package Commandable::Finder::SubAttributes 0.08;
 
 use v5.14;
 use warnings;
@@ -67,8 +67,11 @@ Gives a plain string description text for the command.
 
 Gives a named argument for the command and its description.
 
-If the name is suffixed by a C<?> character, this argument is optional. (The
-C<?> character itself will be removed from the name).
+If the name is suffixed by a C<?>, this argument is optional. (The C<?> itself
+will be removed from the name).
+
+If the name is suffixed by C<...>, this argument is slurpy. (The C<...> itself
+will be removed from the name).
 
 =head2 Command_opt
 
@@ -146,6 +149,9 @@ can be disabled by passing a defined-but-false value such as C<0> or C<''>.
 
 =back
 
+Any additional arguments are passed to the C<configure> method to be used as
+configuration options.
+
 =cut
 
 sub new
@@ -156,16 +162,20 @@ sub new
    HAVE_ATTRIBUTE_STORAGE or
       croak "Cannot create a $class as Attribute::Storage is not available";
 
-   my $package = $args{package} or croak "Require 'packaage'";
+   my $package = ( delete $args{package} ) or croak "Require 'packaage'";
 
-   my $name_prefix = $args{name_prefix} // "command_";
-   my $conv_under = $args{underscore_to_hyphen} // 1;
+   my $name_prefix = ( delete $args{name_prefix} )          // "command_";
+   my $conv_under  = ( delete $args{underscore_to_hyphen} ) // 1;
 
-   return bless {
+   my $self = bless {
       package     => $package,
       name_prefix => $name_prefix,
       conv_under  => $conv_under,
    }, $class;
+
+   $self->configure( %args ) if %args;
+
+   return $self;
 }
 
 =head2 new_for_caller

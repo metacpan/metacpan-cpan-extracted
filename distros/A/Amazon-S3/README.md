@@ -97,11 +97,11 @@ dependencies. Below is the original description of the module._
 > The need for this module arose from some work that needed
 > to work with S3 and would be distributed, installed and used
 > on many various environments where compiled dependencies may
-> not be an option. [Net::Amazon::S3](https://metacpan.org/pod/Net::Amazon::S3) used [XML::LibXML](https://metacpan.org/pod/XML::LibXML)
+> not be an option. [Net::Amazon::S3](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3) used [XML::LibXML](https://metacpan.org/pod/XML%3A%3ALibXML)
 > tying it to that specific and often difficult to install
 > option. In order to remove this potential barrier to entry,
-> this module is forked and then modified to use [XML::SAX](https://metacpan.org/pod/XML::SAX)
-> via [XML::Simple](https://metacpan.org/pod/XML::Simple).
+> this module is forked and then modified to use [XML::SAX](https://metacpan.org/pod/XML%3A%3ASAX)
+> via [XML::Simple](https://metacpan.org/pod/XML%3A%3ASimple).
 
 # LIMITATIONS
 
@@ -247,6 +247,18 @@ Create a new S3 client object. Takes some arguments:
 
     default: 4096
 
+## turn\_on\_special\_retry
+
+Called to add extry retry codes if retry has been set
+
+## turn\_off\_special\_retry
+
+Called to turn off special retry codes when we are deliberately triggering them
+
+## adjust\_region
+
+Sets the region for the signing object to be appropriate for the bucket
+
 ## buckets
 
 Returns `undef` on error, else HASHREF of results:
@@ -261,7 +273,7 @@ Returns `undef` on error, else HASHREF of results:
 
 - buckets
 
-    Any ARRAYREF of [Amazon::SimpleDB::Bucket](https://metacpan.org/pod/Amazon::SimpleDB::Bucket) objects for the 
+    Any ARRAYREF of [Amazon::SimpleDB::Bucket](https://metacpan.org/pod/Amazon%3A%3ASimpleDB%3A%3ABucket) objects for the 
     account.
 
 ## add\_bucket 
@@ -276,7 +288,7 @@ Takes a HASHREF:
 
     See the set\_acl subroutine for documenation on the acl\_short options
 
-Returns 0 on failure or a [Amazon::S3::Bucket](https://metacpan.org/pod/Amazon::S3::Bucket) object on success
+Returns 0 on failure or a [Amazon::S3::Bucket](https://metacpan.org/pod/Amazon%3A%3AS3%3A%3ABucket) object on success
 
 ## bucket BUCKET
 
@@ -286,7 +298,7 @@ Returns an (unverified) bucket object from an account. This method does not acce
 
 ## delete\_bucket
 
-Takes either a [Amazon::S3::Bucket](https://metacpan.org/pod/Amazon::S3::Bucket) object or a HASHREF containing 
+Takes either a [Amazon::S3::Bucket](https://metacpan.org/pod/Amazon%3A%3AS3%3A%3ABucket) object or a HASHREF containing 
 
 - bucket
 
@@ -436,11 +448,11 @@ _You are encouraged to use the newer `list_bucket_all_v2` method._
 
 ## last\_response
 
-Returns the last [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object.
+Returns the last [HTTP::Response](https://metacpan.org/pod/HTTP%3A%3AResponse) object.
 
 ## last\_request
 
-Returns the last [HTTP::Request](https://metacpan.org/pod/HTTP::Request) object.
+Returns the last [HTTP::Request](https://metacpan.org/pod/HTTP%3A%3ARequest) object.
 
 ## level
 
@@ -585,11 +597,11 @@ Current maintainer: Rob Lauer <bigfoot@cpan.org>
 
 # SEE ALSO
 
-[Amazon::S3::Bucket](https://metacpan.org/pod/Amazon::S3::Bucket), [Net::Amazon::S3](https://metacpan.org/pod/Net::Amazon::S3)
+[Amazon::S3::Bucket](https://metacpan.org/pod/Amazon%3A%3AS3%3A%3ABucket), [Net::Amazon::S3](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3)
 
 # COPYRIGHT AND LICENCE
 
-This module was initially based on [Net::Amazon::S3](https://metacpan.org/pod/Net::Amazon::S3) 0.41, by
+This module was initially based on [Net::Amazon::S3](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3) 0.41, by
 Leon Brocard. Net::Amazon::S3 was based on example code from
 Amazon with this notice:
 

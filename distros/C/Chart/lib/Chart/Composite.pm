@@ -4,7 +4,7 @@ use v5.12;
 
 package Chart::Composite;
 our @ISA     = qw(Chart::Base);
-our $VERSION = 'v2.403.1';
+our $VERSION = 'v2.403.2';
 
 use Chart::Base;
 use GD;
@@ -61,8 +61,7 @@ sub set
 # had to override it to reassemble the \@data array correctly
 #
 # @return Reference to an array of the image
-sub imagemap_dump
-{
+sub imagemap_dump {
     my $self = shift;
     my ( $i, $j );
     my @map;

@@ -74,7 +74,7 @@ PDL routine sec. If you need to call it specify its origin module : PDL::Basic::
 
 
 
-#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -131,21 +131,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *geexp = \&PDL::geexp;
 #line 138 "Trans.pm"
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgeexp = \&PDL::__Ccgeexp;
 #line 145 "Trans.pm"
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgeexp = \&PDL::__Ncgeexp;
 #line 152 "Trans.pm"
@@ -180,14 +180,14 @@ sub PDL::cgeexp {
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cctrsqrt = \&PDL::__Cctrsqrt;
 #line 187 "Trans.pm"
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nctrsqrt = \&PDL::__Nctrsqrt;
 #line 194 "Trans.pm"
@@ -224,14 +224,14 @@ sub PDL::ctrsqrt {
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cctrfun = \&PDL::__Cctrfun;
 #line 231 "Trans.pm"
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nctrfun = \&PDL::__Nctrfun;
 #line 238 "Trans.pm"

@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 af80917efe8ef899d620cfc3328ddbd07fc1f5a4824ca3d3d9f3386eab137348 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 5ef4e0de06e1f29587d2437c684ea71bffb87d85d7650344a3c99343364b65e6 Changes
+SHA256 388458ae1a8019c9d0c59518c2aba14f0aeaf6180a50eea873f2dd5a9070ad7d INSTALL
+SHA256 a4f85c6f4d6e8bdd37b7ab08013e3e3bee1fe8e910e20f8f54d5025ffe40f384 LICENSE
+SHA256 5d1bc5b0b1e09f8116462d11af79a5b0d64da42752a07d5fa830619a697e6344 MANIFEST
+SHA256 dfa311001e10486c604ca56d8ede3644e4dbf8b19052f844420eddbf734ba957 META.json
+SHA256 aea15a2c4d9ef1e71d8233af3ffa943038e2046418b4e12b75f0cd534f2c59e9 META.yml
+SHA256 a35deac33e158a39543e85ca319fb3a79ed9064656ccb6132472ea952f5d946a Makefile.PL
+SHA256 5358963a35b7bef25fb7542073aad9c143562efe1528f40e76cb8336468db36c README
+SHA256 a9aec7bcb8fc774645ce929138c077379134504e4dfa6b839f8589e3e7b9f803 dist.ini
+SHA256 09f46c1f1c4be1516047a7c479a083a5865d24eea8a22d85c4d431104291055f doap.ttl
+SHA256 f835bcf547a68e815427fb339798b3f0621363da86bff966fc0141cb34b32927 lib/builtins/compat.pm
+SHA256 f8e838cf33fb3bca27cde04b737c6a4c9f7c018e32247aa2304744ae00bd1d91 t/01basic.t
+SHA256 8d962964e6328709a9fbaaef8245859b88f5e6de6c18e2d9c819814db4b2d706 t/02testall.t
+SHA256 85572b2e742fefcc1dabb293cd62b759411f41f62ddc419bc26d9b2b0361a2c2 t/03testall-namespaced.t
+SHA256 e18507119e0d8dfe7edb8c2b6155c1266844605f2395908097f596290b85d440 t/04import.t
+SHA256 27fcc302b977d426ce338b68d7c9312bb15d23726d1a2ffccd3a2cfee7660fae t/05import-warnings.t
+SHA256 b09cae4b9967119e6eca178dd15a5663c6cd7b9ed0afa3fd40272427325930bf t/98stringnum.t
+SHA256 6e5d6c32e546236d2d4e92102c40d0e60958a3b69146d6cf481fc109dc7a39e5 t/99bools.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCYtBEQQAKCRDOv4Eoaip9
+ObXTAKCZekL+Cxd54UEoFslgFtR2BTmjewCfbs2jUrw1grF8ZfOyrsi7/edqsQ4=
+=Zytg
+-----END PGP SIGNATURE-----

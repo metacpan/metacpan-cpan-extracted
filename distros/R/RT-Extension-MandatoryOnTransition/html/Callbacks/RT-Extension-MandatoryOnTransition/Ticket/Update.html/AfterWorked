@@ -1,11 +1,16 @@
 <%args>
 $Ticket
+@ExcludeCustomFields => ()
 </%args>
 <%init>
 my ($core, $cfs, $roles) = RT::Extension::MandatoryOnTransition->RequiredFields(
     Ticket  => $Ticket,
     To      => $ARGS{'Status'} || $ARGS{'DefaultStatus'},
 );
+
+my %exclude_cfs = map { $_ => 1 } @ExcludeCustomFields;
+@$cfs = grep { !$exclude_cfs{$_} } @$cfs;
+
 return unless @$cfs or @$roles;
 
 my $comp = '/Elements/EditCustomFields';

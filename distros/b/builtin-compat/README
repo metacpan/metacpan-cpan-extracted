@@ -1,0 +1,110 @@
+NAME
+    builtin::compat - Provide builtin functions for older perl versions
+
+SYNOPSIS
+      use builtin::compat qw(
+        true
+        false
+        is_bool
+        weaken
+        unweaken
+        is_weak
+        blessed
+        refaddr
+        reftype
+        created_as_string
+        created_as_number
+        ceil
+        floor
+        trim
+        indexed
+      );
+
+DESCRIPTION
+    Provides builtin functions for perl versions that do not include the
+    builtin module.
+
+    No functions are exported by default.
+
+    This module does its best to behave similar to builtin, which creates
+    its exported functions as lexicals. The functions will be created in the
+    currently compiling scope, not the immediate caller of
+    "builtin::compat->import". The functions will also be removed at the end
+    of the compilation scope using namespace::clean.
+
+    The builtin functions will be used directly when they are available.
+
+FUNCTIONS
+    true
+        See "true" in builtin.
+
+    false
+        See "false" in builtin.
+
+    is_bool
+        See "is_bool" in builtin.
+
+        Prior to perl 5.36, it was not possible to track boolean values
+        fully accurately. This function will not be perfectly accurate on
+        earlier perl versions.
+
+    weaken
+        See "weaken" in builtin.
+
+    unweaken
+        See "unweaken" in builtin.
+
+    is_weak
+        See "is_weak" in builtin.
+
+    blessed
+        See "blessed" in builtin.
+
+    refaddr
+        See "refaddr" in builtin.
+
+    reftype
+        See "reftype" in builtin.
+
+    created_as_string
+        See "created_as_string" in builtin.
+
+        Prior to perl 5.36, it was not possible to check if a scalar value
+        was created as a number or as a string fully accurately. This
+        function will not be entirely accurate before then, but should be as
+        accurate as is possible on these perl versions. In particular, a
+        string like "12345" that has been used as a number will cause
+        "create_as_string" to return false and "created_as_number" to return
+        true.
+
+    created_as_number
+        See "created_as_number" in builtin.
+
+        Has the same caveats as "created_as_string".
+
+    ceil
+        See "ceil" in builtin.
+
+    floor
+        See "floor" in builtin.
+
+    trim
+        See "trim" in builtin.
+
+    indexed
+        See "indexed" in builtin.
+
+AUTHOR
+    haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
+
+CONTRIBUTORS
+    None so far.
+
+COPYRIGHT
+    Copyright (c) 2022 the builtin::compat "AUTHOR" and "CONTRIBUTORS" as
+    listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself. See <https://dev.perl.org/licenses/>.
+

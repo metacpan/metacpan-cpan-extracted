@@ -3,11 +3,12 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder 0.07;
+package Commandable::Finder 0.08;
 
 use v5.14;
 use warnings;
 
+use Carp;
 use List::Util 'max';
 
 require Commandable::Output;
@@ -19,6 +20,35 @@ C<Commandable::Finder> - an interface for discovery of L<Commandable::Command>s
 =head1 METHODS
 
 =cut
+
+=head2 configure
+
+   $finder = $finder->configure( %conf )
+
+Sets configuration options on the finder instance. Returns the finder instance
+itself, to permit easy chaining.
+
+The following configuration options are recognised:
+
+=head3 allow_multiple_commands
+
+If enabled, the L</find_and_invoke> method will permit multiple command
+invocations within a single call.
+
+=cut
+
+sub configure
+{
+   my $self = shift;
+   my %conf = @_;
+
+   exists $conf{$_} and $self->{config}{$_} = delete $conf{$_}
+      for qw( allow_multiple_commands );
+
+   keys %conf and croak "Unrecognised ->configure params: " . join( ", ", sort keys %conf );
+
+   return $self;
+}
 
 =head2 find_commands
 
@@ -44,6 +74,10 @@ A convenient wrapper around the common steps of finding a command named after
 the initial token in a L<Commandable::Invocation>, parsing arguments from it,
 and invoking the underlying implementation function.
 
+If the C<allow_multiple_commands> configuration option is set, it will
+repeatedly attempt to parse a command name followed by arguments and options
+while the invocation string is non-empty.
+
 =cut
 
 sub find_and_invoke
@@ -51,18 +85,30 @@ sub find_and_invoke
    my $self = shift;
    my ( $cinv ) = @_;
 
-   defined( my $cmdname = $cinv->pull_token ) or
-      die "Expected a command name\n";
+   my $multiple = $self->{config}{allow_multiple_commands};
 
-   my $cmd = $self->find_command( $cmdname ) or
-      die "Unrecognised command '$cmdname'";
+   my $result;
+   {
+      defined( my $cmdname = $cinv->pull_token ) or
+         die "Expected a command name\n";
 
-   my @args = $cmd->parse_invocation( $cinv );
+      my $cmd = $self->find_command( $cmdname ) or
+         die "Unrecognised command '$cmdname'";
 
-   length $cinv->peek_remaining and
-      die "Unrecognised extra input: " . $cinv->peek_remaining . "\n";
+      my @args = $cmd->parse_invocation( $cinv );
 
-   return $cmd->code->( @args );
+      !$multiple and length $cinv->peek_remaining and
+         die "Unrecognised extra input: " . $cinv->peek_remaining . "\n";
+
+      $result = $cmd->code->( @args );
+
+      # TODO configurable separator - ';' or '|' or whatever
+      #   currently blank
+
+      redo if $multiple and length $cinv->peek_remaining;
+   }
+
+   return $result;
 }
 
 =head2 find_and_invoke_ARGV
@@ -187,6 +233,7 @@ sub builtin_command_helpcmd
             map { 
                my $argspec = $_;
                my $str = "\$" . uc $argspec->name;
+               $str .= "..." if $argspec->slurpy;
                $str = "($str)" if $argspec->optional;
                $str;
             } @argspecs

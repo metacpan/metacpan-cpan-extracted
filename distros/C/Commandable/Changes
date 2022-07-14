@@ -1,5 +1,15 @@
 Revision history for Commandable
 
+0.08    2022-07-13
+        [CHANGES]
+         * Allow "slurpy" arguments
+         * Added ->configure method to Finder, adding configuration options
+         * Optionally permit multiple command invocations in one line
+
+        [BUGFIXES]
+         * Ensure the ->code field of Command instances is set by all Finder
+           subclasses
+
 0.07    2022-04-25
         [CHANGES]
          * Initial version of Commandable::Output API, an interface for user

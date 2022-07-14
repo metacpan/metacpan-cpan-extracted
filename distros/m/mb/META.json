@@ -1,6 +1,6 @@
 {
     "name" : "mb",
-    "version" : "0.44",
+    "version" : "0.45",
     "abstract" : "Can easy script in Big5, Big5-HKSCS, GBK, Sjis, UHC, UTF-8, ...",
     "author" : [
         "ina <ina@cpan.org>"

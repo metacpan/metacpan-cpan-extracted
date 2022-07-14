@@ -7,43 +7,245 @@ Chart::Manual::Types - document all supported chart types
 
 =head1 OVERVIEW
 
+This page illustrates all supported chart types, describes their
+special abilities and programming needs. More detailled information will
+be linked whenever available.
+
+Generally, each chart type here is implementd by a class: Chart::* (name),
+which inherits most of its methods from Chart::Base.
+
+Currently available are xycharts with points, lines, mountains,
+bar charts, stacked bars, error bars, pie and ring charts with split and
+polar coordinate systems. Also composite charts are possible.
+
+
 =head2 Bars
 
-
 =for HTML <p>
-<img src="https://github.com/lichtkind/Chart/blob/main/dev/test/samples/stackedbars.png" alt="stacked bars">
-<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/bars_2.png" alt="multi bar chart">
-<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/hbars_2.png" alt="horizontal bar chart">
-<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/direction_4.png" alt="polar chart">
-<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/pie_4.png" alt="pie chart">
-<img src="https://github.com/lichtkind/Chart/blob/main/dev/test/samples/split_2.png" alt="multi chart">
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/manual/bars.png" alt="dual bar chart">
 </p>
+
+The class Chart::Bars creates a chart made up of a series of vertical bars.
+The length of each bar depicts one value of your second data set. 
+The first data set however, defines the domain. In this example the first
+value of the first (domain) data set is 'camel'. So the first value of 
+the second set (30000) is positioned after the first tick on the x-axis
+labeled 'camel'. Right beside it is a differently colored first value
+of the third data set (80000). Since the option L<spaced_bars|Chart::Manual::Properties/spaced_bars>
+is set to C<'true'> on default both bars are not crammed together.
+In this example it also makes also sense to activate the horizontal
+L<y_grid line|Chart::Manual::Properties/y_grid line>s and give them 
+a subtle color. Further important was it to set the property L<min_val|Chart::Manual::Properties/min_val>
+to zero, so that the bars could be seen in full length and not from
+the min value of the data sets (30000) on upwards. L<precision|Chart::Manual::Properties/precision>
+set to zero just drops the decimals on the tick label so the chart looks
+a little cleaner.
+
+    use Chart::Bars;
+    
+    my $g = Chart::Bars->new( 600, 600 );
+    $g->add_dataset( qw/ camel cat dog bear shell/ );
+    $g->add_dataset( 30000, 40000, 80000,  50000,   90000 );
+    $g->add_dataset( 80000, 60000, 30000,  30000,   40000 );
+    $g->set(
+        title         => 'Bars !',
+        x_label       => 'Group',
+        y_label       => 'Value',
+        y_grid_lines  => 'true',
+        colors => {
+            y_grid_lines => [180, 180, 180],
+        },
+        min_val       =>  0,
+        precision     =>  0,
+        # spaced_bars   => 'false',
+    );
+    $g->png("bars.png");
 
 
 =head2 Composite
 
+The class Chart::Composite creates a two component chart with two
+types of charts which are layered one above each other. Just set
+the option composite info. For example, you can create a two
+component chart with bars and lines. A composite chart does not
+make sense with all combinations of chart types, but it works pretty
+good with Lines, Points, LinesPoints and Bars. Note that two similar
+chart types may come into visual conflict. Chart::Composite can do
+only composite charts made up of two components. 
+
+=for HTML <p>
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/composite_f.png" alt="composite chart">
+</p>
+
 
 =head2 Direction
+
+The class Chart::Direction creates a diagram based on polar coordi-
+nates. This type of diagram is occasionally referred to as a radial or
+as a radar chart. Chart::Direction plots data specified by angle (e. g.,
+wind direction) and absolute value (e. g., wind strength). The first
+dataset to add is always the set of angles in degrees. The second
+set contains the absolute values. How additional datasets should
+be entered depends on the option pairs (cf. below). By default,
+Chart::Direction will draw a point chart. You can also get a lines
+chart by setting the option point to 'false' and the option line to
+'true'. If you want a lines and point chart, then set both point and
+line to 'true'. In addition, Chart::Direction plots arrows from the
+center to the point or to the end of the line if the option arrow is
+set to 'true'. 
+
+=for HTML <p>
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/direction_4.png" alt="polar chart">
+</p>
+
+
 
 
 =head2 ErrorBars
 
+The class Chart::ErrorBars creates a point chart with error bars. This
+class expects the error values within the data array. By use of the
+add dataset() method the error values are the next two sets after
+the y values. The first set after the y values has to be the set of values
+for the upper error bounds. The next set is the array of the lower
+error bounds. Note that the error values are not specified absolutely
+but rather as offsets from the y value: the upper error values will be
+added to the y values, the lower error values will be subtracted.
+If you want to use the same value for the upper and lower error, you
+can set the same error option to 'true'. In this case only the set
+after the y values is interpreted as a set of errors.
+Of course, it is also possible to use the add pt() method in the
+appropriate way to achieve the same results.
+
+=for HTML <p>
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/error_1.png" alt="error bar chart">
+</p>
+
+
 =head2 HorizontalBars
+
+The class Chart::HorizontalBars creates a chart of horizontally ori-
+ented bars. 
+
+=for HTML <p>
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/hbars_2.png" alt="horizontal bar chart">
+</p>
 
 =head2 Lines
 
+The class Chart::Lines creates a lines chart. (If you want the data
+points marked with symbols, check Chart::LinesPoints on page 35.)
+
+
+=for HTML <p>
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/lines_4.png" alt="line chart">
+</p>
+
+
 =head2 LinesPoints
+
+The class Chart::LinesPoints creates a lines chart where addition-
+ally the individual data points are marked with a symbol. (If you
+want just lines without additional symbols, check Chart::Lines on
+page 32. If you want just symbols for the data points but no lines,
+check Chart::Points on page 47.) 
+
+
+=for HTML <p>
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/linespoints_3.png" alt="line point chart">
+</p>
+
 
 =head2 Mountain
 
+The class Chart::Mountain creates a mountain chart, i. e., the individ-
+ual data sets are stacked and the areas under the curves are colour
+filled. The first data set will be shown at the top of the stack, the
+last at the bottom. 
+
+=for HTML <p>
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/mountain-2.png" alt="mountain chart">
+</p>
+
+
 =head2 Pareto
+
+The class Chart::Pareto creates a Pareto chart, i. e., a set of absolute
+values overlaid with a line chart of the accumulated values. (This
+latter curve is also known as an empirical cumulative distribution
+function or as a Lorenz curve.) This representation usually makes
+sense only if the values are sorted (either in ascending or in de-
+scending order). Chart::Pareto plots only one data set and its labels.
+
+
+=for HTML <p>
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/pareto_1.png" alt="pareto chart">
+</p>
+
 
 =head2 Pie
 
+The class Chart::Pie creates a pie chart. The first added set must
+contain the labels, the second set the values. 
+
+=for HTML <p>
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/pie_8.png" alt="pie chart">
+</p>
+
+
 =head2 Points
+
+The class Chart::Points creates a point chart (also called scatter-
+gram) where the individual data points are marked with a symbol.
+(If you want lines in addition, check Chart::LinesPoints on page 35.)
+
+=for HTML <p>
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/points.png" alt="point chart">
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/points_5.png" alt="point chart">
+</p>
+
 
 =head2 Split
 
+The class Chart::Split creates a lines chart where both x and y axes
+are assumed to be numeric. Split charts are mainly intended for cases
+where many data points are spread over a wide x range while at the
+same time the y range is limited. Typical examples are weather or
+seismic data. The x axis will be split into several intervals of the
+same length (specified with the mandatory option interval). The
+intervals will be displayed in a stacked fashion. The start of the
+top interval is set with the mandatory option start. Chart::Split will
+draw only positive x coordinates. The y axis will not be labelled with
+the y values. Rather, the axis will show only the sequence numbers
+of the intervals. 
+
+=for HTML <p>
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/split_2.png" alt="multi chart">
+</p>
+
+
 =head2 StackedBars
+
+The class Chart::StackedBars creates a chart made up of stacked ver-
+tical bars. The first data set will be shown at the bottom of the stack,
+the last at the top. Chart::StackedBars is a subclass of Chart::Base.
+
+=for HTML <p>
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/test/samples/stackedbars.png" alt="stacked bars chart">
+</p>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2022 David Bonner, Herbert Breunung.
+
+This program is free software; you can redistribute it and/or modify it 
+under same terms as Perl itself.
+
+=head1 AUTHOR
+
+David Bonner, <chartgrp@web.de>
+
+Herbert Breunung, <lichtkind@cpan.org>
+
 
 =cut

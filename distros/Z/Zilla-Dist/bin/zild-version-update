@@ -2,12 +2,12 @@
 
 use strict;
 use IO::All;
-use YAML::XS;
+use Zilla::Dist;
 
-my $yaml = YAML::XS::LoadFile('Meta');
+my $meta = Zilla::Dist->get_meta;
 my $version =
-    $yaml->{'=zild'}{version} ||
-    $yaml->{version} ||
+    $meta->{'=zild'}{version} ||
+    $meta->{version} ||
     die "Can't determine 'version' from 'Meta' file";
 
 for my $module (io->dir('lib')->All_Files) {

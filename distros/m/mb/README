@@ -4,16 +4,16 @@ NAME
 
 SYNOPSIS
 
-  $ perl mb.pm              MBCS_Perl_script.pl (auto detect encoding of script)
-  $ perl mb.pm -e big5      MBCS_Perl_script.pl
-  $ perl mb.pm -e big5hkscs MBCS_Perl_script.pl
-  $ perl mb.pm -e eucjp     MBCS_Perl_script.pl
-  $ perl mb.pm -e gb18030   MBCS_Perl_script.pl
-  $ perl mb.pm -e gbk       MBCS_Perl_script.pl
-  $ perl mb.pm -e sjis      MBCS_Perl_script.pl
-  $ perl mb.pm -e uhc       MBCS_Perl_script.pl
-  $ perl mb.pm -e utf8      MBCS_Perl_script.pl
-  $ perl mb.pm -e wtf8      MBCS_Perl_script.pl
+  $ perl mb.pm              script_by_mbcs.pl      (auto detect encoding of script)
+  $ perl mb.pm -e big5      script_by_big5.pl
+  $ perl mb.pm -e big5hkscs script_by_big5hkscs.pl
+  $ perl mb.pm -e eucjp     script_by_eucjp.pl
+  $ perl mb.pm -e gb18030   script_by_gb18030.pl
+  $ perl mb.pm -e gbk       script_by_gbk.pl
+  $ perl mb.pm -e sjis      script_by_sjis.pl
+  $ perl mb.pm -e uhc       script_by_uhc.pl
+  $ perl mb.pm -e utf8      script_by_utf8.pl
+  $ perl mb.pm -e wtf8      script_by_wtf8.pl
 
   C:\WINDOWS> perl mb.pm script.pl ??-DOS-like *wildcard* available
 

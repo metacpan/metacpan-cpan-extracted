@@ -1,5 +1,11 @@
 Revision history for Perl extension Crypt::PasswdMD5.
 
+1.42  2022-07-13T16:20:00
+	- Accept pull request from Dmitry Karasik, to handle the case where the password
+		has the utf8 bit set. With thanx.
+	- Update t/basic.t to use Encode and to test the utf8 bit setting.
+	- Very slightly reformat the source code of PasswdMD5.pm and basic.t.
+
 1.41  2021-02-01T15:56:00
 	- Adopt new repo structure. See
 		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.

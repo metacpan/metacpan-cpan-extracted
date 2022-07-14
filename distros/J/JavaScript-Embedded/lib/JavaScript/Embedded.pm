@@ -4,7 +4,15 @@ use warnings;
 use Carp;
 use Data::Dumper;
 use Scalar::Util qw( weaken );
-our $VERSION = '2.7.1';
+
+use Config;
+BEGIN {
+  # Create Inline's build directory:
+  mkdir "$Config{installsitelib}/_Inline"
+    unless -d "$Config{installsitelib}/_Inline";
+};
+
+our $VERSION = '2.7.2';
 
 my $GlobalRef = {};
 
@@ -315,6 +323,9 @@ BEGIN {
 }
 
 use Inline C => config =>
+    build_noisy => 1,
+    clean_after_build => 0,
+    directory => "$Config{installsitelib}/_Inline",
     typemaps => _get_path('typemap'),
     INC      => '-I' . _get_path('../C') . ' -I' .  _get_path('../C/lib');
     # myextlib => $Duklib,
@@ -1486,6 +1497,8 @@ or suggestions
 =item * Slaven Rezić L<@eserte|https://github.com/eserte>
 
 =item * Max Maischein L<@Corion|https://github.com/Corion>
+
+=item * Sisyphus L<@Sisyphus|https://github.com/sisyphus>
 
 =back
 

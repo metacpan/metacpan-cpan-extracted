@@ -1,14 +1,14 @@
-use Test::Fatal;
-use Test::Most;
+#!perl
 
-use WWW::Mechanize;
-use WWW::RoboCop;
-use Plack::Handler::HTTP::Server::Simple 0.016;
-use Plack::Test::Agent;
+use strict;
+use warnings;
 
-use DDP;
+use Plack::Handler::HTTP::Server::Simple 0.016;    ## no perlimports
+use Plack::Test::Agent ();
+use Test::More import => [qw( done_testing is_deeply ok )];
+use WWW::RoboCop ();
 
-my $html = <<EOF;
+my $html = <<'EOF';
 <a href="/foo">foo</a>
 <a href="/bar">bar</a>
 <a href="#">
@@ -44,11 +44,11 @@ is_deeply(
     \@results,
     [
         {
-            path   => "/",
+            path   => '/',
             status => 200,
         },
         {
-            path   => "/foo",
+            path   => '/foo',
             status => 200,
         },
     ],

@@ -9,11 +9,12 @@ my $build = Module::Build->new(
       'Module::Build' => '0.4004', # test_requires
    },
    requires => {
+      'Commandable' => '0.08',
       'File::ShareDir' => 0,
       'Future::AsyncAwait' => 0,
       'Future::IO' => '0.03',
       'IO::Termios' => 0,
-      'Object::Pad' => '0.51',
+      'Object::Pad' => '0.57',
       'Struct::Dumb' => 0,
       'YAML' => 0,
 

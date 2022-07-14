@@ -36,7 +36,7 @@ no_index:
 provides:
   Alien::PGPLOT:
     file: lib/Alien/PGPLOT.pm
-    version: v5.2.2.4
+    version: v5.2.2.5
 requires:
   Alien::Base: '0'
   base: '0'
@@ -45,7 +45,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Alien-PGPLOT
   repository: https://gitlab.com/djerius/alien-pgplot.git
-version: v5.2.2.4
+version: v5.2.2.5
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:

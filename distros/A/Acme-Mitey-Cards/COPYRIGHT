@@ -25,6 +25,7 @@ Files: Changes
  lib/Acme/Mitey/Cards/Suit.pm
  lib/Acme/Mitey/Cards/Suit.pm.mite.pm
  lib/Acme/Mitey/Cards/Types.pm
+ lib/Acme/Mitey/Cards/Types/Source.pm
  t/00-cards.t
  t/card-face.t
  t/card-joker.t

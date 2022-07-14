@@ -1,3 +1,8 @@
+0.03 2022-07-14
+
+- [feature] Allow auditing from base classes
+- [update] Make "with" an alias of "test" instead of "role"
+
 0.02 2022-07-11
 
 - [update] Update documentation, include benchmarks

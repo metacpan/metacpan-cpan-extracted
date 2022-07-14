@@ -1,0 +1,7 @@
+% if ( $ARGSRef->{SubmitTicket} ) {
+<& /Callbacks/RT-Extension-MandatoryOnTransition/Ticket/Update.html/BeforeUpdate, %ARGS &>
+% }
+
+<%args>
+$ARGSRef
+</%args>

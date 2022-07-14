@@ -1,0 +1,31 @@
+Type-Library-Compiler
+=====================
+
+Created:      2022-07-12
+Home page:    <https://metacpan.org/release/Type-Library-Compiler>
+Bug tracker:  <https://github.com/tobyink/p5-type-library-compiler/issues>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.005	2022-07-13
+
+ - Added: Support Foo|Bar union type constraints.
+
+0.004	2022-07-13
+
+ [ Bug Fixes ]
+ - Fix bug building hashref in parse_list.
+
+0.003	2022-07-13
+
+ - Not supported by CLI yet, but it's now possible for types in the
+   generated library to be named differently from in the original library;
+   this allows for anonymous type constraints to be used to generate your
+   compiled library.
+ - Smarter to_TypeTiny method.
+
+0.002	2022-07-12
+
+ [ Documentation ]
+ - Fix generated pod and real pod being confused.
+
+0.001	2022-07-12	Initial release

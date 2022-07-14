@@ -5,7 +5,7 @@
 use v5.12;
 
 package Chart::Base;
-our $VERSION = 'v2.403.1';
+our $VERSION = 'v2.403.2';
 
 use FileHandle;
 use Carp;
@@ -594,8 +594,7 @@ sub scalar_jpeg
 # draw the chart and plot the data
 # @param dataref Reference to data
 # @return Status of the plot
-sub make_gd
-{
+sub make_gd {
     my $self    = shift;
     my $dataref = shift;
 
@@ -620,8 +619,7 @@ sub make_gd
 #  get the information to turn the chart into an imagemap
 #
 # @return Reference to an array of the image
-sub imagemap_dump
-{
+sub imagemap_dump {
     my $self = shift;
     my $ref  = [];
     my ( $i, $j );

@@ -1,0 +1,17 @@
+Revision history for builtins
+
+0.000001  Thu Jul 14 06:35:32 2022
+
+    *  Initial implementation.
+
+
+0.000002  Thu Jul 14 07:48:37 2022
+
+    *  First public release
+
+
+
+0.000003  Thu Jul 14 07:54:17 2022
+
+    * Oops...initial release was missing indexed()
+      It's now included.

@@ -13,6 +13,7 @@ Individual properties of a chart can be changed via method C<set>:
     $chart->set( key => 'value', ... );
 
 This page documents all viable keys and values for this operation.
+After detailing the data types, all keys are 
 
 
 =head1 DATA TYPES
@@ -31,7 +32,7 @@ C<'t'> or C<'T'>. C<'none'> as an alias of C<'false'> is also an option.
 Anonymous subroutines that usually takes the first argument and returns
 a transformed result:
 
-    C<sub { $_[0] + 1 }>
+    sub { $_[0] + 1 }
 
 
 =head2 color
@@ -66,7 +67,230 @@ Integers greater or equal zero.
 
 =head2 string
 
-Text for labels and descriptions
+Text for title, subtitle and labels on axis, tics and legend.
+
+
+=head1 SORTED BY CHART TYPE
+
+Summary of all properties, grouped by chart type where there applicable.
+Sections are named after the Chart type in question, except B<All> and B<NoPie>.
+
+The format is: name, L<type|/"DATA TYPES">, description, default value
+Click on name for a longer explanation.
+
+
+=head2 All
+
+Properties available in all chart types:
+
+L<colors-background|/colors> .. L</color> of whole image background ; C<'white'>
+
+L<colors-datasetx|/colors> ........ L</color> of points/lines/bars of dataset number x = 0..64
+
+L<colors-grid_lines|/colors> ..... L</color> of vertical and horizontal grid lines in the plot background; C<'black'>
+
+L<colors-x_grid_lines|/colors>  L</color> of vertical grid lines; C<'black'>
+
+L<colors-y_grid_lines|/colors>  L</color> of horizontal grid lines; C<'black'>
+
+L<colors-text|/colors> .............. L</color> of all text ; C<'black'>
+
+L<colors-title|/colors> .............. L</color> of text above the graph ; C<'black'>
+
+L<colors-x_label|/colors> ........ L</color> of x-axis label text; C<'black'>
+
+L<colors-y_label|/colors> ........ L</color> of y-axis (left side) label text; C<'black'>
+
+L<colors-y_label2|/colors> ...... L</color> of y-axis (right side) label text; C<'black'>
+
+L<colors-misc|/colors> ............ L</color> of boxes, ticks, axis and alike; C<'black'>
+
+L</f_x_tick> .................. L</code> that transforms "would have" into actual tick label on left x-axis; C<undef>
+
+L</f_y_tick> .................. L</code> that transforms "would have" into actual tick label on right y-axis; C<undef>
+
+L</graph_border> ..... space between graph and title + legend in pixel; C<10>
+
+L</grey_background> . L<bool|/boolean>: sets plot background to grey; C<'true'>
+
+L</imagemap> ............ L<bool|/boolean>: enable imagemap_dump(); C<'false'>
+
+L</label_font> ............. L</font> of axis labels; GD::Font->MediumBold
+
+L</legend> .................. qw[left right top bottom none]: placement of the legend; C<'right'>
+
+L</legend_font> ..... L</font> of the text in the legend; GD::Font->Small.
+
+L</legend_labels> ... (array ref): labels of colors in legend; C<undef>
+
+L</png_border> ...... L<pos_int|/"positive integer">: space between graph parts and image edge in pixel; C<10>
+
+L</sub_title> .......... L</string>: text below the L</title> in smaller letters; C<''>
+
+L</text_space> ...... L<pos_int|/"positive integer">: extra space around any text; C<2>
+
+L</title> ................... L</string>: text on top of a chart; C<''>
+
+L</title_font> ........ L</font> of the title text; GD::Font->Large
+
+L</transparent> ..... L<bool|/boolean>: full image background transparency; C<'false'>
+
+L</x_label> ............. L</string>: x-axis label text; C<''>
+
+L</y_label> ............. L</string>:label on the standard, left y-axis; C<''>
+
+L</y_label2> .......... L</string>:label on right y-axis, if different; C<''>
+
+
+=head2 NoPie
+
+Properties available in all chart types of kinda xy-plot, not L</Pie>:
+
+L</custom_x_ticks> .. (array ref): [0,3,4] displays  0th, 3rd, and 4th x-tick; C<undef>
+
+L</grid_lines> ...... L<bool|/boolean>: draw vertical and horizontal grid lines; C<'false'>
+
+L</include_zero> .... L<bool|/boolean>: forces y-axis to include zero; C<'false'>
+
+L</integer_ticks_only>  L<bool|/boolean>: draw x-axis ticks with label only on whole values; C<'false'>
+
+L</max_val> ......... L<pos_int|/"positive integer">: maximum value on y-axis; C<undef>
+
+L</max_x_ticks> ..... L<pos_int|/"positive integer">: maximum of ticks and labels to draw on x-axis; C<100>
+
+L</max_y_ticks> ..... L<pos_int|/"positive integer">: maximum of ticks and labels to draw on y-axis; C<100>
+
+L</min_val> ......... L<pos_int|/"positive integer">: maximum value on y-axis; C<undef>
+
+L</min_x_ticks> ..... L<pos_int|/"positive integer">: minimum of ticks and labels to draw on x-axis; C<6> (min 2)
+
+L</min_y_ticks> ..... L<pos_int|/"positive integer">: minimum of ticks and labels to draw on y-axis; C<6> (min 2)
+
+L</precision> ....... L<pos_int|/"positive integer">: nr. of numerals after the decimal point in axis labels; C<3>
+
+L</skip_int_ticks> .. L<pos_int|/"positive integer">: draw only n'th tick on whole x-value; C<1> (if L</integer_ticks_only>)
+
+L</skip_x_ticks> .... L<pos_int|/"positive integer">: draw only every n'th tick with label; C<1>
+
+L</sort> ................ L<bool|/boolean>: sort data in ascending order; C<'false'>
+
+L</tick_label_font> . L</font> of tick labels;  GD::Font->Small
+
+L</tick_len> ........ L<pos_int|/"positive integer">: length of the x- and y-ticks in pixels; C<4>
+
+L</x_grid_lines> .... L<bool|/boolean>: vertical grid lines matching x ticks; C<'false'>
+
+L</x_ticks> ........... qw[normal staggered vertical]: style of x-axis labels; C<'normal'>
+
+L</xy_plot> .......... L<bool|/boolean>: forces x-y-graph, with numeric x-axis; C<'false'>
+
+L</y_axes> ........... (C<'left'>, C<'right'>, C<'both'>): position of y-axis;C<'left'>
+
+L</y_grid_lines> ..... L<bool|/boolean>: horizontal grid lines matching y ticks; C<'false'>
+
+
+=head2 Bars
+
+This includes Bars StackedBars and HorizontalBars.
+
+L</spaced_bars> ....  L<bool|/boolean>: leave space between the groups of bars; C<'true'>
+
+
+=head2 HorizontalBars
+
+L</skip_y_ticks> .... L<pos_int|/"positive integer">: draw every n'th tick with label on y-axis; C<1>
+
+
+=head2 Composite
+
+L</brush_style1> ...  brush style of points associated with left y-axis; C<undef>
+
+L</brush_style2> ...  brush style of points associated with right y-axis; C<undef>
+
+L</composite_info> .. (array of arrays) which data sets produce which chart types; C<undef>
+
+L</f_y_tick1> ....... L</code> that transforms "would have" into actual label on left y-axis; C<undef>
+
+L</f_y_tick2> ....... L</code> that transforms "would have" into actual label on right y-axis; C<undef>
+
+L</legend_example_size> . Length of the color example line in legend in pixel; C<20>
+
+L</max_val1> ........ L</code> maximum y value on the left axis; C<undef>
+
+L</max_val2> ........ L</code> maximum y value on the right axis; C<undef>
+
+L</min_val1> ........ L</code> minimum y value on the left axis; C<undef>
+
+L</min_val2> ........ L</code> minimum y value on the right axis; C<undef>
+
+L</same_y_axes> ..... L</code> both y-axis have same min and max; C<undef>
+
+L</y_ticks1> ........ L<pos_int|/"positive integer">: number of y ticks on left y-axis; C<undef>
+
+L</y_ticks2> ........ L<pos_int|/"positive integer">: number of y ticks on right y-axis; C<undef>
+
+
+=head2 Direction
+
+L</angle_interval> . L<pos_int|/"positive integer">: angle between radial lines; C<30>
+
+L</arrow> ............ L<bool|/boolean>: paint points as arrows; C<'false'>
+
+L</line> ................ L<bool|/boolean>: connected points with lines; C<'false'>
+
+L</max_circles> .... L<pos_int|/"positive integer">: max nr. of coordinate grid circles; C<100>
+
+L</min_circles> ..... L<pos_int|/"positive integer">: min nr. of coordinate grid circles; C<4> (min. 2)
+
+L</pair> ............... L<bool|/boolean>: use odd numbered data sets to build pairs with the next; C<false>
+
+L</point> ............ L<bool|/boolean>: paint points at all (or only lines); C<false>
+
+L</polar> ............ L<bool|/boolean>: reverse x axis; C<false>
+
+
+=head2 ErrorBars
+
+L</same_error> ....... L<bool|/boolean>: same values for upper and lower error bounds; C<'false'>
+
+
+=head2 Lines
+
+including chart type LinesPoints
+
+L</brush_size> ....... L<pos_int|/"positive integer">: width of the lines in pixels; C<6>
+
+
+=head2 Points
+
+including chart type LinesPoints
+
+L</brushStyle> ........ shape of the points; C<'FilledCircle'>
+
+L</pt_size> ............ L<pos_int|/"positive integer">: radius of points in pixels; C<18>
+
+
+=head2 Pie
+
+L</label_values> ..... qw[percent value both none]: label content on pie slice label; C<'percent'>
+
+L</legend_label_values> . qw[percent value both none]: label content in the legend; C<'value'>
+
+L</legend_lines> .... L<bool|/boolean>: draw lines connecting pie slices and label; C<'false'> 
+
+L</ring> ...................... L</real>: percentage of visible radius; C<1> (full pie)
+
+
+=head2 Split
+
+L</interval> .......... L<pos_int|/"positive integer">: interval of a plot segment; C<'undef'>
+
+L</interval_ticks> .. L<pos_int|/"positive integer">: number of ticks on x-axis; C<5>
+
+L</scale> ............... L</integer>: factor for y-values; C<1>
+
+L</start> ............... L</integer>: start value of the first interval; C<'undef'>
+
 
 =head1 SORTED ALPHABETICALLY
 
@@ -97,7 +321,7 @@ Sets the shape of points for Chart::Points, Chart::LinesPoints.
 Possible values are: 'FilledCircle', 'circle', 'donut', 'OpenCircle', 
 'fatPlus', 'triangle', 'upsidedownTriangle', 'square', 'hollowSquare', 
 'OpenRectangle', 'FilledDiamond', 'OpenDiamond', 'Star', 'OpenStar'.
-Default: 'FilledCircle
+Default: 'FilledCircle'
 
 =head2 brush_style1
 
@@ -242,7 +466,8 @@ L</Split> only: Number of ticks for the x-axis. Defaults to 5.
 
 =head2 label_font
 
-This option changes the L</font> of the axis labels. 
+This option changes the L</font> of the axis labels.
+Default is GD::Font->MediumBold.
 
 =head2 label_values
 
@@ -264,7 +489,7 @@ Defaults to 20.
 =head2 legend_font
 
 This option changes the L</font> of the text in the legend.
-Default is C<GD::Font->Small>.
+Default is GD::Font->Small.
 
 =head2 legend_labels
 
@@ -299,7 +524,7 @@ be connected with lines. Defaults to 'false'.
 
 =head2 max_circles
 
-L<Direction> only: Sets the maximum number of circles in the coordinate system.
+L</Direction> only: Sets the maximum number of circles in the coordinate system.
 Default is 100. This limit is used to avoid plotting  an unreasonable 
 large number of ticks if non-round values are used for the min_val and max_val.
 
@@ -489,7 +714,7 @@ Sets the amount of space left on the sides (lext and right) of text,
 =head2 tick_label_font
 
 This is the font for the tick labels. It also needs 
-a GD font object as an argument. Default is C<GD::Font->Small>
+a GD font object as an argument. Default is GD::Font->Small.
 
 =head2 tick_len
 
@@ -504,7 +729,7 @@ quotation marks then you have to quote "\\n". Default is empty.
 
 =head2 title_font
 
-This option changes the L</font> of the title. Default is C<GD::Font->Large>.
+This option changes the L</font> of the title. Default is GD::Font->Large.
 
 =head2 transparent
 
@@ -541,8 +766,7 @@ If empty, no label is drawn.  Default is empty.
 
 =head2 y_label2
 
-Tells Chart what to use for labels on the second, 
-right y-axis (if different from left).
+Text of the label on the second, right y-axis (if different from left).
 If empty, no label is drawn.  Default is empty.
 
 =head2 y_axes
@@ -554,11 +778,6 @@ Valid values are 'left', 'right' and 'both'. Defaults to 'left'.
 
 Draws horizontal grid lines matching up to y ticks if set to 'true'. Default is false.
 
-=head2 ylabel2
-
-The label for the right y-axis (the second component chart) on a composite
-chart.  Default is undef.
-
 =head2 y_ticks1
 
 L<Composite> only: number of y ticks to use on the first and 
@@ -569,233 +788,18 @@ option, both axes will use that number of y ticks. Both default to undef.
 
 see L</y_ticks1>
 
+=head1 COPYRIGHT & LICENSE
 
-=head1 SORTED BY TOPIC
+Copyright 2022 David Bonner, Herbert Breunung.
 
-=head2 Color
+This program is free software; you can redistribute it and/or modify it 
+under same terms as Perl itself.
 
-L</grey_background> . L<bool|/boolean>: sets plot background to grey; C<'true'>
+=head1 AUTHOR
 
-L</transparent> ..... L<bool|/boolean>: full image background transparency; C<'false'>.
+David Bonner, <chartgrp@web.de>
 
+Herbert Breunung, <lichtkind@cpan.org>
 
-=head2 Coordinates
-
-=head2 Image
-
-=head2 Legend
-
-
-=head1 SORTED BY TYPE
-
-Summary of all properties, grouped by chart type where there applicable.
-Sections are named after the Chart type in question, except B<All> and B<NoPie>.
-
-The format is: name, L<type|/"DATA TYPES">, description, default value
-Click on name for a longer explanation.
-
-=head2 All
-
-Properties available in all chart types:
-
-L<color-background|/colors> .. L</color> of whole image background ; C<'white'>
-
-L<color-datasetx|/colors> .... L</color> of points/lines/bars of dataset number x = 0..64
-
-L<color-grid_lines|/colors> .. L</color> of vertical and horizontal grid lines in the plot background; C<'black'>
-
-L<color-x_grid_lines|/colors>  L</color> of vertical grid lines; C<'black'>
-
-L<color-y_grid_lines|/colors>  L</color> of horizontal grid lines; C<'black'>
-
-L<color-text|/colors> ........ L</color> of all text ; C<'black'>
-
-L<color-title|/colors> ....... L</color> of text above the graph ; C<'black'>
-
-L<color-x_label|/colors> ..... L</color> of x-axis label text; C<'black'>
-
-L<color-y_label|/colors> ..... L</color> of y-axis (left side) label text; C<'black'>
-
-L<color-y_label2|/colors> .... L</color> of y-axis (right side) label text; C<'black'>
-
-L<color-misc|/colors> ........ L</color> of boxes, ticks, axis and alike; C<'black'>
-
-L</f_x_tick> ........ L</code> that transforms "would have" into actual tick label on left x-axis; C<undef>
-
-L</f_y_tick> ........ L</code> that transforms "would have" into actual tick label on right y-axis; C<undef>
-
-L</graph_border> ..... space between graph and title + legend in pixel; C<10>
-
-L</grey_background> . L<bool|/boolean>: sets plot background to grey; C<'true'>
-
-L</legend> .......... qw[left right top bottom none]: placement of the legend; C<'right'>
-
-L</legend_font> ..... L</font> of the text in the legend; C<GD::Font->Small>.
-
-L</legend_labels> ... (array ref): labels of colors in legend; C<undef>
-
-L</png_border> ...... L<pos_int|/"positive integer">: space between graph parts and image edge in pixel; C<10>
-
-L</sub_title> ....... L</string>: text below the L</title> in smaller letters; C<''>
-
-L</text_space> ...... L<pos_int|/"positive integer">: extra space around any text; C<2>
-
-L</title> ........... L</string>: text on top of a chart; C<''>
-
-L</title_font> ...... L</font> of the title text; C<GD::Font->Large>
-
-L</transparent> ..... L<bool|/boolean>: full image background transparency; C<'false'>
-
-L</x_label> ......... L</string>: x-axis label text; C<''>
-
-L</y_label> ......... L</string>:labels on the standard, left y-axis; C<''>
-
-
-=head2 NoPie
-
-Properties available in all chart types of kinda xy-plot, not L</Pie>:
-
-L</custom_x_ticks> .. (array ref): [0,3,4] displays  0th, 3rd, and 4th x-tick; C<undef>
-
-L</grid_lines> ...... L<bool|/boolean>: draw vertical and horizontal grid lines; C<'false'>
-
-L</include_zero> .... L<bool|/boolean>: forces y-axis to include zero; C<'false'>
-
-L</integer_ticks_only>  L<bool|/boolean>: draw x-axis ticks with label only on whole values; C<'false'>
-
-L</max_val> ......... L<pos_int|/"positive integer">: maximum value on y-axis; C<undef>
-
-L</max_x_ticks> ..... L<pos_int|/"positive integer">: maximum of ticks and labels to draw on x-axis; C<100>
-
-L</max_y_ticks> ..... L<pos_int|/"positive integer">: maximum of ticks and labels to draw on y-axis; C<100>
-
-L</min_val> ......... L<pos_int|/"positive integer">: maximum value on y-axis; C<undef>
-
-L</min_x_ticks> ..... L<pos_int|/"positive integer">: minimum of ticks and labels to draw on x-axis; C<6> (min 2)
-
-L</min_y_ticks> ..... L<pos_int|/"positive integer">: minimum of ticks and labels to draw on y-axis; C<6> (min 2)
-
-L</precision> ....... L<pos_int|/"positive integer">: nr. of numerals after the decimal point in axis labels; C<3>
-
-L</skip_int_ticks> .. L<pos_int|/"positive integer">: draw only n'th tick on whole x-value; C<1> (if L</integer_ticks_only>)
-
-L</skip_x_ticks> .... L<pos_int|/"positive integer">: draw only every n'th tick with label; C<1>
-
-L</sort> ............ L<bool|/boolean>: sort data in ascending order; C<'false'>
-
-L</tick_label_font> . L</font> of tick labels; C<GD::Font->Small>
-
-L</tick_len> ........ L<pos_int|/"positive integer">: length of the x- and y-ticks in pixels; C<4>
-
-L</x_grid_lines> .... L<bool|/boolean>: vertical grid lines matching x ticks; C<'false'>
-
-L</x_ticks> ......... qw[normal staggered vertical]: style of x-axis labels; C<'normal'>
-
-L</xy_plot> ......... L<bool|/boolean>: forces x-y-graph, with numeric x-axis; C<'false'>
-
-L</y_axes> .......... (C<'left'>, C<'right'>, C<'both'>): position of y-axis;C<'left'>
-
-L</y_grid_lines> .... L<bool|/boolean>: horizontal grid lines matching y ticks; C<'false'>
-
-
-=head2 Bars
-
-This includes Bars StackedBars and HorizontalBars.
-
-L</spaced_bars> ....  L<bool|/boolean>: leave space between the groups of bars; C<'true'>
-
-=head2 HorizontalBars
-
-L</skip_y_ticks> .... L<pos_int|/"positive integer">: draw every n'th tick with label on y-axis; C<1>
-
-
-=head2 Composite
-
-L</brush_style1> ...  brush style of points associated with left y-axis; C<undef>
-
-L</brush_style2> ...  brush style of points associated with right y-axis; C<undef>
-
-L</composite_info> .. (array of arrays) which data sets produce which chart types; C<undef>
-
-L</f_y_tick1> ....... L</code> that transforms "would have" into actual label on left y-axis; C<undef>
-
-L</f_y_tick2> ....... L</code> that transforms "would have" into actual label on right y-axis; C<undef>
-
-L</legend_example_size> . Length of the color example line in legend in pixel; C<20>
-
-L</max_val1> ........ L</code> maximum y value on the left axis; C<undef>
-
-L</max_val2> ........ L</code> maximum y value on the right axis; C<undef>
-
-L</min_val1> ........ L</code> minimum y value on the left axis; C<undef>
-
-L</min_val2> ........ L</code> minimum y value on the right axis; C<undef>
-
-L</same_y_axes> ..... L</code> both y-axis have same min and max; C<undef>
-
-L</y_ticks1> ........ L<pos_int|/"positive integer">: number of y ticks on left y-axis; C<undef>
-
-L</y_ticks2> ........ L<pos_int|/"positive integer">: number of y ticks on right y-axis; C<undef>
-
-
-=head2 Direction
-
-L</angle_interval> ... L<pos_int|/"positive integer">: angle between radial lines; C<30>
-
-L</arrow> ............ L<bool|/boolean>: paint points as arrows; C<'false'>
-
-L</line> ............. L<bool|/boolean>: connected points with lines; C<'false'>
-
-L</max_circles> ...... L<pos_int|/"positive integer">: max nr. of coordinate grid circles; C<100>
-
-L</min_circles> ...... L<pos_int|/"positive integer">: min nr. of coordinate grid circles; C<4> (min. 2)
-
-L</pair> ............. L<bool|/boolean>: use odd numbered data sets to build pairs with the next; C<false>
-
-L</point> ............ L<bool|/boolean>: paint points at all (or only lines); C<false>
-
-L</polar> ............ L<bool|/boolean>: reverse x axis; C<false>
-
-
-=head2 ErrorBars
-
-L</same_error> ....... L<bool|/boolean>: same values for upper and lower error bounds; C<'false'>
-
-
-=head2 Lines
-
-L</brush_size> ....... L<pos_int|/"positive integer">: width of the lines in pixels; C<6>
-
-
-=head2 LinesPoints
-
-L</pt_size> .......... L<pos_int|/"positive integer">: radius of points in pixels; C<18>
-
-
-=head2 Pie
-
-L</label_values> ..... qw[percent value both none]: label content on pie slice label; C<'percent'>
-
-L</legend_label_values> .. qw[percent value both none]: label content in the legend; C<'value'>
-
-L</legend_lines> ..... L<bool|/boolean>: draw lines connecting pie slices and label; C<'false'> 
-
-L</ring> ............. L</real>: percentage of visible radius; C<1> (full pie)
-
-
-=head2 Points
-
-L</pt_size> .......... L<pos_int|/"positive integer">: radius of points in pixels; C<18>
-
-
-=head2 Split
-
-L</interval> ......... L<pos_int|/"positive integer">: interval of a plot segment; C<'undef'>
-
-L</interval_ticks> ... L<pos_int|/"positive integer">: number of ticks on x-axis; C<5>
-
-L</scale> ............ L</integer>: factor for y-values; C<1>
-
-L</start> ............ L</integer>: start value of the first interval; C<'undef'>
 
 =cut

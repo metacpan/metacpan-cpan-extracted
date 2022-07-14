@@ -22,7 +22,7 @@ sub IMPORT {
   no warnings 'redefine';
 
   for my $name (grep !*{"${into}::${_}"}{"CODE"}, @{$self->EXPORT($into)}) {
-    *{"${into}::${name}"} = sub { goto $self->can($name) };
+    *{"${into}::${name}"} = \&{"@{[$self->NAME]}::${name}"};
   }
 
   return $self;

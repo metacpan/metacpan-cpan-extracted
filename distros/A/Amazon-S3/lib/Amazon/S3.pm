@@ -21,6 +21,8 @@ use List::Util qw{ any };
 use URI::Escape qw(uri_escape_utf8);
 use XML::Simple;
 
+use Net::Amazon::Signature::V4;
+
 use parent qw{Class::Accessor::Fast};
 
 __PACKAGE__->mk_accessors(
@@ -47,7 +49,7 @@ __PACKAGE__->mk_accessors(
   }
 );
 
-our $VERSION = '0.53'; ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
+our $VERSION = '0.54'; ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
 
 ########################################################################
 sub new {
@@ -127,12 +129,53 @@ sub new {
     );
   } ## end else [ if ( $self->retry ) ]
 
+  # The "default" region for Amazon is us-east-1
+  # This is the region to set it to for listing buckets
+  # We don't actually list buckets in our transport, but
+  # it is sometimes useful to list buckets in a test script
+  # For a specific bucket, it is necessary to call adjust_region
+  # to set the region that is appropriate for that bucket
+  $self->{'signer'} = Net::Amazon::Signature::V4->new(
+    $self->aws_access_key_id,
+    $self->aws_secret_access_key,
+    'us-east-1', 's3'
+  );
+
   $ua->timeout( $self->timeout );
   $ua->env_proxy;
   $self->ua($ua);
+  $self->turn_on_special_retry();
 
   return $self;
 } ## end sub new
+
+sub turn_on_special_retry {
+    my $self = shift;
+
+    if ($self->retry) {
+
+        # In the field we are seeing issue of Amazon returning with a 400 code
+        # in the case of timeout.  From AWS S3 logs:
+        #  REST.PUT.PART Backups/2017-05-04/<account>.tar.gz "PUT /Backups<path>?partNumber=27&uploadId=<id> -
+        #  HTTP/1.1" 400 RequestTimeout 360 20971520 20478 - "-" "libwww-perl/6.15"
+        my $http_codes_hr = $self->ua->codes_to_determinate();
+        $http_codes_hr->{400} = 1;
+    }
+}
+
+sub turn_off_special_retry {
+    my $self = shift;
+
+    if ($self->retry) {
+
+        # In the field we are seeing issue of Amazon returning with a 400 code
+        # in the case of timeout.  From AWS S3 logs:
+        #  REST.PUT.PART Backups/2017-05-04/<account>.tar.gz "PUT /Backups<path>?partNumber=27&uploadId=<id> -
+        #  HTTP/1.1" 400 RequestTimeout 360 20971520 20478 - "-" "libwww-perl/6.15"
+        my $http_codes_hr = $self->ua->codes_to_determinate();
+        delete $http_codes_hr->{400};
+    }
+}
 
 ########################################################################
 sub region {
@@ -310,7 +353,7 @@ sub list_bucket {
     next_marker  => $r->{$next_marker} // $EMPTY,
     max_keys     => $r->{MaxKeys},
     is_truncated => (
-      scalar $r->{IsTruncated} eq 'true'
+      ( defined $r->{IsTruncated} && scalar $r->{IsTruncated} eq 'true' )
       ? $TRUE
       : $FALSE
     ),
@@ -388,6 +431,7 @@ sub list_bucket_all {
     if !$bucket;
 
   my $response = $self->list_bucket($conf);
+  croak 'The server has stopped responding' unless $response;
 
   return $response
     if !$response->{is_truncated};
@@ -402,6 +446,7 @@ sub list_bucket_all {
     $conf->{bucket} = $bucket;
 
     $response = $self->list_bucket($conf);
+    croak 'The server has stopped responding' unless $response;
 
     push @{ $all->{keys} }, @{ $response->{keys} };
 
@@ -473,22 +518,27 @@ sub _validate_acl_short {
   return;
 } ## end sub _validate_acl_short
 
-# EU buckets must be accessed via their DNS name. This routine figures out if
-# a given bucket name can be safely used as a DNS name.
-########################################################################
-sub _is_dns_bucket {
-########################################################################
+# Determine if a bucket can used as subdomain for the host
+# Specifying the bucket in the URL path is being deprecated
+# So, if the bucket name is suitable, we need to put it
+# as a subdomain to the host, instead. Currently buckets with
+# periods in their names cannot be handled in that manner
+# due to SSL certificate issues, they will have to remain in
+# the url path instead
+sub _can_bucket_be_subdomain {
   my ($bucketname) = @_;
 
   if ( length $bucketname > $MAX_BUCKET_NAME_LENGTH - 1 ) {
     return $FALSE;
   } ## end if ( length $bucketname...)
 
-  if ( length $bucketname < $MIN_BUCKET_NAME_LENGTH ) {
+  if (length $bucketname < 1) {
     return $FALSE;
-  } ## end if ( length $bucketname...)
+  }
 
-  return $bucketname =~ /[.]/xsm ? $FALSE : $TRUE;
+  return $FALSE unless $bucketname =~ m{^[a-z][a-z0-9-]*$};
+  return $FALSE unless $bucketname =~ m{[a-z0-9]$};
+  return $TRUE;
 } ## end sub _is_dns_bucket
 
 # make the HTTP::Request object
@@ -518,27 +568,19 @@ sub _make_request {
 
   my $host = $self->host;
 
-  my $url;
-
-  if ( $path =~ /^([^\/?]+)(.*)/xsm
-    && _is_dns_bucket($1)
-    && $self->dns_bucket_names ) {
+  $path =~ s/\A\///xsm;
+  my $url = "$protocol://$host/$path";
+  if ($path =~ m{^([^/?]+)(.*)} && _can_bucket_be_subdomain($1)) {
     $url = "$protocol://$1.$host$2";
-  } ## end if ( $path =~ /^([^\/?]+)(.*)/xsm...)
-  else {
-    $path =~ s/\A\///xsm;
-    $url = "$protocol://$host/$path";
-  } ## end else [ if ( $path =~ /^([^\/?]+)(.*)/xsm...)]
-
-  if ( !exists $headers->{Authorization} ) {
-    $self->_add_auth_header( $http_headers, $method, $path );
-  } ## end if ( !exists $headers->...)
+  }
 
   my $request = HTTP::Request->new( $method, $url, $http_headers );
 
   $self->last_request($request);
 
   $request->content($data);
+
+  $self->{'signer'}->sign( $request );
 
   $self->get_logger->trace( sub { return Dumper( [$request] ); } );
 
@@ -562,6 +604,11 @@ sub _send_request {
 
   my $content = $response->content;
 
+  if ($response->code !~ /^2\d\d$/) {
+    $self->_remember_errors($response->content, 1);
+    return;
+  }
+
   if ( $content && $response->content_type eq 'application/xml' ) {
     $content = $self->_xpc_of_content($content);
   } ## end if ( $content && $response...)
@@ -569,10 +616,123 @@ sub _send_request {
   return $content;
 } ## end sub _send_request
 
+#
+# This is the necessary to find and region for a specific bucket
+# and set the signer object to use that region when signing requests
+#
+sub adjust_region {
+    my ( $self, $bucket, $called_from_redirect ) = @_;
+
+    my $request = HTTP::Request->new('GET', 'https://' . $bucket . '.' . $self->host );
+    $self->{'signer'}->sign( $request );
+
+    # We have to turn off our special retry since this will deliberately trigger that code
+    $self->turn_off_special_retry();
+
+    # If the bucket name has a period in it, the certificate validation
+    # will fail since it will expect a certificate for a subdomain.
+    # Setting it to verify against the expected host guards against
+    # that while still being secure since we will have verified
+    # the response as coming from the expected server.
+    $self->ua->ssl_opts( SSL_verifycn_name => $self->host );
+
+    my $response = $self->_do_http($request);
+
+    # Turn this off, since all other requests have the bucket after
+    # the host in the URL, and the host may change depending on the region
+    $self->ua->ssl_opts( SSL_verifycn_name => undef );
+
+    $self->turn_on_special_retry();
+
+    # If No error, then nothing to do
+    return 1 if $response->is_success();
+
+    # If the error is due to the wrong region, then we will get
+    # back a block of XML with the details
+    if ( $response->content_type eq 'application/xml' and $response->content ) {
+
+        my $error_hash = $self->_xpc_of_content( $response->content );
+
+        if ( $error_hash->{'Code'} eq 'PermanentRedirect' and $error_hash->{'Endpoint'} ) {
+
+            # Don't recurse through multiple redirects
+            return if $called_from_redirect;
+
+            # With a permanent redirect error, they are telling us the explicit
+            # host to use.  The endpoint will be in the form of bucket.host
+            my $host = $error_hash->{'Endpoint'};
+
+            # Remove the bucket name from the front of the host name
+            # All the requests will need to be of the form https://host/bucket
+            $host =~ s/^$bucket\.//;
+            $self->host($host);
+
+            # We will need to call ourselves again in order to trigger the
+            # AuthorizationHeaderMalformed error in order to get the region
+            return $self->adjust_region( $bucket, 1 );
+        }
+
+        if ( $error_hash->{'Code'} eq 'AuthorizationHeaderMalformed' and $error_hash->{'Region'} ) {
+
+            # Set the signer to use the correct reader evermore
+            $self->{'signer'}{'endpoint'} = $error_hash->{'Region'};
+
+            # Only change the host if we haven't been called as a redirect where an exact host has been given
+            $self->host( 's3-' . $error_hash->{'Region'} . '.amazonaws.com' ) unless $called_from_redirect;
+
+            return 1;
+        }
+
+        if ( $error_hash->{'Code'} eq 'IllegalLocationConstraintException' ) {
+
+            # This is hackish; but in this case the region name only appears in the message
+            if ( $error_hash->{'Message'} =~ /The (\S+) location/ ) {
+                my $region = $1;
+
+                # Correct the region for the signer
+                $self->{'signer'}{'endpoint'} = $region;
+
+                # Set the proper host for the region
+                $self->host( 's3.' . $region . '.amazonaws.com' );
+
+                return 1;
+            }
+        }
+
+    }
+
+    # Some other error
+    $self->_remember_errors($response->content, 1);
+    return;
+}
+
 ########################################################################
 sub _do_http {
 ########################################################################
   my ( $self, $request, $filename ) = @_;
+
+  # convenient time to reset any error conditions
+  $self->err(undef);
+  $self->errstr(undef);
+  my $response = $self->ua->request($request, $filename);
+
+  # For new buckets at non-standard locations, amazon will sometimes
+  # respond with a temprary redirect.  In this case it is necessary
+  # to try again with the new URL
+  if ($response->code =~ /^3/ and defined $response->header('Location')) {
+
+    # print "Redirecting to:  " . $response->header('Location') . "\n";
+    $request->uri($response->header('Location'));
+    $response = $self->ua->request($request, $filename);
+  }
+
+  return $response;
+}
+
+# Call this if handling any temporary redirect issues
+# (Like needing to probe with a HEAD request when file handle are involved)
+sub _do_http_no_redirect {
+  my ($self, $request, $filename) = @_;
 
   # convenient time to reset any error conditions
   $self->err(undef);
@@ -623,7 +783,7 @@ sub _send_request_expect_nothing_probed {
   my $old_redirectable = $self->ua->requests_redirectable;
   $self->ua->requests_redirectable( [] );
 
-  my $response = $self->_do_http($request);
+  my $response = $self->_do_http_no_redirect($request);
 
   $self->get_logger->trace( Dumper( [$response] ) );
 
@@ -637,7 +797,7 @@ sub _send_request_expect_nothing_probed {
     $request->uri($override_uri);
   } ## end if ( defined $override_uri)
 
-  $response = $self->_do_http($request);
+  $response = $self->_do_http_no_redirect($request);
 
   $self->get_logger->trace( Dumper( [$response] ) );
 
@@ -676,12 +836,22 @@ sub _xpc_of_content {
 ########################################################################
   my ( $self, $src, $keep_root ) = @_;
 
-  return XMLin(
-    $src,
-    'SuppressEmpty' => $EMPTY,
-    'ForceArray'    => ['Contents'],
-    'KeepRoot'      => $keep_root
-  );
+  my $xml_hr;
+
+  eval {
+    $xml_hr = XMLin(
+      $src,
+      'SuppressEmpty' => $EMPTY,
+      'ForceArray'    => ['Contents'],
+      'KeepRoot'      => $keep_root
+    );
+  };
+
+  if ($@) {
+    confess "Error parsing $src:  $@";
+  }
+
+  return $xml_hr;
 } ## end sub _xpc_of_content
 
 # returns 1 if errors were found
@@ -718,6 +888,9 @@ sub _remember_errors {
   return $FALSE;
 } ## end sub _remember_errors
 
+#
+# Deprecated - this adds a header for the old V2 auth signatures
+#
 ########################################################################
 sub _add_auth_header {
 ########################################################################
@@ -881,7 +1054,7 @@ sub _urlencode {
 ########################################################################
   my ( $self, $unencoded ) = @_;
 
-  return uri_escape_utf8( $unencoded, '^A-Za-z0-9_-' );
+  return uri_escape_utf8($unencoded, '^A-Za-z0-9\-\._~\x2f');
 } ## end sub _urlencode
 
 1;
@@ -1155,6 +1328,18 @@ The default buffer size when reading or writing files.
 default: 4096
 
 =back
+
+=head2 turn_on_special_retry
+
+Called to add extry retry codes if retry has been set
+
+=head2 turn_off_special_retry
+
+Called to turn off special retry codes when we are deliberately triggering them
+
+=head2 adjust_region
+
+Sets the region for the signing object to be appropriate for the bucket
 
 =head2 buckets
 

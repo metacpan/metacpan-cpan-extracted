@@ -1,5 +1,6 @@
 # -*- perl -*-
 use Test::More tests => 14;
+use Test::Number::Delta;
 
 use strict;
 use warnings;
@@ -40,7 +41,7 @@ is_deeply($jq1->process({ data => $input107 }), $input107_expected);
 my $input108 = { key1 => 3.141592653589793238462643383279502884197169399375105820974944592307816406286 };
 my $input108_expected = $input108;
 ( my $input108_got ) = $jq1->process({ data => $input108 });
-ok(abs($input108_got->{key1} - $input108_expected->{key1}) < 1e-14);
+delta_ok($input108_got->{key1}, $input108_expected->{key1});
 
 my $input109 = { key1 => undef };
 my $input109_expected = $input109;

@@ -1,0 +1,39 @@
+---
+abstract: 'install all the new builtins from the builtin namespace (Perl 5.36+), and try our best on older versions of Perl'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.96'
+  Test::Warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 1
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: builtins-compat
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  builtins::compat:
+    file: lib/builtins/compat.pm
+    version: '0.004'
+requires:
+  perl: '5.008001'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/builtins-compat/project
+  bugtracker: https://github.com/tobyink/p5-builtins-compat/issues
+  homepage: https://metacpan.org/release/builtins-compat
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-builtins-compat.git
+version: '0.004'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

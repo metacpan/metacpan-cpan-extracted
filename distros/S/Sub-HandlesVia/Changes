@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Sub-HandlesVia>
 Bug tracker:  <https://github.com/tobyink/p5-sub-handlesvia/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.032	2022-07-12
+
+ [ Packaging ]
+ - Require newer version of Role::Hooks.
+
 0.031	2022-07-09
 
  [ Packaging ]

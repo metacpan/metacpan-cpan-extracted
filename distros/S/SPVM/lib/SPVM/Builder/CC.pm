@@ -14,9 +14,21 @@ use File::Basename 'dirname', 'basename';
 use SPVM::Builder;
 use SPVM::Builder::Util;
 use SPVM::Builder::Config;
+use SPVM::Builder::CompileInfo;
 use SPVM::Builder::ObjectFileInfo;
 use SPVM::Builder::LinkInfo;
 use SPVM::Builder::Resource;
+
+sub global_before_compile {
+  my $self = shift;
+  if (@_) {
+    $self->{global_before_compile} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{global_before_compile};
+  }
+}
 
 sub builder {
   my $self = shift;
@@ -70,39 +82,6 @@ sub debug {
   }
   else {
     return $self->{debug};
-  }
-}
-
-sub global_cc_each {
-  my $self = shift;
-  if (@_) {
-    $self->{global_cc_each} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{global_cc_each};
-  }
-}
-
-sub global_ccflags_each {
-  my $self = shift;
-  if (@_) {
-    $self->{global_ccflags_each} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{global_ccflags_each};
-  }
-}
-
-sub global_optimize_each {
-  my $self = shift;
-  if (@_) {
-    $self->{global_optimize_each} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{global_optimize_each};
   }
 }
 
@@ -378,11 +357,12 @@ sub compile_single {
   # Quiet output
   my $quiet = $self->detect_quiet($config);
   
-  my $source_file = $compile_info->{source_file};
+  my $source_file = $compile_info->source_file;
 
   # Execute compile command
   my $cbuilder = ExtUtils::CBuilder->new(quiet => 1);
-  my $cc_cmd = $self->create_compile_command($compile_info);
+  my $cc_cmd = $compile_info->create_compile_command;
+  
   $cbuilder->do_system(@$cc_cmd)
     or confess "Can't compile $source_file: @$cc_cmd";
   unless ($quiet) {
@@ -422,7 +402,7 @@ sub compile {
   # Force compile
   my $force = $self->detect_force($config);
 
-  my $ignore_use_resource = $options->{ignore_use_resource};
+  my $no_use_resource = $options->{no_use_resource};
   my $ignore_native_module = $options->{ignore_native_module};
   
   # Native module file
@@ -525,9 +505,17 @@ sub compile {
       output_file => $object_file,
       source_file => $source_file,
       include_dirs => $options->{include_dirs},
-      ignore_use_resource => $ignore_use_resource,
+      no_use_resource => $no_use_resource,
     });
     
+    if (defined $config->before_compile) {
+      $config->before_compile->($config, $compile_info);
+    }
+
+    if (defined $self->global_before_compile) {
+      $self->global_before_compile->($config, $compile_info);
+    }
+
     # Compile a source file
     if ($need_generate) {
       my $class_rel_dir = SPVM::Builder::Util::convert_class_name_to_rel_dir($class_name);
@@ -541,13 +529,7 @@ sub compile {
     my $compile_info_cc = $compile_info->{cc};
     my $compile_info_ccflags = $compile_info->{ccflags};
     my $object_file_info = SPVM::Builder::ObjectFileInfo->new(
-      class_name => $class_name,
-      file => $object_file,
-      source_file => $source_file,
-      cc => $compile_info_cc,
-      ccflags => $compile_info_ccflags,
-      config => $config,
-      source_type => $cur_is_native_module ? 'native_module' : 'resource',
+      compile_info => $compile_info,
     );
     
     # Add object file information
@@ -561,11 +543,11 @@ sub create_compile_command {
   my ($self, $compile_info) = @_;
 
   my $cc = $compile_info->{cc};
-  my $ccflags = $compile_info->{ccflags};
+  my $merged_ccflags = $compile_info->create_merged_ccflags;
   my $object_file = $compile_info->{object_file};
   my $source_file = $compile_info->{source_file};
   
-  my $cc_cmd = [$cc, '-c', @$ccflags, '-o', $object_file, $source_file];
+  my $cc_cmd = [$cc, '-c', @$merged_ccflags, '-o', $object_file, $source_file];
   
   return $cc_cmd;
 }
@@ -583,27 +565,12 @@ sub create_compile_command_info {
   my $output_file = $options->{output_file};
   my $source_file = $options->{source_file};
   
-  my $cc_each = $config->cc_each;
-  my $cc;
-  if ($cc_each) {
-    $cc = $cc_each->($config, {class_name => $class_name, source_file => $source_file});
-  }
-  else {
-    $cc = $config->cc;
-  }
-  my $global_cc_each = $self->global_cc_each;
-  if ($global_cc_each) {
-    $cc = $global_cc_each->($config, {class_name => $class_name, source_file => $source_file, cc => $cc});
-  }
+  my $cc = $config->cc;
   
-  my $cflags = '';
-  
-  my $builder_include_dir = $config->builder_include_dir;
-  $cflags .= "-I$builder_include_dir ";
-
   # Include directories
+  my $no_use_resource = $options->{no_use_resource};
+  my @include_dirs = @{$config->include_dirs};
   {
-    my @include_dirs = @{$config->include_dirs};
 
     # Add own resource include directory
     my $own_include_dir = $config->own_include_dir;
@@ -612,7 +579,7 @@ sub create_compile_command_info {
     }
     
     # Add resource include directories
-    unless ($options->{ignore_use_resource}) {
+    unless ($options->{no_use_resource}) {
       my $resource_names = $config->get_resource_names;
       for my $resource_name (@$resource_names) {
         my $resource = $config->get_resource($resource_name);
@@ -628,42 +595,24 @@ sub create_compile_command_info {
     if (defined $options->{include_dirs}) {
       push @include_dirs, @{$options->{include_dirs}};
     }
-    
-    my $inc = join(' ', map { "-I$_" } @include_dirs);
-    $cflags .= " $inc";
   }
   
-  my $ccflags_each = $config->ccflags_each;
-  my $ccflags;
-  if ($ccflags_each) {
-    $ccflags = $ccflags_each->($config, {cc => $cc, class_name => $class_name, source_file => $source_file});
-  }
-  else {
-    $ccflags = $config->ccflags;
-  }
-  my $global_ccflags_each = $self->global_ccflags_each;
-  if ($global_ccflags_each) {
-    $ccflags = $global_ccflags_each->($config, {cc => $cc, class_name => $class_name, source_file => $source_file, ccflags => $ccflags});
-  }
-  $cflags .= " " . join(' ', @$ccflags);
+  my $ccflags = $config->ccflags;
   
-  my $optimize_each = $config->optimize_each;
-  my $optimize;
-  if ($optimize_each) {
-    $optimize = $optimize_each->($config, {cc => $cc, class_name => $class_name, source_file => $source_file});
-  }
-  else {
-    $optimize = $config->optimize;
-  }
-  my $global_optimize_each = $self->global_optimize_each;
-  if ($global_optimize_each) {
-    $optimize = $global_optimize_each->($config, {cc => $cc, class_name => $class_name, source_file => $source_file, optimize => $optimize});
-  }
-  $cflags .= " $optimize";
+  my $optimize = $config->optimize;
   
-  my @cflags = ExtUtils::CBuilder->new->split_like_shell($cflags);
-  
-  my $compile_info = {cc => $cc, ccflags => \@cflags, object_file => $output_file, source_file => $source_file};
+  my $builder_include_dir = $config->builder_include_dir;
+
+  my $compile_info = SPVM::Builder::CompileInfo->new(
+    cc => $cc,
+    ccflags => $ccflags,
+    output_file => $output_file,
+    source_file => $source_file,
+    optimize => $optimize,
+    builder_include_dir => $builder_include_dir,
+    include_dirs => \@include_dirs,
+    config => $config,
+  );
   
   return $compile_info;
 }
@@ -720,17 +669,6 @@ sub create_dl_func_list {
   }
 
   return $dl_func_list;
-}
-
-# This is used only for linker output for debug
-sub create_link_command {
-  my ($self, $ld, $output_file, $object_files, $cbuilder_extra_linker_flags) = @_;
-  
-  my @link_command = ($ld, '-o', $output_file, @$object_files, $cbuilder_extra_linker_flags);
-  
-  my $link_command = join(' ', @link_command);
-  
-  return $link_command;
 }
 
 sub link {
@@ -806,23 +744,14 @@ sub link {
     my $cbuilder = ExtUtils::CBuilder->new(quiet => 1, config => $cbuilder_config);
     
     my $link_info_ld = $link_info->ld;
-    my $link_info_ldflags = $link_info->ldflags;
     my $link_info_class_name = $link_info->class_name;
     my $link_info_output_file = $link_info->output_file;
     my $link_info_object_file_infos = $link_info->object_file_infos;
-    my $link_info_lib_infos = $link_info->lib_infos;
     
-    my $all_ldflags_str = '';
-    
-    my $link_info_ldflags_str = join(' ', @$link_info_ldflags);
-    $all_ldflags_str .= $link_info_ldflags_str;
-    
-    my $lib_ldflags_str = join(' ', map { my $tmp = $_->to_string; $tmp } @$link_info_lib_infos);
+    my $merged_ldflags = $link_info->create_merged_ldflags;
     
     my $link_info_object_files = [map { my $tmp = $_->to_string; $tmp } @$link_info_object_file_infos];
 
-    my $cbuilder_extra_linker_flags = "$link_info_ldflags_str $lib_ldflags_str";
-    
     my @tmp_files;
     
     my $output_type = $config->output_type;
@@ -834,11 +763,11 @@ sub link {
         objects => $link_info_object_files,
         module_name => $link_info_class_name,
         lib_file => $link_info_output_file,
-        extra_linker_flags => $cbuilder_extra_linker_flags,
+        extra_linker_flags => "@$merged_ldflags",
         dl_func_list => $dl_func_list,
       );
       unless ($quiet) {
-        my $link_command = $self->create_link_command($ld, $link_info_output_file, $link_info_object_files, $cbuilder_extra_linker_flags);
+        my $link_command = $link_info->to_string;
         warn "$link_command\n";
       }
     }
@@ -858,10 +787,10 @@ sub link {
         objects => $link_info_object_files,
         module_name => $link_info_class_name,
         exe_file => $link_info_output_file,
-        extra_linker_flags => $cbuilder_extra_linker_flags,
+        extra_linker_flags => "@$merged_ldflags",
       );
       unless ($quiet) {
-        my $link_command = $self->create_link_command($ld, $link_info_output_file, $link_info_object_files, $cbuilder_extra_linker_flags);
+        my $link_command = $link_info->to_string;
         warn "$link_command\n";
       }
     }
@@ -912,37 +841,13 @@ sub create_link_info {
   # Linker
   my $ld = $config->ld;
   
-  # All linker flags
-  my @all_ldflags;
-  
   # Output type
   my $output_type = $self->output_type || $config->output_type;
-  
-  # Linker flags for dynamic link
-  if ($output_type eq 'dynamic_lib') {
-    my $dynamic_lib_ldflags = $config->dynamic_lib_ldflags;
-    push @all_ldflags, @$dynamic_lib_ldflags;
-  }
-  
-  # Linker flags
-  my $ldflags = $config->ldflags;
-  push @all_ldflags, @$ldflags;
-  
-  # Optimize
-  my $ld_optimize = $config->ld_optimize;
-  push @all_ldflags, $ld_optimize;
-
-  # Library directory
-  my $lib_dirs = $config->lib_dirs;
-  for my $lib_dir (@$lib_dirs) {
-    if (-d $lib_dir) {
-      push @all_ldflags, "-L$lib_dir";
-    }
-  }
   
   # Libraries
   my $lib_infos = [];
   my $libs = $config->libs;
+  my $lib_dirs = $config->lib_dirs;
   for my $lib (@$libs) {
     my $lib_info;
     
@@ -1034,7 +939,7 @@ sub create_link_info {
     my $compile_options = {
       input_dir => $resource_src_dir,
       output_dir => $resource_object_dir,
-      ignore_use_resource => 1,
+      no_use_resource => 1,
       ignore_native_module => 1,
       config => $resource_config,
       category => $category,
@@ -1084,15 +989,29 @@ sub create_link_info {
     
     $output_file .= $exe_ext;
   }
+
+  # Linker flags for dynamic link
+  my $dynamic_lib_ldflags = $config->dynamic_lib_ldflags;
+  
+  # Linker flags
+  my $ldflags = $config->ldflags;
+  
+  # Optimize
+  my $ld_optimize = $config->ld_optimize;
   
   my $link_info = SPVM::Builder::LinkInfo->new(
     class_name => $class_name,
     ld => $ld,
-    ldflags => \@all_ldflags,
+    ldflags => $ldflags,
     lib_infos => $lib_infos,
     object_file_infos => $all_object_file_infos,
     output_file => $output_file,
+    lib_dirs => $lib_dirs,
+    ld_optimize => $ld_optimize,
+    dynamic_lib_ldflags => $dynamic_lib_ldflags,
+    output_type => $output_type,
   );
+  
   return $link_info;
 }
 
@@ -1141,3 +1060,4 @@ sub create_precompile_source_file {
 =head1 Name
 
 SPVM::Builder::CC - Compiler and Linker of Native Sources
+

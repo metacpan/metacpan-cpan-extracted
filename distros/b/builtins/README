@@ -1,0 +1,43 @@
+builtins version 0.000003
+
+Under Perl 5.36 or later, this module loads every available built-in function
+from the builtin:: namespace, and turns off the warnings about them still
+being experimental.
+
+In other words, loading this module via:
+
+    use builtins;
+
+...is the same as writing:
+
+    use experimental 'builtin';
+    use builtin qw(
+        ceil    floor     trim
+        true    false     is_bool
+        weaken  unweaken  is_weak
+        blessed refaddr   reftype
+        created_as_string created_as_number
+    );
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2022, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

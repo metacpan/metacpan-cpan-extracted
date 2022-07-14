@@ -5,11 +5,12 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,14 +23,13 @@ no_index:
 provides:
   Module::ScanDeps::Static:
     file: lib/Module/ScanDeps/Static.pm
-    version: '0.5'
+    version: '0.6'
 requires:
-  Class::Accessor::Fast: '0.51'
-  IO::Scalar: '2.111'
-  List::Util: '1.50'
-  Module::ScanDeps::Static: '0.4'
-  Pod::Find: '1.63'
-  Readonly: '2.05'
+  Class::Accessor::Fast: '0'
+  IO::Scalar: '0'
+  JSON::PP: '0'
+  Readonly: '0'
   perl: '5.01'
-version: '0.5'
+  version: '0'
+version: '0.6'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -135,7 +135,7 @@
    "provides" : {
       "Alien::PGPLOT" : {
          "file" : "lib/Alien/PGPLOT.pm",
-         "version" : "v5.2.2.4"
+         "version" : "v5.2.2.5"
       }
    },
    "release_status" : "stable",
@@ -150,7 +150,7 @@
          "web" : "https://gitlab.com/djerius/alien-pgplot"
       }
    },
-   "version" : "v5.2.2.4",
+   "version" : "v5.2.2.5",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {

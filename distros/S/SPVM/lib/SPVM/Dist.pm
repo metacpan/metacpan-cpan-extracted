@@ -443,7 +443,7 @@ sub generate_gitkeep_file_for_native_module_src_dir {
 sub generate_gitignore_file {
   my ($self) = @_;
   
-  my $gitignore_content = <<"EOS";
+  my $gitignore_content = <<'EOS';
 blib/*
 Makefile
 Makefile.old
@@ -458,6 +458,8 @@ SPVM-*
 *.bak
 *.BAK
 *.tmp
+*.o
+*.bs
 EOS
   
   # Generate file
@@ -469,22 +471,24 @@ sub generate_manifest_skip_file {
   my ($self) = @_;
   
   # Content
-  my $manifest_skip_content = <<"EOS";
-^blib/
-^Makefile\$
-^Makefile\.old\$
-^MYMETA.yml\$
-^MYMETA.json\$
-^pm_to_blib\$
-^\.spvm_build/
-^t/\.spvm_build/
-^SPVM-
-^core\.
-^core\$
-\.bak\$
-\.tmp\$
-\.BAK\$
-^\.git/
+  my $manifest_skip_content = <<'EOS';
+(^|\/)blib/
+(^|\/)Makefile$
+(^|\/)Makefile.old$
+(^|\/)MYMETA.yml$
+(^|\/)MYMETA.json$
+(^|\/)pm_to_blib$
+(^|\/).spvm_build/
+(^|\/)t/.spvm_build/
+(^|\/)SPVM-
+(^|\/)core\.
+(^|\/)core$
+(^|\/)\.git/
+\.bak$
+\.tmp$
+\.BAK$
+\.o$
+\.bs$
 EOS
 
   # Generate file
@@ -627,7 +631,7 @@ done_testing;
 EOS
   
   # Generate file
-  my $basic_test_rel_file = 't/basic.t';
+  my $basic_test_rel_file = 't/use_spvm_class.t';
   $self->generate_file($basic_test_rel_file, $basic_test_content);
 }
 
@@ -767,6 +771,14 @@ sub generate_dist {
   
   my $class_name = $self->class_name;
   
+  unless (length $class_name) {
+    confess "The class name must be specified";
+  }
+  
+  if ($class_name =~ /-/) {
+    confess "The class name can't contain \"-\"";
+  }
+  
   my $native = $self->native;
   my $resource = $self->resource;
   
@@ -821,7 +833,7 @@ sub generate_dist {
     # Generate Makefile.PL file
     $self->generate_makefile_pl_file;
     
-    # Generate t/basic.t file
+    # Generate t/use_spvm_class.t file
     $self->generate_basic_test_file;
 
     # Generate basic test SPVM module file

@@ -13,7 +13,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.44';
+$VERSION = '0.45';
 $VERSION = $VERSION;
 
 # internal use
@@ -118,16 +118,16 @@ sub main {
         die <<END;
 usage:
 
-perl mb.pm              MBCS_Perl_script.pl (auto detect)
-perl mb.pm -e big5      MBCS_Perl_script.pl
-perl mb.pm -e big5hkscs MBCS_Perl_script.pl
-perl mb.pm -e eucjp     MBCS_Perl_script.pl
-perl mb.pm -e gb18030   MBCS_Perl_script.pl
-perl mb.pm -e gbk       MBCS_Perl_script.pl
-perl mb.pm -e sjis      MBCS_Perl_script.pl
-perl mb.pm -e uhc       MBCS_Perl_script.pl
-perl mb.pm -e utf8      MBCS_Perl_script.pl
-perl mb.pm -e wtf8      MBCS_Perl_script.pl
+perl mb.pm              script_by_mbcs.pl (auto detect)
+perl mb.pm -e big5      script_by_big5.pl
+perl mb.pm -e big5hkscs script_by_big5hkscs.pl
+perl mb.pm -e eucjp     script_by_eucjp.pl
+perl mb.pm -e gb18030   script_by_gb18030.pl
+perl mb.pm -e gbk       script_by_gbk.pl
+perl mb.pm -e sjis      script_by_sjis.pl
+perl mb.pm -e uhc       script_by_uhc.pl
+perl mb.pm -e utf8      script_by_utf8.pl
+perl mb.pm -e wtf8      script_by_wtf8.pl
 
 perl mb.pm script.pl ??-DOS-like *wildcard* available
 
@@ -5273,16 +5273,16 @@ mb - Can easy script in Big5, Big5-HKSCS, GBK, Sjis, UHC, UTF-8, ...
 
 =head1 SYNOPSIS
 
-  $ perl mb.pm              MBCS_Perl_script.pl (auto detect encoding of script)
-  $ perl mb.pm -e big5      MBCS_Perl_script.pl
-  $ perl mb.pm -e big5hkscs MBCS_Perl_script.pl
-  $ perl mb.pm -e eucjp     MBCS_Perl_script.pl
-  $ perl mb.pm -e gb18030   MBCS_Perl_script.pl
-  $ perl mb.pm -e gbk       MBCS_Perl_script.pl
-  $ perl mb.pm -e sjis      MBCS_Perl_script.pl
-  $ perl mb.pm -e uhc       MBCS_Perl_script.pl
-  $ perl mb.pm -e utf8      MBCS_Perl_script.pl
-  $ perl mb.pm -e wtf8      MBCS_Perl_script.pl
+  $ perl mb.pm              script_by_mbcs.pl      (auto detect encoding of script)
+  $ perl mb.pm -e big5      script_by_big5.pl
+  $ perl mb.pm -e big5hkscs script_by_big5hkscs.pl
+  $ perl mb.pm -e eucjp     script_by_eucjp.pl
+  $ perl mb.pm -e gb18030   script_by_gb18030.pl
+  $ perl mb.pm -e gbk       script_by_gbk.pl
+  $ perl mb.pm -e sjis      script_by_sjis.pl
+  $ perl mb.pm -e uhc       script_by_uhc.pl
+  $ perl mb.pm -e utf8      script_by_utf8.pl
+  $ perl mb.pm -e wtf8      script_by_wtf8.pl
 
   C:\WINDOWS> perl mb.pm script.pl ??-DOS-like *wildcard* available
 
@@ -5805,6 +5805,8 @@ However substantially ...
   index                     (already written in regular expression)
   rindex                    (already written in regular expression)
   -----------------------------------------------------------------
+  These functions are not compatible with JPerl.
+  We are glad if you like these specification.
 
 Substantially put, JPerl users can write programs the same way they used to.
 
@@ -6074,6 +6076,10 @@ in perl's memory,
 
 lc("A") makes halfwidth-"a", however lc("乙") makes "乙" not "兀", moreover lc("Ａ") makes "Ａ" not fullwidth-"ａ".
 Like JPerl, for easy to use, "lc()" and "uc()" do not work for MBCS encoding that is not US-ASCII.
+
+"DBCS," "ZENKAKU(full-width) characters," and "KANJI" are often intentionally misused as having the same meaning.
+In other words, full-width alphabetic characters are treated as KANJI.
+In that case, it is desirable that those characters are not converted by lc() and uc().
 
     ----------------------------------------------------------------------------------------------
                                                bare Perl4, bare Perl5     mb.pm modulino
@@ -6536,8 +6542,309 @@ transpiled as follows
 
 Each elements in regular expressions are transpiled as follows
 
+  on every encodings
   ----------------------------------------------------------------------------------------------------------------------
-  in your script                             script transpiled by this software (on sjis encoding)
+  in your script                             script transpiled by this software
+  ----------------------------------------------------------------------------------------------------------------------
+  qr/./                                      qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_dot]})/ ]}@{[mb::_m_passed()]}}
+  qr/\B/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_B]})/ ]}@{[mb::_m_passed()]}}
+  qr/\D/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_D]})/ ]}@{[mb::_m_passed()]}}
+  qr/\H/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_H]})/ ]}@{[mb::_m_passed()]}}
+  qr/\N/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_N]})/ ]}@{[mb::_m_passed()]}}
+  qr/\R/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_R]})/ ]}@{[mb::_m_passed()]}}
+  qr/\S/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_S]})/ ]}@{[mb::_m_passed()]}}
+  qr/\V/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_V]})/ ]}@{[mb::_m_passed()]}}
+  qr/\W/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_W]})/ ]}@{[mb::_m_passed()]}}
+  qr/\b/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_b]})/ ]}@{[mb::_m_passed()]}}
+  qr/\d/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_d]})/ ]}@{[mb::_m_passed()]}}
+  qr/\h/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_h]})/ ]}@{[mb::_m_passed()]}}
+  qr/\s/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_s]})/ ]}@{[mb::_m_passed()]}}
+  qr/\v/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_v]})/ ]}@{[mb::_m_passed()]}}
+  qr/\w/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_w]})/ ]}@{[mb::_m_passed()]}}
+  qr/[\b]/                                   qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[\\b])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:alnum:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:alnum:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:alpha:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:alpha:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:ascii:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:ascii:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:blank:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:blank:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:cntrl:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:cntrl:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:digit:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:digit:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:graph:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:graph:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:lower:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:lower:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:print:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:print:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:punct:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:punct:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:space:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:space:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:upper:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:upper:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:word:]]/                             qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:word:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:xdigit:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:xdigit:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^alnum:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^alnum:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^alpha:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^alpha:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^ascii:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^ascii:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^blank:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^blank:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^cntrl:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^cntrl:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^digit:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^digit:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^graph:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^graph:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^lower:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^lower:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^print:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^print:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^punct:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^punct:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^space:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^space:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^upper:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^upper:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^word:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^word:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^xdigit:]]/                          qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^xdigit:]])]})/ ]}@{[mb::_m_passed()]}}
+  ----------------------------------------------------------------------------------------------------------------------
+  
+  on big5 encoding
+  ----------------------------------------------------------------------------------------------------------------------
+  in your script                             script transpiled by this software
+  ----------------------------------------------------------------------------------------------------------------------
+  qr'.'                                      qr{\G${mb::_anchor}@{[qr'(?:(?>[\x81-\xFE][\x00-\xFF])|.)' ]}@{[mb::_m_passed()]}}
+  qr'\B'                                     qr{\G${mb::_anchor}@{[qr'(?:(?<![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])|(?<=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]))' ]}@{[mb::_m_passed()]}}
+  qr'\D'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![0123456789])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\H'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\x09\x20])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\N'                                     qr{\G${mb::_anchor}@{[qr'(?:(?!\n)(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\R'                                     qr{\G${mb::_anchor}@{[qr'(?>\r\n|[\x0A\x0B\x0C\x0D])' ]}@{[mb::_m_passed()]}}
+  qr'\S'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\t\n\f\r\x20])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\V'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\x0A\x0B\x0C\x0D])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\W'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\b'                                     qr{\G${mb::_anchor}@{[qr'(?:(?<![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])|(?<=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]))' ]}@{[mb::_m_passed()]}}
+  qr'\d'                                     qr{\G${mb::_anchor}@{[qr'[0123456789]' ]}@{[mb::_m_passed()]}}
+  qr'\h'                                     qr{\G${mb::_anchor}@{[qr'[\x09\x20]' ]}@{[mb::_m_passed()]}}
+  qr'\s'                                     qr{\G${mb::_anchor}@{[qr'[\t\n\f\r\x20]' ]}@{[mb::_m_passed()]}}
+  qr'\v'                                     qr{\G${mb::_anchor}@{[qr'[\x0A\x0B\x0C\x0D]' ]}@{[mb::_m_passed()]}}
+  qr'\w'                                     qr{\G${mb::_anchor}@{[qr'[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]' ]}@{[mb::_m_passed()]}}
+  qr'[\b]'                                   qr{\G${mb::_anchor}@{[qr'(?:(?=[\x08])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:alnum:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x5A\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:alpha:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x41-\x5A\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:ascii:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x00-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:blank:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x09\x20])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:cntrl:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x00-\x1F\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:digit:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:graph:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x21-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:lower:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[abcdefghijklmnopqrstuvwxyz])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:print:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x20-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:punct:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x21-\x2F\x3A-\x3F\x40\x5B-\x5F\x60\x7B-\x7E])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:space:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\s\x0B])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:upper:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZ])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:word:]]'                             qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x5A\x5F\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:xdigit:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^alnum:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x5A\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^alpha:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x41-\x5A\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^ascii:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x00-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^blank:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x09\x20])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^cntrl:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x00-\x1F\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^digit:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^graph:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x21-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^lower:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![abcdefghijklmnopqrstuvwxyz])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^print:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x20-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^punct:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x21-\x2F\x3A-\x3F\x40\x5B-\x5F\x60\x7B-\x7E])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^space:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\s\x0B])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^upper:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![ABCDEFGHIJKLMNOPQRSTUVWXYZ])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^word:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x5A\x5F\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^xdigit:]]'                          qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  ----------------------------------------------------------------------------------------------------------------------
+
+  on big5hkscs encoding
+  ----------------------------------------------------------------------------------------------------------------------
+  in your script                             script transpiled by this software
+  ----------------------------------------------------------------------------------------------------------------------
+  qr'.'                                      qr{\G${mb::_anchor}@{[qr'(?:(?>[\x81-\xFE][\x00-\xFF])|.)' ]}@{[mb::_m_passed()]}}
+  qr'\B'                                     qr{\G${mb::_anchor}@{[qr'(?:(?<![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])|(?<=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]))' ]}@{[mb::_m_passed()]}}
+  qr'\D'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![0123456789])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\H'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\x09\x20])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\N'                                     qr{\G${mb::_anchor}@{[qr'(?:(?!\n)(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\R'                                     qr{\G${mb::_anchor}@{[qr'(?>\r\n|[\x0A\x0B\x0C\x0D])' ]}@{[mb::_m_passed()]}}
+  qr'\S'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\t\n\f\r\x20])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\V'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\x0A\x0B\x0C\x0D])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\W'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\b'                                     qr{\G${mb::_anchor}@{[qr'(?:(?<![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])|(?<=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]))' ]}@{[mb::_m_passed()]}}
+  qr'\d'                                     qr{\G${mb::_anchor}@{[qr'[0123456789]' ]}@{[mb::_m_passed()]}}
+  qr'\h'                                     qr{\G${mb::_anchor}@{[qr'[\x09\x20]' ]}@{[mb::_m_passed()]}}
+  qr'\s'                                     qr{\G${mb::_anchor}@{[qr'[\t\n\f\r\x20]' ]}@{[mb::_m_passed()]}}
+  qr'\v'                                     qr{\G${mb::_anchor}@{[qr'[\x0A\x0B\x0C\x0D]' ]}@{[mb::_m_passed()]}}
+  qr'\w'                                     qr{\G${mb::_anchor}@{[qr'[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]' ]}@{[mb::_m_passed()]}}
+  qr'[\b]'                                   qr{\G${mb::_anchor}@{[qr'(?:(?=[\x08])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:alnum:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x5A\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:alpha:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x41-\x5A\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:ascii:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x00-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:blank:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x09\x20])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:cntrl:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x00-\x1F\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:digit:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:graph:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x21-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:lower:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[abcdefghijklmnopqrstuvwxyz])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:print:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x20-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:punct:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x21-\x2F\x3A-\x3F\x40\x5B-\x5F\x60\x7B-\x7E])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:space:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\s\x0B])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:upper:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZ])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:word:]]'                             qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x5A\x5F\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:xdigit:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^alnum:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x5A\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^alpha:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x41-\x5A\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^ascii:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x00-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^blank:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x09\x20])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^cntrl:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x00-\x1F\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^digit:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^graph:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x21-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^lower:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![abcdefghijklmnopqrstuvwxyz])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^print:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x20-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^punct:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x21-\x2F\x3A-\x3F\x40\x5B-\x5F\x60\x7B-\x7E])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^space:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\s\x0B])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^upper:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![ABCDEFGHIJKLMNOPQRSTUVWXYZ])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^word:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x5A\x5F\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^xdigit:]]'                          qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  ----------------------------------------------------------------------------------------------------------------------
+
+  on eucjp encoding
+  ----------------------------------------------------------------------------------------------------------------------
+  in your script                             script transpiled by this software
+  ----------------------------------------------------------------------------------------------------------------------
+  qr'.'                                      qr{\G${mb::_anchor}@{[qr'(?:(?>[\xA1-\xFE][\x00-\xFF])|.)' ]}@{[mb::_m_passed()]}}
+  qr'\B'                                     qr{\G${mb::_anchor}@{[qr'(?:(?<![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])|(?<=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]))' ]}@{[mb::_m_passed()]}}
+  qr'\D'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![0123456789])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\H'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\x09\x20])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\N'                                     qr{\G${mb::_anchor}@{[qr'(?:(?!\n)(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\R'                                     qr{\G${mb::_anchor}@{[qr'(?>\r\n|[\x0A\x0B\x0C\x0D])' ]}@{[mb::_m_passed()]}}
+  qr'\S'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\t\n\f\r\x20])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\V'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\x0A\x0B\x0C\x0D])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\W'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\b'                                     qr{\G${mb::_anchor}@{[qr'(?:(?<![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])|(?<=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]))' ]}@{[mb::_m_passed()]}}
+  qr'\d'                                     qr{\G${mb::_anchor}@{[qr'[0123456789]' ]}@{[mb::_m_passed()]}}
+  qr'\h'                                     qr{\G${mb::_anchor}@{[qr'[\x09\x20]' ]}@{[mb::_m_passed()]}}
+  qr'\s'                                     qr{\G${mb::_anchor}@{[qr'[\t\n\f\r\x20]' ]}@{[mb::_m_passed()]}}
+  qr'\v'                                     qr{\G${mb::_anchor}@{[qr'[\x0A\x0B\x0C\x0D]' ]}@{[mb::_m_passed()]}}
+  qr'\w'                                     qr{\G${mb::_anchor}@{[qr'[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]' ]}@{[mb::_m_passed()]}}
+  qr'[\b]'                                   qr{\G${mb::_anchor}@{[qr'(?:(?=[\x08])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:alnum:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x5A\x61-\x7A])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:alpha:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x41-\x5A\x61-\x7A])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:ascii:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x00-\x7F])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:blank:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x09\x20])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:cntrl:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x00-\x1F\x7F])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:digit:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:graph:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x21-\x7F])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:lower:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[abcdefghijklmnopqrstuvwxyz])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:print:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x20-\x7F])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:punct:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x21-\x2F\x3A-\x3F\x40\x5B-\x5F\x60\x7B-\x7E])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:space:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\s\x0B])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:upper:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZ])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:word:]]'                             qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x5A\x5F\x61-\x7A])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:xdigit:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^alnum:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x5A\x61-\x7A])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^alpha:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x41-\x5A\x61-\x7A])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^ascii:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x00-\x7F])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^blank:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x09\x20])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^cntrl:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x00-\x1F\x7F])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^digit:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^graph:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x21-\x7F])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^lower:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![abcdefghijklmnopqrstuvwxyz])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^print:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x20-\x7F])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^punct:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x21-\x2F\x3A-\x3F\x40\x5B-\x5F\x60\x7B-\x7E])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^space:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\s\x0B])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^upper:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![ABCDEFGHIJKLMNOPQRSTUVWXYZ])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^word:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x5A\x5F\x61-\x7A])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^xdigit:]]'                          qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  ----------------------------------------------------------------------------------------------------------------------
+
+  on gb18030 encoding
+  ----------------------------------------------------------------------------------------------------------------------
+  in your script                             script transpiled by this software
+  ----------------------------------------------------------------------------------------------------------------------
+  qr'.'                                      qr{\G${mb::_anchor}@{[qr'(?:(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|.)' ]}@{[mb::_m_passed()]}}
+  qr'\B'                                     qr{\G${mb::_anchor}@{[qr'(?:(?<![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])|(?<=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]))' ]}@{[mb::_m_passed()]}}
+  qr'\D'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![0123456789])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\H'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\x09\x20])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\N'                                     qr{\G${mb::_anchor}@{[qr'(?:(?!\n)(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\R'                                     qr{\G${mb::_anchor}@{[qr'(?>\r\n|[\x0A\x0B\x0C\x0D])' ]}@{[mb::_m_passed()]}}
+  qr'\S'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\t\n\f\r\x20])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\V'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\x0A\x0B\x0C\x0D])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\W'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\b'                                     qr{\G${mb::_anchor}@{[qr'(?:(?<![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])|(?<=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]))' ]}@{[mb::_m_passed()]}}
+  qr'\d'                                     qr{\G${mb::_anchor}@{[qr'[0123456789]' ]}@{[mb::_m_passed()]}}
+  qr'\h'                                     qr{\G${mb::_anchor}@{[qr'[\x09\x20]' ]}@{[mb::_m_passed()]}}
+  qr'\s'                                     qr{\G${mb::_anchor}@{[qr'[\t\n\f\r\x20]' ]}@{[mb::_m_passed()]}}
+  qr'\v'                                     qr{\G${mb::_anchor}@{[qr'[\x0A\x0B\x0C\x0D]' ]}@{[mb::_m_passed()]}}
+  qr'\w'                                     qr{\G${mb::_anchor}@{[qr'[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]' ]}@{[mb::_m_passed()]}}
+  qr'[\b]'                                   qr{\G${mb::_anchor}@{[qr'(?:(?=[\x08])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:alnum:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x5A\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:alpha:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x41-\x5A\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:ascii:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x00-\x7F])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:blank:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x09\x20])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:cntrl:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x00-\x1F\x7F])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:digit:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:graph:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x21-\x7F])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:lower:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[abcdefghijklmnopqrstuvwxyz])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:print:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x20-\x7F])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:punct:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x21-\x2F\x3A-\x3F\x40\x5B-\x5F\x60\x7B-\x7E])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:space:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\s\x0B])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:upper:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZ])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:word:]]'                             qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x5A\x5F\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:xdigit:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^alnum:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x5A\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^alpha:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x41-\x5A\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^ascii:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x00-\x7F])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^blank:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x09\x20])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^cntrl:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x00-\x1F\x7F])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^digit:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^graph:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x21-\x7F])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^lower:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![abcdefghijklmnopqrstuvwxyz])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^print:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x20-\x7F])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^punct:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x21-\x2F\x3A-\x3F\x40\x5B-\x5F\x60\x7B-\x7E])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^space:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\s\x0B])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^upper:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![ABCDEFGHIJKLMNOPQRSTUVWXYZ])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^word:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x5A\x5F\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^xdigit:]]'                          qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  ----------------------------------------------------------------------------------------------------------------------
+
+  on gbk encoding
+  ----------------------------------------------------------------------------------------------------------------------
+  in your script                             script transpiled by this software
+  ----------------------------------------------------------------------------------------------------------------------
+  qr'.'                                      qr{\G${mb::_anchor}@{[qr'(?:(?>[\x81-\xFE][\x00-\xFF])|.)' ]}@{[mb::_m_passed()]}}
+  qr'\B'                                     qr{\G${mb::_anchor}@{[qr'(?:(?<![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])|(?<=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]))' ]}@{[mb::_m_passed()]}}
+  qr'\D'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![0123456789])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\H'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\x09\x20])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\N'                                     qr{\G${mb::_anchor}@{[qr'(?:(?!\n)(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\R'                                     qr{\G${mb::_anchor}@{[qr'(?>\r\n|[\x0A\x0B\x0C\x0D])' ]}@{[mb::_m_passed()]}}
+  qr'\S'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\t\n\f\r\x20])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\V'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\x0A\x0B\x0C\x0D])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\W'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\b'                                     qr{\G${mb::_anchor}@{[qr'(?:(?<![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])|(?<=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]))' ]}@{[mb::_m_passed()]}}
+  qr'\d'                                     qr{\G${mb::_anchor}@{[qr'[0123456789]' ]}@{[mb::_m_passed()]}}
+  qr'\h'                                     qr{\G${mb::_anchor}@{[qr'[\x09\x20]' ]}@{[mb::_m_passed()]}}
+  qr'\s'                                     qr{\G${mb::_anchor}@{[qr'[\t\n\f\r\x20]' ]}@{[mb::_m_passed()]}}
+  qr'\v'                                     qr{\G${mb::_anchor}@{[qr'[\x0A\x0B\x0C\x0D]' ]}@{[mb::_m_passed()]}}
+  qr'\w'                                     qr{\G${mb::_anchor}@{[qr'[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]' ]}@{[mb::_m_passed()]}}
+  qr'[\b]'                                   qr{\G${mb::_anchor}@{[qr'(?:(?=[\x08])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:alnum:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x5A\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:alpha:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x41-\x5A\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:ascii:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x00-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:blank:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x09\x20])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:cntrl:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x00-\x1F\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:digit:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:graph:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x21-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:lower:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[abcdefghijklmnopqrstuvwxyz])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:print:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x20-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:punct:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x21-\x2F\x3A-\x3F\x40\x5B-\x5F\x60\x7B-\x7E])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:space:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\s\x0B])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:upper:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZ])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:word:]]'                             qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x5A\x5F\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:xdigit:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^alnum:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x5A\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^alpha:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x41-\x5A\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^ascii:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x00-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^blank:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x09\x20])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^cntrl:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x00-\x1F\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^digit:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^graph:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x21-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^lower:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![abcdefghijklmnopqrstuvwxyz])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^print:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x20-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^punct:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x21-\x2F\x3A-\x3F\x40\x5B-\x5F\x60\x7B-\x7E])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^space:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\s\x0B])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^upper:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![ABCDEFGHIJKLMNOPQRSTUVWXYZ])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^word:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x5A\x5F\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^xdigit:]]'                          qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  ----------------------------------------------------------------------------------------------------------------------
+
+  on sjis encoding
+  ----------------------------------------------------------------------------------------------------------------------
+  in your script                             script transpiled by this software
   ----------------------------------------------------------------------------------------------------------------------
   qr'.'                                      qr{\G${mb::_anchor}@{[qr'(?:(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|.)' ]}@{[mb::_m_passed()]}}
   qr'\B'                                     qr{\G${mb::_anchor}@{[qr'(?:(?<![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])|(?<=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]))' ]}@{[mb::_m_passed()]}}
@@ -6583,50 +6890,156 @@ Each elements in regular expressions are transpiled as follows
   qr'[[:^upper:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![ABCDEFGHIJKLMNOPQRSTUVWXYZ])(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
   qr'[[:^word:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x5A\x5F\x61-\x7A])(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
   qr'[[:^xdigit:]]'                          qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
-  qr/./                                      qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_dot]})/ ]}@{[mb::_m_passed()]}}
-  qr/\B/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_B]})/ ]}@{[mb::_m_passed()]}}
-  qr/\D/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_D]})/ ]}@{[mb::_m_passed()]}}
-  qr/\H/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_H]})/ ]}@{[mb::_m_passed()]}}
-  qr/\N/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_N]})/ ]}@{[mb::_m_passed()]}}
-  qr/\R/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_R]})/ ]}@{[mb::_m_passed()]}}
-  qr/\S/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_S]})/ ]}@{[mb::_m_passed()]}}
-  qr/\V/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_V]})/ ]}@{[mb::_m_passed()]}}
-  qr/\W/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_W]})/ ]}@{[mb::_m_passed()]}}
-  qr/\b/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_b]})/ ]}@{[mb::_m_passed()]}}
-  qr/\d/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_d]})/ ]}@{[mb::_m_passed()]}}
-  qr/\h/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_h]})/ ]}@{[mb::_m_passed()]}}
-  qr/\s/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_s]})/ ]}@{[mb::_m_passed()]}}
-  qr/\v/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_v]})/ ]}@{[mb::_m_passed()]}}
-  qr/\w/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_w]})/ ]}@{[mb::_m_passed()]}}
-  qr/[\b]/                                   qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[\\b])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:alnum:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:alnum:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:alpha:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:alpha:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:ascii:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:ascii:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:blank:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:blank:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:cntrl:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:cntrl:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:digit:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:digit:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:graph:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:graph:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:lower:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:lower:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:print:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:print:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:punct:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:punct:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:space:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:space:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:upper:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:upper:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:word:]]/                             qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:word:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:xdigit:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:xdigit:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^alnum:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^alnum:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^alpha:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^alpha:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^ascii:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^ascii:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^blank:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^blank:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^cntrl:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^cntrl:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^digit:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^digit:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^graph:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^graph:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^lower:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^lower:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^print:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^print:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^punct:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^punct:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^space:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^space:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^upper:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^upper:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^word:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^word:]])]})/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^xdigit:]]/                          qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^xdigit:]])]})/ ]}@{[mb::_m_passed()]}}
+  ----------------------------------------------------------------------------------------------------------------------
+
+  on uhc encoding
+  ----------------------------------------------------------------------------------------------------------------------
+  in your script                             script transpiled by this software
+  ----------------------------------------------------------------------------------------------------------------------
+  qr'.'                                      qr{\G${mb::_anchor}@{[qr'(?:(?>[\x81-\xFE][\x00-\xFF])|.)' ]}@{[mb::_m_passed()]}}
+  qr'\B'                                     qr{\G${mb::_anchor}@{[qr'(?:(?<![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])|(?<=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]))' ]}@{[mb::_m_passed()]}}
+  qr'\D'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![0123456789])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\H'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\x09\x20])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\N'                                     qr{\G${mb::_anchor}@{[qr'(?:(?!\n)(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\R'                                     qr{\G${mb::_anchor}@{[qr'(?>\r\n|[\x0A\x0B\x0C\x0D])' ]}@{[mb::_m_passed()]}}
+  qr'\S'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\t\n\f\r\x20])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\V'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\x0A\x0B\x0C\x0D])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\W'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\b'                                     qr{\G${mb::_anchor}@{[qr'(?:(?<![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])|(?<=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]))' ]}@{[mb::_m_passed()]}}
+  qr'\d'                                     qr{\G${mb::_anchor}@{[qr'[0123456789]' ]}@{[mb::_m_passed()]}}
+  qr'\h'                                     qr{\G${mb::_anchor}@{[qr'[\x09\x20]' ]}@{[mb::_m_passed()]}}
+  qr'\s'                                     qr{\G${mb::_anchor}@{[qr'[\t\n\f\r\x20]' ]}@{[mb::_m_passed()]}}
+  qr'\v'                                     qr{\G${mb::_anchor}@{[qr'[\x0A\x0B\x0C\x0D]' ]}@{[mb::_m_passed()]}}
+  qr'\w'                                     qr{\G${mb::_anchor}@{[qr'[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]' ]}@{[mb::_m_passed()]}}
+  qr'[\b]'                                   qr{\G${mb::_anchor}@{[qr'(?:(?=[\x08])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:alnum:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x5A\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:alpha:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x41-\x5A\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:ascii:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x00-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:blank:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x09\x20])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:cntrl:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x00-\x1F\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:digit:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:graph:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x21-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:lower:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[abcdefghijklmnopqrstuvwxyz])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:print:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x20-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:punct:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x21-\x2F\x3A-\x3F\x40\x5B-\x5F\x60\x7B-\x7E])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:space:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\s\x0B])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:upper:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZ])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:word:]]'                             qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x5A\x5F\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:xdigit:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^alnum:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x5A\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^alpha:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x41-\x5A\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^ascii:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x00-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^blank:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x09\x20])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^cntrl:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x00-\x1F\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^digit:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^graph:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x21-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^lower:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![abcdefghijklmnopqrstuvwxyz])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^print:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x20-\x7F])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^punct:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x21-\x2F\x3A-\x3F\x40\x5B-\x5F\x60\x7B-\x7E])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^space:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\s\x0B])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^upper:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![ABCDEFGHIJKLMNOPQRSTUVWXYZ])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^word:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x5A\x5F\x61-\x7A])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^xdigit:]]'                          qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  ----------------------------------------------------------------------------------------------------------------------
+
+  on utf8 encoding
+  ----------------------------------------------------------------------------------------------------------------------
+  in your script                             script transpiled by this software
+  ----------------------------------------------------------------------------------------------------------------------
+  qr'.'                                      qr{\G${mb::_anchor}@{[qr'(?:(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|.)' ]}@{[mb::_m_passed()]}}
+  qr'\B'                                     qr{\G${mb::_anchor}@{[qr'(?:(?<![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])|(?<=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]))' ]}@{[mb::_m_passed()]}}
+  qr'\D'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![0123456789])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\H'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\x09\x20])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\N'                                     qr{\G${mb::_anchor}@{[qr'(?:(?!\n)(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\R'                                     qr{\G${mb::_anchor}@{[qr'(?>\r\n|[\x0A\x0B\x0C\x0D])' ]}@{[mb::_m_passed()]}}
+  qr'\S'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\t\n\f\r\x20])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\V'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\x0A\x0B\x0C\x0D])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\W'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\b'                                     qr{\G${mb::_anchor}@{[qr'(?:(?<![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])|(?<=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]))' ]}@{[mb::_m_passed()]}}
+  qr'\d'                                     qr{\G${mb::_anchor}@{[qr'[0123456789]' ]}@{[mb::_m_passed()]}}
+  qr'\h'                                     qr{\G${mb::_anchor}@{[qr'[\x09\x20]' ]}@{[mb::_m_passed()]}}
+  qr'\s'                                     qr{\G${mb::_anchor}@{[qr'[\t\n\f\r\x20]' ]}@{[mb::_m_passed()]}}
+  qr'\v'                                     qr{\G${mb::_anchor}@{[qr'[\x0A\x0B\x0C\x0D]' ]}@{[mb::_m_passed()]}}
+  qr'\w'                                     qr{\G${mb::_anchor}@{[qr'[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]' ]}@{[mb::_m_passed()]}}
+  qr'[\b]'                                   qr{\G${mb::_anchor}@{[qr'(?:(?=[\x08])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:alnum:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x5A\x61-\x7A])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:alpha:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x41-\x5A\x61-\x7A])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:ascii:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x00-\x7F])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:blank:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x09\x20])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:cntrl:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x00-\x1F\x7F])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:digit:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:graph:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x21-\x7F])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:lower:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[abcdefghijklmnopqrstuvwxyz])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:print:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x20-\x7F])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:punct:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x21-\x2F\x3A-\x3F\x40\x5B-\x5F\x60\x7B-\x7E])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:space:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\s\x0B])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:upper:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZ])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:word:]]'                             qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x5A\x5F\x61-\x7A])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:xdigit:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^alnum:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x5A\x61-\x7A])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^alpha:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x41-\x5A\x61-\x7A])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^ascii:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x00-\x7F])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^blank:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x09\x20])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^cntrl:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x00-\x1F\x7F])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^digit:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^graph:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x21-\x7F])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^lower:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![abcdefghijklmnopqrstuvwxyz])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^print:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x20-\x7F])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^punct:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x21-\x2F\x3A-\x3F\x40\x5B-\x5F\x60\x7B-\x7E])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^space:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\s\x0B])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^upper:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![ABCDEFGHIJKLMNOPQRSTUVWXYZ])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^word:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x5A\x5F\x61-\x7A])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^xdigit:]]'                          qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  ----------------------------------------------------------------------------------------------------------------------
+
+  on wtf8 encoding
+  ----------------------------------------------------------------------------------------------------------------------
+  in your script                             script transpiled by this software
+  ----------------------------------------------------------------------------------------------------------------------
+  qr'.'                                      qr{\G${mb::_anchor}@{[qr'(?:(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|.)' ]}@{[mb::_m_passed()]}}
+  qr'\B'                                     qr{\G${mb::_anchor}@{[qr'(?:(?<![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])|(?<=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]))' ]}@{[mb::_m_passed()]}}
+  qr'\D'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![0123456789])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\H'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\x09\x20])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\N'                                     qr{\G${mb::_anchor}@{[qr'(?:(?!\n)(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\R'                                     qr{\G${mb::_anchor}@{[qr'(?>\r\n|[\x0A\x0B\x0C\x0D])' ]}@{[mb::_m_passed()]}}
+  qr'\S'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\t\n\f\r\x20])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\V'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\x0A\x0B\x0C\x0D])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\W'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\b'                                     qr{\G${mb::_anchor}@{[qr'(?:(?<![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])|(?<=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]))' ]}@{[mb::_m_passed()]}}
+  qr'\d'                                     qr{\G${mb::_anchor}@{[qr'[0123456789]' ]}@{[mb::_m_passed()]}}
+  qr'\h'                                     qr{\G${mb::_anchor}@{[qr'[\x09\x20]' ]}@{[mb::_m_passed()]}}
+  qr'\s'                                     qr{\G${mb::_anchor}@{[qr'[\t\n\f\r\x20]' ]}@{[mb::_m_passed()]}}
+  qr'\v'                                     qr{\G${mb::_anchor}@{[qr'[\x0A\x0B\x0C\x0D]' ]}@{[mb::_m_passed()]}}
+  qr'\w'                                     qr{\G${mb::_anchor}@{[qr'[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]' ]}@{[mb::_m_passed()]}}
+  qr'[\b]'                                   qr{\G${mb::_anchor}@{[qr'(?:(?=[\x08])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:alnum:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x5A\x61-\x7A])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:alpha:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x41-\x5A\x61-\x7A])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:ascii:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x00-\x7F])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:blank:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x09\x20])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:cntrl:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x00-\x1F\x7F])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:digit:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:graph:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x21-\x7F])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:lower:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[abcdefghijklmnopqrstuvwxyz])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:print:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x20-\x7F])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:punct:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x21-\x2F\x3A-\x3F\x40\x5B-\x5F\x60\x7B-\x7E])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:space:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\s\x0B])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:upper:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZ])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:word:]]'                             qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x5A\x5F\x61-\x7A])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:xdigit:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^alnum:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x5A\x61-\x7A])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^alpha:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x41-\x5A\x61-\x7A])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^ascii:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x00-\x7F])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^blank:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x09\x20])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^cntrl:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x00-\x1F\x7F])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^digit:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^graph:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x21-\x7F])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^lower:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![abcdefghijklmnopqrstuvwxyz])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^print:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x20-\x7F])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^punct:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x21-\x2F\x3A-\x3F\x40\x5B-\x5F\x60\x7B-\x7E])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^space:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\s\x0B])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^upper:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![ABCDEFGHIJKLMNOPQRSTUVWXYZ])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^word:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x5A\x5F\x61-\x7A])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^xdigit:]]'                          qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
   ----------------------------------------------------------------------------------------------------------------------
 
 =head1 Command-line Wildcard Expansion on Microsoft Windows

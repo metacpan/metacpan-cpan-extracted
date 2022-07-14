@@ -1,10 +1,12 @@
 Revision history for Perl module JSON::JQ
 
+v0.08:
+   - fix bigint test case
 v0.07:
    - use "long" (64 bits) for integer representation (credit to Roberto Etcheverry)
 v0.06:
    - fix linking problem on alphine Linux (credit to Bob Bell)
-   - more testcases
+   - more test cases
 v0.05:
    - not croak if no output available but no error raised
    - bugfixes in XS code

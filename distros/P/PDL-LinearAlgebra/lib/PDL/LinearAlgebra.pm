@@ -19,7 +19,7 @@ use constant {
 
 use strict;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 $VERSION = eval $VERSION;
 
 @PDL::LinearAlgebra::ISA = qw/PDL::Exporter/;
@@ -62,14 +62,11 @@ PDL::LinearAlgebra - Linear Algebra utils for PDL
 =head1 DESCRIPTION
 
 This module provides a convenient interface to L<PDL::LinearAlgebra::Real>
-and L<PDL::LinearAlgebra::Complex>. Its primary purpose is educational.
-You have to know that routines defined here are not optimized, particularly in term of memory. Since
+and L<PDL::LinearAlgebra::Complex>. Since
 Blas and Lapack use a column major ordering scheme some routines here need to transpose matrices before
 calling fortran routines and transpose back (see the documentation of each routine). If you need
 optimized code use directly  L<PDL::LinearAlgebra::Real> and
-L<PDL::LinearAlgebra::Complex>. It's planned to "port" this module to PDL::Matrix such
-that transpositions will not be necessary, the major problem is that two new modules need to be created PDL::Matrix::Real
-and PDL::Matrix::Complex.
+L<PDL::LinearAlgebra::Complex>.
 
 =cut
 

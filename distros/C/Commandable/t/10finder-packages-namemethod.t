@@ -13,11 +13,13 @@ package MyTest::Command::one {
    use constant COMMAND_ARGS => (
       { name => "arg", description => "the argument" }
    );
+   sub run {}
 }
 
 package MyTest::Command::two {
    use constant COMMAND_NAME => "two";
    use constant COMMAND_DESC => "the two command";
+   sub run {}
 }
 
 package MyTest::Command::nothing {
@@ -55,6 +57,9 @@ my $finder = Commandable::Finder::Packages->new(
       },
       'metadata of argument to one'
    );
+
+   is( $one->package, "MyTest::Command::one",      '$one->package' );
+   is( $one->code,    \&MyTest::Command::one::run, '$one->code' );
 }
 
 done_testing;

@@ -60,6 +60,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#metacpan"
    },
-   "version" : "0.003001",
+   "version" : "0.003002",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -1,5 +1,12 @@
 Revision history for Device-AVR-UPDI
 
+0.11    2022-07-13
+        [CHANGES]
+         * Updates for Object::Pad 0.57
+            + Use `:does` attribute rather than `does` subkeyword
+         * Use Commandable for ARGV handling - gives automatic help, better
+           parse support, generally nicer
+
 0.10    2021-08-25
         [CHANGES]
          * Fix some (harmless) warnings that would otherwise become apparent

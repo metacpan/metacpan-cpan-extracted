@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::TimeTracking;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 RT->AddStyleSheets("time_tracking.css");
 RT->AddJavaScript("time_tracking.js");
@@ -60,6 +60,7 @@ RT-Extension-TimeTracking - Time Tracking Extension
 =head1 RT VERSION
 
 Works with RT 5.0. Check 0.1* versions if you are using RT 4.
+Also supported in RTIR 5.0.3 and later.
 
 =head1 INSTALLATION
 
@@ -301,7 +302,7 @@ Or via the web at: L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Nam
 
 =head1 COPYRIGHT
 
-This extension is Copyright (C) 2013-2020 Best Practical Solutions, LLC.
+This extension is Copyright (C) 2013-2022 Best Practical Solutions, LLC.
 
 This is free software, licensed under:
 

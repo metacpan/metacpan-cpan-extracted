@@ -1,6 +1,9 @@
 Revision history for RT-Client-CLI
 
-4.4.3 2018-06-27
+5.0.3 2022-07-13
+ - Include rt-mailgate
+
+4.4.3 2018-06-26
  - Respect value 0(#31290)
 
 4.2.11 2015-05-07

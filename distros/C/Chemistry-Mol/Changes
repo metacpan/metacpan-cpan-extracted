@@ -1,5 +1,9 @@
 Revision history for Perl extension Chemistry::Mol.
 
+0.39  Jul 13 2022
+
+        - Implemented choice of backend for Chemistry::Mol::clone().
+
 0.38  Apr 9 2021
 
         - Fixed Chemistry::File doc bug (David Westbrook, bug 20067).

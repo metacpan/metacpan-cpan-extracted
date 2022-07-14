@@ -8,7 +8,7 @@ ABSTRACT
 
 VERSION
 
-    0.02
+    0.03
 
 SYNOPSIS
 
@@ -16,16 +16,10 @@ SYNOPSIS
     
       use Mars::Class;
     
-      base 'Person';
-    
-      with 'Identity';
-    
+      attr 'fname';
+      attr 'lname';
       attr 'email';
-      attr 'login';
-      attr 'password';
       attr 'trust';
-    
-      test 'Authenticable';
     
       sub BUILD {
         shift->{trust} = true;
@@ -38,7 +32,11 @@ SYNOPSIS
         lname => 'Alderson',
       );
     
-      # bless({fname => 'Elliot', lname => 'Alderson'}, 'User')
+      # bless({
+      #   'fname' => 'Elliot',
+      #   'lname' => 'Alderson',
+      #   'trust' => 1
+      # }, 'User')
 
 DESCRIPTION
 

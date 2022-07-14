@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.51;
+use Object::Pad 0.57;
 
-package Device::AVR::UPDI 0.10;
+package Device::AVR::UPDI 0.11;
 class Device::AVR::UPDI :strict(params);
 
 use Carp;
@@ -885,7 +885,7 @@ role # hide from indexer
 }
 
 class # hide from indexer
-   Device::AVR::UPDI::_NVMCtrlv0 does Device::AVR::UPDI::_NVMCtrl {
+   Device::AVR::UPDI::_NVMCtrlv0 :does(Device::AVR::UPDI::_NVMCtrl) {
 
    use Carp;
 
@@ -980,7 +980,7 @@ class # hide from indexer
 }
 
 class # hide from indexer
-   Device::AVR::UPDI::_NVMCtrlv2 does Device::AVR::UPDI::_NVMCtrl {
+   Device::AVR::UPDI::_NVMCtrlv2 :does(Device::AVR::UPDI::_NVMCtrl) {
 
    use Carp;
 

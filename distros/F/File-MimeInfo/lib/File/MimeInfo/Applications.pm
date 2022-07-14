@@ -9,7 +9,7 @@ use File::MimeInfo qw/mimetype_canon mimetype_isa/;
 use File::DesktopEntry;
 require Exporter;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(
@@ -178,7 +178,7 @@ sub _write_list {
 }
 
 sub _find_file {
-    my @list = shift;
+    my @list = @_;
     for (@list) {
         my $file = data_files('applications', $_);
         return File::DesktopEntry->new($file) if $file;

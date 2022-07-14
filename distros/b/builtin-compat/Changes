@@ -1,0 +1,10 @@
+Revision history for builtin-compat
+
+0.001001 - 2022-07-14
+  - fix prototype of trim to match current builtin::trim
+  - additional tests
+  - improve documentation
+  - add indexed function
+
+0.001000 - 2022-07-14
+  - initial release

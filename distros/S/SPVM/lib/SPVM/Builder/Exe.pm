@@ -187,6 +187,8 @@ sub new {
 sub get_dependent_resources {
   my ($self) = @_;
   
+  my $config = $self->config;
+  
   unless ($self->{finish_build_runtime}) {
     $self->build_runtime;
   }
@@ -196,9 +198,10 @@ sub get_dependent_resources {
   my $builder = $self->builder;
 
   my $build_dir = $self->builder->build_dir;
-
+  
   # Compiler for native module
   my $builder_cc_native = SPVM::Builder::CC->new(
+    global_before_compile => $config->global_before_compile,
     build_dir => $build_dir,
     builder => $builder,
     quiet => $self->quiet,
@@ -362,6 +365,7 @@ sub build_exe_file {
 
   # Link and generate executable file
   my $cc_linker = SPVM::Builder::CC->new(
+    global_before_compile => $config->global_before_compile,
     build_dir => $build_dir,
     builder => $builder,
     quiet => $self->quiet,
@@ -434,6 +438,7 @@ sub compile_source_file {
   
   # Compile command
   my $builder_cc = SPVM::Builder::CC->new(
+    global_before_compile => $config->global_before_compile,
     build_dir => $build_dir,
     builder => $builder,
     quiet => $self->quiet,
@@ -448,11 +453,7 @@ sub compile_source_file {
   my $compile_info_cc = $compile_info->{cc};
   my $compile_info_ccflags = $compile_info->{ccflags};
   my $object_file_info = SPVM::Builder::ObjectFileInfo->new(
-    file => $output_file,
-    source_file => $source_file,
-    cc => $compile_info_cc,
-    ccflags => $compile_info_ccflags,
-    config => $config,
+    compile_info => $compile_info,
   );
   
   return $object_file_info;
@@ -931,6 +932,8 @@ sub compile_spvm_core_sources {
 sub create_precompile_sources {
   my ($self) = @_;
 
+  my $config = $self->config;
+
   my $builder = $self->builder;
 
   # Build directory
@@ -939,6 +942,7 @@ sub create_precompile_sources {
 
   # Build precompile classes
   my $builder_cc_precompile = SPVM::Builder::CC->new(
+    global_before_compile => $config->global_before_compile,
     build_dir => $build_dir,
     builder => $builder,
     quiet => $self->quiet,
@@ -965,6 +969,8 @@ sub create_precompile_sources {
 
 sub compile_precompile_sources {
   my ($self) = @_;
+
+  my $config = $self->config;
   
   # Builer
   my $builder = $self->builder;
@@ -974,6 +980,7 @@ sub compile_precompile_sources {
   
   # Build precompile classes
   my $builder_cc_precompile = SPVM::Builder::CC->new(
+    global_before_compile => $config->global_before_compile,
     build_dir => $build_dir,
     builder => $builder,
     quiet => $self->quiet,
@@ -1011,6 +1018,8 @@ sub compile_precompile_sources {
 
 sub compile_native_sources {
   my ($self) = @_;
+
+  my $config = $self->config;
   
   my $builder = $self->builder;
 
@@ -1020,6 +1029,7 @@ sub compile_native_sources {
 
   # Compiler for native module
   my $builder_cc_native = SPVM::Builder::CC->new(
+    global_before_compile => $config->global_before_compile,
     build_dir => $build_dir,
     builder => $builder,
     quiet => $self->quiet,
@@ -1074,7 +1084,7 @@ sub compile_native_sources {
           output_dir => $build_object_dir,
           config => $config,
           category => 'native',
-          ignore_use_resource => 1,
+          no_use_resource => 1,
           include_dirs => $include_dirs,
         }
       );

@@ -5,6 +5,7 @@ use Test::More;
 
 # ------------------------------------------------
 
+use_ok('Encode');
 use_ok('Crypt::PasswdMD5');
 
 my($phrase1) = "hello world\n";
@@ -34,5 +35,10 @@ $t      = apache_md5_crypt('test5');
 ok(apache_md5_crypt('test5', $salt) eq $t, 'And again with the Apache Variant');
 
 ok($t =~ /^\$apr1\$/, '$t now has the correct value');
+
+my($phrase2)	= "\x{dead}\x{beef}";
+my($phrase3)	= Encode::encode('utf8', $phrase2);
+
+ok(unix_md5_crypt($phrase2, '1234') eq unix_md5_crypt($phrase3, '1234'), 'Hashing of a utf8 password');
 
 done_testing;

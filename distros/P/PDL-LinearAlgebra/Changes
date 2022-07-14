@@ -1,3 +1,6 @@
+0.33 2022-07-14
+- test, fix mtoeplitz (#16) - thanks @jjatria for report
+
 0.32 2022-05-06
 - fix to work again with MacOS by stripping unknown libraries
 

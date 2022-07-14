@@ -137,3 +137,4 @@ runtest($rank2, 'mrank', 2);
 runtest($a, 'mnorm', 12.211267);
 runtest($a, 'msvd', pdl(12.211267,1.3946136), [0,0]);
 runtest($a, 'mcond', 8.756021);
+runtest(pdl([0,1]), 'mtoeplitz', pdl([0,1],[1,0]));

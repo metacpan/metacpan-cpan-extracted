@@ -27,6 +27,10 @@ my $pod = <<'END_POD';
 
   =head2 $self->some_method( \%options );
 
+  =head2 $<digit>
+
+  L<< /$<digit> >>
+
   =cut
 END_POD
 $pod =~ s/^  //mg;
@@ -34,5 +38,7 @@ $parser->parse_string_document($pod);
 
 like $output, qr/Pod::Document/;
 like $output, qr/<h2 id="\$self-&gt;some_method\(-\\%options-\);">/;
+like $output, qr/<h2 id="\$&lt;digit&gt;">/;
+like $output, qr/<a href="#%24%3Cdigit%3E">/;
 
 done_testing;

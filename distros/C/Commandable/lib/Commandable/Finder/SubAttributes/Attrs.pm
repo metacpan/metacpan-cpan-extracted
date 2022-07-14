@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::SubAttributes::Attrs 0.07;
+package Commandable::Finder::SubAttributes::Attrs 0.08;
 
 use v5.14;
 use warnings;
@@ -36,12 +36,14 @@ sub Command_arg :ATTR(CODE,MULTI)
    my ( $args, $name, $description ) = @_;
 
    my $optional = $name =~ s/\?$//;
+   my $slurpy   = $name =~ s/\.\.\.$//;
 
    my %arg = (
       name        => $name,
       description => $description,
       optional    => $optional,
-      # TODO: all sorts involving type, eatall, etc...
+      slurpy      => $slurpy,
+      # TODO: all sorts involving type, etc...
    );
 
    push @$args, \%arg;

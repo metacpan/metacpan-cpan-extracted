@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::MandatoryOnTransition;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 =head1 NAME
 
@@ -14,6 +14,8 @@ Works with RT 4.4, 5.0
 
 RT 4.0 and 4.2 are now end-of-life, so compatibility with
 newer versions of this extension is unknown.
+
+Also works with RTIR 5.0.3 and later
 
 =head1 DESCRIPTION
 
@@ -114,6 +116,12 @@ or add C<RT::Extension::MandatoryOnTransition> to your existing C<@Plugins> line
 =item Restart your webserver
 
 =back
+
+If running with RTIR, the C<Plugin> line for RTIR must come first in your
+configuration as shown below.
+
+    Plugin('RT::IR');
+    Plugin('RT::Extension::MandatoryOnTransition');
 
 =head1 CONFIGURATION
 
@@ -983,7 +991,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2012-2020 by Best Pracical Solutions, LLC.
+This software is Copyright (c) 2012-2022 by Best Pracical Solutions, LLC.
 
 This is free software, licensed under:
 

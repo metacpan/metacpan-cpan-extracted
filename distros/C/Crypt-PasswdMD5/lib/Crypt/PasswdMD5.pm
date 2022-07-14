@@ -4,12 +4,13 @@ use strict;
 use warnings;
 
 use Digest::MD5;
+use Encode;
 
 use Exporter 'import';
 
 our @EXPORT		= qw/unix_md5_crypt apache_md5_crypt/;
 our @EXPORT_OK	= (@EXPORT, 'random_md5_salt');
-our $VERSION	= '1.41';
+our $VERSION	= '1.42';
 
 # ------------------------------------------------
 
@@ -67,11 +68,10 @@ sub to64
 
 sub unix_md5_crypt
 {
-	my($pw, $salt) = @_;
+	my($pw, $salt)	= @_;
+	$pw				= Encode::encode('utf8', $pw) if Encode::is_utf8($pw);
 
-	my($passwd);
-
-    if (defined $salt)
+	if (defined $salt)
 	{
 		$salt =~ s/^\Q$Magic//;	# Take care of the magic string if present.
 		$salt =~ s/^(.*)\$.*$/$1/;	# Salt can have up to 8 chars...
@@ -80,7 +80,7 @@ sub unix_md5_crypt
 	else
 	{
 		$salt = random_md5_salt();	 	# In case no salt was proffered.
-    }
+	}
 
 	my($ctx) = Digest::MD5 -> new;	# Here we start the calculation.
 
@@ -160,6 +160,8 @@ sub unix_md5_crypt
 	}
 
 	# Final xform
+
+	my($passwd);
 
 	$passwd = '';
 	$passwd .= to64(int(unpack('C', (substr($final, 0, 1) ) ) << 16)

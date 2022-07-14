@@ -5,11 +5,11 @@
 use strict;
 use warnings;
 
-use 5.010000;
+use 5.008001;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "YAML as a Programming Language",
+  "ABSTRACT" => "Program in YAML",
   "AUTHOR" => "Ingy d\x{f6}t Net <ingy\@ingy.net>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -24,29 +24,27 @@ my %WriteMakefileArgs = (
     "bin/yamlscript.pl"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010000",
+  "MIN_PERL_VERSION" => "5.008001",
   "NAME" => "YAMLScript",
   "PREREQ_PM" => {
-    "Mo" => "0.40",
+    "Mo" => "0.4",
     "Mo::xxx" => "0.13",
+    "Sub::Name" => "0.21",
     "XXX" => "0.38",
-    "YAML::PP" => "0.033"
+    "YAML::PP" => "0.034"
   },
-  "TEST_REQUIRES" => {
-    "Test::More" => "0.98"
-  },
-  "VERSION" => "0.0.5",
+  "VERSION" => "0.0.7",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
-  "Mo" => "0.40",
+  "Mo" => "0.4",
   "Mo::xxx" => "0.13",
-  "Test::More" => "0.98",
+  "Sub::Name" => "0.21",
   "XXX" => "0.38",
-  "YAML::PP" => "0.033"
+  "YAML::PP" => "0.034"
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {

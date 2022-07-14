@@ -7,9 +7,9 @@ use warnings;
 use PerlX::Maybe;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-02'; # DATE
+our $DATE = '2022-06-05'; # DATE
 our $DIST = 'App-td'; # DIST
-our $VERSION = '0.105'; # VERSION
+our $VERSION = '0.106'; # VERSION
 
 our %SPEC;
 
@@ -360,6 +360,12 @@ _
             tags => ['category:select-action', 'category:uniq-action', 'category:nauniq-action'],
         },
 
+        case_insensitive => {
+            schema => ['true*'],
+            cmdline_aliases => {i=>{}},
+            tags => ['category:uniq-action', 'category:nauniq-action'],
+        },
+
         no_header_column => {
             summary => "Don't make the first column as column names of the transposed table; ".
                 "instead create column named 'row1', 'row2', ...",
@@ -625,6 +631,7 @@ sub td {
         if ($action eq 'uniq' || $action eq 'nauniq') {
             my $cols = $input_obj->cols_by_idx;
             my $input_rows = $input_obj->rows;
+            my $ci = $args{case_insensitive};
             my @indexes =
                 defined($args{include_columns}) ? (map { $input_obj->col_idx($_) } @{$args{include_columns}}) :
                 defined($args{exclude_columns}) ? do {
@@ -636,11 +643,13 @@ sub td {
                     @indexes;
                 } : (0 .. $#{$cols});
 
+            #use DD; dd \@indexes;
             my @output_rows;
             if ($action eq 'uniq') {
                 my $prev_row_as_str;
                 for my $rownum (0 .. $#{$input_rows}) {
                     my $row_as_str = join "\0", @{ $input_rows->[$rownum] }[@indexes];
+                    $row_as_str = lc $row_as_str if $ci;
                     if (!defined($prev_row_as_str) || $prev_row_as_str ne $row_as_str) {
                         push @output_rows, $input_rows->[$rownum];
                     }
@@ -650,6 +659,7 @@ sub td {
                 my %seen;
                 for my $rownum (0 .. $#{$input_rows}) {
                     my $row_as_str = join "\0", @{ $input_rows->[$rownum] }[@indexes];
+                    $row_as_str = lc $row_as_str if $ci;
                     if (!$seen{$row_as_str}++) {
                         push @output_rows, $input_rows->[$rownum];
                     }
@@ -845,7 +855,7 @@ App::td - Manipulate table data
 
 =head1 VERSION
 
-This document describes version 0.105 of App::td (from Perl distribution App-td), released on 2022-06-02.
+This document describes version 0.106 of App::td (from Perl distribution App-td), released on 2022-06-05.
 
 =head1 FUNCTIONS
 
@@ -1035,6 +1045,8 @@ Action to perform on input table.
 =item * B<argv> => I<array[str]> (default: [])
 
 Arguments.
+
+=item * B<case_insensitive> => I<true>
 
 =item * B<detail> => I<bool>
 

@@ -17,7 +17,7 @@ $g->add_dataset( 7,     -5,    -3,     4,      7 );
 %hash = (
     'transparent'  => 'true',
     'y_axes'       => 'both',
-    'title'        => 'Hirizontal Bars Demo',
+    'title'        => 'Horizontal Bars Demo',
     'y_grid_lines' => 'true',
     'x_label'      => 'x-axis',
     'y_label'      => 'y-axis',

@@ -16,6 +16,7 @@ package MyTest::Command::one {
       { name => "verbose|v", description => "verbose option" },
       { name => "target|t:", description => "target option" },
    );
+   sub run {}
 }
 
 package MyTest::Command::two {
@@ -24,6 +25,7 @@ package MyTest::Command::two {
    use constant COMMAND_OPTS => (
       { name => "default", description => "default option", default => "value" },
    );
+   sub run {}
 }
 
 my $finder = Commandable::Finder::Packages->new(

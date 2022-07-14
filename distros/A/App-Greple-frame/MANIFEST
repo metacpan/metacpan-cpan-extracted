@@ -1,11 +1,11 @@
 Build.PL
 Changes
 LICENSE
-MANIFEST.SKIP
 META.json
 README.md
 cpanfile
 lib/App/Greple/frame.pm
+lib/App/Greple/frame/RPN.pm
 minil.toml
 t/00_compile.t
 META.yml

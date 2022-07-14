@@ -4,13 +4,13 @@ WWW::RoboCop - Police your URLs!
 
 # VERSION
 
-version 0.000100
+version 0.000101
 
 # SYNOPSIS
 
     use feature qw( state );
 
-    use WWW::RoboCop;
+    use WWW::RoboCop ();
 
     my $robocop = WWW::RoboCop->new(
         is_url_allowed => sub {
@@ -19,7 +19,7 @@ version 0.000100
         },
     );
 
-    $robocop->crawl( 'http://host.myhost.com/start' );
+    $robocop->crawl( 'https://example.com' );
 
     my %history = $robocop->get_report;
 
@@ -29,11 +29,12 @@ version 0.000100
     #    ...
     # )
 
+See `examples/crawl-host.pl`, which is included with this distribution, to get a
+quick start.
+
 # DESCRIPTION
 
-BETA BETA BETA!
-
-`WWW::RoboCop` is a dead simple, somewhat opinionated robot.  Given a starting
+`WWW::RoboCop` is a simple, somewhat opinionated robot.  Given a starting
 page, this module will crawl only URLs which have been allowed by the
 `is_url_allowed` callback.  It then creates a report of all visited pages,
 keyed on URL.  You are encouraged to provide your own report creation callback
@@ -58,8 +59,8 @@ Your sub might look something like this:
 
     use feature qw( state );
 
-    use URI;
-    use WWW::RoboCop;
+    use URI ();
+    use WWW::RoboCop ();
 
     my $robocop = WWW::RoboCop->new(
         is_url_allowed => sub {
@@ -130,9 +131,9 @@ while under development, consider providing a [WWW::Mechanize::Cached](https://m
 This can give you enough of a speedup to save you from getting distracted
 and going off to read Hacker News while you wait.
 
-    use CHI;
-    use WWW::Mechanize::Cached;
-    use WWW::RoboCop;
+    use CHI ();
+    use WWW::Mechanize::Cached ();
+    use WWW::RoboCop ();
 
     my $cache = CHI->new(
         driver => 'File',
@@ -171,8 +172,8 @@ The default report looks something like this:
     #    'http://myhost.com/two' => { status => 404, ... },
     # )
 
-See examples/crawl-host.pl, which is included with this distribution, to get a
-dump of the default report.
+See `examples/crawl-host.pl`, which is included with this distribution, to get
+a dump of the default report.
 
 # AUTHOR
 

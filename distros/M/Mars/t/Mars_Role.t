@@ -157,6 +157,45 @@ EOF
   ok $result == 1;
 });
 
+subtest('example-1 from', sub {
+  my $result = eval <<'EOF';
+  package Entity;
+
+  use Mars::Role;
+
+  attr 'startup';
+  attr 'shutdown';
+
+  sub EXPORT {
+    ['startup', 'shutdown']
+  }
+
+  package Record;
+
+  use Mars::Class;
+
+  sub AUDIT {
+    my ($self, $from) = @_;
+    die "Missing startup" if !$from->can('startup');
+    die "Missing shutdown" if !$from->can('shutdown');
+  }
+
+  package Example;
+
+  use Mars::Class;
+
+  with 'Entity';
+
+  from 'Record';
+
+  # "Example"
+EOF
+  ok $result->isa('Record');
+  ok $result->does('Entity');
+  ok $result->can('startup');
+  ok $result->can('shutdown');
+});
+
 subtest('example-1 role', sub {
   my $result = eval <<'EOF';
   package Ability;

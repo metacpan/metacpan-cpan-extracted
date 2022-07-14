@@ -1,17 +1,12 @@
-Chemistry/Mol version 0.38
+Chemistry/Mol version 0.39
 ==========================
 
 This toolkit includes basic objects and methods to describe molecules. It
 consists of several modules: Chemistry::Mol, Chemistry::Atom, Chemistry::Bond,
 and Chemistry::File. These are the core modules of the PerlMol toolkit.
 
-CHANGES SINCE VERSION 0.37
-        - Fixed Chemistry::File doc bug (David Westbrook, bug 20067).
-        - Fixed unescaped left brace in regex (Jim Keenan, bug 115215).
-        - Switched to Dist::Zilla.
-        - Adjusted URLs in documentation, as the source has been hosted on
-          GitHub.
-        - New co-maintainer Andrius Merkys <merkys@cpan.org>.
+CHANGES SINCE VERSION 0.38
+        - Implemented choice of backend for Chemistry::Mol::clone().
 
 INSTALLATION
 
@@ -34,8 +29,9 @@ This module requires these other modules and libraries:
 
 The following modules are optional, but are required by certain functions:
     - Chemistry::InternalCoords
-    - Compress::Zlib
     - Chemistry::Isotope
+    - Clone
+    - Compress::Zlib
 
 COPYRIGHT AND LICENSE
 

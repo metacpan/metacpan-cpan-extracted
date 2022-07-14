@@ -13,12 +13,12 @@ use English qw{-no_match_vars};
 use File::stat;
 use IO::File;
 use MIME::Base64;
-use XML::Simple;
+use XML::LibXML;
 use URI;
 
 use parent qw{Class::Accessor::Fast};
 
-our $VERSION = '0.53'; ## no critic
+our $VERSION = '0.54'; ## no critic
 
 __PACKAGE__->mk_accessors(qw{bucket creation_date account buffer_size});
 
@@ -85,6 +85,8 @@ sub add_key {
 
     $conf->{'Content-Length'} ||= -s ${$value};
     $value = _content_sub( ${$value}, $self->buffer_size );
+
+    $conf->{'x-amz-content-sha256'} = 'UNSIGNED-PAYLOAD';
   } ## end if ( ref $value eq 'SCALAR')
   else {
     $conf->{'Content-Length'} ||= length $value;
@@ -390,8 +392,9 @@ sub get_key {
       ? file_md5_hex($filename)
       : md5_hex( $return->{value} );
 
+    # Some S3-compatible providers return an all-caps MD5 value in the etag so it should be lc'd for comparison.
     croak "Computed and Response MD5's do not match:  $md5 : $etag"
-      if $md5 ne $etag;
+      if $md5 ne lc $etag;
   } ## end if ( $method eq 'GET' )
 
   foreach my $header ( $response->headers->header_field_names ) {
@@ -827,6 +830,30 @@ hood.
 
 See L<Amazon::S3/list_bucket_all_v2> for documentation of this
 method.
+
+=head2 abort_multipart_upload
+
+Abort a multipart upload
+
+=head2 complete_multipart_upload
+
+Signal completion of a multipart upload
+
+=head2 initiate_multipart_upload
+
+Initiate a multipart upload
+
+=head2 list_multipart_upload_parts
+
+List all the uploaded parts of a multipart upload
+
+=head2 list_multipart_uploads
+
+List multipart uploads in progress
+
+=head2 upload_part_of_multipart_upload
+
+Upload a portion of a multipart upload
 
 =head2 get_acl
 

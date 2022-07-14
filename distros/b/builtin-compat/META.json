@@ -1,0 +1,64 @@
+{
+   "abstract" : "Provide builtin functions for older perl versions",
+   "author" : [
+      "haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "builtin-compat",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {}
+      },
+      "runtime" : {
+         "requires" : {
+            "namespace::clean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-builtin-compat@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=builtin-compat"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/haarg/builtin-compat.git",
+         "web" : "https://github.com/haarg/builtin-compat"
+      }
+   },
+   "version" : "0.001001",
+   "x_authority" : "cpan:HAARG",
+   "x_breaks" : {},
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

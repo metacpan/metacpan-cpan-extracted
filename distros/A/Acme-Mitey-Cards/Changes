@@ -6,6 +6,16 @@ Home page:    <https://metacpan.org/release/Acme-Mitey-Cards>
 Bug tracker:  <https://github.com/tobyink/p5-mite/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.011	2022-07-13
+
+ - Updated: Rebuild using Type::Library::Compiler 0.005.
+
+0.010	2022-07-13
+
+ - Acme::Mitey::Cards::Types is now built using Type::Library::Compiler
+   from Acme::Mitey::Cards::Types::Source.
+ - Updated: Rebuild using Mite 0.006012.
+
 0.009	2022-07-08
 
  - Updated: Rebuild using Mite 0.005004.

@@ -116,7 +116,8 @@ NO_CHANGES_YAML="$($ZILD meta =zild/no_changes_yaml)"
 }
 
 year=$(date '+%Y')
-if [ -z "$(grep "$year" Meta)" ]; then
+copyright=$(zild meta copyright)
+if [[ $copyright != *$year* ]]; then
   error "Meta file does not have copyright year '$year'"
 fi
 

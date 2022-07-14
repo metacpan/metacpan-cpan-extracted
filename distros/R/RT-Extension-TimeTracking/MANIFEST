@@ -6,6 +6,9 @@ etc/initialdata
 html/Callbacks/RT-Extension-TimeTracking/Elements/ShowCustomFields/MassageCustomFields
 html/Callbacks/RT-Extension-TimeTracking/Elements/ShowCustomFields/ShowComponentName
 html/Callbacks/RT-Extension-TimeTracking/Elements/Tabs/Privileged
+html/Callbacks/RT-Extension-TimeTracking/RTIR/Display.html/EndOfBasics
+html/Callbacks/RT-Extension-TimeTracking/RTIR/Incident/Display.html/EndOfBasics
+html/Callbacks/RT-Extension-TimeTracking/RTIR/Incident/Reply/index.html/AfterTimeWorked
 html/Callbacks/RT-Extension-TimeTracking/Ticket/Elements/EditTransactionCustomFields/MassageTransactionCustomFields
 html/Callbacks/RT-Extension-TimeTracking/Ticket/Elements/ShowBasics/EndOfList
 html/Elements/ShowCustomFieldActor
@@ -37,3 +40,4 @@ README
 static/css/time_tracking.css
 static/js/time_tracking.js
 xt/work_week.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

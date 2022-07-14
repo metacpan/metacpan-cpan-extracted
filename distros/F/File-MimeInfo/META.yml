@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.30'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +30,7 @@ requires:
 resources:
   bugtracker: https://github.com/mbeijen/File-MimeInfo/issues
   repository: https://github.com/mbeijen/File-MimeInfo
-version: '0.32'
+version: '0.33'
 x_contributors:
   - 'Bernhard RosenkrÃ¤nzer <bero@lindev.ch>'
   - 'Christian Ludwig <chrissicool@gmail.com>'
@@ -45,6 +45,7 @@ x_contributors:
   - 'Patrick Burroughs (Celti) <celti@celti.name>'
   - 'Philippe Bruhat (BooK) <book@cpan.org>'
   - 'Rudolf Leermakers <rudolf@hatsuseno.org>'
+  - 'SPFabGerman <42518661+SPFabGerman@users.noreply.github.com>'
   - 'Sean Smith <ssmith@ncsgraphics.com>'
   - 'Stefan Seifert <nine@detonation.org>'
   - 'brian m. carlson <sandals@crustytoothpaste.net>'

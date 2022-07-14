@@ -192,14 +192,26 @@ upgrade:
 	cp `$(ZILD) sharedir`/Makefile ./
 
 readme:
+ifeq (,$(shell zild meta =zild/no-readme))
+ifneq (,$(wildcard doc/$(NAMEPATH).md))
+	zild-pandoc-json-to-pod \
+	    < doc/$(NAMEPATH).md \
+	    > ReadMe.pod
+else
 	swim --to=pod --complete --wrap --meta=Meta \
 	  doc/$(NAMEPATH).swim > ReadMe.pod
+endif
+endif
 
 about:
+ifeq (,$(shell zild meta =zild/no-about))
 	$(PERL) -S zild-render-template About
+endif
 
 travis:
+ifeq (,$(shell zild meta =zild/no-travis))
 	$(PERL) -S zild-render-template travis.yml .travis.yml
+endif
 
 uninstall: distdir
 	(cd $(DISTDIR); $(PERL) Makefile.PL; make uninstall)

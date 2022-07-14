@@ -1,16 +1,20 @@
 #!/bin/bash
 VERSION=${1:-stable}
-SOURCE="https://raw.githubusercontent.com/bestpractical/rt/$VERSION/bin/rt.in"
 
-echo "Importing from $VERSION"
-echo "Downloading..."
-curl -s $SOURCE \
-    | perl -pe 's,\@PERL\@.*$,/usr/bin/env perl,;s,\@LOCAL_ETC_PATH\@,/usr/local/etc,g;' > script/rt
+for FILE in rt rt-mailgate
+do
+    SOURCE="https://raw.githubusercontent.com/bestpractical/rt/$VERSION/bin/$FILE.in"
+    echo "Importing $FILE from $VERSION"
+    echo "Downloading..."
+    BARE_VERSION=${VERSION/rt-/}
+    curl -s $SOURCE \
+        | perl -pe "s,\@PERL\@.*$,/usr/bin/env perl,;s,\@LOCAL_ETC_PATH\@,/usr/local/etc,g;s,\@RT_BIN_PATH_R\@/,,g;s,\@RT_VERSION_MAJOR\@.\@RT_VERSION_MINOR\@.\@RT_VERSION_PATCH\@,$BARE_VERSION,g;" > script/$FILE
 
-if [[ $? == 0 ]]; then
-    echo "Placeholders rewritten."
-    echo
-    echo "Please check the changes using \`git diff\`."
-else
-    echo "An error occurred!"
-fi
+    if [[ $? == 0 ]]; then
+        echo "Placeholders rewritten."
+        echo
+        echo "Please check the changes using \`git diff\`."
+    else
+        echo "An error occurred!"
+    fi
+done

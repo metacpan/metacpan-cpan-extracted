@@ -1,10 +1,18 @@
 Revision history for Alien-PGPLOT
 
+v5.2.2.5  2022-07-12 14:50:23-04:00 America/New_York
+
+  [BUG FIX]
+
+   * point at new PGPLOT release which fixes bugs with MacOS homebrew and
+     hopefully CPAN Windows Strawberry Perl
+
+
 v5.2.2.4  2022-07-05 14:33:18-04:00 America/New_York
 
-  [RELEASE]
+  [PRODUCTION]
 
-   * promote to release
+   * promote to production
    * no changes from 5.2.2.3
 
   [BUGS]

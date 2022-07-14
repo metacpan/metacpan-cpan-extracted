@@ -222,12 +222,12 @@ sub PDL::mtoeplitz {
 	$ndim--;
 	my $min = $mdim <= $ndim ? $mdim : $ndim;
 	for(1..$min) {
-		$res->slice("$slice_prefix$_:,@{[$_-1]}") .= $n->slice("${slice_prefix}1:,@{[$ndim-$_+1]}");
+		$res->slice("$slice_prefix$_:,(@{[$_-1]})") .= $n->slice("${slice_prefix}1:@{[$ndim-$_+1]}");
 	}
 	$mdim--;
 	$min = $mdim < $ndim ? $mdim : $ndim;
 	for(0..$min){
-		$res->slice("$slice_prefix$_,$_:") .= $m->slice("${slice_prefix}:@{[$mdim-$_]}");
+		$res->slice("${slice_prefix}($_),$_:") .= $m->slice("${slice_prefix}:@{[$mdim-$_]}");
 	}
 	return $res;
 }

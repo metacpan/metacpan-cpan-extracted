@@ -2376,27 +2376,16 @@ C<new> operator can't create the objects from interfaces.
 
 =head1 Module
 
-Module is a single file that can be read as SPVM source code.
+A module means a user defined L<type/"Type"> in a module file. A module is one of a L<class|/"Class">, an L<interface|/"Interface"> or, a L<multi-numeric type|/"Multi-Numeric Type">.
 
   # lib/path/SPVM/Foo/Bar.spvm
   class Foo::Bar {
-  
-  }
-
-Module can contain multiple Classes.
-
-  # lib/path/SPVM/Foo/Bar.spvm
-  class Foo::Bar {
-  
-  }
-  
-  class Foo::Bar::Baz {
   
   }
 
 =head2 Module File Name
 
-Modules must be placed in the module loading path with the following File Name.
+Modules must be placed in the class loading path with the following file name.
 
 Change C<::> to C</>. Add ".spvm" at the end.
 
@@ -2406,12 +2395,12 @@ Change C<::> to C</>. Add ".spvm" at the end.
 
 =head2 Loading Module
 
-The C<use> syntax loads a Module.
+The C<use> syntax loads a module.
   
-  # Load a module
+  # Load a class
   use Foo;
 
-If the module does not exist, a compilation error will occur.
+If the class does not exist, a compilation error will occur.
 
 Modules are loaded at compile-time.
 
@@ -2421,9 +2410,9 @@ C<use> syntax must be defined directly under the L<class definition|/"Class Defi
     use Foo;
   }
 
-=head2 Class Alias
+=head2 Module Alias
 
-C<alias> syntax create an alias name for a class name.
+C<alias> syntax create an alias name for a module name.
   
   # Create alias
   alias Foo::Bar as FB;
@@ -2439,13 +2428,13 @@ C<alias> syntax must be defined directly under the L<class definition|/"Class De
     alias Foo::Bar as FB;
   }
 
-You can create an alias at the same time as loading a module by C<use>.
+You can create an alias at the same time as loading a class by C<use>.
   
   use Foo::Bar as FB;
 
 =head2 Load Module Selective
 
-In SPVM, there is an if require Statement that loads a Module only if it exists in the module path, and if it does not exist, the block does not exist.
+In SPVM, there is an if require Statement that loads a module only if it exists in the module path, and if it does not exist, the block does not exist.
 
 It was designed to implement a part of features of "#ifdef" in C language.
 
@@ -2671,7 +2660,7 @@ This initial value can be changed by using the L<INIT block|/"INIT Block">.
 
 =head2 Class Variable Access
 
-The class variable access is an operation to set or get a class variable.
+The class variable access is an L<operator|/"Operator"> to set or get a class variable.
 
 See the L<getting class varialbe|/"Getting Class Variable"> and the L<setting class varialbe|/"Setting Class Variable">.
 
@@ -2687,7 +2676,7 @@ C<has> keyword defines a field.
 
 Field must be defined directly under the L<class definition|/"Class Definition">.
 
-Field Definition must be specify L</"Type">. The Type must be a L<numeric type|/"Numeric Type"> or an L<object type|/"Object Type">.
+Field Definition must be specify the L<type|/"Type">. The Type must be a L<numeric type|/"Numeric Type"> or an L<object type|/"Object Type">.
 
 Field names must follows the rule specified in L</"Field Name">.
 
@@ -2809,7 +2798,7 @@ See L</"Getting Field"> to get the field of the L<class|/"Class">.
 
 See L</"Setting Field"> to set the field of the L<class|/"Class">.
 
-=head3 Field Access of the Multi-Numeric Type
+=head3 Field Access of thethe multi-numeric type
 
 The field access of the L<multi-numeric type|/"Multi-Numeric Type">.
 
@@ -2860,9 +2849,9 @@ The argument names must be follow the rule of L</"Local Variable Name">.
 
 The minimal length of arguments is C<0>. The max length of arguments is C<255>.
 
-The types of the arguments must be a L<numeric type|/"Numeric Type">, L</"Multi-Numeric Type">, an L<object type|/"Object Type">, or L</"Reference Type">, otherwise a compilation error will occur.
+The types of the arguments must be a L<numeric type|/"Numeric Type">, the L<multi-numeric type|/"Multi-Numeric Type">, an L<object type|/"Object Type">, or L</"Reference Type">, otherwise a compilation error will occur.
 
-The type of the return value must be the L<void type/"void Type">, a L<numeric type|/"Numeric Type">, L</"Multi-Numeric Type"> or an L<object type|/"Object Type">, otherwise a compilation error will occur.
+The type of the return value must be the L<void type/"void Type">, a L<numeric type|/"Numeric Type">, the L<multi-numeric type|/"Multi-Numeric Type"> or an L<object type|/"Object Type">, otherwise a compilation error will occur.
 
 Defined methods can be called using L</"Method Call"> syntax.
 
@@ -3221,15 +3210,15 @@ In special cases, a value of an enumeration can be used as the operand of a L<ca
 
 =head2 Local Variable Declaration
 
-B<Local Variable> is a variable that is declared in L</"Scope Block">.  Local Variable has L</"Scope">. This is the same as Local Variable in C Language.
+B<Local Variable> is a variable that is declared in L</"Scope Block">.  Local Variable has the L<scope|/"Scope">. This is the same as Local Variable in C Language.
 
-Local Variable is declared using B<my> L</"Keyword">.
+The local variable is declared using B<my> L</"Keyword">.
 
   my LOCAL_VARIABLE_NAME : TYPE;
 
 The local variable name must be follow the rule of L</"Local Variable Name">.
 
-L</"Type"> must be specified. Type must be a L<numeric type|/"Numeric Type">, an L<object type|/"Object Type">, L</"Multi-Numeric Type">, or L</"Reference Type">.
+the L<type|/"Type"> must be specified. Type must be a L<numeric type|/"Numeric Type">, an L<object type|/"Object Type">, the L<multi-numeric type|/"Multi-Numeric Type">, or L</"Reference Type">.
 
   # Local Variable Declaration Examples
   my $var : int;
@@ -3237,7 +3226,7 @@ L</"Type"> must be specified. Type must be a L<numeric type|/"Numeric Type">, an
   my $var : Complex_2d;
   my $var : int*;
 
-Local Variable is initialized by L</"Local Variable Initial Value">.
+The local variable is initialized by L</"Local Variable Initial Value">.
 
   # Initialized by 0
   my $num : int;
@@ -3251,7 +3240,7 @@ Local Variable is initialized by L</"Local Variable Initial Value">.
   # x is initialized by 0. y is initialized by 0.
   my $z : Complex_2d;
 
-Initialization can be done at the same time as Local Variable Declaration.
+The initialization of the local variable can be written at the same time as the local variable declaration.
 
   # Initialized by 1
   my $num : int = 1;
@@ -3262,15 +3251,15 @@ Initialization can be done at the same time as Local Variable Declaration.
   # Initialized by Point object
   my $point : Point = new Point;
 
-Using L</"Type Inference">, you omit L</"Type"> in Local Variable Declaration.
+The L<type|/"Type"> can be omitted using the L<type inference|/"Type Inference">, 
 
-  # int
+  # Type inference - int
   my $num = 1;
   
-  # double
+  # Type inference - double
   my $num = 1.0;
 
-Local Variable Declaration returns the value of Local Variable. This is a L</"Expressions">.
+The local variable declaration returns the value of the local variable. The return type is the type of the local variable.
 
   my $ppp = my $bar = 4;
   
@@ -3282,15 +3271,15 @@ Local Variable Declaration returns the value of Local Variable. This is a L</"Ex
   
   }
 
-See L</"Scope"> about Local Variable Scope.
+See the L<scope|/"Scope"> about the scope of the local variable.
 
 =head2 Local Variable Initial Value
 
-Local Variable is initialized by the L<initial value/"Initial Value">.
+The local variable is initialized by the L<initial value/"Initial Value">.
 
 =head2 Local Variable Access
 
-Local Variable Access is an operation to access Local Variable to get or set the value.
+The local variable Access is an L<operator|/"Operator"> to access Local Variable to get or set the value.
 
 See L</"Getting Local Variable"> to get Local Variable value.
 
@@ -3601,7 +3590,7 @@ See L</"Creating Array"> to create Array.
 
 =head2 Array Access
 
-Array Access is an operation to access the element of Array to get or set the value.
+Array Access is an L<operator|/"Operator"> to access the element of Array to get or set the value.
 
   ARRAY->[INDEX]
 
@@ -3613,9 +3602,9 @@ See L</"Setting Array Element"> to set the element value of Array.
 
 =head2 Multi-Numeric Type Definition
 
-Multi-Numeric type represents continuous numeric values. For example, there are three consecutive 32-bit signed integers, two consecutive double-precision floating point numbers. It isplaned to use 3D points, complex numbers, quaternions, etc.
+The multi-numeric type represents continuous numeric values. For example, there are three consecutive 32-bit signed integers, two consecutive double-precision floating point numbers. It isplaned to use 3D points, complex numbers, quaternions, etc.
 
-Multi-Numeric Type are defined by specifying mulnum_t L</"Class Descriptor"> in the L<class definition|/"Class Definition">.
+The multi-numeric type are defined by specifying mulnum_t L</"Class Descriptor"> in the L<class definition|/"Class Definition">.
 
   # Three consecutive 32bit signed integers
   class Complex_2d : mulnum_t {
@@ -3630,7 +3619,7 @@ Multi-Numeric Type are defined by specifying mulnum_t L</"Class Descriptor"> in 
     y : double;
   }
 
-Multi-Numeric Type must end with C<_>, Number of the fields, L</"Multi-Numeric Type Suffix">.
+The multi-numeric type must end with C<_>, Number of the fields, L</"Multi-Numeric Type Suffix">.
 
 The suffix must correspond to a L<numeric type|/"Numeric Type">.
 
@@ -3638,28 +3627,28 @@ All Fields must be the same a L<numeric type|/"Numeric Type">.
 
 The maximum number of the fields is 255.
 
-Multi-Numeric Type can be used as L</"Type"> of L</"Local Variable Declaration">.
+The multi-numeric type can be used as the L<type|/"Type"> of the L<local variable declaration|/"Local Variable Declaration">.
 
-Multi-Numeric Type can be used as an argument L</"Type"> in the L<method definition|/"Method Definition"> .
+The multi-numeric type can be used as an argument the L<type|/"Type"> in the L<method definition|/"Method Definition"> .
 
-Multi-Numeric Type can be used as L</"Type"> of Return Value in the L<method definition|/"Method Definition">.
+The multi-numeric type can be used as the L<type|/"Type"> of Return Value in the L<method definition|/"Method Definition">.
 
-Multi-Numeric Type can be used as L</"Basic Type"> of L</"Array Type"> .
+The multi-numeric type can be used as L</"Basic Type"> of L</"Array Type"> .
 
   my $points = new Complex_2d[5];
 
-Reference can be created for Multi-Numeric Type value.
+Reference can be created forthe multi-numeric type value.
 
   my $z : Complex_2d;
   my $z_ref = \$z;
 
-L<undef|/"Undefined Value"> cannot be assigned to Multi-Numeric Type value.
+L<undef|/"Undefined Value"> cannot be assigned tothe multi-numeric type value.
 
-See L</"Multi-Numeric Type Field Access"> to get and set the value of field of Multi-Numeric Type Value.
+See L</"Multi-Numeric Type Field Access"> to get and set the value of field ofthe multi-numeric type Value.
 
 =head2 Multi-Numeric Type Suffix
 
-List of Multi-Numeric Type Suffix.
+List ofthe multi-numeric type Suffix.
 
 =begin html
 
@@ -3669,7 +3658,7 @@ List of Multi-Numeric Type Suffix.
       <b>Numeric Type</b>
    </th>
     <th>
-      Multi-Numeric Type Suffix
+     the multi-numeric type Suffix
    </th>
   </tr>
   <tr>
@@ -3724,29 +3713,27 @@ List of Multi-Numeric Type Suffix.
 
 =end html
 
-=head2 Multi-Numeric Type Usage
+=head2 Using Multi-Numeric Type
 
-To use Multi-Numeric Type, load a Module using L</"use Statement">.
+A multi-numeric type can be loaded using the L<use statement|/"use Statement">.
 
   use Complex_2d;
-  use Complex_2d;
 
-Next is L</"Local Variable Declaration">. Local Variable Declaration create continuous area for fields of Multi-Numeric Type Value. All fields of of Multi-Numeric Type Value are initialized by the L<initial value/"Initial Value">.
+A multi-numeric value is declared by the L<local variable declaration|/"Local Variable Declaration">.
 
   my $z : Complex_2d;
-  my $z : Complex_2d;
 
-Note that Multi-Numeric Type value are not object, so cannot create a Object by L</"new"> syntax.
+The value is initialized by the L<initial value/"Initial Value">.
 
 =head2 Multi-Numeric Type Field Access
 
-B<Multi-Numeric Type Field Access> is an operation to access Multi-Numeric Type Field to get or set a value.
+The C<multi-numeric type field access> is an L<operator|/"Operator"> to accessthe multi-numeric type Field to get or set a value.
 
   MULTI_NUMERIC_TYPE_VALUE->{FIELD_NAME}
 
-See L</"Getting Multi-Numeric Field"> to get Multi-Numeric Type Field.
+See L</"Getting Multi-Numeric Field"> to getthe multi-numeric type Field.
 
-See L</"Setting Multi-Numeric Field"> to set Multi-Numeric Type Field.
+See L</"Setting Multi-Numeric Field"> to setthe multi-numeric type Field.
 
 =head1 Multi-Numeric Array
 
@@ -3758,15 +3745,15 @@ L</"Multi-Numeric Value"> can be an element of L</"Array">.
 
 Multi-Numeric Array has continuous Multi-Numeric Values.
 
-The Element Type is L</"Multi-Numeric Type">, not an L<object type|/"Object Type">.
+The Element Type is the L<multi-numeric type|/"Multi-Numeric Type">, not an L<object type|/"Object Type">.
 
 For example, Complex_2d[5] is continuous 15 (= 3 * 5) count the L<int type|/"int Type"> Value.
 
-L</"Type"> of Multi-Numeric Array is L</"Array Type">.
+the L<type|/"Type"> of Multi-Numeric Array is L</"Array Type">.
 
 =head2 Multi-Numeric Array Access
 
-Multi-Numeric Array Access is an operation to access Multi-Numeric Array to get and set the element value.
+Multi-Numeric Array Access is an L<operator|/"Operator"> to access Multi-Numeric Array to get and set the element value.
 
   Array->[INDEX]
 
@@ -3841,9 +3828,7 @@ See L<Data type - Wikipedia|https://en.wikipedia.org/wiki/Type_system> about dat
 
 =head2 Initial Value
 
-Local Variable Initial Value are described in L</"Class Variable Initial Value">.
-
-A list of Initial Value. All Bit columns in the data are set to 0.
+The list of initial values.
 
 =begin html
 
@@ -3893,7 +3878,7 @@ A list of Initial Value. All Bit columns in the data are set to 0.
       <b>float</b>
     </td>
     <td>
-      0
+      0 (All bits are <code>0</code>)
     </td>
   </tr>
   <tr>
@@ -3901,7 +3886,7 @@ A list of Initial Value. All Bit columns in the data are set to 0.
       <b>double</b>
     </td>
     <td>
-      0
+      0 (All bits are <code>0</code>)
     </td>
   </tr>
   <tr>
@@ -3917,7 +3902,7 @@ A list of Initial Value. All Bit columns in the data are set to 0.
       <b>Multi-Numeric Type</b>
     </td>
     <td>
-      All Field is 0
+      All fields are set to <code>0</code> (All bits are <code>0</code>)
     </td>
   </tr>
 </table>
@@ -3926,7 +3911,7 @@ A list of Initial Value. All Bit columns in the data are set to 0.
 
 =head2 Numeric Type
 
-Numeric Type are L</"Integral Type"> and L</"Floating Point Type">.
+The numeric type are the L<integral type|/"Integral Type"> and L</"Floating Point Type">.
 
 =head3 Numeric Type Order
 
@@ -4004,19 +3989,19 @@ Note that SPVM has only B<singed> integral types, and doesn't have B<unsigned> i
 
 =head2 byte Type
 
-C<byte> type is a L</"Integral Type"> that represents a signed 8-bit integer. This is the same type as C<int8_t> type of C language.
+C<byte> type is the L<integral type|/"Integral Type"> that represents a signed 8-bit integer. This is the same type as C<int8_t> type of C language.
 
 =head2 short Type
 
-C<short> type  is a L</"Integral Type"> that represents a signed 16-bit integer. This is the same type as C<int16_t> type of C language.
+C<short> type  is the L<integral type|/"Integral Type"> that represents a signed 16-bit integer. This is the same type as C<int16_t> type of C language.
 
 =head2 int Type
 
-C<int> type is  is a L</"Integral Type"> that represents signed 32-bit integer. This is the same as C<int32_t> type of C language.
+C<int> type is  is the L<integral type|/"Integral Type"> that represents signed 32-bit integer. This is the same as C<int32_t> type of C language.
 
 =head2 long Type
 
-C<long> type is a L</"Integral Type"> that represents a signed 64-bit integer. This is the same type as C<int64_t> type of C language.
+C<long> type is the L<integral type|/"Integral Type"> that represents a signed 64-bit integer. This is the same type as C<int64_t> type of C language.
 
 =head2 Floating Point Type
 
@@ -4404,9 +4389,9 @@ B<Examples:>
 
 =head2 Multi-Numeric Type
 
-Multi-Numeric Type are a type that can represent continuous numerical values.
+The multi-numeric type are a type that can represent continuous numerical values.
 
-Multi-Numeric Type can be defined by specifying C<mulnum_t> Descriptor in the the L<class definition|/"Class Definition">.
+The multi-numeric type can be defined by specifying C<mulnum_t> Descriptor in the L<class definition|/"Class Definition">.
 
   class Complex_2d : mulnum_t {
     has x : int;
@@ -4414,11 +4399,11 @@ Multi-Numeric Type can be defined by specifying C<mulnum_t> Descriptor in the th
     has z : int;
   }
 
-See L</"Values ​​"> for a detailed explanation of Multi-Numeric Type.
+See L</"Values ​​"> for a detailed explanation ofthe multi-numeric type.
 
 =head2 Reference Type
 
-Reference Type is a Type that can store the address of a variable. Add C<*> after a L<numeric type|/"Numeric Type"> or L</"Multi-Numeric Type"> You can define it.
+Reference Type is a Type that can store the address of a variable. Add C<*> after a L<numeric type|/"Numeric Type"> or the L<multi-numeric type|/"Multi-Numeric Type"> You can define it.
 
   my $num : int;
   my $num_ref : int* = \$num;
@@ -4430,7 +4415,7 @@ Only the address of the Local Variable acquired by L</"Reference Operator"> can 
 
 If only Local Variable Declaration of Reference Type is performed, a compilation error will occur
 
-Reference Type can be used as Type of L</"Local Variable Declaration">. The address of the Local Variable must be stored by the Reference Operator. In case of only Local Variable Declaration, a compilation error will occur
+Reference Type can be used as Type of the L<local variable declaration|/"Local Variable Declaration">. The address of the Local Variable must be stored by the Reference Operator. In case of only Local Variable Declaration, a compilation error will occur
 
 Reference Type can be used as Type of argument in the L<method definition|/"Method Definition">.
 
@@ -4454,7 +4439,7 @@ Numeric Reference Type means a L<numeric type|/"Numeric Type"> for L</"Reference
 
 =head2 Multi-Numeric Reference Type
 
-Multi-Numeric Reference Type means L</"Reference Type"> for L</"Multi-Numeric Type"> variables. > Means.
+Multi-Numeric Reference Type means L</"Reference Type"> for the L<multi-numeric type|/"Multi-Numeric Type"> variables. > Means.
 
 =head2 Type Qualifier
 
@@ -4476,7 +4461,7 @@ B<Examples:>
 
 =head1 Type Inference
 
-Omitting L</"Type"> when L</"Local Variable Declaration"> by Type Inference can. Type Inference is always performed by the type on the Right side of Assignment Operator.
+Omitting the L<type|/"Type"> when the L<local variable declaration|/"Local Variable Declaration"> by Type Inference can. Type Inference is always performed by the type on the Right side of Assignment Operator.
 
   # int
   my $num = 1;
@@ -5878,19 +5863,17 @@ The numeric narrowing type conversion is performed in some of the L<type casts|/
 
 =head2 Binary Numeric Type Conversion
 
-Binary Numeric Type Conversion is performed to the left operand and the right operand in Binary Operator that takes Numeric Type on the Left and Right sides. L</"Numeric Widening Type Conversion">.
+The binary numeric type conversion is a L<type conversion|/"Type Conversion"> to upgrade the type of the left operand or the right operand of the binary operator that operands are L<numeric types|/"Numeric Type">.
 
-The following rules apply.
+The following rules apply in order.
 
-1. When one Expression is L</"double Type">, the other Type is L</"double Type"> Is converted to>.
+1. If the left operand or the right operand is the L<double type|/"double Type">, the operand of the small type is converted to the big type using the L<numeric widening type conversion|/"Numeric Widening Type Conversion">.
 
-2. If one Expression is L</"float Type">, the other Type is L</"float Type"> Is converted to>.
+2. If the left operand or the right operand is the L<float type|/"float Type">, the operand of the small type is converted to the big type using the L<numeric widening type conversion|/"Numeric Widening Type Conversion">.
 
-3. When one Expression is L</"long Type">, the other Type is L</"long Type"> Is converted to>.
+3. If the left operand or the right operand is the L<long type|/"long Type">, the operand of the small type is converted to the big type using the L<numeric widening type conversion|/"Numeric Widening Type Conversion">.
 
-4, otherwise, it will be converted to the L<int type|/"int Type">.
-
-Binary Numeric Type Conversion is performed in the following cases.
+4, Otherwise, both the left operand and the right operand are converted to the L<int type|/"int Type"> using the L<numeric widening type conversion|/"Numeric Widening Type Conversion">.
 
 =head2 Numeric-to-String Type Conversion
 
@@ -5951,7 +5934,7 @@ Boxing Type Conversion is the operation to convert the value of Numeric Type to 
 
 =head2 Unboxing Type Conversion
 
-Unboxing Type Conversion is an operation to convert the value of Numeric Object Type to the corresponding value of Numeric Type.
+Unboxing Type Conversion is an L<operator|/"Operator"> to convert the value of Numeric Object Type to the corresponding value of Numeric Type.
 
 =head2 Conditional Type Conversion
 
@@ -6141,7 +6124,7 @@ An empty statement is a L<statement|/"Statement"> that do nothing and ends with 
 
 =head2 Operation Statement
 
-The operation statement is the L<statement|/"Statement"> to execute an operation.
+The operation statement is the L<statement|/"Statement"> to execute an L<operator|/"Operator">.
 
 A operation statement is composed of an L<operator|/"Operator"> and C<;>.
 
@@ -6165,7 +6148,7 @@ The C<if> statement is a L<statement|/"Statement"> for conditional branch.
 
 The condition the L<conditional type conversion|/"Conditional Type Conversion"> is executed and Block is executed if the value is non-zero.
 
-If you want to write more than one condition, you can continue with "elsif Statement". The condition determination is performed from above, and each Expression is the L<conditional type conversion|/"Conditional Type Conversion"> is executed, and a corresponding Block is executed if the value is non-zero.
+If you want to write more than one condition, you can continue with "elsif Statement". The condition determination is performed from above, and each operand is the L<conditional type conversion|/"Conditional Type Conversion"> is executed, and a corresponding Block is executed if the value is non-zero.
 
   if (CONDITION) {
   
@@ -6426,7 +6409,7 @@ The C<while> statement is a L<statement|/"Statement"> for repeating.
   
   }
 
-L</"Expressions"> can be described in the condition Expression. The L<conditional type conversion|/"Conditional Type Conversion"> is executed for condition Expression, and if the value is not 0, Block is executed. Exit the otherwise Block.
+The L<operator|/"Operator"> can be described in the condition operator. The L<conditional type conversion|/"Conditional Type Conversion"> is executed for condition operator, and if the value is not 0, Block is executed. Exit the otherwise Block.
 
 B<Examples:>
 
@@ -6446,7 +6429,7 @@ Inside the while block, you can leave the while block by using L</"last Statemen
     last;
   }
 
-Inside a while block, you can use L</"next Statement"> to move to the condition immediately before the next condition Expression.
+Inside a while block, you can use L</"next Statement"> to move to the condition immediately before the next condition operator.
 
   my $i = 0;
   while ($i <5) {
@@ -6484,13 +6467,13 @@ The C<for> Statement is a L<statement|/"Statement"> for repeating.
   
   }
 
-L</"Expressions"> can be described in the initialization Expression. Generally, write Expression such as initialization of loop variable. Initialization Expression can be omitted.
+The L<operator|/"Operator"> can be described in the initialization operator. Generally, write operator such as initialization of loop variable. Initialization operator can be omitted.
 
-Condition Expression, L</"Expressions"> can be described. The L<conditional type conversion|/"Conditional Type Conversion"> is executed for condition Expression, and if the value is not 0, Block is executed. Exit the otherwise block.
+Condition operator, the L<operator|/"Operator"> can be described. The L<conditional type conversion|/"Conditional Type Conversion"> is executed for the condition operator, and if the value is not 0, Block is executed. Exit the otherwise block.
 
-L</"Expressions"> can be described in INCREMENT_STATEMENT. Generally, Expression of Increment of loop variable is described. INCREMENT_STATEMENT can be omitted.
+The L<operator|/"Operator"> can be described in INCREMENT_STATEMENT. Generally, operator of Increment of loop variable is described. INCREMENT_STATEMENT can be omitted.
 
-for Statement has the same meaning as the following while Statement. INCREMENT_STATEMENT is executed at the end of Block. Initialization Expression is enclosed in L</"Simple Block">.
+for Statement has the same meaning as the following while Statement. INCREMENT_STATEMENT is executed at the end of Block. Initialization operator is enclosed in L</"Simple Block">.
 
   {
     INIT_STATEMENT;
@@ -6527,13 +6510,13 @@ The C<return> statement is a L<statement|/"Statement"> to get out of the method.
 
   return;
 
-If there is a Return Value, L</"Expressions"> can be specified.
+If there is a Return Value, the L<operator|/"Operator"> can be specified.
 
   return EXPRESSION;
 
-If the Return Value Type in the L<method definition|/"Method Definition"> is the L<void type/"void Type">, Expression Must not exist, otherwise a compilation error will occur.
+If the Return Value Type in the L<method definition|/"Method Definition"> is the L<void type/"void Type">, operator Must not exist, otherwise a compilation error will occur.
 
-the L<method definition|/"Method Definition">, if the The return type is other than the L<void type/"void Type">, Expression Must match the type of, otherwise a compilation error will occur.
+the L<method definition|/"Method Definition">, if the The return type is other than the L<void type/"void Type">, operator Must match the type of, otherwise a compilation error will occur.
 
 =head2 next Statement
 
@@ -6674,7 +6657,7 @@ B<Examples:>
 
 =head1 Operator
 
-An operator performs an operation.
+An operator performs an L<operator|/"Operator">.
 
 Operators are L<unary operators/"Unary Operator">, L<binary operators|/"Binary Operator">, L<increment operators|/"Increment Operator">, L<decrement operators|/"Decrement Operator">, L<comparison operators|/"Comparison Operator">, L<logical operators|/"Logical Operator">, and L<assignment operators|/"Assignment Operator">.
 
@@ -7133,11 +7116,11 @@ The left shift operator C<E<lt>E<lt>> is a L<binary operator|/"Binary Operator">
 
   LEFT_OPERAND << RIGHT_OPERAND
 
-The left operand must be L</"Integral Type">, otherwise a compilation error will occur.
+The left operand must be the L<integral type|/"Integral Type">, otherwise a compilation error will occur.
 
 L</"Numeric Widening Type Conversion"> is performed to the left operand.
 
-The right operand must be L</"Integral Type"> except for the L<long type|/"long Type">, otherwise a compilation error will occur.
+The right operand must be the L<integral type|/"Integral Type"> except for the L<long type|/"long Type">, otherwise a compilation error will occur.
 
 L</"Numeric Widening Type Conversion"> is performed to the right operand.
 
@@ -7153,11 +7136,11 @@ The arithmetic right shift operator C<E<gt>E<gt>> is a L<binary operator|/"Binar
 
   LEFT_OPERAND >> RIGHT_OPERAND
 
-The left operand must be L</"Integral Type">, otherwise a compilation error will occur.
+The left operand must be the L<integral type|/"Integral Type">, otherwise a compilation error will occur.
 
 L</"Numeric Widening Type Conversion"> is performed to the left operand.
 
-The right operand must be L</"Integral Type"> except for the L<long type|/"long Type">, otherwise a compilation error will occur.
+The right operand must be the L<integral type|/"Integral Type"> except for the L<long type|/"long Type">, otherwise a compilation error will occur.
 
 L</"Numeric Widening Type Conversion"> is performed to the right operand.
 
@@ -7173,11 +7156,11 @@ The logical right shift operator C<E<gt>E<gt>E<gt>>is a L<binary operator|/"Bina
 
   LEFT_OPERAND >>> RIGHT_OPERAND
 
-The left operand must be L</"Integral Type">, otherwise a compilation error will occur.
+The left operand must be the L<integral type|/"Integral Type">, otherwise a compilation error will occur.
 
 L</"Numeric Widening Type Conversion"> is performed to the left operand.
 
-The right operand must be L</"Integral Type"> except for the L<long type|/"long Type">, otherwise a compilation error will occur.
+The right operand must be the L<integral type|/"Integral Type"> except for the L<long type|/"long Type">, otherwise a compilation error will occur.
 
 L</"Numeric Widening Type Conversion"> is performed to the right operand.
 
@@ -7313,7 +7296,7 @@ the Numeric Comparison Operation is performed that exactly same as the following
   (int32_t)(x <= y);
   (int32_t)(x > y ? 1 : x < y ? -1 : 0);
 
-For Numeric Type Operation(==, !=, >, >=, <, <=), the L<int type|/"int Type"> Operation, L</"long Type"> Operation, L</"float Type"> Operation, L</"double Type"> Operation is defined.
+For Numeric Type Operation(==, !=, >, >=, <, <=), the L<int type|/"int Type"> Operation, L</"long Type"> Operation, L</"float Type"> Operation, the L<double type|/"double Type"> Operation is defined.
 
 And Object Type Operation(==, !=) is defined.
 
@@ -7359,7 +7342,7 @@ The list of string comparison operators.
       LEFT_OPERAND gt RIGHT_OPERAND
     </td>
     <td>
-      The left operand is greater than the right operand in dictionary Expression order.
+      The left operand is greater than the right operand in the dictionary order.
     </td>
   </tr>
   <tr>
@@ -7367,7 +7350,7 @@ The list of string comparison operators.
       LEFT_OPERAND ge RIGHT_OPERAND
     </td>
     <td>
-      The left operand is greater than or equal to the right operand compared in dictionary Expression order
+      The left operand is greater than or equal to the right operand compared in the dictionary order
     </td>
   </tr>
   <tr>
@@ -7375,7 +7358,7 @@ The list of string comparison operators.
       LEFT_OPERAND lt RIGHT_OPERAND
     </td>
     <td>
-      The left operand is smaller than the right operand when compared in dictionary Expression order
+      The left operand is less than the right operand when compared in the dictionary order
     </td>
   </tr>
   <tr>
@@ -7383,7 +7366,7 @@ The list of string comparison operators.
       LEFT_OPERAND le RIGHT_OPERAND
     </td>
     <td>
-      The left operand is less than or equal to the right operand compared in dictionary Expression order
+      The left operand is less than or equal to the right operand compared in the dictionary order
     </td>
   </tr>
   <tr>
@@ -7406,7 +7389,7 @@ The C<isa> operator is a L<comparison operator|/"Comparison Operator"> to check 
 
 The return type is L<int type|/"int Type">.
 
-If the right type is a L<numeric type|/"Numeric Type">, L</"Multi-Numeric Type">, L</"Any Object Type">, L</"Reference Type">, it checks the L<assignability|/"Assignability"> at compile-time.
+If the right type is a L<numeric type|/"Numeric Type">, the L<multi-numeric type|/"Multi-Numeric Type">, L</"Any Object Type">, L</"Reference Type">, it checks the L<assignability|/"Assignability"> at compile-time.
 
 If the assignability is true, it is replaced with C<1>. Otherwise it is replaced with C<0>.
 
@@ -7454,7 +7437,7 @@ The C<dump> operator is an L<operator|/"Operator"> to get the string representat
 
   dump OPERAND
 
-It returns the the string representation of the object.
+It returns the string representation of the object.
 
 The return type is the L<string type|/"string Type">.
 
@@ -7645,11 +7628,11 @@ The array length operator is an L<unary operator|/"Unary Operator"> to get the l
 
   @OPERAND
 
-The operand must be a L<Expression|/"Expressions"> that type is an L</"Array Type">, otherwise a compilation error will occur.
+The operand must be an L<operator|/"Operator"> that type is an L</"Array Type">, otherwise a compilation error will occur.
 
-The array length operator returns a the L<int type|/"int Type"> value that is the length of the L</"Array">.
+The array length operator returns the L<int type|/"int Type"> value that is the length of the L</"Array">.
 
-Array Length Operator returns L</"Expressions">
+Array Length Operator returns the L<operator|/"Operator">
 
 B<Examples:>
   
@@ -7669,7 +7652,7 @@ The string creation operator C<new_string_len> is an L<unary operator|/"Unary Op
 
   new_string_len OPERAND
 
-The operand must be an L<operator|/"Operator"> that type is a L</"Integral Type"> except for a L<long type|/"long Type">, otherwise a compilation error will occur.
+The operand must be an L<operator|/"Operator"> that type is the L<integral type|/"Integral Type"> except for a L<long type|/"long Type">, otherwise a compilation error will occur.
 
 The string creation operator returns the string that is created with the lenght.
 
@@ -7897,7 +7880,7 @@ B<Examples:>
 
 =head2 Setting Class Variable
 
-B<Setting Class Variable Expression> is an L<operator|/"Operator"> to set L</"Class Variable"> Value using the L<assignment operator|/"Assignment Operator">.
+B<Setting Class Variable operator> is an L<operator|/"Operator"> to set L</"Class Variable"> Value using the L<assignment operator|/"Assignment Operator">.
 
   $CLASS_NAME::CLASS_VARIABLE_NAME = VALUE
 
@@ -7973,7 +7956,7 @@ The getting field is an L<operator|/"Operator"> to get the L<field|/"Field"> of 
 
 The type of invocant is a L<class type|/"Class Type">.
 
-The retrun type is the L<type|/"Type"> of the Field.
+The retrun type is the L<type|/"Type"> of the field.
 
 B<Examples:>
 
@@ -8005,17 +7988,17 @@ B<Examples:>
 
 =head2 Getting Multi-Numeric Field
 
-B<Getting Multi-Numeric Field Expression> is an L<operator|/"Operator"> to get Field of L</"Multi-Numeric Value">. This is one syntax of the L<field access|/"Field Access">.
+B<Getting Multi-Numeric Field operator> is an L<operator|/"Operator"> to get Field of L</"Multi-Numeric Value">. This is one syntax of the L<field access|/"Field Access">.
 
   INVOCANT->{FIELD_NAME}
 
-Invocant Expression is L</"Multi-Numeric Type">.
+The invocant is the L<multi-numeric type|/"Multi-Numeric Type">.
   
 If the field names does not found in the L</"Class">, a compilation error will occur
 
-Getting Multi-Numeric Field Expression returns the field value in the Multi-Numeric Value.
+Getting Multi-Numeric Field operator returns the field value in the multi-numeric value.
 
-Retrun Type is The L</"Type"> of the Field.
+The retrun type is the L<type|/"Type"> of the field.
 
 B<Examples:>
 
@@ -8024,15 +8007,15 @@ B<Examples:>
 
 =head2 Setting Multi-Numeric Field
 
-Setting Multi-Numeric Field Expression is an L<operator|/"Operator"> to set Field of L</"Multi-Numeric Value"> using L</"Assignment Operator">. This is one syntax of the L<field access|/"Field Access">.
+Setting Multi-Numeric Field operator is an L<operator|/"Operator"> to set Field of L</"Multi-Numeric Value"> using L</"Assignment Operator">. This is one syntax of the L<field access|/"Field Access">.
 
   INVOCANT->{FIELD_NAME} = RIGHT_OPERAND
 
-Invocant Expression is L</"Multi-Numeric Type">.
+The invocant is the L<multi-numeric type|/"Multi-Numeric Type">.
 
 If the field names does not found in the L</"Class">, a compilation error will occur.
 
-Setting Multi-Numeric Field Expression returns the value of the field after setting. 
+Setting Multi-Numeric Field operator returns the value of the field after setting. 
 
 The assignment must satisfy the L<assignability|/"Assignability">.
 
@@ -8045,15 +8028,15 @@ B<Examples:>
 
 =head2 Getting Array Element
 
-B<Getting Array Element Expression> is an L<operator|/"Operator"> to get a Element Value of L</"Array">.
+B<Getting Array Element operator> is an L<operator|/"Operator"> to get a Element Value of L</"Array">.
 
   ARRAY->[INDEX]
 
-Array Expression must be L</"Array Type">.
+Array operator must be L</"Array Type">.
 
 the index must be the L<int type|/"int Type"> or the type that become the L<int type|/"int Type"> by L</"Numeric Widening Type Conversion">.
 
-Getting Array Element Expression returns the Element Value of the Index.
+Getting Array Element operator returns the Element Value of the Index.
 
 If the array is L<undef|/"Undefined Value">, a Runtime Exception occurs.
 
@@ -8072,7 +8055,7 @@ B<Examples:>
 
 =head2 Setting Array Element
 
-Setting Array Element Expression is an L<operator|/"Operator"> to set a Element Value of a Array using L</"Assignment Operator">.
+Setting Array Element operator is an L<operator|/"Operator"> to set a Element Value of a Array using L</"Assignment Operator">.
 
   ARRAY->[INDEX] = RIGHT_OPERAND
 
@@ -8082,7 +8065,7 @@ The index must be the L<int type|/"int Type"> or the type that become the L<int 
 
 The assignment must satisfy the L<assignability|/"Assignability">.
 
-Setting Array Element Expression returns the value of the element after setting.
+Setting Array Element operator returns the value of the element after setting.
 
 If the array is L<undef|/"Undefined Value">, a Runtime Exception occurs.
 
@@ -8279,7 +8262,7 @@ B<Examples:>
 
 The reference operator C<\> is the L<operator|/"Operator"> to create a L<reference|/"Reference">.
 
-  \ OPERAND
+  \OPERAND
 
 The operand must be a L<local variable|/"Local Variable"> that type is a L<numeric type|/"Numeric Type"> or a L<multi-numeric type|/"Multi-Numeric Type">. Otherwise a compilation error will occur.
 
@@ -8301,15 +8284,15 @@ The dereference operators are the L<operatoers|/"Operator"> to perform a deferen
 
 =head3 Getting value by Dereference
 
-Obtaining a value by Dereference is an operation to obtain the actual value from Reference. It was designed to realize the C joint operator C<*>.
+Obtaining a value by Dereference is an L<operator|/"Operator"> to obtain the actual value from Reference. It was designed to realize the C joint operator C<*>.
 
-  $ VARIABLE
+  $VARIABLE
 
 The variable Type must be Reference Type, otherwise a compilation error will occur.
 
-The value obtained by Dereference returns L</"Expressions">.
+The value obtained by Dereference returns the L<operator|/"Operator">.
 
-    B<Example of getting value by Dereference>
+B<Examples:>
 
   my $num : int;
   my $num_ref : int* = \$num;
@@ -8321,17 +8304,17 @@ The value obtained by Dereference returns L</"Expressions">.
 
 =head3 Setting the value with Dereference
 
-Setting a value with Dereference is an operation to set the actual value from Reference. It was designed to realize the C joint operator C<*>.
+Setting a value with Dereference is an L<operator|/"Operator"> to set the actual value from Reference. It was designed to realize the C joint operator C<*>.
 
-  $ VARIABLE = OPERAND
+  $VARIABLE = OPERAND
 
 The variable Type must be Reference Type, otherwise a compilation error will occur.
 
-The type of Expression must match the type of the variable when dereferenced, otherwise a compilation error will occur.
+The type of operator must match the type of the variable when dereferenced, otherwise a compilation error will occur.
 
-Setting a value with Dereference returns the set value. This is L</"Expressions">.
+Setting a value with Dereference returns the set value. This is the L<operator|/"Operator">.
 
-    B<Example of setting values ​​with Dereference>
+B<Examples:>
 
   my $num : int;
   my $num_ref : int* = \$num;
@@ -8344,20 +8327,19 @@ Setting a value with Dereference returns the set value. This is L</"Expressions"
   
   $$z_ref = $z2;
 
-
 =head3 Getting Multi-Numeric Field via Dereference
 
-B<Getting Multi-Numeric Field via Dereference Expression> is an L<operator|/"Operator"> to get Field of L</"Multi-Numeric Value"> via L</"Dereference">. This is one syntax of the L<field access|/"Field Access">
+B<Getting Multi-Numeric Field via Dereference operator> is an L<operator|/"Operator"> to get Field of L</"Multi-Numeric Value"> via L</"Dereference">. This is one syntax of the L<field access|/"Field Access">
 
   INVOCANT->{FIELD_NAME}
 
-Invocant Expression is L</"Multi-Numeric Reference Type">.
+The invocant is L</"Multi-Numeric Reference Type">.
 
 If the field names does not found in the L</"Class">, a compilation error will occur
 
-Getting Multi-Numeric Field via Dereference Expression returns the field value in the Multi-Numeric Value.
+The getting multi-numeric field via dereference operator returns the field value in the multi-numeric value.
 
-Retrun Type is The L</"Type"> of the Field.
+The retrun type is the L<type|/"Type"> of the field.
 
 B<Examples:>
 
@@ -8367,15 +8349,15 @@ B<Examples:>
 
 =head3 Setting Multi-Numeric Field via Dereference
 
-Setting Multi-Numeric Field Expression via Dereference is an L<operator|/"Operator"> to set Field of L</"Multi-Numeric Value"> via L</"Dereference"> using L</"Assignment Operator">. This is one syntax of the L<field access|/"Field Access">.
+The setting multi-numeric field via dereference operator is an L<operator|/"Operator"> to set Field of L</"Multi-Numeric Value"> via L</"Dereference"> using L</"Assignment Operator">. This is one syntax of the L<field access|/"Field Access">.
 
   INVOCANT->{FIELD_NAME} = RIGHT_OPERAND
 
-Invocant Expression is L</"Multi-Numeric Reference Type">.
+The invocant is L</"Multi-Numeric Reference Type">.
 
 If the field names does not found in the L</"Class">, a compilation error will occur
 
-Setting Multi-Numeric Field via Dereference Expression returns the value of the field after setting.
+The setting multi-numeric field via dereference operator returns the value of the field after setting.
 
 The assignment must satisfy the L<assignability|/"Assignability">.
 
@@ -8408,7 +8390,7 @@ The getting current file name C<__FILE__> is an L<operator|/"Operator"> to get t
 
   __FILE__
 
-Current File Name means the relative path from the base path of the module file. For example, if the Module Loaded Path is "/mypath" and the Module name is "Foo::Bar", the absolute path is "/mypath/SPVM/Foo/Bar.spvm" and the relative path is "SPVM/Foo/Bar.spvm". "SPVM/Foo/Bar.spvm" is Current File Name.
+The current file name means the relative path from the base path of the module file. For example, if the class loaded path is C</mypath> and the class name is C<Foo::Bar>, the absolute path is C</mypath/SPVM/Foo/Bar.spvm> and the relative path is C<SPVM/Foo/Bar.spvm>. C<SPVM/Foo/Bar.spvm> is the current file name.
 
 B<Examples:>
 
@@ -8634,7 +8616,7 @@ Weak Reference is a reference that does not increase the reference count. Weak R
 
 SPVM has GC of Reference Count Type. In the GC of Reference Count Type, the object is automatically destroyed when the reference count becomes 0, but when the circular reference occurs, the reference count does not become 0 and the object is automatically destroyed. not.
 
-This is an Example when the Field of the object is circularly referenced.
+This is an example when the field of the object is circularly referenced.
 
   {
     my $foo = new Foo;

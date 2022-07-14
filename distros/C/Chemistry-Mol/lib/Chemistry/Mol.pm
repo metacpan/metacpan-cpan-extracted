@@ -1,6 +1,6 @@
 package Chemistry::Mol;
 
-our $VERSION = '0.38'; # VERSION
+our $VERSION = '0.39'; # VERSION
 # $Id$
 
 =head1 NAME
@@ -48,7 +48,7 @@ our %EXPORT_TAGS = (
       all  => [@EXPORT, @EXPORT_OK],
 );
 
-
+our $clone_backend = 'Storable';
 
 my %FILE_FORMATS = ();
 
@@ -731,12 +731,25 @@ sub formula {
 Makes a copy of a molecule. Note that this is a B<deep> copy; if your molecule
 has a pointer to the rest of the universe, the entire universe will be cloned!
 
+By default, clone() uses L<Storable> to copy the Perl data structure. L<Clone>
+can be used instead by setting variable C<$Chemistry::Mol::clone_backend> to
+C<Clone> (default is C<Storable>). The documentation of Storable claims L<Clone>
+is less memory-intensive.
+
 =cut
 
 sub clone {
     my ($self) = @_;
-    my $clone = dclone $self;
-    $clone->_weaken if Storable->VERSION < 2.14;
+    my $clone;
+    if ($clone_backend eq "Storable") {
+        $clone = dclone $self;
+        $clone->_weaken if Storable->VERSION < 2.14;
+    } elsif ($clone_backend eq "Clone") {
+        require Clone;
+        $clone = Clone::clone $self;
+    } else {
+        croak "Unknown clone backend '$clone_backend'";
+    }
     $clone;
 }
 

@@ -209,7 +209,7 @@ Class Metadata for Perl 5
 
   sub EXPORT {
     # explicitly declare routines to be consumed
-    return ['id', 'login', 'password'];
+    ['id', 'login', 'password']
   }
 
   package Authenticable;
@@ -217,12 +217,19 @@ Class Metadata for Perl 5
   use Mars::Role;
 
   sub authenticate {
-    # ...
+    return true;
+  }
+
+  sub AUDIT {
+    my ($self, $from) = @_;
+    # ensure the caller has a login and password when consumed
+    die "${from} missing the login attribute" if !$from->can('login');
+    die "${from} missing the password attribute" if !$from->can('password');
   }
 
   sub EXPORT {
     # explicitly declare routines to be consumed
-    return ['authenticate'];
+    ['authenticate']
   }
 
   package User;
@@ -230,6 +237,7 @@ Class Metadata for Perl 5
   use Mars::Class;
 
   base 'Person';
+
   with 'Identity';
 
   attr 'email';

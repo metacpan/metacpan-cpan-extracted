@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 #plan 'no_plan';
-plan tests => 11;
+plan tests => 12;
 
 use Chemistry::File::Dumper;
 
@@ -15,8 +15,11 @@ my $mol = Chemistry::Mol->read("t/mol.pl");
 $mol->bonds(7)->delete;
 
 # clone test
-my $mol2 = $mol->clone;
-is_deeply( $mol, $mol2, "clone" );
+for my $backend ('Clone', 'Storable') {
+    $Chemistry::Mol::clone_backend = $backend;
+    my $mol2 = $mol->clone;
+    is_deeply( $mol, $mol2, "clone by $backend" );
+}
 
 # separate test
 my @mols = $mol->separate;

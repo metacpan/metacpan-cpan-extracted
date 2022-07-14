@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -e -u -o pipefail
+
+: "${PERL:=$(which perl)}"
+
+pandoc --from=gfm --to=json |
+  "$PERL" "$(which zild-pandoc-json-to-pod.pl)"

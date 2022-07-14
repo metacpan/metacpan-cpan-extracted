@@ -1,0 +1,97 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/builtins-compat/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008001"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Warnings"^^doap-deps:CpanId ];
+	doap:bug-database    <https://github.com/tobyink/p5-builtins-compat/issues>;
+	doap:created         "2022-07-14"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/builtins-compat>;
+	doap:homepage        <https://metacpan.org/release/builtins-compat>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "builtins-compat";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/builtins-compat/v_0-001>, <http://purl.org/NET/cpan-uri/dist/builtins-compat/v_0-002>, <http://purl.org/NET/cpan-uri/dist/builtins-compat/v_0-003>, <http://purl.org/NET/cpan-uri/dist/builtins-compat/v_0-004>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-builtins-compat>;
+	];
+	doap:shortdesc       "install all the new builtins from the builtin namespace (Perl 5.36+), and try our best on older versions of Perl".
+
+<http://purl.org/NET/cpan-uri/dist/builtins-compat/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "builtins-compat-0.001"^^xsd:string;
+	dc:issued            "2022-07-14"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/builtins-compat-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/builtins-compat/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "builtins-compat-0.002"^^xsd:string;
+	dc:issued            "2022-07-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation, doap-changeset:Packaging;
+			rdfs:label "Fix link to issue tracker.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/builtins-compat-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/builtins-compat/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "builtins-compat-0.003"^^xsd:string;
+	dc:issued            "2022-07-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Improved SYNOPSIS.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Smarter import function allowing you to select which functions to import.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/builtins-compat-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/builtins-compat/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "builtins-compat-0.004"^^xsd:string;
+	dc:issued            "2022-07-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Minor fixes for created_as_number, bool, and trim.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Minor speed improvement for indexed.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/builtins-compat-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

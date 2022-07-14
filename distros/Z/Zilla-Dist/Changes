@@ -1,3 +1,14 @@
+0.1.8 Wed 13 Jul 2022 09:39:55 AM PDT
+ - Use upper case for POD =head1 and =head2
+ - Use a space for pandoc's softbreak to POD
+ - Add Archive::Tar::Wrapper to requirements
+
+0.1.7 Tue 12 Jul 2022 09:35:54 PM PDT
+ - Various small fixes
+
+0.1.6 Tue 12 Jul 2022 04:28:38 PM PDT
+ - Support Markdown docs in doc/
+
 0.1.5 Tue Jun  9 07:58:41 PDT 2020
  - Don't mess with perl versions
  - Change perl5 to perl for testml

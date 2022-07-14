@@ -2,10 +2,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
 
 use v5.20;
 use warnings;
+
+use Commandable;
+use Commandable::Finder::SubAttributes 0.08 ':attrs';
 
 use Device::AVR::UPDI;
 use Getopt::Long;
@@ -109,21 +112,25 @@ sub check_signature
 
 sub open_input_file
 {
+   my ( $file ) = @_;
+
    if( $BINARY ) {
-      return main::Fileformat::Binary->open_in( shift @ARGV );
+      return main::Fileformat::Binary->open_in( $file );
    }
    else {
-      return main::Fileformat::IntelHex->open_in( shift @ARGV );
+      return main::Fileformat::IntelHex->open_in( $file );
    }
 }
 
 sub open_output_file
 {
+   my ( $file ) = @_;
+
    if( $BINARY ) {
-      return main::Fileformat::Binary->open_out( shift @ARGV );
+      return main::Fileformat::Binary->open_out( $file );
    }
    else {
-      return main::Fileformat::IntelHex->open_out( shift @ARGV );
+      return main::Fileformat::IntelHex->open_out( $file );
    }
 }
 
@@ -135,16 +142,9 @@ sub reset_chip
 
 my $RESET_REQUIRED;
 
-while( @ARGV ) {
-   my $OPERATION = shift @ARGV;
-   $OPERATION =~ s/-/_/g;
-   if( my $code = main->can( "run_$OPERATION" ) ) {
-      $code->();
-   }
-   else {
-      die "Unrecognised operation '$OPERATION'\n";
-   }
-}
+Commandable::Finder::SubAttributes->new_for_main
+   ->configure( allow_multiple_commands => 1 )
+   ->find_and_invoke_ARGV;
 
 reset_chip if $RESET_REQUIRED;
 
@@ -293,7 +293,8 @@ Note that this command does not need the C<--part> to be specified.
 
 =cut
 
-sub run_reset
+sub command_reset
+   :Command_description("Sends a reset request")
 {
    $PART //= "ATtiny814"; # part doesn't matter just for reset
    make_updi;
@@ -312,7 +313,8 @@ Note that this command does not need the C<--part> to be specified.
 
 =cut
 
-sub run_read_sib
+sub command_read_sib
+   :Command_description("Reads the System Information Block")
 {
    $PART //= "ATtiny814"; # part doesn't matter
    make_updi;
@@ -332,7 +334,8 @@ Reads the 3-byte signature from the chip and prints it.
 
 =cut
 
-sub run_read_signature
+sub command_read_signature
+   :Command_description("Reads the 3-byte signature from the chip and prints it")
 {
    make_updi;
 
@@ -355,7 +358,8 @@ chip to reset it back to factory state.
 
 =cut
 
-sub run_erase
+sub command_erase
+   :Command_description("Erases the entire chip")
 {
    make_updi;
 
@@ -372,17 +376,22 @@ Optionally reads only the given length.
 
 =cut
 
-sub run_read_flash
+sub command_read_flash
+   :Command_description("Reads from the flash portion of non-volatile memory (\"NVM\")")
+   :Command_arg("file", "path to file data will be written to")
+   :Command_arg("length?", "optional length to read")
 {
+   my ( $file, $readlen ) = @_;
+
    make_updi;
    check_signature;
 
-   my $outfile = open_output_file;
+   my $outfile = open_output_file( $file );
 
    my $length = $updi->partinfo->size_flash;
 
-   if( @ARGV and $ARGV[0] =~ m/^\d/ ) {
-      $length = shift @ARGV;
+   if( defined $readlen and $readlen =~ m/^\d/ ) {
+      $length = $readlen;
       $length = hex $length if $length =~ m/^0/;
    }
 
@@ -400,15 +409,19 @@ Writes to the flash portion of non-volatile memory ("NVM").
 
 =cut
 
-sub run_write_flash
+sub command_write_flash
+   :Command_description("Writes to the flash portion of non-volatile memory (\"NVM\")")
+   :Command_arg("file", "path to file data will be read from")
 {
+   my ( $file ) = @_;
+
    make_updi;
 
    $updi->erase_chip( no_reset => 1 )->get;
 
    check_signature; # TODO: Check if enable_nvmprog logic is correct
 
-   my $data = open_input_file->input;
+   my $data = open_input_file( $file )->input;
 
    _generic_write( flash => $data,
       $updi->partinfo->pagesize_flash, $updi->partinfo->size_flash );
@@ -422,15 +435,21 @@ Reads from the EEPROM portion of non-volatile memory ("NVM").
 
 =cut
 
-sub run_read_eeprom
+sub command_read_eeprom
+   :Command_description("Reads from the EEPROM portion of non-volatile memory (\"NVM\")")
+   :Command_arg("file", "path to file data will be written to")
 {
+   my ( $file ) = @_;
+
    make_updi;
    check_signature;
+
+   my $outfile = open_output_file( $file );
 
    my $data = _generic_read( eeprom =>
       $updi->partinfo->pagesize_eeprom, $updi->partinfo->size_eeprom );
 
-   open_output_file->output( $data );
+   $outfile->output( $data );
 }
 
 =head2 write-eeprom
@@ -441,13 +460,17 @@ Writes to the EEPROM portion of non-volatile memory ("NVM").
 
 =cut
 
-sub run_write_eeprom
+sub command_write_eeprom
+   :Command_description("Writes to the EEPROM portion of non-volatile memory (\"NVM\")")
+   :Command_arg("file", "path to file data will be read from")
 {
+   my ( $file ) = @_;
+
    make_updi;
 
    check_signature;
 
-   my $data = open_input_file->input;
+   my $data = open_input_file( $file )->input;
 
    _generic_write( eeprom => $data,
       $updi->partinfo->pagesize_eeprom, $updi->partinfo->size_eeprom );
@@ -473,7 +496,8 @@ Decoded values of fields are also printed.
 
 =cut
 
-sub run_read_fuses
+sub command_read_fuses
+   :Command_description("Reads fuse values")
 {
    make_updi;
    check_signature;
@@ -516,8 +540,12 @@ names for individual fields.
 
 =cut
 
-sub run_write_fuses
+sub command_write_fuses
+   :Command_description("Writes fuse values")
+   :Command_arg("fuses...", "the fuses to set (as NAME=value ...)")
 {
+   my ( $fuseargs ) = @_;
+
    make_updi;
 
    if( $ERASE ) {
@@ -532,9 +560,9 @@ sub run_write_fuses
 
    my @values;
 
-   while( @ARGV ) {
-      my ( $name, $value ) = split m/=/, $ARGV[0] or last;
-      shift @ARGV;
+   while( @$fuseargs ) {
+      my ( $name, $value ) = split m/=/, $fuseargs->[0] or last;
+      shift @$fuseargs;
 
       if( $name =~ m/\./ ) {
          my ( $regname, $fusename ) = $name =~ m/^(.*?)\.(.*)$/;

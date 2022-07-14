@@ -1,0 +1,67 @@
+#!perl
+
+use 5.008001;
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+sub usage {
+	print <<'USAGE';
+usage: $0 --module=MODULE [options] LIBRARY1=TYPE1,TYPE2 LIBRARY2=TYPE3 [...]
+
+Options:
+  --module=Your::Type::Library    Module name of the type library to make.
+  --write                         Actually write to file.
+
+Arguments:
+  Each argument apart from the options is a type library, an equals sign, then
+  a comma-delimited list of type constraint names.
+
+Example:
+  $0 --module=MyApp::Types Types::Standard=Any,Str,ArrayRef,HashRef
+
+USAGE
+}
+
+my %OPT;
+GetOptions(
+	\%OPT,
+	'module=s',
+	'write',
+	'help',
+);
+
+if ( $OPT{help} ) {
+	print usage();
+	exit( 0 );
+}
+
+if ( not $OPT{module} ) {
+	print STDERR "Module name is required!\n\n";
+	print STDERR usage();
+	exit( 1 );
+}
+
+if ( not @ARGV ) {
+	print STDERR "Types list is required!\n\n";
+	print STDERR usage();
+	exit( 1 );
+}
+
+require Type::Library::Compiler;
+
+my $compiler = 'Type::Library::Compiler'->new(
+	types => 'Type::Library::Compiler'->parse_list( @ARGV ),
+	destination_module => $OPT{module},
+);
+
+if ( $OPT{write} ) {
+	$compiler->compile_to_file;
+	printf STDERR "Wrote to: %s\n", $compiler->destination_filename;
+	exit( 0 );
+}
+else {
+	print $compiler->compile_to_string;
+	exit( 0 );
+}
