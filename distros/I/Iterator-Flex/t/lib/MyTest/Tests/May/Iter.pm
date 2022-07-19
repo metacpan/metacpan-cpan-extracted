@@ -17,10 +17,10 @@ sub construct_from_state {
 
     my $x;
     return {
-        _name   => 'prev',
+        _name  => 'prev',
         next   => sub { ++$x },
         rewind => sub { ++$x },
-        ( defined $_[0] && @{$_[0]} ? ( _depends => $_[0] ) : () ),
+        ( defined $_[0] && @{ $_[0] } ? ( _depends => $_[0] ) : () ),
     };
 }
 

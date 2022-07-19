@@ -6,16 +6,22 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Acme::Mitey::Cards::Mite";
-    our $MITE_VERSION = "0.006012";
+    our $MITE_VERSION = "0.007003";
 
     BEGIN {
-        *bare  = \&Acme::Mitey::Cards::Mite::bare;
-        *false = \&Acme::Mitey::Cards::Mite::false;
-        *lazy  = \&Acme::Mitey::Cards::Mite::lazy;
-        *ro    = \&Acme::Mitey::Cards::Mite::ro;
-        *rw    = \&Acme::Mitey::Cards::Mite::rw;
-        *rwp   = \&Acme::Mitey::Cards::Mite::rwp;
-        *true  = \&Acme::Mitey::Cards::Mite::true;
+        require Scalar::Util;
+        *bare    = \&Acme::Mitey::Cards::Mite::bare;
+        *blessed = \&Scalar::Util::blessed;
+        *carp    = \&Acme::Mitey::Cards::Mite::carp;
+        *confess = \&Acme::Mitey::Cards::Mite::confess;
+        *croak   = \&Acme::Mitey::Cards::Mite::croak;
+        *false   = \&Acme::Mitey::Cards::Mite::false;
+        *guard   = \&Acme::Mitey::Cards::Mite::guard;
+        *lazy    = \&Acme::Mitey::Cards::Mite::lazy;
+        *ro      = \&Acme::Mitey::Cards::Mite::ro;
+        *rw      = \&Acme::Mitey::Cards::Mite::rw;
+        *rwp     = \&Acme::Mitey::Cards::Mite::rwp;
+        *true    = \&Acme::Mitey::Cards::Mite::true;
     }
 
     sub new {
@@ -29,8 +35,7 @@
         my $no_build = delete $args->{__no_BUILD__};
 
         # Attribute: name
-        Acme::Mitey::Cards::Mite::croak "Missing key in constructor: name"
-          unless exists $args->{"name"};
+        croak "Missing key in constructor: name" unless exists $args->{"name"};
         (
             (
                 do {
@@ -48,8 +53,7 @@
                 length( $args->{"name"} ) > 0;
             }
           )
-          or Acme::Mitey::Cards::Mite::croak
-          "Type check failed in constructor: %s should be %s", "name",
+          or croak "Type check failed in constructor: %s should be %s", "name",
           "NonEmptyStr";
         $self->{"name"} = $args->{"name"};
 
@@ -64,14 +68,13 @@
                       'SCALAR';
                 }
               }
-              or Acme::Mitey::Cards::Mite::croak
-              "Type check failed in constructor: %s should be %s",
+              or croak "Type check failed in constructor: %s should be %s",
               "abbreviation", "Str";
             $self->{"abbreviation"} = $args->{"abbreviation"};
         }
 
         # Attribute: colour
-        Acme::Mitey::Cards::Mite::croak "Missing key in constructor: colour"
+        croak "Missing key in constructor: colour"
           unless exists $args->{"colour"};
         do {
 
@@ -81,15 +84,15 @@
                   or ref( \( my $val = $args->{"colour"} ) ) eq 'SCALAR';
             }
           }
-          or Acme::Mitey::Cards::Mite::croak
-          "Type check failed in constructor: %s should be %s", "colour", "Str";
+          or croak "Type check failed in constructor: %s should be %s",
+          "colour", "Str";
         $self->{"colour"} = $args->{"colour"};
 
         # Enforce strict constructor
         my @unknown = grep not(/\A(?:abbreviation|colour|name)\z/),
           keys %{$args};
         @unknown
-          and Acme::Mitey::Cards::Mite::croak(
+          and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         # Call BUILD methods
@@ -162,8 +165,7 @@
     # Accessors for abbreviation
     sub abbreviation {
         @_ > 1
-          ? Acme::Mitey::Cards::Mite::croak(
-            "abbreviation is a read-only attribute of @{[ref $_[0]]}")
+          ? croak("abbreviation is a read-only attribute of @{[ref $_[0]]}")
           : (
             exists( $_[0]{"abbreviation"} ) ? $_[0]{"abbreviation"} : (
                 $_[0]{"abbreviation"} = do {
@@ -177,8 +179,7 @@
                               'SCALAR';
                         }
                       }
-                      or Acme::Mitey::Cards::Mite::croak(
-                        "Type check failed in default: %s should be %s",
+                      or croak( "Type check failed in default: %s should be %s",
                         "abbreviation", "Str" );
                     $default_value;
                 }
@@ -196,8 +197,7 @@
     else {
         *colour = sub {
             @_ > 1
-              ? Acme::Mitey::Cards::Mite::croak(
-                "colour is a read-only attribute of @{[ref $_[0]]}")
+              ? croak("colour is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"colour"};
         };
     }
@@ -212,11 +212,127 @@
     else {
         *name = sub {
             @_ > 1
-              ? Acme::Mitey::Cards::Mite::croak(
-                "name is a read-only attribute of @{[ref $_[0]]}")
+              ? croak("name is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"name"};
         };
     }
+
+    our %SIGNATURE_FOR;
+
+    $SIGNATURE_FOR{"clubs"} = sub {
+        my $__NEXT__ = shift;
+
+        my ( %tmp, $tmp, @head );
+
+        @_ == 1
+          or croak(
+            "Wrong number of parameters in signature for %s: %s, got %d",
+            "clubs", "expected exactly 1 parameters",
+            scalar(@_)
+          );
+
+        @head = splice( @_, 0, 1 );
+
+        # Parameter $head[0] (type: Defined)
+        ( defined( $head[0] ) )
+          or croak( "Type check failed in signature for clubs: %s should be %s",
+            "\$_[0]", "Defined" );
+
+        return ( &$__NEXT__( @head, @_ ) );
+    };
+
+    $SIGNATURE_FOR{"diamonds"} = sub {
+        my $__NEXT__ = shift;
+
+        my ( %tmp, $tmp, @head );
+
+        @_ == 1
+          or croak(
+            "Wrong number of parameters in signature for %s: %s, got %d",
+            "diamonds", "expected exactly 1 parameters",
+            scalar(@_)
+          );
+
+        @head = splice( @_, 0, 1 );
+
+        # Parameter $head[0] (type: Defined)
+        ( defined( $head[0] ) )
+          or
+          croak( "Type check failed in signature for diamonds: %s should be %s",
+            "\$_[0]", "Defined" );
+
+        return ( &$__NEXT__( @head, @_ ) );
+    };
+
+    $SIGNATURE_FOR{"hearts"} = sub {
+        my $__NEXT__ = shift;
+
+        my ( %tmp, $tmp, @head );
+
+        @_ == 1
+          or croak(
+            "Wrong number of parameters in signature for %s: %s, got %d",
+            "hearts", "expected exactly 1 parameters",
+            scalar(@_)
+          );
+
+        @head = splice( @_, 0, 1 );
+
+        # Parameter $head[0] (type: Defined)
+        ( defined( $head[0] ) )
+          or
+          croak( "Type check failed in signature for hearts: %s should be %s",
+            "\$_[0]", "Defined" );
+
+        return ( &$__NEXT__( @head, @_ ) );
+    };
+
+    $SIGNATURE_FOR{"spades"} = sub {
+        my $__NEXT__ = shift;
+
+        my ( %tmp, $tmp, @head );
+
+        @_ == 1
+          or croak(
+            "Wrong number of parameters in signature for %s: %s, got %d",
+            "spades", "expected exactly 1 parameters",
+            scalar(@_)
+          );
+
+        @head = splice( @_, 0, 1 );
+
+        # Parameter $head[0] (type: Defined)
+        ( defined( $head[0] ) )
+          or
+          croak( "Type check failed in signature for spades: %s should be %s",
+            "\$_[0]", "Defined" );
+
+        return ( &$__NEXT__( @head, @_ ) );
+    };
+
+    $SIGNATURE_FOR{"standard_suits"} = sub {
+        my $__NEXT__ = shift;
+
+        my ( %tmp, $tmp, @head );
+
+        @_ == 1
+          or croak(
+            "Wrong number of parameters in signature for %s: %s, got %d",
+            "standard_suits", "expected exactly 1 parameters",
+            scalar(@_)
+          );
+
+        @head = splice( @_, 0, 1 );
+
+        # Parameter $head[0] (type: Defined)
+        ( defined( $head[0] ) )
+          or croak(
+"Type check failed in signature for standard_suits: %s should be %s",
+            "\$_[0]", "Defined"
+          );
+
+        return ( &$__NEXT__( @head, @_ ) );
+    };
 
     1;
 }

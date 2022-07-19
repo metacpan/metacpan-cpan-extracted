@@ -14,9 +14,11 @@ This file is the default database distributed with the Perl 5 module
 Math::DifferenceSet::Planar.
 
 It contains 604 cyclic planar difference sets with orders ranging
-from 2 to 4096.  The sets are chosen minimal by lexicographic ordering.
-It also contains planar difference set space data for the same range
-of orders.
+from 2 to 4096.  The sets are chosen minimal by lexicographic ordering
+with priority on small over large elements, so that {0, 1, 3, 9} ranks
+before {0, 1, 4, 6}.  It also contains planar difference set space data
+for the same range of orders.  The radices are chosen with a greedy
+algorithm and not optimized for symmetry.
 
 =head1 FILE FORMAT
 
@@ -53,9 +55,9 @@ important to store.
 
 If a multiplier set of the form I<{b^k | 0 E<8804> k E<lt> e}>
 with a radix I<b> and depth I<e>, and a rotator base of the form
-I<{r_1^j_1E<183>r_2E<183>j_2E<183>...E<183>r_n^j_n>
-I<| 0 E<8804> j_k E<lt> d_k, 1 E<8804> k E<8804> n}>
-with I<n> radices I<r_k> and I<n> depths I<d_k> describe the
+I<{r_1^j_1E<183>r_2^j_2E<183>...E<183>r_n^j_n>
+I<| 0 E<8804> j_k E<lt> e_k, 1 E<8804> k E<8804> n}>
+with I<n> radices I<r_k> and I<n> depths I<e_k> describe the
 multiplicative space of difference set planes of a given order,
 I<rot_radices> and I<rot_depths> are vectors of rotation radices and
 depths packed in C<'w*'> format.
@@ -66,7 +68,7 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019-2021 by Martin Becker, Blaubeuren.
+Copyright (c) 2019-2022 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

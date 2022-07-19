@@ -1,0 +1,37 @@
+---
+abstract: 'get headlines for WebFetch from RSS feed'
+author:
+  - 'Ian Kluft <https://github.com/ikluft>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0'
+  Try::Tiny: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebFetch-Input-RSS
+requires:
+  Carp: '0'
+  Date::Calc: '0'
+  Exception::Class: '0'
+  LWP::UserAgent: '0'
+  Scalar::Util: '0'
+  WebFetch: '0'
+  XML::RSS: '0'
+  base: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/ikluft/WebFetch/issues
+  homepage: https://github.com/ikluft/WebFetch
+  repository: https://github.com/ikluft/WebFetch.git
+version: 0.1.0
+x_generated_by_perl: v5.34.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: GPL-3.0-only

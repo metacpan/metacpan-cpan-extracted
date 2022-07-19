@@ -16,7 +16,7 @@ use constant _F_SPACES   => 1;  # PDS space result set object or undef
 use constant _F_PATH     => 2;  # database path name
 use constant _NFIELDS    => 3;
 
-our $VERSION  = '0.015';
+our $VERSION  = '0.016';
 our @CARP_NOT = qw(Math::DifferenceSet::Planar);
 
 our $DATABASE_DIR = dist_dir('Math-DifferenceSet-Planar');
@@ -161,17 +161,17 @@ Math::DifferenceSet::Planar::Data - storage of sample planar difference sets
 
 =head1 VERSION
 
-This documentation refers to version 0.015 of
+This documentation refers to version 0.016 of
 Math::DifferenceSet::Planar::Data.
 
 =head1 SYNOPSIS
 
   use Math::DifferenceSet::Planar::Data;
 
-  $data = Math::DifferenceSet::Planar->new;
+  $data = Math::DifferenceSet::Planar::Data->new;
 
-  $data = Math::DifferenceSet::Planar->new('pds.db');
-  $data = Math::DifferenceSet::Planar->new($full_path);
+  $data = Math::DifferenceSet::Planar::Data->new('pds.db');
+  $data = Math::DifferenceSet::Planar::Data->new($full_path);
 
   @databases = Math::DifferenceSet::Planar::Data->list_databases;
   $data = Math::DifferenceSet::Planar::Data->new($databases[0]);
@@ -403,7 +403,7 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019-2021 by Martin Becker, Blaubeuren.
+Copyright (c) 2019-2022 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

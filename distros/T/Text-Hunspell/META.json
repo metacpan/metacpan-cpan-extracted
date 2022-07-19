@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "hunspell",
       "spelling",
@@ -36,9 +36,6 @@
             "Alien::Hunspell" : "0.04",
             "ExtUtils::MakeMaker" : "6.52"
          }
-      },
-      "runtime" : {
-         "requires" : {}
       }
    },
    "release_status" : "stable",
@@ -47,5 +44,6 @@
          "url" : "https://github.com/cosimo/perl5-text-hunspell"
       }
    },
-   "version" : "2.14"
+   "version" : "2.16",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

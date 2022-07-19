@@ -1,35 +1,39 @@
 Revision history for Perl extension Groonga-HTTP
 
+1.10 2022-07-15T06:33:54Z
+
+    - Added support for escaping search query.
+
 1.09 2022-07-11T05:36:11Z
 
-    - Drop unfinished feature.
-    - Add missin dependency modules.
+    - Dropped unfinished feature.
+    - Added missin dependency modules.
 
 1.08 2022-07-11T00:44:50Z
 
-    - Add support for "delete" command.
+    - Added support for "delete" command.
       However, currently, we support only removal by "key".
       We don't support removal by "id" or "filter".
 
-    - Add support for "load" command.
+    - Added support for "load" command.
 
-    - Add support for HTTP POST request.
+    - Added support for HTTP POST request.
 
-    - Add support for URI encode.
+    - Added support for URI encode.
 
 1.07 2022-07-04T07:48:55Z
 
-    - Add support for "post_filter" as the argument of "select".
+    - Added support for "post_filter" as the argument of "select".
 
 1.06 2022-06-23T09:10:54Z
 
-    - Add support for using multiple dynamic columns.
+    - Added support for using multiple dynamic columns.
 
-    - Add support for "snippet_html" again.
+    - Added support for "snippet_html" again.
 
 1.05 2022-06-22T13:38:51Z
 
-    - Add support for "drilldown_sort_keys" as the argument of "select".
+    - Added support for "drilldown_sort_keys" as the argument of "select".
 
 1.04 2022-06-22T12:23:25Z
 
@@ -37,26 +41,26 @@ Revision history for Perl extension Groonga-HTTP
 
 1.03 2022-06-21T08:11:28Z
 
-    - Reconfigure tag.
+    - Reconfigured tag.
       Because we mistake setting tag of before version.
 
 1.01 2022-06-21T07:52:57Z
 
-    - Add support for getting results of drilldown with a column name.
+    - Added support for getting results of drilldown with a column name.
       We can get the result of the drilldown with a column name.
 
-    - Add support for a new item of the "status" command
+    - Added support for a new item of the "status" command
       Because "memory_map_size" is added since Groonga 12.0.4.
 
-    - Add support for getting value with column name.
+    - Added support for getting value with column name.
       We can get the result of the search with a column name.
 
-    - Add support Array in "output_columns".
+    - Added support Array in "output_columns".
       We can specify "output_columns" with Array as below.
 
         * output_columns => ["_id", "title"]
 
-    - Add a support for "query_expander" as the argument of "select".
+    - Added a support for "query_expander" as the argument of "select".
       This is an alias for "synonym".
       "query_expander" is the same as "synonym".
 
@@ -66,8 +70,8 @@ Revision history for Perl extension Groonga-HTTP
 
 0.05 2022-02-03T08:34:00Z
 
-    - Add support for "match_columns" as the argument of "select"
-    - Add support for "drilldown_output_columns" as the argument of "select"
+    - Added support for "match_columns" as the argument of "select"
+    - Added support for "drilldown_output_columns" as the argument of "select"
 
 0.04 2022-01-27T09:23:00Z
 

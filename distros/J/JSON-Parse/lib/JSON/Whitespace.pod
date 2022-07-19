@@ -35,8 +35,8 @@ This outputs
 
 =head1 VERSION
 
-This documents version 0.61 of JSON::Whitespace corresponding to
-L<git commit 033269fa8972fdce8626aa65cd11a5394ab50492|https://github.com/benkasminbullock/JSON-Parse/commit/033269fa8972fdce8626aa65cd11a5394ab50492> released on Thu Feb 11 09:14:04 2021 +0900.
+This documents version 0.62 of JSON::Whitespace corresponding to
+L<git commit d04630086f6c92fea720cba4568faa0cbbdde5a6|https://github.com/benkasminbullock/JSON-Parse/commit/d04630086f6c92fea720cba4568faa0cbbdde5a6> released on Sat Jul 16 08:23:13 2022 +0900.
 
 
 
@@ -78,7 +78,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2016-2021
+2016-2022
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

@@ -9,6 +9,7 @@ builder/confess-uncoverable.lst
 builder/dod-check.pl
 builder/dod-check.sh
 builder/language-XX.pm
+builder/syntax-check.sh
 builder/update-language.pl
 cpanfile
 examples/README.md
@@ -19,10 +20,12 @@ examples/hello-variable-content.pl
 examples/hello-window-and-dialog.pl
 examples/hello.pl
 examples/listbox.pl
+examples/select-file.pl
 lib/UI/Various.pm
 lib/UI/Various/Box.pm
 lib/UI/Various/Button.pm
 lib/UI/Various/Check.pm
+lib/UI/Various/Compound/FileSelect.pm
 lib/UI/Various/Curses/Box.pm
 lib/UI/Various/Curses/Button.pm
 lib/UI/Various/Curses/Check.pm
@@ -106,9 +109,12 @@ t/18-box.t
 t/19-listbox.t
 t/20-dialog.t
 t/21-optionmenu.t
+t/22-fileselect.t
 t/31-tk-1.t
 t/32-tk-2.t
 t/33-tk-3.t
+t/34-tk-4.t
+t/35-tk-5.t
 t/41-curses.t
 t/51-rich-term.t
 t/52-rich-term-box.t

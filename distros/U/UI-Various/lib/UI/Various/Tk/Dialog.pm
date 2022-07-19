@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use UI::Various::core;
 use UI::Various::Dialog;
@@ -78,8 +78,18 @@ sub _prepare($@)
 
     my @attributes = ();
     # TODO: additional attributes added and translated in loop, when defined
-    $self->_tk(	MainWindow->new(-title => $self->title,
-				@attributes));
+    my $first = $self->top->child(0);
+    if ($first->isa('UI::Various::Window')  and  defined $first->_tk)
+    {
+	$self->_tk($first->_tk->Toplevel(-title => $self->title,
+					 @attributes));
+    }
+    else
+    {
+	# Note that grab will not work with MainWindow!
+	$self->_tk(MainWindow->new(-title => $self->title,
+				   @attributes));
+    }
 
     # We don't use the inherited size (from parent == Main) here, as that
     # would always be the maximum application size!
@@ -127,6 +137,28 @@ sub destroy($)
     $_  and  $_->destroy;
     $self->_tk(undef);
     $self = undef;
+}
+
+#########################################################################
+
+=head2 B<_draw> - show dialogue
+
+C<Tk>'s concrete implementation of
+L<UI::Various::Dialog::draw|UI::Various::Dialog/draw - show dialogue>
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+sub _draw($)
+{
+    debug(2, __PACKAGE__, '::_draw');
+    my ($self) = @_;
+
+    if ($self->top->{_running}  and  not $self->_tk)
+    {
+	$self->_prepare;
+    }
 }
 
 1;

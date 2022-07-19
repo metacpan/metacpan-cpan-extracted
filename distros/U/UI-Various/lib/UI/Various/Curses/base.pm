@@ -40,7 +40,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use UI::Various::core;
 
@@ -213,6 +213,35 @@ sub _update_all_references($)
 	    $_->can('_update')  and  $_->_update();
 	}
     }
+}
+
+#########################################################################
+
+=head2 B<_needed_width> - determine needed width of UI element
+
+    $ui_element->_needed_width();
+
+=head3 description:
+
+This method updates determines the width a UI element needs, which is either
+specified explicitly or the maximum width of its text lines (with possible
+embedded newlines).
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+sub _needed_width($)
+{
+    my ($self) = @_;
+    my $width = $self->{width};
+    unless (defined $width)
+    {
+	$width = 1;
+	local $_;
+	foreach (split "\n", $self->text)
+	{   $width < length($_)  and  $width = length($_);   }
+    }
+    return $width;
 }
 
 1;

@@ -13,19 +13,19 @@ Files: Changes
 Copyright: Copyright 2022 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: README
- lib/Type/Library/Compiler.pm
- t/01basic.t
- t/02example-library.t
-Copyright: This software is copyright (c) 2022 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: INSTALL
  LICENSE
  examples/Example.pm
  examples/make-example.pl
 Copyright: Unknown
 License: Unknown
+
+Files: README
+ lib/Type/Library/Compiler.pm
+ t/01basic.t
+ t/02example-library.t
+Copyright: This software is copyright (c) 2022 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
  CREDITS

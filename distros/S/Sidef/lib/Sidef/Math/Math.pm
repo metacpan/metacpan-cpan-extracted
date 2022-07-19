@@ -19,6 +19,20 @@ package Sidef::Math::Math {
         Sidef::Types::Number::Number::_binsplit(\@list, $block);
     }
 
+    sub binary_exp {
+        my ($self, $r, $x, $n, $block) = @_;
+
+        ($n->is_int && not $n->is_neg)
+          || return Sidef::Types::Number::Number->nan;
+
+        foreach my $bit (CORE::reverse(split(//, $n->as_bin))) {
+            $r = $block->run($x, $r) if $bit;
+            $x = $block->run($x, $x);
+        }
+
+        return $r;
+    }
+
     sub gcd {
         my ($self, @list) = @_;
         Sidef::Types::Number::Number::gcd(@list);
@@ -156,33 +170,7 @@ package Sidef::Math::Math {
 
     sub gcd_factors {
         my ($self, $n, $arr) = @_;
-
-        my $orig_n = $n;
-
-        my @factors;
-        my $G = Sidef::Types::Array::Array->new([grep { $_->is_ntf($n) } map { $n->gcd($_) } @$arr])->sort->uniq;
-
-        foreach my $g (@$G) {
-
-            my $new_g = $g;
-
-            if ($new_g->divides($n)) {
-                ## ok
-            }
-            else {
-                $new_g = $n->gcd($g);
-                $new_g->is_ntf($n) || next;
-            }
-
-            push @factors, $new_g;
-            $n = $n->remove($new_g);
-        }
-
-        if ($n->is_ntf($orig_n)) {
-            push @factors, $n;
-        }
-
-        Sidef::Types::Array::Array->new(\@factors)->sort;
+        Sidef::Types::Number::Number::gcd_factors($n, $arr);
     }
 
     sub smooth_numbers {
@@ -204,6 +192,39 @@ package Sidef::Math::Math {
                         }
 
                         $callback->run($n);
+                    }
+                }
+            )
+        );
+    }
+
+    sub seq {
+        my ($self, @args) = @_;
+        my $block = pop(@args);
+
+        my @seq   = (@args);
+        my $array = Sidef::Types::Array::Array->new(\@seq);
+
+        Sidef::Object::Enumerator->new(
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    my ($callback) = @_;
+
+                    foreach my $n (@seq) {
+                        $callback->run($n);
+                    }
+
+                    my $index = scalar(@seq);
+
+                    if (!@seq) {
+                        push @seq, Sidef::Types::Number::Number::ZERO;
+                    }
+
+                    while (1) {
+                        ++$index;
+                        my $r = $block->run($array, Sidef::Types::Number::Number::_set_int($index));
+                        push @seq, $r;
+                        $callback->run($r);
                     }
                 }
             )

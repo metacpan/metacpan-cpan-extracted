@@ -165,95 +165,92 @@ sub _common_prefix {
   return _leading_zeros( $base_n ^ $last_n );
 }
 
-# recursion ahead
-# end condition: is_cidr
-# split the range in the middle
-# call both halves recursively
+# returns the common prefix bits and ok. ok is true when the range is a CIDR.
+sub _common_ok {
+  my ( $base_n, $last_n, $bits ) = @_;
+
+  my $pfx    = _common_prefix( $base_n, $last_n );
+  my $mask_n = _make_mask_n( $pfx, $bits );
+
+  # apply mask to base and last as AND and OR
+  # and check for all zeros and all ones => it's a CIDR
+  my $is_all_zeros = ( $base_n ^ ( $base_n & $mask_n ) ) eq _make_mask_n( 0, $bits );
+  my $is_all_ones  = ( $last_n | $mask_n ) eq _make_mask_n( 128, $bits );
+
+  return $pfx, $is_all_zeros && $is_all_ones;
+}
+
+# switch to binary representation
+# push start block on stack
 #
-sub _to_cidrs_rec {
-  my ( $self, $buf ) = @_;
+# loop while stack not dry
+# check if is_cidr
+# split the range in the middle
+# put both halves on stack (reverse order)
+# next
+#
+# return cidrs
+#
+sub _to_cidrs_iter {
+  my $self = shift;
+  my @stack;
+  my @result;
 
-  if ( $self->is_cidr ) {
-    push @$buf, $self;
-    return $buf;
-  }
-
-  my $base_ip = $self->{base};
-  my $last_ip = $self->{last};
-
-  my $base_n = $self->{base}->bytes;
-  my $last_n = $self->{last}->bytes;
-
-  my $pfx  = _common_prefix( $base_n, $last_n );
   my $bits = 32;
   $bits = 128 if $self->version == 6;
 
-  # make next mask
-  my $mask_n = _make_mask_n( $pfx + 1, $bits );
+  # make binary representation, put it as start on the stack
+  push @stack, [ $self->{base}->bytes, $self->{last}->bytes ];
 
-  # split range with new mask
-  my $mid_last_n = _make_last_n( $base_n, $mask_n );
-  my $mid_base_n = _make_base_n( $last_n, $mask_n );
+  while ( scalar @stack > 0 ) {
+    my $block_n = pop @stack;
+    my $base_n  = $block_n->[0];
+    my $last_n  = $block_n->[1];
 
-  # make IPs from bitstring
-  my $mid_last_ip = Net::IPAM::IP->new_from_bytes($mid_last_n);
-  my $mid_base_ip = Net::IPAM::IP->new_from_bytes($mid_base_n);
+    my ( $pfx, $is_cidr ) = _common_ok( $base_n, $last_n, $bits );
 
-  # make two new blocks
-  my $b1 = bless {}, ref $self;
-  $b1->{base} = $base_ip;
-  $b1->{last} = $mid_last_ip;
+    # is this block already a CIDR?
+    if ($is_cidr) {
 
-  my $b2 = bless {}, ref $self;
-  $b2->{base} = $mid_base_ip;
-  $b2->{last} = $last_ip;
+      # add block ro result
+      my $block = bless {}, ref $self;
+      $block->{base} = Net::IPAM::IP->new_from_bytes($base_n);
+      $block->{last} = Net::IPAM::IP->new_from_bytes($last_n);
 
-  # make rec-descent call with both halves
-  $buf = _to_cidrs_rec( $b1, $buf );
-  $buf = _to_cidrs_rec( $b2, $buf );
+      push @result, $block;
+      next;
+    }
 
-  return $buf;
+    # split block in two halves, add 1 to common prefix
+    my $mask_n = _make_mask_n( $pfx + 1, $bits );
+
+    # split range with new mask
+    my $mid_last_n = _make_last_n( $base_n, $mask_n );
+    my $mid_base_n = _make_base_n( $last_n, $mask_n );
+
+    # make two new blocks
+    my $block1_n = [ $base_n,     $mid_last_n ];
+    my $block2_n = [ $mid_base_n, $last_n ];
+
+    # push both blocks to stack, reverse the order
+    push @stack, $block2_n, $block1_n;
+  }
+
+  return \@result;
 }
 
 # returns true if base and last forms a CIDR range
 sub _is_cidr {
   my $self = shift;
 
-  if ( $self->version == 4 ) {
-    return _is_cidr4( $self->{base}->bytes, $self->{last}->bytes );
-  }
+  my $bits = 32;
+  $bits = 128 if $self->version == 6;
 
-  return _is_cidr6( $self->{base}->bytes, $self->{last}->bytes );
-}
+  my $base_n = $self->{base}->bytes;
+  my $last_n = $self->{last}->bytes;
 
-sub _is_cidr4 {
-  my ( $base_n, $last_n ) = @_;
-
-  # get the mask
-  my $pfx    = _common_prefix( $base_n, $last_n );
-  my $mask_n = _strip_to_32_bits( $table_mask_n[$pfx] );
-
-  # apply mask to base and last as AND and OR
-  # and check for all zeros and all ones => it's a CIDR
-  my $is_all_zeros = ( $base_n ^ ( $base_n & $mask_n ) ) eq _strip_to_32_bits( $table_mask_n[0] );
-  my $is_all_ones  = ( $last_n | $mask_n ) eq _strip_to_32_bits( $table_mask_n[128] );
-
-  return $is_all_zeros && $is_all_ones;
-}
-
-sub _is_cidr6 {
-  my ( $base_n, $last_n ) = @_;
-
-  # get the mask
-  my $pfx    = _common_prefix( $base_n, $last_n );
-  my $mask_n = $table_mask_n[$pfx];
-
-  # apply mask to base and last as AND and OR
-  # and check for all zeros and all ones => it's a CIDR
-  my $is_all_zeros = ( $base_n ^ ( $base_n & $mask_n ) ) eq $table_mask_n[0];
-  my $is_all_ones  = ( $last_n | $mask_n ) eq $table_mask_n[128];
-
-  return $is_all_zeros && $is_all_ones;
+  my ( $pfx, $is_cidr ) = _common_ok( $base_n, $last_n, $bits );
+  return $is_cidr;
 }
 
 # base = addr & netMask
@@ -487,7 +484,7 @@ Karl Gaissmaier, C<< <karl.gaissmaier(at)uni-ulm.de> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2020-2021 by Karl Gaissmaier.
+This software is copyright (c) 2020-2022 by Karl Gaissmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

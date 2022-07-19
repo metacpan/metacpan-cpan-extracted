@@ -7,7 +7,7 @@ package Iterator::Flex::Role::Wrap::Self;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Scalar::Util;
 use Iterator::Flex::Utils 'NEXT';
@@ -20,7 +20,7 @@ use namespace::clean;
 sub _construct_next ( $, $ipar, $ ) {
 
     # ensure we don't hold any strong references in the subroutine
-    my $next = $ipar->{+NEXT};
+    my $next = $ipar->{ +NEXT };
     Scalar::Util::weaken $next;
 
     my $sub;
@@ -58,7 +58,9 @@ Iterator::Flex::Role::Wrap::Self - Construct a next() method for a coderef which
 
 =head1 VERSION
 
-version 0.14
+version 0.15
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

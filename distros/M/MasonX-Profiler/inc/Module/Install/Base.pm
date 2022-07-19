@@ -1,57 +1,83 @@
-#line 1 "inc/Module/Install/Base.pm - /usr/local/lib/perl5/site_perl/5.8.4/Module/Install/Base.pm"
-# $File: //depot/cpan/Module-Install/lib/Module/Install/Base.pm $ $Author: autrijus $
-# $Revision: #10 $ $Change: 1847 $ $DateTime: 2003/12/31 23:14:54 $ vim: expandtab shiftwidth=4
-
+#line 1
 package Module::Install::Base;
 
-#line 31
+use strict 'vars';
+use vars qw{$VERSION};
+BEGIN {
+	$VERSION = '1.19';
+}
+
+# Suspend handler for "redefined" warnings
+BEGIN {
+	my $w = $SIG{__WARN__};
+	$SIG{__WARN__} = sub { $w };
+}
+
+#line 42
 
 sub new {
-    my ($class, %args) = @_;
-
-    foreach my $method (qw(call load)) {
-        *{"$class\::$method"} = sub {
-            +shift->_top->$method(@_);
-        } unless defined &{"$class\::$method"};
-    }
-
-    bless(\%args, $class);
+	my $class = shift;
+	unless ( defined &{"${class}::call"} ) {
+		*{"${class}::call"} = sub { shift->_top->call(@_) };
+	}
+	unless ( defined &{"${class}::load"} ) {
+		*{"${class}::load"} = sub { shift->_top->load(@_) };
+	}
+	bless { @_ }, $class;
 }
 
-#line 49
+#line 61
 
 sub AUTOLOAD {
-    my $self = shift;
-    goto &{$self->_top->autoload};
+	local $@;
+	my $func = eval { shift->_top->autoload } or return;
+	goto &$func;
 }
 
-#line 60
+#line 75
 
-sub _top { $_[0]->{_top} }
+sub _top {
+	$_[0]->{_top};
+}
 
-#line 71
+#line 90
 
 sub admin {
-    my $self = shift;
-    $self->_top->{admin} or Module::Install::Base::FakeAdmin->new;
+	$_[0]->_top->{admin}
+	or
+	Module::Install::Base::FakeAdmin->new;
 }
 
+#line 106
+
 sub is_admin {
-    my $self = shift;
-    $self->admin->VERSION;
+	! $_[0]->admin->isa('Module::Install::Base::FakeAdmin');
 }
 
 sub DESTROY {}
 
 package Module::Install::Base::FakeAdmin;
 
-my $Fake;
-sub new { $Fake ||= bless(\@_, $_[0]) }
+use vars qw{$VERSION};
+BEGIN {
+	$VERSION = $Module::Install::Base::VERSION;
+}
+
+my $fake;
+
+sub new {
+	$fake ||= bless(\@_, $_[0]);
+}
+
 sub AUTOLOAD {}
+
 sub DESTROY {}
+
+# Restore warning handler
+BEGIN {
+	$SIG{__WARN__} = $SIG{__WARN__}->();
+}
 
 1;
 
-__END__
-
-#line 115
+#line 159

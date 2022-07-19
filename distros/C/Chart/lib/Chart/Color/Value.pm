@@ -3,7 +3,7 @@ use v5.12;
 # check, convert and measure color values
 
 package Chart::Color::Value;
-our $VERSION = 'v2.403.2';
+our $VERSION = 'v2.403.5';
 use Carp;
 
 sub check_rgb { # carp returns 1
@@ -113,7 +113,7 @@ sub rgb_from_hsl { # convert color value triplet (int > int), (real > real) if $
 sub hex_from_rgb {  return unless @_ == 3;  sprintf "#%02x%02x%02x", @_ }
 sub rgb_from_hex { # translate #000000 and #000 --> r, g, b
     my $hex = shift;
-    return carp "hex color definition has to start with # followed by 3 or 6 hex characters (0-9,a-f)" 
+    return carp "hex color definition '$hex' has to start with # followed by 3 or 6 hex characters (0-9,a-f)" 
         unless defined $hex and (length($hex) == 4 or length($hex) == 7) and $hex =~ /^#[\da-f]+$/i;
     $hex = substr $hex, 1;
     (length $hex == 3) ? (map { hex($_.$_) } unpack( "a1 a1 a1", $hex)) 

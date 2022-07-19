@@ -1,4 +1,6 @@
 Revision history for Alien-Tar-Size, note the CHANGELOG.md of the repository is much more comprehensive
+v0.2.0  2022-07-19
+        Fix BSD builds by making libdl optional
 
 v0.1.0  2022-06-30
         First version, released on an unsuspecting world.

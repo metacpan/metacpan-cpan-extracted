@@ -20,6 +20,7 @@ t/090_coverage.t
 t/091_pod.t
 t/092_manifest.t
 t/093_prereq.t
+t/094_signature.t
 t/099_kwalitee.t
 t/conf/extra.conf.in
 t/CookieTest.pm
@@ -28,3 +29,4 @@ t/server.key
 t/TEST.PL
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

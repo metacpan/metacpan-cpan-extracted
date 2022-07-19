@@ -34,7 +34,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-FretboardDiagram
   repository: https://github.com/ology/Music-FretboardDiagram.git
-version: '0.1313'
+version: '0.1314'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

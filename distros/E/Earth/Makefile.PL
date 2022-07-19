@@ -7,7 +7,7 @@ use 5.018;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "FP Library for Perl 5",
+  "ABSTRACT" => "FP Framework for Perl 5",
   "AUTHOR" => "AWNCORP <awncorp\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -16,22 +16,15 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.018",
   "NAME" => "Earth",
-  "PREREQ_PM" => {
-    "Venus" => "0.09"
-  },
-  "TEST_REQUIRES" => {
-    "Venus" => "0.09"
-  },
-  "VERSION" => "0.01",
+  "PREREQ_PM" => {},
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 
-my %FallbackPrereqs = (
-  "Venus" => "0.09"
-);
+my %FallbackPrereqs = ();
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

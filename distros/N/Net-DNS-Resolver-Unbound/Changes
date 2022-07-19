@@ -1,6 +1,10 @@
 Revision history for Perl extension Net::DNS::Resolver::Unbound.
 
 
+**** 1.16  Jul 18, 2022
+	Strip line terminator from configuration variables.
+
+
 **** 1.15  Jul 11, 2022
 	pkg-config --keep-system-libs flag  non-portable.
 

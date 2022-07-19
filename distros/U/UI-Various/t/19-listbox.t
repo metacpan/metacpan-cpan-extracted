@@ -19,7 +19,7 @@ no multidimensional;
 
 use Cwd 'abs_path';
 
-use Test::More tests => 49;
+use Test::More tests => 52;
 use Test::Output;
 use Test::Warn;
 
@@ -82,6 +82,10 @@ eval {   UI::Various::Listbox::remove(Dummy->new(), 0);   };
 like($@,
      qr/^invalid object \(Dummy\) in call to .*::Listbox::remove$re_msg_tail/,
      'bad access of remove fails');
+eval {   UI::Various::Listbox::replace(Dummy->new(), 0);   };
+like($@,
+     qr/^invalid object \(Dummy\) in call to .*::Listbox::replace$re_msg_tail/,
+     'bad access of replace fails');
 
 my $main = UI::Various::Main->new(width => 40);
 
@@ -337,32 +341,61 @@ is($counter, 4, 'counter for listbox 12-2 has correct 2nd value');
 $main->remove($lb12);
 
 ####################################
-# triggering remaining missing coverage in base::_cut:
+# testing replacement of content:
+my @text_r_a = ('entry #1', 'entry #2');
+my @text_r_b = ('1st entry', '2nd entry', '3rd entry', 'on next page and long');
+my @text_r_c = ();
+my $next = 1;
+my $lb_r;
+$lb_r = UI::Various::Listbox->new(texts => \@text_r_a,
+				  height => 3, selection => 1,
+				  on_select => sub{
+				      if ($next == 1)
+				      {   $lb_r->replace(@text_r_b);   }
+				      elsif ($next == 2)
+				      {   $lb_r->replace(@text_r_c);   }
+				      $next++;
+				  });
 
-$main->width(undef);
+$main->add($lb_r);			# now we have a maximum width
+$main->width(undef);			# trigger different width computation
+
+stdout_is
+{   _call_with_stdin("1\n1\n0\n", sub { $lb_r->_process(); });   }
+    "      1-2/2\n<1>   entry #1\n<2>   entry #2\n\n" .
+    $output_select0 . "1\n" .
+    "<+/-> 1-3/4\n<1>   1st entry\n<2>   2nd entry\n<3>   3rd entry\n" .
+    $output_select1 . "1\n" .
+    "      0/0\n\n\n\n" .
+    $output_select0 . "0\n",
+    '_process 10 prints correct output for listbox R';
+
+is_deeply(\@text_r_a, ['entry #1', 'entry #2'],
+	  'original external array is not modified by replace');
+
+####################################
+# triggering remaining missing coverage in base::_cut:
 my @text2 = ('1st entry', '2nd entry');
-my $lb2 = UI::Various::Listbox->new(texts => \@text2,
-				    height => 3, selection => 0);
-$main->add($lb2);			# now we have a maximum width
-stdout_is(sub {   $lb2->_show('<1> ');   },
+$lb_r->replace(@text2);
+stdout_is(sub {   $lb_r->_show('<1> ');   },
 	  "<1>   1-2/2\n      1st entry\n      2nd entry\n\n",
-	  '_show 10 prints correct listbox 2-0');
-$lb2->add();
-$lb2->add('3rd entry', '4th entry');
-$lb2->{first} = 1;
-stdout_is(sub {   $lb2->_show('<1> ');   },
-	  "<1>   2-4/4\n      2nd entry\n      3rd entry\n      4th entry\n",
 	  '_show 11 prints correct listbox 2-0');
-$lb2->remove(0);
-$lb2->remove(0);
-$lb2->remove(0);
-stdout_is(sub {   $lb2->_show('<1> ');   },
-	  "<1>   1-1/1\n      4th entry\n\n\n",
+$lb_r->add();
+$lb_r->add('3rd entry', '4th entry');
+$lb_r->{first} = 1;
+stdout_is(sub {   $lb_r->_show('<1> ');   },
+	  "<1>   2-4/4\n      2nd entry\n      3rd entry\n      4th entry\n",
 	  '_show 12 prints correct listbox 2-0');
-is($lb2->first, 0, 'first after _show 12 is correct');
-$lb2->remove(0);
-stdout_is(sub {   $lb2->_show('<1> ');   },
-	  "      0/0\n\n\n\n",
+$lb_r->remove(0);
+$lb_r->remove(0);
+$lb_r->remove(0);
+stdout_is(sub {   $lb_r->_show('<1> ');   },
+	  "<1>   1-1/1\n      4th entry\n\n\n",
 	  '_show 13 prints correct listbox 2-0');
-is($lb2->first, -1, 'first after _show 13 is correct');
-$main->remove($lb2);
+is($lb_r->first, 0, 'first after _show 14 is correct');
+$lb_r->remove(0);
+stdout_is(sub {   $lb_r->_show('<1> ');   },
+	  "      0/0\n\n\n\n",
+	  '_show 14 prints correct listbox 2-0');
+is($lb_r->first, -1, 'first after _show 15 is correct');
+$main->remove($lb_r);

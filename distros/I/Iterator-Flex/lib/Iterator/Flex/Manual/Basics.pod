@@ -13,7 +13,7 @@ Iterator::Flex::Manual::Basics - Iterator Basics
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 DESCRIPTION
 
@@ -68,7 +68,7 @@ L<Exhaustion|/Iterator::Flex::Manual::Overview/Exhaustion State>: The iterator h
 
 =head2 Returning Data and Signaling Exhaustion or Error
 
-=head3 Iterator Exhaustion
+=head3 Exhaustion
 
 Exhaustion is traditionally signaled via:
 
@@ -111,71 +111,37 @@ Obviously that's wrong.
 
 One option is to use a value that knowingly can't occur. If your
 temperature is measured in Kelvin, which is always positive, a
-negative value can be a sentinel.  However, that requires that the
-sentinel value be an input parameter to the iterator.
+negative value can be a sentinel.
 
-L<Iterator::Flex> provides a C<<
-L<signal_exhaustion|/Iterator::Flex::Base/signal_exhaustion> >> method
-which currently supports either returning a user defined sentinel or
-throwing an exception.
+L<Iterator::Flex> iterators support returning a user defined sentinel
+or throwing an exception, based on the caller's needs.
 
-=head3 Iterator Error
+=head3 Error
 
 Similar issues arise when the iterator must signal an error.  For
-example, if the iterator retrieves from a database and there is a
-connection issue, the client code must be alerted.  This can be
-done via any of the methods specified in L</Iterator Exhaustion>.
+example, if the iterator retrieves data from a database and there is a
+connection issue, the client code must be alerted. Most
+implementations (language or Perl modules) don't provide an explicit
+specification of how to handle this.
 
-Most implementations (language or Perl modules) don't provide an
-explicit specification of how to handle this.  L<Iterator::Flex>
-provides a C<< L<signal_error|/Iterator::Flex::Base/signal_error> >>
-method which currently supports throwing an exception.
+L<Iterator::Flex> currently supports throwing an exception on error.
 
-=head2 Iterator Capabilities
+=head2 Capabilities
 
 Apart from state, an iterator is mostly defined by its capabilities.
-The only one required is L</next>, which retrieves a value,
+The only one required is L</next>, which retrieves the next value in
+the data stream.
 
 There are a limited set of additional capabilities which are not
 appropriate to all data sources or iterators, so they are optional.
 
-Some capabilities can be emulated by iterator adapters.  The supported
-capabilities are documented in L<Iterator::Flex::Manual::Overview>,
-and are
+These include the capability to return the previous value (C<prev>),
+return the current value without advancement (C<current>), rewind
+the iterator (C<rewind>), and others. Some capabilities can be
+emulated by using an iterator L<adapter|/Adapters>.  The supported
+capabilities are documented in L<Iterator::Flex::Manual::Overview>.
 
-=over
-
-=item *
-
-L<next|Iterator::Flex::Manual::Overview/next>
-
-=item *
-
-L<current|Iterator::Flex::Manual::Overview/current>
-
-=item *
-
-L<prev|Iterator::Flex::Manual::Overview/prev>
-
-=item *
-
-L<rewind|Iterator::Flex::Manual::Overview/rewind>
-
-=item *
-
-L<reset|Iterator::Flex::Manual::Overview/reset>
-
-=item *
-
-L<freeze|Iterator::Flex::Manual::Overview/freeze>
-
-=item *
-
-L<thaw|Iterator::Flex::Manual::Overview/thaw>
-
-=back
-
-=head2 Iterator Generators
+=head2 Generators
 
 An I<iterator generator> creates an iterator from a data source, which
 may be real (such as a data structure in memory, a database, etc.), or
@@ -189,7 +155,7 @@ array like objects (L<Iterator::Flex::ArrayLike>).
 For others, writing an iterator is straightforward; see
 L<Iterator::Flex::Manual::Authoring>.
 
-=head2 Iterator Adapters
+=head2 Adapters
 
 An I<iterator adapter> acts as a filter or modifier on the output of another iterator.
 Applying an adapter to an iterator results in another iterator, which can be used as
@@ -202,7 +168,7 @@ classes for
 
 =item grep
 
-L<igrep|/Iterator::Flex::Common/igrep>, L<Iterator::Flex::Grep>)
+L<igrep|/Iterator::Flex::Common/igrep>, L<Iterator::Flex::Grep>
 
 =item map
 
@@ -227,12 +193,14 @@ L<ifreeze|/Iterator::Flex::Common/ifreeze>, L<Iterator::Flex::Freeze>
 
 =back
 
-=head3 Iterator Wrappers
+=head3 Alien Wrappers
 
 There are a number of existing iterator packages on CPAN (see
 L<Iterator::Flex::Manual::PriorArt>).  L<Iterator::Flex> can wrap
 those iterators so that they can be used within the L<Iterator::Flex>
 framework.  See L<Iterator::Flex::Manual::Alien>.
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

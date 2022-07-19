@@ -8,16 +8,15 @@ use warnings;
 
 use experimental ( 'postderef', 'signatures' );
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Exporter 'import';
 
-our @EXPORT_OK
-  = qw[ iterator iter iarray icycle icache igrep imap iproduct iseq ifreeze thaw ];
+our @EXPORT_OK   = qw[ iterator iter iarray icycle icache igrep imap iproduct iseq ifreeze thaw ];
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-use Ref::Util qw[ is_arrayref is_hashref is_ref is_globref ];
-use Module::Runtime qw[ require_module ];
+use Ref::Util             qw[ is_arrayref is_hashref is_ref is_globref ];
+use Module::Runtime       qw[ require_module ];
 use Iterator::Flex::Utils qw[ throw_failure ];
 use Iterator::Flex::Factory;
 
@@ -47,7 +46,8 @@ use Iterator::Flex::Factory;
 
 
 
-sub iterator :prototype(&@) ($code, $pars={} ) {
+
+sub iterator : prototype(&@) ( $code, $pars = {} ) {
     Iterator::Flex::Factory->construct_from_iterable( $code, $pars );
 }
 
@@ -66,7 +66,8 @@ sub iterator :prototype(&@) ($code, $pars={} ) {
 
 
 
-sub iter ( $iterable, $pars={} ) {
+
+sub iter ( $iterable, $pars = {} ) {
     Iterator::Flex::Factory->to_iterator( $iterable, $pars );
 }
 
@@ -97,7 +98,7 @@ sub iter ( $iterable, $pars={} ) {
 
 
 
-sub iarray ($array, $pars={} ) {
+sub iarray ( $array, $pars = {} ) {
     require Iterator::Flex::Array;
     return Iterator::Flex::Array->new( $array, $pars );
 }
@@ -130,7 +131,7 @@ sub iarray ($array, $pars={} ) {
 
 
 
-sub icache ( $iterable, $pars={} ) {
+sub icache ( $iterable, $pars = {} ) {
     require Iterator::Flex::Cache;
     Iterator::Flex::Cache->new( $iterable, $pars );
 }
@@ -160,7 +161,7 @@ sub icache ( $iterable, $pars={} ) {
 
 
 
-sub icycle ( $array, $pars={} ) {
+sub icycle ( $array, $pars = {} ) {
     require Iterator::Flex::Cycle;
     return Iterator::Flex::Cycle->new( $array, $pars );
 }
@@ -187,7 +188,7 @@ sub icycle ( $array, $pars={} ) {
 
 
 
-sub igrep :prototype(&$) ($code, $pars = {} )  {
+sub igrep : prototype(&$) ( $code, $pars = {} ) {
     require Iterator::Flex::Grep;
     Iterator::Flex::Grep->new( $code, $pars );
 }
@@ -215,7 +216,7 @@ sub igrep :prototype(&$) ($code, $pars = {} )  {
 
 
 
-sub imap :prototype(&$) ($code, $pars={} ) {
+sub imap : prototype(&$) ( $code, $pars = {} ) {
     require Iterator::Flex::Map;
     Iterator::Flex::Map->new( $code, $pars );
 }
@@ -330,7 +331,7 @@ sub iseq {
 
 
 
-sub ifreeze :prototype(&$) ($code, $pars={} ){
+sub ifreeze : prototype(&$) ( $code, $pars = {} ) {
     require Iterator::Flex::Freeze;
     Iterator::Flex::Freeze->new( $code, $pars );
 }
@@ -347,7 +348,7 @@ sub ifreeze :prototype(&$) ($code, $pars={} ){
 
 
 
-sub thaw ($frozen, $pars={} ) {
+sub thaw ( $frozen, $pars = {} ) {
 
     my @steps = $frozen->@*;
 
@@ -365,7 +366,7 @@ sub thaw ($frozen, $pars={} ) {
     require_module( $package );
     my $new_from_state = $package->can( 'new_from_state' )
       or
-    throw_failure( parameter => "unable to thaw: $package doesn't provide 'new_from_state' method" );
+      throw_failure( parameter => "unable to thaw: $package doesn't provide 'new_from_state' method" );
 
     $state->{depends} = \@depends
       if @depends;
@@ -401,48 +402,60 @@ Iterator::Flex::Common - Iterator Generators and Adapters
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
+ use Iterator::Flex::Common ':all'
+
+ # generate an iterator which returns undef upon exhaustion
+ my $iter = iseq( 0, 10, 2 );
+ my $value;
+ say $value while defined $value = $iter->next;
+ # 0 2 4 6 8 10
+
+ # generate an iterator which returns -1 upon exhaustion
+ my $iter = iseq( 1, 10, 2, { exhaustion => [ 'return', -1 ] } );
+ my $value;
+ say $value while ($value = $iter->next) >= 0 ;
+ # 1 3 4 7 9
+
 =head1 DESCRIPTION
 
-C<Iterator::Flex::Common> provides generators for iterators for some
-common cases (arrays, sequences), arbitrary code, and iterator
-adaptors.  As described in
-L<Iterator::Flex::Manual::Overview/Capabilities>, iterators have
-optional capabilities; the descriptions below list which capabilities
-each iterator provides.
+C<Iterator::Flex::Common> provides generators for iterators
+for common uses, such as iterating over arrays, generating numeric
+sequences, wrapping subroutines or other L<iterable
+objects|Iterator::Flex::Manual::Glossary/iterable object> or adapting
+other iterator data streams.
 
-For iterator adapters, such as L</icache>, some capabilities are
-supported only if the iterable they operate on supports them.  For
-example, L</icache> can't provide the
-L<reset|Iterator::Flex::Manual::Overview/reset> or
-L<rewind|Iterator::Flex::Manual::Overview/rewind> capabilities if the
-iterable reads from the terminal.  In these cases, attempting to use
-this capability will result in an error.
+All of the generated iterators and adaptors support the C<next>
+capability; some support additional ones.  For adapters, some
+capabilities are supported only if the iterable they operate on
+supports them.  For example, L</icache> can't provide the C<reset> or
+C<rewind> capabilities if the iterable reads from the terminal.  In
+these cases, attempting to use this capability will result in an
+error.
 
-=head2 Parameters
+See L<Iterator::Flex::Manual::Overview/Capabilities> for a full list
+of capabilities.
 
-Most of the generators take an optional trailing hash, C<%pars> to
-accommodate optional parameters.  Parameters come in three classes,
-explained in L<Iterator::Flex::Manual::Overview/Iterator Parameters>.
-I<General Parameters> are documented there. I<Model Parameters> are
-specific to a type of iterators and are noted in the documentation for
-the generators, below.
+=head2 Generator Parameters
 
-For example, to construct a caching iterator, setting the size of
-the cache, and indicating that the returned iterator should signal
-exhaustion by throwing an exception:
+Most of the generators take an optional trailing hash, C<%pars>, to
+accommodate optional parameters.
 
-  $iter = icache( $iterable,
-                  { capacity => 2,
-                    exhaustion => 'throw',
-                  } );
+Iterator generators accept the C<exhaustion> (see
+L<Iterator::Flex::Manual::Overview/exhaustion>) and C<error> (see
+L<Iterator::Flex::Manual::Overview/error>) parameters, which indicate
+how the generated iterator or adaptor will signal exhaustion and
+error.
 
-Or, to indicate that an iterable signals exhaustion via throwing an exception:
+Adapter generators additionally accept the C<input_exhaustion> (see
+L<Iterator::Flex::Manual::Overview/input_exhaustion>)
+parameter, specifying how the input iterator will signal exhaustion.
 
-  $iter = igrep( $iterable, { input_exhaustion => 'throw' } );
+Some generators have parameters specific to what they do, for example
+the L<icache> adaptor generator has an optional C<capacity> option.
 
 =head1 SUBROUTINES
 
@@ -452,8 +465,9 @@ Or, to indicate that an iterable signals exhaustion via throwing an exception:
 
 Construct an iterator from code. The code will have access to the
 iterator object through C<$_[0]>. By default the code is expected to
-return C<undef> upon exhaustion (this can be changed by setting the
-L<Iterator::Flex::Manual::Overview/input_exhaustion> parameter).
+return C<undef> upon exhaustion; this assumption can be changed by setting the
+C<input_exhaustion> parameter (see
+L<Iterator::Flex::Manual::Overview/input_exhaustion>).
 
 For example, here's a simple integer sequence iterator that counts up to 100:
 
@@ -487,9 +501,10 @@ The returned iterator supports the following methods:
 
 Construct an iterator from an L<iterable
 thing|Iterator::Flex::Manual::Glossary/iterable thing>.  By default
-the code is expected to return C<undef> upon exhaustion (this can be
-changed by setting the L<Iterator::Flex::Manual::Overview/input_exhaustion>
-parameter).
+C<$iterable> is expected to
+return C<undef> upon exhaustion; this assumption can be changed by setting the
+C<input_exhaustion> parameter (see
+L<Iterator::Flex::Manual::Overview/input_exhaustion>).
 
 See L</Parameters> for a description of C<%pars>
 
@@ -701,6 +716,8 @@ See L<Iterator::Flex::Manual::Serialization> for more information.
 
 Restore an iterator that has been frozen.
 See L<Iterator::Flex::Manual::Serialization> for more information.
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

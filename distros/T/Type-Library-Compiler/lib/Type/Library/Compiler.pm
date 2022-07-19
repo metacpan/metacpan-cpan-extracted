@@ -5,7 +5,7 @@ use warnings;
 package Type::Library::Compiler;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.005';
+our $VERSION   = '0.006';
 
 use Type::Library::Compiler::Mite -all;
 use B ();
@@ -82,7 +82,7 @@ sub compile_to_string {
 sub _compile_header {
 	my $self = shift;
 
-	return sprintf <<'CODE', $self->destination_module, $self->constraint_module, $self->destination_module;
+	return sprintf <<'CODE', $self->destination_module, $self->VERSION, $self->constraint_module, $self->destination_module;
 use 5.008001;
 use strict;
 use warnings;
@@ -92,6 +92,7 @@ package %s;
 use Exporter ();
 use Carp qw( croak );
 
+our $TLC_VERSION = "%s";
 our @ISA = qw( Exporter );
 our @EXPORT;
 our @EXPORT_OK;
@@ -159,6 +160,7 @@ BEGIN {
 		if ( ref $library eq 'ARRAY' ) {
 			require Type::Tiny::Union;
 			return 'Type::Tiny::Union'->new(
+				display_name     => $name,
 				type_constraints => [ map $_->to_TypeTiny, @$library ],
 			);
 		}

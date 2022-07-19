@@ -12,4 +12,5 @@ on develop => sub {
    requires 'Test::Pod::Coverage', '1.04';
    requires 'Test::Pod',           '1.51';
    requires 'Moo',                 '2.005004';
+   requires 'Params::Validate',    '1.30';
 };

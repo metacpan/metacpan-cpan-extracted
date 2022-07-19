@@ -7,6 +7,10 @@ Bug tracker:  <https://github.com/kjetilk/p5-rdf-doap/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
 
+0.105	2022-07-18
+
+ - RDF::DOAP::Types->make_immutable.
+
 0.104	2019-12-10
 
  - Sort the output of $project->homepage to prioritize non-metacpan

@@ -7,32 +7,37 @@ use Math::DifferenceSet::Planar::Data;
 use Math::BigInt try => 'GMP';
 use Math::Prime::Util qw(
     is_power is_prime_power euler_phi factor_exp gcd
-    mulmod addmod invmod powmod
+    mulmod addmod invmod powmod divmod
 );
 
 # Math::DifferenceSet::Planar=ARRAY(...)
 # ........... index ...........     # ........... value ...........
-use constant _F_ORDER     =>  0;
-use constant _F_BASE      =>  1;
-use constant _F_EXPONENT  =>  2;
-use constant _F_MODULUS   =>  3;
-use constant _F_N_PLANES  =>  4;    # number of distinct planes this size
-use constant _F_ELEMENTS  =>  5;    # elements arrayref
-use constant _F_ROTATORS  =>  6;    # rotators arrayref, initially empty
-use constant _F_INDEX_MIN =>  7;    # index of smallest element
-use constant _F_PEAK      =>  8;    # peak elements arrayref, initially undef
-use constant _F_ETA       =>  9;    # "eta" value, initially undef
-use constant _NFIELDS     => 10;
+use constant _F_ORDER      =>  0;
+use constant _F_BASE       =>  1;
+use constant _F_EXPONENT   =>  2;
+use constant _F_MODULUS    =>  3;
+use constant _F_N_PLANES   =>  4;   # number of distinct planes this size
+use constant _F_ELEMENTS   =>  5;   # elements arrayref
+use constant _F_ROTATORS   =>  6;   # rotators arrayref, initially empty
+use constant _F_INDEX_MIN  =>  7;   # index of smallest element
+use constant _F_GENERATION =>  8;   # database generation
+use constant _F_LOG        =>  9;   # plane logarithm value, may be undef
+use constant _F_ZETA       => 10;   # "zeta" value, initially undef
+use constant _F_ETA        => 11;   # "eta" value, initially undef
+use constant _F_PEAK       => 12;   # peak elements arrayref, initially undef
+use constant _NFIELDS      => 13;
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 our $_LOG_MAX_ORDER  = 22.1807;         # limit for integer exponentiation
 our $_MAX_ENUM_COUNT = 32768;           # limit for stored rotator set size
 our $_MAX_MEMO_COUNT = 4096;            # limit for memoized values
 our $_DEFAULT_DEPTH  = 1024;            # default check_elements() depth
 our $_USE_SPACES_DB  = 1;               # enable looking up rotators
+our $_MAX_FMT_COUNT  = 5;               # elements printed in messages
 
 my $current_data = undef;               # current M::D::P::Data object
+my $generation   = 0;                   # incremented on $current_data update
 
 my %memo_n_planes = ();                 # memoized n_planes values
 
@@ -185,6 +190,16 @@ sub _structured_rotators {
     };
 }
 
+sub _space_description {
+    my ($spc) = @_;
+    my $order       = $spc->order;
+    my $mul_radix   = $spc->mul_radix;
+    my $mul_depth   = $spc->mul_depth;
+    my ($radices, $depths) = $spc->rotator_space;
+    my @space = map {; "$radices->[$_]^$depths->[$_]"} 0 .. $#{$radices};
+    return "$order: $mul_radix^$mul_depth [@space]";
+}
+
 # integer exponentiation
 sub _pow {
     my ($base, $exponent) = @_;
@@ -245,9 +260,100 @@ sub _index_min {
 # return data connection, creating it if not yet open
 sub _data {
     if (!defined $current_data) {
+        ++$generation;
         $current_data = Math::DifferenceSet::Planar::Data->new;
     }
     return $current_data;
+}
+
+# compose a printable abbreviated description of a set
+sub _fmt_set {
+    my ($this) = @_;
+    my @e = $this->[_F_ORDER] < $_MAX_FMT_COUNT?
+        @{$this->[_F_ELEMENTS]}:
+        (@{$this->[_F_ELEMENTS]}[0 .. $_MAX_FMT_COUNT-1], q[...]);
+    return '{' . join(q[,], @e) . '}';
+}
+
+# identify a plane by its rotator value with respect to a given plane
+# (both arguments zeta-canonized, second argument with known log)
+sub _log {
+    my ($this, $that) = @_;
+    my $modulus = $this->[_F_MODULUS];
+    my %t = ();
+    foreach my $e (@{$this->[_F_ELEMENTS]}) {
+        $t{$e} = 1;
+    }
+    my $r = 0;
+    foreach my $e (@{$that->[_F_ELEMENTS]}) {
+        $r = invmod($e, $modulus);
+        last if $r;
+    }
+    my $factor = 0;
+    if ($r) {
+        ELEM:
+        foreach my $o (@{$this->[_F_ELEMENTS]}) {
+            next if !$o;
+            my $ro = mulmod($r, $o, $modulus);
+            foreach my $e (@{$that->[_F_ELEMENTS]}) {
+                next ELEM if !exists $t{ mulmod($e, $ro, $modulus) };
+            }
+            $factor = $ro;
+            last;
+        }
+    }
+    else {
+        my $ri = $this->iterate_rotators;
+        ROT:
+        while (my $ro = $ri->()) {
+            foreach my $e (@{$that->[_F_ELEMENTS]}) {
+                next ROT if !exists $t{ mulmod($e, $ro, $modulus) };
+            }
+            $factor = $ro;
+            last;
+        }
+    }
+    if ($factor) {
+        my $log = $this->[_F_LOG] =
+            mulmod($that->[_F_LOG], $factor, $modulus);
+        return $log;
+    }
+    croak 'unaligned sets: ', _fmt_set($this), ' versus ', _fmt_set($that);
+}
+
+# $factor = _find_factor($ds1, $ds2);
+sub _find_factor {
+    my ($this, $that) = @_;
+    my $order = $this->order;
+    croak 'sets of same size expected' if $order != $that->order;
+    my $log_this = $this->[_F_GENERATION] == $generation && $this->[_F_LOG];
+    my $log_that = $this->[_F_GENERATION] == $generation && $that->[_F_LOG];
+    $this->[_F_GENERATION] = $that->[_F_GENERATION] = $generation;
+    if (!$log_this) {
+        my $r1 = $this->zeta_canonize;
+        my $r2 = $that->zeta_canonize;
+        if (!$log_that) {
+            my $r3 = Math::DifferenceSet::Planar->new($order)->zeta_canonize;
+            $log_that = $that->[_F_LOG] = _log($r2, $r3);
+        }
+        $log_this = $this->[_F_LOG] =
+            $this == $that? $log_that: _log($r1, $r2);
+    }
+    elsif (!$log_that) {
+        my $r1 = $this->zeta_canonize;
+        my $r2 = $that->zeta_canonize;
+        $log_that = $that->[_F_LOG] = _log($r2, $r1);
+    }
+    return divmod($log_that, $log_this, $this->modulus);
+}
+
+# translation amount between a multiple of a set and another set
+sub _delta_f {
+    my ($this, $factor, $that) = @_;
+    my $modulus = $this->modulus;
+    my ($x)     = $this->find_delta( invmod($factor, $modulus) );
+    my $s       = $that->[_F_ELEMENTS]->[0];
+    return addmod($s, -mulmod($x, $factor, $modulus), $modulus);
 }
 
 # ----- class methods -----
@@ -258,6 +364,7 @@ sub list_databases {
 
 sub set_database {
     my $class = shift;
+    ++$generation;
     $current_data = Math::DifferenceSet::Planar::Data->new(@_);
     return $class->available_count;
 }
@@ -275,9 +382,20 @@ sub available {
 # print "ok" if Math::DifferenceSet::Planar->known_space(9);
 sub known_space {
     my ($class, $order) = @_;
+    return 0 if $order <= 0 || $order > $class->_data->sp_max_order;
+    my $spc = $class->_data->get_space($order);
+    return 0 if !$spc;
+    my ($rad) = $spc->rotator_space;
+    return 0 + @{$rad};
+}
+
+# $desc = Math::DifferenceSet::Planar->known_space_desc(9);
+sub known_space_desc {
+    my ($class, $order) = @_;
     return undef if $order <= 0 || $order > $class->_data->sp_max_order;
     my $spc = $class->_data->get_space($order);
-    return !!$spc;
+    return undef if !$spc;
+    return _space_description($spc);
 }
 
 # $ds = Math::DifferenceSet::Planar->new(9);
@@ -297,15 +415,17 @@ sub new {
         $pds->modulus,
         $pds->n_planes,
         $pds->elements,
-        [],
-        0,
+        [],                     # rotators
+        0,                      # index_min
+        $generation,
+        1,                      # log
     ], $class;
 }
 
-# $ds = Math::DifferenceSet::Planar->from_elements(
+# $ds = Math::DifferenceSet::Planar->from_elements_fast(
 #   0, 1, 3, 9, 27, 49, 56, 61, 77, 81
 # );
-sub from_elements {
+sub from_elements_fast {
     my $class    = shift;
     my $order    = $#_;
     my ($base, $exponent);
@@ -334,9 +454,22 @@ sub from_elements {
         $modulus,
         $n_planes,
         $elements,
-        [],
+        [],                     # rotators
         $index_min,
+        $generation,
     ], $class;
+}
+
+# $ds = Math::DifferenceSet::Planar->from_elements(
+#   0, 1, 3, 9, 27, 49, 56, 61, 77, 81
+# );
+sub from_elements {
+    my ($class, @elements) = @_;
+    my $this = $class->from_elements_fast(@elements);
+    my $ref  = $class->new(@elements - 1);
+    eval { _find_factor($ref, $this) } or
+        croak "apparently not a planar difference set: ", _fmt_set($this);
+    return $this;
 }
 
 # $bool = Math::DifferenceSet::Planar->verify_elements(
@@ -355,7 +488,7 @@ sub verify_elements {
             last if $r1 == $r2;
             my $d = $r1 < $r2? $r2 - $r1: $modulus + $r2 - $r1;
             $d = $modulus - $d if $d > $median;
-            return q[] if substr($seen, $d-1, 1)++;
+            return !1 if substr($seen, $d-1, 1)++;
         }
     }
     return $median == $seen =~ tr/1//;
@@ -443,8 +576,10 @@ sub iterate_available_sets {
             $pds->modulus,
             $pds->n_planes,
             $pds->elements,
-            [],
-            0,
+            [],                 # rotators
+            0,                  # index_min
+            $generation,
+            1,                  # log
         ], $class;
     };
 }
@@ -466,6 +601,21 @@ sub known_space_max_order { $_[0]->_data->sp_max_order }
 
 # $count = Math::DifferenceSet::Planar->known_space_count;
 sub known_space_count     { $_[0]->_data->sp_count }
+
+# $it3 = Math::DifferenceSet::Planar->iterate_known_spaces;
+# $it3 = Math::DifferenceSet::Planar->iterate_known_spaces(10,20);
+# while (my $spc = $it3->()) {
+#   print "$spc\n";
+# }
+sub iterate_known_spaces {
+    my ($class, @minmax) = @_;
+    my $dit = $class->_data->iterate_spaces(@minmax);
+    return sub {
+        my $spc = $dit->();
+        return undef if !$spc;
+        return _space_description($spc);
+    };
+}
 
 # ----- object methods -----
 
@@ -498,7 +648,7 @@ sub elements_sorted {
 sub translate {
     my ($this, $delta) = @_;
     my $modulus = $this->[_F_MODULUS];
-    $delta %= $modulus;
+    $delta %= $modulus unless -$modulus < $delta && $delta < $modulus;
     return $this if !$delta;
     my @elements =
         map { addmod($_, $delta, $modulus) } @{$this->[_F_ELEMENTS]};
@@ -506,11 +656,40 @@ sub translate {
     $that->[_F_ELEMENTS]  = \@elements;
     $that->[_F_INDEX_MIN] =
         $elements[0] < $elements[-1]? 0: _index_min(\@elements);
+    if (defined (my $z = $that->[_F_ZETA])) {
+        $that->[_F_ZETA] = addmod($z,
+            mulmod($delta, $this->[_F_ORDER]-1, $modulus), $modulus);
+    }
     return $that;
 }
 
 # $ds2 = $ds->canonize;
 sub canonize { $_[0]->translate(- $_[0]->[_F_ELEMENTS]->[0]) }
+
+# $ds2 = $ds->gap_canonize;
+sub gap_canonize {
+    my ($this) = @_;
+    my $delta = ($this->largest_gap)[1];
+    return $this->translate(-$delta);
+}
+
+# $ds2 = $ds->zeta_canonize;
+sub zeta_canonize {
+    my ($this) = @_;
+    my $zeta    = $this->zeta;
+    my $order   = $this->order;
+    my $modulus = $this->modulus;
+    if ( ($order - 1) % 3 ) {
+        return $this if !$zeta;
+        my $delta = divmod($zeta, $order - 1, $modulus);
+        return $this->translate(-$delta);
+    }
+    return $this if !$zeta && !$this->contains(0);
+    $modulus /= 3;
+    my $delta = divmod($zeta, $order - 1, $modulus);
+    $delta += $modulus while $this->contains($delta);   # 0..2 iterations
+    return $this->translate(-$delta);
+}
 
 # $it  = $ds->iterate_rotators;
 # while (my $m = $it->()) {
@@ -552,9 +731,9 @@ sub multiply {
     my ($this, $factor) = @_;
     my $modulus = $this->[_F_MODULUS];
     $factor %= $modulus;
+    return $this if 1 == $factor;
     croak "$_[1]: factor is not coprime to modulus"
         if gcd($modulus, $factor) != 1;
-    return $this if 1 == $factor;
     my ($elements, $index_min) = _sort_elements(
         $modulus,
         map { mulmod($_, $factor, $modulus) } @{$this->[_F_ELEMENTS]}
@@ -562,6 +741,10 @@ sub multiply {
     my $that = bless [@{$this}], ref $this;
     $that->[_F_ELEMENTS ] = $elements;
     $that->[_F_INDEX_MIN] = $index_min;
+    if (defined(my $log = $that->[_F_LOG])) {
+        $that->[_F_LOG] = mulmod($log, $factor, $modulus);
+    }
+    $that->[_F_ZETA] &&= mulmod($that->[_F_ZETA], $factor, $modulus);
     return $that;
 }
 
@@ -576,21 +759,22 @@ sub find_delta {
     $de = $modulus - $de if !$up;
     my ($lx, $ux, $c) = (0, 0, 0);
     my ($le, $ue) = @{$elements}[0, 0];
+    my $bogus = 0;
     while ($c != $de) {
         if ($c < $de) {
             if(++$ux > $order) {
                 $ux = 0;
             }
             $ue = $elements->[$ux];
+            $bogus = 1, last if $ux == $lx;
         }
         else {
-            if (++$lx > $order) {
-                croak "bogus set: delta not found: $delta (mod $modulus)";
-            }
+            $bogus = 1, last if ++$lx > $order;
             $le = $elements->[$lx];
         }
         $c = $ue < $le? $modulus + $ue - $le: $ue - $le;
     }
+    croak "bogus set: delta not found: $delta (mod $modulus)" if $bogus;
     return $up? ($le, $ue): ($ue, $le);
 }
 
@@ -605,14 +789,53 @@ sub peak_elements {
     return @{$peak};
 }
 
+# ($e1, $e2, $delta) = $ds->largest_gap;
+sub largest_gap {
+    my ($this) = @_;
+    my $modulus = $this->modulus;
+    my $p_max;
+    my $e_max;
+    my $d_max = 0;
+    my $e_pre = $this->element($this->order);
+    foreach my $e ($this->elements) {
+        my $d = $e - $e_pre;
+        $d += $modulus if $d < 0;
+        if ($d > $d_max) {
+            $d_max = $d;
+            $p_max = $e_pre;
+            $e_max = $e;
+        }
+        $e_pre = $e;
+    }
+    return ($p_max, $e_max, $d_max);
+}
+
+# $e = $ds->zeta
+sub zeta {
+    my ($this) = @_;
+    my $zeta = $this->[_F_ZETA];
+    if (!defined $zeta) {
+        my $order   = $this->[_F_ORDER];
+        my $modulus = $this->[_F_MODULUS];
+        my $start   = $this->[_F_ELEMENTS]->[0];
+        (undef, my $x) = $this->find_delta($order + 1);
+        $zeta = $this->[_F_ZETA] =
+            addmod(mulmod($x, $order, $modulus), -$start, $modulus);
+    }
+    return $zeta;
+}
+
 # $e = $ds->eta
 sub eta {
     my ($this) = @_;
+    return $this->zeta if $this->[_F_EXPONENT] == 1;
     my $eta = $this->[_F_ETA];
     if (!defined $eta) {
-        my $that = $this->multiply($this->order_base);
-        $eta = $this->[_F_ETA] =
-            ($that->element(0) - $this->element(0)) % $this->modulus;
+        my $p   = $this->[_F_BASE];
+        my $m   = $this->[_F_MODULUS];
+        my $s   = $this->[_F_ELEMENTS]->[0];
+        my ($x) = $this->find_delta( invmod($p, $m) );
+        $eta = $this->[_F_ETA] = addmod(mulmod($x, $p, $m), -$s, $m);
     }
     return $eta;
 }
@@ -638,6 +861,102 @@ sub contains {
     return !1;
 }
 
+# $cmp = $ds1->compare($ds2);
+sub compare {
+    my ($this, $that) = @_;
+    my $order = $this->order;
+    my $cmp   = $order <=> $that->order;
+    return $cmp if $cmp;
+    my $lx = $this->[_F_INDEX_MIN];
+    my $rx = $that->[_F_INDEX_MIN];
+    my $le = $this->[_F_ELEMENTS];
+    my $re = $that->[_F_ELEMENTS];
+    foreach my $i (0 .. $order) {
+        $cmp = $le->[$lx] <=> $re->[$rx];
+        return $cmp if $cmp;
+        ++$lx <= $order or $lx = 0;
+        ++$rx <= $order or $rx = 0;
+    }
+    return 0;
+}
+
+# $bool = $ds1->same_plane($ds2);
+sub same_plane {
+    my ($this, $that) = @_;
+    my $order = $this->order;
+    return !1 if $order != $that->order;
+    my $le = $this->[_F_ELEMENTS];
+    my $re = $that->[_F_ELEMENTS];
+    my $delta0 = $re->[0] - $le->[0];
+    if (!$delta0) {
+        foreach my $x (1 .. $order) {
+            return !1 if $re->[$x] != $le->[$x];
+        }
+        return !0;
+    }
+    my $modulus = $this->modulus;
+    my $delta1  = $delta0 < 0? $delta0 + $modulus: $delta0 - $modulus;
+    foreach my $x (1 .. $order) {
+        my $delta = $re->[$x] - $le->[$x];
+        return !1 if $delta != $delta0 && $delta != $delta1;
+    }
+    return !0;
+}
+
+# @e = $ds1->common_elements($ds2);
+sub common_elements {
+    my ($this, $that) = @_;
+    my $order = $this->order;
+    my @common = ();
+    return @common if $order != $that->order;
+    my $li = 0;
+    my $ri = 0;
+    my $lx = $this->[_F_INDEX_MIN];
+    my $rx = $that->[_F_INDEX_MIN];
+    my $le = $this->[_F_ELEMENTS];
+    my $re = $that->[_F_ELEMENTS];
+    my $lv = $le->[$lx];
+    my $rv = $re->[$rx];
+    while (1) {
+        my $cmp = $lv <=> $rv;
+        push @common, $lv if !$cmp;
+        if ($cmp <= 0) {
+            ++$lx <= $order or $lx = 0;
+            last if ++$li > $order;
+            $lv = $le->[$lx];
+        }
+        if ($cmp >= 0) {
+            ++$rx <= $order or $rx = 0;
+            last if ++$ri > $order;
+            $rv = $re->[$rx];
+        }
+    }
+    return @common;
+}
+
+# ($factor, $delta) = $ds1->find_linear_map($ds2);
+sub find_linear_map {
+    my ($this, $that) = @_;
+    my $factor = _find_factor($this, $that);
+    my $delta  = _delta_f($this, $factor, $that);
+    return ($factor, $delta);
+}
+
+# @factor_delta_pairs = $ds1->find_all_linear_maps($ds2);
+sub find_all_linear_maps {
+    my ($this, $that) = @_;
+    my $f1 = eval { _find_factor($this, $that) };
+    return () if !defined $f1;
+    my $modulus = $this->modulus;
+    return
+        sort { $a->[0] <=> $b->[0] }
+        map {
+            my $f = mulmod($f1, $_, $modulus);
+            my $d = _delta_f($this, $f, $that);
+            [$f, $d]
+        } $this->multipliers;
+}
+
 1;
 __END__
 
@@ -649,7 +968,7 @@ Math::DifferenceSet::Planar - object class for planar difference sets
 
 =head1 VERSION
 
-This documentation refers to version 0.015 of Math::DifferenceSet::Planar.
+This documentation refers to version 0.016 of Math::DifferenceSet::Planar.
 
 =head1 SYNOPSIS
 
@@ -658,6 +977,9 @@ This documentation refers to version 0.015 of Math::DifferenceSet::Planar.
   $ds = Math::DifferenceSet::Planar->new(9);
   $ds = Math::DifferenceSet::Planar->new(3, 2);
   $ds = Math::DifferenceSet::Planar->from_elements(
+    0, 1, 3, 9, 27, 49, 56, 61, 77, 81
+  );
+  $ds = Math::DifferenceSet::Planar->from_elements_fast(
     0, 1, 3, 9, 27, 49, 56, 61, 77, 81
   );
   print "ok" if Math::DifferenceSet::Planar->verify_elements(
@@ -673,15 +995,19 @@ This documentation refers to version 0.015 of Math::DifferenceSet::Planar.
   $p  = $ds->order_base;
   $n  = $ds->order_exponent;
 
-  ($e1, $e2) = $ds->find_delta($delta);
-  ($e1, $e2) = $ds->peak_elements;
-  ($e1, $e2) = $ds->find_delta(($ds->modulus - 1) / 2);
-  $eta       = $ds->eta;
-  $bool      = $ds->contains($e1);
+  ($e1, $e2)         = $ds->find_delta($delta);
+  ($e1, $e2)         = $ds->peak_elements;
+  ($e1, $e2)         = $ds->find_delta(($ds->modulus - 1) / 2);
+  ($e1, $e2, $delta) = $ds->largest_gap;
+  $eta               = $ds->eta;
+  $zeta              = $ds->zeta;
+  $bool              = $ds->contains($e1);
 
   $ds1 = $ds->translate(1);
   $ds2 = $ds->canonize;
   $ds2 = $ds->translate(- $ds->element(0)); # equivalent
+  $ds2 = $ds->gap_canonize;
+  $ds2 = $ds->zeta_canonize;
   @pm  = $ds->multipliers;
   $it  = $ds->iterate_rotators;
   while (my $m = $it->()) {
@@ -692,7 +1018,18 @@ This documentation refers to version 0.015 of Math::DifferenceSet::Planar.
     # as above
   }
 
-  $r  = Math::DifferenceSet::Planar->check_elements(
+  $cmp  = $ds1->compare($ds2);
+  $bool = $ds1->same_plane($ds2);
+  @e    = $ds1->common_elements($ds2);
+
+  ($factor, $delta) = $ds1->find_linear_map($ds2);
+  # $ds2 == $ds1->multiply($factor)->translate($delta)
+  foreach my $fd ( $ds1->find_all_linear_maps($ds2) ) {
+    my ($factor, $delta) = @{$fd};
+    # as above
+  }
+
+  $r  = Math::DifferenceSet::Planar->check_elements(    # DEPRECATED
     [0, 1, 3, 9, 27, 49, 56, 61, 77, 81], 10
   );
   print "not small non-negative integers"  if !defined $r;
@@ -716,6 +1053,14 @@ This documentation refers to version 0.015 of Math::DifferenceSet::Planar.
   $min   = Math::DifferenceSet::Planar->available_min_order;
   $max   = Math::DifferenceSet::Planar->available_max_order;
   $count = Math::DifferenceSet::Planar->available_count;
+
+  print "ok" if Math::DifferenceSet::Planar->known_space(9);
+  $desc = Math::DifferenceSet::Planar->known_space_desc(9);
+  $min = Math::DifferenceSet::Planar->known_space_min_order;
+  $max = Math::DifferenceSet::Planar->known_space_max_order;
+  $count = Math::DifferenceSet::Planar->known_space_count;
+  $it3 = Math::DifferenceSet::Planar->iterate_known_spaces;
+  $it3 = Math::DifferenceSet::Planar->iterate_known_spaces(10,20);
 
 =head1 DESCRIPTION
 
@@ -742,10 +1087,11 @@ If t is an element of E<8484>_n coprime to n, S<D E<183> t> =
 S<{d_1 E<183> t, d_2 E<183> t, ..., d_k E<183> t}> is also a difference
 set.  If S<D E<183> t> is a translate of D, t is called a multiplier
 of D.  If t is coprime to n but either identical to 1 (mod n) or not a
-multiplier, it is called a rotator.  Rotators of planar difference
-sets are also rotators of planes as translates of a difference set
-are mapped to translates of the rotated set.  We call a minimal set of
-rotators spanning all plane rotations a rotator base.
+multiplier, it is called a rotator.  Rotators of planar difference sets
+are also rotators of planes as translates of a difference set are mapped
+to translates of the rotated set.  We call a minimal set of rotators
+spanning all plane rotations a rotator base.  Another commonly used term
+would be complete residue system.
 
 Math::DifferenceSet::Planar provides examples of small cyclic planar
 difference sets constructed from finite fields.  It is primarily intended
@@ -754,10 +1100,18 @@ to iterate over all sets of a given size via translations and rotations,
 and to verify whether an arbitrary set of modular integers is a cyclic
 planar difference set.
 
-Currently, only sets with k E<8804> 4097, or moduli E<8804> 16_781_313,
+Currently, only sets with k E<8804> 4097, or moduli E<8804> 16,781,313,
 are supported by the CPAN distribution of the module.  These limits can
 be extended by installing a database with more samples.  Instructions on
 where to obtain additional data will be included in an upcoming release.
+The database with orders up to 2E<185>E<8311> requires 2 GB of storage
+space, while the default database only occupies 2.5 MB.
+
+We work with pre-computed data for lack of super-efficient generators.
+Difference sets can be generated with O(I<kE<178>>) operations with order
+3 polynomials in an order I<k> Galois field, which means only polynomial
+complexity, but still more than would be practical to perform at runtime.
+Getting rid of the databases will require better algorithms.
 
 =head2 Conventions
 
@@ -773,9 +1127,11 @@ and S<I<s> + 1> that are both in the set, and continues by smallest
 possible increments.  For example, S<{ 3, 5, 10, 11, 14 } (mod 21)>
 would be enumerated as S<(10, 11, 14, 3, 5)>.
 
-Each plane (i.e. complete set of translates of a planar difference
-set) has a unique set containing the elements 0 and 1.  We call this
-set the canonical representative of the plane.
+Each plane (i.e. complete set of translates of a planar difference set)
+has a unique set containing the elements 0 and 1.  We call this set the
+canonical representative of the plane.  The canonical representative is
+also the lexically first set of its plane when sorted with priority on
+small elements.
 
 Each planar difference set has, for each nonzero element I<delta>
 of its ring E<8484>_n, a unique pair of elements S<(I<e1>, I<e2>)>
@@ -783,9 +1139,45 @@ satisfying S<I<e2> - I<e1> = I<delta>>.  For S<I<delta> = 1>, we call
 I<e1> the start element.  For S<I<delta> = (I<n> - 1) / 2>, we call I<e1>
 and I<e2> the peak elements.
 
+Sets of a plane could also be sorted lexically with priority on
+large elements.  The first set in that ordering is the one with
+the largest gap between consecutive elements just left of zero.
+We call this set gap-canonical.
+
 As I<order_base> is (conjecturally) always a multiplier, multiplying a
 planar difference set by I<order_base> will yield a translation of the
-original set.  We call the translation amount eta.
+original set.  We call the translation amount I<eta>.
+
+A slightly weaker conjecture asserts that I<order> itself is a multiplier.
+We call the translation amount, upon multiplying a set by its order,
+I<zeta>.  Eta and zeta values could be used for yet more choices of
+canonical representatives of planes.  This library provides, by the
+name of I<zeta_canonize>, one example looking particularly useful.
+
+Yet another conjecture asserts that for any two planar difference sets
+of the same order there is a linear function mapping one of them to
+the other.  It may be an intermediate step to proving the prime power
+conjecture, and it is relevant for some of the algorithms implemented
+here.  Notably, it gives rise to the notion of a "logarithm" identifying
+sets or planes by their linear relationship with some reference set.
+If there was a consensus among math libraries on the choice of a reference
+set and of a particular solution from the solution space of the linear
+equation, such libraries could identify any such set by only two numbers
+and be interoperable.
+
+Such a convention would be an analogy for planar difference sets to what
+Conway polynomials are for finite fields.  The choice, however, is not an
+easy one.  A major disadvantage of Conway polynomials is that, for large
+orders, they are computationally expensive (read: practically impossible)
+to obtain.  All candidates for reference sets, so far, including some
+actually based on Conway polynomials, seem to share this disadvantage.
+
+Thus, this library makes use of linear mappings without exposing their
+"logarithm" aspect.  We prefer to postpone any suggestion for this
+standardization until we are confident it is ecologically preferable.
+The library offers methods to find linear mappings between arbitrary sets,
+so users can pick their own reference sets and treat linear mappings
+relative to them as absolute.
 
 =head1 CLASS VARIABLES
 
@@ -824,13 +1216,21 @@ distinct non-negative integer numbers less than some modulus,
 C<Math::DifferenceSet::Planar-E<gt>from_elements(@e)> returns a planar
 difference set object with precisely these elements.
 
-Note that arguments not verified to define a planar difference set may
-yield a broken object with undefined behaviour.  Note also that this
-method expects elements to be normalized, i.e. integer values from zero
-to the modulus minus one.
-
 The modulus itself is not a parameter, as it can be computed from the
 number I<k> of arguments as S<I<m> = I<k>E<178> - I<k> + 1>.
+
+Improper arguments, such as lists of numbers not actually defining a
+planar difference set, will cause I<from_elements> to raise an exception
+either immediately rejecting the arguments or from failing initial checks.
+Note also that this method expects elements to be normalized, i.e. integer
+values from zero to the modulus minus one.
+
+=item I<from_elements_fast>
+
+The method I<from_elements_fast> is an alternative to I<from_elements>
+that may be used if the arguments are known to be correct.  Arguments not
+verified to define a planar difference set may yield a broken object
+with undefined behaviour, though.  You have been warned.
 
 =back
 
@@ -854,6 +1254,13 @@ of appropriate size, defined but false if it is, but not happens to
 represent a cyclic planar difference set, and true on success.
 
 =item I<check_elements>
+
+DEPRECATED.  OBSOLETE.  Since an efficient and conclusive check is
+now integrated in the I<from_elements> method, checking elements with
+incomplete evidence is now almost pointless.  This method will be removed
+in release 1.0.
+
+From the original documentation:
 
 If C<@e> is an array of integer values,
 C<Math::DifferenceSet::Planar-E<gt>check_elements(\@e)> returns a true
@@ -900,9 +1307,25 @@ multiplier holds, the combined check will rather efficiently detect
 most sets that aren't.  For a counterexample to the conjecture, the check
 might return 2 with a high depth value and 0 with a low depth value.
 
-Currently, the I<check_elements> method should be regarded as
-experimental.  Future research might provide other, more useful check
-types or parametrizations.
+End quote.
+
+Before it was deprecated, the I<check_elements> method in general and
+its parametrizations in particular were already flagged as experimental.
+
+Progress could indeed be made by replacing the non-conclusive multiplier
+check by the conclusive linear mapping check: The conjecture that any two
+sets of same order can be mapped to each other with a linear function, and
+an efficient way to find such a function, now constitute a very practical
+verification of Singer type difference sets.  It is considered cheap
+enough to run that it is now included in the I<from_elements> constructor.
+
+The assumption that all planar difference sets are of this type, however,
+which has lead to the initial scope of this library, should still not be
+taken for granted.  This means the whole library may well be incomplete
+in this regard and fail to handle valid sets.  The only exception is
+the I<verify_elements> method, at the price of unpleasantly poor
+performance.  To make progress here, some more research is needed.
+Contributions are welcome.
 
 =item I<available>
 
@@ -959,6 +1382,35 @@ otherwise.
 The precise meaning of non-zero values returned by I<known_space> is
 implementation specific and should not be relied upon.
 
+=item I<known_space_desc>
+
+The class method
+C<Math::DifferenceSet::Planar-E<gt>known_space_desc($order)> returns a
+descriptive string if pre-computed rotator space information for order
+C<$order> is available to the module, otherwise undef.
+
+The precise meaning of strings returned by I<known_space_desc> is
+implementation specific and should not be relied upon.  They are intended
+for documentation rather than further processing.
+
+=item I<iterate_known_spaces>
+
+The class method C<Math::DifferenceSet::Planar-E<gt>iterate_known_spaces>
+returns a code reference that, repeatedly called, returns descriptions
+of all pre-computed rotator spaces known to the module, one by one.
+The iterator returns a false value when it is exhausted.
+
+C<Math::DifferenceSet::Planar-E<gt>iterate_known_spaces($lo, $hi)>
+returns an iterator over all pre-computed spaces with orders between
+C<$lo> and C<$hi> (inclusively), ordered by ascending size.  If C<$lo> is
+not defined, it is taken as zero.  If C<$hi> is omitted or not defined,
+it is taken as plus infinity.  If C<$lo> is greater than C<$hi>, they
+are swapped and the sequence is reversed, so that it is ordered by
+descending size.
+
+The strings returned by the iterators are the same as if obtained by
+I<known_space_desc>.
+
 =item I<known_space_min_order>
 
 The class method C<Math::DifferenceSet::Planar-E<gt>known_space_min_order>
@@ -1011,18 +1463,10 @@ with each of the database names returned by I<list_databases>.
 
 If C<$ds> is a planar difference set object and C<$t> is an integer
 number, C<$ds-E<gt>translate($t)> returns an object representing the
-translate of the set by C<$t % $ds-E<gt>modulus>.
+translate of the set by C<$t>.
 
 Translating by each element of the cyclic group in turn generates
 all difference sets belonging to one plane.
-
-=item I<canonize>
-
-If C<$ds> is a planar difference set object, C<$ds-E<gt>canonize>
-returns an object representing the canonical translate of the set.
-All sets of a plane yield the same set upon canonizing.  Using our
-enumeration convention, an equivalent operation to canonizing is to
-translate by the negative of the first or start element.
 
 =item I<multiply>
 
@@ -1031,16 +1475,46 @@ number coprime to the modulus, C<$ds-E<gt>multiply($t)> returns an object
 representing the difference set generated by multiplying each element
 by C<$t>.
 
+=item I<canonize>
+
+If C<$ds> is a planar difference set object, C<$ds-E<gt>canonize> returns
+an object representing the canonical translate of the set.  All sets
+of a plane yield the same set upon canonizing.  Using our enumeration
+convention, an equivalent operation to canonizing is to translate by
+the negative of the start element.  The canonical representative of a
+plane is also its lexicographically first set when sets are compared
+element-wise from smallest to largest element.
+
+=item I<gap_canonize>
+
+If C<$ds> is a planar difference set object, C<$ds-E<gt>gap_canonize>
+returns an object representing the translate of the set with the
+largest gap placed so that it is followed by zero.  This is also
+the lexicographically first set of the plane when sets are compared
+element-wise from largest to smallest element.
+
+=item I<zeta_canonize>
+
+If C<$ds> is a planar difference set object, C<$ds-E<gt>zeta_canonize>
+returns an object representing the unique translate of the set defined
+as follows: If the plane has only one set with I<zeta> equal to zero,
+take this.  Otherwise, from the three sets with I<zeta> equal to zero,
+take the set not containing the element zero.  Here, I<zeta> means the
+translation amount when the set is multiplied by its order, which always
+is a multiplier (see below).
+
 =item I<iterate_planes>
 
 If C<$ds> is a planar difference set object, C<$ds-E<gt>iterate_planes>
 returns a code reference that, repeatedly called, returns all canonized
 planar difference sets of the same size, generated using a rotator base,
-one by one.  The iterator returns a false value when it is exhausted.
+one by one.  The first set returned will be on the same plane as the
+invocant.  The iterator returns a false value when it is exhausted.
 
-The succession of sets returned by I<iterate_planes> may come in any
-implementation-specific order.  If I<iterate_planes> is repeatedly called
-within one program run, the same difference set will always yield the
+The succession of sets returned by I<iterate_planes>, after the first
+set, may come in any implementation-specific order.  If I<iterate_planes>
+is repeatedly called within one program run and while the rotator space
+database is not changed, the same difference set will always yield the
 same sequence of planes, however.  Multiple iterators will each have an
 individual state and run independently, even if generated from the same
 sample difference set.
@@ -1121,11 +1595,11 @@ C<($e1, $e2)> of the set with the property that C<$e2 - $e1 == $delta>
 (modulo the modulus of the set).  If C<$delta> is not zero or a multiple
 of the modulus this pair will be unique.
 
-The unique existence of such a pair is in fact the defining quality of a
-planar difference set.  The algorithm has an I<O(n)> time complexity if
-I<n> is the cardinality of the set.  If it fails, the set stored in the
-object is not actually a difference set.  An exception will be raised
-in that case.
+The unique existence of such a pair is in fact the defining quality of
+a planar difference set.  The algorithm has an I<O(n)> time complexity
+if I<n> is the cardinality of the set.  It may fail if the set stored
+in the object is not actually a difference set.  An exception will be
+raised in that case.
 
 =item I<peak_elements>
 
@@ -1139,6 +1613,23 @@ C<$ds-E<gt>peak_elements> returns the pair C<($e1, $e2)>.
 Equivalently, C<$e1> and C<$e2> can be computed as:
 C<($e1, $e2) = $ds-E<gt>find_delta( ($ds-E<gt>modulus - 1) / 2 )>
 
+=item I<largest_gap>
+
+If C<$ds> is a planar difference set object with modulus C<$modulus>,
+there is a unique pair of consecutive elements C<($e1, $e2)> of the set,
+when sorted by residue value and repeated cyclically, with the largest
+difference modulo the modulus.
+
+For example, the set I<{3, 4, 6} (mod 7)> has increases of I<{1, 2, 4}>
+with the largest increase I<4> between the elements I<6> and I<3>
+(wrapping around).
+
+C<$ds-E<gt>largest_gap> returns both elements C<($e1, $e2)> and the
+increase amount C<($e2 - $e1) % $ds-E<gt>modulus> called C<$delta>.
+The number of modular integers not in the set between two consecutive
+elements of the set is called their gap.  This gap can be calculated as
+C<$delta - 1>.
+
 =item I<eta>
 
 The prime power conjecture of planar difference sets states that any
@@ -1149,17 +1640,90 @@ of the set.  Thus multiplying the set by the prime is equivalent to
 a translation.  The translation amount is called I<eta> here and the
 method I<eta> returns its value.
 
-Technically, C<$ds-E<gt>eta> is equivalent to
-C<$ds-E<gt>multiply($ds-E<gt>order_base)-E<gt>element(0)-$ds-E<gt>element(0)>,
-wich would still be defined if one of the conjectures was proven wrong,
-though not quite meaningful if the multiplication result was on a
-different plane.
+The method has no safeguard to check if for its invocant the prime
+multiplier conjecture actually holds.  With a counterexample, it would
+just return some meaningless value.
+
+=item I<zeta>
+
+Another multiplier conjecture asserts that the order of a set is a
+multiplier.  The translation amount from multiplying by the order is
+called I<zeta> here.  For sets with prime order, I<zeta> and I<eta>
+are equal.  The return value will be correct only for sets satisfying
+the order multiplier conjecture, otherwise meaningless.
+
+=back
+
+=head2 Binary Operators
+
+=over 4
 
 =item I<contains>
 
 If C<$ds> is a planar difference set object and C<$e> an integer number,
 C<$ds-E<gt>contains($e)> returns a boolean that is true if C<$e> is an
 element of the set.
+
+Note that C<$e> has to be in the range of zero to the modulus minus
+one to be found, as modular integers are represented by their standard
+residue values throughout this library.
+
+=item I<compare>
+
+If C<$ds1> and C<$ds2> are planar difference set objects,
+C<$ds1-E<gt>compare($ds2)> returns a comparison value less than zero,
+zero, or greater than zero, if C<$ds1> precedes, is equal, or follows
+C<$ds2> according to this order relation: Smaller sets before larger sets,
+sets of equal size in lexicographic order when written from smallest to
+largest element and compared element-wise left to right.
+
+Example: I<{0, 4, 5} E<lt> {1, 2, 4} E<lt> {1, 2, 6} E<lt> {0, 1, 3, 9}>.
+
+=item I<same_plane>
+
+If C<$ds1> and C<$ds2> are planar difference set objects,
+C<$ds1-E<gt>same_plane($ds2)> returns a boolean value of true if C<$ds2>
+is a translate of C<$ds1>, otherwise false.  If they do, they will have
+either precisely one element or all elements in common and the translation
+amount will be equal to the difference of their start elements.
+
+=item I<common_elements>
+
+If C<$ds1> and C<$ds2> are planar difference set objects of equal order,
+C<$ds1-E<gt>common_elements($ds2)> returns a list of elements that are in
+both sets.  For sets of different size, an empty list will be returned.
+In scalar context, the length of the list will be returned.
+
+=item I<find_linear_map>
+
+If C<$ds1> and C<$ds2> are planar difference set objects
+of equal order, C<$ds1-E<gt>find_linear_map($ds2)> returns
+two values C<$factor> and C<$delta> with the property that
+C<$ds1-E<gt>multiply($factor)-E<gt>translate($delta)> will be equal
+to C<$ds2>.  It is conjectured that this is always possible.  For sets
+of different size, or if the arguments constitute a counterexample to
+the conjecture, exceptions will be raised.
+
+Note that the solution will not be unique and may depend on circumstances
+not easy to predict.
+
+=item I<find_all_linear_maps>
+
+If C<$ds1> and C<$ds2> are planar difference set objects of equal order,
+C<$ds1-E<gt>find_all_linear_maps($ds2)> returns a list of arrayrefs
+holding two values C<$factor> and C<$delta> each, with the property
+that C<$ds1-E<gt>multiply($factor)-E<gt>translate($delta)> will be equal
+to C<$ds2>.  It is conjectured that this is always possible.  For sets
+of different size, or if the arguments constitute a counterexample to
+the conjecture, an empty list will be returned.
+
+The pairs in the result will be sorted in ascending order by their
+first component.
+
+Technically, the list will be created using I<find_linear_map> and
+I<multipliers>.  The completeness of the solution space thus depends on
+the I<3n> multipliers conjecture, asserting that each set has precisely
+I<3E<183>n> multipliers.
 
 =back
 
@@ -1209,12 +1773,17 @@ or some values were too large for a difference set of the given size.
 The modulus matching the number of arguments, minus one, is indicated
 in the message.
 
-=item elements of PDS expected
+=item apparently not a planar difference set: %s
 
-The class method I<from_elements> was called with values that obviously
-define no planar difference set.  Note that not all cases of wrong values
-will be detected this way.  Dubious values should always be verified
-before they are turned into an object.
+The class method I<from_elements> was called with values that apparently
+define no planar difference set.  Note that this verdict might be
+incorrect if the linear mapping conjecture turned out to be wrong, when
+verifying a counterexample, but it will be correct with all actually
+wrong sets.
+
+You can override the internal linear mapping check by using
+I<from_elements_fast> in place of I<from_elements>.  Unverified sets
+may yield broken objects with inconsistent behaviour, though.
 
 =item duplicate element: %d
 
@@ -1234,6 +1803,21 @@ object of a set lacking the required I<delta> value.  This means that
 the set was not actually a difference set, which in turn means that
 previously a constructor must have been called with unverified set
 elements.  The delta value and the modulus are reported in the message.
+
+=item sets of same size expected
+
+One of the methods I<find_linear_map> or I<find_all_linear_maps> was
+called with two sets of different size.  Linear map functions can only
+exist for sets with equal size.
+
+=item unaligned sets: %s versus %s
+
+One of the methods I<find_linear_map> or I<find_all_linear_maps>
+surprisingly did not succeed.  This would prove another conjecture wrong,
+or, more likely, indicate one of the objects was created from elements not
+actually representing a valid planar difference set.  Abbreviated element
+lists of two difference sets are included in the message.  For technical
+reasons, these may be translates of the original invocants.
 
 =back
 
@@ -1379,7 +1963,7 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019-2021 by Martin Becker, Blaubeuren.
+Copyright (c) 2019-2022 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

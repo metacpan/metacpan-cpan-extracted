@@ -41,5 +41,8 @@ t/09_5.10_use_constant.t
 t/10_prototypes.t
 t/11_except.t
 MANIFEST.SKIP
+lib/Sub/WrapPackages/CallTree.pm
+t/lib/Sub/WrapPackages/Tests/Victim.pm
+t/sub-wrappackages-calltree.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,60 @@
+{
+   "abstract" : "Simple parallel execution",
+   "author" : [
+      "Andy Armstrong <andy@hexten.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Parallel-Iterator",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {},
+      "configure" : {},
+      "runtime" : {
+         "requires" : {
+            "Config" : "0",
+            "IO::Handle" : "0",
+            "IO::Select" : "0",
+            "Storable" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Parallel-Iterator"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ap/Parallel-Iterator.git",
+         "web" : "https://github.com/ap/Parallel-Iterator"
+      }
+   },
+   "version" : "1.001",
+   "x_copyright" : {
+      "holder" : "Andy Armstrong",
+      "year" : 2007
+   },
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

@@ -1,10 +1,10 @@
 package Acme::Mitey::Cards::Set;
 
-our $VERSION   = '0.011';
+our $VERSION   = '0.013';
 our $AUTHORITY = 'cpan:TOBYINK';
 
-use Acme::Mitey::Cards::Mite qw( -bool -is croak );
-use Acme::Mitey::Cards::Types qw(:types);
+use Acme::Mitey::Cards::Mite qw( -all );
+use Acme::Mitey::Cards::Types qw( :types );
 
 use List::Util ();
 
@@ -19,11 +19,19 @@ sub _build_cards {
 	return [];
 }
 
+signature_for to_string => (
+	pos => [],
+);
+
 sub to_string {
 	my $self = shift;
 
 	return join " ", map $_->to_string, @{ $self->cards };
 }
+
+signature_for count => (
+	pos => [],
+);
 
 sub count {
 	my $self = shift;
@@ -31,8 +39,12 @@ sub count {
 	scalar @{ $self->cards };
 }
 
+signature_for take => (
+	pos => [ Int ],
+);
+
 sub take {
-	my ( $self, $n ) = ( shift, @_ );
+	my ( $self, $n ) = @_;
 
 	croak "Not enough cards: wanted %d but only have %d", $n, $self->count
 		if $n > $self->count;

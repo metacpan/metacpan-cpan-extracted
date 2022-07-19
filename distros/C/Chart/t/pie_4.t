@@ -2,7 +2,6 @@
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Pie;
-use GD;
 use strict;
 use File::Temp 0.19;
 my $samples = File::Temp->newdir();
@@ -20,8 +19,8 @@ $g->set( 'legend_label_values' => 'value' );
 $g->set( 'legend'              => 'bottom' );
 $g->set( 'grey_background'     => 'false' );
 $g->set( 'x_label'             => '' );
-$g->set( 'legend_font'         => gdSmallFont );
-$g->set( 'title_font'          => gdGiantFont );
+$g->set( 'legend_font'         => GD::Font->Small );
+$g->set( 'title_font'          => GD::Font->Giant );
 $g->set( 'legend_lines'        => 'false' );
 
 $g->png("$samples/pie_4.png");

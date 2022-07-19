@@ -60,6 +60,7 @@
       "test" : {
          "requires" : {
             "Crypt::OpenSSL::Guess" : "0",
+            "File::Spec::Functions" : "0",
             "File::Which" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0"
@@ -69,7 +70,7 @@
    "provides" : {
       "XML::Sig" : {
          "file" : "lib/XML/Sig.pm",
-         "version" : "0.57"
+         "version" : "0.58"
       }
    },
    "release_status" : "stable",
@@ -83,7 +84,7 @@
          "web" : "https://github.com/perl-net-saml2/perl-XML-Sig"
       }
    },
-   "version" : "0.57",
+   "version" : "0.58",
    "x_contributors" : [
       "Byrne Reese <byrne@cpan.org>",
       "Chris Andrews <chris@nodnol.org>",

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.551';
+our $VERSION = '0.552';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form );
 
@@ -966,7 +966,7 @@ sub fill_form {
             $k = 1;
             $self->__home( $m );
         }
-        elsif ( $char == VK_UP || $char == CONTROL_R ) {
+        elsif ( $char == VK_UP || $char == CONTROL_S ) {
             $k = 1;
             if ( $self->{i}{curr_row} == 0 ) {
                 $self->{i}{beep} = 1;
@@ -983,7 +983,7 @@ sub fill_form {
                 }
             }
         }
-        elsif ( $char == VK_DOWN || $char == CONTROL_S ) {
+        elsif ( $char == VK_DOWN || $char == CONTROL_T ) {
             $k = 1;
             if ( $self->{i}{curr_row} == $#$list ) {
                 $self->{i}{beep} = 1;
@@ -1166,7 +1166,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.551
+Version 0.552
 
 =cut
 
@@ -1219,9 +1219,9 @@ C<Home> or C<Ctrl-A>: Move to the start of the line.
 
 C<End> or C<Ctrl-E>: Move to the end of the line.
 
-C<Up-Arrow> or C<Ctrl-R>: Move up one row.
+C<Up-Arrow> or C<Ctrl-S>: Move up one row.
 
-C<Down-Arrow> or C<Ctrl-S>: Move down one row.
+C<Down-Arrow> or C<Ctrl-T>: Move down one row.
 
 C<Ctrl-X>: Delete the text of the line.
 

@@ -16,11 +16,7 @@ sub _test_values {
         begin    => 0,
         end      => 4,
         expected => [
-            [ undef, undef, 0 ],
-            [ undef, 0,     10 ],
-            [ 0,     10,    20 ],
-            [ 10,    20,    undef ],
-            [ 20,    undef, undef ],
+            [ undef, undef, 0 ], [ undef, 0, 10 ], [ 0, 10, 20 ], [ 10, 20, undef ], [ 20, undef, undef ],
         ],
         @_
     );
@@ -88,29 +84,15 @@ subtest "rewind" => sub {
 
         drain( $iter, 3 );
 
-        is(
-            [ $iter->prev, $iter->current ],
-            [ 20,          undef ],
-            "prev/current before rewind"
-        );
+        is( [ $iter->prev, $iter->current ], [ 20, undef ], "prev/current before rewind" );
 
         try_ok { $iter->rewind } "rewind";
 
-        is(
-            [ $iter->prev, $iter->current ],
-            [ 20,          undef ],
-            "prev/current after rewind"
-        );
+        is( [ $iter->prev, $iter->current ], [ 20, undef ], "prev/current after rewind" );
 
-        _test_values(
-            $iter,
-            expected => [
-                [ 20,    undef, 0 ],
-                [ undef, 0,     10 ],
-                [ 0,     10,    20 ],
-                [ 10,    20,    undef ],
-                [ 20,    undef, undef ],
-            ],
+        _test_values( $iter,
+            expected =>
+              [ [ 20, undef, 0 ], [ undef, 0, 10 ], [ 0, 10, 20 ], [ 10, 20, undef ], [ 20, undef, undef ], ],
         );
         is( $iter->next, undef, "iterator exhausted" );
         ok( $iter->is_exhausted, "iterator exhausted (officially)" );
@@ -121,30 +103,15 @@ subtest "rewind" => sub {
 
         <$iter> for 1 .. 2;
 
-        is(
-            [ $iter->prev, $iter->current ],
-            [ 0,           10 ],
-            "prev/current before rewind"
-        );
+        is( [ $iter->prev, $iter->current ], [ 0, 10 ], "prev/current before rewind" );
 
         try_ok { $iter->rewind } "rewind";
 
-        is(
-            [ $iter->prev, $iter->current ],
-            [ 0,           10 ],
-            "prev/current after rewind"
-        );
+        is( [ $iter->prev, $iter->current ], [ 0, 10 ], "prev/current after rewind" );
 
-        _test_values(
-            $iter,
-            expected => [
-                [ 0,  10,    0 ],
-                [ 10, 0,     10 ],
-                [ 0,  10,    20 ],
-                [ 10, 20,    undef ],
-                [ 20, undef, undef ],
-            ],
-        );
+        _test_values( $iter,
+            expected =>
+              [ [ 0, 10, 0 ], [ 10, 0, 10 ], [ 0, 10, 20 ], [ 10, 20, undef ], [ 20, undef, undef ], ], );
 
         is( $iter->next, undef, "iterator exhausted" );
         ok( $iter->is_exhausted, "iterator exhausted (officially)" );
@@ -182,8 +149,7 @@ subtest "freeze" => sub {
         try_ok { $freeze = $iter->freeze } "freeze iterator";
         try_ok { $iter   = thaw( $freeze ) } "thaw iterator";
 
-        ok( $iter->is_exhausted,
-            "thawed, frozen, exhausted iterator is still exhausted" );
+        ok( $iter->is_exhausted, "thawed, frozen, exhausted iterator is still exhausted" );
 
     }
 
@@ -195,23 +161,23 @@ subtest 'exhaustion' => sub {
 
     subtest 'return' => sub {
 
-        my $array = [ @array ];
-        my $iter = iarray( $array , { exhaustion => [ return => 22 ] } );
+        my $array = [@array];
+        my $iter  = iarray( $array, { exhaustion => [ return => 22 ] } );
 
         drain( $iter, 3, 22 );
-        ok ( $iter->is_exhausted, 'drained' );
-        is ( $iter->prev, 2, "prev value" );
-        is ( $iter->next, 22, "next value" );
+        ok( $iter->is_exhausted, 'drained' );
+        is( $iter->prev, 2,  "prev value" );
+        is( $iter->next, 22, "next value" );
     };
 
     subtest 'throw' => sub {
 
-        my $iter = iarray( [ @array ], { exhaustion => 'throw' } );
+        my $iter = iarray( [@array], { exhaustion => 'throw' } );
 
         ok( dies { drain( $iter, 3 ) }, "threw" );
 
-        ok ( $iter->is_exhausted, 'drained' );
-        is ( $iter->prev, 2, "prev value" );
+        ok( $iter->is_exhausted, 'drained' );
+        is( $iter->prev, 2, "prev value" );
 
         ok( dies { $iter->next }, "next throws" );
     };

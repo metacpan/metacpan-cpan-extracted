@@ -3,7 +3,7 @@ use 5.006;
 package Test::DiagINC;
 # ABSTRACT: List modules and versions loaded if tests fail
 
-our $VERSION = '0.008';
+our $VERSION = '0.010';
 
 # If the tested module did not load strict/warnings we do not want
 # to load them either. On the other hand we would like to know our
@@ -28,10 +28,15 @@ sub _max_length {
 # Requires %ENV cleanup to work under taint mode
 my $REALPATH_CWD = do {
     local $ENV{PATH};
+    delete $ENV{PATH};
     local $ENV{IFS};
+    delete $ENV{IFS};
     local $ENV{CDPATH};
+    delete $ENV{CDPATH};
     local $ENV{ENV};
+    delete $ENV{ENV};
     local $ENV{BASH_ENV};
+    delete $ENV{BASH_ENV};
     my ($perl) = $^X =~ /(.+)/; # $^X is internal how could it be tainted?!
     `"$perl" -MCwd -le "print getcwd"`;
 };
@@ -161,7 +166,7 @@ Test::DiagINC - List modules and versions loaded if tests fail
 
 =head1 VERSION
 
-version 0.008
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -239,7 +244,7 @@ Otherwise, it will just be sent to STDERR.
 
 =for Pod::Coverage BUILD
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -264,9 +269,13 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Peter Rabbitson Roy Ivy III
+=for stopwords Graham Knop Peter Rabbitson Roy Ivy III
 
 =over 4
+
+=item *
+
+Graham Knop <haarg@haarg.org>
 
 =item *
 

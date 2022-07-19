@@ -1,4 +1,3 @@
--st
 -se
 -w
 -conv
@@ -10,3 +9,6 @@
 -blbs=2
 -nolq
 -nsbl
+-l=100
+-vmll
+-xs

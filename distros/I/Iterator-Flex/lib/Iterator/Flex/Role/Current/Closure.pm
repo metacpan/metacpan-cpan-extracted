@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Current::Closure;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Iterator::Flex::Utils qw( :default ITERATOR CURRENT );
 use Role::Tiny;
@@ -24,7 +24,7 @@ use namespace::clean;
 
 
 sub current ( $self ) {
-    $REGISTRY{ refaddr $self }{+ITERATOR}{+CURRENT}->( $_[0] );
+    $REGISTRY{ refaddr $self }{ +ITERATOR }{ +CURRENT }->( $self );
 }
 *__current__ = \&current;
 
@@ -52,7 +52,7 @@ Iterator::Flex::Role::Current::Closure - Implement C<current> as a closure store
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 METHODS
 
@@ -63,6 +63,8 @@ version 0.14
    $iterator->current;
 
 Returns the current value.
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

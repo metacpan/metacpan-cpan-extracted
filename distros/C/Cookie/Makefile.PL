@@ -15,6 +15,7 @@ my %WriteMakefileArgs = (
         'overloading'   => '0.02',
         'parent'        => 0,
         'strict'        => 0,
+        'vars'          => 0,
         'version'       => 0,
         'warnings'      => 0,
         'DateTime'      => '1.52',
@@ -42,7 +43,8 @@ my %WriteMakefileArgs = (
     },
     LICENSE             => 'perl_5',
     MIN_PERL_VERSION    => 'v5.16.0',
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    (MM->can('signature_target') ? (SIGN => 1) : ()),
+    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', PREOP => './dev/cleanup.pl' },
     clean               => { FILES => 'Cookie-*' },
     ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
         'meta-spec' => { version => 2 },

@@ -6,17 +6,22 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Acme::Mitey::Cards::Mite";
-    our $MITE_VERSION = "0.006012";
+    our $MITE_VERSION = "0.007003";
 
     BEGIN {
-        *bare  = \&Acme::Mitey::Cards::Mite::bare;
-        *croak = \&Acme::Mitey::Cards::Mite::croak;
-        *false = \&Acme::Mitey::Cards::Mite::false;
-        *lazy  = \&Acme::Mitey::Cards::Mite::lazy;
-        *ro    = \&Acme::Mitey::Cards::Mite::ro;
-        *rw    = \&Acme::Mitey::Cards::Mite::rw;
-        *rwp   = \&Acme::Mitey::Cards::Mite::rwp;
-        *true  = \&Acme::Mitey::Cards::Mite::true;
+        require Scalar::Util;
+        *bare    = \&Acme::Mitey::Cards::Mite::bare;
+        *blessed = \&Scalar::Util::blessed;
+        *carp    = \&Acme::Mitey::Cards::Mite::carp;
+        *confess = \&Acme::Mitey::Cards::Mite::confess;
+        *croak   = \&Acme::Mitey::Cards::Mite::croak;
+        *false   = \&Acme::Mitey::Cards::Mite::false;
+        *guard   = \&Acme::Mitey::Cards::Mite::guard;
+        *lazy    = \&Acme::Mitey::Cards::Mite::lazy;
+        *ro      = \&Acme::Mitey::Cards::Mite::ro;
+        *rw      = \&Acme::Mitey::Cards::Mite::rw;
+        *rwp     = \&Acme::Mitey::Cards::Mite::rwp;
+        *true    = \&Acme::Mitey::Cards::Mite::true;
     }
 
     sub new {
@@ -162,6 +167,85 @@
             )
         );
     }
+
+    our %SIGNATURE_FOR;
+
+    $SIGNATURE_FOR{"count"} = sub {
+        my $__NEXT__ = shift;
+
+        my ( %tmp, $tmp, @head );
+
+        @_ == 1
+          or croak(
+            "Wrong number of parameters in signature for %s: %s, got %d",
+            "count", "expected exactly 1 parameters",
+            scalar(@_)
+          );
+
+        @head = splice( @_, 0, 1 );
+
+        # Parameter $head[0] (type: Defined)
+        ( defined( $head[0] ) )
+          or croak( "Type check failed in signature for count: %s should be %s",
+            "\$_[0]", "Defined" );
+
+        return ( &$__NEXT__( @head, @_ ) );
+    };
+
+    $SIGNATURE_FOR{"take"} = sub {
+        my $__NEXT__ = shift;
+
+        my ( %tmp, $tmp, @head );
+
+        @_ == 2
+          or croak(
+            "Wrong number of parameters in signature for %s: %s, got %d",
+            "take", "expected exactly 2 parameters",
+            scalar(@_)
+          );
+
+        @head = splice( @_, 0, 1 );
+
+        # Parameter $head[0] (type: Defined)
+        ( defined( $head[0] ) )
+          or croak( "Type check failed in signature for take: %s should be %s",
+            "\$_[0]", "Defined" );
+
+        # Parameter $_[0] (type: Int)
+        (
+            do {
+                my $tmp = $_[0];
+                defined($tmp) and !ref($tmp) and $tmp =~ /\A-?[0-9]+\z/;
+            }
+          )
+          or croak( "Type check failed in signature for take: %s should be %s",
+            "\$_[1]", "Int" );
+
+        return ( &$__NEXT__( @head, @_ ) );
+    };
+
+    $SIGNATURE_FOR{"to_string"} = sub {
+        my $__NEXT__ = shift;
+
+        my ( %tmp, $tmp, @head );
+
+        @_ == 1
+          or croak(
+            "Wrong number of parameters in signature for %s: %s, got %d",
+            "to_string", "expected exactly 1 parameters",
+            scalar(@_)
+          );
+
+        @head = splice( @_, 0, 1 );
+
+        # Parameter $head[0] (type: Defined)
+        ( defined( $head[0] ) )
+          or croak(
+            "Type check failed in signature for to_string: %s should be %s",
+            "\$_[0]", "Defined" );
+
+        return ( &$__NEXT__( @head, @_ ) );
+    };
 
     1;
 }

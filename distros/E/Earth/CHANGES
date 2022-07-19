@@ -1,3 +1,20 @@
+0.04 2022-07-16
+
+- [feature] Implement "args" function
+- [feature] Implement "error" function, and die with stack trace
+
+0.03 2022-07-14
+
+- [feature] Implement "then" function
+- [feature] Implement "can" function
+- [feature] Allow invocation via scalar reference
+- [feature] Implement "roll" function
+- [update] Deprecate Earth::Entity
+- [update] Remove dependency on Venus
+- [update] Remove the Venus "catch" function
+- [update] Remove the Venus "error" function
+- [update] Remove the Venus "raise" function
+
 0.01 2022-07-02
 
 - [feature] Initial implementation

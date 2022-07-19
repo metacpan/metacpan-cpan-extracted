@@ -16,3 +16,7 @@ Revision history for Perl extension Try::ALRM.
           The TLDR; is to not export Tiny::ALRM::try
           and to reference it using the full namespace.
         - added example script using both modules
+
+0.4  Mon Jul 18 11:05:12 2022
+        - refactor dispatch based on number of arguments
+          passed to the 'try' method

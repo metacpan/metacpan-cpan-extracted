@@ -3,7 +3,7 @@ use v5.12;
 
 package Chart::HorizontalBars;
 our @ISA     = qw(Chart::Base);
-our $VERSION = 'v2.403.2';
+our $VERSION = 'v2.403.5';
 
 use Chart::Base;
 use GD;
@@ -22,8 +22,7 @@ use Carp;
 # Overwrites this function of Chart::Base
 # @return status
 #
-sub _draw_x_ticks
-{
+sub _draw_x_ticks {
     my $self      = shift;
     my $data      = $self->{'dataref'};
     my $font      = $self->{'tick_label_font'};
@@ -44,20 +43,15 @@ sub _draw_x_ticks
     ( $h, $w ) = ( $font->height, $font->width );
 
     #get the right x-value and width
-    if ( $self->{'y_axes'} =~ /^right$/i )
-    {
+    if ( $self->{'y_axes'} =~ /^right$/i ) {
         $x1 = $self->{'curr_x_min'};
         $width =
           $self->{'curr_x_max'} - $x1 - $self->{'tick_len'} - $self->{'text_space'} - $w * $self->{'x_tick_label_length'};
-    }
-    elsif ( $self->{'y_axes'} =~ /^both$/i )
-    {
+    } elsif ( $self->{'y_axes'} =~ /^both$/i ) {
         $x1 = $self->{'curr_x_min'} + $self->{'text_space'} + $w * $self->{'x_tick_label_length'} + $self->{'tick_len'};
         $width =
           $self->{'curr_x_max'} - $x1 - $self->{'tick_len'} - $self->{'text_space'} - $w * $self->{'x_tick_label_length'};
-    }
-    else
-    {
+    } else {
         $x1    = $self->{'curr_x_min'} + $self->{'text_space'} + $w * $self->{'x_tick_label_length'} + $self->{'tick_len'};
         $width = $self->{'curr_x_max'} - $x1;
     }
@@ -68,36 +62,28 @@ sub _draw_x_ticks
     #draw the labels
     $y2 = $y1;
 
-    if ( $self->{'x_ticks'} =~ /^normal/i )
-    {    #just normal ticks
-            #get the point for updating later
+    if ( $self->{'x_ticks'} =~ /^normal/i ) { # just normal ticks
+                                              # get the point for updating later
         $y1 = $self->{'curr_y_max'} - 2 * $self->{'text_space'} - $h - $self->{'tick_len'};
 
         #get the start point
         $y2 = $y1 + $self->{'tick_len'} + $self->{'text_space'};
-        for ( 0 .. $#labels )
-        {
+        for ( 0 .. $#labels ) {
             $label = $self->{'y_tick_labels'}[$_];
             $x2 = $x1 + ( $delta * $_ ) - ( $w * length($label) / 2 );
             $self->{'gd_obj'}->string( $font, $x2, $y2, $label, $textcolor );
         }
-    }
-    elsif ( $self->{'x_ticks'} =~ /^staggered/i )
-    {    #staggered ticks
-            #get the point for updating later
+    } elsif ( $self->{'x_ticks'} =~ /^staggered/i ) { # staggered ticks
+                                                      # get the point for updating later
         $y1 = $self->{'curr_y_max'} - 3 * $self->{'text_space'} - 2 * $h - $self->{'tick_len'};
 
-        for ( 0 .. $#labels )
-        {
+        for ( 0 .. $#labels ) {
             $label = $self->{'y_tick_labels'}[$_];
             $x2 = $x1 + ( $delta * $_ ) - ( $w * length($label) / 2 );
-            unless ( $_ % 2 )
-            {
+            unless ( $_ % 2 ) {
                 $y2 = $y1 + $self->{'text_space'} + $self->{'tick_len'};
                 $self->{'gd_obj'}->string( $font, $x2, $y2, $label, $textcolor );
-            }
-            else
-            {
+            } else {
                 $y2 = $y1 + $h + 2 * $self->{'text_space'} + $self->{'tick_len'};
                 $self->{'gd_obj'}->string( $font, $x2, $y2, $label, $textcolor );
             }
@@ -105,43 +91,35 @@ sub _draw_x_ticks
 
     }
 
-    elsif ( $self->{'x_ticks'} =~ /^vertical/i )
-    {    #vertical ticks
-            #get the point for updating later
+    elsif ( $self->{'x_ticks'} =~ /^vertical/i ) { # vertical ticks
+                                                   # get the point for updating later
         $y1 = $self->{'curr_y_max'} - 2 * $self->{'text_space'} - $w * $self->{'y_tick_label_length'} - $self->{'tick_len'};
 
-        for ( 0 .. $#labels )
-        {
+        for ( 0 .. $#labels ) {
             $label = $self->{'y_tick_labels'}[$_];
 
-            #get the start point
+            # get the start point
             $y2 = $y1 + $self->{'tick_len'} + $w * length($label) + $self->{'text_space'};
 
             $x2 = $x1 + ( $delta * $_ ) - ( $h / 2 );
             $self->{'gd_obj'}->stringUp( $font, $x2, $y2, $label, $textcolor );
         }
 
-    }
+    } else { carp "I don't understand the type of x-ticks you specified" }
 
-    else
-    {
-        carp "I don't understand the type of x-ticks you specified";
-    }
-
-    #update the curr x and y max value
+    # update the curr x and y max value
     $self->{'curr_y_max'} = $y1;
     $self->{'curr_x_max'} = $x1 + $width;
 
-    #draw the ticks
+    # draw the ticks
     $y1 = $self->{'curr_y_max'};
     $y2 = $self->{'curr_y_max'} + $self->{'tick_len'};
-    for ( 0 .. $#labels )
-    {
+    for ( 0 .. $#labels ) {
         $x2 = $x1 + ( $delta * $_ );
         $self->{'gd_obj'}->line( $x2, $y1, $x2, $y2, $misccolor );
         if (   $self->true( $self->{'grid_lines'} )
-            or $self->true( $self->{'x_grid_lines'} ) )
-        {
+            or $self->true( $self->{'x_grid_lines'} ) ) {
+                
             $self->{'grid_data'}->{'x'}->[$_] = $x2;
         }
     }
@@ -153,8 +131,7 @@ sub _draw_x_ticks
 #  draw the y-ticks and their labels
 # Overwrites this function of Chart::Base
 # @return status
-sub _draw_y_ticks
-{
+sub _draw_y_ticks {
     my $self      = shift;
     my $side      = shift || 'left';
     my $data      = $self->{'dataref'};
@@ -176,9 +153,8 @@ sub _draw_y_ticks
     ( $h, $w ) = ( $font->height, $font->width );
 
     #figure out, where to draw
-    if ( $side =~ /^right$/i )
-    {
-
+    if ( $side =~ /^right$/i ) {
+        
         #get the right startposition
         $x1 = $self->{'curr_x_max'};
         $y1 = $self->{'curr_y_max'} - $h / 2;
@@ -218,9 +194,7 @@ sub _draw_y_ticks
             }
         }
 
-    }
-    elsif ( $side =~ /^both$/i )
-    {
+    } elsif ( $side =~ /^both$/i ) {
 
         #get the right startposition
         $x1 = $self->{'curr_x_max'};
@@ -299,10 +273,7 @@ sub _draw_y_ticks
                 $self->{'grid_data'}->{'y'}->[$_] = $y2;
             }
         }
-    }
-
-    else
-    {
+    } else {
 
         #get the right startposition
         $x1 = $self->{'curr_x_min'};
@@ -319,8 +290,7 @@ sub _draw_y_ticks
         }
 
         #draw the labels
-        for ( 0 .. int( ( $self->{'num_datapoints'} - 1 ) / $self->{'skip_y_ticks'} ) )
-        {
+        for ( 0 .. int( ( $self->{'num_datapoints'} - 1 ) / $self->{'skip_y_ticks'} ) ) {
             $y2 = $y1 - ($delta) * ( $_ * $self->{'skip_y_ticks'} );
             $x2 =
               $x1 -
@@ -337,13 +307,11 @@ sub _draw_y_ticks
         $x1 = $self->{'curr_x_min'};
         $x2 = $self->{'curr_x_min'} - $self->{'tick_len'};
         $y1 += $h / 2;
-        for ( 0 .. ( $self->{'num_datapoints'} - 1 / $self->{'skip_y_ticks'} ) )
-        {
+        for ( 0 .. ( $self->{'num_datapoints'} - 1 / $self->{'skip_y_ticks'} ) ) {
             $y2 = $y1 - ( $delta * $_ );
             $self->{'gd_obj'}->line( $x1, $y2, $x2, $y2, $misccolor );
             if (   $self->true( $self->{'grid_lines'} )
-                or $self->true( $self->{'x_grid_lines'} ) )
-            {
+                or $self->true( $self->{'x_grid_lines'} ) ) {
                 $self->{'grid_data'}->{'y'}->[$_] = $y2;
             }
         }
@@ -512,8 +480,7 @@ sub _find_y_scale
         {
             my $labelText;
 
-            if ( defined $self->{f_x_tick} )
-            {
+            if ( defined $self->{f_x_tick} )  {
 
                 # Is _default_f_tick function used?
                 if ( $self->{f_x_tick} == \&_default_f_tick )
@@ -529,6 +496,8 @@ sub _find_y_scale
             {
                 $labelText = sprintf( "%." . $precision . "f", $labelNum );
             }
+
+            $labelText = 0 if abs $labelText < (0.1 ** $precision);
 
             #print "labelText = $labelText\n";
             push @tickLabels, $labelText;
@@ -549,8 +518,7 @@ sub _find_y_scale
 
 ## @fn private _draw_data
 # finally get around to plotting the data for (horizontal) bars
-sub _draw_data
-{
+sub _draw_data {
     my $self      = shift;
     my $data      = $self->{'dataref'};
     my $misccolor = $self->_color_role_to_index('misc');
@@ -560,8 +528,7 @@ sub _draw_data
     my ( $i, $j, $color );
 
     # init the imagemap data field if they wanted it
-    if ( $self->true( $self->{'imagemap'} ) )
-    {
+    if ( $self->true( $self->{'imagemap'} ) ) {
         $self->{'imagemap_data'} = [];
     }
 
@@ -572,74 +539,56 @@ sub _draw_data
     $height = $self->{'curr_y_max'} - $self->{'curr_y_min'};
     $delta1 = $height / ( $self->{'num_datapoints'} > 0 ? $self->{'num_datapoints'} : 1 );
     $map    = $width / ( $self->{'max_val'} - $self->{'min_val'} );
-    if ( $self->true( $self->{'spaced_bars'} ) )
-    {
+    if ( $self->true( $self->{'spaced_bars'} ) ) {
         $delta2 = $delta1 / ( $self->{'num_datasets'} + 2 );
-    }
-    else
-    {
+    } else {
         $delta2 = $delta1 / $self->{'num_datasets'};
     }
 
     # get the base x-y values
     $y1 = $self->{'curr_y_max'} - $delta2;
-    if ( $self->{'min_val'} >= 0 )
-    {
+    if ( $self->{'min_val'} >= 0 ) {
         $x1  = $self->{'curr_x_min'};
         $mod = $self->{'min_val'};
-    }
-    elsif ( $self->{'max_val'} <= 0 )
-    {
+    } elsif ( $self->{'max_val'} <= 0 ){
         $x1  = $self->{'curr_x_max'};
         $mod = $self->{'max_val'};
-    }
-    else
-    {
+    } else {
         $x1  = $self->{'curr_x_min'} + abs( $map * $self->{'min_val'} );
         $mod = 0;
         $self->{'gd_obj'}->line( $x1, $self->{'curr_y_min'}, $x1, $self->{'curr_y_max'}, $misccolor );
     }
 
     # draw the bars
-    for $i ( 1 .. $self->{'num_datasets'} )
-    {
+    for $i ( 1 .. $self->{'num_datasets'} ) {
 
         # get the color for this dataset
         $color = $self->_color_role_to_index( 'dataset' . ( $i - 1 ) );
 
         # draw every bar for this dataset
-        for $j ( 0 .. $self->{'num_datapoints'} )
-        {
+        for $j ( 0 .. $self->{'num_datapoints'} ) {
 
             # don't try to draw anything if there's no data
-            if ( defined( $data->[$i][$j] ) )
-            {
+            if ( defined( $data->[$i][$j] ) ) {
 
                 # find the bounds of the rectangle
-                if ( $self->true( $self->{'spaced_bars'} ) )
-                {
+                if ( $self->true( $self->{'spaced_bars'} ) ) {
                     $y2 = $y1 - ( $j * $delta1 ) - ( $self->{'num_datasets'} * $delta2 ) + ( ( $i - 1 ) * $delta2 );
-                }
-                else
-                {
+                } else {
                     $y2 = $y1 - ( $j * $delta1 ) - ( $self->{'num_datasets'} * $delta2 ) + ( ($i) * $delta2 );
                 }
                 $x2 = $x1;
                 $y3 = $y2 + $delta2;
 
                 #cut the bars off, if needed
-                if ( $data->[$i][$j] > $self->{'max_val'} )
-                {
+                if ( $data->[$i][$j] > $self->{'max_val'} ) {
                     $x3 = $x1 + ( ( $self->{'max_val'} - $mod ) * $map ) - 1;
                     $cut = 1;
                 }
-                elsif ( $data->[$i][$j] < $self->{'min_val'} )
-                {
+                elsif ( $data->[$i][$j] < $self->{'min_val'} ) {
                     $x3 = $x1 + ( ( $self->{'min_val'} - $mod ) * $map ) + 1;
                     $cut = 1;
-                }
-                else
-                {
+                } else {
                     $x3 = $x1 + ( ( $data->[$i][$j] - $mod ) * $map );
                     $cut = 0;
                 }
@@ -647,45 +596,33 @@ sub _draw_data
                 # draw the bar
                 ## y2 and y3 are reversed in some cases because GD's fill
                 ## algorithm is lame
-                if ( $data->[$i][$j] < 0 )
-                {
+                if ( $data->[$i][$j] < 0 ) {
                     $self->{'gd_obj'}->filledRectangle( $x3, $y2, $x2, $y3, $color );
-                    if ( $self->true( $self->{'imagemap'} ) )
-                    {
+                    if ( $self->true( $self->{'imagemap'} ) ) {
                         $self->{'imagemap_data'}->[$i][$j] = [ $x3, $y2, $x2, $y3 ];
                     }
 
                     $self->{'gd_obj'}->filledRectangle( $x3, $y2, $x2, $y3, $color );
-                    if ( $self->true( $self->{'imagemap'} ) )
-                    {
+                    if ( $self->true( $self->{'imagemap'} ) ) {
                         $self->{'imagemap_data'}->[$i][$j] = [ $x3, $y2, $x2, $y3 ];
                     }
-                }
-                else
-                {
+                } else {
                     $self->{'gd_obj'}->filledRectangle( $x2, $y2, $x3, $y3, $color );
-                    if ( $self->true( $self->{'imagemap'} ) )
-                    {
+                    if ( $self->true( $self->{'imagemap'} ) ) {
                         $self->{'imagemap_data'}->[$i][$j] = [ $x2, $y2, $x3, $y3 ];
                     }
                 }
 
                 # now outline it. outline red if the bar had been cut off
-                unless ($cut)
-                {
+                unless ($cut) {
                     $self->{'gd_obj'}->rectangle( $x2, $y3, $x3, $y2, $misccolor );
-                }
-                else
-                {
+                } else {
                     $pink = $self->{'gd_obj'}->colorAllocate( 255, 0, 255 );
                     $self->{'gd_obj'}->rectangle( $x2, $y3, $x3, $y2, $pink );
                 }
 
-            }
-            else
-            {
-                if ( $self->true( $self->{'imagemap'} ) )
-                {
+            } else {
+                if ( $self->true( $self->{'imagemap'} ) ) {
                     $self->{'imagemap_data'}->[$i][$j] = [ undef(), undef(), undef(), undef() ];
                 }
             }
@@ -699,5 +636,4 @@ sub _draw_data
 
 }
 
-## be a good module and return 1
-1;
+1; # be a good module and return 1

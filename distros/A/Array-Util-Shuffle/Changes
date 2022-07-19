@@ -1,0 +1,23 @@
+0.004   2022-07-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename dist/module Array::{,Util::}Shuffle because Array::Shuffle is
+          an existing module on CPAN (by SALVA).
+
+
+0.003   2022-06-02  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Add Synopsis and Description.
+
+
+0.002   2022-05-22  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention sampling modules.
+
+
+0.001   2022-05-22  Released-By: PERLANCAR
+
+        - First release.

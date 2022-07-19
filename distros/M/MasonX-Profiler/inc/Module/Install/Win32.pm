@@ -1,43 +1,44 @@
-#line 1 "inc/Module/Install/Win32.pm - /usr/local/lib/perl5/site_perl/5.8.4/Module/Install/Win32.pm"
-# $File: //depot/cpan/Module-Install/lib/Module/Install/Win32.pm $ $Author: autrijus $
-# $Revision: #9 $ $Change: 1789 $ $DateTime: 2003/11/11 01:22:54 $ vim: expandtab shiftwidth=4
-
+#line 1
 package Module::Install::Win32;
-use Module::Install::Base; @ISA = qw(Module::Install::Base);
-
-$VERSION = '0.02';
 
 use strict;
+use Module::Install::Base ();
+
+use vars qw{$VERSION @ISA $ISCORE};
+BEGIN {
+	$VERSION = '1.19';
+	@ISA     = 'Module::Install::Base';
+	$ISCORE  = 1;
+}
 
 # determine if the user needs nmake, and download it if needed
 sub check_nmake {
-    my $self = shift;
-    $self->load('can_run');
-    $self->load('get_file');
+	my $self = shift;
+	$self->load('can_run');
+	$self->load('get_file');
 
-    require Config;
-    return unless (
-        $Config::Config{make}                   and
-        $Config::Config{make} =~ /^nmake\b/i    and
-        $^O eq 'MSWin32'                        and
-        !$self->can_run('nmake')
-    );
+	require Config;
+	return unless (
+		$^O eq 'MSWin32'                     and
+		$Config::Config{make}                and
+		$Config::Config{make} =~ /^nmake\b/i and
+		! $self->can_run('nmake')
+	);
 
-    print "The required 'nmake' executable not found, fetching it...\n";
+	print "The required 'nmake' executable not found, fetching it...\n";
 
-    require File::Basename;
-    my $rv = $self->get_file(
-        url         => 'http://download.microsoft.com/download/vc15/Patch/1.52/W95/EN-US/Nmake15.exe',
-        ftp_url     => 'ftp://ftp.microsoft.com/Softlib/MSLFILES/Nmake15.exe',
-        local_dir   => File::Basename::dirname($^X),
-        size        => 51928,
-        run         => 'Nmake15.exe /o > nul',
-        check_for   => 'Nmake.exe',
-        remove      => 1,
-    );
+	require File::Basename;
+	my $rv = $self->get_file(
+		url       => 'http://download.microsoft.com/download/vc15/Patch/1.52/W95/EN-US/Nmake15.exe',
+		ftp_url   => 'ftp://ftp.microsoft.com/Softlib/MSLFILES/Nmake15.exe',
+		local_dir => File::Basename::dirname($^X),
+		size      => 51928,
+		run       => 'Nmake15.exe /o > nul',
+		check_for => 'Nmake.exe',
+		remove    => 1,
+	);
 
-    if (!$rv) {
-        die << '.';
+	die <<'END_MESSAGE' unless $rv;
 
 -------------------------------------------------------------------------------
 
@@ -56,11 +57,8 @@ that directory, and run "Nmake15.exe" from there; that will create the
 You may then resume the installation process described in README.
 
 -------------------------------------------------------------------------------
-.
-    }
+END_MESSAGE
+
 }
 
 1;
-
-__END__
-

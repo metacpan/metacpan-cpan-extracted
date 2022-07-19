@@ -19,8 +19,8 @@ subtest "basic" => sub {
         my @values;
         push @values, <$iter>;
         push @values, <$iter>;
-        is( \@values, [ 10, 20 ], "values are correct" );
-        is( $iter->next, undef, "iterator exhausted" );
+        is( \@values,    [ 10, 20 ], "values are correct" );
+        is( $iter->next, undef,      "iterator exhausted" );
     };
 };
 
@@ -28,7 +28,7 @@ subtest "reset" => sub {
 
     {
         my $iter = igrep { $_ >= 10 } iterator { undef };
-        isa_ok( dies { $iter->reset }, [ 'Iterator::Flex::Failure::Unsupported' ], 'unsupported' );
+        isa_ok( dies { $iter->reset }, ['Iterator::Flex::Failure::Unsupported'], 'unsupported' );
     }
 
 
@@ -38,8 +38,8 @@ subtest "reset" => sub {
         my @values;
         push @values, <$iter>;
         push @values, <$iter>;
-        is( \@values, [ 10, 20 ], "values are correct" );
-        is( $iter->next, undef, "iterator exhausted" );
+        is( \@values,    [ 10, 20 ], "values are correct" );
+        is( $iter->next, undef,      "iterator exhausted" );
     };
 
     try_ok { $iter->reset } "reset";
@@ -48,8 +48,8 @@ subtest "reset" => sub {
         my @values;
         push @values, <$iter>;
         push @values, <$iter>;
-        is( \@values, [ 10, 20 ], "values are correct" );
-        is( $iter->next, undef, "iterator exhausted" );
+        is( \@values,    [ 10, 20 ], "values are correct" );
+        is( $iter->next, undef,      "iterator exhausted" );
     };
 
 };

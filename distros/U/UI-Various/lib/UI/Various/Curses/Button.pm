@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use UI::Various::core;
 use UI::Various::Button;
@@ -91,9 +91,10 @@ sub _prepare($$$)
 	error('_1_element_must_be_accompanied_by_parent', __PACKAGE__);
 	return 1;
     }
+    my $width = $self->_needed_width;
     $self->_cui($_->_cui
 		->add($self->_cid,
-		      'Buttonbox', -x => $column, -y => $row,
+		      'Buttonbox', -x => $column, -y => $row, -width => $width,
 		      -buttons =>
 		      [{-label => $self->text,
 			-onpress => sub {

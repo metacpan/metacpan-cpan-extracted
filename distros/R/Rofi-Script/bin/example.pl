@@ -2,23 +2,58 @@
 use strict;
 use warnings;
 
-# use lib './lib';
 use Rofi::Script;
 
-rofi
-  ->set_prompt("Please select one")
-  ->add_option("Show markup example")
-  if rofi->is_initial_call;
+exit 1 unless rofi;
+
+if (rofi->is_initial_call) {
+  rofi
+    ->set_message("Select a value below, or enter your own to see an error")
+    ->set_prompt("Please select one")
+    ->add_option("Show global options example")
+    ->add_option("Show row options example");
+}
 
 SWITCH: for (rofi->shift_arg) {
     next unless $_;
 
-    /markup/ && rofi
+    /Show global options example/ && do {
+      rofi
         ->set_prompt("markup")
-        ->set_message("This is a message")
         ->enable_markup_rows
-        ->add_option(qq{<i>You can use pango for markup</i>});
+        ->set_no_custom
+        ->set_message("This is a message row. It is set as global state. Also, you can't enter custom values now. That's a global state thing.")
+        ->add_option("<i>This row uses pango markup. Enabling markup is a global option.</i>")
+        ->add_option("This row is urgent. Marking a row as urgent is global state.", urgent => 1)
+        ->add_option("Another normal row")
+        ->add_option("You can have multiple urgent rows, just set the urgent flag on each row", urgent => 1);
+      next;
+    };
+
+    /Show row options example/ && do {
+      rofi
+        ->set_prompt("row options")
+        ->set_message('The first row is nonselectable. The second has invisible search terms. Type "foobar" and it will be selected')
+        ->add_option(
+          "This is nonselectable", (
+            nonselectable => 1,
+          ),
+        )
+        ->add_option(
+          "This has metadata" => (
+            meta => 'foobar'
+          ),
+        );
+      next;
+    };
+
+    /Exit/ && do {
+        exit 0;
+    };
+
+    rofi
+      ->set_message("Unsupported option $_")
+      ->add_option("Exit");
 }
 
-rofi->debug;
 rofi->show;

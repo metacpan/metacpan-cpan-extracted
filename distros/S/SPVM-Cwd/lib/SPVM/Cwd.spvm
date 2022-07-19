@@ -1,3 +1,6 @@
 class Cwd {
   native static method getcwd : string ();
+
+  native static method realpath : string ($file : string);
+  static method abs_path : string ($file :string) { return &realpath($file); }
 }

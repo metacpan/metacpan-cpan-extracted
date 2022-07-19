@@ -5,7 +5,7 @@ use warnings;
 package RDF::DOAP;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.104';
+our $VERSION   = '0.105';
 
 use Moose;
 extends 'RDF::DOAP::Resource';

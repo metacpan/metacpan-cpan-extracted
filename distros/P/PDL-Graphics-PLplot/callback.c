@@ -14,7 +14,7 @@ extern Core *PDL;
   static SV* label ## _subroutine; \
   void label ## _callback_set(SV* sv, char *errmsg) { \
     if (SvTRUE(sv) && (! SvROK(sv) || SvTYPE(SvRV(sv)) != SVt_PVCV)) \
-      croak(errmsg); \
+      croak("%s", errmsg); \
     label ## _subroutine = sv; \
   }
 
@@ -240,7 +240,8 @@ void labelfunc_callback(PLINT axis, PLFLT value, char *label_text, PLINT length,
     croak("labelfunc: must return one perl scalar");
 
   // Copy label into output string
-  snprintf( label_text, length, (char *)SvPV_nolen(ST(0)) );
+  strncpy( label_text, (char *)SvPV_nolen(ST(0)), length-1 );
+  label_text[length-1] = '\0';
 
   PUTBACK;
   FREETMPS;

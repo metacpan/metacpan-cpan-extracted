@@ -1,13 +1,15 @@
-Build.PL
 Changes
-lib/Test/File/Contents.pm
-MANIFEST			This list of files
+LICENSE
+MANIFEST
+META.json                                Module JSON meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+Makefile.PL
 README
+boilerplate.pl
+lib/Test/File/Contents.pm
 t/10.basic.t
 t/data/aaa.txt
 t/data/aaa2.txt
 t/data/bbb.txt
 t/data/utf8-2.txt
 t/data/utf8.txt
-META.yml
-META.json

@@ -1,6 +1,5 @@
-# $Id: 040-batch.t 2696 2007-10-04 18:17:24Z andy $
-use strict;
-use warnings;
+use strict; use warnings;
+
 use Test::More;
 use Parallel::Iterator qw( iterate_as_array );
 

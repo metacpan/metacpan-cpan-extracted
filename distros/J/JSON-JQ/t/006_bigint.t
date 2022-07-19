@@ -1,6 +1,6 @@
 # -*- perl -*-
 use Test::More tests => 4;
-use Test::Number::Delta;
+use Test::Number::Delta within => 1e-4;
 
 use strict;
 use warnings;

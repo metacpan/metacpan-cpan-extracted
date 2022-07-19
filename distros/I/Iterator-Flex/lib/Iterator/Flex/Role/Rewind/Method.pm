@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Rewind::Method;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Role::Tiny;
 
@@ -23,7 +23,7 @@ use namespace::clean;
 
 around rewind => sub {
     my $orig = shift;
-    my $self  = shift;
+    my $self = shift;
     $self->_apply_method_to_depends( 'rewind' );
 
     $self->$orig;
@@ -62,7 +62,7 @@ Iterator::Flex::Role::Rewind::Method - Implement C<rewind> as a method
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 METHODS
 
@@ -73,6 +73,8 @@ version 0.14
    $iterator->rewind;
 
 Rewind the iterator.
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

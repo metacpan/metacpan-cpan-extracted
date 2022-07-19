@@ -1,15 +1,14 @@
 package Iterator::Flex::Role::Wrap::Throw;
 
-# ABSTRACT: Role to add throw on exhaustion to an iterator which sets is_exhausted.
+# ABSTRACT: Role to add throw on exhaustion to an iterator which adapts another iterator
 
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
-use Iterator::Flex::Utils qw( :RegistryKeys INPUT_EXHAUSTION );
-use Scalar::Util;
-use Ref::Util qw( is_regexpref is_arrayref is_coderef );
+use Iterator::Flex::Utils qw( :RegistryKeys INPUT_EXHAUSTION PASSTHROUGH );
+use Ref::Util             qw( is_ref is_blessed_ref is_regexpref is_arrayref is_coderef );
 use Role::Tiny;
 use experimental 'signatures';
 
@@ -17,23 +16,43 @@ use namespace::clean;
 
 around _construct_next => sub ( $orig, $class, $ipar, $gpar ) {
 
-    my $next  = $class->$orig( $ipar, $gpar );
+    my $next = $class->$orig( $ipar, $gpar );
 
     my $exception = (
         $gpar->{ +INPUT_EXHAUSTION } // do {
             require Iterator::Flex::Failure;
             Iterator::Flex::Failure::parameter->throw(
                 "internal error: input exhaustion policy was not registered" );
-          }
+        }
     )->[1];
 
     my $wsub;
 
-    if ( is_arrayref( $exception ) ) {
+    if ( !defined $exception ) {
 
         $wsub = sub {
             my $self = $_[0] // $wsub;
-            my $val = eval { $next->( $self ) };
+            my $val  = eval { $next->( $self ) };
+            return $@ ne '' ? $self->signal_exhaustion( $@ ) : $val;
+        };
+    }
+
+    elsif ( !is_ref( $exception ) && $exception eq +PASSTHROUGH ) {
+
+        $wsub = sub {
+            my $self = $_[0] // $wsub;
+            my $val  = eval { $next->( $self ) };
+            return $@ ne '' ? $self->signal_exhaustion( $@ ) : $val;
+        };
+    }
+
+    elsif ( !is_ref( $exception ) || is_arrayref( $exception ) ) {
+        $exception = [$exception]
+          unless is_arrayref( $exception );
+
+        $wsub = sub {
+            my $self = $_[0] // $wsub;
+            my $val  = eval { $next->( $self ) };
             if ( $@ ne '' ) {
                 my $e = $@;
                 return $self->signal_exhaustion( $e )
@@ -48,7 +67,7 @@ around _construct_next => sub ( $orig, $class, $ipar, $gpar ) {
 
         $wsub = sub {
             my $self = $_[0] // $wsub;
-            my $val = eval { $next->( $self ) };
+            my $val  = eval { $next->( $self ) };
             if ( $@ ne '' ) {
                 my $e = $@;
                 return $self->signal_exhaustion( $e ) if $e =~ $exception;
@@ -62,7 +81,7 @@ around _construct_next => sub ( $orig, $class, $ipar, $gpar ) {
 
         $wsub = sub {
             my $self = $_[0] // $wsub;
-            my $val = eval { $next->( $self ) };
+            my $val  = eval { $next->( $self ) };
             if ( $@ ne '' ) {
                 my $e = $@;
                 return $self->signal_exhaustion( $e ) if $exception->( $e );
@@ -73,12 +92,12 @@ around _construct_next => sub ( $orig, $class, $ipar, $gpar ) {
     }
 
     else {
+        require Iterator::Flex::Failure;
+        require Scalar::Util;
+        Iterator::Flex::Failure::parameter->throw(
+            "internal error: unknown type for input exhaustion policy: ${ \Scalar::Util::reftype( $exception ) }"
+        );
 
-        $wsub = sub {
-            my $self = $_[0] // $wsub;
-            my $val = eval { $next->( $self ) };
-            return $@ ne '' ? $self->signal_exhaustion( $@ ) : $val;
-        };
     }
 
 
@@ -113,11 +132,13 @@ __END__
 
 =head1 NAME
 
-Iterator::Flex::Role::Wrap::Throw - Role to add throw on exhaustion to an iterator which sets is_exhausted.
+Iterator::Flex::Role::Wrap::Throw - Role to add throw on exhaustion to an iterator which adapts another iterator
 
 =head1 VERSION
 
-version 0.14
+version 0.15
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

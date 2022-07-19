@@ -28,7 +28,7 @@ sub drain {
 
     $ctx->release;
 
-    die $@ if $@
+    die $@ if $@;
 }
 
 1;

@@ -1,11 +1,11 @@
 
-# xy charts (plots) with points (dots)
+# xy charts with points (circles or other shapes)
 
 use v5.12;
 
 package Chart::Points;
 our @ISA     = qw(Chart::Base);
-our $VERSION = 'v2.403.2';
+our $VERSION = 'v2.403.5';
 
 use Carp;
 use GD;

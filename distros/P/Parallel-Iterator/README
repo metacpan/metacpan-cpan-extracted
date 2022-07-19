@@ -1,22 +1,37 @@
-Parallel-Iterator version 1.00
+Parallel::Iterator
+
+This module provides a 'parallel map'. Multiple worker processes are
+forked so that many instances of the transformation function may be
+executed simultaneously.
+
+For time consuming operations, particularly operations that spend most of
+their time waiting for I/O, this is a big performance win. It also
+provides a simple idiom to make effective use of multi CPU systems.
+
+There is, however, a considerable overhead associated with forking, so
+the example in the synopsis (doubling a list of numbers) is *not* a
+sensible use of this module.
 
 INSTALLATION
 
-To install this module, run the following commands:
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-    perl Makefile.PL
-    make
-    make test
-    make install
+  cpanm .
+  cpan  .
+  cpanp -i .
 
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
-DEPENDENCIES
+  perl Makefile.PL
+  make
+  make test
+  make install
 
-None.
+COPYRIGHT AND LICENSE
 
-COPYRIGHT AND LICENCE
+This software is copyright (c) 2007 by Andy Armstrong.
 
-Copyright (C) 2007, Andy Armstrong
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.

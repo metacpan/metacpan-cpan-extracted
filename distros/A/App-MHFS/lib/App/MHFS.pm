@@ -5402,14 +5402,18 @@ package MHFS::Plugin::GetVideo {
     use URI::Escape qw (uri_escape);
     use Devel::Peek qw(Dump);
     no warnings "portable";
-BEGIN {
     use Config;
-    die('Integers are too small!') if($Config{ivsize} < 8);
-}
+
     MHFS::Util->import();
 
     sub new {
         my ($class, $settings) = @_;
+
+        if($Config{ivsize} < 8) {
+            warn("Integers are too small!");
+            return undef;
+        }
+
         my $self =  {};
         bless $self, $class;
 
@@ -6948,7 +6952,7 @@ package MHFS::Plugin::VideoLibrary {
 }
 
 package App::MHFS; #Media Http File Server
-use version; our $VERSION = version->declare("v0.4.0");
+use version; our $VERSION = version->declare("v0.4.1");
 use strict; use warnings;
 use feature 'say';
 

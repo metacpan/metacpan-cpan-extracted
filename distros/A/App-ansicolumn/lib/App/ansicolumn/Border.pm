@@ -31,7 +31,8 @@ use utf8;
 use Data::Dumper;
 
 my %template = (
-    DEFAULT => {
+    DEFAULT => 'space',
+    space => {
 	top    => '',
 	left   => '',
 	center => '  ',
@@ -313,8 +314,9 @@ my %template = (
 
 use Clone qw(clone);
 
-for my $style (qw(line vbar box round_box shadow_box frame page_frame comb rake mesh mesh2
+for my $style (qw(line vbar box round_box shadow_box frame page_frame comb rake mesh
 		  dumbbell ribbon)) {
+    $template{$style} // next;
     my $new = $template{"heavy_$style"} = clone $template{$style};
     while (my($k, $v) = each %$new) {
 	for (ref $v ? @$v : $new->{$k}) {
@@ -325,6 +327,13 @@ for my $style (qw(line vbar box round_box shadow_box frame page_frame comb rake 
 
 sub heavy {
     $_[0] =~ tr[─│┌┐└┘├┤┬┴┼╴╵╶╷][━┃┏┓┗┛┣┫┳┻╋╸╹╺╻]r;
+}
+
+# handle alias styles
+for my $style (keys %template) {
+    while (not ref (my $alias = $template{$style})) {
+	($template{$style} = $template{$alias}) // last;
+    }
 }
 
 sub new {

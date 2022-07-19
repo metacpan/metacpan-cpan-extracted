@@ -6,7 +6,7 @@ use warnings;
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.014000';
+our $VERSION   = '1.016002';
 
 $VERSION =~ tr/_//d;
 
@@ -89,7 +89,8 @@ Evaluate: {
 		}
 		
 		if ( $node->{type} eq "slurpy" ) {
-			return +{ slurpy => _eval_type( $node->{of}, $reg ) };
+			require Types::Standard;
+			return Types::Standard::Slurpy()->of( _eval_type( $node->{of}, $reg ) );
 		}
 		
 		if ( $node->{type} eq "complement" ) {

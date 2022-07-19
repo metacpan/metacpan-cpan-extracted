@@ -6,6 +6,8 @@ BEGIN
 
 BEGIN
 {
+    use strict;
+    use warnings;
     use_ok( 'Cookie' );
     use_ok( 'Cookie::Domain' );
     use_ok( 'Cookie::Jar' );

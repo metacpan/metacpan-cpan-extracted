@@ -15,3 +15,15 @@ Revision history for builtins
 
     * Oops...initial release was missing indexed()
       It's now included.
+
+
+0.000004  Thu Jul 14 22:00:17 2022
+
+    * Removed unneeded PerlCritic tests
+      (thanks, William!)
+
+
+0.000005  Sat Jul 16 01:56:07 2022
+
+    * Automated detection of the current list of builtin:: functions
+      (so module will adapt automatically as new functions are added)

@@ -18,12 +18,13 @@ no_index:
     - t
     - xt
 requires:
+  Scalar::Util: '1.36'
   namespace::clean: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=builtin-compat
   license: http://dev.perl.org/licenses/
   repository: https://github.com/haarg/builtin-compat.git
-version: '0.001001'
+version: '0.001002'
 x_authority: cpan:HAARG
 x_breaks: {}
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

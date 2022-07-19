@@ -6,7 +6,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   Alien::Base::Wrapper: '1.97'
-  Alien::libFLAC: '0'
+  Alien::libFLAC: v0.2.0
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
@@ -19,10 +19,11 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
+requires:
+  perl: '5.020002'
 resources:
   bugtracker: https://github.com/G4Vi/MHFS/issues
   homepage: https://github.com/G4Vi/MHFS
   repository: https://github.com/G4Vi/MHFS.git
-version: v0.2.0
+version: v0.2.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

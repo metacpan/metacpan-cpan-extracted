@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.152';
+our $VERSION = '0.153';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -187,7 +187,7 @@ sub print_table {
         extra_w        => $^O eq 'MSWin32' || $^O eq 'cygwin' ? 0 : WIDTH_CURSOR,
         data_row_count => $data_row_count,
         info_row       => $info_row,
-        regex_number   => "^([^.EeIiNn]*)(\Q$self->{decimal_separator}\E[0-9]+)?\\z",
+        regex_number   => "^([^.EeNn]*)(\Q$self->{decimal_separator}\E[0-9]+)?\\z",
     };
     my $search = {
         filter => '',
@@ -239,11 +239,7 @@ sub print_table {
 
 sub __get_data {
     my ( $self, $tbl_orig, $const ) = @_;
-    my $term_w = get_term_width();
-    if ( ! defined $term_w ) { #
-        die "Term width not defined!";
-    }
-    $term_w += $const->{extra_w};
+    my $term_w = get_term_width() + $const->{extra_w};
     my $progress = Term::TablePrint::ProgressBar->new( {
         data_row_count => $const->{data_row_count},
         col_count => scalar @{$tbl_orig->[0]},
@@ -639,9 +635,9 @@ sub __cols_to_string {
                         $number = ( length $1 ? $1 : '' ) . $fract;
                     }
                     else {
-                        # scientific notation, NaN, Inf, Infinity
+                        # scientific notation, NaN, Inf, Infinity, '0 but true'
                         $number = $tbl_copy->[$row][$col] + 0;
-                        # $1 + 0: infinity -> Inf (else messed output)
+                        # + 0: infinity -> Inf (else possible messed output)
                     }
                 }
                 else {
@@ -905,7 +901,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.152
+Version 0.153
 
 =cut
 

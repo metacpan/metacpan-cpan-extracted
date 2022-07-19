@@ -4,17 +4,20 @@ use strict;
 use warnings;
 use Test::More;
 use File::Which;
+use File::Spec::Functions qw(catfile);
 
 BEGIN {
     use_ok( 'XML::Sig' );
 }
 
-open my $file, 't/unsigned/saml_request.xml' or die "no test saml request";
-my $xml;
-{
-    local undef $/;
-    $xml = <$file>;
+sub slurp_file {
+    my $name = shift;
+    open (my $fh, '<', $name) or die "Unable to open $name";
+    local $/ = undef;
+    return <$fh>;
 }
+
+my $xml = slurp_file('t/unsigned/saml_request.xml');
 
 # First test signing with an RSA key
 my $sig = XML::Sig->new({ x509 => 1, key => 't/rsa.private.key', cert => 't/rsa.cert.pem' });
@@ -57,26 +60,49 @@ SKIP: {
 }
 
 # Test that XML::Sig can verify a xmlsec1 DSA signed xml
-open $file, 't/signed/saml_request-xmlsec1-dsa-signed.xml' or die "no test saml_request-xmlsec1-dsa-signed.xml";
-my $xmlsec;
-{
-    local undef $/;
-    $xmlsec = <$file>;
-}
-
+$xml = slurp_file('t/signed/saml_request-xmlsec1-dsa-signed.xml');
 my $xmlsec1_dsasig = XML::Sig->new();
-my $xmlsec_ret = $xmlsec1_dsasig->verify($xmlsec);
+my $xmlsec_ret = $xmlsec1_dsasig->verify($xml);
 ok($xmlsec_ret, "xmlsec1: DSA Verifed Successfully");
 
 # Test that XML::Sig can verify a xmlsec1 RSA signed xml
-open $file, 't/signed/saml_request-xmlsec1-rsa-signed.xml' or die "no test saml_request-xmlsec1-rsa-signed.xml";
-{
-    local undef $/;
-    $xmlsec = <$file>;
-}
-
+$xml = slurp_file('t/signed/saml_request-xmlsec1-rsa-signed.xml');
 my $xmlsec1_rsasig = XML::Sig->new( {x509 => 1, cert => 't/rsa.cert.pem'} );
-$xmlsec_ret = $xmlsec1_rsasig->verify($xmlsec);
+$xmlsec_ret = $xmlsec1_rsasig->verify($xml);
 ok($xmlsec_ret, "xmlsec1: RSA Verifed Successfully");
+
+# SAML metadata
+my $md = slurp_file(catfile(qw(t unsigned saml_metadata.xml)));
+
+$sig = XML::Sig->new(
+    {
+        x509 => 1,
+        key  => 't/rsa.private.key',
+        cert => 't/rsa.cert.pem',
+        # The syntax is similar to xmlsec: --id-attr:ID urn:...:EntityDescriptor
+        ns   => { md => 'urn:oasis:names:tc:SAML:2.0:metadata' },
+        id_attr => '/md:EntityDescriptor[@ID]',
+    });
+
+my $signed = $sig->sign($md);
+
+$ret = $sig->verify($signed);
+
+ok($ret, "Verified SAML metadata signature");
+
+my $xp = XML::LibXML::XPathContext->new(
+    XML::LibXML->load_xml(string => $signed)
+);
+
+my %ns = (
+    md => 'urn:oasis:names:tc:SAML:2.0:metadata',
+    ds => 'http://www.w3.org/2000/09/xmldsig#'
+);
+$xp->registerNs($_, $ns{$_}) foreach keys %ns;
+
+my $nodes = $xp->findnodes('//ds:Signature');
+is($nodes->size, 1, "Found only one signature node");
+my $node = $nodes->get_node(1);
+is($node->nodePath, '/md:EntityDescriptor/dsig:Signature', ".. and on the correct node path");
 
 done_testing;

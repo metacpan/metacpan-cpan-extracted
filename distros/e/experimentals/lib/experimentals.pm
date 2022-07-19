@@ -1,5 +1,5 @@
 package experimentals;
-our $VERSION = '0.017';
+our $VERSION = '0.019';
 
 use 5.010;
 use strict;
@@ -40,10 +40,16 @@ sub import {
     # Always enable all available features...
     feature->import(keys %FEATURES);
 
+    # Turn on utf8 if the feature requires it...
+    if ($FEATURES{ extra_paired_delimiters }) {
+        require utf8;
+        utf8->import();
+    }
+
     # Are we reporting???
     my $reporting = grep { defined $_ && lc($_) eq '-report' } @_;
 
-    # If not reporting, disable all warnings avout experimental features...
+    # If not reporting, disable all warnings about experimental features...
     if (!$reporting) {
         warnings->unimport(keys %WARNINGS);
     }
@@ -81,7 +87,7 @@ experimentals - Experimental features made even easier
 
 =head1 VERSION
 
-This document describes experimentals version 0.017
+This document describes experimentals version 0.019
 
 
 =head1 SYNOPSIS
@@ -99,37 +105,43 @@ This document describes experimentals version 0.017
 C<use experimental> is a life-saver under modern Perls,
 but if you want to be truly modern Perl hacker you need something like:
 
-    use v5.22;
+    use v5.36;
     use experimental qw(
-            fc          postderef     current_sub
-            say         regex_sets    unicode_eval
-            state       array_base    postderef_qq
-            switch      smartmatch    lexical_subs
-            bitwise     signatures    lexical_topic
-            evalbytes   refaliasing   unicode_strings
-            autoderef
+            fc        bitwise       current_sub
+            say       indirect      unicode_eval
+            try       evalbytes     postderef_qq
+            isa       array_base    declared_refs
+            state     smartmatch    unicode_strings
+            defer     signatures    multidimensional
+            switch    refaliasing   extra_paired_delimiters
     );
 
-which is uncomfortably verbose.
+...which is uncomfortably verbose.
 
 This module reduces that to:
 
-    use v5.22;
+    use v5.36;
     use experimentals;
 
 
 =head1 INTERFACE
 
 You load the module and it enables all the Perl 5.10+ features that are
-available under whatever version of Perl you are using. It also silences
-the I<"...is experimental"> warnings on those features that are still
-considered experimental (as listed in L<perlexperiment>)
+available under whatever version of Perl you are using.
+
+At the same time, the module silences the I<"...is experimental"> warnings
+on those features that are still considered experimental
+(as listed in L<perlexperiment>).
+
+The module also turns on the C<utf8> pragma in your code if any feature
+you're activating requires that I<(e.g. the 'extra_paired_delimiters' feature
+that was introduced in Perl 5.36)>.
 
 If you specify:
 
     no experimentals;
 
-then all "experimental" features are disabled (i.e. their warnings are
+...then all "experimental" features are disabled (i.e. their warnings are
 re-enabled). However, non-experimental features (such as C<say>, C<state>,
 or C<__SUB__>) are unaffected by C<no experimentals>.
 
@@ -143,7 +155,7 @@ So you can turn on every modern feature, except one or two you don't
 trust, like so:
 
     use experimentals;
-    no experimental 'lexical_topic', 'smartmatch', 'array_base';
+    no experimental 'smartmatch', 'array_base';
 
 Likewise, in some inner scope you can lexically disable all experimental features, except
 the few you actually need, with:

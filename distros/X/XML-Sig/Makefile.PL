@@ -39,11 +39,12 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Crypt::OpenSSL::Guess" => 0,
+    "File::Spec::Functions" => 0,
     "File::Which" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.57",
+  "VERSION" => "0.58",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -63,6 +64,7 @@ my %FallbackPrereqs = (
   "CryptX" => "0.036",
   "Digest::SHA" => 0,
   "Encode" => 0,
+  "File::Spec::Functions" => 0,
   "File::Which" => 0,
   "MIME::Base64" => 0,
   "Test::Exception" => 0,

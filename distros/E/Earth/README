@@ -1,14 +1,14 @@
 NAME
 
-    Earth - FP Library
+    Earth - FP Framework
 
 ABSTRACT
 
-    FP Standard Library for Perl 5
+    FP Framework for Perl 5
 
 VERSION
 
-    0.01
+    0.03
 
 SYNOPSIS
 
@@ -16,30 +16,68 @@ SYNOPSIS
     
       use Earth;
     
-      wrap 'Venus::String', 'String';
+      wrap 'Digest::SHA', 'SHA';
     
-      # call(String, 'function', @args);
+      call(SHA(), 'sha1_hex');
     
-      true;
+      # "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 
 DESCRIPTION
 
-    Earth is a functional-programming framework with standard library for
-    Perl 5, built on top of Venus which provides the underlying
-    object-oriented standard library. Perl is a multi-paradigm programming
-    language that also supports functional programming, but, Perl has an
-    intentionally limited standard library with an emphasis on providing
-    library support via the CPAN which is overwhelmingly object-oriented.
-    This makes developing in a functional style difficult as you'll
-    eventually need to rely on a CPAN library that requires you to switch
-    over to object-oriented programming.Earth facilitates functional
-    programming for Perl 5 by providing keyword functions which enable
-    indirect routine dispatching, allowing the execution of both functional
-    and object-oriented code.
+    Earth is a functional-programming framework for Perl 5. Perl is a
+    multi-paradigm programming language that also supports functional
+    programming, but, Perl has an intentionally limited standard library
+    with an emphasis on providing library support via the CPAN which is
+    overwhelmingly object-oriented. This makes developing in a functional
+    style difficult as you'll eventually need to rely on a CPAN library
+    that requires you to switch over to object-oriented programming. Earth
+    facilitates functional programming for Perl 5 by providing functions
+    which enable indirect routine dispatching, allowing the execution of
+    both functional and object-oriented code.
 
 FUNCTIONS
 
     This package provides the following functions:
+
+ args
+
+      args(Any @args) (HashRef)
+
+    The args function takes a list of arguments and returns a hashref.
+
+    Since 0.04
+
+    args example 1
+
+        # given: synopsis
+      
+        args(content => 'example');
+      
+        # {content => "example"}
+
+    args example 2
+
+        # given: synopsis
+      
+        args({content => 'example'});
+      
+        # {content => "example"}
+
+    args example 3
+
+        # given: synopsis
+      
+        args('content');
+      
+        # {content => undef}
+
+    args example 4
+
+        # given: synopsis
+      
+        args('content', 'example', 'algorithm');
+      
+        # {content => "example", algorithm => undef}
 
  call
 
@@ -54,65 +92,52 @@ FUNCTIONS
 
         # given: synopsis
       
-        my $string = call(String('hello'), 'titlecase');
+        call(SHA, 'sha1_hex');
       
-        # "Hello"
+        # "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 
     call example 2
 
         # given: synopsis
       
-        my $default = call(String('hello'), 'default');
+        call('Digest::SHA', 'sha1_hex');
       
-        # ""
+        # "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 
     call example 3
 
         # given: synopsis
       
-        my $space = call(String('hello'), 'space');
+        call(\SHA, 'new');
       
-        # bless( {value => "Venus::String"}, 'Venus::Space' )
+        # bless(do{\(my $o = '...')}, 'Digest::SHA')
 
- catch
+    call example 4
 
-      catch(CodeRef $block) (Error, Any)
-
-    The catch function executes the code block trapping errors and
-    returning the caught exception in scalar context, and also returning
-    the result as a second argument in list context.
-
-    Since 0.01
-
-    catch example 1
-
-        package main;
+        # given: synopsis
       
-        use Earth;
+        wrap 'Digest';
       
-        my $error = catch {die};
+        call(Digest('SHA'), 'reset');
       
-        $error; # 'Died at ...'
+        # "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 
-    catch example 2
+ can
 
-        package main;
-      
-        use Earth;
-      
-        my ($error, $result) = catch {error};
-      
-        $error; # Venus::Error
+      can(Str | Object | CodeRef $self, Str $name) (CodeRef)
 
-    catch example 3
+    The can function checks if the object or class has a routine matching
+    the name provided, and if so returns a coderef for that routine.
 
-        package main;
+    Since 0.02
+
+    can example 1
+
+        # given: synopsis
       
-        use Earth;
+        my $coderef = can(SHA(1), 'sha1_hex');
       
-        my ($error, $result) = catch {true};
-      
-        $result; # 1
+        # sub { ... }
 
  chain
 
@@ -127,56 +152,61 @@ FUNCTIONS
 
         # given: synopsis
       
-        my $string = chain(String('hello world'), ['replace', 'world', 'cosmos'], 'get');
+        my $hex = chain(\SHA, 'new', 'sha1_hex');
       
-        # "hello cosmos"
+        # "d3aed913fdc7f277dddcbde47d50a8b5259cb4bc"
 
     chain example 2
 
         # given: synopsis
       
-        my $string = chain(String('hELLO  World'), 'box', 'lowercase', 'kebabcase', 'unbox');
+        my $hex = chain(\SHA, 'new', ['add', 'hello'], 'sha1_hex');
       
-        # "hello-world"
+        # "f47b0cd4b6336d07ab117d7ee3f47566c9799f23"
 
     chain example 3
 
         # given: synopsis
       
-        my $string = chain(String('hello'), 'space', 'inherits');
+        wrap 'Digest';
       
-        # ["Venus::Kind::Value"]
+        my $hex = chain(Digest('SHA'), ['add', 'hello'], 'sha1_hex');
+      
+        # "8575ce82b266fdb5bc98eb43488c3b420577c24c"
 
  error
 
-      error(Maybe[HashRef] $args) (Error)
+      error(Str $message, Int $offset, Int $limit) (Any)
 
-    The error function throws a Venus::Error exception object using the
-    exception object arguments provided.
+    The error function dies with the error message provided and prints a
+    stacktrace. If $limit or $offset are provided, those options will
+    constrain the output of the stacktrace.
 
-    Since 0.01
+    Since 0.04
 
     error example 1
 
-        package main;
+        # given: synopsis
       
-        use Earth;
+        error;
       
-        my $error = error;
-      
-        # bless( {...}, 'Venus::Error' )
+        # "Exception!"
 
     error example 2
 
-        package main;
+        # given: synopsis
       
-        use Earth;
+        error('Exception!');
       
-        my $error = error {
-          message => 'Something failed!',
-        };
+        # "Exception!"
+
+    error example 3
+
+        # given: synopsis
       
-        # bless( {...}, 'Venus::Error' )
+        error('Exception!', 0, 1);
+      
+        # "Exception!"
 
  false
 
@@ -212,8 +242,8 @@ FUNCTIONS
 
       make(Str $package, Any @args) (Any)
 
-    The make function "call" in "calls" the new routine on the invocant and
-    returns the result which should be a package string or an object.
+    The make function "calls" the new routine on the invocant and returns
+    the result which should be a package string or an object.
 
     Since 0.01
 
@@ -221,59 +251,67 @@ FUNCTIONS
 
         # given: synopsis
       
-        my $string = make('Venus::String');
+        my $string = make(SHA);
       
-        # bless( {value => ""}, 'Venus::String' )
+        # bless(do{\(my $o = '...')}, 'Digest::SHA')
 
     make example 2
 
         # given: synopsis
       
-        my $string = make('Venus::String', 'hello world');
+        my $string = make(Digest, 'SHA');
       
-        # bless( {value => "hello world"}, 'Venus::String' )
+        # bless(do{\(my $o = '...')}, 'Digest::SHA')
 
- raise
+ roll
 
-      raise(Str $class | Tuple[Str, Str] $class, Maybe[HashRef] $args) (Error)
+      roll(Str $name, Any @args) (Any)
 
-    The raise function generates and throws a named exception object
-    derived from Venus::Error, or provided base class, using the exception
-    object arguments provided.
+    The roll function takes a list of arguments, assuming the first
+    argument is invokable, and reorders the list such that the routine name
+    provided comes after the invocant (i.e. the 1st argument), creating a
+    list acceptable to the "call" function.
 
-    Since 0.01
+    Since 0.02
 
-    raise example 1
-
-        package main;
-      
-        use Earth;
-      
-        my $error = raise 'MyApp::Error';
-      
-        # bless( {...}, 'Venus::Error' )
-
-    raise example 2
+    roll example 1
 
         package main;
       
         use Earth;
       
-        my $error = raise ['MyApp::Error', 'Venus::Error'];
+        my @list = roll('sha1_hex', SHA);
       
-        # bless( {...}, 'Venus::Error' )
+        # ("Digest::SHA", "sha1_hex")
 
-    raise example 3
+    roll example 2
 
         package main;
       
         use Earth;
       
-        my $error = raise ['MyApp::Error', 'Venus::Error'], {
-          message => 'Something failed!',
-        };
+        my @list = roll('sha1_hex', call(SHA(1), 'reset'));
       
-        # bless( {...}, 'Venus::Error' )
+        # (bless(do{\(my $o = '...')}, 'Digest::SHA'), "sha1_hex")
+
+ then
+
+      then(Str | Object | CodeRef $self, Any @args) (Any)
+
+    The then function proxies the call request to the "call" function and
+    returns the result as a list, prepended with the invocant.
+
+    Since 0.02
+
+    then example 1
+
+        package main;
+      
+        use Earth;
+      
+        my @list = then(SHA, 'sha1_hex');
+      
+        # ("Digest::SHA", "da39a3ee5e6b4b0d3255bfef95601890afd80709")
 
  true
 
@@ -322,51 +360,41 @@ FUNCTIONS
 
         # given: synopsis
       
-        my $coderef = wrap('Venus::Space');
+        my $coderef = wrap('Digest::SHA');
       
-        # my $space = VenusSpace();
+        # my $digest = DigestSHA();
       
-        # "Venus::Space"
+        # "Digest::SHA"
 
     wrap example 2
 
         # given: synopsis
       
-        my $coderef = wrap('Venus::Space');
+        my $coderef = wrap('Digest::SHA');
       
-        # my $space = VenusSpace({});
+        # my $digest = DigestSHA(1);
       
-        # bless( {value => "Venus"}, 'Venus::Space' )
+        # bless(do{\(my $o = '...')}, 'Digest::SHA')
 
     wrap example 3
 
         # given: synopsis
       
-        my $coderef = wrap('Venus::Space', 'Space');
+        my $coderef = wrap('Digest::SHA', 'SHA');
       
-        # my $space = Space();
+        # my $digest = SHA;
       
-        # "Venus::String"
+        # "Digest::SHA"
 
     wrap example 4
 
         # given: synopsis
       
-        my $coderef = wrap('Venus::Space', 'Space');
+        my $coderef = wrap('Digest::SHA', 'SHA');
       
-        # my $space = Space({});
+        # my $digest = SHA(1);
       
-        # bless( {value => "Venus"}, 'Venus::Space' )
-
-    wrap example 5
-
-        # given: synopsis
-      
-        my $coderef = wrap('Venus::Space', 'Space');
-      
-        # my $space = Space('Earth');
-      
-        # bless( {value => "Earth"}, 'Venus::Space' )
+        # bless(do{\(my $o = '...')}, 'Digest::SHA')
 
 AUTHORS
 

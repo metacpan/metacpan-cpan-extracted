@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental 'signatures', 'postderef';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Scalar::Util;
 use List::Util;
@@ -54,7 +54,7 @@ sub new ( $class, @args ) {
     my $pars = Ref::Util::is_hashref( $args[-1] ) ? pop @args : {};
 
     $class->_throw( parameter => "incorrect number of arguments for sequence" )
-      if @args < 1 || @args > 3 ;
+      if @args < 1 || @args > 3;
 
     my %state;
     $state{step}  = pop @args if @args == 3;
@@ -84,19 +84,17 @@ sub construct ( $class, $state ) {
         $next  = $begin unless defined $next;
 
         %params = (
-            (+NEXT) => sub {
+            ( +NEXT ) => sub {
                 if ( $next > $end ) {
-                    if ( !$self->is_exhausted ) {
-                        $prev    = $current;
-                        $current = $self->signal_exhaustion;
-                    }
-                    return $current;
+                    $prev = $current
+                      unless $self->is_exhausted;
+                    return $current = $self->signal_exhaustion;
                 }
                 $prev    = $current;
                 $current = $next++;
                 return $current;
             },
-            (+FREEZE) => sub {
+            ( +FREEZE ) => sub {
                 [
                     $class,
                     {
@@ -114,15 +112,14 @@ sub construct ( $class, $state ) {
     else {
 
         $class->_throw(
-            "sequence will be inifinite as \$step is zero or has the incorrect sign"
-          )
+            parameter => "sequence will be inifinite as \$step is zero or has the incorrect sign" )
           if ( $begin < $end && $step <= 0 ) || ( $begin > $end && $step >= 0 );
 
         $next = $begin unless defined $next;
         $iter = 0      unless defined $iter;
 
         %params = (
-            (+FREEZE) => sub {
+            ( +FREEZE ) => sub {
                 [
                     $class,
                     {
@@ -136,15 +133,12 @@ sub construct ( $class, $state ) {
                     } ]
             },
 
-            (+NEXT) => $begin < $end
+            ( +NEXT ) => $begin < $end
             ? sub {
                 if ( $next > $end ) {
-                    if ( !$self->is_exhausted ) {
-                        $prev    = $current;
-                        $current = undef;
-                        $self->set_exhausted;
-                    }
-                    return undef;
+                    $prev = $current
+                      unless $self->is_exhausted;
+                    return $current = $self->signal_exhaustion;
                 }
                 $prev    = $current;
                 $current = $next;
@@ -153,12 +147,9 @@ sub construct ( $class, $state ) {
             }
             : sub {
                 if ( $next < $end ) {
-                    if ( !$self->is_exhausted ) {
-                        $prev    = $current;
-                        $current = undef;
-                        $self->set_exhausted;
-                    }
-                    return undef;
+                    $prev = $current
+                      unless $self->is_exhausted;
+                    return $current = $self->signal_exhaustion;
                 }
                 $prev    = $current;
                 $current = $next;
@@ -170,21 +161,21 @@ sub construct ( $class, $state ) {
 
     return {
         %params,
-        (+CURRENT) => sub { $current },
-        (+PREV)    => sub { $prev },
-        (+REWIND)  => sub {
+        ( +CURRENT ) => sub { $current },
+        ( +PREV )    => sub { $prev },
+        ( +REWIND )  => sub {
             $next = $begin;
             $iter = 0;
         },
-        (+RESET) => sub {
+        ( +RESET ) => sub {
             $prev = $current = undef;
             $next = $begin;
             $iter = 0;
         },
 
-        (+_SELF) => \$self,
+        ( +_SELF ) => \$self,
 
-        (+STATE) => \$iterator_state,
+        ( +STATE ) => \$iterator_state,
     };
 
 }
@@ -223,7 +214,7 @@ Iterator::Flex::Sequence - Numeric Sequence Iterator Class
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 METHODS
 
@@ -256,6 +247,8 @@ The iterator supports the following capabilities:
 =item freeze
 
 =back
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

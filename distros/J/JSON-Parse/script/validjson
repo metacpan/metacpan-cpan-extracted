@@ -1,8 +1,8 @@
 #!/home/ben/software/install/bin/perl
 use warnings;
 use strict;
-use lib '/home/ben/projects/Json3/blib/lib';
-use lib '/home/ben/projects/Json3/blib/arch';
+use lib '/home/ben/projects/json-parse/blib/lib';
+use lib '/home/ben/projects/json-parse/blib/arch';
 use JSON::Parse 'assert_valid_json';
 use Getopt::Long;
 my $ok = GetOptions (

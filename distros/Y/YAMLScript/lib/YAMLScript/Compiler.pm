@@ -1,5 +1,5 @@
 package YAMLScript::Compiler;
-use Mo qw'default xxx';
+use Mo qw(default xxx);
 
 has yaml => ();
 has from => ();
@@ -11,6 +11,7 @@ use YAMLScript::NS;
 use YAMLScript::Expr;
 use YAMLScript::Func;
 use YAMLScript::Str;
+use YAMLScript::Util;
 
 use YAML::PP;
 use YAML::PP::Schema;
@@ -22,15 +23,15 @@ BEGIN {
     my $load_scalar = \&YAML::PP::Schema::load_scalar;
     no warnings 'redefine';
     *YAML::PP::Schema::create_mapping = sub {
-        $_[2]->{tag} //= '-';
+        $_[2]->{tag} //= '!';
         goto $create_mapping;
     };
     *YAML::PP::Schema::create_sequence = sub {
-        $_[2]->{tag} //= '-';
+        $_[2]->{tag} //= '!';
         goto $create_sequence;
     };
     *YAML::PP::Schema::load_scalar = sub {
-        $_[2]->{tag} //= '-'
+        $_[2]->{tag} //= '!'
             if $_[2]->{style} == 1;
         goto $load_scalar;
     };
@@ -38,19 +39,14 @@ BEGIN {
 
 # Regex patterns for YAMLScript DSL syntax:
 my $lc = qr/(?:[a-z])/;             # lower case
-my $dg = qw/(?:[0-9])/;             # digit
+my $dg = qr/(?:[0-9])/;             # digit
 my $an = qr/(?:[a-z0-9])/;          # alphanum
 my $sp = qr/(?:[-])/;               # separator
 my $p1 = qr/(?:$lc$an*)/;           # part 1 of identifier
 my $pt = qr/(?:$an+)/;              # other part of identifier
-my $id = qr/(?:$p1(?:$sp$pt)*)/;    # identifier
+my $id = qr/(?:_|$p1(?:$sp$pt)*)/;  # identifier
 
 my $punc = qr/(?:[\-\+\*\/\.\=\<\>\:])/;
-my $ops = {
-    '..' => 'range',
-    '+' => 'add',
-    '-' => 'sub',
-};
 
 my $key_defn = qr/^($id)\((.*)\)$/;
 my %exprs = (
@@ -82,7 +78,7 @@ sub compile {
 
     # Make a new NS (namespace) object:
     my $ns = YAMLScript::NS->new(
-        need => ['YS-Core'],
+        NEED => ['YS-Core'],
     );
 
     while (my ($key, $val) = each %$code) {
@@ -90,7 +86,7 @@ sub compile {
             $val = [ $val ] unless ref($val) eq 'ARRAY';
             unshift @$val, 'YS-Core' unless
                 grep {$_ eq 'YS-Core'} @$val;
-            $ns->need($val);
+            $ns->NEED($val);
         }
         else {
             $key =~ $key_defn or
@@ -103,9 +99,20 @@ sub compile {
                 sign => $sign,
                 body => $val,
             );
-            $ns->vars->{$name} = $func;
+            my $arity = @$sign;
+            my $full = "${name}__$arity";
+
+            $ns->{$full} = sub {
+                YAMLScript::Call->new(
+                    ____ => $full,
+                    code => $func,
+                    args => $_[0],
+                ),
+            };
         }
     }
+
+    $ns->init;
 
     # Return the NS object:
     return $ns;
@@ -141,9 +148,9 @@ sub configure {
                 my ($key, $val) = @$data;
                 if (ref($key) eq 'YAMLScript::Str') {
                     $key = $$key;
-                    $val = delete $hash->{$key} or die;
+                    $val = delete $hash->{$key};
                     # YAMLScript 'def' (assignment)
-                    if ($key =~ /^([-\w]+)\s*=$/) {
+                    if ($key =~ /^($id)\s*=$/) {
                         $hash->{____} = 'def';
                         $hash->{args} = [$1, $val];
                     }
@@ -176,7 +183,7 @@ sub configure {
         tag => qr/^/,
         on_create => sub {
             my $tag = $_[1]->{tag};
-            if ($tag eq '-') {
+            if ($tag eq '!') {
                 return [];
             }
             else {
@@ -215,7 +222,7 @@ sub configure {
 
     my $re_num = qr/^-?\d+$/;
     $schema->add_resolver(
-        tag => '-',
+        tag => '!',
         match => [
             all => sub {
                 my ($constructor, $event) = @_;

@@ -42,7 +42,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use UI::Various::core;
 use UI::Various::widget;
@@ -328,6 +328,44 @@ sub remove($$)
     # call UI-specific implementation, if applicable:
     if ($self->can('_remove'))
     {   $self->_remove($index);   }
+}
+
+#########################################################################
+
+=head2 B<replace> - replace all elements
+
+    $listbox->replace(@new_elements);
+
+=head3 example:
+
+    $self->replace('one new entry', 'another new entry');
+
+=head3 parameters:
+
+    $text               list of texts to replace original entries
+
+=head3 description:
+
+This method replaces all elements in the listbox and removes all selections.
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+sub replace($@)
+{
+    my $self = shift;
+
+    # sanity checks:
+    $self->isa(__PACKAGE__)
+	or  fatal('invalid_object__1_in_call_to__2__3',
+		  ref($self), __PACKAGE__, 'replace');
+    my @new_entries = @_;	# create a copy!
+    $self->{texts} = \@new_entries;
+    $self->{_selected} = [ (' ') x scalar(@new_entries) ];
+    $self->{first} = 0 < @{$self->{texts}} ? 0 : -1;
+    # call UI-specific implementation, if applicable:
+    if ($self->can('_replace'))
+    {   $self->_replace(@_);   }
 }
 
 #########################################################################

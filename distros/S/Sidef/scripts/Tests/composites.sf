@@ -1,0 +1,120 @@
+#!/usr/bin/ruby
+
+# Tests for composite-related methods.
+
+do {
+    var p = (2**127 - 1)
+
+    for k in (-100 .. 100) {
+        var t = next_composite(p+k)
+        assert(t.is_composite)
+    }
+}
+
+do {
+    var p = 4171
+
+    for k in (-100 .. 100) {
+        var t = next_composite(p+k)
+        assert(t.is_composite)
+    }
+}
+
+do {
+    var n = 0
+    var arr = []
+    20.of {
+        arr << (n = next_composite(n))
+    }
+    assert_eq(arr, {.is_composite}.first(20))
+}
+
+assert_eq(
+    1..composite_count(100) -> map{.composite},
+    1..100 -> grep { .is_composite }
+)
+
+with (123456789) {|n|
+    assert_eq(composite_count(composite(n)), n)
+    assert_eq(composite(composite_count(n)), n)
+
+    assert_eq(composite_count(composite(n.flip)), n.flip)
+    assert_eq(composite(composite_count(n.flip)), n.flip)
+}
+
+assert_eq(composite_count(1, 100), composite_count(100))
+assert_eq(composite_count(0, 100), 74)
+assert_eq(composite_count(0, 101), 74)
+assert_eq(composite_count(3, 100), 74)
+assert_eq(composite_count(4, 100), 74)
+assert_eq(composite_count(4, 101), 74)
+assert_eq(composite_count(5, 100), 73)
+assert_eq(composite_count(6, 100), 73)
+assert_eq(composite_count(6, 101), 73)
+assert_eq(composite_count(7, 101), 72)
+
+assert_eq(composite_count(123, 1234), 123..1234 -> count { .is_composite })
+assert_eq(composite_count(1234, 12345), 1234..12345 -> count { .is_composite })
+
+assert_eq(n_composites(10),    [4, 6, 8, 9, 10, 12, 14, 15, 16, 18])
+assert_eq(n_composites(5, 50), [50, 51, 52, 54, 55])
+assert_eq(n_composites(5, 53), [54, 55, 56, 57, 58])
+
+do {
+    var ranges = [
+
+        [1, 10],
+        [2, 10],
+        [3, 10],
+        [4, 10],
+        [5, 10],
+
+        [2**128, 2**128 + 100],
+        [2**64 - 10, 2**64 + 10],
+        [2**64 - 10, 2**64 - 1],
+        [2**32 - 10, 2**32 + 10],
+        [2**32 - 10, 2**32 - 1],
+    ]
+
+    for from, to in (ranges) {
+
+        var C = composites(from, to)
+
+        assert_eq(
+            from..to -> grep { .is_composite },
+            C
+        )
+
+        assert_eq(
+            composites(from..to)
+            C
+        )
+
+        assert_eq(
+            gather { each_composite(from, to, { take(_) }) },
+            C
+        )
+
+        assert_eq(
+            Math.seq(next_composite(from-1), { .tail.next_composite }).while { _ <= to },
+            C
+        )
+    }
+}
+
+assert_eq(
+    1..100 `by` 2 -> composites.to_a,
+    composites(1, 100).grep { .is_odd }
+)
+
+for n in (1..8) {
+    for k in (2..15 -> map{|b| b**n }) {
+        var t = nth_composite(k)
+        assert(t.is_composite)
+        assert_eq(t.composite_count, k)
+    }
+}
+
+assert_eq(3000.of{.nth_composite}.ft(1), 3000.dec.by{.is_composite})
+
+say "** Test passed!"

@@ -262,6 +262,10 @@ We will write example YAMLScript programs for each of these use cases, in time.
 
 =over
 
+=item * Implement most of the core libraries with YAMLScript
+
+=item * Programatically port many functions from clojure/core source code
+
 =item * Write an implementation spec for YAMLScript
 
 =item * Port YAMLScript to many languages
@@ -290,7 +294,19 @@ We will write example YAMLScript programs for each of these use cases, in time.
 
 This is very ALPHA software.
 
-Some of the features documented here are not yet implemented.
+Some of the features documented here are not yet implemented:
+
+=over
+
+=item * YAMLScript REPL
+
+=item * Python Port (Very soon)
+
+=item * JavaScript Port (after Python)
+
+=item * Some functions abaove
+
+=back
 
 Everything in the test files definitely works. :)
 

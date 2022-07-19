@@ -13,7 +13,7 @@ Iterator::Flex::Manual::Overview - An Abstract overview of Iterators
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 DESCRIPTION
 
@@ -265,8 +265,9 @@ Throwing an exception of type C<Iterator::Flex::Failure::Error>.
 
 =head2 Capabilities
 
-C<Iterator::Flex> iterators have a single required capability, L</next>, as well as a number
-of optional capabilities.
+Iterators are capable of performing at least one task, namely retrieving the next datum in the
+data stream, but may be capable of others as well.  These capabilities are invoked as methods
+with the name of the capability, e.g. C<< $iter->next >>, C<< $iter->prev >>, etc.
 
 =head3 Required Capabilities
 
@@ -410,7 +411,7 @@ L</freeze>.  Given a serialized iterator, it reconstitute it so that
 it behaves exactly as it would before it was frozen.  Under the hood
 it calls the C<thaw> method.
 
-=head2 Iterator Parameters
+=head2 Generator Parameters
 
 Parameters are passed to iterator and attribute generators, either
 through the convenience functions in L<Iterator::Flex::Common>, the
@@ -419,7 +420,7 @@ bespoke iterator classes which subclass L<Iterator::Flex::Base>.
 
 =head3 Classes of Parameters
 
-There are three classes of parameters used by iterators and adapters:
+There are several classes of parameters used by iterators and adapters:
 
 =over
 
@@ -436,11 +437,15 @@ iterator provides.
 
 =item *
 
-I<Signal> parameters define how the iterator signals exhaustion or error.
+I<Exhaustion> parameters define how the iterator signals exhaustion.
+
+=item *
+
+I<Error> parameters define how the iterator signals error.
 
 =back
 
-Signal and Interface parameters are also called I<General Parameters>.
+Exhaustion, Error, and Interface parameters are also called I<General Parameters>.
 
 =head3 Interface Parameters
 
@@ -487,7 +492,7 @@ L<Iterator::Flex::Base>.
 
 A code reference which returns the next element in the data source.
 This will be made available as the object method C<next>, but
-may also be invoked directly as a subroutine (e.g. C<$next->()> ).
+may also be invoked directly as a subroutine (e.g. C<< $next->() >>).
 
 Access to the iterator object can be obtained by either:
 
@@ -602,24 +607,68 @@ constructors.  Bespoke classes must provide this explicitly.
 
 =back
 
-=head3 Signal Exhaustion
+=head3 Exhaustion
+
+There are two parameters that specify how exhaustion is signalled:
 
 =over
 
 =item C<input_exhaustion>
 
-This applies only to iterator adapters, and indicates how the consumed iterator signals exhaustion.
-It may have one of the following values:
+This applies only to iterator adapters, and indicates how the consumed
+iterator signals exhaustion.  It can take the following values:
 
 =over
 
 =item C<throw>
 
-Throw an exception of L<Iterator::Flex::Failure::Exhaustion|Iterator::Flex::Failure/Exhaustion>.
+The consumed iterator throws an indeterminate exception on exhaustion.
+
+=item C<< [ throw => $class ] >>
+
+The consumed iterator throws an exception upon exhaustion in the given class on exhaustion.
+
+=item C<< [ throw => \@classes ] >>
+
+The consumed iterator throws an exception upon exhaustion in one of the given classes on exhaustion.
+
+=item C<< [ throw => $regexp ] >>
+
+The consumed iterator throws an exception upon exhaustion which when stringified matches the passed
+regular expression.
+
+=item C<< [ throw => $coderef ] >>
+
+The consumed iterator throws an exception; C<< $coderef->( $e ) >> returns true if 
+the exception indicates exhaustion.
+
+=item C<return>
+
+The consumed iterator returns a sentinel value of
+C<undef> on exhaustion.
+
+=item C<< [ return => $value ] >>
+
+The consumed iterator returns a sentinel value of
+C<$value> on exhaustion.
+
+=back
+
+=item C<exhaustion>
+
+This applies to both iterators and adapters, and indicates how they
+signal exhaustion.  It can take the following values:
+
+=over
 
 =item C<< [ throw => 'passthrough' ] >>
 
-Only for adapters; the consumed iterator will throw on exhaustion; let that exception propagate.
+Only for adapters where the consumed iterator will throw on
+exhaustion; this lets that exception propagate.
+
+=item C<throw>
+
+Throw an exception of L<Iterator::Flex::Failure::Exhaustion|Iterator::Flex::Failure/Exhaustion>.
 
 =item C<< [ throw => $coderef ] >>
 
@@ -630,7 +679,7 @@ be thrown.
 =item C<return>
 
 For both iterators and adapters, indicates that a sentinel value of
-c<undef> will be returned.
+C<undef> will be returned.
 
 =item C<< [ return => $value ] >>
 
@@ -638,10 +687,11 @@ For both iterators and adapters, indicates that the specified sentinel value wil
 
 =back
 
-=item C<exhaustion>
+=back
 
-This applies to both iterators and  adapters, and indicates how they signal exhaustion.
-It takes the same values as L</input_exhaustion>
+=head3 Error
+
+=over
 
 =item C<error>
 
@@ -661,6 +711,8 @@ Invoke C<$coderef>.  If it does not throw, an exception of  L<Iterator::Flex::Fa
 =back
 
 =back
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

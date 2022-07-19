@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/File-Size.t
+lib/File/Size.pm
+META.yml                                 Module meta-data (added by MakeMaker)

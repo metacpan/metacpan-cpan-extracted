@@ -1,25 +1,33 @@
 Revision History for WWW-FetchStory
 ===================================
 
-v0.2201 2020-07-23
+v0.2307 2022-07-19
 ------------------
 
-* 2020-07-23 09:57:10 +1000
-  added AO3 relationship parsing
+* 2022-07-19 01:33:22 +1000
+  Fixed the problem with EPUB descriptions.
+* 2022-07-19 01:27:36 +1000
+  Disabling the replacement of EPUB descriptions.
+* 2022-07-19 00:43:46 +1000
+  problems with HTML in AO3 summaries
+* 2022-07-19 00:30:23 +1000
+  problems with HTML in AO3 summaries
 
-v0.22 2020-07-23
-----------------
+v0.2303 2022-07-14
+------------------
 
-* 2020-07-23 09:36:27 +1000
-  fixed bug with AO3 story-parsing
-* 2020-05-16 14:36:56 +1000
+* 2022-07-14 01:02:37 +1000
+  fixing wordcount
+* 2022-07-12 18:30:38 +1000
+  I think I got it
+* 2022-07-12 17:51:01 +1000
+  still bothering AO3 EPUB
+* 2022-07-12 17:33:18 +1000
+  fetching AO3 epub
+* 2022-01-30 10:33:53 +1100
   version bump
-* 2020-05-16 14:35:01 +1000
-  option for meta only
-* 2020-05-06 17:32:19 +1000
-  tweaking for Marvel
-* 2019-04-04 01:53:33 +1100
-  fixed bug with AO3 parsing of download URL
+* 2022-01-30 10:33:29 +1100
+  tweak
 
 ===================================
 End of changes in the last 365 days

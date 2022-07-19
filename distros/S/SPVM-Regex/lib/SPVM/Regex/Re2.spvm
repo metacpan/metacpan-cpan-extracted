@@ -1,0 +1,1 @@
+class Regex::Re2 : pointer_t;

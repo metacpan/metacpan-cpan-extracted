@@ -5,7 +5,7 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory Raku
 
 =head1 NAME
 
@@ -13,30 +13,118 @@ Iterator::Flex::Manual::Authoring - How to write an iterator
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 DESCRIPTION
 
-Iterators are constructed by passing an attribute hash (call it
-C<%AttrHash>) to a factory, which uses it to construct an appropriate
-iterator class, instantiate it, and return it to the user.
+=head2 Iterator Phases
 
-First we'll create the hash, then figure out how to make it available
-to the factory.
+Iterators must manage the four different phases that the iterator might be in:
 
-=head2 The Attribute Hash
+=over
+
+=item * initialization
+
+=item * iteration
+
+=item * exhaustion
+
+=item * error
+
+=back
+
+For more details, see L<Iterator::Flex::Manual::Overview/Iterator life-cycle>.
+
+=head3 Initialization
+
+When an iterator is constructed it is typically passed some state
+information; it may be an array or a hash, a database handle, or a
+file pointer.
+
+The constructor must save the relevant pieces of information
+(typically through closed-over variables; see below) and initialize
+variables which keep track of where the iterator is in the data stream.
+
+For example, if the iterator operates on an array, it will need to keep
+track of the index of the element it must return next.
+
+Some iterators don't need or have access to that information.  If an
+iterator operates on a file handle, returning the next line in the file,
+the file handle keeps track of the next line in the file, so the
+iterator doesn't need to.  Similarly, if an iterator is retrieving
+data from a database via a cursor, the database will keep track of
+where it is in the data stream.
+
+=head3 Iteration
+
+In the iteration phase, the iterator identifies the data to return,
+updates its internal state (if necessary) so that it will return the
+correct data on the next iteration, and returns the data.
+
+If the data stream has been exhausted, then the iterator must indicate
+this by calling the C<signal_exhaustion> method. This method
+implements the exhaustion policy requested by the user who set up the
+iterator (either returning a sentinel value or throwing an exception.
+
+After this the iterator enters the L</Exhaustion> phase.
+
+If there is an error (e.g. if a database connection is dropped), the
+iterator must signal this by calling the C<signal_error> method.  Not
+all iterators have an error phase.
+
+=head3 Exhaustion
+
+Unlike other iteration implementations, it is legal to call an
+iterator's C<next> method after the iterator is exhausted.
+In the exhaustion phase, the iterator simply invokes
+the C<signal_exhaustion> method
+
+=head3 Error
+
+Not all iterators have an error phase, but if they are in one, they
+simply call C<signal_error>.
+
+=head2 Capabilities
+
+An iterator must do at least one thing: return the next datum from the
+data stream.  This is the I<next> capability. L<Iterator::Flex>
+iterators can support a number of other capabilities; see in
+L<Iterator::Flex::Manual::Overview>,
+
+=head2 Building an Iterator
+
+Iterators are constructed by passing an attribute hash, C<%AttrHash>
+to the C<Iterator::Flex> factory, which uses it to construct an
+appropriate iterator class, instantiate it, and return it to the user.
 
 The attribute hash (whose contents are documented much greater detail
 in L<Iterator::Flex::Manual::Overview/Iterator Parameters>) describes
 the iterator's capabilities and provides implementations.
 
-The heart of L<Iterator::Flex> iterators is the C<next> capability,
-which I<must> be implemented as a closure. Other capabilities are
-optional and may be either closures or methods.
+The main iterator routine (C<next>) must be a closure, with state
+contained in closed over variables. Every time a new iterator is
+constructed, a new closure is generated.
 
-=head3 next
+Writing an iterator generally involves writing a subroutine which
+returns the C<%AttrHash> containing the closures.  As an example,
+we will construct an iterator which operates on arrays, providing
+a number of capabilities.
 
-C<next> has two responsibilities:
+For simplicity, we'll write a C<construct> subroutine which is passed
+a reference to the array to iterator over, and returns the C<%AttrHash>.
+Later we'll see how to create a one-off iterator and a standalone iterator
+class using the concepts we've explored.
+
+Our C<construct> subroutine will be called as
+
+ $ref_AttrHash = construct( \@array );
+
+=head3 Creating the C<next> capability
+
+First, let's concentrate on the heart of the iterator, the C<next> capability,
+which I<must> be implemented as a closure. 
+
+C<next> has three responsibilities:
 
 =over
 
@@ -48,19 +136,24 @@ return the next data element
 
 signal exhaustion
 
+=item *
+
+(optionally) signal an error.
+
 =back
 
 It usually also ensures that the C<current> and C<previous>
 capabilities return the proper values.  Because it is called most
 often, it should be as efficient as possible.
 
-As mentioned above, C<next> I<must> be implemented as a closure. It
-has to keep track of state on its own, as it may not be passed any.
+C<next> cannot keep state internally. Our C<construct> subroutine will
+store the state in lexical variables which only our instance of
+C<next> will have access to.
 
-To illustrate, here's the entry in C<%AttrHash> for the C<next>
-closure for L<Iterator::Flex::Array>:
+To illustrate, here's an implementation of C<next> for iteration
+over an array:
 
- next => sub {
+ my $next = sub {
      if ( $next == $len ) {
          # if first time through, set current
          $prev = $current
@@ -71,25 +164,30 @@ closure for L<Iterator::Flex::Array>:
      $current = $next++;
 
      return $arr->[$current];
- },
+ };
 
-The first thing to notice is that there are a number of closed over
-variables that are defined outside of the subroutine.
+Notice that the subroutine doesn't take I<any> parameters. Also notice
+that it uses a number of variables that are I<not defined> in the
+subroutine, e.g. C<$arr>, C<$next>, etc. These are lexical variables
+in C<configure> and are initialized I<outside> of the C<$next>
+closure.
 
-It's cheap to retain the state of an array (it's just an index), so we
-can easily keep track of C<$next>, C<$prev>, C<$current>, and provide
-the additional L<prev|Iterator::Flex::Manual::Overview/prev> and
-L<current|Iterator::Flex::Manual::Overview/current> capabilities.  We
-also keep track of the array, C<$arr>, and its length C<$len>.
+C<$arr> is the array we're operating on, C<$len> is its length (so we
+don't have to look it up every time). Because it's cheap to retain the
+state of an array (it's just an index), we can easily keep track of
+what is needed to implement the
+L<prev|Iterator::Flex::Manual::Overview/prev> and
+L<current|Iterator::Flex::Manual::Overview/current> capabilities;
+those are stored in C<$prev> and C<$current>.
 
-Finally, there's C<$self>, which is a handle to the iterator's
-object. It's not used for any performance critical work.
+Finally, there's C<$self>, which is a handle for our iterator.  It's
+not used for any performance critical work.
 
-These must all be properly initialized; more on that later.
+These must all be properly initialized by C<construct> before C<$next>
+is created; we'll go over that later. Let's first look at the code for
+the C<$next> closure.
 
-=head4 Exhaustion Phase
-
-The code is divided into two sections; the first deals with data exhaustion:
+The code is divided into two sections; the first deals with data exhaustion>:
 
      if ( $next == $len ) {
          # if first time through, set prev
@@ -98,24 +196,31 @@ The code is divided into two sections; the first deals with data exhaustion:
          return $current = $self->signal_exhaustion;
      }
 
-Every time the iterator is invoked, the exhaustion state is
-determined. If it is exhausted, the iterator can start using
-L<Iterator::Flex>'s exhaustion facilities.
+Every time the iterator is invoked, it checks if it has run out of
+data.  If it is has (e.g. C<$next == $len>) then the iterator
+sets up the exhaustion phase.  The C<is_exhausted> predicate will be
+true if the iterator is I<already> in the exhaustion phase.  If it is,
+it doesn't need to perform work required to handle other capabilities.
+In our case, the first time the iterator is in the exhausted state it
+must set C<$prev> so that it correctly returns the last element in the
+array (which will be $current from the last successful iteration).
 
-Recall that an iterator may signal exhaustion by throwing an exception
-or returning a sentinel value.  The iterator itself doesn't care; it
-just calls the C<signal_exhaustion> method, which will first set the
-C<is_exhausted> predicate and then either return a sentinel value or
-throw an exception (which the iterator should I<not> catch).  In the
-former case, the iterator should pass that sentinel value on to the
-caller.
+Then, it signals exhaustion by returning its C<signal_exhaustion>
+method (and setting C<$current> to that value, so the C<current>
+capability will return the correct value).
 
-Unlike in some iterator models, calling C<next> after the iterator is
-exhausted is always a defined operation, always resulting in the same
-behavior.  C<next> should thus I<always> call C<signal_exhaustion> when
-exhausted, even if the iterator has already signaled exhaustion.
+Recall that it is the I<client> code that determines how the iterator
+will signal exhaustion (i.e, via a sentinel value or an exception). The
+iterator itself doesn't care; it simply returns the result of the
+C<signal_exhaustion> method, which will set the C<is_exhausted> object
+predicate and then either return a sentinel value or throw an
+exception.
 
-=head4 Iteration Phase
+In other iterator implementations (e.g. C++, Raku), calling C<next>
+(or other methods) on an exhausted iterator is undefined behavior.
+This is I<not> true for C<Iterator::Flex> iterators.  An exhausted
+iterator must always respond, identically, to a call to C<next>, so
+must always return the result of the C<signal_exhaustion> method.
 
 The second part of the code takes care of returning the correct data
 and setting the iterator up for the succeeding call to C<next>. It
@@ -128,98 +233,84 @@ return the proper values:
 
      return $arr->[$current];
 
+=head3 Other capabilities
+
+For completeness, here's the implementation of the rest of the iterator's capabilities:
+
+ my $reset   = sub { $prev = $current = undef;  $next = 0; };
+ my $rewind  = sub { $next = 0; };
+ my $prev    = sub { return defined $prev ? $arr->[$prev] : undef; };
+ my $current = sub { return defined $current ? $arr->[$current] : undef; };
+
+They have been written as closures accessing the lexical variables,
+but they could also have been written as methods if the iterator chose
+to store its state in some other fashion.  Only C<next> must be a closure.
+
 =head4 Initialization Phase
 
 Finally, we'll get to the iterator initialization phase, which may make
 more sense now that we've gone through the other phases.  Recall that
-we are using closed over variables to keep track of state. That means
-our C<next> sub must be created for every iterator so it can close
-over the current set of lexical variables.
+we are using closed over variables to keep track of state.
 
 Our code should look something like this:
 
-  # initialize lexical variables here
-  ...
+  sub construct ( $array ) {
 
-  %attrHash = (
-     next => sub { ... } # as above, closing over lexical variables
-  };
+    # initialize lexical variables here
+    my $next = ...;
+    my $prev = ...;
+    my $current = ...;
+    my $arr = ...;
+    my $len = ...;
 
-We need to initialize C<$next>, C<$prev>, C<$current>, C<$arr>, C<$len>, and
-C<$self>.
+    my $self = ...;
 
-The first five are easy
+    # create our closures
+    my $next = sub { ... };
+    my $prev = sub { ... };
+    ...
 
-  # initialize lexical variables here
+    # return our %AttrHash:
+    return {
+             _self => \$self,
+              next => $next,
+              prev => $prev,
+           current => $current,
+             reset => $reset,
+            rewind => $rewind,
+    };
+  }
+
+The first five lexical variables are easy:
+
   my $next = 0;
   my $prev = undef;
   my $current = undef;
-  my $arr = \@array ;  # <-- this is passed in from the user "somehow"
-  my $len = @array;
+  my $arr = $array ;
+  my $len = $array->@*;
 
-Now, what about C<$self>? Why is it a closed over variable, rather
-than being passed as a parameter to the C<next> sub?  The answer is
-that C<next> is I<not> a method. L<Iterator::Flex> allows it to be treated as one, e.g.
-
-  $iter->next
-
-is valid, but for efficiency the iterator can be called
-directly as a subroutine, e.g.,
-
-  $iter->();
-
-skipping the overhead of an object method call. In this case, there's
-no way to pass in C<$self>, so where does it come from and how is it
-initialized?  The answer is the closed over variable C<$self>, and
-another entry in the attribute hash, C<_self> which contains a
-reference to C<$self> that the iterator factory will use to initialize
-C<$self>.
-
-  # initialize lexical variables here
-  ...
-  my $self;
-
-  %attrHash = (
-     _self => \$self,
-     next => sub { ... } # as above, closing over lexical variables
-  };
-
-=head3 Other capabilities
-
-For completeness, here's are the rest of the capabilities, except for
-C<freeze>, which complicates things quite a bit, and which we'll get
-into later.
-
- reset   => sub { $prev = $current = undef;  $next = 0; },
- rewind  => sub { $next = 0; },
- prev    => sub { return defined $prev ? $arr->[$prev] : undef; },
- current => sub { return defined $current ? $arr->[$current] : undef; },
+Now, what about C<$self>? It is a reference to our iterator object,
+but the object hasn't be created yet; that's done when C<%AttrHash> is
+passed to C<Iterator::Flex::Factory>. So where does C<$self> get
+initialized?  The answer lies in the C<_self> entry in C<%AttrHash>,
+which holds a reference to C<$self>.  When L<Iterator::Flex::Factory>
+creates the iterator object it uses the C<_self> entry to initialize
+C<$self>.  (Note that C<$self> is B<not> a reference to a hash.  You
+cannot store data in it.)
 
 =head3 Wrapping up
 
-At this point C<%AttrHash> is functionally complete. The only thing left unknown is
-the array to iterate over, which has to be kept variable, so wrapping the above
-code into a subroutine
-
- sub configure ( $array ) {
-
-     # initialize lexical variables here
-     ...
-
-     my %AttrHash = ( ... );
-     return \%AttrHash;
- }
+At this point C<construct> is functionally complete; given an array it'll return
+a hash that can be fed to the iterator factory.
 
 =head2 Passing the C<%AttrHash> to the factory
 
-Now we're ready to use the C<%AttrHash> to construct an
-iterator. Iterators may be constructed on-the-fly, or may be
-formalized as classes.
+Iterators may be constructed on-the-fly, or may be formalized as classes.
 
 =head3 A one-off iterator
 
 This approach uses L<Iterator::Flex::Factory/construct_from_attrs> to create an
-iterator object from a hash describing the iterator capabilities:
+iterator object from our C<%AttrHash>:
 
   my @array = ( 1..100 );
   my $AttrHash = construct( \@array );
@@ -317,7 +408,7 @@ Here's the code for L<Iterator::Flex::Array/new>:
 
 It's pretty simple. It saves the general options hash if present,
 stores the passed array (the state) in a hash, and passes both of
-them to the super class' constructor.  ( A hash is used here because
+them to the super class' constructor.  (A hash is used here because
 L<Iterator::Flex::Array> can be serialized, and extra state is
 required to do so).
 
@@ -424,7 +515,7 @@ These indicate that the named capability is present and implemented as a closure
       $class->SUPER::new( { array => $_[0] }, $gpar );
   }
 
-  sub configure {
+  sub construct {
      my ( $class, $state ) = @_;
 
      # initialize lexical variables here
@@ -445,6 +536,8 @@ These indicate that the named capability is present and implemented as a closure
   ] );
 
   1;
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

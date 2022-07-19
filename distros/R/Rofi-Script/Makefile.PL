@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010000;
+
 
 use ExtUtils::MakeMaker;
 
@@ -17,7 +17,6 @@ my %WriteMakefileArgs = (
     "bin/example.pl"
   ],
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "Rofi::Script",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -37,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "autodie" => 0
   },
-  "VERSION" => "1.000",
+  "VERSION" => "1.221970",
   "test" => {
     "TESTS" => "t/*.t"
   }

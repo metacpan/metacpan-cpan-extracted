@@ -1,0 +1,17 @@
+uint64_t     T_U_LONG64
+uint32_t     T_U_LONG32
+
+INPUT
+T_U_LONG64
+    $var = (uint64_t) exs_SvUV($arg)
+
+T_U_LONG32
+    $var = (uint64_t) exs_SvUV($arg)
+    if ($var > UINT32_MAX) croak("%" UVuf " exceeds U32 max (%u)", $var, UINT32_MAX);
+
+OUTPUT
+T_U_LONG64
+    sv_setuv($arg, (UV)$var);
+
+T_U_LONG32
+    sv_setuv($arg, (UV)$var);

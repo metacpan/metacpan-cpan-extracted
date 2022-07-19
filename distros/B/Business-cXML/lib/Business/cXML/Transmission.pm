@@ -112,11 +112,17 @@ sub new {
 		};
 		return [ 400, $@ ] if $@;
 		eval {
-			$doc->validate();
-			$self->{xml_root} = ($doc = $doc->documentElement);
+			my $dtd = XML::LibXML::Dtd->new(undef, "http://xml.cxml.org/schemas/cXML/" . $Business::cXML::CXML_VERSION . "/cXML.dtd");
+			$doc->validate($dtd);
 		};
-		return [ 406, $@ ] if $@;
+		if ($@) {
+			eval {
+				$doc->validate();
+			};
+			return [ 406, $@ ] if $@;
+		};
 
+		$self->{xml_root} = ($doc = $doc->documentElement);
 		$doc->ferry($self, {
 			version          => '__UNIMPLEMENTED',
 			payloadID        => '_id',

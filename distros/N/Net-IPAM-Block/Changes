@@ -1,5 +1,8 @@
 Revision history for Net-IPAM-Block
 
+5.20    Mon, 18 Jul 2022 16:54:04 +0200
+        * replace recursive func in to_cidrs with a stack and iteration
+
 5.10    Wed, 27 Apr 2022 20:32:43 +0200
         * add serialization method TO_JSON
 

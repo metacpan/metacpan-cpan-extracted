@@ -17,13 +17,15 @@ use strictures;
 no indirect 'fatal';
 no multidimensional;
 
+use Cwd 'abs_path';
+
 use Test::More;
 use Test::Output;
 
 BEGIN {
     eval { require Curses::UI; };
     $@  and  plan skip_all => 'Curses::UI not found';
-    plan tests => 51;
+    plan tests => 58;
 
     # define fixed environment for unit tests:
     delete $ENV{DISPLAY};
@@ -31,6 +33,8 @@ BEGIN {
 }
 
 use UI::Various({use => ['Curses']});
+
+use constant T_PATH => map { s|/[^/]+$||; $_ } abs_path($0);
 
 #########################################################################
 # minimal dummy classes needed for unit tests:
@@ -177,6 +181,7 @@ is($@, '', 'update of unused UI::Various::Curses::Text does not fail');
 my $result = 'not set';
 my $w;
 my $button2 = UI::Various::Button->new(text => 'Quit',
+				       width => 4,
 				       code => sub {
 					   $result =
 					       $text2->_cui->text . ':' .
@@ -323,7 +328,7 @@ is($counter, 4, 'counter has correct value');
 # test standard behaviour with a single-selection listbox:
 $listbox = UI::Various::Listbox->new(texts => [1..5], height => 5,
 				     selection => 1);
-my $selected = -1;
+my ($selected1, $selected2, $texts1, $texts2) = (-1, -1, -1, -1);
 $w =  $main->window($listbox,
 		    UI::Various::Button->new
 		    (text => 'Remove #5',
@@ -331,7 +336,11 @@ $w =  $main->window($listbox,
 		    UI::Various::Button->new
 		    (text => 'Quit',
 		     code => sub{
-			 $selected = $listbox->selected();
+			 $selected1 = $listbox->selected();
+			 $texts1 = @{$listbox->texts};
+			 $listbox->replace(3, 2, 1);
+			 $selected2 = $listbox->selected();
+			 $texts2 = @{$listbox->texts};
 			 $w->destroy;
 		     }));
 
@@ -343,7 +352,10 @@ combined_like
 {   $main->mainloop;   }
     qr/^.*Quit\b.*$/s,
     'mainloop 5 produces correct output';
-is($selected, 2, '2nd listbox had correct final selection');
+is($selected1, 2, '2nd listbox had correct final selection');
+is($texts1, 4, '2nd listbox had correct number of elements');
+is($selected2, undef, "listbox's replace also removes selection");
+is($texts2, 3, 'entries of listbox have been replaced');
 is(@{$main->{children}}, 0, 'main 5 no longer has children');
 
 ####################################
@@ -425,13 +437,43 @@ is($option2, 3, '2nd optionmenu run its on_select');
 is(@{$main->{children}}, 0, 'main 8 no longer has children');
 
 ####################################
+# test selection of single output file (selecting it):
+my $fs =
+    UI::Various::Compound::FileSelect->new
+    (mode => 0,
+     filter => [['PL scripts' => '\.pl$']],
+     directory => T_PATH);
+($selected1, $selected2) = ('', '');
+$w =  $main->window($fs,
+		    UI::Various::Button->new
+		    (text => 'Quit',
+		     code => sub{
+			 $selected1 = $fs->selection();
+			 $selected2 = $fs->{_widget}{input}->textvar;
+			 $w->destroy;
+		     }));
+@chars_to_read = ("\t", "\t", ' ',	# select sub-directory
+		  ' ',			# select 1st file
+		  "\t", "\t", ' ');	# quit
+combined_like
+{   $main->mainloop;   }
+    qr/^.*functions\b.*$/s,
+    'mainloop 9 produces correct output';
+like($selected1, qr'/t/functions/[a-z_]+\.pl$',
+     'file selection returned correct file');
+like($selected1, qr"/t/functions/$selected2", 'file selection is consistent');
+is(@{$main->{children}}, 0, 'main 9 no longer has children');
+
+####################################
 # test unused behaviour (and get 100% coverage):
 
 $w1 = UI::Various::Window->new(title => 'hello');
 $w2 = UI::Various::Window->new(title => 'dummy 1');
 my $d1 = UI::Various::Dialog->new(title => 'dummy 2', height => 2);
-my $d2 = $main->dialog({title => 'dummy 3', height => 3});
+my $d2 = $main->dialog({title => 'dummy 3', height => 3},
+		       UI::Various::Button->new(text => "multi\n line"));
 is(@{$main->{children}}, 4, 'main has new children');
+$d2->_prepare;
 is($w1->title(), 'hello', 'window constructor sets title');
 $w1->add($text1);
 is(@{$w1->{children}}, 1, 'Window has 1 child');

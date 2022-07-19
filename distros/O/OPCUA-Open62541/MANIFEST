@@ -33,6 +33,7 @@ t/client-browse.t
 t/client-browsenext-async.t
 t/client-config-context.t
 t/client-config-default.t
+t/client-config-userpass.t
 t/client-config.t
 t/client-connect-async-refcount.t
 t/client-connect-async.t

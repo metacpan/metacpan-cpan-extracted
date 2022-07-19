@@ -129,6 +129,12 @@ sub _inject_mite_functions {
     *{"$caller\::with"} = $class->_make_with( $caller, $file, $kind )
         if $requested->( with => true );
 
+    *{"$caller\::signature_for"} = sub {
+        my ( $name ) = @_;
+        $name =~ s/^\+//;
+        $class->around( $caller, $name, ${"$caller\::SIGNATURE_FOR"}{$name} );
+    } if $requested->( signature_for => false );
+
     *{"$caller\::extends"} = sub {}
         if $kind eq 'class' && $requested->( extends => true );
     *{"$caller\::requires"} = sub {}

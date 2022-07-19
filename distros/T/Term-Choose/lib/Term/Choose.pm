@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.756';
+our $VERSION = '1.757';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -26,6 +26,24 @@ BEGIN {
     else {
         require Term::Choose::Linux;
         $Plugin = 'Term::Choose::Linux';
+    }
+}
+
+END {
+    if ( $? == 255 ) {
+        if( $^O eq 'MSWin32' ) {
+            my $input = Win32::Console->new( Win32::Console::constant( "STD_INPUT_HANDLE",  0 ) );
+            $input->Mode( 0x0001|0x0002|0x0004 );
+            $input->Flush;
+        }
+        elsif ( TERM_READKEY ) {
+            Term::ReadKey::ReadMode( 'restore' );
+        }
+        else {
+            system( "stty sane" );
+        }
+        print "\n", clear_to_end_of_screen;
+        print show_cursor;
     }
 }
 
@@ -268,6 +286,7 @@ sub choose {
     my $self = shift;
     return $self->__choose( @_ );
 }
+
 
 sub __choose {
     my $self = shift;
@@ -1256,7 +1275,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.756
+Version 1.757
 
 =cut
 

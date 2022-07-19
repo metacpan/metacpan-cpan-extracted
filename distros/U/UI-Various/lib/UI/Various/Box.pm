@@ -10,7 +10,7 @@ UI::Various::Box - general box widget of L<UI::Various>
 
     use UI::Various;
     my $main = UI::Various::main();
-    my $box = UI::Various::Box(border => 1, columns => 2, rows => 3);
+    my $box = UI::Various::Box->new(border => 1, columns => 2, rows => 3);
     $box->add(0, 0, UI::Various::Text->new(text => 'Hello World!'));
     ...
     $box->add(2, 1, UI::Various::Button->new(text => 'Quit',
@@ -53,7 +53,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use UI::Various::core;
 use UI::Various::toplevel;

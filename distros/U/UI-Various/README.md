@@ -8,10 +8,6 @@ UI::Various - graphical/non-graphical user interface without external programs
 
 # ABSTRACT
 
-**This module is still WORK IN PROGRESS, but already usable with some
-restrictions.** Currently it provides basic functionality only (no dialogues,
-no frills).
-
 Did you ever need to decide if a graphical or text based user interface is
 best for your Perl application?  A GUI may be easier to use, but will not
 run on run on a server without a window system (like X11 or Wayland) and
@@ -35,6 +31,12 @@ front" of that window.  See ["LIMITS"](#limits) for more details.  All graphics,
 pictures or icons (unless the later are part of the character set used) need
 alternative descriptions for the text based interfaces, which can make a big
 difference in the usability.
+
+Currently the module is still missing some of its planned frills like
+alignment, colour, exact positioning, graphics, pictures or icons.  At least
+the first two of this list will be added in later versions.  The essential
+functionality is ready to be used and will be tested / used by another
+project developed before further enhancements on this one.
 
 # DESCRIPTION
 
@@ -190,6 +192,11 @@ configures the handling of output send to STDERR:
     catch all error messages and print them when the program exits (or you
     switch back to `0`) in order to avoid cluttering the terminal output,
     e.g. when running under Curses
+
+    Note that under Curses you probably even then still won't see the output, as
+    the ncurses library apparently clears the terminal after Perl's END
+    handlers.  See `examples/listbox.pl` and `examples/select-file.pl` for a
+    possible mitigation.
 
 - `1`
 

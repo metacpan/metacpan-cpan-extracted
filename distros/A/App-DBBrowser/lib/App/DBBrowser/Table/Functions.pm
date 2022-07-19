@@ -477,9 +477,6 @@ sub __interval_to_converted_epoch { #
         { Columns=>[1], MaxRows => $maxrows },
         @{$sql->{where_args}//[]}
     );
-    if ( ! defined $first_dates ) {
-        return;
-    }
     return $converted_epoch, $first_dates;
 }
 
@@ -576,12 +573,15 @@ sub __get_manual_interval {
             @tmp_info = ( @top, $qt_col . ':' );
             if ( ! eval {
                 ( $converted_epoch, $first_dates ) = $sf->__interval_to_converted_epoch( $sql, $func, $maxrows, $qt_col, $div );
+                if ( ! $converted_epoch || ! $first_dates ) {
+                    die "No results!";
+                }
                 1 }
             ) {
                 push @tmp_info, $@;
             }
             else {
-                push @tmp_info, @{$first_dates}[0 .. $info_rows_count - 1];
+                push @tmp_info, map { defined ? $_ : 'undef' } @{$first_dates}[0 .. $info_rows_count - 1];
                 push @tmp_info, '...';
             }
             # Choose

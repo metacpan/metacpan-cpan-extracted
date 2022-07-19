@@ -1,13 +1,26 @@
-name: MasonX-Profiler
-version: 0.06
-abstract: Mason per-component profiler
-author: Autrijus Tang <autrijus@autrijus.org>
-license: perl
+---
+abstract: 'Mason per-component profiler'
+author:
+  - 'Best Practical Solutions, LLC <modules@bestpractical.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
 distribution_type: module
-requires:
-  HTML::Mason: 0
-  Time::HiRes: 0
+dynamic_config: 1
+generated_by: 'Module::Install version 1.19'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MasonX-Profiler
 no_index:
   directory:
     - inc
-generated_by: Module::Install version 0.33
+    - t
+requires:
+  HTML::Mason: 0
+  Time::HiRes: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.07'

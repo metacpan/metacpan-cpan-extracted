@@ -548,7 +548,7 @@ PREFIX (string) (json_parse_t * parser)
 			     /* Location of first quote. */
 			     start - 1,
 			     /* Location of last quote. */
-			     parser->end,
+			     parser->end - 1,
 			     json_token_string);
 #else
     parser->end = start;

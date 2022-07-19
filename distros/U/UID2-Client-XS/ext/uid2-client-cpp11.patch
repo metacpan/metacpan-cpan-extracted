@@ -1,0 +1,26 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index de9a312..855dc26 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -5,8 +5,3 @@ project ("uid2-client")
+ set (CMAKE_CXX_STANDARD 11)
+ 
+ add_subdirectory(lib)
+-
+-add_subdirectory(app)
+-
+-enable_testing()
+-add_subdirectory(test)
+diff --git a/lib/uid2client.cpp b/lib/uid2client.cpp
+index ed9fb61..8262b4c 100644
+--- a/lib/uid2client.cpp
++++ b/lib/uid2client.cpp
+@@ -199,7 +199,7 @@ namespace uid2
+         const auto request = MakeV2Request(secretKey.data(), Timestamp::Now(), nonce);
+ 		if (auto res = httpClient.Post("/v2/key/latest", request, "text/plain"))
+ 		{
+-			if (res->status >= 200 || res->status < 300)
++			if (res->status >= 200 && res->status < 300)
+ 			{
+ 				return ParseV2Response(res->body, secretKey.data(), nonce);
+ 			}

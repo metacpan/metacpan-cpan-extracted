@@ -1,5 +1,21 @@
 Revision history for XML-Sig
 
+0.58 -- Mon Jul 18 21:45:06 ADT 2022
+
+  [Notable Changes since 0.57]
+
+  Thanks to Wesley Schwengle (waterkip) XML::Sig can now sign arbitrary
+  XML nodes with the id_attr.  This allows an application to specify
+  the xpath of the node to sign. Ex: /md:EntityDescriptor[@ID].  In addition
+  the ns attribute can be used to support additional namespaces that
+  may be in your XML.
+
+  - b26f8ba Ensure xml signed via id_attr can be verified
+  - 028c851 Merge pull request #41 from waterkip/bug-61
+  - 915c100 Sign SAML metadata correctly
+  - daf2654 Add custom slurp command for files
+  - cfc7e9e v0.57
+
 0.57 -- Fri Apr 15 19:56:05 ADT 2022
 
   [Notable Changes since 0.56]

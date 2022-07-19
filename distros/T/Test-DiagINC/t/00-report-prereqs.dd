@@ -25,8 +25,7 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Portability::Files' => '0',
                                       'Test::Spelling' => '0.12',
-                                      'Test::Version' => '1',
-                                      'blib' => '1.01'
+                                      'Test::Version' => '1'
                                     }
                     },
        'runtime' => {

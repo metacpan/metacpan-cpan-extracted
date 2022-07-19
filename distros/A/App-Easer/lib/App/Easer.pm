@@ -3,7 +3,7 @@ use v5.24;
 use warnings;
 use experimental qw< signatures >;
 no warnings qw< experimental::signatures >;
-{ our $VERSION = '2.002' }
+{ our $VERSION = '2.004' }
 
 sub import ($package, @args) {
    my $api = 'V1'; # default

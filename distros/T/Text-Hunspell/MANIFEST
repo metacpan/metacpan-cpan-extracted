@@ -4,6 +4,7 @@ Hunspell.pm
 Hunspell.xs
 Makefile.PL
 MANIFEST
+LICENSE
 perlobject.map
 README
 t/01-use.t

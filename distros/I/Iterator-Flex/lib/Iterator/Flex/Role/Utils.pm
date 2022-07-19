@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Ref::Util;
 
@@ -36,7 +36,7 @@ sub _load_module ( $class, $path, $namespaces ) {
     else {
         $namespaces //= [ $class->_namespaces ];
 
-        for my $namespace ( @{ $namespaces} ) {
+        for my $namespace ( @{$namespaces} ) {
             my $module = $namespace . '::' . $path;
             return $module if eval { Module::Runtime::require_module( $module ) };
         }
@@ -60,8 +60,8 @@ sub _load_module ( $class, $path, $namespaces ) {
 
 
 
-sub _load_role ( $class, $path ) {
-    $class->_load_module( $path, [ $class->_role_namespaces ] );
+sub _load_role ( $class, $role ) {
+    $class->_load_module( $role, [ $class->_role_namespaces ] );
 }
 
 
@@ -103,15 +103,14 @@ sub _can_meth ( $self, @methods ) {
 
     my $par = Ref::Util::is_hashref( $methods[-1] ) ? pop @methods : {};
 
-    for my $method ( @methods) {
+    for my $method ( @methods ) {
         $self->_throw( parameter => "'method' parameters must be a string" )
           if Ref::Util::is_ref( $method );
 
         my $sub;
         foreach ( "__${method}__", $method ) {
             if ( defined( $sub = $thing->can( $_ ) ) ) {
-                my @ret = ( ( !!$par->{name} ? $_ : () ),
-                            ( !!$par->{code} ? $sub : () ) );
+                my @ret = ( ( !!$par->{name} ? $_ : () ), ( !!$par->{code} ? $sub : () ) );
                 push @ret, $sub unless @ret;
                 return @ret > 1 ? @ret : $ret[0];
             }
@@ -149,8 +148,7 @@ sub _resolve_meth ( $obj, $target, $method, @fallbacks ) {
             Ref::Util::is_coderef( $method )
               ? $method
               : $target->can( $method )
-              // $obj->_throw( parameter =>
-                  qq{method '$method' is not provided by the object} );
+              // $obj->_throw( parameter => qq{method '$method' is not provided by the object} );
         }
 
         else {
@@ -173,7 +171,7 @@ sub _resolve_meth ( $obj, $target, $method, @fallbacks ) {
 sub _throw ( $self, $failure, $msg ) {
     require Iterator::Flex::Failure;
     local @Iterator::Flex::Role::Utils::CARP_NOT = scalar caller;
-    my $type  = join( '::', 'Iterator::Flex::Failure', $failure );
+    my $type = join( '::', 'Iterator::Flex::Failure', $failure );
     $type->throw( { msg => $msg, trace => Iterator::Flex::Failure->croak_trace } );
 }
 
@@ -202,7 +200,7 @@ Iterator::Flex::Role::Utils - Role based utilities
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 DESCRIPTION
 
@@ -211,16 +209,16 @@ a class.  They are structured that way so that they may be overridden
 if necessary.  (Well, technically I<under-ridden> if they already exist before
 this role is applied).
 
-=head1 METHODS
+=head1 CLASS METHODS
 
 =head2 _load_module
 
-  $module = $class->_load_module( @path );
+  $module = $class->_load_module( $module, ?\@namespaces );
 
-Search through the namespaces provided by C<< $class->_namespaces >> to load the
-module whose name is given by
-
-   $class->_module_name( $namespace, @path );
+Loads the named module.  If C<$module> begins with a C<+> it is assumed to be a fully
+qualified module name, otherwise it is searched for in the namespaces
+provided by C<@namespaces> (which defaults to the namespaces returned
+by the C<< L<_namespaces|Iterator::Flex::Base/_namespaces> >> class method.
 
 Throws C<Iterator::Flex::Failure::class> if it couldn't require
 the module (for whatever reason).
@@ -229,7 +227,7 @@ the module (for whatever reason).
 
   $module = $class->_load_role( $role );
 
-Loads the named role.  If the name begins with a C<+>, it is assumed
+Loads the named role.  If C<$role>  begins with a C<+>, it is assumed
 to be a fully qualified name, otherwise it is searched for in the
 namespaces returned by the C<<
 L<_role_namespaces|Iterator::Flex::Base/_role_namespaces> >> class
@@ -277,11 +275,15 @@ If it does not exist, a C<Iterator::Flex::Failure::parameter> error is thrown.
 
 If C<$method> is not defined, then C<< $obj->_can_meth( $target, @fallbacks ) >> is returned.
 
+=head1 METHODS
+
 =head2 _throw
 
   $obj->_throw( $type => $message );
 
 Throw an exception object of class C<Iterator::Flex::Failure::$type> with the given message.
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

@@ -60,7 +60,7 @@ use PPI             ();
 use PPI::Exception  ();
 use PPI::Singletons '%_PARENT';
 
-our $VERSION = '1.274';
+our $VERSION = '1.275';
 
 our $errstr = "";
 
@@ -437,6 +437,18 @@ sub _statement {
 			if ( !$Next->significant ) {
 				push @{$self->{delayed}}, $Next;
 				next;
+			}
+
+			# Scheduled block must be followed by left curly or
+			# semicolon.  Otherwise we have something else (e.g.
+			# open( CHECK, ... );
+			if (
+				'PPI::Statement::Scheduled' eq $class
+				and not ( $Next->isa( 'PPI::Token::Structure' )
+					and $Next->content =~ m/\A[{;]\z/ ) # }
+			) {
+				$class = undef;
+				last;
 			}
 
 			# Lexical subroutine

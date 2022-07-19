@@ -31,5 +31,5 @@ requires:
 resources:
   bugtracker: https://github.com/kuerbis/Term-Choose/issues
   repository: https://github.com/kuerbis/Term-Choose.git
-version: '1.756'
+version: '1.757'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

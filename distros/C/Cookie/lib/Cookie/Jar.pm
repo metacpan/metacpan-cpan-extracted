@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie/Jar.pm
-## Version v0.1.4
+## Version v0.2.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/10/08
-## Modified 2022/06/27
+## Modified 2022/07/16
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -15,6 +15,7 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
+    use vars qw( $VERSION $COOKIES_DEBUG $MOD_PERL $MOD_PERL_VERSION );
     our( $MOD_PERL, $MOD_PERL_VERSION );
     if( exists( $ENV{MOD_PERL} )
         &&
@@ -34,16 +35,18 @@ BEGIN
     use Cookie::Domain;
     use DateTime;
     use JSON;
-    use Module::Generic::File qw( file );
     use Module::Generic::HeaderValue;
     use Nice::Try;
     use Scalar::Util;
     use URI::Escape ();
-    our $VERSION = 'v0.1.4';
+    our $VERSION = 'v0.2.0';
     # This flag to allow extensive debug message to be enabled
     our $COOKIES_DEBUG = 0;
     use constant CRYPTX_VERSION => '0.074';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -51,7 +54,20 @@ sub init
     # Apache2::RequestRec object
     my $req;
     $req = shift( @_ ) if( @_ && ( @_ % 2 ) );
+    # For decryption and encryption
+    $self->{algo} = undef;
+    # If a cookie file is provided, yes, we'll automatically load and save from and to it.
+    $self->{autosave} = 1;
+    # For decryption and encryption
+    $self->{encrypt} = 0;
+    $self->{file} = '';
     $self->{host} = '';
+    # For decryption and encryption
+    $self->{iv} = undef;
+    # For decryption and encryption
+    $self->{secret}  = undef;
+    # Cookie file type; can also be 'lwp' or 'netscape'
+    $self->{type} = 'json';
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ );
     $self->{request} = $req if( $req );
@@ -59,6 +75,32 @@ sub init
     $self->{_cookies} = [];
     # Index by host, path, name
     $self->{_index} = {};
+    my $file = $self->file;
+    if( $file && $file->exists && !$file->is_empty )
+    {
+        my $encrypt = $self->encrypt;
+        my $type = $self->type;
+        my $type2sub = 
+        {
+        json => \&load,
+        lwp  => \&load_as_lwp,
+        netscape => \&load_as_netscape,
+        };
+        return( $self->error( "Unknown cookie jar type '$type'. This can be either json, lwp or netscape" ) ) if( !CORE::exists( $type2sub->{ $type } ) );
+        my $loader = $type2sub->{ $type };
+        
+        if( $encrypt )
+        {
+            $loader->( $self, $file,
+                algo => $self->algo,
+                key  => $self->secret,
+            ) || return( $self->pass_error );
+        }
+        else
+        {
+            $loader->( $self, $file ) || return( $self->pass_error );
+        }
+    }
     return( $self );
 }
 
@@ -88,12 +130,9 @@ sub add
     {
         my $hv = Module::Generic::HeaderValue->new_from_header( $this, decode => 1, debug => $self->debug ) ||
             return( $self->error( Module::Generic::HeaderValue->error ) );
-        $self->message( 5, "Got here for string '", overload::StrVal( $this ), "' and header value object '", overload::StrVal( $hv ), "'" );
-        $self->message( 5, "header value is '$hv'" );
         my $ref = {};
         $ref->{name} = $hv->value->first;
         $ref->{value} = $hv->value->second;
-        $self->message( 4, "Properties found: '", $hv->params->keys->sort->join( "', '" ), "'." ) if( $COOKIES_DEBUG );
         $hv->params->foreach(sub
         {
             my( $n, $v ) = @_;
@@ -104,7 +143,6 @@ sub add
         # In case those were provided too in the cookie line
         $ref->{samesite} = 1 if( CORE::exists( $ref->{samesite} ) );
         $ref->{httponly} = 1 if( CORE::exists( $ref->{httponly} ) );
-        $self->message( 4, "Adding cookies with properties: ", sub{ $self->SUPER::dump( $ref ) }) if( $COOKIES_DEBUG );
         $this = $self->make( %$ref );
         return( $self->pass_error ) if( !defined( $this ) );
     }
@@ -117,7 +155,6 @@ sub add
     my $idx = $self->_index;
     $this->name or return( $self->error( "No cookie name was set in this cookie." ) );
     my $key = $self->key( $this ) || return( $self->pass_error );
-    $self->message( 4, "Adding cookie '", $this->name, "' with key '$key' to our repository." ) if( $COOKIES_DEBUG );
     $ref->push( $this );
     $idx->{ $key } = [] if( !CORE::exists( $idx->{ $key } ) );
     push( @{$idx->{ $key }}, $this );
@@ -133,7 +170,6 @@ sub add_request_header
     return( $self->error( "Request object provided is not an object." ) ) if( !Scalar::Util::blessed( $req ) );
     return( $self->error( "Request object provided does not support the uri or header methods." ) ) if( !$req->can( 'uri' ) || !$req->can( 'header' ) );
     my $uri = $req->uri || return( $self->error( "No uri set in the request object." ) );
-    $self->message( 3, "Adding cookies to request header for uri '$uri'." ) if( $COOKIES_DEBUG );
     my $scheme = $uri->scheme;
     unless( $scheme =~ /^https?\z/ )
     {
@@ -178,7 +214,6 @@ sub add_request_header
         return( $self->pass_error( $dom->error ) ) if( !defined( $res ) );
         if( !CORE::length( $res ) || ( $res && !$res->domain->length ) )
         {
-            $self->message( 3, "No root domain found for host \"$host\"." );
             return( $self->error( "No root domain found for host \"$host\"." ) );
         }
         $root = $res->domain;
@@ -196,7 +231,6 @@ sub add_request_header
     my @ok_cookies = ();
     # Get all cookies for the canonicalised request-host and its sub domains, then we check each one found according to rfc6265 algorithm as stated above
     my $cookies = $self->get_by_domain( $root, with_subdomain => 1 );
-    $self->messagef( 3, "%d cookies for for canonicalised domain '$root'", $cookies->length );
     # Ref: rfc6265, section 5.4
     # <https://datatracker.ietf.org/doc/html/rfc6265#section-5.4>
     foreach my $c ( @$cookies )
@@ -204,29 +238,23 @@ sub add_request_header
         unless( $c->host_only && $root eq $c->domain ||
                 !$c->host_only && $host eq $c->domain )
         {
-            $self->message( 3, "This cookie '", $c->name, "' has domain '", $c->domain, "' not matching request host '$host'. Is this cookie domain a host-only domain (implicit)? ", ( $c->host_only ? 'yes' : 'no' ) );
             next;
         }
-        $self->message( 3, "Cookie '", $c->name, "' expiration is '", $c->expires, "' vs now ($now)" ) if( $COOKIES_DEBUG );
         if( index( $path, $c->path ) != 0 )
         {
-            $self->message( 3, "This cookie \"", $c->name, "\" does not have an applicable path (", $c->path, ")." ) if( $COOKIES_DEBUG );
             next;
         }
         elsif( !$is_secure && $c->secure )
         {
-            $self->message( 3, "Requested connection is not using ssl, but this cookie require a secure connection." ) if( $COOKIES_DEBUG );
             next;
         }
         # elsif( $c->expires && $c->expires->epoch < $now )
         elsif( $c->expires && $c->expires < $now )
         {
-            $self->message( 3, "The cookie has expired. Cookie expired on ", $c->expires->stringify ) if( $COOKIES_DEBUG );
             next;
         }
         elsif( $c->port && $c->port != $port )
         {
-            $self->message( 3, "Cookie port '", $c->port, "' does not match request port '$port'" ) if( $COOKIES_DEBUG );
             next;
         }
         push( @ok_cookies, $c );
@@ -275,28 +303,23 @@ sub add_response_header
     {
         
         $c->debug( $self->debug );
-        $self->message( 4, "Checking cookie '", $c->name, "' with expiration date of '", $c->expires, "'" ) if( $COOKIES_DEBUG );
         if( $c->discard )
         {
-            $self->message( 3, "Cookie is marked to be discarded, skipping." ) if( $COOKIES_DEBUG );
             next;
         }
         
         if( $resp )
         {
-            $self->message( 4, "Adding cookie '", $c->name, "' to response object." ) if( $COOKIES_DEBUG );
             $resp->headers->push_header( 'Set-Cookie' => "$c" );
         }
         elsif( $r )
         {
-            $self->message( 4, "Adding cookie '", $c->name, "' using Apache2::RequestRec." ) if( $COOKIES_DEBUG );
             # APR::Table
             # We use 'add' and not 'set'
             $r->err_headers_out->add( 'Set-Cookie' => "$c" );
         }
         else
         {
-            $self->message( 4, "Adding cookie '", $c->name, "' to list for return string." ) if( $COOKIES_DEBUG );
             push( @values, "Set-Cookie: $c" );
         }
     }
@@ -311,6 +334,11 @@ sub add_response_header
     return( '' );
 }
 
+# NOTE: the algorithm used, if any, to decrypt or encrypt the cookie jar file
+sub algo { return( shift->_set_get_scalar( 'algo', @_ ) ); }
+
+sub autosave { return( shift->_set_get_boolean( 'autosave', @_ ) ); }
+
 sub delete
 {
     my $self = shift( @_ );
@@ -319,31 +347,25 @@ sub delete
     if( scalar( @_ ) == 1 && $self->_is_a( $_[0], 'Cookie' ) )
     {
         my $c = shift( @_ );
-        $self->message( 4, "Trying to remove cookie name '", $c->name, "' with host '", $c->domain, "' and path '", $c->path, "'." ) if( $COOKIES_DEBUG );
         my $addr = Scalar::Util::refaddr( $c );
         my $removed = $self->new_array;
         for( my $i = 0; $i < scalar( @$ref ); $i++ )
         {
             my $this = $ref->[$i];
-            $self->message( 4, "Checking target cookie '", $c->name, "' against this cookie '", $this->name, "'." ) if( $COOKIES_DEBUG );
             if( Scalar::Util::refaddr( $this ) eq $addr )
             {
                 my $key = $self->key( $this );
-                $self->message( 4, "Target cookie with address '$addr' matches this cookie. Now checking if index '$key' exists." ) if( $COOKIES_DEBUG );
                 if( CORE::exists( $idx->{ $key } ) )
                 {
                     # if( !$self->_is_array( $idx->{ $key } ) )
                     if( !Scalar::Util::reftype( $idx->{ $key } ) eq 'ARRAY' )
                     {
-                        $self->message( 4, "I was expecting an array for key '$key', but got '", overload::StrVal( $idx->{ $key } ), "' (", ref( $idx->{ $key } ), ")" ) if( $COOKIES_DEBUG );
                         return( $self->error( "I was expecting an array for key '$key', but got '", overload::StrVal( $idx->{ $key } ), "' (", ref( $idx->{ $key } ), ")" ) );
                     }
-                    $self->message( 4, "Found matching index entry for key '$key'." ) if( $COOKIES_DEBUG );
                     for( my $j = 0; $j < scalar( @{$idx->{ $key }} ); $j++ )
                     {
                         if( Scalar::Util::refaddr( $idx->{ $key }->[$j] ) eq $addr )
                         {
-                            $self->message( 4, "Removing cookie match by address at offset $j of index '$key'" ) if( $COOKIES_DEBUG );
                             CORE::splice( @{$idx->{ $key }}, $j, 1 );
                             $j--;
                         }
@@ -351,7 +373,6 @@ sub delete
                     # Cleanup
                     CORE::delete( $idx->{ $key } ) if( scalar( @{$idx->{ $key }} ) == 0 );
                 }
-                $self->message( 4, "Removing object from object repository." ) if( $COOKIES_DEBUG );
                 CORE::splice( @$ref, $i, 1 );
                 $removed->push( $c );
             }
@@ -413,11 +434,14 @@ sub do
         }
         catch( $e )
         {
-            return( $self->error( "An unexpected error occurred while calling code reference on cookie named \"", $ref->{ $n }->name, "\": $e" ) );
+            return( $self->error( "An unexpected error occurred while calling code reference on cookie named \"", $ref->{ $c }->name, "\": $e" ) );
         }
     }
     return( $all );
 }
+
+# NOTE: Should we decrypt or encrypt the cookie jar file?
+sub encrypt { return( shift->_set_get_boolean( 'encrypt', @_ ) ); }
 
 sub exists
 {
@@ -426,7 +450,6 @@ sub exists
     $host ||= $self->host || '';
     $path //= '';
     return( $self->error( "No cookie name was provided to check if it exists." ) ) if( !defined( $name ) || !CORE::length( $name ) );
-    $self->message( 3, "Checking cookie '$name' exists using host '$host' and path '$path'" ) if( $COOKIES_DEBUG );
     my $c = $self->get( $name => $host, $path );
     return( defined( $c ) ? 1 : 0 );
 }
@@ -440,26 +463,22 @@ sub extract
     my $uri;
     if( $self->_is_a( $resp, 'HTTP::Response' ) )
     {
-        $self->message( 3, "Response object provided is of class HTTP::Response" ) if( $COOKIES_DEBUG );
         my $req = $resp->request;
         return( $self->error( "No HTTP::Request object is set in this HTTP::Response." ) ) if( !$resp->request );
         $uri = $resp->request->uri;
     }
     elsif( $resp->can( 'uri' ) && $resp->can( 'header' ) )
     {
-        $self->message( 3, "Response object provided is not an HTTP::Response object, but has the uri and header methods." ) if( $COOKIES_DEBUG );
         $uri = $resp->uri;
     }
     else
     {
         return( $self->error( "Response object provided does not support the uri or scheme methods and is not a class or subclass of HTTP::Response either." ) );
     }
-    $self->message( 3, "Set-Cookie header is: ", sub{ $self->SUPER::dump( [$resp->header( 'Set-Cookie' )] ) } ) if( $COOKIES_DEBUG );
     my $all = Module::Generic::HeaderValue->new_from_multi( [$resp->header( 'Set-Cookie' )], debug => $self->debug, decode => 1 ) ||
         return( $self->pass_error( Module::Generic::HeaderValue->error ) );
     return( $resp ) unless( $all->length );
     $uri || return( $self->error( "No uri set in the response object." ) );
-    $self->message( 3, "URI is '$uri'" ) if( $COOKIES_DEBUG );
     my( $host, $port, $path );
     if( $host = $resp->header( 'Host' ) ||
         ( $resp->request && ( $host = $resp->request->header( 'Host' ) ) ) )
@@ -493,22 +512,18 @@ sub extract
     else
     {
         my $dom = Cookie::Domain->new || return( $self->pass_error( Cookie::Domain->error ) );
-        $self->message( 3, "Guessing root domain for host '$host'." ) if( $COOKIES_DEBUG );
         my $res = $dom->stat( $host );
         if( !defined( $res ) )
         {
-            $self->message( 3, "Error found while trying to get root domain for host \"$host\"." ) if( $COOKIES_DEBUG );
             return( $self->pass_error( $dom->error ) );
         }
         # Possibly empty
-        $self->message( 3, "No root found in public suffix for host \"$host\"." ) if( !$res );
         $root = $res ? $res->domain : '';
     }
     
     foreach my $o ( @$all )
     {
         my( $name, $value ) = $o->value->list;
-        $self->message( 3, "Creating cookie with name '$name' and value '$value'" );
         my $c = Cookie->new( name => $name, value => $value ) || 
             return( $self->pass_error( Cookie->error ) );
         if( CORE::length( $o->param( 'expires' ) ) )
@@ -530,7 +545,6 @@ sub extract
         
         if( $o->param( 'domain' ) )
         {
-            $self->message( 3, "Using domain specified in cookie attribute '", $o->param( 'domain' ), "'." ) if( $COOKIES_DEBUG );
             # rfc6265, section 5.2.3:
             # "If the first character of the attribute-value string is %x2E ("."): Let cookie-domain be the attribute-value without the leading %x2E (".") character."
             # Ref: <https://datatracker.ietf.org/doc/html/rfc6265#section-5.2.3>
@@ -549,7 +563,6 @@ sub extract
             }
             else
             {
-                $self->message( 3, "This cookie '$name' has a domain '$c_dom' that is either set to the public prefix or is not same as the remote host '$host' nor is it a domain higher in hierarchy." ) if( $COOKIES_DEBUG );
                 next;
             }
         }
@@ -559,22 +572,18 @@ sub extract
         {
             if( $root )
             {
-                $self->message( 3, "Using root '$root'" ) if( $COOKIES_DEBUG );
                 $c->domain( $root );
                 $c->implicit(1);
             }
             else
             {
-                $self->message( 3, "No suitable domain derived from host '$host'" ) if( $COOKIES_DEBUG );
             }
         }
         
-        $self->message( 3, "Cookie specified path is '", $o->param( 'path' ), "'." ) if( $COOKIES_DEBUG );
         # rfc6265: "If the server omits the Path attribute, the user agent will use the "directory" of the request-uri's path component as the default value."
         if( defined( $o->param( 'path' ) ) && CORE::length( $o->param( 'path' ) ) )
         {
             $c->path( $o->param( 'path' ) );
-            $self->message( 3, "Using cookie specified path '", $o->param( 'path' ), "'." ) if( $COOKIES_DEBUG );
         }
         else
         {
@@ -583,40 +592,31 @@ sub extract
             if( $path eq '/' || substr( $path, -1, 1 ) eq '/' )
             {
                 $c->path( $path );
-                $self->message( 3, "Path ($path) end with a /, so using this as the path directory." ) if( $COOKIES_DEBUG );
             }
             else
             {
                 $frag->pop;
                 $c->path( $frag->join( '/' )->scalar );
-                $self->message( 3, "Using path ($path) upper directory as path -> '", $c->path, "'." ) if( $COOKIES_DEBUG );
             }
         }
         $c->port( $port ) if( defined( $port ) );
-        $self->message( 3, "Port is set to '", $c->port, "'." ) if( $COOKIES_DEBUG );
         $c->http_only(1) if( $o->param( 'httponly' ) );
         $c->secure(1) if( $o->param( 'secure' ) );
         $c->same_site(1) if( $o->param( 'samesite' ) );
         
-        $self->message( 4, "Checking if we already have a cookie for name '", $c->name, "', host '", $c->domain, "' and path '", $c->path, "'." ) if( $COOKIES_DEBUG );
         my @old = $self->get({ name => $c->name, host => $c->domain, path => $c->path });
-        $self->messagef( 4, "Found %d cookie(s) matching ours.", scalar( @old ) );
         if( scalar( @old ) )
         {
             $c->created_on( $old[0]->created_on ) if( $old[0]->created_on );
-            $self->messagef( 4, "Removing %d cookie(s) identical to this new one.", scalar( @old ) );
             # $self->replace( $c );
             for( @old )
             {
                 my $arr;
                 $arr = $self->delete( $_ ) || do
                 {
-                    $self->message( 4, "Error trying to remove cookie '", $_->name, "': ", $self->error ) if( $COOKIES_DEBUG );
                 };
-                $self->messagef( 4, "%d cookie objects removed.", $arr->length ) if( $COOKIES_DEBUG );
             }
         }
-        $self->message( 3, "Adding cookie name '", $c->name, "'." ) if( $COOKIES_DEBUG );        
         $self->add( $c ) || return( $self->pass_error );
     }
     return( $self );
@@ -637,11 +637,9 @@ sub fetch
     my $cookies = [];
     if( $r )
     {
-        $self->message( 3, "Fetching cookie from Apache headers: ", $r->as_string ) if( $COOKIES_DEBUG );
         try
         {
             my $pool = $r->pool;
-            $self->message( 3, "Getting an APR Table object instance." ) if( $COOKIES_DEBUG );
             # my $o = APR::Request::Apache2->handle( $r->pool );
             my $o = APR::Request::Apache2->handle( $r );
             if( $o->jar_status =~ /^(?:Missing input data|Success)$/ )
@@ -659,16 +657,13 @@ sub fetch
                         push( @$cookies, $c );
                     }
                 }
-                $self->messagef( 3, "%d cookies found using APR::Request::Apache2.", scalar( @$cookies ) );
             }
             else
             {
-                $self->message( 3, "Malformed cookie found: ", $o->jar_status );
             }
         }
         catch( $e )
         {
-            $self->message( 3, "An error occurred while trying to get cookies using APR::Request::Apache2, reverting to Cookie header: $e" );
         }
         $cookie_header = $r->headers_in->get( 'Cookie' );
     }
@@ -684,7 +679,6 @@ sub fetch
     {
         $cookie_header = $ENV{HTTP_COOKIE} // '';
     }
-    $self->message( 3, "Raw cookie header found is '$cookie_header'" );
     if( !scalar( @$cookies ) )
     {
         my $ref = $self->parse( $cookie_header );
@@ -694,7 +688,6 @@ sub fetch
                 return( $self->pass_error );
             push( @$cookies, $c );
         }
-        $self->messagef( 3, "%d cookies found using Cookie header: %s", scalar( @$cookies ), join( ', ', map( $_->name, @$cookies ) ) );
     }
     # We are called in void context like $jar->fetch which means we fetch the cookies and add them to our stack internally
     if( $opts->{store} )
@@ -706,6 +699,9 @@ sub fetch
     }
     return( $self->new_array( $cookies ) );
 }
+
+# NOTE: the location of the cookie jar file
+sub file { return( shift->_set_get_file( 'file', @_ ) ); }
 
 sub get
 {
@@ -753,37 +749,28 @@ sub get
         my $c_name = $c->name;
         my $c_host = $c->domain;
         my $c_path = $c->path;
-        $self->message( 4, "Checking name '", ( $name // '' ), "' and host '", ( $host // '' ), "' against this cookie '", ( $c_name // '' ), "' with host '", ( $c_host // '' ), "' and path '", ( $c_path // '' ), "'." ) if( $COOKIES_DEBUG );
         
-        $self->message( 4, "Does name '", ( $name // '' ), "' matches this cookie name '", ( $c_name // '' ), "'? ", ( $name eq $c_name ? 'yes' : 'no' ) ) if( $COOKIES_DEBUG );
         next unless( $c_name eq $name );
         
-        $self->message( 4, "Is host '", ( $host // '' ), "' empty? ", ( !defined( $host ) || !CORE::length( $host ) ? 'yes' : 'no' ) ) if( $COOKIES_DEBUG );
         
         if( !defined( $host ) || !CORE::length( $host ) )
         {
-            $self->message( 4, "Adding cookie '$name' that matched this cookie" ) if( $COOKIES_DEBUG );
             push( @found, $c );
             next;
         }
         
-        $self->message( 4, "Checking now if host '", ( $host // '' ), "' is part of '.", ( $c_host // '' ), "'" ) if( $COOKIES_DEBUG );
         if( defined( $c_host ) && 
             ( $host eq $c_host || index( reverse( $host ), reverse( ".${c_host}" ) ) == 0 ) )
         {
-            $self->message( 3, "Found cookie '$c_name' with domain '$c_host' matching perfectly or being a higher host than '$host'." ) if( $COOKIES_DEBUG );
             if( defined( $path ) && CORE::length( "$path" ) )
             {
-                $self->message( 4, "Checking path '$path' against this cookie path '$c_path'" ) if( $COOKIES_DEBUG );
                 if( index( $path, $c_path ) == 0 )
                 {
-                $self->message( 4, "Found cookie path '$c_path' matching path '$path', returning it." ) if( $COOKIES_DEBUG );
                     push( @found, $c );
                 }
             }
             else
             {
-                $self->message( 4, "No requested path provided, returning cookie based on name and host match only." ) if( $COOKIES_DEBUG );
                 push( @found, $c );
             }
         }
@@ -794,15 +781,12 @@ sub get
         return( wantarray() ? @found : $found[0] );
     }
     
-    $self->message( 4, "Keys in index are: '", join( "', '", sort( keys( %$idx ) ) ), "'" ) if( $COOKIES_DEBUG );
     # Ultimately, check if there is a cookie entry with just the cookie name and no host
     # which happens for cookies repository on server side
     if( CORE::exists( $idx->{ $name } ) )
     {
-        $self->message( 3, "Found cookie name '$name' without any host" ) if( $COOKIES_DEBUG );
         return( wantarray() ? @{$idx->{ $name }} : $idx->{ $name }->[0] );
     }
-    $self->message( 3, "Did not find anything." ) if( $COOKIES_DEBUG );
     return;
 }
 
@@ -867,19 +851,17 @@ sub load
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{host} //= '';
     $opts->{decrypt} //= 0;
-    $opts->{secret} //= '';
     $opts->{algo} //= '';
     # Initialisation Vector for encryption
     # Re-use it if it was previously set
     $opts->{iv} //= $self->_initialisation_vector->scalar || '';
     my $host = $opts->{host} || $self->host || '';
-    my $f = file( $file );
+    my $f = $self->new_file( $file ) || return( $self->pass_error );
     my $json = $f->load;
     return( $self->pass_error( $f->error ) ) if( !defined( $json ) );
     # No need to go further
     if( !CORE::length( $json ) )
     {
-        $self->message( 3, "Cookie json file provided \"$file\" is empty." ) if( $COOKIES_DEBUG );
         return( $self );
     }
     
@@ -889,14 +871,12 @@ sub load
         my $algo = $opts->{algo};
         return( $self->error( "Cookies file encryption was enabled, but no key was set to decrypt it." ) ) if( !defined( $key ) || !CORE::length( "$key" ) );
         return( $self->error( "Cookies file encryption was enabled, but no algorithm was set to decrypt it." ) ) if( !defined( $algo ) || !CORE::length( "$algo" ) );
-        $self->message( 4, "Value to decrypt is ", CORE::length( $json ), " bytes big." ) if( $COOKIES_DEBUG );
         try
         {
             $self->_load_class( 'Crypt::Misc', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
             my $p = $self->_encrypt_objects( @$opts{qw( key algo iv )} ) || return( $self->pass_error );
             my $crypt = $p->{crypt};
             my $bin = Crypt::Misc::decode_b64( "$json" );
-            $self->message( 4, "Base64 decoded value is ", CORE::length( $bin ), " bytes big." ) if( $COOKIES_DEBUG );
             $json = $crypt->decrypt( "$bin", @$p{qw( key iv )} );
         }
         catch( $e )
@@ -927,20 +907,16 @@ sub load
         if( !CORE::exists( $def->{name} ) ||
             !CORE::exists( $def->{value} ) )
         {
-            $self->message( 3, "Cookie found from json cookie file \"$file\" that is missing core properties (name or value: ", sub{ $self->SUPER::dump( $def ) } ) if( $COOKIES_DEBUG );
             next;
         }
         elsif( !defined( $def->{name} ) || !CORE::length( $def->{name} ) )
         {
-            $self->message( 3, "Found a cookie in cookie file \"$file\" who name is empty: ", sub{ $self->SUPER::dump( $def ) }) if( $COOKIES_DEBUG );
             next:
         }
         my $c = $self->make( $def ) || do
         {
-            $self->message( 3, "Unable to create a cookie object for cookie \"$n\": ", $self->error ) if( $COOKIES_DEBUG );
             next;
         };
-        $self->message( 4, "Saving loaded cookie '", $c->name, "' to repo." ) if( $COOKIES_DEBUG );
         $self->add( $c ) || return( $self->pass_error );
     }
     return( $self );
@@ -952,25 +928,21 @@ sub load_as_lwp
     my $file = shift( @_ ) || return( $self->error( "No filename was provided." ) );
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{decrypt} //= 0;
-    $opts->{secret} //= '';
     $opts->{algo} //= '';
     # Initialisation Vector for encryption
     # Re-use it if it was previously set
     $opts->{iv} //= $self->_initialisation_vector->scalar || '';
     my $f = $self->new_file( $file );
     my $host = $opts->{host} || $self->host || '';
-    # $self->message( 4, "Loading LWP cookies from file '$f' for host '$host'" );
     $f->open( '<', { binmode => ( $opts->{decrypt} ? 'raw' : 'utf-8' ) }) || return( $self->pass_error( $f->error ) );
     my $code = sub
     {
-        $self->message( 4, "Found line '$_'" ) if( $COOKIES_DEBUG );
         if( /^Set-Cookie3:[[:blank:]\h]*(.*?)$/ )
         {
             my $c = $self->add( $1 );
         }
         else
         {
-            $self->message( 4, "Line does not match regep." ) if( $COOKIES_DEBUG );
         }
     };
     
@@ -982,16 +954,13 @@ sub load_as_lwp
         my $algo = $opts->{algo};
         return( $self->error( "Cookies file encryption was enabled, but no key was set to decrypt it." ) ) if( !defined( $key ) || !CORE::length( "$key" ) );
         return( $self->error( "Cookies file encryption was enabled, but no algorithm was set to decrypt it." ) ) if( !defined( $algo ) || !CORE::length( "$algo" ) );
-        $self->message( 4, "Value to decrypt is ", CORE::length( $raw ), " bytes big." ) if( $COOKIES_DEBUG );
         try
         {
             $self->_load_class( 'Crypt::Misc', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
             my $p = $self->_encrypt_objects( @$opts{qw( key algo iv )} ) || return( $self->pass_error );
             my $crypt = $p->{crypt};
             my $bin = Crypt::Misc::decode_b64( "$raw" );
-            $self->message( 4, "Base64 decoded value is ", CORE::length( $bin ), " bytes big." ) if( $COOKIES_DEBUG );
             my $data = $crypt->decrypt( "$bin", @$p{qw( key iv )} );
-            $self->message( 4, "Decrypted data is: '$data'" ) if( $COOKIES_DEBUG );
             my $scalar = $self->new_scalar( \$data );
             my $io = $scalar->open || return( $self->pass_error( $! ) );
             $io->line( $code, chomp => 1, auto_next => 1 ) || return( $self->pass_error( $f->error ) );
@@ -1043,12 +1012,9 @@ sub make
     no overloading;
     return( $self->error( "Cookie name was not provided." ) ) if( !$opts->{name} );
     $opts->{debug} = $self->debug;
-    $self->message( 3, "Creating cookie with following parameters: ", sub{ $self->SUPER::dump( $opts ) } ) if( $COOKIES_DEBUG );
     my $c = Cookie->new( debug => $self->debug );
     return( $self->pass_error( Cookie->error ) ) if( !defined( $c ) );
-    $self->message( 4, "Applying values -> ", sub{ $self->SUPER::dump( $opts ) } ) if( $COOKIES_DEBUG );
     $c->apply( $opts ) || return( $self->pass_error( $c->error ) );
-    $self->message( 4, "Returning cookie object." ) if( $COOKIES_DEBUG );
     return( $c );
 }
 
@@ -1132,7 +1098,6 @@ sub merge
         }
     });
     return( $self->error( $error ) ) if( defined( $error ) );
-    $self->message( 3, "Added $n cookies from the repository to ours." ) if( $COOKIES_DEBUG );
     return( $self );
 }
 
@@ -1231,8 +1196,8 @@ sub replace
             {
                 if( Scalar::Util::refaddr( $ref->[$j] ) eq $addr )
                 {
-                    CORE::splice( @$ref, $i, 1 );
-                    $i--;
+                    CORE::splice( @$ref, $j, 1 );
+                    $j--;
                     last;
                 }
             }
@@ -1250,7 +1215,6 @@ sub save
     my $file = shift( @_ ) || return( $self->error( "No filename was provided." ) );
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{encrypt} //= 0;
-    $opts->{secret} //= '';
     $opts->{algo} //= '';
     # Initialisation Vector for encryption
     # Re-use it if it was previously set
@@ -1283,7 +1247,7 @@ sub save
     $today->set_formatter( $dt_fmt );
     my $data = { cookies => $all, updated_on => "$today" };
     
-    my $f = file( $file );
+    my $f = $self->new_file( $file ) || return( $self->pass_error );
     my $j = JSON->new->allow_nonref->pretty->canonical->convert_blessed;
     my $json;
     try
@@ -1303,9 +1267,7 @@ sub save
         my $p = $self->_encrypt_objects( @$opts{qw( key algo iv )} ) || return( $self->pass_error );
         my $crypt = $p->{crypt};
         # $value = Crypt::Misc::encode_b64( $crypt->encrypt( "$value", $p->{key}, $p->{iv} ) );
-        $self->message( 4, "Key size '", CORE::length( $p->{key} ), " and IV size '", CORE::length( $p->{iv} ), "'." ) if( $COOKIES_DEBUG );
         my $encrypted = $crypt->encrypt( "$json", @$p{qw( key iv )} );
-        $self->message( 4, "Encrypted data is now '$encrypted'" ) if( $COOKIES_DEBUG );
         my $b64 = Crypt::Misc::encode_b64( $encrypted );
         $f->unload( $b64 );
     }
@@ -1323,7 +1285,6 @@ sub save_as_lwp
     my $file = shift( @_ ) || return( $self->error( "No filename was provided." ) );
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{encrypt} //= 0;
-    $opts->{secret} //= '';
     $opts->{algo} //= '';
     # Initialisation Vector for encryption
     # Re-use it if it was previously set
@@ -1331,7 +1292,7 @@ sub save_as_lwp
     $opts->{skip_discard} //= 0;
     $opts->{skip_expired} //= 0;
     return( $self->error( "No file to write cookies was specified." ) ) if( !$file );
-    my $f = file( $file );
+    my $f = $self->new_file( $file ) || return( $self->pass_error );
     
     my $raw = '';
     my $p = {};
@@ -1339,7 +1300,6 @@ sub save_as_lwp
     {
         $self->_load_class( 'Crypt::Misc', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
         $p = $self->_encrypt_objects( @$opts{qw( key algo iv )} ) || return( $self->pass_error );
-        $self->message( 4, "Key size '", CORE::length( $p->{key} ), " and IV size '", CORE::length( $p->{iv} ), "'." ) if( $COOKIES_DEBUG );
     }
     
     my $io = $f->open( '>', { binmode => ( $opts->{encrypt} ? 'raw' : 'utf-8' ) }) || 
@@ -1390,7 +1350,6 @@ sub save_as_lwp
     {
         my $crypt = $p->{crypt};
         my $encrypted = $crypt->encrypt( "$raw", @$p{qw( key iv )} );
-        $self->message( 4, "Encrypted data is now '$encrypted'" ) if( $COOKIES_DEBUG );
         my $b64 = Crypt::Misc::encode_b64( $encrypted );
         $io->print( $b64 );
     }
@@ -1406,7 +1365,7 @@ sub save_as_netscape
     $opts->{skip_discard} //= 0;
     $opts->{skip_expired} //= 0;
     return( $self->error( "No file to write cookies was specified." ) ) if( !$opts->{file} );
-    my $f = file( $opts->{file} );
+    my $f = $self->new_file( $opts->{file} ) || return( $self->pass_error );
     my $io = $f->open( '>', { binmode => 'utf-8' }) || 
         return( $self->error( "Unable to write cookies to file \"$opts->{file}\": ", $f->error ) );
     $io->print( "# Netscape HTTP Cookie File:\n" );
@@ -1431,6 +1390,9 @@ sub save_as_netscape
 
 # For backward compatibility with HTTP::Cookies
 sub scan { return( shift->do( @_ ) ); }
+
+# NOTE: the secret key to be used to decrypt or encrypt the cookie jar file
+sub secret { return( shift->_set_get_scalar( 'secret', @_ ) ); }
 
 sub set
 {
@@ -1457,6 +1419,9 @@ sub set
     return( $self );
 }
 
+# NOTE: cookie jar file type, e.g.: json, lwp or netscape
+sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
+
 sub _cookies { return( shift->_set_get_array_as_object( '_cookies', @_ ) ); }
 
 sub _encrypt_objects
@@ -1474,7 +1439,6 @@ sub _encrypt_objects
         $self->_load_class( $class ) || return( $self->pass_error );
         my $key_len = $class->keysize;
         my $block_len = $class->blocksize;
-        $self->message( 4, "Key size: $key_len and block size: $block_len and our key size is '", CORE::length( $key ), "'." ) if( $COOKIES_DEBUG );
         return( $self->error( "The size of the key provided (", CORE::length( $key ), ") does not match the minimum key size required for this algorithm \"$algo\" (${key_len})." ) ) if( CORE::length( $key ) < $key_len );
         # Generate an "IV", i.e. Initialisation Vector based on the required block size
         if( defined( $iv ) && CORE::length( "$iv" ) )
@@ -1492,7 +1456,6 @@ sub _encrypt_objects
         }
         my $key_pack = pack( 'H' x $key_len, $key );
         my $iv_pack  = pack( 'H' x $block_len, $iv );
-        $self->message( 4, "Returning key size '", CORE::length( $key_pack ), "' and IV size '", CORE::length( $iv_pack ), "'." ) if( $COOKIES_DEBUG );
         return({ 'crypt' => $crypt, key => $key_pack, iv => $iv_pack });
     }
     catch( $e )
@@ -1522,16 +1485,57 @@ sub _normalize_path  # so that plain string compare can be used
     return( $str );
 }
 
-1;
+sub DESTROY
+{
+    my $self = shift( @_ );
+    my $file = $self->file;
+    if( $self->autosave && $file )
+    {
+        my $encrypt = $self->encrypt;
+        my $type = $self->type;
+        my $type2sub = 
+        {
+        json => \&save,
+        lwp  => \&save_as_lwp,
+        netscape => \&save_as_netscape,
+        };
+        if( !CORE::exists( $type2sub->{ $type } ) )
+        {
+            warn( "Unknown cookie jar type '$type'. This can be either json, lwp or netscape\n" ) if( $self->_warnings_is_enabled );
+            return;
+        }
+        
+        my $unloader = $type2sub->{ $type };
+        
+        if( $encrypt )
+        {
+            $unloader->( $self, $file,
+                algo => $self->algo,
+                key  => $self->secret,
+            ) || do
+            {
+                warn( $self->error, "\n" ) if( $self->_warnings_is_enabled );
+            };
+        }
+        else
+        {
+            $unloader->( $self, $file ) || do
+            {
+                warn( $self->error, "\n" ) if( $self->_warnings_is_enabled );
+            };
+        }
+    }
+};
 
-# XXX POD
+1;
+# NOTE: POD
 __END__
 
 =encoding utf8
 
 =head1 NAME
 
-Cookie::Jar - Cookies API for Server & Client
+Cookie::Jar - Cookie Jar Class for Server & Client
 
 =head1 SYNOPSIS
 
@@ -1627,10 +1631,20 @@ Cookie::Jar - Cookies API for Server & Client
 
     # Merge repository
     $jar->merge( $jar2 ) || die( $jar->error );
+    
+    # For autosave
+    my $jar = Cookie::Jar->new(
+        file => '/some/where/cookies.json',
+        # True by default
+        autosave => 1,
+        encrypt => 1,
+        secret => 'My big secret',
+        algo => 'AES',
+    ) || die( Cookie::Jar->error );
 
 =head1 VERSION
 
-    v0.1.4
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -1766,6 +1780,14 @@ So you can create a repository and use it to store the cookies sent by the http 
     # Add Set-Cookie header for that cookie, but do not add cookie to repository
     $jar->set( $cookie_object );
 
+=head2 algo
+
+String. Sets or gets the algorithm to use when loading or saving the cookie jar.
+
+=head2 autosave
+
+Boolean. Sets or gets the boolean value for automatically saving the cookie jar to the given file specified with L</file>
+
 =head2 delete
 
 Given a cookie name, an optional host and optional path or a L<Cookie> object, and this will remove it from the cookie repository.
@@ -1812,6 +1834,12 @@ If the code return C<undef>, it will end the loop, and it the code returns true,
         return(0);
     });
     print( "Found cookies: ", $found->map(sub{$_->name})->join( ',' ), "\n" );
+
+=head2 encrypt
+
+Boolean. Sets or gets the boolean value for whether to encrypt or not the cookie jar when saving it, or whether to decrypt it when loading cookies from it.
+
+This defaults to false.
 
 =head2 exists
 
@@ -1860,6 +1888,14 @@ A cookie key is made of the host (possibly empty), the path and the cookie name 
     $jar->fetch || die( $jar->error );
     # Cookies returned, but NOT added to the repository
     my $cookies = $jar->fetch || die( $jar->error );
+
+=head2 file
+
+Sets or gets the file path to the cookie jar file.
+
+If provided upon instantiation, and if the file exists on the filesystem and is not empty, C<Cookie::Jar> will load all the cookies from it.
+
+If L</autosave> is set to a true, C<Cookie::Jar> will automatically save all cookies to the specified cookie jar file, possibly encrypting it if L</algo> and L</secret> are set.
 
 =head2 get
 
@@ -2195,6 +2231,10 @@ It returns the current object. If an error occurred, it will return C<undef> and
 
 This is an alias for L</do>
 
+=head2 secret
+
+String. Sets or gets the secret string to use for decrypting or encrypting the cookie jar. This is used in conjonction with L</file>, L</encrypt> and L</algo>
+
 =head2 set
 
 Given a cookie object, and an optional hash or hash reference of parameters, and this will add the cookie to the outgoing http headers using the C<Set-Cookie> http header. To do so, it uses the L<Apache2::RequestRec> value set in L</request>, if any, or a L<HTTP::Response> compatible response object provided with the C<response> parameter.
@@ -2209,6 +2249,10 @@ Ultimately if none of those two are provided it returns the C<Set-Cookie> header
     print( STDOUT $jar->set( $c ), "\015\012" );
 
 Unless the latter, this method returns the current object.
+
+=head2 type
+
+String. Sets or gets the cookie jar file format type. The supported formats are: C<json>, C<lwp> and C<netscape>
 
 =head1 IMPORTING COOKIES
 

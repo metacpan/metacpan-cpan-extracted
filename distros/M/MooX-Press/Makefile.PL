@@ -30,11 +30,11 @@ my $meta = {
                                                        "MooX::Enumeration"    => "0.010",
                                                        "namespace::autoclean" => 0,
                                                        "perl"                 => 5.008008,
-                                                       "Role::Hooks"          => 0.001,
-                                                       "Sub::HandlesVia"      => 0.025,
-                                                       "Sub::MultiMethod"     => 0.008,
-                                                       "Sub::SymMethod"       => 0.001,
-                                                       "Type::Tiny"           => "1.012000",
+                                                       "Role::Hooks"          => 0.008,
+                                                       "Sub::HandlesVia"      => 0.032,
+                                                       "Sub::MultiMethod"     => 0.908,
+                                                       "Sub::SymMethod"       => 0.005,
+                                                       "Type::Tiny"           => 1.016002,
                                                      },
                                        suggests   => { "Mouse" => 0, "MouseX::NonMoose" => 0 },
                                      },
@@ -45,9 +45,9 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "MooX::Press"           => { file => "lib/MooX/Press.pm", version => 0.085 },
-                        "MooX::Press::Keywords" => { file => "lib/MooX/Press/Keywords.pm", version => 0.085 },
-                        "Zydeco::Lite"          => { file => "lib/Zydeco/Lite.pm", version => 0.085 },
+                        "MooX::Press"           => { file => "lib/MooX/Press.pm", version => 0.086 },
+                        "MooX::Press::Keywords" => { file => "lib/MooX/Press/Keywords.pm", version => 0.086 },
+                        "Zydeco::Lite"          => { file => "lib/Zydeco/Lite.pm", version => 0.086 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -61,7 +61,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/MooX-Press/project",
                       },
-  "version"        => 0.085,
+  "version"        => 0.086,
 };
 
 my %dynamic_config;

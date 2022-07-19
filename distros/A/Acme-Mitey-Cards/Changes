@@ -6,6 +6,14 @@ Home page:    <https://metacpan.org/release/Acme-Mitey-Cards>
 Bug tracker:  <https://github.com/tobyink/p5-mite/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.013	2022-07-19
+
+ - Signature improvements.
+
+0.012	2022-07-18
+
+ - Updated: Use the new `signature_for` keyword in Mite 0.007000.
+
 0.011	2022-07-13
 
  - Updated: Rebuild using Type::Library::Compiler 0.005.

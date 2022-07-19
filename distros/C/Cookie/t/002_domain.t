@@ -6,10 +6,14 @@ BEGIN
     use lib './lib';
     use open ':std' => ':utf8';
     use Test::More;
+    use vars qw( $DEBUG );
     use_ok( 'Cookie::Domain' );
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
     require( "./t/env.pl" ) if( -e( "t/env.pl" ) );
 };
+
+use strict;
+use warnings;
 
 my $dom = Cookie::Domain->new( debug => $DEBUG );
 isa_ok( $dom, 'Cookie::Domain' );

@@ -1,26 +1,21 @@
 ---
 abstract: 'Test routines for examining the contents of files'
 author:
-  - unknown
+  - 'Kirrily Robert'
+  - 'David E. Wheeler'
 build_requires:
-  Module::Build: '0.30'
   Test::More: '0.70'
-configure_requires:
-  Module::Build: '0.30'
-dynamic_config: 1
-generated_by: 'Module::Build version 0.4212, CPAN::Meta::Converter version 2.150001'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Test-File-Contents
-provides:
-  Test::File::Contents:
-    file: lib/Test/File/Contents.pm
-    version: '0.23'
-recommends:
-  Test::Pod: '1.41'
-  Test::Pod::Coverage: '1.06'
+no_index:
+  directory:
+    - t
+    - inc
 requires:
   Digest::MD5: '0'
   File::Spec: '0'
@@ -28,8 +23,11 @@ requires:
   Text::Diff: '0.35'
   perl: '5.008003'
 resources:
-  bugtracker: https://github.com/theory/test-file-contents/issues/
-  homepage: http://search.cpan.org/dist/Test-File-Contents/
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-File-Contents
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/theory/test-file-contents
-version: '0.23'
+  repository: https://github.com/ap/Test-File-Contents.git
+version: '0.240'
+x_copyright:
+  holder: 'David E. Wheeler'
+  year: 2016
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

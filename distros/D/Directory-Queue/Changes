@@ -1,5 +1,10 @@
 Revision history for Directory-Queue:
 
+2.2	Tue Jul 19 2022
+	* Directory::Queue::Normal now uses the safest method to count
+          the number of elements in the queue, this can be changed using
+          the newly added nlink constructor option (BZ#2108537).
+
 2.1	Wed Oct 13 2021
 	* Fixed maxlock option handling (RT#129557).
 

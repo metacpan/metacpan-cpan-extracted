@@ -165,7 +165,8 @@ sub parse_string {
 	    # NOTE convenient in this case but technically incorrect as
 	    # it is legal for keys to repeat.
 	    my %query = $uri->query_form();
-	    $href = ( $query{GROUP} || $query{SOURCE} )
+	    #         Celestrak        Celestrak Supplemental
+	    $href = ( $query{GROUP} || $query{FILE} )
 		or next;
 	} else {
 	    $href =~ s/ [.] txt \z //smx

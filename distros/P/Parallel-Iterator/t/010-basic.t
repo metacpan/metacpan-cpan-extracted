@@ -1,6 +1,5 @@
-# $Id: 010-basic.t 2701 2007-10-04 20:31:37Z andy $
-use strict;
-use warnings;
+use strict; use warnings;
+
 use Test::More tests => 13;
 use Parallel::Iterator qw( iterate iterate_as_array iterate_as_hash );
 

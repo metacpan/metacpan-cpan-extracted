@@ -1,0 +1,13 @@
+total 210552
+drwxr-xr-x  31 liyao  staff       992  4 10 21:39 AlgoC
+drwxr-xr-x@ 19 liyao  staff       608  4 10 21:39 AlgoCpp
+drwxr-xr-x  13 liyao  staff       416  3 27 22:05 Search-Fzf
+-rw-r--r--   1 liyao  staff         0  4 10 22:00 debug.log
+drwxr-xr-x   4 liyao  staff       128  4  2 15:28 lib
+-rw-r--r--   1 liyao  staff         0  4 10 22:01 lsfile
+-rw-r--r--   1 liyao  staff      1444  4 10 22:00 main.pl
+-rwxr-xr-x   1 liyao  staff       182  3 21 17:49 module.sh
+-rw-r--r--   1 liyao  staff  99480335  3 31 20:20 tempfile
+-rw-r--r--   1 liyao  staff       486  4  7 11:23 tempfile10
+-rw-r--r--   1 liyao  staff   8305588  3 31 20:21 tempfile100k
+-rw-r--r--   1 liyao  staff         0  4 10 22:01 中文文件.txt

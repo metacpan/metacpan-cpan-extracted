@@ -3,21 +3,98 @@
 
 =head1 NAME
 
-Chart::Manual::Workflows - document the ways to create charts
+Chart::Manual::Workflows - different ways to create charts
 
 =head1 OVERVIEW
 
+Four of the five major steps in creating a chart image are fixed in their
+order. First you have to L<load the module|/"use Chart">, secondly
+L<create|Chart::Manual::Methods/new> create the object.  After that you
+ may change some L<properties|Chart::Manual::Properties>.
+And always as a last step you L<create the image|/"create image">,
+no matter if the output goes to STDOUT or into a file.
+
+The only flexibility lies in how you prefer to provide the data.
+And here you have three options. Most commonly you 
+L<add one data set|Chart::Manual::Methods/add_dataset> at the time,
+which could be also understood as a row of the complete data table.
+Second option is to build the table 
+L<column by column|Chart::Manual::Methods/add_pt>. Thirdly you can
+drop the complete table L<at once|/"drop data">, either by reference to 
+a data structure or L<a file|/"data files"> containing the data.
+The last option is  closed if you already given the object data. 
+It is not advisable to reuse a chart object for further image creation
+outside of modern art projects.
+
+=head1 STEPS
+
+Most steps are already explained elsewhere and the OVERVIEW just links
+there. The missing bits are layed out here.
+
+=head2 use Chart
+
+As with any other Modul you have to:
+
+  use Chart::[Type];
+  
+Type being a placeholder for a name of a chart type, which are:
+Bars, Composite, Direction, ErrorBars, HorizontalBars, Lines, LinesPoints,
+Mountain, Pareto, Pie, Points, Split, StackedBars. To know more about them
+read L<Chart::Manual::Types>.
+
+Alternatively write to load all chart types at ones with 
+
+  use Chart;
+
+Both are not importing any symbols in your name space but load L<Carp>
+and L<GD>.
+
+=head2 drop data
+
+All the methods listed in the L<last section|/"create image">, 
+that create the final image, take as an optional, second argument data.
+This data may be delivered either as a reference to an array of arrays:
+
+    my $data = [ [ 1, 4, 3 ... <data set 0> ], [ <data set 1> ], ... ];
+    $graph->png( 'file.png', $data );
+
+or in form of a file. Then the argument has to be a file name or a
+file handle (old school as in C<FILE> or modern as in C<$FH>).
+Alternatively use the method L<add_datafile|Chart::Manual::Methods/add_datafile>.
+
+=head2 data files
+
+Are arbitrary named text files containing one or several rows of numbers,
+which have to be separated by spaces or tabs (\t) (mixing allowed). 
+Perl style comments or empty lines will be ignored, but rows containing
+different amount of numbers will cause problems.
+
+=head2 create image
+
+Currently we support only images in the PNG and JPEG format. The methods
+to create them are named straight forwardly: 
+-E<gt>L<png|Chart::Manual::Methods/png> and
+-E<gt>L<jpeg|Chart::Manual::Methods/jpeg>. Both take the same
+arguments and produce image files. For shell scripting or web programming
+you need the image binary, which you get with:
+-E<gt>L<cgi_png|Chart::Manual::Methods/cgi_png> or 
+-E<gt>L<cgi_jpeg|Chart::Manual::Methods/cgi_jpeg>. Some users
+might even want the L<GD> object for further processing by your perl
+programm. In that case please use:  
+-E<gt>L<scalar_png|Chart::Manual::Methods/scalar_png> or 
+-E<gt>L<scalar_jpeg|Chart::Manual::Methods/scalar_jpeg>.
+
+After having created a chart for web purposes, you also might want to 
+utilize L<imagemap_dump|Chart::Manual::Methods/imagemap_dump>.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2022 David Bonner, Herbert Breunung.
+Copyright 2022 Herbert Breunung.
 
 This program is free software; you can redistribute it and/or modify it 
 under same terms as Perl itself.
 
 =head1 AUTHOR
-
-David Bonner, <chartgrp@web.de>
 
 Herbert Breunung, <lichtkind@cpan.org>
 

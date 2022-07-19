@@ -3,9 +3,10 @@ package Text::Hunspell;
 require DynaLoader;
 
 use vars qw/  @ISA $VERSION /;
+
 @ISA = 'DynaLoader';
 
-$VERSION = '2.14';
+$VERSION = '2.16';
 
 bootstrap Text::Hunspell $VERSION;
 
@@ -167,6 +168,20 @@ Returns morphologically modified stem like $word.
 
 tells us that the masculine form of 'danseuse' is 'danseur'.
 
+=head1 ENCODING
+
+Note that Hunspell dictionaries often come in non-UTF-8 encodings. If
+your code uses UTF-8, you need to encode the strings into the needed
+encoding. For example Czech (files C<cs_CZ.dic> and C<cs_CZ.aff>) uses
+B<ISO-8859-2>:
+
+  use utf8;
+  use Encode;
+
+  print $speller->check(encode('ISO-8859-2', "žluťoučký"))
+        ? "found.\n"
+        : "not found.\n";
+}
 
 =head1 BUGS
 

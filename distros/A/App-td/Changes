@@ -1,3 +1,9 @@
+0.107   2022-06-05  Released-By: PERLANCAR; Urgency: medium
+
+        - [incompatible change] Rename option name --repeat to --repeated, allow
+          uniq/nauniq to return duplicate rows under --repeated.
+
+
 0.106   2022-06-04  Released-By: PERLANCAR; Urgency: medium
 
         - [actions uniq, nauniq] Add option --case-insensitive (-i).

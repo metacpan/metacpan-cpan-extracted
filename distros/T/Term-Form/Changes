@@ -1,6 +1,9 @@
 Revision history for Term::Form
 
 
+0.552   2022-07-17
+    - Update key bindings.
+
 0.551   2022-06-25
     - Update readline history.
 

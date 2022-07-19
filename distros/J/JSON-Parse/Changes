@@ -1,3 +1,7 @@
+0.62 2022-07-16
+
+* Bug fix for tokenize with backslash-double quote
+
 0.61 2021-02-11
 
 * Add upgrade_utf8 method

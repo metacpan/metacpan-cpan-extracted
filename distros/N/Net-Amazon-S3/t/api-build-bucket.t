@@ -10,7 +10,7 @@ BEGIN { require "test-helper-common.pl" }
 
 use Scalar::Util;
 
-plan tests => 4;
+plan tests => 6;
 
 sub build_bucket;
 sub test_method_bucket;
@@ -24,6 +24,20 @@ SKIP:
 		build_bucket ('foo'),
 		obj_isa ('Net::Amazon::S3::Bucket'),
 		methods (bucket => 'foo'),
+		;
+
+	test_method_bucket
+		"bucket (bucket => STRING) should return respective bucket object",
+		build_bucket (bucket => 'foo'),
+		obj_isa ('Net::Amazon::S3::Bucket'),
+		methods (bucket => 'foo'),
+		;
+
+	test_method_bucket
+		"bucket (STRING, region => STRING) should return respective bucket object",
+		build_bucket ('foo', region => 'bar'),
+		obj_isa ('Net::Amazon::S3::Bucket'),
+		methods (bucket => 'foo', region =>'bar'),
 		;
 
 	my $bar = build_bucket ('bar');

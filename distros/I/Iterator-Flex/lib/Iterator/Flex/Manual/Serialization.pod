@@ -13,7 +13,7 @@ Iterator::Flex::Manual::Serialization - Serializing iterators
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 DESCRIPTION
 
@@ -55,6 +55,8 @@ Dependencies are passed to the thaw routine only if they are present.
 =back
 
 =back
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

@@ -15,8 +15,9 @@ ansicolumn \[options\] \[file ...\]
     -o#                  output separator
     -R#                  right adjust table columns
 
-    -P[#]                page mode, with optional page length
-    -U[#]                show in N-up format (-WC# --linestyle=wrap)
+    -P[#], --page=#      page mode, with optional page length
+    -U[#], --up=#        show in N-up format (-WC# --linestyle=wrap)
+    --2up .. --9up       same as -U2 .. -U9
     -D                   document mode
     -C#                  number of panes
     -S#                  pane width
@@ -46,7 +47,7 @@ ansicolumn \[options\] \[file ...\]
 
 # VERSION
 
-Version 1.17
+Version 1.18
 
 # DESCRIPTION
 
@@ -113,11 +114,11 @@ default, from the standard input.
     **--height** exists.  Otherwise page height is set to terminal height
     minus one.
 
-- **-U**#, **--up**=#
+- **-U**#, **--up**=#, **--2up** .. **--9up**
 
-    Show in N-up format.  This option set **--pane=#** with **--widen** and
-    **--linestyle=wrap** options.  This is convenient when you want
-    multi-column output without page mode.
+    Show in N-up format.  Almost same as **-P** but does not set page
+    height.  This is convenient when you want multi-column output without
+    page control.
 
 - **-D**, **--document**
 
@@ -155,7 +156,7 @@ default, from the standard input.
 
     Insert empty line between every successive non-empty lines.
 
-- **--border**\[=_style_\], **-B**
+- **-B**, **--border**\[=_style_\]
 
     Print border.  Enabled by **--page** option automatically.  If the
     optional _style_ is given, it is used as a border style and precedes
@@ -163,7 +164,7 @@ default, from the standard input.
 
     Border style is specified by **--border-style** option.
 
-- **--fillup**\[=`pane`|`page`|`none`\], **-F**
+- **-F**, **--fillup**\[=`pane`|`page`|`none`\]
 
     Fill up final pane or page by empty lines.  Parameter is optional and
     considered as 'pane' by default.  Set by **--page** option
@@ -217,6 +218,7 @@ default, from the standard input.
 
     Sample styles:
     none,
+    space,
     vbar,          heavy-vbar,       fat-vbar,
     line,          heavy-line,
     stick,         heavy-stick,

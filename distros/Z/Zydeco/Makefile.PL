@@ -31,7 +31,7 @@ my $meta = {
                                                        "Exporter::Tiny" => "1.000000",
                                                        "Import::Into" => 0,
                                                        "Keyword::Simple" => 0.04,
-                                                       "MooX::Press" => 0.085,
+                                                       "MooX::Press" => 0.086,
                                                        "Path::ScanINC" => 0,
                                                        "perl" => "5.014000",
                                                        "PPR" => "0.000023",
@@ -44,8 +44,8 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "MooX::Pression" => { file => "lib/MooX/Pression.pm", version => 0.615 },
-                        "Zydeco" => { file => "lib/Zydeco.pm", version => 0.615 },
+                        "MooX::Pression" => { file => "lib/MooX/Pression.pm", version => 0.616 },
+                        "Zydeco" => { file => "lib/Zydeco.pm", version => 0.616 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -59,7 +59,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Zydeco/project",
                       },
-  "version"        => 0.615,
+  "version"        => 0.616,
   "x_contributors" => ["S\xE9bastien Feug\xE8re (SMONFF) <smonff\@cpan.org>"],
 };
 

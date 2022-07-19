@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.014000';
+our $VERSION   = '1.016002';
 
 $VERSION =~ tr/_//d;
 
@@ -461,6 +461,7 @@ sub to_TypeTiny {
 		return _TypeTinyFromMouse( $t )           if $class->isa( "Mouse::Meta::TypeConstraint" );
 		return _TypeTinyFromValidationClass( $t ) if $class->isa( "Validation::Class::Simple" );
 		return _TypeTinyFromValidationClass( $t ) if $class->isa( "Validation::Class" );
+		return $t->to_TypeTiny                    if $t->can( "DOES" ) && $t->DOES( "Type::Library::Compiler::TypeConstraint" ) && $t->can( "to_TypeTiny" );
 		return _TypeTinyFromGeneric( $t )         if $t->can( "check" );                            # i.e. Type::API::Constraint
 	} #/ if ( my $class = blessed...)
 	#>>>

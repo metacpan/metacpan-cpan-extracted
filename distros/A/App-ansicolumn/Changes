@@ -1,5 +1,11 @@
 Revision history for Perl extension App-ansicolumn
 
+1.18 2022-07-16T04:26:26Z
+
+    - Introduce --2up .. --9up option as an alias for -U2 .. -U9.
+    - Give border-style name `space' for `DEFAULT' style.
+    - Now -U option enables --border and --fillup.
+
 1.17 2022-03-16T08:54:57Z
 
     - Implement -U# option for N-up format output.

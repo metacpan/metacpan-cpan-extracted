@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Exhaustion::Throw;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Ref::Util;
 use Iterator::Flex::Utils qw( :default :RegistryKeys );
@@ -28,7 +28,7 @@ use namespace::clean;
 sub signal_exhaustion ( $self, @ ) {
     $self->set_exhausted;
 
-    my $exception = $REGISTRY{refaddr $self}{+GENERAL}{+EXHAUSTION}[1];
+    my $exception = $REGISTRY{ refaddr $self}{ +GENERAL }{ +EXHAUSTION }[1];
 
     $exception->() if Ref::Util::is_coderef( $exception );
 
@@ -61,7 +61,7 @@ Iterator::Flex::Role::Exhaustion::Throw - signal exhaustion by setting exhausted
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 METHODS
 
@@ -71,6 +71,8 @@ version 0.14
 
 Signal that the iterator is exhausted.  This version sets the
 iterator's exhausted flag and throws an exception.
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

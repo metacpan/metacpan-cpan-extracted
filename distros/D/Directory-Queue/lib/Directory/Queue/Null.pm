@@ -13,7 +13,7 @@
 package Directory::Queue::Null;
 use strict;
 use warnings;
-our $VERSION  = "2.1";
+our $VERSION  = "2.2";
 our $REVISION = sprintf("%d.%02d", q$Revision: 1.7 $ =~ /(\d+)\.(\d+)/);
 
 #
@@ -231,4 +231,4 @@ L<Directory::Queue::Simple>.
 
 Lionel Cons L<http://cern.ch/lionel.cons>
 
-Copyright (C) CERN 2010-2021
+Copyright (C) CERN 2010-2022

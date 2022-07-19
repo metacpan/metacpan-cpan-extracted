@@ -41,7 +41,7 @@ BEGIN {
     chomp $_;
     -c $_  and  -w $_
 	or  plan skip_all => 'required TTY (' . $_ . ') not available';
-    plan tests => 17;
+    plan tests => 18;
 
     # define fixed environment for unit tests:
     delete $ENV{DISPLAY};
@@ -396,3 +396,86 @@ stdout_is
 	 '#=============#',
 	 $prompt),
     'simple 8-3-0 mainloop runs correctly';
+
+####################################
+# list with selection, multiple pages and replace:
+$lb8 = UI::Various::Listbox->new(texts => \@text8, height => 3,
+				 selection => 1);
+my @alt_text1 = ('entry #1', 'entry #2', 'entry #3');
+my @alt_text3 = ('entry #3 +', 'entry #4', 'entry #5');
+my $step = 1;
+my $replace = UI::Various::Button->new(text => 'Modify',
+				       code => sub {
+					   if ($step == 1)
+					   {   $lb8->replace(@alt_text1);   }
+					   elsif ($step == 2)
+					   {   $lb8->remove(2);   }
+					   elsif ($step == 3)
+					   {   $lb8->add(@alt_text3);   }
+					   $step++;
+				       });
+$win = $main->window({title => '8-3-1'}, $lb8, $replace, $quit);
+stdout_is
+{   _call_with_stdin("1\n3\n1\n5\n5\n5\n6", sub { $main->mainloop; });   }
+    join("\n",
+	 '#= 8-3-1 ==<0>#',
+	 '"<1>+1-3/8    "',
+	 '"<2> 1st entry"',
+	 '"<3> 2nd entry"',
+	 '"<4> 3rd entry"',
+	 '"<5> [Modify] "',
+	 '"<6> [Quit]   "',
+	 '#=============#',
+	 $prompt . '#= 8-3-1 ==<0>#',
+	 '"<1>+4-6/8    "',
+	 '"<2> 4th entry"',
+	 '"<3> 5th entry"',
+	 '"<4> 6th entry"',
+	 '"<5> [Modify] "',
+	 '"<6> [Quit]   "',
+	 '#=============#',
+	 $prompt . '#= 8-3-1 ==<0>#',
+	 '"<1>+4-6/8    "',
+	 '"<2> 4th entry"',
+	 '"<3> '.$D{SL1}.'5th entry'.$D{SL0}.'"',
+	 '"<4> 6th entry"',
+	 '"<5> [Modify] "',
+	 '"<6> [Quit]   "',
+	 '#=============#',
+	 $prompt . '#= 8-3-1 ==<0>#',
+	 '"<1>+6-8/8    "',
+	 '"<2> 6th entry"',
+	 '"<3> 7th entry"',
+	 '"<4> 8th entry"',
+	 '"<5> [Modify] "',
+	 '"<6> [Quit]   "',
+	 '#=============#',
+	 $prompt . '#= 8-3-1 =<0>#',
+	 '"<1>+1-3/3   "',
+	 '"<2> entry #1"',
+	 '"<3> entry #2"',
+	 '"<4> entry #3"',
+	 '"<5> [Modify]"',
+	 '"<6> [Quit]  "',
+	 '#============#',
+	 $prompt . '#= 8-3-1 =<0>#',
+	 '"<1>+1-2/2   "',
+	 '"<2> entry #1"',
+	 '"<3> entry #2"',
+	 '"            "',
+	 '"<5> [Modify]"',
+	 '"<6> [Quit]  "',
+	 '#============#',
+	 $prompt . '#= 8-3-1 ===<0>#',
+	 '"<1>+1-3/5     "',
+	 '"<2> entry #1  "',
+	 '"<3> entry #2  "',
+	 '"<4> entry #3 +"',
+	 '"<5> [Modify]  "',
+	 '"<6> [Quit]    "',
+	 '#==============#',
+	 $prompt),
+    'simple 8-3-1 mainloop runs correctly';
+
+####################################
+# triggering remaining missing coverage:

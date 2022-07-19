@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Exhaustion::ImportedReturn;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Iterator::Flex::Utils qw( :default :RegistryKeys );
 
@@ -22,8 +22,8 @@ use namespace::clean;
 
 
 
-sub imported_sentinel ($self) {
-    return $REGISTRY{ refaddr $self }{+GENERAL}{ +INPUT_EXHAUSTION }[1];
+sub imported_sentinel ( $self ) {
+    return $REGISTRY{ refaddr $self }{ +GENERAL }{ +INPUT_EXHAUSTION }[1];
 }
 
 1;
@@ -50,7 +50,7 @@ Iterator::Flex::Role::Exhaustion::ImportedReturn - Imported iterator returns a s
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 METHODS
 
@@ -59,6 +59,8 @@ version 0.14
   $sentinel = $iterator->sentinel
 
 returns the sentinel which the iterator will return to signal exhaustion
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

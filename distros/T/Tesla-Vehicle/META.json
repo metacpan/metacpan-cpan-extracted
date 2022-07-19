@@ -32,7 +32,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Tesla::API" : "0.09",
+            "HTTP::Tiny" : "0",
+            "JSON" : "0",
+            "Tesla::API" : "0.10",
             "perl" : "5.006"
          }
       },
@@ -53,6 +55,6 @@
          "web" : "https://github.com/stevieb9/tesla-vehicle"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

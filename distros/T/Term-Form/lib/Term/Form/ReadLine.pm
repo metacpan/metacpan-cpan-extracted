@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.551';
+our $VERSION = '0.552';
 use Exporter 'import';
 our @EXPORT_OK = qw( read_line );
 
@@ -455,8 +455,8 @@ sub readline {
         elsif ( $char == VK_HOME      || $char == CONTROL_A ) { $self->__home(   $m ) }
         elsif ( $char == KEY_BSPACE   || $char == CONTROL_H ) { $self->__bspace( $m ) }
         elsif ( $char == VK_DELETE    || $char == CONTROL_D ) { $self->__delete( $m ) }
-        elsif ( $char == VK_UP        || $char == CONTROL_R ) { $m = $self->__select_history( $m, $prompt, 1 ) }
-        elsif ( $char == VK_DOWN      || $char == CONTROL_S ) { $m = $self->__select_history( $m, $prompt, 0 ) }
+        elsif ( $char == VK_UP        || $char == CONTROL_S ) { $m = $self->__select_history( $m, $prompt, 1 ) }
+        elsif ( $char == VK_DOWN      || $char == CONTROL_T ) { $m = $self->__select_history( $m, $prompt, 0 ) }
         elsif (                          $char == CONTROL_X ) {
             if ( @{$m->{str}} ) {
                 my $list = [ [ $prompt, '' ] ];
@@ -499,7 +499,7 @@ Term::Form::ReadLine - Read a line from STDIN.
 
 =head1 VERSION
 
-Version 0.551
+Version 0.552
 
 =cut
 
@@ -550,9 +550,9 @@ C<Page-Down> or C<Ctrl-N>: Move forward 10 characters.
 
 C<Ctrl-X>: If the input puffer is not empty, the input puffer is cleared, else C<Ctrl-X> returns nothing (undef).
 
-C<Up-Arrow> or C<Ctrl-R>: History up.
+C<Up-Arrow> or C<Ctrl-S>: History up.
 
-C<Down-Arrow> or C<Ctrl-S>: History down.
+C<Down-Arrow> or C<Ctrl-T>: History down.
 
 =head1 METHODS
 

@@ -41,9 +41,20 @@ $window =
 		  (text => 'Quit',
 		   code => sub{
 		       local $_;
-		       print STDERR "Selection (after $counter changes):\n";
-		       print STDERR "\t$_\t$list[$_]\n"
+		       # Note that Curses needs "\r\n":
+		       print STDERR "Selection (after $counter changes):\r\n";
+		       print STDERR "\t$_\t$list[$_]\r\n"
 			   foreach $listbox->selected;
 		       $window->destroy;
 		   }));
 $main->mainloop;
+
+# Trick to see previously stored standard error output even when Curses
+# clears the screen at the very end of program:
+END {
+    if (UI::Various::using() eq 'Curses')
+    {
+	print STDERR "\r\n waiting 10 seconds before screen is cleared\r\n";
+	sleep 10;
+    }
+}

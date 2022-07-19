@@ -9,8 +9,12 @@ use Scalar::Util 'refaddr';
 use Ref::Util 'is_ref';
 use Iterator::Flex::Common 'iterator';
 
-sub use_object { sub { $_[0]->next } }
-sub use_coderef { sub { $_[0]->() } }
+sub use_object {
+    sub { $_[0]->next }
+}
+sub use_coderef {
+    sub { $_[0]->() }
+}
 
 sub test {
     my ( $mknext ) = @_;
@@ -37,8 +41,7 @@ sub test {
         [ number => sub { $_[0] == $_[1] }, -22 ],
         [ string => sub { $_[0] eq $_[1] }, 'last' ],
         [
-            reference =>
-              sub { is_ref( $_[0] ) && refaddr( $_[0] ) == refaddr( $_[1] ) },
+            reference => sub { is_ref( $_[0] ) && refaddr( $_[0] ) == refaddr( $_[1] ) },
             \1
         ],
       )
@@ -50,7 +53,7 @@ sub test {
             my $len = my @data = ( 1 .. 10 );
             my @got;
             my $iterator = iterator { shift( @data ) // $value }
-              { input_exhaustion => [ return => $value ] };
+            { input_exhaustion => [ return => $value ] };
             my $next = $mknext->( $iterator );
             while ( @got <= $len ) {
                 my $data = $next->( $iterator );
@@ -67,9 +70,10 @@ sub test {
         my $len = my @data = ( 1 .. 10 );
         my @got;
         my $iterator = iterator { shift( @data ) // die }
-          { input_exhaustion => 'throw',
-                     exhaustion => 'return',
-                   };
+        {
+            input_exhaustion => 'throw',
+            exhaustion       => 'return',
+        };
         my $next = $mknext->( $iterator );
         while ( @got <= $len ) {
             my $data = $next->( $iterator );
@@ -84,9 +88,8 @@ sub test {
     subtest 'output exhaustion: throw' => sub {
         my $len = my @data = ( 1 .. 10 );
         my @got;
-        my $iterator
-          = iterator { shift @data } { exhaustion => 'throw' };
-        my $next = $mknext->( $iterator );
+        my $iterator = iterator { shift @data } { exhaustion => 'throw' };
+        my $next     = $mknext->( $iterator );
 
         my $err = dies {
             my $data;
@@ -132,11 +135,9 @@ sub test {
     $ctx->release;
 }
 
-for my $impl ( [ object => \&use_object ],
-               [ coderef => \&use_coderef ],
-             ) {
+for my $impl ( [ object => \&use_object ], [ coderef => \&use_coderef ], ) {
     my ( $label, $sub ) = @$impl;
-    subtest ( $label, \&test,  $sub );
+    subtest( $label, \&test, $sub );
 }
 
 

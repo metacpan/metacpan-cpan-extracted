@@ -74,7 +74,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 #########################################################################
 
@@ -113,6 +113,8 @@ our %T =
      => "bad usage of %s as %s",
      bad_usage_of__1_pkg_is__2
      => "bad usage of %s, \$pkg is '%s'",
+     can_t_open__1__2
+     => "can't open '%s': %s",
      can_t_remove__1_from_old_parent__2
      => "can't remove '%s' from old parent '%s'",
      can_t_remove__1_no_such_node_in__2

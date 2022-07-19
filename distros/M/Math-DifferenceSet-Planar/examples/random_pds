@@ -3,16 +3,25 @@
 use strict;
 use warnings;
 use Math::DifferenceSet::Planar;
-use Math::Prime::Util qw(gcd);
+use Math::Prime::Util qw(gcd urandomm);
 
 use constant PDS => Math::DifferenceSet::Planar::;
 
 $| = 1;
 
-if (@ARGV != 1 || $ARGV[0] !~ /^[1-9][0-9]*\z/) {
-    die "usage: random_pds order\n";
-}
+my $USAGE = "usage: random_pds [-c] [-nnn] order\n";
 
+my $mult      = 1;
+my $canonical = 0;
+while (@ARGV && $ARGV[0] =~ /^-(.+)\z/s) {
+    my $opt = $1;
+    shift @ARGV;
+    last                 if '-' eq $opt;
+    $canonical = 1, next if 'c' eq $opt;
+    $mult   = $opt, next if $opt =~ /^[1-9][0-9]*\z/;
+    die $USAGE;
+}
+die $USAGE if @ARGV != 1 || $ARGV[0] !~ /^[1-9][0-9]*\z/;
 my ($q) = @ARGV;
 
 if ($q > PDS->available_max_order) {
@@ -22,15 +31,23 @@ if (!PDS->available($q)) {
     die "$q: order is not a prime power\n";
 }
 
-my $s0 = PDS->new($q);
-my $m  = $s0->modulus;
-my $t  = 1 + int rand($m - 1);
-while (gcd($t, $m) != 1) {
-    $t  = 1 + int rand($m - 1);
+my $s0      = PDS->new($q);
+my $modulus = $s0->modulus;
+foreach my $i (1 .. $mult) {
+    my $t  = 1 + urandomm($modulus - 1);
+    while (gcd($t, $modulus) != 1) {
+        $t  = 1 + urandomm($modulus - 1);
+    }
+    my $s1 = $s0->multiply($t);
+    if ($canonical) {
+        $s1 = $s1->canonize;
+    }
+    else {
+        $s1 = $s1->translate(urandomm($modulus));
+    }
+    my @e = $s1->elements;
+    print "@e\n";
 }
-my $s1 = $s0->multiply($t)->translate(int rand $m);
-my @e  = $s1->elements;
-print "@e\n";
 
 __END__
 =head1 NAME
@@ -39,13 +56,30 @@ random_pds - generate a random planar difference set
 
 =head1 SYNOPSIS
 
-  random_pds order
+  random_pds [-c] [-nnn] order
 
 =head1 DESCRIPTION
 
 This example program picks a random planar difference set of a given
 order.  The output will be a line with integer numbers, separated by
-blanks, ordered numerically.
+blanks, in sequence, starting with the elements with difference one.
+
+An option in the form of a negative integer means that multiple sets are
+generated, as many as the absolute value of the integer.  Option B<-c>
+makes the output canonical, so that start elements will always be zero
+and one.
+
+=head1 BUGS AND LIMITATIONS
+
+The randomness of the first result depends on the amount of entropy
+available on the platform the tool is running on.  Additional results
+are distributed uniformly over the solution domain using a pseudo random
+number generator.  It is sufficiently deep to cover the whole domain
+but may exhibit subtle regularities due to its deterministic nature.
+
+Whether the solution domain actually contains all difference sets of a
+given order depends on the validity of the conjecture that any two of
+them can be mapped to each other with linear functions.
 
 =head1 AUTHOR
 
@@ -53,7 +87,7 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019-2021 by Martin Becker, Blaubeuren.
+Copyright (c) 2019-2022 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

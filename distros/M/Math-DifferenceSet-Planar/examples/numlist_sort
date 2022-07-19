@@ -6,6 +6,41 @@ use warnings;
 
 $| = 1;
 
+sub left_to_right {
+    my $cmp = @{$a} <=> @{$b};
+    my $i = 0;
+    while (!$cmp && $i < @{$a}) {
+        $cmp = $a->[$i] <=> $b->[$i];
+        ++$i;
+    }
+    $cmp
+}
+
+sub right_to_left {
+    my $cmp = @{$a} <=> @{$b};
+    my $i = @{$a};
+    while (!$cmp && $i > 0) {
+        --$i;
+        $cmp = $a->[$i] <=> $b->[$i];
+    }
+    $cmp
+}
+
+my $precedence = \&left_to_right;
+my $reversed   = 0;
+
+while (@ARGV && $ARGV[0] =~ /^-(.+)\z/s) {
+    my $opt = $1;
+    shift @ARGV;
+    last if '-' eq $opt;
+    if ($opt =~ /^[ir]+\z/) {
+        $precedence = \&right_to_left if $opt =~ /i/;
+        $reversed   = 1               if $opt =~ /r/;
+        next;
+    }
+    die "usage: numlist_sort [-i] [-r] [file]...\n";
+}
+
 my @bunch = ();
 while (<<>>) {
     s/^\s+//;
@@ -13,41 +48,45 @@ while (<<>>) {
     next if !@e;
 
     die "integer numbers separated by whitespace expected\n"
-        if grep { !/^(?:0|[1-9][0-9]*)\z/ } @e;
+        if grep { !/^(?:0|-?[1-9][0-9]*)\z/ } @e;
 
     push @bunch, \@e;
 }
 
-my @sorted =
-    sort {
-        my $cmp = @{$a} <=> @{$b};
-        my $i = 0;
-        while (!$cmp && $i < @{$a}) {
-            $cmp = $a->[$i] <=> $b->[$i];
-            ++$i;
-        }
-        $cmp
-    } @bunch;
+my @sorted = sort $precedence @bunch;
 
-foreach my $r (@sorted) {
-    print "@{$r}\n";
+if ($reversed) {
+    my $i = @sorted;
+    while ($i > 0) {
+        --$i;
+        print "@{$sorted[$i]}\n";
+    }
+}
+else {
+    foreach my $r (@sorted) {
+        print "@{$r}\n";
+    }
 }
 
 __END__
 =head1 NAME
 
-numlist_sort - sort a list of a list of numbers
+numlist_sort - sort a list of lists of numbers
 
 =head1 SYNOPSIS
 
-  numlist_sort [file]...
+  numlist_sort [-i] [-r] [file]...
 
 =head1 DESCRIPTION
 
-This example program reads lines with lists of non-negative integer
-numbers, separated by whitespace, sorts the list of lists, first by
-size, then by first element, then by second element, etc., and writes
-the final result to standard output.
+This example program reads lines with lists of integer numbers, separated
+by whitespace, sorts the list of lists, first by size, then by leftmost
+element, then by second element from the left, etc., and writes the
+final result to standard output.
+
+Option B<-i> flips the precedence from left-to-right to right-to-left.
+
+Option B<-r> reverses the output order.
 
 =head1 AUTHOR
 
@@ -55,7 +94,7 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019-2021 by Martin Becker, Blaubeuren.
+Copyright (c) 2019-2022 by Martin Becker, Blaubeuren.
 
 =head1 DISCLAIMER OF WARRANTY
 

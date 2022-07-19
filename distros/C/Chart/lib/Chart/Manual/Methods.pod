@@ -3,66 +3,199 @@
 
 =head1 NAME
 
-Chart::Manual::Methods - user API descriotion
+Chart::Manual::Methods - user API 
 
 =head1 OVERVIEW
 
-=head1 SORTED ALPHABETICALLY
+This are all methods for the chart user.
 
+=head1 ALPHABETICALLY
 
 =head2 add_datafile
 
+Adds a complete data set from a file, which only works if that is the
+only data the object recieves. You have to either provide a filename
+or filehandle (old school or in SCALAR).
+
+    $graph->add_dataset( 'file.tsv' );
+    $graph->add_dataset( $file_handle );
+    $graph->add_dataset( FILE_HANDLE );
+    
+An optional second argument, which defaults to C<'set'> can change the
+read data format if set to C<'pt'>. In C<'set'> mode every row of the
+file content is fed to L</add_dataset>, in C<'pt'> every row get loaded
+like via L</add_pt>.
+
+    $graph->add_dataset( 'file.tsv', 'pt'  );
+
+The arbitrary named text files containing one or several rows of numbers,
+have to be separated by spaces or tabs (\t) (mixing allowed). 
+Perl style comments or empty lines will be ignored, but rows containing
+different amount of numbers will cause problems.
+
 =head2 add_dataset
+
+Adding a list of values as one data set. That is one row in the overall
+data. The first data set are usually x-axis labels (domain set).
+Make sure all set have the same length.
+
+    $graph->add_dataset(  1, 2, 3, ...  );
+    $graph->add_dataset( [1, 2, 3, ...] );
+    
+For instances with L<Points|Chart::Manual::Types/Points>,
+L<Lines|Chart::Manual::Types/Lines> or
+L<Bars|Chart::Manual::Types/Bars> one data set is represented by a set
+of graphic items (points, bars or line) of one color.
 
 =head2 add_pt
 
+Adds (appends) to each already existing data set one value. (Adds to set 0
+the 3, to set 1 the 6 and so forth.) Therefore  make sure that the amount
+of numbers matches the already existing number of data sets.
+
+    $graph->add_pt(  3, 6, 9, ...  );
+    $graph->add_pt( [3, 6, 9, ...] );
+
 =head2 cgi_jpeg
+
+Creates same JPEG image as L</jpeg>, but outputs to STDOUT. Since no file
+name or handle needed, only the optional data argument is acceptable.
+
+    $graph->cgi_jpeg( );
+    my $data = [[1, 2, 3],   # data set 0
+                [3, 4, 5] ]; # data set 1 
+    $graph->cgi_jpeg( \@data );
+
+This method takes only one optional argument
 
 =head2 cgi_png
 
+Creates same PNG image as L</png>, but outputs to STDOUT. Since no file
+name or handle needed, only the optional data argument is acceptable.
+
+    $graph->cgi_png( );
+    
+    my @data = ([1, 2, 3],   # data set 0
+                [3, 4, 5]);  # data set 1 
+    $graph->cgi_png( $data );
+
 =head2 clear_data
+
+Need no arguments and deletes all so far added data.
 
 =head2 get_data
 
+Return data (array of arrays) given to a graph.
+
 =head2 imagemap_dump
+
+When creating a chart for web purposes by L</cgi_jpeg> or L</cgi_png>,
+you maybe want the information, where are the areas of interests in the
+image that should react to a users click. (HTML tag map). 
+Coordinates of bars or points of the first drawn data set is to be 
+found under the index 1 in the overall array of the image map and so forth.
+Each element is again  an array with the values of x1, y1, x2, y2.
+But you can only call the method, if you activated this functionality
+by setting the property: L<imagemap|Chart::Manual::Properties/imagemap> to C<'true'>.
+
+    my $image_map = $graph->imagemap_dump();
+    
+    say "coordinates of first bar, first data set:";
+    say for @{$image_map->[1][0]};
 
 =head2 jpeg
 
+Creates an JPEG image from given data and properties. Accepts a file name
+or a file handle (raw and in a SCALAR). The method closes the file handle.
+
+    $graph->jpeg( 'image.jpg' );
+    $graph->jpeg( $file_handle );
+    $graph->jpeg( FILE_HANDLE );
+    
+    $graph->jpeg( 'image.jpg', $data );
+    $graph->jpeg( 'image.jpg', 'data_file.tsv' );
+    $graph->jpeg( 'image.jpg', $file_handle );
+    $graph->jpeg( 'image.jpg', FILE_HANDLE );
+
+The second, optional argument is the data in form of an array of arrays 
+reference. This only works, if there is no data already given to the object.
+Alternatively the data can also be loaded from a file, just provide
+the filename or filehandle (modern in SCALAR or old school).
+Read more about the file format at L</add_datafile> and note that
+this method has another option for loading transposed data tables.
+
 =head2 new
+
+Creates a new chart object. Takes two optional arguments, 
+which are the width and height of the to be produced image in pixels.
+Defaults for that are 400 x 300.
+
+    my $graph = Chart::Bars->new ( );
+    my $graph = Chart::Bars->new (600, 700);
+    
+Instead of Bars, you can also use: Composite, Direction, ErrorBars, 
+HorizontalBars, Lines, LinesPoints, Mountain, Pareto, Pie, Points, Split
+and StackedBars. To know more about them read L<Chart::Manual::Types>.
 
 =head2 png
 
+Creates an PNG image from given data and properties. Accepts a file name
+or a file handle (raw and in a SCALAR). The method closes the file handle.
+
+    $graph->png( 'image.png' );
+    $graph->png( $file_handle );
+    $graph->png( FILE_HANDLE );
+    
+    $graph->png( 'image.png', $data );
+    $graph->png( 'image.png', 'data_file.tsv' );
+    $graph->png( 'image.png', $file_handle );
+    $graph->png( 'image.png', FILE_HANDLE );
+
+
+The second, optional argument is the data in form of an array of arrays 
+reference. This only works, if there is no data already given to the object.
+Alternatively the data can also be loaded from a file, just provide
+the filename or filehandle (modern in SCALAR or old school).
+Read more about the file format at L</add_datafile> and note that
+this method has another option for loading transposed data tables.
+
 =head2 scalar_jpeg
 
+Creates same JPEG image as L</cgi_jpeg> but returns the image binary -
+no output to STDOUT or a file.
+
+    my $image_binary = $graph->scalar_jpeg();
+    my $image_binary = $graph->scalar_jpeg( $data );
+ 
 =head2 scalar_png
 
+Creates same PNG image as L</cgi_png> but returns the image binary - 
+no output to STDOUT or a file.
+
+    my $image_binary = $graph->scalar_png();
+    my $image_binary = $graph->scalar_png( $data );
+ 
 =head2 set
 
-L<Chart::Manual::Properties>
+Method to change one or more chart properties in hash form.
 
+  $chart->set ( property_name => 'new value', ... );
+  $chart->set ( %properties );
 
-=head1 SORTED THEMATICALLY
-
-=head2 Data
-
-=head2 Output
-
-=head2 Properties
+Different chart types react to different properties, which are all listed
+and explained under L<Chart::Manual::Properties>.
 
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2022 David Bonner, Herbert Breunung.
+Copyright 2022 Herbert Breunung.
 
 This program is free software; you can redistribute it and/or modify it 
 under same terms as Perl itself.
 
 =head1 AUTHOR
 
-David Bonner, <chartgrp@web.de>
-
 Herbert Breunung, <lichtkind@cpan.org>
 
-
-
 =cut
+

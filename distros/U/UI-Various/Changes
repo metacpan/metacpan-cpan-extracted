@@ -1,6 +1,21 @@
 Revision history for Perl extension UI-Various
 
-0.24 2022-06-07T11:21:30Z
+0.25 2022-07-19T12:46:42Z
+
+0.25 2022-07-19T12:45:46Z
+
+    - minor addition to documentation of DoD script
+    - added Compound::FileSelect widget
+    - fixed missing width in Curses::Button
+    - fixed buggy modification behavior in PoorTerm::Listbox
+    - fixed self-destruction of PoorTerm::toplevel via Button in Boxes
+    - fixed bad prompting in RichTerm::Optionmenu
+    - fixed totally broken behavior of Dialog for Tk
+    - added tests and fixed handling of undisplayed Listbox in Tk
+    - added script for simple syntax checking of all modules
+    - added core function 'message'
+    - added method Listbox::replace
+    - minor documentation fixes
 
 0.24 2022-06-07T11:20:48Z
 

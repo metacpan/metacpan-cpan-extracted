@@ -1,5 +1,16 @@
 Revision history for Perl extension Text::Hunspell.
 
+2.16    2022/07/15 13:04:00 Europe/Oslo (cosimo)
+
+        Included LICENSE file in distribution manifest.
+
+2.15    2022/07/15 12:19:00 Europe/Oslo (cosimo)
+
+        Documentation and license improvements:
+        - Merged https://github.com/cosimo/perl5-text-hunspell/pull/14 by @manwar (from 2015! Sorry)
+        - Merged https://github.com/cosimo/perl5-text-hunspell/pull/16 by @choroba (from 2016! Sorry)
+        - Merged https://github.com/cosimo/perl5-text-hunspell/pull/18 by @JJ (from a month ago)
+
 2.14    2016/01/14 08:36:00 Europe/Oslo (cosimo)
 
         No functional changes. Now Text::Hunspell depends on Alien::Hunspell

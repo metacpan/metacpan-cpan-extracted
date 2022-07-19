@@ -366,33 +366,6 @@ C<environment> key points to value C<1>.
 
 Executable.
 
-=item C<getopt_config>
-
-Array of strings. See below for defaults.
-
-A list of strings to use to configure C<Getopt::Long> for the specific
-command.
-
-By default it is set to C<gnu_getopt>. If a command is I<not> a leaf,
-C<require_order> and C<pass_through> are added too, although the latter
-only temporarily to allow for chaining (unrecognized options might still
-trigger an exception). If C<allow_residual_options> is true,
-C<pass_through> is added.
-
-
-=item C<help>
-
-A concise form of help, ideally a single line to explain what the
-(sub-)command does. It is used when generating the whole help for the
-command, as well as the list of sub-commands of the help for the parent
-command.
-
-=item C<options>
-
-Array of items.
-
-See L</OPTIONS>.
-
 =item C<fallback_to>
 
 String.
@@ -429,6 +402,19 @@ C<-self> and the three words C<help>, C<commands>, and C<tree> are not
 possible valid values as arguments for the leaf command itself (e.g.
 when it does not use non-option command line arguments).
 
+=item C<getopt_config>
+
+Array of strings. See below for defaults.
+
+A list of strings to use to configure C<Getopt::Long> for the specific
+command.
+
+By default it is set to C<gnu_getopt>. If a command is I<not> a leaf,
+C<require_order> and C<pass_through> are added too, although the latter
+only temporarily to allow for chaining (unrecognized options might still
+trigger an exception). If C<allow_residual_options> is true,
+C<pass_through> is added.
+
 =item C<hashy_class>
 
 String. Defaults to C<App::Easer::V2::Command>.
@@ -437,6 +423,13 @@ The class name to use for inflating applications defined as hash
 references into objects.
 
 Anything different from the default is a liability.
+
+=item C<help>
+
+A concise form of help, ideally a single line to explain what the
+(sub-)command does. It is used when generating the whole help for the
+command, as well as the list of sub-commands of the help for the parent
+command.
 
 =item C<help_channel>
 
@@ -483,9 +476,15 @@ String.
 Name of the command. If absent, the first item in the C<alias> array is
 used.
 
+=item C<options>
+
+Array of items.
+
+See L</OPTIONS>.
+
 =item C<params_validate>
 
-Hash reference or C<undef>.
+Hash reference or C<undef>. Ignored if L</validate> is set.
 
 If passed as a hash reference, two keys are supported:
 
@@ -508,6 +507,15 @@ configuration (see L</OPTIONS>).
 Array of items.
 
 See L</OPTIONS>.
+
+=item C<validate>
+
+Sub reference for performing validation. Will be called during the
+validation phase and passed the command object instance:
+
+   $validation_sub->($self);
+
+If set, L</params_validate> is ignored.
 
 =back
 
@@ -1137,6 +1145,23 @@ Use of this method is discouraged and not future-proof.
 See L</Application High Level View> and L</OPTIONS>.
 
 =item C<validate>
+
+   $self->validate(\&validation_sub);
+   $self->validate;
+
+Performs validation.
+
+When a validation sub is set (either calling with a parameter, or
+setting it via C<validate> in L</new>) it will be called, receiving
+C<$self> as the only parameter:
+
+   $sub->($self);
+
+The validator is supposed to throw an exception upon validation failure.
+
+If no validation sub is set, L</params_validate> is looked for. If
+present, validation is applied according to it, using
+L<Params::Validate>.
 
 =back
 

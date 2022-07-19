@@ -558,7 +558,7 @@ sub create_bootstrap_main_func_source {
 
   $source .= <<"EOS";
 
-int32_t main(int32_t argc, const char *argv[]) {
+int32_t main(int32_t command_args_length, const char *command_args[]) {
 
   SPVM_ENV* env = SPVM_NATIVE_new_env_prepared();
 
@@ -579,24 +579,30 @@ int32_t main(int32_t argc, const char *argv[]) {
   // Enter scope
   int32_t scope_id = env->enter_scope(env, stack);
   
-  // Starting file name
-  void* cmd_start_file_obj = env->new_string(env, stack, argv[0], strlen(argv[0]));
+  // Program name - string
+  void* obj_program_name = env->new_string(env, stack, command_args[0], strlen(command_args[0]));
   
-  // new byte[][args_length] object
-  int32_t arg_type_basic_id = env->get_basic_type_id(env, "byte");
-  void* cmd_args_obj = env->new_muldim_array(env, stack, arg_type_basic_id, 1, argc - 1);
-  
-  // Set command line arguments
-  for (int32_t arg_index = 1; arg_index < argc; arg_index++) {
-    void* cmd_arg_obj = env->new_string(env, stack, argv[arg_index], strlen(argv[arg_index]));
-    env->set_elem_object(env, stack, cmd_args_obj, arg_index - 1, cmd_arg_obj);
+  // ARGV - string[]
+  void* obj_argv = env->new_object_array(env, stack, SPVM_NATIVE_C_BASIC_TYPE_ID_STRING, command_args_length - 1);
+  for (int32_t arg_index = 1; arg_index < command_args_length; arg_index++) {
+    void* obj_arg = env->new_string(env, stack, command_args[arg_index], strlen(command_args[arg_index]));
+    env->set_elem_object(env, stack, obj_argv, arg_index - 1, obj_arg);
   }
   
-  stack[0].oval = cmd_start_file_obj;
-  stack[1].oval = cmd_args_obj;
+  stack[0].oval = obj_program_name;
+  stack[1].oval = obj_argv;
   
   // Call INIT blocks
   env->call_init_blocks(env, stack);
+  
+  // Set command info
+  {
+    int32_t e;
+    e = env->set_command_info_program_name(env, stack, obj_program_name);
+    assert(e == 0);
+    e = env->set_command_info_argv(env, stack, obj_argv);
+    assert(e == 0);
+  }
   
   // Run
   int32_t error = env->call_spvm_method(env, stack, method_id);

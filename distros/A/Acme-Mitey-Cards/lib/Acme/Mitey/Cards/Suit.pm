@@ -1,10 +1,10 @@
 package Acme::Mitey::Cards::Suit;
 
-our $VERSION   = '0.011';
+our $VERSION   = '0.013';
 our $AUTHORITY = 'cpan:TOBYINK';
 
-use Acme::Mitey::Cards::Mite qw( -bool -is );
-use Acme::Mitey::Cards::Types qw(:types);
+use Acme::Mitey::Cards::Mite qw( -all );
+use Acme::Mitey::Cards::Types qw( :types );
 
 has name => (
 	is       => ro,
@@ -26,7 +26,11 @@ has colour => (
 
 {
 	my ( $hearts, $diamonds, $spades, $clubs );
-	
+
+	signature_for $_ => ( pos => [] )
+		for qw( hearts diamonds spades clubs );
+
+
 	sub hearts {
 		$hearts ||= Acme::Mitey::Cards::Suit->new( name => 'Hearts', colour => 'red' );
 	}
@@ -43,6 +47,10 @@ has colour => (
 		$clubs ||= Acme::Mitey::Cards::Suit->new( name => 'Clubs', colour => 'black' );
 	}
 }
+
+signature_for standard_suits => (
+	pos => [],
+);
 
 sub standard_suits {
 	my $class = shift;

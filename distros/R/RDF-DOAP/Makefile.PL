@@ -24,7 +24,7 @@ my $meta = {
                           develop   => { recommends => { "Dist::Inkt" => 0.001 } },
                           runtime   => {
                                          requires => {
-                                           "Exporter::Tiny"        => 0.026,
+                                           "Exporter::Tiny"        => "1.000",
                                            "JSON"                  => "2.00",
                                            "List::Util"            => 1.45,
                                            "match::simple"         => 0.001,
@@ -32,37 +32,37 @@ my $meta = {
                                            "MooseX::AttributeTags" => 0.001,
                                            "perl"                  => "5.010",
                                            "RDF::Trine"            => "1.000",
-                                           "Types::Standard"       => 0.022,
+                                           "Types::Standard"       => 1.012,
                                          },
                                        },
                           test      => { requires => { "Test::LongString" => 0, "Test::More" => 0.96 } },
                         },
   "provides"         => {
-                          "RDF::DOAP"                             => { file => "lib/RDF/DOAP.pm", version => 0.104 },
-                          "RDF::DOAP::Change"                     => { file => "lib/RDF/DOAP/Change.pm", version => 0.104 },
-                          "RDF::DOAP::Change::Addition"           => { file => "lib/RDF/DOAP/Change/Addition.pm", version => 0.104 },
-                          "RDF::DOAP::Change::BackCompat"         => { file => "lib/RDF/DOAP/Change/BackCompat.pm", version => 0.104 },
-                          "RDF::DOAP::Change::Bugfix"             => { file => "lib/RDF/DOAP/Change/Bugfix.pm", version => 0.104 },
-                          "RDF::DOAP::Change::Documentation"      => { file => "lib/RDF/DOAP/Change/Documentation.pm", version => 0.104 },
-                          "RDF::DOAP::Change::Packaging"          => { file => "lib/RDF/DOAP/Change/Packaging.pm", version => 0.104 },
-                          "RDF::DOAP::Change::Regression"         => { file => "lib/RDF/DOAP/Change/Regression.pm", version => 0.104 },
-                          "RDF::DOAP::Change::Removal"            => { file => "lib/RDF/DOAP/Change/Removal.pm", version => 0.104 },
-                          "RDF::DOAP::Change::SecurityFix"        => { file => "lib/RDF/DOAP/Change/SecurityFix.pm", version => 0.104 },
+                          "RDF::DOAP"                             => { file => "lib/RDF/DOAP.pm", version => 0.105 },
+                          "RDF::DOAP::Change"                     => { file => "lib/RDF/DOAP/Change.pm", version => 0.105 },
+                          "RDF::DOAP::Change::Addition"           => { file => "lib/RDF/DOAP/Change/Addition.pm", version => 0.105 },
+                          "RDF::DOAP::Change::BackCompat"         => { file => "lib/RDF/DOAP/Change/BackCompat.pm", version => 0.105 },
+                          "RDF::DOAP::Change::Bugfix"             => { file => "lib/RDF/DOAP/Change/Bugfix.pm", version => 0.105 },
+                          "RDF::DOAP::Change::Documentation"      => { file => "lib/RDF/DOAP/Change/Documentation.pm", version => 0.105 },
+                          "RDF::DOAP::Change::Packaging"          => { file => "lib/RDF/DOAP/Change/Packaging.pm", version => 0.105 },
+                          "RDF::DOAP::Change::Regression"         => { file => "lib/RDF/DOAP/Change/Regression.pm", version => 0.105 },
+                          "RDF::DOAP::Change::Removal"            => { file => "lib/RDF/DOAP/Change/Removal.pm", version => 0.105 },
+                          "RDF::DOAP::Change::SecurityFix"        => { file => "lib/RDF/DOAP/Change/SecurityFix.pm", version => 0.105 },
                           "RDF::DOAP::Change::SecurityRegression" => {
                                                                        file => "lib/RDF/DOAP/Change/SecurityRegression.pm",
-                                                                       version => 0.104,
+                                                                       version => 0.105,
                                                                      },
-                          "RDF::DOAP::Change::Tests"              => { file => "lib/RDF/DOAP/Change/Tests.pm", version => 0.104 },
-                          "RDF::DOAP::Change::Update"             => { file => "lib/RDF/DOAP/Change/Update.pm", version => 0.104 },
-                          "RDF::DOAP::ChangeSet"                  => { file => "lib/RDF/DOAP/ChangeSet.pm", version => 0.104 },
-                          "RDF::DOAP::Issue"                      => { file => "lib/RDF/DOAP/Issue.pm", version => 0.104 },
-                          "RDF::DOAP::Person"                     => { file => "lib/RDF/DOAP/Person.pm", version => 0.104 },
-                          "RDF::DOAP::Project"                    => { file => "lib/RDF/DOAP/Project.pm", version => 0.104 },
-                          "RDF::DOAP::Repository"                 => { file => "lib/RDF/DOAP/Repository.pm", version => 0.104 },
-                          "RDF::DOAP::Resource"                   => { file => "lib/RDF/DOAP/Resource.pm", version => 0.104 },
-                          "RDF::DOAP::Types"                      => { file => "lib/RDF/DOAP/Types.pm", version => 0.104 },
-                          "RDF::DOAP::Utils"                      => { file => "lib/RDF/DOAP/Utils.pm", version => 0.104 },
-                          "RDF::DOAP::Version"                    => { file => "lib/RDF/DOAP/Version.pm", version => 0.104 },
+                          "RDF::DOAP::Change::Tests"              => { file => "lib/RDF/DOAP/Change/Tests.pm", version => 0.105 },
+                          "RDF::DOAP::Change::Update"             => { file => "lib/RDF/DOAP/Change/Update.pm", version => 0.105 },
+                          "RDF::DOAP::ChangeSet"                  => { file => "lib/RDF/DOAP/ChangeSet.pm", version => 0.105 },
+                          "RDF::DOAP::Issue"                      => { file => "lib/RDF/DOAP/Issue.pm", version => 0.105 },
+                          "RDF::DOAP::Person"                     => { file => "lib/RDF/DOAP/Person.pm", version => 0.105 },
+                          "RDF::DOAP::Project"                    => { file => "lib/RDF/DOAP/Project.pm", version => 0.105 },
+                          "RDF::DOAP::Repository"                 => { file => "lib/RDF/DOAP/Repository.pm", version => 0.105 },
+                          "RDF::DOAP::Resource"                   => { file => "lib/RDF/DOAP/Resource.pm", version => 0.105 },
+                          "RDF::DOAP::Types"                      => { file => "lib/RDF/DOAP/Types.pm", version => 0.105 },
+                          "RDF::DOAP::Utils"                      => { file => "lib/RDF/DOAP/Utils.pm", version => 0.105 },
+                          "RDF::DOAP::Version"                    => { file => "lib/RDF/DOAP/Version.pm", version => 0.105 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -77,7 +77,7 @@ my $meta = {
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/RDF-DOAP/project",
                           x_IRC        => "irc://irc.perl.org/#perlrdf",
                         },
-  "version"          => 0.104,
+  "version"          => 0.105,
   "x_static_install" => 1,
 };
 
@@ -152,28 +152,8 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

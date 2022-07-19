@@ -9,7 +9,7 @@ use PerlX::Maybe;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-06-05'; # DATE
 our $DIST = 'App-td'; # DIST
-our $VERSION = '0.106'; # VERSION
+our $VERSION = '0.107'; # VERSION
 
 our %SPEC;
 
@@ -242,6 +242,7 @@ Next, you can use these actions:
 
     # Pick 5 random rows from input
     % osnames -l --json | td shuf -n5
+    % osnames -l --json | td pick -n5  ;# synonym for 'shuf'
 
     # Sort by column(s) (add "-" prefix to for descending order)
     % osnames -l --json | td sort value tags
@@ -258,6 +259,20 @@ Next, you can use these actions:
 
     # Show rows from the row 5 onwards
     % osnames -l --json | td tail -n +5
+
+    # Remove adjacent duplicate rows:
+    % command ... | td uniq
+    % command ... | td uniq -i ;# case-insensitive
+    % command ... | td uniq --repeated ;# only shows the duplicate rows
+    % command ... | td uniq -i C1 -i C2 ;# only use columns C1 & C2 to check uniqueness
+    % command ... | td uniq -e C5 -e C6 ;# use all columns but C5 & C6 to check uniqueness
+
+    # Remove non-adjacent duplicate rows:
+    % command ... | td nauniq
+    % command ... | td nauniq -i ;# case-insensitive
+    % command ... | td nauniq --repeated ;# only shows the duplicate rows
+    % command ... | td nauniq -i C1 -i C2 ;# only use columns C1 & C2 to check uniqueness
+    % command ... | td nauniq -e C5 -e C6 ;# use all columns but C5 & C6 to check uniqueness
 
     # Transpose table (make first column of rows as column names in the
     # transposed table)
@@ -332,11 +347,24 @@ _
             tags => ['category:actions-action'],
         },
 
-        repeat => {
-            summary => 'Allow duplicates',
+        repeated => {
+            summary => 'Allow/show duplicates',
             schema => 'bool*',
             cmdline_aliases => {r=>{}},
-            tags => ['category:shuf-action', 'category:pick-action'],
+            tags => [
+                'category:shuf-action', 'category:pick-action',
+                'category:uniq-action', 'category:nauniq-action',
+            ],
+            description => <<'_',
+
+For shuf/pick actions, setting this option means sampling with replacement which
+makes a single row can be sampled/picked multiple times. The default is to
+sample without replacement.
+
+For uniq/nauniq actions, setting this option means instructing to return
+duplicate rows instead of the unique rows.
+
+_
         },
 
         weight_column => {
@@ -602,7 +630,7 @@ sub td {
             my $weight_column_idx = defined $args{weight_column} ?
                 $input_obj->col_idx($args{weight_column}) : undef;
             my @output_rows;
-            if ($args{repeat}) {
+            if ($args{repeated}) {
                 if (defined $weight_column_idx) {
                     require Array::Sample::WeightedRandom;
                     my @ary = map { [$input_rows->[$_], $input_rows->[$_][$weight_column_idx]] } 0 .. scalar(@$input_rows);
@@ -647,21 +675,38 @@ sub td {
             my @output_rows;
             if ($action eq 'uniq') {
                 my $prev_row_as_str;
+                my %seen_dupes;
                 for my $rownum (0 .. $#{$input_rows}) {
                     my $row_as_str = join "\0", @{ $input_rows->[$rownum] }[@indexes];
                     $row_as_str = lc $row_as_str if $ci;
                     if (!defined($prev_row_as_str) || $prev_row_as_str ne $row_as_str) {
-                        push @output_rows, $input_rows->[$rownum];
+                        if ($args{repeated}) {
+                            %seen_dupes = ();
+                        } else {
+                            push @output_rows, $input_rows->[$rownum];
+                        }
+                    } else {
+                        if ($args{repeated}) {
+                            push @output_rows, $input_rows->[$rownum] unless $seen_dupes{$row_as_str}++;
+                        }
                     }
                     $prev_row_as_str = $row_as_str;
                 }
             } else { # nauniq
                 my %seen;
+                my %seen_dupes;
                 for my $rownum (0 .. $#{$input_rows}) {
                     my $row_as_str = join "\0", @{ $input_rows->[$rownum] }[@indexes];
                     $row_as_str = lc $row_as_str if $ci;
                     if (!$seen{$row_as_str}++) {
-                        push @output_rows, $input_rows->[$rownum];
+                        if (!$args{repeated}) {
+                            push @output_rows, $input_rows->[$rownum];
+                        }
+                    } else {
+                        if ($args{repeated}) {
+                            push @output_rows, $input_rows->[$rownum]
+                                unless $seen_dupes{$row_as_str}++;
+                        }
                     }
                 }
             }
@@ -855,7 +900,7 @@ App::td - Manipulate table data
 
 =head1 VERSION
 
-This document describes version 0.106 of App::td (from Perl distribution App-td), released on 2022-06-05.
+This document describes version 0.107 of App::td (from Perl distribution App-td), released on 2022-06-05.
 
 =head1 FUNCTIONS
 
@@ -973,6 +1018,7 @@ Next, you can use these actions:
  
  # Pick 5 random rows from input
  % osnames -l --json | td shuf -n5
+ % osnames -l --json | td pick -n5  ;# synonym for 'shuf'
  
  # Sort by column(s) (add "-" prefix to for descending order)
  % osnames -l --json | td sort value tags
@@ -989,6 +1035,20 @@ Next, you can use these actions:
  
  # Show rows from the row 5 onwards
  % osnames -l --json | td tail -n +5
+ 
+ # Remove adjacent duplicate rows:
+ % command ... | td uniq
+ % command ... | td uniq -i ;# case-insensitive
+ % command ... | td uniq --repeated ;# only shows the duplicate rows
+ % command ... | td uniq -i C1 -i C2 ;# only use columns C1 & C2 to check uniqueness
+ % command ... | td uniq -e C5 -e C6 ;# use all columns but C5 & C6 to check uniqueness
+ 
+ # Remove non-adjacent duplicate rows:
+ % command ... | td nauniq
+ % command ... | td nauniq -i ;# case-insensitive
+ % command ... | td nauniq --repeated ;# only shows the duplicate rows
+ % command ... | td nauniq -i C1 -i C2 ;# only use columns C1 & C2 to check uniqueness
+ % command ... | td nauniq -e C5 -e C6 ;# use all columns but C5 & C6 to check uniqueness
  
  # Transpose table (make first column of rows as column names in the
  # transposed table)
@@ -1060,9 +1120,16 @@ Arguments.
 
 Don't make the first column as column names of the transposed table; instead create column named 'row1', 'row2', ...
 
-=item * B<repeat> => I<bool>
+=item * B<repeated> => I<bool>
 
-Allow duplicates.
+AllowE<sol>show duplicates.
+
+For shuf/pick actions, setting this option means sampling with replacement which
+makes a single row can be sampled/picked multiple times. The default is to
+sample without replacement.
+
+For uniq/nauniq actions, setting this option means instructing to return
+duplicate rows instead of the unique rows.
 
 =item * B<weight_column> => I<str>
 

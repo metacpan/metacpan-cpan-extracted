@@ -7,12 +7,11 @@ my(%param, $emv, $name);
 %param = (
     NAME                => 'Directory::Queue',
     AUTHOR              => 'Lionel Cons <lionel.cons@cern.ch>',
-    VERSION             => '2.1',
+    VERSION             => '2.2',
     ABSTRACT_FROM       => 'lib/Directory/Queue.pm',
     LICENSE             => 'perl',
     PL_FILES            => {},
     BUILD_REQUIRES => {
-        'Encode'        => 0,
         'File::Temp'    => 0,
         # optional: Pod::Coverage
         'Test::More'    => 0,
@@ -20,6 +19,7 @@ my(%param, $emv, $name);
         # optional: Test::Pod::Coverage
     },
     PREREQ_PM => {
+        'Encode'        => 0,
         'No::Worries'   => '1.4',
         'POSIX'         => 0,
         'Time::HiRes'   => 0,

@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Exhaustion::Return;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Scalar::Util();
 use Iterator::Flex::Utils qw[ :default :RegistryKeys ];
@@ -22,8 +22,8 @@ use namespace::clean;
 
 
 
-sub sentinel ($self) {
-    return $REGISTRY{ refaddr $self }{+GENERAL}{+EXHAUSTION}[1];
+sub sentinel ( $self ) {
+    return $REGISTRY{ refaddr $self }{ +GENERAL }{ +EXHAUSTION }[1];
 }
 
 
@@ -35,7 +35,7 @@ sub sentinel ($self) {
 
 
 
-sub signal_exhaustion ($self, @) {
+sub signal_exhaustion ( $self, @ ) {
     $self->set_exhausted;
     return $self->sentinel;
 }
@@ -65,7 +65,7 @@ Iterator::Flex::Role::Exhaustion::Return - signal exhaustion by returning a sent
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 METHODS
 
@@ -81,6 +81,8 @@ returns the sentinel which the iterator will return to signal exhaustion
 
 Signal that the iterator is exhausted, by calling C<<
 $self->set_exhausted >> and returning the iterator's sentinel value.
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

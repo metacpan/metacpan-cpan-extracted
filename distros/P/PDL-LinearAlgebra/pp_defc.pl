@@ -32,7 +32,11 @@ $doc
 =cut
 
 sub PDL::c$function {
-  ref \$_[0] eq 'PDL::Complex' || \$_[0]->type->real ? goto &PDL::__Cc$function : goto &PDL::__Nc$function;
+  barf "Cannot mix PDL::Complex and native-complex" if
+    (grep ref(\$_) eq 'PDL::Complex', \@_) and
+    (grep UNIVERSAL::isa(\$_, 'PDL') && !\$_->type->real, \@_);
+  goto &PDL::__Cc$function if grep ref(\$_) eq 'PDL::Complex', \@_;
+  goto &PDL::__Nc$function;
 }
 *c$function = \\&PDL::c$function;
 

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental qw( signatures postderef );
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use parent 'Iterator::Flex::Base';
 use Iterator::Flex::Utils qw( STATE :IterAttrs :IterStates throw_failure );
@@ -57,7 +57,7 @@ use namespace::clean;
 
 
 
-sub new ( $class, $iterable, $pars={} ) {
+sub new ( $class, $iterable, $pars = {} ) {
 
     throw_failure( parameter => '"pars" argument must be a hash' )
       unless Ref::Util::is_hashref( $pars );
@@ -81,7 +81,7 @@ sub construct ( $class, $state ) {
 
     my ( $src, $capacity, $idx, $cache ) = @{$state}{qw[ depends capacity idx cache ]};
     $src = $src->[0];
-    $idx //= -1;
+    $idx   //= -1;
     $cache //= [];
 
     my $self;
@@ -89,27 +89,27 @@ sub construct ( $class, $state ) {
 
     return {
 
-        (+_SELF) => \$self,
+        ( +_SELF ) => \$self,
 
-        (+STATE) => \$iterator_state,
+        ( +STATE ) => \$iterator_state,
 
-        (+RESET) => sub {
+        ( +RESET ) => sub {
             $idx = -1;
-            @{ $cache } = ();
+            @{$cache} = ();
         },
 
-        (+REWIND) => sub {
+        ( +REWIND ) => sub {
         },
 
-        (+PREV) => sub {
-            return defined $idx? $cache->[ ($idx-1) % $capacity] : undef;
+        ( +PREV ) => sub {
+            return defined $idx ? $cache->[ ( $idx - 1 ) % $capacity ] : undef;
         },
 
-        (+CURRENT) => sub {
-            return defined $idx? $cache->[ $idx % $capacity] : undef;
+        ( +CURRENT ) => sub {
+            return defined $idx ? $cache->[ $idx % $capacity ] : undef;
         },
 
-        (+NEXT) => sub {
+        ( +NEXT ) => sub {
 
             return $self->signal_exhaustion
               if $iterator_state == +IterState_EXHAUSTED;
@@ -123,17 +123,17 @@ sub construct ( $class, $state ) {
             return $current;
         },
 
-        (+METHODS) => {
+        ( +METHODS ) => {
             at => sub ( $, $at ) {
                 $cache->[ ( $at - $idx ) % $capacity ];
             },
         },
 
-        (+FREEZE) => sub {
-            return [ $class, { idx => $idx, capacity => $capacity, cache => $cache  } ];
+        ( +FREEZE ) => sub {
+            return [ $class, { idx => $idx, capacity => $capacity, cache => $cache } ];
         },
 
-        (+_DEPENDS) => $src,
+        ( +_DEPENDS ) => $src,
     };
 }
 
@@ -174,7 +174,7 @@ Iterator::Flex::Cache - Cache Iterator Class
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 METHODS
 
@@ -215,6 +215,8 @@ The returned iterator supports the following capabilities:
 =item freeze
 
 =back
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

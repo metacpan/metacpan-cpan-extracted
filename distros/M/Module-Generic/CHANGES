@@ -1,6 +1,9 @@
 Revision history for Perl module Module::Generic
 
-v0.24.2 2022-06-28T14:12:48+0900
+v0.24.3 2022-07-15T15:07:18+0900
+    - Improved checking shared memory support
+
+v0.24.2 2022-06-28T14:12:48Z +0900
     - Corrected a missing condition in_set_get_code to return a dummy anonymous sub in object context
 
 v0.24.1 2022-06-24T07:36:36Z +0900

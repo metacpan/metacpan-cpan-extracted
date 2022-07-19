@@ -37,7 +37,7 @@ use warnings 'once';
 use Carp;
 use Storable ();
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use UI::Various::language::en;
 
@@ -59,7 +59,7 @@ our @ISA = qw(Exporter);
 # 1st row: public functions of the package UI::Various
 # 2nd/3rd row: internal functions of the package UI::Various
 our @EXPORT = qw(language logging stderr using
-		 fatal error warning info debug msg
+		 fatal error warning info debug message msg
 		 construct access set get access_varref dummy_varref);
 
 #########################################################################
@@ -71,12 +71,15 @@ use constant _ROOT_PACKAGE_ => substr(__PACKAGE__, 0, rindex(__PACKAGE__, "::"))
 use constant UI_ELEMENTS =>
     qw(Box Button Check Dialog Input Listbox Main Optionmenu Radio Text Window);
 
+use constant COMPOUND_ELEMENTS => (map {('Compound::' . $_)} qw(FileSelect));
+
 our @CARP_NOT =
     (	_ROOT_PACKAGE_,
 	map {( _ROOT_PACKAGE_ . '::' . $_ )}
 	(qw(core base container),
 	 map {( $_, "Tk::$_", "Curses::$_", "RichTerm::$_", "PoorTerm::$_" )}
-	 UI_ELEMENTS)
+	 UI_ELEMENTS,
+	 COMPOUND_ELEMENTS)
     );
 
 # global data-structure holding internal configuration:
@@ -262,7 +265,7 @@ Otherwise this method just exports the core functions to our other modules.
 	if (ref($include) eq '')
 	{
 	    if ($include eq 'all')
-	    {   $include = [ UI_ELEMENTS ];   }
+	    {   $include = [ UI_ELEMENTS, COMPOUND_ELEMENTS ];   }
 	    elsif ($include eq 'none')
 	    {   $include = [];   }
 	    else
@@ -504,8 +507,8 @@ sub fatal($;@)
 =head3 description:
 
 If the current logging level is lower than C<ERROR> / C<WARNING> / C<INFO>
-these function do nothing.  Otherwise they print the formatted message using
-C<_message>.
+these functions do nothing.  Otherwise they print the formatted message
+using C<_message>.
 
 C<_message> has logging level to be printed as additional 1st parameter.  It
 checks the logging level, looks up the format (or simple) string passed in
@@ -539,6 +542,42 @@ sub _message($$;@)
     else
     {   warn $_;   }
     return undef;
+}
+
+#########################################################################
+
+=head2 B<message> - return formatted message
+
+    $string = message($message_id, @message_data);
+
+=head3 example:
+
+    $_ = message('can_t_open__1__2', $_, $!);
+
+=head3 parameters:
+
+    $message_id         ID of the text or format string in language module
+    @message_data       optional additional text data for format string
+
+=head3 description:
+
+This function just returns the formatted message for the given
+C<$message_id> and C<@message_data>, e.g. to be used within a compound
+widget.
+
+=head3 returns:
+
+the formatted message as string
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+sub message($;@)
+{
+    my $message_id = shift;
+    local $_ = msg($message_id);
+    $_ = sprintf($_, @_)  unless  $_ eq $message_id;
+    return $_;
 }
 
 #########################################################################
@@ -700,8 +739,12 @@ sub construct($$@)		# not $$$@, that may put $self in wrong context!
 		  ref($self), (caller(1))[3]);
 
     # create (correct!) object:
-    $class =~ s/.*:://;
-    $self = bless $attributes, ui() . '::' . $class;
+    unless ($class =~ m/::Compound::/)
+    {
+	$class =~ s/.*:://;
+	$class = ui() . '::' . $class;
+    }
+    $self = bless $attributes, $class;
 
     # handle optional initial attribute values:
     my $parameters = {};

@@ -13,8 +13,8 @@
 package Directory::Queue::Normal;
 use strict;
 use warnings;
-our $VERSION  = "2.1";
-our $REVISION = sprintf("%d.%02d", q$Revision: 1.15 $ =~ /(\d+)\.(\d+)/);
+our $VERSION  = "2.2";
+our $REVISION = sprintf("%d.%02d", q$Revision: 1.16 $ =~ /(\d+)\.(\d+)/);
 
 #
 # used modules
@@ -52,7 +52,6 @@ use constant LOCKED_DIRECTORY => "locked";
 #
 
 our(
-    $_SubDirs,        # code reference returning the number of sub-directories
     $_FileRegexp,     # regexp matching a file in an element directory
     %_Byte2Esc,       # byte to escape map
     %_Esc2Byte,       # escape to byte map
@@ -148,6 +147,7 @@ sub _older ($$) {
 #  - lstat() is used so symlinks are not followed
 #  - this only checks the number of hard links
 #  - we do not even check that the given path indeed points to a directory!
+#  - this will return incorrect results on some filesystems like DOS or Btrfs
 
 sub _subdirs_stat ($) {
     my($path) = @_;
@@ -165,6 +165,7 @@ sub _subdirs_stat ($) {
 # readdir version (slower):
 #  - we really count the number of entries
 #  - we however do not check that these entries are themselves indeed directories
+#  - this is the default method to favor correctness over speed
 
 sub _subdirs_readdir ($) {
     my($path) = @_;
@@ -172,12 +173,14 @@ sub _subdirs_readdir ($) {
     return(scalar(_special_getdir($path)));
 }
 
-# use the right version (we cannot rely on hard links on DOS-like systems)
+#
+# wrapper method
+#
 
-if ($^O =~ /^(cygwin|dos|MSWin32)$/) {
-    $_SubDirs = \&_subdirs_readdir;
-} else {
-    $_SubDirs = \&_subdirs_stat;
+sub _subdirs ($$) {
+    my($self, $path) = @_;
+
+    return($self->{nlink} ? _subdirs_stat($path) : _subdirs_readdir($path));
 }
 
 #
@@ -218,6 +221,8 @@ sub new : method {
             unless $option{maxelts} =~ /^\d+$/ and $option{maxelts} > 0;
         $self->{maxelts} = delete($option{maxelts});
     }
+    # check nlink
+    $self->{nlink} = delete($option{nlink});
     # check schema
     if (defined($option{schema})) {
         dief("invalid schema: %s", $option{schema})
@@ -270,7 +275,7 @@ sub count : method {
     }
     # count sub-directories
     foreach my $name (@list) {
-        $subdirs = $_SubDirs->($self->{path}."/".$name);
+        $subdirs = _subdirs($self, $self->{path}."/".$name);
         $count += $subdirs if $subdirs;
     }
     # that's all
@@ -535,7 +540,7 @@ sub _insertion_directory ($) {
     # check the last directory
     @list = sort(@list);
     $new = pop(@list);
-    $subdirs = $_SubDirs->($self->{path}."/".$new);
+    $subdirs = _subdirs($self, $self->{path}."/".$new);
     if (defined($subdirs)) {
         return($new) if $subdirs < $self->{maxelts};
         # this last directory is now full... create a new one
@@ -712,7 +717,7 @@ sub purge : method {
         pop(@list);
         foreach my $name (@list) {
             $path = $self->{path}."/".$name;
-            $subdirs = $_SubDirs->($path);
+            $subdirs = _subdirs($self, $path);
             next if $subdirs or not defined($subdirs);
             _special_rmdir($path);
         }
@@ -846,6 +851,11 @@ as used by the purge() method
 
 default maximum time for a temporary element (in seconds, default 300)
 as used by the purge() method
+
+=item nlink
+
+flag indicating that the "nlink optimization" (faster but only working on some
+filesystems) will be used
 
 =item schema
 
@@ -1042,4 +1052,4 @@ L<Directory::Queue>.
 
 Lionel Cons L<http://cern.ch/lionel.cons>
 
-Copyright (C) CERN 2010-2021
+Copyright (C) CERN 2010-2022

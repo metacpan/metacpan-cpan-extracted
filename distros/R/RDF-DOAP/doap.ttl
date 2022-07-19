@@ -18,9 +18,9 @@
 	doap-deps:runtime-requirement [
 		doap-deps:on "match::simple 0.001"^^doap-deps:CpanId;
 	], [ doap-deps:on "perl 5.010"^^doap-deps:CpanId ], [
-		doap-deps:on "Exporter::Tiny 0.026"^^doap-deps:CpanId;
+		doap-deps:on "Exporter::Tiny 1.000"^^doap-deps:CpanId;
 	], [
-		doap-deps:on "Types::Standard 0.022"^^doap-deps:CpanId;
+		doap-deps:on "Types::Standard 1.012"^^doap-deps:CpanId;
 	], [ doap-deps:on "JSON 2.00"^^doap-deps:CpanId ], [ doap-deps:on "List::Util 1.45"^^doap-deps:CpanId ], [ doap-deps:on "Moose 2.0600"^^doap-deps:CpanId ], [
 		doap-deps:on "MooseX::AttributeTags 0.001"^^doap-deps:CpanId;
 	], [ doap-deps:on "RDF::Trine 1.000"^^doap-deps:CpanId ];
@@ -35,7 +35,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/kjetilk>, <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "RDF-DOAP";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-001>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-002>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-003>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-004>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-005>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-006>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-007>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-008>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-009>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-010>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-011>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-012>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-100>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-101>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-102>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-103>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-104>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-001>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-002>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-003>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-004>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-005>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-006>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-007>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-008>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-009>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-010>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-011>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-012>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-100>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-101>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-102>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-103>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-104>, <http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-105>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/kjetilk/p5-rdf-doap>;
@@ -288,6 +288,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-DOAP-0.104.tar.gz>;
 	doap:revision        "0.104"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-DOAP/v_0-105>
+	a                    doap:Version;
+	dc:identifier        "RDF-DOAP-0.105"^^xsd:string;
+	dc:issued            "2022-07-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "RDF::DOAP::Types->make_immutable.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-DOAP-0.105.tar.gz>;
+	doap:revision        "0.105"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/kjetilk>
 	a                    foaf:Person;

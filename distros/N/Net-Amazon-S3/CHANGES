@@ -1,6 +1,12 @@
 Revision history for Perl module Net::Amazon::S3:
 
-0.99
+v0.991     2022-07-17
+	- Fix Signature V4 when uri contains tilde (issue #119, thanks marcusclip)
+	- API->bucket now accepts optional region (issue #117)
+	- Disable Signature V4 uri simplification for S3 service (issue #96)
+	- Build user agent lazily
+
+0.99 2021-12-05
 	- Client API doesn't check corrupted download anymore (using ETag == MD5)
 	- fix broken Client::Object->head method (#112) (thanks Mortivor and  fkoyer)
 	- Support ranged download (#113) (thanks fkoyer)

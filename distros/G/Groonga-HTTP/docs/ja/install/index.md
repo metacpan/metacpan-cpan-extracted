@@ -18,7 +18,7 @@ Groonga-HTTP は CPAN で提供されています。
 ```console
 % sudo dnf install -y perl-App-cpanminus
 % sudo dnf install -y gcc
-% cpanm Groonga-HTTP
+% cpanm Groonga::HTTP
 ```
 
 Groonga-HTTP のインストールに Carton を使いたい場合は、 Groonga-HTTP を以下の手順でインストールします。

@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Client::Bucket;
-$Net::Amazon::S3::Client::Bucket::VERSION = '0.99';
+$Net::Amazon::S3::Client::Bucket::VERSION = '0.991';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use Data::Stream::Bulk::Callback;
@@ -214,7 +214,7 @@ Net::Amazon::S3::Client::Bucket - An easy-to-use Amazon S3 client bucket
 
 =head1 VERSION
 
-version 0.99
+version 0.991
 
 =head1 SYNOPSIS
 
@@ -331,7 +331,7 @@ Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
+This software is copyright (c) 2022 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

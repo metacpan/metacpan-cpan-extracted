@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Draw fretboard chord diagrams
 
-our $VERSION = '0.1313';
+our $VERSION = '0.1314';
 
 use Moo;
 use strictures 2;
@@ -530,7 +530,7 @@ Music::FretboardDiagram - Draw fretboard chord diagrams
 
 =head1 VERSION
 
-version 0.1313
+version 0.1314
 
 =head1 SYNOPSIS
 
@@ -836,6 +836,10 @@ L<Music::Image::Chord>
 For a B<real> chord analyzer:
 
 L<https://www.oolimo.com/guitarchords/analyze>
+
+Or maybe:
+
+L<https://www.scales-chords.com/chord-namer/guitar>
 
 =head1 AUTHOR
 

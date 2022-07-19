@@ -1,5 +1,11 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+1.03 2022-07-19
+    - github CI is building open62541 version 1.0.6, 1.1.6, 1.3.2,
+      and master.  1.2 tests fail and there is no goal to fix them.
+      Remove version 1.2.5 from CI.
+    - Allow to set username and passwort in the client config.
+
 1.02 2022-07-09
     - Fix reference counting with server node lifecycle callbacks.
       The behaviour in open62541 has changed, use heuristic to free

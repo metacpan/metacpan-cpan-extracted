@@ -1,5 +1,7 @@
 Revision history for Perl module JSON::JQ
 
+v0.09:
+   - fix bigint test case again (on Linux)
 v0.08:
    - fix bigint test case
 v0.07:

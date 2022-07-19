@@ -33,7 +33,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use UI::Various::core;
 use UI::Various::Listbox;
@@ -122,19 +122,26 @@ sub _process($)
 {
     my ($self) = @_;
     my ($h, $selection) = ($self->height, $self->selection);
-    my $entries = @{$self->texts};
-    my $head = $entries > $h ? '<+/-> ' : '      ';
-    $head .= ' ' x (($selection > 0) * int($h / 10));
+    my $entries = ();
+    my ($head, $prompt) = ('', '');
     my $pre_active = '<%' . int(1 + $h / 10) . 'd> ';
     my $re_selection = ($selection == 0 ? qr/(0)/ :
 			$selection == 1 ? qr/(\d+)/ :
 			qr/(\d+)(?:,\s*\d+)*/);
-    my $prompt = msg('enter_selection');
-    $entries > $h  and  $prompt .= ' (' . msg('scrolls') . ')';
-    $prompt .= ': ';
+    $self->{_modified} = 1;
     local $_ = '';
     while ($_ ne '0')
     {
+	if (defined $self->{_modified})
+	{
+	    $entries = @{$self->texts};
+	    $head = $entries > $h ? '<+/-> ' : '      ';
+	    $head .= ' ' x (($selection > 0) * int($h / 10));
+	    $prompt = msg('enter_selection');
+	    $entries > $h  and  $prompt .= ' (' . msg('scrolls') . ')';
+	    $prompt .= ': ';
+	    delete $self->{_modified};
+	}
 	my $i = $self->{first};
 	my $last = $i + $h;
 	$last <= $entries  or  $last = $entries;
@@ -214,6 +221,49 @@ sub _process($)
 	}
     }
 }
+
+#########################################################################
+
+=head2 B<_add> - add new element
+
+C<PoorTerm>'s specific implementation of
+L<UI::Various::Listbox::add|UI::Various::Listbox/add - add new element>
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+sub _add($@)
+{   $_[0]->{_modified} = 1;   }
+
+#########################################################################
+
+=head2 B<_remove> - remove element
+
+C<PoorTerm>'s specific implementation of
+L<UI::Various::Listbox::remove|UI::Various::Listbox/remove - remove element>
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+sub _remove($$)
+{   $_[0]->{_modified} = 1;   }
+
+#########################################################################
+
+=head2 B<_replace> - replace all elements
+
+C<PoorTerm>'s specific implementation of
+L<UI::Various::Listbox::replace|UI::Various::Listbox/replace - replace all
+elements>
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+sub _replace($@)
+{   $_[0]->{_modified} = 1;   }
 
 1;
 

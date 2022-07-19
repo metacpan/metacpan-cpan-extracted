@@ -24,7 +24,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Type-Library-Compiler";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Type-Library-Compiler/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Type-Library-Compiler/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Type-Library-Compiler/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Type-Library-Compiler/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Type-Library-Compiler/v_0-005>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Type-Library-Compiler/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Type-Library-Compiler/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Type-Library-Compiler/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Type-Library-Compiler/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Type-Library-Compiler/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Type-Library-Compiler/v_0-006>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-type-library-compiler>;
@@ -98,6 +98,23 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Library-Compiler-0.005.tar.gz>;
 	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-Library-Compiler/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "Type-Library-Compiler-0.006"^^xsd:string;
+	dc:issued            "2022-07-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Smarter to_TypeTiny method for unions.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Set $TLC_VERSION package variable in compiled libraries.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Library-Compiler-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

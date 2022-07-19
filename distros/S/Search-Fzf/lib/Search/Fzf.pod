@@ -1,0 +1,480 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Search::Fzf - Ported Fzf using perl. 
+
+=head1 SYNOPSIS
+
+    use strict;
+    use Search::Fzf;
+
+    my @listStr = split /\n/, qx(ls -l);
+    my $userConfig = {
+      prompt => "> You Entered: ",
+      pointer => '>',
+      marker => '*',
+      algo => 'v2', 
+    };
+    my $outStr = fzf(\@listStr, $userConfig);
+    print $outStr, "\n";
+
+=head1 DESCRIPTION
+
+    fzf is a powerful command line fuzzy search tool(https://github.com/junegunn/fzf).
+    Using Search::Fzf, You can use fzf's fuzzy query functionality as a module within a Perl process.
+
+=head1 FUNCTION
+
+=head2 fzf(\@strArr, \%CONFIG)
+
+    The entry function of Search::Fzf includes two parameters.
+    The first parameter \@strArr is a reference to an array of strings or a reference to a file handle to retrieve the query.
+    The second parameter \@CONFIG is a reference to the configuration hash.
+    The return value is a array reference. 
+    If no selection is made, the list contains only one string, which is the current line.
+
+    You can use a file handle as input, e.g.
+
+    open my $fileH, "-|", 'fd .';
+    my $outStr = fzf($fileH, $userConfig);
+    close $fileH;
+
+=head1 OPTION
+
+=head2 prompt: STRING
+
+    The prompt of input (default: 'Your Entered: ').
+
+=head2 pointer: STRING
+
+    Pointer to the current line (default: '>').
+
+=head2 marker: STRING
+
+    Multi-select marker (default: '*').
+
+=head2 algo: STRING
+
+    Fuzzy matching algorithm (default: 'v2');
+
+    Scoring criteria.
+    The match score consists of two factors.
+    One is the number of non-matching characters included in the matched substring,
+    the other is the number of segments that the matched substring is cut by non-matching characters.
+    The score is calculated as the negative of the product of the two factors.
+
+
+=head3 'v1'
+
+  Option 'v1' is a Faster greedy algorithm.
+  V1 is equivalent to a regular expression using a split character,
+  e.g. for the pattern string "abc", equivalent to using the regular expression "(a).*(b).*(c).*".
+  The algorithm is simple and fast, but as it only sees the first occurrence,
+  it is not guaranteed to find the occurrence with the highest score.
+
+=head3 'v2'
+
+  FuzzyMatchV2 implements a modified version of Smith-Waterman algorithm to find pattern string.
+  Unlike the original algorithm, omission or mismatch of a character in the pattern is not allowed.
+
+
+=head3 'exact'
+
+  To match the pattern string as a whole,
+  e.g. the pattern string 'abc',
+  exact is equivalent to using the regular expression "(abc)".
+
+=head2 caseInsensitive: BOOLEAN
+
+  Case-insensitive or Case-sensitive match (default: 1, Case-insensitive).
+
+=head2 sort: BOOLEAN
+
+  Sort the result (default: True).
+
+=head2 delimiter: STRING
+
+  Field delimiter regex for "nth" and "withNth" option (default "\s+").
+
+=head2 nth: ARRAY Reference
+
+  Fidel index expressions for limiting search scope, you can use [1,2,3] or [1..3], default is undef.
+
+=head2 withNth: ARRAY Reference
+
+  Transform the presentation of each line using field index expressions, default is undef.
+
+=head2 tac: BOOLEAN 
+
+  Reverse the order of the input (default: False).
+
+=head2 disable: BOOLEAN
+
+  Do not perform search. With this option, fzf becomes a simple selector interface rather than a "fuzzy finder" (default: False).
+
+=head2 expect: STRING
+  
+  When the COMMAND_EXPECT_ACCEPT key is pressed,
+  a line will be added before the string returned by the FZF function,
+  defined by the expect option(default: undef).
+
+=head2 multi: BOOLEAN
+
+  Enable multi-select with select key (default: False), the default toggle select key is tab.
+
+=head2 cycle: BOOLEAN
+
+  Enable cyclic scroll (default: True).
+
+=head2 mouse: BOOLEAN
+
+  Enable mouse click event (default: False).
+
+=head2 keepRight: BOOLEAN
+
+  keep the right end of line visible when it's too long (default: False).
+
+=head2 hscroll: BOOLEAN
+
+ Enable horizontal scroll (default: True).
+
+=head2 hScrollOff: INTEGER
+
+  Number of screen columns to keep to the right of the highlighted substring (default: 5). Setting ti to a large value will cause the text to be positioned on the center of the screen.
+
+=head2 jumpLabels: ARRAY Reference
+
+  Label characters for jump and jump-accept, you can use ['a'..'z'] or ['a', 'b', 'c'],
+  default is [a .. z].
+
+=head2 header: STRING
+
+  The given string will be printed as sticky header (default: undef), the lines are not affected by "withNth" option.
+  
+=head2 headerLines: INTEGER
+
+  The first N lines of the input are treated as the sticky header.
+
+=head2 headerFirst: BOOLEAN
+
+  Print header before the prompt line (default: False).
+
+=head2 border: BOOLEAN
+
+  Draw border around the finder (default: False).
+
+=head2 topMargin, bottomMargin, leftMargin, rightMargin: INTEGER
+
+  Margins around the finder, default margin is 0.
+
+=head2 topPadding, bottomPadding, leftPadding, rightPadding: INTEGER
+
+  Padding inside the border, padding is distinguishable from margin only when 'border' option is used, default padding is 0.
+
+=head2 layout: INTEGER
+
+  Choose the layout.
+  0: default, display form the bottom of the screen.
+  1: reverse, display from top of the screen.
+  2: reverse-list, display from the top of the screen, prompt at the bottom
+
+=head2 info: INTEGER
+
+  Determines the display style of finder info.
+  0: default, display on the next line to the prompt.
+  1: inline, display on the same line.
+  2: hidden, do not display finder info.
+
+=head2 color: BOOLEAN
+
+  Enable colored output (default: True).
+  fzf use ANSI COLORS scheam for color configuation.
+
+  'default': Default terminal froeground/background color.
+  16 base colors: black, red, green, yellow, blue, magenta, cyan, white, bright_black, bright_red, bright_green, bright_yellow, bright_blue, bright_magenta, bright_cyan, bright_white.
+  ansi rgb colors: use the regular expression "r(\d+)g(\d+)b(\d+)" to describe the color string,
+  where the numbers are 0 to 5, that is,
+  each primary color has 6 levels of color representation, a total of 216 colors.
+  grey colors: grey0 ~ grey23, a total of 24 grayscale colors.
+
+=head3 colorFg: STRING
+
+  Text.
+
+=head3 colorBg: STRING
+
+  Background.
+
+=head3 colorFgPlus: STRING
+
+  Current line text.
+
+=head3 colorBgPlus: STRING
+
+  Current line background.
+
+=head3 colorHl: STRING
+
+  Highlighted substrings.
+
+=head3 colorHlPlus: STRING
+
+  Current highlighted substrings.
+
+=head3 colorPointer: STRING
+
+  Pointer to the current line.
+
+=head3 colorMarker: STRING
+
+  Multi-select marker.
+
+=head3 colorGutter: STRING
+
+  Gutter on the left (defaults to colorBgPlus).
+
+=head3 colorInfo: STRING
+
+  Info line.
+
+=head3 colorPrompt: STRING
+
+  Prompt.
+
+=head3 colorHeader: STRING
+
+  Header.
+
+=head3 colorQuery: STRING
+
+  Query string.
+
+=head3 colorDisabled: STRING
+
+  Query string when search is disabled.
+
+=head3 colorSpinner: STRING
+
+  Streaming input indicator.
+
+=head3 colorFgPreview: STRING
+
+  Preview window text, this option is valid only when option 'previewWithColor' is False.
+
+=head3 colorBgPreview: STRING
+
+  Preview window background, this option is valid only when option 'previewWithColor' is False.
+
+=head2 preview: BOOLEAN
+
+  Open preview window(default: False).
+
+=head2 previewWithColor: BOOLEAN
+
+  Enable colored preview output (default: True).
+
+=head2 previewPosition: INTEGER
+
+  Determines the position of preview window.
+  0: Up.
+  1: Down, default.
+  2: Left.
+  3: Right.
+
+=head2 previewBorder: BOOLEAN
+
+  Draw border around the preview window (default: True).
+
+=head2 previewWrap: BOOLEAN
+
+  Long lines are truncated by default. Line wrap can be enabled with this option.
+  
+=head2 previewScrollOff: INTEGER
+
+  Determins the initial scroll offset of the preview window (default: 0).
+
+=head2 previewCyclic: BOOLEAN
+
+  Enable preview window cyclic scroll (default: True).
+
+=head2 previewHead: INTEGER
+
+  Keep the top N lines as fixed header so that they are always visible.
+
+=head2 previewFollow: BOOLEAN
+
+  Preview window will automatically scroll to the bottom when this option is set (default: False).
+
+=head2 previewFunc: FUNCTION
+
+  Callback function: previewFunc($strList, $lines, $columns).
+  $strList: Array reference, column split list of current line, use "delimiter" option to split.
+  $lines: rows of screen.
+  $columns: columns of screen.
+  Callback function, used to generate the preview text,
+  the return value is a string array reference, one element per line.
+
+=head2 timeout: INTEGER
+
+  Timeout is the keyboard waiting time.
+  Fzf uses non-blocking mode, and regularly checks for preview updates. 
+  Unit: milliseconds(default 100 milliseconds).
+
+=head2 execFunc: FUNCTION
+
+  Callback function: execFunc($strList).
+  $strList: Array reference, column split list of current line, use "delimiter" option to split.
+  Callback function for executing custom logic, default is undef.
+
+=head2 asynRead: INTEGER
+
+  When using file handle input,
+  the "asynRead" option can be used to perform pattern matching 
+  while the input character stream is not complete.
+
+=head2 threads: INTEGER
+
+  The number of threads executing the matching algorithm (default: 4).
+
+=head1 Keys
+
+  The input key contains characters with ASC code below 127.
+  'ctrl-@', 'ctrl-a', 'ctrl-b', 'ctrl-c', 'ctrl-d', 'ctrl-e', 'ctrl-f', 'ctrl-g', 'ctrl-h', 'ctrl-i', 'ctrl-j', 'ctrl-k', 'ctrl-l',
+  'ctrl-m', 'ctrl-n', 'ctrl-o', 'ctrl-p', 'ctrl-q', 'ctrl-r', 'ctrl-s', 'ctrl-t', 'ctrl-u', 'ctrl-v', 'ctrl-w', 'ctrl-x', 'ctrl-y', 'ctrl-z',
+  'ctrl-[', 'ctrl-\\', 'ctrl-]', 'ctrl-^', 'ctrl--',
+  " ", '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
+  '0'..'9',
+  ':', ';', '<', '=', '>', '?', '@',
+  'A'..'Z',
+  '[', '\\', ']', '^', '_', '`',
+  'a'..'z',
+  '{', '|', '}', '~', 'bs',
+
+  Whether the ctrl combination key  can be used needs to be defined by the operating system.
+  For function key definitions, please refer to the description of the Curse module.
+
+=head2 Commands
+
+    COMMAND_IDLE: Idle command, do nothing.
+    COMMAND_ABORT: Exit process.
+    COMMAND_ACCEPT: Return select lines. 
+    COMMAND_ACCEPT_NON_EMPTY: If select list is not empty, return.
+    COMMAND_BACKWARD_CHAR: Backward input query cursor.
+    COMMAND_BACKWARD_DELETE_CHAR : Backward and delete one char.
+    COMMAND_BACKWARD_DELETE_CHAR_EOF: Same as COMMAND_BACKWARD_DELETE_CHAR, abort fzf if query is empty.
+    COMMAND_BACKWARD_KILL_WORD: Backward and delete one word.
+    COMMAND_BACKWARD_WORD: Backward input query cursor one word.
+    COMMAND_BEGINNING_OF_LINE: Set the cursor to the first char of query string.
+    COMMAND_CANCEL: Clear query string if not empty, abort fzf otherwise.
+    COMMAND_CLEAR_SELECTION: Clear all selections.
+    COMMAND_CLEAR_QUERY: Clear query string.
+    COMMAND_DELETE_CHAR: Del one char.
+    COMMAND_DELETE_CHAR_EOF: Same as COMMAND_DELETE_CHAR, abort fzf if query is empty.
+    COMMAND_DESELECT: Deselect current line.
+    COMMAND_DESELECT_ALL: Deselect all line selected.
+    COMMAND_DISABLE_SEARCH: Disable query input.
+    COMMAND_DOWN: Move Current line down.
+    COMMAND_ENABLE_SEARCH: Enable query input.
+    COMMAND_END_OF_LINE: Set the cursor to the last char of query string.
+    COMMAND_EXECUTE: Execute user defined function, use "execFunc" option.
+    COMMAND_EXPECT_ACCEPT: Add expect string.
+    COMMAND_FIRST: Scroll horizontally to the first char of current line.
+    COMMAND_FORWARD_CHAR: Forward input query cursor.
+    COMMAND_FORWARD_WORD: Forward input query cursor one word.
+    COMMAND_JUMP: Show jump label, EasyMotion-like 2-keystroke movement.
+    COMMAND_KILL_LINE: From current cursor position, delete to end of query string.
+    COMMAND_KILL_WORD: Kill one word.
+    COMMAND_LAST: Scroll horizontally to the last char of current line.
+    COMMAND_PAGE_DOWN: Scroll one page down.
+    COMMAND_PAGE_UP: Move current line up.
+    COMMAND_HALF_PAGE_DOWN: Scroll half page down.
+    COMMAND_HALF_PAGE_UP: Scroll half page up.
+    COMMAND_PREVIEW_DOWN: Set preview window down of the main window.
+    COMMAND_PREVIEW_UP: Set preview window up of the main window.
+    COMMAND_PREVIEW_PAGE_DOWN: Scroll preview window one page down.
+    COMMAND_PREVIEW_PAGE_UP: Scroll preview window one page up.
+    COMMAND_PREVIEW_HALF_PAGE_DOWN: Scroll preview window half page down.
+    COMMAND_PREVIEW_HALF_PAGE_UP: Scroll preview window half page up.
+    COMMAND_PREVIEW_BOTTOM: Scroll preview window to the bottom.
+    COMMAND_PREVIEW_TOP: Scroll preview window to the top.
+    COMMAND_SELECT: Select current line.
+    COMMAND_SELECT_ALL: Select all lines.
+    COMMAND_TOGGLE: Toggle current line in select and unselect status.
+    COMMAND_TOGGLE_ALL: Toggle all lines.
+    COMMAND_TOGGLE_DOWN: Toggle current line and move down.
+    COMMAND_TOGGLE_PREVIEW: Toggle preview window open or close.
+    COMMAND_TOGGLE_PREVIEW_POSITION: Toggle preview window position.
+    COMMAND_TOGGLE_PREVIEW_WRAP: Toggle preview window wrap or truncated.
+    COMMAND_TOGGLE_SEARCH: Toggle query input disable or enable
+    COMMAND_TOGGLE_SORT: Toggle search result sort or unsort.
+    COMMAND_TOGGLE_UP: Toggle current line and move up.
+    COMMAND_UP: Move current line up.
+    COMMAND_LEFT: Scroll horizontally current line left.
+    COMMAND_RIGHT: Scroll horizontally current line right. 
+    COMMAND_HOME: Scroll horizontally current line to the first char.
+    COMMAND_END: Scroll horizontally current line to the last char. 
+    COMMAND_CLICKED: Mouse clicked.
+    COMMAND_CLICKED_ACCEPT: Mouse Click and accept.
+    COMMAND_CHECK: Timeout check.
+    COMMAND_TOGGLE_ALGO: Toggle seach algorithm.
+
+=head1 KEYMAP
+
+  C<%DEFAULT_MAP = (
+    'ctrl-u' => 'COMMAND_IDLE',
+    'ctrl-]' => 'COMMAND_IDLE',
+    'ctrl-^' => 'COMMAND_IDLE',
+    'ctrl--' => 'COMMAND_IDLE',
+    'ctrl-[' => 'COMMAND_ABORT',
+    'ctrl-m' => 'COMMAND_ACCEPT',
+    'ctrl-h' => 'COMMAND_BACKWARD_CHAR', #ctrl-h
+    'KEY_BACKSPACE' => 'COMMAND_BACKWARD_DELETE_CHAR',
+    'ctrl-x' => 'COMMAND_DELETE_CHAR',
+    'ctrl-j' => 'COMMAND_DOWN',
+    'ctrl-l' => 'COMMAND_FORWARD_CHAR',
+    'ctrl-w' => 'COMMAND_FORWARD_WORD',
+    'ctrl-t' => 'COMMAND_JUMP',
+    'KEY_NPAGE'=> 'COMMAND_HALF_PAGE_DOWN',
+    'KEY_PPAGE'=> 'COMMAND_HALF_PAGE_UP',
+    'ctrl-k' => 'COMMAND_UP',
+    'KEY_UP'=> 'COMMAND_UP',
+    'KEY_DOWN'=> 'COMMAND_DOWN',
+    'KEY_LEFT'=> 'COMMAND_LEFT',
+    'KEY_RIGHT'=> 'COMMAND_RIGHT',
+    'KEY_HOME'=> 'COMMAND_HOME',
+    'KEY_END'=> 'COMMAND_END',
+    'ctrl-n' => 'COMMAND_PREVIEW_HALF_PAGE_DOWN',
+    'ctrl-p' => 'COMMAND_PREVIEW_HALF_PAGE_UP',
+    'KEY_F(4)' => 'COMMAND_TOGGLE_PREVIEW',
+    'KEY_F(5)' => 'COMMAND_TOGGLE_PREVIEW_POSITION',
+    'KEY_F(6)' => 'COMMAND_TOGGLE_PREVIEW_WRAP',
+    'KEY_F(12)' => 'COMMAND_EXPECT_ACCEPT',
+    'ctrl-r' => 'COMMAND_TOGGLE_ALGO',
+    'ctrl-i' => 'COMMAND_TOGGLE',
+    'KEY_BTAB' => 'COMMAND_TOGGLE_ALL',
+    'ctrl-d' => 'COMMAND_TOGGLE_SEARCH',
+  );>
+
+=head1 AUTHOR
+
+  liyao <liyao0117@qq.com>
+
+=head1 LICENSE
+
+  This code is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=head1 COPYRIGHT
+
+  Copyright (C) 2022 Liyao
+
+=head1 SEE ALSO
+
+L<Curses>
+
+Fzf 
+L<https://github.com/junegunn/fzf>
+
+=cut

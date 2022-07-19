@@ -58,6 +58,17 @@ Efficiently computes the modular multiplicative inverses of a list of integers, 
 
 =cut
 
+=head2 binary_exp
+
+    Math.binary_exp(c, x, n, {|a,b| ... })
+
+Generic implementation of the binary exponentiation algorithm, using the binary expansion of C<n>.
+
+    say Math.binary_exp(1, 3, 43, {|a,b| a * b })  #=> 3^43
+    say Math.binary_exp(0, 3, 43, {|a,b| a + b })  #=> 3*43
+
+=cut
+
 =head2 binsplit
 
     Math.binsplit(block, list...)
@@ -94,15 +105,15 @@ Returns the greatest common divisor (GCD) of a list of integers.
 
 =head2 gcd_factors
 
-    Math.gcd_factors(n, array)
+    Math.gcd_factors(n, [a, b, ...])
 
-Given an integer and a list of numbers, it tries to find non-trivial factors of n, checking each gcd(n, array[0]), gcd(n, array[1]), etc.
+Given a positive integer and an array of integers, it tries to find non-trivial factors of n, checking each C<gcd(n, array[0])>, C<gcd(n, array[1])>, etc.
 
     var n = 43*43*97*503
     var a = [19*43*97, 1, 13*41*43*101]
-    say Math.gcd_factors(n, a)          #=> [43, 97, 503]
+    say Math.gcd_factors(n, a)          #=> [43, 43, 97, 503]
 
-When no factors are found, an empty list is returned. The returned list contains no duplicates.
+The product of the factors gives back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -220,6 +231,19 @@ Returns the sum of a given range and an optional given step.
 Efficiently returns the remainders of C<n> when divided by each integer from the given array.
 
     say Math.remainders(8675309, [11,13,17,19,23])      #=> [5, 6, 5, 4, 8]
+
+=cut
+
+=head2 seq
+
+    Math.seq(x, y, z, ..., {|a,n| ... })
+
+Returns an Enumerator object which generates an infinite sequence specified by the initial terms and the given block.
+
+Example:
+
+    say Math.seq(2, { .last.next_prime }).first(30)     # prime numbers
+    say Math.seq(1, 1, { .last(2).sum }).first(30)      # Fibonacci numbers
 
 =cut
 

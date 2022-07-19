@@ -45,10 +45,11 @@ requires:
   parent: '0'
   perl: '5.016000'
   strict: '0'
+  vars: '0'
   version: '0'
   warnings: '0'
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Cookie/issues
   repository: https://gitlab.com/jackdeguest/Cookie
-version: v0.1.13
+version: v0.2.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

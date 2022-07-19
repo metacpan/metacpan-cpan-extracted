@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.153   2022-07-17
+        - Code refactoring.
+
 0.152   2022-07-12
         - Formatting numbers: bugfixes and updates.
         - Code refactoring.

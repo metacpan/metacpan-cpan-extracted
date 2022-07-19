@@ -1,6 +1,6 @@
 package Net::IPAM::Block;
 
-our $VERSION = '5.10';
+our $VERSION = '5.20';
 
 use 5.10.0;
 use strict;
@@ -247,10 +247,7 @@ If the range is a CIDR, just returns the CIDR:
 =cut 
 
 sub to_cidrs {
-
-  # rec-descent call, start with empty buf []
-  my $cidrs = Net::IPAM::Block::Private::_to_cidrs_rec( $_[0], [] );
-
+  my $cidrs = Net::IPAM::Block::Private::_to_cidrs_iter( $_[0] );
   return wantarray ? @$cidrs : $cidrs;
 }
 

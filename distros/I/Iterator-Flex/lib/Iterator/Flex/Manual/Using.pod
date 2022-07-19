@@ -13,20 +13,19 @@ Iterator::Flex::Manual::Using - How to use an Iterator::Flex iterator
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 DESCRIPTION
 
 =head2 Construction
-
-The first thing to do is to construct one.  L<Iterator::Flex::Common> provides
-a number of easy-to-use front-ends, so
 
 =head2 Iteration
 
 =head2 Exhaustion
 
 =head2 Errors
+
+=head1 INTERNALS
 
 =head1 METHODS
 
@@ -75,7 +74,11 @@ changed.
 
   $iter->is_exhausted;
 
-True if the iterator is in the L<exhausted state|Iterator::Flex::Manual::Overview/Exhausted State>.
+True if the iterator is in the L<exhausted
+state|Iterator::Flex::Manual::Overview/Exhausted State>.  A false
+value does I<not> indicate that further data are available, only that
+the iterator has not yet transitioned from I<Iteration> to
+I<Exhausted>.  In general, iterators
 
 =item is_error
 

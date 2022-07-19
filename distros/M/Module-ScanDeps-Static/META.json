@@ -34,10 +34,11 @@
       },
       "runtime" : {
          "requires" : {
-            "Class::Accessor::Fast" : "0",
-            "IO::Scalar" : "0",
-            "JSON::PP" : "0",
-            "Readonly" : "0",
+            "Class::Accessor::Fast" : "0.51",
+            "IO::Scalar" : "2.111",
+            "JSON::PP" : "2.97001",
+            "Pod::Find" : "0",
+            "Readonly" : "2.05",
             "perl" : "5.01",
             "version" : "0"
          }
@@ -51,10 +52,10 @@
    "provides" : {
       "Module::ScanDeps::Static" : {
          "file" : "lib/Module/ScanDeps/Static.pm",
-         "version" : "0.6"
+         "version" : "0.7"
       }
    },
    "release_status" : "stable",
-   "version" : "0.6",
+   "version" : "0.7",
    "x_serialization_backend" : "JSON::PP version 4.10"
 }

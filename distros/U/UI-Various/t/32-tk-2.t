@@ -32,7 +32,7 @@ BEGIN {
     $ENV{DISPLAY}  or  plan skip_all => 'DISPLAY not found';
     eval { require Tk; };
     $@  and  plan skip_all => 'Perl/Tk not found';
-    plan tests => 9;
+    plan tests => 10;
 
     # define fixed environment for unit tests:
     delete $ENV{UI};
@@ -124,6 +124,8 @@ my $button1 = UI::Various::Button->new
 	 push @counts, scalar(@{$listbox2->texts});
 	 $ww2 = $win2->width;
 	 @selection = $listbox2->selected();
+	 $listbox2->replace(1, 2, 3, 4);
+	 push @counts, scalar(@{$listbox2->texts});
 	 $button2->_tk()->invoke;
      });
 $win1 = $main->window({title => 'Hello', height => 12}, $text1, $button1);
@@ -144,5 +146,6 @@ is($ww2, 42, '$win2 had correct fixed width');
 is($counts[0], 9, 'listbox has correct 1st count');
 is($counts[1], 8, 'listbox has correct 2nd count');
 is_deeply(\@selection, [1, 2, 4], 'listbox had correct final selection');
+is($counts[2], 4, 'listbox has correct 3rd count');
 # We don't trigger the the event with selectionSet, so the counter is still 0:
 is($counter, 0, 'counter has correct value');

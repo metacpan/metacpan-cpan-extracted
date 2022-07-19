@@ -13,13 +13,7 @@ sub _test_values {
         npull    => 5,
         begin    => 0,
         end      => 4,
-        expected => [
-            [ undef, undef, 0 ],
-            [ undef, 0,     10 ],
-            [ 0,     10,    20 ],
-            [ 10,    20,    0 ],
-            [ 20,    0,     10 ],
-        ],
+        expected => [ [ undef, undef, 0 ], [ undef, 0, 10 ], [ 0, 10, 20 ], [ 10, 20, 0 ], [ 20, 0, 10 ], ],
         @_
     );
 
@@ -70,30 +64,14 @@ subtest "rewind" => sub {
 
         <$iter> for 1 .. 2;
 
-        is(
-            [ $iter->prev, $iter->current ],
-            [ 0,           10 ],
-            "prev/current before rewind"
-        );
+        is( [ $iter->prev, $iter->current ], [ 0, 10 ], "prev/current before rewind" );
 
         try_ok { $iter->rewind } "rewind";
 
-        is(
-            [ $iter->prev, $iter->current ],
-            [ 0,           10 ],
-            "prev/current after rewind"
-        );
+        is( [ $iter->prev, $iter->current ], [ 0, 10 ], "prev/current after rewind" );
 
-        _test_values(
-            $iter,
-            expected => [
-                [ 0,  10, 0 ],
-                [ 10, 0,  10 ],
-                [ 0,  10, 20 ],
-                [ 10, 20, 0 ],
-                [ 20, 0,  10 ],
-            ],
-        );
+        _test_values( $iter,
+            expected => [ [ 0, 10, 0 ], [ 10, 0, 10 ], [ 0, 10, 20 ], [ 10, 20, 0 ], [ 20, 0, 10 ], ], );
     };
 };
 

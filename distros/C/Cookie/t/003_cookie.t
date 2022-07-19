@@ -5,6 +5,7 @@ BEGIN
     use warnings;
     use lib './lib';
     use Test::More;
+    use vars qw( $DEBUG $CRYPTX_REQUIRED_VERSION );
     # 2021-11-01T08:12:10
     use Test::Time time => 1635754330;
     use DateTime;
@@ -19,6 +20,9 @@ BEGIN
     use_ok( 'Cookie' );
     require( "./t/env.pl" ) if( -e( "t/env.pl" ) );
 };
+
+use strict;
+use warnings;
 
 subtest 'methods' => sub
 {

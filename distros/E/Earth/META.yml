@@ -1,9 +1,8 @@
 ---
-abstract: 'FP Library for Perl 5'
+abstract: 'FP Framework for Perl 5'
 author:
   - 'AWNCORP <awncorp@cpan.org>'
 build_requires:
-  Venus: '0.09'
   perl: '5.018'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -15,11 +14,10 @@ meta-spec:
   version: '1.4'
 name: Earth
 requires:
-  Venus: '0.09'
   perl: '5.018'
 resources:
   homepage: https://metacpan.org/dist/Earth
-version: '0.01'
+version: '0.04'
 x_authority: cpan:AWNCORP
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -41,7 +41,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use UI::Various::core;
 use UI::Various::toplevel;
@@ -135,6 +135,32 @@ have to recreate it.
 
 sub destroy($)
 {   fatal('specified_implementation_missing');   }
+
+#########################################################################
+
+=head2 B<draw> - show dialogue
+
+    $dialog->draw();
+
+=head3 description:
+
+C<draw> draws / shows and process the dialogue, if the UI is already active.
+It is only used by some UIs, notably C<Tk>.
+
+Note that it is called C<draw> and not C<show> as an internal method
+C<_show> already exists for some other UI/widget combinations.
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+sub draw($)
+{
+    my ($self) = @_;
+    if ($self->can('_draw'))
+    {   $self->_draw();   }
+
+}
 
 1;
 

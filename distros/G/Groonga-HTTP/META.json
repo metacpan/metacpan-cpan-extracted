@@ -69,9 +69,12 @@
       "Groonga::Commands::Status" : {
          "file" : "lib/Groonga/Commands/Status.pm"
       },
+      "Groonga::Escape" : {
+         "file" : "lib/Groonga/Escape.pm"
+      },
       "Groonga::HTTP" : {
          "file" : "lib/Groonga/HTTP.pm",
-         "version" : "1.09"
+         "version" : "1.10"
       },
       "Groonga::HTTP::Client" : {
          "file" : "lib/Groonga/HTTP/Client.pm"
@@ -92,7 +95,7 @@
          "web" : "https://github.com/groonga/Groonga-HTTP"
       }
    },
-   "version" : "1.09",
+   "version" : "1.10",
    "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1
 }

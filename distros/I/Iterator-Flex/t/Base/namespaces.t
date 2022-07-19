@@ -43,7 +43,7 @@ package C11 {
 is( [ Base->_namespaces ],      ['Iterator::Flex'],       'Base' );
 is( [ Base->_role_namespaces ], ['Iterator::Flex::Role'], 'Base Role' );
 
-is( [ C11->_namespaces ], [ 'C11', 'Iterator::Flex' ], 'C11' );
+is( [ C11->_namespaces ],      [ 'C11',      'Iterator::Flex' ], 'C11' );
 is( [ C11::C12->_namespaces ], [ 'C11::C12', 'Iterator::Flex' ], 'C11::C12' );
 
 

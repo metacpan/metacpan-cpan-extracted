@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.302    2022-07-17
+        - Function Epoch_to_DateTime: handle undefined values.
+
 2.301    2022-07-06
         - Use Encode::Locale to get STDIN/STDOUT encodings.
         - Win32: don't alter the terminal code page.

@@ -2,7 +2,7 @@ NAME
     Test::DiagINC - List modules and versions loaded if tests fail
 
 VERSION
-    version 0.008
+    version 0.010
 
 SYNOPSIS
         # preferably load before anything else
@@ -94,6 +94,8 @@ AUTHOR
     David Golden <dagolden@cpan.org>
 
 CONTRIBUTORS
+    *   Graham Knop <haarg@haarg.org>
+
     *   Peter Rabbitson <ribasushi@cpan.org>
 
     *   Roy Ivy III <rivy.dev@gmail.com>

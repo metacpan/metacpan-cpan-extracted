@@ -1,3 +1,17 @@
+0.0.11 Mon 18 Jul 2022 05:18:07 PM PDT
+ - Attempt to fix a BSD 'make test' failure
+ - Attempt to fix cpantesters fails on windows
+
+0.0.10 Sat 16 Jul 2022 05:23:35 PM PDT
+ - Attempt to fix a BSD Makefile error
+
+0.0.9 Sat 16 Jul 2022 04:45:52 PM PDT
+ - Fix test fails on cpantesters
+ - Add function aliasing
+
+0.0.8 Fri 15 Jul 2022 02:56:31 PM PDT
+ - Regenerate docs with fixed generator
+
 0.0.7 Wed 13 Jul 2022 10:13:34 AM PDT
  - Regenerate docs with fixed generator
  - Add Use Cases to docs

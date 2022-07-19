@@ -291,9 +291,9 @@ struct spvm_env {
   void* (*new_memory_stack)(SPVM_ENV* env, SPVM_VALUE* stack, size_t byte_size);
   void (*free_memory_stack)(SPVM_ENV* env, SPVM_VALUE* stack, void* block);
   int32_t (*get_memory_blocks_count_stack)(SPVM_ENV* env, SPVM_VALUE* stack);
+  int32_t (*set_command_info_program_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* obj_program_name);
+  int32_t (*set_command_info_argv)(SPVM_ENV* env, SPVM_VALUE* stack, void* obj_argv);
 };
-
-
 
 
 struct spvm_env_runtime {
@@ -429,6 +429,7 @@ enum {
   SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE_CLASS,
   SPVM_NATIVE_C_BASIC_TYPE_ID_BOOL_CLASS,
   SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS,
+  SPVM_NATIVE_C_BASIC_TYPE_ID_COMMAND_INFO_CLASS,
 };
 
 enum {

@@ -1609,12 +1609,48 @@ Returns the number of composite numbers <= n, or in the range C<a..b>.
 
 =cut
 
+=head2 composite_count_lower
+
+    composite_count_lower(n)
+
+Lower bound for C<composite_count(n)>.
+
+=cut
+
+=head2 composite_count_upper
+
+    composite_count_upper(n)
+
+Upper bound for C<composite_count(n)>.
+
+=cut
+
+=head2 composite_lower
+
+    composite_lower(n)
+
+Lower bound for the n-th composite number.
+
+Aliases: I<nth_composite_lower>
+
+=cut
+
 =head2 composites
 
     composites(n)
     composites(a,b)
 
 Returns an array with the composite numbers <= n, or in the range C<a..b>.
+
+=cut
+
+=head2 composite_upper
+
+    composite_upper(n)
+
+Upper bound for the n-th composite number.
+
+Aliases: I<nth_composite_upper>
 
 =cut
 
@@ -1790,6 +1826,22 @@ When C<x> is omitted, a Polynomial object is returned:
     say cyclotomic(12)          #=> x^4 - x^2 + 1
 
 Aliases: I<cyclotomic_polynomial>
+
+=cut
+
+=head2 cyclotomic_factor
+
+    cyclotomic_factor(n)
+    cyclotomic_factor(n, bases...)
+
+Factorization method, based on cyclotomic polynomials, trying to find algebraic factors of C<n>.
+
+    say cyclotomic_factor(2**120 + 1)
+    say cyclotomic_factor((10**258 - 1)/9 - 10**(258/2) - 1, 10)
+
+An optional list of bases can be given to restrict the search only to the given bases.
+
+The product of the factors, will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -2152,7 +2204,7 @@ Aliases: I<composites_each>
 
 Iterates over the k-omega primes <= n, or in the range C<a..b>.
 
-k-omega primes are numbers C<n> such that C<omega(n) == k>.
+k-omega primes are numbers C<n> that satisfy C<omega(n) == k>.
 
     1.omega_primes_each(100, {|n| say n })          # iterate over prime powers <= 100
     2.omega_primes_each(50, 100, {|n| say n })      # iterate over 2-omega primes in range 50..100
@@ -2195,6 +2247,20 @@ It efficiently iterates over the primes in the given range, using a segmented pr
 It's considerably faster than using the C<next_prime(n)> method.
 
 Aliases: I<primes_each>
+
+=cut
+
+=head2 each_prime_power
+
+    n.each_prime_power { ... }
+    each_prime_power(a,b, { ... })
+
+Iterate over prime powers <= n, or in the range C<a..b>:
+
+    100.each_prime_power {|k| say k }         # iterate over prime powers <= 100
+    each_prime_power(50, 100, {|k| say k })   # iterate over prime powers in the range [50, 100]
+
+Aliases: I<prime_powers_each>
 
 =cut
 
@@ -2429,10 +2495,20 @@ Complex numbers are also supported:
 =head2 factor
 
     factor(n)
+    factor(n, { ... })
 
 Returns an array with the prime factors of C<n>, where C<n> is a positive integer, such that C<n.factor.prod == n>.
 
     say 180.factor  #=> [2, 2, 3, 3, 5]
+
+An optional block can be provided, to use a specific factorization method:
+
+    say factor(10**120 - 10**40, {|k| k.ecm_factor })
+    say factor(10**120 - 10**40, {|k| k.fermat_factor })
+
+The block is expected to return an array with zero or more (not necessarily prime) factors of C<k>.
+
+The block is called recursively for each new composite factor found, until no new factors are found.
 
 Aliases: I<factors>
 
@@ -2711,6 +2787,20 @@ The value of C<d> is always non-negative.
 
 =cut
 
+=head2 gcd_factors
+
+    gcd_factors(n, [a, b, ...])
+
+Given a positive integer and an array of integers, it tries to find non-trivial factors of n, checking each C<gcd(n, array[0])>, C<gcd(n, array[1])>, etc.
+
+    var n = 43*43*97*503
+    var a = [19*43*97, 1, 13*41*43*101]
+    say gcd_factors(n, a)                #=> [43, 43, 97, 503]
+
+The product of the factors gives back C<n>. However, some factors may be composite.
+
+=cut
+
 =head2 gcud
 
     gcud(...)
@@ -2826,8 +2916,7 @@ Aliases: I<hermite_polynomialHe>
 
 =head2 holf_factor
 
-    n.holf_factor
-    n.holf_factor(tries)
+    n.holf_factor(tries=1e4)
 
 Hart's OLF method (variant of Fermat's method).
 
@@ -3360,7 +3449,7 @@ Return true if C<n> passes the Agrawal-Kayal-Saxena (AKS) primality test.
 
 Return true if C<n> is a k-almost prime (i.e.: true iff C<n> is the product of C<k> not necessarily distinct primes).
 
-Equivalently, k-almost primes are numbers n such that C<bigomega(n) == k>.
+Equivalently, k-almost primes are numbers C<n> that satisfy C<bigomega(n) == k>.
 
     say 20.by { .is_almost_prime(1) }   # primes
     say 20.by { .is_almost_prime(2) }   # semiprimes
@@ -3836,6 +3925,14 @@ Aliases: I<is_pell_pseudoprime>
 
 =cut
 
+=head2 is_perfect
+
+    n.is_perfect
+
+Returns true if C<n> is a perfect number (i.e.: sigma(n) == 2*n).
+
+=cut
+
 =head2 is_perrin_psp
 
     n.is_perrin_psp
@@ -4094,24 +4191,37 @@ Returns true when C<n> is smooth over the prime factors of C<k>.
 
 =cut
 
-=head2 is_sqr
+=head2 is_square
 
-    n.is_sqr
-    is_square(n)
+    n.is_square
 
 Returns true if C<n> is a perfect square integer.
 
-Aliases: I<is_square>, I<is_perfect_square>
+Aliases: I<is_sqr>, I<is_perfect_square>
 
 =cut
 
-=head2 is_square_free
+=head2 is_squarefree
 
-    n.is_square_free
+    n.is_squarefree
 
 Returns true if the prime factorization of n does not include duplicated factors (i.e.: n is not divisible by a square).
 
-Aliases: I<is_squarefree>
+Aliases: I<is_square_free>
+
+=cut
+
+=head2 is_squarefree_almost_prime
+
+    n.is_squarefree_almost_prime(k=2)
+
+Returns true if C<n> is a squarefree k-almost prime (i.e.: true iff C<n> is the product of C<k> distinct primes).
+
+Equivalently, k-almost primes are numbers C<n> that satisfy C<bigomega(n) == omega(n) == k>.
+
+    say 20.by { .is_squarefree_almost_prime(1) }   # primes
+    say 20.by { .is_squarefree_almost_prime(2) }   # squarefree semiprimes
+    say 20.by { .is_squarefree_almost_prime(3) }   # sphenic numbers
 
 =cut
 
@@ -4908,11 +5018,27 @@ Aliases: I<call>
 
 =cut
 
+=head2 next_almost_prime
+
+    n.next_almost_prime(k=2)
+
+Returns the next k-almost prime greater than C<n>.
+
+=cut
+
 =head2 next_composite
 
     n.next_composite
 
-Given a non-negative integer C<n>, it returns the next composite number after C<n>.
+Given a non-negative integer C<n>, returns the next composite number greater than C<n>.
+
+=cut
+
+=head2 next_omega_prime
+
+    n.next_omega_prime(k=2)
+
+Returns the next k-omega prime greater than C<n>.
 
 =cut
 
@@ -4920,7 +5046,7 @@ Given a non-negative integer C<n>, it returns the next composite number after C<
 
     n.next_palindrome(b=10)
 
-Efficiently returns the next palindrome in base-b greater than n.
+Efficiently returns the next palindrome in base-b greater than C<n>.
 
     # Iterate over the base-10 palindromic numbers < 10^6
     for (var n = 0; n < 1e6; n = n.next_palindrome) {
@@ -4946,6 +5072,22 @@ Aliases: I<next_power>
 
 =cut
 
+=head2 next_powerfree
+
+    n.next_powerfree(k=2)
+
+Returns the next k-powerfree number greater than C<n>.
+
+=cut
+
+=head2 next_powerful
+
+    n.next_powerful(k=2)
+
+Returns the next k-powerful number greater than C<n>.
+
+=cut
+
 =head2 next_prime
 
     n.next_prime
@@ -4954,11 +5096,35 @@ Returns the next prime larger than C<n>.
 
 =cut
 
+=head2 next_prime_power
+
+    n.next_prime_power
+
+Given a non-negative integer C<n>, returns the next prime power (C<p^k> with k >= 1) greater than C<n>.
+
+=cut
+
+=head2 next_semiprime
+
+    n.next_semiprime
+
+Returns the next semiprime greater than C<n>.
+
+=cut
+
 =head2 next_squarefree
 
     n.next_squarefree
 
-Returns the next squarefree integer larger than C<n>.
+Returns the next squarefree number greater than C<n>.
+
+=cut
+
+=head2 next_squarefree_almost_prime
+
+    n.next_squarefree_almost_prime(k=2)
+
+Returns the next squarefree k-almost prime greater than C<n>.
 
 =cut
 
@@ -5039,6 +5205,85 @@ The value for C<start> can be any arbitrarily large integer:
     say n_primes(10, 2**128 + 1)    # first 10 primes > 2^128
 
 Aliases: I<nprimes>, I<next_primes>
+
+=cut
+
+=head2 nth_almost_prime
+
+    nth_almost_prime(n, k=2)
+
+Returns the n-th k-almost prime.
+
+    say nth_almost_prime(1e7, 2)   #=> 56168169
+    say nth_almost_prime(1e7, 3)   #=> 41657362
+    say nth_almost_prime(1e7, 4)   #=> 47997635
+
+=cut
+
+=head2 nth_omega_prime
+
+    nth_omega_prime(n, k=2)
+
+Returns the n-th k-omega prime.
+
+    say nth_omega_prime(1e7, 2)    #=> 42314023
+    say nth_omega_prime(1e7, 3)    #=> 28013887
+    say nth_omega_prime(1e7, 4)    #=> 39780102
+
+=cut
+
+=head2 nth_powerfree
+
+    nth_powerfree(n, k=2)
+
+Returns the n-th k-powerfree number.
+
+    say nth_powerfree(1e14, 2)  #=> 164493406685659
+    say nth_powerfree(1e14, 3)  #=> 120205690315927
+    say nth_powerfree(1e14, 4)  #=> 108232323371116
+
+=cut
+
+=head2 nth_powerful
+
+    nth_powerful(n, k=2)
+
+Returns the n-th k-powerful number.
+
+    say nth_powerful(1e4, 2)    #=> 23002083
+    say nth_powerful(1e4, 3)    #=> 16720797973
+
+=cut
+
+=head2 nth_prime_power
+
+    nth_prime_power(n)
+
+Returns the n-th prime power C<p^k> with k >= 1.
+
+    say nth_prime_power(1e12)   #=> 29996212395727
+
+=cut
+
+=head2 nth_squarefree
+
+    nth_squarefree(n)
+
+Returns the n-th squarefree number. (OEIS: A005117)
+
+    say nth_squarefree(1e14)    #=> 164493406685659
+
+=cut
+
+=head2 nth_squarefree_almost_prime
+
+    nth_squarefree_almost_prime(n, k=2)
+
+Returns the n-th squarefree k-almost prime.
+
+    say nth_squarefree_almost_prime(1e7, 2)     #=> 56173891
+    say nth_squarefree_almost_prime(1e7, 3)     #=> 48108421
+    say nth_squarefree_almost_prime(1e7, 4)     #=> 81556446
 
 =cut
 
@@ -5168,7 +5413,7 @@ Aliases: I<omega_primepi>
 
 Returns an array with k-omega primes <= n, or in the range C<a..b>.
 
-k-omega primes are numbers C<n> such that C<omega(n) == k>.
+k-omega primes are numbers C<n> that satisfy C<omega(n) == k>.
 
     say 1.omega_primes(100)         # prime powers <= 100
     say 2.omega_primes(50, 100)     # 2-omega primes in range 50..100
@@ -5210,6 +5455,20 @@ Returns an array with the real and imaginary parts of C<x>.
     n.pbrent_factor(tries)
 
 Pollard-Brent rho factorization method.
+
+The product of the factors, will give back C<n>. However, some factors may be composite.
+
+=cut
+
+=head2 pell_factor
+
+    pell_factor(n, tries=1e4)
+
+Pell factorization method, trying to find a factor of C<n>.
+
+This method is particularly effective for numbers that have factors close to C<sqrt(n)>.
+
+    say pell_factor(10**120 - 10**40)
 
 The product of the factors, will give back C<n>. However, some factors may be composite.
 
@@ -5724,7 +5983,7 @@ Aliases: I<prime_count>, I<count_primes>
 
     n.primepi_lower
 
-Lower bound for prime_count(n).
+Lower bound for C<prime_count(n)>.
 
 Aliases: I<prime_count_lower>
 
@@ -5734,7 +5993,7 @@ Aliases: I<prime_count_lower>
 
     n.primepi_upper
 
-Upper bound for prime_count(n).
+Upper bound for C<prime_count(n)>.
 
 Aliases: I<prime_count_upper>
 
@@ -5763,9 +6022,25 @@ Returns the number of prime powers <= n, or in the range C<a..b>.
 
 =cut
 
+=head2 prime_power_count_lower
+
+    prime_power_count_lower(n)
+
+Lower bound for C<prime_power_count(n)>.
+
+=cut
+
+=head2 prime_power_count_upper
+
+    prime_power_count_upper(n)
+
+Upper bound for C<prime_power_count(n)>.
+
+=cut
+
 =head2 prime_power_divisors
 
-    n.prime_power_divisors()
+    n.prime_power_divisors
 
 Returns the prime power divisors of n.
 
@@ -5774,6 +6049,28 @@ Returns the prime power divisors of n.
 Equivalent with:
 
     n.divisors.grep{.is_prime_power}
+
+=cut
+
+=head2 prime_power_lower
+
+    prime_power_lower(n)
+
+Lower bound for the n-th prime power.
+
+Aliases: I<nth_prime_power_lower>
+
+=cut
+
+=head2 prime_powers
+
+    prime_powers(n)
+    prime_powers(a,b)
+
+Returns an array with the prime powers <= n, or in the range C<a..b>.
+
+    say prime_powers(100)          # prime powers <= 100
+    say prime_powers(50, 100)      # prime powers in the range [50, 100]
 
 =cut
 
@@ -5819,6 +6116,16 @@ This method is equivalent with:
     n.factor_map {|p,k| p**k }.sort
 
 Aliases: I<prime_power_unitary_divisors>, I<unitary_prime_power_divisors>
+
+=cut
+
+=head2 prime_power_upper
+
+    prime_power_upper(n)
+
+Upper bound for the n-th prime power.
+
+Aliases: I<nth_prime_power_upper>
 
 =cut
 
@@ -6320,13 +6627,25 @@ Also works with arbitrarily large n:
 
 =cut
 
+=head2 rough_divisors
+
+    k.rough_divisors(n)
+
+Returns an array with the divisors of n that are k-rough.
+
+Equivalent with (but more efficient):
+
+    n.divisors.grep { .is_rough(k) }
+
+=cut
+
 =head2 rough_part
 
-    n.rough_part(k)
+    k.rough_part(n)
 
 It returns the k-rough part of n that contains all the prime factors p|n such that p >= k.
 
-    say 15.of {|n| rough_part(n!, 3) }      #=> OEIS: A049606
+    say 15.of {|n| 3.rough_part(n!) }      #=> OEIS: A049606
 
 =cut
 
@@ -6490,6 +6809,18 @@ Returns the number of k-smooth numbers <= n, or in the range C<a..b>.
 
 =cut
 
+=head2 smooth_divisors
+
+    k.smooth_divisors(n)
+
+Returns an array with the divisors of n that are k-smooth.
+
+Equivalent with (but more efficient):
+
+    n.divisors.grep { .is_smooth(k) }
+
+=cut
+
 =head2 smooth_numbers
 
     smooth_numbers(limit, [p1,p2,...])
@@ -6511,11 +6842,11 @@ An optional block can be provided, which is called with two arguments, C<n> and 
 
 =head2 smooth_part
 
-    n.smooth_part(k)
+    k.smooth_part(n)
 
 It efficiently returns the largest divisor of n that is k-smooth.
 
-    say 20.of {|n| smooth_part(n!, 3) }     #=> OEIS: A118381
+    say 20.of {|n| 3.smooth_part(n!) }     #=> OEIS: A118381
 
 =cut
 
@@ -6567,6 +6898,24 @@ Sum of the distinct primes dividing n.
 Sum of primes dividing n (with repetition).
 
     say 30.of { .sopfr }    #=> OEIS: A001414
+
+=cut
+
+=head2 special_factor
+
+    special_factor(n, tries=1)
+
+Tries to find special factors of C<n>, using various special-factorization methods, including trial division, p-1 method, p+1 method, HOLF method, Fermat method, Pell method, Miller-Rabin method and the Lucas-Miller method.
+
+An additional optional argument can be given to increase the number of tries by the given factor. For example, C<tries = 2> will double the number of tries.
+
+The method returns an array with the factors of C<n>:
+
+    say special_factor((3**120 + 1) * (5**240 - 1))
+
+The product of the factors, will give back C<n>. However, some factors may be composite.
+
+Aliases: I<special_factors>
 
 =cut
 
@@ -6876,8 +7225,7 @@ Returns the number of unitary square divisors of C<n>.
 
 =head2 squfof_factor
 
-    n.squfof_factor
-    n.squfof_factor(tries)
+    n.squfof_factor(tries=1e4)
 
 Shanks' SQUFOF method.
 
@@ -6926,7 +7274,7 @@ Number of derangements of a set with n elements having exactly k fixed points. A
 
     submod(a,b,m)
 
-Modular integer subtraction: C<(a-b)%m>.
+Modular integer subtraction: C<(a-b) % m>.
 
     say submod(43, 97, 127)     #=> (43-97)%127
 
@@ -6953,7 +7301,7 @@ Returns an array with the subsets of the integers in the range C<0..n-1>, or ite
 
     sum_of_squares(n)
 
-Returns an array of C<[a,b]> pairs containing all the positive solutions to the equation:
+Returns an array of C<[a,b]> pairs, with a <= b, containing all the positive solutions to the equation:
 
     n = a^2 + b^2
 

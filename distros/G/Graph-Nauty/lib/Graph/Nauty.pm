@@ -13,7 +13,9 @@ our @EXPORT_OK = qw(
     orbits_are_same
 );
 
-our $VERSION = '0.4.0'; # VERSION
+our $VERSION = '0.5.0'; # VERSION
+
+our $worksize = 0;
 
 require XSLoader;
 XSLoader::load('Graph::Nauty', $VERSION);
@@ -135,7 +137,8 @@ sub automorphism_group_size
     my( $graph, $color_sub ) = @_;
 
     my $statsblk = sparsenauty( _nauty_graph( $graph, $color_sub ),
-                                undef );
+                                undef,
+                                $worksize );
     return $statsblk->{grpsize1} * 10 ** $statsblk->{grpsize2};
 }
 
@@ -145,8 +148,11 @@ sub orbits
 
     my( $nauty_graph, $labels, $breaks ) =
         _nauty_graph( $graph, $color_sub, $order_sub );
-    my $statsblk = sparsenauty( $nauty_graph, $labels, $breaks,
-                                { getcanon => 1 } );
+    my $statsblk = sparsenauty( $nauty_graph,
+                                $labels,
+                                $breaks,
+                                { getcanon => 1 },
+                                $worksize );
 
     my $orbits = [];
     for my $i (@{$statsblk->{lab}}) {
@@ -178,8 +184,8 @@ sub are_isomorphic
     # a getaround to avoid it:
     return 1 if $nauty_graph1[0]->{nv} == 0;
 
-    my $statsblk1 = sparsenauty( @nauty_graph1, { getcanon => 1 } );
-    my $statsblk2 = sparsenauty( @nauty_graph2, { getcanon => 1 } );
+    my $statsblk1 = sparsenauty( @nauty_graph1, { getcanon => 1 }, $worksize );
+    my $statsblk2 = sparsenauty( @nauty_graph2, { getcanon => 1 }, $worksize );
 
     for my $i (0..$nauty_graph1[0]->{nv}-1) {
         my $j = $statsblk1->{lab}[$i];
@@ -198,8 +204,11 @@ sub canonical_order
 
     my( $nauty_graph, $labels, $breaks ) =
         _nauty_graph( $graph, $color_sub, $order_sub );
-    my $statsblk = sparsenauty( $nauty_graph, $labels, $breaks,
-                                { getcanon => 1 } );
+    my $statsblk = sparsenauty( $nauty_graph,
+                                $labels,
+                                $breaks,
+                                { getcanon => 1 },
+                                $worksize );
 
     return grep { !blessed $_ || !$_->isa( Graph::Nauty::EdgeVertex:: ) }
                 map { $nauty_graph->{original}[$_] }
@@ -230,7 +239,7 @@ __END__
 
 =head1 NAME
 
-Graph::Nauty - Perl bindings for nauty
+Graph::Nauty - Perl bindings for Nauty
 
 =head1 SYNOPSIS
 
@@ -261,7 +270,7 @@ Graph::Nauty - Perl bindings for nauty
 
 =head1 DESCRIPTION
 
-Graph::Nauty provides an interface to nauty, a set of procedures for
+Graph::Nauty provides an interface to Nauty, a set of procedures for
 determining the automorphism group of a vertex-coloured graph, and for
 testing graphs for isomorphism.
 
@@ -298,16 +307,24 @@ Edge colors are generated from L<Graph|Graph> edge attributes. Complete
 hash of each edge's attributes is stringified (deterministically) and
 used to divide edges into equivalence classes.
 
+=head2 Working storage size
+
+Nauty needs working storage, which it does not allocate by itself.
+Graph::Nauty follows the advice of the Nauty user guide by allocating
+the recommended amount of memory, but for certain graphs this might not
+be enough, still. To control that, C<$Graph::Nauty::worksize> could be
+used to set the size of memory in the units of Nauty's C<setword>.
+
 =head1 INSTALLING
 
 Building and installing Graph::Nauty from source requires shared library
-and C headers for nauty, which can be downloaded from
+and C headers for Nauty, which can be downloaded from
 L<https://users.cecs.anu.edu.au/~bdm/nauty/>. Both the library and C
 headers have to be installed to locations visible by Perl's C compiler.
 
 =head1 SEE ALSO
 
-For the description of nauty refer to L<http://pallini.di.uniroma1.it>.
+For the description of Nauty refer to L<http://pallini.di.uniroma1.it>.
 
 =head1 AUTHOR
 
@@ -317,8 +334,6 @@ Andrius Merkys, L<mailto:merkys@cpan.org>
 
 Copyright (C) 2020 by Andrius Merkys
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.26.1 or,
-at your option, any later version of Perl 5 you may have available.
+Graph::Nauty is distributed under the BSD-3-Clause license.
 
 =cut

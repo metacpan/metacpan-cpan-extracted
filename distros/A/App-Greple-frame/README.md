@@ -33,7 +33,7 @@ Put next line in your `~/.greplerc` to autoload **App::Greple::frame** module.
 Then you can use **--frame** option whenever you want.
 
 <div>
-    <p><img width="75%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-frame/main/images/terminal-2.png">
+    <p><img width="75%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-frame/main/images/terminal-3.png">
 </div>
 
 # FUNCTION
@@ -48,9 +48,15 @@ Then you can use **--frame** option whenever you want.
 
     If non-digit character is found in the value part, it is considered as
     a Reverse Polish Notation, starting terminal width pushed on the
-    stack.  Next command set `terminal-width / 2 - 3`.
+    stack.  RPN `2/3-` means `terminal-width / 2 - 3`.
 
-        greple -Mframe::set=width=2/3- ...
+    You can use like this:
+
+        greple -Mframe::set=width=2/3- --frame --uc '(\w+::)+\w+' --git | ansicolumn -PC2
+
+    <div>
+            <p><img width="75%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-frame/main/images/terminal-column.png">
+    </div>
 
 # SEE ALSO
 

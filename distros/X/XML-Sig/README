@@ -3,7 +3,7 @@ NAME
     Signatures
 
 VERSION
-    version 0.57
+    version 0.58
 
 SYNOPSIS
        my $xml = '<foo ID="abc">123</foo>';
@@ -127,6 +127,15 @@ USAGE
         the full XML document so is this is true (1) it will not include the
         XML Declaration at the beginning of the signed XML. False (0) or
         undefined returns an XML document starting with the XML Declaration.
+
+    The following options act similar to "xmlsec --id-attr:ID
+    <node-namespace-uri>:<name>"
+
+    ns  A HashRef to namespaces you want to define to select the correct
+        attribute ID on
+
+    id_attr
+        The xpath string you want to sign your XML message on.
 
   METHODS
    new(...)
@@ -300,7 +309,8 @@ COPYRIGHT AND LICENSE
                 2015       Mike Wisener
                 2016       Jeff Fearn
                 2017       Mike Wisener, xmikew
-                2019-2022  Timothy Legge
+                2019-2021  Timothy Legge
+                2022       Timothy Legge, Wesley Schwengle
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,10 +1,10 @@
 package Acme::Mitey::Cards::Deck;
 
-our $VERSION   = '0.011';
+our $VERSION   = '0.013';
 our $AUTHORITY = 'cpan:TOBYINK';
 
-use Acme::Mitey::Cards::Mite qw( -bool -is croak );
-use Acme::Mitey::Cards::Types qw(:types);
+use Acme::Mitey::Cards::Mite qw( -all );
+use Acme::Mitey::Cards::Types qw( :types );
 
 extends 'Acme::Mitey::Cards::Set';
 
@@ -59,6 +59,10 @@ sub _build_original_cards {
 	return \@cards;
 }
 
+signature_for discard_jokers => (
+	pos => [],
+);
+
 sub discard_jokers {
 	my $self = shift;
 
@@ -78,16 +82,22 @@ sub discard_jokers {
 	return Acme::Mitey::Cards::Set->new( cards => \@jokers );
 }
 
+signature_for deal_hand => (
+	named => [
+		count         => Int,     { default => 7 },
+		args_for_hand => HashRef, { slurpy => true },
+	],
+);
+
 sub deal_hand {
-	my ( $self, %args ) = ( shift, @_ );
+	my ( $self, $arg ) = @_;
 
-	my $n = defined( $args{count} ) ? delete( $args{count} ) : 7;
-	croak "Not enough cards: wanted %d but only have %d", $n, $self->count
-		if $n > $self->count;
+	croak "Not enough cards: wanted %d but only have %d", $arg->count, $self->count
+		if $arg->count > $self->count;
 
-	my $took = $self->take( $n );
+	my $took = $self->take( $arg->count );
 	return Acme::Mitey::Cards::Hand->new(
-		%args,
+		%{ $arg->args_for_hand },
 		cards => [ @{ $took->cards } ],
 	);
 }

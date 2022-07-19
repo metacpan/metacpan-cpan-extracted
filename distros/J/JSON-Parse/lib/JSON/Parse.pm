@@ -4,21 +4,21 @@ use strict;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw/
-		   assert_valid_json
-		   json_file_to_perl
-		   json_to_perl
-		   parse_json
-		   parse_json_safe
-		   read_json
-		   valid_json
-		   validate_json
-	       /;
+    assert_valid_json
+    json_file_to_perl
+    json_to_perl
+    parse_json
+    parse_json_safe
+    read_json
+    valid_json
+    validate_json
+/;
 
 our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
 );
 use Carp;
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 require XSLoader;
 XSLoader::load (__PACKAGE__, $VERSION);
 

@@ -5,6 +5,7 @@ BEGIN
     use warnings;
     use lib './lib';
     use Test::More;
+    use vars qw( $DEBUG $CRYPTX_REQUIRED_VERSION );
     # 2021-11-01T08:12:10
     use Test::Time time => 1635754330;
     use HTTP::Request ();
@@ -19,6 +20,9 @@ BEGIN
     use_ok( 'Cookie::Jar' );
     require( "./t/env.pl" ) if( -e( "t/env.pl" ) );
 };
+
+use strict;
+use warnings;
 
 subtest 'methods' => sub
 {
@@ -281,7 +285,7 @@ subtest 'cookie jar' => sub
         diag( "add_request_header returned an error: ", $jar->error ) if( $DEBUG );
     }
 
-    $h = $req->header( 'Cookie' );
+    my $h = $req->header( 'Cookie' );
     like( $h, qr/session_token=${token}/ );
     like( $h, qr/csrf_token=${csrf}/ );
     

@@ -5,7 +5,7 @@ package Iterator::Flex::Role;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Role::Tiny;
 use experimental 'signatures';
@@ -23,7 +23,7 @@ require Iterator::Flex;
 
 
 
-sub icache ( $iter, $code ) { Iterator::Flex::icache( \&{ $code }, $iter ) }
+sub icache ( $iter, $code ) { Iterator::Flex::icache( \&{$code}, $iter ) }
 
 
 
@@ -33,7 +33,7 @@ sub icache ( $iter, $code ) { Iterator::Flex::icache( \&{ $code }, $iter ) }
 
 
 
-sub igrep ( $iter, $code ) { Iterator::Flex::igrep( \&{ $code }, $iter ) }
+sub igrep ( $iter, $code ) { Iterator::Flex::igrep( \&{$code}, $iter ) }
 
 
 
@@ -43,7 +43,7 @@ sub igrep ( $iter, $code ) { Iterator::Flex::igrep( \&{ $code }, $iter ) }
 
 
 
-sub imap ( $iter, $code ) { Iterator::Flex::imap( \&{ $code }, $iter ) }
+sub imap ( $iter, $code ) { Iterator::Flex::imap( \&{$code}, $iter ) }
 
 
 
@@ -53,7 +53,7 @@ sub imap ( $iter, $code ) { Iterator::Flex::imap( \&{ $code }, $iter ) }
 
 
 
-sub ifreeze ( $iter, $code ) { Iterator::Flex::ifreeze( \&{ $code }, $iter ) }
+sub ifreeze ( $iter, $code ) { Iterator::Flex::ifreeze( \&{$code}, $iter ) }
 
 1;
 
@@ -79,7 +79,7 @@ Iterator::Flex::Role - Iterator Methods to add Iterator::Flex Iterator modifiers
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 METHODS
 
@@ -106,6 +106,8 @@ Return a new iterator modifying the original iterator via L<Iterator::Flex/ifree
   $new_iter = $iter->ifreeze( sub { ... } );
 
 Return a new iterator modifying the original iterator via L<Iterator::Flex/ifreeze>.
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

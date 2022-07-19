@@ -32,3 +32,16 @@ Revision history for experimentals
        Removed testing for lexical subs under 5.25+
        (thanks Slaven!)
 
+
+
+0.018  Sat Jul 16 04:54:29 2022
+
+        Automatically apply the utf8 pragma if the experimental
+        'extra_paired_delimiters' feature will be activated
+        (because that feature is useless without utf8).
+
+
+0.019  Sat Jul 16 05:04:46 2022
+
+        Documented auto-utf8 behaviour.
+

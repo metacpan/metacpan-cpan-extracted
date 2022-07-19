@@ -31,6 +31,10 @@ use Types::Standard -types, "slurpy";
 use Type::Utils;
 use Scalar::Util qw(refaddr);
 
+{
+	my $e = exception { compile_named()->(foo => 1) };
+	like($e, qr{^Wrong number of parameters});
+}
 
 {
 	package
@@ -144,7 +148,7 @@ sub _simple_test {
 		
 		like(
 			exception { $check->({ foo => 3, bar => 42, xxx => 1, yyy => 2, zzz => 3 }) },
-			qr/^Unrecognized parameters: xxx, yyy, and zzz/,
+			qr/^Unrecognized parameters: xxx, yyy, zzz/,
 			'additional parameters',
 		);
 		
@@ -326,7 +330,7 @@ subtest "Shortcuts for Any and Optional[Any]" => sub {
 	);
 	like(
 		exception { $chk->(foo => "xyz", bar => "abc", baz => "def") },
-		qr/Unrecognized parameter/,
+		qr/(Unrecognized parameter)|(Wrong number of parameters)/,
 	);
 	like(
 		exception { $chk->(bar => "abc") },

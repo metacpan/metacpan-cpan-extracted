@@ -18,7 +18,7 @@ The following install procedure is if we use Groonga-HTTP that provides in CAPN.
 ```console
 % sudo dnf install -y perl-App-cpanminus
 % sudo dnf install -y gcc
-% cpanm Groonga-HTTP
+% cpanm Groonga::HTTP
 ```
 
 If we want to use Carton to install Groonga-HTTP, we install Groonga-HTTP in the following procedure.

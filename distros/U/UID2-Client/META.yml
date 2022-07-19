@@ -1,0 +1,65 @@
+---
+abstract: 'Unified ID 2.0 Perl Client'
+author:
+  - 'Jiro Nishiguchi <jiro@cpan.org>'
+build_requires:
+  Test::MockObject: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: UID2-Client
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  UID2::Client:
+    file: lib/UID2/Client.pm
+    version: '0.01'
+  UID2::Client::Decryption:
+    file: lib/UID2/Client/Decryption.pm
+  UID2::Client::DecryptionStatus:
+    file: lib/UID2/Client/DecryptionStatus.pm
+  UID2::Client::EncryptionStatus:
+    file: lib/UID2/Client/EncryptionStatus.pm
+  UID2::Client::IdentityScope:
+    file: lib/UID2/Client/IdentityScope.pm
+  UID2::Client::IdentityType:
+    file: lib/UID2/Client/IdentityType.pm
+  UID2::Client::Key:
+    file: lib/UID2/Client/Key.pm
+  UID2::Client::KeyContainer:
+    file: lib/UID2/Client/KeyContainer.pm
+  UID2::Client::Timestamp:
+    file: lib/UID2/Client/Timestamp.pm
+recommends:
+  IO::Socket::SSL: '1.56'
+  JSON::XS: '0'
+  Net::SSLeay: '1.49'
+requires:
+  Class::Accessor::Lite: '0'
+  CryptX: '0.060'
+  HTTP::Tiny: '0'
+  JSON: '0'
+  List::MoreUtils: '0'
+  perl: '5.010000'
+resources:
+  bugtracker: https://github.com/spiritloose/uid2-client-perl/issues
+  homepage: https://github.com/spiritloose/uid2-client-perl
+  repository: https://github.com/spiritloose/uid2-client-perl.git
+version: '0.01'
+x_authority: cpan:JIRO
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -146,7 +146,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.154';
+our $VERSION = '0.155';
 our @EXPORT_OK = qw{
     shell
 
@@ -309,75 +309,75 @@ my %catalogs = (	# Catalog names (and other info) for each source.
     celestrak_supplemental => {
 	gps		=> {
 	    name	=> 'GPS Operational',
-	    source	=> 'GPS-A',
+	    # source	=> 'GPS-A',
 	    rms		=> 1,
 	    match	=> 1,
 	},
 	glonass		=> {
 	    name	=> 'GLONASS Operational',
-	    source	=> 'GLONASS-RE',
+	    # source	=> 'GLONASS-RE',
 	    rms		=> 1,
 	    match	=> 1,
 	},
 	meteosat	=> {
 	    name	=> 'METEOSAT',
-	    source	=> 'METEOSAT-SV',
+	    # source	=> 'METEOSAT-SV',
 	    rms		=> 1,
 	    match	=> 1,
 	},
 	intelsat	=> {
 	    name	=> 'Intelsat',
-	    source	=> 'Intelsat-11P',
+	    # source	=> 'Intelsat-11P',
 	    rms		=> 1,
 	    match	=> 1,
 	},
 	ses		=> {
 	    name	=> 'SES',
-	    source	=> 'SES-11P',
+	    # source	=> 'SES-11P',
 	    rms		=> 1,
 	    match	=> 1,
 	},
 	telesat		=> {
 	    name	=> 'Telesat',
-	    source	=> 'Telesat-E',
+	    # source	=> 'Telesat-E',
 	    rms		=> 1,
 	    match	=> 1,
 	},
 	orbcomm		=> {
 	    name	=> 'Orbcomm (no RMS or match data)',
-	    source	=> 'Orbcomm-TLE',
+	    # source	=> 'Orbcomm-TLE',
 	},
 	iss		=> {
 	    name	=> 'ISS (from NASA, no match data)',
-	    source	=> 'ISS-E',
+	    # source	=> 'ISS-E',
 	    rms		=> 1,
 	},
 	cpf		=> {
 	    name	=> 'CPF (no match data)',
-	    source	=> 'CPF',
+	    # source	=> 'CPF',
 	    rms		=> 1,
 	},
 	starlink	=> {
 	    name	=> 'Starlink',
-	    source	=> 'SpaceX-E',
+	    # source	=> 'SpaceX-E',
 	    rms		=> 1,
 	    match	=> 1,
 	},
 	oneweb		=> {
 	    name	=> 'OneWeb',
-	    source	=> 'OneWeb-E',
+	    # source	=> 'OneWeb-E',
 	    rms		=> 1,
 	    match	=> 1,
 	},
 	planet		=> {
 	    name	=> 'Planet (no, not Mercury etc)',
-	    source	=> 'Planet-E',
+	    # source	=> 'Planet-E',
 	    rms		=> 1,
 	    match	=> 1,
 	},
 	iridium		=> {
 	    name	=> 'Iridium Next',
-	    source	=> 'Iridium-E',
+	    # source	=> 'Iridium-E',
 	    rms		=> 1,
 	    match	=> 1,
 	},
@@ -1346,7 +1346,7 @@ sub celestrak_supplemental {
 		$info->{spacetrack_type} = 'orbit';
 		my $uri = URI->new( "$base_url/sup-gp.php" );
 		$uri->query_form(
-		    SOURCE	=> $source,
+		    FILE	=> $source,
 		    FORMAT	=> 'tle',
 		);
 		$info->{url} = $uri;

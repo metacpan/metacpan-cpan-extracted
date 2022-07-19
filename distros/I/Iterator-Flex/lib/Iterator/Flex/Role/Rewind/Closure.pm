@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Rewind::Closure;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Iterator::Flex::Base ();
 use Iterator::Flex::Utils qw( :default ITERATOR REWIND );
@@ -28,7 +28,7 @@ sub rewind ( $self ) {
 
     $self->_apply_method_to_depends( 'rewind' );
 
-    $REGISTRY{ refaddr $self }{ +ITERATOR }{+REWIND}->( $self );
+    $REGISTRY{ refaddr $self }{ +ITERATOR }{ +REWIND }->( $self );
     $self->_clear_state;
 
     return;
@@ -62,7 +62,7 @@ Iterator::Flex::Role::Rewind::Closure - Implement C<rewind> as a closure stored 
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 METHODS
 
@@ -73,6 +73,8 @@ version 0.14
    $iterator->rewind;
 
 Rewind the iterator;
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

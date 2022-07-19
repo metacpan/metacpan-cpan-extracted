@@ -19,14 +19,14 @@ no multidimensional;
 
 use Cwd 'abs_path';
 
-use Test::More tests => 62;
+use Test::More tests => 63;
 use Test::Output;
 use Test::Warn;
 
 # define fixed environment for unit tests:
 BEGIN { delete $ENV{DISPLAY}; delete $ENV{UI}; }
 
-use UI::Various({use => [], include => [qw(Main Text Button Box)]});
+use UI::Various({use => [], include => [qw(Main Text Button Box Window)]});
 
 use constant T_PATH => map { s|/[^/]+$||; $_ } abs_path($0);
 do(T_PATH . '/functions/call_with_stdin.pl');
@@ -375,3 +375,38 @@ $output =
 stdout_is(sub {   $outer_box->_show('');   },
 	  $output,
 	  '_show with empty prefix prints 5 combined boxes correctly');
+$main->remove($outer_box);
+
+####################################
+# tests with box with buttons in running window (terminated via button):
+my $window;
+$box = UI::Various::Box->new(border => 1, rows => 2);
+$box->add(UI::Various::Button->new(text => 'OK',
+				   code => sub{    print "OK!\n";    }),
+	  UI::Various::Button->new(text => 'Quit',
+				   code => sub{    $window->destroy;    }));
+$outer_box = UI::Various::Box->new(border => 1);
+$outer_box->add($box);
+$window = $main->window({title => 'running boxes'}, $outer_box);
+
+my $output_select2 =
+    "<0> leave window\n\n----- enter number to choose next step: ";
+$output =
+    "========== running boxes\n" .
+    "<1> ----------\n" .
+    "    <*> ----------\n" .
+    "        [ OK ]\n" .
+    "        [ Quit ]\n" .
+    "        ----------\n" .
+    "    ----------\n" .
+    $output_select2 . "1\n" .
+    "<1> [ OK ]\n" .
+    "<2> [ Quit ]\n" .
+    $output_select . "1\nOK!\n" .
+    "<1> [ OK ]\n" .
+    "<2> [ Quit ]\n" .
+    $output_select . "2\n";
+stdout_is
+{   _call_with_stdin("1\n1\n2\n", sub { $main->mainloop; });   }
+    $output,
+    'box with buttons in running window is handled correctly';

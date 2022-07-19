@@ -1,3 +1,77 @@
+0.07  2022-07-15
+  [Document Fix]
+    * Fix document of cap1 to cap20 simple mistake.
+    
+0.06  2022-07-15
+  [Incompatible Changes]
+    * Regex 0.06 binds Google Re2.
+    * Change the field and method definitions
+      [Before]
+      has captures : ro string[];
+      has match_start : ro int;
+      has match_length : ro int;
+      has replace_count : ro int;
+      has before_is_hyphen : byte;
+      has before_is_open_bracket : byte;
+      native static method re2_test : void ();
+      static method new : Regex ($re_str_and_options : string[]...)
+      static method new_with_options : Regex ($re_str : string, $option_chars : string)
+      method match : int ($target : string, $target_base_index : int)
+      method replace  : string ($target : string, $target_offset : int, $replace : string)
+      method replace_cb  : string ($target : string, $target_offset : int, $replace_cb : Regex::Replacer)
+      method replace_all  : string ($target : string, $target_offset : int, $replace : string)
+      method replace_all_cb  : string ($target : string, $target_offset : int, $replace_cb : Regex::Replacer)
+      method cap1 : string ()
+      method cap2 : string ()
+      method cap3 : string ()
+      method cap4 : string ()
+      method cap5 : string ()
+      method cap6 : string ()
+      method cap7 : string ()
+      method cap8 : string ()
+      method cap9 : string ()
+      method cap10 : string ()
+      
+      [After]
+      has captures : ro string[];
+      has match_start : ro int;
+      has match_length : ro int;
+      has replaced_count : ro int;
+      static method new : Regex ($pattern_and_flags : string[]...)
+      method match : int ($string : string)
+      method match_offset : int ($string : string, $offset : int*);
+      method cap1 : string ()
+      method cap2 : string ()
+      method cap3 : string ()
+      method cap4 : string ()
+      method cap5 : string ()
+      method cap6 : string ()
+      method cap7 : string ()
+      method cap8 : string ()
+      method cap9 : string ()
+      method cap10 : string ()
+      method cap11 : string ()
+      method cap12 : string ()
+      method cap13 : string ()
+      method cap14 : string ()
+      method cap15 : string ()
+      method cap16 : string ()
+      method cap17 : string ()
+      method cap18 : string ()
+      method cap19 : string ()
+      method cap20 : string ()
+      method replace  : string ($string : string, $replace_string : string)
+      method replace_cb  : string ($string : string, $replace_cb : Regex::Replacer)
+      method replace_g  : string ($string : string, $replace_string : string)
+      method replace_g_cb  : string ($string : string, $replace_cb : Regex::Replacer)
+      method replace_offset  : string ($string : string, $offset_ref : int*, $replace : string)
+      method replace_cb_offset  : string ($string : string, $offset_ref : int*, $replace_cb : Regex::Replacer)
+      method replace_g_offset  : string ($string : string, $offset_ref : int*, $replace : string)
+      method replace_g_cb_offset  : string ($string : string, $offset_ref : int*, $replace_cb : Regex::Replacer)
+      
+  [Changes]
+    * Need SPVM::Resource::Re2::V2022_06_01 0.05.
+    * Need SPVM 0.9615.
 0.05  2022-06-23
   * Catch up with SPVM 0.9612.
 

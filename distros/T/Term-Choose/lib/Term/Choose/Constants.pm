@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.756';
+our $VERSION = '1.757';
 
 use Exporter qw( import );
 
@@ -12,7 +12,7 @@ our @EXPORT_OK = qw(
     NEXT_get_key
     CONTROL_SPACE LINE_FEED CARRIAGE_RETURN
     CONTROL_A CONTROL_B CONTROL_C CONTROL_D CONTROL_E CONTROL_F CONTROL_H CONTROL_I
-    CONTROL_K CONTROL_N CONTROL_P CONTROL_Q CONTROL_R CONTROL_S CONTROL_U CONTROL_X
+    CONTROL_K CONTROL_N CONTROL_P CONTROL_Q CONTROL_R CONTROL_S CONTROL_T CONTROL_U CONTROL_X
     KEY_BTAB KEY_TAB KEY_ESC KEY_SPACE KEY_h KEY_j KEY_k KEY_l KEY_q KEY_Tilde KEY_BSPACE
     VK_LEFT VK_RIGHT VK_UP VK_DOWN
     VK_INSERT VK_DELETE VK_HOME VK_END VK_PAGE_UP VK_PAGE_DOWN
@@ -22,8 +22,7 @@ our @EXPORT_OK = qw(
 );
 
 our %EXPORT_TAGS = (
-    all => [ @EXPORT_OK ],
-    keys => [ @EXPORT_OK ] # old Term::Form use the tag ':keys'. Keep this for some time # 17.06.2021
+    all => [ @EXPORT_OK ]
 );
 
 
@@ -61,9 +60,9 @@ use constant {
 #   CONTROL_O       => 0x0f,
     CONTROL_P       => 0x10,
     CONTROL_Q       => 0x11,
-    CONTROL_R       => 0x12,
+    CONTROL_R       => 0x12, # unused
     CONTROL_S       => 0x13,
-#   CONTROL_T       => 0x14,
+    CONTROL_T       => 0x14,
     CONTROL_U       => 0x15,
 #   CONTROL_V       => 0x16,
 #   CONTROL_W       => 0x17,

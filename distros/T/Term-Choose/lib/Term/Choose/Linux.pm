@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.756';
+our $VERSION = '1.757';
 
 use Term::Choose::Constants qw( :all );
 use Term::Choose::Screen    qw( hide_cursor show_cursor normal );
@@ -93,7 +93,7 @@ sub __get_key_OS {
                 if ( $c4 eq '~' ) {
                     if    ( $c3 eq '2' ) { return VK_INSERT; }      #\e[2~
                     elsif ( $c3 eq '3' ) { return VK_DELETE; }      #\e[3~
-                    elsif ( $c3 eq '4' ) { return VK_END; }         #\e[4~
+                    elsif ( $c3 eq '4' ) { return VK_END; }         #\e[4~ #
                     elsif ( $c3 eq '5' ) { return VK_PAGE_UP; }     #\e[5~
                     elsif ( $c3 eq '6' ) { return VK_PAGE_DOWN; }   #\e[6~
                 }

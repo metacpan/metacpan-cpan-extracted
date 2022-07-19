@@ -1,5 +1,5 @@
 package WWW::FetchStory::Fetcher::RestrictedSection;
-$WWW::FetchStory::Fetcher::RestrictedSection::VERSION = '0.2201';
+$WWW::FetchStory::Fetcher::RestrictedSection::VERSION = '0.2307';
 use strict;
 use warnings;
 =head1 NAME
@@ -8,7 +8,7 @@ WWW::FetchStory::Fetcher::RestrictedSection - fetching module for WWW::FetchStor
 
 =head1 VERSION
 
-version 0.2201
+version 0.2307
 
 =head1 DESCRIPTION
 

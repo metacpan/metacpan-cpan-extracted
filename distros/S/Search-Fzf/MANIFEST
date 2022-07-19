@@ -1,0 +1,32 @@
+AlgoCpp/Algo.cc
+AlgoCpp/AlgoCpp.xs
+AlgoCpp/Makefile.PL
+AlgoCpp/algo.h
+AlgoCpp/algo.xsp
+AlgoCpp/jpcre2.hpp
+AlgoCpp/lib/Search/Fzf/AlgoCpp.pm
+AlgoCpp/ppport.h
+AlgoCpp/reader.cc
+AlgoCpp/t/00-load.t
+AlgoCpp/t/01-read.t
+AlgoCpp/t/02-asynread.t
+AlgoCpp/t/03-headandmark.t
+AlgoCpp/t/04-nthread.t
+AlgoCpp/t/testfile
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Search/Fzf/AlgoCpp.pm
+lib/Search/Fzf/Tui.pm
+lib/Search/Fzf.pm
+lib/Search/Fzf.pod
+t/00-load.t
+t/01-tui.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

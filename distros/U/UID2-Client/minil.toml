@@ -1,0 +1,6 @@
+name = "UID2-Client"
+license = "perl_5"
+module_maker = "ModuleBuildTiny"
+badges = ["github-actions/test", "metacpan"]
+authority = "cpan:JIRO"
+static_install = "auto"

@@ -73,6 +73,7 @@ my @files = (
     't/signed/xmlsec1-signed-dsa-multiple.xml',
     't/signed/xmlsec1-signed-rsa-multiple.xml',
     't/sso.cert.pem',
+    't/unsigned/saml_metadata.xml',
     't/unsigned/saml_request.xml',
     't/unsigned/sign_multiple_sections.xml',
     't/unsigned/xml-sig-unsigned-dsa-multiple.xml',

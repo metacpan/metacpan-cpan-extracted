@@ -566,12 +566,11 @@ use SPVM::Builder::Util::API;
 WriteMakefile(
   NAME              => 'SPVM::$class_name',
   VERSION_FROM      => '$perl_module_rel_file',
-  PREREQ_PM         => {}, # e.g., Module::Name => 1.1
   LICENSE           => 'perl_5',
   (\$] >= 5.005 ?     ## Add these new keywords supported since 5.005
     (ABSTRACT_FROM  => '$perl_module_rel_file',
      AUTHOR         => 'USER_NAME<USER_MAIL>') : ()),
-  test => {TESTS => 't/*.t'},
+  test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'},
   clean => {FILES => ['.spvm_build', 't/.spvm_build']},
   META_MERGE => {
     'meta-spec' => { version => 2 },
@@ -582,10 +581,20 @@ WriteMakefile(
         web  => '',
       },
     },
+    no_index => {
+      directory => [],
+    }
   },
-  # SPVM::Builder::Util::API is needed for Makefile.PL
+  NORECURS => 1,
   CONFIGURE_REQUIRES => {
+    # SPVM::Builder::Util::API is needed for Makefile.PL
     'SPVM'              => '$SPVM::VERSION',
+  },
+  PREREQ_PM => {
+    
+  },
+  TEST_REQUIRES => {
+    
   },
 );
 

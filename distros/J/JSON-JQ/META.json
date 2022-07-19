@@ -43,7 +43,7 @@
    "provides" : {
       "JSON::JQ" : {
          "file" : "lib/JSON/JQ.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -58,6 +58,6 @@
          "url" : "https://github.com/dxma/perl5-json-jq"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

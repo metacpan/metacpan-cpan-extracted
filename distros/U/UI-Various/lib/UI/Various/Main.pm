@@ -48,7 +48,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use UI::Various::core;
 use UI::Various::container;
@@ -330,6 +330,7 @@ sub dialog($@)
     }
     my $dialog = UI::Various::Dialog->new($rh_attributes);
     $dialog->add($_) foreach @ui_elements;
+    $dialog->draw();
     return $dialog;
 }
 

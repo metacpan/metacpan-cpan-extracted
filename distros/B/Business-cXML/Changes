@@ -1,11 +1,14 @@
 Revision history for Business-cXML
 
+v0.6.8  2022-07-14
+        Enhancement: validate from default DTD for documents missing "DOCTYPE"
+
 v0.6.7  2018-03-27
         Enhancement: built-in logging removes line-breaking whitespace from XML
 
 v0.6.6  2018-02-15
         New: debug and trace logging levels
-		  New: POSR extrinsic "UserId"
+        New: POSR extrinsic "UserId"
         Enhancement: trap fatal errors occuring during callbacks
         Bugfix: transmissions lost input payloadID since v0.6.5
 

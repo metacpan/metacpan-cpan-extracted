@@ -4,7 +4,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -51,8 +51,7 @@
             "Test::Pod::Coverage" : "1.08",
             "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.12",
-            "Test::Version" : "1",
-            "blib" : "1.01"
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
@@ -81,7 +80,7 @@
    "provides" : {
       "Test::DiagINC" : {
          "file" : "lib/Test/DiagINC.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -96,12 +95,15 @@
          "web" : "https://github.com/dagolden/Test-DiagINC"
       }
    },
-   "version" : "0.008",
+   "version" : "0.010",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
+      "Graham Knop <haarg@haarg.org>",
       "Peter Rabbitson <ribasushi@cpan.org>",
       "Roy Ivy III <rivy.dev@gmail.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
+   "x_spdx_expression" : "Apache-2.0"
 }
 

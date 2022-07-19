@@ -57,6 +57,8 @@ t/syntax-error-1.json
 t/syntax.t
 t/test-empty-string.t
 t/test.json
+t/tokenize-bug.t
+t/u-in-key.t
 t/unicode.t
 t/upgrade-utf8.t
 t/utf8.t

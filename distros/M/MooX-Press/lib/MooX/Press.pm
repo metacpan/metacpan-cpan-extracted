@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.085';
+our $VERSION   = '0.086';
 
 use Types::Standard 1.010000 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -1243,7 +1243,7 @@ sub _make_package_generator {
 	my $builder = shift;
 	my ($name, %opts) = @_;
 	my $gen = $opts{generator} or die 'no generator code given!';
-	
+
 	my $kind = $opts{is_role} ? 'role' : 'class';
 	
 	my $qname = $builder->qualify_name($name, $opts{prefix});
@@ -2023,14 +2023,14 @@ sub _optimize_signature {
 	my @sig = @$signature;
 	require Type::Params;
 	my $global_opts = {};
-	$global_opts = shift(@sig) if is_HashRef($sig[0]) && !$sig[0]{slurpy};
+	$global_opts = shift(@sig) if is_HashRef($sig[0]);
 	$global_opts->{want_details} = 1;
 	
 	my $details = $builder->_build_method_signature_check($method_class, $method_name, $signature_style, [$global_opts, @sig]);
 	return if keys %{$details->{environment}};
 	return if $details->{source} =~ /return/;
-	
-	$details->{source} =~ /^sub \{(.+)\};$/s or return;
+
+	$details->{source} =~ /^sub \{(.+)\};?$/s or return;
 	return "do { $1 }";
 }
 
@@ -2049,7 +2049,7 @@ sub _build_method_signature_check {
 	require Type::Params;
 	
 	my $global_opts = {};
-	$global_opts = shift(@sig) if is_HashRef($sig[0]) && !$sig[0]{slurpy};
+	$global_opts = shift(@sig) if is_HashRef($sig[0]);
 	
 	$global_opts->{subname} ||= $method_name;
 	
@@ -2059,11 +2059,6 @@ sub _build_method_signature_check {
 	my $reg;
 	
 	while (@sig) {
-		if (is_HashRef($sig[0]) and $sig[0]{slurpy}) {
-			push @params, shift @sig;
-			# die "lolwut? after slurpy? you srs?" if @sig;
-		}
-		
 		my ($name, $type, $opts) = (undef, undef, {});
 		if ($is_named) {
 			($name, $type) = splice(@sig, 0, 2);
@@ -2071,7 +2066,7 @@ sub _build_method_signature_check {
 		else {
 			$type = shift(@sig);
 		}
-		if (is_HashRef($sig[0]) && !ref($sig[0]{slurpy})) {
+		if ( is_HashRef $sig[0] ) {
 			$opts = shift(@sig);
 		}
 		
@@ -2097,18 +2092,11 @@ sub _build_method_signature_check {
 			}
 		}
 		
-		my $hide_opts = 0;
-		if ($opts->{slurpy} && !ref($opts->{slurpy})) {
-			delete $opts->{slurpy};
-			$type = { slurpy => $type };
-			$hide_opts = 1;
-		}
-		
 		push(
 			@params,
 			$is_named
-				? ($name, $type, $hide_opts?():($opts))
-				: (       $type, $hide_opts?():($opts))
+				? ($name, $type, $opts)
+				: (       $type, $opts)
 		);
 	}
 	

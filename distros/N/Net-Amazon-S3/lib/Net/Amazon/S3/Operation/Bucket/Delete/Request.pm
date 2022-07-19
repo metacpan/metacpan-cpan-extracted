@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Bucket::Delete::Request;
 # ABSTRACT: An internal class to delete a bucket
-$Net::Amazon::S3::Operation::Bucket::Delete::Request::VERSION = '0.99';
+$Net::Amazon::S3::Operation::Bucket::Delete::Request::VERSION = '0.991';
 use Moose 0.85;
 extends 'Net::Amazon::S3::Request::Bucket';
 
@@ -22,7 +22,7 @@ Net::Amazon::S3::Operation::Bucket::Delete::Request - An internal class to delet
 
 =head1 VERSION
 
-version 0.99
+version 0.991
 
 =head1 SYNOPSIS
 
@@ -51,7 +51,7 @@ Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
+This software is copyright (c) 2022 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

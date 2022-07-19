@@ -46,6 +46,9 @@ lib/Type/Coercion/FromMoose.pm
 lib/Type/Coercion/Union.pm
 lib/Type/Library.pm
 lib/Type/Params.pm
+lib/Type/Params/Coderef.pm
+lib/Type/Params/Parameter.pm
+lib/Type/Params/Signature.pm
 lib/Type/Parser.pm
 lib/Type/Registry.pm
 lib/Type/Tiny.pm
@@ -131,6 +134,7 @@ t/20-modules/Type-Library/to.t
 t/20-modules/Type-Library/types.t
 t/20-modules/Type-Params/badsigs.t
 t/20-modules/Type-Params/carping.t
+t/20-modules/Type-Params/clone.t
 t/20-modules/Type-Params/coerce.t
 t/20-modules/Type-Params/compile-named-bless.t
 t/20-modules/Type-Params/compile-named-oo-pp.t
@@ -282,6 +286,7 @@ t/21-types/RoleName.t
 t/21-types/ScalarRef.t
 t/21-types/SimpleStr.t
 t/21-types/SingleDigit.t
+t/21-types/Slurpy.t
 t/21-types/Str.t
 t/21-types/StrLength.t
 t/21-types/StrMatch-more.t
@@ -338,6 +343,7 @@ t/30-external/Sub-Quote/delayed-quoting.t
 t/30-external/Sub-Quote/unquote-coercions.t
 t/30-external/Sub-Quote/unquote-constraints.t
 t/30-external/Switcheroo/basic.t
+t/30-external/Type-Library-Compiler/basic.t
 t/30-external/Type-Tie/basic.t
 t/30-external/Type-Tie/type-nano.t
 t/30-external/Types-ReadOnly/basic.t
@@ -376,6 +382,7 @@ t/98-param-eg-from-docs.t
 t/99-moose-std-types-test.t
 t/README
 t/lib/BiggerLib.pm
+t/lib/CompiledLib.pm
 t/lib/DemoLib.pm
 t/mk-test-manifest.pl
 t/not-covered.pl

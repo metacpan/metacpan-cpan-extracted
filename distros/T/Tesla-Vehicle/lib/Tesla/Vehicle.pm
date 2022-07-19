@@ -7,17 +7,24 @@ use parent 'Tesla::API';
 
 use Carp qw(croak confess);
 use Data::Dumper;
+use HTTP::Tiny;
+use JSON;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use constant {
     DEBUG_ONLINE    => $ENV{TESLA_DEBUG_ONLINE},
     DEBUG_API_RETRY => $ENV{TESLA_DEBUG_API_RETRY},
     API_RETRIES     => 5,
+    URL_GEOCODING   => 'https://nominatim.openstreetmap.org/reverse',
     WAKE_TIMEOUT    => 30,
     WAKE_INTERVAL   => 2,
     WAKE_BACKOFF    => 1.15
 };
+
+# HTTP::Tiny client object for doing reverse geocoding of vehicle location
+
+my $address_web_client;
 
 # Object Related
 
@@ -235,7 +242,7 @@ sub charge_amps {
     return $_[0]->data->{charge_state}{charge_amps};
 }
 sub charge_actual_current {
-    return $_[0]->data->{charge_state}{charge_actual_current};
+    return $_[0]->data->{charge_state}{charge_actual_current} // 0;
 }
 sub charge_limit_soc {
     return $_[0]->data->{charge_state}{charge_limit_soc};
@@ -605,8 +612,49 @@ sub wake {
     }
 }
 
+# Location conversion
+
+sub address {
+    my ($self) = @_;
+
+    my $lat = $self->latitude;
+    my $lon = $self->longitude;
+
+    my $geo_data = {
+        lat => $lat,
+        lon => $lon,
+        format => 'json',
+    };
+
+    my $uri_params = $self->_address_web_client()->www_form_urlencode($geo_data);
+    my $uri = "${\URL_GEOCODING}?$uri_params";
+
+    my $geocode_response = $self->_address_web_client()->get($uri);
+
+    if ($geocode_response->{success}) {
+        my $json_geocode_data = $geocode_response->{content};
+        my $geocode_data = decode_json($json_geocode_data);
+
+        my $address_data = $geocode_data->{address};
+
+        return $address_data;
+    }
+    else {
+        return {};
+    }
+}
+
 # Private Methods
 
+sub _address_web_client {
+    my ($self) = @_;
+
+    if (! $self->{address_web_client}) {
+        $self->{address_web_client} = HTTP::Tiny->new;
+    }
+
+    return $self->{address_web_client};
+}
 sub _id {
     my ($self, $id) = @_;
 
@@ -681,6 +729,8 @@ Tesla::Vehicle - Access information and command Tesla automobiles via the API
         $car->speed,
         $car->power
     );
+
+    my $physical_address_hashref = $car->address;
 
 =head1 DESCRIPTION
 
@@ -853,6 +903,35 @@ your vehicle. This is not the same as the ID you use to access the API.
 Returns an alpha-numeric string that contains the actual Vehicle Identification
 Number of your vehicle. This value is located on a stamped plate on the driver's
 side bottom on the outside of your windshield.
+
+=head1 LOCATION METHODS
+
+Alongside L</latitude> and L</longitude>, we provide a convenience method to
+return human readable address location data for your vehicle.
+
+=head2 address
+
+Takes no parameters. If the L</latitude> and L</longitude> information for the
+vehicle is available, we will return a hash reference containing the street
+address information of the vehicle.
+
+The return hash reference may have additional keys depending on the specific
+location.
+
+Example return:
+
+    {
+        'state'             => 'British Columbia',
+        'city'              => 'Kelowna',
+        'road'              => 'Old Vernon Road',
+        'postcode'          => 'V1X 7T8',
+        'village'           => 'Ellison',
+        'country'           => 'Canada',
+        'ISO3166-2-lvl4'    => 'CA-BC',
+        'leisure'           => 'Ellison Dog Park',
+        'country_code'      => 'ca',
+        'county'            => 'Regional District of Central Okanagan'
+    }
 
 =head1 COMMAND METHODS
 

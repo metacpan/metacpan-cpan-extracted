@@ -13,7 +13,7 @@ Iterator::Flex::Manual - Index of Iterator::Flex Manuals
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 DESCRIPTION
 
@@ -60,6 +60,8 @@ L<Iterator::Flex::Manual::Serialization> - How to serialize and deserialize an i
 L<Iterator::Flex::Manual::Using> - How to use an Iterator::Flex iterator
 
 =back
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

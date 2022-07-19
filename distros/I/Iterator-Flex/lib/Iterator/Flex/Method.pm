@@ -1,10 +1,12 @@
 package Iterator::Flex::Method;
 
+# ABSTRACT: Compartmentalize Iterator::Flex::Method::Maker
+
 use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 # Package::Variant based modules generate constructor functions
 # dynamically when those modules are imported.  However, loading the
@@ -31,8 +33,7 @@ package Iterator::Flex::Method::Maker {
 
         if ( Role::Tiny->is_role( $package ) ) {
             require Iterator::Flex::Failure;
-            Iterator::Flex::Failure::RoleExists->throw(
-                { payload => $package } );
+            Iterator::Flex::Failure::RoleExists->throw( { payload => $package } );
         }
 
         $INC{ Module::Runtime::module_notional_filename( $package ) } = 1;
@@ -42,8 +43,7 @@ package Iterator::Flex::Method::Maker {
     sub make_variant ( $, $, $, %arg ) {
         my $name = $arg{name};
         install $name => sub {
-            return $REGISTRY{ refaddr $_[0] }{ +ITERATOR }{ +METHODS }{$name}
-              ->( @_ );
+            return $REGISTRY{ refaddr $_[0] }{ +ITERATOR }{ +METHODS }{$name}->( @_ );
         };
     }
 }
@@ -68,11 +68,13 @@ __END__
 
 =head1 NAME
 
-Iterator::Flex::Method
+Iterator::Flex::Method - Compartmentalize Iterator::Flex::Method::Maker
 
 =head1 VERSION
 
-version 0.14
+version 0.15
+
+=head1 INTERNALS
 
 =for Pod::Coverage make_variant_package_name
   make_variant

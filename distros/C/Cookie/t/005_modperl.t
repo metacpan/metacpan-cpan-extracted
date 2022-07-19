@@ -3,6 +3,7 @@ BEGIN
 {
     use Test::More;
     use lib './lib';
+    use vars qw( $DEBUG $CRYPTX_REQUIRED_VERSION $hostport $host $port $mp_host $proto );
     use constant HAS_APACHE_TEST => $ENV{HAS_APACHE_TEST};
     use constant HAS_SSL => $ENV{HAS_SSL};
     if( HAS_APACHE_TEST )
@@ -39,6 +40,9 @@ BEGIN
     diag( "Host: '$host', port '$port'" ) if( $DEBUG );
 };
 
+use strict;
+use warnings;
+
 subtest 'basic' => sub
 {
     my $token = q{eyJleHAiOjE2MzYwNzEwMzksImFsZyI6IkhTMjU2In0.eyJqdGkiOiJkMDg2Zjk0OS1mYWJmLTRiMzgtOTE1ZC1hMDJkNzM0Y2ZmNzAiLCJmaXJzdF9uYW1lIjoiSm9obiIsImlhdCI6MTYzNTk4NDYzOSwiYXpwIjoiNGQ0YWFiYWQtYmJiMy00ODgwLThlM2ItNTA0OWMwZTczNjBlIiwiaXNzIjoiaHR0cHM6Ly9hcGkuZXhhbXBsZS5jb20iLCJlbWFpbCI6ImpvaG4uZG9lQGV4YW1wbGUuY29tIiwibGFzdF9uYW1lIjoiRG9lIiwic3ViIjoiYXV0aHxlNzg5OTgyMi0wYzlkLTQyODctYjc4Ni02NTE3MjkyYTVlODIiLCJjbGllbnRfaWQiOiJiZTI3N2VkYi01MDgzLTRjMWEtYTM4MC03Y2ZhMTc5YzA2ZWQiLCJleHAiOjE2MzYwNzEwMzksImF1ZCI6IjRkNGFhYmFkLWJiYjMtNDg4MC04ZTNiLTUwNDljMGU3MzYwZSJ9.VSiSkGIh41xXIVKn9B6qGjfzcLlnJAZ9jGOPVgXASp0};
@@ -64,7 +68,7 @@ subtest 'basic' => sub
     diag( "Server response is: ", $resp->as_string ) if( $DEBUG );
     is( $resp->code, Apache2::Const::HTTP_OK, 'test01 server' );
     
-    $rv = $jar->extract( $resp ) || do
+    my $rv = $jar->extract( $resp ) || do
     {
         diag( "extract returned an error: ", $jar->error ) if( $DEBUG );
     };
@@ -99,7 +103,7 @@ subtest 'basic' => sub
         diag( "add_request_header returned an error: ", $jar->error ) if( $DEBUG );
     }
 
-    $h = $req->header( 'Cookie' );
+    my $h = $req->header( 'Cookie' );
     like( $h, qr/session_token=${token}/ );
     like( $h, qr/csrf_token=${csrf}/ );
     
@@ -200,10 +204,10 @@ subtest 'encrypted' => sub
         );
         
         # test 1
-        $req = HTTP::Request->new( GET => "${proto}://${hostport}/tests/test07" );
+        my $req = HTTP::Request->new( GET => "${proto}://${hostport}/tests/test07" );
         $req->header( Host => "${mp_host}:${port}" );
         diag( "Request is: ", $req->as_string ) if( $DEBUG );
-        $resp = $ua->request( $req );
+        my $resp = $ua->request( $req );
         diag( "Server response is: ", $resp->as_string ) if( $DEBUG );
         is( $resp->code, Apache2::Const::HTTP_OK, 'server issued secret cookies' );
         my $c = $jar->get( 'secret_cookie' );
@@ -253,10 +257,10 @@ subtest 'signed' => sub
         );
         
         # test 1
-        $req = HTTP::Request->new( GET => "${proto}://${hostport}/tests/test10" );
+        my $req = HTTP::Request->new( GET => "${proto}://${hostport}/tests/test10" );
         $req->header( Host => "${mp_host}:${port}" );
         diag( "Request is: ", $req->as_string ) if( $DEBUG );
-        $resp = $ua->request( $req );
+        my $resp = $ua->request( $req );
         diag( "Server response is: ", $resp->as_string ) if( $DEBUG );
         is( $resp->code, Apache2::Const::HTTP_OK, 'server issued a signed cookie' );
         my $c = $jar->get( 'signed_cookie' );

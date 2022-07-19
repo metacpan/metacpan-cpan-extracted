@@ -4606,15 +4606,45 @@ The currently supported options are:
 
 =over 4
 
-=item * I<callback>
+=item * C<callback>
 
 A code reference representing the callback called for each element found while crawling directories.
 
-=item * I<skip>
+The variable C<$_> representing the current file or directory found, will be made available as a L<Module::Generic::File> object, and will also be passed as the first argument to the callback.
+
+=item * C<skip>
 
 An array reference of files or directories path to skip.
 
 Each of the file or directories path thus provided will be converted into an L<Module::Generic::File> with an absolute file path to avoid unpleasant surprise, since L<File::Find> L<perlfunc/chdir> into each new directory it finds.
+
+=back
+
+Additional L<File::Find> options supported. See L<File::Find> documentation for their description.
+
+=over 4
+
+=item * C<bydepth>
+
+=item * C<dangling_symlinks>
+
+=item * C<follow>
+
+=item * C<follow_fast>
+
+=item * C<follow_skip>
+
+=item * C<no_chdir>
+
+=item * C<postprocess>
+
+=item * C<preprocess>
+
+=item * C<untaint>
+
+=item * C<untaint_pattern>
+
+=item * C<untaint_skip>
 
 =back
 

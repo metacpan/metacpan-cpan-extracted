@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Signature::V4Implementation;
 # ABSTRACT: Implements the Amazon Web Services signature version 4, AWS4-HMAC-SHA256 (copy of Net::Amazon::Signature::V4)
-$Net::Amazon::S3::Signature::V4Implementation::VERSION = '0.99';
+$Net::Amazon::S3::Signature::V4Implementation::VERSION = '0.991';
 
 use strict;
 use warnings;
@@ -135,7 +135,12 @@ sub _canonical_request {
 		? ( $1, $2 )
 		: ( $req->uri, '' );
 	$creq_canonical_uri =~ s@^https?://[^/]*/?@/@;
-	$creq_canonical_uri = _simplify_uri( $creq_canonical_uri );
+
+	# Documentation says "do not normalize URI paths for requests to Amazon S3"
+	# https://docs.aws.amazon.com/general/latest/gr/sigv4-create-canonical-request.html
+
+	#$creq_canonical_uri = _simplify_uri( $creq_canonical_uri );
+
 	$creq_canonical_query_string = $self->_sort_query_string( $creq_canonical_query_string );
 
 	# Ensure Host header is present as its required
@@ -313,7 +318,7 @@ Net::Amazon::S3::Signature::V4Implementation - Implements the Amazon Web Service
 
 =head1 VERSION
 
-version 0.99
+version 0.991
 
 =head1 DESCRIPTION
 
@@ -351,7 +356,7 @@ Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
+This software is copyright (c) 2022 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

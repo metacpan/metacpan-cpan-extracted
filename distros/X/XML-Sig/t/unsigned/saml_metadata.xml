@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" entityID="http://localhost:3000" ID="_8f32b973-729a-48fd-9275-0887f06e1cc8">
+  <md:SPSSODescriptor ID="NETSAML2_1c3b4c4d82aad0d9ecc41e400ef4079e" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol" AuthnRequestsSigned="0" WantAssertionsSigned="0" errorURL="http://localhost:3000/error">
+    <md:KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>
+          MIIDFTCCAf2gAwIBAgIBATANBgkqhkiG9w0BAQUFADA3MQswCQYDVQQGEwJVUzEO
+          MAwGA1UECgwFbG9jYWwxCzAJBgNVBAsMAmN0MQswCQYDVQQDDAJDQTAeFw0xMDEw
+          MDYxMjM4MTRaFw0xMTEwMDYxMjM4MTRaMFcxCzAJBgNVBAYTAlVTMQ4wDAYDVQQK
+          DAVsb2NhbDELMAkGA1UECwwCY3QxDTALBgNVBAMMBHNhbWwxHDAaBgkqhkiG9w0B
+          CQEWDXNhbWxAY3QubG9jYWwwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAMhu
+          pJZpvu1m6ys+IrWrm3pK+onwRAYCyrgQ0RyK2cHbVLFbjBqTjKnt+PiVbnZPZUTs
+          tkV9oijZGQvaMy9ingJursICUQzmOfYRDm4s9gFJJOHUGYnItRhp4uj3EoWWyX8I
+          6Mr+g3/vNgNFvD5S9L7Hk1mSw8SnPlblZAWlFUwXAgMBAAGjgY8wgYwwDAYDVR0T
+          AQH/BAIwADAxBglghkgBhvhCAQ0EJBYiUnVieS9PcGVuU1NMIEdlbmVyYXRlZCBD
+          ZXJ0aWZpY2F0ZTAdBgNVHQ4EFgQUGy/iPd7PVObrF+lK4+ZShcbStLYwCwYDVR0P
+          BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDANBgkqhkiG9w0B
+          AQUFAAOCAQEAYoYq3Rc6jC7f8DnKxDHntHxH91F5mfp8Y3j7ALcRG/mrzkMhvxU2
+          O2qmh4aHzZBoY1EU9VjrVgyPJPAjFQVC+OjIE46Gavh5wobzYmVGeFLOa9NhPv50
+          h3EOw1eCda3VwcvStWw1OhT8cpEGqgJJVAcjwcm4VBtWjodxRn3E4zBr/xxzR1HU
+          ISvnu1/xomsSS+aenG5toWmhoJIKFbfhQkpnBlgGD5+12Cxn2jHpgv15262ZZIJS
+          WPp/0bQqdAAUzkJZPpUGUN1sTXPJexYT6na7XvLd6mvO1g+WDk6aZnW/zcT3T9tL
+          Iavyic/p4gZtXckweq+VTn9CdZp6ZTQtVw==
+          </ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </md:KeyDescriptor>
+    <md:SingleLogoutService Location="http://localhost:3000/slo-soap" Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://localhost:3000/sls-redirect-response"/>
+    <md:SingleLogoutService Location="http://localhost:3000/sls-post-response" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" index="1" isDefault="true" Location="http://localhost:3000/consumer-post"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" index="2" isDefault="false" Location="http://localhost:3000/consumer-artifact"/>
+  </md:SPSSODescriptor>
+  <md:Organization>
+    <md:OrganizationName xml:lang="en">Net::SAML2 Saml2Test</md:OrganizationName>
+    <md:OrganizationDisplayName xml:lang="en">Saml2Test app for Net::SAML2</md:OrganizationDisplayName>
+    <md:OrganizationURL xml:lang="en">http://www.example.com</md:OrganizationURL>
+  </md:Organization>
+  <md:ContactPerson contactType="other">
+    <md:Company>Saml2Test app for Net::SAML2</md:Company>
+    <md:EmailAddress>saml2test@example.com</md:EmailAddress>
+  </md:ContactPerson>
+</md:EntityDescriptor>

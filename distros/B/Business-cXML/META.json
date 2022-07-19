@@ -4,13 +4,13 @@
       "StÃ©phane Lavergne <https://github.com/vphantom/>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Business-cXML",
    "no_index" : {
@@ -52,5 +52,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.6.7"
+   "version" : "v0.6.8",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

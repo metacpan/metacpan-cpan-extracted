@@ -1,6 +1,6 @@
 package SPVM::Cwd;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 1;
 
@@ -8,14 +8,18 @@ our $VERSION = '0.01';
 
 SPVM::Cwd - get pathname of current working directory
 
-=head1 Synopsys
+=head1 Usage
 
   use Cwd;
   my $dir = Cwd->getcwd;
+  
+  my $abs_path = Cwd->abs_path($file);
 
 =head1 Description
 
 This module provides functions for determining the pathname of the current working directory.
+
+C<Cwd> is a Perl L<Cwd> porting to L<SPVM>.
 
 C<Cwd> is a L<SPVM> module.
 
@@ -32,6 +36,18 @@ L<SPVM> is yet experimental status.
 Returns the current working directory. On error returns undef, with L<errno|SPVM::Errno/"errno"> set to indicate the error.
 
 Exposes the POSIX function getcwd(3).
+
+=head2 abs_path
+
+  static method abs_path : string ($file :string)
+
+Uses the same algorithm as getcwd(). Symbolic links and relative-path components ("." and "..") are resolved to return the canonical pathname, just like realpath(3). On error returns undef, with L<Errno->errno|SPVM::Errno/"errno"> set to indicate the error.
+
+=head2 realpath
+
+  static method realpath : string ($file : string)
+
+A synonym for abs_path().
 
 =head1 Repository
 

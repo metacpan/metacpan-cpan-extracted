@@ -1,5 +1,25 @@
 Revision history for Iterator-Flex
 
+0.15      2022-07-18 11:50:51-04:00 America/New_York
+
+  [BUG FIX]
+
+    * resolve RT#141012, always call overload::Method with three arguments. HVDS++
+
+    * sequences did not correctly handle exhaustion => 'throw' or
+      exhaustion => [ return => $sentinel ]
+
+    * some of the non-documented ways of handling input exhaustion didn't work
+      as expected.
+
+  [DOCUMENTATION]
+
+    * rework Iterator::Flex::Manual:Authoring
+
+    * iterator adaptors handling of input exhaustion from their input iterators
+      was not properly/fully documented.
+
+
 0.14      2021-10-06 15:00:47-04:00 America/New_York
 
   [BUILD]

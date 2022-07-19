@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMem.pm
-## Version v0.2.3
+## Version v0.2.4
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2022/03/13
+## Modified 2022/07/15
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -39,7 +39,11 @@ BEGIN
     # Even better
     $SUPPORTED_RE = qr/IPC\/SysV/;
     if( $Config{extensions} =~ /$SUPPORTED_RE/ && 
-        $^O !~ /^(?:Android|dos|MSWin32|os2|VMS|riscos)/i )
+        $^O !~ /^(?:Android|dos|MSWin32|os2|VMS|riscos)/i &&
+        # we need semaphore and messages
+        $Config{d_sem} eq 'define' &&
+        $Config{d_msg} eq 'define'
+        )
     {
         require IPC::SysV;
         IPC::SysV->import( qw( IPC_RMID IPC_PRIVATE IPC_SET IPC_STAT IPC_CREAT IPC_EXCL IPC_NOWAIT
@@ -105,7 +109,7 @@ EOT
             lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
             'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.2.3';
+    our $VERSION = 'v0.2.4';
 };
 
 # use strict;

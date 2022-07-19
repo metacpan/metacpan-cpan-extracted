@@ -33,6 +33,7 @@
          "requires" : {
             "Dist::Milla" : "v1.0.20",
             "Moo" : "2.005004",
+            "Params::Validate" : "1.30",
             "Path::Tiny" : "0.084",
             "Template::Perlish" : "1.56",
             "Test::Pod" : "1.51",
@@ -55,31 +56,31 @@
    "provides" : {
       "App::Easer" : {
          "file" : "lib/App/Easer.pm",
-         "version" : "2.002"
+         "version" : "2.004"
       },
       "App::Easer::V1" : {
          "file" : "lib/App/Easer/V1.pm",
-         "version" : "2.002"
+         "version" : "2.004"
       },
       "App::Easer::V2" : {
          "file" : "lib/App/Easer/V2.pm",
-         "version" : "2.002"
+         "version" : "2.004"
       },
       "App::Easer::V2::Command" : {
          "file" : "lib/App/Easer/V2.pm",
-         "version" : "2.002"
+         "version" : "2.004"
       },
       "App::Easer::V2::Command::Commands" : {
          "file" : "lib/App/Easer/V2.pm",
-         "version" : "2.002"
+         "version" : "2.004"
       },
       "App::Easer::V2::Command::Help" : {
          "file" : "lib/App/Easer/V2.pm",
-         "version" : "2.002"
+         "version" : "2.004"
       },
       "App::Easer::V2::Command::Tree" : {
          "file" : "lib/App/Easer/V2.pm",
-         "version" : "2.002"
+         "version" : "2.004"
       }
    },
    "release_status" : "stable",
@@ -94,7 +95,7 @@
          "web" : "https://github.com/polettix/App-Easer"
       }
    },
-   "version" : "2.002",
+   "version" : "2.004",
    "x_contributors" : [
       "Flavio Poletti <flavio@polettix.it>"
    ],

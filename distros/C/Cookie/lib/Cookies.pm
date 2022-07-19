@@ -14,18 +14,22 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Cookie::Jar );
+    use vars qw( $VERSION );
     our $VERSION = $Cookie::Jar::VERSION;
 };
 
-1;
+use strict;
+use warnings;
 
+1;
+# NOTE: POD
 __END__
 
 =encoding utf-8
 
 =head1 NAME
 
-Cookies - Cookies API for Server & Client
+Cookies - Cookie Jar Class for Server & Client
 
 =head1 SYNOPSIS
 

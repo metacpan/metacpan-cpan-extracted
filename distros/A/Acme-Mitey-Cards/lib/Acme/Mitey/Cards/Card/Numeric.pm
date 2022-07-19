@@ -1,10 +1,10 @@
 package Acme::Mitey::Cards::Card::Numeric;
 
-our $VERSION   = '0.011';
+our $VERSION   = '0.013';
 our $AUTHORITY = 'cpan:TOBYINK';
 
-use Acme::Mitey::Cards::Mite qw( -bool -is );
-use Acme::Mitey::Cards::Types qw(:types);
+use Acme::Mitey::Cards::Mite qw( -all );
+use Acme::Mitey::Cards::Types qw( :types );
 
 extends 'Acme::Mitey::Cards::Card';
 
@@ -24,12 +24,18 @@ has number => (
 	coerce   => true,
 );
 
+signature_for number_or_a => (
+	pos => [],
+);
+
 sub number_or_a {
 	my $self = shift;
 
 	my $num = $self->number;
 	( $num == 1 ) ? 'A' : $num;
 }
+
+signature_for '+to_string';
 
 sub to_string {
 	my $self = shift;

@@ -1,0 +1,53 @@
+{
+   "abstract" : "Pure perl GIF encoding",
+   "author" : [
+      "Gavin Hayes <gahayes@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Image-GIF-Encoder-PP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/G4Vi/gifenc-pl/issues"
+      },
+      "homepage" : "https://github.com/G4Vi/gifenc-pl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/G4Vi/gifenc-pl.git",
+         "web" : "https://github.com/G4Vi/gifenc-pl"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.10"
+}

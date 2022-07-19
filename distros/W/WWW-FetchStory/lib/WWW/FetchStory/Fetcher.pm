@@ -1,5 +1,5 @@
 package WWW::FetchStory::Fetcher;
-$WWW::FetchStory::Fetcher::VERSION = '0.2201';
+$WWW::FetchStory::Fetcher::VERSION = '0.2307';
 use strict;
 use warnings;
 =head1 NAME
@@ -8,7 +8,7 @@ WWW::FetchStory::Fetcher - fetching module for WWW::FetchStory
 
 =head1 VERSION
 
-version 0.2201
+version 0.2307
 
 =head1 DESCRIPTION
 
@@ -1153,9 +1153,11 @@ sub get_epub {
 	    }
 	}
         print STDERR "get_epub: about to replace description\n" if $self->{debug};
-	$self->epub_replace_description(description=>$meta{summary}, xml=>$dom);
+        $self->epub_replace_description(description=>$meta{summary}, xml=>$dom);
+
 	# remove meta info we don't want to be added to this
 	delete $meta{description};
+	delete $meta{summary};
 	delete $meta{title};
 	delete $meta{chapters};
 	delete $meta{epub_url};
@@ -1182,6 +1184,10 @@ sub epub_replace_description {
 
     my $dom = $args{xml};
     my $desc = $args{description};
+    # need to clean up the description removing things not okay to put in a meta tag
+    $desc =~ s!<[^>]+>!!g;
+    $desc =~ s!</[^>]+>!!g;
+    $desc =~ s!"!''!g;
     print STDERR "epub_replace_description: description=$desc\n" if $self->{debug};
     my @metanodes = $dom->getElementsByLocalName('metadata');
     return unless @metanodes;
@@ -1189,7 +1195,7 @@ sub epub_replace_description {
     my @dnodes = $metanode->getElementsByLocalName('description');
     if ($dnodes[0])
     {
-	$metanode->removeChild($dnodes[0]);
+        $metanode->removeChild($dnodes[0]);
     }
     $metanode->appendTextChild('dc:description', $desc);
 } # epub_replace_description

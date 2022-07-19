@@ -40,7 +40,7 @@
             "File::ShareDir" : "0",
             "HTML::Template" : "2.97",
             "URI::Escape" : "5.09",
-            "perl" : "5.006"
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -61,6 +61,6 @@
          "web" : "https://github.com/G4Vi/MHFS"
       }
    },
-   "version" : "v0.4.0",
+   "version" : "v0.4.1",
    "x_serialization_backend" : "JSON::PP version 4.10"
 }

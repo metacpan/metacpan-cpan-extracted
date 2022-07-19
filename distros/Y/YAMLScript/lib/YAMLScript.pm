@@ -1,7 +1,7 @@
 package YAMLScript;
-use Mo qw'build default xxx';
+use Mo qw(build default xxx);
 
-our $VERSION = '0.0.7';
+our $VERSION = '0.0.11';
 
 use YAMLScript::Compiler;
 use YAMLScript::NS;
@@ -10,6 +10,8 @@ has from => ();
 has file => ();
 has yaml => ();
 has data => {};
+
+use Carp;
 
 sub BUILD {
     my ($self) = @_;
@@ -48,7 +50,12 @@ sub run {
 
     ns_push($ns);
 
-    $ns->call('main', @args);
+    my $arity = @args;
+    my $name = "main__$arity";
+
+    my $call = $ns->{$name} or die "Can't find '$name' in ns";
+    $call = $call->([@args]);
+    $call->call();
 
     ns_pop;
 }

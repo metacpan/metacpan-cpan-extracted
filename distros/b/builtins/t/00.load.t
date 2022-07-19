@@ -1,3 +1,4 @@
+use v5.36;
 use Test::More tests => 1;
 
 BEGIN {

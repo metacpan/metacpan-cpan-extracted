@@ -29,19 +29,17 @@ my $tmpdir = tempdir( CLEANUP => 1 );
 
 # Test numbers to skip on incompatible versions of PLplot
 my %skip_num = (
-  '01' => qr/^5\.13\./,
-  '15' => qr/^5\.13\./,
-);
-my %skip_longdouble = $Config{nvtype} !~ /long/i ? () : (
-  '07' => 1, # the SVG translation bit of matrix() is out by .02 w/long double
+  '01' => sub { $_[0] =~ /^5\.13\./ },
+  '15' => sub { $_[0] =~ /^5\.13\./ },
+  '07' => sub { $Config{nvtype} =~ /long/i }, # the SVG translation bit of matrix() is out by .02 w/long double
+  '14' => sub { $^O =~ /win32/i },
 );
 
 my $plgver = plgver();
 foreach my $plplot_test_script (@scripts) {
   my ($num) = ($plplot_test_script =~ /x(\d\d)\.pl/);
 SKIP: {
-  skip "Skipping test script $num on PLplot $plgver", 1 if exists $skip_num{$num} && $plgver =~ $skip_num{$num};
-  skip "Skipping test script $num on long double", 1 if $skip_longdouble{$num};
+  skip "Skipping test script $num", 1 if $skip_num{$num} && $skip_num{$num}->($plgver);
 subtest "Test script: $num" => sub {
   (my $c_code = $plplot_test_script) =~ s/\.pl/c\.c/;
 

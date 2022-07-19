@@ -1,0 +1,19 @@
+Revision history for Perl extension File::Size.
+
+0.01  Unknown Date.
+	- Testing version with no particular purposes.
+
+0.02  Sun Sep 24 01:08:33 IDT 2006
+	- This is actually the first version.
+
+0.03  Mon Sep 25 14:20:48 IDT 2006
+	- Fixed a bug regarding the findcb() subroutine
+
+0.04  Fri Sep 29 23:30:07 IDT 2006
+	- Added missing dependencies information to Makefile.PL
+
+0.05  Thu Oct 26 15:29:41 IST 2006
+	- Fixed a bug reported by Jaime Prilusky, which reports wrong directory size when calling the getsize() method more than 1 time. Thank you Jaime!
+
+0.06 Thu Oct 26 20:23:24 IST 2006
+	- Useless varialbe dropped

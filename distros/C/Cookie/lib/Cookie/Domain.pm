@@ -100,7 +100,6 @@ sub cron_fetch
     $opts->{file} //= '';
     my $file = $opts->{file} || $self->file;
     $file = $self->_is_a( $file, 'Module::Generic::File' ) ? $file : Module::Generic::File::file( $file );
-    $self->message( 3, "Using public suffix data file \"$file\" and remote url \"", URL, "\"." );
     require LWP::UserAgent;
     my $ua = LWP::UserAgent->new(
         agent => "Cookie::Domain/" . $VERSION,
@@ -143,13 +142,9 @@ sub cron_fetch
     try
     {
         my $resp = $ua->get( URL, %$req_headers );
-        $self->message( 3, "Initial query was: ", $resp->request->as_string );
-        $self->message( 3, "Server response is: ", $resp->headers->as_string );
         my $code = $resp->code;
         my $data = $resp->decoded_content( default_charset => 'utf-8', alt_charset => 'utf-8' );
-        $self->message( 3, "Server responded with code $code and ", length( $data ), " bytes of data." );
         my $last_mod = $resp->header( 'Last-Modified' );
-        $self->message( 3, "Last-Modified header value found: '$last_mod'" );
 
         my $tz;
         # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
@@ -182,7 +177,6 @@ sub cron_fetch
         if( $code == 304 || 
             ( !$file->is_empty && $mtime && $mtime == $epoch ) )
         {
-            $self->message( 3, "Remote public suffix data has not changed. Etag is: '$meta->{etag}'" );
             if( !$self->suffixes->length )
             {
                 $self->load_public_suffix || return( $self->pass_error );
@@ -202,7 +196,6 @@ sub cron_fetch
         {
             return( $self->error( "Remote server returned no data." ) );
         }
-        $self->message( 3, "Saving ", length( $data ), " bytes of data to file \"$file\"." );
         $file->lock;
         $file->unload_utf8( $data ) || return( $self->error( "Unable to open public suffix data file \"$file\" in write mode: ", $file->error ) );
         $file->unlock;
@@ -258,9 +251,7 @@ sub load
     my $json_file = $self->json_file;
     if( defined( $PUBLIC_SUFFIX_DATA ) && ref( $PUBLIC_SUFFIX_DATA ) eq 'HASH' )
     {
-        $self->message( 3, "Re-using data from memory" );
         $self->suffixes( $PUBLIC_SUFFIX_DATA );
-        $self->messagef( 3, "%d suffixes in memory.", $self->suffixes->length );
         $self->meta( {} );
     }
     elsif( $json_file && $json_file->exists )
@@ -312,7 +303,6 @@ sub load_json
     {
         return( $self->error( "Json data file provided \"$file\" is empty." ) );
     }
-    $self->message( 3, "Loading json data file \"$file\"." );
     my $json = $file->load_utf8;
     return( $self->error( "Unable to open the public suffix json data file in read mode: $!" ) ) if( !defined( $json ) );
     return( $self->error( "No data found from public domain json file \"$file\"." ) ) if( !CORE::length( $json ) );
@@ -353,7 +343,6 @@ sub load_public_suffix
     {
         return( $self->error( "Public suffix data file provided \"$file\" is empty." ) );
     }
-    $self->message( 3, "Loading raw data file \"$file\"." );
     $file->open( '<', { binmode => 'utf-8' }) || return( $self->error( "Unable to open the public suffix data file in read mode: ", $file->error ) );
     my $ref = {};
     try
@@ -387,9 +376,7 @@ sub load_public_suffix
         return( $self->error( "An unexpected error occurred while parsing the public suffix data file content: $e" ) );
     }
     $file->close;
-    # $self->message( 3, "Done parsing public suffix file \"$file\". Data is: ", sub{ $self->SUPER::dump( $ref ) });
     $self->suffixes( $ref );
-    # $self->messagef( 3, "%d suffixed loaded.", $self->suffixes->length );
     $PUBLIC_SUFFIX_DATA = $ref;
     return( $self );
 }
@@ -405,9 +392,7 @@ sub save_as_json
     my $self = shift( @_ );
     my $file = shift( @_ ) || $self->json_file || return( $self->error( "No json file was specified." ) );
     $file = $self->_is_a( $file, 'Module::Generic::File' ) ? $file : Module::Generic::File::file( "$file" );
-    # $self->message( 3, "Save public prefixes data to json file \"$file\"." );
     my $data = $self->suffixes;
-    # $self->message( 3, "Data to save are: ", sub{ $self->SUPER::dump( $data ) });
     my $tz;
     # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
     # "Cannot determine local time zone"
@@ -455,7 +440,6 @@ sub stat
 {
     my $self = shift( @_ );
     my $name = shift( @_ ) || return( $self->error( "No host name was provided" ) );
-    $self->message( 3, "Processing host \"$name\"" );
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{min_suffix} = $self->min_suffix if( !exists( $opts->{min_suffix} ) );
     my $idn;
@@ -467,25 +451,20 @@ sub stat
         $name = lc( $name );
         $name =~ s/^[[:blank:]\h]+|[[:blank:]\h]+$//g;
         $name =~s/\.$//;
-        $self->message( 3, "Host is an international domain, converting to ascii: $idn => $name" );
     }
     else
     {
         $name =~ s/^\.|\.$//g;
         $name = lc( $name );
     }
-    $self->message( 1, "Host name \"$name\" is malformed." ) if( $name !~ /$DOMAIN_RE/ );
     return( $self->error( "Malformed domain name \"$name\"" ) ) if( $name !~ /$DOMAIN_RE/ );
     my $labels = $self->new_array( [split( /\./, $name )] );
-    $self->message( 3, "Domain parts are: ", sub{ $self->dump( @$labels ) } );
-    # $self->messagef( 3, "Found %d labels.", $labels->length );
     my $any  = {};
     my $host = {};
     my $expt = {};
     my $ref  = $self->suffixes;
     my $def  = $ref;
     my $stack = [];
-    $self->messagef( 3, "Using %d public suffixes.", $ref->length );
     # The following algorithm is borrowed from IO-Socket-SSL
     # for( my $i = 0; $i < scalar( @$labels ); $i++ )
     $labels->reverse->for(sub
@@ -495,7 +474,6 @@ sub stat
         my $buff = [];
         if( my $public_label_def = $def->{ $label } )
         {
-            # $self->message( 3, "Name match, adding '$label' and negative check is '", defined( $public_label_def->{_is_neg} ) ? $public_label_def->{_is_neg} : '', "'" );
             # name match, continue with next path element
             push( @$buff, $public_label_def );
             if( exists( $public_label_def->{_is_neg} ) && $public_label_def->{_is_neg} )
@@ -520,7 +498,6 @@ sub stat
                 $any->{ $i + 1 }->{ $i + 1 } = 1;
             }
         }
-        # $self->message( 3, "\t[after wc] Host is: ", sub{ $self->dump( $host ) }, ", exception is: ", sub{ $self->dump( $expt ) }, " and wild is: ", sub{ $self->dump( $any ) } );
         
         no warnings 'exiting';
         LABEL:
@@ -552,10 +529,8 @@ sub stat
     my( $len ) = sort{ $b <=> $a } (
         keys( %$any ), keys( %$host ), map{ $_-1 } keys( %$expt )
     );
-    # $self->message( 3, "Longest match found is '", ( $len // '' ), "'" );
     $len = $opts->{min_suffix} if( !defined( $len ) );
     $len += int( $opts->{add} ) if( $opts->{add} );
-    # $self->message( 3, "Adjusted length now is: '$len'." );
     my $suffix;
     my $sub;
     if( $len < $labels->length )
@@ -596,7 +571,7 @@ sub stat
 
 sub suffixes { return( shift->_set_get_hash_as_mix_object( 'suffixes', @_ ) ); }
 
-# XXX Cookie::Domain::Result class
+# NOTE: Cookie::Domain::Result class
 {
     package
         Cookie::Domain::Result;
@@ -628,7 +603,7 @@ sub suffixes { return( shift->_set_get_hash_as_mix_object( 'suffixes', @_ ) ); }
 
 1;
 
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8

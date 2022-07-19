@@ -3,7 +3,7 @@ use v5.24;
 use warnings;
 use experimental qw< signatures >;
 no warnings qw< experimental::signatures >;
-{ our $VERSION = '2.002' }
+{ our $VERSION = '2.004' }
 use Carp;
 
 use parent 'Exporter';
@@ -401,17 +401,32 @@ sub commit ($self, @n) {
 } ## end sub commit
 
 # validate collected options values, called after commit ends.
-sub validate ($self) {
-   my $validator = $self->params_validate // return;
-   require Params::Validate;
-   if (my $config_validator = $validator->{config} // undef) {
-      my @array = $self->config_hash;
-      Params::Validate::validate(@array, $config_validator);
+sub validate ($self, @n) {
+
+   # Support the "accessor" interface for using a validation sub
+   my $validator = $self->_rw(@n);
+   return $validator if @n;
+
+   # If set, it MUST be a validation sub reference. Otherwise, try the
+   # params_validate/Params::Validate path.
+   if ($validator) {
+      die "validator can only be a CODE reference\n"
+         unless ref $validator eq 'CODE';
+      $validator->($self);
    }
-   if (my $args_validator = $validator->{args} // undef) {
-      my @array = $self->residual_args;
-      Params::Validate::validate_pos(@array, $args_validator->@*);
+   elsif (my $params_validate = $self->params_validate) {
+      require Params::Validate;
+      if (my $config_validator = $params_validate->{config} // undef) {
+         my @array = $self->config_hash;
+         Params::Validate::validate(\@array, $config_validator);
+      }
+      if (my $args_validator = $params_validate->{args} // undef) {
+         my @array = $self->residual_args;
+         Params::Validate::validate_pos(\@array, $args_validator->@*);
+      }
    }
+   else {} # no validation needed
+
    return $self;
 } ## end sub validate ($self)
 

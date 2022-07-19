@@ -108,4 +108,13 @@ ok   $union->check( {} ), 'Integer | Hash - {}';
 ok ! $union->check( [] ), 'Integer | Hash - []';
 ok ! $union->check( '' ), 'Integer | Hash - ""';
 
+my $tt_union = $union->to_TypeTiny;
+isa_ok( $tt_union, 'Type::Tiny' );
+isa_ok( $tt_union, 'Type::Tiny::Union' );
+is( "$tt_union", 'Integer|Hash' );
+ok   $tt_union->check( 42 ), 'TT: Integer | Hash - 42';
+ok   $tt_union->check( {} ), 'TT: Integer | Hash - {}';
+ok ! $tt_union->check( [] ), 'TT: Integer | Hash - []';
+ok ! $tt_union->check( '' ), 'TT: Integer | Hash - ""';
+
 done_testing;

@@ -157,6 +157,7 @@ lib/Groonga/Commands/Delete.pm
 lib/Groonga/Commands/Load.pm
 lib/Groonga/Commands/Select.pm
 lib/Groonga/Commands/Status.pm
+lib/Groonga/Escape.pm
 lib/Groonga/HTTP.pm
 lib/Groonga/HTTP/Client.pm
 lib/Groonga/ResultSet.pm

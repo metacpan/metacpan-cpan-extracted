@@ -19,7 +19,7 @@ name: App-td
 provides:
   App::td:
     file: lib/App/td.pm
-    version: '0.106'
+    version: '0.107'
 recommends:
   Text::CSV_XS: '0'
 requires:
@@ -47,7 +47,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-td
   homepage: https://metacpan.org/release/App-td
   repository: git://github.com/perlancar/perl-App-td.git
-version: '0.106'
+version: '0.107'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

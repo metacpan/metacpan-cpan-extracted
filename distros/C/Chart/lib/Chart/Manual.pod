@@ -3,14 +3,14 @@
 
 =head1 NAME
 
-Chart::Manual - Chart user manual
+Chart::Manual - Chart user documentation index
 
 =head1 SYNOPSIS
 
 Chart is a collection of modules for visualizing numerical data.
-Its design goals are feature richness, maximal flexibility, and minimal 
-dependencies. It writes PNG and JPG images into files or STDOUT 
-(for web usage).
+Its design goals are (in that order) maximal flexibility, feature richness
+and minimal dependencies. It can write PNG and JPG images into files and
+STDOUT (for web and shell usage).
 
 The early API is mostly borrowed from Martien Verbruggen's L<GIFgraph> module.
 
@@ -39,12 +39,20 @@ are sorted there by name or topic or type:
 L<Chart::Manual::Properties>
 
 
+=head1 FUTURE CHANGES
+
+Much of what is documented here will be superseded by a new API provided
+by upcoming version 3.0. The old API will be discouraged but not deprecated,
+except maybe the module Chart::Composite.
+
+
 =head1 COPYRIGHT & LICENSE
 
 Copyright 2022 David Bonner, Herbert Breunung.
 
 This program is free software; you can redistribute it and/or modify it 
 under same terms as Perl itself.
+
 
 =head1 AUTHOR
 

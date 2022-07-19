@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,9 +18,12 @@ no_index:
     - t
     - inc
 requires:
+  Capture::Tiny: '0'
   Devel::Caller::IgnoreNamespaces: '1'
   Sub::Prototype: '0.02'
+  Test::More: '0.88'
 resources:
   bugtracker: https://github.com/DrHyde/perl-modules-Sub-WrapPackages/issues
   repository: https://github.com/DrHyde/perl-modules-Sub-WrapPackages
-version: '2.01'
+version: '2.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

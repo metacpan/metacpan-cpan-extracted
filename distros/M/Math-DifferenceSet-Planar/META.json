@@ -4,7 +4,7 @@
       "Martin Becker <becker-cpan-mp (at) cozap.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -52,23 +52,23 @@
    "provides" : {
       "Math::DifferenceSet::Planar" : {
          "file" : "lib/Math/DifferenceSet/Planar.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Math::DifferenceSet::Planar::Data" : {
          "file" : "lib/Math/DifferenceSet/Planar/Data.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Math::DifferenceSet::Planar::Schema" : {
          "file" : "lib/Math/DifferenceSet/Planar/Schema.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Math::DifferenceSet::Planar::Schema::Result::DifferenceSet" : {
          "file" : "lib/Math/DifferenceSet/Planar/Schema/Result/DifferenceSet.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Math::DifferenceSet::Planar::Schema::Result::DifferenceSetSpace" : {
          "file" : "lib/Math/DifferenceSet/Planar/Schema/Result/DifferenceSetSpace.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       }
    },
    "release_status" : "stable",
@@ -86,6 +86,6 @@
          "web" : "https://github.com/mhasch/perl-Math-DifferenceSet-Planar"
       }
    },
-   "version" : "0.015",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.016",
+   "x_serialization_backend" : "JSON::PP version 4.09"
 }

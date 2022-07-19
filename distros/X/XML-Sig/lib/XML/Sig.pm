@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package XML::Sig;
-our $VERSION = '0.57';
+our $VERSION = '0.58';
 
 use Encode;
 # ABSTRACT: XML::Sig - A toolkit to help sign and verify XML Digital Signatures
@@ -44,7 +44,7 @@ sub new {
     my $class = shift;
     my $params = shift;
     my $self = {};
-    foreach my $prop ( qw/ key cert cert_text / ) {
+    foreach my $prop ( qw/ key cert cert_text ns id_attr/ ) {
         if ( exists $params->{ $prop } ) {
             $self->{ $prop } = $params->{ $prop };
         }
@@ -118,13 +118,20 @@ sub sign {
     $self->{ parser }->registerNs('dsig', 'http://www.w3.org/2000/09/xmldsig#');
     $self->{ parser }->registerNs('ec', 'http://www.w3.org/2001/10/xml-exc-c14n#');
     $self->{ parser }->registerNs('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
+    if ($self->{ns}) {
+        foreach (keys %{$self->{ns}}) {
+            $self->{ parser }->registerNs($_, $self->{ns}{$_});
+        }
+    }
 
     print ("Signing XML\n") if $DEBUG;
 
     my @ids_to_sign = $self->_get_ids_to_sign();
 
-    foreach (@ids_to_sign) {
-        my $signid = $_;
+    foreach my $signid (@ids_to_sign) {
+
+        print ("Signing ID $signid\n") if $DEBUG;
+
         # Temporarily create the Signature XML from the part
         # TODO: ths section needs a rewrite to create the xml in
         # a better way.
@@ -428,6 +435,17 @@ sub signer_cert {
 ##
 sub _get_ids_to_sign {
     my $self = shift;
+
+    if ($self->{id_attr}) {
+        my $nodes = $self->{parser}->findnodes($self->{id_attr});
+        if ($nodes->size == 0) {
+            die "Unable to find an attribute node with $self->{id_attr}";
+        }
+        my $node = $nodes->get_node(1);
+        return $node->getAttribute('ID');
+
+    }
+
     my @id = $self->{parser}->findnodes('//@ID');
     my @ids;
     foreach (@id) {
@@ -1653,7 +1671,7 @@ XML::Sig - XML::Sig - A toolkit to help sign and verify XML Digital Signatures
 
 =head1 VERSION
 
-version 0.57
+version 0.58
 
 =head1 SYNOPSIS
 
@@ -1804,6 +1822,21 @@ Some applications such as Net::SAML2 expect to sign a fragment of the
 full XML document so is this is true (1) it will not include the
 XML Declaration at the beginning of the signed XML.  False (0) or
 undefined returns an XML document starting with the XML Declaration.
+
+=back
+
+The following options act similar to C<< xmlsec --id-attr:ID
+<node-namespace-uri>:<name> >>
+
+=over
+
+=item B<ns>
+
+A HashRef to namespaces you want to define to select the correct attribute ID on
+
+=item B<id_attr>
+
+The xpath string you want to sign your XML message on.
 
 =back
 
@@ -1997,7 +2030,8 @@ This software is copyright (c) 2022 by Byrne Reese, Chris Andrews and Others; in
             2015       Mike Wisener
             2016       Jeff Fearn
             2017       Mike Wisener, xmikew
-            2019-2022  Timothy Legge
+            2019-2021  Timothy Legge
+            2022       Timothy Legge, Wesley Schwengle
 
 
 This is free software; you can redistribute it and/or modify it under

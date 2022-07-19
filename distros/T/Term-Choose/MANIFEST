@@ -18,8 +18,8 @@ README
 t/00_load/00-load.t
 t/00_load/01-new.t
 t/01_arguments/01_new.t
-t/01_arguments/01_new_invalid.t
 t/01_arguments/Data_Test_Arguments.pm
+tools/build_TCF_char_width_table_modules.pl
 xt/01_option.t
 xt/02_option_error.t
 xt/cntr_choose.t

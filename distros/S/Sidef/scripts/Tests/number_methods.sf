@@ -8,6 +8,26 @@ assert_eq(squarefree_sum(1e7), 30396557311887)
 assert_eq(squarefree_count(1e9), 607927124)
 assert_eq(squarefree_count(1e10), 6079270942)
 
+assert_eq(
+    semiprimes(100),
+    1..100 -> grep { .is_semiprime },
+)
+
+assert_eq(
+    semiprimes(50, 100),
+    50..100 -> grep { .is_semiprime },
+)
+
+assert_eq(
+    prime_powers(100),
+    1..100 -> grep { .is_prime_power },
+)
+
+assert_eq(
+    prime_powers(50, 100),
+    50..100 -> grep { .is_prime_power },
+)
+
 for k in (0..10) {
 
     assert_eq(k.almost_primes(1000), 1..1000 -> grep { .is_almost_prime(k) })
@@ -185,6 +205,18 @@ assert_eq(
 assert_eq(
     gather { 10..100 `by` 3 -> each_semiprime {|k| take(k) } },
     10..100 `by` 3 -> grep { .is_semiprime }
+)
+
+# RangeNumber prime power numbers
+
+assert_eq(
+    gather { 50..100 -> each_prime_power {|k| take(k) } },
+    prime_powers(50, 100)
+)
+
+assert_eq(
+    gather { 10..100 `by` 3 -> each_prime_power {|k| take(k) } },
+    10..100 `by` 3 -> grep { .is_prime_power }
 )
 
 # Counting methods
@@ -371,7 +403,7 @@ do {
 }
 
 do {
-    for n in (2047, 13421773, 14073748835533, 1376414970248942474729, 48663264978548104646392577273, 294413417279041274238472403168164964689, 98117433931341406381352476618801951316878459720486433149, 1252977736815195675988249271013258909221812482895905512953752551821) {
+    for n in (%n[2047, 13421773, 14073748835533, 1376414970248942474729, 48663264978548104646392577273, 294413417279041274238472403168164964689, 98117433931341406381352476618801951316878459720486433149, 1252977736815195675988249271013258909221812482895905512953752551821]) {
         assert(n.is_psp)
         assert(n.is_over_psp)
         assert(n.is_strong_psp)
@@ -392,6 +424,9 @@ do {
     {|n| assert_eq(dop_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(cop_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(fermat_factor(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(pell_factor(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(miller_factor(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(lucas_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(holf_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(pm1_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(pp1_factor(n).prod, n||1) }.each(0..30)
@@ -400,6 +435,49 @@ do {
     {|n| assert_eq(squfof_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(qs_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(trial_factor(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(cyclotomic_factor(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(special_factors(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(Math.gcd_factors(n, n.isqrt.primes).prod, n||1) }.each(0..30)
+}
+
+do {
+    func verify_factors(f,n) {
+        assert_eq(f.prod, n)
+        assert(f.len >= 2)
+        assert(f.all { n % _ == 0})
+    }
+
+    for n in ([10**120 - 10**40, 2**128 - 1]) {
+
+        verify_factors(n.factor { .squfof_factor(1e4) }, n)
+        verify_factors(n.factor { .trial_factor }, n)
+        verify_factors(n.factor { .pell_factor }, n)
+        verify_factors(n.factor { .flt_factor }, n)
+        verify_factors(n.factor { .holf_factor }, n)
+        verify_factors(n.factor { .mbe_factor }, n)
+        verify_factors(n.factor { .fermat_factor }, n)
+        verify_factors(n.factor { .cyclotomic_factor }, n)
+        verify_factors(n.factor { .chebyshev_factor(1e4) }, n)
+        verify_factors(n.factor { .ecm_factor }, n)
+        verify_factors(n.factor { .pm1_factor(1e4) }, n)
+        verify_factors(n.factor { .pp1_factor(1e4) }, n)
+
+        verify_factors(n.special_factors, n)
+        verify_factors(n.dop_factor, n)
+        verify_factors(n.cop_factor, n)
+
+        if (n.is_odd) {
+            verify_factors(n.factor { .miller_factor }, n)
+            verify_factors(n.factor { .lucas_factor }, n)
+        }
+    }
+
+    with (58571442634534443082821160508299574798027946748324125518533225605795841) {|n|
+        verify_factors(miller_factor(n), n)
+        verify_factors(lucas_factor(n), n)
+        verify_factors(lucas_factor(n, -1), n)
+        verify_factors(lucas_factor(n, +1), n)
+    }
 }
 
 do {
@@ -407,5 +485,83 @@ do {
     assert_eq(20.of {.lnsuperfactorial} ~Z=~= 20.of{.superfactorial.ln} -> uniq, [true])
     assert_eq(20.of {.lnhyperfactorial} ~Z=~= 20.of{.hyperfactorial.ln} -> uniq, [true])
 }
+
+assert_eq(cyclotomic_factor(((10**258 - 1)/9 - 10**(258/2) - 1)),     %n[2, 5, 7, 11, 11, 13, 17, 73, 101, 137, 353, 449, 641, 1409, 69857, 5882353, 100000000000000000000000000000001, 909090909090909090909090909090909090909091, 10000000000000000000000000000000000000000000000000000000000000001, 1098901098901098901098901098901098901098900989010989010989010989010989010989010989011])
+assert_eq(cyclotomic_factor(((10**258 - 1)/9 - 10**(258/2) - 1), 10), %n[10, 11, 11, 91, 101, 10001, 100000001, 10000000000000001, 100000000000000000000000000000001, 909090909090909090909090909090909090909091, 10000000000000000000000000000000000000000000000000000000000000001, 1098901098901098901098901098901098901098900989010989010989010989010989010989010989011])
+
+do {
+    var p = (2**127 - 1)
+
+    for k in (-100 .. 100) {
+        var t = next_prime_power(p+k)
+        assert(t.is_prime_power)
+    }
+}
+
+do {
+    var p = 4171
+
+    for k in (-100 .. 100) {
+        var t = next_prime_power(p+k)
+        assert(t.is_prime_power)
+    }
+}
+
+do {
+    var n = 0
+    var arr = []
+    20.of {
+        arr << (n = next_prime_power(n))
+    }
+    assert_eq(arr, {.is_prime_power}.first(20))
+}
+
+assert_eq(prime_count(619, 619), 1)
+assert_eq(prime_count(620, 620), 0)
+assert_eq(prime_count(620, 621), 0)
+assert_eq(prime_count(619, 621), 1)
+assert_eq(prime_count(620, 621), 0)
+assert_eq(prime_count(620, 630), 0)
+assert_eq(prime_count(620, 631), 1)
+assert_eq(prime_count(619, 631), 2)
+
+assert_eq(prime_count(2**127 - 1, 2**127 - 1), 1)
+assert_eq(3.almost_prime_count(82654, 7158821), 1736362)
+assert_eq(4.almost_prime_count(83925, 4376019), 872251)
+
+assert_eq(omega_prime_count(15, 880788066951082290), 10)
+assert_eq(omega_prime_count(15, 1922334673882737115), 365)
+
+with (14.omega_primes(20483443417467030)) {|a|
+    assert_eq(a.last, 20483443417467030)
+    assert_eq(a.len, 15)
+}
+
+with (15.omega_primes(1922334673882737115)) {|a|
+    assert_eq(a.last, 1920731913647276730)
+    assert_eq(a.len, 365)
+}
+
+assert_eq(next_omega_prime(1e12, 7), 1000000000090)
+assert_eq(next_omega_prime(1e12, 6), 1000000000010)
+
+assert_eq(
+    10.by { .is_squarefree_almost_prime(2) },
+    10.of { .inc.nth_squarefree_almost_prime(2) },
+)
+
+assert_eq(
+    10.by { .is_squarefree_almost_prime(3) },
+    10.of { .inc.nth_squarefree_almost_prime(3) },
+)
+
+assert(is_squarefree_almost_prime(2**64 + 1, 2))
+assert(!is_squarefree_almost_prime(2**64 + 1, 3))
+assert(is_squarefree_almost_prime((2**64 + 1) * 2, 3))
+assert(!is_squarefree_almost_prime((2**64 + 1) * 4, 3))
+assert(is_squarefree_almost_prime((2**64 + 1) * 503 * 863, 4))
+assert(is_squarefree_almost_prime((2**64 + 1) * 503 * 863 * 1000000007, 5))
+assert(!is_squarefree_almost_prime((2**64 + 1) * 503 * 863 * 1000000007**2, 5))
+assert(!is_squarefree_almost_prime((2**64 + 1) * 503 * 863 * 1000000007**2, 6))
 
 say "** Tests passed!"

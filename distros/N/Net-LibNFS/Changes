@@ -1,0 +1,7 @@
+Revision history for Perl extension Net::LibNFS:
+
+0.02 Sat 16 Jul 2022
+- Fix tests (warnings from dependency)
+
+0.01 Fri 15 Jul 2022
+- Initial release

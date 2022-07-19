@@ -4,7 +4,7 @@ Net::Amazon::S3 - Use the Amazon S3 - Simple Storage Service
 
 # VERSION
 
-version 0.99
+version 0.991
 
 # SYNOPSIS
 
@@ -236,6 +236,17 @@ Create a new S3 client object. Takes some arguments:
     This uses exponential backoff with retries after 1, 2, 4, 8, 16, 32 seconds,
     as recommended by Amazon. Defaults to off.
 
+    When retry is on, request will be automatically retried when one of following
+    HTTP statuses happens
+
+    - 408 - Request Timeout
+    - 500 - Internal Server Error
+    - 502 - Bad Gateway
+    - 503 - Service Unavailable
+    - 504 - Gateway Timeout
+
+    For more details see [LWP::UserAgent::Determined](https://metacpan.org/pod/LWP%3A%3AUserAgent%3A%3ADetermined).
+
 - host
 
     Deprecated.
@@ -355,9 +366,21 @@ Provides operation [CreateBucket](https://docs.aws.amazon.com/AmazonS3/latest/AP
 
 ## bucket BUCKET
 
-Takes a scalar argument, the name of the bucket you're creating
+        # build bucket with guessed region
+        $s3->bucket ('foo');
+        $s3->bucket (bucket => 'foo');
+        $s3->bucket (name   => 'foo');
+
+        # build with explicit region
+        $s3->bucket ('foo', region => 'bar');
 
 Returns an (unverified) bucket object from an account. Does no network access.
+
+However, when guessing region, `HeadRegion` operation may be called before
+first network access.
+
+Region is mandatory when using Signature V4 authorization, which is default
+for AWS. AWS limits number of HTTP requests, see [https://aws.amazon.com/premiumsupport/knowledge-center/s3-request-limit-avoid-throttling/](https://aws.amazon.com/premiumsupport/knowledge-center/s3-request-limit-avoid-throttling/)
 
 ## delete\_bucket
 
@@ -623,7 +646,7 @@ Branislav Zahradník <barney@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
+This software is copyright (c) 2022 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

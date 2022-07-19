@@ -19,6 +19,7 @@ my %META = (
     runtime => {
       requires => {
         'namespace::clean' => 0,
+        'Scalar::Util' => '1.36',
       },
     },
     develop   => {

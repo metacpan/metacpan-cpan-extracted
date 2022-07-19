@@ -15,17 +15,19 @@ share {
         '%{make}',
         '%{make} install',
     ];
-    gather sub {
-        my($build) = @_;
-        $build->runtime_prop->{$_} = "-I@{[ $build->runtime_prop->{prefix} ]}/include " for qw( cflags cflags_static );
-        $build->runtime_prop->{$_} = "-L@{[ $build->runtime_prop->{prefix} ]}/lib -lFLAC " for qw( libs libs_static );
-    };
+    gather [
+        [ 'pkg-config --cflags flac', \'%{.runtime.cflags}'  ],
+        [ 'pkg-config --libs flac', \'%{.runtime.libs}'    ],
+        [ 'pkg-config --cflags --static flac', \'%{.runtime.cflags_static}'  ],
+        [ 'pkg-config --libs --static flac', \'%{.runtime.libs_static}'    ],
+    ];
     plugin 'Gather::IsolateDynamic';
 };
 
 sys {
-    gather sub {
-        my($build) = @_;
-        $build->runtime_prop->{$_} = '-lFLAC' for qw( libs );
-    };
+    # the system static libs often aren't compiled with fPIC, so just link dynamically
+    gather [
+        [ 'pkg-config --cflags flac', \'%{.runtime.cflags}'  ],
+        [ 'pkg-config --libs flac', \'%{.runtime.libs}'    ],
+    ];
 };

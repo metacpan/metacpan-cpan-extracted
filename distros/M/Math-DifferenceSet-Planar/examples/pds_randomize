@@ -1,0 +1,108 @@
+#!/usr/bin/env perl
+
+use 5.022;
+use strict;
+use warnings;
+use Math::DifferenceSet::Planar;
+use Math::Prime::Util qw(gcd urandomm);
+
+$| = 1;
+
+my $mult       = 1;
+my $canonical  = 0;
+my $same_plane = 0;
+while (@ARGV && $ARGV[0] =~ /^-(.+)\z/s) {
+    my $opt = $1;
+    shift @ARGV;
+    last if '-' eq $opt;
+    $mult = $opt, next  if $opt =~ /^[1-9][0-9]*\z/;
+    if ($opt =~ /^[cs]+\z/) {
+        $canonical  = 1 if $opt =~ /c/;
+        $same_plane = 1 if $opt =~ /s/;
+        next;
+    }
+    die "usage: pds_randomize [-c|-s] [-nnn] [file]...\n";
+}
+
+while (<<>>) {
+    chomp;
+    my @e = split /\s+/;
+    my $s = Math::DifferenceSet::Planar->from_elements(@e);
+    my $modulus = $s->modulus;
+    foreach my $i (1 .. $mult) {
+        my $s1 = $s;
+        if (!$same_plane) {
+            my $t  = 1 + urandomm($modulus - 1);
+            while (gcd($t, $modulus) != 1) {
+                $t  = 1 + urandomm($modulus - 1);
+            }
+            $s1 = $s->multiply($t);
+        }
+        if ($canonical) {
+            $s1 = $s1->canonize;
+        }
+        else {
+            $s1 = $s1->translate(urandomm($modulus));
+        }
+        my @e = $s1->elements;
+        print "@e\n";
+    }
+}
+
+__END__
+=head1 NAME
+
+pds_randomize - generate random planar difference sets using given sets
+
+=head1 SYNOPSIS
+
+  pds_randomize [-c|-s] [-nnn] [file]...
+
+=head1 DESCRIPTION
+
+This example program reads planar difference sets, one per line, as
+integer numbers separated by whitespace, and writes randomly chosen
+other sets of the same size to standard output.
+
+For each set in the input one random set is generated.  An option
+in the form of a negative integer defines the absolute value of the
+integer as multiplicity, which means that for each set in the input
+that many random sets are generated.
+
+Option B<-c> makes the output canonical, so that start elements will
+always be zero and one.  Option B<-s> makes each output stay within
+the same plane as the input, resulting in random translates rather than
+completely random sets.
+
+=head1 BUGS AND LIMITATIONS
+
+The randomness of the first result depends on the amount of entropy
+available on the platform the tool is running on.  Additional results
+are distributed uniformly over their respective solution domains using
+a pseudo random number generator.  It is sufficiently deep to cover all
+of the domains this tool can handle but may exhibit subtle regularities
+due to its deterministic nature.
+
+Whether the solution domains actually contain all difference sets of
+their respective orders depends on the validity of the conjecture that
+any two of them of the same order can be mapped to each other with
+linear functions.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2022 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

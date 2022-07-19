@@ -1,0 +1,8 @@
+name = "UID2-Client-XS"
+license = "bsd"
+module_maker = "ModuleBuild"
+badges = ['github-actions/test', 'metacpan']
+[build]
+build_class = "builder::MyBuilder"
+[no_index]
+directory = ['t', 'xt', 'inc', 'share', 'eg', 'examples', 'author', 'builder', 'vendor']

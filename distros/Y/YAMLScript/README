@@ -266,6 +266,10 @@ YAMLSCRIPT
 
  FUTURE PLANS
 
+      * Implement most of the core libraries with YAMLScript
+
+      * Programatically port many functions from clojure/core source code
+
       * Write an implementation spec for YAMLScript
 
       * Port YAMLScript to many languages
@@ -289,7 +293,15 @@ YAMLSCRIPT
 
     This is very ALPHA software.
 
-    Some of the features documented here are not yet implemented.
+    Some of the features documented here are not yet implemented:
+
+      * YAMLScript REPL
+
+      * Python Port (Very soon)
+
+      * JavaScript Port (after Python)
+
+      * Some functions abaove
 
     Everything in the test files definitely works. :)
 

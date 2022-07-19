@@ -33,7 +33,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use UI::Various::core;
 use UI::Various::Box;
@@ -172,6 +172,8 @@ sub _process($)
 
     while (1)
     {
+	if ($self->_toplevel  and  defined $self->_toplevel->{_self_destruct})
+	{   return undef;   }
 	$self->_show;
 	local $_ = <STDIN>;
 	print $_;

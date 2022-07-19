@@ -40,7 +40,7 @@ msgid ""
 "```console\n"
 "% sudo dnf install -y perl-App-cpanminus\n"
 "% sudo dnf install -y gcc\n"
-"% cpanm Groonga-HTTP\n"
+"% cpanm Groonga::HTTP\n"
 "```"
 msgstr ""
 

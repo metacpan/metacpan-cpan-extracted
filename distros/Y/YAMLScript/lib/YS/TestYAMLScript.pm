@@ -1,16 +1,24 @@
 package YS::TestYAMLScript;
-use Mo qw'xxx';
-use YS;
-extends 'YS';
+use Mo qw(xxx);
 
 use Test::More ();
 
 my $count = 0;
 
-sub BUILD {
-    my ($self) = @_;
+sub define {
+    [
+        ok =>
+        2 => sub {
+            my ($got, $label) = @_;
+            Test::More::ok(
+                $got,
+                $label,
+            );
+            $count++;
+        },
+    ],
 
-    $self->func(
+    [
         is =>
         3 => sub {
             my ($got, $want, $label) = @_;
@@ -21,9 +29,9 @@ sub BUILD {
             );
             $count++;
         },
-    );
+    ],
 
-    $self->func(
+    [
         pass =>
         1 => sub {
             my ($label) = @_;
@@ -32,8 +40,7 @@ sub BUILD {
             );
             $count++;
         },
-    );
-
+    ],
 }
 
 sub END {

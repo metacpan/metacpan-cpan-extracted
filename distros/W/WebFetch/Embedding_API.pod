@@ -97,7 +97,6 @@ to the names in $obj->{data}{fields}.
 
 Programs which need to use this data can read it directly from the
 records and fields in $obj->{data}{records}.
-Some sample code is shown in the WebFetch FAQ at http://www.webfetch.org/
 
 A module which inherits from WebFetch and fails to provide these variables
 is assumed to be a WebFetch 0.09 module.

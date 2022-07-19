@@ -20,8 +20,8 @@ subtest "basic" => sub {
         push @values, <$iter>;
         push @values, <$iter>;
         push @values, <$iter>;
-        is( \@values, [ 2, 12, 22 ], "values are correct" );
-        is( $iter->next, undef, "iterator exhausted" );
+        is( \@values,    [ 2, 12, 22 ], "values are correct" );
+        is( $iter->next, undef,         "iterator exhausted" );
     };
 };
 
@@ -34,8 +34,8 @@ subtest "reset" => sub {
         push @values, <$iter>;
         push @values, <$iter>;
         push @values, <$iter>;
-        is( \@values, [ 2, 12, 22 ], "values are correct" );
-        is( $iter->next, undef, "iterator exhausted" );
+        is( \@values,    [ 2, 12, 22 ], "values are correct" );
+        is( $iter->next, undef,         "iterator exhausted" );
     };
 
     try_ok { $iter->reset } "reset";
@@ -45,8 +45,8 @@ subtest "reset" => sub {
         push @values, <$iter>;
         push @values, <$iter>;
         push @values, <$iter>;
-        is( \@values, [ 2, 12, 22 ], "values are correct" );
-        is( $iter->next, undef, "iterator exhausted" );
+        is( \@values,    [ 2, 12, 22 ], "values are correct" );
+        is( $iter->next, undef,         "iterator exhausted" );
     };
 
 };

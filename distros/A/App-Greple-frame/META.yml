@@ -26,7 +26,7 @@ no_index:
 provides:
   App::Greple::frame:
     file: lib/App/Greple/frame.pm
-    version: '0.05'
+    version: '0.06'
   App::Greple::frame::RPN:
     file: lib/App/Greple/frame/RPN.pm
 requires:
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/greple-frame/issues
   homepage: https://github.com/kaz-utashiro/greple-frame
   repository: https://github.com/kaz-utashiro/greple-frame.git
-version: '0.05'
+version: '0.06'
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -6,16 +6,22 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Acme::Mitey::Cards::Mite";
-    our $MITE_VERSION = "0.006012";
+    our $MITE_VERSION = "0.007003";
 
     BEGIN {
-        *bare  = \&Acme::Mitey::Cards::Mite::bare;
-        *false = \&Acme::Mitey::Cards::Mite::false;
-        *lazy  = \&Acme::Mitey::Cards::Mite::lazy;
-        *ro    = \&Acme::Mitey::Cards::Mite::ro;
-        *rw    = \&Acme::Mitey::Cards::Mite::rw;
-        *rwp   = \&Acme::Mitey::Cards::Mite::rwp;
-        *true  = \&Acme::Mitey::Cards::Mite::true;
+        require Scalar::Util;
+        *bare    = \&Acme::Mitey::Cards::Mite::bare;
+        *blessed = \&Scalar::Util::blessed;
+        *carp    = \&Acme::Mitey::Cards::Mite::carp;
+        *confess = \&Acme::Mitey::Cards::Mite::confess;
+        *croak   = \&Acme::Mitey::Cards::Mite::croak;
+        *false   = \&Acme::Mitey::Cards::Mite::false;
+        *guard   = \&Acme::Mitey::Cards::Mite::guard;
+        *lazy    = \&Acme::Mitey::Cards::Mite::lazy;
+        *ro      = \&Acme::Mitey::Cards::Mite::ro;
+        *rw      = \&Acme::Mitey::Cards::Mite::rw;
+        *rwp     = \&Acme::Mitey::Cards::Mite::rwp;
+        *true    = \&Acme::Mitey::Cards::Mite::true;
     }
 
     BEGIN {
@@ -59,9 +65,8 @@
                     $ok;
                 }
               )
-              or Acme::Mitey::Cards::Mite::croak
-              "Type check failed in constructor: %s should be %s", "cards",
-              "CardArray";
+              or croak "Type check failed in constructor: %s should be %s",
+              "cards", "CardArray";
             $self->{"cards"} = $args->{"cards"};
         }
 
@@ -90,16 +95,15 @@
                       )
                 );
               }
-              or Acme::Mitey::Cards::Mite::croak
-              "Type check failed in constructor: %s should be %s", "owner",
-              "Str|Object";
+              or croak "Type check failed in constructor: %s should be %s",
+              "owner", "Str|Object";
             $self->{"owner"} = $args->{"owner"};
         }
 
         # Enforce strict constructor
         my @unknown = grep not(/\A(?:cards|owner)\z/), keys %{$args};
         @unknown
-          and Acme::Mitey::Cards::Mite::croak(
+          and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         # Call BUILD methods
@@ -149,8 +153,7 @@
                       )
                 );
               }
-              or Acme::Mitey::Cards::Mite::croak(
-                "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Str|Object" );
             $_[0]{"owner"} = $_[1];
             $_[0];

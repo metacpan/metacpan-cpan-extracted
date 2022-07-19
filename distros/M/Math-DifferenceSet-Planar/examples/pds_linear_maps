@@ -1,0 +1,107 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Math::ModInt qw(mod);
+use Math::DifferenceSet::Planar;
+
+$| = 1;
+
+my $terse = 0;
+my $full = 0;
+while (@ARGV && $ARGV[0] =~ /^-(.+)\z/s) {
+    my $opt = $1;
+    shift @ARGV;
+    last            if '-' eq $opt;
+    $full = 1, next if 'f' eq $opt;
+    die "usage: pds_linear_maps [-f] [file]...\n";
+}
+
+my @sets    = ();
+my $modulus = 0;
+while (<<>>) {
+    die "lists of integers expected\n" if !/^[0-9]+(?:\s+[0-9]+){1,1000}/;
+    chomp;
+    my @e = split /\s+/;
+    my $s = Math::DifferenceSet::Planar->from_elements(@e);
+    my $order = $s->order;
+    die "sets have different order\n" if @sets && $sets[0]->order != $order;
+    push @sets, $s;
+    $modulus ||= $s->modulus;
+}
+foreach my $s2 (@sets) {
+    my $ps2 = fmt_set($s2);
+    foreach my $s1 (@sets) {
+        last if !$full && $s1 == $s2;
+        my $ps1 = fmt_set($s1);
+        my ($f, $d);
+        if ($full) {
+            my @m =
+                sort { $a->[0] <=> $b->[0] }
+                $s1->find_all_linear_maps($s2);
+            $f = '(' . join('|', map {$_->[0]} @m) . ')';
+            $d = '(' . join('|', map {$_->[1]} @m) . ')';
+        }
+        else {
+            ($f, $d) = $s1->find_linear_map($s2);
+        }
+        print "$ps2 == $f * $ps1 + $d (mod $modulus)\n";
+    }
+}
+
+sub fmt_set {
+    my ($set) = @_;
+    my @e = $set->elements_sorted;
+    if (@e > 5) {
+        splice @e, 4, @e - 4, '...';
+    }
+    return '{' . join(',', @e) . '}';
+}
+
+__END__
+=head1 NAME
+
+pds_linear_maps - find linear map functions between planar difference sets
+
+=head1 SYNOPSIS
+
+  pds_linear_maps [-f] [file]...
+
+=head1 DESCRIPTION
+
+This example program reads planar difference sets of equal size, one per
+line, as integer numbers separated by whitespace, and for each pair of
+them prints linear functions mapping one of them to the other.
+
+With option B<-f>, all such mappings are displayed.  Otherwise, a single
+mapping for each combination of two different input lines is displayed.
+
+=head1 BUGS AND LIMITATIONS
+
+The existence and frequency of linear mappings between planar difference
+sets, as well as our algorithms, depend partly on conjectures.  This tool
+thus may fail to find some solutions.
+
+This tool will be most practical for small sets.  Mapping sets with
+hundreds of thousands of elements could take hours.  Another limitation
+depends on the database of sample sets on your platform.  It will always
+support orders up to 2**12 but rarely much more than 2**17.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2022 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

@@ -1,5 +1,5 @@
 package WWW::FetchStory::Fetcher::AO3;
-$WWW::FetchStory::Fetcher::AO3::VERSION = '0.2201';
+$WWW::FetchStory::Fetcher::AO3::VERSION = '0.2307';
 use strict;
 use warnings;
 =head1 NAME
@@ -8,7 +8,7 @@ WWW::FetchStory::Fetcher::AO3 - fetching module for WWW::FetchStory
 
 =head1 VERSION
 
-version 0.2201
+version 0.2307
 
 =head1 DESCRIPTION
 
@@ -141,7 +141,11 @@ sub parse_toc {
     $info{category} = $self->parse_category(%args);
     $info{rating} = $self->parse_rating(%args);
     $info{chapters} = $self->parse_chapter_urls(%args, sid=>$sid);
-    #$info{epub_url} = $self->parse_epub_url(%args, sid=>$sid);
+    my $epub_url = $self->parse_epub_url(%args, sid=>$sid);
+    if ($epub_url)
+    {
+        $info{epub_url} = $epub_url;
+    }
     if ($info{epub_url})
     {
         $info{wordcount} = $self->parse_wordcount(%args);
@@ -193,7 +197,7 @@ sub parse_epub_url {
     my $content = $args{content};
     my $sid = $args{sid};
     my $epub_url = '';
-    if ($content =~ m!href="(/downloads/[-\/\w]+/$sid/[^.]+\.epub)!)
+    if ($content =~ m!href="(/downloads/$sid/[^.]+\.epub)!)
     {
 	$epub_url = ("http://archiveofourown.org$1");
     }
@@ -240,7 +244,6 @@ sub parse_author {
 
     my $content = $args{content};
 
-    say STDERR "start of parse_author";
     my $author = '';
     if ($content =~ m! href="/users/\w+/pseuds/\w+">([^<]+)</a>!)
     {
@@ -287,8 +290,9 @@ sub parse_summary {
     # AO3 tends to have messy HTML stuff stuck in the summary
     $summary =~ s!&lt;[a-zA-Z]&gt;!!g;
     $summary =~ s!&lt;/[a-zA-Z]&gt;!!g;
-    $summary =~ s!<\w+>!!g;
-    $summary =~ s!</\w+>!!g;
+    $summary =~ s!&amp;!and!g;
+    $summary =~ s!<[^>]+>!!g;
+    $summary =~ s!</[^>]+>!!g;
     $summary =~ s!&#x27;!'!g;
     $summary =~ s!&#39;!'!g;
     return $summary;
@@ -307,6 +311,10 @@ sub parse_wordcount {
 
     my $words = '';
     if ($content =~ m!\((\d+) words\)!m)
+    {
+	$words = $1;
+    }
+    elsif ($content =~ m!<dt class="words">Words:</dt><dd class="words">(\d+)</dd>!)
     {
 	$words = $1;
     }
@@ -389,7 +397,7 @@ sub parse_universe {
     {
         $universe = 'Blakes 7';
     }
-    elsif ($universe =~ m!(Marvel Cinematic Universe|Avengers|Iron Man)!)
+    elsif ($universe =~ m!(Marvel Cinematic Universe|Avengers|Iron Man|Captain America)!)
     {
         $universe = 'MCU';
     }

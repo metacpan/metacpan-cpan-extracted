@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Type-Library-Compiler>
 Bug tracker:  <https://github.com/tobyink/p5-type-library-compiler/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.006	2022-07-19
+
+ - Set $TLC_VERSION package variable in compiled libraries.
+ - Smarter to_TypeTiny method for unions.
+
 0.005	2022-07-13
 
  - Added: Support Foo|Bar union type constraints.

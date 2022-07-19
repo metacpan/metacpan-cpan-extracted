@@ -1,39 +1,63 @@
-#line 1 "inc/Module/Install/WriteAll.pm - /usr/local/lib/perl5/site_perl/5.8.4/Module/Install/WriteAll.pm"
-# $File: //depot/cpan/Module-Install/lib/Module/Install/WriteAll.pm $ $Author: autrijus $
-# $Revision: #3 $ $Change: 1885 $ $DateTime: 2004/03/11 05:55:27 $ vim: expandtab shiftwidth=4
-
+#line 1
 package Module::Install::WriteAll;
-use Module::Install::Base; @ISA = qw(Module::Install::Base);
+
+use strict;
+use Module::Install::Base ();
+
+use vars qw{$VERSION @ISA $ISCORE};
+BEGIN {
+	$VERSION = '1.19';
+	@ISA     = qw{Module::Install::Base};
+	$ISCORE  = 1;
+}
 
 sub WriteAll {
-    my $self = shift;
-    my %args = (
-        meta => 1,
-        sign => 0,
-        inline => 0,
-        check_nmake => 1,
-        @_
-    );
+	my $self = shift;
+	my %args = (
+		meta        => 1,
+		sign        => 0,
+		inline      => 0,
+		check_nmake => 1,
+		@_,
+	);
 
-    $self->sign(1) if $args{sign};
-    $self->Meta->write if $args{meta};
-    $self->admin->WriteAll(%args) if $self->is_admin;
+	$self->sign(1)                if $args{sign};
+	$self->admin->WriteAll(%args) if $self->is_admin;
 
-    if ($0 =~ /Build.PL$/i) {
-	$self->Build->write;
-    }
-    else {
 	$self->check_nmake if $args{check_nmake};
-        $self->makemaker_args( PL_FILES => {} )
-            unless $self->makemaker_args->{'PL_FILES'};
+	unless ( $self->makemaker_args->{PL_FILES} ) {
+		# XXX: This still may be a bit over-defensive...
+		unless ($self->makemaker(6.25)) {
+			$self->makemaker_args( PL_FILES => {} ) if -f 'Build.PL';
+		}
+	}
 
-        if ($args{inline}) {
-            $self->Inline->write;
-        }
-        else {
-            $self->Makefile->write;
-        }
-    }
+	# Until ExtUtils::MakeMaker support MYMETA.yml, make sure
+	# we clean it up properly ourself.
+	$self->realclean_files('MYMETA.yml');
+
+	if ( $args{inline} ) {
+		$self->Inline->write;
+	} else {
+		$self->Makefile->write;
+	}
+
+	# The Makefile write process adds a couple of dependencies,
+	# so write the META.yml files after the Makefile.
+	if ( $args{meta} ) {
+		$self->Meta->write;
+	}
+
+	# Experimental support for MYMETA
+	if ( $ENV{X_MYMETA} ) {
+		if ( $ENV{X_MYMETA} eq 'JSON' ) {
+			$self->Meta->write_mymeta_json;
+		} else {
+			$self->Meta->write_mymeta_yaml;
+		}
+	}
+
+	return 1;
 }
 
 1;

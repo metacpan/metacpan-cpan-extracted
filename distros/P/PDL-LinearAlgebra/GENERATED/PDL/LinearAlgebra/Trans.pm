@@ -173,24 +173,28 @@ ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
 =cut
 
 sub PDL::cgeexp {
-  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgeexp : goto &PDL::__Ncgeexp;
+  barf "Cannot mix PDL::Complex and native-complex" if
+    (grep ref($_) eq 'PDL::Complex', @_) and
+    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
+  goto &PDL::__Ccgeexp if grep ref($_) eq 'PDL::Complex', @_;
+  goto &PDL::__Ncgeexp;
 }
 *cgeexp = \&PDL::cgeexp;
-#line 180 "Trans.pm"
+#line 184 "Trans.pm"
 
 
 
 #line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cctrsqrt = \&PDL::__Cctrsqrt;
-#line 187 "Trans.pm"
+#line 191 "Trans.pm"
 
 
 
 #line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nctrsqrt = \&PDL::__Nctrsqrt;
-#line 194 "Trans.pm"
+#line 198 "Trans.pm"
 
 
 
@@ -217,24 +221,28 @@ If uplo is true, A is lower triangular.
 =cut
 
 sub PDL::ctrsqrt {
-  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cctrsqrt : goto &PDL::__Nctrsqrt;
+  barf "Cannot mix PDL::Complex and native-complex" if
+    (grep ref($_) eq 'PDL::Complex', @_) and
+    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
+  goto &PDL::__Cctrsqrt if grep ref($_) eq 'PDL::Complex', @_;
+  goto &PDL::__Nctrsqrt;
 }
 *ctrsqrt = \&PDL::ctrsqrt;
-#line 224 "Trans.pm"
+#line 232 "Trans.pm"
 
 
 
 #line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cctrfun = \&PDL::__Cctrfun;
-#line 231 "Trans.pm"
+#line 239 "Trans.pm"
 
 
 
 #line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nctrfun = \&PDL::__Nctrfun;
-#line 238 "Trans.pm"
+#line 246 "Trans.pm"
 
 
 
@@ -256,10 +264,14 @@ If uplo is true, A is lower triangular.
 =cut
 
 sub PDL::ctrfun {
-  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cctrfun : goto &PDL::__Nctrfun;
+  barf "Cannot mix PDL::Complex and native-complex" if
+    (grep ref($_) eq 'PDL::Complex', @_) and
+    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
+  goto &PDL::__Cctrfun if grep ref($_) eq 'PDL::Complex', @_;
+  goto &PDL::__Nctrfun;
 }
 *ctrfun = \&PDL::ctrfun;
-#line 263 "Trans.pm"
+#line 275 "Trans.pm"
 
 
 
@@ -1251,7 +1263,7 @@ it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
-#line 1255 "Trans.pm"
+#line 1267 "Trans.pm"
 
 
 

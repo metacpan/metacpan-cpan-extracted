@@ -12,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,7 @@ no_index:
 provides:
   Test::DiagINC:
     file: lib/Test/DiagINC.pm
-    version: '0.008'
+    version: '0.010'
 requires:
   B: '0'
   Cwd: '0'
@@ -41,9 +41,12 @@ resources:
   bugtracker: https://github.com/dagolden/Test-DiagINC/issues
   homepage: https://github.com/dagolden/Test-DiagINC
   repository: https://github.com/dagolden/Test-DiagINC.git
-version: '0.008'
+version: '0.010'
 x_authority: cpan:DAGOLDEN
 x_contributors:
+  - 'Graham Knop <haarg@haarg.org>'
   - 'Peter Rabbitson <ribasushi@cpan.org>'
   - 'Roy Ivy III <rivy.dev@gmail.com>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Apache-2.0

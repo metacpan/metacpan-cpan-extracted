@@ -1,13 +1,20 @@
-# WebFetch::Input::PerlStruct.pm
-# push a Perl structure with pre-parsed news into WebFetch
+# WebFetch::Input::PerlStruct
+# ABSTRACT: accept a Perl structure with pre-parsed news into WebFetch
 #
-# Copyright (c) 1998-2009 Ian Kluft. This program is free software; you can
+# Copyright (c) 1998-2022 Ian Kluft. This program is free software; you can
 # redistribute it and/or modify it under the terms of the GNU General Public
-# License Version 3. See  http://www.webfetch.org/GPLv3.txt
+# License Version 3. See  https://www.gnu.org/licenses/gpl-3.0-standalone.html
+
+# pragmas to silence some warnings from Perl::Critic
+## no critic (Modules::RequireExplicitPackage)
+# This solves a catch-22 where parts of Perl::Critic want both package and use-strict to be first
+use strict;
+use warnings;
+use utf8;
+## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch::Input::PerlStruct;
-
-use strict;
+$WebFetch::Input::PerlStruct::VERSION = '0.14.0';
 use base "WebFetch";
 
 # define exceptions/errors
@@ -62,27 +69,33 @@ sub fetch
 }
 
 1;
-__END__
-# POD docs follow
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-WebFetch::Input::PerlStruct - accepts a Perl structure with pre-parsed news
+WebFetch::Input::PerlStruct - accept a Perl structure with pre-parsed news into WebFetch
+
+=head1 VERSION
+
+version 0.14.0
 
 =head1 SYNOPSIS
 
 In perl scripts:
 
-C<use WebFetch::Input::PerlStruct;>
+    use WebFetch::Input::PerlStruct;
 
-C<$obj = new WebFetch::Input::PerlStruct (
-	"content" => content_struct,
-	"dir" => output_dir,
-	"dest" => output_file,
-	"dest_format" => output_format,	# used to select WebFetch output module
-	[ "group" => file_group_id, ]
-	[ "mode" => file_mode_perms, ]
-	[ "quiet" => 1 ]);>
+    $obj = WebFetch::Input::PerlStruct->new(
+        "content" => content_struct,
+        "dir" => output_dir,
+        "dest" => output_file,
+        "dest_format" => output_format,	# used to select WebFetch output module
+        [ "group" => file_group_id, ]
+        [ "mode" => file_mode_perms, ]
+        [ "quiet" => 1 ]);
 
 I<Note: WebFetch::Input::PerlStruct is a Perl interface only.
 It does not support usage from the command-line.>
@@ -131,21 +144,30 @@ this data.
 Otherwise, meaning can only be applied to field names if they already
 match WebFetch's well-known field names.
 
-=head1 AUTHOR
-
-WebFetch was written by Ian Kluft
-Send patches, bug reports, suggestions and questions to
-C<maint@webfetch.org>.
-
 =head1 SEE ALSO
 
-=for html
-<a href="WebFetch.html">WebFetch</a>
+L<WebFetch>
+L<https://github.com/ikluft/WebFetch>
 
-=for text
-WebFetch
+=head1 BUGS AND LIMITATIONS
 
-=for man
-WebFetch
+Please report bugs via GitHub at L<https://github.com/ikluft/WebFetch/issues>
+
+Patches and enhancements may be submitted via a pull request at L<https://github.com/ikluft/WebFetch/pulls>
+
+=head1 AUTHOR
+
+Ian Kluft <https://github.com/ikluft>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 1998-2022 by Ian Kluft.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
 
 =cut
+
+__END__
+# POD docs follow

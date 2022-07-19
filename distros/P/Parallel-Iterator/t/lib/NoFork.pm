@@ -1,4 +1,3 @@
-# $Id: NoFork.pm 2683 2007-10-04 12:35:06Z andy $
 package NoFork;
 
 # This code originally written by Eric Wilhelm for the Test::Harness

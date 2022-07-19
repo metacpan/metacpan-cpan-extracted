@@ -1,8 +1,5 @@
-# $File: //member/autrijus/MasonX-Profiler/lib/MasonX/Profiler.pm $ $Author: autrijus $
-# $Revision: #9 $ $Change: 10936 $ $DateTime: 2004/06/22 14:43:01 $
-
 package MasonX::Profiler;
-$MasonX::Profiler::VERSION = '0.06';
+$MasonX::Profiler::VERSION = '0.07';
 
 use strict;
 use Time::HiRes ();
@@ -13,8 +10,7 @@ MasonX::Profiler - Mason per-component profiler
 
 =head1 VERSION
 
-This document describes version 0.06 of MasonX::Profiler, released
-June 22, 2004.
+This document describes version 0.07 of MasonX::Profiler.
 
 =head1 SYNOPSIS
 
@@ -22,8 +18,8 @@ In the Mason handler:
 
     use MasonX::Profiler;
     my $ah = HTML::Mason::ApacheHandler->new(
-	preamble => 'my $p = MasonX::Profiler->new($m, $r);',
-	# ...
+        preamble => 'my $p = MasonX::Profiler->new($m, $r);',
+        # ...
     );
 
 Note that B<CGIHandler> and B<Apache2Handler> works, too.
@@ -35,6 +31,16 @@ Alternatively, in F<httpd.conf>, before loading your C<PerlHandler>:
 
 Note that if you are using virtual hosts, the two lines above must be
 inside the C<E<lt>VirtualHostE<gt>> block, not outside it.
+
+=head1 INSTALLATION
+
+MasonX::Profiler uses the standard perl module install process:
+
+    cpansign -v        # optional; see SIGNATURE for details
+    perl Makefile.PL
+    make           # or 'nmake' on Win32
+    make test
+    make install
 
 =head1 DESCRIPTION
 
@@ -109,6 +115,8 @@ sub DESTROY {
 1;
 
 =head1 AUTHORS
+
+Best Practical Solutions, LLC <modules@bestpractical.com>
 
 Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>
 

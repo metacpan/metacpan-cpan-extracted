@@ -28,12 +28,14 @@
       "configure" : {
          "requires" : {
             "Alien::Base::Wrapper" : "1.97",
-            "Alien::libFLAC" : "0",
+            "Alien::libFLAC" : "v0.2.0",
             "ExtUtils::MakeMaker" : "6.52"
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "perl" : "5.020002"
+         }
       }
    },
    "release_status" : "stable",
@@ -48,6 +50,6 @@
          "web" : "https://github.com/G4Vi/MHFS"
       }
    },
-   "version" : "v0.2.0",
+   "version" : "v0.2.2",
    "x_serialization_backend" : "JSON::PP version 4.10"
 }

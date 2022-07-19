@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use UI::Various::core;
 use UI::Various::Listbox;
@@ -130,7 +130,7 @@ L<UI::Various::Listbox::add|UI::Various::Listbox/add - add new element>
 sub _add($@)
 {
     my ($self) = shift;
-    $self->_tk->insert('end', @_);
+    defined $self->_tk  and  $self->_tk->insert('end', @_);
 }
 
 #########################################################################
@@ -147,7 +147,29 @@ L<UI::Various::Listbox::remove|UI::Various::Listbox/remove - remove element>
 sub _remove($$)
 {
     my ($self, $index) = (@_);
-    $self->_tk->delete($index);
+    defined $self->_tk  and  $self->_tk->delete($index);
+}
+
+#########################################################################
+
+=head2 B<_replace> - replace all elements
+
+C<PoorTerm>'s specific implementation of
+L<UI::Various::Listbox::replace|UI::Various::Listbox/replace - replace all
+elements>
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+sub _replace($@)
+{
+    my ($self) = shift;
+    if (defined $self->_tk)
+    {
+	$self->_tk->delete(0, 'end');
+	$self->_tk->insert(0, @_);
+    }
 }
 
 #########################################################################
@@ -165,7 +187,7 @@ selection of listbox>
 sub _selected($)
 {
     my ($self) = @_;
-    return $self->_tk->curselection;
+    return defined $self->_tk ? $self->_tk->curselection : ();
 }
 
 1;

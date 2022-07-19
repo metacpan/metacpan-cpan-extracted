@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie.pm
-## Version v0.1.13
+## Version v0.2.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/10/08
-## Modified 2022/06/27
+## Modified 2022/07/16
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -15,6 +15,7 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
+    use vars qw( $VERSION $SUBS $COOKIE_DEBUG );
     use DateTime;
     use DateTime::Format::Strptime;
     use Module::Generic::DateTime;
@@ -28,11 +29,14 @@ BEGIN
         '=='     => \&same_as,
         fallback => 1,
     );
-    our $VERSION = 'v0.1.13';
+    our $VERSION = 'v0.2.0';
     our $SUBS;
     our $COOKIE_DEBUG = 0;
     use constant CRYPTX_VERSION => '0.074';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -77,7 +81,6 @@ sub init
     $self->{version}    = '';
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
-    # $self->message( 3, "Returning cookie with value: '", $self->as_string, "'." );
     $self->{fields} = [qw( name value comment commentURL discard domain expires http_only implicit max_age path port same_site secure version )];
     return( $self );
 }
@@ -119,7 +122,6 @@ sub apply
 {
     my $self = shift( @_ );
     my $hash = $self->_get_args_as_hash( @_ );
-    $self->message( 4, "Called with values: ", sub{ $self->SUPER::dump( $hash ) }) if( $COOKIE_DEBUG );
     return( $self ) if( !scalar( keys( %$hash ) ) );
     if( !defined( $SUBS ) || 
         ref( $SUBS ) ne 'ARRAY' ||
@@ -131,7 +133,6 @@ sub apply
     foreach( @$SUBS )
     {
         # Value could be undef
-        $self->message( 4, "Applying property '$_' with ", ( defined( $hash->{ $_ } ) ? 'defined' : 'undefined' ), " value '", $hash->{ $_ }, "'." ) if( $COOKIE_DEBUG );
         # Passing an empty string to Module::Generic::Number will trigger an error (undef)
         # So if the value is empty, we simply set it directly.
         if( $_ eq 'version' && !CORE::length( $hash->{ $_ } ) )
@@ -194,7 +195,6 @@ sub as_string
                 $self->_load_class( 'Crypt::Mac::HMAC', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
                 my $signature = Crypt::Mac::HMAC::hmac_b64( "SHA256", "$key", "$value" );
                 $value = "$value.$signature";
-                $self->message( 4, "Signature is '$signature' with new cookie value '$value'" );
             }
             elsif( $self->encrypt )
             {
@@ -203,11 +203,8 @@ sub as_string
                 my $p = $self->_encrypt_objects( $key => $algo ) || return( $self->pass_error );
                 my $crypt = $p->{crypt};
                 # $value = Crypt::Misc::encode_b64( $crypt->encrypt( "$value", $p->{key}, $p->{iv} ) );
-                # $self->message( 4, "Key size '", CORE::length( $p->{key} ), " and IV size '", CORE::length( $p->{iv} ), "'." );
                 my $encrypted = $crypt->encrypt( "$value", $p->{key}, $p->{iv} );
-                # $self->message( 4, "Encrypted data is now '$encrypted'" );
                 $value = Crypt::Misc::encode_b64( $encrypted );
-                # $self->message( 4, "Cookie value encoded in base64 is now '$value'" );
             }
         }
         catch( $e )
@@ -234,11 +231,9 @@ sub as_string
     push( @parts, sprintf( 'Port=%d', $self->port ) ) if( $self->port );
     push( @parts, sprintf( 'Path=%s', $self->path ) ) if( $self->path );
     # Could be empty. If not specified, it would be a session cookie
-    $self->message( 4, "Cookie expiration set to '", $self->expires, "'" );
     if( ( my $t = $self->expires ) && !$self->max_age->length )
     {
         ( my $dt_str = "$t" ) =~ s/\bUTC\b/GMT/;
-        $self->message( 3, "Setting the expiration timestamp to '$dt_str'." );
         push( @parts, sprintf( 'Expires=%s', $dt_str ) );
     }
     # Number of seconds until the cookie expires
@@ -251,9 +246,7 @@ sub as_string
     }
     push( @parts, 'Secure' ) if( $self->secure );
     push( @parts, 'HttpOnly' ) if( $self->http_only );
-    $self->message( 3, "cookie components are: ", sub{ $self->SUPER::dump( \@parts ) });
     my $c = join( '; ', @parts );
-    $self->message( 3, "Returning cookie string: '$c'." );
     $self->{_cache_value} = $c;
     CORE::delete( $self->{_reset} );
     return( $c );
@@ -282,7 +275,6 @@ sub decrypt
     my $algo = $opts->{algo} || $self->algo;
     return( $self->error( "Cookie encryption was enabled, but no key was set to decrypt it." ) ) if( !defined( $key ) || !CORE::length( "$key" ) );
     return( $self->error( "Cookie encryption was enabled, but no algorithm was set to decrypt it." ) ) if( !defined( $algo ) || !CORE::length( "$algo" ) );
-    # $self->message( 4, "Value to decrypt is '$value'" );
     try
     {
         $self->_load_class( 'Crypt::Misc', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
@@ -290,7 +282,6 @@ sub decrypt
         my $p = $self->_encrypt_objects( $key => $algo, $opts->{iv} ) || return( $self->pass_error );
         my $crypt = $p->{crypt};
         my $bin = Crypt::Misc::decode_b64( "$value" );
-        # $self->message( 4, "Base64 decoded value is '$bin'" );
         return( $crypt->decrypt( "$bin", $p->{key}, $p->{iv} ) );
     }
     catch( $e )
@@ -324,7 +315,6 @@ sub expires
     {
         $self->reset(1);
         my $exp = shift( @_ );
-        $self->message( 3, "Received expiration value of '", ( $exp // '' ), "' (", ( defined( $exp ) ? 'defined' : 'undefined' ), ")." ) if( $COOKIE_DEBUG );
         my $tz;
         # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
         # "Cannot determine local time zone"
@@ -340,12 +330,10 @@ sub expires
         # unsets the value
         if( !defined( $exp ) )
         {
-            $self->message( 3, "Unsetting (undef) cookie expiration" ) if( $COOKIE_DEBUG );
             $self->{expires} = undef;
         }
         elsif( $exp =~ /^\d{1,10}$/ )
         {
-            $self->message( 3, "Value is actually a unix timestamp '$exp' -> ", scalar( localtime( $exp ) ), "." ) if( $COOKIE_DEBUG );
             try
             {
                 # Unexpectedly, DateTime sets the time zone ONLY after having instantiated the
@@ -370,7 +358,6 @@ sub expires
         {
             my( $num, $unit ) = ( $1, $2 );
             $unit = 's' if( !length( $unit ) );
-            # $self->message( 3, "Value is actually a variable time." );
             my $interval =
             {
                 's' => 1,
@@ -388,19 +375,16 @@ sub expires
         }
         elsif( lc( $exp ) eq 'now' )
         {
-            # $self->message( 3, "Value is actually a special keyword." );
             $dt = DateTime->now( time_zone => $tz );
         }
         elsif( defined( $exp ) && CORE::length( $exp ) )
         {
-            # $self->message( 3, "Trying to parse '", overload::StrVal( $exp ), "'." );
             $dt = $self->_parse_timestamp( $exp );
             return( $self->pass_error ) if( !defined( $dt ) );
             return( $self->error( "Provided expires value '$exp' is an invalid expression." ) ) if( !CORE::length( $dt ) );
         }
         else
         {
-            $self->message( 3, "Don't know what to do with '$exp'." );
         }
         
         if( defined( $dt ) )
@@ -432,7 +416,6 @@ sub is_expired
     my $self = shift( @_ );
     my $exp = $self->expires;
     my $max_age = $self->max_age;
-    # $self->message( 4, "Expiration value is '", ( $exp // '' ), "' (", overload::StrVal( $exp ), ")." );
     return( $self->false ) if( !defined( $exp ) && !defined( $max_age ) );
     if( ( defined( $exp ) && !$self->_is_a( $exp, 'Module::Generic::DateTime' ) && !$self->_is_a( $exp, 'DateTime' ) ) ||
         ( defined( $max_age ) && $max_age !~ /\-?\d+$/ ) )
@@ -440,7 +423,6 @@ sub is_expired
         return( $self->false );
     }
     my $now = DateTime->now;
-    # $self->message( 4, "Is $exp lower than $now ? ", ( $exp < $now ? 'yes' : 'no' ) );
     if( ( defined( $max_age ) && $max_age <= 0 ) || 
         ( defined( $exp ) && $exp < $now ) )
     {
@@ -471,11 +453,9 @@ sub is_valid
     return( $self->error( "Signature validation is required, but no key has been set." ) ) if( !$self->key->length && !CORE::exists( $opts->{key} ) || ( CORE::exists( $opts->{key} ) && !CORE::length( $opts->{key} ) ) );
     my $value = $self->value;
     return( $self->true ) if( !$value->length );
-    # $self->message( 3, "Going to validate cookie value '$value'" );
     if( $value->index( '.' ) == -1 )
     {
         # Not an error, so we only issue a warning if warnings are enabled
-        $self->message( 3, "The cookie does not have a signature attached to it." );
         warnings::warn( "The cookie does not have a signature attached to it." ) if( warnings::enabled() );
         return( $self->false );
     }
@@ -485,12 +465,10 @@ sub is_valid
     my $sig = pop( @parts );
     my $orig = join( '.', @parts );
     my $key = $opts->{key};
-    $self->message( 3, "Original string is '$orig' and signature is '$sig' and key is '$key'." );
     try
     {
         $self->_load_class( 'Crypt::Mac::HMAC', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
         my $check = Crypt::Mac::HMAC::hmac_b64( 'SHA256', "$key", "$orig" );
-        # $self->message( 3, "Is check '$check' same as signature '$sig' ? ", ( $check eq $sig ? 'yes' : 'no' ) );
         return( "$check" eq "$sig" );
     }
     catch( $e )
@@ -625,7 +603,6 @@ sub same_as
     my $this = shift( @_ );
     return(0) if( !$this || !$self->_is_object( $this ) );
     my $fields = $self->fields;
-    # $self->message( 4, "Checking cookie \"", $self->name, "\" against \"", ( $this->can( 'name' ) ? $this->name : "$this" ), "\"." );
     foreach my $f ( @$fields )
     {
         my $v = $self->$f;
@@ -637,7 +614,6 @@ sub same_as
             ( defined( $v ) && length( "$v" ) != length( "$v2" ) ) ||
             ( defined( $v ) && defined( $v2 ) && "$v" ne "$v2" ) )
         {
-            # $self->message( 4, "Our property '$f' ($v) [", ( defined( $v ) ? 'defined' : 'undefined' ), "]  does not match with the other object property value ($v2) [", ( defined( $v2 ) ? 'defined' : 'undefined' ), "]." );
             return(0);
         }
     }
@@ -691,14 +667,11 @@ sub _encrypt_objects
     {
         $self->_load_class( 'Crypt::Mode::CBC', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
         $self->_load_class( 'Bytes::Random::Secure' ) || return( $self->pass_error );
-        # $self->message( 4, "Algorithm is '$algo'" );
         my $crypt = Crypt::Mode::CBC->new( "$algo" ) || return( $self->error( "Unable to create a Crypt::Mode::CBC object." ) );
-        # $self->message( 4, "Crypt object is '$crypt'" );
         my $class = "Crypt::Cipher::${algo}";
         $self->_load_class( $class ) || return( $self->pass_error );
         my $key_len = $class->keysize;
         my $block_len = $class->blocksize;
-        $self->message( 4, "Key size: $key_len and block size: $block_len and our key size is '", CORE::length( $key ), "'." );
         return( $self->error( "The size of the key provided (", CORE::length( $key ), ") does not match the minimum key size required for this algorithm \"$algo\" (${key_len})." ) ) if( CORE::length( $key ) < $key_len );
         # Generate an "IV", i.e. Initialisation Vector based on the required block size
         $iv ||= $self->initialisation_vector;
@@ -760,7 +733,7 @@ sub TO_JSON
 
 1;
 
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -860,7 +833,7 @@ Cookie - Cookie Object with Encryption or Signature
 
 =head1 VERSION
 
-    v0.1.13
+    v0.2.0
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,43 @@
 Revision history for Perl extension Math::DifferenceSet::Planar.
 
+0.016   Sat, 16 Jul 2022 22:11:14 +0200
+        - bug fix for a corner case in find_delta
+        - integration of linear mapping algorithms
+        - new methods:
+          - common_elements
+          - compare
+          - find_linear_map
+          - find_all_linear_maps
+          - from_elements_fast
+          - gap_canonize
+          - iterate_known_spaces
+          - known_space_count
+          - known_space_desc
+          - known_space_max_order
+          - known_space_min_order
+          - largest_gap
+          - same_plane
+          - zeta
+          - zeta_canonize
+        - deprecated method:
+          - check_elements
+        - new examples:
+          - A3333852-essential.pl
+          - A3333852.pl
+          - pds_gap_canonize
+          - pds_largest_gap
+          - pds_linear_maps
+          - pds_randomize
+          - pds_rotators
+          - pds_spaces
+          - pds_zeta
+          - pds_zeta_canonize
+        - improved examples:
+          - numlist_sort
+          - random_pds
+        - improved documentation
+        - more unit tests
+
 0.015   Fri, 16 Jul 2021 21:23:57 +0200
         - fixed an inefficiency in iterate_rotators()
         - fixed documentation typos

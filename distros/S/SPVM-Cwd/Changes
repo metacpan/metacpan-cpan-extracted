@@ -1,4 +1,10 @@
+0.02 2022-07-15
+  [New Features]
+    * Add the following methods.
+      static method realpath : string ($file : string)
+      static method abs_path : string ($file :string)
+
 0.01 2022-07-06
   
   * First release
-  
+

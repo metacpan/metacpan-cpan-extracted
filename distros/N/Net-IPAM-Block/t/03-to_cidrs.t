@@ -37,4 +37,7 @@ is_deeply( $clist, [ $cidr1, $cidr2 ], 'wantarray' );
 $clist = Net::IPAM::Block->new('::/0')->to_cidrs;
 is_deeply( $clist, [ Net::IPAM::Block->new('::/0') ], 'return the cidr' );
 
+$clist = Net::IPAM::Block->new('::-ffff:ffff:ffff:ffff:ffff:ffff:ffff:fffe')->to_cidrs;
+is( scalar @$clist, 128, '"::-ffff:ffff:ffff:ffff:ffff:ffff:ffff:fffe" -> long cidr list' );
+
 done_testing();

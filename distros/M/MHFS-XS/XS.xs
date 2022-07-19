@@ -216,7 +216,8 @@ bool _MHFS_XS_Track_get_flac(MHFS_XS_Track *track, uint64_t start, size_t count)
             free(rawSamples);
             goto _MHFS_XS_Track_get_flac_cleanup;       
         }
-        for(unsigned i = 0; i < (count * pFlac->channels) ; i++)
+        unsigned i;
+        for( i = 0; i < (count * pFlac->channels) ; i++)
         {
             fbuffer[i] = raw16Samples[i];       
         }
@@ -230,7 +231,8 @@ bool _MHFS_XS_Track_get_flac(MHFS_XS_Track *track, uint64_t start, size_t count)
             free(rawSamples);
             goto _MHFS_XS_Track_get_flac_cleanup;       
         }
-        for(unsigned i = 0; i < (count * pFlac->channels) ; i++)
+        unsigned i;
+        for( i = 0; i < (count * pFlac->channels) ; i++)
         {
             // drflac outputs 24 bit audio to the higher bits of int32_t, we need it represented as a normal integer for libflac
             fbuffer[i] = sar(raw32Samples[i], 8);                       
@@ -350,7 +352,8 @@ bool _MHFS_XS_Track_wavvfs_read_range(MHFS_XS_Track *track, uint64_t start, uint
         }
 
         unsigned flacbufferpos = track->largest_offset-bytesleft;
-        for(unsigned sampleindex = skipsample; bytesleft > 0; sampleindex++)
+        unsigned sampleindex;
+        for( sampleindex = skipsample; bytesleft > 0; sampleindex++)
         {
             unsigned tocopy = (bytesleft > samplesize ? samplesize : bytesleft) - skipbytes;
             

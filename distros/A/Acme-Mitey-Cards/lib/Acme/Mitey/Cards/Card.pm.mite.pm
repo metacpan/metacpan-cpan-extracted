@@ -6,17 +6,22 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Acme::Mitey::Cards::Mite";
-    our $MITE_VERSION = "0.006012";
+    our $MITE_VERSION = "0.007003";
 
     BEGIN {
-        *bare  = \&Acme::Mitey::Cards::Mite::bare;
-        *carp  = \&Acme::Mitey::Cards::Mite::carp;
-        *false = \&Acme::Mitey::Cards::Mite::false;
-        *lazy  = \&Acme::Mitey::Cards::Mite::lazy;
-        *ro    = \&Acme::Mitey::Cards::Mite::ro;
-        *rw    = \&Acme::Mitey::Cards::Mite::rw;
-        *rwp   = \&Acme::Mitey::Cards::Mite::rwp;
-        *true  = \&Acme::Mitey::Cards::Mite::true;
+        require Scalar::Util;
+        *bare    = \&Acme::Mitey::Cards::Mite::bare;
+        *blessed = \&Scalar::Util::blessed;
+        *carp    = \&Acme::Mitey::Cards::Mite::carp;
+        *confess = \&Acme::Mitey::Cards::Mite::confess;
+        *croak   = \&Acme::Mitey::Cards::Mite::croak;
+        *false   = \&Acme::Mitey::Cards::Mite::false;
+        *guard   = \&Acme::Mitey::Cards::Mite::guard;
+        *lazy    = \&Acme::Mitey::Cards::Mite::lazy;
+        *ro      = \&Acme::Mitey::Cards::Mite::ro;
+        *rw      = \&Acme::Mitey::Cards::Mite::rw;
+        *rwp     = \&Acme::Mitey::Cards::Mite::rwp;
+        *true    = \&Acme::Mitey::Cards::Mite::true;
     }
 
     sub new {
@@ -38,9 +43,8 @@
                       and $args->{"deck"}->isa(q[Acme::Mitey::Cards::Deck]);
                 }
               )
-              or Acme::Mitey::Cards::Mite::croak
-              "Type check failed in constructor: %s should be %s", "deck",
-              "Deck";
+              or croak "Type check failed in constructor: %s should be %s",
+              "deck", "Deck";
             $self->{"deck"} = $args->{"deck"};
         }
         require Scalar::Util && Scalar::Util::weaken( $self->{"deck"} )
@@ -56,16 +60,15 @@
                       or ref( \( my $val = $args->{"reverse"} ) ) eq 'SCALAR';
                 }
               }
-              or Acme::Mitey::Cards::Mite::croak
-              "Type check failed in constructor: %s should be %s", "reverse",
-              "Str";
+              or croak "Type check failed in constructor: %s should be %s",
+              "reverse", "Str";
             $self->{"reverse"} = $args->{"reverse"};
         }
 
         # Enforce strict constructor
         my @unknown = grep not(/\A(?:deck|reverse)\z/), keys %{$args};
         @unknown
-          and Acme::Mitey::Cards::Mite::croak(
+          and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         # Call BUILD methods
@@ -145,8 +148,7 @@
     else {
         *deck = sub {
             @_ > 1
-              ? Acme::Mitey::Cards::Mite::croak(
-                "deck is a read-only attribute of @{[ref $_[0]]}")
+              ? croak("deck is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"deck"};
         };
     }
@@ -154,8 +156,7 @@
     # Accessors for reverse
     sub reverse {
         @_ > 1
-          ? Acme::Mitey::Cards::Mite::croak(
-            "reverse is a read-only attribute of @{[ref $_[0]]}")
+          ? croak("reverse is a read-only attribute of @{[ref $_[0]]}")
           : (
             exists( $_[0]{"reverse"} ) ? $_[0]{"reverse"} : (
                 $_[0]{"reverse"} = do {
@@ -169,14 +170,38 @@
                               'SCALAR';
                         }
                       }
-                      or Acme::Mitey::Cards::Mite::croak(
-                        "Type check failed in default: %s should be %s",
+                      or croak( "Type check failed in default: %s should be %s",
                         "reverse", "Str" );
                     $default_value;
                 }
             )
           );
     }
+
+    our %SIGNATURE_FOR;
+
+    $SIGNATURE_FOR{"to_string"} = sub {
+        my $__NEXT__ = shift;
+
+        my ( %tmp, $tmp, @head );
+
+        @_ == 1
+          or croak(
+            "Wrong number of parameters in signature for %s: %s, got %d",
+            "to_string", "expected exactly 1 parameters",
+            scalar(@_)
+          );
+
+        @head = splice( @_, 0, 1 );
+
+        # Parameter $head[0] (type: Defined)
+        ( defined( $head[0] ) )
+          or croak(
+            "Type check failed in signature for to_string: %s should be %s",
+            "\$_[0]", "Defined" );
+
+        return ( &$__NEXT__( @head, @_ ) );
+    };
 
     1;
 }

@@ -17,7 +17,7 @@ name: Try-ALRM
 resources:
   homepage: https://github.com/oodler577/p5-Try-ALRM
   repository: https://github.com/oodler577/p5-Try-ALRM.git
-version: '0.3'
+version: '0.4'
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

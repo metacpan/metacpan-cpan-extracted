@@ -20,12 +20,12 @@ sub _test_values {
     my @values = map { [ $iter->current, $iter->next ] } 1 .. $npull;
 
     my @expected = (
-        [ undef, [ 0, 2 ] ],
+        [ undef,    [ 0, 2 ] ],
         [ [ 0, 2 ], [ 0, 3 ] ],
         [ [ 0, 3 ], [ 1, 2 ] ],
         [ [ 1, 2 ], [ 1, 3 ] ],
         [ [ 1, 3 ], undef ],
-        [ undef, undef ],
+        [ undef,    undef ],
     )[ $begin .. $end ];
 
     is( \@values, \@expected, "values are correct" )
@@ -65,12 +65,12 @@ subtest "basic" => sub {
             is(
                 \@values,
                 [
-                    [ undef, { a => 0, b => 2 } ],
+                    [ undef,              { a => 0, b => 2 } ],
                     [ { a => 0, b => 2 }, { a => 0, b => 3 } ],
                     [ { a => 0, b => 3 }, { a => 1, b => 2 } ],
                     [ { a => 1, b => 2 }, { a => 1, b => 3 } ],
                     [ { a => 1, b => 3 }, undef ],
-                    [ undef, undef ],
+                    [ undef,              undef ],
                 ],
                 "values are correct"
             ) or diag pp( \@values );
@@ -102,20 +102,20 @@ subtest "rewind" => sub {
 
 subtest "only one" => sub {
 
-    my $iter = iproduct( [ 1 ], [ 2, 3 ] );
+    my $iter = iproduct( [1], [ 2, 3 ] );
 
     my @values = map { [ $iter->current, $iter->next ] } 1 .. 3;
 
-            is(
-                \@values,
-               array {
-                   item [ undef, [ 1, 2] ];
-                   item [ [1,2], [ 1, 3] ];
-                   item [ [1,3], undef ];
-                   end;
-               },
-                "values are correct"
-            ) or diag pp( \@values );
+    is(
+        \@values,
+        array {
+            item [ undef, [ 1, 2 ] ];
+            item [ [ 1, 2 ], [ 1, 3 ] ];
+            item [ [ 1, 3 ], undef ];
+            end;
+        },
+        "values are correct"
+    ) or diag pp( \@values );
 
 
 };
@@ -155,10 +155,7 @@ subtest "freeze" => sub {
 
             is(
                 \@values,
-                [
-                    [ undef, { a => 0, b => 2 } ],
-                    [ { a => 0, b => 2 }, { a => 0, b => 3 } ],
-                ],
+                [ [ undef, { a => 0, b => 2 } ], [ { a => 0, b => 2 }, { a => 0, b => 3 } ], ],
                 "values are correct"
             ) or diag pp( \@values );
 
@@ -178,7 +175,7 @@ subtest "freeze" => sub {
                     [ { a => 0, b => 3 }, { a => 1, b => 2 } ],
                     [ { a => 1, b => 2 }, { a => 1, b => 3 } ],
                     [ { a => 1, b => 3 }, undef ],
-                    [ undef, undef ],
+                    [ undef,              undef ],
                 ],
                 "values are correct"
             ) or diag pp( \@values );

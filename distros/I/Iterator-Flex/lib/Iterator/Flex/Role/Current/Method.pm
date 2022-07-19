@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Current::Method;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Role::Tiny;
 
@@ -49,7 +49,7 @@ Iterator::Flex::Role::Current::Method - Implement C<current> as a method
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 METHODS
 
@@ -60,6 +60,8 @@ version 0.14
    $iterator->current;
 
 Returns the current value.
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

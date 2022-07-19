@@ -7,6 +7,7 @@
     builder/dod-check.pl    # check project against Definition of Done
     builder/dod-check.sh    # pretty-print wrapper for builder/dod-check.pl,
                             # also fixes various file permissions
+    builder/syntas-check.sh # simple syntax check for all .pm files
 	builder/update-language.pl --check
 	                        # check default language file (EN) for completeness
 	builder/update-language.pl DE

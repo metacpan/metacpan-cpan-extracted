@@ -1,5 +1,5 @@
 {
-   "abstract" : "Perl bindings for nauty",
+   "abstract" : "Perl bindings for Nauty",
    "author" : [
       "Andrius Merkys <merkys@cpan.org>"
    ],
@@ -46,7 +46,7 @@
          "web" : "https://github.com/merkys/graph-nauty"
       }
    },
-   "version" : "0.4.0",
+   "version" : "0.5.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

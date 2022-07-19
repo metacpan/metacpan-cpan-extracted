@@ -76,4 +76,9 @@ my $complex_matrix=(1+sequence(2,2))*$i;
 $got=$complex_matrix->mdet;
 ok(fapprox($got, 2), "Complex mdet") or diag "got $got";
 
+$A = pdl '[[1+i 2+i][3+i 4+i]]';
+$B = identity(2);
+ok fapprox($got = $A x $B, $A), 'complex first' or diag "got: $got";
+ok fapprox($got = $B x $A, $A), 'complex second' or diag "got: $got";
+
 done_testing;

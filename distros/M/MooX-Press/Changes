@@ -6,6 +6,15 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <https://github.com/tobyink/p5-moox-press/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.086	2022-07-19
+
+ [ Packaging ]
+ - Raise the minimum versions of certain required dependencies.
+
+ [ Other ]
+ - Updated: Cope with changes to Slurpy in latest
+   Type::Params/Types::Standard. This actually simplifies things.
+
 0.085	2022-06-19
 
  [ Bug Fixes ]

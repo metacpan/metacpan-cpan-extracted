@@ -1,0 +1,93 @@
+Changes since 5.0.0
+Fix non-pthread build
+	
+Changes since 4.0.0
+	
+Multithread support for Linux and Windows
+Fix NFS4 behavior of chmod/chown/utimes
+Add marshalling / unmarshalling of various NFSv4.1 structures (but not 4.1 support)
+PS3 support
+PS2 EE support
+Support escaped characters in the URL
+Fix MINGW build
+
+Changes since 3.0.0
+
+Fix the versioning in makerpms.sh
+Fix some compile issues in the test programs.
+NFSv3: skip commit on close if the file has not been written to.
+Add nfs_umount() to NFSv3
+Add nfs_statvfs64()
+Fix invalid shift of pid_t when generating rpc->xid
+Compile fixes for Mac OSX
+Fix for dup2() on Windows
+NFSv4 fix for directory handling
+Improvements to configure/bulding
+
+Changes since 2.0.0
+
+NFSv4 support.
+lockf() support (NFSv4 only).
+fcntl() support for locking (NFSv4 only).
+Add CMake support.
+URL arguments to select NFS version.
+URL argument to set nfsport. This allows NFSv4 to work for
+ servers without portmapper support.
+URL argument to set he mount port.
+NFSv4: use getpwnam to map NFSv4 (Ganesha) when passing uid/gid
+ as a user/group name insead of as a uid/gid.
+Added nfs-fh: a simle utility to print the filehandle for a nfs file.
+Win32 build fixes.
+Add a new open2() function that takes a mode argument.
+Add a testsuite for libnfs.
+	
+
+
+Changes since 1.11.0
+
+BUGS
+====
+Fix NULL pointer crash in nfs_link().
+
+Clamp read/write size for servers (Ganesha) that offer very large io sizes
+instead of failing to connect to the export.
+
+Tell the server to commit all data to stable storage when we close files.
+
+Double free fix: don't call rpc_free_pdu() after rpc_queue_pdu() failure.
+
+Fix for memory leak in rpc_allocate_*().
+
+Fixes to build nfs-ls and nfs-cp on win32.
+
+Abort the mount process correctly if MOUNT/MNT returns error or is cancelled.
+
+Fix memory leak in error path in nfs_create_2_cb().
+
+Fix leak of rpc->inbuf if we destroy the context while we still have PDUs
+in flight.
+
+
+FEATURES
+========
+Add O_NOFOLLOW support for nfs_open()
+
+Add a new mkdir2 command that also takes a mode argument.
+
+Add a new readlink2 command that avoids having to preallocate the buffer.
+
+Add support for RPC timeouts for both the sync and async interfaces.
+
+Build fixes for Mingw and Cygwin
+
+Update README to document two new Windows builds
+
+Use SOCK_CLOEXEC for the sockets
+
+Make rpc_set{g|u}id() public
+
+Performance optimization: socket: Batch pdu read in rpc_read_from_socket
+
+Low level support for NFSv4 and some examples
+
+Support for building RPC servers

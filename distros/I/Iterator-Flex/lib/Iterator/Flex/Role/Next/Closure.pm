@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Next::Closure;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Iterator::Flex::Utils 'NEXT';
 use Scalar::Util;
@@ -30,12 +30,12 @@ use namespace::clean;
 sub _construct_next ( $class, $ipar, $ ) {
 
     # ensure we don't hold any strong references in the subroutine
-    my $sub = $ipar->{+NEXT} // $class->_throw( parameter =>  "Missing 'next' parameter" );
-    Scalar::Util::weaken $ipar->{+NEXT};
+    my $sub = $ipar->{ +NEXT } // $class->_throw( parameter => "Missing 'next' parameter" );
+    Scalar::Util::weaken $ipar->{ +NEXT };
     return $sub;
 }
 
-sub next ( $self ) { &{ $self } }
+sub next ( $self ) { &{$self}() }
 *__next__ = \&next;
 
 1;
@@ -62,7 +62,7 @@ Iterator::Flex::Role::Next::Closure - Construct a next() method for iterators wi
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 METHODS
 
@@ -76,6 +76,8 @@ Wrapper for iterator next callback optimized for the case where
 iterator exhaustion is handled by the iterator.  Typically this means
 the iterator closure calls C<< $self->signal_exhaustion >>, which is added
 by a specific C<Iterator::Flex::Role::Exhaustion> role.
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

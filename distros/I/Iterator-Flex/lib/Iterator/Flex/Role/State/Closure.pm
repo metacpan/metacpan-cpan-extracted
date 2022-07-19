@@ -5,7 +5,7 @@ package Iterator::Flex::Role::State::Closure;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Iterator::Flex::Utils qw( :default ITERATOR STATE :IterStates );
 
@@ -22,11 +22,11 @@ use namespace::clean;
 
 
 
-sub set_state ($self, $state ) {
+sub set_state ( $self, $state ) {
 
     ${ $REGISTRY{ refaddr $self }{ +ITERATOR }{ +STATE } } = $state
-      unless ( ${ $REGISTRY{ refaddr $self }{ +ITERATOR }{ +STATE } }
-        // +IterState_CLEAR ) == +IterState_ERROR;
+      unless ( ${ $REGISTRY{ refaddr $self }{ +ITERATOR }{ +STATE } } // +IterState_CLEAR )
+      == +IterState_ERROR;
 }
 
 
@@ -37,9 +37,12 @@ sub set_state ($self, $state ) {
 
 
 
-sub get_state ($self) {
-    ${ $REGISTRY{ refaddr $self }{+ITERATOR}{+STATE} };
+sub get_state ( $self ) {
+    ${ $REGISTRY{ refaddr $self }{ +ITERATOR }{ +STATE } };
 }
+
+with 'Iterator::Flex::Role::State';
+
 1;
 
 #
@@ -64,7 +67,7 @@ Iterator::Flex::Role::State::Closure - Iterator State is kept in a closure varia
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 METHODS
 
@@ -79,6 +82,8 @@ Set the iterator's state to $state
   $iter->set_state( $state );
 
 Get the iterator's state;
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

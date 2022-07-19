@@ -6,7 +6,7 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = '2.10';
+our $VERSION = '2.11';
 
 use Tie::RefHash;
 use HTTP::Request 1.30;
@@ -897,16 +897,35 @@ sub set_fields {
 
     my $form = $self->current_form or $self->die( 'No form defined' );
 
-    while ( my ( $field, $value ) = each %fields ) {
+    FIELD:
+    for my $field ( keys %fields ) {
+        my $value = $fields{$field};
+
         if ( ref $value eq 'ARRAY' ) {
             $form->find_input( $field, undef,
                          $value->[1])->value($value->[0] );
         }
         else {
+            if ( ref $value eq 'SCALAR' ) {
+                my $input = $form->find_input( $field );
+
+                if ( not defined int $$value ) {
+                    warn "Only references to integers are supported. Using 0.";
+                    $$value = 0;
+                }
+
+                my @possible_values = $input->possible_values;
+                if ($#possible_values < $$value) {
+                    warn "Not enough options for $field to select index $$value";
+                    next FIELD;
+                }
+                $value = $possible_values[ $$value ];
+            }
+
             $form->value($field => $value);
         }
-    } # while
-} # set_fields()
+    }
+}
 
 
 sub set_visible {
@@ -953,6 +972,13 @@ sub tick {
     # loop though all the inputs
     my $index = 1;
     while ( my $input = $self->current_form->find_input( $name, 'checkbox', $index ) ) {
+        # Sometimes the HTML is malformed and there is no value for the check
+        # box, so we just return if the value passed is an empty string
+        # (and the form input is found)
+        if ($value eq '') {
+            $input->value($set ? $value : undef);
+            return;
+        }
         # Can't guarantee that the first element will be undef and the second
         # element will be the right name
         foreach my $val ($input->possible_values()) {
@@ -1818,7 +1844,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 2.10
+version 2.11
 
 =head1 SYNOPSIS
 
@@ -2850,16 +2876,29 @@ false and calls C<< $self->warn() >> with an error message.
 
 =head2 $mech->set_fields( $name => $value ... )
 
+=head2 $mech->set_fields( $name => \@nvalue_and_instance_number )
+
+=head2 $mech->set_fields( $name => \$value_instance_number )
+
 This method sets multiple fields of the current form. It takes a list
 of field name and value pairs. If there is more than one field with
 the same name, the first one found is set. If you want to select which
 of the duplicate field to set, use a value which is an anonymous array
 which has the field value and its number as the 2 elements.
 
-        # set the second foo field
+        # set the second $name field to 'foo'
         $mech->set_fields( $name => [ 'foo', 2 ] );
 
 The fields are numbered from 1.
+
+For fields that have a predefined set of values, you may also provide a
+reference to an integer, if you don't know the options for the field, but you
+know you just want (e.g.) the first one.
+
+        # select the first value in the $name select box
+        $mech->set_fields( $name => \0 );
+        # select the last value in the $name select box
+        $mech->set_fields( $name => \-1 );
 
 This applies to the current form.
 
@@ -2903,9 +2942,17 @@ C<set_visible> returns the number of values set.
 =head2 $mech->tick( $name, $value [, $set] )
 
 "Ticks" the first checkbox that has both the name and value associated
-with it on the current form.  Dies if there is no named check box for
-that value.  Passing in a false value as the third optional argument
-will cause the checkbox to be unticked.
+with it on the current form.  If there is no value to the input, just
+pass an empty string as the value.  Dies if there is no named checkbox
+for the value given, if a value is given.  Passing in a false value
+as the third optional argument will cause the checkbox to be unticked.
+The third value does not need to be set if you wish to merely tick the
+box.
+
+    $mech->tick('extra', 'cheese');
+    $mech->tick('extra', 'mushrooms');
+
+    $mech->tick('no_value', ''); # <input type="checkbox" name="no_value">
 
 =head2 $mech->untick($name, $value)
 

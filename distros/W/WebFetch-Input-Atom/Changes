@@ -1,0 +1,6 @@
+Revision history for WebFetch::Input::Atom
+
+0.1.0 2022-07-18T23:55:22-07:00 America/Los_Angeles
+ [MINOR]
+ - reorg out from WebFetch distro to new module to separate its
+   dependencies

@@ -3,7 +3,7 @@ use warnings;
 
 package Try::ALRM;
 
-our $VERSION = q{0.3};
+our $VERSION = q{0.4};
 
 use Exporter qw/import/;
 our @EXPORT    = qw(try ALRM timeout);
@@ -14,7 +14,7 @@ our $TIMEOUT = 60;
 # setter/getter for $Try::ALRM::TIMEOUT
 sub timeout (;$) {
     my $timeout = shift;
-    if ($timeout) {
+    if ( defined $timeout ) {
         _assert_timeout($timeout);
         $TIMEOUT = $timeout;
     }
@@ -26,35 +26,47 @@ sub try (&;@) {
 
     # local $TIMEOUT incase trailing timeout is provided
     # after 'try {}' or after 'ALRM {}'
-    local $TIMEOUT   = $TIMEOUT;
+    local $TIMEOUT = $TIMEOUT;
     local $SIG{ALRM} = $SIG{ALRM};
 
-    # if there NO 'try'
-    if ( @_ == 0 ) {
-      die qq{You are not even try'ing! A lexical block to execute is required!\n};
-    }
-    #   try { ... };
-    elsif ( @_ == 1 ) {
-      $TIMEOUT = $TIMEOUT;
-    }
-    #   try { ... } 5;
-    elsif ( @_ == 2 and ref($CATCH) !~ m/^CODE$|::/ ) {
-      $TIMEOUT = $_[1];
-    }
-    #   try { ... } ALRM { ... };
-    elsif ( @_ == 2 and ref($CATCH) =~ m/^CODE$|::/ ) {
-      $TIMEOUT = $TIMEOUT;
-      $SIG{ALRM} = $CATCH;
-    }
-    #   try { ... } ALRM { ... } 5;
-    elsif ( @_ == 3 ) {
-      $TIMEOUT = $_[2];
-      $SIG{ALRM} = $CATCH;
-    }
+    my $num_args = scalar @_;
+    my $dispatch = {
+
+        # if there NO 'try'
+        0 => sub { die qq{You are not even try'ing! A lexical block to execute is required!\n}; },
+
+        #   try { ... }; - basically no-op
+        1 => sub {
+            return ( $TIMEOUT, $SIG{ALRM} );
+        },
+
+        # handle 2 block forms, see in anonymous sub
+        2 => sub {
+
+            #   try { ... } 5;
+            if ( ref($CATCH) !~ m/^CODE$|::/ ) {
+                return ( $_[1], $SIG{ALRM} );
+            }
+
+            #   try { ... } ALRM { ... };
+            elsif ( ref($CATCH) =~ m/^CODE$|::/ ) {
+                $SIG{ALRM} = $CATCH;
+                return ( $TIMEOUT, $SIG{ALRM} );
+            }
+        },
+
+        #   try { ... } ALRM { ... } 5;
+        3 => sub {
+            $SIG{ALRM} = $CATCH;
+            return ( $_[2], $SIG{ALRM} );
+        },
+    };
+
+    ( $TIMEOUT, $SIG{ALRM} ) = $dispatch->{$num_args}->(@_);
 
     # final check on the value of $TIMEOUT
     if ($TIMEOUT) {
-      _assert_timeout($TIMEOUT);
+        _assert_timeout($TIMEOUT);
     }
 
     # do trad alarm stuff
@@ -109,14 +121,13 @@ Is equivalent to,
 =head1 DESCRIPTION
 
 Provides I<try/catch>-like semantics for handling code being guarded by
-C<alarm>. Because it's localized and potentially expected, C<ALRM> signals
+C<alarm>. Because it's localized and I<probably> expected, C<ALRM> signals
 can be treated as exceptions.
 
 C<alarm> is extremely useful, but it can be cumbersome do add in code. The
 goal of this module is to make it more idiomatic, and therefore more accessible.
 It also allows for the C<ALRM> signal itself to be treated more semantically
 as an exception. Which makes it a more natural to write and read in Perl.
-That's the idea, anyway.
 
 Internally, the I<keywords> are implemented as prototypes and uses the same
 sort of coersion of a lexical bloc to a subroutine reference that is used
@@ -135,6 +146,12 @@ This module exports 3 methods:
 =item C<timeout>
 
 =back
+
+=head1 PACKAGE ENVIRONMENT
+
+This module exposes C<$Try::ALRM::TIMEOUT> as a package variable; it can be
+modified in traditional ways. The module also provides ways to deal with it,
+continue reading to learn how.
 
 =head2 The C<try> keyword
 

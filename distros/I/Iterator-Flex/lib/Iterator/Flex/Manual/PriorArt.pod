@@ -13,7 +13,7 @@ Iterator::Flex::Manual::PriorArt - Other Iterator Models
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 DESCRIPTION
 
@@ -74,6 +74,8 @@ L<Iterator>
 L<Iterator::Simple>
 
 =back
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

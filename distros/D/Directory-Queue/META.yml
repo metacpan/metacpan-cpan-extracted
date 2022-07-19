@@ -3,7 +3,6 @@ abstract: 'object oriented interface to a directory based queue'
 author:
   - 'Lionel Cons <lionel.cons@cern.ch>'
 build_requires:
-  Encode: 0
   File::Temp: 0
   Test::More: 0
 configure_requires:
@@ -20,7 +19,8 @@ no_index:
     - t
     - inc
 requires:
+  Encode: 0
   No::Worries: 1.4
   POSIX: 0
   Time::HiRes: 0
-version: 2.1
+version: 2.2

@@ -4,7 +4,7 @@
       "Branislav Zahradn\u00edk <barney@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -115,7 +115,7 @@
          "web" : "https://github.com/rustyconover/net-amazon-s3"
       }
    },
-   "version" : "0.99",
+   "version" : "0.991",
    "x_contributors" : [
       "Aaron Crane <arc@cpan.org>",
       "Ali Anari <ali@anari.me>",

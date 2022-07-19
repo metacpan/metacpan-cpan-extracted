@@ -3,6 +3,7 @@
 static void fail_empty (json_parse_t * parser)
 {
     parser->bad_type = json_initial_state;
+    parser->expected = 0;
     parser->error = json_error_empty_input;
     failbadinput (parser);
 }

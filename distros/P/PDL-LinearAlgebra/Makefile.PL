@@ -10,6 +10,7 @@ my @pkgs = qw(lapack blas);
 our $libs0 = (
   eval {require PkgConfig; join ' ', map PkgConfig->find($_)->get_ldflags, @pkgs} ||
   eval {require ExtUtils::PkgConfig; join ' ', map ExtUtils::PkgConfig->libs($_), @pkgs} ||
+  find_libs() ||
   `pkg-config @pkgs --libs` ||
   '-L/usr/lib/atlas -llapack -lblas -latlas'
 ) . ' ' . ExtUtils::F77->runtime;
@@ -74,3 +75,27 @@ WriteMakefile(
   dist => { PREOP=>'$(PERL) -MPDL::Core::Dev -e pdlpp_mkgen $(DISTVNAME)' }, # GENERATED subdir in dist tarball
   clean => { FILES => '*~' },
 );
+
+
+sub find_libs {
+  return if $^O !~ /linux/i;
+
+  # in performance order based on libraries I've used
+  # for xnec2c in Ubuntu, Debian, SuSE, CentOS, etc.
+  # See comments here for detail:
+  #    https://github.com/KJ7LNW/xnec2c/blob/master/src/mathlib.c#L29
+  my @libs = qw/
+    openblaso
+    openblas_openmp
+    openblasp
+    openblas_pthreads
+    openblas
+    openblas_serial
+    mkl_rt/;
+
+  for my $l (@libs) {
+    return "-l$l" if (check_lib(lib => $l));
+  }
+
+  return;
+}

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental qw( signatures declared_refs refaliasing );
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Iterator::Flex::Utils qw( RETURN STATE EXHAUSTION :IterAttrs :IterStates );
 use Iterator::Flex::Factory;
@@ -74,15 +74,15 @@ sub new ( $class, @args ) {
     }
     else {
         $class->_throw( parameter => 'expected an even number of arguments' )
-          if  @args % 2;
+          if @args % 2;
 
         while ( @args ) {
-            push @keys, shift @args;
+            push @keys,      shift @args;
             push @iterators, shift @args;
         }
-    };
+    }
 
-    $class->SUPER::new( { keys => \@keys, depends =>\@iterators, value => [] }, $pars );
+    $class->SUPER::new( { keys => \@keys, depends => \@iterators, value => [] }, $pars );
 }
 
 sub construct ( $class, $state ) {
@@ -95,16 +95,14 @@ sub construct ( $class, $state ) {
       = @{$state}{qw[ depends keys value thaw ]};
 
     # transform into iterators if required.
-    my @iterators = map {
-        Iterator::Flex::Factory->to_iterator( $_, { (+EXHAUSTION) => +RETURN } )
-    } @depends;
+    my @iterators
+      = map { Iterator::Flex::Factory->to_iterator( $_, { ( +EXHAUSTION ) => +RETURN } ) } @depends;
 
     # can only work if the iterators support a rewind method
     $class->_throw( parameter => "all iterables must provide a rewind method" )
-      unless List::Util::all  { defined $class->_can_meth( $_, 'rewind' ) } @iterators;
+      unless List::Util::all { defined $class->_can_meth( $_, 'rewind' ) } @iterators;
 
-    $class->_throw(
-        parameter => "number of keys not equal to number of iterators" )
+    $class->_throw( parameter => "number of keys not equal to number of iterators" )
       if @keys && @keys != @iterators;
 
     @value = map { $_->current } @iterators
@@ -116,11 +114,11 @@ sub construct ( $class, $state ) {
     my $iterator_state;
     my %params = (
 
-        (+_SELF) => \$self,
+        ( +_SELF ) => \$self,
 
-        (+STATE) => \$iterator_state,
+        ( +STATE ) => \$iterator_state,
 
-        (+NEXT) => sub {
+        ( +NEXT ) => sub {
             return $self->signal_exhaustion if $iterator_state == +IterState_EXHAUSTED;
 
             # first time through
@@ -171,8 +169,8 @@ sub construct ( $class, $state ) {
             }
         },
 
-        (+CURRENT) => sub {
-            return undef if !@value;
+        ( +CURRENT ) => sub {
+            return undef                    if !@value;
             return $self->signal_exhaustion if $iterator_state eq +IterState_EXHAUSTED;
             if ( @keys ) {
                 my %value;
@@ -184,9 +182,9 @@ sub construct ( $class, $state ) {
             }
         },
 
-        (+RESET)  => sub { @value = () },
-        (+REWIND) => sub { @value = () },
-        (+_DEPENDS) => \@iterators,
+        ( +RESET )    => sub { @value = () },
+        ( +REWIND )   => sub { @value = () },
+        ( +_DEPENDS ) => \@iterators,
     );
 
     # can only freeze if the iterators support a current method
@@ -196,13 +194,13 @@ sub construct ( $class, $state ) {
       )
     {
 
-        $params{+FREEZE} = sub {
+        $params{ +FREEZE } = sub {
             return [ $class, { keys => \@keys } ];
         };
-        $params{+_ROLES} = ['Freeze'];
+        $params{ +_ROLES } = ['Freeze'];
     }
 
-    $params{+_NAME} = 'iproduct';
+    $params{ +_NAME } = 'iproduct';
     return \%params;
 }
 
@@ -239,7 +237,7 @@ Iterator::Flex::Product - An iterator which produces a Cartesian product of iter
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 METHODS
 
@@ -281,6 +279,8 @@ This iterator may be frozen only if all of the iterables support the
 C<prev> or C<__prev__> method.
 
 =back
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

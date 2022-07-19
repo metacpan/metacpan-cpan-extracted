@@ -24,6 +24,7 @@ requires "warnings" => "0";
 
 on 'test' => sub {
   requires "Crypt::OpenSSL::Guess" => "0";
+  requires "File::Spec::Functions" => "0";
   requires "File::Which" => "0";
   requires "Test::Exception" => "0";
   requires "Test::More" => "0";

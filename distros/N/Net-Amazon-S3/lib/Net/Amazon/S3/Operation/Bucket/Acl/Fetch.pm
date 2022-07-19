@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Bucket::Acl::Fetch;
 # ABSTRACT: Internal class to perform GetBucketAcl operation
-$Net::Amazon::S3::Operation::Bucket::Acl::Fetch::VERSION = '0.99';
+$Net::Amazon::S3::Operation::Bucket::Acl::Fetch::VERSION = '0.991';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Net::Amazon::S3::Operation::Bucket::Acl::Fetch - Internal class to perform GetBu
 
 =head1 VERSION
 
-version 0.99
+version 0.991
 
 =head1 DESCRIPTION
 
@@ -33,7 +33,7 @@ Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
+This software is copyright (c) 2022 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

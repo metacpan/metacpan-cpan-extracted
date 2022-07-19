@@ -44,7 +44,7 @@ Windows users see below.
     install the Text::Hunspell module.
 
     Hunspell installation example:
-    1. download an untar hunspell
+    1. download and untar hunspell
     2. cd hunspell
     3. ./configure
     4. ./make

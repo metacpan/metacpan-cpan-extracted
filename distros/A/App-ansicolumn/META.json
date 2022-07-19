@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.12",
+   "generated_by" : "Minilla/v3.1.19",
    "license" : [
       "perl_5"
    ],
@@ -44,13 +44,13 @@
          "requires" : {
             "Clone" : "0",
             "Getopt::EX" : "v1.25.0",
-            "Getopt::EX::Hashed" : "1.00",
+            "Getopt::EX::Hashed" : "1.03",
             "List::Util" : "1.45",
             "Math::RPN" : "0",
             "Term::ReadKey" : "0",
-            "Text::ANSI::Fold" : "2.11",
+            "Text::ANSI::Fold" : "2.12",
             "Text::ANSI::Fold::Util" : "0",
-            "Text::ANSI::Printf" : "1.03",
+            "Text::ANSI::Printf" : "2.01",
             "perl" : "v5.16.0"
          }
       },
@@ -63,7 +63,7 @@
    "provides" : {
       "App::ansicolumn" : {
          "file" : "lib/App/ansicolumn.pm",
-         "version" : "1.17"
+         "version" : "1.18"
       },
       "App::ansicolumn::Border" : {
          "file" : "lib/App/ansicolumn/Border.pm"
@@ -79,11 +79,12 @@
       },
       "homepage" : "https://github.com/kaz-utashiro/App-ansicolumn",
       "repository" : {
-         "url" : "git://github.com/kaz-utashiro/App-ansicolumn.git",
+         "type" : "git",
+         "url" : "https://github.com/kaz-utashiro/App-ansicolumn.git",
          "web" : "https://github.com/kaz-utashiro/App-ansicolumn"
       }
    },
-   "version" : "1.17",
+   "version" : "1.18",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

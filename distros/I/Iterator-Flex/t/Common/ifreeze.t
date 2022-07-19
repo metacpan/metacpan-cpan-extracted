@@ -28,9 +28,7 @@ sub _test_values {
         @_
     );
 
-    my @values
-      = map { [ $iter->prev, $iter->current, $iter->next ] }
-      $p{pull_begin} .. $p{pull_end};
+    my @values = map { [ $iter->prev, $iter->current, $iter->next ] } $p{pull_begin} .. $p{pull_end};
 
     my @expected = ( @{ $p{expected} } )[ $p{begin} .. $p{end} ];
 
@@ -96,9 +94,11 @@ subtest "serialize" => sub {
 };
 
 subtest "downstream can't freeze" => sub {
-    my $err = dies { ifreeze {} igrep { %_/2 } iseq( 3 ) };
-    isa_ok( $err, [ 'Iterator::Flex::Failure::parameter' ], "parameter exception" );
-    like ( "$err", qr/must provide a freeze method/, "correct message" );
+    my $err = dies {
+        ifreeze {} igrep { %_ / 2 } iseq( 3 )
+    };
+    isa_ok( $err, ['Iterator::Flex::Failure::parameter'], "parameter exception" );
+    like( "$err", qr/must provide a freeze method/, "correct message" );
 };
 
 done_testing;

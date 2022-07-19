@@ -11,6 +11,7 @@ dod-check.pl - check Definition of Done
     dod-check.pl
     dod-check.pl 1 2 3 4 5 8 9  # only run checks 1 to 9
     dod-check.pl -11 -12        # run all checks except 11 and 12
+    dod-check.pl 0		# list all steps without running them
 
 =head1 ABSTRACT
 

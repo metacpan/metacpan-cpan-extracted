@@ -1,0 +1,50 @@
+Search-Fzf
+
+fzf is a powerful command line fuzzy search tool (https://github.com/junegunn/fzf).
+Using Search::Fzf, You can use fzf's fuzzy query functionality as a module
+within a Perl process.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+
+	Search::Fzf uses the regex library to split fields, by default std::regex
+	is used. For better performance, libpcre2 can be used. You should first 
+	install the pcre2 library(http://www.pcre.org/), Then run Makefile.PL 
+	with arguments DEFINE="-DUSE_PCRE_REGEX".
+
+	perl Makefile.PL DEFINE="-DUSE_PCRE_REGEX"
+
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Search::Fzf
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Search-Fzf
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Search-Fzf
+
+    Search CPAN
+        https://metacpan.org/release/Search-Fzf
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2022 by liyao.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

@@ -1,0 +1,6 @@
+Revision history for WebFetch::Output::TT
+
+0.1.0 2022-07-18T23:56:09-07:00 America/Los_Angeles
+ [MINOR]
+ - reorg out from WebFetch distro to new module to separate its
+   dependencies

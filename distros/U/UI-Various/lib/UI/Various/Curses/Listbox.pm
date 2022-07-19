@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use UI::Various::core;
 use UI::Various::Listbox;
@@ -154,6 +154,26 @@ sub _remove($$)
     defined $self->{on_select}  and  $self->{no_on_select} = 1;
     $self->_cui->set_selection(@selected);
     defined $self->{on_select}  and  delete $self->{no_on_select};
+    $self->_cui->intellidraw();
+}
+
+#########################################################################
+
+=head2 B<_replace> - replace all elements
+
+C<PoorTerm>'s specific implementation of
+L<UI::Various::Listbox::replace|UI::Various::Listbox/replace - replace all
+elements>
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+sub _replace($@)
+{
+    my ($self) = shift;
+    $self->_cui->clear_selection();
+    $self->_cui->values($self->{texts});
     $self->_cui->intellidraw();
 }
 

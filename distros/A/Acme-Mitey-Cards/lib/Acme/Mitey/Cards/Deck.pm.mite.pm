@@ -6,17 +6,22 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Acme::Mitey::Cards::Mite";
-    our $MITE_VERSION = "0.006012";
+    our $MITE_VERSION = "0.007003";
 
     BEGIN {
-        *bare  = \&Acme::Mitey::Cards::Mite::bare;
-        *croak = \&Acme::Mitey::Cards::Mite::croak;
-        *false = \&Acme::Mitey::Cards::Mite::false;
-        *lazy  = \&Acme::Mitey::Cards::Mite::lazy;
-        *ro    = \&Acme::Mitey::Cards::Mite::ro;
-        *rw    = \&Acme::Mitey::Cards::Mite::rw;
-        *rwp   = \&Acme::Mitey::Cards::Mite::rwp;
-        *true  = \&Acme::Mitey::Cards::Mite::true;
+        require Scalar::Util;
+        *bare    = \&Acme::Mitey::Cards::Mite::bare;
+        *blessed = \&Scalar::Util::blessed;
+        *carp    = \&Acme::Mitey::Cards::Mite::carp;
+        *confess = \&Acme::Mitey::Cards::Mite::confess;
+        *croak   = \&Acme::Mitey::Cards::Mite::croak;
+        *false   = \&Acme::Mitey::Cards::Mite::false;
+        *guard   = \&Acme::Mitey::Cards::Mite::guard;
+        *lazy    = \&Acme::Mitey::Cards::Mite::lazy;
+        *ro      = \&Acme::Mitey::Cards::Mite::ro;
+        *rw      = \&Acme::Mitey::Cards::Mite::rw;
+        *rwp     = \&Acme::Mitey::Cards::Mite::rwp;
+        *true    = \&Acme::Mitey::Cards::Mite::true;
     }
 
     BEGIN {
@@ -192,6 +197,100 @@
               : $_[0]{"reverse"};
         };
     }
+
+    our %SIGNATURE_FOR;
+
+    $SIGNATURE_FOR{"deal_hand"} = sub {
+        my $__NEXT__ = shift;
+
+        my ( %out, %in, %tmp, $tmp, $dtmp, @head );
+
+        @_ == 2 && ( ref( $_[1] ) eq 'HASH' )
+          or @_ % 2 == 1 && @_ >= 1
+          or croak(
+            "Wrong number of parameters in signature for %s: %s, got %d",
+            "deal_hand", "that does not seem right",
+            scalar(@_)
+          );
+
+        @head = splice( @_, 0, 1 );
+
+        # Parameter $head[0] (type: Defined)
+        ( defined( $head[0] ) )
+          or croak(
+            "Type check failed in signature for deal_hand: %s should be %s",
+            "\$_[0]", "Defined" );
+
+        %in = ( @_ == 1 and ( ref( $_[0] ) eq 'HASH' ) ) ? %{ $_[0] } : @_;
+
+        # Parameter count (type: Int)
+        $dtmp = exists( $in{"count"} ) ? $in{"count"} : "7";
+        (
+            do {
+                my $tmp = $dtmp;
+                defined($tmp) and !ref($tmp) and $tmp =~ /\A-?[0-9]+\z/;
+            }
+          )
+          or croak(
+            "Type check failed in signature for deal_hand: %s should be %s",
+            "\$_{\"count\"}", "Int" );
+        $out{"count"} = $dtmp;
+        delete( $in{"count"} );
+
+        my $SLURPY = \%in;
+
+        # Parameter args_for_hand (type: Slurpy[HashRef])
+        ( ( ref($SLURPY) eq 'HASH' ) )
+          or croak(
+            "Type check failed in signature for deal_hand: %s should be %s",
+            "\$SLURPY", "Slurpy[HashRef]" );
+        $out{"args_for_hand"} = $SLURPY;
+
+        return (
+            &$__NEXT__(
+                @head,
+                bless(
+                    \%out,
+                    "Acme::Mitey::Cards::Deck::__NAMED_ARGUMENTS__::deal_hand"
+                )
+            )
+        );
+    };
+
+    {
+
+        package Acme::Mitey::Cards::Deck::__NAMED_ARGUMENTS__::deal_hand;
+        use strict;
+        no warnings;
+        sub args_for_hand { $_[0]{"args_for_hand"} }
+        sub count         { $_[0]{"count"} }
+        sub has_count     { exists $_[0]{"count"} }
+        1;
+    }
+
+    $SIGNATURE_FOR{"discard_jokers"} = sub {
+        my $__NEXT__ = shift;
+
+        my ( %tmp, $tmp, @head );
+
+        @_ == 1
+          or croak(
+            "Wrong number of parameters in signature for %s: %s, got %d",
+            "discard_jokers", "expected exactly 1 parameters",
+            scalar(@_)
+          );
+
+        @head = splice( @_, 0, 1 );
+
+        # Parameter $head[0] (type: Defined)
+        ( defined( $head[0] ) )
+          or croak(
+"Type check failed in signature for discard_jokers: %s should be %s",
+            "\$_[0]", "Defined"
+          );
+
+        return ( &$__NEXT__( @head, @_ ) );
+    };
 
     1;
 }

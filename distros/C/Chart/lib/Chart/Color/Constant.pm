@@ -3,7 +3,7 @@ use v5.12;
 # named colors from X11, HTML (SVG) standard and Pantone report
 
 package Chart::Color::Constant;
-our $VERSION = 'v2.403.2';
+our $VERSION = 'v2.403.5';
 use Carp;
 use Chart::Color::Value;
 

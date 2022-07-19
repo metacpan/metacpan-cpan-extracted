@@ -82,13 +82,19 @@ a suitable factor.  The program concludes with a summary of the check
 results on standard error.  The exit code is 0 (success) if no lines
 had to be filtered out, otherwise 1.
 
+=head1 DEPRECATION NOTICE
+
+The I<check_elements> method of the Math::DifferenceSet::Planar library
+this script is demonstrating is deprecated and will not be in the 1.0
+release.  This example program will be dropped, too.
+
 =head1 AUTHOR
 
 Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2021 by Martin Becker, Blaubeuren.
+Copyright (c) 2021-2022 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

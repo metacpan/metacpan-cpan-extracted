@@ -13,7 +13,7 @@ Iterator::Flex::Manual::Caveats - Caveats
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 DESCRIPTION
 
@@ -34,6 +34,8 @@ This is a simple fix: convert the single L<Iterator::Flex::Role::Freeze> role in
 separate C<Iterator::Flex::Role::Freeze::Closure>  and C<Iterator::Flex::Role::Freeze::Method> roles.
 
 =back
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

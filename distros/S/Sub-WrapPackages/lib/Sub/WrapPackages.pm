@@ -20,7 +20,7 @@ Devel::Caller::IgnoreNamespaces::register(__PACKAGE__);
 use Data::Dumper;
 $Data::Dumper::Deparse = 1;
 
-$VERSION = '2.01';
+$VERSION = '2.02';
 
 use lib ();
 {

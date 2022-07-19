@@ -25,7 +25,7 @@ my $meta = {
                                          },
                           },
   "provides"           => {
-                            "Type::Library::Compiler"       => { file => "lib/Type/Library/Compiler.pm", version => 0.005 },
+                            "Type::Library::Compiler"       => { file => "lib/Type/Library/Compiler.pm", version => 0.006 },
                             "Type::Library::Compiler::Mite" => { file => "lib/Type/Library/Compiler/Mite.pm" },
                           },
   "release_status"     => "stable",
@@ -42,7 +42,7 @@ my $meta = {
                                             },
                             x_identifier => "http://purl.org/NET/cpan-uri/dist/Type-Library-Compiler/project",
                           },
-  "version"            => 0.005,
+  "version"            => 0.006,
   "x_provides_scripts" => {
                             "type-library-compile" => { file => "bin/type-library-compile" },
                           },

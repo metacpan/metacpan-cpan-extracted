@@ -1,6 +1,6 @@
 package App::ansicolumn;
 
-our $VERSION = "1.17";
+our $VERSION = "1.18";
 
 use v5.14;
 use warnings;
@@ -71,6 +71,12 @@ use Getopt::EX::Hashed; {
     has '+fillup'    => any => [ qw(pane page none), '' ] ;
     has '+ambiguous' => any => [ qw(wide narrow) ] ;
 
+    # --2up .. --9up
+    my $nup = sub { $_[0] =~ /^(\d+)/ and $_->{up} = $1 } ;
+    for my $n (2..9) {
+	has "${n}up" => '', action => $nup;
+    }
+
     # for run-time use
     has span                => ;
     has panes               => ;
@@ -78,19 +84,19 @@ use Getopt::EX::Hashed; {
 
     Getopt::EX::Hashed->configure( DEFAULT => [] );
 
-    has '+help' => action => sub {
+    has '+help' => sub {
 	pod2usage
 	    -verbose  => 99,
 	    -sections => [ qw(SYNOPSIS VERSION) ];
     };
 
-    has '+version' => action  => sub {
+    has '+version' => sub {
 	say "Version: $VERSION";
 	exit;
     };
 
     ### RPN calc for --height, --width, --pane, --pane-width
-    has [ qw(+height +width +pane +pane_width) ] => action => sub {
+    has [ qw(+height +width +pane +pane_width) ] => sub {
 	my $obj = $_;
 	my($name, $val) = @_;
 	$obj->{$name} = $val !~ /\D/ ? $val : do {
@@ -100,7 +106,7 @@ use Getopt::EX::Hashed; {
     };
 
     ### --ambiguous=wide
-    has '+ambiguous' => action => sub {
+    has '+ambiguous' => sub {
 	if ($_[1] eq 'wide') {
 	    $Text::VisualWidth::PP::EastAsian = 1;
 	    Text::ANSI::Fold->configure(ambiguous => 'wide');
@@ -108,14 +114,14 @@ use Getopt::EX::Hashed; {
     };
 
     ### --tabstop, --tabstyle
-    has [ qw(+tabstop +tabstyle) ] => action => sub {
+    has [ qw(+tabstop +tabstyle) ] => sub {
 	my($name, $val) = map "$_", @_;
 	Text::ANSI::Fold->configure($name => $val);
     };
 
     ### --tabhead, --tabspace
     use charnames ':loose';
-    has [ qw(+tabhead +tabspace) ] => action => sub {
+    has [ qw(+tabhead +tabspace) ] => sub {
 	my($name, $c) = map "$_", @_;
 	$c = charnames::string_vianame($c) || die "$c: invalid name\n"
 	    if length($c) > 1;
@@ -182,6 +188,8 @@ sub setup_options {
 	$obj->{pane} = $obj->up;
 	$obj->{widen} = 1;
 	$obj->{linestyle} ||= 'wrap';
+	$obj->{border} //= 1;
+	$obj->{fillup} //= 'pane';
     }
 
     ## -D

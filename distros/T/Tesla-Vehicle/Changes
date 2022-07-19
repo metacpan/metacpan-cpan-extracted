@@ -1,5 +1,11 @@
 Revision history for Tesla-Vehicle
 
+0.08    2022-07-18
+    - Return 0 if charge_actual_current() is undef
+    - Bump prereq of Tesla::API for changes addressing Tesla API timeout issues
+    - Added address(); converts lat/lon into human readable street address
+      information
+
 0.07    2022-03-31
     - Added PR#7; Add set_charge_limit() and examples/control.pl (Thanks
       @ankratochvil !)

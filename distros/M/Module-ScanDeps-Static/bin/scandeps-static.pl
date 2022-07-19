@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.5';
+our $VERSION = '0.7';
 
 use Module::ScanDeps::Static;
 

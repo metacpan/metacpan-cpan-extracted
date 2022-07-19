@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use App::JYJ;
+
+App::JYJ->new->run;

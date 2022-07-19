@@ -9,7 +9,7 @@ use 5.008;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Perl bindings for nauty",
+  "ABSTRACT" => "Perl bindings for Nauty",
   "AUTHOR" => "Andrius Merkys <merkys\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "Graph::Undirected" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.4.0",
+  "VERSION" => "0.5.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

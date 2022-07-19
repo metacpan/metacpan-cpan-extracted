@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-frame
 
+0.06 2022-07-15T10:00:26Z
+
+    - update frame format
+
 0.05 2022-07-14T07:28:44Z
 
     - accept RPN as a width

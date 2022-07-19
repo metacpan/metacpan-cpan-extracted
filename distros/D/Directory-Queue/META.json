@@ -22,7 +22,6 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Encode" : "0",
             "File::Temp" : "0",
             "Test::More" : "0"
          }
@@ -34,6 +33,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Encode" : "0",
             "No::Worries" : "1.4",
             "POSIX" : "0",
             "Time::HiRes" : "0"
@@ -41,5 +41,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.1"
+   "version" : "2.2"
 }

@@ -5,6 +5,7 @@ author:
   - 'Timothy Legge <timlegge@cpan.org>'
 build_requires:
   Crypt::OpenSSL::Guess: '0'
+  File::Spec::Functions: '0'
   File::Which: '0'
   Test::Exception: '0'
   Test::More: '0'
@@ -20,7 +21,7 @@ name: XML-Sig
 provides:
   XML::Sig:
     file: lib/XML/Sig.pm
-    version: '0.57'
+    version: '0.58'
 requires:
   Carp: '0'
   Class::Accessor: '0'
@@ -45,7 +46,7 @@ requires:
 resources:
   bugtracker: https://github.com/perl-net-saml2/perl-XML-Sig/issues
   repository: git://github.com/perl-net-saml2/perl-XML-Sig.git
-version: '0.57'
+version: '0.58'
 x_contributors:
   - 'Byrne Reese <byrne@cpan.org>'
   - 'Chris Andrews <chris@nodnol.org>'

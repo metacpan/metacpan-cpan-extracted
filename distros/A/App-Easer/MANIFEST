@@ -90,6 +90,8 @@ t/V2/20.collect-options.t
 t/V2/21.options-ordering.json
 t/V2/21.options-ordering.t
 t/V2/22.custom-sources.t
+t/V2/30.params-validate.t
+t/V2/31.custom-validate.t
 t/V2/LocalTester.pm
 t/author-pod-syntax.t
 t/author-pod-version.t

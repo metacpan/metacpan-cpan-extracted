@@ -19,10 +19,12 @@ no_index:
     - t
     - inc
 requires:
-  Tesla::API: '0.09'
+  HTTP::Tiny: '0'
+  JSON: '0'
+  Tesla::API: '0.10'
   perl: '5.006'
 resources:
   bugtracker: https://github.com/stevieb9/tesla-vehicle/issues
   repository: https://github.com/stevieb9/tesla-vehicle.git
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

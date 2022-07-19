@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.104';
+our $VERSION   = '0.105';
 
 use Type::Utils -all;
 use Type::Library -base;
@@ -36,5 +36,7 @@ for my $class (qw/ Project Version Change ChangeSet Person Issue Repository /)
 	coerce $class,
 		from 'Identifier', qq{ "RDF::DOAP::$class"->rdf_load(\$_) };
 }
+
+__PACKAGE__->make_immutable;
 
 1;

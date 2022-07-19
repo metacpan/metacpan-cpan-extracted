@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Ref::Util;
 use Iterator::Flex::Utils ':IterAttrs';
@@ -75,7 +75,7 @@ Role::Tiny::With::with 'Iterator::Flex::Role::Utils';
 
 
 
-sub new ( $class, $obj, $pars={} ) {
+sub new ( $class, $obj, $pars = {} ) {
 
     $class->_croak( parameter => "argument must be a blessed reference" )
       unless Ref::Util::is_blessed_ref( $obj );
@@ -91,8 +91,7 @@ sub construct ( $class, $state ) {
     my ( $obj, $prev, $current, $next, $length, $at )
       = @{$state}{qw[ object prev current next length at ]};
 
-    $class->_throw(
-        parameter => "state 'object' argument must be a blessed reference" )
+    $class->_throw( parameter => "state 'object' argument must be a blessed reference" )
       unless Ref::Util::is_blessed_ref( $obj );
 
     $length = $class->_resolve_meth( $obj, $length, 'length', 'len' );
@@ -116,30 +115,30 @@ sub construct ( $class, $state ) {
 
     return {
 
-        (+_SELF) => \$self,
+        ( +_SELF ) => \$self,
 
-        (+RESET) => sub {
+        ( +RESET ) => sub {
             $prev = $current = undef;
             $next = 0;
         },
 
-        (+REWIND) => sub {
+        ( +REWIND ) => sub {
             $next = 0;
         },
 
-        (+PREV) => sub {
+        ( +PREV ) => sub {
             return defined $prev ? $obj->$at( $prev ) : undef;
         },
 
-        (+CURRENT) => sub {
+        ( +CURRENT ) => sub {
             return defined $current ? $obj->$at( $current ) : undef;
         },
 
-        (+NEXT) => sub {
+        ( +NEXT ) => sub {
             if ( $next == $len ) {
                 # if first time through, set current
                 $prev = $current
-                  if ! $self->is_exhausted;
+                  if !$self->is_exhausted;
                 return $current = $self->signal_exhaustion;
             }
             $prev    = $current;
@@ -184,7 +183,7 @@ Iterator::Flex::ArrayLike - ArrayLike Iterator Class
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 METHODS
 
@@ -243,6 +242,8 @@ The returned iterator supports the following capabilities:
 =item freeze
 
 =back
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

@@ -8,7 +8,7 @@ use warnings;
 
 use experimental qw( signatures declared_refs refaliasing);
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Ref::Util        ();
 use Role::Tiny       ();
@@ -37,11 +37,10 @@ Role::Tiny::With::with 'Iterator::Flex::Role::Utils';
 
 
 sub to_iterator ( $CLASS, $iterable = undef, $pars = {} ) {
-    return
-      defined $iterable
+    return defined $iterable
       ? $CLASS->construct_from_iterable( $iterable, $pars )
       : $CLASS->construct( {
-            (+NEXT) => sub { }
+            ( +NEXT ) => sub { }
         } );
 }
 
@@ -62,12 +61,10 @@ sub to_iterator ( $CLASS, $iterable = undef, $pars = {} ) {
 
 sub construct ( $CLASS, $in_ipar = {}, $in_gpar = {} ) {
 
-    $CLASS->_throw(
-        parameter => "iterator parameters parameter must be a hashref" )
+    $CLASS->_throw( parameter => "'iterator parameters' parameter must be a hashref" )
       unless Ref::Util::is_hashref( $in_ipar );
 
-    $CLASS->_throw(
-        parameter => "general parameters parameter must be a hashref" )
+    $CLASS->_throw( parameter => "'general parameters' parameter must be a hashref" )
       unless Ref::Util::is_hashref( $in_gpar );
 
     my %ipar = $in_ipar->%*;
@@ -80,8 +77,8 @@ sub construct ( $CLASS, $in_ipar = {}, $in_gpar = {} ) {
     my $par;
     my @roles;
 
-    my $class = $ipar{+CLASS} // 'Iterator::Flex::Base';
-    delete $ipar_k{+CLASS};
+    my $class = $ipar{ +CLASS } // 'Iterator::Flex::Base';
+    delete $ipar_k{ +CLASS };
 
     $CLASS->_throw( parameter => "'class' parameter must be a string" )
       if Ref::Util::is_ref( $class );
@@ -90,14 +87,14 @@ sub construct ( $CLASS, $in_ipar = {}, $in_gpar = {} ) {
       if $class ne 'Iterator::Flex::Base'
       && !Module::Runtime::require_module( $class );
 
-    delete $ipar_k{+_NAME};
+    delete $ipar_k{ +_NAME };
     $CLASS->_throw( parameter => "'@{[ _NAME ]}' parameter value must be a string\n" )
-      if defined( $par = $ipar{+_NAME} ) && Ref::Util::is_ref( $par );
+      if defined( $par = $ipar{ +_NAME } ) && Ref::Util::is_ref( $par );
 
     push @roles, 'State::Registry';
 
     delete $gpar_k{ +INPUT_EXHAUSTION };
-    my $input_exhaustion = $gpar{ +INPUT_EXHAUSTION } // [ (+RETURN) => undef ];
+    my $input_exhaustion = $gpar{ +INPUT_EXHAUSTION } // [ ( +RETURN ) => undef ];
 
     my @input_exhaustion
       = Ref::Util::is_arrayref( $input_exhaustion )
@@ -108,7 +105,7 @@ sub construct ( $CLASS, $in_ipar = {}, $in_gpar = {} ) {
     my $has_output_exhaustion_policy = defined $gpar{ +EXHAUSTION };
 
     if ( $input_exhaustion[0] eq +RETURN ) {
-        push @roles, 'Exhaustion::ImportedReturn','Wrap::Return';
+        push @roles, 'Exhaustion::ImportedReturn', 'Wrap::Return';
         push $input_exhaustion->@*, undef if @input_exhaustion == 1;
         $gpar{ +INPUT_EXHAUSTION } = \@input_exhaustion;
         $gpar{ +EXHAUSTION }       = $gpar{ +INPUT_EXHAUSTION }
@@ -116,22 +113,21 @@ sub construct ( $CLASS, $in_ipar = {}, $in_gpar = {} ) {
     }
 
     elsif ( $input_exhaustion[0] eq THROW ) {
-        push @roles,  'Exhaustion::ImportedThrow', 'Wrap::Throw';
+        push @roles, 'Exhaustion::ImportedThrow', 'Wrap::Throw';
         $gpar{ +INPUT_EXHAUSTION } = \@input_exhaustion;
-        $gpar{ +EXHAUSTION }       = [ (+THROW) => PASSTHROUGH ]
+        $gpar{ +EXHAUSTION }       = [ ( +THROW ) => PASSTHROUGH ]
           unless $has_output_exhaustion_policy;
     }
 
     $CLASS->_throw( parameter => "missing or undefined 'next' parameter" )
-      if !defined( $ipar{+NEXT} );
+      if !defined( $ipar{ +NEXT } );
 
-    for my $method ( +NEXT, +REWIND, +RESET, +PREV, +CURRENT  ) {
+    for my $method ( +NEXT, +REWIND, +RESET, +PREV, +CURRENT ) {
 
         delete $ipar_k{$method};
         next unless defined( my $code = $ipar{$method} );
 
-        $CLASS->_throw( parameter =>
-              "'$method' parameter value must be a code reference\n" )
+        $CLASS->_throw( parameter => "'$method' parameter value must be a code reference\n" )
           unless Ref::Util::is_coderef( $code );
 
         # if $class can't perform the required method, add a role
@@ -139,25 +135,23 @@ sub construct ( $CLASS, $in_ipar = {}, $in_gpar = {} ) {
         if ( $method eq +NEXT ) {
             # next is always a closure, but the caller may want to
             # keep track of $self
-            push @roles, defined $ipar{+_SELF} ? 'Next::ClosedSelf' : 'Next::Closure';
-            delete $ipar_k{+_SELF};
+            push @roles, defined $ipar{ +_SELF } ? 'Next::ClosedSelf' : 'Next::Closure';
+            delete $ipar_k{ +_SELF };
         }
         else {
-            my $impl = $class->can( $method ) ?  'Method' : 'Closure';
+            my $impl = $class->can( $method ) ? 'Method' : 'Closure';
             push @roles, ucfirst( $method ) . '::' . $impl;
         }
     }
 
     # these are dealt with in the iterator constructor.
-    delete @ipar_k{ +METHODS, +FREEZE  };
+    delete @ipar_k{ +METHODS, +FREEZE };
 
     if ( !!%ipar_k || !!%gpar_k ) {
 
-        $CLASS->_throw( parameter =>
-              "unknown iterator parameters: @{[ join( ', ', keys %ipar_k ) ]}" )
+        $CLASS->_throw( parameter => "unknown iterator parameters: @{[ join( ', ', keys %ipar_k ) ]}" )
           if %ipar_k;
-        $CLASS->_throw( parameter =>
-              "unknown iterator parameters: @{[ join( ', ', keys %gpar_k ) ]}" )
+        $CLASS->_throw( parameter => "unknown iterator parameters: @{[ join( ', ', keys %gpar_k ) ]}" )
           if %gpar_k;
     }
 
@@ -204,17 +198,17 @@ sub construct_from_iterable ( $CLASS, $obj, $pars = {} ) {
     my ( $mpars, $ipars, $spars ) = parse_pars( $pars );
 
     $CLASS->_throw( parameter =>
-          "unknown parameters pased to construct_from_iterable: @{[ join ', ', keys $mpars->%* ]}"
-    ) if $mpars->%*;
+          "unknown parameters pased to construct_from_iterable: @{[ join ', ', keys $mpars->%* ]}" )
+      if $mpars->%*;
 
     if ( Ref::Util::is_blessed_ref( $obj ) ) {
         return $CLASS->construct_from_object( $obj, $ipars, $spars );
     }
 
     elsif ( Ref::Util::is_arrayref( $obj ) ) {
-        $CLASS->_throw( parameter =>
-              "unknown parameters pased to construct_from_iterable: @{[ join ', ', $ipars->%* ]}"
-        ) if $ipars->%*;
+        $CLASS->_throw(
+            parameter => "unknown parameters pased to construct_from_iterable: @{[ join ', ', $ipars->%* ]}" )
+          if $ipars->%*;
         return $CLASS->construct_from_array( $obj, $spars );
     }
 
@@ -241,7 +235,7 @@ sub construct_from_iterable ( $CLASS, $obj, $pars = {} ) {
 
 
 
-sub construct_from_array ( $, $obj, $pars={} ) {
+sub construct_from_array ( $, $obj, $pars = {} ) {
     require Iterator::Flex::Array;
     return Iterator::Flex::Array->new( $obj, $pars );
 }
@@ -271,7 +265,7 @@ sub construct_from_array ( $, $obj, $pars={} ) {
 sub construct_from_object ( $CLASS, $obj, $ipar, $gpar ) {
 
     $CLASS->_throw( parameter => q['$object' parameter is not a real object] )
-      unless Ref::Util::is_blessed_ref($obj);
+      unless Ref::Util::is_blessed_ref( $obj );
 
     return construct_from_iterator_flex( $CLASS, $obj, $ipar, $gpar )
       if $obj->isa( 'Iterator::Flex::Base' );
@@ -279,24 +273,24 @@ sub construct_from_object ( $CLASS, $obj, $ipar, $gpar ) {
     my %ipar = $ipar->%*;
     my %gpar = $gpar->%*;
 
-    $gpar{ +INPUT_EXHAUSTION } //= [ (+RETURN) => undef ];
+    $gpar{ +INPUT_EXHAUSTION } //= [ ( +RETURN ) => undef ];
 
-    if ( !exists $ipar{+NEXT} ) {
+    if ( !exists $ipar{ +NEXT } ) {
         my $code;
         if ( $code = $CLASS->_can_meth( $obj, 'iter' ) ) {
-            $ipar{+NEXT} = $code->( $obj );
+            $ipar{ +NEXT } = $code->( $obj );
         }
         elsif ( $code = $CLASS->_can_meth( $obj, 'next' )
-            || overload::Method( $obj, '<>' ) )
+            || overload::Method( $obj, '<>', undef, undef ) )
         {
-            $ipar{+NEXT} = sub { $code->( $obj ) };
+            $ipar{ +NEXT } = sub { $code->( $obj ) };
         }
 
-        elsif ( $code = overload::Method( $obj, '&{}' ) ) {
-            $ipar{+NEXT} = $code->( $obj );
+        elsif ( $code = overload::Method( $obj, '&{}', undef, undef ) ) {
+            $ipar{ +NEXT } = $code->( $obj );
         }
 
-        elsif ( $code = overload::Method( $obj, '@{}' ) ) {
+        elsif ( $code = overload::Method( $obj, '@{}', undef, undef ) ) {
             return $CLASS->construct_from_array( $code->( $obj ), \%gpar );
         }
 
@@ -343,17 +337,14 @@ sub construct_from_iterator_flex ( $CLASS, $obj, $, $gpar ) {
     # latest one applied will work.  So, use what's in the registry to
     # figure out what it actually does.
 
-    my \@have = $registry{ +EXHAUSTION } // $CLASS->_throw( internal =>
-          "registered Iterator::Flex iterator doesn't have a registered exhaustion"
-    );
+    my \@have = $registry{ +EXHAUSTION } // $CLASS->_throw(
+        internal => "registered Iterator::Flex iterator doesn't have a registered exhaustion" );
 
     # reuse the object if the requested and existing exhaustion signals are the same.
     return $obj
       if $want[0] eq $have[0]
-      && (
-          ( defined $want[1] && defined $have[1] && $want[1] eq $have[1] )
-       || (   !defined $want[1] && !defined $have[1] )
-      );
+      && ( ( defined $want[1] && defined $have[1] && $want[1] eq $have[1] )
+        || ( !defined $want[1] && !defined $have[1] ) );
 
     # now we need a proxy object.
     my %gpars = (
@@ -363,7 +354,7 @@ sub construct_from_iterator_flex ( $CLASS, $obj, $, $gpar ) {
 
     my %ipars;
     for my $method ( +NEXT, +PREV, +CURRENT, +REWIND, +RESET, +FREEZE ) {
-        next unless defined (  my $code = $CLASS->_can_meth( $obj, $method ) );
+        next unless defined( my $code = $CLASS->_can_meth( $obj, $method ) );
         $ipars{$method} = sub { $code->( $obj ) };
     }
 
@@ -374,7 +365,7 @@ sub construct_from_attr ( $CLASS, $in_ipar = {}, $in_gpar = {} ) {
     my %gpar = $in_gpar->%*;
 
     # this indicates that there should be no wrapping of 'next'
-    $gpar{+INPUT_EXHAUSTION} = +PASSTHROUGH;
+    $gpar{ +INPUT_EXHAUSTION } = +PASSTHROUGH;
     $CLASS->construct( $in_ipar, \%gpar );
 }
 
@@ -402,7 +393,7 @@ Iterator::Flex::Factory - Create on-the-fly Iterator::Flex classes/objects
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 CLASS METHODS
 
@@ -474,6 +465,8 @@ by the constructed iterator:
 =item C<__current__> or C<current>
 
 =back
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

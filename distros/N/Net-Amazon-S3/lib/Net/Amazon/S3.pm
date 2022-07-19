@@ -1,6 +1,6 @@
 package Net::Amazon::S3;
 # ABSTRACT: Use the Amazon S3 - Simple Storage Service
-$Net::Amazon::S3::VERSION = '0.99';
+$Net::Amazon::S3::VERSION = '0.991';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 
@@ -77,7 +77,13 @@ has vendor => (
 
 has 'timeout' => ( is => 'ro', isa => 'Num',  required => 0, default => 30 );
 has 'retry'   => ( is => 'ro', isa => 'Bool', required => 0, default => 0 );
-has 'ua'     => ( is => 'rw', isa => 'LWP::UserAgent', required => 0 );
+has 'ua'
+	=> is => 'rw'
+	=> isa => 'LWP::UserAgent'
+	=> required => 0
+	=> lazy => 1
+	=> builder => '_build_ua'
+;
 has 'err'    => ( is => 'rw', isa => 'Maybe[Str]',     required => 0 );
 has 'errstr' => ( is => 'rw', isa => 'Maybe[Str]',     required => 0 );
 has keep_alive_cache_size => ( is => 'ro', isa => 'Int', required => 0, default => 10 );
@@ -169,7 +175,7 @@ around BUILDARGS => sub {
 };
 
 
-sub BUILD {
+sub _build_ua {
 	my $self = shift;
 
 	my $ua;
@@ -189,7 +195,7 @@ sub BUILD {
 	$ua->timeout( $self->timeout );
 	$ua->env_proxy;
 
-	$self->ua($ua);
+	return $ua;
 }
 
 sub buckets {
@@ -238,12 +244,17 @@ sub add_bucket {
 }
 
 sub bucket {
-	my ( $self, $bucket ) = @_;
+	my $self = shift;
+	my %args = Net::Amazon::S3::Utils->parse_arguments_with_bucket (\@_);
 
-	return $bucket if $bucket->$Safe::Isa::_isa ($self->bucket_class);
+	return $args{bucket}
+		if $args{bucket}->$Safe::Isa::_isa ($self->bucket_class);
 
-	return $self->bucket_class->new(
-		{ bucket => $bucket, account => $self } );
+	return $self->bucket_class->new ({
+		account => $self,
+		bucket => $args{bucket},
+		(region => $args{region}) x defined $args{region},
+	});
 }
 
 sub delete_bucket {
@@ -386,7 +397,7 @@ sub _perform_operation {
 
 sub _urlencode {
 	my ( $self, $unencoded ) = @_;
-	return uri_escape_utf8( $unencoded, '^A-Za-z0-9_\-\.' );
+	return uri_escape_utf8( $unencoded, '^A-Za-z0-9_~\-\.' );
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -405,7 +416,7 @@ Net::Amazon::S3 - Use the Amazon S3 - Simple Storage Service
 
 =head1 VERSION
 
-version 0.99
+version 0.991
 
 =head1 SYNOPSIS
 
@@ -649,6 +660,25 @@ If this library should retry upon errors. This option is recommended.
 This uses exponential backoff with retries after 1, 2, 4, 8, 16, 32 seconds,
 as recommended by Amazon. Defaults to off.
 
+When retry is on, request will be automatically retried when one of following
+HTTP statuses happens
+
+=over
+
+=item 408 - Request Timeout
+
+=item 500 - Internal Server Error
+
+=item 502 - Bad Gateway
+
+=item 503 - Service Unavailable
+
+=item 504 - Gateway Timeout
+
+=back
+
+For more details see L<LWP::UserAgent::Determined>.
+
 =item host
 
 Deprecated.
@@ -782,9 +812,21 @@ Provides operation L<CreateBucket|https://docs.aws.amazon.com/AmazonS3/latest/AP
 
 =head2 bucket BUCKET
 
-Takes a scalar argument, the name of the bucket you're creating
+	# build bucket with guessed region
+	$s3->bucket ('foo');
+	$s3->bucket (bucket => 'foo');
+	$s3->bucket (name   => 'foo');
+
+	# build with explicit region
+	$s3->bucket ('foo', region => 'bar');
 
 Returns an (unverified) bucket object from an account. Does no network access.
+
+However, when guessing region, C<HeadRegion> operation may be called before
+first network access.
+
+Region is mandatory when using Signature V4 authorization, which is default
+for AWS. AWS limits number of HTTP requests, see L<https://aws.amazon.com/premiumsupport/knowledge-center/s3-request-limit-avoid-throttling/>
 
 =head2 delete_bucket
 
@@ -1074,7 +1116,7 @@ Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
+This software is copyright (c) 2022 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

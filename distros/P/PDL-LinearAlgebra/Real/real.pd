@@ -90,7 +90,7 @@ use strict;
 
   use overload (
     'x' => sub {
-      $_[0]->type->real
+      !(grep ref($_) && !$_->type->real, @_[0,1])
         ? PDL::mmult($_[0], $_[1])
         : PDL::cmmult($_[0], $_[1])
     },

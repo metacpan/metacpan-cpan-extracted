@@ -32,7 +32,7 @@ BEGIN {
     $ENV{DISPLAY}  or  plan skip_all => 'DISPLAY not found';
     eval { require Tk; };
     $@  and  plan skip_all => 'Perl/Tk not found';
-    plan tests => 35;
+    plan tests => 39;
 
     # define fixed environment for unit tests:
     delete $ENV{UI};
@@ -175,6 +175,15 @@ stderr_like
 {   $optionmenu->_prepare(0, 0);   }
     qr/^UI.*::Tk::Optionmenu element must be accompanied by parent$re_msg_tail/,
     'orphaned Optionmenu causes error';
+
+$_ = $listbox->selected();
+is($_, undef, 'listbox has correct undef selection before usage');
+$listbox->add('added');
+is($listbox->{texts}[8], 'added', 'listbox adds correctly before usage');
+$listbox->remove(8);
+is_deeply($listbox->{texts}, \@text8, 'listbox removes correctly before usage');
+$listbox->replace(@text8);
+is_deeply($listbox->{texts}, \@text8, 'listbox replaces correctly before usage');
 
 $box1->add(0, 1, $input, $check, $text2, $radio);
 

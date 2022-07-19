@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Exhaustion::PassthroughThrow;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Role::Tiny;
 use experimental 'signatures';
@@ -32,7 +32,7 @@ use namespace::clean;
 
 
 
-sub signal_exhaustion ($self, @exception) {
+sub signal_exhaustion ( $self, @exception ) {
     $self->set_exhausted;
 
     die( @exception ) if @exception;
@@ -65,7 +65,7 @@ Iterator::Flex::Role::Exhaustion::PassthroughThrow - signal exhaustion by transi
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 METHODS
 
@@ -87,6 +87,8 @@ via the L<Iterator::Flex::Base/set_exhausted> method.
 die with C<@exception> if provided, else throw L<Iterator::Flex::Failure/Exhausted>.
 
 =back
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 

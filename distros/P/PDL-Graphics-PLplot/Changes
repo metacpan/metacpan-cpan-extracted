@@ -1,3 +1,9 @@
+0.83 2022-07-17
+- immediate re-release to fix packaging problem
+
+0.82 2022-07-17
+- stop misusing snprintf as if is strncpy in plslabelfunc callback
+
 0.81 2022-02-20
 - stop passing null ndarray in test as invalid in PDL 2.073
 

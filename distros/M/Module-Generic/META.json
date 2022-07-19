@@ -106,6 +106,6 @@
          "web" : "https://gitlab.com/jackdeguest/Module-Generic"
       }
    },
-   "version" : "v0.24.2",
+   "version" : "v0.24.3",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

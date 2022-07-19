@@ -19,7 +19,7 @@ no multidimensional;
 
 use Cwd 'abs_path';
 
-use Test::More tests => 94;
+use Test::More tests => 97;
 use Test::Output;
 use Test::Warn;
 
@@ -183,6 +183,15 @@ warning_like
     'debug level 0 causes error';
 
 # TODO: Do we need to go back to WARN?
+
+# testing message:
+$_ = UI::Various::core::message('unknown_option__1', 'MSG');
+is($_, "unknown option 'MSG'", 'valid message returned correct text');
+warning_like
+{   $_ = UI::Various::core::message('unknown_option__2', 'MSG');   }
+{   carped => qr/^message 'unknown_option__2' missing in 'en'$re_msg_tail/   },
+    "missing message in 'en' again creates error";
+is($_, 'unknown_option__2', 'invalid message returned correct text');
 
 #####################################
 # output tests:

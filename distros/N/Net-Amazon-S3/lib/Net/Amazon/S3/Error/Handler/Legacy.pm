@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Error::Handler::Legacy;
-$Net::Amazon::S3::Error::Handler::Legacy::VERSION = '0.99';
+$Net::Amazon::S3::Error::Handler::Legacy::VERSION = '0.991';
 # ABSTRACT: An internal class to report errors like legacy API
 
 use Moose;
@@ -47,7 +47,7 @@ Net::Amazon::S3::Error::Handler::Legacy - An internal class to report errors lik
 
 =head1 VERSION
 
-version 0.99
+version 0.991
 
 =head1 DESCRIPTION
 
@@ -62,7 +62,7 @@ Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
+This software is copyright (c) 2022 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

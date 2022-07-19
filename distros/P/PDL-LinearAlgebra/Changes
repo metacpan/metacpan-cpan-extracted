@@ -1,3 +1,9 @@
+0.35 2022-07-17
+- fix `$real x $native_complex` (#18) - thanks @KJ7LNW for report
+
+0.34 2022-07-17
+- improve LAPACK detection on Linux - thanks @KJ7LNW
+
 0.33 2022-07-14
 - test, fix mtoeplitz (#16) - thanks @jjatria for report
 

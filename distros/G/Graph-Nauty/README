@@ -1,9 +1,9 @@
 
 
 This archive contains the distribution Graph-Nauty,
-version 0.4.0:
+version 0.5.0:
 
-  Perl bindings for nauty
+  Perl bindings for Nauty
 
 This software is Copyright (c) 2020-2022 by Andrius Merkys.
 

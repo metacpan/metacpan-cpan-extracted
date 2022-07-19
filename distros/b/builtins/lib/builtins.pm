@@ -3,21 +3,11 @@ package builtins;
 use 5.036;
 use warnings;
 
-our $VERSION = '0.000003';
+our $VERSION = '0.000005';
 
 sub import {
     warnings->unimport('experimental::builtin');
-    builtin->import(
-        qw<
-            true false is_bool
-            weaken unweaken is_weak
-            blessed refaddr reftype
-            created_as_string created_as_number
-            ceil floor
-            trim
-            indexed
-          >
-    );
+    builtin->import( grep { $_ ne 'import' } keys %builtin:: );
 }
 
 

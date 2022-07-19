@@ -1,81 +1,142 @@
 package YS::Core;
-use Mo qw'xxx';
-use YS;
-extends 'YS';
+use Mo qw(xxx);
+use YAMLScript::Util;
 
-# Use named subs for better stack traces
+use boolean;
 
-sub BUILD {
-    my ($self) = @_;
+sub define {
+    my ($self, $ns) = @_;
 
-    $self->func(
-        [ add => '+' ] =>
-        2 => sub {
-            my ($x, $y) = @_;
-            $x + $y;
-        },
-    );
+    [
+        add =>
+        2 => sub { $_[0] + $_[1] },
+        op => '+',
+    ],
+    [
+        sub =>
+        2 => sub { $_[0] - $_[1] },
+        op => '-',
+    ],
+    [
+        mul =>
+        2 => sub { $_[0] * $_[1] },
+        op => '*',
+    ],
+    [
+        div =>
+        2 => sub { $_[0] / $_[1] },
+        op => '/',
+    ],
 
-    $self->func(
+    [
+        comment =>
+        _ => sub { return },
+        lazy => 1,
+        alias => [ qw(ignore) ],
+    ],
+
+    [
         conj =>
         2 => sub {
             my ($list, $val) = @_;
             push @$list, $val;
-            $list;
+            return $list;
         },
-    );
+    ],
 
-    $self->func(
+    [
         def =>
         2 => sub {
             my ($var, $val) = @_;
-            $self->vars->{$var} = $val;
+            $ns->{$var} = $val;
             return $var;
         },
-    );
+    ],
 
-    $self->macro(
-        for =>
-        2 => sub {
-            my ($list, $action) = @_;
-            $list = $self->val($list);
-            for my $elem (@$list) {
-                $self->vars->{_} = $elem;
-                $action->call($self);
-            }
+    [
+        do =>
+        _ => sub {
+            $_->call for @_;
         },
-    );
+        lazy => 1,
+    ],
 
-    $self->func(
+    [
+        map =>
+        2 => sub {
+            my ($fn, $list) = @_;
+            $list = $self->val($list);
+            [
+                map {
+                    $ns->{_} = $_;
+                    $fn->call($_);
+                } @$list
+            ];
+        },
+        lazy => 1,
+    ],
+
+    [
+        'number?' =>
+        1 => sub {
+            $_[0] =~ /^(?:
+                (
+                    0
+                |
+                    -? [1-9] [0-9]*
+                |
+                    -?
+                    [1-9]
+                    ( \. [0-9]* [1-9] )?
+                    ( e [-+] [1-9] [0-9]* )?
+                )
+            )$ /x ? true : false;
+        },
+    ],
+
+    [
+        for =>
+        _ => sub {
+            my ($list, @stmt) = @_;
+            $list = $self->val($list);
+            for (@$list) {
+                $ns->{_} = $_;
+                for my $stmt (@stmt) {
+                    $stmt->call;
+                }
+            }
+            delete $ns->{_};
+            return;
+        },
+        lazy => 1,
+    ],
+
+    [
         len =>
         1 => sub {
             my ($string) = @_;
-            length $string;
+            return length $string;
         },
-    );
+    ],
 
-    $self->func(
-        [ range => '..' ] =>
+    [
+        range =>
         2 => sub {
             my ($min, $max) = @_;
-            [ $min .. $max ];
+            return [ $min .. $max ];
         },
-    );
+        op => '..',
+    ],
 
-    $self->func(
+    [
         say =>
         1 => sub {
-            # XXX YAMLScript::Scope::scope();
             my ($string) = @_;
+            local $ns->{foo} = 1;
+            $string = $self->val($string);
             print $string . "\n";
         },
-    );
-
-    $self->func(
-        [ sub => '-' ] =>
-        2 => sub {
-            my ($x, $y) = @_;
-            $x - $y;
-        },
-    );
+    ],
 }
+
+1;

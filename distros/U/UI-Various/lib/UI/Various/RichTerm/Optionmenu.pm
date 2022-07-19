@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use UI::Various::core;
 use UI::Various::Optionmenu;
@@ -154,8 +154,7 @@ sub _process($)
     my $blank = ' ' x (length($max) + 3);
     my $prompt = '';
 
-    local $_ = $self->{_selected};
-    my $selected =  defined $_ ? $_ : '';
+    local $_;
     $Text::Wrap::columns = $self->width;
     foreach (0..$#{$self->{options}})
     {
@@ -166,7 +165,7 @@ sub _process($)
     $prompt .= Text::Wrap::wrap('', '', msg('enter_selection') . ' (' .
 				sprintf(msg('_1_to_cancel'), 0) . '): ');
     my $re_valid = '^(?:' . join('|', 0..$max) . ')$';
-    $_ = $self->top->readline($prompt, $re_valid, $selected);
+    $_ = $self->top->readline($prompt, $re_valid, '');
     if (0 < $_)
     {
 	$self->{_selected_menu} = $self->{options}[$_ - 1][0];

@@ -35,8 +35,8 @@ sub construct {
             return $arr->[$current];
         },
 
-        reset  => sub { $prev = $current = undef; $next = 0; },
-        rewind => sub { $next = 0; },
+        reset   => sub { $prev = $current = undef; $next = 0; },
+        rewind  => sub { $next = 0; },
         prev    => sub { return defined $prev    ? $arr->[$prev]    : undef; },
         current => sub { return defined $current ? $arr->[$current] : undef; },
     };

@@ -1,0 +1,55 @@
+{
+   "abstract" : "Ported Fzf using perl. ",
+   "author" : [
+      "liyao <liyao0117@qq.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Search-Fzf",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Curses" : "1.38",
+            "List::MoreUtils" : "0.43",
+            "List::Util" : "1.60",
+            "Term::ANSIColor" : "5.01",
+            "Term::Terminfo" : "0.09",
+            "Text::ANSI::Util" : "0.233",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Curses" : "1.38",
+            "Term::Terminfo" : "0.09",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

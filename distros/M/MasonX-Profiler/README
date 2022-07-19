@@ -1,27 +1,65 @@
-# $File: //member/autrijus/MasonX-Profiler/README $ $Author: autrijus $
-# $Revision: #2 $ $Change: 10888 $ $DateTime: 2004/06/17 00:16:20 $
+NAME
+    MasonX::Profiler - Mason per-component profiler
 
-This is the README file for MasonX::Profiler, a per-component profiler
-extension for HTML::Mason.
+VERSION
+    This document describes version 0.07 of MasonX::Profiler.
 
-Please type "perldoc MasonX::Profiler" after installation to see
-the module usage information.
+SYNOPSIS
+    In the Mason handler:
 
-* Installation
+        use MasonX::Profiler;
+        my $ah = HTML::Mason::ApacheHandler->new(
+            preamble => 'my $p = MasonX::Profiler->new($m, $r);',
+            # ...
+        );
 
-MasonX::Profiler uses the standard perl module install process:
+    Note that CGIHandler and Apache2Handler works, too.
 
-cpansign -v		# optional; see SIGNATURE for details
-perl Makefile.PL
-make			# or 'nmake' on Win32
-make test
-make install
+    Alternatively, in httpd.conf, before loading your "PerlHandler":
 
-* Copyright
+        PerlModule MasonX::Profiler
+        PerlSetVar MasonPreamble "my $p = MasonX::Profiler->new($m, $r);"
 
-Copyright 2002, 2003, 2004 by Autrijus Tang <autrijus@autrijus.org>.
+    Note that if you are using virtual hosts, the two lines above must be
+    inside the "<VirtualHost>" block, not outside it.
 
-All rights reserved.  You can redistribute and/or modify
-this bundle under the same terms as Perl itself.
+INSTALLATION
+    MasonX::Profiler uses the standard perl module install process:
 
-See <http://www.perl.com/perl/misc/Artistic.html>.
+        cpansign -v        # optional; see SIGNATURE for details
+        perl Makefile.PL
+        make           # or 'nmake' on Win32
+        make test
+        make install
+
+DESCRIPTION
+    This module prints per-component profiling information to "STDERR"
+    (usually directed to the Apache error log). Its output looks like this:
+
+        =Mason= 127.0.0.1 - /NoAuth/webrt.css BEGINS {{{
+        =Mason= 127.0.0.1 -     /NoAuth/webrt.css {{{
+        =Mason= 127.0.0.1 -         /Elements/Callback {{{
+        =Mason= 127.0.0.1 -         /Elements/Callback }}} 0.0008
+        =Mason= 127.0.0.1 -     /NoAuth/webrt.css }}} 0.0072
+        =Mason= 127.0.0.1 - /NoAuth/webrt.css }}} ENDS
+
+    Each row contains five whitespace-separated fields: "=Mason=", remote IP
+    address, "-", indented component name, and how many seconds did it take
+    to process that component, including all subcomponents called by it.
+
+    The beginning and end of the initial request is represented by the
+    special time fields "BEGINS" and "ENDS".
+
+AUTHORS
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+    Autrijus Tang <autrijus@autrijus.org>
+
+COPYRIGHT
+    Copyright 2002, 2003, 2004 by Autrijus Tang <autrijus@autrijus.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

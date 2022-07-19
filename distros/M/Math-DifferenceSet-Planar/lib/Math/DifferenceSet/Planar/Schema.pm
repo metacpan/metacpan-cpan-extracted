@@ -5,7 +5,7 @@ use warnings;
 
 use base 'DBIx::Class::Schema';
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 __PACKAGE__->load_namespaces;
 
@@ -17,7 +17,7 @@ Math::DifferenceSet::Planar::Schema - data schema for planar difference sets
 
 =head1 VERSION
 
-This documentation refers to version 0.015 of
+This documentation refers to version 0.016 of
 Math::DifferenceSet::Planar::Schema.
 
 =head1 SYNOPSIS
@@ -59,7 +59,7 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019-2021 by Martin Becker, Blaubeuren.
+Copyright (c) 2019-2022 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

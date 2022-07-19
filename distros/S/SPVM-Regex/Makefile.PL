@@ -10,6 +10,7 @@ WriteMakefile(
   VERSION_FROM      => 'lib/SPVM/Regex.pm',
   PREREQ_PM         => {
     'SPVM::Unicode' => '0.03',
+    'SPVM::Resource::Re2::V2022_06_01' => '0.05',
   }, # e.g., Module::Name => 1.1
   LICENSE           => 'perl_5',
   ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
@@ -29,7 +30,7 @@ WriteMakefile(
   },
   # SPVM::Builder::Util::API is needed for Makefile.PL
   CONFIGURE_REQUIRES => {
-    'SPVM'              => '0.9612',
+    'SPVM'              => '0.9615',
   },
 );
 

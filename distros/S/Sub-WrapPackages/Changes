@@ -1,3 +1,7 @@
+2.02    2022-07-16
+
+- Add Sub::WrapPackages::CallTree utility
+
 2017-10-25   2.01  Bugfixes for wrapping Foo::* - don't wrap FooBar,
                      only Foo::Bar and friends;
                    Minor code improvements

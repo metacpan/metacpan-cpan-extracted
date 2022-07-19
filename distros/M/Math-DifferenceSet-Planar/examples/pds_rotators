@@ -1,0 +1,82 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Math::Prime::Util qw(mulmod);
+use Math::DifferenceSet::Planar;
+
+$| = 1;
+
+my $USAGE = "usage: pds_rotators [-f] (p n|q)\n";
+
+my $full = 0;
+while (@ARGV && $ARGV[0] =~ /^-(.+)\z/s) {
+    my $opt = $1;
+    shift @ARGV;
+    last            if '-' eq $opt;
+    $full = 1, last if 'f' eq $opt;
+    die $USAGE;
+}
+if (@ARGV < 1 || 2 < @ARGV  || grep {!/^[1-9][0-9]*\z/} @ARGV) {
+    die $USAGE;
+}
+
+my $ds = Math::DifferenceSet::Planar->new(@ARGV);
+my $mo = $ds->modulus;
+my $it = $ds->iterate_rotators;
+my @mu;
+if ($full) {
+    @mu = $ds->multipliers;
+    shift @mu;
+}
+
+while (my $ro = $it->()) {
+    if ($full) {
+        my @eqv = map { mulmod($_, $ro, $mo) } @mu;
+        print "$ro @eqv\n";
+    }
+    else {
+        print $ro, "\n";
+    }
+}
+
+__END__
+=head1 NAME
+
+pds_rotators - enumerate planar difference set rotators of a given order
+
+=head1 SYNOPSIS
+
+  pds_rotators [-f] p n
+  pds_rotators [-f] order
+
+=head1 DESCRIPTION
+
+This example program writes rotators (complete residue systems) for
+planar difference sets of a given order to standard output.  The order
+can be specified as a prime number and an exponent, or as a prime power.
+The output will be lines with one integer number per line, for all
+rotators of the given order.
+
+With option B<-f>, output lines consist of lists of equivalent rotator
+values separated by blanks.  Thus all values coprime to the modulus will
+appear, grouped by plane.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2022 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

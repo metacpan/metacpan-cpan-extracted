@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.756';
+our $VERSION = '1.757';
 
 use Exporter qw( import );
 
@@ -93,13 +93,19 @@ sub bell { return $bell }
 
 
 sub get_term_size {
-    my ( $width, $height ) = ( 0, 0 );
+    my ( $width, $height, $error );
     if ( TERM_READKEY ) {
         ( $width, $height ) = ( Term::ReadKey::GetTerminalSize() )[ 0, 1 ];
+        if ( ! $width || ! $height ) {
+            $error = "get_term_size - Term::ReadKey::GetTerminalSize:";
+        }
     }
     elsif( $^O eq 'MSWin32' ) {
         require Win32::Console;
         ( $width, $height ) = Win32::Console->new()->Size();
+        if ( ! $width || ! $height ) {
+            $error = "get_term_size - Win32::Console Size:";
+        }
     }
     else {
         my $size = qx(stty size);
@@ -107,6 +113,14 @@ sub get_term_size {
             $width  = $2;
             $height = $1;
         }
+        if ( ! $width || ! $height ) {
+            $error = "get_term_size - stty size:";
+        }
+    }
+    if ( $error ) {
+        $error .=  " No term width!" if ! $width;
+        $error .=  " No term height!" if ! $height;
+        die $error;
     }
     return $width - WIDTH_CURSOR, $height;
 }

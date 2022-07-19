@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Freeze;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use List::Util;
 
@@ -31,20 +31,19 @@ sub freeze ( $obj ) {
 
     my @freeze;
 
-    if ( defined $ipar->{+_DEPENDS} ) {
+    if ( defined $ipar->{ +_DEPENDS } ) {
 
         # first check if dependencies can freeze.
         my $cant = List::Util::first { !$_->can( 'freeze' ) }
-        @{ $ipar->{+_DEPENDS} };
-        $obj->_throw( parameter =>
-              "dependency: @{[ $cant->_name ]} is not serializeable" )
+        @{ $ipar->{ +_DEPENDS } };
+        $obj->_throw( parameter => "dependency: @{[ $cant->_name ]} is not serializeable" )
           if $cant;
 
         # now freeze them
-        @freeze = map $_->freeze, @{ $ipar->{+_DEPENDS} };
+        @freeze = map $_->freeze, @{ $ipar->{ +_DEPENDS } };
     }
 
-    push @freeze, $ipar->{+FREEZE}->( $obj ), $obj->is_exhausted;
+    push @freeze, $ipar->{ +FREEZE }->( $obj ), $obj->is_exhausted;
 
     return \@freeze;
 }
@@ -75,7 +74,7 @@ Iterator::Flex::Role::Freeze - Role to add serialization capability to an Iterat
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 METHODS
 
@@ -85,6 +84,8 @@ version 0.14
 
 Returns a recipe to freeze an iterator and its dependencies.  See
 L<Iterator::Flex/"Serialization of Iterators"> for more information.
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 
