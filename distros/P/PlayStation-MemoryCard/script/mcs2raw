@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+
+# Copyright (c) 2021 Gavin Hayes and others, see LICENSE in the root of the project
+
+use strict; use warnings;
+use feature 'say';
+use Getopt::Long qw(GetOptions);
+Getopt::Long::Configure qw(gnu_getopt); 
+use File::Basename;
+use PlayStation::MemoryCard;
+
+my $outpath;
+my $outdir = '.';
+GetOptions(
+    'outpath|p=s' => \$outpath,
+    'outdir|d=s' => \$outdir,
+) or die "Usage: $0 inputfile [--outpath <outputfilename>] OR [--outdir <outputdir>]\n";
+
+my $infile;
+if((@ARGV) > 0) {
+	$infile = $ARGV[0];
+}
+else {
+	$infile = '-'; 
+}
+
+my $mcfile = PlayStation::MemoryCard->load($infile);
+$mcfile or die("unable to load: $infile");
+if($mcfile->{'type'} ne 'mcs') {
+    die("Unsupported input file type");
+}
+my $save = $mcfile->readSave();
+$outpath //= $outdir . '/' . $save->{'filename'};
+
+open(my $fh, '>', $outpath) or die("Unable to create file: $outpath");
+print $fh $save->{'data'};

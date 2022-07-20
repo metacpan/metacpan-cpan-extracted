@@ -15,8 +15,9 @@ use JSON;
 use MIME::Base64 qw(encode_base64url);
 use WWW::Mechanize;
 use URI;
+use UUID;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 $| = 1;
 
@@ -58,6 +59,8 @@ sub new {
     my $self = bless {}, $class;
 
     $self->endpoints;
+
+    $self->uuid;
 
     # Return early if the user specifies that they are
     # not authenticated. Use this param for unit tests
@@ -112,7 +115,7 @@ sub api {
         }
     }
 
-    my $url = URI->new(URL_API . $uri);
+    my $url = $self->uri(URL_API . $uri);
 
     my $header = ['Content-Type' => 'application/json; charset=UTF-8'];
 
@@ -145,7 +148,7 @@ sub api {
 }
 sub api_cache_clear {
     my ($self) = @_;
-    %api_cache = ();
+    $api_cache{$self->uuid} = {};
 }
 sub api_cache_persist {
     my ($self, $persist) = @_;
@@ -265,7 +268,7 @@ sub update_data_files {
 
         (my $data_method = $filename) =~ s/\.json//;
 
-        my $url = URI->new($data_url);
+        my $url = $self->uri($data_url);
 
         my $request = HTTP::Request->new('GET', $url,);
 
@@ -315,6 +318,15 @@ sub update_data_files {
         }
     }
 }
+sub uri {
+    my ($self, $url) = @_;
+
+    if (! defined $url) {
+        croak "The uri() method requires a URL string sent in";
+    }
+
+    return URI->new($url);
+}
 sub useragent_string {
     my ($self, $ua_string) = @_;
 
@@ -338,7 +350,15 @@ sub useragent_timeout {
 
     return $self->{useragent_timeout} // USERAGENT_TIMEOUT;
 }
+sub uuid {
+    my ($self) = @_;
 
+    if (! defined $self->{uuid}) {
+        $self->{uuid} = UUID::uuid();
+    }
+
+    return $self->{uuid};
+}
 # Private methods
 
 sub _access_token {
@@ -388,7 +408,7 @@ sub _access_token_generate {
 
     my $auth_code = $self->_authentication_code;
 
-    my $url = URI->new(URL_TOKEN);
+    my $url = $self->uri(URL_TOKEN);
     my $header = ['Content-Type' => 'application/json; charset=UTF-8'];
 
     my $request_data = {
@@ -451,7 +471,7 @@ sub _access_token_refresh {
 
     my ($self) = @_;
 
-    my $url = URI->new(URL_TOKEN);
+    my $url = $self->uri(URL_TOKEN);
     my $header = ['Content-Type' => 'application/json; charset=UTF-8'];
 
     my $refresh_token = $self->_access_token_data->{refresh_token};
@@ -527,15 +547,17 @@ sub _api_cache {
     }
 
     if ($data) {
-        $api_cache{$endpoint}{$id}{data} = $data;
-        $api_cache{$endpoint}{$id}{time} = time;
+        $api_cache{$self->uuid}->{$endpoint}{$id}{data} = $data;
+        $api_cache{$self->uuid}->{$endpoint}{$id}{time} = time;
     }
 
-    return $api_cache{$endpoint}{$id};
+    return $api_cache{$self->uuid}->{$endpoint}{$id};
 }
 sub _api_cache_data {
     # Returns the entire API cache (for testing)
-    return %api_cache;
+
+    my ($self) = @_;
+    return %{ $api_cache{$self->uuid} };
 }
 sub _authentication_cache_file {
     my ($self, $filename) = @_;
@@ -601,7 +623,7 @@ sub _authentication_code_url {
     # Generate Tesla's authentication URL
 
     my ($self) = @_;
-    my $auth_url = URI->new(URL_AUTH);
+    my $auth_url = $self->uri(URL_AUTH);
 
     my %params = (
         client_id             => 'ownerapi',
@@ -868,6 +890,16 @@ operate on only that file.
 
 I<Return>: None. C<croak()>s on faiure.
 
+=head2 uri($url)
+
+Parameters:
+
+    $url
+
+I<Mandatory, String>: The URL to instantiate the object with.
+
+Instantiates and returns a new L</URI> object ready to be used.
+
 =head2 useragent_string($ua_string)
 
 Sets/gets the useragent string we send to the Tesla API.
@@ -888,6 +920,15 @@ Parameters:
 I<Optional, Integer/Float>: The timeout in seconds or fractions of a second.
 
 I<Return>: Integer/Float, the currently set value.
+
+=head2 uuid
+
+Each L</Tesla::API> object is identified internally by a unique identifier
+string. This method returns it for you.
+
+Example:
+
+    5A7C01A5-0C47-4815-8B33-9AE3A475FF01
 
 =head1 METHODS - API CACHE
 
@@ -941,6 +982,12 @@ I<Return>: Integer, the number of seconds we're caching Tesla API data for.
 =head1 API CACHING
 
 We've employed a complex caching mechanism for data received from Tesla's API.
+
+Each L<Tesla::API> object you instantiate has its own cache storage.
+Modifications to the cache or any cache attributes or parameters will not
+affect the caching of other objects whether they be created in the same or a
+different process/script. The cache is kept separate by using the stored UUID
+of each object.
 
 By default, we cache retrieved data for every endpoint/ID pair in the cache for
 two seconds (modifiable by C<api_cache_timeout()>, or C<api_cache_timeout> in

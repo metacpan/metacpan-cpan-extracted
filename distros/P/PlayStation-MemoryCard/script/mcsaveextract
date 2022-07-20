@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+
+# Copyright (c) 2021 Gavin Hayes and others, see LICENSE in the root of the project
+
+use strict; use warnings;
+use Encode qw(decode);
+use PlayStation::MemoryCard;
+binmode(STDERR, "encoding(UTF-8)");
+(@ARGV >= 1) or die("No mcd provided");
+
+# load the memory card
+my $file = $ARGV[0];
+my $mcfile = PlayStation::MemoryCard->load($file);
+if(!$mcfile) {
+	die("Failed to open $file");
+}
+elsif($mcfile->{'type'} ne 'mcd') {
+	die("Unsupported input format");
+}
+
+my $searchfname;
+$searchfname = decode('utf8', $ARGV[1]) if (@ARGV >= 2);
+$mcfile->foreachDirEntry(sub {
+	my ($entry, $newsave, $entrydata) = @_;
+	return if(! $newsave);	
+
+    # find the save
+	if(PlayStation::MemoryCard::SaveNameAndTitleMatch($newsave, $searchfname)) {
+		my $mcs = PlayStation::MemoryCard::FormatSaveAsMCS($newsave);
+		print $mcs;
+		exit 0;	
+	}
+});	
+warn "Failed to extract save";
+exit 1;

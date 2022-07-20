@@ -1,0 +1,196 @@
+#!/usr/bin/perl
+
+# Copyright (c) 2021 Gavin Hayes and others, see LICENSE in the root of the project
+
+use strict; use warnings;
+use feature 'say';
+use Encode qw(decode);
+use Getopt::Long qw(GetOptions);
+Getopt::Long::Configure qw(gnu_getopt);
+use PlayStation::MemoryCard;
+use Image::GIF::Encoder::PP;
+
+sub extract_icon {
+	my($save) = @_;
+    my $fileheader = $save->{'header'};
+	my $contents = $save->{'data'};
+
+	if($fileheader->{'framecnt'} == 0) {
+		warn("Save is invalid, bad icon framecnt read, assuming 1");
+		$fileheader->{'framecnt'} = 1;
+	}
+	my $framedata = substr($contents, 0x80, 0x80*$fileheader->{'framecnt'});
+
+	my $timbuf = '' .
+	pack('V', 0x10) .                                     # magic
+	pack('V', 0x8)  .                                     # flags, hasclut and (flags & 3) == 0 (4bit clut)
+	pack('V', 12+(16*2)) .                                # clut len including header
+	pack('vvvv', 0, 0, 16, 1) .                           # clut pos and dimensions
+	pack('v16', @{$fileheader->{'clut'}}) .               # actual clut
+	pack('V', 12+(0x80 * $fileheader->{'framecnt'})) .    # image len including header
+	pack('vvvv', 1, 0, 4, 16*$fileheader->{'framecnt'}) . # image pos and dimensions
+	pack('a*', $framedata);	                              # actual image
+    print $timbuf;
+}
+
+sub make_gif {
+	my ($save, $scale) = @_;
+	$scale ||= 1;
+
+    # convert the palette to RGB24 and flag a transparent color
+	my $red_mask = 0x1F;
+    my $green_mask = 0x3E0;
+    my $blue_mask = 0x7C00;
+	my $ti = -1;
+    my $i = 0;
+	my $palette;
+    foreach my $rgb555 (@{$save->{'header'}{'clut'}}) {
+        my $red = ($rgb555 & $red_mask) << 3;
+    	my $green = (($rgb555 & $green_mask) >> 5) << 3;
+    	my $blue = (($rgb555 & $blue_mask) >> 10) << 3;
+        $palette .= pack('CCC', $red, $green, $blue);
+        if(($rgb555 == 0) && ($ti == -1)) {
+            $ti = $i; 
+        }
+        $i++;
+    }
+
+	# determine the frame rate
+	my $delay = 0;
+	my $numframes = $save->{'header'}{'framecnt'};
+    # https://psx-spx.consoledev.net/controllersandmemorycards/#title-frame-block-115-frame-0-in-first-block-of-file-only
+    if ($numframes == 2) {
+        # (changes every 16 PAL frames)
+        $delay = (16 * 2);
+    }
+    elsif($numframes == 3) {
+        # (changes every 11 PAL frames)
+        $delay = (11 * 2);
+    }
+    
+	# create a new gif with the desired size
+	my $calcscale = $scale;
+    $calcscale = 1/(-$calcscale) if($calcscale < 0);    
+    my $w = 16 * $calcscale;
+    my $h = 16 * $calcscale;    
+    my $gif = Image::GIF::Encoder::PP->new(undef, $w, $h, $palette, 4, 0, $ti);
+    $gif or die("fail to open gif");
+
+    # write the frames
+	my $contents = $save->{'data'};
+	my $framebuf;
+	vec($framebuf, 0x80-1, 8) = 0;
+	my $expanded;
+	vec($expanded, (16*16)-1, 8) = 0;
+	my $foffset = 0x80;
+	for(my $i = 0; $i < $save->{'header'}{'framecnt'}; $i++) {
+		$framebuf = substr($contents, $foffset, 0x80);		
+		$expanded = Image::GIF::Encoder::PP::expand_frame($framebuf, 4, 8);
+		if($scale != 1) {
+            if( ! Image::GIF::Encoder::PP::scale($expanded, 16, 16, $scale, \$gif->{'frame'})) {
+                die("failed to scale");
+            }
+        }
+        else {
+            $gif->{'frame'} = $expanded;
+        }
+		$gif->add_frame($delay);
+		$foffset += 0x80;
+	}
+
+	# write trailer
+	undef $gif;
+}
+
+my $csrc;
+my $gif;
+GetOptions(
+    'csrc|c' => \$csrc,
+	'gif|g:i'=> \$gif
+) or die "Usage: $0 inputfile [savesubstring] [--csrc OR --gif[integer]]\n";
+
+
+@ARGV >= 1 or die('not enough args provided');
+
+my $file = $ARGV[0];
+my $mcfile = PlayStation::MemoryCard->load($file);
+if(! $mcfile) {
+	die("unable to load: $file");
+}
+
+my $searchfname;
+$searchfname = decode('utf8', $ARGV[1]) if (@ARGV >= 2);
+my @saves;
+# find a valid save
+if($mcfile->{'type'} eq 'mcd') {
+	$mcfile->foreachDirEntry(sub {
+		my ($entry, $newsave, $entrydata) = @_;			
+        if($newsave && PlayStation::MemoryCard::SaveNameAndTitleMatch($newsave, $searchfname)) {
+			push @saves, $newsave;
+			return;
+		}
+	});	
+}
+elsif(($mcfile->{'type'} eq 'mcs') ||($mcfile->{'type'} eq 'rawsave'))  {
+	my $save = $mcfile->readSave();
+	push @saves, $save;
+}
+else {
+	die("unhandled format");
+}
+
+my $save = shift @saves;
+$save or die("no save found to extract icon");
+$save->{'header'} = PlayStation::MemoryCard::parse_file_header($save->{'data'});
+if(! $csrc && ! defined($gif)) {
+	extract_icon($save);
+}
+elsif(defined $gif) {
+	make_gif($save, $gif);
+}
+elsif($csrc) {
+	my $cfile = "#include <stdint.h>\n\n";
+	#my $red_mask = 0x1F;
+    #my $green_mask = 0x3E0;
+    #my $blue_mask = 0x7C00;
+	#$cfile .= "static const uint8_t PALETTE[16][3] = {";
+	#for my $rgb555 (@{$save->{'header'}{'clut'}}) {
+	#	my $red = ($rgb555 & $red_mask) << 3;
+	#	my $green = (($rgb555 & $green_mask) >> 5) << 3;
+	#	my $blue = (($rgb555 & $blue_mask) >> 10) << 3;
+	#	$cfile .= sprintf(" {0x%02X, 0x%02X, 0x%02X},", $red, $green, $blue);
+	#}
+	my $fcount = $save->{'header'}{'framecnt'};
+	my $contents = $save->{'data'};
+	$cfile .= "static const uint16_t PALETTE[16] = {";
+	for my $color (@{$save->{'header'}{'clut'}}) {
+		$cfile .= sprintf(" 0x%04X,", $color);
+	}
+	chop $cfile;
+	$cfile .= " };\n";
+	$cfile .= "#define FRAMECNT $fcount\n";
+    $cfile .= 'static const uint8_t IMDATA[FRAMECNT][16][16] = {';
+	for(my $i = 0; $i < $fcount; $i++) {
+		$cfile .= "{";
+		my $frame = substr($contents, (($i+1) * 0x80), 0x80);
+		for(my $y = 0; $y < 16; $y++) {
+			$cfile .= "\n{";
+			for(my $x = 0; $x < 16; $x++) {
+				my $ch = vec($frame, ($y * 16)+$x, 4);
+				$cfile .= sprintf(" %02u,", $ch);
+			}
+			chop $cfile;
+			$cfile .= "},";			
+		}
+		chop $cfile;
+		$cfile .= "\n}, ";
+	}
+	chop $cfile;
+	chop $cfile;
+	$cfile .= "};\n";	
+	print $cfile;
+}
+else {
+	die("should not be reachable");
+}
+

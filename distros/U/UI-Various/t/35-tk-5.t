@@ -93,8 +93,12 @@ my $dialog = UI::Various::Dialog->new();
 my $dialog2 = UI::Various::Dialog->new(height => 5);
 my $dialog3 = UI::Various::Dialog->new(height => 5, width => 10);
 
-is(@{$main->{children}}, 4, 'main has new children');
-is($win1->title(), 'hello', 'window constructor sets title');
+$_ = @{$main->{children}};
+diag '1: "', $_, '"';
+is($_, 4, 'main has correct number of children');
+$_ = $win1->title;
+diag '2: "', $_, '"';
+is($_, 'hello', 'window constructor sets title');
 
 $dialog2->_prepare();
 
@@ -105,6 +109,8 @@ $dialog2->destroy();
 $dialog3->_prepare();
 $dialog3->destroy();
 
-is(@{$main->{children}}, 0, 'main is clean again');
+$_ = @{$main->{children}};
+diag '3: "', $_, '"';
+is($_, 0, 'main is clean again');
 
 $main->mainloop();		# an additional empty call just for the coverage

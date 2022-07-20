@@ -40,7 +40,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use UI::Various::core;
 

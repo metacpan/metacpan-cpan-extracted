@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+
+# Copyright (c) 2021 Gavin Hayes and others, see LICENSE in the root of the project
+
+use strict; use warnings;
+use PlayStation::MemoryCard;
+
+# create empty memory card
+my $memcard = PlayStation::MemoryCard::BlankMCD();
+
+# Add each save to the memcard
+my $directoryoffset = 0x80;
+my $savedataoffset = 0x2000;
+foreach my $file (@ARGV) {
+    # load input file
+    my $mcfile = PlayStation::MemoryCard->load($file);
+	if(! $mcfile) {
+		die("unable to load: $file");
+	}
+	my @saves;
+	if($mcfile->{'type'} eq 'mcd') {
+		$mcfile->foreachDirEntry(sub {
+			my ($entry, $newsave, $entrydata) = @_;
+			if($newsave) {
+				push @saves, $newsave;
+			}			
+		});
+	}	
+	elsif(($mcfile->{'type'} eq 'mcs') || ($mcfile->{'type'} eq 'rawsave')) {
+		push @saves, $mcfile->readSave();
+	}
+	else {
+		die("unsupported filetype");
+	}
+
+	foreach my $save (@saves) {
+		# create the mcd data from the save
+	    my $mcdsave = PlayStation::MemoryCard::FormatSaveAsMCD($directoryoffset, $save);
+    
+	    # verify there is enough space for the save
+        my $newdirspaceneeded = length($mcdsave->{'dirdata'});
+	    my $newsavespaceneeded = length($mcdsave->{'savedata'});    
+	    if(($newdirspaceneeded + $directoryoffset) > 2048) {
+	    	die("Too many directory entries");
+	    }
+	    if(($newsavespaceneeded + $savedataoffset) > 131072) {
+	    	die("Too much savedata");
+	    }
+    
+        # copy in the save
+        substr($memcard, $directoryoffset, $newdirspaceneeded, $mcdsave->{'dirdata'});
+        substr($memcard, $savedataoffset, $newsavespaceneeded, $mcdsave->{'savedata'});
+	    $directoryoffset += $newdirspaceneeded;
+	    $savedataoffset += $newsavespaceneeded;
+	}	
+}
+
+# output the memory card
+print $memcard;

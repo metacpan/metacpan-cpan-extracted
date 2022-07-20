@@ -1,9 +1,11 @@
 package Sah::Schema::hexstr;
 
+use strict;
+
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-23'; # DATE
+our $DATE = '2022-06-05'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our $schema = [str => {
     summary => 'String of bytes in hexadecimal',
@@ -12,9 +14,9 @@ our $schema = [str => {
     examples => [
         {value=>'', valid=>1},
         {value=>'a0', valid=>1},
-        {value=>'a0f', valid=>0},
+        {value=>'a0f', valid=>0, summary=>'Odd number of digits (3)'},
         {value=>'a0ff', valid=>1},
-        {value=>'a0fg', valid=>0},
+        {value=>'a0fg', valid=>0, summary=>'Invalid hexdigit (g)'},
         {value=>'a0ff12345678', valid=>1},
     ],
 
@@ -35,7 +37,7 @@ Sah::Schema::hexstr - String of bytes in hexadecimal
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schema::hexstr (from Perl distribution Sah-Schemas-Str), released on 2021-07-23.
+This document describes version 0.004 of Sah::Schema::hexstr (from Perl distribution Sah-Schemas-Str), released on 2022-06-05.
 
 =head1 SYNOPSIS
 
@@ -65,8 +67,7 @@ To specify schema in L<Rinci> function metadata and use the metadata with
 L<Perinci::CmdLine> to create a CLI:
 
  # in lib/MyApp.pm
- package
-   MyApp;
+ package MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
      v => 1.1,
@@ -86,10 +87,9 @@ L<Perinci::CmdLine> to create a CLI:
  1;
 
  # in myapp.pl
- package
-   main;
+ package main;
  use Perinci::CmdLine::Any;
- Perinci::CmdLine::Any->new(url=>'/MyApp/myfunc')->run;
+ Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
 
  # in command-line
  % ./myapp.pl --help
@@ -106,11 +106,11 @@ Sample data:
 
  "a0"  # valid
 
- "a0f"  # INVALID
+ "a0f"  # INVALID (Odd number of digits (3))
 
  "a0ff"  # valid
 
- "a0fg"  # INVALID
+ "a0fg"  # INVALID (Invalid hexdigit (g))
 
  "a0ff12345678"  # valid
 
@@ -122,6 +122,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Str>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Str>
@@ -129,16 +157,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

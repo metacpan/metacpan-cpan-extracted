@@ -25,5 +25,5 @@ no_index:
 resources:
   bugtracker: https://github.com/FGasper/p5-Linux-WireGuard/issues
   repository: git://github.com/FGasper/p5-Linux-WireGuard.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

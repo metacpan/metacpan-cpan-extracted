@@ -10,11 +10,11 @@ SMS::Send::UK::123txt
 
 =head1 VERSION
 
-Version 0.0.2
+Version 0.0.3
 
 =cut
 
-our $VERSION = '0.0.2';
+our $VERSION = '0.0.3';
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,6 @@ You need a 123-txt account in order to use this driver
 use base 'SMS::Send::Driver';
 use LWP::UserAgent();
 use JSON qw(encode_json);
-use URI::Escape qw(uri_escape);
 use Scalar::Util qw( looks_like_number );
 
 =head2 new
@@ -207,7 +206,7 @@ sub send_sms {
         pass        => $self->{'pass'},
         source      => $self->{'from'},
         destination => $to,
-        sms         => uri_escape($text),
+        sms         => $text,
     });
 
     my $response = $ua->post(

@@ -1,5 +1,11 @@
 Revision history for Tesla-API
 
+1.02    2022-07-19
+    - Add uri(); Generates and returns a new URI object (to be inherited)
+    - Add uuid(); Each object now has its own cache. All cache data and related
+      mechanism attributes are confined and will not be modified by other
+      objects, whether in the same or separate process (closes #11)
+
 1.01    2022-04-22
     - Unit test suite now has 90% coverage
     - _decode() is now an object method as opposed to a simple function

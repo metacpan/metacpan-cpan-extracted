@@ -1,6 +1,6 @@
 package Pithub::Repos;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01036';
+our $VERSION = '0.01037';
 # ABSTRACT: Github v3 Repos API
 
 use Moo;
@@ -45,6 +45,31 @@ sub branches {
     return $self->request(
         method => 'GET',
         path   => sprintf( '/repos/%s/%s/branches', delete $args{user}, delete $args{repo} ),
+        %args,
+    );
+}
+
+
+sub rename_branch {
+    my ( $self, %args ) = @_;
+    croak 'Missing parameters: branch' unless $args{branch};
+    croak 'Missing key in parameters: data (hashref)' unless ref $args{data} eq 'HASH';
+    $self->_validate_user_repo_args( \%args );
+    return $self->request(
+        method => 'POST',
+        path   => sprintf( '/repos/%s/%s/branches/%s/rename', delete $args{user}, delete $args{repo}, delete $args{branch} ),
+        %args,
+    );
+}
+
+
+sub merge_branch {
+    my ( $self, %args ) = @_;
+    croak 'Missing key in parameters: data (hashref)' unless ref $args{data} eq 'HASH';
+    $self->_validate_user_repo_args( \%args );
+    return $self->request(
+        method => 'POST',
+        path   => sprintf( '/repos/%s/%s/merges', delete $args{user}, delete $args{repo} ),
         %args,
     );
 }
@@ -265,7 +290,7 @@ Pithub::Repos - Github v3 Repos API
 
 =head1 VERSION
 
-version 0.01036
+version 0.01037
 
 =head1 METHODS
 
@@ -301,6 +326,49 @@ Examples:
     my $result = $repos->branches( user => 'plu', repo => 'Pithub' );
 
 See also L<branch> to get information about a single branch.
+
+=back
+
+=head2 rename_branch
+
+=over
+
+=item *
+
+Rename a branch
+
+    POST /repos/:user/:repo/branches/:branch/rename
+
+Examples:
+
+    my $b = Pithub::Repos->new;
+    my $result = $b->rename_branch(
+        user => 'plu',
+        repo => 'Pithub',
+        branch  => 'travis',
+        data => { new_name => 'travis-ci' }
+    );
+
+=back
+
+=head2 merge_branch
+
+=over
+
+=item *
+
+Merge a branch
+
+    POST /repos/:user/:repo/merges
+
+Examples:
+
+    my $b = Pithub::Repos->new;
+    my $result = $b->rename_branch(
+        user => 'plu',
+        repo => 'Pithub',
+        data => { base => 'master', head => 'travis', message => 'My commit message' }
+    );
 
 =back
 
@@ -554,7 +622,7 @@ Johannes Plunien <plu@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011-2019 by Johannes Plunien.
+This software is copyright (c) 2011 by Johannes Plunien.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

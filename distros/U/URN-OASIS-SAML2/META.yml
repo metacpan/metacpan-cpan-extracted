@@ -1,0 +1,35 @@
+---
+abstract: 'Constants for urn:oasis SAML2 implementations'
+author:
+  - 'Wesley Schwengle <waterkip@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Deep: '0'
+  Test::More: '0.96'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: URN-OASIS-SAML2
+provides:
+  URN::OASIS::SAML2:
+    file: lib/URN/OASIS/SAML2.pm
+    version: '0.001'
+requires:
+  perl: '5.006'
+resources:
+  repository: git://github.com/perl-net-saml2/urn-oasis-saml2.git
+version: '0.001'
+x_contributors:
+  - 'Wesley Schwengle <wesleys@opperschaap.net>'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: BSD

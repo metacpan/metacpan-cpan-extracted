@@ -4,8 +4,9 @@ use open qw(:std :utf8);
 use EAV::XS;
 use Test::More;
 # This is a workaround in case if the locale is not utf-8 compatable.
-use POSIX qw(setlocale LC_ALL);
-setlocale(LC_ALL, "en_US.UTF-8");
+use POSIX qw(locale_h);
+use locale;
+setlocale(LC_ALL, "en_US.UTF-8") or die "setlocale";
 
 
 my $testnum = 0;

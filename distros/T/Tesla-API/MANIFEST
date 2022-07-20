@@ -24,6 +24,7 @@ t/300-api_cache_persist.t
 t/305-api_cache_time.t
 t/310-api_cache.t
 t/315-api_cache_clear.t
+t/320-api_cache_per_object.t
 t/400-api_attempts.t
 t/500-api.t
 t/510-api_with_cache.t

@@ -1,4 +1,4 @@
-/* this file was auto-generated at 2021-12-04 21:39:27 */
+/* this file was auto-generated at 2022-07-20 00:10:13 */
 
 #include <stdio.h> /* NULL */
 #include "include/eav/auto_tld.h"
@@ -190,7 +190,7 @@ const tld_t tld_list[] = {
     { "brussels", 9, TLD_TYPE_GENERIC },
     { "bs", 3, TLD_TYPE_COUNTRY_CODE },
     { "bt", 3, TLD_TYPE_COUNTRY_CODE },
-    { "budapest", 9, TLD_TYPE_GENERIC },
+    { "budapest", 9, TLD_TYPE_NOT_ASSIGNED },
     { "bugatti", 8, TLD_TYPE_GENERIC },
     { "build", 6, TLD_TYPE_GENERIC },
     { "builders", 9, TLD_TYPE_GENERIC },
@@ -319,7 +319,7 @@ const tld_t tld_list[] = {
     { "crs", 4, TLD_TYPE_GENERIC },
     { "cruise", 7, TLD_TYPE_GENERIC },
     { "cruises", 8, TLD_TYPE_GENERIC },
-    { "csc", 4, TLD_TYPE_GENERIC },
+    { "csc", 4, TLD_TYPE_NOT_ASSIGNED },
     { "cu", 3, TLD_TYPE_COUNTRY_CODE },
     { "cuisinella", 11, TLD_TYPE_GENERIC },
     { "cv", 3, TLD_TYPE_COUNTRY_CODE },
@@ -696,6 +696,7 @@ const tld_t tld_list[] = {
     { "kh", 3, TLD_TYPE_COUNTRY_CODE },
     { "ki", 3, TLD_TYPE_COUNTRY_CODE },
     { "kia", 4, TLD_TYPE_GENERIC },
+    { "kids", 5, TLD_TYPE_GENERIC },
     { "kim", 4, TLD_TYPE_GENERIC },
     { "kinder", 7, TLD_TYPE_GENERIC },
     { "kindle", 7, TLD_TYPE_GENERIC },
@@ -761,7 +762,7 @@ const tld_t tld_list[] = {
     { "lipsy", 6, TLD_TYPE_GENERIC },
     { "live", 5, TLD_TYPE_GENERIC },
     { "living", 7, TLD_TYPE_GENERIC },
-    { "lixil", 6, TLD_TYPE_GENERIC },
+    { "lixil", 6, TLD_TYPE_NOT_ASSIGNED },
     { "lk", 3, TLD_TYPE_COUNTRY_CODE },
     { "llc", 4, TLD_TYPE_GENERIC },
     { "llp", 4, TLD_TYPE_GENERIC },

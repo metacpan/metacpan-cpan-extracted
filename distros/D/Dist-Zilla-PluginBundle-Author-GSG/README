@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v0.2.0
+    version v0.2.1
 
 SYNOPSIS
 
@@ -332,8 +332,7 @@ Setting up a new dist
     Set github.user and github.token
 
       You can get a GitHub token by following GitHub's instructions
-      <https://help.github.com/en/articles/creating-a-personal-access-token
-      -for-the-command-line>.
+      <https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line>.
 
           git config --global github.user  github_login_name
           git config --global github.token token_from_instructions_above
@@ -344,7 +343,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2019 - 2021 by Grant Street Group.
+    This software is Copyright (c) 2019 - 2022 by Grant Street Group.
 
     This is free software, licensed under:
 

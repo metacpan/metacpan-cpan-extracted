@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+
+# Copyright (c) 2021 Gavin Hayes and others, see LICENSE in the root of the project
+
+use strict; use warnings;
+use feature 'say';
+use Getopt::Long qw(GetOptions);
+Getopt::Long::Configure qw(gnu_getopt); 
+use File::Basename;
+use PlayStation::MemoryCard;
+
+my $codename;
+
+GetOptions(
+    'overridefilename|o=s' => \$codename,
+) or die "Usage: $0 inputfile [--overridefilename <savefilename>]\n";
+
+my $infile;
+if((@ARGV) > 0) {
+	$infile = $ARGV[0];
+    $codename //= basename($infile);
+}
+else {
+	$infile = '-';
+    $codename or die("filename must be provided for raw save");    
+}
+
+my $mcfile = PlayStation::MemoryCard->load($infile, $codename);
+$mcfile or die("unable to load: $infile");
+if($mcfile->{'type'} ne 'rawsave') {
+    die("Unsupported input file type");
+}
+my $save = $mcfile->readSave();
+print PlayStation::MemoryCard::FormatSaveAsMCS($save);

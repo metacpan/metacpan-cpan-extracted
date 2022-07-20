@@ -1,0 +1,55 @@
+{
+   "abstract" : "Utilities for working with PlayStation memory card and save files",
+   "author" : [
+      "Gavin Hayes <gahayes@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PlayStation-MemoryCard",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Image::GIF::Encoder::PP" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/G4Vi/psx_mc_cli/issues"
+      },
+      "homepage" : "https://github.com/G4Vi/psx_mc_cli",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/G4Vi/psx_mc_cli.git",
+         "web" : "https://github.com/G4Vi/psx_mc_cli"
+      }
+   },
+   "version" : "v0.2.0",
+   "x_serialization_backend" : "JSON::PP version 4.10",
+   "x_static_install" : 1
+}

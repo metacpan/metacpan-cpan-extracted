@@ -309,6 +309,7 @@ t/lib/PPI/Test/Run.pm
 t/lib/PPI/Test/pragmas.pm
 t/marpa.t
 t/ppi_element.t
+t/ppi_element_replace.t
 t/ppi_lexer.t
 t/ppi_node.t
 t/ppi_normal.t

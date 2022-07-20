@@ -26,7 +26,7 @@ cmp_deeply(
 note explain \@names;
 
 SKIP: {
-    skip 'get_device() requires root' if $>;
+    skip 'get_device() requires root', 1 if $>;
 
     my @devices = map { Linux::WireGuard::get_device($_) } @names;
 

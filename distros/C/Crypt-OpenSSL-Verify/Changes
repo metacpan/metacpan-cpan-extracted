@@ -1,5 +1,12 @@
 Version History
 
+0.35 -- Tue Jul 19 21:57:11 ADT 2022
+
+    - a5a91d7 Increment version for a release
+    - 90e2edd Renew Certificate
+    - 886e910 Remove unused files
+    - c9a089b v0.34
+
 0.34 -- Wed Feb 23 23:10:26 AST 2022
 
     [Minor Makefile update for Solaris]

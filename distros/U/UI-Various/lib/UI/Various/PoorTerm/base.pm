@@ -39,7 +39,7 @@ use Text::Wrap;
 $Text::Wrap::huge = 'overflow';
 $Text::Wrap::unexpand = 0;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use UI::Various::core;
 

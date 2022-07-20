@@ -16,8 +16,8 @@ CPANFILE_SNAPSHOT ?= $(shell \
 		grep { m(/lib/perl5$$) } @INC; \
 		print File::Spec->abs2rel($$_) . "\n" if $$_' 2>/dev/null )
 
-ON_DEVELOP := $(shell $(CARTON) exec -- \
-	dzil nop >/dev/null 2>/dev/null && echo $(CARTON) || echo develop )
+DZIL := $(shell $(CARTON) exec -- perl -e \
+		'(my $$p = $$ENV{PATH}) =~ s,:.*,/dzil,; print $$p' )
 
 ifeq ($(MAIN_MODULE),)
 MAIN_MODULE := lib/$(subst -,/,$(DIST_NAME)).pm
@@ -70,10 +70,10 @@ realclean: clean
 update: README.md LICENSE.txt $(EXTRA_UPDATES)
 	@echo Everything is up to date
 
-README.md: $(MAIN_MODULE) dist.ini $(ON_DEVELOP)
+README.md: $(MAIN_MODULE) dist.ini $(DZIL)
 	$(CARTON) exec dzil run sh -c "pod2markdown $< > ${CURDIR}/$@"
 
-LICENSE.txt: dist.ini $(ON_DEVELOP)
+LICENSE.txt: dist.ini $(DZIL)
 	$(CARTON) exec dzil run sh -c "install -m 644 LICENSE ${CURDIR}/$@"
 
 .SECONDEXPANSION:
@@ -83,8 +83,9 @@ $(CONTRIB): $(SHARE_DIR)/$$(@)
 $(CPANFILE_SNAPSHOT): $(CARTON) cpanfile
 	$(CARTON) install $(CARTON_INSTALL_FLAGS)
 
-develop: $(CPANFILE_SNAPSHOT)
+$(DZIL): $(CPANFILE_SNAPSHOT)
 	$(CARTON) install # with develop
+	@test -e $@ && touch $@ # update timestamp
 
 carton:
 	@echo You must install carton: https://metacpan.org/pod/Carton >&2;

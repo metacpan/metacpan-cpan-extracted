@@ -3,8 +3,9 @@ use warnings;
 use EAV::XS;
 use Test::More;
 # This is a workaround in case if the locale is not utf-8 compatable.
-use POSIX qw(setlocale LC_ALL);
-setlocale(LC_ALL, "en_US.UTF-8");
+use POSIX qw(locale_h);
+use locale;
+setlocale(LC_ALL, "en_US.UTF-8") or die "setlocale";
 
 
 my $testnum = 0;
@@ -61,6 +62,8 @@ my @email_fail = (
 );
 
 for my $email (@email_pass) {
+    diag ("error when processing '", $email, "': ", $eav->get_error())
+        if !$eav->is_email($email);
     ok ($eav->is_email($email), "pass: '" . $email . "'");
     $testnum++;
 }

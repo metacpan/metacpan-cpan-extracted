@@ -1,5 +1,8 @@
 Revision history for Perl extension Linux::WireGuard:
 
+0.03
+- Fix compatibility with old Test::More versions.
+
 0.02 Mon 18 Jul 2022
 - Rename Wireguard -> WireGuard.
 - Make `endpoint` undef if there is no endpoint for a given peer.

@@ -6,7 +6,7 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = '2.11';
+our $VERSION = '2.12';
 
 use Tie::RefHash;
 use HTTP::Request 1.30;
@@ -689,14 +689,14 @@ sub form_action {
 
 
 sub form_name {
-    my ($self, $form) = @_;
-    return $self->form_with( name => $form );
+    my ( $self, $name, $args ) = @_;
+    return $self->form_with( name => $name, $args || () );
 }
 
 
 sub form_id {
-    my ($self, $formid) = @_;
-    defined( my $form = $self->form_with( id => $formid ) )
+    my ( $self, $formid, $args ) = @_;
+    defined( my $form = $self->form_with( id => $formid, $args || () ) )
       or $self->warn(qq{ There is no form with ID "$formid"});
     return $form;
 }
@@ -724,7 +724,15 @@ sub form_with_fields {
     my ($self, @fields) = @_;
     die 'no fields provided' unless scalar @fields;
 
+    my $nth;
+    if ( @fields > 1 && ref $fields[-1] eq 'HASH' ) {
+        $nth = ( pop @fields )->{n};
+    }
+
     my @matches = $self->all_forms_with_fields(@fields);
+    if ( $nth ) {
+        @matches = ( @matches >= $nth ) ? ( $matches[ $nth - 1 ] ) : ();
+    }
     my $nmatches = @matches;
     if ( $nmatches > 0 ) {
         if ( $nmatches > 1 ) {
@@ -733,7 +741,8 @@ sub form_with_fields {
         return $self->{current_form} = $matches[0];
     }
     else {
-        $self->warn( qq{There is no form with the requested fields} );
+        $self->warn( $nth ? qq{There is no match \#$nth form with the requested fields}
+                          : qq{There is no form with the requested fields} );
         return undef;
     }
 }
@@ -752,10 +761,22 @@ sub all_forms_with {
 
 
 sub form_with {
-    my ( $self, %spec ) = @_;
+    my ( $self, @args ) = @_;
 
     return if not $self->forms;
+
+    # Determine if we should return the nth instance
+    my $nth;
+    if ( @args % 2 && ref $args[-1] eq 'HASH' ) {
+        $nth = ( pop @args )->{n};
+    }
+
+    my %spec = @args;
+
     my @forms = $self->all_forms_with(%spec);
+    if ( $nth ) {
+        @forms = ( @forms >= $nth ) ? $forms[ $nth - 1 ] : ();
+    }
     if ( @forms > 1 ) {    # Warn if several forms matched.
         # For ->form_with( method => 'POST', action => '', id => undef ) we get:
         # >>There are 2 forms with empty action and no id and method "POST".
@@ -1844,7 +1865,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 2.11
+version 2.12
 
 =head1 SYNOPSIS
 
@@ -2318,7 +2339,7 @@ HTTP headers.
 =head2 $mech->title()
 
 Returns the contents of the C<< <TITLE> >> tag, as parsed by
-L<HTML::HeadParser>.  Returns undef if the content is not HTML.
+L<HTML::HeadParser>.  Returns C<undef> if the content is not HTML.
 
 =head2 $mech->redirects()
 
@@ -2445,7 +2466,7 @@ C<undef>.  If C<autocheck> is enabled an exception will be thrown instead.
 Finds a link in the currently fetched page. It returns a
 L<WWW::Mechanize::Link> object which describes the link.  (You'll
 probably be most interested in the
-C<L<< url()|"WWW::Mechanize::Link/$link->url()" >>> property.)
+C<L<< url()|WWW::Mechanize::Link/"$link->url()" >>> property.)
 If it fails to find a link it returns C<undef>.
 
 You can take the URL part and pass it to the C<get()> method.  If
@@ -2611,7 +2632,7 @@ images.  In scalar context, returns an array reference of all images.
 
 Finds an image in the current page. It returns a
 L<WWW::Mechanize::Image> object which describes the image.  If it fails
-to find an image it returns undef.
+to find an image it returns C<undef>.
 
 You can select which image to find by passing in one or more of these
 key/value pairs:
@@ -2746,7 +2767,7 @@ C<L<< click()|/"$mech->click( $button [, $x, $y] )" >>>.
 When called in a list context, the number of the found form is also returned as
 a second value.
 
-Emits a warning and returns undef if no form is found.
+Emits a warning and returns C<undef> if no form is found.
 
 The first form is number 1, not zero.
 
@@ -2763,22 +2784,46 @@ C<L<< click()|/"$mech->click( $button [, $x, $y] )" >>>.
 
 Returns C<undef> if no form is found.
 
-=head2 $mech->form_name( $name )
+=head2 $mech->form_name( $name [, \%args ] )
 
-Selects a form by name.  If there is more than one form on the page
-with that name, then the first one is used, and a warning is
-generated.
+Selects a form by name.
+
+By default, the first form that has this name will be returned.
+
+    my $form = $mech->form_name("order_form");
+
+If you want the second, third or nth match, pass an optional arguments hash
+reference as the final parameter with a key C<n> to pick which instance you
+want. The numbering starts at 1.
+
+    my $third_product_form = $mech->form_name("buy_now", { n => 3 });
+
+If the C<n> parameter is not passed, and there is more than one form on the page
+with that name, then the first one is used, and a warning is generated.
 
 If it is found, the form is returned as an L<HTML::Form> object and
 set internally for later use with Mech's form methods such as
 C<L<< field()|/"$mech->field( $name, $value, $number )" >>> and
 C<L<< click()|/"$mech->click( $button [, $x, $y] )" >>>.
 
-Returns undef if no form is found.
+Returns C<undef> if no form is found.
 
-=head2 $mech->form_id( $id )
+=head2 $mech->form_id( $id [, \%args ] )
 
-Selects a form by ID.  If there is more than one form on the page
+Selects a form by ID.
+
+By default, the first form that has this ID will be returned.
+
+    my $form = $mech->form_id("order_form");
+
+Although the HTML specification requires the ID to be unique within a page,
+some pages might not adhere to that. If you want the second, third or nth match,
+pass an optional arguments hash reference as the final parameter with a
+key C<n> to pick which instance you want. The numbering starts at 1.
+
+    my $third_product_form = $mech->form_id("buy_now", { n => 3 });
+
+If the C<n> parameter is not passed, and there is more than one form on the page
 with that ID, then the first one is used, and a warning is generated.
 
 If it is found, the form is returned as an L<HTML::Form> object and
@@ -2793,18 +2838,28 @@ unless C<quiet> is enabled.
 
 Selects a form by passing in a list of field names it must contain.  All matching forms (perhaps none) are returned as a list of L<HTML::Form> objects.
 
-=head2 $mech->form_with_fields( @fields )
+=head2 $mech->form_with_fields( @fields, [ \%args ] )
 
-Selects a form by passing in a list of field names it must contain.  If there
-is more than one form on the page with that matches, then the first one is used,
-and a warning is generated.
+Selects a form by passing in a list of field names it must contain. By default,
+the first form that matches all of these field names will be returned.
+
+    my $form = $mech->form_with_fields( qw/sku quantity add_to_cart/ );
+
+If you want the second, third or nth match, pass an optional arguments hash
+reference as the final parameter with a key C<n> to pick which instance you
+want. The numbering starts at 1.
+
+    my $form = $mech->form_with_fields( 'sky', 'qty', { n => 2 } );
+
+If the C<n> parameter is not passed, and there is more than one form on the page
+with that ID, then the first one is used, and a warning is generated.
 
 If it is found, the form is returned as an L<HTML::Form> object and set internally
 for later used with Mech's form methods such as
 C<L<< field()|/"$mech->field( $name, $value, $number )" >>> and
 C<L<< click()|/"$mech->click( $button [, $x, $y] )" >>>.
 
-Returns undef and emits a warning if no form is found.
+Returns C<undef> and emits a warning if no form is found.
 
 Note that this functionality requires libwww-perl 5.69 or higher.
 
@@ -2819,7 +2874,7 @@ Using C<undef> as value means that the attribute in question must not be present
 
 All matching forms (perhaps none) are returned as a list of L<HTML::Form> objects.
 
-=head2 $mech->form_with( $attr1 => $value1, $attr2 => $value2, ... )
+=head2 $mech->form_with( $attr1 => $value1, $attr2 => $value2, ..., [ \%args ] )
 
 Searches for forms with arbitrary attribute/value pairs within the E<lt>formE<gt>
 tag.
@@ -2829,12 +2884,25 @@ instead.)
 When given more than one pair, all criteria must match.
 Using C<undef> as value means that the attribute in question must not be present.
 
+By default, the first form that matches all criteria will be returned.
+
+    my $form = $mech->form_with( name => 'order_form', method => 'POST' );
+
+If you want the second, third or nth match, pass an optional arguments hash
+reference as the final parameter with a key C<n> to pick which instance you
+want. The numbering starts at 1.
+
+    my $form = $mech->form_with( method => 'POST', { n => 4 } );
+
+If the C<n> parameter is not passed, and there is more than one form on the page
+matching these criteria, then the first one is used, and a warning is generated.
+
 If it is found, the form is returned as an L<HTML::Form> object and set internally
 for later used with Mech's form methods such as
 C<L<< field()|/"$mech->field( $name, $value, $number )" >>> and
 C<L<< click()|/"$mech->click( $button [, $x, $y] )" >>>.
 
-Returns undef if no form is found.
+Returns C<undef> if no form is found.
 
 =head1 FIELD METHODS
 
@@ -2846,7 +2914,7 @@ These methods allow you to set the values of fields in a given form.
 
 Given the name of a field, set its value to the value specified.
 This applies to the current form (as set by the
-C<L<< form_name()|/"$mech->form_name( $name )" >>> or
+C<L<< form_name()|/"$mech->form_name( $name [, \%args ] )" >>> or
 C<L<< form_number()|/"$mech->form_number($number)" >>>
 method or defaulting to the first form on the page).
 
@@ -2876,7 +2944,7 @@ false and calls C<< $self->warn() >> with an error message.
 
 =head2 $mech->set_fields( $name => $value ... )
 
-=head2 $mech->set_fields( $name => \@nvalue_and_instance_number )
+=head2 $mech->set_fields( $name => \@value_and_instance_number )
 
 =head2 $mech->set_fields( $name => \$value_instance_number )
 
@@ -3058,8 +3126,9 @@ and data setting in one operation. It selects the first form that contains all
 fields mentioned in C<\%fields>.  This is nice because you don't need to know
 the name or number of the form to do this.
 
-(calls C<L<< form_with_fields()|/"$mech->form_with_fields( @fields )" >>> and
-       C<L<< set_fields()|/"$mech->set_fields( $name => $value ... )" >>>).
+(calls
+C<L<< form_with_fields()|/"$mech->form_with_fields( @fields, [ \%args ] )" >>>
+and C<L<< set_fields()|/"$mech->set_fields( $name => $value ... )" >>>).
 
 If you choose C<with_fields>, the C<fields> option will be ignored. The
 C<form_number>, C<form_name> and C<form_id> options will still be used.  An
@@ -3075,12 +3144,12 @@ specified, the currently-selected form is used.
 =item * C<< form_name => name >>
 
 Selects the form named I<name> (calls
-C<L<< form_name()|/"$mech->form_name( $name )" >>>)
+C<L<< form_name()|/"$mech->form_name( $name [, \%args ] )" >>>)
 
 =item * C<< form_id => ID >>
 
 Selects the form with ID I<ID> (calls
-C<L<< form_id()|/"$mech->form_id( $id )" >>>)
+C<L<< form_id()|/"$mech->form_name( $name [, \%args ] )" >>>)
 
 =item * C<< button => button >>
 

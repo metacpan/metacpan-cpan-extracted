@@ -60,6 +60,7 @@ do { my $x = {
                                    'MIME::Base64' => '0',
                                    'Path::Tiny' => '0',
                                    'Scalar::Util' => '0',
+                                   'Test::Builder' => '0',
                                    'Test::More' => '0',
                                    'Test::Most' => '0',
                                    'lib' => '0',

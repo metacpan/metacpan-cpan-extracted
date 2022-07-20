@@ -3,8 +3,9 @@ use warnings;
 use EAV::XS;
 use Test::More;
 # This is a workaround in case if the locale is not utf-8 compatable.
-use POSIX qw(setlocale LC_ALL);
-setlocale(LC_ALL, "en_US.UTF-8");
+use POSIX qw(locale_h);
+use locale;
+setlocale(LC_ALL, "en_US.UTF-8") or die "setlocale";
 
 
 my $testnum = 1;
@@ -20,6 +21,8 @@ my %domains = (
 );
 
 foreach my $email (keys %domains) {
+    diag ("error when processing '", $email, "': ", $eav->get_error())
+        if !$eav->is_email($email);
     ok($eav->is_email($email), "pass: ${email}");
 
     my $expect = $domains{$email};
@@ -35,6 +38,8 @@ my %ipv4s = (
 );
 
 foreach my $email (keys %ipv4s) {
+    diag ("error when processing '", $email, "': ", $eav->get_error())
+        if !$eav->is_email($email);
     ok($eav->is_email($email), "pass: ${email}");
 
     my $expect = $ipv4s{$email};
@@ -51,6 +56,8 @@ my %ipv6s = (
 );
 
 foreach my $email (keys %ipv6s) {
+    diag ("error when processing '", $email, "': ", $eav->get_error())
+        if !$eav->is_email($email);
     ok($eav->is_email($email), "pass: ${email}");
 
     my $expect = $ipv6s{$email};

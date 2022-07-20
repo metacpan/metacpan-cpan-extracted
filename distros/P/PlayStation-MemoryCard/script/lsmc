@@ -1,0 +1,121 @@
+#!/usr/bin/perl
+
+# Copyright (c) 2021 Gavin Hayes and others, see LICENSE in the root of the project
+
+use strict; use warnings;
+use feature 'say';
+use Getopt::Long qw(GetOptions);
+Getopt::Long::Configure qw(gnu_getopt); 
+use PlayStation::MemoryCard;
+
+sub print_directory {
+	my ($dir) = @_;	 
+    
+	my %blockstring = (		
+		0x52 => 'MIDLINK',
+		0x53 => 'ENDLINK',
+		0xA0 => 'EMPTY',
+		0xA1 => 'EMPTY',
+		0xA2 => 'EMPTY',
+		0xA3 => 'EMPTY',
+		0xFF => 'UNUSABLE'
+	);
+	my $inusestr = $blockstring{$dir->{'inuse'}};
+	if(! $inusestr) {
+		if($dir->{'inuse'}== 0x51) {
+			$inusestr = ($dir->{'linkindex'} == 0xFFFF) ? 'INUSE' : 'SRTLINK';			
+		}		
+		else {
+			$inusestr = sprintf("0x%X", $dir->{'inuse'});
+		}
+	}
+	my $linkstr = sprintf("0x%04X", $dir->{'linkindex'});	
+	my $datastring = ((($dir->{'datasize'} % 0x2000) == 0) && ($dir->{'calcblocks'} <= 15)) ? sprintf("%2u blocks", $dir->{calcblocks}) : $dir->{datasize}. " bytes";
+    my $xorstring = ($dir->{'calcxor'} == $dir->{'xor'}) ? sprintf("xor 0x%X", $dir->{'xor'}) : sprintf("xor bad, calculated 0x%X stored 0x%x", $dir->{'calcxor'}, $dir->{'xor'});
+
+    say sprintf("%-8s %-20s %s %-20s %s", $inusestr, $dir->{'codename'}, $linkstr, $datastring, $xorstring);	
+}
+
+sub onSave {
+	my ($save) = @_;
+	my $contents = $save->{'data'};
+	my $fileheader = $save->{'header'};
+	my $blockcount = length($contents) / 0x2000;
+	say sprintf("%-20s %-40s %u", $save->{'filename'}, $fileheader->{'title'}, $blockcount);
+	
+	# get the clut colors, not currently used
+	my $red_mask = 0x1F;
+    my $green_mask = 0x3E0;
+    my $blue_mask = 0x7C00;
+	foreach my $rgb555 (@{$fileheader->{'clut'}}) {
+		my $red = ($rgb555 & $red_mask) << 3;
+		my $green = (($rgb555 & $green_mask) >> 5) << 3;
+		my $blue = (($rgb555 & $blue_mask) >> 10) << 3;
+	}
+
+    # print the icon
+	my $foffset = 0x80;
+	for(my $i = 0; $i < $fileheader->{'framecnt'}; $i++) {
+		my $framebuf = substr($contents, $foffset, 0x80);		
+		for(my $y = 0; $y < 16; $y++) {
+			for(my $x = 0; $x < 16; $x++) {
+				my $ch = vec($framebuf, ($y * 16)+$x, 4);
+				print(($ch) ? "X" : " ");
+				print(($ch) ? "X" : " ");
+			}
+			print("\n");
+		}
+		print("\n");
+		$foffset += 0x80;
+	}
+}
+
+binmode(STDOUT, "encoding(UTF-8)");
+#GetOptions(
+#    'data|d' => \$data,
+#) or die "Usage: $0 --data\n";
+
+my @files;
+if((@ARGV) > 0) {
+	@files = @ARGV;
+}
+else {
+	push @files, '-';
+}
+
+foreach my $file (@files) {	
+	my $mcfile = PlayStation::MemoryCard->load($file);
+	say (($file ne '-') ? "$file:" : 'From STDIN:');
+	if(! $mcfile) {
+		warn("unable to load: $file");
+		next;
+	}
+	my @saves;
+	# read in the saves, print out the directories if mcd
+	if($mcfile->{'type'} eq 'mcd') {
+		$mcfile->foreachDirEntry(sub {
+			my ($entry, $newsave, $entrydata) = @_;			
+            if($newsave) {
+				push @saves, $newsave;
+			}
+			print_directory($entry);
+		});
+		print("\n");		
+	}
+	elsif(($mcfile->{'type'} eq 'mcs') ||($mcfile->{'type'} eq 'rawsave'))  {
+		my $save = $mcfile->readSave();
+		push @saves, $save;
+	}
+	else {
+		warn("skipping unhandled format");
+		print("\n");
+		next;
+	}
+    
+	# print out the saves
+	say sprintf("%-20s %-40s %12s", 'filename', 'title', 'blockcount');
+	for my $save (@saves) {
+		$save->{'header'} = PlayStation::MemoryCard::parse_file_header($save->{'data'});
+		onSave($save);
+	}
+}

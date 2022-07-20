@@ -45,6 +45,7 @@ my %WriteMakefileArgs = (
         'MIME::Base64'      => '3.16',
         'WWW::Mechanize'    => 0,
         'URI'               => 0,
+        'UUID'              => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Tesla-API-*' },
