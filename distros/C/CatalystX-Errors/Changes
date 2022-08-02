@@ -39,3 +39,7 @@ The following logs changes for the CPAN distribution Valiant
           - using status_code instead of jsut status.  This is a break change but needed because I found
           'status' was just too generic and was causing namespace conflicts.
           - improved the docs a bit.
+
+0.001009 2022-07-24
+          - fixed minor issue were we'd get double logging to the Catalyst error log, but miss logging
+            other things that needed logging.

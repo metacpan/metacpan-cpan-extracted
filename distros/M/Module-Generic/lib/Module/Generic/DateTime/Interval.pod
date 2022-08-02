@@ -121,6 +121,20 @@ Example:
     $int->years( 10 );
     my $years = $int->years;
 
+=head1 SERIALISATION
+
+=for Pod::Coverage FREEZE
+
+=for Pod::Coverage STORABLE_freeze
+
+=for Pod::Coverage STORABLE_thaw
+
+=for Pod::Coverage THAW
+
+=for Pod::Coverage TO_JSON
+
+Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable> is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
+
 =head1 SEE ALSO
 
 L<Module::Generic>, L<Module::Generic::DateTime>, L<DateTime>, L<DateTime::Format::Strptime>, L<DateTime::TimeZone>

@@ -19,6 +19,7 @@ use Test::More;
 use Test::Mojo;
 
 my $t = Test::Mojo->new('Game::CharacterSheetGenerator');
+$t->app->config("face_generator_url", undef);
 $t->app->log->level('warn');
 
 # start with an english root

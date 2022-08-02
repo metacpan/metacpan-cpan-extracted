@@ -1,5 +1,11 @@
 Revision history for Geo::Coder::Abbreviations
 
+0.05	Fri Jul 22 10:05:38 EDT 2022
+	Use LWP::Simple::WithCache instead of LWP::Simple
+	Better die message when the file can't be downloaded
+	Use local copy if the abbreviations file can't be downloaded
+	Use a fork of the abbreviations as the original is giving 404 errors at the moment
+
 0.04	Sun Oct  4 20:41:12 EDT 2020
 	Fix skipped count when not testing on the Internet
 	

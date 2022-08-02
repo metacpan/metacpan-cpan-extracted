@@ -69,8 +69,6 @@ unlike( $name_no_data_tr, qr/"\w""/,
 
 my $name_data1_tr = $diva1->_input( $fields[0], $data1 );
 #note("Input Element for name_data1_tr: $name_data1_tr");
-unlike( $name_data1_tr, qr/placeholder/,
-    'Input with data has no placeholder' );
 like( $name_data1_tr, qr/ value="Baloney"/, 'Value set: value="Baloney" ' );
 
 my $ourid_no_data_tr = $diva1->_input( $fields[3] );
@@ -107,3 +105,4 @@ unlike( $trivial_tr, qr/form-control/,
     'the default class isnt in the input' );
 
 done_testing;
+

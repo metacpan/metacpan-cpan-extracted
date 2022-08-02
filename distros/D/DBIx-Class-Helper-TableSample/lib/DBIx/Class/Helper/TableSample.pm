@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_arrayref is_plain_hashref is_plain_scalarref /;
 
 use namespace::clean;
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.3.1';
 
 
 sub _resolved_attrs {
@@ -41,7 +41,7 @@ sub _resolved_attrs {
 
         my $part_sql = " tablesample";
 
-        if (my $type = $conf->{type}) {
+        if (my $type = ($conf->{method} // $conf->{type})) {
             $part_sql .= " $type";
         }
 
@@ -84,7 +84,7 @@ DBIx::Class::Helper::TableSample - Add support for tablesample clauses
 
 =head1 VERSION
 
-version v0.2.0
+version v0.3.1
 
 =head1 SYNOPSIS
 
@@ -105,7 +105,7 @@ Using the resultset:
     {
       columns     => [qw/ id name /],
       tablesample => {
-        type     => 'system',
+        method   => 'system',
         fraction => 0.5,
       },
     }
@@ -113,7 +113,7 @@ Using the resultset:
 
 This generates the SQL
 
-  SELECT me.id FROM artist me TABLESAMPLE SYSTEM (0.5)
+  SELECT me.id, me.name FROM artist me TABLESAMPLE SYSTEM (0.5)
 
 =head1 DESCRIPTION
 
@@ -150,9 +150,9 @@ references, e.g.
     }
   );
 
-=item C<type>
+=item C<method>
 
-By default, there is no sampling type., e.g. you can simply use:
+By default, there is no sampling method, e.g. you can simply use:
 
   my $rs = $schema->resultset('Wobbles')->search_rs(
     undef,
@@ -176,10 +176,28 @@ to generate
 
   SELECT me.id FROM artist me TABLESAMPLE (5)
 
-If your database supports or requires a type, you can specify it,
-e.g. C<system> or C<bernoulli>.
+If your database supports or requires a sampling method, you can
+specify it, e.g. C<system> or C<bernoulli>.
 
-See your database documentation for the allowable types.
+  my $rs = $schema->resultset('Wobbles')->search_rs(
+    undef,
+    {
+      columns     => [qw/ id name /],
+      tablesample => {
+         fraction => 5,
+         method   => 'system',
+      },
+    }
+  );
+
+will generate
+
+  SELECT me.id FROM artist me TABLESAMPLE SYSTEM (5)
+
+See your database documentation for the allowable methods.
+
+Prior to version 0.3.0, this was called C<type>. It is supported for
+backwards compatability.
 
 =item C<repeatable>
 
@@ -209,11 +227,13 @@ references.
 
 Resultsets with joins or inner queries are not supported.
 
+Delete and update queries are not supported.
+
 =head1 CAVEATS
 
 This module is experimental.
 
-Not all databases support table sampling, and thoser that do may have
+Not all databases support table sampling, and those that do may have
 different restrictions.  You should consult your database
 documentation.
 
@@ -244,7 +264,7 @@ Library L<https://www.sciencephoto.com>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Robert Rothenberg.
+This software is Copyright (c) 2019-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

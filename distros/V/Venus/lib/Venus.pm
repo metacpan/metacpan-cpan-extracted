@@ -7,41 +7,39 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '0.09';
+our $VERSION = '1.01';
 
 # AUTHORITY
 
-our $AUTHORITY = 'cpan:CPANERY';
+our $AUTHORITY = 'cpan:AWNCORP';
 
 # IMPORTS
 
 sub import {
-  my ($package, @exports) = @_;
+  my ($self, @args) = @_;
 
   my $target = caller;
 
   no strict 'refs';
 
   my %seen;
-  for my $name (grep !$seen{$_}++, @exports, 'true', 'false') {
-    *{"${target}::${name}"} = $package->can($name) if !$target->can($name);
+  for my $name (grep !$seen{$_}++, @args, 'true', 'false') {
+    *{"${target}::${name}"} = $self->can($name) if !$target->can($name);
   }
 
-  return $package;
+  return $self;
 }
 
 # FUNCTIONS
 
 sub catch (&) {
-  my (@args) = @_;
-
-  my ($callback) = @_;
-
-  require Venus::Try;
+  my ($data) = @_;
 
   my $error;
 
-  my @result = Venus::Try->new($callback)->error(\$error)->result;
+  require Venus::Try;
+
+  my @result = Venus::Try->new($data)->error(\$error)->result;
 
   return wantarray ? ($error ? ($error, undef) : ($error, @result)) : $error;
 }
@@ -64,11 +62,9 @@ sub false () {
 }
 
 sub raise ($;$) {
-  my ($package, $data) = @_;
+  my ($self, $data) = @_;
 
-  my $parent = 'Venus::Error';
-
-  ($package, $parent) = (@$package) if (ref($package) eq 'ARRAY');
+  ($self, my $parent) = (@$self) if (ref($self) eq 'ARRAY');
 
   $data //= {};
   $data->{context} //= (caller(1))[3];
@@ -77,7 +73,7 @@ sub raise ($;$) {
 
   require Venus::Throw;
 
-  return Venus::Throw->new(package => $package, parent => $parent)->error($data);
+  return Venus::Throw->new(package => $self, parent => $parent)->error($data);
 }
 
 sub true () {
@@ -103,7 +99,7 @@ OO Standard Library for Perl 5
 
 =head1 VERSION
 
-0.09
+1.01
 
 =cut
 
@@ -140,14 +136,15 @@ OO Standard Library for Perl 5
 =head1 DESCRIPTION
 
 This library provides an object-orientation framework and extendible standard
-library for Perl 5, built on top of L<Moo> with classes which wrap most native
-Perl data types. Venus has a simple modular architecture, robust library of
-classes and methods, supports pure-Perl autoboxing, advanced exception
-handling, "true" and "false" keywords, package introspection, command-line
-options parsing, and more. This package will always automatically exports
-C<true> and C<false> keyword functions (unless existing routines of the same
-name already exist in the calling package), otherwise exports keyword functions
-as requested at import. This library requires Perl C<5.18+>.
+library for Perl 5, built on top of the L<Mars> architecture with classes which
+wrap most native Perl data types. Venus has a simple modular architecture,
+robust library of classes, methods, and roles, supports pure-Perl autoboxing,
+advanced exception handling, "true" and "false" functions, package
+introspection, command-line options parsing, and more. This package will always
+automatically exports C<true> and C<false> keyword functions (unless existing
+routines of the same name already exist in the calling package or its parents),
+otherwise exports keyword functions as requested at import. This library
+requires Perl C<5.18+>.
 
 =cut
 
@@ -177,7 +174,9 @@ I<Since C<0.01>>
 
   my $error = catch {die};
 
-  $error; # 'Died at ...'
+  $error;
+
+  # "Died at ..."
 
 =back
 
@@ -191,7 +190,9 @@ I<Since C<0.01>>
 
   my ($error, $result) = catch {error};
 
-  $error; # Venus::Error
+  $error;
+
+  # bless({...}, 'Venus::Error')
 
 =back
 
@@ -205,7 +206,9 @@ I<Since C<0.01>>
 
   my ($error, $result) = catch {true};
 
-  $result; # 1
+  $result;
+
+  # 1
 
 =back
 
@@ -230,6 +233,8 @@ I<Since C<0.01>>
 
   my $error = error;
 
+  # bless({...}, 'Venus::Error')
+
 =back
 
 =over 4
@@ -243,6 +248,8 @@ I<Since C<0.01>>
   my $error = error {
     message => 'Something failed!',
   };
+
+  # bless({message => 'Something failed!', ...}, 'Venus::Error')
 
 =back
 
@@ -267,6 +274,8 @@ I<Since C<0.01>>
 
   my $false = false;
 
+  # 0
+
 =back
 
 =over 4
@@ -278,6 +287,8 @@ I<Since C<0.01>>
   use Venus;
 
   my $true = !false;
+
+  # 1
 
 =back
 
@@ -303,6 +314,8 @@ I<Since C<0.01>>
 
   my $error = raise 'MyApp::Error';
 
+  # bless({...}, 'MyApp::Error')
+
 =back
 
 =over 4
@@ -314,6 +327,8 @@ I<Since C<0.01>>
   use Venus 'raise';
 
   my $error = raise ['MyApp::Error', 'Venus::Error'];
+
+  # bless({...}, 'MyApp::Error')
 
 =back
 
@@ -328,6 +343,8 @@ I<Since C<0.01>>
   my $error = raise ['MyApp::Error', 'Venus::Error'], {
     message => 'Something failed!',
   };
+
+  # bless({message => 'Something failed!', ...}, 'MyApp::Error')
 
 =back
 
@@ -352,6 +369,8 @@ I<Since C<0.01>>
 
   my $true = true;
 
+  # 1
+
 =back
 
 =over 4
@@ -363,6 +382,8 @@ I<Since C<0.01>>
   use Venus;
 
   my $false = !true;
+
+  # 0
 
 =back
 
@@ -413,6 +434,8 @@ B<example 1>
 
   $array->count == $hash->count;
 
+  # 1
+
 =back
 
 =over 4
@@ -430,6 +453,8 @@ B<example 1>
 
   my $array = Venus::Array->new;
 
+  # bless({...}, 'Venus::Array')
+
 B<example 2>
 
   package main;
@@ -437,6 +462,8 @@ B<example 2>
   use Venus::Boolean;
 
   my $boolean = Venus::Boolean->new;
+
+  # bless({...}, 'Venus::Boolean')
 
 B<example 3>
 
@@ -446,6 +473,8 @@ B<example 3>
 
   my $code = Venus::Code->new;
 
+  # bless({...}, 'Venus::Code')
+
 B<example 4>
 
   package main;
@@ -453,6 +482,8 @@ B<example 4>
   use Venus::Float;
 
   my $float = Venus::Float->new;
+
+  # bless({...}, 'Venus::Float')
 
 B<example 5>
 
@@ -462,6 +493,8 @@ B<example 5>
 
   my $hash = Venus::Hash->new;
 
+  # bless({...}, 'Venus::Hash')
+
 B<example 6>
 
   package main;
@@ -469,6 +502,8 @@ B<example 6>
   use Venus::Number;
 
   my $number = Venus::Number->new;
+
+  # bless({...}, 'Venus::Number')
 
 B<example 7>
 
@@ -478,6 +513,8 @@ B<example 7>
 
   my $regexp = Venus::Regexp->new;
 
+  # bless({...}, 'Venus::Regexp')
+
 B<example 8>
 
   package main;
@@ -485,6 +522,8 @@ B<example 8>
   use Venus::Scalar;
 
   my $scalar = Venus::Scalar->new;
+
+  # bless({...}, 'Venus::Scalar')
 
 B<example 9>
 
@@ -494,6 +533,8 @@ B<example 9>
 
   my $string = Venus::String->new;
 
+  # bless({...}, 'Venus::String')
+
 B<example 10>
 
   package main;
@@ -501,6 +542,8 @@ B<example 10>
   use Venus::Undef;
 
   my $undef = Venus::Undef->new;
+
+  # bless({...}, 'Venus::Undef')
 
 =back
 
@@ -540,6 +583,8 @@ B<example 1>
 
   my $args = Venus::Args->new;
 
+  # bless({...}, 'Venus::Args')
+
 B<example 2>
 
   package main;
@@ -547,6 +592,8 @@ B<example 2>
   use Venus::Box;
 
   my $box = Venus::Box->new;
+
+  # bless({...}, 'Venus::Box')
 
 B<example 3>
 
@@ -556,6 +603,8 @@ B<example 3>
 
   my $docs = Venus::Data->new->docs;
 
+  # bless({...}, 'Venus::Data')
+
 B<example 4>
 
   package main;
@@ -563,6 +612,8 @@ B<example 4>
   use Venus::Date;
 
   my $date = Venus::Date->new;
+
+  # bless({...}, 'Venus::Date')
 
 B<example 5>
 
@@ -572,6 +623,8 @@ B<example 5>
 
   my $error = Venus::Error->new;
 
+  # bless({...}, 'Venus::Error')
+
 B<example 6>
 
   package main;
@@ -579,6 +632,8 @@ B<example 6>
   use Venus::Json;
 
   my $json = Venus::Json->new;
+
+  # bless({...}, 'Venus::Json')
 
 B<example 7>
 
@@ -588,6 +643,8 @@ B<example 7>
 
   my $name = Venus::Name->new;
 
+  # bless({...}, 'Venus::Name')
+
 B<example 8>
 
   package main;
@@ -595,6 +652,8 @@ B<example 8>
   use Venus::Opts;
 
   my $opts = Venus::Opts->new;
+
+  # bless({...}, 'Venus::Opts')
 
 B<example 9>
 
@@ -604,6 +663,8 @@ B<example 9>
 
   my $path = Venus::Path->new;
 
+  # bless({...}, 'Venus::Path')
+
 B<example 10>
 
   package main;
@@ -611,6 +672,8 @@ B<example 10>
   use Venus::Data;
 
   my $text = Venus::Data->new->text;
+
+  # bless({...}, 'Venus::Data')
 
 B<example 11>
 
@@ -620,6 +683,8 @@ B<example 11>
 
   my $space = Venus::Space->new;
 
+  # bless({...}, 'Venus::Space')
+
 B<example 12>
 
   package main;
@@ -627,6 +692,8 @@ B<example 12>
   use Venus::Throw;
 
   my $throw = Venus::Throw->new;
+
+  # bless({...}, 'Venus::Throw')
 
 B<example 13>
 
@@ -636,6 +703,8 @@ B<example 13>
 
   my $try = Venus::Try->new;
 
+  # bless({...}, 'Venus::Try')
+
 B<example 14>
 
   package main;
@@ -643,6 +712,8 @@ B<example 14>
   use Venus::Type;
 
   my $type = Venus::Type->new;
+
+  # bless({...}, 'Venus::Type')
 
 B<example 15>
 
@@ -652,6 +723,8 @@ B<example 15>
 
   my $vars = Venus::Vars->new;
 
+  # bless({...}, 'Venus::Vars')
+
 B<example 16>
 
   package main;
@@ -659,6 +732,8 @@ B<example 16>
   use Venus::Match;
 
   my $match = Venus::Match->new;
+
+  # bless({...}, 'Venus::Match')
 
 B<example 17>
 
@@ -668,6 +743,8 @@ B<example 17>
 
   my $process = Venus::Process->new;
 
+  # bless({...}, 'Venus::Process')
+
 B<example 18>
 
   package main;
@@ -676,6 +753,8 @@ B<example 18>
 
   my $template = Venus::Template->new;
 
+  # bless({...}, 'Venus::Template')
+
 B<example 19>
 
   package main;
@@ -683,6 +762,8 @@ B<example 19>
   use Venus::Yaml;
 
   my $yaml = Venus::Yaml->new;
+
+  # bless({...}, 'Venus::Yaml')
 
 =back
 
@@ -703,6 +784,8 @@ B<example 1>
 
   $space->do('tryload')->routines;
 
+  # [...]
+
 =back
 
 =over 4
@@ -718,6 +801,7 @@ B<example 1>
 
   use Venus::Class;
 
+  with 'Venus::Role::Tryable';
   with 'Venus::Role::Throwable';
   with 'Venus::Role::Catchable';
 
@@ -733,7 +817,7 @@ B<example 1>
 
   my $error = $myapp->catch('execute');
 
-  # $error->isa('MyApp::Error');
+  # bless({...}, 'MyApp::Error');
 
 =back
 
@@ -797,6 +881,8 @@ B<example 1>
 
   $string->base64;
 
+  # "aGVsbG8sIHdvcmxk\n"
+
 =back
 
 =over 4
@@ -821,10 +907,12 @@ B<example 1>
 
   $template->render;
 
+  # "Welcome, friend!"
+
 =back
 
 =head1 AUTHORS
 
-Cpanery, C<cpanery@cpan.org>
+Awncorp, C<awncorp@cpan.org>
 
 =cut

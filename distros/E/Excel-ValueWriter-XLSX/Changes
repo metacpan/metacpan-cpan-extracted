@@ -1,5 +1,17 @@
 Revision history for Excel-ValueWriter-XLSX
 
+0.6      02.08.2022
+  - escape XML entities in formulas
+
+0.5      02.08.2022
+  - bug fix : $VERSION was declared with 'my' instead of 'our'
+
+0.4      01.08.2022
+  - save_as() can also take a filehandle instead of a filename
+
+0.3      31.07.2022
+  - support for formulas
+
 0.2      15.01.2022
   - fix UTF8 support
   - new optional parameter: $headers

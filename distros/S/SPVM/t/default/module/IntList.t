@@ -6,28 +6,28 @@ use warnings;
 
 use Test::More;
 
-use SPVM 'TestCase::Lib::IntList';
-
-
+use SPVM 'TestCase::Module::IntList';
 
 # Start objects count
 my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
-# SPVM::IntList
+# IntList
 {
-  ok(SPVM::TestCase::Lib::IntList->push);
-  ok(SPVM::TestCase::Lib::IntList->pop);
-  ok(SPVM::TestCase::Lib::IntList->new);
-  ok(SPVM::TestCase::Lib::IntList->new_len);
-  ok(SPVM::TestCase::Lib::IntList->unshift);
-  ok(SPVM::TestCase::Lib::IntList->shift);
-  ok(SPVM::TestCase::Lib::IntList->length);
-  ok(SPVM::TestCase::Lib::IntList->get);
-  ok(SPVM::TestCase::Lib::IntList->set);
-  ok(SPVM::TestCase::Lib::IntList->set_array);
-  ok(SPVM::TestCase::Lib::IntList->to_array);
-  ok(SPVM::TestCase::Lib::IntList->insert);
-  ok(SPVM::TestCase::Lib::IntList->remove);
+  ok(SPVM::TestCase::Module::IntList->fields);
+  ok(SPVM::TestCase::Module::IntList->new);
+  ok(SPVM::TestCase::Module::IntList->new_len);
+  ok(SPVM::TestCase::Module::IntList->get);
+  ok(SPVM::TestCase::Module::IntList->insert);
+  ok(SPVM::TestCase::Module::IntList->pop);
+  ok(SPVM::TestCase::Module::IntList->push);
+  ok(SPVM::TestCase::Module::IntList->remove);
+  ok(SPVM::TestCase::Module::IntList->replace);
+  ok(SPVM::TestCase::Module::IntList->resize);
+  ok(SPVM::TestCase::Module::IntList->set);
+  ok(SPVM::TestCase::Module::IntList->set_array);
+  ok(SPVM::TestCase::Module::IntList->shift);
+  ok(SPVM::TestCase::Module::IntList->to_array);
+  ok(SPVM::TestCase::Module::IntList->unshift);
 }
 
 # All object is freed

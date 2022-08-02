@@ -54,6 +54,6 @@
          "url" : "https://github.com/oetiker/mojolicious-plugin-spnego"
       }
    },
-   "version" : "v0.5.2",
+   "version" : "v0.5.4",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

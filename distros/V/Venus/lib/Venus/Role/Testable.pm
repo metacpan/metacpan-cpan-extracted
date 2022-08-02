@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo::Role;
+use Venus::Role 'with';
 
 # METHODS
 
@@ -27,6 +27,12 @@ sub istrue {
   require Venus::Boolean;
 
   return $self->$code(@args) ? Venus::Boolean::TRUE() : Venus::Boolean::FALSE();
+}
+
+# EXPORTS
+
+sub EXPORT {
+  ['isfalse', 'istrue']
 }
 
 1;
@@ -53,7 +59,7 @@ Testable Role for Perl 5
 
   with 'Venus::Role::Testable';
 
-  has 'value';
+  attr 'value';
 
   sub execute {
     return pop;

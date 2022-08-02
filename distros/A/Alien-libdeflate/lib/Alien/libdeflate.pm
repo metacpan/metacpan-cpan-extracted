@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw{ Alien::Base };
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 1;
 
@@ -25,10 +25,10 @@ __END__
   <img src="https://img.shields.io/cpan/v/Alien-libdeflate.svg"
        alt="CPAN" />
 </a>
-<!-- Travis -->
-<a href="https://travis-ci.org/kiwiroy/alien-libdeflate">
-  <img src="https://travis-ci.org/kiwiroy/alien-libdeflate.svg?branch=master"
-       alt="Travis Buils Status" />
+<!-- GitHub Actions -->
+<a href="https://github.com/kiwiroy/alien-libdeflate/actions/workflows/ci.yml">
+  <img src="https://github.com/kiwiroy/alien-libdeflate/actions/workflows/ci.yml/badge.svg"
+       alt="Build Status" />
 </a>
 
 =end html
@@ -69,10 +69,6 @@ packages can make use of them.
 The version installed will be the latest release on the master branch from
 the libdeflate GitHub L<repository|https://github.com/ebiggers/libdeflate>.
 
-=head1 AUTHOR
-
-kiwiroy
-
 =head2 Influential Environment Variables
 
 =over 4
@@ -90,5 +86,11 @@ default search paths, set this variable to add the B<lib> directory using
 C<-L/path/to/system/libdeflate/lib>
 
 =back
+
+=head1 AUTHORS
+
+Roy Storey (kiwiroy@cpan.org)
+
+Zakariyya Mughal <zmughal@cpan.org>
 
 =cut

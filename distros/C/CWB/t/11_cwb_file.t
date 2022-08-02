@@ -1,7 +1,7 @@
 # -*-cperl-*-
 ## Test CWB::OpenFile function with automagic compression/decompression
 
-use Test::More tests => 28;
+use Test::More tests => 33;
 
 use CWB;
 
@@ -18,9 +18,10 @@ test_read_file("< data/files/ok.txt", "read plain file (explicit read mode, 1-ar
 test_read_file("<", "data/files/ok.txt", "read plain file (explicit read mode, 2-argument form)");
 
 ## check which compression formats are available
-our $have_Z = is_available("(echo ok | compress | uncompress)");
-our $have_gz = is_available("gzip -cd data/files/ok.txt.gz");
+our $have_Z   = is_available("(echo ok | compress | uncompress)");
+our $have_gz  = is_available("gzip  -cd data/files/ok.txt.gz");
 our $have_bz2 = is_available("bzip2 -cd data/files/ok.txt.bz2");
+our $have_xz  = is_available("xz    -cd data/files/ok.txt.xz");
 
 ## try reading legacy compressed file (.Z) if "compress" and "uncompress" programs are available
 SKIP: {
@@ -46,40 +47,53 @@ SKIP: {
   test_read_file("<", "data/files/ok.txt.bz2", "read .bz2 file (explicit read mode, 2-argument form)");
 }
 
+## try reading XZ compressed file (.xz) if "xz" program is available
+SKIP: {
+  skip "xz program not installed", 3 unless $have_xz;
+  test_read_file("data/files/ok.txt.xz", "read .xz file (implicit read mode)"); # T13
+  test_read_file("< data/files/ok.txt.xz", "read .xz file (explicit read mode, 1-argument form)");
+  test_read_file("<", "data/files/ok.txt.xz", "read .xz file (explicit read mode, 2-argument form)");
+}
+
 ## try writing and then reading uncompressed and compressed files, with 1-argument and 2-argument forms
-test_read_write_file(".txt", 0); # 1-argument form, T13
+test_read_write_file(".txt", 0); # 1-argument form, T16
 test_read_write_file(".txt", 1); # 2-argument form
 SKIP: {
   skip "compress program not installed", 2 unless $have_Z;
-  test_read_write_file(".Z", 0); # 1-argument form, T15
+  test_read_write_file(".Z", 0); # 1-argument form, T18
   test_read_write_file(".Z", 1); # 2-argument form
 }
 SKIP: {
   skip "gzip program not installed", 2 unless $have_gz;
-  test_read_write_file(".gz", 0); # 1-argument form, T17
+  test_read_write_file(".gz", 0); # 1-argument form, T20
   test_read_write_file(".gz", 1); # 2-argument form
 }
 SKIP: {
   skip "bzip2 program not installed", 2 unless $have_bz2;
-  test_read_write_file(".bz2", 0); # 1-argument form, T19
+  test_read_write_file(".bz2", 0); # 1-argument form, T22
   test_read_write_file(".bz2", 1); # 2-argument form
+}
+SKIP: {
+  skip "xz program not installed", 2 unless $have_xz;
+  test_read_write_file(".xz", 0); # 1-argument form, T24
+  test_read_write_file(".xz", 1); # 2-argument form
 }
 
 ## test I/O layers (encoding for input files)
-my $textU = test_load_file("<:encoding(UTF-8)", "data/files/words_utf8.txt", "load plain file in UTF-8 encoding"); # T21
+my $textU = test_load_file("<:encoding(UTF-8)", "data/files/words_utf8.txt", "load plain file in UTF-8 encoding"); # T26
 my $textL = test_load_file("<:encoding(ISO-8859-1)", "data/files/words_latin1.txt", "load plain file in ISO-8859-1 encoding");
 ok($textU eq $textL, "character encoding I/O layer works");
 ok(uc($textU) eq uc($textL) && uc($textU) ne $textU, "character encoding I/O layer produces Unicode strings");
 SKIP: {
   skip "gzip program not installed", 3 unless $have_gz;
-  my $textUgz = test_load_file("<:encoding(UTF-8)", "data/files/words_utf8.txt.gz", "load .gz file in UTF-8 encoding"); # T25
+  my $textUgz = test_load_file("<:encoding(UTF-8)", "data/files/words_utf8.txt.gz", "load .gz file in UTF-8 encoding"); # T30
   my $textLgz = test_load_file("<:encoding(ISO-8859-1)", "data/files/words_latin1.txt.gz", "load .gz file in ISO-8859-1 encoding");
   ok($textUgz eq $textU && $textLgz eq $textL, "character encoding I/O layer works with .gz files");
 }
 
 ## test that reading non-existent compressed file fails immediately
 eval { CWB::OpenFile("data/files/does_not_exist.gz") };
-like($@, qr/does not exist/, "error condition when opening non-existent .gz file"); # T28
+like($@, qr/does not exist/, "error condition when opening non-existent .gz file"); # T33
 
 ## check if specified tool is available in user's path
 sub is_available {

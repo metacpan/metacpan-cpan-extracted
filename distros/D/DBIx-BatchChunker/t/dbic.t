@@ -62,6 +62,7 @@ subtest 'DBIC Processing (+ process_past_max)' => sub {
         process_past_max  => 1,
         min_chunk_percent => 0,
         target_time       => 0,
+        verbose           => 0,
     );
 
     is($batch_chunker->id_name, 'me.trackid', 'Right id_name guessed');
@@ -110,6 +111,7 @@ subtest 'DBIC Processing + single_rows (+ rsc)' => sub {
         single_rows       => 1,
         min_chunk_percent => 0,
         target_time       => 0,
+        verbose           => 0,
     );
 
     is($batch_chunker->id_name, 'me.trackid', 'Right id_name guessed and aliased');
@@ -145,6 +147,7 @@ subtest 'DIY Processing (+ process_past_max)' => sub {
 
         process_past_max => 1,
         target_time      => 0,
+        verbose          => 0,
     );
 
     # Calculate
@@ -189,6 +192,7 @@ subtest 'process_past_max + min_chunk_percent' => sub {
         min_chunk_percent => sprintf("%.2f",
             ($CHUNK_SIZE - 1) / $CHUNK_SIZE
         ) + 0.01,
+        verbose           => 0,
     );
 
     # Calculate
@@ -237,6 +241,7 @@ subtest 'Automatic execution (DBIC Processing + single_rows + rsc)' => sub {
 
         single_rows       => 1,
         min_chunk_percent => 0,
+        verbose           => 0,
     );
 
     isa_ok($batch_chunker, ['DBIx::BatchChunker'], '$bc');
@@ -276,6 +281,7 @@ subtest 'Runtime targeting (too fast)' => sub {
         },
 
         min_chunk_percent => 0,
+        debug             => 0,
     );
 
     my $range = $batch_chunker->max_id - $batch_chunker->min_id + 1;
@@ -318,6 +324,7 @@ subtest 'Runtime targeting (too slow)' => sub {
         },
 
         min_chunk_percent => 0,
+        debug             => 0,
     );
 
     my $range = $batch_chunker->max_id - $batch_chunker->min_id + 1;
@@ -354,6 +361,7 @@ subtest 'Retry testing' => sub {
         dbic_retry_opts   => {},  # non-DBIC "defaults"
         min_chunk_percent => 0,
         target_time       => 0,
+        verbose           => 0,
     );
 
     # Calculate
@@ -396,6 +404,7 @@ subtest 'Retry testing + single_rows' => sub {
         single_rows       => 1,
         min_chunk_percent => 0,
         target_time       => 0,
+        verbose           => 0,
     );
 
     # Calculate

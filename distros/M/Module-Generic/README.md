@@ -59,7 +59,7 @@ SYNOPSIS
 VERSION
 =======
 
-        v0.23.0
+        v0.25.0
 
 DESCRIPTION
 ===========
@@ -306,7 +306,9 @@ returns the perl data.
 
 The 2 serialisers currently supported are:
 [Sereal](https://metacpan.org/pod/Sereal){.perl-module} and
-[Storable](https://metacpan.org/pod/Storable){.perl-module}. They are
+[Storable::Improved](https://metacpan.org/pod/Storable::Improved){.perl-module}
+(or the legacy
+[Storable](https://metacpan.org/pod/Storable){.perl-module}). They are
 not required by
 [Module::Generic](https://metacpan.org/pod/Module::Generic){.perl-module},
 so you must install them yourself. If the serialiser chosen is not
@@ -337,33 +339,42 @@ The supported parameters are:
     A file handle. This is used when the serialiser is
     [Storable](https://metacpan.org/pod/Storable){.perl-module} to call
     its function [\"store\_fd\" in
-    Storable](https://metacpan.org/pod/Storable#store_fd){.perl-module}
+    Storable::Improved](https://metacpan.org/pod/Storable::Improved#store_fd){.perl-module}
     and [\"fd\_retrieve\" in
-    Storable](https://metacpan.org/pod/Storable#fd_retrieve){.perl-module}
+    Storable::Improved](https://metacpan.org/pod/Storable::Improved#fd_retrieve){.perl-module}
 
 -   *lock*
 
     Boolean. If true, this will lock the file before reading from it.
     This works only in conjonction with *file* and the serialiser
-    [Storable](https://metacpan.org/pod/Storable){.perl-module}
+    [Storable::Improved](https://metacpan.org/pod/Storable::Improved){.perl-module}
 
 -   *serialiser* or *serializer*
 
     A string being the class of the serialiser to use. This can be only
     either [Sereal](https://metacpan.org/pod/Sereal){.perl-module} or
-    [Storable](https://metacpan.org/pod/Storable){.perl-module}
+    [Storable](https://metacpan.org/pod/Storable){.perl-module} or
+    [Storable::Improved](https://metacpan.org/pod/Storable::Improved){.perl-module}
 
 Additionally the following options are supported and passed through
-directly to [\"decode\" in
-Sereal::Decoder](https://metacpan.org/pod/Sereal::Decoder#decode){.perl-module}
-if the serialiser is
-[Sereal](https://metacpan.org/pod/Sereal){.perl-module}:
-*alias\_smallint*, *alias\_varint\_under*, *incremental*,
-*max\_num\_array\_entries*, *max\_num\_hash\_entries*,
-*max\_recursion\_depth*, *max\_string\_length*,
-*max\_uncompressed\_size*, *no\_bless\_objects*, *refuse\_objects*,
-*refuse\_snappy*, *set\_readonly*, *set\_readonly\_scalars*,
-*use\_undef*, *validate\_utf8*
+directly to each serialiser:
+
+-   [CBOR](https://metacpan.org/pod/CBOR::XS){.perl-module}:
+    `max_depth`, `max_size`, `allow_unknown`, `allow_sharing`,
+    `allow_cycles`, `forbid_objects`, `pack_strings`, `text_keys`,
+    `text_strings`, `validate_utf8`, `filter`
+-   [\"decode\" in
+    Sereal::Decoder](https://metacpan.org/pod/Sereal::Decoder#decode){.perl-module}
+    if the serialiser is
+    [Sereal](https://metacpan.org/pod/Sereal){.perl-module}:
+    `alias_smallint`, `alias_varint_under`, `incremental`,
+    `max_num_array_entries`, `max_num_hash_entries`,
+    `max_recursion_depth`, `max_string_length`, `max_uncompressed_size`,
+    `no_bless_objects`, `refuse_objects`, `refuse_snappy`,
+    `set_readonly`, `set_readonly_scalars`, `use_undef`, `validate_utf8`
+-   [Storable::Improved](https://metacpan.org/pod/Storable::Improved){.perl-module}
+    / [Storable](https://metacpan.org/pod/Storable){.perl-module}: no
+    option available
 
 If an error occurs, this sets an
 [error](https://metacpan.org/pod/Module::Generic#error){.perl-module}
@@ -1186,9 +1197,12 @@ serialise
 This method use a specified serialiser class and serialise the given
 data either by returning it or by saving it directly to a given file.
 
-The 2 serialisers currently supported are:
+The 3 serialisers currently supported are:
+[CBOR](https://metacpan.org/pod/CBOR::XS){.perl-module},
 [Sereal](https://metacpan.org/pod/Sereal){.perl-module} and
-[Storable](https://metacpan.org/pod/Storable){.perl-module}. They are
+[Storable::Improved](https://metacpan.org/pod/Storable::Improved){.perl-module}
+(or the legacy version
+[Storable](https://metacpan.org/pod/Storable){.perl-module}). They are
 not required by
 [Module::Generic](https://metacpan.org/pod/Module::Generic){.perl-module},
 so you must install them yourself. If the serialiser chosen is not
@@ -1201,7 +1215,8 @@ parameters. It can then:
 
 -   save data directly to File
 -   save data to a file handle (only with
-    [Storable](https://metacpan.org/pod/Storable){.perl-module})
+    [Storable::Improved](https://metacpan.org/pod/Storable::Improved){.perl-module}
+    / [Storable](https://metacpan.org/pod/Storable){.perl-module})
 -   Return the serialised data
 
 The supported parameters are:
@@ -1218,36 +1233,46 @@ The supported parameters are:
 -   *io*
 
     A file handle. This is used when the serialiser is
-    [Storable](https://metacpan.org/pod/Storable){.perl-module} to call
-    its function [\"store\_fd\" in
-    Storable](https://metacpan.org/pod/Storable#store_fd){.perl-module}
+    [Storable::Improved](https://metacpan.org/pod/Storable::Improved){.perl-module}
+    / [Storable](https://metacpan.org/pod/Storable){.perl-module} to
+    call its function [\"store\_fd\" in
+    Storable::Improved](https://metacpan.org/pod/Storable::Improved#store_fd){.perl-module}
     and [\"fd\_retrieve\" in
-    Storable](https://metacpan.org/pod/Storable#fd_retrieve){.perl-module}
+    Storable::Improved](https://metacpan.org/pod/Storable::Improved#fd_retrieve){.perl-module}
 
 -   *lock*
 
     Boolean. If true, this will lock the file before writing to it. This
     works only in conjonction with *file* and the serialiser
-    [Storable](https://metacpan.org/pod/Storable){.perl-module}
+    [Storable::Improved](https://metacpan.org/pod/Storable::Improved){.perl-module}
 
 -   *serialiser* or *serializer*
 
     A string being the class of the serialiser to use. This can be only
     either [Sereal](https://metacpan.org/pod/Sereal){.perl-module} or
-    [Storable](https://metacpan.org/pod/Storable){.perl-module}
+    [Storable::Improved](https://metacpan.org/pod/Storable::Improved){.perl-module}
 
 Additionally the following options are supported and passed through
-directly to [\"decode\" in
-Sereal::Decoder](https://metacpan.org/pod/Sereal::Decoder#decode){.perl-module}
-if the serialiser is
-[Sereal](https://metacpan.org/pod/Sereal){.perl-module}:
-*aliased\_dedupe\_strings*, *canonical*, *canonical\_refs*, *compress*,
-*compress\_level*, *compress\_threshold*, *croak\_on\_bless*,
-*dedupe\_strings*, *freeze\_callbacks*, *max\_recursion\_depth*,
-*no\_bless\_objects*, *no\_shared\_hashkeys*, *protocol\_version*,
-*snappy*, *snappy\_incr*, *snappy\_threshold*, *sort\_keys*,
-*stringify\_unknown*, *undef\_unknown*, *use\_protocol\_v1*,
-*warn\_unknown*
+directly for each serialiser:
+
+-   [CBOR](https://metacpan.org/pod/CBOR::XS){.perl-module}:
+    `max_depth`, `max_size`, `allow_unknown`, `allow_sharing`,
+    `allow_cycles`, `forbid_objects`, `pack_strings`, `text_keys`,
+    `text_strings`, `validate_utf8`, `filter`
+-   [\"encode\" in
+    Sereal::Decoder](https://metacpan.org/pod/Sereal::Decoder#encode){.perl-module}
+    if the serialiser is
+    [Sereal](https://metacpan.org/pod/Sereal){.perl-module}:
+    `aliased_dedupe_strings`, `canonical`, `canonical_refs`, `compress`,
+    `compress_level`, `compress_threshold`, `croak_on_bless`,
+    `dedupe_strings`, `freeze_callbacks`, `max_recursion_depth`,
+    `no_bless_objects`, `no_shared_hashkeys`, `protocol_version`,
+    `snappy`, `snappy_incr`, `snappy_threshold`, `sort_keys`,
+    `stringify_unknown`, `undef_unknown`, `use_protocol_v1`,
+    `warn_unknown`
+-   [Storable::Improved](https://metacpan.org/pod/Storable::Improved){.perl-module}
+    / [Storable](https://metacpan.org/pod/Storable){.perl-module}: no
+    option available
 
 If an error occurs, this sets an
 [error](https://metacpan.org/pod/Module::Generic#error){.perl-module}
@@ -1415,21 +1440,71 @@ Provided with arguments and this support method will return the
 arguments provided as hash reference irrespective of whether they were
 initially provided as hash reference or a simple hash.
 
+In list context, this returns an hash reference and an array reference
+containing the order of the properties provided.
+
 For example:
 
         my $ref = $self->_get_args_as_hash( first => 'John', last => 'Doe' );
         # returns hash reference { first => 'John', last => 'Doe' }
         my $ref = $self->_get_args_as_hash({ first => 'John', last => 'Doe' });
         # same result as previous example
-        my $res = $self->_get_args_as_hash(); # no args provided
+        my $ref = $self->_get_args_as_hash(); # no args provided
         # returns an empty hash reference
+        my( $ref, $keys ) = $self->_get_args_as_hash( first => 'John', last => 'Doe' );
+
+In the last example, `$keys` is an [array
+object](https://metacpan.org/pod/Module::Generic::Array){.perl-module}
+containing the list of properties passed an in the order they were
+provided, i.e. `first` and `last`. If the properties were provided as an
+hash reference, the `$keys` returned will be the sorted list of
+properties, such as:
+
+        my( $ref, $keys ) = $self->_get_args_as_hash({ last => 'Doe', first => 'John' });
+
+Here, `$keys` will be sorted and contain the properties in their
+alphabetical order.
 
 However, this will return empty:
 
         my $ref = $self->_get_args_as_hash( { age => 42, city => 'Tokyo' }, some_other => 'parameter' );
 
 This returns an empty hash reference, because although the first
-parameter is an hash reference, there is more than on parameter.
+parameter is an hash reference, there is more than one parameter.
+
+As of version v0.24.0, this utility method allows for more advanced use
+and permits embedding parameters among arguments, remove them from the
+list and return them.
+
+For example:
+
+Assuming `@_` contains: `foo bar debug 4 baz`
+
+        my $ref = $self->_get_args_as_hash( @_, args_list => [qw( debug )] );
+
+This will set `$ref` with `debug` only.
+
+Even the special parameter `args_list` does not have to be at the end
+and could be anywhere:
+
+        my $ref = $self->_get_args_as_hash( 'foo', 'bar', args_list => [qw( debug )], 'debug', 4, 'baz' );
+
+If you want to modify `@_`,because you need its content without any
+params, pass `@_` as an array reference.
+
+        my $ref = $self->_get_args_as_hash( \@_, args_list => [qw( debug )] );
+        say "@_";
+
+`$ref` is an hash reference that would contain `debug` and `@_` only
+contains `foo bar baz`
+
+You can also simply pass `@_` as a reference to simply save memory.
+
+Assuming `@_` is `foo bar baz 3 debug 4`
+
+        my $ref = $self->_get_args_as_hash( \@_ );
+
+This would set `$ref` to be an hash reference with keys `foo baz debug`
 
 \_get\_stack\_trace
 -------------------
@@ -1446,6 +1521,25 @@ object initiated with the following options set:
 
 :   This is set to 1 so this very method is not included in the frames
     stack
+
+\_implement\_freeze\_thaw
+-------------------------
+
+Provided with a list of package names and this method will implement in
+each of them the subroutines necessary to handle
+[Storable::Improved](https://metacpan.org/pod/Storable::Improved){.perl-module}
+(or the legacy
+[Storable](https://metacpan.org/pod/Storable){.perl-module}),
+[CBOR](https://metacpan.org/pod/CBOR::XS){.perl-module} and
+[Sereal](https://metacpan.org/pod/Sereal){.perl-module} serialisation.
+
+In effect, it will check that the subroutines `FREEZE`, `THAW`,
+`STORABLE_freeze` and `STORABLE_thaw` exists or sets up simple ones if
+they are not defined.
+
+This works for packages that use hash-based objects. However, you need
+to make sure there is no specific package requirements, and if there is,
+you might need to customise those subroutines by yourself.
 
 \_is\_a
 -------
@@ -1520,6 +1614,47 @@ If you would use :
 
 It would rather return the module package name: `My::Module`
 
+\_is\_class\_loadable
+---------------------
+
+Provided with a package name, a.k.a. a class, and an optional version
+and this will endeavour to check if that class is installed and if a
+version is provided, if it is greater or equal to the version provided.
+
+If the module is not already loaded and a version was provided, it uses
+[Module::Metadata](https://metacpan.org/pod/Module::Metadata){.perl-module}
+to get that module version.
+
+It returns true if the module can be loaded or false otherwise.
+
+If an error occurred, it sets an [error](#error){.perl-module} and
+returns `undef`, so be sure to check whether the return value is
+defined.
+
+\_is\_class\_loaded
+-------------------
+
+Provided with a package name, a.k.a. a class, and this returns true if
+the class has already been loaded or false otherwise.
+
+If you are running under mod\_perl, this method will use [\"loaded\" in
+Apache2::Module](https://metacpan.org/pod/Apache2::Module#loaded){.perl-module}
+to find out, otherwise, it will simply check if the class exists in
+`%INC`
+
+\_is\_code
+----------
+
+Provided with some value, possibly, undefined, and this returns true if
+it is a `CODE`, such as a subroutine reference or an anonymous
+subroutine, or false otherwise.
+
+\_is\_glob
+----------
+
+Provided with some value, possibly, undefined, and this returns true if
+it is a filehandle, or false otherwise.
+
 \_is\_hash
 ----------
 
@@ -1581,6 +1716,7 @@ An empty string or `undef` can be provided and will not be checked.
             qw( :some_tags SOME_CONSTANTS_TO_IMPORT ),
             { version => 'v1.2.3', caller => 'Its::Me' }
         ) || die( $self->error );
+        $self->_load_class( 'My::Module', { no_import => 1 } ) || die( $self->error );
 
 Provided with a class/package name, some optional list of semantics to
 import, and, as the last parameter, an optional hash reference of
@@ -1603,11 +1739,31 @@ Possible options are:
     default to the value provided with [\"caller\" in
     perlfunc](https://metacpan.org/pod/perlfunc#caller){.perl-module}
 
+*no\_import*
+
+:   Set to a true value and this will prevent the loaded module from
+    importing anything into your namespace.
+
+    This is the equivalent of doing:
+
+            use My::Module ();
+
 *version*
 
 :   The minimum version for this class to load. This value is passed
     directly to [\"use\" in
     perlfunc](https://metacpan.org/pod/perlfunc#use){.perl-module}
+
+\_load\_classes
+---------------
+
+This will load multiple classes by providing it an array reference of
+class name to load and an optional hash or hash reference of options,
+similar to those provided to
+[\"\_load\_class\"](#load_class){.perl-module}
+
+If one of those classes failed to load, it will return immediately after
+setting an [\"error\"](#error){.perl-module}.
 
 \_lvalue
 --------
@@ -2057,11 +2213,22 @@ given file as a
 [Module::Generic::File](https://metacpan.org/pod/Module::Generic::File){.perl-module}
 object.
 
-It returns under and set an error if the provided value is not a proper
-file.
+It returns `undef` and set an [error](#error){.perl-module} if the
+provided value is not a proper file.
 
 Note that the files does not need to exist and it can also be a
 directory or a symbolic link or any other file on the system.
+
+\_set\_get\_glob
+----------------
+
+        sub handle { return( shift->_set_get_glob( 'handle', @_ ) ); }
+
+Provided with an object property name and a glob (file handle) and this
+will store the given glob.
+
+It returns `undef` and set an [error](#error){.perl-module} if the
+provided value is not a glob.
 
 \_set\_get\_hash
 ----------------
@@ -2458,7 +2625,33 @@ object of those data.
 \_warnings\_is\_enabled
 -----------------------
 
-Returns true of warnings are enabled, false otherwise.
+Called with the class object or providing another class object as
+argument, and this returns true if warnings are enabled for the given
+class, false otherwise.
+
+Example:
+
+        $self->_warnings_is_enabled();
+        # Providing another class object
+        $self->_warnings_is_enabled( $other_object );
+
+\_warnings\_is\_registered
+--------------------------
+
+Called with the class object or providing another class object as
+argument, and this returns true if warnings are registered for the given
+class, false otherwise.
+
+This is useful, because calling `warnings::enabled()` to check if
+warnings are enabled for a given class when that class has not
+registered for warnings using the pragma `use warnings::register` will
+produce an error `Unknown warnings category`.
+
+Example:
+
+        $self->_warnings_is_registered();
+        # Providing another class object
+        $self->_warnings_is_registered( $other_object );
 
 \_\_dbh
 -------
@@ -2476,6 +2669,12 @@ set to true in the database handler.
 
 It returns the database handler object.
 
+```{=pod::coverage}
+_autoload_subs
+```
+```{=pod::coverage}
+_autoload_add_to_cache
+```
 DEBUG
 -----
 
@@ -2547,7 +2746,43 @@ you can use the try-catch block using an experimental feature
 `use feature 'try';`, but this does not support `catch` by exception
 class.
 
-However
+SERIALISATION
+=============
+
+The modules in the
+[Module::Generic](https://metacpan.org/pod/Module::Generic){.perl-module}
+distribution all supports
+[Storable::Improved](https://metacpan.org/pod/Storable::Improved){.perl-module}
+(or the legacy
+[Storable](https://metacpan.org/pod/Storable){.perl-module}),
+[Sereal](https://metacpan.org/pod/Sereal){.perl-module} and
+[CBOR](https://metacpan.org/pod/CBOR::XS){.perl-module} serialisation,
+by implementing the methods `FREEZE`, `THAW`, `STORABLE_freeze`,
+`STORABLE_thaw`
+
+Even the IO modules like
+[Module::Generic::File::IO](https://metacpan.org/pod/Module::Generic::File::IO){.perl-module}
+and
+[Module::Generic::Scalar::IO](https://metacpan.org/pod/Module::Generic::Scalar::IO){.perl-module}
+can be serialised and deserialised if the methods `FREEZE` and `THAW`
+are used. By design the methods `STORABLE_freeze` and `STORABLE_thaw`
+are not implemented because it would trigger a
+[Storable](https://metacpan.org/pod/Storable){.perl-module} exception
+\"Unexpected object type (8) in store\_hook()\". Instead it is strongly
+encouraged you use the improved
+[Storable::Improved](https://metacpan.org/pod/Storable::Improved){.perl-module}
+which addresses and mitigate those issues.
+
+For serialisation with
+[Sereal](https://metacpan.org/pod/Sereal){.perl-module}, make sure to
+instantiate the [Sereal
+encoder](https://metacpan.org/pod/Sereal::Encoder){.perl-module} with
+the `freeze_callbacks` option set to true, otherwise, `Sereal` will not
+use the `FREEZE` and `THAW` methods.
+
+See [\"FREEZE/THAW CALLBACK MECHANISM\" in
+Sereal::Encoder](https://metacpan.org/pod/Sereal::Encoder#FREEZE/THAW CALLBACK MECHANISM){.perl-module}
+for more information.
 
 SEE ALSO
 ========
@@ -2573,7 +2808,7 @@ and
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x560d6cc05588)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x557ab13bac00)"}\>
 
 COPYRIGHT & LICENSE
 ===================

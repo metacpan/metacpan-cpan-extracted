@@ -2,7 +2,7 @@ NAME
     HTTP::CookieJar - A minimalist HTTP user agent cookie jar
 
 VERSION
-    version 0.012
+    version 0.014
 
 SYNOPSIS
       use HTTP::CookieJar;
@@ -78,9 +78,10 @@ METHODS
     *   hostonly -- if present, the cookie may only be used with the domain
         as a host
 
-    *   creation_time -- epoch seconds since the cookie was first stored
+    *   creation_time -- epoch time when the cookie was first stored
 
-    *   last_access_time -- epoch seconds since the cookie was last stored
+    *   last_access_time -- epoch time when the cookie was last accessed
+        (i.e. "now")
 
     Keep in mind that "httponly" means it should only be used in requests
     and not made available via Javascript, etc. This is pretty meaningless

@@ -2,7 +2,7 @@ package Catalyst::Plugin::Statsd;
 
 # ABSTRACT: Log Catalyst stats to statsd
 
-use v5.10.1;
+use v5.14;
 
 use Moose::Role;
 
@@ -15,7 +15,7 @@ use namespace::autoclean;
 
 requires qw/ log_stats /;
 
-our $VERSION = 'v0.7.2';
+our $VERSION = 'v0.8.0';
 
 
 sub statsd_client {
@@ -99,7 +99,7 @@ Catalyst::Plugin::Statsd - Log Catalyst stats to statsd
 
 =head1 VERSION
 
-version v0.7.2
+version v0.8.0
 
 =head1 SYNOPSIS
 
@@ -281,7 +281,7 @@ Slaven Rezić <slaven@rezic.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

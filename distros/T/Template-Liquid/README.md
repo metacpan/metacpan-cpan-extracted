@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/sanko/template-liquid.svg?branch=master)](https://travis-ci.org/sanko/template-liquid) [![MetaCPAN Release](https://badge.fury.io/pl/Template-Liquid.svg)](https://metacpan.org/release/Template-Liquid)
+[![Actions Status](https://github.com/sanko/template-liquid/actions/workflows/linux.yaml/badge.svg)](https://github.com/sanko/template-liquid/actions) [![Actions Status](https://github.com/sanko/template-liquid/actions/workflows/windows.yaml/badge.svg)](https://github.com/sanko/template-liquid/actions) [![Actions Status](https://github.com/sanko/template-liquid/actions/workflows/osx.yaml/badge.svg)](https://github.com/sanko/template-liquid/actions) [![Actions Status](https://github.com/sanko/template-liquid/actions/workflows/freebsd.yaml/badge.svg)](https://github.com/sanko/template-liquid/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Template-Liquid.svg)](https://metacpan.org/release/Template-Liquid)
 # NAME
 
 Template::Liquid - A Simple, Stateless Template System
@@ -106,7 +106,7 @@ For more, see [Template::Liquid::Tag::Comment](https://metacpan.org/pod/Template
 ## `raw`
 
 Raw temporarily disables tag processing. This is useful for generating content
-(eg, Mustache, Handlebars) which uses conflicting syntax.
+(Mustache, Handlebars) which uses conflicting syntax.
 
     {% raw %}
         In Handlebars, {{ this }} will be HTML-escaped, but {{{ that }}} will not.
@@ -369,14 +369,14 @@ yourself. Everyone knows computers cannot be trusted.
 
 # Template::LiquidX or Solution?
 
-I'd really rather use Solution::{Package} for extentions but Template::LiquidX
+I'd really rather use Solution::{Package} for extensions but Template::LiquidX
 really is a better choice.
 
 As I understand it, the original project's name, Liquid, is a reference to the
 classical states of matter (the engine itself being stateless). I wanted to use
 [solution](http://en.wikipedia.org/wiki/Solution) because it's liquid but with
 bits of other stuff floating in it. (Pretend you majored in chemistry instead
-of mathematics or computer science.) Liquid tempates will _always_ work with
+of mathematics or computer science.) Liquid templates will _always_ work with
 Template::Liquid but (due to Template::LiquidX's expanded syntax)
 Template::LiquidX templates _may not_ be compatible with Liquid or
 Template::Liquid.
@@ -393,7 +393,7 @@ Lütke](http://blog.leetsoft.com/).
 
 # License and Legal
 
-Copyright (C) 2009-2016 by Sanko Robinson <sanko@cpan.org>
+Copyright (C) 2009-2022 by Sanko Robinson <sanko@cpan.org>
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of [The Artistic License

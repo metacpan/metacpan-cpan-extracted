@@ -25,4 +25,21 @@ $t->get_ok('/')
     ->text_is('h1' => 'Hex Describe')
     ->text_like('textarea[name=map]' => qr/^0101 dark-green trees village$/m);
 
+$t->get_ok('/rules')
+    ->status_is(200)
+    ->text_is('h1' => 'Hex Describe (rules)')
+    ->element_exists('input[value="schroeder"]')
+    ->text_like('input + a' => qr/Alex Schroeder/m);
+
+$t->get_ok('/rules/list?load=schroeder')
+    ->status_is(200)
+    ->text_is('h1' => 'Hex Describe (list of rules)')
+    ->content_like(qr/>orcs</);
+
+$t->get_ok('/rule?rule=orcs&load=schroeder')
+    ->status_is(200)
+    ->text_is('h1' => 'Hex Descriptions (no map)')
+    ->text_is('p a' => 'orcs')
+    ->text_is('div.description p strong' => 'orcs');
+
 done_testing;

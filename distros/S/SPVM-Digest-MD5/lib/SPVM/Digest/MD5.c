@@ -530,7 +530,7 @@ int32_t SPVM__Digest__MD5__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   env->set_pointer(env, stack, obj_ctx, ctx);
   
-  env->set_field_object_by_name(env, stack, obj_self, "Digest::MD5", "context", "Digest::MD5::Context", obj_ctx, &e, FILE_NAME, __LINE__);
+  env->set_field_object_by_name_v2(env, stack, obj_self, "Digest::MD5", "context", obj_ctx, &e, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   stack[0].oval = obj_self;
@@ -552,7 +552,7 @@ int32_t SPVM__Digest__MD5__add(SPVM_ENV* env, SPVM_VALUE* stack) {
   const char* data = (unsigned char *)env->get_chars(env, stack, obj_string);
   int32_t len = env->length(env, stack, obj_string);
   
-  void* obj_ctx = env->get_field_object_by_name(env, stack, obj_self, "Digest::MD5", "context", "Digest::MD5::Context", &e, FILE_NAME, __LINE__);
+  void* obj_ctx = env->get_field_object_by_name_v2(env, stack, obj_self, "Digest::MD5", "context", &e, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   MD5_CTX* ctx = env->get_pointer(env, stack, obj_ctx);
@@ -568,7 +568,7 @@ int32_t SPVM__Digest__MD5__digest(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t e;
   void* obj_self = stack[0].oval;
   
-  void* obj_ctx = env->get_field_object_by_name(env, stack, obj_self, "Digest::MD5", "context", "Digest::MD5::Context", &e, FILE_NAME, __LINE__);
+  void* obj_ctx = env->get_field_object_by_name_v2(env, stack, obj_self, "Digest::MD5", "context", &e, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   MD5_CTX* ctx = env->get_pointer(env, stack, obj_ctx);
@@ -584,7 +584,7 @@ int32_t SPVM__Digest__MD5__hexdigest(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t e;
   void* obj_self = stack[0].oval;
   
-  void* obj_ctx = env->get_field_object_by_name(env, stack, obj_self, "Digest::MD5", "context", "Digest::MD5::Context", &e, FILE_NAME, __LINE__);
+  void* obj_ctx = env->get_field_object_by_name_v2(env, stack, obj_self, "Digest::MD5", "context", &e, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   MD5_CTX* ctx = env->get_pointer(env, stack, obj_ctx);
@@ -600,7 +600,7 @@ int32_t SPVM__Digest__MD5__b64digest(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t e;
   void* obj_self = stack[0].oval;
   
-  void* obj_ctx = env->get_field_object_by_name(env, stack, obj_self, "Digest::MD5", "context", "Digest::MD5::Context", &e, FILE_NAME, __LINE__);
+  void* obj_ctx = env->get_field_object_by_name_v2(env, stack, obj_self, "Digest::MD5", "context", &e, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   MD5_CTX* ctx = env->get_pointer(env, stack, obj_ctx);
@@ -618,7 +618,7 @@ int32_t SPVM__Digest__MD5__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  void* obj_ctx = env->get_field_object_by_name(env, stack, obj_self, "Digest::MD5", "context", "Digest::MD5::Context", &e, FILE_NAME, __LINE__);
+  void* obj_ctx = env->get_field_object_by_name_v2(env, stack, obj_self, "Digest::MD5", "context", &e, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   MD5_CTX* ctx = env->get_pointer(env, stack, obj_ctx);

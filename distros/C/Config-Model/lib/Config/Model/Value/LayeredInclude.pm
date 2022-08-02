@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Value::LayeredInclude 2.150;
+package Config::Model::Value::LayeredInclude 2.152;
 
 use v5.20;
 use Mouse;
@@ -86,7 +86,7 @@ Config::Model::Value::LayeredInclude - Include a sub layer configuration
 
 =head1 VERSION
 
-version 2.150
+version 2.152
 
 =head1 SYNOPSIS
 

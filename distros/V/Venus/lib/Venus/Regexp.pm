@@ -5,14 +5,15 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class;
 
-extends 'Venus::Kind::Value';
+base 'Venus::Kind::Value';
 
 use overload (
   'eq' => sub{"$_[0]" eq "$_[1]"},
   'ne' => sub{"$_[0]" ne "$_[1]"},
   'qr' => sub{$_[0]->value},
+  fallback => 1,
 );
 
 # METHODS
@@ -1738,7 +1739,7 @@ I<Since C<0.01>>
     qr/(?<username>\w+)$/,
   );
 
-  my $replace = $regexp->replace('Hey, unknown', 'cpanery');
+  my $replace = $regexp->replace('Hey, unknown', 'awncorp');
 
   # bless({ ... }, 'Venus::Replace')
 
@@ -1768,7 +1769,7 @@ I<Since C<0.01>>
     qr/(?<greet>\w+), (?<username>\w+)/,
   );
 
-  my $search = $regexp->search('hey, cpanery');
+  my $search = $regexp->search('hey, awncorp');
 
   # bless({ ... }, 'Venus::Search')
 

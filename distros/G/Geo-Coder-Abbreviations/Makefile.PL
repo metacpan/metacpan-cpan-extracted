@@ -28,7 +28,7 @@ WriteMakefile(
 		# 'Test::Kwalitee' => 0,
 	}, PREREQ_PM => {
 		'JSON' => 4.02,
-		'LWP::Simple' => 0,
+		'LWP::Simple::WithCache' => 0,
 		'LWP::Protocol::https' => 0,
 	},
 	dist => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
@@ -40,6 +40,12 @@ WriteMakefile(
 				type => 'git',
 				url => 'git://github.com/nigelhorne/Geo-Coder-Abbreviations.git',
 				web => 'https://github.com/nigelhorne/Geo-Coder-Abbreviations',
+				repository => 'https://github.com/nigelhorne/Geo-Coder-Abbreviations',
+			}, bugtracker => {
+				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Abbreviations',
+				web => 'https://github.com/nigelhorne/Geo-Coder-Abbreviations/issues',
+				url => 'https://github.com/nigelhorne/Geo-Coder-Abbreviations/issues',
+				mailto => 'bug-Geo-Coder-Abbreviations@rt.cpan.org'
 			},
 		},
 	},

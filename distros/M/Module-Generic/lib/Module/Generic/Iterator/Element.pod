@@ -70,6 +70,20 @@ Returns the previous L<Module::Generic::Iterator::Element> object relative to th
 
 Return the value of the L<Module::Generic::Iterator::Element> object, whatever that may be.
 
+=head1 SERIALISATION
+
+=for Pod::Coverage FREEZE
+
+=for Pod::Coverage STORABLE_freeze
+
+=for Pod::Coverage STORABLE_thaw
+
+=for Pod::Coverage THAW
+
+=for Pod::Coverage TO_JSON
+
+Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
+
 =head1 SEE ALSO
 
 L<Module::Generic::Iterator::Element>, L<Module::Generic::Array>

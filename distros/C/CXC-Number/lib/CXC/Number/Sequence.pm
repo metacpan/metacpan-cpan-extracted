@@ -16,7 +16,7 @@ use Moo;
 
 use experimental 'signatures';
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 use namespace::clean;
 
@@ -29,7 +29,7 @@ has _raw_elements => (
     isa      => Sequence,
     required => 1,
     coerce   => 1,
-  );
+);
 
 
 sub _convert ( $self, $bignum ) {
@@ -49,7 +49,7 @@ sub _convert ( $self, $bignum ) {
 
 
 
-sub elements ($self) {
+sub elements ( $self ) {
     $self->_convert( $self->_raw_elements );
 }
 
@@ -61,7 +61,7 @@ sub elements ($self) {
 
 
 
-sub nelem ($self) {
+sub nelem ( $self ) {
     scalar $self->_raw_elements->@*;
 }
 
@@ -75,10 +75,9 @@ sub nelem ($self) {
 
 
 
-sub spacing ($self) {
+sub spacing ( $self ) {
     my $elements = $self->_raw_elements;
-    my @spacing =
-      map { $elements->[$_] - $elements->[ $_ - 1 ] }
+    my @spacing  = map { $elements->[$_] - $elements->[ $_ - 1 ] }
       1 .. ( $self->nelem - 1 );
     return $self->_convert( \@spacing );
 }
@@ -91,7 +90,7 @@ sub spacing ($self) {
 
 
 
-sub min ($self) {
+sub min ( $self ) {
     return $self->_convert( $self->_raw_elements->[0] );
 }
 
@@ -103,7 +102,7 @@ sub min ($self) {
 
 
 
-sub max ($self) {
+sub max ( $self ) {
     return $self->_convert( $self->_raw_elements->[-1] );
 }
 
@@ -143,12 +142,12 @@ sub build ( $, $type, %options ) {
 
 
 
-sub bignum ($self) {
+sub bignum ( $self ) {
     require Moo::Role;
     return Moo::Role->apply_roles_to_object(
-                                            __PACKAGE__->new( elements => $self->_raw_elements ),
-                                            __PACKAGE__ . '::Role::BigNum',
-                                           );
+        __PACKAGE__->new( elements => $self->_raw_elements ),
+        __PACKAGE__ . '::Role::BigNum',
+    );
 }
 
 
@@ -163,12 +162,12 @@ sub bignum ($self) {
 
 
 
-sub pdl ($self) {
+sub pdl ( $self ) {
     require Moo::Role;
     return Moo::Role->apply_roles_to_object(
-                                            __PACKAGE__->new( elements => $self->_raw_elements ),
-                                            __PACKAGE__ . '::Role::PDL',
-                                           );
+        __PACKAGE__->new( elements => $self->_raw_elements ),
+        __PACKAGE__ . '::Role::PDL',
+    );
 }
 
 
@@ -196,7 +195,7 @@ CXC::Number::Sequence - Numerical Sequence Generation
 
 =head1 VERSION
 
-version 0.06
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -218,7 +217,7 @@ this may change to a role based relationship.
 At present sequences are not lazily built.  This can easily be
 accommodated and iterators added.
 
-=head1 CONSTRUCTOR
+=head1 CONSTRUCTORS
 
 =head2 build
 
@@ -291,15 +290,23 @@ Returns an object which returns piddles for the following methods
   elements -> piddle
   spacing  -> piddle
 
-=head1 BUGS
+=head1 INTERNALS
 
-Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number> or by email
-to L<bug-cxc-number@rt.cpan.org|mailto:bug-cxc-number@rt.cpan.org>.
+=head1 SUPPORT
 
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/cxc-number
+
+and may be cloned from
+
+  https://gitlab.com/djerius/cxc-number.git
 
 =head1 SEE ALSO
 

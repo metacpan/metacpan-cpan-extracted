@@ -2,6 +2,8 @@
 use utf8;
 use Test::Tester;
 use t::Test::abeltje;
+use File::Temp qw( tempdir );
+use File::Spec::Functions qw( catfile );
 
 use Test::DBIC::SQLite;
 
@@ -149,4 +151,57 @@ use Test::DBIC::SQLite;
     );
 }
 
+{
+    my $tmpdir = tempdir(CLEANUP => 1);
+    my $dbname = catfile($tmpdir, "test-dbic-sqlite-$$");
+    check_test(
+        sub {
+            local $Test::DBIC::SQLite::LeaveCreatedDatabases = 0;
+            my $t = Test::DBIC::SQLite->new(
+                schema_class      => 'Music::Schema',
+                dbi_connect_info  => $dbname,
+                post_connect_hook => \&populate_db,
+            );
+            my $schema = $t->connect_dbic_ok();
+            $schema->storage->disconnect();
+        },
+        {
+            ok => 1,
+            name => "the schema ISA Music::Schema",
+        },
+        "$dbname auto-dropped"
+    );
+    ok(! -e $dbname, "database auto-dropped");
+}
+
+{
+    my $tmpdir = tempdir(CLEANUP => 1);
+    my $dbname = catfile($tmpdir, "test-dbic-sqlite-$$");
+    check_test(
+        sub {
+            local $Test::DBIC::SQLite::LeaveCreatedDatabases = 1;
+            my $t = Test::DBIC::SQLite->new(
+                schema_class      => 'Music::Schema',
+                dbi_connect_info  => $dbname,
+                post_connect_hook => \&populate_db,
+            );
+            my $schema = $t->connect_dbic_ok();
+            $schema->storage->disconnect();
+        },
+        {
+            ok => 1,
+            name => "the schema ISA Music::Schema",
+        },
+        "$dbname not auto-dropped"
+    );
+    ok( -d $tmpdir, "tempdir exists");
+    ok( -e $dbname, "database $dbname exists");
+}
+
 abeltje_done_testing();
+
+sub populate_db {
+    my $schema = shift;
+    use Music::FromYAML;
+    artist_from_yaml($schema, catfile('t', 'madness.yml'))
+}

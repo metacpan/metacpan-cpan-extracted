@@ -50,7 +50,7 @@ $test->for('includes');
 
   with 'Venus::Role::Doable';
 
-  has 'time';
+  attr 'time';
 
   sub execute {
     return;

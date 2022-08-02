@@ -5,15 +5,32 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use overload (
+  '""' => 'explain',
+  '~~' => 'explain',
+  fallback => 1,
+);
 
-extends 'Venus::Kind';
+use Venus::Class;
 
+base 'Venus::Kind';
+
+with 'Venus::Role::Valuable';
 with 'Venus::Role::Buildable';
 with 'Venus::Role::Accessible';
 with 'Venus::Role::Explainable';
+with 'Venus::Role::Proxyable';
 with 'Venus::Role::Pluggable';
-with 'Venus::Role::Valuable';
+
+# BUILDERS
+
+sub build_arg {
+  my ($self, $data) = @_;
+
+  return {
+    value => $data,
+  };
+}
 
 # METHODS
 
@@ -67,7 +84,7 @@ Value Base Class for Perl 5
 
   use Venus::Class;
 
-  extends 'Venus::Kind::Value';
+  base 'Venus::Kind::Value';
 
   package main;
 

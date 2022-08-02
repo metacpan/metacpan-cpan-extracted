@@ -1,4 +1,4 @@
-# Version 0.05 alpha $Revision: 1.6 $ $Date: 2001/06/24 17:11:26 $
+=pod
 
 =head1 TO DO
 
@@ -281,7 +281,7 @@ contents.   Disadvantage:  The old contents are still in the cache.  I
 think it makes more sense to have a special expiration manager for
 this.  Make one up and bundle it.
 
-19991220 I have one written: Memoize::ExpireFile.  But how can you
+19991220 I have one written: F<t/lib/ExpireFile.pm>.  But how can you
 make this work when the function might have several arguments, of
 which some are filenames and some aren't?
 

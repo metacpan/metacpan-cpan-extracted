@@ -15,18 +15,20 @@ name: Task-PerlCriticAllPolicies
 provides:
   Task::PerlCriticAllPolicies:
     file: lib/Task/PerlCriticAllPolicies.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   Perl::Critic: '0'
   Perl::Critic::Bangs: '0'
   Perl::Critic::CognitiveComplexity: '0'
   Perl::Critic::Compatibility: '0'
+  Perl::Critic::Dancer2: '0'
   Perl::Critic::Deprecated: '0'
   Perl::Critic::Dynamic: '0'
   Perl::Critic::Freenode: '0'
   Perl::Critic::Git: '0'
   Perl::Critic::Itch: '0'
   Perl::Critic::Lax: '0'
+  Perl::Critic::Mardem: '0'
   Perl::Critic::MergeProfile: '0'
   Perl::Critic::Moose: '0'
   Perl::Critic::More: '0'
@@ -60,6 +62,7 @@ requires:
   Perl::Critic::Policy::TryTiny::RequireUse: '0'
   Perl::Critic::Policy::ValuesAndExpressions::PreventSQLInjection: '0'
   Perl::Critic::Policy::ValuesAndExpressions::ProhibitEmptyPostfixLoop: '0'
+  Perl::Critic::Policy::ValuesAndExpressions::ProhibitFiletest_rwxRWX: '0'
   Perl::Critic::Policy::ValuesAndExpressions::ProhibitSingleArgArraySlice: '0'
   Perl::Critic::Policy::Variables::NameReuse: '0'
   Perl::Critic::Policy::Variables::ProhibitLoopOnHash: '0'
@@ -85,7 +88,7 @@ requires:
 resources:
   bugtracker: https://github.com/gugod/Task-PerlCriticAllPolicies/issues
   repository: https://github.com/gugod/Task-PerlCriticAllPolicies.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: MIT
 x_static_install: '1'

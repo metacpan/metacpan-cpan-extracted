@@ -5,10 +5,12 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class;
 
-extends 'Venus::Kind::Utility';
+base 'Venus::Kind::Utility';
 
+with 'Venus::Role::Valuable';
+with 'Venus::Role::Buildable';
 with 'Venus::Role::Accessible';
 
 use Scalar::Util ();
@@ -983,6 +985,10 @@ L<Venus::Kind::Utility>
 This package integrates behaviors from:
 
 L<Venus::Role::Accessible>
+
+L<Venus::Role::Buildable>
+
+L<Venus::Role::Valuable>
 
 =cut
 

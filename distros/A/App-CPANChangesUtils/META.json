@@ -62,7 +62,7 @@
    "provides" : {
       "App::CPANChangesUtils" : {
          "file" : "lib/App/CPANChangesUtils.pm",
-         "version" : "0.076"
+         "version" : "0.077"
       }
    },
    "release_status" : "stable",
@@ -77,12 +77,17 @@
          "web" : "https://github.com/perlancar/perl-App-CPANChangesUtils"
       }
    },
-   "version" : "0.076",
+   "version" : "0.077",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::InsertCommandOutput",
+            "name" : "InsertCommandOutput",
+            "version" : "0.056"
+         },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript parse-cpan-changes",
@@ -449,7 +454,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.780"
+                        "version" : "0.781"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",

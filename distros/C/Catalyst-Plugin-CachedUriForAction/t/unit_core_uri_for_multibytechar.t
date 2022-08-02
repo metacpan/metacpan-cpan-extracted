@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use URI;
 
 use lib 't/lib';
 use TestApp;

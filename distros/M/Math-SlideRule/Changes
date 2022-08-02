@@ -1,5 +1,8 @@
-Revision history for Math-SlideRule. Notable things I remember to put here,
-anyways. The git log may be more informative?
+"Revision" history for Math-SlideRule.
+
+1.11    July 2022
+        Update pod tests: second blood, part II. More test coverage,
+        which is very much harder to write a few years down the line.
 
 1.10    Still March 2020
         Update pod tests.

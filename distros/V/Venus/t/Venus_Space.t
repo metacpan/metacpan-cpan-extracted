@@ -190,8 +190,9 @@ $test->for('example', 2, 'all', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, [
-    ["Venus::Space", ["Venus::Name"]],
-    ["Venus::Name", ["Venus::Kind::Utility"]]
+    ["Venus::Space", ["Venus::Name", "Venus::Core::Class"]],
+    ["Venus::Name", ["Venus::Kind::Utility", "Venus::Core::Class"]],
+    ["Venus::Core::Class", ["Venus::Core"]]
   ];
 
   $result
@@ -223,7 +224,7 @@ $test->for('example', 2, 'all', sub {
  $test->for('example', 3, 'all', sub {
    my ($tryable) = @_;
    ok my $result = $tryable->result;
-   ok @$result == 2;
+   ok @$result == 3;
    ok @{$result->[0]} == 2;
    ok $result->[0][0] eq 'Venus::Space';
    ok $result->[0][1] =~ 'Venus/Space';
@@ -2111,7 +2112,7 @@ specified.
 
   # given: synopsis;
 
-  my $require = $space->require('Moo');
+  my $require = $space->require('Venus');
 
   # 1
 
@@ -2599,7 +2600,7 @@ specified.
 
   my $space = Venus::Space->new('foo/goo');
 
-  my $use = $space->use('Moo');
+  my $use = $space->use('Venus');
 
   # bless({ value => "foo/goo" }, "Venus::Space")
 
@@ -2610,13 +2611,11 @@ $test->for('example', 1, 'use', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Space');
   ok "$result" eq 'Foo::Goo';
-  ok 'Foo::Goo'->isa('Moo::Object');
   is $result->package, 'Foo::Goo';
-  ok $result->package->can('after');
-  ok $result->package->can('before');
-  ok $result->package->can('extends');
-  ok $result->package->can('has');
-  ok $result->package->can('with');
+  ok !$result->package->can('error');
+  ok $result->package->can('false');
+  ok !$result->package->can('raise');
+  ok $result->package->can('true');
 
   $result
 });
@@ -2629,7 +2628,7 @@ $test->for('example', 1, 'use', sub {
 
   my $space = Venus::Space->new('foo/hoo');
 
-  my $use = $space->use('Moo', 'has');
+  my $use = $space->use('Venus', 'error');
 
   # bless({ value => "foo/hoo" }, "Venus::Space")
 
@@ -2640,13 +2639,11 @@ $test->for('example', 2, 'use', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Space');
   ok "$result" eq 'Foo::Hoo';
-  ok 'Foo::Hoo'->isa('Moo::Object');
   is $result->package, 'Foo::Hoo';
-  ok $result->package->can('after');
-  ok $result->package->can('before');
-  ok $result->package->can('extends');
-  ok $result->package->can('has');
-  ok $result->package->can('with');
+  ok $result->package->can('error');
+  ok $result->package->can('false');
+  ok !$result->package->can('raise');
+  ok $result->package->can('true');
 
   $result
 });
@@ -2659,7 +2656,7 @@ $test->for('example', 2, 'use', sub {
 
   my $space = Venus::Space->new('foo/foo');
 
-  my $use = $space->use(['Moo', 9.99], 'has');
+  my $use = $space->use(['Venus', 9.99], 'error');
 
 =cut
 
@@ -2674,11 +2671,10 @@ $test->for('example', 3, 'use', sub {
   ok my $result = $tryable->result;
   is $result->package, 'Foo::Foo';
   ok $failed;
-  ok !$result->package->can('after');
-  ok !$result->package->can('before');
-  ok !$result->package->can('extends');
-  ok !$result->package->can('has');
-  ok !$result->package->can('with');
+  ok !$result->package->can('error');
+  ok !$result->package->can('false');
+  ok !$result->package->can('raise');
+  ok !$result->package->can('true');
 
   $result
 });

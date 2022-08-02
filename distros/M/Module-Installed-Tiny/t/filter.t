@@ -4,10 +4,10 @@
 
 use strict;
 use warnings;
-
-use Module::Installed::Tiny qw(module_source module_installed);
 use Test::More 0.98;
 use Test::Needs 'lib::disallow';
+
+use Module::Installed::Tiny qw(module_source module_installed);
 
 subtest module_installed => sub {
     require lib::disallow;

@@ -1,3 +1,30 @@
+0.008   2022-06-09  Released-By: PERLANCAR; Urgency: medium
+
+        - [schema str_or_re] Allow string in the form of 'qr(...)' to also
+          be converted to Regexp object.
+
+
+0.007   2022-06-08  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+        - [schema str_or_re] [doc] Tweak description to mention that a
+          Regexp object is also accepted.
+
+
+0.006   2022-06-08  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with newer Pod::Weaver::Plugin::Sah::Schemas (0.070)
+          to tweak examples display.
+
+
+0.005   2022-06-08  Released-By: PERLANCAR; Urgency: medium
+
+        - [schema str_or_re] Allow regex modifiers i, m, s.
+
+
 0.004   2022-06-05  Released-By: PERLANCAR; Urgency: medium
 
         - Add schema: str_or_re.
@@ -18,4 +45,3 @@
 0.001   2019-08-23  Released-By: PERLANCAR; Released: no
 
         - First release.
-

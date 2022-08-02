@@ -4,7 +4,7 @@
       "Dan Book <dbook@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -71,227 +71,227 @@
    "provides" : {
       "Perl::Critic::Community" : {
          "file" : "lib/Perl/Critic/Community.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Community::Utils" : {
          "file" : "lib/Perl/Critic/Community/Utils.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Freenode" : {
          "file" : "lib/Perl/Critic/Freenode.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Freenode::Utils" : {
          "file" : "lib/Perl/Critic/Freenode/Utils.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::AmpersandSubCalls" : {
          "file" : "lib/Perl/Critic/Policy/Community/AmpersandSubCalls.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::ArrayAssignAref" : {
          "file" : "lib/Perl/Critic/Policy/Community/ArrayAssignAref.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::BarewordFilehandles" : {
          "file" : "lib/Perl/Critic/Policy/Community/BarewordFilehandles.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::ConditionalDeclarations" : {
          "file" : "lib/Perl/Critic/Policy/Community/ConditionalDeclarations.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::ConditionalImplicitReturn" : {
          "file" : "lib/Perl/Critic/Policy/Community/ConditionalImplicitReturn.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::DeprecatedFeatures" : {
          "file" : "lib/Perl/Critic/Policy/Community/DeprecatedFeatures.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::DiscouragedModules" : {
          "file" : "lib/Perl/Critic/Policy/Community/DiscouragedModules.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::DollarAB" : {
          "file" : "lib/Perl/Critic/Policy/Community/DollarAB.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::Each" : {
          "file" : "lib/Perl/Critic/Policy/Community/Each.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::EmptyReturn" : {
          "file" : "lib/Perl/Critic/Policy/Community/EmptyReturn.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::IndirectObjectNotation" : {
          "file" : "lib/Perl/Critic/Policy/Community/IndirectObjectNotation.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::LexicalForeachIterator" : {
          "file" : "lib/Perl/Critic/Policy/Community/LexicalForeachIterator.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::LoopOnHash" : {
          "file" : "lib/Perl/Critic/Policy/Community/LoopOnHash.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::ModPerl" : {
          "file" : "lib/Perl/Critic/Policy/Community/ModPerl.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::MultidimensionalArrayEmulation" : {
          "file" : "lib/Perl/Critic/Policy/Community/MultidimensionalArrayEmulation.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::OpenArgs" : {
          "file" : "lib/Perl/Critic/Policy/Community/OpenArgs.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::OverloadOptions" : {
          "file" : "lib/Perl/Critic/Policy/Community/OverloadOptions.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::POSIXImports" : {
          "file" : "lib/Perl/Critic/Policy/Community/POSIXImports.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::PackageMatchesFilename" : {
          "file" : "lib/Perl/Critic/Policy/Community/PackageMatchesFilename.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::PreferredAlternatives" : {
          "file" : "lib/Perl/Critic/Policy/Community/PreferredAlternatives.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::Prototypes" : {
          "file" : "lib/Perl/Critic/Policy/Community/Prototypes.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::StrictWarnings" : {
          "file" : "lib/Perl/Critic/Policy/Community/StrictWarnings.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::Threads" : {
          "file" : "lib/Perl/Critic/Policy/Community/Threads.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::Wantarray" : {
          "file" : "lib/Perl/Critic/Policy/Community/Wantarray.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::WarningsSwitch" : {
          "file" : "lib/Perl/Critic/Policy/Community/WarningsSwitch.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Community::WhileDiamondDefaultAssignment" : {
          "file" : "lib/Perl/Critic/Policy/Community/WhileDiamondDefaultAssignment.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::AmpersandSubCalls" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/AmpersandSubCalls.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::ArrayAssignAref" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/ArrayAssignAref.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::BarewordFilehandles" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/BarewordFilehandles.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::ConditionalDeclarations" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/ConditionalDeclarations.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::ConditionalImplicitReturn" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/ConditionalImplicitReturn.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::DeprecatedFeatures" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/DeprecatedFeatures.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::DiscouragedModules" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/DiscouragedModules.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::DollarAB" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/DollarAB.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::Each" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/Each.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::EmptyReturn" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/EmptyReturn.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::IndirectObjectNotation" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/IndirectObjectNotation.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::LexicalForeachIterator" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/LexicalForeachIterator.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::LoopOnHash" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/LoopOnHash.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::ModPerl" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/ModPerl.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::MultidimensionalArrayEmulation" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/MultidimensionalArrayEmulation.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::OpenArgs" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/OpenArgs.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::OverloadOptions" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/OverloadOptions.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::POSIXImports" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/POSIXImports.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::PackageMatchesFilename" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/PackageMatchesFilename.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::PreferredAlternatives" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/PreferredAlternatives.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::Prototypes" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/Prototypes.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::StrictWarnings" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/StrictWarnings.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::Threads" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/Threads.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::Wantarray" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/Wantarray.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::WarningsSwitch" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/WarningsSwitch.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Perl::Critic::Policy::Freenode::WhileDiamondDefaultAssignment" : {
          "file" : "lib/Perl/Critic/Policy/Freenode/WhileDiamondDefaultAssignment.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       }
    },
    "release_status" : "stable",
@@ -307,19 +307,20 @@
       },
       "x_IRC" : "irc://irc.libera.chat/#perl"
    },
-   "version" : "v1.0.2",
+   "version" : "v1.0.3",
    "x_contributors" : [
       "Amory Meltzer <Amorymeltzer@gmail.com>",
       "Dan Book <grinnz@gmail.com>",
       "Dan Book <grinnz@grinnz.com>",
       "David Cantrell <david@cantrell.org.uk>",
       "Graham Knop <haarg@haarg.org>",
+      "Ian Bradley <ian.bradley@studiocrabapple.com>",
       "Ryan Voots <simcop2387@simcop2387.info>",
       "Tomasz Konojacki <me@xenu.pl>",
       "William Taylor <williamt@rebelfactions.com>"
    ],
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_generated_by_perl" : "v5.34.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

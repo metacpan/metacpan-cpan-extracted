@@ -51,7 +51,7 @@ $test->for('includes');
 
   with 'Venus::Role::Testable';
 
-  has 'value';
+  attr 'value';
 
   sub execute {
     return pop;

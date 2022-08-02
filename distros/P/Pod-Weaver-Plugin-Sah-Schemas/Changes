@@ -1,3 +1,8 @@
+0.070   2022-06-08  Released-By: PERLANCAR; Urgency: medium
+
+        - Also show example's summary for valid examples.
+
+
 0.069   2021-08-04  Released-By: PERLANCAR; Urgency: medium
 
 	- In generated Synopsis, show more code on using with Data::Sah.

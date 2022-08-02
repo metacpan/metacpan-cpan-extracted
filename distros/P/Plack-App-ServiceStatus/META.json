@@ -4,7 +4,7 @@
       "Thomas Klausner <domm@plix.at>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -58,23 +58,31 @@
    "provides" : {
       "Plack::App::ServiceStatus" : {
          "file" : "lib/Plack/App/ServiceStatus.pm",
-         "version" : "0.904"
+         "version" : "0.906"
+      },
+      "Plack::App::ServiceStatus::DBI" : {
+         "file" : "lib/Plack/App/ServiceStatus/DBI.pm",
+         "version" : "0.906"
       },
       "Plack::App::ServiceStatus::DBIC" : {
          "file" : "lib/Plack/App/ServiceStatus/DBIC.pm",
-         "version" : "0.904"
+         "version" : "0.906"
+      },
+      "Plack::App::ServiceStatus::DBIxConnector" : {
+         "file" : "lib/Plack/App/ServiceStatus/DBIxConnector.pm",
+         "version" : "0.906"
       },
       "Plack::App::ServiceStatus::Elasticsearch" : {
          "file" : "lib/Plack/App/ServiceStatus/Elasticsearch.pm",
-         "version" : "0.904"
+         "version" : "0.906"
       },
       "Plack::App::ServiceStatus::NetStomp" : {
          "file" : "lib/Plack/App/ServiceStatus/NetStomp.pm",
-         "version" : "0.904"
+         "version" : "0.906"
       },
       "Plack::App::ServiceStatus::Redis" : {
          "file" : "lib/Plack/App/ServiceStatus/Redis.pm",
-         "version" : "0.904"
+         "version" : "0.906"
       }
    },
    "release_status" : "stable",
@@ -89,9 +97,9 @@
          "web" : "https://github.com/domm/Plack-App-ServiceStatus"
       }
    },
-   "version" : "0.904",
-   "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "version" : "0.906",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

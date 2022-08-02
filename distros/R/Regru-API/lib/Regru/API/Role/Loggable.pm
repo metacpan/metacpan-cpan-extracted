@@ -9,7 +9,7 @@ use namespace::autoclean;
 use Data::Dumper;
 use Carp;
 
-our $VERSION = '0.051'; # VERSION
+our $VERSION = '0.052'; # VERSION
 our $AUTHORITY = 'cpan:CHIM'; # AUTHORITY
 
 sub debug_warn {
@@ -40,7 +40,7 @@ Regru::API::Role::Loggable - something that produces a debug messages
 
 =head1 VERSION
 
-version 0.051
+version 0.052
 
 =head1 SYNOPSIS
 

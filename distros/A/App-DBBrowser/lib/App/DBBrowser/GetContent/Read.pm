@@ -87,56 +87,61 @@ sub from_col_by_col {
     else {
         $col_names = $sql->{insert_into_cols};
     }
-    my $default = 2;
+    my $default;
 
-    ROWS: while ( 1 ) {
-        if ( @$aoa ) {
-            ASK: while ( 1 ) {
-                my $add = 'Add Data';
-                my @pre = ( undef, $sf->{i}{ok} );
-                my $menu = [ @pre, $add ];
-                my $info = $sf->__get_read_info( $aoa );
-                # Choose
-                my $add_row = $tc->choose(
-                    $menu,
-                    { %{$sf->{i}{lyt_h}}, info => $info, prompt => '', default => $default }
-                );
-                $ax->print_sql_info( $info );
-                if ( ! defined $add_row ) {
-                    if ( @$aoa ) {
-                        $default = 0;
-                        $#$aoa--;
-                        next ASK;
-                    }
-                    $aoa = []; ##
-                    return;
-                }
-                elsif ( $add_row eq $sf->{i}{ok} ) {
-                    if ( ! @$aoa ) {
-                        return;
-                    }
-                    my $file_fs = $sf->{i}{f_plain};
-                    require Text::CSV;
-                    Text::CSV::csv( in => $aoa, out => $file_fs ) or die Text::CSV->error_diag;
-                    return 1, $file_fs;
-                }
-                last ASK;
-            }
-        }
+    ADD_DATA: while ( 1 ) {
         my $info = $sf->__get_read_info( $aoa );
         my $fields = [ map { [ $_, ] } @$col_names ];
         # Fill_form
-        my $row = $tf->fill_form(
+        my $data = $tf->fill_form(
             $fields,
             { info => $info, auto_up => 1, confirm => $sf->{i}{confirm}, back => $sf->{i}{back} . '   ' }
         );
         $ax->print_sql_info( $info );
-        if ( ! defined $row ) {
+        if ( ! defined $data ) {
+            if ( ! @$aoa ) {
+                return;
+            }
             $default = 0;
         }
         else {
-            push @{$aoa}, [ map { $_->[1] } @$row ];
+            push @{$aoa}, [ map { $_->[1] } @$data ];
             $default = 2;
+        }
+
+        WHAT_NEXT: while ( 1 ) {
+            my $add = 'Add Data';
+            my @pre = ( undef, $sf->{i}{ok} );
+            my $menu = [ @pre, $add ];
+            my $info = $sf->__get_read_info( $aoa );
+            # Choose
+            my $choice = $tc->choose(
+                $menu,
+                { %{$sf->{i}{lyt_h}}, info => $info, prompt => '', default => $default }
+            );
+            $ax->print_sql_info( $info );
+            if ( ! defined $choice ) {
+                if ( @$aoa ) {
+                    $default = 0;
+                    $#$aoa--;
+                    next WHAT_NEXT;
+                }
+                else {
+                    return;
+                }
+            }
+            elsif ( $choice eq $sf->{i}{ok} ) {
+                if ( ! @$aoa ) {
+                    return;
+                }
+                my $file_fs = $sf->{i}{f_plain};
+                require Text::CSV;
+                Text::CSV::csv( in => $aoa, out => $file_fs ) or die Text::CSV->error_diag;
+                return 1, $file_fs;
+            }
+            elsif ( $choice eq $add ) {
+                last WHAT_NEXT;
+            }
         }
     }
 }

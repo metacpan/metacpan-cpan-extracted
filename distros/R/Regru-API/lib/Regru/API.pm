@@ -9,7 +9,7 @@ use Carp ();
 use Class::Load qw(try_load_class);
 use namespace::autoclean;
 
-our $VERSION = '0.051'; # VERSION
+our $VERSION = '0.052'; # VERSION
 our $AUTHORITY = 'cpan:CHIM'; # AUTHORITY
 
 with 'Regru::API::Role::Client';
@@ -94,7 +94,7 @@ Regru::API - Perl bindings for Reg.ru API v2
 
 =head1 VERSION
 
-version 0.051
+version 0.052
 
 =head1 SYNOPSIS
 

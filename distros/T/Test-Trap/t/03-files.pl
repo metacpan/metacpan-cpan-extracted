@@ -41,7 +41,7 @@ STDERR: {
   open STDERR, '>', $errname;
   STDERR->autoflush(1);
   print STDOUT '';
-  sub stderr () { local $/; no warnings 'io'; local *ERR; open ERR, '<', $errname or die; <ERR> }
+  sub stderr () { local $/; no warnings 'io'; open my $ERR, '<', $errname or die; <$ERR> }
   END { close STDERR; close $errfh }
 }
 

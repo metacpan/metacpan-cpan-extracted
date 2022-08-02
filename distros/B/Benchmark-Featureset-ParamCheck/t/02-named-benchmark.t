@@ -84,7 +84,7 @@ my %complex = %{ 'Benchmark::Featureset::ParamCheck'->complex_named_data };
 
 	%benchmark_data = %trivial;
 	is_fastest(
-		Benchmark::Featureset::ParamCheck::Implementation::TypeParams->short_name,
+		Benchmark::Featureset::ParamCheck::Implementation::TypeParams::TypeTiny->short_name,
 		20,
 		\%benchmark,
 		"trivial data benchmark"
@@ -92,7 +92,7 @@ my %complex = %{ 'Benchmark::Featureset::ParamCheck'->complex_named_data };
 
 	%benchmark_data = %complex;
 	is_fastest(
-		Benchmark::Featureset::ParamCheck::Implementation::TypeParams->short_name,
+		Benchmark::Featureset::ParamCheck::Implementation::TypeParams::TypeTiny->short_name,
 		20,
 		\%benchmark,
 		"complex data benchmark"

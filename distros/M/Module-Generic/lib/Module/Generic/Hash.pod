@@ -105,7 +105,7 @@ Module::Generic::Hash - Hash Manipulation Object Class
 
 =head1 VERSION
 
-    v1.1.0
+    v1.2.0
 
 =head1 DESCRIPTION
 
@@ -365,6 +365,20 @@ To return entries with uppercase first :
 And if one of the value were C<JohN  DOE>, this would result in C<John Doe>
 
 If the parameter I<sort> is provided, then it will sort the array before returning the values and before executing the reference of the subroutine on each entry.
+
+=head1 SERIALISATION
+
+=for Pod::Coverage FREEZE
+
+=for Pod::Coverage STORABLE_freeze
+
+=for Pod::Coverage STORABLE_thaw
+
+=for Pod::Coverage THAW
+
+=for Pod::Coverage TO_JSON
+
+Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
 
 =head1 SEE ALSO
 

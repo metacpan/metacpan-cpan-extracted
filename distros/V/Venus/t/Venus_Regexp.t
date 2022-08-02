@@ -2303,7 +2303,7 @@ introspect the result of the operation.
     qr/(?<username>\w+)$/,
   );
 
-  my $replace = $regexp->replace('Hey, unknown', 'cpanery');
+  my $replace = $regexp->replace('Hey, unknown', 'awncorp');
 
   # bless({ ... }, 'Venus::Replace')
 
@@ -2343,7 +2343,7 @@ introspect the result of the operation.
     qr/(?<greet>\w+), (?<username>\w+)/,
   );
 
-  my $search = $regexp->search('hey, cpanery');
+  my $search = $regexp->search('hey, awncorp');
 
   # bless({ ... }, 'Venus::Search')
 

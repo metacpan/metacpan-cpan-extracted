@@ -108,6 +108,25 @@ subtest "simple selector: attribute selector" => sub {
     );
 
     test_parse(
+        name=>"regex literal 1",
+        expr=>"T[attr =~ /foo/]",
+        res=>[
+            [{type=>"T", filters=>[
+                {type=>"attr_selector", attr=>[{name=>"attr"}], op=>"=~", value=>qr/foo/u},
+            ]}],
+        ],
+    );
+    test_parse(
+        name=>"regex literal 2",
+        expr=>"T[attr =~ qr(foo/bar)]",
+        res=>[
+            [{type=>"T", filters=>[
+                {type=>"attr_selector", attr=>[{name=>"attr"}], op=>"=~", value=>qr(foo/bar)u},
+            ]}],
+        ],
+    );
+
+    test_parse(
         name=>"array literal (empty array)",
         expr=>"T[attr in []]",
         res=>[

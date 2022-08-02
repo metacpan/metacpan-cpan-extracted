@@ -6,3 +6,4 @@ META.json
 META.yml
 README.md
 t/basic.t
+t/filehandle.t

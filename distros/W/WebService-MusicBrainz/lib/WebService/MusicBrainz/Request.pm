@@ -5,7 +5,7 @@ use Mojo::UserAgent;
 use Mojo::URL;
 use Mojo::Util qw/dumper/;
 
-has url_base => 'http://musicbrainz.org/ws/2';
+has url_base => 'https://musicbrainz.org/ws/2';
 has ua => sub { Mojo::UserAgent->new() };
 has 'format' => 'json';
 has 'search_resource';
@@ -114,7 +114,7 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-http://wiki.musicbrainz.org/XMLWebService
+https://wiki.musicbrainz.org/XMLWebService
 
 =cut
 

@@ -3,25 +3,23 @@ package Amazon::S3;
 use strict;
 use warnings;
 
-use 5.010;
-
 use Amazon::S3::Bucket;
 use Amazon::S3::Constants qw{:all};
 use Amazon::S3::Logger;
+use Amazon::S3::Signature::V4;
 
 use Carp;
 use Data::Dumper;
 use Digest::HMAC_SHA1;
+use Digest::MD5 qw{md5_hex};
 use English qw{-no_match_vars};
 use HTTP::Date;
 use LWP::UserAgent::Determined;
-use MIME::Base64 qw(encode_base64 decode_base64);
+use MIME::Base64 qw{encode_base64 decode_base64};
 use Scalar::Util qw{ reftype blessed };
 use List::Util qw{ any };
-use URI::Escape qw(uri_escape_utf8);
-use XML::Simple;
-
-use Net::Amazon::Signature::V4;
+use URI::Escape qw{uri_escape_utf8};
+use XML::Simple qw{XMLin};
 
 use parent qw{Class::Accessor::Fast};
 
@@ -31,11 +29,13 @@ __PACKAGE__->mk_accessors(
     aws_secret_access_key
     token
     buffer_size
+    cache_signer
     credentials
     dns_bucket_names
     digest
     err
     errstr
+    error
     host
     last_request
     last_response
@@ -44,12 +44,13 @@ __PACKAGE__->mk_accessors(
     retry
     _region
     secure
+    _signer
     timeout
     ua
   }
 );
 
-our $VERSION = '0.54'; ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
+our $VERSION = '0.55'; ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
 
 ########################################################################
 sub new {
@@ -62,7 +63,16 @@ sub new {
   $options{secure}           //= $TRUE;
   $options{host}             //= $DEFAULT_HOST;
   $options{dns_bucket_names} //= $TRUE;
+  $options{cache_signer}     //= $FALSE;
+  $options{retry}            //= $FALSE;
+
   $options{_region} = delete $options{region};
+  $options{_signer} = delete $options{signer};
+
+  # convenience for level => 'debug' & for consistency with Amazon::Credentials
+  if ( delete $options{debug} ) {
+    $options{level} = 'debug';
+  }
 
   # save this for later
   my $level = $options{level};
@@ -99,10 +109,6 @@ sub new {
     }
   );
 
-  if ( $self->_region ) {
-    $self->region( $self->_region ); # reset host if necessary
-  } ## end if ( $self->_region )
-
   if ( !$self->credentials ) {
 
     croak 'No aws_access_key_id'
@@ -110,6 +116,11 @@ sub new {
 
     croak 'No aws_secret_access_key'
       if !$self->aws_secret_access_key;
+
+    # encrypt credentials
+    $self->aws_access_key_id( _encrypt( $self->aws_access_key_id ) );
+    $self->aws_secret_access_key( _encrypt( $self->aws_secret_access_key ) );
+    $self->token( _encrypt( $self->token ) );
   } ## end if ( !$self->credentials)
 
   my $ua;
@@ -129,52 +140,179 @@ sub new {
     );
   } ## end else [ if ( $self->retry ) ]
 
-  # The "default" region for Amazon is us-east-1
-  # This is the region to set it to for listing buckets
-  # We don't actually list buckets in our transport, but
-  # it is sometimes useful to list buckets in a test script
-  # For a specific bucket, it is necessary to call adjust_region
-  # to set the region that is appropriate for that bucket
-  $self->{'signer'} = Net::Amazon::Signature::V4->new(
-    $self->aws_access_key_id,
-    $self->aws_secret_access_key,
-    'us-east-1', 's3'
-  );
-
   $ua->timeout( $self->timeout );
   $ua->env_proxy;
   $self->ua($ua);
+
+  $self->region( $self->_region // 'us-east-1' );
+
+  if ( !$self->_signer && $self->cache_signer ) {
+    $self->_signer( $self->signer );
+  }
+
   $self->turn_on_special_retry();
 
   return $self;
 } ## end sub new
 
-sub turn_on_special_retry {
-    my $self = shift;
+########################################################################
+{
+  my $encryption_key;
 
-    if ($self->retry) {
+########################################################################
+  sub _encrypt {
+########################################################################
+    my ($text) = @_;
 
-        # In the field we are seeing issue of Amazon returning with a 400 code
-        # in the case of timeout.  From AWS S3 logs:
-        #  REST.PUT.PART Backups/2017-05-04/<account>.tar.gz "PUT /Backups<path>?partNumber=27&uploadId=<id> -
-        #  HTTP/1.1" 400 RequestTimeout 360 20971520 20478 - "-" "libwww-perl/6.15"
-        my $http_codes_hr = $self->ua->codes_to_determinate();
-        $http_codes_hr->{400} = 1;
+    return $text if !$text;
+
+    if ( !defined $encryption_key ) {
+      eval {
+        require Crypt::Blowfish;
+        require Crypt::CBC;
+      };
+
+      if ($EVAL_ERROR) {
+        $encryption_key = $EMPTY;
+      }
+      else {
+        $encryption_key = md5_hex( rand $PID );
+      }
     }
+
+    return $text
+      if !$encryption_key;
+
+    my $cipher = Crypt::CBC->new(
+      -pass        => $encryption_key,
+      -cipher      => 'Crypt::Blowfish',
+      -nodeprecate => $TRUE,
+    );
+
+    return $cipher->encrypt($text);
+  }
+
+########################################################################
+  sub _decrypt {
+########################################################################
+    my ($secret) = @_;
+
+    return $secret
+      if !$secret || !$encryption_key;
+
+    my $cipher = Crypt::CBC->new(
+      -pass   => $encryption_key,
+      -cipher => 'Crypt::Blowfish'
+    );
+
+    return $cipher->decrypt($secret);
+  }
+
 }
 
-sub turn_off_special_retry {
-    my $self = shift;
+########################################################################
+sub get_bucket_location {
+########################################################################
+  my ( $self, $bucket ) = @_;
 
-    if ($self->retry) {
+  my $region;
 
-        # In the field we are seeing issue of Amazon returning with a 400 code
-        # in the case of timeout.  From AWS S3 logs:
-        #  REST.PUT.PART Backups/2017-05-04/<account>.tar.gz "PUT /Backups<path>?partNumber=27&uploadId=<id> -
-        #  HTTP/1.1" 400 RequestTimeout 360 20971520 20478 - "-" "libwww-perl/6.15"
-        my $http_codes_hr = $self->ua->codes_to_determinate();
-        delete $http_codes_hr->{400};
+  if ( !ref $bucket || ref $bucket !~ /Amazon::S3::Bucket/xsm ) {
+    $bucket = Amazon::S3::Bucket->new( bucket => $bucket, account => $self );
+  }
+
+  return $bucket->get_location_constraint // 'us-east-1';
+}
+
+########################################################################
+sub get_default_region {
+########################################################################
+  my ($self) = @_;
+
+  my $region = $ENV{AWS_REGION} || $ENV{AWS_DEFAULT_REGION};
+  return $region
+    if $region;
+
+  my $url
+    = 'http://169.254.169.254/latest/meta-data/placement/availability-zone';
+
+  my $request = HTTP::Request->new( 'GET', $url );
+
+  my $ua = LWP::UserAgent->new;
+  $ua->timeout(0);
+
+  my $response = eval { return $ua->request($request); };
+
+  if ( $response && $response->is_success ) {
+    if ( $response->content =~ /\A([[:lower:]]+[-][[:lower:]]+[-]\d+)/xsm ) {
+      $region = $1;
     }
+  }
+
+  return $region || 'us-east-1';
+}
+
+# Amazon::Credentials compatibility methods
+########################################################################
+sub get_aws_access_key_id {
+########################################################################
+  my ($self) = @_;
+
+  return _decrypt( $self->aws_access_key_id );
+}
+
+########################################################################
+sub get_aws_secret_access_key {
+########################################################################
+  my ($self) = @_;
+
+  return _decrypt( $self->aws_secret_access_key );
+}
+
+########################################################################
+sub get_token {
+########################################################################
+  my ($self) = @_;
+
+  return _decrypt( $self->token );
+}
+
+########################################################################
+sub turn_on_special_retry {
+########################################################################
+  my ($self) = @_;
+
+  if ( $self->retry ) {
+
+    # In the field we are seeing issue of Amazon returning with a 400
+    # code in the case of timeout.  From AWS S3 logs: REST.PUT.PART
+    # Backups/2017-05-04/<account>.tar.gz "PUT
+    # /Backups<path>?partNumber=27&uploadId=<id> - HTTP/1.1" 400
+    # RequestTimeout 360 20971520 20478 - "-" "libwww-perl/6.15"
+    my $http_codes_hr = $self->ua->codes_to_determinate();
+    $http_codes_hr->{400} = 1;
+  }
+
+  return;
+}
+
+########################################################################
+sub turn_off_special_retry {
+########################################################################
+  my ($self) = @_;
+
+  if ( $self->retry ) {
+
+    # In the field we are seeing issue with Amazon returning a 400
+    # code in the case of timeout.  From AWS S3 logs: REST.PUT.PART
+    # Backups/2017-05-04/<account>.tar.gz "PUT
+    # /Backups<path>?partNumber=27&uploadId=<id> - HTTP/1.1" 400
+    # RequestTimeout 360 20971520 20478 - "-" "libwww-perl/6.15"
+    my $http_codes_hr = $self->ua->codes_to_determinate();
+    delete $http_codes_hr->{400};
+  }
+
+  return;
 }
 
 ########################################################################
@@ -204,9 +342,24 @@ sub region {
 ########################################################################
 sub buckets {
 ########################################################################
-  my ($self) = @_;
+  my ( $self, $verify_region ) = @_;
 
-  my $r = $self->_send_request( 'GET', $EMPTY, {} );
+  # The "default" region for Amazon is us-east-1
+  # This is the region to set it to for listing buckets
+  # You may need to reset the signer's endpoint to 'us-east-1'
+
+  # temporarily cache signer
+  my $region = $self->_region;
+
+  $self->reset_signer_region('us-east-1'); # default region for buckets op
+
+  my $r = $self->_send_request(
+    { method  => 'GET',
+      path    => $EMPTY,
+      headers => {},
+      region  => 'us-east-1',
+    }
+  );
 
   return if $self->_remember_errors($r);
 
@@ -229,11 +382,14 @@ sub buckets {
           creation_date => $node->{CreationDate},
           account       => $self,
           buffer_size   => $self->buffer_size,
+          verify_region => $verify_region // $FALSE,
         }
         );
 
     } ## end foreach my $node ( @{$buckets...})
   } ## end if ( ref $r->{Buckets})
+
+  $self->reset_signer_region($region); # restore original region
 
   return {
     owner_id          => $owner_id,
@@ -243,44 +399,102 @@ sub buckets {
 } ## end sub buckets
 
 ########################################################################
+sub reset_signer_region {
+########################################################################
+  my ( $self, $region ) = @_;
+
+  # reset signer's region, if the region wasn't us-east-1...note this
+  # is probably not needed anymore since bucket operations now send
+  # the region of the bucket to the signer
+  if ( $self->cache_signer ) {
+    if ( $self->region && $self->region ne 'us-east-1' ) {
+      if ( $self->signer->can('region') ) {
+        $self->signer->region($region);
+      }
+    }
+  }
+  else {
+    $self->region($region);
+  }
+
+  return $self->region;
+}
+
+########################################################################
 sub add_bucket {
 ########################################################################
   my ( $self, $conf ) = @_;
 
+  my $region = $conf->{location_constraint} // $conf->{region}
+    // $self->region;
+
+  if ( $region && $region eq 'us-east-1' ) {
+    undef $region;
+  }
+
   my $bucket = $conf->{bucket};
-  croak 'must specify bucket' if !$bucket;
+
+  croak 'must specify bucket'
+    if !$bucket;
+
+  my %header_ref;
 
   if ( $conf->{acl_short} ) {
     $self->_validate_acl_short( $conf->{acl_short} );
+
+    $header_ref{'x-amz-acl'} = $conf->{acl_short};
   } ## end if ( $conf->{acl_short...})
 
-  my $header_ref
-    = ( $conf->{acl_short} )
-    ? { 'x-amz-acl' => $conf->{acl_short} }
-    : {};
-
-  my $data = $EMPTY;
-
-  if ( defined $conf->{location_constraint} ) {
-    $data = <<"XML";
-<CreateBucketConfiguration><LocationConstraint>$conf->{location_constraint}</LocationConstraint></CreateBucketConfiguration>
+  my $xml = <<'XML';
+<CreateBucketConfiguration>
+  <LocationConstraint>%s</LocationConstraint>
+</CreateBucketConfiguration>
 XML
-  } ## end if ( defined $conf->{location_constraint...})
 
-  return $FALSE
-    if !$self->_send_request_expect_nothing( 'PUT', "$bucket/",
-    $header_ref, $data );
+  my $data = defined $region ? sprintf $xml, $region : $EMPTY;
 
-  return $self->bucket($bucket);
+  my $retval = $self->_send_request_expect_nothing(
+    { method  => 'PUT',
+      path    => "$bucket/",
+      headers => \%header_ref,
+      data    => $data,
+      region  => $region,
+    }
+  );
+
+  my $bucket_obj = $retval ? $self->bucket($bucket) : undef;
+
+  return $bucket_obj;
 } ## end sub add_bucket
 
 ########################################################################
 sub bucket {
 ########################################################################
-  my ( $self, $bucketname ) = @_;
+  my ( $self, @args ) = @_;
+
+  my ( $bucketname, $region, $verify_region );
+
+  if ( ref $args[0] && reftype( $args[0] ) eq 'HASH' ) {
+    ( $bucketname, $region, $verify_region )
+      = @{ $args[0] }{qw{bucket region verify_region}};
+  }
+  else {
+    ( $bucketname, $region ) = @args;
+  }
+
+  # only set to default region if a region wasn't passed or region
+  # verification not requested
+  if ( !$region && !$verify_region ) {
+    $region = $self->region;
+  }
 
   return Amazon::S3::Bucket->new(
-    { bucket => $bucketname, account => $self } );
+    { bucket        => $bucketname,
+      account       => $self,
+      region        => $region,
+      verify_region => $verify_region,
+    }
+  );
 } ## end sub bucket
 
 ########################################################################
@@ -289,19 +503,27 @@ sub delete_bucket {
   my ( $self, $conf ) = @_;
 
   my $bucket;
+  my $region;
 
   if ( eval { return $conf->isa('Amazon::S3::Bucket'); } ) {
     $bucket = $conf->bucket;
+    $region = $conf->region;
   } ## end if ( eval { return $conf...})
   else {
     $bucket = $conf->{bucket};
+    $region = $conf->{region} || $self->get_bucket_location($bucket);
   } ## end else [ if ( eval { return $conf...})]
 
   croak 'must specify bucket'
     if !$bucket;
 
-  return $self->_send_request_expect_nothing( 'DELETE', $bucket . $SLASH,
-    {} );
+  return $self->_send_request_expect_nothing(
+    { method  => 'DELETE',
+      path    => $bucket . $SLASH,
+      headers => {},
+      region  => $region,
+    }
+  );
 } ## end sub delete_bucket
 
 ########################################################################
@@ -333,7 +555,13 @@ sub list_bucket {
       keys %{$conf};
   } ## end if ( %{$conf} )
 
-  my $r = $self->_send_request( 'GET', $path, {} );
+  my $r = $self->_send_request(
+    { method  => 'GET',
+      path    => $path,
+      headers => {},
+      region  => $self->region
+    }
+  );
 
   return if $self->_remember_errors($r);
 
@@ -431,7 +659,8 @@ sub list_bucket_all {
     if !$bucket;
 
   my $response = $self->list_bucket($conf);
-  croak 'The server has stopped responding' unless $response;
+  croak 'The server has stopped responding'
+    if !$response;
 
   return $response
     if !$response->{is_truncated};
@@ -446,7 +675,8 @@ sub list_bucket_all {
     $conf->{bucket} = $bucket;
 
     $response = $self->list_bucket($conf);
-    croak 'The server has stopped responding' unless $response;
+    croak 'The server has stopped responding'
+      if !$response;
 
     push @{ $all->{keys} }, @{ $response->{keys} };
 
@@ -506,6 +736,32 @@ sub level {
 } ## end sub level
 
 ########################################################################
+sub signer {
+########################################################################
+  my ($self) = @_;
+
+  return $self->_signer
+    if $self->_signer;
+
+  my $creds = $self->credentials ? $self->credentials : $self;
+
+  my $signer = Amazon::S3::Signature::V4->new(
+    { access_key_id => $creds->get_aws_access_key_id,
+      secret        => $creds->get_aws_secret_access_key,
+      region        => $self->region || $self->get_default_region,
+      service       => 's3',
+      $self->get_token ? ( security_token => $creds->get_token ) : (),
+    }
+  );
+
+  if ( $self->cache_signer ) {
+    $self->_signer($signer);
+  }
+
+  return $signer;
+}
+
+########################################################################
 sub _validate_acl_short {
 ########################################################################
   my ( $self, $policy_name ) = @_;
@@ -532,14 +788,15 @@ sub _can_bucket_be_subdomain {
     return $FALSE;
   } ## end if ( length $bucketname...)
 
-  if (length $bucketname < 1) {
+  if ( length $bucketname < $MIN_BUCKET_NAME_LENGTH ) {
     return $FALSE;
   }
 
-  return $FALSE unless $bucketname =~ m{^[a-z][a-z0-9-]*$};
-  return $FALSE unless $bucketname =~ m{[a-z0-9]$};
+  return $FALSE if $bucketname !~ m{\A[[:lower:]][[:lower:]\d-]*\z}xsm;
+  return $FALSE if $bucketname !~ m{[[:lower:]\d]\z}xsm;
+
   return $TRUE;
-} ## end sub _is_dns_bucket
+}
 
 # make the HTTP::Request object
 
@@ -547,8 +804,18 @@ sub _can_bucket_be_subdomain {
 sub _make_request {
 ########################################################################
   my ( $self, @args ) = @_;
+  my ( $method, $path, $headers, $data, $metadata, $region );
 
-  my ( $method, $path, $headers, $data, $metadata ) = @args;
+  if ( ref $args[0] && reftype( $args[0] ) eq 'HASH' ) {
+    ( $method, $path, $headers, $data, $metadata, $region )
+      = @{ $args[0] }{qw{method path headers data metadata region}};
+  }
+  else {
+    ( $method, $path, $headers, $data, $metadata, $region ) = @args;
+  }
+
+  # reset region on every call...every bucket can have it's own region
+  $self->region( $region // $self->_region );
 
   croak 'must specify method'
     if !$method;
@@ -570,7 +837,10 @@ sub _make_request {
 
   $path =~ s/\A\///xsm;
   my $url = "$protocol://$host/$path";
-  if ($path =~ m{^([^/?]+)(.*)} && _can_bucket_be_subdomain($1)) {
+
+  if ( $path =~ m{\A([^/?]+)(.*)}xsm
+    && $self->dns_bucket_names
+    && _can_bucket_be_subdomain($1) ) {
     $url = "$protocol://$1.$host$2";
   }
 
@@ -580,7 +850,9 @@ sub _make_request {
 
   $request->content($data);
 
-  $self->{'signer'}->sign( $request );
+  $self->signer->region($region); # always set regional endpoint for signing
+
+  $self->signer->sign($request);
 
   $self->get_logger->trace( sub { return Dumper( [$request] ); } );
 
@@ -594,18 +866,25 @@ sub _send_request {
 ########################################################################
   my ( $self, @args ) = @_;
 
-  my $request = @args == 1 ? $args[0] : $self->_make_request(@args);
+  my $request;
+
+  if ( @args == 1 && ref $args[0] =~ /HTTP::Request/xsm ) {
+    $request = $args[0];
+  }
+  else {
+    $request = $self->_make_request(@args);
+  }
 
   my $response = $self->_do_http($request);
 
-  $self->get_logger->trace( Dumper( [$response] ) );
+  $self->get_logger->debug( Dumper( [$response] ) );
 
   $self->last_response($response);
 
   my $content = $response->content;
 
-  if ($response->code !~ /^2\d\d$/) {
-    $self->_remember_errors($response->content, 1);
+  if ( $response->code !~ /\A2\d\d\z/xsm ) {
+    $self->_remember_errors( $response->content, 1 );
     return;
   }
 
@@ -617,93 +896,112 @@ sub _send_request {
 } ## end sub _send_request
 
 #
-# This is the necessary to find and region for a specific bucket
+# This is the necessary to find the region for a specific bucket
 # and set the signer object to use that region when signing requests
-#
+########################################################################
 sub adjust_region {
-    my ( $self, $bucket, $called_from_redirect ) = @_;
+########################################################################
+  my ( $self, $bucket, $called_from_redirect ) = @_;
 
-    my $request = HTTP::Request->new('GET', 'https://' . $bucket . '.' . $self->host );
-    $self->{'signer'}->sign( $request );
+  my $request
+    = HTTP::Request->new( 'GET', 'https://' . $bucket . $DOT . $self->host );
+  $self->{'signer'}->sign($request);
 
-    # We have to turn off our special retry since this will deliberately trigger that code
-    $self->turn_off_special_retry();
+  # We have to turn off our special retry since this will deliberately trigger that code
+  $self->turn_off_special_retry();
 
-    # If the bucket name has a period in it, the certificate validation
-    # will fail since it will expect a certificate for a subdomain.
-    # Setting it to verify against the expected host guards against
-    # that while still being secure since we will have verified
-    # the response as coming from the expected server.
-    $self->ua->ssl_opts( SSL_verifycn_name => $self->host );
+  # If the bucket name has a period in it, the certificate validation
+  # will fail since it will expect a certificate for a subdomain.
+  # Setting it to verify against the expected host guards against
+  # that while still being secure since we will have verified
+  # the response as coming from the expected server.
+  $self->ua->ssl_opts( SSL_verifycn_name => $self->host );
 
-    my $response = $self->_do_http($request);
+  my $response = $self->_do_http($request);
 
-    # Turn this off, since all other requests have the bucket after
-    # the host in the URL, and the host may change depending on the region
-    $self->ua->ssl_opts( SSL_verifycn_name => undef );
+  # Turn this off, since all other requests have the bucket after
+  # the host in the URL, and the host may change depending on the region
+  $self->ua->ssl_opts( SSL_verifycn_name => undef );
 
-    $self->turn_on_special_retry();
+  $self->turn_on_special_retry();
 
-    # If No error, then nothing to do
-    return 1 if $response->is_success();
+  # If No error, then nothing to do
+  return 1 if $response->is_success();
 
-    # If the error is due to the wrong region, then we will get
-    # back a block of XML with the details
-    if ( $response->content_type eq 'application/xml' and $response->content ) {
+  # If the error is due to the wrong region, then we will get
+  # back a block of XML with the details
+  if ( $response->content_type eq 'application/xml' and $response->content ) {
 
-        my $error_hash = $self->_xpc_of_content( $response->content );
+    my $error_hash = $self->_xpc_of_content( $response->content );
 
-        if ( $error_hash->{'Code'} eq 'PermanentRedirect' and $error_hash->{'Endpoint'} ) {
+    if (  $error_hash->{'Code'} eq 'PermanentRedirect'
+      and $error_hash->{'Endpoint'} ) {
 
-            # Don't recurse through multiple redirects
-            return if $called_from_redirect;
+      # Don't recurse through multiple redirects
+      return if $called_from_redirect;
 
-            # With a permanent redirect error, they are telling us the explicit
-            # host to use.  The endpoint will be in the form of bucket.host
-            my $host = $error_hash->{'Endpoint'};
+      # With a permanent redirect error, they are telling us the explicit
+      # host to use.  The endpoint will be in the form of bucket.host
+      my $host = $error_hash->{'Endpoint'};
 
-            # Remove the bucket name from the front of the host name
-            # All the requests will need to be of the form https://host/bucket
-            $host =~ s/^$bucket\.//;
-            $self->host($host);
+      # Remove the bucket name from the front of the host name
+      # All the requests will need to be of the form https://host/bucket
+      $host =~ s/\A$bucket[.]//xsm;
+      $self->host($host);
 
-            # We will need to call ourselves again in order to trigger the
-            # AuthorizationHeaderMalformed error in order to get the region
-            return $self->adjust_region( $bucket, 1 );
-        }
-
-        if ( $error_hash->{'Code'} eq 'AuthorizationHeaderMalformed' and $error_hash->{'Region'} ) {
-
-            # Set the signer to use the correct reader evermore
-            $self->{'signer'}{'endpoint'} = $error_hash->{'Region'};
-
-            # Only change the host if we haven't been called as a redirect where an exact host has been given
-            $self->host( 's3-' . $error_hash->{'Region'} . '.amazonaws.com' ) unless $called_from_redirect;
-
-            return 1;
-        }
-
-        if ( $error_hash->{'Code'} eq 'IllegalLocationConstraintException' ) {
-
-            # This is hackish; but in this case the region name only appears in the message
-            if ( $error_hash->{'Message'} =~ /The (\S+) location/ ) {
-                my $region = $1;
-
-                # Correct the region for the signer
-                $self->{'signer'}{'endpoint'} = $region;
-
-                # Set the proper host for the region
-                $self->host( 's3.' . $region . '.amazonaws.com' );
-
-                return 1;
-            }
-        }
-
+      # We will need to call ourselves again in order to trigger the
+      # AuthorizationHeaderMalformed error in order to get the region
+      return $self->adjust_region( $bucket, 1 );
     }
 
-    # Some other error
-    $self->_remember_errors($response->content, 1);
-    return;
+    if (  $error_hash->{'Code'} eq 'AuthorizationHeaderMalformed'
+      and $error_hash->{'Region'} ) {
+
+      # Set the signer to use the correct reader evermore
+      $self->{'signer'}{'endpoint'} = $error_hash->{'Region'};
+
+      # Only change the host if we haven't been called as a redirect
+      # where an exact host has been given
+      if ( !$called_from_redirect ) {
+        $self->host( 's3-' . $error_hash->{'Region'} . '.amazonaws.com' );
+      }
+
+      return 1;
+    }
+
+    if ( $error_hash->{'Code'} eq 'IllegalLocationConstraintException' ) {
+
+      # This is hackish; but in this case the region name only appears in the message
+      if ( $error_hash->{'Message'} =~ /The (\S+) location/xsm ) {
+        my $region = $1;
+
+        # Correct the region for the signer
+        $self->{'signer'}{'endpoint'} = $region;
+
+        # Set the proper host for the region
+        $self->host( 's3.' . $region . '.amazonaws.com' );
+
+        return 1;
+      }
+    }
+
+  }
+
+  # Some other error
+  $self->_remember_errors( $response->content, 1 );
+  return;
+}
+
+########################################################################
+sub reset_errors {
+########################################################################
+  my ($self) = @_;
+
+  $self->err(undef);
+  $self->errstr(undef);
+  $self->error(undef);
+
+  return $self;
 }
 
 ########################################################################
@@ -712,33 +1010,47 @@ sub _do_http {
   my ( $self, $request, $filename ) = @_;
 
   # convenient time to reset any error conditions
-  $self->err(undef);
-  $self->errstr(undef);
-  my $response = $self->ua->request($request, $filename);
+  $self->reset_errors;
+
+  my $response = $self->ua->request( $request, $filename );
 
   # For new buckets at non-standard locations, amazon will sometimes
-  # respond with a temprary redirect.  In this case it is necessary
+  # respond with a temporary redirect.  In this case it is necessary
   # to try again with the new URL
-  if ($response->code =~ /^3/ and defined $response->header('Location')) {
+  if ( $response->code =~ /\A3/xsm and defined $response->header('Location') )
+  {
 
-    # print "Redirecting to:  " . $response->header('Location') . "\n";
-    $request->uri($response->header('Location'));
-    $response = $self->ua->request($request, $filename);
+    $self->get_logger->debug(
+      'Redirecting to:  ' . $response->header('Location') );
+
+    $request->uri( $response->header('Location') );
+    $response = $self->ua->request( $request, $filename );
   }
+
+  $self->get_logger->debug( Dumper( [$response] ) );
+
+  $self->last_response($response);
 
   return $response;
 }
 
 # Call this if handling any temporary redirect issues
 # (Like needing to probe with a HEAD request when file handle are involved)
+
+########################################################################
 sub _do_http_no_redirect {
-  my ($self, $request, $filename) = @_;
+########################################################################
+  my ( $self, $request, $filename ) = @_;
 
   # convenient time to reset any error conditions
-  $self->err(undef);
-  $self->errstr(undef);
+  $self->reset_errors;
 
-  return $self->ua->request( $request, $filename );
+  my $response = $self->ua->request( $request, $filename );
+  $self->get_logger->debug( Dumper( [$response] ) );
+
+  $self->last_response($response);
+
+  return $response;
 } ## end sub _do_http
 
 ########################################################################
@@ -749,10 +1061,6 @@ sub _send_request_expect_nothing {
   my $request = $self->_make_request(@args);
 
   my $response = $self->_do_http($request);
-
-  $self->get_logger->trace( Dumper( [$response] ) );
-
-  $self->last_response($response);
 
   my $content = $response->content;
 
@@ -775,9 +1083,28 @@ sub _send_request_expect_nothing {
 ########################################################################
 sub _send_request_expect_nothing_probed {
 ########################################################################
-  my ( $self, $method, $path, $conf, $value ) = @_;
+  my ( $self, @args ) = @_;
 
-  my $request      = $self->_make_request( 'HEAD', $path );
+  my ( $method, $path, $conf, $value, $region );
+
+  if ( @args == 1 && ref $args[0] ) {
+    ( $method, $path, $conf, $value, $region )
+      = @{ $args[0] }{qw{method path headers data region}};
+  }
+  else {
+    ( $method, $path, $conf, $value, $region )
+      = @{ $args[0] }{qw{method path headers data region}};
+  }
+
+  $region = $region // $self->region;
+
+  my $request = $self->_make_request(
+    { method => 'HEAD',
+      path   => $path,
+      region => $region
+    }
+  );
+
   my $override_uri = undef;
 
   my $old_redirectable = $self->ua->requests_redirectable;
@@ -785,21 +1112,31 @@ sub _send_request_expect_nothing_probed {
 
   my $response = $self->_do_http_no_redirect($request);
 
-  $self->get_logger->trace( Dumper( [$response] ) );
+  if ( $response->code =~ /^3/xsm ) {
+    if ( defined $response->header('Location') ) {
+      $override_uri = $response->header('Location');
+    } ## end if ( $response->code =~...)
+    else {
+      $self->_croak_if_response_error($response);
+    }
 
-  if ( $response->code =~ /^3/xsm && defined $response->header('Location') ) {
-    $override_uri = $response->header('Location');
-  } ## end if ( $response->code =~...)
+    $self->get_logger->debug( 'setting override URI to ', $override_uri );
+  }
 
-  $request = $self->_make_request( $method, $path, $conf, $value );
+  $request = $self->_make_request(
+    { method  => $method,
+      path    => $path,
+      headers => $conf,
+      data    => $value,
+      region  => $region
+    }
+  );
 
   if ( defined $override_uri ) {
     $request->uri($override_uri);
   } ## end if ( defined $override_uri)
 
   $response = $self->_do_http_no_redirect($request);
-
-  $self->get_logger->trace( Dumper( [$response] ) );
 
   $self->ua->requests_redirectable($old_redirectable);
 
@@ -847,8 +1184,8 @@ sub _xpc_of_content {
     );
   };
 
-  if ($@) {
-    confess "Error parsing $src:  $@";
+  if ($EVAL_ERROR) {
+    confess "Error parsing $src:  $EVAL_ERROR";
   }
 
   return $xml_hr;
@@ -872,6 +1209,8 @@ sub _remember_errors {
   } ## end if ( !ref $src && $src...)
 
   my $r = ref $src ? $src : $self->_xpc_of_content( $src, $keep_root );
+
+  $self->error($r);
 
   # apparently buckets() does not keep_root
   if ( $r->{Error} ) {
@@ -1054,7 +1393,7 @@ sub _urlencode {
 ########################################################################
   my ( $self, $unencoded ) = @_;
 
-  return uri_escape_utf8($unencoded, '^A-Za-z0-9\-\._~\x2f');
+  return uri_escape_utf8( $unencoded, '^A-Za-z0-9\-\._~\x2f' );
 } ## end sub _urlencode
 
 1;
@@ -1067,6 +1406,12 @@ __END__
 
 Amazon::S3 - A portable client library for working with and
 managing Amazon S3 buckets and keys.
+
+=begin markdown
+
+![Amazon::S3](https://github.com/rlauer6/perl-amazon-s3/actions/workflows/build.yml/badge.svg?event=push)
+
+=end markdown
 
 =head1 SYNOPSIS
 
@@ -1172,53 +1517,92 @@ via L<XML::Simple>.
 
 =back
 
-=head1 LIMITATIONS
+=head1 LIMITATIONS AND DIFFERENCES WITH EARLIER VERSIONS
 
-As noted this module is no longer a I<drop-in> replacement for
-C<Net::Amazon::S3> and has limitations that may make the use of this
-module in your applications questionable. The list of limitations
-below may not be complete.
+As noted, this module is no longer a I<drop-in> replacement for
+C<Net::Amazon::S3> and has limitations and differences that may make
+the use of this module in your applications questionable.
 
 =over 5
+
+=item MINIMUM PERL
+
+Technically, this module should run on versions 5.10 and above,
+however some of the dependencies may require higher versions of
+C<perl> or install new versions some dependencies that conflict with
+other versions of dependencies...it's a crapshoot when dealing with
+older C<perl> version and CPAN modules.
+
+You may however, be able to build this module by installing older
+versions of those dependencies and take your chances that those older
+versions provide enough working features to support C<Amazon::S3>. It
+is likely they do...and this module has recently been tested on
+version 5.10.0 C<perl> using some older CPAN modules to resolve
+dependency issues.
+
+To build this module on an earlier version of C<perl> you may need to
+downgrade some modules.  In particular I have found this recipe to
+work for building and testing on 5.10.0.
+
+In this order install:
+
+ HTML::HeadParser 2.14
+ LWP 6.13
+ Amazon::S3 0.55
+
+...other versions I<may> work...YMMV.
 
 =item * API Signing
 
 Making calls to AWS APIs requires that the calls be signed.  Amazon
 has added a new signing method (Signature Version 4) to increase
-security around their APIs.  This module continues to use the original
-signing method (Signature Version 2).
+security around their APIs. This module no longer utilizes Signature
+Version V2.
 
 B<New regions after January 30, 2014 will only support Signature Version 4.>
 
-There has been some effort to add support of Signature Version 4
-however several method in this package may need significant
-refactoring and testing in order to support the new sigining method.
+See L</Signature Version V4> below for important details.>
 
 =over 10
-
-=item Signature Version 2
-
-
-L<https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html>
 
 =item Signature Version 4
 
 L<https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-query-string-auth.html>
 
+I<IMPORTANT NOTE:>
+
+Unlike Signature Version 2, Version 4 requires a regional
+parameter. This implies that you need to supply the bucket's region
+when signing requests for any API call that involves a specific
+bucket. Starting with version 0.55 of this module,
+C<Amazon::S3::Bucket> provides a new method (C<region()> and accepts
+in the constructor a C<region> parameter.  If a region is not
+supplied, the region for the bucket will be set to the region set in
+the C<account> object (C<Amazon::S3>) that you passed to the bucket's
+new constructor.  Alternatively, you can request that the bucket's new
+constructor determine the bucket's region for you by calling the
+C<get_location_constraint()> method.
+
+When signing API calls, the region for the specific bucket will be
+used. For calls that are not regional (C<buckets()>, e.g.) the default
+region ('us-east-1') will be used.
+
+=item Signature Version 2
+
+L<https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html>
+
 =back
 
 =item * New APIs
 
-This module does not support the myriad of new API method calls
-available for S3 since its original creation.
+This module does not support some of the newer API method calls
+for S3 added after the initial creation of this interface.
 
 =item * Multipart Upload Support
 
-While there are undocumented methods for multipart uploads (used for
-files >5Gb), those methods have not been tested and may not in fact
-work today.
+There is limited testing for multipart uploads.
 
-For more information regarding multipart uploads visit the link below.
+For more information regarding multi-part uploads visit the link below.
 
 L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_CreateMultipartUpload.html>
 
@@ -1319,7 +1703,7 @@ it is an Amazon endpoint.
 
 The AWS region you where your bucket is located.
 
-default: no region
+default: us-east-1
 
 =item buffer_size
 
@@ -1329,27 +1713,114 @@ default: 4096
 
 =back
 
-=head2 turn_on_special_retry
+=head2 signer
 
-Called to add extry retry codes if retry has been set
+Sets or retrieves the signer object. API calls must be signed using
+your AWS credentials. By default, starting with version 0.54 the
+module will use L<Net::Amazon::Signature::V4> as the signer and
+instantiate a signer object in the constructor. Note however, that
+signers need your credentials and they I<will> get stored by that
+class, making them susceptible to inadvertant exfiltration. You have a
+few options here:
 
-=head2 turn_off_special_retry
+=over 5
 
-Called to turn off special retry codes when we are deliberately triggering them
+=item 1. Use your own signer.
 
-=head2 adjust_region
+You may have noticed that you can also provide your own credentials
+object forcing this module to use your object for retrieving
+credentials. Likewise, you can use your own signer so that this
+module's signer never sees or stores those credentials.
 
-Sets the region for the signing object to be appropriate for the bucket
+=item 2. Pass the credentials object and set C<cache_signer> to a
+false value.
+
+If you pass a credentials object and set C<cache_signer> to a false
+value, the module will use the credentials object to retrieve
+credentials and create a new signer each time an API call is made that
+requires signing. This prevents your credentials from being stored
+inside of the signer class.
+
+I<Note that using your own credentials object that stores your
+credentials in plaintext is also going to expose your credentials when
+someone dumps the class.>
+
+=item 3. Pass credentials, set C<cache_signer> to a false value.
+
+Unfortunately, while this will prevent L<Net::Amazon::Signature::V4>
+from hanging on to your credentials, you credentials will be stored in
+the L<Amazon::S3> object.
+
+Starting with version 0.55 of this module, if you have installed
+L<Crypt::CBC> and L<Crypt::Blowfish>, your credentials will be
+encrypted using a random key created when the class is
+instantiated. While this is more secure than leaving them in
+plaintext, if the key is discovered (the key however is not stored in
+the object's hash) and the object is dumped, your I<encrypted>
+credentials can be exposed.
+
+=item 4. Use very granular credentials for bucket access only.
+
+Use credentials that only allow access to a bucket or portions of a
+bucket required for your application. This will at least limit the
+I<blast radius> of any potential security breach.
+
+=item 5. Do nothing...send the credentials, use the default signer.
+
+In this case, both the L<Amazon::S3> class and the
+L<Net::Amazon::Signature::V4> have your credentials. Caveat Emptor.
+
+See Also L<Amazon::Credentials> for more information about safely
+storing your credentials and preventing exfiltration.
+
+=back
+
+=head2 region
+
+Sets the region for the for the API calls. This will also be the
+default when instantiating the bucket object unless you pass the
+region parameter in the C<bucket> method or use the C<verify_region>
+flag that will I<always> verify the region of the bucket using the
+C<get_location_constraint> method.
+
+default: us-east-1
 
 =head2 buckets
 
-Returns C<undef> on error, else HASHREF of results:
+ buckets([verify-region])
+
+=over
+
+=item verify-region (optional)
+
+C<verify-region> is a boolean value that indicates if the
+bucket's region should be verified when the bucket object is
+instantiated.
+
+If set to true, this method will call the C<bucket> method with
+C<verify_region> set to true causing the constructor to call the
+C<get_location_constraint> for each bucket to set the bucket's
+region. This will cause a significant decrease in the peformance of
+the C<buckets()> method. Setting the region for each bucket is
+necessary since API operations on buckets require the region of the
+bucket when signing API requests. If all of your buckets are in the
+same region and you have passed a region parameter to your S3 object,
+then that region will be used when calling the constructor of your
+bucket objects.
+
+default: false
+
+=back
+
+Returns a HASHREF containging the metadata for all of the buckets
+owned by the accout or (see below) or C<undef> on
+error.
 
 =over
 
 =item owner_id
 
-The owner's ID of the buckets owner.
+The owner ID of the bucket's owner.
 
 =item owner_display_name
 
@@ -1357,38 +1828,61 @@ The name of the owner account.
 
 =item buckets
 
-Any ARRAYREF of L<Amazon::SimpleDB::Bucket> objects for the 
+Any ARRAYREF of L<Amazon::S3::Bucket> objects for the 
 account.
 
 =back
 
-=head2 add_bucket 
+=head2 add_bucket
 
-Takes a HASHREF:
+ add_bucket(bucket-configuration)
+
+C<bucket-configuration> is a reference to a hash with bucket configuration
+parameters.
 
 =over
 
 =item bucket
 
-The name of the bucket you want to add
+The name of the bucket. See L<Bucket name
+rules|https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html>
+for more details on bucket naming rules.
 
 =item acl_short (optional)
 
 See the set_acl subroutine for documenation on the acl_short options
 
+=item location_constraint
+
+=item region
+
+The region the bucket is to be created in.
+
 =back
 
-Returns 0 on failure or a L<Amazon::S3::Bucket> object on success
+Returns a L<Amazon::S3::Bucket> object on success or C<undef> on failure.
 
-=head2 bucket BUCKET
+=head2 bucket
 
-Takes a scalar argument, the name of the bucket you're creating
+ bucket(bucket, [region])
 
-Returns an (unverified) bucket object from an account. This method does not access the network.
+ bucket({ bucket => bucket-name, verify_region => boolean, region => region });
+
+Takes a scalar argument or refernce to a hash of arguments.
+
+You can pass the region or set C<verify_region> indicating that
+you want the bucket constructor to detemine the bucket region.
+
+If you do not pass the region or set the C<verify_region> value, the
+region will be set to the default region set in your C<Amazon::S3>
+object.
+
+See L<Amazon::S3::Bucket> for a complete description of the C<bucket>
+method.
 
 =head2 delete_bucket
 
-Takes either a L<Amazon::S3::Bucket> object or a HASHREF containing 
+Takes either a L<Amazon::S3::Bucket> object or a HASHREF containing:
 
 =over
 
@@ -1396,11 +1890,31 @@ Takes either a L<Amazon::S3::Bucket> object or a HASHREF containing
 
 The name of the bucket to remove
 
+=item region
+
+Region the bucket is located in. If not provided, the method will
+determine the bucket's region by calling C<get_bucket_location>.
+
 =back
 
-Returns false (and fails) if the bucket isn't empty.
+Returns a boolean indicating the success of failure of the API
+call. Check C<err> or C<errstr> for error messages.
 
-Returns true if the bucket is successfully deleted.
+Note from the L<Amazon's documentation|https://docs.aws.amazon.com/AmazonS3/latest/userguide/BucketRestrictions.html>
+
+=over 10
+
+If a bucket is empty, you can delete it. After a bucket is deleted,
+the name becomes available for reuse. However, after you delete the
+bucket, you might not be able to reuse the name for various reasons.
+
+For example, when you delete the bucket and the name becomes available
+for reuse, another AWS account might create a bucket with that
+name. In addition, B<some time might pass before you can reuse the name
+of a deleted bucket>. If you want to use the same bucket name, we
+recommend that you don't delete the bucket.
+
+=back
 
 =head2 dns_bucket_names
 
@@ -1528,6 +2042,26 @@ Each key is a HASHREF that looks like this:
         owner_displayname => $owner_name
     }
 
+=head2 get_bucket_location
+
+ get_bucket_location(bucket-name)
+ get_bucket_locaiton(bucket-obj)
+
+This is a convenience routines for the C<get_location_constraint()> of
+the bucket object.  This method will, however return the default
+region of 'us-east-1' when C<get_location_constraint()> returns a null
+value.
+
+ my $region = $s3->get_bucket_location('my-bucket');
+
+Starting with version 0.55, C<Amazon::S3::Bucket> will call this
+C<get_location_constraint()> to determine the region for the
+bucket. You can get the region for the bucket by using the C<region()>
+method of the bucket object.
+
+  my $bucket = $s3->bucket('my-bucket');
+  my $bucket_region = $bucket->region;
+
 =head2 get_logger
 
 Returns the logger object. If you did not set a logger when you
@@ -1548,6 +2082,18 @@ Takes the same arguments as list_bucket.
 
 I<You are encouraged to use the newer C<list_bucket_all_v2> method.>
 
+=head2 err
+
+The S3 error code for the last error encountered.
+
+=head2 errstr
+
+A human readable error string for the last error encountered.
+
+=head2 error
+
+The decoded XML string as a hash object of the last error.
+
 =head2 last_response
 
 Returns the last L<HTTP::Response> object.
@@ -1561,6 +2107,14 @@ Returns the last L<HTTP::Request> object.
 Set the logging level.
 
 default: error
+
+=head2 turn_on_special_retry
+
+Called to add extra retry codes if retry has been set
+
+=head2 turn_off_special_retry
+
+Called to turn off special retry codes when we are deliberately triggering them
 
 =head1 ABOUT
 

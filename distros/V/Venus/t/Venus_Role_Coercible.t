@@ -54,11 +54,10 @@ $test->for('includes');
 
   with 'Venus::Role::Coercible';
 
-  has 'name';
-
-  has 'father';
-  has 'mother';
-  has 'siblings';
+  attr 'name';
+  attr 'father';
+  attr 'mother';
+  attr 'siblings';
 
   sub coerce {
     {

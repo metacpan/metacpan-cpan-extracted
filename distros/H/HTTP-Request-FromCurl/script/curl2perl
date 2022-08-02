@@ -6,12 +6,13 @@ use Pod::Usage;
 
 use HTTP::Request::FromCurl;
 
-our $VERSION = '0.37';
+our $VERSION = '0.40';
 
 Getopt::Long::Configure('pass_through');
 GetOptions(
-    'no-tidy'  => \my $no_tidy,
-    'type|t=s' => \my $ua_type,
+    'no-tidy'        => \my $no_tidy,
+    'no-read-files'  => \my $no_read_files,
+    'type|t=s'       => \my $ua_type,
 ) or pod2usage(2);
 
 =head1 NAME
@@ -120,7 +121,7 @@ BEGIN { eval { require Perl::Tidy; $has_tidy = 1; } }
 
 my $request = HTTP::Request::FromCurl->new(
     argv => [ @ARGV ],
-    read_files => 1,
+    read_files => !$no_read_files,
 ) or exit 1; # Getopt::Long has already printed the error message
 
 my $lwp = $request->as_snippet( type => $ua_type );

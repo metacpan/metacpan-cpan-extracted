@@ -1,7 +1,7 @@
 ---
 abstract: 'minimal random permuted congruential generator'
 author:
-  - 'Jeremy Mates <jmates@cpan.org>'
+  - 'Jeremy Mates <jeremy.mates@gmail.com>'
 build_requires:
   Algorithm::Diff: '0'
   ExtUtils::CBuilder: '0'
@@ -20,11 +20,11 @@ name: Math-Random-PCG32
 provides:
   Math::Random::PCG32:
     file: lib/Math/Random/PCG32.pm
-    version: '0.17'
+    version: '0.23'
 requires:
   perl: '5.014000'
 resources:
   license: http://www.apache.org/licenses/LICENSE-2.0.txt
   repository: https://github.com/thrig/Math-Random-PCG32
-version: '0.17'
+version: '0.23'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

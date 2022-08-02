@@ -153,7 +153,7 @@ sub connect_dbic_ok {
             eval { $pre_deploy_hook->($schema) };
             if (my $error = $@) {
                 $self->builder->diag("Error in pre-deploy-hook: $error");
-                $self->builder->ok(0, $test_name);
+                return $self->builder->ok(0, $test_name);
             }
         }
 
@@ -293,7 +293,7 @@ sub ValidationTemplates {
 
 =head1 COPYRIGHT
 
-(c) MMXXI - Abe Timmerman <abeltje@cpan.org>
+E<copy> MMXXI - Abe Timmerman <abeltje@cpan.org>
 
 =head1 LICENSE
 

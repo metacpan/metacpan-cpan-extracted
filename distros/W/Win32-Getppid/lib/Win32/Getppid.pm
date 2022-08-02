@@ -8,7 +8,7 @@ use base qw( Exporter );
 BEGIN {
 
 # ABSTRACT: Implementation of getppid() for windows
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
   if($^O =~ /^(cygwin|MSWin32|msys)$/)
   {
@@ -19,20 +19,19 @@ our $VERSION = '0.05'; # VERSION
 }
 
 our @EXPORT;
-our @EXPORT_OK;
+our @EXPORT_OK = qw( getppid );
 
 if($^O eq 'MSWin32')
 {
   @EXPORT = qw( getppid );
-  @EXPORT_OK = qw( getppid );
 }
 elsif($^O =~ /^(cygwin|msys)$/)
 {
-  @EXPORT_OK = qw( getppid );
+  # Allow import, but not by default
+  # on cygwin/msys
 }
 else
 {
-  @EXPORT_OK = qw( getppid );
   if($] >= 5.016)
   {
     *getppid = \&CORE::getppid;
@@ -62,7 +61,7 @@ Win32::Getppid - Implementation of getppid() for windows
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -94,7 +93,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Graham Ollis.
+This software is copyright (c) 2015-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

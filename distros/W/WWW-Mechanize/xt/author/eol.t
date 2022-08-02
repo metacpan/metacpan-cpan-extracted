@@ -59,6 +59,7 @@ my @files = (
     't/history_1.html',
     't/history_2.html',
     't/history_3.html',
+    't/html_file.txt',
     't/image-new.t',
     't/image-parse.css',
     't/image-parse.html',

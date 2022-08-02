@@ -2,8 +2,8 @@ NAME
     Data::CSel - Select tree node objects using CSS Selector-like syntax
 
 VERSION
-    This document describes version 0.127 of Data::CSel (from Perl
-    distribution Data-CSel), released on 2021-07-13.
+    This document describes version 0.128 of Data::CSel (from Perl
+    distribution Data-CSel), released on 2022-06-07.
 
 SYNOPSIS
      use Data::CSel qw(csel csel_each);
@@ -174,11 +174,12 @@ EXPRESSION SYNTAX
 
      [name = 'ujang']
 
-    Regex literal. Must be delimited by "/" ... "/", can be followed by zero
-    of more regex modifier characters m, s, i):
+    Regex literal. Must be delimited by "/.../" or "qr(...)", can be
+    followed by zero of more regex modifier characters m, s, i):
 
      //
      /ab(c|d)/i
+     qr(foo/bar)
 
     Array. Examples:
 
@@ -380,7 +381,7 @@ EXPRESSION SYNTAX
 
         Filter only objects where the attribute named *attr* has the value
         matching regular expression *value*. Operand should be a regex
-        literal. Regex literal must be delimited by "//".
+        literal. Regex literal must be delimited by "/.../" or "qr(...)".
 
         Example:
 
@@ -389,7 +390,7 @@ EXPRESSION SYNTAX
         selects all "Person" objects that have "first_name()" with the value
         matching the regex "/^Al/".
 
-         Person[first_name =~ /^al/i]
+         Person[first_name =~ qr(^al)i]
 
         Same as previous example except the regex is case-insensitive.
 
@@ -751,13 +752,6 @@ HOMEPAGE
 SOURCE
     Source repository is at <https://github.com/perlancar/perl-Data-CSel>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-CSel>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
   Related to CSS selector
     CSS4 Selectors Specification, <https://www.w3.org/TR/selectors4/>.
@@ -816,10 +810,33 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2019, 2016 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2022, 2021, 2020, 2019, 2016 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-CSel>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

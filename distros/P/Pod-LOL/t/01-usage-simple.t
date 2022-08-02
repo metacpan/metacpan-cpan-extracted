@@ -1,5 +1,5 @@
 #!perl
-use v5.26;    # Indented heredoc.
+use 5.006;
 use strict;
 use warnings;
 use Test::More;
@@ -15,8 +15,8 @@ my @cases = (
     {
         name          => "Empty",
         expected_root => [],
-        pod           => <<~POD,
-      POD
+        pod           => <<"POD",
+POD
     },
     {
         name          => "Head1-Para",
@@ -28,13 +28,13 @@ my @cases = (
             ],
 
         ],
-        pod => <<~POD,
-      =head1 NAME
-      
-      Example - Just an example
-      
-      =cut
-      POD
+        pod => <<"POD",
+=head1 NAME
+
+Example - Just an example
+
+=cut
+POD
     },
     {
         name          => "Head1-Para (no cut)",
@@ -46,35 +46,35 @@ my @cases = (
             ],
 
         ],
-        pod => <<~POD,
-      =head1 NAME
-      
-      Example - Just an example
-      POD
+        pod => <<"POD",
+=head1 NAME
+
+Example - Just an example
+POD
     },
     {
         name          => "Head2",
         expected_root => [ [ "head2", "Function1" ], ],
-        pod           => <<~POD,
+        pod           => <<"POD",
 
-      =head2 Function1
-      
-      =cut
+=head2 Function1
 
-      POD
+=cut
+
+POD
     },
     {
         name          => "Head2-Para",
         expected_root => [ [ "head2", "Function1" ], [ "Para", "Summary" ], ],
-        pod           => <<~POD,
+        pod           => <<"POD",
 
-      =head2 Function1
-      
-      Summary
-      
-      =cut
+=head2 Function1
 
-      POD
+Summary
+
+=cut
+
+POD
     },
     {
         name          => "Head2-Para-Verbatim",
@@ -83,17 +83,17 @@ my @cases = (
             [ "Para",     "Summary" ],
             [ "Verbatim", " Desc" ],
         ],
-        pod => <<~POD,
+        pod => <<"POD",
 
-      =head2 Function1
-      
-      Summary
-      
-       Desc
-      
-      =cut
+=head2 Function1
 
-      POD
+Summary
+
+ Desc
+
+=cut
+
+POD
     },
 );
 

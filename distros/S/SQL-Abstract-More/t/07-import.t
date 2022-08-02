@@ -14,14 +14,14 @@ delete $ENV{SQL_ABSTRACT_MORE_EXTENDS};
   ok $use, "use SQLAM -extends => SQLA -- 2nd invocation" ;
 }
 
-
 { my $use = eval "use SQL::Abstract::More; 1";
-  ok $use, "use SQLAM -- no -extends" ;
+  (my $err = $@) =~ s/ at .*//;
+  ok !$use, "use SQLAM -- no -extends : denied : $err";
 }
 
 { my $use = eval "use SQL::Abstract::More -extends => 'Classic'; 1";
   (my $err = $@) =~ s/ at .*//;
-  ok !$use, "use SQLAM -extends => 'Classic' : denied : $err";
+  ok !$use, "use SQLAM -extends => 'Classic': $err";
 }
 
 done_testing;

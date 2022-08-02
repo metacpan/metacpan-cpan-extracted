@@ -12,7 +12,7 @@ my $writer = Excel::ValueWriter::XLSX->new;
 
 # 1st sheet, plain values and dates
 $writer->add_sheet(s1 => à_table => [[qw/foo bar barbar gig/],
-                                     [1, 2],
+                                     [1, 2, "=[foo]+[bar]&[bar]", "'=[foo]+[bar]&[bar]"],
                                      [3, undef, 0, 4],
                                      [qw(01.01.2022 19.12.1999 2022-3-4 12/30/1998)],
                                      [qw(01.01.1900 28.02.1900 01.03.1900)],
@@ -51,13 +51,15 @@ like $workbook, qr[<sheets><sheet name="s1" sheetId="1" r:id="rId1"/>.+</sheets>
 
 my $sheet1 = $zip->contents('xl/worksheets/sheet1.xml');
 like $sheet1, qr[<sheetData><row r="1" spans="1:4"><c r="A1" t="s"><v>0</v></c><c r="B1" t="s"><v>1</v>],  'sheet1';
+like $sheet1, qr[<f>\Q[foo]+[bar]&amp;[bar]\E</f>], 'formula';
+
 
 my $table1 = $zip->contents('xl/tables/table1.xml');
 like $table1, qr[<tableColumn id="1"], 'table1';
 
 my $strings = $zip->contents('xl/sharedStrings.xml');
-like $strings, qr[<si><t>foo</t></si><si><t>bar</t></si>], 'shared strings';
-
+like $strings, qr[<si><t>foo</t></si><si><t>bar</t></si>],     'shared strings';
+like $strings, qr[<si><t>\Q=[foo]+[bar]&amp;[bar]\E</t></si>], 'escaped formula';
 
 # end of tests
 done_testing;

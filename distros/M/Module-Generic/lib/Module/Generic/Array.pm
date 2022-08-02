@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Array.pm
-## Version v1.4.0
+## Version v1.5.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/05/10
+## Modified 2022/07/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -33,7 +33,7 @@ BEGIN
     );
     $DEBUG  = 0;
     $RETURN = {};
-    our $VERSION = 'v1.4.0';
+    our $VERSION = 'v1.5.0';
 };
 
 use strict;
@@ -832,8 +832,6 @@ sub tenth { CORE::return( CORE::shift->get_null(9) ); }
 
 sub third { CORE::return( CORE::shift->get_null(2) ); }
 
-sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
-
 sub undef
 {
     my $self = CORE::shift( @_ );
@@ -924,7 +922,45 @@ sub _scalar
 
 sub _warnings_is_enabled { CORE::return( warnings::enabled( ref( $_[0] ) || $_[0] ) ); }
 
-# XXX Module::Generic::Array::Tie class
+sub FREEZE
+{
+    my $self = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class = CORE::ref( $self );
+    my @array = @$self;
+    # Return an array reference rather than a list so this works with Sereal and CBOR
+    CORE::return( [$class, \@array] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # But Storable want a list with the first element being the serialised element
+    CORE::return( $class, \@array );
+}
+
+sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+# NOTE: CBOR will call the THAW method with the stored classname as first argument, the constant string CBOR as second argument, and all values returned by FREEZE as remaining arguments.
+# NOTE: Storable calls it with a blessed object it created followed with $cloning and any other arguments initially provided by STORABLE_freeze
+sub THAW
+{
+    my( $self, undef, @args ) = @_;
+    my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    $ref = ( CORE::scalar( @$ref ) && CORE::ref( $ref->[0] ) eq 'ARRAY' ) ? $ref->[0] : [];
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        @$self = @$ref;
+        CORE::return( $self );
+    }
+    else
+    {
+        CORE::return( $class->new( $ref ) );
+    }
+}
+
+sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
+
+# NOTE: Module::Generic::Array::Tie class
 {
     package
         Module::Generic::Array::Tie;

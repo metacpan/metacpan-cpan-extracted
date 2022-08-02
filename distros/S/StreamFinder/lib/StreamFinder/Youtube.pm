@@ -160,6 +160,12 @@ the specified I<-format> argument (default "I<mp4>"), then no streams will
 be returned.  Otherwise, youtube-dl is called again with no format (I<-f>) 
 argument.  Default is 0 (false / unset).
 
+If I<-formats_by_url> is specified, it should be a valid hash-ref. of url 
+patterns to match (keys) and valid "I<youtube-dl -f>" format strings.  
+This allows for overriding the I<-format> option for URLs (ie. certain 
+non-Youtube ones that provide different formats), particularly useful 
+when I<-formatonly> is also specified.
+
 If I<-fast> is specified (set to 1 (true)), a separate probe of the 
 page to fetch the video's title and artist is skipped.  This is useful 
 if you know the video is NOT a YouTube video or you don't care about 
@@ -626,6 +632,12 @@ sub new
 	#NEXT:  GET STREAMS, THUMBNAIL, ETC. FROM youtube-dl:
 
 DO_YTDL:
+	if (defined $self->{'formats_by_url'}) {
+		my %formats_by_url = %{$self->{'formats_by_url'}};
+		foreach my $i (keys %formats_by_url) {
+			$self->{'format'} = $formats_by_url{$i}  if ($url =~ m#$i#i);
+		}
+	}
 	my $ytformat = (defined $self->{'format'}) ? $self->{'format'} : 'mp4';
 	my $ua = (defined $self->{'user-agent'}) ? (' --user-agent "'.$self->{'user-agent'}.'"') : '';
 	my $ytdlArgs = $self->{'youtube-dl-args'};

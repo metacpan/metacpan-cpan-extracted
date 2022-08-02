@@ -50,7 +50,7 @@ $test->for('includes');
 
   with 'Venus::Role::Proxyable';
 
-  has 'test';
+  attr 'test';
 
   sub build_proxy {
     my ($self, $package, $method, @args) = @_;

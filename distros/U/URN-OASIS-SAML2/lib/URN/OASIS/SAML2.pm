@@ -1,6 +1,6 @@
 # vim: tw=120
 package URN::OASIS::SAML2;
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 use warnings;
 use strict;
 
@@ -8,7 +8,7 @@ use strict;
 
 use Exporter qw(import);
 
-my @bindings = qw(
+my @binding = qw(
     BINDING_HTTP_POST
     BINDING_HTTP_ARTIFACT
     BINDING_HTTP_REDIRECT
@@ -17,7 +17,7 @@ my @bindings = qw(
     BINDING_REVERSE_SOAP
 );
 
-my @classes = qw(
+my @class = qw(
     CLASS_UNSPECIFIED
     CLASS_PASSWORD_PROTECTED
     CLASS_M2FA_UNREGISTERED
@@ -26,7 +26,9 @@ my @classes = qw(
     CLASS_SMARTCARD_PKI
 );
 
-my @nameids = qw(
+my @nameid = qw(
+    NAMEID_FORMAT
+    NAMEID_FORMAT_ENTITY
     NAMEID_EMAIL
     NAMEID_TRANSIENT
     NAMEID_PERSISTENT
@@ -38,6 +40,9 @@ my @urn = qw(
     URN_PROTOCOL
     URN_SIGNATURE
     URN_ENCRYPTION
+    URN_PROTOCOL_ARTIFACT_RESPONSE
+    URN_PROTOCOL_LOGOUT_REQUEST
+    URN_PROTOCOL_RESPONSE
 );
 
 my @ns = qw(
@@ -48,20 +53,31 @@ my @ns = qw(
     NS_ENCRYPTION
 );
 
-our @EXPORT_OK = (@bindings, @classes, @nameids, @ns, @urn);
+my @status = qw(
+    STATUS_AUTH_FAILED
+    STATUS_REQUESTER
+    STATUS_REQUEST_DENIED
+    STATUS_RESPONDER
+    STATUS_SUCCESS
+);
+
+our @EXPORT_OK = (@binding, @class, @nameid, @ns, @urn, @status);
 
 our %EXPORT_TAGS = (
     all      => \@EXPORT_OK,
-    bindings => \@bindings,
-    classes  => \@classes,
-    nameid   => \@nameids,
+    bindings => \@binding,
+    binding  => \@binding,
+    classes  => \@class,
+    class    => \@class,
+    nameid   => \@nameid,
     urn      => \@urn,
     ns       => \@ns,
+    status   => \@status,
 );
 
 use constant base    => 'urn:oasis:names:tc:SAML:';
-use constant saml2   => base . ':2.0:';
-use constant saml1_1 => base . ':1.1:';
+use constant saml2   => base . '2.0:';
+use constant saml1_1 => base . '1.1:';
 
 use constant URN_ASSERTION => saml2 . 'assertion';
 use constant NS_ASSERTION  => 'saml';
@@ -78,6 +94,9 @@ use constant NS_SIGNATURE  => 'ds';
 use constant URN_ENCRYPTION => 'http://www.w3.org/2001/04/xmlenc#';
 use constant NS_ENCRYPTION  => 'xenc';
 
+use constant URN_PROTOCOL_ARTIFACT_RESPONSE => URN_PROTOCOL . ':ArtifactResponse';
+use constant URN_PROTOCOL_LOGOUT_REQUEST    => URN_PROTOCOL . ':LogoutRequest';
+use constant URN_PROTOCOL_RESPONSE          => URN_PROTOCOL . ':Response';
 
 use constant BINDING_HTTP_POST     => saml2 . 'bindings:HTTP-POST';
 use constant BINDING_HTTP_ARTIFACT => saml2 . 'bindings:HTTP-Artifact';
@@ -93,9 +112,17 @@ use constant CLASS_M2FA_CONTRACT      => saml2 . 'ac:classes:MobileTwoFactorCont
 use constant CLASS_SMARTCARD          => saml2 . 'ac:classes:Smartcard';
 use constant CLASS_SMARTCARD_PKI      => saml2 . 'ac:classes:SmartcardPKI';
 
-use constant NAMEID_EMAIL      => saml1_1 . 'nameid-format:emailAddress';
-use constant NAMEID_TRANSIENT  => saml1_1 . 'nameid-format:transient';
-use constant NAMEID_PERSISTENT => saml1_1 . 'nameid-format:persistent';
+use constant NAMEID_FORMAT        => saml1_1 . 'nameid-format';
+use constant NAMEID_FORMAT_ENTITY => saml1_1 . 'nameid-format-entity';
+use constant NAMEID_EMAIL         => saml1_1 . 'nameid-format:emailAddress';
+use constant NAMEID_TRANSIENT     => saml1_1 . 'nameid-format:transient';
+use constant NAMEID_PERSISTENT    => saml1_1 . 'nameid-format:persistent';
+
+use constant STATUS_AUTH_FAILED    => saml2 . 'status:AuthnFailed';
+use constant STATUS_REQUESTER      => saml2 . 'status:Requester';
+use constant STATUS_REQUEST_DENIED => saml2 . 'status:RequestDenied';
+use constant STATUS_RESPONDER      => saml2 . 'status:Responder';
+use constant STATUS_SUCCESS        => saml2 . 'status:Success';
 
 1;
 
@@ -111,7 +138,7 @@ URN::OASIS::SAML2 - Constants for urn:oasis SAML2 implementations
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -150,7 +177,7 @@ This module provides constants which are in use by the SAML2 implementation.
 
 =head2 bindings
 
-    use URN::OASIS::SAML2 qw(:bindings);
+    use URN::OASIS::SAML2 qw(:binding);
     use URN::OASIS::SAML2 qw(
         BINDING_HTTP_POST
         BINDING_HTTP_ARTIFACT
@@ -161,7 +188,7 @@ This module provides constants which are in use by the SAML2 implementation.
 
 =head2 classes
 
-    use URN::OASIS::SAML2 qw(:classes);
+    use URN::OASIS::SAML2 qw(:class);
     use URN::OASIS::SAML2 qw(
         CLASS_UNSPECIFIED
         CLASS_PASSWORD_PROTECTED
@@ -178,6 +205,17 @@ This module provides constants which are in use by the SAML2 implementation.
         NAMEID_EMAIL
         NAMEID_TRANSIENT
         NAMEID_PERSISTENT
+    );
+
+=head2 status
+
+    use URN::OASIS::SAML2 qw(:status);
+    use URN::OASIS::SAML2 qw(
+        STATUS_AUTH_FAILED
+        STATUS_REQUESTER
+        STATUS_REQUEST_DENIED
+        STATUS_RESPONDER
+        STATUS_SUCCESS
     );
 
 =head1 AUTHOR

@@ -18,7 +18,7 @@ BEGIN {
   die "You must install the CWB-CL package in order to use this script.\n"
     if $@;
 }
-#### TODO: rewrite program to use cwb-align-decode in CWB 3.5 trunk version ####
+#### TODO: rewrite program to use cwb-align-decode in CWB 3.5 ####
 
 our $Verbose      = 0;      # -v ... show progress & status messages
 our $Opt_Force    = 0;      # -f ... ignore errors (alignment beads are skipped)

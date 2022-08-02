@@ -1,3 +1,9 @@
+0.07 2022-08-01
+  [Internal Ineffective Changes]
+    * Use get_field_object_by_name_v2 in SPVM/Digest/MD5.c
+    * Use set_field_object_by_name_v2 in SPVM/Digest/MD5.c
+  [Pre Requirement Changes]
+    * SPVM 0.9632 is needed.
 0.06 2022-07-11
   [Fix Testing Bugs]
     * Fix the testing bug that "perl_impl" doesn't use the same perl as SPVM::Digest::MD5.

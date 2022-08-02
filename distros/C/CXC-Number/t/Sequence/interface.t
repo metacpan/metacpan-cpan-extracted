@@ -14,7 +14,7 @@ subtest 'new' => sub {
     is(
         Sequence->new( elements => [ 0 .. 11 ] ),
         object {
-            prop blessed  => Sequence;
+            prop blessed => Sequence;
             call min      => 0;
             call max      => 11;
             call nelem    => 12;
@@ -60,7 +60,7 @@ subtest bignum => sub {
     ok( lives { $seq = Sequence->new( elements => [ 0 .. 11 ] )->bignum } )
       or diag $@;
 
-    my $isa_bignum = meta { prop blessed => 'Math::BigFloat' };
+    my $isa_bignum          = meta { prop blessed => 'Math::BigFloat' };
     my $isa_array_of_bignum = array { all_items( $isa_bignum ); etc; };
 
     is( $seq->min,      $isa_bignum,          'min' );
@@ -85,8 +85,8 @@ subtest PDL => sub {
 
         my $isa_PDL = meta { prop blessed => 'PDL' };
 
-        isnt( $seq->min,  $isa_PDL, 'min' );
-        isnt( $seq->max,  $isa_PDL, 'max' );
+        isnt( $seq->min, $isa_PDL, 'min' );
+        isnt( $seq->max, $isa_PDL, 'max' );
 
         is( $seq->spacing,        $isa_PDL, 'spacing' );
         is( $seq->spacing->nelem, 11,       'spacing has correct shape' );
@@ -103,7 +103,7 @@ subtest build => sub {
     is(
         Sequence->build( fixed =>, elements => [ 0 .. 11 ] ),
         object {
-            prop blessed  => Sequence( 'Fixed' );
+            prop blessed => Sequence( 'Fixed' );
             call min      => 0;
             call max      => 11;
             call nelem    => 12;

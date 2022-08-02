@@ -1,0 +1,8 @@
+0.0.3 Wed 27 Jul 2022 10:28:15 AM PDT
+ - Allow fixer postamble to work with share install one
+
+0.0.2 Mon 25 Jul 2022 05:17:43 PM PDT
+ - Remove File::Share local patch for blib
+
+0.0.1 Sun 24 Jul 2022 09:31:04 PM PDT
+ - Initial release

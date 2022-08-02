@@ -1,7 +1,7 @@
 use v5.10.0;
 use warnings;
 
-package JMAP::Tester 0.101;
+package JMAP::Tester 0.102;
 # ABSTRACT: a JMAP client made for testing JMAP servers
 
 use Moo;
@@ -527,6 +527,11 @@ sub upload {
 
 my %DL_DEFAULT = (name => 'download');
 
+sub _jwt_sub_param_from_uri {
+  my ($self, $to_sign) = @_;
+  "$to_sign";
+}
+
 sub download_uri_for {
   my ($self, $arg) = @_;
 
@@ -558,10 +563,13 @@ sub download_uri_for {
       typ => 'JWT',
     }) );
 
+    my $iat = time;
+    $iat = $iat - ($iat % 3600);
+
     my $payload = encode_b64u( $self->json_encode({
       iss => $jwtc->{signingId},
-      iat => time,
-      sub => "$to_sign",
+      iat => $iat,
+      sub => $self->_jwt_sub_param_from_uri($to_sign),
     }) );
 
     my $signature = hmac_b64u(
@@ -838,7 +846,7 @@ sub configure_from_client_session {
     $self->_jwt_config(undef);
   }
 
-  for my $type (qw(api authentication download upload)) {
+  for my $type (qw(api download upload)) {
     if (defined (my $uri = $client_session->{"${type}Url"})) {
       my $setter = "$type\_uri";
       $self->$setter($uri);
@@ -987,7 +995,7 @@ JMAP::Tester - a JMAP client made for testing JMAP servers
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 OVERVIEW
 

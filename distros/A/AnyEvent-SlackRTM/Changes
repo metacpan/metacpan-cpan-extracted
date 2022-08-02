@@ -1,4 +1,7 @@
-1.2       2021-11-11 10:44:52-06:00 America/Chicago
+1.3       2022-07-29 12:41:25-05:00 America/Chicago
+
+    * Switch from rtm.start to rtm.connect. (HT: @afresh1)
+    * Add keep-alive watchdog timer to keep the connection up. (HT: @afresh1)
 
 1.1       2019-10-03 14:01:15-05:00 America/Chicago
 

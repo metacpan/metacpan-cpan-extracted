@@ -161,7 +161,7 @@ Input files with extension C<.gz>, C<.bz2> or C<.xz> are automatically decompres
 
 =item --size=I<limit>, -n I<limit>
 
-Split corpus into parts of up to I<limit> tokens each.  The default CL_MAX_CORPUS_SIZE = 2^32-1 is guaranteed to work for CWB 3.5, but older CWB releases may have a slightly lower limit.  It is recommended to set this option to C<-n 2147000000> or lower for best compatibility.
+Split corpus into parts of up to I<limit> tokens each.  The default CL_MAX_CORPUS_SIZE = 2^32-1 is guaranteed to work for 64-bit CWB 3.5, but older CWB releases may have a slightly lower limit.  It is recommended to set this option to C<-n 2147000000> or lower for best compatibility.
 
 =item --by=I<tag>, -S I<tag>
 

@@ -1,5 +1,5 @@
 package Form::Tiny::Error;
-
+$Form::Tiny::Error::VERSION = '2.13';
 use v5.10;
 use strict;
 use warnings;
@@ -9,8 +9,6 @@ use Types::TypeTiny qw(StringLike);
 use Carp qw(confess);
 
 use namespace::clean;
-
-our $VERSION = '2.12';
 
 use overload
 	q{""} => 'as_string',
@@ -50,6 +48,7 @@ sub as_string
 
 	# Internal use only
 	package Form::Tiny::Error::NestedFormError;
+$Form::Tiny::Error::NestedFormError::VERSION = '2.13';
 	use parent -norequire, 'Form::Tiny::Error';
 
 }
@@ -57,6 +56,7 @@ sub as_string
 {
 
 	package Form::Tiny::Error::InvalidFormat;
+$Form::Tiny::Error::InvalidFormat::VERSION = '2.13';
 	use parent -norequire, 'Form::Tiny::Error';
 
 	sub default_error
@@ -68,6 +68,7 @@ sub as_string
 {
 
 	package Form::Tiny::Error::Required;
+$Form::Tiny::Error::Required::VERSION = '2.13';
 	use parent -norequire, 'Form::Tiny::Error';
 
 	sub default_error
@@ -79,6 +80,7 @@ sub as_string
 {
 
 	package Form::Tiny::Error::IsntStrict;
+$Form::Tiny::Error::IsntStrict::VERSION = '2.13';
 	use parent -norequire, 'Form::Tiny::Error';
 
 	sub default_error
@@ -90,6 +92,7 @@ sub as_string
 {
 
 	package Form::Tiny::Error::DoesNotValidate;
+$Form::Tiny::Error::DoesNotValidate::VERSION = '2.13';
 	use parent -norequire, 'Form::Tiny::Error';
 
 	sub default_error
@@ -141,3 +144,4 @@ A couple of in-place subclasses are provided to differentiate the type of error 
 =item * Form::Tiny::Error::DoesNotValidate
 
 =back
+

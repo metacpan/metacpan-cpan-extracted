@@ -41,7 +41,7 @@ extends 'CXC::Number::Sequence';
 
 use namespace::clean;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 my sub nelem {
     my ( $ratio, $w0, $Dr ) = @_;
@@ -116,7 +116,8 @@ my %ArgBuild;
 %ArgBuild = (
     ( MIN | SOFT_MAX | W0 | RATIO ),
     sub {
-        { elements => e0_le_min( $_->ratio, $_->w0, $_->min, $_->soft_max, $_->min ) };
+        { elements =>
+              e0_le_min( $_->ratio, $_->w0, $_->min, $_->soft_max, $_->min ) };
     },
 
     ( MIN | NELEM | W0 | RATIO ),
@@ -124,12 +125,13 @@ my %ArgBuild;
         my $DRn = DRn_factory( $_->w0, $_->ratio );
         my $E0  = $_->min;
 
-        { elements => [ map { $E0 + $_ } $DRn->( 0 .. $_->nelem-1 ) ] };
+        { elements => [ map { $E0 + $_ } $DRn->( 0 .. $_->nelem - 1 ) ] };
     },
 
     ( SOFT_MIN | MAX | W0 | RATIO ),
     sub {
-        { elements => e0_ge_max( $_->ratio, $_->w0, $_->soft_min, $_->max, $_->max ) };
+        { elements =>
+              e0_ge_max( $_->ratio, $_->w0, $_->soft_min, $_->max, $_->max ) };
     },
 
 
@@ -139,7 +141,8 @@ my %ArgBuild;
         my $DRn = DRn_factory( $_->w0, $_->ratio );
         my $E0  = $_->max;
 
-        { elements => [ map { $E0 - $_ } $DRn->( reverse 0 .. $_->nelem-1 ) ] };
+        { elements => [ map { $E0 - $_ } $DRn->( reverse 0 .. $_->nelem - 1 ) ]
+        };
 
     },
 
@@ -155,13 +158,14 @@ my %ArgBuild;
             # shrink & grow!
             elsif ( $_->e0 < $_->max ) {
 
-                my $low
-                  = e0_ge_max( 1 / $_->ratio, $_->w0 / $_->ratio, $_->min, $_->e0,
-                    $_->e0 );
+                my $low = e0_ge_max(
+                    1 / $_->ratio,
+                    $_->w0 / $_->ratio,
+                    $_->min, $_->e0, $_->e0
+                );
 
                 my $high
-                  = e0_le_min( $_->ratio, $_->w0, $_->e0, $_->max,
-                    $_->e0 );
+                  = e0_le_min( $_->ratio, $_->w0, $_->e0, $_->max, $_->e0 );
 
                 # low and high share an edge; remove it.
                 my @elements = ( $low->@* );
@@ -188,10 +192,10 @@ my @ArgsCrossValidate = ( [
               unless $_->min < $_->max;
 
             parameter_constraint->throw( "w0 > 0 if E[0] <= min\n" )
-              if $_->e0 <= $_->min &&  $_->w0 < 0;
+              if $_->e0 <= $_->min && $_->w0 < 0;
 
             parameter_constraint->throw( "w0 < 0 if E[0] >= max\n" )
-              if $_->e0 >= $_->max &&  $_->w0 > 0;
+              if $_->e0 >= $_->max && $_->w0 > 0;
         },
     ],
 
@@ -327,7 +331,7 @@ CXC::Number::Sequence::Ratio - Numeric Sequence with Relative Fractional Spacing
 
 =head1 VERSION
 
-version 0.06
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -395,7 +399,7 @@ If a parameter value is illegal or a combination of values is illegal
 (e.g. C<< min > max >>), C<new> will throw an exception of class
 C<CXC::Number::Sequence::Failure::parameter::constraint>.
 
-=head1 CONSTRUCTOR
+=head1 CONSTRUCTORS
 
 =head2 new
 
@@ -482,6 +486,8 @@ need not be inside the range. C<< w0 < 0 >> if C<< E[0] > max >>.
 
 =back
 
+=head1 INTERNALS
+
 =for Pod::Coverage BUILDARGS
 
 # COPYRIGHT
@@ -502,9 +508,12 @@ from C<20> to C<2>, starting at C<1>, by a factor of 1.1 per value.
 
  use Data::Dump;
  use aliased 'CXC::Number::Sequence::Ratio';
- dd Ratio->new( soft_min => 2, max => 20,
-                ratio => 1.1, w0 => -1
-              )->elements;
+ dd Ratio->new(
+     soft_min => 2,
+     max      => 20,
+     ratio    => 1.1,
+     w0       => -1
+ )->elements;
 
 results in
 
@@ -523,18 +532,23 @@ results in
    20,
  ]
 
-
 =back
 
-=head1 BUGS
+=head1 SUPPORT
 
-Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number> or by email
-to L<bug-cxc-number@rt.cpan.org|mailto:bug-cxc-number@rt.cpan.org>.
+=head2 Bugs
 
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/cxc-number
+
+and may be cloned from
+
+  https://gitlab.com/djerius/cxc-number.git
 
 =head1 SEE ALSO
 

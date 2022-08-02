@@ -5,7 +5,7 @@
 
 package Game::Xomb;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use 5.24.0;
 use warnings;
@@ -2059,13 +2059,15 @@ sub veggie_name {
 
 sub with_adjacent {
     my ($col, $row, $callback) = @_;
-    for my $adj (
-        [ -1, -1 ], [ -1, 0 ],  [ -1, 1 ], [ 0, -1 ],
-        [ 0,  1 ],  [ 1,  -1 ], [ 1,  0 ], [ 1, 1 ]
-    ) {
-        my ($ac, $ar) = ($col + $adj->[PCOL], $row + $adj->[PROW]);
+    my @pairs = ( -1, -1, -1, 0, -1, 1, 0, -1, 0, 1, 1, -1, 1, 0, 1, 1 );
+    my $max_index = $#pairs;
+    my $i = 0;
+    while ( $i < $max_index ) {
+        my ($ac, $ar) = ($col + $pairs[$i], $row + $pairs[$i+1]);
         next if $ac < 0 or $ac >= MAP_COLS or $ar < 0 or $ar >= MAP_ROWS;
         $callback->([ $ac, $ar ]);
+    } continue {
+        $i += 2;
     }
 }
 

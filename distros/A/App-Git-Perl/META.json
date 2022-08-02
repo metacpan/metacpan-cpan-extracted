@@ -32,14 +32,20 @@
       },
       "runtime" : {
          "requires" : {
+            "IO::Socket::SSL" : "1.42",
             "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IO::Socket::SSL" : "1.42"
          }
       }
    },
    "provides" : {
       "App::Git::Perl" : {
          "file" : "lib/App/Git/Perl.pm",
-         "version" : "v0.1.12"
+         "version" : "v0.1.15"
       }
    },
    "release_status" : "stable",
@@ -53,6 +59,6 @@
          "web" : "https://github.com/nedzadhrnjica/App-Git-Perl"
       }
    },
-   "version" : "v0.1.12",
+   "version" : "v0.1.15",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-use SPVM 'TestCase::Lib::Point';
+use SPVM 'TestCase::Module::Point';
 
 use SPVM 'TestCase::ModuleContainsMultiClass';
 
@@ -17,8 +17,20 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
 # Point
 {
-  ok(SPVM::TestCase::Lib::Point->basic);
-  ok(SPVM::TestCase::Lib::Point->extra);
+  # Interfaces
+  ok(SPVM::TestCase::Module::Point->interfaces);
+  
+  # Fields
+  ok(SPVM::TestCase::Module::Point->fields);
+  
+  # Class methods
+  ok(SPVM::TestCase::Module::Point->new);
+  ok(SPVM::TestCase::Module::Point->new_xy);
+  ok(SPVM::TestCase::Module::Point->clear);
+  ok(SPVM::TestCase::Module::Point->to_string);
+  
+  # Extra
+  ok(SPVM::TestCase::Module::Point->extra);
 }
 
 # All object is freed

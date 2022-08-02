@@ -1,3 +1,10 @@
+0.12 2022-07-31T23:34:46+02:00
+ - Add names for examples.
+ - Add support for definition of example filename in doc defined by POD
+   comment.
+ - Move issues to Github.
+ - Update copyright years.
+
 0.11 2020-03-06T09:42:33+01:00
  - Add test for documentation from .pod file.
  - Fix detecting of sections.

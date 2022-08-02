@@ -1196,7 +1196,9 @@ The rfc822 method returns the date and time formatted as an RFC822 string.
 $test->for('example', 1, 'rfc822', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  like $result, qr/^.+, 01 .+ 1988 00:00:00 [-+]\d{4}$/a;
+  like $result, qr/^.+, 01 .+ 1988 00:00:00 .+$/a;
+  like $result, qr/^.+, 01 .+ 1988 00:00:00 [-+]\d{4}$/a
+    if $ENV{LC_ALL} || $ENV{LC_TIME};
 
   $result
 });
@@ -2504,6 +2506,56 @@ $test->for('example', 1, '(ne)', sub {
 
   $result
 });
+
+=operator ("")
+
+This package overloads the C<""> operator.
+
+=cut
+
+$test->for('operator', '("")');
+
+=example-1 ("")
+
+  # given: synopsis;
+
+  my $result = "$date";
+
+  # "570672000"
+
+=cut
+
+$test->for('example', 1, '("")', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq '570672000';
+
+  $result
+});
+
+=operator (~~)
+
+This package overloads the C<~~> operator.
+
+=cut
+
+$test->for('operator', '(~~)');
+
+=example-1 (~~)
+
+  # given: synopsis;
+
+  my $result = $date ~~ '570672000';
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(~~)', sub {
+  1;
+});
+
+# END
 
 =method truncate_to_day
 

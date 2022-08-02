@@ -9,7 +9,7 @@ use Carp qw/confess/;
 confess "You must first load a Test2::Harness::UI::Schema::NAME module"
     unless $Test2::Harness::UI::Schema::LOADED;
 
-our $VERSION = '0.000120';
+our $VERSION = '0.000124';
 
 sub last_covered_run {
     my $self = shift;
@@ -41,9 +41,11 @@ sub durations {
     my $self   = shift;
     my %params = @_;
 
-    my $median = $params{median} || 0;
-    my $short  = $params{short}  || 15;
-    my $medium = $params{medium} || 30;
+    my $median   = $params{median} || 0;
+    my $short    = $params{short}  || 15;
+    my $medium   = $params{medium} || 30;
+    my $username = $params{user};
+    my $limit    = $params{limit};
 
     my $schema = $self->result_source->schema;
     my $dbh = $schema->storage->dbh;
@@ -60,9 +62,30 @@ sub durations {
     EOT
     my @vals = ($self->project_id);
 
-    if (my $username = $params{user}) {
-        $query .= "AND users.username = ?";
-        push @vals => $username;
+    my ($user_append, @user_args) = $username ? ("users.username = ?", $username) : ();
+
+    if ($username) {
+        $query .= "AND $user_append";
+        push @vals => @user_args;
+    }
+
+    if ($limit) {
+        my $where = $username ? "WHERE $user_append" : "";
+        my $sth   = $dbh->prepare(<<"        EOT");
+            SELECT run_id
+              FROM runs
+              JOIN users USING(user_id)
+              $where
+             ORDER BY run_ord DESC
+             LIMIT ?
+        EOT
+
+        $sth->execute(@user_args, $limit) or die $sth->errstr;
+
+        my @ids = map { $_->[0] } @{$sth->fetchall_arrayref};
+
+        $query .= "AND run_id IN (" . ('?' x scalar @ids) . ")\n";
+        push @vals => (@ids);
     }
 
     my $sth = $dbh->prepare($query);

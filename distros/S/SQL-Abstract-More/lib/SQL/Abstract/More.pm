@@ -19,15 +19,14 @@ use namespace::clean;
 # declare error-reporting functions from SQL::Abstract
 sub puke(@); sub belch(@);  # these will be defined later in import()
 
-
-our $VERSION = '1.38';
+our $VERSION = '1.39';
 our @ISA;
 
 sub import {
   my $class = shift;
 
   # parent class specified from environment variable, or default value
-  my $parent_sqla = $ENV{SQL_ABSTRACT_MORE_EXTENDS} || 'SQL::Abstract';
+  my $parent_sqla = $ENV{SQL_ABSTRACT_MORE_EXTENDS} || 'SQL::Abstract::Classic';
 
   # parent class specified through -extends => .. when calling import()
   $parent_sqla = $_[1] if @_ >= 2 && $_[0] eq '-extends';
@@ -1460,7 +1459,7 @@ SQL::Abstract::More - extension of SQL::Abstract with more constructs and more f
 =head1 DESCRIPTION
 
 This module generates SQL from Perl data structures.  It is a subclass of
-L<SQL::Abstract> or L<SQL::Abstract::Classic>, fully compatible with the parent 
+L<SQL::Abstract::Classic> or L<SQL::Abstract>, fully compatible with the parent
 class, but with some improvements :
 
 =over
@@ -1502,9 +1501,9 @@ and has no API to let the client instantiate from any other class.
 
 =head1 SYNOPSIS
 
-  use SQL::Abstract::More;                       # will inherit from SQL::Abstract;
+  use SQL::Abstract::More;                             # will inherit from SQL::Abstract::Classic;
   #or
-  use SQL::Abstract::More -extends => 'Classic'; # will inherit from SQL::Abstract::Classic;
+  use SQL::Abstract::More -extends => 'SQL::Abstract'; # will inherit from SQL::Abstract;
 
   my $sqla = SQL::Abstract::More->new();
   my ($sql, @bind);
@@ -1611,20 +1610,29 @@ and has no API to let the client instantiate from any other class.
 =head2 import
 
 The C<import()> method is called automatically when a client writes C<use SQL::Abstract::More>.
-It can choose to inherit either from L<SQL::Abstract> or from L<SQL::Abstract::Classic>,
+
+At this point there is a choice to make about the class to inherit from. Originally
+this module was designed as an extension of L<SQL::Abstract> in its versions prior to 1.81.
+Then L<SQL::Abstract> was rewritten with a largely different architecture, published
+under v2.000001. A fork of the previous version is now published under L<SQL::Abstract::Classic>.
+C<SQL::Abstract::More> can inherit from either version; initially it used  L<SQL::Abstract>
+as the default parent, but now the default is back to L<SQL::Abstract::Classic> for better
+compatibility with previous behaviours (see for example L<https://rt.cpan.org/Ticket/Display.html?id=143837>).
+
+The choice of the parent class is made
 according to the following rules :
 
 =over
 
 =item *
 
-L<SQL::Abstract> is the default parent.
+L<SQL::Abstract::Classic> is the default parent.
 
 =item *
 
 another parent can be specified through the C<-extends> keyword:
 
-  use SQL::Abstract::More -extends => 'SQL::Abstract::Classic';
+  use SQL::Abstract::More -extends => 'SQL::Abstract';
 
 =item *
 

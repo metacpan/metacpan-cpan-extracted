@@ -1,10 +1,10 @@
 package Template::Liquid::Tag;
-our $VERSION = '1.0.19';
+our $VERSION = '1.0.20';
 use strict;
 use warnings;
 use base 'Template::Liquid::Document';
 sub tag             { return $_[0]->{'tag_name'}; }
-sub end_tag         { return $_[0]->{'end_tag'} || undef; }
+sub end_tag         { return $_[0]->{'end_tag'}         || undef; }
 sub conditional_tag { return $_[0]->{'conditional_tag'} || undef; }
 
 # Should be overridden by child classes
@@ -23,7 +23,7 @@ sub push_block {
         Template::Liquid::Error->new(
          {type     => 'Subclass',
           template => $_[0]->{template},
-          message =>
+          message  =>
               'Please define a push_block method (for conditional tags) in ' .
               $_[0]
          }
@@ -34,6 +34,12 @@ sub push_block {
 =pod
 
 =encoding UTF-8
+
+=begin stopwords
+
+Lütke jadedPixel kinda jibba jabba
+
+=end stopwords
 
 =head1 NAME
 
@@ -233,7 +239,7 @@ The original Liquid template system was developed by jadedPixel
 
 =head1 License and Legal
 
-Copyright (C) 2009-2012 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+Copyright (C) 2009-2022 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of The Artistic License 2.0.  See the F<LICENSE> file included with

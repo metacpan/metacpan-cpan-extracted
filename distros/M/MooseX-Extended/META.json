@@ -4,7 +4,7 @@
       "Curtis \"Ovid\" Poe <curtis.poe@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -34,6 +34,8 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Perl::Critic::Policy::Moose::ProhibitMultipleWiths" : "0",
+            "Perl::Critic::Policy::Moose::RequireMakeImmutable" : "0",
             "Test::More" : "0",
             "Test::Most" : "0",
             "Test::Perl::Critic" : "0",
@@ -43,7 +45,7 @@
       },
       "runtime" : {
          "requires" : {
-            "B::Hooks::AtRuntime" : "3",
+            "B::Hooks::AtRuntime" : "7",
             "Carp" : "0",
             "Data::Printer" : "0",
             "Exporter" : "0",
@@ -58,8 +60,6 @@
             "Moose::Util" : "0",
             "MooseX::Role::WarnOnConflict" : "0",
             "MooseX::StrictConstructor" : "0",
-            "Perl::Critic::Policy::Moose::ProhibitMultipleWiths" : "0",
-            "Perl::Critic::Policy::Moose::RequireMakeImmutable" : "0",
             "Ref::Util" : "0",
             "Storable" : "0",
             "Type::Library" : "0",
@@ -94,7 +94,6 @@
             "DateTime" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
-            "IO::Async::Loop" : "0",
             "List::Util" : "0",
             "Scalar::Util" : "0",
             "Test::Builder" : "0",
@@ -108,35 +107,35 @@
    "provides" : {
       "Moose::Exception::InvalidAttributeDefinition" : {
          "file" : "lib/Moose/Exception/InvalidAttributeDefinition.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Moose::Exception::InvalidImportList" : {
          "file" : "lib/Moose/Exception/InvalidImportList.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "MooseX::Extended" : {
          "file" : "lib/MooseX/Extended.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "MooseX::Extended::Core" : {
          "file" : "lib/MooseX/Extended/Core.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "MooseX::Extended::Custom" : {
          "file" : "lib/MooseX/Extended/Custom.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "MooseX::Extended::Role" : {
          "file" : "lib/MooseX/Extended/Role.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "MooseX::Extended::Role::Custom" : {
          "file" : "lib/MooseX/Extended/Role/Custom.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "MooseX::Extended::Types" : {
          "file" : "lib/MooseX/Extended/Types.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       }
    },
    "release_status" : "stable",
@@ -151,15 +150,16 @@
          "web" : "https://github.com/Ovid/moosex-extreme"
       }
    },
-   "version" : "0.25",
+   "version" : "0.26",
    "x_contributors" : [
       "Graham Knop <haarg@haarg.org>",
       "Marco Fontani <MFONTANI@cpan.org>",
       "Ovid <ovid@cpan.org>",
-      "Toby Inkster <github@toby.ink>"
+      "Toby Inkster <github@toby.ink>",
+      "Wesley Schwengle <wesleys@opperschaap.net>"
    ],
-   "x_generated_by_perl" : "v5.28.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_generated_by_perl" : "v5.26.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

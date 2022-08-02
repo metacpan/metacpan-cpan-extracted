@@ -1,6 +1,6 @@
 package CWB;
 # -*-cperl-*-
-$VERSION = 'v3.4.0'; 
+$VERSION = 'v3.5.0'; 
 
 use strict;
 use warnings;
@@ -11,7 +11,7 @@ use CWB::Config;
 
 =head1 NAME
 
-CWB - Perl toolbox for the IMS Corpus Workbench
+CWB - Perl toolbox for the IMS Open Corpus Workbench
 
 =head1 SYNOPSIS
 
@@ -163,7 +163,7 @@ Use the B<cwb-config> program to find out the precise installation paths.
 
 Note that I<$CWB::CWBVersion> refers to the release verison of the CWB binaries
 rather than the Perl module (I<$CWB::VERSION>).  All version numbers are encoded
-in Perl numeric style (e.g. C<3.004_001> for CWB v3.4.1), so specific version
+in Perl numeric style (e.g. C<3.005_001> for CWB v3.5.1), so specific version
 requirements can easily be checked by numeric comparison.
 
 =cut

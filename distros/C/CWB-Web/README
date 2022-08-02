@@ -1,7 +1,7 @@
 
-  IMS Open Corpus Workbench: CWB/Perl Web GUI support Version 3.4.0
+  IMS Open Corpus Workbench: CWB/Perl Web GUI support Version 3.5.0
 
-  compatible with CWB version 3.4.x
+  compatible with CWB version 3.5.0
 
 
 This package contains various support libraries for Web interfaces to
@@ -9,12 +9,9 @@ the CWB, most importantly a simple shared cache for CQP query results.
 It is the successor of the WebCqp package available for CWB version 2.2.
 
 CWB::Web has been made available in order to offer full CWB/Perl support
-for the official release of CWB version 3.0, and maintain compatibility
-with existing Web interfaces (some minor adjustments may required).  A
-more substantial reimplementation is planned for the near future, which
-may result in drastic changes especially to the CQP::Web::Search module.
-Future release of CWB::Web may also have additional dependencies, including
-DBD::SQLite and possibly a working C compiler.
+for the official release of CWB version 3.5, and maintain compatibility
+with existing Web interfaces (some minor adjustments may required).
+It may be absent, or radically different, in CWB version 4.0,
 
 
 PREREQUISITES
@@ -23,8 +20,8 @@ The IMS Corpus Workbench and the basic CWB/Perl interfaces must be installed
 on your computer.  In particular, the following modules are required
 
     HTML::Entities
-    CWB::CQP (version 3.0 or newer)
-    CWB::CL  (version 3.0 or newer)
+    CWB::CQP (version 3.5 or newer)
+    CWB::CL  (version 3.5 or newer)
 
 
 QUICK INSTALLATION GUIDE
@@ -38,7 +35,7 @@ have to do is to execute the following commands:
     make install
 
 You will probably have to login as root for the last step (or you can type
-"sudo make install" and enter your root password).  If you want to install
+"sudo make install" and enter your normal password).  If you want to install
 the CWB/Perl modules in a non-standard location, say in "~/perl/lib/perl5/..."
 and "~/perl/man/...", type the following instead of "perl Makefile.PL":
 
@@ -53,19 +50,20 @@ PACKAGE OVERVIEW
 The CWB::Web package contains the following Perl modules:
 
     CWB::Web::Cache     a transparent shared cache for CQP query results
-    CWB::Web::Query     convenient front-end to CQP queries, with pre-formatted kwic lines
+    CWB::Web::Query     convenient front-end to CQP queries, with pre-formatted
+                        kwic lines
     CWB::Web::Search    search-engine-like queries on CWB corpora
 
-NB: The CWB::Web::Query and CWB::Web::Search modules do not make use of the CQP query
-cache, so they are much less efficient than a custom implementation.
+NB: The CWB::Web::Query and CWB::Web::Search modules do not make use of the CQP
+query cache, so they are much less efficient than a custom implementation.
 
-See the manual pages (e.g. "perldoc CWB::Web::Cache") of these modules for further, but
-still incomplete information.
+See the manual pages (e.g. "perldoc CWB::Web::Cache") of these modules for 
+further, but still incomplete information.
 
 
 COPYRIGHT
 
-Copyright (C) 1999-2020 by Stefan Evert [http::/purl.org/stefan.evert]
+Copyright (C) 1999-2022 by Stephanie Evert [http::/purl.org/stephanie.evert]
 
 This software is provided AS IS and the author makes no warranty as to
 its use and performance. You may use the software, redistribute and

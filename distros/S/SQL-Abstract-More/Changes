@@ -1,6 +1,10 @@
 Revision history for SQL-Abstract-More
 
-1.37 02.04.2022
+1.39 22.07.2022
+  - back to SQL::Abstract::Classic as default parent class, because of
+    compatibility issues with special_operators
+
+1.38 02.04.2022
   - support -having without -group_by, since some DBMS admit this syntax (Rouzier++)
 
 1.37 29.01.2021

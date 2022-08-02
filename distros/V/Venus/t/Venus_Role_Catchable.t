@@ -50,6 +50,7 @@ $test->for('includes');
 
   use Venus 'error';
 
+  with 'Venus::Role::Tryable';
   with 'Venus::Role::Catchable';
 
   sub pass {
@@ -85,14 +86,6 @@ errors thrown from dispatched method calls.
 =cut
 
 $test->for('description');
-
-=integrates
-
-Venus::Role::Tryable
-
-=cut
-
-$test->for('integrates');
 
 =method catch
 

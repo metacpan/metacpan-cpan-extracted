@@ -231,7 +231,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
 
                 op_operand_element = SPVM_OP_sibling(compiler, op_operand_element);
                 if (op_operand_element->id == SPVM_OP_C_ID_UNDEF) {
-                  SPVM_COMPILER_error(compiler, "Array initialization first element must not be undef at %s line %d", file, line);
+                  SPVM_COMPILER_error(compiler, "The array initialization first element must be defined at %s line %d", file, line);
                   return;
                 }
                 SPVM_TYPE* type_operand_element = SPVM_OP_get_type(compiler, op_operand_element);
@@ -2881,7 +2881,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 !SPVM_TYPE_is_string_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)
               )
               {
-                SPVM_COMPILER_error(compiler, "Array access invocant must be array or string at %s line %d", op_cur->file, op_cur->line);
+                SPVM_COMPILER_error(compiler, "The array access invocant must be array or string at %s line %d", op_cur->file, op_cur->line);
                 return;
               }
               
@@ -3404,28 +3404,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
           SPVM_METHOD* method = SPVM_LIST_get(methods, method_index);
           SPVM_CLASS* class = method->class;
           SPVM_TYPE* class_type = class->type;
-          
-          // Destructor must receive own class object
-          if (method->is_destructor) {
-            // DESTROY argument must be 0
-            int32_t error = 0;
-            if (method->args_length != 1) {
-              error = 1;
-            }
-            else {
-              SPVM_VAR_DECL* arg_var_decl = SPVM_LIST_get(method->var_decls, 0);
-              SPVM_TYPE* arg_type = arg_var_decl->type;
-              
-              if (!(arg_type->basic_type->id == class_type->basic_type->id && arg_type->dimension == class_type->dimension)) {
-                error = 1;
-              }
-            }
-            
-            if (error) {
-              SPVM_COMPILER_error(compiler, "DESTROY argument must be self at %s line %d", method->op_method->file, method->op_method->line);
-              return;
-            }
-          }
           
           // Check method
           if (!(method->is_native)) {
@@ -5086,18 +5064,6 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
     
     // Resove field offset
     SPVM_OP_CHECKER_resolve_field_offset(compiler, class);
-  }
-  
-  // Error class id is 1
-  // Create class id
-  for (int32_t class_index = compiler->cur_class_base; class_index < compiler->classes->length; class_index++) {
-    SPVM_CLASS* class = SPVM_LIST_get(compiler->classes, class_index);
-    if (strcmp(class->name, "Error") == 0) {
-      SPVM_CLASS* originla_1 = compiler->classes->values[1];
-      compiler->classes->values[1] = class;
-      compiler->classes->values[class_index] = originla_1;
-      
-    }
   }
   
   // Create class id

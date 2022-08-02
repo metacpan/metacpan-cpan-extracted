@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Finfo.pm
-## Version v0.2.1
+## Version v0.3.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2022/03/08
+## Modified 2022/07/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -65,7 +65,7 @@ BEGIN
     };
     our %EXPORT_TAGS = ( all => [qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE )] );
     our @EXPORT_OK = qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE );
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -340,11 +340,48 @@ sub user
     return( $self->new_scalar( scalar( getpwuid( $data->[ FINFO_UID ] ) ) ) );
 }
 
-sub FREEZE { return( shift->filepath ) }
+sub FREEZE
+{
+    my $self = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class = CORE::ref( $self );
+    my %hash  = %$self;
+    # Return an array reference rather than a list so this works with Sereal and CBOR
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # But Storable want a list with the first element being the serialised element
+    CORE::return( $class, \%hash );
+}
 
-sub THAW { return( shift->new( @_ ) ); }
+sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
 
-sub TO_JSON { return( shift->filepath ); }
+sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+# NOTE: CBOR will call the THAW method with the stored classname as first argument, the constant string CBOR as second argument, and all values returned by FREEZE as remaining arguments.
+# NOTE: Storable calls it with a blessed object it created followed with $cloning and any other arguments initially provided by STORABLE_freeze
+sub THAW
+{
+    my( $self, undef, @args ) = @_;
+    my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+    my $new;
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        foreach( CORE::keys( %$hash ) )
+        {
+            $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+        }
+        $new = $self;
+    }
+    else
+    {
+        $new = CORE::bless( $hash => $class );
+    }
+    CORE::return( $new );
+}
+
+sub TO_JSON { CORE::return( CORE::shift->filepath ); }
 
 sub _datetime
 {
@@ -514,7 +551,7 @@ Module::Generic::Finfo - File Info Object Class
 
 =head1 VERSION
 
-    v0.2.1
+    v0.3.0
 
 =head1 DESCRIPTION
 
@@ -703,8 +740,6 @@ Returns the total size of file, in bytes. Same as L</csize>
 
 Provided with a file path and this returns a new L<Module::Generic::Finfo> object.
 
-=head2 uid
-
 =head2 user
 
 Returns the numeric user ID of file's owner. Same as L</uid>
@@ -750,6 +785,20 @@ The file is a (unix domain) socket
 =head2 FILETYPE_UNKFILE
 
 The file is of some other unknown type or the type cannot be determined
+
+=head1 SERIALISATION
+
+=for Pod::Coverage FREEZE
+
+=for Pod::Coverage STORABLE_freeze
+
+=for Pod::Coverage STORABLE_thaw
+
+=for Pod::Coverage THAW
+
+=for Pod::Coverage TO_JSON
+
+Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
 
 =head1 AUTHOR
 

@@ -1,53 +1,87 @@
+use 5.006; use strict; use warnings;
 
-use strict;
-use warnings;
+my $sc = q<https://github.com/ap/Memoize-Saves>;
+my $bt = q<https://rt.cpan.org/Public/Dist/Display.html?Name=Memoize-Saves>;
 
-
-
-use ExtUtils::MakeMaker 6.31;
-
-
-
-my %WriteMakefileArgs = (
-  'ABSTRACT' => 'Plug-in module to specify which return values should be memoized',
-  'AUTHOR' => 'Joshua Gerth <gerth@teleport.com>',
-  'BUILD_REQUIRES' => {
-    'Test::More' => '0'
-  },
-  'CONFIGURE_REQUIRES' => {
-    'ExtUtils::MakeMaker' => '6.31'
-  },
-  'DISTNAME' => 'Memoize-Saves',
-  'EXE_FILES' => [],
-  'LICENSE' => 'perl',
-  'NAME' => 'Memoize::Saves',
-  'PREREQ_PM' => {
-    'Memoize' => '1.02'
-  },
-  'VERSION' => '0.67',
-  'test' => {
-    'TESTS' => 't/*.t'
-  }
+my %META = (
+	name             => 'Memoize-Saves',
+	author           => 'Joshua Gerth <gerth@teleport.com>',
+	x_copyright      => { holder => 'Joshua Gerth', year => 2010 },
+	license          => 'perl_5',
+	prereqs          => {
+		test         => {
+			requires => {
+				Memoize         => '1.02',
+				'Test::More'    => 0,
+			},
+		},
+		runtime      => {
+			requires => {
+				perl            => '5.006',
+			},
+		},
+	},
+	dynamic_config => 0,
+	resources      => {
+		repository => { type => 'git', url => "$sc.git", web => $sc },
+		bugtracker => { web => $bt },
+		license    => [ 'http://dev.perl.org/licenses/' ],
+	},
 );
 
+sub MY::postamble { -f 'META.yml' ? return : <<'' }
+create_distdir : MANIFEST
+MANIFEST :
+	( git ls-files ':!README.pod' ; echo MANIFEST ) | sort -f > MANIFEST
+distdir : boilerplate
+.PHONY  : boilerplate
+boilerplate : distmeta
+	$(PERL) -Ilib boilerplate.pl $(DISTVNAME)
 
-unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
-  my $br = delete $WriteMakefileArgs{BUILD_REQUIRES};
-  my $pp = $WriteMakefileArgs{PREREQ_PM};
-  for my $mod ( keys %$br ) {
-    if ( exists $pp->{$mod} ) {
-      $pp->{$mod} = $br->{$mod} if $br->{$mod} > $pp->{$mod};
-    }
-    else {
-      $pp->{$mod} = $br->{$mod};
-    }
-  }
+## BOILERPLATE ###############################################################
+require ExtUtils::MakeMaker;
+
+my %MM_ARGS;
+
+# have to do this since old EUMM dev releases miss the eval $VERSION line
+my $eumm_version  = eval $ExtUtils::MakeMaker::VERSION;
+my $mymeta        = $eumm_version >= 6.57_02;
+my $mymeta_broken = $mymeta && $eumm_version < 6.57_07;
+
+($MM_ARGS{NAME} = $META{name}) =~ s/-/::/g;
+($MM_ARGS{VERSION_FROM} = "lib/$MM_ARGS{NAME}.pm") =~ s{::}{/}g;
+$MM_ARGS{ABSTRACT_FROM} = $MM_ARGS{VERSION_FROM};
+$META{license} = [ $META{license} ]
+	if $META{license} && !ref $META{license};
+$MM_ARGS{LICENSE} = $META{license}[0]
+	if $META{license} && $eumm_version >= 6.30;
+$MM_ARGS{NO_MYMETA} = 1
+	if $mymeta_broken;
+$MM_ARGS{META_ADD} = { 'meta-spec' => { version => 2 }, %META }
+	unless -f 'META.yml';
+$MM_ARGS{PL_FILES} ||= {};
+$MM_ARGS{NORECURS} = 1
+	if not exists $MM_ARGS{NORECURS};
+
+for (qw(configure build test runtime)) {
+	my $key = $_ eq 'runtime' ? 'PREREQ_PM' : uc $_.'_REQUIRES';
+	my $r = $MM_ARGS{$key} = {
+		%{$META{prereqs}{$_}{requires} || {}},
+		%{delete $MM_ARGS{$key} || {}},
+	};
+	defined $r->{$_} or delete $r->{$_} for keys %$r;
 }
 
-delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
-  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+$MM_ARGS{MIN_PERL_VERSION} = eval delete $MM_ARGS{PREREQ_PM}{perl} || 0;
 
-WriteMakefile(%WriteMakefileArgs);
+delete $MM_ARGS{MIN_PERL_VERSION}
+	if $eumm_version < 6.47_01;
+$MM_ARGS{BUILD_REQUIRES} = {%{$MM_ARGS{BUILD_REQUIRES}}, %{delete $MM_ARGS{TEST_REQUIRES}}}
+	if $eumm_version < 6.63_03;
+$MM_ARGS{PREREQ_PM} = {%{$MM_ARGS{PREREQ_PM}}, %{delete $MM_ARGS{BUILD_REQUIRES}}}
+	if $eumm_version < 6.55_01;
+delete $MM_ARGS{CONFIGURE_REQUIRES}
+	if $eumm_version < 6.51_03;
 
-
-
+ExtUtils::MakeMaker::WriteMakefile(%MM_ARGS);
+## END BOILERPLATE ###########################################################

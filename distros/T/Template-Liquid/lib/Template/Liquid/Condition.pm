@@ -1,5 +1,5 @@
 package Template::Liquid::Condition;
-our $VERSION = '1.0.19';
+our $VERSION = '1.0.20';
 require Template::Liquid::Error;
 use base 'Template::Liquid::Block';
 use strict;
@@ -73,8 +73,8 @@ sub ne { return !$_[0]->eq }    # hashes
 
 sub eq {
     my ($s) = @_;
-    my $l = $s->{template}{context}->get($s->{'lvalue'}) || $s->{'lvalue'};
-    my $r = $s->{template}{context}->get($s->{'rvalue'}) || $s->{'rvalue'};
+    my $l   = $s->{template}{context}->get($s->{'lvalue'}) || $s->{'lvalue'};
+    my $r   = $s->{template}{context}->get($s->{'rvalue'}) || $s->{'rvalue'};
 
     # Might need to render these again
     my $_l = $s->{template}{context}->get($l);
@@ -150,13 +150,13 @@ sub contains {
     return if defined $r && !defined $l;
     return defined($l->{$r})       ? 1 : !1 if ref $l eq 'HASH';
     return (grep { $_ eq $r } @$l) ? 1 : !1 if ref $l eq 'ARRAY';
-    return $l =~ qr[${r}] ? 1 : !1;
+    return $l =~ qr[${r}]          ? 1 : !1;
 }
 
 sub _and {
     my ($s) = @_;
-    my $l = $s->{template}{context}->get($s->{'lvalue'}) || $s->{'lvalue'};
-    my $r = $s->{template}{context}->get($s->{'rvalue'}) || $s->{'rvalue'};
+    my $l   = $s->{template}{context}->get($s->{'lvalue'}) || $s->{'lvalue'};
+    my $r   = $s->{template}{context}->get($s->{'rvalue'}) || $s->{'rvalue'};
 
     # Might need to render these again
     my $_l = $s->{template}{context}->get($l);
@@ -168,8 +168,8 @@ sub _and {
 
 sub _or {
     my ($s) = @_;
-    my $l = $s->{template}{context}->get($s->{'lvalue'}) || $s->{'lvalue'};
-    my $r = $s->{template}{context}->get($s->{'rvalue'}) || $s->{'rvalue'};
+    my $l   = $s->{template}{context}->get($s->{'lvalue'}) || $s->{'lvalue'};
+    my $r   = $s->{template}{context}->get($s->{'rvalue'}) || $s->{'rvalue'};
 
     # Might need to render these again
     my $_l = $s->{template}{context}->get($l);
@@ -221,7 +221,11 @@ sub is_true {
 
 =pod
 
-=encoding UTF-8
+=begin stopwords
+
+stringwise greps
+
+=end stopwords
 
 =head1 NAME
 
@@ -407,7 +411,7 @@ Sanko Robinson <sanko@cpan.org> - http://sankorobinson.com/
 
 =head1 License and Legal
 
-Copyright (C) 2009-2012 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+Copyright (C) 2009-2022 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of The Artistic License 2.0.  See the F<LICENSE> file included with

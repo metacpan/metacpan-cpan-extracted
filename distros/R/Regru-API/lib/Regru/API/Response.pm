@@ -9,7 +9,7 @@ use Try::Tiny;
 use Carp;
 use namespace::autoclean;
 
-our $VERSION = '0.051'; # VERSION
+our $VERSION = '0.052'; # VERSION
 our $AUTHORITY = 'cpan:CHIM'; # AUTHORITY
 
 with qw(
@@ -52,10 +52,10 @@ sub _trigger_response {
             if ($self->is_service_fail) {
                 # Stop processing response
                 $self->is_success(0);
-                die 'Service failed: ' . ($response->decoded_content || $response->content);
+                die 'Service failed: ' . $response->content;
             }
 
-            my $decoded = $self->serializer->decode($response->decoded_content || $response->content);
+            my $decoded = $self->serializer->decode($response->content);
             $self->is_success($decoded->{result} && $decoded->{result} eq 'success');
 
             $self->debug_warn('REG.API request', ($self->is_success ? 'success' : 'fail')) if $self->debug;
@@ -96,7 +96,7 @@ Regru::API::Response - REG.API v2 response wrapper
 
 =head1 VERSION
 
-version 0.051
+version 0.052
 
 =head1 SYNOPSIS
 

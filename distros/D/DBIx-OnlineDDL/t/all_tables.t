@@ -37,7 +37,8 @@ foreach my $source_name (sort @source_names) {
         # Constructor
         my $online_ddl = DBIx::OnlineDDL->new(
             rsrc => $rsrc,
-            # purposely not adding any coderef_hooks
+            # purposely not adding any (useful) coderef_hooks
+            coderef_hooks => { before_triggers => sub {} },
 
             copy_opts => \%copy_opts,
         );

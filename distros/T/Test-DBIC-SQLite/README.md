@@ -1,11 +1,10 @@
 # NAME
 
-`Test::DBIC::SQLite` - Connection tester for any `DBIx::Class::Schema` on `SQLite3`
+`Test::DBIC::SQLite` - Connect to and deploy a [`DBIx::Class::Schema`](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ASchema) on SQLite
 
 # SYNOPSIS
 
-The preferred way (*with* support for **`pre_deploy_hook`**):
-
+The preferred way:
 ```perl
 #! perl -w
 use Test::More;
@@ -26,7 +25,7 @@ is(
    'anythinG',
    "SELECT uc_last(name) AS ul_name FROM ...; works!"
 );
-
+$schema->storage->disconnect;
 $t->drop_dbic_ok();
 done_testing();
 
@@ -42,95 +41,123 @@ sub define_functions {
     );
 }
 ```
-
-The backward compatible way (*without* support for **`pre_deploy_hook`**):
-
+The compatible with `v0.01` way:
 ```perl
 #! perl -w
 use Test::More;
 use Test::DBIC::SQLite;
-
 my $schema = connect_dbic_sqlite_ok('My::Schema');
-
-done_tesing();
+...
+$schema->storage->disconnect;
+drop_dbic_sqlite_ok();
+done_testing();
 ```
-
-
 # DESCRIPTION
 
-This is a re-implementation of `Test::DBIC::SQLite` `v0.01` using the
+This is a re-implementation of `Test::DBIC::SQLite v0.01` that uses the
 [`Moo::Role`](https://metacpan.org/pod/Moo::Role):
-[`Test::DBIC::DBDConnector`](#test-dbic-dbdconnector).
+[`Test::DBIC::DBDConnector`](#testdbicdbdconnector).
 
-It will `import()` [`warnings`](https://metacpan.org/pod/warnings) and
-[`strict`](https://metacpan.org/pod/strict) for you.
+It will `import()` [`warnings`](https://metacpan.org/pod/warnings) and [`strict`](https://metacpan.org/pod/strict) for you.
 
-## **`Test::DBIC::SQLite->new()`**
-
-This is the new implementation that supports the `$pre_deploy_hook`.
-
+## **`Test::DBIC::SQLite->new`**
+```perl
+    my $t = Test::DBIC::SQLite->new(%parameters);
+    my $schema = $t->connect_dbic_ok();
+    ...
+    $schema->storage->disconnect();
+    $t->drop_dbic_ok();
+```
 ### Parameters
 
-Named:
+Named, list:
 
-- ***`schema_class`* => `$dbic_schema_class`** (*Required*)  
-The class name of the
-[DBIx::Class::Schema](https://metacpan.org/pod/DBIx::Class::Schema) to use for
-the database connection.
+- **_`schema_class`_ => `$schema_class`** (_Required_)  
+    The class name of the
+    [DBIx::Class::Schema](https://metacpan.org/pod/DBIx::Class::Schema) to use
+    for the database connection.
 
+- **_`dbi_connect_info`_ => `$sqlite_dbname`** (_Optional_, `:memory:`)  
+    The default is **`:memory:`** which will create a temporary in-memory database.
+    One can also pass a file name for a database on disk. See
+    [MyDBD\_connection\_parameters](#implementation-of-mydbd_connection_parameters).
 
-- ***`dbi_connect_info`* => `$sqlite_dbname`** (*Optional*, `:memory:`)  
-The default is **`:memory:`** which will create a temporary in-memory database.
-One can also pass a file name for a database on disk. See
-[MyDBD\_connection\_parameters](#mydbd_connection_parameters).  
+- **_`pre_deploy_hook`_ => `$pre_deploy_hook`** (_Optional_)  
+    This is an optional `CodeRef` that will be executed right after the connection
+    is established but before `$schema->deploy` is called. The CodeRef will
+    only be called if deploy is also needed. See
+    [MyDBD\_check\_wants\_deploy](#implementation-of-mydbd_check_wants_deploy).
 
-
-- ***`pre_deploy_hook`* => `$pre_deploy_hook`** (*Optional*)  
-This is an optional `CodeRef` that will be executed right after the connection
-is established but before `$schema->deploy` is called. The CodeRef will only be
-called if deploy is also needed. See
-[MyDBD\_check\_wants\_deploy](#mydbd_check_wants_deploy).
-
-
-- ***`post_connect_hook`* => `$post_connect_hook`** (*Optional*)  
-This is an optional `CodeRef` that will be executed right after deploy (if any)
-and just before returning the schema instance. Useful for populating the
-database.
+- **_`post_connect_hook`_ => `$post_connect_hook`** (_Optional_)  
+    This is an optional `CodeRef` that will be executed right after deploy (if any)
+    and just before returning the schema instance. Useful for populating the
+    database.
 
 ### Returns
 
-This method returns an instance of `Test::DBIC::SQLite`.
+An initialised instance of `Test::DBIC::SQLite`.
 
-## **`Test::DBIC::SQLite->connect_dbic_ok()`**
+## `$td->connect_dbic_ok`
 
-This method can be called as a *class*method or as an *instance*method.
+This method is inherited from [Test::DBIC::DBDConnector](https://metacpan.org/pod/Test%3A%3ADBIC%3A%3ADBDConnector).
 
-### The instancemethod
+### Returns
 
-#### Parameters
+An initialised instance of `$schema_class`.
 
-None.
+## `$td->drop_dbic_ok`
 
-#### Returns
+This method implements `rm $dbname`, in order not to litter your test
+directory with left over test databases.
 
-An instance of the `DBIx::Class::Schema` one is trying to test.
+**NOTE**: Make sure you called `$schema->storage->disconnect()` first.
 
-### The classmethod
+**NOTE**: If the test-object goes out of scope without calling `$td->drop_dbic_ok()`, the destructor will try to remove the file. Use
+`$Test::DBIC::SQLite::LeaveCreatedDatabases = 1` to keep the file for
+debugging.
 
-#### Parameters
+## `connect_dbic_sqlite_ok(@parameters)`
 
-See the [new](#test-dbic-sqlite-new-) method.
+Create a SQLite3 database and deploy a dbic\_schema. This function is provided
+for compatibility with `v0.01` of this module.
 
-#### Returns
+See [Test::DBIC::SQLite->new](#test-dbic-sqlite-new) for further information,
+although only these 3 arguments are supported.
 
-An instance of the `DBIx::Class::Schema` one is trying to test.
+### Parameters
+
+Positional:
+
+1. **`$schema_class`** (_Required_)  
+    The class name of the [DBIx::Class::Schema](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ASchema) to use for the database connection.
+
+2. **`$sqlite_dbname`** (_Optional_, `:memory:`)  
+    The default is **`:memory:`** which will create a temporary in-memory database.
+    One can also pass a file name for a database on disk. See [MyDBD\_connection\_parameters](#implementation-of-mydbd_connection_parameters).
+
+3. **`$post_connect_hook`** (_Optional_)  
+    This is an optional `CodeRef` that will be executed right after deploy (if any)
+    and just before returning the schema instance. Useful for populating the
+    database.
+
+### Returns
+
+An initialised instance of `$schema_class`.
+
+## `drop_dbic_sqlite_ok()`
+
+This function uses the cached information of the call to `connect_dbic_sqlite_ok()`
+and clears it after the database is dropped, using another temporary connection
+to the template database.
+
+See [the `drop_dbic_ok()` method](#td-drop_dbic_ok).
 
 ## Implementation of `MyDBD_connection_parameters`
 
-The value of the `dbi_connect_info` parameter to the `connect_dbic_ok()`
-method, is passed to this method. For this *SQLite3* implementation this is a
+The value of the `dbi_connect_info` parameter to the \`new()\`
+constructor, is passed to this method. For this _SQLite3_ implementation this is a
 single string that should contain the name of the database on disk, that can be
-accessed with `SQLite3`. By default we use the "special" value of
+accessed with `sqlite3 (1)`. By default we use the "special" value of
 **`:memory:`** to create a temporary in-memory database.
 
 This method returns a list of parameters to be passed to
@@ -140,40 +167,13 @@ This method returns a list of parameters to be passed to
 ### Note
 
 At this moment we do not support the `uri=file:$db_file_name?mode=rwc` style of
-*dsn*, only the `dbname=$db_file_name` style, as we only support
-`$db_file_name` as a single parameter.
+_dsn_, only the `dbname=$db_file_name` style, as we only support
+`$sqlite_dbname` as a single parameter.
 
 ## Implementation of `MyDBD_check_wants_deploy`
 
 For in-memory databases this will always return **true**. For databases on disk
 this will return **true** if the file does not exist and **false** if it does.
-
-## **`connect_dbic_sqlite_ok()`**
-
-This function is provided for backward compatibility and internally uses
-`Test::DBIC::SQLite->connect_dbic_ok()`.
-
-**NB**: As this function is backward compatible, it does *not* support the
-`$pre_deploy_hook` callback!
-
-### Parameters
-
-Positional:
-
-1. **`$dbic_schema_class`** (*Required*)  
-The class name of the
-[DBIx::Class::Schema](https://metacpan.org/pod/DBIx::Class::Schema) to use for
-the database connection.
-
-2. **`$sqlite_dbname`** (*Optional*, `:memory:`)  
-The default is **`:memory:`** which will create a temporary in-memory database.
-One can also pass a file name for a database on disk. See
-[MyDBD\_connection\_parameters](#mydbd_connection_parameters).
-
-3. **`$post_connect_hook`** (*Optional*)  
-This is an optional `CodeRef` that will be executed right after deploy (if any)
-and just before returning the schema instance. Useful for populating the
-database.
 
 ---
 

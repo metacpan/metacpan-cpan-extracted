@@ -1,8 +1,8 @@
-
+use strict; use warnings;
 
 use Test::More tests => 16;
 
-$DESTROY=0;
+our $DESTROY=0;
 
 my @TO_REMOVE = my $FILE = "/tmp/FlatFile.$$";
 END { unlink @TO_REMOVE }
@@ -36,7 +36,7 @@ is($DESTROY, 0);
 { my $f = FF->new(FILE => $FILE, FIELDS => [qw(fruit color)], MODE => "+<") 
     or die; }
 is($DESTROY, 1);
-my $f = FF->new(FILE => $FILE, FIELDS => [qw(fruit color)], MODE => "+<") 
+$f = FF->new(FILE => $FILE, FIELDS => [qw(fruit color)], MODE => "+<")
   or die;
 undef $f;
 is($DESTROY, 2);
@@ -82,16 +82,16 @@ is($DESTROY, 7);
 is($DESTROY, 8);
 
 
+BEGIN {
 package FF;
-use base FlatFile;
+use FlatFile;
+our @ISA = 'FlatFile';
 
 sub DESTROY {
   $main::DESTROY++;
-  $main::DESTROYED{$_[0]} = 1;
   $_[0]->SUPER::DESTROY;
 }
-
-package main;
+}
 
 __DATA__
 apple  red

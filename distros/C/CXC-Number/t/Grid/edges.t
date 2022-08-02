@@ -10,7 +10,7 @@ sub Failure { join( '::', 'CXC::Number::Grid::Failure', @_ ) }
 is(
     Grid->new( edges => [ 0 .. 11 ] ),
     object {
-        prop blessed   => Grid;
+        prop blessed => Grid;
         call min       => 0;
         call max       => 11;
         call nbins     => 11;

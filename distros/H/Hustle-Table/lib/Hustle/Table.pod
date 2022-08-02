@@ -68,6 +68,25 @@ A cache (hash) is used to drastically improve table lookup performance. Entries
 are automatically added to the cache. However removal of cache entries is up to
 the user to implement on a application basis.
 
+=head2 API Change
+
+B<In version v0.5.3 and earlier>, the dispatcher would always return a two
+element list. The first being the match entry, and the second the a array ref
+of any captures from a regexp match. If the matcher type was 'begin', 'end',
+'exact', or 'numeric', the second element would always be an reference to an
+empty array.
+
+B<From v0.5.4 onwards> to optimise performance of non regex matching, this is
+no longer the case. Only regex type matching will generate this second element.
+Other matching types will not. 
+
+In otherwords when calling the dispatcher:
+
+		my ($entry, $captures)=$dispatcher->($input)
+
+The C<$captures> variable above now will be C<undef> instead of C<[]>, for non
+regex matching
+
 
 =head1 CREATING A TABLE
 
@@ -203,14 +222,17 @@ the table entries:
 	my ($entry, $captures)=$dispatcher->("input");
 	my $value=$entry->[1];
 
-The return from the dispatcher is a list of two elements.
+The return from the dispatcher is a list of upto two elements.
 
 The first is the array reference to the table entry that matched (or the
 default entry if no match was found). The value associated with the table entry
 is located in position 1
 
-The second item returned is an anonymous array of any captures due to a
-matching regex
+The second item, if present, is an anonymous array of any captures due to a
+matching regex.
+
+B<NOTE In version 0.5.3 and earlier:> the second element was returned as a ref
+to an empty array even if the matcher was not a regex.
 
 
 =head1 COMPARISON TO OTHER MODULES

@@ -1,0 +1,34 @@
+# NAME
+
+App::Changelord - cli-based changelog manager
+
+# VERSION
+
+version v0.0.1
+
+# DESCRIPTION
+
+`App::Changelord` offers a collection of cli commands to
+interact with a YAML-based CHANGELOG file format, from which
+a Markdown CHANGELOG fit for general comsumption can be generated.
+
+See the original blog entry in the `SEE ALSO` section for the full
+motivation.
+
+For a list of the commands, `changelord --help`, then to
+get information on the individual commands `changelord *subcommand* --man`.
+
+# SEE ALSO
+
+[Changelord, registrar of deeds extraordinaire](https://techblog.babyl.ca/entry/changelord) - the introducing blog entry.
+
+# AUTHOR
+
+Yanick Champoux <yanick@babyl.ca> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,16 @@
+Changes
+INSTALL.md
+lib/URI/PackageURL.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README.md
+t/00-load.t
+t/10-encode.t
+t/20-decode.t
+t/99-official-purl-test-suite.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

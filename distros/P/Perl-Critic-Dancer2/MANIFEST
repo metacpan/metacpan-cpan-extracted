@@ -15,6 +15,7 @@ dist.ini.baked
 lib/Perl/Critic/Dancer2.pm
 lib/Perl/Critic/Policy/Dancer2/ProhibitDeprecatedKeywords.pm
 lib/Perl/Critic/Policy/Dancer2/ProhibitUnrecommendedKeywords.pm
+lib/Perl/Critic/Policy/Dancer2/ReturnNotNecessary.pm
 perlcriticrc
 perltidyrc
 t/00-compile.t
@@ -22,6 +23,7 @@ t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/ProhibitDeprecatedKeywords.t
 t/ProhibitUnrecommendedKeywords.t
+t/ReturnNotNecessary.t
 t/lib/with_Dancer2.pm
 t/lib/without_Dancer2.pm
 tidyall.ini

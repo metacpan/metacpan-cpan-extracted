@@ -1,9 +1,10 @@
 use warnings;
 use strict;
 use Test::More;
+use Test::Exception;
 
 use lib 't/local';
-use LocalServer;
+use LocalServer ();
 
 BEGIN {
     use_ok( 'WWW::Mechanize' );
@@ -33,6 +34,9 @@ HTML
 
 my $server = LocalServer->spawn( html => $html );
 isa_ok( $server, "LocalServer" );
+
+dies_ok { $mech->submit_form( form_number => 1, fields => { none => 0 } ) }
+'Dies without a form';
 
 $mech->get($server->url);
 ok( $mech->success, 'Fetched OK' );

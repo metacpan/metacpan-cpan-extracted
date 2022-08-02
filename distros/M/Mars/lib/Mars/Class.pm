@@ -18,30 +18,41 @@ sub import {
   no warnings 'redefine';
   no warnings 'once';
 
+  my %exports = map +($_,$_), @args ? @args : qw(
+    attr
+    base
+    false
+    from
+    role
+    test
+    true
+    with
+  );
+
   @{"${from}::ISA"} = 'Mars::Kind::Class';
 
-  if (!*{"${from}::attr"}{"CODE"}) {
+  if ($exports{"attr"} && !*{"${from}::attr"}{"CODE"}) {
     *{"${from}::attr"} = sub {@_ = ($from, @_); goto \&attr};
   }
-  if (!*{"${from}::base"}{"CODE"}) {
+  if ($exports{"base"} && !*{"${from}::base"}{"CODE"}) {
     *{"${from}::base"} = sub {@_ = ($from, @_); goto \&base};
   }
   if (!*{"${from}::false"}{"CODE"}) {
     *{"${from}::false"} = sub {require Mars; Mars::false()};
   }
-  if (!*{"${from}::from"}{"CODE"}) {
+  if ($exports{"from"} && !*{"${from}::from"}{"CODE"}) {
     *{"${from}::from"} = sub {@_ = ($from, @_); goto \&from};
   }
-  if (!*{"${from}::role"}{"CODE"}) {
+  if ($exports{"role"} && !*{"${from}::role"}{"CODE"}) {
     *{"${from}::role"} = sub {@_ = ($from, @_); goto \&role};
   }
-  if (!*{"${from}::test"}{"CODE"}) {
+  if ($exports{"test"} && !*{"${from}::test"}{"CODE"}) {
     *{"${from}::test"} = sub {@_ = ($from, @_); goto \&test};
   }
   if (!*{"${from}::true"}{"CODE"}) {
     *{"${from}::true"} = sub {require Mars; Mars::true()};
   }
-  if (!*{"${from}::with"}{"CODE"}) {
+  if ($exports{"with"} && !*{"${from}::with"}{"CODE"}) {
     *{"${from}::with"} = sub {@_ = ($from, @_); goto \&test};
   }
 
@@ -110,14 +121,14 @@ Class Declaration for Perl 5
 
   package Person;
 
-  use Mars::Class;
+  use Mars::Class 'attr';
 
   attr 'fname';
   attr 'lname';
 
   package Identity;
 
-  use Mars::Role;
+  use Mars::Role 'attr';
 
   attr 'id';
   attr 'login';
@@ -141,6 +152,12 @@ Class Declaration for Perl 5
     # ensure the caller has a login and password when consumed
     die "${from} missing the login attribute" if !$from->can('login');
     die "${from} missing the password attribute" if !$from->can('password');
+  }
+
+  sub BUILD {
+    my ($self, $data) = @_;
+    $self->{auth} = undef;
+    return $self;
   }
 
   sub EXPORT {

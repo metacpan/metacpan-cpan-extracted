@@ -23,8 +23,7 @@ requires 'Pod::Abstract' => 0;
 requires 'Pod::Find' => 0;
 requires 'Readonly' => 0;
 requires 'perl' => '5.6.2';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=Pod-Example';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Pod-Example/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Pod-Example';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Pod-Example';
 test_requires 'English' => 0;
@@ -32,7 +31,7 @@ test_requires 'File::Object' => 0.05;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.11';
+version '0.12';
 
 # Run.
 WriteAll();

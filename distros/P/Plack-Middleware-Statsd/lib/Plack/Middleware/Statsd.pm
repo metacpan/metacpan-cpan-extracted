@@ -7,22 +7,22 @@ package Plack::Middleware::Statsd;
 # RECOMMEND PREREQ:  List::Util::XS
 # RECOMMEND PREREQ:  Ref::Util::XS
 
-use v5.10;
+use v5.14;
 
 use strict;
 use warnings;
 
 use parent qw/ Plack::Middleware /;
 
+use Feature::Compat::Try;
 use List::Util qw/ first /;
 use Plack::Util;
 use Plack::Util::Accessor
     qw/ client sample_rate histogram increment set_add catch_errors /;
 use Ref::Util qw/ is_coderef /;
 use Time::HiRes;
-use Try::Tiny;
 
-our $VERSION = 'v0.5.1';
+our $VERSION = 'v0.6.0';
 
 # Note: You may be able to omit the client if there is a client
 # defined in the environment hash at C<psgix.monitor.statsd>, and the
@@ -51,12 +51,12 @@ sub prepare_app {
                     try {
                         $client->$method( grep { defined $_ } @args );
                     }
-                    catch {
+                    catch($e) {
                         if (my $logger = $env->{'psgix.logger'}) {
-                            $logger->( { message => $_, level => 'error' } );
+                            $logger->( { message => $e, level => 'error' } );
                         }
                         else {
-                            $env->{'psgi.errors'}->print($_);
+                            $env->{'psgi.errors'}->print($e);
                         }
                     };
 
@@ -98,16 +98,15 @@ sub call {
     my $client = ( $env->{'psgix.monitor.statsd'} //= $self->client );
 
     my $start = [Time::HiRes::gettimeofday];
-    my $catch = $self->catch_errors;
     my $res;
 
-    if ($catch) {
-        $res = try {
-            $self->app->($env);
+    if (my $catch = $self->catch_errors) {
+        try {
+            $res = $self->app->($env);
         }
-        catch {
-            $catch->( $env, $_ );;
-        };
+        catch($e) {
+            $res = $catch->( $env, $e );
+        }
     }
     else {
         $res = $self->app->($env);
@@ -212,7 +211,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 =head1 VERSION
 
-version v0.5.1
+version v0.6.0
 
 =head1 SYNOPSIS
 
@@ -464,7 +463,7 @@ L<Plack::Middleware::SizeLimit> version 0.11 supports callbacks that
 allow you to monitor process size information.  In your F<app.psgi>:
 
   use Net::Statsd::Tiny;
-  use Try::Tiny;
+  use Feature::Compat::Try;
 
   my $statsd = Net::Statsd::Tiny->new( ... );
 
@@ -485,8 +484,8 @@ allow you to monitor process size information.  In your F<app.psgi>:
               $statsd->timing_ms('psgi.proc.shared', $shared);
               $statsd->timing_ms('psgi.proc.unshared', $unshared);
           }
-          catch {
-              warn $_;
+          catch($e) {
+              warn $e;
           };
       };
 
@@ -528,7 +527,7 @@ Library L<https://www.sciencephoto.com>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2021 by Robert Rothenberg.
+This software is Copyright (c) 2018-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

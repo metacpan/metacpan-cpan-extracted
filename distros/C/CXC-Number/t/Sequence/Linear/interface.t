@@ -24,16 +24,16 @@ Extrema are as specified. The sequence exactly covers the range.
 =cut
 
 {
-    my %exp = ( min => 1, max => 10, nelem => 10 );
+    my %exp      = ( min => 1, max => 10, nelem => 10 );
     my $sequence = new( %exp );
 
     is(
         $sequence,
         object {
-            call min   => float( $exp{min} );
-            call max   => float( $exp{max} );
+            call min => float( $exp{min} );
+            call max => float( $exp{max} );
             # call nelem => $exp{nelem};
-            call spacing  => meta {
+            call spacing => meta {
                 prop size => 9;
                 prop this => array {
                     all_items number( 1 );
@@ -60,8 +60,8 @@ to minimally cover the specified range, with center at ( min + max ) / 2
     is(
         $sequence,
         object {
-            call min  => float( 0.55 );
-            call max  => float( 10.45 );
+            call min     => float( 0.55 );
+            call max     => float( 10.45 );
             call spacing => meta {
                 prop size => 9;
                 prop this => array {
@@ -88,14 +88,15 @@ range.
 =cut
 
 {
-    my %exp = ( min => 1, nelem => 10, spacing => 1.1 );
+    my %exp      = ( min => 1, nelem => 10, spacing => 1.1 );
     my $sequence = new( %exp );
 
     is(
         $sequence,
         object {
-            call min  => float( 1.0 );
-            call max  => float( $exp{min} + ($exp{nelem}-1) * $exp{spacing} );
+            call min => float( 1.0 );
+            call max =>
+              float( $exp{min} + ( $exp{nelem} - 1 ) * $exp{spacing} );
             call spacing => meta {
                 prop size => 9;
                 prop this => array {
@@ -109,14 +110,15 @@ range.
 }
 
 {
-    my %exp = ( max => 10.9, nelem => 10, spacing => 1.1 );
+    my %exp      = ( max => 10.9, nelem => 10, spacing => 1.1 );
     my $sequence = new( %exp );
 
     is(
         $sequence,
         object {
-            call min  => float( $exp{max} - ($exp{nelem}-1) * $exp{spacing} );
-            call max  => float( $exp{max} );
+            call min =>
+              float( $exp{max} - ( $exp{nelem} - 1 ) * $exp{spacing} );
+            call max     => float( $exp{max} );
             call spacing => meta {
                 prop size => 9;
                 prop this => array {
@@ -148,8 +150,8 @@ minimally cover the specified range.
     is(
         $sequence,
         object {
-            call min  => float( $exp{min} );
-            call max  => float( 10.9 );
+            call min     => float( $exp{min} );
+            call max     => float( 10.9 );
             call spacing => meta {
                 prop size => 9;
                 prop this => array {
@@ -164,14 +166,14 @@ minimally cover the specified range.
 }
 
 {
-    my %exp = ( soft_min => 1, max => 10, spacing => 1.1 );
+    my %exp      = ( soft_min => 1, max => 10, spacing => 1.1 );
     my $sequence = new( %exp );
 
     is(
         $sequence,
         object {
-            call min  => float( 0.1 );
-            call max  => float( $exp{max} );
+            call min     => float( 0.1 );
+            call max     => float( $exp{max} );
             call spacing => meta {
                 prop size => 9;
                 prop this => array {
@@ -196,14 +198,14 @@ The sequence exactly covers the range.
 =cut
 
 {
-    my %exp = ( center => 0, rangew => 10, nelem => 11 );
+    my %exp      = ( center => 0, rangew => 10, nelem => 11 );
     my $sequence = new( %exp );
 
     is(
         $sequence,
         object {
-            call min  => float( -5 );
-            call max  => float( 5 );
+            call min     => float( -5 );
+            call max     => float( 5 );
             call spacing => meta {
                 prop size => 10;
                 prop this => array {
@@ -219,14 +221,14 @@ The sequence exactly covers the range.
 
 
 {
-    my %exp = ( center => 0, rangew => 11, nelem => 12 );
+    my %exp      = ( center => 0, rangew => 11, nelem => 12 );
     my $sequence = new( %exp );
 
     is(
         $sequence,
         object {
-            call min  => float( -5.5 );
-            call max  => float( 5.5 );
+            call min     => float( -5.5 );
+            call max     => float( 5.5 );
             call spacing => meta {
                 prop size => 11;
                 prop this => array {
@@ -252,13 +254,13 @@ center; the sequence minimally covers the range.
 
 
 {
-    my %exp = ( center => 0, rangew => 10, spacing => 1 );
+    my %exp      = ( center => 0, rangew => 10, spacing => 1 );
     my $sequence = new( %exp );
     is(
         $sequence,
         object {
-            call min  => float( -5 );
-            call max  => float( 5 );
+            call min     => float( -5 );
+            call max     => float( 5 );
             call spacing => meta {
                 prop size => 10;
                 prop this => array {
@@ -283,14 +285,14 @@ The sequence exactly covers the range.
 =cut
 
 {
-    my %exp = ( center => 0, spacing => 1, nelem => 11 );
+    my %exp      = ( center => 0, spacing => 1, nelem => 11 );
     my $sequence = new( %exp );
 
     is(
         $sequence,
         object {
-            call min  => float( -5 );
-            call max  => float( 5 );
+            call min     => float( -5 );
+            call max     => float( 5 );
             call spacing => meta {
                 prop size => 10;
                 prop this => array {
@@ -306,14 +308,14 @@ The sequence exactly covers the range.
 
 
 {
-    my %exp = ( center => 0, spacing => 1, nelem => 12 );
+    my %exp      = ( center => 0, spacing => 1, nelem => 12 );
     my $sequence = new( %exp );
 
     is(
         $sequence,
         object {
-            call min  => float( -5.5 );
-            call max  => float( 5.5 );
+            call min     => float( -5.5 );
+            call max     => float( 5.5 );
             call spacing => meta {
                 prop size => 11;
                 prop this => array {
@@ -339,14 +341,14 @@ covers the specified range.
 =cut
 
 {
-    my %exp = ( center => 0, soft_min => -5, soft_max => 3, nelem => 11 );
+    my %exp      = ( center => 0, soft_min => -5, soft_max => 3, nelem => 11 );
     my $sequence = new( %exp );
 
     is(
         $sequence,
         object {
-            call min  => float( -5 );
-            call max  => float( 5 );
+            call min     => float( -5 );
+            call max     => float( 5 );
             call spacing => meta {
                 prop size => 10;
                 prop this => array {
@@ -370,8 +372,8 @@ covers the specified range.
     is(
         $sequence,
         object {
-            call min  => float( -5 );
-            call max  => float( 5 );
+            call min     => float( -5 );
+            call max     => float( 5 );
             call spacing => meta {
                 prop size => 11;
                 prop this => array {
@@ -402,10 +404,10 @@ covers the specified range.
     is(
         $sequence,
         object {
-            call min   => float( -5.5 );
-            call max   => float( 5.5 );
+            call min => float( -5.5 );
+            call max => float( 5.5 );
             # call nelem => number 12;
-            call spacing  => meta {
+            call spacing => meta {
                 prop size => 11;
                 prop this => array {
                     all_items number( 1 );
@@ -421,20 +423,20 @@ covers the specified range.
 isa_ok(
     dies {
         CXC::Number::Sequence::Linear->new(
-            max   => 1,
-            min   => 0,
-            nelem => 11,
-            spacing  => 3
-          )
+            max     => 1,
+            min     => 0,
+            nelem   => 11,
+            spacing => 3
+        )
     },
-    [ 'CXC::Number::Sequence::Failure::parameter::IllegalCombination' ],
+    ['CXC::Number::Sequence::Failure::parameter::IllegalCombination'],
     "overspecified"
 );
 
 # check all underspecified combinations
 {
     my %args = ( max => 1, min => 0, nelem => 11, spacing => 3 );
-    my $s = Set::Partition->new(
+    my $s    = Set::Partition->new(
         list      => [qw( max min nelem spacing )],
         partition => [2] );
 

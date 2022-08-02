@@ -209,6 +209,9 @@ Native APIs have its IDs. These IDs are permanently same for the binary compatib
   192 get_memory_blocks_count_stack
   193 set_command_info_program_name
   194 set_command_info_argv
+  195 get_class_id_by_name
+  196 strerror
+  197 new_string_array
 
 =head2 class_vars_heap
 
@@ -2108,6 +2111,30 @@ If it succeed, return C<0>.
 
 The argv must be a C<string[]> object. Otherwise return non-zero value.
 
+=head2 get_class_id_by_name
+
+  int32_t (*get_class_id_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, int32_t* error, const char* file, int32_t line);
+
+Get class id by the class name.
+
+If the class is not found, C<error> is set to C<1>. Otherwise set to C<0>.
+
+=head2 new_string_array
+
+  void* (*new_string_array)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
+
+Create a new string array. This is alias for the following code using L</"new_object_array">.
+
+  void* obj_string_array = env->new_object_array(env, stack, SPVM_NATIVE_C_BASIC_TYPE_ID_STRING, length);
+
+=head2 strerror
+
+  const char* (*strerror)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value, int32_t length);
+
+Get the value of C<strerror> of C<C language> on thread-safely.
+
+If the length is C<0>, the length is set to C<64>.
+
 =head1 Compiler Native API
 
 L<SPVM::Document::NativeAPI::Compiler>
@@ -2152,6 +2179,7 @@ L<SPVM::Document::NativeAPI::Allocator>
   17 SPVM_NATIVE_C_BASIC_TYPE_ID_BOOL_CLASS
   18 SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS
   19 SPVM_NATIVE_C_BASIC_TYPE_ID_COMMAND_INFO_CLASS
+  20 SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS
 
 These IDs are permanently same for the binary compatibility after the future release C<v1.0>.
 
@@ -2289,6 +2317,7 @@ The basic type category for the any object type.
 =head2 Class IDs
 
   1  SPVM_NATIVE_C_CLASS_ID_ERROR
+  2  SPVM_NATIVE_C_CLASS_ID_ERROR
 
 These IDs are permanently same for the binary compatibility after the future release C<v1.0>.
 

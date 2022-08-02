@@ -1,7 +1,7 @@
 This archive contains the distribution Try-ALRM,
-version 0.4:
+version 0.6:
 
-  Provides C<alarm> semantics similar to C<Try::Catch>.
+  Provides C<try_once> and C<retry> semantics to C<CORE::alarm>, similar to C<Try::Catch>.
 
 This software is copyright (c) 2022 by oodler577.
 

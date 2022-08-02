@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File/Cache.pm
-## Version v0.1.0
+## Version v0.2.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/16
-## Modified 2022/03/16
+## Modified 2022/07/26
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -22,12 +22,13 @@ BEGIN
     use Nice::Try;
     use JSON 4.03 qw( -convert_blessed_universally );
     use Scalar::Util ();
-    use Storable 3.25 ();
+    # use Storable 3.25 ();
+    use Storable::Improved v0.1.3;
     # Hash of cache file to objects to maintain the shared cache file objects created
     $CACHE_REPO = [];
     $CACHE_TO_OBJECT = {};
     $DEBUG = 0;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -50,7 +51,8 @@ sub init
     $self->{size}       = 0;
     $self->{_init_strict_use_sub} = 1;
     # Storable keps breaking :(
-    # I leave the feature of using it as a choice to the user, but defaults to JSON
+    # I leave the feature of using it as a choice to the user, but defaults to JSON.
+    # Other possibilities could be cbor, sereal and storable
     $self->{_packing_method} = 'json';
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     my $tmpdir = sys_tmpdir();
@@ -64,6 +66,8 @@ sub init
 }
 
 sub binmode { return( shift->_set_get_scalar( 'binmode', @_ ) ); }
+
+sub cbor { return( shift->_packing_method( 'cbor' ) ); }
 
 sub create { return( shift->_set_get_boolean( 'create', @_ ) ); }
 
@@ -96,6 +100,18 @@ sub flags
     $flags    |= ( $opts->{mode} || 0666 );
     $self->message( 3, "Returning flags value '$flags'." );
     return( $flags );
+}
+
+sub ftok
+{
+    my $self = shift( @_ );
+    my $id = shift( @_ );
+    my $f = sys_tmpdir();
+    return( int(
+                ( int( $f->inode ) & 0xffff ) |
+                int( ( $f->device ) << 16 ) |
+                ( ( $id & 0xff ) << 21 )
+               ) );
 }
 
 sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
@@ -285,6 +301,7 @@ sub read
     $self->messagef( 4, "${bytes} bytes read with a buffer now of size %d, unpacking data now.", CORE::length( $buffer ) );
     return( $self->pass_error( $file->error ) ) if( !defined( $bytes ) );
     my $packing = $self->_packing_method;
+    $packing = lc( $packing ) if( defined( $packing ) );
     my $data;
     if( CORE::length( $buffer ) )
     {
@@ -294,11 +311,21 @@ sub read
             {
                 $data = $self->_decode_json( $buffer );
             }
+            elsif( $packing eq 'cbor' )
+            {
+                $data = $self->deserialise( data => $buffer, serialiser => 'CBOR::XS', allow_sharing => 1 );
+            }
+            elsif( $packing eq 'sereal' )
+            {
+                $data = $self->deserialise( data => $buffer, serialiser => 'Sereal', freeze_callbacks => 1 );
+            }
+            # By default Storable::Improved
             else
             {
-                $data = Storable::thaw( $buffer );
+                # $data = Storable::Improved::thaw( $buffer );
+                $data = $self->deserialise( data => $buffer, serialiser => 'Storable::Improved' );
             }
-            $self->message( 4, "Decoded data '$buffer' -> '$data': ", sub{ $self->dump( $data ) });
+            $self->message( 4, "Decoded data '", ( $buffer // '' ), "' -> '", ( $data // '' ), "': ", sub{ $self->dump( $data ) });
         }
         catch( $e )
         {
@@ -399,7 +426,16 @@ sub reset
     return( $self );
 }
 
+sub sereal { return( shift->_packing_method( 'sereal' ) ); }
+
 sub serial { return( shift->_set_get_scalar( 'serial', @_ ) ); }
+
+sub serialiser { return( shift->_set_get_scalar( '_packing_method', @_ ) ); }
+
+{
+    no warnings 'once';
+    *serializer = \&serialiser;
+}
 
 sub size { return( shift->_set_get_scalar( 'size', @_ ) ); }
 
@@ -449,9 +485,28 @@ sub write
         {
             $encoded = $self->_encode_json( $data );
         }
+        elsif( $packing eq 'cbor' )
+        {
+            $encoded = $self->serialise( $data, serialiser => 'CBOR::XS', allow_sharing => 1 );
+            return( $self->pass_error ) if( !defined( $encoded ) );
+        }
+        elsif( $packing eq 'sereal' )
+        {
+            $self->_load_class( 'Sereal::Encoder' ) || return( $self->pass_error );
+            $encoded = $self->serialise( $data,
+                serialiser => 'Sereal',
+                freeze_callbacks => 1,
+                compress => &{"Sereal\::Encoder::SRL_ZLIB"}(),
+            );
+            return( $self->pass_error ) if( !defined( $encoded ) );
+        }
+        # Default to Storable::Improved
         else
         {
-            $encoded = Storable::freeze( $data );
+            # local $Storable::forgive_me = 1;
+            # $encoded = Storable::Improved::freeze( $data );
+            $encoded = $self->serialise( $data, serialiser => 'Storable::Improved' );
+            return( $self->pass_error ) if( !defined( $encoded ) );
         }
     }
     catch( $e )
@@ -621,18 +676,6 @@ sub _fill
     return(1);
 }
 
-sub ftok
-{
-    my $self = shift( @_ );
-    my $id = shift( @_ );
-    my $f = sys_tmpdir();
-    return( int(
-                ( int( $f->inode ) & 0xffff ) |
-                int( ( $f->device ) << 16 ) |
-                ( ( $id & 0xff ) << 21 )
-               ) );
-}
-
 sub _packing_method { return( shift->_set_get_scalar( '_packing_method', @_ ) ); }
 
 sub _str2key
@@ -693,6 +736,47 @@ sub DESTROY
     }
 };
 
+sub FREEZE
+{
+    my $self = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class = CORE::ref( $self );
+    my %hash  = %$self;
+    # Return an array reference rather than a list so this works with Sereal and CBOR
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # But Storable want a list with the first element being the serialised element
+    CORE::return( $class, \%hash );
+}
+
+sub STORABLE_freeze { return( shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { return( shift->THAW( @_ ) ); }
+
+# NOTE: CBOR will call the THAW method with the stored classname as first argument, the constant string CBOR as second argument, and all values returned by FREEZE as remaining arguments.
+# NOTE: Storable calls it with a blessed object it created followed with $cloning and any other arguments initially provided by STORABLE_freeze
+sub THAW
+{
+    my( $self, undef, @args ) = @_;
+    my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+    my $new;
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        foreach( CORE::keys( %$hash ) )
+        {
+            $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+        }
+        $new = $self;
+    }
+    else
+    {
+        $new = CORE::bless( $hash => $class );
+    }
+    CORE::return( $new );
+}
+
 # NOTE: END
 END
 {
@@ -737,7 +821,6 @@ END
     }
 };
 
-
 1;
 # NOTE: POD
 __END__
@@ -746,7 +829,7 @@ __END__
 
 =head1 NAME
 
-Module::Generic::File::Cache - Module Generic
+Module::Generic::File::Cache - File-based Cache
 
 =head1 SYNOPSIS
 
@@ -759,7 +842,7 @@ Module::Generic::File::Cache - Module Generic
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.1
 
 =head1 DESCRIPTION
 
@@ -774,6 +857,10 @@ This is particularly useful for system that lack support for shared cache. See L
 This instantiates a shared cache object. It takes the following parameters:
 
 =over 4
+
+=item I<cbor>
+
+Provided with a value (true or false does not matter), and this will set L<CBOR::XS> as the data serialisation mechanism when storing data to cache file.
 
 =item I<debug>
 
@@ -791,9 +878,9 @@ See L<perlmod> for more about object destruction.
 
 =item I<json>
 
-Provided with a value (true or false does not matter), and this will set L<JSON> as the data packing mechanism when storing data to memory.
+Provided with a value (true or false does not matter), and this will set L<JSON> as the data serialisation mechanism when storing data to cache file.
 
-Please note that if you want to store objects, you need to use I<storable> instead, because L<JSON> is not suitable to serialise objects.
+Please note that if you want to store objects, you need to use I<cbor>, I<sereal> or I<storable> instead, because L<JSON> is not suitable to serialise objects.
 
 =item I<key>
 
@@ -815,6 +902,10 @@ Shared cache files are owned by system users and access to shared cache files is
 
 If you do not want to share it with any other user than yourself, setting mode to C<0600> is fine.
 
+=item I<sereal>
+
+Provided with a value (true or false does not matter), and this will set L<Sereal> as the data serialisation mechanism when storing data to cache file.
+
 =item I<size>
 
 The size in byte of the shared cache.
@@ -823,7 +914,7 @@ This is set once it is created. You can create again the shared cache file with 
 
 =item I<storable>
 
-Provided with a value (true or false does not matter), and this will set L<Storable> as the data packing mechanism when storing data to cache file.
+Provided with a value (true or false does not matter), and this will set L<Storable::Improved> as the data serialisation mechanism when storing data to cache file.
 
 =back
 
@@ -839,6 +930,10 @@ An object will be returned if it successfully initiated, or C<undef()> upon erro
     ) || die( Module::Generic::SharedMem->error );
 
 =head2 binmode
+
+=head2 cbor
+
+When called, this will set L<CBOR::XS> as the data serialisation mechanism when storing data to cache file or reading data from cache file.
 
 =head2 create
 
@@ -980,6 +1075,10 @@ This serial is created based on the I<key> parameter provided either upon object
 
 The serial is created by calling L</ftok> to provide a reliable and repeatable numeric identifier. L</ftok> is a simili polyfill of L<IPC::SysV/ftok>
 
+=head2 serialiser
+
+Sets or gets the serialiser. Possible values are: C<cbor>, C<json>, C<sereal>, C<storable>
+
 =head2 size
 
 Sets or gets the shared cache size.
@@ -1015,6 +1114,20 @@ Write the data provided to the shared cache, after having encoded it using L<JSO
 You can store in shared cache any kind of data excepted glob, such as scalar reference, array or hash reference. You could also store module objects, but L<JSON> only supports encoding objects that are based on array or hash. As the L<JSON> documentation states "other blessed references will be converted into null"
 
 It returns the current object for chaining, or C<undef> if there was an error, which can then be retrieved with L<Module::Generic/error>
+
+=head1 SERIALISATION
+
+=for Pod::Coverage FREEZE
+
+=for Pod::Coverage STORABLE_freeze
+
+=for Pod::Coverage STORABLE_thaw
+
+=for Pod::Coverage THAW
+
+=for Pod::Coverage TO_JSON
+
+Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
 
 =head1 AUTHOR
 

@@ -5,19 +5,18 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class;
 
-extends 'Venus::Kind::Utility';
+base 'Venus::Kind::Utility';
 
+with 'Venus::Role::Valuable';
+with 'Venus::Role::Buildable';
 with 'Venus::Role::Accessible';
 with 'Venus::Role::Proxyable';
 
 # ATTRIBUTES
 
-has named => (
-  is => 'rw',
-  default => sub {{}},
-);
+attr 'named';
 
 # BUILDERS
 
@@ -30,6 +29,14 @@ sub build_proxy {
     return $self->get($method) if !$has_value; # no value
     return $self->set($method, $value);
   };
+}
+
+sub build_self {
+  my ($self, $data) = @_;
+
+  $self->named({}) if !$self->named;
+
+  return $self;
 }
 
 # METHODS
@@ -134,7 +141,7 @@ Vars Class for Perl 5
   use Venus::Vars;
 
   my $vars = Venus::Vars->new(
-    value => { USER => 'cpanery', HOME => '/home/cpanery', },
+    value => { USER => 'awncorp', HOME => '/home/awncorp', },
     named => { iam => 'USER', root => 'HOME', },
   );
 
@@ -184,7 +191,11 @@ This package integrates behaviors from:
 
 L<Venus::Role::Accessible>
 
+L<Venus::Role::Buildable>
+
 L<Venus::Role::Proxyable>
+
+L<Venus::Role::Valuable>
 
 =cut
 
@@ -210,7 +221,7 @@ I<Since C<0.01>>
 
   my $default = $vars->default;
 
-  # { USER => 'cpanery', HOME => '/home/cpanery', ... }
+  # { USER => 'awncorp', HOME => '/home/awncorp', ... }
 
 =back
 
@@ -291,7 +302,7 @@ I<Since C<0.01>>
 
   my $get = $vars->get('iam');
 
-  # "cpanery"
+  # "awncorp"
 
 =back
 
@@ -303,7 +314,7 @@ I<Since C<0.01>>
 
   my $get = $vars->get('USER');
 
-  # "cpanery"
+  # "awncorp"
 
 =back
 
@@ -327,7 +338,7 @@ I<Since C<0.01>>
 
   my $get = $vars->get('user');
 
-  # "cpanery"
+  # "awncorp"
 
 =back
 
@@ -469,13 +480,13 @@ I<Since C<0.01>>
   use Venus::Vars;
 
   my $vars = Venus::Vars->new(
-    value => { USER => 'cpanery', HOME => '/home/cpanery', },
+    value => { USER => 'awncorp', HOME => '/home/awncorp', },
     named => { root => 'HOME', },
   );
 
   my $unnamed = $vars->unnamed;
 
-  # { USER => "cpanery" }
+  # { USER => "awncorp" }
 
 =back
 

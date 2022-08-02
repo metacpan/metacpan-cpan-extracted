@@ -1,0 +1,64 @@
+## name $0 is OK
+## failures 0
+## cut
+
+say $0;
+say ${0};
+say "$0";
+say "${0}";
+say `$0`;
+say `${0}`;
+print <<"EOD";
+$0
+EOD
+print <<"EOD";
+${0}
+EOD
+m/ $0 /smx;
+m/ ${0} /smx;
+
+#-----------------------------------------------------------------------------
+
+## name $0nnn is not OK
+## failures 20
+## cut
+
+say $00;
+say $01;
+say ${00};
+say ${01};
+say "$00";
+say "$01";
+say "${00}";
+say "${01}";
+say `$00`;
+say `$01`;
+say `${00}`;
+say `${01}`;
+print <<"EOD";
+$00
+EOD
+print <<"EOD";
+$01
+EOD
+print <<"EOD";
+${00}
+EOD
+print <<"EOD";
+${01}
+EOD
+m/ $00 /smx;
+m/ $01 /smx;
+m/ ${00} /smx;
+m/ ${01} /smx;
+
+#-----------------------------------------------------------------------------
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 78
+#   indent-tabs-mode: nil
+#   c-indentation-style: bsd
+# End:
+# ex: set ts=8 sts=4 sw=4 tw=78 ft=perl expandtab shiftround :

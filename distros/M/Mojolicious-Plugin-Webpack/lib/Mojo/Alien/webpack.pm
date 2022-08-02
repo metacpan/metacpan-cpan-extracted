@@ -326,7 +326,7 @@ Parses the filenames in L</out_dir> and returns a hash ref with information
 about the generated assets. Example return value:
 
   {
-    'relatibe/output.development.js' => {            # Key is relative path to out_dir()
+    'relative/output.development.js' => {            # Key is relative path to out_dir()
       ext   => 'css',                                # File extension
       mode  => 'development',                        # or "production"
       mtime => 1616976114,                           # File modification epoch timestamp

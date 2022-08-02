@@ -1,20 +1,24 @@
---- #YAML:1.0
-name:               Memoize
-version:            1.03
-abstract:           ~
-author:  []
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+---
+abstract: 'Make functions faster by trading space for time'
+author:
+  - 'Mark Jason Dominus'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:  {}
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  Test::More: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Memoize
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.006'
+resources:
+  bugtracker: https://rt.cpan.org/Dist/Display.html?Name=Memoize
+  repository: https://github.com/ap/Memoize.git
+version: '1.09'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

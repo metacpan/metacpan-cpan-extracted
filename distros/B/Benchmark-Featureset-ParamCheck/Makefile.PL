@@ -37,98 +37,115 @@ my $meta = {
                                            "Ref::Util::XS" => 0.116,
                                            "Specio::Declare" => 0.37,
                                            "Specio::Library::Builtins" => 0.37,
-                                           "Type::Params" => "1.001_009",
+                                           "Type::Nano" => 0,
+                                           "Type::Params" => 1.016002,
                                            "Type::Tiny::XS" => 0.012,
-                                           "Types::Standard" => "1.001_009",
+                                           "Types::Standard" => 1.016002,
                                          },
                                        },
                           test      => { requires => { "Module::Runtime" => 0, "Test::Modern" => 0.013 } },
                         },
   "provides"         => {
-                          "Benchmark::Featureset::ParamCheck"                                          => { file => "lib/Benchmark/Featureset/ParamCheck.pm", version => 0.005 },
+                          "Benchmark::Featureset::ParamCheck"                                          => { file => "lib/Benchmark/Featureset/ParamCheck.pm", version => 0.006 },
                           "Benchmark::Featureset::ParamCheck::Base"                                    => {
                                                                                                             file => "lib/Benchmark/Featureset/ParamCheck/Base.pm",
-                                                                                                            version => 0.005,
+                                                                                                            version => 0.006,
                                                                                                           },
                           "Benchmark::Featureset::ParamCheck::Base::DataValidator"                     => {
                                                                                                             file => "lib/Benchmark/Featureset/ParamCheck/Base/DataValidator.pm",
-                                                                                                            version => 0.005,
+                                                                                                            version => 0.006,
                                                                                                           },
                           "Benchmark::Featureset::ParamCheck::Base::MXPV"                              => {
                                                                                                             file => "lib/Benchmark/Featureset/ParamCheck/Base/MXPV.pm",
-                                                                                                            version => 0.005,
+                                                                                                            version => 0.006,
                                                                                                           },
                           "Benchmark::Featureset::ParamCheck::Base::ParamsCheck"                       => {
                                                                                                             file => "lib/Benchmark/Featureset/ParamCheck/Base/ParamsCheck.pm",
-                                                                                                            version => 0.005,
+                                                                                                            version => 0.006,
                                                                                                           },
                           "Benchmark::Featureset::ParamCheck::Base::PV"                                => {
                                                                                                             file => "lib/Benchmark/Featureset/ParamCheck/Base/PV.pm",
-                                                                                                            version => 0.005,
+                                                                                                            version => 0.006,
                                                                                                           },
                           "Benchmark::Featureset::ParamCheck::Base::PVC"                               => {
                                                                                                             file => "lib/Benchmark/Featureset/ParamCheck/Base/PVC.pm",
-                                                                                                            version => 0.005,
+                                                                                                            version => 0.006,
                                                                                                           },
                           "Benchmark::Featureset::ParamCheck::Implementation::DataValidator::Moose"    => {
                                                                                                             file => "lib/Benchmark/Featureset/ParamCheck/Implementation/DataValidator/Moose.pm",
-                                                                                                            version => 0.005,
+                                                                                                            version => 0.006,
                                                                                                           },
                           "Benchmark::Featureset::ParamCheck::Implementation::DataValidator::Mouse"    => {
                                                                                                             file => "lib/Benchmark/Featureset/ParamCheck/Implementation/DataValidator/Mouse.pm",
-                                                                                                            version => 0.005,
+                                                                                                            version => 0.006,
                                                                                                           },
                           "Benchmark::Featureset::ParamCheck::Implementation::DataValidator::TypeTiny" => {
                                                                                                             file => "lib/Benchmark/Featureset/ParamCheck/Implementation/DataValidator/TypeTiny.pm",
-                                                                                                            version => 0.005,
+                                                                                                            version => 0.006,
                                                                                                           },
                           "Benchmark::Featureset::ParamCheck::Implementation::MXPV::Moose"             => {
                                                                                                             file => "lib/Benchmark/Featureset/ParamCheck/Implementation/MXPV/Moose.pm",
-                                                                                                            version => 0.005,
+                                                                                                            version => 0.006,
                                                                                                           },
                           "Benchmark::Featureset::ParamCheck::Implementation::MXPV::TypeTiny"          => {
                                                                                                             file => "lib/Benchmark/Featureset/ParamCheck/Implementation/MXPV/TypeTiny.pm",
-                                                                                                            version => 0.005,
+                                                                                                            version => 0.006,
                                                                                                           },
                           "Benchmark::Featureset::ParamCheck::Implementation::ParamsCheck::Perl"       => {
                                                                                                             file => "lib/Benchmark/Featureset/ParamCheck/Implementation/ParamsCheck/Perl.pm",
-                                                                                                            version => 0.005,
+                                                                                                            version => 0.006,
                                                                                                           },
                           "Benchmark::Featureset::ParamCheck::Implementation::ParamsCheck::TypeTiny"   => {
                                                                                                             file => "lib/Benchmark/Featureset/ParamCheck/Implementation/ParamsCheck/TypeTiny.pm",
-                                                                                                            version => 0.005,
+                                                                                                            version => 0.006,
                                                                                                           },
                           "Benchmark::Featureset::ParamCheck::Implementation::Perl"                    => {
                                                                                                             file => "lib/Benchmark/Featureset/ParamCheck/Implementation/Perl.pm",
-                                                                                                            version => 0.005,
+                                                                                                            version => 0.006,
                                                                                                           },
                           "Benchmark::Featureset::ParamCheck::Implementation::PV"                      => {
                                                                                                             file => "lib/Benchmark/Featureset/ParamCheck/Implementation/PV.pm",
-                                                                                                            version => 0.005,
+                                                                                                            version => 0.006,
                                                                                                           },
                           "Benchmark::Featureset::ParamCheck::Implementation::PV::TypeTiny"            => {
                                                                                                             file => "lib/Benchmark/Featureset/ParamCheck/Implementation/PV/TypeTiny.pm",
-                                                                                                            version => 0.005,
+                                                                                                            version => 0.006,
                                                                                                           },
                           "Benchmark::Featureset::ParamCheck::Implementation::PVC::Moose"              => {
                                                                                                             file => "lib/Benchmark/Featureset/ParamCheck/Implementation/PVC/Moose.pm",
-                                                                                                            version => 0.005,
+                                                                                                            version => 0.006,
                                                                                                           },
                           "Benchmark::Featureset::ParamCheck::Implementation::PVC::Specio"             => {
                                                                                                             file => "lib/Benchmark/Featureset/ParamCheck/Implementation/PVC/Specio.pm",
-                                                                                                            version => 0.005,
+                                                                                                            version => 0.006,
                                                                                                           },
                           "Benchmark::Featureset::ParamCheck::Implementation::PVC::TypeTiny"           => {
                                                                                                             file => "lib/Benchmark/Featureset/ParamCheck/Implementation/PVC/TypeTiny.pm",
-                                                                                                            version => 0.005,
+                                                                                                            version => 0.006,
                                                                                                           },
                           "Benchmark::Featureset::ParamCheck::Implementation::RefUtilXS"               => {
                                                                                                             file => "lib/Benchmark/Featureset/ParamCheck/Implementation/RefUtilXS.pm",
-                                                                                                            version => 0.005,
+                                                                                                            version => 0.006,
                                                                                                           },
-                          "Benchmark::Featureset::ParamCheck::Implementation::TypeParams"              => {
-                                                                                                            file => "lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams.pm",
-                                                                                                            version => 0.005,
+                          "Benchmark::Featureset::ParamCheck::Implementation::TypeParams::Moose"       => {
+                                                                                                            file => "lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams/Moose.pm",
+                                                                                                            version => 0.006,
+                                                                                                          },
+                          "Benchmark::Featureset::ParamCheck::Implementation::TypeParams::Mouse"       => {
+                                                                                                            file => "lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams/Mouse.pm",
+                                                                                                            version => 0.006,
+                                                                                                          },
+                          "Benchmark::Featureset::ParamCheck::Implementation::TypeParams::Specio"      => {
+                                                                                                            file => "lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams/Specio.pm",
+                                                                                                            version => 0.006,
+                                                                                                          },
+                          "Benchmark::Featureset::ParamCheck::Implementation::TypeParams::TypeNano"    => {
+                                                                                                            file => "lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams/TypeNano.pm",
+                                                                                                            version => 0.006,
+                                                                                                          },
+                          "Benchmark::Featureset::ParamCheck::Implementation::TypeParams::TypeTiny"    => {
+                                                                                                            file => "lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams/TypeTiny.pm",
+                                                                                                            version => 0.006,
                                                                                                           },
                         },
   "release_status"   => "stable",
@@ -145,7 +162,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Benchmark-Featureset-ParamCheck/project",
                         },
-  "version"          => 0.005,
+  "version"          => 0.006,
   "x_static_install" => 1,
 };
 
@@ -220,28 +237,8 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

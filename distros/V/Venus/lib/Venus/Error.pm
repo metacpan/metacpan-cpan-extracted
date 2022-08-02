@@ -5,31 +5,27 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class;
 
-extends 'Venus::Kind::Utility';
+base 'Venus::Kind::Utility';
 
 with 'Venus::Role::Explainable';
 with 'Venus::Role::Stashable';
 
 use overload (
+  '""' => 'explain',
   '.' => sub{$_[0]->message . "$_[1]"},
   'eq' => sub{$_[0]->message eq "$_[1]"},
   'ne' => sub{$_[0]->message ne "$_[1]"},
   'qr' => sub{qr/@{[quotemeta($_[0]->message)]}/},
+  '~~' => 'explain',
+  fallback => 1,
 );
 
 # ATTRIBUTES
 
-has context => (
-  is => 'rw',
-  default => '(None)',
-);
-
-has message => (
-  is => 'rw',
-  default => 'Exception!',
-);
+attr 'context';
+attr 'message';
 
 # BUILDERS
 
@@ -44,6 +40,8 @@ sub build_arg {
 sub build_self {
   my ($self, $data) = @_;
 
+  $self->context('(None)') if !$self->context;
+  $self->message('Exception!') if !$self->message;
   $self->trace(2) if !@{$self->frames};
 
   return $self;
@@ -416,6 +414,38 @@ B<example 1>
   # given: synopsis;
 
   my $test = 'Exception!' =~ qr/$error/;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<("")>
+
+This package overloads the C<""> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = "$error";
+
+  # "Exception!"
+
+=back
+
+=over 4
+
+=item operation: C<(~~)>
+
+This package overloads the C<~~> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $error ~~ 'Exception!';
 
   # 1
 

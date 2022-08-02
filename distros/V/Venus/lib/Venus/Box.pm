@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class;
 
 with 'Venus::Role::Buildable';
 with 'Venus::Role::Proxyable';

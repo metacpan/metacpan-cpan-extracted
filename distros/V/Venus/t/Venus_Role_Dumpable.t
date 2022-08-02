@@ -49,7 +49,7 @@ $test->for('includes');
 
   use Venus::Class;
 
-  has 'test';
+  attr 'test';
 
   with 'Venus::Role::Dumpable';
 

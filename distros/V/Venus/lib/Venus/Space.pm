@@ -5,9 +5,9 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class;
 
-extends 'Venus::Name';
+base 'Venus::Name';
 
 # METHODS
 
@@ -634,8 +634,6 @@ sub use {
 
   my $version;
 
-  my $class = $self->package;
-
   ($target, $version) = @$target if ref $target eq 'ARRAY';
 
   $self->require($target);
@@ -651,7 +649,7 @@ sub use {
     'sub{ my ($target, @params) = @_; $target->import(@params)}'
   );
 
-  $self->eval(join("\n", @statement))->($target, $class, @params);
+  $self->eval(join("\n", @statement))->($target, @params);
 
   return $self;
 }
@@ -2153,7 +2151,7 @@ I<Since C<0.01>>
 
   # given: synopsis;
 
-  my $require = $space->require('Moo');
+  my $require = $space->require('Venus');
 
   # 1
 
@@ -2510,7 +2508,7 @@ I<Since C<0.01>>
 
   my $space = Venus::Space->new('foo/goo');
 
-  my $use = $space->use('Moo');
+  my $use = $space->use('Venus');
 
   # bless({ value => "foo/goo" }, "Venus::Space")
 
@@ -2526,7 +2524,7 @@ I<Since C<0.01>>
 
   my $space = Venus::Space->new('foo/hoo');
 
-  my $use = $space->use('Moo', 'has');
+  my $use = $space->use('Venus', 'error');
 
   # bless({ value => "foo/hoo" }, "Venus::Space")
 
@@ -2542,7 +2540,7 @@ I<Since C<0.01>>
 
   my $space = Venus::Space->new('foo/foo');
 
-  my $use = $space->use(['Moo', 9.99], 'has');
+  my $use = $space->use(['Venus', 9.99], 'error');
 
 =back
 

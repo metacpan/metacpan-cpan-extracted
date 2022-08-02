@@ -5,18 +5,23 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class;
 
-extends 'Venus::Kind::Utility';
+base 'Venus::Kind::Utility';
 
+with 'Venus::Role::Valuable';
+with 'Venus::Role::Buildable';
 with 'Venus::Role::Accessible';
 with 'Venus::Role::Explainable';
 
 use overload (
+  '""' => 'explain',
   '.' => sub{$_[0]->value . "$_[1]"},
   'eq' => sub{$_[0]->value eq "$_[1]"},
   'ne' => sub{$_[0]->value ne "$_[1]"},
   'qr' => sub{qr/@{[quotemeta($_[0]->value)]}/},
+  '~~' => 'explain',
+  fallback => 1,
 );
 
 my $sep = qr/'|__|::|\\|\//;
@@ -193,7 +198,11 @@ This package integrates behaviors from:
 
 L<Venus::Role::Accessible>
 
+L<Venus::Role::Buildable>
+
 L<Venus::Role::Explainable>
+
+L<Venus::Role::Valuable>
 
 =cut
 
@@ -586,6 +595,38 @@ B<example 1>
   # given: synopsis;
 
   "Foo/Bar" =~ qr/$name/;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<("")>
+
+This package overloads the C<""> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = "$name";
+
+  # "Foo/Bar"
+
+=back
+
+=over 4
+
+=item operation: C<(~~)>
+
+This package overloads the C<~~> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $name ~~ 'Foo/Bar';
 
   # 1
 

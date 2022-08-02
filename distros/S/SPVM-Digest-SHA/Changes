@@ -1,3 +1,9 @@
+0.02 2022-08-01
+  [Internal Ineffective Changes]
+    * Use get_field_object_by_name_v2 in SPVM/Digest/SHA.c
+    * Use set_field_object_by_name_v2 in SPVM/Digest/SHA.c
+  [Pre Requirement Changes]
+    * SPVM 0.9632 is needed.
 0.01 2022-07-14
   [Changes]
     * First release.

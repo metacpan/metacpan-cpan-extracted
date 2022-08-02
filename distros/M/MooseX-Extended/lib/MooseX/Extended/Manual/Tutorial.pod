@@ -13,7 +13,7 @@ MooseX::Extended::Manual::Tutorial - Building a Better Moose
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 GENESIS
 
@@ -272,7 +272,9 @@ I<optionally> be passed to the constructor, just use C<< required => 0 >>.
 Note that C<param>, like C<field>, defaults to read-only, C<< is => 'ro' >>.
 You can override this:
 
-    param name => ( is => 'rw', isa => NonEmptyStr );
+    param name => ( is => 'rw',  isa => NonEmptyStr );
+    # or
+    param name => ( is => 'rwp', isa => NonEmptyStr ); # adds _set_name
 
 Otherwise, it behaves like C<has>. You can pass in any arguments that C<has>
 accepts.
@@ -280,6 +282,9 @@ accepts.
     # we'll make it private, but allow it to be passed to the constructor
     # as `name`
     param _name   => ( isa => NonEmptyStr, init_arg => 'name' );
+
+The C<param>'s C<is> option accepts C<rwp>, like Moo. It will create a writer
+in the name C<< _set_${attribute_name| >>.
 
 =head2 C<field>
 
@@ -304,10 +309,15 @@ The above C<field> definition is equivalent to:
 Note that C<field>, like C<param>, defaults to read-only, C<< is => 'ro' >>.
 You can override this:
 
-    field some_data => ( is => 'rw', isa => NonEmptyStr );
+    field some_data => ( is => 'rw',  isa => NonEmptyStr );
+    #
+    field some_data => ( is => 'rwp', isa => NonEmptyStr ); # adds _set_some_data
 
 Otherwise, it behaves like C<has>. You can pass in any arguments that C<has>
 accepts.
+
+The C<field>'s C<is> option accepts C<rwp>, like Moo. It will create a writer
+in the name C<< _set_${attribute_name| >>.
 
 If you pass C<field> an C<init_arg> with a defined value, the code
 will usually throw a L<Moose::Exception::InvalidAttributeDefinition>
@@ -580,7 +590,7 @@ you can start deleting various bits of boilerplate in your code (such as the
 C<make_immutable> call).
 
 Unfortunately, many Moose hierarchies are not clean. You might fail on the
-C<StrictConstructor>, of find that you use multiple inheritance and rely on
+C<StrictConstructor>, or find that you use multiple inheritance and rely on
 dfs (depth-first search) instead of the C3 mro, or maybe (horrors!), you have
 classes that aren't declared as immutable and you have code that relies on
 this. A brute-force approach to handling this could be the following:

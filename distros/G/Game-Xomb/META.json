@@ -54,7 +54,7 @@
    "provides" : {
       "Game::Xomb" : {
          "file" : "lib/Game/Xomb.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       }
    },
    "release_status" : "stable",
@@ -66,6 +66,6 @@
          "url" : "https://github.com/thrig/Game-Xomb"
       }
    },
-   "version" : "1.03",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "1.04",
+   "x_serialization_backend" : "JSON::PP version 4.10"
 }

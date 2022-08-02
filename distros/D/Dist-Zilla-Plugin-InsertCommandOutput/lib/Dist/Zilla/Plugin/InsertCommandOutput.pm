@@ -1,10 +1,5 @@
 package Dist::Zilla::Plugin::InsertCommandOutput;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-07'; # DATE
-our $DIST = 'Dist-Zilla-Plugin-InsertCommandOutput'; # DIST
-our $VERSION = '0.055'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -19,9 +14,16 @@ with (
     },
 );
 
-has make_verbatim => (is => 'rw', default => sub{1});
+has make_verbatim => (is => 'rw', default => sub{1}); # DEPRECATED
+
+has indent => (is => 'rw', default => sub{1});
 
 use namespace::autoclean;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-06-10'; # DATE
+our $DIST = 'Dist-Zilla-Plugin-InsertCommandOutput'; # DIST
+our $VERSION = '0.056'; # VERSION
 
 sub munge_files {
     my $self = shift;
@@ -52,7 +54,9 @@ sub _command_output {
         die "Command '$cmd' failed: " . explain_child_error();
     }
 
-    $res =~ s/^/ /gm if $self->make_verbatim;
+    my $indent = " " x $self->indent;
+
+    $res =~ s/^/$indent/gm if $self->make_verbatim;
     $res;
 }
 
@@ -72,14 +76,14 @@ Dist::Zilla::Plugin::InsertCommandOutput - Insert the output of command into you
 
 =head1 VERSION
 
-This document describes version 0.055 of Dist::Zilla::Plugin::InsertCommandOutput (from Perl distribution Dist-Zilla-Plugin-InsertCommandOutput), released on 2021-06-07.
+This document describes version 0.056 of Dist::Zilla::Plugin::InsertCommandOutput (from Perl distribution Dist-Zilla-Plugin-InsertCommandOutput), released on 2022-06-10.
 
 =head1 SYNOPSIS
 
 In dist.ini:
 
  [InsertCommandOutput]
- ;make_verbatim=1
+ ;indent=4
 
 In your POD:
 
@@ -94,11 +98,12 @@ inserted as-is). If command fails (C<$?> is non-zero), build will be aborted.
 
 =for Pod::Coverage .+
 
-=head1 CONTRIBUTOR
+=head1 CONFIGURATION
 
-=for stopwords perlancar (@netbook-zenbook)
+=head2 indent
 
-perlancar (@netbook-zenbook) <perlancar@gmail.com>
+Uint. Default: 1. Number of spaces to indent each line of output with. Can be
+set to 0 to not indent at all.
 
 =head1 HOMEPAGE
 
@@ -107,14 +112,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Dist-Zilla
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Dist-Zilla-Plugin-InsertCommandOutput>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-InsertCommandOutput>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -131,11 +128,36 @@ L<Dist::Zilla::Plugin::InsertExample>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2019, 2018, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2019, 2018, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-InsertCommandOutput>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

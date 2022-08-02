@@ -4,8 +4,9 @@ author:
   - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
 build_requires:
   Test::More: '0.88'
+  URI: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,11 +19,12 @@ no_index:
 requires:
   Catalyst: '5.90090'
   URI::Encode::XS: '0.11'
+  mro: '0'
   perl: '5.008005'
 resources:
   bugtracker: https://github.com/ap/Catalyst-Plugin-CachedUriForAction/issues
   repository: git://github.com/ap/Catalyst-Plugin-CachedUriForAction.git
-version: '1.000'
+version: '1.001'
 x_copyright:
   holder: 'Aristotle Pagaltzis'
   year: 2021

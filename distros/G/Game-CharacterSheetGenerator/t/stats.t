@@ -33,7 +33,7 @@ $t->get_ok('/stats/de/100')
 
 $t->get_ok('/stats')
     ->status_is(302)
-    ->header_is(Location => '/stats/en/1000');
+    ->header_is(Location => '/stats/en/100');
 
 $t->get_ok('/stats/100')
     ->status_is(302)
@@ -41,6 +41,6 @@ $t->get_ok('/stats/100')
 
 $t->get_ok('/stats/de')
     ->status_is(302)
-    ->header_is(Location => '/stats/de/1000');
+    ->header_is(Location => '/stats/de/100');
 
 done_testing();

@@ -2,7 +2,7 @@ NAME
     HTTP::Tiny - A small, simple, correct HTTP/1.1 client
 
 VERSION
-    version 0.080
+    version 0.082
 
 SYNOPSIS
         use HTTP::Tiny;
@@ -226,6 +226,10 @@ METHODS
     be the in-progress response hash reference, as described below. (This
     allows customizing the action of the callback based on the "status" or
     "headers" received prior to the content body.)
+
+    Content data in the request/response is handled as "raw bytes". Any
+    encoding/decoding (with associated headers) are the responsibility of
+    the caller.
 
     The "request" method returns a hashref containing the response. The
     hashref will have the following keys:
@@ -539,6 +543,8 @@ CONTRIBUTORS
 
     *   Felipe Gasper <felipe@felipegasper.com>
 
+    *   Graham Knop <haarg@haarg.org>
+
     *   Greg Kennedy <kennedy.greg@gmail.com>
 
     *   James E Keenan <jkeenan@cpan.org>
@@ -594,7 +600,7 @@ CONTRIBUTORS
     *   Xavier Guimard <yadd@debian.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021 by Christian Hansen.
+    This software is copyright (c) 2022 by Christian Hansen.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

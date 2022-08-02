@@ -16,7 +16,7 @@ our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
 );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use C::Tokenize '$comment_re';
 use File::Slurper qw!read_text write_text!;
@@ -78,6 +78,7 @@ sub tidy_css
     $text =~ s!(\{|\}|;)(\s*\S)!$1\n$2!g;
     $text =~ s!(\S\s*)(\})!$1\n$2!g;
     $text =~ s!(\S)(\{)!$1 $2!g;
+    $text =~ s!(\S*)(\})!$1\n$2!g;
 
     my @lines = split /\n/, $text;
 
@@ -111,7 +112,7 @@ sub tidy_css
 	    push @tidy, "$indent$after";
 	    next;
 	}
-	if (/\}/) {
+	while (/\}/g) {
 	    $depth--;
 	    if ($depth < 0) {
 		warn "$i: depth = $depth\n";
@@ -127,7 +128,7 @@ sub tidy_css
 	# If not a CSS pseudoclass or pseudoelement
 	if (! /(?:\.|#)\w+.*?:/ && ! /^\s*:+/) {
 	    # Insert a space after a colon
-	    s/([^:]):(\S)/$1: $2/;
+	    s/([^:]):([^:\s])/$1: $2/;
 	}
 	s/\s+$//;
 	push @tidy, $_;

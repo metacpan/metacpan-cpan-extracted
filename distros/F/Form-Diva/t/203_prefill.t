@@ -19,7 +19,7 @@ sub Tester {
     elsif ( $testType eq 'unlike'){
         unlike( $generated->[ $row ]{ input },
             qr/$input/, "$comment  -- $input");}
-    else { fail( "Ivalid testType $testType provided for test: $comment") }    
+    else { fail( "Ivalid testType $testType provided for test: $comment") }
 }
 
 my $diva1 = Form::Diva->new(
@@ -28,10 +28,10 @@ my $diva1 = Form::Diva->new(
     form_name => 'diva1',
     form        => [
         { n => 'name', t => 'text', p => 'Your Name', l => 'Full Name' },
-        { name => 'phone', type => 'tel', extra => 'required', 
+        { name => 'phone', type => 'tel', extra => 'required',
             comment => 'phoney phooey', default => 'say Hello' },
         {qw / n email t email l Email c form-email placeholder doormat/},
-        { name => 'our_id', type => 'number', 
+        { name => 'our_id', type => 'number',
                 extra => 'disabled', placeholder => 11 },
         {  name => 'onemore', default => 'old college try' },
         {   name    => 'checktest',
@@ -59,47 +59,49 @@ my $data2 = {
 # need to create series of tests, several iterations of prefill and then do a plain generate to
 # confirm original default/placholder still exist.
 my @results1 = (
-    {   row => 0 ,  input => q|value="spaghetti"|, 
+    {   row => 0 ,  input => q|value="spaghetti"|,
         comment => 'prefilled name with value spaghetti is set'},
-    {   row => 1 ,  input => q|value="say Hello"|, 
-        comment => 'prefilled with no value for phone gets default'},    
-    {   row => 2 ,    input => q|value="dinner\@food.food"|, 
-        comment => 'prefilled email with value dinner@food.food is set'},   
-    {   row => 3 ,  input => q|value=""|,  
+    {   row => 0 ,  input => q|placeholder="Your Name"|,
+        comment => 'prefilled name with value gets placeholder of "Your Name"'},
+    {   row => 1 ,  input => q|value="say Hello"|,
+        comment => 'prefilled with no value for phone gets default'},
+    {   row => 2 ,    input => q|value="dinner\@food.food"|,
+        comment => 'prefilled email with value dinner@food.food is set'},
+    {   row => 3 ,  input => q|value=""|,
         comment => 'prefilled our_id with no value gets no value'},
-    {   row => 3 ,  input => q|placeholder="11"|, 
-        comment => 'prefilled our_id with no value gets placeholder of 11'},    
-    {   row => 4 ,    input => q|value="old college try"|, 
-        comment => 'prefilled with no value for onemore gets default'},            
+    {   row => 3 ,  input => q|placeholder="11"|,
+        comment => 'prefilled our_id with no value gets placeholder of 11'},
+    {   row => 4 ,    input => q|value="old college try"|,
+        comment => 'prefilled with no value for onemore gets default'},
     {   row => 5 ,    input => q|checked="checked">French|, testType => 'like',
-        comment => 'checkbox has selected French'},         
+        comment => 'checkbox has selected French'},
     {   row => 5 ,    input => q|"checked">Argentinian|, testType => 'unlike',
-        comment => 'confirm that another item is not checked'},              
+        comment => 'confirm that another item is not checked'},
 );
 
 my @results2 = (
-    {   row => 0 ,  input => q|value="Coffee"|, 
+    {   row => 0 ,  input => q|value="Coffee"|,
         comment => 'prefilled name with value Coffee is set'},
-    {   row => 1 ,  input => q|value="say Hello"|, 
-        comment => 'prefilled with no value for phone gets default'},    
-    {   row => 2 ,    input => q|placeholder="doormat"|, 
-        comment => 'doormat is the placeholder (default) for email'},   
-    {   row => 3 ,  input => q|value=""|,  
+    {   row => 1 ,  input => q|value="say Hello"|,
+        comment => 'prefilled with no value for phone gets default'},
+    {   row => 2 ,    input => q|placeholder="doormat"|,
+        comment => 'doormat is the placeholder (default) for email'},
+    {   row => 3 ,  input => q|value=""|,
         comment => 'prefilled our_id with no value gets no value'},
-    {   row => 3 ,  input => q|placeholder="11"|, 
-        comment => 'prefilled our_id with no value gets placeholder of 11'},    
-    {   row => 4 ,    input => q|value="old college try"|, 
-        comment => 'prefilled with no value for onemore gets default'},            
+    {   row => 3 ,  input => q|placeholder="11"|,
+        comment => 'prefilled our_id with no value gets placeholder of 11'},
+    {   row => 4 ,    input => q|value="old college try"|,
+        comment => 'prefilled with no value for onemore gets default'},
     {   row => 5 ,    input => q|checked="checked">Irish|, testType => 'like',
-        comment => 'checkbox has selected Irish'},         
+        comment => 'checkbox has selected Irish'},
     {   row => 5 ,    input => q|"checked">Argentinian|, testType => 'unlike',
-        comment => 'confirm that another item is not checked'},              
+        comment => 'confirm that another item is not checked'},
 );
 
 my $nodatagenerate = $diva1->generate ;
 my $nodataprefill = $diva1->prefill ;
 
-is_deeply( $nodataprefill, $nodatagenerate, 
+is_deeply( $nodataprefill, $nodatagenerate,
     "With no data prefill and generate return the same" );
 
 my $data_prefill_1 = $diva1->prefill( $data1 );
@@ -109,7 +111,8 @@ my $data_prefill_2 = $diva1->prefill( $data2 );
 foreach my $test ( @results2) { Tester( $data_prefill_2, $test ) }
 
 my $post_generate = $diva1->generate ;
-is_deeply( $post_generate, $nodatagenerate, 
+is_deeply( $post_generate, $nodatagenerate,
     "Generate without Data returns the same after prefill was used as it did before." );
 
 done_testing();
+

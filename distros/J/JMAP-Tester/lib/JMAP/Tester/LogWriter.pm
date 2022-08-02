@@ -1,4 +1,4 @@
-package JMAP::Tester::LogWriter 0.101;
+package JMAP::Tester::LogWriter 0.102;
 
 use Moo::Role;
 
@@ -7,7 +7,7 @@ requires 'write';
 use namespace::clean;
 
 {
-  package JMAP::Tester::LogWriter::Code 0.101;
+  package JMAP::Tester::LogWriter::Code 0.102;
 
   use Moo;
   use namespace::clean;
@@ -17,7 +17,7 @@ use namespace::clean;
 }
 
 {
-  package JMAP::Tester::LogWriter::Handle 0.101;
+  package JMAP::Tester::LogWriter::Handle 0.102;
 
   use Moo;
   use namespace::clean;
@@ -27,7 +27,7 @@ use namespace::clean;
 }
 
 {
-  package JMAP::Tester::LogWriter::Filename 0.101;
+  package JMAP::Tester::LogWriter::Filename 0.102;
 
   use Moo;
   use namespace::clean;
@@ -71,7 +71,7 @@ JMAP::Tester::LogWriter
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 AUTHOR
 

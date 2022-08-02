@@ -3,9 +3,9 @@ package Sah::Schema::latin_alphanum;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-05'; # DATE
+our $DATE = '2022-06-09'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 our $schema = [str => {
     summary => 'String containing only zero or more Latin letters/digits, i.e. A-Za-z0-9',
@@ -34,9 +34,19 @@ Sah::Schema::latin_alphanum - String containing only zero or more Latin letters/
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::Schema::latin_alphanum (from Perl distribution Sah-Schemas-Str), released on 2022-06-05.
+This document describes version 0.008 of Sah::Schema::latin_alphanum (from Perl distribution Sah-Schemas-Str), released on 2022-06-09.
 
 =head1 SYNOPSIS
+
+=head2 Sample data and validation results against this schema
+
+ ""  # valid
+
+ "A019"  # valid
+
+ "foo bar"  # INVALID
+
+=head2 Using with Data::Sah
 
 To check data against this schema (requires L<Data::Sah>):
 
@@ -44,10 +54,44 @@ To check data against this schema (requires L<Data::Sah>):
  my $validator = gen_validator("latin_alphanum*");
  say $validator->($data) ? "valid" : "INVALID!";
 
- # Data::Sah can also create validator that returns nice error message string
- # and/or coerced value. Data::Sah can even create validator that targets other
- # language, like JavaScript. All from the same schema. See its documentation
- # for more details.
+The above schema returns a boolean result (true if data is valid, false if
+otherwise). To return an error message string instead (empty string if data is
+valid, a non-empty error message otherwise):
+
+ my $validator = gen_validator("latin_alphanum", {return_type=>'str_errmsg'});
+ my $errmsg = $validator->($data);
+ 
+ # a sample valid data
+ $data = "";
+ my $errmsg = $validator->($data); # => ""
+ 
+ # a sample invalid data
+ $data = "foo bar";
+ my $errmsg = $validator->($data); # => "Must match regex pattern qr(\\A[A-Za-z0-9]*\\z)"
+
+Often a schema has coercion rule or default value, so after validation the
+validated value is different. To return the validated (set-as-default, coerced,
+prefiltered) value:
+
+ my $validator = gen_validator("latin_alphanum", {return_type=>'str_errmsg+val'});
+ my $res = $validator->($data); # [$errmsg, $validated_val]
+ 
+ # a sample valid data
+ $data = "";
+ my $res = $validator->($data); # => ["",""]
+ 
+ # a sample invalid data
+ $data = "foo bar";
+ my $res = $validator->($data); # => ["Must match regex pattern qr(\\A[A-Za-z0-9]*\\z)","foo bar"]
+
+Data::Sah can also create validator that returns a hash of detailed error
+message. Data::Sah can even create validator that targets other language, like
+JavaScript, from the same schema. Other things Data::Sah can do: show source
+code for validator, generate a validator code with debug comments and/or log
+statements, generate human text from schema. See its documentation for more
+details.
+
+=head2 Using with Params::Sah
 
 To validate function parameters against this schema (requires L<Params::Sah>):
 
@@ -60,11 +104,14 @@ To validate function parameters against this schema (requires L<Params::Sah>):
      ...
  }
 
+=head2 Using with Perinci::CmdLine::Lite
+
 To specify schema in L<Rinci> function metadata and use the metadata with
-L<Perinci::CmdLine> to create a CLI:
+L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
 
  # in lib/MyApp.pm
- package MyApp;
+ package
+   MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
      v => 1.1,
@@ -84,9 +131,10 @@ L<Perinci::CmdLine> to create a CLI:
  1;
 
  # in myapp.pl
- package main;
+ package
+   main;
  use Perinci::CmdLine::Any;
- Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+ Perinci::CmdLine::Any->new(url=>'/MyApp/myfunc')->run;
 
  # in command-line
  % ./myapp.pl --help
@@ -96,14 +144,6 @@ L<Perinci::CmdLine> to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
-
-Sample data:
-
- ""  # valid
-
- "A019"  # valid
-
- "foo bar"  # INVALID
 
 =head1 HOMEPAGE
 

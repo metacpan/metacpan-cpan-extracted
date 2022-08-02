@@ -1,0 +1,13 @@
+Revision history for Perl module Storable::Improved
+
+v0.1.3 2022-07-25T11:13:47+0900
+    - Minor documentation correction
+
+v0.1.2 2022-07-24T18:25:01Z +0900
+    - Minor correction in test units for blead and other future versions of Storable.
+
+v0.1.1 2022-07-24T06:44:13Z +0900
+    - Corrected minor documentation typos.
+
+v0.1.0 2022-07-24T13:00:00Z +0900
+    - Initial version

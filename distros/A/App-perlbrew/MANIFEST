@@ -27,6 +27,7 @@ t/08.error_available.t
 t/08.error_install.t
 t/08.error_install_blead.t
 t/08.error_install_cpanm.t
+t/08.error_install_cpm.t
 t/09.exit_status.t
 t/10.resolve.t
 t/11.editdist.t
@@ -55,6 +56,7 @@ t/command-exec.t
 t/command-help.t
 t/command-info.t
 t/command-install-cpanm.t
+t/command-install-cpm.t
 t/command-install-from-archive.t
 t/command-install-patchperl.t
 t/command-install.t
@@ -63,7 +65,12 @@ t/command-list.t
 t/current_perl.t
 t/current_shell.t
 t/do_system.t
+t/error-http_download-exec-error.t
+t/error-http_download-exit-nonzero.t
+t/error-http_download-param-validation.t
+t/error-install-before-init.t
 t/failure-command-install-cpanm.t
+t/failure-command-install-cpm.t
 t/failure-command-install-patchperl.t
 t/fake-bin/curl
 t/home.t

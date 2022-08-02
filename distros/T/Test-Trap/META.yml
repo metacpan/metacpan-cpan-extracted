@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,19 +15,19 @@ name: Test-Trap
 provides:
   Test::Trap:
     file: lib/Test/Trap.pm
-    version: v0.3.4
+    version: v0.3.5
   Test::Trap::Builder:
     file: lib/Test/Trap/Builder.pm
-    version: v0.3.4
+    version: v0.3.5
   Test::Trap::Builder::PerlIO:
     file: lib/Test/Trap/Builder/PerlIO.pm
-    version: v0.3.4
+    version: v0.3.5
   Test::Trap::Builder::SystemSafe:
     file: lib/Test/Trap/Builder/SystemSafe.pm
-    version: v0.3.4
+    version: v0.3.5
   Test::Trap::Builder::TempFile:
     file: lib/Test/Trap/Builder/TempFile.pm
-    version: v0.3.4
+    version: v0.3.5
 requires:
   Carp: '0'
   Config: '0'
@@ -47,5 +47,5 @@ requires:
   warnings: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: v0.3.4
+version: v0.3.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

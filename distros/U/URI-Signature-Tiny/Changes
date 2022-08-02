@@ -1,5 +1,8 @@
 Release history for URI-Signature-Tiny
 
+1.004 Thu 21 Jul 2022
+	- No uninitialized warnings for undef signatures
+
 1.003 Sat 11 Sep 2021
 	- Changelog fix
 	- No functional changes

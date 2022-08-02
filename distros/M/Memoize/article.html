@@ -1,13 +1,12 @@
 <HTML>
 <HEAD>
 <TITLE>Bricolage: Memoization</TITLE>
-<LINK REV="made" HREF="mailto:mjd-perl-tpj@plover.com">
-<BASE HREF="http://perl.plover.com/MiniMemoize/memoize.html">
+<BASE HREF="https://perl.plover.com/MiniMemoize/memoize.html">
 </HEAD>
 
 <BODY BGCOLOR=white>
 
-<p align=right><font size=-1>&copy; Copyright 1999 The Perl Journal.  Reprinted with permission.</font></p>
+<p style="float: right"><small>&copy; Copyright 1999 The Perl Journal.  Reprinted with permission.</small></p>
 	
 <!-- INDEX BEGIN -->
 
@@ -39,7 +38,6 @@
 <P>
 <H1><A NAME="I_Bricolage_Memoization"><EM>Bricolage</EM>: Memoization</A></H1>
 <P>
-<img src="../pics/medium-sigils.gif" align=left>
 <EM>Caching</EM> is a useful general technique that sometimes makes programs run faster. It
 does this by exchanging space for time: Caching tries to save previously
 computed results in an attempt to reuse them later rather than recomputing
@@ -783,7 +781,7 @@ return undef. Here's the code:
 <PRE>    # Nope.
     return undef;
   }
-    
+
 </PRE>
 <P>
 Now let's ask it if it can find a way to split the elements of
@@ -901,7 +899,7 @@ Suppose that <CODE>iota()</CODE> is memoized, and the caller does something like
         $i10 = iota(10);
         $j10 = iota(10);
 </PRE>
-        
+
 <TT>$i10</TT> and <TT>$j10</TT> look like they're both arrays containing the
 numbers from 1 to 10.  But they're not really; they're both references
 to the same array!  If <TT>iota()</TT> hadn't been memoized, they would be
@@ -943,25 +941,11 @@ Intelligence</EM>, Monterrey, Mexico, September 1993.
 218--219. 
 
 <P>
-The <TT>Memoize</TT> module is available from CPAN, and also from <A
-HREF="http://www.plover.com/~mjd/perl/Memoize/.">http://www.plover.com/~mjd/perl/Memoize/.</A>
+The <TT>Memoize</TT> module is available from CPAN.
 The source code for the
 <TT>MiniMemoize</TT> module, and the other programs described in this article, is available from
 <A HREF="http://www.tpj.com/">http://www.tpj.com/</A> and from <A
-HREF="http://www.plover.com/~mjd/perl/MiniMemoize/">http://www.plover.com/~mjd/perl/MiniMemoize/.</A>
-
-<HR>
-
-<img src="../pics/small-sigils.gif" align=right>
-<p>Return to: 
-<a href="http://www.plover.com/~mjd/">Universe of Discourse main page</a> |
-<a href="http://www.plover.com/~mjd/whatsnew.html">What's new page</a> |
-<a href="../">Perl Paraphernalia</a>|
-<a href="../Memoize/"><tt>Memoize.pm</tt> Page</a>|
-<a href="./">Memoization Page</a>
-</p>
-
-<p><a href="mailto:mjd-tpj-memoize+@plover.com">mjd-tpj-memoize+@plover.com</a></p>
+HREF="https://perl.plover.com/MiniMemoize/">https://perl.plover.com/MiniMemoize/.</A>
 
 </BODY>
 

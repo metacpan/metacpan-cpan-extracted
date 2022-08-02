@@ -15,8 +15,8 @@ use Getopt::Long;
 use Pod::Usage;
 use Time::HiRes qw(time);
 
-die "This program requires CWB version 3.4.15 or newer (you have $CWB::Config::VersionString)\n"
-  unless $CWB::CWBVersion >= 3.004_015;
+die "This program requires CWB version 3.5.0 or newer (you have $CWB::Config::VersionString)\n"
+  unless $CWB::CWBVersion >= 3.005_000;
 
 ## configuration variables and arguments
 our $Opt_Registry = undef;      # -r <dir> ... search source corpus in registry <dir>
@@ -376,7 +376,7 @@ Display short help page.
 
 =head1 PREREQUISITES
 
-B<cwb-make-subcorpus> requires a recent version of CWB with special support in the B<cwb-encode> utility, viz. B<CWB v3.4.15> or newer. If you have installed multiple CWB releases on your computer, make sure that the CWB/Perl modules are configured to use an appropriate CWB version.
+B<cwb-make-subcorpus> requires a recent version of CWB with special support in the B<cwb-encode> utility, viz. B<CWB v3.5.0> or newer. If you have installed multiple CWB releases on your computer, make sure that the CWB/Perl modules are configured to use an appropriate CWB version.
 
 For efficiency reasons, character encodings are converted with the external B<iconv> utility, which must be installed somewhere in the system path. Your version of B<iconv> must support command line options C<-f> (source encoding), C<-t> (target encoding) and C<-c> (ignore conversion errors); it also needs to understand CWB style encoding names such as C<utf8> and C<latin1>. Suitable versions of B<iconv> are provided e.g. by Linux and Mac OS X.
 

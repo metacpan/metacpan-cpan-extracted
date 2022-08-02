@@ -13,7 +13,7 @@ Form::Diva - Generate HTML5 form label and input fields
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 DESCRIPTION
 
@@ -23,7 +23,7 @@ uglier Perl Code in your Controller.
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 USAGE
 
@@ -277,7 +277,13 @@ Form::Diva is meant to be used with a Templating System. L<Template::Toolkit> is
 
 =head1 AUTHOR
 
-John Karr, C<brainbuz at brainbuz.org>
+John Karr L<BRAINBUZ|https://metacpan.org/author/BRAINBUZ>
+
+=head2 CONTRIBUTORS
+
+Bartosz Jarzyna L<BRTASTIC|https://metacpan.org/author/BRTASTIC>
+
+Mohammad S Anwar L<MANWAR|https://metacpan.org/author/MANWAR>
 
 =head1 BUGS
 

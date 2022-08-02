@@ -50,7 +50,7 @@ sub dependencies {
 sub init {
   my $self = shift;
   return $self if -r $self->config;
-  $self->_run(qw(init -y));
+  $self->_run($self->binary eq 'pnpm' ? qw(init) : qw(init -y));
   croak "$self->{basename} init failed: @{[$self->config]} was not generated." unless -r $self->config;
   return $self;
 }
@@ -58,6 +58,9 @@ sub init {
 sub install {
   my ($self, $name, $info) = @_;
   croak "Can't install packages without package.json" unless -w $self->config;
+
+  # Make sure npm can install devDependencies and dependency
+  local $self->{mode} = '';
 
   # Install everything
   do { $self->_run('install'); return $self } unless $name;

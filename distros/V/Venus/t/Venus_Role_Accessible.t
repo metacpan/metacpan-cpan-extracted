@@ -49,11 +49,12 @@ $test->for('includes');
 
   use Venus::Class;
 
+  with 'Venus::Role::Valuable';
   with 'Venus::Role::Accessible';
 
   package main;
 
-  my $example = Example->new('hello, there');
+  my $example = Example->new(value => 'hello, there');
 
 =cut
 
@@ -73,15 +74,6 @@ as well as C<get> and C<set> methods for modifying the value.
 =cut
 
 $test->for('description');
-
-=integrates
-
-Venus::Role::Buildable
-Venus::Role::Valuable
-
-=cut
-
-$test->for('integrates');
 
 =method get
 

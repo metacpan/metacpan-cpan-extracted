@@ -4,9 +4,9 @@ author:
   - 'Ingy döt Net <ingy@cpan.org>'
 build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,15 +14,19 @@ meta-spec:
 name: File-Share
 no_index:
   directory:
+    - example
     - inc
     - t
     - xt
-    - example
 requires:
   File::ShareDir: '1.03'
+  Readonly: '2.05'
   perl: v5.8.1
 resources:
   bugtracker: https://github.com/ingydotnet/file-share-pm/issues
   homepage: https://github.com/ingydotnet/file-share-pm
   repository: https://github.com/ingydotnet/file-share-pm.git
-version: '0.25'
+version: '0.27'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

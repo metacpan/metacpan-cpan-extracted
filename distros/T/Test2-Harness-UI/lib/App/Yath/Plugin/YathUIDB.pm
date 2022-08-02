@@ -2,7 +2,7 @@ package App::Yath::Plugin::YathUIDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000120';
+our $VERSION = '0.000124';
 
 use Test2::Harness::UI::Util qw/config_from_settings/;
 use Test2::Harness::Util::JSON qw/decode_json/;
@@ -166,6 +166,12 @@ option_group {prefix => 'yathui-db', category => "YathUI Options"} => sub {
         default => 0,
     );
 
+    option duration_limit => (
+        type => 's',
+        description => 'Limit the number of runs to look at for durations data (default: 10)',
+        default => 25,
+    );
+
     option publisher => (
         type => 's',
         description => 'When using coverage or duration data, only use data uploaded by this user',
@@ -299,10 +305,11 @@ sub duration_data {
     my $pname   = $settings->yathui->project                            or die "yathui-project is required.\n";
     my $project = $schema->resultset('Project')->find({name => $pname}) or die "Invalid project '$pname'.\n";
 
-    my %args = (user => $ydb->publisher);
+    my %args = (user => $ydb->publisher, limit => $ydb->duration_limit);
     if (my $yui = $settings->prefix('yathui')) {
         $args{short}  = $yui->medium_duration;
         $args{medium} = $yui->long_duration;
+
         # TODO
         #$args{median} = $yui->median_durations;
     }

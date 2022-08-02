@@ -56,7 +56,9 @@ else {
   );
 } ## end else [ if ( $ENV{AMAZON_S3_CREDENTIALS...})]
 
-my $bucketname = sprintf '/net-amazon-s3-test-%s', lc $aws_access_key_id;
+my $bucketname_raw = sprintf 'net-amazon-s3-test-%s', lc $aws_access_key_id;
+
+my $bucketname = '/' . $bucketname_raw;
 
 my $bucket_obj = eval { $s3->add_bucket( { bucket => $bucketname } ); };
 
@@ -70,11 +72,8 @@ is( ref $bucket_obj, 'Amazon::S3::Bucket', 'created bucket' . $bucketname )
 my $response = $bucket_obj->list
   or BAIL_OUT( $s3->err . ": " . $s3->errstr );
 
-is(
-  $response->{bucket},
-  $bucketname =~ s/^\///r,
-  'no bucket name is list response'
-) or BAIL_OUT( Dumper [$response] );
+is( $response->{bucket}, $bucketname_raw, 'no bucket name is list response' )
+  or BAIL_OUT( Dumper [$response] );
 
 ok( !$response->{prefix}, 'no prefix in list response' );
 ok( !$response->{marker}, 'no marker in list response' );
@@ -137,7 +136,7 @@ subtest 'list' => sub {
       BAIL_OUT( $s3->err . ": " . $s3->errstr );
     } ## end if ( !$response )
 
-    is( $response->{bucket}, $bucketname =~ s/^\///r, 'no bucket name' );
+    is( $response->{bucket}, $bucketname_raw, 'no bucket name' );
 
     ok( !$response->{prefix}, 'no prefix' )
       or diag( Dumper [$response] );
@@ -176,7 +175,7 @@ subtest 'list-v2' => sub {
       BAIL_OUT( $s3->err . ": " . $s3->errstr );
     } ## end if ( !$response )
 
-    is( $response->{bucket}, $bucketname =~ s/^\///r, 'no bucket name' );
+    is( $response->{bucket}, $bucketname_raw, 'no bucket name' );
 
     ok( !$response->{prefix}, 'no prefix' )
       or diag( Dumper [$response] );

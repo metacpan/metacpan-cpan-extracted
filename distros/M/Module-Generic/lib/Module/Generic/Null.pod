@@ -130,6 +130,20 @@ This can be any of (case do not actually matter): C<ARRAY>, C<BOOLEAN>, C<CODE>,
 
 =back
 
+=head1 SERIALISATION
+
+=for Pod::Coverage FREEZE
+
+=for Pod::Coverage STORABLE_freeze
+
+=for Pod::Coverage STORABLE_thaw
+
+=for Pod::Coverage THAW
+
+=for Pod::Coverage TO_JSON
+
+Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
+
 =head2 CREDITS
 
 Based on an original idea from L<Brian D. Foy|https://stackoverflow.com/users/2766176/brian-d-foy> discussed on L<StackOverflow|https://stackoverflow.com/a/7068271/4814971> and also on L<Perl Monks|https://www.perlmonks.org/?node_id=265214>

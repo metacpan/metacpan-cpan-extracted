@@ -1,6 +1,6 @@
 package Test::Trap::Builder::PerlIO;
 
-use version; $VERSION = qv('0.3.4');
+use version; $VERSION = qv('0.3.5');
 
 use strict;
 use warnings;
@@ -30,7 +30,7 @@ Test::Trap::Builder::PerlIO - Capture strategy using PerlIO::scalar
 
 =head1 VERSION
 
-Version 0.3.4
+Version 0.3.5
 
 =head1 DESCRIPTION
 

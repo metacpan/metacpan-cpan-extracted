@@ -28,9 +28,11 @@ sub ATTR {
   no warnings 'redefine';
 
   *{"@{[$self->NAME]}::$attr"}
-    = sub { local @_ = ($_[0], $attr, @_[1 .. $#_]); goto \&attr };
+    = sub { @_ = ($_[0], $attr, @_[1 .. $#_]); goto \&attr };
 
-  $${"@{[$self->NAME]}::META"}{ATTR}{$attr} = [$attr, @args];
+  my $index = int(keys(%{$${"@{[$self->NAME]}::META"}{ATTR}})) + 1;
+
+  $${"@{[$self->NAME]}::META"}{ATTR}{$attr} = [$index, [$attr, @args]];
 
   return $self;
 }
@@ -42,7 +44,7 @@ sub AUDIT {
 }
 
 sub BASE {
-  my ($self, $base) = @_;
+  my ($self, $base, @args) = @_;
 
   no strict 'refs';
 
@@ -52,7 +54,9 @@ sub BASE {
     $base, (grep +($_ ne $base), @{"@{[$self->NAME]}::ISA"})
   );
 
-  $${"@{[$self->NAME]}::META"}{BASE}{$base} = [$base];
+  my $index = int(keys(%{$${"@{[$self->NAME]}::META"}{BASE}})) + 1;
+
+  $${"@{[$self->NAME]}::META"}{BASE}{$base} = [$index, [$base, @args]];
 
   return $self;
 }
@@ -61,7 +65,12 @@ sub BLESS {
   my ($self, @args) = @_;
 
   my $data = $self->ARGS($self->BUILDARGS(@args));
-  my $anew = bless($data, $self->NAME);
+  my $anew = bless(
+    (
+      ref $data eq 'HASH' ? {%$data} : (ref $data eq 'ARRAY' ? [@$data] : $data)
+    ),
+    $self->NAME
+  );
 
   $anew->BUILD($data);
 
@@ -139,7 +148,7 @@ sub NAME {
 }
 
 sub ROLE {
-  my ($self, $role) = @_;
+  my ($self, $role, @args) = @_;
 
   eval "require $role" if !$$cache{$role};
 
@@ -149,7 +158,9 @@ sub ROLE {
 
   no strict 'refs';
 
-  $${"@{[$self->NAME]}::META"}{ROLE}{$role} = [$role];
+  my $index = int(keys(%{$${"@{[$self->NAME]}::META"}{ROLE}})) + 1;
+
+  $${"@{[$self->NAME]}::META"}{ROLE}{$role} = [$index, [$role, @args]];
 
   return $self;
 }
@@ -178,7 +189,7 @@ sub TEST {
 sub attr {
   my ($self, $name, @args) = @_;
 
-  return $self if !$name;
+  return undef if !$name;
   return $self->{$name} if !int@args;
   return $self->{$name} = $args[0];
 }
@@ -222,7 +233,7 @@ Kind Base Class for Perl 5
 
 =head1 DESCRIPTION
 
-This package provides a base class for L<"class"|Mars::Kine::Class> and
+This package provides a base class for L<"class"|Mars::Kind::Class> and
 L<"role"|Mars::Kind::Role> (kind) derived packages and provides class building,
 object construction, and object deconstruction lifecycle hooks. The
 L<Mars::Class> and L<Mars::Role> packages provide a simple DSL for automating
@@ -1071,6 +1082,11 @@ I<Since C<0.01>>
 The ROLE method is a class building lifecycle hook which consumes the role
 provided, automatically invoking the role's L</IMPORT> hook. B<Note:> Unlike
 the L</TEST> and L</WITH> hooks, this hook doesn't invoke the L</AUDIT> hook.
+The role composition semantics are as follows: Routines to be consumed must be
+explicitly declared via the L</EXPORT> hook. Routines will be copied to the
+consumer unless they already exist (excluding routines from base classes, which
+will be overridden). If multiple roles are consumed having routines with the
+same name (i.e. naming collisions) the first routine copied wins.
 
 I<Since C<0.01>>
 

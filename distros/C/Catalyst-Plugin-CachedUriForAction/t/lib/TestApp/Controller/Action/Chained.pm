@@ -3,8 +3,6 @@ package TestApp::Controller::Action::Chained;
 use strict;
 use warnings;
 
-use HTML::Entities;
-
 use base qw/Catalyst::Controller/;
 
 #

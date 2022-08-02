@@ -1,5 +1,5 @@
 package Form::Tiny::Meta::Filtered;
-
+$Form::Tiny::Meta::Filtered::VERSION = '2.13';
 use v5.10;
 use strict;
 use warnings;
@@ -10,8 +10,6 @@ use Carp qw(carp);
 use Form::Tiny::Hook;
 use Form::Tiny::Filter;
 use Moo::Role;
-
-our $VERSION = '2.12';
 
 requires qw(inherit_from setup);
 

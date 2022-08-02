@@ -53,9 +53,10 @@ $test->for('includes');
 
   use Venus::Class;
 
+  with 'Venus::Role::Dumpable';
   with 'Venus::Role::Printable';
 
-  has 'test';
+  attr 'test';
 
   sub execute {
     return [@_];
@@ -90,14 +91,6 @@ return value of a dispatched method call to STDOUT.
 =cut
 
 $test->for('description');
-
-=integrates
-
-Venus::Role::Dumpable
-
-=cut
-
-$test->for('integrates');
 
 =method print
 

@@ -1,0 +1,3185 @@
+# Versuchsballon für Rorschachhamster und Alex Schröder.
+
+;Gelände Name Adjektiv
+1,Abend
+1,Schwert
+1,Schild
+1,Kiesel
+1,Baum
+1,Blitz
+1,Teufel
+1,Blut
+1,Ruf
+1,Brunnen
+1,Arm
+1,Burg
+1,Duft
+1,Eis
+1,Eisen
+1,Erz
+1,Feuer
+1,Feiertag
+1,Friedens
+1,Fels
+1,Honig
+1,Chaos
+1,Hüter
+1,Kiefern
+1,Korn
+1,Gift
+1,Kreide
+1,Kreis
+1,Kreuz
+1,Krieg
+1,Krieger
+1,Kupfer
+1,Mond
+1,Morgen
+1,Morgenstern
+1,Mutter
+1,Säure
+1,Ofen
+1,Palmen
+1,Zauberer
+1,Salz
+1,Schlacht
+1,Schlangen
+1,Sichel
+1,Sonnen
+1,Tod
+1,Vater
+1,Wort
+
+
+
+# --------------------
+;forest
+1,[Wald]
+
+;firs
+1,[Wald]
+
+;fir-forest
+1,[Wald]
+
+;trees
+1,[Wald]
+
+;Wald
+1,In dieser Ecke vom [Wald Name] leben [Merkwürdige Waldwesen].
+
+;Wald Name
+1,[name for forest/forest-hill/trees/fir-forest/firs]
+
+;name for forest/forest-hill/trees/fir-forest/firs
+1,[Wald Name Adjektiv][Wald Name 1]
+
+;Wald Name Adjektiv
+1,Finster
+1,Schwarz
+1,Erz
+1,[Gelände Name Adjektiv]
+
+;Wald Name 1
+1,wald
+
+# --------------------
+
+;swamp
+1,[Sumpf]
+
+;swamp2
+1,[Sumpf]
+
+;Sumpf
+1,In dieser Ecke vom [Sumpf Name] leben [Merkwürdige Sumpfwesen].
+
+;Sumpf Name
+1,[name for swamp/swamp2]
+
+;name for swamp/swamp2
+1,[Sumpf Name Adjektiv][Sumpf Name 1]
+
+;Sumpf Name Adjektiv
+1,Grau
+1,Alt
+1,Birken
+1,Weiden
+1,[Gelände Name Adjektiv]
+
+;Sumpf Name 1
+1,sumpf
+1,-Auenwald
+
+# --------------------
+
+;mountain
+1,[Berge]
+
+
+
+;mountains
+1,[Berge]
+
+;Berge
+1,In dieser Ecke [Gebirge Name] leben [Merkwürdige Bergwesen].
+
+;Gebirge Name
+1,[name for mountain/mountains]
+
+;name for mountain/mountains
+1,der [Berg Name Adjektiv]alpen
+1,des [Berg Name Adjektiv]gebirges
+1,der [Berg Name Adjektiv]firsten
+1,der [Berg Name Adjektiv]kuppen
+1,der [Berg Name Adjektiv]zacken
+1,der [Berg Name Adjektiv]steine
+1,der [Berg Name Adjektiv]spitzen
+1,des [Berg Name Adjektiv]kamms
+1,des [Berg Name Adjektiv]massivs
+1,der [Berg Name Adjektiv]berge
+1,der [Berg Name Adjektiv]kette
+1,der [Berg Name Adjektiv]gipfel
+
+;Berg Name Adjektiv
+1,Grau
+1,Schwarz
+1,Erz
+1,Harz
+1,Tannen
+1,[Gelände Name Adjektiv]
+
+# --------------------
+
+;forest-hill
+1,[Hügel]
+1,[Wald]
+
+;hill
+1,[Hügel]
+
+;hills
+1,[Hügel]
+
+;Hügel
+1,In dieser Ecke [Hügel Name] leben [Merkwürdige Hügelwesen].
+
+;Hügel Name
+1,[name for hills/hill/forest-hill]
+
+;name for hills/hill/forest-hill
+1,der [Hügel Name Adjektiv]heide
+1,der [Hügel Name Adjektiv]hügel
+1,der [Hügel Name Adjektiv]kuppen
+
+;Hügel Name Adjektiv
+1,Sand
+1,Schotter
+1,Mittel
+1,Buckel
+1,Erd
+1,[Gelände Name Adjektiv]
+
+# --------------------;
+
+;water
+1,[See]
+
+
+;See
+1,Im ruhigen Wasser [name for lakes] leben [Merkwürdige Süßwasserwesen].
+1,In Ufernähe [name for lakes] findet man [Merkwürdige Süßwasserwesen]. 
+1,Im seichten Wasser am Ufer [name for lakes] tummeln sich [Merkwürdige Süßwasserwesen]. 
+
+;name for lakes
+1,des [See Name Adjektiv]sees
+1,des [See Name Adjektiv]wassers
+1,des [See Name Adjektiv]teiches
+
+;See Name Adjektiv
+1,Schilf
+1,Dunkel
+1,Mond
+1,Kalt
+1,[Gelände Name Adjektiv]
+
+# --------------------;
+
+;grass
+1,[Steppe]
+
+;Steppe
+1,In dieser Ecke [Steppe Name] leben [Merkwürdige Steppenwesen].
+
+;Steppe Name
+1,der [Steppe Name Adjektiv]steppe
+1,des [Steppe Name Adjektiv]graslandes
+
+;Steppe Name Adjektiv
+1,Trocken
+1,Weit
+1,Roll
+1,[Gelände Name Adjektiv]
+
+# --------------------
+
+;thorp
+1,[Dorf]
+
+;village
+1,[Dorf]
+
+;Dorf
+1,[Dorf Name] ist ein[Dorfdetail] mit [1d900+100] [Dorf Stimmung]n [Dorf Bewohner] [Kultur]er Kultur. Herrscher ist [Regierung].
+1,[Dorf Name] wird bewohnt von [1d900+100] [Dorf Stimmung]n [Dorf Bewohner] [Kultur]er Kultur. Es wird regiert von [Regierung].
+
+;Kultur
+1,[name for a Kultur [1d2]]
+
+;name for a Kultur 1
+1,[Kultur Arten]
+
+;name for a Kultur 2
+1,[Kultur Arten]
+
+;Kultur Arten
+1,griechisch
+1,nordisch
+1,deutsch
+1,sumerisch
+
+;NSC
+1,[NSCW], [NSC Details]
+1,[NSCM], [NSC Details]
+
+;NSCW
+10,Kämpferin der [Stufe].
+20,Mensch der Stufe 0.
+6,Klerikerin der [Stufe].
+6,Diebin der [Stufe].
+2,Zauberkundige der [Stufe].
+3,Druidin der [Stufe].
+1,Paladinin der [Stufe].
+2,Waldläuferin der [Stufe].
+
+;NSCM
+10,Kämpfer der [Stufe].
+20,Mensch der Stufe 0.
+6,Kleriker der [Stufe].
+6,Dieb der [Stufe].
+2,Zauberkundiger der [Stufe].
+3,Druide der [Stufe].
+1,Paladin der [Stufe].
+2,Waldläufer der [Stufe].
+
+;NSC Details
+1,grimmig
+1,freundlich
+1,gelangweilt
+
+;Stufe
+85,[1d6]
+14,[1d6+6]
+1,[1d6+12]
+
+;Regierung
+1,[Adel Mann ] [Männername [same Kultur]], [NSCM], durch Eroberung
+1,[Adel Frau] [Frauenname [same Kultur]], [NSCW], durch Eroberung
+1,[Adel Mann] [Männername [same Kultur]], [NSCM], durch Geburt
+1,[Adel Frau] [Frauenname [same Kultur]], [NSCW], durch Geburt
+1,[Adel Mann] [Männername [same Kultur]], [NSCM], durch Wahl
+1,[Adel Mann] [Männername [same Kultur]], [NSCM], durch Wahl der umgebenen [Adelige]
+1,[Adel Mann] [Männername [same Kultur]], [NSCM], durch Wahl aus OBERSCHICHT
+1,[Adel Frau] [Frauenname [same Kultur]], [NSCW], durch Wahl
+1,[Adel Frau] [Frauenname [same Kultur]], [NSCW], durch Wahl der umgebenen [Adelige]
+1,[Adel Frau] [Frauenname [same Kultur]], [NSCW], durch Wahl aus OBERSCHICHT
+1,eine kleine Gruppe von [Dorf Bewohner] [same Kultur]er Kultur, angeführt von [Männername [same Kultur]], [NSCM]
+1,eine kleine Gruppe von [Dorf Bewohner] [same Kultur]er Kultur, angeführt von [Frauenname [same Kultur]], [NSCW]
+1,Avatar (RELIGION)
+1,Bürokratie (ohne nominellen Herrscher)
+1,FRAKTIONEN
+1,FRAKTIONEN
+1,FRAKTIONEN
+1,Geld
+1,Gewählter Bürgermeister, [NSC]
+1,Gewählter Diktator, [NSC]
+1,Gildenoberhaupt (1-5 Diebes-, 6 Assassinen-)
+1,Gildenoberhaupt (50% Beruf/50% Handwerk)
+1,Magier, [Frauenname [same Kultur]], [NSC]
+1,Magnat (Gehört praktisch alles)
+1,MILITÄRoberhaupt
+1,Monster
+1,OBERSCHICHT
+1,Parlament
+1,Priester
+1,Räte
+1,Richter
+1,Senat (OBERSCHICHT)
+1,Tyrann
+1,Verwaltungsbeamter
+1,[Doppelregierung] von [Regierung] und [Regierung]
+
+;Doppelregierung
+1,Bürgerkrieg 
+1,Koexistenz 
+1,Zusammenarbeit 
+1,Verschiedene Stadtteile 
+1,Getrennte Aufgaben 
+1,Personalunion
+
+;Adel Mann
+1,Ritter
+1,Freiherr
+1,Baron
+1,Graf
+1,Herzog
+1,Fürst
+1,Prinz
+1,König
+1,Markgraf
+1,Vicomte
+1,Patrizier
+1,Oberherr
+1,Regent
+1,Hetmann
+1,Jarl
+1,Archon
+1,Basileus
+1,Nobellisimos
+1,Potentat
+1,Sebastokrator
+1,Sebastos
+
+;Adel Frau
+1,Ritterin
+1,Freifrau
+1,Baroness
+1,Gräfin
+1,Herzogin
+1,Fürstin
+1,Prinzessin
+1,Königin
+1,Markgräfin
+1,Vicomtin
+1,Matrone
+1,Oberherrin
+1,Regentin
+1,Hetfrau
+1,Jarl
+1,Archonin
+1,Basilissa
+1,Nobellissima
+1,Potentatin
+1,Sebastokratorissa
+1,Sebaste
+
+;Adelige
+1,Ritter und Ritterinnen
+1,Freifrauen und Freiherren
+1,Barone und Baronesse
+1,Gräfinnen und Gräfe
+1,Herzoge und Herzoginnen
+1,Fürstinnen und Fürsten
+1,Prinzen und Prinzessinnen
+1,Königinnen und Königen
+1,Markgrafen und Markgräfinnen
+1,Vicomtinnen und Vicomtes
+1,Patriziern und Matronen
+1,Oberherren und Oberherrinnen
+1,Regenten und Regentinnen
+1,Hetmännern und Hetfrauen
+1,Jarls
+1,Archonen und Archoninnen
+1,Basileis und Basilissai
+1,Nobellisimi und Nobellissimae
+1,Potentaten und Potentatinnen
+1,Sebastokratoren und Sebastokratorissen
+1,Sebastoi und Sebastei
+
+;Dorf Name
+1,[capitalize Dorfname 1][Dorfname 2][Dorfname 3]
+20,[capitalize Dorfname 2][Dorfname 3]
+
+;Dorfdetail
+1, Dorf
+1,e Gemeinde
+1, Nest
+
+;Dorfname 1
+1,west
+1,ost
+1,norder
+1,süder
+1,wester
+1,oster
+1,nord
+1,süd
+1,ober
+1,unter
+1,nieder
+1,klein
+1,groß
+
+;Dorfname 2
+1,äbtissin
+1,aff
+1,ammel
+1,bau
+1,ber
+1,berge
+1,birt
+1,bock
+1,brau
+1,brück
+1,burg
+1,bütt
+1,dier
+1,dregg
+1,eil
+1,eisen
+1,en
+1,et
+1,ettel
+1,eulen
+1,falken
+1,feils
+1,fisch
+1,forst
+1,[Frauenname [Kultur]]s
+1,frede
+1,ge
+1,geck
+1,gersten
+1,gött
+1,gröd
+1,hamm
+1,haus
+1,heinzen
+1,herbst
+1,herz
+1,hill
+1,hö
+1,höft
+1,hohen
+1,hor
+1,hör
+1,husen
+1,hütt
+1,idel
+1,kaschen
+1,keppes
+1,kickes
+1,kinzen
+1,koll
+1,königs
+1,küh
+1,lauch
+1,leim
+1,lex
+1,lind
+1,mander
+1,[Männername [Kultur]]s
+1,wisch
+1,hamel
+1,mast
+1,matze
+1,mau
+1,merl
+1,mersch
+1,mus
+1,muxe
+1,nasing
+1,nitz
+1,ober
+1,pier
+1,pintes
+1,rad
+1,reh
+1,reiff
+1,reime
+1,ro
+1,ro
+1,röm
+1,sax
+1,scheid
+1,scheiten
+1,scheu
+1,schwarzen
+1,schwer
+1,senge
+1,seve
+1,solk
+1,strick
+1,toden
+1,ueß
+1,uppers
+1,usch
+1,wagen
+1,wald
+1,wall
+1,welschen
+1,wett
+1,wieden
+1,will
+1,win
+1,wit
+1,zweifel
+
+;Dorfname 3
+1,au
+9,bach
+3,berg
+1,born
+1,borstel
+2,burg
+1,dingen
+3,dorf
+1,e
+1,edra
+2,el
+3,en
+1,ern
+1,ers
+3,feld
+1,felde
+1,gaard
+1,gabe
+1,gert
+1,graben
+1,groven
+1,grund
+4,hausen
+2,koog
+1,hof
+1,horn
+1,in
+1,itz
+1,kopp
+1,korb
+4,ler
+2,lingen
+1,moor
+1,mühle
+1,münd
+1,ning
+1,nitz
+1,raden
+3,rath
+1,rich
+1,ringen
+1,rodt
+1,roth
+8,scheid
+1,stein
+1,sten
+1,sum
+1,tal
+1,vede
+3,weiler
+1,werscheid
+1,wisch
+1,witz
+1,wen
+1,wörden
+1,zen
+1,hafen
+7,
+
+;Frauenname griechisch
+1,Ariadne
+1,Xanthippe
+
+;Männername griechisch
+1,Sophokles
+1,Platon
+
+;Frauenname nordisch
+1,Alfbjörg
+1,Gundis
+
+;Männername nordisch
+1,Thorulf
+1,Hakan
+
+;Frauenname deutsch
+1,Käthe
+1,Emma
+
+;Männername deutsch
+1,Siegfried
+1,Hagen
+
+;Frauenname sumerisch
+1,Namimma
+1,Ergirtu
+
+;Männername sumerisch
+1,Iblal
+1,Mespit-Kum
+
+;Dorf Stimmung
+1,ängstliche
+1,arbeitsame
+1,zum Aufbruch bereite
+1,betriebsame
+1,bewegte
+1,böse
+1,dekadente
+1,brutale
+1,empathielose
+1,empathische
+1,familiäre
+1,hoffnungslose
+1,gelangweilte
+1,gelassene
+1,geschäftige
+1,unheimliche
+1,gute
+1,hedonistische
+1,hervorragende
+1,lustige
+1,nationalistische
+1,panische
+1,pflichterfüllte
+1,revolutionäre
+1,trauernde
+1,unzufriedene
+1,wohlwollende
+1,zielstrebige
+1,zufriedene
+
+;Dorf Bewohner
+1,Menschen
+1,Zwergen
+1,Elfen
+
+# --------------------
+;Merkwürdige Tropische Flachwasserwesen
+1,[name for a Merkwürdige Tropische Flachwasserwesen [1d6]]
+
+;name for a Merkwürdige Tropische Flachwasserwesen 1
+1,[Merkwürdige Tropische Flachwasserwesen Namen]
+;name for a Merkwürdige Tropische Flachwasserwesen 2
+1,[Merkwürdige Tropische Flachwasserwesen Namen]
+;name for a Merkwürdige Tropische Flachwasserwesen 3
+1,[Merkwürdige Tropische Flachwasserwesen Namen]
+;name for a Merkwürdige Tropische Flachwasserwesen 4
+1,[Merkwürdige Tropische Flachwasserwesen Namen]
+;name for a Merkwürdige Tropische Flachwasserwesen 5
+1,[Merkwürdige Tropische Flachwasserwesen Namen]
+;name for a Merkwürdige Tropische Flachwasserwesen 6
+1,[Merkwürdige Tropische Flachwasserwesen Namen]
+
+;Merkwürdige Tropische Flachwasserwesen Namen
+1,[Merkwürdige Tropische Flachwasserwesen Adjektiv] [capitalize Merkwürdige Tropische Flachwasserwesen Name 1][Merkwürdige Tropische Flachwasserwesen Name 2]
+
+;Merkwürdige Tropische Flachwasserwesen Adjektiv
+1,agile
+1,aktive
+1,allesfressende
+1,am Grund laufende
+1,amphibische
+1,auffällige
+1,außergewöhnliche
+1,behutsame
+1,bewegungslose
+1,bizzare
+1,blaugeringelte
+1,Blut riechende
+1,bodenbewohnende
+1,breite
+1,breitmäulige
+1,bunte
+1,dämmerungsaktive
+1,eigenartige
+1,eindrucksvolle
+1,einzelgängerische
+1,elegante
+1,empfindliche
+1,energische
+1,erstaunliche
+1,farbändernde
+1,farbenfrohe
+1,faule
+1,fleißige
+1,fransige
+1,freundliche
+1,friedliche
+1,furchtlose
+1,fusselige
+1,gebänderte
+1,gefrässige
+1,gefürchtete
+1,gesellige
+1,getarnte
+1,gewandte
+1,gewöhnliche
+1,giftige
+1,grabende
+1,großäugige
+1,große
+1,haarige
+1,harmlose
+1,hungrige
+1,intelligente
+1,interessante
+1,kleine
+1,knackende
+1,kommunizierende
+1,kränkliche
+1,laichende
+1,lange
+1,langsame
+1,lauernde
+1,leuchtende
+1,Luft atmende
+1,massige
+1,nachtaktive
+1,Nachts auftauchende
+1,ortsgebundene
+1,Parasiten fressende
+1,Plankton fressende
+1,quirlige
+1,räuberische
+1,Röhren bauende
+1,scheue
+1,schleimige
+1,schmale
+1,schnelle
+1,schwankende
+1,seitlich abgeflachte
+1,sesshafte
+1,stoische
+1,stressige
+1,strudelnde
+1,sympathische
+1,tarnfarbene
+1,tauchende
+1,territoriale
+1,träge
+1,treibende
+1,unauffällige
+1,undulierende
+1,unheimliche
+1,unsymetrische
+1,urtümliche
+1,verborgene
+1,verspielte
+1,vielflossige
+1,wandernde
+1,wimmelnde
+1,wohlschmeckende
+1,wühlende
+1,zahllose
+1,zappelige
+1,zutrauliche
+1,[Merkwürdige Tropische Flachwasserwesen Adjektiv], [Merkwürdige Tropische Flachwasserwesen Adjektiv]
+
+;Merkwürdige Tropische Flachwasserwesen Name 1
+1,adler
+1,bananen
+1,blau
+1,blumen
+1,borsten
+1,braun
+1,breitarm
+1,buckel
+1,clown
+1,doktor
+1,dornen
+1,drachen
+1,drücker
+1,einsiedler
+1,faden
+1,falter
+1,fang
+1,fels
+1,feuer
+1,gelbflossen
+1,geweih
+1,glas
+1,gorgonen
+1,haar
+1,hammer
+1,hand
+1,hirn
+1,horn
+1,ichthyo
+1,juwelen
+1,kaiser
+1,kamm
+1,kardinal
+1,karett
+1,katzen
+1,kegel
+1,kugel
+1,kurz
+1,lang
+1,langflossen
+1,leder
+1,leucht
+1,lipp
+1,loch
+1,löcher
+1,masken
+1,meer
+1,mosa
+1,mund
+1,nackt
+1,napf
+1,nasen
+1,nessel
+1,panzer
+1,papagei
+1,perl
+1,pfeilschwanz
+1,pinzett
+1,plesio
+1,pracht
+1,purpur
+1,riesen
+1,riff
+1,rippen
+1,rosa
+1,rot
+1,rücken
+1,ruder
+1,säge
+1,samt
+1,sand
+1,scheren
+1,schiffs
+1,schläfer
+1,schwarz
+1,schwimm
+1,see
+1,segelflossen
+1,spitzen
+1,stachel
+1,stech
+1,stein
+1,streifen
+1,suppen
+1,süß
+1,taschen
+1,teppich
+1,teufels
+1,tiger
+1,tupfen
+1,vasen
+1,warzen
+1,weich
+1,weiß
+1,wimpel
+1,wolfs
+1,zacken
+1,zitronen
+1,zwerg
+1,[Merkwürdige Tropische Flachwasserwesen Name 1][Merkwürdige Tropische Flachwasserwesen Name 1]
+
+;Merkwürdige Tropische Flachwasserwesen Name 2
+1,aale[Normale Fischwerte]
+1,algen
+1,ammoniten
+1,anemonen
+1,asseln
+1,austern
+1,barben
+1,barrakudas[Normale Fischwerte]
+1,barsche[Normale Fischwerte]
+1,belemniten
+1,boote[Qualle Werte]
+1,brassen
+1,chimären
+1,delphine[Normale Fischwerte]
+1,echsen
+1,engel
+1,fische
+1,fledermäuse[Normale Fischwerte]
+1,flosser
+1,füsiliere
+1,füßer
+1,garnelen
+1,groppen
+1,grundeln
+1,gurken
+1,hähne
+1,haie
+1,halter
+1,hasen
+1,häupter
+1,häuter
+1,hechte
+1,heringe
+1,hocker
+1,hüpfer
+1,hydren[Qualle Werte]
+1,igel
+1,jungfrauen
+1,kalmare
+1,ketea
+1,kiemer
+1,köpfe
+1,korallen
+1,krabben
+1,kraken
+1,krebse
+1,krokodile[Krokodil Werte]
+1,kronen
+1,langusten
+1,leguane
+1,lilien
+1,makrelen[Normale Fischwerte]
+1,manatis
+1,mantas[Normale Fischwerte]
+1,mäuler
+1,mäuse
+1,medusen[Qualle Werte]
+1,muränen
+1,muscheln
+1,nadeln
+1,nautilusse
+1,nereidchen
+1,nixen
+1,ohren
+1,oktopoi
+1,pferdchen
+1,placodermi[Normale Fischwerte]
+1,pocken
+1,polypen[Qualle Werte]
+1,quallen[Qualle Werte]
+1,quastenflosser[Normale Fischwerte]
+1,raupen
+1,robben
+1,rochen[Normale Fischwerte]
+1,saurier
+1,schaler
+1,scheiden
+1,schildkröten
+1,schlangen
+1,schnapper
+1,schnecken
+1,schwämme
+1,sepias
+1,sirenen
+1,skorpione
+1,spinnen
+1,sterne
+1,tänzerinnen
+1,tiere
+1,tintenfische
+1,trilobiten
+1,tritönchen
+1,tümmler[Normale Fischwerte]
+1,wächter
+1,wale
+1,walzen
+1,welse[Normale Fischwerte]
+1,wespen[Qualle Werte]
+1,würmer
+# --------------------
+;Merkwürdige Süßwasserwesen
+1,[name for a Merkwürdige Süßwasserwesen [1d6]]
+
+;name for a Merkwürdige Süßwasserwesen 1
+1,[Merkwürdige Süßwasserwesen Namen]
+;name for a Merkwürdige Süßwasserwesen 2
+1,[Merkwürdige Süßwasserwesen Namen]
+;name for a Merkwürdige Süßwasserwesen 3
+1,[Merkwürdige Süßwasserwesen Namen]
+;name for a Merkwürdige Süßwasserwesen 4
+1,[Merkwürdige Süßwasserwesen Namen]
+;name for a Merkwürdige Süßwasserwesen 5
+1,[Merkwürdige Süßwasserwesen Namen]
+;name for a Merkwürdige Süßwasserwesen 6
+1,[Merkwürdige Süßwasserwesen Namen]
+
+;Merkwürdige Süßwasserwesen Namen
+1,[Merkwürdige Süßwasserwesen Adjektiv] [capitalize Merkwürdige Süßwasserwesen Name 1][Merkwürdige Süßwasserwesen Name 2]
+
+;Merkwürdige Süßwasserwesen Adjektiv
+1,aggressive
+1,agile
+1,aktive
+1,algenbewachsene
+1,allesfressende
+1,amphibische
+1,auffällige
+1,außergewöhnliche
+1,behutsame
+1,bewegungslose
+1,bizzare
+1,blubernde
+1,bodenbewohnende
+1,breite
+1,breitmäulige
+1,dämmerungsaktive
+1,dornbewehrte
+1,dunkle
+1,eigenartige
+1,eindrucksvolle
+1,einzelgängerische
+1,elegante
+1,empfindliche
+1,energische
+1,entzückende
+1,erstaunliche
+1,faule
+1,fleißige
+1,freundliche
+1,friedliche
+1,furchtlose
+1,gebänderte
+1,gefleckte
+1,gefrässige
+1,gefürchtete
+1,gesellige
+1,gestreifte
+1,getarnte
+1,gewandte
+1,gewöhnliche
+1,grabende
+1,großäugige
+1,große
+1,harmlose
+1,helle
+1,hungrige
+1,intelligente
+1,interessante
+1,kleine
+1,kommunizierende
+1,kränkliche
+1,laichende
+1,lange
+1,langsame
+1,lauernde
+1,Luft/Wasser atmende
+1,massige
+1,nachtaktive
+1,nestbauende
+1,ortsgebundene
+1,plätschernde
+1,quakende
+1,quirlige
+1,räuberische
+1,robuste
+1,Röhren bauende
+1,scheue
+1,schleimige
+1,schmale
+1,schnelle
+1,schwankende
+1,sesshafte
+1,spuckende
+1,stachelige
+1,stoische
+1,stressige
+1,strudelnde
+1,sympathische
+1,tarnfarbene
+1,tauchende
+1,territoriale
+1,träge
+1,treibende
+1,unauffällige
+1,unheimliche
+1,urtümliche
+1,verborgene
+1,verspielte
+1,vielgestaltige
+1,walzenförmige
+1,wandernde
+1,wimmelnde
+1,winterschlafende
+1,wohlschmeckende
+1,wühlende
+1,zahllose
+1,zahnlose
+1,zappelige
+1,zutrauliche
+1,[Merkwürdige Süßwasserwesen Adjektiv], [Merkwürdige Süßwasserwesen Adjektiv]
+
+;Merkwürdige Süßwasserwesen Name 1
+1,Ähren
+1,Bach
+1,Band
+1,Bär
+1,Bauch
+1,Bauern
+1,Berg
+1,Bisam
+1,Bläß
+1,Blau
+1,Blut
+1,Brach
+1,Brunnen
+1,Buckel
+1,Büffel
+1,Bunt
+1,Dunkel
+1,Edel
+1,Eintags
+1,Faden
+1,Fels
+1,Feuer
+1,Finger
+1,Flach
+1,Floh
+1,Fluß
+1,Gelb
+1,Gelbrand
+1,Glanz
+1,Glatt
+1,Gold
+1,Gras
+1,Grau
+1,Grund
+1,Haken
+1,Hand
+1,Höcker
+1,Hunds
+1,Kamm
+1,Keil
+1,Kiefer
+1,Kies
+1,Kobold
+1,Köcher
+1,Kräusel
+1,Kriebel
+1,Krokodil
+1,Kronen
+1,Kurz
+1,Lang
+1,Mähnen
+1,Maler
+1,Marmor
+1,Moder
+1,Mosaik
+1,Mund
+1,Mützen
+1,Quell
+1,Regenbogen
+1,Ried
+1,Riesen
+1,Ringel
+1,Rippen
+1,Rohr
+1,Rot
+1,Rücken
+1,Sand
+1,Schild
+1,Schlamm
+1,Schleim
+1,Schlick
+1,Schnatter
+1,Schneider
+1,Schopf
+1,Schrei
+1,Schuppen
+1,Schuster
+1,Schwanz
+1,Schwarz
+1,Silber
+1,Sing
+1,Spiegel
+1,Stachel
+1,Stein
+1,Stelz
+1,Stock
+1,Süßwasser
+1,Teich
+1,Tiefen
+1,Tümpel
+1,Tüpfel
+1,Ufer
+1,Wander
+1,Wasser
+1,Weiß
+1,Woll
+1,Zahn
+1,Zuck
+1,Zwerg
+1,[Merkwürdige Süßwasserwesen Name 1][Merkwürdige Süßwasserwesen Name 1]
+
+;Merkwürdige Süßwasserwesen Name 2
+1,aale[Kleine Fischwerte]
+1,adler
+1,amöben
+1,amseln
+1,äschen[Kleine Fischwerte]
+1,asseln
+1,barben[Kleine Fischwerte]
+1,barsche[Normale Fischwerte]
+1,beißer
+1,biber
+1,bitterlinge[Normale Fischwerte]
+1,brassen
+1,döbel[Kleine Fischwerte]
+1,dommeln
+1,egel[Kleine Fischwerte]
+1,elritzen[Kleine Fischwerte]
+1,enten
+1,federn
+1,feen
+1,felchen[Kleine Fischwerte]
+1,fische[Kleine Fischwerte]
+1,fliegen
+1,flöhe
+1,forellen[Normale Fischwerte]
+1,frösche
+1,gänse
+1,geistchen
+1,groppen[Kleine Fischwerte]
+1,grundeln[Kleine Fischwerte]
+1,gründlinge[Kleine Fischwerte]
+1,güster[Kleine Fischwerte]
+1,hechte[Normale Fischwerte]
+1,huchen[Kleine Fischwerte]
+1,hühner
+1,jungfern
+1,käfer
+1,karauschen[Normale Fischwerte]
+1,karpfen[Normale Fischwerte]
+1,kärpflinge[Kleine Fischwerte]
+1,kormorane
+1,krabben
+1,krebschen
+1,krebse
+1,lachse[Normale Fischwerte]
+1,larven
+1,läufer
+1,libellen
+1,lieschen
+1,lurche
+1,männchen
+1,maränen[Kleine Fischwerte]
+1,milben
+1,molche
+1,mücken
+1,muscheln
+1,nasen[Kleine Fischwerte]
+1,nattern
+1,neunaugen[Kleine Fischwerte]
+1,nixen
+1,nymphchen
+1,otter
+1,peitzger[Kleine Fischwerte]
+1,plötzen[Kleine Fischwerte]
+1,quappen[Kleine Fischwerte]
+1,ratten
+1,reiher
+1,renken[Kleine Fischwerte]
+1,rotaugen[Kleine Fischwerte]
+1,säger
+1,saiblinge[Kleine Fischwerte]
+1,salamander
+1,salmler[Kleine Fischwerte]
+1,scharben
+1,schlangen
+1,schleien[Kleine Fischwerte]
+1,schmerlen[Kleine Fischwerte]
+1,schnecken
+1,schnepfen
+1,schwäne
+1,schwimmer[Kleine Fischwerte]
+1,sichler
+1,skorpione
+1,spinnen
+1,sterlets[Kleine Fischwerte]
+1,stichlinge[Kleine Fischwerte]
+1,stinte[Kleine Fischwerte]
+1,stögel[Kleine Fischwerte]
+1,störche
+1,störe[Normale Fischwerte]
+1,streber[Kleine Fischwerte]
+1,strömer[[Kleine Fischwerte]
+1,tierchen
+1,unken
+1,vögel
+1,wanzen
+1,welse[Normale Fischwerte]
+1,wesen
+1,würmer
+1,zander[Kleine Fischwerte]
+
+# --------------------
+
+;Merkwürdige Waldwesen
+1,[name for a Merkwürdige Waldwesen [1d6]]
+
+;name for a Merkwürdige Waldwesen 1
+1,[Merkwürdige Waldwesen Namen]
+;name for a Merkwürdige Waldwesen 2
+1,[Merkwürdige Waldwesen Namen]
+;name for a Merkwürdige Waldwesen 3
+1,[Merkwürdige Waldwesen Namen]
+;name for a Merkwürdige Waldwesen 4
+1,[Merkwürdige Waldwesen Namen]
+;name for a Merkwürdige Waldwesen 5
+1,[Merkwürdige Waldwesen Namen]
+;name for a Merkwürdige Waldwesen 6
+1,[Merkwürdige Waldwesen Namen]
+
+;Merkwürdige Waldwesen Namen
+1,[Merkwürdige Waldwesen Adjektiv] [capitalize Merkwürdige Waldwesen Name 1][Merkwürdige Waldwesen Name 2]
+
+;Merkwürdige Waldwesen Adjektiv
+1,Aas fressende
+1,aggressive
+1,auffällige
+1,aufgeblähte
+1,ausgelassene
+1,badende
+1,bettelnde
+1,beulige
+1,bewachsene
+1,bissige
+1,blattfressende
+1,borstige
+1,dumme
+1,dunkle
+1,dürre
+1,faule
+1,fette
+1,fliegende
+1,fröhliche
+1,Früchte fressende
+1,furchtsame
+1,gegürtelte
+1,geisterhafte
+1,gestreifte
+1,getupfte
+1,glänzende
+1,gleitende
+1,glitzernde
+1,greifende
+1,großfüßige
+1,häßliche
+1,heimliche
+1,heisere
+1,helle
+1,herumtollende
+1,Holz fressende
+1,hungrige
+1,hüpfende
+1,intelligente
+1,jagende
+1,kletternde
+1,knochige
+1,knorrige
+1,krabbelnde
+1,krallenbewehrte
+1,kreischende
+1,kriechende
+1,kugelnde
+1,kurzschwänzige
+1,langbeinige
+1,langhaarige
+1,langschwänzige
+1,laute
+1,leckere
+1,leise
+1,massige
+1,modernde
+1,müffelnde
+1,netzspinnende
+1,neugierige
+1,prächtige
+1,quietschende
+1,räudige
+1,riechende
+1,robbende
+1,röchelnde
+1,röhrende
+1,scheue
+1,schillernde
+1,schlaksige
+1,schlurfende
+1,schmale
+1,schmatzende
+1,schnaufende
+1,schnelle
+1,schöne
+1,schreiende
+1,schwärmende
+1,schwebende
+1,sesshafte
+1,singende
+1,stachelige
+1,stoische
+1,stolpernde
+1,streitsüchtige
+1,surrende
+1,tanzende
+1,tollpatschige
+1,torkelnde
+1,träge
+1,ungenießbare
+1,verseuchte
+1,walzende
+1,winterschlafende
+1,wohlschmeckende
+1,wühlende
+1,wurzelnde
+1,zahme
+1,zutrauliche
+1,[Merkwürdige Waldwesen Adjektiv], [Merkwürdige Waldwesen Adjektiv]
+
+;Merkwürdige Waldwesen Name 1
+1,abend
+1,auer
+1,band
+1,baum
+1,blatt
+1,blau
+1,blitz
+1,blut
+1,blüten
+1,boden
+1,borken
+1,bunt
+1,busch
+1,büschel
+1,dämmerungs
+1,dickicht
+1,dreck
+1,düster
+1,eich
+1,eichel
+1,elfen
+1,erd
+1,fauch
+1,feder
+1,fels
+1,feucht
+1,fleck
+1,geweih
+1,glüh
+1,gold
+1,grab
+1,grau
+1,greif
+1,groß
+1,grün
+1,hasel
+1,hauer
+1,haus
+1,haut
+1,helm
+1,holz
+1,honig
+1,horn
+1,keulen
+1,klauen
+1,klein
+1,knall
+1,kompost
+1,kronen
+1,kugel
+1,laub
+1,leder
+1,leucht
+1,licht
+1,maul
+1,moos
+1,morgen
+1,nacht
+1,nackt
+1,nebel
+1,panzer
+1,perl
+1,pilz
+1,plapper
+1,rauf
+1,reb
+1,regen
+1,reisig
+1,ringel
+1,rost
+1,rot
+1,rund
+1,rutsch
+1,schalen
+1,schatten
+1,schild
+1,schmuck
+1,schuppen
+1,schwanz
+1,schwarz
+1,silber
+1,spitz
+1,stein
+1,stern
+1,stink
+1,tatzel
+1,tröt
+1,trug
+1,unterholz
+1,wald
+1,weber
+1,weiß
+1,wild
+1,würge
+1,wurzel
+1,zahn
+1,zapfen
+1,zweig
+1,zwerg
+1,[Merkwürdige Waldwesen Name 1][Merkwürdige Waldwesen Name 1]
+
+;Merkwürdige Waldwesen Name 2
+1,adler[Kleine Werte]
+1,ameisen[Kleine Werte]
+1,amseln[Kleine Werte]
+1,bären[Bär Werte]
+1,biber[Kleine Werte]
+1,bienen[Kleine Werte]
+1,biester[Kleine Werte]
+1,blobs[Kleine Werte]
+1,böcke[Kleine Werte]
+1,dachse[Kleine Werte]
+1,dämonen[Teufel Werte]
+1,drachen[Drache Werte]
+1,drosseln[Kleine Werte]
+1,eber[Wildschwein Werte]
+1,echsen[Echse Werte]
+1,eidechsen[Kleine Werte]
+1,einhörner[Kleine Werte]
+1,elstern[Kleine Werte]
+1,eulen[Kleine Werte]
+1,falter[Kleine Werte]
+1,feen[Kleine Werte]
+1,finken[Kleine Werte]
+1,fledermäuse[Kleine Werte]
+1,fliegen[Kleine Werte]
+1,frösche[Kleine Werte]
+1,füchse[Kleine Werte]
+1,geier[Kleine Werte]
+1,geistchen[Kleine Werte]
+1,getiere[Kleine Werte]
+1,gnömchen[Kleine Werte]
+1,goblinge[Kleine Werte]
+1,grillen[Kleine Werte]
+1,häher[Kleine Werte]
+1,hamster[Kleine Werte]
+1,hasen[Kleine Werte]
+1,hirsche[Pferd Werte]
+1,hörnchen[Kleine Werte]
+1,hornissen[Kleine Werte]
+1,hühner[Kleine Werte]
+1,hunde[Wolf Werte]
+1,igel[Kleine Werte]
+1,iltisse[Kleine Werte]
+1,käfer[Kleine Werte]
+1,kaninchen[Kleine Werte]
+1,katzen[Kleine Werte]
+1,käuze[Kleine Werte]
+1,knechte[Kleine Werte]
+1,kojoten[Kleine Werte]
+1,krähen[Kleine Werte]
+1,kröten[Kleine Werte]
+1,larven[Kleine Werte]
+1,läuse[Kleine Werte]
+1,luchse[Raubkatze Werte]
+1,marder[Kleine Werte]
+1,mäuse[Kleine Werte]
+1,meisen[Kleine Werte]
+1,molche[Echse Werte]
+1,motten[Kleine Werte]
+1,mulle[Kleine Werte]
+1,nattern[Schlange Werte]
+1,ochsen[Kleine Werte]
+1,opossums[Kleine Werte]
+1,pferde[Pferd Werte]
+1,ponies[Pferd Werte]
+1,ratten[Kleine Werte]
+1,raupen[Kleine Werte]
+1,rehe[Kleine Werte]
+1,salamander[Echse Werte]
+1,saurier[Kleine Werte]
+1,schaben[Kleine Werte]
+1,schafe[Kleine Werte]
+1,schlangen[Schlange Werte]
+1,schleichen[Echse Werte]
+1,schmetterlinge[Kleine Werte]
+1,schnecken[Kleine Werte]
+1,schrecken[Kleine Werte]
+1,schweine[Wildschwein Werte]
+1,spechte[Kleine Werte]
+1,sperlinge[Kleine Werte]
+1,spinnen[Spinnen Werte]
+1,tauben[Kleine Werte]
+1,tausendfüßer[Kleine Werte]
+1,teufel[Teufel Werte]
+1,tiere[Normale Werte]
+1,unken[Kleine Werte]
+1,viecher[Kleine Werte]
+1,wachteln[Kleine Werte]
+1,wanzen[Kleine Werte]
+1,wesen[Menschen Werte]
+1,wespen[Kleine Werte]
+1,wisente[Kuh Werte]
+1,wölfe[Wolf Werte]
+1,wolpertinger[Kleine Werte]
+1,wurfe[Kleine Werte]
+1,würmchen[Kleine Werte]
+1,würmer[Kleine Werte]
+1,zecken[Kleine Werte]
+1,ziegen[Kleine Werte]
+1,zikaden[Kleine Werte]
+
+# --------------------
+
+;Merkwürdige Hügelwesen
+1,[name for a Merkwürdige Hügelwesen [1d6]]
+
+;name for a Merkwürdige Hügelwesen 1
+1,[Merkwürdige Hügelwesen Namen]
+;name for a Merkwürdige Hügelwesen 2
+1,[Merkwürdige Hügelwesen Namen]
+;name for a Merkwürdige Hügelwesen 3
+1,[Merkwürdige Hügelwesen Namen]
+;name for a Merkwürdige Hügelwesen 4
+1,[Merkwürdige Hügelwesen Namen]
+;name for a Merkwürdige Hügelwesen 5
+1,[Merkwürdige Hügelwesen Namen]
+;name for a Merkwürdige Hügelwesen 6
+1,[Merkwürdige Hügelwesen Namen]
+
+;Merkwürdige Hügelwesen Namen
+1,[Merkwürdige Hügelwesen Adjektiv] [capitalize Merkwürdige Hügelwesen Name 1][Merkwürdige Hügelwesen Name 2]
+
+;Merkwürdige Hügelwesen Adjektiv
+1,Aas fressende
+1,aggressive
+1,ängstliche
+1,auffällige
+1,aufgeblähte
+1,aufmerksame
+1,ausgelassene
+1,bettelnde
+1,beulige
+1,biestige
+1,bissige
+1,blasse
+1,borstige
+1,dumme
+1,dunkle
+1,dürre
+1,einzelgängerische
+1,fette
+1,fliegende
+1,fröhliche
+1,furchtsame
+1,geisterhafte
+1,gewandte
+1,glänzende
+1,gleitende
+1,glitzernde
+1,grabende
+1,Gras fressende
+1,großfüßige
+1,getarnte
+1,harthäutige
+1,häßliche
+1,heimliche
+1,heisere
+1,helle
+1,herumstreifende
+1,herumtollende
+1,hungrige
+1,hüpfende
+1,intelligente
+1,jagende
+1,kleinköpfige
+1,klettige
+1,knochige
+1,knorrige
+1,krallenbewehrte
+1,kreischende
+1,kugelnde
+1,kurzbeinige
+1,kurzschwänzige
+1,langschwänzige
+1,langweilige
+1,Laub fressende
+1,laute
+1,lavendelfarbene
+1,leckere
+1,leise
+1,massige
+1,missgelaunte
+1,nachtaktive
+1,neugierige
+1,nistende
+1,prächtige
+1,quietschende
+1,rasende
+1,räudige
+1,riechende
+1,röchelnde
+1,rutschende
+1,scharfsichtige
+1,scheue
+1,schimmernde
+1,schlaksige
+1,schleichende
+1,schmale
+1,schmatzende
+1,schnaufende
+1,schöne
+1,schreiende
+1,schwärmende
+1,seltene
+1,singende
+1,speckige
+1,stachelige
+1,staubige
+1,stoische
+1,stolpernde
+1,streitsüchtige
+1,surrende
+1,tanzende
+1,tollpatschige
+1,torkelnde
+1,trockene
+1,verspielte
+1,vom Aussterben bedrohte
+1,wohlschmeckende
+1,wühlende
+1,zahme
+1,zutrauliche
+1,[Merkwürdige Hügelwesen Adjektiv], [Merkwürdige Hügelwesen Adjektiv]
+
+;Merkwürdige Hügelwesen Name 1
+1,abend
+1,augen
+1,bach
+1,band
+1,bart
+1,birk
+1,blau
+1,blitz
+1,boden
+1,braun
+1,bunt
+1,busch
+1,dämmerungs
+1,dreck
+1,feder
+1,fels
+1,fleck
+1,fuß
+1,gelb
+1,geröll
+1,glüh
+1,gold
+1,gras
+1,grau
+1,groß
+1,grotten
+1,gruben
+1,gürtel
+1,haar
+1,haut
+1,heid
+1,helm
+1,herden
+1,heu
+1,himmel
+1,höhen
+1,hohl
+1,höhlen
+1,honig
+1,horn
+1,hügel
+1,kamm
+1,keulen
+1,klauen
+1,klein
+1,klippen
+1,kluft
+1,kolk
+1,kugel
+1,laub
+1,lawinen
+1,leder
+1,luft
+1,mähnen
+1,maul
+1,morgen
+1,nacht
+1,oger
+1,pfeif
+1,plapper
+1,rassel
+1,rau
+1,raub
+1,rauf
+1,regen
+1,reif
+1,riesen
+1,ringel
+1,rot
+1,rötel
+1,rücken
+1,rund
+1,sand
+1,schabracken
+1,schalen
+1,schild
+1,schmuck
+1,schmutz
+1,schreit
+1,schwanz
+1,schwarz
+1,silber
+1,spalt
+1,spitz
+1,spring
+1,staub
+1,scheiben
+1,stein
+1,stern
+1,stink
+1,trug
+1,trut
+1,wasser
+1,weber
+1,weiß
+1,wende
+1,wild
+1,zaun
+1,zwerg
+1,[Merkwürdige Hügelwesen Name 1][Merkwürdige Hügelwesen Name 1]
+
+;Merkwürdige Hügelwesen Name 2
+1,adler[Normale Werte]
+1,ameisen[Kleine Werte]
+1,amseln[Kleine Werte]
+1,bären[Bär Werte]
+1,bienen[Kleine Werte]
+1,biester[Kleine Werte]
+1,böcke[Ziege Werte]
+1,büffel[Kuh Werte]
+1,bussarde[Kleine Werte]
+1,dachse[Kleine Werte]
+1,dämonen[Teufel Werte]
+1,drachen[Drache Werte]
+1,drosseln[Kleine Werte]
+1,echsen[Echse Werte]
+1,eidechsen[Kleine Werte]
+1,esel[Pferd Werte]
+1,eulen[Kleine Werte]
+1,falken[Kleine Werte]
+1,fasane[Kleine Werte]
+1,feen[Kleine Werte]
+1,finken[Kleine Werte]
+1,fledermäuse[Kleine Werte]
+1,fliegen[Kleine Werte]
+1,frösche[Kleine Werte]
+1,füchse[Wolf Werte]
+1,geistchen[Kleine Werte]
+1,getiere[Kleine Werte]
+1,goblinge[Kleine Werte]
+1,grillen[Kleine Werte]
+1,habichte[Kleine Werte]
+1,häher[Kleine Werte]
+1,hähne[Kleine Werte]
+1,hälse[Kleine Werte]
+1,hamster[Kleine Werte]
+1,hasen[Kleine Werte]
+1,hirsche[Pferd Werte]
+1,hörnchen[Kleine Werte]
+1,hühner[Kleine Werte]
+1,hummeln[Kleine Werte]
+1,hunde[Wolf Werte]
+1,iltisse[Kleine Werte]
+1,käfer[Kleine Werte]
+1,kaninchen[Kleine Werte]
+1,katzen[Kleine Werte]
+1,käuze[Kleine Werte]
+1,kehlchen[Kleine Werte]
+1,knechte[Kleine Werte]
+1,kojoten[Wolf Werte]
+1,krähen[Kleine Werte]
+1,kraniche[Kleine Werte]
+1,kröten[Kleine Werte]
+1,larven[Kleine Werte]
+1,luchse[Raubkatze werte]
+1,männchen[Kleine Werte]
+1,marder[Kleine Werte]
+1,mäuse[Kleine Werte]
+1,meisen[Kleine Werte]
+1,molche[Kleine Werte]
+1,motten[Kleine Werte]
+1,mulle[Kleine Werte]
+1,nattern[Schlange Werte]
+1,ochsen[Kuh Werte]
+1,paviane[Normale Werte]
+1,ponies[Pferd Werte]
+1,pumas[Raubkatze werte]
+1,raben[Kleine Werte]
+1,racken[Kleine Werte]
+1,ratten[Kleine Werte]
+1,ammern[Kleine Werte]
+1,rehe[Normale Werte]
+1,salamander[Kleine Werte]
+1,saurier[Normale Werte]
+1,schakale[wolf Werte]
+1,schlangen[Schlange Werte]
+1,schmetterlinge[Kleine Werte]
+1,schnepfen[Kleine Werte]
+1,schnucken[Ziege Werte]
+1,schrecken[Kleine Werte]
+1,schweine[Wildschwein Werte]
+1,seelen[Kleine Werte]
+1,segler[Kleine Werte]
+1,stare[Kleine Werte]
+1,storche[Kleine Werte]
+1,tauben[Kleine Werte]
+1,tausendfüßer[Kleine Werte]
+1,teufel[Teufel Werte]
+1,tiere[Kleine Werte]
+1,trappen[Kleine Werte]
+1,viecher[Kleine Werte]
+1,wesen[Kleine Werte]
+1,wespen[Kleine Werte]
+1,wölfe[Wolf Werte]
+1,wurfe[Kleine Werte]
+1,würger[Kleine Werte]
+1,würmchen[Kleine Werte]
+1,würmer[Kleine Werte]
+1,ziegen[Ziege Werte]
+1,ziesel[Kleine Werte]
+1,züngler[Kleine Werte]
+
+# --------------------
+
+;Merkwürdige Bergwesen
+1,[name for a Merkwürdige Bergwesen [1d6]]
+
+;name for a Merkwürdige Bergwesen 1
+1,[Merkwürdige Bergwesen Namen]
+;name for a Merkwürdige Bergwesen 2
+1,[Merkwürdige Bergwesen Namen]
+;name for a Merkwürdige Bergwesen 3
+1,[Merkwürdige Bergwesen Namen]
+;name for a Merkwürdige Bergwesen 4
+1,[Merkwürdige Bergwesen Namen]
+;name for a Merkwürdige Bergwesen 5
+1,[Merkwürdige Bergwesen Namen]
+;name for a Merkwürdige Bergwesen 6
+1,[Merkwürdige Bergwesen Namen]
+
+;Merkwürdige Bergwesen Namen
+1,[Merkwürdige Bergwesen Adjektiv] [capitalize Merkwürdige Bergwesen Name 1][Merkwürdige Bergwesen Name 2]
+
+;Merkwürdige Bergwesen Adjektiv
+1,Aas fressende
+1,aggressive
+1,ängstliche
+1,auffällige
+1,aufgeblähte
+1,ausgelassene
+1,bettelnde
+1,beulige
+1,biestige
+1,bissige
+1,blasse
+1,borstige
+1,dicht bepelzte
+1,dumme
+1,dunkle
+1,einzelgängerische
+1,eisige
+1,fette
+1,fliegende
+1,frierende
+1,fröhliche
+1,frostresistente
+1,furchtsame
+1,geisterhafte
+1,getupfte
+1,gewandte
+1,glänzende
+1,gleitende
+1,glitzernde
+1,grabende
+1,Gras fressende
+1,großfüßige
+1,hängende
+1,harthäutige
+1,häßliche
+1,heimliche
+1,heisere
+1,helle
+1,herumtollende
+1,hungrige
+1,hüpfende
+1,intelligente
+1,jagende
+1,klebfüßige
+1,kleinköpfige
+1,klettige
+1,knochige
+1,knorrige
+1,krallenbewehrte
+1,kraxelnde
+1,kreischende
+1,kugelnde
+1,kurzbeinige
+1,kurzschwänzige
+1,langhaarige
+1,langschwänzige
+1,laute
+1,leckere
+1,leise
+1,massige
+1,missgelaunte
+1,nachtaktive
+1,neugierige
+1,nistende
+1,prächtige
+1,quietschende
+1,räudige
+1,riechende
+1,röchelnde
+1,röhrende
+1,rutschende
+1,scharfsichtige
+1,schaukelnde
+1,scheue
+1,schimmernde
+1,schlaksige
+1,schlanke
+1,schleichende
+1,schmale
+1,schmatzende
+1,schnaufende
+1,schöne
+1,schreiende
+1,schwärmende
+1,seltene
+1,singende
+1,speckige
+1,stachelige
+1,stoische
+1,streitsüchtige
+1,surrende
+1,tanzende
+1,ungenießbare
+1,verseuchte
+1,verspielte
+1,winterschlafende
+1,wohlschmeckende
+1,zitternde
+1,zutrauliche
+1,[Merkwürdige Bergwesen Adjektiv], [Merkwürdige Bergwesen Adjektiv]
+
+;Merkwürdige Bergwesen Name 1
+1,abend
+1,alm
+1,auer
+1,bach
+1,band
+1,berg
+1,blau
+1,blizzard
+1,braun
+1,dämmerungs
+1,eis
+1,fall
+1,fauch
+1,feder
+1,fell
+1,fels
+1,flechten
+1,fleck
+1,frost
+1,fuß
+1,gabel
+1,gebirgs
+1,gelb
+1,geröll
+1,gipfel
+1,rassel
+1,bart
+1,grau
+1,groß
+1,grotten
+1,haar
+1,hagel
+1,hang
+1,himmel
+1,hochland
+1,höhen
+1,hohl
+1,höhlen
+1,horn
+1,kälte
+1,kamm
+1,keulen
+1,kiefern
+1,klauen
+1,klein
+1,klippen
+1,kluft
+1,kolk
+1,kugel
+1,lawinen
+1,leucht
+1,luft
+1,mähnen
+1,maul
+1,morgen
+1,murmel
+1,nacht
+1,nackt
+1,ohr
+1,ork
+1,pass
+1,rau
+1,rauf
+1,regen
+1,reif
+1,ren
+1,riesen
+1,ringel
+1,rost
+1,rot
+1,rücken
+1,wolken
+1,schalen
+1,schmuck
+1,schmutz
+1,schnee
+1,schwanz
+1,schwarz
+1,silber
+1,spalt
+1,spitz
+1,spring
+1,steiger
+1,stein
+1,steiß
+1,stern
+1,stink
+1,tal
+1,tatzel
+1,trug
+1,viel
+1,weiß
+1,wild
+1,winter
+1,woll
+1,würge
+1,yeti
+1,zahn
+1,zwerg
+1,[Merkwürdige Bergwesen Name 1][Merkwürdige Bergwesen Name 1]
+
+;Merkwürdige Bergwesen Name 2
+1,adler[Kleine Werte]
+1,affen[Normale Werte]
+1,alben[Kleine Werte]
+1,ameisen[Kleine Werte]
+1,amseln[Kleine Werte]
+1,bären[Bär Werte]
+1,biester[Kleine Werte]
+1,böcke[Ziege Werte]
+1,bussarde[Kleine Werte]
+1,chinchillas[Kleine Werte]
+1,dachse[Kleine Werte]
+1,dämonen[Kleine Werte]
+1,dohlen[Kleine Werte]
+1,drachen[Drache Werte]
+1,drosseln[Kleine Werte]
+1,eidechsen[Kleine Werte]
+1,elstern[Kleine Werte]
+1,esel[Pferd Werte]
+1,eulen[Kleine Werte]
+1,falken[Kleine Werte]
+1,feen[Kleine Werte]
+1,finken[Kleine Werte]
+1,fledermäuse[Kleine Werte]
+1,fliegen[Kleine Werte]
+1,fraße[Kleine Werte]
+1,füchse[Kleine Werte]
+1,gämse[Ziege Werte]
+1,geier[Kleine Werte]
+1,geistchen[Kleine Werte]
+1,getiere[Kleine Werte]
+1,gnömchen[Kleine Werte]
+1,goblinge[Kleine Werte]
+1,guanakos[Kleine Werte]
+1,habichte[Kleine Werte]
+1,häher[Kleine Werte]
+1,hähne[Kleine Werte]
+1,hasen[Kleine Werte]
+1,hexchen[Kleine Werte]
+1,hirsche[Pferd Werte]
+1,hörnchen[Kleine Werte]
+1,hühner[Kleine Werte]
+1,hummeln[Kleine Werte]
+1,hunde[Kleine Werte]
+1,iltisse[Kleine Werte]
+1,käfer[Kleine Werte]
+1,motten[Kleine Werte]
+1,kaninchen[Kleine Werte]
+1,katzen[Kleine Werte]
+1,käuze[Kleine Werte]
+1,keas[Kleine Werte]
+1,kehlchen[Kleine Werte]
+1,kobel[Kleine Werte]
+1,koboldchen[Kleine Werte]
+1,kojoten[Kleine Werte]
+1,kondore[Kleine Werte]
+1,krähen[Kleine Werte]
+1,kröten[Kleine Werte]
+1,leoparde[Raubkatze Werte]
+1,luchse[Kleine Werte]
+1,männchen[Kleine Werte]
+1,marder[Kleine Werte]
+1,mäuse[Kleine Werte]
+1,meisen[Kleine Werte]
+1,milane[Kleine Werte]
+1,molche[Kleine Werte]
+1,muffel[Ziege Werte]
+1,nattern[Kleine Werte]
+1,pudu[Kleine Werte]
+1,pumas[Raubkatze Werte]
+1,raben[Kleine Werte]
+1,ratten[Kleine Werte]
+1,rehe[Pferd Werte]
+1,salamander[Kleine Werte]
+1,schafe[Ziege Werte]
+1,schakale[Kleine Werte]
+1,schlangen[Kleine Werte]
+1,schmetterlinge[Kleine Werte]
+1,schrate[Kleine Werte]
+1,schrecken[Kleine Werte]
+1,seelen[Kleine Werte]
+1,stare[Kleine Werte]
+1,stelzen[Kleine Werte]
+1,tahre[Ziege Werte]
+1,tauben[Kleine Werte]
+1,tausendfüßer[Kleine Werte]
+1,teufel[Kleine Werte]
+1,tiere[Kleine Werte]
+1,tiger[Raubkatze Werte]
+1,tröllchen[Kleine Werte]
+1,viecher[Kleine Werte]
+1,vikunjas[Kleine Werte]
+1,wesen[Kleine Werte]
+1,wichtelchen[Kleine Werte]
+1,wölfe[Wolf Werte]
+1,wolpertinger[Kleine Werte]
+1,würmer[Kleine Werte]
+1,yaks[Pferd Werte]
+1,ziegen[Ziege Werte]
+1,ziesel[Kleine Werte]
+
+# --------------------
+
+;Merkwürdige Steppenwesen
+1,[name for a Merkwürdige Steppenwesen [1d6]]
+
+;name for a Merkwürdige Steppenwesen 1
+1,[Merkwürdige Steppenwesen Namen]
+;name for a Merkwürdige Steppenwesen 2
+1,[Merkwürdige Steppenwesen Namen]
+;name for a Merkwürdige Steppenwesen 3
+1,[Merkwürdige Steppenwesen Namen]
+;name for a Merkwürdige Steppenwesen 4
+1,[Merkwürdige Steppenwesen Namen]
+;name for a Merkwürdige Steppenwesen 5
+1,[Merkwürdige Steppenwesen Namen]
+;name for a Merkwürdige Steppenwesen 6
+1,[Merkwürdige Steppenwesen Namen]
+
+;Merkwürdige Steppenwesen Namen
+1,[Merkwürdige Steppenwesen Adjektiv] [capitalize Merkwürdige Steppenwesen Name 1][Merkwürdige Steppenwesen Name 2]
+
+;Merkwürdige Steppenwesen Adjektiv
+1,Aas fressende
+1,aggressive
+1,auffällige
+1,aufgeblähte
+1,ausgelassene
+1,bettelnde
+1,beulige
+1,biestige
+1,bissige
+1,borstige
+1,dumme
+1,dunkle
+1,dürre
+1,einzelgängerische
+1,fette
+1,fliegende
+1,flinke
+1,fröhliche
+1,furchtsame
+1,galoppierende
+1,geisterhafte
+1,gepunktete
+1,gestreifte
+1,getupfte
+1,gewandte
+1,glänzende
+1,gleitende
+1,glitzernde
+1,grabende
+1,Gras fressende
+1,großfüßige
+1,häßliche
+1,heimliche
+1,heisere
+1,helle
+1,herumstreifende
+1,herumtollende
+1,hungrige
+1,hüpfende
+1,intelligente
+1,jagende
+1,knochige
+1,knorrige
+1,krallenbewehrte
+1,kreischende
+1,kugelnde
+1,kurzschwänzige
+1,langbeinige
+1,langhaarige
+1,langschwänzige
+1,laute
+1,leckere
+1,leise
+1,massige
+1,missgelaunte
+1,mobile
+1,nachtaktive
+1,neugierige
+1,prächtige
+1,quietschende
+1,rasende
+1,räudige
+1,riechende
+1,röchelnde
+1,röhrende
+1,scharfsichtige
+1,scheue
+1,schimmernde
+1,schlaksige
+1,schlanke
+1,schleichende
+1,schmale
+1,schmatzende
+1,schnaufende
+1,schnelle
+1,schöne
+1,schreiende
+1,schwärmende
+1,schwebende
+1,seltene
+1,sich vom Wind treiben lassende
+1,singende
+1,spurtende
+1,stachelige
+1,stoische
+1,stolpernde
+1,streitsüchtige
+1,surrende
+1,tanzende
+1,teleportierende
+1,tollpatschige
+1,torkelnde
+1,ungenießbare
+1,verseuchte
+1,verspielte
+1,wohlschmeckende
+1,wühlende
+1,zahme
+1,zutrauliche
+1,[Merkwürdige Steppenwesen Adjektiv], [Merkwürdige Steppenwesen Adjektiv]
+
+;Merkwürdige Steppenwesen Name 1
+1,abend
+1,augen
+1,band
+1,beil
+1,blau
+1,blitz
+1,boden
+1,bunt
+1,busch
+1,büschel
+1,dämmerungs
+1,dickicht
+1,dreck
+1,fauch
+1,feder
+1,feld
+1,feucht
+1,fleck
+1,flink
+1,gabel
+1,gelb
+1,glüh
+1,gold
+1,kamm
+1,gras
+1,grau
+1,groß
+1,gürtel
+1,haut
+1,helm
+1,herden
+1,heu
+1,honig
+1,horn
+1,keulen
+1,klauen
+1,klein
+1,kugel
+1,lauf
+1,leder
+1,leucht
+1,licht
+1,luft
+1,mähnen
+1,maul
+1,morgen
+1,moschus
+1,murmel
+1,nacht
+1,nackt
+1,ohr
+1,panzer
+1,perl
+1,pfeif
+1,plapper
+1,prärie
+1,rauf
+1,regen
+1,ren
+1,renn
+1,ringel
+1,rost
+1,rot
+1,rötel
+1,rund
+1,saiga
+1,sand
+1,schabracken
+1,schalen
+1,schild
+1,schmuck
+1,schreit
+1,schwanz
+1,schwarz
+1,silber
+1,spitz
+1,spring
+1,staub
+1,stein
+1,steiß
+1,steppen
+1,stern
+1,stink
+1,stroh
+1,trampel
+1,trug
+1,trut
+1,wander
+1,warzen
+1,wasser
+1,weber
+1,weiß
+1,wild
+1,wind
+1,woll
+1,würge
+1,zahn
+1,zentauren
+1,zwerg
+1,[Merkwürdige Steppenwesen Name 1][Merkwürdige Steppenwesen Name 1]
+
+;Merkwürdige Steppenwesen Name 2
+1,adler[Kleine Werte]
+1,ameisen[Kleine Werte]
+1,amseln[Kleine Werte]
+1,antilopen[Pferd Werte]
+1,bären[Bär Werte]
+1,bienen[Kleine Werte]
+1,biester[Kleine Werte]
+1,bisons[Pferd Werte]
+1,böcke[Kleine Werte]
+1,büffel[Kuh Werte]
+1,dämonen[Teufel Werte]
+1,drachen[Drache Werte]
+1,drosseln[Kleine Werte]
+1,echsen[Echse Werte]
+1,eidechsen[Kleine Werte]
+1,elstern[Kleine Werte]
+1,emus[Kleine Werte]
+1,eulen[Kleine Werte]
+1,falken[Kleine Werte]
+1,falter[Kleine Werte]
+1,fasane[Kleine Werte]
+1,finken[Kleine Werte]
+1,fledermäuse[Kleine Werte]
+1,fliegen[Kleine Werte]
+1,füchse[Kleine Werte]
+1,gazellen[Kleine Werte]
+1,geier[Kleine Werte]
+1,geistchen[Kleine Werte]
+1,getiere[Kleine Werte]
+1,grillen[Kleine Werte]
+1,hamster[Kleine Werte]
+1,hasen[Kleine Werte]
+1,hirsche[Pferd Werte]
+1,hörnchen[Kleine Werte]
+1,hühner[Kleine Werte]
+1,hunde[Wolf Werte]
+1,hüpfer[Kleine Werte]
+1,iltisse[Kleine Werte]
+1,käfer[Kleine Werte]
+1,kamele[Pferd Werte]
+1,kängurus[Kleine Werte]
+1,kaninchen[Kleine Werte]
+1,katzen[Raubkatze Werte]
+1,käuze[Kleine Werte]
+1,kehlchen[Kleine Werte]
+1,kiebitze[Kleine Werte]
+1,knechte[Kleine Werte]
+1,kojoten[Wolf Werte]
+1,krähen[Kleine Werte]
+1,kraniche[Kleine Werte]
+1,kröten[Kleine Werte]
+1,larven[Kleine Werte]
+1,luchse[Raubkatze Werte]
+1,mammuts[Elefant Werte]
+1,mäuse[Kleine Werte]
+1,meisen[Kleine Werte]
+1,mulle[Kleine Werte]
+1,nandus[Kleine Werte]
+1,nashörner[Elefant Werte]
+1,nattern[Schlange Werte]
+1,ochsen[Kuh Werte]
+1,opossums[Kleine Werte]
+1,pferde[Pferd Werte]
+1,ponies[Pferd Werte]
+1,pumas[Raubkatze Werte]
+1,raben[Kleine Werte]
+1,ratten[Kleine Werte]
+1,rehe[Kleine Werte]
+1,saurier[Normale Werte]
+1,schaben[Normale Werte]
+1,schafe[Kleine Werte]
+1,schakale[Wolf Werte]
+1,schlangen[Schlange Werte]
+1,schmetterlinge[Kleine Werte]
+1,schnäbel[Kleine Werte]
+1,schrecken[Kleine Werte]
+1,schweinchen[Kleine Werte]
+1,schweine[Wildschwein Werte]
+1,sittiche[Kleine Werte]
+1,stare[Kleine Werte]
+1,storche[Kleine Werte]
+1,strausse[Kleine Werte]
+1,tauben[Kleine Werte]
+1,tausendfüßer[Kleine Werte]
+1,termiten[Kleine Werte]
+1,teufel[Teufel Werte]
+1,tiere[Normale Werte]
+1,trappen[Kleine Werte]
+1,viecher[Kuh Werte]
+1,wesen[Normale Werte]
+1,wespen[Kleine Werte]
+1,wölfe[Wolf Werte]
+1,wurfe[Kleine Werte]
+1,würmchen[Kleine Werte]
+1,würmer[Kleine Werte]
+1,ziegen[Kleine Werte]
+1,ziesel[Kleine Werte]
+1,züngler[Kleine Werte]
+
+# --------------------
+
+;Merkwürdige Sumpfwesen
+1,[name for a Merkwürdige Sumpfwesen [1d6]]
+
+;name for a Merkwürdige Sumpfwesen 1
+1,[Merkwürdige Sumpfwesen Namen]
+;name for a Merkwürdige Sumpfwesen 2
+1,[Merkwürdige Sumpfwesen Namen]
+;name for a Merkwürdige Sumpfwesen 3
+1,[Merkwürdige Sumpfwesen Namen]
+;name for a Merkwürdige Sumpfwesen 4
+1,[Merkwürdige Sumpfwesen Namen]
+;name for a Merkwürdige Sumpfwesen 5
+1,[Merkwürdige Sumpfwesen Namen]
+;name for a Merkwürdige Sumpfwesen 6
+1,[Merkwürdige Sumpfwesen Namen]
+
+;Merkwürdige Sumpfwesen Namen
+1,[Merkwürdige Sumpfwesen Adjektiv] [capitalize Merkwürdige Sumpfwesen Name 1][Merkwürdige Sumpfwesen Name 2]
+
+
+;Merkwürdige Sumpfwesen Adjektiv
+1,Aas fressende
+1,aggressive
+1,algige
+1,amphibische
+1,ängstliche
+1,aufgeblähte
+1,badende
+1,bettelnde
+1,beulige
+1,bewachsene
+1,biestige
+1,bissige
+1,blasse
+1,blubbernde
+1,borstige
+1,dumme
+1,dunkle
+1,düstere
+1,einzelgängerische
+1,fette
+1,feuchte
+1,fliegende
+1,furchtsame
+1,geisterhafte
+1,genießbare
+1,getarnte
+1,getupfte
+1,gewandte
+1,glatte
+1,gleitende
+1,glibbrige
+1,glitschige
+1,Gras fressende
+1,großfüßige
+1,häßliche
+1,heimliche
+1,heisere
+1,herumtollende
+1,heulende
+1,hungrige
+1,hüpfende
+1,intelligente
+1,jagende
+1,klagende
+1,klettige
+1,knochige
+1,krabbelnde
+1,kreischende
+1,kurzbeinige
+1,kurzschwänzige
+1,kurzsichtige
+1,langschwänzige
+1,lauernde
+1,laute
+1,leichte
+1,leise
+1,melancholische
+1,missgelaunte
+1,nachtaktive
+1,neugierige
+1,planschende
+1,quietschende
+1,räudige
+1,riechende
+1,röchelnde
+1,röhrende
+1,rutschende
+1,scheue
+1,schimmernde
+1,schlanke
+1,schleichende
+1,schleimige
+1,schmale
+1,schmatzende
+1,schmutzige
+1,schnaufende
+1,schöne
+1,schreiende
+1,schwärmende
+1,seltene
+1,singende
+1,speckige
+1,starrende
+1,stille
+1,stinkende
+1,stoische
+1,streitsüchtige
+1,suhlende
+1,tanzende
+1,traurige
+1,ungenießbare
+1,untertauchende
+1,verseuchte
+1,verspielte
+1,Wasser spuckende
+1,weichhäutige
+1,wohlschmeckende
+1,zitternde
+1,zutrauliche
+1,[Merkwürdige Sumpfwesen Adjektive][Merkwürdige Sumpfwesen Adjektive]
+
+;Merkwürdige Sumpfwesen Name 1
+1,bach
+1,band
+1,bauch
+1,birk
+1,bisam
+1,blau
+1,blut
+1,brach
+1,braun
+1,bruch
+1,damm
+1,dämmerungs
+1,delta
+1,dreck
+1,dunst
+1,erd
+1,fauch
+1,faul
+1,fäulnis
+1,feder
+1,feld
+1,fenn
+1,fieber
+1,fleck
+1,fluß
+1,gas
+1,gelb
+1,glüh
+1,graben
+1,gras
+1,grau
+1,groß
+1,grün
+1,höcker
+1,irr
+1,kanal
+1,klein
+1,knäk
+1,kolk
+1,krick
+1,lach
+1,leucht
+1,loch
+1,marsch
+1,matsch
+1,moder
+1,moor
+1,moos
+1,morast
+1,morgen
+1,nacht
+1,nackt
+1,nass
+1,nebel
+1,pest
+1,pfeif
+1,pfuhl
+1,pilz
+1,reet
+1,regen
+1,ried
+1,riesen
+1,rinnen
+1,rohr
+1,röhricht
+1,rot
+1,schilf
+1,schlamm
+1,schleim
+1,schlick
+1,schmuck
+1,schmutz
+1,schwamm
+1,schwanz
+1,schwarz
+1,schwemm
+1,schwimm
+1,see
+1,silber
+1,spitz
+1,stech
+1,stock
+1,sumpf
+1,tauch
+1,teich
+1,torf
+1,totarm
+1,toten
+1,trauer
+1,trug
+1,tümpel
+1,ufer
+1,wehr
+1,weiden
+1,weiher
+1,wiesen
+1,wild
+1,würge
+1,zwerg
+1,[Merkwürdige Sumpfwesen Name 1][Merkwürdige Sumpfwesen Name 1]
+
+;Merkwürdige Sumpfwesen Name 2
+1,adler[Kleine Werte]
+1,alligatoren[Krokodil Werte]
+1,ammern[Kleine Werte]
+1,amseln[Kleine Werte]
+1,bären[Bär Werte]
+1,biber[Kleine Werte]
+1,biester[Kleine Werte]
+1,bussarde[Kleine Werte]
+1,dämonen[Teufel Werte]
+1,dohlen[Kleine Werte]
+1,drachen[Drache Werte]
+1,drosseln[Kleine Werte]
+1,echsen[Echse Werte]
+1,egel[Kleine Werte]
+1,eidechsen[Kleine Werte]
+1,elche[Kuh Werte]
+1,elstern[Kleine Werte]
+1,enten[Kleine Werte]
+1,eulen[Kleine Werte]
+1,falken[Kleine Werte]
+1,falter[Kleine Werte]
+1,feen[Kleine Werte]
+1,finken[Kleine Werte]
+1,fliegen[Kleine Werte]
+1,frösche[Kleine Werte]
+1,füchse[Wolf Werte]
+1,gänse[Normale Werte]
+1,geistchen[Kleine Werte]
+1,getiere[Kleine Werte]
+1,gnömchen[Kleine Werte]
+1,goblinge[Kleine Werte]
+1,habichte[Kleine Werte]
+1,häher[Kleine Werte]
+1,hähne[Kleine Werte]
+1,hexchen[Kleine Werte]
+1,hörnchen[Kleine Werte]
+1,hühner[Kleine Werte]
+1,hummeln[Kleine Werte]
+1,hunde[Wolf Werte]
+1,iltisse[Kleine Werte]
+1,jungfern[Kleine Werte]
+1,käfer[Kleine Werte]
+1,kaninchen[Kleine Werte]
+1,käuze[Kleine Werte]
+1,kehlchen[Kleine Werte]
+1,koboldchen[Kleine Werte]
+1,krabben[Kleine Werte]
+1,krähen[Kleine Werte]
+1,kraniche[Kleine Werte]
+1,krebse[Kleine Werte]
+1,krokodile[Krokodil Werte]
+1,kröten[Kleine Werte]
+1,larven[Kleine Werte]
+1,lerchen[Kleine Werte]
+1,lichter[Kleine Werte]
+1,lurche[Kleine Werte]
+1,maden[Kleine Werte]
+1,männchen[Kleine Werte]
+1,marder[Kleine Werte]
+1,mäuse[Kleine Werte]
+1,meisen[Kleine Werte]
+1,milane[Kleine Werte]
+1,molche[Kleine Werte]
+1,motten[Kleine Werte]
+1,möwen[Kleine Werte]
+1,mücken[Kleine Werte]
+1,nattern[Kleine Werte]
+1,neunaugen[Kleine Werte]
+1,pythons[Normale Werte]
+1,raben[Kleine Werte]
+1,ratten[Kleine Werte]
+1,raupen[Kleine Werte]
+1,rehe[Normale Werte]
+1,reiher[Kleine Werte]
+1,säger[Kleine Werte]
+1,salamander[Echse Werte]
+1,schlangen[Schlange Werte]
+1,schleichen[Echse Werte]
+1,schmetterlinge[Kleine Werte]
+1,schnecken[Kleine Werte]
+1,schnepfen[Kleine Werte]
+1,schrecken[Kleine Werte]
+1,schwäne[Normale Werte]
+1,seelen[Kleine Werte]
+1,spinnen[Kleine Werte]
+1,stare[Kleine Werte]
+1,stelzen[Kleine Werte]
+1,störche[Kleine Werte]
+1,tausendfüßer[Kleine Werte]
+1,teufel[Teufel Werte]
+1,tiere[Kleine Werte]
+1,tiger[Raubkatze Werte]
+1,unken[Kleine Werte]
+1,viecher[Kleine Werte]
+1,vögel[Kleine Werte]
+1,welse[Normale Werte]
+1,wesen[Kleine Werte]
+1,würmchen[Kleine Werte]
+1,würmer[Normale Werte]
+
+# --------------------
+
+;Kleine Fischwerte
+100,
+10, (TW: [Kleine TP] RK: [Kleine Rüstung] S: [Kleiner Schaden] RW: 18 GS: Schwimmen [2d6+3] ML: [2d4+1] EP: [Kleines EP])
+1,[Normale Werte]
+
+
+;Kleine Werte
+100,
+10, (TW: [Kleine TP] RK: [Kleine Rüstung] S: [Kleiner Schaden] RW: 18 GS: [2d6+3] ML: [2d4+1] EP: [Kleines EP])
+1,[Normale Werte]
+
+;Kleine TP
+1,1 TP
+1,1W2 TP
+1,1W4 TP
+1,1W6 TP
+1,1-1
+
+;Kleine Rüstung
+1,9/10
+1,8/11
+1,7/12
+1,6/13
+
+;Kleiner Schaden
+1,1
+3,1W2
+4,1W3
+2,1W4
+1,1W6
+1,1W2/1W2
+1,1W3/1W3
+
+;Kleines EP
+10,10
+1,30 [Kleines Besonderes]
+
+;Kleines Besonderes
+1,Bes: Kann sich einmal pro Tag unsichtbar machen
+1,Bes: Kann einmal pro Tag [Effekt] spucken, 6m Länge, 1W6 Schaden
+1,Bes: Kann sich einmal pro Tag in einen [Verwandelding] verwandeln
+
+;Effekt
+1,Feuer
+1,Blitze
+1,Kälte
+1,Schnee
+1,Eis
+1,Hagel
+1,Frost
+1,Säure
+1,Schlamm
+1,Mulch
+1,Blätter
+1,Knochen
+1,Halbverdautes
+
+;Verwandelding
+1,Baum
+4,Fels
+4,Stein
+
+;Normale Fischwerte
+10, (TW: [Normale TW] RK: [Normale RK] [Normaler FischA] RW: [Normaler RW] GS: Schwimmen [2d6+3] ML: [2d4+2] EP: [Normale EP])
+1,[Kleine Fischwerte]
+1,
+
+;Normale Werte
+10, (TW: [Normale TW] RK: [Normale RK] [Normaler A] RW: [Normaler RW] GS: [2d6+3] ML: [2d4+2] EP: [Normale EP])
+1,[Kleine Werte]
+1,
+
+;Normale TW
+20,[quote 1 as TW]
+4,[quote 1 as TW]+1
+15,[quote 2 as TW]
+3,[quote 2 as TW]+1
+10,[quote 3 as TW]
+2,[quote 3 as TW]+1
+5,[quote 4 as TW]
+1,[quote 4 as TW]+1
+
+;Normale RK
+1,9/10
+2,8/11
+3,7/12
+4,6/13
+3,5/14
+2,4/15
+1,3/16
+
+;Normaler A
+5,S: 1W6
+4,S: 1W8
+3,S: 1W4/1W4/1W6
+2,S: 1W6/1W6
+1,S: 1W10
+
+;Normaler FischA
+5,S: 1W4
+4,S: 1W6
+3,S: 1W8
+2,S: 1W10
+1,S: 1W12
+
+# Der Rettungswurf bezieht sich auf die Trefferwürfel
+;Normaler RW
+1,[RW: [same TW]]
+;RW: 1
+1,17
+;RW: 2
+1,16
+;RW: 3
+1,14
+;RW: 4
+1,13
+
+# Die Erfahrungspunkte bezieht sich auf die Trefferwürfel (und es gibt
+# auf dieser Stufe keine Spezialfähgikeiten)
+;Normale EP
+1,[EP: [same TW]]
+;EP: 1
+1,15
+;EP: 2
+1,30
+;EP: 3
+1,60
+;EP: 4
+1,120
+
+# --------------------
+
+;Bär Werte
+1,[Schwarzbär Werte]
+1,[Graubär Werte]
+1,[Polarbär Werte]
+1,[Normale Werte]
+
+;Schwarzbär Werte
+1, (TW: 4+1 RK: 7/12 S: 1W3/1W3/1W6 RW: 13 GS: 9 ML: 6 EP: 120 Bes: Treffen beide Tatzen gibt es nochmal 1W8 wegen der „Umarmung“)
+
+;Graubär Werte
+1, (TW: 6 RK: 6/13 S: 1W6/1W6/1W10 RW: 11 GS: 9 ML: 7 EP: 400 Bes: Treffen beide Tatzen gibt es nochmal 2W6 wegen der „Umarmung“ und der Bär lässt nicht mehr los, also automatischer Schaden jede Runde)
+
+;Polarbär Werte
+1, (TW: 7 RK: 6/13 S: 1W6+1/1W6+1/1W10+1 RW: 9 GS: 12 ML: 8 EP: 600 Bes: Treffen beide Tatzen gibt es nochmal 3W6 wegen der „Umarmung“)
+
+;Drache Werte
+2,[Kleine Werte]
+1,[Normale Werte]
+
+# Die ‘richtigen’ Drachen sind wohl eher in der Einzahl, wie NSCs.
+# 1, (TW: 5 RK: 2/17 S: 1W4/1W4/2W8 RW: 12 GS: 9/24 (fliegen) ML: 8 EP: 600)
+# 1, (TW: 6 RK: 2/17 S: 1W4/1W4/2W8 RW: 11 GS: 9/24 (fliegen) ML: 8 EP: 600)
+# 1, (TW: 7 RK: 2/17 S: 1W4/1W4/2W8 RW: 9 GS: 9/24 (fliegen) ML: 8 EP: 600)
+# 1, (TW: 6 RK: 2/17 S: 1W4/1W4/3W6 RW: 11 GS: 9/24 (fliegen) ML: 8 EP: 600)
+# 1, (TW: 7 RK: 2/17 S: 1W4/1W4/3W6 RW: 9 GS: 9/24 (fliegen) ML: 8 EP: 600)
+# 1, (TW: 8 RK: 2/17 S: 1W4/1W4/3W6 RW: 8 GS: 9/24 (fliegen) ML: 8 EP: 600)
+# 1, (TW: 7 RK: 2/17 S: 1W6/1W6/2W10 RW: 9 GS: 9/24 (fliegen) ML: 8 EP: 600)
+# 1, (TW: 8 RK: 2/17 S: 1W6/1W6/2W10 RW: 8 GS: 9/24 (fliegen) ML: 8 EP: 600)
+# 1, (TW: 9 RK: 2/17 S: 1W6/1W6/2W10 RW: 6 GS: 9/24 (fliegen) ML: 8 EP: 600)
+# 1, (TW: 8 RK: 2/17 S: 1W6/1W6/3W6 RW: 8 GS: 9/24 (fliegen) ML: 8 EP: 600)
+# 1, (TW: 9 RK: 2/17 S: 1W6/1W6/3W6 RW: 6 GS: 9/24 (fliegen) ML: 8 EP: 600)
+# 1, (TW: 10 RK: 2/17 S: 1W6/1W6/3W6 RW: 5 GS: 9/24 (fliegen) ML: 8 EP: 600)
+# 1, (TW: 9 RK: 2/17 S: 1W8/1W8/3W10 RW: 6 GS: 9/24 (fliegen) ML: 8 EP: 600)
+# 1, (TW: 10 RK: 2/17 S: 1W8/1W8/3W10 RW: 5 GS: 9/24 (fliegen) ML: 8 EP: 600)
+# 1, (TW: 11 RK: 2/17 S: 1W8/1W8/3W10 RW: 4 GS: 9/24 (fliegen) ML: 8 EP: 600)
+
+;Echse Werte
+1,[Kleine Werte]
+1, (TW: 2 RK: 5/14 S: 1W6 RW: 16 GS: 12 ML: 7 EP: 30)
+
+;Elefant Werte
+1, (TW: 8 RK: 6 S: 3W8 RW: 8 GS: 12 ML: 8 EP: 800)
+1, (TW: 9 RK: 5 S: 4W8 RW: 6 GS: 12 ML: 8 EP: 1100)
+
+;Pferd Werte
+1, (TW: 2 RK: 7/12 S: 1W6/1W6 RW: 17 GS: 18 ML: 3 EP: 30)
+1, (TW: 3 RK: 7/12 S: 1W6/1W6 RW: 17 GS: 18 ML: 3 EP: 60)
+
+;Krokodil Werte
+1, (TW: 6 RK: 3/16 S: 3W6 RW: 11 GS: 9/Schwimmen 12 ML: 9 EP: 400)
+3, (TW: 3 RK: 4/15 S: 1W6 RW: 14 GS: 9/Schwimmen 12 ML: 8 EP: 60)
+
+;Kuh Werte
+1, (TW: 4 RK: 7/12 S: 1W8 RW: 13 GS: 15 ML: 4 EP: 120 Bes: Zusätzlicher Sturmangriff +2 in der ersten Runde)
+
+;Qualle Werte
+1,
+1, (TW: 1W4 TP RK: 9/10 S: 1+Gift RW: 18 GS: Schwimmen 1 ML: [1d6+1] EP: 30 Bes: [Gift])
+1, (TW: 1 TP RK: 8/11 S: 1W3+Gift RW: 17 GS: Schwimmen [1d3] ML: [1d6+2] EP: 60 Bes: [Gift])
+
+;Raubkatze Werte
+# löwe
+1, (TW: 5+2 RK: 6/13 S: 1W4/1W4/1W8 RW: 12 GS: 12 ML: 6 EP: 240)
+# luchs
+1, (TW: 2 RK: 7/12 S: 1W2/1W2/1W6 RW: 16 GS: 12 ML: 6 EP: 30)
+
+;Schlange Werte
+1, (TW: 1W6 TP RK: 5/14 S: 1+Gift RW: 18 GS: 18 ML: 5 EP: 30 Bes: [Gift])
+1, (TW: 2 RK: 5/14 S: 1W2+Gift RW: 16 GS: 15 ML: 7 EP: 60 Bes: [Gift])
+
+;Teufel Werte
+1,[Kleine Werte]
+
+;Wildschwein Werte
+1, (TW: 3+3 RK: 7/12 S: 3W4 RW: 14 GS: 15 ML: 10 EP: 120 Bes: Kämpft nach dem „Tod“ noch zwei Runden weiter)
+
+;Wolf Werte
+1, (TW: 2+1 RK: 7/12 S: 1W6 RW: 17 GS: 15 ML: 8 EP: 15)
+
+;Ziege Werte
+1,[Kleine Werte]
+1, (TW 2 RK 7/12 S: 1W6 RW 18 GS 18 ML 5 EP 60 Bes: Doppelter Schaden mit Rammstoß, RW oder umgestoßen)
+
+;Gift
+1,Gift, Tödliches[Rettungswurf Gift][Onset Gift]
+1,Gift, 5 TP Schaden[Rettungswurf Gift][Onset Gift]
+1,Gift, 1W6 Phasen Schlaf[Rettungswurf Gift][Onset Gift]
+1,Gift, 10 TP Schaden[Rettungswurf Gift][Onset Gift]
+1,Gift, 1W6 Phasen Lähmung[Rettungswurf Gift][Onset Gift]
+1,Gift, 15 TP Schaden[Rettungswurf Gift][Onset Gift]
+1,Gift, 20 TP Schaden[Rettungswurf Gift][Onset Gift]
+1,Gift, 25 TP Schaden[Rettungswurf Gift][Onset Gift]
+1,Gift, 30 TP Schaden[Rettungswurf Gift][Onset Gift]
+1,Gift, 40 TP Schaden[Rettungswurf Gift][Onset Gift]
+1,Gift, 50 TP Schaden[Rettungswurf Gift][Onset Gift]
+
+;Rettungswurf Gift
+2,, RW mit +1 Bonus
+1,, RW mit +2 Bonus
+1,, RW mit +3 Bonus
+1,, RW mit +4 Bonus
+4,
+2,, RW mit -1 Malus
+1,, RW mit -2 Malus
+1,, RW mit -3 Malus
+1,, RW mit -4 Malus
+
+;Onset Gift
+5,
+1,, wirkt nach einer Runde
+1,, wirkt nach 1W4 Runden
+1,, wirkt nach 1W8 Runden
+1,, wirkt nach einer Phase
+1,, wirkt nach 1W4 Phasen
+# --------------------
+
+

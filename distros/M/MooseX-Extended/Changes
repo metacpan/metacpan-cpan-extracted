@@ -1,5 +1,16 @@
 Revision history for MooseX-Extended
 
+0.26      2022-07-29 08:28:21 CEST
+
+          - "naked" fields (those no writer, default, or builder) that cannot
+            have a value set will now issue a warning. (thanks, tobyink)
+          - `is => 'rwp'` is now supported
+          - Use new version of B::Hooks::AtRuntime. Classes now remain
+            immutable under the debugger. Thanks to haarg and Ben Morrow for
+            following up on that.
+          - Move perl critic deps to test dependencies and update
+            dist.ini in the process. (thanks, waterkip!)
+
 0.25      2022-06-16 16:02:05 CEST
 
           - `builder` can now accept a coderef (stolen from Moo). (thanks,

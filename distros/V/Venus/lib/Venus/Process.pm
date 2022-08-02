@@ -5,10 +5,18 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use overload (
+  '""' => 'explain',
+  '~~' => 'explain',
+  fallback => 1,
+);
 
-extends 'Venus::Kind::Utility';
+use Venus::Class;
 
+base 'Venus::Kind::Utility';
+
+with 'Venus::Role::Valuable';
+with 'Venus::Role::Buildable';
 with 'Venus::Role::Accessible';
 with 'Venus::Role::Explainable';
 
@@ -395,7 +403,11 @@ This package integrates behaviors from:
 
 L<Venus::Role::Accessible>
 
+L<Venus::Role::Buildable>
+
 L<Venus::Role::Explainable>
+
+L<Venus::Role::Valuable>
 
 =cut
 
@@ -1197,3 +1209,41 @@ I<Since C<0.06>>
 =back
 
 =cut
+
+=head1 OPERATORS
+
+This package overloads the following operators:
+
+=cut
+
+=over 4
+
+=item operation: C<("")>
+
+This package overloads the C<""> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = "$parent";
+
+  # $pid
+
+=back
+
+=over 4
+
+=item operation: C<(~~)>
+
+This package overloads the C<~~> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $parent ~~ /^\d+$/;
+
+  # 1
+
+=back

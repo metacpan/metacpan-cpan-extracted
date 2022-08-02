@@ -1,11 +1,16 @@
-Makefile.PL
-MANIFEST
+Changes
 FlatFile.pm
+LICENSE
+MANIFEST
+META.json                                Module JSON meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+Makefile.PL
 README
-COPYING
 TODO
+boilerplate.pl
 t/00_basic.t
 t/01_passwd.t
+t/01_post_update.t
 t/02_write.t
 t/02_write_destruct.t
 t/02_write_destruct_2.t

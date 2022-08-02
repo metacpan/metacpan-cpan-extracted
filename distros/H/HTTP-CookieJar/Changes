@@ -1,5 +1,16 @@
 Revision history for HTTP-CookieJar
 
+0.014     2022-07-25 09:45:56-04:00 America/New_York
+
+    - No changes from 0.013
+
+0.013     2022-07-17 10:13:20-04:00 America/New_York (TRIAL RELEASE)
+
+    [FIXED]
+
+    - Cookie last access time is updated when a cookie is retrieved; this has
+      no functional effect but is consistent with RFC 6265.
+
 0.012     2021-06-16 05:34:31-04:00 America/New_York
 
     - No changes from 0.011

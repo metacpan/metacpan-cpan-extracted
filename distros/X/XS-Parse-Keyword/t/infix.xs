@@ -26,6 +26,8 @@ OP *pp_add(pTHX)
 }
 
 static const struct XSParseInfixHooks hooks_add = {
+  .lhs_flags = XPI_OPERAND_TERM,
+  .rhs_flags = XPI_OPERAND_TERM,
   .permit_hintkey = hintkey,
   .cls = 0,
 
@@ -44,6 +46,8 @@ OP *pp_xor(pTHX)
 }
 
 static const struct XSParseInfixHooks hooks_xor = {
+  .lhs_flags = XPI_OPERAND_TERM,
+  .rhs_flags = XPI_OPERAND_TERM,
   .permit_hintkey = hintkey,
   .cls = 0,
 
@@ -82,6 +86,7 @@ OP *pp_intersperse(pTHX)
 }
 
 static const struct XSParseInfixHooks hooks_intersperse = {
+  .lhs_flags = XPI_OPERAND_TERM,
   .rhs_flags = XPI_OPERAND_LIST,
   .permit_hintkey = hintkey,
   .cls = 0,

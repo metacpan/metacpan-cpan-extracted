@@ -13,14 +13,14 @@ subtest('synopsis', sub {
   my $result = eval <<'EOF';
   package Person;
 
-  use Mars::Class;
+  use Mars::Class 'attr';
 
   attr 'fname';
   attr 'lname';
 
   package Identity;
 
-  use Mars::Role;
+  use Mars::Role 'attr';
 
   attr 'id';
   attr 'login';
@@ -41,6 +41,12 @@ subtest('synopsis', sub {
   sub AUDIT {
     my ($self, $from) = @_;
     die "${from} missing Identity role" if !$from->does('Identity');
+  }
+
+  sub BUILD {
+    my ($self, $data) = @_;
+    $self->{auth} = undef;
+    return $self;
   }
 
   sub EXPORT {
@@ -84,6 +90,8 @@ EOF
   ok $result->lname eq 'Alderson';
   ok $result->does('Identity');
   ok $result->does('Authenticable');
+  ok exists $result->{auth};
+  ok !defined $result->{auth};
 });
 
 subtest('example-1 attr', sub {

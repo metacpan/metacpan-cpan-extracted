@@ -122,6 +122,10 @@ It passes its arguments to the L</C<before_verify>> callback,
 which must return two values:
 the bare URI with the signature stripped off, and the signature.
 
+Both the signature extracted by the L</C<before_verify>> callback
+and the actual signature computed by the L</C<function>> callback
+must be defined for verification to pass.
+
 =back
 
 =head1 SEE ALSO

@@ -56,7 +56,7 @@ $test->for('includes');
 
   use Venus::Class;
 
-  extends 'Venus::Kind';
+  base 'Venus::Kind';
 
   with 'Venus::Role::Comparable';
 

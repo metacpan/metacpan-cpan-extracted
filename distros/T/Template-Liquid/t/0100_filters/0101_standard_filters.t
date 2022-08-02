@@ -729,7 +729,8 @@ is( Template::Liquid->parse(q[{{ 'Running the halls!!!' | truncate:19 }}])
     q[{{ 'Running the halls!!!' | truncate:19 }} => Running the hall...]
 );
 note q[This next method uses C<blah> which is defined as C<'STOP!'>];
-is( Template::Liquid->parse(q[{{ 'Any Colour You Like' | truncate:10,blah }}])
+is( Template::Liquid->parse(
+                            q[{{ 'Any Colour You Like' | truncate:10,blah }}])
         ->render(blah => 'STOP!'),
     'Any CSTOP!',
     q[{{ 'Any Colour You Like' | truncate:10,blah }} => Any CSTOP!]

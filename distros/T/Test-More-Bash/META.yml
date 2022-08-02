@@ -1,0 +1,37 @@
+---
+abstract: 'Write Perl tests in Bash'
+author:
+  - 'Ingy döt Net <ingy@ingy.net>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-More-Bash
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+    - xt
+requires:
+  Capture::Tiny: '0.48'
+  File::Share: '0.26'
+  Mo: '0.40'
+  Mo::xxx: '0.13'
+  Test::Simple: '1.302191'
+  XXX: '0.38'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/ingydotnet/test-more-bash-pm/issues
+  homepage: https://github.com/ingydotnet/test-more-bash-pm
+  repository: https://github.com/ingydotnet/test-more-bash-pm.git
+version: 0.0.3
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

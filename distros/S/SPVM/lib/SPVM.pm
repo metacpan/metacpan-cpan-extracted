@@ -1,6 +1,6 @@
 package SPVM;
 
-our $VERSION = '0.9625';
+our $VERSION = '0.9632';
 
 use 5.008007;
 use strict;
@@ -304,6 +304,11 @@ sub new_string_from_bin {
 sub new_object_array {
   SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::new_object_array($BUILDER, @_);
+}
+
+sub new_any_object_array {
+  SPVM::init() unless $SPVM_INITED;
+  SPVM::ExchangeAPI::new_any_object_array($BUILDER, @_);
 }
 
 sub new_mulnum_array {

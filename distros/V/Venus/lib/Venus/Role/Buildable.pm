@@ -5,57 +5,55 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo::Role;
+use Venus::Role 'with';
 
 # BUILDERS
 
 sub BUILD {
-  return $_[0];
-}
-
-# MODIFIERS
-
-around BUILD => sub {
-  my ($orig, $self, $args) = @_;
-
-  $self->$orig($args);
+  my ($self, $args) = @_;
 
   if ($self->can('build_self')) {
     $self->build_self($args);
   }
 
   return $self;
-};
+}
 
-around BUILDARGS => sub {
-  my ($orig, $class, @args) = @_;
+sub BUILDARGS {
+  my ($self, @args) = @_;
 
   # build_nil accepts a single-arg (empty hash)
   my $present = @args == 1 && ref $args[0] eq 'HASH' && !%{$args[0]};
 
   # empty hash argument
-  if ($class->can('build_nil') && $present) {
-    @args = ($class->build_nil($args[0]));
+  if ($self->can('build_nil') && $present) {
+    @args = ($self->build_nil($args[0]));
   }
 
   # build_arg accepts a single-arg (non-hash)
   my $inflate = @args == 1 && ref $args[0] ne 'HASH';
 
   # single argument
-  if ($class->can('build_arg') && $inflate) {
-    @args = ($class->build_arg($args[0]));
+  if ($self->can('build_arg') && $inflate) {
+    @args = ($self->build_arg($args[0]));
   }
 
   # build_args should not accept a single-arg (non-hash)
   my $ignore = @args == 1 && ref $args[0] ne 'HASH';
 
   # standard arguments
-  if ($class->can('build_args') && !$ignore) {
-    @args = ($class->build_args(@args == 1 ? $args[0] : {@args}));
+  if ($self->can('build_args') && !$ignore) {
+    @args = ($self->build_args(@args == 1 ? $args[0] : {@args}));
   }
 
-  return $class->$orig(@args);
-};
+  return (@args);
+}
+
+# EXPORTS
+
+sub EXPORT {
+  ['BUILDARGS']
+}
 
 1;
 
@@ -81,7 +79,7 @@ Buildable Role for Perl 5
 
   with 'Venus::Role::Buildable';
 
-  has 'test';
+  attr 'test';
 
   package main;
 
@@ -125,8 +123,8 @@ I<Since C<0.01>>
 
   use Venus::Class;
 
-  has 'x';
-  has 'y';
+  attr 'x';
+  attr 'y';
 
   with 'Venus::Role::Buildable';
 
@@ -166,8 +164,8 @@ I<Since C<0.01>>
 
   use Venus::Class;
 
-  has 'x';
-  has 'y';
+  attr 'x';
+  attr 'y';
 
   with 'Venus::Role::Buildable';
 
@@ -208,8 +206,8 @@ I<Since C<0.01>>
 
   use Venus::Class;
 
-  has 'x';
-  has 'y';
+  attr 'x';
+  attr 'y';
 
   with 'Venus::Role::Buildable';
 
@@ -249,8 +247,8 @@ I<Since C<0.01>>
 
   use Venus::Class;
 
-  has 'x';
-  has 'y';
+  attr 'x';
+  attr 'y';
 
   with 'Venus::Role::Buildable';
 

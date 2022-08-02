@@ -9,6 +9,18 @@ use base 'Mars::Kind';
 
 # METHODS
 
+sub BUILD {
+  my ($self, $data) = @_;
+
+  no strict 'refs';
+
+  for my $build (grep defined, map *{"${_}::BUILD"}{"CODE"}, @{$self->META->roles}) {
+    $self->$build($data);
+  }
+
+  return $self;
+}
+
 sub does {
   my ($self, @args) = @_;
 

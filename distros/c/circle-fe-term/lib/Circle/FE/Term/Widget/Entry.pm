@@ -1,11 +1,13 @@
 #  You may distribute under the terms of the GNU General Public License
 #
-#  (C) Paul Evans, 2010-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2021 -- leonerd@leonerd.org.uk
 
 package Circle::FE::Term::Widget::Entry;
 
 use strict;
 use constant type => "Entry";
+
+use Tickit::Widget::Entry::Plugin::Completion;
 
 sub build
 {
@@ -128,7 +130,28 @@ sub build
       },
    );
 
-   $widget->{obj} = $obj;
+   Tickit::Widget::Entry::Plugin::Completion->apply( $widget,
+      ignore_case => 1,
+      append_after_word => "",
+      gen_words => sub {
+         my %args = @_;
+         my $match = qr/^\Q$args{word}\E/i;
+         my $at_sol = ( $args{wordpos} == 0 );
+
+         my @matches;
+         foreach my $group ( values %{ $obj->prop("completions") } ) {
+            next if $group->prop("only_at_sol") and not $at_sol;
+            my $suffix = $at_sol ? $group->prop("suffix_sol") : "";
+            length $suffix or $suffix = " ";
+
+            push @matches, map { "$_$suffix" }
+                           grep { $_ =~ $match }
+                           @{ $group->prop("items") };
+         }
+
+         return @matches;
+      },
+   );
 
    return $widget;
 }
@@ -145,19 +168,9 @@ package Circle::FE::Term::Widget::Entry::Widget;
 use base qw( Tickit::Widget::Entry );
 Tickit::Window->VERSION( '0.42' );
 
-Tickit::Async->VERSION( '0.21' ); # ->cancel_timer
+use Tickit::Async 0.21;  # ->cancel_timer
 
 use Tickit::Style -copy;
-
-use constant KEYPRESSES_FROM_STYLE => 1;
-
-style_definition base =>
-   '<Tab>' => "tab_complete";
-
-use Tickit::Utils qw( textwidth );
-use List::Util qw( max );
-
-use constant PEN_UNDER => Tickit::Pen->new( u => 1 );
 
 sub new
 {
@@ -191,19 +204,7 @@ sub on_key
 
    $self->{tab}->activated;
 
-   my $redo_tab_complete;
-   if( my $popup = delete $self->{tab_complete_popup} ) {
-      $popup->hide;
-      $redo_tab_complete++
-   }
-
    my $ret = $self->SUPER::on_key( @_ );
-
-   if( $redo_tab_complete ) {
-      if( $ev->type eq "text" or $ev->str eq "Backspace" ) {
-         $self->key_tab_complete;
-      }
-   }
 
    if( $ret && $self->{on_typing} and length $self->text ) {
       my $tickit = $self->window->tickit;
@@ -233,95 +234,6 @@ sub stopped_typing
    $self->window->tickit->cancel_timer( $self->{typing_timer_id} ) if defined $self->{typing_timer_id};
    undef $self->{typing_timer_id};
    $self->{on_typing}->( 0 );
-}
-
-sub key_tab_complete
-{
-   my $widget = shift;
-
-   my $obj = $widget->{obj};
-
-   my ( $partial ) = substr( $widget->text, 0, $widget->position ) =~ m/(\S*)$/;
-   my $plen = length $partial or return 1;
-
-   my $at_sol = ( $widget->position - $plen ) == 0;
-
-   my @matches;
-   my $matchgroup;
-   foreach my $group ( values %{ $obj->prop("completions") } ) {
-      next if $group->prop("only_at_sol") and not $at_sol;
-
-      my @more = grep { $_ =~ m/^\Q$partial\E/i } @{ $group->prop("items") };
-
-      push @matches, @more;
-      $matchgroup = $group if @more;
-   }
-
-   return 1 unless @matches;
-
-   my $add = $matches[0];
-   foreach my $more ( @matches[1..$#matches] ) {
-      # Find the common prefix
-      my $diffpos = 1;
-      $diffpos++ while lc substr( $add, 0, $diffpos ) eq lc substr( $more, 0, $diffpos );
-
-      return 1 if $diffpos == 1;
-
-      $add = substr( $add, 0, $diffpos - 1 );
-   }
-
-   if( @matches == 1 ) {
-      # No others meaning only one initially
-      $add .= ( $matchgroup->prop("suffix_sol") and $at_sol ) ? $matchgroup->prop("suffix_sol")
-                                                              : " ";
-   }
-
-   $widget->text_splice( $widget->position - $plen, $plen, $add );
-
-   if( @matches > 1 ) {
-      # Split matches on next letter
-      my %next;
-      foreach ( @matches ) {
-         my $l = substr( $_, $plen, 1 );
-         push @{ $next{$l} }, $_;
-      }
-
-      my @possibles = map {
-         @{ $next{$_} } == 1 ? $next{$_}[0]
-                             : substr( $next{$_}[0], 0, $plen + 1 )."..."
-      } sort keys %next;
-
-      # TODO: Wrap these into a flow
-
-      # TODO: need scrolloffs
-      my $popup = $widget->window->make_popup(
-         -(scalar @possibles), $widget->position - $widget->{scrolloffs_co} - $plen,
-         scalar @possibles, max( map { textwidth($_) } @possibles ),
-      );
-
-      $popup->pen->chattrs({ bg => 'green', fg => 'black' });
-
-      $popup->bind_event( expose => sub {
-         my ( $win, undef, $info ) = @_;
-         my $rb = $info->rb;
-
-         foreach my $line ( 0 .. $#possibles ) {
-            my $str = $possibles[$line];
-
-            $rb->goto( $line, 0 );
-
-            $rb->text( substr( $str, 0, $plen + 1 ), PEN_UNDER );
-            $rb->text( substr( $str, $plen + 1 ) ) if length $str > $plen + 1;
-            $rb->erase_to( $win->cols );
-         }
-      } );
-
-      $popup->show;
-
-      $widget->{tab_complete_popup} = $popup;
-   }
-
-   return 1;
 }
 
 sub send_pending

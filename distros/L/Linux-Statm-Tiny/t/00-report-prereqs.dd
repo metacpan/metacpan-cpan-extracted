@@ -1,7 +1,12 @@
 do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
        'develop' => {
                       'requires' => {
-                                      'Test::CleanNamespaces' => '0.15',
+                                      'Mite' => '0.002001',
                                       'Test::EOF' => '0',
                                       'Test::EOL' => '0',
                                       'Test::MinimumVersion' => '0',
@@ -9,18 +14,19 @@ do { my $x = {
                                       'Test::NoTabs' => '0',
                                       'Test::Pod' => '1.41',
                                       'Test::Pod::LinkCheck' => '0',
-                                      'Test::Portability::Files' => '0',
                                       'Test::TrailingSpace' => '0.0203'
                                     }
                     },
        'runtime' => {
                       'requires' => {
-                                      'Moo' => '0',
-                                      'MooX::Aliases' => '0',
-                                      'Types::Standard' => '0',
+                                      'Carp' => '0',
+                                      'Fcntl' => '0',
+                                      'POSIX' => '0',
                                       'constant' => '0',
-                                      'namespace::autoclean' => '0.16',
-                                      'perl' => 'v5.10.1'
+                                      'mro' => '0',
+                                      'perl' => '5.010001',
+                                      'strict' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'test' => {
@@ -30,9 +36,7 @@ do { my $x = {
                    'requires' => {
                                    'File::Spec' => '0',
                                    'Module::Metadata' => '0',
-                                   'Test::More' => '0',
-                                   'strict' => '0',
-                                   'warnings' => '0'
+                                   'Test::More' => '0'
                                  }
                  }
      };

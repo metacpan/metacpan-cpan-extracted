@@ -1,3 +1,19 @@
+0.10 2022-08-01
+  [Internal Ineffective Changes]
+    * Use get_field_object_by_name_v2 in SPVM/Regex.cpp
+    * Use set_field_object_by_name_v2 in SPVM/Regex.cpp
+  [Pre Requirement Changes]
+    * SPVM 0.9632 is needed.
+0.09 2022-08-01
+  [Internal Changes]
+    * Remove unused SPVM::Pattern class
+  [Test Fix]
+    * Add unexpectedly removed tests.
+    * Add URL escape test.
+0.08 2022-07-22
+  [Bug Fix]
+    * Fix the bug that RE2 object is not released in the destructor.
+    * Fix the bug that RE2 object is leaked when the compilation error occurs.
 0.07  2022-07-15
   [Document Fix]
     * Fix document of cap1 to cap20 simple mistake.

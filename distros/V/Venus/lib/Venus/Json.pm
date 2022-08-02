@@ -5,22 +5,25 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use overload (
+  '""' => 'explain',
+  '~~' => 'explain',
+  fallback => 1,
+);
 
-extends 'Venus::Kind::Utility';
+use Venus::Class;
 
+base 'Venus::Kind::Utility';
+
+with 'Venus::Role::Valuable';
+with 'Venus::Role::Buildable';
 with 'Venus::Role::Accessible';
 with 'Venus::Role::Explainable';
 
 # ATTRIBUTES
 
-has decoder => (
-  is => 'rw',
-);
-
-has encoder => (
-  is => 'rw',
-);
+attr 'decoder';
+attr 'encoder';
 
 # BUILDERS
 
@@ -261,7 +264,11 @@ This package integrates behaviors from:
 
 L<Venus::Role::Accessible>
 
+L<Venus::Role::Buildable>
+
 L<Venus::Role::Explainable>
+
+L<Venus::Role::Valuable>
 
 =cut
 

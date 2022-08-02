@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Hash.pm
-## Version v1.1.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v1.2.0
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/02/27
+## Modified 2022/07/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -39,7 +39,7 @@ BEGIN
         'ge'     => sub { _obj_comp( @_, 'ge') },
         fallback => 1,
     );
-    our( $VERSION ) = 'v1.1.0';
+    our( $VERSION ) = 'v1.2.0';
 };
 
 use strict;
@@ -267,13 +267,6 @@ sub set { $_[0]->{ $_[1] } = $_[2]; }
 
 sub size { return( shift->length ); }
 
-sub TO_JSON
-{
-    my $self = shift( @_ );
-    my $ref  = { %$self };
-    return( $ref );
-}
-
 sub undef { %{$_[0]} = () };
 
 sub values
@@ -345,7 +338,6 @@ sub _internal
     my $self = shift( @_ );
     my $field = shift( @_ );
     my $meth  = shift( @_ );
-    # print( STDERR ref( $self ), "::_internal -> Caling method '$meth' for field '$field' with value '", join( "', '", @_ ), "'\n" );
     $self->_tie_object->enable(0);
     my( @resA, $resB );
     if( wantarray )
@@ -411,6 +403,57 @@ sub _tie_object
 {
     my $self = shift( @_ );
     return( tied( %$self ) );
+}
+
+sub FREEZE
+{
+    my $self = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class = CORE::ref( $self );
+    my $clone = $self->clone;
+    $clone->_tie_object->enable(0);
+    my %data = %{$clone->{data}};
+    $clone->_tie_object->enable(1);
+    # Return an array reference rather than a list so this works with Sereal and CBOR
+    CORE::return( [$class, \%data] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # But Storable want a list with the first element being the serialised element
+    CORE::return( $class, \%data );
+}
+
+sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+# NOTE: CBOR will call the THAW method with the stored classname as first argument, the constant string CBOR as second argument, and all values returned by FREEZE as remaining arguments.
+# NOTE: Storable calls it with a blessed object it created followed with $cloning and any other arguments initially provided by STORABLE_freeze
+sub THAW
+{
+    my( $self, undef, @args ) = @_;
+    my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+    my $new;
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        foreach( CORE::keys( %$hash ) )
+        {
+            $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+        }
+        $new = $self;
+    }
+    else
+    {
+        $new = $class->new( $hash );
+    }
+    CORE::return( $new );
+}
+
+sub TO_JSON
+{
+    my $self = CORE::shift( @_ );
+    my $ref  = { %$self };
+    CORE::return( $ref );
 }
 
 1;

@@ -59,6 +59,16 @@ my $pe =<<EOF;
 EOF
 is (tidy_css ($pe), $pe, "Don't alter pseudoelements");
 
+my $b4 =<<EOF;
+section.function h3::before {
+    content: "⊛";
+    color: var(--dark-blue);
+    opacity: 0.5;
+}
+EOF
+like (tidy_css ($b4), qr!::!, "Don't split colons before ::before");
+
+
 #TODO: {
 #    local $TODO = "Don't insert space after colons in comments";
     my $comment="/* http://stackoverflow.com/a/16282279 */\n";
@@ -81,6 +91,30 @@ EOF
 
 my $colonspaceout = tidy_css ($colonspace);
 is ($colonspaceout, $colonspace, "Property/value pair colon space OK");
+
+my $mediaquery = <<'EOF';
+@media (max-width: 596px) {
+	p {
+		color: red;
+	}
+}
+	p {
+		color: green;
+	}
+EOF
+my $mediaqueryout = tidy_css ($mediaquery);
+my $mediaqueryexpect =<<'EOF';
+@media (max-width: 596px) {
+    p {
+        color: red;
+    }
+}
+
+p {
+    color: green;
+}
+EOF
+is ($mediaqueryout, $mediaqueryexpect, "Correct indentation of closing }");
 
 done_testing ();
 

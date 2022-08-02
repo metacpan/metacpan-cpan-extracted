@@ -1,5 +1,8 @@
 Revision history for Win32-Getppid
 
+0.06      2022-07-29 19:14:52 -0600
+  - Close handle to avoid leaking it (gh#6, gh#7)
+
 0.05      2017-08-31 13:24:45 -0400
   - Migrate to EUMM
 

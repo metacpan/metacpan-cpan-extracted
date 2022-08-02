@@ -55,7 +55,7 @@ $test->for('includes');
 
   use Venus::Class;
 
-  extends 'Venus::Kind';
+  base 'Venus::Kind';
 
   package main;
 
@@ -135,9 +135,9 @@ $test->for('example', 1, 'checksum', sub {
 
   use Venus::Class;
 
-  extends 'Venus::Kind';
+  base 'Venus::Kind';
 
-  has 'value';
+  attr 'value';
 
   package main;
 
@@ -228,9 +228,9 @@ $test->for('example', 1, 'numified', sub {
 
   use Venus::Class;
 
-  extends 'Venus::Kind';
+  base 'Venus::Kind';
 
-  has 'value';
+  attr 'value';
 
   package main;
 
@@ -398,9 +398,9 @@ $test->for('example', 1, 'stringified', sub {
 
   use Venus::Class;
 
-  extends 'Venus::Kind';
+  base 'Venus::Kind';
 
-  has 'value';
+  attr 'value';
 
   package main;
 

@@ -154,7 +154,7 @@ void* SPVM_XS_UTIL_new_mulnum_array(pTHX_ SPVM_ENV* env, SPVM_VALUE* stack, cons
       }
     }
     else {
-      *sv_error = sv_2mortal(newSVpvf("Element must be a hash reference at %s line %d\n", MFILE, __LINE__));
+      *sv_error = sv_2mortal(newSVpvf("The element must be a hash reference at %s line %d\n", MFILE, __LINE__));
       return NULL;
     }
   }
@@ -165,7 +165,7 @@ void* SPVM_XS_UTIL_new_mulnum_array(pTHX_ SPVM_ENV* env, SPVM_VALUE* stack, cons
 MODULE = SPVM::ExchangeAPI		PACKAGE = SPVM::ExchangeAPI
 
 SV*
-call_spvm_method(...)
+xs_call_spvm_method(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -1342,7 +1342,7 @@ call_spvm_method(...)
 }
 
 SV*
-array_to_elems(...)
+xs_array_to_elems(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -1371,7 +1371,7 @@ array_to_elems(...)
 
   // Array must be SPVM::BlessedObject::Array or SPVM::BlessedObject::Array
   if (!(SvROK(sv_array) && sv_derived_from(sv_array, "SPVM::BlessedObject::Array"))) {
-    croak("Array must be SPVM::BlessedObject::Array object at %s line %d\n", MFILE, __LINE__);
+    croak("The array must be SPVM::BlessedObject::Array object at %s line %d\n", MFILE, __LINE__);
   }
   
   // Get object
@@ -1560,7 +1560,7 @@ array_to_elems(...)
 }
 
 SV*
-array_to_bin(...)
+xs_array_to_bin(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -1715,7 +1715,7 @@ array_to_bin(...)
 }
 
 SV*
-string_object_to_bin(...)
+xs_string_object_to_bin(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -1760,7 +1760,7 @@ string_object_to_bin(...)
 }
 
 SV*
-array_length(...)
+xs_array_length(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -1789,7 +1789,7 @@ array_length(...)
 
   // Array must be SPVM::BlessedObject::Array or SPVM::BlessedObject::Array
   if (!(SvROK(sv_array) && sv_derived_from(sv_array, "SPVM::BlessedObject::Array"))) {
-    croak("Array must be SPVM::BlessedObject::Array object at %s line %d\n", MFILE, __LINE__);
+    croak("The array must be SPVM::BlessedObject::Array object at %s line %d\n", MFILE, __LINE__);
   }
   
   // Get object
@@ -1805,7 +1805,7 @@ array_length(...)
 }
 
 SV*
-array_set(...)
+xs_array_set(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -1934,7 +1934,7 @@ array_set(...)
 }
 
 SV*
-array_get(...)
+xs_array_get(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -2060,7 +2060,7 @@ array_get(...)
 }
 
 SV*
-new_string_array(...)
+xs_new_string_array(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -2127,7 +2127,7 @@ new_string_array(...)
 }
 
 SV*
-new_byte_array(...)
+xs_new_byte_array(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -2184,7 +2184,7 @@ new_byte_array(...)
 }
 
 SV*
-new_byte_array_unsigned(...)
+xs_new_byte_array_unsigned(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -2241,7 +2241,7 @@ new_byte_array_unsigned(...)
 }
 
 SV*
-new_byte_array_len(...)
+xs_new_byte_array_len(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -2268,7 +2268,7 @@ new_byte_array_len(...)
   int32_t length = (int32_t)SvIV(sv_length);
   
   if (length < 0) {
-    croak("Length must be more than or equals to 0 at %s line %d\n", MFILE, __LINE__);
+    croak("The length must be greater than or equal to 0 at %s line %d\n", MFILE, __LINE__);
   }
   
   // New array
@@ -2282,7 +2282,7 @@ new_byte_array_len(...)
 }
 
 SV*
-new_byte_array_from_bin(...)
+xs_new_byte_array_from_bin(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -2330,7 +2330,7 @@ new_byte_array_from_bin(...)
 }
 
 SV*
-new_string(...)
+xs_new_string(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -2384,7 +2384,7 @@ new_string(...)
 }
 
 SV*
-new_string_from_bin(...)
+xs_new_string_from_bin(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -2437,7 +2437,7 @@ new_string_from_bin(...)
 }
 
 SV*
-new_short_array(...)
+xs_new_short_array(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -2494,7 +2494,7 @@ new_short_array(...)
 }
 
 SV*
-new_short_array_unsigned(...)
+xs_new_short_array_unsigned(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -2551,7 +2551,7 @@ new_short_array_unsigned(...)
 }
 
 SV*
-new_short_array_len(...)
+xs_new_short_array_len(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -2578,7 +2578,7 @@ new_short_array_len(...)
   int32_t length = (int32_t)SvIV(sv_length);
   
   if (length < 0) {
-    croak("Length must be more than or equals to 0 at %s line %d\n", MFILE, __LINE__);
+    croak("The length must be greater than or equal to 0 at %s line %d\n", MFILE, __LINE__);
   }
   
   // New array
@@ -2592,7 +2592,7 @@ new_short_array_len(...)
 }
 
 SV*
-new_short_array_from_bin(...)
+xs_new_short_array_from_bin(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -2640,7 +2640,7 @@ new_short_array_from_bin(...)
 }
 
 SV*
-new_int_array(...)
+xs_new_int_array(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -2696,7 +2696,7 @@ new_int_array(...)
 }
 
 SV*
-new_int_array_unsigned(...)
+xs_new_int_array_unsigned(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -2752,7 +2752,7 @@ new_int_array_unsigned(...)
 }
 
 SV*
-new_int_array_len(...)
+xs_new_int_array_len(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -2779,7 +2779,7 @@ new_int_array_len(...)
   int32_t length = (int32_t)SvIV(sv_length);
   
   if (length < 0) {
-    croak("Length must be more than or equals to 0 at %s line %d\n", MFILE, __LINE__);
+    croak("The length must be greater than or equal to 0 at %s line %d\n", MFILE, __LINE__);
   }
   
   // New array
@@ -2793,7 +2793,7 @@ new_int_array_len(...)
 }
 
 SV*
-new_int_array_from_bin(...)
+xs_new_int_array_from_bin(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -2841,7 +2841,7 @@ new_int_array_from_bin(...)
 }
 
 SV*
-new_long_array(...)
+xs_new_long_array(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -2898,7 +2898,7 @@ new_long_array(...)
 }
 
 SV*
-new_long_array_unsigned(...)
+xs_new_long_array_unsigned(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -2955,7 +2955,7 @@ new_long_array_unsigned(...)
 }
 
 SV*
-new_long_array_len(...)
+xs_new_long_array_len(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -2982,7 +2982,7 @@ new_long_array_len(...)
   int32_t length = (int32_t)SvIV(sv_length);
   
   if (length < 0) {
-    croak("Length must be more than or equals to 0 at %s line %d\n", MFILE, __LINE__);
+    croak("The length must be greater than or equal to 0 at %s line %d\n", MFILE, __LINE__);
   }
   
   // New array
@@ -2996,7 +2996,7 @@ new_long_array_len(...)
 }
 
 SV*
-new_long_array_from_bin(...)
+xs_new_long_array_from_bin(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -3044,7 +3044,7 @@ new_long_array_from_bin(...)
 }
 
 SV*
-new_float_array(...)
+xs_new_float_array(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -3100,7 +3100,7 @@ new_float_array(...)
 }
 
 SV*
-new_float_array_len(...)
+xs_new_float_array_len(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -3127,7 +3127,7 @@ new_float_array_len(...)
   int32_t length = (int32_t)SvIV(sv_length);
   
   if (length < 0) {
-    croak("Length must be more than or equals to 0 at %s line %d\n", MFILE, __LINE__);
+    croak("The length must be greater than or equal to 0 at %s line %d\n", MFILE, __LINE__);
   }
   
   // New array
@@ -3141,7 +3141,7 @@ new_float_array_len(...)
 }
 
 SV*
-new_float_array_from_bin(...)
+xs_new_float_array_from_bin(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -3189,7 +3189,7 @@ new_float_array_from_bin(...)
 }
 
 SV*
-new_double_array(...)
+xs_new_double_array(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -3244,7 +3244,7 @@ new_double_array(...)
 }
 
 SV*
-new_double_array_len(...)
+xs_new_double_array_len(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -3271,7 +3271,7 @@ new_double_array_len(...)
   int32_t length = (int32_t)SvIV(sv_length);
   
   if (length < 0) {
-    croak("Length must be more than or equals to 0 at %s line %d\n", MFILE, __LINE__);
+    croak("The length must be greater than or equal to 0 at %s line %d\n", MFILE, __LINE__);
   }
   
   // New array
@@ -3285,7 +3285,7 @@ new_double_array_len(...)
 }
 
 SV*
-new_double_array_from_bin(...)
+xs_new_double_array_from_bin(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -3333,7 +3333,7 @@ new_double_array_from_bin(...)
 }
 
 SV*
-new_string_array_len(...)
+xs_new_string_array_len(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -3360,7 +3360,7 @@ new_string_array_len(...)
   int32_t length = (int32_t)SvIV(sv_length);
   
   if (length < 0) {
-    croak("Length must be more than or equals to 0 at %s line %d\n", MFILE, __LINE__);
+    croak("The length must be greater than or equal to 0 at %s line %d\n", MFILE, __LINE__);
   }
   
   // Element type id
@@ -3379,7 +3379,7 @@ new_string_array_len(...)
 }
 
 SV*
-new_object_array_len(...)
+xs_new_object_array_len(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -3407,7 +3407,7 @@ new_object_array_len(...)
   int32_t length = (int32_t)SvIV(sv_length);
   
   if (length < 0) {
-    croak("Length must be more than or equals to 0 at %s line %d\n", MFILE, __LINE__);
+    croak("The length must be greater than or equal to 0 at %s line %d\n", MFILE, __LINE__);
   }
   
   // Element type id
@@ -3427,7 +3427,7 @@ new_object_array_len(...)
 }
 
 SV*
-_new_object_array(...)
+_xs_new_object_array(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -3482,7 +3482,7 @@ _new_object_array(...)
     if (!SvOK(sv_element)) {
       env->set_elem_object(env, stack, array, index, NULL);
     }
-    else if (sv_isobject(sv_element) && sv_derived_from(sv_element, "SPVM::BlessedObject::Class")) {
+    else if (sv_isobject(sv_element) && sv_derived_from(sv_element, "SPVM::BlessedObject")) {
       void* object = SPVM_XS_UTIL_get_object(aTHX_ sv_element);
       
       if (basic_type_id == SPVM_NATIVE_C_BASIC_TYPE_ID_ANY_OBJECT) {
@@ -3496,7 +3496,7 @@ _new_object_array(...)
       }
     }
     else {
-      croak("Element must be SPVM::BlessedObject object at %s line %d\n", MFILE, __LINE__);
+      croak("The element must be SPVM::BlessedObject object at %s line %d\n", MFILE, __LINE__);
     }
   }
   
@@ -3508,7 +3508,7 @@ _new_object_array(...)
 }
 
 SV*
-_new_muldim_array(...)
+_xs_new_muldim_array(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -3577,7 +3577,7 @@ _new_muldim_array(...)
       }
     }
     else {
-      croak("Element must be inherit SPVM::BlessedObject object at %s line %d\n", MFILE, __LINE__);
+      croak("The element must be inherit SPVM::BlessedObject object at %s line %d\n", MFILE, __LINE__);
     }
   }
   
@@ -3589,7 +3589,7 @@ _new_muldim_array(...)
 }
 
 SV*
-_new_mulnum_array(...)
+_xs_new_mulnum_array(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -3630,7 +3630,7 @@ _new_mulnum_array(...)
 }
 
 SV*
-_new_mulnum_array_from_bin(...)
+_xs_new_mulnum_array_from_bin(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -3779,7 +3779,7 @@ _new_mulnum_array_from_bin(...)
 }
 
 SV*
-get_exception(...)
+xs_get_exception(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -3818,7 +3818,7 @@ get_exception(...)
 }
 
 SV*
-_set_exception(...)
+_xs_set_exception(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -3857,7 +3857,7 @@ _set_exception(...)
 }
 
 SV*
-get_memory_blocks_count(...)
+xs_get_memory_blocks_count(...)
   PPCODE:
 {
   (void)RETVAL;

@@ -50,7 +50,7 @@ $test->for('includes');
 
   with 'Venus::Role::Matchable';
 
-  has 'active';
+  attr 'active';
 
   sub validate {
     my ($self) = @_;

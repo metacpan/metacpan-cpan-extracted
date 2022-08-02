@@ -97,7 +97,7 @@
 \.rej$
 \.tdy$
 \.tmp$
-^\w$
+# ^\w$
 \.ttc$
 \.pmc$
 
@@ -108,6 +108,7 @@ Catalyst-Plugin-Statsd-.*\.tar\.gz
 \.mailmap$
 perltidy\.(LOG|ERR)
 fatlib/
+^\.mite$
 cpanfile\.snapshot$
 local/
 ^CatalystX-Statsd

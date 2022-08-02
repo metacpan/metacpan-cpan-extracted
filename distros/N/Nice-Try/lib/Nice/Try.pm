@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## A real Try Catch Block Implementation Using Perl Filter - ~/lib/Nice/Try.pm
-## Version v1.3.0
+## Version v1.3.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/05/17
-## Modified 2022/04/24
+## Modified 2022/07/28
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -28,7 +28,7 @@ BEGIN
     use Scalar::Util ();
     use List::Util ();
     use Want ();
-    our $VERSION = 'v1.3.0';
+    our $VERSION = 'v1.3.1';
     our $ERROR;
     our( $CATCH, $DIED, $EXCEPTION, $FINALLY, $HAS_CATCH, @RETVAL, $SENTINEL, $TRY, $WANTARRAY );
 }
@@ -1386,7 +1386,7 @@ sub _process_loop_breaks
         if( $class eq 'PPI::Structure::For' ||
             ( $class eq 'PPI::Statement::Compound' && 
               CORE::defined( $e->first_element->content ) && 
-              $e->first_element->content =~ /^(foreach|while)$/ ) )
+              $e->first_element->content =~ /^(for|foreach|while)$/ ) )
         {
             # $self->_message( 6, "Skipping it. Its first word was '", $e->first_element->content, "'" );
             next;
@@ -1828,7 +1828,7 @@ And you also have granular power in the catch block to filter which exception to
 
 =head1 VERSION
 
-    v1.3.0
+    v1.3.1
 
 =head1 DESCRIPTION
 

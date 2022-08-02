@@ -108,15 +108,19 @@
    "provides" : {
       "Perl::Critic::Dancer2" : {
          "file" : "lib/Perl/Critic/Dancer2.pm",
-         "version" : "0.4000"
+         "version" : "0.4100"
       },
       "Perl::Critic::Policy::Dancer2::ProhibitDeprecatedKeywords" : {
          "file" : "lib/Perl/Critic/Policy/Dancer2/ProhibitDeprecatedKeywords.pm",
-         "version" : "0.4000"
+         "version" : "0.4100"
       },
       "Perl::Critic::Policy::Dancer2::ProhibitUnrecommendedKeywords" : {
          "file" : "lib/Perl/Critic/Policy/Dancer2/ProhibitUnrecommendedKeywords.pm",
-         "version" : "0.4000"
+         "version" : "0.4100"
+      },
+      "Perl::Critic::Policy::Dancer2::ReturnNotNecessary" : {
+         "file" : "lib/Perl/Critic/Policy/Dancer2/ReturnNotNecessary.pm",
+         "version" : "0.4100"
       }
    },
    "release_status" : "stable",
@@ -131,7 +135,7 @@
          "web" : "https://gitlab.com/GeekRuthie/Perl-Critic-Dancer2"
       }
    },
-   "version" : "0.4000",
+   "version" : "0.4100",
    "x_BuiltWith" : {
       "modules" : {
          "CPAN::Meta" : "2.150010",

@@ -1,5 +1,15 @@
 Revision history for Test-Trap
 
+0.3.5	Wed 27 Jul 2022 05:58:02 AM CEST
+        No changes to the libraries, just to the tests.  Perl best
+        practices form a moving target.
+        - Stop using bareword filehandles; if it isn't deprecated
+          already, it will be.
+        - RT #143716: Perl pulled the rug from under me on untainting
+          environment variables when it stopped treating an empty
+          string as a safe PATH.  Fix by deleting the offending
+          environment variables instead, as suggested by Graham Knop.
+
 0.3.4	Sun Oct 14 20:39:41 CEST 2018
 	For this release, many thanks go to Todd Rinaldo, who found
         that my fix for the $^E clobbering wound up clobbering $! in

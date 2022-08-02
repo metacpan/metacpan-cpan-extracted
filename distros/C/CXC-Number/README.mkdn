@@ -1,0 +1,50 @@
+# NAME
+
+CXC::Number - A namespace for modules which deal with numbers.
+
+# VERSION
+
+version 0.07
+
+# DESCRIPTION
+
+The following are known:
+
+- [CXC::Number::Grid](https://metacpan.org/pod/CXC::Number::Grid)
+
+    A representation of a grid of numbers, with the ability to join and
+    overlay grids.  Useful for binning data.
+
+- [CXC::Number::Sequence](https://metacpan.org/pod/CXC::Number::Sequence)
+
+    A namespace and module for dealing with sequences of numbers, often
+    constructed so that they are useful for binning data.
+
+# BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+[https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number](https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number) or by email
+to [bug-cxc-number@rt.cpan.org](mailto:bug-cxc-number@rt.cpan.org).
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+# SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+- [CXC::Number::Grid](https://metacpan.org/pod/CXC::Number::Grid)
+- [CXC::Number::Sequence](https://metacpan.org/pod/CXC::Number::Sequence)
+
+# AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2019 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+    The GNU General Public License, Version 3, June 2007

@@ -1,5 +1,5 @@
 package Hustle::Table;
-use version; our $VERSION=version->declare("v0.5.3");
+use version; our $VERSION=version->declare("v0.5.4");
 
 use strict;
 use warnings;
@@ -114,7 +114,6 @@ sub _prepare_online_cached {
 		my $d="if";
 		for($item->[Hustle::Table::type_]){
                         if(ref($item->[Hustle::Table::matcher_]) eq "Regexp"){
-			#$d.=\'($input=~m{\' . $item->[Hustle::Table::matcher_] .\'})\';
 				$d.=\'($input=~$table->[\'. $index .\'][Hustle::Table::matcher_] )\';
 				$do_capture=1;
                         }
@@ -144,10 +143,10 @@ sub _prepare_online_cached {
 		$d.=\' $cache->{$input}=$entry;\';
 
 		if($do_capture){
-			$d.=\' return $entry,[@{^CAPTURE}];\'; 
+			$d.=\'return ($entry, [@{^CAPTURE}]);\';
 		}	
 		else {
-			$d.=\' return $entry,[];\'; 
+			$d.=\'return ($entry);\';
 
 		}
 
@@ -158,25 +157,24 @@ sub _prepare_online_cached {
 	';
 
 	my $template=
-	' sub {
-		my \$input=shift;
-		my \$rhit=\$cache->{\$input};
-		my \$entry;
-		if(\$rhit){
-			\\\my \@hit=\$rhit;
-			#normal case, acutally executes potental regex
-			unless(\$hit[Hustle::Table::type_]){
-				if(\$input=~ \$hit[Hustle::Table::matcher_]){
-                                        return \$rhit, [\@{^CAPTURE}];
+	' 
+	my \$input;
+	my \$entry;
+	sub {
+		\$input=shift;
+		\$entry=\$cache->{\$input};
 
-				}
-			}
-			else{
-				#string or number
-				return \$rhit,[];
-			}
-		}
+		#Locate cached regex types, perform capture, and return
+		\$entry
+			and !(\$entry->[Hustle::Table::type_])
+			and \$input=~ \$entry->[Hustle::Table::matcher_]
+			and return \$entry, [\@{^CAPTURE}];
 
+		#Locate cached non regex types and return
+		\$entry and return \$entry;
+
+
+		#Build the logic for matcher entry in order of listing
 		@{[do {
 			my $index=0;
 			my $base={index=>0, item=>undef};
@@ -190,8 +188,9 @@ sub _prepare_online_cached {
 			} 0..$table->@*-2;
 		}]}
 
-		\$entry=\$table->[\@\$table-1];
-		\$cache->{\$input}=\$entry;
+
+		#If we get here we cache and return the default matcher
+		\$cache->{\$input}=\$table->[\@\$table-1];
 	} ';
 
 	my $top_level=Template::Plex->load([$template],{table=>$table, cache=>$cache, sub=>$sub_template});

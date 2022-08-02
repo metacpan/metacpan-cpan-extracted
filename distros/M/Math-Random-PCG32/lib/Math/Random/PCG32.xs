@@ -127,7 +127,7 @@ SV *
 rand_from(pcg32_random_t *rng, avref)
     AV *avref;
     PREINIT:
-        SSize_t i, len, rnd, trim;
+        SSize_t i, len, rnd;
         SV *dunno, **src, **dst;
     CODE:
         len = av_len(avref) + 1;
@@ -161,13 +161,48 @@ rand_idx(pcg32_random_t *rng, avref)
 UV
 roll(pcg32_random_t *rng, uint32_t count, uint32_t sides)
     PREINIT:
-        uint32_t i, sum;
+        uint32_t sum;
     CODE:
+        if (count == 0) croak("count must be positive");
+        if (sides == 0) croak("sides must be positive");
         sum = count;
-        for (i = 0; i < count; i++) sum += pcg32_random_r(rng) % sides;
+        while (count--) sum += pcg32_random_r(rng) % sides;
         RETVAL = sum;
     OUTPUT:
         RETVAL
+
+void
+sample(pcg32_random_t *rng, uint32_t count, avref)
+    AV *avref;
+    PREINIT:
+        AV* smpl;
+        SSize_t len, i;
+        uint32_t total;
+    PPCODE:
+        smpl = newAV();
+        len = av_len(avref) + 1;
+        if (len == 0 || count == 0) goto DONE;
+        if (count >= len) {
+            av_extend(smpl, len - 1);
+            for (i = 0; i < len; i++) {
+                SV *sv = *av_fetch(avref, i, FALSE);
+                av_push(smpl, sv);
+            }
+        } else {
+            total = len;
+            av_extend(smpl, count - 1);
+            for (i = 0; i < len; i++) {
+                if (pcg32_random_r(rng) < ( count * ( UINT32_MAX / total ) )) {
+                    SV *sv = *av_fetch(avref, i, FALSE);
+                    av_push(smpl, sv);
+                    if (--count == 0) break;
+                }
+                total--;
+            }
+        }
+    DONE:
+        ST(0) = sv_2mortal( newRV_inc((SV *) smpl) );
+        XSRETURN(1);
 
 void
 DESTROY(pcg32_random_t *rng)

@@ -32,7 +32,7 @@ my $diva1 = Form::Diva->new(
         },
     ],
     hidden =>
-        [ { n => 'secret' }, 
+        [ { n => 'secret' },
         { n => 'hush', default => 'very secret' }, ],
 );
 
@@ -93,7 +93,7 @@ foreach my $nametest (
 
 foreach my $test (
     [ 'input_class', 'class="form-control"' ],
-    [ 'placeholder', '' ],
+    [ 'placeholder', 'placeholder="Your Name"' ],
     [ 'rawvalue',    'Baloney' ],
     [ 'value',       'value="Baloney"' ],
     )
@@ -101,7 +101,7 @@ foreach my $test (
     tester( \%name_data1, 'name_data1', $test->[0], $test->[1] );
 }
 foreach my $test (
-    [ 'placeholder', '' ],
+    [ 'placeholder', 'placeholder="Your Name"' ],
     [ 'rawvalue',    'Salami' ],
     [ 'value',       'value="Salami"' ],
     )
@@ -138,7 +138,7 @@ foreach my $emailtest (
 
 foreach my $emailtest2 (
     [ 'type',        'type="email"' ],
-    [ 'placeholder', '' ],
+    [ 'placeholder', 'placeholder="doormat"' ],
     [ 'id',          'id="formdiva_email"' ],
     [ 'name',        'name="email"' ],
     [ 'rawvalue',    'salami@yapc.org' ],
@@ -191,3 +191,4 @@ tester(
 );
 
 done_testing;
+

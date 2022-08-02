@@ -1,5 +1,5 @@
 package Form::Tiny::FieldDefinition;
-
+$Form::Tiny::FieldDefinition::VERSION = '2.13';
 use v5.10;
 use strict;
 use warnings;
@@ -15,8 +15,6 @@ use Form::Tiny::Error;
 use Form::Tiny::Path;
 
 use namespace::clean;
-
-our $VERSION = '2.12';
 
 has 'name' => (
 	is => 'ro',

@@ -1,6 +1,7 @@
 package HTTP::Request::FromCurl;
 use strict;
 use warnings;
+use File::Basename 'basename';
 use HTTP::Request;
 use HTTP::Request::Common;
 use URI;
@@ -11,12 +12,13 @@ use HTTP::Request::CurlParameters;
 use HTTP::Request::Generator 'generate_requests';
 use PerlX::Maybe;
 use MIME::Base64 'encode_base64';
+use File::Basename 'basename';
 
 use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.37';
+our $VERSION = '0.40';
 
 =head1 NAME
 
@@ -164,6 +166,8 @@ our @option_spec = (
     'show-error|S',      # ignored
     'fail|f',            # ignored
     'silent|s',          # ignored
+    'anyauth',           # ignored
+    'basic',
     'buffer!',
     'compressed',
     'cookie|b=s',
@@ -173,9 +177,11 @@ our @option_spec = (
     'data-binary=s@',
     'data-raw=s@',
     'data-urlencode=s@',
+    'digest',
     'dump-header|D=s',   # ignored
     'referrer|e=s',
     'form|F=s@',
+    'form-string=s@',
     'get|G',
     'globoff|g',
     'head|I',
@@ -184,6 +190,7 @@ our @option_spec = (
     'insecure|k',
     'location|L',        # ignored, we always follow redirects
     'max-time|m=s',
+    'ntlm',
     'keepalive!',
     'request|X=s',
     'oauth2-bearer=s',
@@ -195,6 +202,7 @@ our @option_spec = (
     'parallel-immediate',        # ignored
     'parallel-max',              # ignored
     'junk-session-cookies|j',    # ignored, must be set in code using the HTTP request
+    'unix-socket=s',
 );
 
 sub new( $class, %options ) {
@@ -296,12 +304,37 @@ sub _maybe_read_data_file( $self, $read_files, $data ) {
             binmode $fh;
             $res = <$fh>
         } else {
-            $res = $_
+            $res = $data
         }
     } else {
         $res = ($data =~ /^\@(.*)/)
              ? "... contents of $1 ..."
              : $data
+    }
+    return $res
+}
+
+sub _maybe_read_upload_file( $self, $read_files, $data ) {
+    my $res;
+    if( $read_files ) {
+        if( $data =~ /^<(.*)/ ) {
+            open my $fh, '<', $1
+                or die "$1: $!";
+            local $/; # / for Filter::Simple
+            binmode $fh;
+            $res = <$fh>
+        } elsif( $data =~ /^\@(.*)/ ) {
+            # Upload the file
+            $res = [ $1 => basename($1), Content_Type => 'application/octet-stream' ];
+        } else {
+            $res = $data
+        }
+    } else {
+        if( $data =~ /^[<@](.*)/ ) {
+            $res = [ undef,  basename($1), Content_Type => 'application/octet-stream', Content => "... contents of $1 ..." ],
+        } else {
+            $res = $data
+        }
     }
     return $res
 }
@@ -320,7 +353,19 @@ sub _build_request( $self, $uri, $options, %build_options ) {
                     ;
     my @post_urlencode_data = @{ $options->{'data-urlencode'} || [] };
     my @post_binary_data = @{ $options->{'data-binary'} || [] };
-    my @form_args = @{ $options->{form} || []};
+
+    my @form_args;
+    if( $options->{form}) {
+        # support --form uploaded_file=@myfile
+        #     and --form "uploaded_text=<~/texts/content.txt"
+        push @form_args, map {   /^([^=]+)=(.*)$/
+                                 ? ($1 => $self->_maybe_read_upload_file( $build_options{ read_files }, $2 ))
+                                 : () } @{$options->{form}
+                             };
+    };
+    if( $options->{'form-string'}) {
+        push @form_args, map {; /^([^=]+)=(.*)$/ ? ($1 => $2) : (); } @{ $options->{'form-string'}};
+    };
 
     # expand the URI here if wanted
     my @uris = ($uri);
@@ -388,7 +433,7 @@ sub _build_request( $self, $uri, $options, %build_options ) {
             my $req = HTTP::Request::Common::POST(
                 'https://example.com',
                 Content_Type => 'form-data',
-                Content => [ map { /^([^=]+)=(.*)$/ ? ($1 => $2) : () } @form_args ],
+                Content => \@form_args,
             );
             $body = $req->content;
             $request_default_headers{ 'Content-Type' } = join "; ", $req->headers->content_type;
@@ -429,6 +474,7 @@ sub _build_request( $self, $uri, $options, %build_options ) {
 
         if( $options->{ 'user' } ) {
             if(    $options->{anyauth}
+                || $options->{digest}
                 || $options->{ntlm}
                 || $options->{negotiate}
                 ) {
@@ -493,19 +539,29 @@ sub _build_request( $self, $uri, $options, %build_options ) {
             my $compressions = HTTP::Message::decodable();
             $self->_add_header( \%headers, 'Accept-Encoding' => $compressions );
         };
+
+        my $auth;
+        for my $kind (qw(basic ntlm negotiate)) {
+            if( $options->{$kind}) {
+                $auth = $kind;
+            }
+        };
+
         push @res, HTTP::Request::CurlParameters->new({
             method => $method,
             uri    => $uri,
             headers => \%headers,
             body   => $body,
+            maybe auth => $auth,
             maybe credentials => $options->{ user },
             maybe output => $options->{ output },
             maybe timeout => $options->{ 'max-time' },
             maybe cookie_jar => $options->{'cookie-jar'},
             maybe cookie_jar_options => $options->{'cookie-jar-options'},
             maybe insecure => $options->{'insecure'},
-            maybe show_error => $options->{'show_error'},
+            maybe show_error => $options->{'show-error'},
             maybe fail => $options->{'fail'},
+            maybe unix_socket => $options->{'unix-socket'},
         });
     }
 
@@ -616,7 +672,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2018-2021 by Max Maischein C<corion@cpan.org>.
+Copyright 2018-2022 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

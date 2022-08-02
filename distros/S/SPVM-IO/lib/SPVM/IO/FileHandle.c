@@ -1,6 +1,8 @@
 #include "spvm_native.h"
 #include <stdio.h>
 
+const char* FILE_NAME = "IO/FileHandle.c";
+
 int32_t SPVM__IO__FileHandle__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
 
   // File handle
@@ -12,7 +14,7 @@ int32_t SPVM__IO__FileHandle__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
       env->set_pointer(env, stack, ofh, NULL);
       
       if (ret == EOF) {
-        return env->die(env, stack, "Can't close file handle at %s line %d", "IO/FileHandle.c", __LINE__);
+        return env->die(env, stack, "Can't close the file handle at %s line %d", FILE_NAME, __LINE__);
       }
     }
   }

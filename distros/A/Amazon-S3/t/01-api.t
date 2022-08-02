@@ -50,8 +50,8 @@ my $secure = $host ? 0 : 1;
 # your tests may fail unless you have DNS entry for the bucket name
 # e.g 127.0.0.1 net-amazon-s3-test-test.localhost
 
-my $dns_bucket_names;
-#  = ( $host && !exists $ENV{AMAZON_S3_DNS_BUCKET_NAMES} ) ? 0 : 1;
+my $dns_bucket_names
+  = ( $host && !exists $ENV{AMAZON_S3_DNS_BUCKET_NAMES} ) ? 0 : 1;
 
 $skip_acls //= exists $ENV{AMAZON_S3_MINIO}
   || exists $ENV{AMAZON_S3_SKIP_ACL_TESTS};
@@ -153,7 +153,7 @@ for my $location (@REGIONS) {
     };
 
     if ( $EVAL_ERROR || !$bucket_obj ) {
-      diag( $s3->err . ": " . $s3->errstr );
+      diag( Dumper( [ $EVAL_ERROR, $s3->err, $s3->errstr, $s3->error ] ) );
     } ## end if ( $EVAL_ERROR || !$bucket_obj)
 
     last if $bucket_obj;
@@ -207,7 +207,7 @@ for my $location (@REGIONS) {
     skip "invalid response to 'list'"
       if !$response;
 
-    is( $response->{bucket}, $bucketname =~ s/^\///r )
+    is( $response->{bucket}, $bucketname_raw )
       or BAIL_OUT( Dumper [$response] );
 
     ok( !$response->{prefix} );
@@ -219,7 +219,7 @@ for my $location (@REGIONS) {
     is( $response->{is_truncated}, 0 );
 
     is_deeply( $response->{keys}, [] )
-      or BAIL_OUT( Dumper( [$response] ) );
+      or diag( Dumper( [$response] ) );
 
     is( undef, $bucket_obj->get_key("non-existing-key") );
   } ## end SKIP:
@@ -373,11 +373,7 @@ for my $location (@REGIONS) {
       BAIL_OUT( $s3->err . ": " . $s3->errstr );
     } ## end if ( !$response )
 
-    is(
-      $response->{bucket},
-      $bucketname =~ s/^\///r,
-      "list($v) - bucketname "
-    );
+    is( $response->{bucket}, $bucketname_raw, "list($v) - bucketname " );
 
     ok( !$response->{prefix}, "list($v) - prefix empty" )
       or diag( Dumper [$response] );

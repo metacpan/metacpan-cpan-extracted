@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Dynamic.pm
-## Version v1.1.1
+## Version v1.2.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/03/30
+## Modified 2022/07/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,7 +19,7 @@ BEGIN
     use warnings::register;
     use Scalar::Util ();
     # use Class::ISA;
-    our $VERSION = 'v1.1.1';
+    our $VERSION = 'v1.2.0';
 };
 
 use strict;
@@ -43,8 +43,6 @@ sub new
     {
         CORE::warn( "Parameter provided is not an hash reference: '", join( "', '", @_ ), "'\n" ) if( $this->_warnings_is_enabled );
     }
-    # $self->message( 3, "Data provided are: ", sub{ $self->dumper( $hash ) } );
-    # print( STDERR __PACKAGE__, "::new(): Got for hash: '", join( "', '", sort( keys( %$hash ) ) ), "'\n" );
     my $make_class = sub
     {
         my $k = shift( @_ );
@@ -59,7 +57,6 @@ sub new
         $clean_field =~ s/\_{2,}/_/g;
         $clean_field =~ s/[^a-zA-Z0-9\_]+//g;
         $clean_field =~ s/^\d+//g;
-        ## print( STDERR __PACKAGE__, "::new(): \$clean_field now is '$clean_field'\n" );
         my $perl = <<EOT;
 package $new_class;
 BEGIN
@@ -72,9 +69,7 @@ BEGIN
 1;
 
 EOT
-        # print( STDERR __PACKAGE__, "::_set_get_hash_as_object(): Evaluating\n$perl\n" );
         my $rc = eval( $perl );
-        # print( STDERR __PACKAGE__, "::_set_get_hash_as_object(): Returned $rc\n" );
         die( "Unable to dynamically create module $new_class: $@" ) if( $@ );
         return( $new_class, $clean_field );
     };
@@ -90,10 +85,6 @@ EOT
             # $clean_field =~ s/^\d+//g;
             my( $new_class, $clean_field ) = $make_class->( $k );
             next unless( length( $clean_field ) );
-            # print( STDERR __PACKAGE__, "::new(): Is hash looping? ", ( $hash->{ $k }->{_looping} ? 'yes' : 'no' ), " (", ref( $hash->{ $k }->{_looping} ), ")\n" );
-#             my $o = $hash->{ $k }->{_looping} ? $hash->{ $k }->{_looping} : $new_class->new( $hash->{ $k } );
-#             $data->{ $clean_field } = $o;
-#             $hash->{ $k }->{_looping} = $o;
             eval( "sub ${new_class}::${clean_field} { return( shift->_set_get_object( '$clean_field', '$new_class', \@_ ) ); }" );
             die( $@ ) if( $@ );
             $self->$clean_field( $hash->{ $k } );
@@ -101,8 +92,7 @@ EOT
         elsif( ref( $hash->{ $k } ) eq 'ARRAY' )
         {
             my( $new_class, $clean_field ) = $make_class->( $k );
-            # print( STDERR __PACKAGE__, "::new() found an array for key $k, creating objects for class $new_class\n" );
-            ## We take a peek at what we have to determine how we will handle the data
+            # We take a peek at what we have to determine how we will handle the data
             my $mode = lc( scalar( @{$hash->{ $k }} ) ? ref( $hash->{ $k }->[0] ) : '' );
             if( $mode eq 'hash' )
             {
@@ -158,13 +148,54 @@ EOT
     return( $self );
 }
 
+sub FREEZE
+{
+    my $self = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class = CORE::ref( $self );
+    my %hash  = %$self;
+    # Return an array reference rather than a list so this works with Sereal and CBOR
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # But CBOR and Storable want a list with the first element being the serialised element
+    CORE::return( $class, \%hash );
+}
+
+sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+# NOTE: CBOR will call the THAW method with the stored classname as first argument, the constant string CBOR as second argument, and all values returned by FREEZE as remaining arguments.
+# NOTE: Storable calls it with a blessed object it created followed with $cloning and any other arguments initially provided by STORABLE_freeze
+sub THAW
+{
+    my( $self, undef, @args ) = @_;
+    my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+    my $new;
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        foreach( CORE::keys( %$hash ) )
+        {
+            $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+        }
+        $new = $self;
+    }
+    else
+    {
+        $new = CORE::bless( $hash => $class );
+    }
+    CORE::return( $new );
+}
+
 sub TO_JSON
 {
-    my $self = shift( @_ );
+    my $self = CORE::shift( @_ );
     my $ref  = { %$self };
     CORE::delete( $ref->{_data} );
     CORE::delete( $ref->{_data_repo} );
-    return( $ref );
+    CORE::return( $ref );
 }
 
 AUTOLOAD

@@ -20,7 +20,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 22.6
+    version: 22.7
   AsposeCellsCloud::LiteCellsApi:
     file: lib/AsposeCellsCloud/LiteCellsApi.pm
   AsposeCellsCloud::LightCellsApi:
@@ -159,6 +159,14 @@ provides:
     file: lib/AsposeCellsCloud/Object/DataSorter.pm
   AsposeCellsCloud::Object::DifSaveOptions:
     file: lib/AsposeCellsCloud/Object/DifSaveOptions.pm
+  AsposeCellsCloud::Object::DocxSaveOptions:
+    file: lib/AsposeCellsCloud/Object/DocxSaveOptions.pm
+  AsposeCellsCloud::Object::JsonSaveOptions:
+    file: lib/AsposeCellsCloud/Object/JsonSaveOptions.pm
+  AsposeCellsCloud::Object::PptxSaveOptions:
+    file: lib/AsposeCellsCloud/Object/PptxSaveOptions.pm
+  AsposeCellsCloud::Object::SqlScriptSaveOptions:
+    file: lib/AsposeCellsCloud/Object/SqlScriptSaveOptions.pm                
   AsposeCellsCloud::Object::DiscUsage:
     file: lib/AsposeCellsCloud/Object/DiscUsage.pm
   AsposeCellsCloud::Object::DynamicFilter:
@@ -568,5 +576,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 22.6
+version: 22.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -19,7 +19,9 @@ try {
     sleep 6;
 }
 ALRM {
-    print qq{Alarm Clock!!\n};
-} 1; # <~ temporarily overrides $Try::ALRM::TIMEOUT
+    print qq{Custom Alarm Clock!!\n};
+} timeout => 1;
+
+# <~ temporarily overrides $Try::ALRM::TIMEOUT
 
 printf qq{timeout is set globally to %d seconds\n}, timeout;

@@ -5,9 +5,19 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo::Role;
+use Venus::Role 'with';
 
-with 'Venus::Role::Dumpable';
+# AUDITS
+
+sub AUDIT {
+  my ($self, $from) = @_;
+
+  if (!$from->does('Venus::Role::Dumpable')) {
+    die "${self} requires ${from} to consume Venus::Role::Dumpable";
+  }
+
+  return $self;
+}
 
 # METHODS
 
@@ -53,6 +63,20 @@ sub say_string {
   return $self->printer(($method ? scalar($self->$method(@args)) : $self), "\n");
 }
 
+# EXPORTS
+
+sub EXPORT {
+  [
+    'print',
+    'print_pretty',
+    'print_string',
+    'printer',
+    'say',
+    'say_pretty',
+    'say_string',
+  ]
+}
+
 1;
 
 
@@ -75,9 +99,10 @@ Printable Role for Perl 5
 
   use Venus::Class;
 
+  with 'Venus::Role::Dumpable';
   with 'Venus::Role::Printable';
 
-  has 'test';
+  attr 'test';
 
   sub execute {
     return [@_];
@@ -99,14 +124,6 @@ Printable Role for Perl 5
 
 This package provides a mechanism for outputting (printing) objects or the
 return value of a dispatched method call to STDOUT.
-
-=cut
-
-=head1 INTEGRATES
-
-This package integrates behaviors from:
-
-L<Venus::Role::Dumpable>
 
 =cut
 

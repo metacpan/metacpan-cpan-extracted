@@ -98,11 +98,10 @@ use IO::Select;
 use Encode;
 
 use POSIX ":sys_wait_h";         # for non-blocking waitpid
-                                 # TODO potential win32 problem?
 
 ## package global variables
 our @CQP_options = "-c";         # always run CQP in child mode
-our $CQP_version = "3.0.0";      # required version of CQP (checked at startup)
+our $CQP_version = "3.5.0";      # required version of CQP (checked at startup)
 
 our %Child = ();                 # keep track of running CQP processes
 
@@ -274,7 +273,7 @@ sub check_version {
 
 =item I<$version_string> = I<$cqp>->B<version>;
 
-Returns formatted version string for the CQP background process, e.g. C<2.2.99> or C<3.0>.
+Returns formatted version string for the CQP background process, e.g. C<2.2.99> or C<3.5.0>.
 
 =cut
 

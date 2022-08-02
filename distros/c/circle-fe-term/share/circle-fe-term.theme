@@ -71,5 +71,5 @@ matrix.invite={fg:#960 ***} {fg:#EB3 Invites:} {indent }{fg:#5FF {?$name|$name|{
 matrix.join={fg:#0B0 ***} {fg:#5F5 Joins:} {indent }{?$name|{fg:#0DD $name} {fg:#888 [{fg:#55F $user_id}]}|{fg:#0DD {i:1 $user_id}}} has joined
 matrix.leave={fg:#B00 ***} {fg:#F55 Leaves:} {indent }{fg:#0DD {?$name|$name|{i:1 $user_id}}} has left
 matrix.rename={fg:#0DD ***} {?$oldname|{fg:#5FF $oldname} {fg:#888 [{fg:#55F $user_id}]}|{fg:#5FF {i:1 $user_id}}} is now known as {fg:#5FF $newname}
-matrix.member={fg:#960 ***} {fg:#EB3 Member:} {indent }{fg:#5FF {?$name|$name|{i:1 $user_id}}} set {fg:#5FF $subject} {fh:#999 $state} to {fg:#EB3 $newval}
+matrix.member={fg:#960 ***} {fg:#EB3 Member:} {indent }{fg:#5FF {?$name|$name|{i:1 $user_id}}} set {fg:#5FF $subject} {fg:#999 $state} to {fg:#EB3 $newval}
 matrix.state={fg:#880 ***} {fg:#DD3 State:} {indent }{fg:#5FF {?$name|$name|{i:1 $user_id}}} {?$oldval|changed {fg:#DD8 $state} from {fg:#DD8 $oldval}|set {fg:#DD8 $state}} to {fg:#DD8 $newval}

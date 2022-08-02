@@ -34,7 +34,6 @@ for my $spec (@specs) {
     my $dia = Music::FretboardDiagram->new(
       frets    => $frets,
       chord    => [ $spec ],
-      absolute => 1,
       outfile  => sprintf('%s-%02d', $0, $i),
       horiz    => 1,
       size     => 50,

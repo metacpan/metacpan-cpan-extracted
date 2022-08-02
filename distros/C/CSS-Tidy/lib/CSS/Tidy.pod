@@ -14,8 +14,8 @@ CSS::Tidy - reformat CSS
 
 =head1 VERSION
 
-This documents version 0.03 of CSS-Tidy
-corresponding to L<git commit d5e498c8e56c332304999dec5f4f915a7c67a6cc|https://github.com/benkasminbullock/css-tidy/commit/d5e498c8e56c332304999dec5f4f915a7c67a6cc> released on Sat Mar 27 10:49:16 2021 +0900.
+This documents version 0.04 of CSS-Tidy
+corresponding to L<git commit d237baf76e9f413725f83c33b825d7ed347e86d4|https://github.com/benkasminbullock/css-tidy/commit/d237baf76e9f413725f83c33b825d7ed347e86d4> released on Sat Jul 30 19:54:16 2022 +0900.
 
 =head1 DESCRIPTION
 
@@ -209,7 +209,7 @@ tried it on.
 =item L<CSS::Struct>
 
 
-[Author: L<SKIM|https://metacpan.org/author/SKIM>; Date: C<2020-08-11>; Version: C<0.03>]
+[Author: L<SKIM|https://metacpan.org/author/SKIM>; Date: C<2021-01-28>; Version: C<0.04>]
 
 
 
@@ -221,6 +221,8 @@ tried it on.
 
 
 
+Claims to reduce memory usage compared to the L<CSS> module.
+
 =back
 
 =head3 Preprocessors
@@ -228,10 +230,29 @@ tried it on.
 =over
 
 
+=item L<Crayon>
+
+
+[⭐ Author: L<LNATION|https://metacpan.org/author/LNATION>; Date: C<2021-04-15>; Version: C<0.07>]
+
+
+
+"dedupe, minify and extend CSS". We haven't tried it, but from the
+documentation it seems to be a CSS preprocessor.
+
+
 =item L<CSS::LESS>
 
 
 [Author: L<MUGIFLY|https://metacpan.org/author/MUGIFLY>; Date: C<2013-09-20>; Version: C<v0.0.3>]
+
+
+
+
+=item L<CSS::Prepare>
+
+
+[Author: L<MNF|https://metacpan.org/author/MNF>; Date: C<2011-06-20>; Version: C<v0.9.2.4>]
 
 
 
@@ -245,6 +266,14 @@ tried it on.
 
 Unfortunately this is built on top of a deprecated library which is
 being replaced with Dart Sass.
+
+
+=item L<CSS::Scopifier>
+
+
+[⭐ Author: L<VANSTYN|https://metacpan.org/author/VANSTYN>; Date: C<2015-08-27>; Version: C<0.04>]
+
+
 
 =back
 
@@ -272,7 +301,7 @@ being replaced with Dart Sass.
 =item L<CSS::Minifier::XS>
 
 
-[⭐ Author: L<GTERMARS|https://metacpan.org/author/GTERMARS>; Date: C<2020-12-31>; Version: C<0.11>]
+[⭐ Author: L<GTERMARS|https://metacpan.org/author/GTERMARS>; Date: C<2021-02-07>; Version: C<0.13>]
 
 
 
@@ -280,7 +309,7 @@ being replaced with Dart Sass.
 =item L<CSS::Packer>
 
 
-[⭐ Author: L<LEEJO|https://metacpan.org/author/LEEJO>; Date: C<2018-11-06>; Version: C<2.07>]
+[⭐ Author: L<LEEJO|https://metacpan.org/author/LEEJO>; Date: C<2021-03-02>; Version: C<2.08>]
 
 
 
@@ -318,7 +347,26 @@ it depends on L</CSS::SAC> which seems to be unusable.
 
 
 
+=item L<CSS::Selector::Parser>
+
+
+[Author: L<HDP|https://metacpan.org/author/HDP>; Date: C<2011-11-06>; Version: C<0.003>]
+
+
+
+
+=item L<CSS::Selector::Grammar>
+
+
+[Author: L<DFH|https://metacpan.org/author/DFH>; Date: C<2014-07-04>; Version: C<0.002>]
+
+
+
+
 =item L<Graphics::ColorNames::CSS>
+
+
+[⭐ Author: L<CFAERBER|https://metacpan.org/author/CFAERBER>; Date: C<2019-05-01>; Version: C<1.14>]
 
 
 
@@ -349,7 +397,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2021
+2021-2022
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

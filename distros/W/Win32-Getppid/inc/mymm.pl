@@ -8,7 +8,7 @@ use File::Copy qw( copy );
 sub myWriteMakefile
 {
   my(%args) = @_;
-  
+
   if($^O =~ /^(cygwin|MSWin32|msys)$/)
   {
     $args{INC} = '-Ixs';

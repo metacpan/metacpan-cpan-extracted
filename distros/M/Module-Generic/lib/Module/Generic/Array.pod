@@ -175,7 +175,7 @@ Module::Generic::Array - An Array Manipulation Object Class
 
 =head1 VERSION
 
-    v1.4.0
+    v1.5.0
 
 =head1 DESCRIPTION
 
@@ -1151,6 +1151,20 @@ This add the given values at the beginning of the array.
 =head2 values
 
 Get a list of all the array values and return a list in list context or a ne L<Module::Generic::Array> object in scalar context.
+
+=head1 SERIALISATION
+
+=for Pod::Coverage FREEZE
+
+=for Pod::Coverage STORABLE_freeze
+
+=for Pod::Coverage STORABLE_thaw
+
+=for Pod::Coverage THAW
+
+=for Pod::Coverage TO_JSON
+
+Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
 
 =head1 SEE ALSO
 

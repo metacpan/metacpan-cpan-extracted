@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Provides C<alarm> semantics similar to C<Try::Catch>.",
+  "ABSTRACT" => "Provides C<try_once> and C<retry> semantics to C<CORE::alarm>, similar to C<Try::Catch>.",
   "AUTHOR" => "oodler577 <oodler\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.4",
+  "VERSION" => "0.6",
   "test" => {
     "TESTS" => "t/*.t"
   }

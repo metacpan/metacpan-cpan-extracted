@@ -1,3 +1,5 @@
+use strict; use warnings;
+
 use Test::More tests => 7;
 use FlatFile;
 ok(1); # If we made it this far, we're ok.
@@ -10,7 +12,7 @@ print F <DATA>;
 close F;
 
 package PW;
-use vars ('@ISA', '$FILE', '@FIELDS', '$FIELDSEP', '$RECCLASS');
+our (@ISA, $FILE, $FIELDS, $FIELDSEP, $RECCLASS);
 @ISA = qw(FlatFile);
 $FILE = $tmp;
 $FIELDS = ['fruit', 'color'];
@@ -26,11 +28,6 @@ my @afruit = PW->c_lookup(sub {$_{fruit} =~ /a/});
 is(scalar(@afruit), 2);
 is($afruit[0]->fruit, "apple");
 is($afruit[1]->fruit, "banana");
-
-#########################
-
-# Insert your test code below, the Test module is use()ed here so read
-# its man page ( perldoc Test ) for help writing this test script.
 
 __DATA__
 apple  red

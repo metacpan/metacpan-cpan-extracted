@@ -210,6 +210,66 @@ is( Template::Liquid->parse(
 INPUT
 
 EXPECTED
+is( Template::Liquid->parse(
+        <<'INPUT')->render(), <<'EXPECTED', 'condition with and/or in quotes if [A] (myvar == "foo and bar")');
+{% assign myvar = "foo and bar" %}{% if myvar == "foo and bar" %}
+    foo and bar
+{% else %}
+    Not foo and bar
+{% endif %}
+INPUT
+
+    foo and bar
+
+EXPECTED
+is( Template::Liquid->parse(
+        <<'INPUT')->render(), <<'EXPECTED', 'compound condition with "and" in quotes if [A] (myvar == "foo and bar" and 5 > 1)');
+{% assign myvar = "foo and bar" %}{% if myvar == "foo and bar" and 5 > 1 %}
+    foo and bar
+{% else %}
+    Not foo and bar
+{% endif %}
+INPUT
+
+    foo and bar
+
+EXPECTED
+is( Template::Liquid->parse(
+        <<'INPUT')->render(), <<'EXPECTED', 'compound condition with "and" in quotes if [A] (myvar == "foo and bar" and 5 < 1)');
+{% assign myvar = "foo and bar" %}{% if myvar == "foo and bar" and 5 < 1 %}
+    foo and bar
+{% else %}
+    Not foo and bar
+{% endif %}
+INPUT
+
+    Not foo and bar
+
+EXPECTED
+is( Template::Liquid->parse(
+        <<'INPUT')->render(), <<'EXPECTED', 'compound condition with "or" in quotes if [A] (myvar == "foo or bar" and 5 > 1)');
+{% assign myvar = "foo or bar" %}{% if myvar == "foo or bar" and 5 > 1 %}
+    foo or bar
+{% else %}
+    Not foo or bar
+{% endif %}
+INPUT
+
+    foo or bar
+
+EXPECTED
+is( Template::Liquid->parse(
+        <<'INPUT')->render(), <<'EXPECTED', 'compound condition with "or" in quotes if [A] (myvar == "foo or bar" and 5 < 1)');
+{% assign myvar = "foo or bar" %}{% if myvar == "foo or bar" and 5 < 1 %}
+    foo or bar
+{% else %}
+    Not foo or bar
+{% endif %}
+INPUT
+
+    Not foo or bar
+
+EXPECTED
 
 # I'm finished
 done_testing();

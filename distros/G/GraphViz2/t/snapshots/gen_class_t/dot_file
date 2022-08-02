@@ -1,0 +1,37 @@
+'graph  {
+ graph [ class="graph_root" style="rounded" stylesheet="class-demo-styles.css" ]
+ node [ shape="box" style="rounded" ]
+
+ subgraph "cluster_match" {
+  graph [ class="match" label="Championship Match" margin="32" ]
+
+  subgraph "cluster_team1" {
+   graph [ bgcolor="peachpuff" class="team_orange" label="Orange Team" margin="16" ]
+   "Coach O" [ class="coach" fillcolor="white" shape="hexagon" style="filled" ]
+
+   subgraph {
+    rank="sink"
+    "oplayer1" [ class="player" label="Player O1" ]
+    "oplayer2" [ class="player" label="Player O2" ]
+    "oplayer1" -- "oplayer2" [ class="teammate_of" ]
+   }
+   "Coach O" -- "oplayer1" [ class="coach_of" ]
+   "Coach O" -- "oplayer2" [ class="coach_of" ]
+  }
+
+  subgraph "cluster_team2" {
+   graph [ bgcolor="lightblue" class="team_blue" label="Blue Team" margin="16" ]
+   "Coach B" [ class="coach" fillcolor="white" shape="hexagon" style="filled" ]
+
+   subgraph {
+    rank="sink"
+    "bplayer1" [ class="player" label="Player B1" ]
+    "bplayer2" [ class="player" label="Player B2" ]
+    "bplayer1" -- "bplayer2" [ class="teammate_of" ]
+   }
+   "Coach B" -- "bplayer1" [ class="coach_of" ]
+   "Coach B" -- "bplayer2" [ class="coach_of" ]
+  }
+ }
+}
+'

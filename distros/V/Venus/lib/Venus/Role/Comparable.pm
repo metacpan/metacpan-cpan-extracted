@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo::Role;
+use Venus::Role 'with';
 
 require Scalar::Util;
 require Venus::Type;
@@ -154,6 +154,12 @@ sub tv {
   }
 }
 
+# EXPORTS
+
+sub EXPORT {
+  ['eq', 'ge', 'gele', 'gt', 'gtlt', 'lt', 'le', 'ne', 'tv']
+}
+
 1;
 
 
@@ -176,7 +182,7 @@ Comparable Role for Perl 5
 
   use Venus::Class;
 
-  extends 'Venus::Kind';
+  base 'Venus::Kind';
 
   with 'Venus::Role::Comparable';
 

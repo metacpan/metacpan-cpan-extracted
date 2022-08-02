@@ -8,6 +8,7 @@ class TestCase::NativeAPI {
   use TestCase::Callback::ImplementCallback2;
   use Fn;
   use Array;
+  use Error;
   
   our $BYTE_VALUE : byte;
   our $SHORT_VALUE : short;
@@ -685,6 +686,19 @@ class TestCase::NativeAPI {
   }
   native static method native_set_field_object_by_name : int ($simple : TestCase::Simple);
 
+  static method set_field_object_by_name_v2 : int () {
+    my $simple = TestCase::Simple->new;
+    
+    TestCase::NativeAPI->native_set_field_object_by_name_v2($simple);
+    
+    unless ($simple->{object_value}{x} == 3) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  native static method native_set_field_object_by_name_v2 : int ($simple : TestCase::Simple);
+  
   static method set_field_object_by_name_exception : int () {
     my $simple = TestCase::Simple->new;
     
@@ -853,6 +867,16 @@ class TestCase::NativeAPI {
     return $success;
   }
   native static method native_get_field_object_by_name : int ($simple : TestCase::Simple);
+  static method get_field_object_by_name_v2 : int () {
+    my $simple = TestCase::Simple->new;
+    $simple->{object_value} = TestCase::Minimal->new;
+    $simple->{object_value}{x} = 5;
+    
+    my $success = TestCase::NativeAPI->native_get_field_object_by_name_v2($simple);
+    
+    return $success;
+  }
+  native static method native_get_field_object_by_name_v2 : int ($simple : TestCase::Simple);
 
   static method get_field_object_by_name_exception : int () {
     my $simple = TestCase::Simple->new;
@@ -1224,4 +1248,12 @@ class TestCase::NativeAPI {
 
   native static method new_string_nolen : int ();
   
+  native static method get_class_id : int ();
+  native static method get_class_id_by_name : int ();
+
+  native static method strerror_value : string ($errno_value : int);
+  native static method new_object_array_raw : int ();
+  native static method new_object_array : int ();
+  native static method new_string_array : int ();
+  native static method new_string_array_value : string[] ();
 }

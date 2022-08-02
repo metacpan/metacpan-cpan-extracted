@@ -29,9 +29,14 @@ subtest 'constraints' => sub {
 
     subtest 'shrinking spacing, ratio && w0 too small' => sub {
 
-        subtest 'E[0] == min' => sub  {
+        subtest 'E[0] == min' => sub {
             my $err = dies {
-                Sequence->new( min => 1, soft_max => 10, w0 => .01, ratio => 0.1 );
+                Sequence->new(
+                    min      => 1,
+                    soft_max => 10,
+                    w0       => .01,
+                    ratio    => 0.1
+                );
             };
             isa_ok( $err, Failure( 'parameter::constraint' ) );
             like( $err, qr/spacing.*too small/ );
@@ -60,7 +65,7 @@ subtest 'parameter combinations' => sub {
         dies {
             Sequence->new( min => 1, soft_max => 2, ratio => 2 );
         },
-        ['Error::TypeTiny::WrongNumberOfParameters'],
+        ['Error::TypeTiny'],
         'no w0',
     );
 

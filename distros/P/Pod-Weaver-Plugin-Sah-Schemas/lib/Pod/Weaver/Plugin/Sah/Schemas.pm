@@ -1,17 +1,17 @@
 package Pod::Weaver::Plugin::Sah::Schemas;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-04'; # DATE
-our $DIST = 'Pod-Weaver-Plugin-Sah-Schemas'; # DIST
-our $VERSION = '0.069'; # VERSION
-
 use 5.010001;
 use Moose;
 with 'Pod::Weaver::Role::AddTextToSection';
 with 'Pod::Weaver::Role::Section';
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-06-08'; # DATE
+our $DIST = 'Pod-Weaver-Plugin-Sah-Schemas'; # DIST
+our $VERSION = '0.070'; # VERSION
+
 sub weave_section {
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
     my ($self, $document, $input) = @_;
 
@@ -123,6 +123,9 @@ sub weave_section {
                         push @pod, " ", Data::Dmp::dmp($value);
                         if ($eg->{valid}) {
                             push @pod, "  # valid";
+                            push @pod, " ($eg->{summary})"
+                                if defined $eg->{summary};
+
                             my $has_validated_value;
                             my $validated_value;
                             if (exists $eg->{validated_value}) {
@@ -160,7 +163,7 @@ To check data against this schema (requires L<Data::Sah>):
  my \$validator = gen_validator("$sch_name*");
  say \$validator->(\$data) ? "valid" : "INVALID!";
 
-The above schema returns a boolean value (true if data is valid, false if
+The above schema returns a boolean result (true if data is valid, false if
 otherwise). To return an error message string instead (empty string if data is
 valid, a non-empty error message otherwise):
 
@@ -208,7 +211,7 @@ _
 
                     push @pod, <<"_";
 
-Data::Sah can also create validator that returns a hash of detaild error
+Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
 JavaScript, from the same schema. Other things Data::Sah can do: show source
 code for validator, generate a validator code with debug comments and/or log
@@ -312,7 +315,7 @@ Pod::Weaver::Plugin::Sah::Schemas - Plugin to use when building Sah::Schemas::* 
 
 =head1 VERSION
 
-This document describes version 0.069 of Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution Pod-Weaver-Plugin-Sah-Schemas), released on 2021-08-04.
+This document describes version 0.070 of Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution Pod-Weaver-Plugin-Sah-Schemas), released on 2022-06-08.
 
 =head1 SYNOPSIS
 
@@ -345,12 +348,6 @@ It does the following to L<lib/Sah/Schema/*> .pm files:
 
 =for Pod::Coverage weave_section
 
-=head1 CONTRIBUTOR
-
-=for stopwords Steven Haryanto
-
-Steven Haryanto <sharyanto@cpan.org>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Pod-Weaver-Plugin-Sah-Schemas>.
@@ -358,14 +355,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Pod-Weaver
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Pod-Weaver-Plugin-Sah-Schemas>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Sah-Schemas>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -377,11 +366,42 @@ L<Dist::Zilla::Plugin::Sah::Schemas>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020, 2019, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Sah-Schemas>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

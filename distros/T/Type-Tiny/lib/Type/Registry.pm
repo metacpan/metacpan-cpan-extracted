@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Registry::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Registry::VERSION   = '1.016002';
+	$Type::Registry::VERSION   = '1.016006';
 }
 
 $Type::Registry::VERSION =~ tr/_//d;
@@ -261,16 +261,16 @@ sub make_class_type {
 	my $self = shift;
 	my ( $class ) = @_;
 	
-	require Type::Tiny::Class;
-	return "Type::Tiny::Class"->new( class => $class );
+	require Types::Standard;
+	return Types::Standard::InstanceOf()->of( $class );
 }
 
 sub make_role_type {
 	my $self = shift;
 	my ( $role ) = @_;
 	
-	require Type::Tiny::Role;
-	return "Type::Tiny::Role"->new( role => $role );
+	require Types::Standard;
+	return Types::Standard::ConsumerOf()->of( $role );
 }
 
 sub AUTOLOAD {

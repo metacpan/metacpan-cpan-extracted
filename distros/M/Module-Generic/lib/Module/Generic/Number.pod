@@ -97,7 +97,7 @@ Module::Generic::Number - Number Manipulation Object Class
 
 =head1 VERSION
 
-    v1.1.1
+    v1.2.0
 
 =head1 DESCRIPTION
 
@@ -625,6 +625,20 @@ Special method called by L<JSON> to transform this object into a string suitable
 =head2 unformat
 
 Provided with a string containing a number, and this returns a number as a L<Module::Generic::Number> object.
+
+=head1 SERIALISATION
+
+=for Pod::Coverage FREEZE
+
+=for Pod::Coverage STORABLE_freeze
+
+=for Pod::Coverage STORABLE_thaw
+
+=for Pod::Coverage THAW
+
+=for Pod::Coverage TO_JSON
+
+Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
 
 =head1 SEE ALSO
 

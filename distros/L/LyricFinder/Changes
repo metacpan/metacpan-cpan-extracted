@@ -62,3 +62,6 @@ Revision history for LyricFinder
 1.21    2021/12/01
         LyricFinder::Letras - Fix - Was broken due to slight change in their 
         site (wasn't returning any lyrics due to "artist mismatch".
+1.22    2022/07/29
+        LyricFinder::Genius - Remove spam from end of lyrics text recently 
+        added by Genius. :/

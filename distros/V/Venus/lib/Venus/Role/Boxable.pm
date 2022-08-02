@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo::Role;
+use Venus::Role 'with';
 
 # METHODS
 
@@ -17,6 +17,12 @@ sub box {
   my $value = $method ? $self->$method(@args) : $self;
 
   return Venus::Box->new(value => $value);
+}
+
+# EXPORTS
+
+sub EXPORT {
+  ['box']
 }
 
 1;
@@ -43,7 +49,7 @@ Boxable Role for Perl 5
 
   with 'Venus::Role::Boxable';
 
-  has 'text';
+  attr 'text';
 
   package main;
 

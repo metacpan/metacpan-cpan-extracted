@@ -52,8 +52,9 @@ $test->for('includes');
 
   use Venus::Class;
 
-  has 'test';
+  attr 'test';
 
+  with 'Venus::Role::Dumpable';
   with 'Venus::Role::Digestable';
 
   sub execute {

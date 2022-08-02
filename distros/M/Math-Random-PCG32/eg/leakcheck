@@ -37,7 +37,7 @@ my $call = shift // die "Usage: $0 dispatch-method\n";
 die "no such method\n" unless exists $dispatch{$call};
 
 my @seeds;
-sysopen my $fh, "/dev/random", O_RDONLY or die "no random: $!\n";
+sysopen my $fh, "/dev/urandom", O_RDONLY or die "no random: $!\n";
 my $bert;
 for (1 .. 2) {
     my $len = sysread $fh, $bert, 8;

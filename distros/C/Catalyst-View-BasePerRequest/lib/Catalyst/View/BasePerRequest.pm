@@ -1,6 +1,6 @@
 package Catalyst::View::BasePerRequest;
 
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 our $DEFAULT_FACTORY = 'Catalyst::View::BasePerRequest::Factory';
 
 use Moose;
@@ -13,7 +13,7 @@ extends 'Catalyst::View';
 has 'catalyst_component_name' => (is=>'ro');
 has 'app' => (is=>'ro');
 has 'ctx' => (is=>'ro');
-has 'content_type' => (is=>'ro', required=>1);
+has 'content_type' => (is=>'ro', required=>0, predicate=>'has_content_type');
 has 'code' => (is=>'rw', predicate=>'has_code');
 has 'status_codes' => (is=>'rw', predicate=>'has_status_codes');
 
@@ -70,7 +70,7 @@ sub render {
 
 sub process {
   my ($self, $c, @args) = @_;
-  return $self->respond($c, undef, undef, @args);
+  return $self->respond($c);
 }
 
 sub respond {
@@ -81,7 +81,7 @@ sub respond {
     Module::Runtime::use_module('Catalyst::View::BasePerRequest::Exception::InvalidStatusCode')->throw(status_code=>$r->status)
       if $self->has_status_codes && !$self->status_codes->{$r->status};
   
-    $r->content_type($self->content_type) if !$r->content_type;
+    $r->content_type($self->content_type) if !$r->content_type && $self->has_content_type;
     $r->headers->push_header(@{$headers}) if $headers;
     $r->body($self->get_rendered(@args));
   }
@@ -105,10 +105,7 @@ sub get_rendered {
   return $self->flatten_rendered_for_response_body(@rendered);
 }
 
-sub flatten_rendered_for_response_body {
-  my ($self, @rendered) = @_;
-  return join '', @rendered;
-}
+sub flatten_rendered_for_response_body { return shift->flatten_rendered(@_) }
 
 sub render_error_class { 'Catalyst::View::BasePerRequest::Exception::RenderError' }
 
@@ -121,17 +118,23 @@ sub do_handle_render_exception {
 
 sub prepare_render_args {
   my ($self, @args) = @_;
+
   if($self->has_code) {
     my $inner = $self->render_code;
     unshift @args, $inner; # pass any $inner as an argument to ->render()
   }
+
   return ($self->ctx, @args);
 }
 
 sub render_code {
   my $self = shift;
-  my @inner = $self->code->($self->prepare_render_code_args);
-  my $flat = $self->flatten_rendered_for_response_body(@inner);
+  my @inner = map {
+    Scalar::Util::blessed($_) && $_->can('get_rendered') ? $_->get_rendered : $_;
+  }  $self->code->($self->prepare_render_code_args);
+
+  my $flat = $self->flatten_rendered_for_inner_content
+  (@inner);
   return $flat;
 }
 
@@ -140,6 +143,12 @@ sub prepare_render_code_args {
   return $self;
 }
 
+sub flatten_rendered_for_inner_content { return shift->flatten_rendered(@_) }
+
+sub flatten_rendered {
+  my $self = shift;
+  return join '', grep { defined($_) } @_;
+}
 
 sub content {
   my ($self, $name) = @_;
@@ -151,44 +160,51 @@ sub content {
 sub render_content_value {
   my $self = shift;
   if((ref($_[0])||'') eq 'CODE') {
-    return $self->flatten_rendered_for_response_body($_[0]->($_[1]));
+    return $self->flatten_rendered_for_content_blocks($_[0]->($_[1]));
   } else {
-    return $self->flatten_rendered_for_response_body(@_);
+    return $self->flatten_rendered_for_content_blocks(@_);
   }
 }
 
+sub flatten_rendered_for_content_blocks { return shift->flatten_rendered(@_) }
 
 sub content_for {
   my ($self, $name, $value) = @_;
-  Module::Runtime::use_module('Catalyst::View::BasePerRequest::Exception::ContentBlockError')
-    ->throw(content_name=>$name, content_msg=>'Content block is already defined') if exists $self->ctx->stash->{view_blocks}{$name};
+  Module::Runtime::use_module($self->_content_exception_class)
+    ->throw(content_name=>$name, content_msg=>'Content block is already defined') if $self->_content_exists($name);
   $self->ctx->stash->{view_blocks}{$name} = $self->render_content_value($value);
   return;
 }
 sub content_append {
   my ($self, $name, $value) = @_;
-  Module::Runtime::use_module('Catalyst::View::BasePerRequest::Exception::ContentBlockError')
-    ->throw(content_name=>$name, content_msg=>'Content block doesnt exist for appending') unless exists $self->ctx->stash->{view_blocks}{$name};
+  Module::Runtime::use_module($self->_content_exception_class)
+    ->throw(content_name=>$name, content_msg=>'Content block doesnt exist for appending') unless $self->_content_exists($name);
   $self->ctx->stash->{view_blocks}{$name} .= $self->render_content_value($value);
   return;
 }
 
 sub content_replace {
   my ($self, $name, $value) = @_;
-  Module::Runtime::use_module('Catalyst::View::BasePerRequest::Exception::ContentBlockError')
-    ->throw(content_name=>$name, content_msg=>'Content block doesnt exist for replacing') unless exists $self->ctx->stash->{view_blocks}{$name};
+  Module::Runtime::use_module($self->_content_exception_class)
+    ->throw(content_name=>$name, content_msg=>'Content block doesnt exist for replacing') unless $self->_content_exists($name);
   $self->ctx->stash->{view_blocks}{$name} = $self->render_content_value($value);
   return;
 }
 
 sub content_around {
   my ($self, $name, $value) = @_;
-  Module::Runtime::use_module('Catalyst::View::BasePerRequest::Exception::ContentBlockError')
-    ->throw(content_name=>$name, content_msg=>'Content block doesnt exist for replacing') unless exists $self->ctx->stash->{view_blocks}{$name};
+  Module::Runtime::use_module($self->_content_exception_class)
+    ->throw(content_name=>$name, content_msg=>'Content block doesnt exist') unless $self->_content_exists($name);
   $self->ctx->stash->{view_blocks}{$name} = $self->render_content_value($value, $self->ctx->stash->{view_blocks}{$name});
   return;
 }
 
+sub _content_exception_class { return 'Catalyst::View::BasePerRequest::Exception::ContentBlockError' }
+
+sub _content_exists {
+  my ($self, $name) = @_;
+  return exists $self->ctx->stash->{view_blocks}{$name} ? 1:0;
+}
 
 sub detach { return shift->ctx->detach }
 
@@ -247,14 +263,14 @@ One way to use it in a controller:
 =head1 DESCRIPTION
 
 B<NOTE>: This is early access code.  Although it's based on several other internal projects
-which have iterated over this concept for a number of years I still reserve the right
+which I have iterated over this concept for a number of years I still reserve the right
 to make breaking changes as needed.
 
 B<NOTE>: You probably won't actually use this directly, it's intended to be a base framework
 for building / prototyping strongly typed / per request views in L<Catalyst>. This
 documentation serves as an overview of the concept.  In particular please note that
 this code does not address any issues around HTML / Javascript injection attacks or
-provides any auto escaping. You'll need to bake those features into whatver you
+provides any auto escaping. You'll need to bake those features into whatever you
 build on top of this.  Because of this the following documentation is light and is mostly
 intended to help anyone who is planning to build something on top of this framework
 rather than use it directly.
@@ -275,7 +291,7 @@ ok with a simple websites.  There are however downsides as your site becomes mor
 complex. First of all the stash as a means to pass data from the Controller to the
 template can be fragile.  For example just making a simple typo in the stash key
 can break your templates in ways that might not be easy to figure out.  Also your
-template can't enforce its requirements very easily (and its not easy for someone
+template can't enforce its requirements very easily (and it's not easy for someone
 working in the controller to know exactly what things need to go into the stash in
 order for the template to function as desired.)  The view itself has no way of 
 providing view / display oriented logic; generally that logic ends up creeping back up
@@ -292,7 +308,7 @@ Basically the classic approach works acceptable well for a simple website but st
 break down as your site becomes more complicated.
 
 An alternative approach, which is explored in this distribution, is to have a defined view for
-each desired response anf for it to define an explicit API that the controller uses to provide the required
+each desired response and for it to define an explicit API that the controller uses to provide the required
 and optional data to the view.  This defined view can further define its own methods
 used to generate suitable information for display.   Such an approach is more initial work
 as well as learning for the website developers, but in the long term it can provide

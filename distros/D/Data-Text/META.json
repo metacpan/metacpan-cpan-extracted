@@ -34,7 +34,8 @@
          "requires" : {
             "Carp" : "0",
             "String::Clean" : "0",
-            "String::Util" : "0"
+            "String::Util" : "0",
+            "overload" : "0"
          }
       },
       "test" : {
@@ -62,6 +63,6 @@
          "x_repository" : "https://github.com/nigelhorne/Data-Text"
       }
    },
-   "version" : "0.09",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.09"
 }

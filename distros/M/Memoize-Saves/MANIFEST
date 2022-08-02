@@ -1,13 +1,10 @@
 Changes
 LICENSE
 MANIFEST
-META.json
-META.yml
+META.json                                Module JSON meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 Makefile.PL
 README
-dist.ini
+boilerplate.pl
 lib/Memoize/Saves.pm
-t/release-eol.t
-t/release-no-tabs.t
-t/release-pod-coverage.t
-t/release-pod-syntax.t
+t/memoize.t

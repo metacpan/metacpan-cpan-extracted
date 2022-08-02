@@ -1,3 +1,11 @@
+0.086   2022-07-30  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] [subcommand info] chdir to git dir first when executing 'git
+          branch'.
+
+        - [ux] Tweak error message
+
+
 0.085   2022-03-20  Released-By: PERLANCAR; Urgency: medium
 
         - Specify minimum version for git dependency to 2.22.0 for 'info'

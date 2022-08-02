@@ -5,11 +5,21 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class 'base', 'with';
 
-extends 'Venus::Kind';
+base 'Venus::Kind';
 
 with 'Venus::Role::Buildable';
+
+# BUILDERS
+
+sub build_arg {
+  my ($self, $data) = @_;
+
+  return {
+    value => $data,
+  };
+}
 
 1;
 
@@ -33,7 +43,7 @@ Utility Base Class for Perl 5
 
   use Venus::Class;
 
-  extends 'Venus::Kind::Utility';
+  base 'Venus::Kind::Utility';
 
   package main;
 

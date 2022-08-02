@@ -1,8 +1,47 @@
-1.03  Sun, 22 Apr 2012 17:11:16 -0400
+1.09  Sun 31 Jul 2022
+  * Skip for thread safety tests on Perl 5.10.0
+  * Drastically improved Memoized::NDBM_File EXISTS shim
+  * Minimum Perl version set at 5.6
+  * Removal of Memoize::ExpireTest and Memoize::ExpireFile
+
+1.08  Thu 28 Jul 2022
+  * Skip for thread safety tests on unthreaded perls
+
+1.07  Thu 28 Jul 2022
+  * Thread safety (RT #21707)
+  * Support for reference values in Memoize::Expire (RT #38344)
+  * Support for iterating tied Memoize::Expire hashes (RT #124507)
+  * Advisory locking in Memoize::Storable (RT #133859)
+
+1.06  Wed 27 Jul 2022
+  * Deprecation of Memoize::SDBM_File
+  * Test fixes
+
+1.05  Sun 24 Jul 2022
+  * Actual implementation of the HASH option of Memoize::Expire (RT #18171, Eric Brine)
+  * Vim modeline in Expire.pm (RT #38785, Moritz Lenz)
+  * Fix for minor memory leak in unmemoize() (RT #52819, Joshua I. Miller)
+  * Actual implementation of the 'nstore' option of Memoize::Storable (RT #77790, Jonathan Nieder)
+  * Fix for broken LIST_CACHE => MERGE option in memoize() (RT #91927, Slaven Rezic)
+
+1.04  Fri 22 Jul 2022
+  * No removal of . from @INC during TIE module load.
+    The module load is not optional, so the . removal was mistaken
+  * Properly overridable $Memoize::Expire::DEBUG (RT #133860, Slaven Rezic).
+    Previously it would get reset the module was loaded
+  * Correct INSTALLDIRS for installation on pre-5.12 perls (RT #63935)
+  * Documentation fixes (David Steinbrunner, Dominic Hargreaves, Slaven Rezic, Glenn Fowler)
+
+1.03_01  Tue Jul 26 2016
+  * Removal of . from @INC during TIE module load (Tony Cook)
+  * Timing-sensitive test fixes (RT #108382, David Mitchell)
+  * GDBM test fixes (RT #139736, Sergey Poznyakoff)
+
+1.03  Sun 22 Apr 2012
   * Clarified MERGE cache options and fixed bug
   * Documentation fixes
 
-1.02  Mon, 29 Nov 2010 18:33:58 +0100
+1.02  Mon 29 Nov 2010
   * First release with a changelog, woo!
   * Synchronise with changes in bleadperl up to version 1.01_03.
   * Memoize::Saves, an experimental example module previously included in this

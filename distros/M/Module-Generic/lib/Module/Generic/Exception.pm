@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Exception.pm
-## Version v1.1.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v1.2.0
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/02/27
+## Modified 2022/07/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -29,7 +29,12 @@ BEGIN
     $CALLER_LEVEL = 0;
     $CALLER_INTERNAL->{'Module::Generic'}++;
     $CALLER_INTERNAL->{'Module::Generic::Exception'}++;
-    our $VERSION = 'v1.1.0';
+    our $VERSION = 'v1.2.0';
+};
+
+BEGIN
+{
+    Module::Generic->_implement_freeze_thaw( qw( Devel::StackTrace Devel::StackTrace::Frame ) );
 };
 
 use strict;
@@ -38,8 +43,6 @@ no warnings 'redefine';
 sub init
 {
     my $self = shift( @_ );
-    # require Data::Dumper::Concise;
-    # print( STDERR __PACKAGE__, "::init() Got here with args: ", Data::Dumper::Concise::Dumper( \@_ ), "\n" );
     $self->{code} = '' unless( length( $self->{code} ) );
     $self->{type} = '' unless( length( $self->{type} ) );
     $self->{file} = '' unless( length( $self->{file} ) );
@@ -69,7 +72,7 @@ sub init
     
     unless( length( $args->{skip_frames} ) )
     {
-        ## XXX Taken from Carp to find the right point in the stack to start from
+        # NOTE: Taken from Carp to find the right point in the stack to start from
         no strict 'refs';
         my $caller_func;
         $caller_func = \&{"CORE::GLOBAL::caller"} if( defined( &{"CORE::GLOBAL::caller"} ) );
@@ -114,7 +117,7 @@ sub init
     }
     
     my $skip_frame = $args->{skip_frames} || 0;
-    ## Skip one frame to exclude us
+    # Skip one frame to exclude us
     $skip_frame++;
     
     my $trace = Devel::StackTrace->new( skip_frames => $skip_frame, indent => 1 );
@@ -136,12 +139,12 @@ sub init
         $self->{code} = $args->{code} if( exists( $args->{code} ) );
         $self->{type} = $args->{type} if( exists( $args->{type} ) );
         $self->{retry_after} = $args->{retry_after} if( exists( $args->{retry_after} ) );
-        ## I do not want to alter the original hash reference, which may adversely affect the calling code if they depend on its content for further execution for example.
+        # I do not want to alter the original hash reference, which may adversely affect the calling code if they depend on its content for further execution for example.
         my $copy = {};
         %$copy = %$args;
         CORE::delete( @$copy{ qw( message code type retry_after skip_frames ) } );
         # print( STDERR __PACKAGE__, "::init() Following non-standard keys to set up: '", join( "', '", sort( keys( %$copy ) ) ), "'\n" );
-        ## Do we have some non-standard parameters?
+        # Do we have some non-standard parameters?
         foreach my $p ( keys( %$copy ) )
         {
             my $p2 = $p;
@@ -160,9 +163,8 @@ sub init
     return( $self );
 }
 
-#sub as_string { return( $_[0]->{message} ); }
-## This is important as stringification is called by die, so as per the manual page, we need to end with new line
-## And will add the stack trace
+# This is important as stringification is called by die, so as per the manual page, we need to end with new line
+# And will add the stack trace
 sub as_string
 {
     no overloading;
@@ -175,7 +177,6 @@ sub as_string
     return( $str );
 }
 
-## if( Module::Generic::Exception->caught( $e ) ) { # do something, it's ours }
 sub caught 
 {
     my( $class, $e ) = @_;
@@ -243,6 +244,47 @@ sub throw
     die( $e );
 }
 
+sub FREEZE
+{
+    my $self = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class = CORE::ref( $self );
+    my %hash  = %$self;
+    # Return an array reference rather than a list so this works with Sereal and CBOR
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # But Storable want a list with the first element being the serialised element
+    CORE::return( $class, \%hash );
+}
+
+sub STORABLE_freeze { return( shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { return( shift->THAW( @_ ) ); }
+
+# NOTE: CBOR will call the THAW method with the stored classname as first argument, the constant string CBOR as second argument, and all values returned by FREEZE as remaining arguments.
+# NOTE: Storable calls it with a blessed object it created followed with $cloning and any other arguments initially provided by STORABLE_freeze
+sub THAW
+{
+    my( $self, undef, @args ) = @_;
+    my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+    my $new;
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        foreach( CORE::keys( %$hash ) )
+        {
+            $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+        }
+        $new = $self;
+    }
+    else
+    {
+        $new = CORE::bless( $hash => $class );
+    }
+    CORE::return( $new );
+}
+
 sub TO_JSON { return( shift->as_string ); }
 
 # Devel::StackTrace has a stringification overloaded so users can use the object to get more information or simply use it as a string to get the stack trace equivalent of doing $trace->as_string
@@ -270,13 +312,13 @@ sub _obj_eq
             return( 0 );
         }
     }
-    ## Compare error message
+    # Compare error message
     elsif( !ref( $other ) )
     {
         my $me = $self->message;
         return( $me eq $other );
     }
-    ## Otherwise some reference data to which we cannot compare
+    # Otherwise some reference data to which we cannot compare
     return( 0 ) ;
 }
 

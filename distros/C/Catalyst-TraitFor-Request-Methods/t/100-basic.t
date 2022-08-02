@@ -2,6 +2,7 @@
 
 use Test::Most;
 
+use HTTP::Request;
 use HTTP::Request::Common;
 
 use lib 't/lib';
@@ -9,7 +10,7 @@ use lib 't/lib';
 use Catalyst::Test 'TestApp';
 
 my @Methods =
-  map { "is_" . $_ } qw/ get head post put delete connect options trace patch /;
+  map { "is_" . $_ } qw/ get head post put delete connect options trace patch propfind /;
 
 subtest 'HEAD' => sub {
 
@@ -43,6 +44,13 @@ subtest 'POST' => sub {
     ok $c->req->is_post, 'is_post';
     ok !$c->req->is_get, '!is_get';
 
+};
+
+subtest 'Unrecognized HTTP method' => sub {
+
+    my ( $res, $c ) = ctx_request( HTTP::Request->new( SPORK => '/' ) );
+
+    ok $c->req->is_unrecognized_method;
 };
 
 done_testing;

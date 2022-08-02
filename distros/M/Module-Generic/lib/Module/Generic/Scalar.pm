@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Scalar.pm
-## Version v1.2.1
+## Version v1.3.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/04/10
+## Modified 2022/07/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -78,7 +78,7 @@ BEGIN
     );
     $DEBUG = 0;
     $ERRORS = {};
-    our $VERSION = 'v1.2.1';
+    our $VERSION = 'v1.3.0';
 };
 
 use strict;
@@ -159,7 +159,6 @@ sub callback
             my $tie = tied( $$self );
             return(1) if( !$tie );
             my $rv = $tie->unset_callback( $what );
-            print( STDERR ref( $self ), "::callback: Any callback left? ", ( $rv ? 'yes' : 'no' ), "\n" ) if( $DEBUG );
             untie( $$self ) if( !$tie->has_callback );
             return( $rv );
         }
@@ -436,7 +435,6 @@ sub match
             : qr/(?:\Q$re\E)+/
         : $re;
     @rv = $$self =~ /$re/;
-    # print( STDERR ref( $self ), "::match: \@rv is: @rv, has ", scalar( @rv ), " element(s): ", Module::Generic->dump( \@rv ), "\n" );
     if( scalar( @{^CAPTURE} ) )
     {
         for( my $i = 0; $i < scalar( @{^CAPTURE} ); $i++ )
@@ -590,8 +588,6 @@ sub replace
     }
     # For named captures
     my $names = { %+ };
-    # print( STDERR ref( $self ), "::replace: \@rv contains ", scalar( @rv ), " element(s) and is ", Module::Generic->dump( \@rv ), " and \@matches is ", Module::Generic->dump( \@matches ), "\n" );
-    # print( STDERR ref( $self ), "::replace: Does caller want an object? ", want('OBJECT') ? 'yes' : 'no', "\n" );
     unless( want( 'OBJECT' ) || want( 'SCALAR' ) || want( 'LIST' ) || scalar( @matches ) )
     {
         return(0);
@@ -702,9 +698,7 @@ sub substr
     return( __PACKAGE__->_new( CORE::substr( ${$self}, $offset ) ) );
 }
 
-sub TO_JSON { CORE::return( ${$_[0]} ); }
-
-## The 3 dash here are just so my editor does not get confused with colouring
+# The 3 dash here are just so my editor does not get confused with colouring
 sub tr ###
 {
     my $self = CORE::shift( @_ );
@@ -795,7 +789,7 @@ sub _warnings_is_registered
     return(0);
 }
 
-DESTROY
+sub DESTROY
 {
     local( $., $@, $!, $^E, $? );
     my $self = shift( @_ );
@@ -803,8 +797,52 @@ DESTROY
     CORE::delete( $ERRORS->{ $addr } );
 };
 
+sub FREEZE
+{
+    my $self = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class = CORE::ref( $self ) || $self;
+    # Return an array reference rather than a list so this works with Sereal and CBOR
+    CORE::return( [$class, $$self] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # But Storable want a list with the first element being the serialised element
+    CORE::return( $$self );
+}
+
+sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+sub THAW
+{
+    my( $self, undef, @args ) = @_;
+    my( $class, $str );
+    if( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' )
+    {
+        ( $class, $str ) = @{$args[0]};
+    }
+    else
+    {
+        $class = CORE::ref( $self ) || $self;
+        $str = CORE::shift( @args );
+    }
+    my $new;
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        $$self = $str;
+        $new = $self;
+    }
+    else
+    {
+        $new = CORE::return( $class->new( $str ) );
+    }
+    CORE::return( $new );
+}
+
+sub TO_JSON { CORE::return( ${$_[0]} ); }
+
 
-# XXX Module::Generic::RegexpCapture package
+# NOTE: Module::Generic::RegexpCapture package
 {
     package
         Module::Generic::RegexpCapture;
@@ -845,9 +883,53 @@ DESTROY
     sub name { return( shift->_set_get_hash_as_object( 'name', @_ ) ); }
     
     sub result { return( shift->_set_get_array_as_object( 'result', @_ ) ); }
+
+    sub FREEZE
+    {
+        my $self = CORE::shift( @_ );
+        my $serialiser = CORE::shift( @_ ) // '';
+        my $class = CORE::ref( $self );
+        my %hash  = %$self;
+        # Return an array reference rather than a list so this works with Sereal and CBOR
+        CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+        # But Storable want a list with the first element being the serialised element
+        CORE::return( $class, \%hash );
+    }
+
+    sub STORABLE_freeze { return( shift->FREEZE( @_ ) ); }
+
+    sub STORABLE_thaw { return( shift->THAW( @_ ) ); }
+
+    # NOTE: CBOR will call the THAW method with the stored classname as first argument, the constant string CBOR as second argument, and all values returned by FREEZE as remaining arguments.
+    # NOTE: Storable calls it with a blessed object it created followed with $cloning and any other arguments initially provided by STORABLE_freeze
+    sub THAW
+    {
+        # STORABLE_thaw would issue $cloning as the 2nd argument, while CBOR would issue
+        # 'CBOR' as the second value.
+        my( $self, undef, @args ) = @_;
+        my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+        my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+        my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+        my $new;
+        # Storable pattern requires to modify the object it created rather than returning a new one
+        if( CORE::ref( $self ) )
+        {
+            foreach( CORE::keys( %$hash ) )
+            {
+                $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+            }
+            $new = $self;
+        }
+        else
+        {
+            $new = CORE::bless( $hash => $class );
+        }
+        CORE::return( $new );
+    }
 }
 
 {
+    # NOTE: Module::Generic::Scalar::Tie class
     package
         Module::Generic::Scalar::Tie;
     BEGIN

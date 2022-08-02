@@ -11,16 +11,20 @@ sub Failure { join( '::', 'CXC::Number::Grid::Failure', @_ ) }
 subtest 'overlap' => sub {
 
     subtest 'as is' => sub {
-        my $grid1 = Grid->new( edges => [ 0, 1, 2, 3 ], include => [ 0, 0, 0 ] );
-        my $grid2 = Grid->new( edges => [ 1.1, 2.2 ], include => [1] );
+
+        #<<< no tidy
+        my $grid1 = Grid->new( edges   => [ 0,  1,   3,   5 ],
+                               include => [   0,   0,   0   ] );
+        my $grid2 = Grid->new( edges   => [        2,   4   ],
+                               include => [           1     ] );
+        #>>> ydit on
 
         my $gridN = overlay_n( $grid1, $grid2 );
 
         is(
             $gridN,
             object {
-                call bin_edges =>
-                  array { item number $_ for 0, 1, 1.1, 2.2, 3 };
+                call bin_edges => array { item number $_ for 0, 1, 2, 4, 5 };
                 call include => array { item number $_ for 0, 0, 1, 0 };
             },
         );
@@ -29,12 +33,13 @@ subtest 'overlap' => sub {
 
     subtest 'snap to overlay' => sub {
 
-        my $grid1 = Grid->new( edges => [ 0, 1, 2, 3 ], include => [ 0, 0, 0 ] );
+        my $grid1
+          = Grid->new( edges => [ 0, 1, 2, 3 ], include => [ 0, 0, 0 ] );
         my $grid2 = Grid->new( edges => [ 1.1, 2.2 ], include => [1] );
         my $grid3 = Grid->new( edges => [ 2.3, 3.4 ], include => [0] );
 
         my $gridN = overlay_n( $grid1, $grid2, $grid3,
-                               { snap_dist => 0.1, snap_to => 'overlay' } );
+            { snap_dist => 0.1, snap_to => 'overlay' } );
 
         # grid1 < grid 2
         #  before snap
@@ -59,8 +64,7 @@ subtest 'overlap' => sub {
         is(
             $gridN,
             object {
-                call bin_edges =>
-                  array { item number $_ for 0, 1.1, 2.3, 3.4 };
+                call bin_edges => array { item number $_ for 0, 1.1, 2.3, 3.4 };
                 call include => array { item number $_ for 0, 1, 0 };
             },
         );
@@ -69,11 +73,12 @@ subtest 'overlap' => sub {
 
     subtest 'snap to underlay' => sub {
 
-        my $grid1 = Grid->new( edges => [ 0, 1, 2, 3 ], include => [ 0, 0, 0 ] );
+        my $grid1
+          = Grid->new( edges => [ 0, 1, 2, 3 ], include => [ 0, 0, 0 ] );
         my $grid2 = Grid->new( edges => [ 1.1, 1.9 ], include => [1] );
 
         my $gridN = overlay_n( $grid1, $grid2,
-                               { snap_dist => 0.1, snap_to => 'underlay' } );
+            { snap_dist => 0.1, snap_to => 'underlay' } );
 
         # grid1 < grid 2
         #  before snap
@@ -92,8 +97,7 @@ subtest 'overlap' => sub {
         is(
             $gridN,
             object {
-                call bin_edges =>
-                  array { item number $_ for 0, 1, 2, 3 };
+                call bin_edges => array { item number $_ for 0, 1, 2, 3 };
                 call include => array { item number $_ for 0, 1, 0 };
             },
         );

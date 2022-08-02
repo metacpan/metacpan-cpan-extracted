@@ -448,3 +448,8 @@ Revision history for StreamFinder
 1.87    2022/06/07
         - StreamFinder::BrandNewTube - Add support for Ugetube.com videos.
         Note:  User must specify full ugetube.com URLs.
+1.88    2022/07/30
+        - StreamFinder::PodcastAddict - Fix failure to capture "year" field.
+        - StreamFinder::Rumble - Fix not capturing full video descriptions.
+        - StreamFinder::Youtube - Add -formats_by_url => {hash} option to allow 
+        specifying different video formats allowed based on URL matching.

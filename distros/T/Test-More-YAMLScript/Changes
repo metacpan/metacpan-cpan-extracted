@@ -1,0 +1,16 @@
+0.0.5 Mon 25 Jul 2022 08:56:17 AM PDT
+ - Refactor code into YAMLScript
+ - Bump the YAMLScript dep version to 0.0.15
+
+0.0.4 Mon 25 Jul 2022 06:20:09 AM PDT
+ - Bump the YAMLScript dep version to 0.0.14
+
+0.0.3 Sun 24 Jul 2022 03:15:03 PM PDT
+ - Use fixed DistTestFixer
+ - Add subtest and skip-all support
+
+0.0.2 Fri 22 Jul 2022 04:35:44 PM PDT
+ - Fix ReadMe file
+
+0.0.1 Fri 22 Jul 2022 01:21:55 PM PDT
+ - Initial release

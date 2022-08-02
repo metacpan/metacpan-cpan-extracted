@@ -1,5 +1,5 @@
 package Form::Tiny::Form;
-
+$Form::Tiny::Form::VERSION = '2.13';
 use v5.10;
 use strict;
 use warnings;
@@ -11,8 +11,6 @@ use List::Util qw(any);
 use Form::Tiny::Error;
 use Form::Tiny::Utils qw(try);
 use Moo::Role;
-
-our $VERSION = '2.12';
 
 has 'field_defs' => (
 	is => 'ro',

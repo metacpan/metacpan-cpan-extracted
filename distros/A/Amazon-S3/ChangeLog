@@ -1,3 +1,135 @@
+Mon Aug  1 15:44:04 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.55 - bucket region]:
+	* requires: latest version of most modules
+	* src/main/perl/lib/Amazon/S3.pm.in
+	- pod tweaks, corrections
+	- don't specify a minimum version of perl
+	(new): set default region to 'us-east-1', again
+	(get_bucket_location): $bucket, not $self
+	(buckets)
+	- verify region option
+	- pass hash of options and region to _send_request
+	(add_bucket)
+	- do not add region constraint if us-east-1
+	- refactored, send region to _send_request_expect_nothing
+	(delete_bucket): likewise refactored
+	(list_bucket): likewise refactored
+	(_make_request): use region() method of signer
+	(_do_http): debug statements, set last_reponse, reset_errors
+	(_do_http_no_redirect): likewise
+	(_send_request_expect_nothing): likewise
+	(_send_request_expect_nothing_probed)
+	- accept hash argument
+	- debug statements
+	- croak if redirect, but no Location
+	(error): new
+	(reset_errors): new
+	(_remember_error): set error
+	* src/main/perl/lib/Amazon/S3/Bucket.pm.in
+	- pod tweaks, corrections
+	(new)
+	- + logger attribute
+	- + verify_region attribute, verify region if true
+	(_uri): remove leading '/'
+	(add_key): correct region if 301 response
+	(upload_multipart_object): debug messages
+	(upload_part_of_multipart_upload): likewise
+	(complete_multipart_upload): likewise
+	(get_key): remove redundant debug message
+	(delete_key): pass region to _send_request_expect_nothing
+	(set_acl): likewise
+	* src/main/perl/t/01-api.t: do not bailout on early tests
+	(error): new
+	(last_response): new
+	* src/main/perl/t/03-region.t: default region is us-east-1
+
+Fri Jul 22 14:47:30 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.55 - testing, revert to XML::Simple]:
+	* src/main/perl/t/01-api.t: remove /r option in regex
+	* src/main/perl/t/04-list-buckets: likewise
+	* src/main/perl/lib/Amazon/S3.pm: use XML::Simple
+	* src/main/perl/lib/Amazon/S3/Bucket.pm.in: likewise
+	(make_xml_document_simple): new
+	* src/main/perl/t/06-list-multipart-uploads.t: XML::Simple
+	* configure.ac: remove Lib::XML, Lib::XML::Simple, add XML::Simple
+	* cpan/requires: likewise
+	* TODO.md: new
+
+Thu Jul 21 11:14:16 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.55 - CI/CD]:
+	* .github/workflows/build.yml: remove make cpan
+	* README.md: generated
+	* src/main/perl/lib/Amazon/S3.pm.in: update badge
+
+Thu Jul 21 10:53:03 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.55 - CI/CD]:
+	* .github/workflows/build.yml
+	* README.md: generated
+	* configure.ac: typo, IO::Scalar
+	* cpan/requires
+	- IO::Scalar, JSON:PP, Pod::Markdown
+	* src/main/perl/lib/Amazon/S3.pm.in: add badge
+	* NEWS.md: update
+
+Mon Jul 18 16:27:41 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.55 - regional buckets]:
+	* NEWS.md: new
+	* src/main/perl/lib/Amazon/S3/Constants.pm.in
+	- + $MIN_MULTIPART_UPLOAD_CHUNK_SIZE
+	* src/main/perl/lib/Amazon/S3.pm.in
+	- document Signature V4 changes/implications
+	- use new Amazon::S3::Signature::V4 object
+	(_make_request): accept hash ref as argument
+	(get_bucket_location): new
+	(reset_signer_region): new
+	* src/main/perl/lib/Amazon/S3/Bucket.pm.in
+	- document multipart methods
+	- send region in all _make_request calls
+	(_send_request): check if arg is a request
+	(new)
+	- accept region argument
+	- set bucket region if region not passed
+	(upload_multipart_object): new
+	* src/main/perl/lib/Amazon/S3/Signature/V4: new
+	* src/main/perl/lib/Makefile.am: add above to build
+	* src/main/perl/t/05-multpart-upload.t: new
+	* src/main/perl/t/06-list-multpart-upload.t: new
+
+Thu Jul 14 06:34:56 2022  Rob Lauer  <rlauer6@comcast.net>>
+
+	[0.55 - use XML::LibXML]:
+	* VERSION: bump
+	* src/main/perl/lib/Amazon/S3.pm.in: use XML::LibXML, not XML::Simple
+	- perlcritic cleanups
+	- pod cleanup
+	(new)
+	- cache_signer
+	- encrypt credentials
+	(get_default_region): new
+	(get_aws_access_key_id): new
+	(get_aws_secret_access_key): new
+	(get_token): new
+	(_decrypt): new
+	(_encrypt): new
+	(signer)
+	- accesses _signer now
+	- set default region to caller's value or default
+	(buckets): set region to us-east-1 temporarily
+	(debug): new convenience method for level => 'debug'
+	(_make_request): allow disabling of domain buckets
+	* src/main/perl/lib/Amazon/S3/Bucket.pm.in: comment tweak
+	* src/main/perl/lib/Amazon/S3/Constant.pm.in: $DOT
+	* src/main/perl/t/01-api.t: set $dns_bucket_names to true?
+	* cpan/test-requires: +Test::Output
+	* cpan/requires: -Test::Output
+	* configure.ac
+	- ads_PERL_MODULE XML::LibXML::Simple, XML::LibXML, Test::Output
+
 Wed Jul 13 13:09:04 2022  Rob Lauer  <rlauer6@comcast.net>
 
 	[0.54 - merge timmullin changes]:

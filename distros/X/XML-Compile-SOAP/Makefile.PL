@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 use 5.010;
 
-my $version = '3.27';
+my $version = '3.28';
 
 my $prereq =
    { XML::Compile         => '1.58'
@@ -11,7 +11,8 @@ my $prereq =
    , Log::Report          => '1.05'
 
    , LWP               => 6.08
-   , Net::HTTP         => 6.16  # older versions contain nasty bugs
+   , LWP::Protocol::https => 6.00
+   , Net::HTTP         => 6.16  # older versions contains nasty bugs
    , Time::HiRes       => 0
    , File::Slurper     => 0
 

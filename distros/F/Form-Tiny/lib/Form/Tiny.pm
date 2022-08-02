@@ -1,5 +1,5 @@
 package Form::Tiny;
-
+$Form::Tiny::VERSION = '2.13';
 use v5.10;
 use strict;
 use warnings;
@@ -11,8 +11,6 @@ use Scalar::Util qw(blessed);
 use Form::Tiny::Form;
 use Form::Tiny::Utils qw(trim :meta_handlers);
 require Moo;
-
-our $VERSION = '2.12';
 
 sub import
 {
@@ -43,14 +41,15 @@ sub ft_install
 		meta_roles => [],
 	};
 
-	my $plugins = $self->_get_flag(\@import_flags, 'plugins', 1);
+	my $plugins_flag = $self->_get_flag(\@import_flags, 'plugins', 1);
+	my @plugins = @{$plugins_flag // []};
 
 	$self->_select_behaviors(
 		$wanted, \@import_flags,
 		$self->_get_behaviors($self->_generate_helpers($caller, \$context))
 	);
 
-	foreach my $plugin (@$plugins) {
+	foreach my $plugin (@plugins) {
 		$plugin = "Form::Tiny::Plugin::$plugin";
 		$plugin =~ s/^.+\+//;
 		my $success = eval "use $plugin; 1";

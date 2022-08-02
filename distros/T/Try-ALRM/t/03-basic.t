@@ -17,8 +17,8 @@ is 5, $Try::ALRM::TIMEOUT, sprintf( qq{default timeout is %d seconds}, timeout )
 # setting to nullify default ALRM handler
 $SIG{ALRM} = sub { note q{Alarm Clock!!} };
 
-# try/ALRM
-try {
+# try_once/ALRM
+try_once {
     local $| = 1;
 
     # timeout is set to 1 due to trailing value after ALRM block

@@ -20,6 +20,7 @@ WriteMakefile(
     'Modern::Perl' => 1.20180701,
     'Mojolicious' => 0,
     'I18N::AcceptLanguage' => 0,
+    'Encode::Locale' => 0,
     'File::ShareDir' => 0,
     'File::Slurper' => 0,
     'XML::LibXML' => 0,

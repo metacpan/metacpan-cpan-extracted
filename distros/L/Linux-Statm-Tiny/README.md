@@ -4,7 +4,7 @@ Linux::Statm::Tiny - simple access to Linux /proc/../statm
 
 # VERSION
 
-version 0.0603
+version 0.0700
 
 # SYNOPSIS
 
@@ -123,6 +123,7 @@ Robert Rothenberg <rrwo@cpan.org>
 - James Raspass <jraspass@gmail.com>
 - Karen Etheridge <ether@cpan.org>
 - Mohammad S Anwar <mohammad.anwar@yahoo.com>
+- Toby Inkster <github@toby.ink>
 
 # COPYRIGHT AND LICENSE
 

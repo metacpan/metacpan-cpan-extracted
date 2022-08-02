@@ -74,26 +74,27 @@ subtest _note_at => sub {
     my $obj = new_ok 'Music::FretboardDiagram' => [ chord => CHORD ];
 
     my $note = 0;
-    my $got = $obj->_note_at(1, $note);
+    my $posn = $obj->position;
+    my $got = $obj->_note_at($posn, 1, $note);
     is $got, 'E', 'open E';
     $note = 1;
-    $got = $obj->_note_at(1, $note);
+    $got = $obj->_note_at($posn, 1, $note);
     is $got, 'F', '1st fret F';
 
     $note = 0;
-    $obj->position(13);
-    $got = $obj->_note_at(1, $note);
+    $posn = 13;
+    $got = $obj->_note_at($posn, 1, $note);
     is $got, 'E', '12th fret E';
     $note = 1;
-    $got = $obj->_note_at(1, $note);
+    $got = $obj->_note_at($posn, 1, $note);
     is $got, 'F', '13th fret F';
 
     $note = 0;
-    $obj->position(25);
-    $got = $obj->_note_at(1, $note);
+    $posn = 25;
+    $got = $obj->_note_at($posn, 1, $note);
     is $got, 'E', '24th fret E';
     $note = 1;
-    $got = $obj->_note_at(1, $note);
+    $got = $obj->_note_at($posn, 1, $note);
     is $got, 'F', '25th fret F';
 };
 
@@ -104,6 +105,22 @@ subtest image => sub {
     ];
     my $got = $obj->draw;
     isa_ok $got, 'Imager', 'returned image';
+};
+
+subtest spec_to_notes => sub {
+    my $obj = new_ok 'Music::FretboardDiagram' => [ chord => CHORD ];
+    my $got = $obj->spec_to_notes($obj->chord->[0][1]);
+    my $expect = [];
+    is_deeply $got, $expect, 'spec_to_notes';
+
+    $got = $obj->spec_to_notes('x02220');
+    $expect = [qw(A E A Db E)];
+    is_deeply $got, $expect, 'spec_to_notes';
+
+    $obj->position(2);
+    $got = $obj->spec_to_notes('x02220');
+    $expect = [qw(A F Bb D E)];
+    is_deeply $got, $expect, 'spec_to_notes';
 };
 
 done_testing();

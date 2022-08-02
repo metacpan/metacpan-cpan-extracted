@@ -7,16 +7,19 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Backend::Any 2.150;
+package Config::Model::Backend::Any 2.152;
+
+use v5.20;
 
 use Carp;
-use strict;
-use warnings;
 use Config::Model::Exception;
 use Mouse;
 
 use File::Path;
 use Log::Log4perl qw(get_logger :levels);
+
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
 
 my $logger = get_logger("Backend");
 
@@ -132,18 +135,7 @@ sub write_global_comment {
     goto &write_global_comments;
 }
 
-sub write_global_comments {
-    my $self = shift;
-    my ($ioh, $cc);
-    if (ref($_[0])) {
-        my ($package, $filename, $line) = caller;
-        $logger->warn("write_global_comments: io_handle parameter is deprecated ($filename: $line)");
-        ($ioh, $cc) = @_;
-    }
-    else {
-        ( $cc ) = @_;
-    }
-
+sub write_global_comments ($self, $cc) {
     croak "write_global_comments: no comment char specified" unless $cc;
 
     # no need to mention 'cme list' if current application is found
@@ -167,22 +159,11 @@ sub write_global_comments {
         $res .= "\n";
     }
 
-    $ioh->print($res) if defined $ioh;
     return $res;
 }
 
 # $cc can be undef when writing a list on a single line
-sub write_data_and_comments {
-    my $self = shift;
-    my ($ioh, $cc, @data_and_comments);
-    if (not defined $_[0] or ref($_[0])) {
-        $logger->warn("write_data_and_comments: io_handle parameter is deprecated");
-        ($ioh, $cc, @data_and_comments) = @_;
-    }
-    else {
-        ( $cc, @data_and_comments ) = @_;
-    }
-
+sub write_data_and_comments ( $self, $cc, @data_and_comments ) {
     my $res = '';
     while (@data_and_comments) {
         my ( $d, $c ) = splice @data_and_comments, 0, 2;
@@ -191,7 +172,6 @@ sub write_data_and_comments {
         }
         $res .= "$d\n" if defined $d;
     }
-    $ioh->print($res) if defined $ioh;
     return $res;
 }
 
@@ -213,7 +193,7 @@ Config::Model::Backend::Any - Virtual class for other backends
 
 =head1 VERSION
 
-version 2.150
+version 2.152
 
 =head1 SYNOPSIS
 

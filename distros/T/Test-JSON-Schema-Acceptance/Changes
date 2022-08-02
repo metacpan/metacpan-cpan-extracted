@@ -1,5 +1,11 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.017     2022-07-23 21:55:43Z
+        - now allowing additional (ignored) properties in test data, to be
+          forward-compatible with developments to the test suite
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/637f0ac3ebdd110065ab846918c03b364d9ee253...69acf52990b004240839ae19b4bec8fb01d50876
+
 1.016     2022-02-22 01:59:45Z
         - skip tests that are not possible on perls >= 5.35.9, due to changes
           in internal handling of numbers when treated as strings

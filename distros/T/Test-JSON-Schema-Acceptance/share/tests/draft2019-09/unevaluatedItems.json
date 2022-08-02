@@ -1,10 +1,7 @@
 [
     {
         "description": "unevaluatedItems true",
-        "schema": {
-            "type": "array",
-            "unevaluatedItems": true
-        },
+        "schema": { "unevaluatedItems": true },
         "tests": [
             {
                 "description": "with no unevaluated items",
@@ -20,10 +17,7 @@
     },
     {
         "description": "unevaluatedItems false",
-        "schema": {
-            "type": "array",
-            "unevaluatedItems": false
-        },
+        "schema": { "unevaluatedItems": false },
         "tests": [
             {
                 "description": "with no unevaluated items",
@@ -39,10 +33,7 @@
     },
     {
         "description": "unevaluatedItems as schema",
-        "schema": {
-            "type": "array",
-            "unevaluatedItems": { "type": "string" }
-        },
+        "schema": { "unevaluatedItems": { "type": "string" } },
         "tests": [
             {
                 "description": "with no unevaluated items",
@@ -64,7 +55,6 @@
     {
         "description": "unevaluatedItems with uniform items",
         "schema": {
-            "type": "array",
             "items": { "type": "string" },
             "unevaluatedItems": false
         },
@@ -79,7 +69,6 @@
     {
         "description": "unevaluatedItems with tuple",
         "schema": {
-            "type": "array",
             "items": [
                 { "type": "string" }
             ],
@@ -101,7 +90,6 @@
     {
         "description": "unevaluatedItems with additionalItems",
         "schema": {
-            "type": "array",
             "items": [
                 { "type": "string" }
             ],
@@ -119,7 +107,6 @@
     {
         "description": "unevaluatedItems with nested tuple",
         "schema": {
-            "type": "array",
             "items": [
                 { "type": "string" }
             ],
@@ -147,9 +134,35 @@
         ]
     },
     {
-        "description": "unevaluatedItems with nested additionalItems",
+        "description": "unevaluatedItems with nested items",
         "schema": {
-            "type": "array",
+            "unevaluatedItems": {"type": "boolean"},
+            "anyOf": [
+                { "items": {"type": "string"} },
+                true
+            ]
+        },
+        "tests": [
+            {
+                "description": "with only (valid) additional items",
+                "data": [true, false],
+                "valid": true
+            },
+            {
+                "description": "with no additional items",
+                "data": ["yes", "no"],
+                "valid": true
+            },
+            {
+                "description": "with invalid additional item",
+                "data": ["yes", false],
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "unevaluatedItems with nested items and additionalItems",
+        "schema": {
             "allOf": [
                 {
                     "items": [
@@ -176,16 +189,13 @@
     {
         "description": "unevaluatedItems with nested unevaluatedItems",
         "schema": {
-            "type": "array",
             "allOf": [
                 {
                     "items": [
                         { "type": "string" }
                     ]
                 },
-                {
-                    "unevaluatedItems": true
-                }
+                { "unevaluatedItems": true }
             ],
             "unevaluatedItems": false
         },
@@ -205,7 +215,6 @@
     {
         "description": "unevaluatedItems with anyOf",
         "schema": {
-            "type": "array",
             "items": [
                 { "const": "foo" }
             ],
@@ -252,7 +261,6 @@
     {
         "description": "unevaluatedItems with oneOf",
         "schema": {
-            "type": "array",
             "items": [
                 { "const": "foo" }
             ],
@@ -288,7 +296,6 @@
     {
         "description": "unevaluatedItems with not",
         "schema": {
-            "type": "array",
             "items": [
                 { "const": "foo" }
             ],
@@ -313,10 +320,7 @@
     {
         "description": "unevaluatedItems with if/then/else",
         "schema": {
-            "type": "array",
-            "items": [
-                { "const": "foo" }
-            ],
+            "items": [ { "const": "foo" } ],
             "if": {
                 "items": [
                     true,
@@ -366,7 +370,6 @@
     {
         "description": "unevaluatedItems with boolean schemas",
         "schema": {
-            "type": "array",
             "allOf": [true],
             "unevaluatedItems": false
         },
@@ -386,7 +389,6 @@
     {
         "description": "unevaluatedItems with $ref",
         "schema": {
-            "type": "array",
             "$ref": "#/$defs/bar",
             "items": [
                 { "type": "string" }
@@ -421,9 +423,7 @@
                 {
                     "items": [ true ]
                 },
-                {
-                    "unevaluatedItems": false
-                }
+                { "unevaluatedItems": false }
             ]
         },
         "tests": [
@@ -437,14 +437,10 @@
     {
         "description": "item is evaluated in an uncle schema to unevaluatedItems",
         "schema": {
-            "type": "object",
             "properties": {
                 "foo": {
-                    "type": "array",
                     "items": [
-                        {
-                            "type": "string"
-                        }
+                        { "type": "string" }
                     ],
                     "unevaluatedItems": false
                   }
@@ -455,9 +451,7 @@
                         "foo": {
                             "items": [
                                 true,
-                                {
-                                    "type": "string"
-                                }
+                                { "type": "string" }
                             ]
                         }
                     }
@@ -483,6 +477,57 @@
                     ]
                 },
                 "valid": false
+            }
+        ]
+    },
+    {
+        "description": "non-array instances are valid",
+        "schema": {"unevaluatedItems": false},
+        "tests": [
+            {
+                "description": "ignores booleans",
+                "data": true,
+                "valid": true
+            },
+            {
+                "description": "ignores integers",
+                "data": 123,
+                "valid": true
+            },
+            {
+                "description": "ignores floats",
+                "data": 1.0,
+                "valid": true
+            },
+            {
+                "description": "ignores objects",
+                "data": {},
+                "valid": true
+            },
+            {
+                "description": "ignores strings",
+                "data": "foo",
+                "valid": true
+            },
+            {
+                "description": "ignores null",
+                "data": null,
+                "valid": true
+            }
+        ]
+    },
+    {
+        "description": "unevaluatedItems should properly handle null data",
+        "schema": {
+            "unevaluatedItems": {
+                "type": "null"
+            }
+        },
+        "tests": [
+            {
+                "description": "null items allowed",
+                "data": [ null ],
+                "valid": true
             }
         ]
     }

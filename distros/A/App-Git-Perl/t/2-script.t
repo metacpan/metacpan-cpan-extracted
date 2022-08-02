@@ -2,6 +2,18 @@ use Test::More;
 
 my $script = "script/git-perl";
 
+#----------------------------------------------------------------------------
+# Skip testing on Windows
+
+if ( $ENV{COMSPEC} ) {
+  pass("Since using some of the linux cli commands, this script is not intended to use in Windows. Sorry.");
+  done_testing();
+  exit;
+}
+
+#----------------------------------------------------------------------------
+# configure environment for testing
+
 my $gitdir = qx{ $script config dir };
 chomp($gitdir);
 $gitdir = "." if ( not $gitdir );
@@ -35,7 +47,7 @@ if ( $test =~ /Author: / ) {
   fail("git log does not work. I cannot see changes from git log");
 }
 
-if ( $test =~ /Cloned into: (.*)/ ) {
+if ( $test =~ /Cloned into: (.*)/s ) {
   $test=$1;
   chomp($test);
 }

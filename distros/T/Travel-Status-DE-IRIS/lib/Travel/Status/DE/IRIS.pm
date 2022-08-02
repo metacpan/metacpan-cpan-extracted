@@ -6,7 +6,7 @@ use 5.014;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.66';
+our $VERSION = '1.69';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -87,7 +87,7 @@ sub new_p {
 	}
 
 	for my $eva (@related_stations) {
-		@candidates = $opt{get_station}( $opt{station} );
+		@candidates = $opt{get_station}($eva);
 
 		if ( @candidates == 1 ) {
 			push(
@@ -293,7 +293,7 @@ sub postprocess_results {
 		for my $transfer (@merge_candidates) {
 			my $result
 			  = first { $_->transfer and $_->transfer eq $transfer->train_id }
-			@{ $self->{results} };
+			  @{ $self->{results} };
 			if ($result) {
 				$result->merge_with_departure($transfer);
 			}
@@ -848,7 +848,7 @@ sub get_result_by_train {
 	my ( $self, $type, $train_no ) = @_;
 
 	my $res = first { $_->type eq $type and $_->train_no eq $train_no }
-	@{ $self->{results} };
+	  @{ $self->{results} };
 	return $res;
 }
 
@@ -964,7 +964,7 @@ Non-blocking variant (EXPERIMENTAL):
 
 =head1 VERSION
 
-version 1.66
+version 1.69
 
 =head1 DESCRIPTION
 

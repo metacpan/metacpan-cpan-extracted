@@ -2,10 +2,12 @@ NAME
     Sah::Schemas::Str - Various string schemas
 
 VERSION
-    This document describes version 0.004 of Sah::Schemas::Str (from Perl
-    distribution Sah-Schemas-Str), released on 2022-06-05.
+    This document describes version 0.008 of Sah::Schemas::Str (from Perl
+    distribution Sah-Schemas-Str), released on 2022-06-09.
 
 SAH SCHEMAS
+    The following schemas are included in this distribution:
+
     *   hexstr
 
         String of bytes in hexadecimal.
@@ -35,8 +37,17 @@ SAH SCHEMAS
 
         String or regex (if string is of the form `/.../`).
 
-        If string is of the form of "/.../", then it will be parsed as a
-        regex. Otherwise, it's accepted as a plain string.
+        Either string or Regexp object is accepted.
+
+        If string is of the form of "/.../" or "qr(...)", then it will be
+        compiled into a Regexp object. If the regex pattern inside "/.../"
+        or "qr(...)" is invalid, value will be rejected.
+
+        Currently, unlike in normal Perl, for the "qr(...)" form, only
+        parentheses "(" and ")" are allowed as the delimiter.
+
+        Currently modifiers "i", "m", and "s" after the second "/" are
+        allowed.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -47,9 +58,9 @@ SOURCE
     <https://github.com/perlancar/perl-Sah-Schemas-Str>.
 
 SEE ALSO
-    Sah - specification
+    Sah - schema specification
 
-    Data::Sah
+    Data::Sah - Perl implementation of Sah
 
 AUTHOR
     perlancar <perlancar@cpan.org>

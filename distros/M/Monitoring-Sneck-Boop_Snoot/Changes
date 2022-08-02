@@ -1,6 +1,9 @@
 Revision history for Monitoring-Sneck-Boop_Snoot
 
-0.1.0   2022-05-07/03:30
+0.2.0   2022-08-01/15:15
+        -Add support for base64+gzip returns.
+
+0.1.1   2022-05-07/03:30
         -Correct the exit code for -n on OK.
 
 0.1.0   2022-05-07/03:30

@@ -1,13 +1,9 @@
-package Memoize::Saves;
-BEGIN {
-  $Memoize::Saves::AUTHORITY = 'cpan:FLORA';
-}
-BEGIN {
-  $Memoize::Saves::VERSION = '0.67';
-}
-# ABSTRACT: Plug-in module to specify which return values should be memoized
+use strict; use warnings;
 
-$DEBUG = 0;
+package Memoize::Saves;
+our $VERSION = '0.69';
+
+our $DEBUG;
 
 sub TIEHASH
 {
@@ -122,9 +118,8 @@ sub STORE
 
 1;
 
-
-
 __END__
+
 =pod
 
 =encoding utf-8
@@ -137,13 +132,14 @@ Memoize::Saves - Plug-in module to specify which return values should be memoize
 
     use Memoize;
 
+    tie my %cache => 'Memoize::Saves',
+      CACHE => [ "word1", "word2" ],
+      DUMP  => [ "word3", "word4" ],
+      REGEX => "Regular Expression",
+      HASH  => $cache_hashref;
+
     memoize 'function',
-      SCALAR_CACHE => [TIE, Memoize::Saves,
-                       CACHE => [ "word1", "word2" ],
-                       DUMP  => [ "word3", "word4" ],
-                       REGEX => "Regular Expression",
-                       HASH  => $cache_hashref,
-                      ],
+      SCALAR_CACHE => [ HASH => \%cache ];
 
 =head1 DESCRIPTION
 
@@ -203,4 +199,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

@@ -17,12 +17,14 @@ t/08-taint.t
 t/09-inc-hook.t
 t/10-wrong-module-sub.t
 t/11-wrong-module-all.t
+t/12-loadfail.t
 t/50-meta.t
 t/51-pod.t
 t/52-pod-coverage.t
 t/test/duplicates/ModuleFindTest.pm
 t/test/duplicates/ModuleFindTest/SubMod.pm
 t/test/duplicates/ModuleFindTest/SubMod/SubSubMod.pm
+t/test/LoadFailTest/LoadFailMod.pm
 t/test/ModuleFindTest.pm
 t/test/ModuleFindTest/SubMod.pm
 t/test/ModuleFindTest/SubMod/SubSubMod.pm

@@ -1,5 +1,14 @@
 Revision history for XS-Parse-Keyword
 
+0.25    2022-07-25
+        [CHANGES]
+         * Permit infix operators to consume fewer than all the available
+           symbols; allowing for RHS operands that begin with symbols without
+           intervening whitespace
+         * Improved unit-testing of infix operator parser precedence issues
+         * Added `XPI_OPERAND_ARITH`; renumbered `XPI_OPERAND_TERM` to be
+           non-zero. Currently zero is accepted for back-compat
+
 0.24    2022-06-26
         [CHANGES]
          * Skip attempting to create duplicate wrapper funcs, in case of

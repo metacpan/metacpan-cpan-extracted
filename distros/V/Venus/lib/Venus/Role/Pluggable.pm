@@ -5,31 +5,41 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo::Role;
+use Venus::Role 'with';
 
-with 'Venus::Role::Proxyable';
+# AUDITS
 
-# BUILDERS
+sub AUDIT {
+  my ($self, $from) = @_;
 
-sub build_proxy {
-  return undef;
+  if (!$from->does('Venus::Role::Proxyable')) {
+    die "${self} requires ${from} to consume Venus::Role::Proxyable";
+  }
+
+  return $self;
 }
 
-# MODIFIERS
+# METHODS
 
-around build_proxy => sub {
-  my ($orig, $self, $package, $method, @args) = @_;
+sub build_proxy {
+  my ($self, $package, $method, @args) = @_;
 
   require Venus::Space;
 
   my $space = Venus::Space->new($package)->child('plugin', $method);
 
-  return $self->$orig($package, $method, @args) if !$space->tryload;
+  return undef if !$space->tryload;
 
   return sub {
     return $space->build->execute($self, @args);
   };
-};
+}
+
+# EXPORTS
+
+sub EXPORT {
+  ['build_proxy']
+}
 
 1;
 
@@ -65,9 +75,10 @@ Pluggable Role for Perl 5
 
   use Venus::Class;
 
+  with 'Venus::Role::Proxyable';
   with 'Venus::Role::Pluggable';
 
-  has 'secret';
+  attr 'secret';
 
   package main;
 
@@ -80,13 +91,5 @@ Pluggable Role for Perl 5
 =head1 DESCRIPTION
 
 This package provides a mechanism for dispatching to plugin classes.
-
-=cut
-
-=head1 INTEGRATES
-
-This package integrates behaviors from:
-
-L<Venus::Role::Proxyable>
 
 =cut

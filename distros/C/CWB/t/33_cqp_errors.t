@@ -63,13 +63,11 @@ for my $R (1, 2, 3) { # T21–T23
   syntax_error("A = TAB 'the' []{$R,$R1} 'elephant'", "invalid distance range ($R,$R1) in TAB query", qr/invalid.*range/i);
 }
 
-# unsupported inequality comparisons for strings and regexp raise errors in CQP v3.4.17+
-SKIP: {
-  skip "unsupported inequality comparisons are only caught in CQP v3.4.17 and newer", 6 unless $cqp->check_version(3, 4, 17);
-  syntax_error("A = [lemma >= 'elephant']", "inequality comparison >= for p-attribute", qr/inequality/i); # T24
-  syntax_error("A = [lemma < 'elephant']", "inequality comparison < for p-attribute", qr/inequality/i);
-  syntax_error("A = [lemma > 'el.*' \%c]", "inequality comparison > for regular expression", qr/inequality/i);
-  syntax_error("A = [lemma = 'elephant'] :: match.story_title <= 'ACME'", "inequality comparison <= for s-attribute", qr/inequality/i);
-  syntax_error("A = [lemma < word]", "inequality comparison < between p-attributes", qr/inequality/i);
-  syntax_error("A = [normalize(lemma, 'c') >= normalize(word, 'c')]", "inequality comparison >= between strings", qr/inequality/i); # T29
-}
+# unsupported inequality comparisons for strings and regexp raise errors
+syntax_error("A = [lemma >= 'elephant']", "inequality comparison >= for p-attribute", qr/inequality/i); # T24
+syntax_error("A = [lemma < 'elephant']", "inequality comparison < for p-attribute", qr/inequality/i);
+syntax_error("A = [lemma > 'el.*' \%c]", "inequality comparison > for regular expression", qr/inequality/i);
+syntax_error("A = [lemma = 'elephant'] :: match.story_title <= 'ACME'", "inequality comparison <= for s-attribute", qr/inequality/i);
+syntax_error("A = [lemma < word]", "inequality comparison < between p-attributes", qr/inequality/i);
+syntax_error("A = [normalize(lemma, 'c') >= normalize(word, 'c')]", "inequality comparison >= between strings", qr/inequality/i); # T29
+

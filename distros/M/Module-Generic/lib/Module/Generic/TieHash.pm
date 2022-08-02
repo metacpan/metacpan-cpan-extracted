@@ -99,7 +99,6 @@ sub FETCH
     my $data = $self->{data};
     my $key  = shift( @_ );
     my $caller = caller;
-    ## print( STDERR "FETCH($caller)[enable=$self->{enable}] <- '$key''\n" );
     if( $self->_exclude( $caller ) || !$self->{enable} )
     {
         #print( STDERR "FETCH($caller)[owner calling, enable=$self->{enable}] <- '$key' <- '$self->{$key}'\n" );

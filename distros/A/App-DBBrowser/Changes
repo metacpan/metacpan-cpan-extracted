@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.303    2022-07-22
+        - Bugfix insert plain.
+
 2.302    2022-07-17
         - Function Epoch_to_DateTime: handle undefined values.
 

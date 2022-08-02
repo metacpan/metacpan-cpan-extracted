@@ -102,10 +102,10 @@ BEGIN {
 }
 
 # Protect against tainted PATH &c ...
-$ENV{PATH} = '';
-$ENV{CDPATH} = '';
-$ENV{ENV} = '';
-$ENV{BASH_ENV} = '';
+delete $ENV{PATH};
+delete $ENV{CDPATH};
+delete $ENV{ENV};
+delete $ENV{BASH_ENV};
 
 my ($PERL) = $^X =~ /^([\w.\/:\\~-]+)$/;
 if ($PERL) {

@@ -14,7 +14,7 @@
 #include <math.h>
 
 // Module file name
-static const char* MFILE = "Webkit/Select.c";
+static const char* FILE_NAME = "Webkit/Select.c";
 
 int32_t SPVM__IO__Select___can_read(SPVM_ENV* env, SPVM_VALUE* stack) {
   
@@ -53,7 +53,7 @@ int32_t SPVM__IO__Select___can_read(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   // Error check
   if (success_count == -1) {
-    return env->die(env, stack, "select fail", MFILE, __LINE__);
+    return env->die(env, stack, "select fail", FILE_NAME, __LINE__);
   }
   
   // Can handles
@@ -109,7 +109,7 @@ int32_t SPVM__IO__Select___can_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   // Error check
   if (success_count == -1) {
-    return env->die(env, stack, "select fail", MFILE, __LINE__);
+    return env->die(env, stack, "select fail", FILE_NAME, __LINE__);
   }
   
   // Can handles
@@ -166,7 +166,7 @@ int32_t SPVM__IO__Select___has_exception(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   // Error check
   if (success_count == -1) {
-    return env->die(env, stack, "select fail", MFILE, __LINE__);
+    return env->die(env, stack, "select fail", FILE_NAME, __LINE__);
   }
   
   // Can handles

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v0.941.1
+    version v1.0.0
 
 SYNOPSIS
 
@@ -23,7 +23,7 @@ SYNOPSIS
     
             coderef => sub { $_[1]->delete },
             sleep   => 1,
-            debug   => 1,
+            verbose => 1,
     
             progress_name    => 'Deleting deprecated accounts',
             process_past_max => 1,
@@ -300,10 +300,14 @@ ATTRIBUTES
     format would probably want to leave it at the default. Otherwise, you
     should provide your own.
 
-  debug
+  verbose
 
-    Boolean. If turned on, displays timing stats on each chunk, as well as
-    total numbers.
+    Boolean. By default, this is on, which displays timing stats on each
+    chunk, as well as total numbers. This is still subject to
+    non-interactivity checks from "progress_bar".
+
+    (This was previously defaulted to off, and called debug, prior to
+    v1.0.0.)
 
  Common Attributes
 
@@ -339,10 +343,18 @@ ATTRIBUTES
 
     The amount of rows to be processed in each loop.
 
-    Default is 1000 rows. This figure should be sized to keep per-chunk
-    processing time at around 5 seconds. If this is too large, rows may
-    lock for too long. If it's too small, processing may be unnecessarily
-    slow.
+    This figure should be sized to keep per-chunk processing time at around
+    5 seconds. If this is too large, rows may lock for too long. If it's
+    too small, processing may be unnecessarily slow.
+
+    Default is 1 row, which is only appropriate if "target_time" (on by
+    default) is enabled. This will cause the processing to slowly ramp up
+    to the target time as BatchChunker gathers more data.
+
+    Otherwise, if you using static chunk sizes with target_time turned off,
+    figure out the right chunk size with a few test runs and set it here.
+
+    (This was previously defaulted to 1000 rows, prior to v1.0.0.)
 
   target_time
 
@@ -351,10 +363,15 @@ ATTRIBUTES
     high or too low, this will dynamically adjust "chunk_size" to try to
     match the target.
 
-    Turning this on does not mean you should ignore chunk_size! If the
-    starting chunk size is grossly inaccurate to the workload, you could
-    end up with several chunks in the beginning causing long-lasting locks
-    before the runtime targeting reduces them down to a reasonable size.
+    BatchChunker will still use the initial chunk_size, and it will need at
+    least one chunk processed, before it makes adjustments. If the starting
+    chunk size is grossly inaccurate to the workload, you could end up with
+    several chunks in the beginning causing long-lasting locks before the
+    runtime targeting reduces them down to a reasonable size.
+
+    (Chunk size reductions are prioritized before increases, so it should
+    re-size as soon as it finds the problem. But, one bad chunk could be
+    all it takes to cause an outage.)
 
     Default is 5 seconds. Set this to zero to turn off runtime targeting.
     (This was previously defaulted to off prior to v0.92, and set to 15 in
@@ -365,15 +382,17 @@ ATTRIBUTES
     The number of seconds to sleep after each chunk. It uses Time::HiRes's
     version, so fractional numbers are allowed.
 
-    Default is 0, which is fine for most operations. But, it is highly
-    recommended to turn this on (say, 1 to 5 seconds) for really long
-    one-off DB operations, especially if a lot of disk I/O is involved.
-    Without this, there's a chance that the slaves will have a hard time
-    keeping up, and/or the master won't have enough processing power to
-    keep up with standard load.
+    Default is 0.5 seconds, which is fine for most operations. You can
+    likely get away with zero for smaller operations, but test it out
+    first. If processing is going to take up a lot of disk I/O, you may
+    want to consider a higher setting. If the database server spends too
+    much time on processing, the replicas may have a hard time keeping up
+    with standard load.
 
     This will increase the overall processing time of the loop, so try to
     find a balance between the two.
+
+    (This was previously defaulted to 0 seconds, prior to v1.0.0.)
 
   process_past_max
 
@@ -535,7 +554,7 @@ METHODS
     
             ### Optional ###
             progress_bar     => $progress,  # defaults to "Processing $source_name" bar
-            debug            => 1,          # displays timing stats on each chunk
+            verbose          => 1,          # displays timing stats on each chunk
         );
     
         $batch_chunker->execute if $batch_chunker->calculate_ranges;
@@ -590,11 +609,11 @@ PRIVATE METHODS
 
     Increments the progress bar.
 
- _print_debug_status
+ _print_chunk_status
 
-    Prints out a standard debug status line, if debug is enabled. What it
-    prints is generally uniform, but it depends on the processing action.
-    Most of the data is pulled from "loop_state".
+    Prints out a standard chunk status line, if "verbose" is enabled. What
+    it prints is generally uniform, but it depends on the processing
+    action. Most of the data is pulled from "loop_state".
 
 CAVEATS
 

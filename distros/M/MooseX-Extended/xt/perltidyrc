@@ -1,5 +1,3 @@
-# Veure settings for Perl::Tidy
-#
 # Common parameters
 --break-at-old-comma-breakpoints
 --maximum-line-length=160

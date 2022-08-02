@@ -27,14 +27,14 @@ if ($help) {
   exit 2;
 }
 
-## required CWB version for this module (3.0.0, though only 3.4.24+ is fully supported)
+## required CWB version for this module (3.5.0 stable release)
 our $rMajor = 3;
-our $rMinor = 0;
-our $rBeta = 0;
+our $rMinor = 5;
+our $rBeta  = 0;
 
 ## run cwb-config to check installed CWB version
 my $version = `'$config_util' --version 2>/dev/null`;
-die 
+die
   "Can't run cwb-config program.\n",
   "Please make sure that an up-to-date version of the IMS Open Corpus Workbench has been installed and/or use the --config option to specify the full path to the cwb-config program.\n"
   unless defined $version and $version =~ /^([0-9])\.([0-9]{1,2})(\.b?([0-9]+))?$/;
@@ -98,7 +98,7 @@ WriteMakefile(
   LICENSE      => 'perl',
   META_MERGE   => {
     resources => {
-      homepage => 'http://cwb.sourceforge.net/',
+      homepage => 'https://cwb.sourceforge.io/',
       repository => 'http://svn.code.sf.net/p/cwb/code/perl/trunk',
     },
   },

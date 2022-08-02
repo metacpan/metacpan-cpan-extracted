@@ -6,6 +6,7 @@ build_requires:
   Catalyst: '5.90090'
   Catalyst::Test: '0'
   File::Spec: '0'
+  HTTP::Request: '0'
   HTTP::Request::Common: '0'
   Module::Metadata: '0'
   Moose: '0'
@@ -17,7 +18,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 keywords:
   - Catalyst
   - Catalyst::Request
@@ -30,16 +31,18 @@ name: Catalyst-TraitFor-Request-Methods
 provides:
   Catalyst::TraitFor::Request::Methods:
     file: lib/Catalyst/TraitFor/Request/Methods.pm
-    version: v0.2.3
+    version: v0.3.2
 requires:
   Catalyst: '5.90090'
+  Data::Enum: '0'
   Moose::Role: '0'
   namespace::autoclean: '0'
+  perl: v5.10.1
 resources:
   bugtracker: https://github.com/robrwo/Catalyst-TraitFor-Request-Methods-/issues
   repository: git://github.com/robrwo/Catalyst-TraitFor-Request-Methods-.git
-version: v0.2.3
+version: v0.3.2
 x_authority: cpan:RRWO
-x_generated_by_perl: v5.28.1
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

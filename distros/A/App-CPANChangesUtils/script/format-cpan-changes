@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-10'; # DATE
+our $DATE = '2022-06-13'; # DATE
 our $DIST = 'App-CPANChangesUtils'; # DIST
-our $VERSION = '0.076'; # VERSION
+our $VERSION = '0.077'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CPANChangesUtils/format_cpan_changes",
@@ -40,7 +40,7 @@ format-cpan-changes - Format CPAN Changes
 
 =head1 VERSION
 
-This document describes version 0.076 of format-cpan-changes (from Perl distribution App-CPANChangesUtils), released on 2022-06-10.
+This document describes version 0.077 of format-cpan-changes (from Perl distribution App-CPANChangesUtils), released on 2022-06-13.
 
 =head1 SYNOPSIS
 

@@ -11,7 +11,7 @@ use Moo;
 use IPC::Run3; # For run3().
 use Types::Standard qw/Any ArrayRef HasMethods HashRef Int Str/;
 
-our $VERSION = '2.66';
+our $VERSION = '2.67';
 
 my $DATA_SECTION = get_data_section; # load once
 my $DEFAULT_COMBINE = 1; # default for combine_node_and_port
@@ -1854,6 +1854,7 @@ crow
 curve
 diamond
 dot
+icurve
 inv
 none
 normal
@@ -1861,9 +1862,7 @@ tee
 vee
 
 @@ common_attribute
-Damping => graph
-K => graph, cluster
-URL => edge, node, graph, cluster
+_background => graph
 area => node, cluster
 arrowhead => edge
 arrowsize => edge
@@ -1872,6 +1871,7 @@ bb => graph
 bgcolor => graph, cluster
 center => graph
 charset => graph
+class => edge, node, cluster, graph
 clusterrank => graph
 color => edge, node, cluster
 colorscheme => edge, node, cluster, graph
@@ -1879,6 +1879,7 @@ comment => edge, node, graph
 compound => graph
 concentrate => graph
 constraint => edge
+Damping => graph
 decorate => edge
 defaultdist => graph
 dim => graph
@@ -1887,10 +1888,10 @@ dir => edge
 diredgeconstraints => graph
 distortion => node
 dpi => graph
-edgeURL => edge
 edgehref => edge
 edgetarget => edge
 edgetooltip => edge
+edgeURL => edge
 epsilon => graph
 esep => graph
 fillcolor => node, edge, cluster
@@ -1903,7 +1904,6 @@ fontsize => edge, node, graph, cluster
 forcelabels => graph
 gradientangle => node, cluster, graph
 group => node
-headURL => edge
 head_lp => edge
 headclip => edge
 headhref => edge
@@ -1911,15 +1911,17 @@ headlabel => edge
 headport => edge
 headtarget => edge
 headtooltip => edge
+headURL => edge
 height => node
 href => graph, cluster, node, edge
 id => graph, cluster, node, edge
 image => node
 imagepath => graph
+imagepos => node
 imagescale => node
 inputscale => graph
+K => graph, cluster
 label => edge, node, graph, cluster
-labelURL => edge
 label_scheme => graph
 labelangle => edge
 labeldistance => edge
@@ -1932,6 +1934,7 @@ labeljust => graph, cluster
 labelloc => node, graph, cluster
 labeltarget => edge
 labeltooltip => edge
+labelURL => edge
 landscape => graph
 layer => edge, node, cluster
 layerlistsep => graph
@@ -1955,13 +1958,15 @@ minlen => edge
 mode => graph
 model => graph
 mosek => graph
+newrank => graph
 nodesep => graph
 nojustify => graph, cluster, node, edge
 normalize => graph
+notranslate => graph
 nslimit => graph
+nslimit1 => graph
 ordering => graph, node
-orientation => node
-orientation => graph
+orientation => node, graph
 outputorder => graph
 overlap => graph
 overlap_scaling => graph
@@ -2008,7 +2013,6 @@ splines => graph
 start => graph
 style => edge, node, cluster, graph
 stylesheet => graph
-tailURL => edge
 tail_lp => edge
 tailclip => edge
 tailhref => edge
@@ -2016,9 +2020,11 @@ taillabel => edge
 tailport => edge
 tailtarget => edge
 tailtooltip => edge
+tailURL => edge
 target => edge, node, graph, cluster
-tooltip => node, edge, cluster
+tooltip => node, edge, cluster, graph
 truecolor => graph
+URL => edge, node, graph, cluster
 vertices => node
 viewport => graph
 voro_margin => graph
@@ -2054,6 +2060,7 @@ box3d
 cds
 circle
 component
+cylinder
 diamond
 doublecircle
 doubleoctagon
@@ -2076,6 +2083,7 @@ octagon
 oval
 parallelogram
 pentagon
+plain
 plaintext
 point
 polygon

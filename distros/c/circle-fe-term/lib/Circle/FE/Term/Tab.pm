@@ -76,7 +76,7 @@ sub new
             "tag",
             on_set => sub {
                my ( $newtag ) = @_;
-               $self->set_label_text( $newtag );
+               $self->set_label( $newtag );
             },
          )
       );
@@ -126,23 +126,6 @@ sub set_level
    my ( $level ) = @_;
 
    $self->set_pen( Circle::FE::Term->get_theme_pen( "level$level" ) );
-}
-
-sub set_label_text
-{
-   my $self = shift;
-   my ( $text ) = @_;
-
-   $self->{label} = $text;
-
-   return unless my $tab = $self->{tab};
-   $tab->set_label( $text );
-}
-
-sub label
-{
-   my $self = shift;
-   return $self->{label};
 }
 
 sub label_short

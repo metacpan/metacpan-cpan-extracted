@@ -1,0 +1,510 @@
+SYNOPSIS
+========
+
+        use Storable::Improved;
+        store \%table, 'file';
+        $hashref = retrieve('file');
+
+        use Storable::Improved qw(nstore store_fd nstore_fd freeze thaw dclone);
+
+        # Network order
+        nstore \%table, 'file';
+        $hashref = retrieve('file');        # There is NO nretrieve()
+
+        # Storing to and retrieving from an already opened file
+        store_fd \@array, \*STDOUT;
+        nstore_fd \%table, \*STDOUT;
+        $aryref = fd_retrieve(\*SOCKET);
+        $hashref = fd_retrieve(\*SOCKET);
+
+        # Serializing to memory
+        $serialized = freeze \%table;
+        %table_clone = %{ thaw($serialized) };
+
+        # Deep (recursive) cloning
+        $cloneref = dclone($ref);
+
+        # Advisory locking
+        use Storable qw(lock_store lock_nstore lock_retrieve)
+        lock_store \%table, 'file';
+        lock_nstore \%table, 'file';
+        $hashref = lock_retrieve('file');
+
+VERSION
+=======
+
+        v0.1.3
+
+DESCRIPTION
+===========
+
+[Storable::Improved](https://metacpan.org/pod/Storable::Improved){.perl-module}
+is a drop-in replacement for
+[Storable](https://metacpan.org/pod/Storable){.perl-module}. It is a
+thin module inheriting from
+[Storable](https://metacpan.org/pod/Storable){.perl-module} and
+mitigating some of
+[Storable](https://metacpan.org/pod/Storable){.perl-module} core flaws
+that have been pointed out to the development team (See [\"SEE
+ALSO\"](#see-also){.perl-module}), but not addressed mostly due their
+unwillingness to do so. Hence, this module offers the implementation
+initially suggested.
+
+As [Storable](https://metacpan.org/pod/Storable){.perl-module}
+documentation states, \"the
+[Storable](https://metacpan.org/pod/Storable){.perl-module} package
+brings persistence to your Perl data structures containing `SCALAR`,
+`ARRAY`, `HASH` or `REF` objects, i.e. anything that can be conveniently
+stored to disk and retrieved at a later time.\"
+
+[Storable::Improved](https://metacpan.org/pod/Storable::Improved){.perl-module}
+provides an opportunity to support `GLOB`-based objects as well and
+correct other issues.
+
+What issues does it address?
+
+1\. Fail processing of GLOB-based objects
+
+:   [Storable](https://metacpan.org/pod/Storable){.perl-module} would
+    fail. For example:
+
+            use IO::File;
+            use Storable ();
+            my $io = IO::File->new( __FILE__, 'r' );
+            my $serialised = Storable::freeze( $io );
+
+    would yield the fatal error:
+
+            Can't store GLOB items
+
+    and if you set `$Storable::forgive_me` to a true value, as pointed
+    out in [Storable](https://metacpan.org/pod/Storable){.perl-module}
+    documentation, this would yield:
+
+            Can't store item GLOB(0x563f92a2cc48)
+
+    And if you implemented a `STORABLE_freeze` in the hope you could
+    return an acceptable value to `Storable::freeze` upon freezing your
+    glob-object, you are in for a disappointment.
+    [Storable](https://metacpan.org/pod/Storable){.perl-module} would
+    trigger the following fatal error. For example:
+
+            use IO::File;
+            use Storable ();
+            sub IO::File::STORABLE_freeze {};
+            $Storable::forgive_me = 1;
+            my $io = IO::File->new( __FILE__, 'r' );
+            my $serialised = Storable::freeze( $io );
+
+    would yield:
+
+            Unexpected object type (8) in store_hook()
+
+    Completely obscure and unhelpful error and undocumented too. Whether
+    `STORABLE_freeze` returns anything makes no difference.
+
+2\. Fail processing of XS module objects
+
+:   For example:
+
+            use v5.36;
+            use strict;
+            use warnings;
+            use HTTP::XSHeaders;
+            use Storable ();
+
+            my $h = HTTP::XSHeaders->new(
+                Content_Type => 'text/html; charset=utf8',
+            );
+            say "Content-Type: ", $h->header( 'Content-Type' );
+            say "Serialising.";
+            my $serial = Storable::freeze( $h );
+            my $h2 = Storable::thaw( $serial );
+            say "Is $h2 an object of HTTP::XSHeaders? ", ( $h2->isa( 'HTTP::XSHeaders' ) ? 'yes' : 'no' );
+            say "Can $h2 do header? ", ( $h2->can( 'header' ) ? 'yes' : 'no' );
+            say "Content-Type: ", $h2->header( 'Content-Type' );
+            # Exception occurs here: "hl is not an instance of HTTP::XSHeaders"
+
+    would result in a fatal error
+    `hl is not an instance of HTTP::XSHeaders` even though
+    `$h2->isa('HTTP::XSHeaders')` returns true. This is because the
+    object is created by
+    [Storable](https://metacpan.org/pod/Storable){.perl-module} and not
+    by the XS module and is incompatible. Thus, you would think
+    [Storable](https://metacpan.org/pod/Storable){.perl-module} has
+    successfully deserialised the data when it actually did not.
+
+3\. Output from `STORABLE_thaw` is discarded
+
+:   For example:
+
+            use v5.36;
+            use strict;
+            use warnings;
+            use HTTP::XSHeaders;
+            use Storable ();
+
+            sub HTTP::XSHeaders::STORABLE_freeze
+            {
+                my( $self, $cloning ) = @_;
+                return if( $cloning );
+                my $class = ref( $self ) || $self;
+                my $h = {};
+                my $headers = [];
+                my $order = [];
+                $self->scan(sub
+                {
+                    my( $f, $val ) = @_;
+                    if( exists( $h->{ $f } ) )
+                    {
+                        $headers->{ $f } = [ $h->{ $f } ] unless( ref( $h->{ $f } ) eq 'ARRAY' );
+                        push( @{$h->{ $f }}, $val );
+                    }
+                    else
+                    {
+                        $h->{ $f } = $val;
+                        push( @$order, $f );
+                    }
+                });
+                foreach my $f ( @$order )
+                {
+                    push( @$headers, $f, $h->{ $f } );
+                }
+                my %hash  = %$self;
+                $hash{_headers_to_restore} = $headers;
+                return( $class, \%hash );
+            }
+
+            sub HTTP::XSHeaders::STORABLE_thaw
+            {
+                my( $self, undef, $class, $hash ) = @_;
+                $class //= ref( $self ) || $self;
+                $hash //= {};
+                my $headers = ref( $hash->{_headers_to_restore} ) eq 'ARRAY'
+                    ? delete( $hash->{_headers_to_restore} )
+                    : [];
+                my $new = $class->new( @$headers );
+                foreach( keys( %$hash ) )
+                {
+                    $new->{ $_ } = delete( $hash->{ $_ } );
+                }
+                # Unfortunately, Storable ignores $new !
+                # So this would never work...
+                return( $new );
+            }
+
+            my $h = HTTP::XSHeaders->new(
+                Content_Type => 'text/html; charset=utf8',
+            );
+            say "Content-Type: ", $h->header( 'Content-Type' );
+            say "Serialising.";
+            my $serial = Storable::freeze( $h );
+            my $h2 = Storable::thaw( $serial );
+            say "Is $h2 an object of HTTP::XSHeaders? ", ( $h2->isa( 'HTTP::XSHeaders' ) ? 'yes' : 'no' );
+            say "Can $h2 do header? ", ( $h2->can( 'header' ) ? 'yes' : 'no' );
+            say "Content-Type: ", $h2->header( 'Content-Type' );
+            # Exception occurs here: "hl is not an instance of HTTP::XSHeaders"
+
+    This would still yield the fatal error:
+    `hl is not an instance of HTTP::XSHeaders`, and that is because
+    [Storable](https://metacpan.org/pod/Storable){.perl-module} discard
+    the value returned by `STORABLE_thaw`. If it did accept it, the
+    resulting object would work perfectly.
+    [CBOR::XS](https://metacpan.org/pod/CBOR::XS){.perl-module} and
+    [Sereal::Decoder](https://metacpan.org/pod/Sereal::Decoder){.perl-module}
+    do exactly that with the special subroutine `THAW`, and it works
+    well.
+
+To address those issues,
+[Storable::Improved](https://metacpan.org/pod/Storable::Improved){.perl-module}
+provides a modified version of [\"freeze\"](#freeze){.perl-module} and
+[\"thaw\"](#thaw){.perl-module} and leaves the rest unchanged. This puts
+it more in line with other serialisers such as
+[CBOR::XS](https://metacpan.org/pod/CBOR::XS){.perl-module} and
+[Sereal](https://metacpan.org/pod/Sereal){.perl-module}
+
+CLASS FUNCTIONS
+===============
+
+freeze
+------
+
+Provided with some data to freeze, and this checks whether the data
+provided is a blessed object, and if it has the method
+`STORABLE_freeze_pre_processing`. If it has, it calls it and pass the
+returned value to `Storable::freeze`, thus giving you a chance to
+prepare your module object before it gets serialised.
+
+In most case, this is not needed and whatever your `STORABLE_freeze`
+returns, [Storable](https://metacpan.org/pod/Storable){.perl-module}
+would use. However, in cases where your module produces glob-based
+objects, `Storable::freeze` would ignore what `STORABLE_freeze` produces
+and trigger an error, rendering it useless. This gives you a chance for
+those scenario, to prepare your module objects, before they are passed
+to `Storable::freeze`
+
+It returns the resulting serialised data created by `Storable::freeze`
+
+thaw
+----
+
+HOOKS
+=====
+
+\"Any class may define hooks that will be called during the
+serialization and deserialization process on objects that are instances
+of that class. Those hooks can redefine the way serialization is
+performed (and therefore, how the symmetrical deserialization should be
+conducted).\" (quote from the
+[Storable](https://metacpan.org/pod/Storable){.perl-module}
+documentation.)
+
+`STORABLE_freeze` *obj*, *cloning* {#storable_freeze-objobj-cloningcloning}
+----------------------------------
+
+No change. See
+[Storable](https://metacpan.org/pod/Storable){.perl-module}
+documentation for more information.
+
+Example:
+
+        sub STORABLE_freeze
+        {
+            my( $self, $cloning ) = @_;
+            return if( $cloning );
+            my $class = ref( $self ) || $self;
+            my %hash  = %$self;
+            return( $class, \%hash );
+        }
+
+`STORABLE_thaw` *obj*, *cloning*, *serialized*, ... {#storable_thaw-objobj-cloningcloning-serializedserialized}
+---------------------------------------------------
+
+No change. See
+[Storable](https://metacpan.org/pod/Storable){.perl-module}
+documentation for more information.
+
+A word of caution here. What the original
+[Storable](https://metacpan.org/pod/Storable){.perl-module}
+documentation does not tell you is that:
+
+1\. You can only modify the object that is passed by [Storable](https://metacpan.org/pod/Storable){.perl-module}, but [Storable](https://metacpan.org/pod/Storable){.perl-module} disregards any returned value from `STORABLE_thaw`
+
+:   
+
+2\. The object created by [Storable](https://metacpan.org/pod/Storable){.perl-module} is mostly incompatible with XS modules. For example:
+
+:       use v5.36;
+            use strict;
+            use warnings;
+            use HTTP::XSHeaders;
+            use Storable ();
+
+            my $h = HTTP::XSHeaders->new(
+                Content_Type => 'text/html; charset=utf8',
+            );
+            say "Content-Type: ", $h->header( 'Content-Type' );
+            say "Serialising.";
+            my $serial = Storable::freeze( $h );
+            my $h2 = Storable::thaw( $serial );
+            say "Is $h2 an object of HTTP::XSHeaders? ", ( $h2->isa( 'HTTP::XSHeaders' ) ? 'yes' : 'no' );
+            say "Can $h2 do header? ", ( $h2->can( 'header' ) ? 'yes' : 'no' );
+            say "Content-Type: ", $h2->header( 'Content-Type' );
+            # Exception occurs here: "hl is not an instance of HTTP::XSHeaders"
+
+    would produce:
+
+            Content-Type: text/html; charset=utf8
+            Serialising.
+            Is My::Headers=HASH(0x555a5c06f198) an object of HTTP::XSHeaders? yes
+            Can My::Headers=HASH(0x555a5c06f198) do header? yes
+            hl is not an instance of HTTP::XSHeaders
+
+    This is because, although the `HTTP::XSHeaders` object in this
+    example created by
+    [Storable](https://metacpan.org/pod/Storable){.perl-module} itself,
+    is a blessed reference of
+    [HTTP::XSHeaders](https://metacpan.org/pod/HTTP::XSHeaders){.perl-module},
+    that object cannot successfully call its own methods! This is
+    because that object is not a native XS module object.
+    [Storable](https://metacpan.org/pod/Storable){.perl-module} created
+    that replica, but it is not working, and
+    [Storable](https://metacpan.org/pod/Storable){.perl-module} could
+    have taken from the best practices as implemented in the API of
+    [CBOR::XS](https://metacpan.org/pod/CBOR::XS){.perl-module} or
+    [Sereal](https://metacpan.org/pod/Sereal){.perl-module} by taking
+    and using the return value from
+    [STORABLE\_thaw](https://metacpan.org/pod/STORABLE_thaw){.perl-module}
+    like [CBOR::XS](https://metacpan.org/pod/CBOR::XS){.perl-module} and
+    [Sereal](https://metacpan.org/pod/Sereal){.perl-module} do with the
+    `THAW` hook, but nope.
+
+    It would have made sense, since each module knows better than
+    [Storable](https://metacpan.org/pod/Storable){.perl-module} what
+    needs to be done ultimately to make their object work.
+
+STORABLE\_freeze\_pre\_processing
+---------------------------------
+
+**New**
+
+If the data passed to [\"freeze\"](#freeze){.perl-module} is a blessed
+reference and that `STORABLE_freeze_pre_processing` is implemented in
+the object\'s module, this is called by
+[\"freeze\"](#freeze){.perl-module} **before** the object is serialised
+by [Storable](https://metacpan.org/pod/Storable){.perl-module}, giving
+it a chance to make it in a way that is acceptable to
+[Storable](https://metacpan.org/pod/Storable){.perl-module} without
+dying.
+
+Consider the following:
+
+        use IO::File;
+        my $io = IO::File->new( __FILE__, 'r' );
+        my $serial = Storable::freeze( $io );
+
+would throw a fatal error that Storable does not accept glob, but if you
+did:
+
+        use IO::File;
+        local $Storable::forgive_me = 1;
+        sub IO::File::STORABLE_freeze_pre_processing
+        {
+            my $self = shift( @_ );
+            my $class = ref( $self ) || $self;
+            my $args = [ __FILE__, 'r' ];
+            # We change the glob object into a regular hash-based one to be Storable-friendly
+            my $this = bless( { args => $args, class => $class } => $class );
+            return( $this );
+        }
+
+        sub IO::File::STORABLE_thaw_post_processing
+        {
+            my $self = shift( @_ );
+            my $args = $self->{args};
+            my $class = $self->{class};
+            # We restore our glob object. Geez that was hard. Not.
+            my $obj = $class->new( @$args );
+            return( $obj );
+        }
+        my $io = IO::File->new( __FILE__, 'r' );
+        my $serial = Storable::Improved::freeze( $io );
+        my $io2 = Storable::Improved::thaw( $serial );
+
+And here you go, `$io2` would be equivalent to your initial glob, opened
+with the same arguments as the first one.
+
+STORABLE\_thaw\_post\_processing
+--------------------------------
+
+**New**
+
+If the data passed to [\"freeze\"](#freeze){.perl-module} is a blessed
+reference and that `STORABLE_thaw_post_processing` is implemented in the
+object\'s module, this is called by [\"thaw\"](#thaw){.perl-module}
+**after** [Storable](https://metacpan.org/pod/Storable){.perl-module}
+has deserialised the data, giving you an opportunity to make final
+adjustments to make the module object a working one.
+
+Consider the following:
+
+        use HTTP::XSHeaders;
+        use Storable::Improved;
+        
+        sub HTTP::XSHeaders::STORABLE_freeze
+        {
+            my( $self, $cloning ) = @_;
+            return if( $cloning );
+            my $class = ref( $self ) || $self;
+            my $h = {};
+            my $headers = [];
+            my $order = [];
+            # Get all headers field and values in their original order
+            $self->scan(sub
+            {
+                my( $f, $val ) = @_;
+                if( exists( $h->{ $f } ) )
+                {
+                    $h->{ $f } = [ $h->{ $f } ] unless( ref( $h->{ $f } ) eq 'ARRAY' );
+                    push( @{$h->{ $f }}, $val );
+                }
+                else
+                {
+                    $h->{ $f } = $val;
+                    push( @$order, $f );
+                }
+            });
+            foreach my $f ( @$order )
+            {
+                push( @$headers, $f, $h->{ $f } );
+            }
+            my %hash  = %$self;
+            $hash{_headers_to_restore} = $headers;
+            return( $class, \%hash );
+        }
+
+        sub HTTP::XSHeaders::STORABLE_thaw
+        {
+            my( $self, undef, $class, $hash ) = @_;
+            $class //= ref( $self ) || $self;
+            $hash //= {};
+            $hash->{_class} = $class;
+            $self->{_deserialisation_params} = $hash;
+            # Useles to do more in STORABLE_thaw, because Storable anyway ignores the value returned
+            # so we just store our hash of parameters for STORABLE_thaw_post_processing to do its actual job
+            return( $self );
+        }
+
+        sub HTTP::XSHeaders::STORABLE_thaw_post_processing
+        {
+            my $obj = shift( @_ );
+            my $hash = ( exists( $obj->{_deserialisation_params} ) && ref( $obj->{_deserialisation_params} ) eq 'HASH' )
+                ? delete( $obj->{_deserialisation_params} )
+                : {};
+            my $class = delete( $hash->{_class} ) || ref( $obj ) || $obj;
+            my $headers = ref( $hash->{_headers_to_restore} ) eq 'ARRAY'
+                ? delete( $hash->{_headers_to_restore} )
+                : [];
+            my $new = $class->new( @$headers );
+            foreach( keys( %$hash ) )
+            {
+                $new->{ $_ } = delete( $hash->{ $_ } );
+            }
+            return( $new );
+        }
+
+        my $h = HTTP::XSHeaders->new(
+            Content_Type => 'text/html; charset=utf8',
+        );
+        my $serial = Storable::Improved::freeze( $h );
+        my $h2 = Storable::Improved::thaw( $serial );
+        # $h2 is an instance from HTTP::XSHeaders
+        # Calling a method using this XS method object works! Example:
+        # $h2->header( 'Content-Type' );
+        # produces: 'text/html; charset=utf8'
+
+SEE ALSO
+========
+
+[Storable](https://metacpan.org/pod/Storable){.perl-module},
+[CBOR::XS](https://metacpan.org/pod/CBOR::XS){.perl-module},
+[Sereal](https://metacpan.org/pod/Sereal){.perl-module}
+
+[Storable issue
+\#19964](https://github.com/Perl/perl5/issues/19964){.perl-module}
+
+[Storable issue
+\#19984](https://github.com/Perl/perl5/issues/19984){.perl-module}
+
+AUTHOR
+======
+
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x5620d0c9c5e8)"}\>
+
+COPYRIGHT & LICENSE
+===================
+
+Copyright (c) 2022 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.

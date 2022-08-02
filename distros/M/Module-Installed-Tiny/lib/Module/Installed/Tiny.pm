@@ -1,14 +1,15 @@
 package Module::Installed::Tiny;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-19'; # DATE
-our $DIST = 'Module-Installed-Tiny'; # DIST
-our $VERSION = '0.005'; # VERSION
-
 use strict;
 use warnings;
 
 use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-07-30'; # DATE
+our $DIST = 'Module-Installed-Tiny'; # DIST
+our $VERSION = '0.010'; # VERSION
+
 our @EXPORT_OK = qw(module_installed module_source);
 
 our $SEPARATOR;
@@ -22,97 +23,136 @@ BEGIN {
     }
 }
 
-sub _module_source {
-    my $name_pm = shift;
+sub _parse_name {
+    my $name = shift;
 
+    my ($name_mod, $name_pm, $name_path);
+    # name_mod is Foo::Bar form, name_pm is Foo/Bar.pm form, name_path is
+    # Foo/Bar.pm or Foo\Bar.pm (uses native path separator), name_path_prefix is
+    # Foo/Bar.
+
+    if ($name =~ m!/|\.pm\z!) {
+        # assume it's name_pm form
+        $name_pm = $name;
+        $name_mod = $name;    $name_mod =~ s/\.pm\z//; $name_mod =~ s!/!::!g;
+        $name_path = $name_pm; $name_path =~ s!/!$SEPARATOR!g if $SEPARATOR ne '/';
+    } elsif ($SEPARATOR ne '/' && $name =~ m!\Q$SEPARATOR!) {
+        # assume it's name_path form
+        $name_path = $name;
+        ($name_pm = $name_path) =~ s!\Q$SEPARATOR!/!g;
+        $name_mod = $name_pm; $name_mod =~ s/\.pm\z//; $name_mod =~ s!/!::!g;
+    } else {
+        # assume it's name_mod form
+        $name_mod = $name;
+        ($name_pm  = "$name_mod.pm") =~ s!::!/!g;
+        $name_path = $name_pm; $name_path =~ s!/!$SEPARATOR!g if $SEPARATOR ne '/';
+    }
+
+    ($name_mod, $name_pm, $name_path);
+}
+
+sub module_source {
+    my ($name, $opts) = @_;
+
+    $opts //= {};
+    $opts->{die} = 1 unless defined $opts->{die};
+
+    my ($name_mod, $name_pm, $name_path) = _parse_name($name);
+
+    my $index = -1;
+    my @res;
+  ENTRY:
     for my $entry (@INC) {
+        $index++;
         next unless defined $entry;
         my $ref = ref($entry);
         my ($is_hook, @hook_res);
         if ($ref eq 'ARRAY') {
             $is_hook++;
-            @hook_res = $entry->[0]->($entry, $name_pm);
+            eval { @hook_res = $entry->[0]->($entry, $name_pm) };
+            if ($@) { if ($opts->{die}) { die "Can't locate $name_pm in \@INC (you may need to install the $name_mod module): $entry: $@ (\@INC contains ".join(" ", @INC).")" } else { return } }
         } elsif (UNIVERSAL::can($entry, 'INC')) {
             $is_hook++;
-            @hook_res = $entry->INC($name_pm);
+            eval { @hook_res = $entry->INC($name_pm) };
+            if ($@) { if ($opts->{die}) { die "Can't locate $name_pm in \@INC (you may need to install the $name_mod module): $entry: $@ (\@INC contains ".join(" ", @INC).")" } else { return } }
         } elsif ($ref eq 'CODE') {
             $is_hook++;
-            @hook_res = $entry->($entry, $name_pm);
+            eval { @hook_res = $entry->($entry, $name_pm) };
+            if ($@) { if ($opts->{die}) { die "Can't locate $name_pm in \@INC (you may need to install the $name_mod module): $entry: $@ (\@INC contains ".join(" ", @INC).")" } else { return } }
         } else {
-            my $path = "$entry$SEPARATOR$name_pm";
+            my $path = "$entry$SEPARATOR$name_path";
             if (-f $path) {
-                open my($fh), "<", $path
-                    or die "Can't locate $name_pm: $path: $!";
+                my $fh;
+                unless (open $fh, "<", $path) {
+                    if ($opts->{die}) { die "Can't locate $name_pm in \@INC (you may need to install the $name_mod module): $entry: $path: $! (\@INC contains ".join(" ", @INC).")" } else { return }
+                }
                 local $/;
-                return wantarray ? (scalar <$fh>, $path) : scalar <$fh>;
+                my $res = wantarray ? [scalar <$fh>, $path, $entry, $index, $name_mod, $name_pm, $name_path] : scalar <$fh>;
+                if ($opts->{all}) { push @res, $res } else { return wantarray ? @$res : $res }
+            } elsif ($opts->{find_prefix}) {
+                $name_path =~ s/\.pm\z//;
+                if (-d $path) {
+                    my $res = wantarray ? [undef, $path, $entry, $index, $name_mod, $name_pm, $name_path] : \$path;
+                    if ($opts->{all}) { push @res, $res } else { return wantarray ? @$res : $res }
+                }
             }
         }
 
         if ($is_hook) {
             next unless @hook_res;
-            my $prepend_ref; $prepend_ref = shift @hook_res if ref($hook_res[0]) eq 'SCALAR';
-            my $fh         ; $fh          = shift @hook_res if ref($hook_res[0]) eq 'GLOB';
-            my $code       ; $code        = shift @hook_res if ref($hook_res[0]) eq 'CODE';
-            my $code_state ; $code_state  = shift @hook_res if @hook_res;
-            if ($fh) {
-                my $src = "";
-                local $_;
-                while (!eof($fh)) {
-                    $_ = <$fh>;
-                    if ($code) {
-                        $code->($code, $code_state);
+            my ($src, $fh, $code);
+            eval {
+                my $prepend_ref; $prepend_ref = shift @hook_res if ref($hook_res[0]) eq 'SCALAR';
+                $fh                           = shift @hook_res if ref($hook_res[0]) eq 'GLOB';
+                $code                         = shift @hook_res if ref($hook_res[0]) eq 'CODE';
+                my $code_state ; $code_state  = shift @hook_res if @hook_res;
+                if ($fh) {
+                    $src = "";
+                    local $_;
+                    while (!eof($fh)) {
+                        $_ = <$fh>;
+                        if ($code) {
+                            $code->($code, $code_state);
+                        }
+                        $src .= $_;
                     }
-                    $src .= $_;
+                    $src = $$prepend_ref . $src if $prepend_ref;
+                } elsif ($code) {
+                    $src = "";
+                    local $_;
+                    while ($code->($code, $code_state)) {
+                        $src .= $_;
+                    }
+                    $src = $$prepend_ref . $src if $prepend_ref;
                 }
-                $src = $$prepend_ref . $src if $prepend_ref;
-                return wantarray ? ($src, $entry) : $src;
-            } elsif ($code) {
-                my $src = "";
-                local $_;
-                while ($code->($code, $code_state)) {
-                    $src .= $_;
-                }
-                $src = $$prepend_ref . $src if $prepend_ref;
-                return wantarray ? ($src, $entry) : $src;
-            }
+            }; # eval
+            if ($@) { if ($opts->{die}) { die "Can't locate $name_pm in \@INC (you may need to install the $name_mod module): $entry: ".($fh || $code).": $@ (\@INC contains ".join(" ", @INC).")" } else { return } }
+            my $res = wantarray ? [$src, undef, $entry, $index, $name_mod, $name_pm, $name_path] : $src;
+            if ($opts->{all}) { push @res, $res } else { return wantarray ? @$res : $res }
+        } # if $is_hook
+    }
+
+    if (@res) {
+        return wantarray ? @res : \@res;
+    } else {
+        if ($opts->{die}) {
+            die "Can't locate $name_pm in \@INC (you may need to install the $name_mod module) (\@INC contains ".join(" ", @INC).")";
+        } else {
+            return;
         }
     }
-
-    die "Can't locate $name_pm in \@INC (\@INC contains: ".join(" ", @INC).")";
-}
-
-sub module_source {
-    my $name = shift;
-
-    # convert Foo::Bar -> Foo/Bar.pm
-    my $name_pm;
-    if ($name =~ /\A\w+(?:::\w+)*\z/) {
-        ($name_pm = "$name.pm") =~ s!::!$SEPARATOR!g;
-    } else {
-        $name_pm = $name;
-    }
-
-    _module_source $name_pm;
 }
 
 sub module_installed {
-    my $name = shift;
+    my ($name, $opts) = @_;
 
     # convert Foo::Bar -> Foo/Bar.pm
-    my $name_pm;
-    if ($name =~ /\A\w+(?:::\w+)*\z/) {
-        ($name_pm = "$name.pm") =~ s!::!$SEPARATOR!g;
-    } else {
-        $name_pm = $name;
-    }
+    my ($name_mod, $name_pm, $name_path) = _parse_name($name);
 
     return 1 if exists $INC{$name_pm};
 
-    if (eval { _module_source $name_pm; 1 }) {
-        1;
-    } else {
-        0;
-    }
+    my $res = module_source($name, {%{ $opts || {}}, die=>0});
+    defined($res) ? 1:0;
 }
 
 1;
@@ -130,7 +170,7 @@ Module::Installed::Tiny - Check if a module is installed, with as little code as
 
 =head1 VERSION
 
-This document describes version 0.005 of Module::Installed::Tiny (from Perl distribution Module-Installed-Tiny), released on 2021-05-19.
+This document describes version 0.010 of Module::Installed::Tiny (from Perl distribution Module-Installed-Tiny), released on 2022-07-30.
 
 =head1 SYNOPSIS
 
@@ -154,6 +194,11 @@ try to C<require()> it:
  if (eval { require Foo::Bar; 1 }) {
      # Foo::Bar is available
  }
+ # or
+ my $mod_pm = "Foo/Bar.pm";
+ if (eval { require $mod_pm; 1 }) {
+     # Foo::Bar is available
+ }
 
 However, this actually loads the module. There are some cases where this is not
 desirable: 1) we have to check a lot of modules (actually loading the modules
@@ -169,44 +214,156 @@ This module does not require any other module except L<Exporter>.
 
 =head1 FUNCTIONS
 
-=head2 module_installed($name) => bool
+=head2 module_source
 
-Check that module named C<$name> is available to load. This means that: either
-the module file exists on the filesystem and searchable in C<@INC> and the
-contents of the file can be retrieved, or when there is a require hook in
-C<@INC>, the module's source can be retrieved from the hook.
+Usage:
+
+ module_source($name [ , \%opts ]) => str | list
+
+Return module's source code, without actually loading/executing it. Module
+source will be searched in C<@INC> the way Perl's C<require()> finds modules.
+This include executing require hooks in C<@INC> if there are any.
+
+Die on failure (e.g. module named C<$name> not found in C<@INC> or module source
+file cannot be read) with the same/similar message as Perl's C<require()>:
+
+ Can't locate Foo/Bar.pm (you may need to install the Foo::Bar module) ...
+
+Module C<$name> can be in the form of C<Foo::Bar>, C<Foo/Bar.pm> or
+C<Foo\Bar.pm> (on Windows).
+
+In list context, will return a record of information:
+
+ #   [0]   [1]    [2]     [3]     [4]        [5]       [6]
+ my ($src, $path, $entry, $index, $name_mod, $name_pm, $name_path) = module_source($name);
+
+where:
+
+=over
+
+=item * $src
+
+String. The module source code.
+
+=item * $path
+
+String. The filesystem path (C<undef> if source comes from a require hook).
+
+=item * $entry
+
+The element in C<@INC> where the source comes from.
+
+=item * $index
+
+Integer, the index of entry in C<@INC> where the source comes from, 0 means the
+first entry.
+
+=item * $name_mod
+
+Module name normalized to C<Foo::Bar> form.
+
+=item * $name_pm
+
+Module name normalized to C<Foo/Bar.pm> form.
+
+=item * $name_path
+
+Module name normalized to C<Foo/Bar.pm> form or C<Foo\Bar.pm> form depending on
+the native path separator character.
+
+=back
+
+Options:
+
+=over
+
+=item * die
+
+Bool. Default true. If set to false, won't die upon failure but instead will
+return undef (or empty list in list context).
+
+=item * find_prefix
+
+Bool. If set to true, when a module (e.g. C<Foo/Bar.pm>) is not found in the
+fileysstem but its directory is (C<Foo/Bar/>), then instead of dying or
+returning undef/empty list, the function will return:
+
+ \$path
+
+in scalar context, or:
+
+ (undef, $path, $entry, $index, $name_mod, $name_pm, $name_path)
+
+in list context. In scalar context, you can differentiate path from module
+source because the path is returned as a scalar reference. So to get the path:
+
+ $source_or_pathref = module_source("Foo/Bar.pm", {find_prefix=>1});
+ if (ref $source_or_pathref eq 'SCALAR') {
+     say "Path is ", $$source_or_pathref;
+ } else {
+     say "Module source code is $source_or_pathref";
+ }
+
+=item * all
+
+Bool. If set to true, then instead of stopping after one source is found, the
+function will continue finding sources until all entries in C<@INC> is
+exhausted. Then will return all the found sources as an arrayref:
+
+ my $sources = module_source($name, {all=>1});
+
+In list context, will return a list of records instead of a single record:
+
+ my @records = module_source($name, {all=>1});
+ for my $record (@records) {
+     my ($src, $path, $entry, $index, $name_mod, $name_pm, $name_path) = @$record;
+     ...
+ }
+
+=back
+
+=head2 module_installed
+
+Usage:
+
+ module_installed($name [ , \%opts ]) => bool
+
+Check that module named C<$name> is available to load, without actually
+loading/executing the module. Module will be searched in C<@INC> the way Perl's
+C<require()> finds modules. This include executing require hooks in C<@INC> if
+there are any.
 
 Note that this does not guarantee that the module can eventually be loaded
 successfully, as there might be syntax or runtime errors in the module's source.
 To check for that, one would need to actually load the module using C<require>.
 
-=head2 module_source($name) => str | (str, source_name)
+Module C<$name> can be in the form of C<Foo::Bar>, C<Foo/Bar.pm> or
+F<Foo\Bar.pm> (on Windows).
 
-Return module's source code, without actually loading it. Die on failure (e.g.
-module named C<$name> not found in C<@INC>).
+Options:
 
-In list context:
+=over
 
- my @res = module_source($name);
+=item * find_prefix
 
-will return the list:
+See L</module_source> documentation.
 
-(str, source_name)
-
-where C<str> is the module source code and C<source_name> is source information
-(file path, or the @INC ref entry when entry is a ref).
+=back
 
 =head1 FAQ
 
 =head2 How to get module source without dying? I want to just get undef if module source is not available.
 
-Wrap in C<eval()> or C<try/catch> (Perl 5.34+):
+Set the C<die> option to false:
 
- my $src;
- eval { $src = module_source $name };
- # $src contains the module source or undef if not available
+ my $src = module_source($name, {die=>0});
 
 This is what C<module_installed()> does.
+
+=head2 How to know which @INC entry the source comes from?
+
+Call the L</module_source> in list context, where you will get more information
+including the entry. See the function documentation for more details.
 
 =head1 HOMEPAGE
 
@@ -215,14 +372,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Module-Ins
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Module-Installed-Tiny>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Module-Installed-Tiny/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -239,11 +388,36 @@ hooks, nor do they actually check that the module file is readable.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2020, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Installed-Tiny>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

@@ -1,4 +1,3 @@
-
 #! perl
 
 use Test2::V0;
@@ -90,9 +89,7 @@ subtest 'mixed excludes' => sub {
             [ $grid->_raw_edges->@[ 3 .. 6 ] ],
             'raw edges'
         );
-        is( $grids[0]->_include,
-            [ $grid->_include->@[ 3 .. 5 ] ],
-            'include' );
+        is( $grids[0]->_include, [ $grid->_include->@[ 3 .. 5 ] ], 'include' );
 
         is( $grids[0]->oob, $grid->oob, 'oob' );
     };
@@ -103,12 +100,10 @@ subtest 'mixed excludes' => sub {
 
         is(
             $grids[1]->_raw_edges,
-            [ $grid->_raw_edges->@[ 8..10 ] ],
+            [ $grid->_raw_edges->@[ 8 .. 10 ] ],
             'raw edges'
         );
-        is( $grids[1]->_include,
-            [ $grid->_include->@[ 8..9 ] ],
-            'include' );
+        is( $grids[1]->_include, [ $grid->_include->@[ 8 .. 9 ] ], 'include' );
 
         is( $grids[1]->oob, $grid->oob, 'oob' );
     };

@@ -8,22 +8,23 @@ Chart::Manual::Types - all chart types by example
 =head1 OVERVIEW
 
 This page illustrates all supported chart types, describes their
-special abilities and programming needs. More detailled information will
-be linked whenever available.
+special abilities and programming needs. Detailled information is linked
+whenever possible.
 
 Currently available are xycharts with points, lines, mountains,
 bar charts, stacked bars, error bars, pie and ring charts with split and
 polar coordinate systems. Also composite charts are possible.
 
 Generally, each chart type here is implementd by a class: Chart::* (name),
-which inherits most of its methods from Chart::Base. Every constructor
-takes two arguments, which are width and height of the later generated image.
+which inherits most of its methods from Chart::Base. Every 
+L<constructor|Chart::Manual::Methods/new> takes two arguments,
+which are width and height of the later generated image.
 
 
 =head2 Bars
 
 =for HTML <p>
-<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/manual/bars.png" alt="dual bar chart" width="400" height="400">
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/manual/bars.png" alt="dual bar chart" width="500" height="300">
 </p>
 
 The class Chart::Bars creates a chart made up of a series of vertical bars.
@@ -44,7 +45,7 @@ a little cleaner. All the the other color set serv the same purpose.
 
     use Chart::Bars;
     
-    my $g = Chart::Bars->new( 400, 400 );
+    my $g = Chart::Bars->new( 500, 300 );
     $g->add_dataset( qw/ camel cat dog bear shell/ );
     $g->add_dataset( 300, 400, 800, 500, 900 );
     $g->add_dataset( 800, 600, 300, 300, 400 );
@@ -111,6 +112,7 @@ L<precision|Chart::Manual::Properties/precision>.
     );
     $g->png("composite.png");
 
+
 =head2 Direction
 
 =for HTML <p>
@@ -125,7 +127,7 @@ the most outer circle is at L<max_value|Chart::Manual::Properties/max_value>.
 In order to reverse that you have to set L<polar|Chart::Manual::Properties/polar> C<'true'>.
 In our example we preferred to have a real comparison between arrow lengths
 so we artificially put zero as C<min_value> by setting L<include_zero|Chart::Manual::Properties/include_zero>
-C<'true'>. The just mentioned arrow style we achieve by deactivating
+C<'true'>. The just mentioned arrow style we achieved by deactivating
 L<point|Chart::Manual::Properties/point> (drawing small circles) and 
 turning on L<arrow|Chart::Manual::Properties/arrow>. An additional 
 C<'true'> L<line|Chart::Manual::Properties/line> would connect the
@@ -140,8 +142,8 @@ As with most chart types, the first data set defines the domain :
 the x-values of all following data sets, which then define the associated
 y-values (and therefore all sets have to have the same length).
 Because we set in this example L<pairs|Chart::Manual::Properties/pairs>
-C<'true'>, now every odd numbered data set is the domain for the next,
-but they still have to have the same length
+C<'true'>, now every odd numbered data set is the domain for the next set.
+But they still all sets have to have the same length.
 
 
     use Chart::Direction;
@@ -189,7 +191,7 @@ part of the error bar and the fourth set the lower part (distance between
 main point and the lower bound of the error bar). The fourth set might be
 omitted, when property L<same_error|Chart::Manual::Properties/same_error>
 is set C<'true'>. In this case upper and lower part of the error bar have
-the same size. Because in all this produced only one set of error bars
+the same size. Because all this produced only one set of error bars
 with one color, there is no need for a legend. That is why it is switched
 off by setting property L<legend|Chart::Manual::Properties/legend> to 
 C<'none'>. The label on the x-axis are painted in the C<'staggered'> style,
@@ -210,8 +212,8 @@ For better readability C<'both'> L<y_axes|Chart::Manual::Properties/y_axes> were
         legend         => 'none',
         y_axes         => 'both',
         x_ticks        => 'staggered',
-        pt_size        => 12,
-        brush_size     => 2,
+        pt_size        =>  12,
+        brush_size     =>   2,
         grid_lines     => 'true',
         colors => {
             grid_lines   => 'gray70',
@@ -219,6 +221,7 @@ For better readability C<'both'> L<y_axes|Chart::Manual::Properties/y_axes> were
         },
     );
     $g->png("error.png");
+
 
 =head2 HorizontalBars
 
@@ -230,8 +233,8 @@ The class Chart::HorizontalBars creates a chart of horizontally oriented bars.
 Same rules apply as in L</Bars>, except due negative values in our data sets
 here L<min_val|Chart::Manual::Properties/min_val> doesn't have to be set to zero.
 And instead of L<y_grid_lines|Chart::Manual::Properties/y_grid_lines>
-we activate and color L<x_grid_lines|Chart::Manual::Properties/x_grid_lines>
-
+we activate and color L<x_grid_lines|Chart::Manual::Properties/x_grid_lines>.
+Deactivating the grey background of the plot just adds a little friendliness. 
 
     use Chart::HorizontalBars;
 
@@ -253,11 +256,12 @@ we activate and color L<x_grid_lines|Chart::Manual::Properties/x_grid_lines>
             y_label      => 'gray40',
             title        => 'gray20',
         }
+        grey_background  => 'false',
     );
     $g->png("hbars.png");
 
 
-=head2 Lines
+=head1 Lines
 
 =for HTML <p>
 <img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/manual/lines.png" alt="xy chart with lines">
@@ -310,8 +314,8 @@ L<brush_size|Chart::Manual::Properties/brush_size> (line thickness).
 In our example we named both axis via L<x_label|Chart::Manual::Properties/x_label>
 and L<y_label|Chart::Manual::Properties/y_label> and set L<xy_plot|Chart::Manual::Properties/xy_plot>
 off, which is not really needed, since it is on C<'false'> per default.
-This allows you to give the x-axis  none numerical, custom tick labels,
-which are by accident the numbers 1 .. 18, as the first data row shows.
+This allows you to give the x-axis none numerical, custom tick labels,
+which are by accident the numbers 1 .. 17, as the first data row shows.
 The purpose of this maneuver is to not have zero as the first column label.
 
 Because the origin of coordinate system is usually in the left lower
@@ -330,15 +334,18 @@ to the drawing method.
 
     my $g = Chart::LinesPoints->new( 600, 300 );
     $g->set(
-        'title'              => 'Soccer Season 2002',
-        'legend_labels'      => ['NY Soccer Club', 'Denver Tigers', 
-                                 'Houston Spacecats', 'Washington Presidents'],
-        'y_label'            => 'position in the table',
-        'x_label'            => 'day of play',
-        'grid_lines'         => 'true',
-        'f_y_tick'           =>  sub { - $_[0] },
-        # 'xy_plot'          => 'false',
-        'integer_ticks_only' => 'true',
+        title              => 'Soccer Season 2002',
+        legend_labels      => ['NY Soccer Club', 'Denver Tigers', 
+                               'Houston Spacecats', 'Washington Presidents'],
+        y_label            => 'position in the table',
+        x_label            => 'day of play',
+        grid_lines         => 'true',
+        f_y_tick           =>  sub { - $_[0] },
+        # xy_plot            => 'true',
+        integer_ticks_only => 'true',
+        colors             => { 
+            grid_lines     => 'gray70', 
+        },
     );
     $g->png("linespoints.png", [
         [qw(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17)],
@@ -358,13 +365,14 @@ to the drawing method.
 The class Chart::Mountain creates a mountain chart, which is a line chart
 (see L</Lines>), where the area under the curve, right to the curve below
 is filled with the color of the data set. In the following example we use
-custom colors in hex notation (which Chart::Color supports) which getting
-mapped onto the colors settings of L<dataset0|Chart::Manual::Properties/colors-datasetx> .. dataset4.
-As always, the first (data set) row in the data are the domain or x-axis
-labels. Another specialty of mountain charts are patterns (not provided !),
+custom colors in hex notation (as supported by Chart::Color) which are 
+getting mapped onto the colors settings of 
+L<dataset0|Chart::Manual::Properties/colors-datasetx> .. dataset4.
+As always, the first data set (row in the data table) holds the domain or
+x-axis labels. Another specialty of mountain charts are patterns (not provided !),
 to fill the area with. We load them via GD and give them over to the
 C<'patterns'> property. Patterns are small images with one color and the
-second being transparent
+second being transparent.
 
     use Chart::Mountain;
 
@@ -409,21 +417,22 @@ chart. The bars display absolute values of the data set (Pareto accepts
 only one), while the line represent the accumulation (sum of all values
 from the start on the left up to this value). For a better orientation
 the absolute values should be sorted. In case your data set is not already,
-change the property <sort|Chart::Manual::Properties/sort> to C<'true'>.
+change the property L<sort|Chart::Manual::Properties/sort> to C<'true'>.
 (Note that the days of the week are not in chronological order,
 but in the order of decreasing sale amounts.) The first given  data set
 is like in most cases the domain (x-axis labels). So the color of the first
 data set containing numbers has the color of 
 L<dataset0|Chart::Manual::Properties/colors-datasetx> and the accumulation
 gets the color of dataset1 (which are per default also red and green, 
-but in reverse order).
+but in reverse order). We choose a Pantone Report designer red, which 
+sticks out but is not too shrill.
 
 For better optics we set L<spaced_bars|Chart::Manual::Properties/spaced_bars>
 off, so that the bars touch each other and give a nice counterweight to
 the red color of the line. It's also a bit nicer, when the red labels
 above the red line don't stick out the chart, so we increased the 
 L<max_val|Chart::Manual::Properties/max_val> from 5180 to 5500. Finally
-to prevent the y-axis from overcrowding we set labels (and y_grid_lines)
+to prevent the y-axis from overcrowding, we set labels (and y_grid_lines)
 only every 250 by setting L<skip_int_ticks|Chart::Manual::Properties/skip_int_ticks>
 and activating L<integer_ticks_only|Chart::Manual::Properties/integer_ticks_only>.
 
@@ -446,12 +455,13 @@ and activating L<integer_ticks_only|Chart::Manual::Properties/integer_ticks_only
         colors  => {
             title        => 'darkblue',
             dataset0     => 'green',
-            dataset1     => 'red',
-            x_label      => 'red',
+            dataset1     => 'aurorared',
+            x_label      => 'aurorared',
             y_grid_lines => 'white',
         },
     );
     $g->png("pareto.png");
+
 
 =head2 Pie
 
@@ -461,10 +471,10 @@ and activating L<integer_ticks_only|Chart::Manual::Properties/integer_ticks_only
 
 The class Chart::Pie creates a pie or ring chart. The first added data
 set must contain the labels and the second set the values. Our example
-displays a ring chart with a thickness of 35% (of the radius).
-If the L<ring|Chart::Manual::Properties/ring> property is omitted,
-the chart falls back to regular pie. Every ring slice is labeled with the
-stated label, plus the percentage of its value, as defined with the property
+displays a ring chart with a thickness of 35% (of the radius). If the
+L<ring|Chart::Manual::Properties/ring> property is omitted, the chart form
+falls back to regular pie. Every ring slice is labeled with the stated label,
+plus the percentage of its value, as defined with the property 
 L<label_values|Chart::Manual::Properties/label_values>. Connecting lines
 between label and slice are drawn because L<legend_lines|Chart::Manual::Properties/legend_lines>
 is set to C<'true'>. The actual legend is placed on the bottom, in order
@@ -474,9 +484,9 @@ L<legend_label_values|Chart::Manual::Properties/legend_label_values>
 is set to C<'values'>. Unlike other chart types, where one data set is 
 correlated with a color, here every slice has to have its own color.
 Thats why the first data point has the color of L<dataset0|Chart::Manual::Properties/colors-datasetx> 
-the second of dataset1 and so forth. In most case the default colors
-are good enough unless you want special meanings in mind. Please also note
-the multi line (row) title.
+the second of dataset1 and so forth. In most cases the default colors
+are good enough, unless you have special meanings in mind. Please also
+note the multi line (row) title text.
 
 
     use Chart::Pie;
@@ -491,7 +501,6 @@ the multi line (row) title.
              'legend_lines'        => 'true',
              'ring'                => 0.35, 
     );
-
     $g->png("pie.png");
 
 
@@ -507,7 +516,7 @@ where the individual data points are marked with a symbol.
 The shape of the symbol is selected by the property L<brushStyle|Chart::Manual::Properties/brushStyle>,
 which was not utilized in this example, in order to use the default shape:
 a circle of a diameter set by L<pt_size|Chart::Manual::Properties/pt_size>.
-All shapes can be seen in the demo above.
+All shapes can be seen in the demo above, right.
 (If you want in addition lines, connecting the points, check L</LinesPoints>.)
 
 The first data set comprises the domain set, displayed on the x-axis.
@@ -515,7 +524,8 @@ L<precision|Chart::Manual::Properties/precision> set to zero cuts the
 decimals on the y-axis labels and keeps it clean. The method C<add_pt>
 appends to every data set another value, adding another column to the chart.
 L<png_border|Chart::Manual::Properties/png_border> does just adds frame
-of 10 pixel width around the entire image.
+of 10 pixel width around the entire image. They middle gray grid lines
+are just easy for the eyes.
 
     use Chart::Points;
 
@@ -532,6 +542,10 @@ of 10 pixel width around the entire image.
         precision    =>  0,
         grid_lines   => 'true',
         png_border   => 10,
+        colors => {
+            grid_lines => 'gray70',
+
+        },
     );
     $g->png("points.png");
 
@@ -582,16 +596,22 @@ of the intervals.
     );
     $g->png("split.png");
 
+
 =head2 StackedBars
 
 =for HTML <p>
 <img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/manual/stackedbars.png" alt="stacked bar chart">
 </p>
 
-The class Chart::StackedBars creates a chart made up of stacked vertical 
-bars instead of being beside each other. This means the bars depicting
-data set 3 are on top of data set 2 and data set 4 is the highest.
-Except this change, same rules again apply as in  L</Bars>.
+The class Chart::StackedBars is a variant of L</Bars> that stacks
+bars belonging to one x-value on top of each other, instead of putting 
+them beside each other. Data sets 0..n are ordered from the bottom up.
+They are in most cases more intuitive than L</Pie> charts, because its
+easier to intuit linear than quadratic ratios. As in the Bars example we
+activated horizontal grid lines, which were subtle colored. To surpress
+decimals on the y-axis L<precision|Chart::Manual::Properties/precision> was turned down.
+And as in most cases - the first data set is the domain, which will be
+drawn as x-axis labels.
 
     use Chart::StackedBars;
     
@@ -604,9 +624,10 @@ Except this change, same rules again apply as in  L</Bars>.
         title             => 'Stacked Bars',
         legend            => 'left',
         precision         =>  0,
+        y_grid_lines      => 'true',
         grey_background   => 'false',
-            colors => {
-             x_grid_lines => 'gray70',
+        colors => {
+             grid_lines   => 'gray80',
              misc         => 'gray55',
              text         => 'gray55',
              x_label      => 'gray40',

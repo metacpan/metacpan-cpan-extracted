@@ -1,0 +1,12 @@
+0.0.4 Mon 25 Jul 2022 08:57:30 AM PDT
+ - Refactor code into YAMLScript
+ - Bump dep to Test::More::YAMLScript => 0.0.4
+
+0.0.3 Mon 25 Jul 2022 06:26:01 AM PDT
+ - Bump dep to Test::More::YAMLScript => 0.0.4
+
+0.0.2 Sun 24 Jul 2022 05:36:42 PM PDT
+ - Fixes for cpantesters failures
+
+0.0.1 Sun 24 Jul 2022 08:13:12 AM PDT
+ - Initial release

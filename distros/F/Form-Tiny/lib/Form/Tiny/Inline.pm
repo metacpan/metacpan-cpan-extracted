@@ -1,5 +1,5 @@
 package Form::Tiny::Inline;
-
+$Form::Tiny::Inline::VERSION = '2.13';
 use v5.10;
 use strict;
 use warnings;
@@ -11,8 +11,6 @@ use Form::Tiny::Meta;
 use Form::Tiny::Utils qw(trim create_anon_form_meta);
 
 use namespace::clean;
-
-our $VERSION = '2.12';
 
 with 'Form::Tiny::Form';
 
@@ -75,8 +73,8 @@ sub form_meta
 {
 
 	package Form::Tiny::Inline::Builder;
-
-	use Types::Standard qw(RoleName Str);
+$Form::Tiny::Inline::Builder::VERSION = '2.13';
+use Types::Standard qw(RoleName Str);
 
 	sub create
 	{

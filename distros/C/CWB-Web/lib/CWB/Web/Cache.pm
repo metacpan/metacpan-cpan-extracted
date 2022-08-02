@@ -497,7 +497,7 @@ sub query {
         $cqp->exec("set $name keyword NULL")    # if $keyword == "", make sure to delete keywords that may have been loaded from partial match
         if $matching_lines >= 2;
         ## but only if the result has been loaded from cache with a non-empty set keyword clause ($matching_lines >= 2)
-        ## in order to avoid overwriting keyword anchors that have been set directly in the query (CQP v3.4.16 and newer)
+        ## in order to avoid overwriting keyword anchors that have been set directly in the query
       }
       else {
         $cqp->exec("set $name keyword $keyword"); # otherwise execute keyword command
@@ -575,7 +575,7 @@ and C<cut> to limit the maximal number of matches).  After successful execution,
 loaded into the CQP backend, the appropriate corpus is activated, and the I<$id> of the named query is
 returned.
 
-Starting from version 3.4.15, the C<sort> clause is executed I<after> a C<set keyword> command
+The C<sort> clause is executed I<after> a C<set keyword> command 
 so that C<keyword> anchors can be used in sorting.
 
 Direct access to cache entries is provided by the low-level methods B<store()> and B<retrieve()>.
@@ -589,7 +589,7 @@ B<TODO>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1999-2020 Stefan Evert [http::/purl.org/stefan.evert]
+Copyright (C) 1999-2022 Stephanie Evert [http::/purl.org/stephanie.evert]
 
 This software is provided AS IS and the author makes no warranty as to
 its use and performance. You may use the software, redistribute and

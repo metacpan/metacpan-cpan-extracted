@@ -28,31 +28,31 @@ no_index:
 provides:
   Avro:
     file: lib/Avro.pm
-    version: 1.11.0
+    version: 1.11.1
   Avro::BinaryDecoder:
     file: lib/Avro/BinaryDecoder.pm
-    version: 1.11.0
+    version: 1.11.1
   Avro::BinaryEncoder:
     file: lib/Avro/BinaryEncoder.pm
-    version: 1.11.0
+    version: 1.11.1
   Avro::DataFile:
     file: lib/Avro/DataFile.pm
-    version: 1.11.0
+    version: 1.11.1
   Avro::DataFileReader:
     file: lib/Avro/DataFileReader.pm
-    version: 1.11.0
+    version: 1.11.1
   Avro::DataFileWriter:
     file: lib/Avro/DataFileWriter.pm
-    version: 1.11.0
+    version: 1.11.1
   Avro::Protocol:
     file: lib/Avro/Protocol.pm
-    version: 1.11.0
+    version: 1.11.1
   Avro::Protocol::Message:
     file: lib/Avro/Protocol/Message.pm
-    version: 1.11.0
+    version: 1.11.1
   Avro::Schema:
     file: lib/Avro/Schema.pm
-    version: 1.11.0
+    version: 1.11.1
 requires:
   Compress::Zlib: 0
   Compress::Zstd: 0
@@ -67,4 +67,4 @@ requires:
   perl: 5.10.1
 resources:
   license: http://apache.org/licenses/LICENSE-2.0
-version: 1.11.0
+version: 1.11.1

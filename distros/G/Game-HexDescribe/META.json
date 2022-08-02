@@ -35,9 +35,11 @@
          "requires" : {
             "Array::Utils" : "0",
             "File::ShareDir" : "0",
+            "IO::Socket::SSL" : "0",
             "List::MoreUtils" : "0",
             "Modern::Perl" : "1.20180701",
             "Mojolicious" : "0",
+            "Role::Tiny" : "0",
             "Text::Autoformat" : "0",
             "perl" : "5.026000",
             "strict" : "0",
@@ -53,6 +55,6 @@
          "web" : "https://alexschroeder.ch/cgit/hex-describe/about/"
       }
    },
-   "version" : 1,
+   "version" : 1.01,
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

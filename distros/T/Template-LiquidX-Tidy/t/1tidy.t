@@ -9,6 +9,7 @@ require "./t/results.pl";
 plan tests => 2;
 
 my $source = <<'LIQUID';
+<wbr>
 <a href="{% if site.github %}{{ site.github.tar_url | replace_first: '/tarball/', '/tree/' }}{% else %}file://{{ site.source }}{% endif
 %}/{% if page.relative_path %}{{ page.relative_path }}{% elsif paginator and paginator.page > 1
 %}{% assign temp0 = "/" | append: paginator.page | append: "/"

@@ -27,8 +27,12 @@ Files: Changes
  lib/Benchmark/Featureset/ParamCheck/Implementation/ParamsCheck/TypeTiny.pm
  lib/Benchmark/Featureset/ParamCheck/Implementation/Perl.pm
  lib/Benchmark/Featureset/ParamCheck/Implementation/RefUtilXS.pm
- lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams.pm
-Copyright: Copyright 2018 Toby Inkster.
+ lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams/Moose.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams/Mouse.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams/Specio.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams/TypeNano.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams/TypeTiny.pm
+Copyright: Copyright 2022 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/01-named-correctness.t
@@ -44,33 +48,33 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: README
- lib/Benchmark/Featureset/ParamCheck.pm
-Copyright: This software is copyright (c) 2017, 2018 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: INSTALL
  LICENSE
 Copyright: Unknown
 License: Unknown
 
-Files: Makefile.PL
-Copyright: Copyright 2013 Toby Inkster.
+Files: README
+ lib/Benchmark/Featureset/ParamCheck.pm
+Copyright: This software is copyright (c) 2017, 2018 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: dist.ini
 Copyright: Copyright 2017 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: Makefile.PL
+Copyright: Copyright 2020 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2018 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2018 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  

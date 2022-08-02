@@ -65,7 +65,7 @@
    "provides" : {
       "URN::OASIS::SAML2" : {
          "file" : "lib/URN/OASIS/SAML2.pm",
-         "version" : "0.001"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -76,7 +76,7 @@
          "web" : "https://github.com/perl-net-saml2/urn-oasis-saml2"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_contributors" : [
       "Wesley Schwengle <wesleys@opperschaap.net>"
    ],

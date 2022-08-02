@@ -1,5 +1,5 @@
 {
-   "abstract" : "Provides C<alarm> semantics similar to C<Try::Catch>.",
+   "abstract" : "Provides C<try_once> and C<retry> semantics to C<CORE::alarm>, similar to C<Try::Catch>.",
    "author" : [
       "oodler577 <oodler@cpan.org>"
    ],
@@ -35,7 +35,7 @@
          "web" : "https://github.com/oodler577/p5-Try-ALRM"
       }
    },
-   "version" : "0.4",
+   "version" : "0.6",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

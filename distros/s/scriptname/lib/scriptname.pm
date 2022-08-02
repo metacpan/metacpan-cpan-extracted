@@ -8,7 +8,7 @@ use 5.000;
 my($myname, $mybase, $mydir);
 
 BEGIN {
-  our $VERSION = '0.92';
+  our $VERSION = '0.94';
   our $AUTHORITY = 'MASSA';
 
   use Carp;
@@ -18,7 +18,8 @@ BEGIN {
   if( $0 eq '-' || $0 eq '-e' ) {
     $mydir = cwd
   } else {
-    $myname = $0 = realpath $0;
+    my($zero) = ($0 =~ /^(.*)$/);
+    $myname = $0 = realpath $zero;
     $mybase = basename $0, qw(.t .pm .pl .perl .exe .com .bat);
     $mydir = dirname $0;
     croak 'chdir() too early' unless -f $0
@@ -63,7 +64,7 @@ scriptname - Locate original perl script
 
 =head1 VERSION
 
-version 0.92
+version 0.94
 
 =head1 SYNOPSIS
 

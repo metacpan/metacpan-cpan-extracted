@@ -98,7 +98,9 @@ $test->for('inherits');
 =integrates
 
 Venus::Role::Accessible
+Venus::Role::Buildable
 Venus::Role::Proxyable
+Venus::Role::Valuable
 
 =cut
 

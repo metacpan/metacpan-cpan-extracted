@@ -6,13 +6,13 @@
 
 package Math::Random::PCG32;
 
-our $VERSION = '0.17';
+our $VERSION = '0.23';
 
 use strict;
 use warnings;
 use Exporter qw(import);
 our @EXPORT_OK = qw(coinflip decay irand irand64 irand_in irand_way
-  rand rand_elm rand_from rand_idx roll);
+  rand rand_elm rand_from rand_idx roll sample);
 require XSLoader;
 XSLoader::load('Math::Random::PCG32', $VERSION);
 
@@ -83,11 +83,11 @@ only with small numbers.
 =item B<new> I<initstate> I<initseq>
 
 Makes a new object. No peeking! The two seed values must be 64-bit
-unsigned integers. These could be read off of C</dev/random>, e.g.
+unsigned integers. These could be read off of C</dev/urandom>, e.g.
 
     use Fcntl;
     my $raw;
-    sysopen( my $fh, "/dev/random", O_RDONLY ) or die ...;
+    sysopen( my $fh, "/dev/urandom", O_RDONLY ) or die ...;
     ... = sysread $fh, $raw, 8;
     my $seed = unpack "Q", $raw;
 
@@ -168,6 +168,15 @@ Sums the result of rolling the given number of dice.
 
 I<Since version 0.17.> Prior to that was called B<dice>. Prior to
 version 0.10 did not exist.
+
+=item B<sample> I<count> I<array-reference>
+
+Returns I<count> random elements from I<array-reference> as an array
+reference, or an empty array reference if the I<count> is zero or the
+length of the I<array-reference> is zero. The elements are returned in
+the same order as they appear in the I<array-reference>.
+
+I<Since version 0.23.>
 
 =back
 

@@ -163,14 +163,14 @@ Variable derefs are expanded in 'plain' (unquoted) YAML strings:
 =item * Conditionals
 
     if:
-    - (>): [x, 50         # condition
+    - (>): [x, 50]        # condition
     - say: $x wins :)    # then
     - say: $x loses :(   # else
 
 or:
 
     if:
-      (>): [x, 50         # condition
+      (>): [x, 50]        # condition
     then:
       say: $x wins :)    # then
     else:

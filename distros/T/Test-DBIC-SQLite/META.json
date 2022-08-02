@@ -56,7 +56,7 @@
          "url" : "https://github.com/abeltje/Test-DBIC-SQLite.git"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_IRC" : "irc://irc.perl.org/#amsterdam.pm",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

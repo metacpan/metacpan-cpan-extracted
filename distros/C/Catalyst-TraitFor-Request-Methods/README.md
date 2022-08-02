@@ -4,7 +4,7 @@ Catalyst::TraitFor::Request::Methods - Add enumerated methods for HTTP requests
 
 # VERSION
 
-version v0.2.3
+version v0.3.2
 
 # SYNOPSIS
 
@@ -18,7 +18,7 @@ __PACKAGE__->config(
 );
 ```
 
-In any code that uses a [Catalyst::Request](https://metacpan.org/pod/Catalyst::Request), e.g.
+In any code that uses a [Catalyst::Request](https://metacpan.org/pod/Catalyst%3A%3ARequest), e.g.
 
 ```
 if ($c->request->is_post) {
@@ -86,9 +86,17 @@ The request method is `TRACE`.
 
 The request method is `PATCH`.
 
+## is\_propfind
+
+The request method is `PROPFIND`.
+
+## is\_unrecognized\_method
+
+The request method is not recognized.
+
 # SEE ALSO
 
-[Catalyst::Request](https://metacpan.org/pod/Catalyst::Request)
+[Catalyst::Request](https://metacpan.org/pod/Catalyst%3A%3ARequest)
 
 # SOURCE
 
@@ -110,7 +118,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2020 by Robert Rothenberg.
+This software is Copyright (c) 2019-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

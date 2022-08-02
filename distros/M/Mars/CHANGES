@@ -1,3 +1,14 @@
+0.04 2022-07-22
+
+- [feature] Allow classes and roles to declare imports
+- [update] Classes cascade "BUILD" lifecycle hooks in roles
+- [update] Retain declaration ordering in meta
+- [update] Cascade BUILDs from roles in the order declared
+- [update] Fix class attribute resolver
+- [update] Fix attr and base recursion during reflection
+- [update] Add "does" and "meta" methods to roles
+- [update] Always export "true" and "false" functions
+
 0.03 2022-07-14
 
 - [feature] Allow auditing from base classes

@@ -21,14 +21,16 @@ no_index:
 requires:
   Array::Utils: '0'
   File::ShareDir: '0'
+  IO::Socket::SSL: '0'
   List::MoreUtils: '0'
   Modern::Perl: '1.20180701'
   Mojolicious: '0'
+  Role::Tiny: '0'
   Text::Autoformat: '0'
   perl: '5.026000'
   strict: '0'
   warnings: '0'
 resources:
   repository: https://alexschroeder.ch/cgit/hex-describe
-version: 1
+version: 1.01
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

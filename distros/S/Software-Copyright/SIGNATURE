@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 87aa62395c2b776d86ea21a30a6e06056422e3a43ee9f5f55fccf04df349b3a2 Build.PL
+SHA256 2f90275967c55782300c68a2ddfa5c6e528b1c831eebb3b1c13c03e31244e312 Changes
+SHA256 71ef6bd10bd52f33692b61d5eae22be890224bd52ced83f60250c6f352f1b8c1 LICENSE
+SHA256 c699a5017b505ebedbad6dc8c1da08c4ab160abb05ec90f5a0f0d650cc2871bb MANIFEST
+SHA256 b955a74343a31de8d25bd0d2877205a6a5bdc103c0188d9224b7af8fd2de66b5 META.json
+SHA256 051828c54519041b92cae1e78ec6c08468e1d8ba072c48b8859a150dcf4377b5 META.yml
+SHA256 35db632e67e2ff9b5718174abf2e2655934c42d7e55d8b3f59c508af65adae1b README.org
+SHA256 634f27e8ed3cc81f7386a48ed307f3b16846ab5e781a2a97cf815b52c0cf9243 debian/watch~
+SHA256 be7c233beff1e47cd3c3c2f98dadb13ecb89e94506444c300e1fdf75b51371c8 dist.ini
+SHA256 b9bba8aa37f409382b98c23574c99db40cf6b6586129c36afebfd76ae201c174 lib/Software/Copyright.pm
+SHA256 a8a2ee8e4f8ac228fba0770fbf71686a11a4b57ab8a6e714da471acab77cf17e lib/Software/Copyright/Owner.pm
+SHA256 1426058c25bb6f984da183269483fa7d46d59f2b180456033facc47062d6f576 lib/Software/Copyright/Statement.pm
+SHA256 524a936e24b97598a40b22fd959f028c0ecb02b099612fa939381993c53d9094 t/author-pod-spell.t
+SHA256 c3e9d9780105519f5744e8d63a7e21eefc749d2348ace2627ebea492355933d1 t/author-pod-syntax.t
+SHA256 4ab88258ccebce07be6101ffde2b3afed688897d04eb1b8f697e40b2f94589c1 t/author-synopsis.t
+SHA256 cc4c17d920cde887f3832569e23a784624a8d6edd37d79947d6af329ba36483d t/copyright.t
+SHA256 66c12aeeb3c146f0083d29cc97066b612dc97c3ac946390c45335cd67dd5739e t/owner.t
+SHA256 f611ee4f9b710a3701c751f78c5926e7bea05b0614e40133311fc069dbba3b01 t/split-copyright.t
+SHA256 ba8c87a53311de948d4c5ab78f0cf4f75d84d996382fd04588f87da73c04897c t/statement.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEn3I5/LZk8Qsz6dwDwx9P2UmrK2wFAmLe1OQACgkQwx9P2Umr
+K2zfcQ/+JtYII9Eitjf/POMV1+ewR3WoYqtDtOsE3xsFs9uGveWrrPXZUx0g9IdC
+GOkWUpzoRTLvy0JQ3szOMchX2W3b6TkMaYes/j3Xz35TRqSCudzSftWW9FHt1DP4
+ASoIFh/3HR3GQ3zEz87M52XfaOEt54ZtG0oFFFLSgKAKZiw7agxxOKL4bYJ4vbih
+Ei/HFjsT2oas84oP/FT4BBj52f4E4LYnStGTJqILBrvRyhcDzi/oH9Am5ZfQW2vg
+UBnrxmoImPXQSSm9ZUTP4n6DfgRS9J+RMK2gZ2+bip90XF2UbzV6yniA/b8uoEuf
+0MR2Yg5bNhdlsEk8sFZ+dRVeWsuDmaKIdywEnGk2A9MOrZFj3SfQFzyteZE/Bf1y
+Nfp1243u5FQQ3W+t8Tgjr+2GAGK9GyqcD8dk4sRLmH7MyUVJRzElfo+Qw7oyF2rl
++SWLR7kilf4l/1ZJ+xuzCZewedlfghZeJJ4tIZoRZuT2JDCDQy7N/wrm9G7U1fOX
+Kmo9HoKdixdYL7w8hmCoVSE3R1addnIzsSdtVm1j20igW1CmR0MJbs/PVpm+MQP6
+SY7ARcEOpSgktP/uW8NRZcHTyvcwpLPmTBUqJKmYk5uRxs9CtyPM+nBTnQ0ZRMlU
+DPZV3P3exjbzRYciySfwp9JRpupHPZV/Dd/qegDPrHHNurjcT9o=
+=xw6S
+-----END PGP SIGNATURE-----

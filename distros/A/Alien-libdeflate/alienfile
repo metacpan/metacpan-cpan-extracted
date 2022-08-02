@@ -7,8 +7,6 @@ use alienfile;
 use Path::Tiny qw{path};
 use Alien::Build::CommandSequence;
 
-our $deflate_version = '1.0';
-
 ## default helper deps Alien::MSYS for all systems?
 meta->interpolator->replace_helper(install => sub {
   return 'install';
@@ -17,22 +15,27 @@ meta->interpolator->replace_helper(install => sub {
 plugin 'Probe::CBuilder' => (
   cflags => join(' ', grep { defined && length } $ENV{ALIEN_LIBDEFLATE_PROBE_CFLAGS}),
   libs   => join(' ', grep { defined && length } $ENV{ALIEN_LIBDEFLATE_PROBE_LDFLAGS}, '-ldeflate'),
+  version => qr/([0-9\.]+)/,
   program => <<'END_OF_CODE');
+#include <stdio.h>
 #include <libdeflate.h>
-int main(int argc, char *argv[]) { return 0; }
+int main(int argc, char *argv[]) { printf("%s\n", LIBDEFLATE_VERSION_STRING); return 0; }
 END_OF_CODE
 
 share {
   ## *bsd make is incompatible
   requires 'Alien::gmake' => 0;
+  requires 'Config';
 
-  start_url "https://github.com/ebiggers/libdeflate/archive/v${deflate_version}.tar.gz";
-
-  plugin Download => ( version => qr/([0-9\.]+)/, bootstrap_ssl => 1 );
+  start_url "https://github.com/ebiggers/libdeflate/releases";
+  plugin Download => (
+    filter => qr/^v.*\.tar\.gz$/,
+    version => qr/([0-9\.]+)/,
+  );
 
   plugin Extract => ( format => 'tar.gz' );
 
-  meta_prop->{destdir} = 1;
+  meta_prop->{destdir} = $^O ne 'MSWin32' ? 1 : 0;
 
   # Available targets:
   # ------------------
@@ -44,44 +47,69 @@ share {
   # -e test_checksums
   # -e checksum
 
+  my $CC = qq(CC=@{[ $Config::Config{cc} ]});
+  my $static_lib = 'libdeflate.a';
+  my $shared_lib = qq(libdeflate.@{[ $Config::Config{so} ]});
+  my @progs = map { "$_@{[ $Config::Config{_exe} ]}" } qw(gzip gunzip);
   build [
-    '%{gmake} libdeflate.a gzip gunzip checksum CFLAGS=-fPIC',
+    [ '%{gmake}',
+        $CC,
+        $static_lib, qw(STATIC_LIB_SUFFIX=.a),
+        @progs,
+        qw(CFLAGS=-fPIC),
+    ],
+    [ '%{gmake}',
+        $CC,
+        $shared_lib,
+    ],
     sub {
       my $build = shift;
       my @dirs;
       my %fileset = (
         (map { $_ => path('include')->child($_)->stringify } qw{libdeflate.h}),
-        (map { $_ => path('lib')->child($_)->stringify } qw{libdeflate.a}),
-        (map { $_ => path('bin')->child($_)->stringify } qw{checksum gzip gunzip}),
+        (map { $_ => path('lib')->child($_)->stringify } ( $static_lib, $shared_lib )),
+        (map { $_ => path('bin')->child("libdeflate-$_")->stringify } @progs),
       );
 
-      $build->log("copy stuff to $ENV{DESTDIR}");
-      my $destdir     = $ENV{DESTDIR};
-      my $destdir_abs = path($destdir)->child($build->install_prop->{prefix});
+      my $process_file_cb;
+      if( exists $ENV{DESTDIR} ) {
+        $build->log("copy stuff to $ENV{DESTDIR}");
+        my $destdir     = $ENV{DESTDIR};
+        my $destdir_abs = path($destdir)->child($build->install_prop->{prefix});
+        $process_file_cb = sub {
+          $destdir_abs->child(shift)->stringify
+        };
+      } else {
+        $process_file_cb = sub {
+          path($build->install_prop->{prefix})
+            ->child(shift)->stringify
+        };
+      }
 
-      push @dirs, $destdir_abs->child($_)->stringify
+      push @dirs, $process_file_cb->($_)
         for (qw{include lib bin});
 
       Alien::Build::CommandSequence->new(
         (map { join ' ', '%{install} -d', $_ } @dirs),
         (map {
-          join ' ', '%{install} -c', $_, $destdir_abs->child($fileset{$_})->stringify
+          join ' ', '%{install} -c', $_, $process_file_cb->($fileset{$_})
         } keys %fileset),
       )->execute($build);
     }
   ];
 
-  after gather => sub {
-    my $build = shift;
-    my $prefix = path($build->install_prop->{prefix})->absolute;
-    my @dirs;
-    push @dirs, $prefix->child($_)->stringify for (qw{include lib});
+  plugin 'Gather::IsolateDynamic';
 
-    $build->runtime_prop->{version} = $deflate_version;
-    $build->runtime_prop->{cflags} = $build->runtime_prop->{cflags_static}
-      = "-I$dirs[0]";
-    $build->runtime_prop->{libs} = $build->runtime_prop->{libs_static}
-      = "-L$dirs[1] -ldeflate";
+  after gather => sub {
+    my $build   = shift;
+    my $prefix  = path($build->install_prop->{prefix})->absolute;
+    my $lib     = $prefix->child('lib')->stringify;
+    my $include = $prefix->child('include');
+    my $dynamic = $prefix->child('lib', 'dynamic');
+
+    $build->runtime_prop->{cflags}      = "-I$include";
+    $build->runtime_prop->{libs}        = "-L$dynamic -ldeflate";
+    $build->runtime_prop->{libs_static} = "-L$lib -ldeflate";
   };
 
 };

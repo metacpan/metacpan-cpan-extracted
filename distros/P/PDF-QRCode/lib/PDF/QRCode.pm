@@ -1,7 +1,7 @@
 package PDF::QRCode;
 use Text::QRCode;
 use Sub::Util qw(set_subname);
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.1';
 =pod
 
 =begin markdown

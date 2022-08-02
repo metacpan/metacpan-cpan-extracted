@@ -16,8 +16,8 @@ name: Pod-LOL
 provides:
   Pod::LOL:
     file: lib/Pod/LOL.pm
-    version: '0.08'
+    version: '0.10'
 resources:
   license: http://www.perlfoundation.org/artistic_license_2_0
-version: '0.08'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

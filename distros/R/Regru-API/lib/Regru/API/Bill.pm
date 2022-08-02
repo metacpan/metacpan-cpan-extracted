@@ -7,7 +7,7 @@ use warnings;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '0.051'; # VERSION
+our $VERSION = '0.052'; # VERSION
 our $AUTHORITY = 'cpan:CHIM'; # AUTHORITY
 
 with 'Regru::API::Role::Client';
@@ -41,7 +41,7 @@ Regru::API::Bill - REG.API v2 invoice management
 
 =head1 VERSION
 
-version 0.051
+version 0.052
 
 =head1 DESCRIPTION
 

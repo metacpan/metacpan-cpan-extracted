@@ -18,30 +18,41 @@ sub import {
   no warnings 'redefine';
   no warnings 'once';
 
+  my %exports = map +($_,$_), @args ? @args : qw(
+    attr
+    base
+    false
+    from
+    role
+    test
+    true
+    with
+  );
+
   @{"${from}::ISA"} = 'Mars::Kind::Role';
 
-  if (!*{"${from}::attr"}{"CODE"}) {
+  if ($exports{"attr"} && !*{"${from}::attr"}{"CODE"}) {
     *{"${from}::attr"} = sub {@_ = ($from, @_); goto \&attr};
   }
-  if (!*{"${from}::base"}{"CODE"}) {
+  if ($exports{"base"} && !*{"${from}::base"}{"CODE"}) {
     *{"${from}::base"} = sub {@_ = ($from, @_); goto \&base};
   }
   if (!*{"${from}::false"}{"CODE"}) {
     *{"${from}::false"} = sub {require Mars; Mars::false()};
   }
-  if (!*{"${from}::from"}{"CODE"}) {
+  if ($exports{"from"} && !*{"${from}::from"}{"CODE"}) {
     *{"${from}::from"} = sub {@_ = ($from, @_); goto \&from};
   }
-  if (!*{"${from}::role"}{"CODE"}) {
+  if ($exports{"role"} && !*{"${from}::role"}{"CODE"}) {
     *{"${from}::role"} = sub {@_ = ($from, @_); goto \&role};
   }
-  if (!*{"${from}::test"}{"CODE"}) {
+  if ($exports{"test"} && !*{"${from}::test"}{"CODE"}) {
     *{"${from}::test"} = sub {@_ = ($from, @_); goto \&test};
   }
   if (!*{"${from}::true"}{"CODE"}) {
     *{"${from}::true"} = sub {require Mars; Mars::true()};
   }
-  if (!*{"${from}::with"}{"CODE"}) {
+  if ($exports{"with"} && !*{"${from}::with"}{"CODE"}) {
     *{"${from}::with"} = sub {@_ = ($from, @_); goto \&test};
   }
 
@@ -110,14 +121,14 @@ Role Declaration for Perl 5
 
   package Person;
 
-  use Mars::Class;
+  use Mars::Class 'attr';
 
   attr 'fname';
   attr 'lname';
 
   package Identity;
 
-  use Mars::Role;
+  use Mars::Role 'attr';
 
   attr 'id';
   attr 'login';
@@ -141,6 +152,12 @@ Role Declaration for Perl 5
     # ensure the caller has a login and password when consumed
     die "${from} missing the login attribute" if !$from->can('login');
     die "${from} missing the password attribute" if !$from->can('password');
+  }
+
+  sub BUILD {
+    my ($self, $data) = @_;
+    $self->{auth} = undef;
+    return $self;
   }
 
   sub EXPORT {
@@ -182,13 +199,8 @@ This package provides a role builder which when used causes the consumer to
 inherit from L<Mars::Kind::Role> which provides role construction and lifecycle
 L<hooks|Mars::Kind>. A role differs from a L<"class"|Mars::Class> in that it
 can't be instantiated using the C<new> method. A role can act as an interface
-by defining the an L<"audit"|Mars::Kind/AUDIT> hook, which is invoked
-automatically by the L<"test"|Mars::Class/test> function. The role composition
-semantics are as follows: Routines to be consumed must be explicitly declared
-via the L<"export"|Mars::Kind/EXPORT> hook. Routines will be copied to the
-consumer unless they already exist (excluding routines from base classes, which
-will be overridden). If multiple roles are consumed having routines with the
-same name (i.e. naming collisions) the first routine copied wins.
+by defining an L<"audit"|Mars::Kind/AUDIT> hook, which is invoked automatically
+by the L<"test"|Mars::Class/test> function.
 
 =cut
 

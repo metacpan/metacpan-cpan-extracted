@@ -25,8 +25,10 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Catalyst' => '5.90090',
+                                      'Data::Enum' => '0',
                                       'Moose::Role' => '0',
-                                      'namespace::autoclean' => '0'
+                                      'namespace::autoclean' => '0',
+                                      'perl' => 'v5.10.1'
                                     }
                     },
        'test' => {
@@ -37,6 +39,7 @@ do { my $x = {
                                    'Catalyst' => '5.90090',
                                    'Catalyst::Test' => '0',
                                    'File::Spec' => '0',
+                                   'HTTP::Request' => '0',
                                    'HTTP::Request::Common' => '0',
                                    'Module::Metadata' => '0',
                                    'Moose' => '0',

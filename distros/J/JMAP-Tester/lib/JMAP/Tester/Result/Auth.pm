@@ -1,7 +1,7 @@
 use v5.10.0;
 use strict;
 
-package JMAP::Tester::Result::Auth 0.101;
+package JMAP::Tester::Result::Auth 0.102;
 # ABSTRACT: what you get when you authenticate
 
 use Moo;
@@ -40,7 +40,7 @@ JMAP::Tester::Result::Auth - what you get when you authenticate
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 OVERVIEW
 

@@ -4,6 +4,8 @@ use 5.006;
 use strict;
 use warnings;
 use String::ShellQuote;
+use MIME::Base64;
+use Gzip::Faster;
 
 =head1 NAME
 
@@ -11,11 +13,11 @@ Monitoring::Sneck::Boop_Snoot -  Boop the Monitoring::Sneck's snoot via SNMP
 
 =head1 VERSION
 
-Version 0.1.1
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -154,6 +156,11 @@ sub boop_the_snoot {
 	my ( $oid, $json ) = split( /\ +/, $returned, 2 );
 	$json =~ s/^\"//;
 	$json =~ s/\"$//;
+
+	# check for base64 incasae the return has been gzipped
+	if ($json =~ /^[A-Za-z0-9\/\+\n]+\=*\n*$/ ) {
+		$json = gunzip(decode_base64($json));
+	}
 
 	return $json;
 }

@@ -32,7 +32,9 @@
       },
       "runtime" : {
          "requires" : {
+            "Gzip::Faster" : "0",
             "JSON" : "0",
+            "MIME::Base64" : "0",
             "String::ShellQuote" : "0",
             "perl" : "5.006"
          }
@@ -51,6 +53,6 @@
          "web" : "https://github.com/VVelox/Monitoring-Sneck-Boop_Snoot"
       }
    },
-   "version" : "v0.1.1",
+   "version" : "v0.2.0",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

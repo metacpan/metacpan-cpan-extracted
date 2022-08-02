@@ -1,16 +1,8 @@
-#!/usr/bin/perl
-#
-# Home filesystems are listed in @HOMEDEVS
-# Minimal values are listed in @NO_QUOTA
-#
-# $ID: $
-# $Author: mjd $
-#
+use strict; use warnings;
 
 package FlatFile;
 use Tie::File;
-$VERSION = "0.11";
-use strict;
+our $VERSION = '0.12';
 use Carp 'croak';
 
 =head1 NAME
@@ -42,7 +34,7 @@ FlatFile - Manipulate flat-file databases
   # Usage pattern B:  subclass
   #  PasswordFile.pm:
   package PasswordFile;
-  use base FlatFile;
+  use FlatFile;
   our @ISA = 'FlatFile';
   our @FIELDS = qw(username password uid gid gecos home shell);
   our $RECSEP = "\n";
@@ -432,13 +424,12 @@ sub nextrec {
 
   # Someone may have done an in-memory update of the record
   # we just read.  If so, discard the disk data and
-  # return the in-memory version of the record instead.
-  return $self->{UPDATE}{$recno}
-    if exists $self->{UPDATE}{$recno};
-
+  # proceed with the in-memory version of the record instead.
   # if it wasn't updated, the continue processing
   # with the disk data
-  my $line = $self->{file}[$recno];
+  my $line = exists $self->{UPDATE}{$recno}
+	? $self->{UPDATE}{$recno}
+	: $self->{file}[$recno];
   return unless defined $line;
   my @data = split $self->{FIELDSEP}, $line, -1;
   $self->{recno} = $recno+1;
@@ -718,6 +709,12 @@ sub DESTROY {
   $self->();
 }
 
+1;
+
+__END__
+
+=pod
+
 =head1 BUGS
 
 Various design defects; see TODO file
@@ -727,12 +724,13 @@ the interface, might change in future versions.
 
 =head1 AUTHOR
 
-Mark Jason Dominus (mjd@plover.com)
+Mark Jason Dominus
 
-  $Id: FlatFile.pm,v 1.4 2006/07/09 06:53:37 mjd Exp $
-  $Revision: 1.4 $
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2006 by Mark Jason Dominus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;
-

@@ -12,4 +12,4 @@ verbose = 9
 [TryTiny::RequireUse]
 
 [TestingAndDebugging::RequireUseStrict]
-equivalent_modules = Moo Moo::Role strictures
+equivalent_modules = Moo Moo::Role strictures Test2::V0

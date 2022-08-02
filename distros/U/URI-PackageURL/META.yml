@@ -1,0 +1,27 @@
+---
+abstract: 'Perl extension for Package URL (aka "purl")'
+author:
+  - 'Giuseppe Di Terlizzi <gdt@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  JSON::PP: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: URI-PackageURL
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.010'
+resources:
+  repository: git://github.com/giterlizzi/perl-URI-PackageURL
+version: '1.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

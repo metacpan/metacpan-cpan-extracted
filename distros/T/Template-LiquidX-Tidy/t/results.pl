@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 our $t1_expected = <<'LIQUID';
+<wbr>
 <a href="{% if site.github %}{{ site.github.tar_url | replace_first: '/tarball/', '/tree/' }}{% else %}file://{{ site.source }}{%
     endif
     %}/{% if page.relative_path %}{{ page.relative_path }}{%
@@ -13,6 +14,7 @@ our $t1_expected = <<'LIQUID';
 LIQUID
 
 our $t2_expected = <<'LIQUID';
+<wbr>
 <a href="{%
     if site.github
         %}{{ site.github.tar_url | replace_first: '/tarball/', '/tree/' }}{%

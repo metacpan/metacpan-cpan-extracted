@@ -4,7 +4,7 @@ no warnings 'uninitialized';
 
 package Form::Diva;
 
-our $VERSION='1.03';
+our $VERSION='1.04';
 
 # use Data::Printer;
 
@@ -162,13 +162,16 @@ sub _field_bits {
         $out{rawvalue} = $data->{$fname} || '';
     }
     else {
-        if ( $in{placeholder} ) {
-            $out{placeholder} = qq!placeholder="$in{placeholder}"!;
-        }
-        else { $out{placeholder} = '' }
         if   ( $in{default} ) { $out{rawvalue} = $in{default}; }
         else                  { $out{rawvalue} = '' }
     }
+    if ( $in{placeholder} ) {
+        $out{placeholder} = qq!placeholder="$in{placeholder}"!;
+    }
+    else {
+        $out{placeholder} = '';
+    }
+
     $out{value} = qq!value="$out{rawvalue}"!;
     return %out;
 }
@@ -180,12 +183,15 @@ sub _label {
     # http://www.w3.org/TR/html5/forms.html#the-label-element
     my $self  = shift;
     my $field = shift;
+
+    return '' if exists $field->{label} && !defined $field->{label};
+
     my $label_class
         = $field->{label_class}
         ? $field->{label_class}
         : $self->{label_class};
     my $label_tag
-        = $field->{label} ? $field->{label} : ucfirst( $field->{name} );
+        = exists $field->{label} ? $field->{label} || '' : ucfirst( $field->{name} );
     return qq|<LABEL for="$field->{id}" id="$field->{id}_label" class="$label_class">|
         . qq|$label_tag</LABEL>|;
 }
@@ -204,8 +210,6 @@ sub _input {
         $input .= qq|<INPUT $B{type} $B{name} $B{id}
         $B{input_class} $B{placeholder} $B{extra} $B{value} >|;
     }
-    $input =~ s/\s+/ /g;     # remove extra whitespace.
-    $input =~ s/\s+>/>/g;    # cleanup space before closing >
     return $input;
 }
 
@@ -347,7 +351,6 @@ sub prefill {
         my $iname = $item->{name};
         if ( $data->{$iname} ) {
             $item->{default} = $data->{$iname};
-            delete $item->{placeholder};
         }
     }
     my $generated = $self->generate( undef, $overide );
@@ -392,7 +395,7 @@ PLAINLOOP:
             comment => $field->{comment},
         );
         $row{label}
-            = $field->{label} ? $field->{label} : ucfirst( $field->{name} );
+            = exists $field->{label} ? $field->{label} || '' : ucfirst( $field->{name} );
         $row{id} = $field->{id}
             ; # coverage testing deletion ? $field->{id} : 'formdiva_' . $field->{name};
         if ($moredata) {
@@ -423,7 +426,7 @@ Form::Diva - Generate HTML5 form label and input fields
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 AUTHOR
 

@@ -5,7 +5,7 @@ use warnings;
 package Benchmark::Featureset::ParamCheck::Implementation::RefUtilXS;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.005';
+our $VERSION   = '0.006';
 
 use parent qw(Benchmark::Featureset::ParamCheck::Base);
 use Ref::Util::XS 0.116 qw(is_blessed_ref is_plain_hashref is_plain_arrayref is_ref);

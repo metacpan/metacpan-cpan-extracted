@@ -9,7 +9,7 @@ use Regru::API::Response;
 use namespace::autoclean;
 use Carp;
 
-our $VERSION = '0.051'; # VERSION
+our $VERSION = '0.052'; # VERSION
 our $AUTHORITY = 'cpan:CHIM'; # AUTHORITY
 
 with qw(
@@ -135,7 +135,7 @@ Regru::API::Role::Client - something that makes requests to API
 
 =head1 VERSION
 
-version 0.051
+version 0.052
 
 =head1 SYNOPSIS
 

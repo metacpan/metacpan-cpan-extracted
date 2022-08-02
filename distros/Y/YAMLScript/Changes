@@ -1,3 +1,19 @@
+0.0.16 Fri 29 Jul 2022 02:05:31 PM PDT
+ - Add def fn and defn support
+
+0.0.15 Mon 25 Jul 2022 08:53:30 AM PDT
+ - Improve YAMLScript.pm module API
+ - Add if/else (==) (!=) (=~) (!~) support
+
+0.0.14 Sun 24 Jul 2022 03:00:39 PM PDT
+ - Fix dashes in func names and calls with no args
+
+0.0.13 Sun 24 Jul 2022 02:21:08 PM PDT
+ - Makefile generation portability fixes for failing cpantesters
+
+0.0.12 Fri 22 Jul 2022 08:16:18 AM PDT
+ - Another attempt to fix test failures on Windows
+
 0.0.11 Mon 18 Jul 2022 05:18:07 PM PDT
  - Attempt to fix a BSD 'make test' failure
  - Attempt to fix cpantesters fails on windows

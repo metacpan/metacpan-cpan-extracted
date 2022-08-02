@@ -1,5 +1,10 @@
 Revision history for perl distribution Mojolicious-Plugin-Webpack
 
+1.02 2022-07-29T10:45:50+0900
+ - Fix "pnpm init -y" is not a valid command
+ - Fix installing both devDependencies and dependencies #14 #15
+   Contributor: Daniel Mantovani
+
 1.01 2021-05-25T07:36:24+0900
  - Removed need for assets/asset_map.mode.json
  - Add support for mojo webpack --build

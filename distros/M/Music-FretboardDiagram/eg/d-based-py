@@ -1,0 +1,69 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# Show top 3-string triads with D in the bass
+
+# For author testing only:
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Chord-Guitar Music-FretboardDiagram);
+
+use Algorithm::Combinatorics qw(variations_with_repetition);
+use Data::Dumper::Compact qw(ddc);
+use List::Util qw(any);
+use Music::FretboardDiagram;
+use Capture::Tiny qw(capture);
+
+my $frets = shift || 5;   # number of frets to display up to 10
+
+my $i = 0;
+
+for my $position (1, 5) {
+    my @specs;
+    my $iter = variations_with_repetition([0 .. $frets - 1], 3);
+    while (my $v = $iter->next) {
+        my $chord = 'xx0' . join('', @$v);
+        push @specs, [ $position, $chord ];
+    }
+
+    for my $spec (@specs) {
+        $i++;
+
+        my $dia = Music::FretboardDiagram->new(
+          frets    => $frets,
+          chord    => [ $spec ],
+          outfile  => sprintf('%s-%02d', $0, $i),
+          horiz    => 1,
+          size     => 50,
+          verbose  => 1,
+        );
+
+        my $notes = join ' ', $dia->spec_to_notes($dia->chord->[0][1])->@*;
+
+        my ($name) = capture {
+            system qq/python3 -c "import music21; c = music21.chord.Chord('$notes'); print(c.pitchedCommonName)"/;
+        };
+        chomp $name;
+        $name =~ s/enharmonic equivalent to //i;
+        $name =~ s/enharmonic/enharm/i;
+        $name =~ s/second/2nd/i;
+        $name =~ s/third/3rd/i;
+        $name =~ s/fourth/4th/i;
+        $name =~ s/seventh/7th/i;
+        $name =~ s/augmented/aug/i;
+        $name =~ s/diminished/dim/i;
+        $name =~ s/dominant/dom/i;
+        $name =~ s/incomplete/incomp/i;
+        $name =~ s/truncated/trunc/i;
+        $name =~ s/alternating/alt/i;
+        $name =~ s/perfect/perf/i;
+        $name =~ s/major/maj/ig;
+        $name =~ s/minor/min/ig;
+        $name =~ s/\bchord\b//i;
+        $name =~ s/\s+/ /g;
+warn __PACKAGE__,' L',__LINE__,' ',,sprintf("%-3d. @%d %-12s => %s\n", $i, $position, "[$notes]", $name);
+
+        $dia->showname(ucfirst $name);
+
+        $dia->draw;
+    }
+}

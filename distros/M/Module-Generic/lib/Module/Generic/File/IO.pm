@@ -19,11 +19,13 @@ BEGIN
     use Fcntl;
     use IO::File ();
     use parent qw( Module::Generic IO::File );
-    use vars qw( $VERSION @EXPORT );
+    use vars qw( $VERSION @EXPORT $THAW_REOPENS_FILE );
     use Nice::Try;
+    use Scalar::Util ();
     use Want;
     our @EXPORT = grep( /^(?:O_|F_GETFL|F_SETFL)/, @Fcntl::EXPORT );
     push( @EXPORT, @{$Fcntl::EXPORT_TAGS{flock}}, @{$Fcntl::EXPORT_TAGS{seek}} );
+    our $THAW_REOPENS_FILE = 1;
     our $VERSION = 'v0.1.0';
 };
 
@@ -33,6 +35,7 @@ sub new
     my $class = ( ref( $this ) || $this );
     my $opts = {};
     $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
+    my $args = [@_];
     my $self;
     try
     {
@@ -43,7 +46,7 @@ sub new
     {
         return( $this->error( "Error trying to open file \"", $_[0], "\" with arguments: '", join( "', '", @_[1..$#_] ), "': $e" ) );
     }
-    *$self = {};
+    *$self = { args => $args };
     if( Want::want( 'OBJECT' ) )
     {
         return( $self->init( $opts ) );
@@ -73,6 +76,12 @@ sub init
     *$self->{_init_strict_use_sub} = 1;
     $self->Module::Generic::init( $opts ) || return( $self->pass_error );
     return( $self );
+}
+
+sub args
+{
+    my $self = shift( @_ );
+    return( *$self->{args} );
 }
 
 sub autoflush { return( shift->_filehandle_method( 'autoflush', @_ ) ); }
@@ -247,7 +256,67 @@ sub _filehandle_method
 
 sub DESTROY
 {
-    shift->close;
+    # NOTE: Storable creates a dummy object as a SCALAR instead of GLOB, so we need to check.
+    shift->close if( Scalar::Util::reftype( $_[0] ) eq 'GLOB' );
+}
+
+sub FREEZE
+{
+    my $self = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class = CORE::ref( $self ) || $self;
+    my $args = $self->args;
+    CORE::return( [$class, \@$args] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    CORE::return( $class, \@$args )
+}
+
+# NOTE: There cannot be a STORABLE_freeze subroutine, or else Storable would trigger an error "Unexpected object type (8) in store_hook()". So Storable must do it by itself, which means it will die or if $Storable::forgive_me is set to a true value, it will instead create a SCALAR instance of this class containing a string like "You lost GLOB(0x5616db45e4e8)"
+# sub STORABLE_freeze { return( shift->FREEZE( @_ ) ); }
+# 
+# sub STORABLE_thaw { return( shift->THAW( @_ ) ); }
+
+# NOTE: STORABLE_freeze_pre_processing called by Storable::Improved
+sub STORABLE_freeze_pre_processing
+{
+    my $self = CORE::shift( @_ );
+    my $class = CORE::ref( $self ) || $self;
+    my $args = $self->args;
+    # We change the glob object into a regular hash-based one to be Storable-friendly
+    my $this = CORE::bless( { args => $args, class => $class } => $class );
+    CORE::return( $this );
+}
+
+sub STORABLE_thaw_post_processing
+{
+    my $self = CORE::shift( @_ );
+    my $args = ( CORE::exists( $self->{args} ) && CORE::ref( $self->{args} ) eq 'ARRAY' )
+        ? $self->{args}
+        : [];
+    my $class = ( CORE::exists( $self->{class} ) && CORE::defined( $self->{class} ) && CORE::length( $self->{class} ) ) 
+        ? $self->{class}
+        : ( CORE::ref( $self ) || $self );
+    # We restore our glob object. Geez that was hard. Not.
+    my $obj = $THAW_REOPENS_FILE ? $class->new( @$args ) : $class->new;
+    return( $obj );
+}
+
+# NOTE: THAW is called by Sereal and CBOR
+sub THAW
+{
+    my( $self, undef, @args ) = @_;
+    my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    $ref = ( CORE::scalar( @$ref ) && CORE::ref( $ref->[0] ) eq 'ARRAY' ) ? $ref->[0] : [];
+    my $new;
+    if( $THAW_REOPENS_FILE && CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' )
+    {
+        $new = $class->new( @$ref );
+    }
+    else
+    {
+        $new = $class->new;
+    }
+    CORE::return( $new );
 }
 
 1;
@@ -279,6 +348,10 @@ Supported methods are rigorously the same as L<IO::File> and L<IO::Handle> on to
 The IO methods are listed below for convenience, but make sure to check the L<IO::File> documentation for more information.
 
 =head1 METHODS
+
+=head2 args
+
+Returns an array reference containing the original arguments passed during object instantiation.
 
 =head2 autoflush
 
@@ -491,6 +564,28 @@ L<Module::Generic::File::IO> automatically exports the following constants taken
 =back
 
 See also the manual page for C<fcntl> for more detail about those constants.
+
+=head1 SERIALISATION
+
+=for Pod::Coverage FREEZE
+
+=for Pod::Coverage STORABLE_freeze
+
+=for Pod::Coverage STORABLE_thaw
+
+=for Pod::Coverage THAW
+
+=for Pod::Coverage TO_JSON
+
+Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>
+
+For C<STORABLE_freeze> and C<STORABLE_thaw>, they are not implemented, because as of version C<3.26> Storable raises an exception without giving any chance to the IO module to return an object representing the deserialised data. So, instead of using L<Storable>, use instead the drop-in replacement L<Storable::Improved>, which addresses and mitigate those issues.
+
+If you use L<Storable::Improved>, then serialisation and deserialisation will work seamlessly.
+
+Failure to do use L<Storable::Improved>, and L<Storable> would instead return the L<Module::Generic::File::IO> as a C<SCALAR> object rather than a glob.
+
+Note that by default C<$THAW_REOPENS_FILE> is set to a true value, and this will have deserialisation recreate an object somewhat equivalent to the original one.
 
 =head1 AUTHOR
 

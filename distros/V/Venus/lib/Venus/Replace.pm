@@ -5,41 +5,42 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class;
 
-extends 'Venus::Kind::Utility';
+base 'Venus::Kind::Utility';
 
 with 'Venus::Role::Explainable';
 with 'Venus::Role::Stashable';
 
 use overload (
+  '""' => 'explain',
   '.' => sub{"$_[0]" . "$_[1]"},
   'eq' => sub{"$_[0]" eq "$_[1]"},
   'ne' => sub{"$_[0]" ne "$_[1]"},
   'qr' => sub{qr{@{[quotemeta("$_[0]")]}}},
+  '~~' => 'explain',
+  fallback => 1,
 );
 
 # ATTRIBUTES
 
-has flags => (
-  is => 'rw',
-  default => '',
-);
+attr 'flags';
+attr 'regexp';
+attr 'string';
+attr 'substr';
 
-has regexp => (
-  is => 'rw',
-  default => sub{qr//},
-);
+# BUILDERS
 
-has string => (
-  is => 'rw',
-  default => '',
-);
+sub build_self {
+  my ($self, $data) = @_;
 
-has substr => (
-  is => 'rw',
-  default => '',
-);
+  $self->flags('') if !$self->flags;
+  $self->regexp(qr//) if !$self->regexp;
+  $self->string('') if !$self->string;
+  $self->substr('') if !$self->substr;
+
+  return $self;
+}
 
 # METHODS
 
@@ -724,6 +725,38 @@ B<example 1>
   # given: synopsis;
 
   my $result = 'hello universe, welcome' =~ qr/$replace/;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<("")>
+
+This package overloads the C<""> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = "$replace";
+
+  # "hello universe"
+
+=back
+
+=over 4
+
+=item operation: C<(~~)>
+
+This package overloads the C<~~> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $replace ~~ 'hello universe';
 
   # 1
 

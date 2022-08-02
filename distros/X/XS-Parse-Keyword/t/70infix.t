@@ -6,15 +6,15 @@ use utf8;
 
 use Test::More;
 
-use B qw( svref_2object walkoptree );
-
 use B::Deparse;
-my $deparser = B::Deparse->new();
+my $deparser = B::Deparse->new( "-p" );
 
 use lib "t";
 use testcase "t::infix";
 
 BEGIN { plan skip_all => "No PL_infix_plugin" unless XS::Parse::Infix::HAVE_PL_INFIX_PLUGIN; }
+
+use v5.16;
 
 BEGIN { $^H{"t::infix/permit"} = 1; }
 
@@ -38,6 +38,64 @@ BEGIN { $^H{"t::infix/permit"} = 1; }
       [ 3, 5, 7 ], 'addpairs infix operator' );
 }
 
+sub _getoptree
+{
+   my ( $sub ) = @_;
+
+   # Ugh - this would be so much neater if we could pass coderefs into
+   # B::walkoptree directly
+   # Additionally there's no pre-mid-postfix walk options :(
+
+   my $dump_optree = sub {
+      my $sub = __SUB__;
+      my ( $op ) = @_;
+      my $opname = $op->name;
+
+      # Avoid test-dependence on the actual ppaddr by mangling out the name
+      $opname =~ s/0x[[:xdigit:]]+/0xXXX/;
+
+      return $op->first->$sub if $opname eq "null";
+
+      my @kids;
+      if( $op->flags & B::OPf_KIDS ) {
+         my $kid = $op->first;
+         while( $kid ) {
+            push @kids, $kid->$sub;
+
+            $kid = $kid->sibling; undef $kid if ref($kid) eq "B::NULL";
+         }
+      }
+
+      my $ret = $opname;
+      $ret .= "[" . join( ", ", @kids ) . "]" if @kids;
+      return $ret;
+   };
+
+   # Reach inside to the first statement
+   return B::svref_2object( $sub )->ROOT->first->first->sibling
+      ->$dump_optree;
+}
+
+sub is_optree
+{
+   my ( $sub, $exp, $name ) = @_;
+   is( _getoptree( $sub ), $exp, $name );
+}
+
+{
+   is_optree sub { $_[0] add $_[1] },
+      "infix_add_0xXXX[aelemfast, aelemfast]",
+      'optree of call to infix operator';
+
+   is_optree sub { $_[0] * $_[1] add $_[2] * $_[3] },
+      "infix_add_0xXXX[multiply[aelemfast, aelemfast], multiply[aelemfast, aelemfast]]",
+      'optree of call to infix operator at default precedence';
+
+   is_optree sub { $_[0] * ($_[1] add $_[2]) * $_[3] },
+      "multiply[multiply[aelemfast, infix_add_0xXXX[aelemfast, aelemfast]], aelemfast]",
+      'optree of call to infix operator at forced precedence';
+}
+
 sub is_deparsed
 {
    my ( $sub, $exp, $name ) = @_;
@@ -59,6 +117,10 @@ sub is_deparsed
    is_deparsed sub { $_[0] add $_[1] },
       '$_[0] add $_[1];',
       'deparsed call to infix operator';
+
+   is_deparsed sub { $_[0] * $_[1] add $_[2] * $_[3] },
+      '($_[0] * $_[1]) add ($_[2] * $_[3]);',
+      'deparsed call to infix operator at default precedence';
 
    is_deparsed sub { $_[0] ⊕ $_[1] },
       '$_[0] ⊕ $_[1];',

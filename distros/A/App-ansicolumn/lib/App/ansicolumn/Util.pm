@@ -56,6 +56,11 @@ sub get_width {
     $obj->width || $obj->term_width;
 }
 
+sub effective_height {
+    my $obj = shift;
+    $obj->height - $obj->border_height;
+}
+
 sub rpn_calc {
     use Math::RPN;
     state $re = qr/(?:\d*\.)?\d+|[_a-z]+|--|\+\+|[<>!]=|\S/i;
@@ -112,7 +117,8 @@ sub layout {
 sub do_space_layout {
     my $obj = shift;
     my($dp) = @_;
-    my $height = $obj->height - $obj->border_height;
+    my $height = $obj->effective_height || die;
+    return if $height <= 0;
     for (my $page = 0; (my $top = $page * $height) < @$dp; $page++) {
 	if ($height >= 4 and $top > 2 and !$obj->isolation) {
 	    if ($dp->[$top - 2] !~ /\S/ and
@@ -142,7 +148,7 @@ sub _fillup {
 sub do_fillup {
     my $obj = shift;
     my $dp = shift;
-    my $line = $obj->height - $obj->border_height;
+    my $line = $obj->effective_height || die;
     defined $obj->fillup and $obj->fillup !~ /^(?:no|none)$/
 	or return;
     $obj->{fillup} ||= 'pane';
@@ -154,7 +160,7 @@ sub do_pagebreak {
     my $obj = shift;
     $obj->pagebreak or return;
     my $dp = shift;
-    my $height = $obj->height - $obj->border_height;
+    my $height = $obj->effective_height || die;
     my @up;
     use List::Util qw(first);
     while (defined(my $i = first { $dp->[$_] =~ /\f/ } 0 .. $#{$dp})) {

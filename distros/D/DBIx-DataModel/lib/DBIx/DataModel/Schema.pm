@@ -7,20 +7,20 @@ package DBIx::DataModel::Schema;
 
 use warnings;
 use strict;
-use DBIx::DataModel::Meta::Utils qw/does/;
+use DBIx::DataModel::Meta::Utils   qw/does/;
 use DBIx::DataModel::Source::Table;
 
-use Scalar::Util          qw/blessed/;
-use Data::Structure::Util;  # for calling unbless(), fully qualified
-use Module::Load          qw/load/;
-use Params::Validate      qw/validate_with SCALAR ARRAYREF CODEREF UNDEF
-                                           OBJECT BOOLEAN/;
+use Scalar::Util                   qw/blessed/;
+use Data::Structure::Util;           # for calling unbless(), fully qualified
+use Module::Load                   qw/load/;
+use Params::Validate               qw/validate_with SCALAR ARRAYREF CODEREF UNDEF
+                                                    OBJECT BOOLEAN/;
 
-use Carp::Clan            qw[^(DBIx::DataModel::|SQL::Abstract)];
+use Carp::Clan                     qw[^(DBIx::DataModel::|SQL::Abstract)];
 
-use SQL::Abstract::More 1.37;
+use SQL::Abstract::More 1.39;
 use Try::Tiny;
-use mro              qw/c3/;
+use mro                            qw/c3/;
 
 use namespace::clean;
 

@@ -26,7 +26,6 @@ sub TIEHASH
 {
     my $self = shift( @_ );
     my $pkg  = ( caller() )[0];
-    # print( STDERR __PACKAGE__ . "::TIEHASH() called with following arguments: '", join( ', ', @_ ), "'.\n" );
     my %arg  = ( @_ );
     my $auth = [ $pkg, __PACKAGE__ ];
     if( $arg{ 'pkg' } )
@@ -45,10 +44,8 @@ sub CLEAR
 {
     my $self = shift( @_ );
     my $pkg = ( caller() )[0];
-    ## print( $err __PACKAGE__ . "::CLEAR() called by package '$pkg'.\n" );
     my $data = $self->{ '__priv__' };
     return() if( $data->{ 'readonly' } && $pkg ne __PACKAGE__ );
-    ## if( $data->{ 'readonly' } || $data->{ 'protect' } )
     if( !( $data->{ 'perms' } & 2 ) )
     {
         return if( !grep( /^$pkg$/, @{ $data->{ 'pkg' } } ) );
@@ -71,10 +68,8 @@ sub DELETE
     my $self = shift( @_ );
     my $pkg  = ( caller() )[0];
     $pkg     = ( caller(1) )[0] if( $pkg eq 'Module::Generic' );
-    ## print( STDERR __PACKAGE__ . "::DELETE() package '$pkg' tries to delete '$_[ 0 ]'\n" );
     my $data = $self->{ '__priv__' };
     return if( $_[0] eq '__priv__' && $pkg ne __PACKAGE__ );
-    ## if( $data->{ 'readonly' } || $data->{ 'protect' } )
     if( !( $data->{ 'perms' } & 2 ) )
     {
         return() if( !grep( /^$pkg$/, @{ $data->{ 'pkg' } } ) );
@@ -86,7 +81,6 @@ sub EXISTS
 {
     my $self = shift( @_ );
     my $pkg = ref( $self );
-    # print( STDERR __PACKAGE__ . "::EXISTS() called from package '", ( caller() )[ 0 ], "'.\n" );
     return(0) if( $_[0] eq '__priv__' && $pkg ne __PACKAGE__ );
     my $data = $self->{ '__priv__' };
     if( !( $data->{ 'perms' } & 4 ) )
@@ -94,14 +88,11 @@ sub EXISTS
         my $pkg = ( caller() )[0];
         return(0) if( !grep( /^$pkg$/, @{$data->{ 'pkg' }} ) );
     }
-    # print( STDERR __PACKAGE__ . "::EXISTS() returns: '", exists( $self->{ $_[ 0 ] } ), "'.\n" );
     return( exists( $self->{ shift( @_ ) } ) );
 }
 
 sub FETCH
 {
-    # return( shift->{ shift( @_ ) } );
-    # print( STDERR __PACKAGE__ . "::FETCH() called with arguments: '", join( ', ', @_ ), "'.\n" );
     my $self = shift( @_ );
     my $pkg = ref( $self );
     # This is a hidden entry, we return nothing
@@ -112,7 +103,6 @@ sub FETCH
     if( !( $data->{ 'perms' } & 4 ) )
     {
         my $pkg = ( caller() )[0];
-        ## print( STDERR __PACKAGE__ . "::FETCH() package '$pkg' wants to fetch the value of '$_[ 0 ]'\n" );
         return if( !grep( /^$pkg$/, @{$data->{ 'pkg' }} ) );
     }
     return( $self->{ shift( @_ ) } );
@@ -128,14 +118,10 @@ sub FIRSTKEY
     if( !( $data->{ 'perms' } & 4 ) )
     {
         my $pkg = ( caller(0) )[0];
-        ## print( STDERR __PACKAGE__ . "::FIRSTKEY() called by package '$pkg'\n" );
         return if( !grep( /^$pkg$/, @{$data->{ 'pkg' }} ) );
     }
-    ## print( STDERR __PACKAGE__ . "::FIRSTKEY(): gathering object's keys.\n" );
     my( @keys ) = grep( !/^__priv__$/, keys( %$self ) );
     $self->{ '__priv__' }->{ 'ITERATOR' } = \@keys;
-    ## print( STDERR __PACKAGE__ . "::FIRSTKEY(): keys are: '", join( ', ', @keys ), "'.\n" );
-    ## print( STDERR __PACKAGE__ . "::FIRSTKEY() returns '$keys[ 0 ]'.\n" );
     return( shift( @keys ) );
 }
 
@@ -148,11 +134,9 @@ sub NEXTKEY
     if( !( $data->{ 'perms' } & 4 ) )
     {
         my $pkg = ( caller(0) )[0];
-        ## print( STDERR __PACKAGE__ . "::NEXTKEY() called by package '$pkg'\n" );
         return if( !grep( /^$pkg$/, @{$data->{ 'pkg' }} ) );
     }
     my $keys = $self->{ '__priv__' }->{ 'ITERATOR' };
-    ## print( STDERR __PACKAGE__ . "::NEXTKEY() returns '$_[ 0 ]'.\n" );
     return( shift( @$keys ) );
 }
 
@@ -161,19 +145,13 @@ sub STORE
     my $self = shift( @_ );
     return() if( $_[0] eq '__priv__' );
     my $data = $self->{ '__priv__' };
-    #if( $data->{ 'readonly' } || 
-    #    $data->{ 'protect' } )
     if( !( $data->{ 'perms' } & 2 ) )
     {
         my $pkg  = ( caller() )[0];
         $pkg     = ( caller(1) )[0] if( $pkg eq 'Module::Generic' );
-        ## print( STDERR __PACKAGE__ . "::STORE() package '$pkg' is trying to STORE the value '$_[ 1 ]' to key '$_[ 0 ]'\n" );
         return if( !grep( /^$pkg$/, @{ $data->{ 'pkg' } } ) );
     }
-    ## print( STDERR __PACKAGE__ . "::STORE() ", ( caller() )[ 0 ], " is storing value '$_[ 1 ]' for key '$_[ 0 ]'.\n" );
-    ## $self->{ shift( @_ ) } = shift( @_ );
     $self->{ $_[0] } = $_[1];
-    ## print( STDERR __PACKAGE__ . "::STORE(): object '$self' now contains: '", join( ', ', map{ "$_, $self->{ $_ }" } keys( %$self ) ), "'.\n" );
 }
 
 1;

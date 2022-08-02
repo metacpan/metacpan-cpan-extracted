@@ -11,7 +11,7 @@ use Scalar::Util qw(blessed);
 Readonly::Array our @EXPORT_OK => qw(check_array check_array_object check_bool
 	check_isa check_length check_number check_number_of_items check_required);
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 sub check_array {
 	my ($self, $key) = @_;
@@ -294,7 +294,7 @@ Returns undef.
 
  check_length():
          Parameter '%s' has length greater than '%s'.
-			'Value', $self->{$key},
+			Value: %s
 
  check_number():
          Parameter '%s' must a number.
@@ -394,6 +394,46 @@ Returns undef.
  use strict;
  use warnings;
 
+ use Mo::utils qw(check_bool);
+ use Test::MockObject;
+
+ my $self = {
+         'key' => 1,
+ };
+ check_bool($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output:
+ # ok
+
+=head1 EXAMPLE6
+
+ use strict;
+ use warnings;
+
+ use Error::Pure;
+ use Mo::utils qw(check_bool);
+
+ $Error::Pure::TYPE = 'Error';
+
+ my $self = {
+         'key' => 'bad',
+ };
+ check_bool($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output like:
+ # #Error [..utils.pm:?] Parameter 'key' must be a bool (0/1).
+
+=head1 EXAMPLE7
+
+ use strict;
+ use warnings;
+
  use Mo::utils qw(check_isa);
  use Test::MockObject;
 
@@ -408,7 +448,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE6
+=head1 EXAMPLE8
 
  use strict;
  use warnings;
@@ -428,7 +468,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' must be a 'Test::MockObject' object.
 
-=head1 EXAMPLE7
+=head1 EXAMPLE9
 
  use strict;
  use warnings;
@@ -448,7 +488,7 @@ Returns undef.
  # Output like:
  # ok
 
-=head1 EXAMPLE8
+=head1 EXAMPLE10
 
  use strict;
  use warnings;
@@ -468,7 +508,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' has length greater than '2'.
 
-=head1 EXAMPLE9
+=head1 EXAMPLE11
 
  use strict;
  use warnings;
@@ -486,7 +526,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE10
+=head1 EXAMPLE12
 
  use strict;
  use warnings;
@@ -506,7 +546,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' must be a number.
 
-=head1 EXAMPLE11
+=head1 EXAMPLE13
 
  use strict;
  use warnings;
@@ -549,7 +589,7 @@ Returns undef.
  # Output like:
  # ok
 
-=head1 EXAMPLE12
+=head1 EXAMPLE14
 
  use strict;
  use warnings;
@@ -592,7 +632,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Test for Item 'value1' has multiple values.
 
-=head1 EXAMPLE13
+=head1 EXAMPLE15
 
  use strict;
  use warnings;
@@ -610,7 +650,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE14
+=head1 EXAMPLE16
 
  use strict;
  use warnings;
@@ -665,6 +705,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

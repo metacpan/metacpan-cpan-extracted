@@ -10,7 +10,11 @@ use experimental 'lexical_subs';
 
 use Carp;
 
-use Hash::Wrap 0.11 { -as => 'wrap_attrs_ro', -immutable => 1, -exists => 'has' };
+use Hash::Wrap 0.11 {
+    -as        => 'wrap_attrs_ro',
+    -immutable => 1,
+    -exists    => 'has'
+};
 use Types::Standard qw( Optional Bool );
 use CXC::Number::Sequence::Failure -all;
 use CXC::Number::Sequence::Types -all;
@@ -22,7 +26,7 @@ use enum
 
 use Moo;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 extends 'CXC::Number::Sequence';
 
@@ -38,28 +42,29 @@ has _force_extrema => (
 );
 
 my %ArgMap = (
-    align    => { type => Optional [Alignment],      flag => ALIGN },
-    spacing     => { type => Optional [BigPositiveNum], flag => SPACING },
-    center   => { type => Optional [BigNum],         flag => CENTER },
-    max      => { type => Optional [BigNum],         flag => MAX },
-    min      => { type => Optional [BigNum],         flag => MIN },
-    nelem    => { type => Optional [BigPositiveInt], flag => NELEM },
-    rangew   => { type => Optional [BigPositiveNum], flag => RANGEW },
-    soft_max => { type => Optional [BigNum],         flag => SOFT_MAX },
-    soft_min => { type => Optional [BigNum],         flag => SOFT_MIN },
+    align         => { type => Optional [Alignment],      flag => ALIGN },
+    spacing       => { type => Optional [BigPositiveNum], flag => SPACING },
+    center        => { type => Optional [BigNum],         flag => CENTER },
+    max           => { type => Optional [BigNum],         flag => MAX },
+    min           => { type => Optional [BigNum],         flag => MIN },
+    nelem         => { type => Optional [BigPositiveInt], flag => NELEM },
+    rangew        => { type => Optional [BigPositiveNum], flag => RANGEW },
+    soft_max      => { type => Optional [BigNum],         flag => SOFT_MAX },
+    soft_min      => { type => Optional [BigNum],         flag => SOFT_MIN },
     force_extrema => { type => Optional [Bool], flag => FORCE_EXTREMA },
 );
 
 my sub build_sequence {
     my $attr = wrap_attrs_ro( shift );
-    my @seq = map { $attr->min + $attr->spacing * $_ } 0 .. ($attr->nelem-1);
+    my @seq
+      = map { $attr->min + $attr->spacing * $_ } 0 .. ( $attr->nelem - 1 );
 
     # make sure that the bounds exactly match what is specified if the
     # sequence is exactly covering [min,max], just in case roundoff error
     # occurs.
-    if ( $attr->args->has( 'force_extrema') &&
-         $attr->args->force_extrema
-       ) {
+    if (   $attr->args->has( 'force_extrema' )
+        && $attr->args->force_extrema )
+    {
         $seq[0]  = $attr->min;
         $seq[-1] = $attr->max;
     }
@@ -143,28 +148,30 @@ my %ArgBuild;
     ( MIN | MAX | NELEM ),
     sub {
         {
-            elements =>build_sequence( {
-                    args          => $_,
-                    min           => $_->min,
-                    max           => $_->max,
-                    nelem         => $_->nelem,
-                    spacing          => ( $_->max - $_->min ) / ( $_->nelem - 1 ),
+            elements => build_sequence( {
+                    args    => $_,
+                    min     => $_->min,
+                    max     => $_->max,
+                    nelem   => $_->nelem,
+                    spacing => ( $_->max - $_->min ) / ( $_->nelem - 1 ),
                 } ) };
     },
 
     #----------------------------------------
 
-    # The sequence covers [ MIN= (max-min) / 2 - (nelem - 1 ) * spacing, MIN + ( nelem - 1 ) * spacing ]
-    # nelem = ceil( ( max - min ) / spacing )
+# The sequence covers [ MIN= (max-min) / 2 - (nelem - 1 ) * spacing, MIN + ( nelem - 1 ) * spacing ]
+# nelem = ceil( ( max - min ) / spacing )
 
     ( MIN | MAX | SPACING ),
     sub {
         local $_ = wrap_attrs_ro( {
-            force_extrema => $_->has('force_extrema') ? $_->force_extrema : 0,
-            center        => ( $_->max + $_->min ) / 2,
-            spacing          => $_->spacing,
-            rangew        => ( $_->max - $_->min ),
-        } );
+                force_extrema => $_->has( 'force_extrema' )
+                ? $_->force_extrema
+                : 0,
+                center  => ( $_->max + $_->min ) / 2,
+                spacing => $_->spacing,
+                rangew  => ( $_->max - $_->min ),
+            } );
 
         $ArgBuild{ ( CENTER | RANGEW | SPACING ) }->();
     },
@@ -175,12 +182,12 @@ my %ArgBuild;
     ( MIN | NELEM | SPACING ),
     sub {
         {
-            elements =>build_sequence( {
-                    args          => $_,
-                    min           => $_->min,
-                    max           => $_->min + ( $_->nelem - 1 )* $_->spacing,
-                    nelem         => $_->nelem,
-                    spacing          => $_->spacing
+            elements => build_sequence( {
+                    args    => $_,
+                    min     => $_->min,
+                    max     => $_->min + ( $_->nelem - 1 ) * $_->spacing,
+                    nelem   => $_->nelem,
+                    spacing => $_->spacing
                 } ) };
     },
 
@@ -188,12 +195,12 @@ my %ArgBuild;
     ( MAX | NELEM | SPACING ),
     sub {
         {
-            elements =>build_sequence( {
-                    args          => $_,
-                    min           => $_->max - ( $_->nelem - 1 )* $_->spacing,
-                    max           => $_->max,
-                    nelem         => $_->nelem,
-                    spacing          => $_->spacing,
+            elements => build_sequence( {
+                    args    => $_,
+                    min     => $_->max - ( $_->nelem - 1 ) * $_->spacing,
+                    max     => $_->max,
+                    nelem   => $_->nelem,
+                    spacing => $_->spacing,
                 } ) };
     },
 
@@ -203,15 +210,15 @@ my %ArgBuild;
     ( CENTER | SPACING | NELEM ),
     sub {
 
-        my $half_width = $_->spacing * ($_->nelem-1) / 2;
+        my $half_width = $_->spacing * ( $_->nelem - 1 ) / 2;
 
         {
-            elements =>build_sequence( {
-                    args          => $_,
-                    min           => $_->center - $half_width,
-                    max           => $_->center + $half_width,
-                    nelem         => $_->nelem,
-                    spacing          => $_->spacing,
+            elements => build_sequence( {
+                    args    => $_,
+                    min     => $_->center - $half_width,
+                    max     => $_->center + $half_width,
+                    nelem   => $_->nelem,
+                    spacing => $_->spacing,
                 } ) };
 
     },
@@ -220,15 +227,15 @@ my %ArgBuild;
     # The sequence covers [ MIN=center - width/2, MIN + (nelem-1) * spacing ]
     ( CENTER | RANGEW | NELEM ),
     sub {
-        my $spacing = $_->rangew / ($_->nelem - 1);
+        my $spacing = $_->rangew / ( $_->nelem - 1 );
 
         {
-            elements =>build_sequence( {
-                    args          => $_,
-                    min           => $_->center - $_->rangew / 2,
-                    max           => $_->center + $_->rangew / 2,
-                    nelem         => $_->nelem,
-                    spacing          => $spacing,
+            elements => build_sequence( {
+                    args    => $_,
+                    min     => $_->center - $_->rangew / 2,
+                    max     => $_->center + $_->rangew / 2,
+                    nelem   => $_->nelem,
+                    spacing => $spacing,
                 } ) };
 
     },
@@ -240,12 +247,12 @@ my %ArgBuild;
         my $nelem = ( $_->rangew / $_->spacing )->bceil + 1;
 
         {
-            elements =>build_sequence( {
-                    args          => $_,
-                    min           => $_->center - ($nelem-1) / 2 * $_->spacing,
-                    max           => $_->center + ($nelem-1) / 2 * $_->spacing,
-                    nelem         => $nelem,
-                    spacing          => $_->spacing
+            elements => build_sequence( {
+                    args    => $_,
+                    min     => $_->center - ( $nelem - 1 ) / 2 * $_->spacing,
+                    max     => $_->center + ( $nelem - 1 ) / 2 * $_->spacing,
+                    nelem   => $nelem,
+                    spacing => $_->spacing
                 } ) };
 
     },
@@ -259,11 +266,13 @@ my %ArgBuild;
         my $hw1 = $_->soft_max - $_->center;
 
         local $_ = wrap_attrs_ro( {
-            force_extrema => $_->has('force_extrema') ? $_->force_extrema : 0,
-            center        => $_->center,
-            rangew        => 2 * ( $hw0 > $hw1 ? $hw0 : $hw1 ),
-            nelem         => $_->nelem,
-        } );
+                force_extrema => $_->has( 'force_extrema' )
+                ? $_->force_extrema
+                : 0,
+                center => $_->center,
+                rangew => 2 * ( $hw0 > $hw1 ? $hw0 : $hw1 ),
+                nelem  => $_->nelem,
+            } );
         $ArgBuild{ ( CENTER | RANGEW | NELEM ) }->();
 
     },
@@ -278,11 +287,13 @@ my %ArgBuild;
         my $hw1 = $_->soft_max - $_->center;
 
         local $_ = wrap_attrs_ro( {
-            force_extrema => $_->has('force_extrema') ? $_->force_extrema : 0,
-            center        => $_->center,
-            spacing          => $_->spacing,
-            rangew        => 2 * ( $hw0 > $hw1 ? $hw0 : $hw1 ),
-        } );
+                force_extrema => $_->has( 'force_extrema' )
+                ? $_->force_extrema
+                : 0,
+                center  => $_->center,
+                spacing => $_->spacing,
+                rangew  => 2 * ( $hw0 > $hw1 ? $hw0 : $hw1 ),
+            } );
 
         $ArgBuild{ ( CENTER | RANGEW | SPACING ) }->();
     },
@@ -295,12 +306,12 @@ my %ArgBuild;
         my $nelem = ( ( $_->soft_max - $_->min ) / $_->spacing )->bceil + 1;
 
         {
-            elements =>build_sequence( {
-                    args          => $_,
-                    min           => $_->min,
-                    max           => $_->min + $nelem * $_->spacing,
-                    nelem         => $nelem,
-                    spacing          => $_->spacing
+            elements => build_sequence( {
+                    args    => $_,
+                    min     => $_->min,
+                    max     => $_->min + $nelem * $_->spacing,
+                    nelem   => $nelem,
+                    spacing => $_->spacing
                 } ) };
     },
 
@@ -310,12 +321,12 @@ my %ArgBuild;
     sub {
         my $nelem = ( ( $_->max - $_->soft_min ) / $_->spacing )->bceil + 1;
         {
-            elements =>build_sequence( {
-                    args          => $_,
-                    min           => $_->max - ($nelem-1) * $_->spacing,
-                    max           => $_->max,
-                    nelem         => $nelem,
-                    spacing          => $_->spacing
+            elements => build_sequence( {
+                    args    => $_,
+                    min     => $_->max - ( $nelem - 1 ) * $_->spacing,
+                    max     => $_->max,
+                    nelem   => $nelem,
+                    spacing => $_->spacing
                 } ) };
     },
 
@@ -331,12 +342,12 @@ my %ArgBuild;
         my $min   = $E0 + $imin * $_->spacing;
 
         {
-            elements =>build_sequence( {
-                    args          => $_,
-                    min           => $min,
-                    max           => $min + ($nelem-1) * $_->spacing,
-                    nelem         => $nelem,
-                    spacing          => $_->spacing,
+            elements => build_sequence( {
+                    args    => $_,
+                    min     => $min,
+                    max     => $min + ( $nelem - 1 ) * $_->spacing,
+                    nelem   => $nelem,
+                    spacing => $_->spacing,
                 } ) };
     },
 
@@ -347,18 +358,18 @@ my %ArgBuild;
 
         my ( $P, $f ) = $_->align->@*;
         my $spacing = ( $_->max - $_->min ) / ( $_->nelem - 2 );
-        my $E0   = $P - $f * $spacing;
-        my $imin = ( ( $_->min - $E0 ) / $spacing )->bfloor;
-        my $imax = ( ( $_->max - $E0 ) / $spacing )->bceil;
-        my $min  = $E0 + $imin * $spacing;
+        my $E0      = $P - $f * $spacing;
+        my $imin    = ( ( $_->min - $E0 ) / $spacing )->bfloor;
+        my $imax    = ( ( $_->max - $E0 ) / $spacing )->bceil;
+        my $min     = $E0 + $imin * $spacing;
 
         {
-            elements =>build_sequence( {
-                    args          => $_,
-                    min           => $min,
-                    max           => $min + ($_->nelem-1) * $spacing,
-                    nelem         => $_->nelem,
-                    spacing          => $spacing,
+            elements => build_sequence( {
+                    args    => $_,
+                    min     => $min,
+                    max     => $min + ( $_->nelem - 1 ) * $spacing,
+                    nelem   => $_->nelem,
+                    spacing => $spacing,
                 } ) };
     },
 
@@ -397,7 +408,7 @@ CXC::Number::Sequence::Linear - Numeric Sequence with Equal Spacing
 
 =head1 VERSION
 
-version 0.06
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -488,6 +499,8 @@ elements.
 
 =back
 
+=head1 INTERNALS
+
 =for Pod::Coverage BUILDARGS
 
 =head1 Methods
@@ -552,16 +565,16 @@ two elements, even though the generated sequence doesn't include C<0>:
 
  use Data::Dump;
  use aliased 'CXC::Number::Sequence::Linear';
- dd Linear->new( min => 5.1,
-                 max => 8,
-                 spacing => 1,
-                 align => [ 0, 0.5 ],
-               )->elements;
+ dd Linear->new(
+     min     => 5.1,
+     max     => 8,
+     spacing => 1,
+     align   => [ 0, 0.5 ],
+ )->elements;
 
 results in
 
  [4.5, 5.5, 6.5, 7.5, 8.5]
-
 
 =back
 
@@ -576,15 +589,21 @@ or a combination of values is illegal ( e.g. C<< min > max >>, C<new>
 will throw an exception of class
 C<CXC::Number::Sequence::Failure::parameter::constraint>.
 
-=head1 BUGS
+=head1 SUPPORT
 
-Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number> or by email
-to L<bug-cxc-number@rt.cpan.org|mailto:bug-cxc-number@rt.cpan.org>.
+=head2 Bugs
 
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/cxc-number
+
+and may be cloned from
+
+  https://gitlab.com/djerius/cxc-number.git
 
 =head1 SEE ALSO
 

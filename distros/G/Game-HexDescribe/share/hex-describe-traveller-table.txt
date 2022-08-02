@@ -4,8 +4,11 @@
 ;TOP
 1,[welcome][on names][on stats][on equipment]
 
+;END
+1,[appendix]
+
 ;welcome
-1,Welcome to the [global save space name as subsector][same subsector] subsector!<p class="sidebar"><a href="https://campaignwiki.org/travellercharacter/">Classic Traveller Character Generator</a> (with Citizens of the Imperium). <a href="https://campaignwiki.org/hex-describe/rule?rule=rogue&load=traveller">Rogues</a>.
+1,Welcome to the [global save space name as subsector][same subsector] subsector!<p class="sidebar"><a href="https://campaignwiki.org/travellercharacter/">Classic Traveller Character Generator</a> (with Citizens of the Imperium). You’ll find some pre-generated characters and ships in the <a href="#appendix">appendix</a>.
 
 ;on names
 1,<p>**Names:** When Chinese or Japanese names are being used, the order is *surname* then *given name*; other names use the order *given name* then *surname*; some people have no surname.
@@ -26,7 +29,6 @@
 ;gas
 4,There is a gas giant in this system.
 1,There are two gas giants in this system.
-1,There is a gas giant in this system. [append streamlined ship]Sensors show the *[same ship name]* scooping up unrefined fuel.
 
 ;size
 1,[size-[0|1|2|3|4|5|6|7|8|9|A]]
@@ -178,30 +180,22 @@
 1,[starport-[A|B|C|D|E|X]]
 
 ;starport-A
-1,<p>[here store [same name] as big port][same name] has a **class A** starport. [shipyard] [refinery] [ship in orbit]
-1,<p>[here store [same name] as big port][same name] has a **class A** starport. [shipyard] [refinery] [ship at the starport] [ship in orbit]
-1,<p>[here store [same name] as big port][same name] has a **class A** starport. [shipyard] [refinery] [ship at the starport] [ship at the starport]
-1,<p>[here store [same name] as big port][same name] has a **class A** starport. [shipyard] [refinery] [ship at the starport] [ship in orbit]
-1,<p>[here store [same name] as big port][same name] has a **class A** starport. [shipyard] [refinery] [ship at the starport] [ship at the starport] [ship in orbit]
+1,<p class="sidebar">Pre-generated characters and ships are in the <a href="#appendix">appendix</a>.<p>[here store [same name] as big port][same name] has a **class A** starport. [shipyard] [refinery]
 
 ;starport-B
-1,<p>[here store [same name] as big port][same name] has a **class B** starport. [shipyard] [refinery] [ship in orbit]
-1,<p>[here store [same name] as big port][same name] has a **class B** starport. [shipyard] [refinery] [ship at the starport]
-1,<p>[here store [same name] as big port][same name] has a **class B** starport. [shipyard] [refinery] [ship at the starport] [ship in orbit]
+1,<p><p class="sidebar">Pre-generated characters and ships are in the <a href="#appendix">appendix</a>.<p>[here store [same name] as big port][same name] has a **class B** starport. [shipyard] [refinery]
 
 ;starport-C
-1,<p>[same name] has a **class C** starport. [dockyard] [unrefined fuel] [ship at the starport] 
-1,<p>[same name] has a **class C** starport. [dockyard] [unrefined fuel] [ship in orbit]
-1,<p>[same name] has a **class C** starport. [dockyard] [unrefined fuel] [starport-C mission]
+1,<p class="sidebar">Pre-generated characters and ships are in the <a href="#appendix">appendix</a>.<p>[same name] has a **class C** starport. [dockyard] [unrefined fuel]
 
 ;starport-D
-1,<p>[same name] has a **class D** starport. [small starport building] [starport-D mission]
+1,<p class="sidebar">Pre-generated characters and ships (2 in 6 chance) are in the <a href="#appendix">appendix</a>.<p>[same name] has a **class D** starport. [small starport building] [starport-D mission]
 
 ;starport-E
-1,<p>[same name] has a **class E** starport.[here store [same name] as backwater system] [no facilities]
+1,<p class="sidebar">Pre-generated characters and ships (1 in 6 chance, streamlined hulls only) are in the <a href="#appendix">appendix</a>.<p>[same name] has a **class E** starport.[here store [same name] as backwater system] [no facilities]
 
 ;starport-X
-1,There is no starport, here.[here store [same name] as backwater system] This system is therefore not strictly part of the imperial network.
+1,<p class="sidebar">Pre-generated characters and ships (unlikely!) are in the <a href="#appendix">appendix</a>.<p>There is no starport, here.[here store [same name] as backwater system] This system is therefore not strictly part of the imperial network.
 
 ;shipyard
 1,The *[shipyard name]* shipyards loom large over the starport’s various landing pads.
@@ -356,7 +350,7 @@
 1,<p class="sidebar">Patron<p>The **harbour master** *[here human name as harbour master]* is nowhere to be seen which is strange as they usually greet new arrivals in person. Further investigation reveals [same harbour master] [lying sick in bed|dead out the back|doesn’t appear to be here at all|has packed up and left in a hurry].
 
 ;starport-D mission fix wiring
-1,<p class="sidebar">Patron<p>[humble harbour master] They are looking for someone to mend the wiring. It’s always shorting out and [same habour master] can’t work out why. They’ll pay 2000 Cr to anyone that sorts it out for good.
+1,<p class="sidebar">Patron<p>[humble harbour master] They are looking for someone to mend the wiring. It’s always shorting out and [same harbour master] can’t work out why. They’ll pay 2000 Cr to anyone that sorts it out for good.
 
 ;starport-D mission broken drone
 1,<p class="sidebar">Patron<p>[humble harbour master] They have a drone that needs repairing and then returning to *[nearby big port]*.
@@ -365,10 +359,10 @@
 1,<p class="sidebar">Patron<p>[humble harbour master] They are seeking someone to help them with the mountain of paperwork they need to complete because an inspector from *[nearby big port]* will be visiting soon. *[same harbour master]* offers 200 Cr a day and says there is [1d6+1] day’s worth of work. [help with paperwork smuggling]
 
 ;help with paperwork smuggling
-1,Some of the paperwork suggests a smuggling ring is operating through this starport. [habour master smuggler]
+1,Some of the paperwork suggests a smuggling ring is operating through this starport. [harbour master smuggler]
 2,
 
-;habour master smuggler
+;harbour master smuggler
 1,It also mentions *[same harbour master] by name so it looks like they may be involved in some way.
 3,
 
@@ -421,7 +415,7 @@
 1,<p>There is a small and unimportant research station on [same name], at least according to imperial standards. A few dozen [science people] live here.
 1,<p>A few dozen people live on [same name].
 1,<p>[Twenty|Thirty|Fourty|Fifty] or so people have recently arrived to establish a new colony here on [same name].
-1,<p>*[shipyard name]* has set up a base of about [thirty|fourty|fifty|sixty|seventy] people here to see what resources can be found on [same name].
+1,<p>*[shipyard name as company name]* has set up a base of about [thirty|fourty|fifty|sixty|seventy] people here to see what resources can be found on [same name].
 
 ;population-2
 1,<p>There is a single settlement with a few hundred people on [same name]. [colony ship]
@@ -431,18 +425,18 @@
 ;population-3
 1,<p>A few thousand people live around the [same name] starport. [colony ship]
 1,<p>Some thousand people live around the [same name] starport, with a few thousand more in smaller villages nearby. [colony ship]
-1,<p>The [same name] starport has fallen into disrepair since the [upheaval|troubles|civil war|dark times] but the few thousand residents left still cling onto the hope of better times ahead.
+1,<p>The [same name] starport has fallen into disrepair since the [upheaval|troubles|civil war|dark times] but the few thousand residents left still cling to [here [same name] as war system] onto the hope of better times ahead.
 
 ;colony ship
 1,The first settlers arrived here about [1d4+1]00 years ago with the [colony|generation] ship *[mellow ship name]*. Tracing your ancestry back to the original settlers is a source of pride for the locals.
 1,The settlement was founded by a colony ship from *[nearby big port]* about [1d4]00 years ago. These old ties are still considered to be important by the locals.
-1,The settlement was originally a penal colony for *[nearby big port]* and gained independence [1d20]0 years ago. The resentment is still strong among the locals.
+1,The settlement was originally a penal colony for *[nearby big port]* and gained independence [1d20]0 years ago. The resentment is still strong among the locals.[store [same name] as war system]
 1,The settlement was founded by the *[company name]* company from *[nearby big port]* about [1d4]00 years ago. You can still see the logo and their products everywhere.
 1,The settlement was founded by the *[human surname]* foundation from *[nearby big port]* about [1d20]0 years ago. Their descendants are still very important people in the system.
 
 ;population-4
 1,<p>*[space name]* is a town with a few ten thousand inhabitants that has grown around the [same name] starport.
-1,<p>There are two main settlements, each with a few ten thousand inhabitants on [same name]. *Old [space name]* is built around the old starport. When it fell into disrepair in the [upheaval|troubles|civil war|dark times], it was abandoned and in recent years *New [same space name]* was built around the new starport. There is quite some rivalry, of course.
+1,<p>There are two main settlements, each with a few ten thousand inhabitants on [here [same name] as war system]. *Old [space name]* is built around the old starport. When it fell into disrepair in the [upheaval|troubles|civil war|dark times], it was abandoned and in recent years *New [same space name]* was built around the new starport. There is quite some rivalry, of course.
 1,<p>The town of [same name] sprawls around the starport, housing around [twenty|fourty|fifty|sixty|eighty|ninety] thousand people.
 
 ;population-5
@@ -463,20 +457,27 @@
 ;population-A
 1,<p>Several dozen billion people live on the planet.
 
+;science person
+1,zoologist
+1,botanist
+1,chemist
+1,weapon researcher
+1,nuclear physicist
+1,xenobiologist
+1,astrophysicist
+1,geologist
+1,quantum field researche
+1,background radiation researcher
+1,solar dynamics researcher
+1,planetologist
+1,palaeontologist
+1,archaeologist
+1,xenoarcheologist
+1,historian
+1,mathematician
+
 ;science people
-1,zoologists
-1,botanists
-1,chemists
-1,weapon researchers
-1,nuclear physicists
-1,xenobiologists
-1,astrophysicists
-1,geologists
-1,quantum field researches
-1,background radiation researchers
-1,solar dynamics researchers
-1,planetologists
-1,xenoarcheologists
+1,[science person]s
 
 # Government interacts with population. Government is
 # 2d6-7+population. Thus, population-0 can still result in
@@ -489,22 +490,103 @@
 1,<p>While unsettled, the system is claimed as a protectorate by *[nearby big port]*. Nobody cares about that, however.
 
 ;government-0
-1,<p>There is no government to speak of. The family is the highest good, here. Marriages are alliance contracts. If you’re not connected to the right people, things are difficult.
-1,<p>This is an anarchist society. Networks of family relations and informal obligations regulate public life. Getting things done requires a lot of legwork.
-1,<p>This is an anarcho-collectivist society. Property is collectively owned outside starports. Profit is illegal.
-1,<p>This is an anarcho-communist society. A gift-economy is used to regulate obligations. Profit is illegal. No wages are earned.
-1,<p>This is an anarcho-syndicalist society. All economic activity is organised in small-scale cooperatives.
-1,<p>The original settlers were anarcho-primitivists and people still live far apart from each other, all trying to live as independently as possible.
+1,<p>There is no government to speak of. The family is the highest good, here. Marriages are alliance contracts. If you’re not connected to the right people, things are difficult. [anarchist people]
+1,<p>This is an anarchist society. Networks of family relations and informal obligations regulate public life. Getting things done requires a lot of legwork. [anarchist people]
+1,<p>This is an anarcho-collectivist society. Property is collectively owned outside starports. Profit is illegal. [anarchist people]
+1,<p>This is an anarcho-communist society. A gift-economy is used to regulate obligations. Profit is illegal. No wages are earned. [anarchist people]
+1,<p>This is an anarcho-syndicalist society. All economic activity is organised in small-scale cooperatives. [anarchist people]
+1,<p>The original settlers were anarcho-primitivists and people still live far apart from each other, all trying to live as independently as possible. [anarchist people]
+
+;anarchist people
+1,<p>Some people you might find here: <ul><li>**[with anarchist job]** [person], [anarchist skill]-1<li>**[and anarchist job]** [person], [anarchist skill]-1<li>**[and anarchist job]** [person], [anarchist skill]-1<li>**[and anarchist job]** [person]</ul>
+1,<p>Some people with connections: <ul><li>**[with anarchist job]** [person], [anarchist skill]-1<li>**[and anarchist job]** [person], [anarchist skill]-1<li>**[and anarchist job]** [person], [anarchist skill]-1<li>**[and anarchist job]** [person]<li>**[and anarchist job]** [person]</ul>
+
+;anarchist job
+1,singer
+1,writer
+1,poet
+1,actor
+1,farmer
+1,maker
+1,operator
+1,baker
+1,cook
+1,teacher
+1,cleaner
+1,designer
+1,fabricator
+1,hunter
+
+;anarchist skill
+4,Jack-o-T
+3,Computer
+2,Streetwise
+1,Mechanical
+1,Streetwise
+1,Electronic
+1,[blade combat]
+1,[gun combat]
 
 ;population-0 government-1
 1,<p>While unsettled, the system is claimed as a by *[company name]* from *[nearby big port]*. Economic activity without a permit draws their ire.
 1,<p>While unsettled, the system is claimed as a by *[company name]* from *[nearby big port]*. Economic activity is allowed within a 50:50 sharing agreement. Almost nobody is willing to accept this deal, however. Workarounds exist.
 
+;population-1 government-1
+1,<p>The entire colony is incorporated as the *[same company name]*. There simply is no alternative, but it’s not so bad. [small company people]
+1,<p>*[same company name]* owns everything, here: all the buildings, all the jobs, the company shop, and the bar, the *[bar]*. Everyone is indebted to the company. [small company people] [bar people]
+
 ;government-1
-1,<p>The society is ruled by a number of mega-corporations, the biggest of which is *[company name]*. People are unhappy because the near system-wide monopoly on all civil cervices has given rise to increased rent-seeking. There are service fees to be paid for everything. This is seen as an inherently unfair head tax by many and *[human name]* (not their real name) is trying to organise a reform from the shadows.
-1,<p>The society is ruled by a number of mega-corporations, with *[with company name]* and *[and company name]* being the biggest ones. Competition has driven down prices, but corporate power has also made sure that everything has a price, including air and water. To them, anything without a price is worthless, or there for the taking.
-1,<p>This is a mercantilist society, where the state is run by the *[company name]* company for the benefit of all. This is only a problem for those not found in their registries: new arrivals, refugees, illegals, people avoiding the benevolent surveillance. 
-1,<p>This is a late stage capitalist society, where everything has been privatised; the state and the *[company name]* company are essentially the same and everybody is being exploited. The locals don’t know how to organise themselves: if somebody were to oppose this corporatism, how would they live and breathe without a company to pay for it? How would their voice get heard without owning media channels and public relation channels? It is inconceivable to succeed outside their system, they say.
+1,<p>The society is ruled by a number of mega-corporations, the biggest of which is *[company name]*. People are unhappy because the near system-wide monopoly on all civil cervices has given rise to increased rent-seeking. There are service fees to be paid for everything. This is seen as an inherently unfair head tax by many and *[human name]* (not their real name) is trying to organise a reform from the shadows. [company people]
+1,<p>The society is ruled by a number of mega-corporations, with *[with company name]* and *[and company name as second company name]* being the biggest ones. Competition has driven down prices, but corporate power has also made sure that everything has a price, including air and water. To them, anything without a price is worthless, or there for the taking. [small company people] [second small company people]
+1,<p>This is a mercantilist society, where the state is run by the *[company name]* company for the benefit of all. This is only a problem for those not found in their registries: new arrivals, refugees, illegals, people avoiding the benevolent surveillance. [company people]
+1,<p>This is a late stage capitalist society, where everything has been privatised; the state and the *[company name]* company are essentially the same and everybody is being exploited. The locals don’t know how to organise themselves: if somebody were to oppose this corporatism, how would they live and breathe without a company to pay for it? How would their voice get heard without owning media channels and public relation channels? It is inconceivable to succeed outside their system, they say. [company people]
+
+;small company people
+1,<p>Some people working at *[same company name]*: <ul><li>**[with company job]** [person]<li>**[and company job]** [person]</ul>
+1,<p>Some people working at *[same company name]*: <ul><li>**[with company job]** [person]<li>**[and company job]** [person]<li>**[and company job]** [person]</ul>
+
+;second small company people
+1,<p>Some people working at *[same second company name]*: <ul><li>**[with company job]** [person]<li>**[and company job]** [person]</ul>
+1,<p>Some people working at *[same second company name]*: <ul><li>**[with company job]** [person]<li>**[and company job]** [person]<li>**[and company job]** [person]</ul>
+
+;company people
+1,<p>Some people working at *[same company name]*: <ul><li>**[with company job]** [person]<li>**[and company job]** [person]<li>**[and company job]** [person]<li>**[and company job]** [person]</ul>
+1,<p>Some people working at *[same company name]*: <ul><li>**[with company job]** [person]<li>**[and company job]** [person]<li>**[and company job]** [person]<li>**[and company job]** [person]<li>**[and company job]** [person]</ul>
+
+;company job
+1,chief [executive|financial|security|information|space] officer
+1,[head of the board|board member]
+1,head of [security|engineering|sales|training|communication|logistics]
+1,[security|engineering|medical] [manager|officer]
+1,[project|sales|sanitation] manager
+1,programmer
+1,clerk
+1,secretary
+1,engineer
+1,supervisor
+1,writer
+1,data scientist
+1,harbour master
+1,cleaner
+1,epidemiologist
+1,technician
+1,cook
+
+;bar people
+1,<p>Some people you might find at the *[same bar]*: <ul><li>**[with bar job]** [person]<li>**[and bar job]** [person]</ul>
+1,<p>Some people you might find at the *[same bar]*: <ul><li>**[with bar job]** [person]<li>**[and bar job]** [person]<li>**[and bar job]** [person]</ul>
+
+;bar job
+1,owner
+1,servant
+1,dancer
+1,regular
+1,headhunter
+1,gambler
+1,undercover cop
+1,actor
+1,student
+1,[science person]
 
 ;population-0 government-2
 1,<p>While unsettled, there’s an old satellite system still in operation that provides a forum for visitors. A bunch of ship captains calling themselves the *[here system friends as association of captains]* uses the forum to deliberate on rare policy decisions and enforces them, using the surveillance systems of satellite network to identify trespassers. No [mining|hunting|landing] on [same name]!
@@ -577,16 +659,61 @@
 1,<p>Society has splintered into various group, each trying to live according to slightly different rules. In order to allow for this, an elaborate system of [labels|rituals] and [traditions|organisations] has been set up such that each person can be ruled according to their allegiance. The entire system is controlled by a caste of [programmers|administrators|tech wizards|government service providers]. It all sounds very benevolent until you find that it’s hard to switch your allegiance – and then it dawns on you that you’re living in a feudal technocracy.
 
 ;government-6
-1,<p>This is a colony of the *[nearby big port]*. The local [administration|puppet government] is led by the *[human name]*. The locals are squeezed for all they’re worth and suffer. The [rebellion|resistance] is gaining power, led by the charismatic *[human name]*. There is going to be violence, soon. 
-1,<p>This is a colony of the *[nearby big port]*. The local [administration|puppet government] is led by the *[human name]*. The parent system has been subsidising all the recent developments, but money is starting to run out. They are no longer willing to fund the colony and *[same human name]* is struggling to prepare the locals for independence. Should the transition fail, all hell is going to break loose.
-1,<p>In a recent conflict with *[nearby big port]*, the entire local government was replaced by a new administration more [amenable|agreeable] to the victors. The leader of the new administration is *[human name]*, [acquiescent|submissive] and quick to say that now is the time to [forgive and forget|make amends], not to seek revenge for fear of reprisals.
-1,<p>When terrorists on *[nearby big port]* turned out to be from *[same name]*, it didn’t take long before the navy showed up, overthrew the old order on [same name], and installed a puppet government, currently led by *[human name]*. Curfews, patrols, interrogations, allegations of torture, and occasional revelations thereof provide fertile grounds for more shootings, more bombs, more assassinations. These are bad times.
+1,<p>This is a colony of the *[nearby big port]*. The local [administration|puppet government] is led by **[colonizer title]** [person]. The locals are squeezed for all they’re worth and suffer. The [rebellion|resistance] is gaining power, led by the charismatic [person]. There is going to be violence, soon. [rebellion people]
+1,<p>This is a colony of the *[nearby big port]*. The local [administration|puppet government] is led by **[colonizer title]** [person]. The parent system has been subsidising all the recent developments, but money is starting to run out. They are no longer willing to fund the colony and *[same human name]* is struggling to prepare the locals for independence. Should the transition fail, all hell is going to break loose. [rebellion people]
+1,<p>In a recent conflict with *[nearby big port]*, the entire local government was replaced by a new administration more [amenable|agreeable] to the victors. The leader of the new administration is **[colonizer title]** [person], [acquiescent|submissive] and quick to say that now is the time to [forgive and forget|make amends], not to seek revenge for fear of reprisals. [rebellion people]
+1,<p>When terrorists on *[nearby big port]* turned out to be from *[same name]*, it didn’t take long before the navy showed up, overthrew the old order on [same name], and installed a puppet government, currently led by **[colonizer title]** [person]. Curfews, patrols, interrogations, allegations of torture, and occasional revelations thereof provide fertile grounds for more shootings, more bombs, more assassinations. These are bad times. [rebellion people]
+
+;colonizer title
+1,administrator
+1,burgrave
+1,captain
+1,commander
+1,custodian
+1,director
+1,exarch
+1,governor
+1,guardian
+1,principal
+1,shepherd
+1,tetrarch
+1,viceroy
+1,warden
+
+;rebellion people
+1,<p>Some people involved in recent events: <ul><li>**[with rebellion job]** [person]<li>**[and rebellion job]** [person]<li>**[and rebellion job]** [person]<li>**[and rebellion job]** [person]</ul>
+1,<p>Some people involved in recent events: <ul><li>**[with rebellion job]** [person]<li>**[and rebellion job]** [person]<li>**[and rebellion job]** [person]<li>**[and rebellion job]** [person]<li>**[and rebellion job]** [person]</ul>
+
+;rebellion job
+1,cop
+1,undercover cop
+1,secret police
+1,agent provocateur
+1,detective
+1,journalist
+1,observer
+1,desperate parent
+1,confused
+1,student
+1,servant
+1,clerk
+1,soldier
+1,security officer
+1,militia
+1,terrorist
+1,thief
+1,priest
+1,demonstrator
+1,activist
+1,civilian
+1,victim
+1,spectator
 
 ;government-7
 1,<p>The system has fallen apart into multiple polities: each urban centre claiming sovereignty, involved in border disputes, internal squabbles, unable to deal with the imperial order in the subsector. The starport falls within the sphere of influence of *[space name]*. It’s a mess.
 1,<p>The system was settled in different places at different times. The initial phase was rough and there never developed any cohesion. Now the system is balkanized, with the local governments appealing each to their rich past, unwilling to give up any privileges. The starport is controlled by the *[space name]*. It’s tricky.
-1,<p>After the recent upheavals and the ensuing civil war, the system has splintered into different groups, each led by a warlord. [warlord situation] The starport is controlled by warlord *[human name]*.
-1,<p>The system is balkanized but stable. Many smaller states have fought cruel wars to create the illusion of a homogeneous local population. With this goal attained and stabilised using propaganda and the self-interests of the elite, things won’t be changing any time soon. This also makes the system easy prey for imperial actors, obviously. The starport is built in the *[space name]* region.
+1,<p>After the recent upheavals and the ensuing civil war on [here [same name] as war system], the system has splintered into different groups, each led by a warlord. [warlord situation] The starport is controlled by warlord *[human name]*.
+1,<p>The [here [same name] as war system] system is balkanized but stable. Many smaller states have fought cruel wars to create the illusion of a homogeneous local population. With this goal attained and stabilised using propaganda and the self-interests of the elite, things won’t be changing any time soon. This also makes the system easy prey for imperial actors, obviously. The starport is built in the *[space name]* region.
 
 ;warlord situation
 1,There’s peace right now, and negotiations are ongoing.
@@ -595,10 +722,10 @@
 1,There’s peace right now but all the warlords are hiring military specialists so the outlook is dim.
 
 ;government-8
-1,<p>The civil service bureaucracy on [same name] has served the population well: through all the ups and downs of recent decades, the unchanging civil service exams make sure that the ranks of government are filled with competent experts. People study long and hard when they’re young, which makes for good candidates, but it also takes its toll: drop outs end up with lousy jobs. Depression and suicides are common. The [worst of the lot|most prestigious institution] is the *[civil service institution]*.
-1,<p>The state maintains elite civil service institutes to train its next generation of civil servants. This has served the population well: through all the ups and downs of recent decades, the unchanging civil service exams make sure that the ranks of government are filled with competent experts. People study long and hard when they’re young, which makes for good candidates, but it also takes its toll: drop outs end up with lousy jobs; depression and suicides are common. The [worst of the lot|most prestigious institution] is the *[civil service institution]*.
-1,<p>Every young citizen on [same name] spends two years in the civil service. On the one hand, this means that you find trainees on all levels of government. On the other hand, this means citizens all know what it’s like to work inside the government. The best administrators stay and make their careers in government. There is a lot of grumbling about those two years, but there is also a lot of pride. The [most prestigious institution|the harshest one ] is the *[civil service institution]*.
-1,<p>The influence of the empire comes and goes. What keeps the government running is the civil service bureaucracy. Everything of strategic importance is run by the state: the postal services, transportation networks, markets, construction, the energy sector. Things are slow to change because all important changes haven through the political system. On the other hand, people feel that resources are allocated fairly. The [most prestigious one is|current members of government all met at] the *[civil service institution]*.
+1,<p>The civil service bureaucracy on [same name] has served the population well: through all the ups and downs of recent decades, the unchanging civil service exams make sure that the ranks of government are filled with competent experts. People study long and hard when they’re young, which makes for good candidates, but it also takes its toll: drop outs end up with lousy jobs. Depression and suicides are common. The [worst of the lot|most prestigious institution] is the *[civil service institution]*. [civil service institution people]
+1,<p>The state maintains elite civil service institutes to train its next generation of civil servants. This has served the population well: through all the ups and downs of recent decades, the unchanging civil service exams make sure that the ranks of government are filled with competent experts. People study long and hard when they’re young, which makes for good candidates, but it also takes its toll: drop outs end up with lousy jobs; depression and suicides are common. The [worst of the lot|most prestigious institution] is the *[civil service institution]*. [civil service institution people]
+1,<p>Every young citizen on [same name] spends two years in the civil service. On the one hand, this means that you find trainees on all levels of government. On the other hand, this means citizens all know what it’s like to work inside the government. The best administrators stay and make their careers in government. There is a lot of grumbling about those two years, but there is also a lot of pride. The [most prestigious institution|the harshest one ] is the *[civil service institution]*. [civil service institution people]
+1,<p>The influence of the empire comes and goes. What keeps the government running is the civil service bureaucracy. Everything of strategic importance is run by the state: the postal services, transportation networks, markets, construction, the energy sector. Things are slow to change because all important changes haven through the political system. On the other hand, people feel that resources are allocated fairly. The [most prestigious one is|current members of government all met at] the *[civil service institution]*. [civil service institution people]
 
 ;civil service institution
 1,[Ministry|Institute|University|School] of [civil service topic]
@@ -630,21 +757,152 @@
 1,Philosophy
 1,Theology
 
+;civil service institution people
+1,<p>Some people involved at the *[same civil service institution]*: <ul><li>**[with civil service institution job]** [person], [bureaucracy skill]-1<li>**[and civil service institution job]** [person], [bureaucracy skill]-1<li>**[and civil service institution job]** [person], [bureaucracy skill]-1<li>**[and civil service institution job]** [person]</ul>
+1,<p>Some people involved at the *[same civil service institution]*: <ul><li>**[with civil service institution job]** [person], [bureaucracy skill]-1<li>**[and civil service institution job]** [person], [bureaucracy skill]-1<li>**[and civil service institution job]** [person], [bureaucracy skill]-1<li>**[and civil service institution job]** [person]<li>**[and civil service institution job]** [person]</ul>
+
+;civil service institution job
+1,clerk
+1,administrator
+1,bureaucrat
+1,overseer
+1,planner
+1,controller
+1,professor of [same civil service field of knowledge]
+1,teacher
+1,secretary
+1,dean
+1,department head
+1,head of [reporting|statistics|logistics|science|public relations|sanitation]
+1,project manager
+1,team leader
+1,student
+1,intern
+1,journalist
+1,cook
+1,mechanic
+1,engineer
+1,union leader
+1,union member
+
 ;government-9
-1,<p>The impersonal bureaucracy of [same name] is a meat grinder. More than two dozen ministries run the state; more than three dozen secret services monitor communications and commerce. The rules contradict each other, the laws are different on all three levels of the state; precedents are important but access to the law is restricted. If you’re investigated by the state, you’ll always be in infraction of some rule or another. Everything is labyrinthine and nepotism is the only way to assure things actually work, at least occasionally. The [worst of them all is the|breeding ground for all this corruption is the all-mighty] *[civil service institution]*.
-1,<p>The codes and laws governing [same name] have remained unchanged for centuries. New directives are piled on old ones, executive orders partially overturn some rules but not other. The court system is huge and lawyers are the most important human resources for everybody. Taxation is fairly low but court fees are unavoidable and significant.
-1,<p>Professional politicians are elected into government and hardly ever leave. This encourages them to promise whatever is necessary at the beginning but soon “The Game” begins, jockeying for positions, forming and betraying alliances, backstabbing. Should some clueless soul such as *[human name]* most recently decide to stand for office with the stated intent of “cleaning up” they’ll soon find themselves inundated in accusations of molestation, bribery, and incompetence; and if that doesn’t help, organised crime is going to break into their homes, kidnap their family members, kill their pets.
-1,<p>The central government ordains what is to be done, the local branches of government follow orders or are replaced. The machinations in the centre of power are inscrutable and it doesn’t matter who you vote for, the result is always the same. And yet, it somehow works. Occasionally there are strikes, and the burning of trash and disruption of commerce, but then everything calms down again and business as usual resumes. The local governor responsible for the starport is *[human name]*. Follow orders is their core competency.
+1,<p>The impersonal bureaucracy of [same name] is a meat grinder. More than two dozen ministries run the state; more than three dozen secret services monitor communications and commerce. The rules contradict each other, the laws are different on all three levels of the state; precedents are important but access to the law is restricted. If you’re investigated by the state, you’ll always be in infraction of some rule or another. Everything is labyrinthine and nepotism is the only way to assure things actually work, at least occasionally. The [worst of them all is the|breeding ground for all this corruption is the all-mighty] *[civil service institution]*. [bureaucracy people] [civil service institution people]
+1,<p>The codes and laws governing [same name] have remained unchanged for centuries. New directives are piled on old ones, executive orders partially overturn some rules but not other. The court system is huge and lawyers are the most important human resources for everybody. Taxation is fairly low but court fees are unavoidable and significant. [bureaucracy people]
+1,<p>Professional politicians are elected into government and hardly ever leave. This encourages them to promise whatever is necessary at the beginning but soon “The Game” begins, jockeying for positions, forming and betraying alliances, backstabbing. Should some clueless soul such as *[human name]* most recently decide to stand for office with the stated intent of “cleaning up” they’ll soon find themselves inundated in accusations of molestation, bribery, and incompetence; and if that doesn’t help, organised crime is going to break into their homes, kidnap their family members, kill their pets. [bureaucracy people]
+1,<p>The central government ordains what is to be done, the local branches of government follow orders or are replaced. The machinations in the centre of power are inscrutable and it doesn’t matter who you vote for, the result is always the same. And yet, it somehow works. Occasionally there are strikes, and the burning of trash and disruption of commerce, but then everything calms down again and business as usual resumes. The local governor responsible for the starport is *[human name]*. Following orders is their core competency. [bureaucracy people]
+
+;bureaucracy people
+1,<p>Some people involved in the bureaucracy running [same name]: <ul><li>**[with bureaucracy job]** [person], [bureaucracy skill]-1<li>**[and bureaucracy job]** [person], [bureaucracy skill]-1<li>**[and bureaucracy job]** [person], [bureaucracy skill]-1<li>**[and bureaucracy job]** [person]</ul>
+1,<p>Some people involved in the bureaucracy of [same name]: <ul><li>**[with bureaucracy job]** [person], [bureaucracy skill]-1<li>**[and bureaucracy job]** [person], [bureaucracy skill]-1<li>**[and bureaucracy job]** [person], [bureaucracy skill]-1<li>**[and bureaucracy job]** [person]<li>**[and bureaucracy job]** [person]</ul>
+
+;bureaucracy job
+1,clerk
+1,administrator
+1,bureaucrat
+1,overseer
+1,planner
+1,forecaster
+1,controller
+1,head of [reporting|statistics|mathematics|logistics|transportation|public constructions]
+1,project manager
+1,[youth|team] leader
+1,enforcer
+1,secret agent
+1,secret police
+1,detective
+1,cop
+
+;bureaucracy skill
+3,Admin
+2,Bribery
+2,Forgery
+1,[common other skill]
 
 ;government-A
-5,<p>This system is ruled by *[human name]*, a charismatic dictator. They got to power on a platform of [order|unity|fiscal discipline] and [development|progress|prosperity], and they promised to [fight corruption|break up the monopolies|enact land reform|tax the rich|find work for the young|introduce universal basic income|reform the system|regain former military glory]. [popular support]
-1,<p>This system is ruled by *[human name]*, a charismatic dictator. They deposed the old government after they had failed to put down a rebellion and got dragged into a civil war. *[same human name]* cleaned up the mess, put down the rebellion, initiated the necessary reforms, and finally deposed the government as well. [popular support]
-1,<p>The twenty year plans elaborated by the colleges of statecraft and economy are adhered to in exacting ways, for complex networks of informants, controllers and consultants produce a steady churn of promotions and demotions based on goal achievement with respect to “The Plan”. It is more important to follow the plan than to solve actual problems for the locals. The only way this is made bearable is a complex network of shadow markets and informal ties.
-1,<p>Old computer networks control production and distribution; the operators and programmers are servants of the system and nobody really understands the byzantine routes the logistic optimiser produces. In the end, it all works out somehow and since everybody is afraid of a breakdown, all resources are invested into maintenance and extension of the existing system, even though nobody really understands it.
+5,<p>This system is ruled by *[human name]*, a charismatic dictator. They got to power on a platform of [order|unity|fiscal discipline] and [development|progress|prosperity], and they promised to [fight corruption|break up the monopolies|enact land reform|tax the rich|find work for the young|introduce universal basic income|reform the system|regain former military glory]. [popular support] [dictatorship people]
+1,<p>This system is ruled by *[human name]*, a charismatic dictator. They deposed the old government after they had failed to put down a rebellion and got dragged into a civil war.[store [same name] as war system] *[same human name]* cleaned up the mess, put down the rebellion, initiated the necessary reforms, and finally deposed the government as well. [popular support] [dictatorship people]
+1,<p>The twenty year plans elaborated by the colleges of statecraft and economy are adhered to in exacting ways, for complex networks of informants, controllers and consultants produce a steady churn of promotions and demotions based on goal achievement with respect to “The Plan”. It is more important to follow the plan than to solve actual problems for the locals. The only way this is made bearable is a complex network of shadow markets and informal ties. [shadow people]
+1,<p>Old computer networks control production and distribution; the operators and programmers are servants of the system and nobody really understands the byzantine routes the logistic optimiser produces. In the end, it all works out somehow and since everybody is afraid of a breakdown, all resources are invested into maintenance and extension of the existing system, even though nobody really understands it. [programmer people]
 
 ;popular support
 1,They are riding a wave of popular support, for now.
 1,The underlying causes are far from resolved, however.
+
+;dictatorship people
+1,<p>Some people involved in the dictatorship: <ul><li>**[with dictatorship job]** [person], [bureaucracy skill]-1<li>**[and dictatorship job]** [person], [bureaucracy skill]-1<li>**[and dictatorship job]** [person], [bureaucracy skill]-1<li>**[and dictatorship job]** [person]</ul>
+1,<p>Some people involved in the dictatorship: <ul><li>**[with dictatorship job]** [person], [bureaucracy skill]-1<li>**[and dictatorship job]** [person], [bureaucracy skill]-1<li>**[and dictatorship job]** [person], [bureaucracy skill]-1<li>**[and dictatorship job]** [person]<li>**[and dictatorship job]** [person]</ul>
+
+;dictatorship job
+1,clerk
+1,administrator
+1,overseer
+1,planner
+1,controller
+1,head of [reporting|statistics|mathematics|logistics|transportation|public constructions|incarceration]
+1,[prison|project|reeducation camp|education campaign] manager
+1,[youth|team|precinct] leader
+1,enforcer
+1,secret agent
+1,secret police
+1,detective
+1,cop
+1,undercover cop
+1,warden
+1,jailer
+1,armed guard
+1,union buster
+1,<span title="torturer">interrogation specialist</span>
+
+;shadow people
+1,<p>Some people involved in the shadow hierarchy: <ul><li>**[with shadow job]** [person], [shadow skill]-1<li>**[and shadow job]** [person], [shadow skill]-1<li>**[and shadow job]** [person], [shadow skill]-1<li>**[and shadow job]** [person]</ul>
+1,<p>Some people involved in the shadow hierarchy: <ul><li>**[with shadow job]** [person], [shadow skill]-1<li>**[and shadow job]** [person], [shadow skill]-1<li>**[and shadow job]** [person], [shadow skill]-1<li>**[and shadow job]** [person]<li>**[and shadow job]** [person]</ul>
+
+;shadow job
+1,project manager
+1,team leader
+1,guide
+1,bureaucrat
+1,enforcer
+1,secret agent
+1,smuggler
+1,facilitator
+1,crook
+1,fence
+1,thief
+1,extortionist
+1,teacher
+1,martial artist
+1,swindler
+1,actor
+1,musician
+1,scrounger
+
+;shadow skill
+3,Admin
+1,Computer
+1,Bribery
+1,Forgery
+1,Streetwise
+1,[common other skill]
+
+;programmer people
+1,<p>Some people involved in the hierarchy: <ul><li>**[with programmer job]** [person], [programmer skill]-1<li>**[and programmer job]** [person]<li>**[and programmer job]** [person], [programmer skill]-1<li>**[and programmer job]** [person]</ul>
+1,<p>Some people involved in the hierarchy: <ul><li>**[with programmer job]** [person], [with programmer skill]-1, [and programmer skill]-1<li>**[and programmer job]** [person], [programmer skill]-1<li>**[and programmer job]** [person], [programmer skill]-1<li>**[and programmer job]** [person]<li>**[and programmer job]** [person]</ul>
+1,<p>Some people involved in the hierarchy: <ul><li>**[with programmer job]** [person], [with programmer skill]-2, [and programmer skill]-1<li>**[with programmer job]** [person], [with programmer skill]-1, [and programmer skill]-1<li>**[and programmer job]** [person], [programmer skill]-1<li>**[and programmer job]** [person], [programmer skill]-1<li>**[and programmer job]** [person]<li>**[and programmer job]** [person]</ul>
+
+;programmer job
+1,chief [economic|information] officer
+1,programming director
+1,head [of assignments|of programming|of planning|bureaucrat|of administration|of testing]
+1,[logistics|project|team|network|test] manager
+1,[computing|programming|procedural] clerk
+1,[system|software|network|test|integration] engineer
+1,[delivery|software|information|solution] architect
+
+;programmer skill
+3,Computer
+2,Admin
+1,[common other skill]
 
 ;government-B
 1,<p>When *[human name]* passed away, [their protege|the vice chancellor|the vice president|the senate head] *[human name]* took over and tried to [uphold the old order|live up to their predecessor’s legacy|institute smaller reforms], but they lack charisma and slowly popular support has been eroding.
@@ -948,13 +1206,33 @@
 # Bases
 
 ;naval
-1,<p>There is a **naval base** called *[here naval base name]* in the system under **commander** *[here upcoming as navy captain]*, [smart upp], [with smart navy skill]-2 [and smart navy skill]-2 [and smart navy skill]-1 [and smart navy skill]-1 [and smart navy skill]-1 [and smart navy skill]-1 [and smart navy skill]-1. [navy squad at the base]
-1,<p>There is a **naval base** called *[here naval base name]* in the system under **captain** *[here upstart as navy captain]*, [smart upp], [with smart navy skill]-3 [and smart navy skill]-2 [and smart navy skill]-2 [and smart navy skill]-1 [and smart navy skill]-1 [and smart navy skill]-1 [and smart navy skill]-1 [and smart navy skill]-1. [navy squad at the base]
+1,<p class="sidebar">Pre-generated squads are in the <a href="#navy">appendix</a>.<p>There is a **naval base** called *[here naval base name]* with about [1d10x10+100] people in the system. [navy base people]
 
 ;naval base name
 1,[mythical beast]-[1d9]
 1,[All|United] [mythical beast]s
 3,[Glorious|Victorious|Superior|Terrible|Furious|Angry] [mythical beast][|s]
+
+;mythical beast
+# must allow plural with an s
+1,Dragon
+1,Minotaur
+1,Hydra
+1,Chimera
+1,Ettin
+1,Giant
+1,Ogre
+1,Goblin
+1,Giant Eagle
+1,Orc
+1,Wizard
+1,Warlock
+1,Sorcerer
+1,Cyclop
+
+;navy base people
+1,<p>Some people at the base:<ul><li>**commander** *[here upcoming as navy captain]* ([symbol]), [smart upp], [with smart navy skill]-2 [and smart navy skill]-2 [and smart navy skill]-1 [and smart navy skill]-1 [and smart navy skill]-1 [and smart navy skill]-1 [and smart navy skill]-1<li>**harbour master** [person], Admin-2, [navy skills]<li>**[with navy job]** [person], [navy skills], Admin-1<li>**[and navy job]** [person], [bureaucracy skill]-1</ul>
+1,<p>Some people at the base:<ul><li>**captain** *[here upstart as navy captain]* ([symbol]), [smart upp], [with smart navy skill]-3 [and smart navy skill]-2 [and smart navy skill]-2 [and smart navy skill]-1 [and smart navy skill]-1 [and smart navy skill]-1 [and smart navy skill]-1 [and smart navy skill]-1<li>**harbour master** [person], Admin-2, [navy skills]<li>**[with navy job]** [person], [navy skills], Admin-1<li>**[and navy job]** [person], [bureaucracy skill]-1</ul>
 
 ;upcoming
 # modeled on [human name]
@@ -1002,34 +1280,22 @@
 2,[store C as soc][baron]
 1,[store C as soc][baron]
 
-;mythical beast
-# must allow plural with an s
-1,Dragon
-1,Minotaur
-1,Hydra
-1,Chimera
-1,Ettin
-1,Giant
-1,Ogre
-1,Goblin
-1,Giant Eagle
-1,Orc
-1,Wizard
-1,Warlock
-1,Sorcerer
-1,Cyclop
-
-;navy squad at the base
-1, There are about [1d10x10+100] people at the base right now. If you need individuals, pick from the following squad led by [navy lieutenant]; [navy personnel]; [navy personnel]; [navy personnel]; [navy personnel]; [navy personnel]; [navy personnel]; [navy personnel].
+;navy job
+1,clerk
+1,team manager
+1,head of [shipping|logistics|repairs|security|transportation|space elevator operations|port operations|refuelling]
+1,security officer
+1,maintenance manager
+1,refuelling manager
 
 ;scout
-1,<p>There is a **scout base** called *[here scout base name]* in the system. The current crew is small. [scout base crew] All who served here end up joining the *[here scout base friends as association of captains]*. [scout base mission]
+1,<p>There is a **scout base** called *[here scout base name]* in the system. [scout base crew]<p>All who served here end up joining the *[here scout base friends as association of captains]*. [scout base mission]
 
 ;scout base crew
-1,The only person on duty is **commander** *[human name as base commander]*, [smart upp], [smart scout skills].
-1,The **commander** is *[human name as base commander]*, [smart upp], [smart scout skills]. Their **partner** is *[human name]*, [smart upp], [smart scout skills].
-1,The **commander** is *[human name as base commander]*, [smart upp], [smart scout skills]. Their **partner** is *[human name]*, [upp], [scout skills].
-1,The **commander** is *[human name as base commander]*, [smart upp], [smart scout skills]. Their **senior partner** in their team is *[human name]*, [upp], [scout skills]. Their **junior partner** is *[human name]*, [upp], [scout skills].
+1,<ul><li>**commander** *[human name as base commander]*, [smart upp], [smart scout skills]</ul>
+1,<ul><li>**commander** *[human name as base commander]*, [smart upp], [smart scout skills]<li>**partner** *[human name]*, [smart upp], [smart scout skills]</ul>
+1,<ul><li>**commander** *[human name as base commander]*, [smart upp], [smart scout skills]<li>**partner** *[human name]*, [upp], [scout skills]</ul>
+1,<ul><li>**commander** *[human name as base commander]*, [smart upp], [smart scout skills]<li>**senior partner** *[human name]*, [upp], [scout skills]<li>**junior partner** *[human name]*, [upp], [scout skills]</ul>
 
 ;scout base name
 1,[same name] [Observatory|Intelligence|Surveillance|Exploration|Mission|Uplift|Listening Post]
@@ -1093,15 +1359,32 @@
 1,The **crime boss** is *[here human name as crime boss]*, [smart upp], [smart other skills]. Their **right hand** is *[human name]*, [upp], [common other skills]. There are [2d6] more *criminals* in the building, 777777, Shotgun-1.
 
 ;rogue
-1,This **rogue** is *[here human name as rogue]*, [a criminal], [upp], [common other skills].
+1,*[here human name as rogue]*, is [a criminal], [upp], [common other skills].
 
 ;a criminal
 1,a crook
 1,a hustler
 1,an operator
 1,an activist
-1,a liar
+1,a [notorious|compulsive] liar
 1,a con artist
+1,a lookout
+1,a spy
+1,a foreign agent
+1,a revolutionary
+1,an anarchist
+1,a fascist
+1,an fraudster
+1,an extortionist
+1,a thief
+1,a drug dealer
+1,a small-arms dealer
+1,a thug for hire
+1,a hired thug
+1,a security operative
+1,a hacker
+1,an undercover agent
+1,a former paramilitary
 
 # there are just three crime syndicates
 ;crime syndicate
@@ -1252,30 +1535,15 @@
 ;streamlined ship
 5,[scout/courier]
 4,[free trader]
-3,[subsidized merchant]
-2,[patrol cruiser]
+3,[subsidized merchant from here]
+2,[patrol cruiser from here]
 1,[safari ship]
 
 ;unstreamlined ship
-4,[subsidized liner]
+4,[subsidized liner from here]
 3,[yacht]
 2,[mercenary cruiser]
 1,[laboratory ship]
-
-;ship at the starport
-2,<p>[append streamlined ship]The *[same ship name]* is currently being [ship activity] at the port.
-1,<p>[append streamlined ship]The *[same ship name]* is on one of the landing pads.
-
-;ship in orbit
-1,<p>[append ship]The *[same ship name]* is in orbit, [preparing to leave|having just arrived].
-1,<p>[append ship]The *[same ship name]* is approaching the system.
-1,<p>[append unstreamlined ship]The *[same ship name]* is being [ship activity] in orbit.
-
-;rich-end
-1,<p>[append subsidized liner]The *[same ship name]* is in orbit, [preparing to leave|having just arrived].
-1,<p>[append subsidized liner]The *[same ship name]* is approaching the system.
-1,<p>[append subsidized liner]The *[same ship name]* is being [ship activity] in orbit.
-3,
 
 ;ship activity
 5,refueled
@@ -1292,12 +1560,16 @@
 ;free trader
 1,<p>The *[here ship name]* is a **type A** free trader (200t, streamlined). This ship is limited to jump-1 and 1-G acceleration. [free trader ship crew]
 
-;subsidized merchant
+;subsidized merchant from here
 1,<p>The *[here ship name]* is a **type R** “fat trader” (400t, streamlined), subsidized by the *[nearby big port]* government. This ship is limited to jump-1. [subsidized merchant ship crew]
+
+;subsidized merchant
 1,<p>The *[here ship name]* is a **type R** “fat trader” (400t, streamlined), subsidized by the *[other big port]* government. This ship is limited to jump-1. [subsidized merchant ship crew]
 
-;subsidized liner
+;subsidized liner from here
 1,<p>The *[here mellow ship name as ship name]* is a **type M** subsidized liner (600t, unstreamlined), subsidized by the *[nearby big port]* government to transport passengers and freight along long-haul routes through the [same subsector] subsector. This ship supports jump-3. [subsidized liner ship crew]
+
+;subsidized liner
 4,<p>The *[here mellow ship name as ship name]* is a **type M** subsidized liner (600t, unstreamlined), subsidized by the *[other big port]* government to transport passengers and freight along long-haul routes through the [same subsector] subsector. This ship supports jump-3. [subsidized liner ship crew]
 
 ;yacht
@@ -1311,10 +1583,13 @@
 1,They just brought *[human noble]* and their entourage from *[nearby big port]* to retake their fiefdom and they sure could use some help. The rival [house and leader] will be arriving within a few days. Time to prepare!
 
 ;mercenary cruiser
-1,<p>The *[here martial ship name as ship name]* is a **type M** mercenary cruiser (800t, unstreamlined). [ship captain].<p>[squad].<p>[squad].<p>[squad].
+1,<p>The *[here martial ship name as ship name]* is a **type M** mercenary cruiser (800t, unstreamlined). [ship captain].<p>[mercenary squad].<p>[mercenary squad].<p>[mercenary squad].
+
+;patrol cruiser from here
+1,<p class="sidebar">Patron<p>The *[here martial ship name as ship name]* is a **type T** patrol cruiser (400t, streamlined). They hail all incoming ships: “This is captain *[here human name as ship captain]* of the patrol cruiser *[same ship name]* hailing all incoming ships. We are looking for information on the whereabouts of pirate *[nearby crime boss]*. Do not aid and abet them. Reward for their location: 5000 Cr. Reward for their capture, dead: 10000 Cr. Reward for their capture, alive: 20000 Cr.”<p>[patrol cruiser ship crew]
 
 ;patrol cruiser
-1,<p class="sidebar">Patron<p>The *[here martial ship name as ship name]* is a **type T** patrol cruiser (400t, streamlined). They hail all incoming ships: “This is captain *[here human name as ship captain]* of the patrol cruiser *[same ship name]* hailing all incoming ships. We are looking for information on the whereabouts of pirate *[nearby crime boss]*. Do not aid and abet them. Reward for their location: 5000 Cr. Reward for their capture, dead: 10000 Cr. Reward for their capture, dead: 20000 Cr.”<p>[patrol cruiser ship crew]
+1,<p>The *[here martial ship name as ship name]* is a **type T** patrol cruiser (400t, streamlined).<p>[patrol cruiser ship crew]
 
 ;laboratory ship
 1,<p>The *[here mellow ship name as ship name]* is a **type L** laboratory ship (400t, unstreamlined). [ship captain]
@@ -1458,8 +1733,12 @@
 # some guns are a sign of pirate activity!
 1,The **first gunner** is *[human name]*, [store Gunnery as extra skill][merchant upp and skills]. Their turret has a [beam laser|pulse laser] mounted. The **second gunner** is *[human name]*, [store Gunnery as extra skill][merchant upp and skills]. Their turret has a [beam laser|pulse laser|missile racks|sandcasters] mounted. The **third gunner** is *[human name]*, [store Gunnery as extra skill][merchant upp and skills]. Their turret has a [beam laser|pulse laser|missile racks|sandcasters] mounted.
 
-;squad
-1,[lieutenant]; [mercenary]; [mercenary]; [mercenary]; [mercenary]; [mercenary]
+;mercenary squad
+1,[lieutenant]; [mercenary]; [mercenary]; [mercenary]; [mercenary]; [mercenary]; [squad origin story]
+
+;squad origin story
+1,the story goes that the *[same squad name]* fought their first engagements back on *[other war system]*
+1,they trace their history back to the fighting on *[other war system]*
 
 ;lieutenant
 1,The **lance corporal** of the *[squad name]* is *[human name]*, [upp], [lieutenant skills]
@@ -1487,6 +1766,7 @@
 1,[common other skill]-1
 
 ;common other skill
+# no Computer, no Admin
 1,[vehicle skill]
 2,Gambling
 2,Brawling
@@ -1522,7 +1802,7 @@
 ;patrol cruiser ship crew
 # pilot, navigator, engineer, medic, steward, maybe a gunner
 # the ship captain name must already be decided
-1,The **pilot** of this ship is *[same ship captain]*, [store Pilot as extra skill][navy upp and skills]. The **navigator** is *[human name]*, [store Navigation as extra skill][navy upp and skills]. The **first engineer** is *[human name]*, [store Engineer as extra skill][navy upp and skills]. The **second engineer** is *[human name]*, [store Engineer as extra skill][navy upp and skills]. The **third engineer** is *[human name]*, [store Engineer as extra skill][navy upp and skills]. The **medic** is *[human name]*, [store Medical as extra skill][navy upp and skills]. The **first gunner** is *[human name]*, [store Gunnery as extra skill][navy upp and skills]. Their turret has a [beam laser|pulse laser] mounted. The **second gunner** is *[human name]*, [store Gunnery as extra skill][navy upp and skills]. Their turret has a [beam laser|pulse laser|missile racks|sandcasters] mounted. The **third gunner** is *[human name]*, [store Gunnery as extra skill][navy upp and skills]. Their turret has a [beam laser|pulse laser|missile racks|sandcasters] mounted. The **fourth gunner** is *[human name]*, [store Gunnery as extra skill][navy upp and skills]. Their turret has a [beam laser|pulse laser|missile racks|sandcasters] mounted. [maybe navy squad]
+1,The **pilot** of this ship is *[same ship captain]*, [store Pilot as extra skill][navy upp and skills]. The **navigator** is *[human name]*, [store Navigation as extra skill][navy upp and skills]. The **first engineer** is *[human name]*, [store Engineer as extra skill][navy upp and skills]. The **second engineer** is *[human name]*, [store Engineer as extra skill][navy upp and skills]. The **third engineer** is *[human name]*, [store Engineer as extra skill][navy upp and skills]. The **medic** is *[human name]*, [store Medical as extra skill][navy upp and skills]. The **first gunner** is *[human name]*, [store Gunnery as extra skill][navy upp and skills]. Their turret has a [beam laser|pulse laser] mounted. The **second gunner** is *[human name]*, [store Gunnery as extra skill][navy upp and skills]. Their turret has a [beam laser|pulse laser|missile racks|sandcasters] mounted. The **third gunner** is *[human name]*, [store Gunnery as extra skill][navy upp and skills]. Their turret has a [beam laser|pulse laser|missile racks|sandcasters] mounted. The **fourth gunner** is *[human name]*, [store Gunnery as extra skill][navy upp and skills]. Their turret has a [beam laser|pulse laser|missile racks|sandcasters] mounted.<p>[maybe navy squad]
 
 ;yacht crew
 1,The **pilot** of this ship is *[here human name as ship captain]*, [store Pilot as extra skill][merchant upp and skills]. The **engineer** is *[human name]*, [store Engineer as extra skill][merchant upp and skills]. The **steward** is *[human name]*, [store Steward as extra skill][merchant upp and skills]. The **medic** is *[human name]*, [store Medical as extra skill][merchant upp and skills]. [maybe a merchant gunner]
@@ -1546,6 +1826,7 @@
 4,[limited smart navy skill]-1
 
 ;limited navy skill
+# no Admin
 1,Ship’s Boat
 2,Vacc Suit
 1,Fwd Obsvr
@@ -1567,8 +1848,11 @@
 1,Admin
 
 ;maybe navy squad
-1,The ship also transports a navy squad of eight from *[nearby naval base name]* base: [navy lieutenant]; [navy personnel]; [navy personnel]; [navy personnel]; [navy personnel]; [navy personnel]; [navy personnel]; [navy personnel].
+1,The ship also transports a navy squad of eight from *[nearby naval base name]* base: [navy squad]
 1,
+
+;navy squad
+1,[navy lieutenant]; [navy personnel]; [navy personnel]; [navy personnel]; [navy personnel]; [navy personnel]; [navy personnel]; [navy personnel].
 
 ;navy personnel
 2,**private** *[human name]*, [upp], [with navy skill]-1 [and navy skill]-1 [and navy skill]-1
@@ -1791,6 +2075,14 @@
 1,dog
 
 ;martial animal
+1,wolf
+19,[regular martial animal]
+
+;martial animals
+1,wolves
+19,[regular martial animal]s
+
+;regular martial animal
 1,eagle
 1,hawk
 1,merlin
@@ -1806,8 +2098,13 @@
 1,cheetah
 # other carnivores
 1,hyena
-1,wolf
 1,python
+1,shark
+1,ray
+1,scorpion
+1,boar
+1,bear
+# if you add to this list, update the numbers above!
 
 ;weapon
 1,claw
@@ -1822,7 +2119,7 @@
 1,axe
 
 ;squad name
-1,[martial verb] [capitalize martial animal]
+1,[martial verb] [capitalize martial animals]
 
 ;martial verb
 1,Grinning
@@ -2522,7 +2819,11 @@
 1,worm
 1,slug
 
-# human names
+# humans
+
+;person
+# no skills
+1,*[human name]*, [upp]
 
 ;human name
 1,[nobility][african name] ([symbol])
@@ -13347,3 +13648,36 @@
 
 ;vocal
 1,[a|e|i|o|u]
+
+;appendix
+1,<h2 id="appendix">Appendix</h2>[rogues][squads][scouts][traders][patrol cruisers]
+
+;rogues
+1,<h3 id="rogues">Rogues</h3><p>These are the petty criminals and hustlers you’ll find everywhere in the subsector hanging around spaceports.<p>[rogue]<p>[rogue]<p>[rogue]<p>[rogue]<p>[rogue]<p>[rogue]<p>[rogue]<p>[rogue]<p>[rogue]<p>[rogue]<p>[rogue]<p>[rogue]<p>[rogue]<p>[rogue]<p>[rogue]<p>[rogue]<p>[rogue]<p>[rogue]<p>[rogue]<p>[rogue]
+
+;squads
+1,<h3 id="squads">Squads of soldiers</h3>[navy squads][mercenary squads]
+
+;navy squads
+1,<h4 id="navy">Navy Squads</h4><p>Navy personnel is trained in all sorts of technical and martial skills. They are used at navy bases and on space ships.<p>[navy squad]<p>[navy squad]<p>[navy squad]<p>[navy squad]<p>[navy squad]
+
+;mercenary squads
+1,<h4 id="mercenary">Mercenary Squads</h4><p>Mercenaries are trained in the use of weapons. Space ships bring them to their destination, and there they’ll fight. They’re not spacers, usually.<p>[mercenary squad].<p>[mercenary squad].<p>[mercenary squad].<p>[mercenary squad].<p>[mercenary squad].
+
+;scouts
+1,<h3 id="scouts">Scouts</h2><p>The small decommissioned scout ships provide a cheap pool of couriers, blockade runners, drug smugglers, spies, and agents.[scout/courier][scout/courier][scout/courier][scout/courier][scout/courier]
+
+;traders
+1,<h3 id="traders">Traders</h3>[free traders][fat traders][subsidized liners]
+
+;free traders
+1,<h4 id="free">Free Traders</h4><p>The free traders are lowest of the rung, working the outermost shipping lanes where margins are low, criminal activity abounds, and corruption is just another fact of life.[free trader][free trader][free trader][free trader][free trader]
+
+;fat traders
+1,<h4 id="fat">Fat Traders</h4><p>The “fat” traders are subsidized merchants.[subsidized merchant][subsidized merchant][subsidized merchant][subsidized merchant][subsidized merchant]
+
+;subsidized liners
+1,<h4 id="liner">Subsidized Liners</h4><p>The subsidized liners are even bigger and better. They have unstreamlined hulls and need an orbital spaceport (this excludes systems with class E starports, or no starport, i.e. X).[subsidized liner][subsidized liner][subsidized liner][subsidized liner][subsidized liner]
+
+;patrol cruisers
+1,<h3 id="patrol">Patrol Cruisers</h3><p>Patrol cruisers are used for inspections and to fight piracy.[patrol cruiser][patrol cruiser][patrol cruiser][patrol cruiser]

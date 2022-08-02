@@ -1,0 +1,59 @@
+type: object
+additionalProperties: false
+properties:
+  project:
+    type: object
+    additionalProperties: false
+    properties:
+      homepage:
+        type: [ string, 'null' ]
+        description: url of the project's homepage
+        examples:
+          - https://github.com/yanick/app-changelord
+      name:
+        type: [ 'null', string ]
+        description: name of the project
+        examples:
+          - App::Changelord
+      ticket_url:
+        type: string
+        description: perl code that takes a ticket string (e.g. 'GH123') via the `$_` variable and turns it into a link.
+        examples:
+          - s!GH(\d+)!https://github.com/yanick/App-Changelord/issue/$1/
+          - /^\d+$/ ? "https://.../$_" : undef
+      with_stats:
+        description: if true, add git statistics when bumping the version.
+  change_types:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      properties:
+          keywords:
+            type: array
+            items: { type: string }
+          level: { enum: [ major, minor, patch ] }
+          title: { type: string }
+  releases:
+    type: array
+    items:
+      oneOf:
+        - type: string
+        - type: object
+          additionalProperties: false
+          properties:
+            version: { type: [ 'null', string ] }
+            date: { type: ['null',string] }
+            changes: { type: 'array', items: { $ref: '#/$defs/change' } }
+$defs:
+  change:
+    oneOf:
+      - type: string
+      - type: object
+        required: [ desc ]
+        additionalProperties: false
+        properties:
+          desc: { type: string }
+          ticket: { type: [ string, 'null' ] }
+          type: { type: [ string, 'null' ] }
+          commit: { type: [ string, 'null' ] }

@@ -48,6 +48,7 @@ subtest 'Active DBI Processing (+ sleep)' => sub {
 
         target_time => 0,
         sleep       => 0.1,
+        verbose     => 0,
     );
     $SIG{__WARN__} = '';
     like $legacy_warning, qr/considered legacy usage/, 'warned about legacy usage';
@@ -120,6 +121,7 @@ subtest 'Query DBI Processing (+ min_chunk_percent)' => sub {
         min_chunk_percent => sprintf("%.2f",
             ($CHUNK_SIZE - 1) / $CHUNK_SIZE
         ) + 0.01,
+        verbose           => 0,
     );
     $SIG{__WARN__} = '';
     like $legacy_warning, qr/considered legacy usage/, 'warned about legacy usage';
@@ -174,6 +176,7 @@ subtest 'Query DBI Processing + single_row (+ rsc)' => sub {
 
         single_rows => 1,
         target_time => 0,
+        debug       => 0,
     );
     $SIG{__WARN__} = '';
     like $legacy_warning, qr/considered legacy usage/, 'warned about legacy usage';
@@ -220,6 +223,7 @@ subtest 'DIY Processing (+ min_chunk_percent)' => sub {
         min_chunk_percent => sprintf("%.2f",
             ($CHUNK_SIZE - 1) / $CHUNK_SIZE
         ) + 0.01,
+        verbose           => 0,
     );
     $SIG{__WARN__} = '';
     like $legacy_warning, qr/considered legacy usage/, 'warned about legacy usage';

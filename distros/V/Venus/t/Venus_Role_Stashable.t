@@ -50,7 +50,7 @@ $test->for('includes');
 
   with 'Venus::Role::Stashable';
 
-  has 'test';
+  attr 'test';
 
   package main;
 

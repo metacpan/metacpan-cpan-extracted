@@ -6,14 +6,13 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = '2.12';
+our $VERSION = '2.13';
 
-use Tie::RefHash;
-use HTTP::Request 1.30;
-use LWP::UserAgent 6.45;
-use HTML::Form 1.00;
+use Tie::RefHash ();
+use HTTP::Request 1.30 ();
+use HTML::Form 1.00 ();
 use HTML::TokeParser ();
-use Scalar::Util qw(tainted);
+use Scalar::Util qw( tainted );
 
 use base 'LWP::UserAgent';
 
@@ -705,7 +704,7 @@ sub form_id {
 
 sub all_forms_with_fields {
     my ($self, @fields) = @_;
-    die 'no fields provided' unless scalar @fields;
+    $self->die('no fields provided') unless scalar @fields;
 
     my @matches;
     FORMS: for my $form (@{ $self->forms }) {
@@ -722,7 +721,7 @@ sub all_forms_with_fields {
 
 sub form_with_fields {
     my ($self, @fields) = @_;
-    die 'no fields provided' unless scalar @fields;
+    $self->die('no fields provided') unless scalar @fields;
 
     my $nth;
     if ( @fields > 1 && ref $fields[-1] eq 'HASH' ) {
@@ -1141,7 +1140,6 @@ sub submit_form {
 
     my @filtered_sets;
     if ( $args{with_fields} ) {
-        $fields || die q{must submit some 'fields' with with_fields};
         my @got = $self->all_forms_with_fields(keys %{$fields});
         $self->die("There is no form with the requested fields") if not @got;
         push @filtered_sets, \@got;
@@ -1171,7 +1169,7 @@ sub submit_form {
         # Assume that each filtered set only has a given form object once.
         # So we can count occurrences.
         #
-        tie my %c, 'Tie::RefHash' or die;
+        tie my %c, Tie::RefHash:: or $self->die('Cannot determine a form to use');
         foreach (@filtered_sets) {
             foreach (@$_) {
                 ++$c{$_};
@@ -1386,7 +1384,7 @@ sub request {
     my $self = shift;
     my $request = shift;
 
-    _die( '->request was called without a request parameter' )
+    $self->die( '->request was called without a request parameter' )
         unless $request;
 
     $request = $self->_modify_request( $request );
@@ -1515,7 +1513,7 @@ sub _taintedness {
     }
 
     # Sanity check
-    die "Our taintbrush should have zero length!" if length $_taintbrush;
+    die("Our taintbrush should have zero length!") if length $_taintbrush;
 
     return $_taintbrush;
 }
@@ -1865,7 +1863,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 2.12
+version 2.13
 
 =head1 SYNOPSIS
 

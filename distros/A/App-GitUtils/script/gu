@@ -8,9 +8,9 @@ use App::GitUtils;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-20'; # DATE
+our $DATE = '2022-07-30'; # DATE
 our $DIST = 'App-GitUtils'; # DIST
-our $VERSION = '0.085'; # VERSION
+our $VERSION = '0.086'; # VERSION
 
 my $p = '/App/GitUtils/'; # prefix
 Perinci::CmdLine::Any->new(
@@ -43,11 +43,9 @@ gu - Day-to-day command-line utilities for git
 
 =head1 VERSION
 
-This document describes version 0.085 of gu (from Perl distribution App-GitUtils), released on 2022-03-20.
+This document describes version 0.086 of gu (from Perl distribution App-GitUtils), released on 2022-07-30.
 
 =head1 SYNOPSIS
-
-Usage:
 
 % B<gu clone-to-bare> [B<--cmd>=I<subcommand_name>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--dir>=I<dirname>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--target-dir>=I<dirname>]
 
@@ -136,13 +134,37 @@ C<*> marks required options.
 
 Select subcommand.
 
+This is useful if a default subcommand exists, where that subcommand will be
+chosen if user does not specify another explicitly.
+
+
 =item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
 =item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
+
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+ [profile=dev]
+ username=foo
+ pass=beaver
+ 
+ [profile=production]
+ username=bar
+ pass=honey
+
+When you specify C<--config-profile=dev>, C<username> will be set to C<foo> and
+C<password> to C<beaver>. When you specify C<--config-profile=production>,
+C<username> will be set to C<bar> and C<password> to C<honey>.
+
 
 =item B<--format>=I<s>
 
@@ -151,6 +173,12 @@ Choose output format, e.g. json, text.
 Default value:
 
  undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
 
 =item B<--help>, B<-h>, B<-?>
 
@@ -170,28 +198,40 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
+If you specify C<--no-config>, the application will not read any configuration
+file.
+
+
 =item B<--no-env>
 
 Do not read environment for default options.
 
+If you specify C<--no-env>, the application wil not read any environment
+variable.
+
+
 =item B<--page-result>
 
 Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
 
 =item B<--subcommands>
 
@@ -205,6 +245,11 @@ Display program's version and exit.
 
 View output using a viewer.
 
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
 =back
 
 =head2 Options for subcommand clone-to-bare
@@ -216,14 +261,14 @@ View output using a viewer.
 A directory inside git repo.
 
 If not specified, will assume current directory is inside git repository and
-will search `.git` upwards.
+will search C<.git> upwards.
 
 
 =item B<--target-dir>=I<s>
 
 Target repo directory.
 
-If not specified, defaults to `$repodir.bare/`.
+If not specified, defaults to C<$repodir.bare/>.
 
 
 =back
@@ -237,7 +282,7 @@ If not specified, defaults to `$repodir.bare/`.
 A directory inside git repo.
 
 If not specified, will assume current directory is inside git repository and
-will search `.git` upwards.
+will search C<.git> upwards.
 
 
 =back
@@ -251,7 +296,7 @@ will search `.git` upwards.
 A directory inside git repo.
 
 If not specified, will assume current directory is inside git repository and
-will search `.git` upwards.
+will search C<.git> upwards.
 
 
 =back
@@ -265,7 +310,7 @@ will search `.git` upwards.
 A directory inside git repo.
 
 If not specified, will assume current directory is inside git repository and
-will search `.git` upwards.
+will search C<.git> upwards.
 
 
 =back
@@ -279,7 +324,7 @@ will search `.git` upwards.
 A directory inside git repo.
 
 If not specified, will assume current directory is inside git repository and
-will search `.git` upwards.
+will search C<.git> upwards.
 
 
 =item B<--name>=I<s>*
@@ -299,7 +344,7 @@ Can also be specified as the 1st command-line argument.
 A directory inside git repo.
 
 If not specified, will assume current directory is inside git repository and
-will search `.git` upwards.
+will search C<.git> upwards.
 
 
 =item B<--name>=I<s>*
@@ -348,7 +393,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/9GxTiV7elC.conf>, F</home/u1/9GxTiV7elC.conf>, or F</etc/9GxTiV7elC.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/s1/.config/gLtTcp7C8L.conf>, F</home/s1/gLtTcp7C8L.conf>, or F</etc/gLtTcp7C8L.conf>.
 
 All found files will be read and merged.
 
@@ -413,17 +458,17 @@ List of available configuration parameters:
 
 =head1 ENVIRONMENT
 
-=head2 _9GXTIV7ELC_OPT => str
+=head2 GLTTCP7C8L_OPT => str
 
 Specify additional command-line options.
 
 =head1 FILES
 
-F</home/u1/.config/9GxTiV7elC.conf>
+F</home/s1/.config/gLtTcp7C8L.conf>
 
-F</home/u1/9GxTiV7elC.conf>
+F</home/s1/gLtTcp7C8L.conf>
 
-F</etc/9GxTiV7elC.conf>
+F</etc/gLtTcp7C8L.conf>
 
 =head1 HOMEPAGE
 
@@ -450,9 +495,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

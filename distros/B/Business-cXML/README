@@ -1,6 +1,6 @@
-# Business-cXML v0.6.8
+# Business-cXML v0.6.9
 
-[![Build Status](https://travis-ci.org/vphantom/Business-cXML.svg?branch=v0.6.8)](https://travis-ci.org/vphantom/Business-cXML) [![Coverage Status](https://coveralls.io/repos/github/vphantom/Business-cXML/badge.svg?branch=v0.6.8)](https://coveralls.io/github/vphantom/Business-cXML?branch=v0.6.8)
+[![Build Status](https://travis-ci.org/vphantom/Business-cXML.svg?branch=v0.6.9)](https://travis-ci.org/vphantom/Business-cXML) [![Coverage Status](https://coveralls.io/repos/github/vphantom/Business-cXML/badge.svg?branch=v0.6.9)](https://coveralls.io/github/vphantom/Business-cXML?branch=v0.6.9)
 
 Perl implementation of cXML messaging.
 

@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::BackendMgr 2.150;
+package Config::Model::BackendMgr 2.152;
 
 use Mouse;
 use strict;
@@ -327,7 +327,6 @@ sub try_read_backend {
         $res = $backend_obj->$f(
             @read_args,
             file_path => $file_path,
-            io_handle => Config::Model::DeprecatedHandle->new($fh),
             object    => $self->node,
         );
     };
@@ -414,7 +413,6 @@ sub auto_write_init {
         # override needed for "save as" button
         my %backend_args = (
             @wr_args,
-            io_handle => Config::Model::DeprecatedHandle->new($fh),
             file_path => $file_path,
             object    => $node,
             %cb_args            # override from user
@@ -438,8 +436,6 @@ sub auto_write_init {
         return defined $res ? $res : $@ ? 0 : 1;
     };
 
-    # FIXME: enhance write back mechanism so that different backend *and* different nodes
-    # work as expected
     $logger->trace( "registering write $backend in node " . $self->node->name );
 
     $instance->register_write_back(  $self->node->location, $backend, $wb  );
@@ -511,34 +507,6 @@ sub is_auto_write_for_type {
 
 __PACKAGE__->meta->make_immutable;
 
-package Config::Model::DeprecatedHandle 2.150;
-
-our $AUTOLOAD;
-
-sub new {
-    my $class = shift;
-    my $fh = shift;
-
-    return defined $fh ? bless \$fh, $class : undef;
-}
-
-sub AUTOLOAD {
-    my $self = shift;
-    my $f = $AUTOLOAD;
-    $f =~ s/.*:://;
-    my ($package, $filename, $line) = caller;
-
-    # $$self may not be defined during destruction
-    if ($$self and $self->can($f)) {
-        $logger->warn(
-            "io_handle backend parameter is deprecated, ",
-            "please use file_path parameter. ",
-            "(called $f at $filename:$line)"
-        ) unless $package eq "Config::Model::BackendMgr";
-
-        $$self->$f(@_);
-    }
-}
 1;
 
 # ABSTRACT: Load configuration node on demand
@@ -555,7 +523,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.150
+version 2.152
 
 =head1 SYNOPSIS
 

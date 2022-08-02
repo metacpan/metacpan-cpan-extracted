@@ -30,10 +30,10 @@ do { my $x = {
                                       'Catalyst' => '5.90123',
                                       'Moose::Role' => '0',
                                       'POSIX' => '0',
-                                      'Plack::Middleware::Statsd' => '0',
+                                      'Plack::Middleware::Statsd' => 'v0.6.0',
                                       'Ref::Util' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => 'v5.10.1'
+                                      'perl' => 'v5.14.0'
                                     }
                     },
        'test' => {

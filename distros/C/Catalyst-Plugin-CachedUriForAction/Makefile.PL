@@ -11,11 +11,13 @@ my %META = (
 	prereqs     => {
 		runtime => { requires => {qw(
 			perl             5.008005
+			mro                     0
 			Catalyst          5.90090
 			URI::Encode::XS      0.11
 		)} },
 		test => { requires => {qw(
 			Test::More           0.88
+			URI                     0
 		)} },
 	},
 	dynamic_config => 0,

@@ -8,7 +8,7 @@ configure_requires:
   Module::Build::Tiny: '0.035'
   perl: 5.008_001
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.14, CPAN::Meta::Converter version 2.150010'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -37,7 +37,7 @@ provides:
     file: lib/Groonga/Escape.pm
   Groonga::HTTP:
     file: lib/Groonga/HTTP.pm
-    version: '1.10'
+    version: '1.11'
   Groonga::HTTP::Client:
     file: lib/Groonga/HTTP/Client.pm
   Groonga::ResultSet:
@@ -50,7 +50,7 @@ requires:
 resources:
   bugtracker: https://github.com/groonga/Groonga-HTTP/issues
   homepage: https://github.com/groonga/Groonga-HTTP
-  repository: https://github.com/groonga/Groonga-HTTP.git
-version: '1.10'
+  repository: git://github.com/groonga/Groonga-HTTP.git
+version: '1.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

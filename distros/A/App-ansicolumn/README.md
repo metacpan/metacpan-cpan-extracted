@@ -47,7 +47,7 @@ ansicolumn \[options\] \[file ...\]
 
 # VERSION
 
-Version 1.18
+Version 1.19
 
 # DESCRIPTION
 
@@ -341,8 +341,6 @@ option. See \`perldoc Getopt::EX\` for detail.
 ## CPANMINUS
 
     $ cpanm App::ansicolumn
-    or
-    $ curl -sL http://cpanmin.us | perl - App::ansicolumn
 
 To get the latest code, use this:
 

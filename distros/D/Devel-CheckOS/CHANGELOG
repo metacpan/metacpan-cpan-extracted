@@ -1,3 +1,7 @@
+1.94    2022-07-27
+
+- Add Mac OS 12 (Monterey)
+
 1.93    2022-04-25
 
 - No functional changes, just changes to where dependencies are declared

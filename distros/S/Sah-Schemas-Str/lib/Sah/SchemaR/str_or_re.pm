@@ -1,10 +1,10 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::str_or_re;
 
-our $DATE = '2022-06-05'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2022-06-09'; # DATE
+our $VERSION = '0.008'; # VERSION
 
-our $rschema = do{my$var={base=>"any",clsets_after_base=>[{description=>"\nIf string is of the form of `/.../`, then it will be parsed as a regex.\nOtherwise, it's accepted as a plain string.\n\n",examples=>[{valid=>1,value=>""},{valid=>1,value=>"a"},{summary=>"Not a string",valid=>0,value=>{}},{valid=>1,validated_value=>qr(),value=>"//"},{valid=>1,value=>"/foo"},{valid=>1,validated_value=>qr(foo.*),value=>"/foo.*/"},{summary=>"Invalid regex",valid=>0,value=>"/foo[/"}],of=>[["str"],["re"]],prefilters=>["Str::maybe_convert_to_re"],summary=>"String or regex (if string is of the form `/.../`)"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["any"],type=>"any",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"any",clsets_after_base=>[{description=>"\nEither string or Regexp object is accepted.\n\nIf string is of the form of `/.../` or `qr(...)`, then it will be compiled into\na Regexp object. If the regex pattern inside `/.../` or `qr(...)` is invalid,\nvalue will be rejected.\n\nCurrently, unlike in normal Perl, for the `qr(...)` form, only parentheses `(`\nand `)` are allowed as the delimiter.\n\nCurrently modifiers `i`, `m`, and `s` after the second `/` are allowed.\n\n",examples=>[{valid=>1,value=>""},{valid=>1,value=>"a"},{summary=>"Not a string",valid=>0,value=>{}},{valid=>1,validated_value=>qr(),value=>"//"},{summary=>"Becomes a string",valid=>1,value=>"/foo"},{summary=>"Becomes a string",valid=>1,value=>"qr(foo"},{summary=>"Becomes a string",valid=>1,value=>"qr(foo("},{summary=>"Becomes a string",valid=>1,value=>"qr/foo/"},{valid=>1,validated_value=>qr(foo.*),value=>"/foo.*/"},{valid=>1,validated_value=>qr(foo.*),value=>"qr(foo.*)"},{valid=>1,validated_value=>qr(foo)si,value=>"/foo/is"},{valid=>1,validated_value=>qr(foo)si,value=>"qr(foo)is"},{summary=>"Invalid regex",valid=>0,value=>"/foo[/"}],of=>[["str"],["re"]],prefilters=>["Str::maybe_convert_to_re"],summary=>"String or regex (if string is of the form `/.../`)"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["any"],type=>"any",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: String or regex (if string is of the form `/.../`)
@@ -21,7 +21,7 @@ Sah::SchemaR::str_or_re - String or regex (if string is of the form `/.../`)
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::SchemaR::str_or_re (from Perl distribution Sah-Schemas-Str), released on 2022-06-05.
+This document describes version 0.008 of Sah::SchemaR::str_or_re (from Perl distribution Sah-Schemas-Str), released on 2022-06-09.
 
 =head1 DESCRIPTION
 

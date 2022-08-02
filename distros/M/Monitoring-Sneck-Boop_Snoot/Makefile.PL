@@ -20,6 +20,8 @@ my %WriteMakefileArgs = (
 	PREREQ_PM => {
 		'JSON'               => '0',
 		'String::ShellQuote' => '0',
+		'MIME::Base64'       => '0',
+		'Gzip::Faster'       => '0',
 	},
 	META_MERGE => {
 		"meta-spec" => { version => 2 },

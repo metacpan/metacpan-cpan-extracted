@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+use strict; use warnings;
 
 use Test::More tests => 4;
 use FlatFile;
@@ -17,4 +17,3 @@ ok($f);
 
 is($f->field_separator_string, ":", "field separator");
 is($f->record_separator, "\n", "record separator");
-

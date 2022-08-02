@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-10'; # DATE
+our $DATE = '2022-06-13'; # DATE
 our $DIST = 'App-CPANChangesUtils'; # DIST
-our $VERSION = '0.076'; # VERSION
+our $VERSION = '0.077'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CPANChangesUtils/parse_cpan_changes",
@@ -40,7 +40,7 @@ parse-cpan-changes - Parse CPAN Changes file
 
 =head1 VERSION
 
-This document describes version 0.076 of parse-cpan-changes (from Perl distribution App-CPANChangesUtils), released on 2022-06-10.
+This document describes version 0.077 of parse-cpan-changes (from Perl distribution App-CPANChangesUtils), released on 2022-06-13.
 
 =head1 SYNOPSIS
 
@@ -256,6 +256,8 @@ It is also recommended to install L<shcompgen> (see above).
 For fish and zsh, install L<shcompgen> as described above.
 
 =head1 EXAMPLES
+
+=head2 Parse with default settings
 
  % parse-cpan-changes
  [
@@ -491,11 +493,108 @@ For fish and zsh, install L<shcompgen> as described above.
              },
              "note" : "Released-By: PERLANCAR; Urgency: low",
              "version" : "0.076"
+          },
+          "0.077" : {
+             "_parsed_date" : "2022-06-13",
+             "changes" : {
+                "" : {
+                   "changes" : [
+                      "No functional changes.",
+                      "[ux] Show content of Changes file in example."
+                   ],
+                   "name" : ""
+                }
+             },
+             "date" : "2022-06-13",
+             "metadata" : {
+                "released-by" : "PERLANCAR",
+                "urgency" : "low"
+             },
+             "note" : "Released-By: PERLANCAR; Urgency: low",
+             "version" : "0.077"
           }
        }
     },
     {}
  ]
+
+Content of C<Changes> file:
+
+ 0.076   2022-06-10  Released-By: PERLANCAR; Urgency: low
+ 
+         - No functional changes.
+ 
+         - [ux] Add an example.
+ 
+ 
+ 0.075   2022-06-10  Released-By: PERLANCAR; Urgency: medium
+ 
+         - [utility parse-cpan-changes] Add option parse_release_metadata
+           (defaults to true) to parse 'key: value' metadata in the release
+           note.
+ 
+ 
+ 0.073   2021-10-17  Released-By: PERLANCAR; Urgency: medium
+ 
+     - Rename module/dist App-ParseCPANChanges -> App-CPANChangesUtils.
+ 
+         - Add CLI format-cpan-changes.
+ 
+ 
+ 0.072   2021-05-25  Released-By: PERLANCAR; Urgency: high
+ 
+     - [build] Rebuild to update Sah coercion module names (old Sah coercion
+           modules have been purged from CPAN).
+ 
+ 
+ 0.071   2020-10-06  Released-By: PERLANCAR; Urgency: medium
+ 
+     - Add option --no-unbless.
+ 
+ 
+ 0.070   2019-07-03  Released-By: PERLANCAR; Urgency: medium
+ 
+     - Add option --class to customize parser class.
+ 
+ 
+ 0.06    2016-01-18  Released-By: PERLANCAR
+ 
+         - No functional changes.
+ 
+         - [build] Rebuild to fix POD section ordering.
+ 
+ 
+ 0.05    2015-09-03  Released-By: PERLANCAR
+ 
+     - No functional changes.
+ 
+     - [dist] Move spec prereqs from RuntimeRequires to
+       DevelopRecommends to reduce deps but still allow indicating spec
+       requirement.
+ 
+ 
+ 0.04     2014-07-22  Released-By: SHARYANTO
+ 
+          - No functional changes.
+ 
+          - Switch CLI scripts from using Perinci::CmdLine to
+            Perinci::CmdLine::Any to reduce size of dependencies.
+ 
+ 
+ 0.03    2013-11-01  Released-By: SHARYANTO
+ 
+         - No functional changes. Mention some other modules and the rationale
+           for the script.
+ 
+ 
+ 0.02    2013-08-06  Released-By: SHARYANTO
+ 
+         - No functional changes. Add missing dep [CT].
+ 
+ 
+ 0.01    2013-08-05  Released-By: SHARYANTO
+ 
+         - First version.
 
 =head1 HOMEPAGE
 

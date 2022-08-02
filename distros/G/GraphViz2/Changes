@@ -1,3 +1,6 @@
+2.67 2022-07-21
+- update to latest allowed entity attributes - thanks @nowthis
+
 2.66 2021-02-21
 - from_graph not drop isolated vertices - thanks @jhannah-mm for report
 

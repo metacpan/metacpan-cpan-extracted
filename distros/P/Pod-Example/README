@@ -5,13 +5,22 @@ SYNOPSIS
      use Pod::Example qw(get sections);
 
      my $example = get($file_or_module[, $section[, $number_of_example]]);
+     my ($example, $filename) = get($file_or_module[, $section[, $number_of_example]]);
      my @sections = sections($file_or_module[, $section]);
 
 SUBROUTINES
   "get"
      my $example = get($file_or_module[, $section[, $number_of_example]]);
+     my ($example, $filename) = get($file_or_module[, $section[, $number_of_example]]);
 
-    Returns code of example.
+    Get content of example. If detect POD comment with filename=FILENAME
+    returns filename string. It's useful for generating of examples from
+    documentation.
+
+    Returns code of example in scalar mode.
+
+    Returns list with code of example and filename (if possible) in array
+    mode.
 
      $file_or_module    - File with pod doc or perl module.
      $section           - Pod section with example. Default value is 'EXAMPLE'.
@@ -79,10 +88,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2011-2020 Michal Josef Špaček
+    © 2011-2022 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.11
+    0.12
 

@@ -2,7 +2,7 @@ use v5.12;
 
 package Chart::StackedBars;
 our @ISA     = qw(Chart::Base);
-our $VERSION = 'v2.403.5';
+our $VERSION = 'v2.403.7';
 
 use Chart::Base;
 use GD;

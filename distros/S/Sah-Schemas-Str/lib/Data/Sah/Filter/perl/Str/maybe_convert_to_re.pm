@@ -5,17 +5,18 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-05'; # DATE
+our $DATE = '2022-06-09'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 sub meta {
     +{
         v => 1,
-        summary => 'Convert string to regex if delimited by /.../',
+        summary => 'Convert string to regex if delimited by /.../ or qr(...)',
         might_fail => 1,
         args => {
             # XXX delimiter
+            # XXX allowed modifiers
         },
     };
 }
@@ -31,7 +32,7 @@ sub filter {
         "",
         "do {",
         "    my \$tmp = $dt; ",
-        "    if (\$tmp =~ m!\\A/.*/\\z!s) { my \$re = eval \"qr\$tmp\"; if (\$@) { [\"Invalid regex: \$@\", \$tmp] } else { [undef, \$re] } } ",
+        "    if (\$tmp =~ m!\\A(?:/.*/|qr\\(.*\\))(?:[ims]*)\\z!s) { my \$re = eval(substr(\$tmp, 0, 2) eq 'qr' ? \$tmp : \"qr\$tmp\"); if (\$@) { [\"Invalid regex: \$@\", \$tmp] } else { [undef, \$re] } } ",
         "    else { [undef, \$tmp] } ",
         "}",
     );
@@ -40,7 +41,7 @@ sub filter {
 }
 
 1;
-# ABSTRACT: Convert string to regex if string is delimited by /.../
+# ABSTRACT: Convert string to regex if string is delimited by /.../ or qr(...)
 
 __END__
 
@@ -50,13 +51,18 @@ __END__
 
 =head1 NAME
 
-Data::Sah::Filter::perl::Str::maybe_convert_to_re - Convert string to regex if string is delimited by /.../
+Data::Sah::Filter::perl::Str::maybe_convert_to_re - Convert string to regex if string is delimited by /.../ or qr(...)
 
 =head1 VERSION
 
-This document describes version 0.004 of Data::Sah::Filter::perl::Str::maybe_convert_to_re (from Perl distribution Sah-Schemas-Str), released on 2022-06-05.
+This document describes version 0.008 of Data::Sah::Filter::perl::Str::maybe_convert_to_re (from Perl distribution Sah-Schemas-Str), released on 2022-06-09.
 
 =head1 DESCRIPTION
+
+Currently for the C<qr(...)> form, unlike in normal Perl, only parentheses C<(>
+and C<)> are allowed as the delimiter.
+
+Currently regex modifiers C<i>, C<m>, and C<s> are allowed at the end.
 
 =for Pod::Coverage ^(meta|filter)$
 

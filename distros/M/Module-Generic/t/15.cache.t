@@ -172,25 +172,25 @@ SKIP:
         );
         my $c = $cache2->open || do
         {
-            diag( "CHILD: ", $cache2->error ) if( $DEBUG );
+            diag( "[CHILD] Cannot open: ", $cache2->error ) if( $DEBUG );
             exit(1);
         };
         my $ref = $c->read;
         defined( $ref ) || do
         {
-            diag( "CHILD: ", $c->error ) if( $DEBUG );
+            diag( "[CHILD] read returned undef: ", $c->error ) if( $DEBUG );
             exit(1);
         };
         ref( $ref ) eq 'HASH' || do
         {
-            diag( "CHILD: Shared memory data ($ref) is not an hash reference." ) if( $DEBUG );
+            diag( "[CHILD] Shared memory data ($ref) is not an hash reference." ) if( $DEBUG );
             exit(1);
         };
         # $ref = {};
         $ref->{year} = 2021;
         defined( $c->write( $ref ) ) || do
         {
-            diag( "Unable to write to shared memory: $!" ) if( $DEBUG );
+            diag( "Unable to write to shared memory: ", $c->error ) if( $DEBUG );
             exit(1);
         };
         exit(0);

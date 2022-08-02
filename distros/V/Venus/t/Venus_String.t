@@ -201,14 +201,14 @@ The camelcase method converts the string to camelcase.
 
   my $camelcase = $string->camelcase;
 
-  # "HelloWorld"
+  # "helloWorld"
 
 =cut
 
 $test->for('example', 1, 'camelcase', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq "HelloWorld";
+  ok $result eq "helloWorld";
 
   $result
 });
@@ -2855,6 +2855,38 @@ $test->for('example', 9, 'ne', sub {
   is $result, 0;
 
   !$result
+});
+
+=method pascalcase
+
+The pascalcase method converts the string to pascalcase.
+
+=signature pascalcase
+
+  pascalcase() (Str)
+
+=metadata pascalcase
+
+{
+  since => '0.01',
+}
+
+=example-1 pascalcase
+
+  # given: synopsis;
+
+  my $pascalcase = $string->pascalcase;
+
+  # "HelloWorld"
+
+=cut
+
+$test->for('example', 1, 'pascalcase', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "HelloWorld";
+
+  $result
 });
 
 =method prepend

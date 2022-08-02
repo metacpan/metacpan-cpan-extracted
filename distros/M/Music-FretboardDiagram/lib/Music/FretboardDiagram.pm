@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Draw fretboard chord diagrams
 
-our $VERSION = '0.1314';
+our $VERSION = '0.1315';
 
 use Moo;
 use strictures 2;
@@ -202,7 +202,7 @@ sub draw {
         if ( $fret == 1 ) {
             $i->string(
                 font  => $font,
-                text  => $self->position,
+                text  => $self->chord->[0][0],
                 color => BLACK,
                 x     => $SPACE / 4,
                 y     => $SPACE * 2 + $SPACE / 4,
@@ -261,7 +261,7 @@ sub draw {
                 );
             }
             elsif ( $note =~ /[oO0]/ ) {
-                my $temp = $self->fretboard->{$string}[0];
+                my $temp = $self->_note_at(0, $string, $note);
                 push @chord, $temp;
 
                 warn "O at 0,$string = $temp\n" if $self->verbose;
@@ -277,7 +277,7 @@ sub draw {
                 );
             }
             else {
-                my $temp = $self->_note_at($string, $note);
+                my $temp = $self->_note_at($posn, $string, $note);
                 push @chord, $temp;
 
                 warn "Dot at $note,$string = $temp\n" if $self->verbose;
@@ -360,7 +360,7 @@ sub _draw_horiz {
         if ( $fret == 1 ) {
             $i->string(
                 font  => $font,
-                text  => $self->position,
+                text  => $self->chord->[0][0],
                 color => BLACK,
                 y     => $SPACE / 2 + $SPACE / 5,
                 x     => $SPACE * 2 - $SPACE / 5,
@@ -406,7 +406,7 @@ sub _draw_horiz {
             }
 
             if ( $note =~ /[xX]/ ) {
-                warn "X at fret:0, string:$string\n" if $self->verbose;
+                warn "X at posn: $posn, fret:0, string:$string\n" if $self->verbose;
 
                 $i->string(
                     font  => $font,
@@ -419,10 +419,10 @@ sub _draw_horiz {
                 );
             }
             elsif ( $note =~ /[oO0]/ ) {
-                my $temp = $self->fretboard->{$string}[0];
+                my $temp = $self->_note_at(0, $string, $note);
                 unshift @chord, $temp;
 
-                warn "O at fret:0, string:$string = $temp\n" if $self->verbose;
+                warn "O at posn: $posn, fret:0, string:$string = $temp\n" if $self->verbose;
 
                 $i->string(
                     font  => $font,
@@ -435,10 +435,10 @@ sub _draw_horiz {
                 );
             }
             else {
-                my $temp = $self->_note_at($string, $note);
+                my $temp = $self->_note_at($posn, $string, $note);
                 unshift @chord, $temp;
 
-                warn "Dot at fret:$note, string:$string = $temp\n" if $self->verbose;
+                warn "Dot at posn: $posn, fret:$note, string:$string = $temp\n" if $self->verbose;
 
                 my $x = $self->absolute
                     ? $SPACE + $SPACE / 2 + ($posn - 1 + $note - 1) * $SPACE
@@ -495,8 +495,15 @@ sub _fret_match {
 }
 
 sub _note_at {
-    my ($self, $string, $n) = @_;
-    return $self->fretboard->{$string}[ ($self->position + $n - 1) % @{ $self->fretboard->{1} } ];
+    my ($self, $posn, $string, $n) = @_;
+    my $i;
+    if ($posn) {
+        $i = ($posn + $n - 1) % @{ $self->fretboard->{1} };
+    }
+    else {
+        $i = 0;
+    }
+    return $self->fretboard->{$string}[$i];
 }
 
 sub _output_image {
@@ -516,6 +523,36 @@ sub _boolean {
     croak "$arg is not a Boolean value" unless $arg =~ /^[10]$/;
 }
 
+
+sub spec_to_notes {
+    my ($self, $spec) = @_;
+
+    my @notes;
+
+    croak 'chord length and string number differ'
+        if length $spec != $self->strings;
+
+    my $string = $self->strings;
+
+    for my $n (split //, $spec) {
+        if ($n eq 'x' || $n eq 'X') {
+            $string--;
+            next;
+        }
+
+        if ( $n =~ /[oO0]/ ) {
+            push @notes, $self->_note_at(0, $string, $n);
+        }
+        else {
+            push @notes, $self->_note_at($self->position, $string, $n);
+        }
+
+        $string--;
+    }
+
+    return \@notes;
+}
+
 1;
 
 __END__
@@ -530,7 +567,7 @@ Music::FretboardDiagram - Draw fretboard chord diagrams
 
 =head1 VERSION
 
-version 0.1314
+version 0.1315
 
 =head1 SYNOPSIS
 
@@ -562,6 +599,8 @@ version 0.1314
   $dia->showname('Xb dim');       # "X flat diminished"
 
   $dia->draw;
+
+  $dia->spec_to_notes('x02220');  # [A E A Db E]
 
 =head1 DESCRIPTION
 
@@ -810,6 +849,12 @@ B<type>.
 
 If the B<image> attribute is set, return the image object instead of
 writing to a file.
+
+=head2 spec_to_notes
+
+  $notes = $dia->spec_to_notes('x02220'); # A E A Db E
+
+Convert a "spec string" to a list of named notes.
 
 =head1 THANK YOU
 

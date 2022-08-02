@@ -1,5 +1,23 @@
 Revision history for Perl-Critic-Dancer2
 
+0.4100 2022-07-31T16:31:28-04:00 America/New_York
+ [NEW FEATURES]
+ - Add ReturnNotNecessary policy
+
+ [STATISTICS]
+ - code churn: 7 files changed, 139 insertions(+), 9 deletions(-)
+
+0.4001 2022-07-31T11:52:49-04:00 America/New_York
+ [BUG FIXES]
+ - Ensure that deprecated and unrecommended keywords won't fuss about being
+   hash keys.
+
+ [DOCUMENTATION]
+ - Minor tweaks, added link to GH issue on D2
+
+ [STATISTICS]
+ - code churn: 6 files changed, 65 insertions(+), 8 deletions(-)
+
 0.4000 2022-07-02T17:36:02-04:00 America/New_York
  - First version.
 

@@ -1,14 +1,14 @@
-# Copyrights 2007-2021 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2007-2022 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
+# Pod stripped from pm file by OODoc 2.03.
 # This code is part of distribution XML-Compile-SOAP.  Meta-POD processed
 # with OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package XML::Compile::Transport::SOAPHTTP;
 use vars '$VERSION';
-$VERSION = '3.27';
+$VERSION = '3.28';
 
 use base 'XML::Compile::Transport';
 
@@ -42,7 +42,9 @@ sub init($)
       ( $args->{user_agent}
       , keep_alive => (exists $args->{keep_alive} ? $args->{keep_alive} : 1)
       , timeout    => ($args->{timeout} || 180)
+      , ssl_opts   => $args->{ssl_opts}
       );
+
     $self;
 }
 

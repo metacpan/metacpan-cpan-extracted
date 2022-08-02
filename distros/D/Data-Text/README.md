@@ -4,11 +4,17 @@ Data::Text - Class to handle text in an OO way
 
 # VERSION
 
-Version 0.09
+Version 0.10
 
 # SYNOPSIS
 
 Handle text in an OO way.
+
+    use Data::Text;
+
+    my $d = Data::Text->new("Hello, World!\n");
+
+    print $d->as_string();
 
 # SUBROUTINES/METHODS
 
@@ -22,6 +28,12 @@ The optional parameter 'text' contains a string, or object, to initialise the ob
 
 Sets the object to contain the given text.
 
+The argument can be a reference to an array of strings, or an object.
+If called with an object, the message as\_string() is sent to it for its contents.
+
+    $d->set({ text => "Hello, World!\n" });
+    $d->set(text => [ 'Hello, ', 'World!', "\n" ]);
+
 ## append
 
 Adds data given in "text" to the end of the object.
@@ -30,8 +42,26 @@ I expect I'll improve that.
 
 Successive calls to append() can be daisy chained.
 
+    $d->set('Hello ')->append("World!\n");
+
 The argument can be a reference to an array of strings, or an object.
 If called with an object, the message as\_string() is sent to it for its contents.
+
+## equal
+
+Are two texts the same?
+
+    my $t1 = Data::Text->new('word');
+    my $t2 = Data::Text->new('word');
+    print ($t1 == $t2), "\n";   # Prints 1
+
+## not\_equal
+
+Are two texts different?
+
+    my $t1 = Data::Text->new('xyzzy');
+    my $t2 = Data::Text->new('plugh');
+    print ($t1 != $t2), "\n";   # Prints 1
 
 ## as\_string
 
@@ -43,11 +73,11 @@ Returns the length of the text.
 
 ## trim
 
-Removes leading and trailing spaces from the string.
+Removes leading and trailing spaces from the text.
 
 ## rtrim
 
-Removes trailing spaces from the string.
+Removes trailing spaces from the text.
 
 ## replace
 
@@ -104,6 +134,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2021 Nigel Horne.
+Copyright 2021-2022 Nigel Horne.
 
 This program is released under the following licence: GPL2

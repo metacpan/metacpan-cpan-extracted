@@ -1,5 +1,9 @@
 Revision history for Perl extension Form::Tiny.
 
+2.13 Tue Aug 2 2022
+	- fix plugin array being modified by import routines
+	- switch to Dist::Zilla
+
 2.12 Sun May 8 2022
 	- improve performance and maintainability
 

@@ -27,7 +27,7 @@ no warnings _disabled_warnings();
 use B::Hooks::AtRuntime 'after_runtime';
 use Import::Into;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 sub import {
     my ( $class, %args ) = @_;
@@ -67,32 +67,26 @@ sub _apply_default_features ( $config, $for_class, $params = undef ) {
     Carp->import::into($for_class)                              unless $config->{excludes}{carp};
     namespace::autoclean->import::into($for_class)              unless $config->{excludes}{autoclean};
 
-    # see perldoc -v '$^P'
-    if ($^P) {
-        say STDERR "We are running under the debugger or using code that uses debugger code (e.g., Devel::Cover). $for_class is not immutable";
-    }
-    else {
-        unless ( $config->{excludes}{immutable} or $config->{_caller_eval} ) {    # https://github.com/Ovid/moosex-extreme/pull/34
+    unless ( $config->{excludes}{immutable} or $config->{_caller_eval} ) {    # https://github.com/Ovid/moosex-extreme/pull/34
 
-            # after_runtime is loaded too late under the debugger
-            eval {
-                load B::Hooks::AtRuntime, 'after_runtime';
-                after_runtime {
-                    $for_class->meta->make_immutable;
-                    if ( $config->{debug} ) {
+        # after_runtime is loaded too late under the debugger
+        eval {
+            load B::Hooks::AtRuntime, 'after_runtime';
+            after_runtime {
+                $for_class->meta->make_immutable;
+                if ( $config->{debug} ) {
 
-                        # they're doing debug on a class-by-class basis, so
-                        # turn this off after the class compiles
-                        $MooseX::Extended::Debug = 0;
-                    }
-                };
-                1;
-            } or do {
-                my $error = $@;
-                warn
-                  "Could not load 'B::Hooks::AtRuntime': $error. You class is not immutable. You can `use MooseX::Extended excludes => ['immutable'];` to suppress this warning.";
+                    # they're doing debug on a class-by-class basis, so
+                    # turn this off after the class compiles
+                    $MooseX::Extended::Debug = 0;
+                }
             };
-        }
+            1;
+        } or do {
+            my $error = $@;
+            warn
+              "Could not load 'B::Hooks::AtRuntime': $error. You class is not immutable. You can `use MooseX::Extended excludes => ['immutable'];` to suppress this warning.";
+        };
     }
     unless ( $config->{excludes}{true} or $config->{_caller_eval} ) {    # https://github.com/Ovid/moosex-extreme/pull/34
         eval {
@@ -127,7 +121,7 @@ MooseX::Extended - Extend Moose with safe defaults and useful features
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 SYNOPSIS
 
@@ -336,7 +330,7 @@ arrays or hashes will take precedence over scalars:
     multi sub foo ($self, @x) { ... }
     multi sub foo ($self, $x) { ... } # will never be called
 
-It's quite possible to define multi subs that are ambiguous:
+Thus, the following probably doesn't do what you want.
 
     package Foo {
         use MooseX::Extended includes => [qw/multi/];
@@ -506,35 +500,6 @@ Trying to pass a defined C<init_arg> to C<field> will also throw this
 exception, unless the init_arg begins with an underscore. (It is sometimes
 useful to be able to define an C<init_arg> for unit testing.)
 
-=head1 DEBUGGER SUPPORT
-
-When running L<MooseX::Extended> under the debugger, there are some
-behavioral differences you should be aware of.
-
-=over 4
-
-=item * Your classes won't be immutable
-
-Ordinarily, we call C<< __PACKAGE__->meta->make_immutable >> for you. This
-relies on L<B::Hooks::AtRuntime>'s C<after_runtime> function. However, that
-runs too late under the debugger and dies. Thus, we disable this feature under
-the debugger. Your classes may run a bit slower, but hey, it's the debugger!
-
-There is L<a PR against B::Hooks::AtRuntime which will fix this issue|https://github.com/mauzo/B-Hooks-AtRuntime/pull/1>.
-
-=item * C<namespace::autoclean> will frustrate you
-
-It's very frustrating when running under the debugger and doing this:
-
-	13==>       my $total = sum(3,4,5);
-	DB<4>
-	Undefined subroutine &main::sum called at (eval 423) ...
-
-We had removed C<namespace::autoclean> when running under the debugger, but
-backed that out: L<https://github.com/Ovid/moosex-extreme/issues/11>.
-
-=back
-
 =head1 BUGS AND LIMITATIONS
 
 If the MooseX::Extended classes are loaded via I<stringy> eval, C<true> is not
@@ -633,6 +598,10 @@ Zydeco - Jazz up your Perl
 =item * L<Dios|https://metacpan.org/pod/Dios>
 
 Dios - Declarative Inside-Out Syntax
+
+=item * L<MooseX::AttributeShortcuts|https://metacpan.org/pod/MooseX::AttributeShortcuts>
+
+MooseX::AttributeShortcuts - Shorthand for common attribute options
 
 =back
 

@@ -1,5 +1,13 @@
 Changes for Plack::App::ServiceStatus
 
+0.906     2022-08-01 16:11:15+02:00
+    - add Checks for raw DBI and DBIx::Connector
+
+
+0.905     2022-08-01 15:58:12+02:00 [BROKEN]
+    - bad release, please ignore
+
+
 0.904     2021-01-03 17:58:09+01:00
     - dist housekeeping: github issues,
       Dist::Zilla::PluginBundle::Author::DOMM

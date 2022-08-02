@@ -55,7 +55,10 @@ All the methods listed in the L<last section|/"create image">,
 that create the final image, take as an optional, second argument data.
 This data may be delivered either as a reference to an array of arrays:
 
-    my $data = [ [ 1, 4, 3 ... <data set 0> ], [ <data set 1> ], ... ];
+    my $data = [ [ 1, 4, 3 ... ], # data set 0
+                 [ 5, 8, 2 ... ], # data set 1
+                 ...
+    ];
     $graph->png( 'file.png', $data );
 
 or in form of a file. Then the argument has to be a file name or a

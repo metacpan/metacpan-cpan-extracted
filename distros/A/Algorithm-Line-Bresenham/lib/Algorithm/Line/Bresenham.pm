@@ -27,9 +27,9 @@ C code at https://gist.github.com/bert/1085538
 
 package Algorithm::Line::Bresenham;
 use strict; use warnings;
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 use base 'Exporter';
-our @EXPORT_OK = qw/line circle ellipse_rect quad_bezier polyline/;
+our @EXPORT_OK = qw/line circle ellipse_rect quad_bezier polyline varthick_line thick_line/;
 
 
 =head2 C<line>
@@ -294,6 +294,296 @@ sub polyline{
 	}
 	return @points;
 }
+
+=head2 C<thick_line>
+
+    my @points = thick_line ($x0, $y0, $x1, $y1,$thickness)
+
+Draws a line thickened using Murphy's modication of Bresenham'salgorithm
+between two points  of x,y pairs. This routine was further enahnced to 
+provide variable thickness lines and uses multiple helper subroutines.
+
+=head2 C<varthick_line>
+  
+  my @points= varthick_line($x0,$y0,$x1,$y1,$leftFn,$argL,$rightFn,$argR)
+
+Variable thickness lines are implemented as described in
+http://kt8216.unixcab.org/murphy/index.html ; This allows passing of 
+two subroutine references (so the left side and the right sides of the
+line can have differently varying thicknesses) along with a
+user originated parameter. The subroutine reference example is shown below:
+
+   my $leftFn=sub{
+      my ($arg,$p,$l)=@_;
+      # C<$arg> is passed by calling routine,
+      # C<$p> is point on line
+      # C<$l> is length of line
+	  return $p % $arg;
+   };
+
+=cut
+
+## Variable thickness lines using Murphy's Modification of Bresenham Line Algorithm**
+## Codes ported from C in http://kt8216.unixcab.org/murphy/index.html  
+
+ #*                            X BASED LINES                            *
+ 
+sub x_perpendicular{
+  my ($x0,$y0,$dx,$dy,$xstep,$ystep,$einit,$w_left,$w_right,$winit)=@_;
+  
+  my @pts;
+
+  my $threshold = $dx - 2*$dy;
+  my $E_diag= -2*$dx;
+  my $E_square= 2*$dy;
+  my $p=my $q=0;
+
+  my $y= $y0;
+  my $x= $x0;
+  my $error= $einit;
+  my $tk= $dx+$dy-$winit; 
+
+  while($tk<=$w_left)
+  {
+     push (@pts,[$x,$y]);
+     if ($error>=$threshold)
+     {
+       $x= $x + $xstep;
+       $error = $error + $E_diag;
+       $tk= $tk + 2*$dy;
+     }
+     $error = $error + $E_square;
+     $y= $y + $ystep;
+     $tk= $tk + 2*$dx;
+     $q++;
+  }
+
+  $y= $y0;
+  $x= $x0;
+  $error= -$einit;
+  $tk= $dx+$dy+$winit;
+
+  while($tk<=$w_right)
+  {
+     push (@pts,[$x,$y]) if ($p);
+     if ($error>$threshold)
+     {
+       $x= $x - $xstep;
+       $error = $error + $E_diag;
+       $tk= $tk + 2*$dy;
+     }
+     $error = $error + $E_square;
+     $y= $y - $ystep;
+     $tk= $tk + 2*$dx;
+     $p++;
+  }
+
+  push (@pts,[$x,$y]) if ($q==0 && $p<2); # we need this for very thin lines
+  
+  return @pts;
+}
+
+
+sub x_varthick_line{
+   my ($x0,$y0,$dx,$dy,$xstep,$ystep,
+    $left, $argL, #left  thickness function
+    $right,$argR, #right thickness function
+    $pxstep,$pystep)=@_;
+  
+  my @xPoints;
+  
+  my $p_error= 0;
+  my $error= 0;
+  my $y= $y0;
+  my $x= $x0;
+  my $threshold = $dx - 2*$dy;
+  my $E_diag= -2*$dx;
+  my $E_square= 2*$dy;
+  my $length = $dx+1;
+  my $D= sqrt($dx*$dx+$dy*$dy);
+
+  for(my $p=0;$p<$length;$p++)
+  {
+    my $w_left=  $left->($argL, $p, $length)*2*$D;
+    my $w_right= $right->($argR,$p, $length)*2*$D;
+    push @xPoints,x_perpendicular($x,$y, $dx, $dy, $pxstep, $pystep,
+                                      $p_error,$w_left,$w_right,$error);
+    if ($error>=$threshold)
+    {
+      $y= $y + $ystep;
+      $error = $error + $E_diag;
+      if ($p_error>=$threshold) 
+      {
+      push @xPoints,x_perpendicular($x,$y, $dx, $dy, $pxstep, $pystep,
+                                    ($p_error+$E_diag+$E_square), 
+                                     $w_left,$w_right,$error);
+        $p_error= $p_error + $E_diag;
+      }
+      $p_error= $p_error + $E_square;
+    }
+    $error = $error + $E_square;
+    $x= $x + $xstep;
+  }
+  return @xPoints;
+}
+
+ #*                            Y BASED LINES                            *
+
+sub y_perpendicular{
+	my ($x0,$y0,$dx,$dy,$xstep,$ystep,
+        $einit,$w_left, $w_right,$winit)=@_;
+
+  my @pts;
+
+  my $threshold = $dy - 2*$dx;
+  my $E_diag= -2*$dy;
+  my $E_square= 2*$dx;
+  my $p=my $q=0;
+
+  my $y= $y0;
+  my $x= $x0;
+  my $error= -$einit;
+  my $tk= $dx+$dy+$winit; 
+
+
+  while($tk<=$w_left)
+  {
+     push @pts,[$x,$y];
+     if ($error>$threshold)
+     {
+       $y= $y + $ystep;
+       $error = $error + $E_diag;
+       $tk= $tk + 2*$dx;
+     }
+     $error = $error + $E_square;
+     $x= $x + $xstep;
+     $tk= $tk + 2*$dy;
+     $q++;
+  }
+
+
+  $y= $y0;
+  $x= $x0;
+  $error= $einit;
+  $tk= $dx+$dy-$winit; 
+
+  while($tk<=$w_right)
+  {
+     push (@pts,[$x,$y]) if ($p);
+     if ($error>=$threshold)
+     {
+       $y= $y - $ystep;
+       $error = $error + $E_diag;
+       $tk= $tk + 2*$dx;
+     }
+     $error = $error + $E_square;
+     $x= $x - $xstep;
+     $tk= $tk + 2*$dy;
+     $p++;
+  }
+
+  push (@pts,[$x,$y])  if ($q==0 && $p<2); # we need this for very thin lines
+  return @pts;
+ }
+
+
+sub y_varthick_line {
+  my ($x0,$y0,$dx,$dy,$xstep,$ystep,
+    $left, $argL, #left  thickness function
+    $right,$argR, #right thickness function
+    $pxstep,$pystep)=@_;
+  
+  my @yPoints;
+  my $p_error= 0;
+  my $error= 0;
+  my $y= $y0;
+  my $x= $x0;
+  my $threshold = $dy - 2*$dx;
+  my $E_diag= -2*$dy;
+  my $E_square= 2*$dx;
+  my $length = $dy+1;
+  my $D= sqrt($dx*$dx+$dy*$dy);
+
+  for(my $p=0;$p<$length;$p++)
+  {
+    my $w_left=  $left->($argL, $p, $length)*2*$D;
+    my $w_right= $right->($argR,$p, $length)*2*$D;
+    push @yPoints,y_perpendicular($x,$y, $dx, $dy, $pxstep, $pystep,
+                                      $p_error,$w_left,$w_right,$error);
+    if ($error>=$threshold)
+    {
+      $x= $x + $xstep;
+      $error = $error + $E_diag;
+      if ($p_error>=$threshold)
+      {
+      push @yPoints,y_perpendicular($x,$y, $dx, $dy, $pxstep, $pystep,
+                                      ($p_error+$E_diag+$E_square),$w_left,$w_right,$error);
+        $p_error= $p_error + $E_diag;
+      }
+      $p_error= $p_error + $E_square;
+    }
+    $error = $error + $E_square;
+    $y= $y + $ystep;
+  }
+  return @yPoints;
+}
+
+ #*                                ENTRY                                *
+
+sub thick_line{
+     my ($x0,$y0,$x1,$y1,$thickness)=@_;
+     return varthick_line(13,13,5,-5,sub{return $thickness},undef,sub{return $thickness},2)
+};
+
+
+sub varthick_line{
+     my ($x0,$y0,$x1,$y1,
+       $left,$argL,
+       $right,$argR)=@_;
+
+  my $dx= $x1-$x0;
+  my $dy= $y1-$y0;
+  my $xstep= my $ystep= 1;
+
+  if ($dx<0) { $dx= -$dx; $xstep= -1; }
+  if ($dy<0) { $dy= -$dy; $ystep= -1; }
+
+  $xstep= 0 if ($dx==0);
+  $ystep= 0 if ($dy==0);
+  my $pxstep; my $pystep;
+
+  my $xch= 0;
+  for($xstep + $ystep*4){
+    ($_==-1 + -1*4) && do {$pystep= -1; $pxstep= 1; $xch= 1; last;};   # -5
+    ($_==-1 +  0*4) && do {$pystep= -1; $pxstep= 0; $xch= 1; last;};   #  -1
+    ($_==-1 +  1*4) && do {$pystep=  1; $pxstep= 1;  last;};   #  3
+    ($_== 0 + -1*4) && do {$pystep=  0; $pxstep= -1; last;};   #  -4
+    ($_== 0 +  0*4) && do {$pystep=  0; $pxstep= 0;  last;};   #  0
+    ($_== 0 +  1*4) && do {$pystep=  0; $pxstep= 1;  last;};   #  4
+    ($_== 1 + -1*4) && do {$pystep= -1; $pxstep= -1; last;};   #  -3
+    ($_== 1 +  0*4) && do {$pystep= -1; $pxstep= 0;  last;};   #  1
+    ($_== 1 +  1*4) && do {$pystep=  1; $pxstep= -1; $xch=1; last;};   #  5
+  }
+
+  if ($xch){
+	  my $K;
+	  $K= $argL; $argL= $argR; $argR= $K;
+	  $K= $left; $left= $right; $right= $K; }
+
+  if ($dx>$dy){
+	  return x_varthick_line($x0,$y0,$dx,$dy,$xstep,$ystep,
+                                                $left,$argL,$right,$argR,
+                                                $pxstep,$pystep);
+   }
+   else{
+	   return y_varthick_line($x0,$y0,$dx,$dy,$xstep,$ystep,
+                                                $left,$argL,$right,$argR,
+                                                $pxstep,$pystep);
+   }
+}
+
+
+
 
 1;
 __END__

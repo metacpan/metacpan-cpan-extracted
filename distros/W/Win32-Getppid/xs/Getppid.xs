@@ -21,7 +21,7 @@ getppid()
     pid = GetCurrentProcessId();
     found = 0;
     snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    
+
     if(snapshot != INVALID_HANDLE_VALUE)
     {
       pe.dwSize = sizeof(pe);
@@ -37,10 +37,12 @@ getppid()
         good = Process32Next(snapshot, &pe);
       }
     }
-    
+
+    CloseHandle(snapshot);
+
     if(!found)
       croak("Unable to find parent process");
-    
+
   OUTPUT:
     RETVAL
-    
+

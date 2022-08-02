@@ -58,7 +58,7 @@ SYNOPSIS
         }
 
 VERSION
-        v0.23.0
+        v0.25.0
 
 DESCRIPTION
     Module::Generic as its name says it all, is a generic module to inherit
@@ -263,10 +263,10 @@ METHODS
     data either directly from a specified file or being provided, and
     returns the perl data.
 
-    The 2 serialisers currently supported are: Sereal and Storable. They are
-    not required by Module::Generic, so you must install them yourself. If
-    the serialiser chosen is not installed, this will set an errr and return
-    "undef".
+    The 2 serialisers currently supported are: Sereal and Storable::Improved
+    (or the legacy Storable). They are not required by Module::Generic, so
+    you must install them yourself. If the serialiser chosen is not
+    installed, this will set an errr and return "undef".
 
     This method takes some parameters as an hash or hash reference. It can
     then:
@@ -290,26 +290,35 @@ METHODS
     *   *io*
 
         A file handle. This is used when the serialiser is Storable to call
-        its function "store_fd" in Storable and "fd_retrieve" in Storable
+        its function "store_fd" in Storable::Improved and "fd_retrieve" in
+        Storable::Improved
 
     *   *lock*
 
         Boolean. If true, this will lock the file before reading from it.
         This works only in conjonction with *file* and the serialiser
-        Storable
+        Storable::Improved
 
     *   *serialiser* or *serializer*
 
         A string being the class of the serialiser to use. This can be only
-        either Sereal or Storable
+        either Sereal or Storable or Storable::Improved
 
     Additionally the following options are supported and passed through
-    directly to "decode" in Sereal::Decoder if the serialiser is Sereal:
-    *alias_smallint*, *alias_varint_under*, *incremental*,
-    *max_num_array_entries*, *max_num_hash_entries*, *max_recursion_depth*,
-    *max_string_length*, *max_uncompressed_size*, *no_bless_objects*,
-    *refuse_objects*, *refuse_snappy*, *set_readonly*,
-    *set_readonly_scalars*, *use_undef*, *validate_utf8*
+    directly to each serialiser:
+
+    *   CBOR: "max_depth", "max_size", "allow_unknown", "allow_sharing",
+        "allow_cycles", "forbid_objects", "pack_strings", "text_keys",
+        "text_strings", "validate_utf8", "filter"
+
+    *   "decode" in Sereal::Decoder if the serialiser is Sereal:
+        "alias_smallint", "alias_varint_under", "incremental",
+        "max_num_array_entries", "max_num_hash_entries",
+        "max_recursion_depth", "max_string_length", "max_uncompressed_size",
+        "no_bless_objects", "refuse_objects", "refuse_snappy",
+        "set_readonly", "set_readonly_scalars", "use_undef", "validate_utf8"
+
+    *   Storable::Improved / Storable: no option available
 
     If an error occurs, this sets an error and return "undef"
 
@@ -960,9 +969,10 @@ METHODS
     This method use a specified serialiser class and serialise the given
     data either by returning it or by saving it directly to a given file.
 
-    The 2 serialisers currently supported are: Sereal and Storable. They are
-    not required by Module::Generic, so you must install them yourself. If
-    the serialiser chosen is not installed, this will set an errr and return
+    The 3 serialisers currently supported are: CBOR, Sereal and
+    Storable::Improved (or the legacy version Storable). They are not
+    required by Module::Generic, so you must install them yourself. If the
+    serialiser chosen is not installed, this will set an errr and return
     "undef".
 
     This method takes some data and an optional hash or hash reference of
@@ -970,7 +980,7 @@ METHODS
 
     *   save data directly to File
 
-    *   save data to a file handle (only with Storable)
+    *   save data to a file handle (only with Storable::Improved / Storable)
 
     *   Return the serialised data
 
@@ -987,27 +997,38 @@ METHODS
 
     *   *io*
 
-        A file handle. This is used when the serialiser is Storable to call
-        its function "store_fd" in Storable and "fd_retrieve" in Storable
+        A file handle. This is used when the serialiser is
+        Storable::Improved / Storable to call its function "store_fd" in
+        Storable::Improved and "fd_retrieve" in Storable::Improved
 
     *   *lock*
 
         Boolean. If true, this will lock the file before writing to it. This
-        works only in conjonction with *file* and the serialiser Storable
+        works only in conjonction with *file* and the serialiser
+        Storable::Improved
 
     *   *serialiser* or *serializer*
 
         A string being the class of the serialiser to use. This can be only
-        either Sereal or Storable
+        either Sereal or Storable::Improved
 
     Additionally the following options are supported and passed through
-    directly to "decode" in Sereal::Decoder if the serialiser is Sereal:
-    *aliased_dedupe_strings*, *canonical*, *canonical_refs*, *compress*,
-    *compress_level*, *compress_threshold*, *croak_on_bless*,
-    *dedupe_strings*, *freeze_callbacks*, *max_recursion_depth*,
-    *no_bless_objects*, *no_shared_hashkeys*, *protocol_version*, *snappy*,
-    *snappy_incr*, *snappy_threshold*, *sort_keys*, *stringify_unknown*,
-    *undef_unknown*, *use_protocol_v1*, *warn_unknown*
+    directly for each serialiser:
+
+    *   CBOR: "max_depth", "max_size", "allow_unknown", "allow_sharing",
+        "allow_cycles", "forbid_objects", "pack_strings", "text_keys",
+        "text_strings", "validate_utf8", "filter"
+
+    *   "encode" in Sereal::Decoder if the serialiser is Sereal:
+        "aliased_dedupe_strings", "canonical", "canonical_refs", "compress",
+        "compress_level", "compress_threshold", "croak_on_bless",
+        "dedupe_strings", "freeze_callbacks", "max_recursion_depth",
+        "no_bless_objects", "no_shared_hashkeys", "protocol_version",
+        "snappy", "snappy_incr", "snappy_threshold", "sort_keys",
+        "stringify_unknown", "undef_unknown", "use_protocol_v1",
+        "warn_unknown"
+
+    *   Storable::Improved / Storable: no option available
 
     If an error occurs, this sets an error and return "undef"
 
@@ -1136,21 +1157,69 @@ SUPPORT METHODS
     arguments provided as hash reference irrespective of whether they were
     initially provided as hash reference or a simple hash.
 
+    In list context, this returns an hash reference and an array reference
+    containing the order of the properties provided.
+
     For example:
 
         my $ref = $self->_get_args_as_hash( first => 'John', last => 'Doe' );
         # returns hash reference { first => 'John', last => 'Doe' }
         my $ref = $self->_get_args_as_hash({ first => 'John', last => 'Doe' });
         # same result as previous example
-        my $res = $self->_get_args_as_hash(); # no args provided
+        my $ref = $self->_get_args_as_hash(); # no args provided
         # returns an empty hash reference
+        my( $ref, $keys ) = $self->_get_args_as_hash( first => 'John', last => 'Doe' );
+
+    In the last example, $keys is an array object containing the list of
+    properties passed an in the order they were provided, i.e. "first" and
+    "last". If the properties were provided as an hash reference, the $keys
+    returned will be the sorted list of properties, such as:
+
+        my( $ref, $keys ) = $self->_get_args_as_hash({ last => 'Doe', first => 'John' });
+
+    Here, $keys will be sorted and contain the properties in their
+    alphabetical order.
 
     However, this will return empty:
 
         my $ref = $self->_get_args_as_hash( { age => 42, city => 'Tokyo' }, some_other => 'parameter' );
 
     This returns an empty hash reference, because although the first
-    parameter is an hash reference, there is more than on parameter.
+    parameter is an hash reference, there is more than one parameter.
+
+    As of version v0.24.0, this utility method allows for more advanced use
+    and permits embedding parameters among arguments, remove them from the
+    list and return them.
+
+    For example:
+
+    Assuming @_ contains: "foo bar debug 4 baz"
+
+        my $ref = $self->_get_args_as_hash( @_, args_list => [qw( debug )] );
+
+    This will set $ref with "debug" only.
+
+    Even the special parameter "args_list" does not have to be at the end
+    and could be anywhere:
+
+        my $ref = $self->_get_args_as_hash( 'foo', 'bar', args_list => [qw( debug )], 'debug', 4, 'baz' );
+
+    If you want to modify @_,because you need its content without any
+    params, pass @_ as an array reference.
+
+        my $ref = $self->_get_args_as_hash( \@_, args_list => [qw( debug )] );
+        say "@_";
+
+    $ref is an hash reference that would contain "debug" and @_ only
+    contains "foo bar baz"
+
+    You can also simply pass @_ as a reference to simply save memory.
+
+    Assuming @_ is "foo bar baz 3 debug 4"
+
+        my $ref = $self->_get_args_as_hash( \@_ );
+
+    This would set $ref to be an hash reference with keys "foo baz debug"
 
   _get_stack_trace
     This will return a Devel::StackTrace object initiated with the following
@@ -1162,6 +1231,19 @@ SUPPORT METHODS
     *skip_frames* 1
         This is set to 1 so this very method is not included in the frames
         stack
+
+  _implement_freeze_thaw
+    Provided with a list of package names and this method will implement in
+    each of them the subroutines necessary to handle Storable::Improved (or
+    the legacy Storable), CBOR and Sereal serialisation.
+
+    In effect, it will check that the subroutines "FREEZE", "THAW",
+    "STORABLE_freeze" and "STORABLE_thaw" exists or sets up simple ones if
+    they are not defined.
+
+    This works for packages that use hash-based objects. However, you need
+    to make sure there is no specific package requirements, and if there is,
+    you might need to customise those subroutines by yourself.
 
   _is_a
     Provided with an object and a package name and this will return true if
@@ -1226,6 +1308,36 @@ SUPPORT METHODS
 
     It would rather return the module package name: "My::Module"
 
+  _is_class_loadable
+    Provided with a package name, a.k.a. a class, and an optional version
+    and this will endeavour to check if that class is installed and if a
+    version is provided, if it is greater or equal to the version provided.
+
+    If the module is not already loaded and a version was provided, it uses
+    Module::Metadata to get that module version.
+
+    It returns true if the module can be loaded or false otherwise.
+
+    If an error occurred, it sets an error and returns "undef", so be sure
+    to check whether the return value is defined.
+
+  _is_class_loaded
+    Provided with a package name, a.k.a. a class, and this returns true if
+    the class has already been loaded or false otherwise.
+
+    If you are running under mod_perl, this method will use "loaded" in
+    Apache2::Module to find out, otherwise, it will simply check if the
+    class exists in %INC
+
+  _is_code
+    Provided with some value, possibly, undefined, and this returns true if
+    it is a "CODE", such as a subroutine reference or an anonymous
+    subroutine, or false otherwise.
+
+  _is_glob
+    Provided with some value, possibly, undefined, and this returns true if
+    it is a filehandle, or false otherwise.
+
   _is_hash
     Same as "_is_array", but for hash reference.
 
@@ -1266,6 +1378,7 @@ SUPPORT METHODS
             qw( :some_tags SOME_CONSTANTS_TO_IMPORT ),
             { version => 'v1.2.3', caller => 'Its::Me' }
         ) || die( $self->error );
+        $self->_load_class( 'My::Module', { no_import => 1 } ) || die( $self->error );
 
     Provided with a class/package name, some optional list of semantics to
     import, and, as the last parameter, an optional hash reference of
@@ -1283,9 +1396,25 @@ SUPPORT METHODS
         The package name of the caller. If this is not provided, it will
         default to the value provided with "caller" in perlfunc
 
+    *no_import*
+        Set to a true value and this will prevent the loaded module from
+        importing anything into your namespace.
+
+        This is the equivalent of doing:
+
+            use My::Module ();
+
     *version*
         The minimum version for this class to load. This value is passed
         directly to "use" in perlfunc
+
+  _load_classes
+    This will load multiple classes by providing it an array reference of
+    class name to load and an optional hash or hash reference of options,
+    similar to those provided to "_load_class"
+
+    If one of those classes failed to load, it will return immediately after
+    setting an "error".
 
   _lvalue
     This provides a generic lvalue method that can be used both in assign
@@ -1672,11 +1801,19 @@ SUPPORT METHODS
     Provided with an object property name and a file and this will store the
     given file as a Module::Generic::File object.
 
-    It returns under and set an error if the provided value is not a proper
-    file.
+    It returns "undef" and set an error if the provided value is not a
+    proper file.
 
     Note that the files does not need to exist and it can also be a
     directory or a symbolic link or any other file on the system.
+
+  _set_get_glob
+        sub handle { return( shift->_set_get_glob( 'handle', @_ ) ); }
+
+    Provided with an object property name and a glob (file handle) and this
+    will store the given glob.
+
+    It returns "undef" and set an error if the provided value is not a glob.
 
   _set_get_hash
         sub metadata { return( shift->_set_get_hash( 'metadata', @_ ) ); }
@@ -1986,7 +2123,31 @@ SUPPORT METHODS
         my $array = $self->_to_array_object( [qw( Hello world )] ); # Becomes an array object of 'Hello' and 'world'
 
   _warnings_is_enabled
-    Returns true of warnings are enabled, false otherwise.
+    Called with the class object or providing another class object as
+    argument, and this returns true if warnings are enabled for the given
+    class, false otherwise.
+
+    Example:
+
+        $self->_warnings_is_enabled();
+        # Providing another class object
+        $self->_warnings_is_enabled( $other_object );
+
+  _warnings_is_registered
+    Called with the class object or providing another class object as
+    argument, and this returns true if warnings are registered for the given
+    class, false otherwise.
+
+    This is useful, because calling "warnings::enabled()" to check if
+    warnings are enabled for a given class when that class has not
+    registered for warnings using the pragma "use warnings::register" will
+    produce an error "Unknown warnings category".
+
+    Example:
+
+        $self->_warnings_is_registered();
+        # Providing another class object
+        $self->_warnings_is_registered( $other_object );
 
   __dbh
     if your module has the global variables "DB_DSN", this will create a
@@ -2062,7 +2223,26 @@ ERROR & EXCEPTION HANDLING
     you can use the try-catch block using an experimental feature "use
     feature 'try';", but this does not support "catch" by exception class.
 
-    However
+SERIALISATION
+    The modules in the Module::Generic distribution all supports
+    Storable::Improved (or the legacy Storable), Sereal and CBOR
+    serialisation, by implementing the methods "FREEZE", "THAW",
+    "STORABLE_freeze", "STORABLE_thaw"
+
+    Even the IO modules like Module::Generic::File::IO and
+    Module::Generic::Scalar::IO can be serialised and deserialised if the
+    methods "FREEZE" and "THAW" are used. By design the methods
+    "STORABLE_freeze" and "STORABLE_thaw" are not implemented because it
+    would trigger a Storable exception "Unexpected object type (8) in
+    store_hook()". Instead it is strongly encouraged you use the improved
+    Storable::Improved which addresses and mitigate those issues.
+
+    For serialisation with Sereal, make sure to instantiate the Sereal
+    encoder with the "freeze_callbacks" option set to true, otherwise,
+    "Sereal" will not use the "FREEZE" and "THAW" methods.
+
+    See "FREEZE/THAW CALLBACK MECHANISM" in Sereal::Encoder for more
+    information.
 
 SEE ALSO
     Module::Generic::Exception, Module::Generic::Array,

@@ -1,0 +1,182 @@
+#!/trw/local/perl/default/bin/perl 
+
+use 5.006001;
+
+use strict;
+use warnings;
+
+use English qw{ -no_match_vars };
+use Getopt::Long 2.33 qw{ :config auto_version };
+use Perl::Critic;
+use Perl::Critic::Utils qw{ all_perl_files };
+use Perl::Critic::Violation;
+# The following is superfluous as far as Perl::Critic is concerned, but
+# handy if we want to run the debugger.
+use Perl::Critic::Policy::Variables::ProhibitNumericNamesWithLeadingZero;
+use Readonly;
+use Pod::Usage;
+
+our $VERSION = '0.002';
+
+Readonly::Scalar my $DEFAULT_SINGLE_FILE_FORMAT => 4;
+Readonly::Scalar my $DEFAULT_MULTI_FILE_FORMAT  => 5;
+
+my %opt = map { $_ => 1 } @INVERTED_OPTIONS;
+
+GetOptions( \%opt, qw{
+        dump! trace=s
+    },
+    'format=s'  => \( my $format ),
+    'verbose!'  => \( my $verbose ),
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) or pod2usage( { -verbose => 0 } );
+
+if ( ! @ARGV ) {
+    -e 'MANIFEST'
+        or die "No arguments specified and no MANIFEST found\n";
+    require ExtUtils::Manifest;
+    my $manifest = ExtUtils::Manifest::maniread();
+    @ARGV = sort all_perl_files( keys %{ $manifest } )  ## no critic (RequireLocalizedPunctuationVars)
+}
+
+my $critic = Perl::Critic->new(
+    -profile    => 'NONE',
+);
+
+$critic->add_policy(
+    -policy => 'Variables::ProhibitNumericNamesWithLeadingZero',
+    -config => \%opt
+);
+
+{
+    no warnings qw{ newline };  ## no critic (ProhibitNoWarnings)
+    Perl::Critic::Violation::set_format(
+        defined $format ? $format :
+        ( @ARGV > 1 || -d $ARGV[0] ) ?
+            $DEFAULT_MULTI_FILE_FORMAT :
+            $DEFAULT_SINGLE_FILE_FORMAT
+    );
+}
+
+foreach my $fn ( @ARGV ) {
+
+    no warnings qw{ newline };  ## no critic (ProhibitNoWarnings)
+    foreach my $pf ( -e $fn ? all_perl_files( $fn ) : \$fn ) {
+        my @violations = Perl::Critic::Violation::sort_by_location(
+            $critic->critique( $pf ) );
+
+        if ( @violations ) {
+            foreach ( @violations ) {
+                print;
+            }
+        } elsif ( $verbose ) {
+            local $_ = Perl::Critic::Violation::get_format();
+            local $OUTPUT_RECORD_SEPARATOR = "\n";
+            print m/ (?: \A | (?<= [^%] ) ) (?: %% )* %f /smx ?
+                "$pf source OK" : 'source OK';
+        }
+    }
+}
+
+__END__
+
+=head1 NAME
+
+var-names-with-leading-zero - Find unused variables in Perl code
+
+=head1 SYNOPSIS
+
+ var-names-with-leading-zero .
+ var-names-with-leading-zero lib/
+ var-names-with-leading-zero --help
+ var-names-with-leading-zero --version
+
+=head1 OPTIONS
+
+The following options are accepted by this script. They are documented
+with leading double dashes, but single dashes are accepted, as are
+unique abbreviations.
+
+=head2 --dump
+
+ --dump
+
+This B<unsupported> Boolean option causes a dump of variables and their
+declarations to C<STDERR>.
+
+This option and its effects can be changed or retracted without notice.
+
+=head2 --format
+
+ --format 5
+
+This option specifies the F<perlcritic> format to use for output. This
+corresponds to the F<perlcritic> C<--verbose> option, takes the same
+values, and has the same default.
+
+=head2 --help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 --trace
+
+ --trace '$foo %bar'
+
+This B<unsupported> option causes all definitions and uses of the given
+variables to be displayed to C<STDERR>. Multiple variables are
+space-separated. True sigils are used -- that is, C<$foo> refers only to
+the scalar.
+
+This option and its effects may be changed or retracted without notice.
+
+=head2 --verbose
+
+If this Boolean option is asserted, files that have no violations are
+displayed as C<'OK'>. If not, files having no violations produce no
+output.
+
+=head2 --version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DESCRIPTION
+
+This Perl script wraps the rogue Perl::Critic policy
+Variables::ProhibitNumericNamesWithLeadingZero. This is a variant of
+Variables::ProhibitUnusedVariables that actually has some teeth.
+
+If no arguments are passed, the contents of the F<MANIFEST> are scanned
+-- at least, those which appear to be Perl files.
+
+If an argument is passed which is not a file name, it is assumed to be
+code to critique.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2022 by Thomas R. Wyant, III
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 72
+#   indent-tabs-mode: nil
+#   c-indentation-style: bsd
+# End:
+# ex: set ts=8 sts=4 sw=4 tw=72 ft=perl expandtab shiftround :

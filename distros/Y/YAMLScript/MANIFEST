@@ -7,9 +7,7 @@ META.json
 META.yml
 Makefile.PL
 README
-bin/testyamlscript
 bin/yamlscript
-bin/ys-testyamlscript.pl
 bin/ys-yamlscript.pl
 lib/YAMLScript.pm
 lib/YAMLScript.pod
@@ -18,6 +16,7 @@ lib/YAMLScript/Compiler.pm
 lib/YAMLScript/Expr.pm
 lib/YAMLScript/Func.pm
 lib/YAMLScript/NS.pm
+lib/YAMLScript/Native.pm
 lib/YAMLScript/Str.pm
 lib/YAMLScript/Util.pm
 lib/YS/Core.pm
@@ -25,7 +24,10 @@ lib/YS/TestYAMLScript.pm
 lib/YS/XXX.pm
 t/000-compile-modules.t
 t/author-pod-syntax.t
+t/def.t
 t/docker-cpan-test.sh
+t/if.t
+t/lib/DistTestFixer.pm
 t/map.t
 t/strings.t
 t/tag-syntax.t

@@ -1,5 +1,8 @@
 See also the git repository.
 
+0.23    2020-03-08
+        Add sample() method to pick N items from an array reference.
+
 0.17    2020-03-08
         Break interface, dice() renamed to roll(). Made this routine
         slightly faster. rand() made faster. Add coinflip() and

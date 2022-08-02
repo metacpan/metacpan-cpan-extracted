@@ -17,17 +17,17 @@ my %assigns = (
 my $context = new_ok 'Template::Liquid::Context', [assigns => \%assigns];
 #
 is_deeply [$context->get('list')], [$assigns{list}], 'list';
-is $context->get('list.1'),  $assigns{list}[1],  'list.1';
-is $context->get('list.10'), $assigns{list}[10], 'list.10 (undef)';
-is $context->get('list.size'), scalar @{$assigns{list}}, 'list.size';
-is $context->get('list.first'), $assigns{list}[0],  'list.first';
-is $context->get('list.last'),  $assigns{list}[-1], 'list.last';
-is $context->get('lol.0.1'), $assigns{lol}[0][1], 'lol.0.1 (undef)';
-is $context->get('lol.0.1'), undef, 'lol.0.1 (undef part 2)';
-is_deeply [$context->get('hash')], [$assigns{hash}], 'hash';
+is $context->get('list.1'),     $assigns{list}[1],        'list.1';
+is $context->get('list.10'),    $assigns{list}[10],       'list.10 (undef)';
+is $context->get('list.size'),  scalar @{$assigns{list}}, 'list.size';
+is $context->get('list.first'), $assigns{list}[0],        'list.first';
+is $context->get('list.last'),  $assigns{list}[-1],       'list.last';
+is $context->get('lol.0.1'),    $assigns{lol}[0][1],      'lol.0.1 (undef)';
+is $context->get('lol.0.1'),    undef, 'lol.0.1 (undef part 2)';
+is_deeply [$context->get('hash')],      [$assigns{hash}],       'hash';
 is_deeply [$context->get('hash.hash')], [$assigns{hash}{hash}], 'hash.hash';
 is $context->get('hash.hash.var'), $assigns{hash}{hash}{var}, 'hash.hash.var';
-is $context->get('hash.list.0'), $assigns{hash}{list}[0], 'hash.list.0';
+is $context->get('hash.list.0'),   $assigns{hash}{list}[0],   'hash.list.0';
 
 # Simple scalars
 is $context->get('"hash.list.0"'), 'hash.list.0', '"hash.list.0"';
@@ -45,14 +45,14 @@ is $context->get('hash.fake.deep'), undef, 'hash.fake.deep';
 is $context->get('list.50'),        undef, 'list.50';
 is $context->get('list.fake'),      undef, 'list.fake';
 is $context->get('hash.2.50'),      undef, 'list.2.50';
-is $context->get(), undef, '()';
-is $context->get(''),      undef, '(empty string)';
-is $context->get('null'),  undef, 'null';
-is $context->get('nil'),   undef, 'nil';
-is $context->get('blank'), undef, 'blank';
-is $context->get('empty'), undef, 'empty';
-is $context->get('false'), !1,    'false';
-is $context->get('true'),  !!1,   'true';
+is $context->get(),                 undef, '()';
+is $context->get(''),               undef, '(empty string)';
+is $context->get('null'),           undef, 'null';
+is $context->get('nil'),            undef, 'nil';
+is $context->get('blank'),          undef, 'blank';
+is $context->get('empty'),          undef, 'empty';
+is $context->get('false'),          !1,    'false';
+is $context->get('true'),           !!1,   'true';
 is_deeply [$context->get('(1..10)')], [[1 .. 10]], '(1..10)';
 is_deeply [$context->get('(range_1..range_2)')],
     [[$assigns{range_1} .. $assigns{range_2}]], '(range_1..range_2)';

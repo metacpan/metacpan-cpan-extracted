@@ -12,7 +12,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Standard::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::VERSION   = '1.016002';
+	$Types::Standard::VERSION   = '1.016006';
 }
 
 $Types::Standard::VERSION =~ tr/_//d;
@@ -682,24 +682,34 @@ my $_Optional = $meta->add_type(
 	}
 );
 
-my $_slurpy = $meta->add_type(
+my $_slurpy;
+$_slurpy = $meta->add_type(
 	{
 		name                 => "Slurpy",
+		slurpy               => 1,
 		parent               => $_item,
 		constraint_generator => sub {
+			my $self  = $_slurpy;
 			my $param = @_ ? Types::TypeTiny::to_TypeTiny(shift) : $_any;
 			Types::TypeTiny::is_TypeTiny( $param )
 				or _croak(
 				"Parameter to Slurpy[`a] expected to be a type constraint; got $param" );
-			sub { $param->check( $_[0] ) };
-		},
-		inline_generator => sub {
-			my $param = shift;
-			return unless $param->can_be_inlined;
-			return sub {
-				my $v = $_[1];
-				$param->inline_check( $v );
-			};
+			
+			return $self->create_child_type(
+				slurpy          => 1,
+				display_name    => $self->name_generator->( $self, $param ),
+				parameters      => [ $param ],
+				constraint      => sub { $param->check( $_[0] ) },
+				_build_coercion => sub {
+					my $coercion = shift;
+					$coercion->add_type_coercions( @{ $param->coercion->type_coercion_map } )
+						if $param->has_coercion;
+					$coercion->freeze;
+				},
+				$param->can_be_inlined
+					? ( inlined => sub { $param->inline_check( $_[1] ) } )
+					: (),
+			);
 		},
 		deep_explanation => sub {
 			my ( $type, $value, $varname ) = @_;
@@ -709,18 +719,22 @@ my $_slurpy = $meta->add_type(
 				@{ $param->validate_explain( $value, $varname ) },
 			];
 		},
-		coercion_generator => sub {
-			my ( $parent, $child, $param ) = @_;
-			return unless $param->has_coercion;
-			return $param->coercion;
-		},
 		my_methods => {
+			'unslurpy' => sub {
+				my $self  = shift;
+				$self->{_my_unslurpy} ||= $self->find_parent(
+					sub { $_->parent->{uniq} == $_slurpy->{uniq} }
+				)->type_parameter;
+			},
 			'slurp_into' => sub {
 				my $self  = shift;
-				if ( $self->parameters->[1] ) {
-					return $self->parameters->[1];
+				my $parameters = $self->find_parent(
+					sub { $_->parent->{uniq} == $_slurpy->{uniq} }
+				)->parameters;
+				if ( $parameters->[1] ) {
+					return $parameters->[1];
 				}
-				my $constraint = $self->parameters->[0];
+				my $constraint = $parameters->[0];
 				return 'HASH'
 					if $constraint->is_a_type_of( HashRef() )
 					or $constraint->is_a_type_of( Map() )
@@ -733,7 +747,9 @@ my $_slurpy = $meta->add_type(
 
 sub slurpy {
 	my $t = shift;
-	wantarray ? ( $_slurpy->of( $t ) , @_ ) : $_slurpy->of( $t );
+	my $s = $_slurpy->of( $t );
+	$s->{slurpy} ||= 1;
+	wantarray ? ( $s, @_ ) : $s;
 }
 
 $meta->$add_core_type(

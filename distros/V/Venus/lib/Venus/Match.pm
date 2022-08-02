@@ -5,35 +5,35 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class;
 
-extends 'Venus::Kind::Utility';
+base 'Venus::Kind::Utility';
 
+with 'Venus::Role::Valuable';
+with 'Venus::Role::Buildable';
 with 'Venus::Role::Accessible';
 
 use Scalar::Util ();
 
 # ATTRIBUTES
 
-has 'on_none' => (
-  is => 'rw',
-  default => sub{sub{}},
-);
+attr 'on_none';
+attr 'on_only';
+attr 'on_then';
+attr 'on_when';
 
-has 'on_only' => (
-  is => 'rw',
-  default => sub{sub{1}},
-);
+# BUILDERS
 
-has 'on_then' => (
-  is => 'rw',
-  default => sub {[]},
-);
+sub build_self {
+  my ($self, $data) = @_;
 
-has 'on_when' => (
-  is => 'rw',
-  default => sub {[]},
-);
+  $self->on_none(sub{}) if !$self->on_none;
+  $self->on_only(sub{1}) if !$self->on_only;
+  $self->on_then([]) if !$self->on_then;
+  $self->on_when([]) if !$self->on_when;
+
+  return $self;
+}
 
 # METHODS
 
@@ -262,6 +262,10 @@ L<Venus::Kind::Utility>
 This package integrates behaviors from:
 
 L<Venus::Role::Accessible>
+
+L<Venus::Role::Buildable>
+
+L<Venus::Role::Valuable>
 
 =cut
 

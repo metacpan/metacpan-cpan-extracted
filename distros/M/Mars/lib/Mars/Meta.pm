@@ -43,7 +43,9 @@ sub attrs_resolver {
   no strict 'refs';
 
   if (${"${name}::META"} && $${"${name}::META"}{ATTR}) {
-    return (keys %{$${"${name}::META"}{ATTR}});
+    return (map +($_,attrs_resolver($_)), sort {
+      $${"${name}::META"}{ATTR}{$a}[0] <=> $${"${name}::META"}{ATTR}{$b}[0]
+    } keys %{$${"${name}::META"}{ATTR}});
   }
   else {
     return ();
@@ -114,12 +116,12 @@ sub roles {
   my $name = $self->{name};
   my @roles = roles_resolver($name);
 
-  for my $base (@{$self->bases}) {
-    push @roles, roles_resolver($base);
-  }
-
   for my $role (@roles) {
     push @roles, roles_resolver($role);
+  }
+
+  for my $base (@{$self->bases}) {
+    push @roles, roles_resolver($base);
   }
 
   my %seen;
@@ -132,7 +134,9 @@ sub roles_resolver {
   no strict 'refs';
 
   if (${"${name}::META"} && $${"${name}::META"}{ROLE}) {
-    return (keys %{$${"${name}::META"}{ROLE}});
+    return (map +($_, roles_resolver($_)), sort {
+      $${"${name}::META"}{ROLE}{$a}[0] <=> $${"${name}::META"}{ROLE}{$b}[0]
+    } keys %{$${"${name}::META"}{ROLE}});
   }
   else {
     return ();

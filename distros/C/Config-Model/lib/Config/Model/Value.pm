@@ -7,12 +7,13 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Value 2.150;
+package Config::Model::Value 2.152;
 
 use v5.20;
 
 use strict;
 use warnings;
+use feature "switch";
 
 use Mouse;
 use Mouse::Util::TypeConstraints;
@@ -40,7 +41,7 @@ with "Config::Model::Role::HelpAsText";
 with "Config::Model::Role::ComputeFunction";
 
 use feature qw/postderef signatures/;
-no warnings qw/experimental::postderef experimental::signatures/;
+no warnings qw/experimental::postderef experimental::smartmatch experimental::signatures/;
 
 my $logger        = get_logger("Tree::Element::Value");
 my $user_logger   = get_logger("User");
@@ -113,11 +114,21 @@ has error_list => (
     handles => {
         add_error    => 'push',
         clear_errors => 'clear',
-        error_msg    => [ join => "\n" ],
         has_error    => 'count',
         all_errors   => 'elements',
         is_ok        => 'is_empty'
     } );
+
+sub error_msg  ($self) {
+    my $msg = '';
+    if ($self->has_error) {
+        my @add;
+        push @add, $self->compute_obj->compute_info if $self->compute_obj;
+        push @add, $self->{_migrate_from}->compute_info if $self->{_migrate_from};
+        $msg = join("\n", $self->all_errors, @add);
+    }
+    return $msg;
+}
 
 has warning_list => (
     is      => 'ro',
@@ -299,10 +310,10 @@ sub perform_compute {
     my $result = $self->compute_obj->compute;
 
     # check if the computed result fits with the constraints of the
-    # Value model
-    my ($ok, $value, $error, $warn) = $self->_check_value(value => $result);
+    # Value model, but don't check if it's mandatory
+    my ($value, $error, $warn) = $self->_check_value(value => $result);
 
-    if ( not $ok ) {
+    if ( scalar $error->@* ) {
         my $error = join("\n", (@$error, $self->compute_info));
 
         Config::Model::Exception::WrongValue->throw(
@@ -312,7 +323,7 @@ sub perform_compute {
     }
 
     $logger->trace("done");
-    return $ok ? $result : undef;
+    return $result;
 }
 
 # internal, used to generate error messages
@@ -377,11 +388,9 @@ sub migrate_value {
 
     #print "check result: $ok\n";
     if ( not $ok ) {
-        my $error = $self->error_msg . "\n\t" . $self->{_migrate_from}->compute_info;
-
         Config::Model::Exception::WrongValue->throw(
             object => $self,
-            error  => "migrated value error:\n\t" . $error
+            error  => "migrated value error:\n\t" . $self->error_msg
         );
     }
 
@@ -869,8 +878,8 @@ sub _check_value ($self, %args) {
         if (defined $value) {
             my $path = path($value);
             if ($path->exists) {
-                my $check = 'is_'.$vt ;
-                push @warn, "$value is not a $vt" if not path($value)->$check;
+                my $check_sub = 'is_'.$vt ;
+                push @warn, "$value is not a $vt" if not path($value)->$check_sub;
             }
             else {
                 push @warn, "$vt $value does not exists" ;
@@ -922,20 +931,6 @@ sub _check_value ($self, %args) {
         my $msg =
             "Cannot check value_type '$vt' (value '$value'$choice_msg)";
         Config::Model::Exception::Model->throw( object => $self, message => $msg );
-    }
-
-    # a value may be mandatory and have a default value with layers
-    if ( $self->{mandatory}
-         and $check eq 'yes'
-         and ( $mode =~ /backend|user/ )
-         and ( not defined $value or not length($value) )
-         and ( not defined $self->{layered} or not length($self->{layered}))
-        ) {
-        # check only "empty" mode.
-        my $msg = "Undefined mandatory value.";
-        $msg .= $self->warp_error
-            if defined $self->{warped_attribute}{default};
-        push @error, $msg;
     }
 
     if ( defined $self->{match_regexp} and defined $value ) {
@@ -995,13 +990,36 @@ sub _check_value ($self, %args) {
         " errors and ", scalar @warn, " warnings"
     );
 
-    my $ok = not @error;
-    return ($ok, $value, \@error, \@warn);
+    # return $value because it may be modified by apply_fixes
+    return ($value, \@error, \@warn);
 }
 
+sub _check_mandatory_value ($self, %args) {
+    my $value     = $args{value};
+    my $check     = $args{check} || 'yes';
+    my $mode      = $args{mode} || 'backend';
+    my $error     = $args{error} // carp "Missing error parameter";
+
+    # a value may be mandatory and have a default value with layers
+    if ( $self->{mandatory}
+         and $check eq 'yes'
+         and ( $mode =~ /backend|user/ )
+         and ( not defined $value or not length($value) )
+         and ( not defined $self->{layered} or not length($self->{layered}))
+        ) {
+        # check only "empty" mode.
+        my $msg = "Undefined mandatory value.";
+        $msg .= $self->warp_error
+            if defined $self->{warped_attribute}{default};
+        push $error->@*, $msg;
+    }
+
+    return;
+}
 
 sub check_value ($self, @args) {
-    my ($ok, $value, $error, $warn) = $self->_check_value(@args);
+    my ($value, $error, $warn) = $self->_check_value(@args);
+    $self->_check_mandatory_value(@args, value => $value, error => $error);
     $self->clear_errors;
     $self->clear_warnings;
     $self->add_error(@$error)  if @$error;
@@ -1009,6 +1027,7 @@ sub check_value ($self, @args) {
 
     $logger->trace("done");
 
+    my $ok = not $error->@*;
     # return $value because it may be updated by apply_fix
     return wantarray ? ($ok, $value) : $ok;
 }
@@ -1390,7 +1409,7 @@ sub _store ($self, %args) {
     else {
         $self->instance->add_error( $self->location );
         if ($check eq 'skip') {
-            if (not $silent and $self->error_msg) {
+            if (not $silent and $self->has_error) {
                 my $msg = "Warning: ".$self->location." skipping value $value because of the following errors:\n"
                     . $self->error_msg . "\n\n";
                 # fuse UI exits when a warning is issued. No other need to advertise this option
@@ -1691,7 +1710,7 @@ sub _fetch {
         :                                      $self->{upstream_default};
     my $std = defined $pref ? $pref : $known_upstream;
 
-    if ( not defined $data and defined $self->{_migrate_from} ) {
+    if ( defined $self->{_migrate_from} and not defined $data ) {
         $data = $self->migrate_value;
     }
 
@@ -1734,26 +1753,43 @@ sub _fetch {
         return $nbu;
     }
 
-    my $res =
-          $mode eq 'preset'           ? $self->{preset}
-        : $mode eq 'default'          ? $self->{default}
-        : $mode eq 'standard'         ? $std
-        : $mode eq 'layered'          ? $self->{layered}
-        : $mode eq 'upstream_default' ? $self->{upstream_default}
-        : $mode eq 'user'             ? defined $data
-            ? $data
-            : $std
-        : $mode eq 'allow_undef' ? defined $data
-            ? $data
-            : $std
-        : $mode eq 'backend' ? defined $data
-            ? $data
-            : $pref
-        : die "unexpected mode $mode ";
+    my $res;
+    given ($mode) {
+        when ([qw/preset default upstream_default layered/]) {
+            $res = $self->{$mode};
+        }
+        when ('standard') {
+            $res = $std;
+        }
+        when ('backend') {
+            $res = $self->_data_or_alt($data, $pref);
+        }
+        when ([qw/user allow_undef/]) {
+            $res = $self->_data_or_alt($data, $std);
+        }
+        default {
+            die "unexpected mode $mode ";
+        }
+    }
 
     $logger->debug( "done in '$mode' mode for " . $self->location . " -> " . ( $res // '<undef>' ) )
         if $logger->is_debug;
 
+    return $res;
+}
+
+sub _data_or_alt ($self, $data, $alt) {
+    my $res;
+    given ($self->value_type) {
+        when ([qw/integer boolean number/]) {
+            $res = $data // $alt
+        }
+        default {
+            # empty string is considered as undef, but empty string is
+            # still returned if there's not defined alternative ($alt)
+            $res = length($data) ? $data : $alt // $data
+        }
+    }
     return $res;
 }
 
@@ -1968,7 +2004,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.150
+version 2.152
 
 =head1 SYNOPSIS
 
@@ -2042,7 +2078,8 @@ purpose. (C<upstream_default> parameter)
 =item *
 
 mandatory value: reading a mandatory value raises an exception if the
-value is not specified and has no default value.
+value is not specified (i.e is C<undef> or empty string) and has no
+default value.
 
 =item *
 

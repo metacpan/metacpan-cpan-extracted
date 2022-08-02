@@ -8,6 +8,5 @@ MANIFEST.SKIP
 README
 script/csstidy
 t/css-tidy.t
-versionup.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

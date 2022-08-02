@@ -11,17 +11,20 @@ use Params::Validate           qw/validate_with SCALAR ARRAYREF CODEREF
                                                 BOOLEAN OBJECT HASHREF/;
 use List::MoreUtils            qw/any/;
 use mro                        qw/c3/;
-use DBIx::DataModel;
-use SQL::Abstract::More 1.37;
+use SQL::Abstract::More 1.39;
 use Carp::Clan                 qw[^(DBIx::DataModel::|SQL::Abstract)];
-use Exporter                   qw/import/;
 
+# utility function 'does' imported by hand because not really meant
+# to be publicly exportable from SQL::Abstract::More
+BEGIN {no strict 'refs'; *does = \&SQL::Abstract::More::does;}
+
+use Exporter                   qw/import/;
 our @EXPORT = qw/define_class                define_method
                  define_readonly_accessors   define_abstract_methods
                  does/;
 
 
-BEGIN {no strict 'refs'; *does = \&SQL::Abstract::More::does;}
+
 
 
 my %seen_class_method;
@@ -163,38 +166,40 @@ __END__
 
 =head1 NAME
 
-DBIx::DataModel::Meta::Utils - Utility methods for DBIx::DataModel metaclasses
+DBIx::DataModel::Meta::Utils - Utility functions for DBIx::DataModel metaclasses
 
 =head1 SYNOPSIS
 
-  DBIx::DataModel::Meta::Utils->define_class(
+  use DBIx::DataModel::Meta::Utils qw/define_class define_method define_readonly_accessors does/;
+
+  define_class(
     name    => $class_name,
     isa     => \@parents,
     metadm  => $meta_instance,
   );
 
-  DBIx::DataModel::Meta::Utils->define_method(
+  define_method(
     class          => $class_name,
     name           => $method_name,
     body           => $method_body,
     check_override => $toggle,
   );
 
-  DBIx::DataModel::Meta::Utils->define_readonly_accessors(
+  define_readonly_accessors(
     $class_name => @accessor_names
   );
 
 
 =head1 DESCRIPTION
 
-A few utility methods for convenience of other 
+A few utility functions for convenience of other
 C<DBIx::DataModel::Meta::*> subclasses.
 
 =head1 METHODS
 
 =head2 define_class
 
-  DBIx::DataModel::Meta::Utils->define_class(
+  define_class(
     name    => $class_name,
     isa     => \@parents,
     metadm  => $meta_instance,
@@ -206,7 +211,7 @@ accessor method that will return the given C<$meta_instance>.
 
 =head2 define_method
 
-  DBIx::DataModel::Meta::Utils->define_method(
+  define_method(
     class          => $class_name,
     name           => $method_name,
     body           => $method_body,
@@ -221,8 +226,7 @@ method in that class.
 
 =head2 define_readonly_accessors
 
-
-  DBIx::DataModel::Meta::Utils->define_readonly_accessors(
+  define_readonly_accessors(
     $class_name => @accessor_names
   );
 
@@ -232,3 +236,10 @@ name, i.e. accessor C<foo> returns C<< $self->{foo} >>.  However, if
 that value is a hashref or arrayref, a shallow copy is returned : for
 example if C<< $self->{foo} >> is an arrayref, then the accessor
 method returns C<< @{$self->{foo}} >>.
+
+
+=head2 does
+
+
+See L<SQL::Abstract::More/does()>
+

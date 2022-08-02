@@ -21,7 +21,7 @@ subtest 'overlap' => sub {
         my $bins
           = Grid->new( { edges => [ map { -1.5 + $_ * 0.5 } 0 .. 10 ] } );
 
-        ok ( lives {$gti->overlay( $bins ) } )
+        ok( lives { $gti->overlay( $bins ) } )
           or note $@;
     };
 

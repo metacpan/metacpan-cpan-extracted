@@ -20,6 +20,9 @@ it.
 
 Please add an entry to the `Changes` file for anything you do.
 
+Also, do not edit the `Makefile.pl`. It's auto-generated from the `dist.ini`
+file and your changes will be overwritten.
+
 # Non-backwards Compatible Features
 
 Currently, [MooseX::Extended](https://metacpan.org/pod/MooseX::Extended)
@@ -27,7 +30,8 @@ allows configuration via import lists:
 
     use MooseX::Extended
         types    => [qw/HashRef ArrayRef/],
-        excludes => [qw/StrictConstructor/];
+        excludes => ['StrictConstructor'],
+		includes => ['async'];
 
 If you wish to extend `MooseX::Extended`, please use the C<includes> flag if
 the code:
@@ -39,3 +43,7 @@ the code:
 For example:
 
     use MooseX::Extended includes => [qw/multi/];
+
+The `includes` are defined in `MooseX::Extended::Core`, in
+`_default_import_list` and the features are applied in
+`_apply_optional_features`.

@@ -1,3 +1,49 @@
+2.052012 - 2022-08-02
+
+  [BUG FIXES]
+
+  * retry without BULKWALK automatically in snapshot
+  * fix broken VLAN Inventory report
+
+2.052011 - 2022-08-01
+
+  [BUG FIXES]
+
+  * #902 change order of device ports cols to put duplex after speed
+  * vlan names feature missing ports without vlan table entry
+
+2.052010 - 2022-07-27
+
+  [ENHANCEMENTS]
+
+  * #872 separate column for NetBIOS name in IP Inventory
+  * web feature to renumber a device now offers existing interface addresses
+  * web feature to renumber a device is renamed to "Change IP"
+
+  [BUG FIXES]
+
+  * make VLAN names option in device ports also work for VLANs missing a name
+
+2.052009 - 2022-07-26
+
+  [NEW FEATURES]
+
+  * #882 option to display vlan names instead of numbers in device ports
+  * #889 renumber device option in the device details web page
+
+  [ENHANCEMENTS]
+
+  * #877 ignore vlans 1002-1005 in port vlan mismatch report
+  * rename Inventory Data to be Remote Inventory in device ports options
+  * rename Detailed Inventory to be Remote Advertisement in device ports options
+
+  [BUG FIXES]
+
+  * #878 device ports csv misses mac addresses having no IPs
+  * #895 fix for neighbor showing phantom connections when remote_ip is not unique
+  * #897 port free should only apply to physical interfaces
+  * fix error displaying 'unlink' icon for device unreachable in device ports
+
 2.052008 - 2022-06-12
 
   [NEW FEATURES]

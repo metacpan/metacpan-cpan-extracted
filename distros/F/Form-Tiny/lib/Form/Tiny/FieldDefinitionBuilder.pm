@@ -1,5 +1,5 @@
 package Form::Tiny::FieldDefinitionBuilder;
-
+$Form::Tiny::FieldDefinitionBuilder::VERSION = '2.13';
 use v5.10;
 use strict;
 use warnings;
@@ -12,8 +12,6 @@ use Form::Tiny::FieldDefinition;
 use Form::Tiny::Utils qw(has_form_meta);
 
 use namespace::clean;
-
-our $VERSION = '2.12';
 
 has 'data' => (
 	is => 'ro',
@@ -59,3 +57,4 @@ sub build
 }
 
 1;
+

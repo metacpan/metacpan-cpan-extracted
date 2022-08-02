@@ -1,6 +1,6 @@
 package App::ansicolumn;
 
-our $VERSION = "1.18";
+our $VERSION = "1.19";
 
 use v5.14;
 use warnings;
@@ -269,6 +269,8 @@ sub column_out {
     };
     $obj->{height} ||=
 	div(0+@data, $obj->panes) + $obj->border_height;
+
+    die "Not enough height.\n" if $obj->effective_height <= 0;
 
     ## --white-space, --isolation, --fillup, top/bottom border
     $obj->layout(\@data);

@@ -1,3 +1,224 @@
+0.9632 2022-08-01
+  [Internal Ineffective Changes]
+    * Add set_field_object_by_name_v2 native API.
+0.9631 2022-08-01
+  [Internal Ineffective Changes]
+    * Add get_field_object_by_name_v2 native API.
+0.9630 2022-07-30
+  [Bug Fix]
+    * Fix the bug that SPVM::new_object_array can't receive non-class object.
+    * Fix the bug that Fn->sprintf %.3s work well.
+  [New Features]
+    * Add GET_CODE_POINT_ERROR_OVER_STRING_RANGE, GET_CODE_POINT_ERROR_INVALID_UTF8 to Fn class.
+    * Add Fn->split_limit.
+    * Error::System class becomes a default loaded module.
+    * The class id of Error::System become always 2.
+    * Add the constant values of the native API
+      SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS
+      SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM
+    * Add SPVM::new_any_object_array function.
+      
+  [Performance fix]
+    * Fn->join use StringBuffer internally.
+    * Improve substr performance.
+  [Changes]
+    * Fn->index, Fn->index_len, Fn->rindex, Fn->rindex_len throw an exception when the arguments are invalid.
+    * If the element of the strings of the argument of Fn->join is undef, "" is joined.
+    * Fn->ord throws exceptions when the input is undefined or the length is less than 0.
+    * Fn->pow, Fn->powi throws exceptions when the arguments are invalid.
+    * Fn->join throws exceptions when the arguments are invalid.
+    * Improve Fn->substr exception messages.
+    * Fn->repeat allows 0 count.
+    * Fn->index_len, Fn->contains, Fn->index can check empty string.
+    * Improve Fn->to_int_with_base exception message.
+    * Improve Fn->to_long_with_base exception message.
+    * Fn->contains become the alias for the following code
+      my $ret = Fn->index($string, $substring, 0) >= 0;
+    * Excnahge API shows the stack trace when exceptions are thrown
+  [Deprecation]
+    * Fn->trim_ascii_space is renamed to Fn->trim. Fn->trim_ascii_space is deprecated.
+    * Fn->get_next_code_point is renamed to Fn->get_code_point. Fn->get_next_code_point is deprecated.
+    * Fn->look_next_code_point is renamed to Fn->look_code_point. Fn->look_next_code_point is deprecated.
+    * Add Fn->RAND_MAX doc.
+  [Document]
+    * Improve Array class doc.
+  [Document Fix]
+    * Fix Fn->chr doc.
+    * Fix Fn->contains doc.
+    * Add Fn->is_array doc.
+    * Fix the doc that the range of Array->memcpy_(byte|short|int|long|flaot|double|object_address|string_address) is wrong.
+    * Fix the doc that the range of Array->copy_range_(byte|short|int|long|flaot|double) is wrong.
+    * Fix the doc that the range of Array->memset_(byte|short|int|long|flaot|double|object|string) is wrong.
+    * Remove Fn->srpintf doc. This remained wrongly.
+    * Remove %U specifier doc. This ramained wrongly.
+  [Incompatible Changes]
+    * Fn->index_len throw exception.
+      The offset + the length specified by the argument must be less than or equal to the length of the string
+    * Fn->ord become the following alias
+      
+      my $offset = 0;
+      my $code_point = Fn->get_code_point($string, \$offset);
+    * Fn->shorten throw exceptions
+      The string must be defined
+      The length must be greater than or equal to 0
+    * Fn->trim throw exceptions
+      The string must be defined
+    * Fn->chomp throws exceptions
+    * Fn->chompr throws exceptions
+    * Sort->sort_(byte|short|int|long|float|double|string|object) throw exceptions
+      The comparator must be defined
+  [Bug Fix]
+    * Fix the bug that Fn->rindex_len, Fn->rindex don't work well.
+    * Fix the bug Arrya->memmove_string_address calls Arrya->memmove_object. The correct code call Arrya->memmove_object_address.
+0.9629 2022-07-26
+  [New Features]
+    * Add copy_object_address to Array class.
+    * Add copy_range_object_address to Array class.
+    * Add copy_range_string_address to Array class.
+    * Add copy_string_address to Array class.
+    * Add equals_object_address to Array class.
+    * Add equals_string_address to Array class.
+    * Add %p specifier to Format->sprintf method.
+  [Document Fix]
+    * Add the doc of clear method of Point class.
+    * Add the doc of clear method of Point3D class.
+    * Remove the doc of the methods of Fn class. These remains wrongly.
+    * Remove the doc of memmove_byte, memmove_double, memmove_float, memmove_int, memmove_long, memmove_short, new_array_proto
+      memset_byte, memset_double, memset_float, memset_int, memset_long, memset_short, memset_object, memcpy_short, memcpy_long
+      memcpy_int, memcpy_float, memcpy_double, memcpy_byte, equals_array_string, equals_array_short, equals_array_object
+      equals_array_long, equals_array_int, equals_array_float, equals_array_double, equals_array_byte, 
+      dump_array_unsigned_short, dump_array_unsigned_int, dump_array_unsigned_byte, dump_array_string,
+      dump_array_short,  dump_array_object, dump_array_unsigned_short, dump_array_long, dump_array_int,
+      dump_array_float, dump_array_double, dump_array_byte, copy_array_string,
+      copy_array_short, copy_array_range_string, copy_array_range_short, copy_array_range_object,
+      copy_array_range_long, copy_array_range_int, copy_array_range_float, copy_array_range_double,
+      copy_array_range_byte, copy_array_object, copy_array_long, copy_array_int, copy_array_float,
+      copy_array_double, copy_array_byte in Fn class. This remained wrongly.
+    * Remove the doc of memmove, in Array class.
+    * Add the doc of Array->memmove_string, Array->memcpy_string.
+    * Fix the document that equals_byte, equals_short, equals_int, equals_long, equals_float, equals_double, equals_object, equals_string
+      throw exception.
+    
+  [New Document]
+    * Add Fields section to Point class
+    * Add Super Class section to Point3D class
+    * Add Fields section to Point3D class
+  [Changes]
+    * Remove "SPVM/" from native file name.
+    * Array->equals_object can recieve undef equality checker, and check address equality.
+    * Add exception logic to memset_byte, memset_double, memset_float, memset_int, memset_long,
+      memset_object, memset_short, memset_string of Array class.
+    * Add exception logic to memcpy_object_address of Array class.
+  [Incompatible Changes]
+    * Change the following method definition of Array class. Sorry. This is my simple definition mistake.
+      [Before]
+      static method copy_range_object : object[] ($array : object[], $offset : int, $length : int) {
+      [After]
+      static method copy_range_object : object[] ($array : object[], $offset : int, $length : int, $cloner : Cloner);
+      
+      The original behaivior can be used by copy_range_object_address.
+    * copy_range_string copies the value of the string, not address. This is my simple implement mistake.
+      The original behaivior can be used by copy_range_string_address.
+    * Remove Fn->memcpy_object, Fn->memmove_object. This remained wrongly.
+    * Rename Remove Fn->memcpy_object, Fn->memmove_object. This remained wrongly.
+    * Remove Array->dump_byte, Array->dump_short, Array->dump_int, Array->dump_long, Array->dump_float, Array->dump_double,
+      Array->dump_string Array->dump_object. Use the dump operator instead.
+    * The output of Array->dump_unsigned_byte, Array->dump_unsigned_short, Array->dump_unsigned_int, Array->dump_unsigned_long
+      is same as the dump operator except for the unsigned elements.
+  [Deprecation]
+    * Array->memcpy_object is deprecated. Use memcpy_object_address instead. This method will be removed at 0.9630.
+    * Array->memcpy_string is deprecated. Use memcpy_string_address instead. This method will be removed at 0.9630.
+    * Array->memmove_object is deprecated. Use memmove_object_address instead. This method will be removed at 0.9630.
+    * Array->memmove_string is deprecated. Use memmove_string_address instead. This method will be removed at 0.9630.
+    * Rename EqualityChecker::SameObject class to EqualityChecker::Address
+0.9628 2022-07-25
+  [New Features]
+    * Add replace method to ByteList, ShortList, IntList, LongList, FloatList, DoubleList, StringList, List.
+    * Add memcpy_string, memmove_string to Array class.
+    * Add memset_string to Array class.
+    * Add equals_object_address method to Array class.
+  [Changes]
+    * The headding of module file that is generated by spvmdist command is changed.
+      [Before]
+      =head1 Field Methods
+      [After]
+      =head1 Fields
+    * Change the following ByteList field definitions.
+      [Before]
+      has values : byte[];
+      [After]
+      has values : ro byte[];
+    * Change the following ShortList field definitions.
+      [Before]
+      has values : byte[];
+      [After]
+      has values : ro byte[];
+    * Change the following IntList field definitions.
+      [Before]
+      has values : byte[];
+      [After]
+      has values : ro byte[];
+    * Change the following LongList field definitions.
+      [Before]
+      has values : byte[];
+      [After]
+      has values : ro byte[];
+    * Change the following FloatList field definitions.
+      [Before]
+      has values : byte[];
+      [After]
+      has values : ro byte[];
+    * Change the following DoubleList field definitions.
+      [Before]
+      has values : byte[];
+      [After]
+      has values : ro byte[];
+    * Change the following List field definitions.
+      [Before]
+      has values : object[];
+      [After]
+      has values : ro string[];
+    * Change the following StringList field definitions.
+      [Before]
+      has values : byte[];
+      [After]
+      has values : ro byte[];
+    * Improve Array->memmove performance
+    * Improve ByteList exception messages.
+    * Improve ShortList exception messages.
+    * Improve IntList exception messages.
+    * Improve LongList exception messages.
+    * Improve FloatList exception messages.
+    * Improve DoubleList exception messages.
+    * Improve StringList exception messages.
+    * Improve List exception messages.
+    * Improve StringBuffer exception messages.
+    * Improve List exception messages.
+    * Improve the exception messages of Array class.
+    * memmove_object gets to throw an exception when the arguments is invalid.
+    * memcpy_object gets to throw an exception when the arguments is invalid.
+    
+  [Bug Fix]
+    * Fix the StringList->remove bug.
+  [Document]
+    * Add Fields doc to Byte, Short, Int, Long, Float, Double, ByteList, ShortList, IntList, LongList, FloatList, DoubleList, List, StringBuffer class.
+    * Improve ByteList, ShortList, IntList, LongList, FloatList, DoubleList, StringList, List, StringBuffer, Array class doc.
+  [NON BACKWORD COMPATIBLE CHANGES]
+    * Remove undocumented and untested grep method from StringList
+    
+0.962701 2022-07-25
+  [Test Fix]
+    * Fix the test that strerror test failed when EAGAIN is not defined.
+0.9627 2022-07-22
+  [New Feature]
+    * Add new_string_array native API.
+0.9626 2022-07-22
+  [New Features]
+    * Add the following native API
+      int32_t (*get_class_id_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, int32_t* error, const char* file, int32_t line);
+      const char* (*strerror)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value, int32_t length);
+  [Changes]
+    * Improve destructor compile error message.
 0.9625 2022-07-20
   [New Features]
     * Add Error::System class.

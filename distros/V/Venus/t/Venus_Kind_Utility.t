@@ -40,7 +40,7 @@ $test->for('abstract');
 
   use Venus::Class;
 
-  extends 'Venus::Kind::Utility';
+  base 'Venus::Kind::Utility';
 
   package main;
 

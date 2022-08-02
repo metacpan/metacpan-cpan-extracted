@@ -3,7 +3,7 @@ package DBIx::BatchChunker::LoopState;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Loop state object for DBIx::BatchChunker
 use version;
-our $VERSION = 'v0.941.1'; # VERSION
+our $VERSION = 'v1.0.0'; # VERSION
 
 use Moo;
 use MooX::StrictConstructor;
@@ -77,7 +77,7 @@ has progress_bar => (
 
 #pod =head2 timer
 #pod
-#pod Timer for debug messages.  Always spans the time between debug messages.
+#pod Timer for chunk messages.  Always spans the time between chunk messages.
 #pod
 #pod =cut
 
@@ -292,7 +292,7 @@ DBIx::BatchChunker::LoopState - Loop state object for DBIx::BatchChunker
 
 =head1 VERSION
 
-version v0.941.1
+version v1.0.0
 
 =head1 SYNOPSIS
 
@@ -333,7 +333,7 @@ use this attribute:
 
 =head2 timer
 
-Timer for debug messages.  Always spans the time between debug messages.
+Timer for chunk messages.  Always spans the time between chunk messages.
 
 =head2 start
 

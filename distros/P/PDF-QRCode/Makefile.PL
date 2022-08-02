@@ -7,27 +7,69 @@ use FindBin;
 use Data::Dumper;
 use lib "$FindBin::RealBin/3rd/lib/perl5";
 
+my @dep_PDF_API2 = ('PDF::API2' => 0);
+my @dep_PDF_Builder = ('PDF::Builder' => 0);
+
 WriteMakefile(
   NAME         => 'PDF::QRCode',
   VERSION_FROM => 'lib/PDF/QRCode.pm',
-  ABSTRACT     => 'Add QRCode method to PDF::API2',
+  ABSTRACT     => 'Add QRCode method to PDF::API2 or PDF::Builder',
   AUTHOR       => 'Tobias Oetiker <tobi@oetiker.ch>',
   LICENSE      => 'artistic_2',
-  PREREQ_PM    =>  {
-    'Text::QRCode' => 0,
-  },
-  BUILD_REQUIRES => {
-    'CPAN::Uploader' => 0,
-    'PDF::API2' => 0,
-    'PDF::Builder' => 0,
-    'Pod::Markdown::Github' => 0,
-  },
   META_MERGE   => {
-    requires  => {perl => '5.020001'},
+    "meta-spec" => { version => 2 },
+    prereqs => {
+      runtime => {
+        requires => {
+          perl => '5.020001',
+          'Text::QRCode' => 0,
+        },
+        recommends => {
+          @dep_PDF_API2,
+          @dep_PDF_Builder,
+        },
+      },
+      test => {
+        requires => {
+          'Test::More' => '0',
+          'Test::Needs' => '0',
+        },
+      },
+      develop => {
+        requires => {
+          'CPAN::Uploader' => 0,
+          @dep_PDF_API2,
+          @dep_PDF_Builder,
+          'Pod::Markdown::Github' => 0,
+        },
+      },
+    },
     resources => {
       license     => 'http://www.opensource.org/licenses/artistic-license-2.0',
       repository  => 'https://github.com/oetiker/pdf-qrcode',
       bugtracker  => 'https://github.com/oetiker/pdf-qrcode'
+    },
+    optional_features => {
+      'pdf-api2' => {
+        description => 'Provides PDF::API2 support',
+        prereqs => {
+          runtime => {
+            requires => {
+              @dep_PDF_API2,
+            }
+          }
+        }
+      },
+      'pdf-builder' => {
+        description => 'Provides PDF::Builder support',
+        prereqs => {
+          runtime => {
+            requires => {
+              @dep_PDF_Builder,
+            }
+          }
+        }
+      }
     },
     no_index => {directory => ['t','eg']}
   },
@@ -36,8 +78,6 @@ WriteMakefile(
 
 sub MY::postamble {
    my $self = shift;
-   my %r = (%{ $self->{PREREQ_PM} || {} }, %{ $self->{BUILD_REQUIRES} || {} }, %{ $self->{TEST_REQUIRES} || {} } );
-   my $modules = join " ", grep !/^perl\@/, map { $r{$_} ? $_ .'@'. $r{$_} : $_ } keys %r;
    my $tpd = "$FindBin::RealBin/3rd";
    warn "** call 'make 3rd' to build missing dependencies ...\n";
    return <<"EOF";
@@ -61,6 +101,6 @@ CHANGES: $self->{VERSION_FROM} Makefile
 
 $tpd/touch: Makefile
 	\$(NOECHO) \$(ECHO) "*** INSTALLING MISSING BITS FOR TESTING ***"
-	curl -L http://cpanmin.us | env PERL_CPANM_HOME=$tpd \$(PERL) - -q --notest --local-lib-contained $tpd $modules && touch $tpd/touch
+	curl -L http://cpanmin.us | env PERL_CPANM_HOME=$tpd \$(PERL) - -q --installdeps --with-develop --notest --local-lib-contained $tpd . && touch $tpd/touch
 EOF
 }

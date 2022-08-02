@@ -2,6 +2,7 @@
 
 use Test::More;
 use Test::Differences;
+use Test::Exception;
 use Test::Memory::Cycle;
 use Config::Model;
 use Config::Model::Tester::Setup qw/init_test/;
@@ -402,6 +403,20 @@ $model->create_config_class(
                     'pkgname'    => '- Source'
                 } }
         },
+        # see Debian bug https://bugs.debian.org/1015913
+        'Source-with-dir-problem' => {
+            'type' => 'leaf',
+            'value_type' => 'uniline',
+            'compute' => {
+                'allow_override' => '1',
+                'formula' => 'use Cwd; getcwd =~ m!/booya(\w[\w+\-\.]{1,})$!; $1;',
+                'use_eval' => '1'
+            },
+            # kinda impossible, but that's the point
+            'match' => 'booya',
+            mandatory => 1,
+        },
+
     ] );
 
 my $inst = $model->instance(
@@ -422,7 +437,7 @@ eq_or_diff(
             compute_with_override_and_fix compute_with_override_and_powerless_fix
             compute_with_upstream compute_no_var bar
             foo2 url host with_tmp_var Upstream-Contact Maintainer Source Source2 Licenses
-            index_function_target test_index_function OtherMaintainer Vcs-Browser/
+            index_function_target test_index_function OtherMaintainer Vcs-Browser Source-with-dir-problem/
     ],
     "check available elements"
 );
@@ -434,6 +449,9 @@ $bv = $root->fetch_element('bv');
 ok( $bv, "created av and bv values" );
 
 ok( $compute_int = $root->fetch_element('compute_int'), "create computed integer value (av + bv)" );
+
+is($compute_int->has_error,0,"has_error is false");
+is($compute_int->error_msg,'',"error message is empty");
 
 no warnings 'once';
 
@@ -541,6 +559,9 @@ $bv->store(2);
 is( $comp_over->fetch, 3, "test computed value" );
 $comp_over->store(4);
 is( $comp_over->fetch, 4, "test overridden value" );
+$comp_over->clear;
+is( $comp_over->fetch, 3, "test back to computed value" );
+
 
 my $cwu = $root->fetch_element('compute_with_upstream');
 
@@ -644,9 +665,18 @@ is(
     'test compute with complex regexp formula'
 );
 
+$root->store_element_value("Vcs-Browser",undef);
+
 $root->load(
     'OtherMaintainer="Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>" Source=libconfig-model-perl'
 );
+is(
+    $root->grab_value("Vcs-Browser"),
+    'http://anonscm.debian.org/gitweb/?p=pkg-perl/packages/libconfig-model-perl.git',
+    'test compute with complex regexp formula'
+);
+$root->store_element_value("Vcs-Browser",'');
+
 is(
     $root->grab_value("Vcs-Browser"),
     'http://anonscm.debian.org/gitweb/?p=pkg-perl/packages/libconfig-model-perl.git',
@@ -718,6 +748,21 @@ subtest "check warning when applying powerless fix" => sub {
 
     is($cwoapf->fetch, '/dev/lcd0', "test default value after powerless fix");
 };
+
+# that's a mouthful
+subtest "Check apply_fixes on mandatory value where compute returns undef" => sub {
+    # reproduce Debian bug https://bugs.debian.org/1015913
+    # the default dir (PWD) does not match the requirement (/booya/)
+    my $swdp = $root->fetch_element('Source-with-dir-problem');
+    $swdp->apply_fixes;
+    ok(1, "apply fixes done");
+    throws_ok {
+        $swdp->fetch;
+    } 'Config::Model::Exception::WrongValue';
+    ok($swdp->store('booya-dir'),"store booya dir value");
+    is($swdp->fetch,'booya-dir',"read dir value");
+};
+
 
 foreach my $elem (qw/foo2 bar/) {
     foreach my $i (1..3) {

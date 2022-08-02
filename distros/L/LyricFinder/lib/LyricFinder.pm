@@ -34,7 +34,7 @@ use parent 'LyricFinder::_Class';
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-our $VERSION = '1.21';
+our $VERSION = '1.22';
 our $DEBUG = 0;  # If you want debug messages, set debug to a true value
 
 my @supported_mods = (qw(Cache ApiLyricsOvh AZLyrics Genius Letras Musixmatch));

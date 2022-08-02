@@ -1,4 +1,4 @@
-package JMAP::Tester::Role::SentenceBroker 0.101;
+package JMAP::Tester::Role::SentenceBroker 0.102;
 
 use Moo::Role;
 
@@ -24,7 +24,7 @@ JMAP::Tester::Role::SentenceBroker
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 AUTHOR
 

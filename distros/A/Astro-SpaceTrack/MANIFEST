@@ -26,6 +26,7 @@ META.yml
 README
 script/SpaceTrack
 t/basic.t
+t/complete.t
 t/data/Mock-LWP-UserAgent/0437d2e149ca0e1160cd2a16ccdb14c8.json
 t/data/Mock-LWP-UserAgent/045b03a220507df9fdf388a891da2426.json
 t/data/Mock-LWP-UserAgent/0b668732d3fe9ef6563405784241e276.json

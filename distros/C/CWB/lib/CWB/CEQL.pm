@@ -28,7 +28,7 @@ CWB::CEQL - The Common Elementary Query Language for CQP front-ends
   $self->SetParam("default_ignore_diac", 0);        # if 1, default to accent-folded search
   $self->SetParam("ignore_case", {"word_attribute" => 1, "lemma_attribute" => 1, ...}); # case/accent folding for individual attributes;
   $self->SetParam("ignore_diac", {"word_attribute" => 1, "lemma_attribute" => 0, ...}); # keys are the strings for attribute parameters (above) plus "s_attributes"
-  $self->SetParam("tab_optimisation", 1);           # enable TAB query optimisation (CQP v3.4.30+)
+  $self->SetParam("tab_optimisation", 1);           # enable TAB query optimisation
 
   $cqp_query = $CEQL->Parse($ceql_query);
   if (not defined $cqp_query) {
@@ -372,8 +372,7 @@ C<lemma_attribute>, and to 0 for all other attributes.
 =item C<tab_optimisation>
 
 Rewrite simple phrase searches (possibly with optional tokens, e.g. C<++***>) as C<TAB>
-queries for much faster execution. This optimisation should only be enabled for 
-CWB 3.4.30 and newer, due to a serious bug in earlier versions.
+queries for much faster execution.
 
 Note that the TAB rewrite may not be fully equivalent to the original phrase query
 in some corner cases. If there are optional gaps, it behaves similar to the standard

@@ -12,15 +12,29 @@ Data::Text - Class to handle text in an OO way
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
+
+use overload (
+        '==' => \&equal,
+        '!=' => \&not_equal,
+        '""' => \&as_string,
+        bool => sub { 1 },
+        fallback => 1   # So that boolean tests don't cause as_string to be called
+);
 
 =head1 SYNOPSIS
 
 Handle text in an OO way.
+
+    use Data::Text;
+
+    my $d = Data::Text->new("Hello, World!\n");
+
+    print $d->as_string();
 
 =head1 SUBROUTINES/METHODS
 
@@ -55,6 +69,12 @@ sub new {
 
 Sets the object to contain the given text.
 
+The argument can be a reference to an array of strings, or an object.
+If called with an object, the message as_string() is sent to it for its contents.
+
+    $d->set({ text => "Hello, World!\n" });
+    $d->set(text => [ 'Hello, ', 'World!', "\n" ]);
+
 =cut
 
 sub set {
@@ -77,15 +97,20 @@ sub set {
 	if(ref($params{'text'})) {
 		# Allow the text to be a reference to a list of strings
 		if(ref($params{'text'}) eq 'ARRAY') {
+			if(scalar(@{$params{'text'}}) == 0) {
+				Carp::carp(__PACKAGE__, ': no text given');
+				return;
+			}
+			delete $self->{'text'};
 			foreach my $text(@{$params{'text'}}) {
 				$self = $self->append($text);
 			}
 			return $self;
 		}
-		$params{'text'} = $params{'text'}->as_string();
+		$self->{'text'} = $params{'text'}->as_string();
+	} else {
+		$self->{'text'} = $params{'text'};
 	}
-
-	$self->{'text'} = $params{'text'};
 
 	return $self;
 }
@@ -98,6 +123,8 @@ Contains a simple sanity test for consecutive punctuation.
 I expect I'll improve that.
 
 Successive calls to append() can be daisy chained.
+
+    $d->set('Hello ')->append("World!\n");
 
 The argument can be a reference to an array of strings, or an object.
 If called with an object, the message as_string() is sent to it for its contents.
@@ -124,6 +151,10 @@ sub append {
 	if(ref($params{'text'})) {
 		# Allow the text to be a reference to a list of strings
 		if(ref($params{'text'}) eq 'ARRAY') {
+			if(scalar(@{$params{'text'}}) == 0) {
+				Carp::carp(__PACKAGE__, ': no text given');
+				return;
+			}
 			foreach my $text(@{$params{'text'}}) {
 				$self = $self->append($text);
 			}
@@ -136,13 +167,54 @@ sub append {
 
 	if($self->{'text'} && ($self->{'text'} =~ /[\.\,;]\s*$/)) {
 		if($params{'text'} =~ /^\s*[\.\,;]/) {
-			Carp::carp(__PACKAGE__, ': attempt to add consecutive punctuation');
+			Carp::carp(__PACKAGE__,
+			# die(__PACKAGE__,
+				": attempt to add consecutive punctuation\n\tCurrent = '",
+				$self->{'text'},
+				"'\n\tAppend = '",
+				$params{'text'},
+				'"',
+			);
 			return;
 		}
 	}
 	$self->{'text'} .= $params{'text'};
 
 	return $self;
+}
+
+=head2	equal
+
+Are two texts the same?
+
+    my $t1 = Data::Text->new('word');
+    my $t2 = Data::Text->new('word');
+    print ($t1 == $t2), "\n";	# Prints 1
+
+=cut
+
+sub equal {
+	my $self = shift;
+	my $other = shift;
+
+	return $self->as_string() eq $other->as_string();
+}
+
+=head2	not_equal
+
+Are two texts different?
+
+    my $t1 = Data::Text->new('xyzzy');
+    my $t2 = Data::Text->new('plugh');
+    print ($t1 != $t2), "\n";	# Prints 1
+
+=cut
+
+sub not_equal {
+	my $self = shift;
+	my $other = shift;
+
+	return $self->as_string() ne $other->as_string();
 }
 
 =head2 as_string
@@ -175,7 +247,7 @@ sub length {
 
 =head2	trim
 
-Removes leading and trailing spaces from the string.
+Removes leading and trailing spaces from the text.
 
 =cut
 
@@ -189,7 +261,7 @@ sub trim {
 
 =head2	rtrim
 
-Removes trailing spaces from the string.
+Removes trailing spaces from the text.
 
 =cut
 
@@ -271,7 +343,7 @@ L<http://deps.cpantesters.org/?module=Data::Text>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021 Nigel Horne.
+Copyright 2021-2022 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

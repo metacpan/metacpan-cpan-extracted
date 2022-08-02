@@ -1,5 +1,5 @@
 package Form::Tiny::Filter;
-
+$Form::Tiny::Filter::VERSION = '2.13';
 use v5.10;
 use strict;
 use warnings;
@@ -7,8 +7,6 @@ use Moo;
 use Types::Standard qw(HasMethods CodeRef);
 
 use namespace::clean;
-
-our $VERSION = '2.12';
 
 has 'type' => (
 	is => 'ro',

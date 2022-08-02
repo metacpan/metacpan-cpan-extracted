@@ -16,12 +16,12 @@ WriteMakefile(
         no_index       => { directory => [ qw(examples t config) ], },
         prereqs        => { runtime   => { requires => { perl => '5.006' } } },
         resources      => {
-            bugtracker => { web => 'https://github.com/ChristophB/perl-xdt-parser/issues' },
+            bugtracker => { web => 'https://github.com/CrescNet/perl-xdt-parser/issues' },
             license    => [ 'https://opensource.org/licenses/MIT' ],
             repository => {
                 type => 'git',
-                url  => 'https://github.com/ChristophB/perl-xdt-parser.git',
-                web  => 'https://github.com/ChristophB/perl-xdt-parser',
+                url  => 'https://github.com/CrescNet/perl-xdt-parser.git',
+                web  => 'https://github.com/CrescNet/perl-xdt-parser',
             },
         },
     },

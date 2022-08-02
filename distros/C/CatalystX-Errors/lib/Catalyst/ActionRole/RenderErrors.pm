@@ -16,16 +16,17 @@ around 'execute', sub {
 
   return $ret if $self->$dont_dispatch_error($controller, $c);
 
-  my @errors = @{$c->error} || return $ret;
+  my @errors = @{$c->error};
+  return $ret unless @errors;
+
   my $first = $errors[-1]; # We can only handle the last error in the stack
-
-  $c->log->error($first);
-
+ 
   if($c->looks_like_http_error_obj($first)) {
     my ($status_code, $additional_headers, $template_args) = $first->as_http_response;
     $c->clear_errors && $c->dispatch_error($status_code, $additional_headers, $template_args)
       unless ($c->debug && ($status_code >= 500));
   } else {
+    $c->log->error($first);
     $c->clear_errors && $c->dispatch_error(500) unless $c->debug;
   }
 

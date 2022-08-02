@@ -15,7 +15,7 @@ MooseX::Extended::Manual::Shortcuts - Shortcuts to make your Moose easier to wri
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 ATTRIBUTE SHORTCUTS
 
@@ -52,6 +52,15 @@ more consistent.  However, you can still use full names:
     field authz_delegate => (
         builder => '_build_my_darned_authz_delegate',
     );
+
+These are very similar to
+L<MooseX::AttributeShortcuts|https://metacpan.org/pod/MooseX::AttributeShortcuts>,
+but the naming is slightly different. For example, C<< clearer => 1 >> for a
+C<_name> attribute creates a C<clear__name> method. but for
+C<MooseX::AttributeShortcuts>, it would have been named C<_clear_name>.
+
+You still have the C<has> function available for defining attributes, but it
+is unchanged. These shortcuts will not work.
 
 =head2 C<writer>
 
@@ -173,6 +182,18 @@ C<_build__auth_token> (note the two underscores between "build" and "auth_token"
 
 =head1 STEALING FROM MOO
 
+=head2 C<< is => 'rwp' >>
+
+    param name => ( is => 'rwp' );
+
+The above is equivalent to:
+
+    has name => ( is => 'ro', writer => '_set_name' );
+
+Of course, it works for C<field>, too.
+
+=head2 C<builder> Code References
+
 You may also pass a coderef to `builder`:
 
     field created => (
@@ -184,6 +205,16 @@ You may also pass a coderef to `builder`:
 This is different from C<< default => sub {...} >> because it will install a
 C<_build_created> method for you. This is useful if you with to allow a
 subclass to override this method.
+
+=head1 DIAGNOSTICS
+
+Attributes defined using C<param> or C<field> which are read-only
+with no C<init_arg> and no default or builder, will result in a warning.
+If you wish to disable this warning you can.
+
+  no warnings 'MooseX::Extended::naked_fields';
+
+This warning is only available on Perl >= 5.028.
 
 =head1 AUTHOR
 

@@ -2,27 +2,32 @@ package Catalyst::TraitFor::Request::Methods;
 
 # ABSTRACT: Add enumerated methods for HTTP requests
 
+use v5.10.1;
+
 use Moose::Role;
+
+use Data::Enum;
 
 use namespace::autoclean;
 
 requires 'method';
 
-our $VERSION = 'v0.2.3';
+our $VERSION = 'v0.3.2';
 
 
-foreach my $name (qw/ get head post put delete connect options trace patch /) {
+my @METHODS = qw/ get head post put delete connect options trace patch propfind unrecognized_method /;
 
-    my $value = uc $name;
-    my $method = "is_$name";
-
-    has $method => (
-        is      => 'ro',
-        lazy    => 1,
-        default => sub { return $_[0]->method eq $value },
-    );
-
-}
+has _method_enum => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+        state $enum = Data::Enum->new(@METHODS);
+        my $method = $_[0]->method;
+        $method =~ s/\W/_/g;
+        return eval { $enum->new(lc $method) } // $enum->new('unrecognized_method');
+    },
+    handles => [ map { "is_" . $_ } @METHODS ],
+);
 
 
 1;
@@ -39,7 +44,7 @@ Catalyst::TraitFor::Request::Methods - Add enumerated methods for HTTP requests
 
 =head1 VERSION
 
-version v0.2.3
+version v0.3.2
 
 =head1 SYNOPSIS
 
@@ -113,6 +118,14 @@ The request method is C<TRACE>.
 
 The request method is C<PATCH>.
 
+=head2 is_propfind
+
+The request method is C<PROPFIND>.
+
+=head2 is_unrecognized_method
+
+The request method is not recognized.
+
 =head1 SEE ALSO
 
 L<Catalyst::Request>
@@ -137,7 +150,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2020 by Robert Rothenberg.
+This software is Copyright (c) 2019-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

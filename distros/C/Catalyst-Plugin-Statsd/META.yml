@@ -21,7 +21,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 keywords:
   - Catalyst
   - StatsD
@@ -35,24 +35,24 @@ name: Catalyst-Plugin-Statsd
 provides:
   Catalyst::Plugin::Statsd:
     file: lib/Catalyst/Plugin/Statsd.pm
-    version: v0.7.2
+    version: v0.8.0
 recommends:
   Ref::Util::XS: '0'
 requires:
   Catalyst: '5.90123'
   Moose::Role: '0'
   POSIX: '0'
-  Plack::Middleware::Statsd: '0'
+  Plack::Middleware::Statsd: v0.6.0
   Ref::Util: '0'
   namespace::autoclean: '0'
-  perl: v5.10.1
+  perl: v5.14.0
 resources:
   bugtracker: https://github.com/robrwo/CatalystX-Statsd/issues
   repository: git://github.com/robrwo/CatalystX-Statsd.git
-version: v0.7.2
+version: v0.8.0
 x_authority: cpan:RRWO
 x_contributors:
   - 'Slaven Rezić <slaven@rezic.de>'
-x_generated_by_perl: v5.28.1
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

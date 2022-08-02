@@ -1,6 +1,11 @@
 Changelog for DBIx-OnlineDDL
 
-v0.940.0 2021-10-08T16:27:10
+v1.0.0 2022-08-01T21:56:39
+ - Pull request #6: SRE-5588 (Brendan Byrd)
+ - Update README / LICENSE / Makefile (Brendan Byrd)
+ - Add a warning about missing a before_triggers hook (Brendan Byrd)
+
+v0.940.0 2021-10-08T16:26:51
  - Update README (Brendan Byrd)
  - Pull request #5: SM-3087 (Brendan Byrd)
  - Improve speed of trigger name lookups for MySQL (Brendan Byrd)

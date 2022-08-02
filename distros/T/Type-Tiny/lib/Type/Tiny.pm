@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::AUTHORITY  = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION    = '1.016002';
+	$Type::Tiny::VERSION    = '1.016006';
 	$Type::Tiny::XS_VERSION = '0.016';
 }
 
@@ -155,6 +155,7 @@ __PACKAGE__->_install_overloads(
 	},
 	q(eq)  => sub { "$_[0]" eq "$_[1]" },
 	q(cmp) => sub { $_[2] ? ( "$_[1]" cmp "$_[0]" ) : ( "$_[0]" cmp "$_[1]" ) },
+	q(0+)  => sub { $_[0]{uniq} },
 );
 
 __PACKAGE__->_install_overloads(
@@ -416,10 +417,11 @@ sub _dd {
 } #/ sub _dd
 
 sub _loose_to_TypeTiny {
+	my $caller = caller( 1 ); # assumption
 	map +(
 		ref( $_ )
 		? Types::TypeTiny::to_TypeTiny( $_ )
-		: do { require Type::Utils; Type::Utils::dwim_type( $_ ) }
+		: do { require Type::Utils; Type::Utils::dwim_type( $_, for => $caller ) }
 	), @_;
 }
 
@@ -599,7 +601,7 @@ push @CMP, sub {
 		Scalar::Util::refaddr( $B_stem->compiled_check );
 		
 	if ( $A_stem->can_be_inlined and $B_stem->can_be_inlined ) {
-		return 0
+		return CMP_EQUIVALENT
 			if $A_stem->inline_check( '$WOLFIE' ) eq $B_stem->inline_check( '$WOLFIE' );
 	}
 	

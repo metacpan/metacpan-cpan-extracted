@@ -1,6 +1,6 @@
 package Perl::Critic::Policy::Dancer2::ProhibitDeprecatedKeywords;
 
-our $VERSION = '0.4000'; # VERSION
+our $VERSION = '0.4100'; # VERSION
 our $AUTHORITY = 'cpan:GEEKRUTH'; # AUTHORITY
 # ABSTRACT: Trigger perlcritic alerts on deprecated Dancer2 keywords
 use 5.006001;
@@ -40,6 +40,7 @@ sub violates {
    );
    return if !$included;
    if ( defined $deprecated_words{$elem} ) {
+      return if is_hash_key($elem);
       my $alternative = $deprecated_words{$elem};
       my $desc        = qq{Use '$alternative' instead of deprecated Dancer2 keyword '$elem'};
       return $self->violation( $desc, $EXPL, $elem );
@@ -61,7 +62,7 @@ Perl::Critic::Policy::Dancer2::ProhibitDeprecatedKeywords - Trigger perlcritic a
 
 =head1 VERSION
 
-version 0.4000
+version 0.4100
 
 =head1 DESCRIPTION
 

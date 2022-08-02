@@ -1,3 +1,21 @@
+0.40 2022-08-01
+    * Fix test suite by skipping a test on curl versions before 7.60
+      For some reason Curl sends an Expect: 100-continue header on these
+      versions and coding around that seems much effort for little gain.
+    * Fix replacing fake content when reading local files is disabled.
+
+0.39 2022-07-29
+    * Fix crash when reading files is prohibited
+
+0.38 2022-07-29
+    * Parse the authentication types --basic, --digest, --ntlm, --negotiate
+      but they get ignored when generating code
+    * Parse the --unix-socket command line parameter
+      This currently also gets ignored but there are plans to write a support
+      module to allow LWP to use unix domain sockets instead of TCP sockets
+    * Properly support the "@" and "<" specifier in the --form option
+    * Support the --form-string option
+
 0.37 2021-12-24
     * Eliminate (test) prerequisite URL::Encode
       The functionality is already present in the (runtime) prerequisite

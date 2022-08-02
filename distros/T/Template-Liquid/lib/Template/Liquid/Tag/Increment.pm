@@ -1,5 +1,5 @@
 package Template::Liquid::Tag::Increment;
-our $VERSION = '1.0.19';
+our $VERSION = '1.0.20';
 use strict;
 use warnings;
 require Template::Liquid::Error;
@@ -40,7 +40,7 @@ sub new {
         raise Template::Liquid::Error {
                      template => $s->{template},
                      type     => 'Syntax',
-                     message =>
+                     message  =>
                          sprintf(
                          q[Syntax Error in '%s %s' - Valid syntax: %s [name]],
                          $args->{'tag_name'}, $args->{'attrs'}, $class->_me()
@@ -75,7 +75,7 @@ sub _direction {
 sub _me {'increment'}
 
 sub render {
-    my ($s) = @_;
+    my ($s)  = @_;
     my $name = $s->{template}{context}->get($s->{'name'}) || $s->{'name'};
     $s = $s->{template}{document}->{'_INCREMENTS'}{$name} || $s;
     my $node = $s->{'value'};
@@ -89,6 +89,12 @@ sub render {
 =pod
 
 =encoding UTF-8
+
+=begin stopwords
+
+Lütke jadedPixel
+
+=end stopwords
 
 =head1 NAME
 
@@ -147,7 +153,7 @@ The original Liquid template system was developed by jadedPixel
 
 =head1 License and Legal
 
-Copyright (C) 2009-2012 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+Copyright (C) 2009-2022 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of The Artistic License 2.0.  See the F<LICENSE> file included with

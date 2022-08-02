@@ -1,0 +1,31 @@
+---
+abstract: 'Manipulate flat-file databases'
+author:
+  - 'Mark Jason Dominus'
+build_requires:
+  File::Copy: '0'
+  Test::More: '0'
+  Tie::File: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FlatFile
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Tie::File: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=FlatFile
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ap/FlatFile.git
+version: '0.12'
+x_copyright:
+  holder: 'Mark Jason Dominus'
+  year: 2006
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

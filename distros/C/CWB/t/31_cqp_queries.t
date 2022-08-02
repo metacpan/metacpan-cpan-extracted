@@ -106,15 +106,12 @@ is_deeply(rows2hash(\@rows, 2, 0), \%expected_counts, "count PPs by lemma withou
 @rows = map { [$_->[0]." ".$_->[1], $_->[2]] } @rows;
 is_deeply(rows2hash(\@rows), \%expected_counts, "group prep:noun pairs from PPs with cut"); # T32
 
-SKIP: {
-  skip "group ... within only supported by CQP v3.4.26 and newer", 2 unless $cqp->check_version(3, 4, 26);
-  @rows = $cqp->exec_rows("group PP matchend lemma by match word within s cut 3");
-  @rows = map { [$_->[0]." ".$_->[1], $_->[2]] } @rows;
-  is_deeply(rows2hash(\@rows), \%expected_counts, "group prep:noun pairs from PPs within s"); # T33
-  @rows = $cqp->exec_rows("group PP matchend lemma by match word within story cut 3");
-  @rows = map { [$_->[0]." ".$_->[1], $_->[2]] } @rows;
-  is_deeply(rows2hash(\@rows), {"at time" => 3}, "group prep:noun pairs from PPs within story");
-}
+@rows = $cqp->exec_rows("group PP matchend lemma by match word within s cut 3");
+@rows = map { [$_->[0]." ".$_->[1], $_->[2]] } @rows;
+is_deeply(rows2hash(\@rows), \%expected_counts, "group prep:noun pairs from PPs within s"); # T33
+@rows = $cqp->exec_rows("group PP matchend lemma by match word within story cut 3");
+@rows = map { [$_->[0]." ".$_->[1], $_->[2]] } @rows;
+is_deeply(rows2hash(\@rows), {"at time" => 3}, "group prep:noun pairs from PPs within story");
 
 # dump/undump and subqueries
 $cqp->exec("NP = /np[]");
@@ -164,51 +161,42 @@ $cqp->exec("Temp = [pos='IN'] /np[]");
 is_deeply(\@progress_data, [ 1 .. 100 ], "progress handler works correctly"); # T41
 $cqp->progress_off;
 
-# matching strategy modifier (CQP v3.4.12 and newer) T42–T43
-SKIP: {
-  skip "matching strategy modifiers only supported by CQP v3.4.12 and newer", 2 unless $cqp->check_version(3, 4, 12);
-  my $query = "[pos='JJ.*'] [pos='NNS?']+";
-  $cqp->exec("JN0 = $query");
-  $cqp->exec("JN1 = (?longest) $query");
-  $cqp->exec("set MatchingStrategy longest");
-  $cqp->exec("JN2 = $query");
-  $cqp->exec("set MatchingStrategy standard");
-  my @JN1 = $cqp->dump("JN1");
-  my @JN2 = $cqp->dump("JN2");
-  $cqp->exec("JDiff = diff JN2 JN0");
-  my ($n_diff) = $cqp->exec("size JDiff");
-  is_deeply(\@JN1, \@JN2, "matching strategy modifier works (?longest)");
-  ok($n_diff > 0, "confirm that matching strategy makes a difference");
-}
+# matching strategy modifier T42–T43
+my $query = "[pos='JJ.*'] [pos='NNS?']+";
+$cqp->exec("JN0 = $query");
+$cqp->exec("JN1 = (?longest) $query");
+$cqp->exec("set MatchingStrategy longest");
+$cqp->exec("JN2 = $query");
+$cqp->exec("set MatchingStrategy standard");
+my @JN1 = $cqp->dump("JN1");
+my @JN2 = $cqp->dump("JN2");
+$cqp->exec("JDiff = diff JN2 JN0");
+my ($n_diff) = $cqp->exec("size JDiff");
+is_deeply(\@JN1, \@JN2, "matching strategy modifier works (?longest)");
+ok($n_diff > 0, "confirm that matching strategy makes a difference");
 
-# corpus position lookup (new in CQP v3.4.17) T44-T45
-SKIP: {
-  skip "corpus position lookup only available in CQP v3.4.17 and newer", 2 unless $cqp->check_version(3, 4, 17);
-  $cqp->exec("CP1 = [_ = 666] []{2}");
-  my @result = $cqp->dump("CP1");
-  is_deeply(\@result, [[666, 668, -1, -1]], "corpus position lookup with [_ = 666]");
-  $cqp->exec("CP2 = [lemma = 'elephant'] []{0,10} [_ >= 8038]"); # should also work in earlier versions
-  @result = $cqp->dump("CP2");
-  is_deeply(\@result, [[8031, 8038, -1, -1]], "corpus position test with ... [_ >= 8038]");
-}
+# corpus position lookup T44-T45
+$cqp->exec("CP1 = [_ = 666] []{2}");
+my @result = $cqp->dump("CP1");
+is_deeply(\@result, [[666, 668, -1, -1]], "corpus position lookup with [_ = 666]");
+$cqp->exec("CP2 = [lemma = 'elephant'] []{0,10} [_ >= 8038]"); # should also work in earlier versions
+@result = $cqp->dump("CP2");
+is_deeply(\@result, [[8031, 8038, -1, -1]], "corpus position test with ... [_ >= 8038]");
 
-# strlen() built-in function (new in CQP v3.4.17) T46-T50
-SKIP: {
-  skip "strlen() built-in only available in CQP v3.4.17 and newer", 5 unless $cqp->check_version(3, 4, 17);
-  for my $corpus (qw(GOETHE_LATIN1 GOETHE_UTF8)) {
-    $cqp->exec($corpus); 
-    $cqp->exec("G1 = [word = '.*chen' & strlen(word) = 7]");
-    $cqp->exec("G2 = [word = '.*chen' & strlen(word) >= 8]");
-    my ($n1) = $cqp->exec("size G1");
-    my ($n2) = $cqp->exec("size G2");
-    ok($n1 == 1, "strlen() test works for corpus $corpus");
-    ok($n2 == 0, "negative strlen() test works for corpus $corpus");
-  }
-  $cqp->exec("VSS");
-  $cqp->exec("G3 = [lemma = 'time'] :: strlen(match.story_title) <= 5");
-  my ($n) = $cqp->exec("size G3");
-  ok($n == 10, "strlen() test works for s-attribute annotation");
+# strlen() built-in function T46-T50
+for my $corpus (qw(GOETHE_LATIN1 GOETHE_UTF8)) {
+  $cqp->exec($corpus); 
+  $cqp->exec("G1 = [word = '.*chen' & strlen(word) = 7]");
+  $cqp->exec("G2 = [word = '.*chen' & strlen(word) >= 8]");
+  my ($n1) = $cqp->exec("size G1");
+  my ($n2) = $cqp->exec("size G2");
+  ok($n1 == 1, "strlen() test works for corpus $corpus");
+  ok($n2 == 0, "negative strlen() test works for corpus $corpus");
 }
+$cqp->exec("VSS");
+$cqp->exec("G3 = [lemma = 'time'] :: strlen(match.story_title) <= 5");
+my ($n) = $cqp->exec("size G3");
+ok($n == 10, "strlen() test works for s-attribute annotation");
 
 # validate MU Queries against corresponding finite-state queries T51-T54
 $cqp->exec("Union_MU = MU(union [lemma = 'coffee'] [lemma = 'elephant'])");

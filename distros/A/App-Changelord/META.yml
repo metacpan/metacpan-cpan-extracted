@@ -1,0 +1,91 @@
+---
+abstract: 'cli-based changelog manager'
+author:
+  - 'Yanick Champoux <yanick@babyl.ca>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+  strict: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Changelord
+provides:
+  App::Changelord:
+    file: lib/App/Changelord.pm
+    version: v0.0.1
+  App::Changelord::Command::Add:
+    file: lib/App/Changelord/Command/Add.pm
+    version: v0.0.1
+  App::Changelord::Command::Bump:
+    file: lib/App/Changelord/Command/Bump.pm
+    version: v0.0.1
+  App::Changelord::Command::GitGather:
+    file: lib/App/Changelord/Command/GitGather.pm
+    version: v0.0.1
+  App::Changelord::Command::Init:
+    file: lib/App/Changelord/Command/Init.pm
+    version: v0.0.1
+  App::Changelord::Command::Print:
+    file: lib/App/Changelord/Command/Print.pm
+    version: v0.0.1
+  App::Changelord::Command::Schema:
+    file: lib/App/Changelord/Command/Schema.pm
+    version: v0.0.1
+  App::Changelord::Command::Validate:
+    file: lib/App/Changelord/Command/Validate.pm
+    version: v0.0.1
+  App::Changelord::Command::Version:
+    file: lib/App/Changelord/Command/Version.pm
+    version: v0.0.1
+  App::Changelord::Role::ChangeTypes:
+    file: lib/App/Changelord/Role/ChangeTypes.pm
+    version: v0.0.1
+  App::Changelord::Role::Changelog:
+    file: lib/App/Changelord/Role/Changelog.pm
+    version: v0.0.1
+  App::Changelord::Role::Render:
+    file: lib/App/Changelord/Role/Render.pm
+    version: v0.0.1
+  App::Changelord::Role::Stats:
+    file: lib/App/Changelord/Role/Stats.pm
+    version: v0.0.1
+  App::Changelord::Role::Versions:
+    file: lib/App/Changelord/Role/Versions.pm
+    version: v0.0.1
+requires:
+  CLI::Osprey: '0'
+  Git::Repository: '0'
+  JSON: '0'
+  JSON::Schema::Modern: '0'
+  List::AllUtils: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  Path::Tiny: '0'
+  PerlX::Maybe: '0'
+  Version::Dotted::Semantic: '0'
+  YAML: '0'
+  YAML::XS: '0'
+  feature: '0'
+  perl: v5.36.0
+  warnings: '0'
+version: v0.0.1
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributor_covenant:
+  version: 0.02
+x_contributors:
+  - 'Yanick Champoux <yanick@cpan.org>'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

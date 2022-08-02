@@ -3,6 +3,7 @@ lib/Amazon/S3.pm
 lib/Amazon/S3/Bucket.pm
 lib/Amazon/S3/Constants.pm
 lib/Amazon/S3/Logger.pm
+lib/Amazon/S3/Signature/V4.pm
 Makefile.PL
 MANIFEST			This list of files
 README-TESTING.md
@@ -11,5 +12,7 @@ t/01-api.t
 t/02-logger.t
 t/03-region.t
 t/04-list-buckets.t
+t/05-multipart-upload.t
+t/06-list-multipart-uploads.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

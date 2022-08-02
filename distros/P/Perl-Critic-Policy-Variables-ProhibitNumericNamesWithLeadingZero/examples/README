@@ -1,0 +1,12 @@
+This directory contains examples for the ProhibitNumericNamesWithLeadingZero
+Perl-Critic policy. The files are:
+
+README - This file.
+
+var-names-with-leading-zero - This is a script that executes the
+    ProhibitNumericNamesWithLeadingZero policy. It is more or less
+    equivalent to
+    $ perlcritic --single ProhibitNumericNamesWithLeadingZero
+    Use
+    $ var-names-with-leading-zero --help
+    for the documentation.

@@ -5,14 +5,14 @@
 use v5.12;
 
 package Chart::Base;
-our $VERSION = 'v2.403.5';
+our $VERSION = 'v2.403.7';
 
 use FileHandle;
 use Carp;
 use GD;
 use GD::Image;
 use Chart::Color;
-#use Chart::Font;
+#use Property::DataType::Font;
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>#
 #  public methods          #

@@ -1,0 +1,86 @@
+{
+   "abstract" : "Don't use numeric variable names with leading zeroes.",
+   "author" : [
+      "Thomas R. Wyant, III (wyant at cpan dot org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Perl-Critic-Policy-Variables-ProhibitNumericNamesWithLeadingZero",
+   "no_index" : {
+      "directory" : [
+         "doc",
+         "examples",
+         "inc",
+         "tools",
+         "xt"
+      ],
+      "file" : [
+         "TODO.pod"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Carp" : "0",
+            "PPI::Document" : "0",
+            "Perl::Critic::TestUtils" : "0",
+            "Test::More" : "0.88",
+            "Test::Perl::Critic::Policy" : "0",
+            "lib" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "English" : "0",
+            "PPI::Document" : "0",
+            "PPIx::QuoteLike" : "0.011",
+            "PPIx::QuoteLike::Constant" : "0.011",
+            "PPIx::Regexp" : "0.071",
+            "Perl::Critic::Policy" : "1.119",
+            "Perl::Critic::Utils" : "1.119",
+            "Readonly" : "0",
+            "base" : "0",
+            "perl" : "5.006001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Perl::Critic::Policy::Variables::ProhibitNumericNamesWithLeadingZero" : {
+         "file" : "lib/Perl/Critic/Policy/Variables/ProhibitNumericNamesWithLeadingZero.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "wyant@cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-Variables-ProhibitNumericNamesWithLeadingZero"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/trwyant/perl-Perl-Critic-Policy-Variables-ProhibitNumericNamesWithLeadingZero.git",
+         "web" : "https://github.com/trwyant/perl-Perl-Critic-Policy-Variables-ProhibitNumericNamesWithLeadingZero"
+      }
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 4.10"
+}

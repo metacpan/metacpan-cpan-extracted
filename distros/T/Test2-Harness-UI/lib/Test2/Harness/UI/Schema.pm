@@ -6,7 +6,7 @@ use Carp qw/confess/;
 
 use Test2::Harness::Util qw/looks_like_uuid/;
 
-our $VERSION = '0.000120';
+our $VERSION = '0.000124';
 
 use base 'DBIx::Class::Schema';
 
@@ -14,7 +14,6 @@ confess "You must first load a Test2::Harness::UI::Schema::NAME module"
     unless $Test2::Harness::UI::Schema::LOADED;
 
 if ($Test2::Harness::UI::Schema::LOADED =~ m/MySQL/ && eval { require DBIx::Class::Storage::DBI::mysql::Retryable; 1 }) {
-    DBIx::Class::Storage::DBI::mysql::Retryable->_use_join_optimizer(0);
     __PACKAGE__->storage_type('::DBI::mysql::Retryable');
 }
 

@@ -1,5 +1,12 @@
 Revision history for Data::Text
 
+0.10	Mon Aug  1 21:01:05 EDT 2022
+	set() when given a list of strings would append instead of setting
+	Carp when given a reference to an empty array
+	Give more helpful error message
+	Simplify the code
+	Added == and != operators
+
 0.09	Tue Nov 16 08:14:19 EST 2021
 	new() now supports initialisation of the object
 

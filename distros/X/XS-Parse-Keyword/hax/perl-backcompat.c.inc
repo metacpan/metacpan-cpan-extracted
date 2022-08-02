@@ -23,12 +23,21 @@ typedef AV PADNAMELIST;
 typedef SV PADNAME;
 #  define PadnamePV(pn)           (SvPOKp(pn) ? SvPVX(pn) : NULL)
 #  define PadnameLEN(pn)          SvCUR(pn)
+#  define PadnameIsSTATE(pn)      (!!SvPAD_STATE(pn))
 #  define PadnameOUTER(pn)        (SvFAKE(pn) && !SvPAD_STATE(pn))
 #  define PadnamelistARRAY(pnl)   AvARRAY(pnl)
 #  define PadnamelistMAX(pnl)     AvFILLp(pnl)
 
 #  define PadARRAY(p)             AvARRAY(p)
 #  define PadMAX(pad)             AvFILLp(pad)
+#endif
+
+#if !HAVE_PERL_VERSION(5, 22, 0)
+#  define CvPADLIST_set(cv, padlist)  (CvPADLIST(cv) = padlist)
+#endif
+
+#ifndef av_count
+#  define av_count(av)           (AvFILL(av) + 1)
 #endif
 
 #ifndef av_top_index
@@ -41,6 +50,10 @@ typedef SV PADNAME;
 
 #ifndef block_start
 #  define block_start(a)         Perl_block_start(aTHX_ a)
+#endif
+
+#ifndef cophh_exists_pvs
+#  define cophh_exists_pvs(a,b,c)  cBOOL(cophh_fetch_pvs(a,b,c))
 #endif
 
 #ifndef cv_clone

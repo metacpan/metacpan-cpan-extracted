@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -20,16 +20,18 @@
             "Convert::Color::XTerm" : "0",
             "File::ShareDir" : "1.00",
             "IO::Async" : "0.14",
-            "Net::Async::Tangence::Client" : "0.13",
+            "Net::Async::Tangence::Client" : "0.15",
             "String::Tagged" : "0",
             "Tangence::ObjectProxy" : "0.20_001",
             "Text::Balanced" : "0",
             "Tickit" : "0.55",
+            "Tickit::App::Plugin::EscapePrefix" : "0",
             "Tickit::Async" : "0.21",
             "Tickit::Event" : "0.58",
             "Tickit::Style" : "0.40",
             "Tickit::Term" : "0.27",
             "Tickit::Widget::Entry" : "0.20",
+            "Tickit::Widget::Entry::Plugin::Completion" : "0",
             "Tickit::Widget::HBox" : "0.32",
             "Tickit::Widget::Scroller" : "0.15",
             "Tickit::Widget::Tabbed" : "0.019",
@@ -41,7 +43,7 @@
    "provides" : {
       "Circle::FE::Term" : {
          "file" : "lib/Circle/FE/Term.pm",
-         "version" : "0.173170"
+         "version" : "0.222060"
       },
       "Circle::FE::Term::Ribbon" : {
          "file" : "lib/Circle/FE/Term/Ribbon.pm"
@@ -77,6 +79,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.173170",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.222060",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

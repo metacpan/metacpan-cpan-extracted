@@ -5,30 +5,18 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class;
 
-extends 'Venus::Kind::Utility';
+base 'Venus::Kind::Utility';
 
 with 'Venus::Role::Stashable';
 
 # ATTRIBUTES
 
-has message => (
-  is => 'rw',
-);
-
-has package => (
-  is => 'ro',
-);
-
-has parent => (
-  is => 'ro',
-  default => 'Venus::Error',
-);
-
-has context => (
-  is => 'ro',
-);
+attr 'message';
+attr 'package';
+attr 'parent';
+attr 'context';
 
 # BUILDERS
 
@@ -38,6 +26,14 @@ sub build_arg {
   return {
     package => $data,
   };
+}
+
+sub build_self {
+  my ($self, $data) = @_;
+
+  $self->parent('Venus::Error') if !$self->parent;
+
+  return $self;
 }
 
 # METHODS

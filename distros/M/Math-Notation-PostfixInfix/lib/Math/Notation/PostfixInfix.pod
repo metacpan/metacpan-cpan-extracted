@@ -1,0 +1,258 @@
+
+=head1 NAME
+
+Math::Notation::PostfixInfix - Perl extension for Math Postfix and Infix Notation
+
+=head1 SYNOPSIS
+
+ use Math::Notation::PostfixInfix;
+
+ Infix_to_Postfix
+    @array = Infix_to_Postfix ( "math infix expression" );
+
+ Postfix_to_Infix
+    $string = Postfix_to_Infix ( @postfix_array_expression );
+
+ Postfix_Test
+    $bolean = Postfix_Test ( \@postfix_array_expression,
+                             [ \&external_subrot, [ \@subrot_options ]]
+                           );
+
+=head1 DESCRIPTION
+
+This module was created to: 
+
+=over
+
+ (a) Convert INFIX expressions to POSTFIX; 
+ (b) Convert POSTFIX expressions to INFIX and; 
+ (c) Perform POSTFIX context validations.
+
+=back
+
+Context validation can be implemented in item selection routines or data context validation, 
+when it is possible to identify data to be selected or ignored in some data analysis process.
+
+See the section "RECIPES" at the bottom of this document for solutions to common usage!
+
+=head1 RECIPES
+
+The examples below were created in the hope that it will be useful.
+
+=over
+
+=item 1) Converting Infix notation:
+
+=over
+
+code:
+
+  use Math::Notation::PostfixInfix;
+
+  my @array = Math::Notation::PostfixInfix->Infix_to_Postfix
+                    ("a && b || c && d");
+
+results:
+
+  @array = [ "a", "b", "&", "c", "d", "&", "|" ];
+
+=back
+
+=item 2) Convertion Postfix notation:
+
+=over
+
+code:
+
+  use Math::Notation::PostfixInfix;
+
+  my $string = Math::Notation::PostfixInfix->Infix_to_Postfix
+                     ( [ "a","b","&","c","d","&","|" ] );
+  or
+  my $string = Math::Notation::PostfixInfix->Infix_to_Postfix
+                     ( \@array );
+
+results:
+
+  $string = "a and b or c and d";
+
+=back
+
+=item 3) Context Validation, sample 1of2:
+
+=over
+
+code:
+
+  use Math::Notation::PostfixInfix;
+
+  my $mymod = new Math::Notation::PostfixInfix;
+
+  my %hash = ( A=>1, B=>0, C=>1, D=>0 );
+
+  my @array =
+  (
+     [$mymod->Infix_to_Postfix("A && B && C && D")],
+     [$mymod->Infix_to_Postfix("A && B || C && D")],
+     [$mymod->Infix_to_Postfix("A && B || C && D")],
+     [$mymod->Infix_to_Postfix("A || B && C || D")],
+     [$mymod->Infix_to_Postfix("A || B || C || D")],
+  );
+
+   print "test1 = ".$mymod->Postfix_Test($array[0],\&subrot)."\n";
+   print "test2 = ".$mymod->Postfix_Test($array[1],\&subrot)."\n";
+   print "test3 = ".$mymod->Postfix_Test($array[2],\&subrot)."\n";
+   print "test4 = ".$mymod->Postfix_Test($array[3],\&subrot)."\n";
+   print "test5 = ".$mymod->Postfix_Test($array[4],\&subrot)."\n";
+   exit;
+
+   # rule = field information
+   # oper = operator (lt,le,eq,gt,ge,*) ('*' is no operator found)
+   # val1 = left part of field information (for 'oper' not '*')
+   # val2 = right part of field information (for 'oper' not '*')
+   # opts = subroutine options passed on Postfix_Test (3rd args)
+
+   sub subrot
+   {
+       my $rule = shift;	# full field information
+       my $oper = shift;	# may be: lt, le, eq, gt, ge, '*'
+       my $val1 = shift;	# value is '0' if oper = '*'
+       my $val2 = shift;	# value is '0' if oper = '*'
+       my $opts = shift;	# subroution options
+       return $hash{$rule};
+   }
+
+results:
+
+  test1 = 0
+  test2 = 0
+  test3 = 0
+  test4 = 1
+  test5 = 1
+
+=back
+
+=item 4) Context Validation, sample 2of2:
+
+=over
+
+code:
+
+  #/usr/bin/perl
+  #
+  ##file: /tmp/t
+
+  use Math::Notation::PostfixInfix;
+
+  ## testing arguments
+  #
+  die "$0 argv1 is missing" if (!@ARGV);
+
+  ## convertin args as string e get the postfix rule
+  #
+  my $mymod = new Math::Notation::PostfixInfix;
+
+  my @rule = $mymod->Infix_to_Postfix(join(" ",@ARGV));
+
+  print "rule: [ ",join(", ",@rule)," ]\n\n";
+
+  ## test and select the data base the rule
+  #
+  while (my $buf = <DATA>)
+  {
+     $buf =~ s/[\n\r]//g;
+
+     ## matching formated data
+     #
+     if ($buf =~ /^(.*),(.*),(.*)$/i)
+     {
+        ## initialize the fields to test
+        #
+        my %test = (country=>$1, name=>$2, genre=>$3);
+
+        ## apply the rules on the fields
+        #
+        ($mymod->Postfix_Test(\@rule,\&subrot,\%test)) ?
+            print "[match]" :
+            print "[unmatch]";
+     }
+
+     ## unmatching dat record
+     #
+     else {print "[regexp-error]";}
+
+     ## append the data record on the status
+     #
+     print " ",$buf,"\n";
+  }
+  undef($fh);
+
+  ## my context test
+  #
+  sub subrot
+  {
+      ## get the envs
+      #
+      my $rule = shift;
+      my $oper = shift;
+      my $val1 = shift;
+      my $val2 = shift;
+      my $test = shift;
+
+      ## return as match if equal/match and data match
+      #
+      return 1 if ($oper eq "eq" && $test->{$val1} eq $val2);
+
+      ## return as match if notequal/operator and data mismatch
+      #
+      return 1 if ($oper eq "ne" && $test->{$val1} ne $val2);
+
+      ## otherwise return as umatch
+      #
+      return 0;
+  }
+  exit;
+
+  __DATA__
+  usa,peter,male
+  brazil,mary,female
+  france,jean,male
+  france,maria,female
+
+results:
+
+   # perl /tmp/t country eq france
+   rule: [ country eq france ]
+
+   [unmatch] usa,peter,male
+   [unmatch] brazil,mary,female
+   [match] france,jean,male
+   [match] france,maria,female
+
+   # perl /tmp/t country eq france and name ne jean
+   rule: [ country eq france, name ne jean, & ]
+
+   [unmatch] usa,peter,male
+   [unmatch] brazil,mary,female
+   [unmatch] france,jean,male
+   [match] france,maria,female
+
+=back
+
+=back
+
+=head1 AUTHOR
+
+Carlos Celso, E<lt>ccelso@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2022 by Carlos Celso
+
+=head1 LICENSE
+
+This package is free software; can, at your discretion,
+also be used, modified and redistributed under the terms
+of the "GPLv3 - GNU Library General Public License".
+
+=cut

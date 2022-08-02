@@ -1,894 +1,983 @@
 class Array {
-  use StringBuffer;
-  use StringList;
   use Stringer;
   use Cloner;
   use EqualityChecker;
   use Format;
   
-  static method copy_byte : byte[] ($nums : byte[]) {
-    return copy $nums;
-  }
-
-  static method copy_double : double[] ($nums : double[]) {
-    return copy $nums;
-  }
-
-  static method copy_float : float[] ($nums : float[]) {
-    return copy $nums;
-  }
-
-  static method copy_int : int[] ($nums : int[]) {
-    return copy $nums;
-  }
-
-  static method copy_long : long[] ($nums : long[]) {
-    return copy $nums;
-  }
-
-  precompile static method copy_object : object[] ($objects : object[], $cloner : Cloner) {
-    if ($objects == undef) {
-      return undef;
-    }
-    
-    my $length = @$objects;
-
-    my $new_objects = new object[$length];
-
-    for (my $i = 0; $i < $length; $i++) {
-      $new_objects->[$i] = $cloner->($objects->[$i]);
-    }
-
-    return $new_objects;
-  }
-
-  precompile static method copy_range_byte : byte[] ($nums : byte[], $offset : int, $length : int) {
-
-    if ($nums == undef) {
-      die "The argument array must be defined";
-    }
-
-    my $array_length = @$nums;
-
-    if ($offset < 0 || $offset > $array_length - 1) {
-      die "Offset must be in the array range";
-    }
-
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-
-    if ($offset + $length > $array_length) {
-      die "Offset + length must be in the array range";
-    }
-
-    my $range = new byte[$length];
-
-    my $pos = 0;
-    for (my $i = $offset; $i < $offset + $length; $i++) {
-      $range->[$pos] = $nums->[$i];
-      $pos++;
-    }
-
-    return $range;
-  }
-
-  precompile static method copy_range_double : double[] ($nums : double[], $offset : int, $length : int) {
-
-    if ($nums == undef) {
-      die "The argument array must be defined";
-    }
-
-    my $array_length = @$nums;
-
-    if ($offset < 0 || $offset > $array_length - 1) {
-      die "Offset must be in the array range";
-    }
-
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-
-    if ($offset + $length > $array_length) {
-      die "Offset + length must not be in the array range";
-    }
-
-    my $range = new double[$length];
-
-    my $pos = 0;
-    for (my $i = $offset; $i < $offset + $length; $i++) {
-      $range->[$pos] = $nums->[$i];
-      $pos++;
-    }
-
-    return $range;
-  }
-
-  precompile static method copy_range_float : float[] ($nums : float[], $offset : int, $length : int) {
-
-    if ($nums == undef) {
-      die "The argument array must be defined";
-    }
-
-    my $array_length = @$nums;
-
-    if ($offset < 0 || $offset > $array_length - 1) {
-      die "Offset must be in the array range";
-    }
-
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-
-    if ($offset + $length > $array_length) {
-      die "Offset + length must not be in the array range";
-    }
-
-    my $range = new float[$length];
-
-    my $pos = 0;
-    for (my $i = $offset; $i < $offset + $length; $i++) {
-      $range->[$pos] = $nums->[$i];
-      $pos++;
-    }
-
-    return $range;
-  }
-
-  precompile static method copy_range_int : int[] ($nums : int[], $offset : int, $length : int) {
-
-    if ($nums == undef) {
-      die "The argument array must be defined";
-    }
-
-    my $array_length = @$nums;
-
-    if ($offset < 0 || $offset > $array_length - 1) {
-      die "Offset must be in the array range";
-    }
-
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-
-    if ($offset + $length > $array_length) {
-      die "Offset + length must be in the array range";
-    }
-
-    my $range = new int[$length];
-
-    my $pos = 0;
-    for (my $i = $offset; $i < $offset + $length; $i++) {
-      $range->[$pos] = $nums->[$i];
-      $pos++;
-    }
-
-    return $range;
-  }
-
-  precompile static method copy_range_long : long[] ($nums : long[], $offset : int, $length : int) {
-
-    if ($nums == undef) {
-      die "The argument array must be defined";
-    }
-
-    my $array_length = @$nums;
-
-    if ($offset < 0 || $offset > $array_length - 1) {
-      die "Offset must be in the array range";
-    }
-
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-
-    if ($offset + $length > $array_length) {
-      die "Offset + length must not be in the array range";
-    }
-
-    my $range = new long[$length];
-
-    my $pos = 0;
-    for (my $i = $offset; $i < $offset + $length; $i++) {
-      $range->[$pos] = $nums->[$i];
-      $pos++;
-    }
-
-    return $range;
-  }
-
-  precompile static method copy_range_object : object[] ($objects : object[], $offset : int, $length : int) {
-
-    if ($objects == undef) {
-      die "The argument array must be defined";
-    }
-
-    my $array_length = @$objects;
-
-    if ($offset < 0 || $offset > $array_length - 1) {
-      die "Offset must be in the array range";
-    }
-
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-
-    if ($offset + $length > $array_length) {
-      die "Offset + length must not be in the array range";
-    }
-
-    my $range = &new_proto($objects, $length);
-
-    my $pos = 0;
-    for (my $i = $offset; $i < $offset + $length; $i++) {
-      $range->[$pos] = $objects->[$i];
-      $pos++;
-    }
-
-    return $range;
-  }
-
-  precompile static method copy_range_short : short[] ($nums : short[], $offset : int, $length : int) {
-
-    if ($nums == undef) {
-      die "The argument array must be defined";
-    }
-
-    my $array_length = @$nums;
-
-    if ($offset < 0 || $offset > $array_length - 1) {
-      die "Offset must be in the array range";
-    }
-
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-
-    if ($offset + $length > $array_length) {
-      die "Offset + length must be in the array range";
-    }
-
-    my $range = new short[$length];
-
-    my $pos = 0;
-    for (my $i = $offset; $i < $offset + $length; $i++) {
-      $range->[$pos] = $nums->[$i];
-      $pos++;
-    }
-
-    return $range;
-  }
-
-
-  precompile static method copy_range_string : string[] ($strings : string[], $offset : int, $length : int) {
-
-    if ($strings == undef) {
-      die "The argument array must be defined";
-    }
-
-    my $array_length = @$strings;
-
-    if ($offset < 0 || $offset > $array_length - 1) {
-      die "Offset must be in the array range";
-    }
-
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-
-    if ($offset + $length > $array_length) {
-      die "Offset + length must not be in the array range";
-    }
-
-    my $range = new string[$length];
-
-    my $pos = 0;
-    for (my $i = $offset; $i < $offset + $length; $i++) {
-      $range->[$pos] = $strings->[$i];
-      $pos++;
-    }
-
-    return $range;
-  }
-
-  static method copy_short : short[] ($nums : short[]) {
-    return copy $nums;
-  }
-
-  precompile static method copy_string : string[] ($strings : string[]) {
-    if ($strings == undef) {
-      return undef;
-    }
-    
-    my $length = @$strings;
-
-    my $new_strings = new string[$length];
-
-    for (my $i = 0; $i < $length; $i++) {
-      $new_strings->[$i] = copy $strings->[$i];
-    }
-
-    return $new_strings;
+  static method copy_byte : byte[] ($array : byte[]) {
+    return copy $array;
   }
   
-  precompile static method dump_byte : string ($nums : byte[]) {
-    
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$nums; $i++) {
-      my $string = (string)$nums->[$i];
-      $dump .= "  $string";
-      if ($i != @$nums - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
-  }
-
-  precompile static method dump_double : string ($nums : double[]) {
-    
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$nums; $i++) {
-      my $string = (string)$nums->[$i];
-      $dump .= "  $string";
-      if ($i != @$nums - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
-  }
-
-  precompile static method dump_float : string ($nums : float[]) {
-    
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$nums; $i++) {
-      my $string = (string)$nums->[$i];
-      $dump .= "  $string";
-      if ($i != @$nums - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
-  }
-
-  precompile static method dump_int : string ($nums : int[]) {
-    
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$nums; $i++) {
-      my $string = (string)$nums->[$i];
-      $dump .= "  $string";
-      if ($i != @$nums - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
-  }
-
-  precompile static method dump_long : string ($nums : long[]) {
-    
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$nums; $i++) {
-      my $string = (string)$nums->[$i];
-      $dump .= "  $string";
-      if ($i != @$nums - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
-  }
-
-  precompile static method dump_object : string ($objects : object[], $stringer : Stringer) {
-    
-    if ($objects == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$objects; $i++) {
-      my $string = $stringer->($objects->[$i]);
-      $dump .= "  $string";
-      if ($i != @$objects - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
-  }
-
-  precompile static method dump_short : string ($nums : short[]) {
-    
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$nums; $i++) {
-      my $string = (string)$nums->[$i];
-      $dump .= "  $string";
-      if ($i != @$nums - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
-  }
-
-  precompile static method dump_string : string ($strings : string[]) {
-    
-    if ($strings == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$strings; $i++) {
-      my $string = $strings->[$i];
-      $dump .= "  $string";
-      if ($i != @$strings - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
-  }
-
-  precompile static method dump_unsigned_byte : string ($nums : byte[]) {
-    
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$nums; $i++) {
-      my $string = Format->sprintf("%u", (int)$nums->[$i] & 0xFF);
-      $dump .= "  $string";
-      if ($i != @$nums - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
-  }
-
-  precompile static method dump_unsigned_int : string ($nums : int[]) {
-    
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$nums; $i++) {
-      my $string = Format->sprintf("%u", $nums->[$i]);
-      $dump .= "  $string";
-      if ($i != @$nums - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
-  }
-
-  precompile static method dump_unsigned_long : string ($nums : long[]) {
-    
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$nums; $i++) {
-      my $string = Format->sprintf("%lu", $nums->[$i]);
-      $dump .= "  $string";
-      if ($i != @$nums - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
-  }
-
-  precompile static method dump_unsigned_short : string ($nums : short[]) {
-    
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$nums; $i++) {
-      my $string = Format->sprintf("%u", (int)$nums->[$i] & 0xFFFF);
-      $dump .= "  $string";
-      if ($i != @$nums - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
-  }
-
-  precompile static method equals_byte : int ($nums1 : byte[], $nums2 : byte[]) {
-    
-    if ($nums1 == undef && $nums2 == undef) {
-      return 1;
-    }
-    elsif ($nums1 != undef && $nums2 == undef) {
-      return 0;
-    }
-    elsif ($nums1 == undef && $nums2 != undef) {
-      return 0;
-    }
-    
-    my $is_equals = 1;
-    if (@$nums1 == @$nums2) {
-      for (my $i = 0; $i < @$nums1; $i++) {
-        if ($nums1->[$i] != $nums2->[$i]) {
-          $is_equals = 0;
-          last;
-        }
-      }
-    }
-    else {
-      $is_equals = 0;
-    }
-
-    return $is_equals;
-  }
-
-  precompile static method equals_double : int ($nums1 : double[], $nums2 : double[]) {
-    if ($nums1 == undef && $nums2 == undef) {
-      return 1;
-    }
-    elsif ($nums1 != undef && $nums2 == undef) {
-      return 0;
-    }
-    elsif ($nums1 == undef && $nums2 != undef) {
-      return 0;
-    }
-    
-    my $is_equals = 1;
-    if (@$nums1 == @$nums2) {
-      for (my $i = 0; $i < @$nums1; $i++) {
-        if ($nums1->[$i] != $nums2->[$i]) {
-          $is_equals = 0;
-          last;
-        }
-      }
-    }
-    else {
-      $is_equals = 0;
-    }
-
-    return $is_equals;
-  }
-
-  precompile static method equals_float : int ($nums1 : float[], $nums2 : float[]) {
-    if ($nums1 == undef && $nums2 == undef) {
-      return 1;
-    }
-    elsif ($nums1 != undef && $nums2 == undef) {
-      return 0;
-    }
-    elsif ($nums1 == undef && $nums2 != undef) {
-      return 0;
-    }
-    
-    my $is_equals = 1;
-    if (@$nums1 == @$nums2) {
-      for (my $i = 0; $i < @$nums1; $i++) {
-        if ($nums1->[$i] != $nums2->[$i]) {
-          $is_equals = 0;
-          last;
-        }
-      }
-    }
-    else {
-      $is_equals = 0;
-    }
-
-    return $is_equals;
-  }
-
-  precompile static method equals_int : int ($nums1 : int[], $nums2 : int[]) {
-    if ($nums1 == undef && $nums2 == undef) {
-      return 1;
-    }
-    elsif ($nums1 != undef && $nums2 == undef) {
-      return 0;
-    }
-    elsif ($nums1 == undef && $nums2 != undef) {
-      return 0;
-    }
-    
-    my $is_equals = 1;
-    if (@$nums1 == @$nums2) {
-      for (my $i = 0; $i < @$nums1; $i++) {
-        if ($nums1->[$i] != $nums2->[$i]) {
-          $is_equals = 0;
-          last;
-        }
-      }
-    }
-    else {
-      $is_equals = 0;
-    }
-
-    return $is_equals;
-  }
-  precompile static method equals_long : int ($nums1 : long[], $nums2 : long[]) {
-    if ($nums1 == undef && $nums2 == undef) {
-      return 1;
-    }
-    elsif ($nums1 != undef && $nums2 == undef) {
-      return 0;
-    }
-    elsif ($nums1 == undef && $nums2 != undef) {
-      return 0;
-    }
-    
-    my $is_equals = 1;
-    if (@$nums1 == @$nums2) {
-      for (my $i = 0; $i < @$nums1; $i++) {
-        if ($nums1->[$i] != $nums2->[$i]) {
-          $is_equals = 0;
-          last;
-        }
-      }
-    }
-    else {
-      $is_equals = 0;
-    }
-
-    return $is_equals;
-  }
-
-  precompile static method equals_object : int ($objects1 : object[], $objects2 : object[], $equality_checker : EqualityChecker) {
-    if ($objects1 == undef && $objects2 == undef) {
-      return 1;
-    }
-    elsif ($objects1 != undef && $objects2 == undef) {
-      return 0;
-    }
-    elsif ($objects1 == undef && $objects2 != undef) {
-      return 0;
-    }
-    
-    my $is_equals = 1;
-    if (@$objects1 == @$objects2) {
-      for (my $i = 0; $i < @$objects1; $i++) {
-        if (!$equality_checker->($objects1->[$i], $objects2->[$i])) {
-          $is_equals = 0;
-          last;
-        }
-      }
-    }
-    else {
-      $is_equals = 0;
-    }
-
-    return $is_equals;
-  }
-
-  precompile static method equals_short : int ($nums1 : short[], $nums2 : short[]) {
-    if ($nums1 == undef && $nums2 == undef) {
-      return 1;
-    }
-    elsif ($nums1 != undef && $nums2 == undef) {
-      return 0;
-    }
-    elsif ($nums1 == undef && $nums2 != undef) {
-      return 0;
-    }
-    
-    my $is_equals = 1;
-    if (@$nums1 == @$nums2) {
-      for (my $i = 0; $i < @$nums1; $i++) {
-        if ($nums1->[$i] != $nums2->[$i]) {
-          $is_equals = 0;
-          last;
-        }
-      }
-    }
-    else {
-      $is_equals = 0;
-    }
-
-    return $is_equals;
-  }
-
-  precompile static method equals_string : int ($strings1 : string[], $strings2 : string[]) {
-    if ($strings1 == undef && $strings2 == undef) {
-      return 1;
-    }
-    elsif ($strings1 != undef && $strings2 == undef) {
-      return 0;
-    }
-    elsif ($strings1 == undef && $strings2 != undef) {
-      return 0;
-    }
-    
-    my $is_equals = 1;
-    if (@$strings1 == @$strings2) {
-      for (my $i = 0; $i < @$strings1; $i++) {
-        if ($strings1->[$i] ne $strings2->[$i]) {
-          $is_equals = 0;
-          last;
-        }
-      }
-    }
-    else {
-      $is_equals = 0;
-    }
-
-    return $is_equals;
-  }
-
-  precompile static method memset_byte : void ($dest : byte[], $dest_offset : int, $value : byte, $length : int) {
-    my $offset_plus_length = $dest_offset + $length;
-    for (my $i = $dest_offset; $i < $offset_plus_length; $i++) {
-      $dest->[$i] = $value;
-    }
-  }
-  precompile static method memset_double : void ($dest : double[], $dest_offset : int, $value : double, $length : int) {
-    my $offset_plus_length = $dest_offset + $length;
-    for (my $i = $dest_offset; $i < $offset_plus_length; $i++) {
-      $dest->[$i] = $value;
-    }
-  }
-  precompile static method memset_float : void ($dest : float[], $dest_offset : int, $value : float, $length : int) {
-    my $offset_plus_length = $dest_offset + $length;
-    for (my $i = $dest_offset; $i < $offset_plus_length; $i++) {
-      $dest->[$i] = $value;
-    }
-  }
-  precompile static method memset_int : void ($dest : int[], $dest_offset : int, $value : int, $length : int) {
-    my $offset_plus_length = $dest_offset + $length;
-    for (my $i = $dest_offset; $i < $offset_plus_length; $i++) {
-      $dest->[$i] = $value;
-    }
-  }
-  precompile static method memset_long : void ($dest : long[], $dest_offset : int, $value : long, $length : int) {
-    my $offset_plus_length = $dest_offset + $length;
-    for (my $i = $dest_offset; $i < $offset_plus_length; $i++) {
-      $dest->[$i] = $value;
-    }
-  }
-  precompile static method memset_short : void ($dest : short[], $dest_offset : int, $value : short, $length : int) {
-    my $offset_plus_length = $dest_offset + $length;
-    for (my $i = $dest_offset; $i < $offset_plus_length; $i++) {
-      $dest->[$i] = $value;
-    }
-  }
-  precompile static method memset_object : void ($dest : object[], $dest_offset : int, $value : object, $length : int) {
-    my $offset_plus_length = $dest_offset + $length;
-    for (my $i = $dest_offset; $i < $offset_plus_length; $i++) {
-      $dest->[$i] = $value;
-    }
+  static method copy_double : double[] ($array : double[]) {
+    return copy $array;
   }
   
+  static method copy_float : float[] ($array : float[]) {
+    return copy $array;
+  }
+  
+  static method copy_int : int[] ($array : int[]) {
+    return copy $array;
+  }
+  
+  static method copy_long : long[] ($array : long[]) {
+    return copy $array;
+  }
+  
+  precompile static method copy_object : object[] ($array : object[], $cloner : Cloner) {
+    unless ($array) {
+      return undef;
+    }
+    
+    my $length = @$array;
+    
+    my $new_array = new object[$length];
+    
+    if ($cloner) {
+      for (my $i = 0; $i < $length; $i++) {
+        $new_array->[$i] = $cloner->($array->[$i]);
+      }
+    }
+    else {
+      Array->memcpy_object_address($new_array, 0, $array, 0, $length);
+    }
+    
+    return $new_array;
+  }
+  
+  static method copy_object_address : object[] ($array : object[]) {
+    return &copy_object($array, undef);
+  }
+  
+  static method copy_range_byte : byte[] ($array : byte[], $offset : int, $length : int) {
+    
+    unless ($array) {
+      die "The array must be defined";
+    }
+    
+    unless ($offset >= 0) {
+      die "The offset must be greater than or equal to 0";
+    }
+    
+    unless ($length >= 0) {
+      die "The length must be greater than or equal to 0";
+    }
+    
+    my $array_length = @$array;
+    
+    unless ($offset + $length <= $array_length) {
+      die "The offset + the length specified by the argument must be less than or equal to the length of the array";
+    }
+    
+    my $new_array = new byte[$length];
+    
+    Array->memcpy_byte($new_array, 0, $array, $offset, $length);
+    
+    return $new_array;
+  }
+  
+  static method copy_range_double : double[] ($array : double[], $offset : int, $length : int) {
+    
+    unless ($array) {
+      die "The array must be defined";
+    }
+    
+    unless ($offset >= 0) {
+      die "The offset must be greater than or equal to 0";
+    }
+    
+    unless ($length >= 0) {
+      die "The length must be greater than or equal to 0";
+    }
+    
+    my $array_length = @$array;
+    
+    unless ($offset + $length <= $array_length) {
+      die "The offset + the length specified by the argument must be less than or equal to the length of the array";
+    }
+    
+    my $new_array = new double[$length];
+    
+    Array->memcpy_double($new_array, 0, $array, $offset, $length);
+    
+    return $new_array;
+  }
+  
+  static method copy_range_float : float[] ($array : float[], $offset : int, $length : int) {
+    
+    unless ($array) {
+      die "The array must be defined";
+    }
+    
+    unless ($offset >= 0) {
+      die "The offset must be greater than or equal to 0";
+    }
+    
+    unless ($length >= 0) {
+      die "The length must be greater than or equal to 0";
+    }
+    
+    my $array_length = @$array;
+    
+    unless ($offset + $length <= $array_length) {
+      die "The offset + the length specified by the argument must be less than or equal to the length of the array";
+    }
+    
+    my $new_array = new float[$length];
+    
+    Array->memcpy_float($new_array, 0, $array, $offset, $length);
+    
+    return $new_array;
+  }
+  
+  static method copy_range_int : int[] ($array : int[], $offset : int, $length : int) {
+    
+    unless ($array) {
+      die "The array must be defined";
+    }
+    
+    unless ($offset >= 0) {
+      die "The offset must be greater than or equal to 0";
+    }
+    
+    unless ($length >= 0) {
+      die "The length must be greater than or equal to 0";
+    }
+    
+    my $array_length = @$array;
+    
+    unless ($offset + $length <= $array_length) {
+      die "The offset + the length specified by the argument must be less than or equal to the length of the array";
+    }
+    
+    my $new_array = new int[$length];
+    
+    Array->memcpy_int($new_array, 0, $array, $offset, $length);
+    
+    return $new_array;
+  }
+  
+  static method copy_range_long : long[] ($array : long[], $offset : int, $length : int) {
+    
+    unless ($array) {
+      die "The array must be defined";
+    }
+    
+    unless ($offset >= 0) {
+      die "The offset must be greater than or equal to 0";
+    }
+    
+    unless ($length >= 0) {
+      die "The length must be greater than or equal to 0";
+    }
+    
+    my $array_length = @$array;
+    
+    unless ($offset + $length <= $array_length) {
+      die "The offset + the length specified by the argument must be less than or equal to the length of the array";
+    }
+    
+    my $new_array = new long[$length];
+    
+    Array->memcpy_long($new_array, 0, $array, $offset, $length);
+    
+    return $new_array;
+  }
+  
+  precompile static method copy_range_object : object[] ($array : object[], $offset : int, $length : int, $cloner : Cloner) {
+    
+    unless ($array) {
+      die "The array must be defined";
+    }
+    
+    unless ($offset >= 0) {
+      die "The offset must be greater than or equal to 0";
+    }
+    
+    unless ($length >= 0) {
+      die "The length must be greater than or equal to 0";
+    }
+    
+    my $array_length = @$array;
+    
+    unless ($offset + $length <= $array_length) {
+      die "The offset + the length specified by the argument must be less than or equal to the length of the array";
+    }
+    
+    my $new_array = &new_proto($array, $length);
+    
+    if ($cloner) {
+      for (my $i = 0; $i < $length; $i++) {
+        $new_array->[$i] = $cloner->($array->[$offset + $i]);
+      }
+    }
+    else {
+      Array->memcpy_object_address($new_array, 0, $array, $offset, $length);
+    }
+    
+    return $new_array;
+  }
+  
+  static method copy_range_object_address : object[] ($array : object[], $offset : int, $length : int) {
+    return &copy_range_object($array, $offset, $length, undef);
+  }
+  
+  static method copy_range_short : short[] ($array : short[], $offset : int, $length : int) {
+    
+    unless ($array) {
+      die "The array must be defined";
+    }
+    
+    unless ($offset >= 0) {
+      die "The offset must be greater than or equal to 0";
+    }
+    
+    unless ($length >= 0) {
+      die "The length must be greater than or equal to 0";
+    }
+    
+    my $array_length = @$array;
+    
+    unless ($offset + $length <= $array_length) {
+      die "The offset + the length specified by the argument must be less than or equal to the length of the array";
+    }
+    
+    my $new_array = new short[$length];
+    
+    Array->memcpy_short($new_array, 0, $array, $offset, $length);
+    
+    return $new_array;
+  }
+  
+  precompile static method copy_range_string : string[] ($array : string[], $offset : int, $length : int) {
+    
+    unless ($array) {
+      die "The array must be defined";
+    }
+    
+    unless ($offset >= 0) {
+      die "The offset must be greater than or equal to 0";
+    }
+    
+    unless ($length >= 0) {
+      die "The length must be greater than or equal to 0";
+    }
+    
+    my $array_length = @$array;
+    
+    unless ($offset + $length <= $array_length) {
+      die "The offset + the length specified by the argument must be less than or equal to the length of the array";
+    }
+    
+    my $new_array = new string[$length];
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $new_array->[$i] = copy $array->[$offset + $i];
+    }
+    
+    return $new_array;
+  }
+  
+  static method copy_range_string_address : string[] ($array : string[], $offset : int, $length : int) {
+    
+    unless ($array) {
+      die "The array must be defined";
+    }
+    
+    unless ($offset >= 0) {
+      die "The offset must be greater than or equal to 0";
+    }
+    
+    unless ($length >= 0) {
+      die "The length must be greater than or equal to 0";
+    }
+    
+    my $array_length = @$array;
+    
+    unless ($offset + $length <= $array_length) {
+      die "The offset + the length specified by the argument must be less than or equal to the length of the array";
+    }
+    
+    my $new_array = new string[$length];
+    
+    Array->memcpy_string_address($new_array, 0, $array, $offset, $length);
+    
+    return $new_array;
+  }
+  
+  static method copy_short : short[] ($array : short[]) {
+    return copy $array;
+  }
+  
+  precompile static method copy_string : string[] ($array : string[]) {
+    unless ($array) {
+      return undef;
+    }
+    
+    my $length = @$array;
+    
+    my $new_array = new string[$length];
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $new_array->[$i] = copy $array->[$i];
+    }
+    
+    return $new_array;
+  }
+  
+  static method copy_string_address : string[] ($array : string[]) {
+    unless ($array) {
+      return undef;
+    }
+    
+    my $length = @$array;
+    
+    my $new_array = new string[$length];
+    
+    Array->memcpy_string_address($new_array, 0, $array, 0, $length);
+    
+    return $new_array;
+  }
+  
+  precompile static method dump_unsigned_byte : string ($array : byte[]) {
+    
+    unless ($array) {
+      return "undef";
+    }
+    
+    my $dump = "[\n";
+    
+    for (my $i = 0; $i < @$array; $i++) {
+      my $string = Format->sprintf("%u", (int)$array->[$i] & 0xFF);
+      $dump .= "  $string";
+      if ($i != @$array - 1) {
+        $dump .= ",\n";
+      }
+      else {
+        $dump .= "\n";
+      }
+    }
+    
+    $dump .= "] : " . ref $array . "(" . Format->sprintf("%p", (object)$array)  . ")";
+    
+    return $dump;
+  }
+  
+  precompile static method dump_unsigned_int : string ($array : int[]) {
+    
+    unless ($array) {
+      return "undef";
+    }
+    
+    my $dump = "[\n";
+    
+    for (my $i = 0; $i < @$array; $i++) {
+      my $string = Format->sprintf("%u", $array->[$i]);
+      $dump .= "  $string";
+      if ($i != @$array - 1) {
+        $dump .= ",\n";
+      }
+      else {
+        $dump .= "\n";
+      }
+    }
+    
+    $dump .= "] : " . ref $array . "(" . Format->sprintf("%p", (object)$array)  . ")";
+    
+    return $dump;
+  }
+  
+  precompile static method dump_unsigned_long : string ($array : long[]) {
+    
+    unless ($array) {
+      return "undef";
+    }
+    
+    my $dump = "[\n";
+    
+    for (my $i = 0; $i < @$array; $i++) {
+      my $string = Format->sprintf("%lu", $array->[$i]);
+      $dump .= "  $string";
+      if ($i != @$array - 1) {
+        $dump .= ",\n";
+      }
+      else {
+        $dump .= "\n";
+      }
+    }
+    
+    $dump .= "] : " . ref $array . "(" . Format->sprintf("%p", (object)$array)  . ")";
+    return $dump;
+  }
+  
+  precompile static method dump_unsigned_short : string ($array : short[]) {
+    
+    unless ($array) {
+      return "undef";
+    }
+    
+    my $dump = "[\n";
+    
+    for (my $i = 0; $i < @$array; $i++) {
+      my $string = Format->sprintf("%u", (int)$array->[$i] & 0xFFFF);
+      $dump .= "  $string";
+      if ($i != @$array - 1) {
+        $dump .= ",\n";
+      }
+      else {
+        $dump .= "\n";
+      }
+    }
+    
+    $dump .= "] : " . ref $array . "(" . Format->sprintf("%p", (object)$array)  . ")";
+    
+    return $dump;
+  }
+  
+  precompile static method equals_byte : int ($array1 : byte[], $array2 : byte[]) {
+    
+    if ($array1 == undef && $array2 == undef) {
+      return 1;
+    }
+    elsif ($array1 != undef && $array2 == undef) {
+      return 0;
+    }
+    elsif ($array1 == undef && $array2 != undef) {
+      return 0;
+    }
+    
+    my $is_equals = 1;
+    if (@$array1 == @$array2) {
+      for (my $i = 0; $i < @$array1; $i++) {
+        if ($array1->[$i] != $array2->[$i]) {
+          $is_equals = 0;
+          last;
+        }
+      }
+    }
+    else {
+      $is_equals = 0;
+    }
+    
+    return $is_equals;
+  }
+  
+  precompile static method equals_double : int ($array1 : double[], $array2 : double[]) {
+    if ($array1 == undef && $array2 == undef) {
+      return 1;
+    }
+    elsif ($array1 != undef && $array2 == undef) {
+      return 0;
+    }
+    elsif ($array1 == undef && $array2 != undef) {
+      return 0;
+    }
+    
+    my $is_equals = 1;
+    if (@$array1 == @$array2) {
+      for (my $i = 0; $i < @$array1; $i++) {
+        if ($array1->[$i] != $array2->[$i]) {
+          $is_equals = 0;
+          last;
+        }
+      }
+    }
+    else {
+      $is_equals = 0;
+    }
+
+    return $is_equals;
+  }
+
+  precompile static method equals_float : int ($array1 : float[], $array2 : float[]) {
+    if ($array1 == undef && $array2 == undef) {
+      return 1;
+    }
+    elsif ($array1 != undef && $array2 == undef) {
+      return 0;
+    }
+    elsif ($array1 == undef && $array2 != undef) {
+      return 0;
+    }
+    
+    my $is_equals = 1;
+    if (@$array1 == @$array2) {
+      for (my $i = 0; $i < @$array1; $i++) {
+        if ($array1->[$i] != $array2->[$i]) {
+          $is_equals = 0;
+          last;
+        }
+      }
+    }
+    else {
+      $is_equals = 0;
+    }
+
+    return $is_equals;
+  }
+
+  precompile static method equals_int : int ($array1 : int[], $array2 : int[]) {
+    if ($array1 == undef && $array2 == undef) {
+      return 1;
+    }
+    elsif ($array1 != undef && $array2 == undef) {
+      return 0;
+    }
+    elsif ($array1 == undef && $array2 != undef) {
+      return 0;
+    }
+    
+    my $is_equals = 1;
+    if (@$array1 == @$array2) {
+      for (my $i = 0; $i < @$array1; $i++) {
+        if ($array1->[$i] != $array2->[$i]) {
+          $is_equals = 0;
+          last;
+        }
+      }
+    }
+    else {
+      $is_equals = 0;
+    }
+
+    return $is_equals;
+  }
+  precompile static method equals_long : int ($array1 : long[], $array2 : long[]) {
+    if ($array1 == undef && $array2 == undef) {
+      return 1;
+    }
+    elsif ($array1 != undef && $array2 == undef) {
+      return 0;
+    }
+    elsif ($array1 == undef && $array2 != undef) {
+      return 0;
+    }
+    
+    my $is_equals = 1;
+    if (@$array1 == @$array2) {
+      for (my $i = 0; $i < @$array1; $i++) {
+        if ($array1->[$i] != $array2->[$i]) {
+          $is_equals = 0;
+          last;
+        }
+      }
+    }
+    else {
+      $is_equals = 0;
+    }
+
+    return $is_equals;
+  }
+
+  precompile static method equals_object : int ($array1 : object[], $array2 : object[], $equality_checker : EqualityChecker) {
+    if ($array1 == undef && $array2 == undef) {
+      return 1;
+    }
+    elsif ($array1 != undef && $array2 == undef) {
+      return 0;
+    }
+    elsif ($array1 == undef && $array2 != undef) {
+      return 0;
+    }
+    
+    my $is_equals = 1;
+    if (@$array1 == @$array2) {
+      if ($equality_checker) {
+        for (my $i = 0; $i < @$array1; $i++) {
+          unless ($equality_checker->($array1->[$i], $array2->[$i])) {
+            $is_equals = 0;
+            last;
+          }
+        }
+      }
+      else {
+        for (my $i = 0; $i < @$array1; $i++) {
+          unless ($array1->[$i] == $array2->[$i]) {
+            $is_equals = 0;
+            last;
+          }
+        }
+      }
+    }
+    else {
+      $is_equals = 0;
+    }
+   
+    return $is_equals;
+  }
+  
+  static method equals_object_address : int ($array1 : object[], $array2 : object[]) {
+    return &equals_object($array1, $array2, undef);
+  }
+  
+  precompile static method equals_short : int ($array1 : short[], $array2 : short[]) {
+    if ($array1 == undef && $array2 == undef) {
+      return 1;
+    }
+    elsif ($array1 != undef && $array2 == undef) {
+      return 0;
+    }
+    elsif ($array1 == undef && $array2 != undef) {
+      return 0;
+    }
+    
+    my $is_equals = 1;
+    if (@$array1 == @$array2) {
+      for (my $i = 0; $i < @$array1; $i++) {
+        if ($array1->[$i] != $array2->[$i]) {
+          $is_equals = 0;
+          last;
+        }
+      }
+    }
+    else {
+      $is_equals = 0;
+    }
+
+    return $is_equals;
+  }
+
+  precompile static method equals_string : int ($array1 : string[], $array2 : string[]) {
+    if ($array1 == undef && $array2 == undef) {
+      return 1;
+    }
+    elsif ($array1 != undef && $array2 == undef) {
+      return 0;
+    }
+    elsif ($array1 == undef && $array2 != undef) {
+      return 0;
+    }
+    
+    my $is_equals = 1;
+    if (@$array1 == @$array2) {
+      for (my $i = 0; $i < @$array1; $i++) {
+        if ($array1->[$i] ne $array2->[$i]) {
+          $is_equals = 0;
+          last;
+        }
+      }
+    }
+    else {
+      $is_equals = 0;
+    }
+
+    return $is_equals;
+  }
+  
+  static method equals_string_address : int ($array1 : string[], $array2 : string[]) {
+    return &equals_object_address($array1, $array2);
+  }
+
   native static method memcpy_byte : void ($dest : byte[], $dest_offset : int, $source : byte[], $source_offset : int, $length : int);
   native static method memcpy_double : void ($dest : double[], $dest_offset : int, $source : double[], $source_offset : int, $length : int);
   native static method memcpy_float : void ($dest : float[], $dest_offset : int, $source : float[], $source_offset : int, $length : int);
   native static method memcpy_int : void ($dest : int[], $dest_offset : int, $source : int[], $source_offset : int, $length : int);
   native static method memcpy_long : void ($dest : long[], $dest_offset : int, $source : long[], $source_offset : int, $length : int);
   native static method memcpy_short : void ($dest : short[], $dest_offset : int, $source : short[], $source_offset : int, $length : int);
-  precompile static method memcpy_object : void ($dest : object[], $dest_offset : int, $source : object[], $source_offset : int, $length : int) {
+  static method memcpy_string_address : void ($dest : string[], $dest_offset : int, $source : string[], $source_offset : int, $length : int) {
+    &memcpy_object_address($dest, $dest_offset, $source, $source_offset, $length);
+  }
+  static method memcpy_string : void ($dest : string[], $dest_offset : int, $source : string[], $source_offset : int, $length : int) {
+    warn "Array->memcpy_string is deprecated. Use memcpy_string_address instead";
+    &memcpy_string_address($dest, $dest_offset, $source, $source_offset, $length);
+  }
+  precompile static method memcpy_object_address : void ($dest : object[], $dest_offset : int, $source : object[], $source_offset : int, $length : int) {
+    unless ($dest) {
+      die "The destination must be defined";
+    }
+    unless ($source) {
+      die "The source must be defined";
+    }
+    unless ($length >= 0) {
+      die "The length must be greater than or equal to 0";
+    }
+    
+    unless ($dest_offset >= 0) {
+      die "The offset of the destination must be greater than or equal to 0";
+    }
+    
+    unless ($source_offset >= 0) {
+      die "The offset of the source must be greater than or equal to 0";
+    }
+    
+    my $dest_length = @$dest;
+    my $source_length = @$source;
+    
+    unless ($dest_offset + $length <= $dest_length) {
+      die "The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination";
+    }
+    
+    unless ($source_offset + $length <= $source_length) {
+      die "The offset of the source + the length specified by the argument must be less than or equal to the length of the source";
+    }
+    
     for (my $i = 0; $i < $length; $i++) {
       my $dist_index = $dest_offset + $i;
       my $source_index = $source_offset + $i;
       $dest->[$dist_index] = $source->[$source_index];
     }
   }
-
+  static method memcpy_object : void ($dest : object[], $dest_offset : int, $source : object[], $source_offset : int, $length : int) {
+    warn "Array->memcpy_object is deprecated. Use memcpy_object_address instead";
+    &memcpy_object_address($dest, $dest_offset, $source, $source_offset, $length);
+  }
+  
   native static method memmove_byte : void ($dest : byte[], $dest_offset : int, $source : byte[], $source_offset : int, $length : int);
   native static method memmove_double : void ($dest : double[], $dest_offset : int, $source : double[], $source_offset : int, $length : int);
   native static method memmove_float : void ($dest : float[], $dest_offset : int, $source : float[], $source_offset : int, $length : int);
   native static method memmove_int : void ($dest : int[], $dest_offset : int, $source : int[], $source_offset : int, $length : int);
   native static method memmove_long : void ($dest : long[], $dest_offset : int, $source : long[], $source_offset : int, $length : int);
   native static method memmove_short : void ($dest : short[], $dest_offset : int, $source : short[], $source_offset : int, $length : int);
-  static method memmove_object : void ($dest : object[], $dest_offset : int, $source : object[], $source_offset : int, $length : int) {
-    if ($dest == $source) {
-      my $source_length = @$source;
-      my $source_copy = new object[$source_length];
-      my $source_offset_plus_length = $source_offset + $length;
-      &memcpy_object($source_copy, $source_offset, $source, $source_offset, $length);
-      $source = $source_copy;
-    }
-    &memcpy_object($dest, $dest_offset, $source, $source_offset, $length);
+  static method memmove_string_address : void ($dest : string[], $dest_offset : int, $source : string[], $source_offset : int, $length : int) {
+    &memmove_object_address($dest, $dest_offset, $source, $source_offset, $length);
   }
-
+  static method memmove_string : void ($dest : string[], $dest_offset : int, $source : string[], $source_offset : int, $length : int) {
+    warn "Array->memmove_string is deprecated. Use memmove_string_address instead";
+    &memmove_string_address($dest, $dest_offset, $source, $source_offset, $length);
+  }
+  static method memmove_object_address : void ($dest : object[], $dest_offset : int, $source : object[], $source_offset : int, $length : int) {
+    unless ($dest) {
+      die "The destination must be defined";
+    }
+    unless ($source) {
+      die "The source must be defined";
+    }
+    unless ($length >= 0) {
+      die "The length must be greater than or equal to 0";
+    }
+    
+    unless ($dest_offset >= 0) {
+      die "The offset of the destination must be greater than or equal to 0";
+    }
+    
+    unless ($source_offset >= 0) {
+      die "The offset of the source must be greater than or equal to 0";
+    }
+    
+    my $dest_length = @$dest;
+    my $source_length = @$source;
+    
+    unless ($dest_offset + $length <= $dest_length) {
+      die "The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination";
+    }
+    
+    unless ($source_offset + $length <= $source_length) {
+      die "The offset of the source + the length specified by the argument must be less than or equal to the length of the source";
+    }
+    
+    if ($dest_offset < $source_offset) {
+      for (my $i = 0; $i < $length; $i++) {
+        my $dist_index = $dest_offset + $i;
+        my $source_index = $source_offset + $i;
+        $dest->[$dist_index] = $source->[$source_index];
+      }
+    }
+    else {
+      for (my $i = $length - 1; $i >= 0; $i--) {
+        my $dist_index = $dest_offset + $i;
+        my $source_index = $source_offset + $i;
+        $dest->[$dist_index] = $source->[$source_index];
+      }
+    }
+  }
+  static method memmove_object : void ($dest : object[], $dest_offset : int, $source : object[], $source_offset : int, $length : int) {
+    warn "Array->memmove_object is deprecated. Use memmove_object_address instead";
+    &memmove_object_address($dest, $dest_offset, $source, $source_offset, $length);
+  }
+  
+  precompile static method memset_byte : void ($dest : byte[], $dest_offset : int, $element : byte, $length : int) {
+    unless ($dest) {
+      die "The destination must be defined";
+    }
+    
+    unless ($dest_offset >= 0) {
+      die "The offset of the destination must be greater than or equal to 0";
+    }
+    
+    unless ($length >= 0) {
+      die "The length must be greater than or equal to 0";
+    }
+    
+    my $dest_length = @$dest;
+    
+    unless ($dest_offset + $length <= $dest_length) {
+      die "The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination";
+    }
+    
+    if ($length == 0) {
+      return;
+    }
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $dest->[$dest_offset + $i] = $element;
+    }
+  }
+  precompile static method memset_double : void ($dest : double[], $dest_offset : int, $element : double, $length : int) {
+    unless ($dest) {
+      die "The destination must be defined";
+    }
+    
+    unless ($dest_offset >= 0) {
+      die "The offset of the destination must be greater than or equal to 0";
+    }
+    
+    unless ($length >= 0) {
+      die "The length must be greater than or equal to 0";
+    }
+    
+    my $dest_length = @$dest;
+    
+    unless ($dest_offset + $length <= $dest_length) {
+      die "The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination";
+    }
+    
+    if ($length == 0) {
+      return;
+    }
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $dest->[$dest_offset + $i] = $element;
+    }
+  }
+  precompile static method memset_float : void ($dest : float[], $dest_offset : int, $element : float, $length : int) {
+    unless ($dest) {
+      die "The destination must be defined";
+    }
+    
+    unless ($dest_offset >= 0) {
+      die "The offset of the destination must be greater than or equal to 0";
+    }
+    
+    unless ($length >= 0) {
+      die "The length must be greater than or equal to 0";
+    }
+    
+    my $dest_length = @$dest;
+    
+    unless ($dest_offset + $length <= $dest_length) {
+      die "The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination";
+    }
+    
+    if ($length == 0) {
+      return;
+    }
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $dest->[$dest_offset + $i] = $element;
+    }
+  }
+  precompile static method memset_int : void ($dest : int[], $dest_offset : int, $element : int, $length : int) {
+    unless ($dest) {
+      die "The destination must be defined";
+    }
+    
+    unless ($dest_offset >= 0) {
+      die "The offset of the destination must be greater than or equal to 0";
+    }
+    
+    unless ($length >= 0) {
+      die "The length must be greater than or equal to 0";
+    }
+    
+    my $dest_length = @$dest;
+    
+    unless ($dest_offset + $length <= $dest_length) {
+      die "The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination";
+    }
+    
+    if ($length == 0) {
+      return;
+    }
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $dest->[$dest_offset + $i] = $element;
+    }
+  }
+  precompile static method memset_long : void ($dest : long[], $dest_offset : int, $element : long, $length : int) {
+    unless ($dest) {
+      die "The destination must be defined";
+    }
+    
+    unless ($dest_offset >= 0) {
+      die "The offset of the destination must be greater than or equal to 0";
+    }
+    
+    unless ($length >= 0) {
+      die "The length must be greater than or equal to 0";
+    }
+    
+    my $dest_length = @$dest;
+    
+    unless ($dest_offset + $length <= $dest_length) {
+      die "The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination";
+    }
+    
+    if ($length == 0) {
+      return;
+    }
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $dest->[$dest_offset + $i] = $element;
+    }
+  }
+  precompile static method memset_short : void ($dest : short[], $dest_offset : int, $element : short, $length : int) {
+    unless ($dest) {
+      die "The destination must be defined";
+    }
+    
+    unless ($dest_offset >= 0) {
+      die "The offset of the destination must be greater than or equal to 0";
+    }
+    
+    unless ($length >= 0) {
+      die "The length must be greater than or equal to 0";
+    }
+    
+    my $dest_length = @$dest;
+    
+    unless ($dest_offset + $length <= $dest_length) {
+      die "The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination";
+    }
+    
+    if ($length == 0) {
+      return;
+    }
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $dest->[$dest_offset + $i] = $element;
+    }
+  }
+  static method memset_string : void ($dest : string[], $dest_offset : int, $element : string, $length : int) {
+    &memset_object($dest, $dest_offset, $element, $length);
+  }
+  precompile static method memset_object : void ($dest : object[], $dest_offset : int, $element : object, $length : int) {
+    unless ($dest) {
+      die "The destination must be defined";
+    }
+    
+    unless ($dest_offset >= 0) {
+      die "The offset of the destination must be greater than or equal to 0";
+    }
+    
+    unless ($length >= 0) {
+      die "The length must be greater than or equal to 0";
+    }
+    
+    my $dest_length = @$dest;
+    
+    unless ($dest_offset + $length <= $dest_length) {
+      die "The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination";
+    }
+    
+    if ($length == 0) {
+      return;
+    }
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $dest->[$dest_offset + $i] = $element;
+    }
+  }
+  
   native static method new_proto : object[] ($proto_array : object[], $length : int);
 }
 

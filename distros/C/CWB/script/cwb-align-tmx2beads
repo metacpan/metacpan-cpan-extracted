@@ -420,7 +420,7 @@ The manual for B<cwb-align-import> goes into much more detail on the format of t
 
 =head1 COPYRIGHT
 
-Copyright (C) 2018-2020 Corpus Workbench contributors (see file I<AUTHORS>)
+Copyright (C) 2018-2022 Corpus Workbench contributors (see file I<AUTHORS>)
 
 This software is provided AS IS and the author makes no warranty as to
 its use and performance. You may use the software, redistribute and

@@ -1,3 +1,4 @@
+use strict; use warnings;
 
 use Test::More tests => 12;
 ok(1);
@@ -10,8 +11,8 @@ print F <DATA>;
 close F;
 
 package FRUIT;
-use blib;
-use base 'FlatFile';
+use FlatFile;
+our @ISA = 'FlatFile';
 our $FIELDS = [qw(fruit color)];
 our $FIELDSEP = ":";
 
@@ -19,13 +20,13 @@ package main;
 my $f = FRUIT->new(FILE => $FILE, MODE => "+<");
 ok($f);
 
-@redfruit2 = $f->lookup(color => "red");
+my @redfruit2 = $f->lookup(color => "red");
 is(scalar(@redfruit2), 2);
 
 $f->append('strawberry', 'red');
-@recs = $f->c_lookup(sub {1});
+my @recs = $f->c_lookup(sub {1});
 is(scalar(@recs), 5);
-@redfruit3 = $f->lookup(color => "red");
+my @redfruit3 = $f->lookup(color => "red");
 is(scalar(@redfruit3), 3);
 is($redfruit3[0]->fruit, 'apple');
 is($redfruit3[2]->fruit, 'strawberry');
@@ -38,7 +39,7 @@ ok($f);
 @recs = $f->c_lookup(sub {1});
 is(scalar(@recs), 5);
 $f->append('orange', 'orange');
-($Orange) = $f->lookup(fruit => 'orange');
+my ($Orange) = $f->lookup(fruit => 'orange');
 $f->delete_rec($Orange);
 @recs = $f->c_lookup(sub {1});
 is(scalar(@recs), 5);
@@ -47,7 +48,7 @@ $f->flush;
 $f = FRUIT->new(FILE => $FILE, MODE => "+<");
 @recs = $f->c_lookup(sub {1});
 is(scalar(@recs), 5);
-@Orange = $f->lookup(fruit => 'orange');
+my @Orange = $f->lookup(fruit => 'orange');
 is(scalar(@Orange), 0);
 
 __DATA__

@@ -1,4 +1,8 @@
 Release history for Catalyst-Plugin-CachedUriForAction
 
+1.001 Sat 30 Jul 2022
+	- No functional changes
+	- Correct prereq declarations
+
 1.000 Fri 24 Dec 2021
 	- Initial release

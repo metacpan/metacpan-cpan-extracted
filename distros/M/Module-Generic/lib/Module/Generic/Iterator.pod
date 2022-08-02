@@ -91,6 +91,20 @@ Reset the position inside the array and sets it to 0.
 
 Provided with an item, this returns its position in the array or undef if it is not in the array.
 
+=head1 SERIALISATION
+
+=for Pod::Coverage FREEZE
+
+=for Pod::Coverage STORABLE_freeze
+
+=for Pod::Coverage STORABLE_thaw
+
+=for Pod::Coverage THAW
+
+=for Pod::Coverage TO_JSON
+
+Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
+
 =head1 SEE ALSO
 
 L<Module::Generic::Iterator::Element>, L<Module::Generic::Array>

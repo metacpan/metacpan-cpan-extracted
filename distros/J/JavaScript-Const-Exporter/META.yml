@@ -21,7 +21,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 keywords:
   - JavaScript
   - constants
@@ -35,7 +35,7 @@ name: JavaScript-Const-Exporter
 provides:
   JavaScript::Const::Exporter:
     file: lib/JavaScript/Const/Exporter.pm
-    version: v0.1.6
+    version: v0.1.7
 recommends:
   Cpanel::JSON::XS: '0'
   Package::Stash::XS: '0'
@@ -51,7 +51,6 @@ requires:
   Path::Tiny: '0'
   Ref::Util: '0'
   Sub::Identify: '0.06'
-  Try::Tiny: '0'
   Types::Common::String: '0'
   Types::Standard: '0'
   namespace::autoclean: '0'
@@ -61,8 +60,8 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/JavaScript-Const-Exporter/issues
   repository: git://github.com/robrwo/JavaScript-Const-Exporter.git
-version: v0.1.6
+version: v0.1.7
 x_authority: cpan:RRWO
-x_generated_by_perl: v5.28.1
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

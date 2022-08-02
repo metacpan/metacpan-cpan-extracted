@@ -1,5 +1,16 @@
 # This file documents the revision history for Perl extension Catalyst-View-BasePerRequest.
 
+0.004 - 2022-07-25
+  - flatten inner content separately from body content
+
+0.003 - 2022-07-24
+  - POD documentation cleanup / spelling fixes
+  - included views shouldn't need to set content type
+  - ignore undef in the html stream
+  - render included views that are inside content areas
+  - support newer CatalystX-Errors and make it easier for subclasses
+    to overide the exceptions
+
 0.002 - 2022-05-26
   - Fixed distribution meta data
 

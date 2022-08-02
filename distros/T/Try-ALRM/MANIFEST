@@ -14,4 +14,6 @@ lib/Try/ALRM.pm
 t/01-basic.t
 t/02-basic.t
 t/03-basic.t
+t/04-retry.t
+t/05-basic-finally.t
 t/release-kwalitee.t

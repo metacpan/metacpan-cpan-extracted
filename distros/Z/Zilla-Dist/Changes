@@ -1,3 +1,6 @@
+0.1.9 Sun 24 Jul 2022 07:22:47 AM PDT
+ - share/Makefile patches
+
 0.1.8 Wed 13 Jul 2022 09:39:55 AM PDT
  - Use upper case for POD =head1 and =head2
  - Use a space for pandoc's softbreak to POD

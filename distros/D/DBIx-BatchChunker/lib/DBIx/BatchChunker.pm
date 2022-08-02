@@ -3,7 +3,7 @@ package DBIx::BatchChunker;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Run large database changes safely
 use version;
-our $VERSION = 'v0.941.1'; # VERSION
+our $VERSION = 'v1.0.0'; # VERSION
 
 use Moo;
 use MooX::StrictConstructor;
@@ -49,7 +49,7 @@ our $DB_MAX_ID = ~0;
 #pod
 #pod         coderef => sub { $_[1]->delete },
 #pod         sleep   => 1,
-#pod         debug   => 1,
+#pod         verbose => 1,
 #pod
 #pod         progress_name    => 'Deleting deprecated accounts',
 #pod         process_past_max => 1,
@@ -442,18 +442,24 @@ has cldr => (
     default  => sub { CLDR::Number->new(locale => 'en') },
 );
 
-#pod =head3 debug
+#pod =head3 verbose
 #pod
-#pod Boolean.  If turned on, displays timing stats on each chunk, as well as total numbers.
+#pod Boolean.  By default, this is on, which displays timing stats on each chunk, as well as
+#pod total numbers.  This is still subject to non-interactivity checks from L</progress_bar>.
+#pod
+#pod (This was previously defaulted to off, and called C<debug>, prior to v1.0.0.)
 #pod
 #pod =cut
 
-has debug => (
+has verbose => (
     is       => 'rw',
     isa      => Bool,
     required => 0,
-    default  => 0,
+    default  => 1,
 );
+
+# Backwards-compatibility
+*debug = \&verbose;
 
 #pod =head2 Common Attributes
 #pod
@@ -510,9 +516,18 @@ has coderef => (
 #pod
 #pod The amount of rows to be processed in each loop.
 #pod
-#pod Default is 1000 rows.  This figure should be sized to keep per-chunk processing time
-#pod at around 5 seconds.  If this is too large, rows may lock for too long.  If it's too
-#pod small, processing may be unnecessarily slow.
+#pod This figure should be sized to keep per-chunk processing time at around 5 seconds.  If
+#pod this is too large, rows may lock for too long.  If it's too small, processing may be
+#pod unnecessarily slow.
+#pod
+#pod Default is 1 row, which is only appropriate if L</target_time> (on by default) is
+#pod enabled.  This will cause the processing to slowly ramp up to the target time as
+#pod BatchChunker gathers more data.
+#pod
+#pod Otherwise, if you using static chunk sizes with C<target_time> turned off, figure out
+#pod the right chunk size with a few test runs and set it here.
+#pod
+#pod (This was previously defaulted to 1000 rows, prior to v1.0.0.)
 #pod
 #pod =cut
 
@@ -520,7 +535,7 @@ has chunk_size => (
     is       => 'rw',
     isa      => PositiveInt,
     required => 0,
-    default  => 1000,
+    default  => 1,
 );
 
 #pod =head3 target_time
@@ -529,10 +544,13 @@ has chunk_size => (
 #pod including L</sleep>.  If the chunk processing times are too high or too low, this will
 #pod dynamically adjust L</chunk_size> to try to match the target.
 #pod
-#pod B<Turning this on does not mean you should ignore C<chunk_size>!>  If the starting chunk
-#pod size is grossly inaccurate to the workload, you could end up with several chunks in the
-#pod beginning causing long-lasting locks before the runtime targeting reduces them down to a
-#pod reasonable size.
+#pod BatchChunker will still use the initial C<chunk_size>, and it will need at least one
+#pod chunk processed, before it makes adjustments.  If the starting chunk size is grossly
+#pod inaccurate to the workload, you could end up with several chunks in the beginning causing
+#pod long-lasting locks before the runtime targeting reduces them down to a reasonable size.
+#pod
+#pod (Chunk size reductions are prioritized before increases, so it should re-size as soon as
+#pod it finds the problem.  But, one bad chunk could be all it takes to cause an outage.)
 #pod
 #pod Default is 5 seconds.  Set this to zero to turn off runtime targeting.  (This was
 #pod previously defaulted to off prior to v0.92, and set to 15 in v0.92.)
@@ -551,14 +569,16 @@ has target_time => (
 #pod The number of seconds to sleep after each chunk.  It uses L<Time::HiRes>'s version, so
 #pod fractional numbers are allowed.
 #pod
-#pod Default is 0, which is fine for most operations.  But, it is highly recommended to turn
-#pod this on (say, 1 to 5 seconds) for really long one-off DB operations, especially if a lot
-#pod of disk I/O is involved.  Without this, there's a chance that the slaves will have a hard
-#pod time keeping up, and/or the master won't have enough processing power to keep up with
+#pod Default is 0.5 seconds, which is fine for most operations.  You can likely get away with
+#pod zero for smaller operations, but test it out first.  If processing is going to take up a
+#pod lot of disk I/O, you may want to consider a higher setting.  If the database server
+#pod spends too much time on processing, the replicas may have a hard time keeping up with
 #pod standard load.
 #pod
 #pod This will increase the overall processing time of the loop, so try to find a balance
 #pod between the two.
+#pod
+#pod (This was previously defaulted to 0 seconds, prior to v1.0.0.)
 #pod
 #pod =cut
 
@@ -566,7 +586,7 @@ has 'sleep' => (
     is       => 'ro',
     isa      => PositiveOrZeroNum,
     required => 0,
-    default  => 0,
+    default  => 0.5,
 );
 
 #pod =head3 process_past_max
@@ -760,6 +780,9 @@ around BUILDARGS => sub {
 
     my %args = @_ == 1 ? %{ $_[0] } : @_;
 
+    # debug -> verbose
+    $args{verbose} //= delete $args{debug} if exists $args{debug};
+
     # Auto-building of rsc and id_name can be a weird dependency dance, so it's better to
     # handle it here.
     my ($rsc, $rs, $id_name) = @args{qw< rsc rs id_name >};
@@ -849,6 +872,15 @@ around BUILDARGS => sub {
         (defined $args{rs} && $args{coderef}) ||
         $args{coderef}
     );
+
+    if (exists $args{target_time} && $args{target_time} == 0 && !$args{chunk_size}) {
+        warn join "\n",
+            'Dynamic chunk resizing is turned off and the chunk_size is still set to its default of 1.',
+            'This is probably not desirable, and you should find an appropriate static chunk size for',
+            'your workload.',
+            ''
+        ;
+    }
 
     $class->$next( %args );
 };
@@ -1035,7 +1067,7 @@ sub calculate_ranges {
 #pod
 #pod         ### Optional ###
 #pod         progress_bar     => $progress,  # defaults to "Processing $source_name" bar
-#pod         debug            => 1,          # displays timing stats on each chunk
+#pod         verbose          => 1,          # displays timing stats on each chunk
 #pod     );
 #pod
 #pod     $batch_chunker->execute if $batch_chunker->calculate_ranges;
@@ -1074,7 +1106,7 @@ sub execute {
         return;
     }
 
-    if ($self->debug) {
+    if ($self->verbose) {
         $progress->message(
             sprintf "(%s total chunks; %s total rows)",
                 map { $self->cldr->decimal_formatter->format($_) } ( ceil($count / $self->chunk_size), $count)
@@ -1111,7 +1143,7 @@ sub execute {
         # Give the DB a little bit of breathing room
         sleep $self->sleep if $self->sleep;
 
-        $self->_print_debug_status('processed');
+        $self->_print_chunk_status('processed');
         $self->_increment_progress;
         $self->_runtime_checker;
 
@@ -1298,7 +1330,7 @@ sub _process_past_max_checker {
     }
 
     # Run another MAX check
-    $progress->message('Reached end; re-checking max ID') if $self->debug;
+    $progress->message('Reached end; re-checking max ID') if $self->verbose;
     my $new_max_id;
     if (defined( my $rsc = $self->rsc )) {
         $self->_dbic_block_runner( run => sub {
@@ -1322,7 +1354,7 @@ sub _process_past_max_checker {
 
     if (!$new_max_id || $new_max_id eq '0E0') {
         # No max: No affected rows to change
-        $progress->message('No max ID found; nothing left to process...') if $self->debug;
+        $progress->message('No max ID found; nothing left to process...') if $self->verbose;
         $ls->end($self->max_id);
 
         $ls->prev_check('no max');
@@ -1330,18 +1362,18 @@ sub _process_past_max_checker {
     }
     elsif ($new_max_id > $self->max_id) {
         # New max ID
-        $progress->message( sprintf 'New max ID set from %s to %s', $self->max_id, $new_max_id ) if $self->debug;
+        $progress->message( sprintf 'New max ID set from %s to %s', $self->max_id, $new_max_id ) if $self->verbose;
         $self->max_id($new_max_id);
         $progress->target( $new_max_id - $self->min_id + 1 );
         $progress->update( $progress->last_update );
     }
     elsif ($new_max_id == $self->max_id) {
         # Same max ID
-        $progress->message( sprintf 'Found max ID %s; same as end', $new_max_id ) if $self->debug;
+        $progress->message( sprintf 'Found max ID %s; same as end', $new_max_id ) if $self->verbose;
     }
     else {
         # Max too low
-        $progress->message( sprintf 'Found max ID %s; ignoring...', $new_max_id ) if $self->debug;
+        $progress->message( sprintf 'Found max ID %s; ignoring...', $new_max_id ) if $self->verbose;
     }
 
     # Run another boundary check with the new max_id value
@@ -1379,7 +1411,7 @@ sub _chunk_count_checker {
 
     if    ($ls->chunk_count == 0 && $self->min_chunk_percent > 0) {
         # No rows: Skip the block entirely, and accelerate the stepping
-        $self->_print_debug_status('skipped');
+        $self->_print_chunk_status('skipped');
 
         $self->_increment_progress;
 
@@ -1404,7 +1436,7 @@ sub _chunk_count_checker {
     }
     elsif ($chunk_percent > 1 + $self->min_chunk_percent) {
         # Too many rows: Backtrack to the previous range and try to bisect
-        $self->_print_debug_status('shrunk');
+        $self->_print_chunk_status('shrunk');
 
         $ls->_mark_timer;
 
@@ -1438,7 +1470,7 @@ sub _chunk_count_checker {
     }
     elsif ($chunk_percent < $self->min_chunk_percent) {
         # Too few rows: Keep the start ID and accelerate towards a better endpoint
-        $self->_print_debug_status('expanded');
+        $self->_print_chunk_status('expanded');
 
         $ls->_mark_timer;
 
@@ -1522,8 +1554,8 @@ sub _runtime_checker {
     return if $new_target_chunk_size == $ls->chunk_size;  # either nothing changed or it's too miniscule
     return if $new_target_chunk_size < 1;
 
-    # Print out a debug line, if enabled
-    if ($self->debug) {
+    # Print out a processing line, if enabled
+    if ($self->verbose) {
         # CLDR number formatters
         my $integer = $self->cldr->decimal_formatter;
         my $percent = $self->cldr->percent_formatter;
@@ -1559,17 +1591,17 @@ sub _increment_progress {
     $progress->update($so_far);
 }
 
-#pod =head2 _print_debug_status
+#pod =head2 _print_chunk_status
 #pod
-#pod Prints out a standard debug status line, if debug is enabled.  What it prints is
+#pod Prints out a standard chunk status line, if L</verbose> is enabled.  What it prints is
 #pod generally uniform, but it depends on the processing action.  Most of the data is
 #pod pulled from L</loop_state>.
 #pod
 #pod =cut
 
-sub _print_debug_status {
+sub _print_chunk_status {
     my ($self, $action) = @_;
-    return unless $self->debug;
+    return unless $self->verbose;
 
     my $ls    = $self->loop_state;
     my $sleep = $self->sleep || 0;
@@ -1671,7 +1703,7 @@ DBIx::BatchChunker - Run large database changes safely
 
 =head1 VERSION
 
-version v0.941.1
+version v1.0.0
 
 =head1 SYNOPSIS
 
@@ -1690,7 +1722,7 @@ version v0.941.1
 
         coderef => sub { $_[1]->delete },
         sleep   => 1,
-        debug   => 1,
+        verbose => 1,
 
         progress_name    => 'Deleting deprecated accounts',
         process_past_max => 1,
@@ -1944,9 +1976,12 @@ from scratch.
 A L<CLDR::Number> object.  English speakers that use a typical C<1,234.56> format would
 probably want to leave it at the default.  Otherwise, you should provide your own.
 
-=head3 debug
+=head3 verbose
 
-Boolean.  If turned on, displays timing stats on each chunk, as well as total numbers.
+Boolean.  By default, this is on, which displays timing stats on each chunk, as well as
+total numbers.  This is still subject to non-interactivity checks from L</progress_bar>.
+
+(This was previously defaulted to off, and called C<debug>, prior to v1.0.0.)
 
 =head2 Common Attributes
 
@@ -1980,9 +2015,18 @@ Required for all processing modes except L</Active DBI Processing>.
 
 The amount of rows to be processed in each loop.
 
-Default is 1000 rows.  This figure should be sized to keep per-chunk processing time
-at around 5 seconds.  If this is too large, rows may lock for too long.  If it's too
-small, processing may be unnecessarily slow.
+This figure should be sized to keep per-chunk processing time at around 5 seconds.  If
+this is too large, rows may lock for too long.  If it's too small, processing may be
+unnecessarily slow.
+
+Default is 1 row, which is only appropriate if L</target_time> (on by default) is
+enabled.  This will cause the processing to slowly ramp up to the target time as
+BatchChunker gathers more data.
+
+Otherwise, if you using static chunk sizes with C<target_time> turned off, figure out
+the right chunk size with a few test runs and set it here.
+
+(This was previously defaulted to 1000 rows, prior to v1.0.0.)
 
 =head3 target_time
 
@@ -1990,10 +2034,13 @@ The target runtime (in seconds) that chunk processing should strive to achieve, 
 including L</sleep>.  If the chunk processing times are too high or too low, this will
 dynamically adjust L</chunk_size> to try to match the target.
 
-B<Turning this on does not mean you should ignore C<chunk_size>!>  If the starting chunk
-size is grossly inaccurate to the workload, you could end up with several chunks in the
-beginning causing long-lasting locks before the runtime targeting reduces them down to a
-reasonable size.
+BatchChunker will still use the initial C<chunk_size>, and it will need at least one
+chunk processed, before it makes adjustments.  If the starting chunk size is grossly
+inaccurate to the workload, you could end up with several chunks in the beginning causing
+long-lasting locks before the runtime targeting reduces them down to a reasonable size.
+
+(Chunk size reductions are prioritized before increases, so it should re-size as soon as
+it finds the problem.  But, one bad chunk could be all it takes to cause an outage.)
 
 Default is 5 seconds.  Set this to zero to turn off runtime targeting.  (This was
 previously defaulted to off prior to v0.92, and set to 15 in v0.92.)
@@ -2003,14 +2050,16 @@ previously defaulted to off prior to v0.92, and set to 15 in v0.92.)
 The number of seconds to sleep after each chunk.  It uses L<Time::HiRes>'s version, so
 fractional numbers are allowed.
 
-Default is 0, which is fine for most operations.  But, it is highly recommended to turn
-this on (say, 1 to 5 seconds) for really long one-off DB operations, especially if a lot
-of disk I/O is involved.  Without this, there's a chance that the slaves will have a hard
-time keeping up, and/or the master won't have enough processing power to keep up with
+Default is 0.5 seconds, which is fine for most operations.  You can likely get away with
+zero for smaller operations, but test it out first.  If processing is going to take up a
+lot of disk I/O, you may want to consider a higher setting.  If the database server
+spends too much time on processing, the replicas may have a hard time keeping up with
 standard load.
 
 This will increase the overall processing time of the loop, so try to find a balance
 between the two.
+
+(This was previously defaulted to 0 seconds, prior to v1.0.0.)
 
 =head3 process_past_max
 
@@ -2159,7 +2208,7 @@ If either of the min/max statements don't return any ID data, this method will r
 
         ### Optional ###
         progress_bar     => $progress,  # defaults to "Processing $source_name" bar
-        debug            => 1,          # displays timing stats on each chunk
+        verbose          => 1,          # displays timing stats on each chunk
     );
 
     $batch_chunker->execute if $batch_chunker->calculate_ranges;
@@ -2210,9 +2259,9 @@ See L</target_time>.
 
 Increments the progress bar.
 
-=head2 _print_debug_status
+=head2 _print_chunk_status
 
-Prints out a standard debug status line, if debug is enabled.  What it prints is
+Prints out a standard chunk status line, if L</verbose> is enabled.  What it prints is
 generally uniform, but it depends on the processing action.  Most of the data is
 pulled from L</loop_state>.
 

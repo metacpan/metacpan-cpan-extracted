@@ -1,5 +1,5 @@
 package Template::Liquid;
-our $VERSION = '1.0.19';
+our $VERSION = '1.0.20';
 use strict;
 use warnings;
 our (%tags, %filters);
@@ -55,9 +55,9 @@ sub render {
     my ($s, %assigns) = @_;
     my $result;
     if (!$s->{context}) {
-        $s->{context} =
-            Template::Liquid::Context->new(template => $s,
-                                           assigns  => \%assigns);
+        $s->{context}
+            = Template::Liquid::Context->new(template => $s,
+                                             assigns  => \%assigns);
         $result = $s->{document}->render();
     }
     else {
@@ -75,6 +75,12 @@ sub render {
 =pod
 
 =encoding UTF-8
+
+=begin stopwords
+
+sorta whitespace non-evaling
+
+=end stopwords
 
 =head1 NAME
 
@@ -187,7 +193,7 @@ For more, see L<Template::Liquid::Tag::Comment|Template::Liquid::Tag::Comment>.
 =head2 C<raw>
 
 Raw temporarily disables tag processing. This is useful for generating content
-(eg, Mustache, Handlebars) which uses conflicting syntax.
+(Mustache, Handlebars) which uses conflicting syntax.
 
     {% raw %}
         In Handlebars, {{ this }} will be HTML-escaped, but {{{ that }}} will not.
@@ -466,14 +472,14 @@ yourself. Everyone knows computers cannot be trusted.
 
 =head1 Template::LiquidX or Solution?
 
-I'd really rather use Solution::{Package} for extentions but Template::LiquidX
+I'd really rather use Solution::{Package} for extensions but Template::LiquidX
 really is a better choice.
 
 As I understand it, the original project's name, Liquid, is a reference to the
 classical states of matter (the engine itself being stateless). I wanted to use
 L<solution|http://en.wikipedia.org/wiki/Solution> because it's liquid but with
 bits of other stuff floating in it. (Pretend you majored in chemistry instead
-of mathematics or computer science.) Liquid tempates will I<always> work with
+of mathematics or computer science.) Liquid templates will I<always> work with
 Template::Liquid but (due to Template::LiquidX's expanded syntax)
 Template::LiquidX templates I<may not> be compatible with Liquid or
 Template::Liquid.
@@ -492,7 +498,7 @@ Lütke|http://blog.leetsoft.com/>.
 
 =head1 License and Legal
 
-Copyright (C) 2009-2016 by Sanko Robinson <sanko@cpan.org>
+Copyright (C) 2009-2022 by Sanko Robinson <sanko@cpan.org>
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of L<The Artistic License

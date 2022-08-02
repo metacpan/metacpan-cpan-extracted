@@ -5,9 +5,9 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class 'base', 'with';
 
-extends 'Venus::Data';
+base 'Venus::Data';
 
 with 'Venus::Role::Buildable';
 
@@ -23,13 +23,12 @@ sub test {
   __PACKAGE__->new($_[0]);
 }
 
-# MODIFIERS
+# BUILDERS
 
-around build_self => sub {
-  my ($orig, $self, $data) = @_;
+sub build_self {
+  my ($self, $data) = @_;
 
-  $self->$orig($data);
-
+  $self->SUPER::build_self($data);
   for my $item (qw(name abstract tagline synopsis description)) {
     @{$self->find(undef, $item)} || $self->throw->error({
       message => "Test missing pod section =$item",
@@ -65,6 +64,19 @@ sub data_for_attributes {
   my ($self) = @_;
 
   my $data = $self->find(undef, 'attributes');
+
+  $self->throw->error if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_attribute {
+  my ($self, $name) = @_;
+
+  my $data = $self->search({
+    list => 'attribute',
+    name => $name,
+  });
 
   $self->throw->error if !@$data;
 
@@ -307,7 +319,7 @@ sub eval {
 
   local $@;
 
-  my @result = CORE::eval($perl);
+  my @result = CORE::eval(join("\n\n", "no warnings q(redefine);", $perl));
 
   die $@ if $@;
 
@@ -380,7 +392,7 @@ sub pdml_for_abstract {
   return $text ? ($self->head1('abstract', $text)) : ();
 }
 
-sub pdml_for_attribute {
+sub pdml_for_attribute_type1 {
   my ($self, $name, $is, $pre, $isa, $def) = @_;
 
   my @output;
@@ -396,7 +408,51 @@ sub pdml_for_attribute {
   return ($self->head2($name, @output));
 }
 
+sub pdml_for_attribute_type2 {
+  my ($self, $name) = @_;
+
+  my @output;
+
+  my $metadata = $self->text('metadata', $name);
+  my $signature = $self->text('signature', $name);
+
+  push @output, ($signature, '') if $signature;
+
+  my $text = $self->text('attribute', $name);
+
+  return () if !$text;
+
+  push @output, $text;
+
+  if ($metadata) {
+    local $@;
+    if ($metadata = eval $metadata) {
+      if (my $since = $metadata->{since}) {
+        push @output, "", "I<Since C<$since>>";
+      }
+    }
+  }
+
+  my @results = $self->search({name => $name});
+
+  for my $i (1..(int grep {($$_{list} || '') =~ /^example-\d+/} @results)) {
+    push @output, $self->pdml('example', $i, $name),
+  }
+
+  return ($self->head2($name, @output));
+}
+
 sub pdml_for_attributes {
+  my ($self) = @_;
+
+  my $method = $self->text('attributes')
+    ? 'pdml_for_attributes_type1'
+    : 'pdml_for_attributes_type2';
+
+  return $self->$method;
+}
+
+sub pdml_for_attributes_type1 {
   my ($self) = @_;
 
   my @output;
@@ -406,12 +462,30 @@ sub pdml_for_attributes {
   return () if !$text;
 
   for my $line (split /\n/, $text) {
-    push @output, $self->pdml('attribute', (
+    push @output, $self->pdml('attribute_type1', (
       map { split /,\s*/ } split /:\s*/, $line, 2
     ));
   }
 
   return () if !@output;
+
+  if (@output) {
+    unshift @output, $self->head1('attributes',
+      "This package has the following attributes:",
+    );
+  }
+
+  return join "\n", @output;
+}
+
+sub pdml_for_attributes_type2 {
+  my ($self) = @_;
+
+  my @output;
+
+  for my $list ($self->search({list => 'attribute'})) {
+    push @output, $self->pdml('attribute_type2', $list->{name});
+  }
 
   if (@output) {
     unshift @output, $self->head1('attributes',
@@ -847,6 +921,26 @@ sub test_for_attributes {
   return $result;
 }
 
+sub test_for_attribute {
+  my ($self, $name, $code) = @_;
+
+  my $data = $self->data('attribute', $name);
+
+  $code ||= sub {
+    length($data) > 1;
+  };
+
+  my $result = $code->();
+
+  ok($result, "=attribute $name");
+
+  my $package = $self->data('name');
+
+  ok($package->can($name), "$package has $name");
+
+  return $result;
+}
+
 sub test_for_authors {
   my ($self, $code) = @_;
 
@@ -989,10 +1083,8 @@ sub test_for_integrates {
 
   my $package = $self->data('name');
 
-  require Role::Tiny;
-
-  ok(Role::Tiny::does_role($package, $_), "$package does $_")
-    for split /\n/, $data;
+  ok($package->can('does'), "$package has does");
+  ok($package->does($_), "$package does $_") for split /\n/, $data;
 
   return $result;
 }
@@ -1180,6 +1272,20 @@ sub text_for_attributes {
   my ($self) = @_;
 
   my ($error, $result) = $self->catch('data', 'attributes');
+
+  my $output = [];
+
+  if (!$error) {
+    push @$output, $result;
+  }
+
+  return $output;
+}
+
+sub text_for_attribute {
+  my ($self, $name) = @_;
+
+  my ($error, $result) = $self->catch('data', 'attribute', $name);
 
   my $output = [];
 
@@ -1468,6 +1574,13 @@ sub text_for_version {
     push @$output, $result;
   }
 
+  if (!@$output) {
+    my $name = $self->text_for_name;
+    if (my $version = ($name->[0] =~ m/([:\w]+)/m)[0]->VERSION) {
+      push @$output, $version;
+    }
+  }
+
   return $output;
 }
 
@@ -1603,6 +1716,8 @@ The for method attempts to find the POD content based on the name provided and
 executes the corresponding predefined test, optionally accepting a callback
 which, if provided, will be passes a L<Venus::Try> object containing the
 POD-driven test. The callback, if provided, must always return a true value.
+B<Note:> All automated tests disable the I<"redefine"> class of warnings to
+prevent warnings when redeclaring packages in examples.
 
 I<Since C<0.09>>
 

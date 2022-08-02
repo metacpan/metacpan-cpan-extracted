@@ -1,5 +1,9 @@
 Revision history for Form::Diva
 
+1.04	02 Aug 2022
+	fix: generate HTML placeholders regardless of form data availability
+	fix: do not remove whitespace from generated HTML input
+	feature: passing explicit undef as field label skips label generation
 1.03  17 Mar 2020 minor pod fix, remove class deprecated in bootstrap 4.
 1.02	26 Aug 2019 minor pod fix.
 1.01	26 Feb 2019
@@ -53,3 +57,4 @@ Revision history for Form::Diva
 	Fixed bug where id was generated with extra quote.
 0.03    5 July 2014
         First released version uploaded to CPAN.
+

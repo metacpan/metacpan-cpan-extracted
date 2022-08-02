@@ -4,13 +4,13 @@
       "Christian Renz <crenz@web42.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Module-Find",
    "no_index" : {
@@ -38,7 +38,7 @@
          "requires" : {
             "File::Find" : "0",
             "File::Spec" : "0",
-            "perl" : "5.006001"
+            "perl" : "5.008001"
          }
       }
    },
@@ -48,5 +48,6 @@
          "url" : "http://github.com/crenz/Module-Find"
       }
    },
-   "version" : "0.15"
+   "version" : "0.16",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

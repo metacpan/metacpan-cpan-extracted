@@ -1,5 +1,8 @@
 Revision history for xDT-Parser
 
+1.07 2022-07-28
+  - Move to GitHub organization CrescNet
+
 1.06 2021-05-03
   - Add missing test dependency and clean up manifest
 
@@ -7,7 +10,7 @@ Revision history for xDT-Parser
   - Fix a bug where object end records are not added to objects, when read from file
 
 1.04  2021-03-01
-  - Relaxe Moose dependency to version 2
+  - Relax Moose dependency to version 2
 
 1.03  2021-02-15
   - Update to BDT/GDT 3.1

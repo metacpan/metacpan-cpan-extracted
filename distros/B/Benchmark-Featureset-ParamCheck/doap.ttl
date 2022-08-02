@@ -27,12 +27,12 @@
 	], [
 		doap-deps:on "Specio::Library::Builtins 0.37"^^doap-deps:CpanId;
 	], [
-		doap-deps:on "Type::Params 1.001_009"^^doap-deps:CpanId;
+		doap-deps:on "Type::Params 1.016002"^^doap-deps:CpanId;
 	], [
-		doap-deps:on "Types::Standard 1.001_009"^^doap-deps:CpanId;
+		doap-deps:on "Types::Standard 1.016002"^^doap-deps:CpanId;
 	], [ doap-deps:on "perl 5.012"^^doap-deps:CpanId ], [
 		doap-deps:on "Type::Tiny::XS 0.012"^^doap-deps:CpanId;
-	], [
+	], [ doap-deps:on "Type::Nano"^^doap-deps:CpanId ], [
 		doap-deps:on "Data::Validator 1.07"^^doap-deps:CpanId;
 	], [ doap-deps:on "IO::String"^^doap-deps:CpanId ], [ doap-deps:on "Moose 2.2002"^^doap-deps:CpanId ], [
 		doap-deps:on "Moose::Util::TypeConstraints 2.2002"^^doap-deps:CpanId;
@@ -51,7 +51,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Benchmark-Featureset-ParamCheck";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Benchmark-Featureset-ParamCheck/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Benchmark-Featureset-ParamCheck/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Benchmark-Featureset-ParamCheck/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Benchmark-Featureset-ParamCheck/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Benchmark-Featureset-ParamCheck/v_0-005>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Benchmark-Featureset-ParamCheck/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Benchmark-Featureset-ParamCheck/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Benchmark-Featureset-ParamCheck/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Benchmark-Featureset-ParamCheck/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Benchmark-Featureset-ParamCheck/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Benchmark-Featureset-ParamCheck/v_0-006>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-benchmark-featureset-paramcheck>;
@@ -122,6 +122,19 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Benchmark-Featureset-ParamCheck-0.005.tar.gz>;
 	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Benchmark-Featureset-ParamCheck/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "Benchmark-Featureset-ParamCheck-0.006"^^xsd:string;
+	dc:issued            "2022-07-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Test Type::Params with non-Type::Tiny type constraints, including Specio, Moose, Mouse, and Type::Nano.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Benchmark-Featureset-ParamCheck-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

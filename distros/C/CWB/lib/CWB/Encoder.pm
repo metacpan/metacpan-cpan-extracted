@@ -735,15 +735,15 @@ sub null_attributes {
 
 Ignore XML tags that haven't been declared as s-attributes rather than
 inserting them as ordinary tokens. Such XML tags are automatically 
-declared as null attributes. Requires CWB v3.4.21 or newer.  
+declared as null attributes.   
 
 =cut
 
 sub auto_null {
   my ($self, $yesno) = @_;
   my $version = $CWB::CWBVersion;
-  die "CWB::Encoder: auto_null(1) requires CWB v3.4.21 or newer, you have $version"
-    if $yesno && $version < 3.004_021;
+  die "CWB::Encoder: auto_null(1) requires CWB v3.5.0 or newer, you have $version"
+    if $yesno && $version < 3.005_000;
   $self->{AUTONULL} = $yesno ;
 }
 
@@ -986,7 +986,7 @@ sub make_encode_cmd {
   push @cmd, "-R", $self->{REGISTRY}."/".$self->{NAME};     # has been set and checked by prepare_encode()
   push @cmd, "-d", $self->{DIR};
   push @cmd, "-c", $self->{CHARSET};                        # from version 2.2.101, cwb-encode can set character set in registry file
-  push @cmd, "-9" if $self->{AUTONULL};                     # auto-declare null attributes (version 3.4.21+)
+  push @cmd, "-9" if $self->{AUTONULL};                     # auto-declare null attributes
   push @cmd, "-v" if $self->{VERBOSE};                      # show progress in verbose mode
   push @cmd, @{$self->{OPTIONS}} if @{$self->{OPTIONS}};    # set additional user-defined options
   foreach my $file (@files) {   # check that all input files exist

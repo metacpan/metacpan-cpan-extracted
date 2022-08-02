@@ -1,5 +1,13 @@
 Revision history for Perl extension Dancer2::Serializer::XML.
 
+0.06  2022-07-28
+    - Add test pre-reqs
+
+0.05  2022-07-26
+    - Specify build_requires to eliminate CPAN test failures
+    - Specify license
+    - Add Class:Load and Moo pre-reqs
+
 0.04  2017-02-19
 	- Switch Changes file to ISO date format
 	- Remove a few unused classes in module

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMem.pm
-## Version v0.2.4
+## Version v0.3.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2022/07/15
+## Modified 2022/07/26
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -23,7 +23,7 @@ BEGIN
     use Nice::Try;
     use Scalar::Util ();
     use JSON 4.03 qw( -convert_blessed_universally );
-    use Storable 3.25 ();
+    use Storable::Improved ();
     use constant SHM_BUFSIZ     =>  65536;
     use constant SEM_LOCKER     =>  0;
     use constant SEM_MARKER     =>  0;
@@ -109,7 +109,7 @@ EOT
             lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
             'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.2.4';
+    our $VERSION = 'v0.3.1';
 };
 
 # use strict;
@@ -163,6 +163,8 @@ sub attach
     $self->addr( $addr );
     return( $addr );
 }
+
+sub cbor { return( shift->_packing_method( 'cbor' ) ); }
 
 sub create { return( shift->_set_get_boolean( 'create', @_ ) ); }
 
@@ -232,8 +234,10 @@ sub exists
         # $self->message( 3, "Found the shared memory? ", defined( $semid ) ? 'yes' : 'no' );
         if( defined( $semid ) )
         {
-            my $found = semctl( $semid, SEM_MARKER, IPC::SysV::GETVAL, 0 );
-            semctl( $semid, 0, IPC::SysV::IPC_RMID, 0 );
+            my $arg = 0;
+            my $found = semctl( $semid, SEM_MARKER, IPC::SysV::GETVAL, $arg );
+            $arg = 0;
+            semctl( $semid, 0, IPC::SysV::IPC_RMID, $arg );
             return( $found == SHM_EXISTS ? 1 : 0 );
         }
         else
@@ -246,7 +250,8 @@ sub exists
     catch( $e )
     {
         # $self->message( 3, "Trying to access shared memory triggered error: $e" );
-        semctl( $semid, 0, IPC::SysV::IPC_RMID, 0 ) if( $semid );
+        my $arg = 0;
+        semctl( $semid, 0, IPC::SysV::IPC_RMID, $arg ) if( $semid );
         return(0);
     }
 }
@@ -501,7 +506,8 @@ sub pid
     my $semid = $self->semid ||
         return( $self->error( "No semaphore set yet. You must open the shared memory first to remove semaphore." ) );
     no strict 'subs';
-    my $v = semctl( $semid, $sem, IPC::SysV::GETPID, 0 );
+    my $arg = 0;
+    my $v = semctl( $semid, $sem, IPC::SysV::GETPID, $arg );
     return( $v ? 0 + $v : undef() );
 }
 
@@ -553,9 +559,19 @@ sub read
             {
                 $data = $self->_decode_json( $buffer );
             }
+            elsif( $packing eq 'cbor' )
+            {
+                $data = $self->deserialise( data => $buffer, serialiser => 'CBOR::XS', allow_sharing => 1 );
+            }
+            elsif( $packing eq 'sereal' )
+            {
+                $data = $self->deserialise( data => $buffer, serialiser => 'Sereal', freeze_callbacks => 1 );
+            }
+            # By default Storable::Improved
             else
             {
-                $data = Storable::thaw( $buffer );
+                # $data = Storable::Improved::thaw( $buffer );
+                $data = $self->deserialise( data => $buffer, serialiser => 'Storable::Improved' );
             }
             $self->message( 4, "Decoded data '$buffer' -> '$data': ", sub{ $self->dump( $data ) });
         }
@@ -600,10 +616,11 @@ sub remove
     }
     # Remove semaphore
     my $rv;
-    if( !defined( $rv = semctl( $semid, 0, IPC::SysV::IPC_RMID, 0 ) ) )
+    my $arg = 0;
+    if( !defined( $rv = semctl( $semid, 0, IPC::SysV::IPC_RMID, $arg ) ) )
     {
         $self->message( 3, "Failed to remove semaphore with id '$semid': $!" );
-        $self->error( "Warning only: could not remove the semaphore id \"$semid\": $!" );
+        warn( "Warning only: could not remove the semaphore id \"$semid\": $!" ) if( $self->_warnings_is_enabled );
     }
     $self->removed( $rv ? 1 : 0 );
     if( $rv )
@@ -635,10 +652,11 @@ sub remove_semaphore
     $self->unlock();
     my $rv;
     no strict 'subs';
-    if( !defined( $rv = semctl( $semid, 0, IPC::SysV::IPC_RMID, 0 ) ) )
+    my $arg = 0;
+    if( !defined( $rv = semctl( $semid, 0, IPC::SysV::IPC_RMID, $arg ) ) )
     {
         $self->message( 3, "Failed to remove semaphore with id '$semid': $!" );
-        $self->error( "Warning only: could not remove the semaphore id \"$semid\" with IPC::SysV::IPC_RMID value '", IPC::SysV::IPC_RMID, "': $!" );
+        warn( "Warning only: could not remove the semaphore id \"$semid\" with IPC::SysV::IPC_RMID value '", IPC::SysV::IPC_RMID, "': $!" ) if( $self->_warnings_is_enabled );
     }
     $self->removed_semaphore( $rv ? 1 : 0 );
     $self->semid( undef() );
@@ -669,7 +687,16 @@ sub reset
 
 sub semid { return( shift->_set_get_scalar( 'semid', @_ ) ); }
 
+sub sereal { return( shift->_packing_method( 'sereal' ) ); }
+
 sub serial { return( shift->_set_get_scalar( 'serial', @_ ) ); }
+
+sub serialiser { return( shift->_set_get_scalar( '_packing_method', @_ ) ); }
+
+{
+    no warnings 'once';
+    *serializer = \&serialiser;
+}
 
 sub shmstat
 {
@@ -696,7 +723,8 @@ sub stat
         {
             my $sem = shift( @_ );
             # $self->message( 3, "Retrieving semaphore value for '$sem'" );
-            my $v = semctl( $id, $sem, IPC::SysV::GETVAL, 0 );
+            my $arg = 0;
+            my $v = semctl( $id, $sem, IPC::SysV::GETVAL, $arg );
             return( $v ? 0 + $v : undef() );
         }
         else
@@ -771,9 +799,28 @@ sub write
         {
             $encoded = $self->_encode_json( $data );
         }
+        elsif( $packing eq 'cbor' )
+        {
+            $encoded = $self->serialise( $data, serialiser => 'CBOR::XS', allow_sharing => 1 );
+            return( $self->pass_error ) if( !defined( $encoded ) );
+        }
+        elsif( $packing eq 'sereal' )
+        {
+            $self->_load_class( 'Sereal::Encoder' ) || return( $self->pass_error );
+            $encoded = $self->serialise( $data,
+                serialiser => 'Sereal',
+                freeze_callbacks => 1,
+                compress => &{"Sereal\::Encoder::SRL_ZLIB"}(),
+            );
+            return( $self->pass_error ) if( !defined( $encoded ) );
+        }
+        # Default to Storable::Improved
         else
         {
-            $encoded = Storable::freeze( $data );
+            # local $Storable::forgive_me = 1;
+            # $encoded = Storable::Improved::freeze( $data );
+            $encoded = $self->serialise( $data, serialiser => 'Storable::Improved' );
+            return( $self->pass_error ) if( !defined( $encoded ) );
         }
     }
     catch( $e )
@@ -967,6 +1014,48 @@ sub DESTROY
     }
 };
 
+sub FREEZE
+{
+    my $self = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class = CORE::ref( $self );
+    my %hash  = %$self;
+    CORE::delete( @hash{ qw( addr id locked owner removed removed_semaphore semid ) } );
+    # Return an array reference rather than a list so this works with Sereal and CBOR
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # But Storable want a list with the first element being the serialised element
+    CORE::return( $class, \%hash );
+}
+
+sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+# NOTE: CBOR will call the THAW method with the stored classname as first argument, the constant string CBOR as second argument, and all values returned by FREEZE as remaining arguments.
+# NOTE: Storable calls it with a blessed object it created followed with $cloning and any other arguments initially provided by STORABLE_freeze
+sub THAW
+{
+    my( $self, undef, @args ) = @_;
+    my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+    my $new;
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        foreach( CORE::keys( %$hash ) )
+        {
+            $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+        }
+        $new = $self;
+    }
+    else
+    {
+        $new = CORE::bless( $hash => $class );
+    }
+    CORE::return( $new );
+}
+
 END
 {
     foreach my $id ( @$SHEM_REPO )
@@ -1046,6 +1135,45 @@ END
     sub segsz { return( shift->[SEGSZ] ); }
 
     sub uid { return( shift->[UID] ); }
+
+    sub FREEZE
+    {
+        my $self = CORE::shift( @_ );
+        my $serialiser = CORE::shift( @_ ) // '';
+        my $class = CORE::ref( $self );
+        my @array = @$self;
+        # Return an array reference rather than a list so this works with Sereal
+        CORE::return( [$class, \@array] ) if( $serialiser eq 'Sereal' );
+        # But CBOR and Storable want a list with the first element being the serialised element
+        CORE::return( $class, \@array );
+    }
+
+    sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+    sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+    # NOTE: CBOR will call the THAW method with the stored classname as first argument, the constant string CBOR as second argument, and all values returned by FREEZE as remaining arguments.
+    # NOTE: Storable calls it with a blessed object it created followed with $cloning and any other arguments initially provided by STORABLE_freeze
+    sub THAW
+    {
+        my( $self, undef, @args ) = @_;
+        my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+        my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+        my $array = CORE::ref( $ref ) eq 'ARRAY' ? $ref : [];
+        # Storable pattern requires to modify the object it created rather than returning a new one
+        if( CORE::ref( $self ) )
+        {
+            @$self = @$array;
+            CORE::return( $self );
+        }
+        else
+        {
+            my $new = bless( $array => $class );
+            CORE::return( $new );
+        }
+    }
+
+    sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
 }
 
 # NOTE: Module::Generic::SemStat class
@@ -1099,6 +1227,45 @@ END
     sub otime { return( shift->[OTIME] ); }
 
     sub uid { return( shift->[UID] ); }
+
+    sub FREEZE
+    {
+        my $self = CORE::shift( @_ );
+        my $serialiser = CORE::shift( @_ ) // '';
+        my $class = CORE::ref( $self );
+        my @array = @$self;
+        # Return an array reference rather than a list so this works with Sereal
+        CORE::return( [$class, \@array] ) if( $serialiser eq 'Sereal' );
+        # But CBOR and Storable want a list with the first element being the serialised element
+        CORE::return( $class, \@array );
+    }
+
+    sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+    sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+    # NOTE: CBOR will call the THAW method with the stored classname as first argument, the constant string CBOR as second argument, and all values returned by FREEZE as remaining arguments.
+    # NOTE: Storable calls it with a blessed object it created followed with $cloning and any other arguments initially provided by STORABLE_freeze
+    sub THAW
+    {
+        my( $self, undef, @args ) = @_;
+        my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+        my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+        my $array = CORE::ref( $ref ) eq 'ARRAY' ? $ref : [];
+        # Storable pattern requires to modify the object it created rather than returning a new one
+        if( CORE::ref( $self ) )
+        {
+            @$self = @$array;
+            CORE::return( $self );
+        }
+        else
+        {
+            my $new = bless( $array => $class );
+            CORE::return( $new );
+        }
+    }
+
+    sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
 }
 
 1;

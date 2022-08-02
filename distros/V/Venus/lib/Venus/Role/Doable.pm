@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo::Role;
+use Venus::Role 'with';
 
 # METHODS
 
@@ -18,6 +18,12 @@ sub do {
   $self->$code(@args);
 
   return $self;
+}
+
+# EXPORTS
+
+sub EXPORT {
+  ['do']
 }
 
 1;
@@ -44,7 +50,7 @@ Doable Role for Perl 5
 
   with 'Venus::Role::Doable';
 
-  has 'time';
+  attr 'time';
 
   sub execute {
     return;

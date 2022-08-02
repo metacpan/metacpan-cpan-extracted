@@ -1,4 +1,4 @@
-package JMAP::Tester::Abort 0.101;
+package JMAP::Tester::Abort 0.102;
 
 use Moo;
 extends 'Throwable::Error';
@@ -52,7 +52,7 @@ JMAP::Tester::Abort
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 AUTHOR
 

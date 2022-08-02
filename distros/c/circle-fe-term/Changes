@@ -1,5 +1,15 @@
 Revision history for Circle-FE-Term
 
+0.222060 2022-07-26
+        [CHANGES]
+         * Support -4 and -6 commandline flags to force IPv4/IPv6 connection
+         * Migrated various internal code into Tickit plugins
+         * Experimental hack at exporting client metrics using Metrics::Any +
+           Prometheus
+
+        [BUGFIXES]
+         * Remember to `use` required modules as appropriate (RT124848)
+
 0.173170 2017-11-14 18:06:13
         [CHANGES]
          * Render multiline events properly

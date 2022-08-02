@@ -57,6 +57,7 @@ subtest 'Active DBI Processing (+ sleep)' => sub {
 
         target_time => 0,
         sleep       => 0.1,
+        verbose     => 0,
     );
 
     # Can't exactly make 'stmt' an "active" statement, but we can add a callback
@@ -125,6 +126,7 @@ subtest 'Query DBI Processing (+ min_chunk_percent)' => sub {
         min_chunk_percent => sprintf("%.2f",
             ($CHUNK_SIZE - 1) / $CHUNK_SIZE
         ) + 0.01,
+        verbose           => 0,
     );
 
     # Calculate
@@ -177,6 +179,7 @@ subtest 'Query DBI Processing + single_row (+ rsc)' => sub {
 
         single_rows => 1,
         target_time => 0,
+        debug       => 0,
     );
 
     # Calculate
@@ -252,6 +255,7 @@ subtest 'Retry testing' => sub {
         dbic_retry_opts   => {},  # non-DBIC "defaults"
         min_chunk_percent => 0,
         target_time       => 0,
+        debug             => 0,
     );
 
     # Add a callback that includes dying on execute to encourage retries
@@ -325,6 +329,7 @@ subtest 'Retry testing + single_rows' => sub {
         single_rows       => 1,
         min_chunk_percent => 0,
         target_time       => 0,
+        verbose           => 0,
     );
 
     # Calculate

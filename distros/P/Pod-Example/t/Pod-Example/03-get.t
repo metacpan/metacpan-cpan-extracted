@@ -4,7 +4,7 @@ use warnings;
 use English qw(-no_match_vars);
 use File::Object;
 use Pod::Example qw(get);
-use Test::More 'tests' => 16;
+use Test::More 'tests' => 18;
 use Test::NoWarnings;
 
 # Load module.
@@ -135,3 +135,16 @@ print "Foo.\n";
 END
 chomp $right_ret;
 is($ret, $right_ret, 'Example with inner text code.');
+
+# Test.
+($ret, my $example_file) = get($modules_dir->file('Ex11.pm')->s);
+$right_ret = <<'END';
+use strict;
+use warnings;
+
+# Print.
+print "Foo.\n";
+END
+chomp $right_ret;
+is($ret, $right_ret, 'Example.');
+is($example_file, 'example.pl', 'Parse example filename from comment.');

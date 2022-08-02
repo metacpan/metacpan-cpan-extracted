@@ -2,20 +2,35 @@ package Test::DBIC::SQLite;
 use Moo;
 with 'Test::DBIC::DBDConnector';
 
-our $VERSION = "1.00";
+our $VERSION = "1.01";
 
 use parent 'Test::Builder::Module';
 our @EXPORT = qw( connect_dbic_sqlite_ok drop_dbic_sqlite_ok );
 
-use Types::Standard qw( Str );
+$Test::DBIC::SQLite::LeaveCreatedDatabases //= 0;
+
+use Types::Standard qw( Bool Str );
 has '+dbi_connect_info' => (
     is      => 'ro',
     isa     => Str,
     default => sub {':memory:'},
 );
+has _did_create => (
+    is      => 'rwp',
+    isa     => Bool,
+    default => 0,
+);
 
 # Keep a "singleton" around for the functional interface.
 my $_tdbc_cache;
+
+sub DEMOLISH {
+    my $self = shift;
+    if ($self->_did_create && !$Test::DBIC::SQLite::LeaveCreatedDatabases) {
+        unlink($self->dbi_connect_info) if -e $self->dbi_connect_info;
+    }
+    $self->_set__did_create(0);
+}
 
 sub connect_dbic_sqlite_ok {
     my $class = __PACKAGE__;
@@ -61,6 +76,7 @@ sub drop_dbic_ok {
             $self->builder->diag("Could not unlink($dbname): $!");
             return $self->builder->ok(0, $msg);
         }
+        $self->_set__did_create(0);
     }
     return $self->builder->ok(1, $msg);
 }
@@ -95,7 +111,9 @@ sub MyDBD_check_wants_deploy {
     my ($db_name) = $connection_params->[0] =~ m{dbname=(.+)(?:;|$)};
     my $wants_deploy = $db_name eq ':memory:'
         ? 1
-        : ((not -f $db_name) ? 1 : 0);
+        : ((not -e $db_name) ? 1 : 0);
+
+    $self->_set__did_create(1) if ($db_name ne ':memory:') && (not -e $db_name);
 
     return $wants_deploy;
 }
@@ -104,7 +122,7 @@ around ValidationTemplates => sub {
     my $vt = shift;
     my $class = shift;
 
-    use Types::Standard qw( Maybe Str ArrayRef );
+    use Types::Standard qw( ArrayRef Maybe Str );
 
     my $validation_templates = $class->$vt();
     return {
@@ -131,12 +149,38 @@ The preferred way:
     use Test::More;
     use Test::DBIC::SQLite;
 
-    my $t = Test::DBIC::SQLite->new(schema_class => 'My::Schema');
+    my $t = Test::DBIC::SQLite->new(
+        schema_class    => 'My::Schema',
+        pre_deploy_hook => \&define_functions,
+    );
     my $schema = $t->connect_dbic_ok();
-    ...
-    $schema->disconnect();
+
+    my $thing = $schema->resultset('MyTable')->search(
+        { name    => 'Anything' },
+        { columns => [ { ul_name   => \'uc_last(name)' } ] }
+    )->first;
+    is(
+       $thing->get_column('ul_name'),
+       'anythinG',
+       "SELECT uc_last(name) AS ul_name FROM ...; works!"
+    );
+
+    $schema->storage->disconnect;
     $t->drop_dbic_ok();
     done_testing();
+
+    # select uc_last('Stupid'); -- stupiD
+    # these functions will only exist within this database connection
+    sub define_functions {
+        my ($schema) = @_;
+        my $dbh = $schema->storage->dbh;
+        $dbh->sqlite_create_function(
+            'uc_last',
+            1,
+            sub { my ($str) = @_; $str =~ s{(.*)(.)$}{\L$1\U$2}; return $str },
+        );
+    }
+
 
 The compatible with C<v0.01> way:
 
@@ -160,7 +204,7 @@ It will C<import()> L<warnings> and L<strict> for you.
     my $t = Test::DBIC::SQLite->new(%parameters);
     my $schema = $t->connect_dbic_ok();
     ...
-    $schema->disconnect();
+    $schema->storage->disconnect;
     $t->drop_dbic_ok();
 
 =head3 Parameters
@@ -169,38 +213,41 @@ Named, list:
 
 =over
 
-=item B<< C<schema_class> >> => C<$schema_class> (I<Required>)
+=item B<< I<C<schema_class>> => C<$schema_class> >>(I<Required>)
 
-The class name of the L<DBIx::Class::Schema> to use.
+The class name of the L<DBIx::Class::Schema> to use for the database connection.
 
 
-=item B<< C<dbi_connect_info> >> => C<$sqlite_dbname> (I<Optional>, C<:memory:>)
+=item B<< I<C<dbi_connect_info>> => C<$sqlite_dbname> >> (I<Optional>, C<:memory:>)
 
 The default is B<C<:memory:>> which will create a temporary in-memory database.
 One can also pass a file name for a database on disk. See
-L<MyDBD_connection_parameters|/mydbd_connection_parameters>.i
+L<MyDBD_connection_parameters|/implementation-of-mydbd_connection_parameters>.
 
 
-=item B<< C<pre_deploy_hook> >> => C<$pre_deploy_hook> (I<Optional>)
+=item B<< I<C<pre_deploy_hook>> => C<$pre_deploy_hook> >> (I<Optional>)
 
 This is an optional C<CodeRef> that will be executed right after the connection
 is established but before C<< $schema->deploy >> is called. The CodeRef will
 only be called if deploy is also needed. See
-L<MyDBD_check_wants_deploy|/mydbd_check_wants_deploy>.
+L<MyDBD_check_wants_deploy|/implementation-of-mydbd_check_wants_deploy>.
 
 
-=item B<< C<post_connect_hook> >> => C<$post_connect_hook> (I<Optional>)
+=item B<< I<C<post_connect_hook>> => C<$post_connect_hook> >> (I<Optional>)
 
-This is an optional `CodeRef` that will be executed right after deploy (if any)
+This is an optional C<CodeRef> that will be executed right after deploy (if any)
 and just before returning the schema instance. Useful for populating the
 database.
 
-
 =back
+
+=head3 Returns
+
+An initialised instance of C<Test::DBIC::SQLite>.
 
 =head2 C<< $td->connect_dbic_ok >>
 
-This method is inherited from L<Test::DBIC::DBDConnoctor>.
+This method is inherited from L<Test::DBIC::DBDConnector>.
 
 =head3 Returns
 
@@ -208,10 +255,15 @@ An initialised instance of C<$schema_class>.
 
 =head2 C<< $td->drop_dbic_ok >>
 
-This method implements C<< rm $dbname >>, in order not to letter your test
+This method implements C<< rm $dbname >>, in order not to litter your test
 directory with left over test databases.
 
 B<NOTE>: Make sure you called C<< $schema->storage->disconnect() >> first.
+
+B<NOTE>: If the test-object goes out of scope without calling C<<
+$td->drop_dbic_ok() >>, the destructor will try to remove the file. Use
+C<$Test::DBIC::SQLite::LeaveCreatedDatabases = 1> to keep the file for
+debugging.
 
 =head2 C<connect_dbic_sqlite_ok(@parameters)>
 
@@ -227,13 +279,26 @@ Positional:
 
 =over
 
-=item 1. C<$schema_class> (Required)
+=item 1. B<< C<$schema_class> >> (I<Required>)  
 
-=item 2. C<$sqlite_dbname> (Optional)
+The class name of the L<DBIx::Class::Schema> to use for the database connection.
 
-=item 3. C<$post_connect_hook> (Optional)
+=item 2. B<< C<$sqlite_dbname> >> (I<Optional>, C<:memory:>)  
+
+The default is B<C<:memory:>> which will create a temporary in-memory database.
+One can also pass a file name for a database on disk. See L<MyDBD_connection_parameters|/implementation-of-mydbd_connection_parameters>.
+
+=item 3. B<< C<$post_connect_hook> >> (I<Optional>)
+
+This is an optional C<CodeRef> that will be executed right after deploy (if any)
+and just before returning the schema instance. Useful for populating the
+database.
 
 =back
+
+=head3 Returns
+
+An initialised instance of C<$schema_class>.
 
 =head2 C<drop_dbic_sqlite_ok()>
 
@@ -253,9 +318,9 @@ B<C<:memory:>> to create a temporary in-memory database.
 
 This method returns a list of parameters to be passed to
 C<< DBIx::Class::Schema->connect() >>. Keep in mind that the last argument
-(options-hash) will always be augmented with key-value pair: C<< skip_version => 1 >>.
+(options-hash) will always be augmented with key-value pair: C<< ignore_version => 1 >>.
 
-### Note
+=head3 Note
 
 At this moment we do not support the C<uri=file:$db_file_name?mode=rwc> style of
 I<dsn>, only the C<dbname=$db_file_name> style, as we only support
@@ -266,6 +331,14 @@ C<$sqlite_dbname> as a single parameter.
 
 For in-memory databases this will always return B<true>. For databases on disk
 this will return B<true> if the file does not exist and B<false> if it does.
+
+=begin devel_cover_pod
+
+=head2 DEMOLISH
+
+Remove created database files when the object goes out of scope.
+
+=end devel_cover_pod
 
 =head1 AUTHOR
 

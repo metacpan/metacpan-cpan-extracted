@@ -64,6 +64,6 @@
          "web" : "https://github.com/briandfoy/cpan-audit"
       }
    },
-   "version" : "20220708.001",
+   "version" : "20220729.001",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

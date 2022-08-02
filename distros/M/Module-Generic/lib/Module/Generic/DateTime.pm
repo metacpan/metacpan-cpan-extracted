@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/DateTime.pm
-## Version v0.3.0
+## Version v0.4.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/04/08
+## Modified 2022/07/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -58,7 +58,12 @@ BEGIN
         )?
     )?
     /x;
-    our $VERSION = 'v0.3.0';
+    our $VERSION = 'v0.4.0';
+};
+
+BEGIN
+{
+    Module::Generic->_implement_freeze_thaw( qw( DateTime DateTime::Locale::FromData DateTime::TimeZone::UTC ) );
 };
 
 # use strict;
@@ -391,25 +396,52 @@ sub _make_my_own
     }
 }
 
-sub STORABLE_freeze
+sub FREEZE
 {
-    my $self = shift( @_ );
-    return( '' ) if( !$self->{dt} || !Scalar::Util::blessed( $self->{dt} ) );
-    return( $self->{dt}->STORABLE_freeze( @_ ) );
+    my $self = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class = CORE::ref( $self );
+    my %hash  = %$self;
+    # Return an array reference rather than a list so this works with Sereal and CBOR
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # But Storable want a list with the first element being the serialised element
+    CORE::return( $class, \%hash );
 }
 
-sub STORABLE_thaw
+sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+# NOTE: CBOR will call the THAW method with the stored classname as first argument, the constant string CBOR as second argument, and all values returned by FREEZE as remaining arguments.
+# NOTE: Storable calls it with a blessed object it created followed with $cloning and any other arguments initially provided by STORABLE_freeze
+sub THAW
 {
-    my $self = shift( @_ );
-    return( '' ) if( !$self->{dt} || !Scalar::Util::blessed( $self->{dt} ) );
-    return( $self->{dt}->STORABLE_thaw( @_ ) );
+    my( $self, undef, @args ) = @_;
+    my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+    my $new;
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        foreach( CORE::keys( %$hash ) )
+        {
+            $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+        }
+        $new = $self;
+    }
+    else
+    {
+        $new = CORE::bless( $hash => $class );
+    }
+    CORE::return( $new );
 }
 
 sub TO_JSON
 {
-    my $self = shift( @_ );
-    return( '' ) if( !$self->{dt} || !Scalar::Util::blessed( $self->{dt} ) );
-    return( $self->{dt}->stringify );
+    my $self = CORE::shift( @_ );
+    CORE::return( '' ) if( !$self->{dt} || !Scalar::Util::blessed( $self->{dt} ) );
+    CORE::return( $self->{dt}->stringify );
 }
 
 # NOTE: DESTROY
@@ -461,7 +493,7 @@ AUTOLOAD
     }
 };
 
-# XXX package Module::Generic::DateTime::Interval
+# NOTE: package Module::Generic::DateTime::Interval
 package Module::Generic::DateTime::Interval;
 BEGIN
 {
@@ -827,8 +859,12 @@ AUTOLOAD
     }
 };
 
-1;
+sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
 
+sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+1;
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -888,7 +924,7 @@ Module::Generic::DateTime - A DateTime wrapper for enhanced features
 
 =head1 VERSION
 
-    v0.3.0
+    v0.4.0
 
 =head1 DESCRIPTION
 
@@ -941,6 +977,20 @@ This method is called to overload the following operations:
 =head2 op_minus_plus
 
 This methods handles cases of overloading for C<minus> and C<plus>
+
+=head1 SERIALISATION
+
+=for Pod::Coverage FREEZE
+
+=for Pod::Coverage STORABLE_freeze
+
+=for Pod::Coverage STORABLE_thaw
+
+=for Pod::Coverage THAW
+
+=for Pod::Coverage TO_JSON
+
+Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
 
 =head1 SEE ALSO
 

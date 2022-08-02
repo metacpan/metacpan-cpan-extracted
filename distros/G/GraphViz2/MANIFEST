@@ -15,6 +15,7 @@ t/calc3.output
 t/calc3.y
 t/gen.anonymous.t
 t/gen.circo.t
+t/gen.class.t
 t/gen.cluster.t
 t/gen.Heawood.t
 t/gen.html.labels.1.t
@@ -51,6 +52,7 @@ t/sample.stt.1.dat
 t/sample.stt.2.dat
 t/snapshots/gen_anonymous_t/dot_file
 t/snapshots/gen_circo_t/dot_file
+t/snapshots/gen_class_t/dot_file
 t/snapshots/gen_cluster_t/dot_file
 t/snapshots/gen_Heawood_t/dot_file
 t/snapshots/gen_html_labels_1_t/dot_file

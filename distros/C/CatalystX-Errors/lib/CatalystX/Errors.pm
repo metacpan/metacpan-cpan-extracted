@@ -1,6 +1,6 @@
 package CatalystX::Errors;
 
-our $VERSION = '0.001008';
+our $VERSION = '0.001009';
 $VERSION = eval $VERSION;
  
 1;

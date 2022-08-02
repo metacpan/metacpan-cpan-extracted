@@ -1,5 +1,20 @@
 Revision history for Linux-Statm-Tiny
 
+0.0700    2022-07-26 17:27:32+01:00 Europe/London
+  [Enhancements]
+  - Ported over from Moo to Mite (tobyink), which removes the
+    non-core dependencies.
+
+  [Other]
+  - Core prequisites are explicitly listed.
+
+  - Removed import of ceil function into the namespace.
+
+  [Tests]
+  - Removed file portability tests. (Unnecessay, since this is for Linux.)
+
+  - Removed clean namespace tests.
+
 0.0603    2022-04-04 16:41:03+01:00 Europe/London
   [Documentation]
   - Bumped copyright year.

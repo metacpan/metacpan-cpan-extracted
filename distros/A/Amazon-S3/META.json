@@ -22,56 +22,64 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
             "File::ShareDir::Install" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
             "File::ShareDir::Install" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Class::Accessor::Fast" : "0.51",
-            "Digest::HMAC_SHA1" : "1.04",
-            "Digest::MD5::File" : "0.08",
-            "HTTP::Date" : "6.02",
-            "LWP::UserAgent::Determined" : "1.07",
+            "Class::Accessor::Fast" : "0",
+            "Digest::HMAC_SHA1" : "0",
+            "Digest::MD5::File" : "0",
+            "HTTP::Date" : "0",
+            "IO::Scalar" : "0",
+            "LWP" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent::Determined" : "0",
             "List::Util" : "1.5",
             "Net::Amazon::Signature::V4" : "0",
-            "Readonly" : "2.05",
-            "Test::Output" : "1.033",
-            "URI" : "5.10",
-            "URI::Escape" : "5.10",
-            "XML::LibXML" : "0",
-            "perl" : "5.01"
+            "Net::HTTP" : "0",
+            "Pod::Markdown" : "0",
+            "Readonly" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0",
+            "XML::Simple" : "0"
          }
       },
       "test" : {
          "requires" : {
             "Digest::MD5::File" : "0.08",
-            "Test::More" : "1.302190"
+            "Test::More" : "1.302190",
+            "Test::Output" : "1.033"
          }
       }
    },
    "provides" : {
       "Amazon::S3" : {
          "file" : "lib/Amazon/S3.pm",
-         "version" : "0.54"
+         "version" : "0.55"
       },
       "Amazon::S3::Bucket" : {
          "file" : "lib/Amazon/S3/Bucket.pm",
-         "version" : "0.54"
+         "version" : "0.55"
       },
       "Amazon::S3::Constants" : {
          "file" : "lib/Amazon/S3/Constants.pm",
-         "version" : "0.54"
+         "version" : "0.55"
       },
       "Amazon::S3::Logger" : {
          "file" : "lib/Amazon/S3/Logger.pm",
-         "version" : "0.54"
+         "version" : "0.55"
+      },
+      "Amazon::S3::Signature::V4" : {
+         "file" : "lib/Amazon/S3/Signature/V4.pm",
+         "version" : "0"
       }
    },
    "release_status" : "stable",
@@ -87,6 +95,6 @@
          "web" : "http://github.com/rlauer6/perl-amazon-s3"
       }
    },
-   "version" : "0.54",
+   "version" : "0.55",
    "x_serialization_backend" : "JSON::PP version 4.10"
 }

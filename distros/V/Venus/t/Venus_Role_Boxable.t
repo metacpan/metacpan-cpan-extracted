@@ -50,7 +50,7 @@ $test->for('includes');
 
   with 'Venus::Role::Boxable';
 
-  has 'text';
+  attr 'text';
 
   package main;
 

@@ -1,34 +1,35 @@
 =head1 Name
 
-SPVM::Complex_2d - double complex type
+SPVM::Complex_2d - double Complex Type
 
 =head1 Usage
-
+  
+  use Complex_2d;
+  
   my $z : Complex_2d;
-  $z->{re} = 1;
-  $z->{im} = 2;
+  
+  # Set
+  $z->{re} = 1.5;
+  $z->{im} = 2.5;
+  
+  # Get
+  my $re = $z->{re};
+  my $im = $z->{im};
   
 =head1 Description
 
-Complex_2d is double complex type.
+C<Complex_2d> is a L<multi-numeric type|SPVM::Document::LanguageSpecification/"Multi-Numeric Type"> to represent a double complex number.
 
-This module is multi numeric type.
-
-  class Complex_2d : mulnum_t {
-    has re : double;
-    has im : double;
-  }
-
-=head1 Field Methods
+=head1 Fields
 
 =head2 re
 
   has re : double;
 
-Real number.
+A real number.
 
 =head2 im
 
   has im : double;
 
-Imaginary number.
+A imaginary number.

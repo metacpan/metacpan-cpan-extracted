@@ -52,6 +52,7 @@ subtest 'One->Many Processing' => sub {
             note explain $ls if $BATCHCHUNK_TEST_DEBUG;
         },
         target_time => 0,
+        verbose     => 0,
     );
 
     is($batch_chunker->id_name, 'genreid.genreid', 'Right id_name guessed');

@@ -5,16 +5,21 @@ use 5.018;
 use strict;
 use warnings;
 
-use overload (
-  '""' => 'explain',
-  '~~' => 'explain',
-);
+use Venus::Role 'with';
 
-use Moo::Role;
+# AUDIT
 
-# REQUIRES
+sub AUDIT {
+  my ($self, $from) = @_;
 
-requires 'explain';
+  my $name = ref $self || $self;
+
+  if (!$from->can('explain')) {
+    die "${from} requires 'explain' to consume ${name}";
+  }
+
+  return $self;
+}
 
 1;
 
@@ -38,7 +43,7 @@ Explainable Role for Perl 5
 
   use Venus::Class;
 
-  has 'test';
+  attr 'test';
 
   sub explain {
     "okay"
@@ -91,45 +96,3 @@ I<Since C<0.01>>
 =back
 
 =cut
-
-=head1 OPERATORS
-
-This package overloads the following operators:
-
-=cut
-
-=over 4
-
-=item operation: C<("")>
-
-This package overloads the C<""> operator.
-
-B<example 1>
-
-  package main;
-
-  my $example = Example->new(test => 123);
-
-  my $string = "$example";
-
-  # "okay"
-
-=back
-
-=over 4
-
-=item operation: C<(~~)>
-
-This package overloads the C<~~> operator.
-
-B<example 1>
-
-  package main;
-
-  my $example = Example->new(test => 123);
-
-  my $result = $example ~~ 'okay';
-
-  # 1
-
-=back

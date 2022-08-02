@@ -35,7 +35,7 @@ This module provides constants which are in use by the SAML2 implementation.
 
 ## bindings
 
-    use URN::OASIS::SAML2 qw(:bindings);
+    use URN::OASIS::SAML2 qw(:binding);
     use URN::OASIS::SAML2 qw(
         BINDING_HTTP_POST
         BINDING_HTTP_ARTIFACT
@@ -46,7 +46,7 @@ This module provides constants which are in use by the SAML2 implementation.
 
 ## classes
 
-    use URN::OASIS::SAML2 qw(:classes);
+    use URN::OASIS::SAML2 qw(:class);
     use URN::OASIS::SAML2 qw(
         CLASS_UNSPECIFIED
         CLASS_PASSWORD_PROTECTED
@@ -63,4 +63,15 @@ This module provides constants which are in use by the SAML2 implementation.
         NAMEID_EMAIL
         NAMEID_TRANSIENT
         NAMEID_PERSISTENT
+    );
+
+## status
+
+    use URN::OASIS::SAML2 qw(:status);
+    use URN::OASIS::SAML2 qw(
+        STATUS_AUTH_FAILED
+        STATUS_REQUESTER
+        STATUS_REQUEST_DENIED
+        STATUS_RESPONDER
+        STATUS_SUCCESS
     );

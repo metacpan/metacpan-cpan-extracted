@@ -24,49 +24,54 @@ SPVM::StringBuffer - String Buffer
 
 String buffer.
 
+=head1 Fields
+
+=head2 length
+
+  has length : ro int;
+
+The length.
+
+=head2 value
+
+  has value : ro mutable string;
+
+The value. This is the internally used string, but it can be manipulated directly.
+
+  my $value = $buffer->value;
+  $valeu->[0] = 'a';
+
 =head1 Class Methods
 
 =head2 new
 
   static method new : StringBuffer ()
 
-Create new L<StringBuffer|SPVM::StringBuffer> object.
+Create new C<StringBuffer> object.
 
 =head1 Instance Methods
-
-=head2 value
-
-  method value : mutable string; ()
-
-Get the value of the string buffer.
-
-=head2 length
-
-  method length : int ()
-
-Get the string length.
 
 =head2 push
 
   method push  : void ($string : string)
 
-Push a string to the string buffer.
+Add a string after the end of the string in the string buffer.
 
 =head2 push_char
 
   method push_char : void ($char : byte)
 
-Push a character to the string buffer.
+Add a character after the end of the string in the string buffer.
 
 =head2 replace
 
-  method replace : void ($offset : int, $length : int, $replace : string) {
+  method replace : void ($offset : int, $length : int, $replace : string)
 
-Replace the range(from the offset to the offeset + the lenth) of the string buffer with the replacement string.
+Replace the characters of the range specified by the offset and the lenght with the replacement string.
 
-The offset must be greater than or equal to 0. Otherwise an exception will be thrown.
+The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
 
-The offset + the lenght must be less than or equal to the length of the string that the string buffer has. Otherwise an exception will be thrown.
+The offset + the removing lenght must be less than or equal to the length of the string buffer. Otherwise an exception will be thrown.
 
 =head2 to_string
 

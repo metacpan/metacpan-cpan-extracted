@@ -1,5 +1,5 @@
 package Form::Tiny::Meta;
-
+$Form::Tiny::Meta::VERSION = '2.13';
 use v5.10;
 use strict;
 use warnings;
@@ -16,8 +16,6 @@ use Form::Tiny::Utils qw(try uniq get_package_form_meta);
 require Moo::Role;
 
 use namespace::clean;
-
-our $VERSION = '2.12';
 
 # more clear error messages in some crucial cases
 our @CARP_NOT = qw(Form::Tiny Form::Tiny::Form);

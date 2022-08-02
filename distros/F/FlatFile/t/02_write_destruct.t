@@ -1,6 +1,6 @@
-#
+use strict; use warnings;
+
 # same as 02_write, except without the ->flush calls
-#
 
 use Test::More tests => 17;
 use FlatFile;
@@ -89,13 +89,6 @@ ok($f);
   is(scalar(@rec), 1, "one record for banana");
   is($banana->color, "yellow", "banana still ripe");
 }
-
-
-
-#########################
-
-# Insert your test code below, the Test module is use()ed here so read
-# its man page ( perldoc Test ) for help writing this test script.
 
 __DATA__
 apple  red

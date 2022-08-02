@@ -28,6 +28,18 @@ sub IMPORT {
   return $self;
 }
 
+sub does {
+  my ($self, @args) = @_;
+
+  return $self->DOES(@args);
+}
+
+sub meta {
+  my ($self) = @_;
+
+  return $self->META;
+}
+
 1;
 
 
@@ -98,14 +110,20 @@ I<Since C<0.01>>
 
 =item does example 1
 
+  package Employee;
+
+  use base 'Mars::Kind::Role';
+
+  Employee->ROLE('Person');
+
   package main;
 
-  my $user = User->ROLE('Person')->new(
+  my $user = User->ROLE('Employee')->new(
     fname => 'Elliot',
     lname => 'Alderson',
   );
 
-  my $does = $user->does('Person');
+  my $does = Employee->does('Person');
 
   # 1
 
@@ -133,7 +151,7 @@ I<Since C<0.01>>
     lname => 'Alderson',
   );
 
-  my $meta = $user->meta;
+  my $meta = Person->meta;
 
   # bless({...}, 'Mars::Meta')
 

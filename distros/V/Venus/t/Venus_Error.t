@@ -381,6 +381,54 @@ $test->for('example', 1, '(qr)', sub {
   $result
 });
 
+=operator ("")
+
+This package overloads the C<""> operator.
+
+=cut
+
+$test->for('operator', '("")');
+
+=example-1 ("")
+
+  # given: synopsis;
+
+  my $result = "$error";
+
+  # "Exception!"
+
+=cut
+
+$test->for('example', 1, '("")', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result =~ 'Exception!';
+
+  $result
+});
+
+=operator (~~)
+
+This package overloads the C<~~> operator.
+
+=cut
+
+$test->for('operator', '(~~)');
+
+=example-1 (~~)
+
+  # given: synopsis;
+
+  my $result = $error ~~ 'Exception!';
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(~~)', sub {
+  1;
+});
+
 # END
 
 $test->render('lib/Venus/Error.pod') if $ENV{RENDER};

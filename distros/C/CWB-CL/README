@@ -1,7 +1,7 @@
 
-  IMS Open Corpus Workbench: CWB/Perl CL API Version 3.4.33
+  IMS Open Corpus Workbench: CWB/Perl CL API Version 3.5.0
 
-  compatible with CWB version 3.4.33+
+  compatible with CWB version 3.5.0
 
 
 This package contains a Perl interface to the low-level corpus access library
@@ -13,19 +13,21 @@ install this package.
 PREREQUISITES
 
 Before compiling the CWB/Perl package, you must install an up-to-date version
-of the IMS Open Corpus Workbench (see above for precise version requirements).
-You can either compile the CWB from source or install a binary distribution
-available from http://cwb.sourceforge.net/.
+of the IMS Open Corpus Workbench (see above for precise version requirements),
+known for short as the "CWB Core".
 
-If you did not install the CWB in a standard place (i.e. in a directory in 
+You can either compile the CWB Core from source or install a binary package;
+see instructions and links at https://cwb.sourceforge.io/.
+
+If you did not install the CWB Core in a standard place (i.e. a directory in 
 your search path), make sure that the "cwb-config" program can be executed
 from the command line.  This will enable the CWB/Perl makefile to obtain the
 necessary configuration information.
 
 You will also need a working C compiler (the same used to compile your version
-of Perl).  If you have installed a binary distribution of the CWB, the CL library
-(libcl.a) included there might not be compatible with your C compiler.  In this
-case, you will need to compile the IMS Open CWB yourself from source.
+of Perl).  If you have installed a binary distribution of the CWB Core, the CL 
+library (libcl.<a,so,dylib>) included there might not be compatible with your 
+C compiler.  In that case, you will need to compile the CWB Core from source.
 
 
 QUICK INSTALLATION GUIDE
@@ -40,7 +42,7 @@ following commands:
     make install
 
 You will probably have to login as root for the last step (or you can type
-"sudo make install" and enter your root password).  If you want to install
+"sudo make install" and enter your normal password).  If you want to install
 the Perl modules in a non-standard location, say in "~/perl/lib/perl5/..."
 and "~/perl/man/...", type the following instead of "perl Makefile.PL":
 
@@ -49,10 +51,10 @@ and "~/perl/man/...", type the following instead of "perl Makefile.PL":
 Note that you will then have to include the appropriate subdirectories of
 "~/perl/lib/perl5/" in your Perl search path in order to use the CWB modules.
 
-If the "cwb-config" utility is not in your standard search path, you can specify
-its location with the --config option:
+If the "cwb-config" utility is not in your standard search path, you can 
+specify its location with the --config option, for example:
 
-    perl Makefile.PL --config=~/cwb-3.5/bin/cwb-config
+    perl Makefile.PL --config=/opt/cwb-3.5/bin/cwb-config
 
 
 TROUBLESHOOTING

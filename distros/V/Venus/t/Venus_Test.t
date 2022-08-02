@@ -186,6 +186,8 @@ The for method attempts to find the POD content based on the name provided and
 executes the corresponding predefined test, optionally accepting a callback
 which, if provided, will be passes a L<Venus::Try> object containing the
 POD-driven test. The callback, if provided, must always return a true value.
+B<Note:> All automated tests disable the I<"redefine"> class of warnings to
+prevent warnings when redeclaring packages in examples.
 
 =signature for
 

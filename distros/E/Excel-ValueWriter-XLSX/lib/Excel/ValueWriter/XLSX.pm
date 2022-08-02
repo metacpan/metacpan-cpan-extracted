@@ -12,7 +12,7 @@ use Date::Calc            qw/Delta_Days/;
 use Carp                  qw/croak/;
 use Encode                qw/encode_utf8/;
 
-my $VERSION = '0.2';
+our $VERSION = '0.6';
 
 #======================================================================
 # GLOBALS
@@ -35,6 +35,10 @@ my %params_spec = (
                         | (?<m>\d\d?)    /  (?<d>\d\d?) /  (?<y>\d\d\d\d)) # mm/dd/yyyy
                       $]x},
  );
+
+
+my %entity       = ( '<' => '&lt;', '>' => '&gt;', '&' => '&amp;' );
+my $entity_regex = do {my $chars = join "", keys %entity; qr/[$chars]/};
 
 
 #======================================================================
@@ -129,13 +133,15 @@ sub add_sheet {
       defined $val and length $val or next COLUMN;
 
       # choose XML attributes and inner value
-      (my $attrs, $val)
-        = looks_like_number $val             ? (""                  , $val                          )
-        : $date_regex && $val =~ $date_regex ? (qq{ s="$DATE_STYLE"}, n_days($+{y}, $+{m}, $+{d})   )
-        :                                      (qq{ t="s"}          , $self->add_shared_string($val));
+      (my $tag, my $attrs, $val)
+        = looks_like_number $val             ? (v => ""                  , $val                          )
+        : $date_regex && $val =~ $date_regex ? (v => qq{ s="$DATE_STYLE"}, n_days($+{y}, $+{m}, $+{d})   )
+        : $val =~ /^=/                       ? (f => "",                   escape_formula($val)          )
+        :                                      (v => qq{ t="s"}          , $self->add_shared_string($val));
 
       # add the new XML cell
-      push @cells, sprintf qq{<c r="%s%d"%s><v>%s</v></c>}, $col_letter, $row_num, $attrs, $val;
+      my $cell = sprintf qq{<c r="%s%d"%s><%s>%s</%s></c>}, $col_letter, $row_num, $attrs, $tag, $val, $tag;
+      push @cells, $cell;
     }
 
     # generate the row XML and add it to the sheet
@@ -169,6 +175,9 @@ sub add_sheet {
 
 sub add_shared_string {
   my ($self, $string) = @_;
+
+  # single quote before an initial equal sign is ignored (escaping the '=' like in Excel)
+  $string =~ s/^'=/=/;
 
   # keep a global count of how many strings are in the workbook
   $self->{n_strings_in_workbook}++;
@@ -233,7 +242,7 @@ sub worksheet_rels {
 #======================================================================
 
 sub save_as {
-  my ($self, $file_name) = @_;
+  my ($self, $target) = @_;
 
   # assemble all parts within the zip, except sheets and tables that were already added previously
   my $zip = $self->{zip};
@@ -247,9 +256,9 @@ sub save_as {
   $zip->addString($self->styles,             "xl/styles.xml");
 
   # write the Zip archive
-  my $write_result = $zip->writeToFileNamed($file_name);
+  my $write_result = ref $target ? $zip->writeToFileHandle($target) : $zip->writeToFileNamed($target);
   $write_result == AZ_OK
-    or croak "could not write into $self->{xlsx}";
+    or croak "could not save Zip archive into " . (ref($target) || $target);
 }
 
 
@@ -450,18 +459,25 @@ sub n_tables {
 #======================================================================
 
 
-my %entity = ( '<' => '&lt;', '>' => '&gt;', '&' => '&amp;' );
-
 sub si_node {
   my ($string) = @_;
 
   # build XML node for a single shared string
-  $string =~ s/([<>&])/$entity{$1}/eg;
+  $string =~ s/($entity_regex)/$entity{$1}/g;
   my $maybe_preserve_space = $string =~ /^\s|\s$/ ? ' xml:space="preserve"' : '';
   my $node = qq{<si><t$maybe_preserve_space>$string</t></si>};
 
   return $node;
 }
+
+sub escape_formula {
+  my ($string) = @_;
+
+  $string =~ s/^=//;
+  $string =~ s/($entity_regex)/$entity{$1}/g;
+  return $string;
+}
+
 
 sub n_days {
   my ($y, $m, $d) = @_;
@@ -488,7 +504,9 @@ Excel::ValueWriter::XLSX - generating data-only Excel workbooks in XLSX format, 
 =head1 SYNOPSIS
 
   my $writer = Excel::ValueWriter::XLSX->new;
-  $writer->add_sheet($sheet_name1, $table_name1, [qw/a b/], [[1, 2], [3, 4]]);
+  $writer->add_sheet($sheet_name1, $table_name1, [qw/a b tot/], [[1, 2, '=[a]+[b]'],
+                                                                 [3, 4]
+                                                                ]);
   $writer->add_sheet($sheet_name2, $table_name2, \@headers, $row_generator);
   $writer->save_as($filename);
 
@@ -500,15 +518,10 @@ format from Perl programs is the excellent L<Excel::Writer::XLSX>
 module. That module is very rich in features, but quite costly in CPU
 and memory usage. By contrast, the present module
 L<Excel::ValueWriter::XLSX> is aimed at fast and cost-effective
-production of data-only workbooks, containing nothing but plain
-values. Such workbooks are useful in architectures where Excel is used
-merely as a local database, for example in connection with a PowerBI
-architecture.
-
-=head1 VERSION
-
-This is version 0.1, the first release.
-Until version 1.0, slight changes may occur in the API.
+production of data-only workbooks, containing nothing but plain values
+and formulas, without any formatting. Such workbooks are useful in
+architectures where Excel is used merely as a local database, for
+example in connection with a Power Pivot architecture.
 
 
 =head1 METHODS
@@ -576,16 +589,20 @@ callback function used to feed a sheet with 500 lines of 300 columns of random n
 =back
 
 Cells within a row must contain scalar values. Values that look like numbers are treated
-as numbers, string values that match the C<date_regex> are converted into numbers and
-displayed through a date format, all other strings are treated as shared strings at the
+as numbers. String values that match the C<date_regex> are converted into numbers and
+displayed through a date format. String values that start with an initial '=' are treated
+as formulas; but like in Excel, if you want regular string that starts with a '=', put a single
+quote just before the '=' -- that single quote will be removed from the string.
+Everything else is treated as a string. Strings are shared at the
 workbook level (hence a string that appears several times in the input data will be stored
 only once within the workbook).
 
 =head2 save_as
 
-  $writer->save_as($filename);
+  $writer->save_as($target);
 
-Writes the workbook contents into the specified C<$filename>.
+Writes the workbook contents into the specified C<$target>, which can be either
+a filename or filehandle opened for writing.
 
 
 =head1 ARCHITECTURAL NOTE

@@ -98,7 +98,9 @@ $test->for('inherits');
 =integrates
 
 Venus::Role::Accessible
+Venus::Role::Buildable
 Venus::Role::Explainable
+Venus::Role::Valuable
 
 =cut
 
@@ -321,6 +323,54 @@ $test->for('example', 6, 'render', sub {
   ];
 
   $result
+});
+
+=operator ("")
+
+This package overloads the C<""> operator.
+
+=cut
+
+$test->for('operator', '("")');
+
+=example-1 ("")
+
+  # given: synopsis;
+
+  my $result = "$template";
+
+  # "From: <>"
+
+=cut
+
+$test->for('example', 1, '("")', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq 'From: <>';
+
+  $result
+});
+
+=operator (~~)
+
+This package overloads the C<~~> operator.
+
+=cut
+
+$test->for('operator', '(~~)');
+
+=example-1 (~~)
+
+  # given: synopsis;
+
+  my $result = $template ~~ 'From: <>';
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(~~)', sub {
+  1;
 });
 
 # END

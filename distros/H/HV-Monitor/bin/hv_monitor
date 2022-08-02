@@ -1,0 +1,115 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+hv_monitor - LibreNMS style JSON SNMP extend for hypervisor monitoring.
+
+=head1 SYNOPSIS
+
+hv_monitor [B<-c>] [B<-b> <backend>]
+
+=head1 DESCRIPTION
+
+For cron...
+
+    */5 * * * * /usr/local/bin/hv_monitor > /var/cache/hv_monitor.json -c 2> /dev/null
+
+For snmpd...
+
+    extend hv-monitor /bin/cat /var/cache/hv_monitor.json
+
+=head1 FLAGS
+
+=head2 -b <backend>
+
+The backend to use.
+
+Defaults are as below.
+
+    FreeBSD: CBSD
+    Linux: Libvirt
+
+=head2 -c
+
+Compress the output using gzip and base64 encoded so it
+can be transmitted via SNMP with out issue.
+
+=cut
+
+use JSON;
+use strict;
+use warnings;
+use Getopt::Long;
+use JSON;
+use HV::Monitor;
+use MIME::Base64;
+use Gzip::Faster;
+
+sub version {
+	print "hv_monitor v. 0.0.1\n";
+}
+
+sub help {
+	&version;
+
+	print '
+-b <backend>    The backend to use.
+
+-c              gzip the json and then base64 encode it
+
+
+Backends include by default...
+CBSD - Default on FreeBSD
+Libvirt - Default on Linux
+';
+}
+
+my $backend;
+if ( $^O eq 'freebsd' ) {
+	$backend = 'CBSD';
+}
+elsif ( $^O eq 'linux' ) {
+	$backend = 'Libvirt';
+}
+
+# get the commandline options
+my $help     = 0;
+my $version  = 0;
+my $compress = 0;
+Getopt::Long::Configure('no_ignore_case');
+Getopt::Long::Configure('bundling');
+GetOptions(
+	'version' => \$version,
+	'v'       => \$version,
+	'help'    => \$help,
+	'h'       => \$help,
+	'b=s'     => \$backend,
+	'c'       => \$compress,
+);
+
+my $hm = HV::Monitor->new( { backend => $backend } );
+
+eval { $hm->load; };
+if ($@) {
+	print encode_json( { version => 1, data => {}, error => 1, errorString => 'load failed... ' . $@ } ) . "\n";
+	exit 1;
+}
+
+my $data = encode_json( $hm->run );
+
+if ( !$compress ) {
+	print $data. "\n";
+	exit;
+}
+
+my $compressed = encode_base64( gzip($data) );
+$compressed =~ s/\n//g;
+$compressed = $compressed . "\n";
+
+# check which is smaller and prints it
+if ( length($compressed) > length($data) ) {
+	print $data;
+}
+else {
+	print $compressed;
+}

@@ -15,6 +15,7 @@ t/data.t
 t/dist.t
 t/eof.t
 t/eol.t
+t/equal.t
 t/fixme.t
 t/kwalitee.t
 t/links.t

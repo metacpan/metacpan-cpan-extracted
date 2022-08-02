@@ -5,9 +5,9 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class;
 
-extends 'Venus::Kind::Value';
+base 'Venus::Kind::Value';
 
 with 'Venus::Role::Mappable';
 
@@ -23,28 +23,6 @@ sub build_args {
     value => $data
   };
 }
-
-# MODIFIERS
-
-around get => sub {
-  my ($orig, $self, @args) = @_;
-
-  return $self->$orig if $#_ < 2;
-
-  my ($index) = @args;
-
-  return $self->value->{$index};
-};
-
-around set => sub {
-  my ($orig, $self, @args) = @_;
-
-  return $self->$orig(@args) if $#_ < 3;
-
-  my ($index, $value) = @args;
-
-  return $self->value->{$index} = $value;
-};
 
 # METHODS
 
@@ -174,6 +152,16 @@ sub find {
   }
 
   return wantarray ? ($item, int(!!$seen)) : $item;
+}
+
+sub get {
+  my ($self, @args) = @_;
+
+  return $self->value if !int@args;
+
+  my ($index) = @args;
+
+  return $self->value->{$index};
 }
 
 sub grep {
@@ -379,6 +367,16 @@ sub reverse {
   }
 
   return {CORE::reverse(%$result)};
+}
+
+sub set {
+  my ($self, @args) = @_;
+
+  return $self->value if !int@args;
+
+  my ($index, $value) = @args;
+
+  return $self->value->{$index} = $value;
 }
 
 sub slice {

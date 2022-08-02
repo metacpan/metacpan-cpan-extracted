@@ -62,6 +62,48 @@ sub is_bool  ($) {           UNIVERSAL::isa( $_[0], 'Module::Generic::Boolean' )
 sub is_true  ($) {  $_[0] && UNIVERSAL::isa( $_[0], 'Module::Generic::Boolean' ) }
 sub is_false ($) { !$_[0] && UNIVERSAL::isa( $_[0], 'Module::Generic::Boolean' ) }
 
+sub FREEZE
+{
+    my $self = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class = CORE::ref( $self );
+    # Return an array reference rather than a list so this works with Sereal and CBOR
+    CORE::return( [$class, $$self] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # But Storable want a list with the first element being the serialised element
+    CORE::return( $$self );
+}
+
+sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+# NOTE: CBOR will call the THAW method with the stored classname as first argument, the constant string CBOR as second argument, and all values returned by FREEZE as remaining arguments.
+# NOTE: Storable calls it with a blessed object it created followed with $cloning and any other arguments initially provided by STORABLE_freeze
+sub THAW
+{
+    my( $self, undef, @args ) = @_;
+    my( $class, $str );
+    if( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' )
+    {
+        ( $class, $str ) = @{$args[0]};
+    }
+    else
+    {
+        $class = CORE::ref( $self ) || $self;
+        $str = CORE::shift( @args );
+    }
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        $$self = $str;
+        CORE::return( $self );
+    }
+    else
+    {
+        CORE::return( $class->new( $str ) );
+    }
+}
+
 sub TO_JSON
 {
     # JSON does not check that the value is a proper true or false. It stupidly assumes this is a string

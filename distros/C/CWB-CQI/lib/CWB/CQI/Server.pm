@@ -1,5 +1,6 @@
 package CWB::CQI::Server;
 # -*-cperl-*-
+$VERSION = 'v3.5.0';
 
 use strict;
 use warnings;
@@ -45,7 +46,7 @@ checked with the B<cqi_server_available> function before calling B<cqi_server>.
 =cut
 
 our $CQPserver = undef;
-if (eval 'use CWB 3.000_000; 1') {
+if (eval 'use CWB 3.005_000; 1') {
   $CQPserver = $CWB::CQPserver
     if -x $CWB::CQPserver;
 }
@@ -145,7 +146,7 @@ __END__
 
 =head1 COPYRIGHT
 
-Copyright (C) 1999-2020 Stefan Evert [http::/purl.org/stefan.evert]
+Copyright (C) 1999-2022 Stephanie Evert [http::/purl.org/stephanie.evert]
 
 This software is provided AS IS and the author makes no warranty as to
 its use and performance. You may use the software, redistribute and

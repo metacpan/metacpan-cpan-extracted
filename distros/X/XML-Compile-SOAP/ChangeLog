@@ -1,6 +1,14 @@
 
 === version history of distribution XML-Compile-SOAP
 
+version 3.28: Mon  1 Aug 10:49:17 CEST 2022
+
+	Improvements:
+	- require LWP::Potocol::https, because it is quite difficult to find-out
+	  that it missing is the cause of a failing installation.  People should
+	  use https in any case.  Suggested by [Balbino Matanzo]
+	- new() now supports ssl_opts [Peter Arnhold]
+
 version 3.27: Wed  7 Apr 09:52:29 CEST 2021
 
 	Fixes:

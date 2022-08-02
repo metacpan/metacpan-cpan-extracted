@@ -24,6 +24,7 @@ WriteMakefile(
 		'Test::Warn' => 0,
 	}, PREREQ_PM => {
 		'Carp' => 0,
+		'overload' => 0,
 		'String::Clean' => 0,
 		'String::Util' => 0,
 	},

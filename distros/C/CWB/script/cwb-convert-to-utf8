@@ -13,8 +13,8 @@ use CWB::Encoder;
 use Getopt::Long;
 use Pod::Usage;
 
-die "This program requires CWB version 3.4.2 or newer (you have $CWB::Config::VersionString)\n"
-  unless $CWB::CWBVersion >= 3.004_002;
+die "This program requires CWB version 3.5.0 or newer (you have $CWB::Config::VersionString)\n"
+  unless $CWB::CWBVersion >= 3.005_000;
 
 ## configuration variables and arguments
 our $Opt_Registry = undef;      # -r <dir> ... search source corpus in registry <dir>
@@ -278,7 +278,7 @@ Options:
 
 =head1 DESCRIPTION
 
-This script provides a convenient method to convert existing CWB-indexed corpora in legacy encodings (C<latin> = ISO-8859-1 etc.) into UTF-8 encoding for use with recent versions of CWB (v3.4.2 and newer).
+This script provides a convenient method to convert existing CWB-indexed corpora in legacy encodings (C<latin> = ISO-8859-1 etc.) into UTF-8 encoding.
 
 B<cwb-convert-to-utf8> requires two arguments, the CWB name of the old (non-UTF-8) corpus and a data directory for the binary index files of the new (UTF-8) corpus. It will then automatically convert and re-index all corpus attributes and create a new registry file in the same registry directory, appending C<_UTF8> to the corpus name (unless these default choices are overridden by command-line options).  For example,
 
@@ -324,7 +324,7 @@ Display short help page.
 
 =head1 PREREQUISITES
 
-B<cwb-convert-to-utf8> requires a recent version of CWB with Unicode support, viz. B<CWB v3.4.2> or newer. If you have installed multiple CWB releases on your computer, make sure that the CWB/Perl modules are configured to use an appropriate CWB version.
+B<cwb-convert-to-utf8> requires at least version 3.5.0 of the CWB Core to be available. If you have installed multiple CWB releases on your computer, make sure that the CWB/Perl modules are configured to use an appropriate CWB version.
 
 For efficiency reasons, character encodings are converted with the external B<iconv> utility, which must be installed somewhere in the system path. Your version of B<iconv> must support command line options C<-f> (source encoding), C<-t> (target encoding) and C<-c> (ignore conversion errors); it also needs to understand CWB style encoding names such as C<utf8> and C<latin1>. Suitable versions of B<iconv> are provided by Linux and Mac OS X, and by any POSIX-conformant system. 
 
@@ -341,6 +341,4 @@ its use and performance. You may use the software, redistribute and
 modify it under the same terms as Perl itself.
 
 =cut
-
-
 

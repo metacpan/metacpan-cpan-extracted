@@ -1,0 +1,14 @@
+class EqualityChecker::Address {
+  static method new : EqualityChecker::Address () {
+    return new EqualityChecker::Address;
+  }
+  
+  method : int ($object1 : object, $object2 : object) {
+    if ($object1 == $object2) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+}

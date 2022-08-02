@@ -5,7 +5,7 @@ package CXC::Number::Sequence::Types;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 use Math::BigInt upgrade => 'Math::BigFloat';
 use Math::BigFloat;
@@ -34,8 +34,7 @@ BEGIN { extends( "CXC::Number::Types" ) }
 
 
 
-declare Alignment,
-  as Tuple [ BigNum, BigPositiveOrZeroNum ],
+declare Alignment, as Tuple [ BigNum, BigPositiveOrZeroNum ],
   where { $_->[1] < 1 },
   coercion => 1;
 
@@ -50,19 +49,15 @@ coerce Alignment,
 
 
 
-declare Sequence,
-  as ArrayRef[BigNum,2],
-  where {
-      my $arr = $_;
-      $arr->[$_] < $arr->[$_+1] || return
-        for 0..($arr->@* - 2);
-        1;
-  },
-  message {
-      ArrayRef([BigNum,2])->validate($_)
-        or "Must be an array of monotonically increasing numbers with at lest two elements"
-    },
-  coercion => 1;
+declare Sequence, as ArrayRef [ BigNum, 2 ], where {
+    my $arr = $_;
+    $arr->[$_] < $arr->[ $_ + 1 ] || return for 0 .. ( $arr->@* - 2 );
+    1;
+}, message {
+    ArrayRef( [ BigNum, 2 ] )->validate( $_ )
+      or
+      "Must be an array of monotonically increasing numbers with at lest two elements"
+}, coercion => 1;
 
 
 
@@ -71,10 +66,9 @@ declare Sequence,
 
 
 
-declare Spacing,
-  as BigNum,
+declare Spacing, as BigNum,
   where { $_ != 0 },
-  message { BigNum->validate($_) or "Must be a non-zero number" },
+  message { BigNum->validate( $_ ) or "Must be a non-zero number" },
   coercion => 1;
 
 
@@ -84,12 +78,10 @@ declare Spacing,
 
 
 
-declare Ratio,
-  as BigNum,
+declare Ratio, as BigNum,
   where { $_ > 0 && $_ != 1 },
   message { BigNum->validate( $_ ) or "$_ must be > 0 && != 1." },
-  coercion => 1
-;
+  coercion => 1;
 
 #
 # This file is part of CXC-Number
@@ -115,7 +107,7 @@ CXC::Number::Sequence::Types - Type::Tiny types for CXC::Number::Sequence
 
 =head1 VERSION
 
-version 0.06
+version 0.08
 
 =head1 TYPES
 
@@ -136,15 +128,23 @@ A non-zero BigNum
 
 A positive number greater than 1.
 
-=head1 BUGS
+=head1 INTERNALS
 
-Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number> or by email
-to L<bug-cxc-number@rt.cpan.org|mailto:bug-cxc-number@rt.cpan.org>.
+=head1 SUPPORT
 
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/cxc-number
+
+and may be cloned from
+
+  https://gitlab.com/djerius/cxc-number.git
 
 =head1 SEE ALSO
 

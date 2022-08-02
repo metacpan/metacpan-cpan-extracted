@@ -3,7 +3,7 @@ use strict; use warnings;
 package Net::OAuth2Server::Request::Token::TokenExchange;
 use parent 'Net::OAuth2Server::Request';
 
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 
 sub grant_type { 'urn:ietf:params:oauth:grant-type:token-exchange' }
 sub allowed_methods { 'POST' }

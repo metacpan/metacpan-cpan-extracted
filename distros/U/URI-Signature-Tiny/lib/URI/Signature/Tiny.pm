@@ -2,7 +2,7 @@ use strict; use warnings;
 
 package URI::Signature::Tiny;
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 use Digest::SHA ();
 use Carp ();
@@ -38,7 +38,7 @@ sub signature {
 
 	my $sig = $self->{'function'}->( $uri, $self->{'secret'} );
 
-	$sig =~ s/=+\z//, $sig =~ y{+/}{-_} if $self->{'recode_base64'};
+	$sig =~ s/=+\z//, $sig =~ y{+/}{-_} if defined $sig and $self->{'recode_base64'};
 
 	$sig;
 }
@@ -51,7 +51,10 @@ sub sign {
 sub verify {
 	my $self = shift;
 	my ( $uri, $sig ) = $self->{'before_verify'}->( @_ );
-	$sig eq $self->signature( $uri );
+	if ( defined $sig ) {
+		my $computed = $self->signature( $uri );
+		defined $computed and $computed eq $sig;
+	}
 }
 
 1;

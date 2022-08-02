@@ -1,5 +1,5 @@
 # Exclude the author-only build scripts
-(build|make-pod|clean|modules)\.pl
+(build|make-pod|clean|modules|versionup)\.pl
 # Exclude the built module
 blib/.*
 # Exclude all git files

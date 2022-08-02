@@ -4,13 +4,13 @@
       "Roy Storey <kiwiroy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Alien-libdeflate",
    "no_index" : {
@@ -24,16 +24,18 @@
          "requires" : {
             "Alien::Build" : "1.41",
             "Alien::Build::MM" : "1.41",
+            "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
             "Alien::gmake" : "0.11",
             "Archive::Tar" : "0",
-            "ExtUtils::MakeMaker" : "0",
-            "HTML::LinkExtor" : "0",
+            "Config" : "0",
+            "ExtUtils::MakeMaker" : "6.52",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
+            "Mojo::DOM" : "0",
+            "Mojolicious" : "7.00",
             "Net::SSLeay" : "1.49",
             "Sort::Versions" : "0",
-            "Test::More" : "0.88",
             "URI" : "0",
             "URI::Escape" : "0"
          }
@@ -41,14 +43,19 @@
       "configure" : {
          "requires" : {
             "Alien::Build" : "1.41",
-            "Alien::Build::MM" : "0.25",
-            "ExtUtils::CBuilder" : "0"
+            "Alien::Build::MM" : "1.41",
+            "ExtUtils::CBuilder" : "0",
+            "ExtUtils::MakeMaker" : "6.52"
          }
       },
       "runtime" : {
          "requires" : {
+            "Alien::Base" : "0.038",
             "Alien::Build" : "0.25",
-            "perl" : "5.008009"
+            "base" : "0",
+            "perl" : "5.008009",
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
@@ -62,17 +69,20 @@
          "url" : "https://github.com/kiwiroy/alien-libdeflate.git"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 1.41",
+      "generated_by" : "Alien::Build::MM version 2.50",
       "requires" : {
          "share" : {
+            "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
             "Alien::gmake" : "0.11",
             "Archive::Tar" : "0",
-            "HTML::LinkExtor" : "0",
+            "Config" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
+            "Mojo::DOM" : "0",
+            "Mojolicious" : "7.00",
             "Net::SSLeay" : "1.49",
             "Sort::Versions" : "0",
             "URI" : "0",
@@ -81,5 +91,5 @@
          "system" : {}
       }
    },
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

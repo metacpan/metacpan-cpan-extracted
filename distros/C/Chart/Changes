@@ -1,17 +1,33 @@
-2.403.5 2022-08-17 lichtkind
+2.403.7 2022-07-29  lichtkind
+-------
+    * = POD rewrite release
+    * ? move landing page examples in own category, independent from test script runs
+    * ? reduce references to gone modules in Chart.pm POD
+    * ? clearify some bits in POD
+    * ? several final touches on types manual page and example images
+    * ! fix sub title in manual demo of pie chart
+    * ! bad dates, typos in Changes
+
+2.403.6 2022-07-21 lichtkind
+-------
+    * = POD rewrite release
+    * ! gap in HTML tag in POD prevented landing page demo images
+    * ? final touches on new POD documentation
+
+2.403.5 2022-07-18 lichtkind
 -------
     * = POD rewrite release
     * ? completed workflow page in manual
-    * ? completed mthods page in manual
+    * ? completed methods page in manual
 
-2.403.4 2022-08-17 lichtkind
+2.403.4 2022-07-17 lichtkind
 -------
     * = POD rewrite release
     * ? completed types page in manual
     * ! fixed some image sizes
     * ! fixed dist.ini so old stuff from git don't spill into release
 
-2.403.3 2022-08-16 lichtkind
+2.403.3 2022-07-16 lichtkind
 -------
     * = POD rewrite release
     * + addded images to landing page
@@ -20,28 +36,28 @@
     * ? some small addons for properties page
     * ! fixed overlong tick label due rounding error near zero
 
-2.403.2 2022-08-13 lichtkind
+2.403.2 2022-07-13 lichtkind
 -------
     * = POD rewrite release
     * ? completed properties page in manual
     * ? started types page in manual with first test example
     * ! linkfixes on landing POD of Chart.pm
-    * ! linkfixes on Color::Constants.pm POD 
+    * ! linkfixes on Color::Constant.pm POD 
 
-2.403.1 2022-08-12 lichtkind
+2.403.1 2022-07-12 lichtkind
 -------
     * = POD rewrite release
     * ? completed most of properties
-    * ? all names listed in Color::Constants.POD
+    * ? all names listed in Color::Constant.pm POD
 
-2.403.0 2022-08-07 lichtkind
+2.403.0 2022-07-07 lichtkind
 -------
     * = test release to check metacpan POD parser
     * + added Chart::Manual + property sub page
     * - drop PDF and HTML documentation
     * - drop dependency on module: POSIX
 
-2.402.3 2022-07-18 lichtkind
+2.402.3 2022-06-18 lichtkind
 -------
     * + string method to Color objects
     * ? fixed #18891 : document that y_ticks1, y_ticks2 is composite only

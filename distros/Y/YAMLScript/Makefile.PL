@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use 5.008001;
+use 5.010001;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
@@ -16,32 +16,32 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "YAMLScript",
   "EXE_FILES" => [
-    "bin/testyamlscript",
     "bin/yamlscript",
-    "bin/ys-testyamlscript.pl",
     "bin/ys-yamlscript.pl"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.008001",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "YAMLScript",
   "PREREQ_PM" => {
+    "List::MoreUtils" => "0.430",
     "Mo" => "0.40",
     "Mo::xxx" => "0.13",
-    "Sub::Util" => "1.62",
+    "Scalar::Util" => "1.62",
     "XXX" => "0.38",
     "YAML::PP" => "0.034",
     "boolean" => "0.46"
   },
-  "VERSION" => "0.0.11",
+  "VERSION" => "0.0.16",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
+  "List::MoreUtils" => "0.430",
   "Mo" => "0.40",
   "Mo::xxx" => "0.13",
-  "Sub::Util" => "1.62",
+  "Scalar::Util" => "1.62",
   "XXX" => "0.38",
   "YAML::PP" => "0.034",
   "boolean" => "0.46"
@@ -59,35 +59,6 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
 WriteMakefile(%WriteMakefileArgs);
 
 package MY;
-sub postamble {
-    my $self = shift;
-    $self->SUPER::postamble
-    . ( $^O eq 'MSWin32' )
-    ? <<'...'
-export PATH := blib\script;$(PATH)
-
-MYPERL := $(FULLPERLRUN:"%"=%)
-
-pure_all ::
-	$(NOECHO) $(FULLPERLRUN) -p0i.bak -e "s(\$$PERL)($(MYPERL))" blib\script\yamlscript
-...
-    : ( $^O =~ /bsd/ )
-    ? <<'...'
-BPATH=$(PWD)/blib/script:$(PATH)
-
-export PATH=$(BPATH)
-
-MYPERL := $(FULLPERLRUN:"%"=%)
-
-pure_all ::
-	$(NOECHO) $(FULLPERLRUN) -p0i -e 's(\$$PERL)($(MYPERL))' blib/script/yamlscript
-...
-    : <<'...';
-export PATH := blib/script:$(PATH)
-
-MYPERL := $(FULLPERLRUN:"%"=%)
-
-pure_all ::
-	$(NOECHO) $(FULLPERLRUN) -p0i -e 's(\$$PERL)($(MYPERL))' blib/script/yamlscript
-...
-}
+use lib 't/lib';
+use DistTestFixer;
+sub postamble { $_[0]->SUPER::postamble . DistTestFixer->fix('yamlscript', 'ys-yamlscript.pl') }

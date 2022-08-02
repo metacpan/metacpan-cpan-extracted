@@ -1,11 +1,18 @@
 ROADMAP:
 -------
-    2.403: true type fonts
-    2.404: better documentation in package Chart::Setting::Legacy.pod
-    2.405: better legend drawing with additional settings and logos
 
-    2.5  smooth graphics
-    3.0: SVG backend
+3.0 rewrite complete
+...
+
+2.406 rewrite axis, tiks, label, box rendering
+2.405 rewrite legend rendering with new elements
+2.404 true type support and adding unifont (mountain patterns ?)
+
+we are here <-------------------------------------------------
+
+2.403 replaced old pdf and html with new POD documentation with embedded HML img
+2.402 new, powerful color management: HSL, hex_RGB, hash_RGB, Pantone colors
+2.401 reformat distribution to be based on Dist::Zilla, solve CPAN issues
 
 
 TODO's:

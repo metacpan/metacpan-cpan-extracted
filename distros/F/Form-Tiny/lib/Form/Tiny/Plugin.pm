@@ -1,11 +1,9 @@
 package Form::Tiny::Plugin;
-
+$Form::Tiny::Plugin::VERSION = '2.13';
 use v5.10;
 use strict;
 use warnings;
 use Carp qw(croak);
-
-our $VERSION = '2.12';
 
 sub plugin
 {

@@ -139,23 +139,3 @@ Alternatively:
 ```bash
 script/hex-describe daemon --mode development --listen "http://*:3000"
 ```
-
-## Docker
-
-If you want to experiment with a clean Perl environment in order to
-check whether the dependencies are OK, make sure you have Docker
-installed, are part of the docker group, and get the latest-perl
-image:
-
-```bash
-sudo apt install docker.io
-sudo adduser $(whoami) docker
-# if groups doesn’t show docker, you need to log in again
-su - $(whoami)
-# this binds the working directory to /app inside the image
-docker run -it --rm -v $(pwd):/app perl:latest /bin/bash
-# now we’re root inside the image
-cd /app
-cpanm File::ShareDir::Install
-cpanm .
-```

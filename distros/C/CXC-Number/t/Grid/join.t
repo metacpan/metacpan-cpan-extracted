@@ -67,7 +67,7 @@ subtest 'gap' => sub {
         ),
         object {
             prop blessed => Grid;
-            call edges   => [ 1, 2, 3, 4, 5, 6 ];
+            call edges => [ 1, 2, 3, 4, 5, 6 ];
         },
         'default',
     );
@@ -80,7 +80,7 @@ subtest 'gap' => sub {
         ),
         object {
             prop blessed => Grid;
-            call edges   => [ 2, 3, 4, 5, 6 ];
+            call edges => [ 2, 3, 4, 5, 6 ];
         },
         'shift-right',
     );
@@ -93,7 +93,7 @@ subtest 'gap' => sub {
         ),
         object {
             prop blessed => Grid;
-            call edges   => [ 1, 2, 3, 4, 5 ];
+            call edges => [ 1, 2, 3, 4, 5 ];
         },
         'shift-left',
     );
@@ -106,7 +106,7 @@ subtest 'gap' => sub {
         ),
         object {
             prop blessed => Grid;
-            call edges   => [ 1, 2, 4, 5, 6 ];
+            call edges => [ 1, 2, 4, 5, 6 ];
         },
         'snap-right',
     );
@@ -119,7 +119,7 @@ subtest 'gap' => sub {
         ),
         object {
             prop blessed => Grid;
-            call edges   => [ 1, 2, 3, 5, 6 ];
+            call edges => [ 1, 2, 3, 5, 6 ];
         },
         'snap-left',
     );
@@ -132,7 +132,7 @@ subtest 'gap' => sub {
         ),
         object {
             prop blessed => Grid;
-            call edges   => [ 1, 2, 3.5, 5, 6 ];
+            call edges => [ 1, 2, 3.5, 5, 6 ];
         },
         'snap-both',
     );
@@ -145,7 +145,7 @@ subtest 'gap' => sub {
         ),
         object {
             prop blessed => Grid;
-            call edges   => [ 1, 2, 3, 4, 5, 6 ];
+            call edges => [ 1, 2, 3, 4, 5, 6 ];
             call include => [ 1, 1, 1, 1, 1 ];
         },
         'include',
@@ -159,7 +159,7 @@ subtest 'gap' => sub {
         ),
         object {
             prop blessed => Grid;
-            call edges   => [ 1, 2, 3, 4, 5, 6 ];
+            call edges => [ 1, 2, 3, 4, 5, 6 ];
             call include => [ 1, 1, 0, 1, 1 ];
         },
         'exclude',

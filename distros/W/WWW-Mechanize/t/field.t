@@ -2,8 +2,9 @@
 
 use warnings;
 use strict;
-use Test::More tests => 14;
-use URI::file;
+
+use Test::More;
+use URI::file ();
 
 BEGIN {
     delete @ENV{qw(PATH IFS CDPATH ENV BASH_ENV)}; # Placates taint-unsafe Cwd.pm in 5.6.1
@@ -29,6 +30,10 @@ $mech->set_visible( [ radio => 'wongo!' ], 'boingo' );
 is( $mech->value( 'wango' ), 'wongo!', 'wango changed' );
 is( $mech->value( 'dingo', 2 ), 'boingo', 'dingo changed' );
 
+ok( ! $mech->value( 'textarea_name' ), 'textarea is empty' );
+$mech->field( 'textarea_name' => 'foobar' );
+is( $mech->value( 'textarea_name' ), 'foobar', 'textarea has been populated' );
+
 for my $name (qw/__no_value __value_empty/) {
     ok( ! $mech->value( $name ), "$name is empty" ) or diag $mech->field($name);
     $mech->field( $name, 'foo');
@@ -43,3 +48,5 @@ for my $name (qw/__value/) {
     $mech->field( $name, 'foo');
     is( $mech->value( $name ), 'foo', "$name changed" );
 }
+
+done_testing;

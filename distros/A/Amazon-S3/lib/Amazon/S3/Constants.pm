@@ -7,18 +7,20 @@ use parent qw{Exporter};
 
 use Readonly;
 
-our $VERSION = '0.54';
+our $VERSION = '0.55';
 
 # defaults
-Readonly our $AMAZON_HEADER_PREFIX   => 'x-amz-';
-Readonly our $DEFAULT_BUFFER_SIZE    => 4 * 1024;
-Readonly our $DEFAULT_HOST           => 's3.amazonaws.com';
-Readonly our $DEFAULT_TIMEOUT        => 30;
-Readonly our $KEEP_ALIVE_CACHESIZE   => 0;
-Readonly our $METADATA_PREFIX        => 'x-amz-meta-';
-Readonly our $MAX_BUCKET_NAME_LENGTH => 64;
-Readonly our $MIN_BUCKET_NAME_LENGTH => 3;
-Readonly our $DEFAULT_LOG_LEVEL      => 'error';
+Readonly our $AMAZON_HEADER_PREFIX            => 'x-amz-';
+Readonly our $DEFAULT_BUFFER_SIZE             => 4 * 1024;
+Readonly our $DEFAULT_HOST                    => 's3.amazonaws.com';
+Readonly our $DEFAULT_TIMEOUT                 => 30;
+Readonly our $KEEP_ALIVE_CACHESIZE            => 0;
+Readonly our $METADATA_PREFIX                 => 'x-amz-meta-';
+Readonly our $MAX_BUCKET_NAME_LENGTH          => 64;
+Readonly our $MIN_BUCKET_NAME_LENGTH          => 3;
+Readonly our $MIN_MULTIPART_UPLOAD_CHUNK_SIZE => 5 * 1024 * 1024;
+Readonly our $DEFAULT_LOG_LEVEL               => 'error';
+
 Readonly::Hash our %LOG_LEVELS => (
   trace => 5,
   debug => 4,
@@ -35,6 +37,7 @@ Readonly our $FALSE => 0;
 # chars
 Readonly our $COMMA         => q{,};
 Readonly our $COLON         => q{:};
+Readonly our $DOT           => q{.};
 Readonly our $DOUBLE_COLON  => q{::};
 Readonly our $EMPTY         => q{};
 Readonly our $SLASH         => q{/};
@@ -48,6 +51,7 @@ our %EXPORT_TAGS = (
       $AMPERSAND
       $COLON
       $DOUBLE_COLON
+      $DOT
       $COMMA
       $EMPTY
       $EQUAL_SIGN
@@ -73,6 +77,7 @@ our %EXPORT_TAGS = (
       $DEFAULT_HOST
       $MAX_BUCKET_NAME_LENGTH
       $MIN_BUCKET_NAME_LENGTH
+      $MIN_MULTIPART_UPLOAD_CHUNK_SIZE
     }
   ],
 );

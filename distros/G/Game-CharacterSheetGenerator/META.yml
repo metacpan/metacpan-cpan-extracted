@@ -19,6 +19,7 @@ no_index:
     - t
     - inc
 requires:
+  Encode::Locale: '0'
   File::ShareDir: '0'
   File::Slurper: '0'
   I18N::AcceptLanguage: '0'
@@ -30,5 +31,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://alexschroeder.ch/cgit/character-sheet-generator
-version: 1
+version: 1.01
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

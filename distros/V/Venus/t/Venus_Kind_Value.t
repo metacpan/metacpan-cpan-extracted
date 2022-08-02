@@ -50,7 +50,7 @@ $test->for('includes');
 
   use Venus::Class;
 
-  extends 'Venus::Kind::Value';
+  base 'Venus::Kind::Value';
 
   package main;
 

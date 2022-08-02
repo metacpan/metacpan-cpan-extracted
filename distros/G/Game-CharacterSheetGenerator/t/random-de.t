@@ -20,6 +20,7 @@ use Test::Mojo;
 use utf8;
 
 my $t = Test::Mojo->new('Game::CharacterSheetGenerator');
+$t->app->config("face_generator_url", undef);
 $t->app->log->level('warn');
 
 # typical use case: request a random character

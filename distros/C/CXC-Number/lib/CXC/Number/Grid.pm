@@ -9,8 +9,7 @@ use POSIX ();
 
 use Tree::Range::RB;
 
-use Types::Standard
-  qw( ArrayRef InstanceOf Optional Enum Dict Bool );
+use Types::Standard qw( ArrayRef InstanceOf Optional Enum Dict Bool );
 use Type::Params qw( compile );
 use Ref::Util qw[ is_plain_hashref is_blessed_ref ];
 
@@ -25,7 +24,7 @@ use Moo;
 use experimental 'signatures';
 use experimental 'refaliasing';
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 use Exporter::Shiny qw( join_n overlay_n );
 
@@ -137,9 +136,9 @@ sub BUILD ( $self, $ ) {
 
 sub bin_edges ( $self ) {
     my @edges;
-    push @edges, Math::BigFloat->new( POSIX::DBL_MAX) if $self->oob;
+    push @edges, Math::BigFloat->new( POSIX::DBL_MAX ) if $self->oob;
     push @edges, $self->_raw_edges->@*;
-    unshift @edges, Math::BigFloat->new( - POSIX::DBL_MAX)
+    unshift @edges, Math::BigFloat->new( - POSIX::DBL_MAX )
       if $self->oob;
 
     return $self->_convert( \@edges );
@@ -156,7 +155,7 @@ sub bin_edges ( $self ) {
 
 
 
-sub lb ($self) {
+sub lb ( $self ) {
     return $self->_convert( [ $self->_raw_edges->@[ 0 .. $self->nbins - 1 ] ] );
 }
 
@@ -170,7 +169,7 @@ sub lb ($self) {
 
 
 
-sub ub ($self) {
+sub ub ( $self ) {
     return $self->_convert( [ $self->_raw_edges->@[ 1 .. $self->nbins ] ] );
 }
 
@@ -183,7 +182,7 @@ sub ub ($self) {
 
 
 
-sub edges ($self) {
+sub edges ( $self ) {
     return $self->_convert( $self->_raw_edges );
 }
 
@@ -195,7 +194,7 @@ sub edges ($self) {
 
 
 
-sub nedges ($self) {
+sub nedges ( $self ) {
     scalar $self->_raw_edges->@*;
 }
 
@@ -207,7 +206,7 @@ sub nedges ($self) {
 
 
 
-sub nbins ($self) {
+sub nbins ( $self ) {
     $self->nedges - 1;
 }
 
@@ -220,7 +219,7 @@ sub nbins ($self) {
 
 
 
-sub include ($self) {
+sub include ( $self ) {
     return [ $self->_include->@* ];
 }
 
@@ -233,9 +232,10 @@ sub include ($self) {
 
 
 
-sub spacing ($self) {
+sub spacing ( $self ) {
     my $edges = $self->_raw_edges;
-    return $self->_convert( [ map { ( $edges->[$_] - $edges->[ $_ - 1 ] ) } 1 .. $self->nbins ] );
+    return $self->_convert(
+        [ map { ( $edges->[$_] - $edges->[ $_ - 1 ] ) } 1 .. $self->nbins ] );
 }
 
 
@@ -246,7 +246,7 @@ sub spacing ($self) {
 
 
 
-sub min ($self) {
+sub min ( $self ) {
     return $self->_convert( $self->_raw_edges->[0] );
 }
 
@@ -258,7 +258,7 @@ sub min ($self) {
 
 
 
-sub max ($self) {
+sub max ( $self ) {
     return $self->_convert( $self->_raw_edges->[-1] );
 }
 
@@ -270,7 +270,7 @@ sub max ($self) {
 
 
 
-sub split ($self) {
+sub split ( $self ) {
 
     my @grids;
 
@@ -278,7 +278,7 @@ sub split ($self) {
 
     my $include = $self->_include;
 
-    foreach my $idx ( 0..($include->@*-1) ) {
+    foreach my $idx ( 0 .. ( $include->@* - 1 ) ) {
 
         if ( !$include->[$idx] ) {
 
@@ -341,17 +341,17 @@ sub overlay ( $self, @args ) {
 }
 
 
-package
-  CXC::Number::Grid::Range {
+package CXC::Number::Grid::Range {
     use Moo;
     use experimental 'signatures';
     use experimental 'declared_refs';
     use experimental 'refaliasing';
 
-    use overload fallback => 0,
-      bool => sub { 1 },
-      '""' => \&to_string,
-      '.'  => \&concatenate;
+    use overload
+      fallback => 0,
+      bool     => sub { 1 },
+      '""'     => \&to_string,
+      '.'      => \&concatenate;
 
     has layer   => ( is => 'ro' );
     has include => ( is => 'ro' );
@@ -363,15 +363,15 @@ package
         my \%args = ref $args[0] ? $args[0] : {@args};
 
         @args{ 'layer', 'include' } = delete( $args{value} )->@*
-          if defined $args{value };
+          if defined $args{value};
 
         return $class->$orig( \%args );
     };
 
-    sub to_string ( $self, $=, $= ) {
-        my $ub = $self->ub // 'undef';
-        my $lb = $self->lb // 'undef';
-        my $layer = $self->layer // 'undef';
+    sub to_string ( $self, $ =, $ = ) {
+        my $ub      = $self->ub      // 'undef';
+        my $lb      = $self->lb      // 'undef';
+        my $layer   = $self->layer   // 'undef';
         my $include = $self->include // 'undef';
         "( $lb, $ub ) => { layer => $layer, include => $include }";
     }
@@ -399,12 +399,6 @@ sub _dump_tree ( $tree ) {
     say "------------";
 }
 
-sub _reset_layer ( $tree ) {
-    my $ic = $tree->range_iter_closure;
-    while ( my ( $v, $lb, $ub ) = $ic->() ) {
-        defined $v and $v->[0] = 1;
-    }
-}
 
 
 
@@ -509,7 +503,7 @@ sub overlay_n {
     my $gi = 0;
     for my $grid ( $grids->@* ) {
         ++$gi;
-        my $edges  = $grid->_raw_edges;
+        my $edges   = $grid->_raw_edges;
         my $include = $grid->include;
         $tr->range_set(
             $edges->[$_],
@@ -518,10 +512,8 @@ sub overlay_n {
 
         # snap bin edges if they are from different grids and are too close.
         # do this in the loop so that there are only two grids at a time
-        if ( $gi > 1 ) {
-            _snap_to( $tr, $opt->{snap_to}, $opt->{snap_dist} );
-            _reset_layer( $tr );
-        }
+        _snap_to( $tr, $gi, $opt->{snap_to}, $opt->{snap_dist} )
+          if $gi > 1;
     }
 
 
@@ -542,7 +534,7 @@ sub overlay_n {
     return __PACKAGE__->new( edges => \@edges, include => \@include );
 }
 
-sub _snap_to ( $tr, $snap_to, $snap_dist ) {
+sub _snap_to ( $tr, $layer, $snap_to, $snap_dist ) {
 
     return if $snap_dist == 0;
 
@@ -550,15 +542,15 @@ sub _snap_to ( $tr, $snap_to, $snap_dist ) {
     # to visit a predecessor.  It essentially only allows one way
     # tree traversal, so we need to traverse it forwards to handle
     # snapping to the right, and backwards to handle snapping to the left.
-    _merge_bins( $tr, $snap_dist, $snap_to, $_ ) for qw( right left );
+    _merge_bins( $tr, $layer, $snap_dist, $snap_to, $_ ) for qw( right left );
 }
 
-sub _merge_bins ( $tr, $snap_dist, $snap_to, $scan_direction ) {
+sub _merge_bins ( $tr, $layer, $snap_dist, $snap_to, $scan_direction ) {
 
     defined( my $scan_reversed = { right => 0, left => 1 }->{$scan_direction} )
       // die( "illegal scan direction: '$scan_direction'" );
 
-    my sub iter ( $key=undef ) {
+    my sub iter ( $key = undef ) {
         my $iter = $tr->range_iter_closure( $key, $scan_reversed );
         # first range goes from +-inf to real bound; remove
         $iter->() unless defined $key;
@@ -616,7 +608,8 @@ sub _merge_bins ( $tr, $snap_dist, $snap_to, $scan_direction ) {
 
     while ( defined( $next = next_range() ) ) {
 
-        if ( abs( $current->ub - $current->lb ) <= $snap_dist
+        if (   abs( $current->ub - $current->lb ) <= $snap_dist
+            && $next->layer == $layer
             && $current->layer < $next->layer )
         {
             $snap->();
@@ -764,7 +757,7 @@ sub join_n {
             my $delta = $redges->[0] - $edges->[-1];
             $_ += $delta for $edges->@*;
             pop @$edges;
-            push @$edges,  $redges->@*;
+            push @$edges,   $redges->@*;
             push @$include, $rinclude->@*;
         },
 
@@ -784,7 +777,7 @@ sub join_n {
             my ( $edges, $include, $redges, $rinclude ) = @_;
 
             pop @$edges;
-            push @$edges,  $redges->@*;
+            push @$edges,   $redges->@*;
             push @$include, $rinclude->@*;
         },
 
@@ -819,7 +812,7 @@ sub join_n {
             if ( $edges->[-1] == $redges->[0] ) {
 
                 pop @$edges;
-                push @$edges,  $redges->@*;
+                push @$edges,   $redges->@*;
                 push @$include, $rinclude->@*;
             }
             elsif ( $edges->[-1] < $redges->[0] ) {
@@ -839,7 +832,7 @@ sub join_n {
             if ( $edges->[-1] == $redges->[0] ) {
 
                 pop @$edges;
-                push @$edges,  $redges->@*;
+                push @$edges,   $redges->@*;
                 push @$include, $rinclude->@*;
             }
             elsif ( $edges->[-1] < $redges->[0] ) {
@@ -867,7 +860,7 @@ sub join_n {
                       snap-both
                       include
                       exclude
-                      )
+                    )
                 ],
             ],
         ],
@@ -889,7 +882,7 @@ sub join_n {
     my ( $left, @rest ) = @grid_idx;
     my $gl = $grids->[$left];
 
-    my @edges  = $gl->_raw_edges->@*;
+    my @edges   = $gl->_raw_edges->@*;
     my @include = $gl->_include->@*;
 
     my $gr;
@@ -946,12 +939,12 @@ sub join_n {
 
 
 
-sub bignum ($self) {
+sub bignum ( $self ) {
     require Moo::Role;
     return Moo::Role->apply_roles_to_object(
-                                            __PACKAGE__->new( edges => $self->_raw_edges ),
-                                            __PACKAGE__ . '::Role::BigNum',
-                                           );
+        __PACKAGE__->new( edges => $self->_raw_edges ),
+        __PACKAGE__ . '::Role::BigNum',
+    );
 }
 
 
@@ -969,12 +962,12 @@ sub bignum ($self) {
 
 
 
-sub pdl ($self) {
+sub pdl ( $self ) {
     require Moo::Role;
     return Moo::Role->apply_roles_to_object(
-                                            __PACKAGE__->new( edges => $self->_raw_edges ),
-                                            __PACKAGE__ . '::Role::PDL',
-                                           );
+        __PACKAGE__->new( edges => $self->_raw_edges ),
+        __PACKAGE__ . '::Role::PDL',
+    );
 }
 
 
@@ -1004,7 +997,7 @@ CXC::Number::Grid - A class representing a one dimensional numeric grid
 
 =head1 VERSION
 
-version 0.06
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -1026,7 +1019,23 @@ handle the consequences of inevitable numeric imprecision.
 
 Underneath the grid is stored as L<Math::BigFloat> objects.
 
-=head1 CONSTRUCTOR
+=head1 OBJECT ATTRIBUTES
+
+=head2 oob
+
+A boolean, which, if true, indicates that extra bins are added to
+either end of the grid which catch values outside of the range of the
+grid.
+
+=head2 edges
+
+An array of ascending numbers which represent the edges of the bins in the grid.
+
+=head2 include
+
+An array of flags (C<0>, C<1>), one per bin, indicating whether the bin should be included when binning or not.
+
+=head1 CONSTRUCTORS
 
 =head2 new
 
@@ -1054,22 +1063,6 @@ will be C<POSIX::DBL_MAX>.  This allows out-of-bounds data to be accumulated
 at the front and back of the grid.
 
 =back
-
-=head1 ATTRIBUTES
-
-=head2 oob
-
-A boolean, which, if true, indicates that extra bins are added to
-either end of the grid which catch values outside of the range of the
-grid.
-
-=head2 edges
-
-An array of ascending numbers which represent the edges of the bins in the grid.
-
-=head2 include
-
-An array of flags (C<0>, C<1>), one per bin, indicating whether the bin should be included when binning or not.
 
 =head1 METHODS
 
@@ -1392,17 +1385,25 @@ Add a new bin, and mark it as being excluded
 
 =back
 
+=head1 INTERNALS
+
 =for Pod::Coverage BUILD
 
-=head1 BUGS
+=head1 SUPPORT
 
-Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number> or by email
-to L<bug-cxc-number@rt.cpan.org|mailto:bug-cxc-number@rt.cpan.org>.
+=head2 Bugs
 
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/cxc-number
+
+and may be cloned from
+
+  https://gitlab.com/djerius/cxc-number.git
 
 =head1 SEE ALSO
 

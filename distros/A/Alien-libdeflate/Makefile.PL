@@ -21,24 +21,21 @@ WriteMakefile($abmm->mm_args(
     },
   },
   CONFIGURE_REQUIRES => {
-    'Alien::Build' => '1.41',
+    'Alien::Build'        => '1.41',
+    'Alien::Build::MM'    => '1.41',
+    'ExtUtils::MakeMaker' => '6.52',
   },
   BUILD_REQUIRES => {
     'Alien::Build'        => '1.41',
     'Alien::Build::MM'    => '1.41',
-    'Alien::gmake'        => '0',
-    'ExtUtils::MakeMaker' => '0',
-    'HTML::LinkExtor'     => '0',
-    'HTTP::Tiny'          => '0.044',
-    'IO::Socket::SSL'     => '0',
-    'Net::SSLeay'         => '0',
-    'Sort::Versions'      => '0',
-    'Test::More'          => '0.88',
-    'URI'                 => '0',
-    'URI::Escape'         => '0'
+    'ExtUtils::MakeMaker' => '6.52',
   },
   PREREQ_PM => {
-    'perl' => '5.008009'
+    'perl'        => '5.008009',
+    'Alien::Base' => '0.038',
+    'base'        => '0',
+    'strict'      => '0',
+    'warnings'    => '0',
   },
   test => {TESTS => (-e 'META.yml' ? 't/*.t' : 't/*.t xt/*.t')},
 ));

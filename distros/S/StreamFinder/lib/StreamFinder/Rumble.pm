@@ -476,7 +476,8 @@ sub new
 
 			$self->{'albumartist'} = 'https://rumble.com' . $1  if ($html =~ m#href\=\"([^\"]+)\" rel=author#s);
 
-			$self->{'description'} = $1  if ($html =~ m#\</span\>\s+[\-\x{2014}]+\s+\<\/span\>(.+?)\<\/div\>#s);
+			$self->{'description'} = $1  if ($html =~ m#\<div\s+class\=\"container\s+content\s+media\-description\"\>(.+?)\<\/div\>#s);
+			$self->{'description'} ||= $1  if ($html =~ m#\</span\>\s+[\-\x{2014}]+\s+\<\/span\>(.+?)\<\/div\>#s);
 			$self->{'description'} ||= $1  if ($html =~ m#\"description\"\:\"([^\"]+)#s);
 			$self->{'description'} ||= $1  if ($html =~ m#<meta\s+name\=description\"?\s+content\=\"\:\"([^\"]+)#s);
 			$self->{'description'} ||= $1  if ($html =~ m#<meta\s+property\=\"?og\:description\"?\s+content\=\"\:\"([^\"]+)#s);

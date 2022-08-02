@@ -1,10 +1,10 @@
 package CWB::Config;
 
-our $Prefix = '/usr/local/Cellar/cwb3/3.4.33';
-our $BinDir = '/usr/local/Cellar/cwb3/3.4.33/bin';
+our $Prefix = '/usr/local/opt/cwb3';
+our $BinDir = '/usr/local/opt/cwb3/bin';
 our $Registry = '/usr/local/share/cwb/registry';
-our $Version = '3.004033';
-our $VersionString = '3.4.33';
+our $Version = '3.005000';
+our $VersionString = '3.5.0';
 
 our $ValgrindCmd = "";
 

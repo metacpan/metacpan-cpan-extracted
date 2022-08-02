@@ -5,7 +5,7 @@ use warnings;
 package Benchmark::Featureset::ParamCheck::Implementation::DataValidator::Mouse;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.005';
+our $VERSION   = '0.006';
 
 use parent qw(Benchmark::Featureset::ParamCheck::Base::DataValidator);
 use Mouse v2.4.7 ();

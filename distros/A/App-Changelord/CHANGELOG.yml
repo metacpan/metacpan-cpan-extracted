@@ -1,0 +1,25 @@
+---
+project:
+  name: App::Changelord
+  homepage: https://git.babyl.ca/yanick/App-Changelord
+  with_stats: 1
+releases:
+  - version: v0.0.1
+    date: 2022-06-25
+    changes:
+      - Initial release
+      - desc: 'code churn: 27 files changed, 1281 insertions(+)'
+        type: stats
+change_types:
+  - keywords:
+      - feat
+    level: minor
+    title: Features
+  - keywords:
+      - fix
+    level: patch
+    title: Bug fixes
+  - keywords:
+      - stats
+    level: patch
+    title: Statistics

@@ -3,17 +3,18 @@
 use strict;
 use warnings;
 
+use Error::Pure;
+use Mo::utils qw(check_bool);
+
 $Error::Pure::TYPE = 'Error';
 
-use Mo::utils qw(check_isa);
-
 my $self = {
-        'key' => 'foo',
+        'key' => 'bad',
 };
-check_isa($self, 'key', 'Test::MockObject');
+check_bool($self, 'key');
 
 # Print out.
 print "ok\n";
 
 # Output like:
-# #Error [...utils.pm:?] Parameter 'key' must be a 'Test::MockObject' object.
+# #Error [..utils.pm:?] Parameter 'key' must be a bool (0/1).

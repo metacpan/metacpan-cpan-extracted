@@ -3,7 +3,7 @@ use utf8;
 use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   NAME           => 'Mojolicious::Plugin::Webpack',
-  AUTHOR         => 'Jan Henning Thorsen <jhthorsen@cpan.org>',
+  AUTHOR         => 'Jan Henning Thorsen <jan.henning@thorsen.pm>',
   LICENSE        => 'artistic_2',
   ABSTRACT_FROM  => 'lib/Mojolicious/Plugin/Webpack.pm',
   VERSION_FROM   => 'lib/Mojolicious/Plugin/Webpack.pm',

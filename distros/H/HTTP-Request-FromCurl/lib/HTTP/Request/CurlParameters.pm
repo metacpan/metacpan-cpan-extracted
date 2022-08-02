@@ -14,7 +14,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.37';
+our $VERSION = '0.40';
 
 =head1 NAME
 
@@ -133,6 +133,20 @@ has credentials => (
 
 =item *
 
+C<auth>
+
+    auth => 'basic'
+
+The authentication method to use.
+
+=cut
+
+has auth => (
+    is => 'ro',
+);
+
+=item *
+
 C<post_data>
 
     post_data => ['A string','across multiple','scalars']
@@ -171,6 +185,20 @@ The timeout for the request
 =cut
 
 has timeout => (
+    is => 'ro',
+);
+
+=item *
+
+C<unix_socket>
+
+    unix_socket => '/var/run/docker/docker.sock'
+
+The timeout for the request
+
+=cut
+
+has unix_socket => (
     is => 'ro',
 );
 
@@ -825,7 +853,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2018-2021 by Max Maischein C<corion@cpan.org>.
+Copyright 2018-2022 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

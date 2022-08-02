@@ -1,14 +1,17 @@
 ---
 abstract: 'serializer for handling XML data'
 author:
-  - 'Ian Gibbs <igibbs@>'
+  - 'Ian Gibbs <igibbs@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Module::Runtime: '0'
+  Plack::Test: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -17,6 +20,8 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
-version: '0.04'
+requires:
+  Class::Load: '0'
+  Moo: '0'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

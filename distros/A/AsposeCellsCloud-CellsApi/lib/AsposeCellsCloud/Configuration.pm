@@ -116,7 +116,7 @@ sub new {
 
 	# class/static variables
 	$p{http_timeout} //= 180;
-	$p{http_user_agent} //= 'Swagger-Codegen/22.5/perl';
+	$p{http_user_agent} //= 'Swagger-Codegen/22.7/perl';
 
 	# authentication setting
 	$p{api_key} //= {};

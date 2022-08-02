@@ -20,24 +20,24 @@ resources (
 );
 
 test_requires (
-  'Test::More'          => 0,
-  'Test::Exception'     => 0,
-  'SQL::Abstract::Test' => 0,
-  'List::MoreUtils'     => 0,
+  'Test::More'             => 0,
+  'Test::Exception'        => 0,
+  'SQL::Abstract::Test'    => 0,
+  'List::MoreUtils'        => 0,
 );
 
 
 requires (
-  'MRO::Compat'          => 0,
-  'SQL::Abstract'        => 1.73,
-  'Params::Validate'     => 0,
-  'parent'               => 0,
-  'namespace::clean'     => 0,
-  'Scalar::Util'         => 0,
+  'MRO::Compat'            => 0,
+  'SQL::Abstract::Classic' => 0,
+  'Params::Validate'       => 0,
+  'parent'                 => 0,
+  'namespace::clean'       => 0,
+  'Scalar::Util'           => 0,
 );
 
 recommends (
-  'SQL::Abstract::Classic' => 0,
+  'SQL::Abstract'          => 1.73,
  );
 
 

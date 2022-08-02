@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.552-8-g2c387616
+package JSON::Schema::Modern; # git description: v0.553-6-gde7ad62b
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.553';
+our $VERSION = '0.554';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -28,7 +28,7 @@ use File::ShareDir 'dist_dir';
 use Module::Runtime qw(use_module require_module);
 use MooX::TypeTiny 0.002002;
 use MooX::HandlesVia;
-use Types::Standard 1.010002 qw(Bool Int Str HasMethods Enum InstanceOf HashRef Dict CodeRef Optional slurpy ArrayRef Undef ClassName Tuple Map);
+use Types::Standard 1.016003 qw(Bool Int Str HasMethods Enum InstanceOf HashRef Dict CodeRef Optional Slurpy ArrayRef Undef ClassName Tuple Map);
 use Feature::Compat::Try;
 use JSON::Schema::Modern::Error;
 use JSON::Schema::Modern::Result;
@@ -109,7 +109,7 @@ has _format_validations => (
   is => 'bare',
   isa => my $format_type = Dict[
     (map +($_ => Optional[CodeRef]), qw(date-time date time duration email idn-email hostname idn-hostname ipv4 ipv6 uri uri-reference iri iri-reference uuid uri-template json-pointer relative-json-pointer regex)),
-    slurpy HashRef[Dict[type => Enum[qw(null object array boolean string number integer)], sub => CodeRef]],
+    Slurpy[HashRef[Dict[type => Enum[qw(null object array boolean string number integer)], sub => CodeRef]]],
   ],
   init_arg => 'format_validations',
   handles_via => 'Hash',
@@ -593,7 +593,7 @@ has _resource_index => (
       # the vocabularies used when evaluating instance data against schema
       vocabularies => ArrayRef[my $vocabulary_class_type = ClassName->where(q{$_->DOES('JSON::Schema::Modern::Vocabulary')})],
       configs => HashRef,
-      slurpy HashRef[Undef],  # no other fields allowed
+      Slurpy[HashRef[Undef]],  # no other fields allowed
     ]],
   handles_via => 'Hash',
   handles => {
@@ -962,7 +962,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.553
+version 0.554
 
 =head1 SYNOPSIS
 
@@ -1004,11 +1004,11 @@ May be one of:
 
 =item *
 
-L<C<draft2020-12> or C<2020-12>|https://json-schema.org/specification-links.html#2020-12>, corresponding to metaschema C<https://json-schema.org/draft/2020-12/schema>.
+L<C<draft2020-12> or C<2020-12>|https://json-schema.org/specification-links.html#2020-12>, corresponding to metaschema C<https://json-schema.org/draft/2020-12/schema>
 
 =item *
 
-L<C<draft2019-09> or C<2019-09>|https://json-schema.org/specification-links.html#2019-09-formerly-known-as-draft-8>, corresponding to metaschema C<https://json-schema.org/draft/2019-09/schema>.
+L<C<draft2019-09> or C<2019-09>|https://json-schema.org/specification-links.html#2019-09-formerly-known-as-draft-8>, corresponding to metaschema C<https://json-schema.org/draft/2019-09/schema>
 
 =item *
 

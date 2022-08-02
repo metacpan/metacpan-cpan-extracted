@@ -14,6 +14,7 @@ my $tpm = Test::Prereq::Meta->new(
     accept	=> [ qw{
 	Browser::Open
 	Config::Identity
+	File::Glob
 	Term::ReadLine
 	Time::HiRes
 	} ],

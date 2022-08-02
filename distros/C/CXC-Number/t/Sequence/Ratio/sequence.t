@@ -16,10 +16,10 @@ sub expect {
     my @w = map { $w0 * $ratio**$_ } 0 .. $nelem - 2;
 
     ro_hash( {
-        min       => 0.5,
-        w0        => $w0,
-        ratio     => $ratio,
-        elements  => [ reductions { $a + $b } 0.5, @w ],
+        min      => 0.5,
+        w0       => $w0,
+        ratio    => $ratio,
+        elements => [ reductions { $a + $b } 0.5, @w ],
     } );
 }
 
@@ -33,7 +33,8 @@ sub test_sequence {
 
   SKIP: {
         my $sequence;
-        $bool = ok( lives { $sequence = Sequence->new( %pars ) },
+        $bool
+          = ok( lives { $sequence = Sequence->new( %pars ) },
             'create sequence' )
           or do { diag $@; skip 1 };
 
@@ -61,7 +62,7 @@ my %tests = (
             min   => $exp->min,
             w0    => $exp->w0,
             ratio => $exp->ratio,
-            nelem => 0+$exp->elements->@*,
+            nelem => 0+ $exp->elements->@*,
         );
     },
 
@@ -70,10 +71,10 @@ my %tests = (
 
         test_sequence(
             $exp,
-            max => $exp->elements->[-1],
-            w0  => ( $exp->elements->[-1] - $exp->elements->[-2] ),
-            ratio => 1/$exp->ratio,
-            nelem => 0+$exp->elements->@*,
+            max   => $exp->elements->[-1],
+            w0    => ( $exp->elements->[-1] - $exp->elements->[-2] ),
+            ratio => 1 / $exp->ratio,
+            nelem => 0+ $exp->elements->@*,
         );
     },
 
@@ -101,7 +102,7 @@ my %tests = (
             soft_min => ( $exp->elements->[0] + $exp->elements->[1] ) / 2,
             max      => $exp->elements->[-1],
             w0       => ( $exp->elements->[-2] - $exp->elements->[-1] ),
-            ratio => 1/$exp->ratio,
+            ratio    => 1 / $exp->ratio,
         );
     },
 
@@ -117,15 +118,25 @@ my %tests = (
                 my ( $w0, $ratio ) = do {
 
                     if ( $idx == 0 ) {
-                        ( $exp->elements->[1] - $exp->elements->[0], $exp->ratio )
+                        (
+                            $exp->elements->[1] - $exp->elements->[0],
+                            $exp->ratio
+                        )
                     }
                     elsif ( $idx == -1 ) {
    # need to generate the width of the bin whose minimum is the largest bin edge
    # that depends upon whether the bins grew to the left or to the right
-                        ( $exp->elements->[-2] - $exp->elements->[-1], 1 / $exp->ratio )
+                        (
+                            $exp->elements->[-2] - $exp->elements->[-1],
+                            1 / $exp->ratio
+                        );
                     }
                     else {
-                        ( $exp->elements->[ $idx + 1 ] - $exp->elements->[$idx], $exp->ratio )
+                        (
+                            $exp->elements->[ $idx + 1 ]
+                              - $exp->elements->[$idx],
+                            $exp->ratio
+                        )
                     }
                 };
 
@@ -135,9 +146,8 @@ my %tests = (
      # which should drag in another bin
                     e0  => $E0,
                     min => ( $exp->elements->[0] + $exp->elements->[1] ) / 2,
-                    max => ( $exp->elements->[-2] + $exp->elements->[-1] )
-                      / 2,
-                    w0    => $w0,
+                    max => ( $exp->elements->[-2] + $exp->elements->[-1] ) / 2,
+                    w0  => $w0,
                     ratio => $ratio,
                 );
             };

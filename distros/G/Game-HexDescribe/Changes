@@ -1,3 +1,10 @@
+1.01
+
+- Add a subcommand for the command line: "hex-describe rule --help"
+  for more information.
+- More rules for the Schroeder tables.
+- Add Forke's tables (German).
+
 1.00
 
 - New, extracted from a previous repository where it was mixed with

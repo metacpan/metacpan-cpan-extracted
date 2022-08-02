@@ -2,7 +2,7 @@ package Plack::App::ServiceStatus::DBIC;
 
 # ABSTRACT: Check DBIC connection
 
-our $VERSION = '0.904'; # VERSION
+our $VERSION = '0.906'; # VERSION
 
 use 5.018;
 use strict;
@@ -35,7 +35,7 @@ Plack::App::ServiceStatus::DBIC - Check DBIC connection
 
 =head1 VERSION
 
-version 0.904
+version 0.906
 
 =head1 SYNOPSIS
 
@@ -70,7 +70,7 @@ Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 - 2021 by Thomas Klausner.
+This software is copyright (c) 2016 - 2022 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

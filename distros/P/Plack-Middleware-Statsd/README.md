@@ -4,7 +4,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 # VERSION
 
-version v0.5.1
+version v0.6.0
 
 # SYNOPSIS
 
@@ -45,7 +45,7 @@ to a statsd server.
 
 ## client
 
-This is a statsd client, such as an instance of [Net::Statsd::Tiny](https://metacpan.org/pod/Net::Statsd::Tiny).
+This is a statsd client, such as an instance of [Net::Statsd::Tiny](https://metacpan.org/pod/Net%3A%3AStatsd%3A%3ATiny).
 
 It is required.
 
@@ -53,15 +53,15 @@ It is required.
 set.
 
 The only restriction on the client is that it has the same API as
-[Net::Statsd::Tiny](https://metacpan.org/pod/Net::Statsd::Tiny) or similar modules, by supporting the following
+[Net::Statsd::Tiny](https://metacpan.org/pod/Net%3A%3AStatsd%3A%3ATiny) or similar modules, by supporting the following
 methods:
 
 - `increment`
 - `timing_ms` or `timing`
 - `set_add`
 
-This has been tested with [Net::Statsd::Lite](https://metacpan.org/pod/Net::Statsd::Lite) and
-[Net::Statsd::Client](https://metacpan.org/pod/Net::Statsd::Client).
+This has been tested with [Net::Statsd::Lite](https://metacpan.org/pod/Net%3A%3AStatsd%3A%3ALite) and
+[Net::Statsd::Client](https://metacpan.org/pod/Net%3A%3AStatsd%3A%3AClient).
 
 Other statsd client modules may be used via a wrapper class.
 
@@ -200,7 +200,7 @@ The following metrics are logged:
     The header is configured using the `plack.xsendfile.type` environment
     key, otherwise the `HTTP_X_SENDFILE_TYPE` environment variable.
 
-    See [Plack::Middleware::XSendfile](https://metacpan.org/pod/Plack::Middleware::XSendfile) for more information.
+    See [Plack::Middleware::XSendfile](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3AXSendfile) for more information.
 
 - `psgi.worker.pid`
 
@@ -238,16 +238,16 @@ sub finalize {
 }
 ```
 
-Alternatively, you can use [Catalyst::Plugin::Statsd](https://metacpan.org/pod/Catalyst::Plugin::Statsd).
+Alternatively, you can use [Catalyst::Plugin::Statsd](https://metacpan.org/pod/Catalyst%3A%3APlugin%3A%3AStatsd).
 
 ## Using with Plack::Middleware::SizeLimit
 
-[Plack::Middleware::SizeLimit](https://metacpan.org/pod/Plack::Middleware::SizeLimit) version 0.11 supports callbacks that
+[Plack::Middleware::SizeLimit](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3ASizeLimit) version 0.11 supports callbacks that
 allow you to monitor process size information.  In your `app.psgi`:
 
 ```perl
 use Net::Statsd::Tiny;
-use Try::Tiny;
+use Feature::Compat::Try;
 
 my $statsd = Net::Statsd::Tiny->new( ... );
 
@@ -268,8 +268,8 @@ builder {
             $statsd->timing_ms('psgi.proc.shared', $shared);
             $statsd->timing_ms('psgi.proc.unshared', $unshared);
         }
-        catch {
-            warn $_;
+        catch($e) {
+            warn $e;
         };
     };
 ```
@@ -279,13 +279,13 @@ builder {
 ## Non-standard HTTP status codes
 
 If your application is returning a status code that is not handled by
-[HTTP::Status](https://metacpan.org/pod/HTTP::Status), then the metrics may not be logged for that reponse.
+[HTTP::Status](https://metacpan.org/pod/HTTP%3A%3AStatus), then the metrics may not be logged for that reponse.
 
 # SEE ALSO
 
-[Net::Statsd::Client](https://metacpan.org/pod/Net::Statsd::Client)
+[Net::Statsd::Client](https://metacpan.org/pod/Net%3A%3AStatsd%3A%3AClient)
 
-[Net::Statsd::Tiny](https://metacpan.org/pod/Net::Statsd::Tiny)
+[Net::Statsd::Tiny](https://metacpan.org/pod/Net%3A%3AStatsd%3A%3ATiny)
 
 [PSGI](https://metacpan.org/pod/PSGI)
 
@@ -312,7 +312,7 @@ Library [https://www.sciencephoto.com](https://www.sciencephoto.com).
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2021 by Robert Rothenberg.
+This software is Copyright (c) 2018-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

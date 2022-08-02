@@ -1,3 +1,17 @@
+1.01 2022-07-23
+
+- [feature] Test, validate, and generate attributes the same as methods
+- [feature] Export (on-demand) catch, error, and raise from Venus::{Class,Role}
+- [update] Unravel and flattern roles
+- [update] Expose errors on require of classes and roles
+
+1.00 2022-07-22
+
+- [change] Replace Moo with Mars architecture
+- [feature] Auto-generate VERSION from the main module
+- [update] Fix Venus::Date#rfc822 test example 1 on Windows
+- [update] Fix Venus::String#camelcase, add pascalcase
+
 0.09 2022-06-28
 
 - [feature] Include Venus::Test in the library

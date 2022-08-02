@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Warper 2.150;
+package Config::Model::Warper 2.152;
 
 use Mouse;
 
@@ -623,7 +623,7 @@ Config::Model::Warper - Warp tree properties
 
 =head1 VERSION
 
-version 2.150
+version 2.152
 
 =head1 SYNOPSIS
 

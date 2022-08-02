@@ -6,12 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Perl/Critic/Dancer2.pm',
     'Perl/Critic/Policy/Dancer2/ProhibitDeprecatedKeywords.pm',
-    'Perl/Critic/Policy/Dancer2/ProhibitUnrecommendedKeywords.pm'
+    'Perl/Critic/Policy/Dancer2/ProhibitUnrecommendedKeywords.pm',
+    'Perl/Critic/Policy/Dancer2/ReturnNotNecessary.pm'
 );
 
 

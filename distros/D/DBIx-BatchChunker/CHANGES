@@ -1,6 +1,13 @@
 Changelog for DBIx-BatchChunker
 
-v0.941.1 2022-04-11T20:32:47
+v1.0.0 2022-07-28T17:19:52
+ - Add POD coverage exception for 'debug' (Brendan Byrd)
+ - Pull request #11: SRE-5577 (Brendan Byrd)
+ - Update README / Prep for version v1.0.0 (Brendan Byrd)
+ - Rename 'debug' to 'verbose' and set its default to on (Brendan Byrd)
+ - Change the defaults for 'chunk_size' and 'sleep' (Brendan Byrd)
+
+v0.941.1 2022-04-11T20:29:36
  - Pull request #10: SRE-5264 (Brendan Byrd)
  - Update README / LICENSE (Brendan Byrd)
  - Add safeguard when chunk resizing reaches exactly 1 ID (Brendan Byrd)
@@ -46,6 +53,9 @@ v0.940.1 2020-05-08T19:25:47
  - Move xt tests where they belong (Andrew Hewus Fresh)
  - Convert to Dist::Zilla::PluginBundle::Author::GSG (Andrew Hewus Fresh)
 
+v0.940.0 2019-08-06T22:24:54
+ - No changes found
+
 0.94 2019-08-06T22:24:54
  - Fix attribute typo in SYNOPSIS (Brendan Byrd)
  - Update version date in CHANGES (Brendan Byrd)
@@ -53,9 +63,6 @@ v0.940.1 2020-05-08T19:25:47
    (Brendan Byrd)
  - SM-1828: Prep for new version 0.94 (Brendan Byrd)
  - SM-1828: Change boolean $rs calls to "defined $rs" (Brendan Byrd)
-
-v0.940.0 2019-08-06T22:24:54
- - No changes found
 
 0.93 2019-01-09T20:08:59
  - SM-1647: Prep for new version 0.93 (Brendan Byrd)

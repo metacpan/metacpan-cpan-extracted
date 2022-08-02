@@ -10,7 +10,7 @@ use Moo;
 use namespace::clean;
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 ########################################################################
 #
@@ -18,18 +18,18 @@ our $VERSION = '1.10';
 
 # these are taken from common scale names on a slide rule; see code for
 # how they are populated
-has A => (is => 'lazy',);
-has C => (is => 'lazy',);
+has A => ( is => 'lazy', );
+has C => ( is => 'lazy', );
 
-sub _build_A { $_[0]->_range_exp_weighted(1, 100) }
-sub _build_C { $_[0]->_range_exp_weighted(1, 10) }
+sub _build_A { $_[0]->_range_exp_weighted( 1, 100 ) }
+sub _build_C { $_[0]->_range_exp_weighted( 1, 10 ) }
 
 # increased precision comes at the cost of additional memory use
 #
 # NOTE changing the precision after A, C and so forth have been
 # generated will do nothing to those values. instead, construct a new
 # object with a different precision set, if necessary
-has precision => (is => 'rw', default => sub { 10_000 });
+has precision => ( is => 'rw', default => sub { 10_000 } );
 
 ########################################################################
 #
@@ -45,14 +45,14 @@ has precision => (is => 'rw', default => sub { 10_000 });
 # NOTE that these scales are not calibrated directly to one another
 # as they would be on a slide rule
 sub _range_exp_weighted {
-    my ($self, $min, $max) = @_;
+    my ( $self, $min, $max ) = @_;
 
     my @range = map log, $min, $max;
-    my (@values, @distances);
+    my ( @values, @distances );
 
-    my $slope = ($range[1] - $range[0]) / $self->precision;
+    my $slope = ( $range[1] - $range[0] ) / $self->precision;
 
-    for my $d (0 .. $self->precision) {
+    for my $d ( 0 .. $self->precision ) {
         # via slope equation; y = mx + b and m = (y2-y1)/(x2-x1) with
         # assumption that precision 0..$mp and @range[min,max]
         push @distances, $slope * $d + $range[0];
@@ -69,16 +69,16 @@ sub _range_exp_weighted {
 # standard_form to lie somewhere on or between the minimum and maximum
 # values in the given array reference
 sub _rank {
-    my ($self, $value, $ref) = @_;
+    my ( $self, $value, $ref ) = @_;
 
     my $lo = 0;
     my $hi = $#$ref;
 
-    while ($lo <= $hi) {
-        my $mid = int($lo + ($hi - $lo) / 2);
-        if ($ref->[$mid] > $value) {
+    while ( $lo <= $hi ) {
+        my $mid = int( $lo + ( $hi - $lo ) / 2 );
+        if ( $ref->[$mid] > $value ) {
             $hi = $mid - 1;
-        } elsif ($ref->[$mid] < $value) {
+        } elsif ( $ref->[$mid] < $value ) {
             $lo = $mid + 1;
         } else {
             return $mid;
@@ -86,10 +86,10 @@ sub _rank {
     }
 
     # no exact match; return index of value closest to the numeral supplied
-    if ($lo > $#$ref) {
+    if ( $lo > $#$ref ) {
         return $hi;
     } else {
-        if (abs($ref->[$lo] - $value) >= abs($ref->[$hi] - $value)) {
+        if ( abs( $ref->[$lo] - $value ) >= abs( $ref->[$hi] - $value ) ) {
             return $hi;
         } else {
             return $lo;
@@ -110,12 +110,13 @@ sub divide {
     my $n    = shift;
     my $i    = 0;
 
-    die "need at least two numbers\n"      if @_ < 1;
-    die "argument index $i not a number\n" if !defined $n or !looks_like_number($n);
+    die "need at least two numbers\n" if @_ < 1;
+    die "argument index $i not a number\n"
+      unless defined $n and looks_like_number($n);
 
-    my ($n_coe, $n_exp, $neg_count) = $self->standard_form($n);
+    my ( $n_coe, $n_exp, $neg_count ) = $self->standard_form($n);
 
-    my $n_idx    = $self->_rank($n_coe, $self->C->{value});
+    my $n_idx    = $self->_rank( $n_coe, $self->C->{value} );
     my $distance = $self->C->{dist}[$n_idx];
     my $exponent = $n_exp;
 
@@ -125,19 +126,19 @@ sub divide {
 
         $neg_count++ if $m < 0;
 
-        my ($m_coe, $m_exp, undef) = $self->standard_form($m);
-        my $m_idx = $self->_rank($m_coe, $self->C->{value});
+        my ( $m_coe, $m_exp, undef ) = $self->standard_form($m);
+        my $m_idx = $self->_rank( $m_coe, $self->C->{value} );
 
         $distance -= $self->C->{dist}[$m_idx];
         $exponent -= $m_exp;
 
-        if ($distance < $self->C->{dist}[0]) {
+        if ( $distance < $self->C->{dist}[0] ) {
             $distance = $self->C->{dist}[-1] + $distance;
             $exponent--;
         }
     }
 
-    my $d_idx   = $self->_rank($distance, $self->C->{dist});
+    my $d_idx   = $self->_rank( $distance, $self->C->{dist} );
     my $product = $self->C->{value}[$d_idx];
 
     $product *= 10**$exponent;
@@ -151,10 +152,11 @@ sub multiply {
     my $n    = shift;
     my $i    = 0;
 
-    die "need at least two numbers\n"      if @_ < 1;
-    die "argument index $i not a number\n" if !defined $n or !looks_like_number($n);
+    die "need at least two numbers\n" if @_ < 1;
+    die "argument index $i not a number\n"
+      unless defined $n and looks_like_number($n);
 
-    my ($n_coe, $n_exp, $neg_count) = $self->standard_form($n);
+    my ( $n_coe, $n_exp, $neg_count ) = $self->standard_form($n);
 
     # chain method has first lookup on D and then subsequent done by
     # moving C on slider and keeping tabs with the hairline, then reading
@@ -165,7 +167,7 @@ sub multiply {
     # one can also do the multiplication on the A and B scales, which is
     # handy if you then need to pull the square root off of D. but this
     # implementation ignores such alternatives
-    my $n_idx    = $self->_rank($n_coe, $self->C->{value});
+    my $n_idx    = $self->_rank( $n_coe, $self->C->{value} );
     my $distance = $self->C->{dist}[$n_idx];
     my $exponent = $n_exp;
 
@@ -175,8 +177,8 @@ sub multiply {
 
         $neg_count++ if $m < 0;
 
-        my ($m_coe, $m_exp, undef) = $self->standard_form($m);
-        my $m_idx = $self->_rank($m_coe, $self->C->{value});
+        my ( $m_coe, $m_exp, undef ) = $self->standard_form($m);
+        my $m_idx = $self->_rank( $m_coe, $self->C->{value} );
 
         $distance += $self->C->{dist}[$m_idx];
         $exponent += $m_exp;
@@ -187,13 +189,13 @@ sub multiply {
         # also obtain the value with the A and B or the CI and DI
         # scales, but those would then need some rule to track the
         # exponent change))
-        if ($distance > $self->C->{dist}[-1]) {
+        if ( $distance > $self->C->{dist}[-1] ) {
             $distance -= $self->C->{dist}[-1];
             $exponent++;
         }
     }
 
-    my $d_idx   = $self->_rank($distance, $self->C->{dist});
+    my $d_idx   = $self->_rank( $distance, $self->C->{dist} );
     my $product = $self->C->{value}[$d_idx];
 
     $product *= 10**$exponent;
@@ -205,27 +207,27 @@ sub multiply {
 # relies on conversion from A to C scales (and that the distances in
 # said scales are linked to one another)
 sub sqrt {
-    my ($self, $n) = @_;
-    die "argument not a number\n" if !defined $n or !looks_like_number($n);
+    my ( $self, $n ) = @_;
+    die "argument not a number\n" unless defined $n and looks_like_number($n);
     die "Can't take sqrt of $n\n" if $n < 0;
 
-    my ($n_coe, $n_exp, undef) = $self->standard_form($n);
+    my ( $n_coe, $n_exp, undef ) = $self->standard_form($n);
 
-    if ($n_exp % 2 == 1) {
+    if ( $n_exp % 2 == 1 ) {
         $n_coe *= 10;
         $n_exp--;
     }
 
-    my $n_idx = $self->_rank($n_coe, $self->A->{value});
+    my $n_idx = $self->_rank( $n_coe, $self->A->{value} );
 
     # NOTE division is due to A and C scale distances not being calibrated
     # directly with one another
     my $distance = $self->A->{dist}[$n_idx] / 2;
 
-    my $d_idx = $self->_rank($distance, $self->C->{dist});
+    my $d_idx = $self->_rank( $distance, $self->C->{dist} );
     my $sqrt  = $self->C->{value}[$d_idx];
 
-    $sqrt *= 10**($n_exp / 2);
+    $sqrt *= 10**( $n_exp / 2 );
 
     return $sqrt;
 }
@@ -234,7 +236,7 @@ sub sqrt {
 # between a particular range of numbers (to support A/B "double
 # decade" scales)
 sub standard_form {
-    my ($self, $val, $min, $max) = @_;
+    my ( $self, $val, $min, $max ) = @_;
 
     $min //= 1;
     $max //= 10;
@@ -244,13 +246,13 @@ sub standard_form {
     $val = abs $val;
     my $exp = 0;
 
-    if ($val < $min) {
-        while ($val < $min) {
+    if ( $val < $min ) {
+        while ( $val < $min ) {
             $val *= 10;
             $exp--;
         }
-    } elsif ($val >= $max) {
-        while ($val >= $max) {
+    } elsif ( $val >= $max ) {
+        while ( $val >= $max ) {
             $val /= 10;
             $exp++;
         }

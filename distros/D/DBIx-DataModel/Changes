@@ -1,5 +1,12 @@
 Revision history for Perl extension DBIx::DataModel.
 
+v3.03 23.07.2022
+  - forgot to update Build.PL to depend on SQL::Abstract::More v1.39
+
+v3.02 22.07.2022
+  - upgrade dependency on SQL::Abstract::More v1.37
+  - fix circular dependency in Meta::Utils
+  - fix documentation of Meta::Utils (API as functions instead of methods)
 
 v3.01 02.02.2021
   - upgrade dependency on SQL::Abstract::More v1.37

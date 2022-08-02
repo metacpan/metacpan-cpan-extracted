@@ -5,19 +5,18 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo::Role;
+use Venus::Role 'with';
 
-with 'Venus::Role::Buildable';
-with 'Venus::Role::Valuable';
+# AUDITS
 
-# BUILDERS
+sub AUDIT {
+  my ($self, $from) = @_;
 
-sub build_arg {
-  my ($self, $data) = @_;
+  if (!$from->does('Venus::Role::Valuable')) {
+    die "${self} requires ${from} to consume Venus::Role::Valuable";
+  }
 
-  return {
-    value => $data,
-  };
+  return $self;
 }
 
 # METHODS
@@ -32,6 +31,12 @@ sub set {
   my ($self, $value) = @_;
 
   return $self->value($value);
+}
+
+# EXPORTS
+
+sub EXPORT {
+  ['get', 'set']
 }
 
 1;
@@ -56,11 +61,12 @@ Accessible Role for Perl 5
 
   use Venus::Class;
 
+  with 'Venus::Role::Valuable';
   with 'Venus::Role::Accessible';
 
   package main;
 
-  my $example = Example->new('hello, there');
+  my $example = Example->new(value => 'hello, there');
 
 =cut
 
@@ -68,16 +74,6 @@ Accessible Role for Perl 5
 
 This package modifies the consuming package and provides a C<value> attribute
 as well as C<get> and C<set> methods for modifying the value.
-
-=cut
-
-=head1 INTEGRATES
-
-This package integrates behaviors from:
-
-L<Venus::Role::Buildable>
-
-L<Venus::Role::Valuable>
 
 =cut
 

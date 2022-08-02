@@ -4,7 +4,7 @@
       "Bob Faist <bob.faist@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4231",
    "keywords" : [
       "musicbrainz",
       "webservice"
@@ -14,7 +14,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "WebService-MusicBrainz",
    "prereqs" : {
@@ -33,7 +33,7 @@
    "provides" : {
       "WebService::MusicBrainz" : {
          "file" : "lib/WebService/MusicBrainz.pm",
-         "version" : "v1.0.5"
+         "version" : "v1.0.6"
       },
       "WebService::MusicBrainz::Request" : {
          "file" : "lib/WebService/MusicBrainz/Request.pm",
@@ -49,6 +49,6 @@
          "url" : "git://github.com/bfaist/webservice-musicbrainz.git"
       }
    },
-   "version" : "v1.0.5",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "v1.0.6",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

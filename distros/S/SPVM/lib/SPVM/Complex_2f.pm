@@ -1,34 +1,35 @@
 =head1 Name
 
-SPVM::Complex_2f - float complex type
+SPVM::Complex_2f - float Complex Type
 
 =head1 Usage
-
+  
+  use Complex_2f;
+  
   my $z : Complex_2f;
-  $z->{re} = 1;
-  $z->{im} = 2;
+  
+  # Set
+  $z->{re} = 1.5f;
+  $z->{im} = 2.5f;
+  
+  # Get
+  my $re = $z->{re};
+  my $im = $z->{im};
   
 =head1 Description
 
-Complex_2f is float complex type.
+C<Complex_2f> is a L<multi-numeric type|SPVM::Document::LanguageSpecification/"Multi-Numeric Type"> to represent a float complex number.
 
-This module is multi numeric type.
-
-  class Complex_2f : mulnum_t {
-    has re : float;
-    has im : float;
-  }
-
-=head1 Field Methods
+=head1 Fields
 
 =head2 re
 
   has re : float;
 
-Real number.
+A real number.
 
 =head2 im
 
   has im : float;
 
-Imaginary number.
+A imaginary number.

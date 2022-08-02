@@ -32,7 +32,11 @@ lib/Benchmark/Featureset/ParamCheck/Implementation/ParamsCheck/Perl.pm
 lib/Benchmark/Featureset/ParamCheck/Implementation/ParamsCheck/TypeTiny.pm
 lib/Benchmark/Featureset/ParamCheck/Implementation/Perl.pm
 lib/Benchmark/Featureset/ParamCheck/Implementation/RefUtilXS.pm
-lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams.pm
+lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams/Moose.pm
+lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams/Mouse.pm
+lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams/Specio.pm
+lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams/TypeNano.pm
+lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams/TypeTiny.pm
 t/01-named-correctness.t
 t/02-named-benchmark.t
 t/03-positional-correctness.t

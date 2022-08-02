@@ -6,7 +6,7 @@ use warnings;
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy::Variables::ProhibitLoopOnHash';
 
-our $VERSION = 'v1.0.2';
+our $VERSION = 'v1.0.3';
 
 sub default_severity { $SEVERITY_HIGH }
 sub default_themes { 'community' }

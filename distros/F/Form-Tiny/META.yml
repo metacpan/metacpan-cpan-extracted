@@ -3,32 +3,28 @@ abstract: 'Input validator centered around Type::Tiny'
 author:
   - 'Bartosz Jarzyna <bbrtj.pro@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
   Test::Exception: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Form-Tiny
-no_index:
-  directory:
-    - t
-    - inc
 requires:
   Import::Into: '0'
   Moo: '2.000000'
   Sub::Util: '0'
   Type::Tiny: '1.004000'
   namespace::clean: '0'
-  perl: '5.010001'
+  perl: '5.010'
 resources:
   bugtracker: https://github.com/bbrtj/perl-form-tiny/issues
   homepage: https://bbrtj.eu/project/form-tiny
-  license: https://dev.perl.org/licenses
-  repository: https://github.com/bbrtj/perl-form-tiny.git
-version: '2.12'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  repository: git://github.com/bbrtj/perl-form-tiny.git
+version: '2.13'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

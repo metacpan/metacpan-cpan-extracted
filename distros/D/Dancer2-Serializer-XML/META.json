@@ -1,16 +1,16 @@
 {
    "abstract" : "serializer for handling XML data",
    "author" : [
-      "Ian Gibbs <igibbs@>"
+      "Ian Gibbs <igibbs@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dancer2-Serializer-XML",
    "no_index" : {
@@ -31,10 +31,20 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "Class::Load" : "0",
+            "Moo" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Module::Runtime" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

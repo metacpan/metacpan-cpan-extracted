@@ -1,0 +1,26 @@
+# This file documents the revision history for Perl extension CatalystX-RequestModel.
+
+0.007 - TBD
+  - Specify newer Moo version in dependencies
+
+0.006 - 24 July 2022
+  - Fixed issue with incorrect error when there's an error creating the request model
+  
+0.005 - 23 July 2022
+  - JSON Content Body Parser throws an exception when the JSON in the body is
+    invalid.   This is an exception object that you can catch and handle or
+    use CatalystX::Errors.
+
+0.004 - 22 July 2022
+  - Added missing dependency
+
+0.003 - 21 July 2022
+  - fixed previous borked release (what I get for releasing while distracted)
+  
+0.002 - 21 July 2022
+  - fixed incorrect dependency version number
+
+0.001 - 20 July 2022
+  - First Release
+  - In memory of our Akita dog Sunshine, one year passed and greatly missed
+

@@ -64,6 +64,7 @@ my %module = (
         'PerlX::Maybe'             => 0,
         'MIME::Base64'             => 0,
         'JSON'                     => 0,
+        'File::Basename'           => 0, # core anyway
     },
     TEST_REQUIRES => {
         'Test::More'              => '0.88', # for done_testing support

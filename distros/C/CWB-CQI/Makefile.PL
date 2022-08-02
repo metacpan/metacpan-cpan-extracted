@@ -7,13 +7,13 @@ use warnings;
 
 use ExtUtils::MakeMaker;
 
-WriteMakefile( 
+WriteMakefile(
   NAME => "CWB::CQI",
   VERSION_FROM => "lib/CWB/CQI/Client.pm",
   LICENSE      => 'perl',
   META_MERGE   => {
     resources => {
-      homepage => 'http://cwb.sourceforge.net/',
+      homepage => 'https://cwb.sourceforge.io/',
       repository => 'http://svn.code.sf.net/p/cwb/code/perl/trunk',
     },
   },

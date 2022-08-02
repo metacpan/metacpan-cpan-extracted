@@ -1,6 +1,6 @@
 package Test::Trap::Builder::SystemSafe;
 
-use version; $VERSION = qv('0.3.4');
+use version; $VERSION = qv('0.3.5');
 
 use strict;
 use warnings;
@@ -141,7 +141,7 @@ Test::Trap::Builder::SystemSafe - "Safe" capture strategies using File::Temp
 
 =head1 VERSION
 
-Version 0.3.4
+Version 0.3.5
 
 =head1 DESCRIPTION
 

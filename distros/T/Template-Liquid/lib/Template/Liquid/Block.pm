@@ -1,5 +1,5 @@
 package Template::Liquid::Block;
-our $VERSION = '1.0.19';
+our $VERSION = '1.0.20';
 require Template::Liquid::Error;
 use base 'Template::Liquid::Document';
 use strict;
@@ -34,19 +34,23 @@ sub new {
     }, $class;
     $s->{'conditions'} = (
         $args->{'tag_name'} eq 'else' ? [1] : sub {    # Oh, what a mess...
-            my @conditions = split m[\s+\b(and|or)\b\s+]o,
+            my @conditions
+                = split
+                m/(?:\s+\b(and|or)\b\s+)(?![^"]*"(?:[^"]*"[^"]*")*[^"]*$)/o,
                 $args->{parent}->{tag_name} eq 'for'
                 ? 1
                 : (defined $args->{'attrs'} ? $args->{'attrs'} : '');
             my @equality;
             while (my $x = shift @conditions) {
-                push @equality, (
-                    $x =~ m[\b(?:and|or)\b]o           # XXX - ARG
+                push @equality,
+                    (
+                    $x
+                        =~ m/(?:\b(and|or)\b)(?![^"]*"(?:[^"]*"[^"]*")*[^"]*$)/o
                     ? bless({template  => $args->{'template'},
                              parent    => $s,
                              condition => $x,
                              lvalue    => pop @equality,
-                             rvalue =>
+                             rvalue    =>
                                  Template::Liquid::Condition->new(
                                           {template => $args->{'template'},
                                            parent   => $s,
@@ -62,10 +66,10 @@ sub new {
                                            parent   => $s,
                                           }
                     )
-                );
+                    );
             }
             \@equality;
-        }
+            }
             ->()
     );
     return $s;
@@ -75,6 +79,12 @@ sub new {
 =pod
 
 =encoding UTF-8
+
+=begin stopwords
+
+sorta whitespace Lütke jadedPixel
+
+=end stopwords
 
 =head1 NAME
 
@@ -118,7 +128,7 @@ The original Liquid template system was developed by jadedPixel
 
 =head1 License and Legal
 
-Copyright (C) 2009-2012 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+Copyright (C) 2009-2022 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of The Artistic License 2.0.  See the F<LICENSE> file included with

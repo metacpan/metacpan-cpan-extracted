@@ -7,7 +7,7 @@ use warnings;
 use Carp qw<croak confess>;
 
 use base qw(DynaLoader);
-our $VERSION = 'v3.4.33';
+our $VERSION = 'v3.5.0';
 
 ## load object library
 bootstrap CWB::CL $VERSION;
@@ -310,9 +310,9 @@ sub set_debug_level ( $ ) {
 
 =item CWB::CL::set_optimize(1);
 
-Enable experimental optimizations in the Corpus Library.  In the CWB 3.4 beta series leading up to CWB 3.5, the only optimization provides a minor speed-up for certain simple regular expressions.
+Enable experimental optimizations in the Corpus Library.
 
-Stable releases do not contain any experimental optimizations, so this option has no effect.
+Stable releases (including v3.5) do not contain any experimental optimizations, so this option has no effect at present.
 
 =cut
 
@@ -352,7 +352,7 @@ B<CWB::CL> offers some convenience functions for creating and manipulating featu
 
 =item I<$fs> = CWB::CL::make_set(I<$values> [, 's']);
 
-Create a feature set from I<$values>, which is either a string in feature set notation or a hashref.  In the first case, correct notation is checked and the values are sorted if necessary (CWB v3.4.29 and newer are more lenient and will automatically add the surrounding delimiters).  In the second case, a feature set is constructed from the keys of the hash I<%$values>.
+Create a feature set from I<$values>, which is either a string in feature set notation or a hashref.  In the first case, correct notation is checked and the values are sorted if necessary (CWB will automatically add the surrounding delimiters if need be).  In the second case, a feature set is constructed from the keys of the hash I<%$values>.
 
 If a second argument C<s> (or C<split>) is passed, the string I<$value> is split on whitespace.
 

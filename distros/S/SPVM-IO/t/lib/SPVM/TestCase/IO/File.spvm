@@ -101,7 +101,7 @@ class TestCase::IO::File {
         die "Can't open file $file";
       }
       
-      my $buffer = new byte[5];
+      my $buffer = (mutable string)new_string_len 5;
       {
         my $read_length = $io_file->read($buffer);
         unless ((string)$buffer eq "abcd\n") {
@@ -123,7 +123,7 @@ class TestCase::IO::File {
       }
       {
         my $read_length = $io_file->read($buffer);
-        unless ((string)Array->copy_range_byte($buffer, 0, 4) eq "klm\n") {
+        unless (Fn->substr($buffer, 0, 4) eq "klm\n") {
           return 0;
         }
         unless ($read_length == 4) {
@@ -303,7 +303,6 @@ class TestCase::IO::File {
 
     {
       my $line = $io_file->readline;
-      $line = Fn->chompr($line);
       unless ($line == undef) {
         return 0;
       }
@@ -371,7 +370,6 @@ class TestCase::IO::File {
 
     {
       my $line = $io_file->readline;
-      $line = Fn->chompr($line);
       unless ($line == undef) {
         return 0;
       }
@@ -411,7 +409,6 @@ class TestCase::IO::File {
 
     {
       my $line = $io_file->readline;
-      $line = Fn->chompr($line);
       unless ($line == undef) {
         return 0;
       }

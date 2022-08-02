@@ -1,10 +1,5 @@
 package Data::CSel;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-13'; # DATE
-our $DIST = 'Data-CSel'; # DIST
-our $VERSION = '0.127'; # VERSION
-
 use 5.020000;
 use strict;
 use warnings;
@@ -14,6 +9,12 @@ use Code::Includable::Tree::NodeMethods;
 use Scalar::Util qw(blessed refaddr looks_like_number);
 
 use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-06-07'; # DATE
+our $DIST = 'Data-CSel'; # DIST
+our $VERSION = '0.128'; # VERSION
+
 our @EXPORT_OK = qw(
                        csel
                        csel_each
@@ -353,16 +354,29 @@ our $RE =
 
               (?<LITERAL_REGEX>
                   (
-                      /
                       (?:
-                          [^/\\]+
-                      |
-                          \\ .
-                      )*
-                      /
+                          (?:
+                              /
+                              (?:
+                                  [^/\\]+
+                              |
+                                  \\ .
+                              )*
+                              /
+                          ) |
+                          (?:
+                              qr\(
+                              (?:
+                                  [^\)\\]+
+                              |
+                                  \\ .
+                              )*
+                              \)
+                          )
+                      )
                       [ims]*
                   )
-                  (?{ my $re = eval "qr$^N"; die if $@; [$^R, $re] })
+                  (?{ my $code = substr($^N, 0, 2) eq "qr" ? $^N : "qr$^N"; my $re = eval $code; die if $@; [$^R, $re] })
               )
 
               (?<PSEUDOCLASS_NAME>
@@ -425,7 +439,7 @@ sub parse_csel {
     local $^R;
     eval { $_ =~ $re } and return $_;
     die $@ if $@;
-    return undef;
+    return undef; ## no critic: Subroutines::ProhibitExplicitReturnUndef
 }
 
 sub _uniq_objects {
@@ -778,7 +792,7 @@ sub csel {
     }
 }
 
-sub csel_each(&;@) {
+sub csel_each(&;@) { ## no critic: Subroutines::ProhibitSubroutinePrototypes
     my $cb = shift;
     for my $node (csel(@_)) {
         local $_ = $node;
@@ -802,7 +816,7 @@ Data::CSel - Select tree node objects using CSS Selector-like syntax
 
 =head1 VERSION
 
-This document describes version 0.127 of Data::CSel (from Perl distribution Data-CSel), released on 2021-07-13.
+This document describes version 0.128 of Data::CSel (from Perl distribution Data-CSel), released on 2022-06-07.
 
 =head1 SYNOPSIS
 
@@ -975,11 +989,12 @@ is equivalent to:
 
  [name = 'ujang']
 
-B<Regex literal>. Must be delimited by C</> ... C</>, can be followed by zero of
-more regex modifier characters m, s, i):
+B<Regex literal>. Must be delimited by C</.../> or C<qr(...)>, can be followed
+by zero of more regex modifier characters m, s, i):
 
  //
  /ab(c|d)/i
+ qr(foo/bar)
 
 B<Array>. Examples:
 
@@ -1182,7 +1197,7 @@ is the same as:
 
 Filter only objects where the attribute named I<attr> has the value matching
 regular expression I<value>. Operand should be a regex literal. Regex literal
-must be delimited by C<//>.
+must be delimited by C</.../> or C<qr(...)>.
 
 Example:
 
@@ -1191,7 +1206,7 @@ Example:
 selects all C<Person> objects that have C<first_name()> with the value
 matching the regex C</^Al/>.
 
- Person[first_name =~ /^al/i]
+ Person[first_name =~ qr(^al)i]
 
 Same as previous example except the regex is case-insensitive.
 
@@ -1570,14 +1585,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-CSel>
 
 Source repository is at L<https://github.com/perlancar/perl-Data-CSel>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-CSel>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 =head2 Related to CSS selector
@@ -1645,11 +1652,36 @@ CLI to select PPI nodes using CSel: L<ppisel> (from L<App::ppisel>).
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-CSel>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

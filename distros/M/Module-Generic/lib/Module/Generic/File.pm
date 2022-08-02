@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.4.2
+## Version v0.5.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2022/06/26
+## Modified 2022/07/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -127,7 +127,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.4.2';
+    our $VERSION = 'v0.5.0';
 };
 
 use strict;
@@ -1141,7 +1141,6 @@ sub file
 {
     if( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( __PACKAGE__ ) )
     {
-        # print( STDERR "Argument starting from offset 1, are: '", join( "', '", @_[1..$#_] ), "' and do we have an even number of parameters? ", ( !( ( scalar( @_ ) - 1 ) % 2 ) ? 'yes' : 'no' ), "\n" );
         # file( $file_obj );
         # file( $file_obj, $options_hash_ref );
         # file( $file_obj, %options );
@@ -1185,7 +1184,6 @@ sub file
     }
     else
     {
-        # print( STDERR "file(): [type 2] Calling new with ", __PACKAGE__, " and '", join( "', '", @_ ), "'\n" );
         return( __PACKAGE__->new( @_ ) );
     }
 }
@@ -2908,7 +2906,6 @@ sub tempdir { return( &_function2method( \@_ )->tmpdir( @_ ) ); }
 sub tempfile
 {
     my $self = &_function2method( \@_ ) || __PACKAGE__;
-    # print( STDERR __PACKAGE__, "::tempfile: \$self is '$self' and args are '", join( "', '", @_ ), "'\n" );
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{tmpdir} //= 0;
     if( CORE::exists( $opts->{unlink} ) )
@@ -3276,95 +3273,6 @@ sub write
     }
 }
 
-sub DESTROY
-{
-    my $self = shift( @_ );
-    my $file = $self->filepath;
-    # Revert back to the directory we were before there was a chdir, if any
-    # This way, we avoid making change of directory permanent throughout our entire
-    # program, even after our object has died
-    if( my $prev_cwd = $self->_prev_cwd )
-    {
-        CORE::chdir( $prev_cwd );
-    }
-    
-    # Could use also O_TEMPORARY provided by Fcntl to instruct the system to automatically
-    # remove the file, but it is not supported on all platforms.
-    my $orig = $self->{_orig};
-    if( $self->auto_remove )
-    {
-        return unless( CORE::exists( $FILES_TO_REMOVE->{ $$ }->{ $file } ) );
-        CORE::delete( $FILES_TO_REMOVE->{ $$ }->{ $file } );
-        my @info = caller();
-        my $sub = [caller(1)]->[3];
-        $self->message( 3, "Removing file '", $self->filepath, "' that was created in file $orig->[1], at line $orig->[2]. Called from file $info[1] at line $info[2] in sub $sub" );
-        if( $self->is_dir )
-        {
-            $self->rmtree;
-        }
-        else
-        {
-            $self->delete;
-        }
-    }
-    else
-    {
-        my @info = caller();
-#         $self->debug(3);
-        $self->message( 3, "File '", $self->filepath, "' is NOT going to be removed. Created in file $orig->[1], at line $orig->[2]. Called from file $info[1] at line $info[2]" );
-    }
-};
-
-# XXX END
-END
-{
-    # Need to be done last, so we can ensure they are empty before they are removed
-    my @dirs_to_remove = ();
-    # We use File::Spec to get the current directory rather than our cwd() method, 
-    # because we do not want to create a new object in a destruction block
-    my $cwd = File::Spec->rel2abs(File::Spec->curdir);
-    foreach my $pid ( keys( %$FILES_TO_REMOVE ) )
-    {
-        # print( STDERR "END: Checking pid $pid against current pid '$$'\n" );
-        next if( $pid ne $$ );
-        foreach my $file ( keys( %{$FILES_TO_REMOVE->{ $$ }} ) )
-        {
-            # print( STDERR "END: Checking file '$file' whether it is a file or a directory\n" );
-            next if( !$file || !-e( $file ) );
-            if( -d( $file ) )
-            {
-                push( @dirs_to_remove, $file );
-                next;
-            }
-            # print( STDERR "END: Removing file '$file'\n" );
-            CORE::unlink( $file );
-        }
-        foreach my $dir ( @dirs_to_remove )
-        {
-            if( $cwd eq $dir )
-            {
-                my $updir = Cwd::abs_path( File::Spec->updir );
-                warnings::warn( "You currently are inside a directory to remove ($dir), moving you up to $updir\n" ) if( warnings::enabled() );
-                CORE::chdir( $updir ) || do
-                {
-                    warnings::warn( "Unable to move to directory '$updir' above current directory: $!\n" ) if( warnings::enabled() );
-                    next;
-                };
-            }
-            CORE::rmdir( $dir ) || do
-            {
-                warnings::warn( "Unable to remove directory $dir: $!\n" ) if( warnings::enabled() );
-            };
-        }
-    }
-};
-
-sub FREEZE { return( shift->filepath ) }
-
-sub THAW { return( shift->new( @_ ) ); }
-
-sub TO_JSON { return( shift->filepath ); }
-
 sub _filehandle_method
 {
     my $self = shift( @_ );
@@ -3381,7 +3289,7 @@ sub _filehandle_method
         return( $self->error( "You cannot call \"${what}\" on a ${type}. You can only call this on ${for}" ) ) if( !scalar( CORE::grep( $_ eq $type, @$ok ) ) );
         my $opened = $self->opened || 
             return( $self->error( ucfirst( $type ), " \"${file}\" is not opened yet." ) );
-        $self->message( 3, "File handle is '$opened'. Calling method '$what' with arguments: '", CORE::join( "', '", @_ ), "'." );
+        # $self->message( 3, "File handle is '$opened'. Calling method '$what' with arguments: '", CORE::join( "', '", @_ ), "'." );
         # return( $opened->$what( @_ ) );
         my @rv = ();
         if( wantarray() )
@@ -3593,7 +3501,7 @@ sub _move_or_copy
                 my $base;
                 if( $self->_is_object( $dest ) && $self->_is_a( $dest => 'Module::Generic::File' ) )
                 {
-                    # XXX Maybe use child() method instead?
+                    # NOTE: Maybe use child() method instead?
                     $base = $self->basename;
                     my( $vol, $path, $fname ) = $self->_spec_splitpath( $dest->filepath );
                     $dest = $self->_spec_catpath( $vol, $self->_spec_catdir( [ $path, $fname ] ), $base );
@@ -3909,7 +3817,134 @@ sub _uri_file_os_map
     return( $os_map->{lc( $os )} );
 }
 
-# XXX IO::File class modification
+sub DESTROY
+{
+    my $self = shift( @_ );
+    my $file = $self->filepath;
+    # Revert back to the directory we were before there was a chdir, if any
+    # This way, we avoid making change of directory permanent throughout our entire
+    # program, even after our object has died
+    if( my $prev_cwd = $self->_prev_cwd )
+    {
+        CORE::chdir( $prev_cwd );
+    }
+    
+    # Could use also O_TEMPORARY provided by Fcntl to instruct the system to automatically
+    # remove the file, but it is not supported on all platforms.
+    my $orig = $self->{_orig};
+    if( $self->auto_remove )
+    {
+        return unless( CORE::exists( $FILES_TO_REMOVE->{ $$ }->{ $file } ) );
+        CORE::delete( $FILES_TO_REMOVE->{ $$ }->{ $file } );
+        my @info = caller();
+        my $sub = [caller(1)]->[3];
+        $self->message( 3, "Removing file '", $self->filepath, "' that was created in file $orig->[1], at line $orig->[2]. Called from file $info[1] at line $info[2] in sub $sub" );
+        if( $self->is_dir )
+        {
+            $self->rmtree;
+        }
+        else
+        {
+            $self->delete;
+        }
+    }
+    else
+    {
+        my @info = caller();
+#         $self->debug(3);
+        $self->message( 3, "File '", $self->filepath, "' is NOT going to be removed. Created in file $orig->[1], at line $orig->[2]. Called from file $info[1] at line $info[2]" );
+    }
+};
+
+# NOTE: END
+END
+{
+    # Need to be done last, so we can ensure they are empty before they are removed
+    my @dirs_to_remove = ();
+    # We use File::Spec to get the current directory rather than our cwd() method, 
+    # because we do not want to create a new object in a destruction block
+    my $cwd = File::Spec->rel2abs(File::Spec->curdir);
+    foreach my $pid ( keys( %$FILES_TO_REMOVE ) )
+    {
+        next if( $pid ne $$ );
+        foreach my $file ( keys( %{$FILES_TO_REMOVE->{ $$ }} ) )
+        {
+            next if( !$file || !-e( $file ) );
+            if( -d( $file ) )
+            {
+                push( @dirs_to_remove, $file );
+                next;
+            }
+            CORE::unlink( $file );
+        }
+        foreach my $dir ( @dirs_to_remove )
+        {
+            if( $cwd eq $dir )
+            {
+                my $updir = Cwd::abs_path( File::Spec->updir );
+                warnings::warn( "You currently are inside a directory to remove ($dir), moving you up to $updir\n" ) if( warnings::enabled() );
+                CORE::chdir( $updir ) || do
+                {
+                    warnings::warn( "Unable to move to directory '$updir' above current directory: $!\n" ) if( warnings::enabled() );
+                    next;
+                };
+            }
+            CORE::rmdir( $dir ) || do
+            {
+                warnings::warn( "Unable to remove directory $dir: $!\n" ) if( warnings::enabled() );
+            };
+        }
+    }
+};
+
+# NOTE: For CBOR and Sereal
+sub FREEZE
+{
+    my $self = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class = CORE::ref( $self );
+    my %hash  = %$self;
+    CORE::delete( @hash{ qw( opened _handle ) } );
+    # Return an array reference rather than a list so this works with Sereal and CBOR
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # But Storable want a list with the first element being the serialised element
+    CORE::return( $class, \%hash );
+}
+
+sub STORABLE_freeze { return( shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { return( shift->THAW( @_ ) ); }
+
+# NOTE: CBOR will call the THAW method with the stored classname as first argument, the constant string CBOR as second argument, and all values returned by FREEZE as remaining arguments.
+# NOTE: Storable calls it with a blessed object it created followed with $cloning and any other arguments initially provided by STORABLE_freeze
+sub THAW
+{
+    # STORABLE_thaw would issue $cloning as the 2nd argument, while CBOR would issue
+    # 'CBOR' as the second value.
+    my( $self, undef, @args ) = @_;
+    my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+    my $new;
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        foreach( CORE::keys( %$hash ) )
+        {
+            $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+        }
+        $new = $self;
+    }
+    else
+    {
+        $new = CORE::bless( $hash => $class );
+    }
+    CORE::return( $new );
+}
+
+sub TO_JSON { return( shift->filepath ); }
+
+# NOTE: IO::File class modification
 {
     package
         IO::File;
@@ -3917,7 +3952,7 @@ sub _uri_file_os_map
     sub flock { CORE::flock( shift( @_ ), shift( @_ ) ); }
 }
 
-# XXX Module::Generic::File::Map class
+# NOTE: Module::Generic::File::Map class
 {
     package
         Module::Generic::File::Map;
@@ -4147,7 +4182,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.4.2
+    v0.5.0
 
 =head1 DESCRIPTION
 
@@ -5144,7 +5179,7 @@ With fork:
 
     use Module::Generic::File qw( tempfile );
     use POSIX ();
-    use Storable ();
+    use Storable::Improved ();
     
     my $file = tempfile({ unlink => 1 });
     $file->mmap( my $result, 10240, '+<' );
@@ -5170,13 +5205,13 @@ With fork:
         {
             print( "Child $pid already gone\n" );
         }
-        my $object = Storable::thaw( $result );
+        my $object = Storable::Improved::thaw( $result );
     }
     elsif( $pid == 0 )
     {
         # Do some work
         my $object = My::Package->new;
-        $result = Storable::freeze( $object );
+        $result = Storable::Improved::freeze( $object );
     }
     else
     {
@@ -5194,7 +5229,7 @@ With fork:
         }
     }
 
-Provided with some option parameters and this will create a mmap. Mmap are powerful in that they can be used and shared among processes including fork, I<but excluding threads>. Of course, it you want to share objects or other less simple structures, you need to use serialisers like L<Storable> or L<Sereal>.
+Provided with some option parameters and this will create a mmap. Mmap are powerful in that they can be used and shared among processes including fork, I<but excluding threads>. Of course, it you want to share objects or other less simple structures, you need to use serialisers like L<Storable::Improved> or L<Sereal>.
 
 If the file is not opened yet, this will open it using the mode specified, or C<+<> by default. If the file is already opened, an error will be returned that the file cannot be opened by C<mmap> because it is already opened.
 
@@ -5222,7 +5257,7 @@ For those with a perl version lower than C<5.16.0>, be careful that if you use m
 
 The mode in which to mmap open the file. Possible modes are the same as with L<open|perlfunc/open>, however, C<mmap> will not work if you chose a mode like: >, +>, >> or +>>, thus if you want to mmap the file in read only, use < and if you want read-write, use +<. You can also use letters, such as C<r> for read-only and C<r+> for read-write.
 
-The mode can be accompanied by a PerlIO layer like C<:raw>, which is the default, or C<:encoding(utf-8)>, but note that while L<PerlIO> mmap, if your perl version is greater or equal to C<v5.16.0>, will work fine with utf-8, L<File::Map> warns of possibly unknown results when using utf-8 encoder. So if your perl version is equal or greater than C<5.16.0> you are safe, but otherwise, be careful if all works as you expect. Of course, if you use serialisers like L<Storable> or L<Sereal>, then you should not use an encoding, or at least use C<:raw>, which, again, is the default for L<File::Map>
+The mode can be accompanied by a PerlIO layer like C<:raw>, which is the default, or C<:encoding(utf-8)>, but note that while L<PerlIO> mmap, if your perl version is greater or equal to C<v5.16.0>, will work fine with utf-8, L<File::Map> warns of possibly unknown results when using utf-8 encoder. So if your perl version is equal or greater than C<5.16.0> you are safe, but otherwise, be careful if all works as you expect. Of course, if you use serialisers like L<Storable::Improved> or L<Sereal>, then you should not use an encoding, or at least use C<:raw>, which, again, is the default for L<File::Map>
 
 =back
 
@@ -5927,6 +5962,20 @@ However, L<Module::Generic/error> used to return undef, is smart and knows in a 
 =head1 OVERLOADING
 
 Objects of this package are overloaded and their stringification will call L</filename>
+
+=head1 SERIALISATION
+
+=for Pod::Coverage FREEZE
+
+=for Pod::Coverage STORABLE_freeze
+
+=for Pod::Coverage STORABLE_thaw
+
+=for Pod::Coverage THAW
+
+=for Pod::Coverage TO_JSON
+
+Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
 
 =head1 VIRTUALISATION
 

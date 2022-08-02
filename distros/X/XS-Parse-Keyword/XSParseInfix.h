@@ -31,13 +31,15 @@ enum XSParseInfixSelection {
 
 /* lhs_flags, rhs_flags */
 enum {
-  XPI_OPERAND_TERM = 0, /* the "default" termexpr with no context */
   /* other space reserved for other scalar types */
+  XPI_OPERAND_ARITH     = 2,
+  XPI_OPERAND_TERM      = 4,
   XPI_OPERAND_TERM_LIST = 6, /* term in list context */
   XPI_OPERAND_LIST      = 7, /* list in list context */
 
   /* Other bitflags */
   XPI_OPERAND_ONLY_LOOK = (1<<3),
+  XPI_OPERAND_CUSTOM    = (1<<7), /* rhs_flags only */
 };
 
 struct XSParseInfixHooks {
@@ -54,6 +56,9 @@ struct XSParseInfixHooks {
   /* These hooks are alternatives; the first one defined is used */
   OP *(*new_op)(pTHX_ U32 flags, OP *lhs, OP *rhs, void *hookdata);
   OP *(*ppaddr)(pTHX); /* A pp func used directly in newBINOP_custom() */
+
+  /* Used if rhs_flags & XPI_OPERAND_CUSTOM */
+  OP *(*parse_rhs)(pTHX_ void *hookdata);
 };
 
 struct XSParseInfixInfo {

@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.24.3
+## Version v0.26.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2022/07/15
+## Modified 2022/07/28
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -42,7 +42,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.24.3';
+    our $VERSION     = 'v0.26.0';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -69,7 +69,7 @@ BEGIN
     no strict 'refs';
     $DEBUG_LOG_IO = undef();
     # Can use Sereal also
-    $SERIALISER = 'Storable';
+    $SERIALISER = 'Storable::Improved';
     $AUTOLOAD_SUBS = {};
     $SUB_ATTR_LIST = qr{
         [[:blank:]\h]* : [[:blank:]\h]*
@@ -190,6 +190,7 @@ sub _can;
 sub _get_args_as_array;
 sub _get_args_as_hash;
 sub _get_stack_trace;
+sub _implement_freeze_thaw;
 sub _instantiate_object;
 sub _is_a;
 sub _is_array;
@@ -368,12 +369,61 @@ sub new_glob
 sub deserialise
 {
     my $self = shift( @_ );
+    my $data;
+    $data = shift( @_ ) if( scalar( @_ ) && ( @_ % 2 ) );
     my $opts = $self->_get_args_as_hash( @_ );
+    $opts->{data} = $data if( defined( $data ) && length( $data ) );
     my $this  = $self->_obj2h;
     my $class = $opts->{serialiser} || $opts->{serializer} || $SERIALISER;
     return( $self->error( "No serialiser class was provided nor set in \$Module::Generic::SERIALISER" ) ) if( !defined( $class ) || !length( $class ) );
-    $self->_load_class( $class ) || return( $self->pass_error );
-    if( $class eq 'Sereal' )
+    if( $class eq 'CBOR' || $class eq 'CBOR::XS' )
+    {
+        $self->_load_class( 'CBOR::XS' ) || return( $self->pass_error );
+    }
+    else
+    {
+        $self->_load_class( $class ) || return( $self->pass_error );
+    }
+    
+    if( $class eq 'CBOR' || $class eq 'CBOR::XS' )
+    {
+        my @options = qw( max_depth max_size allow_unknown allow_sharing allow_cycles forbid_objects pack_strings text_keys text_strings validate_utf8 filter );
+        try
+        {
+            my $cbor = CBOR::XS->new;
+            $cbor->allow_sharing(1);
+            for( @options )
+            {
+                next unless( CORE::exists( $opts->{ $_ } ) );
+                $cbor->$_( $opts->{ $_ } );
+            }
+            
+            if( exists( $opts->{file} ) && $opts->{file} )
+            {
+                my $f = $self->new_file( $opts->{file} ) || return( $self->pass_error );
+                return( $self->error( "File provided \"$opts->{file}\" does not exist." ) ) if( !$f->exists );
+                return( $self->error( "File provided \"$opts->{file}\" is actually a directory." ) ) if( $f->is_directory );
+                return( $self->error( "File provided \"$opts->{file}\" to deserialise is empty." ) ) if( $f->is_empty );
+                my $data = $f->load( binmode => 'raw' );
+                return( $self->pass_error( $f->error ) ) if( !defined( $data ) );
+                return( $cbor->decode( $data ) );
+            }
+            elsif( exists( $opts->{data} ) )
+            {
+                return( $self->error( "Data provided to deserialise is empty." ) ) if( !defined( $opts->{data} ) || !length( $opts->{data} ) );
+                return( $cbor->decode( $opts->{data} ) );
+            }
+            else
+            {
+                return( $self->error( "No file and no data was provided to deserialise." ) );
+            }
+        }
+        catch( $e )
+        {
+            return( $self->error( "Error trying to deserialise data with $class: $e" ) );
+        }
+    }
+    elsif( $class eq 'Sereal' )
     {
         my @options = qw( refuse_snappy refuse_objects no_bless_objects validate_utf8 max_recursion_depth max_num_hash_entries max_num_array_entries max_string_length max_uncompressed_size incremental alias_smallint alias_varint_under use_undef set_readonly set_readonly_scalars );
         my $ref = {};
@@ -396,7 +446,29 @@ sub deserialise
             elsif( exists( $opts->{data} ) )
             {
                 return( $self->error( "Data provided to deserialise is empty." ) ) if( !defined( $opts->{data} ) || !length( $opts->{data} ) );
-                $dec->decode( $opts->{data} => $code );
+                $self->message( 3, "Checking if data looks like sereal data." );
+                my $type = Sereal::Decoder->looks_like_sereal( $opts->{data} );
+                if( $type eq '' )
+                {
+                    $self->message( 3, "Not a Sereal document" );
+                }
+                elsif( $type eq '0' )
+                {
+                    $self->message( 3, "Possibly utf8 encoded Sereal document" );
+                }
+                else
+                {
+                    $self->message( 3, "Sereal document version $type" );
+                }
+                
+                try
+                {
+                    $dec->decode( $opts->{data} => $code );
+                }
+                catch( $err )
+                {
+                    return( $self->error( "Error trying to deserialise ", CORE::length( $opts->{data} ), " bytes of data ($opts->{data}): $err" ) );
+                }
             }
             else
             {
@@ -406,10 +478,10 @@ sub deserialise
         }
         catch( $e )
         {
-            return( $self->error( "Error trying to serialise data with $class: $e" ) );
+            return( $self->error( "Error trying to deserialise data with $class: $e" ) );
         }
     }
-    elsif( $class eq 'Storable' )
+    elsif( $class eq 'Storable::Improved' || $class eq 'Storable' )
     {
         try
         {
@@ -423,7 +495,7 @@ sub deserialise
                 # The latter would not have the necessary headers
                 # As per Storable documentation, if the following return an hash it is a
                 # valid file with header, otherwise it would return undef
-                my $info = Storable::file_magic( "$opts->{file}" );
+                my $info = &{"${class}\::file_magic"}( "$opts->{file}" );
                 if( ref( $info ) eq 'HASH' )
                 {
                     if( $this->{debug} || $opts->{debug} )
@@ -446,37 +518,37 @@ EOT
                 
                     if( $opts->{lock} )
                     {
-                        return( Storable::lock_retrieve( "$opts->{file}" ) );
+                        return( &{"${class}\::lock_retrieve"}( "$opts->{file}" ) );
                     }
                     else
                     {
-                        return( Storable::retrieve( "$opts->{file}" ) );
+                        return( &{"${class}\::retrieve"}( "$opts->{file}" ) );
                     }
                 }
                 else
                 {
-                    $self->message( 4, "Got here to use Storable::thaw" );
+                    $self->message( 4, "Got here to use ${class}::thaw" );
                     my $f = $self->new_file( $opts->{file} ) || return( $self->pass_error );
                     $f->lock( shared => 1 ) if( $opts->{lock} );
                     my $data = $f->load( binmode => 'raw' );
                     $self->messagef( 4, "Loaded %d bytes of data.", CORE::length( $data ) );
                     $f->unlock;
                     return( $data ) if( !defined( $data ) || !length( $data ) );
-                    my $decoded = Storable::thaw( $data );
+                    my $decoded = &{"${class}\::thaw"}( $data );
                     $self->message( 4, "Returning '$decoded'" );
-                    # return( Storable::thaw( $data ) );
+                    # return( &{"${class}\::thaw"}( $data ) );
                     return( $decoded );
                 }
             }
             elsif( exists( $opts->{data} ) )
             {
                 return( $self->error( "Data provided to deserialise is empty." ) ) if( !defined( $opts->{data} ) || !length( $opts->{data} ) );
-                return( Storable::thaw( $opts->{data} ) );
+                return( &{"${class}\::thaw"}( $opts->{data} ) );
             }
             elsif( exists( $opts->{io} ) )
             {
                 return( $self->error( "File handle provided ($opts->{io}) is not an actual file handle to get data to deserialise." ) ) if( Scalar::Util::reftype( $opts->{io} ) ne 'GLOB' );
-                return( Storable::fd_retrieve( $opts->{io} ) );
+                return( &{"${class}\::fd_retrieve"}( $opts->{io} ) );
             }
             else
             {
@@ -485,7 +557,7 @@ EOT
         }
         catch( $e )
         {
-            return( $self->error( "Error trying to serialise data with $class: $e" ) );
+            return( $self->error( "Error trying to deserialise data with $class: $e" ) );
         }
     }
     else
@@ -1528,8 +1600,41 @@ sub serialise
     my $opts = $self->_get_args_as_hash( @_ );
     my $class = $opts->{serialiser} || $opts->{serializer} || $SERIALISER;
     return( $self->error( "No serialiser class was provided nor set in \$Module::Generic::SERIALISER" ) ) if( !defined( $class ) || !length( $class ) );
-    $self->_load_class( $class ) || return( $self->pass_error );
-    if( $class eq 'Sereal' )
+    if( $class eq 'CBOR' || $class eq 'CBOR::XS' )
+    {
+        $self->_load_class( 'CBOR::XS' ) || return( $self->pass_error );
+    }
+    else
+    {
+        $self->_load_class( $class ) || return( $self->pass_error );
+    }
+    
+    if( $class eq 'CBOR' || $class eq 'CBOR::XS' )
+    {
+        my @options = qw( max_depth max_size allow_unknown allow_sharing allow_cycles forbid_objects pack_strings text_keys text_strings validate_utf8 filter );
+        try
+        {
+            my $cbor = CBOR::XS->new;
+            for( @options )
+            {
+                next unless( CORE::exists( $opts->{ $_ } ) );
+                $cbor->$_( $opts->{ $_ } );
+            }
+            
+            my $serialised = $cbor->encode( $data );
+            if( exists( $opts->{file} ) && $opts->{file} )
+            {
+                my $f = $self->new_file( $opts->{file} ) || return( $self->pass_error );
+                $f->unload( $serialised, { binmode => 'raw' } ) || return( $self->pass_error( $f->error ) );
+            }
+            return( $serialised );
+        }
+        catch( $e )
+        {
+            return( $self->error( "Error trying to serialise data with $class: $e" ) );
+        }
+    }
+    elsif( $class eq 'Sereal' )
     {
         my @options = qw( compress compress_threshold compress_level snappy snappy_incr snappy_threshold croak_on_bless freeze_callbacks no_bless_objects undef_unknown stringify_unknown warn_unknown max_recursion_depth  canonical canonical_refs sort_keys no_shared_hashkeys dedupe_strings aliased_dedupe_strings protocol_version use_protocol_v1 );
         my $ref = {};
@@ -1547,6 +1652,31 @@ sub serialise
             }
             else
             {
+                my $cache = {};
+                my $find;
+                $find = sub
+                {
+                    my $this = shift( @_ );
+                    my $addr = Scalar::Util::refaddr( $this );
+                    return if( ++$cache->{ $addr } > 1 );
+                    foreach my $k ( keys( %$this ) )
+                    {
+                        if( defined( $this->{ $k } ) &&
+                            ref( $this->{ $k } ) &&
+                            Scalar::Util::reftype( $this->{ $k } ) eq 'GLOB' )
+                        {
+                            # $self->message( 0, "Found a glob ", $this->{ $k }, " in property '$k' inside '", overload::StrVal( $this ), "'" );
+                            print( STDERR __PACKAGE__, "::serialise: Found a glob ", $this->{ $k }, " in property '$k' inside '", overload::StrVal( $this ), "'\n" );
+                        }
+                        elsif( defined( $this->{ $k } ) &&
+                               ref( $this->{ $k } ) &&
+                               Scalar::Util::reftype( $this->{ $k } ) eq 'HASH' )
+                        {
+                            $find->( $this->{ $k } );
+                        }
+                    }
+                };
+                $find->( $data );
                 return( $enc->encode( $data ) );
             }
         }
@@ -1555,7 +1685,7 @@ sub serialise
             return( $self->error( "Error trying to serialise data with $class: $e" ) );
         }
     }
-    elsif( $class eq 'Storable' )
+    elsif( $class eq 'Storable::Improved' || $class eq 'Storable' )
     {
         try
         {
@@ -1563,21 +1693,21 @@ sub serialise
             {
                 if( $opts->{lock} )
                 {
-                    return( Storable::lock_store( $data => "$opts->{file}" ) );
+                    return( &{"${class}\::lock_store"}( $data => "$opts->{file}" ) );
                 }
                 else
                 {
-                    return( Storable::store( $data => "$opts->{file}" ) );
+                    return( &{"${class}\::store"}( $data => "$opts->{file}" ) );
                 }
             }
             elsif( exists( $opts->{io} ) )
             {
                 return( $self->error( "File handle provided ($opts->{io}) is not an actual file handle to serialise data to." ) ) if( Scalar::Util::reftype( $opts->{io} ) ne 'GLOB' );
-                return( Storable::store_fd( $data => $opts->{io} ) );
+                return( &{"${class}\::store_fd"}( $data => $opts->{io} ) );
             }
             else
             {
-                return( Storable::freeze( $data ) );
+                return( &{"${class}\::freeze"}( $data ) );
             }
         }
         catch( $e )
@@ -5028,6 +5158,86 @@ EOT
     return( $class );
 }
 PERL
+    # NOTE: _implement_freeze_thaw()
+    _implement_freeze_thaw => <<'PERL',
+sub _implement_freeze_thaw
+{
+    my $self = shift( @_ );
+    my @classes = @_;
+    foreach my $class ( @classes )
+    {
+        unless( defined( &{"${class}\::STORABLE_freeze"} ) )
+        {
+            no warnings 'once';
+            *{"${class}\::STORABLE_freeze"} = sub
+            {
+                my $self = CORE::shift( @_ );
+                my $serialiser = CORE::shift( @_ ) // '';
+                my $class = CORE::ref( $self );
+                my %hash  = %$self;
+                # Return an array reference rather than a list so this works with Sereal and CBOR
+                CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+                # But Storable/Storable::Improved want a list with the first element being the serialised element
+                CORE::return( $class, \%hash );
+            };
+        }
+        
+        unless( defined( &{"${class}\::STORABLE_thaw"} ) )
+        {
+            no warnings 'once';
+            *{"${class}\::STORABLE_thaw"} = sub
+            {
+                # STORABLE_thaw would issue $cloning as the 2nd argument, while CBOR would issue
+                # 'CBOR' as the second value.
+                my( $self, undef, @args ) = @_;
+                my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+                my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+                my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+                my $new;
+                # Storable pattern requires to modify the object it created rather than returning a new one
+                if( CORE::ref( $self ) )
+                {
+                    foreach( CORE::keys( %$hash ) )
+                    {
+                        $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+                    }
+                    $new = $self;
+                }
+                else
+                {
+                    $new = CORE::bless( $hash => $class );
+                }
+                CORE::return( $new );
+            };
+        }
+        
+        unless( defined( &{"${class}\::FREEZE"} ) )
+        {
+            no warnings 'once';
+            *{"${class}::FREEZE"} = sub
+            {
+                my $self = CORE::shift( @_ );
+                my $serialiser = CORE::shift( @_ ) // '';
+                my @args = &{"${class}::STORABLE_freeze"}( $self );
+                CORE::return( \@args ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+                CORE::return( @args );
+            };
+        }
+
+        unless( defined( &{"${class}::THAW"} ) )
+        {
+            no warnings 'once';
+            *{"${class}::THAW"} = sub
+            {
+                my( $self, undef, @args ) = @_;
+                my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+                $self = bless( {} => $self ) unless( ref( $self ) );
+                CORE::return( &{"${class}::STORABLE_thaw"}( $self, undef, @$ref ) );
+            };
+        }
+    }
+}
+PERL
     # NOTE: _lvalue()
     _lvalue => <<'PERL',
 sub _lvalue : lvalue
@@ -5232,8 +5442,6 @@ sub _parse_timestamp
         # e.g. 9.5 => 0.5 * 60 = 30
         my $offset_min  = ( $offset_hour - CORE::int( $offset_hour ) ) * 60;
         $str .= sprintf( '%+03d%02d', $offset_hour, $offset_min );
-        # XXX
-        # $self->message( 3, "Time zone '$tz', offset: '$offset', offset hour '$offset_hour', offset minute '$offset_min'. Resulting string is '$str' and pattern is '$opt->{pattern}'" );
         $opt->{pattern} .= '%z';
     }
     # e.g. Sun, 06 Oct 2019 06:41:11 GMT
@@ -5796,6 +6004,61 @@ sub DEBUG
     return( ${ $pkg . '::DEBUG' } );
 }
 
+# NOTE: Works with CBOR and Sereal <https://metacpan.org/pod/Sereal::Encoder#FREEZE/THAW-CALLBACK-MECHANISM>
+sub FREEZE
+{
+    my $self = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class = CORE::ref( $self );
+    my $ref = $self->_obj2h;
+    my %hash = %$ref;
+    $hash{_is_glob} = Scalar::Util::reftype( $self ) eq 'GLOB' ? 1 : 0;
+    # Return an array reference rather than a list so this works with Sereal and CBOR
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # But Storable want a list with the first element being the serialised element
+    CORE::return( $class, \%hash );
+}
+
+# sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+# sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+# NOTE: Works with CBOR and Sereal <https://metacpan.org/pod/Sereal::Encoder#FREEZE/THAW-CALLBACK-MECHANISM>
+sub THAW
+{
+    my( $self, undef, @args ) = @_;
+    my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+    my $is_glob = CORE::delete( $hash->{_is_glob} );
+    my $new;
+    if( $is_glob )
+    {
+        $new = CORE::ref( $self ) ? $self : $class->new_glob;
+        foreach( CORE::keys( %$hash ) )
+        {
+            *$new->{ $_ } = CORE::delete( $hash->{ $_ } );
+        }
+    }
+    else
+    {
+        # Storable pattern requires to modify the object it created rather than returning a new one
+        if( CORE::ref( $self ) )
+        {
+            foreach( CORE::keys( %$hash ) )
+            {
+                $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+            }
+            $new = $self;
+        }
+        else
+        {
+            $new = bless( $hash => $class );
+        }
+    }
+    CORE::return( $new );
+}
+
 sub VERBOSE
 {
     my $self = shift( @_ );
@@ -6066,7 +6329,7 @@ DESTROY
 };
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -6134,7 +6397,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.24.3
+    v0.26.0
 
 =head1 DESCRIPTION
 
@@ -6312,7 +6575,7 @@ If the debug value is switched to 1, the message will be silenced.
 
 This method use a specified serialiser class and deserialise the given data either directly from a specified file or being provided, and returns the perl data.
 
-The 2 serialisers currently supported are: L<Sereal> and L<Storable>. They are not required by L<Module::Generic>, so you must install them yourself. If the serialiser chosen is not installed, this will set an L<errr|Module::Generic/error> and return C<undef>.
+The 2 serialisers currently supported are: L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>). They are not required by L<Module::Generic>, so you must install them yourself. If the serialiser chosen is not installed, this will set an L<errr|Module::Generic/error> and return C<undef>.
 
 This method takes some parameters as an hash or hash reference. It can then:
 
@@ -6340,19 +6603,29 @@ String. A file path where to store the serialised data.
 
 =item * I<io>
 
-A file handle. This is used when the serialiser is L<Storable> to call its function L<Storable/store_fd> and L<Storable/fd_retrieve>
+A file handle. This is used when the serialiser is L<Storable> to call its function L<Storable::Improved/store_fd> and L<Storable::Improved/fd_retrieve>
 
 =item * I<lock>
 
-Boolean. If true, this will lock the file before reading from it. This works only in conjonction with I<file> and the serialiser L<Storable>
+Boolean. If true, this will lock the file before reading from it. This works only in conjonction with I<file> and the serialiser L<Storable::Improved>
 
 =item * I<serialiser> or I<serializer>
 
-A string being the class of the serialiser to use. This can be only either L<Sereal> or L<Storable>
+A string being the class of the serialiser to use. This can be only either L<Sereal> or L<Storable> or L<Storable::Improved>
 
 =back
 
-Additionally the following options are supported and passed through directly to L<Sereal::Decoder/decode> if the serialiser is L<Sereal>: I<alias_smallint>, I<alias_varint_under>, I<incremental>, I<max_num_array_entries>, I<max_num_hash_entries>, I<max_recursion_depth>, I<max_string_length>, I<max_uncompressed_size>, I<no_bless_objects>, I<refuse_objects>, I<refuse_snappy>, I<set_readonly>, I<set_readonly_scalars>, I<use_undef>, I<validate_utf8>
+Additionally the following options are supported and passed through directly to each serialiser:
+
+=over 4
+
+=item * L<CBOR|CBOR::XS>: C<max_depth>, C<max_size>, C<allow_unknown>, C<allow_sharing>, C<allow_cycles>, C<forbid_objects>, C<pack_strings>, C<text_keys>, C<text_strings>, C<validate_utf8>, C<filter>
+
+=item * L<Sereal::Decoder/decode> if the serialiser is L<Sereal>: C<alias_smallint>, C<alias_varint_under>, C<incremental>, C<max_num_array_entries>, C<max_num_hash_entries>, C<max_recursion_depth>, C<max_string_length>, C<max_uncompressed_size>, C<no_bless_objects>, C<refuse_objects>, C<refuse_snappy>, C<set_readonly>, C<set_readonly_scalars>, C<use_undef>, C<validate_utf8>
+
+=item * L<Storable::Improved> / L<Storable>: no option available
+
+=back
 
 If an error occurs, this sets an L<error|Module::Generic/error> and return C<undef>
 
@@ -6937,7 +7210,7 @@ If it cannot open the file in write mode, or cannot print to it, this will set a
 
 This method use a specified serialiser class and serialise the given data either by returning it or by saving it directly to a given file.
 
-The 2 serialisers currently supported are: L<Sereal> and L<Storable>. They are not required by L<Module::Generic>, so you must install them yourself. If the serialiser chosen is not installed, this will set an L<errr|Module::Generic/error> and return C<undef>.
+The 3 serialisers currently supported are: L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy version L<Storable>). They are not required by L<Module::Generic>, so you must install them yourself. If the serialiser chosen is not installed, this will set an L<errr|Module::Generic/error> and return C<undef>.
 
 This method takes some data and an optional hash or hash reference of parameters. It can then:
 
@@ -6945,7 +7218,7 @@ This method takes some data and an optional hash or hash reference of parameters
 
 =item * save data directly to File
 
-=item * save data to a file handle (only with L<Storable>)
+=item * save data to a file handle (only with L<Storable::Improved> / L<Storable>)
 
 =item * Return the serialised data
 
@@ -6965,19 +7238,29 @@ String. A file path where to store the serialised data.
 
 =item * I<io>
 
-A file handle. This is used when the serialiser is L<Storable> to call its function L<Storable/store_fd> and L<Storable/fd_retrieve>
+A file handle. This is used when the serialiser is L<Storable::Improved> / L<Storable> to call its function L<Storable::Improved/store_fd> and L<Storable::Improved/fd_retrieve>
 
 =item * I<lock>
 
-Boolean. If true, this will lock the file before writing to it. This works only in conjonction with I<file> and the serialiser L<Storable>
+Boolean. If true, this will lock the file before writing to it. This works only in conjonction with I<file> and the serialiser L<Storable::Improved>
 
 =item * I<serialiser> or I<serializer>
 
-A string being the class of the serialiser to use. This can be only either L<Sereal> or L<Storable>
+A string being the class of the serialiser to use. This can be only either L<Sereal> or L<Storable::Improved>
 
 =back
 
-Additionally the following options are supported and passed through directly to L<Sereal::Decoder/decode> if the serialiser is L<Sereal>: I<aliased_dedupe_strings>, I<canonical>, I<canonical_refs>, I<compress>, I<compress_level>, I<compress_threshold>, I<croak_on_bless>, I<dedupe_strings>, I<freeze_callbacks>, I<max_recursion_depth>, I<no_bless_objects>, I<no_shared_hashkeys>, I<protocol_version>, I<snappy>, I<snappy_incr>, I<snappy_threshold>, I<sort_keys>, I<stringify_unknown>, I<undef_unknown>, I<use_protocol_v1>, I<warn_unknown>
+Additionally the following options are supported and passed through directly for each serialiser:
+
+=over 4
+
+=item * L<CBOR|CBOR::XS>: C<max_depth>, C<max_size>, C<allow_unknown>, C<allow_sharing>, C<allow_cycles>, C<forbid_objects>, C<pack_strings>, C<text_keys>, C<text_strings>, C<validate_utf8>, C<filter>
+
+=item * L<Sereal::Decoder/encode> if the serialiser is L<Sereal>: C<aliased_dedupe_strings>, C<canonical>, C<canonical_refs>, C<compress>, C<compress_level>, C<compress_threshold>, C<croak_on_bless>, C<dedupe_strings>, C<freeze_callbacks>, C<max_recursion_depth>, C<no_bless_objects>, C<no_shared_hashkeys>, C<protocol_version>, C<snappy>, C<snappy_incr>, C<snappy_threshold>, C<sort_keys>, C<stringify_unknown>, C<undef_unknown>, C<use_protocol_v1>, C<warn_unknown>
+
+=item * L<Storable::Improved> / L<Storable>: no option available
+
+=back
 
 If an error occurs, this sets an L<error|Module::Generic/error> and return C<undef>
 
@@ -7168,6 +7451,14 @@ This will set an initial indent tab
 This is set to 1 so this very method is not included in the frames stack
 
 =back
+
+=head2 _implement_freeze_thaw
+
+Provided with a list of package names and this method will implement in each of them the subroutines necessary to handle L<Storable::Improved> (or the legacy L<Storable>), L<CBOR|CBOR::XS> and L<Sereal> serialisation.
+
+In effect, it will check that the subroutines C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw> exists or sets up simple ones if they are not defined.
+
+This works for packages that use hash-based objects. However, you need to make sure there is no specific package requirements, and if there is, you might need to customise those subroutines by yourself.
 
 =head2 _is_a
 
@@ -8046,7 +8337,15 @@ To catch fatal error you can use a C<try-catch> block such as implemented by L<N
 
 Since L<perl version 5.33.7|https://perldoc.perl.org/blead/perlsyn#Try-Catch-Exception-Handling> you can use the try-catch block using an experimental feature C<use feature 'try';>, but this does not support C<catch> by exception class.
 
-However
+=head1 SERIALISATION
+
+The modules in the L<Module::Generic> distribution all supports L<Storable::Improved> (or the legacy L<Storable>), L<Sereal> and L<CBOR|CBOR::XS> serialisation, by implementing the methods C<FREEZE>, C<THAW>, C<STORABLE_freeze>, C<STORABLE_thaw>
+
+Even the IO modules like L<Module::Generic::File::IO> and L<Module::Generic::Scalar::IO> can be serialised and deserialised if the methods C<FREEZE> and C<THAW> are used. By design the methods C<STORABLE_freeze> and C<STORABLE_thaw> are not implemented because it would trigger a L<Storable> exception "Unexpected object type (8) in store_hook()". Instead it is strongly encouraged you use the improved L<Storable::Improved> which addresses and mitigate those issues.
+
+For serialisation with L<Sereal>, make sure to instantiate the L<Sereal encoder|Sereal::Encoder> with the C<freeze_callbacks> option set to true, otherwise, C<Sereal> will not use the C<FREEZE> and C<THAW> methods.
+
+See L<Sereal::Encoder/"FREEZE/THAW CALLBACK MECHANISM"> for more information.
 
 =head1 SEE ALSO
 

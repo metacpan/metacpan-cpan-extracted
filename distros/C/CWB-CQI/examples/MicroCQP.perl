@@ -2,7 +2,7 @@
 # -*-cperl-*-
 ## A simple command-line front-end for CQP using the CQi client-server protocol
 
-## Copyright (C) 1999-2001 by Stefan Evert
+## Copyright (C) 1999-2022 by Stephanie Evert
 $| = 1;
 
 use strict;

@@ -468,8 +468,8 @@ TRYIT:
 		$self->{'iconurl'} = $self->{'imageurl'};
 		$self->{'articonurl'} ||= $self->{'imageurl'};
 		if ($html =~ m#\<i class\=\"fa fa\-calendar\"\>\<\/i\>(.*?)(\d\d\d\d)\<\/span\>#) {
-			($self->{'created'} = $1 . $2) =~ s/^\s+//;
 			$self->{'year'} = $2;
+			($self->{'created'} = $1 . $2) =~ s/^\s+//;
 		}
 		$self->{'description'} = $1  if ($html =~ m#\<meta\s+property\=\"og\:description\"\s+content\=\"(.+?)\"\>#);
 		while ($html =~ s#\<video(.+?)</video>##sio) {   #GRAB ANY VIDEO STREAMS (PODCASTADDICT SUPPORTS VIDEO PODCASTS!):

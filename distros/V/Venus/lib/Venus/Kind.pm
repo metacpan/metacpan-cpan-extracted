@@ -5,14 +5,15 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class 'with';
 
 with 'Venus::Role::Boxable';
+with 'Venus::Role::Tryable';
 with 'Venus::Role::Catchable';
 with 'Venus::Role::Comparable';
+with 'Venus::Role::Dumpable';
 with 'Venus::Role::Digestable';
 with 'Venus::Role::Doable';
-with 'Venus::Role::Dumpable';
 with 'Venus::Role::Matchable';
 with 'Venus::Role::Printable';
 with 'Venus::Role::Testable';
@@ -138,7 +139,7 @@ Kind Base Class for Perl 5
 
   use Venus::Class;
 
-  extends 'Venus::Kind';
+  base 'Venus::Kind';
 
   package main;
 
@@ -213,9 +214,9 @@ I<Since C<0.08>>
 
   use Venus::Class;
 
-  extends 'Venus::Kind';
+  base 'Venus::Kind';
 
-  has 'value';
+  attr 'value';
 
   package main;
 
@@ -280,9 +281,9 @@ I<Since C<0.08>>
 
   use Venus::Class;
 
-  extends 'Venus::Kind';
+  base 'Venus::Kind';
 
-  has 'value';
+  attr 'value';
 
   package main;
 
@@ -403,9 +404,9 @@ I<Since C<0.08>>
 
   use Venus::Class;
 
-  extends 'Venus::Kind';
+  base 'Venus::Kind';
 
-  has 'value';
+  attr 'value';
 
   package main;
 

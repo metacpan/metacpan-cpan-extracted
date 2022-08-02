@@ -21,7 +21,6 @@ lib/Chart/Composite.pm
 lib/Chart/Constants.pm
 lib/Chart/Direction.pm
 lib/Chart/ErrorBars.pm
-lib/Chart/Font.pm
 lib/Chart/HorizontalBars.pm
 lib/Chart/Lines.pm
 lib/Chart/LinesPoints.pm
@@ -35,6 +34,7 @@ lib/Chart/Pareto.pm
 lib/Chart/Pie.pm
 lib/Chart/Points.pm
 lib/Chart/Property.pm
+lib/Chart/Property/DataType/Font.pm
 lib/Chart/Split.pm
 lib/Chart/StackedBars.pm
 t/001_color_value.t

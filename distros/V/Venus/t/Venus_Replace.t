@@ -721,6 +721,54 @@ $test->for('example', 1, '(qr)', sub {
   $result
 });
 
+=operator ("")
+
+This package overloads the C<""> operator.
+
+=cut
+
+$test->for('operator', '("")');
+
+=example-1 ("")
+
+  # given: synopsis;
+
+  my $result = "$replace";
+
+  # "hello universe"
+
+=cut
+
+$test->for('example', 1, '("")', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq 'hello universe';
+
+  $result
+});
+
+=operator (~~)
+
+This package overloads the C<~~> operator.
+
+=cut
+
+$test->for('operator', '(~~)');
+
+=example-1 (~~)
+
+  # given: synopsis;
+
+  my $result = $replace ~~ 'hello universe';
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(~~)', sub {
+  1;
+});
+
 # END
 
 $test->render('lib/Venus/Replace.pod') if $ENV{RENDER};

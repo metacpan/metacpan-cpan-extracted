@@ -38,7 +38,6 @@ do { my $x = {
                                       'Path::Tiny' => '0',
                                       'Ref::Util' => '0',
                                       'Sub::Identify' => '0.06',
-                                      'Try::Tiny' => '0',
                                       'Types::Common::String' => '0',
                                       'Types::Standard' => '0',
                                       'namespace::autoclean' => '0',

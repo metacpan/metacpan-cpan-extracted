@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Instance 2.150;
+package Config::Model::Instance 2.152;
 
 #use Scalar::Util qw(weaken) ;
 use strict;
@@ -234,7 +234,7 @@ sub register_write_back {
 }
 
 # used for auto_read auto_write feature
-has [qw/name application backend backend_arg backup/] => (
+has [qw/name application backend_arg backup/] => (
     is  => 'ro',
     isa => 'Maybe[Str]',
 );
@@ -542,7 +542,7 @@ sub write_back {
             $args{$k} ||= '';
             $args{$k} .= '/' if $args{$k} and $args{$k} !~ m(/$);
         }
-        elsif ( $k !~ /^(config_file|backend)$/ ) {
+        elsif ( $k ne 'config_file' ) {
             croak "write_back: wrong parameters $k";
         }
     }
@@ -574,7 +574,6 @@ sub _write_back_node {
     my %args = @_;
 
     my $path = delete $args{path};
-    my $force_backend = delete $args{backend} || $self->{backend};
     my $force_write   = delete $args{force_write};
 
     my $node = $self->config_root->grab(
@@ -590,7 +589,6 @@ sub _write_back_node {
         my @wb_args = (
             %args,
             config_file   => $self->{config_file},
-            force_backend => $force_backend,
             force         => $force_write,
             backup        => $self->backup,
         );
@@ -599,17 +597,10 @@ sub _write_back_node {
             my $dir = $args{config_dir};
             mkpath( $dir, 0, oct(755) ) if $dir and not -d $dir;
 
-            my $res ;
-            if (not $force_backend
-                or $force_backend eq $backend
-                or $force_backend eq 'all' ) {
-
-                # exit when write is successfull
-                my $res = $cb->(@wb_args);
-                $logger->info( "write_back called with $backend backend, result is ",
-                               defined $res ? $res : '<undef>' );
-                last if ( $res and not $force_backend );
-            }
+            # exit when write is successfull
+            my $res = $cb->(@wb_args);
+            $logger->info( "write_back called with $backend backend, result is ",
+                           defined $res ? $res : '<undef>' );
         }
 
         if (not defined $node) {
@@ -673,7 +664,7 @@ Config::Model::Instance - Instance of configuration tree
 
 =head1 VERSION
 
-version 2.150
+version 2.152
 
 =head1 SYNOPSIS
 
@@ -751,10 +742,6 @@ directory if C<root_dir> is empty.
 
 Directory to read or write configuration file. This parameter must be
 supplied if not provided by the configuration model. (string)
-
-=item backend
-
-Specify which backend to use. See L</write_back> for details
 
 =item backend_arg
 
@@ -1050,11 +1037,6 @@ This feature enables you to declare with the model a way to load
 configuration data (and to write it back). See
 L<Config::Model::BackendMgr> for details.
 
-=head2 backend
-
-Get the preferred backend method for this instance (as passed to the
-constructor).
-
 =head2 backend_arg
 
 Get L<cme> command line argument that may be used by the backend to
@@ -1088,7 +1070,7 @@ L<Config::Model::AnyThing/notify_change> for more details.
 In summary, save the content of the configuration tree to
 configuration files.
 
-In more details, C<write_back> trie to run all subroutines registered
+In more details, C<write_back> tries to run all subroutines registered
 with C<register_write_back> to write the configuration information.
 (See L<Config::Model::BackendMgr> for details).
 

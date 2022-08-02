@@ -51,7 +51,7 @@ WriteMakefile(
         'POSIX'         => '1.53_01',
         'Regexp::Common'=> '2017060201',
         'Scalar::Util'  => '1.50',
-        'Storable'      => '3.25',
+        'Storable::Improved' => 'v0.1.3',
         'Sub::Util'     => '1.54',
         'Tie::Hash'     => '1.05',
         'URI::Escape'   => '5.09',

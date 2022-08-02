@@ -5,38 +5,20 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class;
 
-extends 'Venus::Kind::Utility';
+base 'Venus::Kind::Utility';
 
 use Scalar::Util ();
 
 # ATTRIBUTES
 
-has 'invocant' => (
-  is => 'ro'
-);
-
-has 'arguments' => (
-  is => 'ro'
-);
-
-has 'on_try' => (
-  is => 'rw'
-);
-
-has 'on_catch' => (
-  is => 'rw',
-  default => sub {[]},
-);
-
-has 'on_default' => (
-  is => 'rw'
-);
-
-has 'on_finally' => (
-  is => 'rw'
-);
+attr 'invocant';
+attr 'arguments';
+attr 'on_try';
+attr 'on_catch';
+attr 'on_default';
+attr 'on_finally';
 
 # BUILDERS
 
@@ -46,6 +28,14 @@ sub build_arg {
   return {
     on_try => $data,
   };
+}
+
+sub build_self {
+  my ($self, $data) = @_;
+
+  $self->on_catch([]) if !defined $self->on_catch;
+
+  return $self;
 }
 
 # METHODS

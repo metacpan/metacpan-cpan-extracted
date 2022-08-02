@@ -13,7 +13,7 @@ use Readonly;
 Readonly::Array our @EXPORT_OK => qw(get sections);
 Readonly::Scalar my $EMPTY_STR => q{};
 
-our $VERSION = 0.11;
+our $VERSION = 0.12;
 
 # Get content for file or module.
 sub get {
@@ -23,9 +23,9 @@ sub get {
 	my $pod_abstract = _pod_abstract($file_or_module);
 
 	# Get section pod.
-	my ($code) = _get_content($pod_abstract, $section, $number_of_example);
+	my ($code, $example_filename) = _get_content($pod_abstract, $section, $number_of_example);
 
-	return $code;
+	return wantarray ? ($code, $example_filename) : $code;
 }
 
 # Get example sections.
@@ -65,6 +65,7 @@ sub _get_content {
 
 	# Get pod.
 	my $child_pod = $EMPTY_STR;
+	my $example_filename;
 	foreach my $child ($pod_section->children) {
 		if ($child->type eq 'begin') {
 
@@ -79,13 +80,20 @@ sub _get_content {
 			} else {
 				next;
 			}
+		} elsif ($child->type eq 'for') {
+			my $body = $child->body;
+			if ($body =~ m/^comment\s*filename=([\w\.]+)\s*$/ms) {
+				$example_filename = $1;
+			}
 		} else {
 			$child_pod .= $child->pod;
 		}
 	}
 
 	# Remove spaces and return.
-	return _remove_spaces($child_pod);
+	my $ret = _remove_spaces($child_pod);
+
+	return wantarray ? ($ret, $example_filename) : $ret;
 }
 
 # Get section name.
@@ -192,6 +200,7 @@ Pod::Example - Module for getting example from POD.
  use Pod::Example qw(get sections);
 
  my $example = get($file_or_module[, $section[, $number_of_example]]);
+ my ($example, $filename) = get($file_or_module[, $section[, $number_of_example]]);
  my @sections = sections($file_or_module[, $section]);
 
 =head1 SUBROUTINES
@@ -199,8 +208,14 @@ Pod::Example - Module for getting example from POD.
 =head2 C<get>
 
  my $example = get($file_or_module[, $section[, $number_of_example]]);
+ my ($example, $filename) = get($file_or_module[, $section[, $number_of_example]]);
 
-Returns code of example.
+Get content of example. If detect POD comment with filename=FILENAME returns
+filename string. It's useful for generating of examples from documentation.
+
+Returns code of example in scalar mode.
+
+Returns list with code of example and filename (if possible) in array mode.
 
  $file_or_module    - File with pod doc or perl module.
  $section           - Pod section with example. Default value is 'EXAMPLE'.
@@ -227,6 +242,8 @@ Returns array of example sections.
 
 =head1 EXAMPLE1
 
+=for comment filename=print_example.pl
+
  use strict;
  use warnings;
 
@@ -239,6 +256,8 @@ Returns array of example sections.
  # This example.
 
 =head1 EXAMPLE2
+
+=for comment filename=print_sections.pl
 
  use strict;
  use warnings;
@@ -287,12 +306,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2011-2020 Michal Josef Špaček
+© 2011-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.11
+0.12
 
 =cut

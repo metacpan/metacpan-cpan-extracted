@@ -1,12 +1,12 @@
 use strict;
 use warnings;
 
-use 5.006001;
+use 5.008001;
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile1(
-    MIN_PERL_VERSION => '5.006001',
+    MIN_PERL_VERSION => '5.008001',
     META_MERGE => {
         resources => {
             repository => 'http://github.com/crenz/Module-Find',

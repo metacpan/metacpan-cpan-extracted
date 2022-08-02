@@ -53,7 +53,7 @@ $test->for('includes');
 
   with 'Venus::Role::Buildable';
 
-  has 'test';
+  attr 'test';
 
   package main;
 
@@ -104,8 +104,8 @@ when a single non-hashref is provided.
 
   use Venus::Class;
 
-  has 'x';
-  has 'y';
+  attr 'x';
+  attr 'y';
 
   with 'Venus::Role::Buildable';
 
@@ -158,8 +158,8 @@ hook into the handling of the arguments provided.
 
   use Venus::Class;
 
-  has 'x';
-  has 'y';
+  attr 'x';
+  attr 'y';
 
   with 'Venus::Role::Buildable';
 
@@ -213,8 +213,8 @@ after all arguments have been handled and set.
 
   use Venus::Class;
 
-  has 'x';
-  has 'y';
+  attr 'x';
+  attr 'y';
 
   with 'Venus::Role::Buildable';
 
@@ -268,8 +268,8 @@ when a single empty hashref is provided.
 
   use Venus::Class;
 
-  has 'x';
-  has 'y';
+  attr 'x';
+  attr 'y';
 
   with 'Venus::Role::Buildable';
 

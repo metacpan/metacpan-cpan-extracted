@@ -1,0 +1,23 @@
+Release history for FlatFile
+
+0.12  2006-07-09
+	- Fix for return value of nextrec after update (RT #22167, Ricardo Signes)
+	- Fix for test failures on OSes with extended /etc/passwd format (RT #129146)
+
+0.11  2006-07-09
+
+Bug fixes in the handling of inherited classes, particularly those
+with nonstandard field separators.
+
+0.10  2006-07-06
+
+Rewrote internals; the module now uses Tie::File for I/O, instead of
+doing all the I/O manually.  This changed some behavior, but it will
+be much easier to move forward.  A number of insoluble problems are
+now wither solved or solvable.  In particular, you no longer need to
+call ->flush explicitly; it is invoked automatically when the database
+object is finished.
+
+0.03  2006-07-06
+
+Initial release.

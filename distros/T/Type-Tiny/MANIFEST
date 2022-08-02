@@ -39,6 +39,7 @@ lib/Error/TypeTiny/Assertion.pm
 lib/Error/TypeTiny/Compilation.pm
 lib/Error/TypeTiny/WrongNumberOfParameters.pm
 lib/Eval/TypeTiny.pm
+lib/Eval/TypeTiny/CodeAccumulator.pm
 lib/Reply/Plugin/TypeTiny.pm
 lib/Test/TypeTiny.pm
 lib/Type/Coercion.pm
@@ -46,7 +47,6 @@ lib/Type/Coercion/FromMoose.pm
 lib/Type/Coercion/Union.pm
 lib/Type/Library.pm
 lib/Type/Params.pm
-lib/Type/Params/Coderef.pm
 lib/Type/Params/Parameter.pm
 lib/Type/Params/Signature.pm
 lib/Type/Parser.pm
@@ -68,6 +68,7 @@ lib/Type/Tiny/Manual/Optimization.pod
 lib/Type/Tiny/Manual/Params.pod
 lib/Type/Tiny/Manual/Policies.pod
 lib/Type/Tiny/Manual/UsingWithClassTiny.pod
+lib/Type/Tiny/Manual/UsingWithMite.pod
 lib/Type/Tiny/Manual/UsingWithMoo.pod
 lib/Type/Tiny/Manual/UsingWithMoo2.pod
 lib/Type/Tiny/Manual/UsingWithMoo3.pod
@@ -103,6 +104,7 @@ t/20-modules/Error-TypeTiny-Compilation/basic.t
 t/20-modules/Error-TypeTiny-WrongNumberOfParameters/basic.t
 t/20-modules/Error-TypeTiny/basic.t
 t/20-modules/Error-TypeTiny/stacktrace.t
+t/20-modules/Eval-TypeTiny-CodeAccumulator/basic.t
 t/20-modules/Eval-TypeTiny/aliases-devel-lexalias.t
 t/20-modules/Eval-TypeTiny/aliases-native.t
 t/20-modules/Eval-TypeTiny/aliases-padwalker.t
@@ -132,6 +134,7 @@ t/20-modules/Type-Library/is.t
 t/20-modules/Type-Library/recursive-type-definitions.t
 t/20-modules/Type-Library/to.t
 t/20-modules/Type-Library/types.t
+t/20-modules/Type-Params/alias.t
 t/20-modules/Type-Params/badsigs.t
 t/20-modules/Type-Params/carping.t
 t/20-modules/Type-Params/clone.t

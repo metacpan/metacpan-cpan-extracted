@@ -1,5 +1,10 @@
 Revision history for Music-FretboardDiagram
 
+0.1315 2022-07-31 08:05:04
+    - Add the spec_to_notes() method.
+    - Fix the position logic for sets of chords and in the _note_at() method.
+    - Add the eg/d-based-py program to grab chord-names from music21.
+
 0.1314 2022-07-17 07:31:25
     - Enhance eg/d-based...
     - Improve documentation.

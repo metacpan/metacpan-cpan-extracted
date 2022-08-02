@@ -4,7 +4,7 @@ Perl::Critic::Dancer2 - A collection of handy perlcritic modules for Dancer2
 
 # VERSION
 
-version 0.4000
+version 0.4100
 
 # SYNOPSIS
 
@@ -20,19 +20,24 @@ The included policies are:
 
 - [Perl::Critic::Policy::Dancer2::ProhibitUnrecommendedKeywords](https://metacpan.org/pod/Perl%3A%3ACritic%3A%3APolicy%3A%3ADancer2%3A%3AProhibitUnrecommendedKeywords)
 
-    Complains about usage of unrecommended keywords \[Default severity: 2\] 
+    Complains about usage of unrecommended keywords \[Default severity: 2\]
+
+- [Perl::Critic::Policy::Dancer2::ReturnNotNecessary](https://metacpan.org/pod/Perl%3A%3ACritic%3A%3APolicy%3A%3ADancer2%3A%3AReturnNotNecessary)
+
+    Certain keywords immediately end execution of the route with an implicit
+    `return`, so using `return` before them is not necessary. \[Default severity: 3\]
 
 # AFFILIATION
 
 This module has no functionality, but instead contains documentation
 for this distribution and acts as a means of pulling other modules
 into a bundle.  All of the Policy modules contained herein will have
-an "AFFILIATION" section announcing their participation in this
+an **AFFILIATION** section announcing their participation in this
 grouping.
 
 # CONFIGURATION AND ENVIRONMENT
 
-All policies included are in the "dancer2" theme.  See the
+All policies included are in the `dancer2` theme.  See the
 [Perl::Critic](https://metacpan.org/pod/Perl%3A%3ACritic) documentation for how to make use of this.
 
 # ACKNOWLEDGEMENTS
@@ -40,11 +45,13 @@ All policies included are in the "dancer2" theme.  See the
 Special thanks to [Jason Crome](https://metacpan.org/author/CROMEDOME), who
 is always encouraging me to indulge and write tools like this one. And to
 [Sawyer X](https://metacpan.org/author/XSAWYERX), who discussed the need for
-such a module on a Dancer2 issue a loooooong time back.
+such a module on a Dancer2 issue a loooooong time back, at
+[this GitHub issue](https://github.com/PerlDancer/Dancer2/issues/1263).
 
 # SEE ALSO
 
-[Perl::Critic](https://metacpan.org/pod/Perl%3A%3ACritic),[Dancer2](https://metacpan.org/pod/Dancer2)
+- [Perl::Critic](https://metacpan.org/pod/Perl%3A%3ACritic)
+- [Dancer2](https://metacpan.org/pod/Dancer2)
 
 # AUTHOR
 

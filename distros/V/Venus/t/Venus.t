@@ -18,14 +18,6 @@ Venus
 
 $test->for('name');
 
-=version
-
-0.09
-
-=cut
-
-$test->for('version');
-
 =tagline
 
 OO Library
@@ -94,14 +86,15 @@ $test->for('synopsis', sub {
 =description
 
 This library provides an object-orientation framework and extendible standard
-library for Perl 5, built on top of L<Moo> with classes which wrap most native
-Perl data types. Venus has a simple modular architecture, robust library of
-classes and methods, supports pure-Perl autoboxing, advanced exception
-handling, "true" and "false" keywords, package introspection, command-line
-options parsing, and more. This package will always automatically exports
-C<true> and C<false> keyword functions (unless existing routines of the same
-name already exist in the calling package), otherwise exports keyword functions
-as requested at import. This library requires Perl C<5.18+>.
+library for Perl 5, built on top of the L<Mars> architecture with classes which
+wrap most native Perl data types. Venus has a simple modular architecture,
+robust library of classes, methods, and roles, supports pure-Perl autoboxing,
+advanced exception handling, "true" and "false" functions, package
+introspection, command-line options parsing, and more. This package will always
+automatically exports C<true> and C<false> keyword functions (unless existing
+routines of the same name already exist in the calling package or its parents),
+otherwise exports keyword functions as requested at import. This library
+requires Perl C<5.18+>.
 
 =cut
 
@@ -131,7 +124,9 @@ argument in list context.
 
   my $error = catch {die};
 
-  $error; # 'Died at ...'
+  $error;
+
+  # "Died at ..."
 
 =cut
 
@@ -151,7 +146,9 @@ $test->for('example', 1, 'catch', sub {
 
   my ($error, $result) = catch {error};
 
-  $error; # Venus::Error
+  $error;
+
+  # bless({...}, 'Venus::Error')
 
 =cut
 
@@ -171,7 +168,9 @@ $test->for('example', 2, 'catch', sub {
 
   my ($error, $result) = catch {true};
 
-  $result; # 1
+  $result;
+
+  # 1
 
 =cut
 
@@ -206,6 +205,8 @@ exception object arguments provided.
 
   my $error = error;
 
+  # bless({...}, 'Venus::Error')
+
 =cut
 
 $test->for('example', 1, 'error', sub {
@@ -227,6 +228,8 @@ $test->for('example', 1, 'error', sub {
   my $error = error {
     message => 'Something failed!',
   };
+
+  # bless({message => 'Something failed!', ...}, 'Venus::Error')
 
 =cut
 
@@ -263,6 +266,8 @@ practically indistinguishable from the conventional numerical C<0> value.
 
   my $false = false;
 
+  # 0
+
 =cut
 
 $test->for('example', 1, 'false', sub {
@@ -280,6 +285,8 @@ $test->for('example', 1, 'false', sub {
   use Venus;
 
   my $true = !false;
+
+  # 1
 
 =cut
 
@@ -314,6 +321,8 @@ provided.
 
   my $error = raise 'MyApp::Error';
 
+  # bless({...}, 'MyApp::Error')
+
 =cut
 
 $test->for('example', 1, 'raise', sub {
@@ -334,6 +343,8 @@ $test->for('example', 1, 'raise', sub {
   use Venus 'raise';
 
   my $error = raise ['MyApp::Error', 'Venus::Error'];
+
+  # bless({...}, 'MyApp::Error')
 
 =cut
 
@@ -357,6 +368,8 @@ $test->for('example', 2, 'raise', sub {
   my $error = raise ['MyApp::Error', 'Venus::Error'], {
     message => 'Something failed!',
   };
+
+  # bless({message => 'Something failed!', ...}, 'MyApp::Error')
 
 =cut
 
@@ -394,6 +407,8 @@ practically indistinguishable from the conventional numerical C<1> value.
 
   my $true = true;
 
+  # 1
+
 =cut
 
 $test->for('example', 1, 'true', sub {
@@ -411,6 +426,8 @@ $test->for('example', 1, 'true', sub {
   use Venus;
 
   my $false = !true;
+
+  # 0
 
 =cut
 
@@ -462,6 +479,8 @@ $test->for('feature', 'standard-library');
 
   $array->count == $hash->count;
 
+  # 1
+
 =cut
 
 $test->for('example', 1, 'standard-library', sub {
@@ -488,6 +507,8 @@ $test->for('feature', 'value-classes');
 
   my $array = Venus::Array->new;
 
+  # bless({...}, 'Venus::Array')
+
 =cut
 
 $test->for('example', 1, 'value-classes', sub {
@@ -504,6 +525,8 @@ $test->for('example', 1, 'value-classes', sub {
   use Venus::Boolean;
 
   my $boolean = Venus::Boolean->new;
+
+  # bless({...}, 'Venus::Boolean')
 
 =cut
 
@@ -522,6 +545,8 @@ $test->for('example', 2, 'value-classes', sub {
 
   my $code = Venus::Code->new;
 
+  # bless({...}, 'Venus::Code')
+
 =cut
 
 $test->for('example', 3, 'value-classes', sub {
@@ -538,6 +563,8 @@ $test->for('example', 3, 'value-classes', sub {
   use Venus::Float;
 
   my $float = Venus::Float->new;
+
+  # bless({...}, 'Venus::Float')
 
 =cut
 
@@ -556,6 +583,8 @@ $test->for('example', 4, 'value-classes', sub {
 
   my $hash = Venus::Hash->new;
 
+  # bless({...}, 'Venus::Hash')
+
 =cut
 
 $test->for('example', 5, 'value-classes', sub {
@@ -572,6 +601,8 @@ $test->for('example', 5, 'value-classes', sub {
   use Venus::Number;
 
   my $number = Venus::Number->new;
+
+  # bless({...}, 'Venus::Number')
 
 =cut
 
@@ -590,6 +621,8 @@ $test->for('example', 6, 'value-classes', sub {
 
   my $regexp = Venus::Regexp->new;
 
+  # bless({...}, 'Venus::Regexp')
+
 =cut
 
 $test->for('example', 7, 'value-classes', sub {
@@ -606,6 +639,8 @@ $test->for('example', 7, 'value-classes', sub {
   use Venus::Scalar;
 
   my $scalar = Venus::Scalar->new;
+
+  # bless({...}, 'Venus::Scalar')
 
 =cut
 
@@ -624,6 +659,8 @@ $test->for('example', 8, 'value-classes', sub {
 
   my $string = Venus::String->new;
 
+  # bless({...}, 'Venus::String')
+
 =cut
 
 $test->for('example', 9, 'value-classes', sub {
@@ -640,6 +677,8 @@ $test->for('example', 9, 'value-classes', sub {
   use Venus::Undef;
 
   my $undef = Venus::Undef->new;
+
+  # bless({...}, 'Venus::Undef')
 
 =cut
 
@@ -697,6 +736,8 @@ $test->for('feature', 'utility-classes');
 
   my $args = Venus::Args->new;
 
+  # bless({...}, 'Venus::Args')
+
 =cut
 
 $test->for('example', 1, 'utility-classes', sub {
@@ -713,6 +754,8 @@ $test->for('example', 1, 'utility-classes', sub {
   use Venus::Box;
 
   my $box = Venus::Box->new;
+
+  # bless({...}, 'Venus::Box')
 
 =cut
 
@@ -731,6 +774,8 @@ $test->for('example', 2, 'utility-classes', sub {
 
   my $docs = Venus::Data->new->docs;
 
+  # bless({...}, 'Venus::Data')
+
 =cut
 
 $test->for('example', 3, 'utility-classes', sub {
@@ -747,6 +792,8 @@ $test->for('example', 3, 'utility-classes', sub {
   use Venus::Date;
 
   my $date = Venus::Date->new;
+
+  # bless({...}, 'Venus::Date')
 
 =cut
 
@@ -765,6 +812,8 @@ $test->for('example', 4, 'utility-classes', sub {
 
   my $error = Venus::Error->new;
 
+  # bless({...}, 'Venus::Error')
+
 =cut
 
 $test->for('example', 5, 'utility-classes', sub {
@@ -781,6 +830,8 @@ $test->for('example', 5, 'utility-classes', sub {
   use Venus::Json;
 
   my $json = Venus::Json->new;
+
+  # bless({...}, 'Venus::Json')
 
 =cut
 
@@ -799,6 +850,8 @@ $test->for('example', 6, 'utility-classes', sub {
 
   my $name = Venus::Name->new;
 
+  # bless({...}, 'Venus::Name')
+
 =cut
 
 $test->for('example', 7, 'utility-classes', sub {
@@ -815,6 +868,8 @@ $test->for('example', 7, 'utility-classes', sub {
   use Venus::Opts;
 
   my $opts = Venus::Opts->new;
+
+  # bless({...}, 'Venus::Opts')
 
 =cut
 
@@ -833,6 +888,8 @@ $test->for('example', 8, 'utility-classes', sub {
 
   my $path = Venus::Path->new;
 
+  # bless({...}, 'Venus::Path')
+
 =cut
 
 $test->for('example', 9, 'utility-classes', sub {
@@ -849,6 +906,8 @@ $test->for('example', 9, 'utility-classes', sub {
   use Venus::Data;
 
   my $text = Venus::Data->new->text;
+
+  # bless({...}, 'Venus::Data')
 
 =cut
 
@@ -867,6 +926,8 @@ $test->for('example', 10, 'utility-classes', sub {
 
   my $space = Venus::Space->new;
 
+  # bless({...}, 'Venus::Space')
+
 =cut
 
 $test->for('example', 11, 'utility-classes', sub {
@@ -883,6 +944,8 @@ $test->for('example', 11, 'utility-classes', sub {
   use Venus::Throw;
 
   my $throw = Venus::Throw->new;
+
+  # bless({...}, 'Venus::Throw')
 
 =cut
 
@@ -901,6 +964,8 @@ $test->for('example', 12, 'utility-classes', sub {
 
   my $try = Venus::Try->new;
 
+  # bless({...}, 'Venus::Try')
+
 =cut
 
 $test->for('example', 13, 'utility-classes', sub {
@@ -917,6 +982,8 @@ $test->for('example', 13, 'utility-classes', sub {
   use Venus::Type;
 
   my $type = Venus::Type->new;
+
+  # bless({...}, 'Venus::Type')
 
 =cut
 
@@ -935,6 +1002,8 @@ $test->for('example', 14, 'utility-classes', sub {
 
   my $vars = Venus::Vars->new;
 
+  # bless({...}, 'Venus::Vars')
+
 =cut
 
 $test->for('example', 15, 'utility-classes', sub {
@@ -951,6 +1020,8 @@ $test->for('example', 15, 'utility-classes', sub {
   use Venus::Match;
 
   my $match = Venus::Match->new;
+
+  # bless({...}, 'Venus::Match')
 
 =cut
 
@@ -969,6 +1040,8 @@ $test->for('example', 16, 'utility-classes', sub {
 
   my $process = Venus::Process->new;
 
+  # bless({...}, 'Venus::Process')
+
 =cut
 
 $test->for('example', 17, 'utility-classes', sub {
@@ -985,6 +1058,8 @@ $test->for('example', 17, 'utility-classes', sub {
   use Venus::Template;
 
   my $template = Venus::Template->new;
+
+  # bless({...}, 'Venus::Template')
 
 =cut
 
@@ -1003,6 +1078,8 @@ $test->for('example', 18, 'utility-classes', sub {
   use Venus::Yaml;
 
   my $yaml = Venus::Yaml->new;
+
+  # bless({...}, 'Venus::Yaml')
 
 =cut
 
@@ -1033,6 +1110,8 @@ $test->for('feature', 'package-reflection');
 
   $space->do('tryload')->routines;
 
+  # [...]
+
 =cut
 
 $test->for('example', 1, 'package-reflection', sub {
@@ -1057,6 +1136,7 @@ $test->for('feature', 'exception-handling');
 
   use Venus::Class;
 
+  with 'Venus::Role::Tryable';
   with 'Venus::Role::Throwable';
   with 'Venus::Role::Catchable';
 
@@ -1072,7 +1152,7 @@ $test->for('feature', 'exception-handling');
 
   my $error = $myapp->catch('execute');
 
-  # $error->isa('MyApp::Error');
+  # bless({...}, 'MyApp::Error');
 
 =cut
 
@@ -1154,6 +1234,8 @@ $test->for('feature', 'pluggable-library');
 
   $string->base64;
 
+  # "aGVsbG8sIHdvcmxk\n"
+
 =cut
 
 $test->for('example', 1, 'pluggable-library', sub {
@@ -1187,6 +1269,8 @@ $test->for('feature', 'template-system');
 
   $template->render;
 
+  # "Welcome, friend!"
+
 =cut
 
 $test->for('example', 1, 'template-system', sub {
@@ -1198,7 +1282,7 @@ $test->for('example', 1, 'template-system', sub {
 
 =authors
 
-Cpanery, C<cpanery@cpan.org>
+Awncorp, C<awncorp@cpan.org>
 
 =cut
 

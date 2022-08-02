@@ -22,7 +22,7 @@ test_psgi($app, sub {
 	is($res->header('Content-Type'), 'text/html; charset=utf-8', 'Content type (HTML).');
 	my $right_content = <<'END';
 <!DOCTYPE html>
-<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head><body>Hello world</body></html>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /></head><body>Hello world</body></html>
 END
 	chomp $right_content;
 	is($res->content, $right_content, 'Content (hello world html page).');

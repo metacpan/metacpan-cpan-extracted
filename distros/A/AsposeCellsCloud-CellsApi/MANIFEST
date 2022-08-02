@@ -319,6 +319,10 @@ lib/AsposeCellsCloud/Object/DataBar.pm
 lib/AsposeCellsCloud/Object/DataBarBorder.pm
 lib/AsposeCellsCloud/Object/DataSorter.pm
 lib/AsposeCellsCloud/Object/DifSaveOptions.pm
+lib/AsposeCellsCloud/Object/DocxSaveOptions.pm
+lib/AsposeCellsCloud/Object/JsonSaveOptions.pm
+lib/AsposeCellsCloud/Object/PptxSaveOptions.pm
+lib/AsposeCellsCloud/Object/SqlScriptSaveOptions.pm
 lib/AsposeCellsCloud/Object/DiscUsage.pm
 lib/AsposeCellsCloud/Object/DynamicFilter.pm
 lib/AsposeCellsCloud/Object/Error.pm

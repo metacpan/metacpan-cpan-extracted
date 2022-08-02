@@ -4,7 +4,7 @@ DBIx::Class::Helper::TableSample - Add support for tablesample clauses
 
 # VERSION
 
-version v0.2.0
+version v0.3.1
 
 # SYNOPSIS
 
@@ -28,7 +28,7 @@ my $rs = $schema->resultset('Wobbles')->search_rs(
   {
     columns     => [qw/ id name /],
     tablesample => {
-      type     => 'system',
+      method   => 'system',
       fraction => 0.5,
     },
   }
@@ -38,13 +38,13 @@ my $rs = $schema->resultset('Wobbles')->search_rs(
 This generates the SQL
 
 ```
-SELECT me.id FROM artist me TABLESAMPLE SYSTEM (0.5)
+SELECT me.id, me.name FROM artist me TABLESAMPLE SYSTEM (0.5)
 ```
 
 # DESCRIPTION
 
 This helper adds rudimentary support for tablesample queries
-to [DBIx::Class](https://metacpan.org/pod/DBIx::Class) resultsets.
+to [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass) resultsets.
 
 The `tablesample` key supports the following options as a hash
 reference:
@@ -76,9 +76,9 @@ reference:
     );
     ```
 
-- `type`
+- `method`
 
-    By default, there is no sampling type., e.g. you can simply use:
+    By default, there is no sampling method, e.g. you can simply use:
 
     ```perl
     my $rs = $schema->resultset('Wobbles')->search_rs(
@@ -108,10 +108,32 @@ reference:
     SELECT me.id FROM artist me TABLESAMPLE (5)
     ```
 
-    If your database supports or requires a type, you can specify it,
-    e.g. `system` or `bernoulli`.
+    If your database supports or requires a sampling method, you can
+    specify it, e.g. `system` or `bernoulli`.
 
-    See your database documentation for the allowable types.
+    ```perl
+    my $rs = $schema->resultset('Wobbles')->search_rs(
+      undef,
+      {
+        columns     => [qw/ id name /],
+        tablesample => {
+           fraction => 5,
+           method   => 'system',
+        },
+      }
+    );
+    ```
+
+    will generate
+
+    ```
+    SELECT me.id FROM artist me TABLESAMPLE SYSTEM (5)
+    ```
+
+    See your database documentation for the allowable methods.
+
+    Prior to version 0.3.0, this was called `type`. It is supported for
+    backwards compatability.
 
 - `repeatable`
 
@@ -143,17 +165,19 @@ reference:
 
 Resultsets with joins or inner queries are not supported.
 
+Delete and update queries are not supported.
+
 # CAVEATS
 
 This module is experimental.
 
-Not all databases support table sampling, and thoser that do may have
+Not all databases support table sampling, and those that do may have
 different restrictions.  You should consult your database
 documentation.
 
 # SEE ALSO
 
-[DBIx::Class](https://metacpan.org/pod/DBIx::Class)
+[DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass)
 
 # SOURCE
 
@@ -178,7 +202,7 @@ Library [https://www.sciencephoto.com](https://www.sciencephoto.com).
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Robert Rothenberg.
+This software is Copyright (c) 2019-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

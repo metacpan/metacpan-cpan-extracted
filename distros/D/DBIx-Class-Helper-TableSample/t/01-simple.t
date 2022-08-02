@@ -53,7 +53,19 @@ run_me {
     attr => {
         columns => [qw/ id /],
         tablesample => {
-            type     => 'bernoulli',
+            fraction => 0.5,
+            method   => 'system',
+        },
+    },
+    sql => q{SELECT me.id FROM artist me TABLESAMPLE SYSTEM (0.5)},
+};
+
+run_me {
+    table_class => 'Artist',
+    attr => {
+        columns => [qw/ id /],
+        tablesample => {
+            method  => 'bernoulli',
             fraction => 0.5,
         },
     },

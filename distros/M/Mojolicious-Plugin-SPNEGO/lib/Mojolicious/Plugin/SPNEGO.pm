@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Net::LDAP::SPNEGO;
 use IO::Socket::Timeout;
 use Mojo::Util qw(b64_decode);
-our $VERSION = '0.5.2';
+our $VERSION = '0.5.4';
 
 my %cCache;
 
@@ -34,34 +34,37 @@ sub register {
             if ($AuthBase64 and $status){
                 for ($status){
                     my $timeout = $cfg->{timeout} // 10;
-                    my $ldap = $cCache->{ldapObj} //= Net::LDAP::SPNEGO->new(
-                        $cfg->{ad_server},
-                        debug=>($cfg->{ldap_debug}//$ENV{SPNEGO_LDAP_DEBUG}//0),
-                        onerror=> sub { my $msg = shift; 
-                            $c->log->error("LDAP ERROR: " . $msg->error);
-                            return $msg
-                        },
-                        timeout=>$timeout,
-                        verify => $cfg->{verify} // 'none'
-                    ) or return 0;
-                    if ($ldap->uri !~ m{^ldaps://}){
-                        my $msg;
-                        if ($cfg->{verify}){
-                            $msg = $ldap->start_tls(verify => $cfg->{verify});
+                    my $ldap = $cCache->{ldapObj};
+                    if (not $ldap) {
+                        $ldap = $cCache->{ldapObj} = Net::LDAP::SPNEGO->new(
+                            $cfg->{ad_server},
+                            debug=>($cfg->{ldap_debug}//$ENV{SPNEGO_LDAP_DEBUG}//0),
+                            onerror=> sub { my $msg = shift; 
+                                $c->log->error("LDAP ERROR: " . $msg->error);
+                                return $msg
+                            },
+                            timeout=>$timeout,
+                            verify => $cfg->{verify} // 'none'
+                        ) or return 0;
+                        if ($ldap->uri !~ m{^ldaps://}){
+                            my $msg;
+                            if ($cfg->{verify}){
+                                $msg = $ldap->start_tls(verify => $cfg->{verify});
+                            }
+                            elsif ($cfg->{start_tls}){
+                                $msg = $ldap->start_tls($cfg->{start_tls});
+                            }
+                            if ($msg and $msg->is_error()){
+                                $c->log->error($msg->error);
+                                return 0;
+                            }
                         }
-                        elsif ($cfg->{start_tls}){
-                            $msg = $ldap->start_tls($cfg->{start_tls});
-                        }
-                        if ($msg and $msg->is_error()){
-                            $c->log->error($msg->error);
-                            return 0;
-                        }
+                        # Read/Write timeouts via setsockopt
+                        my $socket = $ldap->socket(sasl_layer=>0);
+                        IO::Socket::Timeout->enable_timeouts_on($socket);
+                        $socket->read_timeout($timeout);
+                        $socket->write_timeout($timeout);
                     }
-                    # Read/Write timeouts via setsockopt
-                    my $socket = $ldap->socket(sasl_layer=>0);
-                    IO::Socket::Timeout->enable_timeouts_on($socket);
-                    $socket->read_timeout($timeout);
-                    $socket->write_timeout($timeout);
                     /^Type1/ && do {
                         $c->app->log->debug("Bind Type1 ...");
                         my $mesg = $ldap->bind_type1($AuthBase64);

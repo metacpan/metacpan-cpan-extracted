@@ -1,6 +1,6 @@
 package Perl::Critic::Policy::Dancer2::ProhibitUnrecommendedKeywords;
 
-our $VERSION = '0.4000'; # VERSION
+our $VERSION = '0.4100'; # VERSION
 our $AUTHORITY = 'cpan:GEEKRUTH'; # AUTHORITY
 # ABSTRACT: Trigger perlcritic alerts on unrecommended Dancer2 keywords
 use 5.006001;
@@ -34,6 +34,7 @@ sub violates {
    );
    return if !$included;
    if ( defined $unrecommended_words{$elem} ) {
+      return if is_hash_key($elem);
       my $alternative = $unrecommended_words{$elem};
       my $desc        = qq{Use '$alternative' instead of unrecommended Dancer2 keyword '$elem'};
       return $self->violation( $desc, $EXPL, $elem );
@@ -55,7 +56,7 @@ Perl::Critic::Policy::Dancer2::ProhibitUnrecommendedKeywords - Trigger perlcriti
 
 =head1 VERSION
 
-version 0.4000
+version 0.4100
 
 =head1 DESCRIPTION
 

@@ -11,6 +11,18 @@ WriteMakefile(
   EXE_FILES        => ['script/git-perl'],
   (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
     'meta-spec' => { version => 2 },
+     prereqs => {
+       test => {
+         requires => {
+           'IO::Socket::SSL' => '1.42',
+         },
+       },
+       runtime => {
+         requires => {
+           'IO::Socket::SSL' => '1.42',
+        },
+      },
+    },
     resources => {
       repository => {
         type       => 'git',
@@ -24,7 +36,7 @@ WriteMakefile(
     provides => {
       'App::Git::Perl' => {
         file => 'lib/App/Git/Perl.pm',
-        version => '0.1.12',
+        version => '0.1.15',
       }
     },
   })

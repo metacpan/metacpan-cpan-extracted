@@ -146,7 +146,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.155';
+our $VERSION = '0.156';
 our @EXPORT_OK = qw{
     shell
 
@@ -165,7 +165,7 @@ our %EXPORT_TAGS = (
     status	=> [ grep { m/ \A BODY_STATUS_IS_ /smx } @EXPORT_OK ],
 );
 
-use Carp;
+use Carp ();
 use Getopt::Long 2.39;
 use HTTP::Date ();
 use HTTP::Request;
@@ -184,12 +184,12 @@ use HTTP::Status qw{
 use IO::File;
 use IO::Uncompress::Unzip ();
 use JSON qw{};
-use List::Util qw{ max };
+use List::Util ();
 use LWP::UserAgent;	# Not in the base.
-use POSIX qw{strftime};
-use Scalar::Util 1.07 qw{ blessed openhandle };
-use Text::ParseWords;
-use Time::Local;
+use POSIX ();
+use Scalar::Util 1.07 ();
+use Text::ParseWords ();
+use Time::Local ();
 use URI qw{};
 # use URI::Escape qw{};
 
@@ -246,6 +246,8 @@ use constant CLASSIC_RETRIEVE_OPTIONS => [
 	"type ('catnum' or 'epoch', with 'catnum' the default)",
     'start_epoch=s' => 'date',
 ];
+
+our $COMPLETION_APP;	# A hack.
 
 my %catalogs = (	# Catalog names (and other info) for each source.
     celestrak => {
@@ -845,12 +847,17 @@ web page will break this method.
 
 =cut
 
+# Called dynamically
+sub _amsat_opts {	## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+    return [
+	'file=s'	=> 'Name of cache file',
+    ];
+}
+
 sub amsat {
     my ( $self, @args ) = @_;
 
-    ( my $opt, @args ) = _parse_args( [
-	    'file=s'	=> 'Name of cache file',
-	], @args );
+    ( my $opt, @args ) = _parse_args( @args );
 
     return $self->_get_from_net(
 	%{ $opt },
@@ -1009,14 +1016,18 @@ There are no arguments.
 	],
     );
 
+    # Called dynamically
+    sub _box_score_opts {	## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+	return [
+	    'json!'	=> 'Return data in JSON format',
+	    'format=s'	=> 'Specify return format',
+	];
+    }
+
     sub box_score {
 	my ( $self, @args ) = @_;
 
-	( my $opt, @args ) = _parse_args(
-	    [
-		'json!'		=> 'Return data in JSON format',
-		'format=s'	=> 'Specify return format',
-	    ], @args );
+	( my $opt, @args ) = _parse_args( @args );
 	my $format = _retrieval_format( box_score => $opt );
 
 	my $resp = $self->spacetrack_query_v2( qw{
@@ -1079,7 +1090,7 @@ There are no arguments.
 sub __catalog {
     my ( undef, $name ) = @_;
     $catalogs{$name}
-	or confess "Bug - catalog $name does not exist";
+	or Carp::confess "Bug - catalog $name does not exist";
     return $catalogs{$name};
 }
 
@@ -1199,13 +1210,23 @@ response will contain headers
 
 =cut
 
+# Called dynamically
+sub _celestrak_opts {	## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+    return $COMPLETION_APP->{direct} ?
+    CLASSIC_RETRIEVE_OPTIONS :
+    [
+	_get_retrieve_options(),
+	'observing_list|observing-list!' => 'return observing list',
+    ];
+}
+
 sub celestrak {
     my ($self, @args) = @_;
     delete $self->{_pragmata};
 
     ( my $opt, @args ) = $self->{direct} ?
 	_parse_args( CLASSIC_RETRIEVE_OPTIONS, @args ) :
-	_parse_retrieve_args(
+	$self->_parse_retrieve_args(
 	    [ 'observing_list|observing-list!' => 'return observing list' ],
 	    @args,
 	);
@@ -1305,14 +1326,18 @@ L<https://celestrak.org/NORAD/elements/supplemental/>.
 
 =cut
 
+# Called dynamically
+sub _celestrak_supplemental_opts {	## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+    return [
+	'file=s'	=> 'Name of cache file',
+	'rms!'		=> 'Return RMS data',
+	'match!'	=> 'Return match data',
+    ];
+}
+
 sub celestrak_supplemental {
     my ( $self, @args ) = @_;
-    ( my $opt, @args ) = _parse_args(
-	[
-	    'file=s'	=> 'Name of cache file',
-	    'rms!'	=> 'Return RMS data',
-	    'match!'	=> 'Return match data',
-	], @args );
+    ( my $opt, @args ) = _parse_args( @args );
     $opt->{rms}
 	and $opt->{match}
 	and return HTTP::Response->new(
@@ -1451,12 +1476,18 @@ sub _celestrak_repack_iridium {
 	    return $self->_no_such_catalog(
 		$source => $name, $msg);
 	};
-	foreach ( _trim( split ',', $type ) ) {
-	    s/ ; .* //smx;
-	    $valid_type{$_}
+	foreach my $type ( _trim( split ',', $type ) ) {
+	    $type =~ s/ ; .* //smx;
+	    $valid_type{$type}
 		or next;
+	    local $_ = $resp->decoded_content();
 	    # As of February 12 2022 Celestrak does this
-	    $resp->decoded_content() =~ m/\ANo GP data found\b/
+	    # As of July 23 2022 this is not at the beginning of the
+	    # string
+	    m/^No GP data found\b/sm
+		and last;
+	    # As of July 25 2022 Celestrak does this.
+	    m/^(?:GROUP|FILE) "[^"]+" does not exist/sm
 		and last;
 	    return;
 	}
@@ -1726,21 +1757,25 @@ HTTP::Response from C<login()>.
 
 =cut
 
+# Called dynamically
+sub _favorite_opts {	## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+    return [
+	'json!'	=> 'Return data in JSON format',
+	'format=s'	=> 'Specify return format',
+    ];
+}
+
 sub favorite {
     my ($self, @args) = @_;
     delete $self->{_pragmata};
 
-    ( my $opt, @args ) = _parse_args(
-	[
-	    'json!'	=> 'Return data in JSON format',
-	    'format=s'	=> 'Specify return format',
-	], @args );
+    ( my $opt, @args ) = _parse_args( @args );
 
     @args
 	and defined $args[0]
-	or croak 'Must specify a favorite';
+	or Carp::croak 'Must specify a favorite';
     @args > 1
-	and croak 'Can not specify more than one favorite';
+	and Carp::croak 'Can not specify more than one favorite';
     # https://beta.space-track.org/basicspacedata/query/class/tle_latest/favorites/Visible/ORDINAL/1/EPOCH/%3Enow-30/format/3le
 
     my $rest = $self->_convert_retrieve_options_to_rest( $opt );
@@ -1800,14 +1835,19 @@ You can specify the C<retrieve()> options on this method as well.
 
 =cut
 
+# Called dynamically
+sub _file_opts {	## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+    return [ _get_retrieve_options() ];
+}
+
 sub file {
     my ($self, @args) = @_;
 
-    my ( $opt, $file ) = _parse_retrieve_args( @args );
+    my ( $opt, $file ) = $self->_parse_retrieve_args( @args );
 
     delete $self->{_pragmata};
 
-    if ( ! openhandle( $file ) ) {
+    if ( ! Scalar::Util::openhandle( $file ) ) {
 	-e $file or return HTTP::Response->new (
 	    HTTP_NOT_FOUND, "Can't find file $file");
 	my $fh = IO::File->new($file, '<') or
@@ -1840,6 +1880,16 @@ See L</Attributes> for the names and functions of the attributes.
 
 =cut
 
+# Called dynamically
+sub _readline_complete_command_get {	## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+    # my ( $self, $text, $line, $start, $cmd_line ) = @_;
+    my ( $self, $text ) = @_;
+    $text eq ''
+	and return( $self->attribute_names() );
+    my $re = qr/ \A \Q$text\E /smx;
+    return( sort grep { $_ =~ $re } $self->attribute_names() );
+}
+
 sub get {
     my ( $self, $name ) = @_;
     delete $self->{_pragmata};
@@ -1867,9 +1917,9 @@ See L</Attributes> for the names and functions of the attributes.
 sub getv {
     my ( $self, $name ) = @_;
     defined $name
-	or croak 'No attribute name specified';
+	or Carp::croak 'No attribute name specified';
     my $code = $accessor{$name}
-	or croak "No such attribute as '$name'";
+	or Carp::croak "No such attribute as '$name'";
     return $code->( $self, $name );
 }
 
@@ -2255,11 +2305,16 @@ The BODY_STATUS constants are exportable using the :status tag.
 
     my %ignore_raw = map { $_ => 1 } qw{ kelso sladen };
 
+    # Called dynamically
+    sub _iridium_status_opts {	## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+	return [
+	    'raw!'	=> 'Do not supplement with kelso data'
+	];
+    }
+
     sub iridium_status {
 	my ( $self, @args ) = @_;
-	my ( $opt, $fmt ) = _parse_args( [
-		'raw!'	=> 'Do not supplement with kelso data'
-	    ], @args );
+	my ( $opt, $fmt ) = _parse_args( @args );
 	defined $fmt
 	    or $fmt = $self->{iridium_status_format};
 	$self->_deprecation_notice( iridium_status => $fmt );
@@ -2275,7 +2330,7 @@ The BODY_STATUS constants are exportable using the :status tag.
 
 	unless ( 'kelso' eq $fmt ) {
 	    my $code = $self->can( "_iridium_status_$fmt" )
-		or croak "Bad iridium_status format '$fmt'";
+		or Carp::croak "Bad iridium_status format '$fmt'";
 	    ( $resp = $code->( $self, $fmt, \%rslt ) )->is_success()
 		or return $resp;
 	}
@@ -2534,14 +2589,18 @@ There are no arguments.
 {
     my @headings = ( 'Abbreviation', 'Launch Site' );
 
+    # Called dynamically
+    sub _launch_sites_opts {	## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+	return [
+	    'json!'	=> 'Return data in JSON format',
+	    'format=s'	=> 'Specify return format',
+	];
+    }
+
     sub launch_sites {
 	my ( $self, @args ) = @_;
 
-	( my $opt, @args ) = _parse_args(
-	    [
-		'json!'	=> 'Return data in JSON format',
-		'format=s' => 'Specify return format',
-	    ], @args );
+	( my $opt, @args ) = _parse_args( @args );
 	my $format = _retrieval_format( launch_sites => $opt );
 
 	my $resp = $self->spacetrack_query_v2( qw{
@@ -2752,12 +2811,17 @@ No Space Track username and password are required to use this method.
 
 =cut
 
+# Called dynamically
+sub _mccants_opts {	## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+    return [
+	'file=s'	=> 'Name of cache file',
+    ];
+}
+
 sub mccants {
     my ( $self, @args ) = @_;
 
-    ( my $opt, @args ) = _parse_args( [
-	    'file=s'	=> 'Name of cache file',
-	], @args );
+    ( my $opt, @args ) = _parse_args( @args );
 
     return $self->_get_from_net(
 	%{ $opt },
@@ -2929,11 +2993,18 @@ added to the HTTP::Response object returned.
 
 =cut
 
+# Called dynamically
+sub _retrieve_opts {	## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+    return [
+	_get_retrieve_options(),
+    ];
+}
+
 sub retrieve {
     my ( $self, @args ) = @_;
     delete $self->{_pragmata};
 
-    @args = _parse_retrieve_args( @args );
+    @args = $self->_parse_retrieve_args( @args );
     my $opt = _parse_retrieve_dates( shift @args );
 
     my $rest = $self->_convert_retrieve_options_to_rest( $opt );
@@ -3102,7 +3173,7 @@ sub _search_rest {
     my ( $self, $pred, $xfrm, @args ) = @_;
     delete $self->{_pragmata};
 
-    ( my $opt, @args ) = _parse_search_args( @args );
+    ( my $opt, @args ) = $self->_parse_search_args( @args );
 
     my $headings = _search_heading_hash_ref( $opt );
     my @heading_order = _search_heading_order( $opt );
@@ -3159,7 +3230,7 @@ sub _search_rest {
 	defined $opt->{format}
 	    or $opt->{format} = 'tle';
 	ARRAY_REF eq ref $data
-	    or croak "Format $rest_args->{format} does not support TLE retrieval";
+	    or Carp::croak "Format $rest_args->{format} does not support TLE retrieval";
 	my $ropt = _remove_search_options( $opt );
 
 	my $rslt = $self->retrieve( $ropt,
@@ -3380,6 +3451,8 @@ containing the actual search results.
 
 =cut
 
+*_search_date_opts = \&_get_search_options;
+
 sub search_date {	## no critic (RequireArgUnpacking)
     splice @_, 1, 0, LAUNCH => \&_format_launch_date_rest;
     goto &_search_rest;
@@ -3431,6 +3504,8 @@ from the web page. Subsequent elements are references to arrays
 containing the actual search results.
 
 =cut
+
+*_search_decay_opts = \&_get_search_options;
 
 sub search_decay {	## no critic (RequireArgUnpacking)
     splice @_, 1, 0, DECAY => \&_format_launch_date_rest;
@@ -3492,6 +3567,8 @@ containing the actual search results.
  
 =cut
 
+*_search_id_opts = \&_get_search_options;
+
 sub search_id {	## no critic (RequireArgUnpacking)
     splice @_, 1, 0, OBJECT_ID => \&_format_international_id_rest;
     goto &_search_rest;
@@ -3546,6 +3623,8 @@ from the web page. Subsequent elements are references to arrays
 containing the actual search results.
 
 =cut
+
+*_search_name_opts = \&_get_search_options;
 
 sub search_name {	## no critic (RequireArgUnpacking)
     splice @_, 1, 0, OBJECT_NAME => sub { return "~~$_[0]" };
@@ -3625,6 +3704,8 @@ containing the actual search results.
 
 =cut
 
+*_search_oid_opts = \&_get_search_options;
+
 sub search_oid {	## no critic (RequireArgUnpacking)
 ##  my ( $self, @args ) = @_;
     splice @_, 1, 0, OBJECT_NUMBER => sub { return $_[0] };
@@ -3636,7 +3717,7 @@ sub _check_range {
     ($lo, $hi) = ($hi, $lo) if $lo > $hi;
     $lo or $lo = 1;	# 0 is illegal
     $hi - $lo >= $self->{max_range} and do {
-	carp <<"EOD";
+	Carp::carp <<"EOD";
 Warning - Range $lo-$hi ignored because it is greater than the
 	  currently-set maximum of $self->{max_range}.
 EOD
@@ -3662,16 +3743,25 @@ See L</Attributes> for the names and functions of the attributes.
 
 =cut
 
+# Called dynamically
+sub _readline_complete_command_set {	## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+    # my ( $self, $text, $line, $start, $cmd_line ) = @_;
+    my ( undef, undef, undef, undef, $cmd_line ) = @_;
+    @{ $cmd_line } % 2
+	or return;	# Can't complete arguments
+    goto &_readline_complete_command_get;
+}
+
 sub set {	## no critic (ProhibitAmbiguousNames)
     my ($self, @args) = @_;
     delete $self->{_pragmata};
     @args % 2
-	and croak __PACKAGE__, '->set( ',
+	and Carp::croak __PACKAGE__, '->set( ',
 	join( ', ', map { "'$_'" } @args ),
 	') requires an even number of arguments';
     while (@args) {
 	my $name = shift @args;
-	croak "Attribute $name may not be set. Legal attributes are ",
+	Carp::croak "Attribute $name may not be set. Legal attributes are ",
 		join (', ', sort keys %mutator), ".\n"
 	    unless $mutator{$name};
 	my $value = shift @args;
@@ -3830,6 +3920,19 @@ my %known_meta = (
     },
 );
 
+my $readline_word_break_re;
+
+{
+    my %alias = (
+	show	=> 'get',
+    );
+
+    sub _verb_alias {
+	my ( $verb ) = @_;
+	return $alias{$verb} || $verb;
+    }
+}
+
 sub shell {
     my @args = @_;
     my $self = _instance( $args[0], __PACKAGE__ ) ? shift @args :
@@ -3855,11 +3958,7 @@ EOD
 	    $buffer = shift @args;
 	} else {
 	    $read ||= $interactive ? ( eval {
-		    require Term::ReadLine;
-		    $rdln ||= Term::ReadLine->new (
-			'SpaceTrack orbital element access');
-		    $stdout = $rdln->OUT || \*STDOUT;
-		    sub { $rdln->readline ( $self->getv( 'prompt' ) ) };
+		    $self->_get_readline( $stdout )
 		} || sub { print { $stdout } $self->getv( 'prompt' ); return <STDIN> } ) :
 		sub { return<STDIN> };
 	    $buffer = $read->();
@@ -3875,7 +3974,7 @@ EOD
 	# in place, so that (e.g.) '\>foo' is seen as an argument, not a
 	# redirection.
 
-	my @cmdarg = parse_line( '\s+', 1, $buffer );
+	my @cmdarg = Text::ParseWords::parse_line( '\s+', 1, $buffer );
 
 	# Pull off any redirections.
 
@@ -3890,9 +3989,9 @@ EOD
 	# argument false. This should not create any more tokens, it
 	# should just un-quote and un-escape the data.
 
-	@cmdarg = map { parse_line( qr{ \s+ }, 0, $_ ) } @cmdarg;
+	@cmdarg = map { Text::ParseWords::parse_line( qr{ \s+ }, 0, $_ ) } @cmdarg;
 	$redir ne ''
-	    and ( $redir ) = parse_line ( qr{ \s+ }, 0, $redir );
+	    and ( $redir ) = Text::ParseWords::parse_line ( qr{ \s+ }, 0, $redir );
 
 	$redir =~ s/ \A (>+) ~ /$1$ENV{HOME}/smx;
 	my $verb = lc shift @cmdarg;
@@ -3915,7 +4014,7 @@ EOD
 	}
 
 	last if $verb eq 'exit' || $verb eq 'bye';
-	$verb eq 'show' and $verb = 'get';
+	$verb = _verb_alias( $verb );
 	$verb eq 'source' and do {
 	    eval {
 		splice @args, 0, 0, $self->_source (shift @cmdarg);
@@ -3994,6 +4093,30 @@ EOD
 	and not $self->{filter}
 	and print { $stdout } "\n";
     return;
+}
+
+sub _get_readline {	## no critic (Subroutines::RequireArgUnpacking)
+    my ( $self ) = @_;
+    require Term::ReadLine;
+    $rdln ||= Term::ReadLine->new (
+	'SpaceTrack orbital element access');
+    @_ > 1
+	and $_[1] = ( $rdln->OUT || \*STDOUT );	# $stdout
+    if ( 'Term::ReadLine::Perl' eq $rdln->ReadLine() ) {
+	require File::Glob;
+
+	$readline_word_break_re ||= qr<
+	    [\Q$readline::rl_completer_word_break_characters\E]+
+	>smx;
+
+	no warnings qw{ once };
+	$readline::rl_completion_function = sub {
+	    my ( $text, $line, $start ) = @_;
+	    return $self->__readline_completer(
+		$text, $line, $start );
+	};
+    }
+    return sub { $rdln->readline ( $self->getv( 'prompt' ) ) };
 }
 
 
@@ -4102,20 +4225,23 @@ method.
     }
 }
 
+# Called dynamically
+sub _spaceflight_opts {	## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+    return [
+	'all!' => 'retrieve all data',
+	'effective!' => 'include effective date',
+	# The below are the version 1 retrieval options, which are
+	# emulated for this method. See the definition of
+	# CLASSIC_RETRIEVE_OPTIONS for more information.
+	@{ CLASSIC_RETRIEVE_OPTIONS() },
+    ];
+}
+
 sub spaceflight {
     my ($self, @args) = @_;
     delete $self->{_pragmata};
 
-    @args = _parse_args(
-	[
-	    'all!' => 'retrieve all data',
-	    'effective!' => 'include effective date',
-	    # The below are the version 1 retrieval options, which are
-	    # emulated for this method. See the definition of
-	    # CLASSIC_RETRIEVE_OPTIONS for more information.
-	    @{ CLASSIC_RETRIEVE_OPTIONS() },
-	],
-	@args );
+    @args = _parse_args( @args );
     my $opt = _parse_retrieve_dates( shift @args );
 
     $opt->{all} = 0 if $opt->{last5} || $opt->{start_epoch};
@@ -4182,7 +4308,7 @@ sub spaceflight {
 		my $yr = substr $data[-2], 18, 2;
 		my $da = substr $data[-2], 20, 12;
 		$yr += 100 if $yr < 57;
-		my $ep = timegm (0, 0, 0, 1, 0, $yr) + ($da - 1) * 86400;
+		my $ep = Time::Local::timegm (0, 0, 0, 1, 0, $yr) + ($da - 1) * 86400;
 		if ( $opt->{all} ||
 		    $opt->{start_epoch} && $ep >= $opt->{start_epoch} &&
 			$ep < $opt->{end_epoch} ||
@@ -4308,20 +4434,29 @@ HTTP::Response from C<login()>.
     sub _unpack_query {
 	my ( $arg ) = @_;
 	my $code = $unpack_query{ref $arg}
-	    or confess "Programming error - unexpected query $arg";
+	    or Carp::confess "Programming error - unexpected query $arg";
 	return $code->( $arg );
     }
 
 }
 
+# Called dynamically
+sub _spacetrack_opts {	## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+    return [
+	'json!'		=> 'Return data in JSON format',
+	'format=s'	=> 'Specify retrieval format',
+    ];
+}
+
+# Called dynamically
+sub _spacetrack_catalog_version {	## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+    return $_[0]->getv( 'space_track_version' );
+}
+
 sub spacetrack {
     my ( $self, @args ) = @_;
 
-    my ( $opt, $catalog ) = _parse_args(
-	[
-	    'json!'	=> 'Return data in JSON format',
-	    'format=s'	=> 'Specify retrieval format',
-	], @args );
+    my ( $opt, $catalog ) = _parse_args( @args );
 
     _retrieval_format( tle => $opt );
 
@@ -4330,7 +4465,7 @@ sub spacetrack {
 	or return $self->_no_such_catalog( spacetrack => 2, $catalog );
 
     defined $info->{deprecate}
-	and croak "Catalog '$catalog' is deprecated in favor of '$info->{deprecate}'";
+	and Carp::croak "Catalog '$catalog' is deprecated in favor of '$info->{deprecate}'";
 
     defined $info->{favorite}
 	and return $self->favorite( $opt, $info->{favorite} );
@@ -4643,24 +4778,31 @@ lost as the individual OIDs are updated.
 	},
     );
 
+    # Called dynamically
+    sub _update_opts {	## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+	return [
+	    _get_retrieve_options(),
+	];
+    }
+
     sub update {
 	my ( $self, @args ) = @_;
 
-	my ( $opt, $fn ) = _parse_retrieve_args( @args );
+	my ( $opt, $fn ) = $self->_parse_retrieve_args( @args );
 
 	$opt = { %{ $opt } };	# Since we modify it.
 
 	delete $opt->{start_epoch}
-	    and croak '-start_epoch not allowed';
+	    and Carp::croak '-start_epoch not allowed';
 	delete $opt->{end_epoch}
-	    and croak '-end_epoch not allowed';
+	    and Carp::croak '-end_epoch not allowed';
 
 	my $json = $self->_get_json_object();
 	my $data;
 	{
 	    local $/ = undef;
 	    open my $fh, '<', $fn
-		or croak "Unable to open $fn: $!";
+		or Carp::croak "Unable to open $fn: $!";
 	    $data = $json->decode( <$fh> );
 	    close $fh;
 	}
@@ -4707,7 +4849,7 @@ lost as the individual OIDs are updated.
 
 	    {
 		open my $fh, '>', $fn
-		    or croak "Failed to open $fn: $!";
+		    or Carp::croak "Failed to open $fn: $!";
 		print { $fh } $json->encode( $data );
 		close $fh;
 	    }
@@ -4818,7 +4960,7 @@ sub _accumulate_file_of_record {
 		and $datum->{_file_of_record} = $context->{file};
 	}
     } else {
-	$context->{file} = max( -1,
+	$context->{file} = List::Util::max( -1,
 	    map { $_->{FILE} }
 	    grep { defined $_->{FILE} }
 	    @{ $data }
@@ -4920,7 +5062,7 @@ sub _accumulate_json_return {	## no critic (ProhibitUnusedPrivateSubroutines)
 sub _accumulate_unknown_data {
     my ( undef, $content, $context ) = @_;	# Invocant unused
     defined $context->{data}
-	and croak "Unable to accumulate $context->{format} data";
+	and Carp::croak "Unable to accumulate $context->{format} data";
     $context->{data} = $content;
     return;
 }
@@ -4988,7 +5130,7 @@ sub _record_cookie_generic {
 	    $interface_info->{cookie_expires} = $expires;
 	    $self->{dump_headers} & DUMP_TRACE
 		and warn 'Cookie expiration: ',
-		    strftime( '%d-%b-%Y %H:%M:%S', localtime $expires ),
+		    POSIX::strftime( '%d-%b-%Y %H:%M:%S', localtime $expires ),
 		    " ($expires)\n";	## no critic (RequireCarping)
 	    return $expires > time;
 	}
@@ -5077,15 +5219,15 @@ sub _check_cookie_generic {
 	    or return;
 	my $desc = $method;
 	if ( ref $level ) {
-	    defined $argument or confess( 'Bug - $argument undefined' );
+	    defined $argument or Carp::confess( 'Bug - $argument undefined' );
 	    $level = $level->{$argument}
 		or return;
 	    $desc = "$method $argument";
 	}
 	$level >= 3
-	    and croak "$desc is retracted";
+	    and Carp::croak "$desc is retracted";
 	warnings::enabled( 'deprecated' )
-	    and carp "$desc is deprecated";
+	    and Carp::carp "$desc is deprecated";
 	1 == $level
 	    or return;
 	if ( ref $deprecate{$method} ) {
@@ -5410,9 +5552,9 @@ sub _get_from_net {
 		and return $resp;
 	}
 	$url = $info->{url}
-	    or confess "Programming error - No url defined for $method( '$arg{catalog}' )";
+	    or Carp::confess "Programming error - No url defined for $method( '$arg{catalog}' )";
     } else {
-	confess q<Programming error - neither 'url' nor 'catalog' specified>;
+	Carp::confess q<Programming error - neither 'url' nor 'catalog' specified>;
     }
 
     if ( my $resp = $self->_dump_request(
@@ -5463,7 +5605,7 @@ sub _get_from_net {
 
     if ( $resp->code() == HTTP_NOT_MODIFIED ) {
 	defined $arg{file}
-	    or confess q{Programming Error - argument 'file' not defined};
+	    or Carp::confess q{Programming Error - argument 'file' not defined};
 	local $/ = undef;
 	open my $fh, '<', $arg{file}
 	    or return HTTP::Response->new(
@@ -5598,7 +5740,7 @@ sub _handle_observing_list {
 sub _instance {
     my ( $object, $class ) = @_;
     ref $object or return;
-    blessed( $object ) or return;
+    Scalar::Util::blessed( $object ) or return;
     return $object->isa( $class );
 }
 
@@ -5730,10 +5872,10 @@ static method flushes the cache to force the identity data to be reread.
 	}
 	foreach my $key ( qw{ username password } ) {
 	    exists $identity->{$key}
-		or croak "Identity file omits $key";
+		or Carp::croak "Identity file omits $key";
 	}
 	scalar keys %{ $identity } > 2
-	    and croak 'Identity file defines keys besides username and password';
+	    and Carp::croak 'Identity file defines keys besides username and password';
 	return $identity;
     }
 }
@@ -5749,7 +5891,7 @@ static method flushes the cache to force the identity data to be reread.
 	    $self->{_space_track_interface}[$version];
 
 	exists $spacetrack_interface_info->{$name}
-	    or croak "Can not set $name for interface version $version";
+	    or Carp::croak "Can not set $name for interface version $version";
 
 	$need_logout{$name}
 	    and $self->logout();
@@ -5764,7 +5906,7 @@ sub _access_spacetrack_interface {
     my $spacetrack_interface_info =
 	$self->{_space_track_interface}[$version];
     exists $spacetrack_interface_info->{$name}
-	or croak "Can not get $name for interface version $version";
+	or Carp::croak "Can not get $name for interface version $version";
     return $spacetrack_interface_info->{$name};
 }
 
@@ -5781,7 +5923,7 @@ sub _mutate_authen {
 # This subroutine just does some argument checking and then co-routines
 # off to _mutate_attrib.
 sub _mutate_iridium_status_format {
-    croak "Error - Illegal status format '$_[2]'"
+    Carp::croak "Error - Illegal status format '$_[2]'"
 	unless $catalogs{iridium_status}{$_[2]};
     $_[0]->_deprecation_notice( iridium_status_format => $_[2] );
     goto &_mutate_attrib;
@@ -5793,7 +5935,7 @@ sub _mutate_iridium_status_format {
 # This subroutine just does some argument checking and then co-routines
 # off to _mutate_attrib.
 sub _mutate_number {
-    $_[2] =~ m/ \D /smx and croak <<"EOD";
+    $_[2] =~ m/ \D /smx and Carp::croak <<"EOD";
 Attribute $_[1] must be set to a numeric value.
 EOD
     goto &_mutate_attrib;
@@ -5809,10 +5951,10 @@ sub _mutate_space_track_version {
 	or $value = DEFAULT_SPACE_TRACK_VERSION;
     $value =~ m/ \A \d+ \z /smx
 	and $self->{_space_track_interface}[$value]
-	or croak "Invalid Space Track version $value";
+	or Carp::croak "Invalid Space Track version $value";
 ##  $self->_deprecation_notice( $name => $value );
     $value == 1
-	and croak 'The version 1 SpaceTrack interface stopped working July 16 2013 at 18:00 UT';
+	and Carp::croak 'The version 1 SpaceTrack interface stopped working July 16 2013 at 18:00 UT';
     return ( $self->{$name} = $value );
 }
 
@@ -5844,12 +5986,12 @@ sub _mutate_verify_hostname {
 	my ( $self, $source, @args ) = @_;
 
 	my $info = $catalogs{$source}
-	    or confess "Programming error - No such source as '$source'";
+	    or Carp::confess "Programming error - No such source as '$source'";
 
 	if ( ARRAY_REF eq ref $info ) {
 	    my $inx = shift @args;
 	    $info = $info->[$inx]
-		or confess "Programming error - Illegal index $inx ",
+		or Carp::confess "Programming error - Illegal index $inx ",
 		    "for '$source'";
 	}
 
@@ -5890,6 +6032,14 @@ sub _mutate_verify_hostname {
 
     sub _parse_args {
 	my ( $lgl_opts, @args ) = @_;
+	unless ( ARRAY_REF eq ref $lgl_opts ) {
+	    unshift @args, $lgl_opts;
+	    ( my $caller = ( caller 1 )[3] ) =~ s/ ( .* ) :: //smx;
+	    my $pkg = $1;
+	    my $code = $pkg->can( "_${caller}_opts" )
+		or Carp::confess "Bug - _${caller}_opts not found";
+	    $lgl_opts = $code->();
+	}
 	my $opt;
 	if ( HASH_REF eq ref $args[0] ) {
 	    $opt = { %{ shift @args } };	# Poor man's clone.
@@ -5959,8 +6109,8 @@ EOD
     defined $arg{suffix}
 	and $msg .= $arg{suffix};
     $arg{carp}
-	or croak $msg;
-    carp $msg;
+	or Carp::croak $msg;
+    Carp::carp $msg;
     return;
 }
 
@@ -6039,8 +6189,12 @@ sub _parse_launch_date {
 	'format=s' => 'Specify data format'
     );
 
+    sub _get_retrieve_options {
+	return @legal_retrieve_options;
+    }
+
     sub _parse_retrieve_args {
-	my @args = @_;
+	my ( undef, @args ) = @_;	# Invocant unused
 	my $extra_options = ARRAY_REF eq ref $args[0] ?
 	    shift @args :
 	    undef;
@@ -6085,16 +6239,16 @@ sub _parse_launch_date {
 	$opt->{json}
 	    and defined $opt->{format}
 	    and $opt->{format} ne 'json'
-	    and croak 'Inconsistent retrieval format specification';
+	    and Carp::croak 'Inconsistent retrieval format specification';
 	$format{$table}
-	    or confess "Programming error - $table not supported";
+	    or Carp::confess "Programming error - $table not supported";
 	defined $opt->{format}
 	    or $opt->{format} = $opt->{json} ? 'json' :
 		$format{$table}{default};
 	exists $opt->{json}
 	    or $opt->{json} = 'json' eq $opt->{format};
 	$format{$table}{valid}{ $opt->{format} }
-	    or croak "Invalid $table retrieval format '$opt->{format}'";
+	    or Carp::croak "Invalid $table retrieval format '$opt->{format}'";
 	return $opt->{format} eq 'legacy' ? 'json' : $opt->{format};
     }
 }
@@ -6110,7 +6264,7 @@ sub _parse_launch_date {
 	    or return 'catnum';
 	$sort = lc $sort;
 	$valid{$sort}
-	    or croak "Illegal sort '$sort'";
+	    or Carp::croak "Illegal sort '$sort'";
 	return $sort;
     }
 }
@@ -6141,7 +6295,7 @@ sub _parse_retrieve_dates {
 		( \d+ ) \D+ ( \d+ ) \D+ ( \d+ )
 		(?: \D+ ( \d+ ) (?: \D+ ( \d+ ) (?: \D+ ( \d+ ) )? )? )?
 	    \z >smx
-		or croak "Error - Illegal date '$str'";
+		or Carp::croak "Error - Illegal date '$str'";
 	    my @time = ( $6, $5, $4, $3, $2, $1 );
 	    foreach ( @time ) {
 		defined $_
@@ -6154,9 +6308,9 @@ sub _parse_retrieve_dates {
 	    }
 	    $time[4] -= 1;
 	    eval {
-		$opt->{$key} = timegm( @time );
+		$opt->{$key} = Time::Local::timegm( @time );
 		1;
-	    } or croak "Error - Illegal date '$str'";
+	    } or Carp::croak "Error - Illegal date '$str'";
 	}
 
 	$found++;
@@ -6169,7 +6323,7 @@ sub _parse_retrieve_dates {
 	    $opt->{end_epoch} ||= $opt->{start_epoch} + 86400;
 	}
 
-	$opt->{start_epoch} <= $opt->{end_epoch} or croak <<'EOD';
+	$opt->{start_epoch} <= $opt->{end_epoch} or Carp::croak <<'EOD';
 Error - End epoch must not be before start epoch.
 EOD
 
@@ -6216,7 +6370,7 @@ EOD
 
 	if ( defined $opt->{status} ) {
 	    defined ( my $query = $status_query{$opt->{status}} )
-		or croak "Unknown status '$opt->{status}'";
+		or Carp::croak "Unknown status '$opt->{status}'";
 	    $query
 		and $rest{DECAY} = $query;
 	}
@@ -6228,7 +6382,7 @@ EOD
 		%incl = map { $_ => 1 } keys %include_map;
 		foreach ( @{ $opt->{exclude} } ) {
 		    $include_map{$_}
-			or croak "Unknown exclusion '$_'";
+			or Carp::croak "Unknown exclusion '$_'";
 		    delete $incl{$_};
 		}
 	    }
@@ -6236,7 +6390,7 @@ EOD
 	    if ( $opt->{include} && @{ $opt->{include} } ) {
 		foreach ( @{ $opt->{include} } ) {
 		    $include_map{$_}
-			or croak "Unknown inclusion '$_'";
+			or Carp::croak "Unknown inclusion '$_'";
 		    $incl{$_} = 1;
 		}
 	    }
@@ -6260,18 +6414,22 @@ EOD
     );
     my %legal_search_status = map {$_ => 1} qw{onorbit decayed all};
 
+    sub _get_search_options {
+	return \@legal_search_args;
+    }
+
     sub _parse_search_args {
-	my @args = @_;
+	my ( $self, @args ) = @_;
 
 	my $extra = ARRAY_REF eq ref $args[0] ? shift @args : [];
-	@args = _parse_retrieve_args(
+	@args = $self->_parse_retrieve_args(
 	    [ @legal_search_args, @{ $extra } ], @args );
 
 	my $opt = $args[0];
 
 	$opt->{status} ||= 'onorbit';
 
-	$legal_search_status{$opt->{status}} or croak <<"EOD";
+	$legal_search_status{$opt->{status}} or Carp::croak <<"EOD";
 Error - Illegal status '$opt->{status}'. You must specify one of
 	@{[join ', ', map {"'$_'"} sort keys %legal_search_status]}
 EOD
@@ -6280,7 +6438,7 @@ EOD
 	    $opt->{$key} ||= [];
 	    $opt->{$key} = [ map { split ',', $_ } @{ $opt->{$key} } ];
 	    foreach ( @{ $opt->{$key} } ) {
-		$include_map{$_} or croak <<"EOD";
+		$include_map{$_} or Carp::croak <<"EOD";
 Error - Illegal -$key value '$_'. You must specify one or more of
 	@{[join ', ', map {"'$_'"} sort keys %include_map]}
 EOD
@@ -6329,7 +6487,7 @@ EOD
 
 	foreach my $key ( keys %special ) {
 	    @rslt
-		and croak "You may not specify both '$rslt[0]' and '$key'";
+		and Carp::croak "You may not specify both '$rslt[0]' and '$key'";
 	    defined $rest_args->{$key}
 		and push @rslt, $key, $rest_args->{$key};
 	}
@@ -6349,6 +6507,119 @@ EOD
 sub _spacetrack_v2_response_is_empty {
     my ( $resp ) = @_;
     return $resp->content() =~ m/ \A \s* (?: [[] \s* []] )? \s* \z /smx;
+}
+
+sub __readline_completer {
+    my ( $app, $text, $line, $start ) = @_;
+
+    $start
+	or return $app->_readline_complete_command( $text );
+
+    my ( $cmd, @cmd_line ) = split $readline_word_break_re, $line, -1;
+    $cmd = _verb_alias( $cmd );
+
+    local $COMPLETION_APP = $app;
+
+    if ( my $code = $app->can( "_readline_complete_command_$cmd" ) ) {
+	return $code->( $app, $text, $line, $start, \@cmd_line );
+    }
+
+    if ( $text =~ m/ \A - /smx and my $code = $app->can( "_${cmd}_opts") ) {
+	return _readline_complete_options( $code, $text );
+    }
+
+
+    $catalogs{$cmd}
+	and return $app->_readline_complete_catalog( $text, $cmd );
+
+    my @files = File::Glob::bsd_glob( "$text*" );
+    if ( 1 == @files ) {
+	$files[0] .= -d $files[0] ? '/' : ' ';
+    } elsif ( $readline::var_CompleteAddsuffix ) {
+	foreach ( @files ) {
+	    if ( -l $_ ) {
+		$_ .= '@';
+	    } elsif ( -d $_ ) {
+		$_ .= '/';
+	    } elsif ( -x _) {
+		$_ .= '*';
+	    } elsif ( -S _ || -p _ ) {
+		$_ .= '=';
+	    }
+	}
+    }
+    $readline::rl_completer_terminator_character = '';
+    return @files;
+}
+
+sub _readline_complete_catalog {
+	my ( $app, $text, $cat ) = @_;
+	my $this_cat = $catalogs{$cat};
+	if ( ARRAY_REF eq ref $this_cat ) {
+	    my $code = $app->can( "_${cat}_catalog_version" )
+		or Carp::confess "Bug - _${cat}_catalog_version() not found";
+	    $this_cat = $this_cat->[ $code->( $app ) ];
+	}
+	defined $text
+	    and $text ne ''
+	    or return( sort keys %{ $this_cat } );
+	my $re = qr/ \A \Q$text\E /smx;
+	return ( grep { $_ =~ $re } sort keys %{ $this_cat } )
+}
+
+{
+    my @builtins;
+    my %disallow = map { $_ => 1 } qw{
+	can getv import isa
+	new spaceflight
+    };
+    sub _readline_complete_command {
+	my ( $app, $text ) = @_;
+	unless ( @builtins ) {
+	    push @builtins, qw{ bye exit show };
+	    my $stash = ( ref $app || $app ) . '::';
+	    no strict qw{ refs };
+	    foreach my $sym ( keys %$stash ) {
+		$sym =~ m/ \A _ /smx
+		    and next;
+		$sym =~ m/ [[:upper:]] /smx
+		    and next;
+		$disallow{$sym}
+		    and next;
+		$app->can( $sym )
+		    or next;
+		push @builtins, $sym;
+	    }
+	    @builtins = sort @builtins;
+	}
+	my $match = qr< \A \Q$text\E >smx;
+	my @rslt = grep { $_ =~ $match } @builtins;
+	1 == @rslt
+	    and $rslt[0] =~ m/ \W \z /smx
+	    and $readline::rl_completer_terminator_character = '';
+	return ( sort @rslt );
+    }
+}
+
+sub _readline_complete_options {
+    my ( $code, $text ) = @_;
+    $text =~ m/ \A ( --? ) ( .* ) /smx
+	or return;
+    # my ( $prefix, $match ) = ( $1, $2 );
+    my $match = $2;
+    my %lgl = @{ $code->() };
+    my $re = qr< \A \Q$match\E >smx;
+    my @rslt;
+    foreach ( keys %lgl ) {
+	my $type = '';
+	( my $o = $_ ) =~ s/ ( [!=?] ) .* //smx
+	    and $type = $1;
+	my @names = split qr< \| >smx, $o;
+	$type eq q<!>
+	    and push @names, map { "no-$_" } @names;
+	push @rslt, map { "--$_" } grep { $_ =~ $re } @names;
+    }
+    return ( sort @rslt );
 }
 
 sub _rest_date {

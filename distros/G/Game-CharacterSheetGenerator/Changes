@@ -1,3 +1,15 @@
+1.01
+
+- Add porters and hirelings, with new character sheets: Hireling.svg,
+  Mietling.svg.
+  
+- New, hand-written charactersheets, including new variants:
+  Charactersheet-adv.svg, Charakterblatt-adv.svg.
+
+- Bug fixes in skills and the like.
+
+- Removed the printed character code (and its decoding) since it made
+  everything so slow and didn't seem very useful.
 
 1.00
 

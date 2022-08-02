@@ -1,6 +1,22 @@
 Revision history for Perl extension UI-Various
 
-0.26 2022-07-20T10:07:58Z
+0.30 2022-07-25T06:49:39Z
+
+0.30 2022-07-25T06:48:07Z
+
+    - still more diagnostic for segmentation violation on some CPAN test servers
+
+0.29 2022-07-24T07:28:49Z
+
+    - still more diagnostic for silent error on some CPAN test servers
+
+0.28 2022-07-23T07:35:25Z
+
+    - yet more diagnostic for silent error on some CPAN test servers
+
+0.27 2022-07-22T09:22:47Z
+
+    - added more diagnostic for silent error on some CPAN test servers
 
 0.26 2022-07-20T10:06:46Z
 

@@ -1,7 +1,7 @@
 {
    "abstract" : "OO Library for Perl 5",
    "author" : [
-      "Cpanery <cpanery@cpan.org>"
+      "AWNCORP <awncorp@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
@@ -21,13 +21,11 @@
       },
       "runtime" : {
          "requires" : {
-            "Moo" : "2.005004",
             "perl" : "5.018"
          }
       },
       "test" : {
          "requires" : {
-            "Moo" : "2.005004",
             "perl" : "5.018"
          }
       }
@@ -36,8 +34,8 @@
    "resources" : {
       "homepage" : "https://metacpan.org/dist/Venus"
    },
-   "version" : "0.09",
-   "x_authority" : "cpan:CPANERY",
+   "version" : "1.01",
+   "x_authority" : "cpan:AWNCORP",
    "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
    "x_spdx_expression" : "Apache-2.0"

@@ -30,7 +30,7 @@ WriteMakefile(
   NORECURS => 1,
   CONFIGURE_REQUIRES => {
     # SPVM::Builder::Util::API is needed for Makefile.PL
-    'SPVM'              => '0.9622',
+    'SPVM'              => '0.9632',
   },
   PREREQ_PM => {
     

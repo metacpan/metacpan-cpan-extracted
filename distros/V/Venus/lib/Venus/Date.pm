@@ -5,18 +5,19 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class;
 
-extends 'Venus::Kind::Utility';
+base 'Venus::Kind::Utility';
 
 with 'Venus::Role::Buildable';
 with 'Venus::Role::Explainable';
 
 use overload (
+  '""' => 'explain',
   '!=' => sub{("$_[0]" + 0) != ($_[1] + 0)},
   '+' => sub{("$_[0]" + 0) + ($_[1] + 0)},
   '-' => sub{("$_[0]" + 0) - ($_[1] + 0)},
-  '0+' => sub{("$_[0]" + 0)},
+  '0+' => sub{($_[0]->epoch + 0)},
   '<' => sub{("$_[0]" + 0) < ($_[1] + 0)},
   '<=' => sub{("$_[0]" + 0) <= ($_[1] + 0)},
   '==' => sub{("$_[0]" + 0) == ($_[1] + 0)},
@@ -24,33 +25,18 @@ use overload (
   '>=' => sub{("$_[0]" + 0) >= ($_[1] + 0)},
   'eq' => sub{"$_[0]" eq "$_[1]"},
   'ne' => sub{"$_[0]" ne "$_[1]"},
+  '~~' => 'explain',
+  fallback => 1,
 );
 
 # ATTRIBUTES
 
-has day => (
-  is => 'rw',
-);
-
-has month => (
-  is => 'rw',
-);
-
-has year => (
-  is => 'rw',
-);
-
-has hour => (
-  is => 'rw',
-);
-
-has minute => (
-  is => 'rw',
-);
-
-has second => (
-  is => 'rw',
-);
+attr 'day';
+attr 'month';
+attr 'year';
+attr 'hour';
+attr 'minute';
+attr 'second';
 
 # BUILDERS
 
@@ -2356,6 +2342,38 @@ B<example 1>
   # given: synopsis;
 
   my $result = $date ne '560672000';
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<("")>
+
+This package overloads the C<""> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = "$date";
+
+  # "570672000"
+
+=back
+
+=over 4
+
+=item operation: C<(~~)>
+
+This package overloads the C<~~> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date ~~ '570672000';
 
   # 1
 

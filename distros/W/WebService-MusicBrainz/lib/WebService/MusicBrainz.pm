@@ -4,11 +4,11 @@ use strict;
 use Mojo::Base -base;
 use WebService::MusicBrainz::Request;
 
-our $VERSION = '1.0.5';
+our $VERSION = '1.0.6';
 
 has 'request';
 has valid_resources =>
-    sub { [ 'area', 'artist', 'discid', 'label', 'recording', 'release', 'release_group' ] };
+    sub { [ 'area', 'artist', 'discid', 'label', 'recording', 'release', 'release-group' ] };
 has relationships => sub {
     my $rels = [
         'area-rels',          'artist-rels', 'event-rels',     'instrument-rels',
@@ -27,7 +27,7 @@ our %subquery_map = (
     label         => [qw(releases)],
     recording     => [qw(artists releases)],
     release       => [qw(artists collections labels recordings release-groups)],
-    release_group => [qw(artists releases)],
+    'release-group' => [qw(artists releases)],
 );
 
 has search_fields_by_resource => sub {
@@ -58,7 +58,7 @@ has search_fields_by_resource => sub {
         'trnum',           'tracks',        'tracksrelease', 'tag',
         'type',            'video'
     ];
-    $search_fields{release_group} = [
+    $search_fields{'release-group'} = [
         'arid',        'artist',  'comment',      'creditname',
         'primarytype', 'rgid',    'releasegroup', 'releasegroupaccent',
         'releases',    'release', 'reid',         'secondarytype',
@@ -289,7 +289,7 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-http://musicbrainz.org/doc/Development/XML_Web_Service/Version_2
+https://musicbrainz.org/doc/MusicBrainz_API
 
 =cut
 

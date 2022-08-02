@@ -3,16 +3,24 @@ package Sah::Schema::str_or_re;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-05'; # DATE
+our $DATE = '2022-06-09'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 our $schema = [any => {
     summary => 'String or regex (if string is of the form `/.../`)',
     description => <<'_',
 
-If string is of the form of `/.../`, then it will be parsed as a regex.
-Otherwise, it's accepted as a plain string.
+Either string or Regexp object is accepted.
+
+If string is of the form of `/.../` or `qr(...)`, then it will be compiled into
+a Regexp object. If the regex pattern inside `/.../` or `qr(...)` is invalid,
+value will be rejected.
+
+Currently, unlike in normal Perl, for the `qr(...)` form, only parentheses `(`
+and `)` are allowed as the delimiter.
+
+Currently modifiers `i`, `m`, and `s` after the second `/` are allowed.
 
 _
     of => [
@@ -28,8 +36,16 @@ _
         {value=>{}, valid=>0, summary=>'Not a string'},
 
         {value=>'//', valid=>1, validated_value=>qr//},
-        {value=>'/foo', valid=>1},
+        {value=>'/foo', valid=>1, summary=>'Becomes a string'},
+        {value=>'qr(foo', valid=>1, summary=>'Becomes a string'},
+        {value=>'qr(foo(', valid=>1, summary=>'Becomes a string'},
+        {value=>'qr/foo/', valid=>1, summary=>'Becomes a string'},
+
         {value=>'/foo.*/', valid=>1, validated_value=>qr/foo.*/},
+        {value=>'qr(foo.*)', valid=>1, validated_value=>qr/foo.*/},
+        {value=>'/foo/is', valid=>1, validated_value=>qr/foo/is},
+        {value=>'qr(foo)is', valid=>1, validated_value=>qr/foo/is},
+
         {value=>'/foo[/', valid=>0, summary=>'Invalid regex'},
     ],
 
@@ -50,9 +66,39 @@ Sah::Schema::str_or_re - String or regex (if string is of the form `/.../`)
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::Schema::str_or_re (from Perl distribution Sah-Schemas-Str), released on 2022-06-05.
+This document describes version 0.008 of Sah::Schema::str_or_re (from Perl distribution Sah-Schemas-Str), released on 2022-06-09.
 
 =head1 SYNOPSIS
+
+=head2 Sample data and validation results against this schema
+
+ ""  # valid
+
+ "a"  # valid
+
+ {}  # INVALID (Not a string)
+
+ "//"  # valid, becomes qr()
+
+ "/foo"  # valid (Becomes a string)
+
+ "qr(foo"  # valid (Becomes a string)
+
+ "qr(foo("  # valid (Becomes a string)
+
+ "qr/foo/"  # valid (Becomes a string)
+
+ "/foo.*/"  # valid, becomes qr(foo.*)
+
+ "qr(foo.*)"  # valid, becomes qr(foo.*)
+
+ "/foo/is"  # valid, becomes qr(foo)si
+
+ "qr(foo)is"  # valid, becomes qr(foo)si
+
+ "/foo[/"  # INVALID (Invalid regex)
+
+=head2 Using with Data::Sah
 
 To check data against this schema (requires L<Data::Sah>):
 
@@ -60,10 +106,44 @@ To check data against this schema (requires L<Data::Sah>):
  my $validator = gen_validator("str_or_re*");
  say $validator->($data) ? "valid" : "INVALID!";
 
- # Data::Sah can also create validator that returns nice error message string
- # and/or coerced value. Data::Sah can even create validator that targets other
- # language, like JavaScript. All from the same schema. See its documentation
- # for more details.
+The above schema returns a boolean result (true if data is valid, false if
+otherwise). To return an error message string instead (empty string if data is
+valid, a non-empty error message otherwise):
+
+ my $validator = gen_validator("str_or_re", {return_type=>'str_errmsg'});
+ my $errmsg = $validator->($data);
+ 
+ # a sample valid data
+ $data = "qr/foo/";
+ my $errmsg = $validator->($data); # => ""
+ 
+ # a sample invalid data
+ $data = {};
+ my $errmsg = $validator->($data); # => "Not of type text"
+
+Often a schema has coercion rule or default value, so after validation the
+validated value is different. To return the validated (set-as-default, coerced,
+prefiltered) value:
+
+ my $validator = gen_validator("str_or_re", {return_type=>'str_errmsg+val'});
+ my $res = $validator->($data); # [$errmsg, $validated_val]
+ 
+ # a sample valid data
+ $data = "qr/foo/";
+ my $res = $validator->($data); # => ["","qr/foo/"]
+ 
+ # a sample invalid data
+ $data = {};
+ my $res = $validator->($data); # => ["Not of type text",{}]
+
+Data::Sah can also create validator that returns a hash of detailed error
+message. Data::Sah can even create validator that targets other language, like
+JavaScript, from the same schema. Other things Data::Sah can do: show source
+code for validator, generate a validator code with debug comments and/or log
+statements, generate human text from schema. See its documentation for more
+details.
+
+=head2 Using with Params::Sah
 
 To validate function parameters against this schema (requires L<Params::Sah>):
 
@@ -76,11 +156,14 @@ To validate function parameters against this schema (requires L<Params::Sah>):
      ...
  }
 
+=head2 Using with Perinci::CmdLine::Lite
+
 To specify schema in L<Rinci> function metadata and use the metadata with
-L<Perinci::CmdLine> to create a CLI:
+L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
 
  # in lib/MyApp.pm
- package MyApp;
+ package
+   MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
      v => 1.1,
@@ -100,9 +183,10 @@ L<Perinci::CmdLine> to create a CLI:
  1;
 
  # in myapp.pl
- package main;
+ package
+   main;
  use Perinci::CmdLine::Any;
- Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+ Perinci::CmdLine::Any->new(url=>'/MyApp/myfunc')->run;
 
  # in command-line
  % ./myapp.pl --help
@@ -113,26 +197,18 @@ L<Perinci::CmdLine> to create a CLI:
 
  % ./myapp.pl --arg1 ...
 
-Sample data:
-
- ""  # valid
-
- "a"  # valid
-
- {}  # INVALID (Not a string)
-
- "//"  # valid, becomes qr()
-
- "/foo"  # valid
-
- "/foo.*/"  # valid, becomes qr(foo.*)
-
- "/foo[/"  # INVALID (Invalid regex)
-
 =head1 DESCRIPTION
 
-If string is of the form of C</.../>, then it will be parsed as a regex.
-Otherwise, it's accepted as a plain string.
+Either string or Regexp object is accepted.
+
+If string is of the form of C</.../> or C<qr(...)>, then it will be compiled into
+a Regexp object. If the regex pattern inside C</.../> or C<qr(...)> is invalid,
+value will be rejected.
+
+Currently, unlike in normal Perl, for the C<qr(...)> form, only parentheses C<(>
+and C<)> are allowed as the delimiter.
+
+Currently modifiers C<i>, C<m>, and C<s> after the second C</> are allowed.
 
 =head1 HOMEPAGE
 

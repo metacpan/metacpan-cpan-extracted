@@ -21,7 +21,8 @@ onlineddl_test 'No-op copy' => 'Track' => sub {
     # Constructor
     my $online_ddl = DBIx::OnlineDDL->new(
         rsrc => $track_rsrc,
-        # purposely not adding any coderef_hooks
+        # purposely not adding any (useful) coderef_hooks
+        coderef_hooks => { before_triggers => sub {} },
 
         copy_opts => {
             chunk_size => $CHUNK_SIZE,
@@ -65,6 +66,7 @@ onlineddl_test 'Existing triggers' => 'Track' => sub {
     # Constructor (another no-op)
     my $online_ddl = DBIx::OnlineDDL->new(
         rsrc => $track_rsrc,
+        coderef_hooks => { before_triggers => sub {} },
         copy_opts => {
             chunk_size => $CHUNK_SIZE,
         },

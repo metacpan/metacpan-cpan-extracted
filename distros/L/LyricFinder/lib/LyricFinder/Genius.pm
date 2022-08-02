@@ -72,11 +72,14 @@ sub fetch {
 	$self->{'Url'} = $Site . '/' . $self->{'Url'};
 
 	my $lyrics = $self->_web_fetch($artist_in, $song_in);
-	if ($lyrics && $haveLyricsCache && $self->{'-cache'} && $self->{'-cache'} !~ /^\</) {
-		$self->_debug("=== WILL CACHE LYRICS! ===");
-		# cache the fetched lyrics, if we can:
-		my $cache = new LyricFinder::Cache(%{$self});
-		$cache->save($artist_in, $song_in, $lyrics)  if ($cache);
+	if ($lyrics) {
+		$lyrics =~ s/[\d ]*Embed Cancel How to Format Lyrics\:.+$/\n/s;  #REMOVE TRAILING GENIUS SPAM! :^/
+		if ($haveLyricsCache && $self->{'-cache'} && $self->{'-cache'} !~ /^\</) {
+			$self->_debug("=== WILL CACHE LYRICS! ===");
+			# cache the fetched lyrics, if we can:
+			my $cache = new LyricFinder::Cache(%{$self});
+			$cache->save($artist_in, $song_in, $lyrics)  if ($cache);
+		}
 	}
 	return $lyrics;
 }

@@ -13,7 +13,7 @@ is(
         include => [ ( 1 ) x 11 ],
     ),
     object {
-        prop blessed   => Grid;
+        prop blessed => Grid;
         call min       => 0;
         call max       => 11;
         call nbins     => 11;

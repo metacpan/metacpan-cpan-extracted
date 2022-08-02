@@ -1,3 +1,4 @@
+use strict; use warnings;
 
 use Test::More tests => 5;
 use FlatFile;
@@ -17,7 +18,7 @@ my $f = FlatFile->new(FILE => $FILE,
                                   );
 ok($f);
 
-@apple  = $f->lookup(fruit => "apple");
+my @apple = $f->lookup(fruit => "apple");
 is(scalar(@apple), 1);
 is ($apple[0]->fruit, "apple");
 is ($apple[0]->color, undef);

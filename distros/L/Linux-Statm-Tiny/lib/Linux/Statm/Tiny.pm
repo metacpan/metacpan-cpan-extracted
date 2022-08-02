@@ -2,30 +2,27 @@ package Linux::Statm::Tiny;
 
 use v5.10.1;
 
-use Moo;
-use MooX::Aliases;
+use Linux::Statm::Tiny::Mite;
 
 use Fcntl qw/ O_RDONLY /;
-use POSIX qw/ ceil /;
-use Types::Standard qw/ ArrayRef Int /;
-
+use POSIX ();
 use constant page_size => POSIX::sysconf POSIX::_SC_PAGESIZE;
 
-our $VERSION = '0.0603';
+our $VERSION = '0.0700';
 
 # ABSTRACT: simple access to Linux /proc/../statm
 
 
 has pid => (
     is      => 'lazy',
-    isa     => Int,
+    isa     => 'Int',
     default => sub { $$ },
     );
 
 
 has statm => (
     is       => 'lazy',
-    isa      => ArrayRef[Int],
+    isa      => 'ArrayRef[Int]',
     writer   => 'refresh',
     init_arg => undef,
     );
@@ -72,11 +69,11 @@ foreach my $attr (keys %stats) {
 
     has $attr => (
         is       => 'lazy',
-        isa      => Int,
+        isa      => 'Int',
         default  => sub { shift->statm->[$stats{$attr}] },
         init_arg => undef,
-        alias    => \@aliases,
         clearer  => "_refresh_${attr}",
+        alias    => \@aliases,
         );
 
     push @attrs, $attr;
@@ -84,13 +81,13 @@ foreach my $attr (keys %stats) {
     foreach my $alt (keys %alts) {
         has "${attr}_${alt}" => (
             is       => 'lazy',
-            isa      => Int,
+            isa      => 'Int',
             default  => sub { my $self = shift;
-                              ceil($self->$attr * page_size / $alts{$alt});
+                              POSIX::ceil($self->$attr * page_size / $alts{$alt});
                               },
             init_arg => undef,
             clearer  => "_refresh_${attr}_${alt}",
-            $aliases{$attr} ? ( alias => $aliases{$attr} . "_${alt}" ) : ( ),
+            alias    => ( $aliases{$attr} ? $aliases{$attr}."_${alt}" : undef ),
             );
 
         push @attrs, "${attr}_${alt}";
@@ -109,8 +106,6 @@ around refresh => sub {
 
 
 
-use namespace::autoclean 0.16;
-
 1;
 
 __END__
@@ -125,7 +120,7 @@ Linux::Statm::Tiny - simple access to Linux /proc/../statm
 
 =head1 VERSION
 
-version 0.0603
+version 0.0700
 
 =head1 SYNOPSIS
 
@@ -238,7 +233,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Adrian Lai James Raspass Karen Etheridge Mohammad S Anwar
+=for stopwords Adrian Lai James Raspass Karen Etheridge Mohammad S Anwar Toby Inkster
 
 =over 4
 
@@ -257,6 +252,10 @@ Karen Etheridge <ether@cpan.org>
 =item *
 
 Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=item *
+
+Toby Inkster <github@toby.ink>
 
 =back
 

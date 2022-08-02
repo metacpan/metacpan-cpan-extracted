@@ -34,732 +34,787 @@ Role Builder for Perl 5
 
 $test->for('abstract');
 
+=includes
+
+function: attr
+function: base
+function: catch
+function: error
+function: false
+function: from
+function: raise
+function: role
+function: test
+function: true
+function: with
+
+=cut
+
+$test->for('includes');
+
 =synopsis
 
-  package Exemplar;
+  package Person;
+
+  use Venus::Class 'attr';
+
+  attr 'fname';
+  attr 'lname';
+
+  package Identity;
+
+  use Venus::Role 'attr';
+
+  attr 'id';
+  attr 'login';
+  attr 'password';
+
+  sub EXPORT {
+    # explicitly declare routines to be consumed
+    ['id', 'login', 'password']
+  }
+
+  package Authenticable;
 
   use Venus::Role;
 
-  sub handshake {
+  sub authenticate {
     return true;
   }
 
-  package Example;
+  sub AUDIT {
+    my ($self, $from) = @_;
+    # ensure the caller has a login and password when consumed
+    die "${from} missing the login attribute" if !$from->can('login');
+    die "${from} missing the password attribute" if !$from->can('password');
+  }
+
+  sub BUILD {
+    my ($self, $data) = @_;
+    $self->{auth} = undef;
+    return $self;
+  }
+
+  sub EXPORT {
+    # explicitly declare routines to be consumed
+    ['authenticate']
+  }
+
+  package User;
 
   use Venus::Class;
 
-  with 'Exemplar';
+  base 'Person';
+
+  with 'Identity';
+
+  attr 'email';
+
+  test 'Authenticable';
+
+  sub valid {
+    my ($self) = @_;
+    return $self->login && $self->password ? true : false;
+  }
 
   package main;
 
-  my $example = Example->new;
+  my $user = User->new(
+    fname => 'Elliot',
+    lname => 'Alderson',
+  );
 
-  # $example->handshake;
+  # bless({fname => 'Elliot', lname => 'Alderson'}, 'User')
 
 =cut
 
 $test->for('synopsis', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result->isa('Example');
-  ok $result->does('Exemplar');
-  ok $result->handshake == 1;
+  ok $result->isa('User');
+  ok $result->isa('Person');
+  ok $result->can('fname');
+  ok $result->can('lname');
+  ok $result->can('email');
+  ok $result->can('login');
+  ok $result->can('password');
+  ok $result->can('valid');
+  ok !$result->valid;
+  ok UNIVERSAL::isa($result, 'HASH');
+  ok $result->fname eq 'Elliot';
+  ok $result->lname eq 'Alderson';
+  ok $result->does('Identity');
+  ok $result->does('Authenticable');
+  ok exists $result->{auth};
+  ok !defined $result->{auth};
 
   $result
 });
 
 =description
 
-This package modifies the consuming package making it a modified L<Moo> role,
-i.e. L<Moo::Role>. All functions in L<Venus> are automatically imported unless
-routines of the same name already exist.
+This package provides a role builder which when used causes the consumer to
+inherit from L<Venus::Core::Role> which provides role construction and
+lifecycle L<hooks|Venus::Core>. A role differs from a L<"class"|Venus::Class>
+in that it can't be instantiated using the C<new> method. A role can act as an
+interface by defining an L<"audit"|Venus::Core/AUDIT> hook which is invoked
+automatically by the L<"test"|Venus::Class/test> function.
 
 =cut
 
 $test->for('description');
 
-=integrates
+=function attr
 
-Moo::Role
+The attr function creates attribute accessors for the calling package. This
+function is always exported unless a routine of the same name already exists.
+
+=signature attr
+
+  attr(Str $name) (Str)
+
+=metadata attr
+
+{
+  since => '1.00',
+}
+
+=example-1 attr
+
+  package Example;
+
+  use Venus::Class;
+
+  attr 'name';
+
+  # "Example"
 
 =cut
 
-# SKIP TEST, USED FOR DOCUMENTATION ONY
-# $test->for('integrates');
+$test->for('example', 1, 'attr', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->can('name');
+  my $object = $result->new;
+  ok !$object->name;
+  $object = $result->new(name => 'example');
+  ok $object->name eq 'example';
+  $object = $result->new({name => 'example'});
+  ok $object->name eq 'example';
 
-=feature has
+  $result
+});
 
-This package supports the C<has> keyword function and all of its
-configurations. See the L<Moo> documentation for more details.
+=function base
 
-=example-1 has
+The base function registers one or more base classes for the calling package.
+This function is always exported unless a routine of the same name already
+exists.
 
-  package Example::Has;
+=signature base
+
+  base(Str $name) (Str)
+
+=metadata base
+
+{
+  since => '1.00',
+}
+
+=example-1 base
+
+  package Entity;
+
+  use Venus::Class;
+
+  sub output {
+    return;
+  }
+
+  package Example;
+
+  use Venus::Class;
+
+  base 'Entity';
+
+  # "Example"
+
+=cut
+
+$test->for('example', 1, 'base', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Entity');
+  ok $result->isa('Venus::Core::Class');
+  ok $result->isa('Venus::Core');
+  ok $result->can('output');
+
+  $result
+});
+
+=function catch
+
+The catch function executes the code block trapping errors and returning the
+caught exception in scalar context, and also returning the result as a second
+argument in list context. This function isn't export unless requested.
+
+=signature catch
+
+  catch(CodeRef $block) (Error, Any)
+
+=metadata catch
+
+{
+  since => '1.01',
+}
+
+=example-1 catch
+
+  package Ability;
+
+  use Venus::Role 'catch';
+
+  sub attempt_catch {
+    catch {die};
+  }
+
+  sub EXPORT {
+    ['attempt_catch']
+  }
+
+  package Example;
+
+  use Venus::Class 'with';
+
+  with 'Ability';
+
+  package main;
+
+  my $example = Example->new;
+
+  my $error = $example->attempt_catch;
+
+  $error;
+
+  # "Died at ..."
+
+=cut
+
+$test->for('example', 1, 'catch', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok !ref($result);
+
+  $result
+});
+
+=function error
+
+The error function throws a L<Venus::Error> exception object using the
+exception object arguments provided. This function isn't export unless requested.
+
+=signature error
+
+  error(Maybe[HashRef] $args) (Error)
+
+=metadata error
+
+{
+  since => '1.01',
+}
+
+=example-1 error
+
+  package Ability;
+
+  use Venus::Role 'error';
+
+  sub attempt_error {
+    error;
+  }
+
+  sub EXPORT {
+    ['attempt_error']
+  }
+
+  package Example;
+
+  use Venus::Class 'with';
+
+  with 'Ability';
+
+  package main;
+
+  my $example = Example->new;
+
+  my $error = $example->attempt_error;
+
+  # bless({...}, 'Venus::Error')
+
+=cut
+
+$test->for('example', 1, 'error', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\(my $error))->result;
+  ok $error;
+  ok $error->isa('Venus::Error');
+  ok $error->message eq 'Exception!';
+
+  $result
+});
+
+=function false
+
+The false function returns a falsy boolean value which is designed to be
+practically indistinguishable from the conventional numerical C<0> value. This
+function is always exported unless a routine of the same name already exists.
+
+=signature false
+
+  false() (Bool)
+
+=metadata false
+
+{
+  since => '1.00',
+}
+
+=example-1 false
+
+  package Example;
+
+  use Venus::Class;
+
+  my $false = false;
+
+  # 0
+
+=cut
+
+$test->for('example', 1, 'false', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  ok $result == 0;
+
+  !$result
+});
+
+=example-2 false
+
+  package Example;
+
+  use Venus::Class;
+
+  my $true = !false;
+
+  # 1
+
+=cut
+
+$test->for('example', 2, 'false', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=function from
+
+The from function registers one or more base classes for the calling package
+and performs an L<"audit"|Venus::Core/AUDIT>. This function is always exported
+unless a routine of the same name already exists.
+
+=signature from
+
+  from(Str $name) (Str)
+
+=metadata from
+
+{
+  since => '1.00',
+}
+
+=example-1 from
+
+  package Entity;
 
   use Venus::Role;
 
-  has 'data' => (
-    is => 'ro',
-    isa => sub { die }
-  );
+  attr 'startup';
+  attr 'shutdown';
 
-  package Example::HasData;
-
-  use Venus::Class;
-
-  with 'Example::Has';
-
-  has '+data' => (
-    is => 'ro',
-    isa => sub { 1 }
-  );
-
-  package main;
-
-  my $example = Example::HasData->new(data => time);
-
-=cut
-
-$test->for('example', 1, 'has', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->data;
-
-  $result
-});
-
-=feature has-is
-
-This package supports the C<is> directive, used to denote whether the attribute
-is read-only or read-write. See the L<Moo> documentation for more details.
-
-=example-1 has-is
-
-  package Example::HasIs;
-
-  use Venus::Class;
-
-  has data => (
-    is => 'ro'
-  );
-
-  package main;
-
-  my $example = Example::HasIs->new(data => time);
-
-=cut
-
-$test->for('example', 1, 'has-is', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->data;
-
-  $result
-});
-
-=feature has-isa
-
-This package supports the C<isa> directive, used to define the type constraint
-to validate the attribute against. See the L<Moo> documentation for more
-details.
-
-=example-1 has-isa
-
-  package Example::HasIsa;
-
-  use registry;
-
-  use Venus::Class;
-
-  has data => (
-    is => 'ro',
-    isa => 'Str' # e.g. Types::Standard::Str
-  );
-
-  package main;
-
-  my $example = Example::HasIsa->new(data => time);
-
-=cut
-
-$test->for('example', 1, 'has-isa', sub {
-  plan skip_all => 'no registry found' if not(do{eval "require registry; 1"});
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->data;
-
-  $result
-});
-
-=feature has-req
-
-This package supports the C<req> and C<required> directives, used to denote if
-an attribute is required or optional. See the L<Moo> documentation for more
-details.
-
-=example-1 has-req
-
-  package Example::HasReq;
-
-  use Venus::Class;
-
-  has data => (
-    is => 'ro',
-    req => 1 # required
-  );
-
-  package main;
-
-  my $example = Example::HasReq->new(data => time);
-
-=cut
-
-$test->for('example', 1, 'has-req', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->data;
-
-  $result
-});
-
-=feature has-opt
-
-This package supports the C<opt> and C<optional> directives, used to denote if
-an attribute is optional or required. See the L<Moo> documentation for more
-details.
-
-=example-1 has-opt
-
-  package Example::HasOpt;
-
-  use Venus::Class;
-
-  has data => (
-    is => 'ro',
-    opt => 1
-  );
-
-  package main;
-
-  my $example = Example::HasOpt->new(data => time);
-
-=cut
-
-$test->for('example', 1, 'has-opt', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->data;
-
-  $result
-});
-
-=feature has-bld
-
-This package supports the C<bld> and C<builder> directives, expects a C<1>, a
-method name, or coderef and builds the attribute value if it wasn't provided to
-the constructor. See the L<Moo> documentation for more details.
-
-=example-1 has-bld
-
-  package Example::HasBld;
-
-  use Venus::Class;
-
-  has data => (
-    is => 'ro',
-    bld => 1
-  );
-
-  sub _build_data {
-    return rand;
+  sub EXPORT {
+    ['startup', 'shutdown']
   }
 
-  package main;
-
-  my $example = Example::HasBld->new;
-
-=cut
-
-$test->for('example', 1, 'has-bld', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->data;
-
-  $result
-});
-
-=feature has-clr
-
-This package supports the C<clr> and C<clearer> directives expects a C<1> or a
-method name of the clearer method. See the L<Moo> documentation for more
-details.
-
-=example-1 has-clr
-
-  package Example::HasClr;
+  package Record;
 
   use Venus::Class;
 
-  has data => (
-    is => 'ro',
-    clr => 1
-  );
+  sub AUDIT {
+    my ($self, $from) = @_;
+    die "Missing startup" if !$from->can('startup');
+    die "Missing shutdown" if !$from->can('shutdown');
+  }
 
-  package main;
-
-  my $example = Example::HasClr->new(data => time);
-
-  # $example->clear_data;
-
-=cut
-
-$test->for('example', 1, 'has-clr', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->data;
-  ok $result->clear_data;
-  ok !$result->data;
-
-  $result
-});
-
-=feature has-crc
-
-This package supports the C<crc> and C<coerce> directives denotes whether an
-attribute's value should be automatically coerced. See the L<Moo> documentation
-for more details.
-
-=example-1 has-crc
-
-  package Example::HasCrc;
+  package Example;
 
   use Venus::Class;
 
-  has data => (
-    is => 'ro',
-    crc => sub {'0'}
-  );
+  with 'Entity';
 
-  package main;
+  from 'Record';
 
-  my $example = Example::HasCrc->new(data => time);
+  # "Example"
 
 =cut
 
-$test->for('example', 1, 'has-crc', sub {
+$test->for('example', 1, 'from', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok !$result->data;
-  is $result->data, '0';
+  ok $result->isa('Record');
+  ok $result->does('Entity');
+  ok $result->can('startup');
+  ok $result->can('shutdown');
 
   $result
 });
 
-=feature has-def
+=function raise
 
-This package supports the C<def> and C<default> directives expects a
-non-reference or a coderef to be used to build a default value if one is not
-provided to the constructor. See the L<Moo> documentation for more details.
+The raise function generates and throws a named exception object derived from
+L<Venus::Error>, or provided base class, using the exception object arguments
+provided. This function isn't export unless requested.
 
-=example-1 has-def
+=signature raise
 
-  package Example::HasDef;
+  raise(Str $class | Tuple[Str, Str] $class, Maybe[HashRef] $args) (Error)
 
-  use Venus::Class;
+=metadata raise
 
-  has data => (
-    is => 'ro',
-    def => '0'
-  );
+{
+  since => '1.01',
+}
+
+=example-1 raise
+
+  package Ability;
+
+  use Venus::Role 'raise';
+
+  sub attempt_raise {
+    raise 'Example::Error';
+  }
+
+  sub EXPORT {
+    ['attempt_raise']
+  }
+
+  package Example;
+
+  use Venus::Class 'with';
+
+  with 'Ability';
 
   package main;
 
-  my $example = Example::HasDef->new;
+  my $example = Example->new;
+
+  my $error = $example->attempt_raise;
+
+  # bless({...}, 'Example::Error')
 
 =cut
 
-$test->for('example', 1, 'has-def', sub {
+$test->for('example', 1, 'raise', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok !$result->data;
-  is $result->data, '0';
+  ok my $result = $tryable->error(\(my $error))->result;
+  ok $error;
+  ok $error->isa('Example::Error');
+  ok $error->isa('Venus::Error');
+  ok $error->message eq 'Exception!';
 
   $result
 });
 
-=feature has-mod
+=function role
 
-This package supports the C<mod> and C<modify> directives denotes whether a
-pre-existing attribute's definition is being modified. This ability is not
-supported by the L<Moo> object superclass.
+The role function registers and consumes roles for the calling package. This
+function is always exported unless a routine of the same name already exists.
 
-=example-1 has-mod
+=signature role
 
-  package Example::HasNomod;
+  role(Str $name) (Str)
+
+=metadata role
+
+{
+  since => '1.00',
+}
+
+=example-1 role
+
+  package Ability;
 
   use Venus::Role;
 
-  has data => (
-    is => 'rw',
-    opt => 1
-  );
-
-  package Example::HasMod;
-
-  use Venus::Class;
-
-  with 'Example::HasNomod';
-
-  has data => (
-    is => 'ro',
-    req => 1,
-    mod => 1
-  );
-
-  package main;
-
-  my $example = Example::HasMod->new;
-
-=cut
-
-$test->for('example', 1, 'has-mod', sub {
-  my ($tryable) = @_;
-  $tryable->default(sub {
-    my ($error) = @_;
-    "$error" =~ /required/i ? 'errored' : 'unknown';
-  });
-  ok my $result = $tryable->result;
-  is $result, 'errored';
-
-  $result
-});
-
-=feature has-hnd
-
-This package supports the C<hnd> and C<handles> directives denotes the methods
-created on the object which dispatch to methods available on the attribute's
-object. See the L<Moo> documentation for more details.
-
-=example-1 has-hnd
-
-  package Example::Time;
-
-  use Venus::Class;
-
-  sub maketime {
-    return time;
+  sub action {
+    return;
   }
 
-  package Example::HasHnd;
+  package Example;
 
   use Venus::Class;
 
-  has data => (
-    is => 'ro',
-    hnd => ['maketime']
-  );
+  role 'Ability';
 
-  package main;
-
-  my $example = Example::HasHnd->new(data => Example::Time->new);
+  # "Example"
 
 =cut
 
-$test->for('example', 1, 'has-hnd', sub {
+$test->for('example', 1, 'role', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok my $object = $result->data;
-  ok $object->can('maketime');
-  ok $result->maketime;
+  ok $result->does('Ability');
+  ok !$result->can('action');
 
   $result
 });
 
-=feature has-lzy
+=example-2 role
 
-This package supports the C<lzy> and C<lazy> directives denotes whether the
-attribute will be constructed on-demand, or on-construction. See the L<Moo>
-documentation for more details.
+  package Ability;
 
-=example-1 has-lzy
+  use Venus::Role;
 
-  package Example::HasLzy;
-
-  use Venus::Class;
-
-  has data => (
-    is => 'ro',
-    def => sub {time},
-    lzy => 1
-  );
-
-  package main;
-
-  my $example = Example::HasLzy->new;
-
-=cut
-
-$test->for('example', 1, 'has-lzy', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok !$result->{data};
-  ok $result->data;
-  ok $result->{data};
-
-  $result
-});
-
-=feature has-new
-
-This package supports the C<new> directive, if truthy, denotes that the
-attribute will be constructed on-demand, i.e. is lazy, with a builder named
-new_{attribute}. This ability is not supported by the L<Moo> object superclass.
-
-=example-1 has-new
-
-  package Example::HasNew;
-
-  use Venus::Class;
-
-  has data => (
-    is => 'ro',
-    new => 1
-  );
-
-  sub new_data {
-    return time;
+  sub action {
+    return;
   }
 
-  package main;
-
-  my $example = Example::HasNew->new(data => time);
-
-=cut
-
-$test->for('example', 1, 'has-new', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->data;
-
-  $result
-});
-
-=feature has-pre
-
-This package supports the C<pre> and C<predicate> directives expects a C<1> or
-a method name and generates a method for checking the existance of the
-attribute. See the L<Moo> documentation for more details.
-
-=example-1 has-pre
-
-  package Example::HasPre;
-
-  use Venus::Class;
-
-  has data => (
-    is => 'ro',
-    pre => 1
-  );
-
-  package main;
-
-  my $example = Example::HasPre->new(data => time);
-
-=cut
-
-$test->for('example', 1, 'has-pre', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->has_data;
-
-  $result
-});
-
-=feature has-rdr
-
-This package supports the C<rdr> and C<reader> directives denotes the name of
-the method to be used to "read" and return the attribute's value. See the
-L<Moo> documentation for more details.
-
-=example-1 has-rdr
-
-  package Example::HasRdr;
-
-  use Venus::Class;
-
-  has data => (
-    is => 'ro',
-    rdr => 'get_data'
-  );
-
-  package main;
-
-  my $example = Example::HasRdr->new(data => time);
-
-=cut
-
-$test->for('example', 1, 'has-rdr', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->get_data;
-
-  $result
-});
-
-=feature has-tgr
-
-This package supports the C<tgr> and C<trigger> directives expects a C<1> or a
-coderef and is executed whenever the attribute's value is changed. See the
-L<Moo> documentation for more details.
-
-=example-1 has-tgr
-
-  package Example::HasTgr;
-
-  use Venus::Class;
-
-  has data => (
-    is => 'ro',
-    tgr => 1
-  );
-
-  sub _trigger_data {
-    my ($self) = @_;
-
-    $self->{triggered} = 1;
-
-    return $self;
+  sub EXPORT {
+    return ['action'];
   }
 
-  package main;
+  package Example;
 
-  my $example = Example::HasTgr->new(data => time);
+  use Venus::Class;
+
+  role 'Ability';
+
+  # "Example"
 
 =cut
 
-$test->for('example', 1, 'has-tgr', sub {
+$test->for('example', 2, 'role', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result->data;
-  is $result->{triggered}, 1;
+  ok $result->does('Ability');
+  ok $result->can('action');
 
   $result
 });
 
-=feature has-use
+=function test
 
-This package supports the C<use> directive denotes that the attribute will be
-constructed on-demand, i.e. is lazy, using a custom builder meant to perform
-service construction. This directive exists to provide a simple dependency
-injection mechanism for class attributes. This ability is not supported by the
-L<Moo> object superclass.
+The test function registers and consumes roles for the calling package and
+performs an L<"audit"|Venus::Core/AUDIT>, effectively allowing a role to act as
+an interface. This function is always exported unless a routine of the same
+name already exists.
 
-=example-1 has-use
+=signature test
 
-  package Example::HasUse;
+  test(Str $name) (Str)
+
+=metadata test
+
+{
+  since => '1.00',
+}
+
+=example-1 test
+
+  package Actual;
+
+  use Venus::Role;
+
+  package Example;
 
   use Venus::Class;
 
-  has data => (
-    is => 'ro',
-    use => ['service', 'time']
-  );
+  test 'Actual';
 
-  sub service {
-    my ($self, $type, @args) = @_;
+  # "Example"
 
-    $self->{serviced} = 1;
+=cut
 
-    return time if $type eq 'time';
+$test->for('example', 1, 'test', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->does('Actual');
+
+  $result
+});
+
+=example-2 test
+
+  package Actual;
+
+  use Venus::Role;
+
+  sub AUDIT {
+    die "Example is not an 'actual' thing" if $_[1]->isa('Example');
   }
 
-  package main;
+  package Example;
 
-  my $example = Example::HasUse->new;
+  use Venus::Class;
+
+  test 'Actual';
+
+  # "Example"
 
 =cut
 
-$test->for('example', 1, 'has-use', sub {
+$test->for('example', 2, 'test', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->data;
-  is $result->{serviced}, 1;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error =~ qr/Example is not an 'actual' thing/;
 
   $result
 });
 
-=feature has-wkr
+=function true
 
-This package supports the C<wkr> and C<weak_ref> directives is used to denote if
-the attribute's value should be weakened. See the L<Moo> documentation for more
-details.
+The true function returns a truthy boolean value which is designed to be
+practically indistinguishable from the conventional numerical C<1> value. This
+function is always exported unless a routine of the same name already exists.
 
-=example-1 has-wkr
+=signature true
 
-  package Example::HasWkr;
+  true() (Bool)
+
+=metadata true
+
+{
+  since => '1.00',
+}
+
+=example-1 true
+
+  package Example;
 
   use Venus::Class;
 
-  has data => (
-    is => 'ro',
-    wkr => 1
-  );
+  my $true = true;
 
-  package main;
-
-  my $data = do {
-    my ($a, $b);
-
-    $a = { time => time };
-    $b = { time => $a };
-
-    $a->{time} = $b;
-    $a
-  };
-
-  my $example = Example::HasWkr->new(data => $data);
+  # 1
 
 =cut
 
-$test->for('example', 1, 'has-wkr', sub {
+$test->for('example', 1, 'true', sub {
   my ($tryable) = @_;
-  require Scalar::Util;
-
   ok my $result = $tryable->result;
-  ok $result->data;
-  ok Scalar::Util::isweak($result->{data});
+  ok $result == 1;
 
   $result
 });
 
-=feature has-wrt
+=example-2 true
 
-This package supports the C<wrt> and C<writer> directives denotes the name of
-the method to be used to "write" and return the attribute's value. See the
-L<Moo> documentation for more details.
-
-=example-1 has-wrt
-
-  package Example::HasWrt;
+  package Example;
 
   use Venus::Class;
 
-  has data => (
-    is => 'ro',
-    wrt => 'set_data'
-  );
+  my $false = !true;
 
-  package main;
-
-  my $example = Example::HasWrt->new;
+  # 0
 
 =cut
 
-$test->for('example', 1, 'has-wrt', sub {
+$test->for('example', 2, 'true', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  ok $result == 0;
+
+  !$result
+});
+
+=function with
+
+The with function registers and consumes roles for the calling package. This
+function is an alias of the L</test> function and will perform an
+L<"audit"|Venus::Core/AUDIT> if present. This function is always exported
+unless a routine of the same name already exists.
+
+=signature with
+
+  with(Str $name) (Str)
+
+=metadata with
+
+{
+  since => '1.00',
+}
+
+=example-1 with
+
+  package Understanding;
+
+  use Venus::Role;
+
+  sub knowledge {
+    return;
+  }
+
+  package Example;
+
+  use Venus::Class;
+
+  with 'Understanding';
+
+  # "Example"
+
+=cut
+
+$test->for('example', 1, 'with', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result->set_data(time);
-  ok $result->data;
+  ok $result->does('Understanding');
+  ok !$result->can('knowledge');
+
+  $result
+});
+
+=example-2 with
+
+  package Understanding;
+
+  use Venus::Role;
+
+  sub knowledge {
+    return;
+  }
+
+  sub EXPORT {
+    return ['knowledge'];
+  }
+
+  package Example;
+
+  use Venus::Class;
+
+  with 'Understanding';
+
+  # "Example"
+
+=cut
+
+$test->for('example', 2, 'with', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->does('Understanding');
+  ok $result->can('knowledge');
 
   $result
 });

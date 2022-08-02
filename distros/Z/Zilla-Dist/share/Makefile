@@ -14,10 +14,14 @@
 
 .PHONY: cpan test
 
-MAKE := make -f $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
+SHELL := bash
+ROOT := $(shell dirname $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))))
+BASE := $(shell pwd)
+MAKE := make -f $(ROOT)/share/Makefile
 PERL ?= $(shell which perl)
 ZILD := $(PERL) -S zild
 LOG := $(PERL_ZILLA_DIST_RELEASE_LOG)
+export PATH := $(BASE)/bin:$(PATH)
 
 # XXX Change to `metaspec =zild libname`
 NAMEPATH := $(shell $(ZILD) meta =zild/libname)

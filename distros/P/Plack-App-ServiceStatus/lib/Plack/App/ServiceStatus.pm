@@ -2,7 +2,7 @@ package Plack::App::ServiceStatus;
 
 # ABSTRACT: Check and report status of various services needed by your app
 
-our $VERSION = '0.904'; # VERSION
+our $VERSION = '0.906'; # VERSION
 
 use 5.018;
 use strict;
@@ -113,7 +113,7 @@ Plack::App::ServiceStatus - Check and report status of various services needed b
 
 =head1 VERSION
 
-version 0.904
+version 0.906
 
 =head1 SYNOPSIS
 
@@ -187,7 +187,11 @@ The following checks are currently available:
 
 =over
 
-=item * L<Plack::App::ServiceStatus::DBIC>
+=item * L<Plack::App::ServiceStatus::DBI> - (raw DBI C<$dbh>)
+
+=item * L<Plack::App::ServiceStatus::DBIxConnector> - when using C<DBIx::Connector> to connect to a DB
+
+=item * L<Plack::App::ServiceStatus::DBIC> - when you're using C<DBIx::Class>
 
 =item * L<Plack::App::ServiceStatus::Redis>
 
@@ -253,7 +257,7 @@ Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 - 2021 by Thomas Klausner.
+This software is copyright (c) 2016 - 2022 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

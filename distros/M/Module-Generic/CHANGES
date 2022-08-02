@@ -1,6 +1,17 @@
 Revision history for Perl module Module::Generic
 
-v0.24.3 2022-07-15T15:07:18+0900
+v0.26.0 2022-07-28T11:47:10+0900
+    - Correcting mistake in test unit 17.serialise_storable.t, 18.serialise_sereal.t and 19.serialise_cbor.t
+    - Implemented new module Module::Generic::File::Mmap using Cache::FastMmap
+    - Updated documentation for Module::Generic::File::Cache and Module::Generic::SharedMem
+
+v0.25.0 2022-07-18T00:44:48Z +0900
+    - Implemented support for CBOR, Sereal and Storable with STORABLE_freeze and STORABLE_thaw in all modules
+    - Changed serialise() and deserialise() to now use Storable::Improved instead of Storable, as Storable poorly handles GLOB objects and XS objects and ignores the return value from STORABLE_thaw().
+    - Change dependency from Storable to Storable::Improved for better support for GLOB and XS modules objects
+    - Added support for CBOR and Sereal when serialising shared data
+
+v0.24.3 2022-07-15T15:07:18Z +0900
     - Improved checking shared memory support
 
 v0.24.2 2022-06-28T14:12:48Z +0900

@@ -9,7 +9,7 @@ use Error::Pure qw(err);
 use Plack::Util::Accessor qw(component constructor_args data);
 use Symbol::Get;
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 sub _css {
 	my $self = shift;
@@ -259,12 +259,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2021-2022
+© 2021-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

@@ -11,6 +11,7 @@ lib/CPAN/Audit/DB.pm.gpg
 lib/CPAN/Audit/Discover.pm
 lib/CPAN/Audit/Discover/Cpanfile.pm
 lib/CPAN/Audit/Discover/CpanfileSnapshot.pm
+lib/CPAN/Audit/Filter.pm
 lib/CPAN/Audit/FreshnessCheck.pm
 lib/CPAN/Audit/Installed.pm
 lib/CPAN/Audit/Query.pm
@@ -33,6 +34,7 @@ t/data/cpanfile/cpanfile
 t/data/installed/perl5/lib/perl5/Catalyst.pm
 t/discover/cpanfile.t
 t/discover/cpanfile_snapshot.t
+t/excludes.t
 t/installed.t
 t/lib/TestCommand.pm
 t/query.t

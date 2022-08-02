@@ -1,5 +1,5 @@
 use 5.14.0;
-package JMAP::Tester::Logger::HTTP 0.101;
+package JMAP::Tester::Logger::HTTP 0.102;
 
 use Moo;
 
@@ -44,7 +44,7 @@ JMAP::Tester::Logger::HTTP
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 AUTHOR
 

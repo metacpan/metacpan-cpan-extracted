@@ -3,7 +3,7 @@ use v5.12;
 # check, convert and measure color values
 
 package Chart::Color::Value;
-our $VERSION = 'v2.403.5';
+our $VERSION = 'v2.403.7';
 use Carp;
 
 sub check_rgb { # carp returns 1

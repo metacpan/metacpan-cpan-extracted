@@ -5,17 +5,18 @@ use warnings;
 use version;
 use CPAN::Audit::Installed;
 use CPAN::Audit::Discover;
+use CPAN::Audit::Filter;
 use CPAN::Audit::Version;
 use CPAN::Audit::Query;
 use CPAN::Audit::DB;
 use Module::CoreList;
 
-our $VERSION = '20220708.001';
+our $VERSION = '20220729.001';
 
 sub new {
     my( $class, %params ) = @_;
 
-	my @allowed_keys = qw(ascii db include_perl interactive no_corelist no_color quiet verbose version);
+    my @allowed_keys = qw(ascii db exclude include_perl interactive no_corelist no_color quiet verbose version);
 
     my %args = map { $_, $params{$_} } @allowed_keys;
     my $self = bless \%args, $class;
@@ -27,6 +28,7 @@ sub new {
 
     $self->{db}       = CPAN::Audit::DB->db;
 
+    $self->{filter}   = CPAN::Audit::Filter->new( exclude => $args{exclude} );
     $self->{query}    = CPAN::Audit::Query->new( db => $self->{db} );
     $self->{discover} = CPAN::Audit::Discover->new( db => $self->{db} );
 
@@ -119,10 +121,10 @@ sub command {
     elsif ( $command eq 'installed' ) {
         $self->message_info('Collecting all installed modules. This can take a while...');
 
-		my $verbose_callback = sub {
-			my ($info) = @_;
+        my $verbose_callback = sub {
+            my ($info) = @_;
             $self->message( '%s: %s-%s', $info->{path}, $info->{distname}, $info->{version} );
-		};
+        };
 
         my @deps = CPAN::Audit::Installed->new(
             db           => $self->{db},
@@ -144,20 +146,23 @@ sub command {
 
     my $total_advisories = 0;
 
+    my $filter = $self->{filter};
     if (%dists) {
         my $query = $self->{query};
 
-		my $note = $command eq 'installed' ? 'have' : 'requires';
+        my $note = $command eq 'installed' ? 'have' : 'requires';
 
         foreach my $distname ( sort keys %dists ) {
             my $version_range = $dists{$distname};
-            my @advisories = $query->advisories_for( $distname, $version_range );
+            my @advisories =
+                grep { ! $filter->excludes($_) }
+                $query->advisories_for( $distname, $version_range );
 
             $version_range = 'Any'
               if $version_range eq '' || $version_range eq '0';
 
             if (@advisories) {
-            	my $inflect = scalar(@advisories) == 1 ? 'y' : 'ies';
+                my $inflect = scalar(@advisories) == 1 ? 'y' : 'ies';
                 $self->message( "__RED__%s ($note %s) has %d advisor${inflect}__RESET__",
                     $distname, $version_range, scalar(@advisories) );
 
@@ -172,11 +177,14 @@ sub command {
 
     if ($total_advisories) {
         $self->message( '__RED__Total advisories found: %d__RESET__', $total_advisories );
-
+        $self->message( '__RED__Total advisories ignored: %d__RESET__', $filter->ignored_count )
+            if $filter->ignored_count;
         return $total_advisories;
     }
     else {
         $self->message_info('__GREEN__No advisories found__RESET__');
+        $self->message( '__RED__Total advisories ignored: %d__RESET__', $filter->ignored_count )
+            if $filter->ignored_count;
         return 0;
     }
 }
@@ -262,7 +270,7 @@ sub _print {
 1;
 __END__
 
-=encoding utf-8
+=encoding utf8
 
 =head1 NAME
 

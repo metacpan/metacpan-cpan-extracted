@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Infix 0.24;
+package XS::Parse::Infix 0.25;
 
 use v5.14;
 use warnings;
@@ -137,9 +137,13 @@ side of the operator syntax. It should be set to one of the following constants:
 
 =over 4
 
-=item XPI_OPERAND_TERM (0)
+=item XPI_OPERAND_ARITH
 
-Default. The operand is a term expression.
+The operand is an arithmetic expression.
+
+=item XPI_OPERAND_TERM
+
+The operand is a term expression.
 
 =item XPI_OPERAND_TERM_LIST
 

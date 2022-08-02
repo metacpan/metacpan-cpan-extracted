@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 c286501f3d9bf27358dc225db8b9d8abda493fe6423d0f3c1d32a219a0c9a5d4 AUTHOR_PLEDGE
+SHA256 98c59fed9f7e9dea448dba8372cfac123b5f18d0ca98770e1d145646102c2007 CHANGELOG.yml
+SHA256 dd4ca2f953a92d8a7e038258c57bbca27ccf7eae85bec08248d02dce658ae103 CODE_OF_CONDUCT.md
+SHA256 d9759d8b0edce3c923fbe8619a766b4d2277bb18c11694b5f303e639394a32f3 CONTRIBUTORS
+SHA256 bca299b98325ab30c103c770d87a593f6ae53cd5030cfd0d2bc4e9c3571ac49d Changes
+SHA256 3e99c9237e69dd0d5dc267433b892131a07d8c0ca9ff713c0d02cc6c6fb07d99 INSTALL
+SHA256 d754ca47f2216a2b2d0d711402f9581e42ef21c371217d78f051ea8daed135df LICENSE
+SHA256 00f379fee77cf0942ecceea64e24385544f8fd7f0424e2f25f7d5c1f877a3328 MANIFEST
+SHA256 0636f5c634870a4d09197580578740c8230129cd7ca2ac30d7b7a418c121019a META.json
+SHA256 7b2c75df495f8401a3464f3ef18a53c9a4ceceb70a517b2533b5787c602a6085 META.yml
+SHA256 29c2e9b5d0fce5e5b723bf1811094169a54ac9276cc72ff72b26f58b45a9dd6d Makefile.PL
+SHA256 4a77de426e71ba1258d528ffc1c75e56fa5b116757bae14b76a0cbaa1575a88a README.mkdn
+SHA256 7864409a306cc3339814e155ebd5f585943fab0f7b19e1fc8ab0e1b5ca5fdf7e bin/changelord
+SHA256 b395fbcf14e4885edf7a6eb205c4509a77ff5a36ee76307c40e39c5827e647f7 cpanfile
+SHA256 887e61c5475c72f11b4a98af74514c210c55259bc1f139fc6c4848a62dcd60ec doap.xml
+SHA256 c257c45f2702637884b0cf4328e379ec995f5a553dc7705a2f4cc8de8dacdddd lib/App/Changelord.pm
+SHA256 7eefa6c2021a9c5909d29b245cae2b326be6df2e7cf2fb91e6e12d246c600514 lib/App/Changelord/Command/Add.pm
+SHA256 346a4f2b35f4e254143f89a420af672769f917464b1af8f65e8d071f1f8e903b lib/App/Changelord/Command/Bump.pm
+SHA256 d467ee20fb14af8c469a8016b8edbbfe41f121c483a8ffba611d293316820970 lib/App/Changelord/Command/GitGather.pm
+SHA256 531c3ba41296e14f8c7a9ba367201e1df55a9a56e38065fdc410eae8a8abc2ad lib/App/Changelord/Command/Init.pm
+SHA256 85d28a3342f9f4ffdac7a8a1604c1f5644f76a471703ba822189ecb32e0abfb6 lib/App/Changelord/Command/Print.pm
+SHA256 2bd4399e892dc4fe11c484f685b669df525e167ee84406e629d5cf2a4b30c515 lib/App/Changelord/Command/Schema.pm
+SHA256 86b8aae284efd1006a448052c51d6918d35dba3abba7731731585f6e9a415cc3 lib/App/Changelord/Command/Validate.pm
+SHA256 2476df5570078267e767f4f17c7d6c547c002926d0823b3bc9ea67f014db0b60 lib/App/Changelord/Command/Version.pm
+SHA256 038e81733fbd52067163fd4a42a9bdd9462dcbb3f62e4cd9914440fb863b1f89 lib/App/Changelord/Command/changelog-schema.yml
+SHA256 9d0070bda437cb81a1b04ab1662e23cbb1d251c4a4b65ec20cf89f5e3ae3310e lib/App/Changelord/Role/ChangeTypes.pm
+SHA256 bf5c672bd8d553635d9936dd369c8aaafdbd5886395f5b56eb82e342560179fa lib/App/Changelord/Role/Changelog.pm
+SHA256 b8d268841ffd99112b6186bdbc0cf22a5ba199eb294940d83c4ff4646ae4987d lib/App/Changelord/Role/Render.pm
+SHA256 36f55d99c4ae16d363185b308d740ccdbc351ebcdd94072b1d7b9de1b5a376b0 lib/App/Changelord/Role/Stats.pm
+SHA256 36e4dc9eb9688135352a6e87374b8b7440363f6baaae7cb4a340ae5676fd9496 lib/App/Changelord/Role/Versions.pm
+SHA256 2c13d7e67566d938d7881d9c537564adc604a657a58e7edcc87e0e42ed6443c8 t/00-compile.t
+SHA256 e452a3c85ef07482a71f97596ecb36da0b04cf49e48b964aef2aca049475bb5c t/00-report-prereqs.dd
+SHA256 383a9d586fba3bdc22341350adc67e848ff9151380895131b1f6fb2ce8291435 t/00-report-prereqs.t
+SHA256 80ceb2a13fd27f54a9c7d1ae85d8cc79b44b91f922cfeb1e8d7e4834287e0b3d t/basic.t
+SHA256 f90221ab481bbb1dcd39a1a2a014646e6503e455266d15a4a80c88a40bd7cd1d t/render.t
+SHA256 05f5654a1e59450c75289efb1a962b8e8e9f26e459c7d9c4d40287b98869dbb2 t/stats.t
+SHA256 4ec583c855b19b4a8ba02ed6d9b1e80103e1734422850344ffe91e8412440877 t/versions.t
+SHA256 63d9827f7014ae7145a2f3dde173b115b0f529a713aad5f747933bd381a6bd05 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQS4RMr2LZlyA/IlbHHfgfB/4bALjAUCYt7ahAAKCRDfgfB/4bAL
+jAbxAJ9FTUrOySUhzRPDhGGKm8yqg9wVXACfXPB+kjyG1WF3iUZAGvDX3mCz6gI=
+=wrvr
+-----END PGP SIGNATURE-----

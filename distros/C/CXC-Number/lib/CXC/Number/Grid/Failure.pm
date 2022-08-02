@@ -7,16 +7,16 @@ use warnings;
 use parent 'Exporter::Tiny';
 use custom::failures ();
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 our @EXPORT_OK;
 BEGIN {
     my @failures = qw/ parameter::constraint
-                       parameter::unknown
-                       parameter::interface
-                       parameter::IllegalCombination
-                       internal
- /;
+      parameter::unknown
+      parameter::interface
+      parameter::IllegalCombination
+      internal
+      /;
     custom::failures->import( __PACKAGE__, @failures );
     @EXPORT_OK = map { s/::/_/r } @failures;
 }
@@ -24,8 +24,9 @@ BEGIN {
 sub _exporter_expand_sub {
     my $class = shift;
     my ( $name, $args, $globals ) = @_;
-    my $failure = __PACKAGE__ . '::' . ( $name =~ s/_/::/gr);
-    $name => eval "sub () { '$failure' }"; ## no critic (BuiltinFunctions::ProhibitStringyEval)
+    my $failure = __PACKAGE__ . '::' . ( $name =~ s/_/::/gr );
+    ## no critic (BuiltinFunctions::ProhibitStringyEval)
+    $name => eval "sub () { '$failure' }" ;
 }
 
 1;
@@ -42,17 +43,25 @@ CXC::Number::Grid::Failure - CXC::Number::Sequence Exceptions
 
 =head1 VERSION
 
-version 0.06
+version 0.08
 
-=head1 BUGS
+=head1 INTERNALS
 
-Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number> or by email
-to L<bug-cxc-number@rt.cpan.org|mailto:bug-cxc-number@rt.cpan.org>.
+=head1 SUPPORT
 
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/cxc-number
+
+and may be cloned from
+
+  https://gitlab.com/djerius/cxc-number.git
 
 =head1 SEE ALSO
 

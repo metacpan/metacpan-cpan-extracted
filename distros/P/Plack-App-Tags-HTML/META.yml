@@ -29,7 +29,7 @@ no_index:
 requires:
   English: 0
   Error::Pure: 0
-  Plack::Component::Tags::HTML: 0.05
+  Plack::Component::Tags::HTML: 0.06
   Plack::Util::Accessor: 0
   Symbol::Get: 0
   perl: 5.8.0
@@ -38,4 +38,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Plack-App-Tags-HTML
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Plack-App-Tags-HTML
-version: '0.05'
+version: '0.06'

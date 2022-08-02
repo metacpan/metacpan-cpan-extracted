@@ -1,5 +1,5 @@
 use v5.10.0;
-package JMAP::Tester::Response::Paragraph 0.101;
+package JMAP::Tester::Response::Paragraph 0.102;
 # ABSTRACT: a group of sentences in a JMAP response
 
 use Moo;
@@ -188,7 +188,7 @@ JMAP::Tester::Response::Paragraph - a group of sentences in a JMAP response
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 OVERVIEW
 

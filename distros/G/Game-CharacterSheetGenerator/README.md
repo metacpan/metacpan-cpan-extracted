@@ -4,7 +4,7 @@ This is the source repository for a Halberds & Helmets character
 generator.
 
 The character generator is currently
-[installed on Campaign Wiki](http://campaignwiki.org/halberdsnhelmets).
+[installed on Campaign Wiki](https://campaignwiki.org/character-sheet-generator/).
 Take a look at the Help page. It comes with links to examples of what
 this web application can do.
 
@@ -64,21 +64,32 @@ domain when using HTTPS.
 
 ## Posting 20 Characters to Campaign Wiki
 
-Example (English):
+Example (English & German):
 
 ```bash
-for i in $(seq 20); do
-	f=$(mktemp /tmp/char.XXXX)
-	character-sheet-generator random > $f
-	name=$(grep name: $f | cut -c 7-)
-	class=$(grep class: $f | cut -c 8-)
-	if curl --head --silent "https://campaignwiki.org/wiki/Greyheim/$name" | grep --silent "^HTTP/1.1 404"; then
-		echo "|[[$name]] | | 0| 0| $class 1| ?|[[Greyheim]] | – | |"
-		curl -F ns=Greyheim -F title=$name -F frodo=1 -F username=Alex -F summary="New character" -F "text=<$f" https://campaignwiki.org/wiki
-		sleep 1
-	fi
+#!/bin/bash
+for i in $(seq 10); do
+  for lang in de en; do
+    f=$(mktemp /tmp/char.XXXX)
+    echo "Character:" > $f
+    character-sheet-generator random $lang text >> $f
+    echo >> $f
+    name=$(grep name: $f | cut -c 7-)
+    class=$(grep class: $f | cut -c 8-)
+    if curl --head --silent "https://campaignwiki.org/wiki/MontagInZ%c3%bcrich/$name" | grep --silent "^HTTP/1.1 404"; then
+	echo "|[[$name]] |    0|    0|$class 1 |– |no player |"
+	wikiput -u Alex -z frodo -s "New character" "https://campaignwiki.org/wiki/MontagInZ%c3%bcrich/$name" < $f
+	sleep 1
+    else
+	echo $name already exists
+    fi
+  done
 done
 ```
+
+This uses [wikiput](https://oddmuse.org/wiki/wikiput) to do the actual
+posting instead of `curl` because I've been getting a timeout error
+when posting to the wiki using `curl`.
 
 ## Dependencies
 

@@ -1,6 +1,9 @@
 ^.hg
 ^cover_db/
 ^blib
-Build$
+^Build$
 _build_params
-MYMETA.*
+^MYMETA
+\.orig$
+^dev
+^local

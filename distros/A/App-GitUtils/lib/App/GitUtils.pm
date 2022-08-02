@@ -9,9 +9,9 @@ use Cwd qw(getcwd abs_path);
 use File::chdir;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-20'; # DATE
+our $DATE = '2022-07-30'; # DATE
 our $DIST = 'App-GitUtils'; # DIST
-our $VERSION = '0.085'; # VERSION
+our $VERSION = '0.086'; # VERSION
 
 our %SPEC;
 
@@ -109,12 +109,13 @@ sub info {
     my %args = @_;
 
     my $git_dir = _search_git_dir(\%args);
-    return [412, "Can't find .git dir, make sure you're inside a git repo"]
+    return [412, "Can't find .git dir, make sure ".($args{dir} // "the current directory")." is a git repo"]
         unless defined $git_dir;
 
-    my ($repo_name) = $git_dir =~ m!.+/(.+)/\.git\z!
+    my ($repo_name) = $git_dir =~ m!(?:.+/)?([^/]+)/\.git\z!
         or return [500, "Can't extract repo name from git dir '$git_dir'"];
 
+    local $CWD = $git_dir;
     my $current_branch = `git branch --show-current`;
     return [500, "Can't execute git to find out current branch: $!"] if $?;
     chomp $current_branch;
@@ -288,7 +289,7 @@ App::GitUtils - Day-to-day command-line utilities for git
 
 =head1 VERSION
 
-This document describes version 0.085 of App::GitUtils (from Perl distribution App-GitUtils), released on 2022-03-20.
+This document describes version 0.086 of App::GitUtils (from Perl distribution App-GitUtils), released on 2022-07-30.
 
 =head1 SYNOPSIS
 
@@ -607,9 +608,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

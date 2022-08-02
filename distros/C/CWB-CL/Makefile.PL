@@ -9,6 +9,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 use Getopt::Long;
 use File::Spec;
+use Config;
 
 our $config_util = "cwb-config";  # path to cwb-config utility (if not in search path)
 our $help = 0;                    # display help page
@@ -25,10 +26,10 @@ if ($help) {
   exit 2;
 }
 
-## required CWB version for this module (3.5, but also accept 3.4.7+ until official release)
+## required CWB version for this module (3.5)
 our $rMajor = 3;
-our $rMinor = 4;
-our $rBeta = 7;
+our $rMinor = 5;
+our $rBeta  = 0;
 
 ## run cwb-config to check installed CWB version
 my $version = `'$config_util' --version 2>/dev/null`;
@@ -39,7 +40,7 @@ die
 
 our $MajorVersion = $1;
 our $MinorVersion = $2;
-our $BetaVersion = $4 || 0;
+our $BetaVersion  = $4 || 0;
 chomp($version);
 
 die "Error: need CWB version ", version_string($rMajor, $rMinor, $rBeta), " or newer, but only $version is installed.\n"
@@ -58,9 +59,10 @@ print "Checking for CL library ... ";
   }
   my $libdir = `'$config_util' --libdir`;
   chomp($libdir);
-  my $libcl_a = "$libdir/libcl.a";
-  unless (-f $libcl_a and -s $libcl_a > 0) {
-    die "\nERROR: Can't find library file $libcl_a\n";
+  
+  my @libcl = grep { -f && -s > 0 } map {"$libdir/libcl.$_"} qw(a so dylib dll);
+  unless (@libcl) {
+    die "\nERROR: Can't find library file libcl.{a,so,dylib,dll}\n";
   }
 }
 print "ok\n";
@@ -70,21 +72,13 @@ chomp $CFLAGS;
 my $LDFLAGS = `'$config_util' -L`;
 chomp $LDFLAGS;
 
-## -- ugly work-around no longer needed as of 11 Jan 2015 --
-## Currently, CWB 3.4.x includes a call to `pkg-config ...` in LDFLAGS, which WriteMakefile doesn't understand.
-## As a workaround, we detect `...` expressions in the CFLAGS and LDFLAGS returned by "cwb-config -L" and expand them here:
-# sub expand_backticks {
-#   $_[0] =~ s{`(.+?)`}{
-#     my $res = qx{$1};
-#     die "ERROR: Cannot expand `$1`: $!\n"
-#       unless defined $res;
-#     chomp($res);
-#     $res;
-#   }ge;
-# }
-# expand_backticks($CFLAGS);
-# expand_backticks($LDFLAGS);
-## --- end of ugly workaround ---
+# for some configurations, we need to smuggle $LDFLAGS in via LDDLFLAGS as well
+# because LIBS is scrubbed by MakeMaker, removing any non-standard flags
+my $LDDLFLAGS = $Config{lddlflags}; # documentation says this is the default
+if (" $LDFLAGS" =~ /\s-[^Ll]/) {
+  # assume that anything except -L<dir> and -l<lib> is problematic
+  $LDDLFLAGS .= " $LDFLAGS";
+}
 
 WriteMakefile(
   NAME          => 'CWB::CL',
@@ -93,11 +87,12 @@ WriteMakefile(
   TYPEMAPS      => ["CL.typemap"],
   INC           => $CFLAGS,
   LIBS          => $LDFLAGS,
+  LDDLFLAGS     => $LDDLFLAGS, # see above why this may be needed
   DEFINE        => "",
   LICENSE       => "perl",
   META_MERGE    => {
     resources => {
-      homepage => 'http://cwb.sourceforge.net/',
+      homepage => 'https://cwb.sourceforge.io/',
       repository => 'http://svn.code.sf.net/p/cwb/code/perl/trunk',
     },
   },

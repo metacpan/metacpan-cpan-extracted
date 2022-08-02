@@ -1,5 +1,5 @@
 package Template::Liquid::Filters;
-our $VERSION = '1.0.19';
+our $VERSION = '1.0.20';
 use strict;
 use warnings;
 
@@ -22,13 +22,19 @@ sub import {
             uniq upcase url_decode url_encode
             where
             money stock_price
-            ]
+        ]
     );
 }
 
 =pod
 
 =encoding UTF-8
+
+=begin stopwords
+
+Lütke jadedPixel truthy html newlines endcapture vs
+
+=end stopwords
 
 =head1 NAME
 
@@ -62,8 +68,8 @@ right.
 =head1 Standard Filters
 
 These are the current default filters. They have been written to behave exactly
-like their Ruby Liquid counterparts accept where Perl makes improvment
-irresistable.
+like their Ruby Liquid counterparts accept where Perl makes improvement
+irresistible.
 
 =head2 C<abs>
 
@@ -210,7 +216,7 @@ the items from the input arrays.
   - turnips
   - potatoes
 
-You can string togehter C<concat> filters to oin more than two array:
+You can string together two or more array elements with the C<concat> filter:
 
   {% assign furniture = "chairs, tables, shelves" | split: ", " %}
   {% assign vegetables = "carrots, turnips, potatoes" | split: ", " %}
@@ -347,7 +353,7 @@ point numbers.
 
 sub divided_by {
     my ($x, $y) = @_;
-    my $r = $x / $y;
+    my $r    = $x / $y;
     my ($_x) = $x =~ m[\.(\d+)$];
     my ($_y) = $y =~ m[\.(\d+)$];
     my ($_r) = $r =~ m[\.(\d+)$];
@@ -911,11 +917,8 @@ sub sort_natural {
         ]
         if ref $x eq 'HASH' && defined $y;
     return [
-        sort {
-            ($a =~ m[\D] || $b =~ m[\D])
-                ? lc $a cmp lc $b
-                : $a <=> $b
-        } @{$x}
+           sort { ($a =~ m[\D] || $b =~ m[\D]) ? lc $a cmp lc $b : $a <=> $b }
+               @{$x}
         ]
         if ref $x eq 'ARRAY';
     return
@@ -975,9 +978,9 @@ Removes any HTML tags from a string.
   '{{ '<!-- <A comment> -->'                       | strip_html }}' => ' -->'
   {{ "Have <em>you</em> read <strong>Ulysses</strong>?" | strip_html }} => Have you read Ulysses?
 
-Note that this filter uses C<s[<.*?>][]g> in emmulation of the Ruby Liquid
-library's strip_html function. ...so don't email me if you (correcly) think
-this is a braindead way of stripping html.
+Note that this filter uses C<s[<.*?>][]g> in emulation of the Ruby Liquid
+library's strip_html function. ...so don't email me if you (correctly) think
+this is a brain dead way of stripping html.
 
 =cut
 
@@ -1003,7 +1006,7 @@ sub strip_newlines { my ($x, $y) = @_; $x =~ s[\n][]go; return $x; }
 
 =head2 C<times>
 
-Simple multiplication or string repetion.
+Simple multiplication or string repetition.
 
   {{ 'foo' | times: 4 }} => foofoofoofoo
   {{ 5 | times: 4 }} => 20
@@ -1129,7 +1132,7 @@ sub truncatewords {
     $truncate_string = defined $truncate_string ? $truncate_string : '...';
     return if !$data;
     my @wordlist = split ' ', $data;
-    my $l        = $words - 1;
+    my $l = $words - 1;
     $l = 0 if $l < 0;
     return $#wordlist > $l
         ? CORE::join(' ', @wordlist[0 .. $l]) . $truncate_string

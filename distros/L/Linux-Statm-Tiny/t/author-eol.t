@@ -16,18 +16,18 @@ use Test::EOL;
 
 my @files = (
     'lib/Linux/Statm/Tiny.pm',
+    'lib/Linux/Statm/Tiny.pm.mite.pm',
+    'lib/Linux/Statm/Tiny/Mite.pm',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/10-basic.t',
     't/20-fork.t',
-    't/author-clean-namespaces.t',
     't/author-eof.t',
     't/author-eol.t',
     't/author-minimum-version.t',
     't/author-no-tabs.t',
     't/author-pod-linkcheck.t',
     't/author-pod-syntax.t',
-    't/author-portability.t',
     't/release-check-manifest.t',
     't/release-fixme.t',
     't/release-trailing-space.t'

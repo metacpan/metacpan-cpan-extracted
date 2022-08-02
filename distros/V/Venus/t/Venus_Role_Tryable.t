@@ -46,7 +46,7 @@ $test->for('includes');
 
   package Example;
 
-  use Venus::Class;
+  use Venus::Class 'with';
   use Venus 'raise';
 
   with 'Venus::Role::Tryable';

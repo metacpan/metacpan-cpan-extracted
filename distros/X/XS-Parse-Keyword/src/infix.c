@@ -73,26 +73,58 @@ enum OperandShape {
 
 static enum OperandShape operand_shape(const struct HooksAndData *hd)
 {
-  U8 args_flags = (hd->hooks->lhs_flags & 0x07) << 4 | (hd->hooks->rhs_flags & 0x07);
-
-  switch(args_flags) {
-    /* scalar OP scalar */
+  U8 lhs_gimme;
+  switch(hd->hooks->lhs_flags & 0x07) {
+    case 0: /* back-compat */
+    case XPI_OPERAND_ARITH:
     case XPI_OPERAND_TERM:
+      lhs_gimme = G_SCALAR;
+      break;
+
+    case XPI_OPERAND_TERM_LIST:
+    case XPI_OPERAND_LIST:
+      lhs_gimme = G_LIST;
+      break;
+
+    default:
+      croak("TODO: Unsure how to classify operand shape of .lhs_flags=%02X\n",
+          hd->hooks->lhs_flags & 0x07);
+  }
+
+  U8 rhs_gimme;
+  switch(hd->hooks->rhs_flags & 0x07) {
+    case 0: /* back-compat */
+    case XPI_OPERAND_ARITH:
+    case XPI_OPERAND_TERM:
+      rhs_gimme = G_SCALAR;
+      break;
+
+    case XPI_OPERAND_TERM_LIST:
+    case XPI_OPERAND_LIST:
+      rhs_gimme = G_LIST;
+      break;
+
+    default:
+      croak("TODO: Unsure how to classify operand shape of .rhs_flags=%02X\n",
+          hd->hooks->rhs_flags & 0x07);
+  }
+
+  switch((lhs_gimme << 4) | (rhs_gimme)) {
+    /* scalar OP scalar */
+    case (G_SCALAR<<4) | G_SCALAR:
       return SHAPE_SCALARSCALAR;
 
     /* scalar OP list */
-    case XPI_OPERAND_TERM_LIST:
-    case XPI_OPERAND_LIST:
+    case (G_SCALAR<<4) | G_LIST:
       return SHAPE_SCALARLIST;
 
     /* list OP list */
-    case (XPI_OPERAND_TERM_LIST<<4) | XPI_OPERAND_TERM_LIST:
-    case (XPI_OPERAND_TERM_LIST<<4) | XPI_OPERAND_LIST:
+    case (G_LIST<<4) | G_LIST:
       return SHAPE_LISTLIST;
 
     default:
-      croak("TODO: Unsure how to classify operand shape of args_flags=%02X\n",
-          args_flags);
+      croak("TODO: Unsure how to classify operand shape of lhs_gimme=%d rhs_gimme=%d\n",
+          lhs_gimme, rhs_gimme);
       break;
   }
 }
@@ -217,7 +249,12 @@ OP *parse(pTHX_ OP *lhs, struct Perl_custom_infix *def)
   lex_read_space(0);
   OP *rhs = NULL;
 
-  switch(reg->hd.hooks->rhs_flags & 0x07) {
+  switch(reg->hd.hooks->rhs_flags & 0x87) {
+    case XPI_OPERAND_ARITH:
+      rhs = parse_arithexpr(0);
+      break;
+
+    case 0: /* back-compat */
     case XPI_OPERAND_TERM:
       rhs = parse_termexpr(0);
       break;
@@ -228,6 +265,10 @@ OP *parse(pTHX_ OP *lhs, struct Perl_custom_infix *def)
 
     case XPI_OPERAND_LIST:
       rhs = force_list_keeping_pushmark(parse_listexpr(0));
+      break;
+
+    case XPI_OPERAND_CUSTOM:
+      rhs = (*reg->hd.hooks->parse_rhs)(aTHX_ reg->hd.data);
       break;
 
     default:
@@ -246,13 +287,13 @@ static STRLEN my_infix_plugin(pTHX_ char *op, STRLEN oplen, struct Perl_custom_i
 
   HV *hints = GvHV(PL_hintgv);
 
-  struct Registration *reg;
+  struct Registration *reg, *bestreg = NULL;
   for(reg = registrations; reg; reg = reg->next) {
     /* custom registrations have hooks, builtin ones do not */
     if(!reg->hd.hooks)
       continue;
 
-    if(reg->oplen != oplen || !strEQ(reg->info.opname, op))
+    if(reg->oplen > oplen || !strnEQ(reg->info.opname, op, reg->oplen))
       continue;
 
     if(reg->hd.hooks->permit_hintkey &&
@@ -263,11 +304,20 @@ static STRLEN my_infix_plugin(pTHX_ char *op, STRLEN oplen, struct Perl_custom_i
       !(*reg->hd.hooks->permit)(aTHX_ reg->hd.data))
       continue;
 
-    *def = &reg->def;
-    return oplen;
+    /* This is a candidate and the best one, unless we already have something
+     * longer
+     */
+    if(bestreg && bestreg->oplen > reg->oplen)
+      continue;
+
+    bestreg = reg;
   }
 
-  return (*next_infix_plugin)(aTHX_ op, oplen, def);
+  if(!bestreg)
+    return (*next_infix_plugin)(aTHX_ op, oplen, def);
+
+  *def = &bestreg->def;
+  return bestreg->oplen;
 }
 #endif
 
@@ -622,6 +672,9 @@ void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHo
   }
 
   switch(hooks->lhs_flags & ~(XPI_OPERAND_ONLY_LOOK)) {
+    case 0:
+      //warn("No .lhs_flags specified for XSParseInfixHooks; defaulting to XPI_OPERAND_TERM");
+      /* FALLTHROUGH */
     case XPI_OPERAND_TERM:
     case XPI_OPERAND_TERM_LIST:
       break;
@@ -630,9 +683,14 @@ void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHo
   }
 
   switch(hooks->rhs_flags & ~(XPI_OPERAND_ONLY_LOOK)) {
+    case 0:
+      //warn("No .rhs_flags specified for XSParseInfixHooks; defaulting to XPI_OPERAND_TERM");
+      /* FALLTHROUGH */
+    case XPI_OPERAND_ARITH:
     case XPI_OPERAND_TERM:
     case XPI_OPERAND_TERM_LIST:
     case XPI_OPERAND_LIST:
+    case XPI_OPERAND_CUSTOM:
       break;
     default:
       croak("Unrecognised XSParseInfixHooks.rhs_flags value 0x%X", hooks->rhs_flags);

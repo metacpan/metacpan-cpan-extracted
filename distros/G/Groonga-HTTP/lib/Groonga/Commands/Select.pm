@@ -25,6 +25,7 @@ my $command_args = "";
 my $n_hits = undef;
 my @records;
 my $use_drilldown = 0;
+my $n_drilldown_keys = 0;
 my @select_arguments = (
     'table',
     'output_columns',
@@ -108,6 +109,7 @@ sub _parse_arguments {
     }
     if (exists($args->{'drilldown'})) {
         $use_drilldown = 1;
+        $n_drilldown_keys = split(/,/, $args->{'drilldown'});
         $parsed_arguments{'drilldown'} = $args->{'drilldown'};
     }
     if (exists($args->{'drilldown_filter'})) {
@@ -171,19 +173,42 @@ sub _parse_result {
     my @drilldown_result_records = ();
 
     if ($use_drilldown) {
-        $result_set{'n_hits_drilldown'} = $result->[1][0][0];
+        if ($n_drilldown_keys > 1) {
+            my @n_hits_drilldown = ();
+            for (my $n_keys = 0; $n_keys < $n_drilldown_keys; $n_keys++) {
+                push(@n_hits_drilldown, $result->[$n_keys+1][0][0]);
 
-        my @column_names_drilldown;
-        for (my $i = 0; $result->[1][1][$i]; $i++) {
-            push(@column_names_drilldown, $result->[1][1][$i][0]);
-        }
+                my @column_names_drilldown;
+                for (my $i = 0; $result->[$n_keys+1][1][$i]; $i++) {
+                    push(@column_names_drilldown, $result->[$n_keys+1][1][$i][0]);
+                }
 
-        for (my $i = 0, my $j = 2; $i < $result_set{'n_hits_drilldown'}; $i++, $j++) {
-            my %record = ();
-            for (my $k=0; $k < @column_names_drilldown; $k++) {
-                $record{"drilldown_" . $column_names_drilldown[$k]} = "$result->[1][$j][$k]";
+                my @temporary = ();
+                for (my $i = 0, my $j = 2; $i < $n_hits_drilldown[$n_keys]; $i++, $j++) {
+                    my %record = ();
+                    for (my $k=0; $k < @column_names_drilldown; $k++) {
+                        $record{"drilldown_" . $column_names_drilldown[$k]} = "$result->[$n_keys+1][$j][$k]";
+                    }
+                    push(@temporary, \%record);
+                }
+                $drilldown_result_records[$n_keys] = \@temporary;
             }
-            push(@drilldown_result_records, \%record);
+            $result_set{'n_hits_drilldown'} = \@n_hits_drilldown;
+        } else {
+            $result_set{'n_hits_drilldown'} = ($result->[1][0][0]);
+
+            my @column_names_drilldown;
+            for (my $i = 0; $result->[1][1][$i]; $i++) {
+                push(@column_names_drilldown, $result->[1][1][$i][0]);
+            }
+
+            for (my $i = 0, my $j = 2; $i < $result_set{'n_hits_drilldown'}; $i++, $j++) {
+                my %record = ();
+                for (my $k=0; $k < @column_names_drilldown; $k++) {
+                    $record{"drilldown_" . $column_names_drilldown[$k]} = "$result->[1][$j][$k]";
+                }
+                push(@drilldown_result_records, \%record);
+            }
         }
         $use_drilldown = 0;
     }

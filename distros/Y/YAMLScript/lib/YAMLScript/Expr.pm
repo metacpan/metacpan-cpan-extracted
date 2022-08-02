@@ -8,13 +8,20 @@ use YAMLScript::NS;
 
 sub call {
     my ($self) = @_;
-    my $ns = ns;
+    my $ns = NS;
     my $name = $self->____;
+    my $sub = $name;
+    $sub =~ s/-/_/g;
     my $args = $self->args;
     my $arity = @$args;
     my $call =
-        $ns->{"${name}__$arity"} ||
-        $ns->{"${name}___"} or
-        die "Can't resolve call '$name' (for arity '$arity')";
-    $call->($args)->call();
+        $ns->{"${sub}__$arity"} ||
+        $ns->{"${sub}___"} or
+        die "Can't resolve call '$name' with $arity arguments.";
+    if (ref($call) eq 'YAMLScript::Func') {
+        $call->call(@$args);
+    }
+    else {
+        $call->($args)->call();
+    }
 }

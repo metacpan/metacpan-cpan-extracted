@@ -6,15 +6,15 @@ use strict;
 use warnings;
 use FindBin '$Bin';
 use lib "$Bin/lib";
-
-use File::Temp qw(tempfile);
 use Test::More 0.98;
 use Test::Needs 'App::depak';
 
-my ($tempfh, $tempname) = tempfile();
+use File::Temp qw(tempfile);
 
 subtest fatpack => sub {
     require App::depak;
+
+    my ($tempfh, $tempname) = tempfile();
 
     my $res = App::depak::depak(
         pack_method => "fatpack",
@@ -28,11 +28,14 @@ subtest fatpack => sub {
         unless $res->[0] == 200;
 
     my $output = `$^X $tempname`;
+    note "test script is at $tempname";
     like($output, qr/^installed1.*^installed2.*NOT-INSTALLED3/ms);
 };
 
 subtest datapack => sub {
     require App::depak;
+
+    my ($tempfh, $tempname) = tempfile();
 
     my $res = App::depak::depak(
         pack_method => "datapack",
@@ -45,6 +48,7 @@ subtest datapack => sub {
     die "Can't create packed script (datapack): $res->[0] - $res->[1]"
         unless $res->[0] == 200;
 
+    note "test script is at $tempname";
     my $output = `$^X $tempname`;
     like($output, qr/package Local::Foo.*package Local::Bar/s);
 };

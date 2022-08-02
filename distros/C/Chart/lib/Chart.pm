@@ -1,7 +1,7 @@
 use v5.12;
 
 package Chart;
-our $VERSION = 'v2.403.5';
+our $VERSION = 'v2.403.7';
 
 use Chart::Points;
 use Chart::Lines;
@@ -66,23 +66,22 @@ Chart - a series of charting modules
 
 =head1 DESCRIPTION
 
-Chart help you to create PNG and JPG images with visualizations of numeric data.
+Chart helps you to create PNG and JPG images with visualizations of numeric data.
 This page gives you a summary how to use it. 
 For a more thorough documentation and lots of example code please visit the L<Chart::Manual>.
 
 
 =for HTML <p>
-
-<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/manual/points.png"     alt="point chart"               width="300" height="225">
-<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/test/composite_f.png"  alt="composite of bars and lines" width="300" height="225">
-<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/test/stackedbars.png"  alt="stacked bars"              width="300" height="200">
-<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/test/bars_2.png"       alt="multi bar chart"           width="300" height="250">
-<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/test/hbars_2.png"      alt="horizontal bar chart"      width="300" height="240">
-<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/test/direction_4.png"  alt="polar chart"               width="250" height="250">
-<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/test/pie_4.png"        alt="pie chart"                 width="250" height="225">
-<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/test/mountain_2-1.png" alt="mountain chart"            width="300" height="225">
-<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/test/split_2.png"      alt="split chart"               width="250" height="250">
-<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/test/error_1.png"      alt="error bar chart"           width="300" height="225">
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/landing/points.png"    alt="point chart"               width="300" height="225">
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/landing/composite.png" alt="composite of bars and lines" width="300" height="225">
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/landing/sbars.png"     alt="stacked bars"              width="300" height="200">
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/landing/bars.png"      alt="multi bar chart"           width="300" height="250">
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/landing/hbars.png"     alt="horizontal bar chart"      width="300" height="240">
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/landing/polar.png"     alt="polar chart"               width="250" height="250">
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/landing/ring.png"      alt="pie chart"                 width="250" height="225">
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/landing/mountain.png"  alt="mountain chart"            width="300" height="225">
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/landing/split.png"     alt="split chart"               width="250" height="250">
+<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/landing/error.png"     alt="error bar chart"           width="300" height="225">
 </p>
 
 =head2 use-ing Chart
@@ -98,7 +97,7 @@ For example,
   use Chart::Lines;
 
 would invoke the lines module.
-Alternatively write to load all chart types at ones with 
+Alternatively load all chart types at ones and write:
 
   use Chart;
 
@@ -176,7 +175,7 @@ array should be set up the same way as for the normal png method.
 
 =back
 
-=head2 Graph.pm-style API
+=head2 column based API
 
 You might ask, "But what if I just want to add a few points to the graph, 
 and then display it, without all those references to references?".  Well,

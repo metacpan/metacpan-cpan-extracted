@@ -78,6 +78,7 @@ subtest 'DBIC Processing + process_past_max' => sub {
         process_past_max  => 1,
         min_chunk_percent => 0,
         target_time       => 1,
+        debug             => 0,
     );
 
     isa_ok($batch_chunker->rsc, ['DBIx::Class::ResultSetColumn'], '$rsc');
@@ -136,6 +137,7 @@ subtest 'DBIC Processing + single_rows' => sub {
         single_rows       => 1,
         min_chunk_percent => 0,
         target_time       => 0,
+        verbose           => 0,
     );
 
     # Calculate

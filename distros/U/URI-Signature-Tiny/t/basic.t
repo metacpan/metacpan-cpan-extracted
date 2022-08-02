@@ -1,6 +1,6 @@
 use strict; use warnings;
 
-use Test::More tests => 23;
+use Test::More tests => 24;
 use URI ();
 use URI::WithBase ();
 use URI::Signature::Tiny ();
@@ -46,6 +46,9 @@ is _notary( after_sign => sub { join '!', @_ } )->sign( 'foo' ), "$uri!$sig",
 
 ok _notary( before_verify => sub { split '!', shift, 2 } )->verify( "$uri!$sig" ),
 	'Verifying works';
+
+ok ! _notary( before_verify => sub { ( shift, undef ) }, function => sub { undef } )->verify( $uri ),
+	'... and does not consider undef a valid signature';
 
 my ( $ret, $fn, $ln, $e );
 my $zefram = eval { Carp->VERSION('1.25') } ? '.' : '';

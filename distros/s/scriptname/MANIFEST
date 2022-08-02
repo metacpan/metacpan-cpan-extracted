@@ -15,3 +15,4 @@ t/pod-coverage.t
 t/pod.t
 t/release-pod-coverage.t
 t/release-pod-syntax.t
+META.json                                Module JSON meta-data (added by MakeMaker)

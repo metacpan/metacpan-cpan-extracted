@@ -50,17 +50,17 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ChristophB/perl-xdt-parser/issues"
+         "web" : "https://github.com/CrescNet/perl-xdt-parser/issues"
       },
       "license" : [
          "https://opensource.org/licenses/MIT"
       ],
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/ChristophB/perl-xdt-parser.git",
-         "web" : "https://github.com/ChristophB/perl-xdt-parser"
+         "url" : "https://github.com/CrescNet/perl-xdt-parser.git",
+         "web" : "https://github.com/CrescNet/perl-xdt-parser"
       }
    },
-   "version" : "1.06",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.07",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

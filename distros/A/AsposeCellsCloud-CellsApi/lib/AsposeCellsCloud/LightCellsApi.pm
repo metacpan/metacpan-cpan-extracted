@@ -79,6 +79,11 @@ sub new {
         description => '',
         required => '0',
     },
+    'check_excel_restriction' => {
+        data_type => 'boolean',
+        description => '',
+        required => '0',
+    },
     };
     __PACKAGE__->method_documentation->{ 'delete_metadata' } = { 
     	summary => '',
@@ -115,6 +120,9 @@ sub delete_metadata {
     if ( exists $args{'type'}) {
         $query_params->{'type'} = $self->{api_client}->to_query_value($args{'type'});
     }
+    if ( exists $args{'check_excel_restriction'}) {
+        $query_params->{'checkExcelRestriction'} = $self->{api_client}->to_query_value($args{'check_excel_restriction'});
+    }    
 
     $self->{api_client}->check_access_token();
     my $_body_data;
@@ -158,6 +166,11 @@ sub delete_metadata {
         description => '',
         required => '0',
     },
+    'check_excel_restriction' => {
+        data_type => 'boolean',
+        description => '',
+        required => '0',
+    },    
     };
     __PACKAGE__->method_documentation->{ 'get_metadata' } = { 
     	summary => '',
@@ -194,6 +207,9 @@ sub get_metadata {
     if ( exists $args{'type'}) {
         $query_params->{'type'} = $self->{api_client}->to_query_value($args{'type'});
     }
+    if ( exists $args{'check_excel_restriction'}) {
+        $query_params->{'checkExcelRestriction'} = $self->{api_client}->to_query_value($args{'check_excel_restriction'});
+    } 
 
     $self->{api_client}->check_access_token();
     my $_body_data;
@@ -244,6 +260,12 @@ sub get_metadata {
         description => '',
         required => '0',
     },
+    'check_excel_restriction' => {
+        data_type => 'boolean',
+        description => '',
+        required => '0',
+    },
+    
     };
     __PACKAGE__->method_documentation->{ 'post_assemble' } = { 
     	summary => '',
@@ -290,7 +312,9 @@ sub post_assemble {
     if ( exists $args{'format'}) {
         $query_params->{'format'} = $self->{api_client}->to_query_value($args{'format'});
     }
-
+    if ( exists $args{'check_excel_restriction'}) {
+        $query_params->{'checkExcelRestriction'} = $self->{api_client}->to_query_value($args{'check_excel_restriction'});
+    } 
     $self->{api_client}->check_access_token();
     my $_body_data;
     # body params
@@ -344,6 +368,11 @@ sub post_assemble {
         description => '',
         required => '1',
     },        
+    'check_excel_restriction' => {
+        data_type => 'boolean',
+        description => '',
+        required => '0',
+    },    
     };
     __PACKAGE__->method_documentation->{ 'post_clear_objects' } = { 
     	summary => '',
@@ -392,7 +421,10 @@ sub post_clear_objects {
 
     if ( exists $args{'out_format'}) {
         $query_params->{'outFormat'} = $self->{api_client}->to_query_value($args{'out_format'});
-    }    
+    }  
+    if ( exists $args{'check_excel_restriction'}) {
+        $query_params->{'checkExcelRestriction'} = $self->{api_client}->to_query_value($args{'check_excel_restriction'});
+    }       
     # form params
     # if ( exists $args{'file'} ) {
     #     $form_params->{'File'} = [] unless defined $form_params->{'File'};
@@ -451,6 +483,12 @@ sub post_clear_objects {
         description => 'extended query parameters',
         required => '1',
     },
+    'check_excel_restriction' => {
+        data_type => 'boolean',
+        description => '',
+        required => '0',
+    },
+
     };
     __PACKAGE__->method_documentation->{ 'post_export' } = { 
     	summary => '',
@@ -497,12 +535,13 @@ sub post_export {
     if ( exists $args{'object_type'}) {
         $query_params->{'objectType'} = $self->{api_client}->to_query_value($args{'object_type'});
     }
-
     # query params
     if ( exists $args{'format'}) {
         $query_params->{'format'} = $self->{api_client}->to_query_value($args{'format'});
     }
-
+    if ( exists $args{'check_excel_restriction'}) {
+        $query_params->{'checkExcelRestriction'} = $self->{api_client}->to_query_value($args{'check_excel_restriction'});
+    } 
     if ( exists $args{'extended_query_parameters'} ) {   
         my $map_extended_query_parameters =$args{'extended_query_parameters'};
         while ( my ($key,$value) = each( %$map_extended_query_parameters ) ) {
@@ -645,6 +684,11 @@ sub post_import {
         description => '',
         required => '0',
     },
+    'check_excel_restriction' => {
+        data_type => 'boolean',
+        description => '',
+        required => '0',
+    },    
     };
     __PACKAGE__->method_documentation->{ 'post_merge' } = { 
     	summary => '',
@@ -687,6 +731,9 @@ sub post_merge {
     if ( exists $args{'merge_to_one_sheet'}) {
         $query_params->{'mergeToOneSheet'} = $self->{api_client}->to_query_value($args{'merge_to_one_sheet'});
     }
+    if ( exists $args{'check_excel_restriction'}) {
+        $query_params->{'checkExcelRestriction'} = $self->{api_client}->to_query_value($args{'check_excel_restriction'});
+    } 
 
     $self->{api_client}->check_access_token();
     my $_body_data;
@@ -731,6 +778,11 @@ sub post_merge {
         description => 'Cells document property.',
         required => '1',
     },
+    'check_excel_restriction' => {
+        data_type => 'boolean',
+        description => '',
+        required => '0',
+    },    
     };
     __PACKAGE__->method_documentation->{ 'post_metadata' } = { 
     	summary => '',
@@ -769,6 +821,9 @@ sub post_metadata {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
 
     $self->{api_client}->check_access_token();
+    if ( exists $args{'check_excel_restriction'}) {
+        $query_params->{'checkExcelRestriction'} = $self->{api_client}->to_query_value($args{'check_excel_restriction'});
+    }     
     my $_body_data;
     # body params
     if ( exists $args{'file'} ) {   
@@ -907,6 +962,11 @@ sub post_protect {
         description => '',
         required => '0',
     },
+    'check_excel_restriction' => {
+        data_type => 'boolean',
+        description => '',
+        required => '0',
+    },    
     };
     __PACKAGE__->method_documentation->{ 'post_search' } = { 
     	summary => '',
@@ -953,7 +1013,9 @@ sub post_search {
     if ( exists $args{'password'}) {
         $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
     }
-
+    if ( exists $args{'check_excel_restriction'}) {
+        $query_params->{'checkExcelRestriction'} = $self->{api_client}->to_query_value($args{'check_excel_restriction'});
+    } 
     $self->{api_client}->check_access_token();
     my $_body_data;
     # body params
@@ -1015,6 +1077,11 @@ sub post_search {
         description => '',
         required => '0',
     },
+    'check_excel_restriction' => {
+        data_type => 'boolean',
+        description => '',
+        required => '0',
+    },    
     };
     __PACKAGE__->method_documentation->{ 'post_split' } = { 
     	summary => '',
@@ -1071,7 +1138,9 @@ sub post_split {
     if ( exists $args{'to'}) {
         $query_params->{'to'} = $self->{api_client}->to_query_value($args{'to'});
     }
-
+    if ( exists $args{'check_excel_restriction'}) {
+        $query_params->{'checkExcelRestriction'} = $self->{api_client}->to_query_value($args{'check_excel_restriction'});
+    } 
     $self->{api_client}->check_access_token();
     my $_body_data;
     # body params
@@ -1206,6 +1275,11 @@ sub post_unlock {
         description => '',
         required => '1',
     },
+    'check_excel_restriction' => {
+        data_type => 'boolean',
+        description => '',
+        required => '0',
+    },    
     };
     __PACKAGE__->method_documentation->{ 'post_watermark' } = { 
     	summary => '',
@@ -1257,7 +1331,9 @@ sub post_watermark {
     if ( exists $args{'color'}) {
         $query_params->{'color'} = $self->{api_client}->to_query_value($args{'color'});
     }
-
+    if ( exists $args{'check_excel_restriction'}) {
+        $query_params->{'checkExcelRestriction'} = $self->{api_client}->to_query_value($args{'check_excel_restriction'});
+    } 
     # form params
     # if ( exists $args{'file'} ) {
     #     $form_params->{'File'} = [] unless defined $form_params->{'File'};
@@ -1305,6 +1381,11 @@ sub post_watermark {
         description => '',
         required => '1',
     },
+    'check_excel_restriction' => {
+        data_type => 'boolean',
+        description => '',
+        required => '0',
+    },    
     };
     __PACKAGE__->method_documentation->{ 'post_compress' } = { 
     	summary => '',
@@ -1346,7 +1427,9 @@ sub post_compress {
     if ( exists $args{'compress_level'}) {
         $query_params->{'CompressLevel'} = $self->{api_client}->to_query_value($args{'compress_level'});
     }
-
+    if ( exists $args{'check_excel_restriction'}) {
+        $query_params->{'checkExcelRestriction'} = $self->{api_client}->to_query_value($args{'check_excel_restriction'});
+    } 
     if ( exists $args{'file'} ) {   
         my $map_file =$args{'file'};
         while ( my ($filename,$value) = each( %$map_file ) ) {
@@ -1404,6 +1487,11 @@ sub post_compress {
         description => '',
         required => '0',
     },
+    'check_excel_restriction' => {
+        data_type => 'boolean',
+        description => '',
+        required => '0',
+    },    
     };
     __PACKAGE__->method_documentation->{ 'post_replace' } = { 
     	summary => '',
@@ -1456,6 +1544,9 @@ sub post_replace {
     if ( exists $args{'sheet_name'}) {
         $query_params->{'sheetName'} = $self->{api_client}->to_query_value($args{'sheet_name'});
     }        
+    if ( exists $args{'check_excel_restriction'}) {
+        $query_params->{'checkExcelRestriction'} = $self->{api_client}->to_query_value($args{'check_excel_restriction'});
+    }     
     if ( exists $args{'file'} ) {   
         my $map_file =$args{'file'};
         while ( my ($filename,$value) = each( %$map_file ) ) {
@@ -1504,6 +1595,11 @@ sub post_replace {
         description => '',
         required => '1',
     },
+    'check_excel_restriction' => {
+        data_type => 'boolean',
+        description => '',
+        required => '0',
+    },    
     };
     __PACKAGE__->method_documentation->{ 'post_reverse' } = { 
     	summary => '',
@@ -1550,6 +1646,9 @@ sub post_reverse {
     if ( exists $args{'format'}) {
         $query_params->{'format'} = $self->{api_client}->to_query_value($args{'format'});
     }
+    if ( exists $args{'check_excel_restriction'}) {
+        $query_params->{'checkExcelRestriction'} = $self->{api_client}->to_query_value($args{'check_excel_restriction'});
+    }     
     if ( exists $args{'file'} ) {   
         my $map_file =$args{'file'};
         while ( my ($filename,$value) = each( %$map_file ) ) {

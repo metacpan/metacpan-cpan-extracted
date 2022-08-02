@@ -11,6 +11,13 @@ sub foo ($) { ... }
 use feature 'signatures';
 sub foo ($foo) { ... }
 
+## name BundleSignature
+## failures 0
+## cut
+
+use v5.36;
+sub foo ($foo) { ... }
+
 ## name ExperimentalSignature
 ## failures 0
 ## cut

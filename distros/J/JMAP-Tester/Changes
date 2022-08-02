@@ -1,5 +1,14 @@
 Revision history for JMAP-Tester
 
+0.102     2022-07-25 10:45:39-04:00 America/New_York
+        - allow subclasses to change how JWT-authenticated links work
+          (you probably don't need this!)
+        - Stop acting like JMAP sessions contain an authenticationUri, because
+          they don't!  This means: don't change the $tester->authentication_uri
+          to be whatever you find in the client session.  You'll never find a
+          defined value, which means you'll clobber the correctly-set value
+          from initialization.
+
 0.101     2021-08-13 11:02:38-04:00 America/New_York
         - work around bugs in older Role::Tiny; this is what you want if you
           saw: Can't use string ("-1") as a symbol ref

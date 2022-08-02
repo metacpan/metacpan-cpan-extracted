@@ -19,7 +19,7 @@ name: App-CPANChangesUtils
 provides:
   App::CPANChangesUtils:
     file: lib/App/CPANChangesUtils.pm
-    version: '0.076'
+    version: '0.077'
 requires:
   CPAN::Changes: '0'
   Data::Sah::Compiler::perl::TH::bool: '0.911'
@@ -40,11 +40,15 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CPANChangesUtils
   homepage: https://metacpan.org/release/App-CPANChangesUtils
   repository: git://github.com/perlancar/perl-App-CPANChangesUtils.git
-version: '0.076'
+version: '0.077'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::InsertCommandOutput
+      name: InsertCommandOutput
+      version: '0.056'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript parse-cpan-changes'
@@ -334,7 +338,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.780'
+              version: '0.781'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

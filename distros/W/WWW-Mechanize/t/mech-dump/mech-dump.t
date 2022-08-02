@@ -4,8 +4,8 @@ use warnings;
 use strict;
 
 use Test::More;
-use File::Spec;
-use LWP;
+use File::Spec ();
+use LWP ();
 
 BEGIN {
     delete @ENV{ qw( IFS CDPATH ENV BASH_ENV PATH ) };
@@ -21,11 +21,11 @@ if ( $^O eq 'VMS' ) {
 
 # Simply use a file: uri instead of the filename to make this test
 # more independent of what URI::* thinks.
-my $source = 'file:t/google.html t/find_inputs.html';
+my $source = 'file:t/google.html t/find_inputs.html t/html_file.txt';
 
 my $perl;
 $perl = $1 if $^X =~ /^(.+)$/;
-my $command = "$perl -Ilib $exe --forms $source";
+my $command = "$perl -Ilib $exe --forms --images --links $source";
 
 my $actual = `$command`;
 
@@ -40,6 +40,23 @@ GET file:/target-page [bob-the-form]
   btnG=Google Search              (submit)
   btnI=I'm Feeling Lucky          (submit)
 
+
+/images/logo.gif
+
+
+/imghp?hl=en&tab=wi&ie=UTF-8
+/grphp?hl=en&tab=wg&ie=UTF-8
+/dirhp?hl=en&tab=wd&ie=UTF-8
+/nwshp?hl=en&tab=wn&ie=UTF-8
+/advanced_search?hl=en
+/preferences?hl=en
+/language_tools?hl=en
+/tour/services/query.html
+/ads/
+/services/
+/options/
+/about.html
+
 POST http://localhost/ (multipart/form-data) [1st_form]
   1a=                            (text)
   submit1=Submit                 (image)
@@ -57,6 +74,9 @@ POST http://localhost/ [3rd_form]
   YourSister=                    (text)
   YourSister=                    (text)
   submit=Submit                  (submit)
+
+GET http://localhost [text-form]
+  one=                           (text)
 EOF
 } else {
     $expected = <<'EOF';
@@ -68,6 +88,23 @@ GET file:/target-page [bob-the-form]
   btnG=Google Search             (submit)
   btnI=I'm Feeling Lucky         (submit)
 
+
+/images/logo.gif
+
+
+/imghp?hl=en&tab=wi&ie=UTF-8
+/grphp?hl=en&tab=wg&ie=UTF-8
+/dirhp?hl=en&tab=wd&ie=UTF-8
+/nwshp?hl=en&tab=wn&ie=UTF-8
+/advanced_search?hl=en
+/preferences?hl=en
+/language_tools?hl=en
+/tour/services/query.html
+/ads/
+/services/
+/options/
+/about.html
+
 POST http://localhost/ (multipart/form-data) [1st_form]
   1a=                            (text)
   submit1=Submit                 (image)
@@ -85,6 +122,9 @@ POST http://localhost/ [3rd_form]
   YourSister=                    (text)
   YourSister=                    (text)
   submit=Submit                  (submit)
+
+GET http://localhost [text-form]
+  one=                           (text)
 EOF
 }
 

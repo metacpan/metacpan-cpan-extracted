@@ -1,7 +1,7 @@
 #
 #   CQi v0.1
 #   (IMS/HIT Corpus Query Interface)
-#   (C) Stefan Evert, IMS Stuttgart, Sep 1999
+#   (C) 1999-2022 Stephanie Evert
 #
 
 

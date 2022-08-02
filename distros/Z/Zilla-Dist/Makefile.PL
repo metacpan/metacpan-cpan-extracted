@@ -61,7 +61,7 @@ my %WriteMakefileArgs = (
     "YAML::PP" => "0.034",
     "version" => "0.9929"
   },
-  "VERSION" => "0.1.8",
+  "VERSION" => "0.1.9",
   "test" => {
     "TESTS" => "t/*.t"
   }

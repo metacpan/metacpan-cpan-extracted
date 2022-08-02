@@ -3,9 +3,9 @@ package Sah::Schemas::Str;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-05'; # DATE
+our $DATE = '2022-06-09'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 1;
 # ABSTRACT: Various string schemas
@@ -22,9 +22,11 @@ Sah::Schemas::Str - Various string schemas
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::Schemas::Str (from Perl distribution Sah-Schemas-Str), released on 2022-06-05.
+This document describes version 0.008 of Sah::Schemas::Str (from Perl distribution Sah-Schemas-Str), released on 2022-06-09.
 
 =head1 SAH SCHEMAS
+
+The following schemas are included in this distribution:
 
 =over
 
@@ -56,8 +58,16 @@ String or array (1+ length) of (defined) string.
 
 String or regex (if string is of the form `E<sol>...E<sol>`).
 
-If string is of the form of C</.../>, then it will be parsed as a regex.
-Otherwise, it's accepted as a plain string.
+Either string or Regexp object is accepted.
+
+If string is of the form of C</.../> or C<qr(...)>, then it will be compiled into
+a Regexp object. If the regex pattern inside C</.../> or C<qr(...)> is invalid,
+value will be rejected.
+
+Currently, unlike in normal Perl, for the C<qr(...)> form, only parentheses C<(>
+and C<)> are allowed as the delimiter.
+
+Currently modifiers C<i>, C<m>, and C<s> after the second C</> are allowed.
 
 
 =back
@@ -72,9 +82,9 @@ Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Str>.
 
 =head1 SEE ALSO
 
-L<Sah> - specification
+L<Sah> - schema specification
 
-L<Data::Sah>
+L<Data::Sah> - Perl implementation of Sah
 
 =head1 AUTHOR
 

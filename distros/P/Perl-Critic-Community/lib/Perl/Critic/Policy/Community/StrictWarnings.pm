@@ -8,7 +8,7 @@ use Perl::Critic::Utils::Constants qw(@STRICT_EQUIVALENT_MODULES @WARNINGS_EQUIV
 use parent 'Perl::Critic::Policy';
 use version;
 
-our $VERSION = 'v1.0.2';
+our $VERSION = 'v1.0.3';
 
 use constant DESC => 'Missing strict or warnings';
 use constant EXPL => 'The strict and warnings pragmas are important to avoid common pitfalls and deprecated/experimental functionality. Make sure each script or module contains "use strict; use warnings;" or a module that does this for you.';
@@ -53,6 +53,7 @@ sub violates {
 		if ($include->type//'' eq 'use') {
 			$has_strict = 1 if $include->version and version->parse($include->version) >= version->parse('v5.12');
 			$has_strict = 1 if defined $include->module and exists $strict_importers{$include->module};
+			$has_warnings = 1 if $include->version and version->parse($include->version) >= version->parse('v5.36');
 			$has_warnings = 1 if defined $include->module and exists $warnings_importers{$include->module};
 		}
 		return () if $has_strict and $has_warnings;
@@ -75,7 +76,8 @@ misspellings, scoping issues, and performing operations on undefined values.
 Warnings can also alert you to deprecated or experimental functionality. The
 pragmas may either be explicitly imported with C<use>, or indirectly through a
 number of importer modules such as L<Moose> or L<strictures>. L<strict> is also
-enabled automatically with a C<use> declaration of perl version 5.12 or higher.
+enabled automatically with a C<use> declaration of perl version 5.12 or higher,
+as is L<warnings> with a C<use> declaration of 5.36 or higher.
 
   use strict;
   use warnings;
@@ -84,6 +86,8 @@ enabled automatically with a C<use> declaration of perl version 5.12 or higher.
 
   use 5.012;
   use warnings;
+
+  use 5.036;
 
 This policy is similar to the core policies
 L<Perl::Critic::Policy::TestingAndDebugging::RequireUseStrict> and

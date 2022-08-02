@@ -5,7 +5,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -111,7 +111,7 @@
    "provides" : {
       "HTTP::Tiny" : {
          "file" : "lib/HTTP/Tiny.pm",
-         "version" : "0.080"
+         "version" : "0.082"
       }
    },
    "release_status" : "stable",
@@ -126,7 +126,7 @@
          "web" : "https://github.com/chansen/p5-http-tiny"
       }
    },
-   "version" : "0.080",
+   "version" : "0.082",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "Alan Gardner <gardner@pythian.com>",
@@ -145,6 +145,7 @@
       "Dean Pearce <pearce@pythian.com>",
       "Edward Zborowski <ed@rubensteintech.com>",
       "Felipe Gasper <felipe@felipegasper.com>",
+      "Graham Knop <haarg@haarg.org>",
       "Greg Kennedy <kennedy.greg@gmail.com>",
       "James E Keenan <jkeenan@cpan.org>",
       "James Raspass <jraspass@gmail.com>",
@@ -173,8 +174,8 @@
       "Tony Cook <tony@develop-help.com>",
       "Xavier Guimard <yadd@debian.org>"
    ],
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

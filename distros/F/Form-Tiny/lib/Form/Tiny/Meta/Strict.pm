@@ -1,5 +1,5 @@
 package Form::Tiny::Meta::Strict;
-
+$Form::Tiny::Meta::Strict::VERSION = '2.13';
 use v5.10;
 use strict;
 use warnings;
@@ -8,8 +8,6 @@ use Form::Tiny::Utils qw(try);
 use Form::Tiny::Error;
 
 use Moo::Role;
-
-our $VERSION = '2.12';
 
 use constant {
 	MARKER_NONE => '',

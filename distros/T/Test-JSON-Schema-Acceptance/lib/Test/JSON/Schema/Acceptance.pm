@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.015-5-g58b267c
+package Test::JSON::Schema::Acceptance; # git description: v1.016-5-g71cf8b2
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators like JSON::Schema
 
-our $VERSION = '1.016';
+our $VERSION = '1.017';
 
 use 5.020;
 use Moo;
@@ -20,7 +20,7 @@ use JSON::MaybeXS 1.004001;
 use File::ShareDir 'dist_dir';
 use Feature::Compat::Try;
 use MooX::TypeTiny 0.002002;
-use Types::Standard 1.010002 qw(Str InstanceOf ArrayRef HashRef Dict Any HasMethods Bool Optional);
+use Types::Standard 1.016003 qw(Str InstanceOf ArrayRef HashRef Dict Any HasMethods Bool Optional Slurpy);
 use Types::Common::Numeric 'PositiveOrZeroInt';
 use Path::Tiny 0.069;
 use List::Util 1.33 qw(any max sum0);
@@ -365,7 +365,7 @@ has json_decoder => (
   is => 'ro',
   isa => HasMethods[qw(encode decode)],
   lazy => 1,
-  default => sub { JSON::MaybeXS->new(allow_nonref => 1, utf8 => 1, allow_blessed => 1) },
+  default => sub { JSON::MaybeXS->new(allow_nonref => 1, utf8 => 1, allow_blessed => 1, canonical => 1) },
 );
 
 # used for pretty-printing diagnostics
@@ -402,7 +402,9 @@ has _test_data => (
                description => Str,
                comment => Optional[Str],
                valid => $json_bool,
+               Slurpy[Any],
              ]],
+             Slurpy[Any],
            ]],
          ]],
 );
@@ -499,7 +501,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.016
+version 1.017
 
 =head1 SYNOPSIS
 
@@ -619,7 +621,7 @@ maps to C<draft3> through C<draft7>.)
 Instead of specifying a draft specification to test against, which will select the most appropriate
 tests, you can pass in the name of a directory of tests to run directly. Files in this directory
 should be F<.json> files following the format described in
-L<https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/master/README.md>.
+L<https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/README.md>.
 
 =head2 additional_resources
 

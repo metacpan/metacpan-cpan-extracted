@@ -14,10 +14,10 @@ This module requires the following perl modules to be installed:
 
 To install this module, run the following commands:
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+    perl Makefile.PL
+    make
+    make test
+    make install
 
 ## SUPPORT AND DOCUMENTATION
 
@@ -34,6 +34,6 @@ You can also look for information at:
 
 ## LICENSE AND COPYRIGHT
 
-Copyright (C) 2017-2021 Christoph Beger, University of Leipzig
+Copyright (C) 2017-2022 CrescNet, University of Leipzig
 
 This program is released under the following license: MIT

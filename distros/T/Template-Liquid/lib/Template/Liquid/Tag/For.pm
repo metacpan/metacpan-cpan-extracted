@@ -1,5 +1,5 @@
 package Template::Liquid::Tag::For;
-our $VERSION = '1.0.19';
+our $VERSION = '1.0.20';
 use strict;
 use warnings;
 require Template::Liquid::Error;
@@ -97,7 +97,7 @@ sub render {
     if (ref $list eq 'HASH') {
         $list  = [map { {key => $_, value => $list->{$_}} } keys %$list];
         @$list = sort {
-            $a->{$sorted} =~ m[^\d+$]o &&
+            $a->{$sorted}     =~ m[^\d+$]o &&
                 $b->{$sorted} =~ m[^\d+$]o
                 ? ($a->{$sorted} <=> $b->{$sorted})
                 : ($a->{$sorted} cmp $b->{$sorted})
@@ -106,10 +106,7 @@ sub render {
     }
     elsif (defined $sorted) {
         @$list = sort {
-            $a =~ m[^\d+$] &&
-                $b =~ m[^\d+$]
-                ? ($a <=> $b)
-                : ($a cmp $b)
+            $a =~ m[^\d+$] && $b =~ m[^\d+$] ? ($a <=> $b) : ($a cmp $b)
         } @$list;
     }
     if (!defined $list || !$list || !@$list) {
@@ -126,7 +123,7 @@ sub render {
         $list = [@{$list}[$min .. $max]]
             ;    # make a copy so we can use the list again
         @$list  = reverse @$list if $reversed;
-        $limit  = defined $limit ? $limit : scalar @$list;
+        $limit  = defined $limit  ? $limit  : scalar @$list;
         $offset = defined $offset ? $offset : 0;
     }
     return $s->{template}{context}->stack(
@@ -177,6 +174,12 @@ sub render {
 
 =encoding UTF-8
 
+=begin stopwords
+
+Lütke jadedPixel iterable
+
+=end stopwords
+
 =head1 NAME
 
 Template::Liquid::Tag::For - Simple loop construct
@@ -224,7 +227,7 @@ is this the first iteration?
 
 =item * C<forloop.last>
 
-is this the last iternation?
+is this the last iteration?
 
 =item * C<forloop.type>
 
@@ -265,8 +268,8 @@ attribute.
 
 =head3 Sorting
 
-You can sort the variable with the C<sorted> attribute. This is an extention
-beyond the scope of Liquid's syntax and thus incompatible but it's useful. The
+You can sort the variable with the C<sorted> attribute. This is an extension
+beyond the scope of Liquid's syntax and thus incompatible but it's useful.
 
     {% for item in collection sorted %} {{item}} {% endfor %}
 
@@ -356,7 +359,7 @@ CPAN ID: SANKO
 
 =head1 License and Legal
 
-Copyright (C) 2009-2012 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+Copyright (C) 2009-2022 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of L<The Artistic License

@@ -1,5 +1,28 @@
 Version history for Catalyst-TraitFor-Request-Methods:
 
+v0.3.2    2022-07-29 16:46:23+01:00 Europe/London
+  [Enhancements]
+  - Add is_unrecognized_method method.
+
+  [Bug Fix]
+  - Handle unrecognised HTTP methods.  Users of v0.3.0-v0.3.1 should upgrade.
+
+v0.3.1    2022-07-29 11:46:35+01:00 Europe/London
+  [Enhancements]
+  - Added support for the PROPFIND method.
+
+v0.3.0    2022-07-27 12:53:55+01:00 Europe/London
+  [Enhancements]
+  - Use Data::Enum for method predicates.
+
+  [Documentation]
+  - Updated copyright year.
+
+  - Fixed encoding of links in README.
+
+  [Toolchain]
+  - Updated MANIFEST.SKIP.
+
 v0.2.3    2020-07-31 15:01:57+01:00 Europe/London
   [Documentation]
   - Updated copyright year.

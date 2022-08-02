@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Number.pm
-## Version v1.1.1
+## Version v1.2.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/03/05
+## Modified 2022/07/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -98,7 +98,7 @@ BEGIN
         },
         'fallback' => 1,
     );
-    our( $VERSION ) = 'v1.1.1';
+    our( $VERSION ) = 'v1.2.0';
 };
 
 # use strict;
@@ -730,8 +730,6 @@ sub compute
     my( $self, $other, $swap, $opts ) = @_;
     my $other_val = Scalar::Util::blessed( $other ) ? $other : "\"$other\"";
     my $operation = $swap ? "${other_val} $opts->{op} \$self->{_number}" : "\$self->{_number} $opts->{op} ${other_val}";
-    # XXX Remove
-    # print( STDERR __PACKAGE__, "::compute: called from ", [caller(1)]->[0], " at line ", [caller(1)]->[2], ". Evaluating '$operation' with \$self->{_number} being '$self->{_number}'\n" );
     no warnings 'uninitialized';
     no strict;
     if( $opts->{return_object} )
@@ -740,8 +738,6 @@ sub compute
         no overloading;
         warn( "Error with return formula \"$operation\" using object $self having number '$self->{_number}': $@" ) if( $@ && $self->_warnings_is_enabled );
         return if( $@ );
-        # XXX Remove
-        # print( STDERR __PACKAGE__, "::compute: Returning '$res'\n" );
         require Module::Generic::Scalar;
         return( Module::Generic::Scalar->new( $res ) ) if( $opts->{type} eq 'scalar' );
         return( Module::Generic::Infinity->new( $res ) ) if( POSIX::isinf( $res ) );
@@ -757,16 +753,12 @@ sub compute
         warn( "Error with boolean formula \"$operation\" using object $self having number '$self->{_number}': $@" ) if( $@ && $self->_warnings_is_enabled );
         return if( $@ );
         # return( $res ? $self->true : $self->false );
-        # XXX Remove
-        # print( STDERR __PACKAGE__, "::compute: Returning '$res'\n" );
         return( $res );
     }
     else
     {
         # return( eval( $operation ) );
         my $res = eval( $operation );
-        # XXX Remove
-        # print( STDERR __PACKAGE__, "::compute: Returning '$res'\n" );
         return( $res );
     }
 }
@@ -832,7 +824,7 @@ sub format_bytes
     my $self = shift( @_ );
     # no overloading;
     my $num  = $self->{_number};
-    ## See comment in format() method
+    # See comment in format() method
     return( $num ) if( !defined( $num ) );
     my $fmt = $self->_get_formatter;
     try
@@ -933,7 +925,7 @@ sub format_picture
 
 sub formatter { return( shift->_set_get_object_without_init( '_fmt', 'Number::Format', @_ ) ); }
 
-## https://stackoverflow.com/a/483708/4814971
+# <https://stackoverflow.com/a/483708/4814971>
 sub from_binary
 {
     my $self = shift( @_ );
@@ -1155,7 +1147,7 @@ sub round2
     my $self = shift( @_ );
     no overloading;
     my $num  = $self->{_number};
-    ## See comment in format() method
+    # See comment in format() method
     return( $num ) if( !defined( $num ) );
     my $fmt = $self->_get_formatter;
     try
@@ -1197,8 +1189,6 @@ sub symbol { return( shift->_set_get_prop( 'symbol', @_ ) ); }
 sub tan { return( shift->_func( 'tan', { posix => 1 } ) ); }
 
 sub thousand { return( shift->_set_get_prop( 'thousand', @_ ) ); }
-
-sub TO_JSON { return( shift->as_string ); }
 
 sub unformat
 {
@@ -1295,7 +1285,50 @@ AUTOLOAD
     return;
 };
 
-# XXX package Module::Generic::NumberSpecial
+sub FREEZE
+{
+    my $self = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class = CORE::ref( $self );
+    my %hash  = %$self;
+    # Return an array reference rather than a list so this works with Sereal and CBOR
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # But Storable want a list with the first element being the serialised element
+    CORE::return( $class, \%hash );
+}
+
+sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+# NOTE: CBOR will call the THAW method with the stored classname as first argument, the constant string CBOR as second argument, and all values returned by FREEZE as remaining arguments.
+# NOTE: Storable calls it with a blessed object it created followed with $cloning and any other arguments initially provided by STORABLE_freeze
+sub THAW
+{
+    my( $self, undef, @args ) = @_;
+    my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+    my $new;
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        foreach( CORE::keys( %$hash ) )
+        {
+            $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+        }
+        $new = $self;
+    }
+    else
+    {
+        $new = CORE::bless( $hash => $class );
+    }
+    CORE::return( $new );
+}
+
+sub TO_JSON { return( shift->as_string ); }
+
+# NOTE: package Module::Generic::NumberSpecial
 package Module::Generic::NumberSpecial;
 BEGIN
 {
@@ -1349,7 +1382,6 @@ sub _catchall
     no strict;
     my $expr = $swap ? "$other $op $self->{_number}" : "$self->{_number} $op $other";
     my $res = eval( $expr );
-    ## print( ref( $self ), "::_catchall: evaluating $expr => $res\n" );
     CORE::warn( "Error evaluating expression \"$expr\": $@" ) if( $@ );
     return if( $@ );
     return( Module::Generic::Number->new( $res ) ) if( POSIX::isnormal( $res ) );
@@ -1369,8 +1401,6 @@ sub _func
     my $val  = @_ ? shift( @_ ) : undef;
     my $expr = defined( $val ) ? "${namespace}::${func}( $self->{_number}, $val )" : "${namespace}::${func}( $self->{_number} )";
     my $res = eval( $expr );
-    ## $self->message( 3, "Error: $@" ) if( $@ );
-    ## print( STDERR ref( $self ), "::_func -> evaluating '$expr' -> '$res'\n" );
     CORE::warn( $@ ) if( $@ );
     return if( !defined( $res ) );
     return( Module::Generic::Number->new( $res ) ) if( POSIX::isnormal( $res ) );
@@ -1382,24 +1412,21 @@ sub _func
 AUTOLOAD
 {
     my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
-    ## print( STDERR "$AUTOLOAD: called for method \"$method\"\n" );
-    ## If we are chained, return our null object, so the chain continues to work
+    # If we are chained, return our null object, so the chain continues to work
     if( want( 'OBJECT' ) )
     {
-        ## No, this is NOT a typo. rreturn() is a function of module Want
-        # print( STDERR "$AUTOLOAD: Returning the object itself (", ref( $_[0] ), ")\n" );
+        # No, this is NOT a typo. rreturn() is a function of module Want
         rreturn( $_[0] );
     }
-    ## Otherwise, we return infinity, whether positive or negative or NaN depending on what was set
-    ## print( STDERR "$AUTOLOAD: returning '", $_[0]->{_number}, "'\n" );
+    # Otherwise, we return infinity, whether positive or negative or NaN depending on what was set
     return( $_[0]->{_number} );
 };
 
 DESTROY {};
 
-# XXX package Module::Generic::Infinity
-## Purpose is to allow chaining of methods when infinity is returned
-## At the end of the chain, Inf or -Inf is returned
+# NOTE: package Module::Generic::Infinity
+# Purpose is to allow chaining of methods when infinity is returned
+# At the end of the chain, Inf or -Inf is returned
 package Module::Generic::Infinity;
 BEGIN
 {
@@ -1411,7 +1438,7 @@ BEGIN
 
 sub is_infinite { return( 1 ); }
 
-# XXX package Module::Generic::Nan
+# NOTE: package Module::Generic::Nan
 package Module::Generic::Nan;
 BEGIN
 {

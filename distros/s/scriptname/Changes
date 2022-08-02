@@ -1,6 +1,9 @@
 Revision history for scriptname
 
-0.10 Thu May 23 11:59:16 2013
+0.94 Tue Aug 02 11:59:16 2022
+     Untaint $0
+
+0.92 Thu May 23 11:59:16 2013
      Create directories in the tests so CPAN is satisfied :-D
 
 0.9  Wed Dec 19 12:43:22 2012

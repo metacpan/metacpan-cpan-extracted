@@ -21,10 +21,14 @@ character-sheet-generator - a web app to generate character sheets
 =head1 SYNOPSIS
 
     character-sheet-generator daemon --listen "http://*:3040"
+    character-sheet-generator random
 
 =head1 DESCRIPTION
 
-This command starts a web server using Mojolicious.
+B<daemon>: This command starts a web server using Mojolicious.
+
+B<random>: This command prints a random character to standard output.
+See L<Game::CharacterSheetGenerator::Command::Random> for options.
 
 =head1 SEE ALSO
 

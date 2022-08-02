@@ -52,9 +52,10 @@ $test->for('abstract');
 
   use Venus::Class;
 
+  with 'Venus::Role::Proxyable';
   with 'Venus::Role::Pluggable';
 
-  has 'secret';
+  attr 'secret';
 
   package main;
 
@@ -80,14 +81,6 @@ This package provides a mechanism for dispatching to plugin classes.
 =cut
 
 $test->for('description');
-
-=integrates
-
-Venus::Role::Proxyable
-
-=cut
-
-$test->for('integrates');
 
 # END
 

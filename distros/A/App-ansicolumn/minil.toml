@@ -1,15 +1,19 @@
 name = "App-ansicolumn"
 readme_from = "script/ansicolumn"
 badges = ['github-actions/test', 'metacpan']
-authority="cpan:UTASHIRO"
+authority = "cpan:UTASHIRO"
 
-module_maker="ModuleBuildTiny"
+module_maker = "ModuleBuildTiny"
 static_install = "auto"
 
+[release]
+branch = "master"
+
 [FileGatherer]
-exclude_match=['^images/.*']
+exclude_match = ['^images/.*']
 
 [unsupported]
 os = [
     "MSWin32",
 ]
+

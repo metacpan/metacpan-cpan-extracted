@@ -12,9 +12,9 @@ my $sequence = Sequence->new( elements => [ @{ $exp{elements} } ] );
 is(
     $sequence,
     object {
-        call min       => $exp{elements}[0];
-        call max       => $exp{elements}[-1];
-        call nelem     => $exp{elements}->@*;
+        call min      => $exp{elements}[0];
+        call max      => $exp{elements}[-1];
+        call nelem    => $exp{elements}->@*;
         call elements => array {
             item float( $_ ) foreach $exp{elements}->@*;
             end;

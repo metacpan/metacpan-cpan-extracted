@@ -1,62 +1,91 @@
-Changes on 2022-01-06 for repository at:
+Changes on 2022-07-27 for repository at:
   Fetch URL: git@github.com:abeltje/Test-DBIC-SQLite
   Push  URL: git@github.com:abeltje/Test-DBIC-SQLite
 
 Enjoy!
 
-1.00 2022-01-06T10:00:10+01:00 (46b7f18 => Abe Timmerman)
- - (Abe Timmerman, 3 seconds ago) Autocommit for distribution
-   Test::DBIC::SQLite 1.00 (minor)
+1.01 2022-07-27T09:38:03+02:00 (f9c1c23 => Abe Timmerman)
+ - (Abe Timmerman, Wed, 27 Jul 2022 09:38:03 +0200) Autocommit for
+   distribution Test::DBIC::SQLite 1.01 (minor)
+
+1.00_02 2022-07-26T11:02:36+02:00 (ef8bcd1 => Abe Timmerman)
+ - (Abe Timmerman, Tue, 26 Jul 2022 11:02:36 +0200) Autocommit for
+   distribution Test::DBIC::SQLite 1.00_02 (test)
+
+1.00_01 2022-07-25T20:56:21+02:00 (2b59b74 => Abe Timmerman)
+ - (Abe Timmerman, Mon, 25 Jul 2022 20:56:21 +0200) Autocommit for
+   distribution Test::DBIC::SQLite 1.00_01 (test)
+
+ - (Abe Timmerman, Tue, 26 Jul 2022 11:00:09 +0200) Disconnect from the
+   storage before removal
+ -     MSWin32 doesn't allow the removal of open files.
+
+1.00 2022-01-06T10:00:10+01:00 (5b29e50 => Abe Timmerman)
+ - (Abe Timmerman, Thu, 6 Jan 2022 10:00:10 +0100) Autocommit for
+   distribution Test::DBIC::SQLite 1.00 (minor)
+
+ - (Abe Timmerman, Mon, 25 Jul 2022 19:13:59 +0200) Implement auto remove
+   of created database-files
+ -     The object now has a destructor that will remove a database file if
+   it
+ -     was created during the test. Use
+ -     $Test::DBIC::SQLite::LeaveCreatedDatabases for debugging.
+ -     Fix POD and regenerate README.md
 
 0.99_03 2021-12-24T20:54:31+01:00 (9357b1e => Abe Timmerman)
- - (Abe Timmerman, 13 days ago) Autocommit for distribution
-   Test::DBIC::SQLite 0.99_03 (test)
+ - (Abe Timmerman, Fri, 24 Dec 2021 20:54:31 +0100) Autocommit for
+   distribution Test::DBIC::SQLite 0.99_03 (test)
 
 0.99_02 2021-12-24T16:40:52+01:00 (b8ee75b => Abe Timmerman)
- - (Abe Timmerman, 13 days ago) Autocommit for distribution
-   Test::DBIC::SQLite 0.99_02 (test)
+ - (Abe Timmerman, Fri, 24 Dec 2021 16:40:52 +0100) Autocommit for
+   distribution Test::DBIC::SQLite 0.99_02 (test)
 
- - (Abe Timmerman, 13 days ago) Fix another test for dropping
+ - (Abe Timmerman, Fri, 24 Dec 2021 20:53:26 +0100) Fix another test for
+   dropping
 
 0.99_01 2021-12-22T17:50:49+01:00 (17973c6 => Abe Timmerman)
- - (Abe Timmerman, 2 weeks ago) Autocommit for distribution
-   Test::DBIC::SQLite 0.99_01 (test)
+ - (Abe Timmerman, Wed, 22 Dec 2021 17:50:49 +0100) Autocommit for
+   distribution Test::DBIC::SQLite 0.99_01 (test)
 
- - (abeltje, 13 days ago) Disconnect from the storage before dropping the
-   database
+ - (abeltje, Fri, 24 Dec 2021 16:26:33 +0100) Disconnect from the storage
+   before dropping the database
  -     Also add a warning to the POD.
 
 0.01 2015-09-18T12:55:59+02:00 (623efc2 => abeltje)
- - (abeltje, 6 years ago) Autocommit for distribution Test::DBIC::SQLite
-   0.01 (minor)
+ - (abeltje, Fri, 18 Sep 2015 12:55:59 +0200) Autocommit for distribution
+   Test::DBIC::SQLite 0.01 (minor)
 
- - (Abe Timmerman, 9 months ago) Introduce `t::Test::abeltje`
+ - (Abe Timmerman, Thu, 22 Apr 2021 01:25:03 +0200) Introduce
+   `t::Test::abeltje`
  -     This changes the `xt/` tests to more standard ones.
  -     New dependencies for BUILD stage (during testing)
 
- - (Abe Timmerman, 9 months ago) Prepare for the new version of
-   Test::DBIC::SQLite
+ - (Abe Timmerman, Thu, 22 Apr 2021 23:37:26 +0200) Prepare for the new
+   version of Test::DBIC::SQLite
  -     I introduced a Moo::Role that should be able to serve as a base for
  -     implementing other Database drivers.
 
- - (Abe Timmerman, 2 weeks ago) Mostly cleaning up of docs, code and repo
+ - (Abe Timmerman, Wed, 22 Dec 2021 17:34:33 +0100) Mostly cleaning up of
+   docs, code and repo
  -     Added an examle of version-check to test Schema.
 
- - (Abe Timmerman, 2 weeks ago) Update t-Test-abeltje (with Kwalitee check)
+ - (Abe Timmerman, Wed, 22 Dec 2021 17:46:45 +0100) Update t-Test-abeltje
+   (with Kwalitee check)
 
 0.00_02 2015-09-09T16:24:56+02:00 (a9bf17e => abeltje)
- - (abeltje, 6 years ago) Autocommit for distribution Test::DBIC::SQLite
-   0.00_02 (same)
+ - (abeltje, Wed, 9 Sep 2015 16:24:56 +0200) Autocommit for distribution
+   Test::DBIC::SQLite 0.00_02 (same)
 
- - (abeltje, 6 years ago) Improve kwalitee-score
+ - (abeltje, Tue, 15 Sep 2015 06:26:48 +0200) Improve kwalitee-score
  -     Add MIN_PERL_VERSION and AUTHOR to WriteMakefile(()
  -     Add LICENSE section to the documentation
 
 0.00_01 2015-09-02T11:51:42+02:00 (a33c5c6 => abeltje)
- - (abeltje, 6 years ago) Autocommit for distribution Test::DBIC::SQLite
-   0.00_01 (test)
+ - (abeltje, Wed, 2 Sep 2015 11:51:42 +0200) Autocommit for distribution
+   Test::DBIC::SQLite 0.00_01 (test)
 
- - (abeltje, 6 years ago) FIX: Forgot Makefile.PL, Changes in the MANIFEST
+ - (abeltje, Wed, 2 Sep 2015 15:14:26 +0200) FIX: Forgot Makefile.PL,
+   Changes in the MANIFEST
 
 0.00_00 2015-08-31T17:57:47+02:00 (677bf20 => abeltje)
- - (abeltje, 6 years ago) Initial commit.
+ - (abeltje, Mon, 31 Aug 2015 17:57:47 +0200) Initial commit.

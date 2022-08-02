@@ -22,9 +22,16 @@ sub test_one {
 
     my $ctx = context;
 
-    my $tag = join( '; ', map {
-        my $value = ! ref $attr{$_} ? $attr{$_} : '[' . join( ', ', $attr{$_}->@* ) . ']';
-        $_ . ' = ' . $value } @keys ) . ';';
+    my $tag = join(
+        '; ',
+        map {
+            my $value
+              = !ref $attr{$_}
+              ? $attr{$_}
+              : '[' . join( ', ', $attr{$_}->@* ) . ']';
+            $_ . ' = ' . $value
+        } @keys
+    ) . ';';
 
     subtest $tag => sub {
 
@@ -38,7 +45,8 @@ sub test_one {
               };
 
             my $nelem = @{ $exp->{elements} };
-            my $spacing  = exists $attr{spacing} ? $attr{spacing} : $exp->{spacing};
+            my $spacing
+              = exists $attr{spacing} ? $attr{spacing} : $exp->{spacing};
 
             my $min
               = exists $attr{min}      ? $attr{min}
@@ -46,7 +54,7 @@ sub test_one {
               :                          undef;
 
             ok( $sequence->min <= $min, "minimum condition valid" )
-                if defined $min;
+              if defined $min;
 
 
             my $max
@@ -55,13 +63,13 @@ sub test_one {
               :                          undef;
 
             ok( $sequence->max >= $max, "maximum condition valid" )
-                if defined $max;
+              if defined $max;
 
             is(
                 $sequence,
                 object {
-                    call min       => $exp->{elements}[0];
-                    call max       => $exp->{elements}[-1];
+                    call min => $exp->{elements}[0];
+                    call max => $exp->{elements}[-1];
                     # call nelem     => $nelem;
                     call elements => array {
                         item float( $_ ) foreach $exp->{elements}->@*;
@@ -91,9 +99,9 @@ subtest '( MIN | MAX | NELEM )' => sub {
     test
 
       [
-        [ min => 1, max => 10, nelem =>11 ],
+        [ min => 1, max => 10, nelem => 11 ],
         {
-            spacing      => 0.9,
+            spacing  => 0.9,
             elements =>
               [ 1, 1.9, 2.8, 3.7, 4.6, 5.5, 6.4, 7.3, 8.2, 9.1, 10.0 ],
         },
@@ -102,7 +110,7 @@ subtest '( MIN | MAX | NELEM )' => sub {
       [
         [ min => 0.5, max => 7.7, nelem => 10 ],
         {
-            spacing      => 0.8,
+            spacing  => 0.8,
             elements => [ 0.5, 1.3, 2.1, 2.9, 3.7, 4.5, 5.3, 6.1, 6.9, 7.7 ],
         },
       ],
@@ -205,7 +213,7 @@ subtest '( CENTER | SPACING | NELEM )' => sub {
     test [
         [ center => 0, spacing => 1, nelem => 12 ],
         {
-            spacing      => 1,
+            spacing  => 1,
             elements => [
                 -5.5, -4.5, -3.5, -2.5, -1.5, -0.5,
                 0.5,  1.5,  2.5,  3.5,  4.5,  5.5
@@ -217,7 +225,7 @@ subtest '( CENTER | SPACING | NELEM )' => sub {
       [
         [ center => -0.24, spacing => 1, nelem => 12 ],
         {
-            spacing      => 1,
+            spacing  => 1,
             elements => [
                 -5.74, -4.74, -3.74, -2.74, -1.74, -0.74,
                 0.26,  1.26,  2.26,  3.26,  4.26,  5.26
@@ -252,7 +260,7 @@ subtest '( CENTER | RANGEW | NELEM )' => sub {
       [
         [ center => 0, rangew => 10, nelem => 11 ],
         {
-            spacing      => 1,
+            spacing  => 1,
             elements => [ -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5 ],
         },
       ],
@@ -260,7 +268,7 @@ subtest '( CENTER | RANGEW | NELEM )' => sub {
       [
         [ center => -0.24, rangew => 10, nelem => 11 ],
         {
-            spacing      => 1,
+            spacing  => 1,
             elements => [
                 -5.24, -4.24, -3.24, -2.24, -1.24, -0.24,
                 0.76,  1.76,  2.76,  3.76,  4.76
@@ -271,7 +279,7 @@ subtest '( CENTER | RANGEW | NELEM )' => sub {
       [
         [ center => 0, rangew => 11, nelem => 12 ],
         {
-            spacing      => 1,
+            spacing  => 1,
             elements => [
                 -5.5, -4.5, -3.5, -2.5, -1.5, -0.5,
                 0.5,  1.5,  2.5,  3.5,  4.5,  5.5
@@ -283,7 +291,7 @@ subtest '( CENTER | RANGEW | NELEM )' => sub {
       [
         [ center => -0.24, rangew => 11, nelem => 12 ],
         {
-            spacing      => 1,
+            spacing  => 1,
             elements => [
                 -5.74, -4.74, -3.74, -2.74, -1.74, -0.74,
                 0.26,  1.26,  2.26,  3.26,  4.26,  5.26
@@ -322,7 +330,7 @@ subtest '( CENTER | SOFT_MIN | SOFT_MAX | NELEM )' => sub {
         do {
             my $spacing = 12 / 11;
             {
-                spacing      => $spacing,
+                spacing  => $spacing,
                 elements => [ map { -6.0 + $_ * $spacing } 0 .. 11 ],
             },
               ;
@@ -333,7 +341,7 @@ subtest '( CENTER | SOFT_MIN | SOFT_MAX | NELEM )' => sub {
       [
         [ center => 0.55, soft_min => -4.4, soft_max => 5.5, nelem => 10 ],
         {
-            spacing      => 1.1,
+            spacing  => 1.1,
             elements => [ -4.4, -3.3, -2.2, -1.1, 0, 1.1, 2.2, 3.3, 4.4, 5.5 ],
         },
       ],
@@ -343,7 +351,7 @@ subtest '( CENTER | SOFT_MIN | SOFT_MAX | NELEM )' => sub {
         do {
             my $spacing = 0.99;
             {
-                spacing      => $spacing,
+                spacing  => $spacing,
                 elements => [ map { -4.4 + $_ * $spacing } 0 .. 10 ],
             },
               ;
@@ -453,7 +461,7 @@ subtest '( MIN | MAX | NELEM | ALIGN )' => sub {
       [
         [ min => 1, max => 10, nelem => 10, align => [ -0.55, 0 ] ],
         {
-            spacing      => 1.125,
+            spacing  => 1.125,
             elements => [ map { 0.575 + 1.125 * $_ } 0 .. 9 ],
 
         },
@@ -462,7 +470,7 @@ subtest '( MIN | MAX | NELEM | ALIGN )' => sub {
       [
         [ min => 1, max => 10, nelem => 10, align => [ 0.55, 0.2 ] ],
         {
-            spacing      => 1.125,
+            spacing  => 1.125,
             elements => [ map { 0.55 - 0.2 * 1.125 + 1.125 * $_ } 0 .. 9 ],
         },
       ],
@@ -470,7 +478,7 @@ subtest '( MIN | MAX | NELEM | ALIGN )' => sub {
       [
         [ min => 1, max => 10, nelem => 10, align => [ 22.55, 0.2 ] ],
         {
-            spacing      => 1.125,
+            spacing  => 1.125,
             elements => [ map { 0.95 + 1.125 * $_ } 0 .. 9 ],
         },
       ],

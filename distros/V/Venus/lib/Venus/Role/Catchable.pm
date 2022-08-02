@@ -5,9 +5,19 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo::Role;
+use Venus::Role 'with';
 
-with 'Venus::Role::Tryable';
+# AUDITS
+
+sub AUDIT {
+  my ($self, $from) = @_;
+
+  if (!$from->does('Venus::Role::Tryable')) {
+    die "${self} requires ${from} to consume Venus::Role::Tryable";
+  }
+
+  return $self;
+}
 
 # METHODS
 
@@ -17,6 +27,12 @@ sub catch {
   my @result = $self->try($method, @args)->error(\my $error)->result;
 
   return wantarray ? ($error ? ($error, undef) : ($error, @result)) : $error;
+}
+
+# EXPORTS
+
+sub EXPORT {
+  ['catch']
 }
 
 1;
@@ -43,6 +59,7 @@ Catchable Role for Perl 5
 
   use Venus 'error';
 
+  with 'Venus::Role::Tryable';
   with 'Venus::Role::Catchable';
 
   sub pass {
@@ -65,14 +82,6 @@ Catchable Role for Perl 5
 
 This package modifies the consuming package and provides methods for trapping
 errors thrown from dispatched method calls.
-
-=cut
-
-=head1 INTEGRATES
-
-This package integrates behaviors from:
-
-L<Venus::Role::Tryable>
 
 =cut
 

@@ -4,8 +4,9 @@ use Mo qw(default xxx);
 has yaml => ();
 has from => ();
 has code => ();
+has need => ();
 has loader => ();
-has ns   => ();
+has ns => ();
 
 use YAMLScript::NS;
 use YAMLScript::Expr;
@@ -77,16 +78,16 @@ sub compile {
         $loader->load_string($yaml);
 
     # Make a new NS (namespace) object:
+    my $need = $self->need;
+    unshift @$need, 'YS-Core';
     my $ns = YAMLScript::NS->new(
-        NEED => ['YS-Core'],
+        NEED => $need,
     );
 
     while (my ($key, $val) = each %$code) {
         if ($key eq 'use') {
             $val = [ $val ] unless ref($val) eq 'ARRAY';
-            unshift @$val, 'YS-Core' unless
-                grep {$_ eq 'YS-Core'} @$val;
-            $ns->NEED($val);
+            push @$need, @$val;
         }
         else {
             $key =~ $key_defn or
@@ -101,6 +102,7 @@ sub compile {
             );
             my $arity = @$sign;
             my $full = "${name}__$arity";
+            $full =~ s/-/_/g;
 
             $ns->{$full} = sub {
                 YAMLScript::Call->new(
@@ -112,7 +114,7 @@ sub compile {
         }
     }
 
-    $ns->init;
+    $ns->NS_init;
 
     # Return the NS object:
     return $ns;
@@ -146,7 +148,9 @@ sub configure {
             }
             if (@$data == 2) {
                 my ($key, $val) = @$data;
-                if (ref($key) eq 'YAMLScript::Str') {
+                if (ref($key) eq 'YAMLScript::Str' and
+                    $$key !~ $key_defn
+                ) {
                     $key = $$key;
                     $val = delete $hash->{$key};
                     # YAMLScript 'def' (assignment)
@@ -169,6 +173,7 @@ sub configure {
                     }
                     else {
                         $hash->{____} = $key;
+                        $val = [] if not defined $val;
                         $val = [ $val ] unless ref($val) eq 'ARRAY';
                         $hash->{args} = $val;
                     }
@@ -227,6 +232,9 @@ sub configure {
             all => sub {
                 my ($constructor, $event) = @_;
                 my $value = $event->{value};
+                if ($value eq '') {
+                    return undef; # XXX maybe YAMLScript::Nil?
+                }
                 if ($value =~ $re_num) {
                     $value += 0;
                     return $value;

@@ -29,5 +29,5 @@ resources:
   bugtracker: https://github.com/oetiker/mojolicious-plugin-spnego/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/oetiker/mojolicious-plugin-spnego
-version: v0.5.2
+version: v0.5.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

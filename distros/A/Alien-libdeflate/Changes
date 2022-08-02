@@ -1,5 +1,9 @@
 Revision history for perl distribution Alien-libdeflate
 
+0.03 2022-07-27T23:27:41+1200
+ - Retrieve the latest release and improve portability of build (#2 ZMUGHAL)
+ - Added CI workflow (#2 ZMUGHAL)
+
 0.02 2018-05-06T21:12:47+1200
  - Use gmake to build
  - Support system install using cbuilder probe and correctly test

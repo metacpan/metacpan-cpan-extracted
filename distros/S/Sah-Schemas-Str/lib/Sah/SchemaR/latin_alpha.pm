@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::latin_alpha;
 
-our $DATE = '2022-06-05'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2022-06-09'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 our $rschema = do{my$var={base=>"str",clsets_after_base=>[{examples=>[{valid=>1,value=>""},{valid=>1,value=>"Abz"},{valid=>0,value=>"foo123"}],match=>qr(\A[A-Za-z]*\z),summary=>"String containing only zero or more Latin letters, i.e. A-Z or a-z"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::latin_alpha - String containing only zero or more Latin letters, i
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::SchemaR::latin_alpha (from Perl distribution Sah-Schemas-Str), released on 2022-06-05.
+This document describes version 0.008 of Sah::SchemaR::latin_alpha (from Perl distribution Sah-Schemas-Str), released on 2022-06-09.
 
 =head1 DESCRIPTION
 

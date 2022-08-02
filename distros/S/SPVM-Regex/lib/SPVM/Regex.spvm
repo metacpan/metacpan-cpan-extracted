@@ -20,7 +20,7 @@ class Regex {
     
     my $self = new Regex;
     
-    my $re2_pattern = "($pattern)";
+    my $re2_pattern = $pattern;
     
     if ($flags) {
       $re2_pattern = "(?$flags)$re2_pattern";
@@ -30,6 +30,8 @@ class Regex {
     
     return $self;
   }
+  
+  native method DESTROY : void ();
   
   private native method compile : void ($pattern : string);
   
@@ -124,7 +126,7 @@ class Regex {
     
     my $match_count = 0;
     while (1) {
-      my $result_buffer_value = $result_buffer->value;
+      my $result_buffer_value = $result_buffer->to_string;
       
       my $match = $self->match_offset($result_buffer_value, \$offset);
       

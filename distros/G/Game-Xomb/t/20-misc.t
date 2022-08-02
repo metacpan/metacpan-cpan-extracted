@@ -37,7 +37,7 @@ is Game::Xomb::between(1, 6, 9),  6;
     #                 1   2  3  range
     push $weap->@*, 100, 50, 0;
 
-    $deeply->([ Game::Xomb::does_hit(1, $weap) ], [ 1, 99 ], 'hits');
+    $deeply->([ Game::Xomb::does_hit(1, $weap) ], [ !!1, 99 ], 'hits');
 
     my ($hits, $cost) = Game::Xomb::does_hit(3, $weap);
     ok !$hits, 'miss';

@@ -15,7 +15,6 @@ use Module::Load qw/ load /;
 use Package::Stash;
 use Ref::Util qw/ is_scalarref /;
 use Sub::Identify 0.06 qw/ is_sub_constant /;
-use Try::Tiny;
 use Types::Common::String qw/ NonEmptySimpleStr /;
 use Types::Standard qw/ ArrayRef Bool HashRef InstanceOf /;
 
@@ -26,7 +25,7 @@ use Types::Standard qw/ ArrayRef Bool HashRef InstanceOf /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.1.6';
+our $VERSION = 'v0.1.7';
 
 
 option use_var => (
@@ -208,7 +207,7 @@ JavaScript::Const::Exporter - Convert exported Perl constants to JavaScript
 
 =head1 VERSION
 
-version v0.1.6
+version v0.1.7
 
 =head1 SYNOPSIS
 
@@ -359,7 +358,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020-2021 by Robert Rothenberg.
+This software is Copyright (c) 2020-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

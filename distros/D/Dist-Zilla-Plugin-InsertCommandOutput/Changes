@@ -1,3 +1,9 @@
+0.056   2022-06-10  Released-By: PERLANCAR; Urgency: medium
+
+        - Add configuration 'indent' (like in DZP:InsertExample), deprecate
+          and undocument configuration 'make_verbatim'.
+
+
 0.055   2021-06-07  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Tweak regex to avoid overeager removal of newline.

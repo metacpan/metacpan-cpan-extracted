@@ -1,5 +1,9 @@
 Revision history for Perl extension App-ansicolumn
 
+1.19 2022-07-28T03:56:55Z
+
+    - Check the height is not zero.
+
 1.18 2022-07-16T04:26:26Z
 
     - Introduce --2up .. --9up option as an alias for -U2 .. -U9.

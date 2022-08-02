@@ -1,0 +1,15 @@
+Revision history for Perl extension URI::PackageURL.
+
+1.10 2022-08-01
+    - Fixed "namespace vs name" (RT#143917)
+    - Fixed substitution warning when "version" component is not provided
+      in URI::PackageURL->from_string
+
+1.02 2022-07-31
+    - Fixed decode when "namespace" component is "undef"
+
+1.01 2022-07-26
+    - Fixed documentation and test prerequisite (JSON::PP)
+
+1.00 2022-07-25
+    - First release of URI::PackageURL

@@ -1,0 +1,7 @@
+0.002		2022-08-02	T. R. Wyant
+    Add SUPPORT section to POD.
+
+    Add LICENSES. Add Changes, README to MANIFEST.
+
+0.001		2022-08-01	T. R. Wyant
+    Initial release to CPAN.

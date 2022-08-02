@@ -1,0 +1,78 @@
+DESCRIPTION
+
+    This script takes as input a delivery file from Kamstrup (encrypted,
+    compressed KEM file), unpacks it and splits the file into different
+    decoded XML files that can be further processed.
+
+    Minimal input to the script are the encryption key and the input file.
+    If no further configuration file is passed then all information in the
+    input file is written to the output file.
+
+    A configuration file consists of a CSV file with `;` as delimeter and
+    the following columns:
+
+    kamstrup_ordernr;kamstrup_serial_number_start;kamstrup_serial_number_end;number_of_devices;internal_batch_number
+
+    The output file name will be
+    [kamstrup_ordernr]_[internal_batch_number].
+
+    Following functions are available in this package:
+
+    unzip_kem
+
+      Extracts the KEM file from the archive file delivered by Kamstrup. Do
+      not forget to delete the file after processing.
+
+      Takes the archive file name as input. Returns the filename.
+
+    decode_kem
+
+      Decode an encrypted KEM file, requires the input filename and the
+      encryption key.
+
+      Returns the decrypted XML contents of the KEM file as string.
+
+    split_order
+
+      Extracts the contents of a specific order from the combined Kamstrup
+      KEM file.
+
+      Takes as input the parsed content of the KEM file (meter details),
+      the lowest meter number in the order, and the highest meter number in
+      the order.
+
+      Returns all meter information of the devices that match the filter
+      criteria.
+
+    read_config
+
+      Read a CSV configuration file containing the various sub orders.
+
+      CSV needs to be separated with ';' and needs to contain the headers
+      'kamstrup_ordernr', 'kamstrup_serial_number_start',
+      'kamstrup_serial_number_end', 'number_of_devices' and
+      'internal_batch_number'.
+
+    parse_cml_string_to_data
+
+      Convert the XML from the decoded file into a Perl datastructure that
+      can be processed programmatorically.
+
+    write_xml_output
+
+      Write the filtered XML to a file taking into account the required
+      formatting.
+
+      Takes as input the xml skeleton structure
+
+AUTHOR
+
+    Lieven Hollevoet <lieven@quicksand.be>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2022 by Lieven Hollevoet.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

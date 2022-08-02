@@ -4,7 +4,7 @@
       "Grant Street Group <developers@grantstreet.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -80,19 +80,19 @@
    "provides" : {
       "DBIx::OnlineDDL" : {
          "file" : "lib/DBIx/OnlineDDL.pm",
-         "version" : "v0.940.0"
+         "version" : "v1.0.0"
       },
       "DBIx::OnlineDDL::Helper::Base" : {
          "file" : "lib/DBIx/OnlineDDL/Helper/Base.pm",
-         "version" : "v0.940.0"
+         "version" : "v1.0.0"
       },
       "DBIx::OnlineDDL::Helper::MySQL" : {
          "file" : "lib/DBIx/OnlineDDL/Helper/MySQL.pm",
-         "version" : "v0.940.0"
+         "version" : "v1.0.0"
       },
       "DBIx::OnlineDDL::Helper::SQLite" : {
          "file" : "lib/DBIx/OnlineDDL/Helper/SQLite.pm",
-         "version" : "v0.940.0"
+         "version" : "v1.0.0"
       }
    },
    "release_status" : "stable",
@@ -106,9 +106,9 @@
          "web" : "https://github.com/GrantStreetGroup/DBIx-OnlineDDL"
       }
    },
-   "version" : "v0.940.0",
-   "x_generated_by_perl" : "v5.18.2",
-   "x_serialization_backend" : "JSON::XS version 4.02",
+   "version" : "v1.0.0",
+   "x_generated_by_perl" : "v5.20.1",
+   "x_serialization_backend" : "JSON::XS version 4.03",
    "x_spdx_expression" : "Artistic-2.0",
    "x_static_install" : 1
 }

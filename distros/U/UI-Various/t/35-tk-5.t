@@ -94,20 +94,35 @@ my $dialog2 = UI::Various::Dialog->new(height => 5);
 my $dialog3 = UI::Various::Dialog->new(height => 5, width => 10);
 
 $_ = @{$main->{children}};
-diag '1: "', $_, '"';
 is($_, 4, 'main has correct number of children');
 $_ = $win1->title;
-diag '2: "', $_, '"';
 is($_, 'hello', 'window constructor sets title');
 
-$dialog2->_prepare();
+$_ = $dialog2->top->child(0);
+diag 'D2: 1st: '.ref($_);
+diag 'D2: 1st: W == '.($_->isa('UI::Various::Window') ? 1 : 0);
+diag 'D2: 1st: Tk == '.(defined $_->_tk ? 1 : 0);
+
+$dialog2->_prepare(42);
+diag 'trace - a';
 
 $win1->destroy();
+diag 'trace - b';
 $dialog->destroy();
+diag 'trace - c';
 $dialog2->destroy();
+diag 'trace - d';
+
+$_ = $dialog3->top->child(0);
+diag 'D3: 1st: '.ref($_);
+diag 'D3: 1st: W == '.($_->isa('UI::Various::Window') ? 1 : 0);
+diag 'D3: 1st: Tk == '.(defined $_->_tk ? 1 : 0);
 
 $dialog3->_prepare();
+diag 'trace - e';
 $dialog3->destroy();
+diag('trace: $main: ', (defined $main ? 1 : 0));
+diag('trace: $main->{children}: ', (defined $main->{children} ? 1 : 0));
 
 $_ = @{$main->{children}};
 diag '3: "', $_, '"';

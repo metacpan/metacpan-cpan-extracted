@@ -58,7 +58,7 @@ ansicolumn [options] [file ...]
 
 =head1 VERSION
 
-Version 1.18
+Version 1.19
 
 =head1 DESCRIPTION
 
@@ -373,8 +373,6 @@ option. See `perldoc Getopt::EX` for detail.
 =head2 CPANMINUS
 
     $ cpanm App::ansicolumn
-    or
-    $ curl -sL http://cpanmin.us | perl - App::ansicolumn
 
 To get the latest code, use this:
 

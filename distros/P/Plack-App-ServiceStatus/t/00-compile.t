@@ -6,11 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Plack/App/ServiceStatus.pm',
+    'Plack/App/ServiceStatus/DBI.pm',
     'Plack/App/ServiceStatus/DBIC.pm',
+    'Plack/App/ServiceStatus/DBIxConnector.pm',
     'Plack/App/ServiceStatus/Elasticsearch.pm',
     'Plack/App/ServiceStatus/NetStomp.pm',
     'Plack/App/ServiceStatus/Redis.pm'

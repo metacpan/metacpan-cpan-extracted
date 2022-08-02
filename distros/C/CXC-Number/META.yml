@@ -17,7 +17,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.020, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,52 +34,55 @@ no_index:
 provides:
   CXC::Number:
     file: lib/CXC/Number.pm
-    version: '0.06'
+    version: '0.08'
   CXC::Number::Grid:
     file: lib/CXC/Number/Grid.pm
-    version: '0.06'
+    version: '0.08'
   CXC::Number::Grid::Failure:
     file: lib/CXC/Number/Grid/Failure.pm
-    version: '0.06'
+    version: '0.08'
+  CXC::Number::Grid::Range:
+    file: lib/CXC/Number/Grid.pm
+    version: '0.08'
   CXC::Number::Grid::Role::BigNum:
     file: lib/CXC/Number/Grid/Role/BigNum.pm
-    version: '0.06'
+    version: '0.08'
   CXC::Number::Grid::Role::PDL:
     file: lib/CXC/Number/Grid/Role/PDL.pm
-    version: '0.06'
+    version: '0.08'
   CXC::Number::Grid::Types:
     file: lib/CXC/Number/Grid/Types.pm
-    version: '0.06'
+    version: '0.08'
   CXC::Number::Sequence:
     file: lib/CXC/Number/Sequence.pm
-    version: '0.06'
+    version: '0.08'
   CXC::Number::Sequence::Failure:
     file: lib/CXC/Number/Sequence/Failure.pm
-    version: '0.06'
+    version: '0.08'
   CXC::Number::Sequence::Fixed:
     file: lib/CXC/Number/Sequence/Fixed.pm
-    version: '0.06'
+    version: '0.08'
   CXC::Number::Sequence::Linear:
     file: lib/CXC/Number/Sequence/Linear.pm
-    version: '0.06'
+    version: '0.08'
   CXC::Number::Sequence::Ratio:
     file: lib/CXC/Number/Sequence/Ratio.pm
-    version: '0.06'
+    version: '0.08'
   CXC::Number::Sequence::Role::BigNum:
     file: lib/CXC/Number/Sequence/Role/BigNum.pm
-    version: '0.06'
+    version: '0.08'
   CXC::Number::Sequence::Role::PDL:
     file: lib/CXC/Number/Sequence/Role/PDL.pm
-    version: '0.06'
+    version: '0.08'
   CXC::Number::Sequence::Types:
     file: lib/CXC/Number/Sequence/Types.pm
-    version: '0.06'
+    version: '0.08'
   CXC::Number::Sequence::Utils:
     file: lib/CXC/Number/Sequence/Utils.pm
-    version: '0.06'
+    version: '0.08'
   CXC::Number::Types:
     file: lib/CXC/Number/Types.pm
-    version: '0.06'
+    version: '0.08'
 requires:
   Exporter::Shiny: '0'
   Exporter::Tiny: '0'
@@ -94,7 +97,7 @@ requires:
   Tree::Range::RB: '0'
   Type::Library: '0'
   Type::Params: '0'
-  Type::Tiny: '1.006'
+  Type::Tiny: '1.016'
   Type::Utils: '0'
   Types::Common::Numeric: '0'
   Types::Standard: '0'
@@ -106,7 +109,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number
   repository: https://gitlab.com/djerius/cxc-number.git
-version: '0.06'
-x_generated_by_perl: v5.28.1
+version: '0.08'
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: GPL-3.0-only

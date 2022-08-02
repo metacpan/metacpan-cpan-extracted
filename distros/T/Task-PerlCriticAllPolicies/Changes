@@ -1,3 +1,10 @@
+0.06
+	- Released at 2022-07-24T08:44:34+0900
+	- add Perl::Critic::Mardem
+	- add Perl::Critic::Dancer2
+	- add Perl::Critic::Policy::PreferredModules
+	- add Perl::Critic::Policy::ValuesAndExpressions::ProhibitFiletest_rwxRWX
+
 0.05
 	- Released at 2022-03-26T16:43:24+0900
 

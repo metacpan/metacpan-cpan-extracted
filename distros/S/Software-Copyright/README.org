@@ -1,0 +1,23 @@
+* Software::Copyrigh Perl module
+
+** Description
+
+This class holds a copyright statement, i.e. a set of year range, name
+and email.
+
+On construction, a cleanup is done to make the statements more
+standard. Here are some cleanup example:
+
+#+begin_example
+ 2002-6 Joe => 2002-2006, Joe
+ 2001,2002,2003,2004 Joe => 2001-2004, Joe
+ # found in markdown documents
+ 2002 Joe mailto:joe@example.com => 2002, Joe <joe@example.com>
+#+end_example
+
+The constructor is also compatible with the string given by Debian's
+[[https://manpages.debian.org/licensecheck/licensecheck.1p.en.html][licensecheck]], i.e. the statements can be separated by "=/=".
+
+See [[file:lib/Software/Copyright.pm][Software::Copyright]] doc for more details.
+
+

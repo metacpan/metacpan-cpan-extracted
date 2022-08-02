@@ -1,7 +1,19 @@
 Revision history for Perl extension Hustle::Table
 
+0.5.4 	Thu 28 Jul 2022 21:40:32 AEST
+	- Performance improvements
+		- Dispatcher no longer returns an ref to an empty array
+		  with non regex matcher types.
+		- Removed superfluous scope creation in dispatcher
+		- Moved my variable out of dispatcher sub
+		
+	- Improved dispatch matching performance
+		- 1.70x approx for static exact matches
+		- 1.15x approx for regex matches
+
+
 0.5.2   Wed 22 Jun 2022 07:42:37 AEST
-	- Compatibility update for Template::Plex v0.4.1
+	- Compatibility update for Template::Plex v0.4.2
 
 0.5.1   Sat  2 Apr 2022 21:01:36 AEST
 	- Bump min perl version to 5.26 for @{^CAPTURE} variable

@@ -1,5 +1,5 @@
 package Template::Liquid::Context;
-our $VERSION = '1.0.19';
+our $VERSION = '1.0.20';
 require Template::Liquid::Utility;
 require Template::Liquid::Error;
 use strict;
@@ -118,10 +118,29 @@ sub get {
     return     if $var eq 'empty';
     return !1  if $var eq 'false';
     return !!1 if $var eq 'true';
-    return [$s->get($1) .. $s->get($2)]
-        if $var =~ m[^\((\S+)\s*\.\.\s*(\S+)\)$]o;    # range
-    return $s->get($1)->[$2] if $var =~ m'^(.+)\[(\d+)\]$'o;
-    return $s->get($1)->{$2} if $var =~ m'^(.+)\[(.+)\]$'o;
+
+    if ($var =~ m[^\((\S+)\s*\.\.\s*(\S+)\)$]o) {
+        return [$s->get($1) .. $s->get($2)];    # range
+    }
+
+#    print STDERR "DEBUG:var=$var. about to get 1 and 2 from regex";
+# return $s->get($1)->[$2] if $var =~ m'^(.+)\[(\d+)\]$'o; # array index  myvar[2]
+    if ($var =~ m'^(.+)\[(\d+)\]$'o) {
+
+        #	    print STDERR "DEBUG:array index. var=$var. 1=$1,2=$2";
+        my $arr = $s->get($1);
+        return $arr->[$2] if $arr;
+        return;    # return if nothing
+    }
+
+    # return $s->get($1)->{$2} if $var =~ m'^(.+)\[(.+)\]$'o;
+    if ($var =~ m'^(.+)\[(.+)\]$'o) {
+
+        #	    print STDERR "DEBUG:obj property. var=$var. 1=$1,2=$2";
+        my $obj = $s->get($1);
+        return $obj->{$2} if $obj;
+        return;    # return if nothing
+    }
 STEP: while (@path) {
         my $crumb   = shift @path;
         my $reftype = ref $$cursor;
@@ -239,7 +258,7 @@ CPAN ID: SANKO
 
 =head1 License and Legal
 
-Copyright (C) 2009-2012 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+Copyright (C) 2009-2022 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of L<The Artistic License

@@ -147,7 +147,7 @@ STDOUT: {
   open STDOUT, '>', $outname;
   STDOUT->autoflush(1);
   print STDOUT '';
-  sub stdout () { local $/; local *OUT; open OUT, '<', $outname or die; <OUT> }
+  sub stdout () { local $/; open my $OUT, '<', $outname or die; <$OUT> }
   END { close STDOUT; close $outfh }
 }
 
@@ -157,7 +157,7 @@ STDERR: {
   open STDERR, '>', $errname;
   STDERR->autoflush(1);
   print STDERR '';
-  sub stderr () { local $/; local *ERR; open ERR, '<', $errname or die; <ERR> }
+  sub stderr () { local $/; open my $ERR, '<', $errname or die; <$ERR> }
   END { close STDERR; close $errfh }
 }
 

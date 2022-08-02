@@ -430,12 +430,16 @@ subtest "mandatory string provided with a default value" => sub {
     is( $inst->needs_save, 0,       "verify instance needs_save status after storing default value" );
 
     $mwdv->store('boo');
-    is( $mwdv->fetch,      'boo', "overrode default" );
+    is( $mwdv->fetch,      'boo', "override default" );
     is( $inst->needs_save, 1,     "verify instance needs_save status after storing another value" );
 
     $mwdv->store(undef);
     is( $mwdv->fetch,      'booya', "restore default by writing undef value in mandatory string" );
     is( $inst->needs_save, 1,       "verify instance needs_save status after restoring default value" );
+
+    $mwdv->store('');
+    is( $mwdv->fetch, 'booya', "restore default by writing empty value in mandatory string" );
+    is( $inst->needs_save, 2, "verify instance needs_save status after restoring default value" );
 
     print join( "\n", $inst->list_changes("\n") ), "\n" if $trace;
     $inst->clear_changes;
@@ -464,6 +468,9 @@ subtest "boolean where values are translated" => sub {
         $bp->store($v);
         is( $bp->fetch, $expect, "boolean_plain: '$v'->'$expect'" );
     }
+
+    $bp->clear;
+    is( $bp->fetch, undef, "boolean_plain: get 'undef' after clear()" );
 };
 
 subtest "check changes with boolean where values are translated to true/false" => sub {
@@ -495,6 +502,12 @@ subtest "boolean_with_write_as_and_default" => sub {
     my $bwwaad = $root->fetch_element('boolean_with_write_as_and_default');
     is( $bwwaad->fetch, 'true', "boolean_with_write_as_and_default reads true" );
 
+    $bwwaad->store(0);
+    $bwwaad->clear;
+    is( $bwwaad->fetch, 'true', "boolean_with_write_as_and_default returns 'true'" );
+};
+
+subtest "enum with wrong declaration" => sub {
     throws_ok { $bad_root->fetch_element('crooked_enum'); }
         'Config::Model::Exception::Model',
         "test create expected failure with enum with wrong default";

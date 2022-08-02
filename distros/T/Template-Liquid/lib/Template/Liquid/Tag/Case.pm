@@ -1,5 +1,5 @@
 package Template::Liquid::Tag::Case;
-our $VERSION = '1.0.19';
+our $VERSION = '1.0.20';
 use strict;
 use warnings;
 use base 'Template::Liquid::Tag::If';
@@ -78,13 +78,14 @@ sub push_block {
             $args->{'attrs'} =~ m[(${Template::Liquid::Utility::Expression})
                         (?:\s+or\s+|\s*\,\s*)?]oxmg;
     }
-    my $block =
-        Template::Liquid::Block->new({tag_name => $args->{'tag_name'},
-                                      end_tag  => 'end' . $args->{'tag_name'},
-                                      attrs    => $args->{'attrs'},
-                                      template => $args->{'template'},
-                                      parent   => $s
-                                     }
+    my $block
+        = Template::Liquid::Block->new(
+                                      {tag_name => $args->{'tag_name'},
+                                       end_tag => 'end' . $args->{'tag_name'},
+                                       attrs   => $args->{'attrs'},
+                                       template => $args->{'template'},
+                                       parent   => $s
+                                      }
         );
 
     # finish previous block if it exists
@@ -104,6 +105,12 @@ sub push_block {
 =pod
 
 =encoding UTF-8
+
+=begin stopwords
+
+Lütke jadedPixel
+
+=end stopwords
 
 =head1 NAME
 
@@ -147,7 +154,7 @@ The original Liquid template system was developed by jadedPixel
 
 =head1 License and Legal
 
-Copyright (C) 2009-2012 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+Copyright (C) 2009-2022 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of The Artistic License 2.0.  See the F<LICENSE> file included with

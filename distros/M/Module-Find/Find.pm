@@ -1,13 +1,13 @@
 package Module::Find;
 
-use 5.006001;
+use 5.008001;
 use strict;
 use warnings;
 
 use File::Spec;
 use File::Find;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 our $basedir = undef;
 our @results = ();
@@ -345,11 +345,23 @@ Fixed RT#127657 (bug report contributed by Karen Etheridge): Module::Find now us
 directories that did not contain @INC, Module::Find would find the modules correctly, but load
 them from @INC.
 
+=item 0.16, 2022-08-01
+
+Fixes an issue where symlink tests failed on systems that do not support creation of symlinks.
+The issue appears on Windows systems due to changed behaviour in C<File::Find> described 
+in L<perl5/issue #19995|https://github.com/Perl/perl5/issues/19995>
+Symlink tests were previously skipped if C<symlink()> is not available, and now
+also if creation of a symlink is not possible.
+
+Fixes L<issue #9|https://github.com/crenz/Module-Find/issues/9>. Note that on Windows system,
+the patch to C<File::Find> from L<perl5/PR #20008|https://github.com/Perl/perl5/pull/20008> 
+will be required for proper operation. 
+
 =back
 
 =head1 DEVELOPMENT NOTES
 
-Please report any bugs using the CPAN RT system. The development repository for this module is hosted on GitHub: L<http://github.com/crenz/Module-Find/>.
+The development repository for this module is hosted on GitHub: L<http://github.com/crenz/Module-Find/>. Please report any bugs by opening an issue there.
 
 =head1 SEE ALSO
 
@@ -361,7 +373,7 @@ Christian Renz, E<lt>crenz@web42.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2004-2019 by Christian Renz <crenz@web42.com>. All rights reserved.
+Copyright 2004-2022 by Christian Renz <crenz@web42.com>. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

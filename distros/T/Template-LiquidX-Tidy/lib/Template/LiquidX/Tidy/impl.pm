@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(_tidy_list _tidy_make_string);
@@ -54,7 +54,7 @@ sub _tidy_html ($html, $args, $level, $clevel, $stack) {
 	}
 	else {
 	    my $tag = $+{tag} ? lc $+{tag} : '';
-	    if ($tag =~ /^(?| img | br | link | meta )$/ix) {
+	    if ($tag =~ /^(?| area | base | br | col | embed | hr | img | input | link | meta | source | track | wbr )$/ix) {
 		push $stack->{waiting}->@*, $tag;
 	    }
 	    elsif ($+{close2}) {

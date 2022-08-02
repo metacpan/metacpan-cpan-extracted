@@ -35,14 +35,20 @@ EOF
 
 subtest('example-1 does', sub {
   my $result = eval <<'EOF';
+  package Employee;
+
+  use base 'Mars::Kind::Role';
+
+  Employee->ROLE('Person');
+
   package main;
 
-  my $user = User->ROLE('Person')->new(
+  my $user = User->ROLE('Employee')->new(
     fname => 'Elliot',
     lname => 'Alderson',
   );
 
-  my $does = $user->does('Person');
+  my $does = Employee->does('Person');
 
   # 1
 EOF
@@ -58,7 +64,7 @@ subtest('example-1 meta', sub {
     lname => 'Alderson',
   );
 
-  my $meta = $user->meta;
+  my $meta = Person->meta;
 
   # bless({...}, 'Mars::Meta')
 EOF

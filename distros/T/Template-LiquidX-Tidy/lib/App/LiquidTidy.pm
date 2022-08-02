@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use Template::LiquidX::Tidy;
 use Template::Liquid;

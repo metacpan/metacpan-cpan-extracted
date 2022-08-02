@@ -4,7 +4,7 @@ use lib $FindBin::Bin.'/../3rd/lib/perl5';
 use lib $FindBin::Bin.'/../lib';
 
 use Test::More tests => 2;
-use PDF::Builder;
+use Test::Needs 'PDF::Builder';
 use_ok 'PDF::QRCode';
 
 my $pdf = PDF::Builder->new();
