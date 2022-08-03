@@ -55,6 +55,8 @@ $bar->method_with_parentheses(1,'2',qr{3});
 ####
 print SomeClass->method_without_parentheses + 1;
 ####
+print SomeClass->method_with_parentheses() + 1;
+####
 sub_call();
 ####
 $baz->chained_from->chained_to;

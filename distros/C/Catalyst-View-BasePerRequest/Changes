@@ -1,5 +1,13 @@
 # This file documents the revision history for Perl extension Catalyst-View-BasePerRequest.
 
+0.005 - 2022-08-03
+  - capture forwarded args in case they are needed
+  - ability to modify build args
+  - added 'set_http_$STATUS' helpers
+  - fixed but where the status codes didn't get added properly
+  - added prepend capture and added test cases for all captures
+  - fixed issue where headers passed to helpers didn't work correctly
+
 0.004 - 2022-07-25
   - flatten inner content separately from body content
 

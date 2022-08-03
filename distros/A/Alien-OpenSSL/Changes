@@ -1,5 +1,8 @@
 Changes for Alien-OpenSSL
 
+0.14      2022-08-02 17:03:49 -0600
+  - Add support for mac ports system install (gh#18)
+
 0.12      2021-05-03 14:50:11 -0600
   - Update metadata
 

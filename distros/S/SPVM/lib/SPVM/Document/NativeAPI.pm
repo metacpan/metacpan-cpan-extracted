@@ -190,9 +190,9 @@ Native APIs have its IDs. These IDs are permanently same for the binary compatib
   173 copy
   174 shorten
   175 has_interface
-  176 get_method_id_cache
-  177 get_field_id_cache
-  178 get_class_var_id_cache
+  176 reserved176
+  177 reserved177
+  178 reserved178
   179 print
   180 print_stderr
   181 init_env,
@@ -212,6 +212,8 @@ Native APIs have its IDs. These IDs are permanently same for the binary compatib
   195 get_class_id_by_name
   196 strerror
   197 new_string_array
+  198 get_args_stack_length
+  199 set_args_stack_length
 
 =head2 class_vars_heap
 
@@ -364,15 +366,13 @@ B<Examples:>
 
 =head2 get_field_id
 
-  int32_t (*get_field_id)(SPVM_ENV* env, const char* class_name, const char* field_name, const char* signature);
+  int32_t (*get_field_id)(SPVM_ENV* env, const char* class_name, const char* field_name);
 
-Get the ID of the field given the class name, field name, and signature. If the field does not exist, a value less than 0 is returned.
-
-The signature is the same as the field type name.
+Get the ID of the field given the class name, field name. If the field does not exist, a value less than 0 is returned.
 
 B<Examples:>
 
-  int32_t field_id = env->get_field_id(env, "Foo", "x", "int");
+  int32_t field_id = env->get_field_id(env, "Foo", "x");
 
 =head2 get_field_offset
 
@@ -382,47 +382,37 @@ Gets the offset of the field given the field ID. The field ID must be a valid fi
 
 =head2 get_class_var_id
 
-  int32_t (*get_class_var_id)(SPVM_ENV* env, const char* class_name, const char* class_var_name, const char* signature);
+  int32_t (*get_class_var_id)(SPVM_ENV* env, const char* class_name, const char* class_var_name);
 
-Get the class variable ID given the class name, class variable name and signature. If the class variable does not exist, a value less than 0 is returned.
-
-The signature is the same as the class variable type name.
+Get the class variable ID given the class name, class variable name. If the class variable does not exist, a value less than 0 is returned.
 
 B<Examples:>
 
-  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "int");
+  int32_t class_var_id = env->get_class_var_id(env, "Foo", "$VAR");
 
 =head2 get_class_method_id
 
-  int32_t (*get_class_method_id)(SPVM_ENV* env, const char* class_name, const char* method_name, const char* signature);
+  int32_t (*get_class_method_id)(SPVM_ENV* env, const char* class_name, const char* method_name);
 
-Get a class method ID by the class name, the method name, and the method signature. If the class method does not exists, a negative value is returned.
+Get a class method ID by the class name, the method name. If the class method does not exists, a negative value is returned.
 
 This ID is used by L<"call_class_method">.
 
-The method signature has the following format.
-
-  ReturnValueType(ArgumentType1,ArgumentType2,...)
-
 B<Examples:>
 
-  int32_t method_id = env->get_class_method_id(env, "Foo", "get", "int(long,string)");
+  int32_t method_id = env->get_class_method_id(env, "Foo", "get");
 
 =head2 get_instance_method_id
 
-  int32_t (*get_instance_method_id)(SPVM_ENV* env, void* object, const char* method_name, const char* signature);
+  int32_t (*get_instance_method_id)(SPVM_ENV* env, void* object, const char* method_name);
 
-Get a instance method ID by the object, the method name, and the method signatre. If the instance method does not exist, a negative value is returned.
+Get a instance method ID by the object, the method name. If the instance method does not exist, a negative value is returned.
 
 This ID is used by L<"call_instance_method">.
 
-The method signature has the following format,
-
-  ReturnValueType(ArgumentType1,ArgumentType2,...)
-
 B<Examples:>
 
-  int32_t method_id = env->get_instance_method_id(env, object, "get", "int(long,string)");
+  int32_t method_id = env->get_instance_method_id(env, object, "get");
 
 =head2 new_object_raw
 
@@ -769,7 +759,7 @@ If an object and field ID are specified, the byte field value will be returned a
 
 B<Examples:>
 
-  int32_t field_id = env->get_field_id(env, "Foo", "x", "byte");
+  int32_t field_id = env->get_field_id(env, "Foo", "x");
   int8_t field_value = env->get_field_byte(env, stack, object, field_id);
 
 =head2 get_field_short
@@ -780,7 +770,7 @@ If you specify the object and field ID, the value of the short type field will b
 
 B<Examples:>
 
-  int32_t field_id = env->get_field_id(env, "Foo", "x", "short");
+  int32_t field_id = env->get_field_id(env, "Foo", "x");
   int16_t field_value = env->get_field_short(env, stack, object, field_id);
 
 =head2 get_field_int
@@ -791,7 +781,7 @@ If an object and a field ID are specified, the value of the int type field will 
 
 B<Examples:>
 
-  int32_t field_id = env->get_field_id(env, "Foo", "x", "int");
+  int32_t field_id = env->get_field_id(env, "Foo", "x");
   int32_t field_value = env->get_field_int(env, stack, object, field_id);
 
 =head2 get_field_long
@@ -802,7 +792,7 @@ If you specify the object and field ID, the value of the long type field will be
 
 B<Examples:>
 
-  int32_t field_id = env->get_field_id(env, "Foo", "x", "long");
+  int32_t field_id = env->get_field_id(env, "Foo", "x");
   int64_t field_value = env->get_field_long(env, stack, object, field_id);
 
 =head2 get_field_float
@@ -813,7 +803,7 @@ If you specify the object and field ID, the value of the float type field will b
 
 B<Examples:>
 
-  int32_t field_id = env->get_field_id(env, "Foo", "x", "float");
+  int32_t field_id = env->get_field_id(env, "Foo", "x");
   float field_value = env->get_field_float(env, stack, object, field_id);
 
 =head2 get_field_double
@@ -824,7 +814,7 @@ If you specify the object and field ID, the value of the double type field will 
 
 B<Examples:>
 
-  int32_t field_id = env->get_field_id(env, "Foo", "x", "double");
+  int32_t field_id = env->get_field_id(env, "Foo", "x");
   double field_value = env->get_field_double(env, stack, object, field_id);
 
 =head2 get_field_object
@@ -833,7 +823,7 @@ B<Examples:>
 
 If you specify the object and field ID, the value of the object type field is returned as a void* type value in C language. The field ID must be a valid field ID obtained with the field_id function. If the field is a weak reference, it will be removed.
 
-  int32_t field_id = env->get_field_id(env, "Foo", "x", "Int");
+  int32_t field_id = env->get_field_id(env, "Foo", "x");
   void* field_value = env->get_field_object(env, stack, object, field_id);
 
 =head2 set_field_byte
@@ -844,7 +834,7 @@ If you specify the object and field ID and the value of the field, the value is 
 
 B<Examples:>
 
-  int32_t field_id = env->get_field_id(env, "Foo", "x", "byte");
+  int32_t field_id = env->get_field_id(env, "Foo", "x");
   int8_t field_value = 5;
   env->set_field_byte(env, stack, object, field_id, field_value);
 
@@ -856,7 +846,7 @@ If you specify the object and field ID and the value of the field, the value is 
 
 B<Examples:>
 
-  int32_t field_id = env->get_field_id(env, "Foo", "x", "short");
+  int32_t field_id = env->get_field_id(env, "Foo", "x");
   int16_t field_value = 5;
   env->set_field_short(env, stack, object, field_id, field_value);
 
@@ -868,7 +858,7 @@ If you specify the object and field ID and the value of the field, the value is 
 
 B<Examples:>
 
-  int32_t field_id = env->get_field_id(env, "Foo", "x", "int");
+  int32_t field_id = env->get_field_id(env, "Foo", "x");
   int32_t field_value = 5;
   env->set_field_int(env, stack, object, field_id, field_value);
 
@@ -880,7 +870,7 @@ If you specify the object and field ID and the value of the field, the value is 
 
 B<Examples:>
 
-  int32_t field_id = env->get_field_id(env, "Foo", "x", "long");
+  int32_t field_id = env->get_field_id(env, "Foo", "x");
   int64_t field_value = 5;
   env->set_field_long(env, stack, object, field_id, field_value);
 
@@ -892,7 +882,7 @@ If you specify the object and field ID and the value of the field, the value is 
 
 B<Examples:>
 
-  int32_t field_id = env->get_field_id(env, "Foo", "x", "float");
+  int32_t field_id = env->get_field_id(env, "Foo", "x");
   float field_value = 1.5f;
   env->set_field_float(env, stack, object, field_id, field_value);
 
@@ -904,7 +894,7 @@ If you specify the object and field ID and the value of the field, the value is 
 
 B<Examples:>
 
-  int32_t field_id = env->get_field_id(env, "Foo", "x", "double");
+  int32_t field_id = env->get_field_id(env, "Foo", "x");
   double field_value = 1.55;
   env->set_field_double(env, stack, object, field_id, field_value);
 
@@ -916,172 +906,172 @@ Object and field Specify the ID and the value of the field and set the value to 
 
 B<Examples:>
 
-  int32_t field_id = env->get_field_id(env, "Foo", "x", "Int");
+  int32_t field_id = env->get_field_id(env, "Foo", "x");
   int32_t basic_type_id = env->get_basic_type_id(env, "Int");
   void* object = env->new_object(env, stack, basic_type_id);
   env->set_field_object(env, stack, object, field_id, object);
 
 =head2 get_class_var_byte
 
-  int8_t (*get_class_var_byte)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t pkgvar_id);
+  int8_t (*get_class_var_byte)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_id);
 
 If an object and a class variable ID are specified, the value of the byte type class variable is returned as a C language int8_t type value. The class variable ID must be a valid class variable ID obtained with the field_id function.
 
 B<Examples:>
 
-  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "byte");
-  int8_t pkgvar_value = env->get_class_var_byte(env, stack, object, pkgvar_id);
+  int32_t class_var_id = env->get_class_var_id(env, "Foo", "$VAR");
+  int8_t class_var_value = env->get_class_var_byte(env, stack, object, class_var_id);
 
 =head2 get_class_var_short
 
-  int16_t (*get_class_var_short)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t pkgvar_id);
+  int16_t (*get_class_var_short)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_id);
 
 If an object and a class variable ID are specified, the value of the short type class variable will be returned as a C language int16_t type value. The class variable ID must be a valid class variable ID obtained with the field_id function.
 
 B<Examples:>
 
-  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "short");
-  int16_t pkgvar_value = env->get_class_var_short(env, stack, object, pkgvar_id);
+  int32_t class_var_id = env->get_class_var_id(env, "Foo", "$VAR");
+  int16_t class_var_value = env->get_class_var_short(env, stack, object, class_var_id);
 
 =head2 get_class_var_int
 
-  int32_t (*get_class_var_int)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t pkgvar_id);
+  int32_t (*get_class_var_int)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_id);
 
 If an object and a class variable ID are specified, the value of the int type class variable will be returned as a C language int32_t type value. The class variable ID must be a valid class variable ID obtained with the field_id function.
 
 B<Examples:>
 
-  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "int");
-  int32_t pkgvar_value = env->get_class_var_int(env, stack, object, pkgvar_id);
+  int32_t class_var_id = env->get_class_var_id(env, "Foo", "$VAR");
+  int32_t class_var_value = env->get_class_var_int(env, stack, object, class_var_id);
 
 =head2 get_class_var_long
 
-  int64_t (*get_class_var_long)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t pkgvar_id);
+  int64_t (*get_class_var_long)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_id);
 
 If an object and a class variable ID are specified, the value of the long type class variable will be returned as a C language int64_t type value. The class variable ID must be a valid class variable ID obtained with the field_id function.
 
 B<Examples:>
 
-  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "long");
-  int64_t pkgvar_value = env->get_class_var_long(env, stack, object, pkgvar_id);
+  int32_t class_var_id = env->get_class_var_id(env, "Foo", "$VAR");
+  int64_t class_var_value = env->get_class_var_long(env, stack, object, class_var_id);
 
 =head2 get_class_var_float
 
-  float (*get_class_var_float)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t pkgvar_id);
+  float (*get_class_var_float)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_id);
 
 If an object and a class variable ID are specified, the value of the float type class variable will be returned as a C language float type value. The class variable ID must be a valid class variable ID obtained with the field_id function.
 
 B<Examples:>
 
-  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "float");
-  float pkgvar_value = env->get_class_var_float(env, stack, object, pkgvar_id);
+  int32_t class_var_id = env->get_class_var_id(env, "Foo", "$VAR");
+  float class_var_value = env->get_class_var_float(env, stack, object, class_var_id);
 
 =head2 get_class_var_double
 
-  double (*get_class_var_double)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t pkgvar_id);
+  double (*get_class_var_double)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_id);
 
 If you specify an object and a class variable ID, the value of the double type class variable is returned as a C type double type value. The class variable ID must be a valid class variable ID obtained with the field_id function.
 
 B<Examples:>
 
-  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "double");
-  double pkgvar_value = env->get_class_var_double(env, stack, object, pkgvar_id);
+  int32_t class_var_id = env->get_class_var_id(env, "Foo", "$VAR");
+  double class_var_value = env->get_class_var_double(env, stack, object, class_var_id);
 
 =head2 get_class_var_object
 
-  void* (*get_class_var_object)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t pkgvar_id);
+  void* (*get_class_var_object)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_id);
 
 When an object and a class variable ID are specified, the value of the object type class variable is returned as a C language void* type value. The class variable ID must be a valid class variable ID obtained with the field_id function.
 
 B<Examples:>
 
-  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "Int");
-  void* pkgvar_value = env->get_class_var_byte(env, stack, object, pkgvar_id);
+  int32_t class_var_id = env->get_class_var_id(env, "Foo", "$VAR");
+  void* class_var_value = env->get_class_var_byte(env, stack, object, class_var_id);
 
 =head2 set_class_var_byte
 
-  void (*set_class_var_byte)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t pkgvar_id, int8_t value);
+  void (*set_class_var_byte)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_id, int8_t value);
 
 If you specify the object and field ID and the value of the field, the value is set to the byte type field. The field ID must be a valid field ID obtained with the field_id function.
 
 B<Examples:>
 
-  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "byte");
-  int8_t pkgvar_value = 5;
-  env->set_class_var_byte(env, stack, pkgvar_id, pkgvar_value);
+  int32_t class_var_id = env->get_class_var_id(env, "Foo", "$VAR");
+  int8_t class_var_value = 5;
+  env->set_class_var_byte(env, stack, class_var_id, class_var_value);
 
 =head2 set_class_var_short
 
-  void (*set_class_var_short)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t pkgvar_id, int16_t value);
+  void (*set_class_var_short)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_id, int16_t value);
 
 If you specify the object and field ID and the value of the field, the value is set to the short type field. The field ID must be a valid field ID obtained with the field_id function.
 
 B<Examples:>
 
-  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "short");
-  int16_t pkgvar_value = 5;
-  env->set_class_var_short(env, stack, pkgvar_id, pkgvar_value);
+  int32_t class_var_id = env->get_class_var_id(env, "Foo", "$VAR");
+  int16_t class_var_value = 5;
+  env->set_class_var_short(env, stack, class_var_id, class_var_value);
 
 =head2 set_class_var_int
 
-  void (*set_class_var_int)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t pkgvar_id, int32_t value);
+  void (*set_class_var_int)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_id, int32_t value);
 
 If you specify the object and field ID and the value of the field, the value is set to the int type field. The field ID must be a valid field ID obtained with the field_id function.
 
 B<Examples:>
 
-  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "int");
-  int32_t pkgvar_value = 5;
-  env->set_class_var_int(env, stack, pkgvar_id, pkgvar_value);
+  int32_t class_var_id = env->get_class_var_id(env, "Foo", "$VAR");
+  int32_t class_var_value = 5;
+  env->set_class_var_int(env, stack, class_var_id, class_var_value);
 
 =head2 set_class_var_long
 
-  void (*set_class_var_long)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t pkgvar_id, int64_t value);
+  void (*set_class_var_long)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_id, int64_t value);
 
 If you specify the object and field ID and the value of the field, the value is set to the long type field. The field ID must be a valid field ID obtained with the field_id function.
 
 B<Examples:>
 
-  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "long");
-  int64_t pkgvar_value = 5;
-  env->set_class_var_long(env, stack, pkgvar_id, pkgvar_value);
+  int32_t class_var_id = env->get_class_var_id(env, "Foo", "$VAR");
+  int64_t class_var_value = 5;
+  env->set_class_var_long(env, stack, class_var_id, class_var_value);
 
 =head2 set_class_var_float
 
-  void (*set_class_var_float)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t pkgvar_id, float value);
+  void (*set_class_var_float)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_id, float value);
 
 If you specify the object and field ID and the value of the field, the value is set to the float type field. The field ID must be a valid field ID obtained with the field_id function.
 
 B<Examples:>
 
-  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "float");
-  float pkgvar_value = 5;
-  env->set_class_var_float(env, stack, pkgvar_id, pkgvar_value);
+  int32_t class_var_id = env->get_class_var_id(env, "Foo", "$VAR");
+  float class_var_value = 5;
+  env->set_class_var_float(env, stack, class_var_id, class_var_value);
 
 =head2 set_class_var_double
 
-  void (*set_class_var_double)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t pkgvar_id, double value);
+  void (*set_class_var_double)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_id, double value);
 
 If you specify the object and field ID and the value of the field, the value is set to the double type field. The field ID must be a valid field ID obtained with the field_id function.
 
 B<Examples:>
 
-  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "double");
-  double pkgvar_value = 5;
-  env->set_class_var_double(env, stack, pkgvar_id, pkgvar_value);
+  int32_t class_var_id = env->get_class_var_id(env, "Foo", "$VAR");
+  double class_var_value = 5;
+  env->set_class_var_double(env, stack, class_var_id, class_var_value);
 
 =head2 set_class_var_object
 
-  void (*set_class_var_object)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t pkgvar_id, void* value);
+  void (*set_class_var_object)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_var_id, void* value);
 
 Object and field Specify the ID and the value of the field and set the value to the object type field. The field ID must be a valid field ID obtained with the field_id function. After setting, the reference count is incremented by 1. The original value has the reference count decremented by 1.
 
 B<Examples:>
 
-  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "Int");
+  int32_t class_var_id = env->get_class_var_id(env, "Foo", "$VAR");
   int32_t basic_type_id = env->get_basic_type_id(env, "Int");
   void* object = env->new_object(env, stack, basic_type_id);
-  env->set_class_var_object(env, stack, pkgvar_id, pkgvar_value);
+  env->set_class_var_object(env, stack, class_var_id, class_var_value);
 
 =head2 get_pointer
 
@@ -1101,9 +1091,9 @@ If you specify a pointer type object and a C language pointer, the C language po
 
 =head2 call_spvm_method
 
-  int32_t (*call_spvm_method)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t method_id);
+  int32_t (*call_spvm_method)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t method_id, int32_t args_stack_length);
 
-Call a method by specifying the method ID and argument. If an exception occurs in the method, The return value is 1. If not, return 0.
+Call a method by specifying the method ID and the stack length of the argument. If an exception occurs in the method, The return value is 1. If not, return 0.
 
 The return value of the method is set to args[0].
 
@@ -1321,7 +1311,7 @@ B<Examples:>
 
   void* (*new_object_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, int32_t* error, const char* file, int32_t line);
 
-This is same as C<new_object> function, but you can specify class name directry.
+This is same as C<new_object> function, but you can specify class name directly.
 
 If function is succeeded, C<error> is set to 0. If a exception occurs, C<error> is set to 1. 
 
@@ -1335,7 +1325,7 @@ B<Examples:>
 
   void* (*new_pointer_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, void* pointer, int32_t* error, const char* file, int32_t line);
 
-This is same as C<new_pointer> function, but you can specify class name directry.
+This is same as C<new_pointer> function, but you can specify class name directly.
 
 If function is succeeded, C<error> is set to 0. If a exception occurs, C<error> is set to 1. 
 
@@ -1349,7 +1339,7 @@ If function is succeeded, C<error> is set to 0. If a exception occurs, C<error> 
     const char* class_name, const char* field_name, int8_t value,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<set_field_byte> function, but you can specify class name and field name directry.
+This is same as C<set_field_byte> function, but you can specify class name and field name directly.
 
 If function is succeeded, C<error> is set to 0. If a exception occurs, C<error> is set to 1. 
 
@@ -1365,7 +1355,7 @@ B<Examples:>
     const char* class_name, const char* field_name, int16_t value,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<set_field_short> function, but you can specify class name and field name directry.
+This is same as C<set_field_short> function, but you can specify class name and field name directly.
 
 If function is succeeded, C<error> is set to 0. If a exception occurs, C<error> is set to 1. 
 
@@ -1381,7 +1371,7 @@ B<Examples:>
     const char* class_name, const char* field_name, int32_t value,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<set_field_int> function, but you can specify class name and field name directry.
+This is same as C<set_field_int> function, but you can specify class name and field name directly.
 
 If function is succeeded, C<error> is set to 0. If a exception occurs, C<error> is set to 1. 
 
@@ -1397,7 +1387,7 @@ B<Examples:>
     const char* class_name, const char* field_name, int64_t value,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<set_field_long> function, but you can specify class name and field name directry.
+This is same as C<set_field_long> function, but you can specify class name and field name directly.
 
 If function is succeeded, C<error> is set to 0. If a exception occurs, C<error> is set to 1. 
 
@@ -1413,7 +1403,7 @@ B<Examples:>
     const char* class_name, const char* field_name, float value,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<set_field_float> function, but you can specify class name and field name directry.
+This is same as C<set_field_float> function, but you can specify class name and field name directly.
 
 If function is succeeded, C<error> is set to 0. If a exception occurs, C<error> is set to 1. 
 
@@ -1429,7 +1419,7 @@ B<Examples:>
     const char* class_name, const char* field_name, double value,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<set_field_double> function, but you can specify class name and field name directry.
+This is same as C<set_field_double> function, but you can specify class name and field name directly.
 
 If function is succeeded, C<error> is set to 0. If a exception occurs, C<error> is set to 1. 
 
@@ -1442,10 +1432,10 @@ B<Examples:>
 =head2 set_field_object_by_name
 
   void (*set_field_object_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object,
-    const char* class_name, const char* field_name, const char* signature, void* value,
+    const char* class_name, const char* field_name, void* value,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<set_field_object> function, but you can specify class name and field name directry.
+This is same as C<set_field_object> function, but you can specify class name and field name directly.
 
 If function is succeeded, C<error> is set to 0. If a exception occurs, C<error> is set to 1. 
 
@@ -1461,7 +1451,7 @@ B<Examples:>
     const char* class_name, const char* field_name,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<get_field_byte> function, but you can specify class name and field name directry.
+This is same as C<get_field_byte> function, but you can specify class name and field name directly.
 
 If function is succeeded, C<error> is get to 0. If a exception occurs, C<error> is get to 1. 
 
@@ -1477,7 +1467,7 @@ B<Examples:>
     const char* class_name, const char* field_name,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<get_field_short> function, but you can specify class name and field name directry.
+This is same as C<get_field_short> function, but you can specify class name and field name directly.
 
 If function is succeeded, C<error> is get to 0. If a exception occurs, C<error> is get to 1. 
 
@@ -1493,7 +1483,7 @@ B<Examples:>
     const char* class_name, const char* field_name,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<get_field_int> function, but you can specify class name and field name directry.
+This is same as C<get_field_int> function, but you can specify class name and field name directly.
 
 If function is succeeded, C<error> is get to 0. If a exception occurs, C<error> is get to 1. 
 
@@ -1509,7 +1499,7 @@ B<Examples:>
     const char* class_name, const char* field_name,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<get_field_long> function, but you can specify class name and field name directry.
+This is same as C<get_field_long> function, but you can specify class name and field name directly.
 
 If function is succeeded, C<error> is get to 0. If a exception occurs, C<error> is get to 1. 
 
@@ -1525,7 +1515,7 @@ B<Examples:>
     const char* class_name, const char* field_name,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<get_field_float> function, but you can specify class name and field name directry.
+This is same as C<get_field_float> function, but you can specify class name and field name directly.
 
 If function is succeeded, C<error> is get to 0. If a exception occurs, C<error> is get to 1. 
 
@@ -1541,7 +1531,7 @@ B<Examples:>
     const char* class_name, const char* field_name,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<get_field_double> function, but you can specify class name and field name directry.
+This is same as C<get_field_double> function, but you can specify class name and field name directly.
 
 If function is succeeded, C<error> is get to 0. If a exception occurs, C<error> is get to 1. 
 
@@ -1554,10 +1544,10 @@ B<Examples:>
 =head2 get_field_object_by_name
 
   void* (*get_field_object_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object,
-    const char* class_name, const char* field_name, const char* signature,
+    const char* class_name, const char* field_name,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<get_field_object> function, but you can specify class name and field name directry.
+This is same as C<get_field_object> function, but you can specify class name and field name directly.
 
 If function is succeeded, C<error> is get to 0. If a exception occurs, C<error> is get to 1. 
 
@@ -1573,7 +1563,7 @@ B<Examples:>
     const char* class_name, const char* class_var_name, int8_t value,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<set_class_var_byte> function, but you can specify the class name directry.
+This is same as C<set_class_var_byte> function, but you can specify the class name directly.
 
 If function is succeeded, C<error> is get to 0. If a exception occurs, C<error> is get to 1. 
 
@@ -1589,7 +1579,7 @@ B<Examples:>
     const char* class_name, const char* class_var_name, int16_t value,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<set_class_var_short> function, but you can specify the class name directry.
+This is same as C<set_class_var_short> function, but you can specify the class name directly.
 
 If function is succeeded, C<error> is get to 0. If a exception occurs, C<error> is get to 1. 
 
@@ -1605,7 +1595,7 @@ B<Examples:>
     const char* class_name, const char* class_var_name, int32_t value,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<set_class_var_int> function, but you can specify the class name directry.
+This is same as C<set_class_var_int> function, but you can specify the class name directly.
 
 If function is succeeded, C<error> is get to 0. If a exception occurs, C<error> is get to 1. 
 
@@ -1621,7 +1611,7 @@ B<Examples:>
     const char* class_name, const char* class_var_name, int64_t value,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<set_class_var_long> function, but you can specify the class name directry.
+This is same as C<set_class_var_long> function, but you can specify the class name directly.
 
 If function is succeeded, C<error> is get to 0. If a exception occurs, C<error> is get to 1. 
 
@@ -1637,7 +1627,7 @@ B<Examples:>
     const char* class_name, const char* class_var_name, float value,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<set_class_var_float> function, but you can specify the class name directry.
+This is same as C<set_class_var_float> function, but you can specify the class name directly.
 
 If function is succeeded, C<error> is get to 0. If a exception occurs, C<error> is get to 1. 
 
@@ -1653,7 +1643,7 @@ B<Examples:>
     const char* class_name, const char* class_var_name, double value,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<set_class_var_double> function, but you can specify the class name directry.
+This is same as C<set_class_var_double> function, but you can specify the class name directly.
 
 If function is succeeded, C<error> is get to 0. If a exception occurs, C<error> is get to 1. 
 
@@ -1666,10 +1656,10 @@ B<Examples:>
 =head2 set_class_var_object_by_name
 
   void (*set_class_var_object_by_name)(SPVM_ENV* env, SPVM_VALUE* stack,
-    const char* class_name, const char* class_var_name, const char* signature, void* value,
+    const char* class_name, const char* class_var_name, void* value,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<set_class_var_object> function, but you can specify the class name directry.
+This is same as C<set_class_var_object> function, but you can specify the class name directly.
 
 If function is succeeded, C<error> is get to 0. If a exception occurs, C<error> is get to 1. 
 
@@ -1685,7 +1675,7 @@ B<Examples:>
     const char* class_name, const char* class_var_name,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<get_class_var_byte> function, but you can specify the class name directry.
+This is same as C<get_class_var_byte> function, but you can specify the class name directly.
 
 If function is succeeded, C<error> is get to 0. If a exception occurs, C<error> is get to 1. 
 
@@ -1701,7 +1691,7 @@ B<Examples:>
     const char* class_name, const char* class_var_name,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<get_class_var_short> function, but you can specify the class name directry.
+This is same as C<get_class_var_short> function, but you can specify the class name directly.
 
 If function is succeeded, C<error> is get to 0. If a exception occurs, C<error> is get to 1. 
 
@@ -1717,7 +1707,7 @@ B<Examples:>
     const char* class_name, const char* class_var_name,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<get_class_var_int> function, but you can specify the class name directry.
+This is same as C<get_class_var_int> function, but you can specify the class name directly.
 
 If function is succeeded, C<error> is get to 0. If a exception occurs, C<error> is get to 1. 
 
@@ -1733,7 +1723,7 @@ B<Examples:>
     const char* class_name, const char* class_var_name,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<get_class_var_long> function, but you can specify the class name directry.
+This is same as C<get_class_var_long> function, but you can specify the class name directly.
 
 If function is succeeded, C<error> is get to 0. If a exception occurs, C<error> is get to 1. 
 
@@ -1749,7 +1739,7 @@ B<Examples:>
     const char* class_name, const char* class_var_name,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<get_class_var_float> function, but you can specify the class name directry.
+This is same as C<get_class_var_float> function, but you can specify the class name directly.
 
 If function is succeeded, C<error> is get to 0. If a exception occurs, C<error> is get to 1. 
 
@@ -1765,7 +1755,7 @@ B<Examples:>
     const char* class_name, const char* class_var_name,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<get_class_var_double> function, but you can specify the class name directry.
+This is same as C<get_class_var_double> function, but you can specify the class name directly.
 
 If function is succeeded, C<error> is get to 0. If a exception occurs, C<error> is get to 1. 
 
@@ -1778,33 +1768,34 @@ B<Examples:>
 =head2 get_class_var_object_by_name
 
   void* (*get_class_var_object_by_name)(SPVM_ENV* env, SPVM_VALUE* stack,
-    const char* class_name, const char* class_var_name, const char* signature,
+    const char* class_name, const char* class_var_name,
     int32_t* error, const char* file, int32_t line);
 
-This is same as C<get_class_var_object> function, but you can specify the class name directry.
+This is same as C<get_class_var_object> function, but you can specify the class name directly.
 
 If function is succeeded, C<error> is get to 0. If a exception occurs, C<error> is get to 1. 
 
 B<Examples:>
   
   int32_t e;
-  void* value = env->get_class_var_object_by_name(env, stack, "TestCase::NativeAPI", "$MINIMAL_VALUE", "TestCase::Minimal", &e, __FILE__, __LINE__);
+  void* value = env->get_class_var_object_by_name(env, stack, "TestCase::NativeAPI", "$MINIMAL_VALUE", &e, __FILE__, __LINE__);
   if (e) { return e; }
 
 =head2 call_class_method_by_name
 
   int32_t (*call_class_method_by_name)(SPVM_ENV* env, SPVM_VALUE* stack,
-    const char* class_name, const char* method_name, const char* signature,
+    const char* class_name, const char* method_name, int32_t args_stack_length,
     const char* file, int32_t line);
 
-This is same as C<call_spvm_method> function, but you can specify the class name and sub name directry.
+This is same as C<call_spvm_method> function, but you can specify the class name and method name directly.
 
 B<Examples:>
 
   int32_t output;
   {
+    int32_t args_stack_length = 1;
     stack[0].ival = 5;
-    int32_t error = env->call_class_method_by_name(env, stack, "TestCase::NativeAPI", "my_value", "int(int)", __FILE__, __LINE__);
+    int32_t error = env->call_class_method_by_name(env, stack, "TestCase::NativeAPI", "my_value", args_stack_length, __FILE__, __LINE__);
     if (error) {
       return error;
     }
@@ -1813,11 +1804,9 @@ B<Examples:>
 
 =head2 call_instance_method_by_name
 
-  int32_t (*call_instance_method_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object,
-    const char* method_name, const char* signature,
+  int32_t (*call_instance_method_by_name)(SPVM_ENV* env, SPVM_VALUE* stack,
+    void* object, const char* method_name, int32_t args_stack_length,
     const char* file, int32_t line);
-
-B<Examples:>
 
 =head2 get_field_string_chars_by_name
 
@@ -1855,19 +1844,15 @@ Alias for L<"call_spvm_method">
 
 =head2 get_instance_method_id_static
 
-  int32_t (*get_instance_method_id_static)(SPVM_ENV* env, const char* class_name, const char* method_name, const char* signature);
+  int32_t (*get_instance_method_id_static)(SPVM_ENV* env, const char* class_name, const char* method_name);
 
-Get a instance method ID by the class name, the method name, and the method signature. If the instance method does not exists, a negative value is returned.
+Get a instance method ID by the class name, the method name. If the instance method does not exists, a negative value is returned.
 
 This ID is used by L<"call_instance_method">.
 
-The method signature has the following format.
-
-  ReturnValueType(ArgumentType1,ArgumentType2,...)
-
 B<Examples:>
 
-  int32_t method_id = env->get_instance_method_id_static(env, "Foo", "get", "int(long,string)");
+  int32_t method_id = env->get_instance_method_id_static(env, "Foo", "get");
 
 =head2 get_bool_object_value
 
@@ -1975,23 +1960,17 @@ The charaters of the after the given length are filled with C<\0>.
 
 Check the type of the object has the interface.
 
-=head2 get_method_id_cache
+=head2 reserved176
 
-  int32_t (*get_method_id_cache)(SPVM_ENV* env, const char* method_cache_name, int32_t method_cache_name_length);
+  void* reserved176
 
-Get the method ID from the method cache name. The method ID is cacahed.
+=head2 reserved177
 
-=head2 get_field_id_cache
+  void* reserved177
 
-  int32_t (*get_field_id_cache)(SPVM_ENV* env, const char* field_cache_name, int32_t field_cache_name_length);
+=head2 reserved178
 
-Get the method ID from the field cache name. The field ID is cacahed.
-
-=head2 get_class_var_id_cache
-
-  int32_t (*get_class_var_id_cache)(SPVM_ENV* env, const char* class_var_cache_name, int32_t class_var_cache_name_length);
-
-Get the class variable ID from the class variable cache name. The class variable ID is cacahed.
+  void* reserved178
 
 =head2 print
 
@@ -2035,7 +2014,7 @@ Call C<INIT> blocks.
 
 =head2 get_instance_method_id_super
 
-  int32_t (*get_instance_method_id_super)(SPVM_ENV* env, void* object, const char* method_name, const char* signature);
+  int32_t (*get_instance_method_id_super)(SPVM_ENV* env, void* object, const char* method_name);
 
 =head2 new_memory_env
 
@@ -2119,6 +2098,14 @@ Get class id by the class name.
 
 If the class is not found, C<error> is set to C<1>. Otherwise set to C<0>.
 
+=head2 strerror
+
+  const char* (*strerror)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value, int32_t length);
+
+Get the value of C<strerror> of C<C language> on thread-safely.
+
+If the length is C<0>, the length is set to C<64>.
+
 =head2 new_string_array
 
   void* (*new_string_array)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
@@ -2127,13 +2114,17 @@ Create a new string array. This is alias for the following code using L</"new_ob
 
   void* obj_string_array = env->new_object_array(env, stack, SPVM_NATIVE_C_BASIC_TYPE_ID_STRING, length);
 
-=head2 strerror
+=head2 get_args_stack_length
 
-  const char* (*strerror)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value, int32_t length);
+  int32_t (*get_args_stack_length)(SPVM_ENV* env, SPVM_VALUE* stack);
 
-Get the value of C<strerror> of C<C language> on thread-safely.
+Get the stack length of the arguments specified by the caller.
 
-If the length is C<0>, the length is set to C<64>.
+=head2 set_args_stack_length
+
+  void (*set_args_stack_length)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t args_length);
+
+Set the stack length of the arguments for a method call.
 
 =head1 Compiler Native API
 

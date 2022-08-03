@@ -2,6 +2,10 @@ use alienfile;
 use Config;
 use Env qw( @PKG_CONFIG_PATH @PKG_CONFIG_LIBDIR );
 
+configure {
+  requires 'Path::Tiny';
+};
+
 if(defined $ENV{OPENSSL_PREFIX} && -d "$ENV{OPENSSL_PREFIX}/lib/pkgconfig") {
   unshift @PKG_CONFIG_PATH, "$ENV{OPENSSL_PREFIX}/lib/pkgconfig";
 }
@@ -21,16 +25,28 @@ if($^O eq 'darwin' && ! -d '/usr/include/openssl') {
     )
   }
 
-  if( -d '/usr/local/Cellar/openssl') {
+  if( -d '/usr/local/Cellar/openssl' ) {
     require File::Glob;
     my($dir) = File::Glob::bsd_glob('/usr/local/Cellar/openssl/*/lib/pkgconfig');
     push @PKG_CONFIG_LIBDIR, $dir;
   }
 
-  if( -d '/usr/local/Cellar/libressl') {
+  if( -d '/usr/local/Cellar/libressl' ) {
     require File::Glob;
     my($dir) = File::Glob::bsd_glob('/usr/local/Cellar/libressl/*/lib/pkgconfig');
     push @PKG_CONFIG_LIBDIR, $dir;
+  }
+
+  if( -l '/opt/local/bin/openssl' ) {
+    require Path::Tiny;
+    my $dir = Path::Tiny->new(readlink '/opt/local/bin/openssl');
+    $dir = $dir->relative('/opt/local/bin') if $dir->is_relative;
+    $dir = $dir
+      ->parent
+      ->parent
+      ->child('lib')
+      ->child('pkgconfig');
+    push @PKG_CONFIG_LIBDIR, "$dir";
   }
 
   log "overridding PKG_CONFIG_LIBDIR on macOS: $ENV{PKG_CONFIG_LIBDIR}";

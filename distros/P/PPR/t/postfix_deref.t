@@ -3,20 +3,77 @@ use strict;
 
 use Test::More;
 
-plan tests => 1;
+plan tests => 38;
 
 use PPR;
 
-my $src = q{
-    {
-        my @example = map { $_ => $_ } $aref->@*;
-        print join '-' => @example;
-    }
+my @valid_derefs = grep /\S/, split "\n", q{
+
+        $sref->$*
+
+        $aref->$#*
+        $aref->@*
+        $aref->@[1,2,3]
+        $aref->%[1..3]
+
+        $href->%*
+        $href->%{'a','b'}
+        $href->@{'a','b'}
+
+        $cref->()
+        $cref->&*
+
+        $rref->$*->$*
+        $rref->$*->@*
+
+        $gref->**
+        $gref->**->{IO}
+        $gref->**->**->{IO}
+        $gref->*{IO}
+
+        $obj->method
+        $obj->method()
+        $obj->$method
+        $obj->$method()
+
+        # Composite look-ups, including elided arrows between brackets...
+        $ref->{a}[1]('arg')[2]{z}
+        $ref->method->[1]('arg')('arg2')->$method()->[2]{z}->**->$*->&*->$#*
+
+        # These are all--believe it or not--legal (at least syntactically)...
+        $aref->@*->%[1..3]
+        $aref->@*->%{'k1', 'k2'}
+        $aref->@*->method()
+        $aref->@*->$*
+        $aref->@*->**
+
+        $href->%*->@[1..3]
+        $href->%*->@{'k1', 'k2'}
+        $href->%*->method()
+        $href->%*->$*
+        $href->%*->**
 };
 
-$src = q{{ $aref->@*; $href->%*; $sref->$*; $rref->$*->$*; $rref->$*->@*; }};
+my @invalid_derefs = grep /\S/, split "\n", q{
 
-ok $src =~ m{ (?&PerlBlock)  $PPR::GRAMMAR}xms;
+        $aref->@*->[1]
+        $aref->@*->@[1..3]
+        $aref->@*->@{'k1', 'k2'}
+
+        $href->%*->{k}
+        $href->%*->%[1..3]
+        $href->%*->%{'k1', 'k2'}
+};
+
+for my $deref (@valid_derefs) {
+    next if $deref =~ m{\A \s* \#}xms;
+    ok $deref =~ qr{ \A \s* (?&PerlPrefixPostfixTerm) \s* \Z $PPR::GRAMMAR}xms  => "Valid: $deref";
+}
+
+for my $deref (@invalid_derefs) {
+    next if $deref =~ m{\A \s* \#}xms;
+    ok $deref !~ qr{ \A \s* (?&PerlPrefixPostfixTerm) \s* \Z $PPR::GRAMMAR}xms  => "Invalid: $deref";
+}
 
 
 done_testing();

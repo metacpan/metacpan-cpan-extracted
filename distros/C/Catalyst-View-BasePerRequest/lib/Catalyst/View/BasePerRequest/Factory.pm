@@ -14,9 +14,10 @@ sub ACCEPT_CONTEXT {
 sub build {
   my ($factory, $c, @args) = @_;
   my $class = $factory->{class};
+  @args = $class->prepare_build_args($c, @args) if $class->can('prepare_build_args');
   my %build_args = $factory->prepare_build_args($c, @args);
   my $view = eval {
-    $class->new(%build_args);
+    $class->build(%build_args);
   } || do {
     $factory->do_handle_build_view_exception($class, $@);
   };

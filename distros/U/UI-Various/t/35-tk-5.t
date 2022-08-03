@@ -99,33 +99,22 @@ $_ = $win1->title;
 is($_, 'hello', 'window constructor sets title');
 
 $_ = $dialog2->top->child(0);
-diag 'D2: 1st: '.ref($_);
-diag 'D2: 1st: W == '.($_->isa('UI::Various::Window') ? 1 : 0);
-diag 'D2: 1st: Tk == '.(defined $_->_tk ? 1 : 0);
 
-$dialog2->_prepare(42);
-diag 'trace - a';
+# The following call core-dumps on some of the CPAN test servers in the Tk
+# call MainWindow - so far I was not able to reproduce this to track it
+# down:
+$dialog2->_prepare();
 
 $win1->destroy();
-diag 'trace - b';
 $dialog->destroy();
-diag 'trace - c';
 $dialog2->destroy();
-diag 'trace - d';
 
 $_ = $dialog3->top->child(0);
-diag 'D3: 1st: '.ref($_);
-diag 'D3: 1st: W == '.($_->isa('UI::Various::Window') ? 1 : 0);
-diag 'D3: 1st: Tk == '.(defined $_->_tk ? 1 : 0);
 
 $dialog3->_prepare();
-diag 'trace - e';
 $dialog3->destroy();
-diag('trace: $main: ', (defined $main ? 1 : 0));
-diag('trace: $main->{children}: ', (defined $main->{children} ? 1 : 0));
 
 $_ = @{$main->{children}};
-diag '3: "', $_, '"';
 is($_, 0, 'main is clean again');
 
 $main->mainloop();		# an additional empty call just for the coverage

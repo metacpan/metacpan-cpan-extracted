@@ -1,5 +1,9 @@
 Revision history for Perl extension App-optex-pingu
 
+0.03 2022-08-03T02:03:42Z
+
+    - Require File::Share@0.27
+
 0.02 2022-06-22T00:57:24Z
 
     - introduce --pingu-interval option

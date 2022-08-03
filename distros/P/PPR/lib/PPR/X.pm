@@ -15,7 +15,7 @@ BEGIN {
     }
 }
 use warnings;
-our $VERSION = '0.000027';
+our $VERSION = '0.001001';
 use utf8;
 use List::Util qw<min max>;
 
@@ -157,20 +157,43 @@ our $GRAMMAR = qr{
             # Perl pre 5.028
             (?:
                 (?>
-                    (?&PerlParenthesesList)    # Parameter list
+                    (?&PerlSignature)    # Parameter list
                 |
-                    \( [^)]*+ \)               # Prototype (
+                    \( [^)]*+ \)         # Prototype (
                 )
                 (?&PerlOWS)
             )?+
             (?: (?>(?&PerlAttributes))  (?&PerlOWS) )?+
         |
             # Perl post 5.028
-            (?: (?>(?&PerlAttributes))       (?&PerlOWS) )?+
-            (?: (?>(?&PerlParenthesesList))  (?&PerlOWS) )?+    # Parameter list
+            (?: (?>(?&PerlAttributes))  (?&PerlOWS) )?+
+            (?: (?>(?&PerlSignature))   (?&PerlOWS) )?+    # Parameter list
         )
         (?> ; | (?&PerlBlock) )
     )) # End of rule
+
+        (?<PerlSignature>   (?<PerlStdSignature>
+            \(
+                (?>(?&PerlOWS))
+                (?&PerlParameterDeclaration)*+
+            \)
+    )) # End of rule
+
+        (?<PerlParameterDeclaration>   (?<PerlStdParameterDeclaration>
+            (?:
+                    \$  (?>(?&PerlOWS))
+                (?: =   (?>(?&PerlOWS))  (?&PerlConditionalExpression)?+ (?>(?&PerlOWS)) )?+
+            |
+                (?&PerlVariableScalar) (?>(?&PerlOWS))
+                (?: =   (?>(?&PerlOWS))  (?&PerlConditionalExpression)   (?>(?&PerlOWS)) )?+
+            |
+                (?&PerlVariableArray) (?>(?&PerlOWS))
+            |
+                (?&PerlVariableHash)  (?>(?&PerlOWS))
+            )
+            (?: , (?>(?&PerlOWS))  |  (?= \) ) )     # (
+    )) # End of rule
+
 
         (?<PerlUseStatement>   (?<PerlStdUseStatement>
         (?: use | no ) (?>(?&PerlNWS))
@@ -249,9 +272,6 @@ our $GRAMMAR = qr{
         (?<PerlPrefixPostfixTerm>   (?<PerlStdPrefixPostfixTerm>
             (?: (?>(?&PerlPrefixUnaryOperator))  (?&PerlOWS) )*+
             (?>(?&PerlTerm))
-            (?:
-                (?&PerlTermPostfixDereference)
-            )?+
             (?: (?>(?&PerlOWS)) (?&PerlPostfixUnaryOperator) )?+
     )) # End of rule
 
@@ -273,80 +293,103 @@ our $GRAMMAR = qr{
         (?<PerlTerm>   (?<PerlStdTerm>
             (?>
                 (?&PerlReturnExpression)
-            |
-                (?&PerlVariableDeclaration)
-            |
-                (?&PerlAnonymousSubroutine)
-            |
-                (?&PerlVariable)
-            |
-                (?>(?&PerlNullaryBuiltinFunction))  (?! (?>(?&PerlOWS)) \( )
-            |
-                (?&PerlDoBlock) | (?&PerlEvalBlock)
-            |
-                (?&PerlCall)
-            |
-                (?&PerlTypeglob)
-            |
-                (?>(?&PerlParenthesesList))
-                (?: (?>(?&PerlOWS)) (?&PerlArrayIndexer) )?+
-                (?:
-                    (?>(?&PerlOWS))
-                    (?>
-                        (?&PerlArrayIndexer)
-                    |   (?&PerlHashIndexer)
-                    )
-                )*+
-            |
-                (?&PerlAnonymousArray)
-            |
-                (?&PerlAnonymousHash)
-            |
-                (?&PerlDiamondOperator)
-            |
-                (?&PerlContextualMatch)
-            |
-                (?&PerlQuotelikeS)
-            |
-                (?&PerlQuotelikeTR)
-            |
-                (?&PerlQuotelikeQX)
-            |
-                (?&PerlLiteral)
+
+            # The remaining alternatives can all take postfix dereferencers...
+            | (?:
+                    (?= \$ )  (?&PerlScalarAccess)
+              |
+                    (?= \@ )  (?&PerlArrayAccess)
+              |
+                    (?=  % )  (?&PerlHashAccess)
+              |
+                    (?&PerlAnonymousSubroutine)
+              |
+                    (?>(?&PerlNullaryBuiltinFunction))  (?! (?>(?&PerlOWS)) \( )
+              |
+                    (?&PerlDoBlock) | (?&PerlEvalBlock)
+              |
+                    (?&PerlCall)
+              |
+                    (?&PerlVariableDeclaration)
+              |
+                    (?&PerlTypeglob)
+              |
+                    (?>(?&PerlParenthesesList))
+
+                    # Can optionally do a [...] lookup straight after the parens,
+                    # followd by any number of other look-ups
+                    (?:
+                        (?>(?&PerlOWS)) (?&PerlArrayIndexer)
+                        (?:
+                            (?>(?&PerlOWS))
+                            (?>
+                                (?&PerlArrayIndexer)
+                            |   (?&PerlHashIndexer)
+                            |   (?&PerlParenthesesList)
+                            )
+                        )*+
+                    )?+
+              |
+                    (?&PerlAnonymousArray)
+              |
+                    (?&PerlAnonymousHash)
+              |
+                    (?&PerlDiamondOperator)
+              |
+                    (?&PerlContextualMatch)
+              |
+                    (?&PerlQuotelikeS)
+              |
+                    (?&PerlQuotelikeTR)
+              |
+                    (?&PerlQuotelikeQX)
+              |
+                    (?&PerlLiteral)
+              )
+
+              (?: (?&PerlTermPostfixDereference) )?+
             )
     )) # End of rule
 
         (?<PerlTermPostfixDereference>   (?<PerlStdTermPostfixDereference>
-        (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
-        (?>
-            (?> (?&PerlQualifiedIdentifier) | (?&PerlVariableScalar) )
-            (?: (?>(?&PerlOWS)) (?&PerlParenthesesList) )?+
+            # Must have at least one arrowed dereference...
+            (?:
+                (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
+                (?>
+                    # A series of simple brackets can omit interstitial arrows...
+                    (?>  (?&PerlParenthesesList) | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+                    (?:
+                        (?>(?&PerlOWS))
+                        (?> (?&PerlParenthesesList) | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+                    )*+
 
-        |   (?&PerlParenthesesList)
-        |   (?&PerlArrayIndexer)
-        |   (?&PerlHashIndexer)
-        |   \$\*
-        )
+                |   # A method call...
+                    (?> (?&PerlQualifiedIdentifier) | (?! \$\#\* ) (?&PerlVariableScalar) )
+                    (?: (?>(?&PerlOWS)) (?&PerlParenthesesList) )?+
 
-        (?:
-            (?>(?&PerlOWS))
-            (?>
-                ->  (?>(?&PerlOWS))
-                (?> (?&PerlQualifiedIdentifier) | (?&PerlVariableScalar) )
-                (?: (?>(?&PerlOWS)) (?&PerlParenthesesList) )?+
-            |
-                (?: -> (?&PerlOWS) )?+
-                (?> (?&PerlParenthesesList)
-                |   (?&PerlArrayIndexer)
-                |   (?&PerlHashIndexer)
-                |   \$\*
+                |   # An array or hash slice or k/v slice
+                    # (provided it's not subsequently dereferenced)
+                    [\@%] (?> (?>(?&PerlArrayIndexer)) | (?>(?&PerlHashIndexer)) )
+                    (?! (?>(?&PerlOWS)) -> (?>(?&PerlOWS))  [\@%]?+  [\[\{] )
+
+                |   # An array max-index lookup...
+                    \$\#\*
+
+                |   # A scalar-, glob-, or subroutine dereference...
+                    [\$*&] \*
+
+                |   # An array dereference (provided it's not subsequently dereferenced)...
+                    \@\*
+                    (?! (?>(?&PerlOWS)) -> (?>(?&PerlOWS)) [\[\@] )
+
+                |   # A hash dereference (provided it's not subsequently dereferenced)...
+                    \%\*
+                    (?! (?>(?&PerlOWS)) -> (?>(?&PerlOWS)) [\{%] )
+
+                |   # A glob lookup...
+                    \* (?&PerlHashIndexer)
                 )
-            )
-        )*+
-        (?:
-            (?>(?&PerlOWS)) -> (?>(?&PerlOWS)) [\@%]
-            (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
-        )?+
+            )++
     )) # End of rule
 
         (?<PerlControlBlock>   (?<PerlStdControlBlock>
@@ -385,6 +428,17 @@ our $GRAMMAR = qr{
                             |   (?&PerlVariableHash)
                             )
                         |
+                            # List of scalar iterator variables...
+                            my                                   (?>(?&PerlOWS))
+                            \(                                   (?>(?&PerlOWS))
+                                    (?>(?&PerlVariableScalar))   (?>(?&PerlOWS))
+                                (?: ,                            (?>(?&PerlOWS))
+                                    (?>(?&PerlVariableScalar))   (?>(?&PerlOWS))
+                                )*+
+                                (?: ,                            (?>(?&PerlOWS)) )?+
+                            \)
+
+                        |
                             # Implicitly aliased iterator variable...
                             (?> (?: my | our | state ) (?>(?&PerlOWS)) )?+
                             (?&PerlVariableScalar)
@@ -411,12 +465,19 @@ our $GRAMMAR = qr{
                 (?> BEGIN | END | CHECK | INIT | UNITCHECK ) \b   (?>(?&PerlOWS))
                 (?&PerlBlock)
 
+            | # Try/catch/finallys...
+                (?>(?&PerlTryCatchFinallyBlock))
+
+            | # Defers...
+                defer                                     (?>(?&PerlOWS))
+                (?&PerlBlock)
+
             | # Switches...
-                (?> given | when ) \b                             (?>(?&PerlOWS))
-                (?>(?&PerlParenthesesList))                            (?>(?&PerlOWS))
+                (?> given | when ) \b                     (?>(?&PerlOWS))
+                (?>(?&PerlParenthesesList))               (?>(?&PerlOWS))
                 (?&PerlBlock)
             |
-                default                                           (?>(?&PerlOWS))
+                default                                   (?>(?&PerlOWS))
                 (?&PerlBlock)
             )
     )) # End of rule
@@ -548,6 +609,22 @@ our $GRAMMAR = qr{
             eval (?>(?&PerlOWS)) (?&PerlBlock)
     )) # End of rule
 
+        (?<PerlTryCatchFinallyBlock>   (?<PerlStdTryCatchFinallyBlock>
+
+                try \b                                (?>(?&PerlOWS))
+                (?>(?&PerlBlock))
+                                                      (?>(?&PerlOWS))
+                catch \b                              (?>(?&PerlOWS))
+                \(  (?>(?&PerlVariableScalar))  \)    (?>(?&PerlOWS))
+                (?>(?&PerlBlock))
+
+            (?:
+                                                      (?>(?&PerlOWS))
+                finally \b                            (?>(?&PerlOWS))
+                (?>(?&PerlBlock))
+            )?+
+    )) # End of rule
+
         (?<PerlAttributes>   (?<PerlStdAttributes>
             :
             (?>(?&PerlOWS))
@@ -637,6 +714,7 @@ our $GRAMMAR = qr{
             |    [<>*&|/]{1,2}+  (?! [=]  )
             |    \^              (?! [=]  )
             |    ~~
+            |    isa
             )
     )) # End of rule
 
@@ -660,17 +738,17 @@ our $GRAMMAR = qr{
                 # Perl pre 5.028
                 (?:
                     (?>
-                        (?&PerlParenthesesList)    # Parameter list
+                        (?&PerlSignature)    # Parameter list
                     |
-                        \( [^)]*+ \)               # Prototype (
+                        \( [^)]*+ \)         # Prototype (
                     )
                     (?&PerlOWS)
                 )?+
                 (?: (?>(?&PerlAttributes))  (?&PerlOWS) )?+
             |
                 # Perl post 5.028
-                (?: (?>(?&PerlAttributes))       (?&PerlOWS) )?+
-                (?: (?>(?&PerlParenthesesList))  (?&PerlOWS) )?+    # Parameter list
+                (?: (?>(?&PerlAttributes))  (?&PerlOWS) )?+
+                (?: (?>(?&PerlSignature))   (?&PerlOWS) )?+    # Parameter list
             )
             (?&PerlBlock)
     )) # End of rule
@@ -682,6 +760,7 @@ our $GRAMMAR = qr{
             |   (?&PerlHashAccess)
             |   (?&PerlArrayAccess)
             )
+            (?> (?&PerlTermPostfixDereference) )?+
     )) # End of rule
 
         (?<PerlTypeglob>   (?<PerlStdTypeglob>
@@ -701,117 +780,140 @@ our $GRAMMAR = qr{
             |
                 (?&PerlBlock)
             )
+
+            # Optional arrowless access(es) to begin (but can't start with a parens)...
             (?:
-                (?>(?&PerlOWS)) (?: -> (?&PerlOWS) )?+
-                (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
-            )*+
-            (?:
-                (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
-                [\@%]
-                (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+                (?! (?>(?&PerlOWS)) \( )
+                (?:
+                    (?>(?&PerlOWS))
+                    (?: (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
+                )++
             )?+
+
+            # Note: subsequent arrowed postdereferences that would follow here
+            #       are handled at the <PerlTerm> level
+
     )) # End of rule
 
         (?<PerlArrayAccess>   (?<PerlStdArrayAccess>
             (?>(?&PerlVariableArray))
+
+            # Optional arrowless access(es) to begin (but can't start with a parens)...
             (?:
-                (?>(?&PerlOWS)) (?: -> (?&PerlOWS) )?+
-                (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList)  )
-            )*+
-            (?:
-                (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
-                [\@%]
-                (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+                (?! (?>(?&PerlOWS)) \( )
+                (?:
+                    (?>(?&PerlOWS))
+                    (?: (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
+                )++
             )?+
+
+            # Note: subsequent arrowed postdereferences that would follow here
+            #       are handled at the <PerlTerm> level
+
     )) # End of rule
 
         (?<PerlArrayAccessNoSpace>   (?<PerlStdArrayAccessNoSpace>
             (?>(?&PerlVariableArrayNoSpace))
+
+            # Optional arrowless access(es) to begin
+            (?: (?&PerlArrayIndexer) | (?&PerlHashIndexer) )*+
+
+            # Then arrowed accesses (this is an inlined subset of (?&PerlTermPostfixDereference))...
             (?:
-                (?: -> )?+
-                (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList)  )
-            )*+
-            (?:
-                ->
-                [\@%]
-                (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+                # Must have at least one arrowed dereference...
+                (?:
+                    ->
+                    (?>
+                        # A series of simple brackets can omit interstitial arrows...
+                        (?:  (?&PerlArrayIndexer)
+                        |    (?&PerlHashIndexer)
+                        )++
+
+                    |   # An array or hash slice or k/v slice
+                        [\@%] (?> (?>(?&PerlArrayIndexer)) | (?>(?&PerlHashIndexer)) )
+
+                    |   # An array or scalar deref
+                        [\@\$] \*
+                    )
+                )++
             )?+
+            # End of inlining
     )) # End of rule
 
         (?<PerlArrayAccessNoSpaceNoArrow>   (?<PerlStdArrayAccessNoSpaceNoArrow>
             (?>(?&PerlVariableArray))
             (?:
-                (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList)  )
+                (?: (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
             )*+
     )) # End of rule
 
         (?<PerlHashAccess>   (?<PerlStdHashAccess>
             (?>(?&PerlVariableHash))
+
+            # Optional arrowless access(es) to begin (but can't start with a parens)...
             (?:
-                (?>(?&PerlOWS)) (?: -> (?&PerlOWS) )?+
-                (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
-            )*+
-            (?:
-                (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
-                [\@%]
-                (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+                (?! (?>(?&PerlOWS)) \( )
+                (?:
+                    (?>(?&PerlOWS))
+                    (?: (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
+                )++
             )?+
     )) # End of rule
 
         (?<PerlScalarAccess>   (?<PerlStdScalarAccess>
             (?>(?&PerlVariableScalar))
+
+            # Optional arrowless access(es) to begin (but can't start with a parens)...
             (?:
-                (?>(?&PerlOWS))
+                (?! (?>(?&PerlOWS)) \( )
                 (?:
-                    (?:
-                        (?>(?&PerlOWS))      -> (?>(?&PerlOWS))
-                        (?&PerlParenthesesList)
-                    |
-                        (?>(?&PerlOWS))  (?: ->    (?&PerlOWS)  )?+
-                        (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
-                    )
-                    (?:
-                        (?>(?&PerlOWS))  (?: ->    (?&PerlOWS)  )?+
-                        (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
-                    )*+
-                )?+
-                (?:
-                    (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
-                    [\@%]
-                    (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
-                )?+
+                    (?>(?&PerlOWS))
+                    (?: (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
+                )++
             )?+
+
+            # Note: subsequent arrowed postdereferences that would follow here
+            #       are handled at the <PerlTerm> level
+
     )) # End of rule
 
         (?<PerlScalarAccessNoSpace>   (?<PerlStdScalarAccessNoSpace>
             (?>(?&PerlVariableScalarNoSpace))
+
+            # Optional arrowless access(es) to begin...
+            (?: (?&PerlArrayIndexer) | (?&PerlHashIndexer) )*+
+
+            # Then arrowed accesses (this is an inlined subset of (?&PerlTermPostfixDereference))...
             (?:
                 (?:
-                    (?:
-                        ->
-                        (?&PerlParenthesesList)
-                    |
-                        (?: -> )?+
-                        (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
-                    )
-                    (?:
-                        (?: -> )?+
-                        (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
-                    )*+
-                )?+
-                (?:
                     ->
-                    [\@%]
-                    (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
-                )?+
+                    (?>
+                        # A series of simple brackets can omit interstitial arrows...
+                        (?:  (?&PerlArrayIndexer)
+                        |    (?&PerlHashIndexer)
+                        )++
+
+                    |   # An array or hash slice or k/v slice
+                        [\@%] (?> (?>(?&PerlArrayIndexer)) | (?>(?&PerlHashIndexer)) )
+
+                    |   # An array or scalar deref
+                        [\@\$] \*
+                    )
+                )++
             )?+
+            # End of inlining
     )) # End of rule
 
         (?<PerlScalarAccessNoSpaceNoArrow>   (?<PerlStdScalarAccessNoSpaceNoArrow>
             (?>(?&PerlVariableScalarNoSpace))
+
+            # Optional arrowless access(es) (but parens can't be first)...
             (?:
-                (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
-            )*+
+                (?! \( )
+                (?:
+                    (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
+                )++
+            )?+
     )) # End of rule
 
         (?<PerlVariableScalar>   (?<PerlStdVariableScalar>
@@ -962,13 +1064,13 @@ our $GRAMMAR = qr{
             |
                 '  [^'\\]*+  (?: \\. [^'\\]*+ )*+ '
             |
+                (?: q \b | qq (?= (?>(?&PerlOWS)) ' ) )
+                (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
+                (?&PPR_X_quotelike_body)
+            |
                 qq \b
                 (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
                 (?&PPR_X_quotelike_body_interpolated)
-            |
-                q \b
-                (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
-                (?&PPR_X_quotelike_body)
             |
                 (?&PerlHeredoc)
             |
@@ -1043,11 +1145,11 @@ our $GRAMMAR = qr{
                                 (?:
                                     (?>
                                         (?{ local $PPR::X::_heredoc_EOL_start = $^R })
-                                        (?= \$ (?! \s ) )  (?&PerlScalarAccessNoSpace)
+                                        (?= \$ )  (?&PerlScalarAccess)
                                         (?{ $PPR::X::_heredoc_EOL_start })
                                     |
                                         (?{ local $PPR::X::_heredoc_EOL_start = $^R })
-                                        (?= \@ (?! \s ) )  (?&PerlArrayAccessNoSpace)
+                                        (?= \@ )  (?&PerlArrayAccess)
                                         (?{ $PPR::X::_heredoc_EOL_start })
                                     )
                                     [^\n\$\@]*+
@@ -1106,8 +1208,9 @@ our $GRAMMAR = qr{
                 `  [^`]*+  (?: \\. [^`]*+ )*+  `
             |
                 qx
-                    (?:
-                        (?&PerlOWS) ' (?&PPR_X_quotelike_body)
+                    (?>
+                        (?= (?>(?&PerlOWS)) ' )
+                        (?&PPR_X_quotelike_body)
                     |
                         \b (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
                         (?&PPR_X_quotelike_body_interpolated)
@@ -1127,9 +1230,19 @@ our $GRAMMAR = qr{
                 (?>(?&PPR_X_quotelike_body_interpolated))
             |
                 # Bracketed syntax...
-                (?= (?>(?&PerlOWS)) [\[(<\{] )      # )
+                (?= (?>(?&PerlOWS))
+                    (?: [\[(<\{]                 # )
+                    |   (\X) (??{ exists $PPR::X::_QLD_CLOSE_FOR{$^N} ? '' : '(?!)' })
+                    )
+                )
                 (?>(?&PPR_X_regex_body_interpolated))
                 (?>(?&PerlOWS))
+                (?&PPR_X_quotelike_s_e_check)
+                (?>(?&PPR_X_quotelike_body_interpolated))
+            |
+                # Single-quoted syntax...
+                (?= (?>(?&PerlOWS)) ' )
+                (?>(?&PPR_X_regex_body_unclosed))
                 (?&PPR_X_quotelike_s_e_check)
                 (?>(?&PPR_X_quotelike_body_interpolated))
             |
@@ -1153,7 +1266,11 @@ our $GRAMMAR = qr{
                 (?&PPR_X_quotelike_body_interpolated)
             |
                 # Bracketed syntax...
-                (?= (?>(?&PerlOWS)) [\[(<\{] )      # )
+                (?= (?>(?&PerlOWS))
+                    (?: [\[(<\{\«]                 # )]
+                    |   (\X) (??{ exists $PPR::X::_QLD_CLOSE_FOR{$^N} ? '' : '(?!)' })
+                    )
+                )
                 (?>(?&PPR_X_quotelike_body_interpolated))
                 (?>(?&PerlOWS))
                 (?&PPR_X_quotelike_body_interpolated)
@@ -1282,9 +1399,9 @@ our $GRAMMAR = qr{
         (?<PerlNumber>   (?<PerlStdNumber>
             [+-]?+
             (?>
-                0  (?>  x (?&PPR_X_x_digit_seq)
-                |    b (?&PPR_X_b_digit_seq)
-                |      (?&PPR_X_o_digit_seq)
+                0  (?>  x   (?&PPR_X_x_digit_seq)
+                |       b   (?&PPR_X_b_digit_seq)
+                |       o?  (?&PPR_X_o_digit_seq)
                 )
             |
                 (?>
@@ -1311,7 +1428,10 @@ our $GRAMMAR = qr{
 
         (?<PerlBareword>   (?<PerlStdBareword>
             (?! (?> (?= \w )
-                    (?> for(?:each)?+ | while | if | unless | until | use | no | given | when | sub | return )
+                    (?> for(?:each)?+ | while | if      | unless | until | use | no
+                    |   given         | when  | sub     | return | my    | our | state
+                    |   try           | catch | finally | defer
+                    )
                 |   (?&PPR_X_named_op)
                 |   __ (?> END | DATA ) __ \b
                 ) \b
@@ -1402,8 +1522,9 @@ our $GRAMMAR = qr{
 
         (?<PPR_X_non_reserved_identifier>
             (?! (?>
-                for(?:each)?+ | while | if | unless | until | given | when | default
-                |  sub | format | use | no
+                   for(?:each)?+ | while   | if    | unless | until | given | when | default
+                |  sub | format  | use     | no    | my     | our   | state
+                |  try | catch   | finally | defer
                 |  (?&PPR_X_named_op)
                 |  [msy] | q[wrxq]?+ | tr
                 |   __ (?> END | DATA ) __
@@ -1467,7 +1588,7 @@ our $GRAMMAR = qr{
                 (?>
                     \\.
                 |
-                    \[  (?>(?&PPR_X_balanced_squares))  \]
+                    \[  (?&PPR_X_balanced_squares)  \]
                 |
                     (?&PPR_X_newline_and_heredoc)
                 )
@@ -1489,6 +1610,22 @@ our $GRAMMAR = qr{
             )*+
         ) # End of rule (?<PPR_X_balanced_angles>)
 
+        (?<PPR_X_balanced_unicode_delims>
+            (??{$PPR::X::_qld_not_special})*+
+            (?:
+                (?>
+                    \\.
+                |
+                    (??{$PPR::X::_qld_open})
+                    (?>(?&PPR_X_balanced_unicode_delims))
+                    (??{$PPR::X::_qld_close})
+                |
+                    (?&PPR_X_newline_and_heredoc)
+                )
+                (??{$PPR::X::_qld_not_special})*+
+            )*+
+        ) # End of rule (?<PPR_X_balanced_unicode_delims>)
+
         (?<PPR_X_regex_body_unclosed>
             (?>
                 [#]
@@ -1505,13 +1642,28 @@ our $GRAMMAR = qr{
                 |
                     \[  (?>(?&PPR_X_balanced_squares))            (?= \] )
                 |
-                    \(  (?:
-                            \?{1,2} (?= \{ ) (?>(?&PerlBlock))
+                    \(  (?>
+                            \?{1,2}+ (?= \{ )
+                            (?>(?&PerlBlock))
                         |
+                            (?! \?{1,2}+ \{ )
                             (?>(?&PPR_X_balanced_parens))
                         )                                       (?= \) )
                 |
-                    <  (?>(?&PPR_X_balanced_angles))             (?=  > )
+                    <  (?>(?&PPR_X_balanced_angles))              (?=  > )
+                |
+                    (\X) (??{ exists $PPR::X::_QLD_CLOSE_FOR{$^N} ? '' : '(?!)' })
+                    (?{ local $PPR::X::_qld_open  = $^N;
+                        local $PPR::X::_qld_close = $PPR::X::_QLD_CLOSE_FOR{$PPR::X::_qld_open};
+                        local $PPR::X::_qld_not_special
+                            = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n]";
+                        local $PPR::X::_qld_not_special_or_sigil
+                            = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n\\\$\\\@]";
+                        local $PPR::X::_qld_not_special_in_regex_var
+                            = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\s(|)]";
+                    })
+                    (?>(?&PPR_X_balanced_unicode_delims_regex_interpolated))
+                    (?=  (??{$PPR::X::_qld_close}) )
                 |
                     \\
                         [^\\\n]*+
@@ -1554,13 +1706,26 @@ our $GRAMMAR = qr{
             |
                 (?>(?&PerlOWS))
                 (?>
-                    \{  (?>(?&PPR_X_balanced_curlies))    (?= \} )
+                    \{  (?>(?&PPR_X_balanced_curlies))        (?= \} )
                 |
-                    \[  (?>(?&PPR_X_balanced_squares))    (?= \] )
+                    \[  (?>(?&PPR_X_balanced_squares))        (?= \] )
                 |
-                    \(  (?>(?&PPR_X_balanced_parens))     (?= \) )
+                    \(  (?>(?&PPR_X_balanced_parens))         (?= \) )
                 |
-                    <  (?>(?&PPR_X_balanced_angles))     (?=  > )
+                    <  (?>(?&PPR_X_balanced_angles))          (?=  > )
+                |
+                    (\X) (??{ exists $PPR::X::_QLD_CLOSE_FOR{$^N} ? '' : '(?!)' })
+                    (?{ local $PPR::X::_qld_open  = $^N;
+                        local $PPR::X::_qld_close = $PPR::X::_QLD_CLOSE_FOR{$PPR::X::_qld_open};
+                        local $PPR::X::_qld_not_special
+                            = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n]";
+                        local $PPR::X::_qld_not_special_or_sigil
+                            = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n\\\$\\\@]";
+                        local $PPR::X::_qld_not_special_in_regex_var
+                            = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\s(|)]";
+                    })
+                    (?>(?&PPR_X_balanced_unicode_delims))
+                    (?=  (??{$PPR::X::_qld_close}) )
                 |
                     \\
                         [^\\\n]*+
@@ -1600,6 +1765,112 @@ our $GRAMMAR = qr{
             (?>(?&PPR_X_regex_body_interpolated_unclosed))
             \S   # (Note: Don't have to test that this matches; the preceding subrule already did that)
         ) # End of rule (?<PPR_X_regex_body_interpolated>)
+
+        (?<PPR_X_balanced_parens_regex_interpolated>
+            [^)(\\\n\$\@]*+
+            (?:
+                (?>
+                    \\.
+                |
+                    \(  (?>(?&PPR_X_balanced_parens_regex_interpolated))  \)
+                |
+                    (?&PPR_X_newline_and_heredoc)
+                |
+                    (?= \$ (?! [\s(|)] ) )  (?&PerlScalarAccessNoSpace)
+                |
+                    (?= \@ (?! [\s(|)] ) )  (?&PerlArrayAccessNoSpace)
+                |
+                    [\$\@]
+                )
+                [^)(\\\n\$\@]*+
+            )*+
+        ) # End of rule (?<PPR_X_balanced_parens_regex_interpolated>)
+
+        (?<PPR_X_balanced_curlies_regex_interpolated>
+            [^\}\{\\\n\$\@]*+
+            (?:
+                (?>
+                    \\.
+                |
+                    \{  (?>(?&PPR_X_balanced_curlies_regex_interpolated))  \}
+                |
+                    (?&PPR_X_newline_and_heredoc)
+                |
+                    (?= \$ (?! [\s\}(|)] ) )  (?&PerlScalarAccessNoSpace)
+                |
+                    (?= \@ (?! [\s\}(|)] ) )  (?&PerlArrayAccessNoSpace)
+                |
+                    [\$\@]
+                )
+                [^\}\{\\\n\$\@]*+
+            )*+
+        ) # End of rule (?<PPR_X_balanced_curlies_regex_interpolated>)
+
+        (?<PPR_X_balanced_squares_regex_interpolated>
+            [^][\\\n\$\@]*+
+            (?:
+                (?>
+                    \\.
+                |
+                    \[  (?>(?&PPR_X_balanced_squares_regex_interpolated))  \]
+                |
+                    (?&PPR_X_newline_and_heredoc)
+                |
+                    (?= \$ (?! [\s\](|)] ) )  (?&PerlScalarAccessNoSpace)
+                |
+                    (?= \@ (?! [\s\](|)] ) )  (?&PerlArrayAccessNoSpace)
+                |
+                    [\$\@]
+                )
+                [^][\\\n\$\@]*+
+            )*+
+        ) # End of rule (?<PPR_X_balanced_squares_regex_interpolated>)
+
+        (?<PPR_X_balanced_angles_regex_interpolated>
+            [^><\\\n\$\@]*+
+            (?:
+                (?>
+                    \\.
+                |
+                    <  (?>(?&PPR_X_balanced_angles_regex_interpolated))  >
+                |
+                    (?&PPR_X_newline_and_heredoc)
+                |
+                    (?= \$ (?! [\s>(|)] ) )  (?&PerlScalarAccessNoSpace)
+                |
+                    (?= \@ (?! [\s>(|)] ) )  (?&PerlArrayAccessNoSpace)
+                |
+                    [\$\@]
+                )
+                [^><\\\n\$\@]*+
+            )*+
+        ) # End of rule (?<PPR_X_balanced_angles_regex_interpolated>)
+
+
+        (?<PPR_X_balanced_unicode_delims_regex_interpolated>
+            (??{$PPR::X::_qld_not_special_or_sigil})*+
+            (?:
+                (?>
+                    \\.
+                |
+                    (??{ $PPR::X::_qld_open })
+                    (?>(?&PPR_X_balanced_unicode_delims_regex_interpolated))
+                    (??{ $PPR::X::_qld_close })
+                |
+                    (?&PPR_X_newline_and_heredoc)
+                |
+                    (?= \$ (??{ $PPR::X::_qld_not_special_in_regex_var }) )
+                    (?&PerlScalarAccessNoSpace)
+                |
+                    (?= \$ (??{ $PPR::X::_qld_not_special_in_regex_var }) )
+                    (?&PerlArrayAccessNoSpace)
+                |
+                    [\$\@]
+                )
+                (??{$PPR::X::_qld_not_special_or_sigil})*+
+            )*+
+        ) # End of rule (?<PPR_X_balanced_unicode_delims_regex_interpolated>)
+
 
         (?<PPR_X_balanced_parens_interpolated>
             [^)(\\\n\$\@]*+
@@ -1661,6 +1932,28 @@ our $GRAMMAR = qr{
             )*+
         ) # End of rule (?<PPR_X_balanced_squares_interpolated>)
 
+        (?<PPR_X_balanced_unicode_delims_interpolated>
+            (??{$PPR::X::_qld_not_special_or_sigil})*+
+            (?:
+                (?>
+                    \\.
+                |
+                    (??{$PPR::X::_qld_open})
+                    (?>(?&PPR_X_balanced_unicode_delims_interpolated))
+                    (??{$PPR::X::_qld_close})
+                |
+                    (?&PPR_X_newline_and_heredoc)
+                |
+                    (?= \$ (?! \s | (??{$PPR::X::_qld_close}) ) )  (?&PerlScalarAccessNoSpace)
+                |
+                    (?= \@ (?! \s | (??{$PPR::X::_qld_close}) ) )  (?&PerlArrayAccessNoSpace)
+                |
+                    [\$\@]
+                )
+                (??{$PPR::X::_qld_not_special_or_sigil})*+
+            )*+
+        ) # End of rule (?<PPR_X_balanced_unicode_delims_interpolated>)
+
         (?<PPR_X_balanced_angles_interpolated>
             [^><\\\n\$\@]*+
             (?:
@@ -1693,9 +1986,9 @@ our $GRAMMAR = qr{
                         |
                             (?&PPR_X_newline_and_heredoc)
                         |
-                            (?= \$ (?! [\s#] ) )  (?&PerlScalarAccessNoSpace)
+                            (?= \$ (?! [\s#|()] ) )  (?&PerlScalarAccessNoSpace)
                         |
-                            (?= \@ (?! [\s#] ) )  (?&PerlArrayAccessNoSpace)
+                            (?= \@ (?! [\s#|()] ) )  (?&PerlArrayAccessNoSpace)
                         |
                             [\$\@]
                         )
@@ -1705,13 +1998,34 @@ our $GRAMMAR = qr{
                 |
                     (?>(?&PerlOWS))
                     (?>
-                        \{  (?>(?&PPR_X_balanced_curlies_interpolated))    (?= \} )
+                        \{  (?>(?&PPR_X_balanced_curlies_regex_interpolated))    (?= \} )
                     |
-                        \[  (?>(?&PPR_X_balanced_squares_interpolated))    (?= \] )
+                        \[  (?>(?&PPR_X_balanced_squares_regex_interpolated))    (?= \] )
                     |
-                        \(  (?>(?&PPR_X_balanced_parens_interpolated))     (?= \) )
+                        \(  (?>(?&PPR_X_balanced_parens_regex_interpolated))     (?= \) )
                     |
-                        <   (?>(?&PPR_X_balanced_angles_interpolated))     (?=  > )
+                        <   (?>(?&PPR_X_balanced_angles_regex_interpolated))     (?=  > )
+                    |
+                        (\X) (??{ exists $PPR::X::_QLD_CLOSE_FOR{$^N} ? '' : '(?!)' })
+                        (?{ local $PPR::X::_qld_open  = $^N;
+                            local $PPR::X::_qld_close = $PPR::X::_QLD_CLOSE_FOR{$PPR::X::_qld_open};
+                            local $PPR::X::_qld_not_special
+                                = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n]";
+                            local $PPR::X::_qld_not_special_or_sigil
+                                = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n\\\$\\\@]";
+                            local $PPR::X::_qld_not_special_in_regex_var
+                                = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\s(|)]";
+                        })
+                        (?>(?&PPR_X_balanced_unicode_delims_regex_interpolated))
+                        (?=  (??{$PPR::X::_qld_close}) )
+                    |
+                        '
+                            [^'\n]*+
+                            (?:
+                                (?> (?&PPR_X_newline_and_heredoc))
+                                [^'\n]*+
+                            )*+
+                        (?= ' )
                     |
                         \\
                             [^\\\n\$\@]*+
@@ -1719,9 +2033,9 @@ our $GRAMMAR = qr{
                                 (?>
                                     (?&PPR_X_newline_and_heredoc)
                                 |
-                                    (?= \$ (?! [\s\\] ) )  (?&PerlScalarAccessNoSpace)
+                                    (?= \$ (?! [\s\\|()] ) )  (?&PerlScalarAccessNoSpace)
                                 |
-                                    (?= \@ (?! [\s\\] ) )  (?&PerlArrayAccessNoSpace)
+                                    (?= \@ (?! [\s\\|()] ) )  (?&PerlArrayAccessNoSpace)
                                 |
                                     [\$\@]
                                 )
@@ -1737,9 +2051,9 @@ our $GRAMMAR = qr{
                                 |
                                     (?&PPR_X_newline_and_heredoc)
                                 |
-                                    (?= \$ (?! [\s/] ) )  (?&PerlScalarAccessNoSpace)
+                                    (?= \$ (?! [\s/|()] ) )  (?&PerlScalarAccessNoSpace)
                                 |
-                                    (?= \@ (?! [\s/] ) )  (?&PerlArrayAccessNoSpace)
+                                    (?= \@ (?! [\s/|()] ) )  (?&PerlArrayAccessNoSpace)
                                 |
                                     [\$\@]
                                 )
@@ -1754,9 +2068,9 @@ our $GRAMMAR = qr{
                                 (?&PPR_X_newline_and_heredoc)
                             |
                                 (?:
-                                    (?= \$ (?! [\s-] ) )  (?&PerlScalarAccessNoSpaceNoArrow)
+                                    (?= \$ (?! [\s|()-] ) )  (?&PerlScalarAccessNoSpaceNoArrow)
                                 |
-                                    (?= \@ (?! [\s-] ) )  (?&PerlArrayAccessNoSpaceNoArrow)
+                                    (?= \@ (?! [\s|()-] ) )  (?&PerlArrayAccessNoSpaceNoArrow)
                                 |
                                     [^-]
                                 )
@@ -1771,9 +2085,9 @@ our $GRAMMAR = qr{
                             |
                                 (?! \g{PPR_X_qldel} )
                                 (?:
-                                    (?= \$ (?! \g{PPR_X_qldel} | \s ) )  (?&PerlScalarAccessNoSpace)
+                                    (?= \$ (?! \g{PPR_X_qldel} | [\s|()] ) )  (?&PerlScalarAccessNoSpace)
                                 |
-                                    (?= \@ (?! \g{PPR_X_qldel} | \s ) )  (?&PerlArrayAccessNoSpace)
+                                    (?= \@ (?! \g{PPR_X_qldel} | [\s|()] ) )  (?&PerlArrayAccessNoSpace)
                                 |
                                     .
                                 )
@@ -1817,6 +2131,27 @@ our $GRAMMAR = qr{
                         \(  (?>(?&PPR_X_balanced_parens_interpolated))     (?= \) )
                     |
                         <   (?>(?&PPR_X_balanced_angles_interpolated))     (?=  > )
+                    |
+                        (\X) (??{ exists $PPR::X::_QLD_CLOSE_FOR{$^N} ? '' : '(?!)' })
+                        (?{ local $PPR::X::_qld_open  = $^N;
+                            local $PPR::X::_qld_close = $PPR::X::_QLD_CLOSE_FOR{$PPR::X::_qld_open};
+                            local $PPR::X::_qld_not_special
+                                = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n]";
+                            local $PPR::X::_qld_not_special_or_sigil
+                                = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n\\\$\\\@]";
+                            local $PPR::X::_qld_not_special_in_regex_var
+                                = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\s(|)]";
+                        })
+                        (?>(?&PPR_X_balanced_unicode_delims_interpolated))
+                        (?=  (??{$PPR::X::_qld_close}) )
+                    |
+                        '
+                            [^'\n]*+
+                            (?:
+                                (?> (?&PPR_X_newline_and_heredoc))
+                                [^'\n]*+
+                            )*+
+                        (?= ' )
                     |
                         \\
                             [^\\\n\$\@]*+
@@ -1900,6 +2235,7 @@ our $GRAMMAR = qr{
                     [msixpodualgcrn]*+ e [msixpodualgcern]*+
                 )
                 (?=
+                    \S  # Skip the left delimiter
                     (?(?{ $PPR::X::_quotelike_s_end >= 0 })
                         (?>
                             (??{ +pos() && +pos() < $PPR::X::_quotelike_s_end ? '' : '(?!)' })
@@ -1914,6 +2250,30 @@ our $GRAMMAR = qr{
             )?+
         ) # End of rule (?<PPR_X_quotelike_s_e_check>)
 
+        (?<PPR_X_quotelike_s_e_check_uninterpolated>
+            (??{ local $PPR::X::_quotelike_s_end = -1; '' })
+            (?:
+                (?=
+                    (?&PPR_X_quotelike_body)
+                    (??{ $PPR::X::_quotelike_s_end = +pos(); '' })
+                    [msixpodualgcrn]*+ e [msixpodualgcern]*+
+                )
+                (?=
+                    \S  # Skip the left delimiter
+                    (?(?{ $PPR::X::_quotelike_s_end >= 0 })
+                        (?>
+                            (??{ +pos() && +pos() < $PPR::X::_quotelike_s_end ? '' : '(?!)' })
+                            (?>
+                                (?&PerlExpression)
+                            |
+                                \\?+ .
+                            )
+                        )*+
+                    )
+                )
+            )?+
+        ) # End of rule (?<PPR_X_quotelike_s_e_check_uninterpolated>)
+
         (?<PPR_X_filetest_name>   [ABCMORSTWXbcdefgkloprstuwxz]          )
 
         (?<PPR_X_digit_seq>               \d++ (?: _?+         \d++ )*+  )
@@ -1925,7 +2285,335 @@ our $GRAMMAR = qr{
             \n (??{ ($PPR::X::_heredoc_origin // q{}) eq ($_//q{}) ? ($PPR::X::_heredoc_skip{+pos()} // q{}) : q{} })
         ) # End of rule (?<PPR_X_newline_and_heredoc>)
     )
+    # END OF GRAMMAR
 }xms;
+
+
+BEGIN {
+    %PPR::X::_QLD_CLOSE_FOR = (
+#       "\x{0028}"  => "\x{0029}",   # LEFT/RIGHT PARENTHESIS
+#       "\x{003C}"  => "\x{003E}",   # LESS-THAN/GREATER-THAN SIGN
+#       "\x{005B}"  => "\x{005D}",   # LEFT/RIGHT SQUARE BRACKET
+#       "\x{007B}"  => "\x{007D}",   # LEFT/RIGHT CURLY BRACKET
+        "\x{00AB}"  => "\x{00BB}",   # LEFT/RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
+        "\x{00BB}"  => "\x{00AB}",   # RIGHT/LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
+        "\x{0706}"  => "\x{0707}",   # SYRIAC COLON SKEWED LEFT/RIGHT
+        "\x{0F3A}"  => "\x{0F3B}",   # TIBETAN MARK GUG RTAGS GYON,  TIBETAN MARK GUG RTAGS GYAS
+        "\x{0F3C}"  => "\x{0F3D}",   # TIBETAN MARK ANG KHANG GYON,  TIBETAN MARK ANG KHANG GYAS
+        "\x{169B}"  => "\x{169C}",   # OGHAM FEATHER MARK,  OGHAM REVERSED FEATHER MARK
+        "\x{2018}"  => "\x{2019}",   # LEFT/RIGHT SINGLE QUOTATION MARK
+        "\x{2019}"  => "\x{2018}",   # RIGHT/LEFT SINGLE QUOTATION MARK
+        "\x{201C}"  => "\x{201D}",   # LEFT/RIGHT DOUBLE QUOTATION MARK
+        "\x{201D}"  => "\x{201C}",   # RIGHT/LEFT DOUBLE QUOTATION MARK
+        "\x{2035}"  => "\x{2032}",   # REVERSED PRIME,  PRIME
+        "\x{2036}"  => "\x{2033}",   # REVERSED DOUBLE PRIME,  DOUBLE PRIME
+        "\x{2037}"  => "\x{2034}",   # REVERSED TRIPLE PRIME,  TRIPLE PRIME
+        "\x{2039}"  => "\x{203A}",   # SINGLE LEFT/RIGHT-POINTING ANGLE QUOTATION MARK
+        "\x{203A}"  => "\x{2039}",   # SINGLE RIGHT/LEFT-POINTING ANGLE QUOTATION MARK
+        "\x{2045}"  => "\x{2046}",   # LEFT/RIGHT SQUARE BRACKET WITH QUILL
+        "\x{204D}"  => "\x{204C}",   # BLACK RIGHT/LEFTWARDS BULLET
+        "\x{207D}"  => "\x{207E}",   # SUPERSCRIPT LEFT/RIGHT PARENTHESIS
+        "\x{208D}"  => "\x{208E}",   # SUBSCRIPT LEFT/RIGHT PARENTHESIS
+        "\x{2192}"  => "\x{2190}",   # RIGHT/LEFTWARDS ARROW
+        "\x{219B}"  => "\x{219A}",   # RIGHT/LEFTWARDS ARROW WITH STROKE
+        "\x{219D}"  => "\x{219C}",   # RIGHT/LEFTWARDS WAVE ARROW
+        "\x{21A0}"  => "\x{219E}",   # RIGHT/LEFTWARDS TWO HEADED ARROW
+        "\x{21A3}"  => "\x{21A2}",   # RIGHT/LEFTWARDS ARROW WITH TAIL
+        "\x{21A6}"  => "\x{21A4}",   # RIGHT/LEFTWARDS ARROW FROM BAR
+        "\x{21AA}"  => "\x{21A9}",   # RIGHT/LEFTWARDS ARROW WITH HOOK
+        "\x{21AC}"  => "\x{21AB}",   # RIGHT/LEFTWARDS ARROW WITH LOOP
+        "\x{21B1}"  => "\x{21B0}",   # UPWARDS ARROW WITH TIP RIGHT/LEFTWARDS
+        "\x{21B3}"  => "\x{21B2}",   # DOWNWARDS ARROW WITH TIP RIGHT/LEFTWARDS
+        "\x{21C0}"  => "\x{21BC}",   # RIGHT/LEFTWARDS HARPOON WITH BARB UPWARDS
+        "\x{21C1}"  => "\x{21BD}",   # RIGHT/LEFTWARDS HARPOON WITH BARB DOWNWARDS
+        "\x{21C9}"  => "\x{21C7}",   # RIGHT/LEFTWARDS PAIRED ARROWS
+        "\x{21CF}"  => "\x{21CD}",   # RIGHT/LEFTWARDS DOUBLE ARROW WITH STROKE
+        "\x{21D2}"  => "\x{21D0}",   # RIGHT/LEFTWARDS DOUBLE ARROW
+        "\x{21DB}"  => "\x{21DA}",   # RIGHT/LEFTWARDS TRIPLE ARROW
+        "\x{21DD}"  => "\x{21DC}",   # RIGHT/LEFTWARDS SQUIGGLE ARROW
+        "\x{21E2}"  => "\x{21E0}",   # RIGHT/LEFTWARDS DASHED ARROW
+        "\x{21E5}"  => "\x{21E4}",   # RIGHT/LEFTWARDS ARROW TO BAR
+        "\x{21E8}"  => "\x{21E6}",   # RIGHT/LEFTWARDS WHITE ARROW
+        "\x{21F4}"  => "\x{2B30}",   # RIGHT/LEFT ARROW WITH SMALL CIRCLE
+        "\x{21F6}"  => "\x{2B31}",   # THREE RIGHT/LEFTWARDS ARROWS
+        "\x{21F8}"  => "\x{21F7}",   # RIGHT/LEFTWARDS ARROW WITH VERTICAL STROKE
+        "\x{21FB}"  => "\x{21FA}",   # RIGHT/LEFTWARDS ARROW WITH DOUBLE VERTICAL STROKE
+        "\x{21FE}"  => "\x{21FD}",   # RIGHT/LEFTWARDS OPEN-HEADED ARROW
+        "\x{2208}"  => "\x{220B}",   # ELEMENT OF,  CONTAINS AS MEMBER
+        "\x{2209}"  => "\x{220C}",   # NOT AN ELEMENT OF,  DOES NOT CONTAIN AS MEMBER
+        "\x{220A}"  => "\x{220D}",   # SMALL ELEMENT OF,  SMALL CONTAINS AS MEMBER
+        "\x{2264}"  => "\x{2265}",   # LESS-THAN/GREATER-THAN OR EQUAL TO
+        "\x{2266}"  => "\x{2267}",   # LESS-THAN/GREATER-THAN OVER EQUAL TO
+        "\x{2268}"  => "\x{2269}",   # LESS-THAN/GREATER-THAN BUT NOT EQUAL TO
+        "\x{226A}"  => "\x{226B}",   # MUCH LESS-THAN/GREATER-THAN
+        "\x{226E}"  => "\x{226F}",   # NOT LESS-THAN/GREATER-THAN
+        "\x{2270}"  => "\x{2271}",   # NEITHER LESS-THAN/GREATER-THAN NOR EQUAL TO
+        "\x{2272}"  => "\x{2273}",   # LESS-THAN/GREATER-THAN OR EQUIVALENT TO
+        "\x{2274}"  => "\x{2275}",   # NEITHER LESS-THAN/GREATER-THAN NOR EQUIVALENT TO
+        "\x{227A}"  => "\x{227B}",   # PRECEDES/SUCCEEDS
+        "\x{227C}"  => "\x{227D}",   # PRECEDES/SUCCEEDS OR EQUAL TO
+        "\x{227E}"  => "\x{227F}",   # PRECEDES/SUCCEEDS OR EQUIVALENT TO
+        "\x{2280}"  => "\x{2281}",   # DOES NOT PRECEDE/SUCCEED
+        "\x{2282}"  => "\x{2283}",   # SUBSET/SUPERSET OF
+        "\x{2284}"  => "\x{2285}",   # NOT A SUBSET/SUPERSET OF
+        "\x{2286}"  => "\x{2287}",   # SUBSET/SUPERSET OF OR EQUAL TO
+        "\x{2288}"  => "\x{2289}",   # NEITHER A SUBSET/SUPERSET OF NOR EQUAL TO
+        "\x{228A}"  => "\x{228B}",   # SUBSET/SUPERSET OF WITH NOT EQUAL TO
+        "\x{22A3}"  => "\x{22A2}",   # LEFT/RIGHT TACK
+        "\x{22A6}"  => "\x{2ADE}",   # ASSERTION,  SHORT LEFT TACK
+        "\x{22A8}"  => "\x{2AE4}",   # TRUE,  VERTICAL BAR DOUBLE LEFT TURNSTILE
+        "\x{22A9}"  => "\x{2AE3}",   # FORCES,  DOUBLE VERTICAL BAR LEFT TURNSTILE
+        "\x{22B0}"  => "\x{22B1}",   # PRECEDES/SUCCEEDS UNDER RELATION
+        "\x{22D0}"  => "\x{22D1}",   # DOUBLE SUBSET/SUPERSET
+        "\x{22D6}"  => "\x{22D7}",   # LESS-THAN/GREATER-THAN WITH DOT
+        "\x{22D8}"  => "\x{22D9}",   # VERY MUCH LESS-THAN/GREATER-THAN
+        "\x{22DC}"  => "\x{22DD}",   # EQUAL TO OR LESS-THAN/GREATER-THAN
+        "\x{22DE}"  => "\x{22DF}",   # EQUAL TO OR PRECEDES/SUCCEEDS
+        "\x{22E0}"  => "\x{22E1}",   # DOES NOT PRECEDE/SUCCEED OR EQUAL
+        "\x{22E6}"  => "\x{22E7}",   # LESS-THAN/GREATER-THAN BUT NOT EQUIVALENT TO
+        "\x{22E8}"  => "\x{22E9}",   # PRECEDES/SUCCEEDS BUT NOT EQUIVALENT TO
+        "\x{22F2}"  => "\x{22FA}",   # ELEMENT OF/CONTAINS WITH LONG HORIZONTAL STROKE
+        "\x{22F3}"  => "\x{22FB}",   # ELEMENT OF/CONTAINS WITH VERTICAL BAR AT END OF HORIZONTAL STROKE
+        "\x{22F4}"  => "\x{22FC}",   # SMALL ELEMENT OF/CONTAINS WITH VERTICAL BAR AT END OF HORIZONTAL STROKE
+        "\x{22F6}"  => "\x{22FD}",   # ELEMENT OF/CONTAINS WITH OVERBAR
+        "\x{22F7}"  => "\x{22FE}",   # SMALL ELEMENT OF/CONTAINS WITH OVERBAR
+        "\x{2308}"  => "\x{2309}",   # LEFT/RIGHT CEILING
+        "\x{230A}"  => "\x{230B}",   # LEFT/RIGHT FLOOR
+        "\x{2326}"  => "\x{232B}",   # ERASE TO THE RIGHT/LEFT
+        "\x{2329}"  => "\x{232A}",   # LEFT/RIGHT-POINTING ANGLE BRACKET
+        "\x{2348}"  => "\x{2347}",   # APL FUNCTIONAL SYMBOL QUAD RIGHT/LEFTWARDS ARROW
+        "\x{23E9}"  => "\x{23EA}",   # BLACK RIGHT/LEFT-POINTING DOUBLE TRIANGLE
+        "\x{23ED}"  => "\x{23EE}",   # BLACK RIGHT/LEFT-POINTING DOUBLE TRIANGLE WITH VERTICAL BAR
+        "\x{261B}"  => "\x{261A}",   # BLACK RIGHT/LEFT POINTING INDEX
+        "\x{261E}"  => "\x{261C}",   # WHITE RIGHT/LEFT POINTING INDEX
+        "\x{269E}"  => "\x{269F}",   # THREE LINES CONVERGING RIGHT/LEFT
+        "\x{2768}"  => "\x{2769}",   # MEDIUM LEFT/RIGHT PARENTHESIS ORNAMENT
+        "\x{276A}"  => "\x{276B}",   # MEDIUM FLATTENED LEFT/RIGHT PARENTHESIS ORNAMENT
+        "\x{276C}"  => "\x{276D}",   # MEDIUM LEFT/RIGHT-POINTING ANGLE BRACKET ORNAMENT
+        "\x{276E}"  => "\x{276F}",   # HEAVY LEFT/RIGHT-POINTING ANGLE QUOTATION MARK ORNAMENT
+        "\x{2770}"  => "\x{2771}",   # HEAVY LEFT/RIGHT-POINTING ANGLE BRACKET ORNAMENT
+        "\x{2772}"  => "\x{2773}",   # LIGHT LEFT/RIGHT TORTOISE SHELL BRACKET ORNAMENT
+        "\x{2774}"  => "\x{2775}",   # MEDIUM LEFT/RIGHT CURLY BRACKET ORNAMENT
+        "\x{27C3}"  => "\x{27C4}",   # OPEN SUBSET/SUPERSET
+        "\x{27C5}"  => "\x{27C6}",   # LEFT/RIGHT S-SHAPED BAG DELIMITER
+        "\x{27C8}"  => "\x{27C9}",   # REVERSE SOLIDUS PRECEDING SUBSET,  SUPERSET PRECEDING SOLIDUS
+        "\x{27DE}"  => "\x{27DD}",   # LONG LEFT/RIGHT TACK
+        "\x{27E6}"  => "\x{27E7}",   # MATHEMATICAL LEFT/RIGHT WHITE SQUARE BRACKET
+        "\x{27E8}"  => "\x{27E9}",   # MATHEMATICAL LEFT/RIGHT ANGLE BRACKET
+        "\x{27EA}"  => "\x{27EB}",   # MATHEMATICAL LEFT/RIGHT DOUBLE ANGLE BRACKET
+        "\x{27EC}"  => "\x{27ED}",   # MATHEMATICAL LEFT/RIGHT WHITE TORTOISE SHELL BRACKET
+        "\x{27EE}"  => "\x{27EF}",   # MATHEMATICAL LEFT/RIGHT FLATTENED PARENTHESIS
+        "\x{27F4}"  => "\x{2B32}",   # RIGHT/LEFT ARROW WITH CIRCLED PLUS
+        "\x{27F6}"  => "\x{27F5}",   # LONG RIGHT/LEFTWARDS ARROW
+        "\x{27F9}"  => "\x{27F8}",   # LONG RIGHT/LEFTWARDS DOUBLE ARROW
+        "\x{27FC}"  => "\x{27FB}",   # LONG RIGHT/LEFTWARDS ARROW FROM BAR
+        "\x{27FE}"  => "\x{27FD}",   # LONG RIGHT/LEFTWARDS DOUBLE ARROW FROM BAR
+        "\x{27FF}"  => "\x{2B33}",   # LONG RIGHT/LEFTWARDS SQUIGGLE ARROW
+        "\x{2900}"  => "\x{2B34}",   # RIGHT/LEFTWARDS TWO-HEADED ARROW WITH VERTICAL STROKE
+        "\x{2901}"  => "\x{2B35}",   # RIGHT/LEFTWARDS TWO-HEADED ARROW WITH DOUBLE VERTICAL STROKE
+        "\x{2903}"  => "\x{2902}",   # RIGHT/LEFTWARDS DOUBLE ARROW WITH VERTICAL STROKE
+        "\x{2905}"  => "\x{2B36}",   # RIGHT/LEFTWARDS TWO-HEADED ARROW FROM BAR
+        "\x{2907}"  => "\x{2906}",   # RIGHT/LEFTWARDS DOUBLE ARROW FROM BAR
+        "\x{290D}"  => "\x{290C}",   # RIGHT/LEFTWARDS DOUBLE DASH ARROW
+        "\x{290F}"  => "\x{290E}",   # RIGHT/LEFTWARDS TRIPLE DASH ARROW
+        "\x{2910}"  => "\x{2B37}",   # RIGHT/LEFTWARDS TWO-HEADED TRIPLE DASH ARROW
+        "\x{2911}"  => "\x{2B38}",   # RIGHT/LEFTWARDS ARROW WITH DOTTED STEM
+        "\x{2914}"  => "\x{2B39}",   # RIGHT/LEFTWARDS ARROW WITH TAIL WITH VERTICAL STROKE
+        "\x{2915}"  => "\x{2B3A}",   # RIGHT/LEFTWARDS ARROW WITH TAIL WITH DOUBLE VERTICAL STROKE
+        "\x{2916}"  => "\x{2B3B}",   # RIGHT/LEFTWARDS TWO-HEADED ARROW WITH TAIL
+        "\x{2917}"  => "\x{2B3C}",   # RIGHT/LEFTWARDS TWO-HEADED ARROW WITH TAIL WITH VERTICAL STROKE
+        "\x{2918}"  => "\x{2B3D}",   # RIGHT/LEFTWARDS TWO-HEADED ARROW WITH TAIL WITH DOUBLE VERTICAL STROKE
+        "\x{291A}"  => "\x{2919}",   # RIGHT/LEFTWARDS ARROW-TAIL
+        "\x{291C}"  => "\x{291B}",   # RIGHT/LEFTWARDS DOUBLE ARROW-TAIL
+        "\x{291E}"  => "\x{291D}",   # RIGHT/LEFTWARDS ARROW TO BLACK DIAMOND
+        "\x{2920}"  => "\x{291F}",   # RIGHT/LEFTWARDS ARROW FROM BAR TO BLACK DIAMOND
+        "\x{2933}"  => "\x{2B3F}",   # WAVE ARROW POINTING DIRECTLY RIGHT/LEFT
+        "\x{2937}"  => "\x{2936}",   # ARROW POINTING DOWNWARDS THEN CURVING RIGHT/LEFTWARDS
+        "\x{2945}"  => "\x{2946}",   # RIGHT/LEFTWARDS ARROW WITH PLUS BELOW
+        "\x{2947}"  => "\x{2B3E}",   # RIGHT/LEFTWARDS ARROW THROUGH X
+        "\x{2953}"  => "\x{2952}",   # RIGHT/LEFTWARDS HARPOON WITH BARB UP TO BAR
+        "\x{2957}"  => "\x{2956}",   # RIGHT/LEFTWARDS HARPOON WITH BARB DOWN TO BAR
+        "\x{295B}"  => "\x{295A}",   # RIGHT/LEFTWARDS HARPOON WITH BARB UP FROM BAR
+        "\x{295F}"  => "\x{295E}",   # RIGHT/LEFTWARDS HARPOON WITH BARB DOWN FROM BAR
+        "\x{2964}"  => "\x{2962}",   # RIGHT/LEFTWARDS HARPOON WITH BARB UP ABOVE RIGHT/LEFTWARDS HARPOON WITH BARB DOWN
+        "\x{296C}"  => "\x{296A}",   # RIGHT/LEFTWARDS HARPOON WITH BARB UP ABOVE LONG DASH
+        "\x{296D}"  => "\x{296B}",   # RIGHT/LEFTWARDS HARPOON WITH BARB DOWN BELOW LONG DASH
+        "\x{2971}"  => "\x{2B40}",   # EQUALS SIGN ABOVE RIGHT/LEFTWARDS ARROW
+        "\x{2972}"  => "\x{2B41}",   # TILDE OPERATOR ABOVE RIGHTWARDS ARROW,  REVERSE TILDE OPERATOR ABOVE LEFTWARDS ARROW
+        "\x{2974}"  => "\x{2B4B}",   # RIGHTWARDS ARROW ABOVE TILDE OPERATOR, LEFTWARDS ARROW ABOVE REVERSE TILDE OPERATOR
+        "\x{2975}"  => "\x{2B42}",   # RIGHTWARDS ARROW ABOVE ALMOST EQUAL TO, LEFTWARDS ARROW ABOVE REVERSE ALMOST EQUAL TO
+        "\x{2979}"  => "\x{297B}",   # SUBSET/SUPERSET ABOVE RIGHT/LEFTWARDS ARROW
+        "\x{2983}"  => "\x{2984}",   # LEFT/RIGHT WHITE CURLY BRACKET
+        "\x{2985}"  => "\x{2986}",   # LEFT/RIGHT WHITE PARENTHESIS
+        "\x{2987}"  => "\x{2988}",   # Z NOTATION LEFT/RIGHT IMAGE BRACKET
+        "\x{2989}"  => "\x{298A}",   # Z NOTATION LEFT/RIGHT BINDING BRACKET
+        "\x{298B}"  => "\x{298C}",   # LEFT/RIGHT SQUARE BRACKET WITH UNDERBAR
+        "\x{298D}"  => "\x{2990}",   # LEFT/RIGHT SQUARE BRACKET WITH TICK IN TOP CORNER
+        "\x{298F}"  => "\x{298E}",   # LEFT/RIGHT SQUARE BRACKET WITH TICK IN BOTTOM CORNER
+        "\x{2991}"  => "\x{2992}",   # LEFT/RIGHT ANGLE BRACKET WITH DOT
+        "\x{2993}"  => "\x{2994}",   # LEFT/RIGHT ARC LESS-THAN/GREATER-THAN BRACKET
+        "\x{2995}"  => "\x{2996}",   # DOUBLE LEFT/RIGHT ARC GREATER-THAN/LESS-THAN BRACKET
+        "\x{2997}"  => "\x{2998}",   # LEFT/RIGHT BLACK TORTOISE SHELL BRACKET
+        "\x{29A8}"  => "\x{29A9}",   # MEASURED ANGLE WITH OPEN ARM ENDING IN ARROW POINTING UP AND RIGHT/LEFT
+        "\x{29AA}"  => "\x{29AB}",   # MEASURED ANGLE WITH OPEN ARM ENDING IN ARROW POINTING DOWN AND RIGHT/LEFT
+        "\x{29B3}"  => "\x{29B4}",   # EMPTY SET WITH RIGHT/LEFT ARROW ABOVE
+        "\x{29C0}"  => "\x{29C1}",   # CIRCLED LESS-THAN/GREATER-THAN
+        "\x{29D8}"  => "\x{29D9}",   # LEFT/RIGHT WIGGLY FENCE
+        "\x{29DA}"  => "\x{29DB}",   # LEFT/RIGHT DOUBLE WIGGLY FENCE
+        "\x{29FC}"  => "\x{29FD}",   # LEFT/RIGHT-POINTING CURVED ANGLE BRACKET
+        "\x{2A79}"  => "\x{2A7A}",   # LESS-THAN/GREATER-THAN WITH CIRCLE INSIDE
+        "\x{2A7B}"  => "\x{2A7C}",   # LESS-THAN/GREATER-THAN WITH QUESTION MARK ABOVE
+        "\x{2A7D}"  => "\x{2A7E}",   # LESS-THAN/GREATER-THAN OR SLANTED EQUAL TO
+        "\x{2A7F}"  => "\x{2A80}",   # LESS-THAN/GREATER-THAN OR SLANTED EQUAL TO WITH DOT INSIDE
+        "\x{2A81}"  => "\x{2A82}",   # LESS-THAN/GREATER-THAN OR SLANTED EQUAL TO WITH DOT ABOVE
+        "\x{2A83}"  => "\x{2A84}",   # LESS-THAN/GREATER-THAN OR SLANTED EQUAL TO WITH DOT ABOVE RIGHT/LEFT
+        "\x{2A85}"  => "\x{2A86}",   # LESS-THAN/GREATER-THAN OR APPR::XOXIMATE
+        "\x{2A87}"  => "\x{2A88}",   # LESS-THAN/GREATER-THAN AND SINGLE-LINE NOT EQUAL TO
+        "\x{2A89}"  => "\x{2A8A}",   # LESS-THAN/GREATER-THAN AND NOT APPR::XOXIMATE
+        "\x{2A8D}"  => "\x{2A8E}",   # LESS-THAN/GREATER-THAN ABOVE SIMILAR OR EQUAL
+        "\x{2A95}"  => "\x{2A96}",   # SLANTED EQUAL TO OR LESS-THAN/GREATER-THAN
+        "\x{2A97}"  => "\x{2A98}",   # SLANTED EQUAL TO OR LESS-THAN/GREATER-THAN WITH DOT INSIDE
+        "\x{2A99}"  => "\x{2A9A}",   # DOUBLE-LINE EQUAL TO OR LESS-THAN/GREATER-THAN
+        "\x{2A9B}"  => "\x{2A9C}",   # DOUBLE-LINE SLANTED EQUAL TO OR LESS-THAN/ GREATER-THAN
+        "\x{2A9D}"  => "\x{2A9E}",   # SIMILAR OR LESS-THAN/GREATER-THAN
+        "\x{2A9F}"  => "\x{2AA0}",   # SIMILAR ABOVE LESS-THAN/GREATER-THAN ABOVE EQUALS SIGN
+        "\x{2AA1}"  => "\x{2AA2}",   # DOUBLE NESTED LESS-THAN/GREATER-THAN
+        "\x{2AA6}"  => "\x{2AA7}",   # LESS-THAN/GREATER-THAN CLOSED BY CURVE
+        "\x{2AA8}"  => "\x{2AA9}",   # LESS-THAN/GREATER-THAN CLOSED BY CURVE ABOVE SLANTED EQUAL
+        "\x{2AAA}"  => "\x{2AAB}",   # SMALLER THAN/LARGER THAN
+        "\x{2AAC}"  => "\x{2AAD}",   # SMALLER THAN/LARGER THAN OR EQUAL TO
+        "\x{2AAF}"  => "\x{2AB0}",   # PRECEDES/SUCCEEDS ABOVE SINGLE-LINE EQUALS SIGN
+        "\x{2AB1}"  => "\x{2AB2}",   # PRECEDES/SUCCEEDS ABOVE SINGLE-LINE NOT EQUAL TO
+        "\x{2AB3}"  => "\x{2AB4}",   # PRECEDES/SUCCEEDS ABOVE EQUALS SIGN
+        "\x{2AB5}"  => "\x{2AB6}",   # PRECEDES/SUCCEEDS ABOVE NOT EQUAL TO
+        "\x{2AB7}"  => "\x{2AB8}",   # PRECEDES/SUCCEEDS ABOVE ALMOST EQUAL TO
+        "\x{2AB9}"  => "\x{2ABA}",   # PRECEDES/SUCCEEDS ABOVE NOT ALMOST EQUAL TO
+        "\x{2ABB}"  => "\x{2ABC}",   # DOUBLE PRECEDES/SUCCEEDS
+        "\x{2ABD}"  => "\x{2ABE}",   # SUBSET/SUPERSET WITH DOT
+        "\x{2ABF}"  => "\x{2AC0}",   # SUBSET/SUPERSET WITH PLUS SIGN BELOW
+        "\x{2AC1}"  => "\x{2AC2}",   # SUBSET/SUPERSET WITH MULTIPLICATION SIGN BELOW
+        "\x{2AC3}"  => "\x{2AC4}",   # SUBSET/SUPERSET OF OR EQUAL TO WITH DOT ABOVE
+        "\x{2AC5}"  => "\x{2AC6}",   # SUBSET/SUPERSET OF ABOVE EQUALS SIGN
+        "\x{2AC7}"  => "\x{2AC8}",   # SUBSET/SUPERSET OF ABOVE TILDE OPERATOR
+        "\x{2AC9}"  => "\x{2ACA}",   # SUBSET/SUPERSET OF ABOVE ALMOST EQUAL TO
+        "\x{2ACB}"  => "\x{2ACC}",   # SUBSET/SUPERSET OF ABOVE NOT EQUAL TO
+        "\x{2ACF}"  => "\x{2AD0}",   # CLOSED SUBSET/SUPERSET
+        "\x{2AD1}"  => "\x{2AD2}",   # CLOSED SUBSET/SUPERSET OR EQUAL TO
+        "\x{2AD5}"  => "\x{2AD6}",   # SUBSET/SUPERSET ABOVE SUBSET/SUPERSET
+        "\x{2AE5}"  => "\x{22AB}",   # DOUBLE VERTICAL BAR DOUBLE LEFT/RIGHT TURNSTILE
+        "\x{2AF7}"  => "\x{2AF8}",   # TRIPLE NESTED LESS-THAN/GREATER-THAN
+        "\x{2AF9}"  => "\x{2AFA}",   # DOUBLE-LINE SLANTED LESS-THAN/GREATER-THAN OR EQUAL TO
+        "\x{2B46}"  => "\x{2B45}",   # RIGHT/LEFTWARDS QUADRUPLE ARROW
+        "\x{2B47}"  => "\x{2B49}",   # REVERSE TILDE OPERATOR ABOVE RIGHTWARDS ARROW, TILDE OPERATOR ABOVE LEFTWARDS ARROW
+        "\x{2B48}"  => "\x{2B4A}",   # RIGHTWARDS ARROW ABOVE REVERSE ALMOST EQUAL TO,  LEFTWARDS ARROW ABOVE ALMOST EQUAL TO
+        "\x{2B4C}"  => "\x{2973}",   # RIGHTWARDS ARROW ABOVE REVERSE TILDE OPERATOR, LEFTWARDS ARROW ABOVE TILDE OPERATOR
+        "\x{2B62}"  => "\x{2B60}",   # RIGHT/LEFTWARDS TRIANGLE-HEADED ARROW
+        "\x{2B6C}"  => "\x{2B6A}",   # RIGHT/LEFTWARDS TRIANGLE-HEADED DASHED ARROW
+        "\x{2B72}"  => "\x{2B70}",   # RIGHT/LEFTWARDS TRIANGLE-HEADED ARROW TO BAR
+        "\x{2B7C}"  => "\x{2B7A}",   # RIGHT/LEFTWARDS TRIANGLE-HEADED ARROW WITH DOUBLE VERTICAL STROKE
+        "\x{2B86}"  => "\x{2B84}",   # RIGHT/LEFTWARDS TRIANGLE-HEADED PAIRED ARROWS
+        "\x{2B8A}"  => "\x{2B88}",   # RIGHT/LEFTWARDS BLACK CIRCLED WHITE ARROW
+        "\x{2B95}"  => "\x{2B05}",   # RIGHT/LEFTWARDS BLACK ARROW
+        "\x{2B9A}"  => "\x{2B98}",   # THREE-D TOP-LIGHTED RIGHT/LEFTWARDS EQUILATERAL ARROWHEAD
+        "\x{2B9E}"  => "\x{2B9C}",   # BLACK RIGHT/LEFTWARDS EQUILATERAL ARROWHEAD
+        "\x{2BA1}"  => "\x{2BA0}",   # DOWNWARDS TRIANGLE-HEADED ARROW WITH LONG TIP RIGHT/LEFTWARDS
+        "\x{2BA3}"  => "\x{2BA2}",   # UPWARDS TRIANGLE-HEADED ARROW WITH LONG TIP RIGHT/LEFTWARDS
+        "\x{2BA9}"  => "\x{2BA8}",   # BLACK CURVED DOWNWARDS AND RIGHT/LEFTWARDS ARROW
+        "\x{2BAB}"  => "\x{2BAA}",   # BLACK CURVED UPWARDS AND RIGHT/LEFTWARDS ARROW
+        "\x{2BB1}"  => "\x{2BB0}",   # RIBBON ARROW DOWN RIGHT/LEFT
+        "\x{2BB3}"  => "\x{2BB2}",   # RIBBON ARROW UP RIGHT/LEFT
+        "\x{2BEE}"  => "\x{2BEC}",   # RIGHT/LEFTWARDS TWO-HEADED ARROW WITH TRIANGLE ARROWHEADS
+        "\x{2E02}"  => "\x{2E03}",   # LEFT/RIGHT SUBSTITUTION BRACKET
+        "\x{2E03}"  => "\x{2E02}",   # RIGHT/LEFT SUBSTITUTION BRACKET
+        "\x{2E04}"  => "\x{2E05}",   # LEFT/RIGHT DOTTED SUBSTITUTION BRACKET
+        "\x{2E05}"  => "\x{2E04}",   # RIGHT/LEFT DOTTED SUBSTITUTION BRACKET
+        "\x{2E09}"  => "\x{2E0A}",   # LEFT/RIGHT TRANSPOSITION BRACKET
+        "\x{2E0A}"  => "\x{2E09}",   # RIGHT/LEFT TRANSPOSITION BRACKET
+        "\x{2E0C}"  => "\x{2E0D}",   # LEFT/RIGHT RAISED OMISSION BRACKET
+        "\x{2E0D}"  => "\x{2E0C}",   # RIGHT/LEFT RAISED OMISSION BRACKET
+        "\x{2E11}"  => "\x{2E10}",   # REVERSED FORKED PARAGRAPHOS,  FORKED PARAGRAPHOS
+        "\x{2E1C}"  => "\x{2E1D}",   # LEFT/RIGHT LOW PARAPHRASE BRACKET
+        "\x{2E1D}"  => "\x{2E1C}",   # RIGHT/LEFT LOW PARAPHRASE BRACKET
+        "\x{2E20}"  => "\x{2E21}",   # LEFT/RIGHT VERTICAL BAR WITH QUILL
+        "\x{2E21}"  => "\x{2E20}",   # RIGHT/LEFT VERTICAL BAR WITH QUILL
+        "\x{2E22}"  => "\x{2E23}",   # TOP LEFT/RIGHT HALF BRACKET
+        "\x{2E24}"  => "\x{2E25}",   # BOTTOM LEFT/RIGHT HALF BRACKET
+        "\x{2E26}"  => "\x{2E27}",   # LEFT/RIGHT SIDEWAYS U BRACKET
+        "\x{2E28}"  => "\x{2E29}",   # LEFT/RIGHT DOUBLE PARENTHESIS
+        "\x{2E36}"  => "\x{2E37}",   # DAGGER WITH LEFT/RIGHT GUARD
+        "\x{2E42}"  => "\x{201E}",   # DOUBLE LOW-REVERSED-9 QUOTATION MARK,  DOUBLE LOW-9 QUOTATION MARK
+        "\x{2E55}"  => "\x{2E56}",   # LEFT/RIGHT SQUARE BRACKET WITH STROKE
+        "\x{2E57}"  => "\x{2E58}",   # LEFT/RIGHT SQUARE BRACKET WITH DOUBLE STROKE
+        "\x{2E59}"  => "\x{2E5A}",   # TOP HALF LEFT/RIGHT PARENTHESIS
+        "\x{2E5B}"  => "\x{2E5C}",   # BOTTOM HALF LEFT/RIGHT PARENTHESIS
+        "\x{3008}"  => "\x{3009}",   # LEFT/RIGHT ANGLE BRACKET
+        "\x{300A}"  => "\x{300B}",   # LEFT/RIGHT DOUBLE ANGLE BRACKET
+        "\x{300C}"  => "\x{300D}",   # LEFT/RIGHT CORNER BRACKET
+        "\x{300E}"  => "\x{300F}",   # LEFT/RIGHT WHITE CORNER BRACKET
+        "\x{3010}"  => "\x{3011}",   # LEFT/RIGHT BLACK LENTICULAR BRACKET
+        "\x{3014}"  => "\x{3015}",   # LEFT/RIGHT TORTOISE SHELL BRACKET
+        "\x{3016}"  => "\x{3017}",   # LEFT/RIGHT WHITE LENTICULAR BRACKET
+        "\x{3018}"  => "\x{3019}",   # LEFT/RIGHT WHITE TORTOISE SHELL BRACKET
+        "\x{301A}"  => "\x{301B}",   # LEFT/RIGHT WHITE SQUARE BRACKET
+        "\x{301D}"  => "\x{301E}",   # REVERSED DOUBLE PRIME QUOTATION MARK,  DOUBLE PRIME QUOTATION MARK
+        "\x{A9C1}"  => "\x{A9C2}",   # JAVANESE LEFT/RIGHT RERENGGAN
+        "\x{FD3E}"  => "\x{FD3F}",   # ORNATE LEFT/RIGHT PARENTHESIS
+        "\x{FE59}"  => "\x{FE5A}",   # SMALL LEFT/RIGHT PARENTHESIS
+        "\x{FE5B}"  => "\x{FE5C}",   # SMALL LEFT/RIGHT CURLY BRACKET
+        "\x{FE5D}"  => "\x{FE5E}",   # SMALL LEFT/RIGHT TORTOISE SHELL BRACKET
+        "\x{FE64}"  => "\x{FE65}",   # SMALL LESS-THAN/GREATER-THAN SIGN
+        "\x{FF08}"  => "\x{FF09}",   # FULLWIDTH LEFT/RIGHT PARENTHESIS
+        "\x{FF1C}"  => "\x{FF1E}",   # FULLWIDTH LESS-THAN/GREATER-THAN SIGN
+        "\x{FF3B}"  => "\x{FF3D}",   # FULLWIDTH LEFT/RIGHT SQUARE BRACKET
+        "\x{FF5B}"  => "\x{FF5D}",   # FULLWIDTH LEFT/RIGHT CURLY BRACKET
+        "\x{FF5F}"  => "\x{FF60}",   # FULLWIDTH LEFT/RIGHT WHITE PARENTHESIS
+        "\x{FF62}"  => "\x{FF63}",   # HALFWIDTH LEFT/RIGHT CORNER BRACKET
+        "\x{FFEB}"  => "\x{FFE9}",   # HALFWIDTH RIGHT/LEFTWARDS ARROW
+        "\x{1D103}" => "\x{1D102}",   # MUSICAL SYMBOL REVERSE FINAL BARLINE,  MUSICAL SYMBOL FINAL BARLINE
+        "\x{1D106}" => "\x{1D107}",   # MUSICAL SYMBOL LEFT/RIGHT REPEAT SIGN
+        "\x{1F449}" => "\x{1F448}",   # WHITE RIGHT/LEFT POINTING BACKHAND INDEX
+        "\x{1F508}" => "\x{1F568}",   # SPEAKER,  RIGHT SPEAKER
+        "\x{1F509}" => "\x{1F569}",   # SPEAKER WITH ONE SOUND WAVE,  RIGHT SPEAKER WITH ONE SOUND WAVE
+        "\x{1F50A}" => "\x{1F56A}",   # SPEAKER WITH THREE SOUND WAVES,  RIGHT SPEAKER WITH THREE SOUND WAVES
+        "\x{1F57B}" => "\x{1F57D}",   # LEFT/RIGHT HAND TELEPHONE RECEIVER
+        "\x{1F599}" => "\x{1F598}",   # SIDEWAYS WHITE RIGHT/LEFT POINTING INDEX
+        "\x{1F59B}" => "\x{1F59A}",   # SIDEWAYS BLACK RIGHT/LEFT POINTING INDEX
+        "\x{1F59D}" => "\x{1F59C}",   # BLACK RIGHT/LEFT POINTING BACKHAND INDEX
+        "\x{1F5E6}" => "\x{1F5E7}",   # THREE RAYS LEFT/RIGHT
+        "\x{1F802}" => "\x{1F800}",   # RIGHT/LEFTWARDS ARROW WITH SMALL TRIANGLE ARROWHEAD
+        "\x{1F806}" => "\x{1F804}",   # RIGHT/LEFTWARDS ARROW WITH MEDIUM TRIANGLE ARROWHEAD
+        "\x{1F80A}" => "\x{1F808}",   # RIGHT/LEFTWARDS ARROW WITH LARGE TRIANGLE ARROWHEAD
+        "\x{1F812}" => "\x{1F810}",   # RIGHT/LEFTWARDS ARROW WITH SMALL EQUILATERAL ARROWHEAD
+        "\x{1F816}" => "\x{1F814}",   # RIGHT/LEFTWARDS ARROW WITH EQUILATERAL ARROWHEAD
+        "\x{1F81A}" => "\x{1F818}",   # HEAVY RIGHT/LEFTWARDS ARROW WITH EQUILATERAL ARROWHEAD
+        "\x{1F81E}" => "\x{1F81C}",   # HEAVY RIGHT/LEFTWARDS ARROW WITH LARGE EQUILATERAL ARROWHEAD
+        "\x{1F822}" => "\x{1F820}",   # RIGHT/LEFTWARDS TRIANGLE-HEADED ARROW WITH NARROW SHAFT
+        "\x{1F826}" => "\x{1F824}",   # RIGHT/LEFTWARDS TRIANGLE-HEADED ARROW WITH MEDIUM SHAFT
+        "\x{1F82A}" => "\x{1F828}",   # RIGHT/LEFTWARDS TRIANGLE-HEADED ARROW WITH BOLD SHAFT
+        "\x{1F82E}" => "\x{1F82C}",   # RIGHT/LEFTWARDS TRIANGLE-HEADED ARROW WITH HEAVY SHAFT
+        "\x{1F832}" => "\x{1F830}",   # RIGHT/LEFTWARDS TRIANGLE-HEADED ARROW WITH VERY HEAVY SHAFT
+        "\x{1F836}" => "\x{1F834}",   # RIGHT/LEFTWARDS FINGER-POST ARROW
+        "\x{1F83A}" => "\x{1F838}",   # RIGHT/LEFTWARDS SQUARED ARROW
+        "\x{1F83E}" => "\x{1F83C}",   # RIGHT/LEFTWARDS COMPRESSED ARROW
+        "\x{1F842}" => "\x{1F840}",   # RIGHT/LEFTWARDS HEAVY COMPRESSED ARROW
+        "\x{1F846}" => "\x{1F844}",   # RIGHT/LEFTWARDS HEAVY ARROW
+        "\x{1F852}" => "\x{1F850}",   # RIGHT/LEFTWARDS SANS-SERIF ARROW
+        "\x{1F862}" => "\x{1F860}",   # WIDE-HEADED RIGHT/LEFTWARDS LIGHT BARB ARROW
+        "\x{1F86A}" => "\x{1F868}",   # WIDE-HEADED RIGHT/LEFTWARDS BARB ARROW
+        "\x{1F872}" => "\x{1F870}",   # WIDE-HEADED RIGHT/LEFTWARDS MEDIUM BARB ARROW
+        "\x{1F87A}" => "\x{1F878}",   # WIDE-HEADED RIGHT/LEFTWARDS HEAVY BARB ARROW
+        "\x{1F882}" => "\x{1F880}",   # WIDE-HEADED RIGHT/LEFTWARDS VERY HEAVY BARB ARROW
+        "\x{1F892}" => "\x{1F890}",   # RIGHT/LEFTWARDS TRIANGLE ARROWHEAD
+        "\x{1F896}" => "\x{1F894}",   # RIGHT/LEFTWARDS WHITE ARROW WITHIN TRIANGLE ARROWHEAD
+        "\x{1F89A}" => "\x{1F898}",   # RIGHT/LEFTWARDS ARROW WITH NOTCHED TAIL
+        "\x{1F8A1}" => "\x{1F8A0}",   # RIGHTWARDS BOTTOM SHADED WHITE ARROW, LEFTWARDS BOTTOM-SHADED WHITE ARROW
+        "\x{1F8A3}" => "\x{1F8A2}",   # RIGHT/LEFTWARDS TOP SHADED WHITE ARROW
+        "\x{1F8A5}" => "\x{1F8A6}",   # RIGHT/LEFTWARDS RIGHT-SHADED WHITE ARROW
+        "\x{1F8A7}" => "\x{1F8A4}",   # RIGHT/LEFTWARDS LEFT-SHADED WHITE ARROW
+        "\x{1F8A9}" => "\x{1F8A8}",   # RIGHT/LEFTWARDS BACK-TILTED SHADOWED WHITE ARROW
+        "\x{1F8AB}" => "\x{1F8AA}",   # RIGHT/LEFTWARDS FRONT-TILTED SHADOWED WHITE ARROW
+    );
+}
 
 sub decomment {
     if ($] >= 5.014 && $] < 5.016) { _croak( "PPR::X::decomment() does not work under Perl 5.14" )}
@@ -2012,16 +2700,19 @@ sub _croak {
 }
 
 sub _report {
-    state $BUFFER = q{ } x 10;
+    state $CONTEXT_WIDTH = 20;
+    state $BUFFER = q{ } x $CONTEXT_WIDTH;
     state $depth = 0;
     my ($msg, $increment) = @_;
     $depth++ if $increment;
     my $at = pos();
     my $str = $BUFFER . $_ . $BUFFER;
-    my $pre  = substr($str, $at,    10);
-    my $post = substr($str, $at+10, 10);
+    my $pre  = substr($str, $at,                $CONTEXT_WIDTH);
+    my $post = substr($str, $at+$CONTEXT_WIDTH, $CONTEXT_WIDTH);
     tr/\n/ / for $pre, $post;
-    warn sprintf("%10s|%-10s|  %s%s\n", $pre, $post, q{ } x $depth, $msg);
+    no warnings 'utf8';
+    warn sprintf("%05d ⎜%*s⎜%-*s⎜  %s%s\n",
+        $at, $CONTEXT_WIDTH, $pre, $CONTEXT_WIDTH, $post, q{ } x $depth, $msg);
     $depth-- if !$increment;
 }
 
@@ -2036,7 +2727,7 @@ PPR::X - Pattern-based Perl Recognizer
 
 =head1 VERSION
 
-This document describes PPR::X version 0.000027
+This document describes PPR::X version 0.001001
 
 
 =head1 SYNOPSIS
@@ -2530,6 +3221,86 @@ Matches a C<do>-block expression.
 Matches a C<eval>-block expression.
 
 
+=head3 C<< (?&PerlTryCatchFinallyBlock) >>
+
+Matches an C<try> block, followed by an option C<catch> block,
+followed by an optional C<finally> block, using the built-in
+syntax introduced in Perl v5.34 and v5.36.
+
+Note that if your code uses one of the many CPAN modules
+(such as C<Try::Tiny> or C<TryCatch>) that provided try/catch behaviours
+prior to Perl v5.34, then you will most likely need to override
+this subrule to match the alternate C<try>/C<catch> syntax
+provided by your preferred module.
+
+For example, if your code uses the C<TryCatch> module, you would
+need to alter the PPR::X parser by explicitly redefining the subrule
+for C<try> blocks, with something like:
+
+    my $MATCH_A_PERL_DOCUMENT = qr{
+
+        \A (?&PerlEntireDocument) \Z
+
+        (?(DEFINE)
+            # Redefine this subrule to match TryCatch syntax...
+            (?<PerlTryCatchFinallyBlock>
+                    try                                  (?>(?&PerlOWS))
+                    (?>(?&PerlBlock))
+                (?:                                      (?>(?&PerlOWS))
+                    catch                                (?>(?&PerlOWS))
+                (?: \( (?>(?&PPR_X_balanced_parens)) \)    (?>(?&PerlOWS))  )?+
+                    (?>(?&PerlBlock))
+                )*+
+            )
+        )
+
+        $PPR::X::GRAMMAR
+    }xms;
+
+Note that the popular C<Try::Tiny> module actually implements C<try>/C<catch>
+as a normally parsed Perl subroutine call expression, rather than a statement.
+This means that the unmodified PPR::X grammar can successfully parse all the
+module's constructs.
+
+However, the unmodified PPR::X grammar may misclassify some C<Try::Tiny> usages
+as being built-in Perl v5.36 C<try> blocks followed by an unrelated call to
+the C<catch> subroutine, rather than identifying the C<try> and C<catch> as
+a single expression containing two subroutine calls.
+
+If that difference in interpretation matters to you, you can deactivate
+the built-in Perl v5.36 C<try>/C<catch> syntax entirely, like so:
+
+    my $MATCH_A_PERL_DOCUMENT = qr{
+        \A (?&PerlEntireDocument) \Z
+
+        (?(DEFINE)
+            # Turn off built-in try/catch syntax...
+            (?<PerlTryCatchFinallyBlock>   (?!)  )
+
+            # Decanonize 'try' and 'catch' as reserved words ineligible for sub names...
+            (?<PPR_X_X_non_reserved_identifier>
+                (?! (?> for(?:each)?+ | while   | if    | unless | until | given | when   | default
+                    |   sub | format  | use     | no    | my     | our   | state  | defer | finally
+                    # Note: Removed 'try' and 'catch' which appear here in the original subrule
+                    |   (?&PPR_X_X_named_op)
+                    |   [msy] | q[wrxq]?+ | tr
+                    |   __ (?> END | DATA ) __
+                    )
+                    \b
+                )
+                (?>(?&PerlQualifiedIdentifier))
+                (?! :: )
+            )
+
+        )
+
+        $PPR::X::GRAMMAR
+    }xms;
+
+For more details and options for modifying PPR::X grammars in this way,
+see also the documentation of the C<PPR_X> module.
+
+
 =head3 C<< (?&PerlStatementModifier) >>
 
 Matches an C<if>, C<unless>, C<while>, C<until>, C<for>, or C<foreach>
@@ -2551,7 +3322,7 @@ Matches a C<{>...C<}>-delimited block containing zero-or-more statements.
 
 =head3 C<< (?&PerlCall) >>
 
-Matches a class to a subroutine or built-in function.
+Matches a call to a subroutine or built-in function.
 Accepts all valid call syntaxes,
 either via a literal names or a reference,
 with or without a leading C<&>,

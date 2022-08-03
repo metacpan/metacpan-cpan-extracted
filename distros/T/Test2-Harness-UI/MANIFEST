@@ -56,6 +56,7 @@ lib/Test2/Harness/UI/Schema/MySQL/CoverageManager.pm
 lib/Test2/Harness/UI/Schema/MySQL/Email.pm
 lib/Test2/Harness/UI/Schema/MySQL/EmailVerificationCode.pm
 lib/Test2/Harness/UI/Schema/MySQL/Event.pm
+lib/Test2/Harness/UI/Schema/MySQL/Host.pm
 lib/Test2/Harness/UI/Schema/MySQL/Job.pm
 lib/Test2/Harness/UI/Schema/MySQL/JobField.pm
 lib/Test2/Harness/UI/Schema/MySQL/LogFile.pm
@@ -78,6 +79,7 @@ lib/Test2/Harness/UI/Schema/MySQL56/CoverageManager.pm
 lib/Test2/Harness/UI/Schema/MySQL56/Email.pm
 lib/Test2/Harness/UI/Schema/MySQL56/EmailVerificationCode.pm
 lib/Test2/Harness/UI/Schema/MySQL56/Event.pm
+lib/Test2/Harness/UI/Schema/MySQL56/Host.pm
 lib/Test2/Harness/UI/Schema/MySQL56/Job.pm
 lib/Test2/Harness/UI/Schema/MySQL56/JobField.pm
 lib/Test2/Harness/UI/Schema/MySQL56/LogFile.pm
@@ -99,6 +101,7 @@ lib/Test2/Harness/UI/Schema/Overlay/CoverageManager.pm
 lib/Test2/Harness/UI/Schema/Overlay/Email.pm
 lib/Test2/Harness/UI/Schema/Overlay/EmailVerificationCode.pm
 lib/Test2/Harness/UI/Schema/Overlay/Event.pm
+lib/Test2/Harness/UI/Schema/Overlay/Host.pm
 lib/Test2/Harness/UI/Schema/Overlay/Job.pm
 lib/Test2/Harness/UI/Schema/Overlay/JobField.pm
 lib/Test2/Harness/UI/Schema/Overlay/LogFile.pm
@@ -121,6 +124,7 @@ lib/Test2/Harness/UI/Schema/PostgreSQL/CoverageManager.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/Email.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/EmailVerificationCode.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/Event.pm
+lib/Test2/Harness/UI/Schema/PostgreSQL/Host.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/Job.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/JobField.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/LogFile.pm
@@ -142,6 +146,7 @@ lib/Test2/Harness/UI/Schema/Result/CoverageManager.pm
 lib/Test2/Harness/UI/Schema/Result/Email.pm
 lib/Test2/Harness/UI/Schema/Result/EmailVerificationCode.pm
 lib/Test2/Harness/UI/Schema/Result/Event.pm
+lib/Test2/Harness/UI/Schema/Result/Host.pm
 lib/Test2/Harness/UI/Schema/Result/Job.pm
 lib/Test2/Harness/UI/Schema/Result/JobField.pm
 lib/Test2/Harness/UI/Schema/Result/LogFile.pm

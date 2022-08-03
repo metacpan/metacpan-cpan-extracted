@@ -10,7 +10,7 @@ class FloatList {
   has capacity : int;
   
   # Class methods
-  static method new : FloatList ($array : float[]...) {
+  static method new : FloatList ($array = undef : float[]) {
     my $self = new FloatList;
     
     my $length : int;
@@ -180,10 +180,10 @@ class FloatList {
     
     if ($new_length > $length) {
       $self->_maybe_extend($new_length);
-      Array->memset_float($self->{values}, $length, 0, $new_length - $length);
+      Array->memset_float($self->{values}, 0, $length, $new_length - $length);
     }
     elsif ($new_length < $length) {
-      Array->memset_float($self->{values}, $new_length, 0, $length - $new_length);
+      Array->memset_float($self->{values}, 0, $new_length, $length - $new_length);
     }
     
     $self->{length} = $new_length;

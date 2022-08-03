@@ -31,14 +31,6 @@ class TestCase::Module::Array {
       }
     }
     
-    # Array is undef
-    {
-      my $output = Array->copy_byte(undef);
-      unless ($output == undef) {
-        return 0;
-      }
-    }
-    
     return 1;
   }
   
@@ -65,14 +57,6 @@ class TestCase::Module::Array {
       }
       
       unless (@$array_out == 3) {
-        return 0;
-      }
-    }
-    
-    # Array is undef
-    {
-      my $output = Array->copy_double(undef);
-      unless ($output == undef) {
         return 0;
       }
     }
@@ -107,14 +91,6 @@ class TestCase::Module::Array {
       }
     }
     
-    # Array is undef
-    {
-      my $output = Array->copy_float(undef);
-      unless ($output == undef) {
-        return 0;
-      }
-    }
-    
     return 1;
   }
   
@@ -145,14 +121,6 @@ class TestCase::Module::Array {
       }
     }
     
-    # Array is undef
-    {
-      my $output = Array->copy_int(undef);
-      unless ($output == undef) {
-        return 0;
-      }
-    }
-    
     return 1;
   }
   
@@ -179,14 +147,6 @@ class TestCase::Module::Array {
       }
       
       unless (@$array_out == 3) {
-        return 0;
-      }
-    }
-    
-    # Array is undef
-    {
-      my $output = Array->copy_long(undef);
-      unless ($output == undef) {
         return 0;
       }
     }
@@ -289,6 +249,13 @@ class TestCase::Module::Array {
       }
     }
     
+    {
+      my $range = Array->copy_range_byte([(byte)5, -7, 9], 1, -1);
+      unless (Array->equals_byte($range, [(byte)-7, 9])) {
+        return 0;
+      }
+    }
+    
     # Exception
     {
       {
@@ -306,13 +273,6 @@ class TestCase::Module::Array {
       }
       
       {
-        eval { Array->copy_range_byte([(byte)5, -7, 9], 0, -1); };
-        unless (Fn->contains($@, "The length must be greater than or equal to 0")) {
-          return 0;
-        }
-      }
-      
-      {
         eval { Array->copy_range_byte([(byte)5, -7, 9], 2, 2); };
         unless (Fn->contains($@, "The offset + the length specified by the argument must be less than or equal to the length of the array")) {
           return 0;
@@ -322,6 +282,7 @@ class TestCase::Module::Array {
     
     return 1;
   }
+  
   static method copy_range_double : int () {
     {
       my $array = [(double)5, -7, 9, Fn->DOUBLE_MIN(), 127, 15, 19];
@@ -330,10 +291,18 @@ class TestCase::Module::Array {
         return 0;
       }
     }
+    
     {
       my $array = [(double)5, -7, 9, Fn->DOUBLE_MIN(), 127, 15, 19];
       my $range = Array->copy_range_double($array, 1, 3);
       unless (Array->equals_double($range, [(double)-7, 9, Fn->DOUBLE_MIN()])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $range = Array->copy_range_double([(double)5, -7, 9], 1, -1);
+      unless (Array->equals_double($range, [(double)-7, 9])) {
         return 0;
       }
     }
@@ -350,13 +319,6 @@ class TestCase::Module::Array {
       {
         eval { Array->copy_range_double([(double)5, -7, 9], -1, 1); };
         unless (Fn->contains($@, "The offset must be greater than or equal to 0")) {
-          return 0;
-        }
-      }
-      
-      {
-        eval { Array->copy_range_double([(double)5, -7, 9], 0, -1); };
-        unless (Fn->contains($@, "The length must be greater than or equal to 0")) {
           return 0;
         }
       }
@@ -380,10 +342,18 @@ class TestCase::Module::Array {
         return 0;
       }
     }
+    
     {
       my $array = [(float)5, -7, 9, Fn->FLOAT_MIN(), 127, 15, 19];
       my $range = Array->copy_range_float($array, 1, 3);
       unless (Array->equals_float($range, [(float)-7, 9, Fn->FLOAT_MIN()])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $range = Array->copy_range_float([(float)5, -7, 9], 1, -1);
+      unless (Array->equals_float($range, [(float)-7, 9])) {
         return 0;
       }
     }
@@ -400,13 +370,6 @@ class TestCase::Module::Array {
       {
         eval { Array->copy_range_float([(float)5, -7, 9], -1, 1); };
         unless (Fn->contains($@, "The offset must be greater than or equal to 0")) {
-          return 0;
-        }
-      }
-      
-      {
-        eval { Array->copy_range_float([(float)5, -7, 9], 0, -1); };
-        unless (Fn->contains($@, "The length must be greater than or equal to 0")) {
           return 0;
         }
       }
@@ -430,10 +393,18 @@ class TestCase::Module::Array {
         return 0;
       }
     }
+    
     {
       my $array = [(int)5, -7, 9, Fn->INT_MIN(), 127, 15, 19];
       my $range = Array->copy_range_int($array, 1, 3);
       unless (Array->equals_int($range, [(int)-7, 9, Fn->INT_MIN()])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $range = Array->copy_range_int([(int)5, -7, 9], 1, -1);
+      unless (Array->equals_int($range, [(int)-7, 9])) {
         return 0;
       }
     }
@@ -455,13 +426,6 @@ class TestCase::Module::Array {
       }
       
       {
-        eval { Array->copy_range_int([(int)5, -7, 9], 0, -1); };
-        unless (Fn->contains($@, "The length must be greater than or equal to 0")) {
-          return 0;
-        }
-      }
-      
-      {
         eval { Array->copy_range_int([(int)5, -7, 9], 2, 2); };
         unless (Fn->contains($@, "The offset + the length specified by the argument must be less than or equal to the length of the array")) {
           return 0;
@@ -471,6 +435,7 @@ class TestCase::Module::Array {
     
     return 1;
   }
+  
   static method copy_range_long : int () {
     {
       my $array = [(long)5, -7, 9, Fn->LONG_MIN(), 127, 15, 19];
@@ -479,10 +444,18 @@ class TestCase::Module::Array {
         return 0;
       }
     }
+    
     {
       my $array = [(long)5, -7, 9, Fn->LONG_MIN(), 127, 15, 19];
       my $range = Array->copy_range_long($array, 1, 3);
       unless (Array->equals_long($range, [(long)-7, 9, Fn->LONG_MIN()])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $range = Array->copy_range_long([(long)5, -7, 9], 1, -1);
+      unless (Array->equals_long($range, [(long)-7, 9])) {
         return 0;
       }
     }
@@ -504,13 +477,6 @@ class TestCase::Module::Array {
       }
       
       {
-        eval { Array->copy_range_long([(long)5, -7, 9], 0, -1); };
-        unless (Fn->contains($@, "The length must be greater than or equal to 0")) {
-          return 0;
-        }
-      }
-      
-      {
         eval { Array->copy_range_long([(long)5, -7, 9], 2, 2); };
         unless (Fn->contains($@, "The offset + the length specified by the argument must be less than or equal to the length of the array")) {
           return 0;
@@ -520,6 +486,7 @@ class TestCase::Module::Array {
     
     return 1;
   }
+  
   static method copy_range_object : int () {
 
     {
@@ -541,11 +508,24 @@ class TestCase::Module::Array {
       my $minimal4 = TestCase::Minimal->new;
 
       my $array = [$minimal1, $minimal2, $minimal3, $minimal4];
+      my $range = (TestCase::Minimal[])Array->copy_range_object($array, 0, -1, undef);
+      unless (Array->equals_object($range, [$minimal1, $minimal2, $minimal3, $minimal4], EqualityChecker::Address->new)) {
+        return 0;
+      }
+    }
+    {
+      my $minimal1 = TestCase::Minimal->new;
+      my $minimal2 = TestCase::Minimal->new;
+      my $minimal3 = TestCase::Minimal->new;
+      my $minimal4 = TestCase::Minimal->new;
+
+      my $array = [$minimal1, $minimal2, $minimal3, $minimal4];
       my $range = (TestCase::Minimal[])Array->copy_range_object($array, 1, 2, undef);
       unless (Array->equals_object($range, [$minimal2, $minimal3], EqualityChecker::Address->new)) {
         return 0;
       }
     }
+
 
     # Exception
     {
@@ -559,13 +539,6 @@ class TestCase::Module::Array {
       {
         eval { Array->copy_range_object([(object)5, -7, 9], -1, 1, undef); };
         unless (Fn->contains($@, "The offset must be greater than or equal to 0")) {
-          return 0;
-        }
-      }
-      
-      {
-        eval { Array->copy_range_object([(object)5, -7, 9], 0, -1, undef); };
-        unless (Fn->contains($@, "The length must be greater than or equal to 0")) {
           return 0;
         }
       }
@@ -602,6 +575,18 @@ class TestCase::Module::Array {
       my $minimal4 = TestCase::Minimal->new;
 
       my $array = [$minimal1, $minimal2, $minimal3, $minimal4];
+      my $range = (TestCase::Minimal[])Array->copy_range_object_address($array, 0, -1);
+      unless (Array->equals_object($range, [$minimal1, $minimal2, $minimal3, $minimal4], EqualityChecker::Address->new)) {
+        return 0;
+      }
+    }
+    {
+      my $minimal1 = TestCase::Minimal->new;
+      my $minimal2 = TestCase::Minimal->new;
+      my $minimal3 = TestCase::Minimal->new;
+      my $minimal4 = TestCase::Minimal->new;
+
+      my $array = [$minimal1, $minimal2, $minimal3, $minimal4];
       my $range = (TestCase::Minimal[])Array->copy_range_object_address($array, 1, 2);
       unless (Array->equals_object($range, [$minimal2, $minimal3], EqualityChecker::Address->new)) {
         return 0;
@@ -625,23 +610,16 @@ class TestCase::Module::Array {
       }
       
       {
-        eval { Array->copy_range_object_address([(object)5, -7, 9], 0, -1); };
-        unless (Fn->contains($@, "The length must be greater than or equal to 0")) {
-          return 0;
-        }
-      }
-      
-      {
         eval { Array->copy_range_object_address([(object)5, -7, 9], 2, 2); };
         unless (Fn->contains($@, "The offset + the length specified by the argument must be less than or equal to the length of the array")) {
           return 0;
         }
       }
     }
-
+    
     return 1;
   }
-
+  
   static method copy_range_short : int () {
     {
       my $array = [(short)5, -7, 9, Fn->SHORT_MIN(), 127, 15, 19];
@@ -650,10 +628,18 @@ class TestCase::Module::Array {
         return 0;
       }
     }
+    
     {
       my $array = [(short)5, -7, 9, Fn->SHORT_MIN(), 127, 15, 19];
       my $range = Array->copy_range_short($array, 1, 3);
       unless (Array->equals_short($range, [(short)-7, 9, Fn->SHORT_MIN()])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $range = Array->copy_range_short([(short)5, -7, 9], 1, -1);
+      unless (Array->equals_short($range, [(short)-7, 9])) {
         return 0;
       }
     }
@@ -675,13 +661,6 @@ class TestCase::Module::Array {
       }
       
       {
-        eval { Array->copy_range_short([(short)5, -7, 9], 0, -1); };
-        unless (Fn->contains($@, "The length must be greater than or equal to 0")) {
-          return 0;
-        }
-      }
-      
-      {
         eval { Array->copy_range_short([(short)5, -7, 9], 2, 2); };
         unless (Fn->contains($@, "The offset + the length specified by the argument must be less than or equal to the length of the array")) {
           return 0;
@@ -691,11 +670,23 @@ class TestCase::Module::Array {
     
     return 1;
   }
+  
   static method copy_range_string : int () {
     {
       my $value0 = "a";
       my $array = [$value0, "b", "c", "d", "e", "f", "g"];
       my $range = Array->copy_range_string($array, 0, 7);
+      unless ($value0 != $range->[0]) {
+        return 0;
+      }
+      unless (Array->equals_string($range, [$value0, "b", "c", "d", "e", "f", "g"])) {
+        return 0;
+      }
+    }
+    {
+      my $value0 = "a";
+      my $array = [$value0, "b", "c", "d", "e", "f", "g"];
+      my $range = Array->copy_range_string($array, 0, -1);
       unless ($value0 != $range->[0]) {
         return 0;
       }
@@ -728,13 +719,6 @@ class TestCase::Module::Array {
       }
       
       {
-        eval { Array->copy_range_string([(string)5, -7, 9], 0, -1); };
-        unless (Fn->contains($@, "The length must be greater than or equal to 0")) {
-          return 0;
-        }
-      }
-      
-      {
         eval { Array->copy_range_string([(string)5, -7, 9], 2, 2); };
         unless (Fn->contains($@, "The offset + the length specified by the argument must be less than or equal to the length of the array")) {
           return 0;
@@ -750,6 +734,17 @@ class TestCase::Module::Array {
       my $value0 = "a";
       my $array = [$value0, "b", "c", "d", "e", "f", "g"];
       my $range = Array->copy_range_string_address($array, 0, 7);
+      unless ($value0 == $range->[0]) {
+        return 0;
+      }
+      unless (Array->equals_string($range, [$value0, "b", "c", "d", "e", "f", "g"])) {
+        return 0;
+      }
+    }
+    {
+      my $value0 = "a";
+      my $array = [$value0, "b", "c", "d", "e", "f", "g"];
+      my $range = Array->copy_range_string_address($array, 0, -1);
       unless ($value0 == $range->[0]) {
         return 0;
       }
@@ -777,13 +772,6 @@ class TestCase::Module::Array {
       {
         eval { Array->copy_range_string_address([(string)5, -7, 9], -1, 1); };
         unless (Fn->contains($@, "The offset must be greater than or equal to 0")) {
-          return 0;
-        }
-      }
-      
-      {
-        eval { Array->copy_range_string_address([(string)5, -7, 9], 0, -1); };
-        unless (Fn->contains($@, "The length must be greater than or equal to 0")) {
           return 0;
         }
       }
@@ -818,14 +806,6 @@ class TestCase::Module::Array {
       }
       
       unless (@$array_out == 3) {
-        return 0;
-      }
-    }
-    
-    # Array is undef
-    {
-      my $output = Array->copy_short(undef);
-      unless ($output == undef) {
         return 0;
       }
     }
@@ -870,14 +850,6 @@ class TestCase::Module::Array {
       }
     }
     
-    # Array is undef
-    {
-      my $output = Array->copy_string(undef);
-      unless ($output == undef) {
-        return 0;
-      }
-    }
-    
     return 1;
   }
   
@@ -902,14 +874,6 @@ class TestCase::Module::Array {
       }
       
       unless (@$array_out == 3) {
-        return 0;
-      }
-    }
-    
-    # Array is undef
-    {
-      my $output = Array->copy_string_address(undef);
-      unless ($output == undef) {
         return 0;
       }
     }
@@ -2145,9 +2109,9 @@ class TestCase::Module::Array {
     # Copy
     {
       my $dest = new object[4];
-      my $point0 = Point->new_xy(1, 1);
-      my $point1 = Point->new_xy(3, 3);
-      my $point2 = Point->new_xy(5, 5);
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(3, 3);
+      my $point2 = Point->new(5, 5);
       my $source = [$point0, $point1, $point2];
       Array->memcpy_object($dest, 0, $source, 0, 3);
       unless ($dest->[0] == $point0) {
@@ -2167,9 +2131,9 @@ class TestCase::Module::Array {
     # Copy with offset
     {
       my $dest = new object[4];
-      my $point0 = Point->new_xy(1, 1);
-      my $point1 = Point->new_xy(3, 3);
-      my $point2 = Point->new_xy(5, 5);
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(3, 3);
+      my $point2 = Point->new(5, 5);
       my $source = [$point0, $point1, $point2];
       Array->memcpy_object($dest, 1, $source, 0, 3);
       unless ($dest->[0] == undef) {
@@ -2189,9 +2153,9 @@ class TestCase::Module::Array {
     # Copy with offset and length
     {
       my $dest = new object[4];
-      my $point0 = Point->new_xy(1, 1);
-      my $point1 = Point->new_xy(3, 3);
-      my $point2 = Point->new_xy(5, 5);
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(3, 3);
+      my $point2 = Point->new(5, 5);
       my $source = [$point0, $point1, $point2];
       Array->memcpy_object($dest, 1, $source, 1, 2);
       unless ($dest->[0] == undef) {
@@ -2211,9 +2175,9 @@ class TestCase::Module::Array {
     # Copy with 0 length
     {
       my $dest = new object[4];
-      my $point0 = Point->new_xy(1, 1);
-      my $point1 = Point->new_xy(3, 3);
-      my $point2 = Point->new_xy(5, 5);
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(3, 3);
+      my $point2 = Point->new(5, 5);
       my $source = [$point0, $point1, $point2];
       Array->memcpy_object($dest, 0, $source, 0, 0);
       unless ($dest->[0] == undef) {
@@ -2237,9 +2201,9 @@ class TestCase::Module::Array {
     # Copy
     {
       my $dest = new object[4];
-      my $point0 = Point->new_xy(1, 1);
-      my $point1 = Point->new_xy(3, 3);
-      my $point2 = Point->new_xy(5, 5);
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(3, 3);
+      my $point2 = Point->new(5, 5);
       my $source = [$point0, $point1, $point2];
       Array->memcpy_object_address($dest, 0, $source, 0, 3);
       unless ($dest->[0] == $point0) {
@@ -2259,9 +2223,9 @@ class TestCase::Module::Array {
     # Copy with offset
     {
       my $dest = new object[4];
-      my $point0 = Point->new_xy(1, 1);
-      my $point1 = Point->new_xy(3, 3);
-      my $point2 = Point->new_xy(5, 5);
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(3, 3);
+      my $point2 = Point->new(5, 5);
       my $source = [$point0, $point1, $point2];
       Array->memcpy_object_address($dest, 1, $source, 0, 3);
       unless ($dest->[0] == undef) {
@@ -2281,9 +2245,9 @@ class TestCase::Module::Array {
     # Copy with offset and length
     {
       my $dest = new object[4];
-      my $point0 = Point->new_xy(1, 1);
-      my $point1 = Point->new_xy(3, 3);
-      my $point2 = Point->new_xy(5, 5);
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(3, 3);
+      my $point2 = Point->new(5, 5);
       my $source = [$point0, $point1, $point2];
       Array->memcpy_object_address($dest, 1, $source, 1, 2);
       unless ($dest->[0] == undef) {
@@ -2303,9 +2267,9 @@ class TestCase::Module::Array {
     # Copy with 0 length
     {
       my $dest = new object[4];
-      my $point0 = Point->new_xy(1, 1);
-      my $point1 = Point->new_xy(3, 3);
-      my $point2 = Point->new_xy(5, 5);
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(3, 3);
+      my $point2 = Point->new(5, 5);
       my $source = [$point0, $point1, $point2];
       Array->memcpy_object_address($dest, 0, $source, 0, 0);
       unless ($dest->[0] == undef) {
@@ -3326,9 +3290,9 @@ class TestCase::Module::Array {
     # Copy
     {
       my $dest = new object[4];
-      my $point0 = Point->new_xy(1, 1);
-      my $point1 = Point->new_xy(3, 3);
-      my $point2 = Point->new_xy(5, 5);
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(3, 3);
+      my $point2 = Point->new(5, 5);
       my $source = [$point0, $point1, $point2];
       Array->memmove_object($dest, 0, $source, 0, 3);
       unless ($dest->[0] == $point0) {
@@ -3348,9 +3312,9 @@ class TestCase::Module::Array {
     # Copy with offset
     {
       my $dest = new object[4];
-      my $point0 = Point->new_xy(1, 1);
-      my $point1 = Point->new_xy(3, 3);
-      my $point2 = Point->new_xy(5, 5);
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(3, 3);
+      my $point2 = Point->new(5, 5);
       my $source = [$point0, $point1, $point2];
       Array->memmove_object($dest, 1, $source, 0, 3);
       unless ($dest->[0] == undef) {
@@ -3370,9 +3334,9 @@ class TestCase::Module::Array {
     # Copy with offset and length
     {
       my $dest = new object[4];
-      my $point0 = Point->new_xy(1, 1);
-      my $point1 = Point->new_xy(3, 3);
-      my $point2 = Point->new_xy(5, 5);
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(3, 3);
+      my $point2 = Point->new(5, 5);
       my $source = [$point0, $point1, $point2];
       Array->memmove_object($dest, 1, $source, 1, 2);
       unless ($dest->[0] == undef) {
@@ -3392,9 +3356,9 @@ class TestCase::Module::Array {
     # Copy with 0 length
     {
       my $dest = new object[4];
-      my $point0 = Point->new_xy(1, 1);
-      my $point1 = Point->new_xy(3, 3);
-      my $point2 = Point->new_xy(5, 5);
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(3, 3);
+      my $point2 = Point->new(5, 5);
       my $source = [$point0, $point1, $point2];
       Array->memmove_object($dest, 0, $source, 0, 0);
       unless ($dest->[0] == undef) {
@@ -3413,10 +3377,10 @@ class TestCase::Module::Array {
 
     # Duplicate
     {
-      my $point0 = Point->new_xy(1, 1);
-      my $point1 = Point->new_xy(3, 3);
-      my $point2 = Point->new_xy(5, 5);
-      my $point3 = Point->new_xy(7, 7);
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(3, 3);
+      my $point2 = Point->new(5, 5);
+      my $point3 = Point->new(7, 7);
       my $dest = [$point0, $point1, $point2, $point3];
       Array->memmove_object($dest, 0, $dest, 1, 3);
       unless ($dest->[0] == $point1) {
@@ -3433,10 +3397,10 @@ class TestCase::Module::Array {
       }
     }
     {
-      my $point0 = Point->new_xy(1, 1);
-      my $point1 = Point->new_xy(3, 3);
-      my $point2 = Point->new_xy(5, 5);
-      my $point3 = Point->new_xy(7, 7);
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(3, 3);
+      my $point2 = Point->new(5, 5);
+      my $point3 = Point->new(7, 7);
       my $dest = [$point0, $point1, $point2, $point3];
       Array->memmove_object($dest, 1, $dest, 0, 3);
       unless ($dest->[0] == $point0) {
@@ -3461,9 +3425,9 @@ class TestCase::Module::Array {
     # Copy
     {
       my $dest = new object[4];
-      my $point0 = Point->new_xy(1, 1);
-      my $point1 = Point->new_xy(3, 3);
-      my $point2 = Point->new_xy(5, 5);
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(3, 3);
+      my $point2 = Point->new(5, 5);
       my $source = [$point0, $point1, $point2];
       Array->memmove_object_address($dest, 0, $source, 0, 3);
       unless ($dest->[0] == $point0) {
@@ -3483,9 +3447,9 @@ class TestCase::Module::Array {
     # Copy with offset
     {
       my $dest = new object[4];
-      my $point0 = Point->new_xy(1, 1);
-      my $point1 = Point->new_xy(3, 3);
-      my $point2 = Point->new_xy(5, 5);
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(3, 3);
+      my $point2 = Point->new(5, 5);
       my $source = [$point0, $point1, $point2];
       Array->memmove_object_address($dest, 1, $source, 0, 3);
       unless ($dest->[0] == undef) {
@@ -3505,9 +3469,9 @@ class TestCase::Module::Array {
     # Copy with offset and length
     {
       my $dest = new object[4];
-      my $point0 = Point->new_xy(1, 1);
-      my $point1 = Point->new_xy(3, 3);
-      my $point2 = Point->new_xy(5, 5);
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(3, 3);
+      my $point2 = Point->new(5, 5);
       my $source = [$point0, $point1, $point2];
       Array->memmove_object_address($dest, 1, $source, 1, 2);
       unless ($dest->[0] == undef) {
@@ -3527,9 +3491,9 @@ class TestCase::Module::Array {
     # Copy with 0 length
     {
       my $dest = new object[4];
-      my $point0 = Point->new_xy(1, 1);
-      my $point1 = Point->new_xy(3, 3);
-      my $point2 = Point->new_xy(5, 5);
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(3, 3);
+      my $point2 = Point->new(5, 5);
       my $source = [$point0, $point1, $point2];
       Array->memmove_object_address($dest, 0, $source, 0, 0);
       unless ($dest->[0] == undef) {
@@ -3548,10 +3512,10 @@ class TestCase::Module::Array {
 
     # Duplicate
     {
-      my $point0 = Point->new_xy(1, 1);
-      my $point1 = Point->new_xy(3, 3);
-      my $point2 = Point->new_xy(5, 5);
-      my $point3 = Point->new_xy(7, 7);
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(3, 3);
+      my $point2 = Point->new(5, 5);
+      my $point3 = Point->new(7, 7);
       my $dest = [$point0, $point1, $point2, $point3];
       Array->memmove_object_address($dest, 0, $dest, 1, 3);
       unless ($dest->[0] == $point1) {
@@ -3568,10 +3532,10 @@ class TestCase::Module::Array {
       }
     }
     {
-      my $point0 = Point->new_xy(1, 1);
-      my $point1 = Point->new_xy(3, 3);
-      my $point2 = Point->new_xy(5, 5);
-      my $point3 = Point->new_xy(7, 7);
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(3, 3);
+      my $point2 = Point->new(5, 5);
+      my $point3 = Point->new(7, 7);
       my $dest = [$point0, $point1, $point2, $point3];
       Array->memmove_object_address($dest, 1, $dest, 0, 3);
       unless ($dest->[0] == $point0) {
@@ -4023,7 +3987,7 @@ class TestCase::Module::Array {
       my $offset = 1;
       my $length = 2;
       my $new_element = (byte)5;
-      Array->memset_byte($array, $offset, $new_element, $length);
+      Array->memset_byte($array, $new_element, $offset, $length);
       unless (Array->equals_byte($array, [(byte)1, 5, 5, 4])) {
         return 0;
       }
@@ -4035,7 +3999,7 @@ class TestCase::Module::Array {
       my $offset = 1;
       my $length = 0;
       my $new_element = (byte)5;
-      Array->memset_byte($array, $offset, $new_element, $length);
+      Array->memset_byte($array, $new_element, $offset, $length);
       unless (Array->equals_byte($array, [(byte)1, 2, 3, 4])) {
         return 0;
       }
@@ -4047,18 +4011,27 @@ class TestCase::Module::Array {
       my $offset = 0;
       my $length = @$array;
       my $new_element = (byte)5;
-      Array->memset_byte($array, $offset, $new_element, $length);
+      Array->memset_byte($array, $new_element, $offset, $length);
       unless (Array->equals_byte($array, [(byte)5, 5, 5, 5])) {
         return 0;
       }
     }
-    
+    {
+      my $array = [(byte)1, 2, 3, 4];
+      my $offset = 0;
+      my $length = -1;
+      my $new_element = (byte)5;
+      Array->memset_byte($array, $new_element, $offset, $length);
+      unless (Array->equals_byte($array, [(byte)5, 5, 5, 5])) {
+        return 0;
+      }
+    }
     # Exception
     {
       {
         my $source = [(short)1, 3, 5];
         eval { Array->memset_short(undef, 0, 0, 3); };
-        unless (Fn->contains($@, "The destination must be defined")) {
+        unless (Fn->contains($@, "The array must be defined")) {
           return 0;
         }
       }
@@ -4066,8 +4039,8 @@ class TestCase::Module::Array {
       {
         my $dest = new short[4];
         my $source = [(short)1, 3, 5];
-        eval { Array->memset_short($dest, -1, 0, 3); };
-        unless (Fn->contains($@, "The offset of the destination must be greater than or equal to 0")) {
+        eval { Array->memset_short($dest, 0, -1, 3); };
+        unless (Fn->contains($@, "The offset must be greater than or equal to 0")) {
           return 0;
         }
       }
@@ -4075,17 +4048,8 @@ class TestCase::Module::Array {
       {
         my $dest = new short[4];
         my $source = [(short)1, 3, 5];
-        eval { Array->memset_short($dest, 0, 0, -1); };
-        unless (Fn->contains($@, "The length must be greater than or equal to 0")) {
-          return 0;
-        }
-      }
-      
-      {
-        my $dest = new short[4];
-        my $source = [(short)1, 3, 5];
-        eval { Array->memset_short($dest, 2, 0, 3); };
-        unless (Fn->contains($@, "The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination")) {
+        eval { Array->memset_short($dest, 0, 2, 3); };
+        unless (Fn->contains($@, "The offset + the length specified by the argument must be less than or equal to the length of the array")) {
           return 0;
         }
       }
@@ -4104,7 +4068,7 @@ class TestCase::Module::Array {
       my $offset = 1;
       my $length = 2;
       my $new_element = (double)5;
-      Array->memset_double($array, $offset, $new_element, $length);
+      Array->memset_double($array, $new_element, $offset, $length);
       unless (Array->equals_double($array, [(double)1, 5, 5, 4])) {
         return 0;
       }
@@ -4116,7 +4080,7 @@ class TestCase::Module::Array {
       my $offset = 1;
       my $length = 0;
       my $new_element = (double)5;
-      Array->memset_double($array, $offset, $new_element, $length);
+      Array->memset_double($array, $new_element, $offset, $length);
       unless (Array->equals_double($array, [(double)1, 2, 3, 4])) {
         return 0;
       }
@@ -4128,7 +4092,17 @@ class TestCase::Module::Array {
       my $offset = 0;
       my $length = @$array;
       my $new_element = (double)5;
-      Array->memset_double($array, $offset, $new_element, $length);
+      Array->memset_double($array, $new_element, $offset, $length);
+      unless (Array->equals_double($array, [(double)5, 5, 5, 5])) {
+        return 0;
+      }
+    }
+    {
+      my $array = [(double)1, 2, 3, 4];
+      my $offset = 0;
+      my $length = -1;
+      my $new_element = (double)5;
+      Array->memset_double($array, $new_element, $offset, $length);
       unless (Array->equals_double($array, [(double)5, 5, 5, 5])) {
         return 0;
       }
@@ -4139,7 +4113,7 @@ class TestCase::Module::Array {
       {
         my $source = [(double)1, 3, 5];
         eval { Array->memset_double(undef, 0, 0, 3); };
-        unless (Fn->contains($@, "The destination must be defined")) {
+        unless (Fn->contains($@, "The array must be defined")) {
           return 0;
         }
       }
@@ -4147,8 +4121,8 @@ class TestCase::Module::Array {
       {
         my $dest = new double[4];
         my $source = [(double)1, 3, 5];
-        eval { Array->memset_double($dest, -1, 0, 3); };
-        unless (Fn->contains($@, "The offset of the destination must be greater than or equal to 0")) {
+        eval { Array->memset_double($dest, 0, -1, 3); };
+        unless (Fn->contains($@, "The offset must be greater than or equal to 0")) {
           return 0;
         }
       }
@@ -4156,17 +4130,8 @@ class TestCase::Module::Array {
       {
         my $dest = new double[4];
         my $source = [(double)1, 3, 5];
-        eval { Array->memset_double($dest, 0, 0, -1); };
-        unless (Fn->contains($@, "The length must be greater than or equal to 0")) {
-          return 0;
-        }
-      }
-      
-      {
-        my $dest = new double[4];
-        my $source = [(double)1, 3, 5];
-        eval { Array->memset_double($dest, 2, 0, 3); };
-        unless (Fn->contains($@, "The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination")) {
+        eval { Array->memset_double($dest, 0, 2, 3); };
+        unless (Fn->contains($@, "The offset + the length specified by the argument must be less than or equal to the length of the array")) {
           return 0;
         }
       }
@@ -4185,7 +4150,7 @@ class TestCase::Module::Array {
       my $offset = 1;
       my $length = 2;
       my $new_element = (float)5;
-      Array->memset_float($array, $offset, $new_element, $length);
+      Array->memset_float($array, $new_element, $offset, $length);
       unless (Array->equals_float($array, [(float)1, 5, 5, 4])) {
         return 0;
       }
@@ -4197,7 +4162,7 @@ class TestCase::Module::Array {
       my $offset = 1;
       my $length = 0;
       my $new_element = (float)5;
-      Array->memset_float($array, $offset, $new_element, $length);
+      Array->memset_float($array, $new_element, $offset, $length);
       unless (Array->equals_float($array, [(float)1, 2, 3, 4])) {
         return 0;
       }
@@ -4209,7 +4174,17 @@ class TestCase::Module::Array {
       my $offset = 0;
       my $length = @$array;
       my $new_element = (float)5;
-      Array->memset_float($array, $offset, $new_element, $length);
+      Array->memset_float($array, $new_element, $offset, $length);
+      unless (Array->equals_float($array, [(float)5, 5, 5, 5])) {
+        return 0;
+      }
+    }
+    {
+      my $array = [(float)1, 2, 3, 4];
+      my $offset = 0;
+      my $length = -1;
+      my $new_element = (float)5;
+      Array->memset_float($array, $new_element, $offset, $length);
       unless (Array->equals_float($array, [(float)5, 5, 5, 5])) {
         return 0;
       }
@@ -4220,7 +4195,7 @@ class TestCase::Module::Array {
       {
         my $source = [(float)1, 3, 5];
         eval { Array->memset_float(undef, 0, 0, 3); };
-        unless (Fn->contains($@, "The destination must be defined")) {
+        unless (Fn->contains($@, "The array must be defined")) {
           return 0;
         }
       }
@@ -4228,8 +4203,8 @@ class TestCase::Module::Array {
       {
         my $dest = new float[4];
         my $source = [(float)1, 3, 5];
-        eval { Array->memset_float($dest, -1, 0, 3); };
-        unless (Fn->contains($@, "The offset of the destination must be greater than or equal to 0")) {
+        eval { Array->memset_float($dest, 0, -1, 3); };
+        unless (Fn->contains($@, "The offset must be greater than or equal to 0")) {
           return 0;
         }
       }
@@ -4237,17 +4212,8 @@ class TestCase::Module::Array {
       {
         my $dest = new float[4];
         my $source = [(float)1, 3, 5];
-        eval { Array->memset_float($dest, 0, 0, -1); };
-        unless (Fn->contains($@, "The length must be greater than or equal to 0")) {
-          return 0;
-        }
-      }
-      
-      {
-        my $dest = new float[4];
-        my $source = [(float)1, 3, 5];
-        eval { Array->memset_float($dest, 2, 0, 3); };
-        unless (Fn->contains($@, "The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination")) {
+        eval { Array->memset_float($dest, 0, 2, 3); };
+        unless (Fn->contains($@, "The offset + the length specified by the argument must be less than or equal to the length of the array")) {
           return 0;
         }
       }
@@ -4266,7 +4232,7 @@ class TestCase::Module::Array {
       my $offset = 1;
       my $length = 2;
       my $new_element = (int)5;
-      Array->memset_int($array, $offset, $new_element, $length);
+      Array->memset_int($array, $new_element, $offset, $length);
       unless (Array->equals_int($array, [(int)1, 5, 5, 4])) {
         return 0;
       }
@@ -4278,7 +4244,7 @@ class TestCase::Module::Array {
       my $offset = 1;
       my $length = 0;
       my $new_element = (int)5;
-      Array->memset_int($array, $offset, $new_element, $length);
+      Array->memset_int($array, $new_element, $offset, $length);
       unless (Array->equals_int($array, [(int)1, 2, 3, 4])) {
         return 0;
       }
@@ -4290,7 +4256,17 @@ class TestCase::Module::Array {
       my $offset = 0;
       my $length = @$array;
       my $new_element = (int)5;
-      Array->memset_int($array, $offset, $new_element, $length);
+      Array->memset_int($array, $new_element, $offset, $length);
+      unless (Array->equals_int($array, [(int)5, 5, 5, 5])) {
+        return 0;
+      }
+    }
+    {
+      my $array = [(int)1, 2, 3, 4];
+      my $offset = 0;
+      my $length = -1;
+      my $new_element = (int)5;
+      Array->memset_int($array, $new_element, $offset, $length);
       unless (Array->equals_int($array, [(int)5, 5, 5, 5])) {
         return 0;
       }
@@ -4301,7 +4277,7 @@ class TestCase::Module::Array {
       {
         my $source = [(int)1, 3, 5];
         eval { Array->memset_int(undef, 0, 0, 3); };
-        unless (Fn->contains($@, "The destination must be defined")) {
+        unless (Fn->contains($@, "The array must be defined")) {
           return 0;
         }
       }
@@ -4309,8 +4285,8 @@ class TestCase::Module::Array {
       {
         my $dest = new int[4];
         my $source = [(int)1, 3, 5];
-        eval { Array->memset_int($dest, -1, 0, 3); };
-        unless (Fn->contains($@, "The offset of the destination must be greater than or equal to 0")) {
+        eval { Array->memset_int($dest, 0, -1, 3); };
+        unless (Fn->contains($@, "The offset must be greater than or equal to 0")) {
           return 0;
         }
       }
@@ -4318,17 +4294,8 @@ class TestCase::Module::Array {
       {
         my $dest = new int[4];
         my $source = [(int)1, 3, 5];
-        eval { Array->memset_int($dest, 0, 0, -1); };
-        unless (Fn->contains($@, "The length must be greater than or equal to 0")) {
-          return 0;
-        }
-      }
-      
-      {
-        my $dest = new int[4];
-        my $source = [(int)1, 3, 5];
-        eval { Array->memset_int($dest, 2, 0, 3); };
-        unless (Fn->contains($@, "The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination")) {
+        eval { Array->memset_int($dest, 0, 2, 3); };
+        unless (Fn->contains($@, "The offset + the length specified by the argument must be less than or equal to the length of the array")) {
           return 0;
         }
       }
@@ -4347,7 +4314,7 @@ class TestCase::Module::Array {
       my $offset = 1;
       my $length = 2;
       my $new_element = (long)5;
-      Array->memset_long($array, $offset, $new_element, $length);
+      Array->memset_long($array, $new_element, $offset, $length);
       unless (Array->equals_long($array, [(long)1, 5, 5, 4])) {
         return 0;
       }
@@ -4359,7 +4326,7 @@ class TestCase::Module::Array {
       my $offset = 1;
       my $length = 0;
       my $new_element = (long)5;
-      Array->memset_long($array, $offset, $new_element, $length);
+      Array->memset_long($array, $new_element, $offset, $length);
       unless (Array->equals_long($array, [(long)1, 2, 3, 4])) {
         return 0;
       }
@@ -4371,7 +4338,17 @@ class TestCase::Module::Array {
       my $offset = 0;
       my $length = @$array;
       my $new_element = (long)5;
-      Array->memset_long($array, $offset, $new_element, $length);
+      Array->memset_long($array, $new_element, $offset, $length);
+      unless (Array->equals_long($array, [(long)5, 5, 5, 5])) {
+        return 0;
+      }
+    }
+    {
+      my $array = [(long)1, 2, 3, 4];
+      my $offset = 0;
+      my $length = -1;
+      my $new_element = (long)5;
+      Array->memset_long($array, $new_element, $offset, $length);
       unless (Array->equals_long($array, [(long)5, 5, 5, 5])) {
         return 0;
       }
@@ -4382,7 +4359,7 @@ class TestCase::Module::Array {
       {
         my $source = [(long)1, 3, 5];
         eval { Array->memset_long(undef, 0, 0, 3); };
-        unless (Fn->contains($@, "The destination must be defined")) {
+        unless (Fn->contains($@, "The array must be defined")) {
           return 0;
         }
       }
@@ -4390,8 +4367,8 @@ class TestCase::Module::Array {
       {
         my $dest = new long[4];
         my $source = [(long)1, 3, 5];
-        eval { Array->memset_long($dest, -1, 0, 3); };
-        unless (Fn->contains($@, "The offset of the destination must be greater than or equal to 0")) {
+        eval { Array->memset_long($dest, 0, -1, 3); };
+        unless (Fn->contains($@, "The offset must be greater than or equal to 0")) {
           return 0;
         }
       }
@@ -4399,17 +4376,8 @@ class TestCase::Module::Array {
       {
         my $dest = new long[4];
         my $source = [(long)1, 3, 5];
-        eval { Array->memset_long($dest, 0, 0, -1); };
-        unless (Fn->contains($@, "The length must be greater than or equal to 0")) {
-          return 0;
-        }
-      }
-      
-      {
-        my $dest = new long[4];
-        my $source = [(long)1, 3, 5];
-        eval { Array->memset_long($dest, 2, 0, 3); };
-        unless (Fn->contains($@, "The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination")) {
+        eval { Array->memset_long($dest, 0, 2, 3); };
+        unless (Fn->contains($@, "The offset + the length specified by the argument must be less than or equal to the length of the array")) {
           return 0;
         }
       }
@@ -4424,15 +4392,15 @@ class TestCase::Module::Array {
     
     # Basic
     {
-      my $point0 = Point->new_xy(1, 1);
-      my $point1 = Point->new_xy(2, 2);
-      my $point2 = Point->new_xy(3, 3);
-      my $point3 = Point->new_xy(4, 4);
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(2, 2);
+      my $point2 = Point->new(3, 3);
+      my $point3 = Point->new(4, 4);
       my $array = [$point0, $point1, $point2, $point3];
       my $offset = 1;
       my $length = 2;
       my $new_element = (object)undef;
-      Array->memset_object($array, $offset, $new_element, $length);
+      Array->memset_object($array, $new_element, $offset, $length);
       unless ($array->[0] == $point0) {
         return 0;
       }
@@ -4449,15 +4417,15 @@ class TestCase::Module::Array {
     
     # Zero length
     {
-      my $point0 = Point->new_xy(1, 1);
-      my $point1 = Point->new_xy(2, 2);
-      my $point2 = Point->new_xy(3, 3);
-      my $point3 = Point->new_xy(4, 4);
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(2, 2);
+      my $point2 = Point->new(3, 3);
+      my $point3 = Point->new(4, 4);
       my $array = [$point0, $point1, $point2, $point3];
       my $offset = 1;
       my $length = 0;
       my $new_element = (object)undef;
-      Array->memset_object($array, $offset, $new_element, $length);
+      Array->memset_object($array, $new_element, $offset, $length);
       unless ($array->[0] == $point0) {
         return 0;
       }
@@ -4474,15 +4442,38 @@ class TestCase::Module::Array {
     
     # All
     {
-      my $point0 = Point->new_xy(1, 1);
-      my $point1 = Point->new_xy(2, 2);
-      my $point2 = Point->new_xy(3, 3);
-      my $point3 = Point->new_xy(4, 4);
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(2, 2);
+      my $point2 = Point->new(3, 3);
+      my $point3 = Point->new(4, 4);
       my $array = [$point0, $point1, $point2, $point3];
       my $offset = 0;
       my $length = @$array;
       my $new_element = (object)undef;
-      Array->memset_object($array, $offset, $new_element, $length);
+      Array->memset_object($array, $new_element, $offset, $length);
+      unless ($array->[0] == undef) {
+        return 0;
+      }
+      unless ($array->[1] == undef) {
+        return 0;
+      }
+      unless ($array->[2] == undef) {
+        return 0;
+      }
+      unless ($array->[3] == undef) {
+        return 0;
+      }
+    }
+    {
+      my $point0 = Point->new(1, 1);
+      my $point1 = Point->new(2, 2);
+      my $point2 = Point->new(3, 3);
+      my $point3 = Point->new(4, 4);
+      my $array = [$point0, $point1, $point2, $point3];
+      my $offset = 0;
+      my $length = -1;
+      my $new_element = (object)undef;
+      Array->memset_object($array, $new_element, $offset, $length);
       unless ($array->[0] == undef) {
         return 0;
       }
@@ -4502,7 +4493,7 @@ class TestCase::Module::Array {
       {
         my $source = [(string)1, 3, 5];
         eval { Array->memset_object(undef, 0, 0, 3); };
-        unless (Fn->contains($@, "The destination must be defined")) {
+        unless (Fn->contains($@, "The array must be defined")) {
           return 0;
         }
       }
@@ -4510,8 +4501,8 @@ class TestCase::Module::Array {
       {
         my $dest = new string[4];
         my $source = [(string)1, 3, 5];
-        eval { Array->memset_object($dest, -1, 0, 3); };
-        unless (Fn->contains($@, "The offset of the destination must be greater than or equal to 0")) {
+        eval { Array->memset_object($dest, 0, -1, 3); };
+        unless (Fn->contains($@, "The offset must be greater than or equal to 0")) {
           return 0;
         }
       }
@@ -4519,17 +4510,8 @@ class TestCase::Module::Array {
       {
         my $dest = new string[4];
         my $source = [(string)1, 3, 5];
-        eval { Array->memset_object($dest, 0, 0, -1); };
-        unless (Fn->contains($@, "The length must be greater than or equal to 0")) {
-          return 0;
-        }
-      }
-      
-      {
-        my $dest = new string[4];
-        my $source = [(string)1, 3, 5];
-        eval { Array->memset_object($dest, 2, 0, 3); };
-        unless (Fn->contains($@, "The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination")) {
+        eval { Array->memset_object($dest, 0, 2, 3); };
+        unless (Fn->contains($@, "The offset + the length specified by the argument must be less than or equal to the length of the array")) {
           return 0;
         }
       }
@@ -4548,7 +4530,7 @@ class TestCase::Module::Array {
       my $offset = 1;
       my $length = 2;
       my $new_element = (short)5;
-      Array->memset_short($array, $offset, $new_element, $length);
+      Array->memset_short($array, $new_element, $offset, $length);
       unless (Array->equals_short($array, [(short)1, 5, 5, 4])) {
         return 0;
       }
@@ -4560,7 +4542,7 @@ class TestCase::Module::Array {
       my $offset = 1;
       my $length = 0;
       my $new_element = (short)5;
-      Array->memset_short($array, $offset, $new_element, $length);
+      Array->memset_short($array, $new_element, $offset, $length);
       unless (Array->equals_short($array, [(short)1, 2, 3, 4])) {
         return 0;
       }
@@ -4572,7 +4554,17 @@ class TestCase::Module::Array {
       my $offset = 0;
       my $length = @$array;
       my $new_element = (short)5;
-      Array->memset_short($array, $offset, $new_element, $length);
+      Array->memset_short($array, $new_element, $offset, $length);
+      unless (Array->equals_short($array, [(short)5, 5, 5, 5])) {
+        return 0;
+      }
+    }
+    {
+      my $array = [(short)1, 2, 3, 4];
+      my $offset = 0;
+      my $length = -1;
+      my $new_element = (short)5;
+      Array->memset_short($array, $new_element, $offset, $length);
       unless (Array->equals_short($array, [(short)5, 5, 5, 5])) {
         return 0;
       }
@@ -4583,7 +4575,7 @@ class TestCase::Module::Array {
       {
         my $source = [(short)1, 3, 5];
         eval { Array->memset_short(undef, 0, 0, 3); };
-        unless (Fn->contains($@, "The destination must be defined")) {
+        unless (Fn->contains($@, "The array must be defined")) {
           return 0;
         }
       }
@@ -4591,8 +4583,8 @@ class TestCase::Module::Array {
       {
         my $dest = new short[4];
         my $source = [(short)1, 3, 5];
-        eval { Array->memset_short($dest, -1, 0, 3); };
-        unless (Fn->contains($@, "The offset of the destination must be greater than or equal to 0")) {
+        eval { Array->memset_short($dest, 0, -1, 3); };
+        unless (Fn->contains($@, "The offset must be greater than or equal to 0")) {
           return 0;
         }
       }
@@ -4600,17 +4592,8 @@ class TestCase::Module::Array {
       {
         my $dest = new short[4];
         my $source = [(short)1, 3, 5];
-        eval { Array->memset_short($dest, 0, 0, -1); };
-        unless (Fn->contains($@, "The length must be greater than or equal to 0")) {
-          return 0;
-        }
-      }
-      
-      {
-        my $dest = new short[4];
-        my $source = [(short)1, 3, 5];
-        eval { Array->memset_short($dest, 2, 0, 3); };
-        unless (Fn->contains($@, "The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination")) {
+        eval { Array->memset_short($dest, 0, 2, 3); };
+        unless (Fn->contains($@, "The offset + the length specified by the argument must be less than or equal to the length of the array")) {
           return 0;
         }
       }
@@ -4627,7 +4610,7 @@ class TestCase::Module::Array {
       my $offset = 1;
       my $length = 2;
       my $new_element = (string)5;
-      Array->memset_string($array, $offset, $new_element, $length);
+      Array->memset_string($array, $new_element, $offset, $length);
       unless (Array->equals_string($array, [(string)1, 5, 5, 4])) {
         return 0;
       }
@@ -4642,7 +4625,7 @@ class TestCase::Module::Array {
       my $offset = 1;
       my $length = 0;
       my $new_element = (string)5;
-      Array->memset_string($array, $offset, $new_element, $length);
+      Array->memset_string($array, $new_element, $offset, $length);
       unless (Array->equals_string($array, [(string)1, 2, 3, 4])) {
         return 0;
       }
@@ -4654,7 +4637,17 @@ class TestCase::Module::Array {
       my $offset = 0;
       my $length = @$array;
       my $new_element = (string)5;
-      Array->memset_string($array, $offset, $new_element, $length);
+      Array->memset_string($array, $new_element, $offset, $length);
+      unless (Array->equals_string($array, [(string)5, 5, 5, 5])) {
+        return 0;
+      }
+    }
+    {
+      my $array = [(string)1, 2, 3, 4];
+      my $offset = 0;
+      my $length =-1;
+      my $new_element = (string)5;
+      Array->memset_string($array, $new_element, $offset, $length);
       unless (Array->equals_string($array, [(string)5, 5, 5, 5])) {
         return 0;
       }
@@ -4665,7 +4658,7 @@ class TestCase::Module::Array {
       {
         my $source = [(string)1, 3, 5];
         eval { Array->memset_object(undef, 0, 0, 3); };
-        unless (Fn->contains($@, "The destination must be defined")) {
+        unless (Fn->contains($@, "The array must be defined")) {
           return 0;
         }
       }
@@ -4673,8 +4666,8 @@ class TestCase::Module::Array {
       {
         my $dest = new string[4];
         my $source = [(string)1, 3, 5];
-        eval { Array->memset_object($dest, -1, 0, 3); };
-        unless (Fn->contains($@, "The offset of the destination must be greater than or equal to 0")) {
+        eval { Array->memset_object($dest, 0, -1, 3); };
+        unless (Fn->contains($@, "The offset must be greater than or equal to 0")) {
           return 0;
         }
       }
@@ -4682,17 +4675,8 @@ class TestCase::Module::Array {
       {
         my $dest = new string[4];
         my $source = [(string)1, 3, 5];
-        eval { Array->memset_object($dest, 0, 0, -1); };
-        unless (Fn->contains($@, "The length must be greater than or equal to 0")) {
-          return 0;
-        }
-      }
-      
-      {
-        my $dest = new string[4];
-        my $source = [(string)1, 3, 5];
-        eval { Array->memset_object($dest, 2, 0, 3); };
-        unless (Fn->contains($@, "The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination")) {
+        eval { Array->memset_object($dest, 0, 2, 3); };
+        unless (Fn->contains($@, "The offset + the length specified by the argument must be less than or equal to the length of the array")) {
           return 0;
         }
       }

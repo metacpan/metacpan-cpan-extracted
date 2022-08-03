@@ -43,7 +43,6 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
   ok(SPVM::TestCase::NativeAPI->new_object_by_name_exception);
 }
 
-
 # new_pointer_by_name
 {
   ok(SPVM::TestCase::NativeAPI->new_pointer_by_name);
@@ -279,7 +278,7 @@ ok(!-f "$build_dir/work/object/SPVM/CORE.o");
 
 # new_object_array
 {
-  ok(SPVM::TestCase::NativeAPI->new_object_array);
+  ok(SPVM::TestCase::NativeAPI->get_args_stack_length);
 }
 
 # new_string_array
@@ -287,6 +286,8 @@ ok(!-f "$build_dir/work/object/SPVM/CORE.o");
   ok(SPVM::TestCase::NativeAPI->new_string_array);
   is_deeply(SPVM::TestCase::NativeAPI->new_string_array_value->to_elems, ['abc', 'def']);
 }
+
+ok(SPVM::TestCase::NativeAPI->new_memory_apis);
 
 ok(SPVM::TestCase::NativeAPI->new_memory_apis);
 

@@ -18,7 +18,7 @@ use Config;
 our @EXPORT = qw( alien_ok run_ok xs_ok ffi_ok with_subtest synthetic helper_ok interpolate_template_is );
 
 # ABSTRACT: Testing tools for Alien modules
-our $VERSION = '2.50'; # VERSION
+our $VERSION = '2.51'; # VERSION
 
 
 our @aliens;
@@ -171,7 +171,8 @@ sub xs_ok
   require ExtUtils::CBuilder;
   my $skip = do {
     my $have_compiler = $xs->{cbuilder_check};
-    !ExtUtils::CBuilder->new( config => $xs->{cbuilder_config} )->$have_compiler;
+    my %config = %{ $xs->{cbuilder_config} };
+    !ExtUtils::CBuilder->new( config => \%config )->$have_compiler;
   };
 
   if($skip)
@@ -669,7 +670,7 @@ Test::Alien - Testing tools for Alien modules
 
 =head1 VERSION
 
-version 2.50
+version 2.51
 
 =head1 SYNOPSIS
 

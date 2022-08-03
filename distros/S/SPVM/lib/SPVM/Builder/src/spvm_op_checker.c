@@ -51,13 +51,13 @@ void SPVM_OP_CHECKER_free_mem_id(SPVM_COMPILER* compiler, SPVM_LIST* mem_stack, 
   
   SPVM_TYPE* my_type = var_decl->type;
   
-  int32_t width = SPVM_TYPE_get_width(compiler, my_type->basic_type->id, my_type->dimension, my_type->flag);
+  int32_t stack_length = SPVM_TYPE_get_stack_length(compiler, my_type->basic_type->id, my_type->dimension, my_type->flag);
 
   for (int32_t mem_id = 0; mem_id < mem_stack->length; mem_id++) {
     int32_t my_id = (intptr_t)SPVM_LIST_get(mem_stack, mem_id);
     if (my_id == var_decl->id) {
-      assert(mem_id + width <= mem_stack->length);
-      for (int32_t i = 0; i < width; i++) {
+      assert(mem_id + stack_length <= mem_stack->length);
+      for (int32_t i = 0; i < stack_length; i++) {
         mem_stack->values[mem_id + i] = (void*)(intptr_t)-1;
       }
     }
@@ -70,14 +70,14 @@ int32_t SPVM_OP_CHECKER_get_mem_id(SPVM_COMPILER* compiler, SPVM_LIST* mem_stack
   
   SPVM_TYPE* my_type = var_decl->type;
 
-  int32_t width = SPVM_TYPE_get_width(compiler, my_type->basic_type->id, my_type->dimension, my_type->flag);
+  int32_t stack_length = SPVM_TYPE_get_stack_length(compiler, my_type->basic_type->id, my_type->dimension, my_type->flag);
   
   // Search free memory
   int32_t found = 0;
   for (int32_t mem_id = 0; mem_id < mem_stack->length; mem_id++) {
-    if (mem_id + width <= mem_stack->length) {
+    if (mem_id + stack_length <= mem_stack->length) {
       int32_t is_used = 0;
-      for (int32_t i = 0; i < width; i++) {
+      for (int32_t i = 0; i < stack_length; i++) {
         int32_t my_id = (intptr_t)SPVM_LIST_get(mem_stack, mem_id + i);
         if (my_id >= 0) {
           is_used = 1;
@@ -87,7 +87,7 @@ int32_t SPVM_OP_CHECKER_get_mem_id(SPVM_COMPILER* compiler, SPVM_LIST* mem_stack
       if (!is_used) {
         found = 1;
         found_mem_id = mem_id;
-        for (int32_t i = 0; i < width; i++) {
+        for (int32_t i = 0; i < stack_length; i++) {
           mem_stack->values[mem_id + i] = (void*)(intptr_t)var_decl->id;
         }
         break;
@@ -102,7 +102,7 @@ int32_t SPVM_OP_CHECKER_get_mem_id(SPVM_COMPILER* compiler, SPVM_LIST* mem_stack
   // Add stack
   if (!found) {
     found_mem_id = mem_stack->length;
-    for (int32_t i = 0; i < width; i++) {
+    for (int32_t i = 0; i < stack_length; i++) {
       SPVM_LIST_push(mem_stack, (void*)(intptr_t)var_decl->id);
     }
   }
@@ -2499,7 +2499,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 }
               }
               
-              int32_t args_count = call_method->method->args_length;
+              int32_t args_length = call_method->method->args_length;
               int32_t method_is_vaarg = call_method->method->have_vaarg;
 
               // Variable length argument. Last argument is not array.
@@ -2508,7 +2508,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 int32_t arg_index = 0;
                 SPVM_OP* op_operand = op_list_args->first;
                 while ((op_operand = SPVM_OP_sibling(compiler, op_operand))) {
-                  if (arg_index == args_count - 1) {
+                  if (arg_index == args_length - 1) {
                     SPVM_TYPE* type = SPVM_OP_get_type(compiler, op_operand);
                     if (!SPVM_TYPE_is_array_type(compiler, type->basic_type->id, type->dimension, type->flag)) {
                       vaarg_last_arg_is_not_array = 1;
@@ -2519,7 +2519,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 }
                 
                 // Empty vaargs 
-                if (arg_index == args_count - 1) {
+                if (arg_index == args_length - 1) {
                   vaarg_last_arg_is_not_array = 1;
                 }
               }
@@ -2563,7 +2563,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
 
                   op_operand_element->no_need_check = 1;
 
-                  if (arg_index < args_count - 1) {
+                  if (arg_index < args_length - 1) {
                     SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_operand_element);
                     SPVM_OP_insert_child(compiler, op_list_args_new, op_list_args_new->last, op_operand_element);
                     op_operand_element = op_stab;
@@ -2615,23 +2615,23 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 op_list_args = op_list_args_new;
               }
               
-              int32_t call_method_args_count = 0;
+              int32_t call_method_args_length = 0;
               {
                 SPVM_OP* op_operand = op_list_args->first;
                 while ((op_operand = SPVM_OP_sibling(compiler, op_operand))) {
-                  call_method_args_count++;
-                  if (call_method_args_count > args_count) {
+                  call_method_args_length++;
+                  if (call_method_args_length > args_length) {
                     SPVM_COMPILER_error(compiler, "Too many arguments \"%s->%s\" at %s line %d", op_cur->uv.call_method->method->class->name, method_name, op_cur->file, op_cur->line);
                     return;
                   }
                   
-                  SPVM_VAR_DECL* arg_var_decl = SPVM_LIST_get(call_method->method->var_decls, call_method_args_count - 1);
+                  SPVM_VAR_DECL* arg_var_decl = SPVM_LIST_get(call_method->method->var_decls, call_method_args_length - 1);
                   SPVM_TYPE* arg_var_decl_type = arg_var_decl->type;
                   
                   // Check if source can be assigned to dist
                   // If needed, numeric conversion op is added
                   char place[50];
-                  sprintf(place, "%dth argument", call_method_args_count);
+                  sprintf(place, "%dth argument", call_method_args_length);
                   
                   // Invocant is not checked.
                   op_operand = SPVM_OP_CHECKER_check_assign(compiler, arg_var_decl_type, op_operand, place, op_cur->file, op_cur->line);
@@ -2642,10 +2642,12 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 }
               }
               
-              if (call_method_args_count < args_count) {
-                SPVM_COMPILER_error(compiler, "Too few argument \"%s->%s\" at %s line %d", op_cur->uv.call_method->method->class->name, method_name, op_cur->file, op_cur->line);
+              if (call_method_args_length < call_method->method->required_args_length) {
+                SPVM_COMPILER_error(compiler, "Too few arguments \"%s->%s\" at %s line %d", op_cur->uv.call_method->method->class->name, method_name, op_cur->file, op_cur->line);
                 return;
               }
+              
+              call_method->args_length = call_method_args_length;
               
               if (call_method->method->is_destructor) {
                 SPVM_COMPILER_error(compiler, "Can't call DESTROY in yourself at %s line %d", op_cur->file, op_cur->line);
@@ -4194,14 +4196,14 @@ SPVM_OP* SPVM_OP_CHECKER_check_assign(SPVM_COMPILER* compiler, SPVM_TYPE* dist_t
   int32_t narrowing_conversion_error = 0;
   int32_t mutable_invalid = 0;
   
-  int32_t runtime_assignability = SPVM_TYPE_check_assignability(
+  int32_t assignability = SPVM_TYPE_check_assignability(
     compiler,
     dist_type_basic_type_id, dist_type_dimension, dist_type_flag,
     src_type_basic_type_id, src_type_dimension, src_type_flag,
     src_constant, &need_implicite_conversion, &narrowing_conversion_error, &mutable_invalid
   );
     
-  if (!runtime_assignability) {
+  if (!assignability) {
     if (mutable_invalid) {
       SPVM_COMPILER_error(compiler, "Can't assign a non-mutable to a mutable type in %s, at %s line %d", place, file, line);
     }
@@ -4291,7 +4293,7 @@ void SPVM_OP_CHECKER_resolve_types(SPVM_COMPILER* compiler) {
   // Check type names
   for (int32_t i = 0; i < types->length; i++) {
     SPVM_TYPE* type = SPVM_LIST_get(types, i);
-    type->width = SPVM_TYPE_get_width(compiler, type->basic_type->id, type->dimension, type->flag);
+    type->stack_length = SPVM_TYPE_get_stack_length(compiler, type->basic_type->id, type->dimension, type->flag);
     
     if (type->basic_type->category == 0) {
       type->basic_type->category = SPVM_BASIC_TYPE_get_category(compiler, type->basic_type->id);
@@ -4669,10 +4671,6 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
         SPVM_COMPILER_error(compiler, "mulnum_t type can't become class variable at %s line %d", class_var->op_class_var->file, class_var->op_class_var->line);
         return;
       }
-
-      // Create class var signature
-      const char* class_var_signature = SPVM_COMPILER_create_class_var_signature(compiler, class_var);
-      class_var->signature = class_var_signature;
     }
     
     // Check fields
@@ -4686,10 +4684,6 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
         SPVM_COMPILER_error(compiler, "mulnum_t type can't become field at %s line %d", field->op_field->file, field->op_field->line);
         return;
       }
-      
-      // Create field signature
-      const char* field_signature = SPVM_COMPILER_create_field_signature(compiler, field);
-      field->signature = field_signature;
     }
     
     // Check methods
@@ -4697,8 +4691,9 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
       SPVM_METHOD* method = SPVM_LIST_get(class->methods, i);
       
       // Argument limit check
-      int32_t args_width = 0;
+      int32_t args_stack_length = 0;
       SPVM_TYPE* last_arg_type = NULL;
+      int32_t found_optional_arg = 0;
       for (int32_t arg_index = 0; arg_index < method->args_length; arg_index++) {
         SPVM_VAR_DECL* arg_var_decl = SPVM_LIST_get(method->var_decls, arg_index);
 
@@ -4707,18 +4702,63 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
         int32_t is_arg_type_is_mulnum_type = SPVM_TYPE_is_mulnum_type(compiler, arg_type->basic_type->id, arg_type->dimension, arg_type->flag);
         int32_t is_arg_type_is_value_ref_type = SPVM_TYPE_is_mulnum_ref_type(compiler, arg_type->basic_type->id, arg_type->dimension, arg_type->flag);
         
-        if (is_arg_type_is_mulnum_type || is_arg_type_is_value_ref_type) {
-          args_width += arg_type->basic_type->class->fields->length;
+        // Optional argument
+        SPVM_OP* op_optional_arg_default = arg_var_decl->op_optional_arg_default;
+        if (op_optional_arg_default) {
+          found_optional_arg = 1;
+          if (SPVM_TYPE_is_numeric_type(compiler, arg_type->basic_type->id, arg_type->dimension, arg_type->flag)) {
+            if (op_optional_arg_default->id != SPVM_OP_C_ID_CONSTANT) {
+              SPVM_COMPILER_error(compiler, "The default value of the optional argument \"%s\" must be a constant value at %s line %d", arg_var_decl->var->name, method->op_method->file, method->op_method->line);
+              return;
+            }
+            else {
+              SPVM_TYPE* constant_type = SPVM_OP_get_type(compiler, op_optional_arg_default);
+              int32_t need_implicite_conversion = 0;
+              int32_t narrowing_conversion_error = 0;
+              int32_t mutable_invalid = 0;
+              int32_t assignability = SPVM_TYPE_check_assignability(
+                compiler,
+                arg_type->basic_type->id, arg_type->dimension, arg_type->flag,
+                constant_type->basic_type->id, constant_type->dimension, constant_type->flag,
+                op_optional_arg_default->uv.constant, &need_implicite_conversion, &narrowing_conversion_error, &mutable_invalid
+              );
+              
+              if (!assignability) {
+                SPVM_COMPILER_error(compiler, "The default value of the optional argument \"%s\" must be able to assigned to its argument at %s line %d", arg_var_decl->var->name, method->op_method->file, method->op_method->line);
+                return;
+              }
+            }
+          }
+          else if (SPVM_TYPE_is_object_type(compiler, arg_type->basic_type->id, arg_type->dimension, arg_type->flag)) {
+            if (op_optional_arg_default->id != SPVM_OP_C_ID_UNDEF) {
+              SPVM_COMPILER_error(compiler, "The default value of the optional argument \"%s\" must be undef at %s line %d", arg_var_decl->var->name, method->op_method->file, method->op_method->line);
+              return;
+            }
+          }
+          else {
+            SPVM_COMPILER_error(compiler, "The types other than the numeric type and the object type can't be an optional argument at %s line %d", method->op_method->file, method->op_method->line);
+            return;
+          }
         }
         else {
-          args_width++;
+          if (found_optional_arg) {
+            SPVM_COMPILER_error(compiler, "The argument after optional arguments must be an optional argument at %s line %d", method->op_method->file, method->op_method->line);
+            return;
+          }
+        }
+        
+        if (is_arg_type_is_mulnum_type || is_arg_type_is_value_ref_type) {
+          args_stack_length += arg_type->basic_type->class->fields->length;
+        }
+        else {
+          args_stack_length++;
         }
         
         if (arg_index == method->args_length - 1) {
           last_arg_type = arg_type;
         }
       }
-      if (args_width > 255) {
+      if (args_stack_length > 255) {
         SPVM_COMPILER_error(compiler, "Too many arguments at %s line %d", method->op_method->file, method->op_method->line);
         return;
       }
@@ -4780,10 +4820,6 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
         SPVM_COMPILER_error(compiler, "Can't return reference type at %s line %d", method->op_method->file, method->op_method->line);
         return;
       }
-
-      // Create method signature
-      const char* method_signature = SPVM_COMPILER_create_method_signature(compiler, method);
-      method->signature = method_signature;
 
       // Copy has_precomile_descriptor from anon method defined class
       if (method->anon_method_defined_class_name) {
@@ -4852,14 +4888,11 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
       for (int32_t i = 0; i < class->methods->length; i++) {
         SPVM_METHOD* method = SPVM_LIST_get(class->methods, i);
         if (strcmp(method->name, required_method->name) == 0) {
-          if (strcmp(method->signature, required_method->signature) == 0) {
-            method_found = 1;
-            break;
-          }
+          method_found = 1;
         }
       }
       if (!method_found) {
-        SPVM_COMPILER_error(compiler, "The class \"%s\" must have the method \"%s\" with the signature \"%s\" defined in the interface \"%s\" at %s line %d", class->name, required_method->name, required_method->signature, interface->name, class->op_class->file, class->op_class->line);
+        SPVM_COMPILER_error(compiler, "The class \"%s\" must have the method \"%s\" defined in the interface \"%s\" at %s line %d", class->name, required_method->name, interface->name, class->op_class->file, class->op_class->line);
       }
     }
   }
@@ -4988,7 +5021,6 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
         else {
           new_field = SPVM_FIELD_new(compiler);
           new_field->name = field->name;
-          new_field->signature = field->signature;
           new_field->class = cur_class;
           new_field->type = field->type;
           new_field->access_control_type = field->access_control_type;

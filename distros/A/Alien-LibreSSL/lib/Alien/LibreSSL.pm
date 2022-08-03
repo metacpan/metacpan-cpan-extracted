@@ -6,7 +6,7 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Alien wrapper for LibreSSL (alternative to OpenSSL)
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 1;
@@ -23,7 +23,7 @@ Alien::LibreSSL - Alien wrapper for LibreSSL (alternative to OpenSSL)
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -92,7 +92,7 @@ because on some platforms it is more reliable.  Further, this Alien will try
 to use C<wget>.  C<curl> and C<wget> will only be used if they support the
 C<https> protocol.  If neither C<curl>, C<wget> are available and L<Net::SSLeay>
 isn't I<already> installed, then this Alien will refuse to install because it
-has no safe way of retreiving LibreSSL from the internet.  You can force
+has no safe way of retrieving LibreSSL from the internet.  You can force
 an insecure install via C<ftp> or C<http> using the C<ALIEN_OPENSSL_FTP>
 environment variable below, but that is NOT recommended.
 
@@ -123,7 +123,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

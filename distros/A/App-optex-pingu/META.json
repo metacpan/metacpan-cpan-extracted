@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.12",
+   "generated_by" : "Minilla/v3.1.19",
    "license" : [
       "perl_5"
    ],
@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "App::optex" : "v0.5.3",
-            "File::Share" : "0",
+            "File::Share" : "0.27",
             "List::Util" : "0",
             "Time::HiRes" : "0",
             "perl" : "v5.14.0"
@@ -58,7 +58,7 @@
    "provides" : {
       "App::optex::pingu" : {
          "file" : "lib/App/optex/pingu.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -68,11 +68,12 @@
       },
       "homepage" : "https://github.com/kaz-utashiro/optex-pingu",
       "repository" : {
-         "url" : "git://github.com/kaz-utashiro/optex-pingu.git",
+         "type" : "git",
+         "url" : "https://github.com/kaz-utashiro/optex-pingu.git",
          "web" : "https://github.com/kaz-utashiro/optex-pingu"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

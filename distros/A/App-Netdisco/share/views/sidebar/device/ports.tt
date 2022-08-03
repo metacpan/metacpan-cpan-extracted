@@ -48,7 +48,7 @@
                   <li><i class="icon-li icon-signal"></i>&nbsp; Wireless Client</li>
                   <li><i class="icon-li icon-rss"></i>&nbsp; Wireless Access Point</li>
                   <li><i class="icon-li icon-book"></i>&nbsp; Archived Data</li>
-                  <li><i class="icon-li icon-group"></i>&nbsp; Link Aggregate</li>
+                  <li><i class="icon-li icon-group"></i>&nbsp; Interface Group</li>
                   [% IF user_has_role('port_control') %]
                   <li><i class="icon-li icon-refresh icon-spin"></i>&nbsp; Click "Update View"</li>
                   [% END %]
@@ -70,8 +70,6 @@
                         name="[% item.name | html_entity %]"[% ' checked="checked"' IF vars.sidebar_defaults.device_ports.${item.name} %] />
                       [% IF item.name == 'c_admin' %]
                         <span class="label label-info">[% item.label | html_entity %]</span>
-                      [% ELSIF item.name == 'c_vlan_names' %]
-                        <span class="label label-default">[% item.label | html_entity %]</span>
                       [% ELSE %]
                         [% item.label | html_entity %]
                       [% END %]
@@ -139,6 +137,15 @@
                       </select>
                     </div>
                   </li>
+                  [% FOREACH item IN settings.port_display_properties %]
+                  <li>
+                    <label class="checkbox">
+                      <input type="checkbox" id="[% item.name | html_entity %]"
+                        name="[% item.name | html_entity %]"[% ' checked="checked"' IF vars.sidebar_defaults.device_ports.${item.name} %] />
+                      [% item.label | html_entity %]
+                    </label>
+                  </li>
+                  [% END %]
                 </ul>
               </div>
             </div>

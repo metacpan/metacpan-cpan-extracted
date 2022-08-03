@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Alien wrapper for OpenSSL
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 
@@ -28,7 +28,7 @@ Alien::OpenSSL - Alien wrapper for OpenSSL
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -87,7 +87,7 @@ Salvador Fandiño
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2021 by Johanna Amann.
+This software is copyright (c) 2012-2022 by Johanna Amann.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

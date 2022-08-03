@@ -1,0 +1,37 @@
+---
+abstract: 'Tool for creating examples from Perl module POD documentation.'
+author:
+  - 'Michal Josef Spacek <skim@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.19'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Perl-Module-Examples
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Class::Utils: 0
+  File::Find::Rule: 0
+  File::Spec::Functions: 0
+  Getopt::Std: 0
+  IO::Barf: 0
+  Pod::Example: 0.12
+  perl: 5.6.0
+resources:
+  bugtracker: https://github.com/michal-josef-spacek/App-Perl-Module-Examples/issues
+  homepage: https://github.com/michal-josef-spacek/App-Perl-Module-Examples
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: git://github.com/michal-josef-spacek/App-Perl-Module-Examples
+version: '0.01'

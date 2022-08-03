@@ -35,8 +35,8 @@ class TestCase::JSON {
         }
       }
       else {
-        Sort->sort_string($l_keys, 0, scalar @$l_keys, method : int ($a : string, $b : string) { $a cmp $b; });
-        Sort->sort_string($r_keys, 0, scalar @$r_keys, method : int ($a : string, $b : string) { $a cmp $b; });
+        Sort->sort_string_asc($l_keys, 0, scalar @$l_keys);
+        Sort->sort_string_asc($r_keys, 0, scalar @$r_keys);
 
         for (my $key_index = 0; $key_index < @$l_keys; ++$key_index) {
           my $key = $l_keys->[$key_index];

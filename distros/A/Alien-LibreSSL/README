@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.05
+    version 0.06
 
 SYNOPSIS
 
@@ -73,7 +73,7 @@ CAVEATS
     this Alien will try to use wget. curl and wget will only be used if
     they support the https protocol. If neither curl, wget are available
     and Net::SSLeay isn't already installed, then this Alien will refuse to
-    install because it has no safe way of retreiving LibreSSL from the
+    install because it has no safe way of retrieving LibreSSL from the
     internet. You can force an insecure install via ftp or http using the
     ALIEN_OPENSSL_FTP environment variable below, but that is NOT
     recommended.
@@ -97,7 +97,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017 by Graham Ollis.
+    This software is copyright (c) 2017-2022 by Graham Ollis.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

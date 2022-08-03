@@ -1,3 +1,687 @@
+0.9634 2022-08-03
+  [Changes]
+    * Add an optional argument to the following methods of StringBuffer class.
+      [Before]
+      static method new : StringBuffer ()
+      [After]
+      static method new : StringBuffer ($string = undef : string)
+    * Add optional arguments to the following methods of Point class.
+      [Before]
+      static method new : Point ()
+      [After]
+      static method new : Point ($x = 0 : int, $y = 0 : int)
+    * Add optional arguments to the following methods of Point3D class.
+      [Before]
+      static method new : Point3D ()
+      [After]
+      static method new : Point3D ($x = 0 : int, $y = 0 : int, $z = 0 : int)
+      
+  [Incompatible Changes]
+    * The defintions of the following methods of ByteList class are changed.
+      [Before]
+      static method new : ByteList ($array : byte[]...)
+      [After]
+      static method new : ByteList ($array = undef : byte[])
+    * The defintions of the following methods of ShortList class are changed.
+      [Before]
+      static method new : ShortList ($array : short[]...)
+      [After]
+      static method new : ShortList ($array = undef : short[])
+    * The defintions of the following methods of IntList class are changed.
+      [Before]
+      static method new : IntList ($array : int[]...)
+      [After]
+      static method new : IntList ($array = undef : int[])
+    * The defintions of the following methods of LongList class are changed.
+      [Before]
+      static method new : LongList ($array : long[]...)
+      [After]
+      static method new : LongList ($array = undef : long[])
+    * The defintions of the following methods of FloatList class are changed.
+      [Before]
+      static method new : FloatList ($array : float[]...)
+      [After]
+      static method new : FloatList ($array = undef : float[])
+    * The defintions of the following methods of DoubleList class are changed.
+      [Before]
+      static method new : DoubleList ($array : double[]...)
+      [After]
+      static method new : DoubleList ($array = undef : double[])
+    * The defintions of the following methods of List class are changed.
+      [Before]
+      static method new : List ($array : object[]...)
+      [After]
+      static method new : List ($array = undef : object[])
+    * The defintion and implementation of the following method of Array class is changed.
+      [Before]
+
+        static method copy_byte : byte[] ($array : byte[])
+
+      Copy a C<byte> array.
+
+      If the array is not defined, return C<undef>.
+
+      [After]
+      
+        static method copy_byte : byte[] ($array : byte[], $offset = 0 : int, $length = -1 : int)
+
+      Create a new C<byte> array with the length sepcified by the argument, and copy the elements of the C<byte> array from the offset to the offset + the length - C<1> to the created array.
+
+      If the length is less than C<0>, the length is calcurated from the length of the array and the offset.
+
+      The array must be defined. Otherwise an exception will be thrown.
+
+      The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
+
+      The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
+    * Array->copy_range_byte calls Array->copy_byte.
+    * The defintion and implementation of the following method of Array class is changed.
+      [Before]
+
+        static method copy_short : short[] ($array : short[])
+
+      Copy a C<short> array.
+
+      If the array is not defined, return C<undef>.
+
+      [After]
+      
+        static method copy_short : short[] ($array : short[], $offset = 0 : int, $length = -1 : int)
+
+      Create a new C<short> array with the length sepcified by the argument, and copy the elements of the C<short> array from the offset to the offset + the length - C<1> to the created array.
+
+      If the length is less than C<0>, the length is calcurated from the length of the array and the offset.
+
+      The array must be defined. Otherwise an exception will be thrown.
+
+      The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
+
+      The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
+    * Array->copy_range_short calls Array->copy_short.
+    * The defintion and implementation of the following method of Array class is changed.
+      [Before]
+
+        static method copy_int : int[] ($array : int[])
+
+      Copy a C<int> array.
+
+      If the array is not defined, return C<undef>.
+
+      [After]
+      
+        static method copy_int : int[] ($array : int[], $offset = 0 : int, $length = -1 : int)
+
+      Create a new C<int> array with the length sepcified by the argument, and copy the elements of the C<int> array from the offset to the offset + the length - C<1> to the created array.
+
+      If the length is less than C<0>, the length is calcurated from the length of the array and the offset.
+
+      The array must be defined. Otherwise an exception will be thrown.
+
+      The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
+
+      The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
+    * Array->copy_range_int calls Array->copy_int.
+    * The defintion and implementation of the following method of Array class is changed.
+      [Before]
+
+        static method copy_long : long[] ($array : long[])
+
+      Copy a C<long> array.
+
+      If the array is not defined, return C<undef>.
+
+      [After]
+      
+        static method copy_long : long[] ($array : long[], $offset = 0 : int, $length = -1 : int)
+
+      Create a new C<long> array with the length sepcified by the argument, and copy the elements of the C<long> array from the offset to the offset + the length - C<1> to the created array.
+
+      If the length is less than C<0>, the length is calcurated from the length of the array and the offset.
+
+      The array must be defined. Otherwise an exception will be thrown.
+
+      The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
+
+      The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
+    * Array->copy_range_long calls Array->copy_long.
+    * The defintion and implementation of the following method of Array class is changed.
+      [Before]
+
+        static method copy_float : float[] ($array : float[])
+
+      Copy a C<float> array.
+
+      If the array is not defined, return C<undef>.
+
+      [After]
+      
+        static method copy_float : float[] ($array : float[], $offset = 0 : int, $length = -1 : int)
+
+      Create a new C<float> array with the length sepcified by the argument, and copy the elements of the C<float> array from the offset to the offset + the length - C<1> to the created array.
+
+      If the length is less than C<0>, the length is calcurated from the length of the array and the offset.
+
+      The array must be defined. Otherwise an exception will be thrown.
+
+      The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
+
+      The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
+    * Array->copy_range_float calls Array->copy_float.
+    * The defintion and implementation of the following method of Array class is changed.
+      [Before]
+
+        static method copy_double : double[] ($array : double[])
+
+      Copy a C<double> array.
+
+      If the array is not defined, return C<undef>.
+
+      [After]
+      
+        static method copy_double : double[] ($array : double[], $offset = 0 : int, $length = -1 : int)
+
+      Create a new C<double> array with the length sepcified by the argument, and copy the elements of the C<double> array from the offset to the offset + the length - C<1> to the created array.
+
+      If the length is less than C<0>, the length is calcurated from the length of the array and the offset.
+
+      The array must be defined. Otherwise an exception will be thrown.
+
+      The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
+
+      The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
+    * Array->copy_range_double calls Array->copy_double.
+    * The defintion and implementation of the following method of Array class is changed.
+      [Before]
+
+        static method copy_object : object[] ($array : object[], $cloner : Cloner)
+      
+      Copy an object array. Each element is cloned by the L<Cloner|SPVM::Cloner>.
+      [After]
+      
+        static method copy_object : object[] ($array : object[], $cloner = undef : Cloner, $offset = 0 : int, $legnth = -1 : int)
+
+      Create a new object array with the length sepcified by the argument, and clone the elements of the object array by the length from the offset to the created array.
+
+      Each element is cloned by the L<Cloner|SPVM::Cloner>.
+
+      The array must be defined. Otherwise an exception will be thrown.
+
+      The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
+
+      The length must be greater than or equal to C<0>. Otherwise an exception will be thrown.
+
+      The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
+
+    * Array->copy_range_object calls Array->copy_object.
+    * The defintion and implementation of the following method of Array class is changed.
+      [Before]
+
+        static method copy_string : string[] ($array : string[])
+
+      Copy a C<string> array using the C<copy> operator.
+
+      If the array is not defined, return C<undef>.
+
+      [After]
+      
+        static method copy_string : string[] ($array : string[], $offset = 0 : int, $length = -1 : int)
+
+      Create a new C<string> array with the length sepcified by the argument, and copy the elements of the C<string> array using C<copy> operator by the length from the offset to the created array.
+      If the length is less than C<0>, the length is calculated from the length of the array and the offset.
+      The array must be defined. Otherwise an exception will be thrown.
+
+      The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
+
+      The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
+
+    * Array->copy_range_string calls Array->copy_string.
+    * The defintion and implementation of the following method of Array class is changed.
+      [Before]
+        static method copy_string_address : string[] ($array : string[])
+
+      Copy the addresses of the elements of a C<string> array.
+
+      If the array is not defined, return C<undef>.
+
+      [After]
+        static method copy_string_address : string[] ($array : string[], $offset = 0 : int, $length = -1 : int)
+
+      Create a new C<string> array with the length sepcified by the argument, and copy the addresses of the elements of the C<string> array by the length from the offset to the created array.
+      If the length is less than C<0>, the length is calculated from the length of the array and the offset.
+
+      The array must be defined. Otherwise an exception will be thrown.
+
+      The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
+
+      The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
+    * Array->copy_range_string_address calls Array->copy_string_address.
+    * The defintion and implementation of the following method of Array class is changed.
+      [Before]
+    
+        static method memset_byte : void ($dest : byte[], $dest_offset : int, $element : byte, $length : int)
+
+      Set the range of the elements of the destination C<byte> array to the element specified by the argument.
+
+      The range of the elements of the destination array is by the length from the offset of the destination to the offset of the destination.
+
+      The destination must be defined. Otherwise an exception will occur.
+
+      The offset of the destination must be greater than or equal to C<0>. Otherwise an exception will occur.
+
+      The length must be greater than or equal to 0. Otherwise an exception will occur.
+
+      The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination. Otherwise an exception will occur.
+      [After]
+      
+        static method memset_byte : void ($array : byte[], $element : byte, $offset = 0 : int, $length = -1 : int)
+      
+      Set the range of the elements of the C<byte> array to the element specified by the argument.
+      The range of the elements of the array is by the length from the offset.
+      If the length is less than C<0>, the length is calculated from the length of the array and the offset.
+      The array must be defined. Otherwise an exception will occur.
+      The offset of the array must be greater than or equal to C<0>. Otherwise an exception will occur.
+      The offset of the array + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will occur.
+    * The defintion and implementation of the following method of Array class is changed.
+      [Before]
+    
+        static method memset_short : void ($dest : short[], $dest_offset : int, $element : short, $length : int)
+
+      Set the range of the elements of the destination C<short> array to the element specified by the argument.
+
+      The range of the elements of the destination array is by the length from the offset of the destination to the offset of the destination.
+
+      The destination must be defined. Otherwise an exception will occur.
+
+      The offset of the destination must be greater than or equal to C<0>. Otherwise an exception will occur.
+
+      The length must be greater than or equal to 0. Otherwise an exception will occur.
+
+      The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination. Otherwise an exception will occur.
+      [After]
+      
+        static method memset_short : void ($array : short[], $element : short, $offset = 0 : int, $length = -1 : int)
+      
+      Set the range of the elements of the C<short> array to the element specified by the argument.
+      The range of the elements of the array is by the length from the offset.
+      If the length is less than C<0>, the length is calculated from the length of the array and the offset.
+      The array must be defined. Otherwise an exception will occur.
+      The offset of the array must be greater than or equal to C<0>. Otherwise an exception will occur.
+      The offset of the array + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will occur.
+    * The defintion and implementation of the following method of Array class is changed.
+      [Before]
+    
+        static method memset_int : void ($dest : int[], $dest_offset : int, $element : int, $length : int)
+
+      Set the range of the elements of the destination C<int> array to the element specified by the argument.
+
+      The range of the elements of the destination array is by the length from the offset of the destination to the offset of the destination.
+
+      The destination must be defined. Otherwise an exception will occur.
+
+      The offset of the destination must be greater than or equal to C<0>. Otherwise an exception will occur.
+
+      The length must be greater than or equal to 0. Otherwise an exception will occur.
+
+      The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination. Otherwise an exception will occur.
+      [After]
+      
+        static method memset_int : void ($array : int[], $element : int, $offset = 0 : int, $length = -1 : int)
+      
+      Set the range of the elements of the C<int> array to the element specified by the argument.
+      The range of the elements of the array is by the length from the offset.
+      If the length is less than C<0>, the length is calculated from the length of the array and the offset.
+      The array must be defined. Otherwise an exception will occur.
+      The offset of the array must be greater than or equal to C<0>. Otherwise an exception will occur.
+      The offset of the array + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will occur.
+    * The defintion and implementation of the following method of Array class is changed.
+      [Before]
+    
+        static method memset_long : void ($dest : long[], $dest_offset : int, $element : long, $length : int)
+
+      Set the range of the elements of the destination C<long> array to the element specified by the argument.
+
+      The range of the elements of the destination array is by the length from the offset of the destination to the offset of the destination.
+
+      The destination must be defined. Otherwise an exception will occur.
+
+      The offset of the destination must be greater than or equal to C<0>. Otherwise an exception will occur.
+
+      The length must be greater than or equal to 0. Otherwise an exception will occur.
+
+      The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination. Otherwise an exception will occur.
+      [After]
+      
+        static method memset_long : void ($array : long[], $element : long, $offset = 0 : int, $length = -1 : int)
+      
+      Set the range of the elements of the C<long> array to the element specified by the argument.
+      The range of the elements of the array is by the length from the offset.
+      If the length is less than C<0>, the length is calculated from the length of the array and the offset.
+      The array must be defined. Otherwise an exception will occur.
+      The offset of the array must be greater than or equal to C<0>. Otherwise an exception will occur.
+      The offset of the array + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will occur.
+    * The defintion and implementation of the following method of Array class is changed.
+      [Before]
+    
+        static method memset_float : void ($dest : float[], $dest_offset : int, $element : float, $length : int)
+
+      Set the range of the elements of the destination C<float> array to the element specified by the argument.
+
+      The range of the elements of the destination array is by the length from the offset of the destination to the offset of the destination.
+
+      The destination must be defined. Otherwise an exception will occur.
+
+      The offset of the destination must be greater than or equal to C<0>. Otherwise an exception will occur.
+
+      The length must be greater than or equal to 0. Otherwise an exception will occur.
+
+      The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination. Otherwise an exception will occur.
+      [After]
+      
+        static method memset_float : void ($array : float[], $element : float, $offset = 0 : int, $length = -1 : int)
+      
+      Set the range of the elements of the C<float> array to the element specified by the argument.
+      The range of the elements of the array is by the length from the offset.
+      If the length is less than C<0>, the length is calculated from the length of the array and the offset.
+      The array must be defined. Otherwise an exception will occur.
+      The offset of the array must be greater than or equal to C<0>. Otherwise an exception will occur.
+      The offset of the array + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will occur.
+    * The defintion and implementation of the following method of Array class is changed.
+      [Before]
+    
+        static method memset_double : void ($dest : double[], $dest_offset : int, $element : double, $length : int)
+
+      Set the range of the elements of the destination C<double> array to the element specified by the argument.
+
+      The range of the elements of the destination array is by the length from the offset of the destination to the offset of the destination.
+
+      The destination must be defined. Otherwise an exception will occur.
+
+      The offset of the destination must be greater than or equal to C<0>. Otherwise an exception will occur.
+
+      The length must be greater than or equal to 0. Otherwise an exception will occur.
+
+      The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination. Otherwise an exception will occur.
+      [After]
+      
+        static method memset_double : void ($array : double[], $element : double, $offset = 0 : int, $length = -1 : int)
+      
+      Set the range of the elements of the C<double> array to the element specified by the argument.
+      The range of the elements of the array is by the length from the offset.
+      If the length is less than C<0>, the length is calculated from the length of the array and the offset.
+      The array must be defined. Otherwise an exception will occur.
+      The offset of the array must be greater than or equal to C<0>. Otherwise an exception will occur.
+      The offset of the array + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will occur.
+    * The defintion and implementation of the following method of Array class is changed.
+      [Before]
+    
+        static method memset_string : void ($dest : string[], $dest_offset : int, $element : string, $length : int)
+
+      Set the range of the elements of the destination C<string> array to the element specified by the argument.
+
+      The range of the elements of the destination array is by the length from the offset of the destination to the offset of the destination.
+
+      The destination must be defined. Otherwise an exception will occur.
+
+      The offset of the destination must be greater than or equal to C<0>. Otherwise an exception will occur.
+
+      The length must be greater than or equal to 0. Otherwise an exception will occur.
+
+      The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination. Otherwise an exception will occur.
+      [After]
+      
+        static method memset_string : void ($array : string[], $element : string, $offset = 0 : int, $length = -1 : int)
+      
+      Set the range of the elements of the C<string> array to the element specified by the argument.
+      The range of the elements of the array is by the length from the offset.
+      If the length is less than C<0>, the length is calculated from the length of the array and the offset.
+      The array must be defined. Otherwise an exception will occur.
+      The offset of the array must be greater than or equal to C<0>. Otherwise an exception will occur.
+      The offset of the array + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will occur.
+    * The defintion and implementation of the following method of Array class is changed.
+      [Before]
+    
+        static method memset_object : void ($dest : object[], $dest_offset : int, $element : object, $length : int)
+
+      Set the range of the elements of the destination C<object> array to the element specified by the argument.
+
+      The range of the elements of the destination array is by the length from the offset of the destination to the offset of the destination.
+
+      The destination must be defined. Otherwise an exception will occur.
+
+      The offset of the destination must be greater than or equal to C<0>. Otherwise an exception will occur.
+
+      The length must be greater than or equal to 0. Otherwise an exception will occur.
+
+      The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination. Otherwise an exception will occur.
+      [After]
+      
+        static method memset_object : void ($array : object[], $element : object, $offset = 0 : int, $length = -1 : int)
+      
+      Set the range of the elements of the C<object> array to the element specified by the argument.
+      The range of the elements of the array is by the length from the offset.
+      If the length is less than C<0>, the length is calculated from the length of the array and the offset.
+      The array must be defined. Otherwise an exception will occur.
+      The offset of the array must be greater than or equal to C<0>. Otherwise an exception will occur.
+      The offset of the array + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will occur.
+    * The defintions of the following method of Hash class is changed.
+      [Before]
+      static method new : Hash ($key_values : object[]...)
+      [After]
+      static method new : Hash ($key_values = undef : object[])
+    * The defintion and implementation of the following methods of Sort class is changed.
+      [Before]
+      static method sort_byte : void ($array : byte[], $offset : int, $length : int, $comparator : Comparator::Byte)
+      static method sort_byte_asc : void ($array : byte[], $offset : int, $length : int)
+      static method sort_byte_desc : void ($array : byte[], $offset : int, $length : int)
+      static method sort_short : void ($array : short[], $offset : int, $length : int, $comparator : Comparator::Short)
+      static method sort_short_asc : void ($array : short[], $offset : int, $length : int)
+      static method sort_short_desc : void ($array : short[], $offset : int, $length : int)
+      static method sort_int : void ($array : int[], $offset : int, $length : int, $comparator : Comparator::Int)
+      static method sort_int_asc : void ($array : int[], $offset : int, $length : int)
+      static method sort_int_desc : void ($array : int[], $offset : int, $length : int)
+      static method sort_long : void ($array : int[], $offset : int, $length : long, $comparator : Comparator::Long)
+      static method sort_long_asc : void ($array : long[], $offset : int, $length : int)
+      static method sort_long_desc : void ($array : long[], $offset : int, $length : int)
+      static method sort_float : void ($array : int[], $offset : int, $length : int, $comparator : Comparator::Float)
+      static method sort_float_asc : void ($array : float[], $offset : int, $length : int)
+      static method sort_float_desc : void ($array : float[], $offset : int, $length : int)
+      static method sort_double : void ($array : int[], $offset : int, $length : int, $comparator : Comparator::Double)
+      static method sort_double_asc : void ($array : double[], $offset : int, $length : int)
+      static method sort_double_desc : void ($array : double[], $offset : int, $length : int)
+      static method sort_string : void ($array : int[], $offset : int, $length : int, $comparator : Comparator::String)
+      static method sort_string_asc : void ($array : string[], $offset : int, $length : int)
+      static method sort_string_desc : void ($array : string[], $offset : int, $length : int)
+      static method sort_object : void ($array : int[], $offset : int, $length : int, $comparator : Comparator)
+
+      The length must be greater than or equal to C<0>. Otherwise an exception will be thrown.
+
+      [After]
+      static method sort_byte : void ($array : byte[], $comparator : Comparator::Byte, $offset = 0 : int, $length = -1 : int)
+      static method sort_byte_asc : void ($array : byte[], $offset = 0 : int, $length = -1 : int)
+      static method sort_byte_desc : void ($array : byte[], $offset = 0 : int, $length = -1 : int)
+      static method sort_short : void ($array : short[], $comparator : Comparator::Short, $offset = 0 : int, $length = -1 : int)
+      static method sort_short_asc : void ($array : short[], $offset = 0 : int, $length = -1 : int)
+      static method sort_short_desc : void ($array : short[], $offset = 0 : int, $length = -1 : int)
+      static method sort_int : void ($array : int[], $comparator : Comparator::Int, $offset = 0 : int, $length = -1 : int)
+      static method sort_int_asc : void ($array : int[], $offset = 0 : int, $length = -1 : int)
+      static method sort_int_desc : void ($array : int[], $offset = 0 : int, $length = -1 : int)
+      static method sort_long : void ($array : int[], $comparator : Comparator::Long, $offset : int, $length : long)
+      static method sort_long_asc : void ($array : long[], $offset = 0 : int, $length = -1 : int)
+      static method sort_long_desc : void ($array : long[], $offset = 0 : int, $length = -1 : int)
+      static method sort_float : void ($array : int[], $comparator : Comparator::Float, $offset = 0 : int, $length = -1 : int)
+      static method sort_float_asc : void ($array : float[], $offset = 0 : int, $length = -1 : int)
+      static method sort_float_desc : void ($array : float[], $offset = 0 : int, $length = -1 : int)
+      static method sort_double : void ($array : int[], $comparator : Comparator::Double, $offset = 0 : int, $length = -1 : int)
+      static method sort_double_asc : void ($array : double[], $offset = 0 : int, $length = -1 : int)
+      static method sort_double_desc : void ($array : double[], $offset = 0 : int, $length = -1 : int)
+      static method sort_string : void ($array : int[], $comparator : Comparator::String, $offset = 0 : int, $length = -1 : int)
+      static method sort_string_asc : void ($array : string[], $offset = 0 : int, $length = -1 : int)
+      static method sort_string_desc : void ($array : string[], $offset = 0 : int, $length = -1 : int)
+      static method sort_object : void ($array : int[], $comparator : Comparator, $offset = 0 : int, $length = -1 : int)
+
+      If the length is less than C<0>, the length is calculated from the length of the array and the offset.
+
+    * The defintion and implementation of the following methods of Fn class is changed.
+
+      [Before]
+        static method contains : int ($string : string, $substring : string)
+        static method index : int ($string : string, $substring : string, $offset : int)
+        static method rindex : int ($string : string, $substring : string, $offset : int)
+        static method substr : string ($string : string, $offset : int, $length : int)
+        
+        The length must be greater than or equal to C<0>. Otherwise an exception will be thrown.
+
+      [After]
+        static method contains : int ($string : string, $substring : string, $offset = 0 : int, $length = -1 : int)
+        static method index : int ($string : string, $substring : string, $offset = 0 : int, $length = -1 : int)
+        static method rindex : int ($string : string, $substring : string, $offset = 0 : int, $length = -1 : int)
+        static method substr : string ($string : string, $offset : int, $length = -1 : int)
+
+        If the length is less than C<0>, the length to the end of the string is calculated from the length of the string and the offset.
+      
+  [Deprecation]
+    * The following methods of Point class are deprecated.
+      # Point->new_xy($x, $y) is deprecated. Use Point->new($x, $y) instead. This method will be removed after 2022-09-03
+      static method new_xy : Point ($x : int, $y : int)
+    * The following methods of Point3D class are deprecated.
+      # Point3D->new_xyz($x, $y, $z) is deprecated. Use Point3D->new($x, $y, $z) instead. This method will be removed after 2022-09-03
+      static method new_xyz : Point3D ($x : int, $y : int, $z : int)
+    * The following methods of Array class are deprecated.
+      static method copy_range_byte : byte[] ($array : byte[], $offset : int, $length : int) {
+        warn "Array->copy_range_byte(\$array, \$offset, \$length) is deprecated. Use Array->copy(\$array, \$offset, \$length) instead. This method will be removed after 2022-09-03";
+        return &copy_byte($array, $offset, $length);
+      }
+      static method copy_range_short : short[] ($array : short[], $offset : int, $length : int) {
+        warn "Array->copy_range_short(\$array, \$offset, \$length) is deprecated. Use Array->copy(\$array, \$offset, \$length) instead. This method will be removed after 2022-09-03";
+        return &copy_short($array, $offset, $length);
+      }
+      static method copy_range_int : int[] ($array : int[], $offset : int, $length : int) {
+        warn "Array->copy_range_int(\$array, \$offset, \$length) is deprecated. Use Array->copy(\$array, \$offset, \$length) instead. This method will be removed after 2022-09-03";
+        return &copy_int($array, $offset, $length);
+      }
+      static method copy_range_long : long[] ($array : long[], $offset : int, $length : int) {
+        warn "Array->copy_range_long(\$array, \$offset, \$length) is deprecated. Use Array->copy(\$array, \$offset, \$length) instead. This method will be removed after 2022-09-03";
+        return &copy_long($array, $offset, $length);
+      }
+      static method copy_range_float : float[] ($array : float[], $offset : int, $length : int) {
+        warn "Array->copy_range_float(\$array, \$offset, \$length) is deprecated. Use Array->copy(\$array, \$offset, \$length) instead. This method will be removed after 2022-09-03";
+        return &copy_float($array, $offset, $length);
+      }
+      static method copy_range_double : double[] ($array : double[], $offset : int, $length : int) {
+        warn "Array->copy_range_double(\$array, \$offset, \$length) is deprecated. Use Array->copy(\$array, \$offset, \$length) instead. This method will be removed after 2022-09-03";
+        return &copy_double($array, $offset, $length);
+      }
+      static method copy_range_object_address : object[] ($array : object[], $offset : int, $length : int) {
+        warn "Array->copy_range_object_address(\$array, \$offset, \$length) is deprecated. Use Array->copy_object_address(\$array, \$offset, \$length) instead. This method will be removed after 2022-09-03";
+        return &copy_range_object($array, $offset, $length, undef);
+      }
+      static method copy_range_object : object[] ($array : object[], $offset : int, $length : int, $cloner : Cloner) {
+        warn "Array->copy_range_object(\$array, \$offset, \$length, \$cloner) is deprecated. Use Array->copy_object(\$array, \$cloner, \$offset, \$length) instead. This method will be removed after 2022-09-03";
+        return &copy_object($array, $cloner, $offset, $length);
+      }
+      static method copy_range_string : string[] ($array : string[], $offset : int, $length : int) {
+        warn "Array->copy_range_string(\$array, \$offset, \$length) is deprecated. Use Array->copy_string(\$array, \$offset, \$length) instead. This method will be removed after 2022-09-03";
+        return &copy_string($array, $offset, $length);
+      }
+
+      static method copy_range_string_address : string[] ($array : string[], $offset : int, $length : int) {
+        warn "Array->copy_range_string_address(\$array, \$offset, \$length) is deprecated. Use Array->copy_string_address(\$array, \$offset, \$length) instead. This method will be removed after 2022-09-03";
+        return &copy_string_address($array, $offset, $length);
+      }
+
+    * The following methods of Fn class are deprecated.
+      static method index_len : int ($string : string, $substring : string, $offset : int, $length : int) {
+        warn "Fn->index_len(\$string, \$substring, \$offset, \$length) is deprecated. Use Fn->index(\$string, \$substring, \$offset, \$length) instead. This method will be removed after 2022-09-03";
+        return &index($string, $substring, $offset, $length);
+      }
+      static method rindex_len : int ($string : string, $substring : string, $offset : int, $length : int) {
+        warn "Fn->rindex_len(\$string, \$substring, \$offset, \$length) is deprecated. Use Fn->rindex(\$string, \$substring, \$offset, \$length) instead. This method will be removed after 2022-09-03";
+        return &rindex($string, $substring, $offset, $length);
+      }
+      static method split_limit : string[] ($sep : string, $string : string, $limit : int) {
+        warn "Fn->split_limit(\$string, \$substring, \$offset, \$length) is deprecated. Use Fn->split(\$string, \$substring, \$offset, \$length) instead. This method will be removed after 2022-09-03";
+        return &split($sep, $string, $limit);
+      }
+      
+  [Test Fix]
+    * Add Point3D tests. These tests are removed wrongly.
+0.9633 2022-08-03
+  [New Features]
+    * Add optional argument feature.
+    * Add the following native APIs. The length of the arguments can be got in the native module.
+      int32_t (*get_args_stack_length)(SPVM_ENV* env, SPVM_VALUE* stack);
+      void (*set_args_stack_length)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t args_length);
+    * Add the following runtime native APIs.
+      int32_t (*get_method_required_args_length)(void* runtime, int32_t method_id);
+  [Improve Exception Messages]
+    * Improve exception messages in native APIs.
+  [Incompatible Changes]
+    * All the implementations, the fields, the arguments, native APIs, documents about the concept of "signature" are removed.
+    * The definitions of the following native APIs are changed.
+      [Before]
+      int32_t (*get_field_id)(SPVM_ENV* env, const char* class_name, const char* field_name, const char* signature);
+      int32_t (*get_class_var_id)(SPVM_ENV* env, const char* class_name, const char* class_var_name, const char* signature);
+      int32_t (*get_class_method_id)(SPVM_ENV* env, const char* class_name, const char* method_name, const char* signature);
+      int32_t (*get_instance_method_id)(SPVM_ENV* env, void* object, const char* method_name, const char* signature);
+      void (*set_field_object_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* class_name, const char* field_name, const char* signature, void* value, int32_t* error, const char* file, int32_t line);
+      void* (*get_field_object_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* class_name, const char* field_name, const char* signature, int32_t* error, const char* file, int32_t line);
+      void (*set_class_var_object_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* class_var_name, const char* signature, void* value, int32_t* error, const char* file, int32_t line);
+      void* (*get_class_var_object_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* class_var_name, const char* signature, int32_t* error, const char* file, int32_t line);
+      int32_t (*call_class_method_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* method_name, const char* signature, const char* file, int32_t line);
+      int32_t (*call_instance_method_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* method_name, const char* signature, const char* file, int32_t line);
+      int32_t (*get_instance_method_id_static)(SPVM_ENV* env, const char* class_name, const char* method_name, const char* signature);
+      int32_t (*get_instance_method_id_super)(SPVM_ENV* env, void* object, const char* method_name, const char* signature);
+      
+    [After]
+      int32_t (*get_field_id)(SPVM_ENV* env, const char* class_name, const char* field_name);
+      int32_t (*get_class_var_id)(SPVM_ENV* env, const char* class_name, const char* class_var_name);
+      int32_t (*get_class_method_id)(SPVM_ENV* env, const char* class_name, const char* method_name);
+      int32_t (*get_instance_method_id)(SPVM_ENV* env, void* object, const char* method_name);
+      void (*set_field_object_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* class_name, const char* field_name, void* value, int32_t* error, const char* file, int32_t line);
+      void* (*get_field_object_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* class_name, const char* field_name, int32_t* error, const char* file, int32_t line);
+      void (*set_class_var_object_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* class_var_name, void* value, int32_t* error, const char* file, int32_t line);
+      void* (*get_class_var_object_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* class_var_name, int32_t* error, const char* file, int32_t line);
+      int32_t (*call_class_method_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* method_name, const char* file, int32_t line);
+      int32_t (*call_instance_method_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* method_name, const char* file, int32_t line);
+      int32_t (*get_instance_method_id_static)(SPVM_ENV* env, const char* class_name, const char* method_name);
+      int32_t (*get_instance_method_id_super)(SPVM_ENV* env, void* object, const char* method_name);
+      
+    * The definitions of the following runtime native APIs are removed.
+      int32_t (*get_class_var_signature_id)(void* runtime, int32_t class_var_id);
+      int32_t (*get_field_signature_id)(void* runtime, int32_t field_id);
+      int32_t (*get_method_signature_id)(void* runtime, int32_t method_id);
+      
+    * The precompiled methods don't use get_field_id_cache, get_class_var_id_cache, get_method_id_cache.
+    * The definitions of the following runtime native APIs are changed.
+      [Before]
+      int32_t (*get_type_width)(void* runtime, int32_t type_id);
+      [After]
+      int32_t (*get_type_stack_length)(void* runtime, int32_t type_id);
+    * The definitions of the following native APIs are changed.
+      [Before]
+      int32_t (*call_spvm_method)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t method_id, int32_t args_stack_length);
+      int32_t (*call_class_method_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* method_name, const char* file, int32_t line);
+      int32_t (*call_instance_method_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* method_name, const char* file, int32_t line);
+      int32_t (*call_class_method)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t method_id);
+      int32_t (*call_instance_method)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t method_id);
+      [After]
+      int32_t (*call_spvm_method)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t method_id, int32_t args_stack_length);
+      int32_t (*call_class_method_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* method_name, int32_t args_stack_length, const char* file, int32_t line);
+      int32_t (*call_instance_method_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* method_name, int32_t args_stack_length, const char* file, int32_t line);
+      int32_t (*call_class_method)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t method_id, int32_t args_stack_length);
+      int32_t (*call_instance_method)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t method_id, int32_t args_stack_length);
+    * The definitions of the following native APIs are removed.
+      int32_t (*get_method_id_cache)(SPVM_ENV* env, const char* method_cache_name, int32_t method_cache_name_length);
+      int32_t (*get_field_id_cache)(SPVM_ENV* env, const char* field_cache_name, int32_t field_cache_name_length);
+      int32_t (*get_class_var_id_cache)(SPVM_ENV* env, const char* class_var_cache_name, int32_t class_var_cache_name_length);
+  [Internal Ineffective Changes]
+    * Rename the opcode SPVM_OPCODE_C_ID_CALL_INSTANCE_METHOD_BY_SIGNATURE to SPVM_OPCODE_C_ID_CALL_INSTANCE_METHOD_BY_NAME.
+    * Remove signature_id fields in spvm_runtime_class_var, spvm_runtime_field, spvm_runtime_method.
+    * Add args_length field to spvm_call_method.h.
+    * Rename width of spvm_runtime_type to stack_length.
+    * Rename width of spvm_type to stack_length.
+    * Rename SPVM_TYPE_get_width to SPVM_TYPE_get_stack_length.
+    
 0.9632 2022-08-01
   [Internal Ineffective Changes]
     * Add set_field_object_by_name_v2 native API.

@@ -113,6 +113,7 @@ lib/App/Netdisco/SSHCollector/Platform/ASAContext.pm
 lib/App/Netdisco/SSHCollector/Platform/BigIP.pm
 lib/App/Netdisco/SSHCollector/Platform/Clavister.pm
 lib/App/Netdisco/SSHCollector/Platform/CPVSX.pm
+lib/App/Netdisco/SSHCollector/Platform/FortiOS.pm
 lib/App/Netdisco/SSHCollector/Platform/FreeBSD.pm
 lib/App/Netdisco/SSHCollector/Platform/GAIAEmbedded.pm
 lib/App/Netdisco/SSHCollector/Platform/IOS.pm
@@ -465,6 +466,7 @@ share/schema_versions/App-Netdisco-DB-68-69-PostgreSQL.sql
 share/schema_versions/App-Netdisco-DB-69-70-PostgreSQL.sql
 share/schema_versions/App-Netdisco-DB-7-8-PostgreSQL.sql
 share/schema_versions/App-Netdisco-DB-70-71-PostgreSQL.sql
+share/schema_versions/App-Netdisco-DB-71-72-PostgreSQL.sql
 share/schema_versions/App-Netdisco-DB-8-9-PostgreSQL.sql
 share/schema_versions/App-Netdisco-DB-9-10-PostgreSQL.sql
 share/views/admintask.tt

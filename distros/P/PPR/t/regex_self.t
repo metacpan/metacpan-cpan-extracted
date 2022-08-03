@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use utf8;
 
 use Test::More;
 
@@ -12,9 +13,16 @@ plan tests => 1;
 
 use PPR;
 
-ok "qr[ $PPR::GRAMMAR ]"
-    =~ m{ ^ (?&PerlOWS) (?&PerlQuotelikeQR) (?&PerlOWS) $  $PPR::GRAMMAR }xms
-        => 'Matched own grammar';
+if (open my $src_fh, '<', $INC{'PPR.pm'}) {
+    my $src_code = do { local $/; readline $src_fh; };
+
+    ok $src_code
+        =~ m{ (?&PerlEntireDocument)  $PPR::GRAMMAR }xms
+            => 'Matched own source';
+}
+else {
+    fail "Can't open PPR source file: $!";
+}
 
 done_testing();
 

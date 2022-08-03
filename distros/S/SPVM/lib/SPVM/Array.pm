@@ -119,223 +119,243 @@ C<Array> provides array utilities.
 
 =head2 copy_byte
 
-  static method copy_byte : byte[] ($array : byte[])
+  static method copy_byte : byte[] ($array : byte[], $offset = 0 : int, $length = -1 : int)
 
-Copy a C<byte> array.
+Create a new C<byte> array with the length sepcified by the argument, and copy the elements from the offset to the position proceeded by the length to the created array.
 
-If the array is not defined, return C<undef>.
+If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+
+The array must be defined. Otherwise an exception will be thrown.
+
+The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
+
+The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
 
 =head2 copy_double
 
-  static method copy_double : double[] ($array : double[])
+  static method copy_double : double[] ($array : double[], $offset = 0 : int, $length = -1 : int)
 
-Copy a C<double> array.
+Create a new C<double> array with the length sepcified by the argument, and copy the elements from the offset to the position proceeded by the length to the created array.
+
+If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+
+The array must be defined. Otherwise an exception will be thrown.
+
+The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
+
+The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
 
 If the array is not defined, return C<undef>.
 
 =head2 copy_float
 
-  static method copy_float : float[] ($array : float[])
+  static method copy_float : float[] ($array : float[], $offset = 0 : int, $length = -1 : int)
 
-Copy a C<float> array.
+Create a new C<float> array with the length sepcified by the argument, and copy the elements from the offset to the position proceeded by the length to the created array.
 
-If the array is not defined, return C<undef>.
+If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+
+The array must be defined. Otherwise an exception will be thrown.
+
+The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
+
+The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
 
 =head2 copy_int
 
-  static method copy_int : int[] ($array : int[])
+  static method copy_int : int[] ($array : int[], $offset = 0 : int, $length = -1 : int)
 
-Copy a C<int> array.
+Create a new C<int> array with the length sepcified by the argument, and copy the elements from the offset to the position proceeded by the length to the created array.
 
-If the array is not defined, return C<undef>.
+If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+
+The array must be defined. Otherwise an exception will be thrown.
+
+The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
+
+The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
   
 =head2 copy_long
 
-  static method copy_long : long[] ($array : long[])
+  static method copy_long : long[] ($array : long[], $offset = 0 : int, $length = -1 : int)
 
-Copy a C<long> array.
+Create a new C<long> array with the length sepcified by the argument, and copy the elements from the offset to the position proceeded by the length to the created array.
 
-If the array is not defined, return C<undef>.
+If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+
+The array must be defined. Otherwise an exception will be thrown.
+
+The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
+
+The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
 
 =head2 copy_object
 
-  static method copy_object : object[] ($array : object[], $cloner : Cloner)
+  static method copy_object : object[] ($array : object[], $cloner = undef : Cloner, $offset = 0 : int, $legnth = -1 : int)
 
-Copy an object array. Each element is cloned by the L<Cloner|SPVM::Cloner>.
-
-If the array is not defined, return C<undef>.
-
-If the cloner is not defined, the address of each element is copied.
-
-=head2 copy_object_address
-
-  static method copy_object_address : object[] ($array : object[]);
-
-The alias for the following code using L</"copy_object">.
-
-  my $ret = &copy_object($array, undef);
-
-=head2 copy_range_byte
-
-  static method copy_range_byte : byte[] ($array : byte[], $offset : int, $length : int)
-
-Create a new C<byte> array with the length sepcified by the argument, and copy the elements of the C<byte> array from the offset to the offset + the length - C<1> to the created array.
-
-The array must be defined. Otherwise an exception will be thrown.
-
-The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
-
-The length must be greater than or equal to C<0>. Otherwise an exception will be thrown.
-
-The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
-
-=head2 copy_range_double
-
-  static method copy_range_double : double[] ($array : double[], $offset : int, $length : int)
-
-Create a new C<double> array with the length sepcified by the argument, and copy the elements of the C<double> array from the offset to the offset + the length - C<1> to the created array.
-
-The array must be defined. Otherwise an exception will be thrown.
-
-The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
-
-The length must be greater than or equal to C<0>. Otherwise an exception will be thrown.
-
-The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
-
-=head2 copy_range_float
-
-  static method copy_range_float : float[] ($array : float[], $offset : int, $length : int)
-
-Create a new C<float> array with the length sepcified by the argument, and copy the elements of the C<float> array from the offset to the offset + the length - C<1> to the created array.
-
-The array must be defined. Otherwise an exception will be thrown.
-
-The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
-
-The length must be greater than or equal to C<0>. Otherwise an exception will be thrown.
-
-The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
-
-=head2 copy_range_int
-
-  static method copy_range_int : int[] ($array : int[], $offset : int, $length : int)
-
-Create a new C<int> array with the length sepcified by the argument, and copy the elements of the C<int> array from the offset to the offset + the length - C<1> to the created array.
-
-The array must be defined. Otherwise an exception will be thrown.
-
-The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
-
-The length must be greater than or equal to C<0>. Otherwise an exception will be thrown.
-
-The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
-
-=head2 copy_range_long
-
-  static method copy_range_long : long[] ($array : long[], $offset : int, $length : int)
-
-Create a new C<long> array with the length sepcified by the argument, and copy the elements of the C<long> array from the offset to the offset + the length - C<1> to the created array.
-
-The array must be defined. Otherwise an exception will be thrown.
-
-The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
-
-The length must be greater than or equal to C<0>. Otherwise an exception will be thrown.
-
-The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
-
-=head2 copy_range_object
-
-  static method copy_range_object : object[] ($array : object[], $offset : int, $length : int, $cloner : Cloner)
-
-Create a new object array with the length sepcified by the argument, and clone the elements of the object array from the offset to the offset + the length - C<1> to the created array.
+Create a new object array with the length sepcified by the argument, and clone the elements of the object array from the offset to the position proceeded by the length to the created array.
 
 Each element is cloned by the L<Cloner|SPVM::Cloner>.
 
 If the cloner is not defined, the address of each element is copied.
 
+If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+
 The array must be defined. Otherwise an exception will be thrown.
 
 The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
 
-The length must be greater than or equal to C<0>. Otherwise an exception will be thrown.
-
 The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
+
+=head2 copy_object_address
+
+  static method copy_object_address : object[] ($array : object[], $offset = 0 : int, $legnth = -1 : int);
+
+The alias for the following code using L</"copy_object">.
+
+  my $ret = &copy_object($array, undef, $offset, $length);
+
+=head2 copy_range_byte
+
+  static method copy_range_byte : byte[] ($array : byte[], $offset : int, $length : int)
+
+The alias for the following code using L</"copy_byte">
+
+  my $ret = Array->copy_byte($array, $offset, $length);
+
+This method is depracated and will be removed after 2022-08-03.
+
+=head2 copy_range_double
+
+  static method copy_range_double : double[] ($array : double[], $offset : int, $length : int)
+
+The alias for the following code using L</"copy_double">
+
+  my $ret = Array->copy_double($array, $offset, $length);
+
+This method is depracated and will be removed after 2022-08-03.
+
+=head2 copy_range_float
+
+  static method copy_range_float : float[] ($array : float[], $offset : int, $length : int)
+
+The alias for the following code using L</"copy_float">
+
+  my $ret = Array->copy_float($array, $offset, $length);
+
+This method is depracated and will be removed after 2022-08-03.
+
+=head2 copy_range_int
+
+  static method copy_range_int : int[] ($array : int[], $offset : int, $length : int)
+
+The alias for the following code using L</"copy_int">
+
+  my $ret = Array->copy_int($array, $offset, $length);
+
+This method is depracated and will be removed after 2022-08-03.
+
+=head2 copy_range_long
+
+  static method copy_range_long : long[] ($array : long[], $offset : int, $length : int)
+
+The alias for the following code using L</"copy_long">
+
+  my $ret = Array->copy_long($array, $offset, $length);
+
+This method is depracated and will be removed after 2022-08-03.
 
 =head2 copy_range_object
 
   static method copy_range_object : object[] ($array : object[], $offset : int, $length : int, $cloner : Cloner)
 
+The alias for the following code using L</"copy_object">
+
+  my $ret = Array->copy_object($array, $cloner, $offset, $length);
+
+This method is depracated and will be removed after 2022-08-03.
+
+=head2 copy_range_object_address
+
+  static method copy_range_object_address : object[] ($array : object[], $offset : int, $length : int, $cloner : Cloner)
+
 The alias for the following code using L</"copy_range_object">.
 
   my $ret = &copy_range_object($array, $offset, $length, undef);
+
+This method is depracated and will be removed after 2022-08-03.
 
 =head2 copy_range_short
 
   static method copy_range_short : short[] ($array : short[], $offset : int, $length : int)
 
-Create a new C<short> array with the length sepcified by the argument, and copy the elements of the C<short> array from the offset to the offset + the length - C<1> to the created array.
+The alias for the following code using L</"copy_short">
 
-The array must be defined. Otherwise an exception will be thrown.
+  my $ret = Array->copy_short($array, $offset, $length);
 
-The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
-
-The length must be greater than or equal to C<0>. Otherwise an exception will be thrown.
-
-The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
+This method is depracated and will be removed after 2022-08-03.
 
 =head2 copy_range_string
   
   static method copy_range_string : string[] ($array : string[], $offset : int, $length : int)
 
-Create a new C<string> array with the length sepcified by the argument, and copy the elements of the C<string> array using C<copy> operator from the offset to the offset + the length - C<1> to the created array.
+The alias for the following code using L</"copy_string">
 
-The array must be defined. Otherwise an exception will be thrown.
+  my $ret = Array->copy_string($array, $offset, $length);
 
-The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
-
-The length must be greater than or equal to C<0>. Otherwise an exception will be thrown.
-
-The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
+This method is depracated and will be removed after 2022-08-03.
 
 =head2 copy_range_string_address
   
   static method copy_range_string : string[] ($array : string[], $offset : int, $length : int)
 
-Create a new C<string> array with the length sepcified by the argument, and copy the addresses of the elements of the C<string> array from the offset to the offset + the length - C<1> to the created array.
+The alias for the following code using L</"copy_string_address">
+
+  my $ret = Array->copy_string_address($array, $offset, $length);
+
+This method is depracated and will be removed after 2022-08-03.
+
+=head2 copy_short
+
+  static method copy_short : short[] ($array : short[], $offset = 0 : int, $length = -1 : int)
+
+Create a new C<short> array with the length sepcified by the argument, and copy the elements from the offset to the position proceeded by the length to the created array.
+
+If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
 
 The array must be defined. Otherwise an exception will be thrown.
 
 The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
 
-The length must be greater than or equal to C<0>. Otherwise an exception will be thrown.
+The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
+
+=head2 copy_string
+
+  static method copy_string : string[] ($array : string[], $offset = 0 : int, $length = -1 : int)
+
+Create a new C<string> array with the length sepcified by the argument, and copy the elements of the C<string> array using C<copy> operator from the offset to the position proceeded by the length to the created array.
+
+If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+
+The array must be defined. Otherwise an exception will be thrown.
+
+The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
 
 The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
 
-=head2 copy_short
-
-  static method copy_short : short[] ($array : short[])
-
-Copy a C<short> array.
-
-If the array is not defined, return C<undef>.
-  
-=head2 copy_string
-
-  static method copy_string : string[] ($array : string[])
-
-Copy a C<string> array using the C<copy> operator.
-
-If the array is not defined, return C<undef>.
-
 =head2 copy_string_address
 
-  static method copy_string_address : string[] ($array : string[])
+  static method copy_string_address : string[] ($array : string[], $offset = 0 : int, $length = -1 : int)
 
-Copy the addresses of the elements of a C<string> array.
+Create a new C<string> array with the length sepcified by the argument, and copy the addresses of the elements of the C<string> array from the offset to the position proceeded by the length to the created array.
 
-If the array is not defined, return C<undef>.
+If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+
+The array must be defined. Otherwise an exception will be thrown.
+
+The offset must be greater than or equal to C<0>. Otherwise an exception will be thrown.
+
+The offset + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will be thrown.
 
 =head2 dump_unsigned_byte
 
@@ -505,7 +525,7 @@ The alias for the following code using L</"equals_object_address">.
 
 Copy the range of the elements of the source C<byte> array to the range of the elements of the destination C<byte> array.
 
-The range of the elements of the source array is from the offset of the source to the offset of the source + the length specified by the argument - C<1> .
+The range of the elements of the source array is from the offset to the position proceeded by the length of the source.
 
 The range of the elements of the destination array is from the offset of the destination to the offset of the destination + the length specified by the argument.
 
@@ -531,7 +551,7 @@ The offset of the source + the length specified by the argument must be less tha
 
 Copy the range of the elements of the source C<double> array to the range of the elements of the destination C<double> array.
 
-The range of the elements of the source array is from the offset of the source to the offset of the source + the length specified by the argument - C<1> .
+The range of the elements of the source array is from the offset to the position proceeded by the length of the source.
 
 The range of the elements of the destination array is from the offset of the destination to the offset of the destination + the length specified by the argument.
 
@@ -557,7 +577,7 @@ The offset of the source + the length specified by the argument must be less tha
 
 Copy the range of the elements of the source C<float> array to the range of the elements of the destination C<float> array.
 
-The range of the elements of the source array is from the offset of the source to the offset of the source + the length specified by the argument - C<1> .
+The range of the elements of the source array is from the offset to the position proceeded by the length of the source.
 
 The range of the elements of the destination array is from the offset of the destination to the offset of the destination + the length specified by the argument.
 
@@ -583,7 +603,7 @@ The offset of the source + the length specified by the argument must be less tha
 
 Copy the range of the elements of the source C<int> array to the range of the elements of the destination C<int> array.
 
-The range of the elements of the source array is from the offset of the source to the offset of the source + the length specified by the argument - C<1> .
+The range of the elements of the source array is from the offset to the position proceeded by the length of the source.
 
 The range of the elements of the destination array is from the offset of the destination to the offset of the destination + the length specified by the argument.
 
@@ -609,7 +629,7 @@ The offset of the source + the length specified by the argument must be less tha
 
 Copy the range of the elements of the source C<long> array to the range of the elements of the destination C<long> array.
 
-The range of the elements of the source array is from the offset of the source to the offset of the source + the length specified by the argument - C<1> .
+The range of the elements of the source array is from the offset to the position proceeded by the length of the source.
 
 The range of the elements of the destination array is from the offset of the destination to the offset of the destination + the length specified by the argument.
 
@@ -637,7 +657,7 @@ Copy the range of the elements of the source object array to the range of the el
 
 Each address is copied.
 
-The range of the elements of the source array is from the offset of the source to the offset of the source + the length specified by the argument - C<1> .
+The range of the elements of the source array is from the offset to the position proceeded by the length of the source.
 
 The range of the elements of the destination array is from the offset of the destination to the offset of the destination + the length specified by the argument.
 
@@ -669,7 +689,7 @@ The alias for L</"memcpy_object_address">. This method is deprecated.
 
 Copy the range of the elements of the source C<short> array to the range of the elements of the destination C<short> array.
 
-The range of the elements of the source array is from the offset of the source to the offset of the source + the length specified by the argument - C<1> .
+The range of the elements of the source array is from the offset to the position proceeded by the length of the source.
 
 The range of the elements of the destination array is from the offset of the destination to the offset of the destination + the length specified by the argument.
 
@@ -765,123 +785,123 @@ The alias for L</"memmove_string_address">. This method is deprecated.
 
 =head2 memset_byte
 
-  static method memset_byte : void ($dest : byte[], $dest_offset : int, $element : byte, $length : int)
+  static method memset_byte : void ($array : byte[], $element : byte, $offset = 0 : int, $length = -1 : int)
 
-Set the range of the elements of the destination C<byte> array to the element specified by the argument.
+Set the range of the elements of the C<byte> array to the element specified by the argument.
 
-The range of the elements of the destination array is from the offset of the destination to the offset of the destination + the length specified by the argument - C<1> .
+The range of the elements of the array is from the offset to the position proceeded by the length.
 
-The destination must be defined. Otherwise an exception will occur.
+If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
 
-The offset of the destination must be greater than or equal to C<0>. Otherwise an exception will occur.
+The array must be defined. Otherwise an exception will occur.
 
-The length must be greater than or equal to 0. Otherwise an exception will occur.
+The offset of the array must be greater than or equal to C<0>. Otherwise an exception will occur.
 
-The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination. Otherwise an exception will occur.
+The offset of the array + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will occur.
 
 =head2 memset_double
 
-  static method memset_double : void ($dest : double[], $dest_offset : int, $element : double, $length : int)
+  static method memset_double : void ($array : double[], $element : double, $offset = 0 : int, $length = -1 : int)
 
-Set the range of the elements of the destination C<double> array to the element specified by the argument.
+Set the range of the elements of the C<double> array to the element specified by the argument.
 
-The range of the elements of the destination array is from the offset of the destination to the offset of the destination + the length specified by the argument - C<1> .
+The range of the elements of the array is from the offset to the position proceeded by the length.
 
-The destination must be defined. Otherwise an exception will occur.
+If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
 
-The offset of the destination must be greater than or equal to C<0>. Otherwise an exception will occur.
+The array must be defined. Otherwise an exception will occur.
 
-The length must be greater than or equal to 0. Otherwise an exception will occur.
+The offset of the array must be greater than or equal to C<0>. Otherwise an exception will occur.
 
-The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination. Otherwise an exception will occur.
+The offset of the array + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will occur.
 
 =head2 memset_float
 
-  static method memset_float : void ($dest : float[], $dest_offset : int, $element : float, $length : int)
+  static method memset_float : void ($array : float[], $element : float, $offset = 0 : int, $length = -1 : int)
 
-Set the range of the elements of the destination C<float> array to the element specified by the argument.
+Set the range of the elements of the C<float> array to the element specified by the argument.
 
-The range of the elements of the destination array is from the offset of the destination to the offset of the destination + the length specified by the argument - C<1> .
+The range of the elements of the array is from the offset to the position proceeded by the length.
 
-The destination must be defined. Otherwise an exception will occur.
+If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
 
-The offset of the destination must be greater than or equal to C<0>. Otherwise an exception will occur.
+The array must be defined. Otherwise an exception will occur.
 
-The length must be greater than or equal to 0. Otherwise an exception will occur.
+The offset of the array must be greater than or equal to C<0>. Otherwise an exception will occur.
 
-The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination. Otherwise an exception will occur.
+The offset of the array + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will occur.
 
 =head2 memset_int
 
-  static method memset_int : void ($dest : int[], $dest_offset : int, $element : int, $length : int)
+  static method memset_int : void ($array : int[], $element : int, $offset = 0 : int, $length = -1 : int)
 
-Set the range of the elements of the destination C<int> array to the element specified by the argument.
+Set the range of the elements of the C<int> array to the element specified by the argument.
 
-The range of the elements of the destination array is from the offset of the destination to the offset of the destination + the length specified by the argument - C<1> .
+The range of the elements of the array is from the offset to the position proceeded by the length.
 
-The destination must be defined. Otherwise an exception will occur.
+If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
 
-The offset of the destination must be greater than or equal to C<0>. Otherwise an exception will occur.
+The array must be defined. Otherwise an exception will occur.
 
-The length must be greater than or equal to 0. Otherwise an exception will occur.
+The offset of the array must be greater than or equal to C<0>. Otherwise an exception will occur.
 
-The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination. Otherwise an exception will occur.
+The offset of the array + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will occur.
 
 =head2 memset_long
 
-  static method memset_long : void ($dest : long[], $dest_offset : int, $element : long, $length : int)
+  static method memset_long : void ($array : long[], $element : long, $offset = 0 : int, $length = -1 : int)
 
-Set the range of the elements of the destination C<long> array to the element specified by the argument.
+Set the range of the elements of the C<long> array to the element specified by the argument.
 
-The range of the elements of the destination array is from the offset of the destination to the offset of the destination + the length specified by the argument - C<1> .
+The range of the elements of the array is from the offset to the position proceeded by the length.
 
-The destination must be defined. Otherwise an exception will occur.
+If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
 
-The offset of the destination must be greater than or equal to C<0>. Otherwise an exception will occur.
+The array must be defined. Otherwise an exception will occur.
 
-The length must be greater than or equal to 0. Otherwise an exception will occur.
+The offset of the array must be greater than or equal to C<0>. Otherwise an exception will occur.
 
-The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination. Otherwise an exception will occur.
+The offset of the array + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will occur.
 
 =head2 memset_object
 
-  static method memset_object : void ($dest : object[], $dest_offset : int : int, $element : object, $length)
+  static method memset_object : void ($array : object[], $element : object, $offset = 0 : int, $length = -1 : int)
 
-Set the range of the elements of the destination object array to the element specified by the argument.
+Set the range of the elements of the object array to the element specified by the argument.
 
-The range of the elements of the destination array is from the offset of the destination to the offset of the destination + the length specified by the argument - C<1> .
+The range of the elements of the array is from the offset to the position proceeded by the length.
 
-The destination must be defined. Otherwise an exception will occur.
+If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
 
-The offset of the destination must be greater than or equal to C<0>. Otherwise an exception will occur.
+The array must be defined. Otherwise an exception will occur.
 
-The length must be greater than or equal to 0. Otherwise an exception will occur.
+The offset of the array must be greater than or equal to C<0>. Otherwise an exception will occur.
 
-The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination. Otherwise an exception will occur.
+The offset of the array + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will occur.
 
 =head2 memset_short
 
-  static method memset_short : void ($dest : short[], $dest_offset : int, $element : short, $length : int)
+  static method memset_short : void ($array : short[], $element : short, $offset = 0 : int, $length = -1 : int)
 
-Set the range of the elements of the destination C<short> array to the element specified by the argument.
+Set the range of the elements of the C<short> array to the element specified by the argument.
 
-The range of the elements of the destination array is from the offset of the destination to the offset of the destination + the length specified by the argument - C<1> .
+The range of the elements of the array is from the offset to the position proceeded by the length.
 
-The destination must be defined. Otherwise an exception will occur.
+If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
 
-The offset of the destination must be greater than or equal to C<0>. Otherwise an exception will occur.
+The array must be defined. Otherwise an exception will occur.
 
-The length must be greater than or equal to 0. Otherwise an exception will occur.
+The offset of the array must be greater than or equal to C<0>. Otherwise an exception will occur.
 
-The offset of the destination + the length specified by the argument must be less than or equal to the length of the destination. Otherwise an exception will occur.
+The offset of the array + the length specified by the argument must be less than or equal to the length of the array. Otherwise an exception will occur.
 
 =head2 memset_string
 
-  static method memset_string : void ($dest : string[], $dest_offset : int, $element : string, $length : int)
+  static method memset_string : void ($array : string[], $element : string, $offset = 0 : int, $length = -1 : int)
 
 The alias for the following code using L</"memset_object">.
 
-  &memset_object($dest, $dest_offset, $element, $length);
+  &memset_object($dest, $element, $dest_offset, $length);
 
 =head2 new_proto
 

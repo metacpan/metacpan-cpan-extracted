@@ -1,3 +1,4 @@
+use v5.10;
 use strict;
 use warnings;
 
@@ -11,6 +12,9 @@ BEGIN{
 
 use PPR;
 
+my $QUOTELIKE = qr{ \A (?&PerlOWS) (?&PerlQuotelikeQ) (?&PerlOWS) \Z $PPR::GRAMMAR }x;
+
+my $line_offset;
 my $neg = 0;
 while (my $str = <DATA>) {
            if ($str =~ /\A# TH[EI]SE? SHOULD MATCH/) { $neg = 0;       next; }
@@ -19,16 +23,18 @@ while (my $str = <DATA>) {
 
         $str =~ s/\s*^####\h*\Z//m;
 
+        my $line = $line_offset + $.;
         if ($neg) {
-            ok $str !~ m/\A (?&PerlOWS) (?&PerlQuotelikeQ) (?&PerlOWS) \Z $PPR::GRAMMAR/xo => "FAIL: $str";
+            ok $str !~ $QUOTELIKE => "FAIL [$line]: $str";
         }
         else {
-            ok $str =~ m/\A (?&PerlOWS) (?&PerlQuotelikeQ) (?&PerlOWS) \Z $PPR::GRAMMAR/xo => "MATCH: $str";
+            ok $str =~ $QUOTELIKE => "MATCH [$line]: $str";
         }
 }
 
 done_testing();
 
+BEGIN { $line_offset = __LINE__; }
 __DATA__
 # THESE SHOULD MATCH...
     ''

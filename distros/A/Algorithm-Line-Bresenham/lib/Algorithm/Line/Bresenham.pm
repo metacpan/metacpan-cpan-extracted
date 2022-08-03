@@ -14,20 +14,16 @@ Algorithm::Line::Bresenham - simple pixellated line-drawing algorithm
 
 Bresenham is one of the canonical line drawing algorithms for pixellated grids.
 Given a start and an end-point, Bresenham calculates which points on the grid
-need to be filled to generate the line between them.
+need to be filled to generate the line between them. This module has been extended
+to include cureves crcles ellipses and thick licnes, variable thickness lines.
 
-Googling for 'Bresenham', and 'line drawing algorithms' gives some good
-overview.  The code here are adapted from various sources, mainly from 
-C code at https://gist.github.com/bert/1085538
-
-=head1 FUNCTIONS
 
 =cut
 
 
 package Algorithm::Line::Bresenham;
 use strict; use warnings;
-our $VERSION = 0.14;
+our $VERSION = 0.151;
 use base 'Exporter';
 our @EXPORT_OK = qw/line circle ellipse_rect quad_bezier polyline varthick_line thick_line/;
 
@@ -45,7 +41,7 @@ performance reasons
 
 sub line { # ported from https://gist.github.com/bert/1085538
 	use integer;
-	 my ($x0, $y0, $x1, $y1,$callback)=@_;
+	 my ($x0, $y0, $x1, $y1,$callback,$cbArgs)=@_;
 	 use integer;
      my $dx =  abs ($x1 - $x0);
      my $sx = $x0 < $x1 ? 1 : -1;
@@ -56,7 +52,13 @@ sub line { # ported from https://gist.github.com/bert/1085538
      my @points;
  
      while(1){  #/* loop */
-       push @points,[$x0,$y0];
+		 if ($callback){
+			 $callback->($x0,$y0,$cbArgs);
+		 }
+		 else{
+			 push @points,[$x0,$y0];
+		 }
+       
        last if ($x0 == $x1 && $y0 == $y1);
        $e2 = 2 * $err;
        if ($e2 >= $dy) { $err += $dy; $x0 += $sx; } #/* e_xy+e_x > 0 */
@@ -532,10 +534,8 @@ sub y_varthick_line {
 
 sub thick_line{
      my ($x0,$y0,$x1,$y1,$thickness)=@_;
-     return varthick_line(13,13,5,-5,sub{return $thickness},undef,sub{return $thickness},2)
+     return varthick_line($x0,$y0,$x1,$y1,sub{return (1+$thickness)/2},undef,sub{return (1+$thickness)/2},undef)
 };
-
-
 sub varthick_line{
      my ($x0,$y0,$x1,$y1,
        $left,$argL,

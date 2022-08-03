@@ -96,7 +96,6 @@ union spvm_value {
 
 
 
-
 struct spvm_env {
   void* class_vars_heap;
   void* object_header_byte_size;
@@ -119,11 +118,11 @@ struct spvm_env {
   void* reserved18;
   void* reserved19;
   int32_t (*get_basic_type_id)(SPVM_ENV* env, const char* basic_type_name);
-  int32_t (*get_field_id)(SPVM_ENV* env, const char* class_name, const char* field_name, const char* signature);
+  int32_t (*get_field_id)(SPVM_ENV* env, const char* class_name, const char* field_name);
   int32_t (*get_field_offset)(SPVM_ENV* env, int32_t field_id);
-  int32_t (*get_class_var_id)(SPVM_ENV* env, const char* class_name, const char* class_var_name, const char* signature);
-  int32_t (*get_class_method_id)(SPVM_ENV* env, const char* class_name, const char* method_name, const char* signature);
-  int32_t (*get_instance_method_id)(SPVM_ENV* env, void* object, const char* method_name, const char* signature);
+  int32_t (*get_class_var_id)(SPVM_ENV* env, const char* class_name, const char* class_var_name);
+  int32_t (*get_class_method_id)(SPVM_ENV* env, const char* class_name, const char* method_name);
+  int32_t (*get_instance_method_id)(SPVM_ENV* env, void* object, const char* method_name);
   void* (*new_object_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id);
   void* (*new_object)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id);
   void* (*new_byte_array_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
@@ -193,7 +192,7 @@ struct spvm_env {
   void (*set_class_var_object)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t pkgvar_id, void* value);
   void* (*get_pointer)(SPVM_ENV* env, SPVM_VALUE* stack, void* pointer_object);
   void (*set_pointer)(SPVM_ENV* env, SPVM_VALUE* stack, void* pointer_object, void* pointer);
-  int32_t (*call_spvm_method)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t method_id);
+  int32_t (*call_spvm_method)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t method_id, int32_t args_stack_length);
   void* (*get_exception)(SPVM_ENV* env, SPVM_VALUE* stack);
   int32_t (*set_exception)(SPVM_ENV* env, SPVM_VALUE* stack, void* exception);
   int32_t (*get_ref_count)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
@@ -228,37 +227,37 @@ struct spvm_env {
   void (*set_field_long_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* class_name, const char* field_name, int64_t value, int32_t* error, const char* file, int32_t line);
   void (*set_field_float_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* class_name, const char* field_name, float value, int32_t* error, const char* file, int32_t line);
   void (*set_field_double_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* class_name, const char* field_name, double value, int32_t* error, const char* file, int32_t line);
-  void (*set_field_object_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* class_name, const char* field_name, const char* signature, void* value, int32_t* error, const char* file, int32_t line);
+  void (*set_field_object_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* class_name, const char* field_name, void* value, int32_t* error, const char* file, int32_t line);
   int8_t (*get_field_byte_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* class_name, const char* field_name, int32_t* error, const char* file, int32_t line);
   int16_t (*get_field_short_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* class_name, const char* field_name, int32_t* error, const char* file, int32_t line);
   int32_t (*get_field_int_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* class_name, const char* field_name, int32_t* error, const char* file, int32_t line);
   int64_t (*get_field_long_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* class_name, const char* field_name, int32_t* error, const char* file, int32_t line);
   float (*get_field_float_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* class_name, const char* field_name, int32_t* error, const char* file, int32_t line);
   double (*get_field_double_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* class_name, const char* field_name, int32_t* error, const char* file, int32_t line);
-  void* (*get_field_object_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* class_name, const char* field_name, const char* signature, int32_t* error, const char* file, int32_t line);
+  void* (*get_field_object_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* class_name, const char* field_name, int32_t* error, const char* file, int32_t line);
   void (*set_class_var_byte_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* class_var_name, int8_t value, int32_t* error, const char* file, int32_t line);
   void (*set_class_var_short_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* class_var_name, int16_t value, int32_t* error, const char* file, int32_t line);
   void (*set_class_var_int_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* class_var_name, int32_t value, int32_t* error, const char* file, int32_t line);
   void (*set_class_var_long_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* class_var_name, int64_t value, int32_t* error, const char* file, int32_t line);
   void (*set_class_var_float_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* class_var_name, float value, int32_t* error, const char* file, int32_t line);
   void (*set_class_var_double_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* class_var_name, double value, int32_t* error, const char* file, int32_t line);
-  void (*set_class_var_object_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* class_var_name, const char* signature, void* value, int32_t* error, const char* file, int32_t line);
+  void (*set_class_var_object_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* class_var_name, void* value, int32_t* error, const char* file, int32_t line);
   int8_t (*get_class_var_byte_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* class_var_name, int32_t* error, const char* file, int32_t line);
   int16_t (*get_class_var_short_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* class_var_name, int32_t* error, const char* file, int32_t line);
   int32_t (*get_class_var_int_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* class_var_name, int32_t* error, const char* file, int32_t line);
   int64_t (*get_class_var_long_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* class_var_name, int32_t* error, const char* file, int32_t line);
   float (*get_class_var_float_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* class_var_name, int32_t* error, const char* file, int32_t line);
   double (*get_class_var_double_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* class_var_name, int32_t* error, const char* file, int32_t line);
-  void* (*get_class_var_object_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* class_var_name, const char* signature, int32_t* error, const char* file, int32_t line);
-  int32_t (*call_class_method_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* method_name, const char* signature, const char* file, int32_t line);
-  int32_t (*call_instance_method_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* method_name, const char* signature, const char* file, int32_t line);
+  void* (*get_class_var_object_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* class_var_name, int32_t* error, const char* file, int32_t line);
+  int32_t (*call_class_method_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* method_name, int32_t args_stack_length, const char* file, int32_t line);
+  int32_t (*call_instance_method_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* method_name, int32_t args_stack_length, const char* file, int32_t line);
   const char* (*get_field_string_chars_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* obj, const char* class_name, const char* field_name, int32_t* error, const char* file, int32_t line);
   void (*free_env_prepared)(SPVM_ENV* env);
   void* (*dump_raw)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
   void* (*dump)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
-  int32_t (*call_class_method)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t method_id);
-  int32_t (*call_instance_method)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t method_id);
-  int32_t (*get_instance_method_id_static)(SPVM_ENV* env, const char* class_name, const char* method_name, const char* signature);
+  int32_t (*call_class_method)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t method_id, int32_t args_stack_length);
+  int32_t (*call_instance_method)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t method_id, int32_t args_stack_length);
+  int32_t (*get_instance_method_id_static)(SPVM_ENV* env, const char* class_name, const char* method_name);
   int32_t (*get_bool_object_value)(SPVM_ENV* env, SPVM_VALUE* stack, void* bool_object);
   void (*cleanup_global_vars)(SPVM_ENV* env, SPVM_VALUE* stack);
   void (*make_read_only)(SPVM_ENV* env, SPVM_VALUE* stack, void* string);
@@ -274,9 +273,9 @@ struct spvm_env {
   void* (*copy)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
   void (*shorten)(SPVM_ENV* env, SPVM_VALUE* stack, void* string, int32_t new_length);
   int32_t (*has_interface)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t interface_basic_type_id);
-  int32_t (*get_method_id_cache)(SPVM_ENV* env, const char* method_cache_name, int32_t method_cache_name_length);
-  int32_t (*get_field_id_cache)(SPVM_ENV* env, const char* field_cache_name, int32_t field_cache_name_length);
-  int32_t (*get_class_var_id_cache)(SPVM_ENV* env, const char* class_var_cache_name, int32_t class_var_cache_name_length);
+  void* reserved176;
+  void* reserved177;
+  void* reserved178;
   void (*print)(SPVM_ENV* env, SPVM_VALUE* stack, void* string);
   void (*print_stderr)(SPVM_ENV* env, SPVM_VALUE* stack, void* string);
   int32_t (*init_env)(SPVM_ENV* env);
@@ -284,7 +283,7 @@ struct spvm_env {
   int32_t (*get_class_id)(SPVM_ENV* env, const char* class_name);
   SPVM_VALUE* (*new_stack)(SPVM_ENV* env);
   void (*free_stack)(SPVM_ENV* env, SPVM_VALUE* stack);
-  int32_t (*get_instance_method_id_super)(SPVM_ENV* env, void* object, const char* method_name, const char* signature);
+  int32_t (*get_instance_method_id_super)(SPVM_ENV* env, void* object, const char* method_name);
   void* (*new_memory_env)(SPVM_ENV* env, size_t byte_size);
   void (*free_memory_env)(SPVM_ENV* env, void* block);
   int32_t (*get_memory_blocks_count_env)(SPVM_ENV* env);
@@ -296,6 +295,8 @@ struct spvm_env {
   int32_t (*get_class_id_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, int32_t* error, const char* file, int32_t line);
   const char* (*strerror)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value, int32_t length);
   void* (*new_string_array)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
+  int32_t (*get_args_stack_length)(SPVM_ENV* env, SPVM_VALUE* stack);
+  void (*set_args_stack_length)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t args_length);
 };
 
 
@@ -317,7 +318,7 @@ struct spvm_env_runtime {
   int32_t (*get_basic_type_category)(void* runtime, int32_t basic_type_id);
   int32_t (*get_type_basic_type_id)(void* runtime, int32_t type_id);
   int32_t (*get_type_dimension)(void* runtime, int32_t type_id);
-  int32_t (*get_type_width)(void* runtime, int32_t type_id);
+  int32_t (*get_type_stack_length)(void* runtime, int32_t type_id);
   int32_t (*get_type_is_object)(void* runtime, int32_t type_id);
   int32_t (*get_type_is_ref)(void* runtime, int32_t type_id);
   int32_t (*get_class_id_by_name)(void* runtime, const char* class_name);
@@ -336,18 +337,18 @@ struct spvm_env_runtime {
   int32_t (*get_class_var_id_by_index)(void* runtime, int32_t class_id, int32_t class_var_index);
   int32_t (*get_class_var_id_by_name)(void* runtime, const char* class_name, const char* class_var_name);
   int32_t (*get_class_var_name_id)(void* runtime, int32_t class_var_id);
-  int32_t (*get_class_var_signature_id)(void* runtime, int32_t class_var_id);
+  void* reserved36;
   int32_t (*get_class_var_class_id)(void* runtime, int32_t class_var_id);
   int32_t (*get_field_id_by_index)(void* runtime, int32_t class_id, int32_t field_index);
   int32_t (*get_field_id_by_name)(void* runtime, const char* class_name, const char* field_name);
   int32_t (*get_field_name_id)(void* runtime, int32_t field_id);
   int32_t (*get_field_type_id)(void* runtime, int32_t field_id);
-  int32_t (*get_field_signature_id)(void* runtime, int32_t field_id);
+  void* reserved42;
   int32_t (*get_field_class_id)(void* runtime, int32_t field_id);
   int32_t (*get_method_id_by_index)(void* runtime, int32_t class_id, int32_t method_index);
   int32_t (*get_method_id_by_name)(void* runtime, const char* class_name, const char* method_name);
   int32_t (*get_method_name_id)(void* runtime, int32_t method_id);
-  int32_t (*get_method_signature_id)(void* runtime, int32_t method_id);
+  void* reserved47;
   int32_t (*get_method_return_type_id)(void* runtime, int32_t method_id);
   int32_t (*get_method_class_id)(void* runtime, int32_t method_id);
   int32_t (*get_method_is_class_method)(void* runtime, int32_t method_id);
@@ -383,6 +384,7 @@ struct spvm_env_runtime {
   void* (*get_allocator)(void* runtime);
   void (*build)(void* runtime, int32_t* spvm_32bit_codes);
   int32_t (*get_class_parent_class_id)(void* runtime, int32_t class_id);
+  int32_t (*get_method_required_args_length)(void* runtime, int32_t method_id);
 };
 
 struct spvm_env_compiler {

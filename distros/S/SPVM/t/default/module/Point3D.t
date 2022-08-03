@@ -8,8 +8,6 @@ use Test::More;
 
 use SPVM 'TestCase::Module::Point3D';
 
-use SPVM 'TestCase::ModuleContainsMultiClass';
-
 use Devel::Peek;
 
 # Start objects count
@@ -17,22 +15,13 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
 # Point3D
 {
-  # Super class
   ok(SPVM::TestCase::Module::Point3D->super_class);
-  
-  # Interfaces
   ok(SPVM::TestCase::Module::Point3D->interfaces);
-  
-  # Fields
   ok(SPVM::TestCase::Module::Point3D->fields);
-  
-  # Class methods
   ok(SPVM::TestCase::Module::Point3D->new);
   ok(SPVM::TestCase::Module::Point3D->new_xyz);
   ok(SPVM::TestCase::Module::Point3D->clear);
   ok(SPVM::TestCase::Module::Point3D->to_string);
-  
-  # Extra
   ok(SPVM::TestCase::Module::Point3D->extra);
 }
 

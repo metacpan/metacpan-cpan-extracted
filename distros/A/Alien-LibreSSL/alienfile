@@ -27,18 +27,29 @@ if($^O eq 'darwin' && ! -d '/usr/include/openssl')
     )
   }
 
-  if( -d '/usr/local/Cellar/libressl')
+  if( -d '/usr/local/Cellar/libressl' )
   {
     require File::Glob;
     my($dir) = File::Glob::bsd_glob('/usr/local/Cellar/libressl/*/lib/pkgconfig');
     push @PKG_CONFIG_LIBDIR, $dir;
   }
 
-  if( -d '/usr/local/Cellar/openssl')
+  if( -d '/usr/local/Cellar/openssl' )
   {
     require File::Glob;
     my($dir) = File::Glob::bsd_glob('/usr/local/Cellar/openssl/*/lib/pkgconfig');
     push @PKG_CONFIG_LIBDIR, $dir;
+  }
+
+  if( -l '/opt/local/bin/openssl' ) {
+    my $dir = Path::Tiny->new(readlink '/opt/local/bin/openssl');
+    $dir = $dir->relative('/opt/local/bin') if $dir->is_relative;
+    $dir = $dir
+      ->parent
+      ->parent
+      ->child('lib')
+      ->child('pkgconfig');
+    push @PKG_CONFIG_LIBDIR, "$dir";
   }
 
   log "overidding PKG_CONFIG_LIBDIR on macOS: $ENV{PKG_CONFIG_LIBDIR}";
@@ -130,7 +141,6 @@ share {
         my($build) = @_;
         my $prefix = $build->runtime_prop->{prefix};
 
-        require Path::Tiny;
         my @libs = grep /^[a-z]+\.lib$/, map { $_->basename } Path::Tiny->new('.')->child('lib')->children;
         
         $build->runtime_prop->{$_} = "-I$prefix/include " for qw( cflags cflags_static );

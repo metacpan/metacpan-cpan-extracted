@@ -9,7 +9,7 @@ use File::Which ();
 use Env qw( @PKG_CONFIG_PATH );
 
 # ABSTRACT: Probe system and determine library or tool properties using PkgConfig.pm
-our $VERSION = '2.50'; # VERSION
+our $VERSION = '2.51'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -190,7 +190,7 @@ Alien::Build::Plugin::PkgConfig::PP - Probe system and determine library or tool
 
 =head1 VERSION
 
-version 2.50
+version 2.51
 
 =head1 SYNOPSIS
 

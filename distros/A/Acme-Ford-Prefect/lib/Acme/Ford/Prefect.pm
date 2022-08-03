@@ -5,7 +5,7 @@ use warnings;
 use XSLoader;
 
 # ABSTRACT: Test Module for Alien::Base
-our $VERSION = '2.2900'; # VERSION
+our $VERSION = '2.5100'; # VERSION
 
 XSLoader::load(__PACKAGE__, $VERSION);
 
@@ -23,7 +23,7 @@ Acme::Ford::Prefect - Test Module for Alien::Base
 
 =head1 VERSION
 
-version 2.2900
+version 2.5100
 
 =head1 SYNOPSIS
 
@@ -84,7 +84,7 @@ Joel Berger
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2020 by Joel Berger.
+This software is copyright (c) 2012-2022 by Joel Berger.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

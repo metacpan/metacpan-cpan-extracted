@@ -5,7 +5,7 @@ use warnings;
 use 5.008004;
 
 # ABSTRACT: Advanced interpolation engine for Alien builds
-our $VERSION = '2.50'; # VERSION
+our $VERSION = '2.51'; # VERSION
 
 
 sub new
@@ -250,7 +250,7 @@ Alien::Build::Interpolate - Advanced interpolation engine for Alien builds
 
 =head1 VERSION
 
-version 2.50
+version 2.51
 
 =head1 CONSTRUCTOR
 

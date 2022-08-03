@@ -1,8 +1,5 @@
 package Pod::Weaver::Plugin::Rinci;
 
-our $DATE = '2019-04-08'; # DATE
-our $VERSION = '0.780'; # VERSION
-
 use 5.010001;
 use Moose;
 with 'Pod::Weaver::Role::AddTextToSection';
@@ -11,6 +8,11 @@ with 'Pod::Weaver::Role::Section';
 use Perinci::Access::Perl;
 use Perinci::To::POD;
 use Sub::Identify qw(sub_fullname);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-06-13'; # DATE
+our $DIST = 'Pod-Weaver-Plugin-Rinci'; # DIST
+our $VERSION = '0.781'; # VERSION
 
 our $pa = Perinci::Access::Perl->new;
 
@@ -25,26 +27,23 @@ has exclude_files => (
 );
 
 sub _process_module {
-    #require Require::Hook::DzilBuild;
+    require Require::Hook::DzilBuild;
 
     my ($self, $document, $input) = @_;
 
     my $filename = $input->{filename};
     my ($file) = grep { $_->name eq $filename } @{ $input->{zilla}->files };
 
-    unless ($file->isa("Dist::Zilla::File::OnDisk")) {
-        $self->log_debug(["skipping %s: not an ondisk file, currently only ondisk files are processed", $filename]);
-        return;
-    }
-
     # guess package from filename
     $filename =~ m!^lib/(.+)\.pm$!;
     my $package = $1;
     $package =~ s!/!::!g;
 
-    # can't work for now, Perinci::Access client searches in filesystem
-    #local @INC = (Require::Hook::DzilBuild->new(zilla => $input->{zilla}, debug=>1), @INC);
-    local @INC = ("lib", @INC);
+    local @INC = (Require::Hook::DzilBuild->new(zilla => $input->{zilla}, debug=>1), @INC);
+
+    # force reload to get the recent version of module
+    (my $package_pm = "$package.pm") =~ s!::!/!g;
+    delete $INC{$package_pm};
 
     my $url = $package; $url =~ s!::!/!g; $url = "pl:/$url/";
     my $res = $pa->request(meta => $url);
@@ -56,7 +55,7 @@ sub _process_module {
 
     my $exports = {};
     {
-        no strict 'refs';
+        no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
         # we import specifically when module is using Exporter::Rinci as its
         # exporter, because Exporter::Rinci works by filling @EXPORT* variables
@@ -250,7 +249,7 @@ Pod::Weaver::Plugin::Rinci - Insert stuffs to POD from Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.780 of Pod::Weaver::Plugin::Rinci (from Perl distribution Pod-Weaver-Plugin-Rinci), released on 2019-04-08.
+This document describes version 0.781 of Pod::Weaver::Plugin::Rinci (from Perl distribution Pod-Weaver-Plugin-Rinci), released on 2022-06-13.
 
 =head1 SYNOPSIS
 
@@ -351,14 +350,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Pod-Weaver
 
 Source repository is at L<https://github.com/perlancar/perl-Pod-Weaver-Plugin-Rinci>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Rinci>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Pod::Weaver>
@@ -367,11 +358,42 @@ L<Pod::Weaver>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Rinci>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

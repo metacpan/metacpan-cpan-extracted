@@ -1,6 +1,10 @@
 Revision history for Perl extension UI-Various
 
-0.30 2022-07-25T06:49:39Z
+0.31 2022-08-03T09:05:10Z
+
+0.31 2022-08-03T09:04:33Z
+
+    - removed diagnostics for segmentation violation
 
 0.30 2022-07-25T06:48:07Z
 

@@ -6,7 +6,7 @@ use 5.008004;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Core Alien::Build plugin to maintain compatibility with legacy Alien::Base
-our $VERSION = '2.50'; # VERSION
+our $VERSION = '2.51'; # VERSION
 
 
 sub init
@@ -53,7 +53,7 @@ Alien::Build::Plugin::Core::Legacy - Core Alien::Build plugin to maintain compat
 
 =head1 VERSION
 
-version 2.50
+version 2.51
 
 =head1 SYNOPSIS
 

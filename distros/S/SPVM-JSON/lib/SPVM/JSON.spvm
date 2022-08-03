@@ -442,9 +442,7 @@ class JSON : precompile {
       my $hash = (Hash)$spvm_data;
       my $keys = $hash->keys;
       if ($self->canonical) {
-        Sort->sort_string($keys, 0, scalar @$keys, method : int ($a : string, $b : string) {
-          return $a cmp $b;
-        });
+        Sort->sort_string_asc($keys, 0, scalar @$keys);
       }
       for (my $keys_index = 0; $keys_index < @$keys; ++$keys_index) {
         if ($keys_index > 0) {

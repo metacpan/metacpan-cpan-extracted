@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 2.2900
+    version 2.5100
 
 DESCRIPTION
 
@@ -33,7 +33,7 @@ AUTHORS
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2012-2020 by Joel A Berger.
+    This software is copyright (c) 2012-2022 by Joel A Berger.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

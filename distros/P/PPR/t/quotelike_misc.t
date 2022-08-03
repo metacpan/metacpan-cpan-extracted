@@ -31,6 +31,10 @@ done_testing();
 
 __DATA__
 # THESE SHOULD MATCH...
+    /\N{ SPACE } \x{ 20AC } \d{ 1,9 }/
+####
+    m{ x{,9} }
+####
     m{^$DRIVE_RX[\\/]}o
 ####
     m/[@#]_

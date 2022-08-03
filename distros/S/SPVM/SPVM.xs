@@ -208,6 +208,7 @@ xs_call_spvm_method(...)
 
   int32_t method_is_class_method = env->api->runtime->get_method_is_class_method(env->runtime, method_id);
   int32_t method_args_length = env->api->runtime->get_method_args_length(env->runtime, method_id);
+  int32_t method_required_args_length = env->api->runtime->get_method_required_args_length(env->runtime, method_id);
   int32_t method_args_base_id = env->api->runtime->get_method_args_base_id(env->runtime, method_id);
   int32_t method_return_type_id = env->api->runtime->get_method_return_type_id(env->runtime, method_id);
 
@@ -217,10 +218,11 @@ xs_call_spvm_method(...)
   }
   
   // Check argument count
-  if (items - spvm_args_base < method_args_length) {
+  int32_t call_method_args_length = items - spvm_args_base;
+  if (call_method_args_length < method_required_args_length) {
     croak("Too few arguments %s->%s at %s line %d\n", class_name, method_name, MFILE, __LINE__);
   }
-  else if (items - spvm_args_base > method_args_length) {
+  else if (call_method_args_length > method_args_length) {
     croak("Too many arguments %s->%s at %s line %d\n", class_name, method_name, MFILE, __LINE__);
   }
   
@@ -238,6 +240,10 @@ xs_call_spvm_method(...)
 
   // Arguments
   for (int32_t args_index = 0; args_index < method_args_length; args_index++) {
+    
+    if (args_index >= call_method_args_length) {
+      break;
+    }
     
     int32_t args_index_nth = args_index + 1;
     
@@ -1034,7 +1040,8 @@ xs_call_spvm_method(...)
   int32_t method_return_basic_type_category = env->api->runtime->get_basic_type_category(env->runtime, method_return_basic_type_id);
   
   // Call method
-  int32_t excetpion_flag = excetpion_flag = env->call_spvm_method(env, stack, method_id);
+  int32_t args_stack_length = stack_index;
+  int32_t excetpion_flag = excetpion_flag = env->call_spvm_method(env, stack, method_id, args_stack_length);
   
   // Create Perl return value
   if (excetpion_flag) {
@@ -3683,42 +3690,42 @@ _xs_new_mulnum_array_from_bin(...)
 
   int32_t field_length = class_fields_length;
 
-  int32_t field_width;
+  int32_t field_stack_length;
   int32_t mulnum_field_type_basic_type_id = env->api->runtime->get_type_basic_type_id(env->runtime, mulnum_field_type_id);
   switch (mulnum_field_type_basic_type_id) {
     case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE: {
-      field_width = 1;
+      field_stack_length = 1;
       break;
     }
     case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT: {
-      field_width = 2;
+      field_stack_length = 2;
       break;
     }
     case SPVM_NATIVE_C_BASIC_TYPE_ID_INT: {
-      field_width = 4;
+      field_stack_length = 4;
       break;
     }
     case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG: {
-      field_width = 8;
+      field_stack_length = 8;
       break;
     }
     case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT: {
-      field_width = 4;
+      field_stack_length = 4;
       break;
     }
     case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE: {
-      field_width = 8;
+      field_stack_length = 8;
       break;
     }
     default:
-      croak("Unexpected error:set field width");
+      croak("Unexpected error");
   }
   
-  if (binary_length % (field_length * field_width) != 0) {
+  if (binary_length % (field_length * field_stack_length) != 0) {
     croak("Invalid binary data size at %s line %d", MFILE, __LINE__);
   }
   
-  int32_t array_length = binary_length / field_length / field_width;
+  int32_t array_length = binary_length / field_length / field_stack_length;
 
   void* array = env->new_mulnum_array(env, stack, basic_type_id, array_length);
 
@@ -3728,42 +3735,42 @@ _xs_new_mulnum_array_from_bin(...)
     case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE: {
       int8_t* elems = env->get_elems_byte(env, stack, array);
       if (array_length > 0) {
-        memcpy(elems, binary, field_length * array_length * field_width);
+        memcpy(elems, binary, field_length * array_length * field_stack_length);
       }
       break;
     }
     case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT: {
       int16_t* elems = env->get_elems_short(env, stack, array);
       if (array_length > 0) {
-        memcpy(elems, binary, field_length * array_length * field_width);
+        memcpy(elems, binary, field_length * array_length * field_stack_length);
       }
       break;
     }
     case SPVM_NATIVE_C_BASIC_TYPE_ID_INT: {
       int32_t* elems = env->get_elems_int(env, stack, array);
       if (array_length > 0) {
-        memcpy(elems, binary, field_length * array_length * field_width);
+        memcpy(elems, binary, field_length * array_length * field_stack_length);
       }
       break;
     }
     case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG: {
       int64_t* elems = env->get_elems_long(env, stack, array);
       if (array_length > 0) {
-        memcpy(elems, binary, field_length * array_length * field_width);
+        memcpy(elems, binary, field_length * array_length * field_stack_length);
       }
       break;
     }
     case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT: {
       float* elems = env->get_elems_float(env, stack, array);
       if (array_length > 0) {
-        memcpy(elems, binary, field_length * array_length * field_width);
+        memcpy(elems, binary, field_length * array_length * field_stack_length);
       }
       break;
     }
     case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE: {
       double* elems = env->get_elems_double(env, stack, array);
       if (array_length > 0) {
-        memcpy(elems, binary, field_length * array_length * field_width);
+        memcpy(elems, binary, field_length * array_length * field_stack_length);
       }
       break;
     }

@@ -1,3 +1,36 @@
+2.053002 - 2022-08-03
+
+  [NEW FEATURES]
+
+  * #900 make Port VLAN mismatch respect setting hiding VLAN 1002-1005
+  * make VLAN hiding and VLAN names configurable options and move to port properties sidebar section
+
+  [ENHANCEMENTS]
+
+  * #888 add 1.0.8802.1.1 and 1.3.111.2.802 to the SNMP browser
+  * #906 snmp browser is very slow sometimes
+
+  [BUG FIXES]
+
+  * template error when no vlans known for a port
+
+2.053001 - 2022-08-02
+
+  [NEW FEATURES]
+
+  * #904 add FortiOS SSH collector implementation from @jpvelders
+
+2.053000 - 2022-08-02
+
+  [NEW FEATURES]
+
+  * #900 add option in device ports sidebar to hide vlan 1002-1005
+  * Group Cisco subinterfaces in Device Ports view (like LAG)
+
+  [BUG FIXES]
+
+  * #877 fix Port VLAN Mismatches report incorrect with Cisco subinterfaces
+
 2.052012 - 2022-08-02
 
   [BUG FIXES]

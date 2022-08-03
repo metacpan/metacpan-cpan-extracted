@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use UI::Various::core;
 use UI::Various::Dialog;
@@ -75,25 +75,21 @@ sub _prepare($@)
     debug(3, __PACKAGE__, '::_prepare');
     my ($self) = @_;
     local $_;
-$_[1] and $_[1]==42 and print STDERR "# _p: 0\n";
 
     my @attributes = ();
     # TODO: additional attributes added and translated in loop, when defined
     my $first = $self->top->child(0);
     if ($first->isa('UI::Various::Window')  and  defined $first->_tk)
     {
-$_[1] and $_[1]==42 and print STDERR "# _p: 47\n";
 	$self->_tk($first->_tk->Toplevel(-title => $self->title,
 					 @attributes));
     }
     else
     {
-$_[1] and $_[1]==42 and print STDERR "# _p: 42\n";
 	# Note that grab will not work with MainWindow!
 	$self->_tk(MainWindow->new(-title => $self->title,
 				   @attributes));
     }
-$_[1] and $_[1]==42 and print STDERR "# _p: 1\n";
 
     # We don't use the inherited size (from parent == Main) here, as that
     # would always be the maximum application size!
@@ -105,20 +101,16 @@ $_[1] and $_[1]==42 and print STDERR "# _p: 1\n";
 	    (int($self->{width}  * $self->parent->{_char_width}) . 'x' .
 	     int($self->{height} * $self->parent->{_char_height}));
     }
-$_[1] and $_[1]==42 and print STDERR "# _p: 2\n";
 
     # a general dialogue is simply a window with a local grab:
     $self->_tk->focus;
-$_[1] and $_[1]==42 and print STDERR "# _p: 3\n";
     $self->_tk->grab;
-$_[1] and $_[1]==42 and print STDERR "# _p: 4\n";
 
     my ($errors, $row) = (0, 0);
     while ($_ = $self->child)
     {
 	$errors += $_->_prepare($row++, 0);
     }
-$_[1] and $_[1]==42 and print STDERR "# _p: 5\n";
 
     return $errors;
 }

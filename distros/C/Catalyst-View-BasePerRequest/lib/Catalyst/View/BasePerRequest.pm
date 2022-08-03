@@ -1,6 +1,6 @@
 package Catalyst::View::BasePerRequest;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 our $DEFAULT_FACTORY = 'Catalyst::View::BasePerRequest::Factory';
 
 use Moose;
@@ -16,6 +16,7 @@ has 'ctx' => (is=>'ro');
 has 'content_type' => (is=>'ro', required=>0, predicate=>'has_content_type');
 has 'code' => (is=>'rw', predicate=>'has_code');
 has 'status_codes' => (is=>'rw', predicate=>'has_status_codes');
+has 'forwarded_args' => (is=>'rw', predicate=>'has_forwarded_args');
 
 sub COMPONENT {
   my ($class, $app, $args) = @_;
@@ -43,7 +44,13 @@ sub inject_http_status_helpers {
     if(scalar(keys(%status_codes))) {
       next unless $status_codes{$code};
     }
-    eval "sub ${\$class}::${\$subname} { return shift->respond(HTTP::Status::$helper,\@_) }";      
+    eval "sub ${\$class}::${\$subname} { return shift->respond(HTTP::Status::$helper,\\\@_) }";
+    eval "sub ${\$class}::set_${\$subname} {
+      my (\$self, \@headers) = \@_; 
+      \$self->ctx->res->status(HTTP::Status::$helper);
+      \$self->ctx->res->headers->push_header(\@headers) if \@headers;
+      return \$self;
+    }";
   }
 
   return %status_codes;
@@ -52,6 +59,11 @@ sub inject_http_status_helpers {
 sub factory_class {
   my ($class, $app, $merged_args) = @_;
   return $DEFAULT_FACTORY;
+}
+
+sub build {
+  my ($class, %args) = @_;
+  return $class->new(%args);
 }
 
 sub build_factory {
@@ -70,13 +82,14 @@ sub render {
 
 sub process {
   my ($self, $c, @args) = @_;
-  return $self->respond($c);
+  $self->forwarded_args(\@args);
+  return $self->respond();
 }
 
 sub respond {
-  my ($self, $c, $status, $headers, @args) = @_;
+  my ($self, $status, $headers, @args) = @_;
   for my $r ($self->ctx->res) {
-    $r->status($status) if $status && $r->status != 200; # Catalyst sets 200
+    $r->status($status) if $status && $r->status; # != 200; # Catalyst sets 200
 
     Module::Runtime::use_module('Catalyst::View::BasePerRequest::Exception::InvalidStatusCode')->throw(status_code=>$r->status)
       if $self->has_status_codes && !$self->status_codes->{$r->status};
@@ -175,6 +188,7 @@ sub content_for {
   $self->ctx->stash->{view_blocks}{$name} = $self->render_content_value($value);
   return;
 }
+
 sub content_append {
   my ($self, $name, $value) = @_;
   Module::Runtime::use_module($self->_content_exception_class)
@@ -182,6 +196,15 @@ sub content_append {
   $self->ctx->stash->{view_blocks}{$name} .= $self->render_content_value($value);
   return;
 }
+
+sub content_prepend {
+  my ($self, $name, $value) = @_;
+  Module::Runtime::use_module($self->_content_exception_class)
+    ->throw(content_name=>$name, content_msg=>'Content block doesnt exist for prepending') unless $self->_content_exists($name);
+  $self->ctx->stash->{view_blocks}{$name} = $self->render_content_value($value) . $self->ctx->stash->{view_blocks}{$name};
+  return;
+}
+
 
 sub content_replace {
   my ($self, $name, $value) = @_;
@@ -412,10 +435,10 @@ controller via the C<forward> method and not directly:
 
 =head2 respond
 
-Accepts an HTTP status code and a hashref of key / values used to set HTTP headers for a
+Accepts an HTTP status code and an arrayref of key / values used to set HTTP headers for a
 response.  Example:
 
-    $view->respond(201, +{ location=>$url });
+    $view->respond(201, [ location=>$url ]);
 
 Returns the view object to make it easier to do method chaining
 
@@ -526,6 +549,14 @@ you'll need to call L</detach>:
       ->http_bad_request
       ->detach;
 
+If you don't want to generate the response yet (perhaps you'll leave that to a global 'end'
+action) you can use the 'set_http_$STATUS' helpers instead which wil just set the response
+status.
+
+    return $c->view("Error")
+      ->set_http_bad_request
+      ->detach;
+
 Response helpers are just lowercased names you'll find for the codes listed in L<HTTP::Status>.
 Some of the most common ones I find in my code:
 
@@ -551,6 +582,25 @@ view subclass in order to control or otherwise influence how the view works.
 Runs when C<COMPONENT> is called during C<setup_components>.  This gets a reference
 to the merged arguments from all configuration.  You should return this reference
 after modification.
+
+=head2 prepare_build_args
+
+This method will be called (if defined) by the factory class during build time.  It can be used
+to inject args and modify args.   It gets the context and C<@args> as arguments and should return
+all the arguments you want to pass to C<new>.  Example:
+
+    sub prepare_build_args {
+      my ($class, $c, @args) = @_;
+      # Mess with @args
+      return @args;
+    }
+
+=head2 build
+
+Receives the initialization hash and should return a new instance of the the view.  By default this
+just calls C<new> on the class with the hash of args but if you need to call some other method or
+have some complex initialization work that can't be handled with L</prepare_build_args> you can
+override.
 
 =head1 CONFIGURATION
  

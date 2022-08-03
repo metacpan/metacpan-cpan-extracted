@@ -163,7 +163,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "2.50",
+   "version" : "2.51",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)",

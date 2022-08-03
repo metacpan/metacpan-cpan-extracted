@@ -11,7 +11,7 @@ use Carp ();
 sub _path { Path::Tiny::path(@_) }
 
 # ABSTRACT: Specification for defining an external dependency for CPAN
-our $VERSION = '2.50'; # VERSION
+our $VERSION = '2.51'; # VERSION
 
 
 our @EXPORT = qw( requires on plugin probe configure share sys download fetch decode prefer extract patch patch_ffi build build_ffi gather gather_ffi meta_prop ffi log test start_url before after );
@@ -323,7 +323,7 @@ sub _add_modifier
   }
 
   foreach my $hook (
-    map { split /,/, $_ }                        # split on , for when multiple hooks must be attachewd (gather in any)
+    map { split /,/, $_ }                        # split on , for when multiple hooks must be attached (gather in any)
     map { my $x = $_ ; $x =~ s/\$/$suffix/; $x } # substitute $ at the end for a suffix (_ffi) if any
     $modifiers{$stage}->{$meta->{phase}})        # get the list of modifiers
   {
@@ -369,7 +369,7 @@ alienfile - Specification for defining an external dependency for CPAN
 
 =head1 VERSION
 
-version 2.50
+version 2.51
 
 =head1 SYNOPSIS
 

@@ -12,9 +12,9 @@ my $expected = q[
     <html>
       <head>
         <title>Hello</title>
-        <style>...</style>
+        wrapped <!-- 111 --><style>...</style><!-- 222 --> end wrap
       </head>
-      <body><div>Hello John!</div>: one</body>
+      <body><div>Hello prepared_John!</div>: one</body>
     </html>];
 
 {
@@ -30,6 +30,26 @@ my $expected = q[
 {
   ok my $res = request '/test3';
   is $res->content, $expected;
+  is $res->code, 400;
+}
+
+{
+  ok my $res = request '/test4';
+  is $res->content, $expected;
+}
+
+{
+  ok my $res = request '/test5';
+  is $res->content, $expected;
+  is $res->code, 201;
+  is $res->headers->header('location'), 'abc';
+}
+
+{
+  ok my $res = request '/test6';
+  is $res->content, $expected;
+  is $res->code, 201;
+  is $res->headers->header('location'), 'abc';
 }
 
 done_testing

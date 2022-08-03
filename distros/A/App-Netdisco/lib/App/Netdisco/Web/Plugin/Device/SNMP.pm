@@ -31,11 +31,10 @@ ajax '/ajax/data/device/:ip/snmptree/:base' => require_login sub {
                                          ->find( param('ip') ) }
        or send_error('Bad Device', 404);
 
-    my $recurse =  ((param('recurse') and param('recurse') eq 'on') ? 0 : 1);
     my $base = param('base');
-    $base =~ m/^\.1\.3\.6\.1(\.\d+)*$/ or send_error('Bad OID Base', 404);
+    $base =~ m/^\.1(\.\d+)*$/ or send_error('Bad OID Base', 404);
 
-    my $items = _get_snmp_data($device->ip, $base, $recurse);
+    my $items = _get_snmp_data($device->ip, $base);
 
     content_type 'application/json';
     to_json $items;
@@ -80,8 +79,8 @@ ajax '/ajax/data/device/:ip/snmpnodesearch' => require_login sub {
     return to_json [] unless $found;
 
     $found = $found->oid;
-    $found =~ s/^\.1\.3\.6\.1\.?//;
-    my @results = ('.1.3.6.1');
+    $found =~ s/^\.1\.?//;
+    my @results = ('.1');
 
     foreach my $part (split m/\./, $found) {
         my $last = $results[-1];
@@ -98,7 +97,7 @@ ajax '/ajax/content/device/:ip/snmpnode/:oid' => require_login sub {
        or send_error('Bad Device', 404);
 
     my $oid = param('oid');
-    $oid =~ m/^\.1\.3\.6\.1(\.\d+)*$/ or send_error('Bad OID', 404);
+    $oid =~ m/^\.1(\.\d+)*$/ or send_error('Bad OID', 404);
 
     my $object = schema('netdisco')->resultset('DeviceBrowser')
       ->with_snmp_object($device->ip)->find({ 'snmp_object.oid' => $oid })
@@ -121,19 +120,31 @@ ajax '/ajax/content/device/:ip/snmpnode/:oid' => require_login sub {
 sub _get_snmp_data {
     my ($ip, $base, $recurse) = @_;
     my @parts = grep {length} split m/\./, $base;
-    ++$recurse;
+
+    # psql cannot cope with bind params and group by array element
+    # so we build a static query instead.
+
+    my $next_part  = (scalar @parts + 1);
+    my $child_part = (scalar @parts + 2);
+    my $query = <<QUERY;
+  SELECT db.oid_parts[$next_part] AS part,
+         count(distinct(db.oid_parts[$child_part])) as children
+    FROM device_browser db
+    WHERE db.ip = ?
+          AND db.oid LIKE ? || '.%'
+    GROUP BY db.oid_parts[$next_part]
+QUERY
+    my $rs = schema('netdisco')->resultset('Virtual::GenericReport')->result_source;
+    $rs->view_definition($query);
+    $rs->remove_columns($rs->columns);
+    $rs->add_columns(qw/part children/);
 
     my %kids = map { ($base .'.'. $_->{part}) => $_ }
-               schema('netdisco')->resultset('Virtual::OidChildren')
-                                 ->search({}, { bind => [
-                                     (scalar @parts + 1),
-                                     (scalar @parts + 2),
-                                     $base,
-                                     (scalar @parts + 1),
-                                     (scalar @parts + 1),
-                                     $ip,
-                                     $base,
-                                 ] })->hri->all;
+                   schema('netdisco')->resultset('Virtual::GenericReport')
+                   ->search(undef, {
+                     result_class => 'DBIx::Class::ResultClass::HashRefInflator',
+                     bind => [$ip, $base],
+                   })->hri->all;
 
     return [{
       text => 'No SNMP data for this device.',
@@ -156,12 +167,12 @@ sub _get_snmp_data {
         text => ($meta{$_}->{leaf} .' ('. $kids{$_}->{part} .')'),
 
         # for nodes with only one child, recurse to prefetch...
-        children => ( ($recurse < 2 and $kids{$_}->{children} == 1)
-          ? _get_snmp_data($ip, ("${base}.". $kids{$_}->{part}), $recurse)
+        children => (($kids{$_}->{children} == 1)
+          ? _get_snmp_data($ip, ("${base}.". $kids{$_}->{part}), 1)
           : ($kids{$_}->{children} ? \1 : \0)),
 
         # and set the display to open to show the single child
-        state => { opened => ( ($recurse < 2 and $kids{$_}->{children} == 1)
+        state => { opened => ( ($recurse or $kids{$_}->{children} == 1)
           ? \1
           : \0 ) },
 

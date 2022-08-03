@@ -73,5 +73,15 @@ t/decomment_heredoc_large.t
 t/heredoc_large.t
 t/PPR_ERROR_trailing.t
 t/sub_END.t
+t/perl_v5.28.t
+t/perl_v5.30.t
+t/perl_v5.32.t
+t/perl_v5.34.t
+t/perl_v5.36.t
+t/quotelike_noninerpolating.t
+t/regex_interpolation.t
+t/substitution_ge.t
+t/trycatch.t
+t/trytiny.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

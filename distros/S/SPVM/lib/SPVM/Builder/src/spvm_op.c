@@ -2010,7 +2010,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           SPVM_OP* op_type_value = SPVM_OP_new_op_type(compiler, class_var->type, op_decl->file, op_decl->line);
           SPVM_OP* op_var_value_name = SPVM_OP_new_op_name(compiler, class_var->name, op_decl->file, op_decl->line);
           SPVM_OP* op_var_value = SPVM_OP_new_op_var(compiler, op_var_value_name);
-          SPVM_OP* op_arg_value = SPVM_OP_build_arg(compiler, op_var_value, op_type_value, NULL);
+          SPVM_OP* op_arg_value = SPVM_OP_build_arg(compiler, op_var_value, op_type_value, NULL, NULL);
 
           SPVM_OP_insert_child(compiler, op_args, op_args->last, op_arg_value);
           
@@ -2104,7 +2104,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           SPVM_OP* op_type_value = SPVM_OP_new_op_type(compiler, field->type, op_decl->file, op_decl->line);
           SPVM_OP* op_var_value_name = SPVM_OP_new_op_name(compiler, field->name, op_decl->file, op_decl->line);
           SPVM_OP* op_var_value = SPVM_OP_new_op_var(compiler, op_var_value_name);
-          SPVM_OP* op_arg_value = SPVM_OP_build_arg(compiler, op_var_value, op_type_value, NULL);
+          SPVM_OP* op_arg_value = SPVM_OP_build_arg(compiler, op_var_value, op_type_value, NULL, NULL);
 
           SPVM_OP_insert_child(compiler, op_args, op_args->last, op_arg_value);
           
@@ -2675,18 +2675,30 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
     SPVM_TYPE* self_type = SPVM_TYPE_new(compiler, 0, 0, 0);
     SPVM_OP* op_self_type = SPVM_OP_new_op_type(compiler, self_type, op_method->file, op_method->line);
     op_self_type->flag |= SPVM_OP_C_FLAG_TYPE_IS_SELF;
-    SPVM_OP* op_arg_self = SPVM_OP_build_arg(compiler, op_arg_var_self, op_self_type, NULL);
+    SPVM_OP* op_arg_self = SPVM_OP_build_arg(compiler, op_arg_var_self, op_self_type, NULL, NULL);
     SPVM_OP_insert_child(compiler, op_args, op_args->first, op_arg_self);
   }
 
   // Add method arguments
   {
+    int32_t found_optional_arg = 0;
+    int32_t required_args_length = 0;
     int32_t args_length = 0;
     SPVM_OP* op_arg = op_args->first;
     while ((op_arg = SPVM_OP_sibling(compiler, op_arg))) {
+      SPVM_VAR_DECL* arg_var_decl = op_arg->uv.var->var_decl;
+      if (!found_optional_arg) {
+        if (arg_var_decl->op_optional_arg_default) {
+          found_optional_arg = 1;
+        }
+        else {
+          required_args_length++;
+        }
+      }
       args_length++;
     }
     method->args_length = args_length;
+    method->required_args_length = required_args_length;
   }
 
   // Capture variables
@@ -2889,11 +2901,13 @@ SPVM_OP* SPVM_OP_build_enumeration(SPVM_COMPILER* compiler, SPVM_OP* op_enumerat
   return op_enumeration;
 }
 
-SPVM_OP* SPVM_OP_build_arg(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op_type, SPVM_OP* op_descriptors) {
+SPVM_OP* SPVM_OP_build_arg(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op_type, SPVM_OP* op_descriptors, SPVM_OP* op_optional_arg_default) {
   
   SPVM_OP* op_var_decl = SPVM_OP_new_op_var_decl_eternal(compiler, op_var->file, op_var->line);
 
   op_var_decl->uv.var_decl->is_arg = 1;
+  
+  op_var_decl->uv.var_decl->op_optional_arg_default = op_optional_arg_default;
   
   op_var = SPVM_OP_build_var_decl(compiler, op_var_decl, op_var, op_type, op_descriptors);
   

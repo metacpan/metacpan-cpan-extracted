@@ -4,7 +4,7 @@
     <tr>
       <th></th>
       [% FOREACH item IN settings.port_columns %]
-      [% NEXT IF item.name == 'c_admin' OR item.name == 'c_vlan_names' %]
+      [% NEXT IF item.name == 'c_admin'  %]
       [% NEXT IF item.name == 'c_nodes' AND params.c_nodes AND params.c_neighbors %]
         [% NEXT UNLESS params.${item.name} %]
         [% SET th_class = '' %]
@@ -111,7 +111,7 @@
       [% END %]
       [% END %]
         <a class="nd_this-port-only nd_port-only-first" href="[% device_ports | none %]&q=[% params.q | uri %]&f=[% row.port | uri %]&prefer=port">
-          [% IF row.is_master %]
+          [% IF row.is_master OR row.has_subinterfaces %]
             <small><i class="icon-group muted"></i></small>&nbsp;
           [% END %]
         [% row.port | html_entity %]</a>
@@ -204,7 +204,7 @@
       <td>
         [% IF row.vlan AND row.vlan > 0 %]
         <a class="nd_linkcell"
-          [% IF params.c_vlan_names %]
+          [% IF params.p_vlan_names %]
             href="[% uri_for('/search') | none %]?tab=vlan&q=[% row.get_column('native_vlan_name') | uri %]">
               [% row.get_column('native_vlan_name') | html_entity %]</a>
           [% ELSE %]
@@ -218,9 +218,10 @@
 
       [% IF params.c_vmember %]
       <td>
+        [% IF vlans.$portname.size %]
         [% IF vlans.$portname.vlan_count <= settings.devport_vlan_limit %]
           [% SET vlan_count = vlans.$portname.vlan_count %]
-          [% IF params.c_vlan_names %][% SET vlanlist = vlans.$portname.vlan_name_set %]
+          [% IF params.p_vlan_names %][% SET vlanlist = vlans.$portname.vlan_name_set %]
             [% ELSE %][% SET vlanlist = vlans.$portname.vlan_set %][% END %]
           [% IF vlan_count > 10 %] [%# TODO make this a settable variable %]
             <div class="nd_vlan-total">([% vlan_count %])</div><span class="nd_linkcell nd_collapse-vlans">
@@ -236,6 +237,7 @@
           [% END %]
         [% ELSE %]
         <i class="icon-asterisk text-warning"></i> ([% vlans.$portname.vlan_count %] is too many to list)
+        [% END %]
         [% END %]
       </td>
       [% END %]

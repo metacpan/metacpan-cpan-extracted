@@ -23,7 +23,7 @@ name: App-Netdisco
 provides:
   App::Netdisco:
     file: lib/App/Netdisco.pm
-    version: '2.052012'
+    version: '2.053002'
   App::Netdisco::AnyEvent::Nbtstat:
     file: lib/App/Netdisco/AnyEvent/Nbtstat.pm
   App::Netdisco::Backend::Job:
@@ -38,7 +38,7 @@ provides:
     file: lib/App/Netdisco/Configuration.pm
   App::Netdisco::DB:
     file: lib/App/Netdisco/DB.pm
-    version: '71'
+    version: '72'
   App::Netdisco::DB::ExplicitLocking:
     file: lib/App/Netdisco/DB/ExplicitLocking.pm
   App::Netdisco::DB::Result:
@@ -223,6 +223,8 @@ provides:
     file: lib/App/Netdisco/SSHCollector/Platform/CPVSX.pm
   App::Netdisco::SSHCollector::Platform::Clavister:
     file: lib/App/Netdisco/SSHCollector/Platform/Clavister.pm
+  App::Netdisco::SSHCollector::Platform::FortiOS:
+    file: lib/App/Netdisco/SSHCollector/Platform/FortiOS.pm
   App::Netdisco::SSHCollector::Platform::FreeBSD:
     file: lib/App/Netdisco/SSHCollector/Platform/FreeBSD.pm
   App::Netdisco::SSHCollector::Platform::GAIAEmbedded:
@@ -589,7 +591,7 @@ requires:
   Pod::Usage: '0'
   Regexp::Common: '2017060201'
   Role::Tiny: '1.002005'
-  SNMP::Info: '3.84'
+  SNMP::Info: '3.85'
   SQL::Abstract: '1.85'
   SQL::Translator: '0.11024'
   Scope::Guard: '0'
@@ -624,5 +626,5 @@ resources:
   homepage: http://netdisco.org/
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/netdisco/netdisco
-version: '2.052012'
+version: '2.053002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

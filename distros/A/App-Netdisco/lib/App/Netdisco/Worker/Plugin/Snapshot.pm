@@ -63,7 +63,7 @@ register_worker({ phase => 'main', driver => 'snmp' }, sub {
         value => do { my $m = $oidmap{$_}; encode_base64( nfreeze( [$snmp->$m] ) ); },
       }} sort {sortable_oid($a) cmp sortable_oid($b)}
          grep {not $seenoid{$_}++}
-         grep {m/^\.1\.3\.6\.1/}
+         grep {m/^\.1/}
          map {s/^_//; $_}
          keys %cache;
 
@@ -140,7 +140,11 @@ sub get_munges {
 sub walk_and_store {
   my ($device, $snmp, %oidmap) = @_;
 
-  my $walk = walker($device, $snmp, '.1.3.6.1');                 # 10205 rows
+  my $walk = {
+    %{ walker($device, $snmp, '.1.0.8802.1.1') },
+    %{ walker($device, $snmp, '.1.3.6.1') },
+    %{ walker($device, $snmp, '.1.3.111.2.802') },
+  };
   # my %walk = walker($device, $snmp, '.1.3.6.1.2.1.2.2.1.6');   # 22 rows, i_mac/ifPhysAddress
 
   # something went wrong - error
@@ -267,11 +271,12 @@ sub walker {
         ($vars) = $sess->bulkwalk( 0, $repeaters, $var );
         if ( $sess->{ErrorNum} ) {
             debug "snapshot $device BULKWALK " . $sess->{ErrorStr};
-            debug "snapshot $device disabling BULKWALK";
+            debug "snapshot $device disabling BULKWALK and trying again...";
             $vars = [];
             $bulkwalk = 0;
-            delete $sess->{ErrorNum};
-            delete $sess->{ErrorStr};
+            $snmp->{BulkWalk} = 0;
+            undef $sess->{ErrorNum};
+            undef $sess->{ErrorStr};
         }
     }
 
@@ -323,7 +328,10 @@ sub walker {
         if ($loopdetect) {
             # Check to see if we've already seen this IID (looping)
             if ( defined $seen{$oid} and $seen{$oid} ) {
-                return Status->error("Looping on: oid: $oid");
+                debug "snapshot $device : looping on $oid";
+                shift @$vars;
+                $var = shift @$vars or last;
+                next;
             }
             else {
                 $seen{$oid}++;
@@ -339,7 +347,7 @@ sub walker {
             next;
         }
 
-        # debug "snapshot $device - retreived $oid : $val";
+        # debug "snapshot $device - retreived $oid : $val";
         $localstore{$oid} = $val;
     }
 

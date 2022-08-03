@@ -46,6 +46,6 @@
          "web" : "https://github.com/saiftynet/Algorithm-Line-Bresenham"
       }
    },
-   "version" : 0.14,
+   "version" : 0.151,
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

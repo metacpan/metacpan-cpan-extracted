@@ -1,5 +1,9 @@
 Revision history for Alien-Build
 
+2.51      2022-08-03 09:57:08 -0600
+  - Remove use of duplicate lddlfalgs in Test::Alien which could cause failures
+    on AIX (gh#217, gh#316)
+
 2.50      2022-06-23 11:53:00 -0500
   - Documentation updates (gh#308, gh#310)
 

@@ -12,7 +12,7 @@ use Test2::Harness::Util::UUID qw/gen_uuid/;
 
 use Test2::Harness::Util qw/mod2file/;
 
-our $VERSION = '0.000124';
+our $VERSION = '0.000125';
 
 use parent 'Test2::Harness::Renderer';
 use Test2::Harness::Util::HashBase qw{
@@ -40,7 +40,8 @@ sub init {
 
     my $config = $self->{+CONFIG} //= config_from_settings($settings);
 
-    $config->connect // die "Could not connect to the db";
+    my $dbh = $config->connect // die "Could not connect to the db";
+    $dbh->{mysql_auto_reconnect} = 1 if $Test2::Harness::UI::Schema::LOADED =~ m/mysql/i;
 
     STDOUT->autoflush(1);
     print $self->links;

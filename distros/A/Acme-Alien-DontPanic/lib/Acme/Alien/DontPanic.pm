@@ -5,7 +5,7 @@ use warnings;
 use base qw( Alien::Base );
 
 # ABSTRACT: Test Module for Alien::Base::ModuleBuild
-our $VERSION = '2.2900'; # VERSION
+our $VERSION = '2.5100'; # VERSION
 
 1;
 
@@ -21,7 +21,7 @@ Acme::Alien::DontPanic - Test Module for Alien::Base::ModuleBuild
 
 =head1 VERSION
 
-version 2.2900
+version 2.5100
 
 =head1 DESCRIPTION
 
@@ -63,7 +63,7 @@ Joel A Berger <joel.a.berger@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2020 by Joel A Berger.
+This software is copyright (c) 2012-2022 by Joel A Berger.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -154,7 +154,7 @@ Revision history for PPR
     * Updated for loop parsing to support explicitly aliased iterator variables
       (including arrays and hashes)
 
-    * Added (?&PerlTermPostfixDereference) to simply PPR::X overloading of terms
+    * Added (?&PerlTermPostfixDereference) to simplify PPR::X overloading of terms
 
     * Added Perl 5.28 ":attributes(before) ($ignature)" syntax for subroutines
       (thanks, Matt)
@@ -176,7 +176,7 @@ Revision history for PPR
 
     * Oops, fixed decomment() too.
 
-    * Updates PPR::X approriately as well.
+    * Updates PPR::X appropriately as well.
 
 
 
@@ -250,3 +250,68 @@ Revision history for PPR
       (many thanks, Branislav!)
 
     * Corrected edge-case behaviour in parsing of s/.../.../e constructs
+
+
+0.001000  Wed Aug  3 00:33:24 2022
+
+    * Improved parsing of modern subroutine signatures
+      (Thanks, Juerd!)
+
+    * Now supports all the new syntactic features
+      added in Perls v5.28 to v5.36 including:
+        - try/catch/finally
+        - the isa operator
+        - named regex assertions
+        - missing lower bounds on regex counted repetitions
+        - "spacey" curlies in regexes
+        - 0o7777 octal constants
+        - Unicode paired delimiters on quotelikes
+
+    * Improved parsing of s/.../{...}e code blocks
+      (Thanks, Zaki!)
+
+    * Fixed several edge cases of postfix dereferencing
+      (Thanks, Zaki!)
+
+    * The perlop manpage states:
+      "Interpolation in patterns has several quirks:
+       $|, $(, and $) are not interpolated..."
+      PPR now enforces that.
+      (Thanks, Zaki!)
+
+    * Also fixed NON-interpolation of variables
+      inside qq'...', qr'...', etc.
+      (Thanks, Zaki!)
+
+    * NOTE: BACKWARDS INCOMPATIBLE CHANGE...
+      Solving some of the above issues required deep changes to the mechanism
+      of term-matching within the regex...to better reflect actual term precedence
+      within Perl. This means that the subrules (?&PerlTerm), (?&PerlScalarAccess)
+      and (?&PerlArrayAccess) now match differently. Specifically, (?&PerlTerm)
+      now matches chains of trailing -> dereferences and/or -> sub/method calls,
+      while (?&PerlScalarAccess) and (?&PerlArrayAccess) no longer do so.
+      If you were previously using these last two subrules for stand-along matching
+      you will need to be more specific:
+
+        # Old behaviour of...         # Now requires...
+
+        / (?&PerlScalarAccess) /x     / (?&PerlScalarAccess) (?&PerlTermPostfixDerefence) /x
+
+        / (?&PerlArrayAccess)  /x     / (?&PerlArrayAccess)  (?&PerlTermPostfixDerefence) /x
+
+
+0.001001  Wed Aug  3 01:52:51 2022
+
+    * Added try/catch/finally/defer to the list of keywords
+      that are never treated as barewords
+
+    * Corrected parsing of try/catch syntax
+      (the catch block is not optional!)
+
+    * Updated workarounds for parsing code that uses Try::Tiny and TryCatch
+      in line with the above changes
+
+
+0.001002  Wed Aug  3 02:04:01 2022
+
+    * Rereleasing with ::X and ::Debug variations properly updated

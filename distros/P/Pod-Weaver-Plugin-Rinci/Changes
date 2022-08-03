@@ -1,9 +1,14 @@
-0.780   2019-04-08 (PERLANCAR)
+0.781   2022-06-10  Released-By: PERLANCAR; Urgency: medium
+
+        - Use Require::Hook::DzilBuild, force reloading of modules.
+
+
+0.780   2019-04-08  Released-By: PERLANCAR
 
 	- Handle METHODS section.
 
 
-0.77    2017-07-07 (PERLANCAR)
+0.77    2017-07-07  Released-By: PERLANCAR
 
 	- [Bugfix] Forgot to pass -Ilib when generating POD for
 	  Perinci::CmdLine-based scripts (which includes executing the
@@ -12,14 +17,14 @@
 	- [dist] Enable static install.
 
 
-0.76    2017-01-20 (PERLANCAR)
+0.76    2017-01-20  Released-By: PERLANCAR
 
         - [internal] Revert from using Require::Hook::DzilBuild to using 'local
           @INC = ("lib", @INC)' because Riap client searches for pl: URL path
           existence using filesystem anyway.
 
 
-0.75    2017-01-14 (PERLANCAR)
+0.75    2017-01-14  Released-By: PERLANCAR
 
 	- [Bugfix] Fix log message which logged the temporary script name
 	  instead of original one.
@@ -28,13 +33,13 @@
 	  been added.
 
 
-0.74    2017-01-13 (PERLANCAR)
+0.74    2017-01-13  Released-By: PERLANCAR
 
 	- [Bugfix] Set CLI script name, generate COMPLETION section (when
 	  script indeed has completer).
 
 
-0.73    2017-01-11 (PERLANCAR)
+0.73    2017-01-11  Released-By: PERLANCAR
 
 	- [refactor] Extract functionality of generating POD from
           Perinci::CmdLine-based scripts to Perinci::CmdLine::POD, so it's
@@ -44,32 +49,32 @@
           'local @INC = ("lib", @INC)'.
 
 
-0.72    2016-12-10 (PERLANCAR)
+0.72    2016-12-10  Released-By: PERLANCAR
 
 	- Add note about hash argument (--name=s%) being specified using
 	  key=value syntax and can be specified multiple times too like
 	  array (@).
 
 
-0.71    2016-11-29 (PERLANCAR)
+0.71    2016-11-29  Released-By: PERLANCAR
 
         - [Bugfix][regression] Subcommand with name '' was included in the
           Subcommands POD section for CLI with subcommands.
 
 
-0.70    2016-11-29 (PERLANCAR)
+0.70    2016-11-29  Released-By: PERLANCAR
 
 	- Also don't skip adding See Also (links) items from main URL's
 	  Rinci metadata, when CLI has subcommands.
 
 
-0.69    2016-11-29 (PERLANCAR)
+0.69    2016-11-29  Released-By: PERLANCAR
 
 	- Don't skip adding Description from main URL's Rinci metadata,
 	  when CLI has subcommands.
 
 
-0.68    2016-10-27 (PERLANCAR)
+0.68    2016-10-27  Released-By: PERLANCAR
 
 	- [dist] Bump prereq version Perinci::To::POD to 0.81 to grok
 	  'hidden' & 'hidden-mod' in argument spec tags.
@@ -78,18 +83,18 @@
 	  is already done by Perinci::Sub::To::CLIDocData 0.28+.
 
 
-0.67    2016-10-07 (PERLANCAR)
+0.67    2016-10-07  Released-By: PERLANCAR
 
 	- [Bugfix] Referred to the wrong variable so that example results
 	  were not rendered in scripts' POD.
 
 
-0.66    2016-09-28 (PERLANCAR)
+0.66    2016-09-28  Released-By: PERLANCAR
 
 	- [Bugfix] Add missing blank line when generating POD.
 
 
-0.65    2016-09-28 (PERLANCAR)
+0.65    2016-09-28  Released-By: PERLANCAR
 
         - [Enhancement] Introduce x.doc.max_result_lines in example spec to
           limit number of output lines shown.
@@ -100,49 +105,49 @@
           examples with src_plang=bash so dev version of modules are used.
 
 
-0.64    2016-09-27 (PERLANCAR)
+0.64    2016-09-27  Released-By: PERLANCAR
 
         - Recognize pod: and prog: URL schemes in links and convert them to
           proper L<...> POD links.
 
 
-0.63    2016-09-26 (PERLANCAR)
+0.63    2016-09-26  Released-By: PERLANCAR
 
 	- Show the output/result of example with src_plang=bash (by
 	  executing the CLI script and capturing its output).
 
 
-0.62    2016-08-04 (PERLANCAR)
+0.62    2016-08-04  Released-By: PERLANCAR
 
 	- [Bugfix] Don't list configuration for argument when argument is
 	  tagged 'hidden'.
 
 
-0.61    2016-08-03 (PERLANCAR)
+0.61    2016-08-03  Released-By: PERLANCAR
 
 	- Update the content of the CONFIGURATION FILE section for
 	  Perinci::CmdLine::Base 1.57 (where config_filenames might be an
 	  array of hash).
 
 
-0.60    2016-07-22 (PERLANCAR)
+0.60    2016-07-22  Released-By: PERLANCAR
 
 	- Handle (skip) non-OnDisk files.
 
 
-0.59    2016-04-18 (PERLANCAR)
+0.59    2016-04-18  Released-By: PERLANCAR
 
 	- Render links in functions' metadata into script's See Also POD
 	  section.
 
 
-0.58    2016-03-29 (PERLANCAR)
+0.58    2016-03-29  Released-By: PERLANCAR
 
 	- [Bugfix] Fix detecting whether a module's import() uses
 	  Exporter::Rinci's.
 
 
-0.57    2016-03-26 (PERLANCAR)
+0.57    2016-03-26  Released-By: PERLANCAR
 
         - Do not import dist modules because this causes problems with some
           modules, e.g. modules that export 'has' (like
@@ -153,27 +158,27 @@
           import()).
 
 
-0.56    2016-02-26 (PERLANCAR)
+0.56    2016-02-26  Released-By: PERLANCAR
 
 	- [Bugfix] Didn't normalize metadata when getting metadata, so we
 	  didn't get _orig_args_as & _orig_result_naked, so example
 	  rendering in modules was incorrect.
 
 
-0.55    2016-02-22 (PERLANCAR)
+0.55    2016-02-22  Released-By: PERLANCAR
 
 	- If we encounter a subcommand where its spec has been seen before
 	  (by seeing its ref address), we assume that the subcommand is an
 	  alias.
 
 
-0.54    2016-01-23 (PERLANCAR)
+0.54    2016-01-23  Released-By: PERLANCAR
 
 	- Update info on CONFIGURATION FILE to Perinci::CmdLine::Base 1.49
 	  (filtering by program, environment variable).
 
 
-0.53    2016-01-21 (PERLANCAR)
+0.53    2016-01-21  Released-By: PERLANCAR
 
 	- Support multiple config filenames (Perinci::CmdLine::Lite 1.44+).
 
@@ -181,94 +186,94 @@
 	  PWR:SortVersions).
 
 
-0.52    2015-12-25 (PERLANCAR)
+0.52    2015-12-25  Released-By: PERLANCAR
 
 	- [Bugfix] invoke module's import() first, so modules using
 	  Exporter::Rinci can work (because it populates @EXPORT or
 	  @EXPORT_OK in import()).
 
 
-0.51    2015-12-18 (PERLANCAR)
+0.51    2015-12-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Bump prereq version Perinci::To::POD 0.68 -> 0.70.
 
 
-0.50    2015-12-17 (PERLANCAR)
+0.50    2015-12-17  Released-By: PERLANCAR
 
 	- [Bugfix] No need to add envelope again because the Riap client
 	  will already add envelope.
 
 
-0.49    2015-12-08 (PERLANCAR)
+0.49    2015-12-08  Released-By: PERLANCAR
 
         - Wording for POD header for configuration for subcommand: from just
           "Subcommand 'foo'" to "Configuration for subcommand 'foo'".
 
 
-0.48    2015-11-20 (PERLANCAR)
+0.48    2015-11-20  Released-By: PERLANCAR
 
 	- [Bugfix] Referred to the wrong variable when checking
 	  x.doc.show_result example attribute.
 
 
-0.47    2015-10-06 (PERLANCAR)
+0.47    2015-10-06  Released-By: PERLANCAR
 
 	- [Bugfix] Read @EXPORT_OK to check if function is exportable.
 
 
-0.46    2015-09-29 (PERLANCAR)
+0.46    2015-09-29  Released-By: PERLANCAR
 
 	- Supply export behaviour of functions to Perinci::To::POD.
 
 
-0.45    2015-09-25 (PERLANCAR)
+0.45    2015-09-25  Released-By: PERLANCAR
 
         - Observe example spec's x.doc.show_result.
 
 
-0.44    2015-09-23 (PERLANCAR)
+0.44    2015-09-23  Released-By: PERLANCAR
 
         - Show example's result (if example spec does not specify result, will
           call function via Riap to get the result).
 
 
-0.43    2015-09-03 (PERLANCAR)
+0.43    2015-09-03  Released-By: PERLANCAR
 
 	- Workaround to avoid undef in dump env_name and
 	  config_filename/program_name.
 
 
-0.42    2015-07-27 (PERLANCAR)
+0.42    2015-07-27  Released-By: PERLANCAR
 
 	- Tweak format of generated ENVIRONMENT section.
 
 
-0.41    2015-07-04 (PERLANCAR)
+0.41    2015-07-04  Released-By: PERLANCAR
 
 	- Support showing the same option in multiple categories if that
 	  option has multiple category:X tags.
 
 
-0.40    2015-04-14 (PERLANCAR)
+0.40    2015-04-14  Released-By: PERLANCAR
 
 	- [Bugfix] Remove duplicate code, resulting duplicate text in FILES
 	  section.
 
 
-0.39    2015-04-08 (PERLANCAR)
+0.39    2015-04-08  Released-By: PERLANCAR
 
 	- Put common options (non-function argument options like --format &
 	  --log-level) as common/not per-subcommand.
 
 
-0.38    2015-04-07 (PERLANCAR)
+0.38    2015-04-07  Released-By: PERLANCAR
 
 	- Skip listing config params for alias subcommands.
 
 
-0.37    2015-04-07 (PERLANCAR)
+0.37    2015-04-07  Released-By: PERLANCAR
 
 	- Add text explaining the FOO_OPT in Environment section.
 
@@ -276,19 +281,19 @@
 	  section.
 
 
-0.36    2015-04-07 (PERLANCAR)
+0.36    2015-04-07  Released-By: PERLANCAR
 
 	- Add Configuration section for scripts, containing general
 	  information as well as list of available parameters.
 
 
-0.35    2015-04-07 (PERLANCAR)
+0.35    2015-04-07  Released-By: PERLANCAR
 
 	- Properly order categories according to the ordering information
 	  given by Perinci::Sub::To::CLIDocData 0.18.
 
 
-0.34    2015-04-04 (PERLANCAR)
+0.34    2015-04-04  Released-By: PERLANCAR
 
 	- Add before_section/after_section options when adding text to
 	  section to place created sections appropriately.
@@ -296,7 +301,7 @@
 	- Add ~/.config/ dir for FILES.
 
 
-0.33    2015-03-08 (PERLANCAR)
+0.33    2015-03-08  Released-By: PERLANCAR
 
         - Skip producing description or options for alias subcommands, only put
           in their summary.
@@ -305,26 +310,26 @@
           options for FOO subcommand.
 
 
-0.32    2015-02-21 (PERLANCAR)
+0.32    2015-02-21  Released-By: PERLANCAR
 
 	- Use summary/description from subcommand spec before using from
 	  metadata.
 
 
-0.31    2015-02-18 (PERLANCAR)
+0.31    2015-02-18  Released-By: PERLANCAR
 
 	- Avoid experimental warning.
 
 	- Observe 'hidden' tag to skip listing the options in POD.
 
 
-0.30    2015-02-06 (PERLANCAR)
+0.30    2015-02-06  Released-By: PERLANCAR
 
 	- [ux] Put common subroutine options (those tagged with 'common')
 	  to Common Options section.
 
 
-0.29    2015-01-13 (PERLANCAR)
+0.29    2015-01-13  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -332,7 +337,7 @@
           process_module.
 
 
-0.28    2015-01-13 (PERLANCAR)
+0.28    2015-01-13  Released-By: PERLANCAR
 
         - Add back the functionalities of adding FILES as well as ENVIRONMENT
           sections. It's better that the functionalities are added here because
@@ -341,7 +346,7 @@
         - Use Pod::Weaver::Role::AddTextToSection.
 
 
-0.27    2015-01-10 (PERLANCAR)
+0.27    2015-01-10  Released-By: PERLANCAR
 
 	- (Temporarily?) skip adding FILES section (done by
 	  PWS::Files::PerinciCmdLine).
@@ -350,31 +355,31 @@
 	  PWR::AddTextToSection.
 
 
-0.26    2014-12-26 (PERLANCAR)
+0.26    2014-12-26  Released-By: PERLANCAR
 
 	- Skip processing script if script is not eligible (status 412).
 
 
-0.25    2014-12-21 (PERLANCAR)
+0.25    2014-12-21  Released-By: PERLANCAR
 
 	- Refactor: extract role PWR::DumpPerinciCmdLineScript.
 
 
-0.24    2014-12-16 (PERLANCAR)
+0.24    2014-12-16  Released-By: PERLANCAR
 
 	- Support scripts with embedded function under /main.
 
 	- Split Perinci::CmdLine::Base::Patch::DumpAndExit to another dist.
 
 
-0.23    2014-12-09 (PERLANCAR)
+0.23    2014-12-09  Released-By: PERLANCAR
 
 	- [Bugfix] Forgot to add 'lib' to @INC when executing script.
 
 	- Show raw stdout/stderr when failing to capture, for debugging.
 
 
-0.22    2014-12-07 (PERLANCAR)
+0.22    2014-12-07  Released-By: PERLANCAR
 
 	- Fix encoding issue by converting characters to bytes as expected
 	  by read_string() (KENTNL++, ref:
@@ -382,18 +387,18 @@
 	  ecomment-65880917).
 
 
-0.21    2014-12-04 (PERLANCAR)
+0.21    2014-12-04  Released-By: PERLANCAR
 
         - Tweak: don't show valid values or default values for alias options.
 
 
-0.20    2014-12-02 (PERLANCAR)
+0.20    2014-12-02  Released-By: PERLANCAR
 
 	- Switch Perinci::Sub::To::{CLIOptSpec,CLIDocData}, show examples
 	  in Synopsis.
 
 
-0.19    2014-11-30 (PERLANCAR)
+0.19    2014-11-30  Released-By: PERLANCAR
 
         - Use Perinci::Sub::To::CLIOptSpec 0.08 to be able to get '@' even
           though x.schema.entity has been set.
@@ -403,19 +408,19 @@
         - Show option's valid values from schema's 'in' clause, if any.
 
 
-0.18    2014-11-21 (PERLANCAR)
+0.18    2014-11-21  Released-By: PERLANCAR
 
 	- Tweaks for script: Add note about options that can be specified
           multiple times. Don't repeat description for non-main option, instead
           refer to it.
 
 
-0.17    2014-11-21 (PERLANCAR)
+0.17    2014-11-21  Released-By: PERLANCAR
 
 	- Script if function URL qr#^/main/# (embedded).
 
 
-0.16    2014-11-21 (PERLANCAR)
+0.16    2014-11-21  Released-By: PERLANCAR
 
         - Rename distribution from Pod-Weaver-Plugin-Perinci to
           Pod-Weaver-Plugin-Rinci to be consistent with the dzil plugins
@@ -425,76 +430,76 @@
           SYNOPSIS, DESCRIPTION, SUBCOMMANDS, OPTIONS, FILES sections.
 
 
-0.15    2014-04-30 (SHARYANTO)
+0.15    2014-04-30  Released-By: SHARYANTO
 
         - Adjust to Perinci::Access::Perl 0.66 (use normalize_metadata option
           instead of orig_meta result metadata).
 
 
-0.14    2013-11-05 (SHARYANTO)
+0.14    2013-11-05  Released-By: SHARYANTO
 
         [BUG FIXES]
 
         - Didn't use original metadata's args_as & result_naked property values.
 
 
-0.13    2013-11-02 (SHARYANTO)
+0.13    2013-11-02  Released-By: SHARYANTO
 
         - Adjust to Perinci::To::POD 0.36 (no longer uses Riap protocol).
 
         - Skip inserting section if empty.
 
 
-0.12    2013-09-08 (SHARYANTO)
+0.12    2013-09-08  Released-By: SHARYANTO
 
         - Adjust to Perinci::To::POD 0.34 (pl: url scheme now required).
 
 
-0.11    2013-07-26 (SHARYANTO)
+0.11    2013-07-26  Released-By: SHARYANTO
 
         - Adjust to Perinci::To::POD 0.30.
 
 
-0.10    2013-04-04 (SHARYANTO)
+0.10    2013-04-04  Released-By: SHARYANTO
 
         - Append to existing sections (like DESCRIPTION or FUNCTIONS) instead of
           creating another section.
 
 
-0.09    2012-11-05 (SHARYANTO)
+0.09    2012-11-05  Released-By: SHARYANTO
 
         - No functional changes. Make sure "lib" is at the front of @INC.
 
 
-0.08    2011-03-16 (SHARYANTO)
+0.08    2011-03-16  Released-By: SHARYANTO
 
         - Add attributes: exclude_files, exclude_modules.
 
 
-0.07    2011-03-16 (SHARYANTO)
+0.07    2011-03-16  Released-By: SHARYANTO
 
         - Rename distribution from Pod-Weaver-Plugin-SubSpec to
           Pod-Weaver-Plugin-Perinci. Now follows Rinci/Riap specification.
 
 
-0.06    2011-09-22 (SHARYANTO)
+0.06    2011-09-22  Released-By: SHARYANTO
 
         - No functional changes. Fix log message.
 
 
-0.05    2011-09-22 (SHARYANTO)
+0.05    2011-09-22  Released-By: SHARYANTO
 
         - No functional changes. To help debugging, enable logging when a file
           is skipped because there is no "=head1 FUNCTIONS" section.
 
 
-0.04    2011-08-24 (SHARYANTO)
+0.04    2011-08-24  Released-By: SHARYANTO
 
         - No functional changes. Update with rename of Sub::Spec::Pod to
           Sub::Spec::To::Pod.
 
 
-0.03    2011-04-15 (SHARYANTO)
+0.03    2011-04-15  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -502,11 +507,11 @@
           dist can be require'd.
 
 
-0.02    2011-02-10 (SHARYANTO)
+0.02    2011-02-10  Released-By: SHARYANTO
 
         - Remove unneeded 'use' statements.
 
 
-0.01    2011-02-10 (SHARYANTO)
+0.01    2011-02-10  Released-By: SHARYANTO
 
         - First release.

@@ -20,6 +20,7 @@ while (my $str = <DATA>) {
         elsif ($str !~ /^####\h*\Z/m)                { $str .= <DATA>; redo; }
 
         $str =~ s/\s*^####\h*\Z//m;
+        chomp $str;
 
         if ($neg) {
             ok $str !~ m/\A (?&PerlOWS) (?&PerlVariable) (?&PerlOWS) \Z $PPR::GRAMMAR/xo => "FAIL: $str";
@@ -46,6 +47,12 @@ __DATA__
     @{$obj->nextval}
 ####
     @{$obj->nextval($cat,$dog)->{new}}
+####
+    $obj->nextval
+####
+    $obj->_nextval
+####
+    $obj->next_val_
 ####
     $::obj
 ####
@@ -259,8 +266,6 @@ __DATA__
 ####
     \${^MATCH}
 ####
-    $obj->nextval
-####
     *var
 ####
     *$var
@@ -277,13 +282,7 @@ __DATA__
 ####
     \&mod'var
 ####
-    $obj->_nextval
-####
-    $obj->next_val_
-####
     $a->
 ####
     $a (1..3) { print $a }
-####
-    $obj->nextval
 ####

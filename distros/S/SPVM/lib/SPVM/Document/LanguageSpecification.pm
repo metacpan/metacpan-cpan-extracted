@@ -2282,21 +2282,17 @@ B<Examples:>
   class Point3D extends Point {
     
     has z : rw int;
-
-    static method new : Point3D () {
-      return new Point3D;
-    }
     
-    static method new_xyz : Point3D ($x : int, $y : int, $z : int) {
-      my $self = Point3D->new;
+    static method new : Point3D ($x = 0 : int, $y = 0 : int, $z = 0 : int) {
+      my $self = new Point3D;
       
-      $self->set_x($x);
-      $self->set_y($y);
-      $self->set_z($z);
+      $self->{x} = $x;
+      $self->{y} = $y;
+      $self->{z} = $z;
       
       return $self;
     }
-
+    
     method clear : void () {
       $self->SUPER::clear;
       $self->{z} = 0;
@@ -2313,7 +2309,7 @@ B<Examples:>
     }
     
     method cloneable_clone : object () {
-      my $self_clone = Point3D->new_xyz($self->x, $self->y, $self->z);
+      my $self_clone = Point3D->new($self->x, $self->y, $self->z);
       
       return $self_clone;
     }
@@ -2353,7 +2349,7 @@ The class that has L<interface Guarantees|/"Interface Guarantee"> must have the 
     }
   }
   
-  my $stringable = (Stringable)Point->new_xy(1, 2);
+  my $stringable = (Stringable)Point->new(1, 2);
   my $string = $stringable->to_string;
 
 A interface can't have L<filed definitions|/"Field Definition">.
@@ -2836,12 +2832,12 @@ a.
 The C<method> keyword defines a class method or an instance method.
   
   # Static method
-  static method METHOD_NAME : RETURN_VALUE_TYPE (ARG_NAME1 : ARG_TYPE1, ARG_NAME2 : ARG_TYPE2, ...) {
+  static method METHOD_NAME : RETURN_TYPE (ARG_NAME1 : ARG_TYPE1, ARG_NAME2 : ARG_TYPE2, ...) {
     
   }
 
   # Instance method
-  method METHOD_NAME : RETURN_VALUE_TYPE (ARG_NAME1 : ARG_TYPE1, ARG_NAME2 : ARG_TYPE2, ...) {
+  method METHOD_NAME : RETURN_TYPE (ARG_NAME1 : ARG_TYPE1, ARG_NAME2 : ARG_TYPE2, ...) {
     
   }
 
@@ -2861,7 +2857,7 @@ Defined methods can be called using L</"Method Call"> syntax.
 
 A method can have L<method descriptors|/"Method Descriptors">.
 
-  DESCRIPTORS static method METHOD_NAME : RETURN_VALUE_TYPE (ARG_NAME1 : ARG_TYPE1, ARG_NAME2 : ARG_TYPE2, ...) {
+  DESCRIPTORS static method METHOD_NAME : RETURN_TYPE (ARG_NAME1 : ARG_TYPE1, ARG_NAME2 : ARG_TYPE2, ...) {
   
   }
 
@@ -2871,7 +2867,7 @@ A method has L</"Method Block"> except for the case that the method has the C<na
 
 C<...> after the type of the argument indicates the argument is a variable length argument. Only the last argument can become a variable length argument.
 
-  static method METHOD_NAME : RETURN_VALUE_TYPE (ARG_NAME1 : ARG_TYPE1, ARG_NAME2 : ARG_TYPE2...) {
+  static method METHOD_NAME : RETURN_TYPE (ARG_NAME1 : ARG_TYPE1, ARG_NAME2 : ARG_TYPE2...) {
   
   }
 
@@ -2896,6 +2892,30 @@ If you want to treat the value as an individual element, cast it to type other t
 
   sprintf("aaa %p", (object)[(object)1, 2.0]);
 
+=head3 Optional Argument
+
+The optional argument is the syntax to specify optional arguments.
+
+  static method METHOD_NAME : RETURN_TYPE (ARG_NAME1 : ARG_TYPE1, ARG_NAME2 = DEFAULT_VALUE : ARG_TYPE2) {
+  
+  }
+
+B<Examples:>
+
+  static method substr ($string : string, $offset : int, $length = -1 : int) {
+    # ...
+  }
+  
+  my $string = "abc";
+  my $offset = 1;
+  my $substr = &substr($string, $offset);
+  
+  # This is the same as the following code
+  my $string = "abc";
+  my $offset = 1;
+  my $length = -1;
+  my $substr = &substr($string, $offset, $length);
+  
 =head2 Class Method
 
 A class method is defined with the C<static> keyword.
@@ -3049,36 +3069,6 @@ Note that SPVM does not perform constant convolution optimization, so if a const
 
   # This is not Constant Method.  Inline Expansion is not performed
   static method foo : int () { return 5 + 3; }
-
-=head2 Signature
-
-A signature is a string that represents the return type and the types of the arguments of a L<method|/"Method">.
-
-  RETURN_TYPE(ARG_TYPE1,ARG_TYPE2,ARG_TYPEn)
-
-It the method is an L<instance method|/"Instance Method">, the type representation of the first argument is C<self>.
-
-B<Examples:>
-
-  # Method Definition
-  static method foo : int ($num1 : double, $num2 : long[])
-  
-  # The signature
-  int(double,long[])
-  
-  # Method Definition
-  static method foo : void ()
-  
-  # The signature
-  void()
-  
-  # Method Definition
-  method foo : int ($num1 : double, $num2 : long[])
-  
-  # Signature
-  int(self,double,long[])
-
-Signatures are used by L<native APIs|SPVM::Document::NativeAPI>.
 
 =head1 Enumeration
 
@@ -4734,7 +4724,7 @@ Otherwise, the assignability is false.
 B<Examples:>
   
   # Point has Stringable interface
-  my $stringable : Stringable = Point->new_xy(1, 2);
+  my $stringable : Stringable = Point->new(1, 2);
   my $stringable : Stringable = undef;
 
 =head2 Assignability to Any Object
@@ -5306,10 +5296,10 @@ B<Examples:>
   my $cloneable : Cloneable;
   my $stringable = (Stringable)$cloneable;
   
-  my $stringable  = (Stringable)Point->new_xy(1, 2);
+  my $stringable  = (Stringable)Point->new(1, 2);
 
-  my $object : object  = Point->new_xy(1, 2);
-  my $stringable  = (Stringable)Point->new_xy(1, 2);
+  my $object : object  = Point->new(1, 2);
+  my $stringable  = (Stringable)Point->new(1, 2);
   
   my $stringable : Stringable = undef;
 
@@ -7764,7 +7754,7 @@ If the class or the interface has the method implementation, returns C<1>, other
 
 B<Examples:>
 
-  my $stringable = (Stringable)Point->new_xy(1, 2);
+  my $stringable = (Stringable)Point->new(1, 2);
   
   if (has_impl $stringable->to_string) {
     # ...
