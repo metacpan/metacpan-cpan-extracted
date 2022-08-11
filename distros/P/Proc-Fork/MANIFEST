@@ -1,15 +1,15 @@
 Changes
-LICENSE
-MANIFEST
-META.json                                Module JSON meta-data (added by MakeMaker)
-META.yml                                 Module YAML meta-data (added by MakeMaker)
 Makefile.PL
-README
-boilerplate.pl
 eg/daemon.pl
 eg/multichild.pl
 eg/server.pl
 eg/simple.pl
+inc/boilerplate.pl
 lib/Proc/Fork.pm
 t/mock.t
 t/real.t
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+LICENSE
+README

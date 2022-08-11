@@ -68,6 +68,17 @@ sub any {
   return $found ? 1 : 0;
 }
 
+sub call {
+  my ($self, $mapper, $method, @args) = @_;
+
+  require Venus::Type;
+
+  return $self->$mapper(sub{
+    my ($key, $val) = @_;
+    $key, Venus::Type->new($val)->deduce->$method(@args)
+  });
+}
+
 sub count {
   my ($self) = @_;
 
@@ -520,6 +531,47 @@ I<Since C<0.01>>
   });
 
   # 0
+
+=back
+
+=cut
+
+=head2 call
+
+  call(Str $iterable, Str $method) (Any)
+
+The call method executes the given method (named using the first argument)
+which performs an iteration (i.e. takes a callback) and calls the method (named
+using the second argument) on the object (or value) and returns the result of
+the iterable method.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item call example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $call = $hash->call('map', 'incr');
+
+  # ['1', 3, '3', 5, '5', 7, '7', 9]
+
+=back
+
+=over 4
+
+=item call example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $call = $hash->call('grep', 'gt', 4);
+
+  # [5..8]
 
 =back
 

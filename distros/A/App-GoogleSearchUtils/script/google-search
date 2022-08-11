@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-16'; # DATE
+our $DATE = '2022-08-11'; # DATE
 our $DIST = 'App-GoogleSearchUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/GoogleSearchUtils/google_search",
@@ -36,13 +36,15 @@ google-search - Open google search page in browser
 
 =head1 VERSION
 
-This document describes version 0.007 of google-search (from Perl distribution App-GoogleSearchUtils), released on 2022-03-16.
+This document describes version 0.008 of google-search (from Perl distribution App-GoogleSearchUtils), released on 2022-08-11.
 
 =head1 SYNOPSIS
 
-Usage:
+% B<google-search> [B<--action>=I<str>|B<--open-url>|B<--print-html-link>|B<--print-org-link>|B<--print-url>] [B<--append>=I<str>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--delay>=I<duration>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--num>=I<posint>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--prepend>=I<str>] [(B<--query>=I<str>)+|B<--queries-json>=I<json>] [B<--time-end>=I<date>] [B<--time-past>=I<str>] [B<--time-start>=I<date>] [B<--type>=I<str>|B<--image>|B<--map>|B<--news>|B<--video>|B<--web>] -- E<lt>I<query>E<gt> ...
 
-% B<google-search> [B<--action>=I<str>] [B<--append>=I<str>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--delay>=I<duration>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--num>=I<posint>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--prepend>=I<str>] [(B<--query>=I<str>)+] [B<--time-end>=I<date>] [B<--time-past>=I<str>] [B<--time-start>=I<date>] [B<--type>=I<str>] [B<--queries-json>=I<json>] [B<--image>|B<--map>|B<--news>|B<--video>|B<--web>] [B<--open-url>|B<--print-html-link>|B<--print-org-link>|B<--print-url>] -- E<lt>I<query>E<gt> ...
+
+
+See examples in the L</EXAMPLES> section.
 
 =head1 OPTIONS
 
@@ -65,9 +67,9 @@ Valid values:
  ["open_url","print_url","print_html_link","print_org_link"]
 
 Instead of opening the queries in browser, you can also do other action instead.
-For example, `print_url` will print the search URL. `print_html_link` will print
-the HTML link (the <a> tag). And `print_org_link` will print the Org-mode link,
-e.g. `[[url...][query]]`.
+For example, C<print_url> will print the search URL. C<print_html_link> will print
+the HTML link (the <a> tag). And C<print_org_link> will print the Org-mode link,
+e.g. C<[[url...][query]]>.
 
 
 =item B<--append>=I<s>
@@ -178,13 +180,37 @@ See C<--type>.
 
 Set path to configuration file.
 
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
 =item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+ [profile=dev]
+ username=foo
+ pass=beaver
+ 
+ [profile=production]
+ username=bar
+ pass=honey
+
+When you specify C<--config-profile=dev>, C<username> will be set to C<foo> and
+C<password> to C<beaver>. When you specify C<--config-profile=production>,
+C<username> will be set to C<bar> and C<password> to C<honey>.
+
+
 =item B<--no-config>, B<-C>
 
 Do not use any configuration file.
+
+If you specify C<--no-config>, the application will not read any configuration
+file.
+
 
 =back
 
@@ -195,6 +221,10 @@ Do not use any configuration file.
 =item B<--no-env>
 
 Do not read environment for default options.
+
+If you specify C<--no-env>, the application wil not read any environment
+variable.
+
 
 =back
 
@@ -210,6 +240,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -224,24 +260,33 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--page-result>
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -359,41 +404,41 @@ List of available configuration parameters:
 
 =head1 ENVIRONMENT
 
-=head2 GOOGLE_SEARCH_OPT => str
+=head2 GOOGLE_SEARCH_OPT
 
-Specify additional command-line options.
+String. Specify additional command-line options.
 
 =head1 FILES
 
-F</home/u1/.config/google-search.conf>
+=head2 /home/u1/.config/google-search.conf
 
-F</home/u1/google-search.conf>
+=head2 /home/u1/google-search.conf
 
-F</etc/google-search.conf>
+=head2 /etc/google-search.conf
 
 =head1 EXAMPLES
 
-Open a single query, show 100 results:
+=head2 Open a single query, show 100 results
 
  % google-search "a query" -n 100
 
-Open several queries, limit time period all search to the past month:
+=head2 Open several queries, limit time period all search to the past month
 
  % google-search "query one" query2 "query number three" --time-past month
 
-Use a custom browser:
+=head2 Use a custom browser
 
  % BROWSER=lynx google-search "a query"
 
-Use with firefox-container:
+=head2 Use with firefox-container
 
  % BROWSER="firefox-container mycontainer" google-search "query one" query2
 
-Show image search URLs instead of opening them in browser:
+=head2 Show image search URLs instead of opening them in browser
 
  % google-search --image --print-url "query one" query2
 
-Print map search URLs as Org links:
+=head2 Print map search URLs as Org links
 
  % google-search --map --print-org-link "jakarta selatan" "kebun raya bogor"
 
@@ -404,6 +449,12 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Google
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-GoogleSearchUtils>.
+
+=head1 SEE ALSO
+
+L<firefox-container>.
+
+L<App::FirefoxMultiAccountContainersUtils>.
 
 =head1 AUTHOR
 
@@ -422,9 +473,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -221,6 +221,26 @@ sub _default_errors_for_content {
   }
 }
 
+sub process_options {
+  my ($self, $attribute, $options) = @_;
+  if( ($self->attribute_has_errors($attribute)) && (my $errors_attrs = delete $options->{errors_attrs})) {
+    foreach my $key(keys %$errors_attrs) {
+      if(exists $options->{$key}) {
+        if( ($key eq 'data') || ($key eq 'aria') ) {
+          $options->{$key} = +{ %{$options->{$key}}, %{$errors_attrs->{$key}} };
+        } elsif($key eq 'class') {
+          $options->{$key} .= " $errors_attrs->{$key}";
+        } else {
+          $options->{$key} .= $errors_attrs->{$key};
+        }
+      } else {
+        $options->{$key} = $errors_attrs->{$key};
+      }
+    }
+  }
+  return $options;
+}
+
 # $fb->input($attribute, \%options)
 # $fb->input($attribute)
 
@@ -237,7 +257,7 @@ sub input {
   set_unless_defined(name => $options, $self->tag_name_for_attribute($attribute));
   $options->{value} = $self->tag_value_for_attribute($attribute) unless defined($options->{value});
 
-  return Valiant::HTML::FormTags::input_tag $attribute, $options;
+  return Valiant::HTML::FormTags::input_tag $attribute, $self->process_options($attribute, $options);
 }
 
 sub password {
@@ -264,7 +284,7 @@ sub text_area {
   return Valiant::HTML::FormTags::text_area_tag(
     $self->tag_name_for_attribute($attribute),
     $self->tag_value_for_attribute($attribute),
-    $options,
+    $self->process_options($attribute, $options),
   );
 }
 
@@ -295,7 +315,7 @@ sub checkbox {
     $name,
     $checked_value,
     $checked,
-    $options,
+    $self->process_options($attribute, $options),
   );
 
   if($show_hidden_unchecked) {
@@ -317,7 +337,7 @@ sub radio_button {
   $options->{checked} = do { $self->tag_value_for_attribute($attribute) eq $value ? 1:0 } unless exists($options->{checked});
   $options->{id} = $self->tag_id_for_attribute($attribute, $value);
 
-  return $self->input($attribute, $options);
+  return $self->input($attribute, $self->process_options($attribute, $options));
 }
  
 sub date_field {
@@ -404,7 +424,9 @@ sub button {
   $attrs->{name} = $self->tag_name_for_attribute($attribute) unless exists($attrs->{name});
   $attrs->{id} = $self->tag_id_for_attribute($attribute) unless exists($attrs->{id});
 
-  return ref($content) ? Valiant::HTML::FormTags::button_tag($attrs, $content) : Valiant::HTML::FormTags::button_tag($content, $attrs);
+  return ref($content) ?
+    Valiant::HTML::FormTags::button_tag($attrs, $content) :
+      Valiant::HTML::FormTags::button_tag($content, $self->process_options($attribute, $attrs));
 }
 
 sub legend {
@@ -418,6 +440,17 @@ sub legend {
   $value = $value->($default_value) if ((ref($value)||'') eq 'CODE');
 
   return Valiant::HTML::FormTags::legend_tag($value, $options);
+}
+
+sub legend_for {
+  my $self = shift;
+  my $attribute = shift;
+  my $attrs = (ref($_[0])||'') eq 'HASH' ? shift(@_) : +{};
+  my $content = @_ ? shift(@_) : $self->human_name_for_attribute($attribute);
+
+  $attrs->{id} = "@{[ $self->tag_id_for_attribute($attribute) ]}_legend" unless exists($attrs->{id});
+
+  return Valiant::HTML::FormTags::legend_tag($attrs, $content);
 }
 
 sub _legend_default_value {
@@ -528,7 +561,9 @@ sub select {
   my $block = (ref($_[-1])||'') eq 'CODE' ? pop(@_) : undef;
   my $options = (ref($_[-1])||'') eq 'HASH' ? pop(@_) : +{};
   my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
-  my $include_hidden = exists($options->{include_hidden}) ? delete($options->{include_hidden}) : 1; 
+  my $include_hidden = exists($options->{include_hidden}) ? $options->{include_hidden} : 1;
+  my $unselected_default = exists($options->{unselected_value}) ? delete($options->{unselected_value}) : undef;
+
 
   my @selected = ();
   my $name = '';
@@ -550,6 +585,7 @@ sub select {
     if( (ref($tag_value_proto)||'') eq 'ARRAY') {
       @selected = @$tag_value_proto;
       $options->{multiple} = 1;
+      $include_hidden = 1;
     } else {
       @selected = ($tag_value_proto);
     }
@@ -571,10 +607,15 @@ sub select {
     $options_tags = Valiant::HTML::FormTags::capture($block, $model, $attribute_proto, @selected);
   }
 
+  $options->{include_hidden} = 0 if $options->{multiple};
   my $select_tag = Valiant::HTML::FormTags::select_tag($name, $options_tags, $options);
-  if($include_hidden && ref($attribute_proto)) {
-    my ($bridge, $value_method) = %$attribute_proto;
-    $select_tag = $self->hidden("${bridge}[0]._nop", +{value=>1, id=>$options->{id}.'_hidden'})->concat($select_tag);    
+  if($include_hidden && $options->{multiple}) {
+    if(ref($attribute_proto)) {
+      my ($bridge, $value_method) = %$attribute_proto;
+      $select_tag = $self->hidden("${bridge}[0]._nop", +{value=>1, id=>$options->{id}.'_hidden'})->concat($select_tag);
+    } elsif(defined $unselected_default) {
+      $select_tag = $self->hidden("${attribute_proto}[0]", +{value=>$unselected_default, id=>$options->{id}.'_hidden'})->concat($select_tag)
+    }
   }
   return $select_tag;
 }
@@ -638,6 +679,8 @@ sub collection_select {
   return $select_tag;
 }
 
+sub default_collection_checkbox_include_hidden { return 1 }
+
 # $fb->collection_checkbox({person_roles => role_id}, $roles_rs, $value_method, $text_method, \%options, \&block);
 # $fb->collection_checkbox({person_roles => role_id}, $roles_rs, $value_method, $text_method, \%options, \&block);
 sub collection_checkbox {
@@ -647,6 +690,7 @@ sub collection_checkbox {
   my $value_method = @_ ? shift(@_) : 'value';
   my $label_method = @_ ? shift(@_) : 'label';
   my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
+  my $include_hidden = exists($options->{include_hidden}) ? delete($options->{include_hidden}) : $self->default_collection_checkbox_include_hidden;
 
   # It's either +{ person_roles => role_id } or roles 
   my ($attribute, $attribute_value_method) = ();
@@ -683,7 +727,7 @@ sub collection_checkbox {
     my $name = "@{[ $self->name ]}.${attribute}";
     my $checked = grep { $_ eq $checkbox_model->$value_method } @checked_values;
 
-    unless(@checkboxes) { # Add nop as first to handle empty list
+    if($include_hidden && !scalar(@checkboxes)) { # Add nop as first to handle empty list
       my $hidden_fb = Valiant::HTML::Form::_instantiate_builder($name, $value_collection->build, {index=>$index});
       push @checkboxes, $hidden_fb->hidden('_nop', +{value=>'1'});
       $index = $self->nested_child_index($attribute);
@@ -709,6 +753,8 @@ sub _default_collection_checkbox_content {
   };
 }
 
+sub default_collection_radio_buttons_include_hidden { return 1 }
+
 sub collection_radio_buttons {
   my ($self, $attribute, $collection) = (shift, shift, shift);
   my $codeblock = (ref($_[-1])||'') eq 'CODE' ? pop(@_) : undef;
@@ -717,6 +763,8 @@ sub collection_radio_buttons {
   my $label_method = @_ ? shift(@_) : 'label';
   my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
   my $checked_value = exists($options->{checked_value}) ? $options->{checked_value} : $self->tag_value_for_attribute($attribute);
+  my $include_hidden = exists($options->{include_hidden}) ? delete($options->{include_hidden}) : $self->default_collection_radio_buttons_include_hidden;
+
 
   $codeblock = $self->_default_collection_radio_buttons_content unless defined($codeblock);
 
@@ -732,9 +780,9 @@ sub collection_radio_buttons {
 
   while (my $radio_button_model = $collection->next) {
     my $name = "@{[ $self->name ]}.${attribute}";
-    my $checked = $radio_button_model->$value_method eq $checked_value ? 1:0;
+    my $checked = $radio_button_model->$value_method eq ($checked_value||'') ? 1:0;
 
-    unless(@radio_buttons) { # Add nop as first to handle empty list
+    if($include_hidden && !scalar(@radio_buttons) ) { # Add nop as first to handle empty list
       my $hidden_fb = Valiant::HTML::Form::_instantiate_builder($name, $model);
       push @radio_buttons, $hidden_fb->hidden($name, +{name=>$name, id=>$self->tag_id_for_attribute($attribute).'_hidden', value=>''});
     }
@@ -758,13 +806,17 @@ sub _default_collection_radio_buttons_content {
   };
 }
 
+sub radio_buttons {
+  my ($self, $attribute, $collection_proto) = (shift, shift, shift);
+  my $collection = Valiant::HTML::Util::Collection->new(@$collection_proto);
+  return $self->collection_radio_buttons($attribute, $collection, @_);
+}
 
 # select collection needs work (with multiple)
 # select with opt grounps needs to work
 # ?? date and date time helpers (month field, weeks, etc) ??
 
 1;
-
 
 =head1 NAME
 
@@ -1419,6 +1471,20 @@ Examples:
     $fb->legend({class=>'foo'}, sub {"Person"});
     # <legend class="foo">Person</legend>
 
+=head2 legend_for
+
+    $fb->legend_for($attr);
+    $fb->legend_for($attr, \%options);
+
+Creates an HTML C<legend> tags with it's content set to the human translated name of the given
+$attribute.  Allows you to pass some additional HTML attributes to the legend tag.  Examples:
+
+    $fb->legend_for('status')
+    # <legend id="status_legend" >Status</legend>
+    
+    $fb->legend_for('status', {class=>'foo'})
+    # <legend id="status_legend" class="foo" >Status</legend>
+
 =head2 fields_for
 
     $fb->fields_for($attribute, sub {
@@ -1564,6 +1630,39 @@ special handling for \%options:
 
 Mark C\<option> tags as selected or disabled.   If you manual set selected then we ignore
 the value of $attribute (or @values when $attribute is a collection)
+
+=item unselected_value
+
+The value to set the hidden 'unselected' field to. No default value.  See 'include_hidden' for details.
+
+=item include_hidden
+
+Defaults to true for 'multiple' and false for single type selects.
+
+The rules for an HTML form select field specify that if the no option is 'selected' then
+nothing is submitted.  This can cause issues if you are expecting a submission that somehow indicates 'nothing selected'
+means to unset some settings. So we do one of two things when 'include_hidden' is true. When the select is a
+simple 'single value' select (not multiple) we add a hidden field with the same name as the select name but indexed to 0 so its
+always the first value; its value is whatever you set 'unselected_value' to.  If you don't set 'unselected_value' this hidden
+field is NOT created.  If you are using L<Plack::Request> or L<Mojolicious> (or using L<Catalyst> with C<use_hash_multivalue_in_request> option set to
+true, or something like L<Catalyst::TraitFor::Request::StructuredParameters>) then the last value of an array
+body parameter will be returned which will let you choose between a default value or an actual returned value.  Example:
+
+    # $fb->select('state_ids', [map { [$_->label, $_->id] } $roles_collection->all], +{include_hidden=>1, unselected_value=>-1} );
+    # <input id="person_state_ids_hidden" name="person.state_ids[0]" type="hidden" value="-1"/>
+    # <select id="person_state_ids" multiple name="person.state_ids[]">
+    #   <option selected value="1">user</option>
+    #   <option value="2">admin</option>
+    #   <option selected value="3">guest</option>
+    # </select>
+
+
+If you've set the 'multiple' attribute to true, or we detect that multiple values are intended (either when the form value
+of the field is an arrayref or a collection) indicting your select drop list allows one to choose more than one option, 
+we add a hidden field '_nop' at index 0 which you will need to treat at the signal for 'this means unset.   If you are using this with
+L<DBIx:Class::Valiant> then that code will automatically handle this for you.   Otherwise you'll need to handle it
+manually or add code to detect that there is no form submission value under that name.  If you don't want this
+behavior you can manually turn it off be explicitly setting 'include_hidden' to false.
 
 =back
 
@@ -1746,7 +1845,7 @@ permitted.  Example:
     # <input checked id="person_state_id_1_1" name="person.state_id" type="radio" value="1"/>
     # <label for="person_state_id_2">NY</label>
     # <input id="person_state_id_2_2" name="person.state_id" type="radio" value="2"/>
-    # <label for="person_state_id_3">CA</label>'.
+    # <label for="person_state_id_3">CA</label>
     # <input id="person_state_id_3_3" name="person.state_id" type="radio" value="3"/>
 
 Please note when the $attribute is a collection value we add a hidden field to allow you to send a signal
@@ -1774,6 +1873,30 @@ L<Valiant::HTML::FormBuilder::RadioButton>):
 In addition to overriding C<radio_button> and C<label> to already contain value and state (if its checked or
 not) information.   This special builder contains some additional methods of possible use, you should see
 the documentation of L<Valiant::HTML::FormBuilder::RadioButton> for more.
+
+=head2 radio_buttons
+
+    $fb->radio_buttons($attribute, \@options, \%options);
+    $fb->radio_buttons($attribute, \@options, \%options, \&template);
+    $fb->radio_buttons($attribute, \@options);
+    $fb->radio_buttons($attribute, \@options, \&template);
+
+Similar to L</collection_radio_buttons> but takes an arrayref of label / values instead of a collection.
+Useful when you have a list of radio buttons (like from an ENUM) but you don't want to list each radio
+separately.  Example:
+
+    $fb_profile->radio_buttons('status', [[Pending=>'pending'],[Active=>'active'],[Inactive=>'inactive']]);
+
+    # <input id="person_profile_status_hidden" name="person.profile.status" type="hidden" value="">
+    # <input id="person_profile_status_pending_pending" name="person.profile.status" type="radio" value="pending">
+    # <label for="person_profile_status_pending">Pending</label>
+    # <input checked="" id="person_profile_status_active_actie" name="person.profile.status" type="radio" value="active">
+    # <label for="person_profile_status_active">Active</label>
+    # <input id="person_profile_status_inactive_inactive" name="person.profile.status" type="radio" value="inactive">
+    # <label for="person_profile_status_inactive">Inactive</label>
+
+Supports using a template subroutine reference (like L</collection_radio_buttons>) when you need to be
+fussy about style and positioning.
 
 =head1 SEE ALSO
 

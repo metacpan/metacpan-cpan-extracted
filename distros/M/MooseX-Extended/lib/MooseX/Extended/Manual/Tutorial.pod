@@ -13,7 +13,7 @@ MooseX::Extended::Manual::Tutorial - Building a Better Moose
 
 =head1 VERSION
 
-version 0.26
+version 0.28
 
 =head1 GENESIS
 
@@ -622,7 +622,7 @@ C<excludes> until your tests fail and address them one-by-one.
 =head1 MOOSE INTEROPERABILITY
 
 Moose and C<MooseX::Extended> should be 100% interoperable. L<Let us know if
-it's not|https://github.com/Ovid/moosex-extreme/issues>.
+it's not|https://github.com/Ovid/moosex-extended/issues>.
 
 =head1 VERSION COMPATIBILITY
 

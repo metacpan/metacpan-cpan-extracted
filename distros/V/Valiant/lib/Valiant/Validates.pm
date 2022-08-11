@@ -66,8 +66,6 @@ sub no_errors {
   return !shift->has_errors;
 }
 
-has 'validated' => (is=>'rw', required=>1, init_args=>undef, default=>0);
-has 'skip_validation' =>  (is=>'rw', required=>1, init_args=>undef, default=>0);
 has '_context' => (is=>'rw', required=>0, predicate=>'has_context');
 
 sub get_context { shift->_context }
@@ -78,6 +76,17 @@ sub context {
   $self->_context($args);
   return $self;
 }
+
+has '_csrf_token' => (is=>'rw', required=>0, init_arg=>'csrf_token', predicate=>'has_csrf_token');
+
+sub csrf_token {
+  my ($self, $arg) = @_;
+  $self->_csrf_token($arg) if $arg;
+  return $arg ? $self : $self->_csrf_token;
+}
+
+has 'validated' => (is=>'rw', required=>1, init_args=>undef, default=>0);
+has 'skip_validation' =>  (is=>'rw', required=>1, init_args=>undef, default=>0);
 
 sub skip_validate {
   my ($self) = @_;

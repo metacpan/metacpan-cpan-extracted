@@ -1,0 +1,146 @@
+#!/usr/bin/perl
+
+# Created on: 2014-03-19 17:18:17
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use App::Git::Workflow::Command::Pom;
+
+# set default package file
+$App::Git::Workflow::Command::Pom::option{pom}
+    = $App::Git::Workflow::Command::Pom::workflow->config( 'workflow.package',
+    'package.json' );
+
+App::Git::Workflow::Command::Pom->run();
+
+__DATA__
+
+=head1 NAME
+
+git-package - Manage package.json file versions
+
+=head1 VERSION
+
+This documentation refers to git-package version 1.1.20
+
+=head1 SYNOPSIS
+
+   git-package [uniq] [option]
+   git-package next [--update|-u]
+   git-package whos version [option]
+
+ SUB-COMMAND:
+  uniq          Confirm that the current branch is the only branch using its version
+  next          Calculates the next available version number
+  whos          Which branch uses the package version "version"
+
+ OPTIONS:
+  -P --package[=]file
+                Specify the package file location (Default ./package.json)
+  -u --update   Update to next version (used with next)
+  -t --tag[=]str
+                Specify a tag that any branch with newer commits must contain
+  -b --branch[=]str
+                Similarly a branch that other branches with newer commits must
+                contain (Default origin/master)
+  -l --local    Shorthand for --branch '^master$'
+
+  -v --verbose  Show more detailed option
+     --version  Prints the version information
+     --help     Prints this help information
+     --man      Prints the full documentation for git-package
+
+=head1 DESCRIPTION
+
+The C<git-package> tool helps working with NPM package.json files by looking at all branches to see
+what versions are set. The sub commands allow different kinds of checking to be done.
+
+=over 4
+
+=item uniq
+
+Check that the current branch's package.json version is unique across all branches.
+
+=item next
+
+Finds the next available package.json version number buy finding the current nighest
+package.json version and incrementing the second number. If C<--update> is used then
+the package.json version is updated to that number.
+
+=item whos
+
+Find which branch or branches use a package.json version number.
+
+=back
+
+=head1 SUBROUTINES/METHODS
+
+=head2 C<run ()>
+
+Executes the git workflow command
+
+=head2 C<do_whos ()>
+
+=head2 C<do_next ()>
+
+=head2 C<do_uniq ()>
+
+=head2 C<do_bad_branches ($pom)>
+
+Show branches with package.json files that don't pass
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+Defaults for this script can be set through C<git config>
+
+ workflow.prod     Sets how a prod release is determined
+                   eg the default equivalent is branch=^origin/master$
+ workflow.package  The default location for the package.json file (used by C<--new-pom>
+                   when updating package.json for the new branch)
+
+You can set these values either by editing the repository local C<.git/config>
+file or C<~/.gitconfig> or use the C<git config> command
+
+ # eg Setting the global value
+    git config --global workflow.prod 'branch=^origin/master$'
+
+ # or set a repository's local value
+    git config workflow.prod 'tag=^release_\d{4}_\d{2}\d{2}$'
+
+ # or set package.json location to a sub directory
+    git config workflow.package 'somedir/package.json'
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2014 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

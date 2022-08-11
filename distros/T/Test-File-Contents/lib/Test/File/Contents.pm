@@ -12,15 +12,15 @@ Test::File::Contents - Test routines for examining the contents of files
 
 =cut
 
-our $VERSION = '0.240';
+our $VERSION = '0.241';
 
 use Test::Builder;
 use Digest::MD5;
 use File::Spec;
 use Text::Diff;
 
-require Exporter;
-our @ISA = qw(Exporter);
+BEGIN { require Exporter; *import = \&Exporter::import }
+
 our @EXPORT = qw(
     file_contents_eq
     file_contents_eq_or_diff

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 #
-# Copyright (C) 2021 Joelle Maslak
+# Copyright (C) 2021-2022 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 package App::RouterColorizer;
-$App::RouterColorizer::VERSION = '1.212780';
+$App::RouterColorizer::VERSION = '1.222220';
 use Moose;
 
 use feature 'signatures';
@@ -51,7 +51,7 @@ our @BGCOLORS = (
 our $NUM      = qr/$RE{num}{real}/;
 our $INT      = qr/$RE{num}{int}{-sign => ''}/;
 our $POSINT   = qr/(?!0)$INT/;
-our $LOWLIGHT = qr/ (?: -30\. [0-9]{2} ) | (?: -2 [5-9] \. [0-9]{2} ) /xx;
+our $LOWLIGHT = qr/ (?: -[3-9][0-9]\. [0-9]{1,2} ) | (?: -2 [5-9] \. [0-9]{1,2} ) /xx;
 our $LIGHT    = qr/ (?: $NUM ) | (?: N\/A ) /xx;
 
 our $IPV4CIDR = qr/ $RE{net}{IPv4}
@@ -75,8 +75,8 @@ our $IPV6CIDR = qr/ $RE{net}{IPv6}
                     )?
                 /xx;
 
-our @INTERFACE_IGNORES = ( "bytes", "packets input", "packets output", );
-our @INTERFACE_INFOS   = ( "PAUSE input", "PAUSE output", );
+our @INTERFACE_IGNORES = ( "bytes", "packets input", "packets output", "multicast" );
+our @INTERFACE_INFOS   = ( "PAUSE input", "PAUSE output", "pause input" );
 
 our @bgcolors = (
     "\e[30m\e[47m",    # black on white
@@ -212,21 +212,21 @@ s/^ ( \Q  Configured maximum total number of routes is \E \d+ \Q, warning limit 
     }
 
     my $INTERFACE = qr/ [A-Z] \S+ /xx;
-    my $INTSHORT  = qr/ [A-Z][a-z][0-9] \N+ /xx;
+    my $INTSHORT  = qr/ [A-Z][a-z][0-9] \S* /xx;
 
     # "show int" up/down
     $line =~
-s/^ ( $INTERFACE \Q is up, line protocol is up\E \Q (connected)\E? ) $/$self->_colorize($1, $GREEN)/exx;
+s/^ ( $INTERFACE \Q is up, line protocol is up\E (:? \Q (connected)\E )? \s? ) $/$self->_colorize($1, $GREEN)/exx;
     $line =~
-s/^ ( $INTERFACE \Q is administratively down,\E \N+                ) $/$self->_colorize($1, $ORANGE)/exx;
+s/^ ( $INTERFACE \Q is administratively down,\E \N+                          ) $/$self->_colorize($1, $ORANGE)/exx;
     $line =~
-s/^ ( $INTERFACE \Q is \E \N+ \Q, line protocol is \E \N+          ) $/$self->_colorize($1, $RED)/exx;
+s/^ ( $INTERFACE \Q is \E \N+ \Q, line protocol is \E \N+                    ) $/$self->_colorize($1, $RED)/exx;
 
     $line =~ s/^ ( \Q  Up \E   \N+ ) $/$self->_colorize($1, $GREEN)/exx;
     $line =~ s/^ ( \Q  Down \E \N+ ) $/$self->_colorize($1, $RED)/exx;
 
     # "show int" description lines
-    $line =~ s/^ ( \Q \E? \Q Description: \E \N+ ) $/$self->_colorize($1, $INFO)/exx;
+    $line =~ s/^ ( (?: \Q \E|\Q   \E)? \Q Description: \E \N+ ) $/$self->_colorize($1, $INFO)/exx;
 
     # "show int" rates
     $line =~
@@ -246,13 +246,19 @@ s/^ ( $INTSHORT \s+ \Qadmin down\E \s+ \S+ (?: \s+ \N+)? ) $/$self->_colorize($1
     $line =~
       s/^ ( $INTSHORT \s+ down           \s+ \S+ (?: \s+ \N+)? ) $/$self->_colorize($1, $RED)/exx;
 
-    # "show int transceiver"
+    # "show int transceiver" (Arista)
     $line =~
 s/^ ( $INTSHORT (?: \s+ $LIGHT){4} \s+ $LOWLIGHT \s+ \S+ \s ago ) $/$self->_colorize($1, $RED)/exx;
     $line =~
 s/^ ( $INTSHORT (?: \s+ $LIGHT){5}               \s+ \S+ \s ago ) $/$self->_colorize($1, $INFO)/exx;
     $line =~
 s/^ ( $INTSHORT (?: \s+ N\/A  ){6} \s*                          ) $/$self->_colorize($1, $ORANGE)/exx;
+
+    # "show int transceiver" (Cisco)
+    $line =~
+      s/^ ( $INTSHORT (?: \s+ $LIGHT){3} \s+ $LOWLIGHT ) \s+ $/$self->_colorize($1, $RED)/exx;
+    $line =~
+      s/^ ( $INTSHORT (?: \s+ $LIGHT){4}               ) \s+ $/$self->_colorize($1, $INFO)/exx;
 
     #
     # LLDP Neighbors Detail
@@ -283,6 +289,10 @@ s/^ ( \QPhysical interface: \E \S+ \Q Enabled, Physical link is Up\E   ) $/$self
 s/^ ( \QPhysical interface: \E \S+ \Q Enabled, Physical link is Down\E ) $/$self->_colorize($1, $RED)/exx;
     $line =~
 s/^ ( \QPhysical interface: \E \S+ \s \S+ \Q Physical link is Down\E   ) $/$self->_colorize($1, $ORANGE)/exx;
+    $line =~
+s/^ ( \QPhysical interface: \E \S+                                     ) $/$self->_colorize($1, $INFO)/exx;
+
+    $line =~ s/^ ( \Q  Logical interface \E \N+ ) $/$self->_colorize($1, $INFO)/exx;
 
     $line =~ s/^ ( \Q  Input rate     : \E $NUM \N+ ) $/$self->_colorize($1, $INFO)/exx;
     $line =~ s/^ ( \Q  Output rate    : \E $NUM \N+ ) $/$self->_colorize($1, $INFO)/exx;
@@ -308,6 +318,27 @@ s/^ ( \QPhysical interface: \E \S+ \s \S+ \Q Physical link is Down\E   ) $/$self
     $line =~ s/^ (     $ETH     \s+ VCP             ) $/$self->_colorize($1, $GREEN)/exx;
     $line =~ s/^ ( (?: $IFACES) \s+ up \s+ down \N* ) $/$self->_colorize($1, $RED)/exx;
     $line =~ s/^ ( (?: $IFACES) \s+ down \s+ \N*    ) $/$self->_colorize($1, $ORANGE)/exx;
+
+    # Errors
+    $line =~ s/^ ( \Q    Bit errors \E \s+ 0           ) $/$self->_colorize($1, $GREEN)/exx;
+    $line =~ s/^ ( \Q    Bit errors \E \s+ 0           ) $/$self->_colorize($1, $GREEN)/exx;
+    $line =~ s/^ ( \Q    Errored blocks \E \s+ [1-9][0-9]+ ) $/$self->_colorize($1, $RED)/exx;
+    $line =~ s/^ ( \Q    Errored blocks \E \s+ 0           ) $/$self->_colorize($1, $GREEN)/exx;
+    $line =~
+      s/^ ( \Q    FEC \E \S+ \s Errors (?: \s Rate)? \s+ 0   ) $/$self->_colorize($1, $GREEN)/exx;
+    $line =~
+      s/^ ( \Q    FEC \E \S+ \s Errors (?: \s Rate)? \s+ \N+ ) $/$self->_colorize($1, $RED)/exx;
+
+    # show interfaces diagnostics optics
+    $line =~ s/^ ( \Q    Laser output power \E \s+ : \s $NUM \N+ ) $/$self->_colorize($1, $RED)/exx;
+    $line =~
+s/^ ( \Q    Laser output power \E \s+ : \s+ $NUM \Q mW \/ \E $LOWLIGHT \s dBm ) $/$self->_colorize($1, $RED)/exx;
+    $line =~
+s/^ ( \Q    Laser output power \E \s+ : \s+ $NUM \Q mW \/ \E $LIGHT    \s dBm ) $/$self->_colorize($1, $INFO)/exx;
+    $line =~
+s/^ ( \Q    Receiver signal average optical power \E \s+ : \s+ $NUM \Q mW \/ \E $LOWLIGHT \s dBm ) $/$self->_colorize($1, $RED)/exx;
+    $line =~
+s/^ ( \Q    Receiver signal average optical power \E \s+ : \s+ $NUM \Q mW \/ \E $LIGHT    \s dBm ) $/$self->_colorize($1, $INFO)/exx;
 
     return $line;
 }
@@ -423,7 +454,7 @@ App::RouterColorizer - Colorize router CLI output
 
 =head1 VERSION
 
-version 1.212780
+version 1.222220
 
 =head1 DESCRIPTION
 
@@ -519,7 +550,7 @@ Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Joelle Maslak.
+This software is copyright (c) 2021-2022 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

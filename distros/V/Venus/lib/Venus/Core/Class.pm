@@ -10,12 +10,28 @@ use base 'Venus::Core';
 # METHODS
 
 sub BUILD {
-  my ($self, $data) = @_;
+  my ($self, @data) = @_;
 
   no strict 'refs';
 
-  for my $build (grep defined, map *{"${_}::BUILD"}{"CODE"}, @{$self->META->roles}) {
-    $self->$build($data);
+  my @roles = @{$self->META->roles};
+
+  for my $action (grep defined, map *{"${_}::BUILD"}{"CODE"}, @roles) {
+    $self->$action(@data);
+  }
+
+  return $self;
+}
+
+sub DESTROY {
+  my ($self, @data) = @_;
+
+  no strict 'refs';
+
+  my @roles = @{$self->META->roles};
+
+  for my $action (grep defined, map *{"${_}::DESTROY"}{"CODE"}, @roles) {
+    $self->$action(@data);
   }
 
   return $self;

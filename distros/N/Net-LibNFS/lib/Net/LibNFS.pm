@@ -3,7 +3,7 @@ package Net::LibNFS;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 =encoding utf-8
 
@@ -67,8 +67,17 @@ can’t (or just would rather not) L<mount(8)> them locally.
 =head1 LINKING
 
 If a shared libnfs is available and is version 5.0.0 or later we’ll
-compile against that.
-Otherwise we try to compile our own libnfs and link to it statically.
+link (dynamically) against that.
+Otherwise we try to compile our own libnfs and bundle it (statically).
+
+A shared libnfs is preferable because it can receive updates on its
+own; a static libnfs locks you into that version of the library until you
+rebuild Net::LibNFS.
+
+If, though, you have a usable shared libnfs but for some reason still want
+to bundle a custom-built static one, set C<NET_LIBNFS_LINK_STATIC> to a
+truthy value in the environment as you run this distribution’s
+F<Makefile.PL>.
 
 =head1 CHARACTER ENCODING
 
@@ -136,6 +145,9 @@ Recognized options are:
 
 =item * C<tcp_syncnt>, C<uid>, C<gid>, C<debug>, C<dircache>,
 C<autoreconnect>, C<timeout>
+
+=item * C<unix_authn> (arrayref) - Sets UID, GID, and auxiliary GIDs
+at once. Clobbers (and is clobbered by) C<uid> and C<gid>.
 
 =item * C<pagecache>, C<pagecache_ttl>, C<readahead>
 

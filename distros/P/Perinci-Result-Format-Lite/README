@@ -2,9 +2,9 @@ NAME
     Perinci::Result::Format::Lite - Format enveloped result
 
 VERSION
-    This document describes version 0.286 of Perinci::Result::Format::Lite
+    This document describes version 0.287 of Perinci::Result::Format::Lite
     (from Perl distribution Perinci-Result-Format-Lite), released on
-    2022-02-18.
+    2022-05-16.
 
 SYNOPSIS
 DESCRIPTION
@@ -69,10 +69,10 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2022, 2021, 2020, 2018, 2017, 2016, 2015

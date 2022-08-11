@@ -34,9 +34,16 @@ ok near(abs($del35), $del35del), "tai35 is $tai35 = system clock - $del35";
 ok near(abs($del10), $del10del), "tai10 is $tai10 = system clock - $del10";
 ok near(abs($del00), $del00del), "tai   is $tai00 = system clock - $del00";
 
-printf("tai35 error is %0.010f seconds\n", abs(abs($del35) - $del35del));
-printf("tai10 error is %0.010f seconds\n", abs(abs($del10) - $del10del));
-printf("tai   error is %0.010f seconds\n", abs(abs($del00) - $del00del));
+printf("## tai35 error is %0.010f seconds\n", abs(abs($del35) - $del35del));
+printf("## tai10 error is %0.010f seconds\n", abs(abs($del10) - $del10del));
+printf("## tai   error is %0.010f seconds\n", abs(abs($del00) - $del00del));
+
+my $ua_pick = $tai_or->{ua_str};
+my $ua_rand = $tai_or->_pick_user_agent();
+my $ua_edge = $tai_or->{ua_ar}->[0];
+print "## picked user agent [$ua_pick]\n";
+print "## random user agent [$ua_rand]\n";
+print "## MSEdge user agent [$ua_edge]\n";
 
 done_testing();
 exit(0);

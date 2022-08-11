@@ -1,3 +1,8 @@
+0.41 2022-08-09
+    * Add support for --url
+    * Actually respect if the HTTP method is specified via the --request
+      parameter
+
 0.40 2022-08-01
     * Fix test suite by skipping a test on curl versions before 7.60
       For some reason Curl sends an Expect: 100-continue header on these

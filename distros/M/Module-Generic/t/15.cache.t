@@ -70,6 +70,7 @@ SKIP:
     ok( overload::StrVal( $s ) eq overload::StrVal( $cache_object ), 'write return value' );
     my $buffer = $s->read;
     ok( defined( $buffer ), 'read no argument' );
+    diag( "Error with read: ", $s->error ) if( !defined( $buffer ) );
     ok( ref( $buffer ) eq 'HASH', 'read buffer data integrity' );
     if( ref( $buffer ) eq 'HASH' && $buffer->{name} eq 'John Doe' && $buffer->{location} eq 'Tokyo' )
     {

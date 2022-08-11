@@ -165,11 +165,21 @@ This object has two methods: C<start> and C<end> each capable of setting or retu
 
 =head2 ranges
 
-Sets or gets the L<array object|Module::Generic::Array> that contains all the C<HTTP::Promise::Headers::Range::StartEnd> objects. Thus you can use all the methods from L<Module::Generic::Array> to manipulate the range objects.
+Sets or gets the L<array object|Module::Generic::Array> that contains all the C<HTTP::Promise::Headers::Range::StartEnd> objects (see below for a descriptions). Thus you can use all the methods from L<Module::Generic::Array> to manipulate the range objects.
 
 =head2 unit
 
 The unit in which ranges are specified. This is usually C<bytes>.
+
+=head1 HTTP::Promise::Headers::Range::StartEnd
+
+=head2 end
+
+Sets or gets the end of the range as a L<number object|Module::Generic::Number>
+
+=head2 start
+
+Sets or gets the start of the range as a L<number object|Module::Generic::Number>
 
 =head1 AUTHOR
 

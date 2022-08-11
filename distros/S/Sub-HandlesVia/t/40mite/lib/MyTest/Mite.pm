@@ -36,9 +36,9 @@ sub croak   { unshift @_, 'croak'  ; goto \&_error_handler }
 sub confess { unshift @_, 'confess'; goto \&_error_handler }
 
 BEGIN {
-    *_HAS_AUTOCLEAN = eval { require namespace::autoclean }
-        ? \&true
-        : \&false
+    my @bool = ( \&false, \&true );
+    *_HAS_AUTOCLEAN = $bool[ 0+!! eval { require namespace::autoclean } ];
+    *STRICT         = $bool[ 0+!! ( $ENV{PERL_STRICT} || $ENV{EXTENDED_TESTING} || $ENV{AUTHOR_TESTING} || $ENV{RELEASE_TESTING} ) ];
 };
 
 if ( $] < 5.009005 ) {
@@ -58,9 +58,9 @@ or do {
 {
     no strict 'refs';
     my $GUARD_PACKAGE = __PACKAGE__ . '::Guard';
-    *{"$GUARD_PACKAGE\::DESTROY"} = sub { $_[0][1]->() unless $_[0][0] };
-    *{"$GUARD_PACKAGE\::restore"} = sub { $_[0]->DESTROY; $_[0][0] = 1 };
-    *{"$GUARD_PACKAGE\::dismiss"} = sub {                 $_[0][0] = 1 };
+    *{"$GUARD_PACKAGE\::DESTROY"} = sub { $_[0][0] or $_[0][1]->() };
+    *{"$GUARD_PACKAGE\::restore"} = sub { $_[0]->DESTROY; $_[0][0] = true };
+    *{"$GUARD_PACKAGE\::dismiss"} = sub {                 $_[0][0] = true };
     *{"$GUARD_PACKAGE\::peek"}    = sub { $_[0][2] };
     *guard = sub (&) { bless [ 0, @_ ] => $GUARD_PACKAGE };
 }
@@ -129,6 +129,12 @@ sub _inject_mite_functions {
     *{"$caller\::with"} = $class->_make_with( $caller, $file, $kind )
         if $requested->( with => true );
 
+    *{"$caller\::signature_for"} = sub {
+        my ( $name ) = @_;
+        $name =~ s/^\+//;
+        $class->around( $caller, $name, ${"$caller\::SIGNATURE_FOR"}{$name} );
+    } if $requested->( signature_for => false );
+
     *{"$caller\::extends"} = sub {}
         if $kind eq 'class' && $requested->( extends => true );
     *{"$caller\::requires"} = sub {}
@@ -160,18 +166,30 @@ sub _make_has {
 
     no strict 'refs';
     return sub {
-        my ( $names, %args, $code ) = @_;
+        my $names = shift;
+        if ( @_ % 2 ) {
+            my $default = shift;
+            unshift @_, ( 'CODE' eq ref( $default ) )
+                ? ( is => lazy, builder => $default )
+                : ( is => ro, default => $default );
+        }
+        my %spec = @_;
+        my $code;
+
         for my $name ( ref($names) ? @$names : $names ) {
            $name =~ s/^\+//;
 
-           'CODE' eq ref( $code = $args{default} )
+           'CODE' eq ref( $code = $spec{default} )
                and ${"$caller\::__$name\_DEFAULT__"} = $code;
 
-           'CODE' eq ref( $code = $args{builder} )
+           'CODE' eq ref( $code = $spec{builder} )
                and *{"$caller\::_build_$name"} = $code;
 
-           'CODE' eq ref( $code = $args{trigger} )
+           'CODE' eq ref( $code = $spec{trigger} )
                and *{"$caller\::_trigger_$name"} = $code;
+
+           'CODE' eq ref( $code = $spec{clone} )
+               and *{"$caller\::_clone_$name"} = $code;
         }
 
         return;

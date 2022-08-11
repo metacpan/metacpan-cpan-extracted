@@ -1,3 +1,12 @@
+0.002   2022-07-09  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        - [incompatible change] Rename function str_to_re to
+          str_maybe_to_re.
+
+        - The new version of str_to_re() now invariably converts argument to
+          Regexp object.
+
+
 0.001   2022-07-05  Released-By: PERLANCAR
 
         - First release.

@@ -4,7 +4,7 @@ Attean - A Semantic Web Framework
 
 =head1 VERSION
 
-This document describes Attean version 0.030	
+This document describes Attean version 0.031	
 
 =head1 SYNOPSIS
 
@@ -51,7 +51,7 @@ Semantic Web (RDF and SPARQL) data.
 package Attean {
 	use v5.14;
 	use warnings;
-	our $VERSION	= '0.030';
+	our $VERSION	= '0.031';
 	use Attean::API;
 	
 	use Attean::Blank;
@@ -215,23 +215,24 @@ returns undef.
 			return;
 		}
 		
-		my $type	= shift;
-		my %method	= (filename => 'file_extensions', media_type => 'media_types');
-		if (my $method = $method{ $type }) {
-			my $value	= shift;
-			$value	=~ s/^.*[.]// if ($type eq 'filename');
-			$value	=~ s/;.*$// if ($type eq 'media_type');
-			foreach my $p ($self->parsers()) {
-				if (can_load( modules => { $p => 0 })) {
-					next unless ($p->can('does') and $p->does($role));
-					my @exts	= @{ $p->$method() };
-					return $p if (any { $value eq $_ } @exts);
+		while (my $type = shift) {
+			my %method	= (filename => 'file_extensions', media_type => 'media_types');
+			if (my $method = $method{ $type }) {
+				my $value	= shift;
+				$value	=~ s/^.*[.]// if ($type eq 'filename');
+				$value	=~ s/;.*$// if ($type eq 'media_type');
+				foreach my $p ($self->parsers()) {
+					if (can_load( modules => { $p => 0 })) {
+						next unless ($p->can('does') and $p->does($role));
+						my @exts	= @{ $p->$method() };
+						return $p if (any { $value eq $_ } @exts);
+					}
 				}
+			} else {
+				die "Not a valid constraint in get_parser call: $type";
 			}
-			return;
-		} else {
-			die "Not a valid constraint in get_parser call: $type";
 		}
+		return;
 	}
 	
 	{
@@ -451,7 +452,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2020 Gregory Todd Williams.
+Copyright (c) 2014--2022 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

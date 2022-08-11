@@ -118,16 +118,19 @@ close($fh) || warn "Cannot close $export_h, $!";
 
 my @additional_includes = ();
 my @additional_srcdir = ();
-# -----------------------------------------------------
-# We depend on marpa third party that we manage ourself
-# -----------------------------------------------------
-print "... Copying Marpa--R2\n";
-if (! dircopy(File::Spec->catdir('3rdparty', 'github', 'Marpa--R2'),
-              File::Spec->catdir('3rdparty', 'output', 'Marpa--R2'))) {
-  die 'Failed to copy Marpa--R2';
-}
-push(@additional_includes, File::Spec->catdir('3rdparty', 'output', 'Marpa--R2', 'cpan', 'engine', 'read_only'));
-push(@additional_srcdir, File::Spec->catdir('3rdparty', 'output', 'Marpa--R2', 'cpan', 'engine', 'read_only'));
+# --------------------------------------------------------
+# We depend on libmarpa third party that we manage ourself
+# --------------------------------------------------------
+#
+# libmarpa sources are generated using these commands on the 'tested' branch:
+#
+# make clean
+# make dist
+#
+# This is a creating a work/stage directory that we copy back in our libmarpa/work/stage directory
+#
+push(@additional_includes, File::Spec->catdir('libmarpa', 'work', 'stage'));
+push(@additional_srcdir, File::Spec->catdir('libmarpa', 'work', 'stage'));
 
 # -----------------------------------------------------------------------
 # We depend on these generic* stuff that can manage themselvs, eventually
@@ -160,21 +163,23 @@ foreach (qw/genericLogger genericStack genericHash genericSparseArray/) {
     push(@additional_includes, $inc) if (-d $inc);
 }
 
-# ----------------
-# Get source files
-# ----------------
-my @sources;
-find(
-    {
-	no_chdir => 1,
-	wanted => sub {
-	    my $file = File::Spec->canonpath($_);
-	    if (-f $file && ($file =~ /\.c$/ || $file =~ /\.cpp$/)) {
-		push(@sources, $file)
-	    }
-	},
-    },
-    'src', @additional_srcdir);
+# ----------------------------------------------
+# Get source files: we use the amalgamation file
+# ----------------------------------------------
+my @sources = File::Spec->catfile('amalgamation', 'marpaWrapper.c');
+if (0) {
+    find(
+        {
+            no_chdir => 1,
+            wanted => sub {
+                my $file = File::Spec->canonpath($_);
+                if (-f $file && ($file =~ /\.c$/ || $file =~ /\.cpp$/)) {
+                    push(@sources, $file)
+                }
+            },
+        },
+        'src', @additional_srcdir);
+}
 
 # ----------------------------------------------------------------------------------------
 # Generate objects

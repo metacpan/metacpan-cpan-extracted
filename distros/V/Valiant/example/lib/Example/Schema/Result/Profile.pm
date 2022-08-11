@@ -15,6 +15,8 @@ __PACKAGE__->add_columns(
   zip => { data_type => 'varchar', is_nullable => 0, size => 5 },
   birthday => { data_type => 'date', is_nullable => 1, datetime_undef_if_invalid => 1 },
   phone_number => { data_type => 'varchar', is_nullable => 1, size => 32 },
+  registered => { data_type => 'boolean', is_nullable => 0 },
+  status => { data_type => 'enum', is_nullable => 0 }
 );
 
 __PACKAGE__->set_primary_key("id");
@@ -44,5 +46,9 @@ __PACKAGE__->validates(birthday => (
     }
   )
 );
+
+sub status_options($self) {
+  return qw( pending active inactive );
+}
 
 1;

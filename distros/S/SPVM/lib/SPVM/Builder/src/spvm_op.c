@@ -36,7 +36,7 @@
 #include "spvm_allow.h"
 #include "spvm_interface.h"
 #include "spvm_constant_string.h"
-
+#include "spvm_dumper.h"
 
 
 
@@ -97,167 +97,167 @@
 const char* const* SPVM_OP_C_ID_NAMES(void) {
 
   static const char* const id_names[] = {
-    "IF",
-    "UNLESS",
-    "ELSIF",
-    "ELSE",
-    "FOR",
-    "WHILE",
-    "NULL",
-    "LIST",
-    "PUSHMARK",
-    "GRAMMAR",
-    "NAME",
-    "CLASS",
-    "MY",
-    "FIELD",
-    "METHOD",
-    "ENUM",
-    "DESCRIPTOR",
-    "ENUMERATION_VALUE",
-    "BLOCK",
-    "ENUM_BLOCK",
-    "CLASS_BLOCK",
-    "TYPE",
-    "CONSTANT",
-    "INC",
-    "DEC",
-    "PRE_INC",
-    "POST_INC",
-    "PRE_DEC",
-    "POST_DEC",
-    "MINUS",
-    "PLUS",
-    "ADD",
-    "SUBTRACT",
-    "MULTIPLY",
-    "DIVIDE",
-    "BIT_AND",
-    "BIT_OR",
-    "BIT_XOR",
-    "BIT_NOT",
-    "REMAINDER",
-    "LEFT_SHIFT",
-    "RIGHT_ARITHMETIC_SHIFT",
-    "RIGHT_LOGICAL_SHIFT",
-    "LOGICAL_AND",
-    "LOGICAL_OR",
-    "LOGICAL_NOT",
-    "ARRAY_ACCESS",
-    "ASSIGN",
-    "CALL_METHOD",
-    "FIELD_ACCESS",
-    "USE",
-    "RETURN",
-    "LAST",
-    "NEXT",
-    "LOOP",
-    "VAR",
-    "CONVERT",
-    "UNDEF",
-    "ARRAY_LENGTH",
-    "CONDITION",
-    "CONDITION_NOT",
-    "DIE",
-    "SWITCH",
-    "CASE",
-    "DEFAULT",
-    "SWITCH_CONDITION",
-    "VOID",
-    "EVAL",
-    "BLOCK_END",
-    "EXCEPTION_VAR",
-    "NEW",
-    "STAB",
-    "BYTE",
-    "SHORT",
-    "INT",
-    "LONG",
-    "FLOAT",
-    "DOUBLE",
-    "STRING",
-    "OBJECT",
-    "WEAKEN",
-    "WEAKEN_FIELD",
-    "UNWEAKEN",
-    "UNWEAKEN_FIELD",
-    "ISWEAK",
-    "ISWEAK_FIELD",
-    "SPECIAL_ASSIGN",
-    "CONCAT",
-    "SET",
-    "GET",
-    "CLASS_VAR",
-    "CLASS_VAR_ACCESS",
-    "ARRAY_INIT",
-    "BOOL",
-    "LOOP_INCREMENT",
-    "SELF",
-    "CHECK_CONVERT",
-    "NUMERIC_EQ",
-    "NUMERIC_NE",
-    "NUMERIC_LT",
-    "NUMERIC_LE",
-    "NUMERIC_GT",
-    "NUMERIC_GE",
-    "NUMERIC_CMP",
-    "STRING_EQ",
-    "STRING_NE",
-    "STRING_GT",
-    "STRING_GE",
-    "STRING_LT",
-    "STRING_LE",
-    "STRING_CMP",
-    "ISA",
-    "SEQUENCE",
-    "PRECOMPILE",
-    "SCALAR",
-    "ARRAY_FIELD_ACCESS",
-    "REF",
-    "DEREF",
-    "DOT3",
-    "STRING_LENGTH",
-    "RW",
-    "RO",
-    "WO",
-    "INIT",
-    "REQUIRE",
-    "IF_REQUIRE",
-    "CURRENT_CLASS_NAME",
-    "FREE_TMP",
-    "REFCNT",
-    "ALLOW",
-    "BREAK",
-    "WARN",
-    "PRINT",
-    "REFOP",
-    "DUMP",
-    "TRUE",
-    "FALSE",
-    "CURRENT_CLASS",
-    "AS",
-    "MUTABLE",
-    "END_OF_FILE",
-    "DIVIDE_UNSIGNED_INT",
-    "DIVIDE_UNSIGNED_LONG",
-    "REMAINDER_UNSIGNED_INT",
-    "REMAINDER_UNSIGNED_LONG",
-    "NEW_STRING_LEN",
-    "IS_READ_ONLY",
-    "MAKE_READ_ONLY",
-    "COPY",
-    "INTERFACE",
-    "HAS_IMPL",
-    "ELEMENT",
-    "OARRAY",
-    "ALIAS",
-    "OF",
-    "REQUIRED",
-    "CLASS_ID",
-    "ERROR_CODE",
-    "SET_ERROR_CODE",
-    "ERROR",
-    "EXTENDS",
+    "if",
+    "unless",
+    "elsif",
+    "else",
+    "for",
+    "while",
+    "null",
+    "list",
+    "pushmark",
+    "grammar",
+    "name",
+    "class",
+    "my",
+    "field",
+    "method",
+    "enum",
+    "descriptor",
+    "enumeration_value",
+    "block",
+    "enum_block",
+    "class_block",
+    "type",
+    "constant",
+    "inc",
+    "dec",
+    "pre_inc",
+    "post_inc",
+    "pre_dec",
+    "post_dec",
+    "minus",
+    "plus",
+    "add",
+    "subtract",
+    "multiply",
+    "divide",
+    "bit_and",
+    "bit_or",
+    "bit_xor",
+    "bit_not",
+    "remainder",
+    "left_shift",
+    "right_arithmetic_shift",
+    "right_logical_shift",
+    "logical_and",
+    "logical_or",
+    "logical_not",
+    "array_access",
+    "assign",
+    "call_method",
+    "field_access",
+    "use",
+    "return",
+    "last",
+    "next",
+    "loop",
+    "var",
+    "convert",
+    "undef",
+    "array_length",
+    "condition",
+    "condition_not",
+    "die",
+    "switch",
+    "case",
+    "default",
+    "switch_condition",
+    "void",
+    "eval",
+    "block_end",
+    "exception_var",
+    "new",
+    "stab",
+    "byte",
+    "short",
+    "int",
+    "long",
+    "float",
+    "double",
+    "string",
+    "object",
+    "weaken",
+    "weaken_field",
+    "unweaken",
+    "unweaken_field",
+    "isweak",
+    "isweak_field",
+    "special_assign",
+    "concat",
+    "set",
+    "get",
+    "class_var",
+    "class_var_access",
+    "array_init",
+    "bool",
+    "loop_increment",
+    "self",
+    "check_convert",
+    "numeric_eq",
+    "numeric_ne",
+    "numeric_lt",
+    "numeric_le",
+    "numeric_gt",
+    "numeric_ge",
+    "numeric_cmp",
+    "string_eq",
+    "string_ne",
+    "string_gt",
+    "string_ge",
+    "string_lt",
+    "string_le",
+    "string_cmp",
+    "isa",
+    "sequence",
+    "precompile",
+    "scalar",
+    "array_field_access",
+    "reference",
+    "deref",
+    "dot3",
+    "string_length",
+    "rw",
+    "ro",
+    "wo",
+    "init",
+    "require",
+    "if_require",
+    "current_class_name",
+    "free_tmp",
+    "refcnt",
+    "allow",
+    "break",
+    "warn",
+    "print",
+    "refop",
+    "dump",
+    "true",
+    "false",
+    "current_class",
+    "as",
+    "mutable",
+    "end_of_file",
+    "divide_unsigned_int",
+    "divide_unsigned_long",
+    "remainder_unsigned_int",
+    "remainder_unsigned_long",
+    "new_string_len",
+    "is_read_only",
+    "make_read_only",
+    "copy",
+    "interface",
+    "has_impl",
+    "element",
+    "oarray",
+    "alias",
+    "of",
+    "required",
+    "class_id",
+    "error_code",
+    "set_error_code",
+    "error",
+    "extends",
   };
   
   return id_names;
@@ -1076,6 +1076,7 @@ SPVM_OP* SPVM_OP_build_condition(SPVM_COMPILER* compiler, SPVM_OP* op_operand_co
   SPVM_OP* op_condition = SPVM_OP_new_op(compiler, id, op_operand_condition->file, op_operand_condition->line);
   
   if (SPVM_OP_is_rel_op(compiler, op_operand_condition)) {
+    assert(op_operand_condition->moresib == 0);
     SPVM_OP_insert_child(compiler, op_condition, op_condition->last, op_operand_condition);
   }
   else {
@@ -1129,6 +1130,110 @@ SPVM_OP* SPVM_OP_build_for_statement(SPVM_COMPILER* compiler, SPVM_OP* op_for, S
   return op_loop;
 }
 
+SPVM_OP* SPVM_OP_build_foreach_statement(SPVM_COMPILER* compiler, SPVM_OP* op_for, SPVM_OP* op_var_element, SPVM_OP* op_array, SPVM_OP* op_block_statements) {
+
+  /*
+    {
+      my $.i = 0;
+      my $.array = $array;
+      my $.array_length = @$.array;
+      while ($.i < $.array_length) {
+        my $element = $.array->[$.i];
+        
+        # ...
+        
+        $.i++;
+      }
+    }
+  */
+
+  SPVM_OP* op_var_init_name = SPVM_OP_new_op_name(compiler, "$.i", op_for->file, op_for->line);
+  SPVM_OP* op_var_init_orig = SPVM_OP_new_op_var(compiler, op_var_init_name);
+  SPVM_OP* op_var_array_name = SPVM_OP_new_op_name(compiler, "$.array", op_for->file, op_for->line);
+  SPVM_OP* op_var_array_orig = SPVM_OP_new_op_var(compiler, op_var_array_name);
+  SPVM_OP* op_var_array_length_name = SPVM_OP_new_op_name(compiler, "$.array_length", op_for->file, op_for->line);
+  SPVM_OP* op_var_array_length_orig = SPVM_OP_new_op_var(compiler, op_var_array_length_name);
+  
+  // my $.i
+  SPVM_OP* op_var_init_for_decl = SPVM_OP_new_op_var_clone(compiler, op_var_init_orig, op_var_init_orig->file, op_var_init_orig->line);
+  SPVM_OP* op_var_decl_init = SPVM_OP_new_op_var_decl(compiler, op_for->file, op_for->line);
+  SPVM_OP_build_var_decl(compiler, op_var_decl_init, op_var_init_for_decl, NULL, NULL);
+
+  // 0
+  SPVM_OP* op_constant_zero = SPVM_OP_new_op_constant_int(compiler, 0, op_for->file, op_for->line);
+  
+  // my $.i = 0
+  SPVM_OP* op_assign_init = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_for->file, op_for->line);
+  SPVM_OP_build_assign(compiler, op_assign_init, op_var_init_for_decl, op_constant_zero);
+  
+  // my $.array
+  SPVM_OP* op_var_array_for_assign = SPVM_OP_new_op_var_clone(compiler, op_var_array_orig, op_var_array_orig->file, op_var_array_orig->line);
+  SPVM_OP* op_var_decl_array = SPVM_OP_new_op_var_decl(compiler, op_for->file, op_for->line);
+  SPVM_OP_build_var_decl(compiler, op_var_decl_array, op_var_array_for_assign, NULL, NULL);
+  
+  // my $.array = $array
+  SPVM_OP* op_assign_array = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_for->file, op_for->line);
+  SPVM_OP_build_assign(compiler, op_assign_array,  op_var_array_for_assign, op_array);
+
+  // @$.array
+  SPVM_OP* op_var_array_for_length = SPVM_OP_new_op_var_clone(compiler, op_var_array_orig, op_var_array_orig->file, op_var_array_orig->line);
+  SPVM_OP* op_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_LENGTH, compiler->cur_file, compiler->cur_line);
+  SPVM_OP_build_array_length(compiler, op_array_length, op_var_array_for_length);
+
+  // my $.array_length
+  SPVM_OP* op_var_array_length_for_assign = SPVM_OP_new_op_var_clone(compiler, op_var_array_length_orig, op_var_array_length_orig->file, op_var_array_length_orig->line);
+  SPVM_OP* op_var_decl_array_length = SPVM_OP_new_op_var_decl(compiler, op_for->file, op_for->line);
+  SPVM_OP_build_var_decl(compiler, op_var_decl_array_length, op_var_array_length_for_assign, NULL, NULL);
+  
+  // my $.array_length = @$.array
+  SPVM_OP* op_assign_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_for->file, op_for->line);
+  SPVM_OP_build_assign(compiler, op_assign_array_length, op_var_array_length_for_assign, op_array_length);
+
+  // $.i < $array_length
+  SPVM_OP* op_var_init_for_condition = SPVM_OP_new_op_var_clone(compiler, op_var_init_orig, op_var_array_orig->file, op_var_array_orig->line);
+  SPVM_OP* op_var_array_length_for_condition = SPVM_OP_new_op_var_clone(compiler, op_var_array_length_orig, op_var_array_orig->file, op_var_array_orig->line);
+  SPVM_OP* op_numlt = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NUMERIC_LT, op_for->file, op_for->line);
+  SPVM_OP* op_numlt_comparison = SPVM_OP_build_comparison_op(compiler, op_numlt, op_var_init_for_condition, op_var_array_length_for_condition);
+
+  // $.array->[$.i]
+  SPVM_OP* op_var_init_for_array_access = SPVM_OP_new_op_var_clone(compiler, op_var_init_orig, op_var_init_orig->file, op_var_init_orig->line);
+  SPVM_OP* op_var_array_for_array_access = SPVM_OP_new_op_var_clone(compiler, op_var_array_orig, op_var_array_orig->file, op_var_array_orig->line);
+  SPVM_OP* op_array_access = SPVM_OP_build_array_access(compiler, op_var_array_for_array_access, op_var_init_for_array_access);
+  
+  // my $element = $.array->[$.i]
+  SPVM_OP* op_assign_element = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_for->file, op_for->line);
+  SPVM_OP_build_assign(compiler, op_assign_element, op_var_element, op_array_access);
+
+  // $.i
+  SPVM_OP* op_var_init_for_increament = SPVM_OP_new_op_var_clone(compiler, op_var_init_orig, op_var_init_orig->file, op_var_init_orig->line);
+  
+  // ++$.i;
+  SPVM_OP* op_inc_increament = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PRE_INC, op_for->file, op_for->line);
+  SPVM_OP_build_inc(compiler, op_inc_increament, op_var_init_for_increament);
+
+  SPVM_OP* op_statements = op_block_statements->first;
+  if (!op_statements) {
+    op_statements = SPVM_OP_new_op_list(compiler, op_for->file, op_for->line);
+    SPVM_OP_insert_child(compiler, op_block_statements, op_block_statements->first, op_statements);
+  }
+  SPVM_OP_insert_child(compiler, op_statements, op_statements->first, op_assign_element);
+  SPVM_OP_insert_child(compiler, op_statements, op_statements->last, op_inc_increament);
+  
+  SPVM_OP* op_while = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_WHILE, op_for->file, op_for->line);
+  SPVM_OP* op_loop = SPVM_OP_build_while_statement(compiler, op_while, op_numlt_comparison, op_block_statements);
+  
+  SPVM_OP* op_block_new = SPVM_OP_new_op_block(compiler, op_for->file, op_for->line);
+  SPVM_OP* op_statements_new = SPVM_OP_new_op_list(compiler, op_for->file, op_for->line);
+  SPVM_OP_insert_child(compiler, op_block_new, op_block_new->last, op_statements_new);
+  
+  SPVM_OP_insert_child(compiler, op_statements_new, op_statements_new->last, op_assign_init);
+  SPVM_OP_insert_child(compiler, op_statements_new, op_statements_new->last, op_assign_array);
+  SPVM_OP_insert_child(compiler, op_statements_new, op_statements_new->last, op_assign_array_length);
+  SPVM_OP_insert_child(compiler, op_statements_new, op_statements_new->last, op_loop);
+
+  return op_block_new;
+}
+
 SPVM_OP* SPVM_OP_build_while_statement(SPVM_COMPILER* compiler, SPVM_OP* op_while, SPVM_OP* op_operand_condition, SPVM_OP* op_block_statements) {
   
   // Loop
@@ -1138,6 +1243,7 @@ SPVM_OP* SPVM_OP_build_while_statement(SPVM_COMPILER* compiler, SPVM_OP* op_whil
   SPVM_OP* op_operand_init = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NULL, op_while->file, op_while->line);
   
   // Condition
+  assert(op_operand_condition->moresib == 0);
   SPVM_OP* op_condition = SPVM_OP_build_condition(compiler, op_operand_condition, 1);
   op_condition->flag |= SPVM_OP_C_FLAG_CONDITION_LOOP;
 
@@ -1275,12 +1381,13 @@ SPVM_OP* SPVM_OP_build_array_init(SPVM_COMPILER* compiler, SPVM_OP* op_array_ini
           SPVM_OP* op_dist_type = SPVM_OP_new_op_any_object_type(compiler, op_operand_element->file, op_operand_element->line);
           SPVM_OP_build_convert(compiler, op_convert, op_dist_type, op_operand_element, NULL);
           SPVM_OP_replace_op(compiler, op_stab, op_convert);
+          op_operand_element = op_convert;
         }
         element_index++;
       }
       int32_t is_odd = element_index % 2 == 1;
       if (is_odd) {
-        SPVM_COMPILER_error(compiler, "Odd number of elements in {} array init syntax at %s line %d", op_list_elements->file, op_list_elements->line);
+        SPVM_COMPILER_error(compiler, "The lenght of the elements in {} of the array initialization must be an even number at %s line %d", op_list_elements->file, op_list_elements->line);
       }
     }
   }
@@ -1891,15 +1998,15 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           break;
         }
         default: {
-          SPVM_COMPILER_error(compiler, "Invalid class descriptor %s at %s line %d", SPVM_DESCRIPTOR_get_name(compiler, descriptor->id), op_class->file, op_class->line);
+          SPVM_COMPILER_error(compiler, "Invalid class descriptor \"%s\" at %s line %d", SPVM_DESCRIPTOR_get_name(compiler, descriptor->id), op_class->file, op_class->line);
         }
       }
     }
     if (class_descriptors_count > 1) {
-      SPVM_COMPILER_error(compiler, "mulnum_t, pointer_t interface_t can be specified only one at %s line %d", op_list_descriptors->file, op_list_descriptors->line);
+      SPVM_COMPILER_error(compiler, "Only one of class descriptors \"mulnum_t\", \"pointer_t\" or \"interface_t\" can be specified at %s line %d", op_list_descriptors->file, op_list_descriptors->line);
     }
     if (access_control_descriptors_count > 1) {
-      SPVM_COMPILER_error(compiler, "Only one of \"private\" or \"public\" class descriptors can be specified at %s line %d", op_list_descriptors->file, op_list_descriptors->line);
+      SPVM_COMPILER_error(compiler, "Only one of class descriptors \"private\" or \"public\" can be specified at %s line %d", op_list_descriptors->file, op_list_descriptors->line);
     }
   }
   
@@ -1919,7 +2026,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           // Class name must begin with upper case, otherwise compiler error occur.
           // (Invalid example) Foo::bar
           if (islower(class_alias_name[0])) {
-            SPVM_COMPILER_error(compiler, "The class alias name \"%s\" must begin with a upper case character at %s line %d", class_alias_name, op_decl->file, op_decl->line);
+            SPVM_COMPILER_error(compiler, "The class alias name \"%s\" must begin with an upper case character at %s line %d", class_alias_name, op_decl->file, op_decl->line);
           }
           else {
             const char* use_class_name = op_use->uv.use->class_name;
@@ -1933,14 +2040,14 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           }
         }
       }
-      // allow declarations
+      // allow statement
       else if (op_decl->id == SPVM_OP_C_ID_ALLOW) {
         SPVM_LIST_push(class->allows, op_decl->uv.allow);
       }
-      // interface declarations
+      // interface statement
       else if (op_decl->id == SPVM_OP_C_ID_INTERFACE) {
         if (class->category == SPVM_CLASS_C_CATEGORY_MULNUM) {
-          SPVM_COMPILER_error(compiler, "Multi-numeric types can't have \"interface\" syntax at %s line %d", op_decl->file, op_decl->line);
+          SPVM_COMPILER_error(compiler, "The interface statement can't be used in the definition of the multi-numeric type at %s line %d", op_decl->file, op_decl->line);
         }
         SPVM_LIST_push(class->interface_decls, op_decl->uv.interface);
       }
@@ -1949,7 +2056,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
         SPVM_CLASS_VAR* class_var = op_decl->uv.class_var;
 
         if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
-          SPVM_COMPILER_error(compiler, "Interface classes can't have class variables at %s line %d", op_decl->file, op_decl->line);
+          SPVM_COMPILER_error(compiler, "The interface can't have class variables at %s line %d", op_decl->file, op_decl->line);
         }
         SPVM_LIST_push(class->class_vars, op_decl->uv.class_var);
 
@@ -2046,7 +2153,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
         SPVM_FIELD* field = op_decl->uv.field;
         
         if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
-          SPVM_COMPILER_error(compiler, "Interface classes can't have fields at %s line %d", op_decl->file, op_decl->line);
+          SPVM_COMPILER_error(compiler, "The interface can't have fields at %s line %d", op_decl->file, op_decl->line);
         }
         SPVM_LIST_push(class->fields, field);
         
@@ -2179,7 +2286,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
       SPVM_FIELD* field = SPVM_LIST_get(class->fields, i);
 
       if (class->is_pointer) {
-        SPVM_COMPILER_error(compiler, "The class that has \"pointer_t\" descriptor can't have its fields at %s line %d", field->op_field->file, field->op_field->line);
+        SPVM_COMPILER_error(compiler, "The pointer class can't have fields at %s line %d", field->op_field->file, field->op_field->line);
         continue;
       }
 
@@ -2189,7 +2296,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
       SPVM_FIELD* found_field = SPVM_HASH_get(class->field_symtable, field_name, strlen(field_name));
       
       if (found_field) {
-        SPVM_COMPILER_error(compiler, "Redeclaration of field \"%s->{%s}\" at %s line %d", class_name, field_name, field->op_field->file, field->op_field->line);
+        SPVM_COMPILER_error(compiler, "Redeclaration of the field \"%s\" in the class \"%s\" at %s line %d", field_name, class_name, field->op_field->file, field->op_field->line);
       }
       else {
         SPVM_HASH_set(class->field_symtable, field_name, strlen(field_name), field);
@@ -2238,7 +2345,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
       }
       
       if (must_have_block && !method->op_block) {
-        SPVM_COMPILER_error(compiler, "Non-native method must have its block at %s line %d", op_name_method->file, op_name_method->line);
+        SPVM_COMPILER_error(compiler, "The non-native method must have the block at %s line %d", op_name_method->file, op_name_method->line);
       }
       
       // Method check
@@ -2262,46 +2369,46 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
 
       // If Method is anon, method must be method
       if (strlen(method_name) == 0 && method->is_class_method) {
-        SPVM_COMPILER_error(compiler, "Anon methods must be instance methods at %s line %d", method->op_method->file, method->op_method->line);
+        SPVM_COMPILER_error(compiler, "The anon method must be an instance method at %s line %d", method->op_method->file, method->op_method->line);
       }
 
       if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
         // Method having interface_t descriptor must be method
         if (method->is_class_method) {
-          SPVM_COMPILER_error(compiler, "Methods of interface classes must be instance methods at %s line %d", method->op_method->file, method->op_method->line);
+          SPVM_COMPILER_error(compiler, "The method defined in the interface must be an instance method at %s line %d", method->op_method->file, method->op_method->line);
         }
         
         // If class is interface, the method must not be native
         if (method->is_native) {
-          SPVM_COMPILER_error(compiler, "Methods of interface classes  can't have native descriptors at %s line %d", method->op_method->file, method->op_method->line);
+          SPVM_COMPILER_error(compiler, "The method defined in the interface can't have the method descriptor \"native\" at %s line %d", method->op_method->file, method->op_method->line);
         }
 
         // If class is interface, the method must not be precompile
         if (method->is_precompile) {
-          SPVM_COMPILER_error(compiler, "Methods of interface classes can't have precompile descriptors at %s line %d", method->op_method->file, method->op_method->line);
+          SPVM_COMPILER_error(compiler, "The method defined in the interface can't have the method descriptor \"precompile\" at %s line %d", method->op_method->file, method->op_method->line);
         }
         
         // If class is interface, the method must not be precompile
         if (method->op_block) {
-          SPVM_COMPILER_error(compiler, "Methods of interface classes can't have the blocks at %s line %d", method->op_method->file, method->op_method->line);
+          SPVM_COMPILER_error(compiler, "The method defined in the interface can't have the block at %s line %d", method->op_method->file, method->op_method->line);
         }
       }
       else if (class->category == SPVM_CLASS_C_CATEGORY_CLASS) {
         if (method->is_required) {
-          SPVM_COMPILER_error(compiler, "A class type can't have required methods at %s line %d", method->op_method->file, method->op_method->line);
+          SPVM_COMPILER_error(compiler, "The method defined in the class can't have the method descriptor \"required\" at %s line %d", method->op_method->file, method->op_method->line);
         }
       }
       
       if (method->is_native) {
         if (method->op_block) {
-          SPVM_COMPILER_error(compiler, "Native methods can't have blocks at %s line %d", method->op_method->file, method->op_method->line);
+          SPVM_COMPILER_error(compiler, "The native method can't have the block at %s line %d", method->op_method->file, method->op_method->line);
         }
       }
       
       SPVM_METHOD* found_method = SPVM_HASH_get(class->method_symtable, method_name, strlen(method_name));
       
       if (found_method) {
-        SPVM_COMPILER_error(compiler, "Redeclaration of the method \"%s\" at %s line %d", method_name, method->op_method->file, method->op_method->line);
+        SPVM_COMPILER_error(compiler, "Redeclaration of the method \"%s\" in the class \"%s\" at %s line %d", method_name, class_name, method->op_method->file, method->op_method->line);
       }
       // Unknown method
       else {
@@ -2319,7 +2426,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
 
           if (method->is_required) {
             if (class->required_method) {
-              SPVM_COMPILER_error(compiler, "A interface can't have multiple required method \"%s\" at %s line %d", method_name, method->op_method->file, method->op_method->line);
+              SPVM_COMPILER_error(compiler, "The interface can't have multiple required methods \"%s\" at %s line %d", method_name, method->op_method->file, method->op_method->line);
             }
             class->required_method = method;
           }
@@ -2343,22 +2450,22 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
     // interface_t
     if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
       if (!class->required_method) {
-        SPVM_COMPILER_error(compiler, "A interface method must have one required method at %s line %d", op_class->file, op_class->line);
+        SPVM_COMPILER_error(compiler, "The interface must have a required method at %s line %d", op_class->file, op_class->line);
       }
     }
     // mulnum_t
     else if (class->category == SPVM_CLASS_C_CATEGORY_MULNUM) {
       if (class->methods->length > 0) {
-        SPVM_COMPILER_error(compiler, "The class that has the \"mulnum_t\" class descriptor can't have methods at %s line %d", op_class->file, op_class->line);
+        SPVM_COMPILER_error(compiler, "The multi-numeric type can't have methods at %s line %d", op_class->file, op_class->line);
       }
       if (class->class_vars->length > 0) {
-        SPVM_COMPILER_error(compiler, "The class that has the \"mulnum_t\" class descriptor can't have class variables at %s line %d", op_class->file, op_class->line);
+        SPVM_COMPILER_error(compiler, "The multi-numeric type can't have class variables at %s line %d", op_class->file, op_class->line);
       }
       if (class->fields->length == 0) {
-        SPVM_COMPILER_error(compiler, "The class that has the \"mulnum_t\" class descriptor must have at least one field at %s line %d", class->op_class->file, class->op_class->line);
+        SPVM_COMPILER_error(compiler, "The multi-numeric type must have at least one field at %s line %d", class->op_class->file, class->op_class->line);
       }
       else if (class->fields->length > 255) {
-        SPVM_COMPILER_error(compiler, "The class that has the \"mulnum_t\" class descriptor must have fields that length is less than or equal to 255. at %s line %d", class->op_class->file, class->op_class->line);
+        SPVM_COMPILER_error(compiler, "The length of the fields defined in the multi-numeric type must be less than or equal to 255 at %s line %d", class->op_class->file, class->op_class->line);
       }
     }
   }
@@ -2434,7 +2541,7 @@ SPVM_OP* SPVM_OP_build_our(SPVM_COMPILER* compiler, SPVM_OP* op_class_var, SPVM_
   class_var->name = op_name->uv.name;
   
   if (strstr(name, "::")) {
-    SPVM_COMPILER_error(compiler, "The class varaible name \"%s\" in the class variable definition can't contain \"::\" at %s line %d", class_var->name, op_name->file, op_name->line);
+    SPVM_COMPILER_error(compiler, "The class varaible name \"%s\" can't contain \"::\" at %s line %d", class_var->name, op_name->file, op_name->line);
   }
   
   class_var->op_name = op_name;
@@ -2485,10 +2592,10 @@ SPVM_OP* SPVM_OP_build_our(SPVM_COMPILER* compiler, SPVM_OP* op_class_var, SPVM_
         }
       }
       if (field_method_descriptors_count > 1) {
-        SPVM_COMPILER_error(compiler, "Only one of \"rw\", \"ro\", \"wo\" class variable descriptors can be specifed at %s line %d", op_class_var->file, op_class_var->line);
+        SPVM_COMPILER_error(compiler, "Only one of class variable descriptors \"rw\", \"ro\", \"wo\" can be specifed at %s line %d", op_class_var->file, op_class_var->line);
       }
       if (access_control_descriptors_count > 1) {
-        SPVM_COMPILER_error(compiler, "Only one of \"private\" or \"public\" class variable descriptors can be specified at %s line %d", op_class_var->file, op_class_var->line);
+        SPVM_COMPILER_error(compiler, "Only one of class variable descriptors \"private\" or \"public\" can be specified at %s line %d", op_class_var->file, op_class_var->line);
       }
     }
   }
@@ -2553,15 +2660,15 @@ SPVM_OP* SPVM_OP_build_has(SPVM_COMPILER* compiler, SPVM_OP* op_field, SPVM_OP* 
           break;
         }
         default: {
-          SPVM_COMPILER_error(compiler, "Invalid field descriptor %s at %s line %d", SPVM_DESCRIPTOR_get_name(compiler, descriptor->id), op_descriptors->file, op_descriptors->line);
+          SPVM_COMPILER_error(compiler, "Invalid field descriptor \"%s\" at %s line %d", SPVM_DESCRIPTOR_get_name(compiler, descriptor->id), op_descriptors->file, op_descriptors->line);
         }
       }
       
       if (field_method_descriptors_count > 1) {
-        SPVM_COMPILER_error(compiler, "rw, ro, wo can be specifed only one in field declaration at %s line %d", op_field->file, op_field->line);
+        SPVM_COMPILER_error(compiler, "Only one of field descriptors \"rw\", \"ro\" or \"wo\" can be specifed at %s line %d", op_field->file, op_field->line);
       }
       if (access_control_descriptors_count > 1) {
-        SPVM_COMPILER_error(compiler, "Only one of \"private\" or \"public\" field descriptors can be specified at %s line %d", op_field->file, op_field->line);
+        SPVM_COMPILER_error(compiler, "Only one of field descriptors \"private\" or \"public\" can be specified at %s line %d", op_field->file, op_field->line);
       }
     }
   }
@@ -2651,16 +2758,16 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
     }
     
     if (method->is_native && method->is_precompile) {
-      SPVM_COMPILER_error(compiler, "Only one of \"native\" and \"precompile\" method descriptors can be specified at %s line %d", op_descriptors->file, op_descriptors->line);
+      SPVM_COMPILER_error(compiler, "Only one of method descriptors \"native\" and \"precompile\" can be specified at %s line %d", op_descriptors->file, op_descriptors->line);
     }
     if (access_control_descriptors_count > 1) {
-      SPVM_COMPILER_error(compiler, "Only one of \"private\" or \"public\" method descriptors can be specified at %s line %d", op_method->file, op_method->line);
+      SPVM_COMPILER_error(compiler, "Only one of method descriptors \"private\" or \"public\" can be specified at %s line %d", op_method->file, op_method->line);
     }
   }
 
   // Native method can't have block
   if ((method->is_native) && op_block) {
-    SPVM_COMPILER_error(compiler, "Native method can't have block at %s line %d", op_block->file, op_block->line);
+    SPVM_COMPILER_error(compiler, "The native method can't have the block at %s line %d", op_block->file, op_block->line);
   }
   
   // method args
@@ -2723,17 +2830,17 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
     
     // DESTROY return type must be void
     if (!(method->return_type->dimension == 0 && method->return_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_VOID)) {
-      SPVM_COMPILER_error(compiler, "The return type of the destructor(the DESTROY method) must be the void type at %s line %d", op_method->file, op_method->line);
+      SPVM_COMPILER_error(compiler, "The return type of the DESTROY destructor method must be the void type at %s line %d", op_method->file, op_method->line);
     }
     
     // DESTROY is instance method
     if (method->is_class_method) {
-      SPVM_COMPILER_error(compiler, "The destructor(the DESTROY method) must be an instance method at %s line %d", op_method->file, op_method->line);
+      SPVM_COMPILER_error(compiler, "The DESTROY destructor method must be an instance method at %s line %d", op_method->file, op_method->line);
     }
 
     // DESTROY doesn't have arguments without invocant
     if (method->args_length != 1) {
-      SPVM_COMPILER_error(compiler, "The destructor(the DESTROY method) can't have arguments at %s line %d", op_method->file, op_method->line);
+      SPVM_COMPILER_error(compiler, "The DESTROY destructor method can't have arguments at %s line %d", op_method->file, op_method->line);
     }
   }
   
@@ -2808,7 +2915,7 @@ SPVM_OP* SPVM_OP_build_enumeration_value(SPVM_COMPILER* compiler, SPVM_OP* op_na
       compiler->current_enum_value = constant->value.ival;
     }
     else {
-      SPVM_COMPILER_error(compiler, "enum value must be int type at %s line %d", op_constant->file, op_constant->line);
+      SPVM_COMPILER_error(compiler, "The value of the enumeration must be int type at %s line %d", op_constant->file, op_constant->line);
     }
     
     compiler->current_enum_value++;
@@ -2890,7 +2997,7 @@ SPVM_OP* SPVM_OP_build_enumeration(SPVM_COMPILER* compiler, SPVM_OP* op_enumerat
         }
       }
       if (access_control_descriptors_count > 1) {
-        SPVM_COMPILER_error(compiler, "Only one of \"private\" or \"public\" enumeration descriptors can be specified at %s line %d", op_method->file, op_method->line);
+        SPVM_COMPILER_error(compiler, "Only one of enumeration descriptors \"private\" or \"public\" can be specified at %s line %d", op_method->file, op_method->line);
       }
     }
   }
@@ -2996,6 +3103,18 @@ SPVM_OP* SPVM_OP_build_unary_op(SPVM_COMPILER* compiler, SPVM_OP* op_unary, SPVM
   return op_unary;
 }
 
+SPVM_OP* SPVM_OP_build_unary_op_var(SPVM_COMPILER* compiler, SPVM_OP* op_unary, SPVM_OP* op_first) {
+  
+  if (op_first->id != SPVM_OP_C_ID_VAR) {
+    SPVM_COMPILER_error(compiler, "The operand of the %s operator must be a variable at %s line %d", SPVM_OP_get_op_name(op_unary->id), op_first->file, op_first->line);
+  }
+  
+  // Build op
+  SPVM_OP_insert_child(compiler, op_unary, op_unary->last, op_first);
+  
+  return op_unary;
+}
+
 SPVM_OP* SPVM_OP_build_comparison_op(SPVM_COMPILER* compiler, SPVM_OP* op_comparison, SPVM_OP* op_first, SPVM_OP* op_last) {
 
   SPVM_OP_insert_child(compiler, op_comparison, op_comparison->last, op_first);
@@ -3039,7 +3158,7 @@ SPVM_OP* SPVM_OP_build_inc(SPVM_COMPILER* compiler, SPVM_OP* op_inc, SPVM_OP* op
   SPVM_OP_insert_child(compiler, op_inc, op_inc->last, op_first);
 
   if (!SPVM_OP_is_mutable(compiler, op_first)) {
-    SPVM_COMPILER_error(compiler, "Operand of ++ operator must be mutable at %s line %d", op_first->file, op_first->line);
+    SPVM_COMPILER_error(compiler, "The operand of ++ operator must be mutable at %s line %d", op_first->file, op_first->line);
   }
   
   return op_inc;
@@ -3051,7 +3170,7 @@ SPVM_OP* SPVM_OP_build_dec(SPVM_COMPILER* compiler, SPVM_OP* op_dec, SPVM_OP* op
   SPVM_OP_insert_child(compiler, op_dec, op_dec->last, op_first);
 
   if (!SPVM_OP_is_mutable(compiler, op_first)) {
-    SPVM_COMPILER_error(compiler, "Operand of -- operator must be mutable at %s line %d", op_first->file, op_first->line);
+    SPVM_COMPILER_error(compiler, "The operand of -- operator must be mutable at %s line %d", op_first->file, op_first->line);
   }
   
   return op_dec;
@@ -3205,7 +3324,7 @@ SPVM_OP* SPVM_OP_build_special_assign(SPVM_COMPILER* compiler, SPVM_OP* op_speci
   SPVM_OP_insert_child(compiler, op_special_assign, op_special_assign->last, op_operand_dist);
   
   if (!SPVM_OP_is_mutable(compiler, op_operand_dist)) {
-    SPVM_COMPILER_error(compiler, "special assign operator left value must be mutable at %s line %d", op_operand_dist->file, op_operand_dist->line);
+    SPVM_COMPILER_error(compiler, "The left operand of the special assign operator must be mutable at %s line %d", op_operand_dist->file, op_operand_dist->line);
   }
   
   return op_special_assign;
@@ -3222,7 +3341,7 @@ SPVM_OP* SPVM_OP_build_assign(SPVM_COMPILER* compiler, SPVM_OP* op_assign, SPVM_
   op_operand_dist->is_lvalue = 1;
   
   if (!SPVM_OP_is_mutable(compiler, op_operand_dist)) {
-    SPVM_COMPILER_error(compiler, "assign operator left value must be mutable at %s line %d", op_operand_dist->file, op_operand_dist->line);
+    SPVM_COMPILER_error(compiler, "The left operand of the assign operator must be mutable at %s line %d", op_operand_dist->file, op_operand_dist->line);
   }
   
   return op_assign;

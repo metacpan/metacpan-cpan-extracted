@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<export xmlns="http://eu.europa.ec/fpi/fsd/export" generationDate="2020-04-15T15:29:22.497+02:00" globalFileId="123465">
+    <sanctionEntity designationDate="2008-07-03" designationDetails="" unitedNationId="" euReferenceNumber="EU.2026.82" logicalId="5295">
+        <regulation regulationType="amendment" organisationType="commission" publicationDate="2019-04-08" entryIntoForceDate="2019-04-09" numberTitle="2019/555 (OJ L97)" programme="TAQA" logicalId="118061">
+            <publicationUrl>https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:L:2019:097:FULL&amp;from=EN</publicationUrl>
+        </regulation>
+        <subjectType code="person" classificationCode="P"/>
+        <nameAlias firstName="Abid" middleName="" lastName="Hammadou" wholeName="Abid Hammadou" function="" title="" nameLanguage="" strong="true" regulationLanguage="en" logicalId="16353">
+            <regulationSummary regulationType="amendment" publicationDate="2012-07-06" numberTitle="598/2012 (OJ L176)" publicationUrl="http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=OJ:L:2012:176:0059:0061:EN:PDF"/>
+        </nameAlias>
+        <nameAlias firstName="" middleName="" lastName="" wholeName="Abdelhamid Abou Zeid" function="" title="" nameLanguage="" strong="true" regulationLanguage="en" logicalId="6722">
+            <regulationSummary regulationType="amendment" publicationDate="2008-07-17" numberTitle="678/2008 (OJ L189)" publicationUrl="http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=OJ:L:2008:189:0023:0024:EN:PDF"/>
+        </nameAlias>
+        <nameAlias firstName="" middleName="" lastName="" wholeName="Youcef Adel" function="" title="" nameLanguage="" strong="true" regulationLanguage="en" logicalId="6723">
+            <regulationSummary regulationType="amendment" publicationDate="2008-07-17" numberTitle="678/2008 (OJ L189)" publicationUrl="http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=OJ:L:2008:189:0023:0024:EN:PDF"/>
+        </nameAlias>
+        <nameAlias firstName="" middleName="" lastName="" wholeName="Amor Mohamed Ghedeir" function="" title="" nameLanguage="" strong="true" regulationLanguage="en" logicalId="6721">
+            <remark>(a) Mother's name is Benarouba Bachira; (b) Father's name is Mabrouk. Other information: Reportedly deceased as of 24 February 2013.</remark>
+            <regulationSummary regulationType="amendment" publicationDate="2019-04-08" numberTitle="2019/555 (OJ L97)" publicationUrl="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:L:2019:097:FULL&amp;from=EN"/>
+        </nameAlias>
+        <nameAlias firstName="" middleName="" lastName="" wholeName="Abou Abdellah" function="" title="" nameLanguage="" strong="true" regulationLanguage="en" logicalId="6724">
+            <regulationSummary regulationType="amendment" publicationDate="2008-07-17" numberTitle="678/2008 (OJ L189)" publicationUrl="http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=OJ:L:2008:189:0023:0024:EN:PDF"/>
+        </nameAlias>
+        <citizenship region="" countryIso2Code="DZ" countryDescription="ALGERIA" regulationLanguage="en" logicalId="526">
+            <regulationSummary regulationType="amendment" publicationDate="2008-07-17" numberTitle="678/2008 (OJ L189)" publicationUrl="http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=OJ:L:2008:189:0023:0024:EN:PDF"/>
+        </citizenship>
+        <birthdate circa="false" calendarType="GREGORIAN" city="Touggourt, Wilaya (province) of Ouargla" zipCode="" birthdate="1965-12-12" dayOfMonth="12" monthOfYear="12" year="1965" region="" place="" countryIso2Code="DZ" countryDescription="ALGERIA" regulationLanguage="en" logicalId="119885">
+            <regulationSummary regulationType="amendment" publicationDate="2019-04-08" numberTitle="2019/555 (OJ L97)" publicationUrl="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:L:2019:097:FULL&amp;from=EN"/>
+        </birthdate>
+        <birthdate circa="true" calendarType="GREGORIAN" city="Deb-Deb, Amenas, Wilaya (province) of Illizi" zipCode="" year="1958" region="" place="" countryIso2Code="DZ" countryDescription="ALGERIA" regulationLanguage="en" logicalId="1074">
+            <regulationSummary regulationType="amendment" publicationDate="2012-12-04" numberTitle="1142/2012 (OJ L332)" publicationUrl="http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=OJ:L:2012:332:0012:0015:EN:PDF"/>
+        </birthdate>
+    </sanctionEntity>
+    <sanctionEntity designationDate="2009-07-16" designationDetails="" unitedNationId="" euReferenceNumber="EU.4011.64" logicalId="5463">
+        <regulation regulationType="repealing" organisationType="council" publicationDate="2017-08-31" entryIntoForceDate="2017-09-01" numberTitle="2017/1509 (OJ L224)" programme="PRK" logicalId="107441">
+            <publicationUrl>http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32017R1509&amp;from=EN</publicationUrl>
+        </regulation>
+        <subjectType code="person" classificationCode="P"/>
+        <nameAlias firstName="Yu-ro" middleName="" lastName="Han" wholeName="Yu-ro Han" function="Director of Korea Ryongaksan General Trading Corporation" title="" nameLanguage="" strong="true" regulationLanguage="en" logicalId="7105">
+            <regulationSummary regulationType="amendment" publicationDate="2009-07-31" numberTitle="689/2009 (OJ L199)" publicationUrl="http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=OJ:L:2009:199:0003:0005:EN:PDF"/>
+        </nameAlias>
+    </sanctionEntity>
+    <sanctionEntity designationDate="2009-07-16" designationDetails="" unitedNationId="" euReferenceNumber="EU.4009.74" logicalId="5468">
+        <regulation regulationType="repealing" organisationType="council" publicationDate="2017-08-31" entryIntoForceDate="2017-09-01" numberTitle="2017/1509 (OJ L224)" programme="PRK" logicalId="107441">
+            <publicationUrl>http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32017R1509&amp;from=EN</publicationUrl>
+        </regulation>
+        <subjectType code="person" classificationCode="P"/>
+        <nameAlias firstName="Sok-hwa" middleName="" lastName="Hwang" wholeName="Sok-hwa Hwang" function="Director of the General Bureau of Atomic Energy (GBAE)" title="" nameLanguage="" strong="true" regulationLanguage="en" logicalId="7111">
+            <regulationSummary regulationType="amendment" publicationDate="2009-07-31" numberTitle="689/2009 (OJ L199)" publicationUrl="http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=OJ:L:2009:199:0003:0005:EN:PDF"/>
+        </nameAlias>
+    </sanctionEntity>
+    <sanctionEntity designationDetails="" unitedNationId="" euReferenceNumber="EU.3579.2" logicalId="191">
+        <regulation regulationType="amendment" organisationType="council" publicationDate="2020-01-14" entryIntoForceDate="2020-01-15" numberTitle="2020/19 (OJ L8I)" programme="TERR" logicalId="121961">
+            <publicationUrl>https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=uriserv:OJ.LI.2020.008.01.0001.01.ENG&amp;toc=OJ:L:2020:008I:TOC</publicationUrl>
+        </regulation>
+        <subjectType code="person" classificationCode="P"/>
+        <nameAlias firstName="Fahd" middleName="Bin Adballah" lastName="BIN KHALID" wholeName="Fahd Bin Adballah BIN KHALID" function="" gender="M" title="" nameLanguage="" strong="true" regulationLanguage="en" logicalId="291">
+            <regulationSummary regulationType="amendment" publicationDate="2018-03-22" numberTitle="2018/468 (OJ L79)" publicationUrl="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32018R0468&amp;qid=1521740406834&amp;from=EN"/>
+        </nameAlias>
+        <nameAlias firstName="Khalid" middleName="Shaikh" lastName="MOHAMMED" wholeName="Khalid Shaikh MOHAMMED" function="" gender="M" title="" nameLanguage="" strong="true" regulationLanguage="en" logicalId="289">
+            <regulationSummary regulationType="amendment" publicationDate="2018-03-22" numberTitle="2018/468 (OJ L79)" publicationUrl="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32018R0468&amp;qid=1521740406834&amp;from=EN"/>
+        </nameAlias>
+        <nameAlias firstName="Salem" middleName="" lastName="ALI" wholeName="Salem ALI" function="" gender="M" title="" nameLanguage="" strong="true" regulationLanguage="en" logicalId="290">
+            <regulationSummary regulationType="amendment" publicationDate="2018-03-22" numberTitle="2018/468 (OJ L79)" publicationUrl="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32018R0468&amp;qid=1521740406834&amp;from=EN"/>
+        </nameAlias>
+        <nameAlias firstName="Khalid" middleName="Adbul" lastName="WADOOD" wholeName="Khalid Adbul WADOOD" function="" gender="M" title="" nameLanguage="" strong="true" regulationLanguage="en" logicalId="293">
+            <regulationSummary regulationType="amendment" publicationDate="2018-03-22" numberTitle="2018/468 (OJ L79)" publicationUrl="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32018R0468&amp;qid=1521740406834&amp;from=EN"/>
+        </nameAlias>
+        <nameAlias firstName="Ashraf" middleName="Refaat Nabith" lastName="HENIN" wholeName="Ashraf Refaat Nabith HENIN" function="" gender="M" title="" nameLanguage="" strong="true" regulationLanguage="en" logicalId="292">
+            <regulationSummary regulationType="amendment" publicationDate="2018-03-22" numberTitle="2018/468 (OJ L79)" publicationUrl="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32018R0468&amp;qid=1521740406834&amp;from=EN"/>
+        </nameAlias>
+        <birthdate circa="false" calendarType="GREGORIAN" city="-" zipCode="" birthdate="1965-04-14" dayOfMonth="14" monthOfYear="4" year="1965" region="" place="" countryIso2Code="PK" countryDescription="PAKISTAN" regulationLanguage="en" logicalId="183">
+            <regulationSummary regulationType="amendment" publicationDate="2005-11-30" numberTitle="2005/848/EC (OJ L314)" publicationUrl="http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=OJ:L:2005:314:0046:0047:EN:PDF"/>
+        </birthdate>
+        <birthdate circa="false" calendarType="GREGORIAN" city="-" zipCode="" birthdate="1964-03-01" dayOfMonth="1" monthOfYear="3" year="1964" region="" place="" countryIso2Code="PK" countryDescription="PAKISTAN" regulationLanguage="en" logicalId="184">
+            <regulationSummary regulationType="amendment" publicationDate="2005-11-30" numberTitle="2005/848/EC (OJ L314)" publicationUrl="http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=OJ:L:2005:314:0046:0047:EN:PDF"/>
+        </birthdate>
+        <identification diplomatic="false" knownExpired="false" knownFalse="false" reportedLost="false" revokedByIssuer="false" issuedBy="" latinNumber="" nameOnDocument="" number="488555" region="" countryIso2Code="00" countryDescription="UNKNOWN" identificationTypeCode="passport" identificationTypeDescription="National passport" regulationLanguage="en" logicalId="6">
+            <regulationSummary regulationType="repealing" publicationDate="2015-08-01" numberTitle="2015/1325 (OJ L206)" publicationUrl="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32015R1325&amp;rid=1"/>
+        </identification>
+    </sanctionEntity>
+    <sanctionEntity designationDate="2010-12-01" designationDetails="" unitedNationId="" euReferenceNumber="EU.3734.6" logicalId="5807">
+        <regulation regulationType="amendment" organisationType="council" publicationDate="2017-03-08" entryIntoForceDate="2017-03-09" numberTitle="2017/396 (OJ L60)" programme="COD" logicalId="100709">
+            <publicationUrl>http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32017R0396&amp;from=EN</publicationUrl>
+        </regulation>
+        <subjectType code="person" classificationCode="P"/>
+        <nameAlias firstName="" middleName="" lastName="" wholeName="Leo Manzi" function="" title="" nameLanguage="" strong="true" regulationLanguage="en" logicalId="8398">
+            <regulationSummary regulationType="amendment" publicationDate="2010-12-23" numberTitle="1250/2010 (OJ L341)" publicationUrl="http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=OJ:L:2010:341:0011:0014:EN:PDF"/>
+        </nameAlias>
+        <citizenship region="" countryIso2Code="RW" countryDescription="RWANDA" regulationLanguage="en" logicalId="111052">
+            <regulationSummary regulationType="amendment" publicationDate="2017-03-08" numberTitle="2017/396 (OJ L60)" publicationUrl="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32017R0396&amp;from=EN"/>
+        </citizenship>
+        <birthdate circa="false" calendarType="GREGORIAN" city="Rushashi (Northern Province)" zipCode="" year="1954" region="" place="" countryIso2Code="RW" countryDescription="RWANDA" regulationLanguage="en" logicalId="1317">
+            <regulationSummary regulationType="amendment" publicationDate="2010-12-23" numberTitle="1250/2010 (OJ L341)" publicationUrl="http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=OJ:L:2010:341:0011:0014:EN:PDF"/>
+        </birthdate>
+        <birthdate circa="false" calendarType="GREGORIAN" city="Kigali" zipCode="" year="1954" region="" place="" countryIso2Code="RW" countryDescription="RWANDA" regulationLanguage="en" logicalId="1314">
+            <regulationSummary regulationType="amendment" publicationDate="2010-12-23" numberTitle="1250/2010 (OJ L341)" publicationUrl="http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=OJ:L:2010:341:0011:0014:EN:PDF"/>
+        </birthdate>
+        <birthdate circa="false" calendarType="GREGORIAN" city="Rushashi (Northern Province)" zipCode="" year="1953" region="" place="" countryIso2Code="RW" countryDescription="RWANDA" regulationLanguage="en" logicalId="1315">
+            <regulationSummary regulationType="amendment" publicationDate="2010-12-23" numberTitle="1250/2010 (OJ L341)" publicationUrl="http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=OJ:L:2010:341:0011:0014:EN:PDF"/>
+        </birthdate>
+        <birthdate circa="false" calendarType="GREGORIAN" city="Kigali" zipCode="" year="1953" region="" place="" countryIso2Code="RW" countryDescription="RWANDA" regulationLanguage="en" logicalId="1316">
+            <regulationSummary regulationType="amendment" publicationDate="2010-12-23" numberTitle="1250/2010 (OJ L341)" publicationUrl="http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=OJ:L:2010:341:0011:0014:EN:PDF"/>
+        </birthdate>
+        <address city="" street="" poBox="" zipCode="" region="North Kivu" place="Kikoma forest, Bogoyi, Walikale" asAtListingTime="false" countryIso2Code="CD" countryDescription="CONGO, Democratic Republic of (was Zaire)" regulationLanguage="en" logicalId="111053">
+            <remark>FDLR HQ at Kikoma forest, Bogoyi, Walikale, North Kivu, Democratic Republic of the Congo (as of June 2011).</remark>
+            <regulationSummary regulationType="amendment" publicationDate="2017-03-08" numberTitle="2017/396 (OJ L60)" publicationUrl="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32017R0396&amp;from=EN"/>
+        </address>
+    </sanctionEntity>
+    <sanctionEntity designationDate="2009-07-16" designationDetails="" unitedNationId="" euReferenceNumber="EU.4009.74" logicalId="5468">
+        <regulation regulationType="repealing" organisationType="council" publicationDate="2017-08-31" entryIntoForceDate="2017-09-01" numberTitle="2017/1509 (OJ L224)" programme="PRK" logicalId="107441">
+            <publicationUrl>http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32017R1509&amp;from=EN</publicationUrl>
+        </regulation>
+        <subjectType code="person" classificationCode="P"/>
+        <nameAlias wholeName="TestOneWord" function="Test one word entry" title="" nameLanguage="" strong="true" regulationLanguage="en" logicalId="7111">
+            <regulationSummary regulationType="amendment" publicationDate="2009-07-31" numberTitle="689/2009 (OJ L199)" publicationUrl="http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=OJ:L:2009:199:0003:0005:EN:PDF"/>
+        </nameAlias>
+    </sanctionEntity>
+        <sanctionEntity designationDetails="" unitedNationId="" euReferenceNumber="EU.3343.85" logicalId="927">
+        <regulation regulationType="amendment" organisationType="commission" publicationDate="2016-03-02" entryIntoForceDate="2016-03-03" numberTitle="2016/294 (OJ L55)" programme="TAQA" logicalId="93081">
+            <publicationUrl>http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:JOL_2016_055_R_0004&amp;from=EN</publicationUrl>
+        </regulation>
+        <subjectType code="person" classificationCode="P"/>
+        <nameAlias firstName="Mohamed" middleName="Ben Belkacem" lastName="Aouadi" wholeName="Mohamed Ben Belkacem Aouadi" function="" title="" nameLanguage="" strong="true" regulationLanguage="en" logicalId="1942">
+            <regulationSummary regulationType="amendment" publicationDate="2006-01-18" numberTitle="76/2006 (OJ L12)" publicationUrl="http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=OJ:L:2006:012:0007:0016:EN:PDF"/>
+        </nameAlias>
+        <citizenship region="" countryIso2Code="TN" countryDescription="TUNISIA" regulationLanguage="en" logicalId="135">
+            <regulationSummary regulationType="amendment" publicationDate="2003-05-20" numberTitle="866/2003 (OJ L124)" publicationUrl="http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=OJ:L:2003:124:0019:0022:EN:PDF"/>
+        </citizenship>
+        <birthdate circa="false" calendarType="GREGORIAN" city="Tunis" zipCode="" birthdate="1974-12-11" dayOfMonth="11" monthOfYear="12" year="1974" region="" place="" countryIso2Code="TN" countryDescription="TUNISIA" regulationLanguage="en" logicalId="322">
+            <regulationSummary regulationType="amendment" publicationDate="2005-09-23" numberTitle="1551/2005 (OJ L247)" publicationUrl="http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=OJ:L:2005:247:0030:0031:EN:PDF"/>
+        </birthdate>
+        <address city="Tunis" street="23 50th Street, Zehrouni" poBox="" zipCode="" region="" place="" asAtListingTime="false" countryIso2Code="TN" countryDescription="TUNISIA" regulationLanguage="en" logicalId="1623">
+            <remark>Italian Fiscal Code: DAOMMD74T11Z352Z</remark>
+            <regulationSummary regulationType="amendment" publicationDate="2015-01-16" numberTitle="2015/64 (OJ L11)" publicationUrl="http://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:L:2015:011:FULL&amp;from=EN"/>
+        </address>
+        <identification diplomatic="false" knownExpired="false" knownFalse="false" reportedLost="false" revokedByIssuer="false" issuedBy="" latinNumber="" nameOnDocument="" number="04643632" region="" identificationTypeCode="id" identificationTypeDescription="National identification card" countryIso2Code="TN" countryDescription="TUNISIA" regulationLanguage="en" logicalId="69">
+            <regulationSummary regulationType="amendment" publicationDate="2006-01-18" numberTitle="76/2006 (OJ L12)" publicationUrl="http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=OJ:L:2006:012:0007:0016:EN:PDF"/>
+        </identification>
+        <identification diplomatic="false" knownExpired="false" knownFalse="false" reportedLost="false" revokedByIssuer="false" issuedBy="" latinNumber="" nameOnDocument="" number="L191609" region="" identificationTypeCode="passport" identificationTypeDescription="National passport" countryIso2Code="TN" countryDescription="TUNISIA" regulationLanguage="en" logicalId="68">
+            <regulationSummary regulationType="amendment" publicationDate="2006-01-18" numberTitle="76/2006 (OJ L12)" publicationUrl="http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=OJ:L:2006:012:0007:0016:EN:PDF"/>
+        </identification>
+    </sanctionEntity>
+</export>

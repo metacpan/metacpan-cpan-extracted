@@ -1,12 +1,10 @@
 use strict; use warnings;
 
 package Net::OAuth2Server::OIDC;
-
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 package Net::OAuth2Server::Request::Authorization::Role::OIDC;
-
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use Role::Tiny;
 use Class::Method::Modifiers 'fresh';
@@ -49,8 +47,7 @@ around 'new' => \&around__new;
 undef *around__new;
 
 package Net::OAuth2Server::Response::Role::OIDC;
-
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use Role::Tiny;
 use Class::Method::Modifiers 'fresh';

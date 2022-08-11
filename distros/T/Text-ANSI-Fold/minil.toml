@@ -4,3 +4,6 @@ authority = "cpan:UTASHIRO"
 
 module_maker = "ModuleBuildTiny"
 
+[release]
+branch = "master"
+

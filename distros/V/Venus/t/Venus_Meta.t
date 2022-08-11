@@ -41,9 +41,14 @@ method: attrs
 method: base
 method: bases
 method: data
+method: find
+method: local
+method: mixin
+method: mixins
 method: new
 method: role
 method: roles
+method: search
 method: sub
 method: subs
 
@@ -93,13 +98,23 @@ $test->for('includes');
     ['authenticate']
   }
 
+  package Novice;
+
+  use Venus::Mixin;
+
+  sub points {
+    100
+  }
+
   package User;
 
-  use Venus::Class;
+  use Venus::Class 'attr', 'base', 'mixin', 'test', 'with';
 
   base 'Person';
 
   with 'Identity';
+
+  mixin 'Novice';
 
   attr 'email';
 
@@ -400,6 +415,324 @@ $test->for('example', 1, 'data', sub {
   $result
 });
 
+=method find
+
+The find method finds and returns the first configuration for the property type
+specified. This method uses the L</search> method to search C<roles>, C<bases>,
+C<mixins>, and the source package, in the order listed. The "property type" can
+be any one of C<attr>, C<base>, C<mixin>, or C<role>.
+
+=signature find
+
+  find(Str $type, Str $name) (Tuple[Str,Tuple[Int,ArrayRef]])
+
+=metadata find
+
+{
+  since => '1.02',
+}
+
+=example-1 find
+
+  # given: synopsis
+
+  package main;
+
+  my $find = $meta->find;
+
+  # ()
+
+=cut
+
+$test->for('example', 1, 'find', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+
+  !$result
+});
+
+=example-2 find
+
+  # given: synopsis
+
+  package main;
+
+  my $find = $meta->find('attr', 'id');
+
+  # ['Identity', [ 1, ['id']]]
+
+=cut
+
+$test->for('example', 2, 'find', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['Identity', [ 1, ['id']]];
+
+  $result
+});
+
+=example-3 find
+
+  # given: synopsis
+
+  package main;
+
+  my $find = $meta->find('sub', 'valid');
+
+  # ['User', [1, [sub {...}]]]
+
+=cut
+
+$test->for('example', 3, 'find', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok @$result == 2;
+  ok $result->[0] eq 'User';
+  ok @{$result->[1]} == 2;
+  ok $result->[1][0] == 1;
+  ok @{$result->[1][1]} == 1;
+  ok ref $result->[1][1][0] eq 'CODE';
+
+  $result
+});
+
+=example-4 find
+
+  # given: synopsis
+
+  package main;
+
+  my $find = $meta->find('sub', 'authenticate');
+
+  # ['Authenticable', [1, [sub {...}]]]
+
+=cut
+
+$test->for('example', 4, 'find', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok @$result == 2;
+  ok $result->[0] eq 'Authenticable';
+  ok @{$result->[1]} == 2;
+  ok @{$result->[1][1]} == 1;
+  ok ref $result->[1][1][0] eq 'CODE';
+
+  $result
+});
+
+=method local
+
+The local method returns the names of properties defined in the package
+directly (not inherited) for the property type specified. The C<$type> provided
+can be either C<attrs>, C<bases>, C<roles>, or C<subs>.
+
+=signature local
+
+  local(Str $type) (ArrayRef)
+
+=metadata local
+
+{
+  since => '1.02',
+}
+
+=example-1 local
+
+  # given: synopsis
+
+  package main;
+
+  my $attrs = $meta->local('attrs');
+
+  # ['email']
+
+=cut
+
+$test->for('example', 1, 'local', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['email'];
+
+  $result
+});
+
+=example-2 local
+
+  # given: synopsis
+
+  package main;
+
+  my $bases = $meta->local('bases');
+
+  # ['Person', 'Venus::Core::Class']
+
+=cut
+
+$test->for('example', 2, 'local', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['Person', 'Venus::Core::Class'];
+
+  $result
+});
+
+=example-3 local
+
+  # given: synopsis
+
+  package main;
+
+  my $roles = $meta->local('roles');
+
+  # ['Identity', 'Authenticable']
+
+=cut
+
+$test->for('example', 3, 'local', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['Identity', 'Authenticable'];
+
+  $result
+});
+
+=example-4 local
+
+  # given: synopsis
+
+  package main;
+
+  my $subs = $meta->local('subs');
+
+  # [
+  #   'attr',
+  #   'authenticate',
+  #   'base',
+  #   'email',
+  #   'false',
+  #   'id',
+  #   'login',
+  #   'password',
+  #   'test',
+  #   'true',
+  #   'valid',
+  #   'with',
+  # ]
+
+=cut
+
+$test->for('example', 4, 'local', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply [sort @$result], [
+    'attr',
+    'authenticate',
+    'base',
+    'email',
+    'false',
+    'id',
+    'login',
+    'mixin',
+    'password',
+    'test',
+    'true',
+    'valid',
+    'with',
+  ];
+
+  $result
+});
+
+=method mixin
+
+The mixin method returns true or false if the package referenced has consumed
+the mixin named.
+
+=signature mixin
+
+  mixin(Str $name) (Bool)
+
+=metadata mixin
+
+{
+  since => '1.02',
+}
+
+=example-1 mixin
+
+  # given: synopsis
+
+  package main;
+
+  my $mixin = $meta->mixin('Novice');
+
+  # 1
+
+=cut
+
+$test->for('example', 1, 'mixin', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+
+  $result
+});
+
+=example-2 mixin
+
+  # given: synopsis
+
+  package main;
+
+  my $mixin = $meta->mixin('Intermediate');
+
+  # 0
+
+=cut
+
+$test->for('example', 2, 'mixin', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+
+  !$result
+});
+
+=method mixins
+
+The mixins method returns all of the mixins composed into the package
+referenced.
+
+=signature mixins
+
+  mixins() (ArrayRef)
+
+=metadata mixins
+
+{
+  since => '1.02',
+}
+
+=example-1 mixins
+
+  # given: synopsis
+
+  package main;
+
+  my $mixins = $meta->mixins;
+
+  # [
+  #   'Novice',
+  # ]
+
+=cut
+
+$test->for('example', 1, 'mixins', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['Novice'];
+
+  $result
+});
+
 =method new
 
 The new method returns a new instance of this package.
@@ -544,6 +877,114 @@ $test->for('example', 1, 'roles', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply [sort @{$result}], ['Authenticable', 'Identity'];
+
+  $result
+});
+
+=method search
+
+The search method searches the source specified and returns the configurations
+for the property type specified. The source can be any one of C<bases>,
+C<roles>, C<mixins>, or C<self> for the source package. The "property type" can
+be any one of C<attr>, C<base>, C<mixin>, or C<role>.
+
+=signature search
+
+  search(Str $from, Str $type, Str $name) (ArrayRef[Tuple[Str,Tuple[Int,ArrayRef]]])
+
+=metadata search
+
+{
+  since => '1.02',
+}
+
+=example-1 search
+
+  # given: synopsis
+
+  package main;
+
+  my $search = $meta->search;
+
+  # ()
+
+=cut
+
+$test->for('example', 1, 'search', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+
+  !$result
+});
+
+=example-2 search
+
+  # given: synopsis
+
+  package main;
+
+  my $search = $meta->search('roles', 'attr', 'id');
+
+  # [['Identity', [ 1, ['id']]]]
+
+=cut
+
+$test->for('example', 2, 'search', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [['Identity', [ 1, ['id']]]];
+
+  $result
+});
+
+=example-3 search
+
+  # given: synopsis
+
+  package main;
+
+  my $search = $meta->search('self', 'sub', 'valid');
+
+  # [['User', [1, [sub {...}]]]]
+
+=cut
+
+$test->for('example', 3, 'search', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok @$result == 1;
+  ok @{$result->[0]} == 2;
+  ok $result->[0][0] eq 'User';
+  ok @{$result->[0][1]} == 2;
+  ok $result->[0][1][0] == 1;
+  ok @{$result->[0][1][1]} == 1;
+  ok ref $result->[0][1][1][0] eq 'CODE';
+
+  $result
+});
+
+=example-4 search
+
+  # given: synopsis
+
+  package main;
+
+  my $search = $meta->search('self', 'sub', 'authenticate');
+
+  # [['User', [1, [sub {...}]]]]
+
+=cut
+
+$test->for('example', 4, 'search', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok @$result == 1;
+  ok @{$result->[0]} == 2;
+  ok $result->[0][0] eq 'User';
+  ok @{$result->[0][1]} == 2;
+  ok $result->[0][1][0] == 1;
+  ok @{$result->[0][1][1]} == 1;
+  ok ref $result->[0][1][1][0] eq 'CODE';
 
   $result
 });

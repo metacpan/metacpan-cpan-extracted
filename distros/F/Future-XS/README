@@ -1,0 +1,30 @@
+NAME
+
+    Future::XS - experimental XS implementation of Future
+
+SYNOPSIS
+
+       my $future = Future::XS->new;
+    
+       perform_some_operation(
+          on_complete => sub {
+             $future->done( @_ );
+          }
+       );
+    
+       $future->on_ready( sub {
+          say "The operation is complete";
+       } );
+
+DESCRIPTION
+
+    This module provides an XS-based implementation of the Future class. It
+    is currently experimental and shipped in its own distribution for
+    testing purposes, though once it seems stable the plan is to move it
+    into the main Future distribution and load it automatically in favour
+    of the pureperl implementation on supported systems.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

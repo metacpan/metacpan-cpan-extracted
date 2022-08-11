@@ -38,9 +38,9 @@ sub test {
   is($child_exit_status, 0, "Exit status OK");
 }
 
-test(qr(^[1-6]$), qw(rule --table schroeder --rule 1d6 --limit 1));
-test(qr(^[1-6]\n\n---\n\n[1-6]$), qw(rule --table schroeder --rule 1d6 --limit 2));
-test(qr(^[1-6]-[1-6]$), qw(rule --table schroeder --rule 1d6 --limit 2 --separator -));
-test(qr(^[1-6]-in-6$), qw(rule --table schroeder --text [1d6]-in-6 --limit 1));
+test(qr(^[1-6]\s), qw(rule --table schroeder --rule 1d6 --limit 1));
+test(qr(^[1-6]\s+---\s+[1-6]\s), qw(rule --table schroeder --rule 1d6 --limit 2));
+test(qr(^[1-6]-[1-6]\s), qw(rule --table schroeder --rule 1d6 --limit 2 --separator -));
+test(qr(^[1-6]-in-6\s), qw(rule --table schroeder --text [1d6]-in-6 --limit 1));
 
 done_testing;

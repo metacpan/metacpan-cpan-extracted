@@ -1,6 +1,6 @@
 package Pithub::Repos::Hooks;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01037';
+our $VERSION = '0.01039';
 # ABSTRACT: Github v3 Repo Hooks API
 
 use Moo;
@@ -93,7 +93,7 @@ Pithub::Repos::Hooks - Github v3 Repo Hooks API
 
 =head1 VERSION
 
-version 0.01037
+version 0.01039
 
 =head1 METHODS
 

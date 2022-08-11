@@ -103,7 +103,7 @@ Module::Generic::SharedMem - Shared Memory Manipulation
 
 =head1 VERSION
 
-    v0.3.1
+    v0.3.3
 
 =head1 DESCRIPTION
 
@@ -118,7 +118,7 @@ You can check if the system is supported with L</supported>
         # do something
     }
 
-This module only works with reference data, such as array, hash or reference to scalar. Anything that L<Storable::Improved> knows how to L<Storable::Improved/freeze> and L<Storable::Improved/thaw>
+This module only works with reference data, such as array, hash or reference to scalar. Anything that L<CBOR::XS>, L<Sereal>. or L<Storable::Improved> knows how to L<Storable::Improved/freeze> and L<Storable::Improved/thaw>
 
 =head1 DEBUGGING
 
@@ -365,12 +365,17 @@ Get a random key to be used as identifier to create a shared memory.
 
 =head2 read
 
-Read the content of the shared memory and decode the data read using L<JSON>, L<CBOR|CBOR::XS>, L<Sereal> or L<Storable::Improved/thaw> depending on your choice upon either object instantiation or upon using the methods L</json>, L</cbor>, L</sereal> or L</storable>. For example:
+Read the content of the shared memory and decode the data read using L<JSON>, L<CBOR|CBOR::XS>, L<Sereal> or L<Storable::Improved/thaw> depending on your choice of serialiser upon either object instantiation or upon using the methods L</json>, L</cbor>, L</sereal> or L</storable> or even more simply L</serialiser>. For example:
 
     my $s = Module::Generic::SharedMem->new( cbor => 1 ) ||
         die( Module::Generic::SharedMem->error );
     # or
     $s->cbor(1);
+    # or
+    my $s = Module::Generic::SharedMem->new( serialiser => 'cbor' ) ||
+        die( Module::Generic::SharedMem->error );
+
+By default, if no serialiser is specified, it will default to C<storable>.
 
 You can optionally provide a buffer, and a maximum length and it will read that much length and put the shared memory content decoded in that buffer, if it were provided.
 
@@ -481,7 +486,9 @@ Remove the lock, if any. The shared memory must first be opened.
 
 =head2 write
 
-Write the data provided to the shared memory, after having encoded it using L<JSON>, L<CBOR|CBOR::XS>, L<Sereal> or L<Storable::Improved/freeze> depending on your choice. See L</json>, L</cbor>, L</sereal> and L</storable>
+Write the data provided to the shared memory, after having encoded it using L<JSON>, L<CBOR|CBOR::XS>, L<Sereal> or L<Storable::Improved/freeze> depending on your choice of serialiser. See L</json>, L</cbor>, L</sereal> and L</storable>
+
+By default, if no serialiser is specified, it will default to C<storable>.
 
 You can only store in shared memory reference, such as scalar reference, array or hash reference. You could also store module objects, but note that if you choose L<JSON> as a serialiser for your shared data, L<JSON> only supports encoding objects that are based on array or hash. As the L<JSON> documentation states "other blessed references will be converted into null". Thus if you use other reference types, you might want to use L<CBOR|CBOR::XS>, L<Sereal> or L<Storable> instead.
 

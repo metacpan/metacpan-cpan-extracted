@@ -1,5 +1,12 @@
 Revision history for Data-Validate-Sanctions
 
+0.14      2022-08-05 03:02:40+00:00 UTC
+0.13      2022-07-26 13:55:00 CST
+        Improving the search for larger sanction lists
+
+0.12      2019-04-02 00:00:00 CST
+        last_updated will now return the timestamp of the latest list that was updated if no argument is provided
+
 0.11      2018-07-11 14:40:36+08:00 Asia/Manila
         Update cached list only on update any of the lists. Handle network errors.
         Use YAML to store cached lists, to have some metadata. Store this file in `share` by default.

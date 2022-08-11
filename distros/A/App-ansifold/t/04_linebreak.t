@@ -1,5 +1,7 @@
 use v5.14;
 use warnings;
+use utf8;
+use open IO => ':utf8', ':std';
 
 use Data::Dumper;
 use Test::More;
@@ -10,7 +12,7 @@ use t::Util;
 sub folded {
     my @option = @_;
     my $fold = ansifold(@option, "t/04_linebreak.txt");
-    $fold->{stdout} =~ s/\n$//r;
+    $fold->run->{stdout} =~ s/\n$//r;
 }
 
 my @option;

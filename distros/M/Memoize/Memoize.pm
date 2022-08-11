@@ -10,11 +10,7 @@
 use strict; use warnings;
 
 package Memoize;
-our $VERSION = '1.09';
-
-# Compile-time constants
-sub SCALAR () { 0 } 
-sub LIST () { 1 } 
+our $VERSION = '1.10';
 
 use Carp;
 use Exporter;
@@ -84,14 +80,8 @@ sub memoize {
   my %caches;
   for my $context (qw(SCALAR LIST)) {
     # suppress subsequent 'uninitialized value' warnings
-    $options{"${context}_CACHE"} ||= ''; 
-
-    my $cache_opt = $options{"${context}_CACHE"};
-    my @cache_opt_args;
-    if (ref $cache_opt) {
-      @cache_opt_args = @$cache_opt;
-      $cache_opt = shift @cache_opt_args;
-    }
+    my $fullopt = $options{"${context}_CACHE"} ||= '';
+    my ($cache_opt, @cache_opt_args) = ref $fullopt ? @$fullopt : $fullopt;
     if ($cache_opt eq 'FAULT') { # no cache
       $caches{$context} = undef;
     } elsif ($cache_opt eq 'HASH') { # user-supplied hash
@@ -153,13 +143,12 @@ sub _my_tie {
   my ($context, $hash, $fullopt) = @_;
 
   # We already checked to make sure that this works.
-  my ($shortopt, @args) = ref $fullopt ? @$fullopt : $fullopt;
+  my ($shortopt, $module, @args) = ref $fullopt ? @$fullopt : $fullopt;
 
   return unless defined $shortopt && $shortopt eq 'TIE';
   carp("TIE option to memoize() is deprecated; use HASH instead")
       if warnings::enabled('all');
 
-  my $module = shift @args;
   if ($context eq 'LIST' && $scalar_only{$module}) {
     croak("You can't use $module for LIST_CACHE because it can only store scalars");
   }
@@ -193,33 +182,34 @@ sub flush_cache {
 # This is the function that manages the memo tables.
 sub _memoizer {
   my $info = shift;
+
   my $normalizer = $info->{N};
-
-  my $argstr;
-  my $context = (wantarray() ? LIST : SCALAR);
-
-  if (defined $normalizer) { 
-    no strict;
-    if ($context == SCALAR) {
-      $argstr = &{$normalizer}(@_);
-    } elsif ($context == LIST) {
-      ($argstr) = &{$normalizer}(@_);
-    } else {
-      croak "Internal error \#41; context was neither LIST nor SCALAR\n";
-    }
-  } else {                      # Default normalizer
+  my $argstr = do {
     no warnings 'uninitialized';
-    $argstr = join chr(28),@_;  
-  }
+    defined $normalizer
+      ? ( wantarray ? ( &$normalizer )[0] : &$normalizer )
+        . '' # coerce undef to string while the warning is off
+      : join chr(28), @_;
+  };
 
-  if ($context == SCALAR) {
+  if (wantarray) {
+    my $cache = $info->{L};
+    _crap_out($info->{NAME}, 'list') unless $cache;
+    if (exists $cache->{$argstr}) {
+      return @{$cache->{$argstr}};
+    } else {
+      my @q = &{$info->{U}};
+      $cache->{$argstr} = \@q;
+      @q;
+    }
+  } else {
     my $cache = $info->{S};
     _crap_out($info->{NAME}, 'scalar') unless $cache;
     if (exists $cache->{$argstr}) { 
       return $info->{MERGED}
         ? $cache->{$argstr}[0] : $cache->{$argstr};
     } else {
-      my $val = &{$info->{U}}(@_);
+      my $val = &{$info->{U}};
       # Scalars are considered to be lists; store appropriately
       if ($info->{MERGED}) {
 	$cache->{$argstr} = [$val];
@@ -228,18 +218,6 @@ sub _memoizer {
       }
       $val;
     }
-  } elsif ($context == LIST) {
-    my $cache = $info->{L};
-    _crap_out($info->{NAME}, 'list') unless $cache;
-    if (exists $cache->{$argstr}) {
-      return @{$cache->{$argstr}};
-    } else {
-      my @q = &{$info->{U}}(@_);
-      $cache->{$argstr} = \@q;
-      @q;
-    }
-  } else {
-    croak "Internal error \#42; context was neither LIST nor SCALAR\n";
   }
 }
 

@@ -3,7 +3,7 @@ package mb;
 # You are welcome! MOJIBAKE-san, you are our friend forever!!
 ######################################################################
 #
-# mb - Can easy script in Big5, Big5-HKSCS, GBK, Sjis, UHC, UTF-8, ...
+# mb - Can easy script in Big5, Big5-HKSCS, GBK, Sjis(also CP932), UHC, UTF-8, ...
 #
 # https://metacpan.org/release/mb
 #
@@ -13,7 +13,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.45';
+$VERSION = '0.46';
 $VERSION = $VERSION;
 
 # internal use
@@ -125,6 +125,7 @@ perl mb.pm -e eucjp     script_by_eucjp.pl
 perl mb.pm -e gb18030   script_by_gb18030.pl
 perl mb.pm -e gbk       script_by_gbk.pl
 perl mb.pm -e sjis      script_by_sjis.pl
+perl mb.pm -e sjis      script_by_cp932.pl
 perl mb.pm -e uhc       script_by_uhc.pl
 perl mb.pm -e utf8      script_by_utf8.pl
 perl mb.pm -e wtf8      script_by_wtf8.pl
@@ -5269,7 +5270,7 @@ __END__
 
 =head1 NAME
 
-mb - Can easy script in Big5, Big5-HKSCS, GBK, Sjis, UHC, UTF-8, ...
+mb - Can easy script in Big5, Big5-HKSCS, GBK, Sjis(also CP932), UHC, UTF-8, ...
 
 =head1 SYNOPSIS
 
@@ -5280,6 +5281,7 @@ mb - Can easy script in Big5, Big5-HKSCS, GBK, Sjis, UHC, UTF-8, ...
   $ perl mb.pm -e gb18030   script_by_gb18030.pl
   $ perl mb.pm -e gbk       script_by_gbk.pl
   $ perl mb.pm -e sjis      script_by_sjis.pl
+  $ perl mb.pm -e sjis      script_by_cp932.pl
   $ perl mb.pm -e uhc       script_by_uhc.pl
   $ perl mb.pm -e utf8      script_by_utf8.pl
   $ perl mb.pm -e wtf8      script_by_wtf8.pl
@@ -5320,7 +5322,7 @@ mb - Can easy script in Big5, Big5-HKSCS, GBK, Sjis, UHC, UTF-8, ...
     $mb::ORIG_PROGRAM_NAME
 
   supported encodings:
-    Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis, UHC, UTF-8, WTF-8
+    Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis(also CP932), UHC, UTF-8, WTF-8
 
   supported operating systems:
     Apple Inc. OS X,
@@ -5353,16 +5355,13 @@ To install this software without make, type the following:
 
 This software is a source code filter, a transpiler-modulino.
 
-Perl is said to have been able to handle Unicode since version 5.8. However,
-unlike JPerl, "Easy jobs easy" has been lost. (but we have got it again :-D)
+Perl is said to have been able to handle Unicode since version 5.8.
+However, unlike JPerl, "Easy jobs must be easy" has been lost.
 
-In Shift_JIS and similar encodings(Big5, Big5-HKSCS, GB18030, GBK, Sjis, UHC)
-have any DAMEMOJI who have metacharacters at second octet. Which characters
-are DAMEMOJI is depends on whether the enclosing delimiter is single quote or
-double quote.
+In Shift_JIS and similar encodings(Big5, Big5-HKSCS, GB18030, GBK, Sjis, CP932) have any DAMEMOJI who have metacharacters at second octet.
+Which characters are DAMEMOJI is depends on whether the enclosing delimiter is single quote or double quote.
 
-This software escapes DAMEMOJI in your script, generate a new script and
-run it.
+This software escapes DAMEMOJI in your script, generate a new script and run it.
 
 There are some MBCS encodings in the world.
 
@@ -5380,8 +5379,8 @@ There are some MBCS encodings in the world.
 
 =back
 
-Even if you are an avid Unicode proponent, you cannot change this fact. These
-encodings are still used today in most areas except the world wide web.
+These encodings are still used today in most areas except the world wide web.
+Even if you are an avid Unicode proponent, you cannot change this fact.
 
 This software does ...
 
@@ -5389,7 +5388,7 @@ This software does ...
 
 =item * supports MBCS literals of Perl scripts
 
-=item * supports Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis, UHC, UTF-8, and WTF-8
+=item * supports Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis(also CP932), UHC, UTF-8, and WTF-8
 
 =item * does not use the UTF8 flag to avoid MOJIBAKE
 
@@ -5413,8 +5412,6 @@ This software does ...
 
 =back
 
-Let's enjoy MBSC scripting in Perl!!
-
 =head1 Larry Wall san's Style
 
 If you're using the utf8 pragma and you have a big headache, probably, you're on the wrong way.
@@ -5423,7 +5420,7 @@ You should back to the Larry Street where is a sign that says ver.5.00503, once.
 There is another path there. Follow that path.
 Soon, your headache will be improve.
 
-The "length()" described in the script universally functions as "bytes::length()", and the "substr()" in the script universally functions as "bytes::substr()".
+The "length()" described in the script always functions as "bytes::length()", and the "substr()" in the script always functions as "bytes::substr()".
 If you want to know the number of code points of multibyte characters contained in a scalar value, you have to write "mb::length()".
 If you want to execute "substr()" in code point context, you have to write "mb::substr()".
 
@@ -5436,8 +5433,7 @@ Welcome to world of Larry Wall san's Style!!
 =head1 TERMINOLOGY
 
 To understand and use this software, you must know some terminologies.
-But now I have no time for write them. So today is July 7th, I have to go to
-meet Juliet.
+But now I have no time for write them. So today is July 7th, I have to go to meet Juliet.
 The necessary terms are listed below. Maybe world wide web will help you.
 
 =over 2
@@ -5478,8 +5474,7 @@ The necessary terms are listed below. Maybe world wide web will help you.
 
 =head1 MBCS Encodings supported by this software
 
-The encodings supported by this software and their range of octets are as
-follows.
+The encodings supported by this software and their range of octets are as follows.
 
   ------------------------------------------------------------------------------
   big5 (Big5)
@@ -5568,7 +5563,7 @@ follows.
                [|](7C) 亅(817C) 倈(827C) 億(837C) 剕(847C) 厊(857C) 唡(867C) 噟(877C) 坾(887C) 墊(897C) 妡(8A7C) 媩(8B7C) 寍(8C7C) 峾(8D7C) 巪(8E7C) 弢(8F7C) 恷(907C) 憒(917C) 抾(927C) 搢(937C) 攟(947C) 晐(957C) 東(967C) 梶(977C) 榺(987C) 檤(997C) 殀(9A7C) 泑(9B7C) 渱(9C7C) 潀(9D7C) 瀨(9E7C) 焲(9F7C) 爘(A07C) ▅ (A87C) ﹟(A97C) 獆(AA7C) 珅(AB7C) 瑋(AC7C) 瓅(AD7C) 畖(AE7C) 瘄(AF7C) 皘(B07C) 眧(B17C) 瞸(B27C) 硘(B37C) 磡(B47C) 祙(B57C) 秥(B67C) 穦(B77C) 竱(B87C) 箌(B97C) 簗(BA7C) 粅(BB7C) 紎(BC7C) 絴(BD7C) 緗(BE7C) 縷(BF7C) 纜(C07C) 羭(C17C) 聕(C27C) 脇(C37C) 膢(C47C) 舼(C57C) 苵(C67C) 莬(C77C) 葇(C87C) 蓔(C97C) 蕓(CA7C) 藎(CB7C) 蘾(CC7C) 蛗(CD7C) 蝲(CE7C) 蟶(CF7C) 衸(D07C) 褆(D17C) 襹(D27C) 觸(D37C) 詜(D47C) 諀(D57C) 謡(D67C) 讄(D77C) 貄(D87C) 質(D97C) 趞(DA7C) 踻(DB7C) 軀(DC7C) 輡(DD7C) 迀(DE7C) 遼(DF7C) 鄚(E07C) 醸(E17C) 鈢(E27C) 銃(E37C) 鋦(E47C) 鍇(E57C) 鎩(E67C) 鐋(E77C) 鑭(E87C) 閨(E97C) 陓(EA7C) 雦(EB7C) 靯(EC7C) 韡(ED7C) 顋(EE7C) 飢(EF7C) 饇(F07C) 駖(F17C) 騶(F27C) 髚(F37C) 魘(F47C) 鮸(F57C) 鰘(F67C) 鱸(F77C) 鴟(F87C) 鵿(F97C) 鷟(FA7C) 鹼(FB7C) 鼃(FC7C) 齶(FD7C) 
                [}](7D) 亇(817D) 倉(827D) 儅(837D) 剗(847D) 厎(857D) 唥(867D) 噠(877D) 坿(887D) 墋(897D) 妢(8A7D) 媫(8B7D) 寎(8C7D) 峿(8D7D) 巬(8E7D) 弣(8F7D) 恾(907D) 憓(917D) 拀(927D) 搣(937D) 攠(947D) 晑(957D) 杴(967D) 梷(977D) 榼(987D) 檥(997D) 殅(9A7D) 泒(9B7D) 渳(9C7D) 潁(9D7D) 瀩(9E7D) 焳(9F7D) 爙(A07D) ▆ (A87D) ﹠(A97D) 獇(AA7D) 珆(AB7D) 瑌(AC7D) 瓆(AD7D) 畗(AE7D) 瘆(AF7D) 皚(B07D) 眪(B17D) 瞹(B27D) 硙(B37D) 磢(B47D) 祡(B57D) 秨(B67D) 穧(B77D) 竲(B87D) 箎(B97D) 簘(BA7D) 粆(BB7D) 紏(BC7D) 絵(BD7D) 緘(BE7D) 縸(BF7D) 纝(C07D) 羮(C17D) 聖(C27D) 脈(C37D) 膤(C47D) 舽(C57D) 苶(C67D) 莭(C77D) 葈(C87D) 蓕(C97D) 蕔(CA7D) 藑(CB7D) 蘿(CC7D) 蛚(CD7D) 蝳(CE7D) 蟷(CF7D) 衹(D07D) 複(D17D) 襺(D27D) 觹(D37D) 詝(D47D) 諁(D57D) 謢(D67D) 讅(D77D) 貆(D87D) 賫(D97D) 趠(DA7D) 踼(DB7D) 軁(DC7D) 輢(DD7D) 迃(DE7D) 遾(DF7D) 鄛(E07D) 醹(E17D) 鈣(E27D) 銄(E37D) 鋧(E47D) 鍈(E57D) 鎪(E67D) 鐌(E77D) 鑮(E87D) 閩(E97D) 陖(EA7D) 雧(EB7D) 靰(EC7D) 韢(ED7D) 題(EE7D) 飣(EF7D) 饈(F07D) 駗(F17D) 騷(F27D) 髛(F37D) 魙(F47D) 鮹(F57D) 鰙(F67D) 鱹(F77D) 鴠(F87D) 鶀(F97D) 鷠(FA7D) 鹽(FB7D) 鼄(FC7D) 齷(FD7D) 
   ------------------------------------------------------------------------------
-  sjis (Shift_JIS-like encodings)
+  sjis (Shift_JIS-like encodings, ex. cp932)
              1st       2nd
              81..9F    00..FF
              E0..FC    00..FF
@@ -5633,11 +5628,11 @@ follows.
 
 =head1 MBCS subroutines provided by this software
 
-This software provides traditional feature "as was." The new MBCS features
-are provided by subroutines with new names. If you like utf8 pragma, mb::*
-subroutines will help you. On other hand, If you love JPerl, those
-subroutines will not help you very much. Traditional functions of Perl are
-useful still now in octet-oriented semantics.
+This software provides traditional feature "as was."
+The new MBCS features are provided by subroutines with new names.
+If you like utf8 pragma, mb::* subroutines will help you.
+On other hand, If you love JPerl, those subroutines will not help you very much.
+Traditional functions of Perl are useful still now in octet-oriented semantics.
 
   elder <--                            age                              --> younger
   ---------------------------------------------------------------------------------
@@ -5648,15 +5643,15 @@ useful still now in octet-oriented semantics.
   chr                chr                bytes::chr         chr
   getc               getc               ---                getc
   index              ---                bytes::index       index
-  lc                 ---                ---                CORE::lc
-  lcfirst            ---                ---                CORE::lcfirst
+  lc                 ---                ---                CORE::lc (works as tr/\x41-\x5A/\x61-\x7A/)
+  lcfirst            ---                ---                CORE::lcfirst (works as tr/\x41-\x5A/\x61-\x7A/)
   length             length             bytes::length      length
   ord                ord                bytes::ord         ord
   reverse            reverse            ---                reverse
   rindex             ---                bytes::rindex      rindex
   substr             substr             bytes::substr      substr
-  uc                 ---                ---                CORE::uc
-  ucfirst            ---                ---                CORE::ucfirst
+  uc                 ---                ---                CORE::uc (works as tr/\x61-\x7A/\x41-\x5A/)
+  ucfirst            ---                ---                CORE::ucfirst (works as tr/\x61-\x7A/\x41-\x5A/)
   ---                chop               chop               mb::chop
   ---                ---                chr                mb::chr
   ---                ---                getc               mb::getc
@@ -5672,10 +5667,10 @@ useful still now in octet-oriented semantics.
   ---                ---                substr             mb::substr
   ---                uc                 ---                uc (by internal mb::uc)
   ---                ucfirst            ---                ucfirst (by internal mb::ucfirst)
-  ---                ---                lc                 ---
-  ---                ---                lcfirst            ---
-  ---                ---                uc                 ---
-  ---                ---                ucfirst            ---
+  ---                ---                lc                 (mb::Casing::lc)
+  ---                ---                lcfirst            (mb::Casing::lcfirst)
+  ---                ---                uc                 (mb::Casing::uc)
+  ---                ---                ucfirst            (mb::Casing::ucfirst)
   ---------------------------------------------------------------------------------
   do 'file'          ---                ---                do 'file'
   eval 'string'      ---                ---                eval 'string'
@@ -5716,17 +5711,18 @@ index brothers
   mb::rindex_byte         codepoint       octet           useful, JPerl like
   ------------------------------------------------------------------------------------------
 
-The most useful of the above are mb::index_byte() and mb::rindex_byte(), but it's
-more convenient to use regular expressions than those.
+The most useful of the above are mb::index_byte() and mb::rindex_byte(), but it's more convenient to use regular expressions than those.
 So you can forget about these subroutines.
 
 =head1 MBCS special variables provided by this software
 
-This software provides the following two special variables for convenience
+This software provides the following two special variables to easy to use
 
 =over 2
 
 =item * $mb::PERL
+
+$^X means perl interpreter of MBCS version
 
   system(qq{ $^X perl_script.pl });              # had been write this...
   
@@ -5735,6 +5731,8 @@ This software provides the following two special variables for convenience
   system(qq{ $mb::PERL MBCS_perl_script.pl });   # for MBCS script
 
 =item * $mb::ORIG_PROGRAM_NAME
+
+$mb::ORIG_PROGRAM_NAME means $0 before transpiled it
 
   if ($0 =~ /-x64\.pl\z/) { ... }                # had been write this...
   
@@ -5754,7 +5752,7 @@ Running an US-ASCII script using mb.pm allows you to treat multibyte code points
 =head2 On other hand, if you want to write octet-oriented scripts from now on, or port existing octet-oriented scripts to mb.pm
 
 There are only a few places that need to be rewritten.
-If you want to execute "lc()", "lcfirst()", "uc()", and "ucfirst()" on octet-oriented data, you have to write "CORE::lc()", "CORE::lcfirst()", "CORE::uc()", and "CORE::ucfirst()" in your script.
+If you want to execute "lc()", "lcfirst()", "uc()", and "ucfirst()" on octet-oriented data, you have to write this -- "CORE::lc()", "CORE::lcfirst()", "CORE::uc()", and "CORE::ucfirst()".
 
   -----------------------------------------------------------------
   original script in        script with
@@ -5776,7 +5774,7 @@ If you want to execute "lc()", "lcfirst()", "uc()", and "ucfirst()" on octet-ori
 
 There are only a few places that need to be rewritten.
 If you write the functionality of "index()" and "rindex()" in regular expressions, the only difference left is "chop()".
-As "chop()" in JPerl script, you need to write "mb::chop()" when mb.pm modulino environment.
+If you want "chop()" that like JPerl, you need to write "mb::chop()" when mb.pm environment.
 
   -----------------------------------------------------------------
   original script in        script with
@@ -5795,7 +5793,7 @@ As "chop()" in JPerl script, you need to write "mb::chop()" when mb.pm modulino 
   use Module ()             mb::use Module ()
   -----------------------------------------------------------------
 
-However substantially ...
+However substantially is ...
 
   -----------------------------------------------------------------
   original script in        script with
@@ -5805,14 +5803,13 @@ However substantially ...
   index                     (already written in regular expression)
   rindex                    (already written in regular expression)
   -----------------------------------------------------------------
-  These functions are not compatible with JPerl.
-  We are glad if you like these specification.
 
 Substantially put, JPerl users can write programs the same way they used to.
 
 =head1 Porting from script with utf8 pragma
 
-If you want to port existing scripts that has utf8 pragma to mb.pm
+=head2 If you want to port existing scripts that has utf8 pragma to mb.pm
+
 Like traditional style, Perl's built-in functions without package names provide octet-oriented functionality.
 Thus, "length()" and "substr()" work on an octet basis, universally.
 When you need multibyte functionally, you need to use subroutines in the "mb" package, on every time.
@@ -5846,9 +5843,7 @@ When you need multibyte functionally, you need to use subroutines in the "mb" pa
 
 =head1 What are DAMEMOJI?
 
-In single quote, DAMEMOJI are double-byte characters that include the
-following metacharacters ('', q{}, <<'END', qw{}, m'', s''', split(''),
-split(m''), and qr'')
+In single quote, DAMEMOJI are double-byte characters that include the following metacharacters ('', q{}, <<'END', qw{}, m'', s''', split(''), split(m''), and qr'')
 
   ------------------------------------------------------------------
   hex   character as US-ASCII
@@ -5856,9 +5851,7 @@ split(m''), and qr'')
   5C    [\]    backslashed escapes
   ------------------------------------------------------------------
 
-In double quote, DAMEMOJI are double-byte characters that include the
-following metacharacters ("", qq{}, <<END, <<"END", ``, qx{}, <<`END`, //,
-m//, ??, s///, split(//), split(m//), and qr//)
+In double quote, DAMEMOJI are double-byte characters that include the following metacharacters ("", qq{}, <<END, <<"END", ``, qx{}, <<`END`, //, m//, ??, s///, split(//), split(m//), and qr//)
 
   ------------------------------------------------------------------
   hex   character as US-ASCII
@@ -6016,7 +6009,7 @@ in script "script.oo.pl",
 
 then mb.pm executes "script.oo.pl"
 
-in perl's memory,
+in perl interpreter memory,
 
     -----------------------------------------
     encoding     memory        hex dump
@@ -6074,8 +6067,11 @@ in perl's memory,
 
 =head1 MBCS character casing
 
-lc("A") makes halfwidth-"a", however lc("乙") makes "乙" not "兀", moreover lc("Ａ") makes "Ａ" not fullwidth-"ａ".
-Like JPerl, for easy to use, "lc()" and "uc()" do not work for MBCS encoding that is not US-ASCII.
+(The automatic translation of this part may be not correct.
+Please refer to the original text.)
+
+In mb.pm environment, lc("(halfwidth)A") makes "(halfwidth)a", however lc("乙") keeps "乙", not "兀", moreover lc("(fullwidth)Ａ") keeps "(fullwidth)Ａ", not "(fullwidth)ａ".
+For easy to use like JPerl, "lc()" and "uc()" do not work for MBCS encoding that is not US-ASCII.
 
 "DBCS," "ZENKAKU(full-width) characters," and "KANJI" are often intentionally misused as having the same meaning.
 In other words, full-width alphabetic characters are treated as KANJI.
@@ -6109,8 +6105,7 @@ In that case, it is desirable that those characters are not converted by lc() an
 
 =head1 What transpiles to what by this software?
 
-This software automatically transpiles MBCS literal strings in scripts to
-octet-oriented strings(OO-quotee)
+This software automatically transpiles MBCS literal strings in scripts to octet-oriented strings(OO-quotee)
 
   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   in your script                             script transpiled by this software
@@ -6325,10 +6320,8 @@ octet-oriented strings(OO-quotee)
   v1234                                      mb::chr(1234)
   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-The transpile-list below is primarily for Microsoft Windows, but it also
-applies when run on other operating systems to ensure commonality. Even if
-Perl 5.00503, you can stack file test operators, -r -w -f $file works as
--f $file && -w _ && -r _.
+The transpile-list below is primarily for Microsoft Windows, but it also applies when run on other operating systems to ensure commonality.
+Even if Perl 5.00503, you can stack file test operators, -r -w -f $file works as -f $file && -w _ && -r _.
 
   -----------------------------------------------------------------------------
   in your script                             script transpiled by this software
@@ -6523,8 +6516,7 @@ Perl 5.00503, you can stack file test operators, -r -w -f $file works as
   -z qq{file}                                mb::_filetest [qw( -z  )], qq{file}
   -----------------------------------------------------------------------------
 
-Each elements in strings or regular expressions that are double-quote like are
-transpiled as follows
+Each elements in strings or regular expressions that are double-quote like are transpiled as follows
 
   -----------------------------------------------------------------------------------------------
   in your script                             script transpiled by this software
@@ -6541,6 +6533,9 @@ transpiled as follows
   -----------------------------------------------------------------------------------------------
 
 Each elements in regular expressions are transpiled as follows
+
+See:
+P.1023 Multiple-Byte Anchoring in Appendix W Perl Code Examples of ISBN 1-56592-224-7 CJKV Information Processing
 
   on every encodings
   ----------------------------------------------------------------------------------------------------------------------
@@ -6591,7 +6586,7 @@ Each elements in regular expressions are transpiled as follows
   qr/[[:^word:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^word:]])]})/ ]}@{[mb::_m_passed()]}}
   qr/[[:^xdigit:]]/                          qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^xdigit:]])]})/ ]}@{[mb::_m_passed()]}}
   ----------------------------------------------------------------------------------------------------------------------
-  
+
   on big5 encoding
   ----------------------------------------------------------------------------------------------------------------------
   in your script                             script transpiled by this software
@@ -7044,8 +7039,8 @@ Each elements in regular expressions are transpiled as follows
 
 =head1 Command-line Wildcard Expansion on Microsoft Windows
 
-cmd.exe that is default command shell of Microsoft Windows doesn't expand
-wildcard arguments supplied onto command line. But this software helps it.
+cmd.exe that is default command shell of Microsoft Windows doesn't expand wildcard arguments supplied onto command line.
+But this software helps it.
 
   # @ARGV wildcard globbing
   if ($OSNAME =~ /MSWin32/) {
@@ -7082,8 +7077,8 @@ wildcard arguments supplied onto command line. But this software helps it.
 
 =head1 DEPENDENCIES
 
-This mb.pm modulino requires perl5.00503 or later to use. Also requires 'strict'
-module. It requires the 'warnings' module, too if perl 5.6 or later.
+This mb.pm modulino requires perl5.00503 or later to use. Also requires 'strict' module.
+It requires the 'warnings' module, too if perl 5.6 or later.
 
 =head1 Fatal Bugs Unavoidable
 
@@ -7118,9 +7113,7 @@ This is a lost technology in this century.
 
 =item * Limitation of Regular Expression
 
-This software has limitation from \G in multibyte anchoring. Only perl 5.30.0 or
-later can treat the codepoint string which exceeds 65534 octets with a regular
-expression, and only perl 5.10.1 or later can 32766 octets.
+This software has limitation from \G in multibyte anchoring. Only perl 5.30.0 or later can treat the codepoint string which exceeds 65534 octets with a regular expression, and only perl 5.10.1 or later can 32766 octets.
 
   see also,
   
@@ -7139,8 +7132,8 @@ expression, and only perl 5.10.1 or later can 32766 octets.
   perlre length limit
   http://stackoverflow.com/questions/4592467/perlre-length-limit
 
-Everything in this world has limits. If you use perl 5.10 or later, or perl 5.30
-or later, you can increase those limits. That's better way.
+Everything in this world has limits. If you use perl 5.10 or later, or perl 5.30 or later, you can increase those limits.
+That's better way.
 
 =back
 
@@ -7152,8 +7145,8 @@ You can avoid the following bugs with little hacks.
 
 =item * Special Variables $` and $& need m/( Capture All )/
 
-If you use the special variables $ ` or $&, you must enclose the entire regular
-expression in parentheses. Because $` and $& needs $1 to implement its.
+If you use the special variables $ ` or $&, you must enclose the entire regular expression in parentheses.
+Because $` and $& needs $1 to implement its.
 
   ----------------------------------------------------------------------------------------------------------------------
   in your script      after m//, works as                         after s///, works as
@@ -7168,8 +7161,8 @@ expression in parentheses. Because $` and $& needs $1 to implement its.
   ${^MATCH}           $1                                          CORE::substr($&, CORE::length($1))
   ----------------------------------------------------------------------------------------------------------------------
 
-In the past, Perl scripts with special variables $` and $& had a problem with
-slow execution. Both that era and today, capturing by parentheses works well.
+In the past, Perl scripts with special variables $` and $& had a problem with slow execution.
+Both that era and today, capturing by parentheses works well.
 
 =item * Return Value from tr///s
 
@@ -7216,9 +7209,8 @@ value, you can use mb::tr().
 
 =item * mb::substr as Lvalue
 
-If perl version is older than 5.14, mb::substr differs from CORE::substr, and
-cannot be used as an lvalue. To change part of a string, you need use the optional
-fourth argument which is the replacement string.
+If perl version is older than 5.14, mb::substr differs from CORE::substr, and cannot be used as an lvalue.
+To change part of a string, you need use the optional fourth argument which is the replacement string.
 
 mb::substr($string, 13, 4, "JPerl");
 
@@ -7228,22 +7220,19 @@ If you use perl 5.14 or later, you can use lvalue feature.
 
 =head1 Not Supported Features (Tell us Good Idea)
 
-Unfortunately, we couldn't make following features. Could you tell us someone
-who know better idea?
+Unfortunately, we couldn't make following features. Could you tell us better idea?
 
 =over 2
 
 =item * Cloister of Regular Expression
 
-The cloister (?i) and (?i:...) of a regular expression on encoding of big5,
-big5hkscs, gb18030, gbk, sjis, and uhc will not be implemented for the time being.
-I didn't implement this feature because it was difficult to implement and less
-necessary. If you're interested in this issue, try challenge it.
+The cloister (?i) and (?i:...) of a regular expression on encoding of big5, big5hkscs, gb18030, gbk, sjis, and uhc will not be implemented for the time being.
+I didn't implement this feature because it was difficult to implement and less necessary.
+If you're interested in this issue, try challenge it.
 
 =item * Look-behind Assertion
 
-The look-behind assertion like (?<=[A-Z]) or (?<![A-Z]) are not prevented from
-matching trail octet of the previous MBCS codepoint.
+The look-behind assertion like (?<=[A-Z]) or (?<![A-Z]) are not prevented from matching trail octet of the previous MBCS codepoint.
 
 =back
 
@@ -7256,8 +7245,7 @@ There are no plans to implement it in the future, too.
 
 =item * Delimiter of String and Regexp
 
-qq//, q//, qw//, qx//, qr//, m//, s///, tr///, and y/// can't use a wide codepoint
-as the delimiter.
+qq//, q//, qw//, qx//, qr//, m//, s///, tr///, and y/// can't use a wide codepoint as the delimiter.
 I didn't implement this feature because it's rarely needed.
 
 =item * fc(), lc(), lcfirst(), uc(), and ucfirst()
@@ -7279,21 +7267,18 @@ Supported ranges of tr/// and y/// by hyphen are US-ASCII only.
 =item * Modifier /a /d /l and /u of Regular Expression
 
 I have removed these modifiers to remove your headache.
-The concept of this software is not to use two or more encoding methods as
-literal string and literal of regexp in one Perl script. Therefore, modifier
-/a, /d, /l, and /u are not supported.
-\d means [0-9] universally.
+The concept of this software is not to use two or more encoding methods as literal string and literal of regexp in one Perl script.
+Therefore, modifier /a, /d, /l, and /u are not supported.
+\d means [0-9] always.
 
 =item * Empty Variable in Regular Expression
 
-An empty literal string as regexp means empty string. Unlike original Perl, if
-'pattern' is an empty string, the last successfully matched regexp is NOT used.
+An empty literal string as regexp means empty string. Unlike original Perl, if 'pattern' is an empty string, the last successfully matched regexp is NOT used.
 Similarly, empty string made by interpolated variable means empty string, too.
 
 =item * Named Codepoint
 
-A named codepoint, such \N{GREEK SMALL LETTER EPSILON}, \N{greek:epsilon}, or
-\N{epsilon} is not supported.
+A named codepoint, such \N{GREEK SMALL LETTER EPSILON}, \N{greek:epsilon}, or \N{epsilon} is not supported.
 
   # suggested module name
   use mb::Charnames qw( %N ); # supports for all MBCS, including UTF-8
@@ -7304,8 +7289,7 @@ A named codepoint, such \N{GREEK SMALL LETTER EPSILON}, \N{greek:epsilon}, or
 =item * Unicode Properties (aka Codepoint Properties) of Regular Expression
 
 Unicode properties (aka codepoint properties) of regexp are not available.
-Also (?[]) in regexp of perl 5.18 is not available. There is no plans to currently
-support these.
+Also (?[]) in regexp of perl 5.18 is not available. There is no plans to currently support these.
 
   # suggested module name
   use mb::RegExp::Properties qw( %p %P ); # supports for all MBCS, including UTF-8
@@ -7339,16 +7323,15 @@ This feature (\b{...} and \B{...}) considered not yet stable in the Perl specifi
 
 =item * ?? and m?? are Not Supported
 
-Multibyte character needs ( ) which is before {n,m}, {n,}, {n}, *, and + in ?? or
-m??. As a result, you need to rewrite a script about $1,$2,$3,... You cannot use
-(?: ), ?, {n,m}?, {n,}?, and {n}? in ?? and m??, because delimiter of m?? is '?'.
+Multibyte character needs ( ) which is before {n,m}, {n,}, {n}, *, and + in ?? or m??.
+As a result, you need to rewrite a script about $1,$2,$3,... You cannot use (?: ), ?, {n,m}?, {n,}?, and {n}? in ?? and m??, because delimiter of m?? is '?'.
 Here's a quote words from Dan Kogai-san.
 "(I'm just a programmer,) so I can't fix the bug of the spec."
 
 =item * format
 
-Unlike JPerl, mb.pm modulino does not support the format feature. Because it is
-difficult to implement and you can write the same script in other any ways.
+Unlike JPerl, mb.pm modulino does not support the format feature.
+Because it is difficult to implement and you can write the same script in other any ways.
 
 =back
 
@@ -7359,18 +7342,16 @@ Maybe Larry Wall-san think that "escaping" is the best solution in this case.
 P.401 See chapter 15: Unicode
 of ISBN 0-596-00027-8 Programming Perl Third Edition.
 
-Before the introduction of Unicode support in perl, The eq operator
-just compared the byte-strings represented by two scalars. Beginning
-with perl 5.8, eq compares two byte-strings with simultaneous
-consideration of the UTF8 flag.
+Before the introduction of Unicode support in perl, The eq operator just compared the byte-strings represented by two scalars.
+Beginning with perl 5.8, eq compares two byte-strings with simultaneous consideration of the UTF8 flag.
 
 -- we have been taught so for a long time.
 
-Perl is a powerful language for everyone, but UTF8 flag is a barrier
-for common beginners. Because everyone can only one task on one time.
-So calling Encode::encode() and Encode::decode() in application program
-is not better way. Making two scripts for information processing and
-encoding conversion may be better. Please trust me.
+Perl is a powerful language for everyone, but UTF8 flag is a barrier for common beginners.
+Calling Encode::encode() and Encode::decode() in application program is not good way.
+Making one script for information processing, and other one for encoding conversion are better.
+
+"That's a small bit for someone, but the giant  bug on the Perl for mankind."
 
  /*
   * You are not expected to understand this.
@@ -7388,8 +7369,7 @@ encoding conversion may be better. Please trust me.
     +--------------------------------------------+
     http://perl-users.jp/articles/advent-calendar/2010/casual/4
 
-  Confusion of Perl string model is made from double meanings of
-  "Binary string."
+  Confusion of Perl string model is made from double meanings of "Binary string."
   Meanings of "Binary string" are
   1. Non-Text string
   2. Digital octet string
@@ -7407,14 +7387,11 @@ encoding conversion may be better. Please trust me.
     |            Digital octet string            |
     +--------------------------------------------+
 
-There are people who don't agree to change in the character string
-processing model at Perl 5.8. It is impossible to get agreement it
-from majority of Perl programmers who are not heavy users.
-How to solve it by returning to an original Perl, let's read page
-402 of the Programming Perl, 3rd edition, again.
+It is impossible to get agreement changing in the character string processing model at Perl 5.8 from majority of Perl programmers.
 
-Information processing model beginning with perl3 or this software
-of UNIX/C-ism.
+Information processing model of UNIX/C-ism, 
+Information processing model of perl3 or later, and
+Information processing model of this software.
 
     +--------------------------------------------+
     |    Text string as Digital octet string     |
@@ -7459,21 +7436,17 @@ Ideally, We'd like to achieve these five Goals:
 
 =item * Goal #1:
 
-Old byte-oriented programs should not spontaneously break on the old
-byte-oriented data they used to work on.
+Old byte-oriented programs should not spontaneously break on the old byte-oriented data they used to work on.
 
-This software attempts to achieve this goal by embedded functions work as
-traditional and stably.
+This software attempts to achieve this goal by embedded functions work as traditional and stably.
 
 =item * Goal #2:
 
-Old byte-oriented programs should magically start working on the new
-character-oriented data when appropriate.
+Old byte-oriented programs should magically start working on the new character-oriented data when appropriate.
 
 This software is not a magician, so cannot see your mind and run it.
 
-You must decide and write octet semantics or codepoint semantics yourself
-in case by case.
+You must decide and write octet semantics or codepoint semantics yourself in case by case.
 
 figure of Goal #1 and Goal #2.
 
@@ -7489,8 +7462,7 @@ figure of Goal #1 and Goal #2.
       Old --- Old byte-oriented
       New --- New codepoint-oriented
 
-There is a combination from (a) to (e) in data, script, and interpreter
-of old and new. Let's add JPerl, utf8 pragma, and this software.
+There is a combination from (a) to (e) in data, script, and interpreter of old and new. Let's add JPerl, utf8 pragma, and this software.
 
                         (a)     (b)     (c)     (d)     (e)
                                       JPerl,mb        utf8
@@ -7504,40 +7476,33 @@ of old and new. Let's add JPerl, utf8 pragma, and this software.
       Old --- Old byte-oriented
       New --- New codepoint-oriented
 
-The reason why JPerl is very excellent is that it is at the position of
-(c). That is, it is almost not necessary to write a special code to process
-new codepoint oriented script.
+The reason why JPerl is very excellent is that it is at the position of (c).
+That is, it is almost not necessary to write a special code to process new codepoint oriented script.
 
 =item * Goal #3:
 
-Programs should run just as fast in the new character-oriented mode
-as in the old byte-oriented mode.
+Programs should run just as fast in the new character-oriented mode as in the old byte-oriented mode.
 
 It is impossible. Because the following time is necessary.
 
-(1) Time of escape script for old byte-oriented perl.
+(1) Time of escape MBCS script to byte-oriented perl
 
-(2) Time of processing regular expression by escaped script while
-    multibyte anchoring.
+(2) Time of processing multibyte anchoring in regular expression
 
 =item * Goal #4:
 
-Perl should remain one language, rather than forking into a
-byte-oriented Perl and a character-oriented Perl.
+Perl should remain one language, rather than forking into a byte-oriented Perl and a character-oriented Perl.
 
 JPerl remains one Perl "language" by forking to two "interpreters."
 However, the Perl core team did not desire fork of the "interpreter."
 As a result, Perl "language" forked contrary to goal #4.
 
-A codepoint oriented perl is not necessary to make it specially,
-because a byte-oriented perl can already treat the binary data.
-This software is only an application program of byte-oriented Perl,
-a filter program.
+A codepoint oriented perl is not necessary to make it specially, because a byte-oriented perl can already treat the binary data.
+This software is only an application program of byte-oriented Perl, a filter program.
 
-And you will get support from the Perl community, when you solve the
-problem by the Perl script.
+And you will get support from the Perl community, when you solve the problem by the Perl script.
 
-mb.pm modulino keeps one "language" and one "interpreter."
+mb.pm modulino remains one "language" and one "interpreter."
 
 =item * Goal #5:
 
@@ -7547,48 +7512,35 @@ May the mb.pm be with you, always.
 
 =back
 
-Back when Programming Perl, 3rd ed. was written, UTF8 flag was not born
-and Perl is designed to make the easy jobs easy. This software provides
-programming environment like at that time.
+Back when Programming Perl, 3rd edition was written, UTF8 flag was not born and Perl is designed to make the easy jobs do easy.
+This software provides programming environment like at that time.
 
 =head1 Perl's Motto
 
-Some computer scientists (the reductionists, in particular) would
-like to deny it, but people have funny-shaped minds. Mental geography
-is not linear, and cannot be mapped onto a flat surface without
-severe distortion. But for the last score years or so, computer
-reductionists have been first bowing down at the Temple of Orthogonality,
-then rising up to preach their ideas of ascetic rectitude to any who
-would listen.
+Some computer scientists (the reductionists, in particular) would like to deny it, but people have funny-shaped minds.
+Mental geography is not linear, and cannot be mapped onto a flat surface without severe distortion.
+But for the last score years or so, computer reductionists have been first bowing down at the Temple of Orthogonality, then rising up to preach their ideas of ascetic rectitude to any who would listen.
 
-Their fervent but misguided desire was simply to squash your mind to
-fit their mindset, to smush your patterns of thought into some sort of
-Hyperdimensional Flatland. It's a joyless existence, being smushed.
+Their fervent but misguided desire was simply to squash your mind to fit their mindset, to smush your patterns of thought into some sort of Hyperdimensional Flatland.
+It's a joyless existence, being smushed.
 
 --- Learning Perl on Win32 Systems
 
-If you think this is a big headache, you're right. No one likes
-this situation, but Perl does the best it can with the input and
-encodings it has to deal with. If only we could reset history and
-not make so many mistakes next time.
+If you think this is a big headache, you're right.
+No one likes this situation, but Perl does the best it can with the input and encodings it has to deal with.
+If only we could reset history and not make so many mistakes next time.
 
 --- Learning Perl 6th Edition
 
-The most important thing for most people to know about handling
-Unicode data in Perl, however, is that if you don't ever use any Uni-
-code data -- if none of your files are marked as UTF-8 and you don't
-use UTF-8 locales -- then you can happily pretend that you're back in
-Perl 5.005_03 land; the Unicode features will in no way interfere with
-your code unless you're explicitly using them. Sometimes the twin
-goals of embracing Unicode but not disturbing old-style byte-oriented
-scripts has led to compromise and confusion, but it's the Perl way to
-silently do the right thing, which is what Perl ends up doing.
+The most important thing for most people to know about handling Unicode data in Perl, however, is that if you don't ever use any Unicode data -- if none of your files are marked as UTF-8 and you don't use UTF-8 locales
+-- then you can happily pretend that you're back in Perl 5.005_03 land;
+the Unicode features will in no way interfere with your code unless you're explicitly using them.
+Sometimes the twin goals of embracing Unicode but not disturbing old-style byte-oriented scripts has led to compromise and confusion, but it's the Perl way to silently do the right thing, which is what Perl ends up doing.
 
 --- Advanced Perl Programming, 2nd Edition
 
-However, the ability to have any character in a string means you can
-create, scan, and manipulate raw binary data as string -- something with
-which many other utilities would have great difficulty.
+However, the ability to have any character in a string means you can create, scan, and manipulate raw binary data as string
+-- something with which many other utilities would have great difficulty.
 
 --- Learning Perl 8th Edition
 
@@ -7658,9 +7610,12 @@ Description of combinations
   U-U-U     Best choice when I/O is UTF-8 encoding
   ----------------------------------------------------------------------
 
-see also: 7 superstitions about character encoding I encountered
-
-https://qiita.com/tonluqclml/items/d4f8274e0292df393b04
+Using Encode::decode and Encode::encode for file contents, *you* and operators lose two precious things.
+One is the time.
+Other one is the original data.
+Generally speaking, data conversion lose information -- unless perfectly convert one to one.
+Moreover, if you have made script's bug, you will know its bug on too late.
+If you convert encoding of file path -- not file contents, you will know its bug on the time when you test it.
 
 =head1 AUTHOR
 
@@ -7670,13 +7625,10 @@ This project was originated by INABA Hitoshi.
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself. See the LICENSE
-file for details.
+This software is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+See the LICENSE file for details.
 
-This software is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 =head1 SEE ALSO
 

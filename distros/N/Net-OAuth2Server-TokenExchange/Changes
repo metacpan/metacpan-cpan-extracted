@@ -1,10 +1,15 @@
-Revision history for Net-OAuth2Server-TokenExchange
+Release history for Net-OAuth2Server-TokenExchange
 
-0.003 Sat 20 Jul 2022
+0.004 Tue 09 Aug 2022
+	- No functional changes
+	- Packaging fix to stop installing boilerplate.pl
+	- Updated package metadata
+
+0.003 Sat 30 Jul 2022
 	- No functional changes
 	- Correct prereq declaration
 
-0.002 Sat 20 Jul 2022
+0.002 Sat 30 Jul 2022
 	- No functional changes
 	- Correct test prereq declaration
 

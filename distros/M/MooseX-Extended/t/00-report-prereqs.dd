@@ -55,7 +55,8 @@ do { my $x = {
                                     },
                       'suggests' => {
                                       'Future::AsyncAwait' => '0.58',
-                                      'Syntax::Keyword::MultiSub' => '0.02'
+                                      'Syntax::Keyword::MultiSub' => '0.02',
+                                      'Syntax::Keyword::Try' => '0.027'
                                     }
                     },
        'test' => {
@@ -72,6 +73,8 @@ do { my $x = {
                                    'List::Util' => '0',
                                    'Scalar::Util' => '0',
                                    'Test::Builder' => '0',
+                                   'Test::Compile' => 'v3.1.0',
+                                   'Test::Compile::Internal' => '0',
                                    'Test::More' => '0',
                                    'Test::Most' => '0',
                                    'base' => '0',

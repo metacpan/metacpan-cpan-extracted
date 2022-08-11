@@ -5,7 +5,7 @@ use warnings;
 package Sub::MultiMethod;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.908';
+our $VERSION   = '0.909';
 
 use B ();
 use Exporter::Shiny qw(
@@ -659,9 +659,10 @@ Sub::MultiMethod - yet another implementation of multimethods
 How to generate JSON (albeit with very naive string quoting) using
 multimethods:
 
-  use v5.12;
+  use v5.20;
   use strict;
   use warnings;
+  use experimental 'signatures';
   
   package My::JSON {
     use Moo;
@@ -670,60 +671,54 @@ multimethods:
     
     multimethod stringify => (
       signature => [ Undef ],
-      code      => sub {
-        my ($self, $undef) = (shift, @_);
-        'null';
+      code      => sub ( $self, $undef ) {
+        return 'null';
       },
     );
     
     multimethod stringify => (
       signature => [ ScalarRef[Bool] ],
-      code      => sub {
-        my ($self, $bool) = (shift, @_);
-        $$bool ? 'true' : 'false';
+      code      => sub ( $self, $bool ) {
+        return $$bool ? 'true' : 'false';
       },
     );
     
     multimethod stringify => (
       alias     => "stringify_str",
       signature => [ Str ],
-      code      => sub {
-        my ($self, $str) = (shift, @_);
-        sprintf(q<"%s">, quotemeta($str));
+      code      => sub ( $self, $str ) {
+        return sprintf( q<"%s">, quotemeta($str) );
       },
     );
     
     multimethod stringify => (
       signature => [ Num ],
-      code      => sub {
-        my ($self, $n) = (shift, @_);
-        $n;
+      code      => sub ( $self, $n ) {
+        return $n;
       },
     );
     
     multimethod stringify => (
       signature => [ ArrayRef ],
-      code      => sub {
-        my ($self, $arr) = (shift, @_);
-        sprintf(
+      code      => sub ( $self, $arr ) {
+        return sprintf(
           q<[%s]>,
-          join(q<,>, map($self->stringify($_), @$arr))
+          join( q<,>, map( $self->stringify($_), @$arr ) )
         );
       },
     );
     
     multimethod stringify => (
       signature => [ HashRef ],
-      code      => sub {
-        my ($self, $hash) = (shift, @_);
-        sprintf(
+      code      => sub ( $self, $hash ) {
+        return sprintf(
           q<{%s}>,
           join(
             q<,>,
             map sprintf(
               q<%s:%s>,
               $self->stringify_str($_),
-              $self->stringify($hash->{$_})
+              $self->stringify( $hash->{$_} )
             ), sort keys %$hash,
           )
         );
@@ -733,12 +728,15 @@ multimethods:
   
   my $json = My::JSON->new;
   
-  say $json->stringify({
-    foo => 123,
-    bar => [1,2,3],
-    baz => \1,
+  say $json->stringify( {
+    foo  => 123,
+    bar  => [ 1, 2, 3 ],
+    baz  => \1,
     quux => { xyzzy => 666 },
-  });
+  } );
+
+While this example requires Perl 5.20+, Sub::MultiMethod is tested and works
+on Perl 5.8.1 and above.
 
 =head1 DESCRIPTION
 
@@ -821,21 +819,35 @@ already, so will have had defaults and coercions applied.
 
 An example for positional parameters:
 
-  code => sub {
-    my ($self, $prefix, $match, $output) = (shift, @_);
-    print {$output} $prefix;
+  code => sub ( $self, $prefix, $match, $output ) {
+    print { $output } $prefix;
     ...;
   },
 
 An example for named parameters:
 
-  code => sub {
-    my ($self, $arg) = (shift, @_);
-    print {$arg->output} $arg->prefix;
+  code => sub ( $self, $arg ) {
+    print { $arg->output } $arg->prefix;
     ...;
   },
 
 Note that C<< $arg >> is an object with methods for each named parameter.
+
+Corresponding examples for older versions of Perl without signature support.
+
+  code => sub {
+    my ( $self, $prefix, $match, $output ) = @_;
+    print { $output } $prefix;
+    ...;
+  },
+
+And:
+
+  code => sub {
+    my ( $self, $arg ) = @_;
+    print { $arg->output } $arg->prefix;
+    ...;
+  },
 
 =item C<< alias >> I<< (Str|ArrayRef[Str]) >>
 
@@ -1026,16 +1038,16 @@ scalar referred to. Example:
   my ($coderef, $otherref);
   
   multimethod \$coderef => (
-    method => 0,
+    method    => 0,
     signature => [ ArrayRef ],
-    code => sub { say "It's an arrayref!" },
+    code      => sub { say "It's an arrayref!" },
   );
   
   multimethod \$coderef => (
-    method => 0,
-    alias => \$otherref,
+    method    => 0,
+    alias     => \$otherref,
     signature => [ HashRef ],
-    code => sub { say "It's a hashref!" },
+    code      => sub { say "It's a hashref!" },
   );
   
   $coderef->( [] );
@@ -1139,17 +1151,17 @@ applied, and third the modified invocants.
 
 This is basically how the dispatcher for a method works:
 
-  my @invocants = splice(@_, 0, $ismethod);
+  my @invocants = splice( @_, 0, $ismethod );
   my $pkg       = __PACKAGE__;
   
   my $smm = 'Sub::MultiMethod';
   my @candidates =
-    $smm->get_all_multimethod_candidates($pkg, $sub, $ismethod);
-  my ($winner, $new_args, $new_invocants) =
-    $smm->pick_candidate(\@candidates, \@_, \@invocants);
+    $smm->get_all_multimethod_candidates( $pkg, $sub, $ismethod );
+  my ( $winner, $new_args, $new_invocants ) =
+    $smm->pick_candidate( \@candidates, \@_, \@invocants );
   
   my $coderef = $winner->{code};
-  @_ = (@$new_invocants, @$new_args);
+  @_ = ( @$new_invocants, @$new_args );
   goto $coderef;
 
 =back
@@ -1200,7 +1212,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2020 by Toby Inkster.
+This software is copyright (c) 2020-2022 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,3 +1,9 @@
+0.323   2022-08-10  Released-By: PERLANCAR; Urgency: medium
+
+        - Adjust to Getopt::Long::Dump 0.110+ (spec returned is not hashref but
+          arrayref).
+
+
 0.322   2020-04-03  Released-By: PERLANCAR; Urgency: medium
 
 	- Suggest putting sourcing in /etc/profile.d/shcompgen.sh instead

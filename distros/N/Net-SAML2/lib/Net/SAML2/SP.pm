@@ -1,22 +1,26 @@
 use strict;
 use warnings;
 package Net::SAML2::SP;
-our $VERSION = '0.55'; # VERSION
+our $VERSION = '0.57'; # VERSION
 
 use Moose;
-use MooseX::Types::URI qw/ Uri /;
 
-# ABSTRACT: Net::SAML2::SP - SAML Service Provider object
-
-
+use Carp qw(croak);
 use Crypt::OpenSSL::X509;
-use XML::Generator;
-
+use Digest::MD5 ();
+use MooseX::Types::URI qw/ Uri /;
 use Net::SAML2::Binding::POST;
 use Net::SAML2::Binding::Redirect;
 use Net::SAML2::Binding::SOAP;
 use Net::SAML2::Protocol::AuthnRequest;
 use Net::SAML2::Protocol::LogoutRequest;
+use Net::SAML2::Util ();
+use URN::OASIS::SAML2 qw(:bindings :urn);
+use XML::Generator;
+
+# ABSTRACT: Net::SAML2::SP - SAML Service Provider object
+
+
 
 
 has 'url'    => (isa => Uri, is => 'ro', required => 1, coerce => 1);
@@ -26,32 +30,111 @@ has 'key'    => (isa => 'Str', is => 'ro', required => 1);
 has 'cacert' => (isa => 'Maybe[Str]', is => 'ro', required => 1);
 
 has 'error_url'        => (isa => 'Str', is => 'ro', required => 1);
-has 'slo_url_soap'     => (isa => 'Str', is => 'ro', required => 1);
-has 'slo_url_redirect' => (isa => 'Str', is => 'ro', required => 1);
-has 'slo_url_post'     => (isa => 'Str', is => 'ro', required => 1);
-has 'acs_url_post'     => (isa => 'Str', is => 'ro', required => 1);
-has 'acs_url_artifact' => (isa => 'Str', is => 'ro', required => 1);
-
 has 'org_name'         => (isa => 'Str', is => 'ro', required => 1);
 has 'org_display_name' => (isa => 'Str', is => 'ro', required => 1);
 has 'org_contact'      => (isa => 'Str', is => 'ro', required => 1);
 has 'org_url'          => (isa => 'Str', is => 'ro', required => 0);
 
-has '_cert_text' => (isa => 'Str', is => 'rw', required => 0);
+# These are no longer in use, but are not removed by the off change that
+# someone that extended us or added a role to us with these params.
+has 'slo_url_soap'     => (isa => 'Str', is => 'ro', required => 0);
+has 'slo_url_post'     => (isa => 'Str', is => 'ro', required => 0);
+has 'slo_url_redirect' => (isa => 'Str', is => 'ro', required => 0);
+has 'acs_url_post'     => (isa => 'Str', is => 'ro', required => 0);
+has 'acs_url_artifact' => (isa => 'Str', is => 'ro', required => 0);
 
-has 'authnreq_signed'         => (isa => 'Bool', is => 'ro', required => 0);
-has 'want_assertions_signed'  => (isa => 'Bool', is => 'ro', required => 0);
+has '_cert_text' => (isa => 'Str', is => 'ro', init_arg => undef, builder => '_build_cert_text', lazy => 1);
 
+has 'authnreq_signed'         => (isa => 'Bool', is => 'ro', required => 0, default => 1);
+has 'want_assertions_signed'  => (isa => 'Bool', is => 'ro', required => 0, default => 1);
 
-sub BUILD {
+has 'sign_metadata' => (isa => 'Bool', is => 'ro', required => 0, default => 1);
+
+has assertion_consumer_service => (is => 'ro', isa => 'ArrayRef', required => 1);
+has single_logout_service => (is => 'ro', isa => 'ArrayRef', required => 1);
+
+around BUILDARGS => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    my %args = @_;
+
+    if (!$args{single_logout_service}) {
+        #warn "Deprecation warning, please upgrade your code to use ..";
+        my @slo;
+        if (my $slo = $args{slo_url_soap}) {
+            push(
+                @slo,
+                {
+                    Binding  => BINDING_SOAP,
+                    Location => $args{url} . $slo,
+                }
+            );
+        }
+        if (my $slo = $args{slo_url_redirect}) {
+            push(
+                @slo,
+                {
+                    Binding  => BINDING_HTTP_REDIRECT,
+                    Location => $args{url} . $slo,
+                }
+            );
+        }
+        if (my $slo = $args{slo_url_post}) {
+            push(
+                @slo,
+                {
+                    Binding  => BINDING_HTTP_POST,
+                    Location => $args{url} . $slo,
+                }
+            );
+        }
+        $args{single_logout_service} = \@slo;
+    }
+
+    if (!@{$args{single_logout_service}}) {
+      croak("You don't have any Single Logout Services configured!");
+    }
+
+    if (!$args{assertion_consumer_service}) {
+        #warn "Deprecation warning, please upgrade your code to use ..";
+        my @acs;
+        if (my $acs = delete $args{acs_url_post}) {
+            push(
+                @acs,
+                {
+                    Binding  => BINDING_HTTP_POST,
+                    Location => $args{url} . $acs,
+                    isDefault => 'true',
+                }
+            );
+        }
+        if (my $acs = $args{acs_url_artifact}) {
+            push(
+                @acs,
+                {
+                    Binding  => BINDING_HTTP_ARTIFACT,
+                    Location => $args{url} . $acs,
+                    isDefault => 'false',
+                }
+            );
+        }
+
+        $args{assertion_consumer_service} = \@acs;
+    }
+    if (!@{$args{assertion_consumer_service}}) {
+      croak("You don't have any Assertion Consumer Services configured!");
+    }
+    return $self->$orig(%args);
+};
+
+sub _build_cert_text {
     my ($self) = @_;
 
     my $cert = Crypt::OpenSSL::X509->new_from_file($self->cert);
     my $text = $cert->as_string;
     $text =~ s/-----[^-]*-----//gm;
-    $self->_cert_text($text);
-
-    return $self;
+    return $text;
 }
 
 
@@ -169,121 +252,144 @@ sub post_binding {
 }
 
 
-sub metadata {
-    my ($self) = @_;
+sub generate_sp_desciptor_id {
+    my $self = shift;
+    return Net::SAML2::Util::generate_id();
+}
 
-    use Net::SAML2::Util qw/generate_id/;
+
+my $md = ['md' => 'urn:oasis:names:tc:SAML:2.0:metadata'];
+my $ds = ['ds' => 'http://www.w3.org/2000/09/xmldsig#'];
+
+sub generate_metadata {
+    my $self = shift;
 
     my $x = XML::Generator->new(':pretty', conformance => 'loose');
-    my $md = ['md' => 'urn:oasis:names:tc:SAML:2.0:metadata'];
-    my $ds = ['ds' => 'http://www.w3.org/2000/09/xmldsig#'];
 
-    my $metadata = $x->EntityDescriptor(
+    return $x->EntityDescriptor(
         $md,
         {
-            entityID => $self->id },
+            entityID => $self->id,
+            ID       => $self->generate_sp_desciptor_id(),
+        },
         $x->SPSSODescriptor(
             $md,
-            { AuthnRequestsSigned => defined($self->authnreq_signed) ? $self->authnreq_signed : '1',
-              WantAssertionsSigned => defined($self->want_assertions_signed) ? $self->want_assertions_signed : '1',
-              errorURL => $self->url . $self->error_url,
-              protocolSupportEnumeration => 'urn:oasis:names:tc:SAML:2.0:protocol',
-              ID => generate_id()},
-            $x->KeyDescriptor(
-                $md,
-                {
-                    use => 'signing' },
-                $x->KeyInfo(
-                    $ds,
-                    $x->X509Data(
-                        $ds,
-                        $x->X509Certificate(
-                            $ds,
-                            $self->_cert_text,
-                        )
-                    )
-                )
-            ),
-            $x->SingleLogoutService(
-                $md,
-                { Binding => 'urn:oasis:names:tc:SAML:2.0:bindings:SOAP',
-                  Location  => $self->url . $self->slo_url_soap },
-            ),
-            $x->SingleLogoutService(
-                $md,
-                { Binding => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
-                  Location  => $self->url . $self->slo_url_redirect },
-            ),
-            $x->SingleLogoutService(
-                $md,
-                { Binding => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
-                  Location  => $self->url . $self->slo_url_post },
-            ),
-            $x->AssertionConsumerService(
-                $md,
-                { Binding => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
-                  Location => $self->url . $self->acs_url_post,
-                  index => '1',
-                  isDefault => 'true' },
-            ),
-            $x->AssertionConsumerService(
-                $md,
-                { Binding => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact',
-                  Location => $self->url . $self->acs_url_artifact,
-                  index => '2',
-                  isDefault => 'false' },
-            ),
+            {
+                AuthnRequestsSigned        => $self->authnreq_signed,
+                WantAssertionsSigned       => $self->want_assertions_signed,
+                errorURL                   => $self->url . $self->error_url,
+                protocolSupportEnumeration =>
+                    'urn:oasis:names:tc:SAML:2.0:protocol',
+            },
+
+            $self->_generate_key_descriptors($x),
+
+            $self->_generate_single_logout_service($x),
+
+            $self->_generate_assertion_consumer_service($x),
+
         ),
         $x->Organization(
             $md,
             $x->OrganizationName(
-                $md,
-                {
-                    'xml:lang' => 'en' },
-                $self->org_name,
+                $md, { 'xml:lang' => 'en' }, $self->org_name,
             ),
             $x->OrganizationDisplayName(
-                $md,
-                {
-                    'xml:lang' => 'en' },
+                $md, { 'xml:lang' => 'en' },
                 $self->org_display_name,
             ),
             $x->OrganizationURL(
                 $md,
-                {
-                    'xml:lang' => 'en' },
-                defined($self->org_url) ? $self->org_url :$self->url
+                { 'xml:lang' => 'en' },
+                defined($self->org_url) ? $self->org_url : $self->url
             )
         ),
         $x->ContactPerson(
             $md,
-            {
-                contactType => 'other' },
-            $x->Company(
-                $md,
-                $self->org_display_name,
-            ),
-            $x->EmailAddress(
-                $md,
-                $self->org_contact,
-            ),
+            { contactType => 'other' },
+            $x->Company($md, $self->org_display_name,),
+            $x->EmailAddress($md, $self->org_contact,),
         )
     );
+}
+
+sub _generate_key_descriptors {
+    my $self = shift;
+    my $x    = shift;
+
+    return
+           if !$self->authnreq_signed
+        && !$self->want_assertions_signed
+        && !$self->sign_metadata;
+
+    return $x->KeyDescriptor(
+        $md,
+        { use => 'signing' },
+        $x->KeyInfo(
+            $ds,
+            $x->X509Data(
+                $ds,
+                $x->X509Certificate(
+                    $ds,
+                    $self->_cert_text,
+                )
+            ),
+            $x->KeyName(
+                $ds,
+                Digest::MD5::md5_hex($self->_cert_text)
+            ),
+
+        )
+    );
+}
+
+sub _generate_single_logout_service {
+    my $self = shift;
+    my $x    = shift;
+    return map { $x->SingleLogoutService($md, $_) } @{ $self->single_logout_service };
+}
+
+sub _generate_assertion_consumer_service {
+    my $self = shift;
+    my $x    = shift;
+
+    my @services = @{ $self->assertion_consumer_service };
+    my $size     = @services;
+
+    my @acs;
+    for (my $i = 0; $i < $size; ++$i) {
+        push(
+            @acs,
+            $x->AssertionConsumerService(
+                $md, { %{ $services[$i] }, index => $i + 1, },
+            )
+        );
+    }
+    return @acs;
+
+}
+
+
+
+sub metadata {
+    my $self = shift;
+
+    my $metadata = $self->generate_metadata();
+    return $metadata unless $self->sign_metadata;
 
     use Net::SAML2::XML::Sig;
-
-    my $signer = Net::SAML2::XML::Sig->new({
-                        key => $self->key,
-                        cert => $self->cert,
-                        sig_hash => 'sha256',
-                        digest_hash => 'sha256',
-                        x509 => 1,
-                });
-
-    # create a signature
-    my $signed = $signer->sign($metadata);
-
-    return $signed;
+    my $signer = Net::SAML2::XML::Sig->new(
+        {
+            key         => $self->key,
+            cert        => $self->cert,
+            sig_hash    => 'sha256',
+            digest_hash => 'sha256',
+            x509        => 1,
+            ns          => { md => 'urn:oasis:names:tc:SAML:2.0:metadata' },
+            id_attr     => '/md:EntityDescriptor[@ID]',
+        }
+    );
+    return $signer->sign($metadata);
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -300,7 +406,7 @@ Net::SAML2::SP - Net::SAML2::SP - SAML Service Provider object
 
 =head1 VERSION
 
-version 0.55
+version 0.57
 
 =head1 SYNOPSIS
 
@@ -310,10 +416,6 @@ version 0.55
     cert => 'sign-nopw-cert.pem',
     key => 'sign-nopw-key.pem',
   );
-
-=head1 NAME
-
-Net::SAML2::SP - SAML Service Provider object
 
 =head1 METHODS
 
@@ -373,11 +475,54 @@ Specifies in the metadata whether the SP wants the Assertion from
 the IdP to be signed
 Optional (0 or 1) defaults to 1 (TRUE) if not specified.
 
+=item B<sign_metadata>
+
+Sign the metadata, defaults to 1 (TRUE) if not specified.
+
+=item B<single_logout_service>
+
+The following option replaces the previous C<slo_url_post>, C<slo_url_soap> and
+C<slo_url_redirect> constructor parameters. The former options are mapped to
+this new structure.
+
+This expects an array of hash refs where you define one or more Single Logout
+Services
+
+  [
+    {
+        Binding => BINDING_HTTP_POST,
+        Location => https://foo.example.com/your-post-endpoint,
+    }
+    {
+        Binding => BINDING_HTTP_ARTIFACT,
+        Location => https://foo.example.com/your-artifact-endpoint,
+    }
+  ]
+
+=item B<assertion_consumer_service>
+
+The following option replaces the previous C<acs_url_post> and
+C<acs_url_artifact> constructor parameters. The former options are mapped to
+this new structure.
+
+This expects an array of hash refs where you define one or more Assertion
+Consumer Services.
+
+  [
+    # Order decides the index
+    {
+        Binding => BINDING_HTTP_POST,
+        Location => https://foo.example.com/your-post-endpoint,
+        isDefault => 'false',
+    }
+    {
+        Binding => BINDING_HTTP_ARTIFACT,
+        Location => https://foo.example.com/your-artifact-endpoint,
+        isDefault => 'true',
+    }
+  ]
+
 =back
-
-=head2 BUILD ( hashref of the parameters passed to the constructor )
-
-Called after the object is created to load the cert from a file
 
 =head2 authn_request( $destination, $nameid_format )
 
@@ -427,6 +572,14 @@ XXX UA
 =head2 post_binding( )
 
 Returns a POST binding object for this SP.
+
+=head2 generate_sp_desciptor_id ( )
+
+Returns the Net::SAML2 unique ID from Net::SAML2::Util::generate_id.
+
+=head2 generate_metadata( )
+
+Generate the metadata XML document for this SP.
 
 =head2 metadata( )
 

@@ -281,57 +281,121 @@ isnt( $now3, $now );
 subtest "serialisation" => sub
 {
     my $test = { name => 'John', age => 22, location => 'Somewhere' };
+    my $has_base64 = $o->_has_base64(1);
     SKIP:
     {
-        if( !$o->_load_class( 'Sereal' ) )
+        my $serialiser = 'CBOR::XS';
+        if( !$o->_load_class( $serialiser ) )
         {
-            skip( "Sereal serialiser is not installed", 6 );
+            skip( "$serialiser serialiser is not installed", 6 );
         }
-        my $bin = $o->serialise( $test, serialiser => 'Sereal' );
+        my $bin = $o->serialise( $test, serialiser => $serialiser );
+        diag( "Error serialising data with $serialiser: ", $o->error ) if( !defined( $bin ) );
         # diag( "Serialised data is '$bin'" ) if( $DEBUG );
-        ok( defined( $bin ) && length( $bin ), "hash is serialised with Sereal" );
-        my $orig = $o->deserialise( data => $bin, serialiser => 'Sereal' );
+        ok( defined( $bin ) && length( $bin ), "hash is serialised with $serialiser" );
+        my $orig = $o->deserialise( data => $bin, serialiser => $serialiser );
+        diag( "Error deserialising data with $serialiser: ", $o->error ) if( !defined( $orig ) );
         # diag( "Deserialised data is '$orig'" ) if( $DEBUG );
-        ok( defined( $orig ) && ref( $orig ) eq 'HASH', "data is deserialised with Sereal" );
+        ok( defined( $orig ) && ref( $orig ) eq 'HASH', "data is deserialised with $serialiser" );
         is_deeply( $orig => $test, 'deserialised data is identical' );
         my $tmp_file = $o->new_tempfile;
-        my $rv = $o->serialise( $test, file => $tmp_file, serialiser => 'Sereal' );
+        my $rv = $o->serialise( $test, file => $tmp_file, serialiser => $serialiser );
+        diag( "Error serialising data to file with $serialiser: ", $o->error ) if( !defined( $rv ) );
         ok( $rv, "Hash is serialised to $tmp_file" );
         undef( $orig );
-        $orig = $o->deserialise( file => $tmp_file, serialiser => 'Sereal' );
+        $orig = $o->deserialise( file => $tmp_file, serialiser => $serialiser );
+        diag( "Error deserialising data from file with $serialiser: ", $o->error ) if( !defined( $orig ) );
         ok( defined( $orig ) && ref( $orig ) eq 'HASH', 'data is deserialised from file' );
         is_deeply( $orig => $test, 'deserialised data from file is identical' );
         $tmp_file->remove;
+        # with base64 encoding
+        if( $has_base64 )
+        {
+            $bin = $o->serialise( $test, serialiser => $serialiser, base64 => 1 );
+            diag( "Error serialising data with $serialiser and base64: ", $o->error ) if( !defined( $bin ) );
+            ok( defined( $bin ) && length( $bin ), "hash is serialised with $serialiser and base64" );
+            my $orig = $o->deserialise( data => $bin, serialiser => $serialiser, base64 => 1 );
+            diag( "Error deserialising data with $serialiser and base64: ", $o->error ) if( !defined( $orig ) );
+            # diag( "Deserialised data is '$orig'" ) if( $DEBUG );
+            ok( defined( $orig ) && ref( $orig ) eq 'HASH', "data is deserialised with $serialiser and base64" );
+            is_deeply( $orig => $test, 'deserialised data is identical' );
+        }
+    };
+
+    SKIP:
+    {
+        my $serialiser = 'Sereal';
+        if( !$o->_load_class( $serialiser ) )
+        {
+            skip( "$serialiser serialiser is not installed", 6 );
+        }
+        my $bin = $o->serialise( $test, serialiser => $serialiser );
+        diag( "Error serialising data with $serialiser: ", $o->error ) if( !defined( $bin ) );
+        # diag( "Serialised data is '$bin'" ) if( $DEBUG );
+        ok( defined( $bin ) && length( $bin ), "hash is serialised with $serialiser" );
+        my $orig = $o->deserialise( data => $bin, serialiser => $serialiser );
+        diag( "Error deserialising data with $serialiser: ", $o->error ) if( !defined( $orig ) );
+        # diag( "Deserialised data is '$orig'" ) if( $DEBUG );
+        ok( defined( $orig ) && ref( $orig ) eq 'HASH', "data is deserialised with $serialiser" );
+        is_deeply( $orig => $test, 'deserialised data is identical' );
+        my $tmp_file = $o->new_tempfile;
+        my $rv = $o->serialise( $test, file => $tmp_file, serialiser => $serialiser );
+        diag( "Error serialising data to file with $serialiser: ", $o->error ) if( !defined( $rv ) );
+        ok( $rv, "Hash is serialised to $tmp_file" );
+        undef( $orig );
+        $orig = $o->deserialise( file => $tmp_file, serialiser => $serialiser );
+        diag( "Error deserialising data from file with $serialiser: ", $o->error ) if( !defined( $orig ) );
+        ok( defined( $orig ) && ref( $orig ) eq 'HASH', 'data is deserialised from file' );
+        is_deeply( $orig => $test, 'deserialised data from file is identical' );
+        $tmp_file->remove;
+        # with base64 encoding
+        if( $has_base64 )
+        {
+            $bin = $o->serialise( $test, serialiser => $serialiser, base64 => 1 );
+            diag( "Error serialising data with $serialiser and base64: ", $o->error ) if( !defined( $bin ) );
+            ok( defined( $bin ) && length( $bin ), "hash is serialised with $serialiser and base64" );
+            my $orig = $o->deserialise( data => $bin, serialiser => $serialiser, base64 => 1 );
+            diag( "Error deserialising data with $serialiser and base64: ", $o->error ) if( !defined( $orig ) );
+            # diag( "Deserialised data is '$orig'" ) if( $DEBUG );
+            ok( defined( $orig ) && ref( $orig ) eq 'HASH', "data is deserialised with $serialiser and base64" );
+            is_deeply( $orig => $test, 'deserialised data is identical' );
+        }
     };
     
     SKIP:
     {
-        if( !$o->_load_class( 'Storable' ) )
+        my $serialiser = 'Storable';
+        if( !$o->_load_class( $serialiser ) )
         {
-            skip( "Storable serialiser is not installed", 9 );
+            skip( "$serialiser serialiser is not installed", 9 );
         }
-        my $bin = $o->serialise( $test, serialiser => 'Storable' );
+        my $bin = $o->serialise( $test, serialiser => $serialiser );
         if( !defined( $bin ) )
         {
             BAIL_OUT( $o->error );
         }
         diag( "Serialised data is '$bin'" ) if( $DEBUG );
-        ok( defined( $bin ) && length( $bin ), "hash is serialised with Storable" );
-        my $orig = $o->deserialise( data => $bin, serialiser => 'Storable' );
+        ok( defined( $bin ) && length( $bin ), "hash is serialised with $serialiser" );
+        my $orig = $o->deserialise( data => $bin, serialiser => $serialiser );
+        diag( "Error deserialising data with $serialiser: ", $o->error ) if( !defined( $orig ) );
         diag( "Deserialised data is '$orig'" ) if( $DEBUG );
-        ok( defined( $orig ) && ref( $orig ) eq 'HASH', "data is deserialised with Storable" );
+        ok( defined( $orig ) && ref( $orig ) eq 'HASH', "data is deserialised with $serialiser" );
         is_deeply( $orig => $test, 'deserialised data is identical' );
         my $tmp_file = $o->new_tempfile;
-        my $rv = $o->serialise( $test, file => $tmp_file, serialiser => 'Storable' );
+        my $rv = $o->serialise( $test, file => $tmp_file, serialiser => $serialiser );
+        diag( "Error serialising data to file with $serialiser: ", $o->error ) if( !defined( $rv ) );
         ok( $rv, "Hash is serialised to $tmp_file" );
         undef( $orig );
-        $orig = $o->deserialise( file => $tmp_file, serialiser => 'Storable' );
+        $orig = $o->deserialise( file => $tmp_file, serialiser => $serialiser );
+        diag( "Error deserialising data from file with $serialiser: ", $o->error ) if( !defined( $orig ) );
         ok( defined( $orig ) && ref( $orig ) eq 'HASH', 'data is deserialised from file' );
         is_deeply( $orig => $test, 'deserialised data from file is identical' );
-        $rv = $o->serialise( $test, file => $tmp_file, serialiser => 'Storable', lock => 1 );
+        $rv = $o->serialise( $test, file => $tmp_file, serialiser => $serialiser, lock => 1 );
+        diag( "Error serialising data to file with lock with $serialiser: ", $o->error ) if( !defined( $rv ) );
         ok( $rv, "Hash is serialised to $tmp_file using lock" );
         undef( $orig );
-        $orig = $o->deserialise( file => $tmp_file, serialiser => 'Storable', lock => 1 );
+        $orig = $o->deserialise( file => $tmp_file, serialiser => $serialiser, lock => 1 );
+        diag( "Error deserialising data from file with lock with $serialiser: ", $o->error ) if( !defined( $orig ) );
         ok( defined( $orig ) && ref( $orig ) eq 'HASH', 'data is deserialised from file using lock' );
         is_deeply( $orig => $test, 'deserialised data from file with lock is identical' );
         undef( $orig );
@@ -340,15 +404,30 @@ subtest "serialisation" => sub
             fail( "Cannot write to temporary file \"$tmp_file\"." );
             skip( "Fail writing to file", 2 );
         };
-        $rv = $o->serialise( $test, io => $fh, serialiser => 'Storable' );
+        $rv = $o->serialise( $test, io => $fh, serialiser => $serialiser );
+        diag( "Error serialising data to filehandle with $serialiser: ", $o->error ) if( !defined( $rv ) );
         $tmp_file->flush;
         # diag( "Temp file $tmp_file size is ", $tmp_file->length, " bytes." ) if( $DEBUG );
+        diag( "Temp file $tmp_file size is ", $tmp_file->length, " bytes." );
         ok( !$tmp_file->is_empty, "writing serialised data using file handle" );
         $fh->close;
         $fh = $tmp_file->open( '<', { binmode => 'raw' });
-        $orig = $o->deserialise( io => $fh, serialiser => 'Storable' );
+        $orig = $o->deserialise( io => $fh, serialiser => $serialiser );
+        diag( "Error deserialising data from filehandle with $serialiser: ", $o->error ) if( !defined( $orig ) );
         is_deeply( $orig => $test, 'deserialised data from file handle is identical' );
         $tmp_file->remove;
+        # with base64 encoding
+        if( $has_base64 )
+        {
+            $bin = $o->serialise( $test, serialiser => $serialiser, base64 => 1 );
+            diag( "Error serialising data with $serialiser and base64: ", $o->error ) if( !defined( $bin ) );
+            ok( defined( $bin ) && length( $bin ), "hash is serialised with $serialiser and base64" );
+            my $orig = $o->deserialise( data => $bin, serialiser => $serialiser, base64 => 1 );
+            diag( "Error deserialising data with $serialiser and base64: ", $o->error ) if( !defined( $orig ) );
+            # diag( "Deserialised data is '$orig'" ) if( $DEBUG );
+            ok( defined( $orig ) && ref( $orig ) eq 'HASH', "data is deserialised with $serialiser and base64" );
+            is_deeply( $orig => $test, 'deserialised data is identical' );
+        }
     };
 };
 

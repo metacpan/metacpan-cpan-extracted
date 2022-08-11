@@ -40,15 +40,18 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ap/Catalyst-Plugin-CachedUriForAction/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Plugin-CachedUriForAction"
       },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ap/Catalyst-Plugin-CachedUriForAction.git",
+         "url" : "https://github.com/ap/Catalyst-Plugin-CachedUriForAction.git",
          "web" : "https://github.com/ap/Catalyst-Plugin-CachedUriForAction"
       }
    },
-   "version" : "1.001",
+   "version" : "1.003",
    "x_copyright" : {
       "holder" : "Aristotle Pagaltzis",
       "year" : 2021

@@ -14,7 +14,7 @@ use base qw(Exporter);
 
 BEGIN {
     @Time::TAI::Simple::EXPORT = qw(tai tai10 tai35);
-    $Time::TAI::Simple::VERSION = '1.15';
+    $Time::TAI::Simple::VERSION = '1.16';
 }
 
 our @LEAPSECOND_UNIX_PATHNAME_LIST = (
@@ -83,15 +83,37 @@ sub new {
         tm_base => 0.0,      # add to monotonic clock time to get TAI epoch time.
         mode    => 'tai10',  # one of: "tai", "tai10", or "tai35".
         dl_fr   => undef,
-        dl_to   => undef
+        dl_to   => undef,
+        ua_ar   => [  # so IERS doesn't deny or redirect connection
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36 Edg/103.0.1264.62',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0',
+            'Mozilla/5.0 (Linux; Android 12; SAMSUNG SM-T870) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/17.0 Chrome/96.0.4664.104 Safari/537.36',
+            'Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/537.36',
+            'Mozilla/5.0 (Android 12; Mobile; rv:102.0) Gecko/102.0 Firefox/102.0',
+            'Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0',
+            'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Goanna/5.1 Firefox/68.0 PaleMoon/31.1.0',
+        ],
     };
     bless ($self, $class);
-    $self->{http_or} = HTTP::Tiny->new(max_redirect => 15, agent => 'Wget/1.18 (linux-gnu)');
+
+    # Spoof the User-Agent string to get around IERS gatekeeping
+    $self->{ua_ar} = [$self->opt('agent')] if ($self->opt('agent'));
+    push @{$self->{ua_ar}}, split(/[\s,]+/, $self->opt('add_agent')) if ($self->opt('add_agent'));
+    $self->{ua_str}  = $self->_pick_user_agent();
+    $self->{http_or} = HTTP::Tiny->new(max_redirect => 15, agent => $self->{ua_str});
+
     $self->{mode}    = $self->opt('mode', 'tai10');
     $self->download_leapseconds() if ($self->opt('download_leapseconds', 0));
     $self->load_leapseconds() unless ($self->opt('do_not_load_leapseconds'));
     $self->calculate_base();  # also sets tm_or and potentially ls_next
     return $self;
+}
+
+sub _pick_user_agent {
+    my ($self) = @_;
+    my $k = $self->opt('force_edge') ? 0 : scalar(@{$self->{ua_ar}});
+    my $ua = $self->{ua_ar}->[int(rand() * $k)];
+    return $ua;
 }
 
 sub time {
@@ -177,18 +199,42 @@ sub download_leapseconds {
             push(@url_list, $urls);
         }
     }
-    push (@url_list, 'http://www.ciar.org/ttk/codecloset/leap-seconds.list');
-    push (@url_list, 'https://www.ietf.org/timezones/data/leap-seconds.list');
+
+    # By default, fetch the cached file to avoid unduly annoying the IERS folks.
+    # Specify --primary to try the IERS file before the cached file.
+    my $primary_url = 'https://www.ietf.org/timezones/data/leap-seconds.list';
+    my $cached_url  = 'http://www.ciar.org/ttk/codecloset/leap-seconds.list';
+    if ($self->opt('primary')) {
+        push @url_list, ($primary_url, $cached_url);
+    } else {
+        push @url_list, ($cached_url, $primary_url);
+    }
+
     eval {
         my $http_or = $self->{http_or};
         my $leapseconds_filename = $self->_leapseconds_filename(\%opt_h);
+        my $success = 0;
         foreach my $url (@url_list) {
-            my $reply = $http_or->mirror($url, $leapseconds_filename, {});
-            next unless (defined($reply) && $reply->{success});
-            $response = 1;
-            $self->{dl_fr} = $url;
-            $self->{dl_to} = $leapseconds_filename;
-            last;
+            my $n_tries = $self->opt('retry', 0) + 1;
+            for my $trying (1..$n_tries) {
+                print "download_leapseconds: try $trying url $url\n" if ($self->opt('debug'));
+                print "download_leapseconds: user agent [$self->{ua_str}]\n" if ($self->opt('debug'));
+                my $reply = $http_or->mirror($url, $leapseconds_filename, {});
+                unless (defined($reply) && $reply->{success}) {
+                    if ($self->opt('churn_agent')) {
+                        $self->{ua_str} = $self->_pick_user_agent();
+                        $self->{http_or} = HTTP::Tiny->new(max_redirect => 15, agent => $self->{ua_str});
+                    }
+                    Time::HiRes::sleep($self->opt('retry_delay', 0.5)) if ($n_tries > 1);
+                    next;
+                }
+                $response = 1;
+                $self->{dl_fr} = $url;
+                $self->{dl_to} = $leapseconds_filename;
+                $success = 1;
+                last;
+            }
+            last if ($success);
         }
     };
     return $response;
@@ -239,7 +285,7 @@ sub _leapseconds_filename {
 
 =head1 VERSION
 
-    1.13
+    1.16
 
 =head1 SYNOPSIS
 
@@ -501,6 +547,22 @@ By default, no attempt is made to download a leapseconds file.  This avoids
 the potential for very long http timeouts and clobbering any existing
 administrator-provided leapseconds file.
 
+C<Time::TAI::Simple->{ua_ar}> is an arrayref to a list of User-Agent strings, 
+and one of these will be picked at random for HTTP queries, stored in C<Time::TAI::Simple->{ua_str}>.
+
+User-Agent spoofing behavior is subject to the following options which can be 
+passed to C<new> (see the documentation for C<tai-download-leapseconds> for a 
+description of their use):
+
+    agent => <STRING>,
+    churn_agent => 1,
+    force_edge => 1,
+
+See C<tai-download-leapseconds> also for the download-related options:
+
+    retry => <NUMBER>,
+    retry_delay => <SECONDS>
+
 =item C<download_urls =E<gt> [$url1, $url2, ...]>
 
 Prepends the provided list of URLs to the list of remove locations from which
@@ -697,6 +759,12 @@ to see its options.
 
 =head1 TODO
 
+Needs support for negative leapseconds.
+
+Needs support for Linux's POSIX CLOCK_TAI, when available, now that that's properly 
+exposed in recent Linux releases.  Currently blocked on L<POSIX::RT::Timer> but if 
+an update is too long in the coming I may just roll my own.
+
 Needs more unit tests.
 
 Does C<new> need changes to be made thread-safe?
@@ -747,7 +815,7 @@ TTK Ciar, <ttk[at]ciar[dot]org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2014-2017 by TTK Ciar
+Copyright 2014-2022 by TTK Ciar
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

@@ -3,8 +3,8 @@
    "author" : [
       "Darren M. Kulp, C<< <kulp @ cpan.org> >>"
    ],
-   "dynamic_config" : 0,
-   "generated_by" : "Module::Install version 0.680, CPAN::Meta::Converter version 2.133380",
+   "dynamic_config" : "1",
+   "generated_by" : "Module::Install version 1.19, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,7 +22,14 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.36",
+            "LWP" : "0",
+            "Test::More" : "0.42"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
          }
       },
       "runtime" : {
@@ -30,11 +37,9 @@
             "Encode" : "0",
             "HTML::Entities" : "0",
             "HTML::Entities::Numbered" : "0.04",
-            "LWP" : "0",
             "MIME::Base64" : "0",
-            "Mac::PropertyList" : "1.29",
+            "Mac::PropertyList" : "1.501",
             "Object::MultiType" : "0.02",
-            "Test::More" : "0.42",
             "XML::SAX::Base" : "0",
             "XML::SAX::Expat" : "0.4",
             "XML::SAX::ParserFactory" : "0",
@@ -44,5 +49,10 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.86"
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.001"
 }

@@ -5,21 +5,21 @@
       "Michael G. Schwern <schwern@pobox.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "File-chdir",
    "no_index" : {
       "directory" : [
-         "t",
-         "xt",
+         "corpus",
          "examples",
-         "corpus"
+         "t",
+         "xt"
       ],
       "package" : [
          "DB"
@@ -36,17 +36,24 @@
          "requires" : {
             "Dist::Zilla" : "5",
             "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.072",
+            "English" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Software::License::Perl_5" : "0",
             "Test::CPAN::Meta" : "0",
             "Test::More" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.12",
-            "Test::Version" : "1"
+            "Test::Version" : "1",
+            "blib" : "1.01",
+            "perl" : "5.006",
+            "warnings" : "0"
          }
       },
       "runtime" : {
@@ -76,15 +83,15 @@
    "provides" : {
       "File::chdir" : {
          "file" : "lib/File/chdir.pm",
-         "version" : "0.1010"
+         "version" : "0.1011"
       },
       "File::chdir::ARRAY" : {
          "file" : "lib/File/chdir.pm",
-         "version" : "0.1010"
+         "version" : "0.1011"
       },
       "File::chdir::SCALAR" : {
          "file" : "lib/File/chdir.pm",
-         "version" : "0.1010"
+         "version" : "0.1011"
       }
    },
    "release_status" : "stable",
@@ -99,10 +106,13 @@
          "web" : "https://github.com/dagolden/File-chdir"
       }
    },
-   "version" : "0.1010",
+   "version" : "0.1011",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
-      "Joel Berger <joel.a.berger@gmail.com>"
-   ]
+      "David Golden <xdg@xdg.me>",
+      "Joel Berger <joel.a.berger@gmail.com>",
+      "Philippe Bruhat (BooK) <book@cpan.org>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
 }
 

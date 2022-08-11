@@ -1,5 +1,9 @@
 Revision history for Mojolicious::Plugin::Geolocation::MMDB
 
+0.004  2022-08-05 15:46:45 CEST
+
+  - Move the primary Git repository to GitHub
+
 0.003  2022-03-07 18:42:33 CET
 
   - Reintroduce the Windows support

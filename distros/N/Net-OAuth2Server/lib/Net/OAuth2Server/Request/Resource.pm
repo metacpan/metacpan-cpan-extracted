@@ -1,6 +1,8 @@
 use strict; use warnings;
 
 package Net::OAuth2Server::Request::Resource;
+our $VERSION = '0.006';
+
 use parent 'Net::OAuth2Server::Request';
 
 sub allowed_methods       { $_[0]->method } # accept whatever the method is
@@ -15,4 +17,4 @@ sub get_grant {
 		or ( $self->error || $self->set_error_invalid_token, return );
 }
 
-our $VERSION = '0.005';
+1;

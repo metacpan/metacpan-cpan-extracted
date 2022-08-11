@@ -7,11 +7,18 @@ sub find_by_id($self, $id) {
   return $self->find({id=>$id});
 }
 
-sub authenticate($self, $username='', $password='') {
-  my $user = $self->find_or_new({username=>$username});
-  $user->errors->add(undef, 'Invalid login credentials')
-    unless $user->in_storage && $user->check_password($password);
-  return $user;
+sub account_for($self, $user) {
+  my $account = $self->find(
+    { 'me.id' => $user->id },
+    { prefetch => ['profile', 'credit_cards', {person_roles => 'role' }] }
+  );
+  $account->build_related_if_empty('profile'); # Needed since the relationship is optional
+  $account->profile->status('pending') unless defined($account->profile->status);
+  return $account;
+}
+
+sub unauthenticated_user($self, $args=+{}) {
+  return $self->new_result($args);  
 }
 
 1;

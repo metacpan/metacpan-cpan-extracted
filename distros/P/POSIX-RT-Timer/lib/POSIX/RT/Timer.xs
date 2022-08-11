@@ -20,47 +20,58 @@
 
 #define die_sys(format) Perl_croak(aTHX_ format, strerror(errno))
 
-typedef struct { const char* key; clockid_t value; } map[];
+typedef struct { const char* key; STRLEN key_length; clockid_t value; } map[];
 
 static map clocks = {
-	{ "realtime" , CLOCK_REALTIME  }
+	{ STR_WITH_LEN("realtime") , CLOCK_REALTIME  }
 #ifdef CLOCK_REALTIME_COARSE
-	, { "realtime_coarse", CLOCK_REALTIME_COARSE }
+	, { STR_WITH_LEN("realtime_coarse"), CLOCK_REALTIME_COARSE }
+#endif
+#ifdef CLOCK_REALTIME_ALARM
+	, { STR_WITH_LEN("realtime_alarm"), CLOCK_REALTIME_ALARM }
 #endif
 #ifdef CLOCK_MONOTONIC
-	, { "monotonic", CLOCK_MONOTONIC }
+	, { STR_WITH_LEN("monotonic"), CLOCK_MONOTONIC }
 #elif defined CLOCK_HIGHRES
-	, { "monotonic", CLOCK_HIGHRES }
+	, { STR_WITH_LEN("monotonic"), CLOCK_HIGHRES }
 #endif
 #ifdef CLOCK_MONOTONIC_RAW
-	, { "monotonic_raw", CLOCK_MONOTONIC_RAW }
+	, { STR_WITH_LEN("monotonic_raw"), CLOCK_MONOTONIC_RAW }
 #endif
 #ifdef CLOCK_MONOTONIC_COARSE
-	, { "monotonic_coarse", CLOCK_MONOTONIC_COARSE }
+	, { STR_WITH_LEN("monotonic_coarse"), CLOCK_MONOTONIC_COARSE }
 #endif
 #ifdef CLOCK_PROCESS_CPUTIME_ID
-	, { "process", CLOCK_PROCESS_CPUTIME_ID }
+	, { STR_WITH_LEN("process"), CLOCK_PROCESS_CPUTIME_ID }
 #elif defined CLOCK_PROF
-	, { "process", CLOCK_PROF }
+	, { STR_WITH_LEN("process"), CLOCK_PROF }
 #endif
 #ifdef CLOCK_THREAD_CPUTIME_ID
-	, { "thread", CLOCK_THREAD_CPUTIME_ID }
+	, { STR_WITH_LEN("thread"), CLOCK_THREAD_CPUTIME_ID }
 #endif
 #ifdef CLOCK_UPTIME
-	, { "uptime", CLOCK_UPTIME }
+	, { STR_WITH_LEN("uptime"), CLOCK_UPTIME }
 #endif
 #ifdef CLOCK_BOOTTIME
-	, { "boottime", CLOCK_BOOTTIME }
+	, { STR_WITH_LEN("boottime"), CLOCK_BOOTTIME }
+#endif
+#ifdef CLOCK_BOOTTIME_ALARM
+	, { STR_WITH_LEN("boottime_alarm"), CLOCK_BOOTTIME_ALARM }
 #endif
 #ifdef CLOCK_VIRTUAL
-	, { "virtual", CLOCK_VIRTUAL }
+	, { STR_WITH_LEN("virtual"), CLOCK_VIRTUAL }
+#endif
+#ifdef CLOCK_TAI
+	, { STR_WITH_LEN("tai"), CLOCK_TAI }
 #endif
 };
 
-static clockid_t S_get_clockid(pTHX_ const char* clock_name) {
+static clockid_t S_get_clockid(pTHX_ SV* clock_name) {
 	int i;
+	STRLEN length;
+	const char* clock_ptr = SvPV(clock_name, length);
 	for (i = 0; i < sizeof clocks / sizeof *clocks; ++i) {
-		if (strEQ(clock_name, clocks[i].key))
+		if (clocks[i].key_length == length && strEQ(clock_ptr, clocks[i].key))
 			return clocks[i].value;
 	}
 	Perl_croak(aTHX_ "No such timer '%s' known", clock_name);
@@ -99,7 +110,7 @@ static clockid_t S_get_clock(pTHX_ SV* ref, const char* funcname) {
 	SV* value;
 	if (!SvROK(ref) || !(value = SvRV(ref)))
 		Perl_croak(aTHX_ "Could not %s: this variable is not a clock", funcname);
-	return SvIV(value);
+	return SvUV(value);
 }
 #define get_clock(ref, func) S_get_clock(aTHX_ ref, func)
 
@@ -111,11 +122,11 @@ static clockid_t S_get_clock(pTHX_ SV* ref, const char* funcname) {
 #endif
 #endif
 
-static SV* S_create_clock(pTHX_ clockid_t clockid, const char* class) {
+static SV* S_create_clock(pTHX_ clockid_t clockid, SV* class) {
 	SV *tmp, *retval;
 	tmp = newSViv(clockid);
 	retval = newRV_noinc(tmp);
-	sv_bless(retval, gv_stashpv(class, 0));
+	sv_bless(retval, gv_stashsv(class, 0));
 	SvREADONLY_on(tmp);
 	return retval;
 }
@@ -141,6 +152,7 @@ static pthread_t* S_get_pthread(pTHX_ SV* thread_handle) {
 	SV* tmp;
 	pthread_t* ret;
 	dSP;
+	ENTER;
 	SAVETMPS;
 	PUSHMARK(SP);
 	PUSHs(thread_handle);
@@ -150,6 +162,7 @@ static pthread_t* S_get_pthread(pTHX_ SV* thread_handle) {
 	tmp = POPs;
 	ret = INT2PTR(pthread_t* ,SvUV(tmp));
 	FREETMPS;
+	LEAVE;
 	return ret;
 }
 #define get_pthread(handle) S_get_pthread(aTHX_ handle)
@@ -173,35 +186,27 @@ static void S_timer_args(pTHX_ timer_init* para, SV** begin, Size_t items) {
 		SV *key = begin[i], *value = begin[i+1];
 		current = SvPV(key, curlen);
 		if (curlen == 5) {
-			if (strEQ(current, "clock")) {
-				para->clockid = SvROK(value) ? get_clock(value, "create timer") : get_clockid(SvPV_nolen(value));
-			}
-			else if (strEQ(current, "value")) {
+			if (strEQ(current, "clock"))
+				para->clockid = SvROK(value) ? get_clock(value, "create timer") : get_clockid(value);
+			else if (strEQ(current, "value"))
 				nv_to_timespec(SvNV(value), &para->itimer.it_value);
-			}
-			else if (strEQ(current, "ident")) {
+			else if (strEQ(current, "ident"))
 				para->ident = SvIV(value);
-			}
 			else
 				goto fail;
 		}
-		else if (curlen == 6 && strEQ(current, "signal")) {
+		else if (curlen == 6 && strEQ(current, "signal"))
 			para->signo = (SvIOK(value) || looks_like_number(value)) ? SvIV(value) : whichsig(SvPV_nolen(value));
-		}
 		else if (curlen == 8) {
-			if (strEQ(current, "interval")) {
+			if (strEQ(current, "interval"))
 				nv_to_timespec(SvNV(value), &para->itimer.it_interval);
-			}
-			else if (strEQ(current, "absolute")) {
+			else if (strEQ(current, "absolute"))
 				para->flags |= TIMER_ABSTIME;
-			}
 			else
 				goto fail;
 		}
-		else {
-			fail:
-			Perl_croak(aTHX_ "Unknown option '%s'", current);
-		}
+		else
+			fail: Perl_croak(aTHX_ "Unknown option '%s'", current);
 	}
 }
 #define timer_args(para, begin, items) S_timer_args(aTHX_ para, begin, items)
@@ -254,7 +259,7 @@ void new(class, ...)
 		Size_t length;
 	PPCODE:
 		class_str = SvPV(class, length);
-		timer_init para = { 0, CLOCK_REALTIME, -1, 0, 0, FALSE };
+		timer_init para = { CLOCK_REALTIME, 0, 0, 0, 0};
 		timer_args(&para, SP + 2, items - 1);
 		PUSHs(timer_instantiate(&para, class_str, length));
 
@@ -317,11 +322,13 @@ MODULE = POSIX::RT::Timer				PACKAGE = POSIX::RT::Clock
 PROTOTYPES: DISABLED
 
 SV*
-new(class, clock_type = "realtime")
-	const char* class;
-	const char* clock_type;
+new(class, ...)
+	SV* class;
+	PREINIT:
+		clockid_t clockid;
 	CODE:
-		RETVAL = create_clock(get_clockid(clock_type), class);
+		clockid = items > 1 ? get_clockid(ST(1)) : CLOCK_REALTIME;
+		RETVAL = create_clock(clockid, class);
 	OUTPUT:
 		RETVAL
 
@@ -336,7 +343,7 @@ handle(self)
 #if defined(_POSIX_CPUTIME) && _POSIX_CPUTIME >= 0
 SV*
 get_cpuclock(class, pid = undef)
-	const char* class;
+	SV* class;
 	SV* pid;
 	PREINIT:
 		clockid_t clockid;
@@ -369,7 +376,7 @@ get_clocks(class)
 		const size_t max = sizeof clocks / sizeof *clocks;
 	PPCODE:
 		for (i = 0; i < max; ++i)
-			mXPUSHp(clocks[i].key, strlen(clocks[i].key));
+			mXPUSHp(clocks[i].key, clocks[i].key_length);
 		XSRETURN(max);
 
 NV
@@ -417,7 +424,7 @@ void
 timer(self, ...)
 	SV* self;
 	PPCODE:
-		timer_init para = { 0, CLOCK_REALTIME, -1, 0, 0, FALSE };
+		timer_init para = { CLOCK_REALTIME, 0, 0, 0, 0};
 		timer_args(&para, SP + 2, items - 1);
 		para.clockid = get_clock(self, "timer");
 		PUSHs(timer_instantiate(&para, "POSIX::RT::Timer", 16));

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/HeaderValue.pm
-## Version v0.4.0
+## Version v0.4.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/11/03
-## Modified 2022/07/18
+## Modified 2022/08/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -66,7 +66,7 @@ BEGIN
     # our $TYPE_REGEXP  = qr/(?:[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+)|$TOKEN_REGEXP/;
     # our $TOKEN_REGEXP = qr/[!#$%&'*+.^_`|~0-9A-Za-z-]+/;
     # our $TEXT_REGEXP  = qr/[\u000b\u0020-\u007e\u0080-\u00ff]+|$COOKIE_DATA_RE/;
-    our $VERSION = 'v0.4.0';
+    our $VERSION = 'v0.4.1';
 };
 
 use strict;
@@ -87,13 +87,9 @@ sub init
     $self->{value_max} = 0;
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
-#     $self->message( 3, "Value array is set to: ", sub{ $self->SUPER::dump( $self->{value} ) });
-#     $self->message( 3, "Setting params to: ", sub{ $self->SUPER::dump( $params ) });
     use overloading;
-#     $self->message( 3, "Decode value is '", $self->decode, "' and is true ? ", $self->decode ? 'yes' : 'no', " (", overload::StrVal( $self->decode ), ")." );
     if( scalar( @{$self->{value}} ) > 1 && $self->decode )
     {
-#         $self->message( 3, "Decoding header value's value '", $self->{value}->[1], "'." );
         $self->{value}->[1] = URI::Escape::uri_unescape( $self->{value}->[1] );
     }
     return( $self );
@@ -108,7 +104,6 @@ sub new_from_multi
     $opts->{debug} //= 0;
     $opts->{decode} //= 0;
     my $me = bless( $opts => ( ref( $self ) || $self ) );
-    $me->message( 4, "Processing value '$s'" );
     my $parts = [];
     my $i = 0;
     if( $self->_is_array( $s ) )
@@ -129,7 +124,6 @@ sub new_from_multi
             defined( $_ ) ? do{ $parts->[$i] .= $_ } : do{ $i++ };
         }
     }
-    # $me->message( 3, "Parts found are: ", sub{ $me->SUPER::dump( $parts )} );
     my $res = $self->new_array;
     for( my $j = 0; $j < scalar( @$parts ); $j++ )
     {
@@ -159,7 +153,6 @@ sub new_from_header
     unless( $self->_is_object( $self ) )
     {
         $self = bless( $opts => $self );
-        $self->message( 4, "Initialised object with options: ", sub{ $self->dump( $opts ) });
     }
     my $sep  = CORE::length( $opts->{separator} ) ? $opts->{separator} : ';';
     my @parts = ();
@@ -181,15 +174,12 @@ sub new_from_header
     #     if( $self->debug )
     #     {
     #         my $trace = $self->_get_stack_trace;
-    #         $self->message( 4, "\$self is '", overload::StrVal( $self ), "' and \$DEBUG value is '$DEBUG' and debug flag is '", $self->debug, "' stack trace: ", $trace->as_string );
     #     }
-        $self->message( 4, "Header value '$n' and its own value is '$v' (", defined( $v ) ? 'defined' : 'undefined', ")." );
         $v =~ s/^\"|(?<!\\)\"$//g;
         if( $opts->{decode} )
         {
             $n = URI::Escape::uri_unescape( $n );
             $v = URI::Escape::uri_unescape( $v ) if( defined( $v ) );
-            $self->message( 4, "After decoding, header value is '$n' and its value is '$v'." );
         }
         $obj = $self->new( defined( $v ) ? [$n, $v] : $n );
     }
@@ -213,7 +203,6 @@ sub new_from_header
             next;
         }
         
-        $self->message( 4, "\tAttribute is '$attribute' and value '", ( $value // '' ), "'. Fragment processed was '$frag'" );
         $value =~ s/^\"|\"$//g if( defined( $value ) );
         # Check character string and length. Should not be more than 255 characters
         # https://datatracker.ietf.org/doc/html/rfc1341
@@ -225,24 +214,20 @@ sub new_from_header
             {
                 if( $value =~ /^$TEXT_REGEXP$/ && ( $value_max_len <= 0 || CORE::length( $value ) <= $value_max_len ) )
                 {
-                    $self->message( 4, "\tAdding property \"$attribute\" with value \"$value\"." );
                     $obj->param( lc( $attribute ) => $value );
                 }
                 else
                 {
-                    $self->message( 2, "Value for property \"$attribute\" contained some illegal characters or exceeded the maximum size of '$value_max_len'." );
                     warnings::warn( "Value for property \"$attribute\" contained some illegal characters or exceeded the maximum size of '$value_max_len'.\n" ) if( warnings::enabled() );
                 }
             }
             else
             {
-                $self->message( 4, "\tAdding property \"$attribute\" with value undef." );
                 $obj->param( lc( $attribute ) => undef );
             }
         }
         else
         {
-            $self->message( 2, "Token \"$attribute\" contains illegal characters or exceeds the maximum size of '$token_max_len'." );
             warnings::warn( "Token \"$attribute\" contains illegal characters or exceeds the maximum size of '$token_max_len'.\n" ) if( warnings::enabled() );
         }
     }
@@ -277,24 +262,20 @@ sub as_string
             {
                 $params = $self->params->keys->sort;
             }
-            # $self->message( 3, "Properties found: '", $params->join( "', '" ), "'" );
             for( my $i = 0; $i < $params->length; $i++ )
             {
                 if( $params->[$i] !~ /^$TOKEN_REGEXP$/ )
                 {
-                    $self->message( 3, "Invalid parameter name: \"" . $params->[$i] . "\"" );
                     return( $self->error( "Invalid parameter name: \"" . $params->[$i] . "\"" ) );
                 }
                 elsif( $token_max_len > 0 && CORE::length( $params->[$i] ) )
                 {
-                    $self->message( 3, "Parameter name \"", substr( $params->[$i], 0, $token_max_len ), "\" exceeds the maximum length of $token_max_len" );
                     return( $self->error( "Parameter name \"", substr( $params->[$i], 0, $token_max_len ), "\" exceeds the maximum length of $token_max_len" ) );
                 }
                 if( length( $string ) > 0 )
                 {
                     $string .= '; ';
                 }
-                # $self->message( 3, "Value for property '", $params->[$i], "' is '", $self->params->get( $params->[$i] ), "'." );
                 # No escaping of property values
                 # $string .= $params->[$i] . '=' . ( $self->encode ? URI::Escape::uri_escape( $self->params->get( $params->[$i] ) ) : $self->qstring( $self->params->get( $params->[$i] ) ) );
                 my $value = $self->params->get( $params->[$i] );
@@ -302,13 +283,11 @@ sub as_string
                 {
                     if( $value_max_len > 0 && CORE::length( $value ) > $value_max_len )
                     {
-                        $self->message( 3, "Parameter \"", $params->[$i], "\" value exceeds the maximum length of $value_max_len" );
                         return( $self->error( "Parameter \"", $params->[$i], "\" value exceeds the maximum length of $value_max_len" ) );
                     }
                     my $qstr = $self->qstring( $value );
                     if( !defined( $qstr ) )
                     {
-                        $self->message( 1, $self->error );
                         warn( $self->error );
                         next;
                     }
@@ -318,7 +297,6 @@ sub as_string
                 {
                     $string .= $params->[$i];
                 }
-                # $self->message( 5, "Resulting string is now '$string'" );
             }
         }
         $self->original( $string );
@@ -358,7 +336,6 @@ sub qstring
 
     if( length( $str ) > 0 && $str !~ /^$TEXT_REGEXP$/ )
     {
-        $self->message( 3, "Invalid parameter value '$str'" );
         return( $self->error( 'Invalid parameter value' ) );
     }
 
@@ -389,12 +366,10 @@ sub value { return( shift->_set_get_array_as_object( 'value', @_ ) ); }
 sub value_as_string
 {
     my $self = shift( @_ );
-    $self->message( 3, "Value is: '", $self->value->join( "', '" )->scalar, "'." );
     my $string = '';
     if( $self->value->length )
     {
         my( $n, $v ) = $self->value->list;
-        $self->message( 3, "header value is '$n' and its value (possibly null) is '$v'" );
         if( defined( $v ) && $n !~ /^$TOKEN_REGEXP$/ )
         {
             if( $self->encode )
@@ -406,13 +381,11 @@ sub value_as_string
             }
             else
             {
-                $self->message( 3, "Invalid token \"$n\"" );
                 return( $self->error( "Invalid token \"$n\"" ) );
             }
         }
         elsif( !defined( $v ) && $n !~ /^$TEXT_REGEXP$/ )
         {
-            $self->message( 3, "Invalid value \"$n\"" );
             return( $self->error( "Invalid value \"$n\"" ) );
         }
         if( defined( $v ) && $self->encode )
@@ -464,7 +437,8 @@ sub FREEZE
     my $class = CORE::ref( $self );
     my %hash  = %$self;
     # Return an array reference rather than a list so this works with Sereal and CBOR
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # On or before Sereal version 4.023, Sereal did not support multiple values returned
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
     # But Storable want a list with the first element being the serialised element
     CORE::return( $class, \%hash );
 }
@@ -522,7 +496,7 @@ Module::Generic::HeaderValue - Generic Header Value Parser
 
 =head1 VERSION
 
-    v0.4.0
+    v0.4.1
 
 =head1 DESCRIPTION
 

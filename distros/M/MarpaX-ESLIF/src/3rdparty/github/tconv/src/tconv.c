@@ -294,7 +294,7 @@ tconv_t tconv_open_ext(const char *tocodes, const char *fromcodes, tconv_option_
   /* 1. trace */
   traces                       = getenv(TCONV_ENV_TRACE);
   tconvp->traceb               = (traces != NULL) ? (atoi(traces) != 0 ? 1 : 0) : 0;
-  if ((tconvOptionp != NULL) && (tconvp->traceCallbackp != NULL)) {
+  if ((tconvOptionp != NULL) && (tconvOptionp->traceCallbackp != NULL)) {
     tconvp->traceCallbackp  = tconvOptionp->traceCallbackp;
     tconvp->traceUserDatavp = tconvOptionp->traceUserDatavp;
     tconvp->genericLoggerp  = genericLogger_newp(_tconvTraceCallbackProxy, tconvp, GENERICLOGGER_LOGLEVEL_TRACE);

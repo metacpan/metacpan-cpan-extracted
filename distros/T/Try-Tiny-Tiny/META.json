@@ -21,11 +21,7 @@
    },
    "prereqs" : {
       "build" : {},
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
+      "configure" : {},
       "runtime" : {
          "requires" : {
             "Try::Tiny" : "0",
@@ -37,15 +33,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ap/Try-Tiny-Tiny/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Try-Tiny-Tiny"
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ap/Try-Tiny-Tiny.git",
+         "url" : "https://github.com/ap/Try-Tiny-Tiny.git",
          "web" : "https://github.com/ap/Try-Tiny-Tiny"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_copyright" : {
       "holder" : "Aristotle Pagaltzis",
       "year" : 2017

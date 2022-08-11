@@ -1,10 +1,10 @@
 {
-   "abstract" : "Command to produce ANSI terminal code",
+   "abstract" : "Colored echo command using ANSI terminal sequence",
    "author" : [
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.12",
+   "generated_by" : "Minilla/v3.1.19",
    "license" : [
       "perl_5"
    ],
@@ -43,10 +43,8 @@
       "runtime" : {
          "requires" : {
             "Encode" : "0",
-            "Getopt::EX" : "v1.26.0",
-            "Getopt::EX::Colormap" : "0",
-            "Getopt::EX::Hashed" : "1.01",
-            "Getopt::EX::Long" : "0",
+            "Getopt::EX" : "v1.28.0",
+            "Getopt::EX::Hashed" : "1.03",
             "List::Util" : "0",
             "Pod::Usage" : "0",
             "Text::ANSI::Printf" : "2.01",
@@ -63,7 +61,7 @@
    "provides" : {
       "App::ansiecho" : {
          "file" : "lib/App/ansiecho.pm",
-         "version" : "0.07"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
@@ -73,15 +71,16 @@
       },
       "homepage" : "https://github.com/kaz-utashiro/App-ansiecho",
       "repository" : {
-         "url" : "git://github.com/kaz-utashiro/App-ansiecho.git",
+         "type" : "git",
+         "url" : "https://github.com/kaz-utashiro/App-ansiecho.git",
          "web" : "https://github.com/kaz-utashiro/App-ansiecho"
       }
    },
-   "version" : "0.07",
+   "version" : "1.01",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

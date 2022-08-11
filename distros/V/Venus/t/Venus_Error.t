@@ -98,6 +98,122 @@ message: rw, opt, Str, C<'Exception!'>
 
 $test->for('attributes');
 
+=method as
+
+The as method returns a new error object using the return value(s) of the "as"
+method specified, which should be defined as C<"as_${name}">, which will be
+called automatically by this method.
+
+=signature as
+
+  as(Str $name) (Error)
+
+=metadata as
+
+{
+  since => '1.02',
+}
+
+=example-1 as
+
+  package System::Error;
+
+  use Venus::Class;
+
+  base 'Venus::Error';
+
+  sub as_auth_error {
+    my ($self) = @_;
+
+    return $self->do('message', 'auth_error');
+  }
+
+  sub as_role_error {
+    my ($self) = @_;
+
+    return $self->do('message', 'role_error');
+  }
+
+  sub is_auth_error {
+    my ($self) = @_;
+
+    return $self->message eq 'auth_error';
+  }
+
+  sub is_role_error {
+    my ($self) = @_;
+
+    return $self->message eq 'role_error';
+  }
+
+  package main;
+
+  my $error = System::Error->new->as('auth_error');
+
+  $error->throw;
+
+=cut
+
+$test->for('example', 1, 'as', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error->result;
+  ok $result->isa('System::Error');
+  ok $result->isa('Venus::Error');
+  ok $result->message eq 'auth_error';
+
+  $result
+});
+
+=example-2 as
+
+  package System::Error;
+
+  use Venus::Class;
+
+  base 'Venus::Error';
+
+  sub as_auth_error {
+    my ($self) = @_;
+
+    return $self->do('message', 'auth_error');
+  }
+
+  sub as_role_error {
+    my ($self) = @_;
+
+    return $self->do('message', 'role_error');
+  }
+
+  sub is_auth_error {
+    my ($self) = @_;
+
+    return $self->message eq 'auth_error';
+  }
+
+  sub is_role_error {
+    my ($self) = @_;
+
+    return $self->message eq 'role_error';
+  }
+
+  package main;
+
+  my $error = System::Error->new->as('role_error');
+
+  $error->throw;
+
+=cut
+
+$test->for('example', 2, 'as', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error->result;
+  ok $result->isa('System::Error');
+  ok $result->isa('Venus::Error');
+  ok $result->message eq 'role_error';
+
+  $result
+});
+
 =method explain
 
 The explain method returns the error message and is used in stringification
@@ -170,6 +286,166 @@ $test->for('example', 1, 'frames', sub {
   ok $last_frame->[1] =~ m{t/Venus_Error.t$};
 
   $result
+});
+
+=method is
+
+The is method returns truthy or falsy based on the return value(s) of the "is"
+method specified, which should be defined as C<"is_${name}">, which will be
+called automatically by this method.
+
+=signature is
+
+  is(Str $name) (Error)
+
+=metadata is
+
+{
+  since => '1.02',
+}
+
+=example-1 is
+
+  package System::Error;
+
+  use Venus::Class;
+
+  base 'Venus::Error';
+
+  sub as_auth_error {
+    my ($self) = @_;
+
+    return $self->do('message', 'auth_error');
+  }
+
+  sub as_role_error {
+    my ($self) = @_;
+
+    return $self->do('message', 'role_error');
+  }
+
+  sub is_auth_error {
+    my ($self) = @_;
+
+    return $self->message eq 'auth_error';
+  }
+
+  sub is_role_error {
+    my ($self) = @_;
+
+    return $self->message eq 'role_error';
+  }
+
+  package main;
+
+  my $is = System::Error->new->as('auth_error')->is('auth_error');
+
+  # 1
+
+=cut
+
+$test->for('example', 1, 'is', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=example-2 is
+
+  package System::Error;
+
+  use Venus::Class;
+
+  base 'Venus::Error';
+
+  sub as_auth_error {
+    my ($self) = @_;
+
+    return $self->do('message', 'auth_error');
+  }
+
+  sub as_role_error {
+    my ($self) = @_;
+
+    return $self->do('message', 'role_error');
+  }
+
+  sub is_auth_error {
+    my ($self) = @_;
+
+    return $self->message eq 'auth_error';
+  }
+
+  sub is_role_error {
+    my ($self) = @_;
+
+    return $self->message eq 'role_error';
+  }
+
+  package main;
+
+  my $is = System::Error->as('auth_error')->is('auth_error');
+
+  # 1
+
+=cut
+
+$test->for('example', 2, 'is', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=example-3 is
+
+  package System::Error;
+
+  use Venus::Class;
+
+  base 'Venus::Error';
+
+  sub as_auth_error {
+    my ($self) = @_;
+
+    return $self->do('message', 'auth_error');
+  }
+
+  sub as_role_error {
+    my ($self) = @_;
+
+    return $self->do('message', 'role_error');
+  }
+
+  sub is_auth_error {
+    my ($self) = @_;
+
+    return $self->message eq 'auth_error';
+  }
+
+  sub is_role_error {
+    my ($self) = @_;
+
+    return $self->message eq 'role_error';
+  }
+
+  package main;
+
+  my $is = System::Error->as('auth_error')->is('role_error');
+
+  # 0
+
+=cut
+
+$test->for('example', 3, 'is', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  ok $result == 0;
+
+  !$result
 });
 
 =method throw

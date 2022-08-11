@@ -7,7 +7,7 @@ build_requires:
   Net::OAuth2Server::Request::Authorization: '0.004'
   Net::OAuth2Server::Request::Token::AuthorizationCode: '0.004'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,9 +24,10 @@ requires:
   Role::Tiny: '0'
   perl: '5.008'
 resources:
-  bugtracker: https://github.com/ap/Net-OAuth2Server-PKCE/issues
-  repository: git://github.com/ap/Net-OAuth2Server-PKCE.git
-version: '0.003'
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-OAuth2Server-PKCE
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ap/Net-OAuth2Server-PKCE.git
+version: '0.005'
 x_copyright:
   holder: 'Aristotle Pagaltzis'
   year: 2020

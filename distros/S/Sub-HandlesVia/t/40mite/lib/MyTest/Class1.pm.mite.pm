@@ -1,16 +1,18 @@
 {
 package MyTest::Class1;
-our $USES_MITE = "Mite::Class";
-our $MITE_SHIM = "MyTest::Mite";
 use strict;
 use warnings;
 
+our $USES_MITE = "Mite::Class";
+our $MITE_SHIM = "MyTest::Mite";
+our $MITE_VERSION = "0.008003";
 
 BEGIN {
     require MyTest::Role2;
     our %DOES = ( "MyTest::Class1" => 1, "MyTest::Role2" => 1, "MyTest::Role1" => 1 );
 }
 
+# Standard Moose/Moo-style constructor
 sub new {
     my $class = ref($_[0]) ? ref(shift) : shift;
     my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
@@ -18,25 +20,28 @@ sub new {
     my $args  = $meta->{HAS_BUILDARGS} ? $class->BUILDARGS( @_ ) : { ( @_ == 1 ) ? %{$_[0]} : @_ };
     my $no_build = delete $args->{__no_BUILD__};
 
-        # Attribute: list
-    do { my $value = exists( $args->{"list"} ) ? $args->{"list"} : do { my $method = $MyTest::Role1::__list_DEFAULT__; $self->$method }; (ref($value) eq 'ARRAY') or MyTest::Mite::croak "Type check failed in constructor: %s should be %s", "list", "ArrayRef"; $self->{"list"} = $value; }; 
+    # Attribute list (type: ArrayRef)
+    # has declaration, file lib/MyTest/Role1.pm, line 41
+    do { my $value = exists( $args->{"list"} ) ? $args->{"list"} : $MyTest::Role1::__list_DEFAULT__->( $self ); (ref($value) eq 'ARRAY') or MyTest::Mite::croak "Type check failed in constructor: %s should be %s", "list", "ArrayRef"; $self->{"list"} = $value; }; 
 
-
-    # Enforce strict constructor
-    my @unknown = grep not( /\Alist\z/ ), keys %{$args}; @unknown and MyTest::Mite::croak( "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
     # Call BUILD methods
     $self->BUILDALL( $args ) if ( ! $no_build and @{ $meta->{BUILD} || [] } );
 
+    # Unrecognized parameters
+    my @unknown = grep not( /\Alist\z/ ), keys %{$args}; @unknown and MyTest::Mite::croak( "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
+
     return $self;
 }
 
+# Used by constructor to call BUILD methods
 sub BUILDALL {
     my $class = ref( $_[0] );
     my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
     $_->( @_ ) for @{ $meta->{BUILD} || [] };
 }
 
+# Destructor should call DEMOLISH methods
 sub DESTROY {
     my $self  = shift;
     my $class = ref( $self ) || $self;
@@ -56,8 +61,10 @@ sub DESTROY {
     return;
 }
 
+# Gather metadata for constructor and destructor
 sub __META__ {
     no strict 'refs';
+    no warnings 'once';
     my $class      = shift; $class = ref($class) || $class;
     my $linear_isa = mro::get_linear_isa( $class );
     return {
@@ -74,6 +81,7 @@ sub __META__ {
     };
 }
 
+# See UNIVERSAL
 sub DOES {
     my ( $self, $role ) = @_;
     our %DOES;
@@ -82,6 +90,7 @@ sub DOES {
     return $self->SUPER::DOES( $role );
 }
 
+# Alias for Moose/Moo-compatibility
 sub does {
     shift->DOES( @_ );
 }
@@ -89,6 +98,7 @@ sub does {
 my $__XS = !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
 # Accessors for list
+# has declaration, file lib/MyTest/Role1.pm, line 41
 if ( $__XS ) {
     Class::XSAccessor->import(
         chained => 1,
@@ -96,7 +106,7 @@ if ( $__XS ) {
     );
 }
 else {
-    *list = sub { @_ > 1 ? MyTest::Mite::croak( "list is a read-only attribute of @{[ref $_[0]]}" ) : $_[0]{"list"} };
+    *list = sub { @_ == 1 or MyTest::Mite::croak( 'Reader "list" usage: $self->list()' ); $_[0]{"list"} };
 }
 
 

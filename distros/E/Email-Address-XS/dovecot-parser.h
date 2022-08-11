@@ -3,6 +3,20 @@
 
 #include <stdbool.h>
 
+enum message_address_parse_flags {
+	/* If enabled, missing mailbox and domain are set to MISSING_MAILBOX
+	   and MISSING_DOMAIN strings. Otherwise they're set to "". */
+	MESSAGE_ADDRESS_PARSE_FLAG_FILL_MISSING = (1 << 0),
+	/* Require local-part to strictly adhere to RFC5322 when parsing dots.
+	   For example ".user", "us..ser" and "user." will be invalid. This
+	   isn't enabled by default, because these kind of invalid addresses
+	   are commonly used in Japan. */
+	MESSAGE_ADDRESS_PARSE_FLAG_STRICT_DOTS = (1 << 1),
+	/* Same as MESSAGE_ADDRESS_PARSE_FLAG_STRICT_DOTS, but accept also
+	   non-strict input. Flag invalid_syntax will be set to true. */
+	MESSAGE_ADDRESS_PARSE_FLAG_NON_STRICT_DOTS_AS_INVALID = (1 << 2),
+};
+
 /* group: ... ; will be stored like:
    {name = NULL, NULL, "group", NULL}, ..., {NULL, NULL, NULL, NULL}
 */
@@ -28,14 +42,10 @@ struct message_address {
 	bool invalid_syntax;
 };
 
-/* Parse message addresses from given data. If fill_missing is TRUE, missing
-   mailbox and domain are set to MISSING_MAILBOX and MISSING_DOMAIN strings.
-   Otherwise they're set to "".
-
-   Note that giving an empty string will return NULL since there are no
-   addresses. */
+/* Parse message addresses from given data. Note that giving an empty string
+   will return NULL since there are no addresses. */
 struct message_address *
-message_address_parse(const char *str, size_t len, unsigned int max_addresses, bool fill_missing);
+message_address_parse(const char *str, size_t len, unsigned int max_addresses, enum message_address_parse_flags flags);
 
 void message_address_add(struct message_address **first, struct message_address **last,
 			 const char *name, size_t name_len, const char *route, size_t route_len,

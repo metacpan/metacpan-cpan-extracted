@@ -137,7 +137,7 @@ sub run {
   my %valid_token_params = (
     client_id     => 1,
     client_secret => 'boo',
-    grant_type    => $grant_type,
+    grant_type    => $grant_type =~ s/_body$//r,
     ( $grant_type eq 'authorization_code' ? (
       code          => $auth_code,
       redirect_uri  => $valid_auth_params{redirect_uri},
@@ -182,20 +182,28 @@ sub run {
 
   my @post_args;
 
-  if ( $grant_type eq 'client_credentials' ) {
-
-    my %valid_token_params = (
-      grant_type    => $grant_type,
-      scope         => [ qw/ eat / ],
-    );
+  if ( $grant_type =~ /client_credentials/ ) {
 
     my $encoded_client_details = b64_encode( join( ':',1,'boo' ) );
     chomp( $encoded_client_details );
 
-    @post_args = (
-      $token_route =>
-      { 'Authorization' => "Basic $encoded_client_details" } =>
-      form => \%valid_token_params
+    my $header = $grant_type =~ /body/
+      ? {}
+      : { 'Authorization' => "Basic $encoded_client_details" };
+
+    my %valid_token_params = (
+      grant_type    => $grant_type =~ s/_body$//r,
+      scope         => [ qw/ eat / ],
+
+      ( $grant_type =~ /body/
+        ? ( client_id => 1, client_secret => 'boo' )
+        : ()
+      ),
+    );
+
+    @post_args = ( %{ $header }
+      ? ( $token_route => $header => form => \%valid_token_params )
+      : ( $token_route => form => \%valid_token_params )
     );
 
   } else {
@@ -226,7 +234,7 @@ sub run {
         access_token  => re( '^.+$' ),
         token_type    => 'Bearer',
         expires_in    => '3600',
-        ( $grant_type eq 'client_credentials'
+        ( $grant_type =~ /client_credentials/
           ? ()
           : ( refresh_token => re( '^.+$' ) )
         ),
@@ -252,7 +260,7 @@ sub run {
   $t->get_ok('/api/eat')->status_is( $args->{no_200_responses} ? 401 : 200 );
   $t->get_ok('/api/sleep')->status_is( 401 );
 
-  if ( $grant_type ne 'client_credentials' ) {
+  if ( $grant_type !~ /client_credentials/ ) {
     note( "refresh token cannot access routes" );
 
     $t->ua->on(start => sub {

@@ -1,21 +1,14 @@
-package # hide from PAUSE
-  Catalyst::ActionRole::RenderView;
+package Catalyst::ActionRole::RenderView;
 
 {
   package Catalyst::ActionRole::RenderView::Utils::NoView;
    
   use Moose;
-  use namespace::clean -except => 'meta';
-    
-  extends 'CatalystX::Utils::HttpException';
-  
-  has '+status' => (is=>'ro', init_arg=>undef, default=>sub {500});
-  has '+errors' => (
-    is=>'ro',
-    init_arg=>undef, 
-    default=>sub { ["No View can be found to render."] },
-  );
+  with 'CatalystX::Utils::DoesHttpException';
    
+  sub status_code { 500 }
+  sub error { "No View can be found to render." }
+
   __PACKAGE__->meta->make_immutable;
 }
 
@@ -39,10 +32,47 @@ around 'execute', sub {
   my $view = $c->view() || Catalyst::ActionRole::RenderView::Utils::NoView->throw;
   $c->forward($view);
 
-
   return @return;
 };
 
+## Will remove this monkey patch when Catalyst is updated
+sub Catalyst::Dispatcher::_invoke_as_component {
+  my ( $self, $c, $component_or_class, $method ) = @_;
+
+  my $component = $self->_find_component($c, $component_or_class);
+  my $component_class = blessed $component || return 0;
+
+  if (my $code = $component_class->can('action_for')) {
+      my $possible_action = $component->$code($method);
+      return $possible_action if $possible_action;
+  }
+
+  my $component_in_waiting = blessed($component_or_class) ?
+    $component_or_class : 
+      $component_class;
+
+  if ( my $code = $component_in_waiting->can($method) ) {
+      return $self->_method_action_class->new(
+          {
+              name      => $method,
+              code      => $code,
+              reverse   => "$component_class->$method",
+              class     => $component_in_waiting,
+              namespace => Catalyst::Utils::class2prefix(
+                  $component_class, ref($c)->config->{case_sensitive}
+              ),
+          }
+      );
+  }
+  else {
+      my $error =
+        qq/Couldn't forward to "$component_class". Does not implement "$method"/;
+      $c->error($error);
+      $c->log->debug($error)
+        if $c->debug;
+      return 0;
+  }
+}
 
 1;
 
@@ -67,13 +97,28 @@ This is basically L<Catalyst::Action::RenderView> done as an action role (basica
 role) rather than as a base class.  This is a bit more flexible if you plan to do fancy
 stuff with your end action.
 
+Two things it doesn't do that the classic L<Catalyst::Action::RenderView> does is it doesn't
+set a default content type if none is found (old one just set C<text/html> which was probably
+ok back in the 'Aughts but not always true now) and we don't support the C<dump_info> when in
+debug mode since I really think something like that belongs in another part of the stack.
+
+I'm willing to be proven wrong, just send me your use cases and patches.
+
+=head1 EXCEPTIONS
+
+This class can throw the following exceptions which are compatible with L<CatalystX::Errors>
+
+=head2 Now View found
+
+If there's no view found when calling '$c->view()' we throw L<Catalyst::ActionRole::RenderView::Utils::NoView>
+
 =head1 AUTHOR
 
   John Napiorkowski <jnapiork@cpan.org>
  
 =head1 COPYRIGHT
  
-Copyright (c) 2021 the above named AUTHOR
+Copyright (c) 2022 the above named AUTHOR
  
 =head1 LICENSE
  

@@ -1,6 +1,19 @@
 Revision history for Perl module HTTP::Promise
 
-v0.1.3 2022-07-01T10:44:30+0900
+v0.1.6 2022-08-06T19:48:15+0900
+    - Attempting to correct an issue with THAWing HTTP::Promise::Message
+
+v0.1.5 2022-08-06T13:57:59Z +0900
+    - Removing an overlooked debugging module from test unit
+
+v0.1.4 2022-07-17T05:56:32Z +0900
+    - Minor correction on the temporary file extension to store response data in _read_body_chunked() in HTTP::Promise
+    - Corrected passing the error object with the reject callback in delete, get, options, patch, post, put methods in HTTP::Promise
+    - Added suport for serialisation by CBOR, Sereal and Storable for all modules
+    - Correcting a bug in HTTP::Promise::Headers::ContentSecurityPolicyReportOnly, in report_uri()
+    - Corrected missing parameters in delete() and options() methods in HTTP::Promise
+
+v0.1.3 2022-07-01T10:44:30Z +0900
     - Correcting error in pod documentation affecting CPAN indexing
 
 v0.1.2 2022-06-30T13:56:42Z +0900

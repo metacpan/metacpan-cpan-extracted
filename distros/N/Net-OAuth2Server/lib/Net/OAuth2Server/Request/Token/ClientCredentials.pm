@@ -1,6 +1,8 @@
 use strict; use warnings;
 
 package Net::OAuth2Server::Request::Token::ClientCredentials;
+our $VERSION = '0.006';
+
 use parent 'Net::OAuth2Server::Request';
 
 sub grant_type { 'client_credentials' }
@@ -14,4 +16,4 @@ sub get_grant {
 	$grant_maker->from_client_credentials( $self, $self->params( $self->grant_parameters ), @_ );
 }
 
-our $VERSION = '0.005';
+1;

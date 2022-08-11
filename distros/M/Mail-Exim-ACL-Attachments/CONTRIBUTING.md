@@ -1,11 +1,11 @@
 # Contributing to Mail::Exim::ACL::Attachments
 
 The code for this distribution is hosted at
-https://gitlab.com/voegelas/mail-exim-acl-attachments.
+https://github.com/voegelas/Mail-Exim-ACL-Attachments.
 
 Grab the latest version using the command:
 
-    git clone https://gitlab.com/voegelas/mail-exim-acl-attachments.git
+    git clone https://github.com/voegelas/Mail-Exim-ACL-Attachments.git
 
 You can submit code changes by forking the repository, pushing your code
 changes to your clone, and then submitting a pull request.

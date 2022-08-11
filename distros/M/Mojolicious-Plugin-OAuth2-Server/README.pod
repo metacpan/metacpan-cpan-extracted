@@ -11,7 +11,7 @@ Authorization Server / Resource Server with Mojolicious
 
 =head1 VERSION
 
-0.49
+0.50
 
 =head1 SYNOPSIS
 
@@ -101,7 +101,7 @@ use Mojo::Util qw/ b64_decode url_unescape /;
 use Net::OAuth2::AuthorizationServer;
 use Carp qw/ croak /;
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 my ( $AuthCodeGrant,$PasswordGrant,$ImplicitGrant,$ClientCredentialsGrant,$Grant,$JWTCallback );
 
@@ -581,12 +581,23 @@ sub _access_token_request_check_params {
 sub _client_credentials_from_header {
   my ( $self ) = @_;
 
+  my ( $client_id,$client_secret );
+
+  # params in the header
   if ( my $auth_header = $self->req->headers->header( 'Authorization' ) ) {
     if ( my ( $encoded_details ) = ( split( 'Basic ',$auth_header ) )[1] ) {
       my $decoded_details = b64_decode( $encoded_details // '' );
-      my ( $client_id,$client_secret ) = split( ':',$decoded_details );
+      ( $client_id,$client_secret ) = split( ':',$decoded_details );
       return ( $client_id,$client_secret );
     }
+
+  # params in the body
+  } elsif ( $client_id = $self->req->param('client_id') ) {
+    $client_secret = $self->req->param('client_secret');
+  }
+
+  if ( $client_id && $client_secret ) {
+    return ( $client_id,$client_secret );
   }
 }
 

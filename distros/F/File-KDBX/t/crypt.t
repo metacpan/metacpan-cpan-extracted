@@ -40,7 +40,7 @@ subtest 'Error handling' => sub {
     pipe(my $read, my $write) or die "pipe failed: $!";
     $read = File::KDBX::IO::Crypt->new($read, cipher => $block_cipher);
 
-    print $write "blah blah blah!\1";
+    print $write "blah blah blah!"; # should produce: FATAL: cipher text length has to be multiple of 16 (15)
     close($write) or die "close failed: $!";
 
     is $read->error, '', 'Read handle starts out fine';

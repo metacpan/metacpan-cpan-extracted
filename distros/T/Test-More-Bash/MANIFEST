@@ -18,3 +18,4 @@ t/done-testing-count.t
 t/done-testing.t
 t/lib/DistTestFixer.pm
 t/more.t
+t/use-perl.t

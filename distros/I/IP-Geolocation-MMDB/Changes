@@ -1,5 +1,9 @@
 Revision history for IP::Geolocation::MMDB
 
+1.009  2022-08-05 14:32:53 CEST
+
+  - Move the primary Git repository to GitHub
+
 1.008  2022-06-07 16:58:48 CEST
 
   - Ensure that the module is subclassable. Fixed by Yujuan Jiang.

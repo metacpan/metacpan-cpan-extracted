@@ -276,13 +276,31 @@ sub _get_printable_call_stack {
 
 sub _arg_to_printable {
 
-    # Oof. In order to avoid warn()ing on undefined values
+    return "$_" if ref;
+
+    return 'undef' if !defined;
+
+    my $copy;
+
+    my $err = $@;
+
+    # In order to avoid warn()ing on undefined values
     # (and to distinguish '' from undef) we now quote scalars.
-    ref() ? "$_" : !defined() ? 'undef' : do {
-        my $copy = $_;
+    #
+    # We also eval the assignment in case the item was already freed.
+    #
+    if ( eval { $copy = $_ } ) {
         $copy =~ s<'><\\'>g;
-        "'$copy'";
-    };
+        substr($copy, 0, 0, q<'>);
+        $copy .= q<'>;
+    }
+    else {
+        $copy = '** argument not available anymore (already freed) **';
+    }
+
+    $@ = $err;
+
+    return $copy;
 }
 
 use constant _TRUE => 1;

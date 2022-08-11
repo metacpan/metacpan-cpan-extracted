@@ -1,0 +1,20 @@
+NAME
+
+    Perl::Critic::Policy::Modules::RequireExplicitPackage::ObjectPad -
+    Always make the package/Object::Pad class explicit.
+
+METHOLDS
+
+ violates
+
+    Please see
+    Perl::Critic::Policy::Modules::RequireExplicitPackage::violates
+
+ _replace_class
+
+    replace 'use Object::Pad' and 'class XXXX' with `package XXX` in
+    PPI::Document object, to make it be processable by
+    Perl::Critic::Policy::Modules::RequireExplicitPackage::violates
+
+    Argument: PPI::Document object Return: cloned PPI::document object
+

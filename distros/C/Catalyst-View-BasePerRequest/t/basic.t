@@ -14,7 +14,7 @@ my $expected = q[
         <title>Hello</title>
         wrapped <!-- 111 --><style>...</style><!-- 222 --> end wrap
       </head>
-      <body><div>Hello prepared_John!</div>: one</body>
+      <body><div>Hello prepared_John!</div>: one, nope</body>
     </html>];
 
 {

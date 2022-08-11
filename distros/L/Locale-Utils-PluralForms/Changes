@@ -1,5 +1,10 @@
 Revision history for Perl extension Locale::Utils::PluralForms.
 
+0.003  Tue Aug  9 18:49:15 2022
+- calculate plural as integer,
+  accept boolean results from plurals as 0/1
+  reported at https://rt.cpan.org/Ticket/Display.html?id=143879
+
 0.002  Fri Sep 29 09:49:40 2017
 - removed makefile dependency Module::Build
 - changed external url

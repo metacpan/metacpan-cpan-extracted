@@ -4,7 +4,7 @@ AtteanX::Parser::SPARQLJSON - SPARQL JSON Parser
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::SPARQLJSON version 0.030
+This document describes AtteanX::Parser::SPARQLJSON version 0.031
 
 =head1 SYNOPSIS
 
@@ -37,7 +37,7 @@ This document describes AtteanX::Parser::SPARQLJSON version 0.030
 use v5.14;
 use warnings;
 
-package AtteanX::Parser::SPARQLJSON 0.030 {
+package AtteanX::Parser::SPARQLJSON 0.031 {
 	use Attean;
 	use Moo;
 	use JSON;
@@ -86,36 +86,51 @@ package AtteanX::Parser::SPARQLJSON 0.030 {
 				my %data;
 				foreach my $v (@$vars) {
 					if (defined(my $value = $b->{ $v })) {
-						my $type	= $value->{type};
-						if ($type eq 'uri') {
-							my $data	= $value->{value};
-							$data{ $v }	= $self->new_iri( value => $data );
-						} elsif ($type eq 'bnode') {
-							my $data	= $value->{value};
-							$data{ $v }	= Attean::Blank->new( $data );
-						} elsif ($type eq 'literal') {
-							my $data	= $value->{value};
-							if (my $lang = $value->{'xml:lang'}) {
-								$data{ $v }	= Attean::Literal->new( value => $data, language => $lang );
-							} elsif (my $dt = $value->{'datatype'}) {
-								my $iri		= $self->new_iri(value => $dt);
-								$data{ $v }	= Attean::Literal->new( value => $data, datatype => $iri );
-							} else {
-								$data{ $v }	= Attean::Literal->new( $data );
-							}
-						} elsif ($type eq 'typed-literal') {
-							my $data	= $value->{value};
-							my $dt		= $value->{datatype};
-							my $iri		= $self->new_iri(value => $dt);
-							$data{ $v }	= Attean::Literal->new( value => $data, datatype => $iri );
-						} else {
-							die "Unknown node type $type during parsing of SPARQL JSON Results";
-						}
+						$data{ $v }	= $self->decode_node($value);
 					}
 				}
 				push(@results, Attean::Result->new( bindings => \%data ));
 			}
 			return @results;
+		}
+	}
+	
+=item C<< decode_node( \%value ) >>
+
+=cut
+
+	sub decode_node {
+		my $self	= shift;
+		my $value	= shift;
+		my $type	= $value->{type};
+		if ($type eq 'uri') {
+			my $data	= $value->{value};
+			return $self->new_iri( value => $data );
+		} elsif ($type eq 'bnode') {
+			my $data	= $value->{value};
+			return Attean::Blank->new( $data );
+		} elsif ($type eq 'literal') {
+			my $data	= $value->{value};
+			if (my $lang = $value->{'xml:lang'}) {
+				return Attean::Literal->new( value => $data, language => $lang );
+			} elsif (my $dt = $value->{'datatype'}) {
+				my $iri		= $self->new_iri(value => $dt);
+				return Attean::Literal->new( value => $data, datatype => $iri );
+			} else {
+				return Attean::Literal->new( $data );
+			}
+		} elsif ($type eq 'typed-literal') {
+			my $data	= $value->{value};
+			my $dt		= $value->{datatype};
+			my $iri		= $self->new_iri(value => $dt);
+			return Attean::Literal->new( value => $data, datatype => $iri );
+		} elsif ($type eq 'triple') {
+			my $s		= $self->decode_node($value->{value}{subject});
+			my $p		= $self->decode_node($value->{value}{predicate});
+			my $o		= $self->decode_node($value->{value}{object});
+			return Attean::Triple->new( $s, $p, $o );
+		} else {
+			die "Unknown node type $type during parsing of SPARQL JSON Results";
 		}
 	}
 
@@ -139,7 +154,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2020 Gregory Todd Williams. This
+Copyright (c) 2014--2022 Gregory Todd Williams. This
 program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

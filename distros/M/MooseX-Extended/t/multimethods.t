@@ -50,7 +50,7 @@ my %cases = (
 );
 
 while ( my ( $name, $class ) = each %cases ) {
-    subtest "Multi in classes" => sub {
+    subtest "Multi in $name" => sub {
         ok my $multi = $class->new, "We should be allowed to load $name with multimethods";
 
         subtest '2d point' => sub {

@@ -197,7 +197,7 @@
    "provides" : {
       "JSON::Schema::Tiny" : {
          "file" : "lib/JSON/Schema/Tiny.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       }
    },
    "release_status" : "stable",
@@ -212,7 +212,7 @@
          "web" : "https://github.com/karenetheridge/JSON-Schema-Tiny"
       }
    },
-   "version" : "0.017",
+   "version" : "0.018",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -1112,7 +1112,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.017",
+                  "tag" : "v0.018",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

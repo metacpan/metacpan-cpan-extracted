@@ -10,6 +10,7 @@ __PACKAGE__->load_components(qw/
   Helper::ResultSet::Me
   Helper::ResultSet::SetOperations
   Helper::ResultSet::IgnoreWantarray
+  ResultSet::SetControl
 /);
 
 sub to_array {

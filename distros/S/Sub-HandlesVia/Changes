@@ -6,6 +6,19 @@ Home page:    <https://metacpan.org/release/Sub-HandlesVia>
 Bug tracker:  <https://github.com/tobyink/p5-sub-handlesvia/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.034	2022-08-07
+
+ - Sub::HandlesVia::CodeGenerator now handles generating code for type
+   assertions and coercions instead of relying on handlers to do it.
+ - Sub::HandlesVia::CodeGenerator now has a configurable sandbox package.
+ - Updated: Sub::HandlesVia::Toolkit::Mite supports recent Mite features
+   such as lvalue accessors and new ways of specifying defaults.
+
+0.033	2022-07-12
+
+ - Optimizations to Sub::HandlesVia::CodeGenerator.
+ - Updated: Recompile with newer Mite.
+
 0.032	2022-07-12
 
  [ Packaging ]

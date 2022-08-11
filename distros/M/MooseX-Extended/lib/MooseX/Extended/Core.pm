@@ -28,7 +28,7 @@ use Ref::Util qw(
 );
 use Carp 'croak';
 
-our $VERSION = '0.26';
+our $VERSION = '0.28';
 
 our @EXPORT_OK = qw(
   _assert_import_list_is_valid
@@ -202,13 +202,14 @@ sub _default_import_list () {
         for_class    => Optional [NonEmptyStr],
         types        => Optional [ ArrayRef [NonEmptyStr] ],
         _import_type => Enum [qw/class role/],
-        _caller_eval => Bool,                                  # https://github.com/Ovid/moosex-extreme/pull/34
+        _caller_eval => Bool,                                  # https://github.com/Ovid/moosex-extended/pull/34
         includes     => Optional [
             ArrayRef [
                 Enum [
                     qw/
                       multi
                       async
+                      try
                       /
                 ]
             ]
@@ -234,6 +235,15 @@ sub _apply_optional_features ( $config, $for_class ) {
         # don't trap the error. Let it bubble up.
         load Future::AsyncAwait;
         Future::AsyncAwait->import::into($for_class);
+    }
+    if ( $config->{includes}{try} ) {
+        if ( $^V && $^V lt v5.24.0 ) {
+            croak("try/catch not supported in Perl version less than v5.24.0. You have $^V");
+        }
+
+        # don't trap the error. Let it bubble up.
+        load Syntax::Keyword::Try;
+        Syntax::Keyword::Try->import::into($for_class);
     }
 }
 
@@ -481,7 +491,7 @@ MooseX::Extended::Core - Internal module for MooseX::Extended
 
 =head1 VERSION
 
-version 0.26
+version 0.28
 
 =head1 DESCRIPTION
 

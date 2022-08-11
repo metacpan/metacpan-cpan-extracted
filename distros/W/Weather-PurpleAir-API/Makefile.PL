@@ -7,7 +7,7 @@ use 5.010000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Client for using the purpleair.com air quality sensor API",
+  "ABSTRACT" => "Client for using the purpleair.com air quality sensor API [DEPRECATED]",
   "AUTHOR" => "TTKCIAR <ttk\@ciar.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::Differences" => "0.60",
     "Test::Most" => "0.30"
   },
-  "VERSION" => "0.08",
+  "VERSION" => "0.09",
   "test" => {
     "TESTS" => "t/*.t"
   }

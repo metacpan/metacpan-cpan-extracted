@@ -9,6 +9,34 @@ use base 'Venus::Core';
 
 # METHODS
 
+sub BUILD {
+  my ($self, @data) = @_;
+
+  no strict 'refs';
+
+  my @roles = @{$self->META->roles};
+
+  for my $action (grep defined, map *{"${_}::BUILD"}{"CODE"}, @roles) {
+    $self->$action(@data);
+  }
+
+  return $self;
+}
+
+sub DESTROY {
+  my ($self, @data) = @_;
+
+  no strict 'refs';
+
+  my @roles = @{$self->META->roles};
+
+  for my $action (grep defined, map *{"${_}::DESTROY"}{"CODE"}, @roles) {
+    $self->$action(@data);
+  }
+
+  return $self;
+}
+
 sub EXPORT {
   my ($self, $into) = @_;
 

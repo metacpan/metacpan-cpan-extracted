@@ -87,7 +87,7 @@ $e = exception {
 like($e, qr/type constraint/, 'delegated method has to do naive type check')
 	or do {
 		require B::Deparse;
-		diag( B::Deparse->new->coderef2text(\&Local::Bleh::splice_nums) );
+		diag( B::Deparse->new->coderef2text(\&Local::Bleh2::splice_nums) );
 	};
 is_deeply($bleh->nums, [3..5], '... and kept the value safe');
 

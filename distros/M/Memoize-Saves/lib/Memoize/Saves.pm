@@ -1,7 +1,7 @@
 use strict; use warnings;
 
 package Memoize::Saves;
-our $VERSION = '0.69';
+our $VERSION = '0.700';
 
 our $DEBUG;
 

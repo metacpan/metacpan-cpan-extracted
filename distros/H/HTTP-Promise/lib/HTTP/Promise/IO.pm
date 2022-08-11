@@ -438,6 +438,7 @@ sub make_select_timeout
     my $now = time();
     my $inactivity_timeout = $self->inactivity_timeout // $opts->{inactivity_timeout} // 600;
     my $inactivity_timeout_at = ( $now + $inactivity_timeout );
+    $self->message( 4, "Setting timeout_at to $inactivity_timeout_at (${inactivity_timeout_at} [", scalar( localtime( $inactivity_timeout_at ) ), "]) ? ", ( $timeout_at > $inactivity_timeout_at ? 'yes' : 'no' ) ); 
     $timeout_at = $inactivity_timeout_at if( $timeout_at > $inactivity_timeout_at );
     my $stop_if = $self->stop_if;
     # wait for data
@@ -715,6 +716,14 @@ sub read_until_in_memory
     my $chunk_size = $opts->{chunk_size} // 2048;
     my $max = $self->max_read_buffer;
     my $buff = '';
+    # Make an initial read to get whatever is in the internal buffer
+    # Maybe that is sufficient to satisfy the regular expression need
+    if( my $buff_len = $self->buffer->length )
+    {
+        my $bytes = $self->read( $buff, $buff_len );
+        return( $self->pass_error ) if( !defined( $bytes ) );
+    }
+
     while( $buff !~ /$re/ )
     {
         my $n = $self->read( $buff, $chunk_size, CORE::length( $buff ) );
@@ -893,6 +902,76 @@ sub _ssl_opts
         }
     }
     return( $ssl_opts );
+}
+
+sub FREEZE
+{
+    my $self = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class = CORE::ref( $self );
+    my %hash  = %$self;
+    CORE::delete( @hash{ qw( _fh ) } );
+    if( CORE::exists( $hash{stop_if} ) && 
+        CORE::defined( $hash{stop_if} ) && 
+        CORE::ref( $hash{stop_if} ) )
+    {
+        require B::Deparse;
+        my $deparse = B::Deparse->new( '-p', '-sC' );
+        my $code = $deparse->coderef2text( CORE::delete( $hash{stop_if} ) );
+        $hash{stop_if_code} = $code;
+    }
+    # Return an array reference rather than a list so this works with Sereal and CBOR
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
+    # But Storable want a list with the first element being the serialised element
+    CORE::return( $class, \%hash );
+}
+
+sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+sub THAW
+{
+    my( $self, undef, @args ) = @_;
+    my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+    my $new;
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        foreach( CORE::keys( %$hash ) )
+        {
+            $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+        }
+        $new = $self;
+    }
+    else
+    {
+        $new = bless( $hash => $class );
+    }
+    if( CORE::exists( $hash->{stop_if_code} ) && 
+        CORE::defined( $hash->{stop_if_code} ) && 
+        CORE::length( $hash->{stop_if_code} ) )
+    {
+        my $code = CORE::delete( $hash->{stop_if_code} );
+        my $saved = $@;
+        # "if you want to eval the result, you should prepend "sub subname ", or "sub " for an anonymous function constructor."
+        # <https://metacpan.org/pod/B::Deparse#coderef2text>
+        my $ref;
+        {
+            no strict;
+            $ref = eval( "sub{ $code }" );
+        }
+        if( $@ )
+        {
+            $@ =~ s/ at .*\n//;
+            die( $@ );
+        }
+        $@ = $saved;
+        $new->{stop_if} = $ref;
+    }
+    CORE::return( $new );
 }
 
 1;

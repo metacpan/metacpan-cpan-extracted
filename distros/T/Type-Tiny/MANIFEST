@@ -156,6 +156,7 @@ t/20-modules/Type-Params/on-die.t
 t/20-modules/Type-Params/optional.t
 t/20-modules/Type-Params/positional.t
 t/20-modules/Type-Params/slurpy.t
+t/20-modules/Type-Params/strictness.t
 t/20-modules/Type-Params/wrap.t
 t/20-modules/Type-Parser/basic.t
 t/20-modules/Type-Parser/moosextypes.t

@@ -258,6 +258,19 @@ EOF
   }
 });
 
+subtest('example-3 BASE', sub {
+  my $result = eval <<'EOF';
+  package User;
+
+  use base 'Mars::Kind';
+
+  User->BASE('Manager');
+
+  # Exception! "Can't locate Manager.pm in @INC"
+EOF
+  ok $@ =~ qr/Can't locate Manager\.pm in \@INC/;
+});
+
 subtest('example-1 BLESS', sub {
   my $result = eval <<'EOF';
   package User;
@@ -478,7 +491,7 @@ subtest('example-1 DESTROY', sub {
 
   undef $user;
 
-  # 1
+  # undef
 EOF
   ok $User::USERS == 0;
 });
@@ -732,6 +745,27 @@ subtest('example-2 NAME', sub {
   # "User"
 EOF
   ok $result eq 'User';
+});
+
+subtest('example-1 MIXIN', sub {
+  my $result = eval <<'EOF';
+  package Action;
+
+  use base 'Mars::Kind';
+
+  package User;
+
+  use base 'Mars::Kind';
+
+  User->MIXIN('Action');
+
+  package main;
+
+  my $admin = User->DOES('Action');
+
+  # 0
+EOF
+  ok $result == 0;
 });
 
 subtest('example-1 ROLE', sub {

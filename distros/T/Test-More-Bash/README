@@ -71,6 +71,29 @@ TEST::MORE::BASH
 
         #!/usr/bin/env test-more-bash
 
+  Alternate Usage
+
+    Instead of using a special shebang line to get the desired behavior,
+    you can start with this Perl line:
+
+        use Test::More::Bash;
+
+    The test file will initially be run as Perl, but Test::More::Bash will
+    exec a command that runs the file as Bash. The Bash runtime code
+    defines a pass through Bash function called use that will effectively
+    ignore the use Test::More::Bash; line.
+
+    NOTE: Passing extra parameters on the use Test::More::Bash line is not
+    yet supported. In other words, you can't do:
+
+        use Test::More::Bash tests => 5;
+
+    Instead just do:
+
+        use Test::More::Bash;
+    
+        plan 5
+
  AUTHORS
 
       * Ingy döt Net ingy@ingy.net <mailto:ingy@ingy.net>

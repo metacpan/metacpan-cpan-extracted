@@ -8,9 +8,9 @@ use Log::ger;
 use Hash::Subset qw(hash_subset);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-27'; # DATE
+our $DATE = '2022-08-09'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.037'; # VERSION
+our $VERSION = '0.044'; # VERSION
 
 our %SPEC;
 
@@ -27,7 +27,7 @@ sub _compile {
 
 sub _get_field_idx {
     my ($field, $field_idxs) = @_;
-    defined($field) && length($field) or die "Please specify field (-F)\n";
+    defined($field) && length($field) or die "Please specify at least a field\n";
     my $idx = $field_idxs->{$field};
     die "Unknown field '$field' (known fields include: ".
         join(", ", map { "'$_'" } sort {$field_idxs->{$a} <=> $field_idxs->{$b}}
@@ -150,6 +150,66 @@ sub _complete_field_list {
 
 sub _complete_sort_field_list {
     _complete_field_or_field_list('sort_field_list', @_);
+}
+
+sub _array2hash {
+    my ($row, $fields) = @_;
+    my $rowhash = {};
+    for my $i (0..$#{$fields}) {
+        $rowhash->{ $fields->[$i] } = $row->[$i];
+    }
+    $rowhash;
+}
+
+sub _select_fields {
+    my ($fields, $field_idxs, $args) = @_;
+
+    my @selected_fields;
+
+    if (defined $args->{include_field_pat}) {
+        for my $field (@$fields) {
+            if ($field =~ $args->{include_field_pat}) {
+                push @selected_fields, $field;
+            }
+        }
+    }
+    if (defined $args->{exclude_field_pat}) {
+        @selected_fields = grep { $_ !~ $args->{exclude_field_pat} }
+            @selected_fields;
+    }
+    if (defined $args->{include_fields}) {
+      FIELD:
+        for my $field (@{ $args->{include_fields} }) {
+            unless (defined $field_idxs->{$field}) {
+                return [400, "Unknown field '$field'"] unless $args->{ignore_unknown_fields};
+                next FIELD;
+            }
+            next if grep { $field eq $_ } @selected_fields;
+            push @selected_fields, $field;
+        }
+    }
+    if (defined $args->{exclude_fields}) {
+      FIELD:
+        for my $field (@{ $args->{exclude_fields} }) {
+            unless (defined $field_idxs->{$field}) {
+                return [400, "Unknown field '$field'"] unless $args->{ignore_unknown_fields};
+                next FIELD;
+            }
+            @selected_fields = grep { $field ne $_ } @selected_fields;
+        }
+    }
+
+    if ($args->{show_selected_fields}) {
+        return [200, "OK", \@selected_fields];
+    }
+
+    #my %selected_field_idxs;
+    #$selected_field_idxs{$_} = $fields_idx->{$_} for @selected_fields;
+
+    my @selected_field_idxs_array;
+    push @selected_field_idxs_array, $field_idxs->{$_} for @selected_fields;
+
+    [100, "Continue", [\@selected_fields, \@selected_field_idxs_array]];
 }
 
 our %args_common = (
@@ -292,7 +352,6 @@ _
         schema => 'filename*',
         req => 1,
         pos => 1,
-        cmdline_aliases => {f=>{}},
         tags => ['category:input'],
     },
 );
@@ -308,7 +367,6 @@ _
         schema => 'filename*',
         req => 1,
         pos => 0,
-        cmdline_aliases => {f=>{}},
         tags => ['category:input'],
     },
 );
@@ -326,7 +384,6 @@ _
         req => 1,
         pos => 0,
         slurpy => 1,
-        cmdline_aliases => {f=>{}},
         tags => ['category:input'],
     },
 );
@@ -360,32 +417,81 @@ our %arg_field_1_nocomp = (
     },
 );
 
-our %arg_fields_1 = (
-    fields => {
+# let's just use field selection args for consistency
+#our %argspecs1_fields = (
+#    fields => {
+#        'x.name.is_plural' => 1,
+#        'x.name.singular' => 'field',
+#        summary => 'Field names',
+#        schema => ['array*', of=>'str*'],
+#        cmdline_aliases => {
+#            f => {},
+#        },
+#        pos => 1,
+#        slurpy => 1,
+#        element_completion => \&_complete_field,
+#        tags => ['category:field-selection'],
+#    },
+#);
+
+our %argspecsopt_field_selection = (
+    include_fields => {
         'x.name.is_plural' => 1,
-        summary => 'Field names',
+        'x.name.singular' => 'include_field',
+        summary => 'Field names to include, takes precedence over --exclude-field-pat',
         schema => ['array*', of=>'str*'],
-        cmdline_aliases => { F=>{} },
-        req => 1,
-        pos => 1,
-        slurpy => 1,
+        cmdline_aliases => {
+            f => {},
+            field => {}, # backward compatibility
+        },
         element_completion => \&_complete_field,
+        tags => ['category:field-selection'],
+    },
+    include_field_pat => {
+        summary => 'Field regex pattern to select, overidden by --exclude-field-pat',
+        schema => 're*',
+        cmdline_aliases => {
+            field_pat => {}, # backward compatibility
+            include_all_fields => { summary => 'Shortcut for --field-pat=.*, effectively selecting all fields', is_flag=>1, code => sub { $_[0]{include_field_pat} = '.*' } },
+        },
+        tags => ['category:field-selection'],
+    },
+    exclude_fields => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'exclude_field',
+        summary => 'Field names to exclude, takes precedence over --fields',
+        schema => ['array*', of=>'str*'],
+        cmdline_aliases => {
+            F => {},
+        },
+        element_completion => \&_complete_field,
+        tags => ['category:field-selection'],
+    },
+    exclude_field_pat => {
+        summary => 'Field regex pattern to exclude, takes precedence over --field-pat',
+        schema => 're*',
+        cmdline_aliases => {
+            exclude_all_fields => { summary => 'Shortcut for --field-pat=.*, effectively selecting all fields', is_flag=>1, code => sub { $_[0]{exclude_field_pat} = '.*' } },
+        },
+        tags => ['category:field-selection'],
+    },
+    ignore_unknown_fields => {
+        summary => 'When unknown fields are specified in --include-field (--field) or --exclude_field options, ignore them instead of throwing an error',
+        schema => 'bool*',
+    },
+    show_selected_fields => {
+        summary => 'Show selected fields and then immediately exit',
+        schema => 'true*',
     },
 );
 
-our %arg_fields_or_field_pat = (
-    fields => {
-        'x.name.is_plural' => 1,
-        summary => 'Field names',
-        schema => ['array*', of=>'str*'],
-        cmdline_aliases => { F=>{} },
+our %arg_eval_1 = (
+    eval => {
+        summary => 'Perl code to do munging',
+        schema => ['any*', of=>['str*', 'code*']],
+        cmdline_aliases => { e=>{} },
+        req => 1,
         pos => 1,
-        slurpy => 1,
-        element_completion => \&_complete_field,
-    },
-    field_pat => {
-        summary => 'Field regex pattern to select',
-        schema => 're*',
     },
 );
 
@@ -524,15 +630,6 @@ our %arg_hash = (
     },
 );
 
-sub _array2hash {
-    my ($row, $fields) = @_;
-    my $rowhash = {};
-    for my $i (0..$#{$fields}) {
-        $rowhash->{ $fields->[$i] } = $row->[$i];
-    }
-    $rowhash;
-}
-
 $SPEC{csvutil} = {
     v => 1.1,
     summary => 'Perform action on a CSV file',
@@ -544,8 +641,9 @@ $SPEC{csvutil} = {
                 'add-field',
                 'list-field-names',
                 'info',
-                'delete-field',
+                'delete-fields',
                 'munge-field',
+                'munge-row',
                 #'replace-newline', # not implemented in csvutil
                 'sort-rows',
                 'sort-fields',
@@ -566,6 +664,8 @@ $SPEC{csvutil} = {
                 #'lookup-fields', # not implemented in csvutil
                 'transpose',
                 'freqtable',
+                'get-cells',
+                'fill-template',
             ]],
             req => 1,
             pos => 0,
@@ -574,6 +674,7 @@ $SPEC{csvutil} = {
         %arg_filename_1,
         %argopt_eval,
         %argopt_field,
+        %argspecsopt_field_selection,
     },
     args_rels => {
     },
@@ -602,17 +703,21 @@ sub csvutil {
     my $i = 0;
     my $header_row_count = 0;
     my $data_row_count = 0;
+
     my $fields = []; # field names, in order
     my %field_idxs; # key = field name, val = index (0-based)
 
+    my $selected_fields;
+    my $selected_field_idxs_array;
+    my $selected_field_idxs_array_sorted;
     my $code;
     my $field_idx;
-    my $field_idxs_array;
     my $sorted_fields;
     my @summary_row;
     my $selected_row;
     my $row_spec_sub;
     my %freqtable; # key=value, val=frequency
+    my @cells;
 
     # for action=split
     my ($split_fh, $split_filename, $split_lines);
@@ -645,11 +750,13 @@ sub csvutil {
                     #return [412, "Empty field name in field #$j"];
                     next;
                 }
-                if (defined $field_idxs{$row->[$j]}) {
+                if (defined $field_idxs{ $row->[$j] }) {
                     return [412, "Duplicate field name '$row->[$j]'"];
                 }
                 $field_idxs{$row->[$j]} = $j;
             }
+
+
             if ($action eq 'sort-fields') {
                 if (my $eg = $args{sort_example}) {
                     $eg = [split /\s*,\s*/, $eg] unless ref($eg) eq 'ARRAY';
@@ -686,13 +793,6 @@ sub csvutil {
                 $row_spec_sub = eval 'sub { my $i = shift; '.join(" || ", @codestr).' }'; ## no critic: BuiltinFunctions::ProhibitStringyEval
                 return [400, "BUG: Invalid row_spec code: $@"] if $@;
             }
-            if ($action eq 'grep') {
-            } elsif ($action eq 'map') {
-            } elsif ($action eq 'sort-rows') {
-            } elsif ($action eq 'each-row') {
-            } elsif ($action eq 'csv') {
-            } elsif ($action eq 'transpose') {
-            }
         } # if i==1 (header row)
 
         if ($action eq 'list-field-names') {
@@ -717,6 +817,27 @@ sub csvutil {
                     die "Error while munging row ".
                         "#$i field '$args{field}' value '$_': $@\n" if $@;
                     $row->[$field_idx] = $_;
+                }
+            }
+            $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header);
+        } elsif ($action eq 'munge-row') {
+            unless ($i == 1) {
+                unless ($code) {
+                    $code = _compile($args{eval});
+                }
+                local $_ = $args{hash} ? _array2hash($row, $fields) : $row;
+                local $main::row = $row;
+                local $main::rownum = $i;
+                local $main::csv = $csv_parser;
+                local $main::field_idxs = \%field_idxs;
+                eval { $code->($_) };
+                die "Error while munging row ".
+                    "#$i field '$args{field}' value '$_': $@\n" if $@;
+                if ($args{hash}) {
+                    for my $field (keys %$_) {
+                        next unless exists $field_idxs{$field};
+                        $row->[$field_idxs{$field}] = $_->{$field};
+                    }
                 }
             }
             $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header);
@@ -775,42 +896,28 @@ sub csvutil {
                 }
             }
             $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header);
-        } elsif ($action eq 'delete-field') {
-            if (!defined($field_idxs_array)) {
-                $field_idxs_array = [];
-                for my $f (@{ $args{_fields} }) {
-                    push @$field_idxs_array, _get_field_idx($f, \%field_idxs);
-                }
-                $field_idxs_array = [sort {$b<=>$a} @$field_idxs_array];
-                for (@$field_idxs_array) {
-                    splice @$row, $_, 1;
-                    unless (@$row) {
-                        return [412, "Can't delete field(s) because CSV will have zero fields"];
-                    }
-                }
-            } else {
-                for (@$field_idxs_array) {
-                    splice @$row, $_, 1;
-                }
+        } elsif ($action eq 'delete-fields') {
+            unless ($selected_fields) {
+                my $res = _select_fields($fields, \%field_idxs, \%args);
+                return $res unless $res->[0] == 100;
+                $selected_fields = $res->[2][0];
+                $selected_field_idxs_array = $res->[2][1];
+                return [412, "At least one field must remain"] if @$selected_fields == @$fields;
+                $selected_field_idxs_array_sorted = [sort { $b <=> $a } @$selected_field_idxs_array];
+            }
+            for (@$selected_field_idxs_array_sorted) {
+                splice @$row, $_, 1;
             }
             $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header);
         } elsif ($action eq 'select-fields') {
-            if (!defined($field_idxs_array)) {
-                $field_idxs_array = [];
-                my %seen;
-                if ($args{_fields}) {
-                    for my $f (@{ $args{_fields} }) {
-                        return [400, "Duplicate field '$f'"] if $seen{$f}++;
-                        push @$field_idxs_array, _get_field_idx($f, \%field_idxs);
-                    }
-                } else {
-                    for my $f (@$fields) {
-                        next unless $f =~ $args{_field_pat};
-                        push @$field_idxs_array, $field_idxs{$f};
-                    }
-                }
+            unless ($selected_fields) {
+                my $res = _select_fields($fields, \%field_idxs, \%args);
+                return $res unless $res->[0] == 100;
+                $selected_fields = $res->[2][0];
+                return [412, "At least one field must be selected"] unless @$selected_fields;
+                $selected_field_idxs_array = $res->[2][1];
             }
-            $row = [map { $row->[$_] } @$field_idxs_array];
+            $row = [@{$row}[@$selected_field_idxs_array]];
             $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header);
         } elsif ($action eq 'sort-fields') {
             unless ($i == 1) {
@@ -926,8 +1033,30 @@ sub csvutil {
             } else {
                 push @$rows, $row;
             }
+        } elsif ($action eq 'fill-template') {
+            push @$rows, _array2hash($row, $fields) unless $i == 1;
         } elsif ($action eq 'csv') {
             $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header);
+        } elsif ($action eq 'get-cells') {
+            my $j = -1;
+          COORD:
+            for my $coord (@{ $args{coordinates} }) {
+                $j++;
+                my ($coord_col, $coord_row) = $coord =~ /\A(.+),(.+)\z/
+                    or return [400, "Invalid coordinate '$coord': must be in col,row form"];
+                $coord_row =~ /\A[0-9]+\z/
+                    or return [400, "Invalid coordinate '$coord': invalid row syntax '$coord_row', must be a number"];
+                next COORD unless $i == $coord_row;
+                if ($coord_col =~ /\A[0-9]+\z/) {
+                    $coord_col >= 0 && $coord_col < @$fields-1
+                        or return [400, "Invalid coordinate '$coord': column number '$coord_col' out of bound, must be between 0-".(@$fields-1)];
+                    $cells[$j] = $row->[$coord_col];
+                } else {
+                    exists $field_idxs{$coord_col}
+                        or return [400, "Invalid coordinate '$coord': Unknown column name '$coord_col'"];
+                    $cells[$j] = $row->[$field_idxs{$coord_col}];
+                }
+            }
         } else {
             return [400, "Unknown action '$action'"];
         }
@@ -1097,6 +1226,27 @@ sub csvutil {
         }
     }
 
+    if ($action eq 'get-cells') {
+        if (@{ $args{coordinates} } == 1) {
+            return [200, "OK", $cells[0]];
+        } else {
+            return [200, "OK", \@cells];
+        }
+    }
+
+    if ($action eq 'fill-template') {
+        require File::Slurper::Dash;
+
+        my $output = '';
+        my $template = File::Slurper::Dash::read_text($args{template_filename});
+        for my $row (@$rows) {
+            my $text = $template;
+            $text =~ s/\[\[(.+?)\]\]/defined $row->{$1} ? $row->{$1} : "[[UNDEFINED:$1]]"/eg;
+            $output .= (length $output ? "\n---\n" : "") . $text;
+        }
+        return [200, "OK", $output];
+    }
+
     [200, "OK", $res, {"cmdline.skip_format"=>1}];
 } # csvutil
 
@@ -1188,26 +1338,26 @@ sub csv_info {
     csvutil(%args, action=>'info');
 }
 
-$SPEC{csv_delete_field} = {
+$SPEC{csv_delete_fields} = {
     v => 1.1,
     summary => 'Delete one or more fields from CSV file',
     args => {
         %args_common,
         %args_csv_output,
         %arg_filename_0,
-        %arg_fields_1,
+        %argspecsopt_field_selection,
     },
     description => '' . $common_desc,
     tags => ['outputs_csv'],
 };
-sub csv_delete_field {
+sub csv_delete_fields {
     my %args = @_;
-    csvutil(%args, action=>'delete-field', _fields => $args{fields});
+    csvutil(%args, action=>'delete-fields');
 }
 
 $SPEC{csv_munge_field} = {
     v => 1.1,
-    summary => 'Munge a field in every row of CSV file',
+    summary => 'Munge a field in every row of CSV file with Perl code',
     description => <<'_' . $common_desc,
 
 Perl code (-e) will be called for each row (excluding the header row) and `$_`
@@ -1215,6 +1365,8 @@ will contain the value of the field, and the Perl code is expected to modify it.
 `$main::row` will contain the current row array. `$main::rownum` contains the
 row number (2 means the first data row). `$main::csv` is the <pm:Text::CSV_XS>
 object. `$main::field_idxs` is also available for additional information.
+
+To munge multiple fields, use <prog:csv-munge-row>.
 
 _
     args => {
@@ -1229,6 +1381,42 @@ _
 sub csv_munge_field {
     my %args = @_;
     csvutil(%args, action=>'munge-field');
+}
+
+$SPEC{csv_munge_row} = {
+    v => 1.1,
+    summary => 'Munge each data arow of CSV file with Perl code',
+    description => <<'_' . $common_desc,
+
+Perl code (-e) will be called for each row (excluding the header row) and `$_`
+will contain the row (arrayref, or hashref if `-H` is specified). The Perl code
+is expected to modify it.
+
+Aside from `$_`, `$main::row` will contain the current row array.
+`$main::rownum` contains the row number (2 means the first data row).
+`$main::csv` is the <pm:Text::CSV_XS> object. `$main::field_idxs` is also
+available for additional information.
+
+The modified `$_` will be rendered back to CSV row.
+
+You can also munge a single field using <prog:csv-munge-field>.
+
+You cannot add new fields using this utility. To do so, use
+<prog:csv-add-field>.
+
+_
+    args => {
+        %args_common,
+        %args_csv_output,
+        %arg_filename_0,
+        %arg_eval_1,
+        %arg_hash,
+    },
+    tags => ['outputs_csv'],
+};
+sub csv_munge_row {
+    my %args = @_;
+    csvutil(%args, action=>'munge-row');
 }
 
 $SPEC{csv_replace_newline} = {
@@ -1866,18 +2054,72 @@ $SPEC{csv_select_fields} = {
         %args_common,
         %args_csv_output,
         %arg_filename_0,
-        %arg_fields_or_field_pat,
-    },
-    args_rels => {
-        req_one => ['fields', 'field_pat'],
+        %argspecsopt_field_selection,
     },
     description => '' . $common_desc,
     tags => ['outputs_csv'],
 };
 sub csv_select_fields {
     my %args = @_;
-    csvutil(%args, action=>'select-fields',
-            _fields => $args{fields}, _field_pat => $args{field_pat});
+    csvutil(%args, action=>'select-fields');
+}
+
+$SPEC{csv_get_cells} = {
+    v => 1.1,
+    summary => 'Get one or more cells from CSV',
+    args => {
+        %args_common,
+        %arg_filename_0,
+        coordinates => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'coordinate',
+            summary => 'List of coordinates, each in the form of <col>,<row> e.g. colname,0 or 1,1',
+            schema => ['array*', of=>'str*'],
+            pos => 1,
+            slurpy => 1,
+        },
+    },
+    description => <<'_' . $common_desc,
+
+This utility lets you specify "coordinates" of cell locations to extract. Each
+coordinate is in the form of `<col>,<row>` where `<col>` is the column name or
+position (zero-based, so 0 is the first column) and `<row>` is the row position
+(one-based, so 1 is the header row and 2 is the first data row).
+
+_
+};
+sub csv_get_cells {
+    my %args = @_;
+    csvutil(%args, action=>'get-cells');
+}
+
+$SPEC{csv_fill_template} = {
+    v => 1.1,
+    summary => 'Substitute template values in a text file with fields from CSV rows',
+    args => {
+        %args_common,
+        %arg_filename_0,
+        template_filename => {
+            schema => 'filename*',
+            req => 1,
+            pos => 1,
+        },
+        # XXX whether to output multiple files or combined
+        # XXX row selection?
+    },
+    description => <<'_' . $common_desc,
+
+Templates are text that contain `[[NAME]]` field placeholders. The field
+placeholders will be replaced by values from the CSV file. This is a simple
+alternative to mail-merge. (I first wrote this utility because LibreOffice
+Writer, as always, has all the annoying bugs; this time, it prevents mail merge
+from working.)
+
+_
+};
+sub csv_fill_template {
+    my %args = @_;
+    csvutil(%args, action=>'fill-template');
 }
 
 $SPEC{csv_dump} = {
@@ -2498,7 +2740,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 0.037 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2022-03-27.
+This document describes version 0.044 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2022-08-09.
 
 =head1 DESCRIPTION
 
@@ -2516,13 +2758,17 @@ This distribution contains the following CLI utilities:
 
 =item * L<csv-csv>
 
-=item * L<csv-delete-field>
+=item * L<csv-delete-fields>
 
 =item * L<csv-dump>
 
 =item * L<csv-each-row>
 
+=item * L<csv-fill-template>
+
 =item * L<csv-freqtable>
+
+=item * L<csv-get-cells>
 
 =item * L<csv-grep>
 
@@ -2535,6 +2781,8 @@ This distribution contains the following CLI utilities:
 =item * L<csv-map>
 
 =item * L<csv-munge-field>
+
+=item * L<csv-munge-row>
 
 =item * L<csv-replace-newline>
 
@@ -3278,11 +3526,11 @@ Return value:  (any)
 
 
 
-=head2 csv_delete_field
+=head2 csv_delete_fields
 
 Usage:
 
- csv_delete_field(%args) -> [$status_code, $reason, $payload, \%result_meta]
+ csv_delete_fields(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Delete one or more fields from CSV file.
 
@@ -3302,9 +3550,13 @@ Specify character to escape value in field in input CSV, will be passed to Text:
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
-=item * B<fields>* => I<array[str]>
+=item * B<exclude_field_pat> => I<re>
 
-Field names.
+Field regex pattern to exclude, takes precedence over --field-pat.
+
+=item * B<exclude_fields> => I<array[str]>
+
+Field names to exclude, takes precedence over --fields.
 
 =item * B<filename>* => I<filename>
 
@@ -3321,6 +3573,18 @@ field names (and the second row contains the first data row). When you declare
 that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
+
+=item * B<ignore_unknown_fields> => I<bool>
+
+When unknown fields are specified in --include-field (--field) or --exclude_field options, ignore them instead of throwing an error.
+
+=item * B<include_field_pat> => I<re>
+
+Field regex pattern to select, overidden by --exclude-field-pat.
+
+=item * B<include_fields> => I<array[str]>
+
+Field names to include, takes precedence over --exclude-field-pat.
 
 =item * B<output_escape_char> => I<str>
 
@@ -3378,6 +3642,10 @@ Defaults to C<"> (double quote). Overrides C<--tsv> option.
 Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
+
+=item * B<show_selected_fields> => I<true>
+
+Show selected fields and then immediately exit.
 
 =item * B<tsv> => I<bool>
 
@@ -3580,6 +3848,89 @@ Return value:  (any)
 
 
 
+=head2 csv_fill_template
+
+Usage:
+
+ csv_fill_template(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Substitute template values in a text file with fields from CSV rows.
+
+Templates are text that contain C<[[NAME]]> field placeholders. The field
+placeholders will be replaced by values from the CSV file. This is a simple
+alternative to mail-merge. (I first wrote this utility because LibreOffice
+Writer, as always, has all the annoying bugs; this time, it prevents mail merge
+from working.)
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
+=item * B<filename>* => I<filename>
+
+Input CSV file.
+
+Use C<-> to read from stdin.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether input CSV has a header row.
+
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
+
+=item * B<quote_char> => I<str>
+
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
+=item * B<template_filename>* => I<filename>
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
 =head2 csv_freqtable
 
 Usage:
@@ -3607,6 +3958,90 @@ Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 =item * B<field>* => I<str>
 
 Field name.
+
+=item * B<filename>* => I<filename>
+
+Input CSV file.
+
+Use C<-> to read from stdin.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether input CSV has a header row.
+
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
+
+=item * B<quote_char> => I<str>
+
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 csv_get_cells
+
+Usage:
+
+ csv_get_cells(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Get one or more cells from CSV.
+
+This utility lets you specify "coordinates" of cell locations to extract. Each
+coordinate is in the form of C<< E<lt>colE<gt>,E<lt>rowE<gt> >> where C<< E<lt>colE<gt> >> is the column name or
+position (zero-based, so 0 is the first column) and C<< E<lt>rowE<gt> >> is the row position
+(one-based, so 1 is the header row and 2 is the first data row).
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<coordinates> => I<array[str]>
+
+List of coordinates, each in the form of <colE<gt>,<rowE<gt> e.g. colname,0 or 1,1.
+
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
 =item * B<filename>* => I<filename>
 
@@ -4240,13 +4675,15 @@ Usage:
 
  csv_munge_field(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Munge a field in every row of CSV file.
+Munge a field in every row of CSV file with Perl code.
 
 Perl code (-e) will be called for each row (excluding the header row) and C<$_>
 will contain the value of the field, and the Perl code is expected to modify it.
 C<$main::row> will contain the current row array. C<$main::rownum> contains the
 row number (2 means the first data row). C<$main::csv> is the L<Text::CSV_XS>
 object. C<$main::field_idxs> is also available for additional information.
+
+To munge multiple fields, use L<csv-munge-row>.
 
 I<Common notes for the utilities>
 
@@ -4277,6 +4714,150 @@ Field name.
 Input CSV file.
 
 Use C<-> to read from stdin.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether input CSV has a header row.
+
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
+
+=item * B<output_escape_char> => I<str>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+=item * B<output_header> => I<bool>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+=item * B<output_quote_char> => I<str>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_sep_char> => I<str>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+=item * B<output_tsv> => I<bool>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
+=item * B<quote_char> => I<str>
+
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 csv_munge_row
+
+Usage:
+
+ csv_munge_row(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Munge each data arow of CSV file with Perl code.
+
+Perl code (-e) will be called for each row (excluding the header row) and C<$_>
+will contain the row (arrayref, or hashref if C<-H> is specified). The Perl code
+is expected to modify it.
+
+Aside from C<$_>, C<$main::row> will contain the current row array.
+C<$main::rownum> contains the row number (2 means the first data row).
+C<$main::csv> is the L<Text::CSV_XS> object. C<$main::field_idxs> is also
+available for additional information.
+
+The modified C<$_> will be rendered back to CSV row.
+
+You can also munge a single field using L<csv-munge-field>.
+
+You cannot add new fields using this utility. To do so, use
+L<csv-add-field>.
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
+=item * B<eval>* => I<str|code>
+
+Perl code to do munging.
+
+=item * B<filename>* => I<filename>
+
+Input CSV file.
+
+Use C<-> to read from stdin.
+
+=item * B<hash> => I<bool>
+
+Provide row in $_ as hashref instead of arrayref.
 
 =item * B<header> => I<bool> (default: 1)
 
@@ -4520,13 +5101,13 @@ Specify character to escape value in field in input CSV, will be passed to Text:
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
-=item * B<field_pat> => I<re>
+=item * B<exclude_field_pat> => I<re>
 
-Field regex pattern to select.
+Field regex pattern to exclude, takes precedence over --field-pat.
 
-=item * B<fields> => I<array[str]>
+=item * B<exclude_fields> => I<array[str]>
 
-Field names.
+Field names to exclude, takes precedence over --fields.
 
 =item * B<filename>* => I<filename>
 
@@ -4543,6 +5124,18 @@ field names (and the second row contains the first data row). When you declare
 that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
+
+=item * B<ignore_unknown_fields> => I<bool>
+
+When unknown fields are specified in --include-field (--field) or --exclude_field options, ignore them instead of throwing an error.
+
+=item * B<include_field_pat> => I<re>
+
+Field regex pattern to select, overidden by --exclude-field-pat.
+
+=item * B<include_fields> => I<array[str]>
+
+Field names to include, takes precedence over --exclude-field-pat.
 
 =item * B<output_escape_char> => I<str>
 
@@ -4600,6 +5193,10 @@ Defaults to C<"> (double quote). Overrides C<--tsv> option.
 Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
+
+=item * B<show_selected_fields> => I<true>
+
+Show selected fields and then immediately exit.
 
 =item * B<tsv> => I<bool>
 
@@ -5738,11 +6335,19 @@ Source repository is at L<https://github.com/perlancar/perl-App-CSVUtils>.
 
 =head1 SEE ALSO
 
-L<App::TSVUtils>
+=head2 Similar CLI bundles for other format
 
-L<App::LTSVUtils>
+L<App::TSVUtils>, L<App::LTSVUtils>, L<App::SerializeUtils>.
 
-L<App::SerializeUtils>
+=head2 Other CSV-related utilities
+
+L<xls2csv> and L<xlsx2csv> from L<Spreadsheet::Read>
+
+L<import-csv-to-sqlite> from L<App::SQLiteUtils>
+
+Query CSV with SQL using L<fsql> from L<App::fsql>
+
+L<csvgrep> from L<csvgrep>
 
 =head1 AUTHOR
 

@@ -10,15 +10,16 @@ memoized. All other values will need to be recomputed each time.
 Use the DUMP option to specify a list of return values which should not
 be memoized. Only these values will need to be recomputed each time.
 
-Use the REGEX option to specify a Regular Expression which must match for
-the return value to be saved. You can supply either a plain text string
-or a compiled regular expression using qr//. Obviously the second method
-is prefered.
+Use the REGEX option to specify a Regular Expression which must match
+for the return value to be saved. You can supply either a plain text
+string or a compiled regular expression using qr//. Obviously the second
+method is prefered.
 
 Specifying multiple options will result in the least common denominator
 being saved.
 
-You can use the HASH option to string multiple Memoize Plug-ins together:
+You can use the HASH option to string multiple Memoize Plug-ins
+together:
 
    tie my %disk_hash => 'GDBM_File', $filename, O_RDWR|O_CREAT, 0666;
    tie my %expiring_cache => 'Memoize::Expire',
@@ -30,15 +31,16 @@ You can use the HASH option to string multiple Memoize Plug-ins together:
 
 INSTALLATION
 
-This is a Perl module distribution. It should be installed with whichever
-tool you use to manage your installation of Perl, e.g. any of
+This is a Perl module distribution. It should be installed with
+whichever tool you use to manage your installation of Perl, e.g. any of
 
   cpanm .
   cpan  .
   cpanp -i .
 
-Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
-Should you wish to install this module manually, the procedure is
+Consult http://www.cpan.org/modules/INSTALL.html for further
+instruction. Should you wish to install this module manually, the
+procedure is
 
   perl Makefile.PL
   make
@@ -49,5 +51,5 @@ COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2010 by Joshua Gerth.
 
-This is free software; you can redistribute it and/or modify it under the
-same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,5 @@
+! Ideal short from 1MHz to 10GHz
+! Hz  S11r  S11i  S21r  S21i  S12r  S12i   S22r  S22i
+# Hz S DB R 50
+1e6   -1e17  0     0     0     0     0     -1e17  0
+10e9  -1e17  0     0     0     0     0     -1e17  0

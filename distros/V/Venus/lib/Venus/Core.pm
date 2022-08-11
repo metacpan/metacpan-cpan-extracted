@@ -28,7 +28,8 @@ sub ATTR {
   no warnings 'redefine';
 
   *{"@{[$self->NAME]}::$attr"}
-    = sub { @_ = ($_[0], $attr, @_[1 .. $#_]); goto \&attr };
+    = sub { @_ = ($_[0], $attr, @_[1 .. $#_]); goto \&attr }
+      if !$self->can($attr);
 
   my $index = int(keys(%{$${"@{[$self->NAME]}::META"}{ATTR}})) + 1;
 
@@ -48,7 +49,7 @@ sub BASE {
 
   no strict 'refs';
 
-  if (!${"${base}::META"} && !$$cache{$base}++) {
+  if (!keys(%{"${base}::"}) || (!${"${base}::META"} && !$$cache{$base}++)) {
     local $@; eval "require $base"; die $@ if $@;
   }
 
@@ -66,13 +67,8 @@ sub BASE {
 sub BLESS {
   my ($self, @args) = @_;
 
-  my $data = $self->ARGS($self->BUILDARGS(@args));
-  my $anew = bless(
-    (
-      ref $data eq 'HASH' ? {%$data} : (ref $data eq 'ARRAY' ? [@$data] : $data)
-    ),
-    $self->NAME
-  );
+  my $data = $self->DATA($self->ARGS($self->BUILDARGS(@args)));
+  my $anew = bless($data, $self->NAME);
 
   $anew->BUILD($data);
 
@@ -80,7 +76,7 @@ sub BLESS {
 }
 
 sub BUILD {
-  my ($self, $data) = @_;
+  my ($self) = @_;
 
   return $self;
 }
@@ -92,15 +88,15 @@ sub BUILDARGS {
 }
 
 sub DATA {
-  my ($self) = @_;
+  my ($self, $data) = @_;
 
-  return {};
+  return $data ? {%$data} : {};
 }
 
 sub DESTROY {
   my ($self) = @_;
 
-  return $self;
+  return;
 }
 
 sub DOES {
@@ -143,6 +139,28 @@ sub META {
   return Venus::Meta->new(name => $self->NAME);
 }
 
+sub MIXIN {
+  my ($self, $mixin, @args) = @_;
+
+  no strict 'refs';
+
+  if (!keys(%{"${mixin}::"}) && !${"${mixin}::META"} && !$$cache{$mixin}++) {
+    local $@; eval "require $mixin"; die $@ if $@;
+  }
+
+  no warnings 'redefine';
+
+  $mixin->IMPORT($self->NAME);
+
+  no strict 'refs';
+
+  my $index = int(keys(%{$${"@{[$self->NAME]}::META"}{MIXIN}})) + 1;
+
+  $${"@{[$self->NAME]}::META"}{MIXIN}{$mixin} = [$index, [$mixin, @args]];
+
+  return $self;
+}
+
 sub NAME {
   my ($self) = @_;
 
@@ -154,7 +172,7 @@ sub ROLE {
 
   no strict 'refs';
 
-  if (!${"${role}::META"} && !$$cache{$role}++) {
+  if (!keys(%{"${role}::"}) || (!${"${role}::META"} && !$$cache{$role}++)) {
     local $@; eval "require $role"; die $@ if $@;
   }
 
@@ -498,6 +516,20 @@ I<Since C<1.00>>
 
 =back
 
+=over 4
+
+=item base example 3
+
+  package User;
+
+  use base 'Venus::Core';
+
+  User->BASE('Manager');
+
+  # Exception! "Can't locate Manager.pm in @INC"
+
+=back
+
 =cut
 
 =head2 bless
@@ -554,6 +586,66 @@ I<Since C<1.00>>
   my $example = User->BLESS({name => 'Elliot'});
 
   # bless({name => 'Elliot'}, 'User')
+
+=back
+
+=over 4
+
+=item bless example 4
+
+  package List;
+
+  use base 'Venus::Core';
+
+  sub ARGS {
+    my ($self, @args) = @_;
+
+    return @args
+      ? ((@args == 1 && ref $args[0] eq 'ARRAY') ? @args : [@args])
+      : $self->DATA;
+  }
+
+  sub DATA {
+    my ($self, $data) = @_;
+
+    return $data ? [@$data] : [];
+  }
+
+  package main;
+
+  my $list = List->BLESS(1..4);
+
+  # bless([1..4], 'List')
+
+=back
+
+=over 4
+
+=item bless example 5
+
+  package List;
+
+  use base 'Venus::Core';
+
+  sub ARGS {
+    my ($self, @args) = @_;
+
+    return @args
+      ? ((@args == 1 && ref $args[0] eq 'ARRAY') ? @args : [@args])
+      : $self->DATA;
+  }
+
+  sub DATA {
+    my ($self, $data) = @_;
+
+    return $data ? [@$data] : [];
+  }
+
+  package main;
+
+  my $list = List->BLESS([1..4]);
+
+  # bless([1..4], 'List')
 
 =back
 
@@ -760,7 +852,7 @@ I<Since C<1.00>>
 
   undef $user;
 
-  # 0
+  # undef
 
 =back
 

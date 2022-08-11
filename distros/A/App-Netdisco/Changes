@@ -1,3 +1,35 @@
+2.053007 - 2022-08-09
+
+  [ENHANCEMENTS]
+
+  * add snmp browser option to limit searching to current device only
+  * run 'loadmibs' in the background if needed for first device snmp browser
+
+2.053006 - 2022-08-07
+
+  [ENHANCEMENTS]
+
+  * #911 requesting an SNMP snapshot in the web will now also install Browser data
+  * #912 on SNMP Browser show OID status, enumeration syntax, and description
+
+2.053005 - 2022-08-04
+
+  [ENHANCEMENTS]
+
+  * on SNMP Browser do not auto-expand branches with no data
+
+2.053004 - 2022-08-04
+
+  [ENHANCEMENTS]
+
+  * the SNMP Browser will colour branches/leaves where there is data
+
+2.053003 - 2022-08-03
+
+  [ENHANCEMENTS]
+
+  * #843 api tokens extended if login again when valid
+
 2.053002 - 2022-08-03
 
   [NEW FEATURES]

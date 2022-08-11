@@ -3,7 +3,7 @@ package Filter::tee ;
 use strict;
 require 5.006 ;
 require XSLoader;
-our $VERSION = "1.61" ;
+our $VERSION = "1.62" ;
 
 XSLoader::load('Filter::tee');
 1;

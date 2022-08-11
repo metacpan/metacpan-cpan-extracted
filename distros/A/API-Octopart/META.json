@@ -1,0 +1,62 @@
+{
+   "abstract" : "Simple inteface for querying part status across vendors at octopart.com.",
+   "author" : [
+      "Eric Wheeler <ewheeler@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "API-Octopart",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "2.167",
+            "Digest::MD5" : "2.55",
+            "JSON" : "2.97001",
+            "LWP::Protocol::https" : "6.07",
+            "LWP::UserAgent" : "6.34",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/KJ7LNW/perl-API-Octopart/issues"
+      },
+      "homepage" : "https://github.com/KJ7LNW/perl-API-Octopart",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/KJ7LNW/perl-API-Octopart.git"
+      }
+   },
+   "version" : 1.001,
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

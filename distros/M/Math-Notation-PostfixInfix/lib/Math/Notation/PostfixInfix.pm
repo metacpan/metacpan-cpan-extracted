@@ -1,11 +1,12 @@
-# ABSTRACT Perl extension for Math Postfix and Infix
+# ABSTRACT Math Notation for Postfix and Infix Expressions
 ###############################################################################
 ##                                                                           ##
 ##  Copyright (c) 2022 - by Carlos Celso.                                    ##
 ##  All rights reserved.                                                     ##
 ##                                                                           ##
-##  This package is free software; you can redistribuite it                  ##
-##  and/or modify it under the same terms as Perl itself.                    ##
+##  This package is free software; can, at your discretion, also be used,    ##
+##  modified and redistributed under the terms of the "GPLv3 - GNU Library   ##
+##  General Public License".                                                 ##
 ##                                                                           ##
 ###############################################################################
 
@@ -24,7 +25,7 @@
 
 	our %EXPORT_TAGS = ( all => [@EXPORT_OK] );
 
-	our $VERSION = "2022.035.1";
+	our $VERSION = "2022.218.2";
 
 	1;
 

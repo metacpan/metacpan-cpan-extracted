@@ -10,6 +10,11 @@ source test-tap.bash
 
 tap:init "$@"
 
+# A pass-through Bash function for when test starts as Perl with:
+#
+#    use Test::More::Bash;
+use()  ( true )
+
 plan() { tap:plan tests "$@"; }
 pass() { tap:pass "$@"; }
 fail() { tap:fail "$@"; }

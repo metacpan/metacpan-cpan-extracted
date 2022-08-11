@@ -1,0 +1,62 @@
+---
+artist:
+  -
+    name: Frank Zappa
+    description: Frank Zappa/Mothers of Invention
+    albums:
+      -
+        name: Broadway the Hard Way
+        year: 1989
+        songs:
+          -
+            name: Elvis Has Just Left the Building
+            track: 1
+          -
+            name: Planet of the Baritone Women
+            track: 2
+          -
+           name: Any Kind of Pain
+           track: 3
+          -
+            name: Dickie's Such an Asshole
+            track: 4
+          -
+            name: When the Lie's So Big
+            track: 5
+          -
+            name: Rhymin' Man
+            track: 6
+          -
+            name: Promiscuous
+            track: 7
+          -
+            name: The Untouchables
+            track: 8
+          -
+            name: Why Don't You Like Me?
+            track: 9
+          -
+            name: Bacon Fat
+            track: 10
+          -
+            name: Stolen Moments
+            track: 11
+          -
+            name: Murder by Numbers
+            track: 12
+          -
+            name: Jezebel Boy
+            track: 13
+          -
+            name: Outside Now
+            track: 14
+          -
+            name: Hot Plate Haven at the Green Hotel
+            track: 15
+          -
+            name: What Kind of Girl?
+            track: 16
+          -
+            name: Jesus Thinks Your're a Jerk
+            track: 17
+

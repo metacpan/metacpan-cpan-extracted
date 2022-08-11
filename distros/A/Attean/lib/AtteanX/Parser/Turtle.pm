@@ -10,17 +10,30 @@ AtteanX::Parser::Turtle - Turtle RDF Parser
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::Turtle version 0.030
+This document describes AtteanX::Parser::Turtle version 0.031
 
 =head1 SYNOPSIS
 
- use AtteanX::Parser::Turtle;
- my $parser	= AtteanX::Parser::Turtle->new( handler => sub {...} );
- $parser->parse_cb_from_io( $fh, $base_uri );
+ use Attean;
+ my $parser	= AtteanX::Parser::Turtle->new( handler => sub {...}, base => $base_iri );
+ 
+ # Parse data from a file-handle and handle triples in the 'handler' callback
+ $parser->parse_cb_from_io( $fh );
+ 
+ # Parse the given byte-string, and return an iterator of triples
+ my $iter = $parser->parse_iter_from_bytes('<s> <p> 1, 2, 3 .');
+ while (my $triple = $iter->next) {
+   print $triple->as_string;
+ }
 
 =head1 DESCRIPTION
 
 This module implements a parser for the Turtle RDF format.
+
+=head1 ROLES
+
+This class consumes L<Attean::API::Parser>, L<Attean::API::PushParser>,
+<Attean::API::AbbreviatingParser>, and <Attean::API::TripleParser>.
 
 =head1 ATTRIBUTES
 
@@ -44,7 +57,7 @@ A boolean indicating whether term values should be canonicalized during parsing.
 
 =cut
 
-package AtteanX::Parser::Turtle 0.030 {
+package AtteanX::Parser::Turtle 0.031 {
 	use Moo;
 	use Types::Standard qw(Bool ArrayRef HashRef Str Maybe InstanceOf);
 	use Types::Namespace qw( NamespaceMap );
@@ -129,9 +142,9 @@ the data read from the UTF-8 encoded byte string C<< $data >>.
 		$self->_parse($l);
 	}
 
-=item C<< parse_term_from_bytes ( $bytes, $base ) >>
+=item C<< parse_term_from_bytes ( $bytes ) >>
 
-=item C<< parse_node ( $bytes, $base ) >>
+=item C<< parse_node ( $bytes ) >>
 
 Returns the Attean::API::Term object corresponding to the node whose N-Triples
 serialization is found at the beginning of C<< $bytes >>.
@@ -152,7 +165,7 @@ serialization is found at the beginning of C<< $bytes >>.
 		my %args	= @_;
 	
 		open(my $fh, '<:encoding(UTF-8)', \$string);
-		my $l	= AtteanX::Parser::Turtle::Lexer->new($fh);
+		my $l	= AtteanX::Parser::Turtle::Lexer->new(file => $fh, %args);
 		my $t = $self->_next_nonws($l);
 		my $node	= $self->_object($l, $t);
 		return $node;
@@ -277,7 +290,9 @@ serialization is found at the beginning of C<< $bytes >>.
 		# subject
 		my $subj;
 		my $bnode_plist	= 0;
-		if ($type == LBRACKET) {
+		if ($type == LTLT) {
+			$subj	= $self->_quotedTriple($l);
+		} elsif ($type == LBRACKET) {
 			$bnode_plist	= 1;
 			$subj	= Attean::Blank->new();
 			my $t	= $self->_next_nonws($l);
@@ -324,6 +339,86 @@ serialization is found at the beginning of C<< $bytes >>.
 		}
 	}
 
+	sub _quotedTriple {
+		my $self	= shift;
+		my $l		= shift;
+		my $subj	= $self->_qtSubject($l);
+
+		my $t		= $self->_next_nonws($l);
+		my $type	= $t->type;
+		unless ($type==IRI or $type==PREFIXNAME or $type==A) {
+			$self->_throw_error("Expecting verb but got " . decrypt_constant($type), $t, $l);
+		}
+		my $pred	= $self->_token_to_node($t);
+		my $obj		= $self->_qtObject($l, $self->_next_nonws($l));
+		$self->_get_token_type($l, GTGT);
+		my $triple	= Attean::Triple->new($subj, $pred, $obj);
+		return $triple;
+	}
+	
+	sub _qtSubject {
+		my $self	= shift;
+		my $l		= shift;
+		my $t		= $self->_next_nonws($l);
+		my $type	= $t->type;
+
+		my $subj;
+		if ($type == LTLT) {
+			$subj	= $self->_quotedTriple($l);
+		} elsif ($type == LBRACKET) {
+			$self->_get_token_type($l, RBRACKET);
+			return Attean::Blank->new();
+		} elsif (not($type==IRI or $type==PREFIXNAME or $type==BNODE)) {
+			$self->_throw_error("Expecting resource or bnode but got " . decrypt_constant($type), $t, $l);
+		} else {
+			$subj	= $self->_token_to_node($t);
+		}
+		return $subj;
+	}
+
+	sub _qtObject {
+		my $self	= shift;
+		my $l		= shift;
+		my $t		= shift;
+		my $tcopy	= $t;
+		my $obj;
+		my $type	= $t->type;
+		if ($type == LTLT) {
+			$obj	= $self->_quotedTriple($l);
+		} elsif ($type == LBRACKET) {
+			$self->_get_token_type($l, RBRACKET);
+			return Attean::Blank->new();
+		} elsif (not($type==IRI or $type==PREFIXNAME or $type==STRING1D or $type==STRING3D or $type==STRING1S or $type==STRING3S or $type==BNODE or $type==INTEGER or $type==DECIMAL or $type==DOUBLE or $type==BOOLEAN)) {
+			$self->_throw_error("Expecting object but got " . decrypt_constant($type), $t, $l);
+		} else {
+			if ($type==STRING1D or $type==STRING3D or $type==STRING1S or $type==STRING3S) {
+				my $value	= $t->value;
+				my $t		= $self->_next_nonws($l);
+				my $dt;
+				my $lang;
+				if ($t) {
+					if ($t->type == HATHAT) {
+						my $t		= $self->_next_nonws($l);
+						if ($t->type == IRI or $t->type == PREFIXNAME) {
+							$dt	= $self->_token_to_node($t);
+						}
+					} elsif ($t->type == LANG) {
+						$lang	= $t->value;
+					} else {
+						$self->_unget_token($t);
+					}
+				}
+				my %args	= (value => $value);
+				$args{language}	= $lang if (defined($lang));
+				$args{datatype}	= $dt if (defined($dt));
+				$obj	= Attean::Literal->new(%args);
+			} else {
+				$obj	= $self->_token_to_node($t, $type);
+			}
+		}
+		return $obj;
+	}
+	
 	sub _assert_list {
 		my $self	= shift;
 		my $subj	= shift;
@@ -383,7 +478,7 @@ serialization is found at the beginning of C<< $bytes >>.
 			my $t		= $self->_next_nonws($l);
 			last unless ($t);
 			my $obj		= $self->_object($l, $t);
-			$self->_assert_triple($subj, $pred, $obj);
+			$self->_assert_triple_with_optional_annotation($l, $subj, $pred, $obj);
 		
 			$t	= $self->_next_nonws($l);
 			if ($t and $t->type == COMMA) {
@@ -395,6 +490,24 @@ serialization is found at the beginning of C<< $bytes >>.
 		}
 	}
 
+	sub _assert_triple_with_optional_annotation {
+		my $self	= shift;
+		my $l		= shift;
+		my $subj	= shift;
+		my $pred	= shift;
+		my $obj		= shift;
+		my $qt		= $self->_assert_triple($subj, $pred, $obj);
+		
+		my $t	= $self->_next_nonws($l);
+		if ($t->type != LANNOT) {
+			$self->_unget_token($t);
+			return;
+		}
+		
+		$self->_predicateObjectList( $l, $qt );
+		$self->_get_token_type($l, RANNOT);
+	}
+	
 	sub _assert_triple {
 		my $self	= shift;
 		my $subj	= shift;
@@ -406,6 +519,7 @@ serialization is found at the beginning of C<< $bytes >>.
 	
 		my $t		= Attean::Triple->new($subj, $pred, $obj);
 		$self->handler->($t);
+		return $t;
 	}
 
 
@@ -416,7 +530,9 @@ serialization is found at the beginning of C<< $bytes >>.
 		my $tcopy	= $t;
 		my $obj;
 		my $type	= $t->type;
-		if ($type==LBRACKET) {
+		if ($type==LTLT) {
+			return $self->_quotedTriple($l);
+		} elsif ($type==LBRACKET) {
 			$obj	= Attean::Blank->new();
 			my $t	= $self->_next_nonws($l);
 			unless ($t) {
@@ -580,7 +696,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2020 Gregory Todd Williams. This
+Copyright (c) 2014--2022 Gregory Todd Williams. This
 program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

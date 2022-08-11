@@ -1,8 +1,7 @@
 use strict; use warnings;
 
 package SQL::PatchDAG;
-
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use File::Spec ();
 use Fcntl ();

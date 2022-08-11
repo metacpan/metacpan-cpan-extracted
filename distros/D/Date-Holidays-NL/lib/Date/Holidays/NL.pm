@@ -1,7 +1,5 @@
-use utf8;
-
 package Date::Holidays::NL;
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -12,6 +10,7 @@ use Exporter qw(import);
 our @EXPORT = qw(
     holidays
     is_holiday
+    is_holiday_dt
 );
 
 use base qw(Date::Holidays::Abstract);
@@ -84,6 +83,7 @@ my %FIXED_DATES = (
         nl       => 'Bevrijdingsdag',
         en       => 'Liberation day',
         interval => 5, # Day off every five years
+        gov      => 1, # Government works are having a day off tho
     },
     'xmas' => {
         m   => 12,
@@ -135,18 +135,29 @@ my %EASTER_BASED = (
 my %cache;
 
 sub holidays {
-    my ($year) = @_;
+    my $year = shift;
+    my %args = @_;
 
     $year //= DateTime->now()->year;
 
-    return $cache{$year} if $cache{$year};
+    my $key = $year;
+    if ($args{gov}) {
+        $key .= 'gov';
+    }
+
+    return $cache{$key} if $cache{$key};
 
     my %h;
     foreach (keys %FIXED_DATES) {
         my $holiday = $FIXED_DATES{$_};
 
         if (my $int = $holiday->{interval}) {
-            next if $year % $int != 0;
+            if ($args{gov} && $holiday->{gov}) {
+                # We should have this
+            }
+            else {
+                next if $year % $int != 0;
+            }
         }
 
         if (my $start = $holiday->{year_started}) {
@@ -182,7 +193,7 @@ sub holidays {
         _to_holidays(\%h, $dt, $holiday);
     }
 
-    $cache{$year} = \%h;
+    $cache{$key} = \%h;
 
     return \%h;
 }
@@ -207,12 +218,31 @@ sub _to_date {
 }
 
 sub is_holiday {
-    my ($year, $month, $day) = @_;
+    my $year  = shift;
+    my $month = shift;
+    my $day   = shift;
 
-    my $holidays = holidays($year);
-    my $dt       = _to_date($day, $month, $year);
+    my $dt = _to_date($day, $month, $year);
+    return is_holiday_dt($dt, @_);
+}
+
+sub is_holiday_dt {
+    my $dt = shift;
+
+    my %args = @_;
+
+    my $holidays = holidays($dt->year, @_);
     my $key      = sprintf("%02i", $dt->day) . sprintf("%02i", $dt->month);
-    return exists $holidays->{$key};
+
+    if (exists $holidays->{$key}) {
+        my $lang = lc(delete $args{lang} // 'nl');
+        if ($lang eq 'en' || $lang eq 'eng') {
+            return $holidays->{$key}[1];
+        }
+        # default to dutch
+        return $holidays->{$key}[0];
+    }
+    return;
 }
 
 'I always get my sin';
@@ -229,14 +259,14 @@ Date::Holidays::NL - The Netherlands official holidays
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
     use Date::Holidays::NL;
 
-    if (is_holiday(2020, 5, 5)) {
-        print "It is Liberation day!", $/;
+    if (my $thing = is_holiday(2020, 5, 5, lang => 'en')) {
+        print "It is $thing!", $/; # prints liberation day
     }
 
 =head1 DESCRIPTION
@@ -247,6 +277,33 @@ A L<Date::Holidays> family member from the Netherlands
 
 This module implements the C<is_holiday> and C<holiday> functions from
 L<Date::Holidays::Abstract>.
+
+=head2 is_holiday(yyyy, mm, dd, %additional)
+
+    is_holiday(
+        '2022', '05', '05',
+        gov  => 1,      # Important for government institutions
+        lang => 'en'    # defaults to nl/nld, alternatively en/eng can be used.
+    );
+
+=head2 is_holiday_dt(dt, %additional)
+
+    is_holiday(
+        DateTime->new(
+            year      => 2022,
+            month     => 5,
+            day       => 5,
+            time_zone => 'Europe/Amsterdam',
+        ),
+        gov  => 1,      # Important for government institutions
+        lang => 'en'    # defaults to nl/nld, alternatively en/eng can be used.
+    );
+
+=head2 holidays(yyyy, gov => 1)
+
+    holidays('2022', gov  => 1);
+
+Similar API to the other functions, returns an hashref for the year.
 
 =head1 AUTHOR
 

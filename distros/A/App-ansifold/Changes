@@ -1,5 +1,27 @@
 Revision history for `ansifold' command.
 
+1.1501 2022-08-09T02:33:39Z
+
+    - Require Text::ANSI::Fold@2.1301 to fix a bug.
+
+1.15 2022-07-04T01:13:31Z
+
+    - Make --colrm option set --separate to empty.
+
+1.14 2022-03-02T06:24:42Z
+
+    - Introduce --prefix option.
+
+1.13 2021-10-25T00:42:27Z
+
+    - Move program body from script/ to lib/.
+    - Improve test codes.
+
+1.12 2021-10-23T02:01:07Z
+
+    - Introduce --colrm option.
+    - Fix -n not working bug.
+
 1.1101 2021-09-09T04:37:08Z
 
     - Improve option validation.

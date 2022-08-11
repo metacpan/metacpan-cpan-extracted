@@ -204,6 +204,39 @@ EOF
   ok $result->can('shutdown');
 });
 
+subtest('example-1 mixin', sub {
+  my $result = eval <<'EOF';
+  package YesNo;
+
+  use Mars::Mixin;
+
+  sub no {
+    return 0;
+  }
+
+  sub yes {
+    return 1;
+  }
+
+  sub EXPORT {
+    ['no', 'yes']
+  }
+
+  package Answer;
+
+  use Mars::Role;
+
+  mixin 'YesNo';
+
+  # "Answer"
+EOF
+  ok $result->isa('Answer');
+  ok $result->can('yes');
+  ok $result->can('no');
+  ok $result->yes == 1;
+  ok $result->no == 0;
+});
+
 subtest('example-1 role', sub {
   my $result = eval <<'EOF';
   package Ability;

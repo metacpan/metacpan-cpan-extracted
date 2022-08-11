@@ -23,9 +23,10 @@ requires:
   Scalar::Util: '0'
   perl: '5.006'
 resources:
-  bugtracker: https://github.com/ap/URI-Signature-Tiny/issues
-  repository: git://github.com/ap/URI-Signature-Tiny.git
-version: '1.004'
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=URI-Signature-Tiny
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ap/URI-Signature-Tiny.git
+version: '1.005'
 x_copyright:
   holder: 'Aristotle Pagaltzis'
   year: 2020

@@ -144,7 +144,7 @@ Module::Generic::Scalar - String Manipulation Object Class
 
 =head1 VERSION
 
-    v1.3.0
+    v1.3.1
 
 =head1 DESCRIPTION
 

@@ -489,6 +489,9 @@ sub pick_description {
 This handles the special redirect syntax: request an URL and if the response
 code is a 301 or 302, take the location header in the response and return it.
 
+If the environment variable C<HEX_DESCRIBE_OFFLINE> is set, these do not get
+resolved and the empty string is returned.
+
 =cut
 
 sub resolve_redirect {
@@ -496,7 +499,7 @@ sub resolve_redirect {
   # make sure that including resources from other servers will not work.
   my $url = shift;
   my $redirects = shift;
-  return '' unless $redirects;
+  return '' unless $redirects and not $ENV{HEX_DESCRIBE_OFFLINE};
   # Special case because table writers probably used the default face generator URL
   $url =~ s!^https://campaignwiki\.org/face!$face_generator_url! if $face_generator_url;
   $url =~ s!^https://campaignwiki\.org/text-mapper!$text_mapper_url! if $text_mapper_url;

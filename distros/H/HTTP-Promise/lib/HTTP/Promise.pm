@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise.pm
-## Version v0.1.3
+## Version v0.1.6
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2022/07/01
+## Modified 2022/08/06
 ## All rights reserved.
 ## 
 ## 
@@ -21,7 +21,8 @@ BEGIN
     use vars qw( $VERSION $AUTOLOAD $CONTENT_SIZE_THRESHOLD $CRLF 
                  $DEFAULT_PROTOCOL $EXCEPTION_CLASS $EXTENSION_VARY
                  $IS_WIN32 $HTTP_TOKEN $HTTP_QUOTED_STRING $BUFFER_SIZE 
-                 $MAX_HEADERS_SIZE $MAX_BODY_IN_MEMORY_SIZE $EXPECT_THRESHOLD $DEFAULT_MIME_TYPE );
+                 $MAX_HEADERS_SIZE $MAX_BODY_IN_MEMORY_SIZE $EXPECT_THRESHOLD $DEFAULT_MIME_TYPE 
+                 $SERIALISER );
     use Cookie;
     use Cookie::Jar;
     use Errno qw( EAGAIN ECONNRESET EINPROGRESS EINTR EWOULDBLOCK ECONNABORTED EISCONN );
@@ -56,7 +57,8 @@ BEGIN
     our $EXPECT_THRESHOLD = 1024000000;
     our $EXTENSION_VARY = 1;
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
-    our $VERSION = 'v0.1.3';
+    our $SERIALISER = $Promise::Me::SERIALISER;
+    our $VERSION = 'v0.1.6';
 };
 
 use strict;
@@ -88,6 +90,7 @@ sub init
     $self->{proxy_authorization}    = undef;
     $self->{requests_redirectable}  = [qw( GET HEAD )];
     $self->{send_te}                = 1;
+    $self->{serialiser}             = $SERIALISER;
     $self->{stop_if}                = sub{};
     $self->{threshold}              = $CONTENT_SIZE_THRESHOLD;
     # 3 minutes
@@ -145,9 +148,9 @@ sub delete
         my( $resolve, $reject ) = @$_;
         my $req = HTTP::Promise::Request->new( 'DELETE' => @_ ) ||
         return( $reject->( HTTP::Promise::Request->error ) );
-        my $resp = $self->send( $req ) || return( $reject->( $self->pass_error ) );
+        my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
         return( $resolve->( $resp ) );
-    }) );
+    }, { args => [@_], ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ) } ) );
 }
 
 sub dnt { return( shift->_set_get_boolean( 'dnt', @_ ) ); }
@@ -164,14 +167,16 @@ sub from { return( shift->_set_get_scalar_as_object( 'from', @_ ) ); }
 sub get
 {
     my $self = shift( @_ );
-    return( Promise::Me->new(sub
+    my $prom = Promise::Me->new(sub
     {
         my( $resolve, $reject ) = @$_;
         my $req = $self->_make_request_query( GET => @_ ) ||
         return( $reject->( HTTP::Promise::Request->error ) );
-        my $resp = $self->send( $req ) || return( $reject->( $self->pass_error ) );
+        my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
         return( $resolve->( $resp ) );
-    }, { args => [@_] } ) );
+    }, { args => [@_], ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ) } ) ||
+        return( $self->pass_error( Promise::Me->error ) );
+    return( $prom );
 }
 
 sub head
@@ -182,9 +187,9 @@ sub head
         my( $resolve, $reject ) = @$_;
         my $req = $self->_make_request_query( HEAD => @_ ) ||
         return( $reject->( HTTP::Promise::Request->error ) );
-        my $resp = $self->send( $req ) || return( $reject->( $self->pass_error ) );
+        my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
         return( $resolve->( $resp ) );
-    }, { args => [@_] }) );
+    }, { args => [@_], ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ) } ) );
 }
 
 sub inactivity_timeout { return( shift->_set_get_number( 'inactivity_timeout', @_ ) ); }
@@ -368,7 +373,7 @@ sub mirror
             $tmpfile->unlink;
         }
         return( $resolve->( $response ) );
-    }) );
+    }, { ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ) } ) );
 }
 
 # NOTE: request parameter
@@ -382,9 +387,9 @@ sub options
         my( $resolve, $reject ) = @$_;
         my $req = $self->_make_request_data( OPTIONS => @_ ) ||
             die( HTTP::Promise::Request->error );
-        my $resp = $self->send( $req ) || return( $reject->( $self->pass_error ) );
+        my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
         return( $resolve->( $resp ) );
-    }) );
+    }, { args => [@_], ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ) } ) );
 }
 
 sub patch
@@ -395,9 +400,9 @@ sub patch
         my( $resolve, $reject ) = @$_;
         my $req = $self->_make_request_data( PATCH => @_ ) ||
             die( HTTP::Promise::Request->error );
-        my $resp = $self->send( $req ) || return( $reject->( $self->pass_error ) );
+        my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
         return( $resolve->( $resp ) );
-    }, { args => [@_] }) );
+    }, { args => [@_], ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ) } ) );
 }
 
 sub post
@@ -408,9 +413,9 @@ sub post
         my( $resolve, $reject ) = @$_;
         my $req = $self->_make_request_data( POST => @_ ) ||
             die( HTTP::Promise::Request->error );
-        my $resp = $self->send( $req ) || return( $reject->( $self->pass_error ) );
+        my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
         return( $resolve->( $resp ) );
-    }, { args => [@_] }) );
+    }, { args => [@_], ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ) } ) );
 }
 
 sub prepare_headers
@@ -480,9 +485,9 @@ sub put
         my( $resolve, $reject ) = @$_;
         my $req = $self->_make_request_data( PUT => @_ ) ||
             die( HTTP::Promise::Request->error );
-        my $resp = $self->send( $req ) || return( $reject->( $self->pass_error ) );
+        my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
         return( $resolve->( $resp ) );
-    }, { args => [@_] }) );
+    }, { args => [@_], ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ) } ) );
 }
 
 sub request
@@ -904,7 +909,11 @@ sub send
         }
     }
 
-    my $ent = HTTP::Promise::Entity->new( headers => $headers, debug => $self->debug );
+    my $ent = HTTP::Promise::Entity->new(
+        headers => $headers,
+        ext_vary => $self->ext_vary,
+        debug => $self->debug
+    );
     $self->_load_class( 'HTTP::Promise::Response' ) || return( $self->pass_error );
     my $resp = HTTP::Promise::Response->new( @$def{qw( code status headers )}, {
         protocol => $def->{protocol},
@@ -1051,11 +1060,14 @@ sub send
         my $part_ent = $parser->parse_multi_part( entity => $ent2, reader => $reader ) ||
             return( $parser->pass_error );
     }
+    
     return( $resp );
 }
 
 # NOTE: request parameter
 sub send_te { return( shift->_set_get_boolean( 'send_te', @_ ) ); }
+
+sub serialiser { return( shift->_set_get_scalar( 'serialiser', @_ ) ); }
 
 sub simple_request
 {
@@ -1387,103 +1399,6 @@ sub _match_no_proxy
 
 sub _pool { return( shift->_set_get_object( '_pool', 'HTTP::Promise::Pool', @_ ) ); }
 
-sub _read_body_chunked
-{
-    my $self = shift( @_ );
-    my $opts = $self->_get_args_as_hash( @_ );
-    my $timeout = $opts->{timeout} // $self->timeout;
-    my $headers = $opts->{headers};
-    return( $self->error( "Headers object provided is not a HTTP::Promise::Headers object." ) ) if( !$self->_is_a( $headers => 'HTTP::Promise::Headers' ) );
-    my $ent = $opts->{entity};
-    return( $self->error( "Entity object provided is not a HTTP::Promise::Entity object." ) ) if( !$self->_is_a( $ent => 'HTTP::Promise::Entity' ) );
-    my $reader = $opts->{reader};
-    return( $self->error( "Reader object provided is not a HTTP::Promise::IO object." ) ) if( !$self->_is_a( $reader => 'HTTP::Promise::IO' ) );
-    my $bufsize = $self->buffer_size;
-    # rfc7231, section 3.1.1.5 says we can assume applicatin/octet-stream if there
-    # is no Content-Type header
-    # <https://tools.ietf.org/html/rfc7231#section-3.1.1.5>
-    my $default_mime = $DEFAULT_MIME_TYPE || 'application/octet-stream';
-    my $len = $headers->content_length;
-
-    # Guessing extension
-    my $mime_type = $headers->mime_type( $default_mime );
-    $self->_load_class( 'HTTP::Promise::MIME' ) || return( $self->pass_error );
-    my $mime = HTTP::Promise::MIME->new;
-    my $ext = $mime->suffix( $mime_type );
-    return( $self->pass_error( $mime->error ) ) if( !defined( $ext ) );
-    $ext ||= 'dat';
-    my $enc;
-    if( $self->ext_vary && ( $enc = $headers->content_encoding ) )
-    {
-        $self->_load_class( 'HTTP::Promise::Stream' ) || return( $self->pass_error );
-        my $enc_ext = HTTP::Promise::Stream->encoding2suffix( $enc ) ||
-            return( $self->pass_error( HTTP::Promise::Stream->error ) );
-            $ext .= $enc_ext->join( '.' )->scalar if( !$enc_ext->is_empty );
-    }
-    my $tempfile = $self->new_tempfile( extension => $ext ) ||
-        return( $self->pass_error );
-    # HTTP::Promise::Body::File inherits from Module::Generic::File, so we pass it some
-    # appropriate parameters.
-    my $body = $ent->new_body( 'file', $tempfile ) ||
-        return( $self->pass_error( $ent->error ) );
-    my $io = $body->open( '+>', { binmode => 'raw', autoflush => 1 } ) ||
-        return( $self->pass_error( $body->error ) );
-    my $buff = '';
-    my $bytes = -1;
-    my $te_re = qr{
-    \A (                 # header
-        ( [0-9a-fA-F]+ ) # next_len (hex number)
-        (?:;
-            $HTTP_TOKEN
-            =
-            (?: $HTTP_TOKEN | $HTTP_QUOTED_STRING )
-        )*               # optional chunk-extensions
-        [[:blank:]]*     # www.yahoo.com adds spaces here.
-                         # Is this valid?
-        \015\012         # CR+LF
-    )
-    }mxs;
-    
-    READ_LOOP: while( $bytes )
-    {
-        # If we do not find anything within the maximum allocable memory size, this will
-        # return an error, so we can bank on it
-        my $hdr = $reader->read_until_in_memory( $te_re, include => 1 );
-        return( $self->pass_error( $reader->error ) ) if( !defined( $hdr ) );
-        last if( !length( $hdr ) );
-        
-        my( $header, $hex_len ) = ( $hdr =~ m/$te_re/ );
-        # remove header from buffer
-        # $hdr = substr( $hdr, 0, length( $header ), '' );
-        my $len = hex( $hex_len );
-        if( $len == 0 )
-        {
-            last READ_LOOP;
-        }
-        # $reader->unread( $hdr ) if( length( $hdr ) );
-
-        my $chunk_size = $bufsize;
-        $chunk_size = $len if( $chunk_size > $len );
-        my $total_bytes = 0;
-        READ_CHUNK: while( $bytes = $reader->read( $buff, $chunk_size ) )
-        {
-            $io->print( $buff ) || return( $self->pass_error( $io->error ) );
-            # We do not want to read more than we should
-            $chunk_size = ( $len - $total_bytes ) if( ( $total_bytes < $len ) && ( ( $total_bytes + $chunk_size ) > $len ) );
-            $total_bytes += $bytes;
-            last READ_CHUNK if( $total_bytes == $len );
-        }
-        $io->close;
-        return( $self->error( "Error reading http body from socket: ", $reader->error ) ) if( !defined( $bytes ) );
-        # consume the trailing CRLF sequence
-        my $trash = $reader->read_until_in_memory( qr/${CRLF}/, include => 1 );
-        return( $self->pass_error( $reader->error ) ) if( !defined( $trash ) );
-    }
-    # consume the final CRLF sequence
-    my $trash = $reader->read_until_in_memory( qr/${CRLF}/, include => 1 );
-    return( $body );
-}
-
 # The purpose of this method is to read the entire HTPP message body, whatever that is, i.e. multipart o not
 # Parsing and decoding is done after data has been read from the socket, because speed matters.
 sub _read_body
@@ -1539,7 +1454,8 @@ sub _read_body
             $chunk_size = $len if( $chunk_size > $len );
             while( $bytes = $reader->read( $buff, $chunk_size ) )
             {
-                $io->print( $buff ) || return( $self->pass_error( $io->error ) );
+                my $bytes_out = $io->syswrite( $buff );
+                return( $self->pass_error( $io->error ) ) if( !defined( $bytes_out ) );
                 # We do not want to read more than we should
                 $chunk_size = ( $len - $total_bytes ) if( ( $total_bytes < $len ) && ( ( $total_bytes + $chunk_size ) > $len ) );
                 $total_bytes += $bytes;
@@ -1578,7 +1494,8 @@ sub _read_body
             
             if( defined( $io ) )
             {
-                $io->print( $buff ) || return( $self->pass_error( $io->error ) );
+                my $bytes_out = $io->syswrite( $buff );
+                return( $self->pass_error( $io->error ) ) if( !defined( $bytes_out ) );
             }
             # The cumulative bytes total for this part exceeds the allowed maximum in memory
             elsif( ( length( $data ) + length( $buff ) ) > $max_in_memory )
@@ -1586,7 +1503,10 @@ sub _read_body
                 $file = $get_temp_file->() || return( $self->pass_error );
                 $io = $file->open( '+>', { binmode => 'raw', autoflush => 1 } ) ||
                     return( $self->pass_error( $file->error ) );
-                $io->print( $data ) || return( $self->pass_error( $io->error ) );
+                my $bytes_out = $io->syswrite( $data );
+                return( $self->pass_error( $io->error ) ) if( !defined( $bytes_out ) );
+                $bytes_out = $io->syswrite( $buff );
+                return( $self->pass_error( $io->error ) ) if( !defined( $bytes_out ) );
                 $data = '';
             }
             else
@@ -1621,6 +1541,8 @@ sub _read_body
                 my $enc_exts = HTTP::Promise::Stream->encoding2suffix( $enc ) ||
                     return( $self->pass_error( HTTP::Promise::Stream->error ) );
                 $enc_ext = $enc_exts->join( '.' )->scalar if( !$enc_exts->is_empty );
+                # Mark body as being encoded if necessary
+                $ent->is_encoded(1);
             }
             if( $mtype && $mtype ne $default_mime )
             {
@@ -1663,6 +1585,8 @@ sub _read_body
                     my $this_file = $file->move( $new_file ) || return( $self->pass_error( $file->error ) );
                     $file = $this_file;
                 }
+                # Mark body as being encoded if necessary
+                $ent->is_encoded(1);
             }
         }
         
@@ -1687,6 +1611,115 @@ sub _read_body
     }
     return( $body );
 }
+
+sub _read_body_chunked
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    my $timeout = $opts->{timeout} // $self->timeout;
+    my $headers = $opts->{headers};
+    return( $self->error( "Headers object provided is not a HTTP::Promise::Headers object." ) ) if( !$self->_is_a( $headers => 'HTTP::Promise::Headers' ) );
+    my $ent = $opts->{entity};
+    return( $self->error( "Entity object provided is not a HTTP::Promise::Entity object." ) ) if( !$self->_is_a( $ent => 'HTTP::Promise::Entity' ) );
+    my $reader = $opts->{reader};
+    return( $self->error( "Reader object provided is not a HTTP::Promise::IO object." ) ) if( !$self->_is_a( $reader => 'HTTP::Promise::IO' ) );
+    my $bufsize = $self->buffer_size;
+    # rfc7231, section 3.1.1.5 says we can assume applicatin/octet-stream if there
+    # is no Content-Type header
+    # <https://tools.ietf.org/html/rfc7231#section-3.1.1.5>
+    my $default_mime = $DEFAULT_MIME_TYPE || 'application/octet-stream';
+    my $len = $headers->content_length;
+
+    # Guessing extension
+    my $mime_type = $headers->mime_type( $default_mime );
+    $self->_load_class( 'HTTP::Promise::MIME' ) || return( $self->pass_error );
+    my $mime = HTTP::Promise::MIME->new;
+    my $ext = $mime->suffix( $mime_type );
+    return( $self->pass_error( $mime->error ) ) if( !defined( $ext ) );
+    $ext ||= 'dat';
+    my $enc;
+    if( $self->ext_vary && ( $enc = $headers->content_encoding ) )
+    {
+        $self->_load_class( 'HTTP::Promise::Stream' ) || return( $self->pass_error );
+        my $enc_ext = HTTP::Promise::Stream->encoding2suffix( $enc ) ||
+            return( $self->pass_error( HTTP::Promise::Stream->error ) );
+            $ext .= '.' . $enc_ext->join( '.' )->scalar if( !$enc_ext->is_empty );
+    }
+    my $tempfile = $self->new_tempfile( extension => $ext ) ||
+        return( $self->pass_error );
+    # HTTP::Promise::Body::File inherits from Module::Generic::File, so we pass it some
+    # appropriate parameters.
+    my $body = $ent->new_body( 'file', $tempfile ) ||
+        return( $self->pass_error( $ent->error ) );
+    my $io = $body->open( '+>', { binmode => 'raw', autoflush => 1 } ) ||
+        return( $self->pass_error( $body->error ) );
+    my $buff = '';
+    my $bytes = -1;
+    my $te_re = qr{
+    \A (                 # header
+        ( [0-9a-fA-F]+ ) # next_len (hex number)
+        (?:;
+            $HTTP_TOKEN
+            =
+            (?: $HTTP_TOKEN | $HTTP_QUOTED_STRING )
+        )*               # optional chunk-extensions
+        [[:blank:]]*     # www.yahoo.com adds spaces here.
+                         # Is this valid?
+        \015\012         # CR+LF
+    )
+    }mxs;
+    
+    READ_LOOP: while( $bytes )
+    {
+        # If we do not find anything within the maximum allocable memory size, this will
+        # return an error, so we can bank on it
+        my $hdr = $reader->read_until_in_memory( $te_re, include => 1 );
+        return( $self->pass_error( $reader->error ) ) if( !defined( $hdr ) );
+        last if( !length( $hdr ) );
+        
+        my( $header, $hex_len ) = ( $hdr =~ m/$te_re/ );
+        # remove header from buffer
+        # $hdr = substr( $hdr, 0, length( $header ), '' );
+        my $len = hex( $hex_len );
+        if( $len == 0 )
+        {
+            last READ_LOOP;
+        }
+        # $reader->unread( $hdr ) if( length( $hdr ) );
+
+        my $chunk_size = $bufsize;
+        $chunk_size = $len if( $chunk_size > $len );
+        my $total_bytes = 0;
+        READ_CHUNK: while( $bytes = $reader->read( $buff, $chunk_size ) )
+        {
+            # TODO: we should make sure that the bytes printed out are equal to the bytes we sent to syswrite
+            my $bytes_out = $io->syswrite( $buff );
+            return( $self->pass_error( $io->error ) ) if( !defined( $bytes_out ) );
+            $total_bytes += $bytes;
+            last READ_CHUNK if( $total_bytes == $len );
+            # We do not want to read more than we should
+            $chunk_size = ( $len - $total_bytes ) if( ( $total_bytes < $len ) && ( ( $total_bytes + $chunk_size ) > $len ) );
+        }
+        return( $self->error( "Error reading http body from socket: ", $reader->error ) ) if( !defined( $bytes ) );
+        # consume the trailing CRLF sequence
+        my $trash = $reader->read_until_in_memory( qr/${CRLF}/, include => 1 );
+        return( $self->pass_error( $reader->error ) ) if( !defined( $trash ) );
+    }
+    $io->close;
+    # consume the final CRLF sequence
+    my $trash = $reader->read_until_in_memory( qr/${CRLF}/, include => 1 );
+    # Mark body as being encoded if necessary
+    $ent->is_encoded( ( defined( $enc ) && CORE::length( $enc ) ) ? 1 : 0 );
+    return( $body );
+}
+
+# NOTE: sub FREEZE is inherited
+
+sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+# NOTE: sub THAW is inherited
 
 1;
 # NOTE: POD
@@ -1718,10 +1751,15 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
         max_headers_size => 8192,
         max_redirect => 3,
         proxy => 'https://proxy.example.org:8080',
+        # Can also be cbor or storable
+        serialiser => 'sereal',
         # You can also use decimals with Time::HiRes
         timeout => 15,
         # force the use of files to store the response content
         use_content_file => 1,
+        # The serialiser to use for the promise in Promise::Me
+        # Defaults to storable, but can also be cbor and sereal
+        serialiser => 'sereal',
     );
     my $prom = $p->get( 'https://www.example.org', $hash_of_query_params )->then(sub
     {
@@ -1738,7 +1776,7 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
 
 =head1 VERSION
 
-    v0.1.3
+    v0.1.6
 
 =head1 DESCRIPTION
 
@@ -1880,6 +1918,12 @@ The url of the proxy to use for the HTTP requests.
 =item * C<requests_redirectable>
 
 Array reference. This sets the list of http methods that are allowed to be redirected. Default to empty, which means that all methods can be redirected.
+
+=item * C<serialiser>
+
+String. Specify the serialiser to use for L<Promise::Me>. Possible values are: L<cbor|CBOR::XS>, L<sereal|Sereal> or L<storable|Storable::Improved>
+
+By default it uses the value set in the global variable C<$SERIALISER>, which is a copy of the C<$SERIALISER> in L<Promise::Me>, which should be by default C<storable>
 
 =item * C<ssl_opts>
 
@@ -2450,6 +2494,12 @@ Boolean. Enables or disables the C<TE> http header. Defaults to true. If true, t
     my $p = HTTP::Promise->new( send_te => 1 );
     $p->send_te(1);
     my $bool = $p->send_te;
+
+=head2 serialiser
+
+String. Sets or gets the serialiser to use for L<Promise::Me>. Possible values are: L<cbor|CBOR::XS>, L<sereal|Sereal> or L<storable|Storable::Improved>
+
+By default, the value is set to the global variable C<$SERIALISER>, which is a copy of the C<$SERIALISER> in L<Promise::Me>, which should be by default C<storable>
 
 =head2 simple_request
 

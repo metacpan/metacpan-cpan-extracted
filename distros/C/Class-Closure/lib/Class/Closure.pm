@@ -1,16 +1,11 @@
-package Class::Closure;
-$Class::Closure::VERSION = '0.302';
-# ABSTRACT: Encapsulated, declarative class style
+use 5.006; use warnings; use strict;
 
-use 5.006;
-use warnings;
-use strict;
+package Class::Closure;
+our $VERSION = '0.303';
 
 use Exporter ();
 use Carp ();
 use Symbol ();
-
-our @ISA = qw(Exporter);
 
 our @EXPORT = qw(
 	has
@@ -178,7 +173,8 @@ sub extends($) { &$EXTENDS }
 sub destroy(&) { _install DESTROY => \Class::Closure::DestroyDelegate->new( $_[0] ) }
 
 package Class::Closure::DestroyDelegate;
-$Class::Closure::DestroyDelegate::VERSION = '0.302';
+our $VERSION = '0.303';
+
 sub new { bless $_[1] }
 sub DESTROY { goto &{$_[0]} }
 
@@ -193,10 +189,6 @@ __END__
 =head1 NAME
 
 Class::Closure - Encapsulated, declarative class style
-
-=head1 VERSION
-
-version 0.302
 
 =head1 SYNOPSIS
 

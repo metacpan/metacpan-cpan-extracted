@@ -780,21 +780,22 @@ subtest 'DSA requests' => sub {
 };
 
 subtest 'PSS Padding' => sub {
-    plan tests => 4;
+    plan tests => 16;
 
-    $decoded = Crypt::PKCS10->new( File::Spec->catpath( @dirpath, 'csr9.pem' ),
-                                   verifySignature => 0,
-                                   readFile =>1, escapeStrings => 1 );
+    foreach my $file ('csr9.pem','csr9a.pem','csr9b.pem','csr9c.pem') {
+        $decoded = Crypt::PKCS10->new( File::Spec->catpath( @dirpath, $file ),
+                        verifySignature => 0,
+                        readFile =>1, escapeStrings => 1 );
 
-    isnt( $decoded, undef, 'load PEM from filename' ) or BAIL_OUT( Crypt::PKCS10->error );
+        isnt( $decoded, undef, 'load PEM from filename' ) or BAIL_OUT( Crypt::PKCS10->error );
 
-    is( $decoded->signatureAlgorithm, 'rsassaPss', 'RSA_PSS signature' );
+        is( $decoded->signatureAlgorithm, 'rsassaPss', 'RSA_PSS signature' );
 
-    is( $decoded->signature(2), undef, 'signature decoding' );
-  SKIP: {
-        skip( "Crypt::PK::RSA is not installed", 1 ) unless( eval { require Crypt::PK::RSA; } );
-
-        ok( $decoded->checkSignature, "verify RSA PSS signature" );
+        is( $decoded->signature(2), undef, 'signature decoding' );
+        SKIP: {
+            skip( "Crypt::PK::RSA is not installed", 1 ) unless( eval { require Crypt::PK::RSA; } );
+            ok( $decoded->checkSignature, "verify RSA PSS signature" );
+        }
     }
 };
 

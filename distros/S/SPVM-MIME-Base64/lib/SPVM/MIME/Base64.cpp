@@ -75,7 +75,7 @@ static const unsigned char index_64[256] = {
 
 #define FILE_NAME "SPVM/MIME/Base64.cpp"
 
-int32_t SPVM__MIME__Base64__encode_base64_opt(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__MIME__Base64__encode_base64(SPVM_ENV* env, SPVM_VALUE* stack) {
         char *str;     /* string to encode */
         int32_t len;   /* length of the string */
         const char*eol;/* the end-of-line sequence to use */
@@ -85,6 +85,8 @@ int32_t SPVM__MIME__Base64__encode_base64_opt(SPVM_ENV* env, SPVM_VALUE* stack) 
         unsigned char c1, c2, c3;
         int32_t chunk;
         uint32_t had_utf8;
+        
+        int32_t items = env->get_args_stack_length(env, stack);
 
         void* obj_str = stack[0].oval;
         
@@ -95,8 +97,11 @@ int32_t SPVM__MIME__Base64__encode_base64_opt(SPVM_ENV* env, SPVM_VALUE* stack) 
         rlen = env->length(env, stack, obj_str);
         str = (char*)env->get_chars(env, stack, obj_str);
         len = rlen;
-
-        void* obj_eol = stack[1].oval;
+        
+        void* obj_eol = NULL;
+        if (items > 1) {
+          obj_eol = stack[1].oval;
+        }
 
         /* set up EOL from the second argument if present, default to "\n" */
         if (obj_eol) {
@@ -230,19 +235,24 @@ int32_t SPVM__MIME__Base64__decode_base64(SPVM_ENV* env, SPVM_VALUE* stack) {
         return 0;
 }
 
-int32_t SPVM__MIME__Base64__encoded_base64_length_opt(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__MIME__Base64__encoded_base64_length(SPVM_ENV* env, SPVM_VALUE* stack) {
         int32_t len;   /* length of the string */
         int32_t eollen; /* length of the EOL sequence */
         uint32_t had_utf8;
 
+        int32_t items = env->get_args_stack_length(env, stack);
+
         void* obj_str = stack[0].oval;
         
         if (!obj_str) {
-                return env->die(env, stack, "The input must be defined", FILE_NAME, __LINE__);
+          return env->die(env, stack, "The input must be defined", FILE_NAME, __LINE__);
+        }
+
+        void* obj_eol = NULL;
+        if (items > 1) {
+          obj_eol = stack[1].oval;
         }
         
-        
-        void* obj_eol = stack[1].oval;
         if (obj_eol) {
             eollen = env->length(env, stack, obj_eol);
         } else {

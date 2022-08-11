@@ -745,7 +745,7 @@ The list of character literal escape characters.
       \n
     </td>
     <td>
-      <code>0x0a</code> LF
+      <code>0x0A</code> LF
     </td>
   </tr>
   <tr>
@@ -753,7 +753,7 @@ The list of character literal escape characters.
       \f
     </td>
     <td>
-      <code>0x0c</code> FF
+      <code>0x0C</code> FF
     </td>
   </tr>
   <tr>
@@ -761,7 +761,7 @@ The list of character literal escape characters.
       \r
     </td>
     <td>
-      <code>0x0d</code> CR
+      <code>0x0D</code> CR
     </td>
   </tr>
   <tr>
@@ -785,7 +785,7 @@ The list of character literal escape characters.
       \\
     </td>
     <td>
-      <code>0x5c</code> \
+      <code>0x5C</code> \
     </td>
   </tr>
   <tr>
@@ -898,7 +898,7 @@ B<Examples:>
       <b>\n</b>
     </td>
     <td>
-      ASCII <code>0x0a</code> LF
+      ASCII <code>0x0A</code> LF
     </td>
   </tr>
   <tr>
@@ -906,7 +906,7 @@ B<Examples:>
       <b>\f</b>
     </td>
     <td>
-      ASCII <code>0x0c</code> FF
+      ASCII <code>0x0C</code> FF
     </td>
   </tr>
   <tr>
@@ -914,7 +914,7 @@ B<Examples:>
       <b>\r</b>
     </td>
     <td>
-      ASCII <code>0x0d</code> CR
+      ASCII <code>0x0D</code> CR
     </td>
   </tr>
   <tr>
@@ -923,6 +923,14 @@ B<Examples:>
     </td>
     <td>
       ASCII <code>0x22</code> "
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <b>\$</b>
+    </td>
+    <td>
+      ASCII <code>0x24</code> $
     </td>
   </tr>
   <tr>
@@ -938,15 +946,7 @@ B<Examples:>
       <b>\\</b>
     </td>
     <td>
-      ASCII <code>0x5c</code> \
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>\$</b>
-    </td>
-    <td>
-      ASCII <code>0x44</code> $
+      ASCII <code>0x5C</code> \
     </td>
   </tr>
   <tr>
@@ -1155,7 +1155,7 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
   %type <opval> method anon_method opt_args args arg has use require alias our
   %type <opval> opt_descriptors descriptors
   %type <opval> opt_statements statements statement if_statement else_statement
-  %type <opval> for_statement while_statement
+  %type <opval> for_statement while_statement foreach_statement
   %type <opval> switch_statement case_statement case_statements opt_case_statements default_statement
   %type <opval> block eval_block init_block switch_block if_require_statement
   %type <opval> unary_operator binary_operator comparison_operator isa
@@ -1163,7 +1163,7 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
   %type <opval> array_access field_access weaken_field unweaken_field isweak_field convert array_length
   %type <opval> assign inc dec allow has_impl
   %type <opval> new array_init die opt_extends
-  %type <opval> var_decl var interface
+  %type <opval> var_decl var interface union_type
   %type <opval> operator opt_operators operators opt_operator logical_operator
   %type <opval> field_name method_name class_name class_alias_name is_read_only
   %type <opval> type qualified_type basic_type array_type
@@ -1290,6 +1290,7 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
 
   arg
     : var ':' qualified_type opt_type_comment
+    | var ASSIGN operator ':' qualified_type opt_type_comment
 
   opt_vaarg
     : /* Empty */
@@ -1314,6 +1315,7 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
   statement
     : if_statement
     | for_statement
+    | foreach_statement
     | while_statement
     | block
     | switch_statement
@@ -1341,6 +1343,10 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
 
   for_statement
     : FOR '(' opt_operator ';' operator ';' opt_operator ')' block
+
+  foreach_statement
+    : FOR var_decl '(' '@' operator ')' block
+    | FOR var_decl '(' '@' '{' operator '}' ')' block
 
   while_statement
     : WHILE '(' operator ')' block
@@ -1437,12 +1443,12 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
     : '+' operator %prec PLUS
     | '-' operator %prec MINUS
     | BIT_NOT operator
-    | REFCNT var
+    | REFCNT operator
     | REFOP operator
     | STRING_LENGTH operator
     | DUMP operator
     | DEREF var
-    | CREATE_REF var
+    | CREATE_REF operator
     | NEW_STRING_LEN operator
     | COPY operator
 
@@ -1600,7 +1606,11 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
     | type_comment
 
   type_comment
-    : OF type
+    : OF union_type
+
+  union_type
+    : union_type BIT_OR type
+    | type
 
   field_name
     : SYMBOL_NAME
@@ -6057,6 +6067,8 @@ If the type of distribution is an L<interface type|/"Interface Type">, an L<inte
 The type comment syntax is supported. The type comment can be written after C<of> keyword.
 
   TYPE of TYPE
+  TYPE of TYPE1|TYPE2
+  TYPE of TYPE1|TYPE2|TYPE3
 
 The type comment can be used the type of the L<field decralation|/"Field Definition">, the L<class variable definition|/"Class Variable Definition">, the L<local variable declaration|/"Local Variable Declaration">, and the return value and the types of arguments of the L<method definition|/"Method Definition">.
 
@@ -6065,9 +6077,11 @@ The type comment can be used the type of the L<field decralation|/"Field Definit
   our $POINTS : List of Point;
   
   my $points : List of Point;
-  
+
   static method foo : List of Point ($arg : List of Point) { ... }
 
+  my $replace : object of string|Regex::Replacer;
+  
 If the type specified as the type comment is not found, a compilation error will occur.
 
 Type comments have no meanings at runtime.
@@ -6462,6 +6476,32 @@ Inside the for Block, you can use L</"next Statement"> to move immediately befor
     if ($i == 3) {
       next;
     }
+  }
+
+=head2 for-each Statement
+
+The for-each statement is a L<statement|/"Statement"> to write the L<for statement|/"for Statement"> for iterating easily.
+
+  for my VAR (@OPERATOR) {
+  
+  }
+  
+  for my VAR (@{OPERATOR}) {
+    
+  }
+
+The following C<for> statement is the same as the following for-each statement.
+
+  # for
+  my $array = [1, 2, 3];
+  for (my $i = 0; $i < @$array; $i++) {
+    my $element = $array->[$i];
+  }
+  
+  # for-each
+  my $array = [1, 2, 3];
+  for my $element (@$array) {
+    
   }
 
 =head2 return Statement

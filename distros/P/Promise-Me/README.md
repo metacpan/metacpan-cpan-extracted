@@ -108,7 +108,7 @@ SYNOPSIS
 VERSION
 =======
 
-        v0.3.0
+        v0.4.0
 
 DESCRIPTION
 ===========
@@ -279,7 +279,7 @@ new
         my $p = Promise::Me->new(sub
         {
             # some code to run asynchronously
-        }, { debug => 4, result_shared_mem_size => 2097152, timeout => 2 });
+        }, { debug => 4, result_shared_mem_size => 2097152, shared_vars_mem_size => 65536, timeout => 2 });
 
 Instantiate a new `Promise::Me` object.
 
@@ -328,8 +328,38 @@ The options supported are:
 *result\_shared\_mem\_size* integer
 
 :   Sets the shared memory segment to store the asynchronous process
-    results. This default to the value of the constant
-    `Module::Generic::SharedMem::SHM_BUFSIZ`, which is 64K bytes.
+    results. This default to the value of the global variable
+    `$RESULT_MEMORY_SIZE`, which is by default 512K bytes, or if empty
+    or not defined, the value of the constant
+    `Module::Generic::SharedMemXS::SHM_BUFSIZ`, which is 64K bytes.
+
+serialiser
+
+:   String. Specify the serialiser to use for
+    [Promise::Me](https://metacpan.org/pod/Promise::Me){.perl-module}.
+    Possible values are:
+    [cbor](https://metacpan.org/pod/CBOR::XS){.perl-module},
+    [sereal](https://metacpan.org/pod/Sereal){.perl-module} or
+    [storable](https://metacpan.org/pod/Storable::Improved){.perl-module}
+
+    By default, the value is set to the global variable `$SERIALISER`,
+    which defaults to `storable`
+
+    This value is passed to
+    [Module::Generic::File::Mmap](https://metacpan.org/pod/Module::Generic::File::Mmap){.perl-module},
+    [Module::Generic::File::Cache](https://metacpan.org/pod/Module::Generic::File::Cache){.perl-module},
+    or
+    [Module::Generic::SharedMemXS](https://metacpan.org/pod/Module::Generic::SharedMemXS){.perl-module}
+    depending on your choice of shared memory medium.
+
+*shared\_vars\_mem\_size* integer
+
+:   Sets the shared memory segment to store the shared variable data,
+    i.e. the ones declared with [\"shared\"](#shared){.perl-module}.
+    This defaults to the value of the global variable
+    `$SHARED_MEMORY_SIZE`, which is by default 64K bytes, or if empty or
+    not defined, the value of the constant
+    `Module::Generic::SharedMemXS::SHM_BUFSIZ`, which is 64K bytes.
 
 *timeout* integer
 
@@ -349,8 +379,25 @@ The options supported are:
     You can use the global package variable `$SHARE_MEDIUM` to set the
     default value for all object instantiation.
 
-    `$SHARE_MEDIUM` value can be either `memory` for shared memory or
-    `file` for shared cache file.
+    `$SHARE_MEDIUM` value can be either `memory` for shared memory,
+    `mmap` for cache mmap or `file` for shared cache file.
+
+*use\_mmap*
+
+:   Boolean. If true,
+    [Promise::Me](https://metacpan.org/pod/Promise::Me){.perl-module}
+    will use a cache mmap file with
+    [Module::Generic::File::Mmap](https://metacpan.org/pod/Module::Generic::File::Mmap){.perl-module}
+    instead of a shared memory block. However, please note that you need
+    to have installed
+    [Cache::FastMmap](https://metacpan.org/pod/Cache::FastMmap){.perl-module}
+    in order to use this.
+
+    You can use the global package variable `$SHARE_MEDIUM` to set the
+    default value for all object instantiation.
+
+    `$SHARE_MEDIUM` value can be either `memory` for shared memory,
+    `mmap` for cache mmap or `file` for shared cache file.
 
 catch
 -----
@@ -420,6 +467,19 @@ If the asynchronous process returns a simple string for example,
 
 Thus, unless the value returned is 1 element and it is a reference, it
 will be made of an array reference.
+
+serialiser
+----------
+
+String. Sets or gets the serialiser to use for
+[Promise::Me](https://metacpan.org/pod/Promise::Me){.perl-module}.
+Possible values are:
+[cbor](https://metacpan.org/pod/CBOR::XS){.perl-module},
+[sereal](https://metacpan.org/pod/Sereal){.perl-module} or
+[storable](https://metacpan.org/pod/Storable::Improved){.perl-module}
+
+By default, the value is set to the global variable `$SERIALISER`, which
+defaults to `storable`
 
 then
 ----
@@ -620,7 +680,16 @@ reference.
         });
 
 It will try to use shared memory or shared cache file depending on the
-value of the global package variable `$SHARE_MEDIUM`
+value of the global package variable `$SHARE_MEDIUM`, which can be
+either `file` for
+[Module::Generic::File::Cache](https://metacpan.org/pod/Module::Generic::File::Cache){.perl-module},
+`mmap` for
+[Module::Generic::File::Mmap](https://metacpan.org/pod/Module::Generic::File::Mmap){.perl-module}
+or `memory` for
+[Module::Generic::File::SharedMem](https://metacpan.org/pod/Module::Generic::File::SharedMem){.perl-module}
+
+The value of `$SHARED_MEMORY_SIZE`, and `$SERIALISER` will be passed
+when instantiating objects for those shared memory medium.
 
 unlock
 ------
@@ -779,10 +848,14 @@ This is true by default. If you want to set it to false, you can do:
 shared\_mem
 -----------
 
-This returns the
-[Module::Generic::SharedMem](https://metacpan.org/pod/Module::Generic::SharedMem){.perl-module}
-object used for sharing data and result between the main parent process
-and the asynchronous child process.
+This returns the object used for sharing data and result between the
+main parent process and the asynchronous child process. It can be
+[Module::Generic::SharedMemXS](https://metacpan.org/pod/Module::Generic::SharedMemXS){.perl-module},
+[Module::Generic::File::Mmap](https://metacpan.org/pod/Module::Generic::File::Mmap){.perl-module}
+or
+[Module::Generic::File::Cache](https://metacpan.org/pod/Module::Generic::File::Cache){.perl-module}
+depending on the value of `$SHARE_MEDIUM`, which can be set to,
+respectively, `memory`, `mmap` or `file`
 
 shared\_space\_destroy
 ----------------------
@@ -854,7 +927,7 @@ alter ego in the other process; thus the need for shareable variables.
 
 You can enable shared variables in two ways:
 
-1. declaring the variable as shared
+1\. declaring the variable as shared
 
 :       my $name : shared;
             # Initiate a value
@@ -865,7 +938,7 @@ You can enable shared variables in two ways:
             my %preferences : shared;
             my @names : shared;
 
-2. calling [\"share\"](#share){.perl-module}
+2\. calling [\"share\"](#share){.perl-module}
 
 :       my( $name, %prefs, @middle_names );
             share( $name, %prefs, @middle_names );
@@ -915,35 +988,59 @@ Otherwise the two keywords would conflict.
 SHARED MEMORY
 =============
 
-This module uses shared memory using perl core functions, or shared
-cache file using
+This module uses shared memory using
+[Module::Generic::SharedMemXS](https://metacpan.org/pod/Module::Generic::SharedMemXS){.perl-module},
+or shared cache file using
 [Module::Generic::File::Cache](https://metacpan.org/pod/Module::Generic::File::Cache){.perl-module}
 if shared memory is not supported, or if the value of the global package
-variable `$SHARE_MEDIUM` is set to `file` instead of `memory`
+variable `$SHARE_MEDIUM` is set to `file` instead of `memory`.
+Alternatively you can also have
+[Promise::Me](https://metacpan.org/pod/Promise::Me){.perl-module} use
+cache mmap file by setting `$SHARE_MEDIUM` to `mmap`. This will have it
+use
+[Module::Generic::File::Mmap](https://metacpan.org/pod/Module::Generic::File::Mmap){.perl-module},
+but note that you will need to install
+[Cache::FastMmap](https://metacpan.org/pod/Cache::FastMmap){.perl-module}
+
+The value of `$SHARE_MEDIUM` is automatically initialised to `memory` if
+the system, on which this module runs, supports
+[IPC::SysV](https://metacpan.org/pod/IPC::SysV){.perl-module}, or `mmap`
+if you have
+[Cache::FastMmap](https://metacpan.org/pod/Cache::FastMmap){.perl-module}
+installed, or else to `file`
 
 Shared memory is used for:
 
-1. shared variables
+1\. shared variables
 
 :   
 
-2. storing results returned by asynchronous processes
+2\. storing results returned by asynchronous processes
 
 :   
 
 You can control how much shared memory is allocated for each by:
 
-1. setting the global variable `$SHARED_MEMORY_SIZE`, which default to 64K bytes.
+1\. setting the global variable `$SHARED_MEMORY_SIZE`, which default to 64K bytes.
 
 :   
 
-2. setting the option *result\_shared\_mem\_size* when instantiating a new `Promise::Me` object. If not set, this will default to [Module::Generic::SharedMem::SHM\_BUFSIZ](https://metacpan.org/pod/Module::Generic::SharedMem::SHM_BUFSIZ){.perl-module} constant value which is 64K bytes.
+2\. setting the option *result\_shared\_mem\_size* when instantiating a new `Promise::Me` object. If not set, this will default to [Module::Generic::SharedMemXS::SHM\_BUFSIZ](https://metacpan.org/pod/Module::Generic::SharedMemXS::SHM_BUFSIZ){.perl-module} constant value which is 64K bytes.
 
 :   If you use [shared cache
     file](https://metacpan.org/pod/Module::Generic::File::Cache){.perl-module},
     then not setting a size is ok. It will use the space on the
     filesystem as needed and obviously return an error if there is no
     space left.
+
+    You can alternatively use
+    [Module::Generic::File::Mmap](https://metacpan.org/pod/Module::Generic::File::Mmap){.perl-module},
+    which has an API similar to
+    [Module::Generic::File::Cache](https://metacpan.org/pod/Module::Generic::File::Cache){.perl-module},
+    but uses an mmap file instead of a simple cache file and rely on the
+    XS module
+    [Cache::FastMmap](https://metacpan.org/pod/Cache::FastMmap){.perl-module},
+    and thus is faster.
 
 CONCURRENCY
 ===========
@@ -981,10 +1078,85 @@ This will yield:
         Promise 1: result is now: 'John Peter '
         Result is: 'John Peter '
 
+CLASS VARIABLE
+==============
+
+\$RESULT\_MEMORY\_SIZE
+----------------------
+
+This is the size in bytes of the shared memory block used for sharing
+result between sub process and main process, such as when you call:
+
+        my $res = $prom->result;
+
+It defaults to 512Kb
+
+\$SERIALISER
+------------
+
+A string representing the serialiser to use by default. A serialiser is
+used to serialiser data to share them between processes. This defaults
+to `storable`
+
+Currently supported serialisers are:
+[CBOR::XS](https://metacpan.org/pod/CBOR::XS){.perl-module},
+[Sereal](https://metacpan.org/pod/Sereal){.perl-module} and
+[Storable](https://metacpan.org/pod/Storable::Improved){.perl-module}
+
+You can set accordingly the value for `$SERIALISER` to: `cbor`, `sereal`
+or `storable`
+
+You can override this global value when you instantiate a new
+[Promise::Me](https://metacpan.org/pod/Promise::Me){.perl-module} object
+with the `serialiser` option. See [\"new\"](#new){.perl-module}
+
+Note that the serialiser used to serialise shared variable, is set only
+via this class variable `$SERIALISER`
+
+\$SHARE\_MEDIUM
+---------------
+
+The value of `$SHARE_MEDIUM` is automatically initialised to `memory` if
+the system, on which this module runs, supports
+[IPC::SysV](https://metacpan.org/pod/IPC::SysV){.perl-module}, or `mmap`
+if you have
+[Cache::FastMmap](https://metacpan.org/pod/Cache::FastMmap){.perl-module}
+installed, or else to `file`
+
+\$SHARED\_MEMORY\_SIZE
+----------------------
+
+This is the size in bytes of the shared memory block used for sharing
+variables between the main process and the sub processes. This is used
+when you share variables, such as:
+
+        my $name : shared;
+        my( $name, %prefs, @middle_names );
+        share( $name, %prefs, @middle_names );
+
+See [\"SHARED VARIABLES\"](#shared-variables){.perl-module}
+
+SERIALISATION
+=============
+
+[Promise::Me](https://metacpan.org/pod/Promise::Me){.perl-module} uses
+the following supported serialiser to serialise shared data across
+processes:
+
+-   [CBOR](https://metacpan.org/pod/CBOR::XS){.perl-module}
+-   [Sereal](https://metacpan.org/pod/Sereal){.perl-module}
+-   [Storable](https://metacpan.org/pod/Storable::Improved){.perl-module}
+
+You can set which one to use globally by setting the class variable
+`$SERIALISER` to `cbor`, `sereal` or to `storable`
+
+You can also set which serialiser to use on a per promise object by
+setting the option `serialiser`. See [\"new\"](#new){.perl-module}
+
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x55829557aec8)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x558dc867c1d0)"}\>
 
 SEE ALSO
 ========

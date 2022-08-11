@@ -3,7 +3,7 @@ package Class::Mock::Generic::InterfaceTester;
 use strict;
 use warnings;
 
-our $VERSION = '1.3001';
+our $VERSION = '1.3002';
 
 use vars qw($AUTOLOAD);
 
@@ -144,7 +144,7 @@ you really do want to return a code-ref. The code-ref supplied will be executed 
 whatever it returns will be returned. If you want to return a reference to a code-ref
 then you can perpetrate a mess like this:
 
-    output => sub { \sub { ... } }
+    output => \sub { \sub { ... } }
 
 =head2 add_fixtures
 

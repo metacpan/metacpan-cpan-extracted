@@ -94,17 +94,19 @@ $url = do {
     my @version = split /\./, $2;
     push @version, 0, 0 if @version == 1;
     push @version, 0    if @version == 2;
+    next if $version[0] >= 2;
+    next if $version[0] == 1 && $version[1] >= 9;
     push @list, [ $path, \@version ];
   }
 
-  ($filename) = reverse 
-                  map { $_->[0] } 
-                  sort { 
+  ($filename) = reverse
+                  map { $_->[0] }
+                  sort {
                     vercmp($a->[1], $b->[1]) || extcmp($a->[0], $b->[0]);
                   } @list;
 
   die "unable to find filename in HTML" unless $filename;
-  
+
   "$url/$filename";
 };
 

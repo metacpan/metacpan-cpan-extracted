@@ -17,7 +17,7 @@ use namespace::clean;
 
 extends 'File::KDBX::Loader';
 
-our $VERSION = '0.904'; # VERSION
+our $VERSION = '0.905'; # VERSION
 
 my $DEFAULT_EXPIRATION = Time::Piece->strptime('2999-12-31 23:59:59', '%Y-%m-%d %H:%M:%S');
 
@@ -397,7 +397,7 @@ File::KDBX::Loader::KDB - Read KDB files
 
 =head1 VERSION
 
-version 0.904
+version 0.905
 
 =head1 DESCRIPTION
 

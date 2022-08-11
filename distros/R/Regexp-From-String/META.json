@@ -47,7 +47,7 @@
    "provides" : {
       "Regexp::From::String" : {
          "file" : "lib/Regexp/From/String.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -62,7 +62,7 @@
          "web" : "https://github.com/perlancar/perl-Regexp-From-String"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

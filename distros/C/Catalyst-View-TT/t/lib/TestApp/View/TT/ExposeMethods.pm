@@ -4,7 +4,7 @@ use Moose;
 extends 'Catalyst::View::TT';
 
 __PACKAGE__->config(
-  expose_methods => [q/exposed_method/],
+  expose_methods => [qw/exposed_method other_exposed_method/],
 );
 
 sub exposed_method {
@@ -16,5 +16,9 @@ sub exposed_method {
     return 'magic ' . $some_param;
 }
 
+sub other_exposed_method {
+    my ($self, $c) = @_;
+    die "ouch that was unexpected";
+}
 
 1;

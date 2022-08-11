@@ -7,7 +7,7 @@ AtteanX::Parser::SPARQLLex - SPARQL Lexer
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::SPARQLLex version 0.030
+This document describes AtteanX::Parser::SPARQLLex version 0.031
 
 =head1 SYNOPSIS
 
@@ -39,7 +39,7 @@ This document describes AtteanX::Parser::SPARQLLex version 0.030
 
 =cut
 
-package AtteanX::Parser::SPARQLLex 0.030 {
+package AtteanX::Parser::SPARQLLex 0.031 {
 	use utf8;
 	use Moo;
 	use Attean;
@@ -104,7 +104,7 @@ the SPARQL query/update read from the L<IO::Handle> object C<< $fh >>.
 	}
 }
 
-package AtteanX::Parser::SPARQLLex::Iterator 0.030 {
+package AtteanX::Parser::SPARQLLex::Iterator 0.031 {
 	use utf8;
 	use Moo;
 	use Attean;
@@ -149,7 +149,7 @@ package AtteanX::Parser::SPARQLLex::Iterator 0.030 {
 	my $r_BLANK_NODE_LABEL		= qr/_:${r_PN_LOCAL_BNODE}/o;
 	my $r_ANON					= qr/\[[\t\r\n ]*\]/o;
 	my $r_NIL					= qr/\([\n\r\t ]*\)/o;
-	my $r_KEYWORDS				= qr/(ABS|ADD|ALL|ASC|ASK|AS|AVG|BASE|BIND|BNODE|BOUND|BY|CEIL|CLEAR|COALESCE|CONCAT|CONSTRUCT|CONTAINS|COPY|COUNT|CREATE|DATATYPE|DAY|DEFAULT|DELETE|DELETE WHERE|DESCRIBE|DESC|DISTINCT|DISTINCT|DROP|ENCODE_FOR_URI|EXISTS|FILTER|FLOOR|FROM|GRAPH|GROUP_CONCAT|GROUP|HAVING|HOURS|IF|INSERT|INSERT|DATA|INTO|IN|IRI|ISBLANK|ISIRI|ISLITERAL|ISNUMERIC|ISURI|LANGMATCHES|LANG|LCASE|LIMIT|LOAD|MAX|MD5|MINUS|MINUTES|MIN|MONTH|MOVE|NAMED|NOT|NOW|OFFSET|OPTIONAL|ORDER|PREFIX|RAND|REDUCED|REGEX|REPLACE|ROUND|SAMETERM|SAMPLE|SECONDS|SELECT|SEPARATOR|SERVICE|SHA1|SHA256|SHA384|SHA512|SILENT|STRAFTER|STRBEFORE|STRDT|STRENDS|STRLANG|STRLEN|STRSTARTS|STRUUID|STR|SUBSTR|SUM|TIMEZONE|TO|TZ|UCASE|UNDEF|UNION|URI|USING|UUID|VALUES|WHERE|WITH|YEAR)(?!:)\b/io;
+	my $r_KEYWORDS				= qr/(ABS|ADD|ALL|ASC|ASK|AS|AVG|BASE|BIND|BNODE|BOUND|BY|CEIL|CLEAR|COALESCE|CONCAT|CONSTRUCT|CONTAINS|COPY|COUNT|CREATE|DATATYPE|DAY|DEFAULT|DELETE|DELETE WHERE|DESCRIBE|DESC|DISTINCT|DISTINCT|DROP|ENCODE_FOR_URI|EXISTS|FILTER|FLOOR|FROM|GRAPH|GROUP_CONCAT|GROUP|HAVING|HOURS|IF|INSERT|INSERT|DATA|INTO|IN|IRI|ISBLANK|ISIRI|ISLITERAL|ISNUMERIC|ISURI|LANGMATCHES|LANG|LCASE|LIMIT|LOAD|MAX|MD5|MINUS|MINUTES|MIN|MONTH|MOVE|NAMED|NOT|NOW|OFFSET|OPTIONAL|ORDER|PREFIX|RAND|REDUCED|REGEX|REPLACE|ROUND|SAMETERM|SAMPLE|SECONDS|SELECT|SEPARATOR|SERVICE|SHA1|SHA256|SHA384|SHA512|SILENT|STRAFTER|STRBEFORE|STRDT|STRENDS|STRLANG|STRLEN|STRSTARTS|STRUUID|STR|SUBSTR|SUM|TIMEZONE|TO|TZ|UCASE|UNDEF|UNION|URI|USING|UUID|VALUES|WHERE|WITH|YEAR|TRIPLE|ISTRIPLE|SUBJECT|PREDICATE|OBJECT)(?!:)\b/io;
 
 	sub BUILD {
 		my $self	= shift;
@@ -157,6 +157,9 @@ package AtteanX::Parser::SPARQLLex::Iterator 0.030 {
 		# 	q[#]	=> '_get_comment',
 			q[@]	=> '_get_lang',
 			q[<]	=> '_get_iriref_or_relational',
+			q[{]	=> '_get_brace_or_annotation_or_or',
+			q[}]	=> '_get_brace_or_annotation_or_or',
+			q[|]	=> '_get_brace_or_annotation_or_or',
 			q[_]	=> '_get_bnode',
 			q[']	=> '_get_single_literal',
 			q["]	=> '_get_double_literal',
@@ -180,8 +183,6 @@ package AtteanX::Parser::SPARQLLex::Iterator 0.030 {
 			','	=> COMMA,
 			'.'	=> DOT,
 			'='	=> EQUALS,
-			'{'	=> LBRACE,
-			'}'	=> RBRACE,
 			']'	=> RBRACKET,
 			')'	=> RPAREN,
 			'-'	=> MINUS,
@@ -333,14 +334,6 @@ package AtteanX::Parser::SPARQLLex::Iterator 0.030 {
 					$self->read_word('^');
 					return $self->new_token(HAT, $start_line, $start_column, '^');
 				}
-			} elsif ($c eq '|') {
-				if ($self->buffer =~ /^\|\|/) {
-					$self->read_word('||');
-					return $self->new_token(OROR, $start_line, $start_column, '||');
-				} else {
-					$self->read_word('|');
-					return $self->new_token(OR, $start_line, $start_column, '|');
-				}
 			} elsif ($c eq '&') {
 				$self->read_word('&&');
 				return $self->new_token(ANDAND, $start_line, $start_column, '&&');
@@ -445,6 +438,12 @@ package AtteanX::Parser::SPARQLLex::Iterator 0.030 {
 		} elsif (substr($buffer, 0, 2) eq '>=') {
 			$self->read_length(2);
 			return $self->new_token(GE, $self->start_line, $self->start_column, '>=');
+		} elsif (substr($buffer, 0, 2) eq '<<') {
+			$self->read_length(2);
+			return $self->new_token(LTLT, $self->start_line, $self->start_column, '<<');
+		} elsif (substr($buffer, 0, 2) eq '>>') {
+			$self->read_length(2);
+			return $self->new_token(GTGT, $self->start_line, $self->start_column, '>>');
 		} elsif (substr($buffer, 0, 1) eq '>') {
 			$self->get_char;
 			return $self->new_token(GT, $self->start_line, $self->start_column, '>');
@@ -500,6 +499,29 @@ package AtteanX::Parser::SPARQLLex::Iterator 0.030 {
 		}
 	}
 	
+	sub _get_brace_or_annotation_or_or {
+		my $self	= shift;
+		if (substr($self->buffer, 0, 2) eq '{|') {
+			$self->read_length(2);
+			return $self->new_token(LANNOT, $self->start_line, $self->start_column, '{|');
+		} elsif (substr($self->buffer, 0, 2) eq '|}') {
+			$self->read_length(2);
+			return $self->new_token(RANNOT, $self->start_line, $self->start_column, '|}');
+		} elsif (substr($self->buffer, 0, 2) eq '||') {
+			$self->read_length(2);
+			return $self->new_token(OROR, $self->start_line, $self->start_column, '||');
+		} elsif (substr($self->buffer, 0, 1) eq '{') {
+			$self->get_char_safe('{');
+			return $self->new_token(LBRACE, $self->start_line, $self->start_column, '{');
+		} elsif (substr($self->buffer, 0, 1) eq '}') {
+			$self->get_char_safe('}');
+			return $self->new_token(RBRACE, $self->start_line, $self->start_column, '}');
+		} else {
+			$self->get_char_safe('|');
+			return $self->new_token(OR, $self->start_line, $self->start_column, '|');
+		}
+	}
+
 	sub _get_lbracket_or_anon {
 		my $self	= shift;
 		if ($self->buffer =~ /^$r_ANON/) {
@@ -692,7 +714,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2020 Gregory Todd Williams. This
+Copyright (c) 2014--2022 Gregory Todd Williams. This
 program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

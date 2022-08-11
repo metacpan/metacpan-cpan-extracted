@@ -4,8 +4,8 @@ use warnings;
 
 use Test::More 0.88;
 
+use File::Spec;
 use Test::DZil;
-use Path::Class;
 use Dist::Zilla::App::Tester;
 
 use Test::File::ShareDir -share => {
@@ -16,7 +16,7 @@ use Test::File::ShareDir -share => {
 my $tzil = Minter->_new_from_profile(
   [ Default => 'xs-mb'],
   { name => 'DZT-Minty-XS', },
-  { global_config_root => dir('corpus/global')->absolute },
+  { global_config_root => File::Spec->rel2abs('corpus/global') },
 );
 
 $tzil->mint_dist;
@@ -34,7 +34,7 @@ like($distini, qr/copyright_holder = A. U. Thor/, "copyright_holder in dist.ini"
 $tzil = Minter->_new_from_profile(
   [ Default => 'xs-mm'],
   { name => 'DZT-Minty-XS', },
-  { global_config_root => dir('corpus/global')->absolute },
+  { global_config_root => File::Spec->rel2abs('corpus/global') },
 );
 
 $tzil->mint_dist;

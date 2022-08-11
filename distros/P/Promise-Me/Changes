@@ -1,6 +1,19 @@
 Revision history for Perl module Promise::Me
 
-v0.3.0 2022-04-07T18:22:58+0900
+v0.4.2 2022-08-07T17:26:03+0900
+    - Improvements in storing shared results, locking resources beforehand
+
+v0.4.1 2022-08-06T13:28:15Z +0900
+    - Minor improvement in test units
+
+v0.4.0 2022-08-03T19:50:31Z +0900
+    - Change dependency from Storable to Storable::Improved for improved efficiency and support for glob and XS objects.
+    - Added the object instantiation option "serialiser" and its corresponding method.
+    - Now, can choose interchangeably between CBOR::XS, Sereal or Storable to serialise data
+    - Now, also one can choose interchangeably, between memory, mmap or file as a medium to share data among processes
+    - Improved documentation
+
+v0.3.0 2022-04-07T18:22:58Z +0900
     - Added $_ as an array reference containing the code reference for resolve() and reject()
 
 v0.2.2 2022-04-03T05:55:48Z +0900

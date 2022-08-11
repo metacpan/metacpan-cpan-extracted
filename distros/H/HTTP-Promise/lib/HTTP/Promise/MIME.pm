@@ -139,6 +139,14 @@ EOT
     return( \$data );
 }
 
+# NOTE: sub FREEZE is inherited
+
+sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+# NOTE: sub THAW is inherited
+
 1;
 # NOTE: POD
 __END__
@@ -147,7 +155,7 @@ __END__
 
 =head1 NAME
 
-HTTP::Promise::MIME - Asynchronous HTTP Request and Promise
+HTTP::Promise::MIME - MIME Types and File Extension Class
 
 =head1 SYNOPSIS
 

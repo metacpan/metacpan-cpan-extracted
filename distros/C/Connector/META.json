@@ -4,7 +4,7 @@
       "Scott Hardin <mrscotty@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.3",
+   "generated_by" : "Minilla/v3.1.19",
    "license" : [
       "perl_5"
    ],
@@ -53,7 +53,7 @@
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -83,7 +83,7 @@
    "provides" : {
       "Connector" : {
          "file" : "lib/Connector.pm",
-         "version" : "1.44"
+         "version" : "1.45"
       },
       "Connector::Builtin" : {
          "file" : "lib/Connector/Builtin.pm"
@@ -111,6 +111,9 @@
       },
       "Connector::Builtin::Memory" : {
          "file" : "lib/Connector/Builtin/Memory.pm"
+      },
+      "Connector::Builtin::Null" : {
+         "file" : "lib/Connector/Builtin/Null.pm"
       },
       "Connector::Builtin::Static" : {
          "file" : "lib/Connector/Builtin/Static.pm"
@@ -194,15 +197,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/mrscotty/connector/issues"
+         "web" : "https://github.com/whiterabbitsecurity/connector/issues"
       },
-      "homepage" : "https://github.com/mrscotty/connector",
+      "homepage" : "https://github.com/whiterabbitsecurity/connector",
       "repository" : {
-         "url" : "git://github.com/mrscotty/connector.git",
-         "web" : "https://github.com/mrscotty/connector"
+         "type" : "git",
+         "url" : "https://github.com/whiterabbitsecurity/connector.git",
+         "web" : "https://github.com/whiterabbitsecurity/connector"
       }
    },
-   "version" : "1.44",
+   "version" : "1.45",
    "x_contributors" : [
       "Martin Bartosch <m.bartosch@cynops.de>",
       "Martin Bartosch <mbartosch@whiterabbitsecurity.com>",
@@ -215,6 +219,6 @@
       "Scott T. Hardin <scott-1@hnsc.de>",
       "Scott T. Hardin <scott.hardin@hnsc.de>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1
 }

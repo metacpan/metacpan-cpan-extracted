@@ -8,9 +8,18 @@ README
 README.md
 SIGNATURE
 t/001_load.t
-t/002_promise.t
+t/002_promise_memory_cbor.t
+t/003_promise_memory_sereal.t
+t/004_promise_memory_storable.t
+t/005_promise_file_cbor.t
+t/006_promise_file_sereal.t
+t/007_promise_file_storable.t
+t/008_promise_mmap_cbor.t
+t/009_promise_mmap_sereal.t
+t/010_promise_mmap_storable.t
 t/090_pod.t
 t/091.signature.t
 t/099_kwalitee.t
+t/Test/Promise/Me.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

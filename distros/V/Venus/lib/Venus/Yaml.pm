@@ -115,7 +115,12 @@ sub package {
     'YAML::PP::LibYAML' => '0.004',
     'YAML::PP' => '0.023',
   );
-  for my $package (qw(YAML::XS YAML::PP::LibYAML YAML::PP)) {
+  for my $package (
+    grep defined,
+    $ENV{VENUS_YAML_PACKAGE},
+    qw(YAML::XS YAML::PP::LibYAML YAML::PP)
+  )
+  {
     my $criteria = "require $package; $package->VERSION($packages{$package})";
     if (do {local $@; eval "$criteria"; $@}) {
       next;
@@ -212,9 +217,10 @@ Yaml Class for Perl 5
 =head1 DESCRIPTION
 
 This package provides methods for reading and writing L<YAML|https://yaml.org>
-data. B<Note:> This package requires that a suitable YAML is installed,
+data. B<Note:> This package requires that a suitable YAML library is installed,
 currently either C<YAML::XS> C<0.67+>, C<YAML::PP::LibYAML> C<0.004+>, or
-C<YAML::PP> C<0.23+>.
+C<YAML::PP> C<0.23+>. You can use the C<VENUS_YAML_PACKAGE> environment
+variable to include or prioritize your preferred YAML library.
 
 =cut
 

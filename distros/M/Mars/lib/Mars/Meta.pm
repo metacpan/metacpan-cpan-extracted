@@ -22,6 +22,10 @@ sub attr {
 sub attrs {
   my ($self) = @_;
 
+  if ($self->{attrs}) {
+    return $self->{attrs};
+  }
+
   my $name = $self->{name};
   my @attrs = attrs_resolver($name);
 
@@ -43,7 +47,7 @@ sub attrs_resolver {
   no strict 'refs';
 
   if (${"${name}::META"} && $${"${name}::META"}{ATTR}) {
-    return (map +($_,attrs_resolver($_)), sort {
+    return (sort {
       $${"${name}::META"}{ATTR}{$a}[0] <=> $${"${name}::META"}{ATTR}{$b}[0]
     } keys %{$${"${name}::META"}{ATTR}});
   }
@@ -64,6 +68,10 @@ sub base {
 
 sub bases {
   my ($self) = @_;
+
+  if ($self->{bases}) {
+    return $self->{bases};
+  }
 
   my $name = $self->{name};
   my @bases = bases_resolver($name);
@@ -94,6 +102,69 @@ sub data {
   return ${"${name}::META"};
 }
 
+sub local {
+  my ($self, $type) = @_;
+
+  return if !$type;
+
+  my $name = $self->{name};
+
+  no strict 'refs';
+
+  return if !int grep $type eq $_, qw(attrs bases mixins roles subs);
+
+  my $function = "${type}_resolver";
+
+  return [&{"${function}"}($name)];
+}
+
+sub mixin {
+  my ($self, $name) = @_;
+
+  return 0 if !$name;
+
+  my $data = {map +($_,$_), @{$self->mixins}};
+
+  return $data->{$name} ? 1 : 0;
+}
+
+sub mixins {
+  my ($self) = @_;
+
+  if ($self->{mixins}) {
+    return $self->{mixins};
+  }
+
+  my $name = $self->{name};
+  my @mixins = mixins_resolver($name);
+
+  for my $mixin (@mixins) {
+    push @mixins, mixins_resolver($mixin);
+  }
+
+  for my $base (@{$self->bases}) {
+    push @mixins, mixins_resolver($base);
+  }
+
+  my %seen;
+  return $self->{mixins} ||= [grep !$seen{$_}++, @mixins];
+}
+
+sub mixins_resolver {
+  my ($name) = @_;
+
+  no strict 'refs';
+
+  if (${"${name}::META"} && $${"${name}::META"}{MIXIN}) {
+    return (map +($_, mixins_resolver($_)), sort {
+      $${"${name}::META"}{MIXIN}{$a}[0] <=> $${"${name}::META"}{MIXIN}{$b}[0]
+    } keys %{$${"${name}::META"}{MIXIN}});
+  }
+  else {
+    return ();
+  }
+}
+
 sub new {
   my ($self, @args) = @_;
 
@@ -112,6 +183,10 @@ sub role {
 
 sub roles {
   my ($self) = @_;
+
+  if ($self->{roles}) {
+    return $self->{roles};
+  }
 
   my $name = $self->{name};
   my @roles = roles_resolver($name);
@@ -155,6 +230,10 @@ sub sub {
 
 sub subs {
   my ($self) = @_;
+
+  if ($self->{subs}) {
+    return $self->{subs};
+  }
 
   my $name = $self->{name};
   my @subs = subs_resolver($name);
@@ -457,6 +536,160 @@ I<Since C<0.01>>
   #     ]
   #   }
   # }
+
+=back
+
+=cut
+
+=head2 local
+
+  local(Str $type) (Any)
+
+The local method returns the names of properties defined in the package
+directly (not inherited) for the property type specified. The C<$type> provided
+can be either C<attrs>, C<bases>, C<mixins>, C<roles>, or C<subs>.
+
+I<Since C<0.05>>
+
+=over 4
+
+=item local example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $attrs = $meta->local('attrs');
+
+  # [...]
+
+=back
+
+=over 4
+
+=item local example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $bases = $meta->local('bases');
+
+  # [...]
+
+=back
+
+=cut
+
+=over 4
+
+=item local example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $mixins = $meta->local('mixins');
+
+  # [...]
+
+=back
+
+=cut
+
+=over 4
+
+=item local example 4
+
+  # given: synopsis
+
+  package main;
+
+  my $roles = $meta->local('roles');
+
+  # [...]
+
+=back
+
+=cut
+
+=over 4
+
+=item local example 5
+
+  # given: synopsis
+
+  package main;
+
+  my $subs = $meta->local('subs');
+
+  # [...]
+
+=back
+
+=cut
+
+=head2 mixin
+
+  mixin(Str $name) (Bool)
+
+The mixin method returns true or false if the package referenced has consumed
+the mixin named.
+
+I<Since C<0.05>>
+
+=over 4
+
+=item mixin example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $mixin = $meta->mixin('Novice');
+
+  # 1
+
+=back
+
+=over 4
+
+=item mixin example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $mixin = $meta->mixin('Intermediate');
+
+  # 0
+
+=back
+
+=cut
+
+=head2 mixins
+
+  mixins() (ArrayRef)
+
+The mixins method returns all of the mixins composed into the package
+referenced.
+
+I<Since C<0.05>>
+
+=over 4
+
+=item mixins example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $mixins = $meta->mixins;
+
+  # [
+  #   'Novice',
+  # ]
 
 =back
 

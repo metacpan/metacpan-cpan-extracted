@@ -119,7 +119,7 @@ with the arguments `foo` and `bar`.
 
 # EXCEPTION OBJECTS
 
-See [X::Tiny::Base](https://metacpan.org/pod/X::Tiny::Base) for more information about the features that that
+See [X::Tiny::Base](https://metacpan.org/pod/X%3A%3ATiny%3A%3ABase) for more information about the features that that
 module exposes to subclasses.
 
 # DESIGN CONSIDERATIONS

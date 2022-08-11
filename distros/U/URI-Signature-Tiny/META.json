@@ -41,15 +41,18 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ap/URI-Signature-Tiny/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=URI-Signature-Tiny"
       },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ap/URI-Signature-Tiny.git",
+         "url" : "https://github.com/ap/URI-Signature-Tiny.git",
          "web" : "https://github.com/ap/URI-Signature-Tiny"
       }
    },
-   "version" : "1.004",
+   "version" : "1.005",
    "x_copyright" : {
       "holder" : "Aristotle Pagaltzis",
       "year" : 2020

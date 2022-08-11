@@ -1,12 +1,28 @@
-Revision history for Getopt-Long-Dump
+0.112   2022-08-10  Released-By: PERLANCAR; Urgency: high
 
-0.10    2016-10-27 (PERLANCAR)
+        - [bugfix] Derp, forgot to adjust one instance of dump to not
+          produce hash.
+
+
+0.111   2022-08-10  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix if() bug introduced in 0.110.
+
+
+0.110   2022-08-10  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        - [incompatible change] [bugfix] Dump Getopt::Spec as arrayref not
+          hashref, because not all option spec must be followed by a destination
+          ref.
+
+
+0.10    2016-10-27  Released-By: PERLANCAR
 
 	- Tweak func.detect_res when under skip_detect so it's closer to
 	  the actual detect result.
 
 
-0.09    2016-10-27 (PERLANCAR)
+0.09    2016-10-27  Released-By: PERLANCAR
 
 	- Add option skip_detect.
 
@@ -14,34 +30,34 @@ Revision history for Getopt-Long-Dump
 	  (--filename), -I (--lib).
 
 
-0.08    2016-10-26 (PERLANCAR)
+0.08    2016-10-26  Released-By: PERLANCAR
 
 	- Dump coderef as sub{"DUMMY"} to avoid problems.
 
 
-0.07    2016-10-21 (PERLANCAR)
+0.07    2016-10-21  Released-By: PERLANCAR
 
 	- Include detection result in func.detect_res result metadata.
 
 
-0.06    2016-10-21 (PERLANCAR)
+0.06    2016-10-21  Released-By: PERLANCAR
 
 	- Set GETOPT_LONG_DUMP to 1 when executing script to be dumped to
 	  aid detection.
 
 
-0.05    2015-09-27 (PERLANCAR)
+0.05    2015-09-27  Released-By: PERLANCAR
 
 	- Replace Data::Dump with Data::Dmp for proper dumping of coderefs.
 
 
-0.04    2015-01-02 (PERLANCAR)
+0.04    2015-01-02  Released-By: PERLANCAR
 
 	- [Bugfix] comply to GetOptions interface: when first argument is
 	  hashref, options specs are given in an array, not hash.
 
 
-0.03    2014-12-21 (PERLANCAR)
+0.03    2014-12-21  Released-By: PERLANCAR
 
 	- Rename dist from Getopt-Long-Patch-DumpAndExit to Getopt-Long-Dump.
 
@@ -50,12 +66,12 @@ Revision history for Getopt-Long-Dump
           App::shcompgen (and potentially others).
 
 
-0.02    2014-12-14 (PERLANCAR)
+0.02    2014-12-14  Released-By: PERLANCAR
 
 	- Rename fragment name DUMPSPEC -> DUMP.
 
 
-0.01    2014-12-14 (PERLANCAR)
+0.01    2014-12-14  Released-By: PERLANCAR
 
         - First release, split from App-GenBashCompleter and renamed from
           ::DumpSpec to ::DumpAndExit.

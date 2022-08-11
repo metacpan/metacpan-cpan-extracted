@@ -1,17 +1,25 @@
 package String::Wildcard::Bash;
 
-our $DATE = '2019-08-30'; # DATE
-our $VERSION = '0.043'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
-use Exporter;
-our @ISA = qw(Exporter);
+use Exporter 'import';
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-08-06'; # DATE
+our $DIST = 'String-Wildcard-Bash'; # DIST
+our $VERSION = '0.044'; # VERSION
+
 our @EXPORT_OK = qw(
                        $RE_WILDCARD_BASH
                        contains_wildcard
+                       contains_brace_wildcard
+                       contains_class_wildcard
+                       contains_joker_wildcard
+                       contains_qmark_wildcard
+                       contains_glob_wildcard
+                       contains_globstar_wildcard
                        convert_wildcard_to_sql
                        convert_wildcard_to_re
                );
@@ -77,6 +85,66 @@ sub contains_wildcard {
     0;
 }
 
+sub contains_brace_wildcard {
+    my $str = shift;
+
+    while ($str =~ /$RE_WILDCARD_BASH/go) {
+        my %m = %+;
+        return 1 if $m{bash_brace};
+    }
+    0;
+}
+
+sub contains_joker_wildcard {
+    my $str = shift;
+
+    while ($str =~ /$RE_WILDCARD_BASH/go) {
+        my %m = %+;
+        return 1 if $m{bash_joker};
+    }
+    0;
+}
+
+sub contains_class_wildcard {
+    my $str = shift;
+
+    while ($str =~ /$RE_WILDCARD_BASH/go) {
+        my %m = %+;
+        return 1 if $m{bash_class};
+    }
+    0;
+}
+
+sub contains_qmark_wildcard {
+    my $str = shift;
+
+    while ($str =~ /$RE_WILDCARD_BASH/go) {
+        my %m = %+;
+        return 1 if $m{bash_joker} && $m{bash_joker} eq '?';
+    }
+    0;
+}
+
+sub contains_glob_wildcard {
+    my $str = shift;
+
+    while ($str =~ /$RE_WILDCARD_BASH/go) {
+        my %m = %+;
+        return 1 if $m{bash_joker} && $m{bash_joker} eq '*';
+    }
+    0;
+}
+
+sub contains_globstar_wildcard {
+    my $str = shift;
+
+    while ($str =~ /$RE_WILDCARD_BASH/go) {
+        my %m = %+;
+        return 1 if $m{bash_joker} && $m{bash_joker} eq '**';
+    }
+    0;
+}
+
 sub convert_wildcard_to_sql {
     my $opts = ref $_[0] eq 'HASH' ? shift : {};
     my $str = shift;
@@ -111,11 +179,24 @@ sub convert_wildcard_to_re {
     my $opts = ref $_[0] eq 'HASH' ? shift : {};
     my $str = shift;
 
-    my $opt_brace   = $opts->{brace} // 1;
-    my $opt_dotglob = $opts->{dotglob} // 0;
+    my $opt_brace    = $opts->{brace} // 1;
+    my $opt_dotglob  = $opts->{dotglob} // 0;
+    my $opt_globstar = $opts->{globstar} // 0;
+    my $opt_ps       = $opts->{path_separator} // '/';
+
+    die "Please use a single character for path_separator" unless length($opt_ps) == 1;
+    my $q_ps =
+        $opt_ps eq '-' ? "\\-" :
+        $opt_ps eq '/' ? '/' :
+        quotemeta($opt_ps);
+
+    my $re_not_ps        = "[^$q_ps]";
+    my $re_not_dot       = "[^.]";
+    my $re_not_dot_or_ps = "[^.$q_ps]";
 
     my @res;
     my $p;
+    my $after_pathsep;
     while ($str =~ /$RE_WILDCARD_BASH/g) {
         my %m = %+;
         if (defined($p = $m{bash_brace_content})) {
@@ -130,8 +211,9 @@ sub convert_wildcard_to_re {
                 #use DD; dd \@elems;
                 push @res, "(?:", join("|", map {
                     convert_wildcard_to_re({
-                        bash_brace => 0,
-                        dotglob    => $opt_dotglob || @res,
+                        brace    => 0,
+                        dotglob  => $opt_dotglob,
+                        globstar => $opt_globstar,
                     }, $_)} @elems), ")";
             } else {
                 push @res, quotemeta($m{bash_brace});
@@ -140,11 +222,18 @@ sub convert_wildcard_to_re {
         } elsif (defined($p = $m{bash_joker})) {
             if ($p eq '?') {
                 push @res, '.';
-            } elsif ($p eq '*') {
-                push @res, $opt_dotglob || @res ? '.*' : '[^.].*';
-            } elsif ($p eq '**') {
-                push @res, '.*';
-            }
+            } elsif ($p eq '*' || $p eq '**' && !$opt_globstar) {
+                push @res, $opt_dotglob || (@res && !$after_pathsep) ?
+                    "$re_not_ps*" : "$re_not_dot_or_ps$re_not_ps*";
+            } elsif ($p eq '**') { # and with 'globstar' option set
+                if ($opt_dotglob) {
+                    push @res, '.*';
+                } elsif (@res && !$after_pathsep) {
+                    push @res, "(?:$re_not_ps*)(?:$q_ps+$re_not_dot_or_ps$re_not_ps*)*";
+                } else {
+                    push @res, "(?:$re_not_dot_or_ps$re_not_ps*)(?:$q_ps+$re_not_dot_or_ps$re_not_ps*)*";
+                }
+           }
 
         } elsif (defined($p = $m{literal_brace_single_element})) {
             push @res, quotemeta($p);
@@ -156,6 +245,8 @@ sub convert_wildcard_to_re {
         } elsif (defined($p = $m{literal})) {
             push @res, quotemeta($p);
         }
+
+        $after_pathsep = defined($m{literal}) && substr($m{literal}, -1) eq $opt_ps;
     }
 
     join "", @res;
@@ -176,7 +267,7 @@ String::Wildcard::Bash - Bash wildcard string routines
 
 =head1 VERSION
 
-This document describes version 0.043 of String::Wildcard::Bash (from Perl distribution String-Wildcard-Bash), released on 2019-08-30.
+This document describes version 0.044 of String::Wildcard::Bash (from Perl distribution String-Wildcard-Bash), released on 2022-08-06.
 
 =head1 SYNOPSIS
 
@@ -229,6 +320,36 @@ applicable to other Unix shells. Haven't checked completely though.
 
 For more specific needs, e.g. you want to check if a string just contains joker
 and not other types of wildcard patterns, use L</"$RE_WILDCARD_BASH"> directly.
+
+=head2 contains_brace_wildcard
+
+Like L</contains_wildcard>, but only return true if string contains brace
+(C<{...,}>) wildcard pattern.
+
+=head2 contains_class_wildcard
+
+Like L</contains_wildcard>, but only return true if string contains character
+class (C<[...]>) wildcard pattern.
+
+=head2 contains_joker_wildcard
+
+Like L</contains_wildcard>, but only return true if string contains any of the
+joker (C<?>, C<*>, or C<**>) wildcard patterns.
+
+=head2 contains_qmark_wildcard
+
+Like L</contains_wildcard>, but only return true if string contains the question
+mark joker (C<?>) wildcard pattern.
+
+=head2 contains_glob_wildcard
+
+Like L</contains_wildcard>, but only return true if string contains the glob
+joker (C<*>, and not C<**>) wildcard pattern.
+
+=head2 contains_globstar_wildcard
+
+Like L</contains_wildcard>, but only return true if string contains the globstar
+joker (C<**> and not C<*>) wildcard pattern.
 
 =head2 convert_wildcard_to_sql
 
@@ -284,8 +405,26 @@ This setting is similar to shell behavior (shopt) setting C<dotglob>.
 
 Examples:
 
- convert_wildcard_to_re({}          , '*a*'); # => "[^.].*a.*"
- convert_wildcard_to_re({dotglob=>1}, '*a*'); # => ".*a.*"
+ convert_wildcard_to_re({}          , '*a*'); # => "[^.][^/]*a[^/]*"
+ convert_wildcard_to_re({dotglob=>1}, '*a*'); # =>     "[^/]*a[^/]*"
+
+=item * globstar
+
+Bool. Default is false. Whether globstar (C<**>) can match across subdirectories
+(matches path separator). The default behavior follows bash; that is, globstar
+option is off and C<**> behaves like C<*>.
+
+This setting is similar to shell behavior (shopt) setting C<globstar>.
+
+ convert_wildcard_to_re({},                         '*'); # => "[^.][^/]*"
+ convert_wildcard_to_re({},                        '**'); # => "[^.][^/]*"
+ convert_wildcard_to_re({globstar=>1},             '**'); # => "(?:[^/.][^/]*)(?:/+[^/.][^/]*)*"
+ convert_wildcard_to_re({globstar=>1, dotglob=>1}, '**'); # => ".*"
+
+=item * path_separator
+
+String, 1 character. Default is C</>. Can be used to customize the path
+separator.
 
 =back
 
@@ -296,14 +435,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/String-Wil
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-String-Wildcard-Bash>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=String-Wildcard-Bash>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -320,11 +451,42 @@ Other C<String::Wildcard::*> modules.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2019, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=String-Wildcard-Bash>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

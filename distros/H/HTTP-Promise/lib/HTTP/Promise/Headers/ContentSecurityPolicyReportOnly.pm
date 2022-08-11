@@ -32,7 +32,7 @@ sub init
     return( $self );
 }
 
-sub report_uri { return( shift->__set_get_value( 'report-uri', @_ ) ); }
+sub report_uri { return( shift->_set_get_property_value( 'report-uri', @_ ) ); }
 
 1;
 # NOTE: POD

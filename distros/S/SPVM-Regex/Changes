@@ -1,3 +1,6 @@
+0.11 2022-08-08
+  [Text Fix]
+    * Fix tests for SPVM upgrading.
 0.10 2022-08-01
   [Internal Ineffective Changes]
     * Use get_field_object_by_name_v2 in SPVM/Regex.cpp

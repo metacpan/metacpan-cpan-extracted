@@ -33,17 +33,13 @@ The list of class methods.
 
 =head2 encode_qp
 
-  static method encode_qp : string ($str : string);
-
-=head2 encode_qp_opt
-
-  static method encode_qp_opt : string ($str : string, $eol : string, $binmode : int);
+  static method encode_qp : string ($str : string, $eol = undef : string, $binmode = 0 : int)
 
 This function returns an encoded version of the string ($str) given as
 argument.
 
 The second argument ($eol) is the line-ending sequence to use.  It is
-optional(C<undef> can be specified) and defaults to "\n".  Every occurrence of "\n" is replaced
+optional and defaults to "\n".  Every occurrence of "\n" is replaced
 with this string, and it is also used for additional "soft line
 breaks" to ensure that no line end up longer than 76 characters.  Pass
 it as "\015\012" to produce data suitable for external consumption.

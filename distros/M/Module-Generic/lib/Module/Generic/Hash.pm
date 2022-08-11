@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Hash.pm
-## Version v1.2.0
+## Version v1.2.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/07/18
+## Modified 2022/08/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -39,7 +39,7 @@ BEGIN
         'ge'     => sub { _obj_comp( @_, 'ge') },
         fallback => 1,
     );
-    our( $VERSION ) = 'v1.2.0';
+    our( $VERSION ) = 'v1.2.1';
 };
 
 use strict;
@@ -211,7 +211,6 @@ sub merge
     my $hash = {};
     $hash = shift( @_ );
     return( $self->error( "No valid hash provided." ) ) if( !$hash || Scalar::Util::reftype( $hash ) ne 'HASH' );
-    ## $self->message( 3, "Hash provided is: ", sub{ $self->dumper( $hash ) } );
     my $opts = {};
     $opts = pop( @_ ) if( @_ && ref( $_[-1] ) eq 'HASH' );
     $opts->{overwrite} = 1 unless( CORE::exists( $opts->{overwrite} ) );
@@ -225,16 +224,13 @@ sub merge
         my $to = shift( @_ );
         my $p  = {};
         $p = shift( @_ ) if( @_ && ref( $_[-1] ) eq 'HASH' );
-        ## $self->message( 3, "Merging hash ", sub{ $self->dumper( $this ) }, " to hash ", sub{ $self->dumper( $to ) }, " and with parameters ", sub{ $self->dumper( $p ) } );
         CORE::foreach my $k ( CORE::keys( %$this ) )
         {
-            # $self->message( 3, "Skipping existing property '$k'." ) if( CORE::exists( $to->{ $k } ) && !$p->{overwrite} );
             next if( CORE::exists( $to->{ $k } ) && !$p->{overwrite} );
             if( ref( $this->{ $k } ) eq 'HASH' || 
                 ( Scalar::Util::blessed( $this->{ $k } ) && $this->{ $k }->isa( 'Module::Generic::Hash' ) ) )
             {
                 my $addr = Scalar::Util::refaddr( $this->{ $k } );
-                # $self->message( 3, "Checking if hash in property '$k' was already processed with address '$addr'." );
                 if( CORE::exists( $seen->{ $addr } ) )
                 {
                     $to->{ $k } = $seen->{ $addr };
@@ -253,7 +249,6 @@ sub merge
             }
         }
     };
-    ## $self->message( 3, "Propagating hash ", sub{ $self->dumper( $hash ) }, " to hash ", sub{ $self->dumper( $data ) } );
     $copy->( $hash, $data, $opts );
     $self->_tie_object->enable(1);
     return( $self );
@@ -343,12 +338,10 @@ sub _internal
     if( wantarray )
     {
         @resA = $self->$meth( $field, @_ );
-        # $self->message( "Resturn list value is: '@resA'" );
     }
     else
     {
         $resB = $self->$meth( $field, @_ );
-        # $self->message( "Resturn scalar value is: '$resB'" );
     }
     $self->_tie_object->enable(1);
     return( wantarray ? @resA : $resB );
@@ -415,7 +408,8 @@ sub FREEZE
     my %data = %{$clone->{data}};
     $clone->_tie_object->enable(1);
     # Return an array reference rather than a list so this works with Sereal and CBOR
-    CORE::return( [$class, \%data] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # On or before Sereal version 4.023, Sereal did not support multiple values returned
+    CORE::return( [$class, \%data] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
     # But Storable want a list with the first element being the serialised element
     CORE::return( $class, \%data );
 }

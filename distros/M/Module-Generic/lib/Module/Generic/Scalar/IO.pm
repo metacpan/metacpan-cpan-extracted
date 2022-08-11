@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Scalar/IO.pm
-## Version v0.2.0
+## Version v0.2.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/04/24
-## Modified 2022/05/01
+## Modified 2022/08/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -25,7 +25,7 @@ BEGIN
     no warnings 'once';
     our @EXPORT = @Module::Generic::File::IO;
     our $ERROR = '';
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -120,7 +120,6 @@ sub init
             $mode .= ':encoding(' . $core->{binmode} . ')';
         }
     }
-    $self->message( 4, "Scalar reference is '", ( $ref // '' ), "' (", overload::StrVal( $ref ), ") -> '", ( $$ref // '' ), "' with mode '$mode'." );
     $self->open( $ref => $mode ) || return( $self->pass_error );
     $self->autoflush( $core->{autoflush} ) if( exists( $core->{autoflush} ) );
     return( $self );
@@ -244,7 +243,6 @@ sub open
         $pl_mode .= ':scalar';
     }
     no warnings 'uninitialized';
-    $self->message( 4, "opening filehandle with mode '$pl_mode' for scalar reference." );
     open( $self, $pl_mode, $ref ) ||
         return( $self->error( "Unable to open( $self, $pl_mode, ", overload::StrVal( $ref ), " ) scalar reference: $!" ) );
     my $bit;
@@ -282,8 +280,6 @@ sub open
     }
     
     # If opened in read, even read/write mode, we position at the beginning of the string
-    $self->message( 4, "Checking if bit set is for reading -> bit = '$bit' and O_RDONLY = '", O_RDONLY, "' and ( O_RDONLY | O_RDWR ) = '", ( O_RDONLY | O_RDWR ), "'" );
-    $self->message( 4, "Scalar reference position at '", $self->tell, "'" );
     *$self->{sr}  = $ref;
     # We use the bits to check what the methods are allowed to do
     *$self->{bit} = $bit;
@@ -305,8 +301,6 @@ sub truncate
     my $pos = $self->tell;
     if( $self->debug )
     {
-        $self->message( 4, "Is handle opened? ", $self->opened( $self ) ? 'yes' : 'no' );
-        $self->message( 4, "Current position is '$pos' and sr is '", ${*$self->{sr}}, "' and data length is '", CORE::length( ${*$self->{sr}} ), "'" );
     }
     return( CORE::length( CORE::substr( ${*$self->{sr}}, $pos, CORE::length( ${*$self->{sr}} ) - $pos, '' ) ) );
 }
@@ -347,7 +341,8 @@ sub FREEZE
     my $class = CORE::ref( $self ) || $self;
     my %hash  = %{*$self};
     # Return an array reference rather than a list so this works with Sereal and CBOR
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # On or before Sereal version 4.023, Sereal did not support multiple values returned
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
     # But Storable want a list with the first element being the serialised element
     CORE::return( $class, \%hash );
 }

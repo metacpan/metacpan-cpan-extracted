@@ -1,0 +1,11 @@
+Revision history for Future-XS
+
+0.02    2022-08-11
+        [BUGFIXES]
+         * Declare test-time dependencies of Test::Identity and Test::Refcount
+         * Before perl 5.36 we'll have to add -std=c99 to the compiler flags
+         * Fix weird typo of `RETVAL` in .xs file
+         * Use `XS_INTERNAL()` rather than `static XS()` because cygwin
+
+0.01    2022-08-10
+        First version, released on an unsuspecting world.

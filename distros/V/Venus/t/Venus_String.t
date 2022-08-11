@@ -37,6 +37,7 @@ $test->for('abstract');
 =includes
 
 method: append
+method: append_with
 method: camelcase
 method: cast
 method: chomp
@@ -61,7 +62,11 @@ method: lowercase
 method: lt
 method: ne
 method: numified
+method: pascalcase
+method: prepend
+method: prepend_with
 method: render
+method: repeat
 method: replace
 method: reverse
 method: rindex
@@ -70,6 +75,7 @@ method: snakecase
 method: split
 method: stringified
 method: strip
+method: substr
 method: titlecase
 method: trim
 method: tv

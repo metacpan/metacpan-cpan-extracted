@@ -29,6 +29,7 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => '6.64',
     },
     TEST_REQUIRES => {
+        'File::Find' => 0,
         'File::Spec' => 0,
         'Test::More' => '0.98',
         'Test::Deep' => 0,

@@ -1,6 +1,6 @@
 package SPVM::MIME::Base64;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 1;
 
@@ -29,25 +29,17 @@ Mail Extensions)>.
 
 The list of class methods.
 
-=head2 encode_base64_opt
+=head2 encode_base64
 
-  static method encode_base64_opt : string ($str : string, $eol : string)
+  static method encode_base64 : string ($str : string, $eol = undef : string)
 
 Encode data by calling the encode_base64() function.  The first
 argument is the byte string to encode.  The second argument is the
-line-ending sequence to use.  It is optional(C<undef> can be specified) and defaults to "\n".  The
+line-ending sequence to use.  It is optional and defaults to "\n".  The
 returned encoded string is broken into lines of no more than 76
 characters each and it will end with $eol unless it is empty.  Pass an
 empty string as second argument if you do not want the encoded string
 to be broken into lines.
-
-=head2 encode_base64
-
-  static method encode_base64 : string ($str : string)
-
-Alias for the following code using L</"encode_base64_opt">.
-
-  &encode_base64_opt($str, undef);
 
 =head2 decode_base64
 
@@ -61,21 +53,13 @@ Any character not part of the 65-character base64 subset is
 silently ignored.  Characters occurring after a '=' padding character
 are never decoded.
 
-=head2 encoded_base64_length_opt
-
-  static method encoded_base64_length_opt : int ($str : string, $eol : string)
-
-Returns the length that the encoded string would have without actually
-encoding it.  This will return the same value as C<< length(&encode_base64_opt($bytes, $eol)) >>,
-but should be more efficient.
-
 =head2 encoded_base64_length
 
-  static method encoded_base64_length : int ($str : string)
+  static method encoded_base64_length : int ($str : string, $eol = undef : string)
 
-Alias for the following code using L</"encoded_base64_length_opt">.
-
-  &encoded_base64_length_opt($str, undef);
+Returns the length that the encoded string would have without actually
+encoding it.  This will return the same value as C<< length(&encode_base64($bytes, $eol)) >>,
+but should be more efficient.
 
 =head2 decoded_base64_length
 

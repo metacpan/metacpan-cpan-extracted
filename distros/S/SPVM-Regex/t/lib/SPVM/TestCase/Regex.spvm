@@ -1602,7 +1602,7 @@ class TestCase::Regex {
         
         for (my $i = 0; $i < length $bytes; $i++) {
           my $byte = $bytes->[$i];
-          my $hex_string = Format->sprintf("%%%02X", $byte & 0xFF);
+          my $hex_string = Format->sprintf("%%%02X", [(object)($byte & 0xFF)]);
           $escaped_char_buffer->push($hex_string);
         }
         

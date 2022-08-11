@@ -374,6 +374,14 @@ sub uri_absolute { return( shift->_set_get_boolean( 'uri_absolute', @_ ) ); }
 
 sub uri_canonical { return( shift->uri->canonical ); }
 
+# NOTE: sub FREEZE is inherited
+
+# NOTE: sub STORABLE_freeze is inherited
+
+# NOTE: sub STORABLE_thaw is inherited
+
+# NOTE: sub THAW is inherited
+
 1;
 # NOTE: POD
 __END__
@@ -382,7 +390,7 @@ __END__
 
 =head1 NAME
 
-HTTP::Promise::Request - Asynchronous HTTP Request and Promise
+HTTP::Promise::Request - HTTP Request Class
 
 =head1 SYNOPSIS
 

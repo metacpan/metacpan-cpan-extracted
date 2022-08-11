@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-TemplateXS
 
+0.003     2022-08-06 21:32:33+02:00 Europe/Amsterdam
+          - Remove Path::Class dependency
+
 0.002     2014-01-13 17:51:45CET+0100 Europe/Amsterdam
           Fix the path for MakeMaker
 

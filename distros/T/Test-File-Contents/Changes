@@ -1,26 +1,31 @@
 Release history for Test-File-Contents
 
-0.240   2022-07-17
+0.241 Wed 10 Aug 2022
+      - No more subclassing of Exporter
+      - Packaging fix to stop installing boilerplate.pl
+      - Updated package metadata
+
+0.240 Sun 17 Jul 2022
       - Packaging improvements. No functional changes.
 
-0.23    2016-03-16
+0.23  Wed 16 Mar 2016
       - Fix encoding errors when reading in a file on Windows with `utf8`
         enabled. See https://rt.perl.org/Ticket/Display.html?id=127668 for the
         bug we've worked around.
 
-0.22    2016-03-02
+0.22  Wed 02 Mar 2016
       - Adjusted tests to account for change in output of Text::Diff 1.44.
         They still pass with earlier versions of Text::Diff.
       - Removed Pod tests from the distribution.
 
-0.21    2013-04-12
+0.21  Fri 12 Apr 2013
       - Require Test::Pod 1.41 for Pod tests. Fixes test failures due to the
         use of the `L<text|scheme>` Pod syntax disallowed in earlier versions
         of Test::Pod.
       - Eliminated "v-string in use/require non-portable" warning on Perl
         5.10.0.
 
-0.20    2011-02-18
+0.20  Fri 18 Feb 2011
       - Now require Perl 5.8.3 or higher. 5.8 has effectively been the
         required Perl all along thanks to the dependency on Digest::MD5.
       - Added encoding option, to make sure that files are read in their
@@ -34,7 +39,7 @@ Release history for Test-File-Contents
         as an alias for backwards compatibility.
       - Added `file_contents_eq_or_diff()` and `files_eq_or_diff()`.
 
-0.10    2011-02-18
+0.10  Fri 18 Feb 2011
       - Maintainership taken by David E. Wheeler.
       - Removed `examples/simple.pl`, since it wouldn't run anyway.
       - Added prototypes to the test functions.
@@ -47,20 +52,20 @@ Release history for Test-File-Contents
         being tested.
       - Wordsmithed some of the diagnostic messages.
 
-0.05    2007-03-20
+0.05  Tue 20 Mar 2007
       - Packaging fixes. No functional changes.
 
-0.04    2005-10-26
+0.04  Wed 26 Oct 2005
       - Small tweaks to the packaging, mostly for CPANTS.  No functional
         changes.
 
-0.03    2006-01-20
+0.03  Fri 20 Jan 2006
       - Added file_contents_isnt and file_contents_unlike and made file
         access OS-neutral (contributed by David Wheeler).
 
-0.02    2004-08-25
+0.02  Wed 25 Aug 2004
       - Minor packaging fixes.
 
-0.01    2004-08-25
+0.01  Wed 25 Aug 2004
       - First version, released on an unsuspecting world.
 

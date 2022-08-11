@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst::Plugin::CurrentComponents.
 
+0.010 - TBD
+  - New plugin methods 'build_view', 'build_model'
+
 0.009 - 2021-10-25
   - fixed typo
   - actionroles now add the view or model to the end of the args

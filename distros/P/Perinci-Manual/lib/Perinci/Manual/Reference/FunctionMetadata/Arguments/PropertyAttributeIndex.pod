@@ -20,7 +20,7 @@ Perinci::Manual::Reference::FunctionMetadata::Arguments::PropertyAttributeIndex 
 
 =head1 VERSION
 
-This document describes version 0.008 of Perinci::Manual::Reference::FunctionMetadata::Arguments::PropertyAttributeIndex (from Perl distribution Perinci-Manual), released on 2021-10-01.
+This document describes version 0.009 of Perinci::Manual::Reference::FunctionMetadata::Arguments::PropertyAttributeIndex (from Perl distribution Perinci-Manual), released on 2022-07-01.
 
 =head1 INDEX
 
@@ -205,7 +205,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

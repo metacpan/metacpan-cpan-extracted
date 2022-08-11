@@ -33,5 +33,5 @@ resources:
   homepage: https://metacpan.org/module/Mojolicious::Plugin::OAuth2::Server
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Humanstate/mojolicious-plugin-oauth2-server
-version: '0.49'
+version: '0.50'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

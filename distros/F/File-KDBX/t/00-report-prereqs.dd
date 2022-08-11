@@ -46,11 +46,14 @@ do { my $x = {
                                       'Carp' => '0',
                                       'Crypt::Argon2' => '0',
                                       'Crypt::Cipher' => '0',
+                                      'Crypt::Cipher::AES' => '0',
                                       'Crypt::Digest' => '0',
                                       'Crypt::Mac::HMAC' => '0',
                                       'Crypt::Misc' => '0.049',
                                       'Crypt::Mode::CBC' => '0',
                                       'Crypt::PRNG' => '0',
+                                      'Crypt::Stream::ChaCha' => '0.048',
+                                      'Crypt::Stream::Salsa20' => '0.055',
                                       'Data::Dumper' => '0',
                                       'Devel::GlobalDestruction' => '0',
                                       'Encode' => '0',
@@ -71,6 +74,7 @@ do { my $x = {
                                       'Storable' => '0',
                                       'Symbol' => '0',
                                       'Text::ParseWords' => '0',
+                                      'Time::Local' => '1.19',
                                       'Time::Piece' => '1.33',
                                       'XML::LibXML' => '0',
                                       'XML::LibXML::Reader' => '0',
@@ -80,6 +84,10 @@ do { my $x = {
                                       'perl' => '5.010',
                                       'strict' => '0',
                                       'warnings' => '0'
+                                    },
+                      'suggests' => {
+                                      'Crypt::Stream::Serpent' => '0.055',
+                                      'Crypt::Stream::Twofish' => '0'
                                     }
                     },
        'test' => {

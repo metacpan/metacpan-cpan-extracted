@@ -341,7 +341,7 @@ if (($cbuilder_config{cc} // 'cc') eq 'cl') {
         $ac->msg_result('yes');
     } else {
         $ac->msg_result('no');
-        $tmpflag = '-Werror';
+        $tmpflag = '';
     }
 
     #
@@ -596,7 +596,7 @@ my %WriteMakefileArgs = (
     "threads::shared" => 0,
     "utf8" => 0
   },
-  "VERSION" => "6.0.24",
+  "VERSION" => "6.0.25",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -20,5 +20,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Dist/Display.html?Name=Memoize
   repository: https://github.com/ap/Memoize.git
-version: '1.09'
+version: '1.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

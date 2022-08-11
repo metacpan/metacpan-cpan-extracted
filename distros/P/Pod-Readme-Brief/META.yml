@@ -18,9 +18,10 @@ requires:
   Pod::Text: '0'
   perl: '5.008'
 resources:
-  bugtracker: https://github.com/ap/Pod-Readme-Brief/issues
-  repository: git://github.com/ap/Pod-Readme-Brief.git
-version: '1.001'
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Readme-Brief
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ap/Pod-Readme-Brief.git
+version: '1.002'
 x_copyright:
   holder: 'Aristotle Pagaltzis'
   year: 2018

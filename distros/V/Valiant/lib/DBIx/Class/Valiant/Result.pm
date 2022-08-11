@@ -442,6 +442,12 @@ sub _param_is_delete {
   return $value ? 1:0;
 }
 
+sub set_columns_recursively {
+  my ($self, $params) = @_;
+  $self->set_from_params_recursively(%$params);
+  return $self;
+}
+
 sub set_from_params_recursively {
   my ($self, %params) = @_;
   debug 2, "Starting 'set_from_params_recursively' for  @{[ ref $self ]}";

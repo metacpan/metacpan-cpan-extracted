@@ -37,14 +37,14 @@ Example:
 
 # VERSION
 
-Version 0.07
+Version 1.01
 
 # DESCRIPTION
 
 ## ECHO
 
 **ansiecho** print arguments with ANSI terminal escape sequence
-according to a given color specification.
+according to a given color and format specification.
 
 In a simple case, **ansiecho** behave exactly same as [echo](https://metacpan.org/pod/echo) command.
 
@@ -67,11 +67,11 @@ See ["STRING LITERAL"](#string-literal) section for detail.
 
 You can specify color of each argument by preceding with **-c** option:
 
-    ansiecho -c R a -c GI b -c BD c
+    ansiecho -c R foo -c GI bar -c BD baz
 
-This command print strings `a`, `b` and `c` according to the color
-spec of `R` (Red), `GI` (_Green Italic_) and `BD` (**Blue Bold**)
-respectively.
+This command print strings `foo`, `bar` and `baz` according to the
+color spec of `R` (Red), `GI` (_Green Italic_) and `BD` (**Blue
+Bold**) respectively.
 
 Foreground and background color is specified in the form of
 `fore/back`.
@@ -96,7 +96,7 @@ including multibyte Unicode characters.
 
 Formatted result ends up to a single argument, and can be a subject of
 other operation.  In the next example, numbers are formatted, colored,
-and given to other format.
+and given to another format.
 
     ansiecho -f '\N{ALARM CLOCK} %s' -c KF/544 -f ' %02d:%02d:%02d ' 1 2 3
 
@@ -159,8 +159,8 @@ Then use this variable like:
 
 - **--separate** _string_
 
-    Set separator string between each arguments.  Option **-j** is a
-    short-cut for **--separate ''**.
+    Set separator string between arguments.  Option **-j** is a short-cut
+    for **--separate ''**.
 
 - **--**\[**no-**\]**rgb24**
 
@@ -302,7 +302,7 @@ always correspond to the character itself.
 
 # COLOR SPEC
 
-This is a brief summary.  Read ["COLOR SPEC" in Getopt::EX::Colormap](https://metacpan.org/pod/Getopt::EX::Colormap#COLOR-SPEC) for
+This is a brief summary.  Read ["COLOR SPEC" in Getopt::EX::Colormap](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AColormap#COLOR-SPEC) for
 complete description.  Try next command to see 256 color table.
 
     perl -MGetopt::EX::Colormap=:all -E colortable
@@ -392,15 +392,15 @@ From GIT repository:
 
 ["Quote and Quote-like Operators" in perlop](https://metacpan.org/pod/perlop#Quote-and-Quote-like-Operators)
 
-[Getopt::EX::Colormap](https://metacpan.org/pod/Getopt::EX::Colormap)
+[Getopt::EX::Colormap](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AColormap)
 
 [https://en.wikipedia.org/wiki/ANSI\_escape\_code](https://en.wikipedia.org/wiki/ANSI_escape_code)
 
-[Graphics::ColorNames::X](https://metacpan.org/pod/Graphics::ColorNames::X)
+[Graphics::ColorNames::X](https://metacpan.org/pod/Graphics%3A%3AColorNames%3A%3AX)
 
 [https://en.wikipedia.org/wiki/X11\_color\_names](https://en.wikipedia.org/wiki/X11_color_names)
 
-[App::ansifold](https://metacpan.org/pod/App::ansifold), [App::ansicolumn](https://metacpan.org/pod/App::ansicolumn)
+[App::ansifold](https://metacpan.org/pod/App%3A%3Aansifold), [App::ansicolumn](https://metacpan.org/pod/App%3A%3Aansicolumn)
 
 # AUTHOR
 
@@ -408,7 +408,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2021 Kazumasa Utashiro.
+Copyright 2021-2022 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

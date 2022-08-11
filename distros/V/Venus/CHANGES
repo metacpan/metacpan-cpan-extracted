@@ -1,3 +1,20 @@
+1.10 2022-08-07
+
+- [change] Rename truncate_to_x methods to restart_x
+- [feature] Cascade DESTROY from Core
+- [feature] Implement Venus::Mixin to mix-in routines
+- [feature] Venus::{Json,Yaml} engine override via ENV VAR
+- [feature] Allow Venus::Meta to return configurations
+- [feature] Allow attr override (prevent accessor install)
+- [feature] Implement Venus::Error#{is,as} for better classification
+- [feature] Implement Venus::Match#test
+- [feature] Implement Venus::{Array,Hash}#call
+- [update] Allow Meta to return local-only attrs, bases, roles, and subs
+- [update] Improve Venus::Space algorithms, add additional methods
+- [update] Add missing documentation in Venus::Date, Venus::String
+- [update] Update Venus::Core to better handle non-hashref based objects
+- [update] Update criteria on require of classes and roles
+
 1.01 2022-07-23
 
 - [feature] Test, validate, and generate attributes the same as methods

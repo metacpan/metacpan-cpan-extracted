@@ -23,6 +23,9 @@ if ( $] >= 5.007003 ) {
     feature 'Additional mappings for Chinese standards',
       -default           => 0,
       'Encode::HanExtra' => '0.20';
+    feature 'Additional mappings for rarely used old standards',
+      -default           => 0,
+      'Encode::DIN66003' => '0.01';
     feature 'Support for POD2 - translations of Perl documentation',
       -default           => 0,
       'POD2::Base'       => '0.041';

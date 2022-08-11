@@ -8,7 +8,7 @@ use PDL::IO::Touchstone;
 use File::Temp qw/tempfile/;
 
 
-use Test::More tests => 2;
+use Test::More tests => 4;
 
 
 my $datadir = 't/test-data';

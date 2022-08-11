@@ -1,0 +1,102 @@
+NAME
+    Test::Sah::Filter - Test Data::Sah::Filter::* modules in distribution
+
+VERSION
+    This document describes version 0.001 of Test::Sah::Filter (from Perl
+    distribution Test-Sah-Filter), released on 2022-07-17.
+
+SYNOPSIS
+    To check a single Data::Sah::Filter::* module:
+
+     use Test::Sah::Filter tests=>1;
+     sah_filter_module_ok("Data::Sah::Filter::perl::Str::check", {opt => ...}, $msg);
+
+    To check all Data::Sah::Filter::* modules in a distro:
+
+     # save in release-sah-filter.t, put in distro's t/ subdirectory
+     use Test::More;
+     plan skip_all => "Not release testing" unless $ENV{RELEASE_TESTING};
+     eval "use Test::Sah::Filter";
+     plan skip_all => "Test::Sah::Filter required for testing Data::Sah::Filter::* modules" if $@;
+     sah_filter_modules_ok({opt => ...}, $msg);
+
+DESCRIPTION
+    This module performs various checks on Data::Sah::Filter::* modules. It
+    is recommended that you include something like "release-sah-filter.t" in
+    your distribution if you add metadata to your code. If you use
+    Dist::Zilla to build your distribution, there is
+    Dist::Zilla::Plugin::Sah::Filter to make it easy to do so.
+
+ACKNOWLEDGEMENTS
+    Some code taken from Test::Pod::Coverage by Andy Lester.
+
+FUNCTIONS
+    All these functions are exported by default.
+
+  sah_filter_module_ok($module [, \%opts ] [, $msg])
+    Load $module and perform tests on it.
+
+    Available options:
+
+    *   test_examples => BOOL (default: 1)
+
+        Whether to test examples in filter.
+
+  sah_filter_modules_ok([ \%opts ] [, $msg])
+    Look for modules in directory lib (or blib instead, if it exists), and
+    run "sah_filter_module_ok" on each of them.
+
+    Options are the same as in "sah_filter_module_ok", plus:
+
+    *   include_modules
+
+    *   exclude_modules
+
+    *   test_js_filters
+
+    *   test_perl_filters
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Test-Sah-Filter>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Test-Sah-Filter>.
+
+SEE ALSO
+    test-sah-filter-modules, a command-line interface for
+    "sah_filter_modules_ok()".
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Sah-Filter>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

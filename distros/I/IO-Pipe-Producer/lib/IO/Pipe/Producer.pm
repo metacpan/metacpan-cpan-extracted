@@ -8,7 +8,7 @@ use Carp;
 our @ISA = qw(IO::Pipe);
 use base qw(IO::Pipe);
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 #NOTICE
 #
@@ -38,31 +38,43 @@ sub new
   {
     #Get the class name
     my $class = shift(@_);
-    #Instantiate an instance of the super class
-    my $self = $class->SUPER::new();
-    #Bless the instantiation into this class so we can call our own methods
-    bless($self,$class);
+    #Instantiate an instance of the super class and bless into this class
+    my $self = bless($class->SUPER::new(),$class);
+    # Constructing a IO::Pipe results in an "Illegal seek" - clear that out
+    $! = undef;
     #If a subroutine call was supplied
     if(scalar(@_))
       {
-	#Declare file handles for STDOUT and STDERR
-	my($fh,$eh);
-	#If new was called in list context
-	if(wantarray)
-	  {
-	    #Fill the handles with the outputs from the subroutine
-	    ($fh,$eh) = $self->getSubroutineProducer(@_);
-	    #Return blessed referents to the file handles
-	    return(bless($fh,$class),bless($eh,$class));
-	  }
-	#Fill the STDOUT handle with the output from the subroutine
-	$fh = $self->getSubroutineProducer(@_);
-	#Return blessed referent to the STDOUT handle
-	return(bless($fh,$class));
+        #Declare file handles for STDOUT and STDERR
+        my($fh,$eh);
+        #If new was called in list context
+        if(wantarray)
+          {
+            #Fill the handles with the outputs from the subroutine
+            ($fh,$eh) = $self->getSubroutineProducer(@_);
+            #Bless referents to the file handles
+            my($bfh,$beh) = (bless($fh,$class),bless($eh,$class));
+            # Constructing a IO::Pipe results in an "Illegal seek" - clear it
+            $! = undef;
+            return($bfh,$beh);
+          }
+        #Fill the STDOUT handle with the output from the subroutine
+        $fh = $self->getSubroutineProducer(@_);
+        #Return blessed referent to the STDOUT handle
+        my $bfh = bless($fh,$class);
+        # Constructing a IO::Pipe results in an "Illegal seek" - clear it
+        $! = undef;
+        return($bfh);
       }
     #Return a blessed referent of the object hash
     if(wantarray)
-      {return($self,bless($class->SUPER::new(),$class))}
+      {
+        #Return a second blessed referent
+        my $self2 = bless($class->SUPER::new(),$class);
+        # Constructing a IO::Pipe results in an "Illegal seek" - clear it
+        $! = undef;
+        return($self,$self2);
+      }
     return($self);
   }
 
@@ -79,12 +91,12 @@ sub getSubroutineProducer
 
     if(!defined($producer_sub) || ref($producer_sub) ne 'CODE')
       {
-	$error = "ERROR:Producer.pm:getSubroutineProducer:A referenced " .
-	  "subroutine is required as the first argument to " .
-	    "getSubroutineProducer.";
-	$Producer::errstr = $error;
-	carp($error);
-	return(undef);
+        $error = "ERROR:Producer.pm:getSubroutineProducer:A referenced " .
+          "subroutine is required as the first argument to " .
+            "getSubroutineProducer.";
+        $Producer::errstr = $error;
+        carp($error);
+        return(undef);
       }
 
     #Create a pipe
@@ -92,74 +104,131 @@ sub getSubroutineProducer
     my($stderr_pipe);
     $stderr_pipe = $self->SUPER::new() if(wantarray);
 
+    my $caller_sub = (caller(1))[3] || "none";
+    my $issys = $caller_sub eq "IO::Pipe::Producer::getSystemProducer";
+
     #Fork off the Producer
     if(defined($pid = fork()))
       {
-	if($pid)
-	  {
-	    ##
-	    ## Parent
-	    ##
+        if($pid)
+          {
+            ##
+            ## Parent
+            ##
 
-	    #Create a read file handle
-	    $stdout_pipe->reader();
-	    $stderr_pipe->reader() if(wantarray);
+            $! = undef;
+            #Create a read file handle
+            $stdout_pipe->reader();
+            $stderr_pipe->reader() if(wantarray);
 
-	    #Return the read file handle to the consumer
-	    if(wantarray)
-	      {return(bless($stdout_pipe,ref($self)),
-		      bless($stderr_pipe,ref($self)))}
-	    return(bless($stdout_pipe,ref($self)));
-	  }
-	else
-	  {
-	    ##
-	    ## Child
-	    ##
+            #Return the read file handle to the consumer
+            if(wantarray)
+              {return(bless($stdout_pipe,ref($self)),
+                      bless($stderr_pipe,ref($self)),
+                      $pid)}
+            return(bless($stdout_pipe,ref($self)));
+          }
+        else
+          {
+            ##
+            ## Child
+            ##
 
-	    #Create a write file handle for the Producer
-	    $stdout_pipe->writer();
-	    $stdout_pipe->autoflush;
-	    $stderr_pipe->writer()  if(defined($stderr_pipe));
-	    $stderr_pipe->autoflush if(defined($stderr_pipe));
+            #Create a write file handle for the Producer
+            $stdout_pipe->writer();
+            $stdout_pipe->autoflush;
+            $stderr_pipe->writer()  if(defined($stderr_pipe));
+            $stderr_pipe->autoflush if(defined($stderr_pipe));
 
-	    #Redirect standard outputs to the pipes or kill the child
-	    if(!open(STDOUT,">&",\${$stdout_pipe}))
-	      {
-		$error = "ERROR:Producer.pm:getSubroutineProducer:Can't " .
-		  "redirect stdout to pipe: [" .
-		    select($stdout_pipe) .
-		      "]. $!";
-		$Producer::errstr = $error;
-		croak($error);
-	      }
-	    elsif(defined($stderr_pipe) && !open(STDERR,">&",\${$stderr_pipe}))
-	      {
-		$error = "ERROR:Producer.pm:getSubroutineProducer:Can't " .
-		  "redirect stderr to pipe: [" .
-		    select($stderr_pipe) .
-		      "]. $!";
-		$Producer::errstr = $error;
-		croak($error);
-	      }
+            # $! = undef;
+            #Redirect standard outputs to the pipes or kill the child
+            if(!open(STDOUT,">&",\${$stdout_pipe}))
+              {
+                $error = "ERROR:Producer.pm:getSubroutineProducer:Can't " .
+                  "redirect stdout to pipe: [" .
+                    select($stdout_pipe) .
+                      "]. $!";
+                $Producer::errstr = $error;
+                croak($error);
+              }
+            elsif(defined($stderr_pipe) && !open(STDERR,">&",\${$stderr_pipe}))
+              {
+                $error = "ERROR:Producer.pm:getSubroutineProducer:Can't " .
+                  "redirect stderr to pipe: [" .
+                    select($stderr_pipe) .
+                      "]. $!";
+                $Producer::errstr = $error;
+                croak($error);
+              }
 
-	    #Call the subroutine passed in (ignore it's return value)
-	    $producer_sub->(@params);
+            #Track runtime errors/warnings (compile/system/etc) for inclusion
+            #in error stream
+            $SIG{__WARN__} =
+              sub
+                {
+                  my $errin = join('',@_);
+                  chomp($errin);
+                  my $err = "WARNING:IO::Pipe::Producer: [$errin].";
+                  if(defined($stderr_pipe))
+                    {print STDERR ($err)}
+                  else
+                    {
+                      chop($err);
+                      carp($err);
+                    }
+                };
 
-	    #Close the writer pipes
-	    close($stdout_pipe);
-	    close($stderr_pipe) if(defined($stderr_pipe));
+            $SIG{__DIE__} =
+              sub
+                {
+                  my $errin = join('',@_);
+                  chomp($errin);
+                  my $err = "ERROR:IO::Pipe::Producer: [$errin].";
+                  $@ = '';
+                  if(defined($stderr_pipe))
+                      {print STDERR ($err)}
+                  else
+                    {
+                      chop($err);
+                      carp($err);
+                    }
+                  #Calling die() suppresses output of unwrapped fatal errors.
+                  die();
+                };
 
-	    #Successfully exiting the child process
-	    exit(0);
-	  }
+            my $exit_code = 0;
+
+            #Call the subroutine passed in & get it's return value
+            my $raw_exit_code = int($producer_sub->(@params));
+
+            if($issys && defined($raw_exit_code) && $raw_exit_code != -1)
+              {$exit_code = $raw_exit_code >> 8}
+
+            if(!defined($raw_exit_code) || $raw_exit_code == -1)
+              {
+                if(defined($stderr_pipe))
+                  {
+                    $error = "Unable to determine system call exit status";
+                    $Producer::errstr = $error;
+                    carp($error);
+                  }
+                $exit_code = 255;
+              }
+
+            #Close the writer pipes
+            close($stdout_pipe);
+            close($stderr_pipe) if(defined($stderr_pipe));
+
+            #Exit with the exit status
+            exit($exit_code);
+          }
       }
     else
       {
-	$error = "ERROR:Producer.pm:getSubroutineProducer:fork() didn't work!";
-	$Producer::errstr = $error;
-	carp($error);
-	return(undef);
+        $error = "ERROR:Producer.pm:getSubroutineProducer:fork() didn't work!";
+        $Producer::errstr = $error;
+        carp($error);
+        return(undef);
       }
   }
 
@@ -219,12 +288,30 @@ IO::Pipe::Producer - Perl extension for IO::Pipe
         }
      }
  
-  #Example 3 (Grab the standard output & standard error of a system call):
+  #Example 3 (Grab the standard output/error of a system call):
  
   use IO::Pipe::Producer;
   $obj = new IO::Pipe::Producer();
   ($stdout_fh,$stderr_fh) =
     $obj->getSystemProducer("echo \"Hello World!\"");
+
+  #Read the handles in the same way as example 2, then...
+
+  Example 4 (Grab the standard output/error of a system call and evaluate the exit status):
+
+  use IO::Pipe::Producer;
+  $obj = new IO::Pipe::Producer();
+  ($stdout_fh,$stderr_fh,$child_pid) =
+    $obj->getSystemProducer("echo \"Hello World!\"");
+
+  #Read the handles in the same way as example 2, then...
+
+  #Wait for the child process to exit
+  waitpid($child_pid,0);
+
+  #Get the exit code of the child process and right shift it by 8
+  my $exit_code = $? >> 8;
+  print("Command exited with status: $exit_code\n");
 
 
 =head1 ABSTRACT

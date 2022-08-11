@@ -3,7 +3,7 @@ package Class::Mock::Common;
 use strict;
 use warnings;
 
-our $VERSION='1.3001';
+our $VERSION='1.3002';
 
 sub _get_tests_from_file {
     my $filename = shift;

@@ -219,6 +219,14 @@ sub print
 
 sub _is_warnings_enabled { return( warnings::enabled( $_[0] ) ); }
 
+# NOTE: FREEZE is inherited
+
+# NOTE: STORABLE_freeze is inherited
+
+# NOTE: STORABLE_thaw is inherited
+
+# NOTE: THAW is inherited
+
 1;
 # NOTE: POD
 __END__

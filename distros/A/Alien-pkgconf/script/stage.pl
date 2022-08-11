@@ -21,7 +21,7 @@ foreach my $type (qw( dll static ))
     close $fh;
     $json;
   };
-  
+
   next if $build->{skip};
 
   recurse(
@@ -29,7 +29,7 @@ foreach my $type (qw( dll static ))
     [],
     $share_dir,
   );
-  
+
   if($type eq 'static')
   {
     local $ENV{PKG_CONFIG_PATH} = File::Spec->catdir($build->{destdir}, @{ $build->{prefix} }, qw( lib pkgconfig ));
@@ -110,7 +110,7 @@ sub recurse
       my $sdir = File::Spec->catdir ($share_dir, @$path);
       my $to   = File::Spec->catfile($share_dir, @$path, $fn);
       mkpath $sdir, 0, 0744;
-      
+
       if(-l $from)
       {
         my $target = readlink $from;

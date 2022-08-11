@@ -5,8 +5,6 @@ author:
 build_requires:
   JSON::PP: '0'
   Test::More: '0'
-configure_requires:
-  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -22,9 +20,10 @@ requires:
   Exporter: '0'
   perl: '5.006'
 resources:
-  bugtracker: https://github.com/ap/Parse-MIME/issues
-  repository: git://github.com/ap/Parse-MIME.git
-version: '1.005'
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Parse-MIME
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ap/Parse-MIME.git
+version: '1.006'
 x_copyright:
   holder: 'Aristotle Pagaltzis'
   year: 2018

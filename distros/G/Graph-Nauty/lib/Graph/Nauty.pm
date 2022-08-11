@@ -13,7 +13,7 @@ our @EXPORT_OK = qw(
     orbits_are_same
 );
 
-our $VERSION = '0.5.0'; # VERSION
+our $VERSION = '0.5.1'; # VERSION
 
 our $worksize = 0;
 
@@ -173,6 +173,9 @@ sub orbits
 sub are_isomorphic
 {
     my( $graph1, $graph2, $color_sub ) = @_;
+
+    $color_sub = sub { "$_[0]" } unless $color_sub;
+
     return 0 if !$graph1->could_be_isomorphic( $graph2 );
 
     my @nauty_graph1 = _nauty_graph( $graph1, $color_sub );
@@ -218,6 +221,9 @@ sub canonical_order
 sub orbits_are_same
 {
     my( $graph1, $graph2, $color_sub ) = @_;
+
+    $color_sub = sub { "$_[0]" } unless $color_sub;
+
     return 0 if !$graph1->could_be_isomorphic( $graph2 );
 
     my @orbits1 = orbits( $graph1, $color_sub );

@@ -16,14 +16,14 @@ Text::Conceal - conceal and recover interface for text processing
 
 # VERSION
 
-Version 0.9901
+Version 1.01
 
 # DESCRIPTION
 
 This is a general interface to transform text data into desirable
 form, and recover the result after the process.
 
-For example, [Text::Tabs](https://metacpan.org/pod/Text::Tabs) does not take care of Asian wide characters
+For example, [Text::Tabs](https://metacpan.org/pod/Text%3A%3ATabs) does not take care of Asian wide characters
 to calculate string width.  So next program does not work as we wish.
 
     use Text::Tabs;
@@ -149,12 +149,12 @@ continuous missing is allowed.  Less characters, more confusion.
 
 # SEE ALSO
 
-- [Text::VisualPrintf](https://metacpan.org/pod/Text::VisualPrintf), [https://github.com/kaz-utashiro/Text-VisualPrintf](https://github.com/kaz-utashiro/Text-VisualPrintf)
+- [Text::VisualPrintf](https://metacpan.org/pod/Text%3A%3AVisualPrintf), [https://github.com/kaz-utashiro/Text-VisualPrintf](https://github.com/kaz-utashiro/Text-VisualPrintf)
 
     This module is originally implemented as a part of
-    [Text::VisualPrintf](https://metacpan.org/pod/Text::VisualPrintf) module.
+    [Text::VisualPrintf](https://metacpan.org/pod/Text%3A%3AVisualPrintf) module.
 
-- [Text::ANSI::Printf](https://metacpan.org/pod/Text::ANSI::Printf), [https://github.com/kaz-utashiro/Text-ANSI-Printf](https://github.com/kaz-utashiro/Text-ANSI-Printf)
+- [Text::ANSI::Printf](https://metacpan.org/pod/Text%3A%3AANSI%3A%3APrintf), [https://github.com/kaz-utashiro/Text-ANSI-Printf](https://github.com/kaz-utashiro/Text-ANSI-Printf)
 
 # AUTHOR
 
@@ -162,7 +162,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2020-2021 Kazumasa Utashiro.
+Copyright 2020-2022 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

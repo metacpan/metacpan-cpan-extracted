@@ -27,13 +27,13 @@ no warnings _disabled_warnings();
 use B::Hooks::AtRuntime 'after_runtime';
 use Import::Into;
 
-our $VERSION = '0.26';
+our $VERSION = '0.28';
 
 sub import {
     my ( $class, %args ) = @_;
     my @caller = caller(0);
     $args{_import_type} = 'class';
-    $args{_caller_eval} = ( $caller[1] =~ /^\(eval/ );    # https://github.com/Ovid/moosex-extreme/pull/34
+    $args{_caller_eval} = ( $caller[1] =~ /^\(eval/ );    # https://github.com/Ovid/moosex-extended/pull/34
     my $target_class = _assert_import_list_is_valid( $class, \%args );
     my @with_meta    = grep { not $args{excludes}{$_} } qw(field param);
     if (@with_meta) {
@@ -67,7 +67,7 @@ sub _apply_default_features ( $config, $for_class, $params = undef ) {
     Carp->import::into($for_class)                              unless $config->{excludes}{carp};
     namespace::autoclean->import::into($for_class)              unless $config->{excludes}{autoclean};
 
-    unless ( $config->{excludes}{immutable} or $config->{_caller_eval} ) {    # https://github.com/Ovid/moosex-extreme/pull/34
+    unless ( $config->{excludes}{immutable} or $config->{_caller_eval} ) {    # https://github.com/Ovid/moosex-extended/pull/34
 
         # after_runtime is loaded too late under the debugger
         eval {
@@ -88,7 +88,7 @@ sub _apply_default_features ( $config, $for_class, $params = undef ) {
               "Could not load 'B::Hooks::AtRuntime': $error. You class is not immutable. You can `use MooseX::Extended excludes => ['immutable'];` to suppress this warning.";
         };
     }
-    unless ( $config->{excludes}{true} or $config->{_caller_eval} ) {    # https://github.com/Ovid/moosex-extreme/pull/34
+    unless ( $config->{excludes}{true} or $config->{_caller_eval} ) {    # https://github.com/Ovid/moosex-extended/pull/34
         eval {
             load true;
             true->import::into($for_class);                              # no need for `1` at the end of the module
@@ -121,7 +121,7 @@ MooseX::Extended - Extend Moose with safe defaults and useful features
 
 =head1 VERSION
 
-version 0.26
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -371,6 +371,25 @@ Allows you to write asynchronous code with C<async> and C<await>.
 
 Only available on Perl v5.26.0 or higher. Requires L<Future::AsyncAwait>.
 
+=item * C<try>
+
+    package My::Try {
+        use MooseX::Extended includes => [qw/try/];
+
+        sub reciprocal ( $self, $num ) {
+            try {
+                return 1 / $num;
+            }
+            catch {
+                croak "Could not calculate reciprocal of $num: $@";
+            }
+        }
+    }
+
+Allows you to use try/catch blocks, via L<Syntax::Keyword::Try>.
+
+Only available on Perl v5.24.0 or higher. Requires L<Syntax::Keyword::Try>.
+
 =back
 
 =head1 REDUCING BOILERPLATE
@@ -490,8 +509,9 @@ name is clearly invalid.
     my $object = Some::Class->new( name => 'WhoAmI' );
     say $object->name;
 
-C<MooseX::Extended> will throw a L<Moose::Exception::InvalidAttributeDefinition> exception
-if it encounters an illegal method name for an attribute.
+C<MooseX::Extended> will throw a
+L<Moose::Exception::InvalidAttributeDefinition> exception if it encounters an
+illegal method name for an attribute.
 
 This also applies to various attributes which allow method names, such as
 C<clone>, C<builder>, C<clearer>, C<writer>, C<reader>, and C<predicate>.
@@ -502,11 +522,20 @@ useful to be able to define an C<init_arg> for unit testing.)
 
 =head1 BUGS AND LIMITATIONS
 
-If the MooseX::Extended classes are loaded via I<stringy> eval, C<true> is not
-loaded, nor is your class made immutable. This is because there were
-intermittant errors (maybe 1 out of 5 times) being thrown. Removing these
-features under stringy eval solves this. See L<this github ticket for more
-infomration|https://github.com/Ovid/moosex-extreme/pull/34>.
+When using L<Test::Compile>, there are intermittent segfaults with
+L<MooseX::Extended> unless you use C<< exclude => ['immutable'] >>. We are
+still trying to figure out wy this is happening. We are not aware of any
+production code affected by this.
+
+See also:
+
+=over 4
+
+=item * L<The github issue|https://github.com/Ovid/moosex-extreme/issues/41>
+
+=item * L<Perlmonks discussion|https://perlmonks.org/?node_id=11145964>
+
+=back
 
 =head1 MANUAL
 
@@ -574,10 +603,6 @@ evaluating it.
 Most of this is written with bog-standard L<Moose>, so there's nothing
 terribly weird inside, but you may wish to note that we use
 L<B::Hooks::AtRuntime> and L<true>. They seem sane, but I<caveat emptor>.
-
-This module was originally released on github as C<MooseX::Extreme>, but
-enough people pointed out that it was not extreme at all. That's why the
-repository is L<https://github.com/Ovid/moosex-extreme/>.
 
 =head1 SEE ALSO
 

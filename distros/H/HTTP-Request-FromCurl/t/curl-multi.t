@@ -12,6 +12,10 @@ my @tests = (
       ignore_headers => 'Cookie', # Curl handling of these is inconsistent
       request_count => 2,
     },
+    { cmd => [ '--verbose', '-s', '$url', '--url', '$url?foo=bar', ],
+      ignore_headers => 'Cookie', # Curl handling of these is inconsistent
+      request_count => 2,
+    },
     { cmd => [ '--verbose', '-s', '$url', '--junk-session-cookies', '$url?foo=bar', ],
       ignore_headers => 'Cookie', # Curl handling of these is inconsistent
       request_count => 2,

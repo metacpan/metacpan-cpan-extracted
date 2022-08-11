@@ -1,0 +1,496 @@
+<?xml version="1.0" standalone="yes"?>
+<sdnList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://tempuri.org/sdnList.xsd">
+  <publshInformation>
+    <Publish_Date>04/22/2020</Publish_Date>
+    <Record_Count>8197</Record_Count>
+  </publshInformation>
+  <sdnEntry>
+    <uid>10689</uid>
+    <firstName>Muhammad</firstName>
+    <lastName>SAEED</lastName>
+    <sdnType>Individual</sdnType>
+    <programList>
+      <program>SDGT</program>
+    </programList>
+    <idList>
+      <id>
+        <uid>7590</uid>
+        <idType>Passport</idType>
+        <idNumber>Booklet A5250088</idNumber>
+        <idCountry>Pakistan</idCountry>
+      </id>
+      <id>
+        <uid>7589</uid>
+        <idType>Passport</idType>
+        <idNumber>BE5978421</idNumber>
+        <idCountry>Pakistan</idCountry>
+        <issueDate>14 Nov 2007</issueDate>
+        <expirationDate>12 Nov 2012</expirationDate>
+      </id>
+      <id>
+        <uid>7588</uid>
+        <idType>National ID No.</idType>
+        <idNumber>23250460642</idNumber>
+        <idCountry>Pakistan</idCountry>
+      </id>
+      <id>
+        <uid>5269</uid>
+        <idType>National ID No.</idType>
+        <idNumber>3520025509842-7</idNumber>
+        <idCountry>Pakistan</idCountry>
+      </id>
+    </idList>
+    <akaList>
+      <aka>
+        <uid>10711</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>SAEED</lastName>
+        <firstName>Hafiz Muhammad</firstName>
+      </aka>
+      <aka>
+        <uid>10712</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>SAEED</lastName>
+        <firstName>Hafiz</firstName>
+      </aka>
+      <aka>
+        <uid>10713</uid>
+        <type>a.k.a.</type>
+        <category>weak</category>
+        <lastName>HAFIZ SAHIB</lastName>
+      </aka>
+      <aka>
+        <uid>10714</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>SAEED</lastName>
+        <firstName>Hafiz Mohammad</firstName>
+      </aka>
+      <aka>
+        <uid>10715</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>SAYEED</lastName>
+        <firstName>Hafez Mohammad</firstName>
+      </aka>
+      <aka>
+        <uid>10716</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>SAYID</lastName>
+        <firstName>Hafiz Mohammad</firstName>
+      </aka>
+      <aka>
+        <uid>10717</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>SYEED</lastName>
+        <firstName>Hafiz Mohammad</firstName>
+      </aka>
+      <aka>
+        <uid>10718</uid>
+        <type>a.k.a.</type>
+        <category>weak</category>
+        <lastName>TATA JI</lastName>
+      </aka>
+      <aka>
+        <uid>10719</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>SAYED</lastName>
+        <firstName>Hafiz Mohammad</firstName>
+      </aka>
+      <aka>
+        <uid>14680</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>SAEED HAFIZ</lastName>
+        <firstName>Muhammad</firstName>
+      </aka>
+    </akaList>
+    <addressList>
+      <address>
+        <uid>15084</uid>
+        <address1>House No. 116 E</address1>
+        <address2>Mohalla Johar</address2>
+        <address3>Town: Lahore, Tehsil:</address3>
+        <city>Lahore City, Lahore District</city>
+        <country>Pakistan</country>
+      </address>
+    </addressList>
+    <nationalityList>
+      <nationality>
+        <uid>6116</uid>
+        <country>Pakistan</country>
+        <mainEntry>true</mainEntry>
+      </nationality>
+    </nationalityList>
+    <dateOfBirthList>
+      <dateOfBirthItem>
+        <uid>6114</uid>
+        <dateOfBirth>05 Jun 1950</dateOfBirth>
+        <mainEntry>true</mainEntry>
+      </dateOfBirthItem>
+    </dateOfBirthList>
+    <placeOfBirthList>
+      <placeOfBirthItem>
+        <uid>6115</uid>
+        <placeOfBirth>Sargodha, Punjab, Pakistan</placeOfBirth>
+        <mainEntry>true</mainEntry>
+      </placeOfBirthItem>
+    </placeOfBirthList>
+  </sdnEntry>
+  <sdnEntry>
+    <uid>18619</uid>
+    <firstName>Hafiz Saeed</firstName>
+    <lastName>KHAN</lastName>
+    <sdnType>Individual</sdnType>
+    <programList>
+      <program>SDGT</program>
+    </programList>
+    <akaList>
+      <aka>
+        <uid>29023</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>SAEED</lastName>
+        <firstName>Hafiz</firstName>
+      </aka>
+      <aka>
+        <uid>29024</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>HAFIZ</lastName>
+        <firstName>Said Khan</firstName>
+      </aka>
+      <aka>
+        <uid>29026</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>KHAN</lastName>
+        <firstName>Wali Hafiz Sayid</firstName>
+      </aka>
+      <aka>
+        <uid>29027</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>SA'ID</lastName>
+        <firstName>Hafiz</firstName>
+      </aka>
+      <aka>
+        <uid>29028</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>KHAN</lastName>
+        <firstName>Hafiz Sa'id</firstName>
+      </aka>
+      <aka>
+        <uid>29029</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>KHAN</lastName>
+        <firstName>Hafiz Said</firstName>
+      </aka>
+      <aka>
+        <uid>29030</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>KHAN</lastName>
+        <firstName>Hafiz Said Muhammad</firstName>
+      </aka>
+      <aka>
+        <uid>29031</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>KHAN</lastName>
+        <firstName>Hafez Sayed</firstName>
+      </aka>
+      <aka>
+        <uid>29032</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>KHAN</lastName>
+        <firstName>Shaykh Hafidh Sa'id</firstName>
+      </aka>
+      <aka>
+        <uid>29033</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>AHMAD</lastName>
+        <firstName>Sayed</firstName>
+      </aka>
+    </akaList>
+    <nationalityList>
+      <nationality>
+        <uid>18015</uid>
+        <country>Pakistan</country>
+        <mainEntry>true</mainEntry>
+      </nationality>
+    </nationalityList>
+    <dateOfBirthList>
+      <dateOfBirthItem>
+        <uid>18011</uid>
+        <dateOfBirth>01 Jan 1976 to 31 Dec 1978</dateOfBirth>
+        <mainEntry>true</mainEntry>
+      </dateOfBirthItem>
+      <dateOfBirthItem>
+        <uid>18012</uid>
+        <dateOfBirth>01 Jan 1977 to 31 Dec 1979</dateOfBirth>
+        <mainEntry>false</mainEntry>
+      </dateOfBirthItem>
+    </dateOfBirthList>
+    <placeOfBirthList>
+      <placeOfBirthItem>
+        <uid>18014</uid>
+        <placeOfBirth>Mamondzowi Village, Orakzai Agency, Pakistan</placeOfBirth>
+        <mainEntry>true</mainEntry>
+      </placeOfBirthItem>
+    </placeOfBirthList>
+  </sdnEntry>
+  <sdnEntry>
+    <uid>19187</uid>
+    <lastName>TROLL PROPERTIES, INC.</lastName>
+    <sdnType>Entity</sdnType>
+    <programList>
+      <program>SDNTK</program>
+    </programList>
+    <idList>
+      <id>
+        <uid>11487</uid>
+        <idType>RUC #</idType>
+        <idNumber>991715-1-534344</idNumber>
+        <idCountry>Panama</idCountry>
+      </id>
+    </idList>
+    <addressList>
+      <address>
+        <uid>29221</uid>
+        <country>Panama</country>
+      </address>
+    </addressList>
+  </sdnEntry>
+  <sdnEntry>
+    <uid>19188</uid>
+    <lastName>INMOBILIARIA MULTI-TIENDAS, S.A.</lastName>
+    <sdnType>Entity</sdnType>
+    <programList>
+      <program>SDNTK</program>
+    </programList>
+    <idList>
+      <id>
+        <uid>11488</uid>
+        <idType>RUC #</idType>
+        <idNumber>1008619-1-537654</idNumber>
+        <idCountry>Panama</idCountry>
+      </id>
+    </idList>
+    <addressList>
+      <address>
+        <uid>29223</uid>
+        <country>Panama</country>
+      </address>
+    </addressList>
+  </sdnEntry>
+  <sdnEntry>
+    <uid>12057</uid>
+    <firstName>Mohammad Reza</firstName>
+    <lastName>NAQDI</lastName>
+    <title>Brigadier General and Commander of the IRGC Basij Resistance Force; President of the Organization of the Basij of the Oppressed; Chief of the Mobilization of the Oppressed Organization</title>
+    <sdnType>Individual</sdnType>
+    <remarks>Head of the Basij</remarks>
+    <programList>
+      <program>IFSR</program>
+      <program>IRGC</program>
+      <program>NPWMD</program>
+      <program>IRAN-HR</program>
+      <program>SDGT</program>
+      <program>IRAN-EO13876</program>
+    </programList>
+    <idList>
+      <id>
+        <uid>114294</uid>
+        <idType>Additional Sanctions Information -</idType>
+        <idNumber>Subject to Secondary Sanctions</idNumber>
+      </id>
+      <id>
+        <uid>133128</uid>
+        <idType>Gender</idType>
+        <idNumber>Male</idNumber>
+      </id>
+    </idList>
+    <akaList>
+      <aka>
+        <uid>13562</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>NAGHDI</lastName>
+        <firstName>Mohammad Reza</firstName>
+      </aka>
+      <aka>
+        <uid>13563</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>SHAMS</lastName>
+        <firstName>Mohammad Reza</firstName>
+      </aka>
+      <aka>
+        <uid>13564</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>NAQDI</lastName>
+        <firstName>Muhammad</firstName>
+      </aka>
+      <aka>
+        <uid>43923</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>NAQDI</lastName>
+        <firstName>Mohammad-Reza</firstName>
+      </aka>
+      <aka>
+        <uid>43924</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>NAGHDI</lastName>
+        <firstName>Mohammedreza</firstName>
+      </aka>
+      <aka>
+        <uid>43925</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>NAQDI</lastName>
+        <firstName>Gholamreza</firstName>
+      </aka>
+      <aka>
+        <uid>43926</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>NAQDI</lastName>
+        <firstName>Gholam-reza</firstName>
+      </aka>
+    </akaList>
+    <addressList>
+      <address>
+        <uid>42179</uid>
+        <country>Iran</country>
+      </address>
+    </addressList>
+    <nationalityList>
+      <nationality>
+        <uid>33127</uid>
+        <country>Iran</country>
+        <mainEntry>true</mainEntry>
+      </nationality>
+    </nationalityList>
+    <dateOfBirthList>
+      <dateOfBirthItem>
+        <uid>7804</uid>
+        <dateOfBirth>1951 to 1953</dateOfBirth>
+        <mainEntry>true</mainEntry>
+      </dateOfBirthItem>
+      <dateOfBirthItem>
+        <uid>7805</uid>
+        <dateOfBirth>1960 to 1962</dateOfBirth>
+        <mainEntry>false</mainEntry>
+      </dateOfBirthItem>
+      <dateOfBirthItem>
+        <uid>7806</uid>
+        <dateOfBirth>Apr 1961</dateOfBirth>
+        <mainEntry>false</mainEntry>
+      </dateOfBirthItem>
+      <dateOfBirthItem>
+        <uid>8368</uid>
+        <dateOfBirth>1953</dateOfBirth>
+        <mainEntry>false</mainEntry>
+      </dateOfBirthItem>
+    </dateOfBirthList>
+    <placeOfBirthList>
+      <placeOfBirthItem>
+        <uid>7808</uid>
+        <placeOfBirth>Najaf, Iraq</placeOfBirth>
+        <mainEntry>true</mainEntry>
+      </placeOfBirthItem>
+      <placeOfBirthItem>
+        <uid>7809</uid>
+        <placeOfBirth>Tehran, Iran</placeOfBirth>
+        <mainEntry>false</mainEntry>
+      </placeOfBirthItem>
+    </placeOfBirthList>
+  </sdnEntry>
+  <sdnEntry>
+    <uid>15496</uid>
+    <firstName>Shigeo</firstName>
+    <lastName>NISHIGUCHI</lastName>
+    <sdnType>Individual</sdnType>
+    <remarks>(Linked To: SUMIYOSHI-KAI)</remarks>
+    <programList>
+      <program>TCO</program>
+    </programList>
+    <addressList>
+      <address>
+        <uid>23080</uid>
+        <address1>c/o 6-4-21 Akasaka, Minato-ku</address1>
+        <city>Tokyo</city>
+        <country>Japan</country>
+      </address>
+    </addressList>
+    <dateOfBirthList>
+      <dateOfBirthItem>
+        <uid>12559</uid>
+        <dateOfBirth>1929 to 1930</dateOfBirth>
+        <mainEntry>true</mainEntry>
+      </dateOfBirthItem>
+    </dateOfBirthList>
+  </sdnEntry>
+  <sdnEntry>
+    <uid>15497</uid>
+    <firstName>Hareaki</firstName>
+    <lastName>FUKUDA</lastName>
+    <sdnType>Individual</sdnType>
+    <remarks>(Linked To: SUMIYOSHI-KAI)</remarks>
+    <programList>
+      <program>TCO</program>
+    </programList>
+    <addressList>
+      <address>
+        <uid>23081</uid>
+        <address1>c/o 6-4-21 Akasaka, Minato-ku</address1>
+        <city>Tokyo</city>
+        <country>Japan</country>
+      </address>
+    </addressList>
+    <dateOfBirthList>
+      <dateOfBirthItem>
+        <uid>12558</uid>
+        <dateOfBirth>1943 to 1944</dateOfBirth>
+        <mainEntry>true</mainEntry>
+      </dateOfBirthItem>
+    </dateOfBirthList>
+  </sdnEntry>
+  <sdnEntry>
+    <uid>12345</uid>
+    <firstName>Donald</firstName>
+    <lastName>Trump</lastName>
+    <sdnType>Individual</sdnType>
+    <programList>
+      <program>TCO</program>
+    </programList>
+    <addressList>
+      <address>
+        <uid>12345</uid>
+        <address1>some street, some allay</address1>
+        <city>Washington</city>
+        <country>USA</country>
+      </address>
+    </addressList>
+    <dateOfBirthList>
+      <dateOfBirthItem>
+        <uid>12345</uid>
+        <dateOfBirth>circa-1951</dateOfBirth>
+        <mainEntry>true</mainEntry>
+      </dateOfBirthItem>
+    </dateOfBirthList>
+  </sdnEntry>
+</sdnList>

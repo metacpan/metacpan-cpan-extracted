@@ -19,15 +19,15 @@ $yyy-12-21T17:05:00 | 21 dec 17:05
 $yyy-12-21T17:05:00 | 21-dec 17:05
 $yyy-12-21T17:05:00 | 21/dec 17:05
 1993-12-21T17:05:00 | 21/dec/93 17:05
-1999-01-01T10:02:18 @ UTC | 1999 10:02:18 "GMT"
+1999-01-01T10:02:18 | 1999 10:02:18 "GMT"
 1994-11-16T22:28:20 @ -0800 | 16 Nov 94 22:28:20 PST
 _END_
     next if m/^\s*#/;
     my ($want, $from) = split m/\s*\|\s*/, $_, 2;
     my ($want_dt, $want_tz) = split m/\s*\@\s*/, $want, 2;
-    $want_tz ||= "floating";
+    $want_tz ||= "+0000";
 
     my $dt = DateTimeX::Easy->new($from);
     is($dt, $want_dt);
-    is($dt->time_zone->name, $want_tz);
+    is($dt->strftime(q{%z}), $want_tz);
 }

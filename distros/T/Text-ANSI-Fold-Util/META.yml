@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,19 +26,19 @@ no_index:
 provides:
   Text::ANSI::Fold::Util:
     file: lib/Text/ANSI/Fold/Util.pm
-    version: '0.06'
+    version: '1.01'
 requires:
   List::Util: '1.45'
-  Text::ANSI::Fold: '2.11'
+  Text::ANSI::Fold: '2.1301'
   Text::ANSI::Tabs: '0.06'
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/kaz-utashiro/Text-ANSI-Fold-Util/issues
   homepage: https://github.com/kaz-utashiro/Text-ANSI-Fold-Util
-  repository: git://github.com/kaz-utashiro/Text-ANSI-Fold-Util.git
-version: '0.06'
+  repository: https://github.com/kaz-utashiro/Text-ANSI-Fold-Util.git
+version: '1.01'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

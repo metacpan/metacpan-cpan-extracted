@@ -1,8 +1,7 @@
 use strict; use warnings;
 
 package Net::OAuth2Server::TokenType;
-
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use constant ();
 use Exporter ();

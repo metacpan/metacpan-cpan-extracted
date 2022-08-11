@@ -22,6 +22,10 @@ sub AUDIT {
     die "${from} requires 'any' to consume ${name}";
   }
 
+  if (!$from->can('call')) {
+    die "${from} requires 'call' to consume ${name}";
+  }
+
   if (!$from->can('count')) {
     die "${from} requires 'count' to consume ${name}";
   }
@@ -111,6 +115,7 @@ Mappable Role for Perl 5
 
   sub all;
   sub any;
+  sub call;
   sub count;
   sub delete;
   sub each;

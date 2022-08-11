@@ -1,4 +1,10 @@
-Revision history for Class-Closure
+Release history for Class-Closure
+
+0.303 Tue 09 Aug 2022
+	- No more inheriting from Exporter
+	- Test::More no longer required to be 0.88 or newer
+	- Packaging fix to stop installing benchmark.pl
+	- Updated package tooling and metadata
 
 0.302 Sat 10 Jan 2015
 	- No functional changes

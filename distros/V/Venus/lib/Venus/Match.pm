@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Venus::Class;
+use Venus::Class 'attr', 'base', 'with';
 
 base 'Venus::Kind::Utility';
 
@@ -144,6 +144,27 @@ sub result {
   }
 
   return wantarray ? ($result, $matched) : $result;
+}
+
+sub test {
+  my ($self) = @_;
+
+  my $matched = 0;
+
+  my $value = $self->value;
+
+  local $_ = $value;
+
+  return $matched if !$self->on_only->($value);
+
+  for (my $i = 0; $i < @{$self->on_when}; $i++) {
+    if ($self->on_when->[$i]->($value)) {
+      $matched++;
+      last;
+    }
+  }
+
+  return $matched;
 }
 
 sub then {

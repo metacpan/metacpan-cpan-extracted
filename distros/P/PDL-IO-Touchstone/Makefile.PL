@@ -3,6 +3,12 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
+my %REQUIRES = (
+	'PDL'                 =>  '2.080',
+	'PDL::Constants'      =>  '0',
+	'PDL::LinearAlgebra'  =>  '0',
+    );
+
 my %WriteMakefileArgs = (
     NAME             => 'PDL::IO::Touchstone',
     AUTHOR           => q{Eric Wheeler <ewheeler@cpan.org>},
@@ -29,9 +35,10 @@ my %WriteMakefileArgs = (
     TEST_REQUIRES => {
         'Test::More' => '0',
 	'File::Temp' => '0',
+	%REQUIRES
     },
     PREREQ_PM => {
-	    'PDL' => '2.080'
+	%REQUIRES
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'PDL-IO-Touchstone-*' },

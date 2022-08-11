@@ -1,5 +1,18 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+2.1301 2022-08-05T08:10:23Z
+
+    - Fix bug of losing "0" with word-boundary.
+
+2.13 2022-03-02T05:13:45Z
+
+    - Introduce "prefix" parameter.
+
+2.12 2021-10-15T02:53:14Z
+
+    - Accept 8-bit CSI and OSC sequence.
+    - Avoid v5.16 error by loading 'charnames' only when < v5.16.
+
 2.1101 2021-09-06T06:34:56Z
 
     - Fix bug of leaving EL after RESET when run-in.

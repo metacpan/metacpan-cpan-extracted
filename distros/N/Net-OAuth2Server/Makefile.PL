@@ -1,6 +1,7 @@
 use 5.008; use strict; use warnings;
 
-my $u = 'github.com/ap/Net-OAuth2Server';
+my $sc = q<https://github.com/ap/Net-OAuth2Server>;
+my $bt = q<https://rt.cpan.org/Public/Dist/Display.html?Name=Net-OAuth2Server>;
 
 my %META = (
 	name        => 'Net-OAuth2Server',
@@ -19,8 +20,8 @@ my %META = (
 	},
 	dynamic_config => 0,
 	resources      => {
-		repository => { type => 'git', url => "git://$u.git", web => "https://$u" },
-		bugtracker => { web => "https://$u/issues" },
+		repository => { type => 'git', url => "$sc.git", web => $sc },
+		bugtracker => { web => $bt },
 	},
 );
 
@@ -31,7 +32,7 @@ MANIFEST :
 distdir : boilerplate
 .PHONY  : boilerplate
 boilerplate : distmeta
-	$(PERL) -Ilib boilerplate.pl $(DISTVNAME)
+	$(PERL) -Ilib inc/boilerplate.pl $(DISTVNAME)
 
 ## BOILERPLATE ###############################################################
 require ExtUtils::MakeMaker;

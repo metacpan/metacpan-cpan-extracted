@@ -1,0 +1,6 @@
+\.git.*
+\bblib$
+\bpm_to_blib$
+.*\.bak
+\bMakefile$
+\bMYMETA.(json|yml)$

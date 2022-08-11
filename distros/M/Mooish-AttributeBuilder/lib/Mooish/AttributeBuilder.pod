@@ -1,0 +1,289 @@
+=head1 NAME
+
+Mooish::AttributeBuilder - build Mooish attribute definitions with less boilerplate
+
+=head1 SYNOPSIS
+
+	use Moo; # or Moose or Mouse or ...
+	use Mooish::AttributeBuilder;
+
+	# this attribute is required in the constructor
+	has param 'param_name';
+	has param 'param_name' => (
+		...
+	);
+
+	# this attribute is optional in the constructor
+	has option 'option_name';
+	has option 'option_name' => (
+		...
+	);
+
+	# this attribute is not available in the constructor
+	has field 'field_name';
+	has field 'field_name' => (
+		...
+	);
+
+	# this extends parent attribute, much like: has '+name_to_extend'
+	has extended 'name_to_extend' => (
+		...
+	);
+
+=head1 DESCRIPTION
+
+This module implements shortcuts and helpers for C<has> keyword in Moose family of modules.
+
+The shortcuts provided are similar to those in L<MooseX::Extended> or
+L<MooX::Keyword::Field>, but they don't depend on specific OO system. Instead,
+those shortcuts are just modifying option lists which are then passed to
+C<has>. This way you can use the module with any OO system which supports the
+Moose set of C<has> parameters.
+
+B<Beta>: interface is not yet stable before version 1.000.
+
+=head1 EXPORTED FUNCTIONS
+
+All functions are exported by default.
+
+=head2 field
+
+	has field $field_name => %more_options;
+
+This function produces a property that cannot be passed to the constructor:
+
+	has $field_name => (
+		is => 'ro',
+		init_arg => undef,
+		%more_options
+	);
+
+=head2 param
+
+	has param $param_name => %more_options;
+
+This function produces a property that is required in the constructor:
+
+	has $param_name => (
+		is => 'ro',
+		required => 1,
+		%more_options
+	);
+
+=head2 option
+
+	has option $option_name => %more_options;
+
+This function produces a property that is optional in the constructor and has a predicate:
+
+	has $option_name => (
+		is => 'ro',
+		required => 0,
+		predicate => "has_${option_name}",
+		%more_options
+	);
+
+=head2 extended
+
+	has extended $name_to_extend => %more_options;
+
+This function does not introduce any extra hash keys, but adds a plus sign before the name:
+
+	has "+${name_to_extend}" => (
+		%more_options
+	);
+
+=head1 SHORTCUTS
+
+The C<%more_options> hash can contain some shortcuts that will be expanded by
+L</option>, L</param>, L</field> or L</extended> functions.
+
+=head2 method name shortcuts
+
+The following values:
+
+	1
+	-public
+	-hidden
+
+... can be passed to the following options, producing standard method names with given prefixes:
+
+	reader:    get_
+	writer:    set_
+	predicate: has_
+	clearer:   clear_
+	builder:   _build_
+	trigger:   _trigger_
+
+The naming rules are as follows:
+
+=over
+
+=item
+
+Properties starting with an underscore produce B<hidden> methods when passed C<1> (starting with underscore as well)
+
+	has field '_name' => (
+		reader => 1
+	);
+
+	# ... becomes:
+	has '_name' => (
+		...
+		reader => '_get_name'
+	);
+
+=item
+
+Properties not starting with an underscore produce B<public> methods when passed C<1> (not starting with underscore)
+
+	has field 'name' => (
+		writer => 1
+	);
+
+	# ... becomes:
+	has 'name' => (
+		...
+		writer => 'set_name'
+	);
+
+=item
+
+Visibility can be forced by passing C<-public> or C<-hidden> instead of C<1>
+
+	has field '_name' => (
+		predicate => -public
+	);
+
+	# ... becomes:
+	has '_name' => (
+		...
+		predicate => 'has_name'
+	);
+
+
+	has field 'name' => (
+		predicate => -hidden
+	);
+
+	# ... becomes:
+	has 'name' => (
+		...
+		predicate => '_has_name'
+	);
+
+=item
+
+C<builder> and C<trigger> are hidden by default. The only way to have them not
+start with an underscore (other than passing the name explicitly) is to pass
+C<-public>.
+
+These two options also don't change the name based on the leading underscore in
+property's name. Builders for C<property> and C<_property> will by default both
+be C<_build_property>.
+
+=back
+
+=head2 lazy + default
+
+	lazy => sub { return 'default value' }
+
+... will be expanded to:
+
+	lazy => 1,
+	default => sub { return 'default value' }
+
+=head2 lazy + builder
+
+	lazy => 'builder_name'
+
+... will be expanded to:
+
+	lazy => 1,
+	builder => 'builder_name'
+
+Note: passing C<1> will work as described in L</method name shortcuts>.
+
+=head2 isa + coerce
+
+	coerce => Types::Standard::Int
+
+... will be expanded to:
+
+	isa => Types::Standard::Int,
+	coerce => 1
+
+As long as it is a blessed reference (object).
+
+=head2 builder / default + required
+
+Having a C<builder> or a C<default> will automatically remove C<required> from the option list.
+
+	# will no longer be required in the constructor
+	has param 'optional' => (
+		default => undef,
+	);
+
+=head2 init_arg
+
+C<init_arg> can use the same shortcuts as described in L</method name shortcuts>.
+
+This can be useful to turn C<_name> into C<name> in the constructor with the help of C<-public>:
+
+	# no underscore in the constructor
+	has param '_name' => (
+		init_arg => -public
+	);
+
+=head2 trigger
+
+In addition to shortcuts described in L</method name shortcuts>, C<trigger> can
+now be passed both as a anon sub (like C<default>) or as a package sub name
+(like C<builder>).
+
+=head1 CAVEATS
+
+=over
+
+=item All attributes produced are 'ro' by default
+
+Since the module does not depend on specific OO implementation, the only common
+C<< is => >> options are C<ro> and C<rw> (as in base Moose). The author considers
+C<rw> to be a I<bad idea> most of the time. Having one method for reading and
+writing can lead to bugs that are hard to spot.
+
+Other than that:
+
+C<< writer => -hidden >> shortcut does more or less what C<rwp> does.
+
+C<< lazy => 1 >> shortcut does more or less what C<lazy> does.
+
+=item Partial MooseX::AttributeShortcuts compatibility
+
+The module implements many of the shortcuts from L<MooseX::AttributeShortcuts>,
+but does not aim to have 100% compatibility. Some details in overlapping
+functionality may differ.
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<MooseX::Extended>
+
+=item L<MooseX::AttributeShortcuts>
+
+=back
+
+=head1 AUTHOR
+
+Bartosz Jarzyna E<lt>bbrtj.pro@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2022 by Bartosz Jarzyna
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

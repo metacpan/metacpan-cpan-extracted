@@ -1,3 +1,6 @@
+0.0.4 Fri 05 Aug 2022 01:18:06 PM PDT
+ - Allow test files to start with 'use Test::More::Bash'
+
 0.0.3 Wed 27 Jul 2022 10:28:15 AM PDT
  - Allow fixer postamble to work with share install one
 

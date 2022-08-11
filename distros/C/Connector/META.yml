@@ -20,7 +20,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -39,7 +39,7 @@ no_index:
 provides:
   Connector:
     file: lib/Connector.pm
-    version: '1.44'
+    version: '1.45'
   Connector::Builtin:
     file: lib/Connector/Builtin.pm
   Connector::Builtin::Authentication::LDAP:
@@ -58,6 +58,8 @@ provides:
     file: lib/Connector/Builtin/File/Simple.pm
   Connector::Builtin::Memory:
     file: lib/Connector/Builtin/Memory.pm
+  Connector::Builtin::Null:
+    file: lib/Connector/Builtin/Null.pm
   Connector::Builtin::Static:
     file: lib/Connector/Builtin/Static.pm
   Connector::Iterator:
@@ -128,10 +130,10 @@ requires:
   Moose: '0'
   perl: '5.010001'
 resources:
-  bugtracker: https://github.com/mrscotty/connector/issues
-  homepage: https://github.com/mrscotty/connector
-  repository: git://github.com/mrscotty/connector.git
-version: '1.44'
+  bugtracker: https://github.com/whiterabbitsecurity/connector/issues
+  homepage: https://github.com/whiterabbitsecurity/connector
+  repository: https://github.com/whiterabbitsecurity/connector.git
+version: '1.45'
 x_contributors:
   - 'Martin Bartosch <m.bartosch@cynops.de>'
   - 'Martin Bartosch <mbartosch@whiterabbitsecurity.com>'

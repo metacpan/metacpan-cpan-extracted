@@ -1,5 +1,11 @@
 Changes for File-chdir
 
+0.1011    2016-10-07 10:23:15-04:00 America/New_York
+
+    [Documentation]
+
+    - Fixed POD typos
+
 0.1010    2015-02-05 10:04:27-05:00 America/New_York
 
     [Changed]

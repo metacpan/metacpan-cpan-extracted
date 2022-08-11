@@ -9,13 +9,22 @@ use File::Temp qw/tempfile/;
 
 use Test::More tests => 200;
 
+# Cumulative error in PDL-to-perl-scalar conversion for long-double builds
+# requires a lower tolerance.  To prevent failing builds just because of
+# floating point error we define a tolerance target and use it below.  Note
+# that normal perl builds work at 1e-9, and longdouble builds work at 1e-8 so
+# 1e-6 should certainly be safe.
+#
+# See here: https://github.com/PDLPorters/pdl/issues/405
+# and here: https://github.com/ebaudrez/Test-PDL/wiki/Rationale:-tolerances
+
+my $tolerance = 1e-6;
 my ($fh, $fn) = tempfile();
 
 # This test iterates over a number of port sizes and output format types
 # to make sure the resulting matrix after format conversion is the same.
 # We write the original matrix in one format and read it in another format
 # to make sure the sum of the errors is very small. 
-
 
 my $n_freq = 10;
 for my $n_ports (1,2,3,4,10)
@@ -80,9 +89,9 @@ sub verify
 	my ($n_ports, $fmt1, $fmt2, $fmt_in, $m1, $m, $f, $f1, $orig_funit) = @_;
 
 	ok ( $fmt2 eq $fmt_in, "n_ports=$n_ports ($orig_funit) $fmt1 => $fmt2: format is equal");
-	ok ( sum($m1 - $m)->re < 1e-9, "n_ports=$n_ports ($orig_funit) $fmt1 => $fmt2: matrix real: error is < 1e-9");
-	ok ( sum($m1 - $m)->im < 1e-9, "n_ports=$n_ports ($orig_funit) $fmt1 => $fmt2: matrix imag: error is < 1e-9");
-	ok ( sum($f1 - $f) < 1e-9, "n_ports=$n_ports ($orig_funit) $fmt1 => $fmt2: freq: error is < 1e-9");
+	ok ( sum($m1 - $m)->re < $tolerance, "n_ports=$n_ports ($orig_funit) $fmt1 => $fmt2: matrix real: error is < $tolerance");
+	ok ( sum($m1 - $m)->im < $tolerance, "n_ports=$n_ports ($orig_funit) $fmt1 => $fmt2: matrix imag: error is < $tolerance");
+	ok ( sum($f1 - $f) < $tolerance, "n_ports=$n_ports ($orig_funit) $fmt1 => $fmt2: freq: error is < $tolerance");
 }
 
 unlink($fn);

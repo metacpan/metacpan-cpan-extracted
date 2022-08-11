@@ -1,8 +1,7 @@
 use strict; use warnings;
 
 package Net::OAuth2Server::PKCE;
-
-our $VERSION = '0.003';
+our $VERSION = '0.005';
 
 use Digest::SHA ();
 
@@ -12,8 +11,7 @@ our %transform = (
 );
 
 package Net::OAuth2Server::Request::Authorization::Role::PKCE;
-
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Role::Tiny;
 use Class::Method::Modifiers 'fresh';
@@ -43,8 +41,7 @@ fresh get_pkce_token => \&fresh__get_pkce_token;
 undef *fresh__get_pkce_token;
 
 package Net::OAuth2Server::Request::Token::AuthorizationCode::Role::PKCE;
-
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Role::Tiny;
 use Class::Method::Modifiers 'fresh';
@@ -59,9 +56,9 @@ sub fresh__get_pkce_challenge {
 		or Carp::croak( "bad code_challenge_method: $method" );
 	$self->ensure_required( 'code_verifier' ) or return;
 	my $verifier = $self->param( 'code_verifier' );
-	$self->set_error_invalid_request( sprintf 'bad code_challenge length: %s (must be 43 (min) to 128 (max))', length $verifier ), return
+	$self->set_error_invalid_request( sprintf 'bad code_verifier length: %s (must be 43 (min) to 128 (max))', length $verifier ), return
 		unless grep 43 <= $_ && $_ <= 128, length $verifier;
-	$self->set_error_invalid_request( sprintf 'bad character in code_challenge: 0x%02X at position %d', ord $1, -1 + pos $verifier ), return
+	$self->set_error_invalid_request( sprintf 'bad character in code_verifier: 0x%02X at position %d', ord $1, -1 + pos $verifier ), return
 		if $verifier =~ /([^.~A-Za-z0-9_-])/g;
 	$t->( $verifier );
 }

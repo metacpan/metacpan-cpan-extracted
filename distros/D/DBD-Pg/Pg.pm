@@ -16,7 +16,7 @@ use 5.008001;
 {
     package DBD::Pg;
 
-    use version; our $VERSION = qv('3.15.1');
+    use version; our $VERSION = qv('3.16.0');
 
     use DBI 1.614 ();
     use Exporter ();
@@ -137,7 +137,7 @@ use 5.008001;
         $class .= '::dr';
 
         ## Work around for issue found in https://rt.cpan.org/Ticket/Display.html?id=83057
-        my $realversion = qv('3.15.1');
+        my $realversion = qv('3.16.0');
 
         $drh = DBI::_new_drh($class, {
             'Name'        => 'Pg',
@@ -1698,7 +1698,7 @@ DBD::Pg - PostgreSQL database driver for the DBI module
 
 =head1 VERSION
 
-This documents version 3.15.1 of the DBD::Pg module
+This documents version 3.16.0 of the DBD::Pg module
 
 =head1 DESCRIPTION
 
@@ -2089,9 +2089,9 @@ location and C<undef> upon failure. This function cannot be used if AutoCommit i
 
 =item pg_lo_lseek64
 
-  $loc = $dbh->pg_lo_lseek64($lobj_fd, $offset, $whence);
-
-Same as pg_lo_lseek, but can handle much larger offsets and returned values. Requires Postgres 9.3 or greater.
+Backwards compatible alias for L</pg_lo_lseek>. Since DBD::Pg 3.16, that
+method handles 64-bit offsets if supported by the Perl and PostgreSQL versions
+in use.
 
 =item pg_lo_tell
 
@@ -2102,9 +2102,9 @@ This function cannot be used if AutoCommit is enabled.
 
 =item pg_lo_tell64
 
-  $loc = $dbh->pg_lo_tell64($lobj_fd);
-
-Same as pg_lo_tell, but can return much larger values. Requires Postgres 9.3 or greater.
+Backwards compatible alias for L</pg_lo_tell>. Since DBD::Pg 3.16, that
+method handles 64-bit offsets if supported by the Perl and PostgreSQL versions
+in use.
 
 =item pg_lo_truncate
 
@@ -2115,9 +2115,9 @@ This function cannot be used if AutoCommit is enabled.
 
 =item pg_lo_truncate64
 
-  $loc = $dbh->pg_lo_truncate64($lobj_fd, $len);
-
-Same as pg_lo_truncate, but can handle much larger lengths. Requires Postgres 9.3 or greater.
+Backwards compatible alias L</for pg_lo_truncate>. Since DBD::Pg 3.16, that
+method handles 64-bit offsets if supported by the Perl and PostgreSQL versions
+in use.
 
 =item pg_lo_close
 
@@ -2788,7 +2788,7 @@ server version 9.0 or higher.
 
 The C<ping> method determines if there is a working connection to an active 
 database server. It does this by sending a small query to the server, currently 
-B<'DBD::Pg ping test v3.15.1'>. It returns 0 (false) if the connection is not valid, 
+B<'DBD::Pg ping test v3.16.0'>. It returns 0 (false) if the connection is not valid, 
 otherwise it returns a positive number (true). The value returned indicates the 
 current state:
 
@@ -4199,14 +4199,14 @@ long-running query.
   print "Result: $result\n";
   my $info = $sth->fetchall_arrayref();
 
-Without asynchronous queries, the above script would take about 8 seconds to run: five seconds waiting 
-for the execute to finish, then three for the check_on_the_kids() function to return. With asynchronous 
-queries, the script takes about 6 seconds to run, and gets in two iterations of check_on_the_kids in 
+Without asynchronous queries, the above script would take about 8 seconds to run: five seconds waiting
+for the execute to finish, then three for the check_on_the_kids() function to return. With asynchronous
+queries, the script takes about 6 seconds to run, and gets in two iterations of check_on_the_kids in
 the process.
 
-Here's an example showing the ability to cancel a long-running query. Imagine two slave databases in 
-different geographic locations over a slow network. You need information as quickly as possible, so 
-you query both at once. When you get an answer, you tell the other one to stop working on your query, 
+Here's an example showing the ability to cancel a long-running query. Imagine two replica databases in
+different geographic locations over a slow network. You need information as quickly as possible, so
+you query both at once. When you get an answer, you tell the other one to stop working on your query,
 as you don't need it anymore.
 
   use strict;
@@ -4214,13 +4214,13 @@ as you don't need it anymore.
   use Time::HiRes 'sleep';
   use DBD::Pg ':async';
 
-  my $dbhslave1 = DBI->connect('dbi:Pg:dbname=postgres;host=slave1', 'postgres', '', {AutoCommit=>0,RaiseError=>1});
-  my $dbhslave2 = DBI->connect('dbi:Pg:dbname=postgres;host=slave2', 'postgres', '', {AutoCommit=>0,RaiseError=>1});
+  my $dbhrep1 = DBI->connect('dbi:Pg:dbname=postgres;host=replica1', 'postgres', '', {AutoCommit=>0,RaiseError=>1});
+  my $dbhrep2 = DBI->connect('dbi:Pg:dbname=postgres;host=replica2', 'postgres', '', {AutoCommit=>0,RaiseError=>1});
 
   $SQL = "SELECT count(*) FROM largetable WHERE flavor='blueberry'";
 
-  my $sth1 = $dbhslave1->prepare($SQL, {pg_async => PG_ASYNC});
-  my $sth2 = $dbhslave2->prepare($SQL, {pg_async => PG_ASYNC});
+  my $sth1 = $dbhrep1->prepare($SQL, {pg_async => PG_ASYNC});
+  my $sth2 = $dbhrep2->prepare($SQL, {pg_async => PG_ASYNC});
 
   $sth1->execute();
   $sth2->execute();
@@ -4296,12 +4296,15 @@ pg_putcopyend methods.
 
 Used to retrieve data from a table after the server has been put into a 
 COPY OUT mode by calling "COPY tablename TO STDOUT". Data is always returned 
-one data row at a time. The first argument to pg_getcopydata 
-is the variable into which the data will be stored (this variable should not 
-be undefined, or it may throw a warning, although it may be a reference). The 
-pg_getcopydata method returns a number greater than 1 indicating the new size of 
-the variable, or a -1 when the COPY has finished. Once a -1 has been returned, no 
-other action is necessary, as COPY mode will have already terminated. Example:
+one data row at a time. Note that the server will add a newline to 
+each returned row.
+
+The first argument to pg_getcopydata is the variable into which the data will 
+be stored (this variable should not be undefined, or it may throw a warning, 
+although it may be a reference). The pg_getcopydata method returns a number 
+greater than 1 indicating the new size of the variable, or a -1 when the 
+COPY has finished. Once a -1 has been returned, no other action is necessary, 
+as COPY mode will have already terminated. Example:
 
   $dbh->do("COPY mytable TO STDOUT");
   my @data;
@@ -4376,6 +4379,10 @@ The constants and their values are:
 DBD::Pg supports all largeobject functions provided by libpq via the
 C<< $dbh->pg_lo* >> methods. Please note that access to a large object, even read-only 
 large objects, must be put into a transaction.
+
+If DBD::Pg is compiled against and connected to PostgreSQL 9.3 or newer, and
+your Perl has 64-bit integers, it will use the 64-bit variants of the seek,
+tell and truncate methods.
 
 =head2 Cursors
 

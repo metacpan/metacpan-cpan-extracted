@@ -1,10 +1,12 @@
 package Pithub::Result;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01037';
 # ABSTRACT: Github v3 result object
 
 use Moo;
-use Array::Iterator;
+
+our $VERSION = '0.01039';
+
+use Pithub::ResultSet ();
 use JSON::MaybeXS qw( JSON );
 use URI ();
 use Carp qw( confess croak );
@@ -92,7 +94,7 @@ has '_iterator' => (
     builder => '_build__iterator',
     clearer => '_clear_iterator',
     is      => 'ro',
-    isa     => _isa_isa_maker('Array::Iterator'),
+    isa     => _isa_isa_maker(Pithub::ResultSet::),
     lazy    => 1,
 );
 
@@ -107,7 +109,7 @@ has '_json' => (
     is      => 'ro',
     isa     => sub {
         confess "$_[0] is not a suitable JSON object"
-          unless eval { $_[0]->can("decode") };
+          unless eval { $_[0]->can('decode') };
     },
     lazy    => 1,
 );
@@ -179,6 +181,7 @@ sub last_page {
 }
 
 
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
 sub next {
     my ($self) = @_;
     my $row = $self->_iterator->getNext;
@@ -192,6 +195,7 @@ sub next {
     }
     return;
 }
+## use critic
 
 
 sub next_page {
@@ -241,7 +245,7 @@ sub _build__iterator {
     my ($self) = @_;
     my $content = $self->content;
     $content = [$content] unless ref $content eq 'ARRAY';
-    return Array::Iterator->new($content);
+    return Pithub::ResultSet->new($content);
 }
 
 sub _build_last_page_uri {
@@ -317,7 +321,7 @@ Pithub::Result - Github v3 result object
 
 =head1 VERSION
 
-version 0.01037
+version 0.01039
 
 =head1 DESCRIPTION
 

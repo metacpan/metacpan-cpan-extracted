@@ -7,7 +7,7 @@ build_requires:
   Template: '0'
   Test::More: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,9 +22,10 @@ requires:
   MRO::Compat: '0'
   perl: '5.008001'
 resources:
-  bugtracker: https://github.com/ap/Catalyst-View-Template/issues
-  repository: git://github.com/ap/Catalyst-View-Template.git
-version: '1.101'
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-View-Template
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ap/Catalyst-View-Template.git
+version: '1.103'
 x_copyright:
   holder: 'Aristotle Pagaltzis'
   year: 2020

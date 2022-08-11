@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Algorithm-Graphs-Reachable-Tiny
+version:             0.02
+abstract:            Compute rechable nodes in a graph.
+license:             perl_5
+author:              
+    - Abdul al Hazred <451@gmx.eu>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

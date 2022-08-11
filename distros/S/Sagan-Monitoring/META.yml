@@ -23,10 +23,12 @@ requires:
   File::Path: '0'
   File::ReadBackwards: '0'
   File::Slurp: '0'
+  Gzip::Faster: '0.21'
   JSON: '0'
+  MIME::Base64: '3.16'
   Time::Piece: '0'
   perl: '5.006'
 resources:
   repository: https://github.com/VVelox/Sagan-Monitoring
-version: v1.1.1
+version: v1.2.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

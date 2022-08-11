@@ -42,7 +42,7 @@ Module::Generic::Scalar::IO - Generic Module Scalar IO Class
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

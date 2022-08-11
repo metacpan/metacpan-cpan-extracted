@@ -101,6 +101,18 @@ SPVM::Test - SPVM test module
 
   static method main : int ($start_file : string, $args : string[]) {
     
+    # for-each
+    {
+      my $nums = [1, 2, 3];
+      for my $num (@$nums) {
+        print "$num\n";
+      }
+      for my $num (@$nums) {
+      }
+      for my $num (@{$nums}) {
+      }
+    }
+    
     # Optional arguments
     {
       {

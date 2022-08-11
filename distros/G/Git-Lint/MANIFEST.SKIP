@@ -38,14 +38,18 @@ t/tmp/
 MYMETA\.json
 MYMETA\.yml$
 \.tar\.gz$$
+Git-Lint-
 
 README.md
+MANIFEST.bak
 
 # Author tests and files
-996_perl-tidy.t
-997_perl-critic.t
-998_pod-checker.t
-999_pod-coverage.t
+100_perl-tidy.t
+101_perl-critic.t
+102_pod-checker.t
+103_pod-coverage.t
+200_manifest.t
+201_version.t
 perltidyrc
 perlcriticrc
 run_cover

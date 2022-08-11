@@ -622,6 +622,14 @@ sub _set_get_value
     return( $hv->value_data );
 }
 
+# NOTE: sub FREEZE is inherited
+
+sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+# NOTE: sub THAW is inherited
+
 # NOTE: HTTP::Promise::Field::QualityValue class
 {
     package
@@ -661,6 +669,15 @@ sub _set_get_value
     sub element { return( shift->_set_get_scalar_as_object( 'element', @_ ) ); }
     
     sub value { return( shift->_set_get_number( 'value', @_ ) ); }
+
+    # NOTE: sub FREEZE is inherited
+
+    sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+    sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+    # NOTE: sub THAW is inherited
+
 }
 
 1;

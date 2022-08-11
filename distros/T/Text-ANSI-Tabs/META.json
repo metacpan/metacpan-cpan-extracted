@@ -1,10 +1,10 @@
 {
    "abstract" : "Tab expand and unexpand with ANSI sequence",
    "author" : [
-      "Kazumasa Utashiro <kaz@utashiro.com>"
+      "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.12",
+   "generated_by" : "Minilla/v3.1.19",
    "license" : [
       "perl_5"
    ],
@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "List::Util" : "1.45",
-            "Text::ANSI::Fold" : "2.11",
+            "Text::ANSI::Fold" : "2.1301",
             "perl" : "v5.14.0"
          }
       },
@@ -57,7 +57,7 @@
    "provides" : {
       "Text::ANSI::Tabs" : {
          "file" : "lib/Text/ANSI/Tabs.pm",
-         "version" : "0.07"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
@@ -67,12 +67,16 @@
       },
       "homepage" : "https://github.com/kaz-utashiro/Text-ANSI-Tabs",
       "repository" : {
-         "url" : "git://github.com/kaz-utashiro/Text-ANSI-Tabs.git",
+         "type" : "git",
+         "url" : "https://github.com/kaz-utashiro/Text-ANSI-Tabs.git",
          "web" : "https://github.com/kaz-utashiro/Text-ANSI-Tabs"
       }
    },
-   "version" : "0.07",
+   "version" : "1.01",
    "x_authority" : "cpan:UTASHIRO",
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_contributors" : [
+      "Kazumasa Utashiro <kaz@utashiro.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

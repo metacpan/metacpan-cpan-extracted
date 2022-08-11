@@ -6,7 +6,7 @@ build_requires:
   Catalyst::Test: '0'
   Test::More: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,9 +22,10 @@ requires:
   Scalar::Util: '0'
   perl: '5.008001'
 resources:
-  bugtracker: https://github.com/ap/Catalyst-Plugin-Digress/issues
-  repository: git://github.com/ap/Catalyst-Plugin-Digress.git
-version: '1.002'
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Plugin-Digress
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ap/Catalyst-Plugin-Digress.git
+version: '1.004'
 x_copyright:
   holder: 'Aristotle Pagaltzis'
   year: 2021

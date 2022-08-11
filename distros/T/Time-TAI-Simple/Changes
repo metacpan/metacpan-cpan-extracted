@@ -1,5 +1,18 @@
 Revision history for time-tai-simple
 
+1.16 Thu Aug  4 19:10:10 PDT 2022
+	- Added pool of recent user agent strings, picked at random.
+	- Added soft unit tests for new user agent functionality.
+        - Added "--retry" option for trying each URL multiple times.
+        - Added "--retry-delay" option for setting pause duration between retries.
+	- Added "--primary" option for trying IERS download URL before cache URL.
+	- Added "--agent" option for overwriting pool of user agent strings.
+	- Added "--add-agent" option for appending to pool of user agent strings.
+	- Added "--force-edge" option for always using the Microsoft Edge user agent string.
+        - Added "--churn-agent" option for changing user agent string on retry.
+	- Added negative leapseconds and Linux CLOCK_TAI to TODO list.
+        - Updated data/leap-seconds.list (no substantive changes, only expiration date).
+
 1.15 Mon Nov 26 16:30:40 PDT 2018
 	- Updated user agent string for fetching leap-seconds.list; IETF redirects to their home page otherwise.
 	- Updated URL fetching leap-seconds.list to use https.

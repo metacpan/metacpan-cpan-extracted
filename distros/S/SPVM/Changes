@@ -1,7 +1,199 @@
+0.9638 2022-08-10
+  [Fix Bug]
+    * Fix the bug that spvmdist command can't show help
+  [Test Improvement]
+    * Add spvmcc -h, --help option tests
+  [Compilation Error Message Improvement]
+    * Improve compilation error messages.
+    * Fix wrong compilation error messages.
+  [Ineffective Changes]
+    * The refcnt operator receive an operater instead of a variable.
+    * op names become lower case.
+    * opcode names become lower case.
+  [Incompatible Changes]
+    * spvmdist and spvmcc help message is output to stdout, instead of stderr.
+0.9637 2022-08-08
+  [New Features]
+    * for-each Statement
+
+      The for-each statement is a statement to write the for statement for iterating easily.
+
+        for my VAR (@OPERATOR) {
+        
+        }
+        
+        for my VAR (@{OPERATOR}) {
+          
+        }
+
+      The following C<for> statement is the same as the following for-each statement.
+
+        # for
+        my $array = [1, 2, 3];
+        for (my $i = 0; $i < @$array; $i++) {
+          my $element = $array->[$i];
+        }
+        
+        # for-each
+        my $array = [1, 2, 3];
+        for my $element (@$array) {
+          
+        }
+      
+0.9636 2022-08-08
+  [New Features]
+    * Add the following native API.
+    
+      const char* (*dumpc)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+  
+  [Improve Compilation Error Messages]
+    * Improve compillation error messages in many places.
+  [Bug Fix]
+    * Fix the bug that the array initialization compilation error is not detected.
+    * Fix the bug that non-interface type can be specified the operand of the interface statement.
+  [Test]
+    * Add many tests of compilation errors.
+  [Incompatible Changes]
+    * Fix the bug that the array initialization compilation error is not detected.
+      For the reason of this, A compilation error occurs in the following code.
+      {"foo" => 1, "bar"}
+0.9635 2022-08-05
+  [New Features]
+    * If the depth of the method call is over 10000, an exception is thrown.
+    * Use union type in type comment.
+      
+      has union_type : object of string|Point;
+    * Add DEFAULT_CAPACITY enumeration value to ByteList class.
+      enum {
+        DEFAULT_CAPACITY = 4,
+      }
+    * Add capacity field is added to ByteList class.
+    
+      has capacity : ro int;
+    
+    * Add optional capacity argument is added to new and new_len of ByteList class.
+      [Before]
+      static method new : ByteList ($array = undef : byte[])
+      static method new_len : ByteList ($length : int)
+      [After]
+      static method new : ByteList ($array = undef : byte[], $capacity = -1 : int)
+      static method new_len : ByteList ($length : int, $capacity = -1 : int)
+    * Add reserve method to ByteList class .
+    * Add capacity field is added to ShortList class.
+    
+      has capacity : ro int;
+    
+    * Add optional capacity argument is added to new and new_len of ShortList class.
+      [Before]
+      static method new : ShortList ($array = undef : short[])
+      static method new_len : ShortList ($length : int)
+      [After]
+      static method new : ShortList ($array = undef : short[], $capacity = -1 : int)
+      static method new_len : ShortList ($length : int, $capacity = -1 : int)
+    * Add reserve method to ShortList class .
+    * Add capacity field is added to IntList class.
+    
+      has capacity : ro int;
+    
+    * Add optional capacity argument is added to new and new_len of IntList class.
+      [Before]
+      static method new : IntList ($array = undef : int[])
+      static method new_len : IntList ($length : int)
+      [After]
+      static method new : IntList ($array = undef : int[], $capacity = -1 : int)
+      static method new_len : IntList ($length : int, $capacity = -1 : int)
+    * Add reserve method to IntList class .
+    * Add capacity field is added to LongList class.
+    
+      has capacity : ro int;
+    
+    * Add optional capacity argument is added to new and new_len of LongList class.
+      [Before]
+      static method new : LongList ($array = undef : long[])
+      static method new_len : LongList ($length : int)
+      [After]
+      static method new : LongList ($array = undef : long[], $capacity = -1 : int)
+      static method new_len : LongList ($length : int, $capacity = -1 : int)
+    * Add reserve method to LongList class .
+
+    * Add capacity field is added to FloatList class.
+    
+      has capacity : ro int;
+    
+    * Add optional capacity argument is added to new and new_len of FloatList class.
+      [Before]
+      static method new : FloatList ($array = undef : float[])
+      static method new_len : FloatList ($length : int)
+      [After]
+      static method new : FloatList ($array = undef : float[], $capacity = -1 : int)
+      static method new_len : FloatList ($length : int, $capacity = -1 : int)
+    * Add reserve method to FloatList class .
+
+    * Add capacity field is added to DoubleList class.
+    
+      has capacity : ro int;
+    
+    * Add optional capacity argument is added to new and new_len of DoubleList class.
+      [Before]
+      static method new : DoubleList ($array = undef : double[])
+      static method new_len : DoubleList ($length : int)
+      [After]
+      static method new : DoubleList ($array = undef : double[], $capacity = -1 : int)
+      static method new_len : DoubleList ($length : int, $capacity = -1 : int)
+    * Add reserve method to DoubleList class .
+
+    * Add capacity field is added to StringList class.
+    
+      has capacity : ro int;
+    
+    * Add optional capacity argument is added to new and new_len of StringList class.
+      [Before]
+      static method new : StringList ($array = undef : string[])
+      static method new_len : StringList ($length : int)
+      [After]
+      static method new : StringList ($array = undef : string[], $capacity = -1 : int)
+      static method new_len : StringList ($length : int, $capacity = -1 : int)
+    * Add reserve method to StringList class .
+
+    * Add capacity field is added to List class.
+    
+      has capacity : ro int;
+    
+    * Add optional capacity argument is added to new and new_len of List class.
+      [Before]
+      static method new : List ($array = undef : object[])
+      static method new_len : List ($length : int)
+      [After]
+      static method new : List ($array = undef : object[], $capacity = -1 : int)
+      static method new_len : List ($length : int, $capacity = -1 : int)
+    * Add reserve method to List class .
+
+    * Add capacity field is added to StringBuffer class.
+    
+      has capacity : ro int;
+    
+    * Add optional capacity argument is added to new and new_len of StringBuffer class.
+      [Before]
+      static method new : StringBuffer ($string = undef : string)
+      [After]
+      static method new : StringBuffer ($string = undef : string, $capacity = -1 : int)
+    * Add reserve method to StringBuffer class.
+    * Add new_len method to StringBuffer class.
+    
+      static method new_len : StringBuffer ($length : int, $capacity = -1 : int)
+
+  [Specification Bug Fix]
+    * The escape character of the string literal "\0" becomes 0x24 ($). This was wrongly 0x44 (D).
+  [Incompatible Changes]
+    * The escape character of the string literal "\0" becomes 0x24 ($). This was wrongly 0x44 (D).
+    * If the depth of the method call is over 10000, an exception is thrown.
+  [Internal Changes]
+    * Remove inline expansion of precompile function in the same class. This maybe reduce the performance of the method call.
+    * Call depth is managed.
 0.9634 2022-08-03
   [Changes]
     * Add an optional argument to the following methods of StringBuffer class.
-      [Before]
+      [qBefore]
       static method new : StringBuffer ()
       [After]
       static method new : StringBuffer ($string = undef : string)

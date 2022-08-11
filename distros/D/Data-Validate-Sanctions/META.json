@@ -4,7 +4,7 @@
       "binary.com <BINARY@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -31,6 +31,7 @@
             "Test::EOL" : "0",
             "Test::Mojibake" : "0",
             "Test::More" : "0.88",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
             "Test::Synopsis" : "0",
@@ -39,18 +40,23 @@
       },
       "runtime" : {
          "requires" : {
+            "Data::Compare" : "0",
+            "Date::Utility" : "0",
             "DateTime::Format::Strptime" : "0",
             "File::ShareDir" : "0",
             "File::Temp" : "0",
             "File::stat" : "0",
             "FindBin" : "0",
+            "Getopt::Long" : "2.42",
             "IO::Uncompress::Unzip" : "0",
             "List::Util" : "0",
+            "Locale::Country" : "3.66",
             "Mojo::UserAgent" : "0",
             "Path::Tiny" : "0",
             "Scalar::Util" : "0",
+            "Syntax::Keyword::Try" : "0.18",
             "Text::CSV" : "0",
-            "Try::Tiny" : "0",
+            "Text::Trim" : "0",
             "XML::Fast" : "0",
             "YAML::XS" : "0",
             "perl" : "5.014000"
@@ -69,7 +75,11 @@
             "IPC::Open3" : "0",
             "Path::Tiny" : "0",
             "Test::CheckDeps" : "0.010",
-            "Test::More" : "0.96"
+            "Test::MockModule" : "0.15",
+            "Test::MockObject" : "1.20161202",
+            "Test::More" : "0.96",
+            "Test::Warn" : "0.23",
+            "Test::Warnings" : "0.026"
          }
       }
    },
@@ -84,7 +94,9 @@
          "web" : "https://github.com/binary-com/perl-Data-Validate-Sanctions"
       }
    },
-   "version" : "0.11",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0222"
+   "version" : "0.14",
+   "x_generated_by_perl" : "v5.26.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

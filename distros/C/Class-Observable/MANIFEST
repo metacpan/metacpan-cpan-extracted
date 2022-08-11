@@ -1,11 +1,6 @@
 Changes
-LICENSE
-MANIFEST
-META.json                                Module JSON meta-data (added by MakeMaker)
-META.yml                                 Module YAML meta-data (added by MakeMaker)
 Makefile.PL
-README
-boilerplate.pl
+inc/boilerplate.pl
 lib/Class/Observable.pm
 t/class_observable.t
 t/collision.t
@@ -16,3 +11,8 @@ t/inherited.t
 t/lib/DeeJay.pm
 t/lib/Song.pm
 t/threads.t
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+LICENSE
+README

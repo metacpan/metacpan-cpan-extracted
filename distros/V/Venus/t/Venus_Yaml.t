@@ -73,9 +73,10 @@ $test->for('synopsis', sub {
 =description
 
 This package provides methods for reading and writing L<YAML|https://yaml.org>
-data. B<Note:> This package requires that a suitable YAML is installed,
+data. B<Note:> This package requires that a suitable YAML library is installed,
 currently either C<YAML::XS> C<0.67+>, C<YAML::PP::LibYAML> C<0.004+>, or
-C<YAML::PP> C<0.23+>.
+C<YAML::PP> C<0.23+>. You can use the C<VENUS_YAML_PACKAGE> environment
+variable to include or prioritize your preferred YAML library.
 
 =cut
 

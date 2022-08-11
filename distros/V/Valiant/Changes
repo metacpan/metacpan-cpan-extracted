@@ -1,5 +1,18 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.001015 2022 August 3
+          - lots of cleanup and changes to the example Catalyst application as well as
+            more testing of the DBIC wrapper for Valiant Validations.
+          - New DBIC result method set_columns_recursively
+          - Move the DBIC resultset validator for set size into its own module (SetSize)
+          - Valiant::HTML::Form checks its model for a csrf_token
+          - numerous non breaking bug fixes to Valiant::HTML::Formbuilder
+          - 'read_attribute_for_html' allows a model to tell the formbuilder how to
+            read attributes for display purposes.  Useful for deflating or reformatting
+          - enhancements to Valiant::HTML::Tagbuilder
+          - new global option on formbuilder fields to set HTML attributes when the field
+            has errors (error_attrs).
+
 0.001014 2022 March 4
           - More changes to fix issues with supporting Windows
           - Fixes to the continuous build system around Windows

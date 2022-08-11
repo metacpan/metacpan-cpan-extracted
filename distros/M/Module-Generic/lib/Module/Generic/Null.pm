@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Null.pm
-## Version v1.1.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v1.1.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/02/27
+## Modified 2022/08/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -26,7 +26,7 @@ BEGIN
                  );
     use Scalar::Util ();
     use Want;
-    our( $VERSION ) = 'v1.1.0';
+    our( $VERSION ) = 'v1.1.1';
 };
 
 use strict;
@@ -124,7 +124,8 @@ sub FREEZE
     my $class = CORE::ref( $self );
     my %hash  = %$self;
     # Return an array reference rather than a list so this works with Sereal and CBOR
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # On or before Sereal version 4.023, Sereal did not support multiple values returned
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
     # But Storable want a list with the first element being the serialised element
     CORE::return( $class, \%hash );
 }

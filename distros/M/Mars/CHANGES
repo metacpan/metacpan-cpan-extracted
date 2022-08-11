@@ -1,3 +1,12 @@
+0.05 2022-08-04
+
+- [feature] Cascade DESTROY in roles from Mars::Kind::{Class,Role}
+- [feature] Implement Mars::Mixin to mix-in routines
+- [update] Expose errors on require of classes and roles
+- [update] Implement Meta#local to return local attrs, bases, mixins, roles, and subs
+- [update] Allow attr override (prevent accessor install)
+- [update] Update Mars::Kind to better handle non-hashref based objects
+
 0.04 2022-07-22
 
 - [feature] Allow classes and roles to declare imports

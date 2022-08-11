@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'Git::Lint::Check::Commit';
 
-our $VERSION = '0.014';
+our $VERSION = '0.016';
 
 my $check_name = 'unresolved conflict';
 

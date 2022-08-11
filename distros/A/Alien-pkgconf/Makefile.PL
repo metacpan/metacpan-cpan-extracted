@@ -9,7 +9,7 @@ BEGIN {
   }
 }
 
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.98;
 use File::Path qw( rmtree );
 use Config;
 
@@ -23,7 +23,7 @@ my %args = (
   VERSION_FROM       => 'lib/Alien/pkgconf.pm',
 
   CONFIGURE_REQUIRES => {
-    'ExtUtils::MakeMaker' => 0,
+    'ExtUtils::MakeMaker' => '6.98',
     'JSON::PP'            => '2.27400',
   },
   TEST_REQUIRES      => {
@@ -48,8 +48,8 @@ my %args = (
     resources => {
       repository => {
         type => 'git',
-        url  => "http://github.com/Perl5-Alien/Alien-pkgconf.git",
-        web  => "http://github.com/Perl5-Alien/Alien-pkgconf",
+        url  => "http://github.com/PerlAlien/Alien-pkgconf.git",
+        web  => "http://github.com/PerlAlien/Alien-pkgconf",
       },
       bugtracker => {
         web  => 'https://github.com/PerlPkgConfig/perl-PkgConfig/issues',
@@ -84,7 +84,7 @@ eval {
   die "ALIEN_INSTALL_TYPE" if defined $ENV{ALIEN_INSTALL_TYPE}
                            && $ENV{ALIEN_INSTALL_TYPE} eq 'share';
 
-  system 'pkgconf', '--atleast-version=1.5.2', 'libpkgconf';
+  system 'pkgconf', '--atleast-version=1.5.2', '--max-version=1.8.0', 'libpkgconf';
   die "no pkgconf" if $?;
   my $cflags = `pkgconf --cflags libpkgconf`;
   die "getting cflags" if $?;

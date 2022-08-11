@@ -1,6 +1,6 @@
 NAME
 
-  mb - Can easy script in Big5, Big5-HKSCS, GBK, Sjis, UHC, UTF-8, ...
+  mb - Can easy script in Big5, Big5-HKSCS, GBK, Sjis(also CP932), UHC, UTF-8, ...
 
 SYNOPSIS
 
@@ -11,6 +11,7 @@ SYNOPSIS
   $ perl mb.pm -e gb18030   script_by_gb18030.pl
   $ perl mb.pm -e gbk       script_by_gbk.pl
   $ perl mb.pm -e sjis      script_by_sjis.pl
+  $ perl mb.pm -e sjis      script_by_cp932.pl
   $ perl mb.pm -e uhc       script_by_uhc.pl
   $ perl mb.pm -e utf8      script_by_utf8.pl
   $ perl mb.pm -e wtf8      script_by_wtf8.pl
@@ -51,7 +52,7 @@ SYNOPSIS
     $mb::ORIG_PROGRAM_NAME
 
   supported encodings:
-    Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis, UHC, UTF-8, WTF-8
+    Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis(also CP932), UHC, UTF-8, WTF-8
 
   supported operating systems:
     Apple Inc. OS X,
@@ -71,8 +72,8 @@ DESCRIPTION
   Perl is said to have been able to handle Unicode since version 5.8. However,
   unlike JPerl, "Easy jobs easy" has been lost. (but we have got it again :-D)
 
-  In Shift_JIS and similar encodings(Big5, Big5-HKSCS, GB18030, GBK, Sjis, UHC)
-  have any DAMEMOJI who have metacharacters at second octet. Which characters
+  In Shift_JIS and similar encodings(Big5, Big5-HKSCS, GB18030, GBK, Sjis, CP932,
+  UHC) have any DAMEMOJI who have metacharacters at second octet. Which characters
   are DAMEMOJI is depends on whether the enclosing delimiter is single quote or
   double quote.
 

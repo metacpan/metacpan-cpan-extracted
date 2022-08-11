@@ -10,15 +10,19 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Proc-Fork
-no_index: {}
+no_index:
+  directory:
+    - t
+    - inc
 requires:
   Carp: '0'
   Exporter::Tidy: '0'
   perl: '5.006'
 resources:
-  bugtracker: https://github.com/ap/Proc-Fork/issues
-  repository: git://github.com/ap/Proc-Fork.git
-version: '0.806'
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Proc-Fork
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ap/Proc-Fork.git
+version: '0.807'
 x_copyright:
   holder: 'Aristotle Pagaltzis'
   year: 2018

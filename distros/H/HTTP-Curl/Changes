@@ -1,0 +1,62 @@
+Revision history for Perl extension HTTP::Any.
+
+1.02  2022-04-20
+	- fixed URL for HTTP::Any::Curl when redirect via proxy
+
+1.01  2021-09-16
+	- fix name
+
+1.00  2021-09-14
+	-  Return API
+
+0.15  2021-06-21
+	- fix compressed for identity
+
+0.14  2021-06-14
+	- compressed
+	- fix POD
+
+0.13  2021-06-10
+    - deflate
+
+0.12  2021-01-11
+	- fix eval for curl perform
+	- remove bad fix for bad server headers
+
+0.11  2019-11-04
+	- fix for on_body when reuse curl_easy
+
+0.10  2018-11-14
+	- HTTP/2 for curl
+
+0.09  2018-11-10
+	- Protocol
+
+0.08  2017-05-16
+	- max_redirect
+
+0.07  2016-03-17
+	- socks proxy support
+
+0.06  2016-01-28
+	- Curl: Reason is finish's "$result" on error
+	- Curl: CURLOPT_MAXREDIRS is 10
+
+0.05.1  2015-09-04
+	- fix Makefile.PL
+
+0.05  2015-08-24
+	- fix for MaxSize and Timeout
+
+0.04  2015-04-03
+	- CODE ref as body for POST request
+
+0.03  2015-01-23
+	- fix for max_size with redirect
+
+0.02  2014-12-xx
+	- on_header and on_body callbacks
+	- only gzip
+
+0.01  2013-08-12
+	- original version

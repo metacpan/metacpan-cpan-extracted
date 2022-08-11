@@ -1,6 +1,6 @@
-use 5.014;
+package main;
 
-use lib 't/lib';
+use 5.018;
 
 use strict;
 use warnings;
@@ -8,29 +8,54 @@ use warnings;
 use Test::Auto;
 use Test::More;
 
+my $test = test(__FILE__);
+
 =name
 
 Test::Auto
+
+=cut
+
+$test->for('name');
+
+=version
+
+0.13
+
+=cut
+
+$test->for('version');
 
 =tagline
 
 Test Automation
 
+=cut
+
+$test->for('tagline');
+
 =abstract
 
-Test Automation, Docs Generation
+Test Automation for Perl 5
+
+=cut
+
+$test->for('abstract');
 
 =includes
 
-function: testauto
+function: test
+method:data
+method: for
+method: render
 
-method: document
-method: parser
-method: subtests
+=cut
+
+$test->for('includes');
 
 =synopsis
 
-  #!/usr/bin/env perl
+  package main;
 
   use Test::Auto;
   use Test::More;
@@ -39,13 +64,40 @@ method: subtests
     't/Test_Auto.t'
   );
 
-  # automation
+  # =synopsis
+  #
+  # use Path::Find 'path';
+  #
+  # my $path = path; # get path using cwd
+  #
+  # =cut
 
-  # my $subtests = $test->subtests->standard;
+  # $test->for('synopsis', sub {
+  #   my ($tryable) = @_;
+  #   ok my $result = $tryable->result;
+  #
+  #   # more test for the synopsis ...
+  #
+  #   $result
+  # });
 
   # ...
 
-  # done_testing;
+  # $test->render('lib/Path/Find.pod');
+
+  # done_testing
+
+=cut
+
+$test->for('synopsis', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Test::Auto');
+  ok $result->isa('Venus::Test');
+  ok $result->value eq 't/Test_Auto.t';
+
+  $result
+});
 
 =description
 
@@ -53,109 +105,88 @@ This package aims to provide, a standard for documenting Perl 5 software
 projects, a framework writing tests, test automation, and documentation
 generation.
 
-=scenario exports
-
-This package automatically exports the C<testauto> function which uses the
-"current file" as the automated testing source.
-
-=example exports
-
-  use Test::Auto;
-  use Test::More;
-
-  my $subtests = testauto 't/Test_Auto.t';
-
-  # automation
-
-  # $subtests->standard;
++=head1 AUTOMATION
 
   # ...
 
-  # done_testing;
+  $test->for('name');
 
-=headers
+This framework provides a set of automated subtests based on the package
+specification, but not everything can be automated so it also provides you with
+powerful hooks into the framework for manual testing.
 
-+=head1 REASONING
+  # ...
 
-This framework lets you write documentation in test files using pod-like
-comment blocks. By using a particular set of comment blocks (the specification)
-this framework can run certain kinds of tests automatically. For example, we
-can automatically ensure that the package the test is associated with is
-loadable, that the test file comment blocks meet the specification, that any
-super-classes or libraries are loadable, and that the functions, methods, and
-routines are properly documented.
+  $test->for('synopsis', sub {
+    my ($tryable) = @_;
 
-+=cut
+    ok my $result = $tryable->result, 'result ok';
 
-=libraries
+    # must return truthy to cont
+    $result;
+  });
 
-Test::Auto::Types
+The code examples documented can be automatically evaluated (evaled) and
+returned using a callback you provide for further testing. Because the code
+examples are returned as L<Venus::Try> objects this makes capturing and testing
+exceptions simple, for example:
 
-=attributes
+  # ...
 
-file: ro, req, Str
-data: ro, opt, Data
+  $test->for('synopsis', sub {
+    my ($tryable) = @_;
 
-=function testauto
+    # catch exception thrown by the synopsis
+    $tryable->catch('Path::Find::Error', sub {
+      return $_[0];
+    });
 
-This function is exported automatically and returns a L<Test::Auto::Subtests>
-object for the test file given.
+    # test the exception
+    ok my $result = $tryable->result, 'result ok';
+    ok $result->isa('Path::Find::Error'), 'exception caught';
 
-=signature testauto
+    # must return truthy to cont
+    $result;
+  });
 
-testauto(Str $file) : Subtests
+Additionally, another manual testing hook (with some automation) is the
+C<example> method. This hook evaluates (evals) a given example and returns the
+result as a L<Venus::Try> object. The first argument is the example ID (or
+  number), for example:
 
-=example-1 testauto
+  # ...
 
-  # given: synopsis
+  $test->for('example', 1, 'children', sub {
+    my ($tryable) = @_;
 
-  my $subtests = testauto 't/Test_Auto.t';
+    ok my $result = $tryable->result, 'result ok';
 
-=method document
+    # must return truthy to cont
+    $result;
+  });
 
-This method returns a L<Test::Auto::Document> object.
+Finally, the lesser-used but useful manual testing hook is the C<feature>
+method. This hook evaluates (evals) a documented feature and returns the result
+as a L<Venus::Try> object, for example:
 
-=signature document
+  # ...
 
-document() : Document
+  $test->for('feature', 'export-path-make', sub {
+    my ($tryable) = @_;
 
-=example-1 document
+    ok my $result = $tryable->result, 'result ok';
 
-  # given: synopsis
+    # must return truthy to cont
+    $result;
+  });
 
-  my $document = $test->document;
-
-=method parser
-
-This method returns a L<Test::Auto::Parser> object.
-
-=signature parser
-
-parser() : Parser
-
-=example-1 parser
-
-  # given: synopsis
-
-  my $parser = $test->parser;
-
-=method subtests
-
-This method returns a L<Test::Auto::Subtests> object.
-
-=signature subtests
-
-subtests() : Subtests
-
-=example-1 subtests
-
-  # given: synopsis
-
-  my $subtests = $test->subtests;
-
-=footers
+The test automation and documentation generation enabled through this framework
+makes it easy to maintain source/test/documentation parity. This also increases
+reusability and reduces the need for complicated state and test setup.
 
 +=head1 SPECIFICATION
+
+  # Since 0.13
 
   # [required]
 
@@ -171,12 +202,17 @@ subtests() : Subtests
   =libraries
   =inherits
   =integrates
-  =attributes
 
   # [repeatable; optional]
 
-  =scenario $name
+  =feature $name
   =example $name
+
+  # [repeatable; optional]
+
+  =attribute $name
+  =signature $name
+  =example-$number $name # [repeatable]
 
   # [repeatable; optional]
 
@@ -196,18 +232,9 @@ subtests() : Subtests
   =signature $name
   =example-$number $name # [repeatable]
 
-  # [repeatable; optional]
-
-  =type $name
-  =type-library $name
-  =type-composite $name # [optional]
-  =type-parent $name # [optional]
-  =type-coercion-$number $name # [optional]
-  =type-example-$number $name # [repeatable]
-
 The specification is designed to accommodate typical package declarations. It
-is used by the parser to provide the content used in the test automation and
-document generation. Note: when code blocks are evaluated I<"redefined">
+is used by the parser to provide the content used in test automation and
+document generation. B<Note:> When code blocks are evaluated I<"redefined">
 warnings are now automatically disabled.
 
 +=head2 name
@@ -257,7 +284,9 @@ tested for existence.
 The C<includes> block should contain a list of C<function>, C<method>, and/or
 C<routine> names in the format of C<$type: $name>. Empty lines are ignored.
 This is tested for existence. Each function, method, and/or routine is tested
-to be documented properly. Also, the package must recognize that each exists.
+to be documented properly, i.e. has the requisite counterparts (e.g. signature
+and at least one example block). Also, the package must recognize that each
+exists.
 
 +=head2 synopsis
 
@@ -321,9 +350,9 @@ are tested for loadability.
 The C<integrates> block should contain a list of packages that are involved in
 the behavior of the main package. These packages are not automatically tested.
 
-+=head2 scenarios
++=head2 features
 
-  =scenario export-path-make
+  =feature export-path-make
 
   quisque egestas diam in arcu cursus euismod quis viverra nibh
 
@@ -342,30 +371,52 @@ the behavior of the main package. These packages are not automatically tested.
 
 There are situation where a package can be configured in different ways,
 especially where it exists without functions, methods or routines for the
-purpose of configuring the environment. The scenario directive can be used to
-automate testing and documenting package usages and configurations.Describing a
-scenario requires two blocks, i.e. C<scenario $name> and C<example $name>. The
-C<scenario> block should contain a description of the scenario and its purpose.
-The C<example> block must exist when documenting a method and should contain
+purpose of configuring the environment. The feature directive can be used to
+automate testing and documenting package usages and configurations. Describing
+a feature requires two blocks, i.e. C<feature $name> and C<example $name>. The
+C<feature> block should contain a description of the feature and its purpose.
+The C<example> block must exist when documenting a feature and should contain
 valid Perl code and return a value. The block may contain a "magic" comment in
 the form of C<given: synopsis> or C<given: example $name> which if present will
 include the given code example(s) with the evaluation of the current block.
-Each scenario is tested and must be recognized to exist by the main package.
+Each feature is tested and must be recognized to exist by the main package.
 
 +=head2 attributes
 
-  =attributes
+  =attribute cwd
 
-  cwd: ro, req, Object
+  quis viverra nibh cras pulvinar mattis nunc sed blandit libero volutpat
+
+  =signature cwd
+
+  cwd(Str $path) : (Object)
+
+  =example-1 cwd
+
+  # given: synopsis
+
+  my $cwd = $path->cwd;
+
+  =example-2 cwd
+
+  # given: synopsis
+
+  my $cwd = $path->cwd('/path/to/file');
 
   =cut
 
-The C<attributes> block should contain a list of package attributes in the form
-of C<$name: $is, $presence, $type>, where C<$is> should be C<ro> (read-only) or
-C<rw> (read-wire), and C<$presence> should be C<req> (required) or C<opt>
-(optional), and C<$type> can be any valid L<Type::Tiny> expression. Each
-attribute declaration must be recognized to exist by the main package and have
-a type which is recognized by one of the declared type libraries.
+Describing an attribute requires at least three blocks, i.e. C<attribute
+$name>, C<signature $name>, and C<example-1 $name>. The C<attribute> block
+should contain a description of the attribute and its purpose. The C<signature>
+block should contain a routine signature in the form of C<$signature :
+$return_type>, where C<$signature> is a valid typed signature and
+C<$return_type> is any valid L<Type::Tiny> expression. The C<example-$number>
+block is a repeatable block, and at least one block must exist when documenting
+an attribute. The C<example-$number> block should contain valid Perl code and
+return a value. The block may contain a "magic" comment in the form of C<given:
+synopsis> or C<given: example-$number $name> which if present will include the
+given code example(s) with the evaluation of the current block. Each attribute
+is tested and must be recognized to exist by the main package.
 
 +=head2 methods
 
@@ -479,198 +530,233 @@ present will include the given code example(s) with the evaluation of the
 current block. Each routine is tested and must be recognized to exist by the
 main package.
 
-+=head2 types
+=cut
 
-  =type Path
+$test->for('description');
 
-    Path
+=inherits
 
-  =type-parent Path
-
-    Object
-
-  =type-library Path
-
-  Path::Types
-
-  =type-composite Path
-
-    InstanceOf["Path::Find"]
-
-  =type-coercion-1 Path
-
-    # can coerce from Str
-
-    './path/to/file'
-
-  =type-example-1 Path
-
-    require Path::Find;
-
-    Path::Find::path('./path/to/file')
-
-  =cut
-
-When developing Perl programs, or type libraries, that use L<Type::Tiny> based
-type constraints, testing and documenting custom type constraints is often
-overlooked. Describing a custom type constraint requires at least two blocks,
-i.e. C<type $name> and C<type-library $name>. While it's not strictly required,
-it's a good idea to also include at least one C<type-example-1 $name>. The
-optional C<type-parent> block should contain the name of the parent type. The
-C<type-composite> block should contain a type expression that represents the
-derived type. The C<type-coercion-$number> block is a repeatable block which
-is used to validate type coercion. The C<type-coercion-$number> block should
-contain valid Perl code and return the value to be coerced. The
-C<type-example-$number> block is a repeatable block, and it's a good idea to
-have at least one block must exist when documenting a type. The
-C<type-example-$number> block should contain valid Perl code and return a
-value. Each type is tested and must be recognized to exist within the package
-specified by the C<type-library> block.
-
-+=head1 AUTOMATION
-
-  $test->standard;
-
-This is the equivalent of writing:
-
-  $test->package;
-  $test->document;
-  $test->libraries;
-  $test->inherits;
-  $test->attributes;
-  $test->methods;
-  $test->routines;
-  $test->functions;
-  $test->types;
-
-This framework provides a set of automated subtests based on the package
-specification, but not everything can be automated so it also provides you with
-powerful hooks into the framework for manual testing.
-
-  my $subtests = $test->subtests;
-
-  $subtests->synopsis(sub {
-    my ($tryable) = @_;
-
-    ok my $result = $tryable->result, 'result ok';
-
-    $result; # for automated testing after the callback
-  });
-
-The code examples documented can be automatically evaluated (evaled) and
-returned using a callback you provide for further testing. Because the code
-examples are returned as C<Test::Auto::Try> objects (see L<Data::Object::Try>),
-this makes capturing and testing exceptions simple, for example:
-
-  my $subtests = $test->subtests;
-
-  $subtests->synopsis(sub {
-    my ($tryable) = @_;
-
-    # catch exception thrown by the synopsis
-    $tryable->catch('Path::Find::Error', sub {
-      return $_[0];
-    });
-    # test the exception
-    ok my $result = $tryable->result, 'result ok';
-    ok $result->isa('Path::Find::Error'), 'exception caught';
-
-    $result;
-  });
-
-Additionally, another manual testing hook (with some automation) is the
-C<example> method. This hook evaluates (evals) a given example and returns the
-result as a C<Test::Auto::Try> object (see L<Data::Object::Try>). The first
-argument is the example ID (or number), for example:
-
-  my $subtests = $test->subtests;
-
-  $subtests->example(-1, 'children', 'method', sub {
-    my ($tryable) = @_;
-
-    ok my $result = $tryable->result, 'result ok';
-
-    $result; # for automated testing after the callback
-  });
-
-Finally, the lesser-used but useful manual testing hook is the C<scenario>
-method. This hook evaluates (evals) a documented scenario and returns the
-result as a C<Test::Auto::Try> object (see L<Data::Object::Try>), for example:
-
-  my $subtests = $test->subtests;
-
-  $subtests->scenario('export-path-make', sub {
-    my ($tryable) = @_;
-
-    ok my $result = $tryable->result, 'result ok';
-
-    $result; # for automated testing after the callback
-  });
-
-The test automation and document generation enabled through this framework
-makes it easy to maintain source/test/documentation parity. This also
-increases reusability and reduces the need for complicated state and test setup.
-
-+=cut
+Venus::Test
 
 =cut
 
-package main;
+$test->for('inherits');
 
-my $subs = testauto(__FILE__);
+=function test
 
-$subs = $subs->standard;
+The test function takes a file path and returns a L<Test::Auto> object for use
+in test automation and documentation rendering. This function is exported
+automatically unless a routine of the same name already exists in the calling
+package.
 
-$subs->plugin('ShortDescription')->tests;
+=signature test
 
-$subs->synopsis(sub {
+  test(Str $file) (Auto)
+
+=metadata test
+
+{
+  since => '0.13',
+}
+
+=example-1 test
+
+  # given: synopsis
+
+  $test = test('t/Test_Auto.t');
+
+  # =synopsis
+  #
+  # use Path::Find 'path';
+  #
+  # my $path = path; # get path using cwd
+  #
+  # =cut
+
+  # $test->for('synopsis', sub {
+  #   my ($tryable) = @_;
+  #   ok my $result = $tryable->result;
+  #
+  #   # more test for the synopsis ...
+  #
+  #   $result
+  # });
+
+  # ...
+
+  # $test->render('lib/Path/Find.pod');
+
+  # done_testing
+
+=cut
+
+$test->for('example', 1, 'test', sub {
   my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Test::Auto');
+  ok $result->isa('Venus::Test');
+  ok $result->value eq 't/Test_Auto.t';
 
-  ok my $result = $tryable->result, 'result ok';
-  is ref($result), 'Test::Auto', 'isa ok';
-
-  $result;
+  $result
 });
 
-$subs->scenario('exports', sub {
+=method data
+
+The data method attempts to find and return the POD content based on the name
+provided. If the content cannot be found an exception is raised.
+
+=signature data
+
+  data(Str $name, Any @args) (Str)
+
+=metadata data
+
+{
+  since => '0.13',
+}
+
+=example-1 data
+
+  # given: synopsis
+
+  my $data = $test->data('name');
+
+  # Test::Auto
+
+=cut
+
+$test->for('example', 1, 'data', sub {
   my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq 'Test::Auto';
 
-  ok my $result = $tryable->result, 'result ok';
-
-  $result;
+  $result
 });
 
-$subs->example(-1, 'testauto', 'function', sub {
+=example-2 data
+
+  # given: synopsis
+
+  my $data = $test->data('unknown');
+
+  # Exception! isa (Test::Auto::Error)
+
+=cut
+
+$test->for('example', 2, 'data', sub {
   my ($tryable) = @_;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error;
+  ok $error->isa('Test::Auto::Error');
 
-  ok my $result = $tryable->result, 'result ok';
-  isa_ok $result, 'Test::Auto::Subtests';
-
-  $result;
+  $result
 });
 
-$subs->example(-1, 'document', 'method', sub {
+=method for
+
+The for method attempts to find the POD content based on the name provided and
+executes the corresponding predefined test, optionally accepting a callback
+which, if provided, will be passes a L<Venus::Try> object containing the
+POD-driven test. The callback, if provided, must always return a true value.
+B<Note:> All automated tests disable the I<"redefine"> class of warnings to
+prevent warnings when redeclaring packages in examples.
+
+=signature for
+
+  for(Str $name | CodeRef $code, Any @args) (Any)
+
+=metadata for
+
+{
+  since => '0.13',
+}
+
+=example-1 for
+
+  # given: synopsis
+
+  my $data = $test->for('name');
+
+  # Test::Auto
+
+=cut
+
+=example-2 for
+
+  # given: synopsis
+
+  my $data = $test->for('synosis');
+
+  # bless({value => 't/Test_Auto.t'}, 'Test::Auto')
+
+=cut
+
+=example-3 for
+
+  # given: synopsis
+
+  my $data = $test->for('example', 1, 'data', sub {
+    my ($tryable) = @_;
+    my $result = $tryable->result;
+    ok length($result) > 1;
+
+    $result
+  });
+
+  # Test::Auto
+
+=cut
+
+$test->for('example', 3, 'for', sub {
   my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "Test::Auto";
 
-  ok my $result = $tryable->result, 'result ok';
-
-  $result;
+  $result
 });
 
-$subs->example(-1, 'parser', 'method', sub {
+=method render
+
+The render method renders and writes a valid POD document, and returns a
+L<Venus::Path> object representation the POD file specified.
+
+=signature render
+
+  render(Str $file) (Path)
+
+=metadata render
+
+{
+  since => '0.13',
+}
+
+=example-1 render
+
+  # given: synopsis
+
+  my $path = $test->render('t/Path_Find.pod');
+
+  # bless({value => 't/Path_Find.pod', 'Venus::Path'})
+
+=cut
+
+$test->for('example', 1, 'render', sub {
   my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Path');
+  $result->unlink;
 
-  ok my $result = $tryable->result, 'result ok';
-
-  $result;
+  $result
 });
 
-$subs->example(-1, 'subtests', 'method', sub {
-  my ($tryable) = @_;
+=authors
 
-  ok my $result = $tryable->result, 'result ok';
+Awncorp, C<awncorp@cpan.org>
 
-  $result;
-});
+=cut
+
+# END
+
+$test->render('lib/Test/Auto.pod') if $ENV{RENDER};
 
 ok 1 and done_testing;

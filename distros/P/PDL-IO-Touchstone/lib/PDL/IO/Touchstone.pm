@@ -20,7 +20,7 @@
 #  respective owners and no grant or license is provided thereof.
 
 package PDL::IO::Touchstone;
-$VERSION = 1.001;
+$VERSION = 1.005;
 
 use 5.010;
 use strict;
@@ -29,13 +29,30 @@ use warnings;
 use Carp;
 
 use PDL;
-use PDL::Ops;
+use PDL::LinearAlgebra;
 use PDL::Constants qw(PI);
+
+use constant RAD2DEG => 180/PI;
+use constant DEG2RAD => PI/180;
 
 BEGIN {  
 	use Exporter;
 	our @ISA = ( @ISA, qw(Exporter) );
 	our @EXPORT = qw/rsnp wsnp/;
+	our @EXPORT_OK = qw/
+		n_ports
+
+		s_to_y
+		y_to_s
+
+		s_to_z
+		z_to_s
+
+		s_to_abcd
+		abcd_to_s
+
+		s_port_z
+		/;
 }
 
 sub rsnp
@@ -54,8 +71,6 @@ sub rsnp
 
 	my $n = 0;
 	my $line;
-
-	my $hz;
 
 	# start at -1 because it increments when a frequency is found.
 	my $row_idx = -1;
@@ -129,8 +144,8 @@ sub rsnp
 				}
 			}
 
-			$hz = shift(@params);
-			$f[$row_idx] = $hz;
+			# Read the frequency off the front.
+			$f[$row_idx] = shift(@params);
 			$col_idx=0;
 		}
 
@@ -167,19 +182,9 @@ sub rsnp
 
 	my $m = _cols_to_matrix($fmt, \@cols);
 
-	my $f = pdl \@f;
+	my $funit = $args->{units} || 'Hz';
+	my $f = _si_scale_hz($orig_funit, $funit, pdl \@f);
 
-	my $funit;
-	if ($args->{units})
-	{
-		$funit = $args->{units};
-	}
-	else
-	{
-		$funit = 'Hz'
-	}
-
-	$f = _si_scale_hz($orig_funit, $funit, $f);
 	return ($f, $m, $param_type, $z0, $comments, $fmt, $funit, $orig_funit);
 }
 
@@ -203,7 +208,7 @@ sub wsnp_fh
 {
 	my ($fd, $f, $m, $param_type, $z0, $comments, $fmt, $from_hz, $to_hz) = @_;
 
-	my ($n_ports) = $m->index(0)->dims;
+	my $n_ports = n_ports($m);
 	my $n_freqs = $f->nelem;
 
 	# Assume $f frequencies are in Hz if from_hz is not defined
@@ -221,27 +226,31 @@ sub wsnp_fh
 	# $d is arranged so real and imag parts can be separated into their own
 	# columns with clump() for writing to the sNp file:
 	my $d = $m->dummy(0,1);
+	
+
+	# $real and $imag are the real and imag parts:
+	my ($real, $imag);
 	if ($fmt eq 'ri')
 	{
-		$a = $d->re;
-		$b = $d->im;
+		$real = $d->re;
+		$imag = $d->im;
 	}
 	elsif ($fmt eq 'ma')
 	{
-		$a = $d->abs;
-		$b = $d->carg * 180 / PI;
+		$real = $d->abs;
+		$imag = $d->carg * RAD2DEG;
 	}
 	elsif ($fmt eq 'db')
 	{
-		$a = 20*log($d->abs)/log(10);
-		$b = $d->carg * 180 / PI;
+		$real = 20*log($d->abs)/log(10);
+		$imag = $d->carg * RAD2DEG;
 	}
 
 	# Prepare real/imag values for interleaving:
-	my $ab = $a->append($b);
+	my $ri = $real->append($imag);
 
 	# Create one row per frequency: (n_ports*2, n_freqs):
-	my $out = $ab->clump(0..2);
+	my $out = $ri->clump(0..2);
 
 	# Scale the input/output frequency:
 	$f = _si_scale_hz($from_hz, $to_hz, $f);
@@ -312,20 +321,20 @@ sub _cols_to_matrix
 
 	foreach my $c (@$cols)
 	{
-		my $a = $c->[0];
-		my $b = $c->[1];
+		my $r = $c->[0];
+		my $i = $c->[1];
 		if ($fmt eq 'ri')
 		{
-			push @cx, $a + $b*i();
+			push @cx, $r + $i*i();
 		}
 		elsif ($fmt eq 'ma')
 		{
-			push @cx, $a*exp(i()*$b*PI()/180);
+			push @cx, $r*exp(i()*$i*DEG2RAD);
 		}
 		elsif ($fmt eq 'db')
 		{
-			my $a = 10**($a/20);
-			push @cx, $a*exp(i()*$b*PI()/180);
+			my $r = 10**($r/20);
+			push @cx, $r*exp(i()*$i*DEG2RAD);
 		}
 		else
 		{
@@ -360,13 +369,344 @@ sub _si_scale_hz
 	return $n*$fscale;
 }
 
+# http://qucs.sourceforge.net/tech/node98.html
+sub s_to_y
+{
+	my ($S, $z0) = @_;
+
+	my $n_ports = n_ports($S);
+
+	$z0 = pdl $z0 if (!ref($z0));
+
+	my $Z_ref = _to_diagonal($z0, $n_ports);
+	my $G_ref = _to_diagonal(1/sqrt($z0->re), $n_ports);
+	my $E = identity($n_ports);
+
+	my $Y = $G_ref->minv x ($S x $Z_ref + $Z_ref)->minv x ($E-$S) x $G_ref;
+
+	# Alternate conversion, not sure which is faster, both have the same
+	# number of matrix multiplications:
+	#my $Y = $G_ref->minv x $Z_ref->minv x ($S + $E)->minv x ($E-$S) x $G_ref;
+	#my $Y = $G_ref->minv x $Z_ref->minv x ($E-$S) x ($S + $E)->minv x $G_ref;
+
+	return $Y;
+}
+
+sub y_to_s
+{
+	my ($Y, $z0) = @_;
+
+	my $n_ports = n_ports($Y);
+
+	$z0 = pdl $z0 if (!ref($z0));
+
+	my $Z_ref = _to_diagonal($z0, $n_ports);
+	my $G_ref = _to_diagonal(1/sqrt($z0->re), $n_ports);
+	my $E = identity($n_ports);
+
+	my $S = $G_ref  x  ($E - $Z_ref  x  $Y)  x  ($E + $Z_ref  x  $Y)->minv()  x  $G_ref->minv();
+
+	return $S;
+}
+
+# This could result in singularities:
+sub s_to_z
+{
+	my ($S, $z0) = @_;
+
+	# This tries to avoid a singularity, but not so successfully.
+	#my $Y = s_to_y($S, $z0);
+	#my $Z;
+	#eval {$Z = $Y->minv };
+	#return $Z;
+
+	my $n_ports = n_ports($S);
+
+	$z0 = pdl $z0 if (!ref($z0));
+
+	my $Z_ref = _to_diagonal($z0, $n_ports);
+	my $G_ref = _to_diagonal(1/sqrt($z0->re), $n_ports);
+	my $E = identity($n_ports);
+
+	# These are equivalent, the second one has a smaller error:
+	#my $Z = $G_ref->minv() x ($E - $S)->minv x ($S x $Z_ref + $Z_ref) x $G_ref;
+	my $Z = $G_ref->minv() x ($E - $S)->minv x ($S + $E) x $Z_ref x $G_ref;
+
+	return $Z;
+}
+
+sub z_to_s
+{
+	my ($Z, $z0) = @_;
+
+	my $n_ports = n_ports($Z);
+
+	$z0 = pdl $z0 if (!ref($z0));
+
+	my $Z_ref = _to_diagonal($z0, $n_ports);
+	my $G_ref = _to_diagonal(1/sqrt($z0->re), $n_ports);
+	my $E = identity($n_ports);
+
+	my $S = $G_ref x ($Z - $Z_ref) x ($Z + $Z_ref)->minv x $G_ref->minv;
+	return $S;
+
+	# This is equivalent but can result in singularities:
+	# minv needs scalar context for return, so assign temp value
+	# for clarity as to what is happening:
+	#my $Y = $Z->minv;
+	#return y_to_s($Y, $z0);
+}
+
+sub s_to_abcd
+{
+	my ($S, $z0) = @_;
+
+	my $n_ports = n_ports($S);
+
+	croak "A-matrix transforms only work with 2-port matrices" if $n_ports != 2;
+
+	# We don't really need it diagonal, but it makes the call compatable with other
+	# conversions if the caller has different impedances per port:
+	my $Z_ref = _to_diagonal($z0, $n_ports);
+	my $z01 = $Z_ref->slice(0,0)->reshape(1);
+	my $z02 = $Z_ref->slice(1,1)->reshape(1);
+
+	$z01 = pdl($z01) if (!ref($z01));
+	$z02 //= $z01;
+	$z02 = pdl($z02) if (!ref($z02));
+
+	my $z01_conj = $z01->conj;
+	my $z02_conj = $z02->conj;
+
+	my ($S11, $S12, $S21, $S22) = _m_to_pos_vecs($S);
+
+	# https://www.researchgate.net/publication/3118645
+	# "Conversions Between S, Z, Y, h, ABCD, and T Parameters
+	#   which are Valid for Complex Source and Load Impedances"
+	# March 1994 IEEE Transactions on Microwave Theory and Techniques 42(2):205 - 211
+	return _pos_vecs_to_m(
+			# A
+			(($z01_conj + $S11*$z01) * (1 - $S22) + $S12*$S21*$z01)
+				/ # over
+			(2*$S21*sqrt($z01->re * $z02->re)),
+
+			# B
+			(($z01_conj + $S11*$z01)*($z02_conj+$S22*$z02) - $S12*$S21*$z01*$z02)
+				/ # over
+			(2*$S21*sqrt($z01->re * $z02->re)),
+
+			# C
+			(( 1 - $S11 )*( 1 - $S22 ) - $S12*$S21)
+				/ # over
+			(2*$S21*sqrt($z01->re * $z02->re)),
+
+			# D
+			((1-$S11)*($z02_conj+$S22*$z02) + $S12*$S21*$z02)
+				/ # over
+			(2*$S21*sqrt($z01->re * $z02->re)),
+		);
+}
+
+sub abcd_to_s
+{
+	my ($ABCD, $z0) = @_;
+
+	my $n_ports = n_ports($ABCD);
+
+	croak "A-matrix transforms only work with 2-port matrices" if $n_ports != 2;
+
+	# We don't really need it diagonal, but it makes the call compatable with other
+	# conversions if the caller has different impedances per port:
+	my $Z_ref = _to_diagonal($z0, $n_ports);
+	my $z01 = $Z_ref->slice(0,0)->reshape(1);
+	my $z02 = $Z_ref->slice(1,1)->reshape(1);
+
+	my $z01_conj = $z01->conj;
+	my $z02_conj = $z02->conj;
+
+	my ($A, $B, $C, $D) = _m_to_pos_vecs($ABCD);
+
+	return _pos_vecs_to_m(
+			# S11
+			($A*$z02 + $B - $C*$z01_conj*$z02 - $D*$z01_conj)
+				/ # over
+			($A*$z02 + $B + $C*$z01*$z02 + $D*$z01),
+
+			# S12
+			(2*($A*$D-$B*$C)*sqrt($z01->re * $z02->re))
+				/ # over
+			($A*$z02 + $B + $C*$z01*$z02 + $D*$z01),
+
+			# S21
+			(2*sqrt($z01->re * $z02->re))
+				/ # over
+			($A*$z02 + $B + $C*$z01*$z02 + $D*$z01),
+
+			# S22
+			(-$A*$z02_conj + $B - $C*$z01*$z02_conj + $D*$z01)
+				/ # over
+			($A*$z02 + $B + $C*$z01*$z02 + $D*$z01)
+		);
+}
+
+###############################################################################
+#                                                      S-Parameter Calculations
+
+# Return the complex port impedance vector for all frequencies given:
+#   - $S: S paramter matrix
+#   - $z0: vector impedances at each port
+#   - $port: the port we want.
+#
+# In a 2-port, this will provide the input or output impedance as follows:
+#   $z_in  = s_port_z($S, 50, 1);
+#   $z_out = s_port_z($S, 50, 2);
+sub s_port_z
+{
+	my ($S, $z0, $port) = @_;
+
+	my $n_ports = n_ports($S);
+
+	$z0 = _to_diagonal($z0, $n_ports);
+
+	my $z_port = _pos_vec($z0, $port, $port);
+	my $s_port = _pos_vec($S, $port, $port);
+
+	return $z_port * ( (1+$s_port) / (1-$s_port) );
+}
+
+# Return the number of ports in an (N,N,M) matrix where N is the port 
+# count and M is the number of frequencies.
+sub n_ports
+{
+	my $m = shift;
+
+	my @dims = $m->slice(':,:,0')->dims;
+
+	croak "matrix must be square $m" if ($dims[0] != $dims[1]);
+
+	return $dims[0];
+}
+
+# Return the number of measurements in the n,n,m pdl:
+# This value will be equal to the number of frequencies:
+sub _n_meas
+{
+	my $m = shift;
+
+	my @dims = $m->dims;
+
+	croak "matrix must be square $m" if ($dims[0] != $dims[1]);
+	croak "matrix must have a 3rd dimension" if @dims < 3;
+
+	return $dims[2];
+}
+
+# Converts a NxNxM pdl where M is the number of frequency samples to a
+# N^2-length list of M-sized vectors, each representing a row-ordered position
+# in the NxN matrix.  ROW ORDERED!
+#
+# This enables mutiplying vector positions for things like 2-port S-to-T
+# conversion.
+#
+# For example:
+# 	my ($S11, $S12, $S21, $S22) = _m_to_pos_vecs($S)
+#
+# 	$T11 = -$S->det / $S21
+# 	$T12 = ...
+# 	$T21 = ...
+# 	$T22 = ...
+#
+sub _m_to_pos_vecs
+{
+	my $m = shift;
+
+	return $m->dummy(0,1)->clump(0..2)->transpose->dog;
+}
+
+# inverse of _m_to_pos_vecs:
+# 	$m = _pos_vecs_to_m(_m_to_pos_vecs($m))
+#
+# for example, re-compose $T from the above:
+# 	$T = _pos_vecs_to_m($T11, $T12, $T21, $T22)
+sub _pos_vecs_to_m
+{
+	my @veclist = @_;
+	my $n = sqrt(scalar(@veclist));
+	my ($m) = $veclist[0]->dims;
+
+	return cat(@veclist)->transpose->reshape($n,$n,$m)
+}
+
+# Return the position vector at (i,j).
+# Note that i,j start at 1 so this is the first element:
+# 	$s11 = _pos_vec($S, 1, 1)
+sub _pos_vec
+{
+	my ($m, $i, $j) = @_;
+
+	my $n_ports = n_ports($m);
+
+	croak "position indexes start at 1: i=$i j=$j" if $i < 1 || $j < 1;
+	croak "requested position index than the matrix: i=$i > $n_ports" if ($i> $n_ports);
+	croak "requested position index than the matrix: j=$j > $n_ports" if ($j> $n_ports);
+
+	my @pos_vecs = _m_to_pos_vecs($m);
+
+	# Expect port numbers like (1,1) or (2,1) but perl expects indexes at 0:
+	$i--;
+	$j--;
+
+	return $pos_vecs[$i * $n_ports + $j];
+}
+
+# Create a diagonal matrix of size n from a scalar or vector $v.
+#
+# For example, $v can represent charectaristic impedance at each port either as:
+#   * a perl scalar value
+#   * a 0-dim pdl like pdl( 5+2*i() )
+#   * a 1-dim single-element pdl like pdl( [5+2*i()] )
+#   * a 1-dim pdl representing the charectaristic impedance at each port
+#
+# In any case, the return value is an (N,N) pdl whith charectaristic impedances
+# for each port along the diagonal:
+#   [50  0]
+#   [ 0 50]
+sub _to_diagonal
+{
+	my ($v, $n_ports) = @_;
+
+	my $ret;
+
+	$v = pdl $v if (!ref($v));
+
+	croak "v must be a PDL or scalar" if (ref($v) ne 'PDL');
+
+	my @dims = $v->dims;
+
+	if (!@dims || (@dims == 1 && $dims[0] == 1))
+	{
+		$ret = zeroes($n_ports,$n_ports);
+		$ret->diagonal(0,1) .= $v;
+	}
+	elsif (@dims == 1 && $dims[0] == $n_ports)
+	{
+		$ret = stretcher($v);
+	}
+	else
+	{
+		croak "\$v must be either a scalar or vector of size $n_ports: $v"
+	}
+
+	return $ret;
+}
+
 1;
 
 __END__
 
 =head1 NAME
 
-PDL::IO::Touchstone 
+PDL::IO::Touchstone - Read and manipulate Touchstone .s2p (and .sNp) files.
 
 =head1 DESCRIPTION
 
@@ -408,10 +748,11 @@ C<$fmt> and C<$to_hz> fields when writing:
 
 Note that you may change neither C<$param_type> nor C<$z0> unless you have done
 your own matrix transform from one parameter type (or impedance) to another.
-This is because while C<PDL::IO::Touchstone> knows how to convert between RA,
+This is because while C<wsnp> knows how to convert between RA,
 MA, and DB formats, it does not manipulate the matrix to convert between
-parameter types (or impedances).
+parameter types (or impedances).  Use the C<P_to_Q()> functions below to transform between matrix types.
 
+=head1 IO Functions
 
 =head2 C<rsnp($filename, $options)> - Read touchstone file
 
@@ -437,7 +778,7 @@ utilize the data loaded by C<rsnp()>:
 
 =over 4
 
-=item * C<$f> - A (M,1) vector piddle of input frequencies where C<M> is the
+=item * C<$f> - A (M) vector piddle of input frequencies where C<M> is the
 number of frequencies.
 
 =item * C<$m> - A (N,N,M) piddle of X-parameter matrices where C<N> is the number
@@ -529,17 +870,147 @@ Internally C<wsnp()> uses C<wsnp_fh()> and C<wsnp_fh()> can be useful for
 building MDF files, however MDF files are much more complicated and outside of
 this module's scope.  Consult the L</"SEE ALSO"> section for more about MDFs and optimizing circuits.
 
+=head1 S-Parameter Conversion Functions
+
+=over 4
+
+=item * Each matrix below is in the (N,N,M) format where N is the number of ports and M
+is the number of frequencies.
+
+=item * The value of C<$z0> in the conversion functions may be complex-valued and
+is represented as either:
+
+=over 4
+
+=item - A perl scalar value: all ports have same impedance
+
+=item - A 0-dim pdl like pdl( 5+2*i() ): all ports have same impedance
+
+=item - A 1-dim single-element pdl like pdl( [5+2*i()] ): all ports have same impedance
+
+=item - A 1-dim pdl representing the charectaristic impedance at each port: ports may have different impedances
+
+=back
+
+=back
+
+=head2 C<$Y = s_to_y($S, $z0)>: Convert S-paramters to Y-parameters.
+
+=over 4
+
+=item * C<$S>: The S-paramter matrix
+
+=item * C<$z0>: Charectaristic impedance (see above).
+
+=item * C<$Y>: The resultant Y-paramter matrix
+
+=back
+
+=head2 C<$S = y_to_s($Y, $z0)>: Convert Y-paramters to S-parameters.
+
+=over 4
+
+=item * C<$Y>: The Y-paramter matrix
+
+=item * C<$z0>: Charectaristic impedance (see above).
+
+=item * C<$S>: The resultant S-paramter matrix
+
+=back
+
+=head2 C<$Z = s_to_z($S, $z0)>: Convert S-paramters to Z-parameters.
+
+=over 4
+
+=item * C<$S>: The S-paramter matrix
+
+=item * C<$z0>: Charectaristic impedance (see above).
+
+=item * C<$Z>: The resultant Z-paramter matrix
+
+=back
+
+=head2 C<$S = z_to_s($Z, $z0)>: Convert Z-paramters to S-parameters.
+
+=over 4
+
+=item * C<$Z>: The Z-paramter matrix
+
+=item * C<$z0>: Charectaristic impedance (see above).
+
+=item * C<$S>: The resultant S-paramter matrix
+
+=back
+
+=head2 C<$ABCD = s_to_abcd($S, $z0)>: Convert S-paramters to ABCD-parameters.
+
+=over 4
+
+=item * C<$S>: The S-paramter matrix
+
+=item * C<$z0>: Charectaristic impedance (see above).
+
+=item * C<$ABCD>: The resultant ABCD-paramter matrix
+
+=back
+
+=head2 C<$S = abcd_to_s($ABCD, $z0)>: Convert ABCD-paramters to S-parameters.
+
+=over 4
+
+=item * C<$ABCD>: The ABCD-paramter matrix
+
+=item * C<$z0>: Charectaristic impedance (see above).
+
+=item * C<$S>: The resultant S-paramter matrix
+
+=back
+
+=head1 S-Paramter Calculaction Functions
+
+All functions prefixed with "s_" require an S-parameter matrix.
+
+=head2 C<$z0n = s_port_z($S, $z0, $n)> - Return the complex port impedance vector for all frequencies given:
+
+=over 4
+
+=item - C<$S>: S paramter matrix
+
+=item - C<$z0>: vector of _reference_ impedances at each port (from C<rsnp>)
+
+=item - C<$n>: the port we want.
+
+=back
+
+In a 2-port, this will provide the input or output impedance as follows:
+
+    $z_in  = s_port_z($S, 50, 1);
+    $z_out = s_port_z($S, 50, 2);
+
+=head1 Helper Functions
+
+=head2 C<$n = n_ports($S)> - return the number of ports represented by the matrix.
+
+Given any matrix (N,N,M) formatted matrix, this function will return N.
+
+
 =head1 SEE ALSO
 
 =over 4
 
 =item Touchstone specification: L<https://ibis.org/connector/touchstone_spec11.pdf>
 
+=item S-parameter matrix transform equations: L<http://qucs.sourceforge.net/tech/node98.html>
+
 =item Building MDF files from multiple S2P files: L<https://youtu.be/q1ixcb_mgeM>, L<https://github.com/KJ7NLL/mdf/>
 
 =item Optimizing amplifer impedance match circuits with MDF files: L<https://youtu.be/nx2jy7EHzxw>
 
 =item MDF file format: L<https://awrcorp.com/download/faq/english/docs/users_guide/data_file_formats.html#i489154>
+
+=item "Conversions Between S, Z, Y, h, ABCD, and T Parameters which are Valid
+for Complex Source and Load Impedances" March 1994 IEEE Transactions on
+Microwave Theory and Techniques 42(2):205 - 211 L<https://www.researchgate.net/publication/3118645>
 
 =back
 

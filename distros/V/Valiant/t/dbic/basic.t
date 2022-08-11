@@ -862,4 +862,54 @@ ok $state->id;
 
   ok $person->valid;
 }
+
+{
+  my $person = Schema
+    ->resultset('Person')
+    ->new_result(+{});
+
+  ok !$person->errors->size;
+
+  $person->set_columns_recursively({
+      username => 'jsjn212',
+      first_name => 'john',
+      last_name => 'napiorkowski',
+      profile => {
+        zip => "78621",
+        city => 'Elgin',
+      },
+    });
+
+  ok !$person->errors->size;
+
+  $person->insert;
+
+  is_deeply +{ $person->errors->to_hash }, +{
+    password => [
+      "can't be blank",
+      "is too short (minimum is 8 characters)",
+    ],
+    profile => [
+      "Is Invalid",
+    ],
+    "profile.address" => [
+      "can't be blank",
+      "is too short (minimum is 2 characters)",
+    ],
+    "profile.birthday" => [
+      "doesn't look like a date",
+    ],
+    "profile.phone_number" => [
+      "can't be blank",
+      "is too short (minimum is 10 characters)",
+    ],
+    "profile.state_id" => [
+      "can't be blank",
+    ],
+    username => [
+      "chosen is not unique",
+    ],
+  };
+}
+
 done_testing;

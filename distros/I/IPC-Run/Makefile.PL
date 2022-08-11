@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 use ExtUtils::MakeMaker;
 
 # Calculate the dependencies
@@ -13,8 +16,10 @@ if ( $^O ne 'MSWin32' ) {
     }
 }
 else {
-    $PREREQ_PM{'Win32::Process'} = '0.14';
-    $PREREQ_PM{'Win32API::File'} = '0.0901';
+    $PREREQ_PM{'Win32'}             = '0.27';
+    $PREREQ_PM{'Win32::Process'}    = '0.14';
+    $PREREQ_PM{'Win32::ShellQuote'} = 0;
+    $PREREQ_PM{'Win32API::File'}    = '0.0901';
     if ( $] >= 5.021006 ) {
         $PREREQ_PM{'Win32API::File'} = '0.1203';
     }
@@ -56,7 +61,7 @@ WriteMakefile(
     VERSION_FROM => 'lib/IPC/Run.pm',
     ( $ExtUtils::MakeMaker::VERSION >= 6.3002 ? ( 'LICENSE' => 'perl', ) : () ),
     PREREQ_PM => {
-        Test::More => '0.47',
+        'Test::More' => '0.47',
         %PREREQ_PM,
     },
     dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

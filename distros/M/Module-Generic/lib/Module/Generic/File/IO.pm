@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File/IO.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/04/26
-## Modified 2022/04/26
+## Modified 2022/08/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -26,7 +26,7 @@ BEGIN
     our @EXPORT = grep( /^(?:O_|F_GETFL|F_SETFL)/, @Fcntl::EXPORT );
     push( @EXPORT, @{$Fcntl::EXPORT_TAGS{flock}}, @{$Fcntl::EXPORT_TAGS{seek}} );
     our $THAW_REOPENS_FILE = 1;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 sub new
@@ -231,7 +231,6 @@ sub _filehandle_method
     my $what = shift( @_ );
     try
     {
-        $self->message( 3, "Calling method '$what' with arguments: '", CORE::join( "', '", map( overload::StrVal( $_ ), @_ ) ), "'." );
         my @rv = ();
         my $ref = IO::File->can( $what ) ||
             return( $self->error( "Method '$what' is unsupported." ) );
@@ -266,7 +265,8 @@ sub FREEZE
     my $serialiser = CORE::shift( @_ ) // '';
     my $class = CORE::ref( $self ) || $self;
     my $args = $self->args;
-    CORE::return( [$class, \@$args] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # On or before Sereal version 4.023, Sereal did not support multiple values returned
+    CORE::return( [$class, \@$args] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
     CORE::return( $class, \@$args )
 }
 
@@ -337,7 +337,7 @@ Module::Generic::File::IO - File IO Object Wrapper
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 

@@ -22,6 +22,7 @@ t/090_password_grant_overrides.t
 t/100_implicit_grant_basic.t
 t/110_implicit_grant_overrides.t
 t/120_client_credentials_grant_basic.t
+t/125_client_credentials_body.t
 t/130_client_credentials_grant_overrides.t
 t/140_gh_16_client_credentials_force_bad_client.t
 t/150_authorization_request_helper.t

@@ -18,6 +18,8 @@ use Test::More;
 use Test::Mojo;
 use utf8;
 
+# No networking.
+$ENV{HEX_DESCRIBE_OFFLINE} = 1;
 my $t = Test::Mojo->new('Game::HexDescribe');
 
 $t->get_ok('/')

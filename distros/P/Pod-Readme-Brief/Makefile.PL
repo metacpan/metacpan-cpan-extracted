@@ -1,33 +1,38 @@
 use 5.008; use strict; use warnings;
 
-my $u = 'github.com/ap/Pod-Readme-Brief';
+my $sc = q<https://github.com/ap/Pod-Readme-Brief>;
+my $bt = q<https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Readme-Brief>;
 
 my %META = (
 	name        => 'Pod-Readme-Brief',
 	author      => 'Aristotle Pagaltzis <pagaltzis@gmx.de>',
-	license     => 'perl_5',
 	x_copyright => { holder => 'Aristotle Pagaltzis', year => 2018 },
-	prereqs     => {
-		runtime => { requires => {qw(
-			perl                5.008
-			Pod::Text           0
-		)} },
+	license     => 'perl_5',
+	resources   => {
+		license    => [ 'http://dev.perl.org/licenses/' ],
+		repository => { type => 'git', url => "$sc.git", web => $sc },
+		bugtracker => { web => $bt },
 	},
 	dynamic_config => 0,
-	resources      => {
-		repository => { type => 'git', url => "git://$u.git", web => "https://$u" },
-		bugtracker => { web => "https://$u/issues" },
+	prereqs => {
+		runtime => {
+			requires => {qw(
+				perl 5.008
+				Pod::Text 0
+			)},
+		},
 	},
 );
 
-sub MY::postamble { <<'' }
+sub MY::postamble { -f 'META.yml' ? return : <<'' }
 create_distdir : MANIFEST
+distdir        : MANIFEST
 MANIFEST :
-	( git ls-files ':!README.pod' . ; echo MANIFEST ) > MANIFEST
+	( git ls-files ':!README.pod' ; echo MANIFEST ) > MANIFEST
 distdir : boilerplate
 .PHONY  : boilerplate
 boilerplate : distmeta
-	$(PERL) -Ilib boilerplate.pl $(DISTVNAME)
+	$(PERL) -Ilib inc/boilerplate.pl $(DISTVNAME)
 
 ## BOILERPLATE ###############################################################
 require ExtUtils::MakeMaker;
@@ -39,9 +44,11 @@ my $eumm_version  = eval $ExtUtils::MakeMaker::VERSION;
 my $mymeta        = $eumm_version >= 6.57_02;
 my $mymeta_broken = $mymeta && $eumm_version < 6.57_07;
 
+(my $basepath = (-d 'lib' && 'lib/') . $META{name}) =~ s{-}{/}g;
+
 ($MM_ARGS{NAME} = $META{name}) =~ s/-/::/g;
-($MM_ARGS{VERSION_FROM} = "lib/$MM_ARGS{NAME}.pm") =~ s{::}{/}g;
-$MM_ARGS{ABSTRACT_FROM} = $MM_ARGS{VERSION_FROM};
+$MM_ARGS{VERSION_FROM} = "$basepath.pm";
+$MM_ARGS{ABSTRACT_FROM} = -f "$basepath.pod" ? "$basepath.pod" : "$basepath.pm";
 $META{license} = [ $META{license} ]
 	if $META{license} && !ref $META{license};
 $MM_ARGS{LICENSE} = $META{license}[0]
@@ -63,7 +70,7 @@ for (qw(configure build test runtime)) {
 	defined $r->{$_} or delete $r->{$_} for keys %$r;
 }
 
-$MM_ARGS{MIN_PERL_VERSION} = delete $MM_ARGS{PREREQ_PM}{perl} || 0;
+$MM_ARGS{MIN_PERL_VERSION} = eval delete $MM_ARGS{PREREQ_PM}{perl} || 0;
 
 delete $MM_ARGS{MIN_PERL_VERSION}
 	if $eumm_version < 6.47_01;

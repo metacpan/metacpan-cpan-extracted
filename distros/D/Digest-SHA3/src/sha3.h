@@ -3,10 +3,10 @@
  *
  * Ref: http://keccak.noekeon.org/specs_summary.html
  *
- * Copyright (C) 2012-2018 Mark Shelor, All Rights Reserved
+ * Copyright (C) 2012-2022 Mark Shelor, All Rights Reserved
  *
- * Version: 1.04
- * Fri Apr 20 16:25:30 MST 2018
+ * Version: 1.05
+ * Mon 08 Aug 2022 11:30:32 AM MST
  *
  */
 

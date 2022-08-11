@@ -3,6 +3,7 @@ package Perinci::CmdLine::POD;
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Data::Dmp;
 use IPC::System::Options qw(system);
@@ -12,9 +13,9 @@ use String::ShellQuote;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-28'; # DATE
+our $DATE = '2022-07-03'; # DATE
 our $DIST = 'Perinci-CmdLine-POD'; # DIST
-our $VERSION = '0.028'; # VERSION
+our $VERSION = '0.032'; # VERSION
 
 our @EXPORT_OK = qw(gen_pod_for_pericmd_script);
 
@@ -280,6 +281,9 @@ sub gen_pod_for_pericmd_script {
         );
         return $dump_res unless $dump_res->[0] == 200;
         $cli = $dump_res->[2];
+        $cli->{program_name} = $args{program_name} if defined $args{program_name};
+        $cli->{env_name}     = $args{env_name}     if defined $args{env_name};
+        # XXX override other aspects
         %metas = %{ $dump_res->[3]{'func.pericmd_inline_metas'} }
             if $dump_res->[3]{'func.pericmd_inline_metas'};
     } else {
@@ -435,10 +439,13 @@ sub gen_pod_for_pericmd_script {
         }
         if (@examples) {
             $has_examples++;
+            my $num = 0;
             for my $eg (@examples) {
+                $num++;
                 my $url = $urls{ $eg->{_sc_name} };
                 my $meta = $metas{ $eg->{_sc_name} };
-                push @sectpod, "$eg->{summary}:\n\n" if $eg->{summary};
+                my $title = $eg->{summary} ? $eg->{summary} : "Example #$num";
+                push @sectpod, "=head2 $title\n\n";
                 my $cmdline = $eg->{cmdline};
                 $cmdline =~ s/\[\[prog\]\]/$cli->{subcommands} ? "$program_name $eg->{_sc_name}" : $program_name/e;
                 push @sectpod, " % $cmdline\n";
@@ -508,6 +515,13 @@ sub gen_pod_for_pericmd_script {
                 unless ($show_result) {
                     push @sectpod, "\n";
                 }
+
+                if ($eg->{description}) {
+                    require Markdown::To::POD;
+
+                    push @sectpod, Markdown::To::POD::markdown_to_pod($eg->{description}), "\n\n";
+                }
+
             } # for example
         } # if @examples
 
@@ -835,7 +849,7 @@ _
                     my $p = "$config_dir/$cfn->{filename}";
                     push @files, $p;
                     push @files_sectpod, $cfn->{section} // '';
-                    push @files_sectpod, "F<$p>\n\n";
+                    push @files_sectpod, "=head2 $p\n\n";
                 }
             }
         }
@@ -947,29 +961,57 @@ _
 
     # section: ENVIRONMENT
     {
-        last if defined $gen_sc;
+        my @sectpod;
 
-        # workaround because currently the dumped object does not contain all
-        # attributes in the hash (Moo/Mo issue?), we need to access the
-        # attribute accessor method first to get them recorded in the hash. this
-        # will be fixed in the dump module in the future.
-        local $0 = $program_name;
-        local @INC = ("lib", @INC);
-        eval "use " . ref($cli) . "()"; ## no critic: BuiltinFunctions::ProhibitStringyEval
-        die if $@;
+      FOO_OPT: {
+            last if defined $gen_sc;
 
-        last unless $cli->read_env;
-        #$self->log_debug(["skipped file %s (script does not read env)", $filename]);
+            # workaround because currently the dumped object does not contain
+            # all attributes in the hash (Moo/Mo issue?), we need to access the
+            # attribute accessor method first to get them recorded in the hash.
+            # this will be fixed in the dump module in the future.
+            local $0 = $program_name;
+            local @INC = ("lib", @INC);
+            eval "use " . ref($cli) . "()"; ## no critic: BuiltinFunctions::ProhibitStringyEval
+            die if $@;
 
-        my $env_name = $cli->env_name;
-        if (!$env_name) {
-            $env_name = uc($program_name);
-            $env_name =~ s/\W+/_/g;
+            last unless $cli->read_env;
+            #$self->log_debug(["skipped file %s (script does not read env)", $filename]);
+
+            my $env_name = $cli->env_name;
+            log_trace "env_name=%s (1)", $env_name;
+            if (!$env_name) {
+                $env_name = uc($program_name);
+                $env_name =~ s/\W+/_/g;
+                log_trace "env_name=%s (2)", $env_name;
+            }
+
+            push @sectpod, "=head2 ", $env_name, "\n\n";
+            push @sectpod, "String. Specify additional command-line options.\n\n";
         }
 
-        my @sectpod;
-        push @sectpod, "=head2 ", $env_name, " => str\n\n";
-        push @sectpod, "Specify additional command-line options.\n\n";
+      X_ENVS: {
+            my $meta = $metas{ defined $gen_sc ? $gen_sc : '' };
+            last unless $meta->{'x.envs'};
+            for my $envname (sort keys %{ $meta->{'x.envs'} }) {
+                my $envspec = $meta->{'x.envs'}{$envname};
+                push @sectpod, "=head2 ", $envname, "\n\n";
+
+                if ($envspec->{schema}) {
+                    require Data::Sah::Terse;
+                    push @sectpod, Data::Sah::Terse::terse_schema($envspec->{schema}), ". ";
+                }
+                if ($envspec->{summary}) {
+                    push @sectpod, $envspec->{summary}, ".";
+                }
+                push @sectpod, "\n\n";
+
+                if ($envspec->{description}) {
+                    require Markdown::To::POD;
+                    push @sectpod, Markdown::To::POD::markdown_to_pod($envspec->{description}), "\n\n";
+                }
+            }
+        } # X_ENVS
 
         push @{ $resmeta->{'func.sections'} }, {name=>'ENVIRONMENT', content=>join("", @sectpod)};
         push @pod, "=head1 ENVIRONMENT\n\n", @sectpod;
@@ -1028,7 +1070,7 @@ Perinci::CmdLine::POD - Generate POD for Perinci::CmdLine-based CLI script
 
 =head1 VERSION
 
-This document describes version 0.028 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2022-05-28.
+This document describes version 0.032 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2022-07-03.
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,8 @@
+1.3002    2022-08-09
+
+- Minor documentation patch
+  https://github.com/DrHyde/perl-modules-Class-Mockable/issues/11
+
 2021-02-12      1.3001  Can read fixtures from a file;
                         Data structures in output now dumped using
                           Data::Dumper::Concise (cosmetic change only)

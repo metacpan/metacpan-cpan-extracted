@@ -1,4 +1,8 @@
-Revision history for Bencode
+Release history for Bencode
+
+1.502 Tue 09 Aug 2022
+	- No functional changes
+	- Updated package tooling and metadata
 
 1.501 Sat 30 Sep 2017
 	- No test failures under Carp < 1.25

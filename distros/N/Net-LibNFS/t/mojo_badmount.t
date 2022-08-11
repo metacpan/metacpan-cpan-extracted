@@ -5,6 +5,7 @@ use warnings;
 
 use Test::More;
 use Test::FailWarnings -allow_deps => 1;
+use Test::Deep;
 
 use Net::LibNFS;
 
@@ -13,29 +14,35 @@ eval { require Mojo::IOLoop } or do {
 };
 
 my $obj = Net::LibNFS->new()->mojo();
-isa_ok($obj, 'Net::LibNFS::Async', 'return from new()');
+isa_ok($obj, 'Net::LibNFS::Async', 'return from mojo()');
 
 my $err;
 
 my $p = $obj->mount('localhost', '/home' . rand)->then(
-    sub { die "should have failed" },
     sub {
-        $err = shift;
+        die "promise OK (?!?)";
+        die "should have failed";
     },
-)->finally( sub { Mojo::IOLoop->stop() } );
+    sub {
+        $err = shift || 'failure was falsy??';
+        die "promise failed ($err)";
+    },
+)->finally( sub {
+    diag "stopping loop";
+    Mojo::IOLoop->stop();
+} );
 
+diag "starting loop";
 Mojo::IOLoop->start();
+diag "after loop";
 
-isa_ok(
+cmp_deeply(
     $err,
-    'Net::LibNFS::X::Base',
-    'either localhost isn’t an NFS server, or we connect to nonexistent export',
+    any(
+        Isa('Net::LibNFS::X::BadConnection'),
+        Isa('Net::LibNFS::X::NFSError'),
+    ),
+    'got expected error on mount() failure',
 ) or diag explain $err;
 
-ok(
-    $err->isa('Net::LibNFS::X::BadConnection') || $err->isa('Net::LibNFS::X::NFSError'),
-    'one of the expected error classes',
-);
-
 done_testing;
-

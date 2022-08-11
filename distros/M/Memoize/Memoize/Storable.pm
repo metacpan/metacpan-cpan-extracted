@@ -1,7 +1,7 @@
 use strict; use warnings;
 
 package Memoize::Storable;
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 use Storable 1.002 ();
 

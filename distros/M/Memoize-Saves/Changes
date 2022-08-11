@@ -1,13 +1,19 @@
+Release history Memoize-Saves
+
+0.700 Tue 09 Aug 2022
+	- No functional changes
+	- Packaging fix to stop installing boilerplate.pl
+
 0.69  Sun 31 Jul 2022
-  * No functional changes
-  * Minimal test suite
+	- No functional changes
+	- Minimal test suite
 
 0.68  Sun 31 Jul 2022
-  * No functional changes
-  * Documentation update for Memoize TIE option deprecation
+	- No functional changes
+	- Documentation update for Memoize TIE option deprecation
 
 0.67  Mon 29 Nov 2010
-  * Declare dependency on Memoize.
+	- Declare dependency on Memoize.
 
 0.66  Mon 29 Nov 2010
-  * Extracted from the Memoize distribution.
+	- Extracted from the Memoize distribution.

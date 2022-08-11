@@ -9,9 +9,17 @@ use Venus::Class;
 
 base 'Venus::Name';
 
-# METHODS
+# BUILDERS
 
-my %has;
+sub build_self {
+  my ($self, $data) = @_;
+
+  $self->{value} = $self->package if !$self->lookslike_a_pragma;
+
+  return $self;
+}
+
+# METHODS
 
 sub all {
   my ($self, $name, @args) = @_;
@@ -60,6 +68,12 @@ sub arrays {
   ];
 
   return $arrays;
+}
+
+sub attributes {
+  my ($self) = @_;
+
+  return $self->meta->local('attrs');
 }
 
 sub authority {
@@ -236,22 +250,6 @@ sub data {
   return $data;
 }
 
-sub destroy {
-  my ($self) = @_;
-
-  require Symbol;
-
-  Symbol::delete_package($self->package);
-
-  my $c_re = quotemeta $self->package;
-  my $p_re = quotemeta $self->path;
-
-  map {delete $has{$_}} grep /^$c_re/, keys %has;
-  map {delete $INC{$_}} grep /^$p_re/, keys %INC;
-
-  return $self;
-}
-
 sub eval {
   my ($self, @args) = @_;
 
@@ -308,25 +306,11 @@ sub id {
 sub init {
   my ($self) = @_;
 
-  my $class = $self->package;
+  $self->tryload;
 
-  if ($self->routine('import')) {
-    return $class;
-  }
+  $self->eval('sub import') if !$self->loaded;
 
-  $class = $self->locate ? $self->load : $self->package;
-
-  if ($self->routine('import')) {
-    return $class;
-  }
-  else {
-    my $import = sub { $class };
-
-    $self->inject('import', $import);
-    $self->load;
-
-    return $class;
-  }
+  return $self->package;
 }
 
 sub inherits {
@@ -344,20 +328,12 @@ sub included {
 sub inject {
   my ($self, $name, $coderef) = @_;
 
-  my $class = $self->package;
-
-  local $@;
   no strict 'refs';
   no warnings 'redefine';
 
-  if (state $subutil = eval "require Sub::Util") {
-    return *{"${class}::${name}"} = Sub::Util::set_subname(
-      "${class}::${name}", $coderef || sub{$class}
-    );
-  }
-  else {
-    return *{"${class}::${name}"} = $coderef || sub{$class};
-  }
+  my $class = $self->package;
+
+  return *{"${class}::${name}"} = $coderef || sub{$class};
 }
 
 sub load {
@@ -365,28 +341,11 @@ sub load {
 
   my $class = $self->package;
 
-  return $class if $has{$class};
+  return $class if $class eq 'main' || $self->loaded;
 
-  if ($class eq "main") {
-    return do { $has{$class} = 1; $class };
-  }
+  my $error = do{local $@; eval "require $class"; $@};
 
-  my $failed = !$class || $class !~ /^\w(?:[\w:']*\w)?$/;
-  my $loaded;
-
-  my $error = do {
-    local $@;
-    no strict 'refs';
-    $loaded = !!$class->can('new');
-    $loaded = !!$class->can('import') if !$loaded;
-    $loaded = !!$class->can('meta') if !$loaded;
-    $loaded = !!$class->can('with') if !$loaded;
-    $loaded = eval "require $class; 1" if !$loaded;
-    $@;
-  }
-  if !$failed;
-
-  do {
+  if ($error) {
     my $throw;
     $error = qq(Error attempting to load $class: @{[$error || 'cause unknown']});
     $throw = $self->throw;
@@ -394,11 +353,6 @@ sub load {
     $throw->stash(package => $self->package);
     $throw->error;
   }
-  if $error
-  or $failed
-  or not $loaded;
-
-  $has{$class} = 1;
 
   return $class;
 }
@@ -406,13 +360,7 @@ sub load {
 sub loaded {
   my ($self) = @_;
 
-  my $class = $self->package;
-  my $pexpr = $self->format('path', '%s.pm');
-
-  my $is_loaded_eval = $has{$class};
-  my $is_loaded_used = $INC{$pexpr};
-
-  return ($is_loaded_eval || $is_loaded_used) ? 1 : 0;
+  return ($self->included || @{$self->routines}) ? 1 : 0;
 }
 
 sub locate {
@@ -427,6 +375,14 @@ sub locate {
   }
 
   return $found;
+}
+
+sub meta {
+  my ($self) = @_;
+
+  require Venus::Meta;
+
+  return Venus::Meta->new(name => $self->package);
 }
 
 sub name {
@@ -475,6 +431,24 @@ sub prepend {
   return $class->new($path);
 }
 
+sub purge {
+  my ($self) = @_;
+
+  return $self if $self->unloaded;
+
+  my $package = $self->package;
+
+  no strict 'refs';
+
+  for my $name (grep !/\A[^:]+::\z/, keys %{"${package}::"}) {
+    undef *{"${package}::${name}"}; delete ${"${package}::"}{$name};
+  }
+
+  delete $INC{$self->format('path', '%s.pm')};
+
+  return $self;
+}
+
 sub rebase {
   my ($self, @args) = @_;
 
@@ -488,17 +462,7 @@ sub rebase {
 sub reload {
   my ($self) = @_;
 
-  my $class = $self->package;
-
-  delete $has{$class};
-
-  my $path = $self->format('path', '%s.pm');
-
-  delete $INC{$path};
-
-  no strict 'refs';
-
-  @{"${class}::ISA"} = ();
+  $self->unload;
 
   return $self->load;
 }
@@ -654,22 +618,6 @@ sub use {
   return $self;
 }
 
-sub used {
-  my ($self) = @_;
-
-  my $class = $self->package;
-  my $path = $self->path;
-  my $regexp = quotemeta $path;
-
-  return $path if $has{$class};
-
-  for my $item (keys %INC) {
-    return $path if $item =~ /$regexp\.pm$/;
-  }
-
-  return '';
-}
-
 sub variables {
   my ($self) = @_;
 
@@ -680,6 +628,40 @@ sub version {
   my ($self) = @_;
 
   return $self->scalar('VERSION');
+}
+
+sub unload {
+  my ($self) = @_;
+
+  return $self if $self->unloaded;
+
+  my $package = $self->package;
+
+  no strict 'refs';
+
+  for my $name (grep !/\A[^:]+::\z/, keys %{"${package}::"}) {
+    undef *{"${package}::${name}"};
+  }
+
+  delete $INC{$self->format('path', '%s.pm')};
+
+  return $self;
+}
+
+sub unloaded {
+  my ($self) = @_;
+
+  return $self->loaded ? 0 : 1;
+}
+
+sub visible {
+  my ($self) = @_;
+
+  no strict 'refs';
+
+  my $package = $self->package;
+
+  return (grep !/\A[^:]+::\z/, keys %{"${package}::"}) ? 1 : 0;
 }
 
 1;
@@ -900,6 +882,70 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 attributes
+
+  attributes() (ArrayRef)
+
+The attributes method searches the package namespace for attributes and returns
+their names. This will not include attributes from roles, mixins, or superclasses.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item attributes example 1
+
+  package Foo::Attrs;
+
+  use Venus::Class 'attr';
+
+  attr 'start';
+  attr 'abort';
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/attrs');
+
+  my $attributes = $space->attributes;
+
+  # ["start", "abort"]
+
+=back
+
+=over 4
+
+=item attributes example 2
+
+  package Foo::Base;
+
+  use Venus::Class 'attr', 'base';
+
+  attr 'start';
+  attr 'abort';
+
+  package Foo::Attrs;
+
+  use Venus::Class 'attr';
+
+  attr 'show';
+  attr 'hide';
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/attrs');
+
+  my $attributes = $space->attributes;
+
+  # ["show", "hide"]
+
+=back
+
+=cut
+
 =head2 authority
 
   authority() (Maybe[Str])
@@ -973,7 +1019,7 @@ I<Since C<0.01>>
 
 =head2 blessed
 
-  blessed(Ref $data) (Object)
+  blessed(Ref $data) (Self)
 
 The blessed method blesses the given value into the package namespace and
 returns an object. If no value is given, an empty hashref is used.
@@ -1020,7 +1066,7 @@ I<Since C<0.01>>
 
 =head2 build
 
-  build(Any @args) (Object)
+  build(Any @args) (Self)
 
 The build method attempts to call C<new> on the package namespace and if
 successful returns the resulting object.
@@ -1381,36 +1427,6 @@ I<Since C<0.01>>
 
 =cut
 
-=head2 destroy
-
-  destroy() (Object)
-
-The destroy method attempts to wipe out a namespace and also remove it and its
-children from C<%INC>. B<NOTE:> This can cause catastrophic failures if used
-incorrectly.
-
-I<Since C<0.01>>
-
-=over 4
-
-=item destroy example 1
-
-  package main;
-
-  use Venus::Space;
-
-  my $space = Venus::Space->new('data/dumper');
-
-  $space->load; # Data/Dumper
-
-  my $destroy = $space->destroy;
-
-  # bless({ value => "data/dumper" }, "Venus::Space")
-
-=back
-
-=cut
-
 =head2 eval
 
   eval(Str @data) (Any)
@@ -1747,9 +1763,9 @@ I<Since C<0.01>>
 
 =head2 loaded
 
-  loaded() (Int)
+  loaded() (Bool)
 
-The loaded method checks whether the package namespace is already loaded
+The loaded method checks whether the package namespace is already loaded and
 returns truthy or falsy.
 
 I<Since C<0.01>>
@@ -1762,9 +1778,11 @@ I<Since C<0.01>>
 
   use Venus::Space;
 
-  my $space = Venus::Space->new('data/dumper');
+  my $space = Venus::Space->new('Kit');
 
-  $space->destroy;
+  $space->init;
+
+  $space->unload;
 
   my $loaded = $space->loaded;
 
@@ -1780,9 +1798,9 @@ I<Since C<0.01>>
 
   use Venus::Space;
 
-  my $space = Venus::Space->new('data/dumper');
+  my $space = Venus::Space->new('Kit');
 
-  $space->load;
+  $space->init;
 
   my $loaded = $space->loaded;
 
@@ -1833,6 +1851,46 @@ I<Since C<0.01>>
   my $locate = $space->locate;
 
   # "/path/to/lib/Data/Dumper.pm"
+
+=back
+
+=cut
+
+=head2 meta
+
+  meta() (Meta)
+
+The meta method returns a L<Venus::Meta> object representing the underlying
+package namespace. To access the meta object for the instance itself, use the
+superclass' L<Venus::Core/META> method.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item meta example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $meta = $space->meta;
+
+  # bless({'name' => 'Foo::Bar'}, 'Venus::Meta')
+
+=back
+
+=over 4
+
+=item meta example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $meta = $space->META;
+
+  # bless({'name' => 'Venus::Space'}, 'Venus::Meta')
 
 =back
 
@@ -2063,6 +2121,41 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 purge
+
+  purge() (Self)
+
+The purge method purges a package space by expunging its symbol table and
+removing it from C<%INC>.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item purge example 1
+
+  package main;
+
+  use Venus::Space;
+
+  # Bar::Gen is generated with $VERSION as 0.01
+
+  my $space = Venus::Space->new('Bar/Gen');
+
+  $space->load;
+
+  my $purge = $space->purge;
+
+  # bless({ value => "Bar::Gen" }, "Venus::Space")
+
+  # Bar::Gen->VERSION was 0.01, now undef
+
+  # Symbol table is gone, $space->visible is 0
+
+=back
+
+=cut
+
 =head2 rebase
 
   rebase(Str @path) (Space)
@@ -2104,7 +2197,7 @@ I<Since C<0.01>>
 
   use Venus::Space;
 
-  # Foo::Gen is generate with $VERSION as 0.01
+  # Foo::Gen is generated with $VERSION as 0.01
 
   my $space = Venus::Space->new('Foo/Gen');
 
@@ -2123,7 +2216,7 @@ I<Since C<0.01>>
 
   use Venus::Space;
 
-  # Foo::Gen is generate with $VERSION as 0.02
+  # Foo::Gen is generated with $VERSION as 0.02
 
   my $space = Venus::Space->new('Foo/Gen');
 
@@ -2489,6 +2582,41 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 unload
+
+  unload() (Self)
+
+The unload method unloads a package space by nullifying its symbol table and
+removing it from C<%INC>.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item unload example 1
+
+  package main;
+
+  use Venus::Space;
+
+  # Bar::Gen is generated with $VERSION as 0.01
+
+  my $space = Venus::Space->new('Bar/Gen');
+
+  $space->load;
+
+  my $unload = $space->unload;
+
+  # bless({ value => "Bar::Gen" }, "Venus::Space")
+
+  # Bar::Gen->VERSION was 0.01, now undef
+
+  # Symbol table remains, $space->visible is 1
+
+=back
+
+=cut
+
 =head2 use
 
   use(Str | Tuple[Str, Str] $target, Any @params) (Space)
@@ -2541,74 +2669,6 @@ I<Since C<0.01>>
   my $space = Venus::Space->new('foo/foo');
 
   my $use = $space->use(['Venus', 9.99], 'error');
-
-=back
-
-=cut
-
-=head2 used
-
-  used() (Str)
-
-The used method searches C<%INC> for the package namespace and if found returns
-the filepath and complete filepath for the loaded package, otherwise returns
-falsy with an empty string.
-
-I<Since C<0.01>>
-
-=over 4
-
-=item used example 1
-
-  package main;
-
-  use Venus::Space;
-
-  my $space = Venus::Space->new('foo/oof');
-
-  my $used = $space->used;
-
-  # ""
-
-=back
-
-=over 4
-
-=item used example 2
-
-  package main;
-
-  use Venus::Space;
-
-  my $space = Venus::Space->new('c_p_a_n');
-
-  $space->load;
-
-  my $used = $space->used;
-
-  # "CPAN"
-
-=back
-
-=over 4
-
-=item used example 3
-
-  package Foo::Bar;
-
-  sub import;
-
-  package main;
-
-  use Venus::Space;
-
-  my $space = Venus::Space->new('foo/bar');
-
-  $space->load;
-
-  my $used = $space->used;
-
-  # "Foo/Bar"
 
 =back
 
@@ -2699,6 +2759,89 @@ I<Since C<0.01>>
   my $version = $space->version;
 
   # 0.01
+
+=back
+
+=cut
+
+=head2 visible
+
+  visible() (Bool)
+
+The visible method returns truthy is the package namespace is visible, i.e. has
+symbols defined.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item visible example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $visible = $space->visible;
+
+  # 1
+
+=back
+
+=over 4
+
+=item visible example 2
+
+  package Foo::Fe;
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/fe');
+
+  my $visible = $space->visible;
+
+  # 0
+
+=back
+
+=over 4
+
+=item visible example 3
+
+  package Foo::Fe;
+
+  our $VERSION = 0.01;
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/fe');
+
+  my $visible = $space->visible;
+
+  # 1
+
+=back
+
+=over 4
+
+=item visible example 4
+
+  package Foo::Fi;
+
+  sub import;
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/fi');
+
+  my $visible = $space->visible;
+
+  # 1
 
 =back
 

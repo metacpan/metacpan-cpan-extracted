@@ -190,7 +190,7 @@ make_path(dirname($config_h));
 #define C_UNLIKELY(x)  C__BUILTIN_EXPECT(!!(x), 0)
 
 /* Copied from https://kernelnewbies.org/FAQ/LikelyUnlikely */
-int main(char *argv[], int argc)
+int main(int argc, char *argv[])
 {
    int a;
 
@@ -222,7 +222,8 @@ static $inline_keyword foo_t static_foo() {
 foo_t foo() {
   return 0;
 }
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[])
+{
   return 0;
 }
 INLINE_SOURCE
@@ -235,6 +236,68 @@ INLINE_SOURCE
             last;
         } else {
             $ac->msg_result('no');
+        }
+    }
+
+    #
+    # function __attribute__ are tested only on GCC compliant compilers.
+    #
+    # We first test that __GNUC__ or __clang_major__ macros is defined.
+    # If it is, we want to check if -Werror option is supported. This will
+    # turn warnings into errors, catching the fact that some compilers just
+    # say that an attribute is not supported instead of yelling natively.
+    #
+    my $have__GNUC__;
+    $ac->msg_checking("if __GNUC__ macro is defined:");
+    if (try_compile("#include <stdlib.h>\n#ifdef __GNUC__\nint main() {\n  exit(0);\n}\n#else\n#  error __GNUC__ is not defined\n#endif\n")) {
+        $ac->msg_result('yes');
+        $have__GNUC__ = 1;
+    } else {
+        $ac->msg_result('no');
+        $have__GNUC__ = 0;
+    }
+
+    my $have__clang_major__;
+    if ($have__GNUC__) {
+        $have__clang_major__ = 0;
+    } else {
+        $ac->msg_checking("if __clang_major__ macro is defined:");
+        if (try_compile("#include <stdlib.h>\n#ifdef __clang_major__\nint main() {\n  exit(0);\n}\n#else\n#  error __clang_major__ is not defined\n#endif\n")) {
+            $ac->msg_result('yes');
+            $have__clang_major__ = 1;
+        } else {
+            $ac->msg_result('no');
+            $have__clang_major__ = 0;
+        }
+    }
+    
+    if ($have__GNUC__ || $have__clang_major__) {
+        my $werrorflag = '-Werror';
+        $ac->msg_checking("if flag $werrorflag works:");
+        if (try_compile("#include <stdlib.h>\nint main() {\n  exit(0);\n}\n", $werrorflag)) {
+            $ac->msg_result('yes');
+        } else {
+            $ac->msg_result('no');
+            $werrorflag = '';
+        }
+
+        if ($werrorflag) {
+            $ac->msg_checking("for __attribute__((flatten))");
+            my $__attribute_flatten = <<__ATTRIBUTE_FLATTEN;
+#include <stdlib.h>
+
+int foo( void ) __attribute__((flatten));
+int main() { exit(0); }
+__ATTRIBUTE_FLATTEN
+            #
+            # This is GCC specific, we want to yell if the attribute is not supported
+            #
+            if (try_link($__attribute_flatten, $werrorflag)) {
+                $ac->msg_result('yes');
+                $ac->define_var("C_GCC_FUNC_ATTRIBUTE_FLATTEN", "__attribute__((flatten))");
+            } else {
+                $ac->msg_result('no');
+            }
         }
     }
 

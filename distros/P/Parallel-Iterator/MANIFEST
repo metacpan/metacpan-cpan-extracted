@@ -1,13 +1,8 @@
 Changes
-LICENSE
-MANIFEST
-META.json                                Module JSON meta-data (added by MakeMaker)
-META.yml                                 Module YAML meta-data (added by MakeMaker)
 Makefile.PL
-README
-boilerplate.pl
 examples/cpan-faces.pl
 examples/speedy.pl
+inc/boilerplate.pl
 lib/Parallel/Iterator.pm
 t/000-load.t
 t/010-basic.t
@@ -19,3 +14,8 @@ t/060-nofork-data.t
 t/070-nofork-block.t
 t/080-nofork-batch.t
 t/lib/NoFork.pm
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+LICENSE
+README

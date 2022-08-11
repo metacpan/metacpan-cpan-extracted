@@ -8,7 +8,7 @@ Class::Closure, and define a sub called CLASS. Inside this sub will lie
 the declarations for the attributes and methods (and subclasses) for
 this class.
 
-  Variables
+Variables
 
 To declare variables, mark them as lexicals within the sub. You may
 prefix them with "has" to make them read-only or "public" to make them
@@ -44,7 +44,7 @@ Given the class above:
 This may be a little different from the usual "$obj->z(32)" syntax you
 might be used to. Trust me, this will grow on you.
 
-  Methods
+Methods
 
 To declare methods, use the "method" keyword and pass a name and a
 reference to a sub:
@@ -67,7 +67,7 @@ functions on yourself, though.
      };
  }
 
-  Accessors
+Accessors
 
 Sometimes a change of interface goes from using a public variable to a
 function with extra behavior. Some would say that's why you never make a
@@ -82,7 +82,7 @@ member variable public. I disagree, since you can just fake one with the
  print $obj->number;  # "Getting the number"  "42"
  $obj->number = 314;  # "Setting the number" ...
 
-  Inheritance
+Inheritance
 
 Unlike the standard Perl 5 object model, Class::Closure can inherit from
 both classes and variables (like Class::Classless). Also, it keeps their
@@ -99,7 +99,7 @@ just inherit from it as an object:
      extends MySuperClass->new(@params);
  }
 
-  Constructors and Destructors
+Constructors and Destructors
 
 The special method BUILD is called whenever a new object is created,
 with the blessed object in the first argument and the rest of the
@@ -116,14 +116,14 @@ a special syntax:
 Yep, that's all. And you heard me correctly, they work right with
 inheritance, unlike the standard "DESTROY" method.
 
-  FALLBACK
+FALLBACK
 
 Class::Closure supports an "AUTOLOAD" feature. But because it uses
 "AUTOLOAD" internally, it has to call it something else. It's called
 "FALLBACK", and it works just like "AUTOLOAD" in every way (the name of
 the current sub is still even in $AUTOLOAD).
 
-  How does it work?
+How does it work?
 
 If you really want to get scary power out of this module, you have to
 understand how it works.
@@ -172,7 +172,7 @@ That avoids a run-time check on each of the method calls, and makes
 things a little easier to read. There's all kinds of other fun stuff you
 can do.
 
-  Technical Notes / Bugs / Caveats / Etc.
+Technical Notes / Bugs / Caveats / Etc.
 
 Included in the distribution is a benchmark.pl script which will test
 various aspects of Class::Closure objects against objects created with
@@ -196,15 +196,16 @@ code. Bug reports/patches welcome.
 
 INSTALLATION
 
-This is a Perl module distribution. It should be installed with whichever
-tool you use to manage your installation of Perl, e.g. any of
+This is a Perl module distribution. It should be installed with
+whichever tool you use to manage your installation of Perl, e.g. any of
 
   cpanm .
   cpan  .
   cpanp -i .
 
-Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
-Should you wish to install this module manually, the procedure is
+Consult http://www.cpan.org/modules/INSTALL.html for further
+instruction. Should you wish to install this module manually, the
+procedure is
 
   perl Makefile.PL
   make

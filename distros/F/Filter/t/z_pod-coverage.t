@@ -13,7 +13,11 @@ plan skip_all => "Test::Pod::Coverage 1.04 required for testing POD coverage"
     if $@;
 
 for (all_modules()) {
-  pod_coverage_ok($_) unless /Filter::decrypt/;
+    if ($^O eq 'MSWin32') {
+        pod_coverage_ok($_) unless /Filter::(decrypt|m4)/;
+    } else {
+        pod_coverage_ok($_) unless /Filter::decrypt/;
+    }
 }
 
 done_testing;

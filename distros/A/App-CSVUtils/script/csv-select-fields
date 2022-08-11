@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-27'; # DATE
+our $DATE = '2022-08-09'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.037'; # VERSION
+our $VERSION = '0.044'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_select_fields",
@@ -39,13 +39,11 @@ csv-select-fields - Only output selected field(s)
 
 =head1 VERSION
 
-This document describes version 0.037 of csv-select-fields (from Perl distribution App-CSVUtils), released on 2022-03-27.
+This document describes version 0.044 of csv-select-fields (from Perl distribution App-CSVUtils), released on 2022-08-09.
 
 =head1 SYNOPSIS
 
-Usage:
-
-% B<csv-select-fields> [B<--escape-char>=I<str>] [B<--field-pat>=I<re>] [B<--format>=I<name>|B<--json>] [B<--header>|B<--input-header>|B<--no-header>|B<--noheader>] [B<--(no)naked-res>] [B<--output-escape-char>=I<str>] [B<--output-header>|B<--no-output-header>|B<--nooutput-header>] [B<--output-quote-char>=I<str>] [B<--output-sep-char>=I<str>] [B<--output-tsv>|B<--no-output-tsv>|B<--nooutput-tsv>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--quote-char>=I<str>] [B<--sep-char>=I<str>] [B<--tsv>|B<--input-tsv>|B<--no-tsv>|B<--notsv>] -- E<lt>I<filename>E<gt> [I<fields>] ...
+% B<csv-select-fields> [B<--escape-char>=I<str>] [B<--exclude-field-pat>=I<re>|B<--exclude-all-fields>] [(B<--exclude-field>=I<str>)+|B<--exclude-fields-json>=I<json>|(B<-F>=I<str>)+] [B<--format>=I<name>|B<--json>] [B<--header>|B<--input-header>|B<--no-header>|B<--noheader>] [B<--ignore-unknown-fields>|B<--no-ignore-unknown-fields>|B<--noignore-unknown-fields>] [B<--include-field-pat>=I<re>|B<--field-pat>=I<re>|B<--include-all-fields>] [(B<--include-field>=I<str>)+|B<--include-fields-json>=I<json>|(B<-f>=I<str>)+|(B<--field>=I<str>)+] [B<--(no)naked-res>] [B<--output-escape-char>=I<str>] [B<--output-header>|B<--no-output-header>|B<--nooutput-header>] [B<--output-quote-char>=I<str>] [B<--output-sep-char>=I<str>] [B<--output-tsv>|B<--no-output-tsv>|B<--nooutput-tsv>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--quote-char>=I<str>] [B<--sep-char>=I<str>] [B<--show-selected-fields>] [B<--tsv>|B<--input-tsv>|B<--no-tsv>|B<--notsv>] -- E<lt>I<filename>E<gt>
 
 =head1 DESCRIPTION
 
@@ -61,25 +59,63 @@ C<*> marks required options.
 
 =over
 
-=item B<--field-pat>=I<s>
+=item B<--ignore-unknown-fields>
 
-Field regex pattern to select.
+When unknown fields are specified in --include-field (--field) or --exclude_field options, ignore them instead of throwing an error.
 
-=item B<--field>=I<s@>, B<-F>
+=item B<--show-selected-fields>
 
-Field names.
+Show selected fields and then immediately exit.
 
-Can also be specified as the 2nd command-line argument and onwards.
+=back
+
+=head2 Field selection options
+
+=over
+
+=item B<--exclude-all-fields>
+
+Shortcut for --field-pat=.*, effectively selecting all fields.
+
+See C<--exclude-field-pat>.
+
+=item B<--exclude-field-pat>=I<s>
+
+Field regex pattern to exclude, takes precedence over --field-pat.
+
+=item B<--exclude-field>=I<s@>, B<-F>
+
+Field names to exclude, takes precedence over --fields.
 
 Can be specified multiple times.
 
-=item B<--fields-json>=I<s>
+=item B<--exclude-fields-json>=I<s>
 
-Field names (JSON-encoded).
+Field names to exclude, takes precedence over --fields (JSON-encoded).
 
-See C<--field>.
+See C<--exclude-field>.
 
-Can also be specified as the 2nd command-line argument and onwards.
+=item B<--include-all-fields>
+
+Shortcut for --field-pat=.*, effectively selecting all fields.
+
+See C<--include-field-pat>.
+
+=item B<--include-field-pat>=I<s>, B<--field-pat>
+
+Field regex pattern to select, overidden by --exclude-field-pat.
+
+=item B<--include-field>=I<s@>, B<--field>, B<-f>
+
+Field names to include, takes precedence over --exclude-field-pat.
+
+Can be specified multiple times.
+
+=item B<--include-fields-json>=I<s>
+
+Field names to include, takes precedence over --exclude-field-pat (JSON-encoded).
+
+See C<--include-field>.
 
 =back
 
@@ -91,24 +127,24 @@ Can also be specified as the 2nd command-line argument and onwards.
 
 Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
-Defaults to `\\` (backslash). Overrides `--tsv` option.
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
 
-=item B<--filename>=I<s>*, B<-f>
+=item B<--filename>=I<s>*
 
 Input CSV file.
 
-Use `-` to read from stdin.
+Use C<-> to read from stdin.
 
 
 Can also be specified as the 1st command-line argument.
 
 =item B<--no-header>, B<--input-header>
 
-By default (`--header`), the first row of the CSV will be assumed to contain
+By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
-that CSV does not have header row (`--no-header`), the first row of the CSV is
-assumed to contain the first data row. Fields will be named `field1`, `field2`,
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
 
@@ -116,22 +152,22 @@ and so on.
 
 Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
-Defaults to `"` (double quote). Overrides `--tsv` option.
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 
 =item B<--sep-char>=I<s>
 
 Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
-Defaults to `,` (comma). Overrides `--tsv` option.
+Defaults to C<,> (comma). Overrides C<--tsv> option.
 
 
 =item B<--tsv>, B<--input-tsv>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
 
-Overriden by `--sep-char`, `--quote-char`, `--escape-char` options. If one of
-those options is specified, then `--tsv` will be ignored.
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 
 =back
@@ -148,6 +184,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -162,34 +204,34 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--output-escape-char>=I<s>
 
 Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
 
-This is like `--escape-char` option but for output instead of input.
+This is like C<--escape-char> option but for output instead of input.
 
-Defaults to `\\` (backslash). Overrides `--output-tsv` option.
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
 
 
 =item B<--output-header>
 
 Whether output CSV should have a header row.
 
-By default, a header row will be output *if* input CSV has header row. Under
-`--output-header`, a header row will be output even if input CSV does not have
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
 header row (value will be something like "col0,col1,..."). Under
-`--no-output-header`, header row will *not* be printed even if input CSV has
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
 header row. So this option can be used to unconditionally add or remove header
 row.
 
@@ -198,28 +240,28 @@ row.
 
 Specify field quote character in output CSV, will be passed to Text::CSV_XS.
 
-This is like `--quote-char` option but for output instead of input.
+This is like C<--quote-char> option but for output instead of input.
 
-Defaults to `"` (double quote). Overrides `--output-tsv` option.
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
 
 
 =item B<--output-sep-char>=I<s>
 
 Specify field separator character in output CSV, will be passed to Text::CSV_XS.
 
-This is like `--sep-char` option but for output instead of input.
+This is like C<--sep-char> option but for output instead of input.
 
-Defaults to `,` (comma). Overrides `--output-tsv` option.
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
 
 
 =item B<--output-tsv>
 
 Inform that output file is TSV (tab-separated) format instead of CSV.
 
-This is like `--tsv` option but for output instead of input.
+This is like C<--tsv> option but for output instead of input.
 
-Overriden by `--output-sep-char`, `--output-quote-char`, `--output-escape-char`
-options. If one of those options is specified, then `--output-tsv` will be
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
 ignored.
 
 
@@ -227,9 +269,18 @@ ignored.
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 

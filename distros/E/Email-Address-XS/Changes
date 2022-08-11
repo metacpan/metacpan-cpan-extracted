@@ -1,5 +1,10 @@
 Revision history for Perl extension Email::Address::XS.
 
+1.05  Sun Aug 07 15:21:35 2022
+	- update dovecot parser from dovecot version 2.3.14
+	- mark the last parsed object as invalid if input string contains trailing garbage
+	  https://github.com/pali/Email-Address-XS/issues/5
+
 1.04  Sat Jun 09 18:20:28 2018
 	- fix docevot parser to disallow leading dot in dot-atom
 	- fix generating and validating email addresses with empty user part

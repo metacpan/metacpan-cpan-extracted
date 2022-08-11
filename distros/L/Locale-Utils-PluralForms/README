@@ -1,4 +1,4 @@
-Locale::Utils::PluralForms version 0.002
+Locale::Utils::PluralForms version 0.003
 ========================================
 
 Utils to use plural forms.
@@ -33,7 +33,7 @@ This module requires these other modules and libraries:
     
 COPYRIGHT AND LICENCE
 
-Copyright (c) 2011 - 2017,
+Copyright (c) 2011 - 2022,
 Steffen Winkler
 steffenw at cpan.org.
 All rights reserved.

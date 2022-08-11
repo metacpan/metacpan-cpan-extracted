@@ -1,15 +1,16 @@
-use FindBin;
-use lib "$FindBin::Bin/lib";
-use JSON::MaybeXS qw( JSON );
-use Pithub::Test::Factory;
-use Test::Most import => [ qw( code done_testing eq_or_diff is isa_ok ok throws_ok use_ok ) ];
+#!perl
 
-BEGIN {
-    use_ok('Pithub::Users');
-    use_ok('Pithub::Users::Emails');
-    use_ok('Pithub::Users::Followers');
-    use_ok('Pithub::Users::Keys');
-}
+use strict;
+use warnings;
+
+use JSON::MaybeXS     qw( JSON );
+use Pithub::Users     ();
+use Test::Differences qw( eq_or_diff );
+use Test::Exception;    # throws_ok
+use Test::More import => [qw( done_testing is isa_ok ok )];
+
+use lib 't/lib';
+use Pithub::Test::Factory ();
 
 # Pithub::Users->get
 {
@@ -29,8 +30,8 @@ BEGIN {
         is $result->success, 1,   'Successful';
 
         is $result->content->{bio},          undef,                              'Attribute exists: bio';
-        is $result->content->{blog},         '',                                 'Attribute exists: blog';
-        is $result->content->{company},      '',                                 'Attribute exists: company';
+        is $result->content->{blog},         q{},                                 'Attribute exists: blog';
+        is $result->content->{company},      q{},                                 'Attribute exists: company';
         is $result->content->{created_at},   '2008-10-29T09:03:04Z',             'Attribute exists: created_at';
         is $result->content->{email},        'plu@pqpq.de',                      'Attribute exists: email';
         is $result->content->{followers},    54,                                 'Attribute exists: followers';
@@ -184,7 +185,7 @@ BEGIN {
 
         is $result->code,        204, 'HTTP status';
         is $result->success,     1,   'Successful';
-        is $result->raw_content, '',  'HTTP body is empty';
+        is $result->raw_content, q{},  'HTTP body is empty';
         is $result->count,       0,   'Empty HTTP body return zero';
         eq_or_diff $result->content, {}, 'Empty HTTP body generates empty hashref';
     }

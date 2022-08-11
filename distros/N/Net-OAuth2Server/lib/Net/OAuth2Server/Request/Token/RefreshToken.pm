@@ -1,6 +1,8 @@
 use strict; use warnings;
 
 package Net::OAuth2Server::Request::Token::RefreshToken;
+our $VERSION = '0.006';
+
 use parent 'Net::OAuth2Server::Request';
 
 sub grant_type { 'refresh_token' }
@@ -14,4 +16,4 @@ sub get_grant {
 	$grant_maker->from_refresh_token( $self, $self->params( $self->grant_parameters ), @_ );
 }
 
-our $VERSION = '0.005';
+1;

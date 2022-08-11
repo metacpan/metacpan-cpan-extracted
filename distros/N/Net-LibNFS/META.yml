@@ -9,10 +9,9 @@ build_requires:
   Test::Fatal: '0'
 configure_requires:
   ExtUtils::MakeMaker::CPANfile: '0.09'
-  ExtUtils::PkgConfig: '0'
   File::Which: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,11 +23,12 @@ no_index:
     - inc
 recommends:
   Alien::cmake3: '0'
+  ExtUtils::PkgConfig: '0'
 requires:
   Promise::XS: '0.16'
-  X::Tiny: '0.21'
+  X::Tiny: '0.22'
 resources:
   bugtracker: https://github.com/FGasper/p5-Net-LibNFS/issues
   repository: git://github.com/FGasper/p5-Net-LibNFS.git
-version: '0.02'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

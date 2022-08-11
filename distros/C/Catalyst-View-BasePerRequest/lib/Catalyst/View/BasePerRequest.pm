@@ -1,6 +1,6 @@
 package Catalyst::View::BasePerRequest;
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 our $DEFAULT_FACTORY = 'Catalyst::View::BasePerRequest::Factory';
 
 use Moose;
@@ -144,11 +144,15 @@ sub render_code {
   my $self = shift;
   my @inner = map {
     Scalar::Util::blessed($_) && $_->can('get_rendered') ? $_->get_rendered : $_;
-  }  $self->code->($self->prepare_render_code_args);
+  }  $self->execute_code_callback($self->prepare_render_code_args);
 
-  my $flat = $self->flatten_rendered_for_inner_content
-  (@inner);
+  my $flat = $self->flatten_rendered_for_inner_content(@inner);
   return $flat;
+}
+
+sub execute_code_callback {
+  my ($self, @args) = @_;
+  return $self->code->(@args);
 }
 
 sub prepare_render_code_args {
@@ -164,10 +168,13 @@ sub flatten_rendered {
 }
 
 sub content {
-  my ($self, $name) = @_;
+  my ($self, $name, $options) = @_;
+  my %options = $options ? %$options : ();
+  my $default = exists($options{default}) ? $options{default} : '';
+
   return exists($self->ctx->stash->{view_blocks}{$name}) ? 
     $self->ctx->stash->{view_blocks}{$name} :
-      '';
+      $default;
 }
 
 sub render_content_value {
@@ -497,8 +504,13 @@ wish to separate template / text from data.  Example:
 
 =head2 content
 
-Gets a content block string.  If the named content block does not exist, returns a zero length'
-string instead.
+Examples:
+
+    $self->content($name);
+    $self->content($name, +{ default=>'No main content' });
+
+Gets a content block string by '$name'.  If the block has not been defined returns either
+a zero length string or whatever you set the default key of the hashref options to.
 
 =head2 content_for
 

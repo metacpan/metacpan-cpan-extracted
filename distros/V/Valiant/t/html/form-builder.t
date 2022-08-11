@@ -168,6 +168,7 @@ is $fb->input('first_name'), '<input id="person_first_name" name="person.first_n
 is $fb->input('first_name', {class=>'foo'}), '<input class="foo" id="person_first_name" name="person.first_name" type="text" value="J"/>';
 is $fb->input('first_name', {errors_classes=>'error'}), '<input class="error" id="person_first_name" name="person.first_name" type="text" value="J"/>';
 is $fb->input('first_name', {class=>'foo', errors_classes=>'error'}), '<input class="foo error" id="person_first_name" name="person.first_name" type="text" value="J"/>';
+is $fb->input('first_name', {class=>'foo', errors_attrs=>{ class=>'error'}}), '<input class="foo error" id="person_first_name" name="person.first_name" type="text" value="J"/>';
 
 is $fb->password('first_name'), '<input id="person_first_name" name="person.first_name" type="password" value=""/>';
 is $fb->password('first_name', {class=>'foo'}), '<input class="foo" id="person_first_name" name="person.first_name" type="password" value=""/>';
@@ -246,6 +247,9 @@ is $fb->fields_for('credit_cards', sub {
   return  $fb_finally->button('add', +{value=>1}, 'Add a New Credit Card');
 }), '<input id="person_credit_cards_0_number" name="person.credit_cards[0].number" type="text" value="234234223444"/><input id="person_credit_cards_0_expiration" name="person.credit_cards[0].expiration" type="date" value="'.$person->credit_cards->[0]->expiration->ymd.'"/><input id="person_credit_cards_1_number" name="person.credit_cards[1].number" type="text" value="342342342322"/><input id="person_credit_cards_1_expiration" name="person.credit_cards[1].expiration" type="date" value="'.$person->credit_cards->[1]->expiration->ymd.'"/><input id="person_credit_cards_2_number" name="person.credit_cards[2].number" type="text" value="111112222233"/><input id="person_credit_cards_2_expiration" name="person.credit_cards[2].expiration" type="date" value="'.$person->credit_cards->[2]->expiration->ymd.'"/><div>Expiration chosen date can&#39;t be earlier than '.DateTime->now->ymd.'</div><button id="person_credit_cards_3_add" name="person.credit_cards[3].add" type="submit" value="1">Add a New Credit Card</button>';
 
+is $fb->select('state_id', [11,22,33], +{class=>'foo'} ), '<select class="foo" id="person_state_id" name="person.state_id"><option value="11">11</option><option value="22">22</option><option value="33">33</option></select>';
+
+
 is $fb->select('state_id', [1,2,3], +{class=>'foo'} ), '<select class="foo" id="person_state_id" name="person.state_id"><option selected value="1">1</option><option value="2">2</option><option value="3">3</option></select>';
 
 is $fb->select('state_id', [1,2,3], +{selected=>[3], disabled=>[1],class=>'foo'} ), '<select class="foo" id="person_state_id" name="person.state_id"><option disabled value="1">1</option><option value="2">2</option><option selected value="3">3</option></select>';
@@ -266,7 +270,13 @@ is $fb->select('state_id', +{multiple=>1}, sub {
     my $selected = $_->id eq $value ? 1:0;
     option_tag($_->name, +{class=>'foo', selected=>$selected, value=>$_->id}); 
   } $states_collection->all;
-}), '<input id="person_state_id_hidden" name="person.state_id[]" type="hidden" value="1"/><select id="person_state_id" multiple name="person.state_id[]"><option class="foo" selected value="1">TX</option><option class="foo" value="2">NY</option><option class="foo" value="3">CA</option></select>';
+}),
+  '<select id="person_state_id" multiple name="person.state_id[]">'.
+    '<option class="foo" selected value="1">TX</option>'.
+    '<option class="foo" value="2">NY</option>'.
+    '<option class="foo" value="3">CA</option>'.
+  '</select>';
+
 
 is $fb->select({roles => 'id'}, [map { [$_->label, $_->id] } $roles_collection->all]), 
   '<input id="person_roles_id_hidden" name="person.roles[0]._nop" type="hidden" value="1"/>'.
@@ -276,8 +286,8 @@ is $fb->select({roles => 'id'}, [map { [$_->label, $_->id] } $roles_collection->
     '<option value="3">guest</option>'.
   '</select>';
 
-is $fb->select('state_ids', [map { [$_->label, $_->id] } $roles_collection->all] ),
-  '<input id="person_state_ids_hidden" name="person.state_ids[]" type="hidden" value="1"/>'.
+is $fb->select('state_ids', [map { [$_->label, $_->id] } $roles_collection->all], {unselected_value=>-1} ),
+  '<input id="person_state_ids_hidden" name="person.state_ids[0]" type="hidden" value="-1"/>'.
   '<select id="person_state_ids" multiple name="person.state_ids[]">'.
     '<option selected value="1">user</option>'.
     '<option value="2">admin</option>'.
@@ -310,14 +320,30 @@ is $fb->collection_checkbox({roles => 'id'}, $roles_collection, id=>'label'),
   '<label for="person_roles_3_id">guest</label>'.
   '<input id="person_roles_3_id" name="person.roles[3].id" type="checkbox" value="3"/>';
 
+is $fb->collection_checkbox({roles => 'id'}, $roles_collection, id=>'label', {include_hidden=>0}), 
+  '<label for="person_roles_4_id">user</label>'.
+  '<input checked id="person_roles_4_id" name="person.roles[4].id" type="checkbox" value="1"/>'.
+  '<label for="person_roles_5_id">admin</label>'.
+  '<input checked id="person_roles_5_id" name="person.roles[5].id" type="checkbox" value="2"/>'.
+  '<label for="person_roles_6_id">guest</label>'.
+  '<input id="person_roles_6_id" name="person.roles[6].id" type="checkbox" value="3"/>';
+
 is $fb->collection_checkbox({roles => 'id'}, $roles_collection, id=>'label', sub {
   my $fb_roles = shift;
   return  $fb_roles->checkbox({class=>'form-check-input'}),
           $fb_roles->label({class=>'form-check-label'});
-}), '<input id="person_roles_4__nop" name="person.roles[4]._nop" type="hidden" value="1"/><input checked class="form-check-input" id="person_roles_5_id" name="person.roles[5].id" type="checkbox" value="1"/><label class="form-check-label" for="person_roles_5_id">user</label><input checked class="form-check-input" id="person_roles_6_id" name="person.roles[6].id" type="checkbox" value="2"/><label class="form-check-label" for="person_roles_6_id">admin</label><input class="form-check-input" id="person_roles_7_id" name="person.roles[7].id" type="checkbox" value="3"/><label class="form-check-label" for="person_roles_7_id">guest</label>';
+}), '<input id="person_roles_7__nop" name="person.roles[7]._nop" type="hidden" value="1"/><input checked class="form-check-input" id="person_roles_8_id" name="person.roles[8].id" type="checkbox" value="1"/><label class="form-check-label" for="person_roles_8_id">user</label><input checked class="form-check-input" id="person_roles_9_id" name="person.roles[9].id" type="checkbox" value="2"/><label class="form-check-label" for="person_roles_9_id">admin</label><input class="form-check-input" id="person_roles_10_id" name="person.roles[10].id" type="checkbox" value="3"/><label class="form-check-label" for="person_roles_10_id">guest</label>';
 
 is $fb->collection_radio_buttons('state_id', $states_collection, id=>'name'),
   '<input id="person_state_id_hidden" name="person.state_id" type="hidden" value=""/>'.
+  '<label for="person_state_id_1">TX</label>'.
+  '<input checked id="person_state_id_1_1" name="person.state_id" type="radio" value="1"/>'.
+  '<label for="person_state_id_2">NY</label>'.
+  '<input id="person_state_id_2_2" name="person.state_id" type="radio" value="2"/>'.
+  '<label for="person_state_id_3">CA</label>'.
+  '<input id="person_state_id_3_3" name="person.state_id" type="radio" value="3"/>';
+
+is $fb->collection_radio_buttons('state_id', $states_collection, id=>'name', {include_hidden=>0}),
   '<label for="person_state_id_1">TX</label>'.
   '<input checked id="person_state_id_1_1" name="person.state_id" type="radio" value="1"/>'.
   '<label for="person_state_id_2">NY</label>'.

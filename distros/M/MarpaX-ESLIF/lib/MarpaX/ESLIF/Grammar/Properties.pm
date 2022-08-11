@@ -7,7 +7,7 @@ package MarpaX::ESLIF::Grammar::Properties;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '6.0.24'; # VERSION
+our $VERSION = '6.0.25'; # VERSION
 
 
 #
@@ -171,7 +171,7 @@ MarpaX::ESLIF::Grammar::Properties - ESLIF Grammar Properties
 
 =head1 VERSION
 
-version 6.0.24
+version 6.0.25
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package Pithub::Gists;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01037';
+our $VERSION = '0.01039';
 # ABSTRACT: Github v3 Gists API
 
 use Moo;
@@ -147,7 +147,7 @@ Pithub::Gists - Github v3 Gists API
 
 =head1 VERSION
 
-version 0.01037
+version 0.01039
 
 =head1 METHODS
 

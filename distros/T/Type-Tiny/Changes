@@ -7,6 +7,14 @@ Home page:    <https://metacpan.org/release/Type-Tiny>
 Bug tracker:  <https://github.com/tobyink/p5-type-tiny/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+1.016007	2022-08-04
+
+ - Added: Type::Params now has a `strictness` option, which if set to false
+   (or certain strings of Perl code that evaluate to false) will skip type
+   checks apart from when needed for coercions, skip parameter count
+   checks, and skip checks for unknown named parameters. You generally
+   don't want to set it to false or indeed set it at all.
+
 1.016006	2022-07-25
 
  [ Documentation ]

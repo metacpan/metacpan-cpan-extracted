@@ -3,17 +3,6 @@ Upstream-Name: Sub-MultiMethod
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Sub-MultiMethod
 
-Files: INSTALL
- LICENSE
- Makefile.PL
- examples/benchmark.pl
- examples/json.pl
- examples/rock-paper-scissors-zydeco.pl
- examples/rock-paper-scissors.pl
- examples/roles.pl
-Copyright: Unknown
-License: Unknown
-
 Files: dist.ini
  t/02singleclass.t
  t/03inheritance.t
@@ -24,6 +13,17 @@ Files: dist.ini
  t/08mro.t
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+ LICENSE
+ Makefile.PL
+ examples/benchmark.pl
+ examples/json.pl
+ examples/rock-paper-scissors-zydeco.pl
+ examples/rock-paper-scissors.pl
+ examples/roles.pl
+Copyright: Unknown
+License: Unknown
 
 Files: Changes
  META.json
@@ -42,12 +42,15 @@ License: public-domain
 
 Files: README
  lib/Sub/MultiMethod.pm
- t/01basic.t
-Copyright: This software is copyright (c) 2020 by Toby Inkster.
+Copyright: This software is copyright (c) 2020-2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/10headtail.t
 Copyright: This software is copyright (c) 2022 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/01basic.t
+Copyright: This software is copyright (c) 2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

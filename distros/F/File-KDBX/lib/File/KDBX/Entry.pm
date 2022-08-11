@@ -21,7 +21,7 @@ use namespace::clean;
 
 extends 'File::KDBX::Object';
 
-our $VERSION = '0.904'; # VERSION
+our $VERSION = '0.905'; # VERSION
 
 my $PLACEHOLDER_MAX_DEPTH = 10;
 my %PLACEHOLDERS;
@@ -681,7 +681,7 @@ File::KDBX::Entry - A KDBX database entry
 
 =head1 VERSION
 
-version 0.904
+version 0.905
 
 =head1 DESCRIPTION
 

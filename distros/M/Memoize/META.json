@@ -45,6 +45,6 @@
          "web" : "https://github.com/ap/Memoize"
       }
    },
-   "version" : "1.09",
+   "version" : "1.10",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

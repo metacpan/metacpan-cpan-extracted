@@ -127,8 +127,9 @@ my $extra_compiler_flags = '';
 # We depend on libiconv that is in the form of a tar.gz
 # -----------------------------------------------------
 {
+    my $iconv_version = "1.16";
     my $tar=Archive::Tar->new();
-    my $libiconv_tar = File::Spec->catfile('3rdparty', 'tar', 'libiconv-1.15.tar.gz');
+    my $libiconv_tar = File::Spec->catfile('3rdparty', 'tar', "libiconv-${iconv_version}.tar.gz");
     $tar->read($libiconv_tar);
     print "... Extracting $libiconv_tar in 3rdparty/output\n";
     make_path(File::Spec->catdir('3rdparty', 'output'));
@@ -161,9 +162,9 @@ my $extra_compiler_flags = '';
                 }
             },
         },
-        File::Spec->catdir('3rdparty', 'output', 'libiconv-1.15'));
+        File::Spec->catdir('3rdparty', 'output', "libiconv-${iconv_version}"));
 
-    my $config_h = File::Spec->catfile('3rdparty', 'output', 'libiconv-1.15', 'include', 'iconv_config.h');
+    my $config_h = File::Spec->catfile('3rdparty', 'output', "libiconv-${iconv_version}", 'include', 'iconv_config.h');
     print "... Generate file $config_h\n";
     open(my $fd, '>', $config_h) || die "Failed to open $config_h, $!";
     print $fd "
@@ -173,13 +174,13 @@ my $extra_compiler_flags = '';
 \n";
     close($fd) || warn "Failed to close $config_h, $!";
 
-    my $iconv_h_in = File::Spec->catfile('3rdparty', 'output', 'libiconv-1.15', 'include', 'iconv.h.in');
-    my $iconv_h = File::Spec->catfile('3rdparty', 'output', 'libiconv-1.15', 'include', 'iconv.h');
+    my $iconv_h_in = File::Spec->catfile('3rdparty', 'output', "libiconv-${iconv_version}", 'include', 'iconv.h.in');
+    my $iconv_h = File::Spec->catfile('3rdparty', 'output', "libiconv-${iconv_version}", 'include', 'iconv.h');
     print "... Generate file $iconv_h\n";
     write_iconv_h($iconv_h_in, $iconv_h);
 
-    my $localcharset_h_in = File::Spec->catfile('3rdparty', 'output', 'libiconv-1.15', 'libcharset', 'include', 'localcharset.h.in');
-    my $localcharset_h = File::Spec->catfile('3rdparty', 'output', 'libiconv-1.15', 'libcharset', 'include', 'localcharset.h');
+    my $localcharset_h_in = File::Spec->catfile('3rdparty', 'output', "libiconv-${iconv_version}", 'libcharset', 'include', 'localcharset.h.in');
+    my $localcharset_h = File::Spec->catfile('3rdparty', 'output', "libiconv-${iconv_version}", 'libcharset', 'include', 'localcharset.h');
     print "... Generate file $localcharset_h\n";
     write_localcharset_h($localcharset_h_in, $localcharset_h);
 
@@ -201,12 +202,12 @@ my $extra_compiler_flags = '';
     $extra_compiler_flags .= " -DENABLE_EXTRA";
     
 
-    push(@additional_srcdir, File::Spec->catfile('3rdparty', 'output', 'libiconv-1.15', 'libcharset', 'lib', 'localcharset.c'));
-    push(@additional_srcdir, File::Spec->catfile('3rdparty', 'output', 'libiconv-1.15', 'lib', 'relocatable.c'));
-    push(@additional_srcdir, File::Spec->catfile('3rdparty', 'output', 'libiconv-1.15', 'lib', 'iconv.c'));
+    push(@additional_srcdir, File::Spec->catfile('3rdparty', 'output', "libiconv-${iconv_version}", 'libcharset', 'lib', 'localcharset.c'));
+    push(@additional_srcdir, File::Spec->catfile('3rdparty', 'output', "libiconv-${iconv_version}", 'lib', 'relocatable.c'));
+    push(@additional_srcdir, File::Spec->catfile('3rdparty', 'output', "libiconv-${iconv_version}", 'lib', 'iconv.c'));
 
-    push(@additional_includes, File::Spec->catfile('3rdparty', 'output', 'libiconv-1.15', 'include'));
-    push(@additional_includes, File::Spec->catfile('3rdparty', 'output', 'libiconv-1.15', 'libcharset', 'include'));
+    push(@additional_includes, File::Spec->catfile('3rdparty', 'output', "libiconv-${iconv_version}", 'include'));
+    push(@additional_includes, File::Spec->catfile('3rdparty', 'output', "libiconv-${iconv_version}", 'libcharset', 'include'));
 }
 
 # -----------------------------------------------------

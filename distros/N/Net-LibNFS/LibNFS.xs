@@ -37,6 +37,9 @@
 #endif
 #endif
 
+// Taken from libnfs itself:
+#define UNIX_AUTHN_MACHINE_NAME "libnfs"
+
 #define PERL_NS "Net::LibNFS"
 #define PERL_STAT_NS PERL_NS "::Stat"
 #define PERL_STATVFS_NS PERL_NS "::StatVFS"
@@ -941,6 +944,36 @@ static int _write_or_pwrite (pTHX_ SV* self_sv, SV* offset_sv, SV* buf_sv, SV* c
     return RETVAL;
 }
 
+// NB: libnfs 5.0.2 added the ability to set auxiliary GIDs, which would
+// obviate this functionality; however, by retaining it we allow pre-5.0.2
+// libnfs releases to set aux GIDs. So there’s little incentive to adopt
+// libnfs’s new hotness.
+//
+static void _set_unix_authn(pTHX_ struct nfs_context* nfs, SV* value_sv) {
+
+    if (!SvROK(value_sv) || (SvTYPE(SvRV(value_sv)) != SVt_PVAV)) {
+        croak("“%s” must be an array reference, not %" SVf, "unix_authn", value_sv);
+    }
+
+    AV* authn_av = (AV*) SvRV(value_sv);
+    uint32_t nums_count = 1 + av_len(authn_av);
+    if (nums_count < 2) croak("“%s” must contain at least 2 numbers", "unix_authn");
+
+    uint32_t nums[nums_count];
+
+    for (unsigned n=0; n<nums_count; n++) {
+        SV** svp = av_fetch(authn_av, n, 0);
+        assert(svp);
+
+        nums[n] = exs_SvUV(*svp);
+    }
+
+    struct AUTH* auth = libnfs_authunix_create(UNIX_AUTHN_MACHINE_NAME, nums[0], nums[1], nums_count - 2, 2 + nums);
+    assert(auth);
+
+    nfs_set_auth(nfs, auth);
+}
+
 // ----------------------------------------------------------------------
 
 MODULE = Net::LibNFS        PACKAGE = Net::LibNFS
@@ -1113,6 +1146,12 @@ set (SV* self_sv, ...)
                         newSVpv(nfs_get_error(perl_nfs->nfs), 0) )
                     );
                 }
+
+                continue;
+            }
+
+            if (!strcmp(param, "unix_authn")) {
+                _set_unix_authn(aTHX_ perl_nfs->nfs, value_sv);
 
                 continue;
             }

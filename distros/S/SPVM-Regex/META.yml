@@ -21,5 +21,5 @@ requires:
   SPVM::Resource::Re2::V2022_06_01: '0.05'
   SPVM::Unicode: '0.03'
 resources: {}
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -5,21 +5,18 @@ package # hide from PAUSE
   package Catalyst::ActionRole::Verbs::Utils::MethodNotAllowed;
    
   use Moose;
-  use namespace::clean -except => 'meta';
-    
-  extends 'CatalystX::Utils::HttpException';
-  
+  with 'CatalystX::Utils::DoesHttpException';
+   
   has resource => (is=>'ro', required=>1);
   has allowed_methods => (is=>'ro', isa=>'ArrayRef[Str]', required=>1);
   has attempted_method => (is=>'ro', isa=>'Str', required=>1);
 
-  has '+status' => (is=>'ro', init_arg=>undef, default=>sub {405});
-  has '+errors' => (
-    is=>'ro',
-    init_arg=>undef, 
-    default=>sub { ["HTTP Method '@{[ $_[0]->attempted_method ]}' not permitted for resource '@{[ $_[0]->resource ]}'.  Can only be: @{[ join ', ', @{$_[0]->allowed_methods||[]} ]}"] },
-  );
-   
+  sub status_code { 405 }
+  sub error {
+    "HTTP Method '@{[ $_[0]->attempted_method ]}' not permitted for resource '@{[ $_[0]->resource ]}'.  ".
+    "Can only be: @{[ join ', ', @{$_[0]->allowed_methods||[]} ]}";
+  }
+     
   __PACKAGE__->meta->make_immutable;
 }
 
@@ -104,18 +101,18 @@ around 'dispatch', sub {
   my ($orig, $self, $ctx, @args) = @_;
   my $ret = $self->$orig($ctx, @args);
   my $method = $ctx->req->method;
-  my @return = @{ delete $ctx->stash->{__execute}||[] };
+  my @return = grep { defined $_ } @{ delete $ctx->stash->{__execute}||[] };
 
   return $ret unless my $action_handler = $self->verb_action_handlers->{$method};
-  return $self->_dispatch_to_verb($ctx, $action_handler, @return);
+  return $self->_dispatch_to_verb($ctx, $action_handler); # @return
 };
 
 sub _dispatch_to_verb {
   my ($self, $ctx, $action_handler, @return) = @_;
 
   ## TODO @return seems to contain undef when it really means empty.
-  #return $ctx->forward($action_handler, [@{$ctx->req->args}, @return]);
-  return $ctx->forward($action_handler, $ctx->req->args)
+  return $ctx->forward($action_handler, [@return]);
+  #return $ctx->forward($action_handler, $ctx->req->args)
 }
 
 1;

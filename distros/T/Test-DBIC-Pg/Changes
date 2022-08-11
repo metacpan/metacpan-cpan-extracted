@@ -1,0 +1,46 @@
+Changes on 2022-08-08 for repository at:
+  Fetch URL: git@github.com:abeltje/Test-DBIC-Pg.git
+  Push  URL: git@github.com:abeltje/Test-DBIC-Pg.git
+
+Enjoy!
+
+1.00 2022-08-08T14:23:39+02:00 (461cbe4 => Abe Timmerman)
+ - (Abe Timmerman, Mon, 8 Aug 2022 14:23:39 +0200) Autocommit for
+   distribution Test::DBIC::Pg 1.00 (minor)
+
+0.99_03 2022-08-02T16:05:00+02:00 (06b8ce4 => Abe Timmerman)
+ - (Abe Timmerman, Tue, 2 Aug 2022 16:05:00 +0200) Autocommit for
+   distribution Test::DBIC::Pg 0.99_03 (test)
+
+0.99_02 2022-08-01T11:50:16+02:00 (7e76679 => Abe Timmerman)
+ - (Abe Timmerman, Mon, 1 Aug 2022 11:50:16 +0200) Autocommit for
+   distribution Test::DBIC::Pg 0.99_02 (test)
+
+ - (Abe Timmerman, Tue, 2 Aug 2022 15:59:02 +0200) Update test-suite and
+   README.md
+ -     Use $TEST_ONLINE to run the online tests
+ -     Add testrules.yml to force sequential execution
+
+ - (Abe Timmerman, Tue, 2 Aug 2022 16:02:34 +0200) Update the general
+   example code from Music-Schema
+
+0.99_01 2022-07-27T15:44:43+02:00 (6a1cf44 => Abe Timmerman)
+ - (Abe Timmerman, Wed, 27 Jul 2022 15:44:43 +0200) Autocommit for
+   distribution Test::DBIC::Pg 0.99_01 (test)
+
+ - (Abe Timmerman, Mon, 1 Aug 2022 11:49:22 +0200) Add `testrules.yml` to
+   ensure test-order
+
+0.00_00 2019-05-22T11:54:25+02:00 (6854f8a => Abe Timmerman)
+ - (Abe Timmerman, Wed, 22 May 2019 11:54:25 +0200) Initial commit
+ -     Pure rip-off of Test-DBIC-SQLite and a hack!
+
+ - (Abe Timmerman, Mon, 11 Jul 2022 12:28:22 +0200) Update to
+   t::Test::abeltje to 1.07
+
+ - (Abe Timmerman, Wed, 13 Jul 2022 11:18:05 +0200) Copy more test-stuff
+   from Test::DBIC::SQLite
+ -     More to come
+
+ - (Abe Timmerman, Wed, 27 Jul 2022 15:20:32 +0200) First attempt to create
+   a distribution

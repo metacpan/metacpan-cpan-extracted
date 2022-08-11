@@ -1,6 +1,6 @@
 package App::ansiecho;
 
-our $VERSION = "0.07";
+our $VERSION = "1.01";
 
 use v5.14;
 use warnings;
@@ -183,7 +183,7 @@ __END__
 
 =head1 NAME
 
-App::ansiecho - Command to produce ANSI terminal code
+ansiecho - Colored echo command using ANSI terminal sequence
 
 =head1 SYNOPSIS
 
@@ -191,8 +191,7 @@ App::ansiecho - Command to produce ANSI terminal code
 
 =head1 DESCRIPTION
 
-B<ansiecho> is a small command interface to produce ANSI terminal
-code using L<Getopt::EX::Colormap> module.
+Document is included in the executable script.
 
 =head1 AUTHOR
 
@@ -200,7 +199,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2021 Kazumasa Utashiro.
+Copyright 2021-2022 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

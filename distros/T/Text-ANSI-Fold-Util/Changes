@@ -1,5 +1,13 @@
 Revision history for Perl extension Text-ANSI-Fold-Util
 
+1.01 2022-08-05T23:04:21Z
+
+    - Deprecate expand() and release 1.01.
+
+0.07 2022-08-05T21:45:38Z
+
+    - requires Text::ANSI::Fold@2.1301
+
 0.06 2021-09-03T13:01:26Z
 
     - Spin-off Text::ANSI::Tabs.

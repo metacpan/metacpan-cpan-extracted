@@ -28,7 +28,7 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.101"
+            "Rinci" : "v1.1.102"
          }
       },
       "runtime" : {
@@ -47,13 +47,15 @@
             "Data::Sah::Compiler::perl::TH::str" : "0.911",
             "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" : "0",
             "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" : "0",
+            "File::Slurper::Dash" : "0",
             "Getopt::Long" : "2.50",
-            "Hash::Subset" : "0.006",
+            "Hash::Subset" : "0.007",
             "Log::ger" : "0.038",
             "Perinci::CmdLine::Any" : "0.152",
             "Perinci::CmdLine::Lite" : "1.915",
             "Perinci::Sub::XCompletion::sortsub_spec" : "0",
             "Sah::Schema::filename" : "0",
+            "Sah::Schema::true" : "0",
             "Sah::Schema::uint" : "0",
             "Scalar::Util" : "0",
             "Sort::ByExample" : "0",
@@ -81,7 +83,7 @@
    "provides" : {
       "App::CSVUtils" : {
          "file" : "lib/App/CSVUtils.pm",
-         "version" : "0.037"
+         "version" : "0.044"
       }
    },
    "release_status" : "stable",
@@ -96,7 +98,7 @@
          "web" : "https://github.com/perlancar/perl-App-CSVUtils"
       }
    },
-   "version" : "0.037",
+   "version" : "0.044",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -129,7 +131,7 @@
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript csv-delete-field",
+            "name" : "GenPericmdScript csv-delete-fields",
             "version" : "0.424"
          },
          {
@@ -144,7 +146,17 @@
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript csv-fill-template",
+            "version" : "0.424"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-freqtable",
+            "version" : "0.424"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript csv-get-cells",
             "version" : "0.424"
          },
          {
@@ -175,6 +187,11 @@
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-munge-field",
+            "version" : "0.424"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript csv-munge-row",
             "version" : "0.424"
          },
          {
@@ -603,7 +620,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.780"
+                        "version" : "0.784"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",

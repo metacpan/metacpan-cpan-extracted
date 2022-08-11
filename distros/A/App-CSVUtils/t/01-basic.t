@@ -59,25 +59,42 @@ subtest csv_add_field => sub {
     is_deeply($res, [200,"OK","f1,f4,f2,f3\n1,4,2,3\n4,6,5,6\n7,8,8,9\n",{'cmdline.skip_format'=>1}], "result (with 'at' option)");
 };
 
-subtest csv_delete_field => sub {
+subtest csv_delete_fields => sub {
     my $res;
 
-    dies_ok { App::CSVUtils::csv_delete_field(filename=>"$dir/1.csv", fields=>["f4"]) }
-        "deleting unknown field -> dies (1)";
+    $res = App::CSVUtils::csv_delete_fields(filename=>"$dir/1.csv", include_fields=>["f4"]);
+    is($res->[0], 400, "deleting unknown field -> error");
 
-    dies_ok { App::CSVUtils::csv_delete_field(filename=>"$dir/1.csv", fields=>["f1", "f4"]) }
-        "deleting unknown field -> dies (2)";
+    subtest "deleting unknown field with ignore_unknown_fields option -> ok" => sub {
+        $res = App::CSVUtils::csv_delete_fields(filename=>"$dir/1.csv", include_fields=>["f4"], ignore_unknown_fields=>1);
+        is_deeply($res, [200, "OK", "f1,f2,f3\n1,2,3\n4,5,6\n7,8,9\n", {'cmdline.skip_format'=>1}]) or diag explain $res;
+    };
 
-    $res = App::CSVUtils::csv_delete_field(filename=>"$dir/2.csv", fields=>["f1"]);
+    subtest "exclude_field_pat option" => sub {
+        $res = App::CSVUtils::csv_delete_fields(filename=>"$dir/1.csv", include_field_pat => qr/.*/, exclude_field_pat=>qr/3/);
+        is_deeply($res, [200, "OK", "f3\n3\n6\n9\n", {'cmdline.skip_format'=>1}]) or diag explain $res;
+    };
+
+    subtest "exclude_fields option" => sub {
+        $res = App::CSVUtils::csv_delete_fields(filename=>"$dir/1.csv", include_field_pat => qr/.*/, exclude_fields=>['f3']);
+        is_deeply($res, [200, "OK", "f3\n3\n6\n9\n", {'cmdline.skip_format'=>1}]) or diag explain $res;
+    };
+
+    subtest "show_selected_fields option" => sub {
+        $res = App::CSVUtils::csv_delete_fields(filename=>"$dir/1.csv", include_field_pat => qr/.*/, exclude_fields=>['f3'], show_selected_fields=>1);
+        is_deeply($res, [200, "OK", ["f1","f2"]]) or diag explain $res;
+    };
+
+    $res = App::CSVUtils::csv_delete_fields(filename=>"$dir/2.csv", include_field_pat=>qr/.*/);
     is($res->[0], 412, "deleting last remaining field -> error (1)");
 
-    $res = App::CSVUtils::csv_delete_field(filename=>"$dir/3.csv", fields=>["f2", "f1"]);
+    $res = App::CSVUtils::csv_delete_fields(filename=>"$dir/3.csv", include_fields=>["f2", "f1"]);
     is($res->[0], 412, "deleting last remaining field -> error (2)");
 
-    $res = App::CSVUtils::csv_delete_field(filename=>"$dir/1.csv", fields=>["f1"]);
+    $res = App::CSVUtils::csv_delete_fields(filename=>"$dir/1.csv", include_fields=>["f1"]);
     is_deeply($res, [200,"OK","f2,f3\n2,3\n5,6\n8,9\n",{'cmdline.skip_format'=>1}], "result");
 
-    $res = App::CSVUtils::csv_delete_field(filename=>"$dir/1.csv", fields=>["f3", "f1"]);
+    $res = App::CSVUtils::csv_delete_fields(filename=>"$dir/1.csv", include_fields=>["f3", "f1"]);
     is_deeply($res, [200,"OK","f2\n2\n5\n8\n",{'cmdline.skip_format'=>1}], "result")
         or diag explain $res;
 };
@@ -231,15 +248,25 @@ subtest csv_concat => sub {
 subtest csv_select_fields => sub {
     my $res;
 
-    dies_ok { App::CSVUtils::csv_select_fields(filename=>"$dir/1.csv", fields=>["f1", "f4"]) }
-        "specifying unknown field -> dies";
+    $res = App::CSVUtils::csv_select_fields(filename=>"$dir/1.csv", include_fields=>["f1", "f4"]);
+    is($res->[0], 400, "specifying unknown field -> error");
 
-    $res = App::CSVUtils::csv_select_fields(filename=>"$dir/1.csv", fields=>["f1", "f1"]);
-    is($res->[0], 400, "duplicated field -> status 400");
+    subtest "specifying unknown field with ignore_unknown_fields option -> ok" => sub {
+        $res = App::CSVUtils::csv_select_fields(filename=>"$dir/1.csv", include_fields=>["f1", "f4"], ignore_unknown_fields=>1);
+        is_deeply($res, [200, "OK", "f1\n1\n4\n7\n", {'cmdline.skip_format'=>1}]) or diag explain $res;
+    };
 
-    $res = App::CSVUtils::csv_select_fields(filename=>"$dir/1.csv", fields=>["f3", "f1"]);
-    is_deeply($res, [200,"OK","f3,f1\n3,1\n6,4\n9,7\n",{'cmdline.skip_format'=>1}], "result")
-        or diag explain $res;
+    subtest "ordering of fields as specified" => sub {
+        $res = App::CSVUtils::csv_select_fields(filename=>"$dir/1.csv", include_fields=>["f3", "f1"]);
+        is_deeply($res, [200,"OK","f3,f1\n3,1\n6,4\n9,7\n",{'cmdline.skip_format'=>1}], "result")
+            or diag explain $res;
+    };
+
+    # XXX test include_field_pat, exclude_fields, exclude_field_pat (but these
+    # are already tested in testing csv_delete_fields().
+
+    # XXX test show_selected_fields (but this is already testing in testing
+    # csv_delete_fields()).
 };
 
 subtest csv_grep => sub {

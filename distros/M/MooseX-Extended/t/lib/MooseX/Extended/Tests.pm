@@ -15,7 +15,7 @@ package MooseX::Extended::Tests {
         my ( $class, %arg_for ) = @_;
         my ( $package, $filename, undef ) = caller;
 
-        my $name = $arg_for{name} // $filename;
+        my $name = $arg_for{name} // $arg_for{module} // $filename;
 
         my $builder = Test::Builder->new;
         if ( my $version = $arg_for{version} ) {

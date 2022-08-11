@@ -1,5 +1,10 @@
 Revision history for File-KDBX.
 
+0.905     2022-08-06 12:12:42-0600
+  * Declare Time::Local 1.19 as a required dependency.
+  * Declare CryptX 0.055 as a required dependency. Thanks HIGHTOWE.
+  * Fixed minor documentation errors.
+
 0.904     2022-07-07 21:51:17-0600
   * Use expanded title, username in OTP parameters.
 

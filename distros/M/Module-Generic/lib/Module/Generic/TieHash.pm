@@ -182,7 +182,6 @@ sub _exclude
 {
     my $self = shift( @_ );
     my $caller = shift( @_ );
-    ## $self->message( 3, "Disable hash contains: ", sub{ $self->dump( $self->{disable} ) });
     return( CORE::exists( $self->{disable}->{ $caller } ) );
 }
 

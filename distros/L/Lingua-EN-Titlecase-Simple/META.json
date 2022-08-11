@@ -11,32 +11,27 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Lingua-EN-Titlecase-Simple",
-   "no_index" : {},
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {},
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
+      "configure" : {},
       "runtime" : {
          "requires" : {
-            "perl" : "5.008001",
-            "strict" : "0",
-            "utf8" : "0",
-            "warnings" : "0"
+            "perl" : "5.008001"
          }
       },
       "test" : {
          "requires" : {
             "Data::Dumper" : "0",
-            "Test::More" : "0",
-            "constant" : "0",
-            "if" : "0",
-            "open" : "0"
+            "Test::More" : "0"
          }
       }
    },
@@ -47,14 +42,14 @@
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ap/titlecase.git",
+         "url" : "https://github.com/ap/titlecase.git",
          "web" : "https://github.com/ap/titlecase"
       }
    },
-   "version" : "1.004",
+   "version" : "1.005",
    "x_copyright" : {
       "holder" : "John Gruber, Aristotle Pagaltzis",
       "year" : 2018
    },
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

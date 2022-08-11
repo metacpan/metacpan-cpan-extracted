@@ -1,11 +1,6 @@
 Changes
-LICENSE
-MANIFEST
-META.json                                Module JSON meta-data (added by MakeMaker)
-META.yml                                 Module YAML meta-data (added by MakeMaker)
 Makefile.PL
-README
-boilerplate.pl
+inc/boilerplate.pl
 lib/Catalyst/View/Template.pm
 lib/Catalyst/View/Template.pod
 t/basic.t
@@ -23,3 +18,8 @@ t/lib/MyApp/root/heart.tt
 t/lib/MyApp/root/specified.tt
 t/lib/MyApp/root/test.tt
 t/lib/MyApp/root/test_args.tt
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+LICENSE
+README

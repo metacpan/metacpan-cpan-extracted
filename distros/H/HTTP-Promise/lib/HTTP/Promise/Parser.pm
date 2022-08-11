@@ -1078,6 +1078,14 @@ sub _trim_crlf
     return( $ref );
 }
 
+# NOTE: sub FREEZE is inherited
+
+sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+# NOTE: sub THAW is inherited
+
 1;
 # NOTE: POD
 __END__

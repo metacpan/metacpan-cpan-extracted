@@ -23,6 +23,7 @@ sub import {
     base
     false
     from
+    mixin
     role
     test
     true
@@ -42,6 +43,9 @@ sub import {
   }
   if ($exports{"from"} && !*{"${from}::from"}{"CODE"}) {
     *{"${from}::from"} = sub {@_ = ($from, @_); goto \&from};
+  }
+  if ($exports{"mixin"} && !*{"${from}::mixin"}{"CODE"}) {
+    *{"${from}::mixin"} = sub {@_ = ($from, @_); goto \&mixin};
   }
   if ($exports{"role"} && !*{"${from}::role"}{"CODE"}) {
     *{"${from}::role"} = sub {@_ = ($from, @_); goto \&role};
@@ -81,6 +85,14 @@ sub from {
   my ($from, @args) = @_;
 
   $from->FROM(@args);
+
+  return $from;
+}
+
+sub mixin {
+  my ($from, @args) = @_;
+
+  $from->MIXIN(@args);
 
   return $from;
 }
@@ -351,6 +363,47 @@ I<Since C<0.03>>
   with 'Entity';
 
   from 'Record';
+
+  # "Example"
+
+=back
+
+=cut
+
+=head2 mixin
+
+  mixin(Str $name) (Str)
+
+The mixin function registers and consumes mixins for the calling package. This
+function is always exported unless a routine of the same name already exists.
+
+I<Since C<0.05>>
+
+=over 4
+
+=item mixin example 1
+
+  package YesNo;
+
+  use Mars::Mixin;
+
+  sub no {
+    return 0;
+  }
+
+  sub yes {
+    return 1;
+  }
+
+  sub EXPORT {
+    ['no', 'yes']
+  }
+
+  package Example;
+
+  use Mars::Class;
+
+  mixin 'YesNo';
 
   # "Example"
 

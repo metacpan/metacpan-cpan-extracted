@@ -1,25 +1,27 @@
 SQL::PatchDAG
 
 This module manages a directory containing SQL files that must be run in
-a particular order. This order is specified implicitly by the contents of
-the files: each of them must contain a dependency declaration, which the
-module provides code to help maintain. This provides a merge-friendly way
-to introduce schema patches in a code base across multiple branches.
+a particular order. This order is specified implicitly by the contents
+of the files: each of them must contain a dependency declaration, which
+the module provides code to help maintain. This provides a
+merge-friendly way to introduce schema patches in a code base across
+multiple branches.
 
 Patch application itself is up the caller. The module does not talk to a
 database.
 
 INSTALLATION
 
-This is a Perl module distribution. It should be installed with whichever
-tool you use to manage your installation of Perl, e.g. any of
+This is a Perl module distribution. It should be installed with
+whichever tool you use to manage your installation of Perl, e.g. any of
 
   cpanm .
   cpan  .
   cpanp -i .
 
-Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
-Should you wish to install this module manually, the procedure is
+Consult http://www.cpan.org/modules/INSTALL.html for further
+instruction. Should you wish to install this module manually, the
+procedure is
 
   perl Makefile.PL
   make
@@ -30,5 +32,5 @@ COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2020 by Aristotle Pagaltzis.
 
-This is free software; you can redistribute it and/or modify it under the
-same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

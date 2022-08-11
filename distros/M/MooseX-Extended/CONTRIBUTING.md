@@ -5,7 +5,7 @@ Contributors are very welcome!
 # Bug Fixes and Typos
 
 For minor fixes, you can [open an
-issue](https://github.com/Ovid/moosex-extreme/issues), but a pull request
+issue](https://github.com/Ovid/moosex-extended/issues), but a pull request
 (with tests, if appropriate) is very welcome.
 
 I do not accept patches. I've found them too much of a pain to apply.
@@ -13,7 +13,7 @@ I do not accept patches. I've found them too much of a pain to apply.
 # New Features
 
 If you would like a feature added, please [open an
-issue](https://github.com/Ovid/moosex-extreme/issues) first so we can discuss
+issue](https://github.com/Ovid/moosex-extended/issues) first so we can discuss
 it.
 
 # Changes

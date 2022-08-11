@@ -19,7 +19,7 @@ Note: Replace '0.10' in the examples below with the current version.
 * Bump version number in lib/Crypt/X509.pm
 
     perl -i -pe "s{^our \\\$VERSION.+}{our \\\$VERSION = '$modver';};" lib/Crypt/PKCS10.pm
-    perl -i -pe "s{^version: .+}{version:            '$modver';};" META.json
+    perl -i -pe "s{\"version\".+,}{\"version\" : \"$modver\",};" META.json
     git add lib/Crypt/PKCS10.pm META.json
     git commit -m "bump version to $modver"
 
@@ -34,5 +34,6 @@ Note: Replace '0.10' in the examples below with the current version.
 
 * Upload tarball to https://pause.perl.org
 
-    minil release
+    # Note: `minil release` will bump the version, so don't use this anymore!
+    #minil release
 

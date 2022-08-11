@@ -46,6 +46,6 @@
          "url" : "https://github.com/rurban/Filter"
       }
    },
-   "version" : "1.61",
+   "version" : "1.62",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

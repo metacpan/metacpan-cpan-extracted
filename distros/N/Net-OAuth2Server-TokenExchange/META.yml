@@ -22,9 +22,10 @@ requires:
   parent: '0'
   perl: '5.008'
 resources:
-  bugtracker: https://github.com/ap/Net-OAuth2Server-TokenExchange/issues
-  repository: git://github.com/ap/Net-OAuth2Server-TokenExchange.git
-version: '0.003'
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-OAuth2Server-TokenExchange
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ap/Net-OAuth2Server-TokenExchange.git
+version: '0.004'
 x_copyright:
   holder: 'Aristotle Pagaltzis'
   year: 2020

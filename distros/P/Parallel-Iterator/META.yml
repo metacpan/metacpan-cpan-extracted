@@ -25,7 +25,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Parallel-Iterator
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ap/Parallel-Iterator.git
-version: '1.001'
+version: '1.002'
 x_copyright:
   holder: 'Andy Armstrong'
   year: 2007

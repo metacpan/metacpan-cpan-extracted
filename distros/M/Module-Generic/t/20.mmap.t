@@ -5,6 +5,7 @@ BEGIN
     use warnings;
     use lib './lib';
     use vars qw( $DEBUG $SERIALISER );
+    use Errno;
     use Nice::Try;
     use Test2::IPC;
     use Test2::V0;

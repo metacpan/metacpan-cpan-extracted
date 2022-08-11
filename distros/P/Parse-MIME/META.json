@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Parse-MIME",
    "no_index" : {
@@ -21,11 +21,7 @@
    },
    "prereqs" : {
       "build" : {},
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
+      "configure" : {},
       "runtime" : {
          "requires" : {
             "Exporter" : "0",
@@ -42,18 +38,21 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ap/Parse-MIME/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Parse-MIME"
       },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ap/Parse-MIME.git",
+         "url" : "https://github.com/ap/Parse-MIME.git",
          "web" : "https://github.com/ap/Parse-MIME"
       }
    },
-   "version" : "1.005",
+   "version" : "1.006",
    "x_copyright" : {
       "holder" : "Aristotle Pagaltzis",
       "year" : 2018
    },
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

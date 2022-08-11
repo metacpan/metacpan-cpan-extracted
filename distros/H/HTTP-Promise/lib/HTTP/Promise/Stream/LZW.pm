@@ -136,6 +136,14 @@ sub is_emcoder_installed
     return( $@ ? 0 : 1 );
 }
 
+# NOTE: sub FREEZE is inherited
+
+# NOTE: sub STORABLE_freeze is inherited
+
+# NOTE: sub STORABLE_thaw is inherited
+
+# NOTE: sub THAW is inherited
+
 1;
 # NOTE: POD
 __END__

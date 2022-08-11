@@ -1,6 +1,8 @@
 use strict; use warnings;
 
 package Net::OAuth2Server::Request::Token;
+our $VERSION = '0.006';
+
 use parent 'Net::OAuth2Server::Request';
 
 sub allowed_methods       { 'POST' }
@@ -19,4 +21,4 @@ sub dispatch {
 	$class ? $class->new( %$self ) : $self->set_error_unsupported_grant_type;
 }
 
-our $VERSION = '0.005';
+1;

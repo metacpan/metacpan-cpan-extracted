@@ -1,5 +1,8 @@
 Revision history for Perl module X::Tiny
 
+0.22 Wed Aug 10 2022
+- Handle already-freed stack items gracefully (rather than blowing up).
+
 0.21 Tue Dec 3 2019
 - Optimize boolean evaluations of overloaded instances.
 

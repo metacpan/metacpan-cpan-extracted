@@ -1,5 +1,58 @@
 Revision history for Perl extension Net::SAML2.
 
+0.57 -- Fri Aug 05 23:34:05 ADT 2022
+
+  [ Release 0.56-TRIAL as 0.57 ]
+
+  [ Significant Changes since 0.55 ]
+
+  - Numerous fixes and cleanups thanks to Wesley Schwengle (waterkip)
+  - Functionality changes mostly limited to Net::SAML2::SP
+  - metadata signing has been improved
+  - updates to github actions
+  - new API for ACS/SLO data in metadata
+
+0.56 -- Sun Jul 24 23:52:56 ADT 2022
+
+  [ Significant Changes since 0.55 ]
+
+  - Numerous fixes and cleanups thanks to Wesley Schwengle (waterkip)
+  - Functionality changes mostly limited to Net::SAML2::SP
+  - metadata signing has been improved
+  - updates to github actions
+  - new API for ACS/SLO data in metadata
+
+  [ Change Log ]
+
+  - signing metadata is now optional
+  - 8ee4f57 Merge pull request #69 from waterkip/GH-46_acs_and_slo_injections
+  - 027d300 fixup! Implement new API for ACS/SLO data in metadata
+  - d81549a Implement new API for ACS/SLO data in metadata
+  - 01d5fb7 Merge pull request #67 from waterkip/testsuite-defaults
+  - 7c51e1b Merge pull request #68 from waterkip/GH-actions
+  - 10b9ab0 Only use defaults/required attrs in net_saml2_sp() test method
+  - 55d6e5e Install Moose in a seperate action
+  - f4d0718 Run Github actions on pull requests
+  - 7eb44fe Make Math::Pari installable
+  - 1fe7b8b cpanm is provided by the perl images
+  - 7f0c885 Update perl images in the matrix
+  - 915adaa Merge pull request #65 from waterkip/GH-cleanup-dist.ini
+  - f754ad7 Merge pull request #66 from waterkip/GH-46-optional_URIs
+  - b25642f Make some URI's optional in the constructor
+  - f01ef30 Remove dependencies from dist.ini
+  - 57142a1 Merge pull request #64 from waterkip/bug-61
+  - 5e6c0f0 Add ds:KeyName to md:KeyDescriptor/ds:Keyinfo
+  - c6b9dfb Fix SAML metadata signing
+  - b18d316 Add missing pod from PR #62
+  - 9f8cd26 Merge pull request #62 from waterkip/sign-metadata_optional
+  - 7e637b7 Make signing metadata optional
+  - beba53f Merge pull request #63 from waterkip/cert-text_builder
+  - 493af8c Merge pull request #60 from waterkip/sp-defaults
+  - 29503c9 Use builder for _cert_text
+  - 5e94d9c Add defaults to authnreq_signed and want_assertions_signed
+  - c2e49e4 v0.55
+  - 159332d (tag: 0.55) Bump version for 0.55 release
+
 0.55 -- Fri Apr 15 21:06:36 ADT 2022
 
   [ Significant Changes since 0.53 ]

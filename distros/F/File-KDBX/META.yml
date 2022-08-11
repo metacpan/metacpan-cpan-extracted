@@ -50,118 +50,118 @@ optional_features:
 provides:
   File::KDBX:
     file: lib/File/KDBX.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Cipher:
     file: lib/File/KDBX/Cipher.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Cipher::CBC:
     file: lib/File/KDBX/Cipher/CBC.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Cipher::Stream:
     file: lib/File/KDBX/Cipher/Stream.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Constants:
     file: lib/File/KDBX/Constants.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Dumper:
     file: lib/File/KDBX/Dumper.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Dumper::KDB:
     file: lib/File/KDBX/Dumper/KDB.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Dumper::Raw:
     file: lib/File/KDBX/Dumper/Raw.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Dumper::V3:
     file: lib/File/KDBX/Dumper/V3.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Dumper::V4:
     file: lib/File/KDBX/Dumper/V4.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Dumper::XML:
     file: lib/File/KDBX/Dumper/XML.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Entry:
     file: lib/File/KDBX/Entry.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Error:
     file: lib/File/KDBX/Error.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Group:
     file: lib/File/KDBX/Group.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::IO:
     file: lib/File/KDBX/IO.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::IO::Crypt:
     file: lib/File/KDBX/IO/Crypt.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::IO::HashBlock:
     file: lib/File/KDBX/IO/HashBlock.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::IO::HmacBlock:
     file: lib/File/KDBX/IO/HmacBlock.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Iterator:
     file: lib/File/KDBX/Iterator.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::KDF:
     file: lib/File/KDBX/KDF.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::KDF::AES:
     file: lib/File/KDBX/KDF/AES.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::KDF::Argon2:
     file: lib/File/KDBX/KDF/Argon2.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Key:
     file: lib/File/KDBX/Key.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Key::ChallengeResponse:
     file: lib/File/KDBX/Key/ChallengeResponse.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Key::Composite:
     file: lib/File/KDBX/Key/Composite.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Key::File:
     file: lib/File/KDBX/Key/File.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Key::Password:
     file: lib/File/KDBX/Key/Password.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Key::YubiKey:
     file: lib/File/KDBX/Key/YubiKey.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Loader:
     file: lib/File/KDBX/Loader.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Loader::KDB:
     file: lib/File/KDBX/Loader/KDB.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Loader::Raw:
     file: lib/File/KDBX/Loader/Raw.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Loader::V3:
     file: lib/File/KDBX/Loader/V3.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Loader::V4:
     file: lib/File/KDBX/Loader/V4.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Loader::XML:
     file: lib/File/KDBX/Loader/XML.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Object:
     file: lib/File/KDBX/Object.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Safe:
     file: lib/File/KDBX/Safe.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Transaction:
     file: lib/File/KDBX/Transaction.pm
-    version: '0.904'
+    version: '0.905'
   File::KDBX::Util:
     file: lib/File/KDBX/Util.pm
-    version: '0.904'
+    version: '0.905'
 recommends:
   Compress::Raw::Zlib: '0'
   File::KDBX::XS: '0'
@@ -173,11 +173,14 @@ requires:
   Carp: '0'
   Crypt::Argon2: '0'
   Crypt::Cipher: '0'
+  Crypt::Cipher::AES: '0'
   Crypt::Digest: '0'
   Crypt::Mac::HMAC: '0'
   Crypt::Misc: '0.049'
   Crypt::Mode::CBC: '0'
   Crypt::PRNG: '0'
+  Crypt::Stream::ChaCha: '0.048'
+  Crypt::Stream::Salsa20: '0.055'
   Data::Dumper: '0'
   Devel::GlobalDestruction: '0'
   Encode: '0'
@@ -198,6 +201,7 @@ requires:
   Storable: '0'
   Symbol: '0'
   Text::ParseWords: '0'
+  Time::Local: '1.19'
   Time::Piece: '1.33'
   XML::LibXML: '0'
   XML::LibXML::Reader: '0'
@@ -211,7 +215,7 @@ resources:
   bugtracker: https://github.com/chazmcgarvey/File-KDBX/issues
   homepage: https://github.com/chazmcgarvey/File-KDBX
   repository: https://github.com/chazmcgarvey/File-KDBX.git
-version: '0.904'
+version: '0.905'
 x_authority: cpan:CCM
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Entity.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/04/19
-## Modified 2022/04/19
-## All rights reserved
+## Modified 2022/08/06
+## All rights reserved.
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -31,7 +32,7 @@ BEGIN
     our $EXCEPTION_CLASS = 'HTTP::Promise::Exception';
     our $BOUNDARY_DELIMITER = "\015\012";
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 use strict;
@@ -1911,6 +1912,32 @@ sub _prepare_multipart_headers
     return( $boundary );
 }
 
+# NOTE: sub FREEZE is inherited
+sub FREEZE
+{
+    my $self = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class = CORE::ref( $self );
+    my $ref = $self->_obj2h;
+    my %hash = %$ref;
+    # We remove this to prevent a circular reference that CBOR::XS does not seem to be managing
+    # This relation is re-created in HTTP::Promise::Message::THAW
+    # It is safe to remove it, because 1) if it is a standalone HTTP::Promise::Entity object, 
+    # then it would not be set anyway, and 2) if it is part of an HTTP::Promise::Message, it
+    # is going to be recreated.
+    CORE::delete( @hash{ qw( http_message ) } ) unless( $serialiser ne 'CBOR' );
+    # Return an array reference rather than a list so this works with Sereal and CBOR
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
+    # But Storable want a list with the first element being the serialised element
+    CORE::return( $class, \%hash );
+}
+
+sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+# NOTE: sub THAW is inherited
+
 1;
 # NOTE: POD
 __END__
@@ -1919,7 +1946,7 @@ __END__
 
 =head1 NAME
 
-HTTP::Promise::Entity - Asynchronous HTTP Request and Promise
+HTTP::Promise::Entity - HTTP Entity Class
 
 =head1 SYNOPSIS
 
@@ -1928,7 +1955,7 @@ HTTP::Promise::Entity - Asynchronous HTTP Request and Promise
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 

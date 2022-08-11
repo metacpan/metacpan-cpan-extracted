@@ -11,7 +11,7 @@ Authorization Server / Resource Server with Mojolicious
 
 # VERSION
 
-0.46
+0.50
 
 # SYNOPSIS
 
@@ -82,7 +82,7 @@ This plugin implements the various OAuth2 grant types flow as described at
 RFC6749, with the exception of the "Extension Grants" as the description of
 that grant type is rather hand-wavy.
 
-The bulk of the functionality is implemented in the [Net::OAuth2::AuthorizationServer](https://metacpan.org/pod/Net::OAuth2::AuthorizationServer)
+The bulk of the functionality is implemented in the [Net::OAuth2::AuthorizationServer](https://metacpan.org/pod/Net%3A%3AOAuth2%3A%3AAuthorizationServer)
 distribution, you should see that for more comprehensive documentation and
 examples of usage.
 
@@ -99,11 +99,11 @@ plugin in its simplest form.
 
     $self->register($app, \%config);
 
-Registering the plugin will call the [Net::OAuth2::AuthorizationServer](https://metacpan.org/pod/Net::OAuth2::AuthorizationServer)
+Registering the plugin will call the [Net::OAuth2::AuthorizationServer](https://metacpan.org/pod/Net%3A%3AOAuth2%3A%3AAuthorizationServer)
 and create a `auth_code_grant` that can be accessed using the defined
 `authorize_route` and `access_token_route`. The arguments passed to the
 plugin are passed straight through to the `auth_code_grant` method in
-the [Net::OAuth2::AuthorizationServer](https://metacpan.org/pod/Net::OAuth2::AuthorizationServer) module.
+the [Net::OAuth2::AuthorizationServer](https://metacpan.org/pod/Net%3A%3AOAuth2%3A%3AAuthorizationServer) module.
 
 ## oauth
 
@@ -114,7 +114,7 @@ token and if the access token has the requisite scopes. The scopes are optional:
       return $c->render( status => 401, text => 'Unauthorized' );
     }
 
-This calls the [Net::OAuth2::AuthorizationServer::AuthorizationCodeGrant](https://metacpan.org/pod/Net::OAuth2::AuthorizationServer::AuthorizationCodeGrant)
+This calls the [Net::OAuth2::AuthorizationServer::AuthorizationCodeGrant](https://metacpan.org/pod/Net%3A%3AOAuth2%3A%3AAuthorizationServer%3A%3AAuthorizationCodeGrant)
 module (`verify_token_and_scope` method) to validate the access/refresh token.
 
 ## oauth2\_auth\_request
@@ -142,7 +142,7 @@ having the plugin direct to the user to the resulting redirect uri
 
 # SEE ALSO
 
-[Net::OAuth2::AuthorizationServer](https://metacpan.org/pod/Net::OAuth2::AuthorizationServer) - The dist that handles the bulk of the
+[Net::OAuth2::AuthorizationServer](https://metacpan.org/pod/Net%3A%3AOAuth2%3A%3AAuthorizationServer) - The dist that handles the bulk of the
 functionality used by this plugin
 
 # AUTHOR & CONTRIBUTORS

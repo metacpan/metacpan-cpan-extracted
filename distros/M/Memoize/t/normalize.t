@@ -1,7 +1,7 @@
 use strict; use warnings;
 use Memoize;
 
-print "1..7\n";
+print "1..8\n";
 
 sub n_null { '' }
 
@@ -52,3 +52,9 @@ memoize('par2', NORMALIZER =>  \&parnorm);
 @res = map { &par2($_) } @ARGS;
 print ((("@res" eq "1 0 1 0 1") ? '' : 'not '), "ok 6\n");
 print (( ($COUNT == 2) ? '' : 'not '), "ok 7\n");
+
+$COUNT = 0;
+sub count_uninitialized { $COUNT += join('', @_) =~ /\AUse of uninitialized value / }
+my $war1 = memoize(sub {1}, NORMALIZER => sub {undef});
+{ local $SIG{__WARN__} = \&count_uninitialized; $war1->() }
+print (( ($COUNT == 0) ? '' : 'not '), "ok 8\n");

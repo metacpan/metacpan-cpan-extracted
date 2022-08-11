@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,21 +27,21 @@ no_index:
 provides:
   App::ansiexpand:
     file: lib/App/ansiexpand.pm
-    version: '0.9901'
+    version: '1.01'
 requires:
   Encode: '0'
   Getopt::EX::Hashed: '1.03'
   Getopt::EX::Long: '0'
   Pod::Usage: '0'
-  Text::ANSI::Tabs: '0.07'
+  Text::ANSI::Tabs: '1.01'
   perl: '5.014'
 resources:
   bugtracker: https://github.com/kaz-utashiro/App-ansiexpand/issues
   homepage: https://github.com/kaz-utashiro/App-ansiexpand
-  repository: git://github.com/kaz-utashiro/App-ansiexpand.git
-version: '0.9901'
+  repository: https://github.com/kaz-utashiro/App-ansiexpand.git
+version: '1.01'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
-x_static_install: 1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

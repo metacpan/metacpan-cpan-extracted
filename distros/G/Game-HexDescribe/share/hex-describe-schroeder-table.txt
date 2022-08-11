@@ -10608,7 +10608,8 @@
 1,Linota
 1,Liutgarde
 1,Lora
-1,Lucia Mabel
+1,Lucia
+1,Mabel
 1,Madelgarde
 1,Magnatrude
 1,Malota

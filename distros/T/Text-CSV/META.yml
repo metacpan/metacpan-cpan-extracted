@@ -18,7 +18,7 @@ no_index:
     - t
     - inc
 recommends:
-  Text::CSV_XS: '1.46'
+  Text::CSV_XS: '1.48'
 requires:
   IO::Handle: '0'
   Test::Harness: '0'
@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/makamaka/Text-CSV/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/makamaka/Text-CSV
-version: '2.01'
+version: '2.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

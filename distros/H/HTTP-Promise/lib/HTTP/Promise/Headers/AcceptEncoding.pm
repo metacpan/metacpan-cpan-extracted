@@ -40,7 +40,7 @@ __END__
 
 =head1 NAME
 
-HTTP::Promise::Headers::AcceptEncoding - Accept Header Field
+HTTP::Promise::Headers::AcceptEncoding - Accept Encoding Header Field
 
 =head1 SYNOPSIS
 

@@ -7,7 +7,7 @@ Attean::Result - SPARQL Result
 
 =head1 VERSION
 
-This document describes Attean::Result version 0.030
+This document describes Attean::Result version 0.031
 
 =head1 SYNOPSIS
 
@@ -29,7 +29,7 @@ It conforms to the L<Attean::API::Result|Attean::API::Binding> role.
 
 =cut
 
-package Attean::Result 0.030 {
+package Attean::Result 0.031 {
 	use Moo;
 	use Types::Standard qw(HashRef ConsumerOf);
 	use Attean::API::Binding;
@@ -43,8 +43,19 @@ Returns the HASH reference containing the variable bindings for this result.
 
 =cut
 
-	has 'bindings' => (is => 'ro', isa => HashRef[ConsumerOf['Attean::API::Term']], default => sub { +{} });
+	has 'bindings' => (is => 'ro', isa => HashRef[ConsumerOf['Attean::API::TermOrTriple']], default => sub { +{} });
 
+# 	sub BUILD {
+# 		my $self	= shift;
+# 		my $args	= shift;
+# 		use Data::Dumper;
+# 		my $b		= $args->{bindings};
+# 		my $keys	= [keys %$b];
+# 		if (scalar(@$keys) == 2) {
+# 			Carp::cluck 'NEW RESULT CONSTRUCTED with variables ' . Dumper($keys);
+# 		}
+# 	}
+	
 =item C<< value( $name ) >>
 
 Returns the term object bound to the C<< $name >>d variable, or undef if the
@@ -105,7 +116,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2020 Gregory Todd Williams.
+Copyright (c) 2014--2022 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

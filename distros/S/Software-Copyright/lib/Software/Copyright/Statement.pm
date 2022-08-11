@@ -8,7 +8,7 @@
 #   The GNU General Public License, Version 3, June 2007
 #
 package Software::Copyright::Statement;
-$Software::Copyright::Statement::VERSION = '0.003';
+$Software::Copyright::Statement::VERSION = '0.004';
 use 5.20.0;
 use warnings;
 
@@ -143,7 +143,7 @@ Software::Copyright::Statement - single copyright statement class
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

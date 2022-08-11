@@ -4,7 +4,7 @@
       "Andreas V\u00f6gele <voegelas@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -52,24 +52,24 @@
    "provides" : {
       "Mojolicious::Plugin::Geolocation::MMDB" : {
          "file" : "lib/Mojolicious/Plugin/Geolocation/MMDB.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://gitlab.com/voegelas/mojolicious-plugin-geolocation-mmdb/-/issues"
+         "web" : "https://github.com/voegelas/Mojolicious-Plugin-Geolocation-MMDB/issues"
       },
-      "homepage" : "https://gitlab.com/voegelas/mojolicious-plugin-geolocation-mmdb",
+      "homepage" : "https://github.com/voegelas/Mojolicious-Plugin-Geolocation-MMDB/wiki",
       "repository" : {
          "type" : "git",
-         "url" : "https://gitlab.com/voegelas/mojolicious-plugin-geolocation-mmdb.git",
-         "web" : "https://gitlab.com/voegelas/mojolicious-plugin-geolocation-mmdb/-/tree/main"
+         "url" : "https://github.com/voegelas/Mojolicious-Plugin-Geolocation-MMDB.git",
+         "web" : "https://github.com/voegelas/Mojolicious-Plugin-Geolocation-MMDB"
       }
    },
-   "version" : "0.003",
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "version" : "0.004",
+   "x_generated_by_perl" : "v5.34.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

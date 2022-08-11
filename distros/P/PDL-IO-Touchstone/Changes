@@ -1,5 +1,19 @@
 Revision history for PDL-IO-Touchstone
 
-0.01    Date/time
+1.005	Fri, 05 Aug 2022 19:50:07 -0700
+	Fixed missing Makefile.PL
+
+1.004	Fri, 05 Aug 2022 19:38:32 -0700
+	Added s_port_z to find per-port impedances
+	Lots of cleanup help from @mohawk on IRC including github CI integration!
+
+1.003   Fri Aug  5 11:56:04 2022 -0700
+	Fixed PDL::LinearAlgebra Dependency
+	Fixed documentation typo
+
+1.002   Thu Jul 28 18:09:15 2022 -0700
+	Added transforms to/from S and these matrices: Z, Y, ABCD
+
+1.001   Fri Jul 15 17:37:23 2022 -0700
         First version, released on an unsuspecting world.
 

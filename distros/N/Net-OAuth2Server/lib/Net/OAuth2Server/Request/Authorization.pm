@@ -1,6 +1,8 @@
 use strict; use warnings;
 
 package Net::OAuth2Server::Request::Authorization;
+our $VERSION = '0.006';
+
 use parent 'Net::OAuth2Server::Request';
 use Object::Tiny::Lvalue qw( response_type redirect_uri );
 
@@ -23,4 +25,4 @@ sub get_grant {
 	$self->error ? () : $grant || ();
 }
 
-our $VERSION = '0.005';
+1;

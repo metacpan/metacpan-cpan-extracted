@@ -4,11 +4,14 @@ use Config;
 use Test::More;
 
 BEGIN {
+	plan skip_all => 'perl 5.8.1 required for thread tests'
+		unless "$]" >= 5.008001;
+
 	plan skip_all => 'perl interpreter is not compiled with ithreads'
 		unless $Config{'useithreads'};
 
-	plan skip_all => 'perl 5.8.1 required for thread tests'
-		unless $] > '5.0080009';
+	plan skip_all => 'threads are unreliable on perl 5.10.0'
+		if "$]" >= 5.009 and "$]" < 5.010001;
 
 	plan skip_all => "threads pragma failed to load: $@"
 		unless eval { require threads };

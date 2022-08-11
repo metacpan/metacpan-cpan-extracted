@@ -97,7 +97,7 @@ Returns a string representation for this C<Cookie> header field.
 
 =head2 cookies
 
-Returns an L<array object|Module::Generic::Array> object used to contain all the cookies.
+Returns an L<array object|Module::Generic::Array> containing all the cookies.
 
 =head1 AUTHOR
 

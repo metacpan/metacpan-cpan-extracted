@@ -27,6 +27,9 @@ t/csr6.pem
 t/csr7.pem
 t/csr8.pem
 t/csr9.pem
+t/csr9a.pem
+t/csr9b.pem
+t/csr9c.pem
 weaver.ini
 xt/01_Kwalitee.t
 META.yml

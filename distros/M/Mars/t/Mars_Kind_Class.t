@@ -28,6 +28,45 @@ EOF
   ok $result->{lname} eq 'Alderson';
 });
 
+subtest('example-1 DESTROY', sub {
+  no warnings 'once';
+  my $result = eval <<'EOF';
+  package Protocol;
+
+  use base 'Mars::Kind::Role';
+
+  our $EVENT = 0;
+
+  sub DESTROY {
+    return $EVENT++;
+  }
+
+  package Resource;
+
+  use base 'Mars::Kind::Class';
+
+  Resource->ROLE('Protocol');
+
+  our $EVENT = 0;
+
+  sub DESTROY {
+    my ($self) = @_;
+    $self->SUPER::DESTROY();
+    return $EVENT++;
+  }
+
+  package main;
+
+  my $resource = Resource->BLESS(name => 'Console');
+
+  undef $resource;
+
+  # undef
+EOF
+  ok $Resource::EVENT == 1;
+  ok $Protocol::EVENT == 1;
+});
+
 subtest('example-1 does', sub {
   local $@;
   my $result = eval <<'EOF';

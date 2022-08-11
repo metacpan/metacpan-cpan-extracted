@@ -2,30 +2,47 @@ use strict;
 use warnings;
 
 use ExtUtils::MakeMaker::CPANfile;
-use ExtUtils::PkgConfig;
 use File::Spec;
 use File::Temp;
+use Config;
 
 my $pc_name = 'libnfs';
 
 my $min_major_version = 5;
 
-my $cflags = ExtUtils::PkgConfig->cflags($pc_name) || q<>;
-my $pc_ldflags = ExtUtils::PkgConfig->libs($pc_name);
+my ($cflags, $pc_ldflags);
 
 my $use_dynamic;
 
-if ($pc_ldflags) {
-    my $modversion = ExtUtils::PkgConfig->modversion($pc_name);
-    print "I found a shared libnfs version $modversion.\n";
+if ($ENV{'NET_LIBNFS_LINK_STATIC'}) {
+    print "You asked specifically for a static libnfs.\n";
+}
+else {
+    if (eval { require ExtUtils::PkgConfig }) {
+        print "Querying pkg-config for a usable libnfs …\n";
 
-    my ($major) = $modversion =~ m<(\d+)>;
+        $pc_ldflags = ExtUtils::PkgConfig->libs($pc_name);
 
-    if ($major >= $min_major_version) {
-        print "That’s recent enough for us, so we’ll use it.\n";
+        if ($pc_ldflags) {
+            $cflags = ExtUtils::PkgConfig->cflags($pc_name) || q<>;
+
+            my $modversion = ExtUtils::PkgConfig->modversion($pc_name);
+            print "I found a shared libnfs, version $modversion.\n";
+
+            my ($major) = $modversion =~ m<(\d+)>;
+
+            if ($major >= $min_major_version) {
+                print "That’s recent enough for us, so we’ll use it.\n";
+                $use_dynamic = 1;
+            }
+            else {
+                print "That’s too old; we need at least version $min_major_version.\n";
+            }
+        }
     }
     else {
-        print "That’s too old for us; we need at least version $min_major_version.\n";
+        print $@;
+        print "ExtUtils::PkgConfig didn’t load, so we can’t check for a shared libnfs.\n";
     }
 }
 
@@ -40,11 +57,15 @@ my $STATIC_INSTALL_DIR = do {
 };
 
 if ($use_dynamic) {
-    print "I found a shared libnfs, so I’ll use it:\n";
+    print "I found a suitable shared libnfs, so I’ll use it:\n";
     print "    libs: $pc_ldflags\n";
     print "    cflags: $cflags\n";
 
     push @link_args, ( LIBS => $pc_ldflags );
+
+    if ($^O !~ /^(MSWin32|darwin|solaris)$/ && ($Config{ld} =~ /gcc|g\+\+/ ||     $Config{gccversion})) {
+       push @link_args, (LDDLFLAGS => "$Config{lddlflags} -Wl,--exclude-libs,ALL");
+    }
 }
 else {
     print "I found no usable shared libnfs, so I’ll try to make a static one.\n";

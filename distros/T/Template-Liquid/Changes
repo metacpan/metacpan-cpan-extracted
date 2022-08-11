@@ -1,4 +1,8 @@
- Changelog for Perl dist Template-Liquid
+Changelog for Perl dist Template::Liquid
+
+1.0.22 2022-08-06T22:12:13Z
+
+  - Resolve quadmath/128bit float test failures (https://github.com/Perl/perl5/issues/18322, etc.)
 
 1.0.20 2022-08-02T03:46:03Z
 

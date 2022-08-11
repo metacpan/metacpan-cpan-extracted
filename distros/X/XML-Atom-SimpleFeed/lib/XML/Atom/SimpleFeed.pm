@@ -3,8 +3,7 @@ use strict;
 use warnings;
 
 package XML::Atom::SimpleFeed;
-
-our $VERSION = '0.904';
+our $VERSION = '0.905';
 
 use Carp;
 use Encode ();

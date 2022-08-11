@@ -35,21 +35,6 @@ Oid lo_import_with_oid (PGconn *conn, char *filename, unsigned int lobjId) {
 
 #endif
 
-#if PGLIBVERSION < 90300
-unsigned int lo_lseek64(PGconn *conn, int fd, unsigned int offset, int whence);
-unsigned int lo_lseek64(PGconn *conn, int fd, unsigned int offset, int whence) {
-    croak ("Cannot use lo_lseek64 unless compiled against Postgres 9.3 or later");
-}
-unsigned int lo_tell64(PGconn *conn, int fd);
-unsigned int lo_tell64(PGconn *conn, int fd) {
-    croak ("Cannot use lo_ltell64 unless compiled against Postgres 9.3 or later");
-}
-int lo_truncate64(PGconn *conn, int fd, unsigned int len);
-int lo_truncate64(PGconn *conn, int fd, unsigned int len) {
-    croak ("Cannot use lo_truncate64 unless compiled against Postgres 9.3 or later");
-}
-#endif
-
 #ifndef PG_DIAG_SCHEMA_NAME
 #define PG_DIAG_SCHEMA_NAME     's'
 #define PG_DIAG_TABLE_NAME      't'
@@ -510,7 +495,7 @@ int dbd_db_ping (SV * dbh)
     }
 
     /* No matter what state we are in, send an empty query to the backend */
-    result = PQexec(imp_dbh->conn, "/* DBD::Pg ping test v3.15.1 */");
+    result = PQexec(imp_dbh->conn, "/* DBD::Pg ping test v3.16.0 */");
     status = PQresultStatus(result);
     PQclear(result);
     if (PGRES_FATAL_ERROR == status) {
@@ -1146,7 +1131,7 @@ SV * dbd_st_FETCH_attrib (SV * sth, imp_sth_t * imp_sth, SV * keysv)
                     }
                 }
                 else {
-                    val = newSVpv(currph->value,0);
+                    val = newSVpv(currph->value,currph->valuelen);
                     if (!hv_store_ent(pvhv, key, val, 0)) {
                         SvREFCNT_dec(val);
                     }
@@ -4526,8 +4511,16 @@ SV * pg_db_error_field (SV *dbh, char * fieldname)
 
     if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_error_field (fieldcode: %d)\n", THEADER_slow, fieldcode);
 
-    return NULL == PQresultErrorField(imp_dbh->last_result, fieldcode) ? &PL_sv_undef : 
-      sv_2mortal(newSVpv(PQresultErrorField(imp_dbh->last_result, fieldcode), 0));
+    char *pq_err_field = PQresultErrorField(imp_dbh->last_result, fieldcode);
+    if (NULL == pq_err_field) {
+        return &PL_sv_undef;
+    }
+    else {
+        SV *sv_err_field = newSVpv(pq_err_field, 0);
+        if (imp_dbh->pg_utf8_flag)
+            SvUTF8_on(sv_err_field);
+        return sv_2mortal(sv_err_field);
+    }
 
 } /* end of pg_db_error_field */
 
@@ -4821,7 +4814,7 @@ int pg_db_lo_open (SV * dbh, unsigned int lobjId, int mode)
     dTHX;
     D_imp_dbh(dbh);
 
-    if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_pg_lo_open (mode: %d objectid: %d)\n",
+    if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_pg_lo_open (mode: %d objectid: %u)\n",
                     THEADER_slow, mode, lobjId);
 
     if (DBIc_has(imp_dbh, DBIcf_AutoCommit)) {
@@ -4870,8 +4863,8 @@ int pg_db_lo_read (SV * dbh, int fd, char * buf, size_t len)
     dTHX;
     D_imp_dbh(dbh);
 
-    if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_lo_read (fd: %d length: %d)\n",
-                    THEADER_slow, fd, (int)len);
+    if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_lo_read (fd: %d length: %" UVuf ")\n",
+                    THEADER_slow, fd, (UV)len);
 
     if (DBIc_has(imp_dbh, DBIcf_AutoCommit)) {
         croak("Cannot call pg_lo_read when AutoCommit is on");
@@ -4895,8 +4888,8 @@ int pg_db_lo_write (SV * dbh, int fd, char * buf, size_t len)
     dTHX;
     D_imp_dbh(dbh);
 
-    if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_lo_write (fd: %d length: %d)\n",
-                    THEADER_slow, fd, (int)len);
+    if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_lo_write (fd: %d length: %" UVuf ")\n",
+                    THEADER_slow, fd, (UV)len);
 
     if (DBIc_has(imp_dbh, DBIcf_AutoCommit)) {
         croak("Cannot call pg_lo_write when AutoCommit is on");
@@ -4914,13 +4907,13 @@ int pg_db_lo_write (SV * dbh, int fd, char * buf, size_t len)
 }
 
 /* ================================================================== */
-int pg_db_lo_lseek (SV * dbh, int fd, int offset, int whence)
+IV pg_db_lo_lseek (SV * dbh, int fd, IV offset, int whence)
 {
 
     dTHX;
     D_imp_dbh(dbh);
 
-    if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_lo_lseek (fd: %d offset: %d whence: %d)\n",
+    if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_lo_lseek (fd: %d offset: %" IVdf " whence: %d)\n",
                     THEADER_slow, fd, offset, whence);
 
     if (DBIc_has(imp_dbh, DBIcf_AutoCommit)) {
@@ -4930,9 +4923,20 @@ int pg_db_lo_lseek (SV * dbh, int fd, int offset, int whence)
     if (!pg_db_start_txn(aTHX_ dbh,imp_dbh))
         return -1;
 
-    if (TLIBPQ_slow) {
-        TRC(DBILOGFP, "%slo_lseek\n", THEADER_slow);
+#ifdef HAS64BITLO
+    if (imp_dbh->pg_server_version >= 90300) {
+        if (TLIBPQ_slow)
+            TRC(DBILOGFP, "%slo_lseek64\n", THEADER_slow);
+
+        return lo_lseek64(imp_dbh->conn, fd, offset, whence); /* new position, -1 on error */
     }
+
+    if (offset < INT_MIN || offset > INT_MAX)
+        croak("lo_lseek offset out of range of integer");
+#endif
+
+    if (TLIBPQ_slow)
+        TRC(DBILOGFP, "%slo_lseek\n", THEADER_slow);
 
     return lo_lseek(imp_dbh->conn, fd, offset, whence); /* new position, -1 on error */
 
@@ -4940,33 +4944,7 @@ int pg_db_lo_lseek (SV * dbh, int fd, int offset, int whence)
 
 
 /* ================================================================== */
-unsigned int pg_db_lo_lseek64 (SV * dbh, int fd, unsigned int offset, int whence)
-{
-
-    dTHX;
-    D_imp_dbh(dbh);
-
-    if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_lo_lseek64 (fd: %d offset: %d whence: %d)\n",
-                    THEADER_slow, fd, offset, whence);
-
-    if (DBIc_has(imp_dbh, DBIcf_AutoCommit)) {
-        croak("Cannot call pg_lo_lseek64 when AutoCommit is on");
-    }
-
-    if (!pg_db_start_txn(aTHX_ dbh,imp_dbh))
-        return -1;
-
-    if (TLIBPQ_slow) {
-        TRC(DBILOGFP, "%slo_lseek64\n", THEADER_slow);
-    }
-
-    return lo_lseek64(imp_dbh->conn, fd, offset, whence); /* new position, -1 on error */
-
-}
-
-
-/* ================================================================== */
-int pg_db_lo_tell (SV * dbh, int fd)
+IV pg_db_lo_tell (SV * dbh, int fd)
 {
 
     dTHX;
@@ -4981,47 +4959,30 @@ int pg_db_lo_tell (SV * dbh, int fd)
     if (!pg_db_start_txn(aTHX_ dbh,imp_dbh))
         return -1;
 
-    if (TLIBPQ_slow) {
+#ifdef HAS64BITLO
+    if (TLIBPQ_slow)
+        TRC(DBILOGFP, "%slo_tell64\n", THEADER_slow);
+
+    if (imp_dbh->pg_server_version >= 90300)
+        return lo_tell64(imp_dbh->conn, fd); /* current position, <0 on error */
+#endif
+
+    if (TLIBPQ_slow)
         TRC(DBILOGFP, "%slo_tell\n", THEADER_slow);
-    }
 
     return lo_tell(imp_dbh->conn, fd); /* current position, <0 on error */
 
 }
 
 /* ================================================================== */
-unsigned int pg_db_lo_tell64 (SV * dbh, int fd)
+int pg_db_lo_truncate (SV * dbh, int fd, IV len)
 {
 
     dTHX;
     D_imp_dbh(dbh);
 
-    if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_lo_tell64 (fd: %d)\n", THEADER_slow, fd);
-
-    if (DBIc_has(imp_dbh, DBIcf_AutoCommit)) {
-        croak("Cannot call pg_lo_tell64 when AutoCommit is on");
-    }
-
-    if (!pg_db_start_txn(aTHX_ dbh,imp_dbh))
-        return -1;
-
-    if (TLIBPQ_slow) {
-        TRC(DBILOGFP, "%slo_tell64\n", THEADER_slow);
-    }
-
-    return lo_tell64(imp_dbh->conn, fd); /* current position, <0 on error */
-
-}
-
-/* ================================================================== */
-int pg_db_lo_truncate (SV * dbh, int fd, size_t len)
-{
-
-    dTHX;
-    D_imp_dbh(dbh);
-
-    if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_lo_truncate (fd: %d length: %d)\n",
-                         THEADER_slow, fd, (int)len);
+    if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_lo_truncate (fd: %d length: %" IVdf ")\n",
+                         THEADER_slow, fd, len);
 
     if (DBIc_has(imp_dbh, DBIcf_AutoCommit)) {
         croak("Cannot call pg_lo_truncate when AutoCommit is on");
@@ -5030,36 +4991,20 @@ int pg_db_lo_truncate (SV * dbh, int fd, size_t len)
     if (!pg_db_start_txn(aTHX_ dbh,imp_dbh))
         return -1;
 
-    if (TLIBPQ_slow) {
-        TRC(DBILOGFP, "%slo_truncate\n", THEADER_slow);
-    }
-
-    return lo_truncate(imp_dbh->conn, fd, len); /* 0 success, <0 on error */
-
-}
-
-/* ================================================================== */
-int pg_db_lo_truncate64 (SV * dbh, int fd, unsigned int len)
-{
-
-    dTHX;
-    D_imp_dbh(dbh);
-
-    if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_lo_truncate64 (fd: %d length: %d)\n",
-                         THEADER_slow, fd, (unsigned int)len);
-
-    if (DBIc_has(imp_dbh, DBIcf_AutoCommit)) {
-        croak("Cannot call pg_lo_truncate64 when AutoCommit is on");
-    }
-
-    if (!pg_db_start_txn(aTHX_ dbh,imp_dbh))
-        return -1;
-
-    if (TLIBPQ_slow) {
+#ifdef HAS64BITLO
+    if (TLIBPQ_slow)
         TRC(DBILOGFP, "%slo_truncate64\n", THEADER_slow);
-    }
 
-    return lo_truncate64(imp_dbh->conn, fd, len); /* 0 success, <0 on error */
+    if (imp_dbh->pg_server_version >= 90300)
+        return lo_truncate64(imp_dbh->conn, fd, len); /* 0 success, <0 on error */
+
+    if (len < INT_MIN || len > INT_MAX)
+        croak("lo_truncate len out of range of integer");
+#endif
+
+    if (TLIBPQ_slow)
+        TRC(DBILOGFP, "%slo_truncate\n", THEADER_slow);
+    return lo_truncate(imp_dbh->conn, fd, len); /* 0 success, <0 on error */
 
 }
 
@@ -5070,7 +5015,7 @@ int pg_db_lo_unlink (SV * dbh, unsigned int lobjId)
     dTHX;
     D_imp_dbh(dbh);
 
-    if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_lo_unlink (objectid: %d)\n", THEADER_slow, lobjId);
+    if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_lo_unlink (objectid: %u)\n", THEADER_slow, lobjId);
 
     if (DBIc_has(imp_dbh, DBIcf_AutoCommit)) {
         croak("Cannot call pg_lo_unlink when AutoCommit is on");
@@ -5150,7 +5095,7 @@ int pg_db_lo_export (SV * dbh, unsigned int lobjId, char * filename)
     dTHX;
     D_imp_dbh(dbh);
 
-    if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_lo_export (objectid: %d filename: %s)\n",
+    if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_lo_export (objectid: %u filename: %s)\n",
                     THEADER_slow, lobjId, filename);
 
     if (!pg_db_start_txn(aTHX_ dbh,imp_dbh))

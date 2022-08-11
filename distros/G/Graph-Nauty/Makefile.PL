@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "Graph::Undirected" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.5.0",
+  "VERSION" => "0.5.1",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -1,9 +1,9 @@
 
 
 This archive contains the distribution Weather-PurpleAir-API,
-version 0.08:
+version 0.09:
 
-  Client for using the purpleair.com air quality sensor API
+  Client for using the purpleair.com air quality sensor API [DEPRECATED]
 
 This software is copyright (c) 2020 by TTKCIAR.
 

@@ -14,7 +14,7 @@ use App::Git::Workflow::Pom;
 use App::Git::Workflow::Command qw/get_options/;
 use Path::Tiny;
 
-our $VERSION = version->new(1.1.18);
+our $VERSION = version->new(1.1.20);
 our $workflow = App::Git::Workflow::Pom->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -22,13 +22,12 @@ our %p2u_extra;
 
 sub run {
     my ($self) = @_;
-    %option = (
-        pom   => $workflow->config('workflow.pom', 'pom.xml'),
-        fetch => 1,
-    );
+    $option{fetch} = 1;
+    $option{pom} ||= $workflow->config('workflow.pom', 'pom.xml'),
+
     get_options(
         \%option,
-        'pom|P=s',
+        'pom|package|P=s',
         'update|u!',
         'skip|s=s',
         'match|m=s',
@@ -151,7 +150,7 @@ git-pom - Manage pom.xml (or package.json) file versions
 
 =head1 VERSION
 
-This documentation refers to git-pom version 1.1.18
+This documentation refers to git-pom version 1.1.20
 
 =head1 SYNOPSIS
 

@@ -3,12 +3,16 @@ NAME
 
 SYNOPSIS
      use Tags::Element qw(element);
+
      my @tags = element($element, @data);
 
 SUBROUTINES
-    "element($element, @data)"
-             Common element helper for writing Tags code.
-             Returns array of element in Tags format.
+  "element($element, @data)"
+     my @tags = element($element, @data);
+
+    Common element helper for writing Tags code.
+
+    Returns array of element in Tags format.
 
 EXAMPLE1
      use strict;
@@ -91,9 +95,10 @@ AUTHOR
     Michal Josef Špaček skim@cpan.org
 
 LICENSE AND COPYRIGHT
-     © 2011-2018 Michal Josef Špaček
-     BSD 2-Clause License
+    © 2011-2022 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

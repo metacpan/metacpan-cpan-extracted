@@ -52,7 +52,7 @@ $test->for('includes');
 
   use Venus::Class;
 
-  attr 'test';
+  attr 'data';
 
   with 'Venus::Role::Dumpable';
   with 'Venus::Role::Digestable';
@@ -60,12 +60,12 @@ $test->for('includes');
   sub execute {
     my ($self, @args) = @_;
 
-    return [$self->test, @args];
+    return [$self->data, @args];
   }
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   # $example->digest;
 
@@ -115,18 +115,18 @@ arguments whose return value will be acted on by this method.
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $digest = $example->digest;
 
-  # "a6c3d9ae59f31690eddbdd15271e856a6b6f15d5"
+  # "fcf148788471488b822cf72b6d6ca9c17554a4c6"
 
 =cut
 
 $test->for('example', 1, 'digest', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq "a6c3d9ae59f31690eddbdd15271e856a6b6f15d5";
+  ok $result eq "fcf148788471488b822cf72b6d6ca9c17554a4c6";
 
   $result
 });
@@ -135,7 +135,7 @@ $test->for('example', 1, 'digest', sub {
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $digest = $example->digest('sha-1', 'execute');
 
@@ -155,7 +155,7 @@ $test->for('example', 2, 'digest', sub {
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $digest = $example->digest('sha-1', 'execute', '456');
 
@@ -192,7 +192,7 @@ arguments whose return value will be acted on by this method.
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $digester = $example->digester;
 
@@ -212,7 +212,7 @@ $test->for('example', 1, 'digester', sub {
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $digester = $example->digester('md5');
 
@@ -249,18 +249,18 @@ return value will be acted on by this method.
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $b64digest = $example->b64digest;
 
-  # "psPZrlnzFpDt290VJx6FamtvFdU"
+  # "/PFIeIRxSIuCLPcrbWypwXVUpMY"
 
 =cut
 
 $test->for('example', 1, 'b64digest', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq "psPZrlnzFpDt290VJx6FamtvFdU";
+  ok $result eq "/PFIeIRxSIuCLPcrbWypwXVUpMY";
 
   $result
 });
@@ -269,7 +269,7 @@ $test->for('example', 1, 'b64digest', sub {
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $b64digest = $example->b64digest('sha-1', 'execute');
 
@@ -289,7 +289,7 @@ $test->for('example', 2, 'b64digest', sub {
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $b64digest = $example->b64digest('sha-1', 'execute', '456');
 
@@ -326,18 +326,18 @@ return value will be acted on by this method.
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $bindigest = $example->bindigest;
 
-  # pack("H*","a6c3d9ae59f31690eddbdd15271e856a6b6f15d5")
+  # pack("H*","fcf148788471488b822cf72b6d6ca9c17554a4c6")
 
 =cut
 
 $test->for('example', 1, 'bindigest', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq pack("H*","a6c3d9ae59f31690eddbdd15271e856a6b6f15d5");
+  ok $result eq pack("H*","fcf148788471488b822cf72b6d6ca9c17554a4c6");
 
   $result
 });
@@ -346,7 +346,7 @@ $test->for('example', 1, 'bindigest', sub {
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $bindigest = $example->bindigest('sha-1', 'execute');
 
@@ -366,7 +366,7 @@ $test->for('example', 2, 'bindigest', sub {
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $bindigest = $example->bindigest('sha-1', 'execute', '456');
 
@@ -403,18 +403,18 @@ return value will be acted on by this method.
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $hexdigest = $example->hexdigest;
 
-  # "a6c3d9ae59f31690eddbdd15271e856a6b6f15d5"
+  # "fcf148788471488b822cf72b6d6ca9c17554a4c6"
 
 =cut
 
 $test->for('example', 1, 'hexdigest', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq "a6c3d9ae59f31690eddbdd15271e856a6b6f15d5";
+  ok $result eq "fcf148788471488b822cf72b6d6ca9c17554a4c6";
 
   $result
 });
@@ -423,7 +423,7 @@ $test->for('example', 1, 'hexdigest', sub {
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $hexdigest = $example->hexdigest('sha-1', 'execute');
 
@@ -443,7 +443,7 @@ $test->for('example', 2, 'hexdigest', sub {
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $hexdigest = $example->hexdigest('sha-1', 'execute', '456');
 

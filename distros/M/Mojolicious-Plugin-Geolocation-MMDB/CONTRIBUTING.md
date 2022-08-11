@@ -1,11 +1,11 @@
 # Contributing to Mojolicious::Plugin::Geolocation::MMDB
 
 The code for this distribution is hosted at
-https://gitlab.com/voegelas/mojolicious-plugin-geolocation-mmdb.
+https://github.com/voegelas/Mojolicious-Plugin-Geolocation-MMDB.
 
 Grab the latest version using the command:
 
-    git clone https://gitlab.com/voegelas/mojolicious-plugin-geolocation-mmdb.git
+    git clone https://github.com/voegelas/Mojolicious-Plugin-Geolocation-MMDB.git
 
 You can submit code changes by forking the repository, pushing your code
 changes to your clone, and then submitting a pull request.

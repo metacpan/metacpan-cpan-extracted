@@ -17,7 +17,7 @@ use namespace::clean;
 
 extends 'File::KDBX::Key';
 
-our $VERSION = '0.904'; # VERSION
+our $VERSION = '0.905'; # VERSION
 
 
 has 'type',     is => 'ro';
@@ -262,7 +262,7 @@ File::KDBX::Key::File - A file key
 
 =head1 VERSION
 
-version 0.904
+version 0.905
 
 =head1 SYNOPSIS
 

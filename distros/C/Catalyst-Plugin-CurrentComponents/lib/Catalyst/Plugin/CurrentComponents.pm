@@ -5,7 +5,7 @@ use Scalar::Util ();
 
 requires 'model', 'view', 'stash';
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 has 'model_instance_from_return' => (is=>'lazy');
 
@@ -75,14 +75,32 @@ sub current_view_instance {
   return $self->stash->{current_view_instance};
 }
 
+sub build_view {
+  my ($self, @args) = @_;
+  my ($view_name) = @{$self->action->attributes->{View}};
+  die "Action '@{[ $self->action ]}' doesn't have a 'View' attribute" unless $view_name;
+  my $view = $self->view($view_name, @args);
+  $self->stash(current_view_instance=>$view);
+  return $view;
+}
+
+sub build_model {
+  my ($self, @args) = @_;
+  my ($model_name) = @{$self->action->attributes->{Model}};
+  die "Action '@{[ $self->action ]}' doesn't have a 'Model' attribute" unless $model_name;
+  my $model = $self->model($model_name, @args);
+  $self->stash(current_model_instance=>$model);
+  return $model;
+}
+
 around 'execute', sub {
   my ($orig, $self, $class, $code, @rest ) = @_;
   my $state = $self->$orig($class, $code, @rest);
 
   if(
+    ($self->model_instance_from_return || $self->view_instance_from_return) &&
     defined $state &&
-    Scalar::Util::blessed($state) &&
-    ($self->model_instance_from_return || $self->view_instance_from_return)
+    Scalar::Util::blessed($state)
   ) {
     my $state_class = ref($state);
     my $app_class = ref($self);
@@ -225,6 +243,12 @@ current value of this stash key.  Expects the string new of a view.
 Sets $c->stash->{current_view_instance} if an argument is passed.  Always returns the
 current value of this stash key.  Expects either the instance of an already created
 view or can accept arguments that can be validly submitted to $c->view.
+
+=head2 build_view 
+
+=head2 build_model
+
+Builds the view or model and makes it the current instance.
 
 =head1 CONTROLLER METHODS
 

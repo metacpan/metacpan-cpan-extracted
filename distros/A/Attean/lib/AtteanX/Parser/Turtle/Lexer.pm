@@ -7,7 +7,7 @@ AtteanX::Parser::Turtle::Lexer - Tokenizer for parsing Turtle, TriG, and N-Tripl
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::Turtle::Lexer version 0.030
+This document describes AtteanX::Parser::Turtle::Lexer version 0.031
 
 =head1 SYNOPSIS
 
@@ -23,7 +23,7 @@ This document describes AtteanX::Parser::Turtle::Lexer version 0.030
 
 =cut
 
-package AtteanX::Parser::Turtle::Lexer 0.030 {
+package AtteanX::Parser::Turtle::Lexer 0.031 {
 	use AtteanX::Parser::Turtle::Constants;
 	use v5.14;
 	use strict;
@@ -80,7 +80,6 @@ current line and column of the input data.
 		']'	=> RBRACKET,
 		'('	=> LPAREN,
 		')'	=> RPAREN,
-		'{'	=> LBRACE,
 		'}'	=> RBRACE,
 		','	=> COMMA,
 		'='	=> EQUALS,
@@ -89,7 +88,10 @@ current line and column of the input data.
 	my %METHOD_TOKEN	= (
 	# 	q[#]	=> '_get_comment',
 		q[@]	=> '_get_keyword',
-		q[<]	=> '_get_iriref',
+		q[<]	=> '_get_iriref_or_ltlt',
+		q[>]	=> '_get_gtgt',
+		q[|]	=> '_get_rannot',
+		q[{]	=> '_get_lbrace_or_lannot',
 		q[_]	=> '_get_bnode',
 		q[']	=> '_get_single_literal',
 		q["]	=> '_get_double_literal',
@@ -149,6 +151,9 @@ Returns the next token present in the input.
 				} elsif ($self->buffer =~ /^PREFIX(?!:)\b/io) {
 					$self->read_length(6);
 					return $self->new_token(PREFIX, $start_line, $start_column);
+				} elsif ($self->buffer =~ /^GRAPH(?!:)\b/io) {
+					$self->read_length(5);
+					return $self->new_token(GRAPH, $start_line, $start_column);
 				} else {
 					return $self->_get_pname;
 				}
@@ -185,9 +190,36 @@ Returns the next token present in the input.
 		}
 	}
 
-	sub _get_iriref {
+	sub _get_gtgt {
+		my $self	= shift;
+		$self->read_word('>>');
+		return $self->new_token(GTGT, $self->start_line, $self->start_column, '>>');
+	}
+	
+	sub _get_lbrace_or_lannot {
+		my $self	= shift;
+		$self->get_char_safe(q[{]);
+		if ($self->buffer =~ /^\|/o) {
+			$self->get_char_safe(q[|]);
+			return $self->new_token(LANNOT, $self->start_line, $self->start_column, '{|');
+		}
+		return $self->new_token(LBRACE, $self->start_line, $self->start_column, '{');
+	}
+	
+	sub _get_rannot {
+		my $self	= shift;
+		$self->read_word('|}');
+		return $self->new_token(RANNOT, $self->start_line, $self->start_column, '|}');
+	}
+	
+	sub _get_iriref_or_ltlt {
 		my $self	= shift;
 		$self->get_char_safe(q[<]);
+		if ($self->buffer =~ /^</o) {
+			$self->get_char_safe(q[<]);
+			return $self->new_token(LTLT, $self->start_line, $self->start_column, '<<');
+		}
+		
 		if ($self->buffer =~ m/^[\x23-\x3d\x3f-\x5a\x5d-\x7e]*>/o) {
 			my $iri	.= $self->read_length($+[0]);
 			chop($iri);
@@ -444,7 +476,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2020 Gregory Todd Williams. This
+Copyright (c) 2014--2022 Gregory Todd Williams. This
 program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

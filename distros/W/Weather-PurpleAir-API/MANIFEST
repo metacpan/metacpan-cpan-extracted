@@ -13,5 +13,6 @@ data/epa_scale.aqicn_com.png
 dist.ini
 lib/Weather/PurpleAir/API.pm
 notes.txt
+purpleair_to_graphite.py
 t/00-packaging.t
 t/01-new.t

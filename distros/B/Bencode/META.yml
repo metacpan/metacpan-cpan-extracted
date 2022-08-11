@@ -3,23 +3,28 @@ abstract: 'BitTorrent serialisation format'
 author:
   - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
 build_requires:
-  Test::Differences: 0
-  Test::More: 0
-configure_requires:
-  ExtUtils::MakeMaker: 0
+  Test::Differences: '0'
+  Test::More: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Bencode
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Exporter::Tidy: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Exporter::Tidy: '0'
+  perl: '5.006'
 resources:
-  bugtracker: http://github.com/ap/Bencode/issues
-  repository: git://github.com/ap/Bencode
-version: 1.501
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Bencode
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ap/Bencode.git
+version: '1.502'
+x_copyright:
+  holder: 'Aristotle Pagaltzis'
+  year: 2017
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

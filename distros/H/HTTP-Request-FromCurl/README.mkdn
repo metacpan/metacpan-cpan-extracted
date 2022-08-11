@@ -52,7 +52,7 @@ the network panel. This module enables converting these to Perl code.
 The constructor returns one or more [HTTP::Request::CurlParameters](https://metacpan.org/pod/HTTP%3A%3ARequest%3A%3ACurlParameters) objects
 that encapsulate the parameters. If the command generates multiple requests,
 they will be returned in list context. In scalar context, only the first request
-will be returned.
+will be returned. Note that the order of URLs between `--url` and unadorned URLs will be changed in the sense that all unadorned URLs will be handled first.
 
     my $req = HTTP::Request::FromCurl->new(
         command => '--data-binary @/etc/passwd https://example.com',

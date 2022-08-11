@@ -86,11 +86,11 @@ elsif($^O eq 'linux' && -f '/etc/gentoo-release')
 }
 
 elsif($^O eq 'linux' && -f '/etc/alpine-release')
-{                  
+{
   $status{pkg_config_dir}    = [qw(
     /usr/lib/pkgconfig
     /usr/share/pkgconfig
-  )];                                                          
+  )];
   $status{system_libdir}     = [qw(
     /lib
     /usr/lib
@@ -139,7 +139,7 @@ elsif($^O =~ /^(gnukfreebsd|linux)$/ && -r "/etc/debian_version")
       }
     }
   }
-    
+
   if($arch)
   {
     if(scalar grep /--print-foreign-architectures/, `dpkg --help`)
@@ -250,7 +250,7 @@ elsif($^O eq 'MSWin32')
       $path,
     ];
     $status{system_libdir}     = [
-      '/mingw/lib', 
+      '/mingw/lib',
       '/mingw/lib/pkgconfig/../../lib',
     ];
     $status{system_includedir} = [
@@ -260,7 +260,7 @@ elsif($^O eq 'MSWin32')
   }
   else
   {
-    die "do not know enough please open ticket: https://github.com/Perl5-Alien/Alien-pkgconf/issues";
+    die "do not know enough please open ticket: https://github.com/PerlAlien/Alien-pkgconf/issues";
   }
 }
 
@@ -295,7 +295,7 @@ elsif($^O eq 'darwin')
 
 else
 {
-  die "do not know enough about this OS to probe for correct paths.  Please open a ticket https://github.com/Perl5-Alien/Alien-pkgconf/issues";
+  die "do not know enough about this OS to probe for correct paths.  Please open a ticket https://github.com/PerlAlien/Alien-pkgconf/issues";
 }
 
 my $my_pkg_config_dir = File::Spec->catdir(@prefix, 'lib', 'pkgconfig');

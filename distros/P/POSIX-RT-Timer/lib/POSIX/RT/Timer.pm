@@ -1,5 +1,5 @@
 package POSIX::RT::Timer;
-$POSIX::RT::Timer::VERSION = '0.017';
+$POSIX::RT::Timer::VERSION = '0.018';
 use 5.008001;
 
 use strict;
@@ -25,7 +25,7 @@ POSIX::RT::Timer - POSIX real-time timers
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 

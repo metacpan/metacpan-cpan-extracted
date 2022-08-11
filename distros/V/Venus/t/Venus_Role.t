@@ -42,6 +42,7 @@ function: catch
 function: error
 function: false
 function: from
+function: mixin
 function: raise
 function: role
 function: test
@@ -477,6 +478,110 @@ $test->for('example', 1, 'from', sub {
   ok $result->does('Entity');
   ok $result->can('startup');
   ok $result->can('shutdown');
+
+  $result
+});
+
+=function mixin
+
+The mixin function registers and consumes mixins for the calling package. This
+function is always exported unless a routine of the same name already exists.
+
+=signature mixin
+
+  mixin(Str $name) (Str)
+
+=metadata mixin
+
+{
+  since => '1.02',
+}
+
+=example-1 mixin
+
+  package YesNo;
+
+  use Venus::Mixin;
+
+  sub no {
+    return 0;
+  }
+
+  sub yes {
+    return 1;
+  }
+
+  sub EXPORT {
+    ['no', 'yes']
+  }
+
+  package Answer;
+
+  use Venus::Role;
+
+  mixin 'YesNo';
+
+  # "Answer"
+
+=cut
+
+$test->for('example', 1, 'mixin', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Answer');
+  ok $result->can('yes');
+  ok $result->can('no');
+  ok $result->yes == 1;
+  ok $result->no == 0;
+
+  $result
+});
+
+=example-2 mixin
+
+  package YesNo;
+
+  use Venus::Mixin;
+
+  sub no {
+    return 0;
+  }
+
+  sub yes {
+    return 1;
+  }
+
+  sub EXPORT {
+    ['no', 'yes']
+  }
+
+  package Answer;
+
+  use Venus::Role;
+
+  mixin 'YesNo';
+
+  sub no {
+    return [0];
+  }
+
+  sub yes {
+    return [1];
+  }
+
+  my $package = "Answer";
+
+  # "Answer"
+
+=cut
+
+$test->for('example', 2, 'mixin', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->can('yes');
+  ok $result->can('no');
+  ok $result->yes == 1;
+  ok $result->no == 0;
 
   $result
 });

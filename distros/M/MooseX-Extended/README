@@ -2,7 +2,7 @@ NAME
     MooseX::Extended - Extend Moose with safe defaults and useful features
 
 VERSION
-    version 0.26
+    version 0.28
 
 SYNOPSIS
         package My::Names {
@@ -246,6 +246,26 @@ CONFIGURATION
         Only available on Perl v5.26.0 or higher. Requires
         Future::AsyncAwait.
 
+    *   "try"
+
+            package My::Try {
+                use MooseX::Extended includes => [qw/try/];
+
+                sub reciprocal ( $self, $num ) {
+                    try {
+                        return 1 / $num;
+                    }
+                    catch {
+                        croak "Could not calculate reciprocal of $num: $@";
+                    }
+                }
+            }
+
+        Allows you to use try/catch blocks, via Syntax::Keyword::Try.
+
+        Only available on Perl v5.24.0 or higher. Requires
+        Syntax::Keyword::Try.
+
 REDUCING BOILERPLATE
     Let's say you've settled on the following feature set:
 
@@ -371,11 +391,16 @@ INVALID ATTRIBUTE DEFINITIONS
     sometimes useful to be able to define an "init_arg" for unit testing.)
 
 BUGS AND LIMITATIONS
-    If the MooseX::Extended classes are loaded via *stringy* eval, "true" is
-    not loaded, nor is your class made immutable. This is because there were
-    intermittant errors (maybe 1 out of 5 times) being thrown. Removing
-    these features under stringy eval solves this. See this github ticket
-    for more infomration <https://github.com/Ovid/moosex-extreme/pull/34>.
+    When using Test::Compile, there are intermittent segfaults with
+    MooseX::Extended unless you use "exclude => ['immutable']". We are still
+    trying to figure out wy this is happening. We are not aware of any
+    production code affected by this.
+
+    See also:
+
+    *   The github issue <https://github.com/Ovid/moosex-extreme/issues/41>
+
+    *   Perlmonks discussion <https://perlmonks.org/?node_id=11145964>
 
 MANUAL
     *   MooseX::Extended::Manual::Tutorial
@@ -430,10 +455,6 @@ NOTES
     Most of this is written with bog-standard Moose, so there's nothing
     terribly weird inside, but you may wish to note that we use
     B::Hooks::AtRuntime and true. They seem sane, but *caveat emptor*.
-
-    This module was originally released on github as "MooseX::Extreme", but
-    enough people pointed out that it was not extreme at all. That's why the
-    repository is <https://github.com/Ovid/moosex-extreme/>.
 
 SEE ALSO
     *   Corinna <https://github.com/Ovid/Cor>

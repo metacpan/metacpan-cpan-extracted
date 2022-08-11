@@ -1,9 +1,9 @@
 /* 
  * Filename : exec.xs
  * 
- * Author   : Paul Marquess 
- * Date     : 2014-12-09 02:50:27 rurban
- * Version  : 1.61
+ * Author   : Reini Urban
+ * Date     : Mi 10. Aug 14:48:49 CEST 2022
+ * Version  : 1.62
  *
  */
 
@@ -65,8 +65,7 @@ typedef struct {
     int		idx;
 #ifdef USE_THREADS
     struct perl_thread *	parent;
-#endif
-#ifdef USE_ITHREADS
+#elif defined USE_ITHREADS
     PerlInterpreter *		parent;
 #endif
 } thrarg;
@@ -84,8 +83,7 @@ pipe_write(void *args)
 #ifdef USE_THREADS
     /* use the parent's perl thread context */
     SET_THR(targ->parent);
-#endif
-#ifdef USE_ITHREADS
+#elif defined USE_ITHREADS
     PERL_SET_THX(targ->parent);
 #endif
     {
@@ -171,8 +169,7 @@ pipe_read(SV *sv, int idx, int maxlen)
 	targ->sv = sv; targ->idx = idx;
 #ifdef USE_THREADS
 	targ->parent = THR;
-#endif
-#ifdef USE_ITHREADS
+#elif defined USE_ITHREADS
 	targ->parent = aTHX;
 #endif
 	/* thread handle is closed when pipe_write() returns */

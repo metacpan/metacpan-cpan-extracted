@@ -9,6 +9,7 @@ win32_compile.t - See if IPC::Run::Win32Helper compiles, even on Unix
 =cut
 
 use strict;
+use warnings;
 
 BEGIN {
     $|  = 1;
@@ -34,7 +35,21 @@ BEGIN {
         plan( skip_all => "android does not support getprotobyname()" );
     }
 
-    $INC{$_} = 1 for qw( Win32/Process.pm Win32API/File.pm );
+    $INC{$_} = 1 for qw(
+      Win32.pm Win32/Process.pm Win32/ShellQuote.pm Win32API/File.pm );
+
+    package Win32;
+
+    use vars qw( @ISA @EXPORT );
+
+    @ISA    = qw( Exporter );
+    @EXPORT = qw(
+      CSIDL_SYSTEM
+    );
+
+    eval "sub $_ {}" for @EXPORT;
+
+    use Exporter;
 
     package Win32API::File;
 
@@ -82,7 +97,11 @@ BEGIN {
     use Exporter;
 }
 
-sub Socket::IPPROTO_TCP() { undef }
+{
+    use Socket ();
+    no warnings 'redefine';
+    sub Socket::IPPROTO_TCP() { return }
+}
 
 package main;
 

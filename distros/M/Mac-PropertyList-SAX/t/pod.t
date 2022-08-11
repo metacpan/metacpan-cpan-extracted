@@ -1,4 +1,5 @@
-# Stolen from Mac::PropertyList (by comdog) for use in Mac::PropertyList::SAX (by kulp)
+#!/usr/bin/env perl
+
 use Test::More;
 eval "use Test::Pod 1.00";
 plan skip_all => "Test::Pod 1.00 required for testing POD" if $@;

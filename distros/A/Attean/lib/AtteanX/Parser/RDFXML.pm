@@ -4,17 +4,33 @@ AtteanX::Parser::RDFXML - RDF/XML Parser
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::RDFXML version 0.030
+This document describes AtteanX::Parser::RDFXML version 0.031
 
 =head1 SYNOPSIS
 
  use Attean;
- my $parser = Attean->get_parser('RDFXML')->new();
- $parser->parse_list_from_io( $fh );
+ my $parser = Attean->get_parser('RDFXML')->new(base => $base_iri);
+
+ use AtteanX::Parser::Turtle;
+ my $parser	= AtteanX::Parser::Turtle->new( handler => sub {...}, base => $base_iri );
+ 
+ # Parse data from a file-handle and handle triples in the 'handler' callback
+ $parser->parse_cb_from_io( $fh );
+ 
+ # Parse the given byte-string, and return an iterator of triples
+ my $iter = $parser->parse_iter_from_bytes('<rdf:RDF>...</rdf:RDF>');
+ while (my $triple = $iter->next) {
+   print $triple->as_string;
+ }
 
 =head1 DESCRIPTION
 
-...
+This module implements a parser for the RDF/XML format.
+
+=head1 ROLES
+
+This class consumes L<Attean::API::Parser>, L<Attean::API::PushParser>,
+<Attean::API::AbbreviatingParser>, and <Attean::API::TripleParser>.
 
 =head1 ATTRIBUTES
 
@@ -41,7 +57,7 @@ A string prefix for identifiers generated for blank nodes.
 use v5.14;
 use warnings;
 
-package AtteanX::Parser::RDFXML 0.030 {
+package AtteanX::Parser::RDFXML 0.031 {
 	use Moo;
 	use Types::Standard qw(Str Object);
 	use Attean;
@@ -726,7 +742,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2020 Gregory Todd Williams. This
+Copyright (c) 2014--2022 Gregory Todd Williams. This
 program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

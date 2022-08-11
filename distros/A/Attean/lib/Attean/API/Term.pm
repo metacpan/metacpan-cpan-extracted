@@ -7,7 +7,7 @@ Attean::API::Term - RDF Terms
 
 =head1 VERSION
 
-This document describes Attean::API::Term version 0.030
+This document describes Attean::API::Term version 0.031
 
 =head1 DESCRIPTION
 
@@ -41,10 +41,11 @@ Returns a string serialization of the term.
 
 =cut
 
-package Attean::API::Term 0.030 {
+package Attean::API::Term 0.031 {
 	use Moo::Role;
 	
 	with 'Attean::API::TermOrVariable', 'Attean::API::ResultOrTerm';
+	with 'Attean::API::TermOrVariableOrTriplePattern';
 	
 	requires 'value'; # => (is => 'ro', isa => 'Str', required => 1);
 	requires 'ntriples_string';
@@ -103,9 +104,11 @@ Returns true if the term has a true SPARQL "effective boolean value", false othe
 		}
 		return $string;
 	}
+
+	with 'Attean::API::TermOrTriple';
 }
 
-package Attean::API::Literal 0.030 {
+package Attean::API::Literal 0.031 {
 	use IRI;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(Maybe Str ConsumerOf);
@@ -117,6 +120,7 @@ package Attean::API::Literal 0.030 {
 	
 	with 'Attean::API::Term';
 	with 'Attean::API::SPARQLSerializable';
+	with 'Attean::API::TermOrVariableOrTriplePattern';
 	
 	requires 'language'; # => (is => 'ro', isa => 'Maybe[Str]', predicate => 'has_language');
 	requires 'datatype'; # => (is => 'ro', isa => 'Attean::API::IRI', required => 1, coerce => 1, default => sub { IRI->new(value => 'http://www.w3.org/2001/XMLSchema#string') });
@@ -200,7 +204,8 @@ package Attean::API::Literal 0.030 {
 	sub compare {
 		my ($a, $b)	= @_;
 		return 1 unless blessed($b);
-		return 1 unless ($b->does('Attean::API::Literal'));
+		return 1 unless ($b->does('Attean::API::Literal') or $b->does('Attean::API::Binding'));
+		return -1 if ($b->does('Attean::API::Binding'));
 		my $c	= ((($a->language // '') cmp ($b->language // '')) || ($a->datatype->value cmp $b->datatype->value) || ($a->value cmp $b->value));
 		return $c;
 	}
@@ -291,7 +296,7 @@ package Attean::API::Literal 0.030 {
 	};
 }
 
-package Attean::API::DateTimeLiteral 0.030 {
+package Attean::API::DateTimeLiteral 0.031 {
 	use DateTime::Format::W3CDTF;
 
 	use Moo::Role;
@@ -303,12 +308,12 @@ package Attean::API::DateTimeLiteral 0.030 {
 	}
 }
 
-package Attean::API::CanonicalizingLiteral 0.030 {
+package Attean::API::CanonicalizingLiteral 0.031 {
 	use Moo::Role;
 	requires 'canonicalized_term';
 }
 
-package Attean::API::BooleanLiteral 0.030 {
+package Attean::API::BooleanLiteral 0.031 {
 	use Scalar::Util qw(blessed looks_like_number);
 
 	use Moo::Role;
@@ -327,7 +332,7 @@ package Attean::API::BooleanLiteral 0.030 {
 	with 'Attean::API::Literal', 'Attean::API::CanonicalizingLiteral';
 }
 
-package Attean::API::NumericLiteral 0.030 {
+package Attean::API::NumericLiteral 0.031 {
 	use Scalar::Util qw(blessed looks_like_number);
 
 	use Moo::Role;
@@ -335,7 +340,8 @@ package Attean::API::NumericLiteral 0.030 {
 	sub compare {
 		my ($a, $b)	= @_;
 		return 1 unless blessed($b);
-		return 1 unless ($b->does('Attean::API::Literal'));
+		return 1 unless ($b->does('Attean::API::Literal') or $b->does('Attean::API::Binding'));
+		return -1 if ($b->does('Attean::API::Binding'));
 		if ($b->does('Attean::API::NumericLiteral')) {
 			return $a->numeric_value <=> $b->numeric_value;
 		} else {
@@ -536,7 +542,7 @@ package Attean::API::NumericLiteral 0.030 {
 	with 'Attean::API::Literal', 'Attean::API::CanonicalizingLiteral';
 }
 
-package Attean::API::Blank 0.030 {
+package Attean::API::Blank 0.031 {
 	use Scalar::Util qw(blessed);
 	use AtteanX::SPARQL::Constants;
 	use AtteanX::SPARQL::Token;
@@ -545,7 +551,8 @@ package Attean::API::Blank 0.030 {
 	use Moo::Role;
 	
 	sub ebv { return 1; }
-	with 'Attean::API::Term', 'Attean::API::BlankOrIRI';
+	with 'Attean::API::Term', 'Attean::API::BlankOrIRI', 'Attean::API::BlankOrIRIOrTriple';
+;
 	with 'Attean::API::SPARQLSerializable';
 	
 	sub sparql_tokens {
@@ -562,7 +569,7 @@ package Attean::API::Blank 0.030 {
 	}
 }
 
-package Attean::API::IRI 0.030 {
+package Attean::API::IRI 0.031 {
 	use IRI;
 	use Scalar::Util qw(blessed);
 	use AtteanX::SPARQL::Constants;
@@ -572,7 +579,7 @@ package Attean::API::IRI 0.030 {
 	use Moo::Role;
 	
 	sub ebv { return 1; }
-	with 'Attean::API::Term', 'Attean::API::BlankOrIRI';
+	with 'Attean::API::Term', 'Attean::API::BlankOrIRI', 'Attean::API::BlankOrIRIOrTriple';
 	with 'Attean::API::SPARQLSerializable';
 	
 	sub sparql_tokens {
@@ -589,7 +596,7 @@ package Attean::API::IRI 0.030 {
 	sub compare {
 		my ($a, $b)	= @_;
 		return 1 unless blessed($b);
-		return -1 if ($b->does('Attean::API::Literal'));
+		return -1 if ($b->does('Attean::API::Literal') or $b->does('Attean::API::Binding'));
 		return 1 unless ($b->does('Attean::API::IRI'));
 		return ($a->value cmp $b->value);
 	}
@@ -632,7 +639,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2020 Gregory Todd Williams.
+Copyright (c) 2014--2022 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

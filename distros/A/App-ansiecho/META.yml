@@ -1,5 +1,5 @@
 ---
-abstract: 'Command to produce ANSI terminal code'
+abstract: 'Colored echo command using ANSI terminal sequence'
 author:
   - 'Kazumasa Utashiro'
 build_requires:
@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,13 +27,11 @@ no_index:
 provides:
   App::ansiecho:
     file: lib/App/ansiecho.pm
-    version: '0.07'
+    version: '1.01'
 requires:
   Encode: '0'
-  Getopt::EX: v1.26.0
-  Getopt::EX::Colormap: '0'
-  Getopt::EX::Hashed: '1.01'
-  Getopt::EX::Long: '0'
+  Getopt::EX: v1.28.0
+  Getopt::EX::Hashed: '1.03'
   List::Util: '0'
   Pod::Usage: '0'
   Text::ANSI::Printf: '2.01'
@@ -41,10 +39,10 @@ requires:
 resources:
   bugtracker: https://github.com/kaz-utashiro/App-ansiecho/issues
   homepage: https://github.com/kaz-utashiro/App-ansiecho
-  repository: git://github.com/kaz-utashiro/App-ansiecho.git
-version: '0.07'
+  repository: https://github.com/kaz-utashiro/App-ansiecho.git
+version: '1.01'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -6,7 +6,7 @@ use experimental qw/ signatures /;
 
 package YAML::Tidy::Node;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 use overload '""' => \&_stringify;
 
 sub new($class, %args) {
@@ -40,6 +40,10 @@ sub _stringify($self, @args) {
     return $str;
 }
 
+sub is_mapping_value($node, $parent) {
+    return ($parent->{type} eq 'MAP' and not $node->{index} % 2);
+}
+
 package YAML::Tidy::Node::Collection;
 use constant DEBUG => $ENV{YAML_TIDY_DEBUG} ? 1 : 0;
 
@@ -58,6 +62,21 @@ sub indent($self) {
 
 sub open($self) { $self->{start} }
 sub close($self) { $self->{end} }
+
+sub sibling($self, $node, $diff) {
+    return unless $diff;
+    my $children = $self->{children};
+    # double check if $node is child of $parent
+    unless ("$children->[ $node->{index} - 1 ]" eq "$node") {
+        die ">$node< is not a child of >$self<";
+    }
+    my $new_index = $node->{index} - 1 + $diff;
+    if ($new_index < 0 or $new_index > $#$children) {
+        die "$new_index out of range for '$self'";
+    }
+    return $children->[ $new_index ];
+}
+
 
 sub end($self) {
     return $self->close->{end};
@@ -94,7 +113,7 @@ sub fix_node_indent($self, $fix) {
 }
 
 sub _move_columns($self, $line, $offset, $fix) {
-#    warn __PACKAGE__.':'.__LINE__.": MOVE $self $line $offset $fix\n";
+#    warn __PACKAGE__.':'.__LINE__.": _move_columns $self $line $offset $fix\n";
     return if $self->end->{line} < $line;
     return if $self->start->{line} > $line;
     for my $e ($self->open, $self->close) {
@@ -111,6 +130,7 @@ sub _move_columns($self, $line, $offset, $fix) {
 
 
 sub _fix_flow_indent($self, %args) {
+#    warn __PACKAGE__.':'.__LINE__.": ========== _fix_flow_indent l=$line diff=$diff\n";
     my $line = $args{line};
     my $diff = $args{diff};
     my $start = $self->open;
@@ -158,6 +178,10 @@ use YAML::PP::Common qw/
 use base 'YAML::Tidy::Node';
 
 sub is_collection { 0 }
+
+sub is_quoted($self) {
+    return $self->{style} ne YAML_PLAIN_SCALAR_STYLE
+}
 
 sub indent($self) {
     return $self->open->{column};
@@ -216,20 +240,20 @@ sub fix_node_indent($self, $fix) {
 }
 
 sub _move_columns($self, $line, $offset, $fix) {
-#    warn __PACKAGE__.':'.__LINE__.": MOVE $self $line $offset $fix\n";
+#    warn __PACKAGE__.':'.__LINE__.": _move_columns $self $line $offset $fix\n";
     return if $self->end->{line} < $line;
     return if $self->start->{line} > $line;
     for my $pos ($self->open, $self->close) {
-            if ($pos->{line} == $line and $pos->{column} >= $offset) {
-                $pos->{column} += $fix;
-            }
+        if ($pos->{line} == $line and $pos->{column} >= $offset) {
+            $pos->{column} += $fix;
+        }
     }
-#    warn __PACKAGE__.':'.__LINE__.": MOVE $self $line $offset $fix\n";
 }
 
 sub _fix_flow_indent($self, %args) {
     my $line = $args{line};
     my $diff = $args{diff};
+#    warn __PACKAGE__.':'.__LINE__.": ========== _fix_flow_indent l=$line diff=$diff\n";
     for my $pos ($self->open, $self->close) {
         if ($pos->{line} == $line) {
             $pos->{column} += $diff;

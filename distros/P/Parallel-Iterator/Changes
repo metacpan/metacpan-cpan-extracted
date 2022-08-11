@@ -1,46 +1,50 @@
 Release history for Parallel-Iterator
 
-1.001 2022-07-15
+1.002 Tue 09 Aug 2022
+	- No functional changes
+	- Packaging fix to stop installing boilerplate.pl
+
+1.001 Fri 15 Jul 2022
 	- No more subclassing of Exporter
 	- Documentation fixes (including RT#67597; thanks to Richard Ganski)
 	- Working tests in absence of . in @INC (RT#120543; thanks to Kent Fredric)
 	- Packaging improvements
 
-1.00 2007-11-15
+1.00 Thu 15 Nov 2007
 	- Use CORE::exit for mod_perl compatibility. Thanks to Michael
 	  Lackhoff for the fix.
 	- Switched to n.nn version numbering.
 
-0.8.0 2007-10-15
+0.8.0 Mon 15 Oct 2007
 	- Only execute END blocks in parent process. Thanks to Aristotle
 	  Pagaltzis for the suggestion and patch.
 
-0.7.0 2007-10-04
+0.7.0 Thu 04 Oct 2007
 	- Added batch and adaptive options.
 	- Fixed load balancing inequality.
 
-0.6.0 2007-10-04
+0.6.0 Thu 04 Oct 2007
 	- Fixed MANIFEST
 
-0.5.0 2007-10-04
+0.5.0 Thu 04 Oct 2007
 	- Made 0 worker option (non-forked) dclone its input data to
 	  achieve the same cloning effect that the forked version
 	  exhibits.
 
-0.4.0 2007-10-03
+0.4.0 Wed 03 Oct 2007
 	- Fixed tests on Windows.
 
-0.3.0 2007-10-02
+0.3.0 Tue 02 Oct 2007
 	- Made job output and result collection run in sync. Formally job
 	  output from the master process ran as quickly as possible. This
 	  results in better scheduling and eliminates the possibility of
 	  blocking with overlarge data (see t/030-block.t).
 	- Added support for iterators throwing errors.
 
-0.2.0 2007-09-20
+0.2.0 Thu 20 Sep 2007
 	- Renamed Parallel-Iterator. Didn't check Parallel-Workers was
 	  available. Duh.
 
-0.1.0 2007-09-20
+0.1.0 Thu 20 Sep 2007
 	- Initial release.
 

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::Protocol::Assertion;
-our $VERSION = '0.55'; # VERSION
+our $VERSION = '0.57'; # VERSION
 
 use Moose;
 use MooseX::Types::DateTime qw/ DateTime /;
@@ -166,7 +166,7 @@ Net::SAML2::Protocol::Assertion - Net::SAML2::Protocol::Assertion - SAML2 assert
 
 =head1 VERSION
 
-version 0.55
+version 0.57
 
 =head1 SYNOPSIS
 

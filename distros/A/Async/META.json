@@ -4,13 +4,13 @@
       "Mark-Jason Dominus"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unrestricted"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Async",
    "no_index" : {
@@ -20,16 +20,8 @@
       ]
    },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
+      "build" : {},
+      "configure" : {},
       "runtime" : {
          "requires" : {
             "perl" : "5.006"
@@ -51,14 +43,14 @@
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ap/Async.git",
+         "url" : "https://github.com/ap/Async.git",
          "web" : "https://github.com/ap/Async"
       }
    },
-   "version" : "0.12",
+   "version" : "0.14",
    "x_copyright" : {
       "holder" : "Mark-Jason Dominus",
       "year" : 2001
    },
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

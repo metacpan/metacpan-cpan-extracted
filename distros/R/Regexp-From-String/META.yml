@@ -20,7 +20,7 @@ name: Regexp-From-String
 provides:
   Regexp::From::String:
     file: lib/Regexp/From/String.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Exporter: '5.57'
   strict: '0'
@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-From-String
   homepage: https://metacpan.org/release/Regexp-From-String
   repository: git://github.com/perlancar/perl-Regexp-From-String.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

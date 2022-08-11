@@ -196,7 +196,10 @@ is(Template::Liquid->parse(q[{{ 5 | divided_by: 3 }}])->render(),
 is(Template::Liquid->parse(q[{{ 20 | divided_by: 7 }}])->render(),
     2, q[{{ 20 | divided_by: 7 }} => 2]);
 is( Template::Liquid->parse(q[{{ 20 | divided_by: 7.0 }}])->render(),
-    ($Config{uselongdouble} ? '2.85714285714285714' : 2.85714285714286),
+    (  $Config{usequadmath}   ? '2.85714285714285714285714285714286'
+     : $Config{uselongdouble} ? '2.85714285714285714'
+     :                          2.85714285714286
+    ),
     q[{{ 20 | divided_by: 7.0 }} => 2.85714285714286...]
 );
 is( Template::Liquid->parse(
@@ -208,7 +211,10 @@ is( Template::Liquid->parse(
 is( Template::Liquid->parse(
         q[{% assign my_integer = 7 %}{% assign my_float = my_integer | times: 1.0 %}{{ 20 | divided_by: my_float }}]
     )->render(),
-    ($Config{uselongdouble} ? '2.85714285714285714' : 2.85714285714286),
+    (  $Config{usequadmath}   ? '2.85714285714285714285714285714286'
+     : $Config{uselongdouble} ? '2.85714285714285714'
+     :                          2.85714285714286
+    ),
     q[{{ 20 | divided_by: my_float }} => 2.85714285714286...]
 );
 
@@ -402,8 +408,10 @@ is(Template::Liquid->parse(q[{{ 3 | modulo: 2 }}])->render(),
     '1', q[{{ 3 | modulo: 2 }} => 1]);
 is(Template::Liquid->parse(q[{{ 24 | modulo: 7 }}])->render(),
     '3', q[{{ 24 | modulo: 7 }} => 3]);
-is(Template::Liquid->parse(q[{{ 183.357 | modulo: 12 }}])->render(),
-    '3.357', q[{{ 183.357 | modulo: 12 }} => 3.357]);
+is( Template::Liquid->parse(q[{{ 183.357 | modulo: 12 }}])->render(),
+    ($Config{usequadmath} ? '3.35699999999999999999999999999999' : '3.357'),
+    q[{{ 183.357 | modulo: 12 }} => 3.357]
+);
 
 # newline_to_br
 is( Template::Liquid->parse(

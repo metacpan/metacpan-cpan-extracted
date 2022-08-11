@@ -3,7 +3,7 @@ NAME
     available
 
 VERSION
-    version 0.089
+    version 0.090
 
 SYNOPSIS
         # Make DateTimeX object for "now":
@@ -154,7 +154,7 @@ METHODS
 
         ... and anything else that you want to pass to the DateTime->new constructor
 
-    If "truncate" is specificied, then DateTime->truncate will be run after
+    If "truncate" is specified, then DateTime->truncate will be run after
     object creation.
 
     Furthermore, you can simply pass the value for "parse" as the first
@@ -187,10 +187,10 @@ METHODS
 
         DateTimeX::Easy->parse($dt, time_zone => "US/Pacific", soft_time_zone_conversion => 1);
                                                                 # Will use US/Pacific as the timezone with NO conversion
-                                                                # For example, "22:00 US/Eastern" will become "22:00 PST8PDT" 
+                                                                # For example, "22:00 US/Eastern" will become "22:00 PST8PDT"
 
         DateTimeX::Easy->parse($dt)->set_time_zone("US/Pacific"); # Will use US/Pacific as the timezone WITH conversion
-                                                                  # For example, "22:00 US/Eastern" will become "19:00 PST8PDT" 
+                                                                  # For example, "22:00 US/Eastern" will become "19:00 PST8PDT"
 
         DateTimeX::Easy->parse($dt, time_zone => "US/Pacific"); # Will ALSO use US/Pacific as the timezone WITH conversion
 
@@ -225,33 +225,20 @@ SEE ALSO
 
     DateTime::Format::Flexible
 
-    DateTime::Format::ICal
-
     DateTime::Format::DateManip
 
     DateTime::Format::ParseDate
 
+    DateTime::Format::ICal
+
     Date::Manip
 
-SOURCE
-    You can contribute or fork this project via GitHub:
-
-    <http://github.com/robertkrimen/datetimex-easy/tree/master>
-
-        git clone git://github.com/robertkrimen/datetimex-easy.git DateTimeX-Easy
-
-ACKNOWLEDGEMENTS
-COPYRIGHT & LICENSE
-    Copyright 2007 Robert Krimen, all rights reserved.
-
-    This program is free software; you can redistribute it and/or modify it
-    under the same terms as Perl itself.
-
 AUTHOR
-      Robert Krimen <robertkrimen@gmail.com>
+    Robert Krimen <rokr@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2010 by Robert Krimen.
+    This software is copyright (c) 2022 by Robert Krimen and others, see the
+    git log.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

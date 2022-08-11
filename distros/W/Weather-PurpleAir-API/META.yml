@@ -1,5 +1,5 @@
 ---
-abstract: 'Client for using the purpleair.com air quality sensor API'
+abstract: 'Client for using the purpleair.com air quality sensor API [DEPRECATED]'
 author:
   - 'TTKCIAR <ttk@ciar.org>'
 build_requires:
@@ -21,4 +21,4 @@ requires:
   String::Similarity: '1.04'
   Time::HiRes: '1.9721'
   perl: '5.010000'
-version: '0.08'
+version: '0.09'

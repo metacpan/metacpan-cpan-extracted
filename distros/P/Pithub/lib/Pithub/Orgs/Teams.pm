@@ -1,18 +1,21 @@
 package Pithub::Orgs::Teams;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01037';
 # ABSTRACT: Github v3 Org Teams API
 
 use Moo;
+
+our $VERSION = '0.01039';
+
 use Carp qw( carp croak );
+
 extends 'Pithub::Base';
 
 
 sub add_member {
     my ( $self, %args ) = @_;
-    carp '"Add team member" API is deprecated. Use add_membership method.';
     croak 'Missing key in parameters: team_id' unless $args{team_id};
     croak 'Missing key in parameters: user'    unless $args{user};
+    carp q{"Add team member" API is deprecated. Use add_membership method.};
     return $self->request(
         method => 'PUT',
         path   => sprintf( '/teams/%s/members/%s', delete $args{team_id}, delete $args{user} ),
@@ -62,6 +65,7 @@ sub create {
 }
 
 
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
 sub delete {
     my ( $self, %args ) = @_;
     croak 'Missing key in parameters: team_id' unless $args{team_id};
@@ -71,6 +75,7 @@ sub delete {
         %args,
     );
 }
+## use critic
 
 
 sub get {
@@ -143,9 +148,9 @@ sub list_repos {
 
 sub remove_member {
     my ( $self, %args ) = @_;
-    carp '"Remove team member" API is deprecated. Use remove_membership method.';
     croak 'Missing key in parameters: team_id' unless $args{team_id};
     croak 'Missing key in parameters: user'    unless $args{user};
+    carp q{"Remove team member" API is deprecated. Use remove_membership method.};
     return $self->request(
         method => 'DELETE',
         path   => sprintf( '/teams/%s/members/%s', delete $args{team_id}, delete $args{user} ),
@@ -203,7 +208,7 @@ Pithub::Orgs::Teams - Github v3 Org Teams API
 
 =head1 VERSION
 
-version 0.01037
+version 0.01039
 
 =head1 METHODS
 

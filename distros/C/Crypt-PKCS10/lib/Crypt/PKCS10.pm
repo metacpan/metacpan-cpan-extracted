@@ -22,7 +22,7 @@ use Encode ();
 use MIME::Base64;
 use Scalar::Util ();
 
-our $VERSION = '2.003';
+our $VERSION = '2.004';
 
 my $apiVersion = undef;  # 0 for compatibility.  1 for prefered
 my $error;
@@ -122,6 +122,7 @@ my %oids = (
     '1.2.840.113549.1.1.6'          => 'rsaOAEPEncryptionSET',
     '1.2.840.113549.1.1.7'          => 'RSAES-OAEP',
     '1.2.840.113549.1.9.15'         => [ 'smimeCapabilities', 'SMIMECapabilities' ],
+    '1.3.14.3.2.26'                 => 'sha1',
     '1.3.14.3.2.29'                 => [ 'sha1WithRSAEncryption', 'SHA1 with RSA signature' ],
     '1.3.6.1.4.1.311.13.1'          => 'RENEWAL_CERTIFICATE',          # Microsoft
     '1.3.6.1.4.1.311.13.2.1'        => 'ENROLLMENT_NAME_VALUE_PAIR',   # Microsoft
@@ -177,55 +178,54 @@ foreach (keys %oids) {
 }
 
 my %oid2extkeyusage = (
-                '1.3.6.1.5.5.7.3.1'        => 'serverAuth',
-                '1.3.6.1.5.5.7.3.2'        => 'clientAuth',
-                '1.3.6.1.5.5.7.3.3'        => 'codeSigning',
-                '1.3.6.1.5.5.7.3.4'        => 'emailProtection',
-                '1.3.6.1.5.5.7.3.8'        => 'timeStamping',
-                '1.3.6.1.5.5.7.3.9'        => 'OCSPSigning',
+    '1.3.6.1.5.5.7.3.1'        => 'serverAuth',
+    '1.3.6.1.5.5.7.3.2'        => 'clientAuth',
+    '1.3.6.1.5.5.7.3.3'        => 'codeSigning',
+    '1.3.6.1.5.5.7.3.4'        => 'emailProtection',
+    '1.3.6.1.5.5.7.3.8'        => 'timeStamping',
+    '1.3.6.1.5.5.7.3.9'        => 'OCSPSigning',
 
-		'1.3.6.1.5.5.7.3.21'       => 'sshClient',
-		'1.3.6.1.5.5.7.3.22'       => 'sshServer',
+    '1.3.6.1.5.5.7.3.21'       => 'sshClient',
+    '1.3.6.1.5.5.7.3.22'       => 'sshServer',
 
-		# Microsoft usages
+    # Microsoft usages
+    '1.3.6.1.4.1.311.10.3.1'   => 'msCTLSign',
+    '1.3.6.1.4.1.311.10.3.2'   => 'msTimeStamping',
+    '1.3.6.1.4.1.311.10.3.3'   => 'msSGC',
+    '1.3.6.1.4.1.311.10.3.4'   => 'msEFS',
+    '1.3.6.1.4.1.311.10.3.4.1' => 'msEFSRecovery',
+    '1.3.6.1.4.1.311.10.3.5'   => 'msWHQLCrypto',
+    '1.3.6.1.4.1.311.10.3.6'   => 'msNT5Crypto',
+    '1.3.6.1.4.1.311.10.3.7'   => 'msOEMWHQLCrypto',
+    '1.3.6.1.4.1.311.10.3.8'   => 'msEmbeddedNTCrypto',
+    '1.3.6.1.4.1.311.10.3.9'   => 'msRootListSigner',
+    '1.3.6.1.4.1.311.10.3.10'  => 'msQualifiedSubordination',
+    '1.3.6.1.4.1.311.10.3.11'  => 'msKeyRecovery',
+    '1.3.6.1.4.1.311.10.3.12'  => 'msDocumentSigning',
+    '1.3.6.1.4.1.311.10.3.13'  => 'msLifetimeSigning',
+    '1.3.6.1.4.1.311.10.3.14'  => 'msMobileDeviceSoftware',
 
-                '1.3.6.1.4.1.311.10.3.1'   => 'msCTLSign',
-                '1.3.6.1.4.1.311.10.3.2'   => 'msTimeStamping',
-                '1.3.6.1.4.1.311.10.3.3'   => 'msSGC',
-                '1.3.6.1.4.1.311.10.3.4'   => 'msEFS',
-                '1.3.6.1.4.1.311.10.3.4.1' => 'msEFSRecovery',
-                '1.3.6.1.4.1.311.10.3.5'   => 'msWHQLCrypto',
-                '1.3.6.1.4.1.311.10.3.6'   => 'msNT5Crypto',
-                '1.3.6.1.4.1.311.10.3.7'   => 'msOEMWHQLCrypto',
-                '1.3.6.1.4.1.311.10.3.8'   => 'msEmbeddedNTCrypto',
-                '1.3.6.1.4.1.311.10.3.9'   => 'msRootListSigner',
-                '1.3.6.1.4.1.311.10.3.10'  => 'msQualifiedSubordination',
-                '1.3.6.1.4.1.311.10.3.11'  => 'msKeyRecovery',
-                '1.3.6.1.4.1.311.10.3.12'  => 'msDocumentSigning',
-                '1.3.6.1.4.1.311.10.3.13'  => 'msLifetimeSigning',
-                '1.3.6.1.4.1.311.10.3.14'  => 'msMobileDeviceSoftware',
-
-                '1.3.6.1.4.1.311.2.1.21'   => 'msCodeInd',
-                '1.3.6.1.4.1.311.2.1.22'   => 'msCodeCom',
-                '1.3.6.1.4.1.311.20.2.2'   => 'msSmartCardLogon',
+    '1.3.6.1.4.1.311.2.1.21'   => 'msCodeInd',
+    '1.3.6.1.4.1.311.2.1.22'   => 'msCodeCom',
+    '1.3.6.1.4.1.311.20.2.2'   => 'msSmartCardLogon',
 
 
-	        # Netscape
-                '2.16.840.1.113730.4.1'    => 'nsSGC',
+    # Netscape
+    '2.16.840.1.113730.4.1'    => 'nsSGC',
 );
 
 my %shortnames = (
-		  countryName            => 'C',
-		  stateOrProvinceName    => 'ST',
-		  organizationName       => 'O',
-		  organizationalUnitName => 'OU',
-		  commonName             => 'CN',
+    countryName            => 'C',
+    stateOrProvinceName    => 'ST',
+    organizationName       => 'O',
+    organizationalUnitName => 'OU',
+    commonName             => 'CN',
 #		  emailAddress           => 'E', # Deprecated & not recognized by some software
-		  domainComponent        => 'DC',
-		  localityName           => 'L',
-		  userID                 => 'UID',
-		  surname                => 'SN',
-		  givenName              => 'GN',
+    domainComponent        => 'DC',
+    localityName           => 'L',
+    userID                 => 'UID',
+    surname                => 'SN',
+    givenName              => 'GN',
 );
 
 our $schema = <<ASN1
@@ -414,10 +414,10 @@ our $schema = <<ASN1
         s               INTEGER}
 
     rsassaPssParam ::= SEQUENCE {
-        digestAlgorithm     [0] EXPLICIT AlgorithmIdentifier,
-        maskGenAlgorithm    ANY,
+        digestAlgorithm     [0] EXPLICIT AlgorithmIdentifier OPTIONAL,
+        maskGenAlgorithm    [1] EXPLICIT AlgorithmIdentifier OPTIONAL,
         saltLength          [2] EXPLICIT INTEGER OPTIONAL,
-        trailerField        ANY OPTIONAL}
+        trailerField        [3] EXPLICIT INTEGER OPTIONAL}
 ASN1
 ;
 
@@ -781,12 +781,20 @@ sub _new {
 
     # parse parameters for RSA PSS
     if ($self->{signatureAlgorithm}{algorithm} eq 'rsassaPss') {
-        my $params = $self->_init('rsassaPssParam')->decode(
-            $self->{signatureAlgorithm}{parameters});
-        $self->{signatureAlgorithm}{parameters} = {
-             'saltLength' => ($params->{saltLength} || 32),
-             'digestAlgorithm' => $self->_oid2name($params->{digestAlgorithm}{algorithm}),
+        my $params = $self->_init('rsassaPssParam')
+            ->decode($self->{signatureAlgorithm}{parameters});
+
+        my $sigInfo = {
+            'saltLength' => ($params->{saltLength} || 20),
+            'digestAlgorithm' => 'sha1',
         };
+        $sigInfo->{digestAlgorithm} = $self->_oid2name($params->{digestAlgorithm}{algorithm})
+            if($params->{digestAlgorithm}{algorithm});
+
+        $sigInfo->{maskGenAlgorithm} = $self->_oid2name($params->{maskGenAlgorithm}{algorithm})
+            if($params->{maskGenAlgorithm}{algorithm});
+
+        $self->{signatureAlgorithm}{parameters} = $sigInfo;
     }
 
     # Extract bundle of bits that is signed
@@ -1284,6 +1292,13 @@ sub subjectPublicKeyParams {
     my $at = $self->pkAlgorithm;
     $at = 'undef' unless( defined $at );
 
+
+    # this is wrong but unfortunately seen in the wild
+    if( $at eq 'rsassaPss') {
+        $at = 'rsaEncryption';
+        warn 'Got rsassaPss as pkAlgorithm - converting to RSA';
+    }
+
     if( $at eq 'rsaEncryption' ) {
         $rv->{keytype} = 'RSA';
         my $par = $self->_init( 'rsaKey' );
@@ -1626,10 +1641,16 @@ sub checkSignature {
             eval { require Crypt::PK::RSA; };
             die( "Unable to load Crypt::PK::RSA\n" ) if( $@ );
 
-            $key = Crypt::PK::RSA->new( \$key );
-
+            # We have seen requests in the wild that accidentially
+            # have the rsaPSS OID set for the key type which is wrong
+            # and therefore not supported by Crypt::PK::RSA. We therefore
+            # build the key directly from the components extracted earlier
+            $key = Crypt::PK::RSA->new( {
+                e => $keyp->{publicExponent},
+                N => $keyp->{modulus},
+            } );
             # if we have NOT pss padding we need to add v1.5 padding
-            push @params, 'v1.5' if (@params == 3);
+            push @params, 'v1.5' if ( $alg ne 'rsassaPss' );
             return $key->verify_message( @params );
 
         }

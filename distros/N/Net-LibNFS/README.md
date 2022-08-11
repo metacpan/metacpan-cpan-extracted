@@ -58,8 +58,17 @@ can’t (or just would rather not) [mount(8)](http://man.he.net/man8/mount) them
 # LINKING
 
 If a shared libnfs is available and is version 5.0.0 or later we’ll
-compile against that.
-Otherwise we try to compile our own libnfs and link to it statically.
+link (dynamically) against that.
+Otherwise we try to compile our own libnfs and bundle it (statically).
+
+A shared libnfs is preferable because it can receive updates on its
+own; a static libnfs locks you into that version of the library until you
+rebuild Net::LibNFS.
+
+If, though, you have a usable shared libnfs but for some reason still want
+to bundle a custom-built static one, set `NET_LIBNFS_LINK_STATIC` to a
+truthy value in the environment as you run this distribution’s
+`Makefile.PL`.
 
 # CHARACTER ENCODING
 
@@ -107,6 +116,8 @@ Recognized options are:
 - `client_name` and `verifier` (NFSv4 only)
 - `tcp_syncnt`, `uid`, `gid`, `debug`, `dircache`,
 `autoreconnect`, `timeout`
+- `unix_authn` (arrayref) - Sets UID, GID, and auxiliary GIDs
+at once. Clobbers (and is clobbered by) `uid` and `gid`.
 - `pagecache`, `pagecache_ttl`, `readahead`
 - `readmax`, `writemax`
 

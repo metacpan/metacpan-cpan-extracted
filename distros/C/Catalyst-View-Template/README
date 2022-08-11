@@ -7,15 +7,16 @@ design objectives:
 
 * To nevertheless integrate seamlessly with Catalyst
 
-* To make all parts of its behaviour easy to augment
+* To be easily augmented in behaviour by overriding or modifying methods
 
   Taken together with the other objectives, this should make it easy to
   repurpose for any view class in which you might want to use Template
   Toolkit templates.
 
 This is a rethink of Catalyst::View::TT whose focus is on providing lots
-of Catalyst-specific features on top of Template Toolkit, which
-ultimately only make templates harder to reuse or test in other contexts.
+of Catalyst-specific features on top of Template Toolkit, but which are
+hard to augment without copy-pasting code from it, and which ultimately
+only make templates harder to reuse or test in other contexts.
 
 INSTALLATION
 

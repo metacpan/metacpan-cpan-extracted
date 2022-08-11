@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::Binding::Redirect;
-our $VERSION = '0.55'; # VERSION
+our $VERSION = '0.57'; # VERSION
 
 use Moose;
 use MooseX::Types::URI qw/ Uri /;
@@ -164,7 +164,7 @@ Net::SAML2::Binding::Redirect - Net::SAML2::Binding::Redirect - HTTP Redirect bi
 
 =head1 VERSION
 
-version 0.55
+version 0.57
 
 =head1 SYNOPSIS
 

@@ -125,7 +125,12 @@ sub package {
     'JSON::PP' => '2.27105',
     'Cpanel::JSON::XS' => '4.09',
   );
-  for my $package (qw(Cpanel::JSON::XS JSON::XS JSON::PP)) {
+  for my $package (
+    grep defined,
+    $ENV{VENUS_JSON_PACKAGE},
+    qw(Cpanel::JSON::XS JSON::XS JSON::PP)
+  )
+  {
     my $criteria = "require $package; $package->VERSION($packages{$package})";
     if (do {local $@; eval "$criteria"; $@}) {
       next;
@@ -222,9 +227,10 @@ Json Class for Perl 5
 =head1 DESCRIPTION
 
 This package provides methods for reading and writing L<JSON|https://json.org>
-data. B<Note:> This package requires that a suitable JSON is installed,
+data. B<Note:> This package requires that a suitable JSON library is installed,
 currently either C<JSON::XS> C<3.0+>, C<JSON::PP> C<2.27105+>, or
-C<Cpanel::JSON::XS> C<4.09+>.
+C<Cpanel::JSON::XS> C<4.09+>. You can use the C<VENUS_JSON_PACKAGE> environment
+variable to include or prioritize your preferred JSON library.
 
 =cut
 

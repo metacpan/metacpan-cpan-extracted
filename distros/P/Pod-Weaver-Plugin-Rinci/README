@@ -2,9 +2,9 @@ NAME
     Pod::Weaver::Plugin::Rinci - Insert stuffs to POD from Rinci metadata
 
 VERSION
-    This document describes version 0.781 of Pod::Weaver::Plugin::Rinci
+    This document describes version 0.783 of Pod::Weaver::Plugin::Rinci
     (from Perl distribution Pod-Weaver-Plugin-Rinci), released on
-    2022-06-13.
+    2022-06-23.
 
 SYNOPSIS
     In your weaver.ini:
@@ -83,6 +83,46 @@ DESCRIPTION
 
     To exclude a script from being processed, you can also put "#
     NO_PWP_RINCI" in the script.
+
+CONFIGURATION
+  exclude_modules
+    String, a regex.
+
+  exclude_files
+    String, a regex.
+
+  use_require_hook_source_dzilbuild
+    Bool, default true.
+
+    Since weaver.ini does not provide something like @Filter in dist.ini,
+    you can also use the environment variable
+    "PERL_POD_WEAVER_PLUGIN_RINCI_USE_REQUIRE_HOOK_SOURCE_DZILBUILD" to set
+    the default value of this configuration option.
+
+  force_reload
+    Bool, default true.
+
+    Whether to force reloading modules, to get the latest version (e.g. a
+    module is already loaded by another plugin but then might get modified;
+    when we are processing the module we might want to reload to get the
+    latest version.
+
+    But this reloading sometimes causes the module to fail to compile, so
+    this option exists.
+
+    Since weaver.ini does not provide something like @Filter in dist.ini,
+    you can also use the environment variable
+    "PERL_POD_WEAVER_PLUGIN_RINCI_FORCE_RELOAD" to set the default value of
+    this configuration option.
+
+ENVIRONMENT
+  PERL_POD_WEAVER_PLUGIN_RINCI_USE_REQUIRE_HOOK_SOURCE_DZILBUILD
+    Bool. Used to set the default for the
+    "/use_require_hook_source_dzilbuild" configuration option.
+
+  PERL_POD_WEAVER_PLUGIN_RINCI_FORCE_RELOAD
+    Bool. Used to set the default for the "/force_reload" configuration
+    option.
 
 HOMEPAGE
     Please visit the project's homepage at

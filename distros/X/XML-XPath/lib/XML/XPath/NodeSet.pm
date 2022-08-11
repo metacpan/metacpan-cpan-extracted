@@ -1,6 +1,6 @@
 package XML::XPath::NodeSet;
 
-$VERSION = '1.47';
+$VERSION = '1.48';
 
 use strict; use warnings;
 

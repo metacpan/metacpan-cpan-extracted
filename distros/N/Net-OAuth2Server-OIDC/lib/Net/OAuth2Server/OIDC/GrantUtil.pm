@@ -1,6 +1,7 @@
 use strict; use warnings;
 
 package Net::OAuth2Server::OIDC::GrantUtil;
+our $VERSION = '0.006';
 
 sub provides_refresh_token { shift->scope->contains( 'offline_access' ) }
 
@@ -22,4 +23,4 @@ sub userinfo_claims {
 	) );
 }
 
-our $VERSION = '0.005';
+1;

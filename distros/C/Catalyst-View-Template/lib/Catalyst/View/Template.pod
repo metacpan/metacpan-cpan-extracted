@@ -32,7 +32,7 @@ with the following design objectives:
 
 =item * To nevertheless integrate seamlessly with L<Catalyst>
 
-=item * To make all parts of its behaviour easy to augment
+=item * To be easily augmented in behaviour by overriding or modifying methods
 
 Taken together with the other objectives, this should make it easy to repurpose
 for any view class in which you might want to use Template Toolkit templates.
@@ -41,6 +41,7 @@ for any view class in which you might want to use Template Toolkit templates.
 
 This is a rethink of L<Catalyst::View::TT> whose focus is on
 providing lots of L<Catalyst>-specific features on top of Template Toolkit,
+but which are hard to augment without copy-pasting code from it, and
 which ultimately only make templates harder to reuse or test in other contexts.
 
 =head1 DEFAULT OPERATION
@@ -200,8 +201,9 @@ It gets passed the configuration hash to pass to L<Template/new>
 and is expected to return an instance of L<Template> or something like it.
 It throws an exception on failure.
 
-You might want to override this method in your view class to modify
-the result of merging all static class configuration.
+B<You might want to override this method in your view class>
+to modify the result of merging all static class configuration.
+
 Most likely you might use this to inject values into the C<INCLUDE_PATH>
 in C<\%config> and then pass through to the super method.
 But you could also construct an instance yourself,
@@ -221,7 +223,7 @@ On success it then calls L</process_output> on the output.
 If template execution fails it calls L</process_error>.
 It returns whatever the called method returns.
 
-You might want to override this method in your view class
+B<You might want to override this method in your view class>
 if you want additional steps taken when the view is forwarded to,
 but which should not be taken when L</render> is called directly.
 
@@ -241,7 +243,7 @@ As usual, you can also forward to this method:
 
  $c->forward( 'View::Web', 'render', $template, \%vars, \$output )
 
-You might want to override this method in your view class
+B<You might want to override this method in your view class>
 if you always want certain additional steps taken before rendering a template.
 E.g. you would use this to add a standard set of variables to the variables
 passed to any template, in which case you will want to modify C<\%vars> and
@@ -291,8 +293,8 @@ and C<< $c->response->content_type >> to C<< $view->content_type >>
 (unless a content type has already been set),
 then it returns true.
 
-You might want to override this method in your view class in order
-to send the output somewhere other than the HTTP response, e.g. e-mail.
+B<You might want to override this method in your view class>
+to use the output somewhere other than the HTTP response, e.g. for e-mail.
 
 =head2 C<process_error>
 
@@ -303,8 +305,8 @@ This logs C<< $view->template->error >> at the C<error> level
 and sets it as a C<< $c->error >>,
 then it returns false.
 
-You are unlikely to want to override this method in your view class
-except maybe in some kind of ancillary view (or something of the sort)
+B<You might want to override this method in your view class>
+in rare cases only, like in an ancillary view (or some such)
 where setting C<< $c->error >> might be too drastic.
 
 =head1 DIFFERENCES FROM L<Catalyst::View::TT>

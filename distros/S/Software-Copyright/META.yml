@@ -34,7 +34,7 @@ requires:
 resources:
   homepage: https://gitlab.com/ddumont/software-copyright.git
   repository: https://gitlab.com/ddumont/software-copyright.git
-version: '0.003'
+version: '0.004'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: GPL-3.0-only

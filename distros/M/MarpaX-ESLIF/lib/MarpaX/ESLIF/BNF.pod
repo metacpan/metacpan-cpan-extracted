@@ -14,7 +14,7 @@ MarpaX::ESLIF::BNF - MarpaX::ESLIF's BNF
 
 =head1 VERSION
 
-version 6.0.24
+version 6.0.25
 
 =head1 DESCRIPTION
 
@@ -458,13 +458,13 @@ When you use the C<⇒> UTF-8 character, it is recommended to say that the gramm
 
 By default, symbol action is C<::transfer> and rule action is C<::concat>, i.e. the parse tree value of a grammar is a binary concatenation of every input representation (see the I<representation> section below), without the eventual discard. Stack manipulation may require the trigger of a I<free> function, and this has no default. Only expected terminals or lexemes are looked up, this is the Longest Acceptable Token Match (LATM) setting, defaulting to a true value. You should not change that. Defaults can be set once, for example like this:
 
-  :default ::= action            => defaultRuleAction
-               latm              => 1
-               discardIsFallback => 0
-               symbol-action     => defaultSymbolAction
-               regex-action      => defaultRegexAction
-               default-encoding  => UTF-8
-               fallback-encoding => UTF-16
+  :default ::= action              => defaultRuleAction
+               latm                => 1
+               discard-is-fallback => 0
+               symbol-action       => defaultSymbolAction
+               regex-action        => defaultRegexAction
+               default-encoding    => UTF-8
+               fallback-encoding   => UTF-16
 
 Predefined actions are available for rules and symbols. Please refer the API documentation to know more about value types.
 
@@ -474,7 +474,7 @@ The C<default-encoding> adverb gives default encoding when the recognizer runs i
 
 The C<fallback-encoding> adverb gives fallback encoding when the recognizer runs in character mode and the end-user gave no encoding nor C<default-encoding>. Then MarpaX::ESLIF will try to I<guess> the encoding, and if this fail, will fallback to this setting. This is the desired setting when you grammar accept input in different encoding, and defaults to a given encoding if the guess fail. Please note that, when guessing an encoding, MarpaX::ESLIF takes into account an eventual BOM, retreiving the later from input characters if it exists.
 
-The C<discard-is-fallback> adverb indicates ESLIF that :discard should not be tried whenever scan/resume is entered. The default is the safe implementation, i.e. it is always tried, and no grammar terminal will match if :discard matches an equal number of bytes or longer. Nevertheless, if you are sure that the grammar's :discard cannot conflict with any other grammar terminal, then :discard, if successful, will always hit as a fallback alternative. The C<discard-is-fallback> enforces this mode, providing a safe performance improvement for grammars that has no conflict between :discard and any other grammar terminal.
+The C<discard-is-fallback> adverb indicates ESLIF that C<:discard> should not be tried whenever scan/resume is entered. The default is the safe implementation, i.e. it is always tried, and no grammar terminal will match if C<:discard> matches an equal number of bytes or longer. Nevertheless, if you are sure that the grammar's C<:discard> cannot conflict with any other grammar terminal, then C<:discard>, if successful, will always hit as a fallback alternative. The C<discard-is-fallback> enforces this mode, providing a safe performance improvement for grammars that has no conflict between C<:discard> and any other grammar terminal.
 
 =item Meta actions
 

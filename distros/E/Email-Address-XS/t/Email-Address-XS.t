@@ -19,7 +19,7 @@ use Carp;
 $Carp::Internal{'Test::Builder'} = 1;
 $Carp::Internal{'Test::More'} = 1;
 
-use Test::More tests => 511;
+use Test::More tests => 516;
 use Test::Builder;
 
 local $SIG{__WARN__} = sub {
@@ -696,6 +696,16 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 		is($address->user(), 'winston.smith.', $subtest);
 		is($address->host(), 'recdep.minitrue', $subtest);
 		is($address->address(), '"winston.smith."@recdep.minitrue', $subtest);
+	}
+
+	{
+		my $subtest = 'test method parse() in scalar context with valid address followed by garbage';
+		my $address = Email::Address::XS->parse('winston.smith@recdep.minitrue garbage');
+		ok(!$address->is_valid(), $subtest);
+		is($address->original(), 'winston.smith@recdep.minitrue ', $subtest);
+		is($address->user(), 'winston.smith', $subtest);
+		is($address->host(), 'recdep.minitrue', $subtest);
+		is($address->address(), 'winston.smith@recdep.minitrue', $subtest);
 	}
 
 }

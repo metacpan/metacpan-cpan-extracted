@@ -21,6 +21,8 @@ requires 'DBIx::Class';
 requires 'Sub::Util';
 requires 'HTML::Escape';
 requires 'URI';
+requires 'Module::Pluggable::Object';
+requires 'Class::Method::Modifiers';
 
 on test => sub {
   requires 'Test::Most' => '0.34';

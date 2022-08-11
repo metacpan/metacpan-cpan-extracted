@@ -4,7 +4,7 @@ use strict;
 use warnings;
 no strict 'refs';
 
-our $VERSION = '1.3001';
+our $VERSION = '1.3002';
 
 our %mocks;
 

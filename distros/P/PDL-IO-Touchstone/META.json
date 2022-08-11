@@ -1,5 +1,5 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Read and manipulate Touchstone .s2p (and .sNp) files.",
    "author" : [
       "Eric Wheeler <ewheeler@cpan.org>"
    ],
@@ -33,12 +33,17 @@
       "runtime" : {
          "requires" : {
             "PDL" : "2.080",
+            "PDL::Constants" : "0",
+            "PDL::LinearAlgebra" : "0",
             "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
             "File::Temp" : "0",
+            "PDL" : "2.080",
+            "PDL::Constants" : "0",
+            "PDL::LinearAlgebra" : "0",
             "Test::More" : "0"
          }
       }
@@ -54,6 +59,6 @@
          "web" : "https://github.com/KJ7LNW/perl-PDL-IO-Touchstone.git"
       }
    },
-   "version" : 1.001,
+   "version" : 1.005,
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

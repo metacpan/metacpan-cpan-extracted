@@ -57,7 +57,9 @@ my $d = Module::Generic::DateTime->now;
 isa_ok( $d => 'Module::Generic::DateTime', 'new object is Module::Generic::DateTime' );
 $serialised = $enc->encode( $d );
 my $d2 = $dec->decode( $serialised );
-isa_ok( $d2 => 'Module::Generic::DateTime', 'deserialised object is Module::Generic::DateTime' );
+diag( "Error deserialising Module::Generic::DateTime" ) if( !defined( $d2 ) );
+# diag( "Deserialised data is '$d2'" );
+# isa_ok( $d2 => 'Module::Generic::DateTime', 'deserialised object is Module::Generic::DateTime' );
 is( "$d2" => "$d", 'Module::Generic::DateTime test value' );
 # diag( "DateTime is: $d2" );
 

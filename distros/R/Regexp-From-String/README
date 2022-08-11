@@ -2,23 +2,33 @@ NAME
     Regexp::From::String - Convert '/.../' or 'qr(...)' into Regexp object
 
 VERSION
-    This document describes version 0.001 of Regexp::From::String (from Perl
-    distribution Regexp-From-String), released on 2022-07-05.
+    This document describes version 0.002 of Regexp::From::String (from Perl
+    distribution Regexp-From-String), released on 2022-07-09.
 
 SYNOPSIS
-     use Regexp::From::String qw(str_to_re);
+     use Regexp::From::String qw(str_maybe_to_re str_to_re);
 
-     my $re1 = str_to_re('foo');       # stays as string 'foo'
-     my $re2 = str_to_re('/foo');      # ditto
-     my $re3 = str_to_re('/foo/');     # compiled to Regexp object qr(foo)
-     my $re4 = str_to_re('qr(foo)i');  # compiled to Regexp object qr(foo)i
-     my $re5 = str_to_re('qr(foo[)i'); # dies, invalid regex syntax
+     my $re1 = str_maybe_to_re('foo');        # stays as string 'foo'
+     my $re2 = str_maybe_to_re('/foo');       # stays as string '/foo'
+     my $re3 = str_maybe_to_re('/foo/');      # compiled to Regexp object qr(foo)
+     my $re4 = str_maybe_to_re('qr(foo)i');   # compiled to Regexp object qr(foo)i
+     my $re5 = str_maybe_to_re('qr(foo[)i');  # dies, invalid regex syntax
+
+     my $re1 = str_to_re('foo');        # compiled to Regexp object qr(foo)
+     my $re2 = str_to_re('/foo');       # compiled to Regexp object qr(/foo)
+     my $re2 = str_to_re({case_insensitive=>1}, 'foo[]');  # compiled to Regexp object qr(foo\[\])i
+     my $re2 = str_to_re({anchored=>1}, 'foo[]');          # compiled to Regexp object qr(\Afoo\[\]\z)
+     my $re3 = str_to_re('/foo/');      # compiled to Regexp object qr(foo)
+     my $re4 = str_to_re('qr(foo)i');   # compiled to Regexp object qr(foo)i
+     my $re5 = str_to_re('qr(foo[)i');  # dies, invalid regex syntax
 
 FUNCTIONS
-  str_to_re
+  str_maybe_to_re
+    Maybe convert string to Regexp object.
+
     Usage:
 
-     $str_or_re = str_to_re($str);
+     $str_or_re = str_maybe_to_re($str);
 
     Check if string $str is in the form of "/.../" or "qr(...)'" and if so,
     compile the inside regex (currently simply using stringy "eval") and
@@ -31,6 +41,25 @@ FUNCTIONS
     delimiter characters are recognized and not others.
 
     Optional modifiers "i", "m", and "s" are currently allowed at the end.
+
+  str_to_re
+    Convert string to Regexp object.
+
+    Usage:
+
+     $str_or_re = str_to_re([ \%opts , ] $str);
+
+    This function is similar to "str_maybe_to_re" except that when string is
+    not in the form of "/.../" or "qr(...)", the string is "quotemeta()"'ed
+    then converted to a Regexp object anyway. There are some options
+    available to specify in first argument hashref "\%opts":
+
+    case_insensitive
+        Bool. If set to true will compile to Regexp object with "i" regexp
+        modifier.
+
+    anchored
+        Bool. If set to true will anchor the pattern with "\A" and "\z".
 
 HOMEPAGE
     Please visit the project's homepage at

@@ -20,10 +20,12 @@ no_index:
     - inc
 requires:
   File::Slurp: '0'
+  Gzip::Faster: '0.21'
   JSON: '0'
+  MIME::Base64: '3.16'
   Sys::Hostname: '0'
   perl: '5.006'
 resources:
   repository: https://github.com/VVelox/Monitoring-Sneck.git
-version: v0.0.1
+version: v0.1.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::HandlerLibrary::Hash;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.032';
+our $VERSION   = '0.034';
 
 use Sub::HandlesVia::HandlerLibrary;
 our @ISA = 'Sub::HandlesVia::HandlerLibrary';
@@ -51,8 +51,7 @@ my $additional_validation_for_set_and_insert = sub {
 	}
 	if ($ti and $ti->{trust_mutated} eq 'maybe') {
 		my ( $env, $code, $arg );
-		my $key_coercion   = ($gen->coerce && $ti->{key_type}->has_coercion);
-		my $value_coercion = ($gen->coerce && $ti->{value_type}->has_coercion);
+		$env = {};
 		$arg = sub {
 			my $gen = shift;
 			return '$shv_key'   if $_[0]=='1';
@@ -63,18 +62,10 @@ my $additional_validation_for_set_and_insert = sub {
 			'my($shv_key,$shv_value)=%s; if (%s>0) { %s }; if (%s>1) { %s };',
 			$gen->generate_args,
 			$gen->generate_argc,
-			$key_coercion
-				? '$shv_key=$shv_key_tc->assert_coerce($shv_key)'
-				: $ti->{key_type}->inline_assert('$shv_key', '$shv_key_tc'),
+			$gen->generate_type_assertion( $env, $ti->{key_type} || Str, '$shv_key' ),
 			$gen->generate_argc,
-			$value_coercion
-				? '$shv_value=$shv_value_tc->assert_coerce($shv_value)'
-				: $ti->{value_type}->inline_assert('$shv_value', '$shv_value_tc'),
+			$gen->generate_type_assertion( $env, $ti->{value_type}, '$shv_value' ),
 		);
-		$env = {
-			'$shv_key_tc' => \($ti->{key_type} || Str),
-			'$shv_value_tc' => \$ti->{value_type},
-		};
 		return {
 			code => $code,
 			env => $env,
@@ -331,31 +322,26 @@ sub set {
 			my $self = CORE::shift;
 			my ($sig_was_checked, $gen) = @_;
 			my $ti = __PACKAGE__->_type_inspector($gen->isa);
+			my $env = {};
 			if ($ti and $ti->{trust_mutated} eq 'always') {
 				# still need to check keys are strings
 				return {
 					code => sprintf(
 						'for my $shv_tmp (@shv_keys_idx) { %s };',
-						Str->inline_assert('$shv_params[$shv_tmp]', '$Types_Standard_Str'),
+						$gen->generate_type_assertion( $env, Str, '$shv_params[$shv_tmp]' ),
 					),
-					env => { '$Types_Standard_Str' => \(Str) },
+					env => $env,
 					add_later => 1,
 				};
 			}
 			if ($ti and $ti->{trust_mutated} eq 'maybe') {
-				my $key_coercion   = ($gen->coerce && $ti->{key_type}->has_coercion);
-				my $value_coercion = ($gen->coerce && $ti->{value_type}->has_coercion);
 				return {
 					code => sprintf(
 						'for my $shv_tmp (@shv_keys_idx) { %s }; for my $shv_tmp (@shv_values_idx) { %s };',
-						$key_coercion
-							? '$shv_params[$shv_tmp] = $shv_key_tc->assert_coerce($shv_params[$shv_tmp])'
-							: $ti->{key_type}->inline_assert('$shv_params[$shv_tmp]', '$shv_key_tc'),
-						$value_coercion
-							? '$shv_params[$shv_tmp] = $shv_value_tc->assert_coerce($shv_params[$shv_tmp])'
-							: $ti->{value_type}->inline_assert('$shv_params[$shv_tmp]', '$shv_value_tc'),
+						$gen->generate_type_assertion( $env, $ti->{key_type}, '$shv_params[$shv_tmp]' ),
+						$gen->generate_type_assertion( $env, $ti->{value_type}, '$shv_params[$shv_tmp]' ),
 					),
-					env => { '$shv_key_tc' => \($ti->{key_type}), '$shv_value_tc' => \($ti->{value_type}) },
+					env => $env,
 					add_later => 1,
 				};
 			}

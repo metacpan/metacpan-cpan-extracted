@@ -48,6 +48,11 @@ is(folded($_, undef, padding => 1), "aaa/  ",   "config width: padding");
 is(folded($_, undef, padding => 1, padchar => '-'),
    "aaa/--", "config width: padding, padchar");
 
+$_ = "000 000 000";
+is(folded($_, 5, boundary => 'word'), "000 ",    "boundary: check 0");
+is(folded($_, 6, boundary => 'word'), "000 ",    "boundary: check 0");
+is(folded($_, 7, boundary => 'word'), "000 000", "boundary: check 0");
+
 configure Text::ANSI::Fold width => 0, boundary => '';
 $_ = "__________aaa bbb/ccc ddd";
 

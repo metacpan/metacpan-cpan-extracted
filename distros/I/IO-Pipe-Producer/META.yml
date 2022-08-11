@@ -1,0 +1,26 @@
+---
+abstract: 'Perl extension for IO::Pipe'
+author:
+  - 'Robert William Leach <rleach@princeton.edu>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IO-Pipe-Producer
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '1.26'
+  IO::Pipe: '1.13'
+  base: '2.18'
+  strict: '1.07'
+  warnings: '1.13'
+version: '2.02'

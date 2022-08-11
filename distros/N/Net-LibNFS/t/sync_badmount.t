@@ -10,6 +10,8 @@ use Test::Deep;
 
 use Net::LibNFS ();
 
+use Errno;
+
 my $nfs = Net::LibNFS->new();
 
 my $err = exception {
@@ -21,7 +23,11 @@ cmp_deeply(
     all(
         Isa('Net::LibNFS::X::NFSError'),
         methods(
-            [ get => 'errno' ] => any(1, 5),
+            [ get => 'errno' ] => any(
+                Errno::EPERM,
+                Errno::EIO,
+                Errno::EFAULT,
+            ),
         ),
     ),
     'expected error',

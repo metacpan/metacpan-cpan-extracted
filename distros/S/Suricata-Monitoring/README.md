@@ -79,6 +79,9 @@ suricata_stats_check -c
 
 -n                       Run as a nagios check style instead of LibreNMS.
 
+-a <seconds>             How far back to read.
+                         Default: 360
+
 -h                       Print help info.
 --help                   Print help info.
 -v                       Print version info.

@@ -36,8 +36,12 @@ $object->push( 33 );
 $object->push( 44 );
 
 is( $object->pop, 44 );
-is_deeply( $object->list, [ 22, 33 ] );
+is_deeply( $object->list, [ 11, 22, 33 ] );
 is( $object->pop, 33 );
-is_deeply( $object->list, [ 22 ] );
+is_deeply( $object->list, [ 11, 22 ] );
+
+$object->reset;
+
+is_deeply( $object->list, [ 11 ] );
 
 done_testing;

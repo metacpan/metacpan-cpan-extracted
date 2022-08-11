@@ -1,12 +1,12 @@
-use Test::More 0.88; # for done_testing
+use strict; use warnings;
 
-BEGIN { require_ok('Class::Closure') }
+use Test::More tests => 18;
 
 my ( $foodestr, $bardestr );
 
 package Foo;
 
-BEGIN { Class::Closure->import }
+use Class::Closure;
 
 sub CLASS {
 	destroy { $foodestr++ };
@@ -30,7 +30,7 @@ sub g : lvalue { $_[0]->{x} }
 
 package Bar;
 
-BEGIN { Class::Closure->import }
+use Class::Closure;
 
 sub CLASS {
 	destroy { $bardestr++ };
@@ -70,5 +70,3 @@ is $bar->nada, 69,         'Fallback';
 is $bar->c, 3,             'Extends';
 is $bar->b, 13,            'Build/Extends';
 is $bar->f, 84,            'Extends/Represents';
-
-done_testing;

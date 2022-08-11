@@ -1,11 +1,11 @@
 # Contributing to Mail::Exim::ACL::Geolocation
 
 The code for this distribution is hosted at
-https://gitlab.com/voegelas/mail-exim-acl-geolocation.
+https://github.com/voegelas/Mail-Exim-ACL-Geolocation.
 
 Grab the latest version using the command:
 
-    git clone https://gitlab.com/voegelas/mail-exim-acl-geolocation.git
+    git clone https://github.com/voegelas/Mail-Exim-ACL-Geolocation.git
 
 You can submit code changes by forking the repository, pushing your code
 changes to your clone, and then submitting a pull request.

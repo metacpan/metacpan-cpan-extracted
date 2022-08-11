@@ -1,6 +1,6 @@
 package Pithub::Repos::Starring;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01037';
+our $VERSION = '0.01039';
 # ABSTRACT: Github v3 Repo Starring API
 
 use Moo;
@@ -82,7 +82,7 @@ Pithub::Repos::Starring - Github v3 Repo Starring API
 
 =head1 VERSION
 
-version 0.01037
+version 0.01039
 
 =head1 METHODS
 

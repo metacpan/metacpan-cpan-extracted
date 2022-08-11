@@ -22,6 +22,10 @@ sub attr {
 sub attrs {
   my ($self) = @_;
 
+  if ($self->{attrs}) {
+    return $self->{attrs};
+  }
+
   my $name = $self->{name};
   my @attrs = attrs_resolver($name);
 
@@ -44,7 +48,7 @@ sub attrs_resolver {
   no warnings 'once';
 
   if (${"${name}::META"} && $${"${name}::META"}{ATTR}) {
-    return (map +($_,attrs_resolver($_)), sort {
+    return (sort {
       $${"${name}::META"}{ATTR}{$a}[0] <=> $${"${name}::META"}{ATTR}{$b}[0]
     } keys %{$${"${name}::META"}{ATTR}});
   }
@@ -65,6 +69,10 @@ sub base {
 
 sub bases {
   my ($self) = @_;
+
+  if ($self->{bases}) {
+    return $self->{bases};
+  }
 
   my $name = $self->{name};
   my @bases = bases_resolver($name);
@@ -95,6 +103,86 @@ sub data {
   return ${"${name}::META"};
 }
 
+
+sub find {
+  my ($self, $type, $name) = @_;
+
+  return if !$type;
+  return if !$name;
+
+  my $configs;
+
+  for my $source (qw(roles bases mixins self)) {
+    $configs = $self->search($source, $type, $name);
+    last if @$configs;
+  }
+
+  return $configs->[0];
+}
+
+sub local {
+  my ($self, $type) = @_;
+
+  return if !$type;
+
+  my $name = $self->{name};
+
+  no strict 'refs';
+
+  return if !int grep $type eq $_, qw(attrs bases mixins roles subs);
+
+  my $function = "${type}_resolver";
+
+  return [&{"${function}"}($name)];
+}
+
+sub mixin {
+  my ($self, $name) = @_;
+
+  return 0 if !$name;
+
+  my $data = {map +($_,$_), @{$self->mixins}};
+
+  return $data->{$name} ? 1 : 0;
+}
+
+sub mixins {
+  my ($self) = @_;
+
+  if ($self->{mixins}) {
+    return $self->{mixins};
+  }
+
+  my $name = $self->{name};
+  my @mixins = mixins_resolver($name);
+
+  for my $mixin (@mixins) {
+    push @mixins, mixins_resolver($mixin);
+  }
+
+  for my $base (@{$self->bases}) {
+    push @mixins, mixins_resolver($base);
+  }
+
+  my %seen;
+  return $self->{mixins} ||= [grep !$seen{$_}++, @mixins];
+}
+
+sub mixins_resolver {
+  my ($name) = @_;
+
+  no strict 'refs';
+
+  if (${"${name}::META"} && $${"${name}::META"}{MIXIN}) {
+    return (map +($_, mixins_resolver($_)), sort {
+      $${"${name}::META"}{MIXIN}{$a}[0] <=> $${"${name}::META"}{MIXIN}{$b}[0]
+    } keys %{$${"${name}::META"}{MIXIN}});
+  }
+  else {
+    return ();
+  }
+}
+
 sub new {
   my ($self, @args) = @_;
 
@@ -113,6 +201,10 @@ sub role {
 
 sub roles {
   my ($self) = @_;
+
+  if ($self->{roles}) {
+    return $self->{roles};
+  }
 
   my $name = $self->{name};
   my @roles = roles_resolver($name);
@@ -145,6 +237,47 @@ sub roles_resolver {
   }
 }
 
+sub search {
+  my ($self, $from, $type, $name) = @_;
+
+  return if !$from;
+  return if !$type;
+  return if !$name;
+
+  no strict 'refs';
+
+  my @configs;
+  my @sources;
+
+  if (lc($from) eq 'bases') {
+    @sources = bases_resolver($self->{name});
+  }
+  elsif (lc($from) eq 'roles') {
+    @sources = roles_resolver($self->{name});
+  }
+  elsif (lc($from) eq 'mixins') {
+    @sources = mixins_resolver($self->{name});
+  }
+  else {
+    @sources = ($self->{name});
+  }
+
+  for my $source (@sources) {
+    if (lc($type) eq 'sub') {
+      if (*{"${source}::${name}"}{"CODE"}) {
+        push @configs, [$source, [1, [*{"${source}::${name}"}{"CODE"}]]];
+      }
+    }
+    else {
+      if ($${"${source}::META"}{uc($type)}{$name}) {
+        push @configs, [$source, $${"${source}::META"}{uc($type)}{$name}];
+      }
+    }
+  }
+
+  return [@configs];
+}
+
 sub sub {
   my ($self, $name) = @_;
 
@@ -157,6 +290,10 @@ sub sub {
 
 sub subs {
   my ($self) = @_;
+
+  if ($self->{subs}) {
+    return $self->{subs};
+  }
 
   my $name = $self->{name};
   my @subs = subs_resolver($name);
@@ -238,13 +375,23 @@ Class Metadata for Perl 5
     ['authenticate']
   }
 
+  package Novice;
+
+  use Venus::Mixin;
+
+  sub points {
+    100
+  }
+
   package User;
 
-  use Venus::Class;
+  use Venus::Class 'attr', 'base', 'mixin', 'test', 'with';
 
   base 'Person';
 
   with 'Identity';
+
+  mixin 'Novice';
 
   attr 'email';
 
@@ -464,6 +611,222 @@ I<Since C<1.00>>
 
 =cut
 
+=head2 find
+
+  find(Str $type, Str $name) (Tuple[Str,Tuple[Int,ArrayRef]])
+
+The find method finds and returns the first configuration for the property type
+specified. This method uses the L</search> method to search C<roles>, C<bases>,
+C<mixins>, and the source package, in the order listed. The "property type" can
+be any one of C<attr>, C<base>, C<mixin>, or C<role>.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item find example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $find = $meta->find;
+
+  # ()
+
+=back
+
+=over 4
+
+=item find example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $find = $meta->find('attr', 'id');
+
+  # ['Identity', [ 1, ['id']]]
+
+=back
+
+=over 4
+
+=item find example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $find = $meta->find('sub', 'valid');
+
+  # ['User', [1, [sub {...}]]]
+
+=back
+
+=over 4
+
+=item find example 4
+
+  # given: synopsis
+
+  package main;
+
+  my $find = $meta->find('sub', 'authenticate');
+
+  # ['Authenticable', [1, [sub {...}]]]
+
+=back
+
+=cut
+
+=head2 local
+
+  local(Str $type) (ArrayRef)
+
+The local method returns the names of properties defined in the package
+directly (not inherited) for the property type specified. The C<$type> provided
+can be either C<attrs>, C<bases>, C<roles>, or C<subs>.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item local example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $attrs = $meta->local('attrs');
+
+  # ['email']
+
+=back
+
+=over 4
+
+=item local example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $bases = $meta->local('bases');
+
+  # ['Person', 'Venus::Core::Class']
+
+=back
+
+=over 4
+
+=item local example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $roles = $meta->local('roles');
+
+  # ['Identity', 'Authenticable']
+
+=back
+
+=over 4
+
+=item local example 4
+
+  # given: synopsis
+
+  package main;
+
+  my $subs = $meta->local('subs');
+
+  # [
+  #   'attr',
+  #   'authenticate',
+  #   'base',
+  #   'email',
+  #   'false',
+  #   'id',
+  #   'login',
+  #   'password',
+  #   'test',
+  #   'true',
+  #   'valid',
+  #   'with',
+  # ]
+
+=back
+
+=cut
+
+=head2 mixin
+
+  mixin(Str $name) (Bool)
+
+The mixin method returns true or false if the package referenced has consumed
+the mixin named.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item mixin example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $mixin = $meta->mixin('Novice');
+
+  # 1
+
+=back
+
+=over 4
+
+=item mixin example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $mixin = $meta->mixin('Intermediate');
+
+  # 0
+
+=back
+
+=cut
+
+=head2 mixins
+
+  mixins() (ArrayRef)
+
+The mixins method returns all of the mixins composed into the package
+referenced.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item mixins example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $mixins = $meta->mixins;
+
+  # [
+  #   'Novice',
+  # ]
+
+=back
+
+=cut
+
 =head2 new
 
   new(Any %args | HashRef $args) (Object)
@@ -563,6 +926,75 @@ I<Since C<1.00>>
   #   'Identity',
   #   'Authenticable'
   # ]
+
+=back
+
+=cut
+
+=head2 search
+
+  search(Str $from, Str $type, Str $name) (ArrayRef[Tuple[Str,Tuple[Int,ArrayRef]]])
+
+The search method searches the source specified and returns the configurations
+for the property type specified. The source can be any one of C<bases>,
+C<roles>, C<mixins>, or C<self> for the source package. The "property type" can
+be any one of C<attr>, C<base>, C<mixin>, or C<role>.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item search example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $search = $meta->search;
+
+  # ()
+
+=back
+
+=over 4
+
+=item search example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $search = $meta->search('roles', 'attr', 'id');
+
+  # [['Identity', [ 1, ['id']]]]
+
+=back
+
+=over 4
+
+=item search example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $search = $meta->search('self', 'sub', 'valid');
+
+  # [['User', [1, [sub {...}]]]]
+
+=back
+
+=over 4
+
+=item search example 4
+
+  # given: synopsis
+
+  package main;
+
+  my $search = $meta->search('self', 'sub', 'authenticate');
+
+  # [['User', [1, [sub {...}]]]]
 
 =back
 

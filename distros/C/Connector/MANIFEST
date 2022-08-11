@@ -16,6 +16,7 @@ lib/Connector/Builtin/File/Path.pm
 lib/Connector/Builtin/File/SCP.pm
 lib/Connector/Builtin/File/Simple.pm
 lib/Connector/Builtin/Memory.pm
+lib/Connector/Builtin/Null.pm
 lib/Connector/Builtin/Static.pm
 lib/Connector/Iterator.pm
 lib/Connector/Multi.pm
@@ -48,6 +49,7 @@ t/01-builtin-file-path.t
 t/01-builtin-file-scp.t
 t/01-builtin-file-simple.t
 t/01-builtin-memory.t
+t/01-builtin-null.t
 t/01-builtin-password-scheme.t
 t/01-builtin-password.t
 t/01-builtin-static.t

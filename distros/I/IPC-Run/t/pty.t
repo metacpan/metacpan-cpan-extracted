@@ -26,6 +26,7 @@ further, but I have not the time.
 =cut
 
 use strict;
+use warnings;
 
 BEGIN {
     $|  = 1;
@@ -103,7 +104,14 @@ my $text = "hello world\n";
 
 ## Older Perls can't ok( a, qr// ), so I manually do that here.
 my $exp;
-my $platform_skip = $^O =~ /(?:dragonfly|aix|freebsd|openbsd|darwin)/ ? "$^O deadlocks on this test" : "";
+my $platform_skip = $^O =~ /(?:dragonfly|aix|freebsd|openbsd|netbsd|darwin)/ ? "$^O deadlocks on this test" : "";
+
+# May force opening /var/lib/sss/mc/group on some systems (see
+# https://github.com/toddr/IPC-Run/issues/130)
+# OpenBSD libc devname(3) opens /var/run/dev.db and keeps it open.
+# As this would confuse open file descriptor checks, open it in
+# advance.
+{my $pty = IO::Pty->new}
 
 ##
 ## stdin only
@@ -112,10 +120,6 @@ SKIP: {
     if ($platform_skip) {
         skip( $platform_skip, 9 );
     }
-
-    # May force opening /var/lib/sss/mc/group on some systems (see
-    # https://github.com/toddr/IPC-Run/issues/130)
-    {my $pty = IO::Pty->new}
 
     $out    = 'REPLACE ME';
     $?      = 99;

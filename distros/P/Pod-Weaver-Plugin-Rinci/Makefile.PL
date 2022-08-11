@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
     "Perinci::To::POD" => "0.874",
     "Pod::Weaver" => 0,
     "Pod::Weaver::Role::AddTextToSection" => "0.06",
-    "Require::Hook::DzilBuild" => 0,
+    "Require::Hook::Source::DzilBuild" => 0,
     "Sub::Identify" => 0,
     "strict" => 0
   },
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.781",
+  "VERSION" => "0.783",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +54,7 @@ my %FallbackPrereqs = (
   "Perinci::To::POD" => "0.874",
   "Pod::Weaver" => 0,
   "Pod::Weaver::Role::AddTextToSection" => "0.06",
-  "Require::Hook::DzilBuild" => 0,
+  "Require::Hook::Source::DzilBuild" => 0,
   "Sub::Identify" => 0,
   "Test::More" => 0,
   "strict" => 0

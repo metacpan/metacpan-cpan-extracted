@@ -1,13 +1,16 @@
 package Getopt::Long::Dump;
 
-our $DATE = '2016-10-27'; # DATE
-our $VERSION = '0.10'; # VERSION
-
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 
 use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-08-10'; # DATE
+our $DIST = 'Getopt-Long-Dump'; # DIST
+our $VERSION = '0.112'; # VERSION
+
 our @EXPORT_OK = qw(dump_getopt_long_script);
 
 our %SPEC;
@@ -88,16 +91,11 @@ sub dump_getopt_long_script {
 
     my $spec;
     if ($stdout =~ /^# BEGIN DUMP $tag\s+(.*)^# END DUMP $tag/ms) {
-        $spec = eval $1;
+        $spec = eval $1; ## no critic: BuiltinFunctions::ProhibitStringyEval
         if ($@) {
             return [500, "Script '$filename' looks like using ".
                         "Getopt::Long, but I got an error in eval-ing ".
                             "captured option spec: $@, raw capture: <<<$1>>>"];
-        }
-        if (ref($spec) ne 'HASH') {
-            return [500, "Script '$filename' looks like using ".
-                        "Getopt::Long, but I didn't get a hash option spec, ".
-                            "raw capture: stdout=<<$stdout>>"];
         }
     } else {
         return [500, "Script '$filename' looks like using Getopt::Long, ".
@@ -125,12 +123,16 @@ Getopt::Long::Dump - Run a Getopt::Long-based script but only to dump the spec
 
 =head1 VERSION
 
-This document describes version 0.10 of Getopt::Long::Dump (from Perl distribution Getopt-Long-Dump), released on 2016-10-27.
+This document describes version 0.112 of Getopt::Long::Dump (from Perl distribution Getopt-Long-Dump), released on 2022-08-10.
 
 =head1 FUNCTIONS
 
 
-=head2 dump_getopt_long_script(%args) -> [status, msg, result, meta]
+=head2 dump_getopt_long_script
+
+Usage:
+
+ dump_getopt_long_script(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Run a Getopt::Long-based script but only to dump the spec.
 
@@ -164,16 +166,17 @@ Libraries to unshift to @INC when running script.
 
 =item * B<skip_detect> => I<bool>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -191,6 +194,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/Getopt-Lon
 
 Source repository is at L<https://github.com/perlancar/perl-Getopt-Long-Dump>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Getopt-Long-Dump>
@@ -198,16 +230,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2016 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -3,7 +3,7 @@ package Catalyst::Helper::View::TTSite;
 use strict;
 use File::Spec;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 $VERSION =~ tr/_//d;
 
 sub mk_compclass {

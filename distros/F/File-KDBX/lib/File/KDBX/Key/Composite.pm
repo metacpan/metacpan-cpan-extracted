@@ -13,7 +13,7 @@ use namespace::clean;
 
 extends 'File::KDBX::Key';
 
-our $VERSION = '0.904'; # VERSION
+our $VERSION = '0.905'; # VERSION
 
 sub init {
     my $self = shift;
@@ -92,7 +92,7 @@ File::KDBX::Key::Composite - A composite key made up of component keys
 
 =head1 VERSION
 
-version 0.904
+version 0.905
 
 =head1 SYNOPSIS
 

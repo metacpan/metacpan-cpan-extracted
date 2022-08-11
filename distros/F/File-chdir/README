@@ -2,7 +2,7 @@ NAME
     File::chdir - a more sensible way to change directories
 
 VERSION
-    version 0.1010
+    version 0.1011
 
 SYNOPSIS
       use File::chdir;
@@ -50,7 +50,7 @@ $CWD
     @CWD represents the current working directory as an array, each
     directory in the path is an element of the array. This can often make
     the directory easier to manipulate, and you don't have to fumble with
-    "File::Spec-"splitpath> and "File::Spec-"catdir> to make portable code.
+    "File::Spec->splitpath" and "File::Spec->catdir" to make portable code.
 
       # Similar to chdir("/usr/local/src/perl")
       @CWD = qw(usr local src perl);
@@ -150,9 +150,9 @@ CAVEATS
     There is currently no way to change the current volume via File::chdir.
 
 NOTES
-    $CWD returns the current directory using native path separators, i.e. \
-    on Win32. This ensures that $CWD will compare correctly with directories
-    created using File::Spec. For example:
+    $CWD returns the current directory using native path separators, i.e.
+    "\" on Win32. This ensures that $CWD will compare correctly with
+    directories created using File::Spec. For example:
 
         my $working_dir = File::Spec->catdir( $CWD, "foo" );
         $CWD = $working_dir;
@@ -215,11 +215,15 @@ AUTHORS
 
     *   Michael G. Schwern <schwern@pobox.com>
 
-CONTRIBUTOR
-    Joel Berger <joel.a.berger@gmail.com>
+CONTRIBUTORS
+    *   David Golden <xdg@xdg.me>
+
+    *   Joel Berger <joel.a.berger@gmail.com>
+
+    *   Philippe Bruhat (BooK) <book@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2015 by Michael G. Schwern and David
+    This software is copyright (c) 2016 by Michael G. Schwern and David
     Golden.
 
     This is free software; you can redistribute it and/or modify it under

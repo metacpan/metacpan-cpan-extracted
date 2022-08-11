@@ -51,7 +51,7 @@
          "web" : "https://github.com/ap/Parallel-Iterator"
       }
    },
-   "version" : "1.001",
+   "version" : "1.002",
    "x_copyright" : {
       "holder" : "Andy Armstrong",
       "year" : 2007

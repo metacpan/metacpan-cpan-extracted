@@ -27,12 +27,11 @@ sub encode_qp($;$$) {
   if (@_ <= 1) {
     $output = SPVM::MIME::QuotedPrint->encode_qp($input);
   }
+  elsif (@_ <= 2) {
+    $output = SPVM::MIME::QuotedPrint->encode_qp($input, $end_of_line);
+  }
   else {
-    unless (defined $binary) {
-      $binary = 0;
-    }
-    
-    $output = SPVM::MIME::QuotedPrint->encode_qp_opt($input, $end_of_line, $binary);
+    $output = SPVM::MIME::QuotedPrint->encode_qp($input, $end_of_line, $binary);
   }
   
   return $output->to_bin;

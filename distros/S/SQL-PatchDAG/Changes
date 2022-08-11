@@ -2,10 +2,16 @@ Release history for SQL-PatchDAG
 
 TODO user manual
 TODO tests and more tests
+TODO DBIx::Deployer comparison?
+
+0.103 Wed 10 Aug 2022
+	- No functional changes
+	- Packaging fix to stop installing boilerplate.pl
+	- Updated package metadata
 
 0.102 Sat 11 Sep 2021
-	- Changelog fix
 	- No functional changes
+	- Changelog fix
 
 0.101 Fri 10 Sep 2021
 	- Bugfix for the -e switch

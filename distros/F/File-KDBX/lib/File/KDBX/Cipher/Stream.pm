@@ -14,7 +14,7 @@ use namespace::clean;
 
 extends 'File::KDBX::Cipher';
 
-our $VERSION = '0.904'; # VERSION
+our $VERSION = '0.905'; # VERSION
 
 
 has 'counter',  is => 'ro', default => 0;
@@ -86,6 +86,7 @@ sub _stream {
                 $counter = int($offset / 64);
                 $pos = $offset % 64;
             }
+            load $pkg;
             my $s = $pkg->new($self->key, $self->iv, $counter);
             # seek to correct position within block
             $s->keystream($pos) if $pos;
@@ -123,7 +124,7 @@ File::KDBX::Cipher::Stream - A cipher stream encrypter/decrypter
 
 =head1 VERSION
 
-version 0.904
+version 0.905
 
 =head1 SYNOPSIS
 

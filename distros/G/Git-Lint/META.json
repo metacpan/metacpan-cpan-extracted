@@ -4,7 +4,7 @@
       "Blaine Motsinger <blaine@renderorange.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -49,6 +49,7 @@
       },
       "test" : {
          "requires" : {
+            "File::Find" : "0",
             "File::Spec" : "0",
             "Test::Deep" : "0",
             "Test::Exception" : "0.42",
@@ -69,6 +70,6 @@
          "web" : "https://github.com/renderorange/Git-Lint"
       }
    },
-   "version" : "0.014",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.016",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

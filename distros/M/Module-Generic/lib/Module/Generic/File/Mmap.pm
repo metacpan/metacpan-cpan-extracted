@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File/Mmap.pm
-## Version v0.1.0
+## Version v0.1.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/07/26
-## Modified 2022/07/26
+## Modified 2022/08/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,13 +16,13 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
-    use vars qw( $VERSION $HAS_CACHE_MMAP );
+    use vars qw( $VERSION $HAS_CACHE_MMAP $HAS_B64 );
     use Data::UUID;
     use JSON 4.03 qw( -convert_blessed_universally );
     use Module::Generic::File qw( file sys_tmpdir );
     use Nice::Try;
     our $HAS_CACHE_MMAP = 0;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.2';
 };
 
 use strict;
@@ -31,6 +31,7 @@ use warnings;
 sub init
 {
     my $self = shift( @_ );
+    $self->{base64}          = undef;
     $self->{cache_file}      = '';
     # Default action when accessing a shared file cache? If 1, it will create it if it does not exist already
     $self->{create}          = 0;
@@ -56,7 +57,6 @@ sub init
     {
         try
         {
-            $self->message( 4, "Instantiating a Cache::FastMmap object with cache file '$f'" );
             # No serialiser because we manage ths ourself
             my $cache = Cache::FastMmap->new(
                 ( ( defined( $self->{destroy} ) && length( $self->{destroy} ) ) ? ( unlink_on_exit => $self->{destroy} ) : () ),
@@ -76,6 +76,8 @@ sub init
     $self->{removed}    = 0;
     return( $self );
 }
+
+sub base64 { return( shift->_set_get_scalar( 'base64', @_ ) ); }
 
 sub cache_file { return( shift->_set_get_file( 'cache_file', @_ ) ); }
 
@@ -102,11 +104,8 @@ sub flags
     $opts->{create} = $self->create unless( length( $opts->{create} ) );
     $opts->{mode} = $self->mode unless( length( $opts->{mode} ) );
     my $flags  = 0;
-    $self->message( 3, "Adding create bit." ) if( $opts->{create} );
     $flags    |= 0600 if( $opts->{create} );
-    $self->message( 3, "Adding exclusive bit" ) if( $opts->{exclusive} );
     $flags    |= ( $opts->{mode} || 0666 );
-    $self->message( 3, "Returning flags value '$flags'." );
     return( $flags );
 }
 
@@ -122,6 +121,8 @@ sub ftok
                ) );
 }
 
+sub has_xs { return( shift->_is_class_loadable( 'Cache::FastMmap' ) ); }
+
 sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
 sub json { return( shift->_packing_method( 'json' ) ); }
@@ -134,7 +135,6 @@ sub key
     {
         $self->{key} = shift( @_ );
         $self->{serial} = $self->_str2key( $self->{key} );
-        $self->message( 3, "Setting key to '$self->{key}' ($self->{serial})" );
     }
     return( $self->{key} );
 }
@@ -169,15 +169,12 @@ sub open
     my $serial;
     if( length( $opts->{key} ) )
     {
-        $self->message( 4, "Getting serial based on key '$opts->{key}'." );
         $serial = $self->_str2key( $opts->{key} ) || 
             return( $self->error( "Cannot get serial from key '$opts->{key}': ", $self->error ) );
     }
     else
     {
-        $self->message( 3, "Getting serial ($self->{serial})" );
         $serial = $self->serial;
-        $self->message( 4, "Got saved serial '$serial' ($self->{serial})." );
     }
     die( "There is no serial!!\n" ) if( !CORE::length( $serial ) );
     my $create = 0;
@@ -197,7 +194,6 @@ sub open
     
     my $cache_dir = $self->{_cache_dir} || return( $self->error( "Cache directory object is gone!" ) );
     return( $self->error( "Cache directory is not a Module::Generic::File object!" ) ) if( !$self->_is_a( $cache_dir => 'Module::Generic::File' ) );
-    $self->message( 4, "Using flags $flags and cache directory \"${cache_dir}\" and serial '${serial}' with create boolean set to '${create}'." );
     if( $cache_dir->exists )
     {
         return( $self->error( "Cache directory exists, but is not a directory!" ) ) if( !$cache_dir->is_dir );
@@ -208,27 +204,21 @@ sub open
     }
     my $fo = $cache_dir->child( $serial );
     my $cache_file = "$fo";
-    $self->message( 4, "Cache file to use is '${cache_file}'" );
     my $io;
     if( $fo->exists )
     {
-        $self->message( 4, "Cache file ${cache_file} already exists." );
         # Need to find a way to make that more efficient
         if( ( $flags & 0600 ) || 
             ( $flags & 0060 ) ||
             ( $flags & 0006 ) )
         {
-            $self->message( 4, "Flags ($flags) require write privilege to the cache file." );
             return( $self->error( "Requested mode ($flags) requires writing, but uid $> is missing write privilege to the cache file \"$cache_file\"." ) ) if( !$fo->can_write );
-            $self->message( 4, "Opening cache file ${cache_file} in read append mode." );
             $io = $fo->open( '<', { binmode => 'raw', autoflush => 1 } ) ||
                 return( $self->pass_error( $fo->error ) );
         }
         else
         {
-            $self->message( 4, "Flags ($flags) require only read priviles." );
             return( $self->error( "Requested mode ($flags) require reading, but missing access privilege to the cache file \"$cache_file\"." ) ) if( !$fo->can_read );
-            $self->message( 4, "Opening cache file ${cache_file} in read-only mode." );
             $io = $fo->open( '<', { binmode => $opts->{binmode}, autoflush => 1 } ) ||
                 return( $self->pass_error( $fo->error ) );
         }
@@ -240,14 +230,12 @@ sub open
             ( $flags & 0060 ) ||
             ( $flags & 0006 ) )
         {
-            $self->message( 4, "Cache file ${cache_file} does not already exist, creating it now." );
             $io = $fo->open( '+>', { binmode => 'raw', autoflush => 1 } ) ||
                 return( $self->pass_error( $fo->error ) );
             $fo->close;
         }
         else
         {
-            $self->message( 4, "Cache file ${cache_file} does not already exist, and flags ($flags) are only in read-only mode." );
             return( $self->error( "Requested mode ($flags) require reading, but the cache file \"$cache_file\" does not exist yet." ) );
         }
     }
@@ -261,11 +249,11 @@ sub open
         cache_file => $fo,
         _packing_method => $self->_packing_method,
     ) || return( $self->error( "Cannot create object with key '", ( $opts->{key} || $self->key ), "': ", $self->error ) );
+    $new->{base64} = $self->base64;
     $new->key( $self->key );
     $new->serial( $serial );
     $new->id( Scalar::Util::refaddr( $new ) );
     $new->size( $opts->{size} );
-    $self->message( 4, "Adding new object to global object repo and returning it." );
     return( $new );
 }
 
@@ -295,12 +283,22 @@ sub read
         return( $self->error( "Error retrieving data in MMap file for key '$key': $e" ) );
     }
     my $bytes = CORE::length( $buffer // '' );
-    $self->message( 4, "${bytes} bytes of data retrieved from Cache::FastMmap." );
     my $packing = $self->_packing_method;
     $packing = lc( $packing ) if( defined( $packing ) );
     my $data;
     if( CORE::defined( $buffer ) && CORE::length( $buffer ) )
     {
+        # There may be encapsulation of data before writing data to memory.
+        # e.g.: MG[14]something here
+        if( index( $buffer, 'MG[' ) == 0 )
+        {
+            my $def = substr( $buffer, 0, index( $buffer, ']' ) + 1, '' );
+            # Get the string length stored
+            my $len = int( substr( $def, 3, -1 ) );
+            # Remove any possible remaining unwanted data
+            substr( $buffer, $len, length( $buffer ), '' );
+        }
+
         try
         {
             if( $packing eq 'json' )
@@ -309,23 +307,36 @@ sub read
             }
             elsif( $packing eq 'cbor' )
             {
-                $data = $self->deserialise( data => $buffer, serialiser => 'CBOR::XS', allow_sharing => 1 );
+                $data = $self->deserialise(
+                    data => $buffer,
+                    serialiser => 'CBOR::XS',
+                    allow_sharing => 1,
+                    ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
+                );
             }
             elsif( $packing eq 'sereal' )
             {
-                $data = $self->deserialise( data => $buffer, serialiser => 'Sereal', freeze_callbacks => 1 );
+                $data = $self->deserialise(
+                    data => $buffer,
+                    serialiser => 'Sereal',
+                    freeze_callbacks => 1,
+                    ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
+                );
             }
             # By default Storable::Improved
             else
             {
                 # $data = Storable::Improved::thaw( $buffer );
-                $data = $self->deserialise( data => $buffer, serialiser => 'Storable::Improved' );
+                $data = $self->deserialise(
+                    data => $buffer,
+                    serialiser => 'Storable::Improved',
+                    ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
+                );
             }
-            $self->message( 4, "Decoded data '", ( $buffer // '' ), "' -> '", ( $data // '' ), "': ", sub{ $self->dump( $data ) });
         }
         catch( $e )
         {
-            return( $self->error( "An error occured while decoding data using $packing: $e", ( length( $buffer ) <= 1024 ? "\nData is: '$buffer'" : '' ) ) );
+            return( $self->error( "An error occured while decoding data using $packing with base64 set to '", ( $self->{base64} // '' ), "': $e" ) );
         }
     }
     else
@@ -333,7 +344,6 @@ sub read
         $data = $buffer;
     }
     
-    $self->messagef( 4, "Unpacked data is now %d bytes.", CORE::length( $data ) );
     # data decoded is not a reference and size was provided and is greater than 0
     if( !ref( $data ) && scalar( @_ ) > 2 && int( $_[2] ) > 0 )
     {
@@ -366,6 +376,27 @@ sub remove
 }
 
 sub removed { return( shift->_set_get_boolean( 'removed', @_ ) ); }
+
+sub reset
+{
+    my $self = shift( @_ );
+    my $default;
+    if( @_ )
+    {
+        $default = shift( @_ );
+    }
+    else
+    {
+        $default = '';
+    }
+    if( my $cache = $self->_cache )
+    {
+        # my $key = $self->key || return( $self->error( "Could not find the mmap key!" ) );
+        # $cache->set( $key => $default );
+        $self->write( $default );
+    }
+    return( $self );
+}
 
 sub sereal { return( shift->_packing_method( 'sereal' ) ); }
 
@@ -407,7 +438,6 @@ sub write
     }
     my $key = $self->key || return( $self->error( "No key set." ) );
     my $cache = $self->_cache || return( $self->error( "No Cache::FastMmap object. It seems it is gone!" ) );
-    $self->message( 4, "Writing ${data} to Cache::FastMmap." );
     my $packing = $self->_packing_method;
     my $encoded;
     try
@@ -418,16 +448,23 @@ sub write
         }
         elsif( $packing eq 'cbor' )
         {
-            $encoded = $self->serialise( $data, serialiser => 'CBOR::XS', allow_sharing => 1 );
+            $encoded = $self->serialise( $data,
+                serialiser => 'CBOR::XS',
+                allow_sharing => 1,
+                ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
+            );
             return( $self->pass_error ) if( !defined( $encoded ) );
         }
         elsif( $packing eq 'sereal' )
         {
             $self->_load_class( 'Sereal::Encoder' ) || return( $self->pass_error );
+            my $const;
+            $const = \&{"Sereal\::Encoder::SRL_ZLIB"} if( defined( &{"Sereal\::Encoder::SRL_ZLIB"} ) );
             $encoded = $self->serialise( $data,
                 serialiser => 'Sereal',
                 freeze_callbacks => 1,
-                compress => &{"Sereal\::Encoder::SRL_ZLIB"}(),
+                ( defined( $const ) ? ( compress => $const->() ) : () ),
+                ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
             );
             return( $self->pass_error ) if( !defined( $encoded ) );
         }
@@ -436,7 +473,10 @@ sub write
         {
             # local $Storable::forgive_me = 1;
             # $encoded = Storable::Improved::freeze( $data );
-            $encoded = $self->serialise( $data, serialiser => 'Storable::Improved' );
+            $encoded = $self->serialise( $data,
+                serialiser => 'Storable::Improved',
+                ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
+            );
             return( $self->pass_error ) if( !defined( $encoded ) );
         }
     }
@@ -445,7 +485,10 @@ sub write
         return( $self->error( "An error occured encoding data provided using $packing: $e. Data was: '$data'" ) );
     }
     
-    $self->messagef( 4, "Writing %d bytes of encoded data to Cache::FastMmap.", CORE::length( $encoded ) );
+    # Simple encapsulation
+    # FYI: MG = Module::Generic
+    substr( $encoded, 0, 0, 'MG[' . length( $encoded ) . ']' );
+    
     try
     {
         $cache->set( $key => $encoded );
@@ -602,7 +645,6 @@ sub _str2key
         # We use the root as a reliable and stable path.
         # I initially though about using __FILE__, but during testing this would be in ./blib/lib and beside one user might use a version of this module somewhere while the one used under Apache/mod_perl2 could be somewhere else and this would render the generation of the IPC key unreliable and unrepeatable
         my $val = $self->ftok( $id );
-        $self->message( 4, "Calling ftok() for key '$key' with numeric id '$id' returning '$val'." );
         return( $val );
     }
 }
@@ -623,7 +665,8 @@ sub FREEZE
     }
     CORE::delete( $hash{_cache} );
     # Return an array reference rather than a list so this works with Sereal and CBOR
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # On or before Sereal version 4.023, Sereal did not support multiple values returned
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
     # But Storable want a list with the first element being the serialised element
     CORE::return( $class, \%hash );
 }
@@ -709,11 +752,12 @@ Module::Generic::File::Mmap - MMap File Class
         serialiser => 'sereal',
         # 256k
         size => 262144,
+        base64 => 1,
     ) || die( Module::Generic::File::Mmap->error, "\n" );
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.2
 
 L<Module::Generic::File::Mmap> implements a Mmap cache mechanism using L<Cache::FastMmap>, which is an XS module. The api is very similar to its counterpart with L<Module::Generic::File::Cache> and L<Module::Generic::SharedMem>, but has the advantage of sharing data over a file like L<Module::Generic::File::Cache>, but using Mmap and being very fast.
 
@@ -838,6 +882,10 @@ Provided with an optional hash or hash reference and this return a bitwise value
 
 This attempts to be a polyfil for L<POSIX/ftok> and provided with some digits, this returns a steady and reproducible serial that serves as a base file name for the cache file.
 
+=head2 has_xs
+
+Read-only. Returns true if the XS module L<Cache::FastMmap> is installed on your system and false otherwise.
+
 =head2 id
 
 Returns the id or serial of the cache file set after having opened it with L</open>
@@ -898,7 +946,9 @@ Get a random key to be used as identifier to create a shared mmap cache.
 
 =head2 read
 
-Read the content of the shared mmap cached and decode the data read using L<JSON> or L<Storable/thaw> depending on your choice upon either object instantiation or upon using the methods L</json> or L</storable>
+Read the content of the shared mmap cached and decode the data read using L<JSON>, L<CBOR|CBOR::XS>, L<Sereal> or L<Storable/thaw> depending on your serialiser of choice upon either object instantiation or upon using the methods L</json> or L</storable>
+
+By default, if no serialiser is specified, it will default to C<storable>.
 
 You can optionally provide a buffer, and a maximum length and it will read that much length and put the shared mmap cache content decoded in that buffer, if it were provided.
 
@@ -982,7 +1032,9 @@ Remove the lock, if any. The shared mmap cache must first be opened.
 
 =head2 write
 
-Write the data provided to the shared mmap cache, after having encoded it using L<JSON> or L<Storable/freeze> depending on your choice. See L</json> and L</storable>
+Write the data provided to the shared mmap cache, after having encoded it using L<JSON>, L<CBOR|CBOR::XS>, L<Sereal> or L<Storable/freeze> depending on your serialiser of choice. See L</json>, L</cbor>, L</sereal> and L</storable> and more simply L</serialiser>
+
+By default, if no serialiser is specified, it will default to C<storable>.
 
 You can store in shared mmap cache any kind of data excepted glob, such as scalar reference, array or hash reference. You could also store module objects, but L<JSON> only supports encoding objects that are based on array or hash. As the L<JSON> documentation states "other blessed references will be converted into null"
 

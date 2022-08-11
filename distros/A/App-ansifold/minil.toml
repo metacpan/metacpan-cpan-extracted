@@ -1,10 +1,17 @@
 name = "App-ansifold"
-# badges = ["travis"]
-badges = ['github-actions/test']
-authority="cpan:UTASHIRO"
+badges = [ 'github-actions/test', 'metacpan' ]
+authority = "cpan:UTASHIRO"
 
-module_maker="ModuleBuildTiny"
+module_maker = "ModuleBuildTiny"
 
-readme_from="script/ansifold"
-abstract_from="script/ansifold"
-authors_from="script/ansifold"
+readme_from = "script/ansifold"
+abstract_from = "script/ansifold"
+authors_from = "script/ansifold"
+
+[release]
+branch = "master"
+
+[unsupported]
+os = [
+    "MSWin32",
+]

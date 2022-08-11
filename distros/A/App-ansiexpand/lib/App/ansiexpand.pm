@@ -1,5 +1,5 @@
 package App::ansiexpand;
-our $VERSION = "0.9901";
+our $VERSION = "1.01";
 
 use 5.014;
 use warnings;
@@ -12,7 +12,7 @@ use Text::ANSI::Tabs qw(ansi_expand ansi_unexpand);
 
 our $DEFAULT_UNEXPAND;
 
-use Getopt::EX::Hashed 1.03 'has'; {
+use Getopt::EX::Hashed 1.03; {
 
     has unexpand  => ' u  !   ' , default => $DEFAULT_UNEXPAND;
     has ambiguous => '    =s  ' , any => [ qw(wide narrow) ];
@@ -21,7 +21,7 @@ use Getopt::EX::Hashed 1.03 'has'; {
     has tabspace  => '    =s  ' ;
     has tabstyle  => ' ts =s  ' ;
     has help      => ' h      ' ;
-    has version   => ' v       ' ;
+    has version   => ' v      ' ;
 
     has '+tabstop' => sub {
 	$Text::ANSI::Tabs::tabstop = $_[1];
@@ -73,7 +73,7 @@ ansiexpand, ansiunexpand - ANSI sequence aware tab expand/unexpand command
 
 =head1 VERSION
 
-Version 0.9901
+Version 1.01
 
 =head1 DESCRIPTION
 
@@ -85,7 +85,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2021 Kazumasa Utashiro.
+Copyright 2021-2022 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

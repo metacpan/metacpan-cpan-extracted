@@ -1,0 +1,440 @@
+sw07#show int status
+
+Port      Name               Status       Vlan       Duplex  Speed Type 
+[32mGi1/0/1   red.antelope.net   connected    1          a-full a-[4m1[24m000 10/100/[4m1[24m000BaseTX[0m
+[1;31mGi1/0/2   to Sw02            notconnect   210          auto   auto 10/100/[4m1[24m000BaseTX[0m
+[33mGi1/0/3                      disabled     210          auto   auto 10/100/[4m1[24m000BaseTX[0m
+[1;31mGi1/0/4   BAD::POE-ERRORS    notconnect   1            auto   auto 10/100/[4m1[24m000BaseTX[0m
+[1;31mGi1/0/5                      notconnect   1            auto   auto 10/100/[4m1[24m000BaseTX[0m
+[1;31mGi1/0/6                      notconnect   1            auto   auto 10/100/[4m1[24m000BaseTX[0m
+[32mTe1/0/7   NNNNNNN Mac Mini   connected    210        a-full  a-10G 100/1G/2.5G/5G/10GBaseT[0m
+[32mTe1/0/8   802.11AC Office AP connected    trunk      a-full a-[4m5[24m000 100/1G/2.5G/5G/10GBaseT[0m
+[1;31mTe1/0/1   To sw08 et49/5     notconnect   1            full    10G SFP-10GBase-SR[0m
+[32mTe1/0/2   To sw08 et49/1     connected    trunk        full    10G SFP-10GBase-SR[0m
+[32mPo1       LAG to sw08        connected    trunk      a-full    10G [0m
+sw07#show int transceiver
+If device is externally calibrated, only calibrated values are printed.
+++ : high alarm, +  : high warning, -  : low warning, -- : low alarm.
+NA or N/A: not applicable, Tx: transmit, Rx: receive.
+mA: milliamperes, dBm: decibels (milliwatts).
+
+                                 Optical   Optical
+           Temperature  Voltage  Tx Power  Rx Power
+Port       (Celsius)    (Volts)  (dBm)     (dBm)
+---------  -----------  -------  --------  --------
+[36mTe1/0/1      56.0       3.35      -3.2     -23.7[0m
+[36mTe1/0/2      54.0       3.28      -1.8      -1.7[0m
+
+
+sw07#show int transceiver
+If device is externally calibrated, only calibrated values are printed.
+++ : high alarm, +  : high warning, -  : low warning, -- : low alarm.
+NA or N/A: not applicable, Tx: transmit, Rx: receive.
+mA: milliamperes, dBm: decibels (milliwatts).
+
+                                 Optical   Optical
+           Temperature  Voltage  Tx Power  Rx Power
+Port       (Celsius)    (Volts)  (dBm)     (dBm)
+---------  -----------  -------  --------  --------
+[1;31mTe1/0/1      56.0       3.35      -3.2     -40.0[0m
+[36mTe1/0/2      54.0       3.28      -1.8      -1.7[0m
+
+
+sw07#exit
+sw07#terminal length 0
+sw07#show int
+[32mVlan1 is up, line protocol is up [0m
+  Hardware is EtherSVI, address is cc5a.5373.32c0 (bia cc5a.5373.32c0)
+  Internet address is [30m[46m192.168.50.20/24[0m
+  MTU [4m1[24m500 bytes, BW 1[4m000[24m000 Kbit/sec, DLY 10 usec, 
+     reliability 255/255, txload 1/255, rxload 1/255
+  Encapsulation ARPA, loopback not set
+  Keepalive not supported 
+  ARP type: ARPA, ARP Timeout 04:00:00
+  Last input 00:00:00, output 00:00:00, output hang never
+  Last clearing of "show interface" counters 1y27w
+  Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: 0
+  Queueing strategy: fifo
+  Output queue: 0/40 (size/max)
+[36m  5 minute input rate [4m3[24m000 bits/sec, 3 packets/sec[0m
+[36m  5 minute output rate [4m2[24m000 bits/sec, 2 packets/sec[0m
+     106[4m474[24m051 packets input, [4m8[24m224[4m762[24m706 bytes, 0 no buffer
+     Received 0 broadcasts (0 IP multicasts)
+[32m     0 runts, 0 giants, 0 throttles [0m
+[32m     0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored[0m
+     6[4m034[24m543 packets output, [4m1[24m871[4m504[24m716 bytes, 0 underruns
+[32m     0 output errors, 0 interface resets[0m
+[32m     0 unknown protocol drops[0m
+[32m     0 output buffer failures, 0 output buffers swapped out[0m
+[32mGigabitEthernet1/0/1 is up, line protocol is up (connected) [0m
+  Hardware is Gigabit Ethernet, address is cc5a.5373.3281 (bia cc5a.5373.3281)
+[36m  Description: foobar[0m
+  MTU [4m1[24m500 bytes, BW 1[4m000[24m000 Kbit/sec, DLY 10 usec, 
+     reliability 255/255, txload 1/255, rxload 1/255
+  Encapsulation ARPA, loopback not set
+  Keepalive set (10 sec)
+  Full-duplex, [4m1[24m000Mb/s, media type is 10/100/[4m1[24m000BaseTX
+  input flow-control is off, output flow-control is unsupported 
+  ARP type: ARPA, ARP Timeout 04:00:00
+  Last input 1y27w, output 00:00:00, output hang never
+  Last clearing of "show interface" counters 1y27w
+  Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: [4m9[24m537
+  Queueing strategy: fifo
+  Output queue: 0/40 (size/max)
+[36m  5 minute input rate [4m21[24m000 bits/sec, 21 packets/sec[0m
+[36m  5 minute output rate [4m33[24m000 bits/sec, 31 packets/sec[0m
+     [4m1[24m578[4m260[24m603 packets input, [4m223[24m625[4m734[24m180 bytes, 0 no buffer
+     Received 47[4m888[24m901 broadcasts (10[4m932[24m670 multicasts)
+[1;31m     0 runts, [4m1[24m690 giants, 0 throttles [0m
+[32m     0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored[0m
+     0 watchdog, 10[4m932[24m670 multicast, 0 pause input
+[32m     0 input packets with dribble condition detected[0m
+     [4m2[24m097[4m422[24m261 packets output, [4m330[24m777[4m884[24m977 bytes, 0 underruns
+[32m     0 output errors, 0 collisions, 0 interface resets[0m
+[32m     0 unknown protocol drops[0m
+[32m     0 babbles, 0 late collision, 0 deferred[0m
+[32m     0 lost carrier, 0 no carrier, 0 pause output[0m
+[32m     0 output buffer failures, 0 output buffers swapped out[0m
+[1;31mGigabitEthernet1/0/2 is down, line protocol is down (notconnect) [0m
+  Hardware is Gigabit Ethernet, address is cc5a.5373.3282 (bia cc5a.5373.3282)
+[36m  Description: to Sw02[0m
+  MTU [4m1[24m500 bytes, BW 1[4m000[24m000 Kbit/sec, DLY 10 usec, 
+     reliability 255/255, txload 1/255, rxload 1/255
+  Encapsulation ARPA, loopback not set
+  Keepalive set (10 sec)
+  Auto-duplex, Auto-speed, media type is 10/100/[4m1[24m000BaseTX
+  input flow-control is off, output flow-control is unsupported 
+  ARP type: ARPA, ARP Timeout 04:00:00
+  Last input 3w4d, output 3w4d, output hang never
+  Last clearing of "show interface" counters 1y27w
+  Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: [4m15[24m589
+  Queueing strategy: fifo
+  Output queue: 0/40 (size/max)
+[36m  5 minute input rate 0 bits/sec, 0 packets/sec[0m
+[36m  5 minute output rate 0 bits/sec, 0 packets/sec[0m
+     668[4m603[24m605 packets input, [4m550[24m809[4m896[24m573 bytes, 0 no buffer
+     Received 20[4m160[24m412 broadcasts (16[4m111[24m344 multicasts)
+[32m     0 runts, 0 giants, 0 throttles [0m
+[32m     0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored[0m
+     0 watchdog, 16[4m111[24m344 multicast, 0 pause input
+[32m     0 input packets with dribble condition detected[0m
+     459[4m639[24m475 packets output, [4m287[24m198[4m641[24m778 bytes, 0 underruns
+[1;31m     0 output errors, 0 collisions, 2 interface resets[0m
+[32m     0 unknown protocol drops[0m
+[32m     0 babbles, 0 late collision, 0 deferred[0m
+[32m     0 lost carrier, 0 no carrier, 0 pause output[0m
+[32m     0 output buffer failures, 0 output buffers swapped out[0m
+[33mGigabitEthernet1/0/3 is administratively down, line protocol is down (disabled) [0m
+  Hardware is Gigabit Ethernet, address is cc5a.5373.3283 (bia cc5a.5373.3283)
+  MTU [4m1[24m500 bytes, BW 1[4m000[24m000 Kbit/sec, DLY 10 usec, 
+     reliability 255/255, txload 1/255, rxload 1/255
+  Encapsulation ARPA, loopback not set
+  Keepalive set (10 sec)
+  Auto-duplex, Auto-speed, media type is 10/100/[4m1[24m000BaseTX
+  input flow-control is off, output flow-control is unsupported 
+  ARP type: ARPA, ARP Timeout 04:00:00
+  Last input 1y13w, output 1y13w, output hang never
+  Last clearing of "show interface" counters 1y27w
+  Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: [4m18[24m575
+  Queueing strategy: fifo
+  Output queue: 0/40 (size/max)
+[36m  5 minute input rate 0 bits/sec, 0 packets/sec[0m
+[36m  5 minute output rate 0 bits/sec, 0 packets/sec[0m
+     660[4m982[24m852 packets input, [4m513[24m648[4m375[24m471 bytes, 0 no buffer
+     Received 8[4m505[24m641 broadcasts (8[4m486[24m848 multicasts)
+[32m     0 runts, 0 giants, 0 throttles [0m
+[32m     0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored[0m
+     0 watchdog, 8[4m486[24m848 multicast, 0 pause input
+[32m     0 input packets with dribble condition detected[0m
+     [4m1[24m165[4m010[24m052 packets output, 1[4m527[24m590[4m897[24m916 bytes, 0 underruns
+[1;31m     0 output errors, 0 collisions, 2 interface resets[0m
+[32m     0 unknown protocol drops[0m
+[32m     0 babbles, 0 late collision, 0 deferred[0m
+[32m     0 lost carrier, 0 no carrier, 0 pause output[0m
+[32m     0 output buffer failures, 0 output buffers swapped out[0m
+[1;31mGigabitEthernet1/0/4 is down, line protocol is down (notconnect) [0m
+  Hardware is Gigabit Ethernet, address is cc5a.5373.3284 (bia cc5a.5373.3284)
+[36m  Description: BAD::POE-ERRORS[0m
+  MTU [4m1[24m500 bytes, BW [4m10[24m000 Kbit/sec, DLY [4m1[24m000 usec, 
+     reliability 255/255, txload 1/255, rxload 1/255
+  Encapsulation ARPA, loopback not set
+  Keepalive set (10 sec)
+  Auto-duplex, Auto-speed, media type is 10/100/[4m1[24m000BaseTX
+  input flow-control is off, output flow-control is unsupported 
+  ARP type: ARPA, ARP Timeout 04:00:00
+  Last input never, output never, output hang never
+  Last clearing of "show interface" counters 1y27w
+  Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: 0
+  Queueing strategy: fifo
+  Output queue: 0/40 (size/max)
+[36m  5 minute input rate 0 bits/sec, 0 packets/sec[0m
+[36m  5 minute output rate 0 bits/sec, 0 packets/sec[0m
+     0 packets input, 0 bytes, 0 no buffer
+     Received 0 broadcasts (0 multicasts)
+[32m     0 runts, 0 giants, 0 throttles [0m
+[32m     0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored[0m
+     0 watchdog, 0 multicast, 0 pause input
+[32m     0 input packets with dribble condition detected[0m
+     0 packets output, 0 bytes, 0 underruns
+[32m     0 output errors, 0 collisions, 0 interface resets[0m
+[32m     0 unknown protocol drops[0m
+[32m     0 babbles, 0 late collision, 0 deferred[0m
+[32m     0 lost carrier, 0 no carrier, 0 pause output[0m
+[32m     0 output buffer failures, 0 output buffers swapped out[0m
+[1;31mGigabitEthernet1/0/5 is down, line protocol is down (notconnect) [0m
+  Hardware is Gigabit Ethernet, address is cc5a.5373.3285 (bia cc5a.5373.3285)
+  MTU [4m1[24m500 bytes, BW 1[4m000[24m000 Kbit/sec, DLY 10 usec, 
+     reliability 255/255, txload 1/255, rxload 1/255
+  Encapsulation ARPA, loopback not set
+  Keepalive set (10 sec)
+  Auto-duplex, Auto-speed, media type is 10/100/[4m1[24m000BaseTX
+  input flow-control is off, output flow-control is unsupported 
+  ARP type: ARPA, ARP Timeout 04:00:00
+  Last input 3w0d, output 3w0d, output hang never
+  Last clearing of "show interface" counters 1y27w
+  Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: 0
+  Queueing strategy: fifo
+  Output queue: 0/40 (size/max)
+[36m  5 minute input rate 0 bits/sec, 0 packets/sec[0m
+[36m  5 minute output rate 0 bits/sec, 0 packets/sec[0m
+     [4m24[24m100 packets input, 7[4m077[24m009 bytes, 0 no buffer
+     Received [4m17[24m609 broadcasts ([4m17[24m434 multicasts)
+[32m     0 runts, 0 giants, 0 throttles [0m
+[32m     0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored[0m
+     0 watchdog, [4m17[24m434 multicast, 0 pause input
+[32m     0 input packets with dribble condition detected[0m
+     [4m211[24m597 packets output, 24[4m506[24m714 bytes, 0 underruns
+[32m     0 output errors, 0 collisions, 0 interface resets[0m
+[32m     0 unknown protocol drops[0m
+[32m     0 babbles, 0 late collision, 0 deferred[0m
+[32m     0 lost carrier, 0 no carrier, 0 pause output[0m
+[32m     0 output buffer failures, 0 output buffers swapped out[0m
+[1;31mGigabitEthernet1/0/6 is down, line protocol is down (notconnect) [0m
+  Hardware is Gigabit Ethernet, address is cc5a.5373.3286 (bia cc5a.5373.3286)
+  MTU [4m1[24m500 bytes, BW 1[4m000[24m000 Kbit/sec, DLY 10 usec, 
+     reliability 255/255, txload 1/255, rxload 1/255
+  Encapsulation ARPA, loopback not set
+  Keepalive set (10 sec)
+  Auto-duplex, Auto-speed, media type is 10/100/[4m1[24m000BaseTX
+  input flow-control is off, output flow-control is unsupported 
+  ARP type: ARPA, ARP Timeout 04:00:00
+  Last input 3w0d, output 3w0d, output hang never
+  Last clearing of "show interface" counters 1y27w
+  Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: 0
+  Queueing strategy: fifo
+  Output queue: 0/40 (size/max)
+[36m  5 minute input rate 0 bits/sec, 0 packets/sec[0m
+[36m  5 minute output rate 0 bits/sec, 0 packets/sec[0m
+     [4m71[24m097 packets input, 11[4m843[24m937 bytes, 0 no buffer
+     Received [4m63[24m826 broadcasts ([4m63[24m802 multicasts)
+[32m     0 runts, 0 giants, 0 throttles [0m
+[32m     0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored[0m
+     0 watchdog, [4m63[24m802 multicast, 0 pause input
+[32m     0 input packets with dribble condition detected[0m
+     8[4m312[24m660 packets output, [4m1[24m410[4m585[24m969 bytes, 0 underruns
+[32m     0 output errors, 0 collisions, 0 interface resets[0m
+[32m     0 unknown protocol drops[0m
+[32m     0 babbles, 0 late collision, 0 deferred[0m
+[32m     0 lost carrier, 0 no carrier, 0 pause output[0m
+[32m     0 output buffer failures, 0 output buffers swapped out[0m
+[1;31mGigabitEthernet1/0/7 is down, line protocol is down (notconnect) [0m
+  Hardware is not present
+  Hardware is Gigabit Ethernet, address is cc5a.5373.3289 (bia cc5a.5373.3289)
+  MTU [4m1[24m500 bytes, BW [4m10[24m000 Kbit/sec, DLY [4m1[24m000 usec, 
+     reliability 255/255, txload 1/255, rxload 1/255
+  Encapsulation ARPA, loopback not set
+  Keepalive not set
+  ARP type: ARPA, ARP Timeout 04:00:00
+  Last input never, output never, output hang never
+  Last clearing of "show interface" counters 1y27w
+  Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: 0
+  Queueing strategy: fifo
+  Output queue: 0/40 (size/max)
+[36m  5 minute input rate 0 bits/sec, 0 packets/sec[0m
+[36m  5 minute output rate 0 bits/sec, 0 packets/sec[0m
+     0 packets input, 0 bytes, 0 no buffer
+     Received 0 broadcasts (0 multicasts)
+[32m     0 runts, 0 giants, 0 throttles [0m
+[32m     0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored[0m
+     0 watchdog, 0 multicast, 0 pause input
+[32m     0 input packets with dribble condition detected[0m
+     0 packets output, 0 bytes, 0 underruns
+[32m     0 output errors, 0 collisions, 0 interface resets[0m
+[32m     0 unknown protocol drops[0m
+[32m     0 babbles, 0 late collision, 0 deferred[0m
+[32m     0 lost carrier, 0 no carrier, 0 pause output[0m
+[32m     0 output buffer failures, 0 output buffers swapped out[0m
+[1;31mGigabitEthernet1/0/8 is down, line protocol is down (notconnect) [0m
+  Hardware is not present
+  Hardware is Gigabit Ethernet, address is cc5a.5373.328a (bia cc5a.5373.328a)
+  MTU [4m1[24m500 bytes, BW [4m10[24m000 Kbit/sec, DLY [4m1[24m000 usec, 
+     reliability 255/255, txload 1/255, rxload 1/255
+  Encapsulation ARPA, loopback not set
+  Keepalive not set
+  ARP type: ARPA, ARP Timeout 04:00:00
+  Last input never, output never, output hang never
+  Last clearing of "show interface" counters 1y27w
+  Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: 0
+  Queueing strategy: fifo
+  Output queue: 0/40 (size/max)
+[36m  5 minute input rate 0 bits/sec, 0 packets/sec[0m
+[36m  5 minute output rate 0 bits/sec, 0 packets/sec[0m
+     0 packets input, 0 bytes, 0 no buffer
+     Received 0 broadcasts (0 multicasts)
+[32m     0 runts, 0 giants, 0 throttles [0m
+[32m     0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored[0m
+     0 watchdog, 0 multicast, 0 pause input
+[32m     0 input packets with dribble condition detected[0m
+     0 packets output, 0 bytes, 0 underruns
+[32m     0 output errors, 0 collisions, 0 interface resets[0m
+[32m     0 unknown protocol drops[0m
+[32m     0 babbles, 0 late collision, 0 deferred[0m
+[32m     0 lost carrier, 0 no carrier, 0 pause output[0m
+[32m     0 output buffer failures, 0 output buffers swapped out[0m
+[32mTenGigabitEthernet1/0/7 is up, line protocol is up (connected) [0m
+  Hardware is Ten Gigabit Ethernet, address is cc5a.5373.3287 (bia cc5a.5373.3287)
+[36m  Description: NNNNNNN Mac Mini[0m
+  MTU [4m1[24m500 bytes, BW 10[4m000[24m000 Kbit/sec, DLY 10 usec, 
+     reliability 255/255, txload 1/255, rxload 1/255
+  Encapsulation ARPA, loopback not set
+  Keepalive set (10 sec)
+  Full-duplex, 10Gb/s, media type is 100/1G/2.5G/5G/10GBaseT
+  input flow-control is off, output flow-control is unsupported 
+  ARP type: ARPA, ARP Timeout 04:00:00
+  Last input 1y27w, output 00:00:00, output hang never
+  Last clearing of "show interface" counters 1y27w
+  Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: 674
+  Queueing strategy: fifo
+  Output queue: 0/40 (size/max)
+[36m  5 minute input rate [4m30[24m000 bits/sec, 13 packets/sec[0m
+[36m  5 minute output rate [4m146[24m000 bits/sec, 14 packets/sec[0m
+     [4m1[24m042[4m873[24m464 packets input, [4m372[24m037[4m835[24m369 bytes, 0 no buffer
+     Received 2[4m184[24m062 broadcasts (1[4m936[24m716 multicasts)
+[1;31m     1 runts, 0 giants, 0 throttles [0m
+[1;31m     8 input errors, 2 CRC, 0 frame, 0 overrun, 0 ignored[0m
+     0 watchdog, 1[4m936[24m716 multicast, 0 pause input
+[32m     0 input packets with dribble condition detected[0m
+     [4m2[24m322[4m959[24m809 packets output, 1[4m296[24m133[4m272[24m622 bytes, 0 underruns
+[1;31m     0 output errors, 0 collisions, 2 interface resets[0m
+[32m     0 unknown protocol drops[0m
+[32m     0 babbles, 0 late collision, 0 deferred[0m
+[32m     0 lost carrier, 0 no carrier, 0 pause output[0m
+[32m     0 output buffer failures, 0 output buffers swapped out[0m
+[32mTenGigabitEthernet1/0/8 is up, line protocol is up (connected) [0m
+  Hardware is Ten Gigabit Ethernet, address is cc5a.5373.3288 (bia cc5a.5373.3288)
+[36m  Description: 802.11AC Office AP[0m
+  MTU [4m1[24m500 bytes, BW 5[4m000[24m000 Kbit/sec, DLY 10 usec, 
+     reliability 255/255, txload 1/255, rxload 1/255
+  Encapsulation ARPA, loopback not set
+  Keepalive set (10 sec)
+  Full-duplex, [4m5[24m000Mb/s, media type is 100/1G/2.5G/5G/10GBaseT
+  input flow-control is off, output flow-control is unsupported 
+  ARP type: ARPA, ARP Timeout 04:00:00
+  Last input 00:00:10, output 00:00:00, output hang never
+  Last clearing of "show interface" counters 1y11w
+  Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: [4m315[24m305
+  Queueing strategy: fifo
+  Output queue: 0/40 (size/max)
+[36m  5 minute input rate [4m4[24m000 bits/sec, 2 packets/sec[0m
+[36m  5 minute output rate [4m5[24m000 bits/sec, 4 packets/sec[0m
+     407[4m976[24m272 packets input, [4m173[24m902[4m012[24m125 bytes, 0 no buffer
+     Received 14[4m021[24m050 broadcasts (11[4m611[24m243 multicasts)
+[32m     0 runts, 0 giants, 0 throttles [0m
+[32m     0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored[0m
+     0 watchdog, 11[4m611[24m243 multicast, [4m168[24m767 pause input
+[32m     0 input packets with dribble condition detected[0m
+     [4m1[24m764[4m939[24m140 packets output, [4m971[24m621[4m602[24m479 bytes, 0 underruns
+[32m     0 output errors, 0 collisions, 0 interface resets[0m
+[32m     0 unknown protocol drops[0m
+[32m     0 babbles, 0 late collision, 0 deferred[0m
+[32m     0 lost carrier, 0 no carrier, 0 pause output[0m
+[32m     0 output buffer failures, 0 output buffers swapped out[0m
+[32mTenGigabitEthernet1/0/1 is up, line protocol is up (connected) [0m
+  Hardware is Ten Gigabit Ethernet, address is cc5a.5373.328b (bia cc5a.5373.328b)
+[36m  Description: To sw08 Et9/1[0m
+  MTU [4m1[24m500 bytes, BW 10[4m000[24m000 Kbit/sec, DLY 10 usec, 
+     reliability 255/255, txload 1/255, rxload 1/255
+  Encapsulation ARPA, loopback not set
+  Keepalive not set
+  Full-duplex, 10Gb/s, link type is auto, media type is SFP-10GBase-SR
+  input flow-control is off, output flow-control is unsupported 
+  ARP type: ARPA, ARP Timeout 04:00:00
+  Last input 00:00:00, output 00:00:00, output hang never
+  Last clearing of "show interface" counters 1y27w
+  Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: 0
+  Queueing strategy: fifo
+  Output queue: 0/40 (size/max)
+[36m  5 minute input rate [4m32[24m000 bits/sec, 27 packets/sec[0m
+[36m  5 minute output rate [4m58[24m000 bits/sec, 39 packets/sec[0m
+     [4m4[24m227[4m993[24m797 packets input, 2[4m337[24m798[4m418[24m630 bytes, 0 no buffer
+     Received [4m1[24m355[4m597[24m891 broadcasts ([4m1[24m229[4m717[24m022 multicasts)
+[32m     0 runts, 0 giants, 0 throttles [0m
+[32m     0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored[0m
+     0 watchdog, [4m1[24m229[4m717[24m022 multicast, 0 pause input
+[32m     0 input packets with dribble condition detected[0m
+     [4m2[24m807[4m574[24m656 packets output, [4m706[24m564[4m958[24m678 bytes, 0 underruns
+[32m     0 output errors, 0 collisions, 0 interface resets[0m
+[32m     0 unknown protocol drops[0m
+[32m     0 babbles, 0 late collision, 0 deferred[0m
+[32m     0 lost carrier, 0 no carrier, 0 pause output[0m
+[32m     0 output buffer failures, 0 output buffers swapped out[0m
+[32mTenGigabitEthernet1/0/2 is up, line protocol is up (connected) [0m
+  Hardware is Ten Gigabit Ethernet, address is cc5a.5373.328c (bia cc5a.5373.328c)
+[36m  Description: To sw08 Et7/1[0m
+  MTU [4m1[24m500 bytes, BW 10[4m000[24m000 Kbit/sec, DLY 10 usec, 
+     reliability 255/255, txload 1/255, rxload 1/255
+  Encapsulation ARPA, loopback not set
+  Keepalive not set
+  Full-duplex, 10Gb/s, link type is auto, media type is SFP-10GBase-SR
+  input flow-control is off, output flow-control is unsupported 
+  ARP type: ARPA, ARP Timeout 04:00:00
+  Last input 00:00:00, output 00:00:00, output hang never
+  Last clearing of "show interface" counters 1y27w
+  Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: 0
+  Queueing strategy: fifo
+  Output queue: 0/40 (size/max)
+[36m  5 minute input rate [4m160[24m000 bits/sec, 45 packets/sec[0m
+[36m  5 minute output rate [4m3[24m000 bits/sec, 4 packets/sec[0m
+     [4m3[24m576[4m695[24m973 packets input, 2[4m225[24m938[4m346[24m084 bytes, 0 no buffer
+     Received 501[4m173[24m636 broadcasts (341[4m827[24m027 multicasts)
+[32m     0 runts, 0 giants, 0 throttles [0m
+[32m     0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored[0m
+     0 watchdog, 341[4m827[24m027 multicast, 0 pause input
+[32m     0 input packets with dribble condition detected[0m
+     [4m1[24m723[4m202[24m045 packets output, 1[4m127[24m583[4m123[24m156 bytes, 0 underruns
+[32m     0 output errors, 0 collisions, 0 interface resets[0m
+[32m     0 unknown protocol drops[0m
+[32m     0 babbles, 0 late collision, 0 deferred[0m
+[32m     0 lost carrier, 0 no carrier, 0 pause output[0m
+[32m     0 output buffer failures, 0 output buffers swapped out[0m
+[32mPort-channel1 is up, line protocol is up (connected) [0m
+  Hardware is EtherChannel, address is cc5a.5373.328c (bia cc5a.5373.328c)
+[36m  Description: LAG to sw08[0m
+  MTU [4m1[24m500 bytes, BW 20[4m000[24m000 Kbit/sec, DLY 10 usec, 
+     reliability 255/255, txload 1/255, rxload 1/255
+  Encapsulation ARPA, loopback not set
+  Keepalive set (10 sec)
+  Full-duplex, 10Gb/s, link type is auto, media type is unknown
+  input flow-control is off, output flow-control is unsupported 
+  Members in this channel: Te1/0/1 Te1/0/2 
+  ARP type: ARPA, ARP Timeout 04:00:00
+  Last input 00:00:00, output 1w3d, output hang never
+  Last clearing of "show interface" counters 1y27w
+  Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: 0
+  Queueing strategy: fifo
+  Output queue: 0/40 (size/max)
+[36m  5 minute input rate [4m207[24m000 bits/sec, 72 packets/sec[0m
+[36m  5 minute output rate [4m60[24m000 bits/sec, 41 packets/sec[0m
+     [4m7[24m804[4m689[24m416 packets input, 4[4m563[24m736[4m600[24m622 bytes, 0 no buffer
+     Received [4m1[24m856[4m771[24m377 broadcasts ([4m1[24m571[4m543[24m907 multicasts)
+[32m     0 runts, 0 giants, 0 throttles [0m
+[32m     0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored[0m
+     0 watchdog, [4m1[24m571[4m543[24m907 multicast, 0 pause input
+[32m     0 input packets with dribble condition detected[0m
+     [4m4[24m530[4m776[24m535 packets output, 1[4m834[24m148[4m057[24m643 bytes, 0 underruns
+[32m     0 output errors, 0 collisions, 0 interface resets[0m
+[32m     0 unknown protocol drops[0m
+[32m     0 babbles, 0 late collision, 0 deferred[0m
+[32m     0 lost carrier, 0 no carrier, 0 pause output[0m
+[32m     0 output buffer failures, 0 output buffers swapped out[0m
+sw07#exit

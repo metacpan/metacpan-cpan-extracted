@@ -1,3 +1,19 @@
+0.044   2022-08-06  Released-By: PERLANCAR; Urgency: medium
+
+        - Add functions:
+          contains_{brace,joker,class,qmark,glob,globstar}_wildcard.
+
+        - [function convert_wildcard_to_re] Add option: path_separator.
+
+        - [function convert_wildcard_to_re] Add option: globstar.
+
+        - Better compliance with bash: joker/glob does not match across
+          subdirectory level, e.g. '*' matches 'aaa' but not 'aaa/bbb'.
+
+        - [bugfix] Fix parameter passed to recursive
+          convert_wildcard_to_re().
+
+
 0.043   2019-08-30  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

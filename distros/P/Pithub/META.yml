@@ -13,12 +13,13 @@ build_requires:
   Path::Tiny: '0'
   Scalar::Util: '0'
   Test::Builder: '0'
+  Test::Differences: '0'
+  Test::Exception: '0'
   Test::More: '0'
   Test::Most: '0'
+  Test::Needs: '0'
   lib: '0'
   perl: '5.010'
-  strict: '0'
-  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
@@ -35,8 +36,7 @@ no_index:
     - t
     - xt
 requires:
-  Array::Iterator: '0'
-  Cache::LRU: '0'
+  CHI: '0'
   Carp: '0'
   HTTP::Headers: '0'
   HTTP::Request: '0'
@@ -47,11 +47,13 @@ requires:
   Moo::Role: '0'
   URI: '0'
   perl: '5.010'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/plu/Pithub/issues
   homepage: https://github.com/plu/Pithub
   repository: https://github.com/plu/Pithub.git
-version: '0.01037'
+version: '0.01039'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -453,7 +455,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.01037
+          tag: v0.01039
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -573,6 +575,7 @@ x_contributors:
   - 'Corey Farwell <coreyf@rwell.org>'
   - 'Florian Ragwitz <rafl@debian.org>'
   - 'Graham Ollis <plicease@cpan.org>'
+  - 'H.Merijn Brand - Tux <linux@tux.freedom.nl>'
   - 'Ichinose Shogo <shogo82148@gmail.com>'
   - 'Ivan Bessarabov <ivan@bessarabov.ru>'
   - 'Johannes Plunien <plu@pqpq.de>'

@@ -160,6 +160,14 @@ sub is_emcoder_installed { return(1); }
 
 sub mode { return( shift->_set_get_number( 'mode', @_ ) ); }
 
+# NOTE: sub FREEZE is inherited
+
+# NOTE: sub STORABLE_freeze is inherited
+
+# NOTE: sub STORABLE_thaw is inherited
+
+# NOTE: sub THAW is inherited
+
 1;
 # NOTE: POD
 __END__

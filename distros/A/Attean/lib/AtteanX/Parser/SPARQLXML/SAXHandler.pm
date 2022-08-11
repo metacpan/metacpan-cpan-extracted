@@ -7,7 +7,7 @@ AtteanX::Parser::SPARQLXML::SAXHandler - XML parser for SPARQL XML Results forma
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::SPARQLXML::SAXHandler version 0.030
+This document describes AtteanX::Parser::SPARQLXML::SAXHandler version 0.031
 
 =head1 STATUS
 
@@ -25,7 +25,7 @@ or be removed entirely.
 
 =cut
 
-package AtteanX::Parser::SPARQLXML::SAXHandler 0.030;
+package AtteanX::Parser::SPARQLXML::SAXHandler 0.031;
 
 use v5.14;
 use warnings;
@@ -48,6 +48,7 @@ my %has_end;
 my %result_count;
 my %result_handlers;
 my %config;
+my %triples;
 
 my %expecting_string	= map { $_ => 1 } qw(boolean bnode uri literal);
 
@@ -87,6 +88,10 @@ sub start_element {
 	unshift( @{ $tagstack{ $addr } }, [$tag, $el] );
 	if ($expecting_string{ $tag }) {
 		$strings{ $addr }	= '';
+	}
+	
+	if ($tag eq 'triple') {
+		push(@{ $triples{ $addr } }, {});
 	}
 }
 
@@ -147,6 +152,19 @@ sub end_element {
 		} else {
 			$values{ $addr }	= Attean::Literal->new( value => $string );
 		}
+	} elsif ($tag eq 'subject') {
+		my $value	= delete( $values{ $addr } );
+		$triples{ $addr }[-1]{$tag}	= $value;
+	} elsif ($tag eq 'predicate') {
+		my $value	= delete( $values{ $addr } );
+		$triples{ $addr }[-1]{$tag}	= $value;
+	} elsif ($tag eq 'object') {
+		my $value	= delete( $values{ $addr } );
+		$triples{ $addr }[-1]{$tag}	= $value;
+	} elsif ($tag eq 'triple') {
+		my $data	= pop(@{ $triples{ $addr } });
+		my $t	= Attean::Triple->new( %{ $data } );
+		$values{ $addr }	= $t;
 	}
 }
 
@@ -209,7 +227,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2020 Gregory Todd Williams. This
+Copyright (c) 2014--2022 Gregory Todd Williams. This
 program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

@@ -76,7 +76,7 @@
          "web" : "https://github.com/ology/MIDI-Bassline-Walk"
       }
    },
-   "version" : "0.0503",
+   "version" : "0.0504",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"

@@ -1,14 +1,14 @@
 ---
 abstract: 'Tab expand and unexpand with ANSI sequence'
 author:
-  - 'Kazumasa Utashiro <kaz@utashiro.com>'
+  - 'Kazumasa Utashiro'
 build_requires:
   Test::More: '0.98'
   Text::Tabs: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,16 +27,18 @@ no_index:
 provides:
   Text::ANSI::Tabs:
     file: lib/Text/ANSI/Tabs.pm
-    version: '0.07'
+    version: '1.01'
 requires:
   List::Util: '1.45'
-  Text::ANSI::Fold: '2.11'
+  Text::ANSI::Fold: '2.1301'
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/kaz-utashiro/Text-ANSI-Tabs/issues
   homepage: https://github.com/kaz-utashiro/Text-ANSI-Tabs
-  repository: git://github.com/kaz-utashiro/Text-ANSI-Tabs.git
-version: '0.07'
+  repository: https://github.com/kaz-utashiro/Text-ANSI-Tabs.git
+version: '1.01'
 x_authority: cpan:UTASHIRO
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_contributors:
+  - 'Kazumasa Utashiro <kaz@utashiro.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

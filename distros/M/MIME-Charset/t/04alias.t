@@ -8,7 +8,7 @@ BEGIN {
 	if ($] < 5.008) { # Perl 5.7.3 + Encode 0.04
 	    require Encode::CN;
 	}
-	plan tests => 33;
+	plan tests => 34;
     }
 }
 
@@ -30,8 +30,8 @@ foreach my $name (@names) {
     my $obj = MIME::Charset->new($name);
     is($obj->as_string, $name, $name);
     if (&MIME::Charset::USE_ENCODE and
-	($name eq 'HZ-GB-2312' or $name eq 'TIS-620' or $name eq 'UTF-16' or
-	$name eq 'UTF-32')) {
+	grep {$name eq $_}
+	    ('HZ-GB-2312', 'ISO-8859-8-I', 'TIS-620', 'UTF-16', 'UTF-32')) {
 	is($obj->decoder ? 'defined' : undef, 'defined', "$name available");
 	diag("$name is decoded by '".$obj->decoder->name."' encoding")
 	    if $obj->decoder;

@@ -1,0 +1,1 @@
+Build with PERL_POD_WEAVER_PLUGIN_RINCI_EXCLUDE_MODULES=Getopt::Long::Patch::DumpAndExit

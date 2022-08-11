@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Iterator.pm
-## Version v1.1.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v1.1.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/02/27
+## Modified 2022/08/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -20,7 +20,7 @@ BEGIN
     use Module::Generic::Array;
     use Scalar::Util ();
     use Want;
-    our( $VERSION ) = 'v1.1.0';
+    our( $VERSION ) = 'v1.1.1';
 };
 
 use strict;
@@ -137,12 +137,10 @@ sub pos : lvalue
     }
     elsif( want( 'RVALUE' ) )
     {
-        # $self->message( 3, "Returning rvalue" );
         rreturn( $self->{pos} );
     }
     else
     {
-        # $self->message( 3, "Else returning pos value" );
         return( $self->{pos} );
     }
     return;
@@ -181,17 +179,13 @@ sub _find_pos
 {
     my $self = shift( @_ );
     my $this = shift( @_ );
-    # $self->message( 3, "Searching for \"$this\" (", ref( $this ) ? $this->value : $this, ")" );
     return if( !CORE::length( $this ) );
     my $is_ref = ref( $this );
     my $ref = $is_ref ? Scalar::Util::refaddr( $this ) : $this;
-    # $self->message( 3, "\"$this\" reference address is \"$ref\"." );
     my $elems = $self->elements;
-    # $self->messagef( 3, "Searching in a %d elements long stack.", $elems->length );
     foreach my $i ( 0 .. $#$elems )
     {
         my $val = $elems->[$i]->value;
-        # $self->message( 3, "Checking ", ( ref( $this ) ? $this->value : $this ), " ($ref) with element No $i \"$val\" (", Scalar::Util::refaddr( $elems->[$i] ), ")." );
         if( ( $is_ref && Scalar::Util::refaddr( $elems->[$i] ) eq $ref ) ||
             ( !$is_ref && $val eq $this ) )
         {
@@ -201,9 +195,13 @@ sub _find_pos
     return;
 }
 
+# NOTE: FREEZE is inherited
+
 sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
 
 sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+# NOTE: THAW is inherited
 
 # NOTE: package Module::Generic::Iterator::Element
 package Module::Generic::Iterator::Element;
@@ -285,7 +283,8 @@ sub FREEZE
     my $class = CORE::ref( $self );
     my %hash  = %$self;
     # Return an array reference rather than a list so this works with Sereal and CBOR
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # On or before Sereal version 4.023, Sereal did not support multiple values returned
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
     # But Storable want a list with the first element being the serialised element
     CORE::return( $class, \%hash );
 }

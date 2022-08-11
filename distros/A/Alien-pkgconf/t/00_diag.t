@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test2::Bundle::More;
+use Test2::V0 -no_srand => 1;
 use Alien::pkgconf;
 use Data::Dumper qw( Dumper );
 

@@ -111,7 +111,7 @@ Provided with a mime type and a quality weight (q-value), and this will push a n
 
 =head2 as_string
 
-Returns a string representation of the Content-Type object.
+Returns a string representation of the C<Accept> object.
 
 =head2 elements
 

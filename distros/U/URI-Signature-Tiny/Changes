@@ -1,5 +1,10 @@
 Release history for URI-Signature-Tiny
 
+1.005 Wed 10 Aug 2022
+	- No functional changes
+	- Packaging fix to stop installing boilerplate.pl
+	- Updated package metadata
+
 1.004 Thu 21 Jul 2022
 	- No uninitialized warnings for undef signatures
 

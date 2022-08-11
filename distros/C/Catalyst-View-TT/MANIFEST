@@ -22,6 +22,8 @@ t/lib/TestApp/Controller/Root.pm
 t/lib/TestApp/FauxProvider.pm
 t/lib/TestApp/root/any_include_path/test
 t/lib/TestApp/root/expose_methods.tt
+t/lib/TestApp/root/exposed_method_fails.tt
+t/lib/TestApp/root/other_exposed_method_dies.tt
 t/lib/TestApp/root/specified_template.tt
 t/lib/TestApp/root/test.tt
 t/lib/TestApp/root/test_alt_content_type.tt
@@ -38,6 +40,7 @@ t/lib/TestApp/View/TT/Includepath2.pm
 t/lib/TestApp/View/TT/Includepath3.pm
 t/lib/TestApp/View/TT/Pkgconfig.pm
 t/lib/TestApp/View/TT/Providerconfig.pm
+t/lib/TestLogger.pm
 t/root/heart
 t/utf8.t
 xt/pod-coverage.t

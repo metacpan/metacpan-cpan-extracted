@@ -87,7 +87,7 @@ is_deeply($bleh->nums, [3..5], 'delegated method worked')
 	or do {
 		diag explain($bleh->nums);
 		require B::Deparse;
-		diag( B::Deparse->new->coderef2text(\&Local::Bleh::splice_nums) );
+		diag( B::Deparse->new->coderef2text(\&Local::Bleh2::splice_nums) );
 	};
 
 is($bleh->first_num, 3, 'curried delegated method worked');

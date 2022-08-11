@@ -83,6 +83,25 @@ sub steal
     }
 }
 
+sub FREEZE
+{
+    my $self = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class = CORE::ref( $self );
+    my %hash  = %$self;
+    CORE::delete( @hash{ qw( sock ) } );
+    # Return an array reference rather than a list so this works with Sereal and CBOR
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # But Storable want a list with the first element being the serialised element
+    CORE::return( $class, \%hash );
+}
+
+sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+# NOTE: sub THAW is inherited
+
 1;
 # NOTE: POD
 __END__

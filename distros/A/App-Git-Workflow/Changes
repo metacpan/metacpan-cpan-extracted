@@ -1,5 +1,25 @@
 Revision history for git-workflow-tools
 
+1.1.20   2022-08-04
+        Updating for release of version 1.1.20
+        Updating mimimum version (Ivan Wills)
+        Fixing testing for memo (Ivan Wills)
+        Making add work with optional option (Ivan Wills)
+        Fixing documentation (Ivan Wills)
+        Fixing using wrong package name (Ivan Wills)
+        Moed commitish into sub key and added last switched commitish (Ivan Wills)
+        Implemented switch (Ivan Wills)
+        Adding standard test etc files (Ivan Wills)
+        Adding new memo command for branches, tags and commits (Ivan Wills)
+
+1.1.19   2022-05-23
+        Updating for release of version 1.1.19
+        Updated (Ivan Wills)
+        Fixing boilerplate (Ivan Wills)
+        Fixing manifest and load test (Ivan Wills)
+        Fixing for tests (Ivan Wills)
+        Making working with package.json files simpler (Ivan Wills)
+
 1.1.18   2022-04-06
         Updating for release of version 1.1.18
         Adding new files to default tests (Ivan Wills)

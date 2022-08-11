@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use base qw< Exporter >;
 our @EXPORT = (qw< ohash_check ohash_define >);
-our $VERSION = '0.2.0';
+our $VERSION = '0.2.2';
 
 my $ohash_def = bless {keys => {'keys' => 1}}, __PACKAGE__;
 
@@ -48,13 +48,13 @@ OptionHash - Checking of option hashes
 
 =head1 VERSION
 
-version 0.2.0
+version 0.2.2
 
 =head1 SYNOPSIS
 
   use OptionHash;
 
-  my $cat_def = ohash_define( keys => [qw< tail nose claws teeth>]);
+  my $cat_def = ohash_define( keys => [qw< tail nose claws teeth >]);
 
   sub cat{
     my %options = @_;
@@ -91,12 +91,30 @@ Check a hash against a definition:
 If everything is okay things will proceed, otherwise ohash_check will croak
 (see Carp).
 
-=head1 FUTURE
+=head1 NOTES
 
-Maybe do the checking part with XS, although honestly it's fast in perl. Might
-do an extra module as it's nice to have a pure perl version anyway.
+Generally the way to use this is to create the definition "types" at compile
+time in the package definition & then check against them later :
 
-Also other checks, like mandatory keys.
+ package foo;
+ use OptionHash;
+ my $DOG_DEF = ohash_define( keys => [ qw< nose > ]);
+ sub build_a_dog{
+     my( %opts ) = @_;
+     ohash_check($DOG_DEF, \%opts);
+ }
+ 1;
+
+=head1 WHY NOT USE...
+
+=head2 Params::ValidationCompiler
+
+Params::ValidationCompiler can also validate a hash of options, and a lot more
+besides, so it's well worth a look. There's a lot more going on than in
+OptionHash which (I'd say) is a bit more focused (thus far anyway) so it's a
+balance between features and complexity. Had I found
+Params::ValidationCompiler before I wrote this I probably wouldn't have
+bothered to re-invent the wheel, but as I already have I'm glad I did!
 
 =head1 AUTHOR
 
@@ -104,7 +122,7 @@ Joe Higton <draxil@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Joe Higton <draxil@gmail.com>.
+This software is copyright (c) 2022 by Joe Higton <draxil@gmail.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

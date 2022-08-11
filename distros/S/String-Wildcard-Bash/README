@@ -2,8 +2,8 @@ NAME
     String::Wildcard::Bash - Bash wildcard string routines
 
 VERSION
-    This document describes version 0.043 of String::Wildcard::Bash (from
-    Perl distribution String-Wildcard-Bash), released on 2019-08-30.
+    This document describes version 0.044 of String::Wildcard::Bash (from
+    Perl distribution String-Wildcard-Bash), released on 2022-08-06.
 
 SYNOPSIS
         use String::Wildcard::Bash qw(
@@ -51,6 +51,30 @@ FUNCTIONS
     contains joker and not other types of wildcard patterns, use
     "$RE_WILDCARD_BASH" directly.
 
+  contains_brace_wildcard
+    Like "contains_wildcard", but only return true if string contains brace
+    ("{...,}") wildcard pattern.
+
+  contains_class_wildcard
+    Like "contains_wildcard", but only return true if string contains
+    character class ("[...]") wildcard pattern.
+
+  contains_joker_wildcard
+    Like "contains_wildcard", but only return true if string contains any of
+    the joker ("?", "*", or "**") wildcard patterns.
+
+  contains_qmark_wildcard
+    Like "contains_wildcard", but only return true if string contains the
+    question mark joker ("?") wildcard pattern.
+
+  contains_glob_wildcard
+    Like "contains_wildcard", but only return true if string contains the
+    glob joker ("*", and not "**") wildcard pattern.
+
+  contains_globstar_wildcard
+    Like "contains_wildcard", but only return true if string contains the
+    globstar joker ("**" and not "*") wildcard pattern.
+
   convert_wildcard_to_sql
     Usage:
 
@@ -97,8 +121,28 @@ FUNCTIONS
 
         Examples:
 
-         convert_wildcard_to_re({}          , '*a*'); # => "[^.].*a.*"
-         convert_wildcard_to_re({dotglob=>1}, '*a*'); # => ".*a.*"
+         convert_wildcard_to_re({}          , '*a*'); # => "[^.][^/]*a[^/]*"
+         convert_wildcard_to_re({dotglob=>1}, '*a*'); # =>     "[^/]*a[^/]*"
+
+    *   globstar
+
+        Bool. Default is false. Whether globstar ("**") can match across
+        subdirectories (matches path separator). The default behavior
+        follows bash; that is, globstar option is off and "**" behaves like
+        "*".
+
+        This setting is similar to shell behavior (shopt) setting
+        "globstar".
+
+         convert_wildcard_to_re({},                         '*'); # => "[^.][^/]*"
+         convert_wildcard_to_re({},                        '**'); # => "[^.][^/]*"
+         convert_wildcard_to_re({globstar=>1},             '**'); # => "(?:[^/.][^/]*)(?:/+[^/.][^/]*)*"
+         convert_wildcard_to_re({globstar=>1, dotglob=>1}, '**'); # => ".*"
+
+    *   path_separator
+
+        String, 1 character. Default is "/". Can be used to customize the
+        path separator.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -107,13 +151,6 @@ HOMEPAGE
 SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-String-Wildcard-Bash>.
-
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=String-Wildcard-Bash>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
     Regexp::Wildcards can also convert a string with wildcard pattern to
@@ -129,9 +166,36 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2015, 2014 by perlancar@cpan.org.
+    This software is copyright (c) 2022, 2019, 2015, 2014 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=String-Wildcard-Bash>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

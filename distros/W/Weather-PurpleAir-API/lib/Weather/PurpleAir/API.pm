@@ -12,13 +12,13 @@ use HTTP::Tiny;
 use Time::HiRes;
 use String::Similarity qw(similarity);
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 # Litchfield  38887 38888   City of Santa Rosa Laguna Treatment Plant 22961 22962    Geek Orchard 26363 26364
 
 =head1 NAME
 
-Weather::PurpleAir::API -- Client interface to Purple Air air quality API
+Weather::PurpleAir::API -- Client interface to Purple Air air quality API [DEPRECATED]
 
 =head1 SYNOPSIS
 
@@ -33,6 +33,8 @@ Weather::PurpleAir::API -- Client interface to Purple Air air quality API
   }
 
 =head1 DESCRIPTION
+
+B<IMPORTANT!!> C<Weather::PurpleAir::API> is deprecated!  The PurpleAir team turned off their old API, and have set up a totally new API.  A re-implementation of C<Weather::PurpleAir::API> for the new API is in progress, and will replace this module (which is now useless).
 
 C<Weather::PurpleAir::API> provides a convenient interface to the Purple Air air quality API.  It will 
 pull down data for specified sensors, transform them as desired (for instance, converting from raw 

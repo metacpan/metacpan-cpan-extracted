@@ -315,3 +315,18 @@ Revision history for PPR
 0.001002  Wed Aug  3 02:04:01 2022
 
     * Rereleasing with ::X and ::Debug variations properly updated
+
+
+0.001003  Mon Aug  8 04:27:57 2022
+
+    * Improved accuracy of variable-post-dereference detection
+      specifically: (?&PerlScalarAccessNoSpace) and (?&PerlArrayAccessNoSpace)
+      within interpolating quotelikes
+      (Thanks, Zaki!)
+
+
+
+0.001004  Mon Aug  8 23:24:09 2022
+
+    * Fixed edge case of 'state' variable declarations
+      (Thanks, Zaki!)

@@ -1,0 +1,63 @@
+{
+   "abstract" : "ISS AH Predictor",
+   "author" : [
+      "Christoph Beger <christoph.beger@medizin.uni-leipzig.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Iss-Ah-Predictor",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.24"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Scalar::Util" : "1.4602",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.3",
+            "Test::PerlTidy" : "20200411"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/CrescNet/iss-ah-predictor/issues"
+      },
+      "license" : [
+         "https://opensource.org/licenses/MIT"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/CrescNet/iss-ah-predictor.git",
+         "web" : "https://github.com/CrescNet/iss-ah-predictor"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

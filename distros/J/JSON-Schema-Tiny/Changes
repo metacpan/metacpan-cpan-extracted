@@ -1,5 +1,8 @@
 Revision history for JSON-Schema-Tiny
 
+0.018     2022-08-06 22:02:20Z
+         - update test skip list for latest release of the test suite
+
 0.017     2022-07-10 04:09:23Z
          - fix 'experimental' prereq for older perls
 

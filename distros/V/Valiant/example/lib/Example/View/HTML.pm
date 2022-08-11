@@ -1,29 +1,15 @@
 package Example::View::HTML;
 
 use Moose;
-use Valiant::HTML::Form ();
+use Valiant::HTML::SafeString 'concat';
+use Example::Syntax;
 
-use Mojo::ByteStream qw(b);
-use Scalar::Util 'blessed';
+extends 'Catalyst::View::BasePerRequest';
 
-extends 'Catalyst::View::MojoTemplate';
+sub flatten_rendered($self, @rendered) {
+  return concat grep { defined($_) } @rendered;
+}
 
 __PACKAGE__->config(
-  helpers => {
-    form_for => \&form_for,
-    fields_for => \&fields_for,
-  },
+  content_type=>'text/html',
 );
-
-sub form_for {
-  my ($self, $c, $model, $attrs, $block) = @_;
-  $attrs->{action} = $c->req->uri unless exists($attrs->{action});
-  return b Valiant::HTML::Form::form_for($model, $attrs, $block);
-}
-
-sub fields_for {
-  my ($self, $c, @args) = @_;
-  return b Valiant::HTML::Form::fields_for(@args);
-}
-
-__PACKAGE__->meta->make_immutable;

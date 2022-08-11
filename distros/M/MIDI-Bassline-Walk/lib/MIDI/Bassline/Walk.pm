@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate walking basslines
 
-our $VERSION = '0.0503';
+our $VERSION = '0.0504';
 
 use Data::Dumper::Compact qw(ddc);
 use Carp qw(croak);
@@ -113,14 +113,14 @@ sub generate {
     $chord ||= 'C';
     $num   ||= 4;
 
-    print "CHORD: $chord\n" if $self->verbose;
-    print "NEXT: $next_chord\n" if $self->verbose && $next_chord;
-
     my ($chord_note, $flavor) = _parse_chord($chord);
 
     my $next_chord_note;
     ($next_chord_note) = _parse_chord($next_chord)
         if $next_chord;
+
+    print "CHORD: $chord => $chord_note, $flavor\n" if $self->verbose;
+    print "NEXT: $next_chord => $next_chord_note\n" if $self->verbose && $next_chord;
 
     my $scale = $self->scale->($chord);
     my $next_scale = defined $next_chord ? $self->scale->($next_chord) : '';
@@ -163,17 +163,17 @@ sub generate {
             $n->en_eq('sharp');
         }
         my $y = $n->format('isobase');
-        if (($flavor =~ /[#b]5/ && ($x eq $tones[4] || $y eq $tones[4]))
+        if (($flavor =~ /[#b]5/ && $tones[4] && ($x eq $tones[4] || $y eq $tones[4]))
             ||
-            ($flavor =~ /7/ && $flavor !~ /[Mm]7/ && ($x eq $tones[6] || $y eq $tones[6]))
+            ($flavor =~ /7/ && $flavor !~ /[Mm]7/ && $tones[6] && ($x eq $tones[6] || $y eq $tones[6]))
             ||
-            ($flavor =~ /[#b]9/ && ($x eq $tones[1] || $y eq $tones[1]))
+            ($flavor =~ /[#b]9/ && $tones[1] && ($x eq $tones[1] || $y eq $tones[1]))
             ||
-            ($flavor =~ /dim/ && ($x eq $tones[2] || $y eq $tones[2]))
+            ($flavor =~ /dim/ && $tones[2] && ($x eq $tones[2] || $y eq $tones[2]))
             ||
-            ($flavor =~ /dim/ && ($x eq $tones[6] || $y eq $tones[6]))
+            ($flavor =~ /dim/ && $tones[6] && ($x eq $tones[6] || $y eq $tones[6]))
             ||
-            ($flavor =~ /aug/ && ($x eq $tones[6] || $y eq $tones[6]))
+            ($flavor =~ /aug/ && $tones[6] && ($x eq $tones[6] || $y eq $tones[6]))
         ) {
             print "\tDROP: $x\n" if $self->verbose;
             next;
@@ -281,7 +281,7 @@ MIDI::Bassline::Walk - Generate walking basslines
 
 =head1 VERSION
 
-version 0.0503
+version 0.0504
 
 =head1 SYNOPSIS
 

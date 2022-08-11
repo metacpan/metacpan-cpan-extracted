@@ -1,11 +1,11 @@
 # Contributing to Alien::libmaxminddb
 
 The code for this distribution is hosted at
-https://gitlab.com/voegelas/alien-libmaxminddb.
+https://github.com/voegelas/Alien-libmaxminddb.
 
 Grab the latest version using the command:
 
-    git clone https://gitlab.com/voegelas/alien-libmaxminddb.git
+    git clone https://github.com/voegelas/Alien-libmaxminddb.git
 
 You can submit code changes by forking the repository, pushing your code
 changes to your clone, and then submitting a pull request.

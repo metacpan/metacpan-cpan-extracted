@@ -68,6 +68,7 @@ $test->for('includes');
 
   sub all;
   sub any;
+  sub call;
   sub count;
   sub delete;
   sub each;

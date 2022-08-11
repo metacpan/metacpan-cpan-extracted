@@ -1,6 +1,7 @@
-package Try::Tiny::Tiny; use strict; use warnings;
+use strict; use warnings;
 
-$Try::Tiny::Tiny::VERSION = '0.003';
+package Try::Tiny::Tiny;
+our $VERSION = '0.004';
 
 my $effective;
 

@@ -681,7 +681,7 @@ INIT:
 		XSRETURN_EMPTY;
 	}
 PPCODE:
-	first_address = message_address_parse(input, input_len, UINT_MAX, false);
+	first_address = message_address_parse(input, input_len, UINT_MAX, MESSAGE_ADDRESS_PARSE_FLAG_NON_STRICT_DOTS_AS_INVALID);
 	count = count_address_groups(first_address);
 	EXTEND(SP, count * 2);
 	address = first_address;

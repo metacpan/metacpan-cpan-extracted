@@ -151,9 +151,38 @@ static inline void _genericLogger_defaultCallbackp(void *userDatavp, genericLogg
   size_t           bytesWritenl   = 0;
   char            *s              = internals;
   size_t           countl         = strlen(s);
+  size_t           deltal;
+#if defined(UINT_MAX) && defined(_MSC_VER)
+   /* On MSVC _write() takes an unsigned int and returns an int */
+  unsigned int     deltaui;
+  int              outputi;
+#else
+  size_t           outputl;
+#endif
 
   while (bytesWritenl < countl) {
-    bytesWritenl += C_WRITE(filenoStderri, s+bytesWritenl, countl-bytesWritenl);
+    deltal = countl - bytesWritenl;
+#if defined(UINT_MAX) && defined(_MSC_VER)
+    if (deltal > UINT_MAX) {
+      deltaui = UINT_MAX;
+    } else {
+      deltaui = (unsigned int) deltal;
+    }
+    outputi = C_WRITE(filenoStderri, s+bytesWritenl, deltaui);
+    if (outputi <= 0) {
+      break;
+    }
+    bytesWritenl += (size_t) outputi;
+#else
+    /* We do not really mind if we are aware of ssize_t type definition */
+    /* The standard says that it returns -1 on error. And (size_t)-1 is */
+    /* perfectly legal.                                                 */
+    outputl = (size_t) C_WRITE(filenoStderri, s+bytesWritenl, deltal);
+    if ((outputl == 0) || (outputl == (size_t)-1)) {
+      break;
+    }
+    bytesWritenl += outputl;
+#endif
   }
 
   if (GENERICLOGGER_LIKELY(dates != dates_internalErrors) && ((genericLoggerp == NULL) || (genericLoggerp->dates != dates))) {
@@ -351,7 +380,7 @@ static inline char *_genericLogger_messageBuilder_aps(genericLogger_t *genericLo
 #ifdef _WIN32
       ((n >= 0) && (n < (int) sizel))
 #else
-      (n < sizel)
+      (n < (int) sizel)
 #endif
         {
       return p;

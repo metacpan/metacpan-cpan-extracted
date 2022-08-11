@@ -70,7 +70,7 @@ has attr => (
     'my_uniqstr_in_place' => 'uniqstr_in_place',
     'my_unshift' => 'unshift',
   },
-  default => sub { [] },
+  default => [],
 );
 
 1;

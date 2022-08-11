@@ -1,6 +1,8 @@
 use strict; use warnings;
 
 package Net::OAuth2Server::Response;
+our $VERSION = '0.006';
+
 use Object::Tiny::Lvalue qw( parameters is_error redirect_uri use_fragment );
 use URI::Escape ();
 use Carp ();
@@ -106,4 +108,4 @@ sub as_uri {
 	$uri . $sep . $qps;
 }
 
-our $VERSION = '0.005';
+1;

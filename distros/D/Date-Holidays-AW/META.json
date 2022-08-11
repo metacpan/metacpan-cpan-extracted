@@ -4,7 +4,7 @@
       "Wesley Schwengle <waterkip@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
@@ -51,8 +51,6 @@
             "Date::Holidays::Abstract" : "0",
             "DateTime" : "0",
             "DateTime::Event::Easter" : "0",
-            "Exporter" : "0",
-            "base" : "0",
             "perl" : "5.010"
          }
       },
@@ -69,7 +67,7 @@
    "provides" : {
       "Date::Holidays::AW" : {
          "file" : "lib/Date/Holidays/AW.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -80,12 +78,12 @@
          "web" : "https://gitlab.com/waterkip/p5-date-holiday-aw"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_contributors" : [
       "Wesley Schwengle <wesley@opndev.io>"
    ],
-   "x_generated_by_perl" : "v5.30.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
    "x_spdx_expression" : "BSD"
 }
 

@@ -1,6 +1,6 @@
 package Pithub::Repos::Contents;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01037';
+our $VERSION = '0.01039';
 # ABSTRACT: Github v3 Repo Contents API
 
 use Moo;
@@ -15,7 +15,7 @@ sub archive {
     $self->_validate_user_repo_args( \%args );
     return $self->request(
         method => 'GET',
-        path   => sprintf( '/repos/%s/%s/%s/%s', delete $args{user}, delete $args{repo}, delete $args{archive_format}, delete $args{ref} || '' ),
+        path   => sprintf( '/repos/%s/%s/%s/%s', delete $args{user}, delete $args{repo}, delete $args{archive_format}, delete $args{ref} || q{} ),
         %args,
     );
 }
@@ -63,7 +63,7 @@ Pithub::Repos::Contents - Github v3 Repo Contents API
 
 =head1 VERSION
 
-version 0.01037
+version 0.01039
 
 =head1 METHODS
 

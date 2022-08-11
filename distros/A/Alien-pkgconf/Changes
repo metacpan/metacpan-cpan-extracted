@@ -1,5 +1,10 @@
 Revision history for Alien-pkgconf
 
+0.18 2022-08-08 08:55:29 -0600
+  - Removing pkgconf 1.9.x for now, as it contains breaking
+    ABI changes that are not easy to reconsile for PkgConfig::LibPkgConf
+    Hopefully we can revisit support for 2.x when/if it becomes stable.
+
 0.17 2020-05-19 03:48:15 -0600
   - Add detection logic for Alpine Linux (tib++ gh#5)
 

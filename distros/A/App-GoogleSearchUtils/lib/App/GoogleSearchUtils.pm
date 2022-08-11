@@ -8,9 +8,9 @@ use Log::ger;
 use Perinci::Object 'envresmulti';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-16'; # DATE
+our $DATE = '2022-08-11'; # DATE
 our $DIST = 'App-GoogleSearchUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 our %SPEC;
 
@@ -136,6 +136,10 @@ _
             'x.doc.show_result' => 0,
         },
     ],
+    links => [
+        {url=>'prog:firefox-container'},
+        {url=>'pm:App::FirefoxMultiAccountContainersUtils'},
+    ],
 };
 sub google_search {
     require Browser::Open;
@@ -179,7 +183,8 @@ sub google_search {
             } else {
                 return [400, "Invalid time_past value '$p'"];
             }
-        } elsif (my ($t1, $t2) = ($args{time_start}, $args{time_end})) {
+        } elsif ($args{time_start} && $args{time_end}) {
+            my ($t1, $t2) = ($args{time_start}, $args{time_end});
             $time_param = "tbs=".URI::Escape::uri_escape(
                 "cdr:1,cd_min:".
                 ($args{time_start}->strftime("%m/%d/%Y")).
@@ -245,7 +250,7 @@ App::GoogleSearchUtils - CLI utilites related to google searching
 
 =head1 VERSION
 
-This document describes version 0.007 of App::GoogleSearchUtils (from Perl distribution App-GoogleSearchUtils), released on 2022-03-16.
+This document describes version 0.008 of App::GoogleSearchUtils (from Perl distribution App-GoogleSearchUtils), released on 2022-08-11.
 
 =head1 SYNOPSIS
 
@@ -335,6 +340,11 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Google
 
 Source repository is at L<https://github.com/perlancar/perl-App-GoogleSearchUtils>.
 
+=head1 SEE ALSO
+
+
+L<App::FirefoxMultiAccountContainersUtils>.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
@@ -352,9 +362,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -5,7 +5,7 @@ use v5.20;
 use experimental qw/ signatures /;
 package YAML::Tidy::Config;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use Cwd;
 use YAML::PP::Common qw/
@@ -88,6 +88,7 @@ sub new($class, %args) {
         trimtrailing => $trimtrailing,
         header => delete $cfg->{header} // 'keep',
         footer => delete $cfg->{footer} // 'keep',
+        adjacency => delete $cfg->{adjacency} // 'keep',
         scalar_style => $scalarstyle,
     }, $class;
     return $self;
@@ -124,6 +125,12 @@ sub addfooter($self) {
     return $footer ? 1 : 0;
 }
 
+sub adjacency($self) {
+    my $adjacency = $self->{adjacency};
+    return undef if $adjacency eq 'keep';
+    return $adjacency ? 1 : 0;
+}
+
 sub removeheader($self) {
     my $header = $self->{header};
     return 0 if $header eq 'keep';
@@ -151,6 +158,7 @@ trailing-spaces: fix
 header: true
 scalar-style:
     default: plain
+adjacency: 0
 EOM
 }
 

@@ -3,7 +3,7 @@ package Graph::Nauty::EdgeVertex;
 use strict;
 use warnings;
 
-our $VERSION = '0.5.0'; # VERSION
+our $VERSION = '0.5.1'; # VERSION
 
 use Data::Dumper;
 

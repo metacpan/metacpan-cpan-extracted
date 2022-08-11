@@ -4,7 +4,7 @@ author:
   - 'Jacques Deguest (jack@deguest.jp)'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Module::Generic::File: v0.3.2
+  Module::Generic::File: v0.5.2
   Test2::IPC: '1.302190'
   Test2::V0: '0.000145'
   Test::More: '1.302162'
@@ -26,13 +26,14 @@ no_index:
 requires:
   Clone: '0.45'
   Config: '0'
+  Errno: '0'
   Filter::Util::Call: '1.59'
-  Module::Generic: v0.22.1
-  Nice::Try: v1.1.2
+  Module::Generic: v0.27.2
+  Nice::Try: v1.3.1
   POSIX: '0'
-  PPI: '1.270'
+  PPI: '1.276'
   Scalar::Util: '1.50'
-  Storable: '3.15'
+  Storable::Improved: v0.1.2
   Want: '0.29'
   curry: '0'
   parent: '0'
@@ -43,5 +44,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Promise-Me/issues
   repository: https://gitlab.com/jackdeguest/Promise-Me
-version: v0.3.0
+version: v0.4.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

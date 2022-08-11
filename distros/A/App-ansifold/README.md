@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/kaz-utashiro/ansifold/workflows/test/badge.svg)](https://github.com/kaz-utashiro/ansifold/actions)
+[![Actions Status](https://github.com/kaz-utashiro/ansifold/workflows/test/badge.svg)](https://github.com/kaz-utashiro/ansifold/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-ansifold.svg)](https://metacpan.org/release/App-ansifold)
 # NAME
 
 ansifold - fold command handling ANSI terminal sequences
@@ -11,6 +11,7 @@ ansifold \[ options \]
           --boundary=word|space    Fold on word boundary
           --padding[=#]            Padding to margin space
           --padchar=_              Default padding character
+          --prefix=string          Set prefix string (default empty)
           --ambiguous=narrow|wide  Unicode ambiguous character handling
     -p    --paragraph              Print extra newline
           --separate=string        Set separator string (default newline)
@@ -24,18 +25,28 @@ ansifold \[ options \]
           --tabhead=char           Tab-head character (default space)
           --tabspace=char          Tab-space character (default space)
           --tabstyle=style         Tab expansion style (shade, dot, symbol)
+          --colrm start [ end ]    colrm(1) command compatible
     -h    --help                   Show help message
     -v    --version                Show version
 
+ansiexpand \[ options \]
+
+ansicolrm \[ options \]
+
 # VERSION
 
-Version 1.1101
+Version 1.1501
 
 # DESCRIPTION
 
-**ansifold** is a fold(1) compatible command utilizing
-[Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold) module, which enables to handle ANSI terminal
+**ansifold** is a [fold(1)](http://man.he.net/man1/fold) compatible command utilizing
+[Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold) module, which enables to handle ANSI terminal
 sequences.
+
+When executed under the name of **ansiexpand**, it works like
+[expand(1)](http://man.he.net/man1/expand) command.  If the name is **ansicolrm**, works like
+[colrm(1)](http://man.he.net/man1/colrm) command.  Because they are not installed automatically,
+make a symbolic link manually if you want.
 
 ## FOLD BY WIDTH
 
@@ -54,6 +65,8 @@ option.
 **ansifold** handles Unicode multi-byte characters properly.  Option
 **--ambiguous** takes _wide_ or _narrow_ and it specifies the visual
 width of Unicode ambiguous characters.
+
+If the width value is `term`, it is replaced by the terminal width.
 
 ## MULTIPLE WIDTH
 
@@ -103,7 +116,7 @@ This can be written as this.
 
 ## NUMBERS
 
-Number description is handled by [Getopt::EX::Numbers](https://metacpan.org/pod/Getopt::EX::Numbers) module, and
+Number description is handled by [Getopt::EX::Numbers](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3ANumbers) module, and
 consists of `start`, `end`, `step` and `length` elements.  For
 example,
 
@@ -135,9 +148,17 @@ Option **--separate** set separator string.
 
 Option **-n** is a short-cut for `--separate ''`.
 
-Option **--paragraph** or **-p** print extra newline after each lines.
+Option **--paragraph** or **-p** print extra newline after each line.
 This is convenient when a paragraph is made up of single line, like
 microsoft word document.
+
+## PREFIX
+
+If a string is given by **--prefix** option, that string is inserted at
+the beginning of each folded text.  This is convenient to produce
+indented text block.  Because the first line is not affected, insert
+appropiate prefix if necessary.  Originally made for
+[App::Greple::frame](https://metacpan.org/pod/App%3A%3AGreple%3A%3Aframe) module.
 
 # LINE BREAKING
 
@@ -152,7 +173,7 @@ Context of word is defined by option value; _word_ means
 alpha-numeric sequence, while _space_ means simply non-space
 printables.
 
-## **--linebreak**=_all_|_ruunin_|_runout_|_none_
+## **--linebreak**=_all_|_runin_|_runout_|_none_
 
 Option **--linebreak** takes a value of _all_, _runin_, _runout_ or
 _none_.  Default value is _none_.
@@ -206,24 +227,32 @@ name.  Next example makes tab character visible keeping text layout.
 Option **--tabstyle** allow to set **--tabhead** and **--tabspace**
 characters at once according to the given style name.  Select from
 `dot`, `symbol` or `shade`.  Styles are defined in
-[Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold) library.
+[Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold) library.
 
     $ ansifold --expand --tabstyle=shade
+
+# COLRM
+
+## **--colrm** \[ start \[ end \] \]
+
+Option **--colrm** takes [colrm(1)](http://man.he.net/man1/colrm) command compatible arguments and
+implicitly set **--separate** empty.  Next command behave exactly like
+`colrm start end` and takes care of ANSI terminal sequences.
+
+    $ ansifold --colrm start end
 
 # FILES
 
 - `~/.ansifoldrc`
 
     Start-up file.
-    See [Getopt::EX::Module](https://metacpan.org/pod/Getopt::EX::Module) for format.
+    See [Getopt::EX::Module](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AModule) for format.
 
 # INSTALL
 
 ## CPANMINUS
 
     $ cpanm App::ansifold
-    or
-    $ curl -sL http://cpanmin.us | perl - App::ansifold
 
 # SEE ALSO
 
@@ -233,7 +262,7 @@ characters at once according to the given style name.  Select from
 
 [Text::ANSI::Fold::Util](https://github.com/kaz-utashiro/Text-ANSI-Fold-Util)
 
-[Getopt::EX::Numbers](https://metacpan.org/pod/Getopt::EX::Numbers)
+[Getopt::EX::Numbers](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3ANumbers)
 
 [https://www.w3.org/TR/jlreq/](https://www.w3.org/TR/jlreq/)
 Requirements for Japanese Text Layout,
@@ -245,7 +274,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2018- Kazumasa Utashiro
+Copyright 2018-2022 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

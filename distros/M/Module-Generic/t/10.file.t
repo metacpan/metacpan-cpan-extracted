@@ -63,7 +63,7 @@ if( $expected_location eq "$f2" )
     $io->print( join( "\n", ( 'line 1', 'line 2', '' ) ) ) || BAIL_OUT( "Unable to write to file \"$f2\": $!" );
     my $pos = $io->tell;
     diag( "File $f2 size is: ", -s( $f2 ) ) if( $DEBUG );
-    # XXX Update this with actual number returned
+    # TODO: Update this with actual number returned
     is( $f2->length, 14, 'file size' );
     my $lines = $f2->content;
     isa_ok( $lines, 'Module::Generic::Array', 'content as array object' );
@@ -153,7 +153,7 @@ subtest 'children' => sub
     for( 1..$n_files )
     {
         my $f = $d->child( "file${_}.txt" )->touch;
-        diag( "Creating file '$f'" );
+        # diag( "Creating file '$f'" );
         push( @files, $f ) if( $f );
         isa_ok( $f, 'Module::Generic::File', "File No ${_} created is object" );
         $f->debug( $DEBUG );

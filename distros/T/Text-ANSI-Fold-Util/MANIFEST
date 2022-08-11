@@ -9,6 +9,5 @@ minil.toml
 t/00_compile.t
 t/01_substr.t
 t/02_width.t
-t/03_expand.t
 META.yml
 MANIFEST

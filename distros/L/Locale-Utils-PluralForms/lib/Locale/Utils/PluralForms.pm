@@ -10,7 +10,7 @@ use HTML::Entities qw(decode_entities);
 require LWP::UserAgent;
 require Safe;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 has language => (
     is       => 'rw',
@@ -149,7 +149,7 @@ EOC
             my \$n = shift;
             my (\$nplurals, \$plural);
             $plural_forms;
-            return \$plural || 0;
+            return 0 + (\$plural || 0);
         }
 EOC
     $self->_plural_code(
@@ -170,13 +170,9 @@ __END__
 
 Locale::Utils::PluralForms - Utils to use plural forms
 
-$Id: PluralForms.pm 382 2011-11-13 13:20:22Z steffenw $
-
-$HeadURL: https://perl-gettext-oo.svn.sourceforge.net/svnroot/perl-gettext-oo/Locale-Utils-PluralForms/trunk/lib/Locale/Utils/PluralForms.pm $
-
 =head1 VERSION
 
-0.002
+0.003
 
 =head1 SYNOPSIS
 
@@ -371,7 +367,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2011 - 2017,
+Copyright (c) 2011 - 2022,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

@@ -94,6 +94,14 @@ sub print
 
 sub purge { return; }
 
+# NOTE: sub FREEZE is inherited
+
+sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+# NOTE: sub THAW is inherited
+
 
 # NOTE: HTTP::Promise::Body::File package
 package HTTP::Promise::Body::File;
@@ -124,6 +132,14 @@ sub init
 sub path { return( shift->filename( @_ ) ); }
 
 sub purge { return( shift->unlink ); }
+
+sub FREEZE { CORE::return( CORE::shift->Module::Generic::File::FREEZE( @_ ) ); }
+
+sub STORABLE_freeze { CORE::return( CORE::shift->Module::Generic::File::STORABLE_freeze( @_ ) ); }
+
+# NOTE: sub STORABLE_thaw is inherited
+
+# NOTE: sub THAW is inherited
 
 
 # NOTE: HTTP::Promise::Body::Scalar package
@@ -171,6 +187,14 @@ sub pass_error { return( shift->Module::Generic::Scalar::pass_error( @_ ) ); }
 sub purge { return( shift->Module::Generic::Scalar::reset( @_ ) ); }
 
 sub set { return( shift->Module::Generic::Scalar::set( @_ ) ); }
+
+sub FREEZE { return( shift->Module::Generic::Scalar::FREEZE( @_ ) ); }
+
+# NOTE: sub STORABLE_freeze is inherited
+
+# NOTE: sub STORABLE_thaw is inherited
+
+sub THAW { return( shift->Module::Generic::Scalar::THAW( @_ ) ); }
 
 
 # NOTE: HTTP::Promise::Body::InCore package

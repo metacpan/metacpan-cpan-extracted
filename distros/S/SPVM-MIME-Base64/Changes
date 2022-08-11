@@ -1,3 +1,29 @@
+0.05 2022-08-04
+  [New Features]
+    * Add the optional argument to MIME::Base64->encode_base64
+      [Before]
+      static method encode_base64 : string ($str : string)
+      [After]
+      static method encode_base64 : string ($str : string, $eol = undef : string)
+      
+    * Add the optional argument to MIME::Base64->encoded_base64_length
+      [Before]
+      static method encoded_base64_length : int ($str : string)
+      [After]
+      static method encoded_base64_length : int ($str : string, $eol = undef : string)
+
+    * Add the optional argument to QuotedPrint->encode_qp
+      [Before]
+      static method encode_qp : string ($str : string)
+      [After]
+      static method encode_qp : string ($str : string, $eol = undef : string, $binmode = 0 : int)
+  [Pre Requirement Changes]
+    * SPVM 0.9634_01+ is needed.
+  [Incompatible Changes]
+    * The following methods are removed.
+      MIME::Base64->encode_base64_opt is removed. Use MIME::Base64->encode_base64 instead.
+      MIME::Base64->encoded_base64_length_opt is removed. Use MIME::Base64->encoded_base64_length instead.
+      QuotedPrint->encode_qp_opt is removed. Use QuotedPrint->encode_qp instead.
 0.04 2022-07-04
   * Imrpve document
   * Add MIME::QuotedPrint class

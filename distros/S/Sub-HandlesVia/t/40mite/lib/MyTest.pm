@@ -6,11 +6,12 @@ use Sub::HandlesVia;
 has list => (
 	is => 'ro',
 	isa => 'ArrayRef',
-	default => sub { [] },
+	default => \ '[11]',
 	handles_via => 'Array',
 	handles => {
-		push => 'push',
-		pop  => 'pop',
+		push  => 'push',
+		pop   => 'pop',
+		reset => 'reset',
 	},
 );
 

@@ -34,6 +34,7 @@ lib/Module/Generic/Scalar/IO.pod
 lib/Module/Generic/SemStat.pod
 lib/Module/Generic/SharedMem.pm
 lib/Module/Generic/SharedMem.pod
+lib/Module/Generic/SharedMemXS.pm
 lib/Module/Generic/Tie.pm
 lib/Module/Generic/Tie.pod
 lib/Module/Generic/TieHash.pm

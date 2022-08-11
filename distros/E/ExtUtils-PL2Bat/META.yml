@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,10 +27,10 @@ requires:
 resources:
   bugtracker: https://github.com/Perl-Toolchain-Gang/extutils-pl2bat/issues
   repository: git://github.com/Perl-Toolchain-Gang/extutils-pl2bat.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
-    version: '5.032000'
+    version: '5.036000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -44,58 +44,58 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Filter/GatherDir'
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Filter/PruneCruft'
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Filter/ManifestSkip'
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Filter/MetaYAML'
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Filter/License'
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Filter/Readme'
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Filter/ShareDir'
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Filter/MakeMaker'
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Filter/Manifest'
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Filter/TestRelease'
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Filter/ConfirmRelease'
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Filter/UploadToCPAN'
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: ExecDir
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: CheckChangesHasContent
@@ -103,19 +103,19 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: MetaConfig
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: MetaJSON
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::GitHub::Meta
       name: GitHub::Meta
-      version: '0.47'
+      version: '0.48'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -126,69 +126,69 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@Default/SingleEncoding'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Name
               name: '@Default/Name'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Version
               name: '@Default/Version'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Region
               name: '@Default/prelude'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@Default/Leftovers'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Region
               name: '@Default/postlude'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Authors
               name: '@Default/Authors'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Default/Legal'
-              version: '4.015'
+              version: '4.018'
       name: PodWeaver
-      version: '4.008'
+      version: '4.009'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
@@ -197,14 +197,14 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.0
+          git_version: 2.37.1
           repo_root: .
       name: Git::NextVersion
-      version: '2.047'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: NextRelease
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -217,17 +217,17 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.0
+          git_version: 2.37.1
           repo_root: .
       name: '@Git/Check'
-      version: '2.047'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
           commit_msg: v%V%n%n%c
-          signoff: '0'
+          signoff: 0
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -235,12 +235,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.0
+          git_version: 2.37.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Commit'
-      version: '2.047'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -248,16 +248,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.004
+          tag: v0.005
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.0
+          git_version: 2.37.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Tag'
-      version: '2.047'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -266,19 +266,19 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.0
+          git_version: 2.37.1
           repo_root: .
       name: '@Git/Push'
-      version: '2.047'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: PkgVersion
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
         Dist::Zilla::Plugin::Test::Compile:
-          bail_out_on_fail: '0'
+          bail_out_on_fail: 0
           fail_on_warning: all
           fake_home: 0
           filename: t/00-compile.t
@@ -297,8 +297,8 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::OnlyCorePrereqs:
           also_disallow: []
-          check_dual_life_versions: '1'
-          deprecated_ok: '0'
+          check_dual_life_versions: 1
+          deprecated_ok: 0
           phases:
             - configure
             - build
@@ -311,48 +311,48 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.017'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.017'
+      version: '6.025'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
-      is_trial: '0'
-    version: '6.017'
-x_generated_by_perl: v5.32.0
+      is_trial: 0
+    version: '6.025'
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

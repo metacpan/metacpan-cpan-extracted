@@ -4,7 +4,7 @@ author:
   - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
 build_requires: {}
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,9 +23,10 @@ requires:
   Role::Tiny: '0'
   perl: '5.008'
 resources:
-  bugtracker: https://github.com/ap/Net-OAuth2Server-OIDC/issues
-  repository: git://github.com/ap/Net-OAuth2Server-OIDC.git
-version: '0.005'
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-OAuth2Server-OIDC
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ap/Net-OAuth2Server-OIDC.git
+version: '0.006'
 x_copyright:
   holder: 'Aristotle Pagaltzis'
   year: 2020

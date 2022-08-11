@@ -38,6 +38,7 @@ $test->for('abstract');
 
 method: all
 method: any
+method: call
 method: cast
 method: count
 method: default
@@ -236,6 +237,63 @@ $test->for('example', 2, 'any', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == 1;
+
+  $result
+});
+
+=method call
+
+The call method executes the given method (named using the first argument)
+which performs an iteration (i.e. takes a callback) and calls the method (named
+using the second argument) on the object (or value) and returns the result of
+the iterable method.
+
+=signature call
+
+  call(Str $iterable, Str $method) (Any)
+
+=metadata call
+
+{
+  since => '1.02',
+}
+
+=example-1 call
+
+  # given: synopsis
+
+  package main;
+
+  my $call = $array->call('map', 'incr');
+
+  # [2..10]
+
+=cut
+
+$test->for('example', 1, 'call', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [2..10];
+
+  $result
+});
+
+=example-2 call
+
+  # given: synopsis
+
+  package main;
+
+  my $call = $array->call('grep', 'gt', 4);
+
+  # [4..9]
+
+=cut
+
+$test->for('example', 2, 'call', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [5..9];
 
   $result
 });

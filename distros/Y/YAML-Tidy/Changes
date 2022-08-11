@@ -1,5 +1,12 @@
 Revision history for Perl module YAML::Tidy
 
+0.007 2022-08-06 00:09:43+02:00
+
+    - Improve scalar style tidying
+    - Also tidy scalar style in flow collections
+    - Fix adjacent values if key turns into plain
+      `{"key":23} --> {key: 23}`
+
 0.006 2022-06-07 15:12:11+02:00
 
     - Fix scalar style

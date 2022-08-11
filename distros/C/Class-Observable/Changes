@@ -1,9 +1,17 @@
-Revision history for Class-Observable
+Release history for Class-Observable
 
-2.000 Sat Feb 06 2021
+2.002 Tue 09 Aug 2022
+	- No functional changes
+	- Packaging fix to stop installing boilerplate.pl
+
+2.001 Sun 07 Aug 2021
+	- No functional changes
+	- Updated package metadata
+
+2.000 Sat 06 Feb 2021
 	- No changes from 1.90-TRIAL
 
-1.90 Fri Feb 05 2021
+1.90 Fri 05 Feb 2021
 	- Maintainer change and tooling update
 	- Fix to prevent delete_observer() from breaking observer references
 	- No more weakening of observer refs
@@ -11,32 +19,32 @@ Revision history for Class-Observable
 	  (please note the documentation section on DESTROY)
 	- No more debug code (but debug-related functions and methods kept for backcompat)
 
-1.04 Sat Oct 16 2004
+1.04 Sat 16 Oct 2004
 	- Weakening of observer refs to prevent leaks (Scalar::Util required)
 	- New observer_log() and observer_error() to override logging/error output
 
-1.03 Wed Jun 16 2004
+1.03 Wed 16 Jun 2004
 	- POD typo fix. Thanks to Dan Langille
 
-1.02 Tue Nov 11 2003
+1.02 Tue 11 Nov 2003
 	- Renaming of delete_observers() as delete_all_observers() (with alias for backcompat)
 	- add_observer() and delete_observer() can now take more than one observer
 
-1.01 Wed Oct 22 2003
+1.01 Wed 22 Oct 2003
 	- POD bug fix. Thanks to forehead@4red.org
 
-1.00 Fri May 02 2003
+1.00 Fri 02 May 2003
 	- New copy_observers() method
 
-0.03 Mon Aug 19 2002
+0.03 Mon 19 Aug 2002
 	- New SET_DEBUG() function to toggle debugging
 	- notify_observers() takes any number of parameters
 
-0.02 Tue May 28 2002
+0.02 Tue 28 May 2002
 	- Modified API to be more like java.util.Observable:
 		- remove_observer( $o )  -> delete_observer( $o )
 		- remove_all_observers() -> delete_observers()
 		- New count_observers()
 
-0.01 Sun May 26 2002
+0.01 Sun 26 May 2002
 	- Initial version

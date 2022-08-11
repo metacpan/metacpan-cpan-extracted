@@ -85,7 +85,7 @@ Digestable Role for Perl 5
 
   use Venus::Class;
 
-  attr 'test';
+  attr 'data';
 
   with 'Venus::Role::Dumpable';
   with 'Venus::Role::Digestable';
@@ -93,12 +93,12 @@ Digestable Role for Perl 5
   sub execute {
     my ($self, @args) = @_;
 
-    return [$self->test, @args];
+    return [$self->data, @args];
   }
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   # $example->digest;
 
@@ -139,11 +139,11 @@ I<Since C<0.01>>
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $b64digest = $example->b64digest;
 
-  # "psPZrlnzFpDt290VJx6FamtvFdU"
+  # "/PFIeIRxSIuCLPcrbWypwXVUpMY"
 
 =back
 
@@ -153,7 +153,7 @@ I<Since C<0.01>>
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $b64digest = $example->b64digest('sha-1', 'execute');
 
@@ -167,7 +167,7 @@ I<Since C<0.01>>
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $b64digest = $example->b64digest('sha-1', 'execute', '456');
 
@@ -194,11 +194,11 @@ I<Since C<0.01>>
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $bindigest = $example->bindigest;
 
-  # pack("H*","a6c3d9ae59f31690eddbdd15271e856a6b6f15d5")
+  # pack("H*","fcf148788471488b822cf72b6d6ca9c17554a4c6")
 
 =back
 
@@ -208,7 +208,7 @@ I<Since C<0.01>>
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $bindigest = $example->bindigest('sha-1', 'execute');
 
@@ -222,7 +222,7 @@ I<Since C<0.01>>
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $bindigest = $example->bindigest('sha-1', 'execute', '456');
 
@@ -249,11 +249,11 @@ I<Since C<0.01>>
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $digest = $example->digest;
 
-  # "a6c3d9ae59f31690eddbdd15271e856a6b6f15d5"
+  # "fcf148788471488b822cf72b6d6ca9c17554a4c6"
 
 =back
 
@@ -263,7 +263,7 @@ I<Since C<0.01>>
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $digest = $example->digest('sha-1', 'execute');
 
@@ -277,7 +277,7 @@ I<Since C<0.01>>
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $digest = $example->digest('sha-1', 'execute', '456');
 
@@ -304,7 +304,7 @@ I<Since C<0.01>>
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $digester = $example->digester;
 
@@ -318,7 +318,7 @@ I<Since C<0.01>>
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $digester = $example->digester('md5');
 
@@ -345,11 +345,11 @@ I<Since C<0.01>>
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $hexdigest = $example->hexdigest;
 
-  # "a6c3d9ae59f31690eddbdd15271e856a6b6f15d5"
+  # "fcf148788471488b822cf72b6d6ca9c17554a4c6"
 
 =back
 
@@ -359,7 +359,7 @@ I<Since C<0.01>>
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $hexdigest = $example->hexdigest('sha-1', 'execute');
 
@@ -373,7 +373,7 @@ I<Since C<0.01>>
 
   package main;
 
-  my $example = Example->new(test => 123);
+  my $example = Example->new(data => 123);
 
   my $hexdigest = $example->hexdigest('sha-1', 'execute', '456');
 

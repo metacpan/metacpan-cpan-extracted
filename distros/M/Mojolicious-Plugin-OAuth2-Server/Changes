@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-OAuth2-Server
 
+0.50     2022-08-08
+        - Allow client_id / client_secret in body params (GH #28)
+
 0.49     2022-06-02
         - Fix tests broken by Mojolicious multiple render fixes (GH #27)
 

@@ -1,5 +1,10 @@
 Revision history for Perl extension Digest::SHA3.
 
+1.05  Mon 08 Aug 2022 11:30:32 AM MST
+	- corrected addfile to report error when stdin is a directory
+		-- ref. rt.cpan.org #143899
+		-- thanks to Gregor Herrmann for pointing this out
+
 1.04  Fri Apr 20 16:25:30 MST 2018
 	- silenced compiler warnings from VS2017
 		-- ref. rt.cpan.org #124477

@@ -5,9 +5,9 @@ use warnings;
 package Sub::HandlesVia::Toolkit::Mite;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.032';
+our $VERSION   = '0.034';
 
-use Sub::HandlesVia::Mite;
+use Sub::HandlesVia::Mite -all;
 extends 'Sub::HandlesVia::Toolkit';
 
 use Types::Standard -types, -is;
@@ -71,6 +71,7 @@ my @method_name_generator = (
 		reader      => sub { "get_$_" },
 		writer      => sub { "set_$_" },
 		accessor    => sub { $_ },
+		lvalue      => sub { $_ },
 		clearer     => sub { "clear_$_" },
 		predicate   => sub { "has_$_" },
 		builder     => sub { "_build_$_" },
@@ -80,6 +81,7 @@ my @method_name_generator = (
 		reader      => sub { "_get_$_" },
 		writer      => sub { "_set_$_" },
 		accessor    => sub { $_ },
+		lvalue      => sub { $_ },
 		clearer     => sub { "_clear_$_" },
 		predicate   => sub { "_has_$_" },
 		builder     => sub { "_build_$_" },
@@ -96,40 +98,41 @@ sub code_generator_for_attribute {
 	
 	my $private = 0+!! ( $name =~ /^_/ );
 	
-	$spec->{is} ||= 'bare';
-	if ( $spec->{is} eq 'lazy' ) {
+	$spec->{is} ||= bare;
+	if ( $spec->{is} eq lazy ) {
 		$spec->{builder} = 1 unless exists $spec->{builder};
-		$spec->{is}      = 'ro';
+		$spec->{is}      = ro;
 	}
-	if ( $spec->{is} eq 'ro' ) {
-		$spec->{reader} = $name unless exists $spec->{reader};
+	if ( $spec->{is} eq ro ) {
+		$spec->{reader} = '%s' unless exists $spec->{reader};
 	}
-	if ( $spec->{is} eq 'rw' ) {
-		$spec->{accessor} = $name unless exists $spec->{accessor};
+	if ( $spec->{is} eq rw ) {
+		$spec->{accessor} = '%s' unless exists $spec->{accessor};
 	}
-	if ( $spec->{is} eq 'rwp' ) {
-		$spec->{reader} = $name unless exists $spec->{reader};
-		$spec->{writer} = "_set_$name" unless exists $spec->{writer};
+	if ( $spec->{is} eq rwp ) {
+		$spec->{reader} = '%s' unless exists $spec->{reader};
+		$spec->{writer} = '_set_%s' unless exists $spec->{writer};
 	}
 	
-	for my $property ( 'reader', 'writer', 'accessor', 'builder' ) {
-		my $methodname = $spec->{$property};
-		if ( defined $methodname and $methodname eq 1 ) {
+	for my $property ( 'reader', 'writer', 'accessor', 'builder', 'lvalue' ) {
+		defined( my $methodname = $spec->{$property} ) or next;
+		if ( $methodname eq 1 ) {
 			my $gen = $method_name_generator[$private]{$property};
 			local $_ = $name;
 			$spec->{$property} = $gen->( $_ );
 		}
+		$spec->{$property} =~ s/\%s/$name/g;
 	}
 	
 	my ( $get, $set, $get_is_lvalue, $set_checks_isa, $default, $slot );
 	
-	if ( my $reader = $spec->{reader} || $spec->{accessor} ) {
+	if ( my $reader = $spec->{reader} || $spec->{accessor} || $spec->{lvalue} ) {
 		$get = sub { shift->generate_self . "->$reader" };
-		$get_is_lvalue = !!0;
+		$get_is_lvalue = false;
 	}
 	else {
 		$get = sub { shift->generate_self . "->{q[$name]}" };
-		$get_is_lvalue = !!1;
+		$get_is_lvalue = true;
 	}
 	
 	if ( my $writer = $spec->{writer} || $spec->{accessor} ) {
@@ -137,14 +140,21 @@ sub code_generator_for_attribute {
 			my ( $gen, $expr ) = @_;
 			$gen->generate_self . "->$writer($expr)";
 		};
-		$set_checks_isa = !!1;
+		$set_checks_isa = true;
+	}
+	elsif ( $writer = $spec->{lvalue} ) {
+		$set = sub {
+			my ( $gen, $expr ) = @_;
+			"( " . $gen->generate_self . "->$writer = $expr )";
+		};
+		$set_checks_isa = false;
 	}
 	else {
 		$set = sub {
 			my ( $gen, $expr ) = @_;
 			"( " . $gen->generate_self . "->{q[$name]} = $expr )";
 		};
-		$set_checks_isa = !!0;
+		$set_checks_isa = false;
 	}
 	
 	$slot = sub { shift->generate_self . "->{q[$name]}" };
@@ -178,7 +188,7 @@ sub code_generator_for_attribute {
 		generator_for_set     => $set,
 		get_is_lvalue         => $get_is_lvalue,
 		set_checks_isa        => $set_checks_isa,
-		set_strictly          => !!1,
+		set_strictly          => true,
 		generator_for_default => sub {
 			my ( $gen, $handler ) = @_ or die;
 			if ( !$default and $handler ) {
@@ -197,6 +207,15 @@ sub code_generator_for_attribute {
 					$gen->generate_self,
 					B::perlstring( $default ),
 				);
+			}
+			elsif ( is_ScalarRef $default ) {
+				return $$default;
+			}
+			elsif ( is_HashRef $default ) {
+				return '{}';
+			}
+			elsif ( is_ArrayRef $default ) {
+				return '[]';
 			}
 			return;
 		},

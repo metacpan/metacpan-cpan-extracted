@@ -18,7 +18,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 =head1 NAME
 
@@ -70,7 +70,7 @@ the network panel. This module enables converting these to Perl code.
 The constructor returns one or more L<HTTP::Request::CurlParameters> objects
 that encapsulate the parameters. If the command generates multiple requests,
 they will be returned in list context. In scalar context, only the first request
-will be returned.
+will be returned. Note that the order of URLs between C<--url> and unadorned URLs will be changed in the sense that all unadorned URLs will be handled first.
 
     my $req = HTTP::Request::FromCurl->new(
         command => '--data-binary @/etc/passwd https://example.com',
@@ -203,6 +203,7 @@ our @option_spec = (
     'parallel-max',              # ignored
     'junk-session-cookies|j',    # ignored, must be set in code using the HTTP request
     'unix-socket=s',
+    'url=s@',
 );
 
 sub new( $class, %options ) {
@@ -232,10 +233,11 @@ sub new( $class, %options ) {
         \my %curl_options,
         @option_spec,
     ) or return;
+    my @urls = (@$cmd, @{ $curl_options{ url } || [] });
 
     return
-        wantarray ? map { $class->_build_request( $_, \%curl_options, %options ) } @$cmd
-                  :       ($class->_build_request( $cmd->[0], \%curl_options, %options ))[0]
+        wantarray ? map { $class->_build_request( $_, \%curl_options, %options ) } @urls
+                  :       ($class->_build_request( $urls[0], \%curl_options, %options ))[0]
                   ;
 }
 
@@ -428,7 +430,7 @@ sub _build_request( $self, $uri, $options, %build_options ) {
         };
 
         if( @form_args) {
-            $method = 'POST';
+            $method //= 'POST';
 
             my $req = HTTP::Request::Common::POST(
                 'https://example.com',
@@ -456,7 +458,7 @@ sub _build_request( $self, $uri, $options, %build_options ) {
             $method = 'HEAD';
 
         } elsif( defined $data ) {
-            $method = 'POST';
+            $method //= 'POST';
             $body = $data;
             $request_default_headers{ 'Content-Type' } = 'application/x-www-form-urlencoded';
 

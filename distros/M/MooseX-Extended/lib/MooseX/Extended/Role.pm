@@ -25,7 +25,7 @@ use true;
 use feature _enabled_features();
 no warnings _disabled_warnings();
 
-our $VERSION = '0.26';
+our $VERSION = '0.28';
 
 # Should this be in the metaclass? It feels like it should, but
 # the MOP really doesn't support these edge cases.
@@ -62,14 +62,14 @@ sub _apply_default_features ( $config, $for_class, $params ) {
 
     Carp->import::into($for_class)                 unless $config->{excludes}{carp};
     namespace::autoclean->import::into($for_class) unless $config->{excludes}{autoclean};
-    true->import                                   unless $config->{excludes}{true} || $config->{_caller_eval}; # https://github.com/Ovid/moosex-extreme/pull/34
+    true->import unless $config->{excludes}{true} || $config->{_caller_eval};    # https://github.com/Ovid/moosex-extended/pull/34
     MooseX::Role::WarnOnConflict->import::into($for_class) unless $config->{excludes}{WarnOnConflict};
 
     feature->import( _enabled_features() );
     warnings->unimport(_disabled_warnings);
 
-    Moose::Role->init_meta(                                                                                     ##
-        %$params,                                                                                               ##
+    Moose::Role->init_meta(                                                      ##
+        %$params,                                                                ##
         metaclass => 'Moose::Meta::Role'
     );
 }
@@ -88,7 +88,7 @@ MooseX::Extended::Role - MooseX::Extended roles
 
 =head1 VERSION
 
-version 0.26
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -217,6 +217,25 @@ Allows you to write asynchronous code with C<async> and C<await>.
 
 Only available on Perl v5.26.0 or higher. Requires L<Future::AsyncAwait>.
 
+=item * C<try>
+
+    package My::Try {
+        use MooseX::Extended includes => [qw/try/];
+
+        sub reciprocal ( $self, $num ) {
+            try {
+                return 1 / $num;
+            }
+            catch {
+                croak "Could not calculate reciprocal of $num: $@";
+            }
+        }
+    }
+
+Allows you to use try/catch blocks, via L<Syntax::Keyword::Try>.
+
+Only available on Perl v5.24.0 or higher. Requires L<Syntax::Keyword::Try>.
+
 =back
 
 =head1 IDENTICAL METHOD NAMES IN CLASSES AND ROLES
@@ -270,7 +289,7 @@ If the MooseX::Extended::Role is loaded via I<stringy> eval, C<true> is not
 loaded, This is because there were intermittant errors (maybe 1 out of 5
 times) being thrown. Removing this feature under stringy eval solves this. See
 L<this github ticket for more
-infomration|https://github.com/Ovid/moosex-extreme/pull/34>.
+infomration|https://github.com/Ovid/moosex-extended/pull/34>.
 
 =head1 REDUCING BOILERPLATE
 

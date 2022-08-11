@@ -20,7 +20,7 @@ use Time::Piece 1.33;
 use boolean;
 use namespace::clean;
 
-our $VERSION = '0.904'; # VERSION
+our $VERSION = '0.905'; # VERSION
 our $WARNINGS = 1;
 
 fieldhashes \my (%SAFE, %KEYS);
@@ -1121,7 +1121,7 @@ File::KDBX - Encrypted database to store secret text and files
 
 =head1 VERSION
 
-version 0.904
+version 0.905
 
 =head1 SYNOPSIS
 
@@ -1684,7 +1684,7 @@ C<algorithm> - Search algorithm, one of C<ids>, C<bfs> or C<dfs> (default: C<ids
     $kdbx->add_entry($entry, %options);
     $kdbx->add_entry(%entry_attributes, %options);
 
-Add a entry to a database. This is equivalent to identifying a parent group and calling
+Add an entry to a database. This is equivalent to identifying a parent group and calling
 L<File::KDBX::Group/add_entry> on the parent group, forwarding the arguments. Available options:
 
 =over 4
@@ -2021,7 +2021,7 @@ C<max_size> - Maximum total size (in bytes) of historical entries to keep (defau
 
 =item *
 
-C<max_age> - Maximum age (in days) of historical entries to keep (default: 365, no limit: -1)
+C<max_age> - Maximum age (in days) of historical entries to keep (default: value of L</maintenance_history_days>, no limit: -1)
 
 =back
 
@@ -2057,7 +2057,7 @@ L</transform_seed>
 =back
 
 Randomizing these values has no effect on a loaded database. These are only used when a database is dumped.
-You normally do not need to call this method explicitly because the dumper does it explicitly by default.
+You normally do not need to call this method explicitly because the dumper does it for you by default.
 
 =head2 key
 

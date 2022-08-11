@@ -33,7 +33,7 @@ sub encode_base64($;$) {
     $output = SPVM::MIME::Base64->encode_base64($input);
   }
   else {
-    $output = SPVM::MIME::Base64->encode_base64_opt($input, $end_of_line);
+    $output = SPVM::MIME::Base64->encode_base64($input, $end_of_line);
   }
   
   return $output->to_bin;
@@ -80,7 +80,7 @@ sub encoded_base64_length($;$) {
     $length = SPVM::MIME::Base64->encoded_base64_length($input);
   }
   else {
-    $length = SPVM::MIME::Base64->encoded_base64_length_opt($input, $end_of_line);
+    $length = SPVM::MIME::Base64->encoded_base64_length($input, $end_of_line);
   }
   
   return $length;

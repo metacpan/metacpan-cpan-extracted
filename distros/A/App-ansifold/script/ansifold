@@ -1,10 +1,23 @@
 #!/usr/bin/env perl
 
-use v5.14;
+use strict;
 use warnings;
-use utf8;
 
-our $VERSION = "1.1101";
+BEGIN {
+    if ($0 =~ /expand$/) {   ## when executed as 'ansiexpand'
+	$App::ansifold::DEFAULT_WIDTH  = -1;
+	$App::ansifold::DEFAULT_EXPAND = -1;
+    }
+    elsif ($0 =~ /colrm$/) { ## when executed as 'ansicolrm'
+	$App::ansifold::DEFAULT_SEPARATE = "";
+	$App::ansifold::DEFAULT_COLRM    = 1;
+    }
+}
+
+use  App::ansifold;
+exit App::ansifold->new->run(splice @ARGV);
+
+__END__
 
 =encoding utf-8
 
@@ -20,6 +33,7 @@ ansifold [ options ]
           --boundary=word|space    Fold on word boundary
           --padding[=#]            Padding to margin space
           --padchar=_              Default padding character
+          --prefix=string          Set prefix string (default empty)
           --ambiguous=narrow|wide  Unicode ambiguous character handling
     -p    --paragraph              Print extra newline
           --separate=string        Set separator string (default newline)
@@ -33,189 +47,28 @@ ansifold [ options ]
           --tabhead=char           Tab-head character (default space)
           --tabspace=char          Tab-space character (default space)
           --tabstyle=style         Tab expansion style (shade, dot, symbol)
+          --colrm start [ end ]    colrm(1) command compatible
     -h    --help                   Show help message
     -v    --version                Show version
 
+ansiexpand [ options ]
+
+ansicolrm [ options ]
+
 =head1 VERSION
 
-Version 1.1101
-
-=cut
-
-use open IO => 'utf8', ':std';
-use Encode;
-map { $_ = decode 'utf8', $_ unless utf8::is_utf8($_) } @ARGV;
-
-use Pod::Usage;
-use List::Util qw(min);
-use Hash::Util qw(lock_keys);
-use Text::ANSI::Fold qw(:constants);
-use Data::Dumper;
-
-my $DEFAULT_WIDTH = 72;
-my $DEFAULT_EXPAND = 0;
-
-##
-## when executed as 'ansiexpand'
-##
-if ($0 =~ /expand$/) {
-    $DEFAULT_WIDTH = -1;
-    $DEFAULT_EXPAND = 1;
-}
-
-use Getopt::EX::Hashed 'has'; {
-
-    has width     => spec => ' w =s@ ' , default => [];
-    has boundary  => spec => '   =s  ' , default => 'none';
-    has padding   => spec => '   :s  ' , action => sub {
-	$_->{padding} = 1;
-	$_->{padchar} = $_[1] if $_[1] ne '';
-    };
-    has padchar   => spec => '   =s  ' ;
-    has ambiguous => spec => '   =s  ' ;
-    has paragraph => spec => ' p +   ' , default => 0;
-    has separate  => spec => '   =s  ' , default => '\n';
-    has linebreak => spec => '   =s  ' , alias   => 'lb';
-    has runin     => spec => '   =i  ' , min => 1, default => 4;
-    has runout    => spec => '   =i  ' , min => 1, default => 4;
-    has nonewline => spec => ' n     ' ;
-    has smart     => spec => ' s !   ' ;
-    has expand    => spec => ' x :-1 ' , default => $DEFAULT_EXPAND;
-    has tabstop   => spec => '   =i  ' , min => 1;
-    has tabhead   => spec => '   =s  ' ;
-    has tabspace  => spec => '   =s  ' ;
-    has tabstyle  => spec => '   =s  ' ;
-    has discard   => spec => '   =s@ ' , default => [];
-    has help      => spec => ' h     ' ;
-    has version   => spec => ' v     ' ;
-
-    has '+boundary'  => re => qr/^(none|word|space)$/;
-    has '+ambiguous' => re => qr/^(wide|narrow)$/ ;
-
-    has '+help' => action => sub {
-	pod2usage
-	    -verbose  => 99,
-	    -sections => [ qw(SYNOPSIS VERSION) ];
-    };
-
-    has '+version' => action  => sub {
-	print "Version: $VERSION\n";
-	exit;
-    };
-
-    has '+nonewline' => action  => sub {
-	$_{separate} = "";
-    };
-
-    has '+linebreak' =>
-	default => LINEBREAK_NONE,
-	action => sub {
-	    my($name, $value) = @_;
-	    $_->{$name} = do {
-		local $_ = $value;
-		my $v = LINEBREAK_NONE;
-		$v   |= LINEBREAK_ALL    if /all/i;
-		$v   |= LINEBREAK_RUNIN  if /runin/i;
-		$v   |= LINEBREAK_RUNOUT if /runout/i;
-		$v;
-	    };
-    };
-
-    has '+smart' =>
-	action => sub {
-	    my $smart = $_->{$_[0]} = $_[1];
-	    ($_->{boundary}, $_->{linebreak}) = do {
-		if ($smart) {
-		    ('word', LINEBREAK_ALL);
-		} else {
-		    ('none', LINEBREAK_NONE);
-		}
-	    };
-    };
-
-} no Getopt::EX::Hashed;
-
-use Getopt::EX::Long qw(:DEFAULT ExConfigure Configure);
-ExConfigure BASECLASS => [ __PACKAGE__, 'Getopt::EX' ];
-Configure "bundling";
-my $opt = Getopt::EX::Hashed->new() or die;
-$opt->getopt || pod2usage();
-
-my @width_map;
-my @width_index;
-
-use Getopt::EX::Numbers;
-my $numbers = Getopt::EX::Numbers->new;
-
-my @width = do {
-    map {
-	if    (/^$/)      { 0  }			# empty
-	elsif (/^-?\d+$/) { $_ }			# number
-	elsif (/^(-?[-\d:]+) (?:\{(\d+)\})? $/x) {	# a:b:c:d{e}
-	    ($numbers->parse($1)->sequence) x ($2 // 1);
-	}
-	else { die "$_: width format error.\n" }
-    }
-    map { split /,/, $_, -1 }
-    @{$opt->{width}};
-};
-
-$opt->{width} = do {
-    if    (@width == 0) { $DEFAULT_WIDTH }
-    elsif (@width == 1) { $width[0] }
-    else {
-	my @map = [ (int(pop @width)) x 2 ];
-	unshift @map, map { [ $_ < 0 ? (-$_, 0) : ($_, 1) ] } @width;
-	@width = map { $_->[0] } @map;
-	@width_index = grep { $map[$_][1] } 0 .. $#map;
-	\@width;
-    }
-};
-
-if ($opt->{expand} > 0) {
-    $opt->{tabstop} = $opt->{expand};
-}
-
-use charnames ':loose';
-for (@{$opt}{qw(tabhead tabspace)}) {
-    defined && length > 1 or next;
-    $_ = charnames::string_vianame($_) || die "$_: invalid name\n";
-}
-
-my $fold = Text::ANSI::Fold->new(
-    map  { $_ => $opt->{$_} }
-    grep { defined $opt->{$_} }
-    qw(width boundary padding padchar ambiguous
-       linebreak runin runout
-       expand tabstyle tabstop tabhead tabspace discard)
-    );
-
-my $separator = do {
-    $opt->{separate} =~ s{ ( \\ (.) ) } {
-	{ '\\' => '\\', n => "\n" }->{$2} // $1
-    }gexr;
-};
-
-while (<>) {
-    my $chomped = chomp;
-    my @chops = $fold->text($_)->chops;
-    if (@width_index > 0) {
-	@chops = grep { defined } @chops[@width_index];
-    }
-    print join $separator, @chops;
-    print "\n" if $chomped;
-    print "\n" x $opt->{paragraph} if $opt->{paragraph} > 0;
-}
-
-exit;
-
-__END__
+Version 1.1501
 
 =head1 DESCRIPTION
 
-B<ansifold> is a fold(1) compatible command utilizing
+B<ansifold> is a L<fold(1)> compatible command utilizing
 L<Text::ANSI::Fold> module, which enables to handle ANSI terminal
 sequences.
+
+When executed under the name of B<ansiexpand>, it works like
+L<expand(1)> command.  If the name is B<ansicolrm>, works like
+L<colrm(1)> command.  Because they are not installed automatically,
+make a symbolic link manually if you want.
 
 =head2 FOLD BY WIDTH
 
@@ -234,6 +87,8 @@ option.
 B<ansifold> handles Unicode multi-byte characters properly.  Option
 B<--ambiguous> takes I<wide> or I<narrow> and it specifies the visual
 width of Unicode ambiguous characters.
+
+If the width value is C<term>, it is replaced by the terminal width.
 
 =head2 MULTIPLE WIDTH
 
@@ -315,9 +170,17 @@ Option B<--separate> set separator string.
 
 Option B<-n> is a short-cut for C<--separate ''>.
 
-Option B<--paragraph> or B<-p> print extra newline after each lines.
+Option B<--paragraph> or B<-p> print extra newline after each line.
 This is convenient when a paragraph is made up of single line, like
 microsoft word document.
+
+=head2 PREFIX
+
+If a string is given by B<--prefix> option, that string is inserted at
+the beginning of each folded text.  This is convenient to produce
+indented text block.  Because the first line is not affected, insert
+appropiate prefix if necessary.  Originally made for
+L<App::Greple::frame> module.
 
 =head1 LINE BREAKING
 
@@ -332,7 +195,7 @@ Context of word is defined by option value; I<word> means
 alpha-numeric sequence, while I<space> means simply non-space
 printables.
 
-=head2 B<--linebreak>=I<all>|I<ruunin>|I<runout>|I<none>
+=head2 B<--linebreak>=I<all>|I<runin>|I<runout>|I<none>
 
 Option B<--linebreak> takes a value of I<all>, I<runin>, I<runout> or
 I<none>.  Default value is I<none>.
@@ -390,6 +253,16 @@ L<Text::ANSI::Fold> library.
 
     $ ansifold --expand --tabstyle=shade
 
+=head1 COLRM
+
+=head2 B<--colrm> [ start [ end ] ]
+
+Option B<--colrm> takes L<colrm(1)> command compatible arguments and
+implicitly set B<--separate> empty.  Next command behave exactly like
+C<colrm start end> and takes care of ANSI terminal sequences.
+
+    $ ansifold --colrm start end
+
 =head1 FILES
 
 =over 4
@@ -406,8 +279,6 @@ See L<Getopt::EX::Module> for format.
 =head2 CPANMINUS
 
     $ cpanm App::ansifold
-    or
-    $ curl -sL http://cpanmin.us | perl - App::ansifold
 
 =head1 SEE ALSO
 
@@ -429,11 +300,12 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2018- Kazumasa Utashiro
+Copyright 2018-2022 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
 
-#  LocalWords:  unicode ansifold LANG colrm KINSOKU
+#  LocalWords:  unicode ansifold LANG colrm KINSOKU ansiexpand
+#  LocalWords:  ansicolrm

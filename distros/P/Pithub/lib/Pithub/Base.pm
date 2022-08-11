@@ -1,15 +1,17 @@
 package Pithub::Base;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01037';
 # ABSTRACT: Github v3 base class for all Pithub modules
 
 use Moo;
+
+our $VERSION = '0.01039';
+
 use Carp qw( croak );
-use HTTP::Headers;
-use HTTP::Request;
+use HTTP::Headers ();
+use HTTP::Request ();
 use JSON::MaybeXS qw( JSON );
 use LWP::UserAgent ();
-use Pithub::Result;
+use Pithub::Result ();
 use URI ();
 
 with 'Pithub::Result::SharedCache';
@@ -223,7 +225,7 @@ sub request {
     }
 
     if ( $self->_token_required( $method, $path ) && !$self->has_token($request) ) {
-        croak sprintf "Access token required for: %s %s (%s)", $method, $path, $uri;
+        croak sprintf 'Access token required for: %s %s (%s)', $method, $path, $uri;
     }
 
     if ($options) {
@@ -255,24 +257,24 @@ sub request {
 sub _make_request {
     my($self, $request) = @_;
 
-    if( my $cached_response = $self->shared_cache->get($request->uri) ) {
+    my $cache_key = $request->uri->as_string;
+    if( my $cached_response = $self->shared_cache->get($cache_key) ) {
         # Add the If-None-Match header from the cache's ETag
         # and make the request
-        $request->header( "If-None-Match" => $cached_response->header("ETag") );
+        $request->header( 'If-None-Match' => $cached_response->header('ETag') );
         my $response = $self->ua->request($request);
 
         # Got 304 Not Modified, cache is still valid
         return $cached_response if ($response->code || 0) == 304;
 
         # The response changed, cache it and return it.
-        $self->shared_cache->set( $request->uri, $response );
+        $self->shared_cache->set( $cache_key, $response );
         return $response;
     }
-    else {
-        my $response = $self->ua->request($request);
-        $self->shared_cache->set( $request->uri, $response );
-        return $response;
-    }
+
+    my $response = $self->ua->request($request);
+    $self->shared_cache->set( $cache_key, $response );
+    return $response;
 }
 
 
@@ -311,6 +313,7 @@ sub _get_user_repo_args {
     return $args;
 }
 
+## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 sub _create_instance {
     my ( $self, $class, @args ) = @_;
 
@@ -319,7 +322,7 @@ sub _create_instance {
         auto_pagination => $self->auto_pagination,
         ua              => $self->ua,
         utf8            => $self->utf8,
-        @args
+        @args,
     );
 
     for my $attr (qw(repo token user per_page jsonp_callback prepare_request)) {
@@ -332,6 +335,7 @@ sub _create_instance {
 
     return $class->new(%args);
 }
+## use critic
 
 sub _request_for {
     my ( $self, $method, $uri, $data ) = @_;
@@ -397,12 +401,14 @@ sub _uri_for {
     return $uri;
 }
 
+## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 sub _validate_user_repo_args {
     my ( $self, $args ) = @_;
     $args = $self->_get_user_repo_args($args);
     croak 'Missing key in parameters: user' unless $args->{user};
     croak 'Missing key in parameters: repo' unless $args->{repo};
 }
+## use critic
 
 1;
 
@@ -418,7 +424,7 @@ Pithub::Base - Github v3 base class for all Pithub modules
 
 =head1 VERSION
 
-version 0.01037
+version 0.01039
 
 =head1 DESCRIPTION
 
@@ -664,8 +670,10 @@ See also: L<http://developer.github.com/v3/oauth/>
 
 =head2 ua
 
-By default a L<LWP::UserAgent> object, but it can be anything that
-implements the same interface.
+By default a L<LWP::UserAgent> object, but it can be anything that implements
+the same interface. For example, you could also use L<WWW::Mechanize::Cached>
+to cache requests on disk, so that subsequent runs of your app can run faster
+and be less likely to exceed rate limits.
 
 =head2 user
 

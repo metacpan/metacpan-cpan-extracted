@@ -2,7 +2,7 @@ use strict; use warnings;
 
 package Class::Observable;
 
-our $VERSION = '2.000';
+our $VERSION = '2.002';
 
 use Scalar::Util 'refaddr';
 use Class::ISA;
@@ -14,10 +14,7 @@ sub SET_DEBUG { $DEBUG = $_[0] }
 sub observer_log   { shift; $DEBUG && warn @_, "\n" }
 sub observer_error { shift; die @_, "\n" }
 
-
-my %O = ();
-
-my %registry;
+my ( %O, %registry );
 
 BEGIN {
 	require Config;
@@ -32,8 +29,7 @@ BEGIN {
 					my  $addr   = refaddr $invocant;
 					$O{ $addr } = $observers;
 					Scalar::Util::weaken( $registry{ $addr } = $invocant );
-				}
-				else {
+				} else {
 					$have_warned++ or warn
 						"*** Inconsistent state ***\n",
 						"Observed instances have gone away " .
@@ -41,8 +37,7 @@ BEGIN {
 				}
 			}
 		};
-	}
-	else {
+	} else {
 		*NEEDS_REGISTRY = sub () { 0 };
 	}
 }
@@ -54,20 +49,12 @@ sub DESTROY {
 	delete $O{ $addr || "::$invocant" };
 }
 
-
-# Add one or more observers (class name, object or subroutine) to an
-# observable thingy (class or object). Return new number of observers.
-
 sub add_observer {
 	my $invocant = shift;
 	my $addr = refaddr $invocant;
 	Scalar::Util::weaken( $registry{ $addr } = $invocant ) if NEEDS_REGISTRY and $addr;
 	push @{ $O{ $addr || "::$invocant" } }, @_;
 }
-
-
-# Remove one or more observers from an observable thingy. Return new
-# number of observers.
 
 sub delete_observer {
 	my $invocant = shift;
@@ -82,10 +69,6 @@ sub delete_observer {
 	scalar @$observers;
 }
 
-
-# Remove all observers from an observable thingy. Return number of
-# observers removed.
-
 sub delete_all_observers {
 	my $invocant = shift;
 	my $addr = refaddr $invocant;
@@ -94,14 +77,8 @@ sub delete_all_observers {
 	$removed ? scalar @$removed : 0;
 }
 
-
 # Backward compatibility
-
 *delete_observers = \&delete_all_observers;
-
-
-# Tell all observers that a state-change has occurred. No return
-# value.
 
 sub notify_observers {
 	for ( $_[0]->get_observers ) {
@@ -109,18 +86,13 @@ sub notify_observers {
 	}
 }
 
-
-# Retrieve *all* observers for a particular thingy. (See docs for what
-# *all* means.) Returns a list of observers
-
 my %supers;
 sub get_observers {
 	my ( @self, $class );
 	if ( my $pkg = ref $_[0] ) {
 		@self  = $_[0];
 		$class = $pkg;
-	}
-	else {
+	} else {
 		$class = $_[0];
 	}
 
@@ -133,10 +105,6 @@ sub get_observers {
 	map $_->get_direct_observers, @self, $class, @$cached_supers;
 }
 
-
-# Copy all observers from one item to another. This also copies
-# observers from parents.
-
 sub copy_observers {
 	my ( $src, $dst ) = @_;
 	my @observer = $src->get_observers;
@@ -144,11 +112,7 @@ sub copy_observers {
 	scalar @observer;
 }
 
-
 sub count_observers { scalar $_[0]->get_observers }
-
-
-# Return observers ONLY for the specified item
 
 sub get_direct_observers {
 	my $invocant = shift;
@@ -156,7 +120,6 @@ sub get_direct_observers {
 	my $observers = $O{ $addr || "::$invocant" } or return wantarray ? () : 0;
 	@$observers;
 }
-
 
 1;
 
@@ -544,8 +507,7 @@ Example:
      eval { $self->_remove_item_from_datastore };
      if ( $@ ) {
          $self->notify_observers( 'remove-fail', error_message => $@ );
-     }
-     else {
+     } else {
          $self->notify_observers( 'remove' );
      }
  }
@@ -688,14 +650,18 @@ L<Aspect|Aspect>
 
 =head1 AUTHOR
 
-Chris Winters <chris@cwinters.com>
+Aristotle Pagaltzis <pagaltzis@gmx.de>
+
+Chris Winters
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2002-2004 Chris Winters.
+This documentation is copyright (c) 2002-2004 Chris Winters.
+
+
 This software is copyright (c) 2021 by Aristotle Pagaltzis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
-=pod
+=cut

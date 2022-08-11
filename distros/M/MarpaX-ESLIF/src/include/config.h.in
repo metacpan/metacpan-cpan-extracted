@@ -14,6 +14,16 @@
 #  endif
 #endif
 
+/* Extremely hot functions must be totally without jumps to */
+/* other function calls. This attribute should be used with */
+/* extreme caution                                          */
+#cmakedefine C_GCC_FUNC_ATTRIBUTE_FLATTEN @C_GCC_FUNC_ATTRIBUTE_FLATTEN@
+#ifdef C_GCC_FUNC_ATTRIBUTE_FLATTEN
+#  define MARPAESLIF_FUNC_ATTRIBUTE_FLATTEN C_GCC_FUNC_ATTRIBUTE_FLATTEN
+#else
+#  define MARPAESLIF_FUNC_ATTRIBUTE_FLATTEN /* Define it to nothing */
+#endif
+
 #cmakedefine HAVE_SYS_TYPES_H  @HAVE_SYS_TYPES_H@
 #cmakedefine HAVE_STDINT_H     @HAVE_STDINT_H@
 #cmakedefine HAVE_STDDEF_H     @HAVE_STDDEF_H@

@@ -24,6 +24,8 @@ my %WriteMakefileArgs = (
 		'Carp'                => '0',
 		'File::Slurp'         => '0',
 		'Time::Piece'         => '0',
+		'MIME::Base64'        => '3.16',
+		'Gzip::Faster'        => '0.21',
 	},
 	dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean      => { FILES    => 'Sagan-Monitoring-*' },

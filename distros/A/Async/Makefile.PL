@@ -1,36 +1,44 @@
 use 5.006; use strict; use warnings;
 
-my $u = 'github.com/ap/Async';
+my $sc = q<https://github.com/ap/Async>;
+my $bt = q<https://rt.cpan.org/Public/Dist/Display.html?Name=Async>;
 
 my %META = (
 	name        => 'Async',
 	author      => 'Mark-Jason Dominus',
-	license     => 'unrestricted',
 	x_copyright => { holder => 'Mark-Jason Dominus', year => 2001 },
-	prereqs     => {
-		configure => { requires => {qw( ExtUtils::MakeMaker 0 )} },
-		build     => { requires => {qw( ExtUtils::MakeMaker 0 )} },
-		runtime   => {
-			requires => {qw( perl 5.006 )},
-			suggests => {qw( Storable 0 )},
-		},
-		test => { requires => {qw( Test::More 0 )} },
+	license     => 'unrestricted',
+	resources   => {
+		repository => { type => 'git', url => "$sc.git", web => $sc },
+		bugtracker => { web => $bt },
 	},
 	dynamic_config => 0,
-	resources      => {
-		repository => { type => 'git', url => "git://$u.git", web => "https://$u" },
-		bugtracker => { web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Async' },
+	prereqs => {
+		runtime => {
+			requires => {qw(
+				perl 5.006
+			)},
+			suggests => {qw(
+				Storable 0
+			)},
+		},
+		test => {
+			requires => {qw(
+				Test::More 0
+			)},
+		},
 	},
 );
 
 sub MY::postamble { -f 'META.yml' ? return : <<'' }
 create_distdir : MANIFEST
+distdir        : MANIFEST
 MANIFEST :
-	( echo MANIFEST ; git ls-files ':!README.pod' ':!.gitblameignore' . ) > MANIFEST
+	( git ls-files ':!README.pod' ':!.gitblameignore' ; echo MANIFEST ) > MANIFEST
 distdir : boilerplate
 .PHONY  : boilerplate
 boilerplate : distmeta
-	$(PERL) -Ilib boilerplate.pl $(DISTVNAME)
+	$(PERL) -Ilib inc/boilerplate.pl $(DISTVNAME)
 
 ## BOILERPLATE ###############################################################
 require ExtUtils::MakeMaker;
@@ -42,9 +50,11 @@ my $eumm_version  = eval $ExtUtils::MakeMaker::VERSION;
 my $mymeta        = $eumm_version >= 6.57_02;
 my $mymeta_broken = $mymeta && $eumm_version < 6.57_07;
 
+(my $basepath = (-d 'lib' && 'lib/') . $META{name}) =~ s{-}{/}g;
+
 ($MM_ARGS{NAME} = $META{name}) =~ s/-/::/g;
-($MM_ARGS{VERSION_FROM} = "$MM_ARGS{NAME}.pm") =~ s{::}{/}g; # NOTE no lib/ prefix for historical reasons
-$MM_ARGS{ABSTRACT_FROM} = $MM_ARGS{VERSION_FROM};
+$MM_ARGS{VERSION_FROM} = "$basepath.pm";
+$MM_ARGS{ABSTRACT_FROM} = -f "$basepath.pod" ? "$basepath.pod" : "$basepath.pm";
 $META{license} = [ $META{license} ]
 	if $META{license} && !ref $META{license};
 $MM_ARGS{LICENSE} = $META{license}[0]
@@ -66,7 +76,7 @@ for (qw(configure build test runtime)) {
 	defined $r->{$_} or delete $r->{$_} for keys %$r;
 }
 
-$MM_ARGS{MIN_PERL_VERSION} = delete $MM_ARGS{PREREQ_PM}{perl} || 0;
+$MM_ARGS{MIN_PERL_VERSION} = eval delete $MM_ARGS{PREREQ_PM}{perl} || 0;
 
 delete $MM_ARGS{MIN_PERL_VERSION}
 	if $eumm_version < 6.47_01;

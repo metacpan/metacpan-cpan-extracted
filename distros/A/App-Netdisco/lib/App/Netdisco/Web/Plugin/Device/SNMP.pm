@@ -34,23 +34,39 @@ ajax '/ajax/data/device/:ip/snmptree/:base' => require_login sub {
     my $base = param('base');
     $base =~ m/^\.1(\.\d+)*$/ or send_error('Bad OID Base', 404);
 
-    my $items = _get_snmp_data($device->ip, $base);
-
     content_type 'application/json';
+
+    return to_json [{
+      text => 'No data for this device. You can request a snapshot in the Details tab.',
+      children => \0,
+      state => { disabled => \1 },
+      icon => 'icon-search',
+    }] unless schema('netdisco')->resultset('DeviceSnapshot')->find($device->ip);
+
+    return to_json [{
+      text => 'No MIB data. Please run `~/bin/netdisco-do loadmibs`.',
+      children => \0,
+      state => { disabled => \1 },
+      icon => 'icon-search',
+    }] unless schema('netdisco')->resultset('SNMPObject')->count();
+
+    my $items = _get_snmp_data($device->ip, $base);
     to_json $items;
 };
 
-ajax '/ajax/data/device/:ip/typeahead' => require_login sub {
-    my $device = try { schema('netdisco')->resultset('Device')
-                                         ->find( param('ip') ) }
-       or send_error('Bad Device', 404);
-
+ajax '/ajax/data/snmp/typeahead' => require_login sub {
     my $term = param('term') or return to_json [];
-    $term = '%'. $term .'%';
 
-    my @found = schema('netdisco')->resultset('DeviceBrowser')
-      ->search({ leaf => { -ilike => $term }, ip => $device->ip },
-               { rows => 25, columns => 'leaf' })
+    my $device = param('ip');
+    my $deviceonly = param('deviceonly');
+    my $table = ($deviceonly ? 'DeviceBrowser' : 'SNMPObject');
+
+    my @found = schema('netdisco')->resultset($table)
+      ->search({ -or => [ oid => $term,
+                          oid => { -like => ($term .'.%') },
+                          leaf => { -ilike => ('%'. $term .'%') } ],
+                 (($deviceonly and $device) ? (ip => $device) : ()), },
+               { rows => 25, columns => 'leaf', order_by => 'oid_parts' })
       ->get_column('leaf')->all;
     return to_json [] unless scalar @found;
 
@@ -58,24 +74,24 @@ ajax '/ajax/data/device/:ip/typeahead' => require_login sub {
     to_json [ sort @found ];
 };
 
-ajax '/ajax/data/device/:ip/snmpnodesearch' => require_login sub {
-    my $device = try { schema('netdisco')->resultset('Device')
-                                         ->find( param('ip') ) }
-       or send_error('Bad Device', 404);
-
-    my $to_match = param('str');
+ajax '/ajax/data/snmp/nodesearch' => require_login sub {
+    my $to_match = param('str') or return to_json [];
     my $partial = param('partial');
-    my $excludeself = param('excludeself');
 
-    return to_json [] unless $to_match or length($to_match);
-    $to_match = $to_match . '%' if $partial;
     my $found = undef;
-
-    my $op = ($partial ? '-ilike' : '=');
-    $found = schema('netdisco')->resultset('DeviceBrowser')
-      ->search({ -or => [ oid => { $op => $to_match }, leaf => { $op => $to_match } ], ip => $device->ip },
-               { rows => 1, order_by => 'oid_parts' })->first;
-
+    if ($partial) {
+        $found = schema('netdisco')->resultset('SNMPObject')
+          ->search({ -or => [ oid => $to_match,
+                              oid => { -like => ($to_match .'.%') },
+                              leaf => { -ilike => ($to_match .'%') } ] },
+                   { rows => 1, order_by => 'oid_parts' })->first;
+    }
+    else {
+        $found = schema('netdisco')->resultset('SNMPObject')
+          ->search({ -or => [ oid => $to_match,
+                              leaf => $to_match ] },
+                   { rows => 1, order_by => 'oid_parts' })->first;
+    }
     return to_json [] unless $found;
 
     $found = $found->oid;
@@ -121,64 +137,40 @@ sub _get_snmp_data {
     my ($ip, $base, $recurse) = @_;
     my @parts = grep {length} split m/\./, $base;
 
-    # psql cannot cope with bind params and group by array element
-    # so we build a static query instead.
-
-    my $next_part  = (scalar @parts + 1);
-    my $child_part = (scalar @parts + 2);
-    my $query = <<QUERY;
-  SELECT db.oid_parts[$next_part] AS part,
-         count(distinct(db.oid_parts[$child_part])) as children
-    FROM device_browser db
-    WHERE db.ip = ?
-          AND db.oid LIKE ? || '.%'
-    GROUP BY db.oid_parts[$next_part]
-QUERY
-    my $rs = schema('netdisco')->resultset('Virtual::GenericReport')->result_source;
-    $rs->view_definition($query);
-    $rs->remove_columns($rs->columns);
-    $rs->add_columns(qw/part children/);
-
-    my %kids = map { ($base .'.'. $_->{part}) => $_ }
-                   schema('netdisco')->resultset('Virtual::GenericReport')
-                   ->search(undef, {
-                     result_class => 'DBIx::Class::ResultClass::HashRefInflator',
-                     bind => [$ip, $base],
-                   })->hri->all;
-
-    return [{
-      text => 'No SNMP data for this device.',
-      children => \0,
-      state => { disabled => \1 },
-      icon => 'icon-search',
-    }] unless scalar keys %kids;
-
     my %meta = map { ('.'. join '.', @{$_->{oid_parts}}) => $_ }
                schema('netdisco')->resultset('Virtual::FilteredSNMPObject')
                                  ->search({}, { bind => [
+                                     $ip,
+                                     (scalar @parts + 1),
+                                     (scalar @parts + 1),
                                      $base,
-                                     (scalar @parts + 1),
-                                     [[ map {$_->{part}} values %kids ]],
-                                     (scalar @parts + 1),
                                  ] })->hri->all;
 
     my @items = map {{
         id => $_,
-        text => ($meta{$_}->{leaf} .' ('. $kids{$_}->{part} .')'),
+        text => ($meta{$_}->{leaf} .' ('. $meta{$_}->{oid_parts}->[-1] .')'),
 
-        # for nodes with only one child, recurse to prefetch...
-        children => (($kids{$_}->{children} == 1)
-          ? _get_snmp_data($ip, ("${base}.". $kids{$_}->{part}), 1)
-          : ($kids{$_}->{children} ? \1 : \0)),
+        ($meta{$_}->{browser} ? (icon => 'icon-folder-close text-info')
+                              : (icon => 'icon-folder-close-alt muted')),
 
+        (scalar @{$meta{$_}->{index}}
+          ? (icon => 'icon-th'.($meta{$_}->{browser} ? ' text-info' : ' muted')) : ()),
+
+        (($meta{$_}->{num_children} == 0 and ($meta{$_}->{type}
+                                              or $meta{$_}->{access} =~ m/^(?:read|write)/
+                                              or $meta{$_}->{oid_parts}->[-1] == 0))
+          ? (icon => 'icon-leaf'.($meta{$_}->{browser} ? ' text-info' : ' muted')) : ()),
+
+        # jstree will async call to expand these, and while it's possible
+        # for us to prefetch by calling _get_snmp_data() and passing to
+        # children, it's much slower UX. async is better for search especially
+        children => ($meta{$_}->{num_children} ? \1 : \0),
+  
         # and set the display to open to show the single child
-        state => { opened => ( ($recurse or $kids{$_}->{children} == 1)
-          ? \1
-          : \0 ) },
+        # but only if there is data below
+        state => { opened => (($meta{$_}->{browser} and $meta{$_}->{num_children} == 1) ? \1 : \0 ) },
 
-        ($kids{$_}->{children} ? () : (icon => 'icon-leaf')),
-        (scalar @{$meta{$_}->{index}} ? (icon => 'icon-th') : ()),
-      }} sort {$kids{$a}->{part} <=> $kids{$b}->{part}} keys %kids;
+      }} sort {$meta{$a}->{oid_parts}->[-1] <=> $meta{$b}->{oid_parts}->[-1]} keys %meta;
 
     return \@items;
 }

@@ -4,21 +4,24 @@
       "Aristotle Pagaltzis <pagaltzis@gmx.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Class-Closure",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
+      "build" : {},
+      "configure" : {},
       "runtime" : {
          "requires" : {
             "Carp" : "0",
@@ -27,9 +30,7 @@
             "PadWalker" : "0",
             "Sentinel" : "0",
             "Symbol" : "0",
-            "perl" : "5.006",
-            "strict" : "0",
-            "warnings" : "0"
+            "perl" : "5.006"
          }
       },
       "test" : {
@@ -43,14 +44,21 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/ap/Class-Closure/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Closure"
       },
-      "homepage" : "http://github.com/ap/Class-Closure",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ap/Class-Closure"
+         "url" : "https://github.com/ap/Class-Closure.git",
+         "web" : "https://github.com/ap/Class-Closure"
       }
    },
-   "version" : "0.302"
+   "version" : "0.303",
+   "x_copyright" : {
+      "holder" : "Aristotle Pagaltzis",
+      "year" : 2015
+   },
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }
-

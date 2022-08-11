@@ -31,7 +31,7 @@ sub _build_config {
           <$fh>;
         };
          eval {
-            $config = JSON->new()->decode($content);
+            $config = decode_json($content);
         };
         if ($@ || !$config || !ref $config) {
             $self->log()->error('Proxy::JSON error parsing content from file '.$file);
@@ -65,7 +65,7 @@ available via the accessor methods.
 
 If the file could not be loaded this connector returns undef for all requests.
 
-B<Note>: Changes made to the YAML file after the connector was first 
+B<Note>: Changes made to the JSON file after the connector was first
 initialized will not be visible as the file is read once on startup and
 persited into memory.
 

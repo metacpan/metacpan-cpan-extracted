@@ -13,10 +13,12 @@ my $obj = Locale::Utils::PluralForms->new(
     all_plural_forms => {
         en => {
             english_name => 'English',
+            # bool construct of plural will be converted into interger 0/1                                        
             plural_forms => 'nplurals=2; plural=(n != 1)',
         },
         ru => {
             english_name => 'Russian',
+            # bool construct of plural will be converted into interger 0/1
             plural_forms => 'nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)',
         },
     },
@@ -50,8 +52,6 @@ for (0 .. 2, 5, 100 .. 102, 105, 110 .. 112, 115, 120 .. 122, 125) { ## no criti
         $_,
         $plural_code->($_),
 }
-
-# $Id: 02_plural_forms_from_data_struct.pl 384 2011-11-13 13:27:02Z steffenw $
 
 __END__
 

@@ -38,10 +38,10 @@ for (
 
 $valid{ $_ } = 1 for 46, 126;
 for (
-	[ 'shorter value', 'a' x 42, 'bad code_challenge length: 42 (must be 43 (min) to 128 (max))' ],
+	[ 'shorter value', 'a' x 42, 'bad code_verifier length: 42 (must be 43 (min) to 128 (max))' ],
 	[ 'correct value', 'a' x 60 ],
-	[ 'longer value',  'a' x 129, 'bad code_challenge length: 129 (must be 43 (min) to 128 (max))' ],
-	( map [ ( sprintf 'character 0x%02X', $_ ), ( sprintf '%%%02X%042d', $_, 0 ), $valid{ $_ } ? () : ( sprintf 'bad character in code_challenge: 0x%02X at position 0', $_ ) ], 0 .. 255 ),
+	[ 'longer value',  'a' x 129, 'bad code_verifier length: 129 (must be 43 (min) to 128 (max))' ],
+	( map [ ( sprintf 'character 0x%02X', $_ ), ( sprintf '%%%02X%042d', $_, 0 ), $valid{ $_ } ? () : ( sprintf 'bad character in code_verifier: 0x%02X at position 0', $_ ) ], 0 .. 255 ),
 ) {
 	my ( $desc, $v, $error ) = @$_;
 	my $req = Net::OAuth2Server::Request::Token::AuthorizationCode->from(

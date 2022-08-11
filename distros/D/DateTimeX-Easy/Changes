@@ -3,10 +3,7 @@ TODO:
     - Perform multiple conversions in one call (via [])
 
 0.089:
-    - Non-development release without DateManip dependency
-
-0.088_1:
-    - Remove DateTime::Format::DateManip from dependencies due to instability in that package and its dependencies (thanks jjn1056)
+    - Remove DateTime::Format::DateManip from dependencies due to instability in that package and its dependencies.
 
 0.088:
     - Remove DateTime::Format::DateParse from dependencies as fails lots of tests and not used (thanks ranguard)

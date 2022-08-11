@@ -49,6 +49,14 @@ sub build_self {
 
 # METHODS
 
+sub as {
+  my ($self, $name) = @_;
+
+  my $method = "as_${name}";
+
+  return (ref $self ? $self : $self->new)->$method;
+}
+
 sub explain {
   my ($self) = @_;
 
@@ -121,6 +129,14 @@ sub frames {
   my ($self) = @_;
 
   return $self->{'$frames'} //= [];
+}
+
+sub is {
+  my ($self, $name) = @_;
+
+  my $method = "is_${name}";
+
+  return (ref $self ? $self: $self->new)->$method ? 1 : 0;
 }
 
 sub throw {

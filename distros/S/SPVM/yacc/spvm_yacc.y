@@ -34,7 +34,7 @@
 %type <opval> method anon_method opt_args args arg has use require alias our
 %type <opval> opt_descriptors descriptors
 %type <opval> opt_statements statements statement if_statement else_statement 
-%type <opval> for_statement while_statement 
+%type <opval> for_statement while_statement foreach_statement
 %type <opval> switch_statement case_statement case_statements opt_case_statements default_statement
 %type <opval> block eval_block init_block switch_block if_require_statement
 %type <opval> unary_operator binary_operator comparison_operator isa
@@ -42,7 +42,7 @@
 %type <opval> array_access field_access weaken_field unweaken_field isweak_field convert array_length
 %type <opval> assign inc dec allow has_impl
 %type <opval> new array_init die opt_extends
-%type <opval> var_decl var interface
+%type <opval> var_decl var interface union_type
 %type <opval> operator opt_operators operators opt_operator logical_operator
 %type <opval> field_name method_name class_name class_alias_name is_read_only
 %type <opval> type qualified_type basic_type array_type
@@ -472,6 +472,7 @@ statements
 statement
   : if_statement
   | for_statement
+  | foreach_statement
   | while_statement
   | block
   | switch_statement
@@ -528,6 +529,16 @@ for_statement
   : FOR '(' opt_operator ';' operator ';' opt_operator ')' block
     {
       $$ = SPVM_OP_build_for_statement(compiler, $1, $3, $5, $7, $9);
+    }
+
+foreach_statement
+  : FOR var_decl '(' '@' operator ')' block
+    {
+      $$ = SPVM_OP_build_foreach_statement(compiler, $1, $2, $5, $7);
+    }
+  | FOR var_decl '(' '@' '{' operator '}' ')' block
+    {
+      $$ = SPVM_OP_build_foreach_statement(compiler, $1, $2, $6, $9);
     }
 
 while_statement
@@ -801,9 +812,9 @@ unary_operator
     {
       $$ = SPVM_OP_build_unary_op(compiler, $1, $2);
     }
-  | REFCNT var
+  | REFCNT operator
     {
-      $$ = SPVM_OP_build_unary_op(compiler, $1, $2);
+      $$ = SPVM_OP_build_unary_op_var(compiler, $1, $2);
     }
   | REFOP operator
     {
@@ -819,11 +830,11 @@ unary_operator
     }
   | DEREF var
     {
-      $$ = SPVM_OP_build_unary_op(compiler, $1, $2);
+      $$ = SPVM_OP_build_unary_op_var(compiler, $1, $2);
     }
-  | CREATE_REF var
+  | CREATE_REF operator
     {
-      $$ = SPVM_OP_build_unary_op(compiler, $1, $2);
+      $$ = SPVM_OP_build_unary_op_var(compiler, $1, $2);
     }
   | NEW_STRING_LEN operator
     {
@@ -1329,11 +1340,31 @@ opt_type_comment
   | type_comment
 
 type_comment
-  : OF type
+  : OF union_type
     {
       $$ = $2;
     }
-    
+
+union_type
+  : union_type BIT_OR type
+    {
+      SPVM_OP* op_list;
+      if ($1->id == SPVM_OP_C_ID_LIST) {
+        op_list = $1;
+      }
+      else {
+        op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
+        SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
+      }
+      SPVM_OP_insert_child(compiler, op_list, op_list->last, $3);
+      
+      $$ = op_list;
+    }
+  | type
+    {
+      $$ = $1;
+    }
+
 field_name
   : SYMBOL_NAME
 

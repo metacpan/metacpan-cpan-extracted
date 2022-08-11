@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 use strict;
 use Test::More;
 
@@ -20,7 +22,5 @@ BEGIN {
 		ok( !$e, "Local::Role$i compiled ok" ) or diag( "Got: $e" );
 	}
 };
-
-ok 1;
 
 done_testing;

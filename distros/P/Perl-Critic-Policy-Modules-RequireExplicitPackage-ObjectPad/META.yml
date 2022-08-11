@@ -1,0 +1,53 @@
+---
+abstract: 'Always make the package/Object::Pad class explicit.'
+author:
+  - 'DERIV <DERIV@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  PPI: '0'
+  Scalar::Util: '0'
+  Test::CheckDeps: '0.010'
+  Test::More: '0.98'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-Policy-Modules-RequireExplicitPackage-ObjectPad
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Perl::Critic::Policy::Modules::RequireExplicitPackage::ObjectPad:
+    file: lib/Perl/Critic/Policy/Modules/RequireExplicitPackage/ObjectPad.pm
+    version: '0.001'
+requires:
+  Class::Method::Modifiers: '2.13'
+  Perl::Critic::Policy::Modules::RequireExplicitPackage: '1.134'
+  indirect: '0.37'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/binary-com/perl-Perl-Critic-Policy-Modules-RequireExplicitPackage-ObjectPad/issues
+  homepage: https://github.com/binary-com/perl-Perl-Critic-Policy-Modules-RequireExplicitPackage-ObjectPad
+  repository: https://github.com/binary-com/perl-Perl-Critic-Policy-Modules-RequireExplicitPackage-ObjectPad.git
+version: '0.001'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'chylli-binary <chylli@binary.com>'
+  - 'Raunak Kathuria <raunakkathuria@gmail.com>'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

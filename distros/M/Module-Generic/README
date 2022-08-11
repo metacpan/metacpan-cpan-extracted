@@ -58,7 +58,7 @@ SYNOPSIS
         }
 
 VERSION
-        v0.25.0
+        v0.27.1
 
 DESCRIPTION
     Module::Generic as its name says it all, is a generic module to inherit
@@ -244,6 +244,70 @@ METHODS
 
         print( $o->coloured( 'underline rgba(255, 0, 0, 0.5)', "Hello everyone!" ), "\n" );
 
+  deserialise
+        my $ref = $self->deserialise( %hash_of_options );
+        my $ref = $self->deserialise( $hash_reference_of_options );
+        my $ref = $self->deserialise( $serialised_data, %hash_of_options );
+        my $ref = $self->deserialise( $serialised_data, $hash_reference_of_options );
+
+    This method deserialise data previously serialised by either CBOR,
+    Sereal or Storable.
+
+    It takes an hash or hash reference of options. You can also provide the
+    data to deserialise as the first argument followed by an hash or hash
+    reference of options.
+
+    The supported options are:
+
+    "base64"
+        Thise can be set to a true value like 1, or to your preferred base64
+        encoder/decoder, or to an array reference containing 2 code
+        references, the first one for encoding and the second one for
+        decoding.
+
+        If this is set simply to a true value, "deserialise" will call
+        "_has_base64" to find out any installed base64 modules. Currently
+        the ones supported are: Crypt::Misc and MIME::Base64. Of course, you
+        need to have one of those modules installed first before it can be
+        used.
+
+        If this option is set and no appropriate module could be found,
+        "deserialise" will return an error.
+
+    "data"
+        Data to be deserialised.
+
+    "file"
+        Provides a file path from which to read the serialised data.
+
+    "io"
+        A filehandle to read the data to deserialise from. This option only
+        works with Storable
+
+    "serialiser"
+        Specify the class name of the serialiser to use. Supported
+        serialiser can either be "CBOR" or CBOR::XS, Sereal and Storable
+
+        If the serialiser is CBOR::XS the following additional options are
+        supported: "max_depth", "max_size", "allow_unknown",
+        "allow_sharing", "allow_cycles", "forbid_objects", "pack_strings",
+        "text_keys", "text_strings", "validate_utf8", "filter"
+
+        See CBOR::XS for detail on those options.
+
+        If the serialiser is Sereal, the following additional options are
+        supported: "refuse_snappy", "refuse_objects", "no_bless_objects",
+        "validate_utf8", "max_recursion_depth", "max_num_hash_entries",
+        "max_num_array_entries", "max_string_length",
+        "max_uncompressed_size", "incremental", "alias_smallint",
+        "alias_varint_under", "use_undef", "set_readonly",
+        "set_readonly_scalars"
+
+        See Sereal for detail on those options.
+
+  deserialize
+    Alias for "deserialise"
+
   debug
     Set or get the debug level. This takes and return an integer.
 
@@ -310,6 +374,12 @@ METHODS
     *   CBOR: "max_depth", "max_size", "allow_unknown", "allow_sharing",
         "allow_cycles", "forbid_objects", "pack_strings", "text_keys",
         "text_strings", "validate_utf8", "filter"
+
+    *   JSON: "allow_blessed" "allow_nonref" "allow_unknown" "allow_tags"
+        "ascii" "boolean_values" "canonical" "convert_blessed"
+        "filter_json_object" "filter_json_single_key_object" "indent"
+        "latin1" "max_depth" "max_size" "pretty" "relaxed" "space_after"
+        "space_before" "utf8"
 
     *   "decode" in Sereal::Decoder if the serialiser is Sereal:
         "alias_smallint", "alias_varint_under", "incremental",
@@ -991,6 +1061,22 @@ METHODS
         Boolean. If true, the serialised data will be appended to the given
         file. This works only in conjonction with *file*
 
+    *   *base64*
+
+        Thise can be set to a true value like 1, or to your preferred base64
+        encoder/decoder, or to an array reference containing 2 code
+        references, the first one for encoding and the second one for
+        decoding.
+
+        If this is set simply to a true value, "serialise" will call
+        "_has_base64" to find out any installed base64 modules. Currently
+        the ones supported are: Crypt::Misc and MIME::Base64. Of course, you
+        need to have one of those modules installed first before it can be
+        used.
+
+        If this option is set and no appropriate module could be found,
+        "serialise" will return an error.
+
     *   *file*
 
         String. A file path where to store the serialised data.
@@ -1018,6 +1104,12 @@ METHODS
     *   CBOR: "max_depth", "max_size", "allow_unknown", "allow_sharing",
         "allow_cycles", "forbid_objects", "pack_strings", "text_keys",
         "text_strings", "validate_utf8", "filter"
+
+    *   JSON: "allow_blessed" "allow_nonref" "allow_unknown" "allow_tags"
+        "ascii" "boolean_values" "canonical" "convert_blessed"
+        "filter_json_object" "filter_json_single_key_object" "indent"
+        "latin1" "max_depth" "max_size" "pretty" "relaxed" "space_after"
+        "space_before" "utf8"
 
     *   "encode" in Sereal::Decoder if the serialiser is Sereal:
         "aliased_dedupe_strings", "canonical", "canonical_refs", "compress",
@@ -1113,6 +1205,23 @@ SUPPORT METHODS
     instantiated upon success or undef and sets an "error"
 
     This is a support method used by "_instantiate_object"
+
+  _has_base64
+    Provided with a value and this returns an array reference containing 2
+    code references: one for encoding and one for decoding.
+
+    Value provided can be a simple true value, such as 1, and then
+    "_has_base64" will check if Crypt::Misc and MIME::Base64 are installed
+    on the system and will use in priority MIME::Base64
+
+    The value provided can also be an array reference already containing 2
+    code references, and in such case, that value is simply returned.
+    Nothing more is done.
+
+    Finally, the value provided can be a module class name. "_has_base64"
+    knows only of Crypt::Misc and MIME::Base64, so if you want to use any
+    other one, arrange yourself to pass to "_has_base64" an array reference
+    of 2 code references as explained above.
 
   _instantiate_object
     This does the same thing as "__instantiate_object" and the purpose is
@@ -2232,10 +2341,10 @@ SERIALISATION
     Even the IO modules like Module::Generic::File::IO and
     Module::Generic::Scalar::IO can be serialised and deserialised if the
     methods "FREEZE" and "THAW" are used. By design the methods
-    "STORABLE_freeze" and "STORABLE_thaw" are not implemented because it
-    would trigger a Storable exception "Unexpected object type (8) in
-    store_hook()". Instead it is strongly encouraged you use the improved
-    Storable::Improved which addresses and mitigate those issues.
+    "STORABLE_freeze" and "STORABLE_thaw" are not implemented in those
+    modules because it would trigger a Storable exception "Unexpected object
+    type (8) in store_hook()". Instead it is strongly encouraged you use the
+    improved Storable::Improved which addresses and mitigate those issues.
 
     For serialisation with Sereal, make sure to instantiate the Sereal
     encoder with the "freeze_callbacks" option set to true, otherwise,
@@ -2243,6 +2352,15 @@ SERIALISATION
 
     See "FREEZE/THAW CALLBACK MECHANISM" in Sereal::Encoder for more
     information.
+
+    For CBOR, it is recommended to use the option "allow_sharing" to enable
+    the reuse of references, such as:
+
+        my $cbor = CBOR::XS->new->allow_sharing;
+
+    Also, if you use the option "allow_tags" with JSON, then all of those
+    modules will work too, since this option enables support for the
+    "FREEZE" and "THAW" methods.
 
 SEE ALSO
     Module::Generic::Exception, Module::Generic::Array,

@@ -466,6 +466,26 @@ $test->for('example', 2, 'base', sub {
   $result
 });
 
+=example-3 base
+
+  package User;
+
+  use base 'Venus::Core';
+
+  User->BASE('Manager');
+
+  # Exception! "Can't locate Manager.pm in @INC"
+
+=cut
+
+$test->for('example', 3, 'base', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error->result;
+  ok $result =~ qr/Can't locate Manager\.pm in \@INC/;
+
+  $result
+});
+
 =method bless
 
 The BLESS method is an object construction lifecycle hook which returns an
@@ -552,6 +572,80 @@ $test->for('example', 3, 'bless', sub {
   ok exists $result->{name};
   ok $result->{name} eq 'Elliot';
   ok $result->name eq 'Elliot';
+
+  $result
+});
+
+=example-4 bless
+
+  package List;
+
+  use base 'Venus::Core';
+
+  sub ARGS {
+    my ($self, @args) = @_;
+
+    return @args
+      ? ((@args == 1 && ref $args[0] eq 'ARRAY') ? @args : [@args])
+      : $self->DATA;
+  }
+
+  sub DATA {
+    my ($self, $data) = @_;
+
+    return $data ? [@$data] : [];
+  }
+
+  package main;
+
+  my $list = List->BLESS(1..4);
+
+  # bless([1..4], 'List')
+
+=cut
+
+$test->for('example', 4, 'bless', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('List');
+  is_deeply $result, [1..4];
+
+  $result
+});
+
+=example-5 bless
+
+  package List;
+
+  use base 'Venus::Core';
+
+  sub ARGS {
+    my ($self, @args) = @_;
+
+    return @args
+      ? ((@args == 1 && ref $args[0] eq 'ARRAY') ? @args : [@args])
+      : $self->DATA;
+  }
+
+  sub DATA {
+    my ($self, $data) = @_;
+
+    return $data ? [@$data] : [];
+  }
+
+  package main;
+
+  my $list = List->BLESS([1..4]);
+
+  # bless([1..4], 'List')
+
+=cut
+
+$test->for('example', 5, 'bless', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('List');
+  is_deeply $result, [1..4];
 
   $result
 });
@@ -819,7 +913,7 @@ the last reference to the object goes away.
 
   undef $user;
 
-  # 0
+  # undef
 
 =cut
 
@@ -1177,6 +1271,53 @@ $test->for('example', 1, 'meta', sub {
   is_deeply [sort @{$result->roles}], ['Admin', 'HasType'];
 
   $result
+});
+
+=method mixin
+
+The MIXIN method is a class building lifecycle hook which consumes the mixin
+provided, automatically invoking the mixin's L</IMPORT> hook. The role
+composition semantics are as follows: Routines to be consumed must be
+explicitly declared via the L</EXPORT> hook. Routines will be copied to the
+consumer even if they already exist. If multiple roles are consumed having
+routines with the same name (i.e. naming collisions) the last routine copied
+wins.
+
+=signature mixin
+
+  MIXIN(Str $name) (Str | Object)
+
+=metadata mixin
+
+{
+  since => '1.02',
+}
+
+=example-1 mixin
+
+  package Action;
+
+  use base 'Venus::Core';
+
+  package User;
+
+  use base 'Venus::Core';
+
+  User->MIXIN('Action');
+
+  package main;
+
+  my $admin = User->DOES('Action');
+
+  # 0
+
+=cut
+
+$test->for('example', 1, 'mixin', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+
+  !$result
 });
 
 =method name

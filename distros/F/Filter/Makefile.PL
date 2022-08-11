@@ -115,6 +115,16 @@ sub MY::libscan
 #' ;
 #}
 
+sub MY::depend {
+  "
+release : test dist
+	-git tag -f \$(VERSION)
+	cpan-upload \$(DISTVNAME).tar\$(SUFFIX)
+	git push
+	git push --tags
+";
+}
+
 sub oldWarnings
 {
     local ($^I) = ".bak" ;

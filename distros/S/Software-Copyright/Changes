@@ -1,3 +1,7 @@
+0.004 2022-08-11
+
+    * dist.ini: removed unused plugin
+
 0.003 2022-07-25
 
     * add missing MouseX::NativeTraits dependency

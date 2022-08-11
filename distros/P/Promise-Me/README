@@ -108,7 +108,7 @@ SYNOPSIS
         }
 
 VERSION
-        v0.3.0
+        v0.4.0
 
 DESCRIPTION
     Promise::Me is an implementation of the JavaScript promise using fork
@@ -266,7 +266,7 @@ METHODS
         my $p = Promise::Me->new(sub
         {
             # some code to run asynchronously
-        }, { debug => 4, result_shared_mem_size => 2097152, timeout => 2 });
+        }, { debug => 4, result_shared_mem_size => 2097152, shared_vars_mem_size => 65536, timeout => 2 });
 
     Instantiate a new "Promise::Me" object.
 
@@ -304,8 +304,28 @@ METHODS
 
     *result_shared_mem_size* integer
         Sets the shared memory segment to store the asynchronous process
-        results. This default to the value of the constant
-        "Module::Generic::SharedMem::SHM_BUFSIZ", which is 64K bytes.
+        results. This default to the value of the global variable
+        $RESULT_MEMORY_SIZE, which is by default 512K bytes, or if empty or
+        not defined, the value of the constant
+        "Module::Generic::SharedMemXS::SHM_BUFSIZ", which is 64K bytes.
+
+    serialiser
+        String. Specify the serialiser to use for Promise::Me. Possible
+        values are: cbor, sereal or storable
+
+        By default, the value is set to the global variable $SERIALISER,
+        which defaults to "storable"
+
+        This value is passed to Module::Generic::File::Mmap,
+        Module::Generic::File::Cache, or Module::Generic::SharedMemXS
+        depending on your choice of shared memory medium.
+
+    *shared_vars_mem_size* integer
+        Sets the shared memory segment to store the shared variable data,
+        i.e. the ones declared with "shared". This defaults to the value of
+        the global variable $SHARED_MEMORY_SIZE, which is by default 64K
+        bytes, or if empty or not defined, the value of the constant
+        "Module::Generic::SharedMemXS::SHM_BUFSIZ", which is 64K bytes.
 
     *timeout* integer
         Currently unused.
@@ -319,8 +339,20 @@ METHODS
         You can use the global package variable $SHARE_MEDIUM to set the
         default value for all object instantiation.
 
-        $SHARE_MEDIUM value can be either "memory" for shared memory or
-        "file" for shared cache file.
+        $SHARE_MEDIUM value can be either "memory" for shared memory, "mmap"
+        for cache mmap or "file" for shared cache file.
+
+    *use_mmap*
+        Boolean. If true, Promise::Me will use a cache mmap file with
+        Module::Generic::File::Mmap instead of a shared memory block.
+        However, please note that you need to have installed Cache::FastMmap
+        in order to use this.
+
+        You can use the global package variable $SHARE_MEDIUM to set the
+        default value for all object instantiation.
+
+        $SHARE_MEDIUM value can be either "memory" for shared memory, "mmap"
+        for cache mmap or "file" for shared cache file.
 
   catch
     This takes a code reference as its unique argument and is added to the
@@ -373,6 +405,13 @@ METHODS
 
     Thus, unless the value returned is 1 element and it is a reference, it
     will be made of an array reference.
+
+  serialiser
+    String. Sets or gets the serialiser to use for Promise::Me. Possible
+    values are: cbor, sereal or storable
+
+    By default, the value is set to the global variable $SERIALISER, which
+    defaults to "storable"
 
   then
     This takes a code reference as its unique argument and is added to the
@@ -547,7 +586,13 @@ EXPORTED FUNCTIONS
         });
 
     It will try to use shared memory or shared cache file depending on the
-    value of the global package variable $SHARE_MEDIUM
+    value of the global package variable $SHARE_MEDIUM, which can be either
+    "file" for Module::Generic::File::Cache, "mmap" for
+    Module::Generic::File::Mmap or "memory" for
+    Module::Generic::File::SharedMem
+
+    The value of $SHARED_MEMORY_SIZE, and $SERIALISER will be passed when
+    instantiating objects for those shared memory medium.
 
   unlock
     This unlocks a shared variable. It has no effect on variable that have
@@ -653,9 +698,11 @@ INTERNAL METHODS
         });
 
   shared_mem
-    This returns the Module::Generic::SharedMem object used for sharing data
-    and result between the main parent process and the asynchronous child
-    process.
+    This returns the object used for sharing data and result between the
+    main parent process and the asynchronous child process. It can be
+    Module::Generic::SharedMemXS, Module::Generic::File::Mmap or
+    Module::Generic::File::Cache depending on the value of $SHARE_MEDIUM,
+    which can be set to, respectively, "memory", "mmap" or "file"
 
   shared_space_destroy
     Boolean. Default to true. If true, the shared space used by the parent
@@ -761,10 +808,17 @@ SHARED VARIABLES
     Otherwise the two keywords would conflict.
 
 SHARED MEMORY
-    This module uses shared memory using perl core functions, or shared
-    cache file using Module::Generic::File::Cache if shared memory is not
-    supported, or if the value of the global package variable $SHARE_MEDIUM
-    is set to "file" instead of "memory"
+    This module uses shared memory using Module::Generic::SharedMemXS, or
+    shared cache file using Module::Generic::File::Cache if shared memory is
+    not supported, or if the value of the global package variable
+    $SHARE_MEDIUM is set to "file" instead of "memory". Alternatively you
+    can also have Promise::Me use cache mmap file by setting $SHARE_MEDIUM
+    to "mmap". This will have it use Module::Generic::File::Mmap, but note
+    that you will need to install Cache::FastMmap
+
+    The value of $SHARE_MEDIUM is automatically initialised to "memory" if
+    the system, on which this module runs, supports IPC::SysV, or "mmap" if
+    you have Cache::FastMmap installed, or else to "file"
 
     Shared memory is used for:
 
@@ -777,11 +831,16 @@ SHARED MEMORY
     bytes.
     2. setting the option *result_shared_mem_size* when instantiating a new
     "Promise::Me" object. If not set, this will default to
-    Module::Generic::SharedMem::SHM_BUFSIZ constant value which is 64K
+    Module::Generic::SharedMemXS::SHM_BUFSIZ constant value which is 64K
     bytes.
         If you use shared cache file, then not setting a size is ok. It will
         use the space on the filesystem as needed and obviously return an
         error if there is no space left.
+
+        You can alternatively use Module::Generic::File::Mmap, which has an
+        API similar to Module::Generic::File::Cache, but uses an mmap file
+        instead of a simple cache file and rely on the XS module
+        Cache::FastMmap, and thus is faster.
 
 CONCURRENCY
     Because Promise::Me forks a separate process to run the code provided in
@@ -815,6 +874,63 @@ CONCURRENCY
         Promise 2: result is now: 'John '
         Promise 1: result is now: 'John Peter '
         Result is: 'John Peter '
+
+CLASS VARIABLE
+  $RESULT_MEMORY_SIZE
+    This is the size in bytes of the shared memory block used for sharing
+    result between sub process and main process, such as when you call:
+
+        my $res = $prom->result;
+
+    It defaults to 512Kb
+
+  $SERIALISER
+    A string representing the serialiser to use by default. A serialiser is
+    used to serialiser data to share them between processes. This defaults
+    to "storable"
+
+    Currently supported serialisers are: CBOR::XS, Sereal and Storable
+
+    You can set accordingly the value for $SERIALISER to: "cbor", "sereal"
+    or "storable"
+
+    You can override this global value when you instantiate a new
+    Promise::Me object with the "serialiser" option. See "new"
+
+    Note that the serialiser used to serialise shared variable, is set only
+    via this class variable $SERIALISER
+
+  $SHARE_MEDIUM
+    The value of $SHARE_MEDIUM is automatically initialised to "memory" if
+    the system, on which this module runs, supports IPC::SysV, or "mmap" if
+    you have Cache::FastMmap installed, or else to "file"
+
+  $SHARED_MEMORY_SIZE
+    This is the size in bytes of the shared memory block used for sharing
+    variables between the main process and the sub processes. This is used
+    when you share variables, such as:
+
+        my $name : shared;
+        my( $name, %prefs, @middle_names );
+        share( $name, %prefs, @middle_names );
+
+    See "SHARED VARIABLES"
+
+SERIALISATION
+    Promise::Me uses the following supported serialiser to serialise shared
+    data across processes:
+
+    *   CBOR
+
+    *   Sereal
+
+    *   Storable
+
+    You can set which one to use globally by setting the class variable
+    $SERIALISER to "cbor", "sereal" or to "storable"
+
+    You can also set which serialiser to use on a per promise object by
+    setting the option "serialiser". See "new"
 
 AUTHOR
     Jacques Deguest <jack@deguest.jp>

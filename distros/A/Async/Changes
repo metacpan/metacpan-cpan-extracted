@@ -1,9 +1,18 @@
 Release history for Async
 
-0.12  2021-11-25
+0.14  Tue 09 Aug 2022
+      - No functional changes
+      - Packaging fix to stop installing boilerplate.pl
+
+0.13  Sun 07 Aug 2022
+      - No functional changes
+      - Improved Test::More backcompat shim. Thanks to Sven Willenbücher
+      - Updated packaging and package metadata
+
+0.12  Thu 25 Nov 2021
       - Corrected DESTROY tests
 
-0.11  2021-11-24
+0.11  Wed 24 Nov 2021
       - Parentage tracking to keep Async processes from killing their siblings. [RT #65738]
         Thanks to Sander De Dycker
       - Global status variable localization in DESTROY. [RT #139416]
@@ -11,5 +20,5 @@ Release history for Async
       - Test suite covering basic use and I/O error conditions. [RT #139416]
         Thanks to Sven Willenbücher
 
-0.10  2000-01-26
+0.10  Wed 26 Jan 2000
       - Initial release

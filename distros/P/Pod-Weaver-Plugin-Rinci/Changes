@@ -1,3 +1,15 @@
+0.783   2022-06-23  Released-By: PERLANCAR; Urgency: medium
+
+        - Add configuration options: force_reload,
+          use_require_hook_source_dzilbuild.
+
+
+0.782   2022-06-23  Released-By: PERLANCAR; Urgency: medium
+
+        - Update to prereq's new name (Require::Hook::DzilBuild ->
+          Require::Hook::Source::DzilBuild).
+
+
 0.781   2022-06-10  Released-By: PERLANCAR; Urgency: medium
 
         - Use Require::Hook::DzilBuild, force reloading of modules.

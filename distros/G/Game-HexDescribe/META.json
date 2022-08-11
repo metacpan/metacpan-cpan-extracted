@@ -55,6 +55,6 @@
          "web" : "https://alexschroeder.ch/cgit/hex-describe/about/"
       }
    },
-   "version" : 1.01,
+   "version" : 1.02,
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

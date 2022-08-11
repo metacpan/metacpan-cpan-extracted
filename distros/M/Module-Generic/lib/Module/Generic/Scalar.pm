@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Scalar.pm
-## Version v1.3.0
+## Version v1.3.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/07/18
+## Modified 2022/08/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -78,7 +78,7 @@ BEGIN
     );
     $DEBUG = 0;
     $ERRORS = {};
-    our $VERSION = 'v1.3.0';
+    our $VERSION = 'v1.3.1';
 };
 
 use strict;
@@ -803,7 +803,8 @@ sub FREEZE
     my $serialiser = CORE::shift( @_ ) // '';
     my $class = CORE::ref( $self ) || $self;
     # Return an array reference rather than a list so this works with Sereal and CBOR
-    CORE::return( [$class, $$self] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # On or before Sereal version 4.023, Sereal did not support multiple values returned
+    CORE::return( [$class, $$self] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
     # But Storable want a list with the first element being the serialised element
     CORE::return( $$self );
 }
@@ -891,7 +892,8 @@ sub TO_JSON { CORE::return( ${$_[0]} ); }
         my $class = CORE::ref( $self );
         my %hash  = %$self;
         # Return an array reference rather than a list so this works with Sereal and CBOR
-        CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+        # On or before Sereal version 4.023, Sereal did not support multiple values returned
+        CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
         # But Storable want a list with the first element being the serialised element
         CORE::return( $class, \%hash );
     }

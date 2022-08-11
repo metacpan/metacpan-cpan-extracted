@@ -1452,6 +1452,14 @@ sub _normalise
     }
 }
 
+# NOTE: sub FREEZE is inherited
+
+sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+# NOTE: sub THAW is inherited
+
 # NOTE: HTTP::Promise::Stream::Generic class
 {
     package
@@ -1645,6 +1653,14 @@ sub _normalise
         }
         return( $fh, $op );
     }
+
+    # NOTE: sub FREEZE is inherited
+
+    sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+    sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+    # NOTE: sub THAW is inherited
 }
 
 1;

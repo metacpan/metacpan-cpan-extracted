@@ -54,28 +54,28 @@
    "provides" : {
       "IP::Geolocation::MMDB" : {
          "file" : "lib/IP/Geolocation/MMDB.pm",
-         "version" : "1.008"
+         "version" : "1.009"
       },
       "IP::Geolocation::MMDB::Metadata" : {
          "file" : "lib/IP/Geolocation/MMDB/Metadata.pm",
-         "version" : "1.008"
+         "version" : "1.009"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://gitlab.com/voegelas/ip-geolocation-mmdb/-/issues"
+         "web" : "https://github.com/voegelas/IP-Geolocation-MMDB/issues"
       },
-      "homepage" : "https://gitlab.com/voegelas/ip-geolocation-mmdb",
+      "homepage" : "https://github.com/voegelas/IP-Geolocation-MMDB/wiki",
       "repository" : {
          "type" : "git",
-         "url" : "https://gitlab.com/voegelas/ip-geolocation-mmdb.git",
-         "web" : "https://gitlab.com/voegelas/ip-geolocation-mmdb/-/tree/main"
+         "url" : "https://github.com/voegelas/IP-Geolocation-MMDB.git",
+         "web" : "https://github.com/voegelas/IP-Geolocation-MMDB"
       }
    },
-   "version" : "1.008",
+   "version" : "1.009",
    "x_generated_by_perl" : "v5.34.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

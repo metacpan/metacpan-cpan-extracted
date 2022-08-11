@@ -57,12 +57,14 @@ my %WriteMakefileArgs = (
     "List::Util" => 0,
     "Scalar::Util" => 0,
     "Test::Builder" => 0,
+    "Test::Compile" => "3.1.0",
+    "Test::Compile::Internal" => 0,
     "Test::More" => 0,
     "Test::Most" => 0,
     "base" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.26",
+  "VERSION" => "0.28",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -94,6 +96,8 @@ my %FallbackPrereqs = (
   "Scalar::Util" => 0,
   "Storable" => 0,
   "Test::Builder" => 0,
+  "Test::Compile" => "3.1.0",
+  "Test::Compile::Internal" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,
   "Type::Library" => 0,

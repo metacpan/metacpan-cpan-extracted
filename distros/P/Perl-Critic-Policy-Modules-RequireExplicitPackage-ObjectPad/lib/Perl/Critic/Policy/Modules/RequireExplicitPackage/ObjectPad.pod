@@ -1,0 +1,43 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Perl::Critic::Policy::Modules::RequireExplicitPackage::ObjectPad
+at lib/Perl/Critic/Policy/Modules/RequireExplicitPackage/ObjectPad.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Perl::Critic::Policy::Modules::RequireExplicitPackage::ObjectPad - Always make the package/Object::Pad class explicit.
+
+=head1 METHOLDS
+
+=head2 violates
+
+Please see L<Perl::Critic::Policy::Modules::RequireExplicitPackage::violates>
+
+=head2 _replace_class
+
+replace 'use Object::Pad' and 'class XXXX' with `package XXX` in L<PPI::Document> object, to make it be processable by L<Perl::Critic::Policy::Modules::RequireExplicitPackage::violates>
+
+Argument: PPI::Document object
+Return: cloned PPI::document object
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Perl::Critic::Policy::Modules::RequireExplicitPackage>
+
+L<applies_to|Perl::Critic::Policy::Modules::RequireExplicitPackage/applies_to>, L<default_maximum_violations_per_document|Perl::Critic::Policy::Modules::RequireExplicitPackage/default_maximum_violations_per_document>, L<default_severity|Perl::Critic::Policy::Modules::RequireExplicitPackage/default_severity>, L<default_themes|Perl::Critic::Policy::Modules::RequireExplicitPackage/default_themes>, L<prepare_to_scan_document|Perl::Critic::Policy::Modules::RequireExplicitPackage/prepare_to_scan_document>, L<supported_parameters|Perl::Critic::Policy::Modules::RequireExplicitPackage/supported_parameters>
+
+=item L<Perl::Critic::Policy>
+
+L<add_themes|Perl::Critic::Policy/add_themes>, L<get_abstract|Perl::Critic::Policy/get_abstract>, L<get_format|Perl::Critic::Policy/get_format>, L<get_long_name|Perl::Critic::Policy/get_long_name>, L<get_maximum_violations_per_document|Perl::Critic::Policy/get_maximum_violations_per_document>, L<get_parameters|Perl::Critic::Policy/get_parameters>, L<get_raw_abstract|Perl::Critic::Policy/get_raw_abstract>, L<get_severity|Perl::Critic::Policy/get_severity>, L<get_short_name|Perl::Critic::Policy/get_short_name>, L<get_themes|Perl::Critic::Policy/get_themes>, L<initialize_if_enabled|Perl::Critic::Policy/initialize_if_enabled>, L<is_enabled|Perl::Critic::Policy/is_enabled>, L<is_safe|Perl::Critic::Policy/is_safe>, L<new|Perl::Critic::Policy/new>, L<new_parameter_value_exception|Perl::Critic::Policy/new_parameter_value_exception>, L<parameter_metadata_available|Perl::Critic::Policy/parameter_metadata_available>, L<set_format|Perl::Critic::Policy/set_format>, L<set_maximum_violations_per_document|Perl::Critic::Policy/set_maximum_violations_per_document>, L<set_severity|Perl::Critic::Policy/set_severity>, L<set_themes|Perl::Critic::Policy/set_themes>, L<throw_parameter_value_exception|Perl::Critic::Policy/throw_parameter_value_exception>, L<to_string|Perl::Critic::Policy/to_string>, L<violation|Perl::Critic::Policy/violation>
+
+=back
+

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/DateTime.pm
-## Version v0.4.0
+## Version v0.4.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/07/18
+## Modified 2022/08/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -58,12 +58,144 @@ BEGIN
         )?
     )?
     /x;
-    our $VERSION = 'v0.4.0';
+    our $VERSION = 'v0.4.2';
 };
 
 BEGIN
 {
-    Module::Generic->_implement_freeze_thaw( qw( DateTime DateTime::Locale::FromData DateTime::TimeZone::UTC ) );
+    unless( defined( &DateTime::FREEZE ) )
+    {
+        *DateTime::FREEZE = sub
+        {
+            my $self = shift( @_ );
+            my $class = ref( $self );
+            my $params = {};
+            for( qw( utc_rd_days utc_rd_secs rd_nanosecs locale tz formatter ) )
+            {
+                $params->{ $_ } = $self->{ $_ };
+            }
+            # not used yet, but may be handy in the future.
+            $params->{version} = ( $DateTime::VERSION || 'git' );
+            return( [$class, $params] );
+        };
+    }
+    unless( defined( &DateTime::THAW ) )
+    {
+        *DateTime::THAW = sub
+        {
+            my( $this, $serialiser, $ref ) = @_;
+            my( $class, $params ) = @$ref;
+            my( $locale, $tz, $formatter ) = @$params{qw( locale tz formatter )};
+            delete( $params->{version} );
+            if( ref( $locale ) eq 'ARRAY' )
+            {
+                $locale = $locale->[0] if( ref( $locale->[0] ) eq 'ARRAY' );
+                my $locale_class = $locale->[0];
+                $locale = &{"${locale_class}\::THAW"}( $locale_class, $serialiser, $locale );
+            }
+            if( ref( $tz ) eq 'ARRAY' )
+            {
+                $tz = $tz->[0] if( ref( $tz->[0] ) eq 'ARRAY' );
+                my $tz_class = $tz->[0];
+                $tz = &{"${tz_class}\::THAW"}( $tz_class, $serialiser, $tz );
+            }
+
+            my $object = bless({
+                utc_vals => [ @$params{qw(utc_rd_days utc_rd_secs rd_nanosecs)} ],
+                tz => $tz,
+            }, 'DateTime::_Thawed' );
+
+            my %formatter = defined( $params->{formatter} ) ? ( formatter => $params->{formatter} ) : ();
+            my $new       = $class->from_object(
+                object => $object,
+                locale => $locale,
+                %formatter,
+            );
+            return( $new );
+        };
+    }
+    unless( defined( &DateTime::TimeZone::FREEZE ) )
+    {
+        *DateTime::TimeZone::FREEZE = sub
+        {
+            my $self = shift;
+            my $class = ref( $self ) || $self;
+            return( [ $class, $self->name ] );
+        };
+    }
+    unless( defined( &DateTime::TimeZone::THAW ) )
+    {
+        *DateTime::TimeZone::THAW = sub
+        {
+            my( $this, $serialiser, $serial ) = @_;
+            my( $class, $tzone ) = @$serial;
+            my $self = $class->new( name => $tzone );
+            return( $self );
+        };
+    }
+    
+    unless( defined( &DateTime::TimeZone::OffsetOnly::FREEZE ) )
+    {
+        *DateTime::TimeZone::OffsetOnly::FREEZE = sub
+        {
+            my( $self, undef ) = @_;
+            my $class = ref( $self );
+            return( [$class, $self->name] );
+        };
+    }
+    unless( defined( &DateTime::TimeZone::OffsetOnly::THAW ) )
+    {
+        *DateTime::TimeZone::OffsetOnly::THAW = sub
+        {
+            my( $this, $serialiser, $serial ) = @_;
+            my( $class, $name ) = @$serial;
+            my $self = $class->new( offset => $name );
+            return( $self );
+        };
+    }
+
+    unless( defined( &DateTime::Locale::FromData::FREEZE ) )
+    {
+        *DateTime::Locale::FromData::FREEZE = sub
+        {
+            my( $self, undef ) = @_;
+            my $class = ref( $self );
+            return( [$class, $self->code] );
+        };
+    }
+    unless( defined( &DateTime::Locale::FromData::THAW ) )
+    {
+        *DateTime::Locale::FromData::THAW = sub
+        {
+            my( $self, undef, $ref ) = @_;
+            my( $class, $code ) = @$ref;
+            require DateTime::Locale;
+            my $new = DateTime::Locale->load( $code );
+            return( $new );
+        };
+    }
+
+    unless( defined( &DateTime::Locale::Base::FREEZE ) )
+    {
+        *DateTime::Locale::Base::FREEZE = sub
+        {
+            my( $self, undef ) = @_;
+            my $class = ref( $self );
+            return( [$class, $self->id] );
+        };
+    }
+    unless( defined( &DateTime::Locale::Base::THAW ) )
+    {
+        *DateTime::Locale::Base::THAW = sub
+        {
+            my( $self, undef, $ref ) = @_;
+            my( $class, $id ) = @$ref;
+            require DateTime::Locale;
+            my $new = DateTime::Locale->load( $id );
+            return( $new );
+        };
+    }
+    Module::Generic->_implement_freeze_thaw( qw( DateTime::TimeZone::UTC ) );
 };
 
 # use strict;
@@ -403,7 +535,8 @@ sub FREEZE
     my $class = CORE::ref( $self );
     my %hash  = %$self;
     # Return an array reference rather than a list so this works with Sereal and CBOR
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # On or before Sereal version 4.023, Sereal did not support multiple values returned
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
     # But Storable want a list with the first element being the serialised element
     CORE::return( $class, \%hash );
 }
@@ -859,9 +992,13 @@ AUTOLOAD
     }
 };
 
+# NOTE: FREEZE is inherited
+
 sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
 
 sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+# NOTE: THAW is inherited
 
 1;
 # NOTE: POD
@@ -924,7 +1061,7 @@ Module::Generic::DateTime - A DateTime wrapper for enhanced features
 
 =head1 VERSION
 
-    v0.4.0
+    v0.4.2
 
 =head1 DESCRIPTION
 
@@ -991,6 +1128,8 @@ This methods handles cases of overloading for C<minus> and C<plus>
 =for Pod::Coverage TO_JSON
 
 Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
+
+Additionally, upon loading L<Module::Generic::DateTime>, it will ensure the following L<DateTime> modules also have a C<FREEZE> and C<THAW> subroutines if not defined already: L<DateTime>, L<DateTime::TimeZone>, L<DateTime::TimeZone::OffsetOnly>, L<DateTime::Locale::FromData>, L<DateTime::Locale::Base>
 
 =head1 SEE ALSO
 

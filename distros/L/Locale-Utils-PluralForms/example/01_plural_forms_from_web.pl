@@ -41,8 +41,6 @@ for (0 .. 2, 5, 100 .. 102, 105, 110 .. 112, 115, 120 .. 122, 125) { ## no criti
         $plural_code->($_),
 }
 
-# $Id: 01_plural_forms_from_web.pl 384 2011-11-13 13:27:02Z steffenw $
-
 __END__
 
 Output:

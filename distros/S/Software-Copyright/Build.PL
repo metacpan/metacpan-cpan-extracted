@@ -27,7 +27,7 @@ my %module_build_args = (
     "Dominique Dumont"
   ],
   "dist_name" => "Software-Copyright",
-  "dist_version" => "0.003",
+  "dist_version" => "0.004",
   "license" => "gpl",
   "module_name" => "Software::Copyright",
   "recursive_test_files" => 1,

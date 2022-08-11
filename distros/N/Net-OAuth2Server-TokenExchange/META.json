@@ -40,15 +40,18 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ap/Net-OAuth2Server-TokenExchange/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Net-OAuth2Server-TokenExchange"
       },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ap/Net-OAuth2Server-TokenExchange.git",
+         "url" : "https://github.com/ap/Net-OAuth2Server-TokenExchange.git",
          "web" : "https://github.com/ap/Net-OAuth2Server-TokenExchange"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_copyright" : {
       "holder" : "Aristotle Pagaltzis",
       "year" : 2020

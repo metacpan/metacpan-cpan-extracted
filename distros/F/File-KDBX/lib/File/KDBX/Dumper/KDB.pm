@@ -14,7 +14,7 @@ use namespace::clean;
 
 extends 'File::KDBX::Dumper';
 
-our $VERSION = '0.904'; # VERSION
+our $VERSION = '0.905'; # VERSION
 
 sub _write_magic_numbers { '' }
 sub _write_headers { '' }
@@ -136,7 +136,7 @@ File::KDBX::Dumper::KDB - Write KDB files
 
 =head1 VERSION
 
-version 0.904
+version 0.905
 
 =head1 DESCRIPTION
 

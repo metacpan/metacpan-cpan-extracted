@@ -1,5 +1,11 @@
 Revision history for Date-Holidays-AW
 
+0.004     2022-08-09 19:09:08Z
+
+    * Adapt similar API as Date::Holidays::NL with regards to gov => 1
+      and lang => 'nl'.
+    * Make is_holiday_dt a public method
+
 0.003     2020-06-20 13:14:20Z
 
     * Fix royal holidays as they have special rules and start/end year

@@ -155,7 +155,7 @@ __END__
 
 =head1 NAME
 
-HTTP::Promise::Headers::AltSvc - Asynchronous HTTP Request and Promise
+HTTP::Promise::Headers::AltSvc - AltSvc Header Field
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 Changes
 Element.pm
-examples/ex1.pl
-examples/ex2.pl
+examples/element_as_html.pl
+examples/element_as_tags.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

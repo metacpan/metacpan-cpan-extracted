@@ -1,3 +1,79 @@
+0.044   2022-08-09  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.041 & 0.041.2.
+
+
+0.041.2 2022-08-08  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utilities: csv-fill-template, csv-get-cells.
+
+        - [cli cli-munge-row] Avoid warning when perl code adds a new field.
+
+        - UPDATE 2022-08-09: rename release from 0.041 to 0.041.2 due to
+          conflict.
+
+
+0.043   2022-08-01  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Tweak POD formatting.
+
+
+0.042   2022-08-01  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Add some examples to App::CSVUtils::Manual::Cookbook.
+
+
+0.041   2022-08-01  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utility: csv-get-cells.
+
+        - [cli cli-munge-row] Avoid warning when perl code adds a new
+          field.
+
+
+0.040   2022-08-01  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        [Incompatible changes]
+
+        - Rename csv-delete-field to csv-select-fields to reflect the fact that
+          it can now select multiple fields.
+
+        - Short option -f now becomes shortcut for --include-field (a.k.a.
+          --field) instead of for --filename.
+
+        [clis csv-delete-fields, csv-select-fields]
+
+        - Improve field selection ability by adding --exclude-field (-F),
+          --exclude-field-pat to exclude fields. We know have four options
+          to select fields: --include-field (--field, -f),
+          --include-field-pat, --exclude-field (-F), and --exclude-field-pat.
+          In addition to that, we also have --include-all-fields and
+          --exclude-all-fields as alias for --include-field-pat .* and
+          --exclude-field-pat .*, respectively.
+
+        - Add option --ignore-unknown-fields to ignore unknown field specified
+          via --include-field (--field, -f) or --exclude-field (-F).
+
+        - Add option --show-selected-fields to show selected fields and
+          immediately exit.
+
+
+0.039   2022-07-27  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention more CSV-related modules.
+
+
+0.038   2022-07-25  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utility: csv-munge-row.
+
+
 0.037   2022-03-27  Released-By: PERLANCAR; Urgency: medium
 
         - Set input and output encoding to UTF8 and note this in the

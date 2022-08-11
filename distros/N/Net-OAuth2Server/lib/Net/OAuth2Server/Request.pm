@@ -1,6 +1,8 @@
 use strict; use warnings;
 
 package Net::OAuth2Server::Request;
+our $VERSION = '0.006';
+
 use Net::OAuth2Server::Set ();
 use Net::OAuth2Server::Response ();
 use MIME::Base64 ();
@@ -166,4 +168,4 @@ sub set_error_invalid_scope             { shift->set_error( invalid_scope       
 sub set_error_server_error              { shift->set_error( server_error              => @_ ) }
 sub set_error_temporarily_unavailable   { shift->set_error( temporarily_unavailable   => @_ ) }
 
-our $VERSION = '0.005';
+1;

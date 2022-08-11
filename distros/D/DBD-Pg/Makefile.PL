@@ -5,7 +5,7 @@ use warnings;
 use 5.008001;
 
 ## No version.pm for this one, as the prereqs are not loaded yet.
-my $VERSION = '3.15.1';
+my $VERSION = '3.16.0';
 
 ## App::Info is stored inside t/lib
 ## Create a proper path so we can use it below
@@ -183,6 +183,9 @@ my $dbi_arch_dir;
 }
 
 my $defines = " -DPGLIBVERSION=$serverversion -DPGDEFPORT=$defaultport";
+if ($Config{ivsize} >= 8 && $serverversion >= 90300) {
+    $defines .= ' -DHAS64BITLO';
+}
 my $comp_opts = $Config{q{ccflags}} . $defines;
 
 if ($ENV{DBDPG_GCCDEBUG}) {

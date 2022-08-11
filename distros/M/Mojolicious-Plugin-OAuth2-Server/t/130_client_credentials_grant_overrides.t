@@ -14,8 +14,8 @@ my $VALID_ACCESS_TOKEN;
 my $verify_client_sub = sub {
   my ( %args ) = @_;
 
-  my ( $c,$client_id,$scopes_ref,$redirect_uri,$response_type )
-    = @args{ qw/ mojo_controller client_id scopes redirect_uri response_type / };
+  my ( $c,$client_id,$client_secret,$scopes_ref,$redirect_uri,$response_type )
+    = @args{ qw/ mojo_controller client_id client_secret scopes redirect_uri response_type / };
 
   ok( $c,'have a mojo_controller' );
 
@@ -24,6 +24,7 @@ my $verify_client_sub = sub {
   return ( 0,'invalid_scope' ) if grep { $_ eq 'cry' } @{ $scopes_ref // [] };
   return ( 0,'access_denied' ) if grep { $_ eq 'drink' } @{ $scopes_ref // [] };
   return ( 0,'unauthorized_client' ) if $client_id ne '1';
+  return ( 0,'unauthorized_client' ) if $client_secret ne 'boo';
 
   # all good
   return ( 1,undef );

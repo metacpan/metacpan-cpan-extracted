@@ -8,7 +8,7 @@ Attean::Plan - Representation of SPARQL query plan operators
 
 =head1 VERSION
 
-This document describes Attean::Plan version 0.030
+This document describes Attean::Plan version 0.031
 
 =head1 SYNOPSIS
 
@@ -32,7 +32,7 @@ Evaluates a quad pattern against the model.
 
 =cut
 
-package Attean::Plan::Quad 0.030 {
+package Attean::Plan::Quad 0.031 {
 	use Moo;
 	use Scalar::Util qw(blessed reftype);
 	use Types::Standard qw(ConsumerOf ArrayRef);
@@ -137,7 +137,7 @@ Evaluates a join (natural-, anti-, or left-) using a nested loop.
 
 =cut
 
-package Attean::Plan::NestedLoopJoin 0.030 {
+package Attean::Plan::NestedLoopJoin 0.031 {
 	use Moo;
 	use List::MoreUtils qw(all);
 	use namespace::clean;
@@ -226,7 +226,7 @@ Evaluates a join (natural-, anti-, or left-) using a hash join.
 
 =cut
 
-package Attean::Plan::HashJoin 0.030 {
+package Attean::Plan::HashJoin 0.031 {
 	use Moo;
 	use List::MoreUtils qw(all);
 	use namespace::clean;
@@ -367,7 +367,7 @@ package Attean::Plan::HashJoin 0.030 {
 
 =cut
 
-package Attean::Plan::Construct 0.030 {
+package Attean::Plan::Construct 0.031 {
 	use Moo;
 	use List::MoreUtils qw(all);
 	use Types::Standard qw(Str ArrayRef ConsumerOf InstanceOf);
@@ -458,7 +458,7 @@ package Attean::Plan::Construct 0.030 {
 
 =cut
 
-package Attean::Plan::Describe 0.030 {
+package Attean::Plan::Describe 0.031 {
 	use Moo;
 	use Attean::RDF;
 	use List::MoreUtils qw(all);
@@ -544,7 +544,7 @@ named variable binding.
 
 =cut
 
-package Attean::Plan::EBVFilter 0.030 {
+package Attean::Plan::EBVFilter 0.031 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(Str ConsumerOf);
@@ -603,7 +603,7 @@ ordering.
 
 =cut
 
-package Attean::Plan::Merge 0.030 {
+package Attean::Plan::Merge 0.031 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(Str ArrayRef ConsumerOf);
@@ -632,7 +632,7 @@ Evaluates a set of sub-plans, returning the union of results.
 
 =cut
 
-package Attean::Plan::Union 0.030 {
+package Attean::Plan::Union 0.031 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use namespace::clean;
@@ -703,7 +703,7 @@ expressions, binding the produced values to new variables.
 
 =cut
 
-package Attean::Plan::Extend 0.030 {
+package Attean::Plan::Extend 0.031 {
 	use Moo;
 	use Encode;
 	use UUID::Tiny ':std';
@@ -753,7 +753,7 @@ package Attean::Plan::Extend 0.030 {
 
 		state $true			= Attean::Literal->true;
 		state $false		= Attean::Literal->false;
-		state $type_roles	= { qw(URI IRI IRI IRI BLANK Blank LITERAL Literal NUMERIC NumericLiteral) };
+		state $type_roles	= { qw(URI IRI IRI IRI BLANK Blank LITERAL Literal NUMERIC NumericLiteral TRIPLE Triple) };
 		state $type_classes	= { qw(URI Attean::IRI IRI Attean::IRI STR Attean::Literal) };
 		
 		if ($expr->isa('Attean::CastExpression')) {
@@ -946,7 +946,7 @@ package Attean::Plan::Extend 0.030 {
 			}
 			
 			my @terms	= map { $self->evaluate_expression($model, $_, $r) } @{ $expr->children };
-			if ($func =~ /^IS([UI]RI|BLANK|LITERAL|NUMERIC)$/) {
+			if ($func =~ /^IS([UI]RI|BLANK|LITERAL|NUMERIC|TRIPLE)$/) {
 				my $role	= "Attean::API::$type_roles->{$1}";
 				my $t		= shift(@terms);
 				my $ok		= (blessed($t) and $t->does($role));
@@ -1246,7 +1246,27 @@ package Attean::Plan::Extend 0.030 {
 				} else {
 					return Attean::Blank->new();
 				}
+			} elsif ($func eq 'SAMETERM') {
+				my @operands	= map { $self->evaluate_expression($model, $_, $r) } @{ $expr->children };
+				my ($a, $b)	= @operands;
+				die "TypeError: SAMETERM" unless (blessed($operands[0]) and blessed($operands[1]));
+				if ($a->compare($b)) {
+					return $false;
+				}
+				if ($a->does('Attean::API::Binding')) {
+					my $ok	= ($a->sameTerms($b));
+					return $ok ? $true : $false;
+				} else {
+					my $ok	= ($a->value eq $b->value);
+					return $ok ? $true : $false;
+				}
+			} elsif ($func =~ /^(SUBJECT|PREDICATE|OBJECT)$/) {
+				my @operands	= map { $self->evaluate_expression($model, $_, $r) } @{ $expr->children };
+				my $pos	= lc($func);
+				my $term	= $operands[0]->$pos();
+				return $term;
 			} else {
+				warn "Expression evaluation unimplemented: " . $expr->as_string;
 				$self->log->warn("Expression evaluation unimplemented: " . $expr->as_string);
 				die "Expression evaluation unimplemented: " . $expr->as_string;
 			}
@@ -1311,7 +1331,12 @@ package Attean::Plan::Extend 0.030 {
 								if ($row{ $var } and $term->as_string ne $row{ $var }->as_string) {
 									next ROW;
 								}
-					
+								
+								if ($term->does('Attean::API::Binding')) {
+									# patterns need to be made ground to be bound as values (e.g. TriplePattern -> Triple)
+									$term	= $term->ground($r);
+								}
+								
 								$row{ $var }	= $term;
 							}
 						}
@@ -1331,7 +1356,7 @@ hash of already-seen results.
 
 =cut
 
-package Attean::Plan::HashDistinct 0.030 {
+package Attean::Plan::HashDistinct 0.031 {
 	use Moo;
 	use namespace::clean;
 	
@@ -1359,7 +1384,7 @@ filtering out sequential duplicates.
 
 =cut
 
-package Attean::Plan::Unique 0.030 {
+package Attean::Plan::Unique 0.031 {
 	use Moo;
 	use namespace::clean;
 	
@@ -1394,7 +1419,7 @@ number of results ("offset") and limiting the total number of returned results
 
 =cut
 
-package Attean::Plan::Slice 0.030 {
+package Attean::Plan::Slice 0.031 {
 	use Moo;
 	use Types::Standard qw(Int);
 	use namespace::clean;
@@ -1435,7 +1460,7 @@ of variable bindings in each result.
 
 =cut
 
-package Attean::Plan::Project 0.030 {
+package Attean::Plan::Project 0.031 {
 	use Moo;
 	with 'Attean::API::BindingSubstitutionPlan', 'Attean::API::UnaryQueryTree';
 	use Types::Standard qw(ArrayRef ConsumerOf);
@@ -1512,9 +1537,10 @@ sorting is applied.
 
 =cut
 
-package Attean::Plan::OrderBy 0.030 {
+package Attean::Plan::OrderBy 0.031 {
 	use Moo;
 	use Types::Standard qw(HashRef ArrayRef InstanceOf Bool Str);
+	use Scalar::Util qw(blessed);
 	use namespace::clean;
 	
 	with 'Attean::API::Plan', 'Attean::API::UnaryQueryTree';
@@ -1536,6 +1562,7 @@ package Attean::Plan::OrderBy 0.030 {
 		my $vars		= shift;
 		my $ascending	= shift;
 		my $rows		= shift;
+		local($Attean::API::Binding::ALLOW_IRI_COMPARISON)	= 1;
 		my @sorted		= map { $_->[0] } sort {
 			my ($ar, $avalues)	= @$a;
 			my ($br, $bvalues)	= @$b;
@@ -1543,7 +1570,18 @@ package Attean::Plan::OrderBy 0.030 {
 			foreach my $i (0 .. $#{ $vars }) {
 				my $ascending	= $ascending->{ $vars->[$i] };
 				my ($av, $bv)	= map { $_->[$i] } ($avalues, $bvalues);
-				$c		= $av ? $av->compare($bv) : 1;
+
+				# Mirrors code in Attean::SimpleQueryEvaluator->evaluate
+				if (blessed($av) and $av->does('Attean::API::Binding') and (not(defined($bv)) or not($bv->does('Attean::API::Binding')))) {
+					$c	= 1;
+				} elsif (blessed($bv) and $bv->does('Attean::API::Binding') and (not(defined($av)) or not($av->does('Attean::API::Binding')))) {
+					$c	= -1;
+				} else {
+					$c		= eval { $av ? $av->compare($bv) : 1 };
+					if ($@) {
+						$c	= 1;
+					}
+				}
 				$c		*= -1 unless ($ascending);
 				last unless ($c == 0);
 			}
@@ -1582,7 +1620,7 @@ Evaluates a SPARQL query against a remote endpoint.
 
 =cut
 
-package Attean::Plan::Service 0.030 {
+package Attean::Plan::Service 0.031 {
 	use Moo;
 	use Types::Standard qw(ConsumerOf Bool Str);
 	use namespace::clean;
@@ -1614,7 +1652,7 @@ Returns a constant set of results.
 
 =cut
 
-package Attean::Plan::Table 0.030 {
+package Attean::Plan::Table 0.031 {
 	use Moo;
 	use Types::Standard qw(ArrayRef ConsumerOf);
 	use namespace::clean;
@@ -1679,7 +1717,7 @@ L<Attean::ListIterator>, the size of that iterator will be used.
 
 =cut
 
-package Attean::Plan::Iterator 0.030 {
+package Attean::Plan::Iterator 0.031 {
 	use Moo;
 	use Types::Standard qw(ArrayRef ConsumerOf Int);
 	use namespace::clean;
@@ -1743,7 +1781,7 @@ package Attean::Plan::Iterator 0.030 {
 
 =cut
 
-package Attean::Plan::ALPPath 0.030 {
+package Attean::Plan::ALPPath 0.031 {
 	use Moo;
 	use Attean::TreeRewriter;
 	use Types::Standard qw(ArrayRef ConsumerOf);
@@ -1895,7 +1933,7 @@ package Attean::Plan::ALPPath 0.030 {
 	}
 }
 
-package Attean::Plan::ZeroOrOnePath 0.030 {
+package Attean::Plan::ZeroOrOnePath 0.031 {
 	use Moo;
 	use Attean::TreeRewriter;
 	use Types::Standard qw(ArrayRef ConsumerOf);
@@ -1994,7 +2032,7 @@ results were produced by evaluating the sub-plan.
 
 =cut
 
-package Attean::Plan::Exists 0.030 {
+package Attean::Plan::Exists 0.031 {
 	use Moo;
 	use Types::Standard qw(ArrayRef ConsumerOf);
 	use namespace::clean;
@@ -2024,7 +2062,7 @@ package Attean::Plan::Exists 0.030 {
 
 =cut
 
-package Attean::Plan::Aggregate 0.030 {
+package Attean::Plan::Aggregate 0.031 {
 	use Moo;
 	use Encode;
 	use UUID::Tiny ':std';
@@ -2253,7 +2291,7 @@ package Attean::Plan::Aggregate 0.030 {
 	}
 }
 
-package Attean::Plan::Sequence 0.030 {
+package Attean::Plan::Sequence 0.031 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(ConsumerOf ArrayRef);
@@ -2278,7 +2316,7 @@ package Attean::Plan::Sequence 0.030 {
 	}
 }
 
-package Attean::Plan::Clear 0.030 {
+package Attean::Plan::Clear 0.031 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(ConsumerOf ArrayRef);
@@ -2315,7 +2353,7 @@ package Attean::Plan::Clear 0.030 {
 	}
 }
 
-package Attean::Plan::Drop 0.030 {
+package Attean::Plan::Drop 0.031 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(ConsumerOf ArrayRef);
@@ -2350,7 +2388,7 @@ package Attean::Plan::Drop 0.030 {
 	}
 }
 
-package Attean::Plan::TripleTemplateToModelQuadMethod 0.030 {
+package Attean::Plan::TripleTemplateToModelQuadMethod 0.031 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(ConsumerOf Str ArrayRef HashRef);
@@ -2426,7 +2464,7 @@ package Attean::Plan::TripleTemplateToModelQuadMethod 0.030 {
 	}
 }
 
-package Attean::Plan::Load 0.030 {
+package Attean::Plan::Load 0.031 {
 	use Moo;
 	use Encode;
 	use LWP::UserAgent;
@@ -2497,7 +2535,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2020 Gregory Todd Williams.
+Copyright (c) 2014--2022 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

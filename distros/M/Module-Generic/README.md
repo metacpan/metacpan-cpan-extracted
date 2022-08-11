@@ -59,7 +59,7 @@ SYNOPSIS
 VERSION
 =======
 
-        v0.25.0
+        v0.27.1
 
 DESCRIPTION
 ===========
@@ -281,6 +281,94 @@ here to set light color if the value is less than 1. For example :
 
         print( $o->coloured( 'underline rgba(255, 0, 0, 0.5)', "Hello everyone!" ), "\n" );
 
+deserialise
+-----------
+
+        my $ref = $self->deserialise( %hash_of_options );
+        my $ref = $self->deserialise( $hash_reference_of_options );
+        my $ref = $self->deserialise( $serialised_data, %hash_of_options );
+        my $ref = $self->deserialise( $serialised_data, $hash_reference_of_options );
+
+This method deserialise data previously serialised by either
+[CBOR](https://metacpan.org/pod/CBOR::XS){.perl-module},
+[Sereal](https://metacpan.org/pod/Sereal){.perl-module} or
+[Storable](https://metacpan.org/pod/Storable::Improved){.perl-module}.
+
+It takes an hash or hash reference of options. You can also provide the
+data to deserialise as the first argument followed by an hash or hash
+reference of options.
+
+The supported options are:
+
+`base64`
+
+:   Thise can be set to a true value like `1`, or to your preferred
+    base64 encoder/decoder, or to an array reference containing 2 code
+    references, the first one for encoding and the second one for
+    decoding.
+
+    If this is set simply to a true value, `deserialise` will call
+    [\"\_has\_base64\"](#has_base64){.perl-module} to find out any
+    installed base64 modules. Currently the ones supported are:
+    [Crypt::Misc](https://metacpan.org/pod/Crypt::Misc){.perl-module}
+    and
+    [MIME::Base64](https://metacpan.org/pod/MIME::Base64){.perl-module}.
+    Of course, you need to have one of those modules installed first
+    before it can be used.
+
+    If this option is set and no appropriate module could be found,
+    `deserialise` will return an error.
+
+`data`
+
+:   Data to be deserialised.
+
+`file`
+
+:   Provides a file path from which to read the serialised data.
+
+`io`
+
+:   A filehandle to read the data to deserialise from. This option only
+    works with
+    [Storable](https://metacpan.org/pod/Storable::Improved){.perl-module}
+
+`serialiser`
+
+:   Specify the class name of the serialiser to use. Supported
+    serialiser can either be `CBOR` or
+    [CBOR::XS](https://metacpan.org/pod/CBOR::XS){.perl-module},
+    [Sereal](https://metacpan.org/pod/Sereal){.perl-module} and
+    [Storable](https://metacpan.org/pod/Storable::Improved){.perl-module}
+
+    If the serialiser is
+    [CBOR::XS](https://metacpan.org/pod/CBOR::XS){.perl-module} the
+    following additional options are supported: `max_depth`, `max_size`,
+    `allow_unknown`, `allow_sharing`, `allow_cycles`, `forbid_objects`,
+    `pack_strings`, `text_keys`, `text_strings`, `validate_utf8`,
+    `filter`
+
+    See [CBOR::XS](https://metacpan.org/pod/CBOR::XS){.perl-module} for
+    detail on those options.
+
+    If the serialiser is
+    [Sereal](https://metacpan.org/pod/Sereal){.perl-module}, the
+    following additional options are supported: `refuse_snappy`,
+    `refuse_objects`, `no_bless_objects`, `validate_utf8`,
+    `max_recursion_depth`, `max_num_hash_entries`,
+    `max_num_array_entries`, `max_string_length`,
+    `max_uncompressed_size`, `incremental`, `alias_smallint`,
+    `alias_varint_under`, `use_undef`, `set_readonly`,
+    `set_readonly_scalars`
+
+    See [Sereal](https://metacpan.org/pod/Sereal){.perl-module} for
+    detail on those options.
+
+deserialize
+-----------
+
+Alias for [\"deserialise\"](#deserialise){.perl-module}
+
 debug
 -----
 
@@ -363,6 +451,11 @@ directly to each serialiser:
     `max_depth`, `max_size`, `allow_unknown`, `allow_sharing`,
     `allow_cycles`, `forbid_objects`, `pack_strings`, `text_keys`,
     `text_strings`, `validate_utf8`, `filter`
+-   [JSON](https://metacpan.org/pod/JSON){.perl-module}: `allow_blessed`
+    `allow_nonref` `allow_unknown` `allow_tags` `ascii` `boolean_values`
+    `canonical` `convert_blessed` `filter_json_object`
+    `filter_json_single_key_object` `indent` `latin1` `max_depth`
+    `max_size` `pretty` `relaxed` `space_after` `space_before` `utf8`
 -   [\"decode\" in
     Sereal::Decoder](https://metacpan.org/pod/Sereal::Decoder#decode){.perl-module}
     if the serialiser is
@@ -1226,6 +1319,25 @@ The supported parameters are:
     Boolean. If true, the serialised data will be appended to the given
     file. This works only in conjonction with *file*
 
+-   *base64*
+
+    Thise can be set to a true value like `1`, or to your preferred
+    base64 encoder/decoder, or to an array reference containing 2 code
+    references, the first one for encoding and the second one for
+    decoding.
+
+    If this is set simply to a true value, `serialise` will call
+    [\"\_has\_base64\"](#has_base64){.perl-module} to find out any
+    installed base64 modules. Currently the ones supported are:
+    [Crypt::Misc](https://metacpan.org/pod/Crypt::Misc){.perl-module}
+    and
+    [MIME::Base64](https://metacpan.org/pod/MIME::Base64){.perl-module}.
+    Of course, you need to have one of those modules installed first
+    before it can be used.
+
+    If this option is set and no appropriate module could be found,
+    `serialise` will return an error.
+
 -   *file*
 
     String. A file path where to store the serialised data.
@@ -1259,6 +1371,11 @@ directly for each serialiser:
     `max_depth`, `max_size`, `allow_unknown`, `allow_sharing`,
     `allow_cycles`, `forbid_objects`, `pack_strings`, `text_keys`,
     `text_strings`, `validate_utf8`, `filter`
+-   [JSON](https://metacpan.org/pod/JSON){.perl-module}: `allow_blessed`
+    `allow_nonref` `allow_unknown` `allow_tags` `ascii` `boolean_values`
+    `canonical` `convert_blessed` `filter_json_object`
+    `filter_json_single_key_object` `indent` `latin1` `max_depth`
+    `max_size` `pretty` `relaxed` `space_after` `space_before` `utf8`
 -   [\"encode\" in
     Sereal::Decoder](https://metacpan.org/pod/Sereal::Decoder#encode){.perl-module}
     if the serialiser is
@@ -1385,6 +1502,31 @@ sets an [\"error\"](#error){.perl-module}
 
 This is a support method used by
 [\"\_instantiate\_object\"](#instantiate_object){.perl-module}
+
+\_has\_base64
+-------------
+
+Provided with a value and this returns an array reference containing 2
+code references: one for encoding and one for decoding.
+
+Value provided can be a simple true value, such as `1`, and then
+`_has_base64` will check if
+[Crypt::Misc](https://metacpan.org/pod/Crypt::Misc){.perl-module} and
+[MIME::Base64](https://metacpan.org/pod/MIME::Base64){.perl-module} are
+installed on the system and will use in priority
+[MIME::Base64](https://metacpan.org/pod/MIME::Base64){.perl-module}
+
+The value provided can also be an array reference already containing 2
+code references, and in such case, that value is simply returned.
+Nothing more is done.
+
+Finally, the value provided can be a module class name. `_has_base64`
+knows only of
+[Crypt::Misc](https://metacpan.org/pod/Crypt::Misc){.perl-module} and
+[MIME::Base64](https://metacpan.org/pod/MIME::Base64){.perl-module}, so
+if you want to use any other one, arrange yourself to pass to
+`_has_base64` an array reference of 2 code references as explained
+above.
 
 \_instantiate\_object
 ---------------------
@@ -2766,7 +2908,7 @@ and
 [Module::Generic::Scalar::IO](https://metacpan.org/pod/Module::Generic::Scalar::IO){.perl-module}
 can be serialised and deserialised if the methods `FREEZE` and `THAW`
 are used. By design the methods `STORABLE_freeze` and `STORABLE_thaw`
-are not implemented because it would trigger a
+are not implemented in those modules because it would trigger a
 [Storable](https://metacpan.org/pod/Storable){.perl-module} exception
 \"Unexpected object type (8) in store\_hook()\". Instead it is strongly
 encouraged you use the improved
@@ -2783,6 +2925,17 @@ use the `FREEZE` and `THAW` methods.
 See [\"FREEZE/THAW CALLBACK MECHANISM\" in
 Sereal::Encoder](https://metacpan.org/pod/Sereal::Encoder#FREEZE/THAW CALLBACK MECHANISM){.perl-module}
 for more information.
+
+For [CBOR](https://metacpan.org/pod/CBOR::XS){.perl-module}, it is
+recommended to use the option `allow_sharing` to enable the reuse of
+references, such as:
+
+        my $cbor = CBOR::XS->new->allow_sharing;
+
+Also, if you use the option `allow_tags` with
+[JSON](https://metacpan.org/pod/JSON){.perl-module}, then all of those
+modules will work too, since this option enables support for the
+`FREEZE` and `THAW` methods.
 
 SEE ALSO
 ========
@@ -2808,7 +2961,7 @@ and
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x557ab13bac00)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x5649fc5c7690)"}\>
 
 COPYRIGHT & LICENSE
 ===================

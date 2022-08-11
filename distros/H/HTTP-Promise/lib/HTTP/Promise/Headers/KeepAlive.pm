@@ -68,7 +68,7 @@ __END__
 
 =head1 NAME
 
-HTTP::Promise::Headers::KeepAlive - Asynchronous HTTP Request and Promise
+HTTP::Promise::Headers::KeepAlive - Keep Alive Header Field
 
 =head1 SYNOPSIS
 

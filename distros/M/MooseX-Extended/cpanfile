@@ -35,6 +35,7 @@ requires "true" => "v1.0.2";
 requires "warnings" => "0";
 suggests "Future::AsyncAwait" => "0.58";
 suggests "Syntax::Keyword::MultiSub" => "0.02";
+suggests "Syntax::Keyword::Try" => "0.027";
 
 on 'test' => sub {
   requires "Capture::Tiny" => "0";
@@ -44,6 +45,8 @@ on 'test' => sub {
   requires "List::Util" => "0";
   requires "Scalar::Util" => "0";
   requires "Test::Builder" => "0";
+  requires "Test::Compile" => "v3.1.0";
+  requires "Test::Compile::Internal" => "0";
   requires "Test::More" => "0";
   requires "Test::Most" => "0";
   requires "base" => "0";

@@ -1,12 +1,13 @@
 Changes
-LICENSE
-MANIFEST
-META.json                                Module JSON meta-data (added by MakeMaker)
-META.yml                                 Module YAML meta-data (added by MakeMaker)
 Makefile.PL
-README
 bin/titlecase
-boilerplate.pl
+inc/boilerplate.pl
 lib/Lingua/EN/Titlecase/Simple.pm
+t/00-load.t
 t/titlecase.t
 t/wantarray.t
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+LICENSE
+README

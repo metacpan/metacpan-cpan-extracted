@@ -72,9 +72,10 @@ $test->for('synopsis', sub {
 =description
 
 This package provides methods for reading and writing L<JSON|https://json.org>
-data. B<Note:> This package requires that a suitable JSON is installed,
+data. B<Note:> This package requires that a suitable JSON library is installed,
 currently either C<JSON::XS> C<3.0+>, C<JSON::PP> C<2.27105+>, or
-C<Cpanel::JSON::XS> C<4.09+>.
+C<Cpanel::JSON::XS> C<4.09+>. You can use the C<VENUS_JSON_PACKAGE> environment
+variable to include or prioritize your preferred JSON library.
 
 =cut
 

@@ -58,7 +58,8 @@ for my $id (sort @ids) {
 #@valid = @valid[0..168];
 #@valid = @valid[0..100];
 my @configs = (18 .. 20);
-#@configs = (0 .. 2);
+#@configs = (18 .. 18);
+#@valid = qw/ 87E4 /;
 
 my @yt;
 map {

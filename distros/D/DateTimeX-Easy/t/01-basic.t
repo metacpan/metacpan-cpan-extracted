@@ -120,20 +120,20 @@ TODO: {
     $dt = DateTimeX::Easy->new("last monday");
     ok($dt);
 
-    # ... but in 1969:
-    $dt = DateTimeX::Easy->new("last monday", year => 1969);
+    # ... but in 1968:
+    $dt = DateTimeX::Easy->new("last monday", year => 1968);
     ok($dt);
 
     # ... at the 100th nanosecond:
-    $dt = DateTimeX::Easy->new("last monday", year => 1969, nanosecond => 100);
+    $dt = DateTimeX::Easy->new("last monday", year => 1968, nanosecond => 100);
     ok($dt);
 
     # ... in US/Eastern: (This will NOT do a timezone conversion)
-    $dt = DateTimeX::Easy->new("last monday", year => 1969, nanosecond => 100, timezone => "US/Eastern");
+    $dt = DateTimeX::Easy->new("last monday", year => 1968, nanosecond => 100, timezone => "US/Eastern");
     ok($dt);
 
     # This WILL do a proper timezone conversion:
-    $dt = DateTimeX::Easy->new("last monday", year => 1969, nanosecond => 100, timezone => "US/Pacific");
+    $dt = DateTimeX::Easy->new("last monday", year => 1968, nanosecond => 100, timezone => "US/Pacific");
     $dt->set_time_zone("America/New_York");
     ok($dt);
 }

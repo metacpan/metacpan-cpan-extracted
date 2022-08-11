@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::CodeGenerator;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.032';
+our $VERSION   = '0.034';
 
 use Sub::HandlesVia::Mite -all;
 
@@ -36,8 +36,17 @@ has coerce => (
 );
 
 has env => (
-	is => rw,
+	is => ro,
+	isa => 'HashRef',
 	default => \ '{}',
+	default_is_trusted => true,
+);
+
+has sandboxing_package => (
+	is => ro,
+	isa => 'Str|Undef',
+	default => sprintf( '%s::__SANDBOX__', __PACKAGE__ ),
+	default_is_trusted => true,
 );
 
 has [ 'generator_for_slot', 'generator_for_get', 'generator_for_set', 'generator_for_default' ] => (
@@ -46,17 +55,18 @@ has [ 'generator_for_slot', 'generator_for_get', 'generator_for_set', 'generator
 );
 
 has generator_for_args => (
-	is => lazy,
+	is => ro,
 	isa => 'CodeRef',
 	builder => sub {
 		return sub {
 			'@_[1..$#_]';
 		};
 	},
+	default_is_trusted => true,
 );
 
 has generator_for_arg => (
-	is => lazy,
+	is => ro,
 	isa => 'CodeRef',
 	builder => sub {
 		return sub {
@@ -65,20 +75,22 @@ has generator_for_arg => (
 			"\$_[$n]";
 		};
 	},
+	default_is_trusted => true,
 );
 
 has generator_for_argc => (
-	is => lazy,
+	is => ro,
 	isa => 'CodeRef',
 	builder => sub {
 		return sub {
 			'(@_-1)';
 		};
 	},
+	default_is_trusted => true,
 );
 
 has generator_for_currying => (
-	is => lazy,
+	is => ro,
 	isa => 'CodeRef',
 	builder => sub {
 		return sub {
@@ -87,10 +99,11 @@ has generator_for_currying => (
 			"splice(\@_,1,0,$arr);";
 		};
 	},
+	default_is_trusted => true,
 );
 
 has generator_for_usage_string => (
-	is => lazy,
+	is => ro,
 	isa => 'CodeRef',
 	builder => sub {
 		return sub {
@@ -101,20 +114,49 @@ has generator_for_usage_string => (
 			"\$instance->$method_name($guts)";
 		};
 	},
+	default_is_trusted => true,
 );
 
 has generator_for_self => (
-	is => lazy,
+	is => ro,
 	isa => 'CodeRef',
 	builder => sub {
 		return sub {
 			'$_[0]';
 		};
 	},
+	default_is_trusted => true,
+);
+
+has generator_for_type_assertion => (
+	is => ro,
+	isa => 'CodeRef',
+	builder => sub {
+		return sub {
+			my ( $gen, $env, $type, $varname ) = @_;
+			my $i = 0;
+			my $type_varname = sprintf '$shv_type_constraint_%d', $type->{uniq};
+			$env->{$type_varname} = \$type;
+			if ( $gen->coerce and $type->has_coercion ) {
+				if ( $type->coercion->can_be_inlined ) {
+					return sprintf '%s=%s;%s;',
+						$varname,
+						$type->coercion->inline_coercion($varname),
+						$type->inline_assert( $varname, $type_varname );
+				}
+				else {
+					return sprintf '%s=%s->assert_coerce(%s);',
+						$varname, $type_varname, $varname;
+				}
+			}
+			return $type->inline_assert( $varname, $type_varname );
+		};
+	},
+	default_is_trusted => true,
 );
 
 has method_installer => (
-	is => rw,
+	is => ro,
 	isa => 'CodeRef',
 );
 
@@ -124,22 +166,22 @@ has _override => (
 );
 
 has is_method => (
-	is => rw,
+	is => ro,
 	default => true,
 );
 
 has get_is_lvalue => (
-	is => rw,
+	is => ro,
 	default => false,
 );
 
 has set_checks_isa => (
-	is => rw,
+	is => ro,
 	default => false,
 );
 
 has set_strictly => (
-	is => rw,
+	is => ro,
 	default => true,
 );
 
@@ -157,7 +199,7 @@ my $REASONABLE_SCALAR = qr/^
 	$/x;
 
 my @generatable_things = qw(
-	slot get set default arg args argc currying usage_string self
+	slot get set default arg args argc currying usage_string self type_assertion
 );
 
 for my $thing ( @generatable_things ) {
@@ -274,20 +316,22 @@ sub _generate_ec_args_for_handler {
 	#
 	my $code = [
 		'sub {',
-		sprintf( 'package %s::__SANDBOX__;', __PACKAGE__ ),
 	];
+	
+	push @$code, sprintf( 'package %s;', $self->sandboxing_package )
+		if $self->sandboxing_package;
 
 	# Need to maintain state between following method calls. A proper
 	# object might be nice, but a hashref will do for now.
 	#
 	my $state = {
-		signature_check_needed  => 1,     # hasn't been done yet
+		signature_check_needed  => true,  # hasn't been done yet
 		final_type_check_needed => $handler->is_mutator,
 		getter                  => scalar($self->generate_get),
 		getter_is_lvalue        => $self->get_is_lvalue,
 		template_wrapper        => undef, # nothing yet
 		add_later               => undef, # nothing yet
-		shifted_self            => 0,
+		shifted_self            => false,
 	};
 
 #	use Hash::Util qw( lock_ref_keys );
@@ -376,7 +420,7 @@ sub _handle_shiftself {
 	# Getter was cached in $state and needs update.
 	#
 	$state->{getter} = $self->generate_get;
-	$state->{shifted_self} = 1;
+	$state->{shifted_self} = true;
 	
 	return $self;
 }
@@ -443,7 +487,7 @@ sub _handle_sigcheck {
 		# that in the state. The information can be used by
 		# additional_validation coderefs.
 		#
-		$state->{signature_check_needed} = 1;
+		$state->{signature_check_needed} = true;
 	}
 	
 	return $self;
@@ -490,7 +534,7 @@ sub _handle_additional_validation {
 	# final attribute value.
 	#
 	if ( $handler->no_validation_needed or not $self->isa ) {
-		$state->{final_type_check_needed} = 0;
+		$state->{final_type_check_needed} = false;
 	}
 	
 	# The handler can define some additional validation to be performed
@@ -549,9 +593,9 @@ sub _handle_additional_validation {
 				? ( $state->{add_later} = $opt->{code} )
 				: push( @$code, $opt->{code} );
 			
-			# It is assumed that a final type check is no longer needed.
+			# Final type check is often no longer needed.
 			#
-			$state->{final_type_check_needed} = 0;
+			$state->{final_type_check_needed} = $opt->{final_type_check_needed} || false;
 		}
 	}
 	
@@ -573,7 +617,7 @@ sub _handle_getter_code {
 		if ( $handler->name =~ /^(Array|Hash):/ ) {
 			push @$code, "my \$shv_ref_invocant = do { $state->{getter} };";
 			$state->{getter} = '$shv_ref_invocant';
-			$state->{getter_is_lvalue} = 1;
+			$state->{getter_is_lvalue} = true;
 		}
 		
 		# Alternatively, unless the handler doesn't want us to, or the template
@@ -606,19 +650,18 @@ sub _handle_setter_code {
 			$me->generate_set( sprintf(
 				'do { my $shv_final_unchecked = %s; %s }',
 				$value_code,
-				$me->isa->inline_assert( '$shv_final_unchecked', '$shv_final_type' ),
+				$me->generate_type_assertion( $env, $me->isa, '$shv_final_unchecked' ),
 			) );
 		} );
-		$env->{'$shv_final_type'} = \( $self->isa );
 		
 		# In this case we can no longer use the getter as an lvalue, if we
 		# ever could.
 		#
-		$state->{getter_is_lvalue} = 0;
+		$state->{getter_is_lvalue} = false;
 		
 		# Stop worrying about the final type check. The setter does that now.
 		#
-		$state->{final_type_check_needed} = 0;
+		$state->{final_type_check_needed} = false;
 	}
 	
 	return $self;
@@ -718,6 +761,10 @@ The toolkit which made this code generator.
 =head2 C<target> B<< ClassName|RoleName >>
 
 The target package for generated methods.
+
+=head2 C<sandboxing_package> B<< ClassName|RoleName|Undef >>
+
+Package name to use as a sandbox; the default is usually fine.
 
 =head2 C<attribute> B<< Str|ArrayRef >>
 
@@ -819,6 +866,12 @@ The default is this coderef:
     return "\$instance->$method_name($guts)";
   }
 
+=head2 C<generator_for_type_assertion> B<< CodeRef >>
+
+Called as a method and passed a hashref compilation environment, a type
+constraint, and a variable name. Generates code to assert that the variable
+value meets the type constraint, with coercion if appropriate.
+
 =head2 C<get_is_lvalue> B<Bool>
 
 Indicates wheter the code generated by C<generator_for_get>
@@ -835,6 +888,10 @@ Indicates wheter we want to ensure that the setter is always called,
 and we should not try to bypass it, even if we have an lvalue getter.
 
 =head1 METHODS
+
+For each C<generator_for_XXX> attribute, there's a corresponding
+C<generate_XXX> method to actually call the coderef, possibly including
+additional processing.
 
 =head2 C<< generate_and_install_method( $method_name, $handler ) >>
 

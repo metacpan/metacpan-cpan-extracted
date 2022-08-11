@@ -4,7 +4,7 @@
       "Joelle Maslak <jmaslak@antelope.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -67,7 +67,7 @@
    "provides" : {
       "App::RouterColorizer" : {
          "file" : "lib/App/RouterColorizer.pm",
-         "version" : "1.212780"
+         "version" : "1.222220"
       }
    },
    "release_status" : "stable",
@@ -81,7 +81,7 @@
          "web" : "https://github.com/jmaslak/App-RouterColorizer"
       }
    },
-   "version" : "1.212780",
+   "version" : "1.222220",
    "x_contributor_covenant" : {
       "version" : 0.02
    },

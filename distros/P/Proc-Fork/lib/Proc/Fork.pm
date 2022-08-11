@@ -1,8 +1,7 @@
 use 5.006; use strict; use warnings;
 
 package Proc::Fork;
-
-our $VERSION = '0.806';
+our $VERSION = '0.807';
 
 use Exporter::Tidy (
 	default => [ ':all' ],
@@ -147,6 +146,8 @@ Declares the block that should run if there was an error, ie when C<fork> return
 If an C<error> clause is not used, errors will raise an exception using C<die>.
 
 =head1 EXAMPLES
+
+The distribution includes the following examples as separate files in the F<eg/> directory:
 
 =head2 Simple example with IPC via pipe
 

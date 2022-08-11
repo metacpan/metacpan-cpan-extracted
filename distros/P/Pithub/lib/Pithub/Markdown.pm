@@ -1,6 +1,6 @@
 package Pithub::Markdown;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01037';
+our $VERSION = '0.01039';
 # ABSTRACT: Github v3 Markdown API
 
 use Moo;
@@ -39,7 +39,7 @@ Pithub::Markdown - Github v3 Markdown API
 
 =head1 VERSION
 
-version 0.01037
+version 0.01039
 
 =head1 ATTRIBUTES
 

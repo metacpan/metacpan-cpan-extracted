@@ -7,14 +7,12 @@ META.json
 META.yml
 README.org
 SIGNATURE
-debian/watch~
 dist.ini
 lib/Software/Copyright.pm
 lib/Software/Copyright/Owner.pm
 lib/Software/Copyright/Statement.pm
 t/author-pod-spell.t
 t/author-pod-syntax.t
-t/author-synopsis.t
 t/copyright.t
 t/owner.t
 t/split-copyright.t

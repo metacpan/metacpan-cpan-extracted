@@ -1,6 +1,6 @@
 package Pithub::Repos::Stats;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01037';
+our $VERSION = '0.01039';
 # ABSTRACT: Github v3 repos / stats API
 
 use Moo;
@@ -50,7 +50,7 @@ Pithub::Repos::Stats - Github v3 repos / stats API
 
 =head1 VERSION
 
-version 0.01037
+version 0.01039
 
 =head1 METHODS
 

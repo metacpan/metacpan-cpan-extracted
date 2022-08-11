@@ -7,7 +7,7 @@ use HTML::Escape ();
 use Scalar::Util (); 
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
-our @EXPORT_OK = qw(raw flattened_raw safe flattened_safe is_safe escape_html);
+our @EXPORT_OK = qw(raw flattened_raw safe flattened_safe is_safe escape_html concat);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 sub _make_safe {

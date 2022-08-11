@@ -10,9 +10,9 @@ use Perinci::To::POD;
 use Sub::Identify qw(sub_fullname);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-13'; # DATE
+our $DATE = '2022-06-23'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Rinci'; # DIST
-our $VERSION = '0.781'; # VERSION
+our $VERSION = '0.783'; # VERSION
 
 our $pa = Perinci::Access::Perl->new;
 
@@ -26,10 +26,31 @@ has exclude_files => (
     isa => 'Str',
 );
 
-sub _process_module {
-    require Require::Hook::DzilBuild;
+# whether to use Require::Hook::Source::DzilBuild
+has use_require_hook_source_dzilbuild => (
+    is => 'rw',
+    isa => 'Bool',
+);
 
+# whether to force reloadding modules
+has force_reload => (
+    is => 'rw',
+    isa => 'Bool',
+);
+
+sub _process_module {
     my ($self, $document, $input) = @_;
+
+    my $use_require_hook_source_dzilbuild =
+        $self->use_require_hook_source_dzilbuild //
+        $ENV{PERL_POD_WEAVER_PLUGIN_RINCI_USE_REQUIRE_HOOK_SOURCE_DZILBUILD} //
+        1;
+    my $force_reload =
+        $self->force_reload //
+        $ENV{PERL_POD_WEAVER_PLUGIN_RINCI_FORCE_RELOAD} //
+        1;
+
+    require Require::Hook::Source::DzilBuild if $use_require_hook_source_dzilbuild;
 
     my $filename = $input->{filename};
     my ($file) = grep { $_->name eq $filename } @{ $input->{zilla}->files };
@@ -39,11 +60,11 @@ sub _process_module {
     my $package = $1;
     $package =~ s!/!::!g;
 
-    local @INC = (Require::Hook::DzilBuild->new(zilla => $input->{zilla}, debug=>1), @INC);
+    local @INC = (Require::Hook::Source::DzilBuild->new(zilla => $input->{zilla}, debug=>1), @INC) if $use_require_hook_source_dzilbuild;
 
     # force reload to get the recent version of module
     (my $package_pm = "$package.pm") =~ s!::!/!g;
-    delete $INC{$package_pm};
+    delete $INC{$package_pm} if $force_reload;
 
     my $url = $package; $url =~ s!::!/!g; $url = "pl:/$url/";
     my $res = $pa->request(meta => $url);
@@ -132,7 +153,7 @@ sub _process_script {
     require File::Temp;
     require Perinci::CmdLine::POD;
     require Perinci::CmdLine::Util;
-    #require Require::Hook::DzilBuild; # script is dumped in a different process, so doesn't work here
+    #require Require::Hook::Source::DzilBuild; # script is dumped in a different process, so doesn't work here
 
     my ($self, $document, $input) = @_;
     # dump to temporary file first because the file might not be an ondisk file
@@ -249,7 +270,7 @@ Pod::Weaver::Plugin::Rinci - Insert stuffs to POD from Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.781 of Pod::Weaver::Plugin::Rinci (from Perl distribution Pod-Weaver-Plugin-Rinci), released on 2022-06-13.
+This document describes version 0.783 of Pod::Weaver::Plugin::Rinci (from Perl distribution Pod-Weaver-Plugin-Rinci), released on 2022-06-23.
 
 =head1 SYNOPSIS
 
@@ -341,6 +362,52 @@ To exclude a script from being processed, you can also put C<# NO_PWP_RINCI> in
 the script.
 
 =for Pod::Coverage weave_section
+
+=head1 CONFIGURATION
+
+=head2 exclude_modules
+
+String, a regex.
+
+=head2 exclude_files
+
+String, a regex.
+
+=head2 use_require_hook_source_dzilbuild
+
+Bool, default true.
+
+Since F<weaver.ini> does not provide something like C<@Filter> in F<dist.ini>,
+you can also use the environment variable
+C<PERL_POD_WEAVER_PLUGIN_RINCI_USE_REQUIRE_HOOK_SOURCE_DZILBUILD> to set the
+default value of this configuration option.
+
+=head2 force_reload
+
+Bool, default true.
+
+Whether to force reloading modules, to get the latest version (e.g. a module is
+already loaded by another plugin but then might get modified; when we are
+processing the module we might want to reload to get the latest version.
+
+But this reloading sometimes causes the module to fail to compile, so this
+option exists.
+
+Since F<weaver.ini> does not provide something like C<@Filter> in F<dist.ini>,
+you can also use the environment variable
+C<PERL_POD_WEAVER_PLUGIN_RINCI_FORCE_RELOAD> to set the default value of this
+configuration option.
+
+=head1 ENVIRONMENT
+
+=head2 PERL_POD_WEAVER_PLUGIN_RINCI_USE_REQUIRE_HOOK_SOURCE_DZILBUILD
+
+Bool. Used to set the default for the C</use_require_hook_source_dzilbuild>
+configuration option.
+
+=head2 PERL_POD_WEAVER_PLUGIN_RINCI_FORCE_RELOAD
+
+Bool. Used to set the default for the C</force_reload> configuration option.
 
 =head1 HOMEPAGE
 

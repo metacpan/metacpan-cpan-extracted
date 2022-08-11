@@ -38,7 +38,7 @@ See L<Mojolicious::Guides> for more information.
 
 package Game::HexDescribe;
 
-our $VERSION = 1.01;
+our $VERSION = 1.02;
 
 use Modern::Perl;
 use Mojolicious::Lite;

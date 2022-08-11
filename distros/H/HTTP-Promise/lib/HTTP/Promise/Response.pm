@@ -353,6 +353,14 @@ sub status_line
     return( "$code $status" );
 }
 
+# NOTE: sub FREEZE is inherited
+
+# NOTE: sub STORABLE_freeze is inherited
+
+# NOTE: sub STORABLE_thaw is inherited
+
+# NOTE: sub THAW is inherited
+
 1;
 # NOTE: POD
 __END__
@@ -361,7 +369,7 @@ __END__
 
 =head1 NAME
 
-HTTP::Promise::Response - Asynchronous HTTP Request and Promise
+HTTP::Promise::Response - HTTP Response Class
 
 =head1 SYNOPSIS
 

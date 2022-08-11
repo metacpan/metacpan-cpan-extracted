@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Message.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/21
-## Modified 2022/03/21
-## All rights reserved
+## Modified 2022/08/06
+## All rights reserved.
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -25,7 +26,7 @@ BEGIN
     our $CRLF = "\015\012";
     # HTTP/1.0, HTTP/1.1, HTTP/2
     our $HTTP_VERSION  = qr/(?<http_protocol>HTTP\/(?<http_version>(?<http_vers_major>[0-9])(?:\.(?<http_vers_minor>[0-9]))?))/;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 use strict;
@@ -279,7 +280,6 @@ sub can
     my $headers = ref( $self ) ? $self->headers : 'HTTP::Promise::Headers';
     my $trace = '';
     my $debug = $self->debug // 0;
-    $trace = $self->_get_stack_trace if( $debug >= 4 );
     if( $headers->can( $method ) )
     {
         # We create the function here so that it will not need to be
@@ -669,7 +669,21 @@ sub encode
     return(1);
 }
 
-sub entity { return( shift->_set_get_object_without_init( 'entity', 'HTTP::Promise::Entity', @_ ) ); }
+# sub entity { return( shift->_set_get_object_without_init( 'entity', 'HTTP::Promise::Entity', @_ ) ); }
+sub entity
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        return( $self->_set_get_object_without_init( 'entity', 'HTTP::Promise::Entity', @_ ) );
+    }
+    if( $self->_is_a( $self->{entity} => 'HTTP::Promise::Entity' ) &&
+        !$self->{entity}->{http_message} )
+    {
+        $self->{entity}->{http_message} = $self;
+    }
+    return( $self->_set_get_object_without_init( 'entity', 'HTTP::Promise::Entity' ) );
+}
 
 sub header { return( shift->headers->header( @_ ) ); }
 
@@ -992,6 +1006,54 @@ sub AUTOLOAD
 # avoid AUTOLOADing it
 sub DESTROY { }
 
+# NOTE: sub FREEZE is inherited
+
+sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+# NOTE: sub THAW is inherited
+sub THAW
+{
+    my( $self, $serialiser, @args ) = @_;
+    my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+    my $new;
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        foreach( CORE::keys( %$hash ) )
+        {
+            $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+        }
+        
+        # Need to make sure the headers object, which is an XS one is properly post processed, because Storable does not handle well XS objects, as of version 3.26
+        if( CORE::exists( $self->{headers} ) && 
+            CORE::defined( $self->{headers} ) && 
+            CORE::ref( $self->{headers} ) && 
+            $self->{headers}->isa( 'HTTP::Promise::Headers' ) )
+        {
+            $self->{headers} = $self->{headers}->STORABLE_thaw_post_processing;
+        }
+        # The headers object in HTTP::Promise::Message must be the same shared on in HTTP::Promise::Entity
+        if( CORE::exists( $self->{entity} ) &&
+            CORE::exists( $self->{entity}->{headers} ) )
+        {
+            $self->{entity}->{headers} = $self->{headers};
+        }
+        $new = $self;
+    }
+    else
+    {
+        $new = bless( $hash => $class );
+    }
+    CORE::return( $new );
+}
+
+# NOTE: only here to avoid triggering HTTP::Promise::Headers::STORABLE_thaw_post_processing which we inherit when we did 'require HTTP::Promise::Headers'
+sub STORABLE_thaw_post_processing { CORE::return( $_[0] ); }
+
 1;
 # NOTE: POD
 __END__
@@ -1012,7 +1074,7 @@ HTTP::Promise::Message - HTTP Message Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 

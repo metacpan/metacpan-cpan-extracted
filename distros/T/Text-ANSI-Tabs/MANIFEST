@@ -9,5 +9,6 @@ minil.toml
 t/00_compile.t
 t/03_expand.t
 t/04_unexpand.t
+t/05_tabstop.t
 META.yml
 MANIFEST

@@ -1,5 +1,8 @@
 Revision history for Sagan-Monitoring
 
+1.2.0	2022-08-03/17:45
+		-Add base64+gzip compression when -b and -c are used.
+
 1.1.1	2022-06-29/16:40
 		-No longer stomp the slug name and some minor doc fixes.
 

@@ -80,7 +80,8 @@
          },
          "suggests" : {
             "Future::AsyncAwait" : "0.58",
-            "Syntax::Keyword::MultiSub" : "0.02"
+            "Syntax::Keyword::MultiSub" : "0.02",
+            "Syntax::Keyword::Try" : "0.027"
          }
       },
       "test" : {
@@ -97,6 +98,8 @@
             "List::Util" : "0",
             "Scalar::Util" : "0",
             "Test::Builder" : "0",
+            "Test::Compile" : "v3.1.0",
+            "Test::Compile::Internal" : "0",
             "Test::More" : "0",
             "Test::Most" : "0",
             "base" : "0",
@@ -107,50 +110,50 @@
    "provides" : {
       "Moose::Exception::InvalidAttributeDefinition" : {
          "file" : "lib/Moose/Exception/InvalidAttributeDefinition.pm",
-         "version" : "0.26"
+         "version" : "0.28"
       },
       "Moose::Exception::InvalidImportList" : {
          "file" : "lib/Moose/Exception/InvalidImportList.pm",
-         "version" : "0.26"
+         "version" : "0.28"
       },
       "MooseX::Extended" : {
          "file" : "lib/MooseX/Extended.pm",
-         "version" : "0.26"
+         "version" : "0.28"
       },
       "MooseX::Extended::Core" : {
          "file" : "lib/MooseX/Extended/Core.pm",
-         "version" : "0.26"
+         "version" : "0.28"
       },
       "MooseX::Extended::Custom" : {
          "file" : "lib/MooseX/Extended/Custom.pm",
-         "version" : "0.26"
+         "version" : "0.28"
       },
       "MooseX::Extended::Role" : {
          "file" : "lib/MooseX/Extended/Role.pm",
-         "version" : "0.26"
+         "version" : "0.28"
       },
       "MooseX::Extended::Role::Custom" : {
          "file" : "lib/MooseX/Extended/Role/Custom.pm",
-         "version" : "0.26"
+         "version" : "0.28"
       },
       "MooseX::Extended::Types" : {
          "file" : "lib/MooseX/Extended/Types.pm",
-         "version" : "0.26"
+         "version" : "0.28"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/Ovid/moosex-extreme/issues"
+         "web" : "https://github.com/Ovid/moosex-extended/issues"
       },
-      "homepage" : "https://github.com/Ovid/moosex-extreme",
+      "homepage" : "https://github.com/Ovid/moosex-extended",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/Ovid/moosex-extreme.git",
-         "web" : "https://github.com/Ovid/moosex-extreme"
+         "url" : "https://github.com/Ovid/moosex-extended.git",
+         "web" : "https://github.com/Ovid/moosex-extended"
       }
    },
-   "version" : "0.26",
+   "version" : "0.28",
    "x_contributors" : [
       "Graham Knop <haarg@haarg.org>",
       "Marco Fontani <MFONTANI@cpan.org>",

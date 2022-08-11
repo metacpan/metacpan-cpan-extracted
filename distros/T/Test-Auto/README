@@ -4,11 +4,15 @@ NAME
 
 ABSTRACT
 
-    Test Automation, Docs Generation
+    Test Automation for Perl 5
+
+VERSION
+
+    0.13
 
 SYNOPSIS
 
-      #!/usr/bin/env perl
+      package main;
     
       use Test::Auto;
       use Test::More;
@@ -17,13 +21,28 @@ SYNOPSIS
         't/Test_Auto.t'
       );
     
-      # automation
+      # =synopsis
+      #
+      # use Path::Find 'path';
+      #
+      # my $path = path; # get path using cwd
+      #
+      # =cut
     
-      # my $subtests = $test->subtests->standard;
+      # $test->for('synopsis', sub {
+      #   my ($tryable) = @_;
+      #   ok my $result = $tryable->result;
+      #
+      #   # more test for the synopsis ...
+      #
+      #   $result
+      # });
     
       # ...
     
-      # done_testing;
+      # $test->render('lib/Path/Find.pod');
+    
+      # done_testing
 
 DESCRIPTION
 
@@ -31,120 +50,90 @@ DESCRIPTION
     software projects, a framework writing tests, test automation, and
     documentation generation.
 
-REASONING
+AUTOMATION
 
-    This framework lets you write documentation in test files using
-    pod-like comment blocks. By using a particular set of comment blocks
-    (the specification) this framework can run certain kinds of tests
-    automatically. For example, we can automatically ensure that the
-    package the test is associated with is loadable, that the test file
-    comment blocks meet the specification, that any super-classes or
-    libraries are loadable, and that the functions, methods, and routines
-    are properly documented.
-
-LIBRARIES
-
-    This package uses type constraints from:
-
-    Test::Auto::Types
-
-SCENARIOS
-
-    This package supports the following scenarios:
-
- exports
-
-      use Test::Auto;
-      use Test::More;
-    
-      my $subtests = testauto 't/Test_Auto.t';
-    
-      # automation
-    
-      # $subtests->standard;
-    
       # ...
     
-      # done_testing;
+      $test->for('name');
 
-    This package automatically exports the testauto function which uses the
-    "current file" as the automated testing source.
+    This framework provides a set of automated subtests based on the
+    package specification, but not everything can be automated so it also
+    provides you with powerful hooks into the framework for manual testing.
 
-ATTRIBUTES
+      # ...
+    
+      $test->for('synopsis', sub {
+        my ($tryable) = @_;
+    
+        ok my $result = $tryable->result, 'result ok';
+    
+        # must return truthy to cont
+        $result;
+      });
 
-    This package has the following attributes:
+    The code examples documented can be automatically evaluated (evaled)
+    and returned using a callback you provide for further testing. Because
+    the code examples are returned as Venus::Try objects this makes
+    capturing and testing exceptions simple, for example:
 
- data
+      # ...
+    
+      $test->for('synopsis', sub {
+        my ($tryable) = @_;
+    
+        # catch exception thrown by the synopsis
+        $tryable->catch('Path::Find::Error', sub {
+          return $_[0];
+        });
+    
+        # test the exception
+        ok my $result = $tryable->result, 'result ok';
+        ok $result->isa('Path::Find::Error'), 'exception caught';
+    
+        # must return truthy to cont
+        $result;
+      });
 
-      data(Data)
+    Additionally, another manual testing hook (with some automation) is the
+    example method. This hook evaluates (evals) a given example and returns
+    the result as a Venus::Try object. The first argument is the example ID
+    (or number), for example:
 
-    This attribute is read-only, accepts (Data) values, and is optional.
+      # ...
+    
+      $test->for('example', 1, 'children', sub {
+        my ($tryable) = @_;
+    
+        ok my $result = $tryable->result, 'result ok';
+    
+        # must return truthy to cont
+        $result;
+      });
 
- file
+    Finally, the lesser-used but useful manual testing hook is the feature
+    method. This hook evaluates (evals) a documented feature and returns
+    the result as a Venus::Try object, for example:
 
-      file(Str)
+      # ...
+    
+      $test->for('feature', 'export-path-make', sub {
+        my ($tryable) = @_;
+    
+        ok my $result = $tryable->result, 'result ok';
+    
+        # must return truthy to cont
+        $result;
+      });
 
-    This attribute is read-only, accepts (Str) values, and is required.
-
-FUNCTIONS
-
-    This package implements the following functions:
-
- testauto
-
-      testauto(Str $file) : Subtests
-
-    This function is exported automatically and returns a
-    Test::Auto::Subtests object for the test file given.
-
-    testauto example #1
-
-        # given: synopsis
-      
-        my $subtests = testauto 't/Test_Auto.t';
-
-METHODS
-
-    This package implements the following methods:
-
- document
-
-      document() : Document
-
-    This method returns a Test::Auto::Document object.
-
-    document example #1
-
-        # given: synopsis
-      
-        my $document = $test->document;
-
- parser
-
-      parser() : Parser
-
-    This method returns a Test::Auto::Parser object.
-
-    parser example #1
-
-        # given: synopsis
-      
-        my $parser = $test->parser;
-
- subtests
-
-      subtests() : Subtests
-
-    This method returns a Test::Auto::Subtests object.
-
-    subtests example #1
-
-        # given: synopsis
-      
-        my $subtests = $test->subtests;
+    The test automation and documentation generation enabled through this
+    framework makes it easy to maintain source/test/documentation parity.
+    This also increases reusability and reduces the need for complicated
+    state and test setup.
 
 SPECIFICATION
 
+      # Since 0.13
+    
       # [required]
     
       =name
@@ -159,12 +148,17 @@ SPECIFICATION
       =libraries
       =inherits
       =integrates
-      =attributes
     
       # [repeatable; optional]
     
-      =scenario $name
+      =feature $name
       =example $name
+    
+      # [repeatable; optional]
+    
+      =attribute $name
+      =signature $name
+      =example-$number $name # [repeatable]
     
       # [repeatable; optional]
     
@@ -183,19 +177,10 @@ SPECIFICATION
       =routine $name
       =signature $name
       =example-$number $name # [repeatable]
-    
-      # [repeatable; optional]
-    
-      =type $name
-      =type-library $name
-      =type-composite $name # [optional]
-      =type-parent $name # [optional]
-      =type-coercion-$number $name # [optional]
-      =type-example-$number $name # [repeatable]
 
     The specification is designed to accommodate typical package
     declarations. It is used by the parser to provide the content used in
-    the test automation and document generation. Note: when code blocks are
+    test automation and document generation. Note: When code blocks are
     evaluated "redefined" warnings are now automatically disabled.
 
  name
@@ -246,8 +231,9 @@ SPECIFICATION
     The includes block should contain a list of function, method, and/or
     routine names in the format of $type: $name. Empty lines are ignored.
     This is tested for existence. Each function, method, and/or routine is
-    tested to be documented properly. Also, the package must recognize that
-    each exists.
+    tested to be documented properly, i.e. has the requisite counterparts
+    (e.g. signature and at least one example block). Also, the package must
+    recognize that each exists.
 
  synopsis
 
@@ -312,9 +298,9 @@ SPECIFICATION
     involved in the behavior of the main package. These packages are not
     automatically tested.
 
- scenarios
+ features
 
-      =scenario export-path-make
+      =feature export-path-make
     
       quisque egestas diam in arcu cursus euismod quis viverra nibh
     
@@ -332,33 +318,54 @@ SPECIFICATION
 
     There are situation where a package can be configured in different
     ways, especially where it exists without functions, methods or routines
-    for the purpose of configuring the environment. The scenario directive
+    for the purpose of configuring the environment. The feature directive
     can be used to automate testing and documenting package usages and
-    configurations.Describing a scenario requires two blocks, i.e. scenario
-    $name and example $name. The scenario block should contain a
-    description of the scenario and its purpose. The example block must
-    exist when documenting a method and should contain valid Perl code and
-    return a value. The block may contain a "magic" comment in the form of
-    given: synopsis or given: example $name which if present will include
-    the given code example(s) with the evaluation of the current block.
-    Each scenario is tested and must be recognized to exist by the main
-    package.
+    configurations. Describing a feature requires two blocks, i.e. feature
+    $name and example $name. The feature block should contain a description
+    of the feature and its purpose. The example block must exist when
+    documenting a feature and should contain valid Perl code and return a
+    value. The block may contain a "magic" comment in the form of given:
+    synopsis or given: example $name which if present will include the
+    given code example(s) with the evaluation of the current block. Each
+    feature is tested and must be recognized to exist by the main package.
 
  attributes
 
-      =attributes
+      =attribute cwd
     
-      cwd: ro, req, Object
+      quis viverra nibh cras pulvinar mattis nunc sed blandit libero volutpat
+    
+      =signature cwd
+    
+      cwd(Str $path) : (Object)
+    
+      =example-1 cwd
+    
+      # given: synopsis
+    
+      my $cwd = $path->cwd;
+    
+      =example-2 cwd
+    
+      # given: synopsis
+    
+      my $cwd = $path->cwd('/path/to/file');
     
       =cut
 
-    The attributes block should contain a list of package attributes in the
-    form of $name: $is, $presence, $type, where $is should be ro
-    (read-only) or rw (read-wire), and $presence should be req (required)
-    or opt (optional), and $type can be any valid Type::Tiny expression.
-    Each attribute declaration must be recognized to exist by the main
-    package and have a type which is recognized by one of the declared type
-    libraries.
+    Describing an attribute requires at least three blocks, i.e. attribute
+    $name, signature $name, and example-1 $name. The attribute block should
+    contain a description of the attribute and its purpose. The signature
+    block should contain a routine signature in the form of $signature :
+    $return_type, where $signature is a valid typed signature and
+    $return_type is any valid Type::Tiny expression. The example-$number
+    block is a repeatable block, and at least one block must exist when
+    documenting an attribute. The example-$number block should contain
+    valid Perl code and return a value. The block may contain a "magic"
+    comment in the form of given: synopsis or given: example-$number $name
+    which if present will include the given code example(s) with the
+    evaluation of the current block. Each attribute is tested and must be
+    recognized to exist by the main package.
 
  methods
 
@@ -475,164 +482,148 @@ SPECIFICATION
     Each routine is tested and must be recognized to exist by the main
     package.
 
- types
+INHERITS
 
-      =type Path
-    
-        Path
-    
-      =type-parent Path
-    
-        Object
-    
-      =type-library Path
-    
-      Path::Types
-    
-      =type-composite Path
-    
-        InstanceOf["Path::Find"]
-    
-      =type-coercion-1 Path
-    
-        # can coerce from Str
-    
-        './path/to/file'
-    
-      =type-example-1 Path
-    
-        require Path::Find;
-    
-        Path::Find::path('./path/to/file')
-    
-      =cut
+    This package inherits behaviors from:
 
-    When developing Perl programs, or type libraries, that use Type::Tiny
-    based type constraints, testing and documenting custom type constraints
-    is often overlooked. Describing a custom type constraint requires at
-    least two blocks, i.e. type $name and type-library $name. While it's
-    not strictly required, it's a good idea to also include at least one
-    type-example-1 $name. The optional type-parent block should contain the
-    name of the parent type. The type-composite block should contain a type
-    expression that represents the derived type. The type-coercion-$number
-    block is a repeatable block which is used to validate type coercion.
-    The type-coercion-$number block should contain valid Perl code and
-    return the value to be coerced. The type-example-$number block is a
-    repeatable block, and it's a good idea to have at least one block must
-    exist when documenting a type. The type-example-$number block should
-    contain valid Perl code and return a value. Each type is tested and
-    must be recognized to exist within the package specified by the
-    type-library block.
+    Venus::Test
 
-AUTOMATION
+FUNCTIONS
 
-      $test->standard;
+    This package provides the following functions:
 
-    This is the equivalent of writing:
+ test
 
-      $test->package;
-      $test->document;
-      $test->libraries;
-      $test->inherits;
-      $test->attributes;
-      $test->methods;
-      $test->routines;
-      $test->functions;
-      $test->types;
+      test(Str $file) (Auto)
 
-    This framework provides a set of automated subtests based on the
-    package specification, but not everything can be automated so it also
-    provides you with powerful hooks into the framework for manual testing.
+    The test function takes a file path and returns a Test::Auto object for
+    use in test automation and documentation rendering. This function is
+    exported automatically unless a routine of the same name already exists
+    in the calling package.
 
-      my $subtests = $test->subtests;
-    
-      $subtests->synopsis(sub {
-        my ($tryable) = @_;
-    
-        ok my $result = $tryable->result, 'result ok';
-    
-        $result; # for automated testing after the callback
-      });
+    Since 0.13
 
-    The code examples documented can be automatically evaluated (evaled)
-    and returned using a callback you provide for further testing. Because
-    the code examples are returned as Test::Auto::Try objects (see
-    Data::Object::Try), this makes capturing and testing exceptions simple,
-    for example:
+    test example 1
 
-      my $subtests = $test->subtests;
-    
-      $subtests->synopsis(sub {
-        my ($tryable) = @_;
-    
-        # catch exception thrown by the synopsis
-        $tryable->catch('Path::Find::Error', sub {
-          return $_[0];
+        # given: synopsis
+      
+        $test = test('t/Test_Auto.t');
+      
+        # =synopsis
+        #
+        # use Path::Find 'path';
+        #
+        # my $path = path; # get path using cwd
+        #
+        # =cut
+      
+        # $test->for('synopsis', sub {
+        #   my ($tryable) = @_;
+        #   ok my $result = $tryable->result;
+        #
+        #   # more test for the synopsis ...
+        #
+        #   $result
+        # });
+      
+        # ...
+      
+        # $test->render('lib/Path/Find.pod');
+      
+        # done_testing
+
+METHODS
+
+    This package provides the following methods:
+
+ data
+
+      data(Str $name, Any @args) (Str)
+
+    The data method attempts to find and return the POD content based on
+    the name provided. If the content cannot be found an exception is
+    raised.
+
+    Since 0.13
+
+    data example 1
+
+        # given: synopsis
+      
+        my $data = $test->data('name');
+      
+        # Test::Auto
+
+    data example 2
+
+        # given: synopsis
+      
+        my $data = $test->data('unknown');
+      
+        # Exception! isa (Test::Auto::Error)
+
+ for
+
+      for(Str $name | CodeRef $code, Any @args) (Any)
+
+    The for method attempts to find the POD content based on the name
+    provided and executes the corresponding predefined test, optionally
+    accepting a callback which, if provided, will be passes a Venus::Try
+    object containing the POD-driven test. The callback, if provided, must
+    always return a true value. Note: All automated tests disable the
+    "redefine" class of warnings to prevent warnings when redeclaring
+    packages in examples.
+
+    Since 0.13
+
+    for example 1
+
+        # given: synopsis
+      
+        my $data = $test->for('name');
+      
+        # Test::Auto
+
+    for example 2
+
+        # given: synopsis
+      
+        my $data = $test->for('synosis');
+      
+        # bless({value => 't/Test_Auto.t'}, 'Test::Auto')
+
+    for example 3
+
+        # given: synopsis
+      
+        my $data = $test->for('example', 1, 'data', sub {
+          my ($tryable) = @_;
+          my $result = $tryable->result;
+          ok length($result) > 1;
+      
+          $result
         });
-        # test the exception
-        ok my $result = $tryable->result, 'result ok';
-        ok $result->isa('Path::Find::Error'), 'exception caught';
-    
-        $result;
-      });
+      
+        # Test::Auto
 
-    Additionally, another manual testing hook (with some automation) is the
-    example method. This hook evaluates (evals) a given example and returns
-    the result as a Test::Auto::Try object (see Data::Object::Try). The
-    first argument is the example ID (or number), for example:
+ render
 
-      my $subtests = $test->subtests;
-    
-      $subtests->example(-1, 'children', 'method', sub {
-        my ($tryable) = @_;
-    
-        ok my $result = $tryable->result, 'result ok';
-    
-        $result; # for automated testing after the callback
-      });
+      render(Str $file) (Path)
 
-    Finally, the lesser-used but useful manual testing hook is the scenario
-    method. This hook evaluates (evals) a documented scenario and returns
-    the result as a Test::Auto::Try object (see Data::Object::Try), for
-    example:
+    The render method renders and writes a valid POD document, and returns
+    a Venus::Path object representation the POD file specified.
 
-      my $subtests = $test->subtests;
-    
-      $subtests->scenario('export-path-make', sub {
-        my ($tryable) = @_;
-    
-        ok my $result = $tryable->result, 'result ok';
-    
-        $result; # for automated testing after the callback
-      });
+    Since 0.13
 
-    The test automation and document generation enabled through this
-    framework makes it easy to maintain source/test/documentation parity.
-    This also increases reusability and reduces the need for complicated
-    state and test setup.
+    render example 1
 
-AUTHOR
+        # given: synopsis
+      
+        my $path = $test->render('t/Path_Find.pod');
+      
+        # bless({value => 't/Path_Find.pod', 'Venus::Path'})
 
-    Al Newkirk, awncorp@cpan.org
+AUTHORS
 
-LICENSE
-
-    Copyright (C) 2011-2019, Al Newkirk, et al.
-
-    This is free software; you can redistribute it and/or modify it under
-    the terms of the The Apache License, Version 2.0, as elucidated in the
-    "license file"
-    <https://github.com/iamalnewkirk/test-auto/blob/master/LICENSE>.
-
-PROJECT
-
-    Wiki <https://github.com/iamalnewkirk/test-auto/wiki>
-
-    Project <https://github.com/iamalnewkirk/test-auto>
-
-    Initiatives <https://github.com/iamalnewkirk/test-auto/projects>
-
-    Milestones <https://github.com/iamalnewkirk/test-auto/milestones>
-
-    Issues <https://github.com/iamalnewkirk/test-auto/issues>
+    Awncorp, awncorp@cpan.org
 

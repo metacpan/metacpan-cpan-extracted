@@ -1,0 +1,86 @@
+{
+   "abstract" : "Parse a date/time string using the best method available",
+   "author" : [
+      "Robert Krimen <rokr@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DateTimeX-Easy",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::EOF" : "0",
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Date::Parse" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::DateManip" : "0",
+            "DateTime::Format::Flexible" : "0",
+            "DateTime::Format::ICal" : "0",
+            "DateTime::Format::Natural" : "0",
+            "DateTime::TimeZone" : "0",
+            "Exporter" : "0",
+            "Scalar::Util" : "0",
+            "Time::Zone" : "0",
+            "YAML" : "0",
+            "base" : "0",
+            "constant" : "0",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DateTimeX::Easy" : {
+         "file" : "lib/DateTimeX/Easy.pm",
+         "version" : "0.090"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.090",
+   "x_contributors" : [
+      "David Steinbrunner <dsteinbrunner@pobox.com>",
+      "John Napiorkowski <jjn1056@gmail.com>",
+      "John Napiorkowski <johnn@John-Napiorkowski-MacBook-Pro.local>",
+      "Leo Lapworth <leo@cuckoo.org>",
+      "RHPizzarro <rich@pennatech.com>",
+      "robertkrimen <robertkrimen@gmail.com>",
+      "rob <rob@740ff789-fa8c-dc11-8ac4-000c6e5764c0>",
+      "Stephen Thirlwall <sdt@dr.com>",
+      "Wesley Schwengle <waterkip@cpan.org>"
+   ],
+   "x_generated_by_perl" : "v5.34.0",
+   "x_maintainers" : [
+      "John Napiorkowski <jjnapiork@cpan.org>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

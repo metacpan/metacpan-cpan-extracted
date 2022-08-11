@@ -1,7 +1,8 @@
 Changes
 Makefile.PL
-boilerplate.pl
+inc/boilerplate.pl
 lib/Catalyst/Plugin/CachedUriForAction.pm
+t/00-load.t
 t/lib/TestApp.pm
 t/lib/TestApp/Controller/Action/Chained.pm
 t/lib/TestApp/Controller/Action/Chained/ArgsOrder.pm

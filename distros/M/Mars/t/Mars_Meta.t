@@ -40,12 +40,21 @@ subtest('synopsis', sub {
     return ['authenticate'];
   }
 
+  package Novice;
+
+  use Mars::Mixin;
+
+  sub points {
+    100
+  }
+
   package User;
 
   use Mars::Class;
 
   base 'Person';
   with 'Identity';
+  mixin 'Novice';
 
   attr 'email';
 
@@ -241,6 +250,89 @@ EOF
   ok $result->{ROLE};
 });
 
+subtest('example-1 local', sub {
+  my $result = eval <<'EOF';
+  package main;
+
+  my $meta = Mars::Meta->new(name => 'User');
+
+  my $attrs = $meta->local('attrs');
+
+  # ['email']
+EOF
+  is_deeply $result, ['email'];
+});
+
+subtest('example-2 local', sub {
+  my $result = eval <<'EOF';
+  package main;
+
+  my $meta = Mars::Meta->new(name => 'User');
+
+  my $bases = $meta->local('bases');
+
+  # ['Person', 'Mars::Kind::Class']
+EOF
+  is_deeply $result, ['Person', 'Mars::Kind::Class'];
+});
+
+subtest('example-3 local', sub {
+  my $result = eval <<'EOF';
+  package main;
+
+  my $meta = Mars::Meta->new(name => 'User');
+
+  my $roles = $meta->local('roles');
+
+  # ['Identity', 'Authenticable']
+EOF
+  is_deeply $result, ['Identity', 'Authenticable'];
+});
+
+subtest('example-4 local', sub {
+  my $result = eval <<'EOF';
+  package main;
+
+  my $meta = Mars::Meta->new(name => 'User');
+
+  my $subs = $meta->local('subs');
+
+  # [
+  #   'attr',
+  #   'authenticate',
+  #   'base',
+  #   'email',
+  #   'false',
+  #   'from',
+  #   'id',
+  #   'login',
+  #   'password',
+  #   'role',
+  #   'test',
+  #   'true',
+  #   'valid',
+  #   'with',
+  # ]
+EOF
+  is_deeply [sort @{$result}], [
+    'attr',
+    'authenticate',
+    'base',
+    'email',
+    'false',
+    'from',
+    'id',
+    'login',
+    'mixin',
+    'password',
+    'role',
+    'test',
+    'true',
+    'valid',
+    'with',
+  ];
+});
+
 subtest('example-1 new', sub {
   my $result = eval <<'EOF';
   package main;
@@ -263,6 +355,62 @@ subtest('example-2 new', sub {
 EOF
   ok $result->isa('Mars::Meta');
   ok $result->{name} eq 'User';
+});
+
+subtest('example-1 mixin', sub {
+  my $result = eval <<'EOF';
+  package main;
+
+  my $user = User->new(
+    fname => 'Elliot',
+    lname => 'Alderson',
+  );
+
+  my $meta = $user->meta;
+
+  my $mixin = $meta->mixin('Novice');
+
+  # 1
+EOF
+  ok $result == 1;
+});
+
+subtest('example-2 mixin', sub {
+  my $result = eval <<'EOF';
+  package main;
+
+  my $user = User->new(
+    fname => 'Elliot',
+    lname => 'Alderson',
+  );
+
+  my $meta = $user->meta;
+
+  my $mixin = $meta->mixin('Intermediate');
+
+  # 0
+EOF
+  ok $result == 0;
+});
+
+subtest('example-1 mixins', sub {
+  my $result = eval <<'EOF';
+  package main;
+
+  my $user = User->new(
+    fname => 'Elliot',
+    lname => 'Alderson',
+  );
+
+  my $meta = $user->meta;
+
+  my $mixins = $meta->mixins;
+
+  # [
+  #   'Novice',
+  # ]
+EOF
+  is_deeply $result, ['Novice'];
 });
 
 subtest('example-1 role', sub {

@@ -8,7 +8,7 @@ use IO::Handle;
 use IO::Select;
 use Config;
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 use Exporter (); *import = \&Exporter::import;
 our @EXPORT_OK = qw( iterate iterate_as_array iterate_as_hash );

@@ -5,7 +5,7 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
 
 # VERSION
 
-Version 2.1101
+Version 2.1301
 
 # SYNOPSIS
 
@@ -79,7 +79,7 @@ using default width with additional parameter:
     ($folded, $remain) = ansi_fold($text, undef, padding => 1);
 
 Some other easy-to-use interfaces are provided by sister module
-[Text::ANSI::Fold::Util](https://metacpan.org/pod/Text::ANSI::Fold::Util).
+[Text::ANSI::Fold::Util](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold%3A%3AUtil).
 
 # OBJECT INTERFACE
 
@@ -196,6 +196,15 @@ function as well as **new** and **configure** method.
     given width.
 
         ansi_fold($text, 80, padding => 1, padchar => '_');
+
+- **prefix** => _string_ | _coderef_
+
+    **prefix** string is inserted before remained string if it is not
+    empty.  This is convenient to produce indented series of text by
+    **chops** interface.
+
+    If the value is reference to subroutine, its result is used as a
+    prefix string.
 
 - **ambiguous** => "narrow" or "wide"
 
@@ -316,31 +325,36 @@ characters with prohibited character handling.
 
 # SEE ALSO
 
-- [Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold)
+- [Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold)
 - [https://github.com/kaz-utashiro/Text-ANSI-Fold](https://github.com/kaz-utashiro/Text-ANSI-Fold)
 
     Distribution and repository.
 
-- [App::ansifold](https://metacpan.org/pod/App::ansifold)
+- [App::ansifold](https://metacpan.org/pod/App%3A%3Aansifold)
 
-    Command line utility using [Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold).
+    Command line utility using [Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold).
 
-- [Text::ANSI::Fold::Util](https://metacpan.org/pod/Text::ANSI::Fold::Util)
+- [Text::ANSI::Fold::Util](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold%3A%3AUtil)
 
-    Collection of utilities using [Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold) module.
+    Collection of utilities using [Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold) module.
 
-- [App::sdif](https://metacpan.org/pod/App::sdif)
+- [Text::ANSI::Tabs](https://metacpan.org/pod/Text%3A%3AANSI%3A%3ATabs)
 
-    [Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold) was originally implemented in **sdif** command for
+    [Text::Tabs](https://metacpan.org/pod/Text%3A%3ATabs) compatible tab expand/unexpand module using
+    [Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold) as a backend processor.
+
+- [App::sdif](https://metacpan.org/pod/App%3A%3Asdif)
+
+    [Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold) was originally implemented in **sdif** command for
     long time, which provide side-by-side view for diff output.  It is
     necessary to process output from **cdif** command which highlight diff
     output using ANSI escape sequences.
 
-- [Text::ANSI::Util](https://metacpan.org/pod/Text::ANSI::Util), [Text::ANSI::WideUtil](https://metacpan.org/pod/Text::ANSI::WideUtil)
+- [Text::ANSI::Util](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AUtil), [Text::ANSI::WideUtil](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AWideUtil)
 
     These modules provide a rich set of functions to handle string
     contains ANSI color terminal sequences.  In contrast,
-    [Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold) provides simple folding mechanism with minimum
+    [Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold) provides simple folding mechanism with minimum
     overhead.  Also **sdif** need to process other than SGR (Select Graphic
     Rendition) color sequence, and non-spacing combining characters, those
     are not supported by these modules.

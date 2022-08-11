@@ -7,22 +7,22 @@ AtteanX::Parser::SPARQL - SPARQL 1.1 Parser.
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::SPARQL version 0.030.
+This document describes AtteanX::Parser::SPARQL version 0.031.
 
 =head1 SYNOPSIS
 
  use AtteanX::Parser::SPARQL;
- my $algbrea = AtteanX::Parser::SPARQL->parse($sparql, $base_uri);
+ my $algbrea = AtteanX::Parser::SPARQL->parse($sparql);
  # or:
  my $parser	= AtteanX::Parser::SPARQL->new();
- my ($algebra) = $parser->parse_list_from_bytes($sparql, $base_uri);
+ my ($algebra) = $parser->parse_list_from_bytes($sparql);
  
  # or to allow parsing of SPARQL 1.1 Updates:
  
- my $algbrea = AtteanX::Parser::SPARQL->parse_update($sparql, $base_uri);
+ my $algbrea = AtteanX::Parser::SPARQL->parse_update($sparql);
  # or:
  my $parser = AtteanX::Parser::SPARQL->new(update => 1);
- my ($algebra) = $parser->parse_list_from_bytes($sparql, $base_uri);
+ my ($algebra) = $parser->parse_list_from_bytes($sparql);
  
 =head1 DESCRIPTION
 
@@ -70,7 +70,7 @@ L<Attean::API::AbbreviatingParser>.
 
 =cut
 
-package AtteanX::Parser::SPARQL 0.030;
+package AtteanX::Parser::SPARQL 0.031;
 
 use strict;
 use warnings;
@@ -213,6 +213,7 @@ sub parse_nodes {
 	my $l		= $self->_configure_lexer( $p->parse_iter_from_bytes(@_) );
 	$self->lexer($l);
 	$self->baseURI($self->{args}{base});
+	$self->build({base => $self->baseURI});
 	
 	my @nodes;
 	while ($self->_peek_token) {
@@ -1202,6 +1203,7 @@ sub _BindingValue_test {
 	return 1 if ($self->_IRIref_test);
 	return 1 if ($self->_test_token(BNODE));
 	return 1 if ($self->_test_token(NIL));
+	return 1 if ($self->_test_token(LTLT));
 	return 0;
 }
 
@@ -1209,6 +1211,8 @@ sub _BindingValue {
 	my $self	= shift;
 	if ($self->_optional_token(KEYWORD, 'UNDEF')) {
 		push(@{ $self->{_stack} }, undef);
+	} elsif ($self->_test_token(LTLT)) {
+		$self->_QuotedTriple();
 	} else {
 		$self->_GraphTerm;
 	}
@@ -1621,7 +1625,7 @@ sub _SubSelect {
 		my $triples								= $self->_push_pattern_container();
 		local($self->{build})					= { triples => $triples};
 		if ($self->{baseURI}) {
-			$self->{build}{base}	= $self->{baseURI};
+			$self->{build}{base}				= $self->{baseURI};
 		}
 		
 		$self->_expected_token(KEYWORD, 'SELECT');
@@ -1730,6 +1734,7 @@ sub _TriplesBlock_test {
 	return 1 if ($self->_test_token(BNODE));
 	return 1 if ($self->_test_token(LPAREN));
 	return 1 if ($self->_test_token(LBRACKET));
+	return 1 if ($self->_test_token(LTLT));
 	return 1 if ($self->_IRIref_test);
 	return 1 if ($self->_test_literal_token);
 	return 0;
@@ -1852,7 +1857,14 @@ sub _InlineDataClause {
 	
 	$self->_expected_token(RBRACE);
 	
-	my @vbs		= map { my %d; @d{ map { $_->value } @vars } = @$_; Attean::Result->new(bindings => \%d) } @rows;
+	my @vbs;
+	foreach my $row (@rows) {
+		my %d;
+		# Turn triple patterns into ground triples.
+		@d{ map { $_->value } @vars } = map { $_->does('Attean::API::TriplePattern') ? $_->as_triple : $_ } @$row;
+		my $result	= Attean::Result->new(bindings => \%d);
+		push(@vbs, $result);
+	}
 	my $table	= Attean::Algebra::Table->new( variables => \@vars, rows => \@vbs );
 	$self->_add_stack( ['Attean::Algebra::Table', $table] );
 	
@@ -2104,7 +2116,7 @@ sub _TriplesSameSubject {
 			push(@triples, $self->__new_statement( $s, @$data ));
 		}
 	} else {
-		$self->_VarOrTerm;
+		$self->_VarOrTermOrQuotedTP;
 		my ($s)	= splice(@{ $self->{_stack} });
 
 		$self->_PropertyListNotEmpty;
@@ -2131,7 +2143,7 @@ sub _TriplesSameSubjectPath {
 			push(@triples, $self->__new_statement( $s, @$data ));
 		}
 	} else {
-		$self->_VarOrTerm;
+		$self->_VarOrTermOrQuotedTP;
 		my ($s)	= splice(@{ $self->{_stack} });
 		$self->_PropertyListNotEmptyPath;
 		my (@list)	= splice(@{ $self->{_stack} });
@@ -2226,6 +2238,16 @@ sub _ObjectList {
 sub _Object {
 	my $self	= shift;
 	$self->_GraphNode;
+	if ($self->_optional_token(LANNOT)) {
+		######################## TODO: SPARQL-star annotation syntax
+		my ($s)	= splice(@{ $self->{_stack} });
+		$self->_PropertyListNotEmptyPath;
+		my (@list)	= splice(@{ $self->{_stack} });
+		my $obj	= AtteanX::Parser::SPARQL::ObjectWrapper->new( value => $s, annotations => \@list);
+		$self->_add_stack($obj);
+		########################
+		$self->_expected_token(RANNOT)
+	}
 }
 
 # [37] Verb ::= VarOrIRIref | 'a'
@@ -2563,6 +2585,7 @@ sub _GraphNode_test {
 	return 1 if ($self->_test_token(LPAREN));
 	return 1 if ($self->_test_token(ANON));
 	return 1 if ($self->_test_token(NIL));
+	return 1 if ($self->_test_token(LTLT));
 	return 0;
 }
 
@@ -2571,7 +2594,7 @@ sub _GraphNode {
 	if ($self->_TriplesNode_test) {
 		$self->_TriplesNode;
 	} else {
-		$self->_VarOrTerm;
+		$self->_VarOrTermOrQuotedTP;
 	}
 }
 
@@ -2586,6 +2609,17 @@ sub _GraphNode {
 # 	return 1 if ($self->_peek_token(NIL));
 # 	return 0;
 # }
+
+sub _VarOrTermOrQuotedTP {
+	my $self	= shift;
+	if ($self->_test_token(VAR)) {
+		$self->_Var();
+	} elsif ($self->_test_token(LTLT)) {
+		$self->_QuotedTP();
+	} else {
+		$self->_GraphTerm;
+	}
+}
 
 sub _VarOrTerm {
 	my $self	= shift;
@@ -2867,10 +2901,45 @@ sub _PrimaryExpression {
 		my $l		= $self->_NumericLiteral;
 		my $expr	= Attean::ValueExpression->new(value => $l);
 		$self->_add_stack($expr);
+	} elsif ($self->_test_token(LTLT)) {
+		$self->_ExprQuotedTP();
+		my $tp		= pop(@{ $self->{_stack} });
+		my $expr	= Attean::ValueExpression->new(value => $tp);
+		$self->_add_stack($expr);
 	} else {
 		my $value	= $self->_RDFLiteral;
 		my $expr	= Attean::ValueExpression->new(value => $value);
 		$self->_add_stack($expr);
+	}
+}
+
+sub _ExprQuotedTP {
+	my $self	= shift;
+	# '<<' ExprVarOrTerm Verb ExprVarOrTerm '>>'
+	$self->_expected_token(LTLT);
+	$self->_ExprVarOrTerm();
+	$self->_Verb();
+	$self->_ExprVarOrTerm();
+	$self->_expected_token(GTGT);
+	
+	my ($s, $p, $o)	= splice(@{ $self->{_stack} }, -3);
+	
+	$self->_add_stack( $self->__new_statement( $s, $p, $o ) );
+}
+
+sub _ExprVarOrTerm {
+	my $self	= shift;
+	if ($self->_test_token(VAR)) {
+		$self->_Var();
+	} elsif ($self->_test_token(LTLT)) {
+		$self->_ExprQuotedTP();
+	} else {
+		# TODO: this should prevent use of bnodes
+		$self->_GraphTerm;
+		my $term		= ${ $self->{_stack} }[-1];
+		if ($term->does('Attean::API::Blank')) {
+			croak "Expecting (non-blank) RDF term but found blank";
+		}
 	}
 }
 
@@ -2948,6 +3017,7 @@ sub _BuiltInCall_test {
 	return 1 if ($self->_test_token(KEYWORD, 'NOT'));
 	return 1 if ($self->_test_token(KEYWORD, 'EXISTS'));
 	return 1 if ($self->_test_token(KEYWORD, qr/^(ABS|CEIL|FLOOR|ROUND|CONCAT|SUBSTR|STRLEN|UCASE|LCASE|ENCODE_FOR_URI|CONTAINS|STRSTARTS|STRENDS|RAND|MD5|SHA1|SHA224|SHA256|SHA384|SHA512|HOURS|MINUTES|SECONDS|DAY|MONTH|YEAR|TIMEZONE|TZ|NOW)$/i));
+	return 1 if ($self->_test_token(KEYWORD, qr/^(TRIPLE|ISTRIPLE|SUBJECT|PREDICATE|OBJECT)$/i));
 	return ($self->_test_token(KEYWORD, qr/^(COALESCE|UUID|STRUUID|STR|STRDT|STRLANG|STRBEFORE|STRAFTER|REPLACE|BNODE|IRI|URI|LANG|LANGMATCHES|DATATYPE|BOUND|sameTerm|isIRI|isURI|isBLANK|isLITERAL|REGEX|IF|isNumeric)$/i));
 }
 
@@ -2983,7 +3053,7 @@ sub _BuiltInCall {
 			# no-arg functions
 			$self->_expected_token(NIL);
 			$self->_add_stack( $self->new_function_expression($op) );
-		} elsif ($op =~ /^(STR|URI|IRI|LANG|DATATYPE|isIRI|isURI|isBLANK|isLITERAL|isNumeric|ABS|CEIL|FLOOR|ROUND|STRLEN|UCASE|LCASE|ENCODE_FOR_URI|MD5|SHA1|SHA224|SHA256|SHA384|SHA512|HOURS|MINUTES|SECONDS|DAY|MONTH|YEAR|TIMEZONE|TZ)$/i) {
+		} elsif ($op =~ /^(STR|URI|IRI|LANG|DATATYPE|isIRI|isURI|isBLANK|isLITERAL|isNumeric|ABS|CEIL|FLOOR|ROUND|STRLEN|UCASE|LCASE|ENCODE_FOR_URI|MD5|SHA1|SHA224|SHA256|SHA384|SHA512|HOURS|MINUTES|SECONDS|DAY|MONTH|YEAR|TIMEZONE|TZ|ISTRIPLE|SUBJECT|PREDICATE|OBJECT)$/i) {
 			### one-arg functions that take an expression
 			$self->_expected_token(LPAREN);
 			$self->_Expression;
@@ -3000,7 +3070,7 @@ sub _BuiltInCall {
 			my ($arg2)	= splice(@{ $self->{_stack} });
 			$self->_add_stack( $self->new_function_expression($op, $arg1, $arg2) );
 			$self->_expected_token(RPAREN);
-		} elsif ($op =~ /^(IF|REPLACE)$/i) {
+		} elsif ($op =~ /^(IF|REPLACE|TRIPLE)$/i) {
 			### three-arg functions that take expressions
 			$self->_expected_token(LPAREN);
 			$self->_Expression;
@@ -3217,6 +3287,45 @@ sub _PrefixedName {
 	my $base	= $self->__base;
 	my $p		= $self->new_iri( value => $iri->value, $base ? (base => $base) : () );
 	return $p;
+}
+
+sub _qtSubjectOrObject {
+	my $self	= shift;
+	# Var | BlankNode | iri | RDFLiteral | NumericLiteral | BooleanLiteral | QuotedTP
+	if ($self->_test_token(LTLT)) {
+		$self->_QuotedTP();
+	} else {
+		$self->_VarOrTerm;
+	}
+}
+
+sub _QuotedTP {
+	my $self	= shift;
+	#'<<' qtSubjectOrObject Verb qtSubjectOrObject '>>'
+	$self->_expected_token(LTLT);
+	$self->_qtSubjectOrObject();
+	$self->_Verb();
+	$self->_qtSubjectOrObject();
+	$self->_expected_token(GTGT);
+	
+	my ($s, $p, $o)	= splice(@{ $self->{_stack} }, -3);
+	
+	if ($self->{__data_pattern}) {
+		foreach my $term ($s, $o) {
+			if ($term->does('Attean::API::Blank')) {
+				croak "Expecting (non-blank) RDF term  in quoted triple, but found blank";
+			}
+		}
+	}
+
+	$self->_add_stack( $self->__new_statement( $s, $p, $o ) );
+}
+
+sub _QuotedTriple {
+	my $self	= shift;
+	#'<<' DataValueTerm Verb DataValueTerm '>>'
+	local($self->{__data_pattern})	= 1;
+	$self->_QuotedTP();
 }
 
 # [69] BlankNode ::= BLANK_NODE_LABEL | ANON
@@ -3464,8 +3573,28 @@ sub __base {
 
 sub __new_statement {
 	my $self	= shift;
-	my @nodes	= @_;
-	return Attean::TriplePattern->new(@nodes);
+	my $s		= shift;
+	my $p		= shift;
+	my $o		= shift;
+	my $annot;
+	if ($o->isa('AtteanX::Parser::SPARQL::ObjectWrapper')) {
+		if (reftype($p) eq 'ARRAY' and $p->[0] eq 'PATH') {
+			# this is actually a property path, for which annotations (stored in the ObjectWrapper) are forbidden
+			croak "Syntax error: Cannot use SPARQL-star annotation syntax on a property path";
+		}
+		$annot	= $o->annotations;
+		$o		= $o->value;
+	}
+	my $t	= Attean::TriplePattern->new($s, $p, $o);
+	my @st	= ($t);
+	if ($annot) {
+		$s	= $t;
+		foreach my $pair (@$annot) {
+			my ($p, $o)	= @$pair;
+			push(@st, $self->__new_statement($s, $p, $o));
+		}
+	}
+	return @st;
 }
 
 sub __new_path {
@@ -3677,6 +3806,18 @@ sub _token_error {
 	croak $message;
 }
 
+package AtteanX::Parser::SPARQL::ObjectWrapper 0.031;
+
+use strict;
+use warnings;
+no warnings 'redefine';
+use Types::Standard qw(InstanceOf HashRef ArrayRef Bool Str Int);
+
+use Moo;
+has 'value'			=> (is => 'rw');
+has 'annotations'	=> (is => 'rw', isa => ArrayRef);
+
+
 1;
 
 __END__
@@ -3699,7 +3840,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2020 Gregory Todd Williams.
+Copyright (c) 2014--2022 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

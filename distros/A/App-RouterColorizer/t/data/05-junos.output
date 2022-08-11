@@ -20,7 +20,7 @@ user@swXX> show interfaces
     Output packets: 10[4m732[24m311
   Interface transmit statistics: Disabled
 
-  Logical interface vcp-255/1/0.32768 (Index 3) (SNMP ifIndex 102)
+[36m  Logical interface vcp-255/1/0.32768 (Index 3) (SNMP ifIndex 102)[0m
     Flags: Encapsulation: Unspecified
     Input packets : 10[4m732[24m471
     Output packets: 10[4m732[24m311
@@ -38,7 +38,7 @@ user@swXX> show interfaces
     Output packets: 10[4m706[24m936
   Interface transmit statistics: Disabled
 
-  Logical interface vcp-255/1/1.32768 (Index 4) (SNMP ifIndex 104)
+[36m  Logical interface vcp-255/1/1.32768 (Index 4) (SNMP ifIndex 104)[0m
     Flags: Encapsulation: Unspecified
     Input packets : 10[4m707[24m511
     Output packets: 10[4m706[24m936
@@ -62,7 +62,7 @@ user@swXX> show interfaces
 [1;31m  Active defects : LINK[0m
   Interface transmit statistics: Disabled
 
-  Logical interface ge-0/0/0.0 (Index 87) (SNMP ifIndex 502)
+[36m  Logical interface ge-0/0/0.0 (Index 87) (SNMP ifIndex 502)[0m
     Flags: Device-Down SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
     Input packets : 0
     Output packets: 0
@@ -88,7 +88,7 @@ user@swXX> show interfaces
 [32m  Active defects : None[0m
   Interface transmit statistics: Disabled
 
-  Logical interface ge-0/0/1.0 (Index 88) (SNMP ifIndex 505)
+[36m  Logical interface ge-0/0/1.0 (Index 88) (SNMP ifIndex 505)[0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     Input packets : [4m312[24m782
     Output packets: 9[4m882[24m094
@@ -114,7 +114,7 @@ user@swXX> show interfaces
 [1;31m  Active defects : LINK[0m
   Interface transmit statistics: Disabled
 
-  Logical interface ge-0/0/2.0 (Index 89) (SNMP ifIndex 507)
+[36m  Logical interface ge-0/0/2.0 (Index 89) (SNMP ifIndex 507)[0m
     Flags: Device-Down SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
     Input packets : 0
     Output packets: 0
@@ -140,7 +140,7 @@ user@swXX> show interfaces
 [32m  Active defects : None[0m
   Interface transmit statistics: Disabled
 
-  Logical interface ge-0/0/3.0 (Index 90) (SNMP ifIndex 509)
+[36m  Logical interface ge-0/0/3.0 (Index 90) (SNMP ifIndex 509)[0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     Input packets : 0
     Output packets: 9[4m882[24m211
@@ -166,7 +166,7 @@ user@swXX> show interfaces
 [32m  Active defects : None[0m
   Interface transmit statistics: Disabled
 
-  Logical interface ge-0/0/4.0 (Index 91) (SNMP ifIndex 511)
+[36m  Logical interface ge-0/0/4.0 (Index 91) (SNMP ifIndex 511)[0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     Input packets : 0
     Output packets: 9[4m882[24m120
@@ -192,7 +192,7 @@ user@swXX> show interfaces
 [1;31m  Active defects : LINK[0m
   Interface transmit statistics: Disabled
 
-  Logical interface ge-0/0/5.0 (Index 92) (SNMP ifIndex 513)
+[36m  Logical interface ge-0/0/5.0 (Index 92) (SNMP ifIndex 513)[0m
     Flags: Device-Down 0x[4m4[24m000 Encapsulation: ENET2
     Protocol aenet, AE bundle: ae0.0
 
@@ -215,7 +215,7 @@ user@swXX> show interfaces
 [32m  Active defects : None[0m
   Interface transmit statistics: Disabled
 
-  Logical interface ge-0/0/6.0 (Index 93) (SNMP ifIndex 515)
+[36m  Logical interface ge-0/0/6.0 (Index 93) (SNMP ifIndex 515)[0m
     Flags: Up 0x[4m4[24m000 Encapsulation: ENET2
     Protocol aenet, AE bundle: ae3.0
 
@@ -238,7 +238,7 @@ user@swXX> show interfaces
 [1;31m  Active defects : LINK[0m
   Interface transmit statistics: Disabled
 
-  Logical interface ge-0/0/7.0 (Index 94) (SNMP ifIndex 517)
+[36m  Logical interface ge-0/0/7.0 (Index 94) (SNMP ifIndex 517)[0m
     Flags: Device-Down SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
     Input packets : 0
     Output packets: 0
@@ -264,7 +264,7 @@ user@swXX> show interfaces
 [1;31m  Active defects : LINK[0m
   Interface transmit statistics: Disabled
 
-  Logical interface ge-0/0/8.0 (Index 95) (SNMP ifIndex 519)
+[36m  Logical interface ge-0/0/8.0 (Index 95) (SNMP ifIndex 519)[0m
     Flags: Device-Down SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
     Input packets : 0
     Output packets: 0
@@ -290,7 +290,7 @@ user@swXX> show interfaces
 [1;31m  Active defects : LINK[0m
   Interface transmit statistics: Disabled
 
-  Logical interface ge-0/0/9.0 (Index 96) (SNMP ifIndex 521)
+[36m  Logical interface ge-0/0/9.0 (Index 96) (SNMP ifIndex 521)[0m
     Flags: Device-Down 0x[4m4[24m000 Encapsulation: ENET2
     Protocol aenet, AE bundle: ae1.0
 
@@ -313,7 +313,7 @@ user@swXX> show interfaces
 [1;31m  Active defects : LINK[0m
   Interface transmit statistics: Disabled
 
-  Logical interface ge-0/0/10.0 (Index 97) (SNMP ifIndex 523)
+[36m  Logical interface ge-0/0/10.0 (Index 97) (SNMP ifIndex 523)[0m
     Flags: Device-Down 0x[4m4[24m000 Encapsulation: ENET2
     Protocol aenet, AE bundle: ae1.0
 
@@ -336,7 +336,7 @@ user@swXX> show interfaces
 [32m  Active defects : None[0m
   Interface transmit statistics: Disabled
 
-  Logical interface ge-0/0/11.0 (Index 98) (SNMP ifIndex 525)
+[36m  Logical interface ge-0/0/11.0 (Index 98) (SNMP ifIndex 525)[0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     Input packets : [4m109[24m866
     Output packets: 9[4m882[24m932
@@ -362,7 +362,7 @@ user@swXX> show interfaces
 [32m  Active defects : None[0m
   Interface transmit statistics: Disabled
 
-  Logical interface ge-1/0/0.0 (Index 73) (SNMP ifIndex 541)
+[36m  Logical interface ge-1/0/0.0 (Index 73) (SNMP ifIndex 541)[0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     Input packets : [4m236[24m126
     Output packets: 9[4m850[24m603
@@ -388,7 +388,7 @@ user@swXX> show interfaces
 [32m  Active defects : None[0m
   Interface transmit statistics: Disabled
 
-  Logical interface ge-1/0/1.0 (Index 74) (SNMP ifIndex 543)
+[36m  Logical interface ge-1/0/1.0 (Index 74) (SNMP ifIndex 543)[0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     Input packets : 26
     Output packets: 9[4m887[24m036
@@ -414,7 +414,7 @@ user@swXX> show interfaces
 [32m  Active defects : None[0m
   Interface transmit statistics: Disabled
 
-  Logical interface ge-1/0/2.0 (Index 75) (SNMP ifIndex 549)
+[36m  Logical interface ge-1/0/2.0 (Index 75) (SNMP ifIndex 549)[0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     Input packets : [4m1[24m729
     Output packets: 9[4m884[24m206
@@ -440,7 +440,7 @@ user@swXX> show interfaces
 [1;31m  Active defects : LINK[0m
   Interface transmit statistics: Disabled
 
-  Logical interface ge-1/0/3.0 (Index 76) (SNMP ifIndex 551)
+[36m  Logical interface ge-1/0/3.0 (Index 76) (SNMP ifIndex 551)[0m
     Flags: Device-Down SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     Input packets : 0
     Output packets: 0
@@ -466,7 +466,7 @@ user@swXX> show interfaces
 [32m  Active defects : None[0m
   Interface transmit statistics: Disabled
 
-  Logical interface ge-1/0/4.0 (Index 77) (SNMP ifIndex 553)
+[36m  Logical interface ge-1/0/4.0 (Index 77) (SNMP ifIndex 553)[0m
     Flags: Up SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
     Input packets : 47
     Output packets: 9[4m882[24m032
@@ -492,7 +492,7 @@ user@swXX> show interfaces
 [1;31m  Active defects : LINK[0m
   Interface transmit statistics: Disabled
 
-  Logical interface ge-1/0/5.0 (Index 78) (SNMP ifIndex 555)
+[36m  Logical interface ge-1/0/5.0 (Index 78) (SNMP ifIndex 555)[0m
     Flags: Device-Down SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     Input packets : [4m42[24m282
     Output packets: 5[4m850[24m497
@@ -518,7 +518,7 @@ user@swXX> show interfaces
 [32m  Active defects : None[0m
   Interface transmit statistics: Disabled
 
----(more)---                                          Logical interface ge-1/0/6.0 (Index 81) (SNMP ifIndex 557)
+---(more)---                                        [36m  Logical interface ge-1/0/6.0 (Index 81) (SNMP ifIndex 557)[0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     Input packets : [4m120[24m010
     Output packets: 9[4m063[24m998
@@ -544,7 +544,7 @@ user@swXX> show interfaces
 [1;31m  Active defects : LINK[0m
   Interface transmit statistics: Disabled
 
-  Logical interface ge-1/0/7.0 (Index 82) (SNMP ifIndex 559)
+[36m  Logical interface ge-1/0/7.0 (Index 82) (SNMP ifIndex 559)[0m
     Flags: Device-Down SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     Input packets : 0
     Output packets: 0
@@ -570,7 +570,7 @@ user@swXX> show interfaces
 [1;31m  Active defects : LINK[0m
   Interface transmit statistics: Disabled
 
-  Logical interface ge-1/0/8.0 (Index 83) (SNMP ifIndex 561)
+[36m  Logical interface ge-1/0/8.0 (Index 83) (SNMP ifIndex 561)[0m
     Flags: Device-Down SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     Input packets : 0
     Output packets: 0
@@ -596,7 +596,7 @@ user@swXX> show interfaces
 [1;31m  Active defects : LINK[0m
   Interface transmit statistics: Disabled
 
-  Logical interface ge-1/0/9.0 (Index 84) (SNMP ifIndex 563)
+[36m  Logical interface ge-1/0/9.0 (Index 84) (SNMP ifIndex 563)[0m
     Flags: Device-Down SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     Input packets : 0
     Output packets: 0
@@ -622,7 +622,7 @@ user@swXX> show interfaces
 [32m  Active defects : None[0m
   Interface transmit statistics: Disabled
 
-  Logical interface ge-1/0/10.0 (Index 85) (SNMP ifIndex 545)
+[36m  Logical interface ge-1/0/10.0 (Index 85) (SNMP ifIndex 545)[0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     Input packets : 0
     Output packets: 9[4m882[24m124
@@ -648,7 +648,7 @@ user@swXX> show interfaces
 [1;31m  Active defects : LINK[0m
   Interface transmit statistics: Disabled
 
-  Logical interface ge-1/0/11.0 (Index 86) (SNMP ifIndex 547)
+[36m  Logical interface ge-1/0/11.0 (Index 86) (SNMP ifIndex 547)[0m
     Flags: Device-Down SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
     Input packets : 0
     Output packets: 0
@@ -668,7 +668,7 @@ user@swXX> show interfaces
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : 0 bps (0 pps)[0m
 
-  Logical interface ae0.0 (Index 65) (SNMP ifIndex 531)
+[36m  Logical interface ae0.0 (Index 65) (SNMP ifIndex 531)[0m
     Flags: Hardware-Down Device-Down SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
     Statistics        Packets        pps         Bytes          bps
     Bundle:
@@ -694,7 +694,7 @@ user@swXX> show interfaces
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : 0 bps (0 pps)[0m
 
-  Logical interface ae1.0 (Index 66) (SNMP ifIndex 533)
+[36m  Logical interface ae1.0 (Index 66) (SNMP ifIndex 533)[0m
     Flags: Hardware-Down Device-Down SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     Statistics        Packets        pps         Bytes          bps
     Bundle:
@@ -720,7 +720,7 @@ user@swXX> show interfaces
 [36m  Input rate     : [4m67[24m152 bps (100 pps)[0m
 [36m  Output rate    : [4m141[24m968 bps (109 pps)[0m
 
-  Logical interface ae3.0 (Index 67) (SNMP ifIndex 567)
+[36m  Logical interface ae3.0 (Index 67) (SNMP ifIndex 567)[0m
     Flags: Up SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
     Statistics        Packets        pps         Bytes          bps
     Bundle:
@@ -746,7 +746,7 @@ user@swXX> show interfaces
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : 0 bps (0 pps)[0m
 
-  Logical interface ae4.0 (Index 68) (SNMP ifIndex 576)
+[36m  Logical interface ae4.0 (Index 68) (SNMP ifIndex 576)[0m
     Flags: Hardware-Down Device-Down SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
     Statistics        Packets        pps         Bytes          bps
     Bundle:
@@ -769,7 +769,7 @@ user@swXX> show interfaces
     Input packets : 0
     Output packets: 343[4m092[24m461
 
-  Logical interface bme0.32768 (Index 5) (SNMP ifIndex 38)
+[36m  Logical interface bme0.32768 (Index 5) (SNMP ifIndex 38)[0m
     Flags: Encapsulation: ENET2
     Input packets : 292[4m472[24m790
     Output packets: 257[4m352[24m717
@@ -786,7 +786,7 @@ user@swXX> show interfaces
       Addresses, Flags: Primary
         Local: 0x11
 
-  Logical interface bme0.32769 (Index 7) (SNMP ifIndex 39)
+[36m  Logical interface bme0.32769 (Index 7) (SNMP ifIndex 39)[0m
     Flags: Down 0x20[4m000[24m000 LinkAddress 0-0 Encapsulation: unknown
     Input packets : 0
     Output packets: 0
@@ -831,7 +831,7 @@ user@swXX> show interfaces
     Input packets : 0
     Output packets: 0
 
-  Logical interface jsrv.1 (Index 72) (SNMP ifIndex 569)
+[36m  Logical interface jsrv.1 (Index 72) (SNMP ifIndex 569)[0m
     Flags: Up 0x20[4m004[24m000 Encapsulation: unknown
     Input packets : 0
     Output packets: 1
@@ -850,7 +850,7 @@ user@swXX> show interfaces
     Input packets : 442[4m741[24m614
     Output packets: 442[4m741[24m614
 
-  Logical interface lo0.16384 (Index 64) (SNMP ifIndex 21)
+[36m  Logical interface lo0.16384 (Index 64) (SNMP ifIndex 21)[0m
     Flags: Encapsulation: Unspecified
     Input packets : 0
     Output packets: 0
@@ -878,7 +878,7 @@ user@swXX> show interfaces
     Input packets : 0
     Output packets: 0
 
-  Logical interface me0.0 (Index 6) (SNMP ifIndex 34)
+[36m  Logical interface me0.0 (Index 6) (SNMP ifIndex 34)[0m
     Flags: Device-Down SNMP-Traps Encapsulation: ENET2
     Input packets : 0
     Output packets: 0
@@ -930,8 +930,8 @@ user@swXX> show interfaces
     Input packets : 10[4m279[24m909
     Output packets: 4[4m911[24m225
 
-  Logical interface vlan.102 (Index 69) (SNMP ifIndex 566)
-    Description: Router Network
+[36m  Logical interface vlan.102 (Index 69) (SNMP ifIndex 566)[0m
+[36m    Description: Router Network[0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     Input packets : 10[4m279[24m909
     Output packets: 4[4m911[24m228
@@ -1057,7 +1057,7 @@ Interface               Admin Link Proto    Local                 Remote
   Device flags   : Present Running
   Link flags     : None
 
-  Logical interface vcp-255/1/0.32768 
+[36m  Logical interface vcp-255/1/0.32768 [0m
     Flags: Encapsulation: Unspecified
 
 [32mPhysical interface: vcp-255/1/1, Enabled, Physical link is Up[0m
@@ -1066,7 +1066,7 @@ Interface               Admin Link Proto    Local                 Remote
   Device flags   : Present Running
   Link flags     : None
 
-  Logical interface vcp-255/1/1.32768 
+[36m  Logical interface vcp-255/1/1.32768 [0m
     Flags: Encapsulation: Unspecified
 
 [1;31mPhysical interface: ge-0/0/0, Enabled, Physical link is Down[0m
@@ -1078,7 +1078,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: Hardware-Down SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-0/0/0.0 
+[36m  Logical interface ge-0/0/0.0 [0m
     Flags: Device-Down SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1091,7 +1091,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-0/0/1.0 
+[36m  Logical interface ge-0/0/1.0 [0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1104,7 +1104,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: Hardware-Down SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-0/0/2.0 
+[36m  Logical interface ge-0/0/2.0 [0m
     Flags: Device-Down SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1117,7 +1117,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-0/0/3.0 
+[36m  Logical interface ge-0/0/3.0 [0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1130,7 +1130,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-0/0/4.0 
+[36m  Logical interface ge-0/0/4.0 [0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1143,7 +1143,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: Hardware-Down SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-0/0/5.0 
+[36m  Logical interface ge-0/0/5.0 [0m
     Flags: Device-Down 0x[4m4[24m000 Encapsulation: ENET2
     aenet
 
@@ -1156,7 +1156,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-0/0/6.0 
+[36m  Logical interface ge-0/0/6.0 [0m
     Flags: Up 0x[4m4[24m000 Encapsulation: ENET2
     aenet
 
@@ -1169,7 +1169,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: Hardware-Down SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-0/0/7.0 
+[36m  Logical interface ge-0/0/7.0 [0m
     Flags: Device-Down SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1182,7 +1182,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: Hardware-Down SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-0/0/8.0 
+[36m  Logical interface ge-0/0/8.0 [0m
     Flags: Device-Down SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1195,7 +1195,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: Hardware-Down SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-0/0/9.0 
+[36m  Logical interface ge-0/0/9.0 [0m
     Flags: Device-Down 0x[4m4[24m000 Encapsulation: ENET2
 ---(more)---                                            aenet
 
@@ -1208,7 +1208,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: Hardware-Down SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-0/0/10.0 
+[36m  Logical interface ge-0/0/10.0 [0m
     Flags: Device-Down 0x[4m4[24m000 Encapsulation: ENET2
     aenet
 
@@ -1221,7 +1221,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-0/0/11.0 
+[36m  Logical interface ge-0/0/11.0 [0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1234,7 +1234,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-1/0/0.0 
+[36m  Logical interface ge-1/0/0.0 [0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1247,7 +1247,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-1/0/1.0 
+[36m  Logical interface ge-1/0/1.0 [0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1260,7 +1260,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-1/0/2.0 
+[36m  Logical interface ge-1/0/2.0 [0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1273,7 +1273,7 @@ Interface               Admin Link Proto    Local                 Remote
 ---(more)---                                          Interface flags: Hardware-Down SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-1/0/3.0 
+[36m  Logical interface ge-1/0/3.0 [0m
     Flags: Device-Down SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1286,7 +1286,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-1/0/4.0 
+[36m  Logical interface ge-1/0/4.0 [0m
     Flags: Up SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1299,7 +1299,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: Hardware-Down SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-1/0/5.0 
+[36m  Logical interface ge-1/0/5.0 [0m
     Flags: Device-Down SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1312,7 +1312,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-1/0/6.0 
+[36m  Logical interface ge-1/0/6.0 [0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1325,7 +1325,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: Hardware-Down SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-1/0/7.0 
+[36m  Logical interface ge-1/0/7.0 [0m
     Flags: Device-Down SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1338,7 +1338,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: Hardware-Down SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-1/0/8.0 
+[36m  Logical interface ge-1/0/8.0 [0m
     Flags: Device-Down SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1351,7 +1351,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: Hardware-Down SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-1/0/9.0 
+[36m  Logical interface ge-1/0/9.0 [0m
     Flags: Device-Down SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1364,7 +1364,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-1/0/10.0 
+[36m  Logical interface ge-1/0/10.0 [0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1377,7 +1377,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: Hardware-Down SNMP-Traps Internal: 0x[4m4[24m000
   Link flags     : None
 
-  Logical interface ge-1/0/11.0 
+[36m  Logical interface ge-1/0/11.0 [0m
     Flags: Device-Down SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1387,7 +1387,7 @@ Interface               Admin Link Proto    Local                 Remote
   Device flags   : Present Running
   Interface flags: Hardware-Down SNMP-Traps Internal: 0x[4m4[24m000
 
-  Logical interface ae0.0 
+[36m  Logical interface ae0.0 [0m
     Flags: Hardware-Down Device-Down SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1397,7 +1397,7 @@ Interface               Admin Link Proto    Local                 Remote
   Device flags   : Present Running
   Interface flags: Hardware-Down SNMP-Traps Internal: 0x[4m4[24m000
 
-  Logical interface ae1.0 
+[36m  Logical interface ae1.0 [0m
     Flags: Hardware-Down Device-Down SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1407,7 +1407,7 @@ Interface               Admin Link Proto    Local                 Remote
   Device flags   : Present Running
   Interface flags: SNMP-Traps Internal: 0x[4m4[24m000
 
-  Logical interface ae3.0 
+[36m  Logical interface ae3.0 [0m
     Flags: Up SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1417,7 +1417,7 @@ Interface               Admin Link Proto    Local                 Remote
   Device flags   : Present Running
   Interface flags: Hardware-Down SNMP-Traps Internal: 0x[4m4[24m000
 ---(more)---                                        
-  Logical interface ae4.0 
+[36m  Logical interface ae4.0 [0m
     Flags: Hardware-Down Device-Down SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
     eth-switch
 
@@ -1426,14 +1426,14 @@ Interface               Admin Link Proto    Local                 Remote
   Speed: Unspecified
   Device flags   : Present Running
 
-  Logical interface bme0.32768 
+[36m  Logical interface bme0.32768 [0m
     Flags: Up Encapsulation: ENET2
     inet  [30m[47m128.0.0.1/2[0m     
           [30m[41m128.0.0.17/2[0m    
           [30m[45m128.0.0.32/2[0m    
     tnp   0x11            
 
-  Logical interface bme0.32769 
+[36m  Logical interface bme0.32769 [0m
     Flags: Down 0x20[4m000[24m000 LinkAddress 0-0 Encapsulation: unknown
     eth-switch
 
@@ -1457,7 +1457,7 @@ Interface               Admin Link Proto    Local                 Remote
   Type: VLAN, Link-level type: VLAN, MTU: [4m1[24m518, Clocking: Unspecified, Speed: [4m1[24m000mbps
   Device flags   : Present Running
 
-  Logical interface jsrv.1 
+[36m  Logical interface jsrv.1 [0m
     Flags: Up 0x20[4m004[24m000 Encapsulation: unknown
     inet  [30m[47m128.0.0.127/2[0m   
 
@@ -1467,7 +1467,7 @@ Interface               Admin Link Proto    Local                 Remote
   Device flags   : Present Running Loopback
   Interface flags: SNMP-Traps
 
-  Logical interface lo0.16384 
+[36m  Logical interface lo0.16384 [0m
     Flags: Encapsulation: Unspecified
     inet  [30m[45m127.0.0.1[0m        --> 0/0
 
@@ -1482,7 +1482,7 @@ Interface               Admin Link Proto    Local                 Remote
   Device flags   : Present Running
   Interface flags: Hardware-Down SNMP-Traps
 
-  Logical interface me0.0 
+[36m  Logical interface me0.0 [0m
     Flags: Device-Down SNMP-Traps Encapsulation: ENET2
     eth-switch
 
@@ -1509,7 +1509,7 @@ Interface               Admin Link Proto    Local                 Remote
   Type: VLAN, Link-level type: VLAN, MTU: [4m8[24m018, Clocking: Unspecified, Speed: [4m1[24m000mbps
   Device flags   : Present Running
 
-  Logical interface vlan.102 
+[36m  Logical interface vlan.102 [0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
     inet  [30m[42m192.0.2.49/28[0m
     inet6 [30m[41mf00:ba7::5/120[0m
@@ -1521,4 +1521,127 @@ Interface               Admin Link Proto    Local                 Remote
   Device flags   : Present Running
   Interface flags: Hardware-Down SNMP-Traps
 ---(more 100%)---                                        
+
+[32mPhysical interface: xe-0/0/0, Enabled, Physical link is Up[0m
+  Interface index: 135, SNMP ifIndex: 509
+[36m  Description: FOOBAR[0m
+  Link-level type: Ethernet, MTU: [4m1[24m518, MRU: [4m1[24m526, LAN-PHY mode, Link-mode: Full-duplex, Speed: 10Gbps, BPDU Error: None, Loop Detect PDU Error: None,
+  Ethernet-Switching Error: None, MAC-REWRITE Error: None, Loopback: Disabled, Source filtering: Disabled, Flow control: Enabled
+  Device flags   : Present Running
+  Interface flags: SNMP-Traps Internal: 0x[4m4[24m000
+  CoS queues     : 8 supported, 8 maximum usable queues
+  Current address: 11:22:33:44:55:66, Hardware address: 11:22:33:44:55:66
+  Last flapped   : [4m2[24m022-05-17 20:59:13 UTC (12w0d 05:15 ago)
+[36m  Input rate     : [4m37[24m824 bps (35 pps)[0m
+[36m  Output rate    : [4m11[24m104 bps (3 pps)[0m
+[32m  Active alarms  : None[0m
+[32m  Active defects : None[0m
+  PCS statistics                      Seconds
+[32m    Bit errors                             0[0m
+[32m    Errored blocks                         0[0m
+  Ethernet FEC statistics              Errors
+[32m    FEC Corrected Errors                    0[0m
+[32m    FEC Uncorrected Errors                  0[0m
+[32m    FEC Corrected Errors Rate               0[0m
+[32m    FEC Uncorrected Errors Rate             0[0m
+  Interface transmit statistics: Disabled
+
+{master:1}
+jmaslak@swXX> show interfaces diagnostics optics 
+[36mPhysical interface: ge-0/1/1[0m
+    Laser bias current                        :  9.502 mA
+[36m    Laser output power                        :  0.2760 mW / -5.59 dBm[0m
+    Module temperature                        :  58 degrees C / 136 degrees F
+    Module voltage                            :  3.3080 V
+[36m    Receiver signal average optical power     :  0.2501 mW / -6.02 dBm[0m
+    Laser bias current high alarm             :  Off
+    Laser bias current low alarm              :  Off
+    Laser bias current high warning           :  Off
+    Laser bias current low warning            :  Off
+    Laser output power high alarm             :  Off
+    Laser output power low alarm              :  Off
+    Laser output power high warning           :  Off
+    Laser output power low warning            :  Off
+    Module temperature high alarm             :  Off
+    Module temperature low alarm              :  Off
+    Module temperature high warning           :  Off
+    Module temperature low warning            :  Off
+    Module voltage high alarm                 :  Off
+    Module voltage low alarm                  :  Off
+    Module voltage high warning               :  Off
+    Module voltage low warning                :  Off
+    Laser rx power high alarm                 :  Off
+    Laser rx power low alarm                  :  Off
+    Laser rx power high warning               :  Off
+    Laser rx power low warning                :  Off
+    Laser bias current high alarm threshold   :  100.000 mA
+    Laser bias current low alarm threshold    :  0.000 mA
+    Laser bias current high warning threshold :  90.000 mA
+    Laser bias current low warning threshold  :  0.100 mA
+    Laser output power high alarm threshold   :  0.6310 mW / -2.00 dBm
+    Laser output power low alarm threshold    :  0.1000 mW / -10.00 dBm
+    Laser output power high warning threshold :  0.5010 mW / -3.00 dBm
+    Laser output power low warning threshold  :  0.1250 mW / -9.03 dBm
+    Module temperature high alarm threshold   :  90 degrees C / 194 degrees F
+    Module temperature low alarm threshold    :  -45 degrees C / -49 degrees F
+    Module temperature high warning threshold :  85 degrees C / 185 degrees F
+    Module temperature low warning threshold  :  -40 degrees C / -40 degrees F
+    Module voltage high alarm threshold       :  3.800 V
+    Module voltage low alarm threshold        :  2.700 V
+    Module voltage high warning threshold     :  3.700 V
+    Module voltage low warning threshold      :  2.800 V
+    Laser rx power high alarm threshold       :  1.2589 mW / 1.00 dBm
+    Laser rx power low alarm threshold        :  0.0126 mW / -19.00 dBm
+    Laser rx power high warning threshold     :  1.0000 mW / 0.00 dBm
+    Laser rx power low warning threshold      :  0.0158 mW / -18.01 dBm
+
+[36mPhysical interface: ge-1/1/1[0m
+    Laser bias current                        :  9.300 mA
+[36m    Laser output power                        :  0.2680 mW / -5.72 dBm[0m
+    Module temperature                        :  56 degrees C / 132 degrees F
+    Module voltage                            :  3.2600 V
+[1;31m    Receiver signal average optical power     :  0.2251 mW / -26.48 dBm[0m
+    Laser bias current high alarm             :  Off
+    Laser bias current low alarm              :  Off
+    Laser bias current high warning           :  Off
+    Laser bias current low warning            :  Off
+    Laser output power high alarm             :  Off
+    Laser output power low alarm              :  Off
+    Laser output power high warning           :  Off
+    Laser output power low warning            :  Off
+    Module temperature high alarm             :  Off
+    Module temperature low alarm              :  Off
+    Module temperature high warning           :  Off
+    Module temperature low warning            :  Off
+    Module voltage high alarm                 :  Off
+    Module voltage low alarm                  :  Off
+    Module voltage high warning               :  Off
+    Module voltage low warning                :  Off
+    Laser rx power high alarm                 :  Off
+    Laser rx power low alarm                  :  Off
+    Laser rx power high warning               :  Off
+    Laser rx power low warning                :  Off
+    Laser bias current high alarm threshold   :  100.000 mA
+    Laser bias current low alarm threshold    :  0.000 mA
+    Laser bias current high warning threshold :  90.000 mA
+    Laser bias current low warning threshold  :  0.100 mA
+    Laser output power high alarm threshold   :  0.6310 mW / -2.00 dBm
+---(more)---                                            Laser output power low alarm threshold    :  0.1000 mW / -10.00 dBm
+    Laser output power high warning threshold :  0.5010 mW / -3.00 dBm
+    Laser output power low warning threshold  :  0.1250 mW / -9.03 dBm
+    Module temperature high alarm threshold   :  90 degrees C / 194 degrees F
+    Module temperature low alarm threshold    :  -45 degrees C / -49 degrees F
+    Module temperature high warning threshold :  85 degrees C / 185 degrees F
+    Module temperature low warning threshold  :  -40 degrees C / -40 degrees F
+    Module voltage high alarm threshold       :  3.800 V
+    Module voltage low alarm threshold        :  2.700 V
+    Module voltage high warning threshold     :  3.700 V
+    Module voltage low warning threshold      :  2.800 V
+    Laser rx power high alarm threshold       :  1.2589 mW / 1.00 dBm
+    Laser rx power low alarm threshold        :  0.0126 mW / -19.00 dBm
+    Laser rx power high warning threshold     :  1.0000 mW / 0.00 dBm
+    Laser rx power low warning threshold      :  0.0158 mW / -18.01 dBm
+---(more 100%)---                                        
+{master:1}
+jmaslak@swXX> exit 
 

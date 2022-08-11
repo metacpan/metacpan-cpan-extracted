@@ -36,9 +36,9 @@ sub croak   { unshift @_, 'croak'  ; goto \&_error_handler }
 sub confess { unshift @_, 'confess'; goto \&_error_handler }
 
 BEGIN {
-    *_HAS_AUTOCLEAN = eval { require namespace::autoclean }
-        ? \&true
-        : \&false
+    my @bool = ( \&false, \&true );
+    *_HAS_AUTOCLEAN = $bool[ 0+!! eval { require namespace::autoclean } ];
+    *STRICT         = $bool[ 0+!! ( $ENV{PERL_STRICT} || $ENV{EXTENDED_TESTING} || $ENV{AUTHOR_TESTING} || $ENV{RELEASE_TESTING} ) ];
 };
 
 if ( $] < 5.009005 ) {
@@ -128,6 +128,12 @@ sub _inject_mite_functions {
 
     *{"$caller\::with"} = $class->_make_with( $caller, $file, $kind )
         if $requested->( with => true );
+
+    *{"$caller\::signature_for"} = sub {
+        my ( $name ) = @_;
+        $name =~ s/^\+//;
+        $class->around( $caller, $name, ${"$caller\::SIGNATURE_FOR"}{$name} );
+    } if $requested->( signature_for => false );
 
     *{"$caller\::extends"} = sub {}
         if $kind eq 'class' && $requested->( extends => true );

@@ -27,7 +27,7 @@ __END__
 
 =head1 NAME
 
-HTTP::Promise::Exception - Asynchronous HTTP Request and Promise
+HTTP::Promise::Exception - HTTP Exception
 
 =head1 SYNOPSIS
 

@@ -22,9 +22,10 @@ requires:
   mro: '0'
   perl: '5.008005'
 resources:
-  bugtracker: https://github.com/ap/Catalyst-Plugin-CachedUriForAction/issues
-  repository: git://github.com/ap/Catalyst-Plugin-CachedUriForAction.git
-version: '1.001'
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Plugin-CachedUriForAction
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ap/Catalyst-Plugin-CachedUriForAction.git
+version: '1.003'
 x_copyright:
   holder: 'Aristotle Pagaltzis'
   year: 2021

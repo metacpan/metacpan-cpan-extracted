@@ -1,9 +1,13 @@
 
 =head1 NAME
 
-Math::Notation::PostfixInfix - Perl extension for Math Postfix and Infix Notation
+Math::Notation::PostfixInfix - Math Notation for Postfix and Infix Expressions
+
+=head1 CONTENTS
+X<CONTENTS>
 
 =head1 SYNOPSIS
+X<SYNOPSIS>
 
  use Math::Notation::PostfixInfix;
 
@@ -19,8 +23,9 @@ Math::Notation::PostfixInfix - Perl extension for Math Postfix and Infix Notatio
                            );
 
 =head1 DESCRIPTION
+X<DESCRIPTION>
 
-This module was created to: 
+This module was created for: 
 
 =over
 
@@ -33,15 +38,17 @@ This module was created to:
 Context validation can be implemented in item selection routines or data context validation, 
 when it is possible to identify data to be selected or ignored in some data analysis process.
 
-See the section "RECIPES" at the bottom of this document for solutions to common usage!
-
-=head1 RECIPES
+=head1 EXAMPLES
+X<EXAMPLES>
 
 The examples below were created in the hope that it will be useful.
 
 =over
 
-=item 1) Converting Infix notation:
+=head2 Infix_to_Postfix
+X<Infix_to_Postfix>
+
+This exempla demonstrates how to convert an INFIX notaton to POSTFIX.
 
 =over
 
@@ -58,7 +65,10 @@ results:
 
 =back
 
-=item 2) Convertion Postfix notation:
+=head2 Postfix_to_Infix
+X<Postfix_to_Infix>
+
+This exempla demonstrates how to convert an POSTFIX notaton to INFIX.
 
 =over
 
@@ -66,7 +76,7 @@ code:
 
   use Math::Notation::PostfixInfix;
 
-  my $string = Math::Notation::PostfixInfix->Infix_to_Postfix
+  my $string = Math::Notation::PostfixInfix->Postfix_to_Infix
                      ( [ "a","b","&","c","d","&","|" ] );
   or
   my $string = Math::Notation::PostfixInfix->Infix_to_Postfix
@@ -78,11 +88,16 @@ results:
 
 =back
 
-=item 3) Context Validation, sample 1of2:
+=head2 Postfix_Test Bolean_value
+X<Postfix_Test Bolean_value>
+
+The script below is a simple example of logical comparation using constant data.
 
 =over
 
 code:
+
+  ## file: /tmp/t1
 
   use Math::Notation::PostfixInfix;
 
@@ -92,37 +107,40 @@ code:
 
   my @array =
   (
-     [$mymod->Infix_to_Postfix("A && B && C && D")],
-     [$mymod->Infix_to_Postfix("A && B || C && D")],
-     [$mymod->Infix_to_Postfix("A && B || C && D")],
-     [$mymod->Infix_to_Postfix("A || B && C || D")],
-     [$mymod->Infix_to_Postfix("A || B || C || D")],
+     [ $mymod->Infix_to_Postfix("A && B && C && D") ],
+     [ $mymod->Infix_to_Postfix("A && B || C && D") ],
+     [ $mymod->Infix_to_Postfix("A && B || C && D") ],
+     [ $mymod->Infix_to_Postfix("A || B && C || D") ],
+     [ $mymod->Infix_to_Postfix("A || B || C || D") ],
   );
 
-   print "test1 = ".$mymod->Postfix_Test($array[0],\&subrot)."\n";
-   print "test2 = ".$mymod->Postfix_Test($array[1],\&subrot)."\n";
-   print "test3 = ".$mymod->Postfix_Test($array[2],\&subrot)."\n";
-   print "test4 = ".$mymod->Postfix_Test($array[3],\&subrot)."\n";
-   print "test5 = ".$mymod->Postfix_Test($array[4],\&subrot)."\n";
-   exit;
+  print "\n"; 
+  print "test1 = ".$mymod->Postfix_Test($array[0],\&subrot)."\n";
+  print "test2 = ".$mymod->Postfix_Test($array[1],\&subrot)."\n";
+  print "test3 = ".$mymod->Postfix_Test($array[2],\&subrot)."\n";
+  print "test4 = ".$mymod->Postfix_Test($array[3],\&subrot)."\n";
+  print "test5 = ".$mymod->Postfix_Test($array[4],\&subrot)."\n";
+  exit;
 
-   # rule = field information
-   # oper = operator (lt,le,eq,gt,ge,*) ('*' is no operator found)
-   # val1 = left part of field information (for 'oper' not '*')
-   # val2 = right part of field information (for 'oper' not '*')
-   # opts = subroutine options passed on Postfix_Test (3rd args)
+  # rule = field information
+  # oper = operator (lt,le,eq,gt,ge,*) ('*' is no operator found)
+  # val1 = left part of field information (for 'oper' not '*')
+  # val2 = right part of field information (for 'oper' not '*')
+  # opts = subroutine options passed on Postfix_Test (3rd args)
 
-   sub subrot
-   {
-       my $rule = shift;	# full field information
-       my $oper = shift;	# may be: lt, le, eq, gt, ge, '*'
-       my $val1 = shift;	# value is '0' if oper = '*'
-       my $val2 = shift;	# value is '0' if oper = '*'
-       my $opts = shift;	# subroution options
-       return $hash{$rule};
-   }
+  sub subrot
+  {
+     my $rule = shift;	# full field information
+     my $oper = shift;	# may be: lt, le, eq, gt, ge, '*'
+     my $val1 = shift;	# value is '0' if oper = '*'
+     my $val2 = shift;	# value is '0' if oper = '*'
+     my $opts = shift;	# subroution options
+     return $hash{$rule};
+  }
 
 results:
+
+  # perl /tmp/t1
 
   test1 = 0
   test2 = 0
@@ -132,15 +150,16 @@ results:
 
 =back
 
-=item 4) Context Validation, sample 2of2:
+=head2 Postfix_Test Hash_table
+X<Postfix_Test Hash_table>
+
+The script below was create to establish the concepts of context selection and exclusion rules based on data in HASH tables.
 
 =over
 
 code:
 
-  #/usr/bin/perl
-  #
-  ##file: /tmp/t
+  ## file: /tmp/t2
 
   use Math::Notation::PostfixInfix;
 
@@ -154,7 +173,7 @@ code:
 
   my @rule = $mymod->Infix_to_Postfix(join(" ",@ARGV));
 
-  print "rule: [ ",join(", ",@rule)," ]\n\n";
+  print "\nrule: [ ",join(", ",@rule)," ]\n\n";
 
   ## test and select the data base the rule
   #
@@ -185,7 +204,7 @@ code:
      #
      print " ",$buf,"\n";
   }
-  undef($fh);
+  exit;
 
   ## my context test
   #
@@ -211,7 +230,6 @@ code:
       #
       return 0;
   }
-  exit;
 
   __DATA__
   usa,peter,male
@@ -221,7 +239,8 @@ code:
 
 results:
 
-   # perl /tmp/t country eq france
+   # perl /tmp/t2 country eq france
+
    rule: [ country eq france ]
 
    [unmatch] usa,peter,male
@@ -229,7 +248,8 @@ results:
    [match] france,jean,male
    [match] france,maria,female
 
-   # perl /tmp/t country eq france and name ne jean
+   # perl /tmp/t2 country eq france and name ne jean
+
    rule: [ country eq france, name ne jean, & ]
 
    [unmatch] usa,peter,male
@@ -241,18 +261,26 @@ results:
 
 =back
 
+=head1 DEPENDENCIES
+X<DEPENDENCIES>
+
+no dependencies
+
 =head1 AUTHOR
+X<AUTHOR>
 
 Carlos Celso, E<lt>ccelso@cpan.orgE<gt>
 
 =head1 COPYRIGHT
+X<COPYRIGHT>
 
 Copyright (C) 2022 by Carlos Celso
 
 =head1 LICENSE
+X<LICENSE>
 
-This package is free software; can, at your discretion,
-also be used, modified and redistributed under the terms
-of the "GPLv3 - GNU Library General Public License".
+This package is free software; can, at your discretion, also be used,
+modified and redistributed under the terms of the "GPLv3 - GNU Library
+General Public License".
 
 =cut

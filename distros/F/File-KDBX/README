@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.904
+    version 0.905
 
 SYNOPSIS
 
@@ -576,7 +576,7 @@ METHODS
         $kdbx->add_entry($entry, %options);
         $kdbx->add_entry(%entry_attributes, %options);
 
-    Add a entry to a database. This is equivalent to identifying a parent
+    Add an entry to a database. This is equivalent to identifying a parent
     group and calling "add_entry" in File::KDBX::Group on the parent group,
     forwarding the arguments. Available options:
 
@@ -875,7 +875,7 @@ METHODS
       keep (default: value of "history_max_size", no limit: -1)
 
       * max_age - Maximum age (in days) of historical entries to keep
-      (default: 365, no limit: -1)
+      (default: value of "maintenance_history_days", no limit: -1)
 
  randomize_seeds
 
@@ -897,8 +897,7 @@ METHODS
 
     Randomizing these values has no effect on a loaded database. These are
     only used when a database is dumped. You normally do not need to call
-    this method explicitly because the dumper does it explicitly by
-    default.
+    this method explicitly because the dumper does it for you by default.
 
  key
 

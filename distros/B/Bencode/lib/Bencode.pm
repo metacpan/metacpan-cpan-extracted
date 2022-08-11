@@ -3,8 +3,7 @@ use strict;
 use warnings;
 
 package Bencode;
-$Bencode::VERSION = '1.501';
-# ABSTRACT: BitTorrent serialisation format
+our $VERSION = '1.502';
 
 use Exporter::Tidy all => [qw( bencode bdecode )];
 
@@ -154,10 +153,6 @@ __END__
 
 Bencode - BitTorrent serialisation format
 
-=head1 VERSION
-
-version 1.501
-
 =head1 SYNOPSIS
 
  use Bencode qw( bencode bdecode );
@@ -165,6 +160,7 @@ version 1.501
  my $bencoded = bencode { 'age' => 25, 'eyes' => 'blue' };
  print $bencoded, "\n";
  my $decoded = bdecode $bencoded;
+
 
 =head1 DESCRIPTION
 

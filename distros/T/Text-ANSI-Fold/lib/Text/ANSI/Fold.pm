@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "2.1101";
+our $VERSION = "2.1301";
 
 use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
@@ -37,14 +37,14 @@ my $color_re    = qr{ \e \[ [\d;]* m }x;
 my $erase_re    = qr{ \e \[ [\d;]* K }x;
 my $csi_re      = qr{
     # see ECMA-48 5.4 Control sequences
-    \e \[		# csi
+    (?: \e\[ | \x9b )	# csi
     [\x30-\x3f]*	# parameter bytes
     [\x20-\x2f]*	# intermediate bytes
     [\x40-\x7e]		# final byte
 }x;
 my $osc_re      = qr{
     # see ECMA-48 8.3.89 OSC - OPERATING SYSTEM COMMAND
-    \e \]			# osc
+    (?: \e\] | \x9d )		# osc
     [\x08-\x13\x20-\x7d]*+	# command
     (?: \e\\ | \x9c | \a )	# st: string terminator
 }x;
@@ -96,7 +96,13 @@ our $DEFAULT_LINEBREAK = LINEBREAK_NONE;
 our $DEFAULT_RUNIN_WIDTH  = 2;
 our $DEFAULT_RUNOUT_WIDTH = 2;
 
-use charnames ':full';
+BEGIN {
+    if ($] < 5.016) {
+	require charnames;
+	charnames->import(':full');
+    }
+}
+
 our %TABSTYLE = (
     pairmap {
 	( $a =~ s/_/-/gr, ref $b ? $b : [ $b, $b ] );
@@ -137,6 +143,7 @@ sub new {
 	padding   => 0,
 	boundary  => '',
 	padchar   => ' ',
+	prefix    => '',
 	ambiguous => 'narrow',
 	margin    => 0,
 	linebreak => $DEFAULT_LINEBREAK,
@@ -351,7 +358,7 @@ sub fold {
     }
 
     if ($word_char_re
-	and my $tail = (/\A(${word_char_re}+)/)[0]
+	and my($tail) = /\A(${word_char_re}+)/
 	and $folded =~ m{
 		^
 		( (?: [^\e]* ${csi_re}++ ) *+ )
@@ -422,6 +429,11 @@ sub fold {
 	    $padding = join '', @bg_stack, $padding, SGR_RESET;
 	}
 	$folded .= $padding;
+    }
+
+    if (length and my $p = $opt{prefix}) {
+	my $s = ref $p eq 'CODE' ? &$p : $p;
+	$_ = $s . $_;
     }
 
     ($folded . $eol, $_, $width - $room);
@@ -511,7 +523,7 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
 
 =head1 VERSION
 
-Version 2.1101
+Version 2.1301
 
 =head1 SYNOPSIS
 
@@ -705,6 +717,15 @@ given width.
 
     ansi_fold($text, 80, padding => 1, padchar => '_');
 
+=item B<prefix> => I<string> | I<coderef>
+
+B<prefix> string is inserted before remained string if it is not
+empty.  This is convenient to produce indented series of text by
+B<chops> interface.
+
+If the value is reference to subroutine, its result is used as a
+prefix string.
+
 =item B<ambiguous> => "narrow" or "wide"
 
 Tells how to treat Unicode East Asian ambiguous characters.  Default
@@ -846,6 +867,11 @@ Command line utility using L<Text::ANSI::Fold>.
 =item L<Text::ANSI::Fold::Util>
 
 Collection of utilities using L<Text::ANSI::Fold> module.
+
+=item L<Text::ANSI::Tabs>
+
+L<Text::Tabs> compatible tab expand/unexpand module using
+L<Text::ANSI::Fold> as a backend processor.
 
 =item L<App::sdif>
 

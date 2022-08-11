@@ -1,12 +1,14 @@
 name = "App-ansiecho"
 readme_from = "script/ansiecho"
+authors_from = "script/ansiecho"
 script_files = [ "script/ansiecho" ]
-badges = ['github-actions/test', 'metacpan']
-authority="cpan:UTASHIRO"
+badges = [ 'github-actions/test', 'metacpan' ]
+authority = "cpan:UTASHIRO"
 
-module_maker="ModuleBuildTiny"
+module_maker = "ModuleBuildTiny"
 static_install = "auto"
 
 [release]
+branch = "main"
 do_not_upload_to_cpan = 0
 

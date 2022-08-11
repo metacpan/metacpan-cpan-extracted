@@ -7,7 +7,7 @@ use v5.20;
 use experimental qw/ signatures /;
 package YAML::Tidy;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use YAML::Tidy::Node;
 use YAML::Tidy::Config;
@@ -311,11 +311,11 @@ my $re = join '|', @re;
 my @all = (@null, @true, @false, @inf, @nan);
 
 sub _replace_quoting($self, $node) {
-    # TODO nodes with tags or anchors
+    return if $node->{tag};
     my $default_style = $self->cfg->default_scalar_style;
     # single line flow scalars
     if (defined $default_style and $node->{style} != $default_style) {
-        my ($changed, $new_string) = $self->_change_style($node, $default_style);
+        my ($changed, $new_string, $new_style) = $self->_change_style($node, $default_style);
         if ($changed) {
             my $lines = $self->{lines};
             my $line = $lines->[ $node->open->{line} ];
@@ -329,6 +329,7 @@ sub _replace_quoting($self, $node) {
             if ($diff) {
                 $self->{tree}->_move_columns($node->open->{line}, $node->close->{column} + 1, $diff);
             }
+            $node->{style} = $new_style;
             $node->close->{column} += $diff;
             $lines->[ $node->open->{line} ] = $line;
         }
@@ -339,21 +340,23 @@ sub _change_style($self, $node, $style) {
     my $value = $node->{value};
     if (grep { $_ eq $value } @all or $value =~ m/($re)/) {
         # leave me alone
-        return (0);
-    }
-    else {
-        my $emit = $self->_emit_value($value, $style);
-        chomp $emit;
-        return (0) if $emit =~ tr/\n//;
-        my $first = substr($emit, 0, 1);
-        my $new_style =
-            $first eq "'" ? YAML_SINGLE_QUOTED_SCALAR_STYLE
-            : $first eq '"' ? YAML_DOUBLE_QUOTED_SCALAR_STYLE
-            : YAML_PLAIN_SCALAR_STYLE;
-        if ($new_style eq $style) {
-            return (1, $emit);
+        if ($node->{style} eq YAML_PLAIN_SCALAR_STYLE or $style eq YAML_PLAIN_SCALAR_STYLE) {
+            return (0);
         }
     }
+
+    my $emit = $self->_emit_value($value, $style);
+    chomp $emit;
+    return (0) if $emit =~ tr/\n//;
+    my $first = substr($emit, 0, 1);
+    my $new_style =
+        $first eq "'" ? YAML_SINGLE_QUOTED_SCALAR_STYLE
+        : $first eq '"' ? YAML_DOUBLE_QUOTED_SCALAR_STYLE
+        : YAML_PLAIN_SCALAR_STYLE;
+    if ($new_style eq $style) {
+        return (1, $emit, $new_style);
+    }
+
     return (0);
 }
 
@@ -514,9 +517,43 @@ sub _process_flow_scalar($self, $parent, $node, $block_indent) {
         my $new_spaces = ' ' x $block_indent;
         $line =~ s/^([ \t]*)/$new_spaces/;
         my $old = length $1;
-        $node->_fix_flow_indent(line => $i, diff => $block_indent - $old);
+        if ($block_indent != $old) {
+            $self->{tree}->_fix_flow_indent(line => $i, diff => $block_indent - $old);
+        }
         $lines->[ $i ] = $line;
     }
+    if (not $node->multiline) {
+        $self->_check_adjacency($node, $parent);
+        if ($node->{name} eq 'scalar_event') {
+            $self->_replace_quoting($node);
+        }
+    }
+}
+
+sub _check_adjacency($self, $node, $parent) {
+    return unless $node->{flow};
+    return unless $node->is_mapping_value($parent);
+    # allowed:     "foo":bar, "foo":*alias
+    # not allowed: foo:bar, foo:*alias
+    my $prev = $parent->sibling($node, -1);
+    my $tidy_adjacency = $self->cfg->adjacency;
+    if (not $prev->is_collection and not $prev->is_quoted) {
+        $tidy_adjacency = 0; # adjacency would be invalid here
+    }
+    my $start = $node->open;
+    my $adjacent = 0;
+    my $line = $self->{lines}->[ $start->{line} ];
+    if ($start->{column} > 0 and substr($line, $start->{column} - 1, 1) eq ':') {
+        $adjacent = 1;
+    }
+    return unless defined $tidy_adjacency; # keep as is
+    if ($tidy_adjacency) {
+        die "Not implemented yet: enforce adjacency";
+    }
+    return unless $adjacent;
+    substr($line, $start->{column}, 0, ' ');
+    $self->{tree}->_move_columns($start->{line}, $start->{column} + 1, +1);
+    $self->{lines}->[ $start->{line} ] = $line;
 }
 
 sub _find_scalar_start($self, $node) {
@@ -708,7 +745,7 @@ sub _tree($self, $yaml, $lines) {
             $flow-- if $flow;
         }
         else {
-            $event = YAML::Tidy::Node::Scalar->new(%$event);
+            $event = YAML::Tidy::Node::Scalar->new(%$event, flow => $flow);
             $ref->{elements}++;
             $event->{index} = $ref->{elements};
             $event->{level} = $level;
@@ -761,6 +798,12 @@ sub _pp($event) {
     }
     $fmt .= "\n";
     printf $fmt, @args;
+}
+
+sub _debug_lines($self) {
+    say "====================================";
+    say for @{ $self->{lines} };
+    say "====================================";
 }
 
 sub highlight($self, $yaml, $type = 'ansi') {

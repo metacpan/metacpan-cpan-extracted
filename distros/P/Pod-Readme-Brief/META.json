@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Pod-Readme-Brief",
    "no_index" : {
@@ -33,18 +33,21 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ap/Pod-Readme-Brief/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Readme-Brief"
       },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ap/Pod-Readme-Brief.git",
+         "url" : "https://github.com/ap/Pod-Readme-Brief.git",
          "web" : "https://github.com/ap/Pod-Readme-Brief"
       }
    },
-   "version" : "1.001",
+   "version" : "1.002",
    "x_copyright" : {
       "holder" : "Aristotle Pagaltzis",
       "year" : 2018
    },
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

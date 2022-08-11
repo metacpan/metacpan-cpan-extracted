@@ -10,12 +10,19 @@ requires 'Catalyst::Plugin::Session';
 requires 'Catalyst::Action::RenderView';
 requires 'Catalyst::TraitFor::Request::StructuredParameters', '0.006';
 requires 'Catalyst::Plugin::CurrentComponents', '0.009';
+requires 'Catalyst::Plugin::ServeFile', '0.004';
+requires 'Catalyst::Plugin::CSRFToken', '0.001';
+requires 'CatalystX::Errors', '0.001009';
+requires 'CatalystX::RequestModel', '0.007';
+requires 'Catalyst::ControllerPerContext', '0.001';
+requires 'Catalyst::View::BasePerRequest', '0.006';
 
 requires 'DBIx::Class', '0.082840';
 requires 'DBIx::Class::Helpers', '2.033003';
 requires 'DBIx::Class::Schema::Loader', '0.07046';
 requires 'DBIx::Class::TimeStamp', '0.14';
-requires 'DBIx::Class::BcryptColumn', '0.001001';
+requires 'DBIx::Class::BcryptColumn', '0.001003';
+requires 'DBIx::Class::ResultSet::SetControl';
 requires 'Gazelle', '0.46';
 requires 'Module::Runtime';
 requires 'experimental', '0.020';
@@ -33,4 +40,6 @@ requires 'Plack::Runner';
 requires 'SQL::Translator';
 requires 'Scalar::Util';
 requires 'Sub::Exporter';
+requires 'WWW::CSRF';
+
 

@@ -20,52 +20,73 @@ App::CSVUtils::Manual::Cookbook - App::CSVUtils cookbook
 
 =head1 VERSION
 
-This document describes version 0.037 of App::CSVUtils::Manual::Cookbook (from Perl distribution App-CSVUtils), released on 2022-03-27.
+This document describes version 0.044 of App::CSVUtils::Manual::Cookbook (from Perl distribution App-CSVUtils), released on 2022-08-09.
 
 =head1 DESCRIPTION
 
 This document lists the various tasks you can do with the scripts included in
 L<App::CSVUtils> distribution.
 
-=head1 ADDING COLUMNS
+Example F<1.csv> content:
+
+ name,age,rank
+ andi,25,120
+ budi,28,115
+ cinta,19,142
+ derry,33,121
+
+=head2 ADDING COLUMNS
+
+With L<csv-add-field>, we add a new column named C<foo> with the content
+calculated from Perl code:
+
+ % csv-add-field 1.csv foo '$main::rownum * 2'
+ name,age,rank,foo
+ andi,25,120,4
+ budi,28,115,6
+ cinta,19,142,8
+ derry,33,121,10
+
+You can specify at which position the new column will be using one of the
+options C<--at>, C<--after>, C<--before>:
+
+TODO EXAMPLE.
+
+=head2 ADDING ROWS
 
 TODO.
 
-=head1 ADDING ROWS
+=head2 ADDING SUMMARY ROW (TOTAL, AVERAGE, ETC)
 
 TODO.
 
-=head1 ADDING SUMMARY ROW (TOTAL, AVERAGE, ETC)
+=head2 CONVERTING TO OTHER FORMATS
+
+=head3 To CSV
 
 TODO.
 
-=head1 CONVERTING TO OTHER FORMATS
-
-=head2 To CSV
+=head3 To JSON
 
 TODO.
 
-=head2 To JSON
+=head3 To Perl data structure
 
 TODO.
 
-=head2 To Perl data structure
+=head3 To TSV
 
 TODO.
 
-=head2 To TSV
+=head3 To YAML
 
 TODO.
 
-=head2 To YAML
+=head2 DEALING WITH NEWLINES IN CSV
 
 TODO.
 
-=head1 DEALING WITH NEWLINES IN CSV
-
-TODO.
-
-=head1 DEALING WITH NON-STANDARD CSV
+=head2 DEALING WITH NON-STANDARD CSV
 
 The utilities allow you to set input's field separator (`--sep-char`), quote
 character (`--quote-char`), and escape character (`--escape-char`), so if you
@@ -87,57 +108,114 @@ Likewise, you can customize output's field separator (`--output-sep-char`),
 quote character (`--output-quote-char`), and escape character
 (`--output-escape-char`).
 
-=head1 FILTERING (SELECTING) COLUMNS
+=head2 FILTERING (SELECTING) COLUMNS
+
+With L<csv-select-fields>:
+
+ % csv-select-fields 1.csv -f age -f name
+ age,name
+ 25,andi
+ 28,budi
+ 19,cinta
+ 33,derry
+
+Note that the order of the fields is as specified.
+
+You can select multiple fields using C<--include-field-pat> option. You can
+exclude fields using C<--exclude-field> and C<--exclude-field-pat>.
+
+=head2 FILTERING (SELECTING) ROWS
 
 TODO.
 
-=head1 FILTERING (SELECTING) ROWS
+=head2 GETTING INFORMATION ABOUT CSV
 
-TODO.
+ % csv-info 1.csv
+ {
+    "data_row_count" : 6,
+    "field_count" : 3,
+    "fields" : [
+       "name",
+       "age",
+       "rank"
+    ],
+    "file_size" : 78,
+    "header_row_count" : 0,
+    "row_count" : 6
+ }
 
-=head1 GETTING INFORMATION ABOUT CSV
+=head3 Listing the column names
 
- % csv-info INPUT.CSV
+ % csv-list-field-names 1.csv
+ +------+-------+
+ | name | index |
+ +------+-------+
+ | age  | 2     |
+ | name | 1     |
+ | rank | 3     |
+ +------+-------+
 
-Sample output:
+ % csv-list-field-names 1.csv --json
+ [
+    200,
+    "OK",
+    [
+       {
+          "index" : 2,
+          "name" : "age"
+       },
+       {
+          "index" : 1,
+          "name" : "name"
+       },
+       {
+          "index" : 3,
+          "name" : "rank"
+       }
+    ],
+    {
+       "stream" : 0,
+       "table.fields" : [
+          "name",
+          "index"
+       ],
+       "title" : "csv-list-field-names 1.csv --json"
+    }
+ ]
 
-=head2 Listing the column names
-
-TODO.
-
-=head1 MERGING CSV
+=head2 MERGING CSV
 
 TODO.
 
 See also L</SPLITTING CSV>.
 
-=head1 MODIFYING COLUMNS
+=head2 MODIFYING COLUMNS
 
 TODO.
 
-=head1 MODIFYING ROWS
+=head2 MODIFYING ROWS
 
 TODO.
 
-=head1 PERFORMING SET OPERATIONS WITH CSV
+=head2 PERFORMING SET OPERATIONS WITH CSV
 
 TODO.
 
-=head1 SORTING COLUMNS
+=head2 SORTING COLUMNS
 
 TODO.
 
-=head1 SORTING ROWS
+=head2 SORTING ROWS
 
 TODO.
 
-=head1 SPLITTING CSV
+=head2 SPLITTING CSV
 
 TODO.
 
 See also L</MERGING CSV>.
 
-=head1 TRANSPOSING
+=head2 TRANSPOSING
 
 Transposing, like in a two-dimensional matrix, means switching row and colum
 indices to produce a new CSV where the columns become rows and vice versa. For

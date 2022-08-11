@@ -437,6 +437,28 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 append_with
+
+  append_with(Str $delimiter, Str @parts) (Str)
+
+The append_with method appends arugments to the string using the delimiter provided.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item append_with example 1
+
+  # given: synopsis;
+
+  my $append = $string->append_with(', ', 'welcome');
+
+  # "hello world, welcome"
+
+=back
+
+=cut
+
 =head2 camelcase
 
   camelcase() (Str)
@@ -2466,6 +2488,73 @@ I<Since C<0.08>>
 
 =cut
 
+=head2 pascalcase
+
+  pascalcase() (Str)
+
+The pascalcase method converts the string to pascalcase.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item pascalcase example 1
+
+  # given: synopsis;
+
+  my $pascalcase = $string->pascalcase;
+
+  # "HelloWorld"
+
+=back
+
+=cut
+
+=head2 prepend
+
+  prepend(Str @parts) (Str)
+
+The prepend method prepends arugments to the string using spaces.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item prepend example 1
+
+  # given: synopsis;
+
+  my $prepend = $string->prepend('welcome');
+
+  # "welcome hello world"
+
+=back
+
+=cut
+
+=head2 prepend_with
+
+  prepend_with(Str $delimiter, Str @parts) (Str)
+
+The prepend_with method prepends arugments to the string using the delimiter
+provided.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item prepend_with example 1
+
+  # given: synopsis;
+
+  my $prepend = $string->prepend_with(', ', 'welcome');
+
+  # "welcome, hello world"
+
+=back
+
+=cut
+
 =head2 render
 
   render(HashRef $tokens) (Str)
@@ -2488,6 +2577,50 @@ I<Since C<0.01>>
   my $render = $string->render({name => 'Friend'});
 
   # "Hi, Friend!"
+
+=back
+
+=cut
+
+=head2 repeat
+
+  repeat(Num $number, Str $delimiter) (Str)
+
+The repeat method repeats the string value N times based on the number provided
+and returns a new concatenated string. Optionally, a delimiter can be provided
+and be place between the occurences.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item repeat example 1
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('999');
+
+  my $repeat = $string->repeat(2);
+
+  # "999999"
+
+=back
+
+=over 4
+
+=item repeat example 2
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('999');
+
+  my $repeat = $string->repeat(2, ',');
+
+  # "999,999"
 
 =back
 
@@ -2785,6 +2918,81 @@ I<Since C<0.01>>
   my $strip = $string->strip;
 
   # "one, two, three"
+
+=back
+
+=cut
+
+=head2 substr
+
+  substr(Num $offset, Num $length, Str $replace) (Str)
+
+The substr method calls the core L</substr> function with the object's string
+value. In list context returns the result and the subject.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item substr example 1
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('hello world');
+
+  my $substr = $string->substr(0, 5);
+
+  # "hello"
+
+=back
+
+=over 4
+
+=item substr example 2
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('hello world');
+
+  my $substr = $string->substr(6, 5);
+
+  # "world"
+
+=back
+
+=over 4
+
+=item substr example 3
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('hello world');
+
+  my $substr = $string->substr(6, 5, 'universe');
+
+  # "hello universe"
+
+=back
+
+=over 4
+
+=item substr example 4
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('hello world');
+
+  my ($result, $subject) = $string->substr(6, 5, 'universe');
+
+  # ("world", "hello universe")
 
 =back
 

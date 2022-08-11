@@ -12,6 +12,7 @@ use POSIX qw/EXIT_SUCCESS/;
 
 my $updir = File::Spec->updir;
 my $curdir = File::Spec->curdir;
+
 #
 # Move to upper dir of this script
 #
@@ -222,11 +223,23 @@ sub _dircopy {
     foreach (sort keys %{$stats}) {
         next if $_ eq $updir;
         next if $_ eq $curdir;
+
+        my $mode = $stats->{$_}->[2];
+
         #
         # Copy only the version of pcre2 we use
         #
-        next if $_ eq 'pcre2-10.23';
-        next if $_ eq 'pcre2-10.33';
+        if (@parents && $parents[-1] eq 'untar') {
+          next if S_ISDIR($mode) && ($_ =~ /^pcre2/) && ($_ ne 'pcre2-10.40');
+        }
+        #
+        # Skip historical Marpa--R2 checkout from marpaWrapper
+        #
+        next if $_ eq 'Marpa--R2';
+        #
+        # Copy only the version of iconv we use
+        #
+        next if ($_ =~ /^libiconv/ && $_ ne 'libiconv-1.16.tar.gz');
         #
         # Do not copy known garbage
         #
@@ -280,6 +293,7 @@ sub _dircopy {
         next if $_ eq 'ipch';
         next if $_ eq 'CMake-codecov';
         next if $_ eq 'testdata';
+        next if $_ =~ /\.tar\.orig\.gz$/;
         if ($_ eq 'tar') {
           #
           # We skip only 'tar' directory of marpaESLIF
@@ -287,8 +301,6 @@ sub _dircopy {
           next unless @parents;
         }
         next if $_ =~ /~$/;
-
-        my $mode = $stats->{$_}->[2];
 
         if (S_ISDIR($mode)) {
             _dircopy(File::Spec->catdir($srcdir, $_), File::Spec->catdir($dstdir, $_), $_, @parents);

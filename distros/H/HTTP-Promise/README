@@ -1,4 +1,4 @@
-  NAME
+NAME
     HTTP::Promise - Asynchronous HTTP Request and Promise
 
 SYNOPSIS
@@ -20,10 +20,15 @@ SYNOPSIS
             max_headers_size => 8192,
             max_redirect => 3,
             proxy => 'https://proxy.example.org:8080',
+            # Can also be cbor or storable
+            serialiser => 'sereal',
             # You can also use decimals with Time::HiRes
             timeout => 15,
             # force the use of files to store the response content
             use_content_file => 1,
+            # The serialiser to use for the promise in Promise::Me
+            # Defaults to storable, but can also be cbor and sereal
+            serialiser => 'sereal',
         );
         my $prom = $p->get( 'https://www.example.org', $hash_of_query_params )->then(sub
         {
@@ -39,14 +44,14 @@ SYNOPSIS
         my $prom = $p->request( $req )->then(sub{ #... })->catch(sub{ # ... });
 
 VERSION
-        v0.1.0
+        v0.1.4
 
 DESCRIPTION
     HTTP::Promise provides with a fast and powerful yet memory-friendly API
     to make true asynchronous HTTP requests using fork using Promise::Me.
 
     It is based on the design of HTTP::Message, but with a much cleaner
-    interface to make requests and manage HTTPP entity bodies.
+    interface to make requests and manage HTTP entity bodies.
 
     Here are the key features:
 
@@ -207,6 +212,15 @@ CONSTRUCTOR
         Array reference. This sets the list of http methods that are allowed
         to be redirected. Default to empty, which means that all methods can
         be redirected.
+
+    *   "serialiser"
+
+        String. Specify the serialiser to use for Promise::Me. Possible
+        values are: cbor, sereal or storable
+
+        By default it uses the value set in the global variable $SERIALISER,
+        which is a copy of the $SERIALISER in Promise::Me, which should be
+        by default "storable"
 
     *   "ssl_opts"
 
@@ -382,6 +396,9 @@ METHODS
             # An HTTP::Promise::Exception object is passed with an error code
             say( "Error code; ", $ex->code, " and message: ", $ex->message );
         });
+
+  dnt
+    Boolean. If set to a true value, this will set the "DNT" header to 1
 
   expect_threshold
     Sets or gets the body size threshold beyond which, this module will
@@ -694,6 +711,11 @@ METHODS
                                                [qw( http https )] => 'https://proxy.example.com:8001' ] );
         my $proxy = $p->proxy( 'https' );
 
+  proxy_authorization
+    Sets or gets the proxy authorization string. This is computed
+    automatically when you set a user and a password to the proxy URI by
+    setting the value to "proxy"
+
   put
     Provided with an "uri" and an optional hash of form data, followed by an
     hash of header name/value pairs and this will issue a "PUT" http request
@@ -825,6 +847,14 @@ METHODS
         my $p = HTTP::Promise->new( send_te => 1 );
         $p->send_te(1);
         my $bool = $p->send_te;
+
+  serialiser
+    String. Sets or gets the serialiser to use for Promise::Me. Possible
+    values are: cbor, sereal or storable
+
+    By default, the value is set to the global variable $SERIALISER, which
+    is a copy of the $SERIALISER in Promise::Me, which should be by default
+    "storable"
 
   simple_request
     This method takes the same parameters as "request" and differs in that
@@ -966,7 +996,7 @@ SEE ALSO
     Module::Generic::Scalar, Module::Generic
 
     HTTP::XSHeaders, File::MMagic::XS, CryptX, HTTP::Parser2::XS,
-    URI::Encode::XS, URI::Escape::XS
+    URI::Encode::XS, URI::Escape::XS, URL::Encode::XS
 
     IO::Compress::Bzip2, IO::Compress::Deflate, IO::Compress::Gzip,
     IO::Compress::Lzf, IO::Compress::Lzip, IO::Compress::Lzma,

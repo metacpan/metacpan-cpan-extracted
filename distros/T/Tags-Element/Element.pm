@@ -10,11 +10,12 @@ use Readonly;
 Readonly::Array our @EXPORT_OK => qw(element);
 
 # Version.
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Common element.
 sub element {
 	my ($element, @data) = @_;
+
 	my @attr;
 	my @content;
 	foreach my $ref (@data) {
@@ -28,6 +29,7 @@ sub element {
 			push @content, ['d', $ref];
 		}
 	}
+
 	return (
 		['b', $element],
 		@attr ? @attr : (),
@@ -51,20 +53,22 @@ Tags::Element - Element utilities for 'Tags'.
 =head1 SYNOPSIS
 
  use Tags::Element qw(element);
+
  my @tags = element($element, @data);
 
 =head1 SUBROUTINES
 
-=over 8
+=head2 C<element($element, @data)>
 
-=item C<element($element, @data)>
+ my @tags = element($element, @data);
 
- Common element helper for writing Tags code.
- Returns array of element in Tags format.
+Common element helper for writing Tags code.
 
-=back
+Returns array of element in Tags format.
 
 =head1 EXAMPLE1
+
+=for comment filename=element_as_tags.pl
 
  use strict;
  use warnings;
@@ -113,6 +117,8 @@ Tags::Element - Element utilities for 'Tags'.
 
 =head1 EXAMPLE2
 
+=for comment filename=element_as_html.pl
+
  use strict;
  use warnings;
 
@@ -158,11 +164,12 @@ Michal Josef Špaček L<skim@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2018 Michal Josef Špaček
- BSD 2-Clause License
+© 2011-2022 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

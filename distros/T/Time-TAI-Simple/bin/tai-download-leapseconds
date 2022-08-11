@@ -27,6 +27,10 @@ my %opt_h = (
     base_time => 0  # don't bother calculating base_time; we're not using it.
 );
 
+for my $param (keys %OPT) {
+    my $opt_key = join('_', split(/\-/, $param));
+    $opt_h{$opt_key} = $OPT{$param};
+}
 $opt_h{leapseconds_pathname} = $OPT{'pathname'} if (defined($OPT{'pathname'}));
 $opt_h{download_urls} = \@URLS if (scalar(@URLS) > 0);
 
@@ -42,13 +46,34 @@ print "$tai_or->{dl_to}\n" unless ($OPT{'q'} || $OPT{'quiet'});
 exit(0);
 
 sub usage {
-    print "Usage: $0 [options]\n" .
-          "Options are:\n" .
-          "    -q     Do not write to STDOUT or STDERR, just exit with 0 or 1.\n" .
-          "    --pathname=<pathname>\n" .
-          "           Download file to specified pathname.\n" .
-          "    --show-url\n" .
-          "           Print source URL before printing destination pathname.\n";
+    print join("\n", (
+        "Usage: $0 [options]",
+        "Options are:",
+        "    --add-agent=<string>",
+        "           Add the specified User-Agent string to the internal list",
+        "    --add-agent=\"<string>|<string>|...\"",
+        "           Add the specified User-Agent strings to the internal list",
+        "    --agent=<string>",
+        "           Use the specified User-Agent string",
+        "    --churn-agent",
+        "           On failure, pick a random User-Agent string for next try",
+        "           (Most useful when --retry=N is set to N > 1)",
+        "           (Does not work with --force-edge)",
+        "    --debug",
+        "           Show annoying descriptions of what it is doing (ignores -q)",
+        "    --force-edge",
+        "           Always use the first User-Agent string in the list",
+        "           (Microsoft Edge, unless overridden with --agent)",
+        "    --pathname=<pathname>",
+        "           Download file to specified pathname",
+        "    --primary",
+        "           Try to fetch from the IERS URL before the cache URL",
+        "    -q     Do not write to STDOUT or STDERR, just exit with 0 or 1",
+        "    --retry=<N>",
+        "           Upon fetch failure, try again up to N times (default 0).",
+        "    --show-url",
+        "           Print source URL before printing destination pathname",
+    ), "\n");
     return 1;
 }
 
@@ -80,11 +105,32 @@ These default behaviors may be controlled via some options:
 
     -h          Describe available options
     --help      Same as -h
+    --add-agent=<string>
+                Add the specified User-Agent string to the internal list
+    --add-agent=\"<string>|<string>|...\"
+                Add the specified User-Agent strings to the internal list
+    --agent=<string>
+                Use the specified User-Agent string
+    --churn-agent
+                On failure, pick a random User-Agent string for next try
+                (Most useful when --retry=N is set to N > 1)
+                (Does not work with --force-edge)
+    --debug
+                Show annoying descriptions of what it is doing (ignores -q)
+    --force-edge
+                Always use the first User-Agent string in the list
+                (Microsoft Edge, unless overridden with --agent)
     --pathname=<pathname>
                 Specify the pathname to which the file is saved.
+    --primary
+                Try to fetch from the IERS URL before the cache URL
+    --retry=<N>
+                Upon fetch failure, try again up to N times (default 0).
+    --retry-delay=<N>
+                When --retry is set, sleep N seconds between tries (default 0.5).
     --show-url  Write to STDOUT the URL from which the file was downloaded.
                 (Before pathname is written to STDOUT, on a different line.)
-    --quiet     Do not write pathname to STDOUT or error messages to STDERR.
+    -q          Do not write pathname to STDOUT or error messages to STDERR.
 
 =head1 ABOUT URLS
 

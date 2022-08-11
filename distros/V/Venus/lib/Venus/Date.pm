@@ -236,6 +236,48 @@ sub restart {
   return $self->reset($timepiece->epoch);
 }
 
+sub restart_day {
+  my ($self) = @_;
+
+  return $self->restart('day');
+}
+
+sub restart_hour {
+  my ($self) = @_;
+
+  return $self->restart('hour');
+}
+
+sub restart_minute {
+  my ($self) = @_;
+
+  return $self->restart('minute');
+}
+
+sub restart_month {
+  my ($self) = @_;
+
+  return $self->restart('month');
+}
+
+sub restart_quarter {
+  my ($self) = @_;
+
+  return $self->restart('quarter');
+}
+
+sub restart_second {
+  my ($self) = @_;
+
+  return $self->restart('second');
+}
+
+sub restart_year {
+  my ($self) = @_;
+
+  return $self->restart('year');
+}
+
 sub rfc822 {
   my ($self) = @_;
 
@@ -425,48 +467,6 @@ sub timeseconds {
   require Time::Seconds;
 
   return Time::Seconds->new($time // 0);
-}
-
-sub truncate_to_day {
-  my ($self) = @_;
-
-  return $self->restart('day');
-}
-
-sub truncate_to_hour {
-  my ($self) = @_;
-
-  return $self->restart('hour');
-}
-
-sub truncate_to_minute {
-  my ($self) = @_;
-
-  return $self->restart('minute');
-}
-
-sub truncate_to_month {
-  my ($self) = @_;
-
-  return $self->restart('month');
-}
-
-sub truncate_to_quarter {
-  my ($self) = @_;
-
-  return $self->restart('quarter');
-}
-
-sub truncate_to_second {
-  my ($self) = @_;
-
-  return $self->restart('second');
-}
-
-sub truncate_to_year {
-  my ($self) = @_;
-
-  return $self->restart('year');
 }
 
 1;
@@ -1298,6 +1298,196 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 restart_day
+
+  restart_day() (Date)
+
+The restart_day method truncates the date and time to the C<day>.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item restart_day example 1
+
+  # given: synopsis;
+
+  $date = $date->restart_day;
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
+
+=back
+
+=cut
+
+=head2 restart_hour
+
+  restart_hour() (Date)
+
+The restart_hour method truncates the date and time to the C<hour>.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item restart_hour example 1
+
+  # given: synopsis;
+
+  $date = $date->restart_hour;
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
+
+=back
+
+=cut
+
+=head2 restart_minute
+
+  restart_minute() (Date)
+
+The restart_minute method truncates the date and time to the C<minute>.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item restart_minute example 1
+
+  # given: synopsis;
+
+  $date = $date->restart_minute;
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
+
+=back
+
+=cut
+
+=head2 restart_month
+
+  restart_month() (Date)
+
+The restart_month method truncates the date and time to the C<month>.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item restart_month example 1
+
+  # given: synopsis;
+
+  $date = $date->restart_month;
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
+
+=back
+
+=cut
+
+=head2 restart_quarter
+
+  restart_quarter() (Date)
+
+The restart_quarter method truncates the date and time to the C<quarter>.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item restart_quarter example 1
+
+  # given: synopsis;
+
+  $date = $date->restart_quarter;
+
+  # $date->string; # 1988-01-01T00:00:00Z
+
+  # $date->epoch; # 567993600
+
+=back
+
+=cut
+
+=head2 restart_second
+
+  restart_second() (Date)
+
+The restart_second method truncates the date and time to the C<second>.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item restart_second example 1
+
+  # given: synopsis;
+
+  $date = $date->restart_second;
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
+
+=back
+
+=cut
+
+=head2 restart_year
+
+  restart_year() (Date)
+
+The restart_year method truncates the date and time to the C<year>.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item restart_year example 1
+
+  # given: synopsis;
+
+  $date = $date->restart_year;
+
+  # $date->string; # 1988-01-01T00:00:00Z
+
+  # $date->epoch; # 567993600
+
+=back
+
+=cut
+
+=head2 rfc1123
+
+  rfc1123() (Str)
+
+The rfc1123 method returns the date and time formatted as an RFC1123 string.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item rfc1123 example 1
+
+  # given: synopsis;
+
+  my $rfc1123 = $date->rfc1123;
+
+  # Mon, 01 Feb 1988 00:00:00 GMT
+
+=back
+
+=cut
+
 =head2 rfc3339
 
   rfc3339() (Str)
@@ -1337,6 +1527,28 @@ I<Since C<0.01>>
   my $rfc7231 = $date->rfc7231;
 
   # Mon, 01 Feb 1988 00:00:00 UTC
+
+=back
+
+=cut
+
+=head2 rfc822
+
+  rfc822() (Str)
+
+The rfc822 method returns the date and time formatted as an RFC822 string.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item rfc822 example 1
+
+  # given: synopsis;
+
+  my $rfc822 = $date->rfc822;
+
+  # Mon, 01 Feb 1988 00:00:00 +0000
 
 =back
 
@@ -1992,174 +2204,6 @@ I<Since C<0.01>>
   # $date->string; # 1989-01-31T05:48:50Z
 
   # $date->epoch; # 602228930
-
-=back
-
-=cut
-
-=head2 truncate_to_day
-
-  truncate_to_day() (Date)
-
-The truncate_to_day method truncates the date and time to the C<day>.
-
-I<Since C<0.09>>
-
-=over 4
-
-=item truncate_to_day example 1
-
-  # given: synopsis;
-
-  $date = $date->truncate_to_day;
-
-  # $date->string; # 1988-02-01T00:00:00Z
-
-  # $date->epoch; # 570672000
-
-=back
-
-=cut
-
-=head2 truncate_to_hour
-
-  truncate_to_hour() (Date)
-
-The truncate_to_hour method truncates the date and time to the C<hour>.
-
-I<Since C<0.09>>
-
-=over 4
-
-=item truncate_to_hour example 1
-
-  # given: synopsis;
-
-  $date = $date->truncate_to_hour;
-
-  # $date->string; # 1988-02-01T00:00:00Z
-
-  # $date->epoch; # 570672000
-
-=back
-
-=cut
-
-=head2 truncate_to_minute
-
-  truncate_to_minute() (Date)
-
-The truncate_to_minute method truncates the date and time to the C<minute>.
-
-I<Since C<0.09>>
-
-=over 4
-
-=item truncate_to_minute example 1
-
-  # given: synopsis;
-
-  $date = $date->truncate_to_minute(1);
-
-  # $date->string; # 1988-02-01T00:00:00Z
-
-  # $date->epoch; # 570672000
-
-=back
-
-=cut
-
-=head2 truncate_to_month
-
-  truncate_to_month() (Date)
-
-The truncate_to_month method truncates the date and time to the C<month>.
-
-I<Since C<0.09>>
-
-=over 4
-
-=item truncate_to_month example 1
-
-  # given: synopsis;
-
-  $date = $date->truncate_to_month(1);
-
-  # $date->string; # 1988-02-01T00:00:00Z
-
-  # $date->epoch; # 570672000
-
-=back
-
-=cut
-
-=head2 truncate_to_quarter
-
-  truncate_to_quarter() (Date)
-
-The truncate_to_quarter method truncates the date and time to the C<quarter>.
-
-I<Since C<0.09>>
-
-=over 4
-
-=item truncate_to_quarter example 1
-
-  # given: synopsis;
-
-  $date = $date->truncate_to_quarter(1);
-
-  # $date->string; # 1988-01-01T00:00:00Z
-
-  # $date->epoch; # 567993600
-
-=back
-
-=cut
-
-=head2 truncate_to_second
-
-  truncate_to_second() (Date)
-
-The truncate_to_second method truncates the date and time to the C<second>.
-
-I<Since C<0.09>>
-
-=over 4
-
-=item truncate_to_second example 1
-
-  # given: synopsis;
-
-  $date = $date->truncate_to_second(1);
-
-  # $date->string; # 1988-02-01T00:00:00Z
-
-  # $date->epoch; # 570672000
-
-=back
-
-=cut
-
-=head2 truncate_to_year
-
-  truncate_to_year() (Date)
-
-The truncate_to_year method truncates the date and time to the C<year>.
-
-I<Since C<0.09>>
-
-=over 4
-
-=item truncate_to_year example 1
-
-  # given: synopsis;
-
-  $date = $date->truncate_to_year(1);
-
-  # $date->string; # 1988-01-01T00:00:00Z
-
-  # $date->epoch; # 567993600
 
 =back
 

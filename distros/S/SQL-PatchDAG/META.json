@@ -4,13 +4,13 @@
       "Aristotle Pagaltzis <pagaltzis@gmx.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "SQL-PatchDAG",
    "no_index" : {
@@ -38,18 +38,21 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ap/SQL-PatchDAG/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=SQL-PatchDAG"
       },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ap/SQL-PatchDAG.git",
+         "url" : "https://github.com/ap/SQL-PatchDAG.git",
          "web" : "https://github.com/ap/SQL-PatchDAG"
       }
    },
-   "version" : "0.102",
+   "version" : "0.103",
    "x_copyright" : {
       "holder" : "Aristotle Pagaltzis",
       "year" : 2020
    },
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

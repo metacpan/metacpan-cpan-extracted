@@ -16,11 +16,11 @@ Suricata::Monitoring - LibreNMS JSON SNMP extend and Nagios style check for Suri
 
 =head1 VERSION
 
-Version 0.1.3
+Version 0.3.1
 
 =cut
 
-our $VERSION = '0.1.3';
+our $VERSION = '0.3.1';
 
 =head1 SYNOPSIS
 
@@ -77,6 +77,9 @@ The only must have is 'files'.
     - error_percent_crit :: Error percent critical threshold.
       - Default :: .1
     
+    - max_age :: How far back to read in seconds.
+      - Default :: 360
+    
     - files :: A hash with the keys being the instance name and the values
       being the Eve files to read. ".total" is not a valid instance name.
       Similarly anything starting with a "." should be considred reserved.
@@ -89,6 +92,7 @@ The only must have is 'files'.
         error_delta_crit   => 2,
         error_percent_warn => .05,
         error_percent_crit => .1,
+        max_age            => 360,
         files=>{
                'ids'=>'/var/log/suricata/alert-ids.json',
                'foo'=>'/var/log/suricata/alert-foo.json',
@@ -118,16 +122,16 @@ sub new {
 	};
 	bless $self;
 
-	# reel in the threshold values
-	my @thresholds = (
+	# reel in the numeric args
+	my @num_args = (
 		'drop_percent_warn',  'drop_percent_crit', 'error_delta_warn', 'error_delta_crit',
-		'error_percent_warn', 'error_percent_crit'
+		'error_percent_warn', 'error_percent_crit', 'max_age'
 	);
-	for my $threshold (@thresholds) {
-		if ( defined( $args{$threshold} ) ) {
-			$self->{$threshold} = $args{$threshold};
-			if ( $args{$threshold} !~ /[0-9\.]+/ ) {
-				confess( '"' . $threshold . '" with a value of "' . $args{$threshold} . '" is not numeric' );
+	for my $num_arg (@num_args) {
+		if ( defined( $args{$num_arg} ) ) {
+			$self->{$num_arg} = $args{$num_arg};
+			if ( $args{$num_arg} !~ /[0-9\.]+/ ) {
+				confess( '"' . $num_arg . '" with a value of "' . $args{$num_arg} . '" is not numeric' );
 			}
 		}
 	}
@@ -566,7 +570,7 @@ sub run {
 		$to_return->{data}{'.total'}{error_percent} = sprintf( '%0.5f', $to_return->{data}{'.total'}{error_percent} );
 	}
 	else {
-		$to_return->{data}{alert} = '3';
+		$to_return->{alert} = '3';
 		push( @alerts, 'Did not find a stats entry after searching back ' . $self->{max_age} . ' seconds' );
 	}
 

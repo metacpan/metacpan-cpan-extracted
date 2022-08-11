@@ -46,7 +46,7 @@ metamail, which comes with this message:
 
 #define qp_isplain(c) ((c) == '\t' || (((c) >= ' ' && (c) <= '~') && (c) != '='))
 
-int32_t SPVM__MIME__QuotedPrint__encode_qp_opt(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__MIME__QuotedPrint__encode_qp(SPVM_ENV* env, SPVM_VALUE* stack) {
 
         const char *eol;
         int32_t eol_len;
@@ -60,6 +60,8 @@ int32_t SPVM__MIME__QuotedPrint__encode_qp_opt(SPVM_ENV* env, SPVM_VALUE* stack)
         int32_t p_len;
         uint32_t had_utf8;
 
+        int32_t items = env->get_args_stack_length(env, stack);
+
         void* obj_str = stack[0].oval;
         
         if (!obj_str) {
@@ -69,7 +71,10 @@ int32_t SPVM__MIME__QuotedPrint__encode_qp_opt(SPVM_ENV* env, SPVM_VALUE* stack)
         beg = (char*)env->get_chars(env, stack, obj_str);
         sv_len = env->length(env, stack, obj_str);
         
-        void* obj_eol = stack[1].oval;
+        void* obj_eol = NULL;
+        if (items > 1) {
+          obj_eol = stack[1].oval;
+        }
         
         if (obj_eol) {
                 eol = env->get_chars(env, stack, obj_eol);
@@ -79,9 +84,12 @@ int32_t SPVM__MIME__QuotedPrint__encode_qp_opt(SPVM_ENV* env, SPVM_VALUE* stack)
                 eol = "\n";
                 eol_len = 1;
         }
-
-        binary = stack[2].ival;
-
+        
+        binary = 0;
+        if (items > 2) {
+          binary = stack[2].ival;
+        }
+        
         end = beg + sv_len;
         
         std::string RETVAL("");

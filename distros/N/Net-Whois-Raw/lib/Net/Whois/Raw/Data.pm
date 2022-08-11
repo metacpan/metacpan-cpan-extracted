@@ -1,5 +1,5 @@
 package Net::Whois::Raw::Data;
-$Net::Whois::Raw::Data::VERSION = '2.99036';
+$Net::Whois::Raw::Data::VERSION = '2.99037';
 # ABSTRACT: Config for Net::Whois::Raw.
 
 use utf8;
@@ -1201,7 +1201,7 @@ our %servers = qw(
 
     PRIV.AT                 whois.nic.priv.at
 
-    AI                      whois.ai
+    AI                      whois.nic.ai
 
     BN                      whois.bnnic.bn
 
@@ -2410,7 +2410,7 @@ our %notfound = (
     'whois-bostik.nic.fr'                  => 'The queried object does not exist: Domain name',
     'whois.aeda.net.ae'                    => 'No Data Found',
     'whois.afilias-srs.net'                => 'NOT FOUND',
-    'whois.ai'                             => '^Domain \S+ not registered',
+    'whois.nic.ai'                         => '^Domain \S+ not registered',
     'whois.bnnic.bn'                       => 'Domain Not Found',
     'whois.gtlds.nic.br'                   => 'The queried object does not exist: ',
     'whois.ngtld.cn'                       => 'No matching record\.',
@@ -4485,7 +4485,7 @@ Net::Whois::Raw::Data - Config for Net::Whois::Raw.
 
 =head1 VERSION
 
-version 2.99036
+version 2.99037
 
 =head1 AUTHOR
 

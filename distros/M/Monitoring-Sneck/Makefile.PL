@@ -21,6 +21,8 @@ my %WriteMakefileArgs = (
 		'JSON'          => '0',
 		'File::Slurp'   => '0',
 		'Sys::Hostname' => '0',
+		'MIME::Base64'  => '3.16',
+		'Gzip::Faster'  => '0.21',
 	},
 	dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean      => { FILES    => 'Monitoring-Sneck-*' },

@@ -467,29 +467,8 @@ for my $encoding ( qw/gzip x-gzip/ )
     # my $decoded_content = $m->decoded_content;
     diag( "Is content in decoded utf8? ", ( utf8::is_utf8( $decoded_content ) ? 'yes' : 'no' ) ) if( $DEBUG );
     ok( defined( $decoded_content ), 'content was decoded' );
-    # XXX
-    # $decoded_content = Encode::decode_utf8( $decoded_content );
     # \x{FEFF} is invisible no-break space and \x{263A} is a smiley
 	is( $decoded_content, "\x{FEFF}Hi there \x{263A}\n", 'decoded utf-8 content' );
-	# XXX Remove
-# 	if( $DEBUG )
-# 	{
-# 	    no warnings 'wide';
-# 	    require Encode;
-# 	    diag( "UTF-8 decoded content is '", Encode::decode_utf8( $decoded_content ), "'" );
-# 	    $decoded_content = Encode::encode_utf8( $decoded_content );
-# 	    $decoded_content =~ s/([\N{U+0080}-\N{U+FFFF}\n])/sprintf('\\x{%X}',ord($1))/eg;
-# #         $decoded_content =~ s/([\0-\11\13-\037])(?!\d)/sprintf('\\%o',ord($1))/eg;
-# #         $decoded_content =~ s/([\0-\11\13-\037\177-\377])/sprintf('\\x%02X',ord($1))/eg;
-# #         $decoded_content =~ s/([^\12\040-\176])/sprintf('\\x{%X}',ord($1))/eg;
-#         diag( "Decoded content is: ", $decoded_content );
-#         my $check_content = "\x{FEFF}Hi there \x{263A}\n";
-# 	    $check_content =~ s/([\N{U+0080}-\N{U+FFFF}\n])/sprintf('\\x{%X}',ord($1))/eg;
-# #         $check_content =~ s/([\0-\11\13-\037])(?!\d)/sprintf('\\%o',ord($1))/eg;
-# #         $check_content =~ s/([\0-\11\13-\037\177-\377])/sprintf('\\x%02X',ord($1))/eg;
-# #         $check_content =~ s/([^\12\040-\176])/sprintf('\\x{%X}',ord($1))/eg;
-#         diag( "Checked content is: ", $check_content );
-# 	}
 	is( $m->content->scalar, "H4sICFWAq0ECA3h4eAB7v3u/R6ZCSUZqUarCoxm7uAAZKHXiEAAAAA==\n", 'original content unchanged' );
 
 	$m2 = $m->clone;

@@ -1,16 +1,17 @@
 {
    "abstract" : "Allow other classes and objects to respond to events in yours",
    "author" : [
-      "Chris Winters <chris@cwinters.com>"
+      "Aristotle Pagaltzis <pagaltzis@gmx.de>",
+      "Chris Winters"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Class-Observable",
    "no_index" : {
@@ -39,18 +40,21 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ap/Class-Observable/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Observable"
       },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ap/Class-Observable.git",
+         "url" : "https://github.com/ap/Class-Observable.git",
          "web" : "https://github.com/ap/Class-Observable"
       }
    },
-   "version" : "2.000",
+   "version" : "2.002",
    "x_copyright" : {
       "holder" : "Aristotle Pagaltzis",
       "year" : 2021
    },
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

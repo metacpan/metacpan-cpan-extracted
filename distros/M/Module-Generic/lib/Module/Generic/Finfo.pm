@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Finfo.pm
-## Version v0.3.0
+## Version v0.3.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2022/07/18
+## Modified 2022/08/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -65,7 +65,7 @@ BEGIN
     };
     our %EXPORT_TAGS = ( all => [qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE )] );
     our @EXPORT_OK = qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE );
-    our $VERSION = 'v0.3.0';
+    our $VERSION = 'v0.3.1';
 };
 
 use strict;
@@ -149,7 +149,6 @@ sub filetype
 {
     my $self = shift( @_ );
     my $file = $self->{filepath};
-    # $self->message( 3, "Stating file '$file'" );
     CORE::stat( $file );
     if( !-e( _ ) )
     {
@@ -211,7 +210,6 @@ sub group
     # perlport: "getgrgid: (Win32, VMS, RISC OS) Not implemented."
     return( $self->gid ) if( $^O =~ /^(win32|vms|riscos)$/i );
     my $name = scalar( getgrgid( $data->[ FINFO_GID ] ) );
-    $self->message( 3, "Group name is defined? ", ( defined( $name ) ? "yes ($name)" : 'no' ) );
     return( $self->new_scalar( scalar( getgrgid( $data->[ FINFO_GID ] ) ) ) );
 }
 
@@ -347,7 +345,8 @@ sub FREEZE
     my $class = CORE::ref( $self );
     my %hash  = %$self;
     # Return an array reference rather than a list so this works with Sereal and CBOR
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # On or before Sereal version 4.023, Sereal did not support multiple values returned
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
     # But Storable want a list with the first element being the serialised element
     CORE::return( $class, \%hash );
 }
@@ -551,7 +550,7 @@ Module::Generic::Finfo - File Info Object Class
 
 =head1 VERSION
 
-    v0.3.0
+    v0.3.1
 
 =head1 DESCRIPTION
 

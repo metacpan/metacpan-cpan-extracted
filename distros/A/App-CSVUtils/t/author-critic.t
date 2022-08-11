@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/CSVUtils.pm','lib/App/CSVUtils/Manual/Cookbook.pod','script/csv-add-field','script/csv-avg','script/csv-concat','script/csv-convert-to-hash','script/csv-csv','script/csv-delete-field','script/csv-dump','script/csv-each-row','script/csv-freqtable','script/csv-grep','script/csv-info','script/csv-list-field-names','script/csv-lookup-fields','script/csv-map','script/csv-munge-field','script/csv-replace-newline','script/csv-select-fields','script/csv-select-row','script/csv-setop','script/csv-sort','script/csv-sort-fields','script/csv-sort-rows','script/csv-split','script/csv-sum','script/csv-transpose','script/csv2csv','script/csv2ltsv','script/csv2td','script/csv2tsv','script/dump-csv','script/tsv2csv'];
+my $filenames = ['lib/App/CSVUtils.pm','lib/App/CSVUtils/Manual/Cookbook.pod','script/csv-add-field','script/csv-avg','script/csv-concat','script/csv-convert-to-hash','script/csv-csv','script/csv-delete-fields','script/csv-dump','script/csv-each-row','script/csv-fill-template','script/csv-freqtable','script/csv-get-cells','script/csv-grep','script/csv-info','script/csv-list-field-names','script/csv-lookup-fields','script/csv-map','script/csv-munge-field','script/csv-munge-row','script/csv-replace-newline','script/csv-select-fields','script/csv-select-row','script/csv-setop','script/csv-sort','script/csv-sort-fields','script/csv-sort-rows','script/csv-split','script/csv-sum','script/csv-transpose','script/csv2csv','script/csv2ltsv','script/csv2td','script/csv2tsv','script/dump-csv','script/tsv2csv'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

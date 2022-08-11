@@ -124,3 +124,10 @@ Revision history for Mac-PropertyList-SAX
         Address https://rt.cpan.org/Ticket/Display.html?id=140151 to avoid
         depending on '.' being in @INC.
 
+1.000	2022-08-10T10:18-05:00
+        Show compatibility with Mac::PropertyList v1.503 by adopting its test
+        suite. Explicitly relicense under Artistic License 2.0. Introduce a
+        simple benchmarking script.
+
+1.001	2022-08-10T17:12-05:00
+        Fix up MANIFEST problems that prevented Makefile.PL from being packed.

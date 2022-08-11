@@ -1,13 +1,20 @@
 package Pithub::Result::SharedCache;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01037';
-# ABSTRACT: A role to share the LRU cache with all Pithub objects
 
 use Moo::Role;
-use Cache::LRU;
 
-my $Shared_Cache = Cache::LRU->new(
-    size        => 200
+our $VERSION = '0.01039';
+# ABSTRACT: A role to share the LRU cache with all Pithub objects
+
+use CHI ();
+
+my $store = {};
+
+my $Shared_Cache = CHI->new(
+    datastore => $store,
+    driver    => 'RawMemory',
+    max_size  => 200,
+    size      => 200,
 );
 
 
@@ -38,7 +45,7 @@ Pithub::Result::SharedCache - A role to share the LRU cache with all Pithub obje
 
 =head1 VERSION
 
-version 0.01037
+version 0.01039
 
 =head1 DESCRIPTION
 
@@ -48,11 +55,11 @@ A role to share the least recently used cache with all Pithub objects.
 
 =head2 shared_cache
 
-Returns the Cache::LRU object shared by all Pithub objects.
+Returns the L<CHI> object shared by all Pithub objects.
 
 =head2 set_shared_cache
 
-Sets the Cache::LRU object shared by all Pithub objects.
+Sets the CHI object shared by all Pithub objects.
 
 This should only be necessary for testing or to change the
 size of the cache.

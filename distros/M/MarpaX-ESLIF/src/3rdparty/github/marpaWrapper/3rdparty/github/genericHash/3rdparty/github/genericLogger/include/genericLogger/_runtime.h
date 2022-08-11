@@ -39,5 +39,8 @@
 #ifdef HAVE_TIME_H
 #include <time.h>
 #endif
+#ifdef HAVE_LIMITS_H
+#include <limits.h>
+#endif
 
 #endif /* GENERICLOGGER_RUNTIME_H */

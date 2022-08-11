@@ -74,6 +74,7 @@ t/13.header_fields.t
 t/14.reader.t
 t/15.body_form.t
 t/16.form-data.t
+t/17.serialisation.t
 t/90.coverage.t
 t/91.pod.t
 t/92.manifest.t

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Number.pm
-## Version v1.2.0
+## Version v1.2.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/07/18
+## Modified 2022/08/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -98,7 +98,7 @@ BEGIN
         },
         'fallback' => 1,
     );
-    our( $VERSION ) = 'v1.2.0';
+    our( $VERSION ) = 'v1.2.1';
 };
 
 # use strict;
@@ -514,7 +514,6 @@ sub init
     $self->SUPER::init( @_ );
     $self->{_original} = $num;
     my $default = $self->default;
-    # $self->message( 3, "Getting current locale" );
     my $curr_locale = POSIX::setlocale( &POSIX::LC_ALL );
     # perllocale: "If no second argument is provided and the category is LC_ALL, the result is implementation-dependent. It may be a string of concatenated locale names (separator also implementation-dependent) or a single locale name."
     # e.g.: 'LC_NUMERIC=en_GB.UTF-8;LC_CTYPE=de_AT.utf8;LC_COLLATE=en_GB.UTF-8;LC_TIME=en_GB.UTF-8;LC_MESSAGES=en_GB.UTF-8;LC_MONETARY=en_GB.UTF-8;LC_ADDRESS=en_GB.UTF-8;LC_IDENTIFICATION=en_GB.UTF-8;LC_MEASUREMENT=en_GB.UTF-8;LC_PAPER=en_GB.UTF-8;LC_TELEPHONE=en_GB.UTF-8;'
@@ -531,35 +530,27 @@ sub init
         }
         $curr_locale = $elems->{LC_NUMERIC} || $elems->{LC_MESSAGES} || $elems->{LC_MONETARY};
     }
-    # $self->message( 3, "Current locale is '$curr_locale'" );
     if( $self->{lang} )
     {
-        # $self->message( 3, "Language requested '$self->{lang}'." );
         try
         {
-            # $self->message( 3, "Current locale found is '$curr_locale'" );
             my $try_locale = sub
             {
                 my $loc;
-                # $self->message( 3, "Checking language '$_[0]'" );
                 ## The user provided only a language code such as fr_FR. We try it, and also other known combination like fr_FR.UTF-8 and fr_FR.ISO-8859-1, fr_FR.ISO8859-1
                 ## Try several possibilities
                 ## RT https://rt.cpan.org/Public/Bug/Display.html?id=132664
                 if( index( $_[0], '.' ) == -1 )
                 {
-                    # $self->message( 3, "Language '$_[0]' is a bareword, check if it works as is." );
                     $loc = POSIX::setlocale( &POSIX::LC_ALL, $_[0] );
-                    # $self->message( 3, "Succeeded to set up locale for language '$_[0]'" ) if( $loc );
                     $_[0] =~ s/^(?<locale>[a-z]{2,3})_(?<country>[a-z]{2})$/$+{locale}_\U$+{country}\E/;
                     if( !$loc && CORE::exists( $SUPPORTED_LOCALES->{ $_[0] } ) )
                     {
-                        # $self->message( 3, "Language '$_[0]' is supported, let's check for right variation" );
                         foreach my $supported ( @{$SUPPORTED_LOCALES->{ $_[0] }} )
                         {
                             if( ( $loc = POSIX::setlocale( &POSIX::LC_ALL, $supported ) ) )
                             {
                                 $_[0] = $supported;
-                                # $self->message( "-> Language variation '$supported' found." );
                                 last;
                             }
                         }
@@ -569,21 +560,16 @@ sub init
                 ## The user is specific, so we try as is
                 else
                 {
-                    # $self->message( 3, "Language '$_[0]' is specific enough, let's try it." );
                     $loc = POSIX::setlocale( &POSIX::LC_ALL, $_[0] );
                 }
                 return( $loc );
             };
             
-            ## $self->message( 3, "Current locale is: '$curr_locale'" );
             if( my $loc = $try_locale->( $self->{lang} ) )
             {
-                # $self->message( 3, "Succeeded in setting locale for language '$self->{lang}'" );
-                ## $self->message( 3, "Succeeded in setting locale to '$self->{lang}'." );
                 my $lconv = POSIX::localeconv();
                 ## Set back the LC_ALL to what it was, because we do not want to disturb the user environment
                 POSIX::setlocale( &POSIX::LC_ALL, $curr_locale );
-                ## $self->messagef( 3, "POSIX::localeconv() returned %d items", scalar( keys( %$lconv ) ) );
                 $default = $lconv if( $lconv && scalar( keys( %$lconv ) ) );
             }
             else
@@ -616,7 +602,6 @@ sub init
 # p_sign_posn
 #         )];
 #         @$lconv{ @$fail } = ( -1 ) x scalar( @$fail );
-        ## $self->message( 3, "No language provided, but current locale '$curr_locale' found" );
         $self->{lang} = $curr_locale;
     }
 
@@ -662,7 +647,6 @@ sub init
         {
             $self->{_number} = $num;
         }
-        ## $self->message( 3, "Unformatted number is: '$self->{_number}'" );
         return( $self->error( "Invalid number: $num" ) ) if( !defined( $self->{_number} ) );
     }
     catch( $e )
@@ -863,7 +847,6 @@ sub format_money
         ## Even though the Number::Format instantiated is set with a currency symbol, 
         ## Number::Format will not respect it, and revert to USD if nothing was provided as argument
         ## This highlights that Number::Format is designed to be used more for exporting function rather than object methods
-        ## $self->message( 3, "Passing Number = '$num', precision = '$precision', currency symbol = '$currency_symbol'." );
         ## return( $fmt->format_price( $num, $precision, $currency_symbol ) );
         my $res = $fmt->format_price( "$num", "$precision", "$currency_symbol" );
         return if( !defined( $res ) );
@@ -887,10 +870,8 @@ sub format_negative
     try
     {
         my $new = $self->format;
-        ## $self->message( 3, "Formatted number '$self->{_number}' now is '$new'" );
         ## return( $fmt->format_negative( $new, @_ ) );
         my $res = $fmt->format_negative( "$new", @_ );
-        ## $self->message( 3, "Result is '$res'" );
         return if( !defined( $res ) );
         require Module::Generic::Scalar;
         return( Module::Generic::Scalar->new( $res ) );
@@ -1078,7 +1059,6 @@ sub new_formatter
         my $opts = {};
         foreach my $prop ( CORE::keys( %$map ) )
         {
-            ## $self->message( 3, "Checking property \"$prop\" value \"", overload::StrVal( $self->{ $prop } ), "\" (", $self->$prop->defined ? 'defined' : 'undefined', ")." );
             my $prop_val;
             if( CORE::exists( $hash->{ $prop } ) )
             {
@@ -1094,7 +1074,6 @@ sub new_formatter
             {
                 $prop_val = '';
             }
-            ## $self->message( 3, "Using property \"$prop\" value \"$prop_val\" (", CORE::defined( $prop_val ) ? 'defined' : 'undefined', ") [ref=", ref( $prop_val ), "]." );
             ## Need to set all the localeconv properties for Number::Format, because it uses mon_thousand_sep intsead of just thousand_sep
             foreach my $lconv_prop ( @{$map->{ $prop }} )
             {
@@ -1107,7 +1086,6 @@ sub new_formatter
                 }
             }
         }
-        # $self->message( 3, "Using following options for Number::Format: ", sub{ $self->SUPER::dump( $opts ) } );
         no warnings qw( uninitialized );
         my $fmt = Number::Format->new( %$opts );
         use warnings;
@@ -1115,7 +1093,6 @@ sub new_formatter
     }
     catch( $e )
     {
-        ## $self->message( 3, "Error trapped in creating a Number::Format object: '$e'" );
         return( $self->error( "Unable to create a Number::Format object: $e" ) );
     }
 }
@@ -1214,17 +1191,13 @@ sub _func
 {
     my $self = shift( @_ );
     my $func = shift( @_ ) || return( $self->error( "No function was provided." ) );
-    # $self->message( 3, "Arguments received are: '", join( "', '", @_ ), "'." );
     my $opts = {};
     no strict;
     $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
     my $namespace = $opts->{posix} ? 'POSIX' : 'CORE';
     my $val  = @_ ? shift( @_ ) : undef;
     my $expr = defined( $val ) ? "${namespace}::${func}( \$self->{_number}, $val )" : "${namespace}::${func}( \$self->{_number} )";
-    # $self->message( 3, "Evaluating '$expr'" );
     my $res = eval( $expr );
-    ## $self->message( 3, "Result for number '$self->{_number}' is '$res'" );
-    $self->message( 3, "Error: $@" ) if( $@ );
     return( $self->pass_error( $@ ) ) if( $@ );
     return if( !defined( $res ) );
     return( Module::Generic::Infinity->new( $res ) ) if( POSIX::isinf( $res ) );
@@ -1235,7 +1208,6 @@ sub _func
 sub _get_formatter
 {
     my $self = shift( @_ );
-    $self->message( 4, "Returning Number::Format object cached -> '$self->{_fmt}'" ) if( $self->{_fmt} );
     return( $self->{_fmt} ) if( $self->{_fmt} );
     my $fmt = $self->new_formatter || return( $self->pass_error );
     $self->{_fmt} = $fmt;
@@ -1251,7 +1223,6 @@ sub _set_get_prop
         my $val = shift( @_ );
         # $val = $val->scalar if( $self->_is_object( $val ) && $val->isa( 'Module::Generic::Scalar' ) );
         $val = "$val" if( CORE::defined( $val ) );
-        ## $self->message( 3, "Setting value \"$val\" (", defined( $val ) ? 'defined' : 'undefined', ") for property \"$prop\"." );
         ## I do not want to set a default value of '' to $self->{ $prop } because if its value is undef, it should remain so
         no warnings 'uninitialized';
         if( !CORE::defined( $val ) || ( CORE::defined( $val ) && $val ne $self->{ $prop } ) )
@@ -1292,7 +1263,8 @@ sub FREEZE
     my $class = CORE::ref( $self );
     my %hash  = %$self;
     # Return an array reference rather than a list so this works with Sereal and CBOR
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # On or before Sereal version 4.023, Sereal did not support multiple values returned
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
     # But Storable want a list with the first element being the serialised element
     CORE::return( $class, \%hash );
 }

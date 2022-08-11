@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = "0.9901";
+our $VERSION = "1.01";
 
 BEGIN {
     if ($0 =~ /unexpand$/) {
@@ -36,7 +36,7 @@ ansiunexpand [ option ] file ...
 
 =head1 VERSION
 
-Version 0.9901
+Version 1.01
 
 =head1 DESCRIPTION
 
@@ -78,6 +78,15 @@ Set the width of Unicode ambiguous characters.  Default is C<narrow>.
 
 =back
 
+=head1 INCOMPATIBILITY
+
+There is no B<-a> option for B<ansiunexpand> and it always convert all
+spaces not only leading ones.  Use normal L<unexpand(1)> to convert
+just leading spaces.
+
+B<ansiexpand> expands all tabs even if it is converted to single
+space without reducing data length.
+
 =head1 FILES
 
 =over 4
@@ -94,8 +103,6 @@ See L<Getopt::EX::Module> for format.
 =head2 CPANMINUS
 
     $ cpanm App::ansiexpand
-    or
-    $ curl -sL http://cpanmin.us | perl - App::ansiexpand
 
 =head1 SEE ALSO
 
@@ -111,7 +118,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2021 Kazumasa Utashiro
+Copyright 2021-2022 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

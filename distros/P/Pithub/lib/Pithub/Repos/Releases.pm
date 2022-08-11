@@ -1,6 +1,6 @@
 package Pithub::Repos::Releases;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01037';
+our $VERSION = '0.01039';
 # ABSTRACT: Github v3 Repo Releases API
 
 use Moo;
@@ -87,7 +87,7 @@ Pithub::Repos::Releases - Github v3 Repo Releases API
 
 =head1 VERSION
 
-version 0.01037
+version 0.01039
 
 =head1 METHODS
 

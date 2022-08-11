@@ -1,7 +1,12 @@
 Changes
 lib/Game/CharacterSheetGenerator.pm
+lib/Game/CharacterSheetGenerator/Command/multiple.pm
 lib/Game/CharacterSheetGenerator/Command/random.pm
 lib/Game/CharacterSheetGenerator/Command/stats.pm
+lib/Game/CharacterSheetGenerator/DwarfNames.pm
+lib/Game/CharacterSheetGenerator/ElfNames.pm
+lib/Game/CharacterSheetGenerator/HalflingNames.pm
+lib/Game/CharacterSheetGenerator/HumanNames.pm
 LICENSE
 Makefile.PL
 MANIFEST

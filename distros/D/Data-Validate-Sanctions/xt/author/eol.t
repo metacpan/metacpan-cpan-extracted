@@ -17,6 +17,13 @@ my @files = (
     't/05_basic.t',
     't/10_env.t',
     't/15_oo.t',
+    't/data/sample_eu.xml',
+    't/data/sample_hmt.csv',
+    't/data/sample_ofac_consolidated.xml',
+    't/data/sample_ofac_sdn.zip',
+    't/data/sdn.xml',
+    't/fetcher.t',
+    't/fetcher_sources.t',
     't/rc/.perlcriticrc',
     't/rc/.perltidyrc'
 );

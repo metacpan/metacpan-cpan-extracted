@@ -1,14 +1,12 @@
 use strict; use warnings;
 
 package Net::OAuth2Server::TokenExchange;
-
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Net::OAuth2Server::Request::Token::TokenExchange ();
 
 package Net::OAuth2Server::Response::Role::TokenExchange;
-
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Role::Tiny;
 use Class::Method::Modifiers 'fresh';

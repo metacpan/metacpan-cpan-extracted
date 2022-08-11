@@ -3,6 +3,11 @@ Release history for Config-INI-Tiny
 TODO keep_comments keep_empty keep_errors
 TODO unparse from_hash
 
+0.105 Tue 09 Aug 2022
+	- No functional changes
+	- Packaging fix to stop installing boilerplate.pl
+	- Updated package metadata
+
 0.104 Mon 15 Nov 2021
 	- Correct parser output when `pairs` is enabled.
 	  Thanks to @djerius for the bug report

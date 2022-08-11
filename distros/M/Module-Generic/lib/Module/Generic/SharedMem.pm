@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMem.pm
-## Version v0.3.1
+## Version v0.3.3
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2022/07/26
+## Modified 2022/08/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,7 +17,7 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
-    use vars qw( $SUPPORTED_RE $SYSV_SUPPORTED $SEMOP_ARGS $SHEM_REPO $ID2OBJ $N );
+    use vars qw( $SUPPORTED_RE $SYSV_SUPPORTED $SEMOP_ARGS $SHEM_REPO $ID2OBJ $N $HAS_B64 );
     use Config;
     use File::Spec ();
     use Nice::Try;
@@ -109,7 +109,7 @@ EOT
             lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
             'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.3.1';
+    our $VERSION = 'v0.3.3';
 };
 
 # use strict;
@@ -118,6 +118,7 @@ no warnings 'redefine';
 sub init
 {
     my $self = shift( @_ );
+    $self->{base64}     = undef;
     # Default action when accessing a shared memory? If 1, it will create it if it does not exist already
     $self->{create}     = 0;
     # If true, this will destroy both the shared memory and the semaphore upon end
@@ -126,7 +127,7 @@ sub init
     $self->{destroy_semaphore} = 0;
     $self->{exclusive}  = 0;
     no strict 'subs';
-    $self->{key}        = IPC::SysV::IPC_PRIVATE if( $SYSV_SUPPORTED );
+    $self->{key}        = &IPC::SysV::IPC_PRIVATE if( $SYSV_SUPPORTED );
     $self->{mode}       = 0666;
     $self->{serial}     = '';
     # SHM_BUFSIZ
@@ -163,6 +164,8 @@ sub attach
     $self->addr( $addr );
     return( $addr );
 }
+
+sub base64 { return( shift->_set_get_scalar( 'base64', @_ ) ); }
 
 sub cbor { return( shift->_packing_method( 'cbor' ) ); }
 
@@ -225,33 +228,29 @@ sub exists
     my $flags = $self->flags({ mode => 0644 });
     # Remove the create bit
     no strict 'subs';
-    $flags = ( $flags ^ IPC::SysV::IPC_CREAT );
-    # $self->message( 3, "Checking if shared memory key \"", ( $opts->{key} || $self->key ), "\" exists with flags '$flags'." );
+    $flags = ( $flags ^ &IPC::SysV::IPC_CREAT );
     my $semid;
     try
     {
         $semid = semget( $serial, 0, $flags );
-        # $self->message( 3, "Found the shared memory? ", defined( $semid ) ? 'yes' : 'no' );
         if( defined( $semid ) )
         {
             my $arg = 0;
-            my $found = semctl( $semid, SEM_MARKER, IPC::SysV::GETVAL, $arg );
+            my $found = semctl( $semid, SEM_MARKER, &IPC::SysV::GETVAL, $arg );
             $arg = 0;
-            semctl( $semid, 0, IPC::SysV::IPC_RMID, $arg );
+            semctl( $semid, 0, &IPC::SysV::IPC_RMID, $arg );
             return( $found == SHM_EXISTS ? 1 : 0 );
         }
         else
         {
-            # $self->message( 3, "Error getting a semaphore: $!" );
             return(0) if( $! =~ /\bNo[[:blank:]]+such[[:blank:]]+file\b/ );
             return;
         }
     }
     catch( $e )
     {
-        # $self->message( 3, "Trying to access shared memory triggered error: $e" );
         my $arg = 0;
-        semctl( $semid, 0, IPC::SysV::IPC_RMID, $arg ) if( $semid );
+        semctl( $semid, 0, &IPC::SysV::IPC_RMID, $arg ) if( $semid );
         return(0);
     }
 }
@@ -262,18 +261,13 @@ sub flags
     my $opts   = $self->_get_args_as_hash( @_ );
     no warnings 'uninitialized';
     no strict 'subs';
-    # $self->message( 3, "Option mode value is '$opts->{mode}'." );
     $opts->{create} = $self->create unless( length( $opts->{create} ) );
     $opts->{exclusive} = $self->exclusive unless( length( $opts->{exclusive} ) );
     $opts->{mode} = $self->mode unless( length( $opts->{mode} ) );
     my $flags  = 0;
-    $self->message( 3, "Adding create bit '", IPC::SysV::IPC_CREAT, "'" ) if( $opts->{create} );
-    $flags    |= IPC::SysV::IPC_CREAT if( $opts->{create} );
-    $self->message( 3, "Adding exclusive bit" ) if( $opts->{exclusive} );
-    $flags    |= IPC::SysV::IPC_EXCL  if( $opts->{exclusive} );
-    $self->message( 3, "Adding mode '", ( $opts->{mode} || 0666 ), "'" );
+    $flags    |= &IPC::SysV::IPC_CREAT if( $opts->{create} );
+    $flags    |= &IPC::SysV::IPC_EXCL  if( $opts->{exclusive} );
     $flags    |= ( $opts->{mode} || 0666 );
-    $self->message( 3, "Returning flags value '$flags'." );
     return( $flags );
 }
 
@@ -283,13 +277,10 @@ sub id
     my $self = shift( @_ );
     my @callinfo = caller;
     no warnings 'uninitialized';
-    # $self->message( 3, "Called from package $callinfo[0] in file $callinfo[1] at line $callinfo[2] with ", scalar( @_ ) ? ( "args: '" . join( "', '", @_ ) . "'." ) : 'no argument.' );
     if( @_ )
     {
-        # $self->message( 3, "Setting id to value '", defined( $_[0] ) ? $_[0] : 'undef()', "'." );
         $self->{id} = shift( @_ );
     }
-    # $self->message( 3, "Returning id '$self->{id}'" );
     return( $self->{id} );
 }
 
@@ -302,7 +293,6 @@ sub key
     {
         $self->{key} = shift( @_ );
         $self->{serial} = $self->_str2key( $self->{key} );
-        $self->message( 3, "Setting key to '$self->{key}' ($self->{serial})" );
     }
     return( $self->{key} );
 }
@@ -315,13 +305,12 @@ sub lock
     # $type = LOCK_EX if( !defined( $type ) );
     $type = LOCK_SH if( !defined( $type ) );
     return( $self->unlock ) if( ( $type & LOCK_UN ) );
-    return( 1 ) if( $self->locked & $type );
+    return(1) if( $self->locked & $type );
     $timeout = 0 if( !defined( $timeout ) || $timeout !~ /^\d+$/ );
     # If the lock is different, release it first
     $self->unlock if( $self->locked );
     my $semid = $self->semid;
     return( $self->error( "No semaphore id set yet." ) ) if( !defined( $semid ) );
-    # $self->message( 3, "Setting a lock on semaphore id \"$semid\" with type \"$type\" and arguments: ", sub{ $self->dump( $SEMOP_ARGS->{ $type } ) } );
     try
     {
         local $SIG{ALRM} = sub{ die( "timeout" ); };
@@ -334,7 +323,6 @@ sub lock
         }
         else
         {
-            # $self->message( 3, "Unable to set a lock on semaphore id \"$semid\": $!" );
             return( $self->error( "Failed to set a lock on semaphore id \"$semid\" for lock type $type: $!" ) );
         }
     }
@@ -388,17 +376,14 @@ sub open
     my $serial;
     if( length( $opts->{key} ) )
     {
-        $self->message( 4, "Getting serial based on key '$opts->{key}'." );
         $serial = $self->_str2key( $opts->{key} ) || 
             return( $self->error( "Cannot get serial from key '$opts->{key}': ", $self->error ) );
         # $serial = $opts->{key};
     }
     else
     {
-        $self->message( 3, "Getting serial ($self->{serial})" );
         $serial = $self->serial;
         # $serial = $self->key;
-        $self->message( 4, "Got saved serial '$serial' ($self->{serial})." );
     }
     die( "There is no serial!!\n" ) if( !CORE::length( $serial ) );
     my $create = 0;
@@ -415,22 +400,18 @@ sub open
         $create = $self->create;
     }
     my $flags = $self->flags( create => $create, ( $opts->{mode} =~ /^\d+$/ ? $opts->{mode} : () ) );
-    $self->message( 3, "Trying to get the shared memory segment with key '", ( $opts->{key} || $self->key ), "' with serial '$serial', size '$opts->{size}' and mode '$opts->{mode}' and flags '$flags'." );
     my $id = shmget( $serial, $opts->{size}, $flags );
     if( defined( $id ) )
     {
-        # $self->message( 3, "Got the shared memory first time around with id \"$id\"." );
     }
     else
     {
-        $self->message( 4, "Shared memory does not exists yet ($!), trying to create it now start from $serial" );
-        my $newflags = ( $flags & IPC::SysV::IPC_CREAT ) ? $flags : ( $flags | IPC::SysV::IPC_CREAT );
+        my $newflags = ( $flags & &IPC::SysV::IPC_CREAT ) ? $flags : ( $flags | &IPC::SysV::IPC_CREAT );
         my $limit = ( $serial + 10 );
-        # IPC::SysV::ftok has likely made the serial unique, but as stated in the manual page, there is no guarantee
+        # &IPC::SysV::ftok has likely made the serial unique, but as stated in the manual page, there is no guarantee
         while( $serial <= $limit )
         {
-            $id = shmget( $serial, $opts->{size}, $newflags | IPC::SysV::IPC_CREAT );
-            $self->message( 4, "Shared memory key '$serial' worked ? ", defined( $id ) ? 'yes' : 'no' );
+            $id = shmget( $serial, $opts->{size}, $newflags | &IPC::SysV::IPC_CREAT );
             $serial++;
             last if( defined( $id ) );
         }
@@ -438,25 +419,19 @@ sub open
     
     if( !defined( $id ) )
     {
-        # $self->message( 3, "Could not open shared memory with flags '$flags': $!" );
         return( $self->error( "Unable to create shared memory id with key \"$serial\" and flags \"$flags\": $!" ) );
     }
     $self->serial( $serial );
     
-    # $self->message( 3, "Shared memory created with id \"$id\"." );
     # The value 3 can be anything above 0 and below the limit set by SEMMSL. On Linux system, this is usually 32,000. Seem semget(2) man page:
     # "The argument nsems can be 0 (a don't care) when a semaphore set is  not being  created.   Otherwise, nsems must be greater than 0 and less than or equal  to  the  maximum  number  of  semaphores  per  semaphore  set (SEMMSL)."
     my $semid = semget( $serial, ( $create ? 3 : 0 ), $flags );
     if( !defined( $semid ) )
     {
-        # $self->message( 3, "Could not get a semaphore, trying again with creating it." );
-        my $newflags = ( $flags | IPC::SysV::IPC_CREAT );
+        my $newflags = ( $flags | &IPC::SysV::IPC_CREAT );
         $semid = semget( $serial, 3, $newflags );
         return( $self->error( "Unable to get a semaphore for shared memory key \"", ( $opts->{key} || $self->key ), "\" wth id \"$id\": $!" ) ) if( !defined( $semid ) );
-        # $self->message( 3, "Retrieved existing semaphore with semaphore id \"$semid\"." );
     }
-    # $self->message( 3, "Semaphore id is '$semid'" );
-    $self->message( 3, "Creating new ", __PACKAGE__, " object with auto destroy set to '", $self->destroy, "'." );
     my $new = $self->new(
         key     => ( $opts->{key} || $self->key ),
         debug   => $self->debug,
@@ -481,19 +456,15 @@ sub open
     # $new->flags( $flags );
     if( $there == SHM_EXISTS )
     {
-        # $self->message( 3, "Binding to existing segment on ", $new->id );
     }
     else
     {
-        # $self->message( 3, "New segment on ", $new->id );
         # We initialise the semaphore with value of 1
         $new->stat( SEM_MARKER, SHM_EXISTS ) ||
             return( $new->error( "Unable to set semaphore during object creation: ", $new->error ) );
-        # $self->message( 3, "Semaphore created." );
     }
     
     $new->op( @{$SEMOP_ARGS->{(LOCK_SH | LOCK_UN)}} );
-    # $self->message( 3, "Returning new object persuant to open" );
     return( $new );
 }
 
@@ -507,7 +478,7 @@ sub pid
         return( $self->error( "No semaphore set yet. You must open the shared memory first to remove semaphore." ) );
     no strict 'subs';
     my $arg = 0;
-    my $v = semctl( $semid, $sem, IPC::SysV::GETPID, $arg );
+    my $v = semctl( $semid, $sem, &IPC::SysV::GETPID, $arg );
     return( $v ? 0 + $v : undef() );
 }
 
@@ -516,7 +487,7 @@ sub rand
     my $self = shift( @_ );
     my $size = $self->size || 1024;
     no strict 'subs';
-    my $key  = shmget( IPC::SysV::IPC_PRIVATE, $size, IPC::SysV::S_IRWXU | IPC::SysV::S_IRWXG | IPC::SysV::S_IRWXO ) || return( $self->error( "Unable to generate a share memory key: $!" ) );
+    my $key  = shmget( &IPC::SysV::IPC_PRIVATE, $size, &IPC::SysV::S_IRWXU | &IPC::SysV::S_IRWXG | &IPC::SysV::S_IRWXO ) || return( $self->error( "Unable to generate a share memory key: $!" ) );
     return( $key );
 }
 
@@ -531,28 +502,38 @@ sub read
     # Optional length parameter for non-reference data only
     $size //= int( $self->size || SHM_BUFSIZ );
     my $id = $self->id;
-    # $self->message( 3, "Reading $size bytes of data from memory for id '$id'." );
     return( $self->error( "No shared memory id! Have you opened it first?" ) ) if( !length( $id ) );
     my $buffer = '';
     my $addr = $self->addr;
     if( $addr )
     {
-        $self->message( 3, "memread( $addr, ", ( defined( $buffer ) ? "'$buffer'" : "''" ), ", 0, $size )", { prefix => '<<<' });
         memread( $addr, $buffer, 0, $size ) ||
             return( $self->error( "Unable to read data from shared memory address \"$addr\" using memread: $!" ) );
     }
     else
     {
-        $self->message( 3, "shmread( $id, ", ( defined( $buffer ) ? "'$buffer'" : "''" ), ", 0, $size )", { prefix => '<<<' });
         shmread( $id, $buffer, 0, $size ) ||
             return( $self->error( "Unable to read data from shared memory id \"$id\": $!" ) );
     }
     # Get rid of nulls end padded
-    $buffer = unpack( "A*", $buffer );
+    # 2022-08-03: Ok, null bytes are added to Storable and CBOR::XS serialised data, 
+    # so we cannot just remove them. Instead we encapsulate the serialised data
+    # $buffer = unpack( "A*", $buffer );
     my $packing = $self->_packing_method;
     my $data;
     if( CORE::length( $buffer ) )
     {
+        # There may be encapsulation of data before writing data to memory.
+        # e.g.: MG[14]something here
+        if( index( $buffer, 'MG[' ) == 0 )
+        {
+            my $def = substr( $buffer, 0, index( $buffer, ']' ) + 1, '' );
+            # Get the string length stored
+            my $len = int( substr( $def, 3, -1 ) );
+            # Remove any possible remaining unwanted data
+            substr( $buffer, $len, length( $buffer ), '' );
+        }
+    
         try
         {
             if( $packing eq 'json' )
@@ -561,23 +542,36 @@ sub read
             }
             elsif( $packing eq 'cbor' )
             {
-                $data = $self->deserialise( data => $buffer, serialiser => 'CBOR::XS', allow_sharing => 1 );
+                $data = $self->deserialise(
+                    data => $buffer,
+                    serialiser => 'CBOR::XS',
+                    allow_sharing => 1,
+                    ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
+                );
             }
             elsif( $packing eq 'sereal' )
             {
-                $data = $self->deserialise( data => $buffer, serialiser => 'Sereal', freeze_callbacks => 1 );
+                $data = $self->deserialise(
+                    data => $buffer,
+                    serialiser => 'Sereal',
+                    freeze_callbacks => 1,
+                    ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
+                );
             }
             # By default Storable::Improved
             else
             {
                 # $data = Storable::Improved::thaw( $buffer );
-                $data = $self->deserialise( data => $buffer, serialiser => 'Storable::Improved' );
+                $data = $self->deserialise(
+                    data => $buffer,
+                    serialiser => 'Storable::Improved',
+                    ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
+                );
             }
-            $self->message( 4, "Decoded data '$buffer' -> '$data': ", sub{ $self->dump( $data ) });
         }
         catch( $e )
         {
-            return( $self->error( "An error occured while decoding data using $packing: $e", ( length( $buffer ) <= 1024 ? "\nData is: '$buffer'" : '' ) ) );
+            return( $self->error( "An error occured while decoding data using $packing with base64 set to '", ( $self->{base64} // '' ), "': $e" ) );
         }
     }
     else
@@ -601,25 +595,21 @@ sub remove
     my $self = shift( @_ );
     return(1) if( $self->removed );
     my $id   = $self->id();
-    # $self->message( 3, "Called to remove shared memory id \"$id\"." );
     return( $self->error( "No shared memory id! Have you opened it first?" ) ) if( !length( $id ) );
     my $semid = $self->semid;
     return( $self->error( "No semaphore set yet. You must open the shared memory first to remove semaphore." ) ) if( !length( $semid ) );
-    $self->message( 3, "Removing shared memory segment with id '$id' and semaphore id '$semid'." );
     $self->unlock();
     no strict 'subs';
     # Remove share memory segment
-    if( !defined( shmctl( $id, IPC::SysV::IPC_RMID, 0 ) ) )
+    if( !defined( shmctl( $id, &IPC::SysV::IPC_RMID, 0 ) ) )
     {
-        $self->message( 3, "Failed to remove shared memory segment with id '$id': $!" );
-        return( $self->error( "Unable to remove share memory segement id '$id' (IPC_RMID is '", IPC::SysV::IPC_RMID, "'): $!" ) );
+        return( $self->error( "Unable to remove share memory segement id '$id' (IPC_RMID is '", &IPC::SysV::IPC_RMID, "'): $!" ) );
     }
     # Remove semaphore
     my $rv;
     my $arg = 0;
-    if( !defined( $rv = semctl( $semid, 0, IPC::SysV::IPC_RMID, $arg ) ) )
+    if( !defined( $rv = semctl( $semid, 0, &IPC::SysV::IPC_RMID, $arg ) ) )
     {
-        $self->message( 3, "Failed to remove semaphore with id '$semid': $!" );
         warn( "Warning only: could not remove the semaphore id \"$semid\": $!" ) if( $self->_warnings_is_enabled );
     }
     $self->removed( $rv ? 1 : 0 );
@@ -648,15 +638,13 @@ sub remove_semaphore
     return(1) if( $self->removed_semaphore );
     my $semid = $self->semid;
     return( $self->error( "No semaphore set yet. You must open the shared memory first to remove semaphore." ) ) if( !length( $semid ) );
-    $self->message( 3, "Removing semaphore with id '$semid' for shared memory segment with id '", $self->id, "'." );
     $self->unlock();
     my $rv;
     no strict 'subs';
     my $arg = 0;
-    if( !defined( $rv = semctl( $semid, 0, IPC::SysV::IPC_RMID, $arg ) ) )
+    if( !defined( $rv = semctl( $semid, 0, &IPC::SysV::IPC_RMID, $arg ) ) )
     {
-        $self->message( 3, "Failed to remove semaphore with id '$semid': $!" );
-        warn( "Warning only: could not remove the semaphore id \"$semid\" with IPC::SysV::IPC_RMID value '", IPC::SysV::IPC_RMID, "': $!" ) if( $self->_warnings_is_enabled );
+        warn( "Warning only: could not remove the semaphore id \"$semid\" with IPC::SysV::IPC_RMID value '", &IPC::SysV::IPC_RMID, "': $!" ) if( $self->_warnings_is_enabled );
     }
     $self->removed_semaphore( $rv ? 1 : 0 );
     $self->semid( undef() );
@@ -704,7 +692,7 @@ sub shmstat
     my $data = '';
     my $id = $self->id || return( $self->error( "No shared memory id set!" ) );
     no strict 'subs';
-    shmctl( $id, IPC::SysV::IPC_STAT, $data ) or
+    shmctl( $id, &IPC::SysV::IPC_STAT, $data ) or
         return( $self->error( "Unable to stat shared memory with id '$id': $!" ) );
     return( Module::Generic::SharedStat->new->unpack( $data ) );
 }
@@ -722,17 +710,15 @@ sub stat
         if( @_ == 1 )
         {
             my $sem = shift( @_ );
-            # $self->message( 3, "Retrieving semaphore value for '$sem'" );
             my $arg = 0;
-            my $v = semctl( $id, $sem, IPC::SysV::GETVAL, $arg );
+            my $v = semctl( $id, $sem, &IPC::SysV::GETVAL, $arg );
             return( $v ? 0 + $v : undef() );
         }
         else
         {
             my( $sem, $val ) = @_;
-            # $self->message( 3, "Setting semaphore '$sem' with value '$val'." );
-            semctl( $id, $sem, IPC::SysV::SETVAL, $val ) ||
-                return( $self->error( "Unable to semctl with semaphore id '$id', semaphore '$sem', SETVAL='", IPC::SysV::SETVAL, "' and value='$val': $!" ) );
+            semctl( $id, $sem, &IPC::SysV::SETVAL, $val ) ||
+                return( $self->error( "Unable to semctl with semaphore id '$id', semaphore '$sem', SETVAL='", &IPC::SysV::SETVAL, "' and value='$val': $!" ) );
         }
     }
     else
@@ -740,14 +726,12 @@ sub stat
         my $data = '';
         if( wantarray() )
         {
-            # $self->message( 3, "Returning all semaphore data." );
-            semctl( $id, 0, IPC::SysV::GETALL, $data ) || return( () );
+            semctl( $id, 0, &IPC::SysV::GETALL, $data ) || return( () );
             return( ( unpack( "s$N*", $data ) ) );
         }
         else
         {
-            # $self->message( 3, "Returning all semaphore data as Module::Generic::SemStat object." );
-            semctl( $id, 0, IPC::SysV::IPC_STAT, $data ) ||
+            semctl( $id, 0, &IPC::SysV::IPC_STAT, $data ) ||
                 return( $self->error( "Unable to stat semaphore with id '$id': $!" ) );
             return( Module::Generic::SemStat->new->unpack( $data ) );
         }
@@ -764,7 +748,6 @@ sub unlock
     return(1) if( !$self->locked );
     my $semid = $self->semid;
     return( $self->error( "No semaphore set yet. You must open the shared memory first to unlock semaphore." ) ) if( !length( $semid ) );
-    # $self->message( 3, "Removing lock for semaphore id \"$semid\" and locked value '$self->{locked}'." );
     my $type = ( $self->locked | LOCK_UN );
     $type ^= LOCK_NB if( $type & LOCK_NB );
     if( defined( $self->op( @{$SEMOP_ARGS->{ $type }} ) ) )
@@ -789,8 +772,6 @@ sub write
     my $id   = $self->id();
     my $size = int( $self->size() ) || SHM_BUFSIZ;
     # my @callinfo = caller;
-    # $self->message( 3, "Called from file $callinfo[1] at line $callinfo[2]" );
-    # $self->message( 3, "Size limit set to '$size'" );
     my $packing = $self->_packing_method;
     my $encoded;
     try
@@ -801,53 +782,64 @@ sub write
         }
         elsif( $packing eq 'cbor' )
         {
-            $encoded = $self->serialise( $data, serialiser => 'CBOR::XS', allow_sharing => 1 );
-            return( $self->pass_error ) if( !defined( $encoded ) );
+            $encoded = $self->serialise( $data,
+                serialiser => 'CBOR::XS',
+                allow_sharing => 1,
+                ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
+            );
+            return( $self->error( "Unable to serialise ", CORE::length( $data ), " bytes of data using CBOR::XS with base64 set to '", ( $self->{base64} // '' ), ": ", $self->error ) ) if( !defined( $encoded ) );
         }
         elsif( $packing eq 'sereal' )
         {
             $self->_load_class( 'Sereal::Encoder' ) || return( $self->pass_error );
+            my $const;
+            $const = \&{"Sereal\::Encoder::SRL_ZLIB"} if( defined( &{"Sereal\::Encoder::SRL_ZLIB"} ) );
             $encoded = $self->serialise( $data,
                 serialiser => 'Sereal',
                 freeze_callbacks => 1,
-                compress => &{"Sereal\::Encoder::SRL_ZLIB"}(),
+                ( defined( $const ) ? ( compress => $const->() ) : () ),
+                ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
             );
-            return( $self->pass_error ) if( !defined( $encoded ) );
+            return( $self->error( "Unable to serialise ", CORE::length( $data ), " bytes of data using Sereal with base64 set to '", ( $self->{base64} // '' ), ": ", $self->error ) ) if( !defined( $encoded ) );
         }
         # Default to Storable::Improved
         else
         {
             # local $Storable::forgive_me = 1;
             # $encoded = Storable::Improved::freeze( $data );
-            $encoded = $self->serialise( $data, serialiser => 'Storable::Improved' );
-            return( $self->pass_error ) if( !defined( $encoded ) );
+            $encoded = $self->serialise( $data,
+                serialiser => 'Storable::Improved',
+                ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
+            );
+            return( $self->error( "Unable to serialise ", CORE::length( $data ), " bytes of data using Storable with base64 set to '", ( $self->{base64} // '' ), ": ", $self->error ) ) if( !defined( $encoded ) );
         }
     }
     catch( $e )
     {
-        return( $self->error( "An error occured encoding data provided using $packing: $e. Data was: '$data'" ) );
+        return( $self->error( "An error occured encoding data provided using $packing with base64 set to '", ( $self->{base64} // '' ), ": $e. Data was: '$data'" ) );
     }
     
-    if( length( $encoded ) > $size )
+    # Simple encapsulation
+    # FYI: MG = Module::Generic
+    substr( $encoded, 0, 0, 'MG[' . length( $encoded ) . ']' );
+    
+    my $len = length( $encoded );
+    if( $len > $size )
     {
         return( $self->error( "Data to write are ", length( $encoded ), " bytes long and exceed the maximum you have set of '$size'." ) );
     }
-    # $self->message( 3, "Storing ", length( $encoded ), " bytes of data", ( length( $encoded ) <= 2048 ? ":\n'$encoded'" : '.' ) );
-    # $size = length( $encoded );
     my $addr = $self->addr;
     if( $addr )
     {
-        memwrite( $addr, $encoded, 0, $size ) ||
+        memwrite( $addr, $encoded, 0, $len ) ||
             return( $self->error( "Unable to write to shared memory address '$addr' using memwrite: $!" ) );
     }
     else
     {
-        $self->message( 3, "shmwrite( $id, '$encoded', 0, $size )", { prefix => '>>>' } );
         # id, data, position, size
-        shmwrite( $id, $encoded, 0, $size ) ||
-            return( $self->error( "Unable to write to shared memory id '$id' with ", length( $encoded ), " bytes of data ($encoded) encoded and memory size of $size: $!" ) );
+        shmwrite( $id, $encoded, 0, $len ) ||
+            return( $self->error( "Unable to write to shared memory id '$id' with ${len} bytes of data encoded and memory size of $size: $!" ) );
     }
-    # $self->message( 3, "Successfully wrote ", length( $encoded ), " bytes of data to memory." );
     return( $self );
 }
 
@@ -976,11 +968,11 @@ sub _str2key
     no strict 'subs';
     if( !defined( $key ) || $key eq '' )
     {
-        return( IPC::SysV::IPC_PRIVATE );
+        return( &IPC::SysV::IPC_PRIVATE );
     }
     elsif( $key =~ /^\d+$/ )
     {
-        my $id = IPC::SysV::ftok( __FILE__, $key ) ||
+        my $id = &IPC::SysV::ftok( __FILE__, $key ) ||
             return( $self->error( "Unable to get a key using IPC::SysV::ftok: $!" ) );
         return( $id );
     }
@@ -990,8 +982,7 @@ sub _str2key
         $id += $_ for( unpack( "C*", $key ) );
         # We use the root as a reliable and stable path.
         # I initially though about using __FILE__, but during testing this would be in ./blib/lib and beside one user might use a version of this module somewhere while the one used under Apache/mod_perl2 could be somewhere else and this would render the generation of the IPC key unreliable and unrepeatable
-        my $val = IPC::SysV::ftok( File::Spec->rootdir(), $id );
-        $self->message( 4, "Calling IPC::SysV::ftok for key '$key' with file '/' and numeric id '$id' returning '$val'." );
+        my $val = &IPC::SysV::ftok( File::Spec->rootdir(), $id );
         return( $val );
     }
 }
@@ -1022,7 +1013,8 @@ sub FREEZE
     my %hash  = %$self;
     CORE::delete( @hash{ qw( addr id locked owner removed removed_semaphore semid ) } );
     # Return an array reference rather than a list so this works with Sereal and CBOR
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # On or before Sereal version 4.023, Sereal did not support multiple values returned
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
     # But Storable want a list with the first element being the serialised element
     CORE::return( $class, \%hash );
 }
@@ -1143,7 +1135,8 @@ END
         my $class = CORE::ref( $self );
         my @array = @$self;
         # Return an array reference rather than a list so this works with Sereal
-        CORE::return( [$class, \@array] ) if( $serialiser eq 'Sereal' );
+        # On or before Sereal version 4.023, Sereal did not support multiple values returned
+        CORE::return( [$class, \@array] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
         # But CBOR and Storable want a list with the first element being the serialised element
         CORE::return( $class, \@array );
     }
@@ -1235,7 +1228,8 @@ END
         my $class = CORE::ref( $self );
         my @array = @$self;
         # Return an array reference rather than a list so this works with Sereal
-        CORE::return( [$class, \@array] ) if( $serialiser eq 'Sereal' );
+        # On or before Sereal version 4.023, Sereal did not support multiple values returned
+        CORE::return( [$class, \@array] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
         # But CBOR and Storable want a list with the first element being the serialised element
         CORE::return( $class, \@array );
     }

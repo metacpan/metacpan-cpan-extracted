@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.12",
+   "generated_by" : "Minilla/v3.1.19",
    "license" : [
       "perl_5"
    ],
@@ -42,15 +42,15 @@
       },
       "runtime" : {
          "requires" : {
-            "Getopt::EX" : "v1.24.1",
-            "Getopt::EX::Hashed" : "0.9917",
-            "Text::ANSI::Fold" : "2.1101",
+            "Getopt::EX" : "v1.28.0",
+            "Getopt::EX::Hashed" : "1.03",
+            "Term::ReadKey" : "0",
+            "Text::ANSI::Fold" : "2.1301",
             "perl" : "5.016"
          }
       },
       "test" : {
          "requires" : {
-            "Command::Runner" : "0",
             "Test::More" : "0.98"
          }
       }
@@ -58,7 +58,7 @@
    "provides" : {
       "App::ansifold" : {
          "file" : "lib/App/ansifold.pm",
-         "version" : "1.1101"
+         "version" : "1.1501"
       }
    },
    "release_status" : "stable",
@@ -68,16 +68,17 @@
       },
       "homepage" : "https://github.com/kaz-utashiro/ansifold",
       "repository" : {
-         "url" : "git://github.com/kaz-utashiro/ansifold.git",
+         "type" : "git",
+         "url" : "https://github.com/kaz-utashiro/ansifold.git",
          "web" : "https://github.com/kaz-utashiro/ansifold"
       }
    },
-   "version" : "1.1101",
+   "version" : "1.1501",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04",
-   "x_static_install" : 1
+   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_static_install" : 0
 }

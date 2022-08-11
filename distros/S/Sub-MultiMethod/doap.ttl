@@ -28,7 +28,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Sub-MultiMethod";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-900>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-901>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-902>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-903>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-904>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-905>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-906>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-907>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-908>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-900>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-901>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-902>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-903>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-904>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-905>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-906>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-907>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-908>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-909>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-sub-multimethod>;
@@ -309,6 +309,23 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-MultiMethod-0.908.tar.gz>;
 	doap:revision        "0.908"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-909>
+	a                    doap:Version;
+	dc:identifier        "Sub-MultiMethod-0.909"^^xsd:string;
+	dc:issued            "2022-06-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Use Perl 5.20+ sub signatures in examples.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Other minor pod tidy ups.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-MultiMethod-0.909.tar.gz>;
+	doap:revision        "0.909"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

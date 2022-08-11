@@ -1,0 +1,81 @@
+#!/usr/bin/perl
+
+# Created on: 2014-03-11 20:58:59
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use App::Git::Workflow::Command::Touch;
+
+App::Git::Workflow::Command::Touch->run();
+
+__DATA__
+
+=head1 NAME
+
+git-touch - Touch files to match the git change times
+
+=head1 VERSION
+
+This documentation refers to git-touch version 1.1.20
+
+=head1 SYNOPSIS
+
+   git-touch [-r|--recurse] [(-c|--commitish) ref] file_or_dir
+
+ OPTIONS:
+  -r --recurse
+  -c --commitish=[commitish]
+                Reference commit to get dates from (Default is current commit)
+
+  -v --verbose  Show more detailed option
+     --version  Prints the version information
+     --help     Prints this help information
+     --man      Prints the full documentation for git-touch
+
+=head1 DESCRIPTION
+
+This will get the last changed time in the git history for a file and set
+that time on the file.
+
+If the file is a directory and --recurse is specified then the directories
+time will be set to the most rectent changed time for files with in it as
+well as changing the times of those files.
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2014 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

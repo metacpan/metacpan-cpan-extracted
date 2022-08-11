@@ -36,7 +36,9 @@
             "File::Path" : "0",
             "File::ReadBackwards" : "0",
             "File::Slurp" : "0",
+            "Gzip::Faster" : "0.21",
             "JSON" : "0",
+            "MIME::Base64" : "3.16",
             "Time::Piece" : "0",
             "perl" : "5.006"
          }
@@ -54,6 +56,6 @@
          "web" : "https://github.com/VVelox/Suricata-Monitoring"
       }
    },
-   "version" : "v0.1.3",
+   "version" : "v0.3.1",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

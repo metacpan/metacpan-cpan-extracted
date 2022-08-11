@@ -12,6 +12,10 @@ t/01_run.t
 t/02_exec.t
 t/04_linebreak.t
 t/04_linebreak.txt
+t/05_misc.t
+t/06_colrm.t
+t/07_expand.t
+t/Runner.pm
 t/Util.pm
 META.yml
 MANIFEST

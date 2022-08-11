@@ -1,12 +1,7 @@
 Changes
-LICENSE
-MANIFEST
-META.json                                Module JSON meta-data (added by MakeMaker)
-META.yml                                 Module YAML meta-data (added by MakeMaker)
 Makefile.PL
-README
-boilerplate.pl
 eg/slackware-news
+inc/boilerplate.pl
 lib/XML/Atom/SimpleFeed.pm
 t/bugs.t
 t/date_construct.t
@@ -14,3 +9,8 @@ t/encodings.t
 t/generator.t
 t/synposis.t
 t/xml_writer.t
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+LICENSE
+README

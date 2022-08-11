@@ -45,6 +45,8 @@ t/multimethods.t
 t/roles.t
 t/rwp.t
 t/stringy-eval.t
+t/test-compile.t
+t/try.t
 t/warnings.t
 xt/author/00-compile.t
 xt/author/perlcritic.t

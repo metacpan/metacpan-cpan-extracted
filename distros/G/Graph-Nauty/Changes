@@ -1,3 +1,8 @@
+0.5.1 2022-08-06
+
+    - Set default color subroutines in are_isomorphic() and
+      orbits_are_same().
+
 0.5.0 2022-07-18
 
     - Made workspace size adaptive to graph size according to the

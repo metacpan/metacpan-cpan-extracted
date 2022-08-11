@@ -75,6 +75,24 @@ You just add this shebang line to a C<t/test-file.t>:
 
     #!/usr/bin/env test-more-bash
 
+=head3 Alternate Usage
+
+Instead of using a special shebang line to get the desired behavior, you can start with this Perl line:
+
+    use Test::More::Bash;
+
+The test file will initially be run as Perl, but Test::More::Bash will exec a command that runs the file as Bash. The Bash runtime code defines a pass through Bash function called C<use> that will effectively ignore the C<use Test::More::Bash;> line.
+
+NOTE: Passing extra parameters on the C<use Test::More::Bash> line is not yet supported. In other words, you can't do:
+
+    use Test::More::Bash tests => 5;
+
+Instead just do:
+
+    use Test::More::Bash;
+
+    plan 5
+
 =head2 AUTHORS
 
 =over

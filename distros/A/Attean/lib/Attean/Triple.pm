@@ -7,7 +7,7 @@ Attean::Triple - RDF Triples
 
 =head1 VERSION
 
-This document describes Attean::Triple version 0.030
+This document describes Attean::Triple version 0.031
 
 =head1 SYNOPSIS
 
@@ -38,7 +38,7 @@ This role consumes L<Attean::API::Triple>.
 
 =cut
 
-package Attean::TriplePattern 0.030 {
+package Attean::TriplePattern 0.031 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Attean::RDF;
@@ -56,9 +56,14 @@ package Attean::TriplePattern 0.030 {
 		# TODO: deprecate this in favor of as_quad_pattern() provided by Attean::API::TriplePattern
 		return $self->as_quad_pattern($graph);
 	}
+	
+	sub ntriples_string {
+		my $self	= shift;
+		return join(' ', '<<', (map { $self->$_()->ntriples_string() } qw(subject predicate object)), '>>');
+	}
 }
 
-package Attean::Triple 0.030 {
+package Attean::Triple 0.031 {
 	use Moo;
 	use Attean::API::Binding;
 	
@@ -100,7 +105,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2020 Gregory Todd Williams.
+Copyright (c) 2014--2022 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

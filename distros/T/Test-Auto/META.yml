@@ -1,36 +1,26 @@
 ---
 abstract: 'Test Automation, Docs Generation'
 author:
-  - 'Al Newkirk <awncorp@cpan.org>'
+  - 'AWNCORP <awncorp@cpan.org>'
 build_requires:
-  Moo: '2.003006'
-  Try::Tiny: '0.30'
-  Type::Tiny: '1.010001'
-  perl: v5.14.0
-  strict: '0'
-  warnings: '0'
+  Venus: '1.10'
+  perl: '5.018'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Test-Auto
 requires:
-  Moo: '2.003006'
-  Try::Tiny: '0.30'
-  Type::Tiny: '1.010001'
-  perl: v5.14.0
-  strict: '0'
-  warnings: '0'
+  Venus: '1.10'
+  perl: '5.018'
 resources:
-  bugtracker: https://github.com/iamalnewkirk/test-auto/issues
-  homepage: http://metacpan.org/release/Test-Auto/
-  repository: git://github.com/iamalnewkirk/test-auto.git
-version: '0.12'
+  homepage: https://metacpan.org/dist/Test-Auto
+version: '0.13'
 x_authority: cpan:AWNCORP
-x_generated_by_perl: v5.26.1
+x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Apache-2.0

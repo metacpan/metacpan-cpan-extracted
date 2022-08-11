@@ -10,10 +10,15 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Proc-Fork",
-   "no_index" : {},
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {},
       "configure" : {},
@@ -29,18 +34,21 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ap/Proc-Fork/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Proc-Fork"
       },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ap/Proc-Fork.git",
+         "url" : "https://github.com/ap/Proc-Fork.git",
          "web" : "https://github.com/ap/Proc-Fork"
       }
    },
-   "version" : "0.806",
+   "version" : "0.807",
    "x_copyright" : {
       "holder" : "Aristotle Pagaltzis",
       "year" : 2018
    },
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

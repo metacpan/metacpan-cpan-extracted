@@ -37,7 +37,7 @@
             "Perinci::To::POD" : "0.874",
             "Pod::Weaver" : "0",
             "Pod::Weaver::Role::AddTextToSection" : "0.06",
-            "Require::Hook::DzilBuild" : "0",
+            "Require::Hook::Source::DzilBuild" : "0",
             "Sub::Identify" : "0",
             "perl" : "5.010001",
             "strict" : "0"
@@ -55,7 +55,7 @@
    "provides" : {
       "Pod::Weaver::Plugin::Rinci" : {
          "file" : "lib/Pod/Weaver/Plugin/Rinci.pm",
-         "version" : "0.781"
+         "version" : "0.783"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/perlancar/perl-Pod-Weaver-Plugin-Rinci"
       }
    },
-   "version" : "0.781",
+   "version" : "0.783",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

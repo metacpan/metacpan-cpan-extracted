@@ -71,4 +71,15 @@ is_deeply(chops($fold),
 	  [ 'x' x 10 ],
 	  "chops (empty, padding, padchar)");
 
+$fold->configure(text => "> 111222333444555", width => 5, prefix => '> ');
+is_deeply(chops($fold),
+	  [ "> 111", "> 222", "> 333", "> 444", "> 555", ],
+	  "prefix");
+
+$fold->configure(text => "01: 111222333444555", width => 7,
+		 prefix => do { my $n = 2; sub { sprintf "%02d: ", $n++ } });
+is_deeply(chops($fold),
+	  [ "01: 111", "02: 222", "03: 333", "04: 444", "05: 555", ],
+	  "prefix sub");
+
 done_testing;

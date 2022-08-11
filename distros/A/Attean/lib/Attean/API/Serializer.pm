@@ -7,7 +7,7 @@ Attean::API::Serializer - Serializer role
 
 =head1 VERSION
 
-This document describes Attean::API::Serializer version 0.030
+This document describes Attean::API::Serializer version 0.031
 
 =head1 DESCRIPTION
 
@@ -33,6 +33,12 @@ produced by this serializer.
 
 Returns a L<Type::Tiny> object representing the type of items that are consumed
 during serialization.
+
+=item C<< file_extensions >>
+
+Returns an ARRAY reference of file extensions commonly associated with the
+media types supported by the serializer (and returned by C<< media_types >>).
+File extensions should NOT include a leading dot.
 
 =item C<< serialize_iter_to_io( $fh, $iterator ) >>
 
@@ -68,7 +74,7 @@ UTF-8 encoded byte string.
 
 use Type::Tiny;
 
-package Attean::API::Serializer 0.030 {
+package Attean::API::Serializer 0.031 {
 	use Moo::Role;
 	use Carp qw(confess);
 	
@@ -104,9 +110,11 @@ package Attean::API::Serializer 0.030 {
 		my $iter	= Attean::ListIterator->new( values => [@_], item_type => $self->handled_type->role );
 		return $self->serialize_iter_to_bytes($iter);
 	}
+	
+	sub file_extensions { return [] }
 }
 
-package Attean::API::AbbreviatingSerializer 0.030 {
+package Attean::API::AbbreviatingSerializer 0.031 {
 	# Serializer that can make use of a base IRI and/or prefix IRI mappings
 	use Types::Standard qw(InstanceOf ConsumerOf Maybe Bool);
 	use Types::Namespace qw( NamespaceMap );
@@ -120,13 +128,13 @@ package Attean::API::AbbreviatingSerializer 0.030 {
 	has omit_base => (is => 'ro', isa => Bool, default => 0);
 }
 
-package Attean::API::AppendableSerializer 0.030 {
+package Attean::API::AppendableSerializer 0.031 {
 	# Serializer for a format that allows multiple serialization calls to be appended and remain syntactically valid
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 }
 
-package Attean::API::TermSerializer 0.030 {
+package Attean::API::TermSerializer 0.031 {
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 	sub handled_type {
@@ -135,7 +143,7 @@ package Attean::API::TermSerializer 0.030 {
 	}
 }
 
-package Attean::API::TripleSerializer 0.030 {
+package Attean::API::TripleSerializer 0.031 {
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 	sub handled_type {
@@ -144,7 +152,7 @@ package Attean::API::TripleSerializer 0.030 {
 	}
 }
 
-package Attean::API::QuadSerializer 0.030 {
+package Attean::API::QuadSerializer 0.031 {
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 	
@@ -154,7 +162,7 @@ package Attean::API::QuadSerializer 0.030 {
 	}
 }
 
-package Attean::API::MixedStatementSerializer 0.030 {
+package Attean::API::MixedStatementSerializer 0.031 {
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 	
@@ -164,7 +172,7 @@ package Attean::API::MixedStatementSerializer 0.030 {
 	}
 }
 
-package Attean::API::ResultSerializer 0.030 {
+package Attean::API::ResultSerializer 0.031 {
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 	sub handled_type {
@@ -216,7 +224,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2020 Gregory Todd Williams.
+Copyright (c) 2014--2022 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

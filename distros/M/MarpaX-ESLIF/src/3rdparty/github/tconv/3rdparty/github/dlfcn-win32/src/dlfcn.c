@@ -216,6 +216,35 @@ static void save_err_ptr_str( const void *ptr, DWORD dwMessageId )
     save_err_str( ptr_buf, dwMessageId );
 }
 
+static UINT MySetErrorMode( UINT uMode )
+{
+    static BOOL (WINAPI *SetThreadErrorModePtr)(DWORD, DWORD *) = NULL;
+    static BOOL failed = FALSE;
+    HMODULE kernel32;
+    DWORD oldMode;
+
+    if( !failed && SetThreadErrorModePtr == NULL )
+    {
+        kernel32 = GetModuleHandleA( "Kernel32.dll" );
+        if( kernel32 != NULL )
+            SetThreadErrorModePtr = (BOOL (WINAPI *)(DWORD, DWORD *)) (LPVOID) GetProcAddress( kernel32, "SetThreadErrorMode" );
+        if( SetThreadErrorModePtr == NULL )
+            failed = TRUE;
+    }
+
+    if( !failed )
+    {
+        if( !SetThreadErrorModePtr( uMode, &oldMode ) )
+            return 0;
+        else
+            return oldMode;
+    }
+    else
+    {
+        return SetErrorMode( uMode );
+    }
+}
+
 static HMODULE MyGetModuleHandleFromAddress( const void *addr )
 {
     static BOOL (WINAPI *GetModuleHandleExAPtr)(DWORD, LPCSTR, HMODULE *) = NULL;
@@ -229,7 +258,7 @@ static HMODULE MyGetModuleHandleFromAddress( const void *addr )
     {
         kernel32 = GetModuleHandleA( "Kernel32.dll" );
         if( kernel32 != NULL )
-            GetModuleHandleExAPtr = (BOOL (WINAPI *)(DWORD, LPCSTR, HMODULE *)) GetProcAddress( kernel32, "GetModuleHandleExA" );
+            GetModuleHandleExAPtr = (BOOL (WINAPI *)(DWORD, LPCSTR, HMODULE *)) (LPVOID) GetProcAddress( kernel32, "GetModuleHandleExA" );
         if( GetModuleHandleExAPtr == NULL )
             failed = TRUE;
     }
@@ -270,21 +299,21 @@ static BOOL MyEnumProcessModules( HANDLE hProcess, HMODULE *lphModule, DWORD cb,
         /* Windows 7 and newer versions have K32EnumProcessModules in Kernel32.dll which is always pre-loaded */
         psapi = GetModuleHandleA( "Kernel32.dll" );
         if( psapi != NULL )
-            EnumProcessModulesPtr = (BOOL (WINAPI *)(HANDLE, HMODULE *, DWORD, LPDWORD)) GetProcAddress( psapi, "K32EnumProcessModules" );
+            EnumProcessModulesPtr = (BOOL (WINAPI *)(HANDLE, HMODULE *, DWORD, LPDWORD)) (LPVOID) GetProcAddress( psapi, "K32EnumProcessModules" );
 
         /* Windows Vista and older version have EnumProcessModules in Psapi.dll which needs to be loaded */
         if( EnumProcessModulesPtr == NULL )
         {
             /* Do not let Windows display the critical-error-handler message box */
-            uMode = SetErrorMode( SEM_FAILCRITICALERRORS );
+            uMode = MySetErrorMode( SEM_FAILCRITICALERRORS );
             psapi = LoadLibraryA( "Psapi.dll" );
             if( psapi != NULL )
             {
-                EnumProcessModulesPtr = (BOOL (WINAPI *)(HANDLE, HMODULE *, DWORD, LPDWORD)) GetProcAddress( psapi, "EnumProcessModules" );
+                EnumProcessModulesPtr = (BOOL (WINAPI *)(HANDLE, HMODULE *, DWORD, LPDWORD)) (LPVOID) GetProcAddress( psapi, "EnumProcessModules" );
                 if( EnumProcessModulesPtr == NULL )
                     FreeLibrary( psapi );
             }
-            SetErrorMode( uMode );
+            MySetErrorMode( uMode );
         }
 
         if( EnumProcessModulesPtr == NULL )
@@ -306,7 +335,7 @@ void *dlopen( const char *file, int mode )
     error_occurred = FALSE;
 
     /* Do not let Windows display the critical-error-handler message box */
-    uMode = SetErrorMode( SEM_FAILCRITICALERRORS );
+    uMode = MySetErrorMode( SEM_FAILCRITICALERRORS );
 
     if( file == NULL )
     {
@@ -399,7 +428,7 @@ void *dlopen( const char *file, int mode )
     }
 
     /* Return to previous state of the error-mode bit flags. */
-    SetErrorMode( uMode );
+    MySetErrorMode( uMode );
 
     return (void *) hModule;
 }
@@ -568,14 +597,20 @@ char *dlerror( void )
 static BOOL get_image_section( HMODULE module, int index, void **ptr, DWORD *size )
 {
     IMAGE_DOS_HEADER *dosHeader;
+    IMAGE_NT_HEADERS *ntHeaders;
     IMAGE_OPTIONAL_HEADER *optionalHeader;
 
     dosHeader = (IMAGE_DOS_HEADER *) module;
 
-    if( dosHeader->e_magic != 0x5A4D )
+    if( dosHeader->e_magic != IMAGE_DOS_SIGNATURE )
         return FALSE;
 
-    optionalHeader = (IMAGE_OPTIONAL_HEADER *) ( (BYTE *) module + dosHeader->e_lfanew + 24 );
+    ntHeaders = (IMAGE_NT_HEADERS *) ( (BYTE *) dosHeader + dosHeader->e_lfanew );
+
+    if( ntHeaders->Signature != IMAGE_NT_SIGNATURE )
+        return FALSE;
+
+    optionalHeader = &ntHeaders->OptionalHeader;
 
     if( optionalHeader->Magic != IMAGE_NT_OPTIONAL_HDR_MAGIC )
         return FALSE;

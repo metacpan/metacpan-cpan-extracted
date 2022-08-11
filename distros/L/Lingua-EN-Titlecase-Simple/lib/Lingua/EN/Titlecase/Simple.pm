@@ -2,7 +2,7 @@ use 5.008001; use strict; use warnings; use utf8;
 
 package Lingua::EN::Titlecase::Simple;
 
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 
 our @SMALL_WORD
 	= qw/ (?<!q&)a an and as at(?!&t) but by en for if in of on or the to v[.]? via vs[.]? /;
@@ -121,19 +121,11 @@ L<Lingua::EN::Titlecase> provides a much more heavyweight, modular solution
 for the same problem. If you seriously disagree with the style rules in this
 module somewhere, you may be happier with that one.
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
+=head1 AUTHOR
 
 John Gruber <http://daringfireball.net/2008/05/title_case>
 
-=item *
-
 Aristotle Pagaltzis <pagaltzis@gmx.de>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.5.0
+## Version v0.5.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2022/07/18
+## Modified 2022/08/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -127,7 +127,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.5.0';
+    our $VERSION = 'v0.5.2';
 };
 
 use strict;
@@ -179,7 +179,6 @@ sub init
     $self->{changed}        = '';
     $self->{opened}         = '';
     $file = $self->{file} || return( $self->error( "No file was provided." ) );
-    $self->message( 3, "File provided is '", ( $file // '' ), "' and auto-remove is set to $self->{auto_remove} and os is '", ( $self->{os} // '' ), "'." );
     unless( CORE::length( $self->{base_dir} ) )
     {
         my $base_dir = '';
@@ -305,13 +304,10 @@ sub as
     local $URI::file::DEFAULT_AUTHORITY = undef;
     $opts->{volume} //= '';
     
-    $self->message( 4, "Filename is '", $self->filename, "'." );
     my( $volume, $parent, $file ) = $self->_spec_splitpath( $self->filename );
     my @dirs   = $self->_spec_splitdir( $parent );
     my $new_dirs = $self->_spec_catdir( [ @dirs ], $os );
-    $self->message( 4, "Parent '$parent', base file '$file', directories: ", sub{ $self->dump( \@dirs ) }, ", newly formatted directories '$new_dirs'" );
     my $path = $self->_spec_catpath( $opts->{volume}, $new_dirs, $file, $os );
-    $self->message( 4, "Creating new object with path '$path'" );
     return( $self->new( $path, os => $os, debug => $self->debug ) );
 }
 
@@ -468,7 +464,6 @@ sub can_read
             }
             # $rv = $io->read( my $buff, 1024 );
             my $flags = $io->fcntl( F_GETFL, 0 );
-            $self->message( 4, "Flags are: $flags and O_RDONLY is '", O_RDONLY, "' and O_RDWR is '", O_RDWR, "'." );
             my $v = ( ( $flags == O_RDONLY ) || ( $flags & ( O_RDONLY | O_RDWR ) ) );
             $v++ unless( $flags & O_ACCMODE );
             $io->close unless( $opened );
@@ -500,7 +495,6 @@ sub can_write
                 warn( "Error getting the file handle flags: ", $io->error ) if( !defined( $flags ) );
                 return( $self->pass_error( $io->error ) ) if( !defined( $flags ) );
                 my $bits = ( O_APPEND | O_WRONLY | O_CREAT | O_RDWR );
-                $self->message( 4, "F_GETFL is '", F_GETFL, "'. Flags are: $flags and O_WRONLY is '", O_WRONLY, "' and O_RDWR is '", O_RDWR, "'. Comparings flags '$flags' against '$bits'. is flags defined? ", ( defined( $flags ) ? 'yes' : 'no' ) );
                 return( $flags & ( O_APPEND | O_WRONLY | O_CREAT | O_RDWR ) );
             }
             elsif( $self->finfo->can_write )
@@ -569,15 +563,10 @@ sub chdir
 {
     my $self = shift( @_ );
     my $file = $self->filepath;
-    $self->message( 3, "Attempting to go to directory \"${file}\"." );
-    $self->message( 3, "Does the directory \"${file}\" exist? ", ( -d( $file ) ? 'yes' : 'no' ), " and is this a directory ? ", ( $self->is_dir ? 'yes' : 'no' ) );
-    $self->message( 4, "Returning error because we are not a directory." ) if( !$self->is_dir );
     return( $self->error( "File \"${file}\" is not a directory, so you cannot use chdir." ) ) if( !$self->is_dir );
     my $curr = $self->cwd;
-    $self->message( 4, "Current directory is '$curr', chdir to $file" );
     CORE::chdir( $file ) || return( $self->error( "Cannot chdir to directory \"${file}\": $!" ) );
     $self->_prev_cwd( $curr );
-    $self->message( 3, "Ok, cwd is now '", $curr );
     return( $self );
 }
 
@@ -643,10 +632,7 @@ sub chmod
         }
     }
     my $file = $self->filename;
-    $self->message( 3, "Setting file mode '$mode' to file \"$file\"." );
-    $self->message( 3, "Does the directory \"${file}\" exist? ", ( -d( $file ) ? 'yes' : 'no' ) );
     CORE::chmod( $mode, $file ) || return( $self->error( sprintf( "An error occurred while changing mode for file \"$file\" to %o: $!", $mode ) ) );
-    $self->message( 3, "Resetting file info." );
     $self->finfo->reset;
     return( $self );
 }
@@ -710,7 +696,6 @@ sub code
                 }
                 elsif( $self->is_empty )
                 {
-                    $self->message( 4, "Code for file is $code" );
                     if( $code == 201 )
                     {
                         # ok then
@@ -747,19 +732,15 @@ sub collapse_dots
     # We use this to know what to return and how to behave
     my $sep  = CORE::length( $opts->{separator} ) ? $opts->{separator} : '/';
     return( '' ) if( !CORE::length( $path ) );
-    $self->message( 4, "Path to process is '${path}' with separator '$opts->{separator}'" );
     # my $u = $opts->{separator} ? URI::file->new( $path ) : URI->new( $path );
-    $self->message( 4, "URI::file class used for os '", ( $self->{os} // '' ), "' is '", $self->_uri_file_class, "'" );
     my $u = $opts->{separator} ? $self->_uri_file_class->new( $path ) : URI->new( $path );
     $u->path( $path ) if( $path =~ /^[[:blank:]\h]+/ || $path =~ /[[:blank:]\h]+$/ );
     # unless( CORE::index( "$u", '.' ) != -1 || CORE::index( "$u", '..' ) != -1 )
     unless( $u =~ /(?:(?:(?:^|\/)\.{1,2}\/)|(?:\/\.{1,2}(?:\/|$)))/ )
     {
-        $self->message( 3, "Nothing to collapse for '$u' (", ( $opts->{separator} ? $u->file( $self->_uri_file_os_map( $self->{os} ) || $^O ) : 'same' ), ")." );
         return( $u );
     }
     my( @callinfo ) = caller;
-    $self->message( 4, "URI based on '$path' with separator provided '$opts->{separator}' is '$u' (", overload::StrVal( $u ), ") and separator to be used is '$sep' and uri path is '", $u->path, "' called from $callinfo[0] in file $callinfo[1] at line $callinfo[2]." );
     $path = $opts->{separator} ? $u->file( $self->{os} || $^O ) : $u->path;
     my @new = ();
     my $len = CORE::length( $path );
@@ -768,7 +749,6 @@ sub collapse_dots
     if( substr( $path, 0, 2 ) eq ".${sep}" )
     {
         substr( $path, 0, 2 ) = '';
-        ## $self->message( 3, "Removed './'. Path is now '", substr( $path, 0 ), "'." );
     }
     elsif( substr( $path, 0, 3 ) eq "..${sep}" )
     {
@@ -794,7 +774,6 @@ sub collapse_dots
     
     # -1 is used to ensure trailing blank entries do not get removed
     my @segments = CORE::split( "\Q$sep\E", $path, -1 );
-    $self->message( 3, "Found ", scalar( @segments ), " segments: ", sub{ $self->dump( \@segments ) } );
     for( my $i = 0; $i < scalar( @segments ); $i++ )
     {
         my $segment = $segments[$i];
@@ -816,7 +795,6 @@ sub collapse_dots
     my $new_path = CORE::join( $sep, @new );
     # substr( $new_path, 0, 0 ) = $sep unless( substr( $new_path, 0, 1 ) eq '/' );
     substr( $new_path, 0, 0 ) = $sep unless( $self->_spec_file_name_is_absolute( $new_path ) );
-    $self->message( 4, "Adding back new path '$new_path' to uri '$u'." );
     if( $opts->{separator} )
     {
         # $u = URI::file->new( $new_path );
@@ -826,7 +804,6 @@ sub collapse_dots
     {
         $u->path( $new_path );
     }
-    $self->message( 4, "Returning uri '$u' (", ( $opts->{separator} ? $u->file( $self->{os} || $^O ) : 'same' ), ")." );
     return( $u );
 }
 
@@ -871,14 +848,11 @@ sub content
             }
             else
             {
-                $self->message( 3, "Opening directory \"$file\"." );
                 # $io = $self->open( $opts ) || return( $self->pass_error );
                 $io = $self->open( $opts ) || do
                 {
-                    $self->message( 3, "Passing error from open: ", $self->error );
                     return( $self->pass_error );
                 };
-                $self->message( 3, "Directory is now opened with io '$io'" );
             }
             my $vol = $self->volume;
             $a = $self->new_array( [ map( $self->_spec_catpath( $vol, $file, $_ ), grep{ !/^\.{1,2}$/ } $io->read ) ] );
@@ -1205,31 +1179,25 @@ sub filename
         my $base_dir = $self->base_dir;
         my $dir_sep  = $self->_os2sep;
         $base_dir .= $dir_sep unless( substr( $base_dir, -CORE::length( $dir_sep ), CORE::length( $dir_sep ) ) eq $dir_sep );
-        $self->message( 3, "New file path provided is: '$newfile' and base directory is '$base_dir' and directory separator is '$dir_sep'" );
         # Resolve the path if there is any link
         my $already_resolved = $self->resolved;
         my $resolved;
         if( !$already_resolved && ( $resolved = $self->resolve( $newfile ) ) )
         {
-            $self->message( 3, "File '$newfile' resolved to '$resolved'." );
             $newfile = $resolved;
             $self->resolved(1);
         }
         
         # If we provide a string for the abs() method it works on Unix, but not on Windows
         # By providing an object, we make it work
-        $self->message( 3, "Is file '$newfile' absolute? ", $self->_spec_file_name_is_absolute( $newfile ) ? 'yes' : 'no' );
         unless( $self->_spec_file_name_is_absolute( $newfile ) )
         {
             # $newfile = URI::file->new( $newfile )->abs( URI::file->new( $base_dir ) )->file( $^O );
             $newfile = $self->_uri_file_abs( $newfile, $base_dir );
-            $self->message( 3, "Made file provided absolute => '$newfile'" );
         }
-        $self->message( 3, "Getting the new file real path: '$newfile'" );
         if( $self->collapse )
         {
             $self->{filename} = $self->collapse_dots( $newfile, { separator => $dir_sep })->file( $self->_uri_file_os_map( $self->{os} ) || $^O );
-            $self->message( 3, "Filename after dot collapsing is: '$self->{filename}'" );
         }
         else
         {
@@ -1239,7 +1207,6 @@ sub filename
         
         # It potentially does not exist
         my $finfo = $self->finfo( $newfile );
-        $self->message( 3, "finfo is '", overload::StrVal( $finfo ), "'." );
         if( !$finfo->exists )
         {
             $self->code(404);
@@ -1250,7 +1217,6 @@ sub filename
         }
         ## Force to create new Apache2::SSI::URI object
     }
-    # $self->message( 3, "Returning filename '$self->{filename}'" );
     return( $self->{filename} );
 }
 
@@ -1286,7 +1252,6 @@ sub find
     if( $opts->{skip} )
     {
         return( $self->error( "Parameter \"skip\" was provided, but it is not an array reference." ) ) if( Scalar::Util::reftype( $opts->{skip} ) ne 'ARRAY' );
-        $self->messagef( 4, "%d files to skip: %s", scalar( @{$opts->{skip}} ), CORE::join( ', ', @{$opts->{skip}} ) );
         foreach my $f ( @{$opts->{skip}} )
         {
             my $this = file( $f );
@@ -1298,11 +1263,9 @@ sub find
     {
         my @files = @_;
         my $curr_dir = $File::Find::dir;
-        $self->messagef( 4, "Preprocessing for directory $curr_dir for %d files.", scalar( @files ) );
         for( my $i = 0; $i <= $#files; $i++ )
         {
             my $curr_file = CORE::join( '/', $curr_dir, $files[$i] );
-            $self->message( 5, "Checking file \"$curr_file\"." );
             if( CORE::exists( $skip->{ $curr_file } ) || $files[$i] CORE::eq '.' || $files[$i] CORE::eq '..' )
             {
                 CORE::splice( @files, $i, 1 );
@@ -1336,18 +1299,14 @@ sub finfo
     elsif( !$self->{finfo} )
     {
         $newfile = $self->filename;
-        $self->message( 3, "Initiating finfo object using filename '$newfile'." );
         return( $self->error( "No file path set. This should not happen." ) ) if( !$newfile );
     }
     
     if( defined( $newfile ) )
     {
         $self->{finfo} = Module::Generic::Finfo->new( $newfile, debug => $self->debug );
-        $self->message( 3, "finfo object is now '", overload::StrVal( $self->{finfo} ), "'" );
-        $self->message( 3, "Error occurred: ", Module::Generic::Finfo->error ) if( !$self->{finfo} );
         return( $self->pass_error( Module::Generic::Finfo->error ) ) if( !$self->{finfo} );
     }
-    # $self->message( 3, "Returning finfo object '", overload::StrVal( $self->{finfo} ), "' for file '$self->{finfo}'." );
     return( $self->{finfo} );
 }
 
@@ -1407,12 +1366,10 @@ sub glob
         # patter provided, if any, must be a regular string
         return( $self->error( "Unsupported pattern provided ($_[0]). It must be a regular scalar, but instead is '", overload::StrVal( $_[0] ), "'" ) ) if( ref( $_[0] ) );
         $pattern = shift( @_ );
-        $self->message( 4, "Pattern supplied is '$pattern'" );
     }
     my $make_objects = ( exists( $opts->{object} ) ? CORE::delete( $opts->{object} ) : 1 );
     my $flags;
     # Parameters have been provided, so we set the flags.
-    $self->messagef( 4, "%d options provided.", scalar( keys( %$opts ) ) );
     if( scalar( keys( %$opts ) ) && $os !~ /^(mswin32|win32|vms|riscos)$/i )
     {
         $opts->{brace} //= 0;
@@ -1438,13 +1395,11 @@ sub glob
         $flags |= File::Glob::GLOB_NOMAGIC if( $opts->{no_magic} );
         $flags |= File::Glob::GLOB_TILDE if( $opts->{expand} );
     }
-    $self->message( 4, "Resolving file '$path' for  provided os value '$os' and real os '$^O', file is a ", ( $self->is_dir ? 'directory' : 'file' ), " and wantarray is -> ", ( wantarray() ? 'yes' : 'no' ) );
     # Those do not work in virtualisation
     if( $os eq $^O )
     {
         if( Want::want( 'LIST' ) )
         {
-            $self->message( 4, "Caller wants a list of files found." );
             my @files;
             if( $os =~ /^(mswin32|win32|vms|riscos)$/i )
             {
@@ -1475,7 +1430,6 @@ sub glob
         }
         else
         {
-            $self->message( 4, "Caller only wants one file." );
             if( $os =~ /^(mswin32|win32|vms|riscos)$/i )
             {
                 require File::DosGlob;
@@ -1526,6 +1480,11 @@ sub is_absolute
 
 sub is_dir { return( shift->finfo->is_dir ); }
 
+{
+    no warnings 'once';
+    *is_directory = \&is_dir;
+}
+
 sub is_empty
 {
     my $self = shift( @_ );
@@ -1561,7 +1520,6 @@ sub is_part_of
     my $file = $self->filepath;
     return( $self->error( "Directory provided \"${this}\" to check if our file \"${file}\" is part of its file path is actually not a directory." ) ) if( !$this->is_dir );
     my $parent = $this->filepath;
-    # $self->message( 3, "Checking if directory '$parent' is part of our file path '$file' starting from offset 0." );
     my $dir_sep = $self->_os2sep;
     return( CORE::index( $file, "${parent}${dir_sep}" ) == 0 ? $self->true : $self->false );
 }
@@ -1792,7 +1750,6 @@ sub load
         if( $self->can_read )
         {
             $pos = $fh->tell;
-            $self->message( 3, "File can be read. Current position is '$pos'" );
             # Move at the beginning of the file
             $fh->seek(0, 0);
         }
@@ -1813,7 +1770,6 @@ sub load
             # Restore cursor position in file
             $fh->seek( $pos, 0 );
         }
-        $self->message( 3, "Returning ", CORE::length( $buf // '' ), " bytes of data." );
         return( $buf );
     }
     catch( $e )
@@ -1956,7 +1912,6 @@ sub mkpath
     {
         my $path = shift( @_ );
         $path = $path->filepath if( $self->_is_object( $path ) && $path->isa( 'Module::Generic::File' ) );
-        $self->message( 3, "Processing file path '$path'" );
         my $params = {};
         $params = shift( @_ ) if( @_ && ref( $_[0] ) eq 'HASH' );
         $params->{recurse} //= 0;
@@ -1999,7 +1954,6 @@ sub mkpath
                 try
                 {
                     my $actual = CORE::readlink( $current_path ) || return( $self->error( "Unable to read the symbolic link \"$current_path\": $!" ) );
-                    $self->message( 3, "Path \"$current_path\" points to a link which resolves to \"$actual\"." );
                     # my $before = URI::file->new( $current_path )->file( $^O );
                     my $before = $self->_uri_file_new( $current_path );
                     # my $after  = URI::file->new( $actual )->abs( $before )->file( $^O );
@@ -2059,7 +2013,6 @@ sub mmap
                 : $DEFAULT_MMAP_SIZE
     );
     return( $self->error( "mmap size is set to 0, which is not possible." ) ) if( !$size );
-    $self->message( 3, "Variable provided is ", CORE::length( $_[0] // '' ), " bytes big ($_[0])." );
     my $mode = ( @_ == 3 ? $_[2] : '+<' );
     my $ok_modes = [qw( > +> >> +>> < +< )];
     my $map =
@@ -2092,7 +2045,6 @@ sub mmap
         return( $self->error( "You cannot use encoding $1 with File::Map. Encoding do not work with File::Map" ) );
     }
     
-    $self->message( 3, "mode is '$mode' and can write ? ", ( $self->can_write ? 'yes' : 'no' ) );
     $self->autoflush(1);
     # If we can write to file, we ensure the file has the same size as the one specified,
     # or else File::Map would issue an exception.
@@ -2103,14 +2055,12 @@ sub mmap
         {
             my $fsize = $self->length;
             # Need to fill the file with the required allocation
-            $self->message( 3, "Is required size '$size' > file size '$fsize' ?" );
             # No size argument was provided, so the size was guessed from the variable length
             # There is no prefix to the data
             if( !$has_size && $var_size )
             {
                 # Position at beginning of file
                 $self->seek( 0, SEEK_SET ) || return( $self->pass_error );
-                $self->message( 3, "Filling file with the value of the variable which is $size bytes of data" );
                 $self->print( $_[0] ) || return( $self->pass_error );
                 $self->truncate( $self->tell ) || return( $self->error( "Unable to truncate the file: $!" ) );
                 $self->seek( 0, SEEK_SET ) || return( $self->pass_error );
@@ -2161,11 +2111,9 @@ sub mmap
     }
     else
     {
-        $self->message( 3, "Cannot write to file '$file'");
         my $fsize = $self->length;
         if( $size > $fsize )
         {
-            $self->message( 3, "Required size is $size but file size is smaller with $fsize bytes, and I do not have permission to write to it to fill the gap necessary for File::Map to work." );
             warnings::warn( "Required size is $size but file size is smaller with $fsize bytes, and I do not have permission to write to it to fill the gap necessary for File::Map to work.\n" ) if( warnings::enabled() );
         }
     }
@@ -2173,7 +2121,6 @@ sub mmap
     # If the user had opened it, he/she will receive an error that he/she needs to close it first and that's ok for he/she to receive this error
     $self->close if( !$opened );
     
-    $self->message( 3, "mmmapping using file '$file' with mode '$mode'" );
     if( HAS_PERLIO_MMAP && !$self->use_file_map )
     {
         my $io = $self->open( "${mode}:mmap" ) || return( $self->pass_error );
@@ -2186,12 +2133,10 @@ sub mmap
             # initial variable data length, if any. This could be zero
             length  => $var_size,
         });
-        $self->message( 3, "tie Module::Generic::File::Map returned $object. Is variable tied ? ", tied( $_[0] ) ? 'yes' : 'no' );
         return( $object );
     }
     else
     {
-        $self->message( 3, "Using File::Map" );
         if( !$self->_load_class( 'File::Map' ) )
         {
             return( $self->error( "You perl version ($]) does not support PerlIO mmap, or you have set the property \"use_file_map\" to true and you do not have File::Map installed. Install File::Map at least if you want to use this method." ) );
@@ -2248,7 +2193,6 @@ sub open
             {
                 $mode = '>>';
             }
-            $self->message( 3, "Opening file \"$file\" with mode '$mode'." );
             try
             {
                 $io = Module::Generic::File::IO->new( $file, $mode, @_ ) || return( $self->error( "Unable to open file \"$file\": $!" ) );
@@ -2266,7 +2210,6 @@ sub open
                 }
                 else
                 {
-                    $self->message( 3, "Setting binmode to '$opts->{binmode}'." );
                     $opts->{binmode} = 'encoding(utf-8)' if( lc( $opts->{binmode} ) eq 'utf-8' );
                     $opts->{binmode} =~ s/^\://g;
                     $io->binmode( ":$opts->{binmode}" ) || return( $self->error( "Unable to set binmode to \"$opts->{binmode}\" for file \"$file\": $!" ) );
@@ -2274,7 +2217,6 @@ sub open
             }
             $io->autoflush( $opts->{autoflush} ) if( CORE::exists( $opts->{autoflush} ) && CORE::length( $opts->{autoflush} ) );
             $self->opened( $io );
-            $self->message( 4, "Did the file exist before? ", ( $existed ? 'yes' : 'no' ), " and can I write to it? ", ( $self->can_write ? 'yes' : 'no' ) );
             if( !$existed && $self->can_write )
             {
                 $self->code( 201 ); # created
@@ -2364,8 +2306,6 @@ sub opened
         {
             return( $self->new_null );
         }
-        # $self->message( 3, "fileno for $fh is: ", CORE::fileno( $fh ) );
-        # $self->message( 3, "Is file opened ? ", ( !$self->is_dir && $fh->opened ) ? 'yes' : 'no' );
         # Maybe the underlying file handle was closed, and if so we update our stored value
         if( !CORE::fileno( $fh ) )
         {
@@ -2395,12 +2335,9 @@ sub parent
     my( $vol, $parent, $file ) = $self->_spec_splitpath( $self->filename );
     $vol //= '';
     $file //= '';
-    $self->message( 3, "Filename is '", $self->filename, "', volume is '$vol', parent '$parent' and file is '$file'." );
     my @segments = $self->_spec_splitpath( $self->_spec_catfile( [ $parent, $file ] ) );
-    # $self->message( 3, "Path segments are: ", sub{ $self->dump( \@segments )} );
     pop( @segments );
     return( $self ) if( !scalar( @segments ) );
-    $self->message( 3, "Creating new object with document uri '", $vol . $self->_spec_catdir( [ @segments ] ), "'." );
     # return( $self->new( join( '/', @segments ), ( $r ? ( apache_request => $r ) : () ) ) );
     # return( $self->new( $vol . $self->_spec_catdir( [ @segments ] ) ) );
     $self->{parent} = $self->new( $self->_spec_catpath( $vol, $self->_spec_catdir( [ @segments ] ), '' ), os => $self->{os} );
@@ -2444,7 +2381,6 @@ sub read
         }
         else
         {
-            $self->message( 4, "Loading data for length '$_[2]' from offset '$_[3]'" );
             # $io->read( $buff, $size, $offset );
             return( $io->read( $_[1], $_[2], $_[3] ) ) if( scalar( @_ ) >= 4 );
             # $io->read( $buff, $size );
@@ -2492,7 +2428,6 @@ sub resolve
     my $max_recursion = $self->max_recursion;
     return( $self->error( "Too many recursion. Exceeded the threshold of $max_recursion" ) ) if( $max_recursion > 0 && $opts->{recurse} >= $max_recursion );
     my $os = $self->{os} || $^O;
-    $self->message( 4, "Resolving file '$path' for  provided os value '$os' and real os '$^O'." );
     my $globbing = CORE::exists( $opts->{globbing} ) ? $opts->{globbing} : $self->{globbing};
     # Those do not work in virtualisation
     if( $globbing && $os eq $^O )
@@ -2507,16 +2442,13 @@ sub resolve
             $path = File::Glob::bsd_glob( $path );
         }
     }
-    $self->message( 3, "Possibly expanded file path now is '$path'." );
     my( $vol, $dirs, $fname ) = $self->_spec_splitpath( $path );
     my @fragments = $self->_spec_splitdir( $dirs );
-    $self->message( 3, "Volume is '$vol', parent '$dirs', file '$fname' and fragments are: ", sub{ $self->dump( \@fragments ) });
     my $curr = $self->new_array;
     my $parent_path  = '';
     foreach my $dir ( @fragments )
     {
         my $current_path = $self->_spec_catdir( [ @$curr, $dir ] );
-        $self->message( 3, "Current path now is: '$current_path'." );
         # Stop right here. There is a missing path, thus we cannot resolve
         if( !-e( $current_path ) )
         {
@@ -2528,7 +2460,6 @@ sub resolve
             try
             {
                 my $actual = CORE::readlink( $current_path );
-                $self->message( 3, "Path \"$current_path\" points to a link which resolves to \"$actual\"." );
                 my $before = URI::file->new( $current_path, ( $self->{os} || $^O ) );
                 # my $after  = URI::file->new( $actual )->abs( $before )->file( $^O );
                 my $after  = $self->_uri_file_abs( $actual, $before );
@@ -2536,10 +2467,8 @@ sub resolve
                 unless( $self->_spec_file_name_is_absolute( $after ) )
                 {
                     $after = $self->resolve( $after, $opts );
-                    $self->message( 3, "Resolved symbolic link value to '$after'." );
                 }
                 my @new = $self->_spec_splitdir( $after );
-                $self->message( 3, "Updated fragments are: ", sub{ $self->dump( \@new ) });
                 $curr = $self->new_array( \@new );
                 next;
             }
@@ -2550,16 +2479,13 @@ sub resolve
         }
         $curr->push( $dir );
     }
-    $self->message( 3, "Returning '", sub{ $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr ] ), $fname ) }, "'" );
-    # XXX Remove debugging
+    # TODO: Remove debugging
     my $debug = $self->debug // 0;
     if( $debug >= 4 )
     {
         my $test = $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr ] ), $fname );
         if( !CORE::length( $test ) )
         {
-            $self->message( 4, "New resolved file resulted into an empty string!!" );
-            $self->message( 4, "Volume is '$vol', \$fname is '$fname' and directories are: '", CORE::join( "', '", @$curr ), "'." );
         }
     }
     return( $self->new( $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr ] ), $fname ), { resolved => 1, os => $self->{os}, ( $self->{base_dir} ? ( base_dir => $self->{base_dir} ) : () ), debug => $self->debug }) );
@@ -2595,10 +2521,8 @@ sub rmtree
 {
     my $self = &_function2method( \@_ ) || return( __PACKAGE__->pass_error );
     my $dir  = $self->filepath;
-    $self->message( 3, "Removing directory \"$dir\"." );
     return( $self->error( "Can only call rmtree on a directory." ) ) if( !$self->is_dir );
     my $opts = $self->_get_args_as_hash( @_ );
-    $self->message( 3, "Options are: ", sub{ $self->dump( $opts ) });
     if( !$self->_is_class_loadable( 'File::Find' ) )
     {
         return( $self->error( "File::Find is required, but is not installed in your system." ) );
@@ -2636,7 +2560,6 @@ sub rmtree
         }
     });
     
-    $self->messagef( 3, "%d files found to remove and %d directory.", $files->length, $dirs_to_remove->length );
     my $prefix = $opts->{dry_run} ? '[DRY RUN]' : '[LIVE]';
     
     # first, we remove all files we found with File::Find
@@ -2650,22 +2573,18 @@ sub rmtree
         {
             if( !-e( $f ) || !-w( $f ) )
             {
-                $self->message( 4, "${prefix} File \"${f}\" eithe does not exist or is not writable." );
                 $error_files->push( $f );
             }
             else
             {
-                $self->message( 4, "${prefix} Would remove file \"${f}\"" );
             }
         }
         else
         {
             try
             {
-                $self->message( 4, "${prefix} Actually removing file \"${f}\"" );
                 CORE::unlink( $f ) || do
                 {
-                    $self->message( 4, "${prefix} Unable to remove file \"${f}\": $!" );
                     $error_files->push( $f );
                 };
             }
@@ -2728,17 +2647,14 @@ sub rmtree
             }
             else
             {
-                $self->message( 4, "${prefix} Would remove directory \"${d}\"" );
             }
         }
         else
         {
             try
             {
-                $self->message( 4, "${prefix} Actually removing directory \"${d}\"" );
                 CORE::rmdir( $d ) || do
                 {
-                    $self->message( 4, "${prefix} Unable to remove directory \"${d}\": $!" );
                     $error_files->push( $d );
                 };
             }
@@ -2751,7 +2667,6 @@ sub rmtree
         # Return true
         return(1);
     });
-    $self->messagef( 3, "${prefix} %d files and directories removed and %d issues found.", ( $total - $error_files->length ), $error_files->length );
     unless( $opts->{keep_root} )
     {
         CORE::rmdir( $dir ) || do
@@ -2759,10 +2674,8 @@ sub rmtree
             warnings::warn( "Unable to remove the directory \"$dir\": $!\n" ) if( warnings::enabled() );
         };
     }
-    $self->message( 4, "Files with issues:" );
     $error_files->foreach(sub
     {
-        $self->message( 4, $_ );
     });
     return( $self );
 }
@@ -2836,7 +2749,6 @@ sub split
     my $file = $self->filename;
     $opts->{remove_leading_sep} //= 0;
     my( $vol, $path, $base ) = $self->_spec_splitpath( $file );
-    $self->message( 3, "Path is '$path'" );
     # /some/where/my/
     my $frags = [$self->_spec_splitdir( $path )];
     pop( @$frags ) if( scalar( @$frags ) > 1 && !CORE::length( $frags->[-1] ) );
@@ -2934,7 +2846,6 @@ sub tempfile
         substr( $opts->{suffix}, 0, 0, '.' ) if( substr( $opts->{suffix}, 0, 1 ) ne '.' );
         $fname .= $opts->{suffix};
     }
-    $self->message( 3, "Filename generated is '$fname'" );
     my $dir;
     my $sys_tmpdir = $self->_spec_tmpdir;
     my $base_vol = [$self->_spec_splitpath( $sys_tmpdir )]->[0];
@@ -2980,7 +2891,6 @@ sub tempfile
     $dir = $self->_spec_catdir( [ $parent, $me ] );
     CORE::delete( @$opts{ qw( tmpdir tempdir ) } );
     my $new = $self->new( $self->_spec_catpath( $base_vol, $dir, $fname ), %$opts ) || return( $self->pass_error );
-    # $self->message( 3, "So far dir is '$dir' with path '$new'" );
     if( $open )
     {
         $opts->{mode} //= '+>';
@@ -3052,11 +2962,8 @@ sub touch
     my $file = $self->filepath;
     if( !$self->exists )
     {
-        $self->message( 3, "File '$file' does not exist yet, open it and close it." );
         my $io = $self->open( '>' ) || return( $self->pass_error );
-        $self->message( 3, "Closing file '$file'." );
         $io->close;
-        # $self->message( 3, "File descriptor is now '", CORE::fileno( $io ), "'." );
     }
     else
     {
@@ -3174,7 +3081,6 @@ sub unlock
     my $file = $self->filepath;
     my $io = $self->opened;
     return( $self->error( "File is not opened yet. You must open the file \"${file}\" first to unlock semaphore." ) ) if( !$io );
-    # $self->message( 3, "Removing lock for semaphore id \"$semid\" and locked value '$self->{locked}'." );
     # my $flags = $self->locked | LOCK_UN;
     # $flags ^= LOCK_NB if( $flags & LOCK_NB );
     my $flags = LOCK_UN;
@@ -3285,11 +3191,9 @@ sub _filehandle_method
     try
     {
         my $ok = [CORE::split( /\|/, $for )];
-        $self->message( 3, "You cannot call \"${what}\" on a ${type}. You can only call this on ${for}" ) if( !scalar( CORE::grep( $_ eq $type, @$ok ) ) );
         return( $self->error( "You cannot call \"${what}\" on a ${type}. You can only call this on ${for}" ) ) if( !scalar( CORE::grep( $_ eq $type, @$ok ) ) );
         my $opened = $self->opened || 
             return( $self->error( ucfirst( $type ), " \"${file}\" is not opened yet." ) );
-        # $self->message( 3, "File handle is '$opened'. Calling method '$what' with arguments: '", CORE::join( "', '", @_ ), "'." );
         # return( $opened->$what( @_ ) );
         my @rv = ();
         if( wantarray() )
@@ -3397,7 +3301,6 @@ sub _make_abs
     if( @_ )
     {
         my $this = shift( @_ );
-        $self->message( 3, "Setting $field to '$this'." );
         if( Scalar::Util::blessed( $this ) && $this->isa( 'URI::file' ) )
         {
             # $this = URI->new_abs( $this )->file( $^O );
@@ -3409,7 +3312,6 @@ sub _make_abs
             $this = URI::file->new_abs( "$this" )->file( $self->{os} || $^O );
             # $this = $self->_uri_file_class->new_abs( "$this" )->file( $self->{os} || $^O );
         }
-        $self->message( 3, "$field is now '$this'" );
         $self->{ $field } = $this;
     }
     return( $self->{ $field } );
@@ -3738,7 +3640,6 @@ sub _uri_file_abs
     # So, we need to create an instance and replace the modified path with the original one, i.e. the one with some leading and/or trailing spaces
     if( $path =~ /^[[:blank:]\h]+/ || $path =~ /[[:blank:]\h]+$/ )
     {
-        $self->message( 3, "File path '$path' has some leading oe trailing white space." );
         my $u = URI::file->new( $path );
         $u->path( $path );
         return( $u->abs( $base )->file( $self->{os} ) );
@@ -3838,7 +3739,6 @@ sub DESTROY
         CORE::delete( $FILES_TO_REMOVE->{ $$ }->{ $file } );
         my @info = caller();
         my $sub = [caller(1)]->[3];
-        $self->message( 3, "Removing file '", $self->filepath, "' that was created in file $orig->[1], at line $orig->[2]. Called from file $info[1] at line $info[2] in sub $sub" );
         if( $self->is_dir )
         {
             $self->rmtree;
@@ -3852,7 +3752,6 @@ sub DESTROY
     {
         my @info = caller();
 #         $self->debug(3);
-        $self->message( 3, "File '", $self->filepath, "' is NOT going to be removed. Created in file $orig->[1], at line $orig->[2]. Called from file $info[1] at line $info[2]" );
     }
 };
 
@@ -3906,7 +3805,8 @@ sub FREEZE
     my %hash  = %$self;
     CORE::delete( @hash{ qw( opened _handle ) } );
     # Return an array reference rather than a list so this works with Sereal and CBOR
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # On or before Sereal version 4.023, Sereal did not support multiple values returned
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
     # But Storable want a list with the first element being the serialised element
     CORE::return( $class, \%hash );
 }
@@ -3999,7 +3899,6 @@ sub TO_JSON { return( shift->filepath ); }
             warn( "Filehandle is gone!\n" );
             return;
         };
-        # $self->message( 3, "Returning content of mmap" );
         my $parent  = ${$$self}->{me};
         my $data    = $parent->load;
         # Initial variable length, if any, because initially the file may be padded with nulls
@@ -4008,11 +3907,9 @@ sub TO_JSON { return( shift->filepath ); }
         my $var_len = ${$$self}->{length} // 0;
         # $data =~ s/\0+$//gs;
         # $data = unpack( 'A*', $data );
-        $self->message( 3, "Returning ", CORE::length( substr( $data, 0, $var_len ) ), " bytes of data." ) if( $var_len );
         return( substr( $data, 0, $var_len ) ) if( $var_len );
         #$data = unpack( 'Z*', $data );
         $data =~ s/\0+$//g;
-        $self->message( 3, "Returning ", CORE::length( $data ), " bytes of data." );
         return( $data );
     }
     
@@ -4025,7 +3922,6 @@ sub TO_JSON { return( shift->filepath ); }
             warn( "Filehandle is gone!\n" );
             return;
         };
-        # $self->message( 3, "Saving '$_[0]' to mmap" );
         my $size   = ${$$self}->{size};
         my $parent = ${$$self}->{me};
         unless( $fh->opened )
@@ -4038,7 +3934,6 @@ sub TO_JSON { return( shift->filepath ); }
             warn( "Unable to set position at beginning in file \"", $parent->filename, "\": $!\n" );
             # return;
         };
-        $self->message( 3, "Writing ", CORE::length( $_[0] // '' ), " bytes of data." );
         # This needs to be print and not syswrite, because we cannot mix syswrite and read/print
         $fh->print( $_[0] ) || do
         {
@@ -4048,7 +3943,6 @@ sub TO_JSON { return( shift->filepath ); }
         $parent->unlock;
         $fh->sync;
         $fh->flush;
-        $self->message( 3, "File \"", $parent->filename, "\" is ", $parent->size, " big." );
         # $fh->print( "\000" x ( $size - length( $_[0] ) ) );
         if( !CORE::defined( $fh->truncate( $fh->tell ) ) )
         {
@@ -4056,7 +3950,6 @@ sub TO_JSON { return( shift->filepath ); }
             return;
         };
         CORE::delete( ${$$self}->{length} );
-        $self->message( 3, "Ok, returning." );
     }
     
     sub DESTROY
@@ -4182,7 +4075,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.5.0
+    v0.5.2
 
 =head1 DESCRIPTION
 

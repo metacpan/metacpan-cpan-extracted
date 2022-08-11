@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File/Cache.pm
-## Version v0.2.1
+## Version v0.2.3
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/16
-## Modified 2022/07/26
+## Modified 2022/08/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,7 +16,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
-    use vars qw( $CACHE_REPO $CACHE_TO_OBJECT $DEBUG );
+    use vars qw( $CACHE_REPO $CACHE_TO_OBJECT $DEBUG $HAS_B64 );
     use Data::UUID;
     use Module::Generic::File qw( file sys_tmpdir );
     use Nice::Try;
@@ -28,7 +28,7 @@ BEGIN
     $CACHE_REPO = [];
     $CACHE_TO_OBJECT = {};
     $DEBUG = 0;
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.3';
 };
 
 use strict;
@@ -38,6 +38,7 @@ sub init
 {
     my $self = shift( @_ );
     $self->{binmode}    = 'utf-8';
+    $self->{base64}     = undef;
     # Default action when accessing a shared file cache? If 1, it will create it if it does not exist already
     $self->{create}     = 0;
     # If true, this will destroy both the shared file cache and the semaphore upon end
@@ -64,6 +65,8 @@ sub init
     $self->{removed}    = 0;
     return( $self );
 }
+
+sub base64 { return( shift->_set_get_scalar( 'base64', @_ ) ); }
 
 sub binmode { return( shift->_set_get_scalar( 'binmode', @_ ) ); }
 
@@ -94,11 +97,8 @@ sub flags
     $opts->{create} = $self->create unless( length( $opts->{create} ) );
     $opts->{mode} = $self->mode unless( length( $opts->{mode} ) );
     my $flags  = 0;
-    $self->message( 3, "Adding create bit." ) if( $opts->{create} );
     $flags    |= 0600 if( $opts->{create} );
-    $self->message( 3, "Adding exclusive bit" ) if( $opts->{exclusive} );
     $flags    |= ( $opts->{mode} || 0666 );
-    $self->message( 3, "Returning flags value '$flags'." );
     return( $flags );
 }
 
@@ -125,7 +125,6 @@ sub key
     {
         $self->{key} = shift( @_ );
         $self->{serial} = $self->_str2key( $self->{key} );
-        $self->message( 3, "Setting key to '$self->{key}' ($self->{serial})" );
     }
     return( $self->{key} );
 }
@@ -165,15 +164,12 @@ sub open
     my $serial;
     if( length( $opts->{key} ) )
     {
-        $self->message( 4, "Getting serial based on key '$opts->{key}'." );
         $serial = $self->_str2key( $opts->{key} ) || 
             return( $self->error( "Cannot get serial from key '$opts->{key}': ", $self->error ) );
     }
     else
     {
-        $self->message( 3, "Getting serial ($self->{serial})" );
         $serial = $self->serial;
-        $self->message( 4, "Got saved serial '$serial' ($self->{serial})." );
     }
     die( "There is no serial!!\n" ) if( !CORE::length( $serial ) );
     my $create = 0;
@@ -193,7 +189,6 @@ sub open
     
     my $cache_dir = $self->{_cache_dir} || return( $self->error( "Cache directory object is gone!" ) );
     return( $self->error( "Cache directory is not a Module::Generic::File object!" ) ) if( !$self->_is_a( $cache_dir => 'Module::Generic::File' ) );
-    $self->message( 4, "Using flags $flags and cache directory \"${cache_dir}\" and serial '${serial}' with create boolean set to '${create}'." );
     if( $cache_dir->exists )
     {
         return( $self->error( "Cache directory exists, but is not a directory!" ) ) if( !$cache_dir->is_dir );
@@ -204,19 +199,15 @@ sub open
     }
     my $fo = $cache_dir->child( $serial );
     my $cache_file = "$fo";
-    $self->message( 4, "Cache file to use is '${cache_file}'" );
     my $io;
     if( $fo->exists )
     {
-        $self->message( 4, "Cache file ${cache_file} already exists." );
         # Need to find a way to make that more efficient
         if( ( $flags & 0600 ) || 
             ( $flags & 0060 ) ||
             ( $flags & 0006 ) )
         {
-            $self->message( 4, "Flags ($flags) require write privilege to the cache file." );
             return( $self->error( "Requested mode ($flags) requires writing, but uid $> is missing write privilege to the cache file \"$cache_file\"." ) ) if( !$fo->can_write );
-            $self->message( 4, "Opening cache file ${cache_file} in read append mode." );
             $io = $fo->open( '+<', { binmode => $opts->{binmode}, autoflush => 1 } ) ||
                 return( $self->pass_error( $fo->error ) );
             # Ok, we could write to the cache file, remove data we just wrote
@@ -225,9 +216,7 @@ sub open
         }
         else
         {
-            $self->message( 4, "Flags ($flags) require only read priviles." );
             return( $self->error( "Requested mode ($flags) require reading, but missing access privilege to the cache file \"$cache_file\"." ) ) if( !$fo->can_read );
-            $self->message( 4, "Opening cache file ${cache_file} in read-only mode." );
             $io = $fo->open( '<', { binmode => $opts->{binmode}, autoflush => 1 } ) ||
                 return( $self->pass_error( $fo->error ) );
         }
@@ -238,7 +227,6 @@ sub open
             ( $flags & 0060 ) ||
             ( $flags & 0006 ) )
         {
-            $self->message( 4, "Cache file ${cache_file} does not already exist, creating it now." );
             $io = $fo->open( '+>', { binmode => $opts->{binmode}, autoflush => 1 } ) ||
                 return( $self->pass_error( $fo->error ) );
             # Some size, was provided, we fill the file with it, thus ensuring the filesystem lets us use that much
@@ -246,13 +234,11 @@ sub open
             # but no more than the size if it was provided.
             if( $opts->{size} )
             {
-                $self->message( 4, "The 'size' parameter was provided with value '$opts->{size}', trying to fill the file with that much bytes." );
                 $self->_fill( $opts->{size} => $fo ) || return( $self->pass_error );
             }
         }
         else
         {
-            $self->message( 4, "Cache file ${cache_file} does not already exist, and flags ($flags) are only in read-only mode." );
             return( $self->error( "Requested mode ($flags) require reading, but the cache file \"$cache_file\" does not exist yet." ) );
         }
     }
@@ -265,12 +251,12 @@ sub open
         destroy => $self->destroy,
         _packing_method => $self->_packing_method,
     ) || return( $self->error( "Cannot create object with key '", ( $opts->{key} || $self->key ), "': ", $self->error ) );
+    $new->{base64} = $self->base64;
     $new->key( $self->key );
     $new->serial( $serial );
     $new->id( Scalar::Util::refaddr( $new ) );
     $new->size( $opts->{size} );
     $new->{_cache_file} = $fo;
-    $self->message( 4, "Adding new object to global object repo and returning it." );
     push( @$CACHE_REPO, $new );
     $CACHE_TO_OBJECT->{ $cache_file } = [] if( !CORE::exists( $CACHE_TO_OBJECT->{ $cache_file } ) );
     CORE::push( @{$CACHE_TO_OBJECT->{ $cache_file }}, $new );
@@ -291,20 +277,29 @@ sub read
     my $file = $self->{_cache_file} ||
         return( $self->error( "No cache file is set yet. Have you first opened the cache file with open()?" ) );
     return( $self->error( "Cache file found in our object is not a Module::Generic::File object." ) ) if( !$self->_is_a( $file => 'Module::Generic::File' ) );
-    $self->messagef( 4, "Reading from cache file \"${file}\" that is %d bytes big.", $file->size );
     $file->lock;
     # Make sure we are at the top of the file
     $file->seek(0,0) || return( $self->pass_error( $file->error ) );
     my $buffer = '';
     my $bytes = $file->read( $buffer, $file->length );
     $file->unlock;
-    $self->messagef( 4, "${bytes} bytes read with a buffer now of size %d, unpacking data now.", CORE::length( $buffer ) );
     return( $self->pass_error( $file->error ) ) if( !defined( $bytes ) );
     my $packing = $self->_packing_method;
     $packing = lc( $packing ) if( defined( $packing ) );
     my $data;
     if( CORE::length( $buffer ) )
     {
+        # There may be encapsulation of data before writing data to memory.
+        # e.g.: MG[14]something here
+        if( index( $buffer, 'MG[' ) == 0 )
+        {
+            my $def = substr( $buffer, 0, index( $buffer, ']' ) + 1, '' );
+            # Get the string length stored
+            my $len = int( substr( $def, 3, -1 ) );
+            # Remove any possible remaining unwanted data
+            substr( $buffer, $len, length( $buffer ), '' );
+        }
+        
         try
         {
             if( $packing eq 'json' )
@@ -313,23 +308,36 @@ sub read
             }
             elsif( $packing eq 'cbor' )
             {
-                $data = $self->deserialise( data => $buffer, serialiser => 'CBOR::XS', allow_sharing => 1 );
+                $data = $self->deserialise(
+                    data => $buffer,
+                    serialiser => 'CBOR::XS',
+                    allow_sharing => 1,
+                    ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
+                );
             }
             elsif( $packing eq 'sereal' )
             {
-                $data = $self->deserialise( data => $buffer, serialiser => 'Sereal', freeze_callbacks => 1 );
+                $data = $self->deserialise(
+                    data => $buffer,
+                    serialiser => 'Sereal',
+                    freeze_callbacks => 1,
+                    ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
+                );
             }
             # By default Storable::Improved
             else
             {
                 # $data = Storable::Improved::thaw( $buffer );
-                $data = $self->deserialise( data => $buffer, serialiser => 'Storable::Improved' );
+                $data = $self->deserialise(
+                    data => $buffer,
+                    serialiser => 'Storable::Improved',
+                    ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
+                );
             }
-            $self->message( 4, "Decoded data '", ( $buffer // '' ), "' -> '", ( $data // '' ), "': ", sub{ $self->dump( $data ) });
         }
         catch( $e )
         {
-            return( $self->error( "An error occured while decoding data using $packing: $e", ( length( $buffer ) <= 1024 ? "\nData is: '$buffer'" : '' ) ) );
+            return( $self->error( "An error occured while decoding data using $packing with base64 set to '", ( $self->{base64} // '' ), "': $e" ) );
         }
     }
     else
@@ -337,7 +345,6 @@ sub read
         $data = $buffer;
     }
     
-    $self->messagef( 4, "Unpacked data is now %d bytes.", CORE::length( $data ) );
     # data decoded is not a reference and size was provided and is greater than 0
     if( !ref( $data ) && scalar( @_ ) > 2 && int( $_[2] ) > 0 )
     {
@@ -362,10 +369,8 @@ sub remove
     my $file = $self->{_cache_file} ||
         return( $self->error( "No cache file is set yet. Have you first opened the cache file with open()?" ) );
     return( $self->error( "Cache file found in our object is not a Module::Generic::File object." ) ) if( !$self->_is_a( $file => 'Module::Generic::File' ) );
-    $self->message( 4, "Checking to remove cache file \"${file}\"." );
     if( !$file->exists )
     {
-        $self->message( 4, "Cache file \"${file}\" already does not exist." );
         $self->removed(1);
         return( $self );
     }
@@ -419,7 +424,6 @@ sub reset
     my $file = $self->{_cache_file} ||
         return( $self->error( "No cache file is set yet. Have you first opened the cache file with open()?" ) );
     return( $self->error( "Cache file found in our object is not a Module::Generic::File object." ) ) if( !$self->_is_a( $file => 'Module::Generic::File' ) );
-    $self->message( 4, "Resetting file cache \"${file}\" with content '$default'" );
     $file->lock( exclusive => 1 );
     $self->write( $default );
     $file->unlock;
@@ -475,8 +479,9 @@ sub write
     my $file = $self->{_cache_file} ||
         return( $self->error( "No cache file is set yet. Have you first opened the cache file with open()?" ) );
     return( $self->error( "Cache file found in our object is not a Module::Generic::File object." ) ) if( !$self->_is_a( $file => 'Module::Generic::File' ) );
-    my $size = int( $self->size );
-    $self->message( 4, "Writing ${data} to cache file \"${file}\"." );
+    my $size = 0;
+    $size = $self->size // 0;
+    $size = int( "${size}" ) if( defined( $size ) );
     my $packing = $self->_packing_method;
     my $encoded;
     try
@@ -487,16 +492,23 @@ sub write
         }
         elsif( $packing eq 'cbor' )
         {
-            $encoded = $self->serialise( $data, serialiser => 'CBOR::XS', allow_sharing => 1 );
+            $encoded = $self->serialise( $data,
+                serialiser => 'CBOR::XS',
+                allow_sharing => 1,
+                ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
+            );
             return( $self->pass_error ) if( !defined( $encoded ) );
         }
         elsif( $packing eq 'sereal' )
         {
             $self->_load_class( 'Sereal::Encoder' ) || return( $self->pass_error );
+            my $const;
+            $const = \&{"Sereal\::Encoder::SRL_ZLIB"} if( defined( &{"Sereal\::Encoder::SRL_ZLIB"} ) );
             $encoded = $self->serialise( $data,
                 serialiser => 'Sereal',
                 freeze_callbacks => 1,
-                compress => &{"Sereal\::Encoder::SRL_ZLIB"}(),
+                ( defined( $const ) ? ( compress => $const->() ) : () ),
+                ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
             );
             return( $self->pass_error ) if( !defined( $encoded ) );
         }
@@ -505,7 +517,10 @@ sub write
         {
             # local $Storable::forgive_me = 1;
             # $encoded = Storable::Improved::freeze( $data );
-            $encoded = $self->serialise( $data, serialiser => 'Storable::Improved' );
+            $encoded = $self->serialise( $data,
+                serialiser => 'Storable::Improved',
+                ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
+            );
             return( $self->pass_error ) if( !defined( $encoded ) );
         }
     }
@@ -514,21 +529,26 @@ sub write
         return( $self->error( "An error occured encoding data provided using $packing: $e. Data was: '$data'" ) );
     }
     
-    if( $size > 0 && length( $encoded ) > $size )
+    # For some reason, I get warning that $size is uninitialised despite having initialised it and ensured it is defined
+    no warnings 'uninitialized';
+    $size //= 0;
+    if( defined( $size ) && 
+        ( $size > 0 ) && 
+        length( $encoded ) > $size )
     {
         return( $self->error( "Data to write are ", length( $encoded ), " bytes long and exceed the maximum you have set of '$size'." ) );
     }
     
-    $self->messagef( 4, "Writing %d bytes of encoded data to cache file \"${file}\".", CORE::length( $encoded ) );
+    # We use simple encapsulation to later remove irrelevant null-bytes and ensuring our data integrity
+    # FYI: MG = Module::Generic
+    # substr( $encoded, 0, 0, 'MG[' . length( $encoded ) . ']' );
+    
     $file->lock;
     $file->seek(0,0);
     $file->print( $encoded );
     $file->flush;
-    $self->messagef( 4, "Position in cache file \"${file}\" is %d", $file->tell );
     $file->truncate( $file->tell );
     $file->unlock;
-    $self->messagef( 4, "Cache file \"${file}\" is %d bytes big.", $file->length );
-    # $self->message( 3, "Successfully wrote ", length( $encoded ), " bytes of data to memory." );
     return( $self );
 }
 
@@ -701,7 +721,6 @@ sub _str2key
         # We use the root as a reliable and stable path.
         # I initially though about using __FILE__, but during testing this would be in ./blib/lib and beside one user might use a version of this module somewhere while the one used under Apache/mod_perl2 could be somewhere else and this would render the generation of the IPC key unreliable and unrepeatable
         my $val = $self->ftok( $id );
-        $self->message( 4, "Calling ftok() for key '$key' with numeric id '$id' returning '$val'." );
         return( $val );
     }
 }
@@ -712,11 +731,9 @@ sub DESTROY
     return unless( CORE::exists( $self->{_cache_file} ) && defined( $self->{_cache_file} ) && CORE::length( $self->{_cache_file} ) );
     my $cache_file = '';
     $cache_file = $self->{_cache_file} if( CORE::length( $self->{_cache_file} ) );
-    # $self->message( 4, "Called for cache file \"${cache_file}\" (", overload::StrVal( $cache_file ), ") with destroy flag set to '$self->{destroy}'" );
     $self->unlock;
     if( $self->destroy )
     {
-        # $self->message( 4, "Cache file \"${cache_file}\" (", overload::StrVal( $cache_file ), " is to be destroyed." );
         return if( !$self->_is_a( $cache_file => 'Module::Generic::File' ) );
         my $ref = $CACHE_TO_OBJECT->{ "$cache_file" };
         if( ref( $ref ) )
@@ -730,7 +747,6 @@ sub DESTROY
                     $i--;
                 }
             }
-            $self->message( 4, "Any other object left? ", scalar( @$ref ) ? 'yes' : 'no' );
             $self->remove if( !scalar( @$ref ) );
         }
     }
@@ -743,7 +759,8 @@ sub FREEZE
     my $class = CORE::ref( $self );
     my %hash  = %$self;
     # Return an array reference rather than a list so this works with Sereal and CBOR
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' || $serialiser eq 'CBOR' );
+    # On or before Sereal version 4.023, Sereal did not support multiple values returned
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
     # But Storable want a list with the first element being the serialised element
     CORE::return( $class, \%hash );
 }
@@ -838,11 +855,14 @@ Module::Generic::File::Cache - File-based Cache
         key => 'something',
         create => 1,
         mode => 0666,
+        base64 => 1,
+        # Could also be CBOR, Storable::Improved
+        serialiser => 'Sereal',
     ) || die( Module::Generic::File::Cache->error, "\n" );
 
 =head1 VERSION
 
-    v0.2.1
+    v0.2.3
 
 =head1 DESCRIPTION
 
@@ -857,6 +877,12 @@ This is particularly useful for system that lack support for shared cache. See L
 This instantiates a shared cache object. It takes the following parameters:
 
 =over 4
+
+=item I<base64>
+
+When set, this will instruct the serialiser used (see option I<serialiser>) to base64 encode and decode the data before writing and after reading.
+
+The value can be either a simple true value, such as C<1>, or a base64 encoder/decoder. Currently the only supported ones are: L<Crypt::Misc> and L<MIME::Base64>, or it can also be an array reference of 2 code references, one for encoding and one for decoding.
 
 =item I<cbor>
 
@@ -906,6 +932,10 @@ If you do not want to share it with any other user than yourself, setting mode t
 
 Provided with a value (true or false does not matter), and this will set L<Sereal> as the data serialisation mechanism when storing data to cache file.
 
+=item I<serialiser>
+
+The class name of the serialiser to use. Currently supported ones are: L<CBOR|CBOR::XS>, L<Sereal>, L<Storable::Improved> (or the legacy L<Storable>)
+
 =item I<size>
 
 The size in byte of the shared cache.
@@ -928,6 +958,12 @@ An object will be returned if it successfully initiated, or C<undef()> upon erro
         size => 65536,
         storable => 1,
     ) || die( Module::Generic::SharedMem->error );
+
+=head2 base64
+
+When set, this will instruct the serialiser used (see option I<serialiser>) to base64 encode and decode the data before writing and after reading.
+
+The value can be either a simple true value, such as C<1>, or a base64 encoder/decoder. Currently the only supported ones are: L<Crypt::Misc> and L<MIME::Base64>, or it can also be an array reference of 2 code references, one for encoding and one for decoding.
 
 =head2 binmode
 
@@ -1029,7 +1065,9 @@ Get a random key to be used as identifier to create a shared cache.
 
 =head2 read
 
-Read the content of the shared cached and decode the data read using L<JSON> or L<Storable/thaw> depending on your choice upon either object instantiation or upon using the methods L</json> or L</storable>
+Read the content of the shared cached and decode the data read using L<JSON>, L<CBOR|CBOR::XS>, L<Sereal> or L<Storable/thaw> depending on your choice of serialiser upon either object instantiation or upon using the methods L</json>, L</cbor>, L</sereal> or L</storable> or even more simply L</serialiser>
+
+By default, if no serialiser is specified, it will default to C<storable>.
 
 You can optionally provide a buffer, and a maximum length and it will read that much length and put the shared cache content decoded in that buffer, if it were provided.
 
@@ -1053,7 +1091,7 @@ If you do not provide any buffer, you can call L</read> like this and it will re
         die( $cache->error );
     }
 
-The content is stored in shared cache after being encoded with L<Storable/freeze>.
+The content is stored in shared cache after being encoded with the serialiser of choice.
 
 =head2 remove
 
@@ -1109,7 +1147,9 @@ Remove the lock, if any. The shared cache must first be opened.
 
 =head2 write
 
-Write the data provided to the shared cache, after having encoded it using L<JSON> or L<Storable/freeze> depending on your choice. See L</json> and L</storable>
+Write the data provided to the shared cache, after having encoded it using L<JSON>, L<CBOR|CBOR::XS>, L<Sereal> or L<Storable/freeze> depending on your serialiser of choice. See L</json>, L</cbor>, L</sereal> and L</storable> and more simply L</serialiser>
+
+By default, if no serialiser is specified, it will default to C<storable>.
 
 You can store in shared cache any kind of data excepted glob, such as scalar reference, array or hash reference. You could also store module objects, but L<JSON> only supports encoding objects that are based on array or hash. As the L<JSON> documentation states "other blessed references will be converted into null"
 
