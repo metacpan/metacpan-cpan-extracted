@@ -6,7 +6,7 @@ use Date::Holidays::NL;
 use DateTime;
 
 my $holidays = holidays(2019);
-is(keys %$holidays, 10, "Ten holidays found in the year 2019");
+is(keys %$holidays, 9, "Nine holidays found in the year 2019");
 
 $holidays = holidays(2019, gov => 1);
 is(
@@ -16,7 +16,7 @@ is(
 );
 
 $holidays = holidays(2020);
-is(keys %$holidays, 11, "Eleven holidays found in the year 2020");
+is(keys %$holidays, 10, "Eleven holidays found in the year 2020");
 
 is(is_holiday(2020, 4, 12, gov => 1, lang => 'nl'),
     "Pasen", 'Pasen is "guessed" correctly in Dutch');

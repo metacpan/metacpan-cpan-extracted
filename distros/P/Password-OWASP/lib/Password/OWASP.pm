@@ -1,8 +1,12 @@
-use utf8;
 package Password::OWASP;
-our $VERSION = '0.001';
+use warnings;
+use strict;
+
+our $VERSION = '0.002';
 
 # ABSTRACT: OWASP recommendations for password storage in perl
+
+1;
 
 __END__
 
@@ -16,7 +20,7 @@ Password::OWASP - OWASP recommendations for password storage in perl
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

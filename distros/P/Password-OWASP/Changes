@@ -2,6 +2,13 @@ Revision history for Password-OWASP
 
 TODO: Look into PBKDF2
 
+0.002     2022-08-12 19:06:39Z
+
+    * Maintainer release
+        * CPANTS was complaining about use strict/warnings
+        * Fix some author tests
+        * By removing use utf8 we become even useable on perl 5.6
+
 0.001     2019-11-02 19:12:32Z
 
     * Initial release

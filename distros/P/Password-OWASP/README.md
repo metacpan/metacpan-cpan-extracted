@@ -14,7 +14,7 @@ This allows for storing password which are longer that 72 characters.
 
 The check\_password method allows for weaker schemes as the module also allows
 for inplace updates on these passwords. Please note that clear text passwords
-need to be prepended with `{CLEARTEXT}` in order for [Authen::Passphrase](https://metacpan.org/pod/Authen::Passphrase) to
+need to be prepended with `{CLEARTEXT}` in order for [Authen::Passphrase](https://metacpan.org/pod/Authen%3A%3APassphrase) to
 do its work.
 
 # SYNOPSIS
@@ -40,12 +40,12 @@ do its work.
 
 # SEE ALSO
 
-- [Password::OWASP::Argon2](https://metacpan.org/pod/Password::OWASP::Argon2)
-- [Password::OWASP::Scrypt](https://metacpan.org/pod/Password::OWASP::Scrypt)
-- [Password::OWASP::Bcrypt](https://metacpan.org/pod/Password::OWASP::Bcrypt)
+- [Password::OWASP::Argon2](https://metacpan.org/pod/Password%3A%3AOWASP%3A%3AArgon2)
+- [Password::OWASP::Scrypt](https://metacpan.org/pod/Password%3A%3AOWASP%3A%3AScrypt)
+- [Password::OWASP::Bcrypt](https://metacpan.org/pod/Password%3A%3AOWASP%3A%3ABcrypt)
 - [OWASP cheatsheet for password storage](https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Password_Storage_Cheat_Sheet.md)
 - [OWASP cheatsheet for authentication storage](https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Authentication_Cheat_Sheet.md)
-- [Authen::Passphrase](https://metacpan.org/pod/Authen::Passphrase)
-- [Authen::Passphrase::Argon2](https://metacpan.org/pod/Authen::Passphrase::Argon2)
-- [Authen::Passphrase::Scrypt](https://metacpan.org/pod/Authen::Passphrase::Scrypt)
-- [Authen::Passphrase::BlowfishCrypt](https://metacpan.org/pod/Authen::Passphrase::BlowfishCrypt)
+- [Authen::Passphrase](https://metacpan.org/pod/Authen%3A%3APassphrase)
+- [Authen::Passphrase::Argon2](https://metacpan.org/pod/Authen%3A%3APassphrase%3A%3AArgon2)
+- [Authen::Passphrase::Scrypt](https://metacpan.org/pod/Authen%3A%3APassphrase%3A%3AScrypt)
+- [Authen::Passphrase::BlowfishCrypt](https://metacpan.org/pod/Authen%3A%3APassphrase%3A%3ABlowfishCrypt)

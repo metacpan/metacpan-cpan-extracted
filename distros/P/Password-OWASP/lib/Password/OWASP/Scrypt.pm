@@ -1,5 +1,5 @@
 package Password::OWASP::Scrypt;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use Moose;
 
 # ABSTRACT: An Scrypt implemenation of Password::OWASP
@@ -64,7 +64,7 @@ Password::OWASP::Scrypt - An Scrypt implemenation of Password::OWASP
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -73,6 +73,7 @@ version 0.001
     use Password::OWASP::Bcrypt;
 
     my $user = get_from_db();
+    my $from_web = "Some very secret password";
 
     my $owasp = Password::OWASP::Bcrypt->new(
         # optional
@@ -97,6 +98,10 @@ Implements Scrypt password checking.
 =head2 crypt_password
 
 Encrypt the password and return it as an RFC2307 formatted string.
+
+=head2 check_password
+
+Check if the password is the same as what was stored.
 
 =head1 SEE ALSO
 

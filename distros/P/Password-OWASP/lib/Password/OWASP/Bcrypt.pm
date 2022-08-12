@@ -1,5 +1,5 @@
 package Password::OWASP::Bcrypt;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use Moose;
 
 # ABSTRACT: A BlowfishCrypt implemenation of Password::OWASP
@@ -33,7 +33,7 @@ Password::OWASP::Bcrypt - A BlowfishCrypt implemenation of Password::OWASP
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -42,6 +42,7 @@ version 0.001
     use Password::OWASP::Bcrypt;
 
     my $user = get_from_db();
+    my $from_web = "Some very secret password";
 
     my $owasp = Password::OWASP::Bcrypt->new(
         # optional

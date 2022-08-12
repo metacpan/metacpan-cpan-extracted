@@ -4,7 +4,7 @@
       "Wesley Schwengle <waterkip@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
@@ -17,7 +17,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.008"
+            "perl" : "5.006"
          }
       },
       "develop" : {
@@ -42,7 +42,6 @@
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
             "Test::Pod::LinkCheck" : "0",
-            "Test::Portability::Files" : "0",
             "Test::Synopsis" : "0",
             "Test::Vars" : "0",
             "Test::Version" : "1"
@@ -60,7 +59,7 @@
             "Moose::Util::TypeConstraints" : "0",
             "Try::Tiny" : "0",
             "namespace::autoclean" : "0",
-            "perl" : "5.008"
+            "perl" : "5.006"
          }
       },
       "test" : {
@@ -72,34 +71,34 @@
             "Sub::Override" : "0",
             "Test::More" : "0.96",
             "Test::Most" : "0",
-            "perl" : "5.008"
+            "perl" : "5.006"
          }
       }
    },
    "provides" : {
       "Password::OWASP" : {
          "file" : "lib/Password/OWASP.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Password::OWASP::AbstractBase" : {
          "file" : "lib/Password/OWASP/AbstractBase.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Password::OWASP::AbstractBaseX" : {
          "file" : "lib/Password/OWASP/AbstractBaseX.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Password::OWASP::Argon2" : {
          "file" : "lib/Password/OWASP/Argon2.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Password::OWASP::Bcrypt" : {
          "file" : "lib/Password/OWASP/Bcrypt.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Password::OWASP::Scrypt" : {
          "file" : "lib/Password/OWASP/Scrypt.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -110,11 +109,9 @@
          "web" : "https://gitlab.com/waterkip/p5-password-owasp"
       }
    },
-   "version" : "0.001",
-   "x_contributors" : [
-      "Wesley Schwengle <wesley@schwengle.net>"
-   ],
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
+   "version" : "0.002",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.31",
+   "x_spdx_expression" : "BSD"
 }
 

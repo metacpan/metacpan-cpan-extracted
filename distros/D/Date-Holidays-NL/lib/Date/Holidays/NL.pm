@@ -1,5 +1,5 @@
 package Date::Holidays::NL;
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -104,6 +104,7 @@ my %EASTER_BASED = (
         d   => -2,
         nl  => 'Goede vrijdag',
         en  => 'Good friday',
+        gov => 1,
     },
     'easter' => {
         d   => 0,
@@ -120,14 +121,14 @@ my %EASTER_BASED = (
         nl  => 'Hemelvaartsdag',
         en  => 'Ascension day',
     },
-    'pentecost' => {
+    pentecost => {
         d   => 49,
         nl  => 'Pinksteren',
         en  => 'Pentecost',
     },
-    'pentecost-2' => {
+    pentecost2 => {
         d   => 50,
-        nl  => 'Pinksteren',
+        nl  => 'Tweede pinksterdag',
         en  => 'Pentecost',
     }
 );
@@ -152,12 +153,14 @@ sub holidays {
         my $holiday = $FIXED_DATES{$_};
 
         if (my $int = $holiday->{interval}) {
-            if ($args{gov} && $holiday->{gov}) {
-                # We should have this
-            }
-            else {
+            if (!$args{gov}) {
                 next if $year % $int != 0;
             }
+        }
+        # Skip government holidays, currently good friday only
+        # https://wetten.overheid.nl/BWBR0002448/2010-10-10
+        elsif (!$args{gov} && $holiday->{gov}) {
+            next;
         }
 
         if (my $start = $holiday->{year_started}) {
@@ -185,6 +188,9 @@ sub holidays {
     my $dt = _to_date(1, 1, $year);
     foreach (keys %EASTER_BASED) {
         my $holiday = $EASTER_BASED{$_};
+        if (!$args{gov} && $holiday->{gov}) {
+            next;
+        }
         my $easter  = DateTime::Event::Easter->new(
             easter => 'western',
             day    => $holiday->{d}
@@ -259,14 +265,14 @@ Date::Holidays::NL - The Netherlands official holidays
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
     use Date::Holidays::NL;
 
     if (my $thing = is_holiday(2020, 5, 5, lang => 'en')) {
-        print "It is $thing!", $/; # prints liberation day
+        print "It is $thing!", $/; # prints 'It is Liberation day!'
     }
 
 =head1 DESCRIPTION
@@ -275,8 +281,15 @@ A L<Date::Holidays> family member from the Netherlands
 
 =head1 METHODS
 
-This module implements the C<is_holiday> and C<holiday> functions from
-L<Date::Holidays::Abstract>.
+This module implements the C<is_holiday>, C<is_holiday_dt> and C<holiday>
+functions from L<Date::Holidays::Abstract>.
+
+All methods accept additional parameters. The most important is a flag called
+C<gov>, when supplied you will get days that the government considers special
+in regards to service terms. It essentially says that if a company or
+government needs to contact you before or on that day it can be expedited to
+the following work day. See the L<relevant
+law|https://wetten.overheid.nl/BWBR0002448/2010-10-10> for more information.
 
 =head2 is_holiday(yyyy, mm, dd, %additional)
 
@@ -288,7 +301,7 @@ L<Date::Holidays::Abstract>.
 
 =head2 is_holiday_dt(dt, %additional)
 
-    is_holiday(
+    is_holiday_dt(
         DateTime->new(
             year      => 2022,
             month     => 5,
@@ -304,6 +317,14 @@ L<Date::Holidays::Abstract>.
     holidays('2022', gov  => 1);
 
 Similar API to the other functions, returns an hashref for the year.
+
+=head1 SEE ALSO
+
+=over
+
+=item https://wetten.overheid.nl/BWBR0002448/2010-10-10
+
+=back
 
 =head1 AUTHOR
 

@@ -1,5 +1,5 @@
 package Password::OWASP::AbstractBaseX;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use Moose::Role;
 use namespace::autoclean;
 
@@ -66,7 +66,7 @@ Password::OWASP::AbstractBaseX - Abstract base class to implement OWASP password
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
