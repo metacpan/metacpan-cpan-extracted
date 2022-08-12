@@ -18,7 +18,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.41';
+our $VERSION = '0.43';
 
 =head1 NAME
 
@@ -169,6 +169,8 @@ our @option_spec = (
     'anyauth',           # ignored
     'basic',
     'buffer!',
+    'capath=s',
+    'cert|E=s',
     'compressed',
     'cookie|b=s',
     'cookie-jar|c=s',
@@ -555,6 +557,8 @@ sub _build_request( $self, $uri, $options, %build_options ) {
             headers => \%headers,
             body   => $body,
             maybe auth => $auth,
+            maybe cert => $options->{cert},
+            maybe capath => $options->{capath},
             maybe credentials => $options->{ user },
             maybe output => $options->{ output },
             maybe timeout => $options->{ 'max-time' },

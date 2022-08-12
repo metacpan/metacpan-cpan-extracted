@@ -3,9 +3,9 @@ package Sah::Schema::hexstr;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-09'; # DATE
+our $DATE = '2022-07-05'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $schema = [str => {
     summary => 'String of bytes in hexadecimal',
@@ -37,7 +37,7 @@ Sah::Schema::hexstr - String of bytes in hexadecimal
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::Schema::hexstr (from Perl distribution Sah-Schemas-Str), released on 2022-06-09.
+This document describes version 0.009 of Sah::Schema::hexstr (from Perl distribution Sah-Schemas-Str), released on 2022-07-05.
 
 =head1 SYNOPSIS
 
@@ -71,11 +71,11 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "a0";
+ $data = "a0ff12345678";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = "a0f";
+ $data = "a0fg";
  my $errmsg = $validator->($data); # => "Must match regex pattern qr(\\A(?:[0-9A-Fa-f]{2})*\\z)"
 
 Often a schema has coercion rule or default value, so after validation the
@@ -86,12 +86,12 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "a0";
- my $res = $validator->($data); # => ["","a0"]
+ $data = "a0ff12345678";
+ my $res = $validator->($data); # => ["","a0ff12345678"]
  
  # a sample invalid data
- $data = "a0f";
- my $res = $validator->($data); # => ["Must match regex pattern qr(\\A(?:[0-9A-Fa-f]{2})*\\z)","a0f"]
+ $data = "a0fg";
+ my $res = $validator->($data); # => ["Must match regex pattern qr(\\A(?:[0-9A-Fa-f]{2})*\\z)","a0fg"]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like

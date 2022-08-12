@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.17
+    version 0.18
 
 SYNOPSIS
 
@@ -23,6 +23,16 @@ DESCRIPTION
     use that. If it cannot be found, the source code will be downloaded
     from the internet and it will be installed in a private share location
     for the use of other modules.
+
+HELPERS
+
+    This Alien provides the following helpers which will execute the
+    corresponding command. You want to use the helpers because they will
+    use the correct incantation on Windows.
+
+    automake
+
+    aclocal
 
 CAVEATS
 

@@ -72,6 +72,6 @@
          "web" : "https://gitlab.com/jackdeguest/Promise-Me"
       }
    },
-   "version" : "v0.4.2",
+   "version" : "v0.4.3",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

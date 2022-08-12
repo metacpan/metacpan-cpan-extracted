@@ -5,7 +5,7 @@ use warnings;
 
 our $USES_MITE = "Mite::Role";
 our $MITE_SHIM = "MyTest::Mite";
-our $MITE_VERSION = "0.008003";
+our $MITE_VERSION = "0.009000";
 BEGIN {
     require MyTest::Role1;
     our %DOES = ( "MyTest::Role2" => 1, "MyTest::Role1" => 1 );

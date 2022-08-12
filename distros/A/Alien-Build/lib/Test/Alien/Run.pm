@@ -6,7 +6,7 @@ use 5.008004;
 use Test2::API qw( context );
 
 # ABSTRACT: Run object
-our $VERSION = '2.51'; # VERSION
+our $VERSION = '2.52'; # VERSION
 
 
 sub out    { shift->{out} }
@@ -173,7 +173,7 @@ Test::Alien::Run - Run object
 
 =head1 VERSION
 
-version 2.51
+version 2.52
 
 =head1 SYNOPSIS
 

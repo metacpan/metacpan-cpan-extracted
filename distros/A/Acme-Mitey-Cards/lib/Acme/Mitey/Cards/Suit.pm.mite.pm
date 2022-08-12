@@ -3,13 +3,42 @@
     package Acme::Mitey::Cards::Suit;
     use strict;
     use warnings;
+    no warnings qw( once void );
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Acme::Mitey::Cards::Mite";
-    our $MITE_VERSION = "0.007003";
+    our $MITE_VERSION = "0.010002";
 
+    # Mite keywords
+    BEGIN {
+        my ( $SHIM, $CALLER ) =
+          ( "Acme::Mitey::Cards::Mite", "Acme::Mitey::Cards::Suit" );
+        (
+            *after, *around, *before,        *extends, *field,
+            *has,   *param,  *signature_for, *with
+          )
+          = do {
+
+            package Acme::Mitey::Cards::Mite;
+            no warnings 'redefine';
+            (
+                sub { $SHIM->HANDLE_after( $CALLER, "class", @_ ) },
+                sub { $SHIM->HANDLE_around( $CALLER, "class", @_ ) },
+                sub { $SHIM->HANDLE_before( $CALLER, "class", @_ ) },
+                sub { },
+                sub { $SHIM->HANDLE_has( $CALLER, field => @_ ) },
+                sub { $SHIM->HANDLE_has( $CALLER, has   => @_ ) },
+                sub { $SHIM->HANDLE_has( $CALLER, param => @_ ) },
+                sub { $SHIM->HANDLE_signature_for( $CALLER, "class", @_ ) },
+                sub { $SHIM->HANDLE_with( $CALLER, @_ ) },
+            );
+          };
+    }
+
+    # Mite imports
     BEGIN {
         require Scalar::Util;
+        *STRICT  = \&Acme::Mitey::Cards::Mite::STRICT;
         *bare    = \&Acme::Mitey::Cards::Mite::bare;
         *blessed = \&Scalar::Util::blessed;
         *carp    = \&Acme::Mitey::Cards::Mite::carp;
@@ -24,6 +53,28 @@
         *true    = \&Acme::Mitey::Cards::Mite::true;
     }
 
+    # Gather metadata for constructor and destructor
+    sub __META__ {
+        no strict 'refs';
+        no warnings 'once';
+        my $class = shift;
+        $class = ref($class) || $class;
+        my $linear_isa = mro::get_linear_isa($class);
+        return {
+            BUILD => [
+                map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+                map { "$_\::BUILD" } reverse @$linear_isa
+            ],
+            DEMOLISH => [
+                map   { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+                  map { "$_\::DEMOLISH" } @$linear_isa
+            ],
+            HAS_BUILDARGS        => $class->can('BUILDARGS'),
+            HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
+        };
+    }
+
+    # Standard Moose/Moo-style constructor
     sub new {
         my $class = ref( $_[0] ) ? ref(shift) : shift;
         my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
@@ -34,7 +85,8 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Attribute: name
+        # Attribute name (type: NonEmptyStr)
+        # has declaration, file lib/Acme/Mitey/Cards/Suit.pm, line 9
         croak "Missing key in constructor: name" unless exists $args->{"name"};
         (
             (
@@ -57,7 +109,8 @@
           "NonEmptyStr";
         $self->{"name"} = $args->{"name"};
 
-        # Attribute: abbreviation
+        # Attribute abbreviation (type: Str)
+        # has declaration, file lib/Acme/Mitey/Cards/Suit.pm, line 19
         if ( exists $args->{"abbreviation"} ) {
             do {
 
@@ -73,7 +126,8 @@
             $self->{"abbreviation"} = $args->{"abbreviation"};
         }
 
-        # Attribute: colour
+        # Attribute colour (type: Str)
+        # has declaration, file lib/Acme/Mitey/Cards/Suit.pm, line 21
         croak "Missing key in constructor: colour"
           unless exists $args->{"colour"};
         do {
@@ -88,25 +142,27 @@
           "colour", "Str";
         $self->{"colour"} = $args->{"colour"};
 
-        # Enforce strict constructor
+        # Call BUILD methods
+        $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
+
+        # Unrecognized parameters
         my @unknown = grep not(/\A(?:abbreviation|colour|name)\z/),
           keys %{$args};
         @unknown
           and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
-        # Call BUILD methods
-        $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
-
         return $self;
     }
 
+    # Used by constructor to call BUILD methods
     sub BUILDALL {
         my $class = ref( $_[0] );
         my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
         $_->(@_) for @{ $meta->{BUILD} || [] };
     }
 
+    # Destructor should call DEMOLISH methods
     sub DESTROY {
         my $self  = shift;
         my $class = ref($self) || $self;
@@ -127,46 +183,14 @@
         return;
     }
 
-    sub __META__ {
-        no strict 'refs';
-        no warnings 'once';
-        my $class = shift;
-        $class = ref($class) || $class;
-        my $linear_isa = mro::get_linear_isa($class);
-        return {
-            BUILD => [
-                map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-                map { "$_\::BUILD" } reverse @$linear_isa
-            ],
-            DEMOLISH => [
-                map   { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-                  map { "$_\::DEMOLISH" } @$linear_isa
-            ],
-            HAS_BUILDARGS        => $class->can('BUILDARGS'),
-            HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
-        };
-    }
-
-    sub DOES {
-        my ( $self, $role ) = @_;
-        our %DOES;
-        return $DOES{$role} if exists $DOES{$role};
-        return 1            if $role eq __PACKAGE__;
-        return $self->SUPER::DOES($role);
-    }
-
-    sub does {
-        shift->DOES(@_);
-    }
-
     my $__XS = !$ENV{MITE_PURE_PERL}
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
     # Accessors for abbreviation
+    # has declaration, file lib/Acme/Mitey/Cards/Suit.pm, line 19
     sub abbreviation {
-        @_ > 1
-          ? croak("abbreviation is a read-only attribute of @{[ref $_[0]]}")
-          : (
+        @_ == 1 or croak('Reader "abbreviation" usage: $self->abbreviation()');
+        (
             exists( $_[0]{"abbreviation"} ) ? $_[0]{"abbreviation"} : (
                 $_[0]{"abbreviation"} = do {
                     my $default_value = $_[0]->_build_abbreviation;
@@ -184,10 +208,11 @@
                     $default_value;
                 }
             )
-          );
+        );
     }
 
     # Accessors for colour
+    # has declaration, file lib/Acme/Mitey/Cards/Suit.pm, line 21
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -196,13 +221,13 @@
     }
     else {
         *colour = sub {
-            @_ > 1
-              ? croak("colour is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"colour"};
+            @_ == 1 or croak('Reader "colour" usage: $self->colour()');
+            $_[0]{"colour"};
         };
     }
 
     # Accessors for name
+    # has declaration, file lib/Acme/Mitey/Cards/Suit.pm, line 9
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -211,12 +236,26 @@
     }
     else {
         *name = sub {
-            @_ > 1
-              ? croak("name is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"name"};
+            @_ == 1 or croak('Reader "name" usage: $self->name()');
+            $_[0]{"name"};
         };
     }
 
+    # See UNIVERSAL
+    sub DOES {
+        my ( $self, $role ) = @_;
+        our %DOES;
+        return $DOES{$role} if exists $DOES{$role};
+        return 1            if $role eq __PACKAGE__;
+        return $self->SUPER::DOES($role);
+    }
+
+    # Alias for Moose/Moo-compatibility
+    sub does {
+        shift->DOES(@_);
+    }
+
+    # Method signatures
     our %SIGNATURE_FOR;
 
     $SIGNATURE_FOR{"clubs"} = sub {
@@ -225,15 +264,13 @@
         my ( %tmp, $tmp, @head );
 
         @_ == 1
-          or croak(
-            "Wrong number of parameters in signature for %s: %s, got %d",
-            "clubs", "expected exactly 1 parameters",
-            scalar(@_)
-          );
+          or
+          croak( "Wrong number of parameters in signature for %s: got %d, %s",
+            "clubs", scalar(@_), "expected exactly 1 parameters" );
 
         @head = splice( @_, 0, 1 );
 
-        # Parameter $head[0] (type: Defined)
+        # Parameter invocant (type: Defined)
         ( defined( $head[0] ) )
           or croak( "Type check failed in signature for clubs: %s should be %s",
             "\$_[0]", "Defined" );
@@ -247,15 +284,13 @@
         my ( %tmp, $tmp, @head );
 
         @_ == 1
-          or croak(
-            "Wrong number of parameters in signature for %s: %s, got %d",
-            "diamonds", "expected exactly 1 parameters",
-            scalar(@_)
-          );
+          or
+          croak( "Wrong number of parameters in signature for %s: got %d, %s",
+            "diamonds", scalar(@_), "expected exactly 1 parameters" );
 
         @head = splice( @_, 0, 1 );
 
-        # Parameter $head[0] (type: Defined)
+        # Parameter invocant (type: Defined)
         ( defined( $head[0] ) )
           or
           croak( "Type check failed in signature for diamonds: %s should be %s",
@@ -270,15 +305,13 @@
         my ( %tmp, $tmp, @head );
 
         @_ == 1
-          or croak(
-            "Wrong number of parameters in signature for %s: %s, got %d",
-            "hearts", "expected exactly 1 parameters",
-            scalar(@_)
-          );
+          or
+          croak( "Wrong number of parameters in signature for %s: got %d, %s",
+            "hearts", scalar(@_), "expected exactly 1 parameters" );
 
         @head = splice( @_, 0, 1 );
 
-        # Parameter $head[0] (type: Defined)
+        # Parameter invocant (type: Defined)
         ( defined( $head[0] ) )
           or
           croak( "Type check failed in signature for hearts: %s should be %s",
@@ -293,15 +326,13 @@
         my ( %tmp, $tmp, @head );
 
         @_ == 1
-          or croak(
-            "Wrong number of parameters in signature for %s: %s, got %d",
-            "spades", "expected exactly 1 parameters",
-            scalar(@_)
-          );
+          or
+          croak( "Wrong number of parameters in signature for %s: got %d, %s",
+            "spades", scalar(@_), "expected exactly 1 parameters" );
 
         @head = splice( @_, 0, 1 );
 
-        # Parameter $head[0] (type: Defined)
+        # Parameter invocant (type: Defined)
         ( defined( $head[0] ) )
           or
           croak( "Type check failed in signature for spades: %s should be %s",
@@ -316,15 +347,13 @@
         my ( %tmp, $tmp, @head );
 
         @_ == 1
-          or croak(
-            "Wrong number of parameters in signature for %s: %s, got %d",
-            "standard_suits", "expected exactly 1 parameters",
-            scalar(@_)
-          );
+          or
+          croak( "Wrong number of parameters in signature for %s: got %d, %s",
+            "standard_suits", scalar(@_), "expected exactly 1 parameters" );
 
         @head = splice( @_, 0, 1 );
 
-        # Parameter $head[0] (type: Defined)
+        # Parameter invocant (type: Defined)
         ( defined( $head[0] ) )
           or croak(
 "Type check failed in signature for standard_suits: %s should be %s",

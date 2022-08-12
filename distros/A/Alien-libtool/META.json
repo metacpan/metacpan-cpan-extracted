@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,6 +37,16 @@
          }
       },
       "develop" : {
+         "recommends" : {
+            "Dist::Zilla::Plugin::AlienBase::Doc" : "0",
+            "Dist::Zilla::Plugin::AlienBuild" : "0",
+            "Dist::Zilla::Plugin::Author::Plicease::Thanks" : "0",
+            "Dist::Zilla::Plugin::Author::Plicease::Upload" : "0",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::Plugin::RemovePrereqs" : "0",
+            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.69",
+            "Software::License::Perl_5" : "0"
+         },
          "requires" : {
             "File::Spec" : "0",
             "FindBin" : "0",
@@ -63,8 +73,8 @@
          "requires" : {
             "Env" : "0",
             "File::chdir" : "0",
-            "Test2::V0" : "0.000060",
-            "Test::Alien" : "0",
+            "Test2::V0" : "0.000121",
+            "Test::Alien" : "2.52",
             "perl" : "5.008001"
          }
       }
@@ -72,19 +82,19 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/Perl5-Alien/Alien-libtool/issues"
+         "web" : "https://github.com/PerlAlien/Alien-libtool/issues"
       },
       "homepage" : "https://metacpan.org/pod/Alien::libtool",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/Perl5-Alien/Alien-libtool.git",
-         "web" : "https://github.com/Perl5-Alien/Alien-libtool"
+         "url" : "git://github.com/PerlAlien/Alien-libtool.git",
+         "web" : "https://github.com/PerlAlien/Alien-libtool"
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_alienfile" : {
-      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.29",
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {
          "share" : {
             "Alien::m4" : "0.11",
@@ -108,8 +118,9 @@
       "Zaki Mughal (zmughal, sivoais)",
       "Chase Whitener (genio, CAPOEIRAB)"
    ],
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }
 

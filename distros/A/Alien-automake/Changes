@@ -1,5 +1,8 @@
 Revision history for Alien-automake
 
+0.18      2022-08-11 16:13:16 -0600
+  - Added helpers for automake and aclocal (gh#14)
+
 0.17      2022-04-03 06:34:22 -0600
   - Disable makeinfo documentation generation for share install (gh#11, gh#12)
 

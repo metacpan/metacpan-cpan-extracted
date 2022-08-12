@@ -19,6 +19,7 @@ Files: Changes
  lib/Sub/HandlesVia/HandlerLibrary/Number.pm
  lib/Sub/HandlesVia/HandlerLibrary/Scalar.pm
  lib/Sub/HandlesVia/HandlerLibrary/String.pm
+ lib/Sub/HandlesVia/Mite.pm
  lib/Sub/HandlesVia/Toolkit.pm.mite.pm
  lib/Sub/HandlesVia/Toolkit/Mite.pm
  lib/Sub/HandlesVia/Toolkit/Mite.pm.mite.pm
@@ -158,13 +159,6 @@ Files: README
 Copyright: This software is copyright (c) 2020, 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/20moosex_extended.t
- t/31egpod_dummy.t
- t/40mite/00-basic.t
- t/40mite/01-roles.t
-Copyright: This software is copyright (c) 2022 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: INSTALL
  LICENSE
  Makefile.PL
@@ -172,20 +166,26 @@ Files: INSTALL
 Copyright: Unknown
 License: Unknown
 
+Files: t/20moosex_extended.t
+ t/31egpod_dummy.t
+ t/40mite/00-basic.t
+ t/40mite/01-roles.t
+Copyright: This software is copyright (c) 2022 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: COPYRIGHT
  CREDITS
  SIGNATURE
 Copyright: None
 License: public-domain
 
-Files: lib/Sub/HandlesVia/Mite.pm
- t/40mite/lib/MyTest/Mite.pm
-Copyright: This software is copyright (c) 2011-2014 by Michael G Schwern.
- This software is copyright (c) 2022 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: t/01basic.t
 Copyright: This software is copyright (c) 2020 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/40mite/lib/MyTest/Mite.pm
+Copyright: This software is copyright (c) 2011-2014 by Michael G Schwern.
+ This software is copyright (c) 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

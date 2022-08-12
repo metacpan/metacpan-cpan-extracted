@@ -1,16 +1,15 @@
+## no critic: TestingAndDebugging::RequireUseStrict
 package Module::List::More;
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-12-22'; # DATE
-our $DIST = 'Module-List-More'; # DIST
-our $VERSION = '0.004010'; # VERSION
 
 #IFUNBUILT
 # # use strict 'subs', 'vars';
 # # use warnings;
 #END IFUNBUILT
 
-my $has_globstar;
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-08-12'; # DATE
+our $DIST = 'Module-List-More'; # DIST
+our $VERSION = '0.004011'; # VERSION
 
 # do our own exporting to start faster
 sub import {
@@ -41,10 +40,13 @@ sub list_modules($$) {
     # filter by wildcard. we cannot do this sooner because wildcard can be put
     # at the end or at the beginning (e.g. '*::Path') so we still need
     my $re_wildcard;
-    if ($options->{wildcard}) {
+    if ($options->{wildcard} || $options->{ls_mode}) {
         require String::Wildcard::Bash;
         my $orig_prefix = $prefix;
+        #print "DEBUG: orig_prefix = <$orig_prefix>\n";
         my @prefix_parts = split /::/, $prefix;
+        pop @prefix_parts if $options->{ls_mode} && @prefix_parts && $orig_prefix !~ /::\z/
+            && !String::Wildcard::Bash::contains_wildcard($orig_prefix);
         $prefix = "";
         my $has_wildcard;
         while (defined(my $part = shift @prefix_parts)) {
@@ -57,11 +59,18 @@ sub list_modules($$) {
                 $prefix .= "$part\::";
             }
         }
-        if ($has_wildcard) {
-            $re_wildcard = convert_wildcard_to_re($orig_prefix);
+        #print "DEBUG: has_wildcard = $has_wildcard\n";
+        if ($options->{wildcard} && $has_wildcard) {
+            $re_wildcard = String::Wildcard::Bash::convert_wildcard_to_re({path_separator=>':', dotglob=>1, globstar=>1}, $orig_prefix);
+            $re_wildcard = qr/\A(?:$re_wildcard)\z/;
+        } else {
+            $re_wildcard = $orig_prefix =~ /::\z/ ? qr/\A\Q$orig_prefix\E/ : qr/\A\Q$orig_prefix\E(?:\z|::)/;
         }
-        $recurse = 1 if $has_globstar;
+        #print "DEBUG: re_wildcard = $re_wildcard\n";
+        $recurse = 1 if String::Wildcard::Bash::contains_globstar_wildcard($orig_prefix);
+        #print "DEBUG: recurse = $recurse\n";
     }
+    #print "DEBUG: prefix = <$prefix>\n";
 
     die "bad module name prefix `$prefix'"
         unless $prefix =~ /\A(?:${root_notleaf_rx}::
@@ -92,6 +101,7 @@ sub list_modules($$) {
                 unless exists $results{$key}{$result_field};
         }
     };
+    #use DD; dd \@prefixes;
     while(@prefixes) {
         my $prefix = pop(@prefixes);
         my @dir_suffix = split(/::/, $prefix);
@@ -110,6 +120,7 @@ sub list_modules($$) {
                        ($list_pod &&
                         $entry =~ $pod_rx)) {
                     my $key = $prefix.$1;
+                    #print "DEBUG: key=<$key>\n";
                     next if $re_wildcard && $key !~ $re_wildcard;
                     my $path = "$dir/$entry";
                     $_set_or_add_result->($key);
@@ -165,68 +176,6 @@ sub list_modules($$) {
     return \%results;
 }
 
-sub convert_wildcard_to_re {
-    $has_globstar = 0;
-    my $re = _convert_wildcard_to_re(@_);
-    $re = qr/\A$re\z/;
-    #print "DEBUG: has_globstar=<$has_globstar>, re=$re\n";
-    $re;
-}
-
-# modified from String::Wildcard::Bash 0.040's convert_wildcard_to_re
-sub _convert_wildcard_to_re {
-    my $opts = ref $_[0] eq 'HASH' ? shift : {};
-    my $str = shift;
-
-    my $opt_brace   = $opts->{brace} // 1;
-
-    my @res;
-    my $p;
-    while ($str =~ /$String::Wildcard::Bash::RE_WILDCARD_BASH/g) {
-        my %m = %+;
-        if (defined($p = $m{bash_brace_content})) {
-            push @res, quotemeta($m{slashes_before_bash_brace}) if
-                $m{slashes_before_bash_brace};
-            if ($opt_brace) {
-                my @elems;
-                while ($p =~ /($String::Wildcard::Bash::re_bash_brace_element)(,|\z)/g) {
-                    push @elems, $1;
-                    last unless $2;
-                }
-                #use DD; dd \@elems;
-                push @res, "(?:", join("|", map {
-                    convert_wildcard_to_re({
-                        bash_brace => 0,
-                    }, $_)} @elems), ")";
-            } else {
-                push @res, quotemeta($m{bash_brace});
-            }
-
-        } elsif (defined($p = $m{bash_joker})) {
-            if ($p eq '?') {
-                push @res, '[^:]';
-            } elsif ($p eq '*') {
-                push @res, '[^:]*';
-            } elsif ($p eq '**') {
-                $has_globstar++;
-                push @res, '.*';
-            }
-
-        } elsif (defined($p = $m{literal_brace_single_element})) {
-            push @res, quotemeta($p);
-        } elsif (defined($p = $m{bash_class})) {
-            # XXX no need to escape some characters?
-            push @res, $p;
-        } elsif (defined($p = $m{sql_joker})) {
-            push @res, quotemeta($p);
-        } elsif (defined($p = $m{literal})) {
-            push @res, quotemeta($p);
-        }
-    }
-
-    join "", @res;
-}
-
 1;
 # ABSTRACT: Module::List, with more options
 
@@ -242,7 +191,7 @@ Module::List::More - Module::List, with more options
 
 =head1 VERSION
 
-This document describes version 0.004010 of Module::List::More (from Perl distribution Module-List-More), released on 2020-12-22.
+This document describes version 0.004011 of Module::List::More (from Perl distribution Module-List-More), released on 2022-08-12.
 
 =head1 SYNOPSIS
 
@@ -361,15 +310,20 @@ results in something like:
      "Module::Pluggable"                => undef,
  }
 
+=item * Recognize c<ls_mode> option
+
+This makes C<list_modules()> behave more like Unix B<ls> utility. When given
+prefix e.g. C<strict> then it will search from the root namespace instead of
+from C<strict::> thus finding C<strict.pm> itself. When given prefix e.g.
+C<Module::List> it will start search in the C<Module::> namespace instead of
+C<Module::List::> thus finding C<Module::List> itself.
+
+However, given C<strict::> or C<Module::List::> will force search from that
+namespace.
+
 =back
 
 =for Pod::Coverage .+
-
-=head1 HISTORY
-
-This module began its life as L<PERLANCAR::Module::List>, my personal
-experimental fork of L<Module::List>. The experiment has also produced other
-forks like L<Module::List::Tiny>, L<Module::List::Wildcard>.
 
 =head1 HOMEPAGE
 
@@ -378,14 +332,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Module-Lis
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Module-List-More>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Module-List-More/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -397,15 +343,47 @@ L<Module::List::Wildcard> is spun off from this module with the main feature of
 wildcard. I might deprecate one of the modules in the future, but currently I
 maintain both.
 
+=head1 HISTORY
+
+This module began its life as L<PERLANCAR::Module::List>, my personal
+experimental fork of L<Module::List>. The experiment has also produced other
+forks like L<Module::List::Tiny>, L<Module::List::Wildcard>.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Module-List-More>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

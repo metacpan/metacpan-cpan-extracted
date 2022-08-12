@@ -205,6 +205,43 @@ DESCRIPTION
        );
      }
 
+     You should be able to use Sub::HandlesVia with L<Mite> 0.001011 or above.
+     Your project will still have a dependency on Sub::HandlesVia.
+
+      package MyApp::Kitchen {
+        use MyApp::Mite;
+        use Sub::HandlesVia;
+    
+        has food => (
+          is          => 'ro',
+          isa         => 'ArrayRef[Str]',
+          handles_via => 'Array',
+          default     => sub { [] },
+          handles     => {
+            'add_food'    => 'push',
+            'find_food'   => 'grep',
+          },
+        );
+      }
+
+    If you have Mite 0.009000 or above, you can probably use its `handles_via`
+    support, and avoid your project having a Sub::HandlesVia dependency!
+
+     package MyApp::Kitchen {
+       use MyApp::Mite;
+   
+       has food => (
+         is          => 'ro',
+         isa         => 'ArrayRef[Str]',
+         handles_via => 'Array',
+         default     => sub { [] },
+         handles     => {
+           'add_food'    => 'push',
+           'find_food'   => 'grep',
+         },
+       );
+     }
+
   Using with Anything
     For Moose and Mouse, Sub::HandlesVia can use their metaobject protocols to
     grab an attribute's definition and install the methods it needs to. For

@@ -25,7 +25,7 @@ our
     ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE, $AUTOLOAD, $INIT, $DEBUG, %SPEED_MAP,
      $NOSUCH, $BIGINT, $REPEATERS);
 
-$VERSION = '3.86';
+$VERSION = '3.87';
 
 =head1 NAME
 
@@ -33,7 +33,7 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.86
+SNMP::Info - Version 3.87
 
 =head1 AUTHOR
 
@@ -64,6 +64,14 @@ list any missing functionality (such as neighbor discovery tables).
                             DestHost    => 'router',
                             Community   => 'public',
                             Version     => 2
+                            # Parameter reference for SNMPv3
+                            # Version   => 3
+                            # SecLevel  => 'authPriv', # authPriv|authNoPriv|noAuthNoPriv
+                            # SecName   => 'myuser',
+                            # AuthProto => 'MD5',      # MD5|SHA
+                            # AuthPass  => 'authp4ss',
+                            # PrivProto => 'DES',      # DES|AES
+                            # PrivPass  => 'pr1vp4ss',
                           ) or die "Can't connect to device.\n";
 
  my $err = $info->error();
@@ -434,6 +442,12 @@ See documentation in L<SNMP::Info::MRO> for details.
 F<S5-AGENT-MIB>, F<S5-CHASSIS-MIB>.
 
 See documentation in L<SNMP::Info::NortelStack> for details.
+
+=item SNMP::Info::PortAccessEntity
+
+F<IEEE8021-PAE-MIB>
+
+See documentation in L<SNMP::Info::PortAccessEntity> for details.
 
 =item SNMP::Info::PowerEthernet
 

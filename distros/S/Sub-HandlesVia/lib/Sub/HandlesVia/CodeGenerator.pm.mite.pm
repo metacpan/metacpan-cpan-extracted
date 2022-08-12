@@ -3,11 +3,39 @@
     package Sub::HandlesVia::CodeGenerator;
     use strict;
     use warnings;
+    no warnings qw( once void );
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Sub::HandlesVia::Mite";
-    our $MITE_VERSION = "0.008003";
+    our $MITE_VERSION = "0.010002";
 
+    # Mite keywords
+    BEGIN {
+        my ( $SHIM, $CALLER ) =
+          ( "Sub::HandlesVia::Mite", "Sub::HandlesVia::CodeGenerator" );
+        (
+            *after, *around, *before,        *extends, *field,
+            *has,   *param,  *signature_for, *with
+          )
+          = do {
+
+            package Sub::HandlesVia::Mite;
+            no warnings 'redefine';
+            (
+                sub { $SHIM->HANDLE_after( $CALLER, "class", @_ ) },
+                sub { $SHIM->HANDLE_around( $CALLER, "class", @_ ) },
+                sub { $SHIM->HANDLE_before( $CALLER, "class", @_ ) },
+                sub { },
+                sub { $SHIM->HANDLE_has( $CALLER, field => @_ ) },
+                sub { $SHIM->HANDLE_has( $CALLER, has   => @_ ) },
+                sub { $SHIM->HANDLE_has( $CALLER, param => @_ ) },
+                sub { $SHIM->HANDLE_signature_for( $CALLER, "class", @_ ) },
+                sub { $SHIM->HANDLE_with( $CALLER, @_ ) },
+            );
+          };
+    }
+
+    # Mite imports
     BEGIN {
         require Scalar::Util;
         *STRICT  = \&Sub::HandlesVia::Mite::STRICT;
@@ -23,6 +51,27 @@
         *rw      = \&Sub::HandlesVia::Mite::rw;
         *rwp     = \&Sub::HandlesVia::Mite::rwp;
         *true    = \&Sub::HandlesVia::Mite::true;
+    }
+
+    # Gather metadata for constructor and destructor
+    sub __META__ {
+        no strict 'refs';
+        no warnings 'once';
+        my $class = shift;
+        $class = ref($class) || $class;
+        my $linear_isa = mro::get_linear_isa($class);
+        return {
+            BUILD => [
+                map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+                map { "$_\::BUILD" } reverse @$linear_isa
+            ],
+            DEMOLISH => [
+                map   { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+                  map { "$_\::DEMOLISH" } @$linear_isa
+            ],
+            HAS_BUILDARGS        => $class->can('BUILDARGS'),
+            HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
+        };
     }
 
     # Standard Moose/Moo-style constructor
@@ -421,41 +470,6 @@
         return;
     }
 
-    # Gather metadata for constructor and destructor
-    sub __META__ {
-        no strict 'refs';
-        no warnings 'once';
-        my $class = shift;
-        $class = ref($class) || $class;
-        my $linear_isa = mro::get_linear_isa($class);
-        return {
-            BUILD => [
-                map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-                map { "$_\::BUILD" } reverse @$linear_isa
-            ],
-            DEMOLISH => [
-                map   { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-                  map { "$_\::DEMOLISH" } @$linear_isa
-            ],
-            HAS_BUILDARGS        => $class->can('BUILDARGS'),
-            HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
-        };
-    }
-
-    # See UNIVERSAL
-    sub DOES {
-        my ( $self, $role ) = @_;
-        our %DOES;
-        return $DOES{$role} if exists $DOES{$role};
-        return 1            if $role eq __PACKAGE__;
-        return $self->SUPER::DOES($role);
-    }
-
-    # Alias for Moose/Moo-compatibility
-    sub does {
-        shift->DOES(@_);
-    }
-
     my $__XS = !$ENV{MITE_PURE_PERL}
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
@@ -784,19 +798,16 @@
 
     # Accessors for method_installer
     # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 158
-    if ($__XS) {
-        Class::XSAccessor->import(
-            chained   => 1,
-            "getters" => { "method_installer" => "method_installer" },
-        );
-    }
-    else {
-        *method_installer = sub {
-            @_ == 1
-              or croak(
-                'Reader "method_installer" usage: $self->method_installer()');
-            $_[0]{"method_installer"};
-        };
+    sub method_installer {
+        @_ > 1
+          ? do {
+            ( ref( $_[1] ) eq 'CODE' )
+              or croak( "Type check failed in %s: value should be %s",
+                "accessor", "CodeRef" );
+            $_[0]{"method_installer"} = $_[1];
+            $_[0];
+          }
+          : ( $_[0]{"method_installer"} );
     }
 
     # Accessors for sandboxing_package
@@ -878,6 +889,20 @@
             @_ == 1 or croak('Reader "toolkit" usage: $self->toolkit()');
             $_[0]{"toolkit"};
         };
+    }
+
+    # See UNIVERSAL
+    sub DOES {
+        my ( $self, $role ) = @_;
+        our %DOES;
+        return $DOES{$role} if exists $DOES{$role};
+        return 1            if $role eq __PACKAGE__;
+        return $self->SUPER::DOES($role);
+    }
+
+    # Alias for Moose/Moo-compatibility
+    sub does {
+        shift->DOES(@_);
     }
 
     1;

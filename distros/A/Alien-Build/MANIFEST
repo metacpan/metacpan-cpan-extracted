@@ -54,6 +54,7 @@ corpus/lib/Alien/Build/Plugin/Download/Foo.pm
 corpus/lib/Alien/Build/Plugin/Fetch/Corpus.pm
 corpus/lib/Alien/Build/Plugin/Fetch/Foo.pm
 corpus/lib/Alien/Build/Plugin/NesAdvantage/Controller.pm
+corpus/lib/Alien/Build/Plugin/NesAdvantage/HelperTest.pm
 corpus/lib/Alien/Build/Plugin/NesAdvantage/Negotiate.pm
 corpus/lib/Alien/Build/Plugin/RogerRamjet.pm
 corpus/lib/Alien/Foo.pm
@@ -66,6 +67,7 @@ corpus/lib/Alien/foomake.pm
 corpus/lib/Alien/libfoo1.pm
 corpus/lib/Alien/libfoo2.pm
 corpus/lib/Alien/libfoo3.pm
+corpus/lib/Alien/perlhelp.pm
 corpus/lib/Foo/Bar/Baz.pm
 corpus/lib/Foo/Bar/Baz1.pm
 corpus/lib/auto/share/dist/Alien-Foo2/README
@@ -83,6 +85,7 @@ corpus/lib/auto/share/dist/Alien-libfoo2/lib/libfoo.a
 corpus/lib/auto/share/dist/Alien-libfoo2/lib/pkgconfig/x1.pc
 corpus/lib/auto/share/dist/Alien-libfoo2/share/pkgconfig/x2.pc
 corpus/lib/auto/share/dist/Alien-libfoo3/_alien/alien.json
+corpus/lib/auto/share/dist/Alien-perlhelp/_alien/alien.json
 corpus/lib/pkgconfig/foo.pc
 corpus/lib/pkgconfig/xor-chillout.pc
 corpus/lib/pkgconfig/xor.pc

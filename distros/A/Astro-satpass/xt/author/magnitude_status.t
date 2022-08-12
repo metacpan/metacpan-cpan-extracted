@@ -33,7 +33,11 @@ foreach my $oid ( sort keys %canned ) {
     my $got = $canned{$oid};
     my @rslt = heavens_above_mag::process_get( $oid );
     my ( undef, $name, $want ) = @{ $rslt[0] };
-    is $got, $want, "Canned magnitude of $oid ($name)";
+    if ( defined( $got ) && defined( $want ) ) {
+	cmp_ok $got, '==', $want, "Canned magnitude of $oid ($name)";
+    } else {
+	is $got, $want, "Canned magnitude of $oid ($name)";
+    }
 }
 
 =begin comment

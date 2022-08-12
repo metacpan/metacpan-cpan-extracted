@@ -19,7 +19,9 @@ my $build = Module::Build->new(
         'Test::More' => 0,
         'File::Spec' => 0,
         'File::Which' => 0,
-        'Pegex' => 0.60, # needed for PL_files to work
+        'Pegex' => 0.75, # needed for PL_files to work
+        'Test::Lib' => 0,
+        'B::Hooks::EndOfScope' => 0,
     },
     requires => {
         'perl' => 'v5.10.0',
@@ -27,7 +29,7 @@ my $build = Module::Build->new(
         'Capture::Tiny' => 0,
         'File::Spec' => 0,
         'File::Which' => 0,
-        'Pegex' => 0.60, # needed for PL_files to work
+        'Pegex' => 0.75, # needed for PL_files to work
         'List::Util' => 0,
         'List::MoreUtils' => 0,
         'Moo' => '1.003',
@@ -38,6 +40,7 @@ my $build = Module::Build->new(
         'App::Prove' => 0,
         'Alien::gputils' => 0.08,
     },
+    script_files => ['script/vic'],
     share_dir => 'share',
     dynamic_config => 1,
     add_to_cleanup => [ qw/*.bak/ ],

@@ -1,5 +1,6 @@
 use Test::More;
-use t::TestVIC tests => 4, debug => 0;
+use Test::Lib;
+use Test::VIC tests => 4, debug => 0;
 
 sub get_input {
     my $type = shift;

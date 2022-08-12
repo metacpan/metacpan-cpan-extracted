@@ -8,6 +8,12 @@
 
 #define _XOPEN_SOURCE_EXTENDED 1  /* We expect wide character functions */
 
+#include <stdbool.h>
+   /* We don't use 'bool', but Curses header files sometimes define
+      it in a way that breaks <perl.h>, when it is subsequently included,
+      and having bool already defined seems to stop Curses header files from
+      doing that.  See further discussion of 'bool' below.
+   */
 #include "CursesDef.h"
 #include "CursesTyp.h"
 #include "c-config.h"
@@ -26,19 +32,30 @@
    We'll probably have to add to this list; maybe someday we should
    just undef them all, since we don't use them.
 
-   "bool" is another, and is more problematic.  Sometimes, ncurses.h
-   defines that explicitly and that's bad, but sometimes it does it
-   by including <stdbool.h>, and that's fine.  In the former case,
-   we should undefine it now, but in the latter we can't, because then
-   a subsequent #include <stdbool.h> (by something we #include below)
-   won't define bool because stdbool.h has already been included.
+   "bool" is another, and is more problematic.  Sometimes, ncurses.h defines
+   that explicitly and that's bad, but sometimes it does it by including
+   <stdbool.h>, and that's fine.  In the former case, we should undefine it
+   now, but in the latter we can't, because then a subsequent #include
+   <stdbool.h> (by something we #include below) won't define bool because
+   stdbool.h has already been included.  We once had a #undef bool in the Mac
+   OSX hints file, so someone presumably found it necessary.  But we have also
+   had a Mac OSX system on which compile failed _because_ of that undef, for
+   the reason described above.
 
-   We're going to leave bool alone now and wait for someone to report
-   that it breaks something.  With a real example, we can then plan how
-   to work around this unfortunate ncurses.h behavior.  We once had a
-   #undef bool.h in the Mac OSX hints file, so someone presumably found
-   it necessary.  But we have also had a Mac OSX system on which compile
-   failed _because_ of that undef, for the reason described above.
+   We also saw (AIX, August 2022) curses.h define bool in such a way that
+   the subsquently included <perl.h> defined its interface structure with
+   the Perl core using the wrong size for bool.  Fortunately, the Perl
+   interface catches that in its "handshake" to negotiate the interface
+   and refuses to run, with an error message like
+
+     loadable library and perl binaries are mismatched (got 0xd800000, needed
+     0xd700000)" or "(got handshake key 8d00080, needed 8700080)
+
+   (Note the misnomer: "loadable library" means Curses.so)
+
+   When we include <stdbool.h> here, that AIX problem ceases to exist --
+   <curses.h> apparently sees that bool is already defined and does not
+   define it itself.
  */
 
 #undef instr

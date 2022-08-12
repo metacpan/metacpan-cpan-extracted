@@ -9,7 +9,7 @@ use Path::Tiny ();
 use File::Temp ();
 
 # ABSTRACT: Autoconf plugin for Alien::Build
-our $VERSION = '2.51'; # VERSION
+our $VERSION = '2.52'; # VERSION
 
 
 has with_pic       => 1;
@@ -190,7 +190,7 @@ Alien::Build::Plugin::Build::Autoconf - Autoconf plugin for Alien::Build
 
 =head1 VERSION
 
-version 2.51
+version 2.52
 
 =head1 SYNOPSIS
 
@@ -216,6 +216,12 @@ based on autoconf packages.
 
 This plugin supports out-of-source builds (known in autoconf terms as "VPATH" builds) via
 the meta property C<out_of_source>.
+
+B<NOTE>: by itself, this plugin is only intended for use on packages that include a
+C<configure> script.  For packages that expect you to use Autotools to generate a
+configure script before building, you can use L<Alien::Autotools> to generate the
+C<configure> script and use this plugin to run it.  For more details see the
+documentation for L<Alien::Autotools>.
 
 =head1 PROPERTIES
 

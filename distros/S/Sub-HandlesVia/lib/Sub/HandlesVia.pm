@@ -7,7 +7,7 @@ package Sub::HandlesVia;
 use Exporter::Shiny qw( delegations );
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.034';
+our $VERSION   = '0.035';
 
 sub _generate_delegations {
 	my ($me, $name, $args, $globals) = (shift, @_);
@@ -299,6 +299,43 @@ Your project will still have a dependency on Sub::HandlesVia.
  package MyApp::Kitchen {
    use MyApp::Mite;
    use Sub::HandlesVia;
+   
+   has food => (
+     is          => 'ro',
+     isa         => 'ArrayRef[Str]',
+     handles_via => 'Array',
+     default     => sub { [] },
+     handles     => {
+       'add_food'    => 'push',
+       'find_food'   => 'grep',
+     },
+   );
+ }
+
+ You should be able to use Sub::HandlesVia with L<Mite> 0.001011 or above.
+ Your project will still have a dependency on Sub::HandlesVia.
+
+  package MyApp::Kitchen {
+    use MyApp::Mite;
+    use Sub::HandlesVia;
+    
+    has food => (
+      is          => 'ro',
+      isa         => 'ArrayRef[Str]',
+      handles_via => 'Array',
+      default     => sub { [] },
+      handles     => {
+        'add_food'    => 'push',
+        'find_food'   => 'grep',
+      },
+    );
+  }
+
+If you have Mite 0.009000 or above, you can probably use its C<handles_via>
+support, and avoid your project having a Sub::HandlesVia dependency!
+
+ package MyApp::Kitchen {
+   use MyApp::Mite;
    
    has food => (
      is          => 'ro',

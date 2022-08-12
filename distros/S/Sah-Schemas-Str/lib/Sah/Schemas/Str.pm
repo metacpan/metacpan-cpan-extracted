@@ -3,9 +3,9 @@ package Sah::Schemas::Str;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-09'; # DATE
+our $DATE = '2022-07-05'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 1;
 # ABSTRACT: Various string schemas
@@ -22,7 +22,7 @@ Sah::Schemas::Str - Various string schemas
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::Schemas::Str (from Perl distribution Sah-Schemas-Str), released on 2022-06-09.
+This document describes version 0.009 of Sah::Schemas::Str (from Perl distribution Sah-Schemas-Str), released on 2022-07-05.
 
 =head1 SAH SCHEMAS
 

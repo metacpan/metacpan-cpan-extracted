@@ -6,8 +6,26 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Build or find autoconf
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
+
+my %helper;
+
+foreach my $command (qw( autoconf autoheader autom4te autoreconf autoscan autoupdate ifnames ))
+{
+  if($^O eq 'MSWin32')
+  {
+    $helper{$command} = sub { qq{sh -c "$command "\$*"" --} };
+  }
+  else
+  {
+    $helper{$command} = sub { $command };
+  }
+}
+
+sub alien_helper {
+  return \%helper;
+}
 
 1;
 
@@ -23,7 +41,7 @@ Alien::autoconf - Build or find autoconf
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -48,7 +66,7 @@ From your alienfile:
    requires 'Alien::Autotools';
    plugin 'Build::Autoconf';
    build [
-     'autoreconf -vfi',
+     '%{autoreconf} -vfi',
      '%{configure}',
      '%{make}',
      '%{make} install',
@@ -68,6 +86,29 @@ but if you are not able to convince them then you have this option.  There are c
  my @dirs = Alien::autoconf->bin_dir;
 
 Returns a list of directories that need to be added to the C<PATH> in order to use C<autoconf>.
+
+=head1 HELPERS
+
+This L<Alien> provides the following helpers which will execute the corresponding command.  You want
+to use the helpers because they will use the correct incantation on Windows.
+
+=over 4
+
+=item C<autoconf>
+
+=item C<autoheader>
+
+=item C<autom4te>
+
+=item C<autoreconf>
+
+=item C<autoscan>
+
+=item C<autoupdate>
+
+=item C<ifname>
+
+=back
 
 =head1 CAVEATS
 
@@ -101,7 +142,7 @@ Mark Jensen (MAJENSEN)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

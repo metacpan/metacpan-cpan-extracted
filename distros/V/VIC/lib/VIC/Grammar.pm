@@ -2,7 +2,7 @@ package VIC::Grammar;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 $VERSION = eval $VERSION;
 
 use Pegex::Base;
@@ -10,7 +10,7 @@ extends 'Pegex::Grammar';
 
 use constant file => './share/vic.pgx';
 
-sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.60)
+sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.75)
   {
     '+grammar' => 'vic',
     '+toprule' => 'program',

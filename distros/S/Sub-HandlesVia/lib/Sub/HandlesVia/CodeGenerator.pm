@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::CodeGenerator;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.034';
+our $VERSION   = '0.035';
 
 use Sub::HandlesVia::Mite -all;
 
@@ -156,7 +156,7 @@ has generator_for_type_assertion => (
 );
 
 has method_installer => (
-	is => ro,
+	is => rw,
 	isa => 'CodeRef',
 );
 

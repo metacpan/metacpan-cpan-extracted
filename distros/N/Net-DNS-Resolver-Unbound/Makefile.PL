@@ -10,16 +10,18 @@ use ExtUtils::MakeMaker;
 
 my $distro = 'Net::DNS::Resolver::Unbound';
 my $module = join '/', 'lib', split /::/, "$distro.pm";
+my $author = ['Dick Franks'];
+$author = join ', ', @$author if $ExtUtils::MakeMaker::VERSION < 6.58;
 
 
 # See perldoc ExtUtils::MakeMaker for details of how to influence
 # the contents of the Makefile that is written.
 
 my %metadata = (
-	NAME		   => "$distro",
-	VERSION_FROM	   => "$module",
-	ABSTRACT_FROM	   => "$module",
-	AUTHOR		   => 'Dick Franks',
+	NAME		   => $distro,
+	VERSION_FROM	   => $module,
+	ABSTRACT_FROM	   => $module,
+	AUTHOR		   => $author,
 	LICENSE		   => 'mit',
 	MIN_PERL_VERSION   => 5.008009,
 	CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => 6.48},
@@ -65,6 +67,13 @@ $lib = $ENV{UNBOUND_LIB}     if $ENV{UNBOUND_LIB};
 chomp $_ for ( $inc, $lib );
 
 
+if ( my $cpp = $Config{cpprun} ) {	## unbound-devel package installed?
+	my $header = 'unbound.h';
+	my @header = `$Config{echo} "#include <$header>" | $cpp $inc - 2>$nul`;
+	die "$header	file not found" unless grep {/$header/} @header;
+}
+
+
 WriteMakefile(
 	%metadata,
 	PREREQ_PM => {%prerequisite},
@@ -83,7 +92,7 @@ sub test {
 
 	return join '', shift->SUPER::test(), <<'END';
 # suppress parallel test execution
-FULLPERLRUN = HARNESS_OPTIONS=c $(FULLPERL)
+FULLPERLRUN = HARNESS_OPTIONS=j1:c $(FULLPERL)
 END
 }
 
@@ -99,7 +108,7 @@ sub install {
 	}
 
 	eval "require $distro";		## no critic
-	my @version = ( 'version', eval { $distro->VERSION } );
+	my @version = grep {$_} 'version', eval { $distro->VERSION };
 
 	my $nameregex = join '\W+', '', split /::/, "$distro.pm\$";
 	my @installed = grep { $_ && m/$nameregex/io } values %INC;
@@ -127,7 +136,7 @@ sub install {
 ##	@installed
 ##
 ##	The installation would be rendered ineffective because the
-##	installed version occurs in the library search path before
+##	existing @version occurs in the library search path before
 ##	$install_site
 ##
 ##	The generated Makefile supports build and test only.
@@ -136,13 +145,10 @@ AMEN
 	my $echo = '	$(NOECHO) $(ECHO) "##"';
 	$message =~ s/##/$echo/eg;
 
-	return join '', <<'END', $message;
+	return join '', <<"END";
 install :
-	$(NOECHO) $(ECHO) "##	Makefile supports build and test only"
-	$(NOECHO) $(ECHO) "##	(see message from Makefile.PL)"
-	$(NOECHO) $(FALSE)
-
-test :: $(TEST_TYPE)
+	$message
+	\$(NOECHO) \$(FALSE)
 END
 }
 

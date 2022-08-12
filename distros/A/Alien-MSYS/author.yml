@@ -11,6 +11,9 @@ pod_spelling_system:
     - alienizing
     - autotools
     - preinstall
+    - Laffan
+    - SLAFFAN
+    - shawnlaffan
 
 pod_coverage:
   # format is "Class#method" or "Class", regex allowed

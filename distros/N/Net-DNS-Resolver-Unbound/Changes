@@ -1,6 +1,10 @@
 Revision history for Perl extension Net::DNS::Resolver::Unbound.
 
 
+**** 1.17  Aug 11, 2022
+	Detect missing C header in Makefile.PL.
+
+
 **** 1.16  Jul 18, 2022
 	Strip line terminator from configuration variables.
 

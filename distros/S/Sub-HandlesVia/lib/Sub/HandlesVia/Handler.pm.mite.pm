@@ -3,11 +3,39 @@
     package Sub::HandlesVia::Handler;
     use strict;
     use warnings;
+    no warnings qw( once void );
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Sub::HandlesVia::Mite";
-    our $MITE_VERSION = "0.008003";
+    our $MITE_VERSION = "0.010002";
 
+    # Mite keywords
+    BEGIN {
+        my ( $SHIM, $CALLER ) =
+          ( "Sub::HandlesVia::Mite", "Sub::HandlesVia::Handler" );
+        (
+            *after, *around, *before,        *extends, *field,
+            *has,   *param,  *signature_for, *with
+          )
+          = do {
+
+            package Sub::HandlesVia::Mite;
+            no warnings 'redefine';
+            (
+                sub { $SHIM->HANDLE_after( $CALLER, "class", @_ ) },
+                sub { $SHIM->HANDLE_around( $CALLER, "class", @_ ) },
+                sub { $SHIM->HANDLE_before( $CALLER, "class", @_ ) },
+                sub { },
+                sub { $SHIM->HANDLE_has( $CALLER, field => @_ ) },
+                sub { $SHIM->HANDLE_has( $CALLER, has   => @_ ) },
+                sub { $SHIM->HANDLE_has( $CALLER, param => @_ ) },
+                sub { $SHIM->HANDLE_signature_for( $CALLER, "class", @_ ) },
+                sub { $SHIM->HANDLE_with( $CALLER, @_ ) },
+            );
+          };
+    }
+
+    # Mite imports
     BEGIN {
         require Scalar::Util;
         *STRICT  = \&Sub::HandlesVia::Mite::STRICT;
@@ -23,6 +51,27 @@
         *rw      = \&Sub::HandlesVia::Mite::rw;
         *rwp     = \&Sub::HandlesVia::Mite::rwp;
         *true    = \&Sub::HandlesVia::Mite::true;
+    }
+
+    # Gather metadata for constructor and destructor
+    sub __META__ {
+        no strict 'refs';
+        no warnings 'once';
+        my $class = shift;
+        $class = ref($class) || $class;
+        my $linear_isa = mro::get_linear_isa($class);
+        return {
+            BUILD => [
+                map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+                map { "$_\::BUILD" } reverse @$linear_isa
+            ],
+            DEMOLISH => [
+                map   { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+                  map { "$_\::DEMOLISH" } @$linear_isa
+            ],
+            HAS_BUILDARGS        => $class->can('BUILDARGS'),
+            HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
+        };
     }
 
     # Standard Moose/Moo-style constructor
@@ -503,41 +552,6 @@
         return;
     }
 
-    # Gather metadata for constructor and destructor
-    sub __META__ {
-        no strict 'refs';
-        no warnings 'once';
-        my $class = shift;
-        $class = ref($class) || $class;
-        my $linear_isa = mro::get_linear_isa($class);
-        return {
-            BUILD => [
-                map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-                map { "$_\::BUILD" } reverse @$linear_isa
-            ],
-            DEMOLISH => [
-                map   { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-                  map { "$_\::DEMOLISH" } @$linear_isa
-            ],
-            HAS_BUILDARGS        => $class->can('BUILDARGS'),
-            HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
-        };
-    }
-
-    # See UNIVERSAL
-    sub DOES {
-        my ( $self, $role ) = @_;
-        our %DOES;
-        return $DOES{$role} if exists $DOES{$role};
-        return 1            if $role eq __PACKAGE__;
-        return $self->SUPER::DOES($role);
-    }
-
-    # Alias for Moose/Moo-compatibility
-    sub does {
-        shift->DOES(@_);
-    }
-
     my $__XS = !$ENV{MITE_PURE_PERL}
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
@@ -895,6 +909,20 @@
         );
     }
 
+    # See UNIVERSAL
+    sub DOES {
+        my ( $self, $role ) = @_;
+        our %DOES;
+        return $DOES{$role} if exists $DOES{$role};
+        return 1            if $role eq __PACKAGE__;
+        return $self->SUPER::DOES($role);
+    }
+
+    # Alias for Moose/Moo-compatibility
+    sub does {
+        shift->DOES(@_);
+    }
+
     1;
 }
 {
@@ -902,11 +930,39 @@
     package Sub::HandlesVia::Handler::Traditional;
     use strict;
     use warnings;
+    no warnings qw( once void );
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Sub::HandlesVia::Mite";
-    our $MITE_VERSION = "0.008003";
+    our $MITE_VERSION = "0.010002";
 
+    # Mite keywords
+    BEGIN {
+        my ( $SHIM, $CALLER ) =
+          ( "Sub::HandlesVia::Mite", "Sub::HandlesVia::Handler::Traditional" );
+        (
+            *after, *around, *before,        *extends, *field,
+            *has,   *param,  *signature_for, *with
+          )
+          = do {
+
+            package Sub::HandlesVia::Mite;
+            no warnings 'redefine';
+            (
+                sub { $SHIM->HANDLE_after( $CALLER, "class", @_ ) },
+                sub { $SHIM->HANDLE_around( $CALLER, "class", @_ ) },
+                sub { $SHIM->HANDLE_before( $CALLER, "class", @_ ) },
+                sub { },
+                sub { $SHIM->HANDLE_has( $CALLER, field => @_ ) },
+                sub { $SHIM->HANDLE_has( $CALLER, has   => @_ ) },
+                sub { $SHIM->HANDLE_has( $CALLER, param => @_ ) },
+                sub { $SHIM->HANDLE_signature_for( $CALLER, "class", @_ ) },
+                sub { $SHIM->HANDLE_with( $CALLER, @_ ) },
+            );
+          };
+    }
+
+    # Mite imports
     BEGIN {
         require Scalar::Util;
         *STRICT  = \&Sub::HandlesVia::Mite::STRICT;
@@ -1380,20 +1436,6 @@
         return $self;
     }
 
-    # See UNIVERSAL
-    sub DOES {
-        my ( $self, $role ) = @_;
-        our %DOES;
-        return $DOES{$role} if exists $DOES{$role};
-        return 1            if $role eq __PACKAGE__;
-        return $self->SUPER::DOES($role);
-    }
-
-    # Alias for Moose/Moo-compatibility
-    sub does {
-        shift->DOES(@_);
-    }
-
     my $__XS = !$ENV{MITE_PURE_PERL}
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
@@ -1412,6 +1454,20 @@
         };
     }
 
+    # See UNIVERSAL
+    sub DOES {
+        my ( $self, $role ) = @_;
+        our %DOES;
+        return $DOES{$role} if exists $DOES{$role};
+        return 1            if $role eq __PACKAGE__;
+        return $self->SUPER::DOES($role);
+    }
+
+    # Alias for Moose/Moo-compatibility
+    sub does {
+        shift->DOES(@_);
+    }
+
     1;
 }
 {
@@ -1419,11 +1475,39 @@
     package Sub::HandlesVia::Handler::CodeRef;
     use strict;
     use warnings;
+    no warnings qw( once void );
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Sub::HandlesVia::Mite";
-    our $MITE_VERSION = "0.008003";
+    our $MITE_VERSION = "0.010002";
 
+    # Mite keywords
+    BEGIN {
+        my ( $SHIM, $CALLER ) =
+          ( "Sub::HandlesVia::Mite", "Sub::HandlesVia::Handler::CodeRef" );
+        (
+            *after, *around, *before,        *extends, *field,
+            *has,   *param,  *signature_for, *with
+          )
+          = do {
+
+            package Sub::HandlesVia::Mite;
+            no warnings 'redefine';
+            (
+                sub { $SHIM->HANDLE_after( $CALLER, "class", @_ ) },
+                sub { $SHIM->HANDLE_around( $CALLER, "class", @_ ) },
+                sub { $SHIM->HANDLE_before( $CALLER, "class", @_ ) },
+                sub { },
+                sub { $SHIM->HANDLE_has( $CALLER, field => @_ ) },
+                sub { $SHIM->HANDLE_has( $CALLER, has   => @_ ) },
+                sub { $SHIM->HANDLE_has( $CALLER, param => @_ ) },
+                sub { $SHIM->HANDLE_signature_for( $CALLER, "class", @_ ) },
+                sub { $SHIM->HANDLE_with( $CALLER, @_ ) },
+            );
+          };
+    }
+
+    # Mite imports
     BEGIN {
         require Scalar::Util;
         *STRICT  = \&Sub::HandlesVia::Mite::STRICT;
@@ -1911,20 +1995,6 @@
         return $self;
     }
 
-    # See UNIVERSAL
-    sub DOES {
-        my ( $self, $role ) = @_;
-        our %DOES;
-        return $DOES{$role} if exists $DOES{$role};
-        return 1            if $role eq __PACKAGE__;
-        return $self->SUPER::DOES($role);
-    }
-
-    # Alias for Moose/Moo-compatibility
-    sub does {
-        shift->DOES(@_);
-    }
-
     my $__XS = !$ENV{MITE_PURE_PERL}
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
@@ -1943,6 +2013,20 @@
                 'Reader "delegated_coderef" usage: $self->delegated_coderef()');
             $_[0]{"delegated_coderef"};
         };
+    }
+
+    # See UNIVERSAL
+    sub DOES {
+        my ( $self, $role ) = @_;
+        our %DOES;
+        return $DOES{$role} if exists $DOES{$role};
+        return 1            if $role eq __PACKAGE__;
+        return $self->SUPER::DOES($role);
+    }
+
+    # Alias for Moose/Moo-compatibility
+    sub does {
+        shift->DOES(@_);
     }
 
     1;

@@ -7,7 +7,21 @@ use Test2::V0;
 use Module::Generic::File qw( file tempfile sys_tmpdir );
 use Scalar::Util ();
 use Promise::Me qw( :all );
+use Time::HiRes;
 our $DESTROY_SHARED_MEM = 0;
+
+# Credits:
+# <https://stackoverflow.com/questions/6855796/what-else-can-i-do-sleep-when-the-sleep-cant-work-well-with-alarm>
+sub sleep_tight
+{
+    my $end = Time::HiRes::time() + shift( @_ );
+    for(;;)
+    {
+        my $delta = $end - Time::HiRes::time();
+        last if( $delta <= 0 );
+        select( undef, undef, undef, $delta );
+    }
+}
 
 sub runtest
 {
@@ -74,7 +88,8 @@ sub runtest
         {
             print( STDERR "Concurrent promise 1 ($$), sleeping.\n" ) if( $DEBUG );
             diag( "Is \$result tied ? ", tied( $result ) ? 'Yes' : 'No', ". Value is -> '$result'" ) if( $DEBUG );
-            sleep(3);
+            # sleep(3);
+            sleep_tight(3);
             $result .= "concurrency 1\n";
             my $file = $tmpfile->clone;
             diag( "Writing 'concurrency 1' to file $tmpfile and my pid is '$$' vs parent '$pid'" ) if( $DEBUG );
@@ -97,7 +112,8 @@ sub runtest
         my $p2 = Promise::Me->new(sub
         {
             print( STDERR "Concurrent promise 2 ($$), sleeping.\n" ) if( $DEBUG );
-            sleep(0.5);
+            # sleep(0.5);
+            sleep_tight(0.5);
             $result .= "concurrency 2\n";
             my $file = file( $tmpfile );
             diag( "[$medium] -> [$serialiser]: Appending 'concurrency 2' to $tmpfile and my pid is '$$' vs parent '$pid'" ) if( $DEBUG );

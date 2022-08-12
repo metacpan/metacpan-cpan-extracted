@@ -5,7 +5,7 @@ use warnings;
 use Test::More;
 
 BEGIN {
-	if (!eval { require Moo } && Moo->VERSION > 2) {
+	unless (eval { require Moo } && Moo->VERSION > 2) {
 		plan skip_all => 'These tests require Moo';
 	}
 }

@@ -1,5 +1,6 @@
 use Test::More;
-use t::TestVIC tests => 1, debug => 0;
+use Test::Lib;
+use Test::VIC tests => 1, debug => 0;
 
 my $input = << '...';
 PIC P16F690;

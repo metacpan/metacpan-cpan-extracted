@@ -1,0 +1,74 @@
+{
+   "abstract" : "Discover or download and install libdogecoin",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-Libdogecoin",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Autotools" : "1.07",
+            "Alien::Build::MM" : "0.25",
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Net::SSLeay" : "1.49",
+            "URI" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "1.19",
+            "Alien::Build::MM" : "0.25"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0",
+            "Alien::Build" : "0.25"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0",
+            "Test::Alien" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.1.1",
+   "x_alienfile" : {
+      "generated_by" : "Alien::Build::MM version 2.52",
+      "requires" : {
+         "share" : {
+            "Alien::Autotools" : "1.07",
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Net::SSLeay" : "1.49",
+            "URI" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

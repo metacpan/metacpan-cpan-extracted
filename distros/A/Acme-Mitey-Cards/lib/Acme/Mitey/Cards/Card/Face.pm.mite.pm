@@ -3,13 +3,42 @@
     package Acme::Mitey::Cards::Card::Face;
     use strict;
     use warnings;
+    no warnings qw( once void );
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Acme::Mitey::Cards::Mite";
-    our $MITE_VERSION = "0.007003";
+    our $MITE_VERSION = "0.010002";
 
+    # Mite keywords
+    BEGIN {
+        my ( $SHIM, $CALLER ) =
+          ( "Acme::Mitey::Cards::Mite", "Acme::Mitey::Cards::Card::Face" );
+        (
+            *after, *around, *before,        *extends, *field,
+            *has,   *param,  *signature_for, *with
+          )
+          = do {
+
+            package Acme::Mitey::Cards::Mite;
+            no warnings 'redefine';
+            (
+                sub { $SHIM->HANDLE_after( $CALLER, "class", @_ ) },
+                sub { $SHIM->HANDLE_around( $CALLER, "class", @_ ) },
+                sub { $SHIM->HANDLE_before( $CALLER, "class", @_ ) },
+                sub { },
+                sub { $SHIM->HANDLE_has( $CALLER, field => @_ ) },
+                sub { $SHIM->HANDLE_has( $CALLER, has   => @_ ) },
+                sub { $SHIM->HANDLE_has( $CALLER, param => @_ ) },
+                sub { $SHIM->HANDLE_signature_for( $CALLER, "class", @_ ) },
+                sub { $SHIM->HANDLE_with( $CALLER, @_ ) },
+            );
+          };
+    }
+
+    # Mite imports
     BEGIN {
         require Scalar::Util;
+        *STRICT  = \&Acme::Mitey::Cards::Mite::STRICT;
         *bare    = \&Acme::Mitey::Cards::Mite::bare;
         *blessed = \&Scalar::Util::blessed;
         *carp    = \&Acme::Mitey::Cards::Mite::carp;
@@ -32,6 +61,7 @@
         push @ISA, "Acme::Mitey::Cards::Card";
     }
 
+    # Standard Moose/Moo-style constructor
     sub new {
         my $class = ref( $_[0] ) ? ref(shift) : shift;
         my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
@@ -42,23 +72,20 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Attribute: deck
+        # Attribute deck (type: Deck)
+        # has declaration, file lib/Acme/Mitey/Cards/Card.pm, line 9
         if ( exists $args->{"deck"} ) {
-            (
-                do {
-                    use Scalar::Util ();
-                    Scalar::Util::blessed( $args->{"deck"} )
-                      and $args->{"deck"}->isa(q[Acme::Mitey::Cards::Deck]);
-                }
-              )
+            blessed( $args->{"deck"} )
+              && $args->{"deck"}->isa("Acme::Mitey::Cards::Deck")
               or croak "Type check failed in constructor: %s should be %s",
               "deck", "Deck";
             $self->{"deck"} = $args->{"deck"};
         }
         require Scalar::Util && Scalar::Util::weaken( $self->{"deck"} )
-          if exists $self->{"deck"};
+          if ref $self->{"deck"};
 
-        # Attribute: reverse
+        # Attribute reverse (type: Str)
+        # has declaration, file lib/Acme/Mitey/Cards/Card.pm, line 19
         if ( exists $args->{"reverse"} ) {
             do {
 
@@ -73,7 +100,8 @@
             $self->{"reverse"} = $args->{"reverse"};
         }
 
-        # Attribute: suit
+        # Attribute suit (type: Suit)
+        # has declaration, file lib/Acme/Mitey/Cards/Card/Face.pm, line 13
         croak "Missing key in constructor: suit" unless exists $args->{"suit"};
         do {
             my $coerced_value = do {
@@ -107,19 +135,15 @@
                   )
                   : $to_coerce;
             };
-            (
-                do {
-                    use Scalar::Util ();
-                    Scalar::Util::blessed($coerced_value)
-                      and $coerced_value->isa(q[Acme::Mitey::Cards::Suit]);
-                }
-              )
+            blessed($coerced_value)
+              && $coerced_value->isa("Acme::Mitey::Cards::Suit")
               or croak "Type check failed in constructor: %s should be %s",
               "suit", "Suit";
             $self->{"suit"} = $coerced_value;
         };
 
-        # Attribute: face
+        # Attribute face (type: Character)
+        # has declaration, file lib/Acme/Mitey/Cards/Card/Face.pm, line 20
         croak "Missing key in constructor: face" unless exists $args->{"face"};
         do {
 
@@ -132,34 +156,23 @@
           "Character";
         $self->{"face"} = $args->{"face"};
 
-        # Enforce strict constructor
+        # Call BUILD methods
+        $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
+
+        # Unrecognized parameters
         my @unknown = grep not(/\A(?:deck|face|reverse|suit)\z/), keys %{$args};
         @unknown
           and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
-        # Call BUILD methods
-        $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
-
         return $self;
-    }
-
-    sub DOES {
-        my ( $self, $role ) = @_;
-        our %DOES;
-        return $DOES{$role} if exists $DOES{$role};
-        return 1            if $role eq __PACKAGE__;
-        return $self->SUPER::DOES($role);
-    }
-
-    sub does {
-        shift->DOES(@_);
     }
 
     my $__XS = !$ENV{MITE_PURE_PERL}
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
     # Accessors for face
+    # has declaration, file lib/Acme/Mitey/Cards/Card/Face.pm, line 20
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -168,13 +181,13 @@
     }
     else {
         *face = sub {
-            @_ > 1
-              ? croak("face is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"face"};
+            @_ == 1 or croak('Reader "face" usage: $self->face()');
+            $_[0]{"face"};
         };
     }
 
     # Accessors for suit
+    # has declaration, file lib/Acme/Mitey/Cards/Card/Face.pm, line 13
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -183,12 +196,26 @@
     }
     else {
         *suit = sub {
-            @_ > 1
-              ? croak("suit is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"suit"};
+            @_ == 1 or croak('Reader "suit" usage: $self->suit()');
+            $_[0]{"suit"};
         };
     }
 
+    # See UNIVERSAL
+    sub DOES {
+        my ( $self, $role ) = @_;
+        our %DOES;
+        return $DOES{$role} if exists $DOES{$role};
+        return 1            if $role eq __PACKAGE__;
+        return $self->SUPER::DOES($role);
+    }
+
+    # Alias for Moose/Moo-compatibility
+    sub does {
+        shift->DOES(@_);
+    }
+
+    # Method signatures
     our %SIGNATURE_FOR;
 
     $SIGNATURE_FOR{"face_abbreviation"} = sub {
@@ -197,15 +224,13 @@
         my ( %tmp, $tmp, @head );
 
         @_ == 1
-          or croak(
-            "Wrong number of parameters in signature for %s: %s, got %d",
-            "face_abbreviation", "expected exactly 1 parameters",
-            scalar(@_)
-          );
+          or
+          croak( "Wrong number of parameters in signature for %s: got %d, %s",
+            "face_abbreviation", scalar(@_), "expected exactly 1 parameters" );
 
         @head = splice( @_, 0, 1 );
 
-        # Parameter $head[0] (type: Defined)
+        # Parameter invocant (type: Defined)
         ( defined( $head[0] ) )
           or croak(
 "Type check failed in signature for face_abbreviation: %s should be %s",

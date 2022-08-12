@@ -1,7 +1,8 @@
-use t::TestVIC;
+use Test::Lib;
+use Test::VIC;
 
 unless ($ENV{TEST_GPUTILS}) {
-    t::TestVIC::plan skip_all => "Skipping unless ENV{TEST_GPUTILS} is defined";
+    Test::VIC::plan skip_all => "Skipping unless ENV{TEST_GPUTILS} is defined";
 } else {
 my $input = <<'...';
 PIC PIC16F690;
@@ -23,8 +24,8 @@ foreach (sort @$chips) {
         $code =~ s/RC0/RA0/gs;
     }
     my $chip = $_;
-    t::TestVIC::subtest "gputils check for $_" => sub { assembles_ok($code, $chip) };
+    Test::VIC::subtest "gputils check for $_" => sub { assembles_ok($code, $chip) };
 }
 
-t::TestVIC::done_testing();
+Test::VIC::done_testing();
 }

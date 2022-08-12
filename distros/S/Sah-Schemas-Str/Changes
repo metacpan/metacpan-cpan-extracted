@@ -1,3 +1,10 @@
+0.009   2022-07-05  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention Regexp::From::String.
+
+
 0.008   2022-06-09  Released-By: PERLANCAR; Urgency: medium
 
         - [schema str_or_re] Allow string in the form of 'qr(...)' to also

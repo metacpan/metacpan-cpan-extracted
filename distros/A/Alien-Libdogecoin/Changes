@@ -1,0 +1,4 @@
+Revision history for Alien::Libdogecoin
+
+0.1.0 2022-08-11 19:10:49 America/Los_Angeles
+    - initial release, supporting libdogecoin 0.1.0

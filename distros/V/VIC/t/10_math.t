@@ -1,4 +1,5 @@
-use t::TestVIC skip_all => 'incomplete implementation';#tests => 0, debug => 0;
+use Test::Lib;
+use Test::VIC skip_all => 'incomplete implementation';#tests => 0, debug => 0;
 
 my $input = <<'...';
 PIC P16F690;

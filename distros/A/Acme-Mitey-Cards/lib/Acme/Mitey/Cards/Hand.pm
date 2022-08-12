@@ -1,6 +1,6 @@
 package Acme::Mitey::Cards::Hand;
 
-our $VERSION   = '0.013';
+our $VERSION   = '0.014';
 our $AUTHORITY = 'cpan:TOBYINK';
 
 use Acme::Mitey::Cards::Mite qw( -all );

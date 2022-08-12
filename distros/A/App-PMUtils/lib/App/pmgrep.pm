@@ -11,9 +11,9 @@ use AppBase::Grep;
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-12-03'; # DATE
+our $DATE = '2022-08-12'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.738'; # VERSION
+our $VERSION = '0.739'; # VERSION
 
 our %SPEC;
 
@@ -69,8 +69,8 @@ _
         },
     },
     output_code => sub {
+        require Module::List::More;
         require Module::Path::More;
-        require PERLANCAR::Module::List;
 
         my %args = @_;
         $args{pm} //= 1;
@@ -78,7 +78,7 @@ _
         my %files;
         for my $q (@{ $args{modules} // [""] }) {
             if ($q eq '' || $q =~ /::\z/ || $args{recursive}) {
-                my $mods = PERLANCAR::Module::List::list_modules(
+                my $mods = Module::List::More::list_modules(
                     $q eq '' || $q =~ /::\z/ ? $q : "$q\::",
                     {
                         list_modules => $args{pm} || $args{pmc},
@@ -146,7 +146,7 @@ App::pmgrep - Print lines from installed Perl module sources matching a pattern
 
 =head1 VERSION
 
-This document describes version 0.738 of App::pmgrep (from Perl distribution App-PMUtils), released on 2021-12-03.
+This document describes version 0.739 of App::pmgrep (from Perl distribution App-PMUtils), released on 2022-08-12.
 
 =head1 FUNCTIONS
 
@@ -267,13 +267,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -6,12 +6,30 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Build or find automake
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
 
 
 
+
+my %helper;
+
+foreach my $command (qw( automake aclocal ))
+{
+  if($^O eq 'MSWin32')
+  {
+    $helper{$command} = sub { qq{sh -c "$command "\$*"" --} };
+  }
+  else
+  {
+    $helper{$command} = sub { $command };
+  }
+}
+
+sub alien_helper {
+  return \%helper;
+}
 
 1;
 
@@ -27,7 +45,7 @@ Alien::automake - Build or find automake
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -46,6 +64,19 @@ detect an existing install of automake on your system.  If found it
 will use that.  If it cannot be found, the source code will be downloaded
 from the internet and it will be installed in a private share location
 for the use of other modules.
+
+=head1 HELPERS
+
+This L<Alien> provides the following helpers which will execute the corresponding command.  You want
+to use the helpers because they will use the correct incantation on Windows.
+
+=over 4
+
+=item C<automake>
+
+=item C<aclocal>
+
+=back
 
 =head1 CAVEATS
 

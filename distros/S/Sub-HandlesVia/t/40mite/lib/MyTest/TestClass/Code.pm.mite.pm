@@ -5,7 +5,7 @@ use warnings;
 
 our $USES_MITE = "Mite::Class";
 our $MITE_SHIM = "MyTest::Mite";
-our $MITE_VERSION = "0.008003";
+our $MITE_VERSION = "0.009000";
 
 # Standard Moose/Moo-style constructor
 sub new {

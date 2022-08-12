@@ -1,0 +1,19 @@
+use alienfile;
+
+plugin 'PkgConfig' => (
+  pkg_name => 'libdogecoin',
+);
+
+share {
+  requires 'Alien::Autotools' => 1.07;
+  start_url 'https://github.com/dogecoinfoundation/libdogecoin/archive/refs/tags/v0.1.0.tar.gz';
+  plugin 'Download';
+  plugin 'Extract' => 'tar.gz';
+  plugin 'Build::Autoconf';
+  build [
+    '%{autoreconf} -if --warnings=all',
+    '%{configure}',
+    '%{make}',
+    '%{make} install',
+  ];
+};

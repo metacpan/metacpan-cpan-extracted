@@ -1,3 +1,13 @@
+0.739   2022-08-12  Released-By: PERLANCAR; Urgency: medium
+
+        [cli pmlist]
+
+        - Rename dep PERLANCAR::Module::List -> Module::List::More.
+
+        - Use ls_mode of String::Wildcard::Bash (0.044+) so it behaves more like
+          'ls'.
+
+
 0.738   2021-12-03  Released-By: PERLANCAR; Urgency: medium
 
 	- Add utility: update-this-mod (cpanm-this-mod).

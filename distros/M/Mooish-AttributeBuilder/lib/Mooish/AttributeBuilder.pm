@@ -1,5 +1,5 @@
 package Mooish::AttributeBuilder;
-$Mooish::AttributeBuilder::VERSION = '0.001';
+$Mooish::AttributeBuilder::VERSION = '0.002';
 use v5.10;
 use strict;
 use warnings;

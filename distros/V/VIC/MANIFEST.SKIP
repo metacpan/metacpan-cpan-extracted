@@ -72,3 +72,13 @@ doc
 gh-pages
 \.log$
 \.lxt$
+todo
+TODO
+\.asm$
+\.cod$
+\.hex$
+\.o$
+\.lst$
+\.stc$
+\.d$
+\.map$

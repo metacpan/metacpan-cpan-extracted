@@ -4,7 +4,7 @@
       "DQNEO"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.10",
+   "generated_by" : "Minilla/v3.1.19",
    "license" : [
       "perl_5"
    ],
@@ -67,7 +67,7 @@
    "provides" : {
       "Amazon::S3::Thin" : {
          "file" : "lib/Amazon/S3/Thin.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "Amazon::S3::Thin::Credentials" : {
          "file" : "lib/Amazon/S3/Thin/Credentials.pm"
@@ -89,17 +89,19 @@
       },
       "homepage" : "https://github.com/DQNEO/Amazon-S3-Thin",
       "repository" : {
-         "url" : "git://github.com/DQNEO/Amazon-S3-Thin.git",
+         "type" : "git",
+         "url" : "https://github.com/DQNEO/Amazon-S3-Thin.git",
          "web" : "https://github.com/DQNEO/Amazon-S3-Thin"
       }
    },
-   "version" : "0.30",
+   "version" : "0.31",
    "x_contributors" : [
       "Bob Showalter <showaltb@gmail.com>",
       "Bob Stockdale <bstockdale@zappos.com>",
       "Breno G. de Oliveira <garu@cpan.org>",
       "Cameron Daniel <cam.daniel@gmail.com>",
       "DQNEO <dqneoo@gmail.com>",
+      "Masayoshi Wada <developer@andantesoftware.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Takumi Akiyama <t.akiym@gmail.com>",
       "Timothy Appnel <tim@appnel.com>"

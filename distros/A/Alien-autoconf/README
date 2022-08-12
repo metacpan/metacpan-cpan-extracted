@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.17
+    version 0.18
 
 SYNOPSIS
 
@@ -29,7 +29,7 @@ SYNOPSIS
        requires 'Alien::Autotools';
        plugin 'Build::Autoconf';
        build [
-         'autoreconf -vfi',
+         '%{autoreconf} -vfi',
          '%{configure}',
          '%{make}',
          '%{make} install',
@@ -54,6 +54,26 @@ METHODS
 
     Returns a list of directories that need to be added to the PATH in
     order to use autoconf.
+
+HELPERS
+
+    This Alien provides the following helpers which will execute the
+    corresponding command. You want to use the helpers because they will
+    use the correct incantation on Windows.
+
+    autoconf
+
+    autoheader
+
+    autom4te
+
+    autoreconf
+
+    autoscan
+
+    autoupdate
+
+    ifname
 
 CAVEATS
 
@@ -88,7 +108,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017 by Graham Ollis.
+    This software is copyright (c) 2017-2022 by Graham Ollis.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

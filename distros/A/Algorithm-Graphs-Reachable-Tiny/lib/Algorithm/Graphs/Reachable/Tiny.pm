@@ -6,7 +6,7 @@ use warnings;
 
 use Exporter 'import';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @EXPORT_OK = qw(all_reachable);
 
@@ -48,7 +48,7 @@ Algorithm::Graphs::Reachable::Tiny - Compute rechable nodes in a graph.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 
 =head1 SYNOPSIS

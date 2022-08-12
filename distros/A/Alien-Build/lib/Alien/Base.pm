@@ -11,7 +11,7 @@ use Text::ParseWords qw/shellwords/;
 use Alien::Util;
 
 # ABSTRACT: Base classes for Alien:: modules
-our $VERSION = '2.51'; # VERSION
+our $VERSION = '2.52'; # VERSION
 
 
 sub import {
@@ -122,7 +122,7 @@ sub _flags
   my $distdir = $config->{distdir};
   $distdir =~ s{\\}{/}g if $^O =~ /^(MSWin32|msys)$/;
 
-  if($prefix ne $distdir)
+  if(defined $flags && $prefix ne $distdir)
   {
     $flags = join ' ', map {
       my $flag = $_;
@@ -602,7 +602,7 @@ Alien::Base - Base classes for Alien:: modules
 
 =head1 VERSION
 
-version 2.51
+version 2.52
 
 =head1 SYNOPSIS
 

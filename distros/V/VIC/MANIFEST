@@ -1,3 +1,4 @@
+bin/vic
 Build.PL
 Changes
 cpanfile
@@ -52,6 +53,7 @@ MANIFEST.SKIP
 META.json
 META.yml
 README
+README.md
 script/vic
 share/examples/adctest.vic
 share/examples/blinker.vic
@@ -64,7 +66,6 @@ share/examples/hw.vic
 share/examples/interrupt.vic
 share/examples/led7seg.vic
 share/examples/loopbreak.vic
-share/examples/math.vic.todo
 share/examples/math8bit.vic
 share/examples/pwm.vic
 share/examples/pwm2.vic
@@ -117,4 +118,4 @@ t/27_reader_pin.t
 t/27_reader_port.t
 t/28_sleep_wakeup.t
 t/28_sleep_wdt.t
-t/TestVIC.pm
+t/lib/Test/VIC.pm

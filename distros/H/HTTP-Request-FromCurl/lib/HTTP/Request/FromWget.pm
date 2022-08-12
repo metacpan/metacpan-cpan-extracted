@@ -15,7 +15,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.41';
+our $VERSION = '0.43';
 
 =head1 NAME
 
@@ -140,31 +140,36 @@ provide a cookie jar in your user agent.
 =cut
 
 our @option_spec = (
-    'user-agent|U=s',
-    'referer=s',
-    'verbose|v',             # ignored
-    'quiet',                 # ignored
-    'buffer!',
-    'compression=s',
-    'cookie|b=s',
-    'load-cookies|c=s',
-    'post-data=s',
-    'post-file=s',
+    'auth-no-challenge',     # ignored
     'body-data=s',
     'body-file=s',
+    'buffer!',
+    'cache!',
+    'ca-directory=s',
+    'check-certificate!',
+    'certificate=s',
+    'compression=s',
     'content-disposition=s',
-    'auth-no-challenge',     # ignored
+    'cookie|b=s@',
+    'cookies!',              # ignored
+    'debug',                 # ignored
     'form|F=s@',
     'header|H=s@',
-    'method=s',
-    'max-time|m=s',
     'http-keep-alive!',
-    'cache!',
-    'http-user=s',
     'http-password=s',
-    'check-certificate!',
+    'http-user=s',
+    'load-cookies|c=s',
+    'method=s',
+    'no-verbose|nv',         # ignored
     'output-document|O=s',   # ignored
-    'debug',                 # ignored
+    'post-data=s',
+    'post-file=s',
+    'progress!',             # ignored
+    'quiet',                 # ignored
+    'referer=s',
+    'timeout|T=i',
+    'user-agent|U=s',
+    'verbose|v',             # ignored
 );
 
 sub new( $class, %options ) {
@@ -180,11 +185,6 @@ sub new( $class, %options ) {
 
         # remove the implicit wget command:
         shift @$cmd;
-    };
-
-    for (@$cmd) {
-        $_ = '--next'
-            if $_ eq '-:'; # GetOptions does not like "next|:" as specification
     };
 
     my $p = Getopt::Long::Parser->new(
@@ -285,7 +285,7 @@ sub _build_request( $self, $uri, $options, %build_options ) {
     my $body;
 
     my @headers = @{ $options->{header} || []};
-    my $method = $options->{request};
+    my $method = $options->{method};
 
     # Ideally, we shouldn't sort the data but process it in-order
     my @post_raw_data;
@@ -293,10 +293,18 @@ sub _build_request( $self, $uri, $options, %build_options ) {
         @post_raw_data = $options->{'post-data'};
         $method = 'POST';
     };
+    if( exists $options->{ 'body-data' }) {
+        @post_raw_data = $options->{'body-data'};
+        $method ||= 'POST';
+    };
                     ;
     if( my $file = $options->{'post-file'} ) {
         @post_raw_data = $self->_maybe_read_data_file( $build_options{ read_files }, $file );
         $method = 'POST';
+    };
+    if( my $file = $options->{'body-file'} ) {
+        @post_raw_data = $self->_maybe_read_data_file( $build_options{ read_files }, $file );
+        $method ||= 'POST';
     };
                     ;
     my @form_args = @{ $options->{form} || []};
@@ -325,7 +333,7 @@ sub _build_request( $self, $uri, $options, %build_options ) {
         };
 
         if( @form_args) {
-            $method = 'POST';
+            $method ||= 'POST';
 
             my $req = HTTP::Request::Common::POST(
                 'https://example.com',
@@ -336,7 +344,7 @@ sub _build_request( $self, $uri, $options, %build_options ) {
             $request_default_headers{ 'Content-Type' } = join "; ", $req->headers->content_type;
 
         } elsif( defined $data ) {
-            $method = 'POST';
+            $method ||= 'POST';
             $body = $data;
             $request_default_headers{ 'Content-Type' } = 'application/x-www-form-urlencoded';
 
@@ -426,6 +434,8 @@ sub _build_request( $self, $uri, $options, %build_options ) {
             uri    => $uri,
             headers => \%headers,
             body   => $body,
+            maybe cert => $options->{certificate},
+            maybe capath => $options->{'ca-directory'},
             maybe credentials => $options->{ user },
             maybe output => $options->{ output },
             maybe timeout => $options->{ 'max-time' },

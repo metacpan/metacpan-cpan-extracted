@@ -1,26 +1,14 @@
 use Test2::V0 -no_srand => 1;
-use Test::Alien;
+use Test::Alien 2.52;
 use Alien::libtool;
 use Env qw( @PATH );
 use File::chdir;
 use File::Temp qw( tempdir );
 
 alien_ok 'Alien::libtool';
+plugin_ok 'Build::MSYS';
 
-my @cmd = ('libtool', '--version');
-
-my $wrapper = sub { [@_] };
-
-if($^O eq 'MSWin32')
-{
-  eval {
-    require Alien::MSYS;
-    push @PATH, Alien::MSYS::msys_path();
-  };
-  $wrapper = sub { ['sh', -c => "@_"] };
-}
-
-run_ok($wrapper->($_, '--version'))
+interpolate_run_ok("%{$_} --version")
   ->success
   ->note for qw( libtool libtoolize );
 
@@ -28,7 +16,7 @@ subtest 'test running out of blib' => sub {
 
   local $CWD = tempdir( CLEANUP => 1);
 
-  run_ok($wrapper->('libtoolize', '--copy'))
+  interpolate_run_ok("%{libtoolize} --copy")
     ->success
     ->note;
 

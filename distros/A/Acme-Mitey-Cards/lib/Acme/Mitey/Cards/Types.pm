@@ -7,6 +7,7 @@ package Acme::Mitey::Cards::Types;
 use Exporter ();
 use Carp qw( croak );
 
+our $TLC_VERSION = "0.006";
 our @ISA = qw( Exporter );
 our @EXPORT;
 our @EXPORT_OK;
@@ -74,6 +75,7 @@ BEGIN {
 		if ( ref $library eq 'ARRAY' ) {
 			require Type::Tiny::Union;
 			return 'Type::Tiny::Union'->new(
+				display_name     => $name,
 				type_constraints => [ map $_->to_TypeTiny, @$library ],
 			);
 		}
@@ -1466,6 +1468,29 @@ BEGIN {
 	push @{ $EXPORT_TAGS{"types"} },  "SingleDigit";
 	push @{ $EXPORT_TAGS{"is"} },     "is_SingleDigit";
 	push @{ $EXPORT_TAGS{"assert"} }, "assert_SingleDigit";
+
+}
+
+# Slurpy
+{
+	my $type;
+	sub Slurpy () {
+		$type ||= bless( [ \&is_Slurpy, "Slurpy", "Types::Standard", "Slurpy" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+	}
+
+	sub is_Slurpy ($) {
+		(!!1)
+	}
+
+	sub assert_Slurpy ($) {
+		(!!1) ? $_[0] : Slurpy->get_message( $_[0] );
+	}
+
+	$EXPORT_TAGS{"Slurpy"} = [ qw( Slurpy is_Slurpy assert_Slurpy ) ];
+	push @EXPORT_OK, @{ $EXPORT_TAGS{"Slurpy"} };
+	push @{ $EXPORT_TAGS{"types"} },  "Slurpy";
+	push @{ $EXPORT_TAGS{"is"} },     "is_Slurpy";
+	push @{ $EXPORT_TAGS{"assert"} }, "assert_Slurpy";
 
 }
 

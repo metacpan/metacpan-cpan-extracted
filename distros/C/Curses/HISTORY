@@ -11,6 +11,13 @@ The module has always been distributed via CPAN.
 Curses itself is much older than the Perl implementation.  Curses was
 originally only a C programming library.
 
+New in 1.39 (Released August 12, 2022)
+
+  Add #include <stdbool.h> to top of Curses.c to fix a conflict between the
+  Curses header files and Perl header files that causes a "loadable library
+  and perl binaries are mismatched" / handshake key failure when you try to
+  load the Perl module.
+
 New in 1.38 (Released July 26, 2021)
 
   Fix compilation failure with some compilers, including AIX's because

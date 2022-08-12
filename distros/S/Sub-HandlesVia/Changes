@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Sub-HandlesVia>
 Bug tracker:  <https://github.com/tobyink/p5-sub-handlesvia/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.035	2022-08-12
+
+ - Sub::HandlesVia::CodeGenerator method_installer is now a rw attribute as
+   Sub::Accessor::Small was relying on that.
+
 0.034	2022-08-07
 
  - Sub::HandlesVia::CodeGenerator now handles generating code for type

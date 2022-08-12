@@ -1,3 +1,11 @@
+0.004011  2022-08-12  Released-By: PERLANCAR; Urgency: medium
+
+          - Add option: ls_mode.
+
+          - Update to String::Wildcard::Bash 0.044+, no longer need to
+            implement our own convert_wildcard_to_re.
+
+
 0.004010  2020-12-22  Released-By: PERLANCAR; Urgency: low
 
 	  - No functional changes.

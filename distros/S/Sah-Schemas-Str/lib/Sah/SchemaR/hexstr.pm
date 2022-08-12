@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::hexstr;
 
-our $DATE = '2022-06-09'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2022-07-05'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 our $rschema = do{my$var={base=>"str",clsets_after_base=>[{examples=>[{valid=>1,value=>""},{valid=>1,value=>"a0"},{summary=>"Odd number of digits (3)",valid=>0,value=>"a0f"},{valid=>1,value=>"a0ff"},{summary=>"Invalid hexdigit (g)",valid=>0,value=>"a0fg"},{valid=>1,value=>"a0ff12345678"}],match=>qr(\A(?:[0-9A-Fa-f]{2})*\z),summary=>"String of bytes in hexadecimal"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::hexstr - String of bytes in hexadecimal
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::SchemaR::hexstr (from Perl distribution Sah-Schemas-Str), released on 2022-06-09.
+This document describes version 0.009 of Sah::SchemaR::hexstr (from Perl distribution Sah-Schemas-Str), released on 2022-07-05.
 
 =head1 DESCRIPTION
 

@@ -1,4 +1,4 @@
-package t::TestVIC;
+package Test::VIC;
 use strict;
 use warnings;
 
@@ -122,7 +122,7 @@ sub plan { $Tester->plan(@_); }
 
 =head1 NAME
 
-t::TestVIC;
+Test::VIC
 
 =head1 SYNOPSIS
 

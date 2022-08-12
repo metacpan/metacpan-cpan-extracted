@@ -39,7 +39,7 @@ use SNMP::Info::Layer3;
 
 our ($VERSION, $DEBUG, %GLOBALS, %MIBS, %FUNCS, %MUNGE);
 
-$VERSION = '3.86';
+$VERSION = '3.87';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -327,7 +327,14 @@ sub i_vlan_membership {
 
     foreach my $vlan ( keys %$v_ports ) {
         my @bp_indexes = split /,/, $v_ports->{$vlan};
-        push @{ $res->{ $bp_index->{$_} } }, $vlan for @bp_indexes;
+        foreach my $idx (@bp_indexes) {
+            if (!exists $bp_index->{$idx}) {
+                print "  VLAN $vlan has no bp_index mapping. Skipping.\n"
+                    if $DEBUG;
+                next;
+            }
+            push @{ $res->{ $bp_index->{$idx} } }, $vlan;
+        }
     }
     return $res;
 }
@@ -353,7 +360,14 @@ sub i_vlan_membership_untagged {
 
     foreach my $vlan ( keys %$v_ports ) {
         my @bp_indexes = split /,/, $v_ports->{$vlan};
-        push @{ $res->{ $bp_index->{$_} } }, $vlan for @bp_indexes;
+        foreach my $idx (@bp_indexes) {
+            if (!exists $bp_index->{$idx}) {
+                print "  untagged VLAN $vlan has no bp_index mapping. Skipping.\n"
+                    if $DEBUG;
+                next;
+            }
+            push @{ $res->{ $bp_index->{$idx} } }, $vlan;
+        }
     }
     return $res;
 }

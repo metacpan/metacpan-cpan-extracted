@@ -3,9 +3,9 @@ package Sah::Schema::latin_letter;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-09'; # DATE
+our $DATE = '2022-07-05'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $schema = [str => {
     summary => 'Latin letter, i.e. A-Z or a-z',
@@ -37,7 +37,7 @@ Sah::Schema::latin_letter - Latin letter, i.e. A-Z or a-z
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::Schema::latin_letter (from Perl distribution Sah-Schemas-Str), released on 2022-06-09.
+This document describes version 0.009 of Sah::Schema::latin_letter (from Perl distribution Sah-Schemas-Str), released on 2022-07-05.
 
 =head1 SYNOPSIS
 
@@ -73,7 +73,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = "";
+ $data = "AB";
  my $errmsg = $validator->($data); # => "Length must be 1"
 
 Often a schema has coercion rule or default value, so after validation the
@@ -88,8 +88,8 @@ prefiltered) value:
  my $res = $validator->($data); # => ["","A"]
  
  # a sample invalid data
- $data = "";
- my $res = $validator->($data); # => ["Length must be 1",""]
+ $data = "AB";
+ my $res = $validator->($data); # => ["Length must be 1","AB"]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like

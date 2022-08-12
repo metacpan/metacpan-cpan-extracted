@@ -14,7 +14,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.41';
+our $VERSION = '0.43';
 
 =head1 NAME
 
@@ -232,6 +232,34 @@ has insecure => (
 
 =item *
 
+C<cert>
+
+    cert => '/path/to/certificate',
+
+Use the certificate file for SSL
+
+=cut
+
+has cert => (
+    is => 'ro',
+);
+
+=item *
+
+C<capath>
+
+    capath => '/path/to/cadir/',
+
+Use the certificate directory for SSL
+
+=cut
+
+has capath => (
+    is => 'ro',
+);
+
+=item *
+
 C<output>
 
 Name of the output file
@@ -292,53 +320,6 @@ sub _build_quoted_body( $self ) {
         return join "", @post_data;
     }
 };
-
-#    if( @form_args) {
-#        $method = 'POST';
-#
-#        my $req = HTTP::Request::Common::POST(
-#            'https://example.com',
-#            Content_Type => 'form-data',
-#            Content => [ map { /^([^=]+)=(.*)$/ ? ($1 => $2) : () } @form_args ],
-#        );
-#        $body = $req->content;
-#        unshift @headers, 'Content-Type: ' . join "; ", $req->headers->content_type;
-#
-#    } elsif( $options->{ get }) {
-#        $method = 'GET';
-#        # Also, append the POST data to the URL
-#        if( @post_data ) {
-#            my $q = $uri->query;
-#            if( defined $q and length $q ) {
-#                $q .= "&";
-#            } else {
-#                $q = "";
-#            };
-#            $q .= join "", @post_data;
-#            $uri->query( $q );
-#        };
-#
-#    } elsif( $options->{ head }) {
-#        $method = 'HEAD';
-#
-#    } elsif( @post_data ) {
-#        $method = 'POST';
-#        $body = join "", @post_data;
-#        unshift @headers, 'Content-Type: application/x-www-form-urlencoded';
-#
-#    } else {
-#        $method ||= 'GET';
-#    };
-
-#    if( defined $body ) {
-#        unshift @headers, sprintf 'Content-Length: %d', length $body;
-#    };
-
-#    my %headers = (
-#        %default_headers,
-#        'Host' => $uri->host_port,
-#        (map { /^\s*([^:\s]+)\s*:\s*(.*)$/ ? ($1 => $2) : () } @headers),
-#    );
 
 =head2 C<< ->as_request >>
 
@@ -418,7 +399,8 @@ sub _pairlist( $self, $l, $prefix = "    " ) {
     return join ",\n",
         pairmap { my $v = ! ref $b ? qq{'$b'}
                           : ref $b eq 'SCALAR' ? $$b
-                          : ref $b eq 'ARRAY' ? '[' . join( ", ", map {qq{'$_'}} @$b ) . ']'
+                          : ref $b eq 'ARRAY'  ? '[' . join( ", ", map {qq{'$_'}} @$b ) . ']'
+                          : ref $b eq 'HASH'   ? '{' . $self->_pairlist([ map { $_ => $b->{$_} } sort keys %$b ]) . '}'
                           : die "Unknown type of $b";
                   qq{$prefix'$a' => $v}
                 } @$l
@@ -496,6 +478,7 @@ sub as_lwp_snippet( $self, %options ) {
 
     my @preamble;
     my @postamble;
+    my %ssl_options;
     push @preamble, @{ $options{ preamble } } if $options{ preamble };
     push @postamble, @{ $options{ postamble } } if $options{ postamble };
     my @setup_ua = ('');
@@ -511,11 +494,27 @@ sub as_lwp_snippet( $self, %options ) {
         push @preamble, @{$p}
     };
 
+    if( $self->insecure ) {
+        push @preamble, 'use IO::Socket::SSL;';
+        $ssl_options{ SSL_verify_mode } = 'IO::Socket::SSL::SSL_VERIFY_NONE';
+        $ssl_options{ SSL_hostname    } = '""';
+        $ssl_options{ verify_hostname } = '""';
+    };
+
+    if( $self->cert ) {
+        push @preamble, 'use IO::Socket::SSL;';
+        $ssl_options{ SSL_ca_file } = $self->cert;
+    };
+    if( $self->capath ) {
+        push @preamble, 'use IO::Socket::SSL;';
+        $ssl_options{ SSL_ca_path } = $self->capath;
+    };
     my $constructor_args = join ",",
                            $self->_pairlist([
                                         send_te => 0,
                                maybe timeout    => $self->timeout,
                                maybe cookie_jar => $init_cookie_jar->{code},
+                               maybe SSL_options => keys %ssl_options ? \%ssl_options : undef,
                            ], '')
                            ;
     if( defined( my $credentials = $self->credentials )) {
@@ -525,12 +524,6 @@ sub as_lwp_snippet( $self, %options ) {
             quotemeta $pass;
         push @setup_ua, $setup_credentials;
     };
-    if( $self->insecure ) {
-        push @preamble, 'use IO::Socket::SSL;';
-        my $setup_insecure = q{$ua->ssl_opts( SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_NONE, SSL_hostname => '', verify_hostname => 0 );};
-        push @setup_ua, $setup_insecure;
-    };
-
     if( $self->show_error ) {
         push @postamble,
             '    die $res->message if $res->is_error;',
@@ -569,6 +562,7 @@ sub as_http_tiny_snippet( $self, %options ) {
 
     my @preamble;
     my @postamble;
+    my %ssl_options;
     push @preamble, @{ $options{ preamble } } if $options{ preamble };
     push @postamble, @{ $options{ postamble } } if $options{ postamble };
     my @setup_ua = ('');
@@ -589,6 +583,10 @@ sub as_http_tiny_snippet( $self, %options ) {
     } else {
         push @ssl, verify_SSL => 1;
     };
+    if( $self->cert ) {
+        push @preamble, 'use IO::Socket::SSL;';
+        $ssl_options{ SSL_ca_file } = $self->cert;
+    };
     if( $self->show_error ) {
         push @postamble,
             '    die $res->{reason} if !$res->{success};',
@@ -601,6 +599,7 @@ sub as_http_tiny_snippet( $self, %options ) {
                                      @ssl,
                                maybe timeout => $self->timeout,
                                maybe cookie_jar => $init_cookie_jar->{code},
+                               maybe SSL_options => keys %ssl_options ? \%ssl_options : undef,
                            ], '')
                            ;
     if( defined( my $credentials = $self->credentials )) {

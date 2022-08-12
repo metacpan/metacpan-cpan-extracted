@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::Toolkit::Mite;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.034';
+our $VERSION   = '0.035';
 
 use Sub::HandlesVia::Mite -all;
 extends 'Sub::HandlesVia::Toolkit';
@@ -26,9 +26,9 @@ sub install_has_wrapper {
 	no strict 'refs';
 	no warnings 'redefine';
 	
-	my $orig = \&{ "$target\::has" };
-	my $uses_mite = ${ "$target\::USES_MITE" };
-	
+	my $orig         = \&{ "$target\::has" };
+	my $uses_mite    = ${ "$target\::USES_MITE" };
+
 	*{ "$target\::has" } = sub {
 		my ( $names, %spec ) = @_;
 		return $orig->($names, %spec) unless $spec{handles}; # shortcut

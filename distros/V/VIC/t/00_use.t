@@ -1,4 +1,5 @@
 use Test::More;
+use Test::Lib;
 
 use_ok('VIC');
 
@@ -6,13 +7,13 @@ can_ok('VIC', 'compile');
 can_ok('VIC', 'assemble');
 can_ok('VIC', 'simulate');
 
-use_ok('t::TestVIC');
+use_ok('Test::VIC');
 
-can_ok('t::TestVIC', 'compiles_ok');
+can_ok('Test::VIC', 'compiles_ok');
 
-can_ok('t::TestVIC', 'compile_fails_ok');
+can_ok('Test::VIC', 'compile_fails_ok');
 
-can_ok('t::TestVIC', 'assembles_ok');
+can_ok('Test::VIC', 'assembles_ok');
 
 can_ok('VIC', 'supported_chips');
 

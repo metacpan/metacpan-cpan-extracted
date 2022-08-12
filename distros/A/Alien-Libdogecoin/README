@@ -1,0 +1,13 @@
+Alien::Libdogecoin
+------------------
+
+This module attempts to find or download, configure, compile, and install libdogecoin.
+
+U<https://github.com/dogecoinfoundation/libdogecoin>
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2022, chromatic. This module is made available under the same
+terms as Perl 5.36.
+
+libdogecoin is made available under the MIT license.

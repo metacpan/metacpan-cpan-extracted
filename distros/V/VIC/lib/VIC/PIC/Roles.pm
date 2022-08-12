@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 $VERSION = eval $VERSION;
 
 package VIC::PIC::Roles::CodeGen;

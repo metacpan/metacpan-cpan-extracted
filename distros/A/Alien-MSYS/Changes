@@ -1,5 +1,8 @@
 Revision history for Alien-MSYS
 
+0.15      2022-08-11 09:51:17 -0600
+  - Documentation fixes and improvements
+
 0.14      2020-03-08 17:07:11 -0600
   - Force a system install on non-MSWin32 and non-cygwin as a share
     install doesn't make sense on non-Windows. (SLAFFAN++ gh#9, gh#10)

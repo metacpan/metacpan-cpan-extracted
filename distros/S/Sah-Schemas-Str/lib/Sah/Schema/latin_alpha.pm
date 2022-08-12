@@ -3,9 +3,9 @@ package Sah::Schema::latin_alpha;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-09'; # DATE
+our $DATE = '2022-07-05'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $schema = [str => {
     summary => 'String containing only zero or more Latin letters, i.e. A-Z or a-z',
@@ -34,7 +34,7 @@ Sah::Schema::latin_alpha - String containing only zero or more Latin letters, i.
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::Schema::latin_alpha (from Perl distribution Sah-Schemas-Str), released on 2022-06-09.
+This document describes version 0.009 of Sah::Schema::latin_alpha (from Perl distribution Sah-Schemas-Str), released on 2022-07-05.
 
 =head1 SYNOPSIS
 
@@ -62,7 +62,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "";
+ $data = "Abz";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
@@ -77,8 +77,8 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "";
- my $res = $validator->($data); # => ["",""]
+ $data = "Abz";
+ my $res = $validator->($data); # => ["","Abz"]
  
  # a sample invalid data
  $data = "foo123";

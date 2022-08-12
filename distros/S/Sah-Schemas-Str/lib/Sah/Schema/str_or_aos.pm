@@ -3,9 +3,9 @@ package Sah::Schema::str_or_aos;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-09'; # DATE
+our $DATE = '2022-07-05'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $schema = [any => {
     summary => 'String or array (0+ length) of (defined) string',
@@ -41,7 +41,7 @@ Sah::Schema::str_or_aos - String or array (0+ length) of (defined) string
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::Schema::str_or_aos (from Perl distribution Sah-Schemas-Str), released on 2022-06-09.
+This document describes version 0.009 of Sah::Schema::str_or_aos (from Perl distribution Sah-Schemas-Str), released on 2022-07-05.
 
 =head1 SYNOPSIS
 
@@ -77,11 +77,11 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "a";
+ $data = ["a"];
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = ["a",undef];
+ $data = {};
  my $errmsg = $validator->($data); # => "Not of type text"
 
 Often a schema has coercion rule or default value, so after validation the
@@ -92,12 +92,12 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "a";
- my $res = $validator->($data); # => ["","a"]
+ $data = ["a"];
+ my $res = $validator->($data); # => ["",["a"]]
  
  # a sample invalid data
- $data = ["a",undef];
- my $res = $validator->($data); # => ["Not of type text",["a",undef]]
+ $data = {};
+ my $res = $validator->($data); # => ["Not of type text",{}]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like

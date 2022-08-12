@@ -6,13 +6,32 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Build or find libtool
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.15'; # VERSION
 
 
 
 
 
 
+
+
+my %helper;
+
+foreach my $command (qw( libtool libtoolize ))
+{
+  if($^O eq 'MSWin32')
+  {
+    $helper{$command} = sub { qq{sh -c "$command "\$*"" --} };
+  }
+  else
+  {
+    $helper{$command} = sub { $command };
+  }
+}
+
+sub alien_helper {
+  return \%helper;
+}
 
 1;
 
@@ -28,7 +47,7 @@ Alien::libtool - Build or find libtool
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -36,7 +55,7 @@ In your script or module:
 
  use Alien::libtool;
  use Env qw( @PATH );
- 
+
  unshift @PATH, Alien::libtool->bin_dir;
 
 =head1 DESCRIPTION
@@ -52,6 +71,19 @@ for the use of other modules.
 
 L<Alien>, L<Alien::Base>, L<Alien::Build::Manual::AlienUser>
 
+=head1 HELPERS
+
+This L<Alien> provides the following helpers which will execute the corresponding command.  You want
+to use the helpers because they will use the correct incantation on Windows.
+
+=over 4
+
+=item libtool
+
+=item libtoolize
+
+=back
+
 =head1 AUTHOR
 
 Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
@@ -64,7 +96,7 @@ Chase Whitener (genio, CAPOEIRAB)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

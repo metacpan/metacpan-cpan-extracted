@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Algorithm-Graphs-Reachable-Tiny
-version:             0.02
+version:             0.03
 abstract:            Compute rechable nodes in a graph.
 license:             perl_5
 author:              

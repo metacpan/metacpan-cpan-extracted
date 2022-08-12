@@ -4,6 +4,7 @@ use lib 't/lib';
 use Test2::V0 -no_srand => 1;
 use Test::Alien;
 use Alien::Foo;
+use Alien::perlhelp;
 use Alien::libfoo1;
 use Env qw( @PATH );
 use ExtUtils::CBuilder;
@@ -157,6 +158,16 @@ subtest 'helper_ok' => sub {
     },
     'failed test',
   );
+};
+
+subtest 'plugin_ok' => sub {
+
+  _reset();
+
+  plugin_ok 'NesAdvantage::HelperTest';
+  helper_ok 'nes';
+  interpolate_template_is '%{nes}', 'advantage';
+
 };
 
 subtest 'interpolate_template_is' => sub {
@@ -788,6 +799,22 @@ EOF
     'run_ok displays diagnostic sans alien_ok',
   ;
 
+  is
+    intercept { run_ok "$^X -e 1" },
+    array {
+      event Ok => sub {
+        call pass => T();
+        call name => match qr/^run/;
+      };
+      event Note => sub {};
+      event Diag => sub {
+        call message => 'run_ok called without any aliens, you may want to call alien_ok';
+      };
+      end;
+    },
+    'run_ok displays diagnostic sans alien_ok',
+  ;
+
   if(eval { require FFI::Platypus; 1 })
   {
     is
@@ -836,6 +863,36 @@ EOF
     },
     'interpolate_template_is called without any aliens, you may want to call alien_ok',
   ;
+
+};
+
+subtest 'interpolate_run_ok' => sub {
+
+  _reset();
+
+  alien_ok 'Alien::perlhelp';
+
+  is
+    intercept { interpolate_run_ok '%{bogus}' },
+    array {
+      event Ok => sub {
+        call pass => F();
+        call name => 'run %{bogus}';
+      };
+      event Diag => sub {};
+      event Diag => sub {
+        call message => 'error in evaluation:';
+      };
+      event Diag => sub {
+        call message => match qr/^  no helper defined for bogus at/;
+      };
+      end;
+    },
+    'run with bogus macro should fail',
+  ;
+
+  interpolate_run_ok ['%{perlhelp}', -e => '1'];
+  interpolate_run_ok '%{perlhelp} -e 1';
 
 };
 

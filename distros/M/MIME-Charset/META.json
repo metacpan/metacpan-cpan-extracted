@@ -50,6 +50,16 @@
             }
          }
       },
+      "misc" : {
+         "description" : "Additional mappings for rarely used old standards",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Encode::DIN66003" : "0"
+               }
+            }
+         }
+      },
       "pod2" : {
          "description" : "Support for POD2 - translations of Perl documentation",
          "prereqs" : {
@@ -84,7 +94,7 @@
    "provides" : {
       "MIME::Charset" : {
          "file" : "lib/MIME/Charset.pm",
-         "version" : "1.012.2"
+         "version" : "1.013.1"
       }
    },
    "release_status" : "stable",
@@ -93,5 +103,5 @@
          "url" : "https://github.com/hatukanezumi/MIME-Charset.git"
       }
    },
-   "version" : "1.012.2"
+   "version" : "1.013.1"
 }
