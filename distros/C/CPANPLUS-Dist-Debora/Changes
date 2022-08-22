@@ -1,5 +1,10 @@
 Revision history for CPANPLUS-Dist-Debora
 
+0.010  2022-08-19 14:54:42 CEST
+
+  - Add versions to the Obsoletes tags
+  - Move the primary Git repository to GitHub
+
 0.009  2022-01-25 16:50:34 CET
 
   - Die with "OS unsupported" in Makefile.PL on Windows

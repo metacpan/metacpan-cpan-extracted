@@ -11,14 +11,13 @@ BEGIN {
 }
 
 my ( $t, @blocks, $str, $dups );
-@blocks = map { Net::IPAM::Block->new($_) } qw(0.0.0.0/0 ::ffff:1.2.3.5 1.2.3.6 1.2.3.7/31 ::/0 fe80::1/10 ::cafe:affe);
+@blocks = map { Net::IPAM::Block->new($_) } qw(0.0.0.0/0 1.2.3.6 1.2.3.7/31 ::/0 fe80::1/10 ::cafe:affe);
 
-ok($t = Net::IPAM::Tree->new(@blocks), "new");
+ok( $t = Net::IPAM::Tree->new(@blocks), "new" );
 
 $str = <<EOT;
 ▼
 ├─ 0.0.0.0/0
-│  ├─ 1.2.3.5/32
 │  └─ 1.2.3.6/31
 │     └─ 1.2.3.6/32
 └─ ::/0
@@ -27,12 +26,12 @@ $str = <<EOT;
 EOT
 
 is( $t->to_string, $str, 'stringify' );
-ok( $t->len == 7, 'len' );
+is( $t->len,       6,    'len' );
 
 ### dups
 
 @blocks = map { Net::IPAM::Block->new($_) } qw(::/0 1.2.3.4 ::/0);
-ok( ($t, $dups) = Net::IPAM::Tree->new(@blocks) , 'new with dups');
+ok( ( $t, $dups ) = Net::IPAM::Tree->new(@blocks), 'new with dups' );
 
 $str = <<EOT;
 ▼
@@ -40,15 +39,15 @@ $str = <<EOT;
 └─ ::/0
 EOT
 
-is( $t->to_string, $str, 'stringify with dups' );
-is($dups->[0], "::/0", 'found the duplicate block');
+is( $t->to_string, $str,   'stringify with dups' );
+is( $dups->[0],    "::/0", 'found the duplicate block' );
 
 ### dups with warn
 {
-    my $msg;
-    local $SIG{__WARN__} = sub { $msg = shift };
-    $t = Net::IPAM::Tree->new(@blocks);
-    like( $msg, qr/duplicate/, 'new with dups, check warnings');
+  my $msg;
+  local $SIG{__WARN__} = sub { $msg = shift };
+  $t = Net::IPAM::Tree->new(@blocks);
+  like( $msg, qr/duplicate/, 'new with dups, check warnings' );
 }
 
 done_testing();

@@ -12,11 +12,11 @@ use warnings;
 
 # as Math::Combinatorics does not preserve input order in return values
 use Algorithm::Combinatorics qw/combinations/;
-use Carp qw/croak/;
-use List::Util qw/shuffle/;
-use Scalar::Util qw/looks_like_number refaddr/;
+use Carp                     qw/croak/;
+use List::Util               qw/shuffle uniqnum/;
+use Scalar::Util             qw/looks_like_number refaddr/;
 
-our $VERSION = '1.15';
+our $VERSION = '1.18';
 
 my $DEG_IN_SCALE = 12;
 
@@ -186,13 +186,13 @@ our %FORTE2PCS = (
     '7-29'  => [ 0, 1, 2, 4, 6, 7, 9 ],
     '7-31'  => [ 0, 1, 3, 4, 6, 7, 9 ],
     '7-Z18' => [ 0, 1, 4, 5, 6, 7, 9 ],    # 0,1,2,3,5,8,9 forte1973
-               # '7-Z18' => [ 0, 1, 2, 3, 5, 8, 9 ], # rahn1980
+        # '7-Z18' => [ 0, 1, 2, 3, 5, 8, 9 ], # rahn1980
     '7-21' => [ 0, 1, 2, 4, 5, 8, 9 ],
     '7-30' => [ 0, 1, 2, 4, 6, 8, 9 ],
     '7-32' => [ 0, 1, 3, 4, 6, 8, 9 ],
     '7-22' => [ 0, 1, 2, 5, 6, 8, 9 ],
     '7-20' => [ 0, 1, 2, 5, 6, 7, 9 ],    # 0,1,2,4,7,8,9 forte1973
-               # '7-20'  => [ 0, 1, 2, 4, 7, 8, 9 ], # rahn1980
+        # '7-20'  => [ 0, 1, 2, 4, 7, 8, 9 ], # rahn1980
     '7-8'   => [ 0, 2, 3, 4, 5, 6, 8 ],
     '7-11'  => [ 0, 1, 3, 4, 5, 6, 8 ],
     '7-23'  => [ 0, 2, 3, 4, 5, 7, 9 ],
@@ -265,18 +265,18 @@ our %FORTE2PCS = (
 # sorting is to align with the table in rahn1980
 our %PCS2FORTE = (
     # trichords (complement nonachords)
-    '0,1,2'              => '3-1',
-    '0,1,3'              => '3-2',
-    '0,1,4'              => '3-3',
-    '0,1,5'              => '3-4',
-    '0,1,6'              => '3-5',
-    '0,2,4'              => '3-6',
-    '0,2,5'              => '3-7',
-    '0,2,6'              => '3-8',
-    '0,2,7'              => '3-9',
-    '0,3,6'              => '3-10',
-    '0,3,7'              => '3-11',
-    '0,4,8'              => '3-12',
+    '0,1,2' => '3-1',
+    '0,1,3' => '3-2',
+    '0,1,4' => '3-3',
+    '0,1,5' => '3-4',
+    '0,1,6' => '3-5',
+    '0,2,4' => '3-6',
+    '0,2,5' => '3-7',
+    '0,2,6' => '3-8',
+    '0,2,7' => '3-9',
+    '0,3,6' => '3-10',
+    '0,3,7' => '3-11',
+    '0,4,8' => '3-12',
     # nonachords (trichords)
     '0,1,2,3,4,5,6,7,8'  => '9-1',
     '0,1,2,3,4,5,6,7,9'  => '9-2',
@@ -291,194 +291,194 @@ our %PCS2FORTE = (
     '0,1,2,3,5,6,7,9,10' => '9-11',
     '0,1,2,4,5,6,8,9,10' => '9-12',
     # tetrachords (octachords)
-    '0,1,2,3'            => '4-1',
-    '0,1,2,4'            => '4-2',
-    '0,1,2,5'            => '4-4',
-    '0,1,2,6'            => '4-5',
-    '0,1,2,7'            => '4-6',
-    '0,1,3,4'            => '4-3',
-    '0,1,3,5'            => '4-11',
-    '0,1,3,6'            => '4-13',
-    '0,1,3,7'            => '4-Z29',
-    '0,1,4,5'            => '4-7',
-    '0,1,4,6'            => '4-Z15',
-    '0,1,4,7'            => '4-18',
-    '0,1,4,8'            => '4-19',
-    '0,1,5,6'            => '4-8',
-    '0,1,5,7'            => '4-16',
-    '0,1,5,8'            => '4-20',
-    '0,1,6,7'            => '4-9',
-    '0,2,3,5'            => '4-10',
-    '0,2,3,6'            => '4-12',
-    '0,2,3,7'            => '4-14',
-    '0,2,4,6'            => '4-21',
-    '0,2,4,7'            => '4-22',
-    '0,2,4,8'            => '4-24',
-    '0,2,5,7'            => '4-23',
-    '0,2,5,8'            => '4-27',
-    '0,2,6,8'            => '4-25',
-    '0,3,4,7'            => '4-17',
-    '0,3,5,8'            => '4-26',
-    '0,3,6,9'            => '4-28',
+    '0,1,2,3' => '4-1',
+    '0,1,2,4' => '4-2',
+    '0,1,2,5' => '4-4',
+    '0,1,2,6' => '4-5',
+    '0,1,2,7' => '4-6',
+    '0,1,3,4' => '4-3',
+    '0,1,3,5' => '4-11',
+    '0,1,3,6' => '4-13',
+    '0,1,3,7' => '4-Z29',
+    '0,1,4,5' => '4-7',
+    '0,1,4,6' => '4-Z15',
+    '0,1,4,7' => '4-18',
+    '0,1,4,8' => '4-19',
+    '0,1,5,6' => '4-8',
+    '0,1,5,7' => '4-16',
+    '0,1,5,8' => '4-20',
+    '0,1,6,7' => '4-9',
+    '0,2,3,5' => '4-10',
+    '0,2,3,6' => '4-12',
+    '0,2,3,7' => '4-14',
+    '0,2,4,6' => '4-21',
+    '0,2,4,7' => '4-22',
+    '0,2,4,8' => '4-24',
+    '0,2,5,7' => '4-23',
+    '0,2,5,8' => '4-27',
+    '0,2,6,8' => '4-25',
+    '0,3,4,7' => '4-17',
+    '0,3,5,8' => '4-26',
+    '0,3,6,9' => '4-28',
     # octachords (tetrachords)
-    '0,1,2,3,4,5,6,7'    => '8-1',
-    '0,1,2,3,4,5,6,8'    => '8-2',
-    '0,1,2,3,4,5,7,8'    => '8-4',
-    '0,1,2,3,4,6,7,8'    => '8-5',
-    '0,1,2,3,5,6,7,8'    => '8-6',
-    '0,1,2,3,4,5,6,9'    => '8-3',
-    '0,1,2,3,4,5,7,9'    => '8-11',
-    '0,1,2,3,4,6,7,9'    => '8-13',
-    '0,1,2,3,5,6,7,9'    => '8-Z29',
-    '0,1,2,3,4,5,8,9'    => '8-7',
-    '0,1,2,3,4,6,8,9'    => '8-Z15',
-    '0,1,2,3,5,6,8,9'    => '8-18',
-    '0,1,2,4,5,6,8,9'    => '8-19',
-    '0,1,2,3,4,7,8,9'    => '8-8',
-    '0,1,2,3,5,7,8,9'    => '8-16',
-    '0,1,2,4,5,7,8,9'    => '8-20',
-    '0,1,2,3,6,7,8,9'    => '8-9',
-    '0,2,3,4,5,6,7,9'    => '8-10',
-    '0,1,3,4,5,6,7,9'    => '8-12',
-    '0,1,2,4,5,6,7,9'    => '8-14',
-    '0,1,2,3,4,6,8,10'   => '8-21',
-    '0,1,2,3,5,6,8,10'   => '8-22',
-    '0,1,2,4,5,6,8,10'   => '8-24',
-    '0,1,2,3,5,7,8,10'   => '8-23',
-    '0,1,2,4,5,7,8,10'   => '8-27',
-    '0,1,2,4,6,7,8,10'   => '8-25',
-    '0,1,3,4,5,6,8,9'    => '8-17',
-    '0,1,3,4,5,7,8,10'   => '8-26', # buggy in rahn1980
-    '0,1,3,4,6,7,9,10'   => '8-28',
+    '0,1,2,3,4,5,6,7'  => '8-1',
+    '0,1,2,3,4,5,6,8'  => '8-2',
+    '0,1,2,3,4,5,7,8'  => '8-4',
+    '0,1,2,3,4,6,7,8'  => '8-5',
+    '0,1,2,3,5,6,7,8'  => '8-6',
+    '0,1,2,3,4,5,6,9'  => '8-3',
+    '0,1,2,3,4,5,7,9'  => '8-11',
+    '0,1,2,3,4,6,7,9'  => '8-13',
+    '0,1,2,3,5,6,7,9'  => '8-Z29',
+    '0,1,2,3,4,5,8,9'  => '8-7',
+    '0,1,2,3,4,6,8,9'  => '8-Z15',
+    '0,1,2,3,5,6,8,9'  => '8-18',
+    '0,1,2,4,5,6,8,9'  => '8-19',
+    '0,1,2,3,4,7,8,9'  => '8-8',
+    '0,1,2,3,5,7,8,9'  => '8-16',
+    '0,1,2,4,5,7,8,9'  => '8-20',
+    '0,1,2,3,6,7,8,9'  => '8-9',
+    '0,2,3,4,5,6,7,9'  => '8-10',
+    '0,1,3,4,5,6,7,9'  => '8-12',
+    '0,1,2,4,5,6,7,9'  => '8-14',
+    '0,1,2,3,4,6,8,10' => '8-21',
+    '0,1,2,3,5,6,8,10' => '8-22',
+    '0,1,2,4,5,6,8,10' => '8-24',
+    '0,1,2,3,5,7,8,10' => '8-23',
+    '0,1,2,4,5,7,8,10' => '8-27',
+    '0,1,2,4,6,7,8,10' => '8-25',
+    '0,1,3,4,5,6,8,9'  => '8-17',
+    '0,1,3,4,5,7,8,10' => '8-26',    # buggy in rahn1980
+    '0,1,3,4,6,7,9,10' => '8-28',
     # pentachords (septachords)
-    '0,1,2,3,4'          => '5-1',
-    '0,1,2,3,5'          => '5-2',
-    '0,1,2,3,6'          => '5-4',
-    '0,1,2,3,7'          => '5-5',
-    '0,1,2,4,5'          => '5-3',
-    '0,1,2,4,6'          => '5-9',
-    '0,1,2,4,7'          => '5-Z36',
-    '0,1,2,4,8'          => '5-13',
-    '0,1,2,5,6'          => '5-6',
-    '0,1,2,5,7'          => '5-14',
-    '0,1,2,5,8'          => '5-Z38',
-    '0,1,2,6,7'          => '5-7',
-    '0,1,2,6,8'          => '5-15',
-    '0,1,3,4,6'          => '5-10',
-    '0,1,3,4,7'          => '5-16',
-    '0,1,3,4,8'          => '5-Z17',
-    '0,1,3,5,6'          => '5-Z12',
-    '0,1,3,5,7'          => '5-24',
-    '0,1,3,5,8'          => '5-27',
-    '0,1,3,6,7'          => '5-19',
-    '0,1,3,6,8'          => '5-29',
-    '0,1,3,6,9'          => '5-31',
-    '0,1,4,5,7'          => '5-Z18',
-    '0,1,4,5,8'          => '5-21',
-    '0,1,4,6,8'          => '5-30',
-    '0,1,4,6,9'          => '5-32',
-    '0,1,4,7,8'          => '5-22',
-    '0,1,5,6,8'          => '5-20',
-    '0,2,3,4,6'          => '5-8',
-    '0,2,3,4,7'          => '5-11',
-    '0,2,3,5,7'          => '5-23',
-    '0,2,3,5,8'          => '5-25',
-    '0,2,3,6,8'          => '5-28',
-    '0,2,4,5,8'          => '5-26',
-    '0,2,4,6,8'          => '5-33',
-    '0,2,4,6,9'          => '5-34',
-    '0,2,4,7,9'          => '5-35',
-    '0,3,4,5,8'          => '5-Z37',
+    '0,1,2,3,4' => '5-1',
+    '0,1,2,3,5' => '5-2',
+    '0,1,2,3,6' => '5-4',
+    '0,1,2,3,7' => '5-5',
+    '0,1,2,4,5' => '5-3',
+    '0,1,2,4,6' => '5-9',
+    '0,1,2,4,7' => '5-Z36',
+    '0,1,2,4,8' => '5-13',
+    '0,1,2,5,6' => '5-6',
+    '0,1,2,5,7' => '5-14',
+    '0,1,2,5,8' => '5-Z38',
+    '0,1,2,6,7' => '5-7',
+    '0,1,2,6,8' => '5-15',
+    '0,1,3,4,6' => '5-10',
+    '0,1,3,4,7' => '5-16',
+    '0,1,3,4,8' => '5-Z17',
+    '0,1,3,5,6' => '5-Z12',
+    '0,1,3,5,7' => '5-24',
+    '0,1,3,5,8' => '5-27',
+    '0,1,3,6,7' => '5-19',
+    '0,1,3,6,8' => '5-29',
+    '0,1,3,6,9' => '5-31',
+    '0,1,4,5,7' => '5-Z18',
+    '0,1,4,5,8' => '5-21',
+    '0,1,4,6,8' => '5-30',
+    '0,1,4,6,9' => '5-32',
+    '0,1,4,7,8' => '5-22',
+    '0,1,5,6,8' => '5-20',
+    '0,2,3,4,6' => '5-8',
+    '0,2,3,4,7' => '5-11',
+    '0,2,3,5,7' => '5-23',
+    '0,2,3,5,8' => '5-25',
+    '0,2,3,6,8' => '5-28',
+    '0,2,4,5,8' => '5-26',
+    '0,2,4,6,8' => '5-33',
+    '0,2,4,6,9' => '5-34',
+    '0,2,4,7,9' => '5-35',
+    '0,3,4,5,8' => '5-Z37',
     # septachords (pentachords)
-    '0,1,2,3,4,5,6'      => '7-1',
-    '0,1,2,3,4,5,7'      => '7-2',
-    '0,1,2,3,4,6,7'      => '7-4',
-    '0,1,2,3,5,6,7'      => '7-5',
-    '0,1,2,3,4,5,8'      => '7-3',
-    '0,1,2,3,4,6,8'      => '7-9',
-    '0,1,2,3,5,6,8'      => '7-Z36',
-    '0,1,2,4,5,6,8'      => '7-13',
-    '0,1,2,3,4,7,8'      => '7-6',
-    '0,1,2,3,5,7,8'      => '7-14',
-    '0,1,2,4,5,7,8'      => '7-Z38',
-    '0,1,2,3,6,7,8'      => '7-7',
-    '0,1,2,4,6,7,8'      => '7-15',
-    '0,1,2,3,4,6,9'      => '7-10',
-    '0,1,2,3,5,6,9'      => '7-16',
-    '0,1,2,4,5,6,9'      => '7-Z17',
-    '0,1,2,3,4,7,9'      => '7-Z12',
-    '0,1,2,3,5,7,9'      => '7-24',
-    '0,1,2,4,5,7,9'      => '7-27',
-    '0,1,2,3,6,7,9'      => '7-19',
-    '0,1,2,4,6,7,9'      => '7-29',
-    '0,1,3,4,6,7,9'      => '7-31',
-    '0,1,4,5,6,7,9'      => '7-Z18', # buggy in rahn1980
-    '0,1,2,4,5,8,9'      => '7-21',
-    '0,1,2,4,6,8,9'      => '7-30',
-    '0,1,3,4,6,8,9'      => '7-32',
-    '0,1,2,5,6,8,9'      => '7-22',
-    '0,1,2,5,6,7,9'      => '7-20', # buggy in rahn1980
-    '0,2,3,4,5,6,8'      => '7-8',
-    '0,1,3,4,5,6,8'      => '7-11',
-    '0,2,3,4,5,7,9'      => '7-23',
-    '0,2,3,4,6,7,9'      => '7-25',
-    '0,1,3,5,6,7,9'      => '7-28',
-    '0,1,3,4,5,7,9'      => '7-26',
-    '0,1,2,4,6,8,10'     => '7-33',
-    '0,1,3,4,6,8,10'     => '7-34',
-    '0,1,3,5,6,8,10'     => '7-35',
-    '0,1,3,4,5,7,8'      => '7-Z37',
+    '0,1,2,3,4,5,6'  => '7-1',
+    '0,1,2,3,4,5,7'  => '7-2',
+    '0,1,2,3,4,6,7'  => '7-4',
+    '0,1,2,3,5,6,7'  => '7-5',
+    '0,1,2,3,4,5,8'  => '7-3',
+    '0,1,2,3,4,6,8'  => '7-9',
+    '0,1,2,3,5,6,8'  => '7-Z36',
+    '0,1,2,4,5,6,8'  => '7-13',
+    '0,1,2,3,4,7,8'  => '7-6',
+    '0,1,2,3,5,7,8'  => '7-14',
+    '0,1,2,4,5,7,8'  => '7-Z38',
+    '0,1,2,3,6,7,8'  => '7-7',
+    '0,1,2,4,6,7,8'  => '7-15',
+    '0,1,2,3,4,6,9'  => '7-10',
+    '0,1,2,3,5,6,9'  => '7-16',
+    '0,1,2,4,5,6,9'  => '7-Z17',
+    '0,1,2,3,4,7,9'  => '7-Z12',
+    '0,1,2,3,5,7,9'  => '7-24',
+    '0,1,2,4,5,7,9'  => '7-27',
+    '0,1,2,3,6,7,9'  => '7-19',
+    '0,1,2,4,6,7,9'  => '7-29',
+    '0,1,3,4,6,7,9'  => '7-31',
+    '0,1,4,5,6,7,9'  => '7-Z18',    # buggy in rahn1980
+    '0,1,2,4,5,8,9'  => '7-21',
+    '0,1,2,4,6,8,9'  => '7-30',
+    '0,1,3,4,6,8,9'  => '7-32',
+    '0,1,2,5,6,8,9'  => '7-22',
+    '0,1,2,5,6,7,9'  => '7-20',     # buggy in rahn1980
+    '0,2,3,4,5,6,8'  => '7-8',
+    '0,1,3,4,5,6,8'  => '7-11',
+    '0,2,3,4,5,7,9'  => '7-23',
+    '0,2,3,4,6,7,9'  => '7-25',
+    '0,1,3,5,6,7,9'  => '7-28',
+    '0,1,3,4,5,7,9'  => '7-26',
+    '0,1,2,4,6,8,10' => '7-33',
+    '0,1,3,4,6,8,10' => '7-34',
+    '0,1,3,5,6,8,10' => '7-35',
+    '0,1,3,4,5,7,8'  => '7-Z37',
     # hexachords, by first column and then sparse 2nd column
-    '0,1,2,3,4,5'        => '6-1',
-    '0,1,2,3,4,6'        => '6-2',
-    '0,1,2,3,4,7'        => '6-Z36',
-    '0,1,2,3,4,8'        => '6-Z37',
-    '0,1,2,3,5,7'        => '6-9',
-    '0,1,2,3,5,8'        => '6-Z40',
-    '0,1,2,3,6,7'        => '6-5',
-    '0,1,2,3,6,8'        => '6-Z41',
-    '0,1,2,3,6,9'        => '6-Z42',
-    '0,1,2,3,7,8'        => '6-Z38',
-    '0,1,2,4,5,8'        => '6-15',
-    '0,1,2,4,6,8'        => '6-22',
-    '0,1,2,4,6,9'        => '6-Z46',
-    '0,1,2,4,7,8'        => '6-Z17',
-    '0,1,2,4,7,9'        => '6-Z47',
-    '0,1,2,5,6,9'        => '6-Z44',
-    '0,1,2,5,7,8'        => '6-18',
-    '0,1,2,5,7,9'        => '6-Z48',
-    '0,1,2,6,7,8'        => '6-7',
-    '0,1,3,4,5,7'        => '6-Z10',
-    '0,1,3,4,5,8'        => '6-14',
-    '0,1,3,4,6,9'        => '6-27',
-    '0,1,3,4,7,9'        => '6-Z49',
-    '0,1,3,5,7,9'        => '6-34',
-    '0,1,4,5,7,9'        => '6-31',
-    '0,1,3,6,7,9'        => '6-30',
-    '0,2,3,6,7,9'        => '6-Z29',
-    '0,1,4,5,6,8'        => '6-16',
-    '0,1,4,5,8,9'        => '6-20',
-    '0,2,3,4,5,7'        => '6-8',
-    '0,2,3,4,6,8'        => '6-21',
-    '0,2,3,4,6,9'        => '6-Z45',
-    '0,2,3,5,7,9'        => '6-33',
-    '0,2,4,5,7,9'        => '6-32',
-    '0,2,4,6,8,10'       => '6-35',
-    '0,1,2,3,5,6'        => '6-Z3',
-    '0,1,2,4,5,6'        => '6-Z4',
-    '0,1,2,4,5,7'        => '6-Z11',
-    '0,1,2,4,6,7'        => '6-Z12',
-    '0,1,3,4,6,7'        => '6-Z13',
-    '0,1,2,5,6,7'        => '6-Z6',
-    '0,1,3,4,6,8'        => '6-Z24',
-    '0,1,2,5,6,8'        => '6-Z43',
-    '0,1,3,5,6,8'        => '6-Z25',
-    '0,1,3,4,7,8'        => '6-Z19',
-    '0,1,3,5,7,8'        => '6-Z26',
-    '0,2,3,4,5,8'        => '6-Z39',
-    '0,1,3,5,6,9'        => '6-Z28',
-    '0,1,4,6,7,9'        => '6-Z50',
-    '0,2,3,5,6,8'        => '6-Z23',
+    '0,1,2,3,4,5'  => '6-1',
+    '0,1,2,3,4,6'  => '6-2',
+    '0,1,2,3,4,7'  => '6-Z36',
+    '0,1,2,3,4,8'  => '6-Z37',
+    '0,1,2,3,5,7'  => '6-9',
+    '0,1,2,3,5,8'  => '6-Z40',
+    '0,1,2,3,6,7'  => '6-5',
+    '0,1,2,3,6,8'  => '6-Z41',
+    '0,1,2,3,6,9'  => '6-Z42',
+    '0,1,2,3,7,8'  => '6-Z38',
+    '0,1,2,4,5,8'  => '6-15',
+    '0,1,2,4,6,8'  => '6-22',
+    '0,1,2,4,6,9'  => '6-Z46',
+    '0,1,2,4,7,8'  => '6-Z17',
+    '0,1,2,4,7,9'  => '6-Z47',
+    '0,1,2,5,6,9'  => '6-Z44',
+    '0,1,2,5,7,8'  => '6-18',
+    '0,1,2,5,7,9'  => '6-Z48',
+    '0,1,2,6,7,8'  => '6-7',
+    '0,1,3,4,5,7'  => '6-Z10',
+    '0,1,3,4,5,8'  => '6-14',
+    '0,1,3,4,6,9'  => '6-27',
+    '0,1,3,4,7,9'  => '6-Z49',
+    '0,1,3,5,7,9'  => '6-34',
+    '0,1,4,5,7,9'  => '6-31',
+    '0,1,3,6,7,9'  => '6-30',
+    '0,2,3,6,7,9'  => '6-Z29',
+    '0,1,4,5,6,8'  => '6-16',
+    '0,1,4,5,8,9'  => '6-20',
+    '0,2,3,4,5,7'  => '6-8',
+    '0,2,3,4,6,8'  => '6-21',
+    '0,2,3,4,6,9'  => '6-Z45',
+    '0,2,3,5,7,9'  => '6-33',
+    '0,2,4,5,7,9'  => '6-32',
+    '0,2,4,6,8,10' => '6-35',
+    '0,1,2,3,5,6'  => '6-Z3',
+    '0,1,2,4,5,6'  => '6-Z4',
+    '0,1,2,4,5,7'  => '6-Z11',
+    '0,1,2,4,6,7'  => '6-Z12',
+    '0,1,3,4,6,7'  => '6-Z13',
+    '0,1,2,5,6,7'  => '6-Z6',
+    '0,1,3,4,6,8'  => '6-Z24',
+    '0,1,2,5,6,8'  => '6-Z43',
+    '0,1,3,5,6,8'  => '6-Z25',
+    '0,1,3,4,7,8'  => '6-Z19',
+    '0,1,3,5,7,8'  => '6-Z26',
+    '0,2,3,4,5,8'  => '6-Z39',
+    '0,1,3,5,6,9'  => '6-Z28',
+    '0,1,4,6,7,9'  => '6-Z50',
+    '0,2,3,5,6,8'  => '6-Z23',
 );
 
 # NOTE may need [AB]? at end for what I call "half prime" forms, as
@@ -524,7 +524,7 @@ sub _apply_melody_rule {
                 my $iter = combinations( \@selection, scalar @$check_set );
 
                 while ( my $subsel = $iter->next ) {
-                    $sel_audit = $code->( $self, $subsel );
+                    $sel_audit  = $code->( $self, $subsel );
                     @$sel_audit = sort { $a <=> $b } @$sel_audit if $flag_sort;
                     if ( "@$sel_audit" eq "@$check_set" ) {
                         return 0, { context => \@selection, index => $i, selection => $subsel };
@@ -545,8 +545,7 @@ sub adjacent_interval_content {
     my $self = shift;
     my $pset = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
 
-    my %seen;
-    my @nset = sort { $a <=> $b } grep { !$seen{$_}++ } @$pset;
+    my @nset = sort { $a <=> $b } uniqnum @$pset;
     croak 'pitch set must contain at least two elements' if @nset < 2;
 
     my %aic;
@@ -565,6 +564,16 @@ sub adjacent_interval_content {
     }
 
     return wantarray ? ( \@aiv, \%aic ) : \@aiv;
+}
+
+# what bands of the Bark scale do the given frequencies belong to? there
+# are several formula for this in the Wikipedia article, this one
+# follows Traunmüller 1990 to avoid pulling in trig functions. not sure
+# if one is supposed to int() or sprintf() round the result to get to an
+# integer value
+sub bark_scale {
+    shift;
+    map { ( 26.81 * $_ ) / ( 1960 + $_ ) - 0.53 } @_;
 }
 
 # Utility, converts a scale_degrees-bit number into a pitch set.
@@ -725,7 +734,7 @@ sub forte2pcs {
 sub gen_melody {
     my ( $self, %params ) = @_;
 
-    my $attempts = 1000;    # enough for Helen, enough for us
+    my $attempts     = 1000;    # enough for Helen, enough for us
     my $max_interval = $params{melody_max_interval} || 16;    # tessitura of a 10th
     delete $params{melody_max_interval};
 
@@ -740,11 +749,11 @@ sub gen_melody {
                 { iset => [ 5, 5 ], },    # adjacent fourths ("cadential basses")
             ],
             exclude_prime => [
-                { ps => [ 0, 3, 7 ], in => 4 },    # major or minor triad, any guise
-                { ps => [ 0, 2, 5, 8 ], },         # 7th, any guise, exact
-                { ps => [ 0, 2, 4, 6 ], in => 5 }, # whole tone formation
-                        # 7-35 (major/minor scale) but also excluding from all 5-x or
-                        # 6-x subsets of said set
+                { ps => [ 0, 3, 7 ], in => 4 },       # major or minor triad, any guise
+                { ps => [ 0, 2, 5, 8 ], },            # 7th, any guise, exact
+                { ps => [ 0, 2, 4, 6 ], in => 5 },    # whole tone formation
+                    # 7-35 (major/minor scale) but also excluding from all 5-x or
+                    # 6-x subsets of said set
                 { ps => [ 0, 1, 3, 5, 6, 8, 10 ], subsets => [ 6, 5 ] },
             ],
         );
@@ -753,7 +762,7 @@ sub gen_melody {
     my $got_melody = 0;
     my @melody;
     eval {
-        ATTEMPT: while ( $attempts-- > 0 ) {
+      ATTEMPT: while ( $attempts-- > 0 ) {
             my %seen;
             my @pitches = 0 .. $self->{_DEG_IN_SCALE} - 1;
             @melody = splice @pitches, rand @pitches, 1;
@@ -873,8 +882,7 @@ sub interval_class_content {
     my $self = shift;
     my $pset = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
 
-    my %seen;
-    my @nset = sort { $a <=> $b } grep { !$seen{$_}++ } @$pset;
+    my @nset = sort { $a <=> $b } uniqnum @$pset;
     croak 'pitch set must contain at least two elements' if @nset < 2;
 
     my %icc;
@@ -980,7 +988,7 @@ sub mininterval {
     }
     my $interval = $to - $from;
     if ( $interval > $self->{_DEG_IN_SCALE} / 2 ) {
-        $dir *= -1;
+        $dir  *= -1;
         $from += $self->{_DEG_IN_SCALE};
         $interval = $from - $to;
     }
@@ -1009,26 +1017,50 @@ sub multiply {
     # get the iterator value for a ref
     sub geti {
         my ( $self, $ref ) = @_;
+        croak 'need an array reference' if !defined $ref or ref $ref ne 'ARRAY';
         return $seen{ refaddr $ref} || 0;
+    }
+
+    # grabi(42, \@array) obtains 42 elements from array, looping to
+    # fill if necessary
+    sub grabi {
+        my ( $self, $count, $ref ) = @_;
+        croak 'need an array reference' if !defined $ref or ref $ref ne 'ARRAY';
+        croak 'count must be non-negative integer'
+          if !looks_like_number($count)
+          or $count < 0;
+        return if @$ref == 0 or $count == 0;
+        $seen{ refaddr $ref} ||= 0;
+        my @results;
+        while ( $count > 0 ) {
+            push @results, $ref->[ $seen{ refaddr $ref} ];
+            $seen{ refaddr $ref } = ( $seen{ refaddr $ref } + 1 ) % @$ref;
+            $count--;
+        }
+        return @results;
     }
 
     # nexti(\@array) - returns subsequent elements of array on each
     # successive call
     sub nexti {
         my ( $self, $ref ) = @_;
+        croak 'need an array reference' if !defined $ref or ref $ref ne 'ARRAY';
         $seen{ refaddr $ref} ||= 0;
-        $ref->[ ++$seen{ refaddr $ref} % @$ref ];
+        $seen{ refaddr $ref } = ( $seen{ refaddr $ref } + 1 ) % @$ref;
+        $ref->[ $seen{ refaddr $ref} ];
     }
 
     # reseti(\@array) - resets counter
     sub reseti {
         my ( $self, $ref ) = @_;
+        croak 'need an array reference' if !defined $ref or ref $ref ne 'ARRAY';
         $seen{ refaddr $ref} = 0;
     }
 
     # set the iterator for a ref
     sub seti {
         my ( $self, $ref, $i ) = @_;
+        croak 'need an array reference' if !defined $ref or ref $ref ne 'ARRAY';
         croak 'iterator must be number'
           unless looks_like_number($i);
         $seen{ refaddr $ref} = $i;
@@ -1037,6 +1069,7 @@ sub multiply {
     # returns current element, but does not advance pointer
     sub whati {
         my ( $self, $ref ) = @_;
+        croak 'need an array reference' if !defined $ref or ref $ref ne 'ARRAY';
         $seen{ refaddr $ref} ||= 0;
         $ref->[ $seen{ refaddr $ref} % @$ref ];
     }
@@ -1060,7 +1093,7 @@ sub new {
     }
 
     # XXX packing not implemented beyond "right" method (via www.mta.ca docs)
-    $self->{_packing} = $param{PACKING} // 'right';
+    $self->{_packing} = 'right';    # $param{PACKING} // 'right';
 
     bless $self, $class;
     return $self;
@@ -1083,23 +1116,10 @@ sub normal_form {
 
     my $equivs = $self->circular_permute( \@nset );
     my @order  = 1 .. $#nset;
-    if ( $self->{_packing} eq 'right' ) {
-        @order = reverse @order;
-    } elsif ( $self->{_packing} eq 'left' ) {
-        # XXX not sure about this, www.mta.ca instructions not totally
-        # clear on the Forte method, and the 7-Z18 (0234589) form
-        # listed there reduces to (0123589). So, blow up until can
-        # figure that out.
-        #      unshift @order, pop @order;
-        # Also, the inclusion of http://en.wikipedia.org/wiki/Forte_number
-        # plus a prime_form call on those pitch sets shows no changes caused
-        # by the default 'right' packing method, so sticking with it until
-        # learn otherwise. (In hindsight, the right packing method is that
-        # of rahn1980, so sticking with that...)
-        die 'left packing method not yet implemented (sorry)';
-    } else {
-        croak 'unknown packing method (try the "right" one)';
-    }
+    # NOTE this only performs 'right' packing, see commits
+    # 9f0c33f8260af9584d38c92af4e7a6a39f7e2769 and prior for long since
+    # unimplemented notes on this topic
+    @order = reverse @order;
 
     my @normal;
     for my $i (@order) {
@@ -1335,8 +1355,7 @@ sub scale_degrees {
     my ( $self, $dis ) = @_;
     if ( defined $dis ) {
         croak 'scale degrees value must be positive integer greater than 1'
-          if !defined $dis
-          or $dis !~ /^\d+$/
+          if $dis !~ /^\d+$/
           or $dis < 2;
         $self->{_DEG_IN_SCALE} = $dis;
     }
@@ -1350,7 +1369,7 @@ sub set_complex {
     croak 'pitch set must contain something' if !@$pset;
 
     my $iset = $self->invert( 0, $pset );
-    my $dis = $self->scale_degrees;
+    my $dis  = $self->scale_degrees;
 
     my @plex = $pset;
     for my $i ( 1 .. $#$pset ) {
@@ -1371,9 +1390,7 @@ sub subsets {
     my $len  = shift;
     my $pset = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
 
-    my %seen;
-    my @nset =
-      map { my $p = $_ % $self->{_DEG_IN_SCALE}; !$seen{$p}++ ? $p : () } @$pset;
+    my @nset = uniqnum map { $_ % $self->{_DEG_IN_SCALE} } @$pset;
     croak 'pitch set must contain two or more unique pitches' if @nset < 2;
 
     if ( defined $len ) {
@@ -1404,8 +1421,7 @@ sub tcis {
     for my $i ( 0 .. $self->{_DEG_IN_SCALE} - 1 ) {
         $tcis[$i] = 0;
         for my $p ( @{ $self->transpose_invert( $i, 0, $pset ) } ) {
-            $tcis[$i]++
-              if exists $seen{$p};
+            $tcis[$i]++ if exists $seen{$p};
         }
     }
     return \@tcis;
@@ -1424,8 +1440,7 @@ sub tcs {
     for my $i ( 1 .. $self->{_DEG_IN_SCALE} - 1 ) {
         $tcs[$i] = 0;
         for my $p ( @{ $self->transpose( $i, $pset ) } ) {
-            $tcs[$i]++
-              if exists $seen{$p};
+            $tcs[$i]++ if exists $seen{$p};
         }
     }
     return \@tcs;
@@ -1436,7 +1451,7 @@ sub transpose {
     my $t    = shift;
     my @tset = ref $_[0] eq 'ARRAY' ? @{ $_[0] } : @_;
 
-    croak 'transpose value not set' if !defined $t;
+    croak 'transpose value not set'          if !defined $t;
     croak 'pitch set must contain something' if !@tset;
 
     $t = int $t;
@@ -1452,7 +1467,7 @@ sub transpose_invert {
     my $axis = shift;
     my $pset = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
 
-    croak 'transpose value not set' if !defined $t;
+    croak 'transpose value not set'          if !defined $t;
     croak 'pitch set must contain something' if !@$pset;
 
     $axis //= 0;
@@ -1478,7 +1493,7 @@ sub variances {
         $count{$p}++;
     }
     for my $p ( sort { $a <=> $b } keys %count ) {
-        push @union, $p;
+        push @union,                                              $p;
         push @{ $count{$p} > 1 ? \@intersection : \@difference }, $p;
     }
     return wantarray ? ( \@intersection, \@difference, \@union ) : \@intersection;
@@ -1559,6 +1574,11 @@ adjacent interval counts for the given pitch set. Return values same as
 for B<interval_class_content> method.
 
 This method suits rhythmic analysis, see L</"RHYTHM">.
+
+=head2 B<bark_scale> I<frequency> ..
+
+Calculate the bark scale number for the given frequencies, using one of
+the several formula available to do that.
 
 =head2 B<bits2pcs> I<number>
 
@@ -1825,6 +1845,12 @@ documented here:
 Returns current position in array (which may be larger than the number
 of elements in the list, as the routines modulate the iterator down as
 necessary to fit the reference).
+
+=item B<grabi> I<count> I<array ref>
+
+Returns a list of I<count> elements from the array reference, looping
+back over the reference when I<count> is greater than the number of
+elements, or the current pointer requires doing so.
 
 =item B<reseti> I<array ref>
 

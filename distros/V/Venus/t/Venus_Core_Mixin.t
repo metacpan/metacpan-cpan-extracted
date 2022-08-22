@@ -8,12 +8,6 @@ use warnings;
 use Test::More;
 use Venus::Test;
 
-{
-  $INC{'Employee.pm'} = 1;
-  $INC{'Person.pm'} = 1;
-  $INC{'User.pm'} = 1;
-}
-
 my $test = test(__FILE__);
 
 =name

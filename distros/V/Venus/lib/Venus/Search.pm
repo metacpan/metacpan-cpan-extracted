@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Venus::Class;
+use Venus::Class 'attr', 'base', 'with';
 
 base 'Venus::Kind::Utility';
 
@@ -82,7 +82,11 @@ sub evaluate {
   my $error = $@;
 
   if ($error) {
-    $self->throw->error({message => $error});
+    my $throw;
+    $throw = $self->throw;
+    $throw->name('on.evaluate');
+    $throw->message($error);
+    $throw->error;
   }
 
   return $self->stash(evaluation => [

@@ -27,7 +27,7 @@ WriteMakefile(
   },
   META_MERGE => {
     requires  => {
-      perl => '5.010001'
+      perl => '5.016'
     },
     resources => {
       license    => 'http://dev.perl.org/licenses/',

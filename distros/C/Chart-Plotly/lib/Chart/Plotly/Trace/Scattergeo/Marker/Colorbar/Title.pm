@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Scattergeo::Marker::Colorbar::Title::Font;
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scattergeo.
 
@@ -39,15 +39,15 @@ has font => ( is  => "rw",
               isa => "Maybe[HashRef]|Chart::Plotly::Trace::Scattergeo::Marker::Colorbar::Title::Font", );
 
 has side => (
-    is  => "rw",
-    isa => enum( [ "right", "top", "bottom" ] ),
+    is            => "rw",
+    isa           => enum( [ "right", "top", "bottom" ] ),
     documentation =>
-      "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
+      "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
 );
 
 has text => (
-    is  => "rw",
-    isa => "Str",
+    is            => "rw",
+    isa           => "Str",
     documentation =>
       "Sets the title of the color bar. Note that before the existence of `title.text`, the title's contents used to be defined as the `title` attribute itself. This behavior has been deprecated.",
 );
@@ -67,7 +67,7 @@ Chart::Plotly::Trace::Scattergeo::Marker::Colorbar::Title - This attribute is on
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -145,7 +145,7 @@ Serialize the trace to JSON. This method should be called only by L<JSON> serial
 
 =item * side
 
-Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.
+Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.
 
 =item * text
 
@@ -159,7 +159,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

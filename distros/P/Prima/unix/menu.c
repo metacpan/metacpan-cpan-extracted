@@ -91,7 +91,7 @@ get_window( Handle self, PMenuItemReg m)
 		wx-> next = w;
 	} else
 		XX-> w = w;
-	CREATE_ARGB_PICTURE(w->w, X(self)->flags.layered ? 32 : 0, w->argb_picture);
+	CREATE_ARGB_PICTURE(w->w, 0, w->argb_picture);
 	return w;
 }
 
@@ -1117,6 +1117,7 @@ DECL_DRAW(image)
 	dummy_s.drawable.argb_picture = w-> argb_picture;
 #endif
 
+	XCHECKPOINT;
 	if ( bm-> is_mono ) {
 		if ( m-> flags. disabled ) {
 			dummy_s.drawable.back.primary = 0x00000000;
@@ -1148,7 +1149,7 @@ DECL_DRAW(image)
 		} else {
 			apc_gp_put_image((Handle) &dummy_p, bm->xor,
 				x, w-> sz.y - H - Y,
-				0, 0, W, H, ropSrcOver);
+				0, 0, W, H, ropBlend);
 		}
 		if ( bm-> use_stippling ) {
 			XSetStipple   ( DISP, draw-> gc, prima_get_hatch( &fillPatterns[fpSimpleDots] ));
@@ -1161,6 +1162,7 @@ DECL_DRAW(image)
 			XSetFillStyle ( DISP, draw-> gc, FillSolid);
 		}
 	}
+	XCHECKPOINT;
 
 	return true;
 }
@@ -1304,6 +1306,7 @@ handle_menu_expose( XEvent *ev, XWindow win, Handle self)
 #ifdef USE_XFT
 	if ( draw. xft_drawable) XftDrawSetClip(( XftDraw*) draw.xft_drawable, rgn);
 #endif
+	XCHECKPOINT;
 	CLIP_ARGB_PICTURE(w->argb_picture, rgn);
 
 #ifdef USE_XFT
@@ -1978,17 +1981,7 @@ prima_end_menu(void)
 static unsigned long
 argb_color(Color color)
 {
-	int a[3];
-
-	a[0] = COLOR_R(color);
-	a[1] = COLOR_G(color);
-	a[2] = COLOR_B(color);
-
-	return
-		(((a[0] << guts. argb_bits. red_range  ) >> 8) << guts. argb_bits.   red_shift) |
-		(((a[1] << guts. argb_bits. green_range) >> 8) << guts. argb_bits. green_shift) |
-		(((a[2] << guts. argb_bits. blue_range ) >> 8) << guts. argb_bits.  blue_shift) |
-		(((0xff << guts. argb_bits. alpha_range ) >> 8) << guts. argb_bits. alpha_shift);
+	return COLOR2DEV_RGBA(&guts.argb_bits,color,0xff);
 }
 
 Bool
@@ -2388,7 +2381,7 @@ apc_window_set_menu( Handle self, Handle menu)
 		M(m)-> w-> w = m-> handle = XCreateWindow( DISP, X_WINDOW,
 			0, 0, 1, 1, 0, CopyFromParent,
 			InputOutput, CopyFromParent, valuemask, &attrs);
-		CREATE_ARGB_PICTURE(M(m)->w->w, 0, M(m)->w->argb_picture);
+		CREATE_ARGB_PICTURE(M(m)->w->w, X(self)->flags.layered ? 32 : 0, M(m)->w->argb_picture);
 		hash_store( guts. menu_windows, &m-> handle, sizeof( m-> handle), m);
 		XResizeWindow( DISP, m-> handle, XX-> size.x, y);
 		XMapRaised( DISP, m-> handle);
@@ -2444,6 +2437,7 @@ apc_menu_item_begin_paint( Handle self, PEvent event)
 	YY-> visual        = pe->layered ? &guts. argb_visual : &guts. visual;
 	YY-> colormap      = pe->layered ? guts. argbColormap : guts. defaultColormap;
 	prima_prepare_drawable_for_painting(event-> gen.H, false );
+	XCHECKPOINT;
 
 	return true;
 
@@ -2452,6 +2446,12 @@ apc_menu_item_begin_paint( Handle self, PEvent event)
 Bool
 apc_menu_item_end_paint( Handle self, PEvent event)
 {
+#ifdef HAVE_X11_EXTENSIONS_XRENDER_H
+	PaintEvent * pe = (PaintEvent*) event-> gen.p;
+	if ( &M(pe->self)->wstatic == M(self)-> w)
+		X(event->gen.H)->argb_picture = 0;
+#endif
+
 	prima_cleanup_drawable_after_painting(event->gen.H);
 	return true;
 }

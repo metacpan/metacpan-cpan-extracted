@@ -1,5 +1,13 @@
 Revision history for Business::Tax::VAT::Validation
 
+1.23  18/08/2022
+    - Further updates because of API changes - expect name & address elements
+      to be namespaced too (thanks to Thomas Glase)
+
+1.22  17/08/2022
+    - Updates required because of changes to EU VIES API - GH#15, thanks
+      to Timothy Su and Thomas Glase for the heads up
+
 1.21  01/11/2021
     - remove `soapaction` header, EU soap endpoint does not like it anymore, 
       GH#12 (tswfi)

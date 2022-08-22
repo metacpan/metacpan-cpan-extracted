@@ -18,7 +18,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.43';
+our $VERSION = '0.46';
 
 =head1 NAME
 
@@ -194,6 +194,7 @@ our @option_spec = (
     'max-time|m=s',
     'ntlm',
     'keepalive!',
+    'range=s',
     'request|X=s',
     'oauth2-bearer=s',
     'output|o=s',
@@ -505,6 +506,10 @@ sub _build_request( $self, $uri, $options, %build_options ) {
 
         if( defined $options->{ referrer }) {
             $self->_add_header( \%headers, "Referer" => $options->{ 'referrer' } );
+        };
+
+        if( defined $options->{ range }) {
+            $self->_add_header( \%headers, "Range" => $options->{ 'range' } );
         };
 
         # We want to compare the headers case-insensitively

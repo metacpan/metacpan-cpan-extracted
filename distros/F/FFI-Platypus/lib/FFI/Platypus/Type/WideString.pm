@@ -10,7 +10,7 @@ use Encode qw( decode encode find_encoding );
 use Carp ();
 
 # ABSTRACT: Platypus custom type for Unicode "wide" strings
-our $VERSION = '1.58'; # VERSION
+our $VERSION = '2.00'; # VERSION
 
 
 my @stack;  # To keep buffer alive.
@@ -23,7 +23,7 @@ sub _compute_wide_string_encoding
       unless FFI::Platypus::Memory->can("_$need");
   }
 
-  my $ffi = FFI::Platypus->new( api => 1, lib => [undef] );
+  my $ffi = FFI::Platypus->new( api => 2, lib => [undef] );
 
   my $size = eval { $ffi->sizeof('wchar_t') };
   die 'no wchar_t' if $@;
@@ -187,13 +187,13 @@ FFI::Platypus::Type::WideString - Platypus custom type for Unicode "wide" string
 
 =head1 VERSION
 
-version 1.58
+version 2.00
 
 =head1 SYNOPSIS
 
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  
- my $ffi = FFI::Platypus->new( api => 1, lib => [undef] );
+ my $ffi = FFI::Platypus->new( api => 2, lib => [undef] );
  $ffi->load_custom_type('::WideString' => 'wstring', access => 'read' );
  $ffi->load_custom_type('::WideString' => 'wstring_w', access => 'write' );
  
@@ -215,9 +215,9 @@ version 1.58
 
 On Windows use with C<LPCWSTR>:
 
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  
- my $ffi = FFI::Platypus->new( api => 1, lib => [undef] );
+ my $ffi = FFI::Platypus->new( api => 2, lib => [undef] );
  
  # define some custom Win32 Types
  # to get these automatically see FFI::Platypus::Lang::Win32
@@ -311,7 +311,7 @@ depends on if you want to initialize the read/write buffer or not.
 The simplest way is to fallback on the default buffer size, which can
 be specified using the C<size> option when creating the custom type.
 
- my $ffi = FFI::Platypus->new( api => 1, lib => [undef] );
+ my $ffi = FFI::Platypus->new( api => 2, lib => [undef] );
  $ffi->load_custom_type('::WideString' => 'wstring',   access => 'read' );
  $ffi->load_custom_type('::WideString' => 'wstring_w', access => 'write', size => 512 );
  
@@ -334,7 +334,7 @@ memory for many of them.
 The safest and most memory efficient method is of course to allocate exactly
 the amount of memory that you need.
 
- my $ffi = FFI::Platypus->new( api => 1, lib => [undef] );
+ my $ffi = FFI::Platypus->new( api => 2, lib => [undef] );
  $ffi->load_custom_type('::WideString' => 'wstring',   access => 'read'  );
  $ffi->load_custom_type('::WideString' => 'wstring_w', access => 'write' );
  
@@ -359,7 +359,7 @@ need most of the time.
 Some functions don't expect empty null padded buffers though, in this
 case you will want to initialize the buffer.
 
- my $ffi = FFI::Platypus->new( api => 1, lib => [undef] );
+ my $ffi = FFI::Platypus->new( api => 2, lib => [undef] );
  $ffi->load_custom_type('::WideString' => 'wstring',   access => 'read'  );
  $ffi->load_custom_type('::WideString' => 'wstring_w', access => 'write' );
  
@@ -438,10 +438,10 @@ a pointer to the first occurrence of a character in an argument string:
 
 Instead you need to work with pointers and casts to use this function:
 
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  use FFI::Platypus::Memory qw( free );
  
- my $ffi = FFI::Platypus->new( api => 1, lib => [undef] );
+ my $ffi = FFI::Platypus->new( api => 2, lib => [undef] );
  
  $ffi->attach( wcsdup => ['wstring'] => 'opaque' );
  $ffi->attach( strchr => [ opaque', 'wchar_t' ] => 'wstring' );

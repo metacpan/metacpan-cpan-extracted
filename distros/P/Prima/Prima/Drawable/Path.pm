@@ -363,6 +363,7 @@ sub points
 		}
 		for my $ppp ( @{$self->{points}}) {
 			@$ppp = grep { @$_ > 2 } @$ppp;
+			Prima::array::deduplicate($_,2) for @$ppp;
 		}
 		$self->{last_matrix} = $self->{curr}->{matrix};
 	}
@@ -880,7 +881,7 @@ sub widen
 		}
 		return $dst;
 	}
-	my $ml = exists($opt{miterLimit}) ? $opt{miterLimit} : 10;
+	my $ml = exists($opt{miterLimit}) ? $opt{miterLimit} : ($self->{canvas} ? $self->{canvas}->miterLimit : 10);
 	$ml = 20        if $ml > 20;
 	$lw = 16834     if $lw > 16834;
 	$lj = lj::Miter if $lj > lj::Miter;

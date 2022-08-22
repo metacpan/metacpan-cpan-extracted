@@ -7,7 +7,7 @@ use Test::Exception;
 
 use Net::DNS::Resolver::Mock;
 
-plan tests => 20;
+plan tests => 24;
 
 {
     my $Resolver = Net::DNS::Resolver::Mock->new();
@@ -68,5 +68,22 @@ plan tests => 20;
 
     $Resolver->die_on( 'cnameptr.example.com.', 'PTR', 'Die Test' );;
     dies_ok( sub{ $Resolver->query( 'cnameptr.example.com.', 'PTR' ) }, 'Dies ok' );
+}
+
+{
+    my $ZoneData = join( "\n",
+        '. 3600 A 1.2.3.4',
+    );
+
+    my $Resolver = Net::DNS::Resolver::Mock->new();
+    $Resolver->zonefile_parse( $ZoneData );
+
+    my $Reply;
+
+    $Reply = $Resolver->query( '.', 'A' );
+    is( defined( $Reply ), 1, 'Valid entry returns set' );
+    is( ref $Reply, 'Net::DNS::Packet', 'Net::DNS::Packet object returned' );
+    is( ref $Reply->{ 'answer' }->[0], 'Net::DNS::RR::A', 'New::DNS::RR::A object returned' );
+    is( $Reply->{ 'answer' }->[0]->rdatastr(), '1.2.3.4', 'Correct IP Address returned' );;
 }
 

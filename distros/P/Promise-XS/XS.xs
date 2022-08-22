@@ -1,9 +1,4 @@
-#define PERL_NO_GET_CONTEXT
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
-
-#include "ppport.h"
+#include "easyxs/easyxs.h"
 
 #include <stdbool.h>
 #include <unistd.h>
@@ -43,6 +38,13 @@
     if (MY_CXT.callback_depth > _MAX_RECURSION) { \
         croak("Exceeded %u callbacks; infinite recursion detected!", _MAX_RECURSION); \
     }
+
+typedef enum {
+    _DEFER_NONE = 0,
+    _DEFER_ANYEVENT,
+    _DEFER_IOASYNC,
+    _DEFER_MOJO,
+} event_system_t;
 
 typedef struct xspr_callback_s xspr_callback_t;
 typedef struct xspr_promise_s xspr_promise_t;
@@ -171,6 +173,8 @@ typedef struct {
     HV* pxs_deferred_stash;
     SV* deferral_cr;
     SV* deferral_arg;
+    event_system_t event_system;
+    SV* stop_cr;
 } my_cxt_t;
 
 typedef struct {
@@ -953,7 +957,7 @@ static inline void _warn_weird_reject_if_needed( pTHX_ SV* self_sv, const char* 
         warn( "%s: Empty call to %s()", pkgname, funcname );
     }
     else {
-        warn( "%s: %s() called with only uninitialized values (%d)", pkgname, funcname, my_items);
+        warn( "%s: %s() called with only uninitialized values (%" IVdf ")", pkgname, funcname, (IV) my_items);
     }
 }
 
@@ -1040,6 +1044,109 @@ static inline SV* _create_prerejected_promise(pTHX_ SV** args, I32 argslen, bool
 }
 
 //----------------------------------------------------------------------
+static SV* _get_nothing_cr_arg (pTHX) {
+    return SvREFCNT_inc( get_sv("Promise::XS::Deferred::_NOTHING_CR", 0) );
+}
+
+static void _anyevent_wait_promise (pTHX_ SV* promise_sv) {
+    SV* condvar = exs_call_method_scalar(
+        sv_2mortal( newSVpvs("AnyEvent") ),
+        "condvar",
+        NULL
+    );
+
+    SV* catch_args[] = {
+        _get_nothing_cr_arg(aTHX),
+        NULL,
+    };
+
+    SV* caught = exs_call_method_scalar(
+        promise_sv,
+        "catch",
+        catch_args
+    );
+
+    SV* finally_args[] = {
+        SvREFCNT_inc(condvar),
+        NULL,
+    };
+
+    exs_call_method_void(
+        caught,
+        "finally",
+        finally_args
+    );
+
+    sv_2mortal(caught);
+
+    exs_call_method_void(
+        condvar,
+        "recv",
+        NULL
+    );
+
+    sv_2mortal(condvar);
+}
+
+static void _ioasync_wait_promise (pTHX_ SV* promise_sv, SV* loop_sv, SV* stop_cr) {
+    SV* catch_args[] = {
+        _get_nothing_cr_arg(aTHX),
+        NULL,
+    };
+
+    SV* caught = exs_call_method_scalar(
+        promise_sv,
+        "catch",
+        catch_args
+    );
+
+    SV* finally_args[] = { SvREFCNT_inc(stop_cr), NULL };
+
+    exs_call_method_void(
+        caught,
+        "finally",
+        finally_args
+    );
+
+    sv_2mortal(caught);
+
+    exs_call_method_void(
+        loop_sv,
+        "run",
+        NULL
+    );
+}
+
+static void _mojo_wait_promise(pTHX_ SV* promise_sv, SV* stop_cr) {
+    SV* catch_args[] = {
+        _get_nothing_cr_arg(aTHX),
+        NULL,
+    };
+
+    SV* caught = exs_call_method_scalar(
+        promise_sv,
+        "catch",
+        catch_args
+    );
+
+    SV* finally_args[] = { SvREFCNT_inc(stop_cr), NULL };
+
+    exs_call_method_void(
+        caught,
+        "finally",
+        finally_args
+    );
+
+    sv_2mortal(caught);
+
+    exs_call_method_void(
+        sv_2mortal( newSVpvs("Mojo::IOLoop") ),
+        "start",
+        NULL
+    );
+}
+
+//----------------------------------------------------------------------
 
 MODULE = Promise::XS     PACKAGE = Promise::XS
 
@@ -1061,6 +1168,8 @@ BOOT:
 
     MY_CXT.deferral_cr = NULL;
     MY_CXT.deferral_arg = NULL;
+    MY_CXT.event_system = _DEFER_NONE;
+    MY_CXT.stop_cr = NULL;
     MY_CXT.pxs_flush_cr = NULL;
 }
 
@@ -1077,7 +1186,9 @@ CLONE(...)
 
         SV* pxs_flush_cr = NULL;
         SV* deferral_cr = NULL;
+        event_system_t event_system;
         SV* deferral_arg = NULL;
+        SV* stop_cr = NULL;
 
         {
             dMY_CXT;
@@ -1095,6 +1206,12 @@ CLONE(...)
             if ( MY_CXT.deferral_arg ) {
                 deferral_arg = sv_dup_inc( MY_CXT.deferral_arg, &params );
             }
+
+            event_system = MY_CXT.event_system;
+
+            if ( MY_CXT.stop_cr ) {
+                stop_cr = sv_dup_inc( MY_CXT.stop_cr, &params );
+            }
         }
 
         {
@@ -1105,6 +1222,8 @@ CLONE(...)
             MY_CXT.pxs_flush_cr = pxs_flush_cr;
             MY_CXT.deferral_cr = deferral_cr;
             MY_CXT.deferral_arg = deferral_arg;
+            MY_CXT.event_system = event_system;
+            MY_CXT.stop_cr      = stop_cr;
 
             // Clone HVs
             MY_CXT.pxs_base_stash = gv_stashpv(BASE_CLASS, FALSE);
@@ -1136,6 +1255,11 @@ MODULE = Promise::XS     PACKAGE = Promise::XS::Deferred
 
 PROTOTYPES: DISABLE
 
+BOOT:
+    newCONSTSUB( gv_stashpvs(BASE_CLASS "::Deferred", FALSE), "_DEFER_ANYEVENT", newSVuv(_DEFER_ANYEVENT));
+    newCONSTSUB( gv_stashpvs(BASE_CLASS "::Deferred", FALSE), "_DEFER_IOASYNC", newSVuv(_DEFER_IOASYNC));
+    newCONSTSUB( gv_stashpvs(BASE_CLASS "::Deferred", FALSE), "_DEFER_MOJO", newSVuv(_DEFER_MOJO));
+
 SV *
 create()
     CODE:
@@ -1153,27 +1277,31 @@ create()
         RETVAL
 
 void
-___set_deferral_generic(SV* cr, ...)
+___set_deferral_generic(SV* deferral_cr, SV* deferral_arg, UV event_system, SV* stop_cr=NULL)
     CODE:
         dMY_CXT;
 
-        cr = SvRV(cr);
+        // deferral_cr = SvRV(deferral_cr);
 
         if (MY_CXT.deferral_cr) {
             SvREFCNT_dec(MY_CXT.deferral_cr);
         }
 
-        MY_CXT.deferral_cr = cr;
-        SvREFCNT_inc(MY_CXT.deferral_cr);
-
-        if (items > 1) {
-            if (MY_CXT.deferral_arg) {
-                SvREFCNT_dec(MY_CXT.deferral_arg);
-            }
-
-            MY_CXT.deferral_arg = ST(1);
-            SvREFCNT_inc(MY_CXT.deferral_arg);
+        if (MY_CXT.deferral_arg) {
+            SvREFCNT_dec(MY_CXT.deferral_arg);
         }
+
+        if (MY_CXT.stop_cr) {
+            SvREFCNT_dec(MY_CXT.stop_cr);
+        }
+
+        MY_CXT.deferral_cr = SvREFCNT_inc(deferral_cr);
+
+        MY_CXT.deferral_arg = SvOK(deferral_arg) ? SvREFCNT_inc(deferral_arg) : NULL;
+
+        MY_CXT.event_system = event_system;
+
+        MY_CXT.stop_cr = stop_cr ? SvREFCNT_inc(stop_cr) : NULL;
 
 # We don’t care if there are args or not.
 void
@@ -1467,3 +1595,30 @@ AWAIT_ON_READY(SV *self_sv, SV* coderef)
         self->promise->on_ready_immediate = coderef;
         SvREFCNT_inc(coderef);
         SvREFCNT_inc(SvRV(coderef));
+
+void
+AWAIT_WAIT(SV* self_sv)
+    PPCODE:
+        dMY_CXT;
+
+        switch (MY_CXT.event_system) {
+            case _DEFER_ANYEVENT:
+                _anyevent_wait_promise(aTHX_ self_sv);
+                break;
+
+            case _DEFER_IOASYNC:
+                _ioasync_wait_promise(aTHX_ self_sv, MY_CXT.deferral_arg, MY_CXT.stop_cr);
+                break;
+
+            case _DEFER_MOJO:
+                _mojo_wait_promise(aTHX_ self_sv, MY_CXT.stop_cr);
+                break;
+
+            default:
+                croak(BASE_CLASS ": No event loop set up! Did you forget to call use_event()?");
+        }
+
+        PUSHMARK(SP);
+
+        int count = call_method("AWAIT_GET", GIMME_V);
+        XSRETURN(count);

@@ -11,7 +11,7 @@ use overload (
   fallback => 1,
 );
 
-use Venus::Class;
+use Venus::Class 'attr', 'base', 'with';
 
 base 'Venus::Kind::Utility';
 
@@ -38,9 +38,13 @@ sub build_self {
 sub config {
   my ($self, $package) = @_;
 
-  $package ||= $self->package or $self->throw->error({
-    message => 'No suitable JSON package',
-  });
+  $package ||= $self->package or do {
+    my $throw;
+    $throw = $self->throw;
+    $throw->name('on.config');
+    $throw->message('No suitable JSON package');
+    $throw->error;
+  };
 
   $package = $package->new
     ->canonical

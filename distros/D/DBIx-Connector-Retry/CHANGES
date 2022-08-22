@@ -1,6 +1,12 @@
 Changelog for DBIx-Connector-Retry
 
-v0.900.2 2021-02-11T22:09:54
+v0.900.3 2022-08-15T21:13:52
+ - Update LICENSE / Makefile (Brendan Byrd)
+ - Update README (Brendan Byrd)
+ - Add caveat about using dbh/connect methods (Brendan Byrd)
+ - Remove special __DIE__ handlers when running DB calls (Brendan Byrd)
+
+v0.900.2 2021-02-11T22:09:39
  - Update README / LICENSE (Brendan Byrd)
  - Fix nested state variable problem with localization (Brendan Byrd)
  - Add execute_method checks to standard tests (Brendan Byrd)
@@ -15,6 +21,9 @@ v0.900.1 2020-05-14T20:27:01
  - Move xt tests to correct location (Andrew Hewus Fresh)
  - Convert to Dist::Zilla::PluginBundle::Author::GSG (Andrew Hewus Fresh)
 
+v0.900.0 2018-07-05T22:52:17
+ - No changes found
+
 0.90 2018-07-05T22:52:17
  - Typo fixups (Brendan Byrd)
  - Add READMEs (Brendan Byrd)
@@ -25,6 +34,3 @@ v0.900.1 2020-05-14T20:27:01
  - Add some bare attributes for extra constructor options (Brendan Byrd)
  - Add a set of tests (Brendan Byrd)
  - Initial version of DBIx::Connector::Retry (Brendan Byrd)
-
-v0.900.0 2018-07-05T22:52:17
- - No changes found

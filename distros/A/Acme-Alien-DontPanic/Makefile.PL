@@ -55,9 +55,10 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => "6.52"
   },
   "CONFIGURE_REQUIRES" => {
-    "Alien::Build"        => "2.51",
-    "Alien::Build::MM"    => "0.40",
-    "ExtUtils::MakeMaker" => "6.52"
+    "Alien::Build"                            => "2.59",
+    "Alien::Build::MM"                        => "0.40",
+    "Alien::Build::Plugin::Digest::Negotiate" => 0,
+    "ExtUtils::MakeMaker"                     => "6.52"
   },
   "DISTNAME"         => "Acme-Alien-DontPanic",
   "LICENSE"          => "perl",
@@ -67,7 +68,7 @@ my %WriteMakefileArgs = (
     "lib/Acme/Alien/DontPanic.pm" => "\$(INST_LIB)/Acme/Alien/DontPanic.pm"
   },
   "PREREQ_PM" => {
-    "Alien::Base" => "2.51"
+    "Alien::Base" => "2.59"
   },
   "TEST_REQUIRES" => {
     "File::Temp"        => 0,
@@ -79,14 +80,14 @@ my %WriteMakefileArgs = (
     "Test::Alien"       => "0.05",
     "Test::Alien::Diag" => 0
   },
-  "VERSION" => "2.5100",
+  "VERSION" => "2.5900",
   "test"    => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
-  "Alien::Base"         => "2.51",
+  "Alien::Base"         => "2.59",
   "Alien::Build"        => "0.40",
   "Alien::Build::MM"    => "0.40",
   "ExtUtils::MakeMaker" => "6.52",

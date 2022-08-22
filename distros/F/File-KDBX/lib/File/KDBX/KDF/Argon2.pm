@@ -12,7 +12,7 @@ use namespace::clean;
 
 extends 'File::KDBX::KDF';
 
-our $VERSION = '0.905'; # VERSION
+our $VERSION = '0.906'; # VERSION
 
 
 sub salt        { $_[0]->{+KDF_PARAM_ARGON2_SALT} or throw 'Salt is not set' }
@@ -69,7 +69,7 @@ File::KDBX::KDF::Argon2 - The Argon2 family of key derivation functions
 
 =head1 VERSION
 
-version 0.905
+version 0.906
 
 =head1 DESCRIPTION
 

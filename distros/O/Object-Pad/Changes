@@ -1,5 +1,17 @@
 Revision history for Object-Pad
 
+0.68    2022-08-13
+        [BUGFIXES]
+         * Wording fix in new Object::Pad::MetaFunctions docs
+         * Avoid label at end of compound statement (RT144005)
+
+0.67    2022-08-12
+        [CHANGES]
+         * Added `Object::Pad::MetaFunctions` to contain some introspection
+           and reflection helper functions
+         * Avoid writing the rather silly-sounding `field $field` in docs;
+           use single-letter field names like `$x` or `$f` instead
+
 0.66    2022-07-07
         [CHANGES]
          * Improved performance on perl 5.22 onwards, by merging the operation
@@ -7,8 +19,8 @@ Revision history for Object-Pad
          * Prepare compatibility with core's `use feature 'class'`:
             + Support `field` keyword as a synonym of `has`, though without
               immediate EXPR version
-            + Merge meaning of `ADJUST` and `ADJUSTPARAMS`; give all such blocks
-              a params hashref. `ADJUSTPARAMS` is now just a synonym
+            + Merge meaning of `ADJUST` and `ADJUSTPARAMS`; give all such
+              blocks a params hashref. `ADJUSTPARAMS` is now just a synonym
          * Print "discouraged" warnings on `requires` keyword
          * Print deprecation warnings on `isa` and `does` subkeywords
          * Added list-returning ->get_attribute_values() accessor to

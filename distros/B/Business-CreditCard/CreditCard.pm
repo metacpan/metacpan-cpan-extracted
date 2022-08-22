@@ -5,7 +5,7 @@ use vars qw( @ISA $VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS $Country );
 
 @ISA = qw( Exporter );
 
-$VERSION = "0.36";
+$VERSION = "0.39";
 
 @EXPORT = qw( cardtype validate generate_last_digit );
 @EXPORT_OK = qw( receipt_cardtype validate_card );
@@ -19,11 +19,25 @@ C<Business::CreditCard> - Validate/generate credit card checksums/names
 
 =head1 SYNOPSIS
 
+    ##
+    # new-style, supported since 0.36 released Jun 14 2016
+    ##
+
+    use Business::CreditCard qw( 0.36 :NEW );
+ 
+    print validate_card("5276 4400 6542 1319");
+    print cardtype("5276 4400 6542 1319");
+
+
+    ##
+    # old interface, deprecated but still supported for backwards compatibility
+    ##
+
     use Business::CreditCard;
  
     print validate("5276 4400 6542 1319");
     print cardtype("5276 4400 6542 1319");
-    print generate_last_digit("5276 4400 6542 131");
+    
 
 Business::CreditCard is available at a CPAN site near you.
 
@@ -33,7 +47,7 @@ These subroutines tell you whether a credit card number is
 self-consistent -- whether the last digit of the number is a valid
 checksum for the preceding digits.  
 
-The validate() subroutine returns 1 if the card number provided passes
+The validate_card() subroutine returns 1 if the card number provided passes
 the checksum test, and 0 otherwise.
 
 The cardtype() subroutine returns a string containing the type of
@@ -61,7 +75,7 @@ Possible return values are:
 Versions before 0.31 may also have returned "Diner's Club/Carte Blanche" (these
 cards are now recognized as "Discover card").
 
-As of 0.30, cardtype() will accept a partial card masked with "x", "X', ".",
+cardtype() will accept a partial card masked with "x", "X", ".",
 "*" or "_".  Only the first 2-6 digits and the length are significant;
 whitespace and dashes are removed.  With two digits, Visa, MasterCard, Discover
 and Amex are recognized (versions before 0.36 needed four digits to recognize
@@ -79,7 +93,7 @@ whether a card is real, or whether it's been stolen, or to actually process
 charges, you need a Merchant account.  See L<Business::OnlinePayment>.
 
 These subroutines will also work if you provide the arguments
-as numbers instead of strings, e.g. C<validate(5276440065421319)>.  
+as numbers instead of strings, e.g. C<validate_card(5276440065421319)>.  
 
 =head1 PROCESSING AGREEMENTS
 
@@ -147,11 +161,27 @@ types.  Lee also contributed a working test.pl.  Alexandr Ciornii
 
 Copyright (C) 1995,1996,1997 Jon Orwant
 Copyright (C) 2001-2006 Ivan Kohler
-Copyright (C) 2007-2016 Freeside Internet Services, Inc.
+Copyright (C) 2007-2021 Freeside Internet Services, Inc.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,
 at your option, any later version of Perl 5 you may have available.
+
+=head1 HOMEPAGE
+
+Homepage:  http://perl.business/creditcard
+
+=head1 REPOSITORY
+
+The code is available from our public git repository:
+
+  git clone git://git.freeside.biz/Business-CreditCard.git
+
+Or on the web:
+
+  http://freeside.biz/gitweb/?p=Business-CreditCard.git
+  Or:
+  http://freeside.biz/gitlist/Business-CreditCard.git
 
 =head1 BUGS
 
@@ -181,12 +211,12 @@ for them explicitly / individually:
   use Business::CreditCard qw( validate_card cardtype receipt_cardtype );
 
 
-Second (we're at now now): 
+Second:
 
 Waiting for 0.36+ to become more prevalent.
 
 
-Third:
+Third (we're at now now):
 
 Recommend new-style usage.  Maybe asking for a specific minimum version turns
 it on too?
@@ -199,7 +229,7 @@ Don't export validate() (or anything else [separately?]) by default.
 
 This is the part that will break things and we probably won't do for a long
 time, until new-style usage is the norm and the tradeoff of breaking old code
-is worth it to stop or namespace pollution.  Maybe do a 1.00 releaes with the
+is worth it to stop our namespace pollution.  Maybe do a 1.00 release with the
 current API and 2.00 is when this happens (with a 1.99_01 pre-release)?
 
 =head1 SEE ALSO

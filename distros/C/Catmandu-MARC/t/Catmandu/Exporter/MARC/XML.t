@@ -33,7 +33,8 @@ ok $exporter->add({
             ['500', ' ', ' ', 'a', undef],
             ['501', ' ', ' ' ],
             ['502', ' ', ' ', 'a', undef, 'b' , 'ok'],
-            ['503'. ' ', ' ', 'a', ''],
+            ['503', ' ', ' ', 'a', ''],
+            ['504', ' ', ' ', '=', 'test'],
         ]
 });
 
@@ -47,6 +48,7 @@ ok(! $xp->exists('/marc:record/marc:datafield[@tag="500"]') ,'skipped 500 - only
 ok(! $xp->exists('/marc:record/marc:datafield[@tag="501"]') ,'skipped 501 - no subfields');
 ok(! $xp->exists('/marc:record/marc:datafield[@tag="502"]/marc:subfield[@code="a"]') ,'skipped 502a - empty subfields');
 ok(! $xp->exists('/marc:record/marc:datafield[@tag="503"]/marc:subfield[@code="a"]') ,'skipped 503a - empty subfields');
+ok($xp->exists('/marc:record/marc:datafield[@tag="504"]/marc:subfield[@code="="]') ,'found 504= - special subfields');
 
 $xml = undef;
 
@@ -63,6 +65,7 @@ ok $exporter->add({
   	{ '501' => { 'ind1' => ' ', 'ind2' => ' ' }} ,
   	{ '502' => { 'subfields' => [ { 'a' => undef} , { 'b' , 'ok' } ] , 'ind1' => ' ', 'ind2' => ' ' } } ,
     { '503' => { 'subfields' => [ { 'a' => '' }] , 'ind1' => ' ', 'ind2' => ' '}} ,
+    { '504' => { 'subfields' => [ { '=' => 'test' }] , 'ind1' => ' ', 'ind2' => ' '}} ,
   ]
 });
 
@@ -75,6 +78,7 @@ ok(! $xp->exists('/marc:record/marc:datafield[@tag="500"]') ,'skipped 500 - only
 ok(! $xp->exists('/marc:record/marc:datafield[@tag="501"]') ,'skipped 501 - no subfields');
 ok(! $xp->exists('/marc:record/marc:datafield[@tag="502"]/marc:subfield[@code="a"]') ,'skipped 502a - empty subfields');
 ok(! $xp->exists('/marc:record/marc:datafield[@tag="503"]/marc:subfield[@code="a"]') ,'skipped 503a - empty subfields');
+ok($xp->exists('/marc:record/marc:datafield[@tag="504"]/marc:subfield[@code="="]') ,'found 504= - special subfields');
 
 {
     my $record = {

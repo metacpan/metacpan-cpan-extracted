@@ -11,8 +11,8 @@
 
 #define SORT(a,b)	{ int swp; if ((a) > (b)) { swp=(a); (a)=(b); (b)=swp; }}
 #define REVERT(a)	(XX-> size. y - (a) - 1)
-#define SHIFT(a,b)	{ (a) += XX-> gtransform. x + XX-> btransform. x; \
-									(b) += XX-> gtransform. y + XX-> btransform. y; }
+#define SHIFT(a,b)	{ (a) += XX-> transform. x + XX-> btransform. x; \
+			(b) += XX-> transform. y + XX-> btransform. y; }
 #define RANGE(a)        { if ((a) < -16383) (a) = -16383; else if ((a) > 16383) a = 16383; }
 #define RANGE2(a,b)     RANGE(a) RANGE(b)
 #define RANGE4(a,b,c,d) RANGE(a) RANGE(b) RANGE(c) RANGE(d)
@@ -125,7 +125,7 @@ prima_init_xrender_subsystem(char * error_buf)
 	guts. xrender_a8_format = XRenderFindStandardFormat(DISP, PictStandardA8);
 	guts. xrender_a1_format = XRenderFindStandardFormat(DISP, PictStandardA1);
 
-	pen.pixmap      = XCreatePixmap( DISP, guts.root, 8, 8, 32);
+	pen.pixmap      = XCreatePixmap( DISP, guts.root, 8, 8, guts.argb_depth);
 	pen.gcv.graphics_exposures = false;
 	pen.gc          = XCreateGC( DISP, pen.pixmap, GCGraphicsExposures, &pen.gcv);
 	xrp_attr.repeat = RepeatNormal;
@@ -173,9 +173,9 @@ pen_update(Handle self)
 		GCTileStipXOrigin | GCTileStipYOrigin |
 		GCForeground      | GCFillStyle       |
 		0;
-	int alpha = XX->paint_alpha, red, green, blue;
+	int alpha = XX->alpha, red, green, blue;
 
-	switch ( XX-> paint_rop) {
+	switch ( XX-> rop) {
 	case ropNotPut:
 		pen.gcv.foreground = ~XX-> fore.primary;
 		pen.gcv.background = ~XX-> back.primary;
@@ -218,23 +218,129 @@ pen_update(Handle self)
 	pen.gcv.foreground |= alpha;
 	pen.gcv.background |= alpha;
 
-	pen.gcv.ts_x_origin = XX-> fill_pattern_offset.x;
-	pen.gcv.ts_y_origin = XX-> fill_pattern_offset.y;
-	if ( !XX-> flags.brush_null_hatch ) {
-		pen.gcv.stipple = prima_get_hatch( &XX-> fill_pattern);
-		if ( !pen.gcv.stipple ) goto SOLID;
-		if ( XX-> paint_rop2 == ropNoOper )
+	prima_get_fill_pattern_offsets(self, &pen.gcv.ts_x_origin, &pen.gcv.ts_y_origin);
+	pen.gcv.stipple = prima_get_hatch( &XX-> fill_pattern);
+	if ( pen.gcv.stipple ) {
+		if ( XX-> rop2 == ropNoOper )
 			pen.gcv.background = 0x00000000;
 		pen.gcv.fill_style = FillOpaqueStippled;
 		flags |= GCStipple | GCBackground;
-	} else {
-	SOLID:
+	} else
 		pen.gcv.fill_style = FillSolid;
-	}
 	XChangeGC( DISP, pen.gc, flags, &pen.gcv);
 
 	XFillRectangle( DISP, pen.pixmap, pen.gc, 0, 0, 8, 8);
 	guts.xrender_pen_dirty = false;
+}
+
+static Point
+get_pixmap_size( Pixmap px )
+{
+	XWindow _w;
+	int _i;
+	unsigned int w, h, _u;
+	Point ret;
+	XGetGeometry( DISP, px, &_w, &_i, &_i, &w, &h, &_u, &_u);
+	ret.x = w;
+	ret.y = h;
+	return ret;
+}
+
+static void
+pen_create_tile(Handle self, Pixmap tile)
+{
+	DEFXX;
+	XRenderPictureAttributes xrp_attr;
+	xrp_attr.repeat = RepeatNormal;
+
+	if ( PDrawable(self)-> fillPatternImage && !X(PDrawable(self)-> fillPatternImage)->type.icon ) {
+		GC gc;
+		XGCValues gcv;
+
+		gcv.foreground = ((XX->alpha << guts. argb_bits. alpha_range) >> 8) << guts. argb_bits. alpha_shift;
+		if ( ( gc = XCreateGC(DISP, tile, GCForeground, &gcv))) {
+			Point sz = get_pixmap_size( tile );
+			XSetPlaneMask( DISP, gc, guts.argb_bits.alpha_mask);
+			XFillRectangle( DISP, tile, gc, 0, 0, sz.x, sz.y);
+			XFreeGC( DISP, gc);
+			XFLUSH;
+		}
+	}
+
+	XX-> fp_render_picture = XRenderCreatePicture( DISP, tile, guts.xrender_argb32_format, CPRepeat, &xrp_attr);
+}
+
+static void
+pen_create_stipple(Handle self, Pixmap stipple)
+{
+	DEFXX;
+	XRenderPictureAttributes xrp_attr;
+	GC gc;
+	XGCValues gcv;
+	Point sz;
+
+	sz = get_pixmap_size( stipple );
+	if ( !( XX-> fp_render_pen = XCreatePixmap( DISP, guts.root, sz.x, sz.y, guts.argb_depth)))
+		return;
+
+	gcv.foreground = DEV_RGBA(&guts.argb_bits,
+		COLOR_R(XX->fore.color) * XX->alpha / 255,
+		COLOR_G(XX->fore.color) * XX->alpha / 255,
+		COLOR_B(XX->fore.color) * XX->alpha / 255,
+		XX->alpha);
+	gcv.background = DEV_RGBA(&guts.argb_bits,
+		COLOR_R(XX->back.color) * XX->alpha / 255,
+		COLOR_G(XX->back.color) * XX->alpha / 255,
+		COLOR_B(XX->back.color) * XX->alpha / 255,
+		(XX->rop2 == ropNoOper) ? 0 : XX->alpha);
+	if ( !( gc = XCreateGC(DISP, XX-> fp_render_pen, GCForeground|GCBackground, &gcv))) {
+		XFreePixmap( DISP, XX-> fp_render_pen );
+		XX-> fp_render_pen = 0;
+		return;
+	}
+
+	XCopyPlane( DISP, stipple, XX-> fp_render_pen, gc, 0, 0, sz.x, sz.y, 0, 0, 1);
+
+	XFreeGC(DISP, gc);
+
+	xrp_attr.repeat = RepeatNormal;
+	if ( !( XX-> fp_render_picture = XRenderCreatePicture( DISP, XX-> fp_render_pen, guts.xrender_argb32_format, CPRepeat, &xrp_attr))) {
+		XFreePixmap(DISP, XX-> fp_render_pen);
+		XX-> fp_render_pen = 0;
+		return;
+	}
+}
+
+void
+prima_render_cleanup_stipples(Handle self)
+{
+	DEFXX;
+	if ( XX-> fp_render_picture ) {
+		XRenderFreePicture( DISP, XX-> fp_render_picture);
+		XX-> fp_render_picture = 0;
+	}
+	if ( XX-> fp_render_pen ) {
+		XFreePixmap(DISP, XX-> fp_render_pen);
+		XX-> fp_render_pen = 0;
+	}
+}
+
+static Picture
+pen_picture( Handle self)
+{
+	DEFXX;
+	if ( guts.xrender_pen_dirty ) {
+		prima_render_cleanup_stipples(self);
+		if ( XX-> fp_stipple || XX-> fp_tile ) {
+			if ( XX-> fp_tile )
+				pen_create_tile(self, XX-> fp_tile);
+			else
+				pen_create_stipple(self, XX-> fp_stipple);
+			guts.xrender_pen_dirty = false;
+		} else
+			pen_update(self);
+	}
+	return XX-> fp_render_picture ? XX-> fp_render_picture : pen.picture;
 }
 
 Bool
@@ -247,10 +353,15 @@ apc_gp_aa_bar( Handle self, double x1, double y1, double x2, double y2)
 	if ( PObject( self)-> options. optInDrawInfo) return false;
 	if ( !XF_IN_PAINT(XX)) return false;
 
-	x1 += XX-> gtransform. x + XX-> btransform. x;
-	y1 = REVERT(y1 + XX-> gtransform. y + XX-> btransform. y) + 1;
-	x2 += XX-> gtransform. x + XX-> btransform. x + 1;
-	y2 = REVERT(y2 + XX-> gtransform. y + XX-> btransform. y);
+	if ( XT_IS_BITMAP(XX)) {
+		if ( XX->alpha < 0x7f ) return true;
+		return apc_gp_bar(self, x1 + .5, y1 + .5, x2 + .5, y2 + .5);
+	}
+
+	x1 += XX-> transform. x + XX-> btransform. x;
+	y1 = REVERT(y1 + XX-> transform. y + XX-> btransform. y) + 1;
+	x2 += XX-> transform. x + XX-> btransform. x + 1;
+	y2 = REVERT(y2 + XX-> transform. y + XX-> btransform. y);
 	RANGE2(x2, y2);
 	p[0].x = x1;
 	p[0].y = y1;
@@ -263,9 +374,8 @@ apc_gp_aa_bar( Handle self, double x1, double y1, double x2, double y2)
 	p[4].x = x1;
 	p[4].y = y1;
 
-	if ( guts.xrender_pen_dirty ) pen_update(self);
 	ok = my_XRenderCompositeDoublePoly(
-		DISP, PictOpOver, pen.picture, XX->argb_picture,
+		DISP, PictOpOver, pen_picture(self), XX->argb_picture,
 		XX->flags.antialias ? guts.xrender_a8_format : guts.xrender_a1_format,
 		0, 0, 0, 0, p, 5,
 		EvenOddRule
@@ -286,20 +396,32 @@ apc_gp_aa_fill_poly( Handle self, int numPts, NPoint * points)
 	if ( PObject( self)-> options. optInDrawInfo) return false;
 	if ( !XF_IN_PAINT(XX)) return false;
 
+	if ( XT_IS_BITMAP(XX)) {
+		Point *p;
+		if ( XX->alpha < 0x7f ) return true;
+		if ( !( p = malloc(( numPts + 1) * sizeof( Point)))) return false;
+		for ( i = 0; i < numPts; i++) {
+			p[i].x = points[i].x + .5;
+			p[i].y = points[i].y + .5;
+		}
+		ok = apc_gp_fill_poly( self, numPts, p );
+		free(p);
+		return ok;
+	}
+
 	if ( !( p = malloc(( numPts + 1) * sizeof( XPointDouble)))) return false;
 
 	for ( i = 0; i < numPts; i++) {
-		p[i].x = points[i]. x + XX-> gtransform. x + XX-> btransform. x;
-		p[i].y = REVERT(points[i]. y + XX-> gtransform. y + XX-> btransform. y);
+		p[i].x = points[i]. x + XX-> transform. x + XX-> btransform. x;
+		p[i].y = REVERT(points[i]. y + XX-> transform. y + XX-> btransform. y);
 		RANGE2(p[i].x, p[i].y);
 	}
-	p[numPts].x = points[0]. x + XX-> gtransform. x + XX-> btransform. x;
-	p[numPts].y = REVERT(points[0]. y + XX-> gtransform. y + XX-> btransform. y);
+	p[numPts].x = points[0]. x + XX-> transform. x + XX-> btransform. x;
+	p[numPts].y = REVERT(points[0]. y + XX-> transform. y + XX-> btransform. y);
 	RANGE2(p[numPts].x, p[numPts].y);
 
-	if ( guts.xrender_pen_dirty ) pen_update(self);
 	ok = my_XRenderCompositeDoublePoly(
-		DISP, PictOpOver, pen.picture, XX->argb_picture,
+		DISP, PictOpOver, pen_picture(self), XX->argb_picture,
 		XX->flags.antialias ? guts.xrender_a8_format : guts.xrender_a1_format,
 		0, 0, 0, 0, p, numPts,
 		((XX->fill_mode & fmWinding) == fmAlternate) ? EvenOddRule : WindingRule

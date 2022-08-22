@@ -9,7 +9,7 @@ use Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::InstanceOf::
 use Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::SexOrGender::Male;
 use Wikibase::Datatype::Value::Monolingual;
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
 
 sub new {
 	my $class = shift;

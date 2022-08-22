@@ -7,9 +7,10 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 }
 
 use Chart::Plotly::Trace::Image::Hoverlabel;
+use Chart::Plotly::Trace::Image::Legendgrouptitle;
 use Chart::Plotly::Trace::Image::Stream;
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: Display an image, i.e. data on a 2D regular raster. By default, when an image is displayed in a subplot, its y axis will be reversed (ie. `autorange: 'reversed'`), constrained to the domain (ie. `constrain: 'domain'`) and it will have the same scale as its x axis (ie. `scaleanchor: 'x,`) in order for pixels to be rendered as squares.
 
@@ -46,21 +47,22 @@ sub type {
 }
 
 has colormodel => (
-                is            => "rw",
-                isa           => enum( [ "rgb", "rgba", "hsl", "hsla" ] ),
-                documentation => "Color model used to map the numerical color components described in `z` into colors.",
+    is            => "rw",
+    isa           => enum( [ "rgb", "rgba", "rgba256", "hsl", "hsla" ] ),
+    documentation =>
+      "Color model used to map the numerical color components described in `z` into colors. If `source` is specified, this attribute will be set to `rgba256` otherwise it defaults to `rgb`.",
 );
 
 has customdata => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
       "Assigns extra data each datum. This may be useful when listening to hover, click and selection events. Note that, *scatter* traces also appends customdata items in the markers DOM elements",
 );
 
 has customdatasrc => ( is            => "rw",
                        isa           => "Str",
-                       documentation => "Sets the source reference on plot.ly for  customdata .",
+                       documentation => "Sets the source reference on Chart Studio Cloud for `customdata`.",
 );
 
 has dx => ( is            => "rw",
@@ -74,30 +76,30 @@ has dy => ( is            => "rw",
 );
 
 has hoverinfo => (
-    is  => "rw",
-    isa => "Str|ArrayRef[Str]",
+    is            => "rw",
+    isa           => "Str|ArrayRef[Str]",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
 
 has hoverinfosrc => ( is            => "rw",
                       isa           => "Str",
-                      documentation => "Sets the source reference on plot.ly for  hoverinfo .",
+                      documentation => "Sets the source reference on Chart Studio Cloud for `hoverinfo`.",
 );
 
 has hoverlabel => ( is  => "rw",
                     isa => "Maybe[HashRef]|Chart::Plotly::Trace::Image::Hoverlabel", );
 
 has hovertemplate => (
-    is  => "rw",
-    isa => "Str|ArrayRef[Str]",
+    is            => "rw",
+    isa           => "Str|ArrayRef[Str]",
     documentation =>
-      "Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example \"y: %{y}\". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example \"Price: %{y:\$.2f}\". https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format for details on the formatting syntax. Dates are formatted using d3-time-format's syntax %{variable|d3-time-format}, for example \"Day: %{2019-01-01|%A}\". https://github.com/d3/d3-3.x-api-reference/blob/master/Time-Formatting.md#format for details on the date formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variables `z`, `color` and `colormodel`. Anything contained in tag `<extra>` is displayed in the secondary box, for example \"<extra>{fullData.name}</extra>\". To hide the secondary box completely, use an empty tag `<extra></extra>`.",
+      "Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example \"y: %{y}\" as well as %{xother}, {%_xother}, {%_xother_}, {%xother_}. When showing info for several points, *xother* will be added to those with different x positions from the first point. An underscore before or after *(x|y)other* will add a space on that side, only when this field is shown. Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example \"Price: %{y:\$.2f}\". https://github.com/d3/d3-format/tree/v1.4.5#d3-format for details on the formatting syntax. Dates are formatted using d3-time-format's syntax %{variable|d3-time-format}, for example \"Day: %{2019-01-01|%A}\". https://github.com/d3/d3-time-format/tree/v2.2.3#locale_format for details on the date formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plotly.com/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variables `z`, `color` and `colormodel`. Anything contained in tag `<extra>` is displayed in the secondary box, for example \"<extra>{fullData.name}</extra>\". To hide the secondary box completely, use an empty tag `<extra></extra>`.",
 );
 
 has hovertemplatesrc => ( is            => "rw",
                           isa           => "Str",
-                          documentation => "Sets the source reference on plot.ly for  hovertemplate .",
+                          documentation => "Sets the source reference on Chart Studio Cloud for `hovertemplate`.",
 );
 
 has hovertext => ( is            => "rw",
@@ -107,31 +109,41 @@ has hovertext => ( is            => "rw",
 
 has hovertextsrc => ( is            => "rw",
                       isa           => "Str",
-                      documentation => "Sets the source reference on plot.ly for  hovertext .",
+                      documentation => "Sets the source reference on Chart Studio Cloud for `hovertext`.",
 );
 
 has ids => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
       "Assigns id labels to each datum. These ids for object constancy of data points during animation. Should be an array of strings, not numbers or any other type.",
 );
 
 has idssrc => ( is            => "rw",
                 isa           => "Str",
-                documentation => "Sets the source reference on plot.ly for  ids .",
+                documentation => "Sets the source reference on Chart Studio Cloud for `ids`.",
+);
+
+has legendgrouptitle => ( is  => "rw",
+                          isa => "Maybe[HashRef]|Chart::Plotly::Trace::Image::Legendgrouptitle", );
+
+has legendrank => (
+    is            => "rw",
+    isa           => "Num",
+    documentation =>
+      "Sets the legend rank for this trace. Items and groups with smaller ranks are presented on top/left side while with `*reversed* `legend.traceorder` they are on bottom/right side. The default legendrank is 1000, so that you can use ranks less than 1000 to place certain items before all unranked items, and ranks greater than 1000 to go after all unranked items.",
 );
 
 has pmeta => (
-    is  => "rw",
-    isa => "Any|ArrayRef[Any]",
+    is            => "rw",
+    isa           => "Any|ArrayRef[Any]",
     documentation =>
       "Assigns extra meta information associated with this trace that can be used in various text attributes. Attributes such as trace `name`, graph, axis and colorbar `title.text`, annotation `text` `rangeselector`, `updatemenues` and `sliders` `label` text all support `meta`. To access the trace `meta` values in an attribute in the same trace, simply use `%{meta[i]}` where `i` is the index or key of the `meta` item in question. To access trace `meta` in layout attributes, use `%{data[n[.meta[i]}` where `i` is the index or key of the `meta` and `n` is the trace index.",
 );
 
 has metasrc => ( is            => "rw",
                  isa           => "Str",
-                 documentation => "Sets the source reference on plot.ly for  meta .",
+                 documentation => "Sets the source reference on Chart Studio Cloud for `meta`.",
 );
 
 has name => ( is            => "rw",
@@ -144,6 +156,13 @@ has opacity => ( is            => "rw",
                  documentation => "Sets the opacity of the trace.",
 );
 
+has source => (
+    is            => "rw",
+    isa           => "Str",
+    documentation =>
+      "Specifies the data URI of the image to be visualized. The URI consists of \"data:image/[<media subtype>][;base64],<data>\"",
+);
+
 has stream => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Image::Stream", );
 
@@ -154,25 +173,25 @@ has text => ( is            => "rw",
 
 has textsrc => ( is            => "rw",
                  isa           => "Str",
-                 documentation => "Sets the source reference on plot.ly for  text .",
+                 documentation => "Sets the source reference on Chart Studio Cloud for `text`.",
 );
 
 has uid => (
-    is  => "rw",
-    isa => "Str",
+    is            => "rw",
+    isa           => "Str",
     documentation =>
       "Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.",
 );
 
 has uirevision => (
-    is  => "rw",
-    isa => "Any",
+    is            => "rw",
+    isa           => "Any",
     documentation =>
       "Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.",
 );
 
 has visible => (
-    is => "rw",
+    is            => "rw",
     documentation =>
       "Determines whether or not this trace is visible. If *legendonly*, the trace is not drawn, but can appear as a legend item (provided that the legend itself is visible).",
 );
@@ -183,7 +202,7 @@ has x0 => ( is            => "rw",
 );
 
 has xaxis => (
-    is => "rw",
+    is            => "rw",
     documentation =>
       "Sets a reference between this trace's x coordinates and a 2D cartesian x axis. If *x* (the default value), the x coordinates refer to `layout.xaxis`. If *x2*, the x coordinates refer to `layout.xaxis2`, and so on.",
 );
@@ -194,7 +213,7 @@ has y0 => ( is            => "rw",
 );
 
 has yaxis => (
-    is => "rw",
+    is            => "rw",
     documentation =>
       "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.",
 );
@@ -206,22 +225,28 @@ has z => (
 );
 
 has zmax => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
-      "Array defining the higher bound for each color component. Note that the default value will depend on the colormodel. For the `rgb` colormodel, it is [255, 255, 255]. For the `rgba` colormodel, it is [255, 255, 255, 1]. For the `hsl` colormodel, it is [360, 100, 100]. For the `hsla` colormodel, it is [360, 100, 100, 1].",
+      "Array defining the higher bound for each color component. Note that the default value will depend on the colormodel. For the `rgb` colormodel, it is [255, 255, 255]. For the `rgba` colormodel, it is [255, 255, 255, 1]. For the `rgba256` colormodel, it is [255, 255, 255, 255]. For the `hsl` colormodel, it is [360, 100, 100]. For the `hsla` colormodel, it is [360, 100, 100, 1].",
 );
 
 has zmin => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
-      "Array defining the lower bound for each color component. Note that the default value will depend on the colormodel. For the `rgb` colormodel, it is [0, 0, 0]. For the `rgba` colormodel, it is [0, 0, 0, 0]. For the `hsl` colormodel, it is [0, 0, 0]. For the `hsla` colormodel, it is [0, 0, 0, 0].",
+      "Array defining the lower bound for each color component. Note that the default value will depend on the colormodel. For the `rgb` colormodel, it is [0, 0, 0]. For the `rgba` colormodel, it is [0, 0, 0, 0]. For the `rgba256` colormodel, it is [0, 0, 0, 0]. For the `hsl` colormodel, it is [0, 0, 0]. For the `hsla` colormodel, it is [0, 0, 0, 0].",
+);
+
+has zsmooth => (
+    is            => "rw",
+    documentation =>
+      "Picks a smoothing algorithm used to smooth `z` data. This only applies for image traces that use the `source` attribute.",
 );
 
 has zsrc => ( is            => "rw",
               isa           => "Str",
-              documentation => "Sets the source reference on plot.ly for  z .",
+              documentation => "Sets the source reference on Chart Studio Cloud for `z`.",
 );
 
 __PACKAGE__->meta->make_immutable();
@@ -239,7 +264,7 @@ Chart::Plotly::Trace::Image - Display an image, i.e. data on a 2D regular raster
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -304,7 +329,7 @@ Trace type.
 
 =item * colormodel
 
-Color model used to map the numerical color components described in `z` into colors.
+Color model used to map the numerical color components described in `z` into colors. If `source` is specified, this attribute will be set to `rgba256` otherwise it defaults to `rgb`.
 
 =item * customdata
 
@@ -312,7 +337,7 @@ Assigns extra data each datum. This may be useful when listening to hover, click
 
 =item * customdatasrc
 
-Sets the source reference on plot.ly for  customdata .
+Sets the source reference on Chart Studio Cloud for `customdata`.
 
 =item * dx
 
@@ -328,17 +353,17 @@ Determines which trace information appear on hover. If `none` or `skip` are set,
 
 =item * hoverinfosrc
 
-Sets the source reference on plot.ly for  hoverinfo .
+Sets the source reference on Chart Studio Cloud for `hoverinfo`.
 
 =item * hoverlabel
 
 =item * hovertemplate
 
-Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example "y: %{y}". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example "Price: %{y:$.2f}". https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format for details on the formatting syntax. Dates are formatted using d3-time-format's syntax %{variable|d3-time-format}, for example "Day: %{2019-01-01|%A}". https://github.com/d3/d3-3.x-api-reference/blob/master/Time-Formatting.md#format for details on the date formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variables `z`, `color` and `colormodel`. Anything contained in tag `<extra>` is displayed in the secondary box, for example "<extra>{fullData.name}</extra>". To hide the secondary box completely, use an empty tag `<extra></extra>`.
+Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example "y: %{y}" as well as %{xother}, {%_xother}, {%_xother_}, {%xother_}. When showing info for several points, *xother* will be added to those with different x positions from the first point. An underscore before or after *(x|y)other* will add a space on that side, only when this field is shown. Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example "Price: %{y:$.2f}". https://github.com/d3/d3-format/tree/v1.4.5#d3-format for details on the formatting syntax. Dates are formatted using d3-time-format's syntax %{variable|d3-time-format}, for example "Day: %{2019-01-01|%A}". https://github.com/d3/d3-time-format/tree/v2.2.3#locale_format for details on the date formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plotly.com/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variables `z`, `color` and `colormodel`. Anything contained in tag `<extra>` is displayed in the secondary box, for example "<extra>{fullData.name}</extra>". To hide the secondary box completely, use an empty tag `<extra></extra>`.
 
 =item * hovertemplatesrc
 
-Sets the source reference on plot.ly for  hovertemplate .
+Sets the source reference on Chart Studio Cloud for `hovertemplate`.
 
 =item * hovertext
 
@@ -346,7 +371,7 @@ Same as `text`.
 
 =item * hovertextsrc
 
-Sets the source reference on plot.ly for  hovertext .
+Sets the source reference on Chart Studio Cloud for `hovertext`.
 
 =item * ids
 
@@ -354,7 +379,13 @@ Assigns id labels to each datum. These ids for object constancy of data points d
 
 =item * idssrc
 
-Sets the source reference on plot.ly for  ids .
+Sets the source reference on Chart Studio Cloud for `ids`.
+
+=item * legendgrouptitle
+
+=item * legendrank
+
+Sets the legend rank for this trace. Items and groups with smaller ranks are presented on top/left side while with `*reversed* `legend.traceorder` they are on bottom/right side. The default legendrank is 1000, so that you can use ranks less than 1000 to place certain items before all unranked items, and ranks greater than 1000 to go after all unranked items.
 
 =item * pmeta
 
@@ -362,7 +393,7 @@ Assigns extra meta information associated with this trace that can be used in va
 
 =item * metasrc
 
-Sets the source reference on plot.ly for  meta .
+Sets the source reference on Chart Studio Cloud for `meta`.
 
 =item * name
 
@@ -372,6 +403,10 @@ Sets the trace name. The trace name appear as the legend item and on hover.
 
 Sets the opacity of the trace.
 
+=item * source
+
+Specifies the data URI of the image to be visualized. The URI consists of "data:image/[<media subtype>][;base64],<data>"
+
 =item * stream
 
 =item * text
@@ -380,7 +415,7 @@ Sets the text elements associated with each z value.
 
 =item * textsrc
 
-Sets the source reference on plot.ly for  text .
+Sets the source reference on Chart Studio Cloud for `text`.
 
 =item * uid
 
@@ -416,15 +451,19 @@ A 2-dimensional array in which each element is an array of 3 or 4 numbers repres
 
 =item * zmax
 
-Array defining the higher bound for each color component. Note that the default value will depend on the colormodel. For the `rgb` colormodel, it is [255, 255, 255]. For the `rgba` colormodel, it is [255, 255, 255, 1]. For the `hsl` colormodel, it is [360, 100, 100]. For the `hsla` colormodel, it is [360, 100, 100, 1].
+Array defining the higher bound for each color component. Note that the default value will depend on the colormodel. For the `rgb` colormodel, it is [255, 255, 255]. For the `rgba` colormodel, it is [255, 255, 255, 1]. For the `rgba256` colormodel, it is [255, 255, 255, 255]. For the `hsl` colormodel, it is [360, 100, 100]. For the `hsla` colormodel, it is [360, 100, 100, 1].
 
 =item * zmin
 
-Array defining the lower bound for each color component. Note that the default value will depend on the colormodel. For the `rgb` colormodel, it is [0, 0, 0]. For the `rgba` colormodel, it is [0, 0, 0, 0]. For the `hsl` colormodel, it is [0, 0, 0]. For the `hsla` colormodel, it is [0, 0, 0, 0].
+Array defining the lower bound for each color component. Note that the default value will depend on the colormodel. For the `rgb` colormodel, it is [0, 0, 0]. For the `rgba` colormodel, it is [0, 0, 0, 0]. For the `rgba256` colormodel, it is [0, 0, 0, 0]. For the `hsl` colormodel, it is [0, 0, 0]. For the `hsla` colormodel, it is [0, 0, 0, 0].
+
+=item * zsmooth
+
+Picks a smoothing algorithm used to smooth `z` data. This only applies for image traces that use the `source` attribute.
 
 =item * zsrc
 
-Sets the source reference on plot.ly for  z .
+Sets the source reference on Chart Studio Cloud for `z`.
 
 =back
 
@@ -434,7 +473,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

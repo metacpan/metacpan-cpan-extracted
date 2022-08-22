@@ -25,7 +25,7 @@ our
     ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE, $AUTOLOAD, $INIT, $DEBUG, %SPEED_MAP,
      $NOSUCH, $BIGINT, $REPEATERS);
 
-$VERSION = '3.87';
+$VERSION = '3.89';
 
 =head1 NAME
 
@@ -33,7 +33,7 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.87
+SNMP::Info - Version 3.89
 
 =head1 AUTHOR
 
@@ -4039,6 +4039,8 @@ Takes an OID and return the object name if the right MIB is loaded.
 
 sub munge_e_type {
     my $oid = shift;
+    return unless $oid;
+    return $oid if $oid =~ m/^\.0/;
 
     my $name = &SNMP::translateObj($oid);
     return $name if defined($name);

@@ -6,7 +6,7 @@ use warnings;
 use Mo qw(build default is);
 use Mo::utils qw(check_array_object check_number_of_items);
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
 
 has glosses => (
 	default => [],
@@ -130,6 +130,8 @@ Returns reference to array with Wikibase::Datatype::Statement instances.
 
 =head1 EXAMPLE
 
+=for comment filename=create_and_print_sense.pl
+
  use strict;
  use warnings;
 
@@ -240,6 +242,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.19
+0.20
 
 =cut

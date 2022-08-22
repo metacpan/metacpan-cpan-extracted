@@ -38,6 +38,12 @@ sub _connector {
     return $conn;
 }
 
+# Outside exception handler check
+$SIG{__DIE__} = sub {
+    fail "Outside exception handler didn't catch the DBI error";
+    die $_[0];
+};
+
 ############################################################
 
 subtest 'No retries' => sub {

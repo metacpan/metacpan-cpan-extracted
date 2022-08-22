@@ -1,5 +1,5 @@
 package File::ShouldUpdate;
-$File::ShouldUpdate::VERSION = '0.2.0';
+$File::ShouldUpdate::VERSION = '0.2.1';
 use strict;
 use warnings;
 use Time::HiRes qw/ stat /;
@@ -61,7 +61,7 @@ File::ShouldUpdate - should files be rebuilt?
 
 =head1 VERSION
 
-version 0.2.0
+version 0.2.1
 
 =head1 SYNOPSIS
 
@@ -79,10 +79,11 @@ version 0.2.0
 
 =head1 DESCRIPTION
 
-This module provides should_update() which can be used to determine if files
-should be updated based on the mtime timestamps of their dependencies. It avoids
-confusing between target and dependencies by using syntactic sugar of the
-familiar makefile rules ( L<https://en.wikipedia.org/wiki/Make_(software)> ).
+This module provides should_update() and should_update_multi() which can be
+used to determine if files should be updated based on the mtime timestamps of
+their dependencies. They avoid confusing between targets and dependencies by
+using the syntactic sugar of the familiar makefile rules (
+L<https://en.wikipedia.org/wiki/Make_(software)> ).
 
 =head1 FUNCTIONS
 

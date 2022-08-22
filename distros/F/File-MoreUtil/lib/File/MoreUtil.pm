@@ -1,19 +1,18 @@
 ## no critic: Subroutines::ProhibitExplicitReturnUndef
 package File::MoreUtil;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-13'; # DATE
-our $DIST = 'File-MoreUtil'; # DIST
-our $VERSION = '0.625'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 use Cwd ();
+use Exporter 'import';
 
-require Exporter;
-our @ISA = qw(Exporter);
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-08-08'; # DATE
+our $DIST = 'File-MoreUtil'; # DIST
+our $VERSION = '0.626'; # VERSION
+
 our @EXPORT_OK = qw(
                        file_exists
                        l_abs_path
@@ -27,6 +26,9 @@ our @EXPORT_OK = qw(
                        dir_has_non_subdirs
                        dir_has_dot_subdirs
                        dir_has_non_dot_subdirs
+                       dir_only_has_files
+                       dir_only_has_dot_files
+                       dir_only_has_non_dot_files
 
                        get_dir_entries
                        get_dir_dot_entries
@@ -100,6 +102,19 @@ sub dir_has_files {
     0;
 }
 
+sub dir_only_has_files {
+    my ($dir) = @_;
+    return undef unless (-d $dir);
+    return undef unless opendir my($dh), $dir;
+    my $has_files;
+    while (defined(my $e = readdir $dh)) {
+        next if $e eq '.' || $e eq '..';
+        return 0 unless -f "$dir/$e";
+        $has_files++;
+    }
+    $has_files ? 1:0;
+}
+
 sub dir_has_dot_files {
     my ($dir) = @_;
     return undef unless (-d $dir);
@@ -113,6 +128,20 @@ sub dir_has_dot_files {
     0;
 }
 
+sub dir_only_has_dot_files {
+    my ($dir) = @_;
+    return undef unless (-d $dir);
+    return undef unless opendir my($dh), $dir;
+    my $has_dot_files;
+    while (defined(my $e = readdir $dh)) {
+        next if $e eq '.' || $e eq '..';
+        return 0 unless $e =~ /\A\./;
+        return 0 unless -f "$dir/$e";
+        $has_dot_files++;
+    }
+    $has_dot_files ? 1:0;
+}
+
 sub dir_has_non_dot_files {
     my ($dir) = @_;
     return undef unless (-d $dir);
@@ -124,6 +153,20 @@ sub dir_has_non_dot_files {
         return 1;
     }
     0;
+}
+
+sub dir_only_has_non_dot_files {
+    my ($dir) = @_;
+    return undef unless (-d $dir);
+    return undef unless opendir my($dh), $dir;
+    my $has_nondot_files;
+    while (defined(my $e = readdir $dh)) {
+        next if $e eq '.' || $e eq '..';
+        return 0 if $e =~ /\A\./;
+        return 0 unless -f "$dir/$e";
+        $has_nondot_files++;
+    }
+    $has_nondot_files ? 1:0;
 }
 
 sub dir_has_subdirs {
@@ -275,7 +318,7 @@ File::MoreUtil - File-related utilities
 
 =head1 VERSION
 
-This document describes version 0.625 of File::MoreUtil (from Perl distribution File-MoreUtil), released on 2021-10-13.
+This document describes version 0.626 of File::MoreUtil (from Perl distribution File-MoreUtil), released on 2022-08-08.
 
 =head1 SYNOPSIS
 
@@ -332,6 +375,13 @@ but:
 This function performs the following test:
 
  !(-l "sym") && (-e _) || (-l _)
+
+Which one should you use: C<-e> or C<file_exists>? It depends on whether you
+want to consider a broken symlink as "existing" or not. Sometimes one is more
+appropriate than the other. If you use C<-e>, your application might overwrite a
+(temporarily) broken symlink; on the other hand if you use C<file_exists>, your
+application will see a file as existing but gets confused when it cannot open
+it.
 
 =head2 l_abs_path
 
@@ -455,6 +505,36 @@ Usage:
 Will return true if C<$dir> exists and has one or more non-dot subdirectories
 (i.e. subdirectories with names not beginning with a dot) in it. A symlink to a
 directory does I<NOT> count as subdirectory.
+
+=head2 dir_only_has_files
+
+Usage:
+
+ dir_only_has_files($dir) => BOOL
+
+Will return true if C<$dir> exists and has one or more plain files in it *and*
+does not have anything else. See L</dir_has_files> for the definition of plain
+files.
+
+=head2 dir_only_has_dot_files
+
+Usage:
+
+ dir_only_has_dot_files($dir) => BOOL
+
+Will return true if C<$dir> exists and has one or more plain dot files in it
+*and* does not have anything else. See L</dir_has_files> for the definition of
+plain files.
+
+=head2 dir_only_has_non_dot_files
+
+Usage:
+
+ dir_only_has_non_dot_files($dir) => BOOL
+
+Will return true if C<$dir> exists and has one or more plain non-dot files in it
+*and* does not have anything else. See L</dir_has_files> for the definition of
+plain files.
 
 =head2 get_dir_entries
 
@@ -601,7 +681,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/File-MoreU
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-File-MoreUtil>.
+Source repository is at L<https://github.com/perlancar/perl-SHARYANTO-File-Util>.
 
 =head1 SEE ALSO
 
@@ -630,13 +710,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2017, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2020, 2019, 2017, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

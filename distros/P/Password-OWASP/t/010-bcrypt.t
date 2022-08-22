@@ -7,7 +7,14 @@ use_ok("Password::OWASP");
 use Password::OWASP::Bcrypt;
 use Authen::Passphrase::BlowfishCrypt;
 
-my $pwo = Password::OWASP::Bcrypt->new();
+my $pwo = Password::OWASP::Bcrypt->new(
+    cost => 4,
+);
+isa_ok($pwo, 'Password::OWASP::Bcrypt');
+is($pwo->cost, 4, "Changed the cost to 4");
+
+$pwo = Password::OWASP::Bcrypt->new();
+is($pwo->cost, 12, "Default is 12");
 
 isa_ok($pwo, 'Password::OWASP::Bcrypt');
 

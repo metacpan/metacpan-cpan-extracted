@@ -62,7 +62,7 @@ use Catmandu::Util qw(xml_escape is_different :array :is);
 use List::Util;
 use Moo;
 
-our $VERSION = '1.271';
+our $VERSION = '1.281';
 
 with 'Catmandu::Exporter', 'Catmandu::Exporter::MARC::Base';
 
@@ -121,7 +121,9 @@ sub add {
              my @line = ('', $_id , ' ' , $tag , $ind1 , $ind2 , ' L ');
              while (@data) {
                  my ($code,$val) = splice(@data, 0, 2);
-                 next unless $code =~ /[A-Za-z0-9]/o;
+                 # some special characters are allowed as subfiled codes in local defined field
+                 # see https://www.loc.gov/marc/96principl.html#eight 8.4.2.3.
+                 next unless $code =~ /[a-z0-9!"#\$%&'\(\)\*\+'-\.\/:;<=>]/o;
                  next unless is_string($val);
                  $val =~ s{[[:cntrl:]]}{}g;
                  push @line , '$$' , $code , $val;

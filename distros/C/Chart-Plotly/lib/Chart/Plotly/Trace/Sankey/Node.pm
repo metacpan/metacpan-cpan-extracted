@@ -9,7 +9,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 use Chart::Plotly::Trace::Sankey::Node::Hoverlabel;
 use Chart::Plotly::Trace::Sankey::Node::Line;
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace sankey.
 
@@ -37,30 +37,40 @@ sub TO_JSON {
 }
 
 has color => (
-    is  => "rw",
-    isa => "Str|ArrayRef[Str]",
+    is            => "rw",
+    isa           => "Str|ArrayRef[Str]",
     documentation =>
       "Sets the `node` color. It can be a single value, or an array for specifying color for each `node`. If `node.color` is omitted, then the default `Plotly` color palette will be cycled through to have a variety of colors. These defaults are not fully opaque, to allow some visibility of what is beneath the node.",
 );
 
 has colorsrc => ( is            => "rw",
                   isa           => "Str",
-                  documentation => "Sets the source reference on plot.ly for  color .",
+                  documentation => "Sets the source reference on Chart Studio Cloud for `color`.",
+);
+
+has customdata => ( is            => "rw",
+                    isa           => "ArrayRef|PDL",
+                    documentation => "Assigns extra data to each node.",
+);
+
+has customdatasrc => ( is            => "rw",
+                       isa           => "Str",
+                       documentation => "Sets the source reference on Chart Studio Cloud for `customdata`.",
 );
 
 has description => ( is      => "ro",
                      default => "The nodes of the Sankey plot.", );
 
 has groups => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
       "Groups of nodes. Each group is defined by an array with the indices of the nodes it contains. Multiple groups can be specified.",
 );
 
 has hoverinfo => (
-    is  => "rw",
-    isa => enum( [ "all", "none", "skip" ] ),
+    is            => "rw",
+    isa           => enum( [ "all", "none", "skip" ] ),
     documentation =>
       "Determines which trace information appear when hovering nodes. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
@@ -69,15 +79,15 @@ has hoverlabel => ( is  => "rw",
                     isa => "Maybe[HashRef]|Chart::Plotly::Trace::Sankey::Node::Hoverlabel", );
 
 has hovertemplate => (
-    is  => "rw",
-    isa => "Str|ArrayRef[Str]",
+    is            => "rw",
+    isa           => "Str|ArrayRef[Str]",
     documentation =>
-      "Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example \"y: %{y}\". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example \"Price: %{y:\$.2f}\". https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format for details on the formatting syntax. Dates are formatted using d3-time-format's syntax %{variable|d3-time-format}, for example \"Day: %{2019-01-01|%A}\". https://github.com/d3/d3-3.x-api-reference/blob/master/Time-Formatting.md#format for details on the date formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variables `value` and `label`. Anything contained in tag `<extra>` is displayed in the secondary box, for example \"<extra>{fullData.name}</extra>\". To hide the secondary box completely, use an empty tag `<extra></extra>`.",
+      "Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example \"y: %{y}\" as well as %{xother}, {%_xother}, {%_xother_}, {%xother_}. When showing info for several points, *xother* will be added to those with different x positions from the first point. An underscore before or after *(x|y)other* will add a space on that side, only when this field is shown. Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example \"Price: %{y:\$.2f}\". https://github.com/d3/d3-format/tree/v1.4.5#d3-format for details on the formatting syntax. Dates are formatted using d3-time-format's syntax %{variable|d3-time-format}, for example \"Day: %{2019-01-01|%A}\". https://github.com/d3/d3-time-format/tree/v2.2.3#locale_format for details on the date formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plotly.com/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variables `value` and `label`. Anything contained in tag `<extra>` is displayed in the secondary box, for example \"<extra>{fullData.name}</extra>\". To hide the secondary box completely, use an empty tag `<extra></extra>`.",
 );
 
 has hovertemplatesrc => ( is            => "rw",
                           isa           => "Str",
-                          documentation => "Sets the source reference on plot.ly for  hovertemplate .",
+                          documentation => "Sets the source reference on Chart Studio Cloud for `hovertemplate`.",
 );
 
 has label => ( is            => "rw",
@@ -87,7 +97,7 @@ has label => ( is            => "rw",
 
 has labelsrc => ( is            => "rw",
                   isa           => "Str",
-                  documentation => "Sets the source reference on plot.ly for  label .",
+                  documentation => "Sets the source reference on Chart Studio Cloud for `label`.",
 );
 
 has line => ( is  => "rw",
@@ -110,7 +120,7 @@ has x => ( is            => "rw",
 
 has xsrc => ( is            => "rw",
               isa           => "Str",
-              documentation => "Sets the source reference on plot.ly for  x .",
+              documentation => "Sets the source reference on Chart Studio Cloud for `x`.",
 );
 
 has y => ( is            => "rw",
@@ -120,7 +130,7 @@ has y => ( is            => "rw",
 
 has ysrc => ( is            => "rw",
               isa           => "Str",
-              documentation => "Sets the source reference on plot.ly for  y .",
+              documentation => "Sets the source reference on Chart Studio Cloud for `y`.",
 );
 
 __PACKAGE__->meta->make_immutable();
@@ -138,7 +148,7 @@ Chart::Plotly::Trace::Sankey::Node - This attribute is one of the possible optio
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -199,7 +209,15 @@ Sets the `node` color. It can be a single value, or an array for specifying colo
 
 =item * colorsrc
 
-Sets the source reference on plot.ly for  color .
+Sets the source reference on Chart Studio Cloud for `color`.
+
+=item * customdata
+
+Assigns extra data to each node.
+
+=item * customdatasrc
+
+Sets the source reference on Chart Studio Cloud for `customdata`.
 
 =item * description
 
@@ -215,11 +233,11 @@ Determines which trace information appear when hovering nodes. If `none` or `ski
 
 =item * hovertemplate
 
-Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example "y: %{y}". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example "Price: %{y:$.2f}". https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format for details on the formatting syntax. Dates are formatted using d3-time-format's syntax %{variable|d3-time-format}, for example "Day: %{2019-01-01|%A}". https://github.com/d3/d3-3.x-api-reference/blob/master/Time-Formatting.md#format for details on the date formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variables `value` and `label`. Anything contained in tag `<extra>` is displayed in the secondary box, for example "<extra>{fullData.name}</extra>". To hide the secondary box completely, use an empty tag `<extra></extra>`.
+Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example "y: %{y}" as well as %{xother}, {%_xother}, {%_xother_}, {%xother_}. When showing info for several points, *xother* will be added to those with different x positions from the first point. An underscore before or after *(x|y)other* will add a space on that side, only when this field is shown. Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example "Price: %{y:$.2f}". https://github.com/d3/d3-format/tree/v1.4.5#d3-format for details on the formatting syntax. Dates are formatted using d3-time-format's syntax %{variable|d3-time-format}, for example "Day: %{2019-01-01|%A}". https://github.com/d3/d3-time-format/tree/v2.2.3#locale_format for details on the date formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plotly.com/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variables `value` and `label`. Anything contained in tag `<extra>` is displayed in the secondary box, for example "<extra>{fullData.name}</extra>". To hide the secondary box completely, use an empty tag `<extra></extra>`.
 
 =item * hovertemplatesrc
 
-Sets the source reference on plot.ly for  hovertemplate .
+Sets the source reference on Chart Studio Cloud for `hovertemplate`.
 
 =item * label
 
@@ -227,7 +245,7 @@ The shown name of the node.
 
 =item * labelsrc
 
-Sets the source reference on plot.ly for  label .
+Sets the source reference on Chart Studio Cloud for `label`.
 
 =item * line
 
@@ -245,7 +263,7 @@ The normalized horizontal position of the node.
 
 =item * xsrc
 
-Sets the source reference on plot.ly for  x .
+Sets the source reference on Chart Studio Cloud for `x`.
 
 =item * y
 
@@ -253,7 +271,7 @@ The normalized vertical position of the node.
 
 =item * ysrc
 
-Sets the source reference on plot.ly for  y .
+Sets the source reference on Chart Studio Cloud for `y`.
 
 =back
 
@@ -263,7 +281,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

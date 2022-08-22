@@ -6,12 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/Docmake.pm',
     'App/XML/DocBook/Builder.pm',
-    'App/XML/DocBook/Docmake.pm'
+    'App/XML/DocBook/Docmake.pm',
+    'App/XML/DocBook/Docmake/CmdComponent.pm'
 );
 
 my @scripts = (

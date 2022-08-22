@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::APIResponseAssertions;
-$Playwright::APIResponseAssertions::VERSION = '1.210';
+$Playwright::APIResponseAssertions::VERSION = '1.251';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,16 +20,6 @@ sub new {
 
 sub spec {
     return $Playwright::spec->{'APIResponseAssertions'}{members};
-}
-
-sub toBeOK {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'toBeOK',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
 }
 
 sub not {
@@ -47,6 +37,16 @@ sub NotToBeOK {
     return $self->_api_request(
         args    => [@_],
         command => 'NotToBeOK',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub toBeOK {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'toBeOK',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -96,7 +96,7 @@ Playwright::APIResponseAssertions - Automatically generated class for Playwright
 
 =head1 VERSION
 
-version 1.210
+version 1.251
 
 =head1 CONSTRUCTOR
 
@@ -106,12 +106,6 @@ You shouldn't have to call this directly.
 Instead it should be returned to you as the result of calls on Playwright objects, or objects it returns.
 
 =head1 METHODS
-
-=head2 toBeOK(@args)
-
-Execute the APIResponseAssertions::toBeOK playwright routine.
-
-See L<https://playwright.dev/api/class-APIResponseAssertions#APIResponseAssertions-toBeOK> for more information.
 
 =head2 not(@args)
 
@@ -124,6 +118,12 @@ See L<https://playwright.dev/api/class-APIResponseAssertions#APIResponseAssertio
 Execute the APIResponseAssertions::NotToBeOK playwright routine.
 
 See L<https://playwright.dev/api/class-APIResponseAssertions#APIResponseAssertions-NotToBeOK> for more information.
+
+=head2 toBeOK(@args)
+
+Execute the APIResponseAssertions::toBeOK playwright routine.
+
+See L<https://playwright.dev/api/class-APIResponseAssertions#APIResponseAssertions-toBeOK> for more information.
 
 =head2 on(@args)
 

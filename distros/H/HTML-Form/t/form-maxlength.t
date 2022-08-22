@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-use lib '.';
 use Test::More tests => 12;
 use HTML::Form;
 

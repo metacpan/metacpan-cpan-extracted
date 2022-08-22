@@ -27,9 +27,9 @@ sub IsStructureEqualJSON {
 
     $test_app->layout(
                        html->Div(
-                                  children => [dcc->Input( id => 'input-id', value => 'initial value', type => 'text' ),
+                                 children => [ dcc->Input( id => 'input-id', value => 'initial value', type => 'text' ),
                                                html->Div( id => 'output-id' )
-                                  ]
+                                 ]
                        )
     );
 
@@ -56,10 +56,10 @@ sub IsStructureEqualJSON {
 
     $test_app->layout(
                        html->Div(
-                                  children => [dcc->Input( id => 'input-id', value => 'initial value', type => 'text' ),
+                                 children => [ dcc->Input( id => 'input-id', value => 'initial value', type => 'text' ),
                                                html->Div( id => 'output-id' ),
                                                html->Div( id => 'second-output-id' )
-                                  ]
+                                 ]
                        )
     );
 
@@ -89,17 +89,16 @@ sub IsStructureEqualJSON {
 
     $test_app->layout(
                        html->Div(
-                                  children => [
-                                          dcc->Input( id => 'input-id', value => 'initial value', type => 'text' ),
+                            children => [ dcc->Input( id => 'input-id', value => 'initial value',      type => 'text' ),
                                           dcc->Input( id => 'second-input-id', value => 'state value', type => 'text' ),
                                           html->Div( id => 'output-id' )
-                                  ]
+                            ]
                        )
     );
 
     $test_app->callback(
         Output   => { component_id => 'output-id', component_property => 'children' },
-        Inputs   => [ { component_id => 'input-id', component_property => 'value' } ],
+        Inputs   => [ { component_id => 'input-id',        component_property => 'value' } ],
         State    => [ { component_id => 'second-input-id', component_property => 'value' } ],
         callback => sub {
             my ( $input_value, $second_input_value ) = @_;
@@ -112,7 +111,8 @@ sub IsStructureEqualJSON {
 
     IsStructureEqualJSON( $test_app->_update_component( from_json($input_update_component) ),
                           '{"response": {"props": {"children": "You have entered initial value and state value"}}}',
-                          'Update component with state dependency' );
+                          'Update component with state dependency'
+    );
 }
 
 {
@@ -120,9 +120,9 @@ sub IsStructureEqualJSON {
 
     $test_app->layout(
                        html->Div(
-                                  children => [dcc->Input( id => 'input-id', value => 'initial value', type => 'text' ),
+                                 children => [ dcc->Input( id => 'input-id', value => 'initial value', type => 'text' ),
                                                html->Div( id => 'output-id' )
-                                  ]
+                                 ]
                        )
     );
 
@@ -142,8 +142,8 @@ sub IsStructureEqualJSON {
       '{"output":"output-id.children","changedPropIds":["input-id.value"],"inputs":[{"id":"input-id","property":"value","value":"initial value"}]}';
     $test_app->_update_component( from_json($input_update_component) );
     is_deeply( $context_output,
-               { inputs    => { 'input-id.value' => 'initial value' },
-                 triggered => [ { prop_id => 'input-id.value', value => 'initial value' } ]
+               {  inputs    => { 'input-id.value' => 'initial value' },
+                  triggered => [ { prop_id => 'input-id.value', value => 'initial value' } ]
                },
                'Context is correctly received by the callback'
     );

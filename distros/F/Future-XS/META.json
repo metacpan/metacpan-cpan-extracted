@@ -31,6 +31,7 @@
       },
       "test" : {
          "requires" : {
+            "Test::Fatal" : "0",
             "Test::Identity" : "0",
             "Test::More" : "0.88",
             "Test::Refcount" : "0"
@@ -40,7 +41,7 @@
    "provides" : {
       "Future::XS" : {
          "file" : "lib/Future/XS.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -49,6 +50,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -6,7 +6,7 @@ use Test::File::ShareDir::Dist { 'DateTime-Locale' => 'share' };
 
 use DateTime::Locale;
 use File::ShareDir qw( dist_dir );
-use Path::Tiny qw( path );
+use Path::Tiny     qw( path );
 
 {
     # This is kind of gross since we are assuming that File::ShareDir always

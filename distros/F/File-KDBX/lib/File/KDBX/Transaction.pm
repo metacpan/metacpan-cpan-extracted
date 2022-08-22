@@ -8,7 +8,7 @@ use Devel::GlobalDestruction;
 use File::KDBX::Util qw(:class);
 use namespace::clean;
 
-our $VERSION = '0.905'; # VERSION
+our $VERSION = '0.906'; # VERSION
 
 
 sub new {
@@ -59,7 +59,7 @@ File::KDBX::Transaction - Make multiple database edits atomically
 
 =head1 VERSION
 
-version 0.905
+version 0.906
 
 =head1 ATTRIBUTES
 

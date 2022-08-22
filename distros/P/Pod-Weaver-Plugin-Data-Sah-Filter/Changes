@@ -1,3 +1,19 @@
+0.004   2022-07-16  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Use Require::Hook::Source::DzilBuild and force reload
+          when loading filer module to get up-to-date metadata.
+
+
+0.003   2022-07-16  Released-By: PERLANCAR; Urgency: medium
+
+        - Show filter arguments in generated examples, if any.
+
+
+0.002   2022-07-16  Released-By: PERLANCAR; Urgency: medium
+
+        - Render metadata's description and examples to POD.
+
+
 0.001   2020-02-10  Released-By: PERLANCAR
 
         - First release.

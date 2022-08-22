@@ -29,7 +29,7 @@ note("catmandu marc export");
           [ '008', ' ', ' ' , '_', '050601s1921    xx |||||||||||||| ||dut  ' ],
           [ '245', '1', '0' , 'a', 'Catmandu Test' ] ,
           [ '650', ' ', '0' , 'a', 'Perl' ] ,
-          [ '650', ' ', '0' , 'a', 'MARC' , 'a' , 'MARC2' ] ,
+          [ '650', ' ', '0' , 'a', 'MARC' , '<' , 'MARC2' ] ,
           [ '650', ' ', '0' , 'a', '加德滿都' ] ,
         ]
     };
@@ -41,7 +41,7 @@ note("catmandu marc export");
 000000002 008   L 050601s1921^^^^xx^||||||||||||||^||dut^^
 000000002 24510 L $$aCatmandu Test
 000000002 650 0 L $$aPerl
-000000002 650 0 L $$aMARC$$aMARC2
+000000002 650 0 L $$aMARC$$<MARC2
 000000002 650 0 L $$a加德滿都
 EOF
 
@@ -96,7 +96,7 @@ note("marc-in-json export");
                     ind2 => '0' ,
                     subfields => [
                         { a => 'MARC'} ,
-                        { a => 'MARC2'}
+                        { '<' => 'MARC2'}
                     ]
                 }
             } ,
@@ -117,7 +117,7 @@ note("marc-in-json export");
 000000002 001   L 000000002
 000000002 24510 L $$aCatmandu Test
 000000002 650 0 L $$aPerl
-000000002 650 0 L $$aMARC$$aMARC2
+000000002 650 0 L $$aMARC$$<MARC2
 000000002 650 0 L $$a加德滿都
 EOF
 

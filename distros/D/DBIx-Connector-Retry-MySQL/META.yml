@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '7.1101'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,10 +22,10 @@ name: DBIx-Connector-Retry-MySQL
 provides:
   DBIx::Connector::Retry::MySQL:
     file: lib/DBIx/Connector/Retry/MySQL.pm
-    version: v1.0.0
+    version: v1.0.1
 requires:
   Algorithm::Backoff::RetryTimeouts: '0'
-  DBIx::Connector::Retry: v0.900.2
+  DBIx::Connector::Retry: v0.900.3
   DBIx::ParseError::MySQL: '0'
   Moo: '0'
   Scalar::Util: '0'
@@ -36,8 +36,8 @@ requires:
 resources:
   bugtracker: https://github.com/GrantStreetGroup/DBIx-Connector-Retry-MySQL/issues
   repository: git://github.com/GrantStreetGroup/DBIx-Connector-Retry-MySQL.git
-version: v1.0.0
-x_generated_by_perl: v5.18.2
+version: v1.0.1
+x_generated_by_perl: v5.20.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0
 x_static_install: 1

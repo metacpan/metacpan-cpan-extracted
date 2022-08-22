@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scattercarpet.
 
@@ -53,7 +53,7 @@ Chart::Plotly::Trace::Scattercarpet::Unselected::Textfont - This attribute is on
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -125,7 +125,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

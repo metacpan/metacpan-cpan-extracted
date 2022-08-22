@@ -136,6 +136,7 @@ get '/ajax/content/search/node' => require_login sub {
           order_by => {'-desc' => 'time_last'},
           '+columns' => [
             'device.dns',
+            'device.name',
             { time_first_stamp => \"to_char(time_first, 'YYYY-MM-DD HH24:MI')" },
             { time_last_stamp =>  \"to_char(time_last, 'YYYY-MM-DD HH24:MI')" },
           ],
@@ -182,7 +183,7 @@ get '/ajax/content/search/node' => require_login sub {
     my $rs_dp = schema('netdisco')->resultset('DevicePort');
     if ($sightings->has_rows or $ips->has_rows or $netbios->has_rows) {
         my $ports = param('deviceports')
-          ? $rs_dp->search({ -and => [@where_mac] }) : undef;
+          ? $rs_dp->search({ -and => [@where_mac] }, { order_by => { '-desc' => 'creation' }}) : undef;
 
         return template 'ajax/search/node_by_mac.tt', {
           ips       => $ips,
@@ -194,7 +195,7 @@ get '/ajax/content/search/node' => require_login sub {
     }
     else {
         my $ports = param('deviceports')
-          ? $rs_dp->search({ -and => [@where_mac, @porttimes] }) : undef;
+          ? $rs_dp->search({ -and => [@where_mac, @porttimes] }, { order_by => { '-desc' => 'creation' }}) : undef;
 
         if (defined $ports and $ports->has_rows) {
             return template 'ajax/search/node_by_mac.tt', {

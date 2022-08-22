@@ -380,6 +380,8 @@ sub get_notify_sub
 	return undef;
 }
 
+sub AUTOLOAD_DEEP_LOOKUP { $#_ ? $_[0]->{_autoload_deep_lookup} = $_[1] : $_[0]->{_autoload_deep_lookup} }
+
 sub AUTOLOAD
 {
 	no strict;
@@ -388,22 +390,13 @@ sub AUTOLOAD
 	Carp::confess "There is no such thing as \"$expectedMethod\"\n"
 		if scalar(@_) or not ref $self;
 	my ($componentName) = $expectedMethod =~ /::([^:]+)$/;
-	my $component = $self-> bring( $componentName);
+	my $component = $self-> bring( $componentName, $self->{_autoload_deep_lookup} ? 1000 : 0);
 	Carp::confess("Unknown widget or method \"$expectedMethod\"")
 		unless $component && ref($component);
 	return $component;
 }
 
-sub find_component
-{
-	my ( $self, $name ) = @_;
-	my @q = $self-> get_components;
-	while ( my $x = shift @q ) {
-		return $x if $x-> name eq $name;
-		push @q, $x-> get_components;
-	}
-	return undef;
-}
+sub find_component { $_[0]->bring($_[1], -1000) }
 
 package Prima::File;
 use vars qw(@ISA);
@@ -628,6 +621,16 @@ sub fillWinding # compatibility
 
 sub font_mapper { Prima::Font::Mapper->new( shift ) }
 
+sub graphic_context
+{
+	my $self = shift;
+	my $cb   = pop;
+	return unless $self->graphic_context_push;
+	$self->set(@_);
+	$cb->();
+	return $self->graphic_context_pop;
+}
+
 package Prima::Image;
 use vars qw( @ISA);
 @ISA = qw(Prima::Drawable);
@@ -733,9 +736,42 @@ sub ui_scale
 	return $self;
 }
 
+sub dataSize  { $_[0]->lineSize * $_[0]->height }
+sub scanline  { substr( $_[0]->data, $_[0]->lineSize * $_[1], $_[0]-> lineSize ) }
+sub shear     { $_[0]->transform(1,@_[2,1],1) }
 sub to_region { Prima::Region->new( image => shift ) }
 
-sub shear { $_[0]->transform(1,@_[2,1],1) }
+sub to_icon
+{
+	my ( $self, %set ) = @_;
+	my $fill = delete $set{fill};
+	my $type = delete $set{maskType} // 1;
+	my $and = Prima::Icon->new(
+		size => [ $self-> size ],
+		type => $type,
+	);
+	if ( defined $fill && length $fill ) {
+		$and->data( $fill  x ( $and->dataSize / (length $fill)));
+	}
+	return Prima::Icon->create_combined( $self, $and, %set );
+}
+
+sub load_stream
+{
+	shift;
+	require Prima::Image::base64;
+	my ($ok, $error) = Prima::Image::base64::load_icon(@_);
+	$@ = $error unless $ok;
+	return $ok;
+}
+
+sub save_stream
+{
+	require Prima::Image::base64;
+	my ( $ok, $error ) = Prima::Image::base64::save(@_);
+	$@ = $error unless $ok;
+	return $ok;
+}
 
 package Prima::Icon;
 use vars qw( @ISA);
@@ -766,6 +802,9 @@ sub profile_check_in
 }
 
 sub maskLineSize { int(( $_[0]->width * $_[0]->maskType + 31 ) / 32 ) * 4 }
+sub maskSize     { $_[0]->maskLineSize * $_[0]->height }
+sub maskline     { substr( $_[0]->mask, $_[0]->maskLineSize * $_[1], $_[0]-> maskLineSize ) }
+sub maskImage    { my ( undef, $mask ) = shift->split; $mask }
 
 sub mirror
 {
@@ -778,8 +817,9 @@ sub mirror
 
 sub create_combined
 {
-	my $self = shift->new( autoMasking => am::None );
-	$self->combine(@_);
+	my ( $class, $xor, $and, @rest ) = @_;
+	my $self = $class->new( autoMasking => am::None, @rest );
+	$self->combine($xor, $and);
 	return $self;
 }
 
@@ -820,6 +860,15 @@ sub image
 	return $image;
 }
 
+sub load_stream
+{
+	shift;
+	require Prima::Image::base64;
+	my ($ok, $error) = Prima::Image::base64::load_icon(@_);
+	$@ = $error unless $ok;
+	return $ok;
+}
+
 package Prima::DeviceBitmap;
 use vars qw( @ISA);
 @ISA = qw(Prima::Drawable);
@@ -853,7 +902,7 @@ sub profile_check_in
 
 sub has_alpha_layer { shift->type == dbt::Layered }
 
-sub dup 
+sub dup
 {
 	my $self = shift;
 	my $dup = ref($self)->new(
@@ -862,7 +911,7 @@ sub dup
 	);
 	$dup->backColor(0);
 	$dup->clear;
-	$dup->put_image(0,0,$self,rop::SrcOver);
+	$dup->put_image(0,0,$self,rop::Blend);
 	return $dup;
 }
 
@@ -1635,12 +1684,12 @@ sub begin_drag
 			$flyback->bring_to_front;
 			my @targ = map { $_ / 2 } $flyback->size;
 			while (abs( $npp[0] - $opp[0]) > $targ[0] || abs($npp[1] - $opp[1]) > $targ[1]) {
-				@npp = map { ( $npp[$_] + $opp[$_] ) / 2 } 0, 1;
+				@npp = map { $npp[$_] * 0.8 + $opp[$_] * 0.2 } 0, 1;
 				my $max_wait = 10;
 				$::application->yield while !$paint_flag && $max_wait--;
 				last unless $flyback;
 				$paint_flag = 0;
-				CORE::select(undef, undef, undef, 0.1);
+				CORE::select(undef, undef, undef, 0.02);
 				$flyback->origin(@npp);
 				$flyback->bring_to_front;
 			}

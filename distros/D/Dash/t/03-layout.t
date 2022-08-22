@@ -29,10 +29,9 @@ $test_app->layout(
 
 my $json = JSON->new->convert_blessed(1);
 
-is_deeply(
-    $json->decode( $json->encode( $test_app->layout ) ),
-    $json->decode(
-        '{"props": {"children": [{"props": {"children": "initial value", "id": "input-id"}, "type": "Textarea", "namespace": "dash_html_components"}, {"props": {"children": null, "id": "output-id"}, "type": "Div", "namespace": "dash_html_components"}]}, "type": "Div", "namespace": "dash_html_components"}'
-    )
+is_deeply( $json->decode( $json->encode( $test_app->layout ) ),
+           $json->decode(
+               '{"props": {"children": [{"props": {"children": "initial value", "id": "input-id"}, "type": "Textarea", "namespace": "dash_html_components"}, {"props": {"children": null, "id": "output-id"}, "type": "Div", "namespace": "dash_html_components"}]}, "type": "Div", "namespace": "dash_html_components"}'
+           )
 );
 

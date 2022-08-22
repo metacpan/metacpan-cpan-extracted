@@ -1,0 +1,9 @@
+name = "PickLE"
+license="artistic_2"
+authority = "cpan:NATHANPC"
+module_maker="ModuleBuildTiny"
+badges = ['metacpan']
+static_install = "auto"
+
+[FileGatherer]
+exclude_match = ['docker-compose.yml', 'Dockerfile']

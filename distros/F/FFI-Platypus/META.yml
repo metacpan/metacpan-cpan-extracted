@@ -30,9 +30,11 @@ requires:
   Capture::Tiny: '0'
   ExtUtils::MakeMaker: '7.12'
   FFI::CheckLib: '0.05'
+  File::Spec::Functions: '0'
   IPC::Cmd: '0'
   JSON::PP: '0'
   List::Util: '1.45'
+  autodie: '0'
   constant: '1.32'
   parent: '0'
   perl: '5.008004'
@@ -41,7 +43,7 @@ resources:
   bugtracker: https://github.com/PerlFFI/FFI-Platypus/issues
   homepage: https://metacpan.org/pod/FFI::Platypus
   repository: git://github.com/PerlFFI/FFI-Platypus.git
-version: '1.58'
+version: '2.00'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Bakkiaraj Murugesan (bakkiaraj)'

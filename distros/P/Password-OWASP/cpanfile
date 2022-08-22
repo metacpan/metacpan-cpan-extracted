@@ -4,7 +4,7 @@
 requires "Authen::Passphrase" => "0";
 requires "Authen::Passphrase::Argon2" => "0";
 requires "Authen::Passphrase::BlowfishCrypt" => "0";
-requires "Authen::Passphrase::Scrypt" => "0";
+requires "Authen::Passphrase::Scrypt" => "0.002";
 requires "Digest::SHA" => "0";
 requires "Moose" => "0";
 requires "Moose::Role" => "0";
@@ -14,6 +14,7 @@ requires "namespace::autoclean" => "0";
 requires "perl" => "5.006";
 
 on 'test' => sub {
+  requires "Authen::Passphrase::Scrypt" => "0.002";
   requires "File::Spec" => "0";
   requires "IO::Handle" => "0";
   requires "IPC::Open3" => "0";

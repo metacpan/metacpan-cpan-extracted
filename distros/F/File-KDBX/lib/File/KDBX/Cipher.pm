@@ -12,7 +12,7 @@ use Module::Load;
 use Scalar::Util qw(looks_like_number);
 use namespace::clean;
 
-our $VERSION = '0.905'; # VERSION
+our $VERSION = '0.906'; # VERSION
 
 my %CIPHERS;
 
@@ -158,7 +158,7 @@ File::KDBX::Cipher - A block cipher mode or cipher stream
 
 =head1 VERSION
 
-version 0.905
+version 0.906
 
 =head1 SYNOPSIS
 
@@ -304,7 +304,8 @@ This is a factory method which returns a subclass.
 
     $self->init;
 
-Initialize the cipher. Called by </new>.
+Called by L</new> to set attributes. You normally shouldn't call this. Returns itself to allow method
+chaining.
 
 =head2 encrypt
 

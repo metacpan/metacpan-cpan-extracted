@@ -8,7 +8,7 @@ package IO::Async::FileStream;
 use strict;
 use warnings;
 
-our $VERSION = '0.801';
+our $VERSION = '0.802';
 
 use base qw( IO::Async::Stream );
 

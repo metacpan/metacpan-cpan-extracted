@@ -1,5 +1,19 @@
 Revision history for IO-Async
 
+0.802   2022-08-15
+        [CHANGES]
+         * Preëmptively use Future ->udata API from upcoming release, to
+           avoid depending on it being a hashref
+         * Report correct caller file + line number in nested test calls to
+           wait_for {}
+
+        [BUGFIXES]
+         * Use 'SOCK_STREAM' instead of hardcoded 1 in t/50resolver.t
+         * Skip exceptional socket condition test on cygwin because it seems
+           always to fail there
+         * Avoid harmless warnings about undef at global destruction
+           (RT142754)
+
 0.801   2021-12-15
         [BUGFIXES]
          * Remove extraneous test-time use of Data::Dump (RT140143)

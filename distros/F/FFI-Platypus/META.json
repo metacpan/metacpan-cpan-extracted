@@ -129,9 +129,11 @@
             "Capture::Tiny" : "0",
             "ExtUtils::MakeMaker" : "7.12",
             "FFI::CheckLib" : "0.05",
+            "File::Spec::Functions" : "0",
             "IPC::Cmd" : "0",
             "JSON::PP" : "0",
             "List::Util" : "1.45",
+            "autodie" : "0",
             "constant" : "1.32",
             "parent" : "0",
             "perl" : "5.008004"
@@ -159,7 +161,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.58",
+   "version" : "2.00",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Bakkiaraj Murugesan (bakkiaraj)",
@@ -183,7 +185,7 @@
       "Pete Houston (openstrike, HOUSTON)"
    ],
    "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.28",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

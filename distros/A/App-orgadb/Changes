@@ -1,3 +1,13 @@
+0.005   2022-08-08  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        - [incompatible change] Rename CLI orgadb to orgadb-sel.
+
+        - Add option --filter-entries-by-field work.
+
+        - [bugfix] Field searching must be from the root field and not
+          subfields.
+
+
 0.004   2022-07-04  Released-By: PERLANCAR; Urgency: medium
 
         - Decrypt .gpg files automatically, and show examples of using

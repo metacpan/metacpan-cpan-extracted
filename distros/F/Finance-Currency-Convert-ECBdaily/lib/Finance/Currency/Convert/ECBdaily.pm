@@ -2,8 +2,8 @@ package Finance::Currency::Convert::ECBdaily;
 
 use vars qw/$VERSION $DATE $CHAT %currencies/;
 
-$VERSION = 0.05;
-$DATE = "01 March 2018";
+$VERSION = 0.08;
+$DATE = "18 Aug 2022";
 
 =head1 NAME
 
@@ -112,22 +112,35 @@ sub convert {
 sub _get_document_xml { 
 
 	my ($amount,$from,$to) = (shift,shift,shift);
-	die "get_document requires a \$amount,\$from_currency,\$target_currency arrity" unless (defined $amount and defined $to and defined $from);
+	unless (defined $amount and defined $to and defined $from) {
+		warn "get_document requires a \$amount,\$from_currency,\$target_currency arrity";
+		return undef;
+	};
 
 	my $url = 'https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml';
 	warn "\nAttempting to access <$url> ...\n" if $CHAT;
 
-	my $content = get $url or die "Unable to get $url\n";
+	my $content = get $url;
+	unless (defined $content) {
+		warn "Unable to get $url\n";
+		return undef;
+	}
 
 	my $xml = new XML::Simple;
 	my $data = $xml->XMLin($content);
 	my $cube = $data->{Cube}->{Cube}->{Cube};
 	
 	my $r1 = _get_rate($cube, $from);
-	die "\ncan not find rate for currency $from" unless $r1;
+	unless($r1) {
+		warn "\nwarn:: can not find rate for currency $from";
+		return undef;
+	}
 	
 	my $r2 = _get_rate($cube, $to);
-	die "\ncan not find rate for currency $to" unless $r2;
+	unless( $r2) {
+		warn "\nwarn:: can not find rate for currency $from or $to";
+		return undef;
+	}
 
 	my $r = $r2/$r1;
 

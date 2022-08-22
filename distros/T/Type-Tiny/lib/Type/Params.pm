@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Params::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Params::VERSION   = '1.016007';
+	$Type::Params::VERSION   = '1.016008';
 }
 
 $Type::Params::VERSION =~ tr/_//d;
@@ -261,45 +261,54 @@ sub wrap_subs {
 	goto \&_wrap_subs;
 }
 
-sub _wrap_subs {
-	my $opts = shift;
-	my $subname =
-		eval   { require Sub::Util } ? \&Sub::Util::set_subname
-		: eval { require Sub::Name } ? \&Sub::Name::subname
-		:                              0;
-	while ( @_ ) {
-		my ( $name, $proto ) = splice @_, 0, 2;
-		my $fullname =
-			( $name =~ /::/ )
-			? $name
-			: sprintf( '%s::%s', $opts->{caller}, $name );
-		my $orig = do {
-			no strict 'refs';
-			exists &$fullname     ? \&$fullname
-				: $opts->{use_can} ? ( $opts->{caller}->can( $name ) || sub { } )
-				: sub { }
-		};
-		my $check = ref( $proto ) eq 'CODE' ? $proto : undef;
-		my $co    = { description => "parameter validation for '$name'" };
-		my $new   = $opts->{skip_invocant}
-			? sub {
-			my $s = shift;
-			$check ||= compile( $co, @$proto );
-			@_ = ( $s, &$check );
-			goto $orig;
-			}
-			: sub {
-			$check ||= compile( $co, @$proto );
-			@_ = ( &$check );
-			goto $orig;
+{
+	my $subname;
+	sub _wrap_subs {
+		my $opts = shift;
+		$subname ||=
+			eval   { require Sub::Util } ? \&Sub::Util::set_subname
+			: eval { require Sub::Name } ? \&Sub::Name::subname
+			: sub { pop; };
+		while ( @_ ) {
+			my ( $name, $proto ) = splice @_, 0, 2;
+			my $fullname = ( $name =~ /::/ ) ? $name : sprintf( '%s::%s', $opts->{caller}, $name );
+			my $orig = do {
+				no strict 'refs';
+				exists &$fullname     ? \&$fullname
+					: $opts->{use_can} ? ( $opts->{caller}->can( $name ) || sub { } )
+					: sub { }
 			};
-		$new = $subname->( $fullname, $new ) if $subname;
-		no strict 'refs';
-		no warnings 'redefine';
-		*$fullname = $new;
-	} #/ while ( @_ )
-	1;
-} #/ sub _wrap_subs
+			my $new;
+			if ( ref $proto eq 'CODE' ) {
+				$new = $opts->{skip_invocant}
+					? sub {
+						my $s = shift;
+						@_ = ( $s, &$proto );
+						goto $orig;
+					}
+					: sub {
+						@_ = &$proto;
+						goto $orig;
+					};
+			}
+			else {
+				$new = compile(
+					{
+						'package'   => $opts->{caller},
+						'subname'   => $name,
+						'goto_next' => $orig,
+						'head'      => $opts->{skip_invocant} ? 1 : 0,
+					},
+					@$proto,
+				);
+			}
+			no strict 'refs';
+			no warnings 'redefine';
+			*$fullname = $subname->( $fullname, $new );
+		} #/ while ( @_ )
+		1;
+	} #/ sub _wrap_subs
+}
 
 1;
 
@@ -522,7 +531,15 @@ into too many details about what else this hashref contains.
 Description of the coderef that will show up in stack traces. Defaults to
 "parameter validation for X" where X is the caller sub name.
 
+=item C<< package >> B<< Str >>
+
+The package of the sub we're supposed to be checking. Not usually important.
+The default is probably fine.
+
 =item C<< subname >> B<< Str >>
+
+The name of the sub we're supposed to be checking. Not usually important.
+The default is probably fine.
 
 If you wish to use the default description, but need to change the sub name,
 use this.
@@ -547,6 +564,57 @@ it will throw an exception.
 If an C<on_die> coderef is provided, then it is called instead, and the
 exception is passed to it as an object. The C<< $check >> coderef will still
 immediately return though.
+
+=item C<< goto_next >> B<< Bool | CodeLike >>
+
+Defaults to false.
+
+This can be used to turn signatures inside out. Instead of your signature
+being a coderef which is called by your function, your function can be a
+coderef which is called by the signature.
+
+  # The function people call.
+  sub foo {
+    state $sig = compile( { goto_next => 1 }, Int );
+    $sig->( \&_real_foo, @_ );
+  }
+  
+  # Your real function which receives checked/coerced arguments
+  sub _real_foo {
+    my ( $n ) = ( @_ );
+    ...;
+  }
+
+Alternatively, using a coderef:
+
+  sub foo {
+    state $sig = compile( { goto_next => \&_real_foo }, Int );
+    $sig->( @_ );
+  }
+  
+  sub _real_foo {
+    my ( $n ) = ( @_ );
+    ...;
+  }
+
+Or even:
+
+  {
+    my $real_foo = sub {
+      my ( $n ) = ( @_ );
+      ...;
+    };
+    *foo = compile( { subname => 'foo', goto_next => $real_foo }, Int );
+  }
+
+If you're using Moose/Mouse/Moo, then this should work:
+
+  sub foo {
+    my ( $n ) = ( @_ );
+    ...;
+  }
+  
+  around foo => compile( { subname => 'foo', goto_next => 1 }, Int );
 
 =item C<< strictness >> B<< Bool | Str >>
 

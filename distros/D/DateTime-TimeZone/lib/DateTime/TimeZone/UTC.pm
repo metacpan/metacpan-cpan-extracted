@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.52';
+our $VERSION = '2.53';
 
 use parent 'Class::Singleton', 'DateTime::TimeZone';
 
@@ -47,7 +47,7 @@ DateTime::TimeZone::UTC - The UTC time zone
 
 =head1 VERSION
 
-version 2.52
+version 2.53
 
 =head1 SYNOPSIS
 
@@ -55,9 +55,9 @@ version 2.52
 
 =head1 DESCRIPTION
 
-This class is used to provide the DateTime::TimeZone API needed by
-DateTime.pm for the UTC time zone, which is not explicitly included in
-the Olson time zone database.
+This class is used to provide the DateTime::TimeZone API needed by DateTime.pm
+for the UTC time zone, which is not explicitly included in the Olson time zone
+database.
 
 The offset for this object will always be zero.
 

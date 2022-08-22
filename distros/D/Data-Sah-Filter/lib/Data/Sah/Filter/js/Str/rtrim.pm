@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-04'; # DATE
+our $DATE = '2022-07-16'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 sub meta {
     +{
@@ -43,13 +43,28 @@ Data::Sah::Filter::js::Str::rtrim - Trim whitespace at the end of string
 
 =head1 VERSION
 
-This document describes version 0.010 of Data::Sah::Filter::js::Str::rtrim (from Perl distribution Data-Sah-Filter), released on 2022-07-04.
+This document describes version 0.011 of Data::Sah::Filter::js::Str::rtrim (from Perl distribution Data-Sah-Filter), released on 2022-07-16.
 
 =head1 SYNOPSIS
 
-Use in Sah schema's C<prefilters> (or C<postfilters>) clause:
+=head2 Using in Sah schema's C<prefilters> (or C<postfilters>) clause
 
- ["str","prefilters",["Str::rtrim"]]
+ ["str","prefilters",[["Str::rtrim"]]]
+
+=head2 Using with L<Data::Sah>:
+
+ use Data::Sah qw(gen_validator);
+ 
+ my $schema = ["str","prefilters",[["Str::rtrim"]]];
+ my $validator = gen_validator($schema);
+ if ($validator->($some_data)) { print 'Valid!' }
+
+=head2 Using with L<Data::Sah:Filter> directly:
+
+ use Data::Sah::Filter qw(gen_filter);
+
+ my $filter = gen_filter([["Str::rtrim"]]);
+ my $filtered_value = $filter->($some_data);
 
 =for Pod::Coverage ^(meta|filter)$
 

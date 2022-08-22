@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.52';
+our $VERSION = '2.53';
 
 use parent 'Class::Singleton', 'DateTime::TimeZone::OffsetOnly';
 
@@ -59,7 +59,7 @@ DateTime::TimeZone::Floating - A time zone that is always local
 
 =head1 VERSION
 
-version 2.52
+version 2.53
 
 =head1 SYNOPSIS
 
@@ -67,9 +67,9 @@ version 2.52
 
 =head1 DESCRIPTION
 
-This class is used to provide the DateTime::TimeZone API needed by
-DateTime.pm, but for floating times, as defined by the RFC 2445 spec.
-A floating time has no time zone, and has an effective offset of zero.
+This class is used to provide the DateTime::TimeZone API needed by DateTime.pm,
+but for floating times, as defined by the RFC 2445 spec. A floating time has no
+time zone, and has an effective offset of zero.
 
 =head1 USAGE
 

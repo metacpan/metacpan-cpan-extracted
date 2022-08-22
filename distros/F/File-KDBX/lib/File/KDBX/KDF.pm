@@ -12,9 +12,18 @@ use Module::Load;
 use Scalar::Util qw(blessed);
 use namespace::clean;
 
-our $VERSION = '0.905'; # VERSION
+our $VERSION = '0.906'; # VERSION
 
 my %KDFS;
+
+our %ROUNDS_INFO = (
+    KDF_UUID_ARGON2D()  => {p => KDF_PARAM_ARGON2_ITERATIONS, d => KDF_DEFAULT_ARGON2_ITERATIONS},
+    KDF_UUID_ARGON2ID() => {p => KDF_PARAM_ARGON2_ITERATIONS, d => KDF_DEFAULT_ARGON2_ITERATIONS},
+);
+our $DEFAULT_ROUNDS_INFO = {
+    p => KDF_PARAM_AES_ROUNDS,
+    d => KDF_DEFAULT_AES_ROUNDS,
+};
 
 
 sub new {
@@ -120,7 +129,7 @@ File::KDBX::KDF - A key derivation function
 
 =head1 VERSION
 
-version 0.905
+version 0.906
 
 =head1 DESCRIPTION
 
@@ -194,7 +203,8 @@ Construct a new KDF.
 
     $kdf = $kdf->init(%attributes);
 
-Called by method to set attributes. You normally shouldn't call this.
+Called by L</new> to set attributes. You normally shouldn't call this. Returns itself to allow method
+chaining.
 
 =head2 transform
 
@@ -213,7 +223,7 @@ so challenge-response keys can produce raw keys. See L<File::KDBX::Key/raw_key>.
 
     $kdf->randomize_seed;
 
-Generate a new random seed/salt.
+Generate and set a new random seed/salt.
 
 =head2 register
 

@@ -1,3 +1,58 @@
+0.12 2022-08-18
+  [New Features]
+    * The match method of the Regex class can receive the offset and the length.
+      [Before]
+      method match : int ($string : string)
+      
+      [After]
+      method match : int ($string : string, $offset = 0 : int, $length = -1 : int)
+  [Document Fix]
+    * Fix many document mistakes.
+  [Bug Fix]
+    * Fix the bug that the replace offset is over the length of the string. This maybe raises some moery leak.
+  [Requirement Changes]
+    * Need SPVM 0.9643+.
+  [Incompatible Changes]
+    * The definitions of the following methods of the Regex class.
+      [Before]
+      method match_offset : int ($string : string, $offset : int*);
+      method replace_g_offset  : string ($string : string, $offset_ref : int*, $replace : string)
+      [After]
+      method match_forward : int ($string : string, $offset : int*);
+      method replace_g_forward  : string ($string : string, $replace :object of string|Regex::Replacer, $offset_ref : int*)
+   * The following methods of the Regex class are removed.
+      method replace_cb_offset  : string ($string : string, $offset_ref : int*, $replace_cb : Regex::Replacer)
+      method replace_g_cb_offset  : string ($string : string, $offset_ref : int*, $replace_cb : Regex::Replacer)
+      method replace_offset  : string ($string : string, $offset_ref : int*, $replace : string)
+   * Remove the following methods of the Regex
+      method replace_g_forward  : string ($string : string, $replace :object of string|Regex::Replacer, $offset_ref : int*);
+   * The definitions of the following methods of the Regex class.
+     [Before]
+     method replace_common : string ($string : string, $replace : object, $options : object[], $offset_ref : int*) {
+     [After]
+     method replace_common : string ($string : string, $replace : object, $offset_ref : int*, $options : object[]) {
+   * The definitions of the following methods of the Regex class.
+      [Before]
+      static method new : Regex ($pattern_and_flags : string[]...)
+      {After]
+      static method new : Regex ($pattern : string, $flags = undef : string)
+   * The definitions of the following methods of the Regex class.
+     [Before]
+     method replace  : string ($string : string, $replace : object of string|Regex::Replacer)
+     method replace_g  : string ($string : string, $replace : object of string|Regex::Replacer)
+     precompile method replace_common : string ($string : string, $replace : object, $offset_ref : int*, $options = undef : object[])
+     [After]
+     method replace  : string ($string : string, $replace : object of string|Regex::Replacer, $offset = 0 : int, $length = -1 : int, $options = undef : object[])
+     method replace_g  : string ($string : string, $replace : object of string|Regex::Replacer, $offset = 0 : int, $length = -1 : int, $options = undef : object[])
+     precompile method replace_common : string ($string : string, $replace : object, $offset_ref : int*, $length = -1 : int, $options = undef : object[])
+
+  [Changes]
+    * The definitions of the following methods of the Regex class.
+      [Before]
+      method replace_common : string ($string : string, $replace : object, $offset_ref : int*, $options : object[]) {
+      [After]
+      method replace_common : string ($string : string, $replace : object, $offset_ref : int*, $options = undef : object[]) {
+  
 0.11 2022-08-08
   [Text Fix]
     * Fix tests for SPVM upgrading.

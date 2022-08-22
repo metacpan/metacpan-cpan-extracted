@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.21, Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,9 +29,13 @@ resources:
   bugtracker: https://github.com/hiratara/p5-Class-Accessor-TrackDirty/issues
   homepage: https://github.com/hiratara/p5-Class-Accessor-TrackDirty
   repository: https://github.com/hiratara/p5-Class-Accessor-TrackDirty.git
-version: '0.11'
+version: 0.110.1
 x_contributors:
   - 'Masahiro Honma <hira.tara@gmail.com>'
   - 'Masahiro Honma <tarara@hirataraDebian.hiratara.local>'
   - 'Neil Bowers <neil@bowers.com>'
+  - 'Yasuharu Iida <yasuharu.iida@fout.jp>'
+x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 1

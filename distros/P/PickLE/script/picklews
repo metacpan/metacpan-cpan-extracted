@@ -1,0 +1,85 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+C<App::PickLE::WebServer> - A minimal API and web server for PickLE
+
+=cut
+
+package App::PickLE::WebServer;
+
+use strict;
+use warnings;
+use Moo;
+use Mojolicious::Lite;
+
+use PickLE::Document;
+use PickLE::Exporter::JSON;
+use PickLE::Exporter::HTML;
+
+=head1 API ENDPOINTS
+
+=over 4
+
+=item C<GET> C</>
+
+The root of the server. This isn't used for anything other than a simple
+reminder to the user that the server is running.
+
+=cut
+
+get "/" => sub { 
+	my $self = shift;
+	$self->render(
+		text => "<h1>It works!</h1>\n<p>This is the PickLE web server.</p>\n"
+	);
+};
+
+=item C<POST> C</export/>I<:ftype>
+
+Exports a PickLE document in a specified I<format>.
+
+=cut
+
+post "/export/:ftype" => sub {
+	my $self = shift;
+
+	# Get the requested format and parse the document we were sent.
+	my $format = $self->param('ftype');
+	my $document = PickLE::Document->from_string($self->req->body);
+	if (not defined $document) {
+		return $self->reply->exception(
+			"There were errors while trying to parse the document.\n");
+	}
+
+	if ($format eq 'pickle') {
+		# Regular PickLE document.
+		return $self->render_text($document->as_string, format => 'txt');
+	} elsif ($format eq 'json') {
+		# JSON
+		return $self->render(json => PickLE::Exporter::JSON->as_hash($document));
+	} elsif ($format eq 'html') {
+		# HTML
+		return $self->render(text => PickLE::Exporter::HTML->as_string($document));
+	}
+
+	# Unknown type to export.
+	return $self->reply->exception("Unknown type of file to be exported.\n");
+};
+
+# Start web server.
+app->start();
+
+__END__
+
+=back
+
+=head1 AUTHOR
+
+Nathan Campos <nathan@innoveworkshop.com>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2022- Nathan Campos.
+
+=cut

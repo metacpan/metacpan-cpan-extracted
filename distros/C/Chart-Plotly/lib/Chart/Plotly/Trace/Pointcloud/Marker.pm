@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Pointcloud::Marker::Border;
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace pointcloud.
 
@@ -36,8 +36,8 @@ sub TO_JSON {
 }
 
 has blend => (
-    is  => "rw",
-    isa => "Bool",
+    is            => "rw",
+    isa           => "Bool",
     documentation =>
       "Determines if colors are blended together for a translucency effect in case `opacity` is specified as a value less then `1`. Setting `blend` to `true` reduces zoom/pan speed if used with large numbers of points.",
 );
@@ -46,29 +46,29 @@ has border => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Pointcloud::Marker::Border", );
 
 has color => (
-    is  => "rw",
-    isa => "Str",
+    is            => "rw",
+    isa           => "Str",
     documentation =>
-      "Sets the marker fill color. It accepts a specific color.If the color is not fully opaque and there are hundreds of thousandsof points, it may cause slower zooming and panning.",
+      "Sets the marker fill color. It accepts a specific color. If the color is not fully opaque and there are hundreds of thousands of points, it may cause slower zooming and panning.",
 );
 
 has opacity => (
-    is  => "rw",
-    isa => "Num",
+    is            => "rw",
+    isa           => "Num",
     documentation =>
       "Sets the marker opacity. The default value is `1` (fully opaque). If the markers are not fully opaque and there are hundreds of thousands of points, it may cause slower zooming and panning. Opacity fades the color even if `blend` is left on `false` even if there is no translucency effect in that case.",
 );
 
 has sizemax => (
-    is  => "rw",
-    isa => "Num",
+    is            => "rw",
+    isa           => "Num",
     documentation =>
       "Sets the maximum size (in px) of the rendered marker points. Effective when the `pointcloud` shows only few points.",
 );
 
 has sizemin => (
-    is  => "rw",
-    isa => "Num",
+    is            => "rw",
+    isa           => "Num",
     documentation =>
       "Sets the minimum size (in px) of the rendered marker points, effective when the `pointcloud` shows a million or more points.",
 );
@@ -88,7 +88,7 @@ Chart::Plotly::Trace::Pointcloud::Marker - This attribute is one of the possible
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -133,7 +133,7 @@ Determines if colors are blended together for a translucency effect in case `opa
 
 =item * color
 
-Sets the marker fill color. It accepts a specific color.If the color is not fully opaque and there are hundreds of thousandsof points, it may cause slower zooming and panning.
+Sets the marker fill color. It accepts a specific color. If the color is not fully opaque and there are hundreds of thousands of points, it may cause slower zooming and panning.
 
 =item * opacity
 
@@ -155,7 +155,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

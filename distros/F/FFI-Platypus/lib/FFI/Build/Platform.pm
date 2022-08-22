@@ -11,7 +11,7 @@ use File::Spec;
 use FFI::Platypus::ShareConfig;
 
 # ABSTRACT: Platform specific configuration.
-our $VERSION = '1.58'; # VERSION
+our $VERSION = '2.00'; # VERSION
 
 
 sub new
@@ -443,7 +443,7 @@ FFI::Build::Platform - Platform specific configuration.
 
 =head1 VERSION
 
-version 1.58
+version 2.00
 
 =head1 SYNOPSIS
 

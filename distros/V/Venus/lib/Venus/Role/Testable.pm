@@ -9,7 +9,7 @@ use Venus::Role 'with';
 
 # METHODS
 
-sub isfalse {
+sub is_false {
   my ($self, $code, @args) = @_;
 
   $code ||= $self->can('value') ? 'value' : sub{};
@@ -19,7 +19,13 @@ sub isfalse {
   return $self->$code(@args) ? Venus::Boolean::FALSE() : Venus::Boolean::TRUE();
 }
 
-sub istrue {
+sub isfalse {
+  my ($self, @args) = @_;
+
+  return $self->is_false(@args);
+}
+
+sub is_true {
   my ($self, $code, @args) = @_;
 
   $code ||= $self->can('value') ? 'value' : sub{};
@@ -29,10 +35,16 @@ sub istrue {
   return $self->$code(@args) ? Venus::Boolean::TRUE() : Venus::Boolean::FALSE();
 }
 
+sub istrue {
+  my ($self, @args) = @_;
+
+  return $self->is_true(@args);
+}
+
 # EXPORTS
 
 sub EXPORT {
-  ['isfalse', 'istrue']
+  ['is_false', 'is_true', 'isfalse', 'istrue']
 }
 
 1;
@@ -69,7 +81,7 @@ Testable Role for Perl 5
 
   my $example = Example->new;
 
-  # $example->istrue(sub{0});
+  # $example->is_true(sub{0});
 
 =cut
 
@@ -87,11 +99,11 @@ This package provides the following methods:
 
 =cut
 
-=head2 isfalse
+=head2 is_false
 
-  isfalse(Str | CodeRef $method, Any @args) (Bool)
+  is_false(Str | CodeRef $method, Any @args) (Bool)
 
-The isfalse method dispatches the method call or executes the callback and
+The is_false method dispatches the method call or executes the callback and
 returns truthy returns as C<false> and falsy returns as C<true>
 L<"boolean"|Venus::Boolean> values.
 
@@ -99,13 +111,13 @@ I<Since C<0.08>>
 
 =over 4
 
-=item isfalse example 1
+=item is_false example 1
 
   package main;
 
   my $example = Example->new;
 
-  my $true = $example->isfalse(execute => 0);
+  my $true = $example->is_false(execute => 0);
 
   # 1
 
@@ -113,13 +125,13 @@ I<Since C<0.08>>
 
 =over 4
 
-=item isfalse example 2
+=item is_false example 2
 
   package main;
 
   my $example = Example->new;
 
-  my $true = $example->isfalse(sub{0});
+  my $true = $example->is_false(sub{0});
 
   # 1
 
@@ -127,13 +139,13 @@ I<Since C<0.08>>
 
 =over 4
 
-=item isfalse example 3
+=item is_false example 3
 
   package main;
 
   my $example = Example->new;
 
-  my $false = $example->isfalse(execute => 1);
+  my $false = $example->is_false(execute => 1);
 
   # 0
 
@@ -141,11 +153,11 @@ I<Since C<0.08>>
 
 =cut
 
-=head2 istrue
+=head2 is_true
 
-  istrue(Str | CodeRef $method, Any @args) (Bool)
+  is_true(Str | CodeRef $method, Any @args) (Bool)
 
-The istrue method dispatches the method call or executes the callback and
+The is_true method dispatches the method call or executes the callback and
 returns truthy returns as C<true> and falsy returns as C<false>
 L<"boolean"|Venus::Boolean> values.
 
@@ -153,13 +165,13 @@ I<Since C<0.08>>
 
 =over 4
 
-=item istrue example 1
+=item is_true example 1
 
   package main;
 
   my $example = Example->new;
 
-  my $true = $example->istrue(execute => 1);
+  my $true = $example->is_true(execute => 1);
 
   # 1
 
@@ -167,13 +179,13 @@ I<Since C<0.08>>
 
 =over 4
 
-=item istrue example 2
+=item is_true example 2
 
   package main;
 
   my $example = Example->new;
 
-  my $true = $example->istrue(sub{1});
+  my $true = $example->is_true(sub{1});
 
   # 1
 
@@ -181,13 +193,13 @@ I<Since C<0.08>>
 
 =over 4
 
-=item istrue example 3
+=item is_true example 3
 
   package main;
 
   my $example = Example->new;
 
-  my $false = $example->istrue(execute => 0);
+  my $false = $example->is_true(execute => 0);
 
   # 0
 

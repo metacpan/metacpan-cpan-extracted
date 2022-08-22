@@ -7559,8 +7559,7 @@ print $Net::FullAuto::FA_Core::LOG
 print $Net::FullAuto::FA_Core::LOG "WHAT IS USE?=$use\n"
       if $Net::FullAuto::FA_Core::log &&
       -1<index $Net::FullAuto::FA_Core::LOG,'*';
-
-   if (!$use || (!$ip && !$hostname)) {
+   if ((!$use || (!$ip && !$hostname)) && $_connect ne 'connect_shell') {
       my $die="Cannot Contact Server \'$hostlabel\' -";
       my $fah=$Net::FullAuto::FA_Core::fa_host;
       if ($ip_flag) {
@@ -26970,7 +26969,7 @@ print $Net::FullAuto::FA_Core::LOG
                      }
                      $cmd_handle->print("echo $$");
                      while (my $line=$cmd_handle->get(Timeout=>$timeout)) {
-                        last if $shell_pid=~s/\s*_funkyPrompt_$//s;
+                        last if $shell_pid=~s/\s*_funkyPrompt_\s*$//s;
                         $shell_pid=$line;
                         select(undef,undef,undef,0.02); # sleep for 1/50th
                                                         # second;
@@ -29953,8 +29952,8 @@ print $Net::FullAuto::FA_Core::LOG "WEVE GOT WINDOWSCOMMAND=$command\n"
                if !$Net::FullAuto::FA_Core::cron &&
                $Net::FullAuto::FA_Core::debug;
             $self->{_cmd_handle}->timeout($cmtimeout);
-            $live_command=~s/\\\\/\\/g;
-            $live_command=~s/\\/\\\\/g;
+            #$live_command=~s/\\\\/\\/g;
+            #$live_command=~s/\\/\\\\/g;
             $live_command=~s/\\$//mg;
             $self->{_cmd_handle}->print($live_command);
             my $growoutput='';my $ready='';my $firstout=0;
@@ -31027,7 +31026,7 @@ print $Net::FullAuto::FA_Core::LOG "WE ARE RETURNING ERROR=$eval_error\n"
          my $exit_code=pop(@stdout_contents);
          $exit_code=pop(@stdout_contents) if $exit_code=~/^\s*$/s;
          if (!defined $exit_code || $exit_code!~/^\d+$/s) {
-            if ($exit_code=~/^(.*)(0|1|2|126|127|130|137|255)\s*$/s) {
+            if ($exit_code=~/^(.*)(0|1|2|123|126|127|130|137|255)\s*$/s) {
                $stdout_contents[$#stdout_contents]=$1;$exitcode=$2;
             }
          } else {
@@ -31035,7 +31034,7 @@ print $Net::FullAuto::FA_Core::LOG "WE ARE RETURNING ERROR=$eval_error\n"
          }
          $stdout=join "\n", @stdout_contents;
       } elsif ($stdout=~/\d+$/s) {
-         if ($stdout=~/^(.*)(0|1|2|126|127|130|137|255)$/s) {
+         if ($stdout=~/^(.*)(0|1|2|123|126|127|130|137|255)$/s) {
             $stdout=$1;$exitcode=$2;
          }
       }

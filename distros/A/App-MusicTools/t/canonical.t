@@ -83,7 +83,8 @@ my @arg_only_tests = (
 
 # Only the first column is considered when the notes arrive via stdin
 # (this allows the subsequent columns to bear other data, such as
-# lyrics, cat photos, or such.)
+# lyrics, cat photos, etc.) Multicolumn output will also be enabled if
+# the --map flag is used.
 my @stdin_tests = (
   # Either "no remaining arguments" or "ultimate argument is a -" should
   # be supported.
@@ -124,6 +125,14 @@ my @stdin_tests = (
       "cis4", "gis", "fis'", "a,",  "f'",  "b,",
       "e",    "dis", "ais",  "d16", "c8.", "g'4"
     ],
+  },
+  # Caught mapping
+  { args =>
+      '--map modal --contrary --retrograde --raw 0 2 4 5 7 9 11 12 14 16 17 19',
+    expected => [
+      "0 -19", "2 -17", "4 -15", "5 -13", "7 -12", "9 -10",
+      "11 -8", "12 -7", "14 -5", "16 -3", "17 -1", "19 0",
+    ]
   },
 );
 

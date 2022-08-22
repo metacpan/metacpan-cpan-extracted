@@ -140,13 +140,11 @@ void ObjectPad_mop_class_apply_attribute(pTHX_ ClassMeta *classmeta, const char 
 
 /* TODO: get attribute */
 
-#define get_classmeta_for(self)  S_get_classmeta_for(aTHX_ self)
-static ClassMeta *S_get_classmeta_for(pTHX_ SV *self)
+ClassMeta *ObjectPad_mop_get_class_for_stash(pTHX_ HV *stash)
 {
-  HV *selfstash = SvSTASH(SvRV(self));
-  GV **gvp = (GV **)hv_fetchs(selfstash, "META", 0);
+  GV **gvp = (GV **)hv_fetchs(stash, "META", 0);
   if(!gvp)
-    croak("Unable to find ClassMeta for %" SVf, SVfARG(HvNAME(selfstash)));
+    croak("Unable to find ClassMeta for %" HEKf, HEKfARG(HvNAME_HEK(stash)));
 
   return NUM2PTR(ClassMeta *, SvUV(SvRV(GvSV(*gvp))));
 }
@@ -237,7 +235,7 @@ SV *ObjectPad_get_obj_backingav(pTHX_ SV *self, enum ReprType repr, bool create)
        *   https://rt.cpan.org/Ticket/Display.html?id=132263
        */
       if(!backingsvp) {
-        struct ClassMeta *classmeta = get_classmeta_for(self);
+        struct ClassMeta *classmeta = mop_get_class_for_stash(SvSTASH(rv));
         AV *backingav = newAV();
 
         make_instance_fields(classmeta, backingav, 0);

@@ -7,12 +7,13 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 }
 
 use Chart::Plotly::Trace::Pointcloud::Hoverlabel;
+use Chart::Plotly::Trace::Pointcloud::Legendgrouptitle;
 use Chart::Plotly::Trace::Pointcloud::Marker;
 use Chart::Plotly::Trace::Pointcloud::Stream;
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
-# ABSTRACT: The data visualized as a point cloud set in `x` and `y` using the WebGl plotting engine.
+# ABSTRACT: *pointcloud* trace is deprecated! Please consider switching to the *scattergl* trace type. The data visualized as a point cloud set in `x` and `y` using the WebGl plotting engine.
 
 sub TO_JSON {
     my $self       = shift;
@@ -47,76 +48,86 @@ sub type {
 }
 
 has customdata => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
       "Assigns extra data each datum. This may be useful when listening to hover, click and selection events. Note that, *scatter* traces also appends customdata items in the markers DOM elements",
 );
 
 has customdatasrc => ( is            => "rw",
                        isa           => "Str",
-                       documentation => "Sets the source reference on plot.ly for  customdata .",
+                       documentation => "Sets the source reference on Chart Studio Cloud for `customdata`.",
 );
 
 has hoverinfo => (
-    is  => "rw",
-    isa => "Str|ArrayRef[Str]",
+    is            => "rw",
+    isa           => "Str|ArrayRef[Str]",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
 
 has hoverinfosrc => ( is            => "rw",
                       isa           => "Str",
-                      documentation => "Sets the source reference on plot.ly for  hoverinfo .",
+                      documentation => "Sets the source reference on Chart Studio Cloud for `hoverinfo`.",
 );
 
 has hoverlabel => ( is  => "rw",
                     isa => "Maybe[HashRef]|Chart::Plotly::Trace::Pointcloud::Hoverlabel", );
 
 has ids => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
       "Assigns id labels to each datum. These ids for object constancy of data points during animation. Should be an array of strings, not numbers or any other type.",
 );
 
 has idssrc => ( is            => "rw",
                 isa           => "Str",
-                documentation => "Sets the source reference on plot.ly for  ids .",
+                documentation => "Sets the source reference on Chart Studio Cloud for `ids`.",
 );
 
 has indices => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
       "A sequential value, 0..n, supply it to avoid creating this array inside plotting. If specified, it must be a typed `Int32Array` array. Its length must be equal to or greater than the number of points. For the best performance and memory use, create one large `indices` typed array that is guaranteed to be at least as long as the largest number of points during use, and reuse it on each `Plotly.restyle()` call.",
 );
 
 has indicessrc => ( is            => "rw",
                     isa           => "Str",
-                    documentation => "Sets the source reference on plot.ly for  indices .",
+                    documentation => "Sets the source reference on Chart Studio Cloud for `indices`.",
 );
 
 has legendgroup => (
-    is  => "rw",
-    isa => "Str",
+    is            => "rw",
+    isa           => "Str",
     documentation =>
       "Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.",
+);
+
+has legendgrouptitle => ( is  => "rw",
+                          isa => "Maybe[HashRef]|Chart::Plotly::Trace::Pointcloud::Legendgrouptitle", );
+
+has legendrank => (
+    is            => "rw",
+    isa           => "Num",
+    documentation =>
+      "Sets the legend rank for this trace. Items and groups with smaller ranks are presented on top/left side while with `*reversed* `legend.traceorder` they are on bottom/right side. The default legendrank is 1000, so that you can use ranks less than 1000 to place certain items before all unranked items, and ranks greater than 1000 to go after all unranked items.",
 );
 
 has marker => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Pointcloud::Marker", );
 
 has pmeta => (
-    is  => "rw",
-    isa => "Any|ArrayRef[Any]",
+    is            => "rw",
+    isa           => "Any|ArrayRef[Any]",
     documentation =>
       "Assigns extra meta information associated with this trace that can be used in various text attributes. Attributes such as trace `name`, graph, axis and colorbar `title.text`, annotation `text` `rangeselector`, `updatemenues` and `sliders` `label` text all support `meta`. To access the trace `meta` values in an attribute in the same trace, simply use `%{meta[i]}` where `i` is the index or key of the `meta` item in question. To access trace `meta` in layout attributes, use `%{data[n[.meta[i]}` where `i` is the index or key of the `meta` and `n` is the trace index.",
 );
 
 has metasrc => ( is            => "rw",
                  isa           => "Str",
-                 documentation => "Sets the source reference on plot.ly for  meta .",
+                 documentation => "Sets the source reference on Chart Studio Cloud for `meta`.",
 );
 
 has name => ( is            => "rw",
@@ -139,33 +150,33 @@ has stream => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Pointcloud::Stream", );
 
 has text => (
-    is  => "rw",
-    isa => "Str|ArrayRef[Str]",
+    is            => "rw",
+    isa           => "Str|ArrayRef[Str]",
     documentation =>
       "Sets text elements associated with each (x,y) pair. If a single string, the same string appears over all the data points. If an array of string, the items are mapped in order to the this trace's (x,y) coordinates. If trace `hoverinfo` contains a *text* flag and *hovertext* is not set, these elements will be seen in the hover labels.",
 );
 
 has textsrc => ( is            => "rw",
                  isa           => "Str",
-                 documentation => "Sets the source reference on plot.ly for  text .",
+                 documentation => "Sets the source reference on Chart Studio Cloud for `text`.",
 );
 
 has uid => (
-    is  => "rw",
-    isa => "Str",
+    is            => "rw",
+    isa           => "Str",
     documentation =>
       "Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.",
 );
 
 has uirevision => (
-    is  => "rw",
-    isa => "Any",
+    is            => "rw",
+    isa           => "Any",
     documentation =>
       "Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.",
 );
 
 has visible => (
-    is => "rw",
+    is            => "rw",
     documentation =>
       "Determines whether or not this trace is visible. If *legendonly*, the trace is not drawn, but can appear as a legend item (provided that the legend itself is visible).",
 );
@@ -176,38 +187,38 @@ has x => ( is            => "rw",
 );
 
 has xaxis => (
-    is => "rw",
+    is            => "rw",
     documentation =>
       "Sets a reference between this trace's x coordinates and a 2D cartesian x axis. If *x* (the default value), the x coordinates refer to `layout.xaxis`. If *x2*, the x coordinates refer to `layout.xaxis2`, and so on.",
 );
 
 has xbounds => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
       "Specify `xbounds` in the shape of `[xMin, xMax] to avoid looping through the `xy` typed array. Use it in conjunction with `xy` and `ybounds` for the performance benefits.",
 );
 
 has xboundssrc => ( is            => "rw",
                     isa           => "Str",
-                    documentation => "Sets the source reference on plot.ly for  xbounds .",
+                    documentation => "Sets the source reference on Chart Studio Cloud for `xbounds`.",
 );
 
 has xsrc => ( is            => "rw",
               isa           => "Str",
-              documentation => "Sets the source reference on plot.ly for  x .",
+              documentation => "Sets the source reference on Chart Studio Cloud for `x`.",
 );
 
 has xy => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
       "Faster alternative to specifying `x` and `y` separately. If supplied, it must be a typed `Float32Array` array that represents points such that `xy[i * 2] = x[i]` and `xy[i * 2 + 1] = y[i]`",
 );
 
 has xysrc => ( is            => "rw",
                isa           => "Str",
-               documentation => "Sets the source reference on plot.ly for  xy .",
+               documentation => "Sets the source reference on Chart Studio Cloud for `xy`.",
 );
 
 has y => ( is            => "rw",
@@ -216,26 +227,26 @@ has y => ( is            => "rw",
 );
 
 has yaxis => (
-    is => "rw",
+    is            => "rw",
     documentation =>
       "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.",
 );
 
 has ybounds => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
       "Specify `ybounds` in the shape of `[yMin, yMax] to avoid looping through the `xy` typed array. Use it in conjunction with `xy` and `xbounds` for the performance benefits.",
 );
 
 has yboundssrc => ( is            => "rw",
                     isa           => "Str",
-                    documentation => "Sets the source reference on plot.ly for  ybounds .",
+                    documentation => "Sets the source reference on Chart Studio Cloud for `ybounds`.",
 );
 
 has ysrc => ( is            => "rw",
               isa           => "Str",
-              documentation => "Sets the source reference on plot.ly for  y .",
+              documentation => "Sets the source reference on Chart Studio Cloud for `y`.",
 );
 
 __PACKAGE__->meta->make_immutable();
@@ -249,11 +260,11 @@ __END__
 
 =head1 NAME
 
-Chart::Plotly::Trace::Pointcloud - The data visualized as a point cloud set in `x` and `y` using the WebGl plotting engine.
+Chart::Plotly::Trace::Pointcloud - *pointcloud* trace is deprecated! Please consider switching to the *scattergl* trace type. The data visualized as a point cloud set in `x` and `y` using the WebGl plotting engine.
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -266,7 +277,7 @@ version 0.041
 
 =head1 DESCRIPTION
 
-The data visualized as a point cloud set in `x` and `y` using the WebGl plotting engine.
+*pointcloud* trace is deprecated! Please consider switching to the *scattergl* trace type. The data visualized as a point cloud set in `x` and `y` using the WebGl plotting engine.
 
 Screenshot of the above example:
 
@@ -312,7 +323,7 @@ Assigns extra data each datum. This may be useful when listening to hover, click
 
 =item * customdatasrc
 
-Sets the source reference on plot.ly for  customdata .
+Sets the source reference on Chart Studio Cloud for `customdata`.
 
 =item * hoverinfo
 
@@ -320,7 +331,7 @@ Determines which trace information appear on hover. If `none` or `skip` are set,
 
 =item * hoverinfosrc
 
-Sets the source reference on plot.ly for  hoverinfo .
+Sets the source reference on Chart Studio Cloud for `hoverinfo`.
 
 =item * hoverlabel
 
@@ -330,7 +341,7 @@ Assigns id labels to each datum. These ids for object constancy of data points d
 
 =item * idssrc
 
-Sets the source reference on plot.ly for  ids .
+Sets the source reference on Chart Studio Cloud for `ids`.
 
 =item * indices
 
@@ -338,11 +349,17 @@ A sequential value, 0..n, supply it to avoid creating this array inside plotting
 
 =item * indicessrc
 
-Sets the source reference on plot.ly for  indices .
+Sets the source reference on Chart Studio Cloud for `indices`.
 
 =item * legendgroup
 
 Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.
+
+=item * legendgrouptitle
+
+=item * legendrank
+
+Sets the legend rank for this trace. Items and groups with smaller ranks are presented on top/left side while with `*reversed* `legend.traceorder` they are on bottom/right side. The default legendrank is 1000, so that you can use ranks less than 1000 to place certain items before all unranked items, and ranks greater than 1000 to go after all unranked items.
 
 =item * marker
 
@@ -352,7 +369,7 @@ Assigns extra meta information associated with this trace that can be used in va
 
 =item * metasrc
 
-Sets the source reference on plot.ly for  meta .
+Sets the source reference on Chart Studio Cloud for `meta`.
 
 =item * name
 
@@ -374,7 +391,7 @@ Sets text elements associated with each (x,y) pair. If a single string, the same
 
 =item * textsrc
 
-Sets the source reference on plot.ly for  text .
+Sets the source reference on Chart Studio Cloud for `text`.
 
 =item * uid
 
@@ -402,11 +419,11 @@ Specify `xbounds` in the shape of `[xMin, xMax] to avoid looping through the `xy
 
 =item * xboundssrc
 
-Sets the source reference on plot.ly for  xbounds .
+Sets the source reference on Chart Studio Cloud for `xbounds`.
 
 =item * xsrc
 
-Sets the source reference on plot.ly for  x .
+Sets the source reference on Chart Studio Cloud for `x`.
 
 =item * xy
 
@@ -414,7 +431,7 @@ Faster alternative to specifying `x` and `y` separately. If supplied, it must be
 
 =item * xysrc
 
-Sets the source reference on plot.ly for  xy .
+Sets the source reference on Chart Studio Cloud for `xy`.
 
 =item * y
 
@@ -430,11 +447,11 @@ Specify `ybounds` in the shape of `[yMin, yMax] to avoid looping through the `xy
 
 =item * yboundssrc
 
-Sets the source reference on plot.ly for  ybounds .
+Sets the source reference on Chart Studio Cloud for `ybounds`.
 
 =item * ysrc
 
-Sets the source reference on plot.ly for  y .
+Sets the source reference on Chart Studio Cloud for `y`.
 
 =back
 
@@ -444,7 +461,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

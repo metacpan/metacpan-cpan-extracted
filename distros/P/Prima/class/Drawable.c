@@ -53,7 +53,7 @@ Drawable_init( Handle self, HV * profile)
 		AV * av;
 		Point tr;
 		SV ** holder, *sv;
-		
+
 		sv = pget_sv( translate);
 		if ( sv && SvOK(sv) && SvROK(sv) && SvTYPE(av = (AV*)SvRV(sv)) == SVt_PVAV && av_len(av) == 1) {
 			tr.x = tr.y = 0;
@@ -85,6 +85,10 @@ Drawable_init( Handle self, HV * profile)
 void
 Drawable_done( Handle self)
 {
+	if ( var-> fillPatternImage ) {
+		unprotect_object(var-> fillPatternImage);
+		var-> fillPatternImage = NULL_HANDLE;
+	}
 	clear_font_abc_caches( self);
 	apc_gp_done( self);
 	inherited done( self);
@@ -137,14 +141,14 @@ void
 Drawable_set( Handle self, HV * profile)
 {
 	dPROFILE;
-	if ( pexist( font))
-	{
+
+	if ( pexist( font)) {
 		SvHV_Font( pget_sv( font), &Font_buffer, "Drawable::set");
 		my-> set_font( self, Font_buffer);
 		pdelete( font);
 	}
-	if ( pexist( translate))
-	{
+
+	if ( pexist( translate)) {
 		AV * av = ( AV *) SvRV( pget_sv( translate));
 		Point tr = {0,0};
 		SV ** holder = av_fetch( av, 0, 0);
@@ -154,6 +158,7 @@ Drawable_set( Handle self, HV * profile)
 		my-> set_translate( self, tr);
 		pdelete( translate);
 	}
+
 	if ( pexist( width) && pexist( height)) {
 		Point size;
 		size. x = pget_i( width);
@@ -162,8 +167,8 @@ Drawable_set( Handle self, HV * profile)
 		pdelete( width);
 		pdelete( height);
 	}
-	if ( pexist( fillPatternOffset))
-	{
+
+	if ( pexist( fillPatternOffset)) {
 		AV * av = ( AV *) SvRV( pget_sv( fillPatternOffset));
 		Point fpo = {0,0};
 		SV ** holder = av_fetch( av, 0, 0);
@@ -173,7 +178,37 @@ Drawable_set( Handle self, HV * profile)
 		my-> set_fillPatternOffset( self, fpo);
 		pdelete( fillPatternOffset);
 	}
+
+	if ( pexist( clipRect)) {
+		int r[4];
+		Rect cr;
+		prima_read_point( pget_sv( clipRect), r, 4, "Array panic on 'clipRect'");
+		cr.left   = r[0];
+		cr.bottom = r[1];
+		cr.right  = r[2];
+		cr.top    = r[3];
+		my-> set_clipRect(self, cr);
+		pdelete( clipRect);
+	}
+
 	inherited set( self, profile);
+}
+
+Bool
+Drawable_graphic_context_push(Handle self)
+{
+	return apc_gp_push(self, NULL, NULL, 0);
+}
+
+Bool
+Drawable_graphic_context_pop(Handle self)
+{
+	Bool ok = apc_gp_pop(self, NULL);
+	if ( var-> fillPatternImage && PObject(var-> fillPatternImage)->stage != csNormal) {
+		unprotect_object(var-> fillPatternImage);
+		var-> fillPatternImage = NULL_HANDLE;
+	}
+	return ok;
 }
 
 int
@@ -388,12 +423,19 @@ Drawable_fillPattern( Handle self, Bool set, SV * svpattern)
 	int i;
 	if ( !set) {
 		AV * av;
-		FillPattern * fp = apc_gp_get_fill_pattern( self);
-		if ( !fp) return NULL_SV;
+		FillPattern * fp;
+		if ( var-> fillPatternImage )
+			return newSVsv( PObject(var->fillPatternImage)->mate );
+
+		if ( !( fp = apc_gp_get_fill_pattern( self))) return NULL_SV;
 		av = newAV();
 		for ( i = 0; i < 8; i++) av_push( av, newSViv(( int) (*fp)[i]));
 		return newRV_noinc(( SV *) av);
 	} else {
+		if ( var->fillPatternImage ) {
+			unprotect_object(var-> fillPatternImage);
+			var->fillPatternImage = NULL_HANDLE;
+		}
 		if ( SvROK( svpattern) && ( SvTYPE( SvRV( svpattern)) == SVt_PVAV)) {
 			FillPattern fp;
 			AV * av = ( AV *) SvRV( svpattern);
@@ -410,6 +452,16 @@ Drawable_fillPattern( Handle self, Bool set, SV * svpattern)
 				fp[ i] = SvIV( *holder);
 			}
 			apc_gp_set_fill_pattern( self, fp);
+		} else if ( SvROK( svpattern) && ( SvTYPE( SvRV( svpattern)) == SVt_PVHV)) {
+			Handle h = gimme_the_mate(svpattern);
+			if ( h && kind_of(h, CImage) && h != self && PObject(h)->stage == csNormal) {
+				protect_object(var-> fillPatternImage = h);
+			} else {
+				warn("Drawable::fillPattern: object passed is not a Prima::Image descendant or is invalid");
+				return NULL_SV;
+			}
+			if ( opt_InPaint)
+				apc_gp_set_fill_image( self, h);
 		} else {
 			int id = SvIV( svpattern);
 			if (( id < 0) || ( id > fpMaxId)) {
@@ -426,8 +478,6 @@ Point
 Drawable_fillPatternOffset( Handle self, Bool set, Point fpo)
 {
 	if (!set) return apc_gp_get_fill_pattern_offset( self);
-	fpo. x %= 8;
-	fpo. y %= 8;
 	apc_gp_set_fill_pattern_offset( self, fpo);
 	return fpo;
 }

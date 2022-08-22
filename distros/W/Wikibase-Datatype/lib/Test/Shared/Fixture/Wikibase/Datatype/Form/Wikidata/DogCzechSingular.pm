@@ -11,7 +11,7 @@ use Wikibase::Datatype::Value::Item;
 use Wikibase::Datatype::Value::Monolingual;
 use Wikibase::Datatype::Value::String;
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
 
 sub new {
 	my $class = shift;
@@ -119,6 +119,8 @@ Returns reference to array of Wikibase::Datatype::Statement items.
 
 =head1 EXAMPLE
 
+=for comment filename=fixture_create_and_print_form_wd_dogczechsingular.pl
+
  use strict;
  use warnings;
 
@@ -175,12 +177,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020-2022
+© 2020-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.19
+0.20
 
 =cut

@@ -5,6 +5,6 @@ use strict;
 use warnings;
 use parent 'Alien::Base';
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.1.1.1';
 
 1;

@@ -9,7 +9,7 @@ use File::Temp ();
 use File::Spec ();
 
 # ABSTRACT: Temp Dir support for Alien::Build
-our $VERSION = '2.52'; # VERSION
+our $VERSION = '2.59'; # VERSION
 
 
 # problem with vanilla File::Temp is that is often uses
@@ -20,6 +20,11 @@ our $VERSION = '2.52'; # VERSION
 # later discover it isn't so careful we can fix it in
 # one place rather thabn alllll the places that we need
 # temp directories.
+
+# we also have a speical case for Windows, which often
+# has problems with long paths if we try to use the
+# current directory for temp files, so for those we
+# use the system tmp directory.
 
 my %root;
 
@@ -83,7 +88,7 @@ Alien::Build::Temp - Temp Dir support for Alien::Build
 
 =head1 VERSION
 
-version 2.52
+version 2.59
 
 =head1 DESCRIPTION
 

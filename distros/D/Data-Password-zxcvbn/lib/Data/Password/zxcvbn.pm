@@ -6,7 +6,7 @@ use Data::Password::zxcvbn::MatchList;
 use Data::Password::zxcvbn::TimeEstimate qw(estimate_attack_times);
 use Exporter 'import';
 our @EXPORT_OK=qw(password_strength);
-our $VERSION = '1.0.4'; # VERSION
+our $VERSION = '1.0.6'; # VERSION
 # ABSTRACT: Dropbox's password estimation logic
 
 
@@ -62,7 +62,7 @@ Data::Password::zxcvbn - Dropbox's password estimation logic
 
 =head1 VERSION
 
-version 1.0.4
+version 1.0.6
 
 =head1 SYNOPSIS
 
@@ -343,7 +343,7 @@ Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by BroadBean UK, a CareerBuilder Company.
+This software is copyright (c) 2022 by BroadBean UK, a CareerBuilder Company.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

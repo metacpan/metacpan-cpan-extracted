@@ -3,7 +3,7 @@ use Catmandu::Sane;
 use Catmandu::Util qw(xml_escape is_different :array :is);
 use Moo;
 
-our $VERSION = '1.271';
+our $VERSION = '1.281';
 
 with 'Catmandu::Exporter', 'Catmandu::Exporter::MARC::Base', 'Catmandu::Buffer';
 
@@ -76,7 +76,9 @@ sub add {
             $self->_line($indent+1,'<marc:datafield tag="' . xml_escape($tag) . '" ind1="' . $ind1 . '" ind2="' . $ind2 . '">');
             while (@data) {
                 my ($code, $val) = splice(@data, 0, 2);
-                next unless $code =~ /[A-Za-z0-9]/;
+                # some special characters are allowed as subfiled codes in local defined field
+                # see https://www.loc.gov/marc/96principl.html#eight 8.4.2.3.
+                next unless $code =~ /[a-z0-9!"#\$%&'\(\)\*\+'-\.\/:;<=>]/g;
                 $self->_line($indent+2,'<marc:subfield code="' . $code . '">' . xml_escape($val) . '</marc:subfield>');
             }
             $self->_line($indent+1,'</marc:datafield>');

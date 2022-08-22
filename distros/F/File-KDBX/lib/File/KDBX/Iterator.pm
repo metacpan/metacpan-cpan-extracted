@@ -14,7 +14,7 @@ use namespace::clean;
 BEGIN { mark_as_loaded('Iterator::Simple::Iterator') }
 extends 'Iterator::Simple::Iterator';
 
-our $VERSION = '0.905'; # VERSION
+our $VERSION = '0.906'; # VERSION
 
 
 sub new {
@@ -221,7 +221,7 @@ File::KDBX::Iterator - KDBX database iterator
 
 =head1 VERSION
 
-version 0.905
+version 0.906
 
 =head1 SYNOPSIS
 

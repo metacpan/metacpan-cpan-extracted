@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace streamtube.
 
@@ -40,7 +40,7 @@ has x => ( is            => "rw",
 
 has xsrc => ( is            => "rw",
               isa           => "Str",
-              documentation => "Sets the source reference on plot.ly for  x .",
+              documentation => "Sets the source reference on Chart Studio Cloud for `x`.",
 );
 
 has y => ( is            => "rw",
@@ -50,7 +50,7 @@ has y => ( is            => "rw",
 
 has ysrc => ( is            => "rw",
               isa           => "Str",
-              documentation => "Sets the source reference on plot.ly for  y .",
+              documentation => "Sets the source reference on Chart Studio Cloud for `y`.",
 );
 
 has z => ( is            => "rw",
@@ -60,7 +60,7 @@ has z => ( is            => "rw",
 
 has zsrc => ( is            => "rw",
               isa           => "Str",
-              documentation => "Sets the source reference on plot.ly for  z .",
+              documentation => "Sets the source reference on Chart Studio Cloud for `z`.",
 );
 
 __PACKAGE__->meta->make_immutable();
@@ -78,7 +78,7 @@ Chart::Plotly::Trace::Streamtube::Starts - This attribute is one of the possible
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -166,7 +166,7 @@ Sets the x components of the starting position of the streamtubes
 
 =item * xsrc
 
-Sets the source reference on plot.ly for  x .
+Sets the source reference on Chart Studio Cloud for `x`.
 
 =item * y
 
@@ -174,7 +174,7 @@ Sets the y components of the starting position of the streamtubes
 
 =item * ysrc
 
-Sets the source reference on plot.ly for  y .
+Sets the source reference on Chart Studio Cloud for `y`.
 
 =item * z
 
@@ -182,7 +182,7 @@ Sets the z components of the starting position of the streamtubes
 
 =item * zsrc
 
-Sets the source reference on plot.ly for  z .
+Sets the source reference on Chart Studio Cloud for `z`.
 
 =back
 
@@ -192,7 +192,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

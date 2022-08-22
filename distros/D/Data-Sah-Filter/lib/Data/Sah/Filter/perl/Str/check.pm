@@ -7,9 +7,9 @@ use warnings;
 use Data::Dmp;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-04'; # DATE
+our $DATE = '2022-07-16'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 sub meta {
     +{
@@ -30,6 +30,17 @@ sub meta {
                 schema => ['array*', of=>'str*'],
             },
         },
+        examples => [
+            {value=>"123", filter_args=>{max_len=>3}, valid=>1},
+            {value=>"12345", filter_args=>{max_len=>3}, valid=>0},
+        ],
+        description => <<'_',
+
+This is more or less a demo filter rule, to show how a filter rule can be used
+to perform some checks. The standard checks performed by this rule, however, are
+better done using standard <pm:Sah> schema clauses like `in`, `min_len`, etc.
+
+_
     };
 }
 
@@ -87,21 +98,42 @@ Data::Sah::Filter::perl::Str::check - Perform some checks
 
 =head1 VERSION
 
-This document describes version 0.010 of Data::Sah::Filter::perl::Str::check (from Perl distribution Data-Sah-Filter), released on 2022-07-04.
+This document describes version 0.011 of Data::Sah::Filter::perl::Str::check (from Perl distribution Data-Sah-Filter), released on 2022-07-16.
 
 =head1 SYNOPSIS
 
-Use in Sah schema's C<prefilters> (or C<postfilters>) clause:
+=head2 Using in Sah schema's C<prefilters> (or C<postfilters>) clause
 
- ["str","prefilters",["Str::check"]]
+ ["str","prefilters",[["Str::check"]]]
+
+=head2 Using with L<Data::Sah>:
+
+ use Data::Sah qw(gen_validator);
+ 
+ my $schema = ["str","prefilters",[["Str::check"]]];
+ my $validator = gen_validator($schema);
+ if ($validator->($some_data)) { print 'Valid!' }
+
+=head2 Using with L<Data::Sah:Filter> directly:
+
+ use Data::Sah::Filter qw(gen_filter);
+
+ my $filter = gen_filter([["Str::check"]]);
+ # $errmsg will be empty/undef when filtering succeeds
+ my ($errmsg, $filtered_value) = $filter->($some_data);
+
+=head2 Sample data and filtering results
+
+ 123 # filtered with args {max_len=>3}, valid, unchanged
+ 12345 # filtered with args {max_len=>3}, INVALID (Length of data must be at most 3), unchanged
+
+=for Pod::Coverage ^(meta|filter)$
 
 =head1 DESCRIPTION
 
 This is more or less a demo filter rule, to show how a filter rule can be used
-to perform some checks. The standard checks performed by this rule, however,
-are better done using standard schema clauses like C<in>, C<min_len>, etc.
-
-=for Pod::Coverage ^(meta|filter)$
+to perform some checks. The standard checks performed by this rule, however, are
+better done using standard L<Sah> schema clauses like C<in>, C<min_len>, etc.
 
 =head1 HOMEPAGE
 

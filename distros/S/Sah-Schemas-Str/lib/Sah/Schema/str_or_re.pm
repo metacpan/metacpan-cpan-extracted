@@ -3,9 +3,9 @@ package Sah::Schema::str_or_re;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-05'; # DATE
+our $DATE = '2022-07-09'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 our $schema = [any => {
     summary => 'String or regex (if string is of the form `/.../`)',
@@ -66,7 +66,7 @@ Sah::Schema::str_or_re - String or regex (if string is of the form `/.../`)
 
 =head1 VERSION
 
-This document describes version 0.009 of Sah::Schema::str_or_re (from Perl distribution Sah-Schemas-Str), released on 2022-07-05.
+This document describes version 0.011 of Sah::Schema::str_or_re (from Perl distribution Sah-Schemas-Str), released on 2022-07-09.
 
 =head1 SYNOPSIS
 
@@ -114,12 +114,12 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "/foo.*/";
+ $data = "/foo/is";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = "/foo[/";
- my $errmsg = $validator->($data); # => "Invalid regex: Unmatched [ in regex; marked by <-- HERE in m/foo[ <-- HERE / at (eval 2484) line 1.\n"
+ $data = {};
+ my $errmsg = $validator->($data); # => "Not of type text"
 
 Often a schema has coercion rule or default value, so after validation the
 validated value is different. To return the validated (set-as-default, coerced,
@@ -129,12 +129,12 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "/foo.*/";
- my $res = $validator->($data); # => ["",qr(foo.*)]
+ $data = "/foo/is";
+ my $res = $validator->($data); # => ["",qr(foo)si]
  
  # a sample invalid data
- $data = "/foo[/";
- my $res = $validator->($data); # => ["Invalid regex: Unmatched [ in regex; marked by <-- HERE in m/foo[ <-- HERE / at (eval 2498) line 1.\n","/foo[/"]
+ $data = {};
+ my $res = $validator->($data); # => ["Not of type text",{}]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
@@ -219,6 +219,8 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Str>.
 
 =head1 SEE ALSO
+
+L<Sah::PSchema::re_from_str>
 
 L<Regexp::From::String>
 

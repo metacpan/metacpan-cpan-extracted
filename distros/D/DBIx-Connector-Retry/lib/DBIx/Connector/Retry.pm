@@ -3,7 +3,7 @@ package DBIx::Connector::Retry;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: DBIx::Connector with block retry support
 use version;
-our $VERSION = 'v0.900.2'; # VERSION
+our $VERSION = 'v0.900.3'; # VERSION
 
 use strict;
 use warnings;
@@ -399,7 +399,14 @@ sub _retry_loop {
 
     do {
         TRY: {
+            ### NOTE: Outside exception handlers shouldn't interrupt the retry process, as it might
+            ### never return back from the eval.  However, if we need to die after the retry_handler
+            ### check below, that should still go to whatever exception handler is in place.
+            ### Therefore, this "local $SIG{__DIE__}" is exactly in this TRY block and expires after
+            ### the DB error is captured.
+            local $SIG{__DIE__};
             local $@;
+
             eval {
                 unless (defined $wantarray) {           $self->$orig($mode, $cref) }
                 elsif          ($wantarray) { @res    = $self->$orig($mode, $cref) }
@@ -488,6 +495,17 @@ sub _retry_loop {
 #pod         $_->commit;  # no, let Connector handle this process!
 #pod     });
 #pod
+#pod =head2 (Ab)using $dbh directly
+#pod
+#pod For maximum retry protection, do not use the L<dbh|DBIx::Connector/dbh> or
+#pod L<connect|DBIx::Connector/connect> methods directly.  Directly accessing and using a DBI
+#pod database or statement handle does NOT grant retry protection, even if it was acquired
+#pod from those methods.  Furthermore, using those methods may trigger a connection failure,
+#pod which isn't protected by C<eval>.
+#pod
+#pod Instead, only use the C<run>/C<txn> methods, and it will attempt the connection for you.
+#pod If the connection fails, retry protection kicks in, as it's part of the same retry loop.
+#pod
 #pod =head2 Fixup mode
 #pod
 #pod Because of the nature of L<fixup mode|DBIx::Connector/Connection Modes>, the block may be
@@ -554,7 +572,7 @@ DBIx::Connector::Retry - DBIx::Connector with block retry support
 
 =head1 VERSION
 
-version v0.900.2
+version v0.900.3
 
 =head1 SYNOPSIS
 
@@ -782,6 +800,17 @@ Connector interface:
         $_->commit;  # no, let Connector handle this process!
     });
 
+=head2 (Ab)using $dbh directly
+
+For maximum retry protection, do not use the L<dbh|DBIx::Connector/dbh> or
+L<connect|DBIx::Connector/connect> methods directly.  Directly accessing and using a DBI
+database or statement handle does NOT grant retry protection, even if it was acquired
+from those methods.  Furthermore, using those methods may trigger a connection failure,
+which isn't protected by C<eval>.
+
+Instead, only use the C<run>/C<txn> methods, and it will attempt the connection for you.
+If the connection fails, retry protection kicks in, as it's part of the same retry loop.
+
 =head2 Fixup mode
 
 Because of the nature of L<fixup mode|DBIx::Connector/Connection Modes>, the block may be
@@ -838,7 +867,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2021 by Grant Street Group.
+This software is Copyright (c) 2018 - 2022 by Grant Street Group.
 
 This is free software, licensed under:
 

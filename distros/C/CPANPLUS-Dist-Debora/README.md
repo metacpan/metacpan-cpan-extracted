@@ -14,19 +14,6 @@ The created packages can be installed with CPANPLUS, dpkg or rpm.
     $ cd ~/.cpanplus/5.34.0/build/XXXX
     $ sudo dpkg -i libsome-module-perl_1.0-1cpanplus_all.deb
 
-## INSTALLATION
-
-Run the following commands to install the software:
-
-    perl Makefile.PL
-    make
-    make test
-    make install
-
-Type the following command to see the module usage information:
-
-    perldoc CPANPLUS::Dist::Debora
-
 ## DEPENDENCIES
 
 Requires Perl 5.16 and the modules CPANPLUS, CPANPLUS::Dist::Build,
@@ -49,6 +36,19 @@ On RPM-based systems, install the following packages:
 * gcc
 * make
 * sudo
+
+## INSTALLATION
+
+Run the following commands to install the software:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Type the following command to see the module usage information:
+
+    perldoc CPANPLUS::Dist::Debora
 
 ## LICENSE AND COPYRIGHT
 

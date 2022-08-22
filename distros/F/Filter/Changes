@@ -1,3 +1,14 @@
+1.64 2022-08-16 rurban
+----
+  * Exec: Silence all Windows -Wint-conversion and -Wint-to-pointer-cast
+    warnings
+
+1.63 2022-08-11 rurban
+----
+  * Exec: Really fix USE_ITHREADS (GH #17) with USE_THREADS
+    on windows. USE_5005THREADS is not defined in older perls, but
+    OLD_PTHREADS_API is.
+
 1.62 2022-08-10 rurban
 ----
   * Exec: compile with USE_THREADS and USE_ITHREADS (GH #17)

@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use Prima;
 use Prima::Const;
-use Prima::IntUtils;
 
 package
     fra; # Frame arragement constants.
@@ -21,9 +20,7 @@ use constant Proportional => 1; # XXX Yet to be implemented.
 package Prima::FrameSet::Frame;
 use strict;
 use warnings;
-use vars qw(@ISA);
-
-@ISA = qw(Prima::Widget Prima::MouseScroller);
+use base qw(Prima::Widget Prima::Widget::MouseScroller);
 
 # Initialization
 sub profile_default
@@ -85,7 +82,7 @@ package Prima::FrameSet::Slider;
 use strict;
 use warnings;
 use vars qw(@ISA);
-use Prima::RubberBand;
+use Prima::Widget::RubberBand;
 
 @ISA = qw(Prima::Widget);
 
@@ -493,6 +490,7 @@ sub on_paint
 {
 	my ($me, $canvas) = @_;
 
+	$canvas->rop2(rop::CopyPut);
 	$canvas-> fillPattern(fp::Interleave);
 	$canvas-> bar(0, 0, $me-> size);
 }

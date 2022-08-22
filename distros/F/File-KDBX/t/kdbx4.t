@@ -34,6 +34,11 @@ subtest 'Verify Format400' => sub {
         master_seed => ";\372y\300yS%\3331\177\231\364u\265Y\361\225\3273h\332R,\22\240a\240\302\271\357\313\23",
     }, 'Extract headers' or diag explain $kdbx->headers;
 
+    is $kdbx->transform_seed,
+        "V\254\6m-\206*\260\305\f\0\366\24:4\235\364A\362\346\221\13)}\250\217P\303\303\2\331\245",
+        'Get the correct transform seed';
+    cmp_ok $kdbx->transform_rounds, '==', 2, 'Get the correct transform rounds';
+
     is $kdbx->meta->{database_name}, 'Format400', 'Extract database name from meta';
     is $kdbx->root->name, 'Format400', 'Extract name of root group';
 
@@ -132,9 +137,9 @@ sub test_upgrade_master_key_integrity {
     plan tests => $expected_version >= KDBX_VERSION_4_0 ? 6 : 5;
 
     my $kdbx = File::KDBX->new;
-    $kdbx->kdf_parameters(fast_kdf);
-
     is $kdbx->kdf->uuid, KDF_UUID_AES, 'Default KDF is AES';
+
+    $kdbx->kdf_parameters(fast_kdf);
 
     {
         local $_ = $kdbx;
@@ -214,6 +219,30 @@ subtest 'Custom data' => sub {
     is_deeply $entry2->custom_data_value('str'), '你好', 'Store a string in entry custom data';
     is_deeply $entry2->custom_data_value('num'), '42', 'Store a number in entry custom data';
     is_deeply $entry2->custom_data_value('bool'), '0', 'Store a boolean in entry custom data';
+};
+
+subtest 'KDF parameters' => sub {
+    my $kdbx = File::KDBX->new;
+    $kdbx->version(KDBX_VERSION_4_0);
+
+    is $kdbx->kdf_parameters->{+KDF_PARAM_UUID}, KDF_UUID_AES, 'Default KDF type is correct';
+    cmp_ok $kdbx->transform_rounds, '==', 100_000, 'Default transform rounds is correct';
+
+    $kdbx->transform_rounds(17);
+    cmp_deeply $kdbx->kdf_parameters, {
+        "\$UUID" => "\311\331\363\232b\212D`\277t\r\b\301\212O\352",
+        R => num(17),
+        S => ignore(),
+    }, 'Set transform rounds for AES KDF';
+
+    $kdbx->kdf_parameters({KDF_PARAM_UUID() => KDF_UUID_ARGON2D});
+    cmp_ok $kdbx->transform_rounds, '==', 10, 'Default Argon2D transform rounds is correct';
+
+    $kdbx->transform_rounds(17);
+    cmp_deeply $kdbx->kdf_parameters, {
+        "\$UUID" => "\357cm\337\214)DK\221\367\251\244\3\343\n\f",
+        I => num(17),
+    }, 'Set transform rounds for Argon KDF';
 };
 
 done_testing;

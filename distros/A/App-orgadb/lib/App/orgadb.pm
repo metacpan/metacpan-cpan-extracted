@@ -8,15 +8,15 @@ use Log::ger;
 use App::orgadb::Common;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-04'; # DATE
+our $DATE = '2022-08-08'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our %SPEC;
 
 $SPEC{':package'} = {
     v => 1.1,
-    summary => 'An opinionated Org addressbook tool',
+    summary => 'An opinionated Org addressbook toolset',
 };
 
 sub _highlight {
@@ -29,9 +29,9 @@ sub _highlight {
     $text;
 }
 
-# this is like select_addressbook_entries(), but selects from object trees
-# instead of from an Org file.
-sub _select_addressbook_entries_single {
+# this is like select(), but selects from object trees instead of from an Org
+# file.
+sub _select_single {
     my %args = @_;
 
     #print "$_ => $args{$_}\n" for sort keys %args;
@@ -88,13 +88,34 @@ sub _select_addressbook_entries_single {
             $expr .= " =~ " . Data::Dmp::dmp($re_entry) . "]";
         }
 
-        log_trace "CSel expression: <$expr>";
-        #log_trace "Number of trees: %d", scalar(@trees);
+        if (defined($args{filter_entries_by_fields}) && @{ $args{filter_entries_by_fields} }) {
+            require Regexp::From::String;
+            my $expr_field = '';
+            for my $field_term (@{ $args{filter_entries_by_fields} }) {
+                my ($field_name, $field_value);
+                if ($field_term =~ /(.+?)\s*=\s*(.+)/) {
+                    $field_name = Regexp::From::String::str_to_re($1);
+                    $field_value = Regexp::From::String::str_to_re($2);
+                } else {
+                    $field_name = Regexp::From::String::str_to_re($field_term);
+                }
+                #$expr_field .= ($expr_field ? ' > List > ' : 'Headline[level=2] > List > ');
+                $expr_field .= ($expr_field ? ' > List > ' : 'List > ');
+                $expr_field .= 'ListItem[desc_term.text =~ '.Data::Dmp::dmp($field_name).']';
+                if ($field_value) {
+                    $expr_field .= '[children_as_string =~ '.Data::Dmp::dmp($field_value).']';
+                }
+            }
+            $expr .= ":has($expr_field)";
+        }
+
+        log_trace "CSel expression for selecting entries: <$expr>";
 
         for my $tree (@$trees) {
             my @nodes = Data::CSel::csel({
                 class_prefixes => ["Org::Element"],
             }, $expr, $tree);
+            #use Tree::Dump; for (@nodes) { td $_; print "\n\n\n" }
             push @matching_entries, @nodes;
             if ($args{num_entries} && @matching_entries > $args{num_entries}) {
                 splice @matching_entries, $args{num_entries};
@@ -104,7 +125,12 @@ sub _select_addressbook_entries_single {
     } # FIND_ENTRIES
     log_trace "Number of matching entries: %d", scalar(@matching_entries);
 
+    #use Tree::Dump; for (@matching_entries) { td $_; print "\n" }
   DISPLAY_ENTRIES: {
+        if ($args{count}) {
+            return [200, "OK", scalar(@matching_entries)];
+        }
+
         my ($clrtheme, $clrtheme_obj);
       LOAD_COLOR_THEME: {
             my $color = $args{color} // 'auto';
@@ -121,15 +147,17 @@ sub _select_addressbook_entries_single {
         };
 
         my ($expr_field, @re_field);
+        my $i = -1;
       ENTRY:
         for my $entry (@matching_entries) {
+            $i++;
 
             my @matching_fields;
             if (defined($args{fields}) && @{ $args{fields} }) {
                 unless (defined $expr_field) {
                     $expr_field = '';
                     for my $field_term (@{ $args{fields} }) {
-                        $expr_field .= ' ' if $expr_field;
+                        $expr_field .= ($expr_field ? ' > List > ' : 'Headline[level=2] > List > ');
                         $expr_field .= 'ListItem[desc_term.text';
                         my $re_field;
                         if (ref $field_term eq 'Regexp') {
@@ -141,11 +169,13 @@ sub _select_addressbook_entries_single {
                         $expr_field .= " =~ " . Data::Dmp::dmp($re_field) . "]";
                         push @re_field, $re_field;
                     }
+                    log_trace "CSel expression for selecting fields: <$expr_field>";
                 }
 
                 @matching_fields = Data::CSel::csel({
                     class_prefixes => ["Org::Element"],
                 }, $expr_field, $entry);
+                log_trace "Number of matching fields for entry #$i: %d", scalar(@matching_fields);
 
                 if ($args{num_fields} && @matching_fields > $args{num_fields}) {
                     splice @matching_fields, $args{num_fields};
@@ -204,19 +234,19 @@ sub _select_addressbook_entries_single {
     $res;
 }
 
-sub _select_addressbook_entries_shell {
+sub _select_shell {
     my %args = @_;
 
-    require App::orgadb::Shell;
-    my $shell = App::orgadb::Shell->new(
-        orgadb_args => \%args,
+    require App::orgadb::Select::Shell;
+    my $shell = App::orgadb::Select::Shell->new(
+        main_args => \%args,
     );
 
     $shell->cmdloop;
     [200];
 }
 
-$SPEC{select_addressbook_entries} = {
+$SPEC{select} = {
     v => 1.1,
     summary => 'Select Org addressbook entries/fields/subfields',
     args => {
@@ -238,7 +268,7 @@ _
         },
     },
 };
-sub select_addressbook_entries {
+sub select {
     my %args = @_;
 
     return [400, "Please specify at least one file"] unless @{ $args{files} || [] };
@@ -278,13 +308,13 @@ sub select_addressbook_entries {
     };
 
     if ($args{shell}) {
-        _select_addressbook_entries_shell(
+        _select_shell(
             _code_parse_files => $code_parse_files,
             %args,
         );
     } else {
         my ($trees, $tree_filenames) = $code_parse_files->(@{ $args{files} });
-        _select_addressbook_entries_single(
+        _select_single(
             %args,
             _trees => $trees,
             _tree_filenames => $tree_filenames,
@@ -293,7 +323,7 @@ sub select_addressbook_entries {
 }
 
 1;
-# ABSTRACT: An opinionated Org addressbook tool
+# ABSTRACT: An opinionated Org addressbook toolset
 
 __END__
 
@@ -303,22 +333,22 @@ __END__
 
 =head1 NAME
 
-App::orgadb - An opinionated Org addressbook tool
+App::orgadb - An opinionated Org addressbook toolset
 
 =head1 VERSION
 
-This document describes version 0.004 of App::orgadb (from Perl distribution App-orgadb), released on 2022-07-04.
+This document describes version 0.005 of App::orgadb (from Perl distribution App-orgadb), released on 2022-08-08.
 
 =head1 SYNOPSIS
 
 =head1 FUNCTIONS
 
 
-=head2 select_addressbook_entries
+=head2 select
 
 Usage:
 
- select_addressbook_entries(%args) -> [$status_code, $reason, $payload, \%result_meta]
+ select(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Select Org addressbook entriesE<sol>fieldsE<sol>subfields.
 
@@ -338,6 +368,10 @@ Whether to use color.
 
 =item * B<color_theme> => I<perl::colortheme::modname_with_optional_args>
 
+=item * B<count> => I<true>
+
+Return just the number of matching entries instead of showing them.
+
 =item * B<detail> => I<bool>
 
 =item * B<entry> => I<str_or_re>
@@ -351,6 +385,23 @@ Find (sub)fields by string or regex search.
 =item * B<files> => I<array[filename]>
 
 Path to addressbook files.
+
+=item * B<filter_entries_by_fields> => I<array[str]>
+
+Find entry by the fields or subfields it has.
+
+The format of each entry_by_field is one of:
+
+ str
+ /re/
+ str = str2
+ str = /re2/
+ /re/ = str2
+ /re/ = /re2/
+
+That is, it can search for a string (C<str>) or regex (C<re>) in the field name,
+and optionally also search for a string (C<str2>) or regex (C<re2>) in the field
+value.
 
 =item * B<formatters> => I<array[str]>
 
@@ -420,6 +471,12 @@ Source repository is at L<https://github.com/perlancar/perl-App-orgadb>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (on netbook-dell-xps13)
+
+perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+
 =head1 CONTRIBUTING
 
 
@@ -433,9 +490,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

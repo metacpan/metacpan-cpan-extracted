@@ -1,3 +1,6 @@
+v5.0.7    2022-08-13 13:00:35 EDT
+  - Add workers field to stats method (#21, Oliver Kurz)
+
 v5.0.6    2021-11-12 19:39:19 EST
   - Improve efficiency of stats query (#19, Sebastian Riedel)
 

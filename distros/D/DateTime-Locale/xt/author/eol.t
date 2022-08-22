@@ -820,6 +820,7 @@ my @files = (
     't/00-report-prereqs.t',
     't/alias.t',
     't/basic.t',
+    't/be-tarask.t',
     't/code-case-insensitive.t',
     't/format-length.t',
     't/iso639-2.t',

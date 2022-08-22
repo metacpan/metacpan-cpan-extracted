@@ -6,7 +6,7 @@ use utf8;
 
 use UUID::Tiny ':std';
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 use Chart::Plotly;
 
@@ -30,7 +30,7 @@ has config => ( is  => 'rw',
 sub html {
     my $self                         = shift;
     my %params                       = @_;
-    my $chart_id                     = $params{'div_id'} // create_uuid_as_string(UUID_TIME);
+    my $chart_id                     = $params{'div_id'}                       // create_uuid_as_string(UUID_TIME);
     my $load_plotly_using_script_tag = $params{'load_plotly_using_script_tag'} // 1;
     my $layout                       = $self->layout;
     my $config                       = $self->config;
@@ -45,7 +45,8 @@ sub html {
     }
     return
       Chart::Plotly::_render_cell( Chart::Plotly::_process_data( $self->traces() ),
-                       $chart_id, $layout, $config, { load_plotly_using_script_tag => $load_plotly_using_script_tag } );
+                                   $chart_id, $layout, $config,
+                                   { load_plotly_using_script_tag => $load_plotly_using_script_tag } );
 }
 
 sub TO_JSON {
@@ -103,7 +104,7 @@ Chart::Plotly::Plot
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -214,7 +215,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

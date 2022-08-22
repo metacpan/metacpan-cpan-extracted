@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace ohlc.
 
@@ -34,15 +34,15 @@ sub TO_JSON {
 }
 
 has dash => (
-    is  => "rw",
-    isa => "Str",
+    is            => "rw",
+    isa           => "Str",
     documentation =>
       "Sets the dash style of lines. Set to a dash type string (*solid*, *dot*, *dash*, *longdash*, *dashdot*, or *longdashdot*) or a dash length list in px (eg *5px,10px,2px,2px*). Note that this style setting can also be set per direction via `increasing.line.dash` and `decreasing.line.dash`.",
 );
 
 has width => (
-    is  => "rw",
-    isa => "Num",
+    is            => "rw",
+    isa           => "Num",
     documentation =>
       "[object Object] Note that this style setting can also be set per direction via `increasing.line.width` and `decreasing.line.width`.",
 );
@@ -62,7 +62,7 @@ Chart::Plotly::Trace::Ohlc::Line - This attribute is one of the possible options
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -120,7 +120,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

@@ -7,7 +7,7 @@ Attean::API::Query - Utility package defining query-related roles
 
 =head1 VERSION
 
-This document describes Attean::API::Query version 0.031
+This document describes Attean::API::Query version 0.032
 
 =head1 SYNOPSIS
 
@@ -24,7 +24,7 @@ This is a utility package for defining query-related roles:
 
 =cut
 
-package Attean::API::DirectedAcyclicGraph 0.031 {
+package Attean::API::DirectedAcyclicGraph 0.032 {
 	use Scalar::Util qw(refaddr);
 	use Types::Standard qw(ArrayRef ConsumerOf);
 
@@ -149,7 +149,7 @@ package Attean::API::DirectedAcyclicGraph 0.031 {
 	}
 }
 
-package Attean::API::SPARQLSerializable 0.031 {
+package Attean::API::SPARQLSerializable 0.032 {
 	use AtteanX::SPARQL::Constants;
 	use AtteanX::SPARQL::Token;
 	use Encode qw(decode_utf8);
@@ -402,7 +402,7 @@ package Attean::API::SPARQLSerializable 0.031 {
 	}
 }
 
-package Attean::API::SPARQLQuerySerializable 0.031 {
+package Attean::API::SPARQLQuerySerializable 0.032 {
 	use Moo::Role;
 	use namespace::clean;
 	with 'Attean::API::SPARQLSerializable';
@@ -417,10 +417,12 @@ package Attean::API::SPARQLQuerySerializable 0.031 {
 
 =cut
 
-package Attean::API::Algebra 0.031 {
+package Attean::API::Algebra 0.032 {
 	use Moo::Role;
-
+	use Types::Standard qw(ArrayRef ConsumerOf);
+	
 	with 'Attean::API::SPARQLSerializable';
+	has 'hints' => (is => 'rw', isa => ArrayRef[ArrayRef[ConsumerOf['Attean::API::Term']]], default => sub { [] });
 	
 	requires 'as_sparql';
 	requires 'in_scope_variables';			# variables that will be in-scope after this operation is evaluated
@@ -494,7 +496,7 @@ package Attean::API::Algebra 0.031 {
 
 =cut
 
-package Attean::API::QueryTree 0.031 {
+package Attean::API::QueryTree 0.032 {
 	use Moo::Role;
 	with 'Attean::API::DirectedAcyclicGraph';
 }
@@ -503,7 +505,7 @@ package Attean::API::QueryTree 0.031 {
 
 =cut
 
-package Attean::API::NullaryQueryTree 0.031 {
+package Attean::API::NullaryQueryTree 0.032 {
 	use Moo::Role;
 	sub arity { return 0 }
 	with 'Attean::API::QueryTree';
@@ -513,7 +515,7 @@ package Attean::API::NullaryQueryTree 0.031 {
 
 =cut
 
-package Attean::API::UnaryQueryTree 0.031 {
+package Attean::API::UnaryQueryTree 0.032 {
 	use Moo::Role;
 	sub arity { return 1 }
 	with 'Attean::API::QueryTree';
@@ -528,7 +530,7 @@ package Attean::API::UnaryQueryTree 0.031 {
 
 =cut
 
-package Attean::API::BinaryQueryTree 0.031 {
+package Attean::API::BinaryQueryTree 0.032 {
 	use Moo::Role;
 	sub arity { return 2 }
 	with 'Attean::API::QueryTree';
@@ -538,7 +540,7 @@ package Attean::API::BinaryQueryTree 0.031 {
 
 =cut
 
-package Attean::API::PropertyPath 0.031 {
+package Attean::API::PropertyPath 0.032 {
 	use Moo::Role;
 	with 'Attean::API::QueryTree';
 	requires 'as_string';
@@ -549,7 +551,7 @@ package Attean::API::PropertyPath 0.031 {
 
 =cut
 
-package Attean::API::UnaryPropertyPath 0.031 {
+package Attean::API::UnaryPropertyPath 0.032 {
 	use Types::Standard qw(ConsumerOf);
 
 	use Moo::Role;
@@ -579,7 +581,7 @@ package Attean::API::UnaryPropertyPath 0.031 {
 
 =cut
 
-package Attean::API::NaryPropertyPath 0.031 {
+package Attean::API::NaryPropertyPath 0.032 {
 	use Types::Standard qw(ArrayRef ConsumerOf);
 
 	use Moo::Role;
@@ -606,7 +608,7 @@ package Attean::API::NaryPropertyPath 0.031 {
 
 =cut
 
-package Attean::API::UnionScopeVariables 0.031 {
+package Attean::API::UnionScopeVariables 0.032 {
 	use Moo::Role;
 	sub in_scope_variables {
 		my $self	= shift;
@@ -622,7 +624,7 @@ package Attean::API::UnionScopeVariables 0.031 {
 
 =cut
 
-package Attean::API::IntersectionScopeVariables 0.031 {
+package Attean::API::IntersectionScopeVariables 0.032 {
 	use Moo::Role;
 	sub in_scope_variables {
 		my $self	= shift;

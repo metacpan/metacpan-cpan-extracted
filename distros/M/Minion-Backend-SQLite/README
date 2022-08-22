@@ -718,6 +718,12 @@ METHODS
 
       Uptime in seconds. Always undefined for SQLite.
 
+    workers
+
+        workers => 200;
+
+      Number of registered workers.
+
  unlock
 
       my $bool = $backend->unlock('foo');

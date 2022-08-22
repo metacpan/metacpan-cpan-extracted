@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 2.52
+    version 2.59
 
 SYNOPSIS
 
@@ -159,10 +159,14 @@ PROPERTIES
 
     destdir
 
-      Use the DESTDIR environment variable to stage your install before
-      copying the files into blib. This is the preferred method of
-      installing libraries because it improves reliability. This technique
-      is supported by autoconf and others.
+      Some plugins (Alien::Build::Plugin::Build::Autoconf for example)
+      support installing via DESTDIR. They will set this property to true
+      if they plan on doing such an install. This helps Alien::Build find
+      the staged install files and how to locate them.
+
+      If available, DESTDIR is used to stage install files in a sub
+      directory before copying the files into blib. This is generally
+      preferred method if available.
 
     destdir_filter
 
@@ -273,16 +277,18 @@ PROPERTIES
       Windows Where MSYS is used and paths like C:/foo are represented as
       /C/foo which are understood by the MSYS tools, but not by Perl. You
       should only use this if you are using Alien::Build::Plugin::Autoconf
-      in your alienfile.
+      in your alienfile. This is set during before the build hook is run.
 
     download
 
       The location of the downloaded archive (tar.gz, or similar) or
-      directory.
+      directory. This will be undefined until the archive is actually
+      downloaded.
 
     env
 
-      Environment variables to override during the build stage.
+      Environment variables to override during the build stage. Plugins are
+      free to set additional overrides using this hash.
 
     extract
 
@@ -293,22 +299,32 @@ PROPERTIES
 
     old
 
+      [deprecated]
+
       Hash containing information on a previously installed Alien of the
       same name, if available. This may be useful in cases where you want
       to reuse the previous install if it is still sufficient.
 
       prefix
 
+	[deprecated]
+
 	The prefix for the previous install. Versions prior to 1.42
 	unfortunately had this in typo form of preifx.
 
       runtime
 
+	[deprecated]
+
 	The runtime properties from the previous install.
 
     patch
 
-      Directory with patches.
+      Directory with patches, if available. This will be undef if there are
+      no patches. When initially installing an alien this will usually be a
+      sibling of the alienfile, a directory called patch. Once installed
+      this will be in the share directory called _alien/patch. The former
+      is useful for rebuilding an alienized package using af.
 
     prefix
 
@@ -371,21 +387,25 @@ PROPERTIES
 
       Alternate configurations. If the alienized package has multiple
       libraries this could be used to store the different compiler or
-      linker flags for each library.
+      linker flags for each library. Typically this will be set by a plugin
+      in the gather stage (for either share or system installs).
 
     cflags
 
-      The compiler flags
+      The compiler flags. This is typically set by a plugin in the gather
+      stage (for either share or system installs).
 
     cflags_static
 
-      The static compiler flags
+      The static compiler flags. This is typically set by a plugin in the
+      gather stage (for either share or system installs).
 
     command
 
       The command name for tools where the name my differ from platform to
       platform. For example, the GNU version of make is usually make in
-      Linux and gmake on FreeBSD.
+      Linux and gmake on FreeBSD. This is typically set by a plugin in the
+      gather stage (for either share or system installs).
 
     ffi_name
 
@@ -393,7 +413,8 @@ PROPERTIES
       dynamic libraries at runtime. This is passed into FFI::CheckLib, so
       if your library is something like libarchive.so or archive.dll you
       would set this to archive. This may be a string or an array of
-      strings.
+      strings. This is typically set by a plugin in the gather stage (for
+      either share or system installs).
 
     ffi_checklib
 
@@ -416,9 +437,21 @@ PROPERTIES
 
          $build->runtime_prop->{ffi_checklib}->{system} = [ try_linker_script => 1 ];
 
+      This is typically set by a plugin in the gather stage (for either
+      share or system installs).
+
+    inline_auto_include
+
+      [version 2.53]
+
+      This property is an array reference of C code that will be passed
+      into Inline::C to make sure that appropriate headers are
+      automatically included. See "auto_include" in Inline::C for details.
+
     install_type
 
-      The install type. Is one of:
+      The install type. This is set by AB core after the probe hook is
+      executed. Is one of:
 
       system
 
@@ -434,11 +467,13 @@ PROPERTIES
 
     libs
 
-      The library flags
+      The library flags. This is typically set by a plugin in the gather
+      stage (for either share or system installs).
 
     libs_static
 
-      The static library flags
+      The static library flags. This is typically set by a plugin in the
+      gather stage (for either share or system installs).
 
     perl_module_version
 
@@ -452,7 +487,8 @@ PROPERTIES
 
     version
 
-      The version of the library or tool
+      The version of the library or tool. This is typically set by a plugin
+      in the gather stage (for either share or system installs).
 
  hook_prop
 
@@ -606,6 +642,33 @@ METHODS
       but the ones that do not should issue a warning if you try to set
       request headers and they are not supported.
 
+ check_digest
+
+    [experimental]
+
+     my $bool = $build->check_digest($path);
+
+    Checks any cryptographic signatures for the given file. The file is
+    specified by $path which may be one of:
+
+    string
+
+      Containing the path to the file to be checked.
+
+    Path::Tiny
+
+      Containing the path to the file to be checked.
+
+    HASH
+
+      A Hash reference containing information about a file. See the fetch
+      hook for details on the format.
+
+    Returns true if the cryptographic signature matches, false if
+    cryptographic signatures are disabled. Will throw an exception if the
+    signature does not match, or if no plugin provides the correct
+    algorithm for checking the signature.
+
  decode
 
      my $decoded_res = $build->decode($res);
@@ -743,8 +806,8 @@ META METHODS
 
  around_hook
 
-     $build->meta->around_hook($hook, $code);
-     Alien::Build->meta->around_hook($name, $code);
+     $build->meta->around_hook($hook_name, $code);
+     Alien::Build->meta->around_hook($hook_name, $code);
 
     Wrap the given hook with a code reference. This is similar to a Moose
     method modifier, except that it wraps around the given hook instead of
@@ -767,6 +830,26 @@ META METHODS
          }
        },
      );
+
+ after_hook
+
+     $build->meta->after_hook($hook_name, sub {
+       my(@args) = @_;
+       ...
+     });
+
+    Execute the given code reference after the hook. The original arguments
+    are passed into the code reference.
+
+ before_hook
+
+     $build->meta->before_hook($hook_name, sub {
+       my(@args) = @_;
+       ...
+     });
+
+    Execute the given code reference before the hook. The original
+    arguments are passed into the code reference.
 
  apply_plugin
 

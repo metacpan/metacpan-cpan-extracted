@@ -1,7 +1,7 @@
 Changes
 CONCEPT
-examples/ex1.pl
-examples/ex2.pl
+examples/web_app_with_div.pl
+examples/web_app_with_stars.pl
 HTML.pm
 images/ex1.png
 inc/Module/Install.pm

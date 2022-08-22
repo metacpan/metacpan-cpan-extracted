@@ -20,7 +20,7 @@ use Time::Piece 1.33;
 use boolean;
 use namespace::clean;
 
-our $VERSION = '0.905'; # VERSION
+our $VERSION = '0.906'; # VERSION
 our $WARNINGS = 1;
 
 fieldhashes \my (%SAFE, %KEYS);
@@ -32,9 +32,12 @@ sub new {
     # copy constructor
     return $_[0]->clone if @_ == 1 && blessed $_[0] && $_[0]->isa($class);
 
-    my $self = bless {}, $class;
+    my $data;
+    $data = shift if is_plain_hashref($_[0]);
+
+    my $self = bless $data // {}, $class;
     $self->init(@_);
-    $self->_set_nonlazy_attributes if empty $self;
+    $self->_set_nonlazy_attributes if !$data;
     return $self;
 }
 
@@ -144,10 +147,12 @@ has raw             => coerce => \&to_string;
 
 # HEADERS
 has 'headers.comment'               => '',                          coerce => \&to_string;
-has 'headers.cipher_id'             => CIPHER_UUID_CHACHA20,        coerce => \&to_uuid;
+has 'headers.cipher_id'             => sub { $_[0]->version < KDBX_VERSION_4_0 ? CIPHER_UUID_AES256 : CIPHER_UUID_CHACHA20 },
+                                                                    coerce => \&to_uuid;
 has 'headers.compression_flags'     => COMPRESSION_GZIP,            coerce => \&to_compression_constant;
 has 'headers.master_seed'           => sub { random_bytes(32) },    coerce => \&to_string;
-has 'headers.encryption_iv'         => sub { random_bytes(16) },    coerce => \&to_string;
+has 'headers.encryption_iv'         => sub { random_bytes($_[0]->version < KDBX_VERSION_4_0 ? 16 : 12) },
+                                                                    coerce => \&to_string;
 has 'headers.stream_start_bytes'    => sub { random_bytes(32) },    coerce => \&to_string;
 has 'headers.kdf_parameters'        => sub {
     +{
@@ -753,16 +758,24 @@ sub _remove_safe { delete $SAFE{$_[0]} }
 sub lock {
     my $self = shift;
 
-    $self->_safe and return $self;
-
+    # Find things to lock:
     my @strings;
-
     $self->entries(history => 1)->each(sub {
-        push @strings, grep { $_->{protect} } values %{$_->strings}, values %{$_->binaries};
+        my $strings = $_->strings;
+        for my $string_key (keys %$strings) {
+            my $string = $strings->{$string_key};
+            push @strings, $string if $string->{protect} // $self->memory_protection($string_key);
+        }
+        push @strings, grep { $_->{protect} } values %{$_->binaries};
     });
+    return $self if !@strings;  # nothing to do
 
-    $self->_safe(File::KDBX::Safe->new(\@strings));
-
+    if (my $safe = $self->_safe) {
+        $safe->add(\@strings);
+    }
+    else {
+        $self->_safe(File::KDBX::Safe->new(\@strings));
+    }
     return $self;
 }
 
@@ -892,7 +905,9 @@ sub prune_history {
 
 sub randomize_seeds {
     my $self = shift;
-    $self->encryption_iv(random_bytes(16));
+    my $iv_size = 16;
+    $iv_size = $self->cipher(key => "\0" x 32)->iv_size if KDBX_VERSION_4_0 <= $self->version;
+    $self->encryption_iv(random_bytes($iv_size));
     $self->inner_random_stream_key(random_bytes(64));
     $self->master_seed(random_bytes(32));
     $self->stream_start_bytes(random_bytes(32));
@@ -921,7 +936,6 @@ sub kdf {
     my %args = @_ % 2 == 1 ? (params => shift, @_) : @_;
 
     my $params = $args{params};
-    my $compat = $args{compatible} // 1;
 
     $params //= $self->kdf_parameters;
     $params = {%{$params || {}}};
@@ -947,18 +961,22 @@ sub kdf {
 
 sub transform_seed {
     my $self = shift;
+    my $param = KDF_PARAM_AES_SEED;     # Short cut: Argon2 uses the same parameter name ("S")
     $self->headers->{+HEADER_TRANSFORM_SEED} =
-        $self->headers->{+HEADER_KDF_PARAMETERS}{+KDF_PARAM_AES_SEED} = shift if @_;
+        $self->headers->{+HEADER_KDF_PARAMETERS}{$param} = shift if @_;
     $self->headers->{+HEADER_TRANSFORM_SEED} =
-        $self->headers->{+HEADER_KDF_PARAMETERS}{+KDF_PARAM_AES_SEED} //= random_bytes(32);
+        $self->headers->{+HEADER_KDF_PARAMETERS}{$param} //= random_bytes(32);
 }
 
 sub transform_rounds {
     my $self = shift;
+    require File::KDBX::KDF;
+    my $info = $File::KDBX::KDF::ROUNDS_INFO{$self->kdf_parameters->{+KDF_PARAM_UUID} // ''} //
+        $File::KDBX::KDF::DEFAULT_ROUNDS_INFO;
     $self->headers->{+HEADER_TRANSFORM_ROUNDS} =
-        $self->headers->{+HEADER_KDF_PARAMETERS}{+KDF_PARAM_AES_ROUNDS} = shift if @_;
+        $self->headers->{+HEADER_KDF_PARAMETERS}{$info->{p}} = shift if @_;
     $self->headers->{+HEADER_TRANSFORM_ROUNDS} =
-        $self->headers->{+HEADER_KDF_PARAMETERS}{+KDF_PARAM_AES_ROUNDS} //= 100_000;
+        $self->headers->{+HEADER_KDF_PARAMETERS}{$info->{p}} //= $info->{d};
 }
 
 
@@ -966,8 +984,8 @@ sub cipher {
     my $self = shift;
     my %args = @_;
 
-    $args{uuid} //= $self->headers->{+HEADER_CIPHER_ID};
-    $args{iv}   //= $self->headers->{+HEADER_ENCRYPTION_IV};
+    $args{uuid} //= $self->cipher_id;
+    $args{iv}   //= $self->encryption_iv;
 
     require File::KDBX::Cipher;
     return File::KDBX::Cipher->new(%args);
@@ -1121,7 +1139,7 @@ File::KDBX - Encrypted database to store secret text and files
 
 =head1 VERSION
 
-version 0.905
+version 0.906
 
 =head1 SYNOPSIS
 
@@ -1278,7 +1296,7 @@ L<File::KDBX::Loader::Raw>.
 
 =head2 comment
 
-A text string associated with the database. Often unset.
+A text string associated with the database stored unencrypted in the file header. Often unset.
 
 =head2 cipher_id
 
@@ -1309,7 +1327,7 @@ The transform seed I<should> be changed each time the database is saved to file.
 =head2 transform_rounds
 
 The number of rounds or iterations used in the key derivation function. Increasing this number makes loading
-and saving the database slower by design in order to make dictionary and brute force attacks more costly.
+and saving the database slower in order to make dictionary and brute force attacks more costly.
 
 =head2 encryption_iv
 

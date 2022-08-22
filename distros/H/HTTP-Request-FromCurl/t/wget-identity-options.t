@@ -28,9 +28,12 @@ my @tests = (
         todo => 'Versions of Wget beyond 1.19.3 must be built with zlib to support --compression',
     },
     { cmd => [ '-O', '-', '--debug', '--method', 'PUT', '$url', '--body-data', '{}' ],
+        version => 1015000,
     },
     { cmd => [ '-O', '-', '--debug', '--timeout', '99', '$url' ],
-    }
+    },
+    { cmd => [ '-O', '-', '--debug', '--bind-address', '$host', '$url' ],
+    },
 );
 
 run_wget_tests( @tests );

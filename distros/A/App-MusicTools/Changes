@@ -1,3 +1,6 @@
+ * 1.32 - add Bark scale support
+ * 1.30 - atonal-util freq2pitch shows delta from expected frequence of
+          the resulting pitch. canonical adds 'map' flag.
  * 1.29 - canonical multicolumn read on stdin, Test::Cmd test rewrite, etc.
  * 1.28 - atonal-util notes2time --fraction=..., basic shows common
    names for certain pitch sets, fix a dep.

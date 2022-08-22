@@ -26,6 +26,7 @@ my $record =<<'EOF';
 246 3  $a C4LJ
 362 0  $a 1.2007 -
 856 4  $u http://journal.code4lib.org/
+999    $= foo $< bar $$ baz
 
 EOF
 
@@ -40,7 +41,8 @@ my $expected = {
         [245,   '0', '0', 'a', 'Code4Lib journal', 'b', 'C4LJ'],
         [246,   '3', ' ', 'a', 'C4LJ'],
         [362,   '0', ' ', 'a', '1.2007 -'],
-        [856,   '4', ' ', 'u', 'http://journal.code4lib.org/']
+        [856,   '4', ' ', 'u', 'http://journal.code4lib.org/'],
+        [999,   ' ', ' ', '=', 'foo', '<', 'bar', '$', 'baz']
     ]
 };
 

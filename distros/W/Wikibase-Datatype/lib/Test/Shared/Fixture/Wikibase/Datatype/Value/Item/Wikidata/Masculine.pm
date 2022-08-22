@@ -4,7 +4,7 @@ use base qw(Wikibase::Datatype::Value::Item);
 use strict;
 use warnings;
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
 
 sub new {
 	my $class = shift;
@@ -66,6 +66,8 @@ Returns string.
 
 =head1 EXAMPLE
 
+=for comment filename=fixture_create_and_print_value_item_wd_masculine.pl
+
  use strict;
  use warnings;
 
@@ -117,6 +119,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.19
+0.20
 
 =cut

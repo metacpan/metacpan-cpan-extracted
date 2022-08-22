@@ -1,0 +1,135 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+C<App::pickle> - Handles PickLE files.
+
+=cut
+
+package App::pickle;
+
+use strict;
+use warnings;
+use autodie;
+use utf8;
+use OptArgs2 'class_optargs';
+use Moo;
+
+# Include the project module directory.
+use FindBin;
+use File::Spec;
+use lib File::Spec->catdir($FindBin::Bin, '..', 'lib');
+
+use PickLE;
+use App::pickle::OptArgs;
+use PickLE::Document;
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item I<document>
+
+PickLE parsed document object.
+
+=cut
+
+has document => (
+	is     => 'ro',
+	writer => '_set_document'
+);
+
+=item I<file>
+
+PickLE file to be parsed into I<document>.
+
+=cut
+
+has file => (
+	is => 'rw'
+);
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item C<run>()
+
+OptArgs command entry point.
+
+=cut
+
+sub run {
+	my ($self) = @_;
+
+	# Enable UTF-8 output.
+	binmode STDOUT, ":encoding(utf8)";
+
+	# Parse the supplied document file.
+	$self->_set_document(PickLE::Document->load($self->file));
+	if (not defined $self->document) {
+		die "There were errors while trying to parse the document.\n";
+	}
+
+	# Let's just print the document contents.
+	$self->print_document;
+}
+
+=item C<print_document>()
+
+Prints the contents of the I<document> in a pretty way.
+
+=cut
+
+sub print_document {
+	my ($self) = @_;
+
+	# Go through properties.
+	$self->document->foreach_property(sub {
+		my $property = shift;
+		print $property->name . ":\t" . $property->value . "\n";
+	});
+	print "\n";
+
+	# Go through categories listing the components in them.
+	$self->document->foreach_category(sub {
+		my $category = shift;
+		print $category->name . ":\n";
+
+		$category->foreach_component(sub {
+			my $component = shift;
+
+			# TODO: Make this output like tree.
+			print '  ';
+			print (($component->picked) ? "\x{2611}" : "\x{2610}");
+			print '  ' . $component->quantity . "\t";
+			print $component->value . "\t" if defined $component->value;
+			print $component->name . "\t";
+			print $component->description if defined $component->description;
+			print "\n";
+		});
+
+		print "\n";
+	});
+}
+
+# Load up the application.
+my ($class, $opts) = class_optargs('App::pickle');
+eval "require $class" or die $@;
+$class->new($opts)->run;
+
+__END__
+
+=back
+
+=head1 AUTHOR
+
+Nathan Campos <nathan@innoveworkshop.com>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2022- Nathan Campos.
+
+=cut

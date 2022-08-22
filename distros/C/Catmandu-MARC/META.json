@@ -92,7 +92,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-MARC"
       }
    },
-   "version" : "1.271",
+   "version" : "1.281",
    "x_contributors" : [
       "Carsten Klee <carsten.klee@sbb.spk-berlin.de>",
       "Carsten Klee <cKlee@users.noreply.github.com>",
@@ -105,10 +105,11 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Nicolas Franck <nicolas.franck@ugent.be>",
       "Nicolas Steenlant <nicolas.steenlant@ugent.be>",
-      "Robin Sheat <robin@catalyst.net.nz>"
+      "Robin Sheat <robin@catalyst.net.nz>",
+      "Vladimir Alexiev <vladimir@sirma.bg>"
    ],
    "x_generated_by_perl" : "v5.24.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 0
 }

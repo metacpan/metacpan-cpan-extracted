@@ -2,14 +2,122 @@ NAME
     App::UniqFiles - Report or omit duplicate file contents
 
 VERSION
-    This document describes version 0.133 of App::UniqFiles (from Perl
-    distribution App-UniqFiles), released on 2022-05-09.
+    This document describes version 0.134 of App::UniqFiles (from Perl
+    distribution App-UniqFiles), released on 2022-08-19.
 
 SYNOPSIS
      # See uniq-files script
 
 NOTES
 FUNCTIONS
+  dupe_files
+    Usage:
+
+     dupe_files(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Report or omit duplicate file contents.
+
+    Given a list of filenames, will check each file size and content for
+    duplicate content. Interface is a bit like the "uniq" Unix command-line
+    program.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   algorithm => *str*
+
+        What algorithm is used to compute the digest of the content.
+
+        The default is to use "md5". Some algorithms supported include
+        "crc32", "sha1", "sha256", as well as "Digest" to use Perl Digest
+        which supports a lot of other algorithms, e.g. "SHA-1", "BLAKE2b".
+
+        If set to '', 'none', or 'size', then digest will be set to file
+        size. This means uniqueness will be determined solely from file
+        size. This can be quicker but will generate a false positive when
+        two files of the same size are deemed as duplicate even though their
+        content may be different.
+
+    *   detail => *true*
+
+        Show details (a.k.a. --show-digest, --show-size, --show-count).
+
+    *   digest_args => *array*
+
+        Some Digest algorithms require arguments, you can pass them here.
+
+    *   files* => *array[str]*
+
+    *   group_by_digest => *bool*
+
+        Sort files by its digest (or size, if not computing digest),
+        separate each different digest.
+
+    *   recurse => *bool*
+
+        If set to true, will recurse into subdirectories.
+
+    *   report_duplicate => *int* (default: 1)
+
+        Whether to return duplicate items.
+
+        Can be set to either 0, 1, 2.
+
+        If set to 2 (the default for "uniq-files"), will only return the
+        first of duplicate items. For example: "file1" contains text 'a',
+        "file2" 'b', "file3" 'a'. Only "file1" will be returned because
+        "file2" is unique and "file3" contains 'a' (already represented by
+        "file1").
+
+        If set to 1 (the default for "dupe-files"), will return all the the
+        duplicate files. From the above example: "file1" and "file3" will be
+        returned.
+
+        If set to 3, will return all but the first of duplicate items. From
+        the above example: "file3" will be returned. This is useful if you
+        want to keep only one copy of the duplicate content. You can use the
+        output of this routine to "mv" or "rm".
+
+        If set to 0, duplicate items will not be returned.
+
+    *   report_unique => *bool* (default: 0)
+
+        Whether to return unique items.
+
+    *   show_count => *bool* (default: 0)
+
+        Whether to return each file content's number of occurence.
+
+        1 means the file content is only encountered once (unique), 2 means
+        there is one duplicate, and so on.
+
+    *   show_digest => *true*
+
+        Show the digest value (or the size, if not computing digest) for
+        each file.
+
+        Note that this routine does not compute digest for files which have
+        unique sizes, so they will show up as empty.
+
+    *   show_size => *true*
+
+        Show the size for each file.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
   uniq_files
     Usage:
 
@@ -39,6 +147,10 @@ FUNCTIONS
         two files of the same size are deemed as duplicate even though their
         content may be different.
 
+    *   detail => *true*
+
+        Show details (a.k.a. --show-digest, --show-size, --show-count).
+
     *   digest_args => *array*
 
         Some Digest algorithms require arguments, you can pass them here.
@@ -60,13 +172,15 @@ FUNCTIONS
 
         Can be set to either 0, 1, 2.
 
-        If set to 2 (the default), will only return the first of duplicate
-        items. For example: "file1" contains text 'a', "file2" 'b', "file3"
-        'a'. Only "file1" will be returned because "file2" is unique and
-        "file3" contains 'a' (already represented by "file1").
+        If set to 2 (the default for "uniq-files"), will only return the
+        first of duplicate items. For example: "file1" contains text 'a',
+        "file2" 'b', "file3" 'a'. Only "file1" will be returned because
+        "file2" is unique and "file3" contains 'a' (already represented by
+        "file1").
 
-        If set to 1, will return all the the duplicate files. From the above
-        example: "file1" and "file3" will be returned.
+        If set to 1 (the default for "dupe-files"), will return all the the
+        duplicate files. From the above example: "file1" and "file3" will be
+        returned.
 
         If set to 3, will return all but the first of duplicate items. From
         the above example: "file3" will be returned. This is useful if you
@@ -86,7 +200,7 @@ FUNCTIONS
         1 means the file content is only encountered once (unique), 2 means
         there is one duplicate, and so on.
 
-    *   show_digest => *bool*
+    *   show_digest => *true*
 
         Show the digest value (or the size, if not computing digest) for
         each file.
@@ -94,7 +208,7 @@ FUNCTIONS
         Note that this routine does not compute digest for files which have
         unique sizes, so they will show up as empty.
 
-    *   show_size => *bool*
+    *   show_size => *true*
 
         Show the size for each file.
 

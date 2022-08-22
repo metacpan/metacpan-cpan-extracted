@@ -2,7 +2,7 @@ package Data::Password::zxcvbn::Match::BruteForce;
 use Moo;
 with 'Data::Password::zxcvbn::Match';
 use List::AllUtils qw(max);
-our $VERSION = '1.0.4'; # VERSION
+our $VERSION = '1.0.6'; # VERSION
 # ABSTRACT: special match class for brute-force guesses
 
 
@@ -63,7 +63,7 @@ Data::Password::zxcvbn::Match::BruteForce - special match class for brute-force 
 
 =head1 VERSION
 
-version 1.0.4
+version 1.0.6
 
 =head1 DESCRIPTION
 
@@ -109,7 +109,7 @@ Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by BroadBean UK, a CareerBuilder Company.
+This software is copyright (c) 2022 by BroadBean UK, a CareerBuilder Company.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

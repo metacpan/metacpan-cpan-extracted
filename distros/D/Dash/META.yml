@@ -15,7 +15,7 @@ configure_requires:
   Path::Tiny: '0'
   Text::Template: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -46,6 +46,7 @@ resources:
   bugtracker: https://github.com/pablrod/perl-Dash/issues
   homepage: https://github.com/pablrod/perl-Dash
   repository: https://github.com/pablrod/perl-Dash.git
-version: '0.10'
-x_generated_by_perl: v5.30.0
+version: '0.11'
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: MIT

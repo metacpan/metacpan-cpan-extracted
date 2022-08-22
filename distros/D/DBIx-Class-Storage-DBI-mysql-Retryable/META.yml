@@ -24,7 +24,7 @@ name: DBIx-Class-Storage-DBI-mysql-Retryable
 provides:
   DBIx::Class::Storage::DBI::mysql::Retryable:
     file: lib/DBIx/Class/Storage/DBI/mysql/Retryable.pm
-    version: v1.0.1
+    version: v1.0.2
 requires:
   Algorithm::Backoff::RetryTimeouts: '0'
   Context::Preserve: '0'
@@ -37,7 +37,7 @@ requires:
 resources:
   bugtracker: https://github.com/GrantStreetGroup/DBIx-Class-Storage-DBI-mysql-Retryable/issues
   repository: git://github.com/GrantStreetGroup/DBIx-Class-Storage-DBI-mysql-Retryable.git
-version: v1.0.1
+version: v1.0.2
 x_generated_by_perl: v5.20.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

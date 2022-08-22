@@ -7,7 +7,7 @@ AtteanX::Parser::SPARQL - SPARQL 1.1 Parser.
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::SPARQL version 0.031.
+This document describes AtteanX::Parser::SPARQL version 0.032.
 
 =head1 SYNOPSIS
 
@@ -70,7 +70,7 @@ L<Attean::API::AbbreviatingParser>.
 
 =cut
 
-package AtteanX::Parser::SPARQL 0.031;
+package AtteanX::Parser::SPARQL 0.032;
 
 use strict;
 use warnings;
@@ -210,7 +210,10 @@ either upon seeing a DOT, or reaching the end of the string.
 sub parse_nodes {
 	my $self	= shift;
 	my $p 		= AtteanX::Parser::SPARQLLex->new();
-	my $l		= $self->_configure_lexer( $p->parse_iter_from_bytes(@_) );
+	my $bytes	= shift;
+	my %args	= @_;
+	my $commas	= $args{'commas'} || 0;
+	my $l		= $self->_configure_lexer( $p->parse_iter_from_bytes($bytes) );
 	$self->lexer($l);
 	$self->baseURI($self->{args}{base});
 	$self->build({base => $self->baseURI});
@@ -222,6 +225,11 @@ sub parse_nodes {
 		} else {
 			$self->_GraphNode;
 		}
+		
+		if ($commas) {
+			$self->_optional_token(COMMA);
+		}
+		
 		push(@nodes, splice(@{ $self->{_stack} }));
 		if ($self->_test_token(DOT)) {
 			$self->log->notice('DOT seen in string, stopping here');
@@ -255,7 +263,6 @@ sub _parse {
 	$self->_RW_Query();
 	delete $build->{star};
 	my $data								= $build;
-#	$data->{triples}						= $self->_pop_pattern_container();
 	return $data;
 }
 
@@ -689,7 +696,8 @@ sub __ModifyTemplate {
 	if ($self->_TriplesBlock_test) {
 		$self->_push_pattern_container;
 		$self->_TriplesBlock;
-		my ($bgp)	= @{ $self->_pop_pattern_container };
+		(my $cont, undef)	= $self->_pop_pattern_container; # ignore hints in a modify template
+		my ($bgp)	= @{ $cont };
 		my @triples	= @{ $bgp->triples };
 		if ($graph) {
 			@triples	= map { $_->as_quad_pattern($graph) } @triples;
@@ -1164,10 +1172,11 @@ sub _TriplesWhereClause {
 	}
 	$self->_expected_token(RBRACE);
 	
-	my $cont		= $self->_pop_pattern_container;
+	my ($cont, $hints)		= $self->_pop_pattern_container;
 	$self->{build}{construct_triples}	= $cont->[0];
 	
 	my $pattern	= $self->_new_join(@$cont);
+	$pattern->hints($hints);
 	$self->_add_patterns( $pattern );
 }
 
@@ -1245,7 +1254,7 @@ sub __GroupByVar {
 		$self->_expected_token(RPAREN);
 		
 	} elsif ($self->_IRIref_test) {
-		$$self->_FunctionCall;
+		$self->_FunctionCall;
 	} elsif ($self->_BuiltInCall_test) {
 		$self->_BuiltInCall;
 	} else {
@@ -1544,11 +1553,12 @@ sub _GroupGraphPatternSub {
 		my $t	= $self->_peek_token;
 		last if (refaddr($t) == refaddr($cur));
 	}
-	my $cont		= $self->_pop_pattern_container;
+	my ($cont, $hints)		= $self->_pop_pattern_container;
 
 	my @filters		= splice(@{ $self->{filters} });
 	my @patterns;
 	my $pattern		= $self->_new_join(@$cont);
+	$pattern->hints($hints);
 	if (@filters) {
 		while (my $f = shift @filters) {
 			$pattern	= Attean::Algebra::Filter->new( children => [$pattern], expression => $f );
@@ -1560,10 +1570,12 @@ sub _GroupGraphPatternSub {
 sub __handle_GraphPatternNotTriples {
 	my $self	= shift;
 	my $data	= shift;
+	return unless ($data);
 	my ($class, @args)	= @$data;
 	if ($class =~ /^Attean::Algebra::(LeftJoin|Minus)$/) {
-		my $cont	= $self->_pop_pattern_container;
+		my ($cont, $hints)	= $self->_pop_pattern_container;
 		my $ggp		= $self->_new_join(@$cont);
+		$ggp->hints($hints);
 		$self->_push_pattern_container;
 		# my $ggp	= $self->_remove_pattern();
 		unless ($ggp) {
@@ -1576,8 +1588,9 @@ sub __handle_GraphPatternNotTriples {
  		my ($table)	= @args;
 		$self->_add_patterns( $table );
 	} elsif ($class eq 'Attean::Algebra::Extend') {
-		my $cont	= $self->_pop_pattern_container;
+		my ($cont, $hints)	= $self->_pop_pattern_container;
 		my $ggp		= $self->_new_join(@$cont);
+		$ggp->hints($hints);
 		$self->_push_pattern_container;
 		# my $ggp	= $self->_remove_pattern();
 		unless ($ggp) {
@@ -1758,8 +1771,9 @@ sub _TriplesBlock {
 	my $self	= shift;
 	$self->_push_pattern_container;
 	$self->__TriplesBlock;
-	my $triples		= $self->_pop_pattern_container;
+	my ($triples, $hints)		= $self->_pop_pattern_container;
 	my $bgp			= $self->__new_bgp( @$triples );
+	$bgp->hints($hints);
 	$self->_add_patterns( $bgp );
 }
 
@@ -1791,7 +1805,7 @@ sub _GraphPatternNotTriples_test {
 	my $t	= $self->_peek_token;
 	return unless ($t);
 	return 0 unless ($t->type == KEYWORD);
-	return ($t->value =~ qr/^(VALUES|BIND|SERVICE|MINUS|OPTIONAL|GRAPH)$/i);
+	return ($t->value =~ qr/^(VALUES|BIND|SERVICE|MINUS|OPTIONAL|GRAPH|HINT)$/i);
 }
 
 sub _GraphPatternNotTriples {
@@ -1804,6 +1818,8 @@ sub _GraphPatternNotTriples {
 		$self->_MinusGraphPattern;
 	} elsif ($self->_test_token(KEYWORD, 'BIND')) {
 		$self->_Bind;
+	} elsif ($self->_test_token(KEYWORD, 'HINT')) {
+		$self->_Hint;
 	} elsif ($self->_test_token(KEYWORD, 'OPTIONAL')) {
 		$self->_OptionalGraphPattern;
 	} elsif ($self->_test_token(LBRACE)) {
@@ -1877,6 +1893,27 @@ sub _Bind {
 	$self->_add_stack( ['Attean::Algebra::Extend', $var, $expr] );
 }
 
+sub _Hint {
+	my $self	= shift;
+	$self->_expected_token(KEYWORD, 'HINT');
+	my $terms	= $self->_HintTerms();
+	$self->_add_hint($terms);
+}
+
+sub _HintTerms {
+	my $self	= shift;
+	
+	$self->_expected_token(LPAREN);
+	
+	my @terms;
+	while ($self->_BindingValue_test) {
+		$self->_BindingValue;
+		push(@terms, splice(@{ $self->{_stack} }));
+	}
+	$self->_expected_token(RPAREN);
+	return \@terms;
+}
+
 sub _ServiceGraphPattern {
 	my $self	= shift;
 	$self->_expected_token(KEYWORD, 'SERVICE');
@@ -1905,8 +1942,9 @@ sub __close_bgp_with_filters {
 	my $self	= shift;
 	my @filters		= splice(@{ $self->{filters} });
 	if (@filters) {
-		my $cont	= $self->_pop_pattern_container;
+		my ($cont, $hints)	= $self->_pop_pattern_container;
 		my $ggp		= $self->_new_join(@$cont);
+		$ggp->hints($hints);
 		$self->_push_pattern_container;
 		# my $ggp	= $self->_remove_pattern();
 		unless ($ggp) {
@@ -2032,6 +2070,9 @@ sub _FunctionCall {
 	my $self	= shift;
 	$self->_IRIref;
 	my ($iri)	= splice(@{ $self->{_stack} });
+	if (my $func = Attean->get_global_aggregate($iri)) {
+	
+	}
 	
 	my @args	= $self->_ArgList;
 
@@ -2083,7 +2124,7 @@ sub _ConstructTemplate {
 	}
 
 	$self->_expected_token(RBRACE);
-	my $cont	= $self->_pop_pattern_container;
+	(my $cont, undef)	= $self->_pop_pattern_container; # ignore hints in a construct template
 	$self->{build}{construct_triples}	= $cont;
 }
 
@@ -2958,8 +2999,16 @@ sub _BrackettedExpression {
 
 sub _Aggregate {
 	my $self	= shift;
-	my $t		= $self->_expected_token(KEYWORD);
-	my $op		= $t->value;
+	
+	my $op;
+	my $custom_agg_iri;
+	if (scalar(@_)) {
+		$custom_agg_iri		= shift->value;
+		$op	= 'CUSTOM';
+	} else {
+		my $t	= $self->_expected_token(KEYWORD);
+		$op		= $t->value;
+	}
 	$self->_expected_token(LPAREN);
 	my $distinct	= 0;
 	if ($self->_optional_token(KEYWORD, 'DISTINCT')) {
@@ -3000,6 +3049,7 @@ sub _Aggregate {
 					children	=> [@expr],
 					scalar_vars	=> \%options,
 					variable	=> $var,
+					custom_iri	=> $custom_agg_iri
 				);
 	$self->{build}{__aggregate}{ $name }	= [ $var, $agg ];
 	my $expr	= Attean::ValueExpression->new(value => $var);
@@ -3133,6 +3183,10 @@ sub _IRIrefOrFunction {
 	$self->_IRIref;
 	if ($self->_ArgList_test) {
 		my ($iri)	= splice(@{ $self->{_stack} });
+		if (my $func = Attean->get_global_aggregate($iri->value)) {
+			# special-case: treat this as an aggregate invocation instead of a scalar function call, since there is a custom aggregate registered
+			return $self->_Aggregate($iri);
+		}
 		my @args	= $self->_ArgList;
 		if ($iri->value =~ m<^http://www[.]w3[.]org/2001/XMLSchema#(?:integer|decimal|float|double|boolean|string|dateTime)$>) {
 			my $expr	= Attean::CastExpression->new( children => \@args, datatype => $iri );
@@ -3534,17 +3588,25 @@ sub _peek_pattern {
 	return $pattern;
 }
 
+sub _add_hint {
+	my $self	= shift;
+	my $hints	= shift;
+	push( @{ $self->{ _pattern_container_hints_stack }[0] }, $hints );
+}
+
 sub _push_pattern_container {
 	my $self	= shift;
 	my $cont	= [];
 	unshift( @{ $self->{ _pattern_container_stack } }, $cont );
+	unshift( @{ $self->{ _pattern_container_hints_stack } }, [] );
 	return $cont;
 }
 
 sub _pop_pattern_container {
 	my $self	= shift;
+	my $hints	= shift( @{ $self->{ _pattern_container_hints_stack } } );
 	my $cont	= shift( @{ $self->{ _pattern_container_stack } } );
-	return $cont;
+	return ($cont, $hints);
 }
 
 sub _add_stack {
@@ -3806,7 +3868,7 @@ sub _token_error {
 	croak $message;
 }
 
-package AtteanX::Parser::SPARQL::ObjectWrapper 0.031;
+package AtteanX::Parser::SPARQL::ObjectWrapper 0.032;
 
 use strict;
 use warnings;

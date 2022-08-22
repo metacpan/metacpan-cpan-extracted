@@ -205,6 +205,7 @@ sub open {
     my $throw;
     my $error = "Can't open $path: $!";
     $throw = $self->throw;
+    $throw->name('on.open');
     $throw->message($error);
     $throw->stash(path => $path);
     $throw->error;
@@ -224,6 +225,7 @@ sub mkcall {
     my $throw;
     my $error = "Can't mkcall $path: " . ($! ? "$!" : "exit code ($?)");
     $throw = $self->throw;
+    $throw->name('on.mkcall');
     $throw->message($error);
     $throw->stash(path => $path);
     $throw->error;
@@ -243,6 +245,7 @@ sub mkdir {
     my $throw;
     my $error = "Can't mkdir $path: $!";
     $throw = $self->throw;
+    $throw->name('on.mkdir');
     $throw->message($error);
     $throw->stash(path => $path);
     $throw->error;
@@ -284,6 +287,7 @@ sub mkfile {
     my $throw;
     my $error = "Can't mkfile $path: $!";
     $throw = $self->throw;
+    $throw->name('on.mkfile');
     $throw->message($error);
     $throw->stash(path => $path);
     $throw->error;
@@ -337,6 +341,7 @@ sub read {
     my $throw;
     my $error = "Can't read $path: $!";
     $throw = $self->throw;
+    $throw->name('on.read.open');
     $throw->message($error);
     $throw->stash(path => $path);
     $throw->error;
@@ -346,6 +351,7 @@ sub read {
     my $throw;
     my $error = "Can't binmode $path: $!";
     $throw = $self->throw;
+    $throw->name('on.read.binmode');
     $throw->message($error);
     $throw->stash(binmode => $binmode);
     $throw->stash(path => $path);
@@ -363,6 +369,7 @@ sub read {
     my $throw;
     my $error = "Can't read from file $path: $!";
     $throw = $self->throw;
+    $throw->name('on.read.error');
     $throw->message($error);
     $throw->stash(path => $path);
     $throw->error;
@@ -394,6 +401,7 @@ sub rmdir {
     my $throw;
     my $error = "Can't rmdir $path: $!";
     $throw = $self->throw;
+    $throw->name('on.rmdir');
     $throw->message($error);
     $throw->stash(path => $path);
     $throw->error;
@@ -477,6 +485,7 @@ sub unlink {
     my $throw;
     my $error = "Can't unlink $path: $!";
     $throw = $self->throw;
+    $throw->name('on.unlink');
     $throw->message($error);
     $throw->stash(path => $path);
     $throw->error;
@@ -494,6 +503,7 @@ sub write {
     my $throw;
     my $error = "Can't write $path: $!";
     $throw = $self->throw;
+    $throw->name('on.write.open');
     $throw->message($error);
     $throw->stash(path => $path);
     $throw->error;
@@ -503,6 +513,7 @@ sub write {
     my $throw;
     my $error = "Can't binmode $path: $!";
     $throw = $self->throw;
+    $throw->name('on.write.binmode');
     $throw->message($error);
     $throw->stash(binmode => $binmode);
     $throw->stash(path => $path);
@@ -514,6 +525,7 @@ sub write {
     my $throw;
     my $error = "Can't write to file $path: $!";
     $throw = $self->throw;
+    $throw->name('on.write.error');
     $throw->message($error);
     $throw->stash(path => $path);
     $throw->error;

@@ -11,6 +11,8 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/autocomplete.t',
+    't/file_upload.t',
+    't/file_upload.txt',
     't/find_input.t',
     't/form-label.t',
     't/form-maxlength.t',

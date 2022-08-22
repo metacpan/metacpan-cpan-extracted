@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Venus::Class;
+use Venus::Class 'base';
 
 base 'Venus::Number';
 

@@ -9,10 +9,10 @@ use feature qw( postderef signatures );
 use namespace::autoclean;
 use autodie;
 
-use Carp qw( confess );
+use Carp                  qw( confess );
 use Data::Dumper::Concise qw( Dumper );
-use JSON::MaybeXS qw( decode_json );
-use List::AllUtils qw( max uniq );
+use JSON::MaybeXS         qw( decode_json );
+use List::AllUtils        qw( max uniq );
 use Locale::Codes::Language
     qw( language_code2code LOCALE_LANG_ALPHA_2 LOCALE_LANG_ALPHA_3 );
 use ModuleGenerator::Locale;
@@ -106,7 +106,6 @@ sub run ($self) {
         or confess $!;
 
     $self->_clean_old_data;
-    $self->_locales;
     $self->_write_data_files;
     $self->_write_catalog_pm;
     $self->_write_pod_files;

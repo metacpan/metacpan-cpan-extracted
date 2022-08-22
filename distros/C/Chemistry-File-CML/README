@@ -1,0 +1,32 @@
+Chemistry/File/CML    version 0.11
+==================================
+
+This module reads CML (Chemical Markup Language) files. 
+
+The CML module automatically registers the 'cml' format with Chemistry::Mol,
+so that molfiles may be identified and read by Chemistry::Mol::read_mol().
+
+CHANGES SINCE VERSION 0.10
+        - Specified dependency on XML::LibXML.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Chemistry::Mol      0.35
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2022 Andrius Merkys <merkys@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

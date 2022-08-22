@@ -90,6 +90,10 @@ use Test::More;
     my $source = 'class MyClass : interface_t { has foo : int; }';
     compile_not_ok($source, qr/The interface can't have fields/);
   }
+  {
+    my $source = 'class MyClass : interface_t  { interface MyClass; required method foo : void (); }';
+    compile_not_ok($source, q|The interface name specified by the interface statement must be different from the name of the current interface|);
+  }
 }
 
 # Pointer Class
@@ -131,20 +135,8 @@ use Test::More;
     compile_not_ok($source, qr/The method defined in the interface must be an instance method/);
   }
   {
-    my $source = 'class MyClass :interface_t { native method foo : void (); }';
-    compile_not_ok($source, qr/The method defined in the interface can't have the method descriptor "native"/);
-  }
-  {
-    my $source = 'class MyClass :interface_t { precompile method foo : void (); }';
-    compile_not_ok($source, qr/The method defined in the interface can't have the method descriptor "precompile"/);
-  }
-  {
     my $source = 'class MyClass { required method foo : void () { } }';
     compile_not_ok($source, qr/The method defined in the class can't have the method descriptor "required"/);
-  }
-  {
-    my $source = 'class MyClass { native method foo : void () { } }';
-    compile_not_ok($source, qr/The native method can't have the block/);
   }
   {
     my $source = 'class MyClass { method foo : void () { } method foo : void () { } }';
@@ -308,7 +300,7 @@ use Test::More;
 {
   {
     my $source = 'class MyClass { interface Complex_2d; }';
-    compile_not_ok($source, qr/The operand of the interface statement msut be an interface type/);
+    compile_not_ok($source);
   }
 }
 

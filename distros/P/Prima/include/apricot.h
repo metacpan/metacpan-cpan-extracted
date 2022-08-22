@@ -282,6 +282,11 @@ extern void *
 memmem(const void *l, size_t l_len, const void *s, size_t s_len);
 #endif
 
+#ifndef HAVE_STRLCPY
+extern size_t
+strlcpy(char * dst, const char * src, size_t dstsize);
+#endif
+
 
 #define alloc1(typ)     ((typ*)malloc(sizeof(typ)))
 #define allocn(typ,n)   ((typ*)malloc((n)*sizeof(typ)))
@@ -1503,6 +1508,9 @@ extern int
 list_first_that( PList self, void * action, void * params);
 
 extern int
+list_grep( PList self, void * action, void * params);
+
+extern int
 list_index_of( PList self, Handle item);
 
 /* utf8 */
@@ -1681,6 +1689,7 @@ typedef struct _ObjectOptions_ {
 	unsigned optScaleChildren       : 1;
 	unsigned optUTF8_helpContext    : 1;
 	unsigned optPreserveType        : 1;   /* Image */
+	unsigned optReadonlyPaint       : 1;
 	unsigned optAutoPopup           : 1;   /* Popup */
 	unsigned optActive              : 1;   /* Timer */
 	unsigned optOwnerIcon           : 1;   /* Window */
@@ -2771,8 +2780,9 @@ typedef enum {
 	ropNoOper,           /* dest = dest */
 
 	/* Porter-Duff operators for 32-bit ARGB image operations */
-	ropSrcOver = 0, /* save value as ropCopy, to serve as a default */
-	ropXor = ropXorPut, /* so they have same value */
+	ropBlend = ropCopyPut,/* save value as ropCopy, to serve as a default */
+	ropXor = ropXorPut,  /* so they have same value */
+	ropSrcOver,
 	ropDstOver,
 	ropSrcCopy,
 	ropDstCopy,
@@ -2809,7 +2819,6 @@ typedef enum {
 	ropDstAlpha           = 0x2000000,
 	ropDstAlphaShift      = 16,
 	ropConstantAlpha      = 0x3000000,
-	ropPremultiply        = 0x4000000,
 	ropConstantColor      = 0x8000000
 } ROP;
 
@@ -2825,10 +2834,12 @@ ROP(Invert) ROP(XorPut) ROP(NotAnd) ROP(AndPut) ROP(NotXor) ROP(NoOper)
 ROP(NotSrcOr) ROP(CopyPut) ROP(NotDestOr) ROP(OrPut) ROP(Whiteness)
 ROP(NotSrcXor) ROP(NotDestXor)
 
+ROP(Blend)
+
 ROP(SrcOver) ROP(SrcCopy) ROP(SrcIn) ROP(SrcOut) ROP(SrcAtop)
 ROP(DstOver) ROP(DstCopy) ROP(DstIn) ROP(DstOut) ROP(DstAtop)
 ROP(Xor) ROP(Clear)
-	
+
 ROP(Add) ROP(Multiply) ROP(Screen) ROP(Overlay)
 ROP(Darken) ROP(Lighten) ROP(ColorDodge) ROP(ColorBurn)
 ROP(HardLight) ROP(SoftLight) ROP(Difference) ROP(Exclusion)
@@ -2836,7 +2847,7 @@ ROP(HardLight) ROP(SoftLight) ROP(Difference) ROP(Exclusion)
 ROP(SrcAlpha) ROP(SrcAlphaShift)
 ROP(DstAlpha) ROP(DstAlphaShift)
 ROP(PorterDuffMask) ROP(ConstantAlpha) ROP(AlphaCopy)
-ROP(Premultiply) ROP(ConstantColor)
+ROP(ConstantColor)
 END_TABLE(rop,UV)
 #undef ROP
 
@@ -3200,8 +3211,9 @@ IST(Hermite)
 IST(Cubic)
 #define    istGaussian           11
 IST(Gaussian)
-END_TABLE(ist,UV)
 #define istMax istGaussian
+IST(Max)
+END_TABLE(ist,UV)
 #undef IST
 
 /* Icon auto masking types */
@@ -3811,6 +3823,14 @@ apc_gp_get_text_out_baseline( Handle self);
 extern Point
 apc_gp_get_transform( Handle self);
 
+typedef void GCStorageFunction( Handle self, void * user_data, unsigned int user_data_size, Bool in_paint);
+
+extern Bool
+apc_gp_push(Handle self, GCStorageFunction * destructor, void * user_data, unsigned int user_data_size);
+
+extern Bool
+apc_gp_pop(Handle self, void *user_data);
+
 extern Bool
 apc_gp_set_alpha( Handle self, int alpha);
 
@@ -3825,6 +3845,9 @@ apc_gp_set_clip_rect( Handle self, Rect clipRect);
 
 extern Bool
 apc_gp_set_color( Handle self, Color color);
+
+extern Bool
+apc_gp_set_fill_image( Handle self, Handle image);
 
 extern Bool
 apc_gp_set_fill_mode( Handle self, int fillMode);

@@ -4,7 +4,7 @@ use Carp qw(croak);
 
 use vars qw( $VERSION );
 use POSIX;
-$VERSION = '0.12';
+$VERSION = '0.13';
 
 sub new {
   my ($class,$name,%args) = @_;

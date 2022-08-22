@@ -8,8 +8,15 @@ use Password::OWASP::Scrypt;
 use Authen::Passphrase::Scrypt;
 
 my $pwo = Password::OWASP::Scrypt->new();
-
 isa_ok($pwo, 'Password::OWASP::Scrypt');
+
+is($pwo->cost, 12, "Default cost factor of 12");
+
+$pwo = Password::OWASP::Scrypt->new(
+    cost => 4
+);
+isa_ok($pwo, 'Password::OWASP::Scrypt');
+is($pwo->cost, 4, "Changed the cost to 4");
 
 my $crypted = $pwo->crypt_password('demo');
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension Form::Tiny::Plugin::Diva.
 
+1.03 Fri Aug 12 2022
+	- fix tests for Form::Diva >= 1.04
+	- switch to Dist::Zilla
+
 1.02 Fri May 6 2022
 	- fix circular reference
 

@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace histogram.
 
@@ -34,22 +34,22 @@ sub TO_JSON {
 }
 
 has currentbin => (
-    is  => "rw",
-    isa => enum( [ "include", "exclude", "half" ] ),
+    is            => "rw",
+    isa           => enum( [ "include", "exclude", "half" ] ),
     documentation =>
       "Only applies if cumulative is enabled. Sets whether the current bin is included, excluded, or has half of its value included in the current cumulative value. *include* is the default for compatibility with various other tools, however it introduces a half-bin bias to the results. *exclude* makes the opposite half-bin bias, and *half* removes it.",
 );
 
 has direction => (
-    is  => "rw",
-    isa => enum( [ "increasing", "decreasing" ] ),
+    is            => "rw",
+    isa           => enum( [ "increasing", "decreasing" ] ),
     documentation =>
       "Only applies if cumulative is enabled. If *increasing* (default) we sum all prior bins, so the result increases from left to right. If *decreasing* we sum later bins so the result decreases from left to right.",
 );
 
 has enabled => (
-    is  => "rw",
-    isa => "Bool",
+    is            => "rw",
+    isa           => "Bool",
     documentation =>
       "If true, display the cumulative distribution by summing the binned values. Use the `direction` and `centralbin` attributes to tune the accumulation method. Note: in this mode, the *density* `histnorm` settings behave the same as their equivalents without *density*: ** and *density* both rise to the number of data points, and *probability* and *probability density* both rise to the number of sample points.",
 );
@@ -69,7 +69,7 @@ Chart::Plotly::Trace::Histogram::Cumulative - This attribute is one of the possi
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -126,7 +126,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

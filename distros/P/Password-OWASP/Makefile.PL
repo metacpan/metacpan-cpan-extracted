@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "Authen::Passphrase" => 0,
     "Authen::Passphrase::Argon2" => 0,
     "Authen::Passphrase::BlowfishCrypt" => 0,
-    "Authen::Passphrase::Scrypt" => 0,
+    "Authen::Passphrase::Scrypt" => "0.002",
     "Digest::SHA" => 0,
     "Moose" => 0,
     "Moose::Role" => 0,
@@ -29,6 +29,7 @@ my %WriteMakefileArgs = (
     "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
+    "Authen::Passphrase::Scrypt" => "0.002",
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
@@ -37,7 +38,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "Test::Most" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,7 +49,7 @@ my %FallbackPrereqs = (
   "Authen::Passphrase" => 0,
   "Authen::Passphrase::Argon2" => 0,
   "Authen::Passphrase::BlowfishCrypt" => 0,
-  "Authen::Passphrase::Scrypt" => 0,
+  "Authen::Passphrase::Scrypt" => "0.002",
   "Digest::SHA" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,

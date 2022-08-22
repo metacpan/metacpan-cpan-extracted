@@ -12,7 +12,7 @@ use Config ();
 use Alien::Build::Log;
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '2.52'; # VERSION
+our $VERSION = '2.59'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -531,6 +531,8 @@ sub download
             my($archive) = $list[0];
             if(-d $archive)
             {
+              # TODO: this is probably a bug that we don't set
+              # download or compelte properties?
               $self->log("single dir, assuming directory");
             }
             else
@@ -556,6 +558,12 @@ sub download
       'download',
     );
 
+    # experimental and undocumented for now
+    if($self->meta->has_hook('check_download'))
+    {
+      $self->meta->call_hook(check_download => $self);
+    }
+
     return $self if $valid;
   }
   else
@@ -563,7 +571,15 @@ sub download
     # This will call the default download hook
     # defined in Core::Download since the recipe
     # does not provide a download hook
-    return $self->_call_hook('download');
+    my $ret = $self->_call_hook('download');
+
+    # experimental and undocumented for now
+    if($self->meta->has_hook('check_download'))
+    {
+      $self->meta->call_hook(check_download => $self);
+    }
+
+    return $self;
   }
 
   die "download failed";
@@ -574,6 +590,54 @@ sub fetch
 {
   my $self = shift;
   $self->_call_hook( 'fetch' => @_ );
+}
+
+
+sub check_digest
+{
+  my($self, $file) = @_;
+
+  return '' unless $self->meta_prop->{check_digest};
+
+  unless(ref($file) eq 'HASH')
+  {
+    my $path = Path::Tiny->new($file);
+    $file = {
+      type     => 'file',
+      filename => $path->basename,
+      path     => "$path",
+      tmp      => 0,
+    };
+  }
+
+  if(defined $file->{path})
+  {
+    # there is technically a race condition here
+    die "Missing file in digest check: @{[ $file->{filename} ]}" unless -f $file->{path};
+    die "Unreadable file in digest check: @{[ $file->{filename} ]}" unless -r $file->{path};
+  }
+  else
+  {
+    die "File is wrong type" unless defined $file->{type} && $file->{type} eq 'file';
+    die "File has no filename" unless defined $file->{filename};
+    die "@{[ $file->{filename} ]} has no content" unless defined $file->{content};
+  }
+
+  my $filename = $file->{filename};
+  my $signature = $self->meta_prop->{digest}->{$filename} || $self->meta_prop->{digest}->{'*'};
+
+  die "No digest for $filename" unless defined $signature && ref $signature eq 'ARRAY';
+
+  my($algo, $expected) = @$signature;
+
+  if($self->meta->call_hook( check_digest => $self, $file, $algo, $expected ))
+  {
+    return 1;
+  }
+  else
+  {
+    die "No plugin provides digest algorithm for $algo";
+  }
 }
 
 
@@ -688,7 +752,7 @@ sub build
       {
         foreach my $key (keys %env_meta)
         {
-          $env_meta{$key} = $self->meta->interpolator->interpolate($env_meta{$key});
+          $env_meta{$key} = $self->meta->interpolator->interpolate($env_meta{$key}, $self);
         }
       }
 
@@ -995,6 +1059,7 @@ sub around_hook
   }
 }
 
+
 sub after_hook
 {
   my($self, $name, $code) = @_;
@@ -1007,6 +1072,7 @@ sub after_hook
     }
   );
 }
+
 
 sub before_hook
 {
@@ -1190,7 +1256,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 2.52
+version 2.59
 
 =head1 SYNOPSIS
 
@@ -1347,10 +1413,14 @@ L<alienfile> then it will be set to true.
 
 =item destdir
 
-Use the C<DESTDIR> environment variable to stage your install before
-copying the files into C<blib>.  This is the preferred method of
-installing libraries because it improves reliability.  This technique
-is supported by C<autoconf> and others.
+Some plugins (L<Alien::Build::Plugin::Build::Autoconf> for example) support
+installing via C<DESTDIR>.  They will set this property to true if they
+plan on doing such an install.  This helps L<Alien::Build> find the staged
+install files and how to locate them.
+
+If available, C<DESTDIR> is used to stage install files in a sub directory before
+copying the files into C<blib>.  This is generally preferred method
+if available.
 
 =item destdir_filter
 
@@ -1473,15 +1543,17 @@ The prefix as understood by autoconf.  This is only different on Windows
 Where MSYS is used and paths like C<C:/foo> are  represented as C</C/foo>
 which are understood by the MSYS tools, but not by Perl.  You should
 only use this if you are using L<Alien::Build::Plugin::Autoconf> in
-your L<alienfile>.
+your L<alienfile>.  This is set during before the build hook is run.
 
 =item download
 
 The location of the downloaded archive (tar.gz, or similar) or directory.
+This will be undefined until the archive is actually downloaded.
 
 =item env
 
-Environment variables to override during the build stage.
+Environment variables to override during the build stage.  Plugins are
+free to set additional overrides using this hash.
 
 =item extract
 
@@ -1492,6 +1564,8 @@ and thus this property may change.
 
 =item old
 
+[deprecated]
+
 Hash containing information on a previously installed Alien of the same
 name, if available.  This may be useful in cases where you want to
 reuse the previous install if it is still sufficient.
@@ -1500,10 +1574,14 @@ reuse the previous install if it is still sufficient.
 
 =item prefix
 
+[deprecated]
+
 The prefix for the previous install.  Versions prior to 1.42 unfortunately
 had this in typo form of C<preifx>.
 
 =item runtime
+
+[deprecated]
 
 The runtime properties from the previous install.
 
@@ -1511,7 +1589,12 @@ The runtime properties from the previous install.
 
 =item patch
 
-Directory with patches.
+Directory with patches, if available.  This will be C<undef> if there
+are no patches.  When initially installing an alien this will usually
+be a sibling of the C<alienfile>, a directory called C<patch>.  Once
+installed this will be in the share directory called C<_alien/patch>.
+The former is useful for rebuilding an alienized package using
+L<af>.
 
 =item prefix
 
@@ -1578,21 +1661,25 @@ The version of L<Alien::Build> used to install the library or tool.
 
 Alternate configurations.  If the alienized package has multiple
 libraries this could be used to store the different compiler or
-linker flags for each library.
+linker flags for each library.  Typically this will be set by a
+plugin in the gather stage (for either share or system installs).
 
 =item cflags
 
-The compiler flags
+The compiler flags.  This is typically set by a plugin in the
+gather stage (for either share or system installs).
 
 =item cflags_static
 
-The static compiler flags
+The static compiler flags.  This is typically set by a plugin in the
+gather stage (for either share or system installs).
 
 =item command
 
 The command name for tools where the name my differ from platform to
 platform.  For example, the GNU version of make is usually C<make> in
-Linux and C<gmake> on FreeBSD.
+Linux and C<gmake> on FreeBSD.  This is typically set by a plugin in the
+gather stage (for either share or system installs).
 
 =item ffi_name
 
@@ -1600,7 +1687,8 @@ The name DLL or shared object "name" to use when searching for dynamic
 libraries at runtime.  This is passed into L<FFI::CheckLib>, so if
 your library is something like C<libarchive.so> or C<archive.dll> you
 would set this to C<archive>.  This may be a string or an array of
-strings.
+strings.  This is typically set by a plugin in the gather stage
+(for either share or system installs).
 
 =item ffi_checklib
 
@@ -1627,9 +1715,21 @@ flag:
 
 =back
 
+This is typically set by a plugin in the gather stage
+(for either share or system installs).
+
+=item inline_auto_include
+
+[version 2.53]
+
+This property is an array reference of C code that will be passed into
+L<Inline::C> to make sure that appropriate headers are automatically
+included.  See L<Inline::C/auto_include> for details.
+
 =item install_type
 
-The install type.  Is one of:
+The install type.  This is set by AB core after the probe hook is
+executed.  Is one of:
 
 =over 4
 
@@ -1649,11 +1749,13 @@ and built.
 
 =item libs
 
-The library flags
+The library flags.  This is typically set by a plugin in the
+gather stage (for either share or system installs).
 
 =item libs_static
 
-The static library flags
+The static library flags.  This is typically set by a plugin in the
+gather stage (for either share or system installs).
 
 =item perl_module_version
 
@@ -1667,7 +1769,8 @@ The final install root.  This is usually they share directory.
 
 =item version
 
-The version of the library or tool
+The version of the library or tool.  This is typically set by a plugin in the
+gather stage (for either share or system installs).
 
 =back
 
@@ -1834,6 +1937,38 @@ are not supported.
 
 =back
 
+=head2 check_digest
+
+[experimental]
+
+ my $bool = $build->check_digest($path);
+
+Checks any cryptographic signatures for the given file.  The
+file is specified by C<$path> which may be one of:
+
+=over 4
+
+=item string
+
+Containing the path to the file to be checked.
+
+=item L<Path::Tiny>
+
+Containing the path to the file to be checked.
+
+=item C<HASH>
+
+A Hash reference containing information about a file.  See
+L<the fetch hook|Alien::Build::Manual::PluginAuthor/"fech hook"> for details
+on the format.
+
+=back
+
+Returns true if the cryptographic signature matches, false if cryptographic
+signatures are disabled.  Will throw an exception if the signature does not
+match, or if no plugin provides the correct algorithm for checking the
+signature.
+
 =head2 decode
 
  my $decoded_res = $build->decode($res);
@@ -1976,8 +2111,8 @@ register its own hook with that name.
 
 =head2 around_hook
 
- $build->meta->around_hook($hook, $code);
- Alien::Build->meta->around_hook($name, $code);
+ $build->meta->around_hook($hook_name, $code);
+ Alien::Build->meta->around_hook($hook_name, $code);
 
 Wrap the given hook with a code reference.  This is similar to a L<Moose>
 method modifier, except that it wraps around the given hook instead of
@@ -2000,6 +2135,26 @@ a method.  For example, this will add a probe system requirement:
      }
    },
  );
+
+=head2 after_hook
+
+ $build->meta->after_hook($hook_name, sub {
+   my(@args) = @_;
+   ...
+ });
+
+Execute the given code reference after the hook.  The original
+arguments are passed into the code reference.
+
+=head2 before_hook
+
+ $build->meta->before_hook($hook_name, sub {
+   my(@args) = @_;
+   ...
+ });
+
+Execute the given code reference before the hook.  The original
+arguments are passed into the code reference.
 
 =head2 apply_plugin
 

@@ -1,0 +1,51 @@
+{
+   "abstract" : "CML reader",
+   "author" : [
+      "Andrius Merkys <merkys@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Chemistry-File-CML",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Chemistry::Isotope" : "0",
+            "Chemistry::Pattern" : "0",
+            "Chemistry::Ring" : "0.19"
+         },
+         "requires" : {
+            "Chemistry::Mol" : "0.35",
+            "XML::LibXML" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://search.cpan.org/dist/Chemistry-File-CML",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/perlmol/chemistry-file-cml.git",
+         "web" : "https://github.com/perlmol/chemistry-file-cml"
+      }
+   },
+   "version" : "0.11",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Splom::Dimension::Axis;
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace splom.
 
@@ -44,15 +44,15 @@ has label => ( is            => "rw",
 );
 
 has name => (
-    is  => "rw",
-    isa => "Str",
+    is            => "rw",
+    isa           => "Str",
     documentation =>
       "When used in a template, named items are created in the output figure in addition to any items the figure already has in this array. You can modify these items in the output figure by making your own item with `templateitemname` matching this `name` alongside your modifications (including `visible: false` or `enabled: false` to hide it). Has no effect outside of a template.",
 );
 
 has templateitemname => (
-    is  => "rw",
-    isa => "Str",
+    is            => "rw",
+    isa           => "Str",
     documentation =>
       "Used to refer to a named item in this array in the template. Named items from the template will be created even without a matching item in the input figure, but you can modify one by making an item with `templateitemname` matching its `name`, alongside your modifications (including `visible: false` or `enabled: false` to hide it). If there is no template or no matching item, this item will be hidden unless you explicitly show it with `visible: true`.",
 );
@@ -64,12 +64,12 @@ has values => ( is            => "rw",
 
 has valuessrc => ( is            => "rw",
                    isa           => "Str",
-                   documentation => "Sets the source reference on plot.ly for  values .",
+                   documentation => "Sets the source reference on Chart Studio Cloud for `values`.",
 );
 
 has visible => (
-    is  => "rw",
-    isa => "Bool",
+    is            => "rw",
+    isa           => "Bool",
     documentation =>
       "Determines whether or not this dimension is shown on the graph. Note that even visible false dimension contribute to the default grid generate by this splom trace.",
 );
@@ -89,7 +89,7 @@ Chart::Plotly::Trace::Splom::Dimension - This attribute is one of the possible o
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -162,7 +162,7 @@ Sets the dimension values to be plotted.
 
 =item * valuessrc
 
-Sets the source reference on plot.ly for  values .
+Sets the source reference on Chart Studio Cloud for `values`.
 
 =item * visible
 
@@ -176,7 +176,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

@@ -1,18 +1,16 @@
-#!/usr/bin/perl
-
-use lib '../lib/blib';
+use strict; use warnings;
 use Stat::lsMode qw(format_mode file_mode);
 
 print "1..14\n";
 
-foreach $i (0 .. 7) {
+foreach my $i (0 .. 7) {
   my $t = $i * 73;
   my $mode = format_mode(oct("0$i$i$i"));
   $mode =~ s/^\?//;
   $mode =~ tr/-/0/;
   $mode =~ tr/0/1/c;
   my $total = 0;
-  foreach $bit (split //, $mode) {
+  foreach my $bit (split //, $mode) {
     $total = $total * 2 + $bit;
   }
   if ($total/73 != $i) {
@@ -23,7 +21,7 @@ foreach $i (0 .. 7) {
 }
 
 umask 000;
-$dir = "/tmp/SlsM.$$." . time;
+my $dir = "/tmp/SlsM.$$." . time;
 
 if (mkdir $dir, 0700) {
   print (((file_mode($dir) eq 'drwx------') ? '' : 'not '), "ok 9\n");

@@ -6,7 +6,7 @@ use 5.008004;
 use Config;
 
 # ABSTRACT: Documentation and tools for using Platypus with the Windows API
-our $VERSION = '1.58'; # VERSION
+our $VERSION = '2.00'; # VERSION
 
 
 sub abi
@@ -197,15 +197,15 @@ FFI::Platypus::Lang::Win32 - Documentation and tools for using Platypus with the
 
 =head1 VERSION
 
-version 1.58
+version 2.00
 
 =head1 SYNOPSIS
 
  use utf8;
- use FFI::Platypus 1.35;
+ use FFI::Platypus 2.00;
  
  my $ffi = FFI::Platypus->new(
-   api  => 1,
+   api  => 2,
    lib  => [undef],
  );
  

@@ -5,8 +5,6 @@ use Test::More;
 use Prima::sys::Test;
 use Prima qw(Application);
 
-plan tests => 1835;
-
 my ($src, $mask, $dst);
 my $can_argb = $::application->get_system_value(sv::LayeredWidgets);
 
@@ -176,7 +174,7 @@ sub test_dst
 	$mask = Prima::Image->create( width => 4, height => 1, type => im::BW);
 	$src = Prima::Image->create( width => 4, height => 1, type => im::BW);
 	test_mask( "1-bit grayscale xor mask / 1-bit and mask on $target");
-	for my $bit ( 4, 8, 24) {
+	for my $bit ( 1, 4, 8, 24) {
 		$src = Prima::Image->create( width => 4, height => 1, type => $bit);
 		test_mask( "$bit-bit xor mask / 1-bit and mask on $target");
 	}
@@ -255,17 +253,17 @@ SKIP: {
 	$icon->combine($src,$mask);
 
 	fill_dst($dst);
-	$dst->rop(rop::SrcOver);
+	$dst->rop(rop::Blend);
 	test_blend_pixels($icon, $descr);
 
 	fill_dst($dst);
-	$dst->rop(rop::SrcOver);
+	$dst->rop(rop::Blend);
 	$icon->begin_paint;
 	test_blend_pixels($icon, "$descr (in paint)");
 	$icon->end_paint;
 
 	fill_dst($dst);
-	$dst->rop(rop::SrcOver);
+	$dst->rop(rop::Blend);
 	test_blend_pixels($icon->bitmap, "$descr (layered)");
 }}
 
@@ -293,7 +291,7 @@ sub test_blend_native
 	$icon->combine($src,$mask);
 
 	fill_dst($dst);
-	$dst->rop(rop::SrcOver);
+	$dst->rop(rop::Blend);
 
 	my $ok = 1;
 	$ok &= $dst->put_image(0,0,$icon);
@@ -359,9 +357,33 @@ $dst->end_paint;
 # .buffered is also not guaranteed, but for 8 pixel widget that shouldn't be a problem
 #
 # also, do test inside onPaint to make sure it's on the buffer, not on the screen
-$dst = Prima::Widget->create( width => 4, height => 2, buffered => 1, onPaint => sub {
-	return if get_flag;
+
+sub ready_to_paint
+{
+	return 0 if get_flag;
+	my $self = shift;
+	my $ok;
+	my @sz = $self-> size;
+	return 0 unless $sz[0] == 4 && $sz[1] == 2;
+	for ( 0..4 ) {
+		$self->color(cl::Black);
+		$self->bar(0,0,$self->size);
+		goto AGAIN unless $self->pixel(0,0) == 0;
+		$self->color(cl::White);
+		$self->bar(0,0,$self->size);
+		goto AGAIN unless $self->pixel(3,1) != 0;
+		$ok = 1;
+		last;
+	AGAIN:
+		select(undef,undef,undef,0.1);
+	}
+	return 0 unless $ok;
 	set_flag;
+	return 1;
+}
+
+$dst = Prima::Widget->create( width => 4, height => 2, buffered => 1, centered => 1, onPaint => sub {
+	return unless ready_to_paint(@_);
 	test_dst("widget");
 });
 $dst->bring_to_front;
@@ -372,10 +394,9 @@ SKIP: {
 SKIP: {
     skip "no argb capability", 226 unless $can_argb;
     reset_flag;
-    $dst = Prima::Widget->create( width => 4, height => 2, buffered => 1, layered => 1, onPaint => sub {
-	return if get_flag;
-	set_flag;
-        test_dst("argb widget");
+    $dst = Prima::Widget->create( width => 4, height => 2, buffered => 1, layered => 1, centered => 1, onPaint => sub {
+	return unless ready_to_paint(@_);
+	test_dst("argb widget");
     });
 
     $dst->bring_to_front;
@@ -387,3 +408,35 @@ SKIP: {
     $dst = Prima::DeviceBitmap->create( width => 4, height => 2, type => dbt::Layered);
     test_dst("layered");
 }
+
+sub test_palette
+{
+	my $bits = shift;
+	$src = Prima::Image->create( width => 2, height => 2, type => $bits | im::GrayScale);
+	$dst = Prima::Image->create( width => 2, height => 2, type => $bits, palette => [ reverse @{ $src->palette } ] );
+	$src->pixel(0,0,0x00);
+	$src->pixel(0,1,0x30);
+	$src->pixel(1,0,0x80);
+	$src->pixel(1,1,0xff);
+	$dst->preserveType(0);
+	$dst->put_image( 0,0,$src );
+	is( $dst->type, $bits, "$bits bits, type preserved");
+	is( $dst->pixel(0,0), 0x000000, "$bits bits, case1");
+	is( $dst->pixel(0,1), ($bits == 4) ? 0x222222 : ($bits == 1 ? 0 : 0x303030), "$bits bits, case2");
+	is( $dst->pixel(1,0), ($bits == 4) ? 0x777777 : ($bits == 1 ? 0 : 0x808080), "$bits bits, case3");
+	is( $dst->pixel(1,1), 0xffffff, "$bits bits, case4");
+
+	$dst->put_image(1,0,$src);
+	is($dst->pixel(0,0),$dst->pixel(1,0), "$bits bits, offset 1,0");
+	is($dst->pixel(0,1),$dst->pixel(1,1), "$bits bits, offset 1,1");
+	$dst->put_image_indirect($src,0,0,1,0,1,2,1,2,rop::CopyPut);
+	my @cm = $src->colormap;
+	is($dst->pixel(0,0),$cm[$src->pixel(1,0) * ((1 << $bits) - 1) / 255], "$bits bits, offset 0,1");
+	is($dst->pixel(0,1),$cm[$src->pixel(1,1) * ((1 << $bits) - 1) / 255], "$bits bits, offset 1,1");
+}
+
+test_palette(1);
+test_palette(4);
+test_palette(8);
+
+done_testing;

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.66;
+package Object::Pad 0.68;
 
 use v5.14;
 use warnings;
@@ -388,11 +388,11 @@ or methods provided by that role.
 I<Since version 0.33.>
 
    role Name {
-      field $field;
+      field $f;
 
-      BUILD { $field = "a value" }
+      BUILD { $f = "a value"; }
 
-      method field { return $field }
+      method field { return $f; }
    }
 
 I<Since version 0.57> a role can declare that it provides another role:
@@ -470,10 +470,10 @@ Generates a reader method to return the current value of the field. If no name
 is given, the name of the field is used. A single prefix character C<_> will
 be removed if present.
 
-   field $field :reader;
+   field $x :reader;
 
    # equivalent to
-   field $field;  method field { return $field }
+   field $x;  method x { return $x }
 
 I<Since version 0.55> these are permitted on any field type, but prior
 versions only allowed them on scalar fields. The reader method behaves
@@ -495,10 +495,10 @@ Generates a writer method to set a new value of the field from its arguments.
 If no name is given, the name of the field is used prefixed by C<set_>. A
 single prefix character C<_> will be removed if present.
 
-   field $field :writer;
+   field $x :writer;
 
    # equivalent to
-   field $field;  method set_field { $field = shift; return $self }
+   field $x;  method set_x { $x = shift; return $self }
 
 I<Since version 0.28> a generated writer method will return the object
 invocant itself, allowing a chaining style.
@@ -520,10 +520,10 @@ Generates an lvalue mutator method to return or set the value of the field.
 These are only permitted for scalar fields. If no name is given, the name of
 the field is used. A single prefix character C<_> will be removed if present.
 
-   field $field :mutator;
+   field $x :mutator;
 
    # equivalent to
-   field $field;  method field :lvalue { $field }
+   field $x;  method x :lvalue { $x }
 
 I<Since version 0.28> all of these generated accessor methods will include
 argument checking similar to that used by subroutine signatures, to ensure the
@@ -545,14 +545,14 @@ C<undef>). If no argument is passed (i.e. C<scalar @_> is false) then the
 field is not modified. In either case, the value of the field is then
 returned.
 
-   field $field :accessor;
+   field $x :accessor;
 
    # equivalent to
-   field $field;
+   field $x;
 
    method field {
-      $field = shift if @_;
-      return $field;
+      $x = shift if @_;
+      return $x;
    }
 
 =head3 :weak
@@ -564,7 +564,8 @@ contains a reference. This applies to within the constructor if C<:param> is
 given, and to a C<:writer> accessor method. Note that this I<only> applies to
 automatically generated code; not normal code written in regular method
 bodies. If you assign into the field variable you must remember to call
-C<Scalar::Util::weaken> yourself.
+C<Scalar::Util::weaken> (or C<builtin::weaken> on Perl 5.36 or above)
+yourself.
 
 =head3 :param, :param(NAME)
 
@@ -613,9 +614,9 @@ forbidden, though known-safe ones may be permitted in future.
 Loop control expressions that are known at compiletime to affect a loop that
 they appear within are permitted.
 
-   field $field { foreach(@list) { next; } }       # this is fine
+   field $x { foreach(@list) { next; } }       # this is fine
 
-   field $field { LOOP: while(1) { last LOOP; } }  # this is fine too
+   field $x { LOOP: while(1) { last LOOP; } }  # this is fine too
 
 =head2 has
 

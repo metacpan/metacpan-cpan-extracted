@@ -1,0 +1,103 @@
+Name: MintyCharger
+Revision: A
+Description: A curiously portable, USB-powered, and fully-featured, battery charger that supports all chemistries and voltages of rechargeable PP3 (9V) batteries, while fitting neatly inside an Altoids tin.
+Website: https://innoveworkshop.com/product/mintycharger
+Source-Control: https://github.com/innoveworkshop/MintyCharger/
+License: CC BY-NC-SA 4.0
+
+---
+
+Ceramic Capacitor:
+[ ]	6	C0805	(0.1u)	"Ceramic Capacitor"	[C0805]
+C1 C7 C8 C9 C10 C11
+
+[ ]	1	C0805	(1u)	"Ceramic Capacitor"	[C0805]
+C5
+
+[ ]	2	C0805	(DNP)	"Ceramic Capacitor"	[C0805]
+C2 C6
+
+Resistor:
+[ ]	1	R1206	(1)	"Resistor"	[R1206]
+R13
+
+[ ]	1	R1206	(10)	"Resistor"	[R1206]
+R8
+
+[ ]	1	R0805	(100)	"Resistor"	[R0805]
+R5
+
+[ ]	1	R0805	(100k)	"Resistor"	[R0805]
+R12
+
+[ ]	5	R0805	(10k)	"Resistor"	[R0805]
+R6 R10 R11 R16 R20
+
+[ ]	12	R0805	(1k)	"Resistor"	[R0805]
+R2 R4 R7 R9 R14 R15 R19 R23 R30 R31 R32 R33
+
+[ ]	11	R0805	(330)	"Resistor"	[R0805]
+R3 R17 R18 R21 R22 R24 R25 R26 R27 R28 R29
+
+[ ]	1	R0805	(DNP)	"Resistor"	[R0805]
+R1
+
+Polarized Capacitor:
+[ ]	1	CPOL-MCVVT016M101EA1L	(100u)	"Polarized Capacitor"	[PANASONIC_D]
+C3
+
+[ ]	1	CPOL-MCVVT016M470DA1L	(47u)	"Polarized Capacitor"	[PANASONIC_C]
+C4
+
+Inductor:
+[ ]	1	L-ELLCTP	(150u)	"Inductor"	[ELLCTP]
+L1
+
+Integrated Circuit:
+[ ]	2	74HC595D	"8-bit SHIFT REGISTER, output latch"	[SO16]
+IC1 IC2
+
+[ ]	2	LM258ADR	"LM258"	[SO08]
+U1 U2
+
+[ ]	1	PIC16F18325-I/SL	"Microchip PIC16F18325"	[SO14]
+U3
+
+LED:
+[ ]	5	LEDCHIP-LED0805	(BLUE)	"LED"	[CHIP-LED0805]
+LED6 LED13 LED14 LED15 LED16
+
+[ ]	3	LEDCHIP-LED0805	(GREEN)	"LED"	[CHIP-LED0805]
+LED5 LED8 LED12
+
+[ ]	4	LEDCHIP-LED0805	(RED)	"LED"	[CHIP-LED0805]
+LED1 LED2 LED7 LED9
+
+[ ]	4	LEDCHIP-LED0805	(YELLOW)	"LED"	[CHIP-LED0805]
+LED3 LED4 LED10 LED11
+
+Transistor:
+[ ]	1	IRLML6346TRPBF	"IRLML6346TRPBF"	[SOT23]
+Q1
+
+[ ]	1	NTD18N06LT4G	"NTD18N06LT4G"	[TO252]
+Q2
+
+Switch:
+[ ]	1	TACT-4PIN-SMT	(SELECT)	"4 Pin Tactile Switch"	[PTS645-SMT]
+S1
+
+Diode:
+[ ]	1	SK34A	"Schottky Rectifier - Taiwan Semiconductor SK34A"	[SMA]
+D1
+
+Connector:
+[ ]	1	USB-MICRO-10118194-0001LF	"USB Micro Connector"	[AMPHENOL_10118194-0001LF]
+USB1
+
+[ ]	1	PIC-ICSPJST-XH	"PIC In-Circuit Serial Programming Header"	[B5B-XH-A]
+ICSP1
+
+Misc:
+[ ]	1	KEYSTONE-590-9V	"Keystone 590 - Arranged for a 9V (PP3) Battery"	[KEYSTONE-590-9V]
+BATT1

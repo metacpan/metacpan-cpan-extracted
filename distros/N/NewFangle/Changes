@@ -1,5 +1,8 @@
 Revision history for NewFangle,
 
+0.09      2022-08-17 10:43:48 -0600
+  - Documentation improvements (gh#28)
+
 0.08      2022-03-03 16:51:34 -0700
   - Improved diagnostic when an invalid license key was provided (allsopp++, gh#24)
   - Documentation fixes (gh#25)

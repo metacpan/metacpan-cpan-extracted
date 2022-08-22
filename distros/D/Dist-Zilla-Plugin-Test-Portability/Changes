@@ -1,4 +1,7 @@
-Revision history for Perl extension Dist-Zilla-Plugin-Test-Portability
+Revision history for Dist-Zilla-Plugin-Test-Portability
+
+2.001001  2022-08-20 21:17:29Z
+  - test no longer skips when Test::Portability::Files is not available
 
 2.001000  2016-08-15 03:24:06Z
   - use the 'deprecated' warning category to issue the warning in

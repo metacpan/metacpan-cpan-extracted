@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Modern
 
+0.032     2022-08-13 23:17:31Z
+          - error when a uri path specification contains duplicate capture
+            names
+
 0.031     2022-06-01 03:59:14Z
           - fix error when request or response body schema is empty (since
             v0.028)

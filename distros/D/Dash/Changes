@@ -1,3 +1,6 @@
+0.11 2022-08-12 14:00:00+0000
+  -Support Mojolicious >= 9.0 (avoid reserved stash values)
+  -Specify port on app creation
 0.10 2020-01-26 15:00:00+0000
   -Support no_update for outputs not updated in a callback
 0.09 2020-01-23 22:00:00+0000

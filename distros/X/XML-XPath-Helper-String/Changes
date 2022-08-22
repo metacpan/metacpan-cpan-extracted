@@ -1,5 +1,14 @@
 Revision history for XML-XPath-Helper-String
 
+1.01    2022/08/15
+        Fixed POD error.
+
+1.00    2022/08/13
+        Functions now take array reference arguments.
+        quoted_string can process multiple strings.
+        one_of_quoted and not_one_of_quoted now can return closures.
+        
+
 0.01    2022/08/12
         First version, released on an unsuspecting world.
 

@@ -402,7 +402,7 @@ SKIP: {
         ok( defined($nm) || $@ =~ /^planes not supported for orders > /);
     }
     else {
-        skip 'medium size sets not supported', 2;
+        skip 'order 1K sets not supported', 2;
     }
 };
 
@@ -415,7 +415,7 @@ SKIP: {
         ok( defined($nm) || $@ =~ /^planes not supported for orders > /);
     }
     else {
-        skip 'large sets not supported', 2;
+        skip 'order 20K sets not supported', 2;
     }
 };
 
@@ -618,8 +618,9 @@ SKIP: {
 
 MEMO_TEST: {
     local $Math::DifferenceSet::Planar::_MAX_MEMO_COUNT = 1;
+    # calling from_elements with an order not yet encountered
     my $ds = Math::DifferenceSet::Planar->from_elements(
-        0, 1, 3, 7, 15, 31, 36, 54, 63
+        0, 1, 3, 9
     );
-    pds_ok($ds, '0 1 3 7 15 31 36 54 63');
+    pds_ok($ds, '0 1 3 9');
 }

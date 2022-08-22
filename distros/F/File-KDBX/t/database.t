@@ -8,6 +8,7 @@ use FindBin qw($Bin);
 use lib "$Bin/lib";
 use TestCommon;
 
+use File::KDBX::Constants qw(:cipher :version);
 use File::KDBX;
 use File::Temp qw(tempfile);
 use Test::Deep;
@@ -29,6 +30,14 @@ subtest 'Create a new database' => sub {
 
     $entry->remove;
     ok $kdbx->_has_implicit_root, 'Removing group makes the root group implicit again';
+
+    cmp_ok $kdbx->version, '==', KDBX_VERSION_3_1, 'Default KDBX file version is 3.1';
+    is $kdbx->cipher_id, CIPHER_UUID_AES256, 'Cipher of new database is AES256';
+    cmp_ok length($kdbx->encryption_iv), '==', 16, 'Encryption IV of new databse is 16 bytes';
+
+    my $kdbx2 = File::KDBX->new(version => KDBX_VERSION_4_0);
+    is $kdbx2->cipher_id, CIPHER_UUID_CHACHA20, 'Cipher of new v4 database is ChaCha20';
+    cmp_ok length($kdbx2->encryption_iv), '==', 12, 'Encryption IV of new databse is 12 bytes';
 };
 
 subtest 'Clone' => sub {

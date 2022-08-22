@@ -7,22 +7,23 @@ use warnings;
 use Log::ger;
 
 use List::Util qw(shuffle);
+use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-24'; # DATE
+our $DATE = '2022-08-20'; # DATE
 our $DIST = 'App-wordlist'; # DIST
-our $VERSION = '0.281'; # VERSION
+our $VERSION = '0.290'; # VERSION
 
 our %SPEC;
 
-our %arg_wordlists = (
+our %argspecopt_wordlists = (
     wordlists => {
+        summary => 'Select one or more wordlist modules',
         'x.name.is_plural' => 1,
         schema => ['array*' => {
             of => 'str*', # for the moment we need to use 'str' instead of 'perl::modname' due to Perinci::Sub::GetArgs::Argv limitation
             'x.perl.coerce_rules'=>[ ['From_str_or_array::expand_perl_modname_wildcard'=>{ns_prefix=>"WordList"}] ],
         }],
-        summary => 'Select one or more wordlist modules',
         cmdline_aliases => {w=>{}},
         element_completion => sub {
             require Complete::Util;
@@ -34,6 +35,65 @@ our %arg_wordlists = (
                 ci    => 1,
             );
         },
+        tags => ['category:module-selection'],
+    },
+);
+
+our %argspecsopt_exclude_wordlist = (
+    exclude_wordlists => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'exclude_wordlist',
+        summary => 'Exclude wordlist modules',
+        schema => ['array*' => {
+            of => 'str*', # for the moment we need to use 'str' instead of 'perl::modname' due to Perinci::Sub::GetArgs::Argv limitation
+            'x.perl.coerce_rules'=>[ ['From_str_or_array::expand_perl_modname_wildcard'=>{ns_prefix=>"WordList"}] ],
+        }],
+        element_completion => sub {
+            require Complete::Util;
+
+            my %args = @_;
+            Complete::Util::complete_array_elem(
+                word  => $args{word},
+                array => [map {$_->{name}} @{ _list_installed() }],
+                ci    => 1,
+            );
+        },
+        cmdline_aliases => {X=>{}},
+        tags => ['category:module-selection'],
+    },
+    exclude_wordlist_pattern => {
+        schema => 're_from_str*',
+        cmdline_aliases => {P=>{}},
+        tags => ['category:module-selection'],
+    },
+    exclude_dynamic_wordlists => {
+        schema => 'bool*',
+        cmdline_aliases => {D=>{}},
+        tags => ['category:module-selection'],
+    },
+);
+
+our %argspecopt_wordlist_bundles = (
+    wordlist_bundles => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'wordlist_bundle',
+        schema => ['array*' => {
+            of => 'str*', # for the moment we need to use 'str' instead of 'perl::modname' due to Perinci::Sub::GetArgs::Argv limitation
+            'x.perl.coerce_rules'=>[ ['From_str_or_array::expand_perl_modname_wildcard'=>{ns_prefix=>"WordList"}] ],
+        }],
+        summary => 'Select one or more wordlist bundle (Acme::CPANModules::WordListBundle::*) modules',
+        cmdline_aliases => {b=>{}},
+        element_completion => sub {
+            require Complete::Util;
+
+            my %args = @_;
+            Complete::Util::complete_array_elem(
+                word  => $args{word},
+                array => [map {$_->{name}} @{ _list_installed_bundles() }],
+                ci    => 1,
+            );
+        },
+        tags => ['category:module-selection'],
     },
 );
 
@@ -70,6 +130,34 @@ sub _list_installed {
     \@res;
 }
 
+sub _list_installed_bundles {
+    require Module::List;
+    my $mods = Module::List::list_modules(
+        "Acme::CPANModules::WordListBundle::",
+        {
+            list_modules  => 1,
+            list_pod      => 0,
+            recurse       => 1,
+            return_path   => 1,
+        });
+    my @res;
+    for my $wlb0 (sort keys %$mods) {
+        (my $wlb = $wlb0) =~ s/\AAcme::CPANModules::WordListBundle:://;
+
+        my $lang = '';
+        if ($wlb =~ /^(\w\w)::/) {
+            $lang = $1;
+        }
+
+        push @res, {
+            name => $wlb,
+            lang => $lang,
+            path => $mods->{$wlb0}{module_path},
+        };
+     }
+    \@res;
+}
+
 sub _word_has_chars_unordered {
     my ($word, $chars, $ci) = @_;
 
@@ -80,10 +168,10 @@ sub _word_has_chars_unordered {
 
     for my $i (0..length($chars)-1) {
         my $char = substr($chars, $i, 1);
-        $word =~ s/\Q$char\E//;
+        my $index = index($word, $char);
+        return 0 if $index < 0;
     }
-
-    return length $word ? 0:1;
+    1;
 }
 
 sub _word_has_chars_ordered {
@@ -108,26 +196,31 @@ sub _word_has_chars_ordered {
 
 $SPEC{wordlist} = {
     v => 1.1,
-    summary => 'Grep words from WordList::*',
+    summary => 'Grep words from (or test them against) WordList::*',
     args => {
         arg => {
             schema => ['array*' => of => 'str*'],
             pos => 0,
             greedy => 1,
+            tags => ['category:word-filtering'],
         },
         ignore_case => {
             schema  => 'bool',
             default => 1,
             cmdline_aliases => {i=>{}},
+            tags => ['category:word-filtering'],
         },
         len => {
             schema  => 'int*',
+            tags => ['category:word-filtering'],
         },
         min_len => {
             schema  => 'int*',
+            tags => ['category:word-filtering'],
         },
         max_len => {
             schema  => 'int*',
+            tags => ['category:word-filtering'],
         },
         num => {
             summary => 'Return (at most) this number of words (0 = unlimited)',
@@ -147,15 +240,24 @@ _
             cmdline_aliases => {r=>{}},
         },
 
-        %arg_wordlists,
+        %argspecopt_wordlists,
+        %argspecopt_wordlist_bundles,
+
+        %argspecsopt_exclude_wordlist,
+
         or => {
             summary => 'Match any word in query instead of the default "all"',
             schema  => 'bool',
+            tags => ['category:word-filtering'],
         },
         action => {
             schema  => ['str*', in=>[
-                'list_cpan', 'list_installed',
-                'grep', 'stat',
+                'list_cpan',
+                'list_installed',
+                'list_selected',
+                'grep',
+                'stat',
+                'test',
             ]],
             default => 'grep',
             cmdline_aliases => {
@@ -174,7 +276,35 @@ _
                     is_flag => 1,
                     code => sub { my $args=shift; $args->{action} = 'stat' },
                 },
+                t => {
+                    summary=>'Test whether words exists in wordlist',
+                    is_flag => 1,
+                    code => sub { my $args=shift; $args->{action} = 'test' },
+                },
             },
+            description => <<'_',
+
+Action `list_installed` (shortcut option `-l`) will list WordList::* modules
+installed on the local system.
+
+Action `list_cpan` (shortcut option `-L`) will list available WordList::*
+modules on CPAN, either by querying the MetaCPAN site or by querying a local
+mini CPAN using <pm:App::lcpan>.
+
+Action `list_selected` (option `--action=list_selected`) will list the selected
+WordList::* modules (e.g. via `-w` or `-b`).
+
+Action `grep` (the default action) will filter the words from each selected
+wordlists and print them.
+
+Action `stat` (shortcut option `-s`) will show statistics about all the selected
+wordlists.
+
+Action `test` (shortcut option `-t`) will check whether words are in one of the
+wordlist, using `word_exists()` method on each wordlist.
+
+
+_
         },
         lcpan => {
             schema => 'bool',
@@ -195,10 +325,12 @@ _
         chars_unordered => {
             summary => 'Specify possible characters for the word (unordered)',
             schema => 'str*',
+            tags => ['category:word-filtering'],
         },
         chars_ordered => {
             summary => 'Specify possible characters for the word (ordered)',
             schema => 'str*',
+            tags => ['category:word-filtering'],
         },
         langs => {
             'x.name.is_plural' => 1,
@@ -224,6 +356,7 @@ _
                 Complete::Util::complete_array_elem(
                     word => $args{word}, array => \@langs);
             },
+            tags => ['category:module-selection'],
         },
         color => {
             summary => 'When to highlight search string/matching pattern with color',
@@ -235,6 +368,12 @@ _
         {
             argv => [],
             summary => 'By default print all words from all wordlists',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            argv => [qw/-D/],
+            summary => 'Print all words from all static wordlists (dynamic ones are excluded with --exclude-dynamic-wordlists a.k.a. -D)',
             test => 0,
             'x.doc.show_result' => 0,
         },
@@ -265,6 +404,24 @@ _
         {
             argv => [qw/-w ID::** foo/],
             summary => 'Select all ID::* wordlists (wildcard will be expanded)',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            argv => [qw/-b Proverbs foo/],
+            summary => 'Select a bunch of wordlists via wordlist bundle (Acme::CPANModules::WordListBundle::* module)',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            argv => [qw/-w Phrase::**::Proverb::** foo/],
+            summary => 'An alternative to select all proverb wordlists',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            argv => [qw/-w Phrase::**::Proverb::** --action=list_selected/],
+            summary => 'Check to see which wordlists we are selecting via `-w` with wildcards or via `-b`',
             test => 0,
             'x.doc.show_result' => 0,
         },
@@ -304,15 +461,96 @@ _
             summary => 'List installed wordlist modules',
             test => 0,
             'x.doc.show_result' => 0,
+            tags => ['category:action-list-installed'],
         },
         {
             argv => [qw/-L/],
             summary => 'List wordlist modules available on CPAN',
             test => 0,
             'x.doc.show_result' => 0,
+            tags => ['category:action-list-cpan'],
+        },
+        {
+            argv => [qw/-w ID::KBBI -s/],
+            summary => 'Show statistics of a wordlist module',
+            test => 0,
+            'x.doc.show_result' => 0,
+            tags => ['category:action-stat'],
+        },
+        {
+            argv => [qw/-w Password::RockYou::BloomOnly -t foobar 123456 someGoodPass923/],
+            summary => 'Check some passwords against a password wordlist',
+            test => 0,
+            'x.doc.show_result' => 0,
+            tags => ['category:action-test'],
+        },
+        {
+            argv => [qw/-w Password::** -X Password::RockYou -t foobar 123456 someGoodPass923/],
+            summary => 'Check some passwords against all Password wordlists except Password::RockYou (because it is slow to check)',
+            test => 0,
+            'x.doc.show_result' => 0,
+            tags => ['category:action-test'],
+        },
+        {
+            argv => [qw/-w Password::** -P RockYou -t foobar 123456 someGoodPass923/],
+            summary => 'Check some passwords against all Password wordlists except those matching /RockYou/ regex',
+            test => 0,
+            'x.doc.show_result' => 0,
+            tags => ['category:action-test'],
         },
     ],
     'cmdline.default_format' => 'text-simple',
+    'x.doc.faq' => <<'_',
+
+## How to select multiple wordlists? It's cumbersome having to -w WORDLIST1 -w WORDLIST2 and so on!
+
+You can specify wildcard in `-w` option, e.g. if you want to include all English
+wordlists you can use `-w EN::*` or `-w EN::**` (`**` recurses while `*` only
+matches one level deep).
+
+Or you can also use `-b` option. Some people bundle wordlists together and put
+them up on CPAN in the `Acme::CPANModules::WordListBundle::*` namespace. You can
+install those modules first then use the wordlist bundle.
+
+## Can `wordlist` help me solve Wordle?
+
+Yes, using regex or the `--chars-ordered` and `--chars-unordered` options. For
+example, if you have:
+
+    T W _ S _
+
+(3 letters with the correct position), you can use:
+
+    % wordlist -w EN::Wordle '/^tw.s./' --len 5
+    twist
+
+or:
+
+    % wordlist -w EN::Wordle --chars-ordered tws --len 5
+    tawse
+    thaws
+    ...
+    twist
+    twits
+
+Another example, if you have:
+
+    W* T* _ S _
+
+(2 letters with the incorrect position and 1 letter in the correct position),
+you can use:
+
+    % wordlist -w EN::Wordle --chars-unordered wts --len 5 '/^...s.$/'
+
+Included in the distribution is the <prog:wordlist-wordle> script for
+convenience. This CLI defaults to grepping the "EN::Wordle" wordlist and you
+specify something like `wt_S_` for the pattern (lowercase for letter in
+incorrect position, uppercase for letter in correct position, underscore for
+unguessed):
+
+    % wordlist-wordle 'wt_S_'
+
+_
 };
 sub wordlist {
     require Encode;
@@ -333,7 +571,7 @@ sub wordlist {
     my $use_color = ($color eq 'always' ? 1 : $color eq 'never' ? 0 : undef)
         // $ENV{COLOR} // (-t STDOUT);
 
-    if ($action eq 'grep' || $action eq 'stat') {
+    if ($action eq 'grep' || $action eq 'stat' || $action eq 'list_selected' || $action eq 'test') {
         # convert /.../ in arg to regex
         for (@$arg) {
             $_ = Encode::decode('UTF-8', $_);
@@ -345,10 +583,41 @@ sub wordlist {
         }
 
         my @res;
-        my $wordlists;
+        my $wordlists = [];
+        my $has_specified_list;
+
+        if ($args{wordlist_bundles}) {
+            $has_specified_list++;
+            for my $wb (@{ $args{wordlist_bundles} }) {
+                my $wbmod = "Acme::CPANModules::WordListBundle::$wb";
+                (my $wbmodpm = "$wbmod.pm") =~ s!::!/!g;
+                require $wbmodpm;
+
+                my $list;
+                {
+                    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
+                    $list = ${"$wbmod\::LIST"};
+                }
+
+                my $i = -1;
+                for my $entry (@{ $list->{entries} }) {
+                    $i++;
+                    my $mod = $entry->{module};
+                    $mod =~ s/\AWordList::// or do {
+                        warn "Wordlist bundle module $wbmod: entry[$i]: module is not WordList::, skipped";
+                        next;
+                    };
+                    push @$wordlists, $mod;
+                }
+            } # for $wb
+        }
+
         if ($args{wordlists}) {
-            $wordlists = $args{wordlists};
-        } else {
+            $has_specified_list++;
+            push @{ $wordlists }, @{ $args{wordlists} };
+        }
+
+        unless ($has_specified_list) {
             $wordlists = [];
             for my $rec (@$list_installed) {
                 if ($args{langs} && @{ $args{langs} }) {
@@ -358,13 +627,56 @@ sub wordlist {
             }
         }
 
+      EXCLUDE_WORDLISTS: {
+            if ($args{exclude_wordlists} && @{ $args{exclude_wordlists} }) {
+                my $filtered_wordlists = [];
+              WORDLIST:
+                for my $wl (@$wordlists) {
+                    for my $exwl (@{ $args{exclude_wordlists} }) {
+                        do { log_trace "Excluding wordlist $wl (--excluded-wordlist)"; next WORDLIST } if $wl eq $exwl;
+                    }
+                    push @$filtered_wordlists, $wl;
+                }
+                $wordlists = $filtered_wordlists;
+            }
+
+            if (defined $args{exclude_wordlist_pattern}) {
+                my $filtered_wordlists = [];
+              WORDLIST:
+                for my $wl (@$wordlists) {
+                    do { log_trace "Excluding wordlist $wl (--excluded-wordlist-pattern)"; next WORDLIST } if $wl =~ $args{exclude_wordlist_pattern};
+                    push @$filtered_wordlists, $wl;
+                }
+                $wordlists = $filtered_wordlists;
+            }
+
+            if ($args{exclude_dynamic_wordlists}) {
+                no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
+                my $filtered_wordlists = [];
+              WORDLIST:
+                for my $wl (@$wordlists) {
+                    my $mod = "WordList::$wl"; $mod =~ s/=.*//;
+                    (my $modpm = "$mod.pm") =~ s!::!/!g;
+                    require $modpm;
+                    do { log_trace "Excluding wordlist $wl (--excluded-dynamic-wordlists)"; next WORDLIST } if ${"$mod\::DYNAMIC"};
+                    push @$filtered_wordlists, $wl;
+                }
+                $wordlists = $filtered_wordlists;
+            }
+        }
+
         $wordlists = [shuffle @$wordlists] if $random;
         log_trace "Wordlist(s) to use: %s", $wordlists;
 
+        if ($action eq 'list_selected') {
+            return [200, "OK", $wordlists];
+        }
+
         if ($action eq 'stat') {
-            no strict 'refs';
+            no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
             return [200] unless @$wordlists;
             my %all_stats;
+          WORDLIST:
             for my $wl (@$wordlists) {
                 my $mod = "WordList::$wl"; $mod =~ s/=.*//;
                 (my $modpm = "$mod.pm") =~ s!::!/!g;
@@ -376,6 +688,33 @@ sub wordlist {
                 }
             }
             return [200, "OK", \%all_stats];
+        }
+
+        if ($action eq 'test') {
+            my @words = @{ $args{arg} };
+            my $res = [200, "OK", [], {'table.fields'=>[qw/word found_in/]}];
+
+          WORDLIST:
+            for my $wl (@$wordlists) {
+                last unless @words;
+                log_debug "Testing against wordlist $wl ...";
+                my $wl_obj;
+                eval {
+                    $wl_obj = Module::Load::Util::instantiate_class_with_optional_args(
+                        {ns_prefix=>"WordList"}, $wl);
+                };
+                if ($@) {
+                    warn;
+                    next WORDLIST;
+                }
+                for my $i (reverse (0 .. $#words)) {
+                    if ($wl_obj->word_exists($words[$i])) {
+                        push @{$res->[2]}, {word=>$words[$i], found_in=>$wl};
+                    }
+                }
+            } # for WORDLIST
+
+            return $res;
         }
 
         # optimize random picking when there's only one wordlist to pick from
@@ -553,8 +892,109 @@ sub wordlist {
     }
 }
 
+gen_modified_sub(
+    base_name => 'wordlist',
+    output_name => 'wordlist_wordle',
+    modify_args => {
+        wordlists => sub {
+            $_[0]{default} = ['EN::Wordle'];
+        },
+        len => sub {
+            $_[0]{default} = 5;
+        },
+    },
+    remove_args => [
+        'action',
+        'lcpan',
+        'chars_unordered',
+        'chars_ordered',
+    ],
+    modify_meta => sub {
+        $_[0]{summary} = 'Help solve Wordle';
+        $_[0]{description} = <<'_';
+
+This is a wrapper to <prog:wordlist> designed to be a convenient helper to solve
+Wordle puzzle. By default it greps from the `EN::Wordle` wordlist. It accepts
+a series of guesses in a format like the following:
+
+    A^R^isE^
+    Pound
+    might
+    blA^ck
+    PR^ivY^
+
+where lowercase means wrong guess, uppercase means correct letter and position,
+while (uppercase) letter followed by a caret (`^`) means the letter exists in
+another position. It will convert these guesses to regex patterns and the
+`--chars-unordered` option and pass it to `wordlist`.
+
+_
+        $_[0]{examples} = [
+            {
+                argv => ['cR^eEk'],
+                summary => 'One guess',
+                test => 0,
+                'x.doc.show_result' => 0,
+            },
+            {
+                argv => ['A^R^isE^', 'Pound', 'might', 'blA^ck', 'PR^ivY^'],
+                summary => 'Five guesses',
+                test => 0,
+                'x.doc.show_result' => 0,
+            },
+        ];
+    },
+    output_code => sub {
+        my %args = @_;
+
+        $args{arg} //= [];
+
+        my $chars_unordered = '';
+        my $possible_letters = join '', "a".."z";
+        my $nonpresent_letters = '';
+        my @new_arg;
+        for my $arg (@{ $args{arg} }) {
+            my @chars = split //, $arg;
+            my $re = '';
+            my %letter_exists;
+            while (@chars) {
+                my $char = shift @chars;
+                return [400, "Invalid letter '$char' in guess '$arg'"] unless $char =~ /[A-Za-z]/;
+                my $caret = @chars && $chars[0] eq '^' ? shift(@chars) : '';
+                my $uc = $char eq uc $char;
+                $char = lc $char;
+
+                if ($caret) { # letter is in another position
+                    my $letters = $possible_letters;
+                    $letters =~ s/$char//;
+                    $re .= "[$letters]";
+                    $letter_exists{$char}++;
+                    $chars_unordered .= $char unless index($chars_unordered, $char) >= 0;
+                } elsif ($uc) { # correct guess
+                    $re .= $char;
+                    $letter_exists{$char}++;
+                    $chars_unordered .= $char unless index($chars_unordered, $char) >= 0;
+                } else { # wrong guess
+                    my $letters = $possible_letters;
+                    $letters =~ s/$char//;
+                    $possible_letters =~ s/$char// unless $letter_exists{$char};
+                    $re .= "[$letters]";
+                }
+            }
+            $re = "/\\A$re\\z/";
+            push @new_arg, $re;
+        }
+
+        $args{arg} = \@new_arg;
+        $args{chars_unordered} = $chars_unordered if length $chars_unordered;
+
+        log_trace "Arguments passed to wordlist(): %s", \%args;
+        wordlist(%args);
+    },
+);
+
 1;
-# ABSTRACT: Grep words from WordList::*
+# ABSTRACT: Grep words from (or test them against) WordList::*
 
 __END__
 
@@ -564,11 +1004,11 @@ __END__
 
 =head1 NAME
 
-App::wordlist - Grep words from WordList::*
+App::wordlist - Grep words from (or test them against) WordList::*
 
 =head1 VERSION
 
-This document describes version 0.281 of App::wordlist (from Perl distribution App-wordlist), released on 2021-10-24.
+This document describes version 0.290 of App::wordlist (from Perl distribution App-wordlist), released on 2022-08-20.
 
 =head1 SYNOPSIS
 
@@ -583,7 +1023,7 @@ Usage:
 
  wordlist(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Grep words from WordList::*.
+Grep words from (or test them against) WordList::*.
 
 Examples:
 
@@ -592,6 +1032,10 @@ Examples:
 =item * By default print all words from all wordlists:
 
  wordlist();
+
+=item * Print all words from all static wordlists (dynamic ones are excluded with --exclude-dynamic-wordlists a.k.a. -D):
+
+ wordlist(exclude_dynamic_wordlists => 1);
 
 =item * Print all words matching E<sol>fooE<sol> and E<sol>barE<sol>:
 
@@ -612,6 +1056,18 @@ Examples:
 =item * Select all ID::* wordlists (wildcard will be expanded):
 
  wordlist(arg => ["foo"], wordlists => ["ID::**"]);
+
+=item * Select a bunch of wordlists via wordlist bundle (Acme::CPANModules::WordListBundle::* module):
+
+ wordlist(arg => ["foo"], wordlist_bundles => ["Proverbs"]);
+
+=item * An alternative to select all proverb wordlists:
+
+ wordlist(arg => ["foo"], wordlists => ["Phrase::**::Proverb::**"]);
+
+=item * Check to see which wordlists we are selecting via `-w` with wildcards or via `-b`:
+
+ wordlist(action => "list_selected", wordlists => ["Phrase::**::Proverb::**"]);
 
 =item * Print all words from EN::Enable wordlist that are 6 characters long and have the letters BOBLEG (in no particular order); great for cheats in word forming games:
 
@@ -651,6 +1107,36 @@ Examples:
 
  wordlist(action => "list_cpan");
 
+=item * Show statistics of a wordlist module:
+
+ wordlist(action => "stat", wordlists => ["ID::KBBI"]);
+
+=item * Check some passwords against a password wordlist:
+
+ wordlist(
+     arg => ["foobar", 123456, "someGoodPass923"],
+   action => "test",
+   wordlists => ["Password::RockYou::BloomOnly"]
+ );
+
+=item * Check some passwords against all Password wordlists except Password::RockYou (because it is slow to check):
+
+ wordlist(
+     arg => ["foobar", 123456, "someGoodPass923"],
+   action => "test",
+   exclude_wordlists => ["Password::RockYou"],
+   wordlists => ["Password::**"]
+ );
+
+=item * Check some passwords against all Password wordlists except those matching E<sol>RockYouE<sol> regex:
+
+ wordlist(
+     arg => ["foobar", 123456, "someGoodPass923"],
+   action => "test",
+   exclude_wordlist_pattern => "RockYou",
+   wordlists => ["Password::**"]
+ );
+
 =back
 
 This function is not exported.
@@ -660,6 +1146,25 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<action> => I<str> (default: "grep")
+
+Action C<list_installed> (shortcut option C<-l>) will list WordList::* modules
+installed on the local system.
+
+Action C<list_cpan> (shortcut option C<-L>) will list available WordList::*
+modules on CPAN, either by querying the MetaCPAN site or by querying a local
+mini CPAN using L<App::lcpan>.
+
+Action C<list_selected> (option C<--action=list_selected>) will list the selected
+WordList::* modules (e.g. via C<-w> or C<-b>).
+
+Action C<grep> (the default action) will filter the words from each selected
+wordlists and print them.
+
+Action C<stat> (shortcut option C<-s>) will show statistics about all the selected
+wordlists.
+
+Action C<test> (shortcut option C<-t>) will check whether words are in one of the
+wordlist, using C<word_exists()> method on each wordlist.
 
 =item * B<arg> => I<array[str]>
 
@@ -683,6 +1188,14 @@ When listing installed modules (C<-l>), this means also returning a wordlist's
 language.
 
 When returning grep result, this means also returning wordlist name.
+
+=item * B<exclude_dynamic_wordlists> => I<bool>
+
+=item * B<exclude_wordlist_pattern> => I<re_from_str>
+
+=item * B<exclude_wordlists> => I<array[str]>
+
+Exclude wordlist modules.
 
 =item * B<ignore_case> => I<bool> (default: 1)
 
@@ -720,7 +1233,133 @@ Pick random words.
 If set to true, then streaming will be turned off. All words will be gathered
 first, then words will be chosen randomly from the gathered list.
 
+=item * B<wordlist_bundles> => I<array[str]>
+
+Select one or more wordlist bundle (Acme::CPANModules::WordListBundle::*) modules.
+
 =item * B<wordlists> => I<array[str]>
+
+Select one or more wordlist modules.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 wordlist_wordle
+
+Usage:
+
+ wordlist_wordle(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Help solve Wordle.
+
+Examples:
+
+=over
+
+=item * One guess:
+
+ wordlist_wordle(arg => ["cR^eEk"]);
+
+=item * Five guesses:
+
+ wordlist_wordle(arg => ["A^R^isE^", "Pound", "might", "blA^ck", "PR^ivY^"]);
+
+=back
+
+This is a wrapper to L<wordlist> designed to be a convenient helper to solve
+Wordle puzzle. By default it greps from the C<EN::Wordle> wordlist. It accepts
+a series of guesses in a format like the following:
+
+ A^R^isE^
+ Pound
+ might
+ blA^ck
+ PR^ivY^
+
+where lowercase means wrong guess, uppercase means correct letter and position,
+while (uppercase) letter followed by a caret (C<^>) means the letter exists in
+another position. It will convert these guesses to regex patterns and the
+C<--chars-unordered> option and pass it to C<wordlist>.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<arg> => I<array[str]>
+
+=item * B<color> => I<str> (default: "auto")
+
+When to highlight search stringE<sol>matching pattern with color.
+
+=item * B<detail> => I<bool>
+
+Display more information when listing modulesE<sol>result.
+
+When listing installed modules (C<-l>), this means also returning a wordlist's
+language.
+
+When returning grep result, this means also returning wordlist name.
+
+=item * B<exclude_dynamic_wordlists> => I<bool>
+
+=item * B<exclude_wordlist_pattern> => I<re_from_str>
+
+=item * B<exclude_wordlists> => I<array[str]>
+
+Exclude wordlist modules.
+
+=item * B<ignore_case> => I<bool> (default: 1)
+
+=item * B<langs> => I<array[str]>
+
+Only include wordlists of certain language(s).
+
+By convention, language code is the first subnamespace of a wordlist module,
+e.g. WordList::EN::* for English, WordList::FR::* for French, and so on.
+Wordlist modules which do not follow this convention (e.g. WordList::Password::*
+or WordList::PersonName::*) are not included.
+
+=item * B<len> => I<int> (default: 5)
+
+=item * B<max_len> => I<int>
+
+=item * B<min_len> => I<int>
+
+=item * B<num> => I<int> (default: 0)
+
+Return (at most) this number of words (0 = unlimited).
+
+=item * B<or> => I<bool>
+
+Match any word in query instead of the default "all".
+
+=item * B<random> => I<bool>
+
+Pick random words.
+
+If set to true, then streaming will be turned off. All words will be gathered
+first, then words will be chosen randomly from the gathered list.
+
+=item * B<wordlist_bundles> => I<array[str]>
+
+Select one or more wordlist bundle (Acme::CPANModules::WordListBundle::*) modules.
+
+=item * B<wordlists> => I<array[str]> (default: ["EN::Wordle"])
 
 Select one or more wordlist modules.
 
@@ -790,13 +1429,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

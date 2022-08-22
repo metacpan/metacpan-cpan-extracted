@@ -1,5 +1,5 @@
-HTTP::Any - a common interface for HTTP clients (LWP, AnyEvent::HTTP, Curl)
-===========================================================================
+HTTP::Curl - HTTP interface for Net::Curl (clone of HTTP::Any::Curl)
+====================================================================
 
 INSTALLATION
 
@@ -12,15 +12,13 @@ To install this module type the following:
 
 Also install:
 
- - Net::Curl to use HTTP::Any::Curl
- - Net::Curl, EV and Net::Curl::Multi::EV to use HTTP::Any::Curl with Multi
- - AnyEvent::HTTP, EV to use HTTP::Any::AnyEvent
- - LWP to use HTTP::Any::LWP
+ - Net::Curl to use HTTP::Curl
+ - Net::Curl, EV and Net::Curl::Multi::EV to use HTTP::Curl with Multi
 
 
 DOCUMENTATION
 
-See Any.pod file.
+See HTTP/Curl.pm file.
 
 
 COPYRIGHT AND LICENCE

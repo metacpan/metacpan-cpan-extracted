@@ -59,7 +59,7 @@ A333852.pl - generate OEIS A333852
 
 =head1 DESCRIPTION
 
-This example program genereates terms of OEIS A333852: Irregular triangle
+This example program generates terms of OEIS A333852: Irregular triangle
 read by rows: representative simple difference sets of Singer type of
 order m, for prime powers m, in lexicographic order.  The output is
 formatted as an OEIS b-file.

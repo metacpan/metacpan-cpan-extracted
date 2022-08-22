@@ -26,9 +26,9 @@ sub IsStructureEqualJSON {
 
     $test_app->layout(
                        html->Div(
-                                  children => [dcc->Input( id => 'input-id', value => 'initial value', type => 'text' ),
+                                 children => [ dcc->Input( id => 'input-id', value => 'initial value', type => 'text' ),
                                                html->Div( id => 'output-id' )
-                                  ]
+                                 ]
                        )
     );
 
@@ -53,10 +53,10 @@ sub IsStructureEqualJSON {
 
     $test_app->layout(
                        html->Div(
-                                  children => [dcc->Input( id => 'input-id', value => 'initial value', type => 'text' ),
+                                 children => [ dcc->Input( id => 'input-id', value => 'initial value', type => 'text' ),
                                                html->Div( id => 'output-id' ),
                                                html->Div( id => 'second-output-id' )
-                                  ]
+                                 ]
                        )
     );
 
@@ -83,17 +83,16 @@ sub IsStructureEqualJSON {
 
     $test_app->layout(
                        html->Div(
-                                  children => [
-                                          dcc->Input( id => 'input-id', value => 'initial value', type => 'text' ),
+                            children => [ dcc->Input( id => 'input-id', value => 'initial value',      type => 'text' ),
                                           dcc->Input( id => 'second-input-id', value => 'state value', type => 'text' ),
                                           html->Div( id => 'output-id' )
-                                  ]
+                            ]
                        )
     );
 
     $test_app->callback(
         Output   => { component_id => 'output-id', component_property => 'children' },
-        Inputs   => [ { component_id => 'input-id', component_property => 'value' } ],
+        Inputs   => [ { component_id => 'input-id',        component_property => 'value' } ],
         State    => [ { component_id => 'second-input-id', component_property => 'value' } ],
         callback => sub {
             my ( $input_value, $second_input_value ) = @_;

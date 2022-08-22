@@ -7,7 +7,7 @@ use Error::Pure qw(err);
 use Mo qw(build is);
 use Mo::utils qw(check_array_object check_required);
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
 
 has snaks => (
 	is => 'ro',
@@ -84,6 +84,8 @@ Returns reference to array of Wikibase::Datatype::Snak instances.
 
 =head1 EXAMPLE
 
+=for comment filename=create_and_print_reference.pl
+
  use strict;
  use warnings;
 
@@ -151,6 +153,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.19
+0.20
 
 =cut

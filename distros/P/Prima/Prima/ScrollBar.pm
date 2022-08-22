@@ -8,14 +8,13 @@
 #
 package Prima::ScrollBar;
 use vars qw(@ISA @stdMetrics);
-@ISA = qw(Prima::Widget Prima::MouseScroller);
+use strict;
+use warnings;
+use Prima;
+use base qw(Prima::Widget Prima::Widget::MouseScroller);
 
 @stdMetrics = Prima::Application-> get_default_scrollbar_metrics;
 my $win32 = (Prima::Application-> get_system_info-> {apc} == apc::Win32);
-
-use strict;
-use warnings;
-use Prima qw(IntUtils);
 
 sub profile_default
 {
@@ -230,9 +229,11 @@ sub on_paint
 				$canvas-> color( $self-> {$_}-> {pressed} ? $clr[0] : $clr[1]);
 				if ( $self->{style} eq 'xp') {
 					$canvas-> backColor( $c3d[0]);
+					$canvas-> rop2(rop::CopyPut);
 					$canvas-> fillPattern([(0xAA,0x55) x 4]);
 					$canvas-> bar( @r);
 					$canvas-> fillPattern(fp::Solid);
+					$canvas-> rop2(rop::NoOper);
 				} else {
 					$canvas-> bar( @r);
 				}
@@ -257,9 +258,11 @@ sub on_paint
 				my $stx = int($maxx / 3) + ( $self-> { tab} -> { pressed} ? 1 : 0);
 				my $lnx = int($maxx / 3);
 				$lnx += $maxx - $lnx * 3;
+				$canvas-> rop2(rop::CopyPut);
 				$canvas-> fillPattern([(0xff, 0) x 4]);
 				$canvas-> fillPatternOffset($stx, $sty);
 				$canvas-> bar( $stx, $sty - 1, $stx + $lnx, $sty + 9);
+				$canvas-> rop2(rop::NoOper);
 			} else {
 				my $stx = $rect[0] +
 					int($lenx / 2) -
@@ -268,9 +271,11 @@ sub on_paint
 				my $sty = int($maxy / 3) - ( $self-> { tab} -> { pressed} ? 1 : 0);
 				my $lny = int($maxy / 3);
 				$lny += $maxy - $lny * 3;
+				$canvas-> rop2(rop::CopyPut);
 				$canvas-> fillPattern([(0xAA) x 8]);
 				$canvas-> fillPatternOffset($stx, $sty);
 				$canvas-> bar( $stx - 1, $sty, $stx + 9, $sty + $lny);
+				$canvas-> rop2(rop::NoOper);
 			}
 		}
 	} else {
@@ -963,7 +968,7 @@ mouse instead of C<Change>.
 
 =head1 SEE ALSO
 
-L<Prima>, L<Prima::Widget>, L<Prima::IntUtils>, F<examples/rtc.pl>, F<examples/scrolbar.pl>
+L<Prima>, L<Prima::Widget>, F<examples/rtc.pl>, F<examples/scrolbar.pl>
 
 =head1 AUTHORS
 

@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-09'; # DATE
+our $DATE = '2022-08-19'; # DATE
 our $DIST = 'App-UniqFiles'; # DIST
-our $VERSION = '0.133'; # VERSION
+our $VERSION = '0.134'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/UniqFiles/uniq_files",
@@ -40,13 +40,11 @@ uniq-files - Report or omit duplicate file contents
 
 =head1 VERSION
 
-This document describes version 0.133 of uniq-files (from Perl distribution App-UniqFiles), released on 2022-05-09.
+This document describes version 0.134 of uniq-files (from Perl distribution App-UniqFiles), released on 2022-08-19.
 
 =head1 SYNOPSIS
 
-Usage:
-
-% B<uniq-files> [B<--algorithm>=I<str>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--digest-args>=I<s>|B<--digest-args-json>=I<json>|B<-A>=I<s>] [B<--format>=I<name>|B<--json>] [B<--group-by-digest>|B<--no-group-by-digest>|B<--nogroup-by-digest>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--recurse>|B<-R>|B<--no-recurse>|B<--norecurse>] [B<--report-duplicate>=I<int>] [B<--report-unique>|B<-D>|B<-a>|B<-d>|B<-u>|B<--no-report-unique>|B<--noreport-unique>] [B<--show-count>|B<-c>|B<--count>|B<--no-show-count>|B<--noshow-count>] [B<--show-digest>|B<--no-show-digest>|B<--noshow-digest>] [B<--show-size>|B<--no-show-size>|B<--noshow-size>] -- E<lt>I<files>E<gt> ...
+B<uniq-files> [B<--algorithm>=I<str>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--detail>|B<-l>] [B<--digest-args>=I<s>|B<--digest-args-json>=I<json>|B<-A>=I<s>] [B<--format>=I<name>|B<--json>] [B<--group-by-digest>|B<--no-group-by-digest>|B<--nogroup-by-digest>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--recurse>|B<-R>|B<--no-recurse>|B<--norecurse>] [B<--report-duplicate>=I<int>] [B<--report-unique>|B<-D>|B<-a>|B<-d>|B<-u>|B<--no-report-unique>|B<--noreport-unique>] [B<--show-count>|B<-c>|B<--count>|B<--no-show-count>|B<--noshow-count>] [B<--show-digest>] [B<--show-size>] -- E<lt>I<files>E<gt> ...
 
 
 
@@ -69,15 +67,19 @@ C<*> marks required options.
 
 What algorithm is used to compute the digest of the content.
 
-The default is to use `md5`. Some algorithms supported include `crc32`, `sha1`,
-`sha256`, as well as `Digest` to use Perl <pm:Digest> which supports a lot of
-other algorithms, e.g. `SHA-1`, `BLAKE2b`.
+The default is to use C<md5>. Some algorithms supported include C<crc32>, C<sha1>,
+C<sha256>, as well as C<Digest> to use Perl L<Digest> which supports a lot of
+other algorithms, e.g. C<SHA-1>, C<BLAKE2b>.
 
 If set to '', 'none', or 'size', then digest will be set to file size. This
 means uniqueness will be determined solely from file size. This can be quicker
 but will generate a false positive when two files of the same size are deemed as
 duplicate even though their content may be different.
 
+
+=item B<--detail>, B<-l>
+
+Show details (a.k.a. --show-digest, --show-size, --show-count).
 
 =item B<--digest-args-json>=I<s>, B<-A>
 
@@ -125,18 +127,18 @@ Valid values:
 
 Can be set to either 0, 1, 2.
 
-If set to 2 (the default), will only return the first of duplicate items. For
-example: `file1` contains text 'a', `file2` 'b', `file3` 'a'. Only `file1` will
-be returned because `file2` is unique and `file3` contains 'a' (already
-represented by `file1`).
+If set to 2 (the default for C<uniq-files>), will only return the first of
+duplicate items. For example: C<file1> contains text 'a', C<file2> 'b', C<file3>
+'a'. Only C<file1> will be returned because C<file2> is unique and C<file3>
+contains 'a' (already represented by C<file1>).
 
-If set to 1, will return all the the duplicate files. From the above example:
-`file1` and `file3` will be returned.
+If set to 1 (the default for C<dupe-files>), will return all the the duplicate
+files. From the above example: C<file1> and C<file3> will be returned.
 
 If set to 3, will return all but the first of duplicate items. From the above
-example: `file3` will be returned. This is useful if you want to keep only one
-copy of the duplicate content. You can use the output of this routine to `mv` or
-`rm`.
+example: C<file3> will be returned. This is useful if you want to keep only one
+copy of the duplicate content. You can use the output of this routine to C<mv> or
+C<rm>.
 
 If set to 0, duplicate items will not be returned.
 
@@ -199,6 +201,17 @@ Shortcut for --log-level=debug.
 
 Set log level.
 
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<fatal>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
 =item B<--quiet>
 
 Shortcut for --log-level=error.
@@ -225,6 +238,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -239,24 +258,33 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--page-result>
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -310,27 +338,27 @@ For fish and zsh, install L<shcompgen> as described above.
 
 =head1 EXAMPLES
 
-List all files which do no have duplicate contents:
+=head2 List all files which do no have duplicate contents
 
  % uniq-files *
 
-List all files which have duplicate contents:
+=head2 List all files (recursively, and in detail) which have duplicate contents (all duplicate copies)
 
- % uniq-files -d *
+ % uniq-files -R -l -d *
 
-Move all duplicate files (except one copy) in this directory (and subdirectories) to .dupes/:
+=head2 Move all duplicate files (except one copy) in this directory (and subdirectories) to .dupes/
 
  % uniq-files -D -R * | while read f; do mv "$f" .dupes/; done
 
-List number of occurences of contents for duplicate files:
+=head2 List number of occurences of contents for duplicate files
 
  % uniq-files -c *
 
-List number of occurences of contents for all files:
+=head2 List number of occurences of contents for all files
 
  % uniq-files -a -c *
 
-List all files, along with their number of content occurrences and content digest. Use the BLAKE2b digest algorithm. And group the files according to their digest.:
+=head2 List all files, along with their number of content occurrences and content digest. Use the BLAKE2b digest algorithm. And group the files according to their digest.
 
  % uniq-files -a -c --show-digest -A BLAKE2,blake2b *
 

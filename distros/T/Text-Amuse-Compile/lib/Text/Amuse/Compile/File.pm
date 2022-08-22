@@ -1100,6 +1100,7 @@ HTML
                          [ rights => [qw/add_rights/],       ],
                          [ isbn => [qw/add_identifier ISBN/], ],
                          [ publisher => [qw/add_publisher/],  ],
+                         [ colophon => [] ],
                         );
 
     foreach my $imp (@impressum_map) {
@@ -1107,7 +1108,9 @@ HTML
         if ($text->header_defined->{$k}) {
             my $str = $header->{$k};
             my ($method, @additional_args) = @{$imp->[1]};
-            $epub->$method($self->_clean_html($str), @additional_args);
+            if ($method) {
+                $epub->$method($self->_clean_html($str), @additional_args);
+            }
             if ($k eq 'isbn') {
                 $str = 'ISBN ' . $str;
             }

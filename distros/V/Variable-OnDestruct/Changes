@@ -1,5 +1,8 @@
 Revision history for Variable-OnDestruct
 
+0.06      2022-08-18 17:23:20+02:00 Europe/Amsterdam
+          - Add on_destruct_fifo
+
 0.05      2022-05-18 23:43:52+02:00 Europe/Amsterdam
           - Don't copy magic to localized variable
           - Don't pass self as argument

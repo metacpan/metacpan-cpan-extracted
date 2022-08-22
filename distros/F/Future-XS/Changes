@@ -1,5 +1,19 @@
 Revision history for Future-XS
 
+0.03    2022-08-16
+        [CHANGES]
+         * Added many new methods:
+            + the new udata API
+            + the timing capture methods
+            + ->get and ->await
+            + the `_with_f` variant methods
+         * Implement proper subclassing support
+         * Upgrade non-future results from sequencing methods into
+           future instances
+
+        [BUGFIXES]
+         * Declare test-time dependency of Test::Fatal
+
 0.02    2022-08-11
         [BUGFIXES]
          * Declare test-time dependencies of Test::Identity and Test::Refcount

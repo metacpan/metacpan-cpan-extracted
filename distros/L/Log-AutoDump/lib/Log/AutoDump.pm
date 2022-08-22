@@ -24,17 +24,19 @@ use constant DEFAULT_QUOTE_KEYS => 0;
 use constant DEFAULT_BASE_DIR => '/tmp';
 use constant MAX_FRAME => 10;
 
+use constant DEFAULT_HISTORY_LENGTH => 0;
+
 =head1 NAME
 
 Log::AutoDump - Log with automatic dumping of references and objects.
 
 =head1 VERSION
 
-Version 0.17
+Version 0.20
 
 =cut
 
-our $VERSION = '0.17';
+our $VERSION = '0.20';
 
 $VERSION = eval $VERSION;
 
@@ -141,14 +143,16 @@ sub new
     }
         
     my $self = {
-         level      => exists $args{ level } ? $args{ level } : DEFAULT_LEVEL,
-         dumps      => exists $args{ dumps } ? $args{ dumps } : 1,
-         dump_depth => $args{ dump_depth } || 0,
-         sort_keys  => exists $args{ sort_keys }  ? $args{ sort_keys }  : DEFAULT_SORT_KEYS,
-         quote_keys => exists $args{ quote_keys } ? $args{ quote_keys } : DEFAULT_QUOTE_KEYS,
-         filename   => $args{ filename },
-         autoflush  => exists $args{ autoflush } ? $args{ autoflush } : 1,
-        _fh         => undef,
+         level          => exists $args{ level } ? $args{ level } : DEFAULT_LEVEL,
+         history_length => exists $args{ history_length } ? $args{ history_length } : DEFAULT_HISTORY_LENGTH,
+         history        => [],
+         dumps          => exists $args{ dumps } ? $args{ dumps } : 1,
+         dump_depth     => $args{ dump_depth } || 0,
+         sort_keys      => exists $args{ sort_keys }  ? $args{ sort_keys }  : DEFAULT_SORT_KEYS,
+         quote_keys     => exists $args{ quote_keys } ? $args{ quote_keys } : DEFAULT_QUOTE_KEYS,
+         filename       => $args{ filename },
+         autoflush      => exists $args{ autoflush } ? $args{ autoflush } : 1,
+        _fh             => undef,
     };
 
     my $fh = IO::File->new( ">> " . $self->{filename} );
@@ -179,6 +183,44 @@ sub level
     my ( $self, $arg ) = @_;
     $self->{ level } = $arg if defined $arg;
     return $self->{ level };
+}
+
+=head3 history_length
+
+Controls how many historical log events to remember.
+
+This is the number of events, not number of statments or dumps.
+
+If a debug statement includes 3 messages/objects, all 3 are stored in one unit of length.
+
+ $log->history_length( 10 );
+
+=cut
+
+sub history_length
+{
+    my ( $self, $arg ) = @_;
+    $self->{ history_length } = $arg if defined $arg;
+    return $self->{ history_length };
+}
+
+=head3 history
+
+The list of historical statements/objects.
+
+Each point in the history is an arrayref of statements/objects.
+
+This is only a getter, the history is accumulated internally.
+
+ $log->history;
+
+=cut
+
+sub history
+{
+    my $self = shift;
+
+    return $self->{ history };
 }
 
 =head3 dumps
@@ -411,6 +453,23 @@ sub _flush
     return $self;
 }
 
+sub _add_to_history
+{
+    my ( $self, @things ) = @_;
+
+    if ( scalar @{ $self->{ history } } >= $self->{ history_length } )
+    {
+        shift @{ $self->{ history } };
+    }
+
+    if ( scalar @{ $self->{ history } } < $self->{ history_length } )
+    {
+        push @{ $self->{ history } }, \@things;
+    }
+
+    return $self;
+}
+
 =head4 trace
 
  $log->trace( "Trace some info" );
@@ -423,6 +482,7 @@ sub trace
 {
     my $self = shift;
     $self->msg( TRACE, @_ ) if $self->is_trace;
+    $self->_add_to_history( @_ );
     return $self;
 }
 
@@ -459,6 +519,7 @@ sub debug
     }
 
     $self->msg( DEBUG, @lines ) if $self->is_debug;
+    $self->_add_to_history( @lines );
 
     return $self;
 }
@@ -481,6 +542,7 @@ sub info
 {
     my $self = shift;
     $self->msg( INFO, @_ ) if $self->is_info;
+    $self->_add_to_history( @_ );
     return $self;
 }
 
@@ -501,6 +563,7 @@ sub warn
 {
     my $self = shift;
     $self->msg( WARN, @_ ) if $self->is_warn;
+    $self->_add_to_history( @_ );
     return $self;
 }
 
@@ -521,6 +584,7 @@ sub error
 {
     my $self = shift;
     $self->msg( ERROR, @_ ) if $self->is_error;
+    $self->_add_to_history( @_ );
     return $self;
 }
 
@@ -541,6 +605,7 @@ sub fatal
 {
     my $self = shift;
     $self->msg( FATAL, @_ ) if $self->is_fatal;
+    $self->_add_to_history( @_ );
     return $self;
 }
 

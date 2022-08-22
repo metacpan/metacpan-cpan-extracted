@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Venus::Class;
+use Venus::Class 'attr', 'base';
 
 base 'Venus::Kind::Utility';
 
@@ -55,11 +55,15 @@ sub callback {
     my $invocant = $self->invocant;
     my $method = $invocant ? $invocant->can($callback) : $self->can($callback);
 
-    $self->throw->error({
-      message => sprintf(qq(Can't locate object method "%s" on package "%s"),
-        ($callback, $invocant ? ref($invocant) : ref($self)))
-    })
-    if !$method;
+    if (!$method) {
+      my $throw;
+      my $error = sprintf(qq(Can't locate object method "%s" on package "%s"),
+        ($callback, $invocant ? ref($invocant) : ref($self)));
+      $throw = $self->throw;
+      $throw->name('on.callback');
+      $throw->message($error);
+      $throw->error;
+    }
 
     $callback = sub {goto $method};
   }
@@ -86,7 +90,7 @@ sub default {
 sub error {
   my ($self, $variable) = @_;
 
-  $self->on_default(sub{($$variable) = @_});
+  $self->on_default(sub{($$variable) = @_}) if $variable;
 
   return $self;
 }

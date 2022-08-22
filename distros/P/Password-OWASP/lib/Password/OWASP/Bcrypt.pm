@@ -1,5 +1,5 @@
 package Password::OWASP::Bcrypt;
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 use Moose;
 
 # ABSTRACT: A BlowfishCrypt implemenation of Password::OWASP
@@ -12,7 +12,7 @@ sub crypt_password {
     my ($self, $pass) = @_;
 
     my $ppr = Authen::Passphrase::BlowfishCrypt->new(
-        cost        => 12,
+        cost        => $self->cost,
         salt_random => 1,
         passphrase  => $self->hash_password($pass),
     );
@@ -33,7 +33,7 @@ Password::OWASP::Bcrypt - A BlowfishCrypt implemenation of Password::OWASP
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 

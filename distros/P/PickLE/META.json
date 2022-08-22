@@ -1,0 +1,113 @@
+{
+   "abstract" : "An electronic component pick list application and file parser library.",
+   "author" : [
+      "Nathan Campos <nathan@innoveworkshop.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.19",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PickLE",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Minilla" : "v3.1.19",
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::MaybeXS" : "1.004003",
+            "Mojolicious" : "9.26",
+            "Moo" : "2.005004",
+            "OptArgs2" : "v0.0.11",
+            "Text::CSV" : "2.01",
+            "XML::Writer" : "0.900",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0.43"
+         }
+      }
+   },
+   "provides" : {
+      "App::pickle::OptArgs" : {
+         "file" : "lib/App/pickle/OptArgs.pm"
+      },
+      "App::pickle::export" : {
+         "file" : "lib/App/pickle/export.pm"
+      },
+      "App::pickle::import" : {
+         "file" : "lib/App/pickle/import.pm"
+      },
+      "PickLE" : {
+         "file" : "lib/PickLE.pm",
+         "version" : "v0.1.0"
+      },
+      "PickLE::Category" : {
+         "file" : "lib/PickLE/Category.pm"
+      },
+      "PickLE::Component" : {
+         "file" : "lib/PickLE/Component.pm"
+      },
+      "PickLE::Converter::EagleBOM" : {
+         "file" : "lib/PickLE/Converter/EagleBOM.pm"
+      },
+      "PickLE::Document" : {
+         "file" : "lib/PickLE/Document.pm"
+      },
+      "PickLE::Exporter::HTML" : {
+         "file" : "lib/PickLE/Exporter/HTML.pm"
+      },
+      "PickLE::Exporter::JSON" : {
+         "file" : "lib/PickLE/Exporter/JSON.pm"
+      },
+      "PickLE::Property" : {
+         "file" : "lib/PickLE/Property.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nathanpc/pickle/issues"
+      },
+      "homepage" : "https://github.com/nathanpc/pickle",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/nathanpc/pickle.git",
+         "web" : "https://github.com/nathanpc/pickle"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_authority" : "cpan:NATHANPC",
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 1
+}

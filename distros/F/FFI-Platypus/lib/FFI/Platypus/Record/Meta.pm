@@ -5,13 +5,13 @@ use warnings;
 use 5.008004;
 
 # ABSTRACT: FFI support for structured records data
-our $VERSION = '1.58'; # VERSION
+our $VERSION = '2.00'; # VERSION
 
 
 {
   require FFI::Platypus;
   my $ffi = FFI::Platypus->new(
-    api          => 1,
+    api          => 2,
   );
   $ffi->bundle;
   $ffi->mangler(sub {
@@ -85,7 +85,7 @@ FFI::Platypus::Record::Meta - FFI support for structured records data
 
 =head1 VERSION
 
-version 1.58
+version 2.00
 
 =head1 DESCRIPTION
 

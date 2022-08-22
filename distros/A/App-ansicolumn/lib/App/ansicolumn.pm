@@ -1,6 +1,6 @@
 package App::ansicolumn;
 
-our $VERSION = "1.19";
+our $VERSION = "1.20";
 
 use v5.14;
 use warnings;
@@ -23,7 +23,7 @@ use App::ansicolumn::Border;
 
 use Getopt::EX::Hashed; {
 
-    Getopt::EX::Hashed->configure( DEFAULT => [ is => 'ro' ] );
+    Getopt::EX::Hashed->configure( DEFAULT => [ is => 'lv' ] );
 
     has debug               => '         ' ;
     has help                => '    h    ' ;
@@ -55,11 +55,11 @@ use Getopt::EX::Hashed; {
     has runin               => ' =i      ' , min => 0, default => 2 ;
     has runout              => ' =i      ' , min => 0, default => 2 ;
     has pagebreak           => ' !       ' , default => 1 ;
-    has border              => ' :s      ' ; has B => '' , action => sub { $_->{border} = '' } ;
+    has border              => ' :s      ' ; has B => '' , action => sub { $_->border = '' } ;
     has border_style        => ' =s   bs ' , default => 'vbar' ;
     has white_space         => ' !       ' , default => 2 ;
     has isolation           => ' !       ' , default => 2 ;
-    has fillup              => ' :s      ' ; has F => '' , action => sub { $_->{fillup} = '' } ;
+    has fillup              => ' :s      ' ; has F => '' , action => sub { $_->fillup = '' } ;
     has fillup_str          => ' :s      ' , default => '' ;
     has ambiguous           => ' =s      ' , default => 'narrow' ;
     has discard_el          => ' !       ' , default => 1 ;
@@ -99,7 +99,7 @@ use Getopt::EX::Hashed; {
     has [ qw(+height +width +pane +pane_width) ] => sub {
 	my $obj = $_;
 	my($name, $val) = @_;
-	$obj->{$name} = $val !~ /\D/ ? $val : do {
+	$obj->$name = $val !~ /\D/ ? $val : do {
 	    my $init = $name =~ /height/ ? $obj->term_height : $obj->term_width;
 	    rpn_calc($init, $val) // die "$val: invalid $name.\n";
 	};
@@ -163,43 +163,43 @@ sub setup_options {
     ## --border takes optional border-style value
     if (defined(my $border = $obj->border)) {
 	if ($border ne '') {
-	    $obj->{border_style} = $border;
+	    $obj->border_style = $border;
 	}
-	$obj->{border} = 1;
+	$obj->border = 1;
     }
 
     ## --linestyle
     if ($obj->linestyle eq 'wordwrap') {
-	$obj->{linestyle} = 'wrap';
-	$obj->{boundary} = 'word';
+	$obj->linestyle = 'wrap';
+	$obj->boundary = 'word';
     }
 
     ## -P
     if (defined $obj->page) {
-	$obj->{widen} = 1 if $obj->pane and not $obj->pane_width;
-	$obj->{height} ||= $obj->page || $obj->term_height - 1;
-	$obj->{linestyle} ||= 'wrap';
-	$obj->{border} //= 1;
-	$obj->{fillup} //= 'pane';
+	$obj->widen = 1 if $obj->pane and not $obj->pane_width;
+	$obj->height ||= $obj->page || $obj->term_height - 1;
+	$obj->linestyle ||= 'wrap';
+	$obj->border //= 1;
+	$obj->fillup //= 'pane';
     }
 
     ## -U
     if ($obj->up) {
-	$obj->{pane} = $obj->up;
-	$obj->{widen} = 1;
-	$obj->{linestyle} ||= 'wrap';
-	$obj->{border} //= 1;
-	$obj->{fillup} //= 'pane';
+	$obj->pane = $obj->up;
+	$obj->widen = 1;
+	$obj->linestyle ||= 'wrap';
+	$obj->border //= 1;
+	$obj->fillup //= 'pane';
     }
 
     ## -D
     if ($obj->document) {
-	$obj->{widen} = 1;
-	$obj->{linebreak} ||= 'all';
-	$obj->{linestyle} ||= 'wrap';
-	$obj->{boundary} ||= 'word';
-	$obj->{white_space} = 0 if $obj->white_space > 1;
-	$obj->{isolation} = 0 if $obj->isolation > 1;
+	$obj->widen = 1;
+	$obj->linebreak ||= 'all';
+	$obj->linestyle ||= 'wrap';
+	$obj->boundary ||= 'word';
+	$obj->white_space = 0 if $obj->white_space > 1;
+	$obj->isolation = 0 if $obj->isolation > 1;
     }
 
     ## --colormap
@@ -211,7 +211,7 @@ sub setup_options {
 
     ## --border
     if ($obj->border) {
-	my $style = $obj->{border_style};
+	my $style = $obj->border_style;
 	($obj->{BORDER} = App::ansicolumn::Border->new)
 	    ->style($style) // die "$style: Unknown style.\n";
     }
@@ -236,7 +236,7 @@ sub column_out {
     my $max_length = max @length;
     my $unit = $obj->column_unit || 1;
 
-    ($obj->{span}, $obj->{panes}) = do {
+    ($obj->span, $obj->panes) = do {
 	my $span;
 	my $panes;
 	if ($obj->widen and not $obj->pane_width) {
@@ -262,12 +262,12 @@ sub column_out {
 	@data = map { $sub->($_) } @data;
     }
 
-    $obj->{border_height} = do {
+    $obj->border_height = do {
 	sum map { length > 0 }
 	    map { $obj->get_border($_) }
 	    qw(top bottom);
     };
-    $obj->{height} ||=
+    $obj->height ||=
 	div(0+@data, $obj->panes) + $obj->border_height;
 
     die "Not enough height.\n" if $obj->effective_height <= 0;

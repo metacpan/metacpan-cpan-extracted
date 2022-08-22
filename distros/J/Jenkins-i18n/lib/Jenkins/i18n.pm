@@ -7,6 +7,7 @@ use Carp qw(confess);
 use File::Find;
 use File::Spec;
 use Set::Tiny;
+use File::Path qw(make_path);
 
 use Jenkins::i18n::Properties;
 
@@ -34,7 +35,7 @@ our @EXPORT_OK = (
     'load_jelly',    'find_langs'
 );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head2 EXPORT
 
@@ -169,6 +170,28 @@ sub find_files {
 
 my $regex = qr/_([a-z]{2})(_[A-Z]{2})?\.properties$/;
 
+=head2 find_langs
+
+Finds all ISO 639-1 standard language based codes available in the Jenkins
+repository based on the filenames prefix (before the file extension) of the
+translated files.
+
+This is basically the opposite of C<find_files> does.
+
+It expect as parameters the complete path to a directory to search for the
+files.
+
+Returns a instance of the L<Set::Tiny> class containing all the language codes
+that were identified.
+
+=back
+
+Find all files Jelly and Java Properties files that could be translated from
+English, i.e., files that do not have a ISO 639-1 standard language based code
+as a filename prefix (before the file extension).
+
+=cut
+
 sub find_langs {
     my $dir = shift;
     confess 'Must provide a string, invalid directory parameter'
@@ -225,9 +248,16 @@ an array reference with the license text.
 
 sub print_license {
     my ( $file, $data_ref ) = @_;
-    my ( $filename, $dirs, $suffix ) = fileparse($file);
-    mkpath($dirs) unless ( -d $dirs );
-    open( my $out, ">" . $file ) or die "Cannot write to $file: $!\n";
+    confess 'The complete path to the file parameter is required'
+        unless ($file);
+    confess 'The data reference parameter is required' unless ($data_ref);
+    confess 'The data reference must be an array reference'
+        unless ( ref($data_ref) eq 'ARRAY' );
+
+    # only dirs part is desired
+    my $dirs = ( File::Spec->splitpath($file) )[1];
+    make_path($dirs) unless ( -d $dirs );
+    open( my $out, '>', $file ) or confess "Cannot write to $file: $!\n";
 
     foreach my $line ( @{$data_ref} ) {
         print $out "#$line";

@@ -1,5 +1,10 @@
 Revision history for Socket
 
+2.036   2022-08-19
+        [BUGFIXES]
+         * Avoid putting macros inside arguments to other macros, as it annoys
+           strict C compilers (Perl #20119)
+
 2.035   2022-07-01
         [CHANGES]
          * Support SO_INCOMING_CPU and SO_INCOMING_NAPI_ID

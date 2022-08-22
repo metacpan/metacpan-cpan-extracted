@@ -40,6 +40,8 @@ t/die.t
 t/dump.t
 t/field.html
 t/field.t
+t/file_upload.html
+t/file_upload.t
 t/find_frame.html
 t/find_frame.t
 t/find_image.t
@@ -95,6 +97,7 @@ t/local/referer.t
 t/local/reload.t
 t/local/select_multiple.t
 t/local/submit.t
+t/mech-dump/file_not_found.t
 t/mech-dump/mech-dump.t
 t/new.t
 t/refresh.html

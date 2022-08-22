@@ -8,20 +8,6 @@ use warnings;
 use Test::More;
 use Venus::Test;
 
-$INC{"$_.pm"} = $0 for qw(
-  Admin
-  Create
-  Delete
-  Elliot
-  Engineer
-  Entity
-  Example
-  HasType
-  IsAdmin
-  Manage
-  User
-);
-
 my $test = test(__FILE__);
 
 =name
@@ -63,6 +49,7 @@ method: does
 method: export
 method: from
 method: import
+method: item
 method: meta
 method: name
 method: role
@@ -480,8 +467,8 @@ $test->for('example', 2, 'base', sub {
 
 $test->for('example', 3, 'base', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->error->result;
-  ok $result =~ qr/Can't locate Manager\.pm in \@INC/;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error =~ qr/Can't locate Manager\.pm in \@INC/;
 
   $result
 });
@@ -1069,8 +1056,8 @@ $test->for('example', 1, 'export', sub {
 =method from
 
 The FROM method is a class building lifecycle hook which registers a base class
-for the calling package, automatically invoking the L</AUDIT> hook on the base
-class.
+for the calling package, automatically invoking the L</AUDIT> and L</IMPORT>
+hooks on the base class.
 
 =signature from
 
@@ -1229,6 +1216,80 @@ $test->for('example', 1, 'import', sub {
   ok $result->DOES('Admin');
   no warnings 'once';
   ok $Admin::USES == 1;
+
+  $result
+});
+
+=method item
+
+The ITEM method is a class instance lifecycle hook which is responsible for
+I<"getting"> and I<"setting"> instance items (or attributes). By default, all
+class attributes are dispatched to this method.
+
+=signature item
+
+  ITEM(Str $name, Any @args) (Str | Object)
+
+=metadata item
+
+{
+  since => '1.11',
+}
+
+=example-1 item
+
+  package User;
+
+  use base 'Venus::Core';
+
+  User->ATTR('name');
+
+  package main;
+
+  my $user = User->BLESS;
+
+  # bless({}, 'User')
+
+  my $item = $user->ITEM('name', 'unknown');
+
+  # "unknown"
+
+=cut
+
+$test->for('example', 1, 'item', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq 'unknown';
+
+  $result
+});
+
+=example-2 item
+
+  package User;
+
+  use base 'Venus::Core';
+
+  User->ATTR('name');
+
+  package main;
+
+  my $user = User->BLESS;
+
+  # bless({}, 'User')
+
+  $user->ITEM('name', 'known');
+
+  my $item = $user->ITEM('name');
+
+  # "known"
+
+=cut
+
+$test->for('example', 2, 'item', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq 'known';
 
   $result
 });

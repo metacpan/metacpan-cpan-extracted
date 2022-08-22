@@ -14,12 +14,12 @@ use base 'DBIx::Class::Core';
 
 =head1 VERSION
 
-This documentation refers to version 0.016 of
+This documentation refers to version 0.017 of
 Math::DifferenceSet::Planar::Schema::Result::DifferenceSetSpace.
 
 =cut
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 =head1 TABLE: C<difference_set_space>
 

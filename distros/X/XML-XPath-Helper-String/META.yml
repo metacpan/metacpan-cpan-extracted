@@ -1,7 +1,7 @@
 --- #YAML:1.0
 name:                XML-XPath-Helper-String
-version:             0.01
-abstract:            Helper functions for xpath expression
+version:             1.01
+abstract:            Helper functions for xpath expression.
 license:             perl_5
 author:              
     - Abdul al Hazred <451@gmx.eu>

@@ -8,11 +8,10 @@
 
 #include "CursesDef.h"
 #include "c-config.h"
-#ifdef VMS
-#include <unistd.h>  /* not in perl.h ??? */
-#endif
 #ifdef WIN32
-#include <Windows.h>
+  #include <Windows.h>
+#else
+  #include <unistd.h>
 #endif
 
 static void
@@ -28,7 +27,7 @@ sleepSeconds(unsigned int seconds) {
 
 
 int
-main(unsigned int  const argc,
+main(int           const argc,
      const char ** const argv) {
 
     WINDOW *b;

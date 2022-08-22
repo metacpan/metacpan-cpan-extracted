@@ -52,12 +52,15 @@ ok(
 my $updated_password;
 
 $pwo = Password::OWASP::Argon2->new(
+    cost => 4,
     update_method => sub {
         my ($password) = shift;
         $updated_password = $password;
         return 1;
     },
 );
+
+is($pwo->cost, 4, "Changed the cost to 4");
 
 $pwo->check_password('demo', '{CLEARTEXT}demo');
 

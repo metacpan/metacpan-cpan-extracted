@@ -1,5 +1,8 @@
 Revision history for File-ShouldUpdate
 
+0.2.1       2022-08-18
+    - Documentation improvements.
+
 0.2.0       2020-11-25
     - Add should_update_multi().
 

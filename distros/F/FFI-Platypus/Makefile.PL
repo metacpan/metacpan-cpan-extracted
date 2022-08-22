@@ -39,6 +39,8 @@ my %WriteMakefileArgs = (
     "lib/FFI/Build/File/Object.pm"               => "\$(INST_LIB)/FFI/Build/File/Object.pm",
     "lib/FFI/Build/MM.pm"                        => "\$(INST_LIB)/FFI/Build/MM.pm",
     "lib/FFI/Build/Platform.pm"                  => "\$(INST_LIB)/FFI/Build/Platform.pm",
+    "lib/FFI/Build/Plugin.pm"                    => "\$(INST_LIB)/FFI/Build/Plugin.pm",
+    "lib/FFI/Build/PluginData.pm"                => "\$(INST_LIB)/FFI/Build/PluginData.pm",
     "lib/FFI/Platypus.pm"                        => "\$(INST_LIB)/FFI/Platypus.pm",
     "lib/FFI/Platypus/API.pm"                    => "\$(INST_LIB)/FFI/Platypus/API.pm",
     "lib/FFI/Platypus/Buffer.pm"                 => "\$(INST_LIB)/FFI/Platypus/Buffer.pm",
@@ -74,21 +76,23 @@ my %WriteMakefileArgs = (
     "lib/FFI/Temp.pm"                            => "\$(INST_LIB)/FFI/Temp.pm"
   },
   "PREREQ_PM" => {
-    "Capture::Tiny"       => 0,
-    "ExtUtils::MakeMaker" => "7.12",
-    "FFI::CheckLib"       => "0.05",
-    "IPC::Cmd"            => 0,
-    "JSON::PP"            => 0,
-    "List::Util"          => "1.45",
-    "constant"            => "1.32",
-    "parent"              => 0
+    "Capture::Tiny"         => 0,
+    "ExtUtils::MakeMaker"   => "7.12",
+    "FFI::CheckLib"         => "0.05",
+    "File::Spec::Functions" => 0,
+    "IPC::Cmd"              => 0,
+    "JSON::PP"              => 0,
+    "List::Util"            => "1.45",
+    "autodie"               => 0,
+    "constant"              => "1.32",
+    "parent"                => 0
   },
   "TEST_REQUIRES" => {
     "Capture::Tiny" => 0,
     "Test2::API"    => "1.302015",
     "Test2::V0"     => "0.000121"
   },
-  "VERSION" => "1.58",
+  "VERSION" => "2.00",
   "test"    => {
     "TESTS" => "t/*.t"
   }

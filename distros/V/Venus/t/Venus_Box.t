@@ -84,7 +84,8 @@ $test->for('integrates');
 
 =method unbox
 
-The unbox method returns the un-boxed underlying object.
+The unbox method returns the un-boxed underlying object. This is a virtual
+method that dispatches to C<__handle__unbox>.
 
 =signature unbox
 

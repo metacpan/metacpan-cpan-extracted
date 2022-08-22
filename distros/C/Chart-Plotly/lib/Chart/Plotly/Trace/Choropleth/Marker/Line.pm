@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace choropleth.
 
@@ -34,15 +34,15 @@ sub TO_JSON {
 }
 
 has color => (
-    is  => "rw",
-    isa => "Str|ArrayRef[Str]",
+    is            => "rw",
+    isa           => "Str|ArrayRef[Str]",
     documentation =>
-      "Sets themarker.linecolor. It accepts either a specific color or an array of numbers that are mapped to the colorscale relative to the max and min values of the array or relative to `marker.line.cmin` and `marker.line.cmax` if set.",
+      "Sets the marker.line color. It accepts either a specific color or an array of numbers that are mapped to the colorscale relative to the max and min values of the array or relative to `marker.line.cmin` and `marker.line.cmax` if set.",
 );
 
 has colorsrc => ( is            => "rw",
                   isa           => "Str",
-                  documentation => "Sets the source reference on plot.ly for  color .",
+                  documentation => "Sets the source reference on Chart Studio Cloud for `color`.",
 );
 
 has width => ( is            => "rw",
@@ -52,7 +52,7 @@ has width => ( is            => "rw",
 
 has widthsrc => ( is            => "rw",
                   isa           => "Str",
-                  documentation => "Sets the source reference on plot.ly for  width .",
+                  documentation => "Sets the source reference on Chart Studio Cloud for `width`.",
 );
 
 __PACKAGE__->meta->make_immutable();
@@ -70,7 +70,7 @@ Chart::Plotly::Trace::Choropleth::Marker::Line - This attribute is one of the po
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -241,11 +241,11 @@ Serialize the trace to JSON. This method should be called only by L<JSON> serial
 
 =item * color
 
-Sets themarker.linecolor. It accepts either a specific color or an array of numbers that are mapped to the colorscale relative to the max and min values of the array or relative to `marker.line.cmin` and `marker.line.cmax` if set.
+Sets the marker.line color. It accepts either a specific color or an array of numbers that are mapped to the colorscale relative to the max and min values of the array or relative to `marker.line.cmin` and `marker.line.cmax` if set.
 
 =item * colorsrc
 
-Sets the source reference on plot.ly for  color .
+Sets the source reference on Chart Studio Cloud for `color`.
 
 =item * width
 
@@ -253,7 +253,7 @@ Sets the width (in px) of the lines bounding the marker points.
 
 =item * widthsrc
 
-Sets the source reference on plot.ly for  width .
+Sets the source reference on Chart Studio Cloud for `width`.
 
 =back
 
@@ -263,7 +263,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

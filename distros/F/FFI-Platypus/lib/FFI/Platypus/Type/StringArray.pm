@@ -6,14 +6,14 @@ use 5.008004;
 use FFI::Platypus;
 
 # ABSTRACT: Platypus custom type for arrays of strings
-our $VERSION = '1.58'; # VERSION
+our $VERSION = '2.00'; # VERSION
 
 
 use constant _incantation =>
   $^O eq 'MSWin32' && do { require Config; $Config::Config{archname} =~ /MSWin32-x64/ }
   ? 'Q'
   : 'L!';
-use constant _size_of_pointer => FFI::Platypus->new( api => 1 )->sizeof('opaque');
+use constant _size_of_pointer => FFI::Platypus->new( api => 2 )->sizeof('opaque');
 use constant _pointer_buffer => "P" . _size_of_pointer;
 
 my @stack;
@@ -97,7 +97,7 @@ sub ffi_custom_type_api_1
       $array_pointer;
     };
 
-    my $pointer_buffer = "P@{[ FFI::Platypus->new( api => 1 )->sizeof('opaque') * $count ]}";
+    my $pointer_buffer = "P@{[ FFI::Platypus->new( api => 2 )->sizeof('opaque') * $count ]}";
     my $incantation_count = _incantation.$count;
 
     $config->{native_to_perl} = sub {
@@ -125,7 +125,7 @@ FFI::Platypus::Type::StringArray - Platypus custom type for arrays of strings
 
 =head1 VERSION
 
-version 1.58
+version 2.00
 
 =head1 SYNOPSIS
 
@@ -145,9 +145,9 @@ In your C code:
 
 In your L<Platypus::FFI> code:
 
- use FFI::Platypus;
+ use FFI::Platypus 2.00;
  
- my $ffi = FFI::Platypus->new( api => 1 );
+ my $ffi = FFI::Platypus->new( api => 2 );
  $ffi->load_custom_type('::StringArray' => 'string_array');
  $ffi->load_custom_type('::StringArray' => 'string_5' => 5);
  

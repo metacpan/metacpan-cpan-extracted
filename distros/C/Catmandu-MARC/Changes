@@ -1,5 +1,13 @@
 Revision history for Catmandu-MARC
 
+1.281  2022-08-17 09:26:17 CEST
+  - Minor fixes in tutorial [VladimirAlexiev]
+  
+1.28  2022-02-28 08:23:55 CET
+  - Adding github action workflows [jorol]
+  - Adding support for special subfield codes that are allowed in MARC [jorol]
+  - Special subfield code support for all importers and exporters
+  
 1.271  2021-10-30 06:04:35 CEST
   - Fixing the copyright and documentation of packages
   

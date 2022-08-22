@@ -17,15 +17,16 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Build" : "2.51",
+            "Alien::Build" : "2.59",
             "Alien::Build::MB" : "0.07",
             "Module::Build" : "0.28"
          }
       },
       "configure" : {
          "requires" : {
-            "Alien::Build" : "1.14",
+            "Alien::Build" : "2.57",
             "Alien::Build::MB" : "0.02",
+            "Alien::Build::Plugin::Digest::Negotiate" : "0",
             "Module::Build" : "0.28",
             "perl" : "5.006"
          }
@@ -142,7 +143,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "2.5100",
+   "version" : "2.5900",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {

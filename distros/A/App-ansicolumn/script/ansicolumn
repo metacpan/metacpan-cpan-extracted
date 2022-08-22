@@ -48,7 +48,7 @@ ansicolumn [options] [file ...]
     --[no-]pagebreak     allow page break
     --border-style=#     border style
     --[no-]ignore-space  ignore space in table output
-    --[no-]white-space   allow white spaces at the top of each panes
+    --[no-]white-space   allow white spaces at the top of each pane
     --[no-]isolation     page-end line isolation
     --tabstop=#          tab-stop character
     --tabhead=#          tab-head character
@@ -58,7 +58,7 @@ ansicolumn [options] [file ...]
 
 =head1 VERSION
 
-Version 1.19
+Version 1.20
 
 =head1 DESCRIPTION
 
@@ -104,7 +104,7 @@ Fill columns before filling rows.
 
 =item B<-o>#, B<--output-separator>=#
 
-When used B<--table> or B<-t> option, each columns are joined by two
+When used B<--table> or B<-t> option, each column are joined by two
 space characters (' ') by default.  This option will change it.
 
 =item B<-R>I<columns>, B<--table-right>=I<columns>
@@ -166,7 +166,7 @@ section.
 
 =item B<-W>, B<--widen>
 
-Use full width of the terminal.  Each panes are expanded to fill
+Use full width of the terminal.  Each pane is expanded to fill
 terminal width, unless B<--pane-width> is specified.
 
 =item B<-p>, B<--paragraph>
@@ -196,7 +196,7 @@ Set page height and page mode on.  See L</CALCULATION> section.
 
 =item B<--column-unit>=#, B<--cu>=#
 
-Each columns are placed at the unit of 8 by default.  This option
+Each column is placed at the unit of 8 by default.  This option
 changes the number of the unit.
 
 =item B<--linestyle>=C<none>|C<truncate>|C<wrap>|C<wordwrap>, B<--ls>=C<...>
@@ -281,8 +281,8 @@ B<--no-ignore-space> option to disable it.
 
 =item B<-->[B<no->]B<white-space>
 
-Allow white spaces at the top of each panes, or clean them up.
-Default true.  Negated by B<--document> option.
+Allow white spaces at the top of each pane, or clean them up.  Default
+true.  Negated by B<--document> option.
 
 =item B<-->[B<no->]B<isolation>
 

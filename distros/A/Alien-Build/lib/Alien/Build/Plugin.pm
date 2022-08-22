@@ -10,7 +10,7 @@ use Digest::SHA ();
 our @CARP_NOT = qw( alienfile Alien::Build Alien::Build::Meta );
 
 # ABSTRACT: Plugin base class for Alien::Build
-our $VERSION = '2.52'; # VERSION
+our $VERSION = '2.59'; # VERSION
 
 
 sub new
@@ -65,19 +65,6 @@ sub import
   };
 
   { no strict 'refs'; *{ "${caller}::has" } = $has }
-}
-
-
-sub subplugin
-{
-  my(undef, $name, %args) = @_;
-  Carp::carp("subplugin method is deprecated");
-  my $class = "Alien::Build::Plugin::$name";
-  my $pm = "$class.pm";
-  $pm =~ s/::/\//g;
-  require $pm unless eval { $class->can('new') };
-  delete $args{$_} for grep { ! defined $args{$_} } keys %args;
-  $class->new(%args);
 }
 
 
@@ -146,7 +133,7 @@ Alien::Build::Plugin - Plugin base class for Alien::Build
 
 =head1 VERSION
 
-version 2.52
+version 2.59
 
 =head1 SYNOPSIS
 
@@ -207,6 +194,10 @@ Methods for retrieving from the internet.
 
 Normally use Download plugins which will pick the correct Decode plugins.
 
+=item L<Alien::Build::Plugin::Digest>
+
+Check cryptographic signatures on downloaded files.
+
 =item L<Alien::Build::Plugin::Extract>
 
 Extract from archives that have been downloaded.
@@ -250,27 +241,6 @@ in practice you should never have two instances with the exact same arguments.
 
 You provide the implementation for this.  The intent is to register
 hooks and set meta properties on the L<Alien::Build> class.
-
-=head2 subplugin
-
-B<DEPRECATED>: Maybe removed, but not before 1 October 2018.
-
- my $plugin2 = $plugin1->subplugin($plugin_name, %args);
-
-Finds the given plugin and loads it (unless already loaded) and creats a
-new instance and returns it.  Most useful from a Negotiate plugin,
-like this:
-
- sub init
- {
-   my($self, $meta) = @_;
-   $self->subplugin(
-     'Foo::Bar',  # loads Alien::Build::Plugin::Foo::Bar,
-                  # or throw exception
-     foo => 1,    # these key/value pairs passsed into new
-     bar => 2,    # for the plugin instance.
-   )->init($meta);
- }
 
 =head2 has
 

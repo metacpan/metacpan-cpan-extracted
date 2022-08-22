@@ -3,7 +3,7 @@
 use strict;
 use Test::More 0.90;
 
-use Variable::OnDestruct;
+use Variable::OnDestruct qw/on_destruct on_destruct_fifo/;
 use Symbol qw/gensym/;
 
 subtest 'Variable types', sub {
@@ -30,6 +30,20 @@ subtest 'Localization', sub {
 		is($counter, 0, 'destructor is not triggered on delocalization');
 	}
 	is($counter, 1, 'destructor is triggered on destruction');
+};
+
+subtest 'lifo', sub {
+	my $var = 'foo';
+	my $counter = 0;
+	on_destruct $var, sub { is($counter++, 1, 'first') };
+	on_destruct $var, sub { is($counter++, 0, 'second') };
+};
+
+subtest 'fifo', sub {
+	my $var = 'foo';
+	my $counter = 0;
+	on_destruct_fifo $var, sub { is($counter++, 0, 'first') };
+	on_destruct_fifo $var, sub { is($counter++, 1, 'second') };
 };
 
 done_testing;

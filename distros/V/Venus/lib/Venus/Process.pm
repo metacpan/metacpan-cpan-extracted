@@ -11,7 +11,7 @@ use overload (
   fallback => 1,
 );
 
-use Venus::Class;
+use Venus::Class 'base', 'with';
 
 base 'Venus::Kind::Utility';
 
@@ -81,6 +81,7 @@ sub chdir {
     my $throw;
     my $error = "Can't chdir $path: $!";
     $throw = $self->throw;
+    $throw->name('on.chdir');
     $throw->message($error);
     $throw->stash(path => $path);
     $throw->stash(pid => _pid());
@@ -152,6 +153,7 @@ sub fork {
     my $throw;
     my $error = "Can't fork process @{[_pid()]}: Fork emulation not supported";
     $throw = $self->throw;
+    $throw->name('on.fork.support');
     $throw->message($error);
     $throw->stash(process => _pid());
     $throw->error;
@@ -164,6 +166,7 @@ sub fork {
     }
 
     $process = $self->class->new;
+    srand;
 
     if ($code) {
       local $_ = $process;
@@ -176,6 +179,7 @@ sub fork {
     my $throw;
     my $error = "Can't fork process @{[_pid()]}: $!";
     $throw = $self->throw;
+    $throw->name('on.fork.process');
     $throw->message($error);
     $throw->stash(process => _pid());
     $throw->error;
@@ -215,6 +219,7 @@ sub setsid {
     my $throw;
     my $error = "Can't start a new session: $!";
     $throw = $self->throw;
+    $throw->name('on.setsid');
     $throw->message($error);
     $throw->stash(pid => _pid());
     $throw->error;
@@ -237,6 +242,7 @@ sub stderr {
       my $throw;
       my $error = "Can't redirect STDERR to $path: $!";
       $throw = $self->throw;
+      $throw->name('on.stderr');
       $throw->message($error);
       $throw->stash(path => $path);
       $throw->stash(pid => _pid());
@@ -263,6 +269,7 @@ sub stdin {
       my $throw;
       my $error = "Can't redirect STDIN to $path: $!";
       $throw = $self->throw;
+      $throw->name('on.stdin');
       $throw->message($error);
       $throw->stash(path => $path);
       $throw->stash(pid => _pid());
@@ -289,6 +296,7 @@ sub stdout {
       my $throw;
       my $error = "Can't redirect STDOUT to $path: $!";
       $throw = $self->throw;
+      $throw->name('on.stdout');
       $throw->message($error);
       $throw->stash(path => $path);
       $throw->stash(pid => _pid());

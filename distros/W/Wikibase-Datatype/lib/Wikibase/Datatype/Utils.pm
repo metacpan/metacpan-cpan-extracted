@@ -11,7 +11,7 @@ use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(check_entity check_language check_lexeme check_property);
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
 
 sub check_entity {
 	my ($self, $key) = @_;
@@ -137,6 +137,8 @@ Returns undef.
 
 =head1 EXAMPLE1
 
+=for comment filename=check_entity_success.pl
+
  use strict;
  use warnings;
 
@@ -154,6 +156,8 @@ Returns undef.
  # ok
 
 =head1 EXAMPLE2
+
+=for comment filename=check_entity_fail.pl
 
  use strict;
  use warnings;
@@ -176,6 +180,8 @@ Returns undef.
 
 =head1 EXAMPLE3
 
+=for comment filename=check_lexeme_success.pl
+
  use strict;
  use warnings;
 
@@ -193,6 +199,8 @@ Returns undef.
  # ok
 
 =head1 EXAMPLE4
+
+=for comment filename=check_lexeme_fail.pl
 
  use strict;
  use warnings;
@@ -215,6 +223,8 @@ Returns undef.
 
 =head1 EXAMPLE5
 
+=for comment filename=check_property_success.pl
+
  use strict;
  use warnings;
 
@@ -232,6 +242,8 @@ Returns undef.
  # ok
 
 =head1 EXAMPLE6
+
+=for comment filename=check_property_fail.pl
 
  use strict;
  use warnings;
@@ -288,6 +300,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.19
+0.20
 
 =cut

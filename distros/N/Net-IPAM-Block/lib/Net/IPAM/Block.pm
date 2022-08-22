@@ -1,6 +1,6 @@
 package Net::IPAM::Block;
 
-our $VERSION = '5.20';
+our $VERSION = '6.01';
 
 use 5.10.0;
 use strict;

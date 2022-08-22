@@ -1,9 +1,9 @@
 NAME
-    App::wordlist - Grep words from WordList::*
+    App::wordlist - Grep words from (or test them against) WordList::*
 
 VERSION
-    This document describes version 0.281 of App::wordlist (from Perl
-    distribution App-wordlist), released on 2021-10-24.
+    This document describes version 0.290 of App::wordlist (from Perl
+    distribution App-wordlist), released on 2022-08-20.
 
 SYNOPSIS
     See the included script wordlist.
@@ -14,13 +14,18 @@ FUNCTIONS
 
      wordlist(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-    Grep words from WordList::*.
+    Grep words from (or test them against) WordList::*.
 
     Examples:
 
     *   By default print all words from all wordlists:
 
          wordlist();
+
+    *   Print all words from all static wordlists (dynamic ones are excluded
+        with --exclude-dynamic-wordlists a.k.a. -D):
+
+         wordlist(exclude_dynamic_wordlists => 1);
 
     *   Print all words matching /foo/ and /bar/:
 
@@ -41,6 +46,20 @@ FUNCTIONS
     *   Select all ID::* wordlists (wildcard will be expanded):
 
          wordlist(arg => ["foo"], wordlists => ["ID::**"]);
+
+    *   Select a bunch of wordlists via wordlist bundle
+        (Acme::CPANModules::WordListBundle::* module):
+
+         wordlist(arg => ["foo"], wordlist_bundles => ["Proverbs"]);
+
+    *   An alternative to select all proverb wordlists:
+
+         wordlist(arg => ["foo"], wordlists => ["Phrase::**::Proverb::**"]);
+
+    *   Check to see which wordlists we are selecting via `-w` with
+        wildcards or via `-b`:
+
+         wordlist(action => "list_selected", wordlists => ["Phrase::**::Proverb::**"]);
 
     *   Print all words from EN::Enable wordlist that are 6 characters long
         and have the letters BOBLEG (in no particular order); great for
@@ -84,11 +103,62 @@ FUNCTIONS
 
          wordlist(action => "list_cpan");
 
+    *   Show statistics of a wordlist module:
+
+         wordlist(action => "stat", wordlists => ["ID::KBBI"]);
+
+    *   Check some passwords against a password wordlist:
+
+         wordlist(
+             arg => ["foobar", 123456, "someGoodPass923"],
+           action => "test",
+           wordlists => ["Password::RockYou::BloomOnly"]
+         );
+
+    *   Check some passwords against all Password wordlists except
+        Password::RockYou (because it is slow to check):
+
+         wordlist(
+             arg => ["foobar", 123456, "someGoodPass923"],
+           action => "test",
+           exclude_wordlists => ["Password::RockYou"],
+           wordlists => ["Password::**"]
+         );
+
+    *   Check some passwords against all Password wordlists except those
+        matching /RockYou/ regex:
+
+         wordlist(
+             arg => ["foobar", 123456, "someGoodPass923"],
+           action => "test",
+           exclude_wordlist_pattern => "RockYou",
+           wordlists => ["Password::**"]
+         );
+
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
 
     *   action => *str* (default: "grep")
+
+        Action "list_installed" (shortcut option "-l") will list WordList::*
+        modules installed on the local system.
+
+        Action "list_cpan" (shortcut option "-L") will list available
+        WordList::* modules on CPAN, either by querying the MetaCPAN site or
+        by querying a local mini CPAN using App::lcpan.
+
+        Action "list_selected" (option "--action=list_selected") will list
+        the selected WordList::* modules (e.g. via "-w" or "-b").
+
+        Action "grep" (the default action) will filter the words from each
+        selected wordlists and print them.
+
+        Action "stat" (shortcut option "-s") will show statistics about all
+        the selected wordlists.
+
+        Action "test" (shortcut option "-t") will check whether words are in
+        one of the wordlist, using "word_exists()" method on each wordlist.
 
     *   arg => *array[str]*
 
@@ -112,6 +182,14 @@ FUNCTIONS
         wordlist's language.
 
         When returning grep result, this means also returning wordlist name.
+
+    *   exclude_dynamic_wordlists => *bool*
+
+    *   exclude_wordlist_pattern => *re_from_str*
+
+    *   exclude_wordlists => *array[str]*
+
+        Exclude wordlist modules.
 
     *   ignore_case => *bool* (default: 1)
 
@@ -151,7 +229,129 @@ FUNCTIONS
         gathered first, then words will be chosen randomly from the gathered
         list.
 
+    *   wordlist_bundles => *array[str]*
+
+        Select one or more wordlist bundle
+        (Acme::CPANModules::WordListBundle::*) modules.
+
     *   wordlists => *array[str]*
+
+        Select one or more wordlist modules.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  wordlist_wordle
+    Usage:
+
+     wordlist_wordle(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Help solve Wordle.
+
+    Examples:
+
+    *   One guess:
+
+         wordlist_wordle(arg => ["cR^eEk"]);
+
+    *   Five guesses:
+
+         wordlist_wordle(arg => ["A^R^isE^", "Pound", "might", "blA^ck", "PR^ivY^"]);
+
+    This is a wrapper to wordlist designed to be a convenient helper to
+    solve Wordle puzzle. By default it greps from the "EN::Wordle" wordlist.
+    It accepts a series of guesses in a format like the following:
+
+     A^R^isE^
+     Pound
+     might
+     blA^ck
+     PR^ivY^
+
+    where lowercase means wrong guess, uppercase means correct letter and
+    position, while (uppercase) letter followed by a caret ("^") means the
+    letter exists in another position. It will convert these guesses to
+    regex patterns and the "--chars-unordered" option and pass it to
+    "wordlist".
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   arg => *array[str]*
+
+    *   color => *str* (default: "auto")
+
+        When to highlight search string/matching pattern with color.
+
+    *   detail => *bool*
+
+        Display more information when listing modules/result.
+
+        When listing installed modules ("-l"), this means also returning a
+        wordlist's language.
+
+        When returning grep result, this means also returning wordlist name.
+
+    *   exclude_dynamic_wordlists => *bool*
+
+    *   exclude_wordlist_pattern => *re_from_str*
+
+    *   exclude_wordlists => *array[str]*
+
+        Exclude wordlist modules.
+
+    *   ignore_case => *bool* (default: 1)
+
+    *   langs => *array[str]*
+
+        Only include wordlists of certain language(s).
+
+        By convention, language code is the first subnamespace of a wordlist
+        module, e.g. WordList::EN::* for English, WordList::FR::* for
+        French, and so on. Wordlist modules which do not follow this
+        convention (e.g. WordList::Password::* or WordList::PersonName::*)
+        are not included.
+
+    *   len => *int* (default: 5)
+
+    *   max_len => *int*
+
+    *   min_len => *int*
+
+    *   num => *int* (default: 0)
+
+        Return (at most) this number of words (0 = unlimited).
+
+    *   or => *bool*
+
+        Match any word in query instead of the default "all".
+
+    *   random => *bool*
+
+        Pick random words.
+
+        If set to true, then streaming will be turned off. All words will be
+        gathered first, then words will be chosen randomly from the gathered
+        list.
+
+    *   wordlist_bundles => *array[str]*
+
+        Select one or more wordlist bundle
+        (Acme::CPANModules::WordListBundle::*) modules.
+
+    *   wordlists => *array[str]* (default: ["EN::Wordle"])
 
         Select one or more wordlist modules.
 
@@ -211,14 +411,14 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2015, 2014
-    by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2022, 2021, 2020, 2018, 2017, 2016, 2015,
+    2014 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

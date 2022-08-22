@@ -13,8 +13,11 @@ call_after (pTHX_ void *p)
     dSP;
     SV  *cv = (SV*)p;
 
+    PUSHSTACKi(PERLSI_DESTROY);
     PUSHMARK(SP);
     call_sv(cv, G_VOID|G_DISCARD);
+    POPSTACK;
+
     SvREFCNT_dec(cv);
 }
 

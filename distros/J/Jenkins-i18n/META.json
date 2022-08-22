@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "Config::Properties" : "1.8",
+            "File::Path" : "2.18",
             "Set::Tiny" : "0.04",
             "Term::ANSIColor" : "5.01",
             "Term::ProgressBar" : "2.22",
@@ -48,6 +49,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.08"
 }

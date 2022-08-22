@@ -24,8 +24,9 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::Build" : "2.51",
+            "Alien::Build" : "2.59",
             "Alien::Build::MM" : "0.40",
+            "Alien::Build::Plugin::Digest::Negotiate" : "0",
             "ExtUtils::MakeMaker" : "6.52",
             "perl" : "5.006"
          }
@@ -113,7 +114,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::Base" : "2.51",
+            "Alien::Base" : "2.59",
             "perl" : "5.006"
          }
       },
@@ -144,7 +145,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "2.5100",
+   "version" : "2.5900",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {

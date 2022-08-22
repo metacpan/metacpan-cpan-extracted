@@ -1,3 +1,5 @@
+ * 1.18 only run gen_melody when release testing
+ * 1.17 add support for Bark scale number calculations
  * 1.15 - Audit against Rahn book tables + tests for such. Forte numbers
    use Z instead of z to conform with said book (though [Zz] still
    accepted in input). Better document half_prime_form vs. other *_form

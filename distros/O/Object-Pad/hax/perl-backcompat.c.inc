@@ -149,3 +149,19 @@ static PADOFFSET MY_pad_add_name(pTHX_ const char *name, STRLEN len, U32 flags, 
 #  define isIDFIRST_utf8_safe(s, e)  (PERL_UNUSED_ARG(e), isIDFIRST_utf8(s))
 #  define isIDCONT_utf8_safe(s, e)   (PERL_UNUSED_ARG(e), isIDCONT_utf8(s))
 #endif
+
+#if !HAVE_PERL_VERSION(5, 26, 0)
+#  define sv_set_undef(sv)  sv_setsv(sv, &PL_sv_undef)
+#endif
+
+#ifndef newAVav
+#  define newAVav(av)  S_newAVav(aTHX_ av)
+static AV *S_newAVav(pTHX_ AV *av)
+{
+  AV *ret = newAV();
+  U32 count = av_count(av);
+  for(U32 i = 0; i < count; i++)
+    av_push(ret, newSVsv(AvARRAY(av)[i]));
+  return ret;
+}
+#endif

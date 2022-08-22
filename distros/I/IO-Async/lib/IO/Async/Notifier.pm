@@ -8,7 +8,7 @@ package IO::Async::Notifier;
 use strict;
 use warnings;
 
-our $VERSION = '0.801';
+our $VERSION = '0.802';
 
 use Carp;
 use Scalar::Util qw( weaken );
@@ -466,6 +466,7 @@ sub remove_child
    LOOP: {
       my $childrenref = $self->{IO_Async_Notifier__children};
       for my $i ( 0 .. $#$childrenref ) {
+         no warnings 'uninitialized';
          next unless $childrenref->[$i] == $child;
          splice @$childrenref, $i, 1, ();
          last LOOP;

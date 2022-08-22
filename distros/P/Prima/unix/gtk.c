@@ -5,6 +5,8 @@
 /*********************************/
 
 #include <sys/param.h>
+#include <sys/socket.h>
+#include <sys/signal.h>
 #include "unix/guts.h"
 #include "img.h"
 
@@ -29,24 +31,27 @@
 static int           gtk_initialized        = 0;
 static GApplication* gtk_app                = NULL;
 static GtkWidget*    gtk_dialog             = NULL;
-static char	     gtk_dialog_title[256];
-static char*	     gtk_dialog_title_ptr   = NULL;
-static Bool	     gtk_select_multiple    = FALSE;
-static Bool	     gtk_overwrite_prompt   = FALSE;
-static Bool	     gtk_show_hidden_files  = FALSE;
-static char	     gtk_current_folder[MAXPATHLEN+1];
-static char*	     gtk_current_folder_ptr = NULL;
-static List*	     gtk_filters            = NULL;
-static int	     gtk_filter_index       = 0;
+static char          gtk_dialog_title[256];
+static char*         gtk_dialog_title_ptr   = NULL;
+static Bool          gtk_select_multiple    = FALSE;
+static Bool          gtk_overwrite_prompt   = FALSE;
+static Bool          gtk_show_hidden_files  = FALSE;
+static char          gtk_current_folder[MAXPATHLEN+1];
+static char*         gtk_current_folder_ptr = NULL;
+static List*         gtk_filters            = NULL;
+static int           gtk_filter_index       = 0;
+static pid_t         gtk_screenshot_pid     = 0;
+static pid_t         gtk_screenshot_ppid    = 0;
+static int           gtk_screenshot_sockets[2];
 
 static GdkDisplay * display = NULL;
 
+#if GTK_MAJOR_VERSION == 2
 static Color
 gdk_color(GdkColor * c)
 {
-		return ((c->red >> 8) << 16) | ((c->green >> 8) << 8) | (c->blue >> 8);
+	return ((c->red >> 8) << 16) | ((c->green >> 8) << 8) | (c->blue >> 8);
 }
-
 
 typedef struct {
 		GType (*func)(void);
@@ -83,34 +88,182 @@ static GTFStruct widget_types[] = {
 };
 #undef GT
 
+#endif
+
 #if GTK_MAJOR_VERSION == 3
+
+static Color
+gdk_color(GdkRGBA * c)
+{
+	int r = c->red   * 255 + .5;
+	int g = c->green * 255 + .5;
+	int b = c->blue  * 255 + .5;
+	if ( r < 0 ) r = 0;
+	if ( g < 0 ) g = 0;
+	if ( b < 0 ) b = 0;
+	if ( r > 255 ) r = 255;
+	if ( g > 255 ) g = 255;
+	if ( b > 255 ) b = 255;
+	return (r << 16) | (g << 8) | b;
+}
+
+static const char * gt_color_properties[] = {
+	"theme_text_color",
+	"theme_bg_color",
+	"theme_selected_fg_color",
+	"theme_selected_bg_color",
+	"insensitive_fg_color",
+	"insensitive_bg_color",
+	"theme_fg_color",
+	"theme_unfocused_bg_color"
+};
+#define GTK_COLORLIST_SIZE (sizeof(gt_color_properties)/sizeof(char*))
+
 GdkDisplay *
 my_gdk_display_open_default (void)
 {
-  GdkDisplay *display;
+	GdkDisplay *display;
 
-  display = gdk_display_get_default ();
-  if (display)
-    return display;
+	display = gdk_display_get_default ();
+	if (display)
+		return display;
 
-  display = gdk_display_open (gdk_get_display_arg_name ());
+	display = gdk_display_open (gdk_get_display_arg_name ());
 
-  return display;
+	return display;
 }
 #endif
 
-#ifdef SAFE_DBUS
+#if defined(SAFE_DBUS) && (GLIB_MAJOR_VERSION > 2 || (GLIB_MAJOR_VERSION == 2 && GLIB_MINOR_VERSION >= 34))
+#define DBUS_SCREENSHOT
+
 /* GIO wants that callback, even empty */
 static void gtk_application_activate (GApplication *app) {}
+
+static int
+make_screenshot(int x, int y, int w, int h)
+{
+	GApplication    *app;
+	GDBusConnection *conn;
+	GVariant        *params, *results;
+	GError          *error = NULL;
+	char             filename[256];
+
+	app = g_application_new("org.gnome.Screenshot", G_APPLICATION_FLAGS_NONE);
+	if ( !g_application_register (app, NULL, NULL)) {
+		g_object_unref(app);
+		Mdebug("cannot register another gtk application\n");
+		return false;
+	}
+
+	if (!( conn = g_application_get_dbus_connection (app))) {
+		g_object_unref(app);
+		Mdebug("cannot get dbus connection\n");
+		return false;
+	}
+
+	snprintf(filename, 256, "/tmp/%d-sc.png", gtk_screenshot_ppid);
+	params = g_variant_new("(iiiibs)",
+		x, y, w, h,
+		0, filename);
+
+	results = g_dbus_connection_call_sync (conn,
+		"org.gnome.Shell.Screenshot",
+		"/org/gnome/Shell/Screenshot",
+		"org.gnome.Shell.Screenshot",
+		"ScreenshotArea",
+		params,
+		NULL,
+		G_DBUS_CALL_FLAGS_NONE,
+		-1,
+		NULL,
+		&error
+	);
+
+	if ( results )
+		g_variant_unref( results );
+	if (error != NULL) {
+		Mdebug("cannot get gnome shell screenshot:%s\n", error->message);
+      		g_error_free (error);
+		g_object_unref(app);
+		return false;
+	}
+
+	g_object_unref(app);
+	return true;
+}
+
+static void
+terminate_screenshot_app(void)
+{
+	int status;
+
+	if ( !gtk_screenshot_pid ) return;
+
+	close( gtk_screenshot_sockets[0]);
+	kill( gtk_screenshot_pid, SIGINT);
+	waitpid( gtk_screenshot_pid, &status, 0);
+	gtk_screenshot_pid = 0;
+}
+
+static void
+run_screenshot_app(void)
+{
+	int s = gtk_screenshot_sockets[1];
+	int buf[20];
+	while (1) {
+		int n = read( s, buf, sizeof(int) * 4 );
+		if ( n < sizeof(int) * 4 ) {
+			Mdebug("bad screenshot request");
+			break;
+		}
+		buf[0] = make_screenshot(buf[0], buf[1], buf[2], buf[3]);
+		n = write( s, buf, sizeof(int) );
+		if ( n < sizeof(int) ) {
+			Mdebug("screenshot: cannot respond");
+			break;
+		}
+	}
+}
+
+static Bool
+request_screenshot(int x, int y, int w, int h)
+{
+	int s = gtk_screenshot_sockets[0];
+	int n, buf[4] = { x, y, w, h };
+	n = write( s, buf, sizeof(int) * 4 );
+	if ( n < sizeof(int) * 4 ) {
+		Mdebug("bad write to screenshot app");
+		terminate_screenshot_app();
+		return false;
+	}
+	n = read( s, buf, sizeof(int));
+	if ( n < sizeof(int) ) {
+		Mdebug("bad read from screenshot app");
+		terminate_screenshot_app();
+		return false;
+	}
+	return n;
+}
+
 #endif
+
+static int
+get_int( GtkSettings * settings, const char * prop_name)
+{
+	gint v;
+	g_object_get(G_OBJECT(settings), prop_name, &v, NULL);
+	return v;
+}
 
 Display*
 prima_gtk_init(void)
 {
-	int i, argc = 0;
+	int  argc = 0;
 	Display *ret;
 	GtkSettings * settings;
 	Color ** stdcolors;
+	int i;
 	PangoWeight weight;
 
 	switch ( gtk_initialized) {
@@ -125,6 +278,23 @@ prima_gtk_init(void)
 		return gdk_x11_display_get_xdisplay(display);
 #endif
 	}
+
+#ifdef DBUS_SCREENSHOT
+	gtk_screenshot_ppid = getpid();
+	if ( socketpair(AF_UNIX, SOCK_STREAM, PF_UNSPEC, gtk_screenshot_sockets) == 0) {
+		gtk_screenshot_pid  = fork();
+		if ( gtk_screenshot_pid == 0 ) {
+			close(gtk_screenshot_sockets[0]);
+			run_screenshot_app();
+			exit(0);
+		} else {
+			close(gtk_screenshot_sockets[1]);
+		}
+	} else {
+		gtk_screenshot_pid = 0;
+		Mdebug("socketpair() error");
+	}
+#endif
 
 #ifdef WITH_GTK_NONX11
 	{
@@ -165,8 +335,9 @@ prima_gtk_init(void)
 	sync_locale();
 #endif
 
-#if defined(SAFE_DBUS) && (GLIB_MAJOR_VERSION > 2 || (GLIB_MAJOR_VERSION == 2 && GLIB_MINOR_VERSION >= 34))
+#ifdef DBUS_SCREENSHOT
 	gtk_app = g_application_new ("org.prima", G_APPLICATION_NON_UNIQUE);
+
 	g_signal_connect (gtk_app, "activate", G_CALLBACK (gtk_application_activate), NULL);
 	if ( !g_application_register (gtk_app, NULL, NULL)) {
   		g_object_unref (gtk_app);
@@ -175,8 +346,9 @@ prima_gtk_init(void)
 #endif
 
 	settings  = gtk_settings_get_default();
-	stdcolors = prima_standard_colors();
+
 #if GTK_MAJOR_VERSION == 2
+	stdcolors = prima_standard_colors(NULL);
 	for ( i = 0; i < sizeof(widget_types)/sizeof(GTFStruct); i++) {
 		GTFStruct * s = widget_types + i;
 		Color     * c = stdcolors[ s-> prima_class >> 16 ];
@@ -230,8 +402,7 @@ prima_gtk_init(void)
 
 		if ( !f) continue;
 		bzero(f, sizeof(Font));
-		strncpy( f->name, pango_font_description_get_family(t->font_desc), 255);
-		f->name[255]=0;
+		strlcpy( f->name, pango_font_description_get_family(t->font_desc), 255);
 		/* does gnome ignore X resolution? */
 		f-> size = pango_font_description_get_size(t->font_desc) / PANGO_SCALE * (96.0 / guts. resolution. y) + .5;
 		weight = pango_font_description_get_weight(t->font_desc);
@@ -244,14 +415,112 @@ prima_gtk_init(void)
 		apc_font_pick( prima_guts.application, f, f);
 #define DEBUG_FONT(font) f->height,f->width,f->size,f->name,f->encoding
 		Fdebug("gtk-font (%s): %d.[w=%d,s=%d].%s.%s\n", s->name, DEBUG_FONT(f));
+#undef DEBUG_FONT
 	}
 #endif
+
+#if GTK_MAJOR_VERSION == 3
+	{
+		/* font */
+		GValue value = {0};
+		Font font;
+		PangoFontDescription *pfd;
+
+		g_value_init(&value, G_TYPE_STRING);
+		g_object_get_property(G_OBJECT(settings), "gtk-font-name", &value);
+
+		bzero(&font, sizeof(Font));
+
+		pfd = pango_font_description_from_string((char*) g_value_peek_pointer(&value));
+
+		strlcpy( font.name, pango_font_description_get_family(pfd), 255);
+		font.size = pango_font_description_get_size(pfd) / 1000.0 + .5;
+		weight    = pango_font_description_get_weight(pfd);
+		if ( weight <= PANGO_WEIGHT_LIGHT ) font.style |= fsThin;
+		if ( weight >= PANGO_WEIGHT_BOLD  ) font.style |= fsBold;
+		if ( pango_font_description_get_style(pfd) == PANGO_STYLE_ITALIC)
+			font.style |= fsItalic;
+		strcpy( font.encoding, "Default" );
+		font.undef.width = font.undef.height = font.undef.pitch = font.undef.vector = 1;
+		apc_font_pick( prima_guts.application, &font, &font);
+#define DEBUG_FONT font.height,font.width,font.size,font.name,font.encoding
+		Fdebug("gtk-font (%s): %d.[w=%d,s=%d].%s.%s\n", g_value_peek_pointer(&value), DEBUG_FONT);
+#undef DEBUG_FONT
+		guts.default_msg_font     =
+		guts.default_menu_font    =
+		guts.default_widget_font  =
+		guts.default_caption_font =
+		guts.default_font         = font;
+
+		pango_font_description_free(pfd);
+
+	}
+
+	{
+		/* colors */
+		GtkStyleContext *ctx;
+		GdkRGBA color;
+		int n_classes;
+		Color colors[GTK_COLORLIST_SIZE], template1[ciMaxId+1], template2[ciMaxId+1];
+
+		stdcolors = prima_standard_colors(&n_classes);
+		ctx = gtk_style_context_new();
+
+		for ( i = 0; i < GTK_COLORLIST_SIZE; i++)
+			colors[i] = clInvalid;
+		memcpy( template1, stdcolors[wcApplication >> 16], sizeof(template1));
+		memcpy( template2, stdcolors[wcButton      >> 16], sizeof(template2));
+
+		for ( i = 0; i < sizeof(gt_color_properties)/sizeof(char*); i++) {
+			if (!gtk_style_context_lookup_color( ctx, gt_color_properties[i], &color))
+				continue;
+			Mdebug("gtk-color: %s %g %g %g\n", gt_color_properties[i], color.red, color.green, color.blue);
+			colors[i] = gdk_color(&color);
+		}
+
+		if ( colors[0] != clInvalid) template1[ciFore]         = colors[0];
+		if ( colors[1] != clInvalid) template1[ciBack]         = colors[1];
+		if ( colors[2] != clInvalid) template1[ciHiliteText]   = colors[2];
+		if ( colors[3] != clInvalid) template1[ciHilite]       = colors[3];
+		if ( colors[4] != clInvalid) template1[ciDisabledText] = colors[4];
+		if ( colors[5] != clInvalid) template1[ciDisabled]     = colors[5];
+
+		if ( colors[0] != clInvalid) template2[ciFore]         = colors[0];
+		if ( colors[1] != clInvalid) template2[ciBack]         = colors[1];
+		if ( colors[6] != clInvalid) template2[ciHiliteText]   = colors[6];
+		if ( colors[7] != clInvalid) template2[ciHilite]       = colors[7];
+		if ( colors[4] != clInvalid) template2[ciDisabledText] = colors[4];
+		if ( colors[5] != clInvalid) template2[ciDisabled]     = colors[5];
+
+		for ( i = 1; i < n_classes; i++) {
+			Color *template;
+			template = (
+				((i << 16) == wcButton) ||
+				((i << 16) == wcRadio) ||
+				((i << 16) == wcCheckBox)
+			) ? template2 : template1;
+			memcpy( stdcolors[i], template, sizeof(template1));
+		}
+
+		g_object_unref(ctx);
+	}
+#endif
+
+	/* misc settings */
+	guts.double_click_time_frame = (Time) get_int( settings, "gtk-double-click-time");
+	i = get_int( settings, "gtk-cursor-blink-time");
+	guts.visible_timeout   = i * 2 / 3; /* from gtkentry.c */
+	guts.invisible_timeout = i * 1 / 3;
+        i = get_int( settings, "gtk-cursor-blink");
+	if ( !i ) guts.invisible_timeout = 0;
+
 	return ret;
 }
 
 Bool
 prima_gtk_done(void)
 {
+	terminate_screenshot_app();
 	if ( gtk_filters) {
 		int i;
 		for ( i = 0; i < gtk_filters-> count; i++)
@@ -423,7 +692,7 @@ gtk_openfile( Bool open)
 				}
 				*(ptr - 1) = 0;
 			} else {
-					warn("gtk_openfile: cannot allocate %d bytes of memory", size);
+				warn("gtk_openfile: cannot allocate %d bytes of memory", size);
 			}
 
 			/* free */
@@ -443,7 +712,7 @@ gtk_openfile( Bool open)
 		{
 			char * d = gtk_file_chooser_get_current_folder( GTK_FILE_CHOOSER (gtk_dialog));
 			if ( d) {
-				strncpy( gtk_current_folder, d, MAXPATHLEN);
+				strlcpy( gtk_current_folder, d, MAXPATHLEN);
 				gtk_current_folder_ptr = gtk_current_folder;
 				g_free( d);
 			} else {
@@ -500,8 +769,7 @@ prima_gtk_openfile( char * params)
 				gtk_current_folder_ptr = NULL;
 			} else {
 				gtk_current_folder_ptr = gtk_current_folder;
-				strncpy( gtk_current_folder, params, MAXPATHLEN);
-				gtk_current_folder[MAXPATHLEN] = 0;
+				strlcpy( gtk_current_folder, params, MAXPATHLEN);
 			}
 		} else
 			return duplicate_string( gtk_current_folder_ptr);
@@ -575,8 +843,7 @@ prima_gtk_openfile( char * params)
 			gtk_dialog_title_ptr = NULL;
 		} else {
 			gtk_dialog_title_ptr = gtk_dialog_title;
-			strncpy( gtk_dialog_title, params, 255);
-			gtk_dialog_title[255] = 0;
+			strlcpy( gtk_dialog_title, params, 255);
 		}
 	} else {
 		warn("gtk.OpenFile: Unknown function %s", params);
@@ -589,14 +856,14 @@ prima_gtk_openfile( char * params)
 Bool
 prima_gtk_application_get_bitmap( Handle self, Handle image, int x, int y, int xLen, int yLen)
 {
-#if defined(SAFE_DBUS) && (GLIB_MAJOR_VERSION > 2 || (GLIB_MAJOR_VERSION == 2 && GLIB_MINOR_VERSION >= 34))
+#ifdef DBUS_SCREENSHOT
 	DEFXX;
 	int              i, found_png;
 	PList            codecs;
-	GVariant        *params, *results;
-	GError   *       error = NULL;
-	GDBusConnection *conn;
 	char             filename[256];
+
+	if ( !gtk_screenshot_pid)
+		return false;
 
 	/* do we have png? it seems gnome only saves scheenshots as pngs */
 	codecs = plist_create( 16, 16);
@@ -616,37 +883,11 @@ prima_gtk_application_get_bitmap( Handle self, Handle image, int x, int y, int x
 	}
 
 	/* execute gnome shell screenshot */
-	snprintf(filename, 256, "/tmp/%d-sc.png", (int) getpid());
-	params = g_variant_new("(iiiibs)",
-		x, XX->size.y - y - yLen, xLen, yLen, 
-		0, filename);
-
-	if (!( conn = g_application_get_dbus_connection (g_application_get_default ()))) {
-		Mdebug("cannot get dbus connection\n");
+	if ( !request_screenshot( x, XX->size.y - y - yLen, xLen, yLen))
 		return false;
-	}
-
-	results = g_dbus_connection_call_sync (conn,
-		"org.gnome.Shell.Screenshot",
-		"/org/gnome/Shell/Screenshot",
-		"org.gnome.Shell.Screenshot",
-		"ScreenshotArea",
-		params,
-		NULL,
-		G_DBUS_CALL_FLAGS_NONE,
-		-1,
-		NULL,
-		&error
-	);
-	if ( results )
-		g_variant_unref( results );
-	if (error != NULL) {
-		Mdebug("cannot get gnome shell screenshot\n");
-      		g_error_free (error);
-		return false;
-	}
 
 	/* load */
+	snprintf(filename, 256, "/tmp/%d-sc.png", gtk_screenshot_ppid);
 	codecs = apc_img_load( image, filename, false, NULL, NULL, NULL);
 	unlink( filename );
 	if ( !codecs ) {

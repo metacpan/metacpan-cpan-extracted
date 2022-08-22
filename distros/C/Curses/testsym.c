@@ -8,6 +8,7 @@
 
 #include "c-config.h"
 
+int
 main() {
   SYM;
 }

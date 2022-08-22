@@ -3,9 +3,9 @@ package Sah::Schema::hexstr;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-05'; # DATE
+our $DATE = '2022-07-09'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 our $schema = [str => {
     summary => 'String of bytes in hexadecimal',
@@ -37,7 +37,7 @@ Sah::Schema::hexstr - String of bytes in hexadecimal
 
 =head1 VERSION
 
-This document describes version 0.009 of Sah::Schema::hexstr (from Perl distribution Sah-Schemas-Str), released on 2022-07-05.
+This document describes version 0.011 of Sah::Schema::hexstr (from Perl distribution Sah-Schemas-Str), released on 2022-07-09.
 
 =head1 SYNOPSIS
 

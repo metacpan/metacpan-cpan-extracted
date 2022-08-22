@@ -1,27 +1,30 @@
-NOTE: Astro::FITS::CFITSIO v1.15 requires cfitsio library version
-      3.48 or later. It can be obtained from
-      https://heasarc.gsfc.nasa.gov/fitsio
+Prerequistes:
+-------------
 
-1. Makefile.PL needs to know where the cfitsio library is installed.
+Astro::FITS::CFITSIO requires CFITSIO library version 4.10 or later.
 
-   If the ExtUtils::PkgConfig Perl module is installed and the
-   cfitsio.pc file is installed where pkg-config can find it
-   then the library will be automatically discovered.  To test
-   the latter condition, run
+You do not need to install CFITSIO yourself.  Astro::FITS::CFITSIO
+uses the Alien::CFITSIO module (avaliable on CPAN) to locate or
+install the CFITSIO library.
 
-      pkg-config --libs cfitsio
+Installation of Alien::CFITSIO ensures that CFITSIO is available,
+either by locating a locally installed version, or by automatically
+downloading and installing CFITSIO into a location private to
+Perl modules (it won't contaminate your environment).
 
-   If this is not the case or you wish to override the pkg-config
-   cfitsio metainformation then set the CFITSIO environment variable
-   pointing to the location of your cfitsio library and headers (e.g.,
-   /usr/local/cfitsio), or a prefix with include and lib
-   subdirectories containing the cfitsio headers and library,
-   respectively (e.g., /usr/local).
+Installation Via A CPAN Client:
+-------------------------------
 
-   $ CFITSIO=/usr/local/cfitsio         # Bourne shell and variants
-   $ export CFITSIO
+Install as you would any other module, e.g.
 
-   % setenv CFITSIO /usr/local/cfitsio  # C shell variants
+   $cpan Astro::FITS::CFITSIO
+
+where $cpan may be cpan, cpanm, or cpm.
+
+Manual Installation:
+--------------------
+
+1. Install Alien::CFITSIO from CPAN. 
 
 2. perl Makefile.PL
 
@@ -34,14 +37,3 @@ NOTE: Astro::FITS::CFITSIO v1.15 requires cfitsio library version
    "runtests" - included to make this easier.
 
 6. make install
-
-If loading of the module fails, please make sure the version of
-cfitsio you're using matches that listed in README as a requirement
-for this version of the module.
-
-If compilaton succeeds but 'make test' fails due to unresolved
-symbols, you could try explicity setting the libcfitsio.a to link
-to. In Makefile.PL, add the following key to the WriteMakefile()
-argument list:
-
-      'MYEXTLIB' => '/path/to/libcfitsio.a',

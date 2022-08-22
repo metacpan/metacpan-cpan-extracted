@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use List::MoreUtils qw(any);
 use Storable qw(dclone freeze);
-our $VERSION = '0.11';
+our $VERSION = '0.110.1';
 
 our $RESERVED_FIELD = '_original';
 our $NEW = 'new';
@@ -270,6 +270,7 @@ Following helper methods will be created automatically.
 =over 4
 
 =item C<< $your_object->is_dirty; >>
+
 =item C<< $your_object->is_dirty("field_name"); >>
 
 Check that the instance is modified. If it's true, you should store this

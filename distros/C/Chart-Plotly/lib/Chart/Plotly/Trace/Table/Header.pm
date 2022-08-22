@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Table::Header::Fill;
 use Chart::Plotly::Trace::Table::Header::Font;
 use Chart::Plotly::Trace::Table::Header::Line;
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace table.
 
@@ -38,15 +38,15 @@ sub TO_JSON {
 }
 
 has align => (
-    is  => "rw",
-    isa => union( [ enum( [ "left", "center", "right" ] ), "ArrayRef" ] ),
+    is            => "rw",
+    isa           => union( [ enum( [ "left", "center", "right" ] ), "ArrayRef" ] ),
     documentation =>
       "Sets the horizontal alignment of the `text` within the box. Has an effect only if `text` spans two or more lines (i.e. `text` contains one or more <br> HTML tags) or if an explicit width is set to override the text width.",
 );
 
 has alignsrc => ( is            => "rw",
                   isa           => "Str",
-                  documentation => "Sets the source reference on plot.ly for  align .",
+                  documentation => "Sets the source reference on Chart Studio Cloud for `align`.",
 );
 
 has fill => ( is  => "rw",
@@ -56,15 +56,15 @@ has font => ( is  => "rw",
               isa => "Maybe[HashRef]|Chart::Plotly::Trace::Table::Header::Font", );
 
 has format => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
-      "Sets the cell value formatting rule using d3 formatting mini-language which is similar to those of Python. See https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format",
+      "Sets the cell value formatting rule using d3 formatting mini-languages which are very similar to those in Python. For numbers, see: https://github.com/d3/d3-format/tree/v1.4.5#d3-format.",
 );
 
 has formatsrc => ( is            => "rw",
                    isa           => "Str",
-                   documentation => "Sets the source reference on plot.ly for  format .",
+                   documentation => "Sets the source reference on Chart Studio Cloud for `format`.",
 );
 
 has height => ( is            => "rw",
@@ -82,7 +82,7 @@ has prefix => ( is            => "rw",
 
 has prefixsrc => ( is            => "rw",
                    isa           => "Str",
-                   documentation => "Sets the source reference on plot.ly for  prefix .",
+                   documentation => "Sets the source reference on Chart Studio Cloud for `prefix`.",
 );
 
 has suffix => ( is            => "rw",
@@ -92,19 +92,19 @@ has suffix => ( is            => "rw",
 
 has suffixsrc => ( is            => "rw",
                    isa           => "Str",
-                   documentation => "Sets the source reference on plot.ly for  suffix .",
+                   documentation => "Sets the source reference on Chart Studio Cloud for `suffix`.",
 );
 
 has values => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
       "Header cell values. `values[m][n]` represents the value of the `n`th point in column `m`, therefore the `values[m]` vector length for all columns must be the same (longer vectors will be truncated). Each value must be a finite number or a string.",
 );
 
 has valuessrc => ( is            => "rw",
                    isa           => "Str",
-                   documentation => "Sets the source reference on plot.ly for  values .",
+                   documentation => "Sets the source reference on Chart Studio Cloud for `values`.",
 );
 
 __PACKAGE__->meta->make_immutable();
@@ -122,7 +122,7 @@ Chart::Plotly::Trace::Table::Header - This attribute is one of the possible opti
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -186,7 +186,7 @@ Sets the horizontal alignment of the `text` within the box. Has an effect only i
 
 =item * alignsrc
 
-Sets the source reference on plot.ly for  align .
+Sets the source reference on Chart Studio Cloud for `align`.
 
 =item * fill
 
@@ -194,11 +194,11 @@ Sets the source reference on plot.ly for  align .
 
 =item * format
 
-Sets the cell value formatting rule using d3 formatting mini-language which is similar to those of Python. See https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format
+Sets the cell value formatting rule using d3 formatting mini-languages which are very similar to those in Python. For numbers, see: https://github.com/d3/d3-format/tree/v1.4.5#d3-format.
 
 =item * formatsrc
 
-Sets the source reference on plot.ly for  format .
+Sets the source reference on Chart Studio Cloud for `format`.
 
 =item * height
 
@@ -212,7 +212,7 @@ Prefix for cell values.
 
 =item * prefixsrc
 
-Sets the source reference on plot.ly for  prefix .
+Sets the source reference on Chart Studio Cloud for `prefix`.
 
 =item * suffix
 
@@ -220,7 +220,7 @@ Suffix for cell values.
 
 =item * suffixsrc
 
-Sets the source reference on plot.ly for  suffix .
+Sets the source reference on Chart Studio Cloud for `suffix`.
 
 =item * values
 
@@ -228,7 +228,7 @@ Header cell values. `values[m][n]` represents the value of the `n`th point in co
 
 =item * valuessrc
 
-Sets the source reference on plot.ly for  values .
+Sets the source reference on Chart Studio Cloud for `values`.
 
 =back
 
@@ -238,7 +238,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

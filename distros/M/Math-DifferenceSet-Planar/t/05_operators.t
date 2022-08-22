@@ -14,9 +14,15 @@ use Config;
 use Math::DifferenceSet::Planar;
 use constant MDP => Math::DifferenceSet::Planar::;
 
-use Test::More tests => 72;
+use Test::More tests => 75;
 
 #########################
+
+sub set {
+    return Math::DifferenceSet::Planar->from_elements( @_ );
+}
+
+sub fmt_set { q[{] . join(q[, ], @_) . q[}] }
 
 my @elems = (
     [0, 4, 5], [1, 2, 4], [1, 2, 6], [0, 1, 3, 9],
@@ -93,10 +99,12 @@ my $c = set(2, 6, 7, 9);
 my ($f, $d) = $c->find_linear_map($c);
 is($c->multiply($f)->translate($d)->compare($c), 0, 'self reference');
 
-sub set {
-    return Math::DifferenceSet::Planar->from_elements( @_ );
-}
-
-sub fmt_set { q[{] . join(q[, ], @_) . q[}] }
+my @de = (-3, -2, -1, 1, 2, 3);
+my $s8 = set(1, 2, 4, 8, 16, 32, 64, 55, 37);
+my @t8 = map { $s8->translate($_)->multiply(5)->eta } @de;
+is("@t8", '58 63 68 5 10 15', 'eta calculation');
+is($s8->eta, 0, 'eta(s8)');
+my @w8 = map { $s8->translate($_)->multiply(5)->eta } @de;
+is("@w8", "@t8", 'eta memoization');
 
 __END__

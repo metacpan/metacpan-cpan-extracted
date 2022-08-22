@@ -77,13 +77,14 @@ Math::Abacus - A toy model of Chinese abacus
 
 =head1 VERSION
 
-Version 0.02
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
+
     use Math::Abacus;
 
     Math::Abacus->num_of_digits(4);
@@ -151,7 +152,7 @@ This software is Copyright (c) 2022 by Cheok-Yin Fung.
 
 This is free software, licensed under:
 
-  The Artistic License 2.0 (GPL Compatible)
+  MIT License (GPL Compatible)
 
 
 =cut

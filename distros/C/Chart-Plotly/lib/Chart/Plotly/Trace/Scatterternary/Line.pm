@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scatterternary.
 
@@ -39,22 +39,22 @@ has color => ( is            => "rw",
 );
 
 has dash => (
-    is  => "rw",
-    isa => "Str",
+    is            => "rw",
+    isa           => "Str",
     documentation =>
       "Sets the dash style of lines. Set to a dash type string (*solid*, *dot*, *dash*, *longdash*, *dashdot*, or *longdashdot*) or a dash length list in px (eg *5px,10px,2px,2px*).",
 );
 
 has shape => (
-    is  => "rw",
-    isa => enum( [ "linear", "spline" ] ),
+    is            => "rw",
+    isa           => enum( [ "linear", "spline" ] ),
     documentation =>
       "Determines the line shape. With *spline* the lines are drawn using spline interpolation. The other available values correspond to step-wise line shapes.",
 );
 
 has smoothing => (
-    is  => "rw",
-    isa => "Num",
+    is            => "rw",
+    isa           => "Num",
     documentation =>
       "Has an effect only if `shape` is set to *spline* Sets the amount of smoothing. *0* corresponds to no smoothing (equivalent to a *linear* shape).",
 );
@@ -79,7 +79,7 @@ Chart::Plotly::Trace::Scatterternary::Line - This attribute is one of the possib
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -144,7 +144,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

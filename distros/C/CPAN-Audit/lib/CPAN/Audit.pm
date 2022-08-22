@@ -3,20 +3,23 @@ use v5.10.1;
 use strict;
 use warnings;
 use version;
+
+use Carp qw(carp);
+use Module::CoreList;
+
 use CPAN::Audit::Installed;
 use CPAN::Audit::Discover;
 use CPAN::Audit::Filter;
 use CPAN::Audit::Version;
 use CPAN::Audit::Query;
 use CPAN::Audit::DB;
-use Module::CoreList;
 
-our $VERSION = '20220729.001';
+our $VERSION = '20220817.001';
 
 sub new {
     my( $class, %params ) = @_;
 
-    my @allowed_keys = qw(ascii db exclude include_perl interactive no_corelist no_color quiet verbose version);
+    my @allowed_keys = qw(ascii db exclude exclude_file include_perl interactive no_corelist no_color quiet verbose version);
 
     my %args = map { $_, $params{$_} } @allowed_keys;
     my $self = bless \%args, $class;
@@ -26,6 +29,8 @@ sub new {
         $self->{no_color} = 1;
     }
 
+    $self->_handle_exclude_file if $self->{exclude_file};
+
     $self->{db}       = CPAN::Audit::DB->db;
 
     $self->{filter}   = CPAN::Audit::Filter->new( exclude => $args{exclude} );
@@ -33,6 +38,24 @@ sub new {
     $self->{discover} = CPAN::Audit::Discover->new( db => $self->{db} );
 
     return $self;
+}
+
+sub _handle_exclude_file {
+    my( $self ) = @_;
+
+    foreach my $file (@{$self->{exclude_file}}) {
+        my $fh;
+        unless( open $fh, "<", $file ) {
+            carp "unable to open exclude_file [$file]: $!\n";
+            return;
+        }
+        my @excludes =
+            grep { !/^\s*$/ }               # no blank lines
+            map  { s{^\s+|\s+$}{}g; $_ }    # strip leading/trailing whitespace
+            map  { s{#.*}{}; $_ }           # strip comments
+            <$fh>;
+        push @{$self->{exclude}}, @excludes;
+        }
 }
 
 sub command {

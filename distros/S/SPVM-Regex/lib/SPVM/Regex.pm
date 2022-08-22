@@ -1,6 +1,6 @@
 package SPVM::Regex;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 1;
 
@@ -65,7 +65,7 @@ SPVM::Regex - Regular Expression
     my $string = "ppzabcz";
     
     # "ppzABbcCz"
-    my $result = $re->replace_cb($string, method : string ($re : Regex) {
+    my $result = $re->replace($string, method : string ($re : Regex) {
       return "AB" . $re->cap1 . "C";
     });
   }
@@ -85,7 +85,7 @@ SPVM::Regex - Regular Expression
     my $string = "ppzabczabcz";
     
     # "ppzABCbcPQRSzABCbcPQRSz"
-    my $result = $re->replace_g_cb($string, method : string ($re : Regex) {
+    my $result = $re->replace_g($string, method : string ($re : Regex) {
       return "ABC" . $re->cap1 . "PQRS";
     });
   }
@@ -152,9 +152,9 @@ Get the replaced count.
 
 =head2 new
 
-  static method new : Regex ($pattern_and_flags : string[]...)
+  static method new : Regex ($pattern : string, $flags = undef : string)
 
-Create a new L<Regex|SPVM::Regex> object and compile the regex pattern with the flags.
+Create a new L<Regex|SPVM::Regex> object and compile the regex pattern and the flags.
 
   my $re = Regex->new("^ab+c");
   my $re = Regex->new("^ab+c", "s");
@@ -163,90 +163,72 @@ Create a new L<Regex|SPVM::Regex> object and compile the regex pattern with the 
 
 =head2 match
 
-  method match : int ($string : string)
+  method match : int ($string : string, $offset = 0 : int, $length = -1 : int)
 
-The Alias for the following L<match_offset|/"match_offset"> method.
+The Alias for the following L<match_forward|/"match_forward"> method.
 
-  my $offset = 0;
-  $re->match_offset($string, \$offset);
+  my $ret = $self->match_forward($string, \$offset, $length);
 
-=head2 match_offset
+=head2 match_forward
 
-  method match_offset : int ($string : string, $offset_ref : int*)
+  method match_forward : int ($string : string, $offset : int*, $length = -1 : int)
 
-Execute pattern matching to the string and the starting offset of the string.
+Execute pattern matching to the string range from the offset to the position proceeded by the length.
 
 The offset is updated to the next starting position.
 
 If the pattern matching is successful, return C<1>, otherwise return C<0>.
 
+The string must be defined. Otherwise an exception will be thrown.
+
+The offset + the length must be less than or equal to the length of the string. Otherwise an exception will be thrown.
+
+The regex compililation is not yet performed. Otherwise an exception will be thrown.
+
 =head2 replace
 
-  method replace  : string ($string : string, $replace : string)
+  method replace  : string ($string : string, $replace : object of string|Regex::Replacer, $offset = 0 : int, $length = -1 : int, $options = undef : object[])
 
-The Alias for the following L<replace_offset|/"replace_offset"> method.
+The Alias for the following L<replace_common|/"replace_common"> method.
 
-  my $offset = 0;
-  $re->replace_offset($string, \$offset, $replace);
-
-=head2 replace_cb
-
-  method replace_cb  : string ($string : string, $replace_cb : Regex::Replacer)
-
-The Alias for the following L<replace_cb_offset|/"replace_cb_offset"> method.
-
-  my $offset = 0;
-  $re->replace_cb_offset($string, \$offset, $replace_cb);
+  my $ret = $self->replace_common($string, $replace, \$offset, $length, $options);
 
 =head2 replace_g
 
-  method replace_g  : string ($string : string, $replace : string)
+  method replace_g  : string ($string : string, $replace : object of string|Regex::Replacer, $offset = 0 : int, $length = -1 : int, $options = undef : object[])
 
-The Alias for the following L<replace_g_offset|/"replace_g_offset"> method.
+The Alias for the following L<replace_common|/"replace_common"> method.
 
-  my $offset = 0;
-  $re->replace_g_offset($string, \$offset, $replace);
+  my $new_options_list = List->new($options);
+  $new_options_list->push("global");
+  $new_options_list->push(1);
+  $options = $new_options_list->to_array;
+  return $self->replace_common($string, $replace, \$offset, $length, $options);
 
-=head2 replace_g_cb
+=head2 replace_common
 
-  method replace_g_cb  : string ($string : string, $replace_cb : Regex::Replacer)
+  method replace_common : string ($string : string, $replace : object of string|Regex::Replacer,
+    $offset_ref : int*, $length = -1 : int, $options = undef : object[])
 
-The Alias for the following L<replace_g_cb_offset|/"replace_g_cb_offset"> method.
+Replace the part of the pattern matching in the string range from the offset to the position proceeded by the length with the replacement string or callback.
 
-  my $offset = 0;
-  $re->replace_g_cb_offset($string, \$offset, $replace_cb);
+The L<options|/"Options of replace_common"> can be used.
 
-=head2 replace_offset
+The string must be defined. Otherwise an exception will be thrown.
 
-  method replace_offset  : string ($string : string, $offset_ref : int*, $replace : string)
+The replacement must be a string or a L<Regex::Replacer|SPVM::Regex::Replacer> object. Otherwise an exception will be thrown.
 
-Replace the part of the pattern matching in the string with the replacement string from the starting offset of the string.
+The offset must be greater than or equal to 0. Otherwise an exception will be thrown.
 
-The offset is updated to the next starting position.
+The offset + the length must be less than or equal to the length of the string. Otherwise an exception will be thrown.
 
-=head2 replace_cb_offset
+Internally L<match_forward|/"match_forward"> is used for the pattern matching.
 
-  method replace_cb_offset  : string ($string : string, $offset_ref : int*, $replace_cb : Regex::Replacer)
+=head3 Options of replace_common
 
-Replace the part of the pattern matching with the replacement callback that is L<Regex::Replacer|SPVM::Regex::Replacer> object from the starting offset of the string.
+=head4 global
 
-The offset is updated to the next starting position.
-
-=head2 replace_g_offset
-
-  method replace_g_offset  : string ($string : string, $offset_ref : int*, $replace : string)
-
-Replace all of the part of the pattern matching with the replacement string from the starting offset of the string.
-
-The offset is updated to the next starting position.
-
-=head2 replace_g_cb_offset
-
-  method replace_g_cb_offset  : string ($string : string, $offset_ref : int*, $replace_cb : Regex::Replacer)
-
-Replace all of the part of the pattern matching with the replacement callback that is L<Regex::Replacer|SPVM::Regex::Replacer> object from the starting offset of the string.
-
-The offset is updated to the next starting position.
+If C<global> is a true value, the global replacement is performed.
 
 =head2 cap1
 

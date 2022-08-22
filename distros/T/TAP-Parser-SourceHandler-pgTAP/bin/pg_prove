@@ -4,7 +4,7 @@ use strict;
 use App::Prove;
 use Getopt::Long;
 
-our $VERSION = '3.35';
+our $VERSION = '3.36';
 $|++;
 
 # Fire up the app, process args, and run the tests.
@@ -85,6 +85,7 @@ sub process_args {
         } keys %{ $opts->{set} })
     );
 
+    # Set defaults.
     $self->{extensions} ||= ['.pg'];
     return;
 }
@@ -147,6 +148,13 @@ C<pg_prove> is a command-line application to run one or more
 L<pgTAP|https://pgtap.org/> tests in a PostgreSQL database. The output of the
 tests is harvested and processed by L<TAP::Harness|TAP::Harness> in order to
 summarize the results of the test.
+
+C<pg_prove> relies on L<C<psql>|https://www.postgresql.org/docs/current/app-psql.html>
+to run the tests, and therefor supports all of the
+L<environment variables|https://www.postgresql.org/docs/current/libpq-envars.html>,
+as well as the L<password file|https://www.postgresql.org/docs/current/libpq-pgpass.html>
+and L<service file|https://www.postgresql.org/docs/current/libpq-pgservice.html> read
+by C<psql>.
 
 Tests can be written and run in one of two ways, as SQL scripts or as
 xUnit-style database functions.
@@ -729,6 +737,9 @@ them in reverse order. Not relevant when used with C<--runtests>.
   pg_prove --archive tap.tar.gz
   pg_prove -a test_output.tar
 
+Send the TAP output to a TAP archive file as well as to the normal output
+destination. The archive formats supported are F<.tar> and F<.tar.gz>.
+
 =item C<-f>
 
 =item C<--formatter>
@@ -751,9 +762,6 @@ Show the X/Y test count as tests run when not verbose (default).
   pg_prove --nocount
 
 Disable the display of the X/Y test count as tests run.
-
-Send the TAP output to a TAP archive file as well as to the normal output
-destination. The archive formats supported are F<.tar> and F<.tar.gz>.
 
 =back
 
@@ -798,6 +806,6 @@ David E. Wheeler <dwheeler@cpan.org>
 
 =head1 Copyright
 
-Copyright (c) 2008-2018 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2008-2022 David E. Wheeler. Some Rights Reserved.
 
 =cut

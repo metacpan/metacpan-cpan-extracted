@@ -1,5 +1,5 @@
 {
-   "abstract" : "HTTP interface for Net::Curl (clone HTTP::Any::Curl)",
+   "abstract" : "HTTP interface for Net::Curl (clone of HTTP::Any::Curl)",
    "author" : [
       "<kni@cpan.org>"
    ],
@@ -37,6 +37,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.03",
+   "version" : "1.04",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

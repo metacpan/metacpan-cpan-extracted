@@ -1,5 +1,29 @@
 Change history for HTML-Form
 
+6.10      2022-08-22 13:20:12Z
+    - Use "croak" instead of "die" to show errors from the perspective of the
+      caller [RT#20499] (GH#29) (Julien Fiegehenn)
+    - Remove the executable bit from a couple of tests (GH#41) (James Raspass)
+    - <option>s within select fields without a name no longer get merged into
+      the previous select field (GH#2) (Julien Fiegehenn)
+    - find_input() can now take a reference to undef to explicitly find inputs
+      that have no name (GH#2) (Julien Fiegehenn)
+
+6.09      2022-08-14 22:16:37Z
+
+    - Replace "use vars" with "our" (GH#34) (James Raspass)
+    - Remove superfluous "use lib" (GH#35) (James Raspass)
+    - Replace "Test" with "Test::More" (GH#36) (James Raspass)
+    - Remove superfluous variable copy (GH#37) (James Raspass)
+
+6.08      2022-08-14 09:26:10Z
+    - Remove Authority section from dist.ini (GH#27) (Olaf Alders)
+    - Allow buttons to not have a value (GH#8) (Felix Ostmann and Julien Fiegehenn)
+    - The legacy API of FileInput fields now correctly supports setting a
+      custom filename (GH#10) (Gil Magno and Julien Fiegehenn)
+    - Allow undef filename for FileInput if there is a Content header (GH#30)
+      (Julien Fiegehenn)
+
 6.07      2020-02-21 03:50:52Z
     - Restore =head1 NAME section to pod for HTML::Form
 

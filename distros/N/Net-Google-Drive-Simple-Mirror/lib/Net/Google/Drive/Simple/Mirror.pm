@@ -6,7 +6,7 @@ use DateTime::Format::RFC3339;
 use DateTime;
 use Carp;
 
-our $VERSION = '0.53';
+our $VERSION = '0.54'; # VERSION
 
 sub new{
     my ($class, %options) = @_;

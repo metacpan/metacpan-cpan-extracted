@@ -152,7 +152,7 @@ sub _options_block {
 # core dumps
 --ignore-file=match:/core[.]\d+$/
 
-# minified Javascript
+# minified JavaScript
 --ignore-file=match:/[.-]min[.]js$/
 --ignore-file=match:/[.]js[.]min$/
 
@@ -173,14 +173,23 @@ sub _options_block {
 # Common archives, as an optimization
 --ignore-file=ext:gz,tar,tgz,zip
 
-# Python compiles modules
+# Python compiled modules
 --ignore-file=ext:pyc,pyd,pyo
+
+# Python's pickle serialization format
+# https://docs.python.org/2/library/pickle.html#example
+# https://docs.python.org/3.7/library/pickle.html#examples
+--ignore-file=ext:pkl,pickle
 
 # C extensions
 --ignore-file=ext:so
 
 # Compiled gettext files
 --ignore-file=ext:mo
+
+# Visual Studio user and workspace settings
+# https://code.visualstudio.com/docs/getstarted/settings
+--ignore-dir=.vscode
 
 ### Filetypes defined
 
@@ -262,6 +271,10 @@ sub _options_block {
 
 # C#
 --type-add=csharp:ext:cs
+
+# Crystal-lang
+# https://crystal-lang.org/
+--type-add=crystal:ext:cr,ecr
 
 # CSS
 # https://www.w3.org/Style/CSS/
@@ -424,7 +437,7 @@ sub _options_block {
 
 # Scala
 # https://www.scala-lang.org/
---type-add=scala:ext:scala
+--type-add=scala:ext:scala,sbt
 
 # Scheme
 # https://groups.csail.mit.edu/mac/projects/scheme/
@@ -475,7 +488,7 @@ sub _options_block {
 # https://toml.io/
 --type-add=toml:ext:toml
 
-# Typescript
+# TypeScript
 # https://www.typescriptlang.org/
 --type-add=ts:ext:ts,tsx
 

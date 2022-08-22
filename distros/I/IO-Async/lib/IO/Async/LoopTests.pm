@@ -28,7 +28,7 @@ use POSIX qw( SIGTERM );
 use Socket qw( sockaddr_family AF_UNIX );
 use Time::HiRes qw( time );
 
-our $VERSION = '0.801';
+our $VERSION = '0.802';
 
 # Abstract Units of Time
 use constant AUT => $ENV{TEST_QUICK_TIMERS} ? 0.1 : 1;
@@ -369,7 +369,9 @@ sub run_tests_io
 
    # Check that error conditions that aren't true read/write-ability are still
    # invoked
-   {
+   SKIP: {
+      skip "cygwin does not indicate read-ready on exceptional sockets", 1 if $^O eq "cygwin";
+
       my ( $S1, $S2 ) = IO::Async::OS->socketpair( 'inet', 'dgram' ) or die "Cannot create AF_INET/SOCK_DGRAM connected pair - $!";
       $_->blocking( 0 ) for $S1, $S2;
       $S2->close;

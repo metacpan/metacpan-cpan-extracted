@@ -7,7 +7,7 @@ use parent qw( FFI::Platypus::TypeParser::Version1 );
 use constant _version => 2;
 
 # ABSTRACT: FFI Type Parser Version Two
-our $VERSION = '1.58'; # VERSION
+our $VERSION = '2.00'; # VERSION
 
 
 1;
@@ -24,11 +24,11 @@ FFI::Platypus::TypeParser::Version2 - FFI Type Parser Version Two
 
 =head1 VERSION
 
-version 1.58
+version 2.00
 
 =head1 SYNOPSIS
 
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  my $ffi = FFI::Platypus->new( api => 2 );
  $ffi->type('string(10)');
 

@@ -6,7 +6,7 @@ use 5.008004;
 use FFI::Platypus;
 
 # ABSTRACT: An FFI function object
-our $VERSION = '1.58'; # VERSION
+our $VERSION = '2.00'; # VERSION
 
 
 use overload '&{}' => sub {
@@ -127,14 +127,14 @@ FFI::Platypus::Function - An FFI function object
 
 =head1 VERSION
 
-version 1.58
+version 2.00
 
 =head1 SYNOPSIS
 
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  
  # call directly
- my $ffi = FFI::Platypus->new( api => 1 );
+ my $ffi = FFI::Platypus->new( api => 2 );
  my $f = $ffi->function(puts => ['string'] => 'int');
  $f->call("hello there");
  

@@ -1,3 +1,9 @@
+1.0.6     2022-08-18 09:29:41+01:00 Europe/London
+ - declare minimum perl version, use mro explicitly
+
+1.0.5     2022-08-16 11:05:56+00:00 UTC
+ - silence undef warnings from UserInput matcher
+
 1.0.4     2019-06-12 10:03:16+01:00 Europe/London
  - improve matching against the "user_info" dictionary: more cases are
    caught, and generally with lower scores

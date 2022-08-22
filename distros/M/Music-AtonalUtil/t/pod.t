@@ -1,12 +1,12 @@
 #!perl
-use 5.10.0;
+use 5.010000;
 use strict;
 use warnings;
-use Test::Most;
+use Test::More;
 
-# Mandate the POD tests, contrary to the dagolden no-pod-tests fad. I rank
-# documentation on par with the code, not something one can maybe remember to
-# maybe run the release testing for.
-use Test::Pod;
+# Ensure a recent version of Test::Pod
+my $min_tp = 1.22;
+eval "use Test::Pod $min_tp";
+plan skip_all => "Test::Pod $min_tp required for testing POD" if $@;
 
 all_pod_files_ok();

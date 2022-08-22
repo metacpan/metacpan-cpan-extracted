@@ -3,60 +3,60 @@
 # You should not use this directly; use Playwright instead.
 
 package Playwright::ModuleList;
-$Playwright::ModuleList::VERSION = '1.210';
+$Playwright::ModuleList::VERSION = '1.251';
 use strict;
 use warnings;
 
-use Playwright::AndroidWebView;
-use Playwright::ConsoleMessage;
-use Playwright::WebSocket;
-use Playwright::CDPSession;
-use Playwright::BrowserType;
-use Playwright::ElementHandle;
-use Playwright::BrowserServer;
 use Playwright::ElectronApplication;
-use Playwright::FileChooser;
-use Playwright::ScreenshotAssertions;
-use Playwright::Coverage;
-use Playwright::AndroidDevice;
-use Playwright::PlaywrightException;
-use Playwright::Mouse;
-use Playwright::Accessibility;
-use Playwright::Frame;
-use Playwright::APIRequestContext;
-use Playwright::PageAssertions;
-use Playwright::APIRequest;
-use Playwright::LocatorAssertions;
-use Playwright::Selectors;
-use Playwright::AndroidInput;
-use Playwright::Logger;
-use Playwright::Route;
-use Playwright::JSHandle;
-use Playwright::WebSocketFrame;
-use Playwright::RequestOptions;
-use Playwright::Touchscreen;
-use Playwright::FormData;
-use Playwright::Worker;
-use Playwright::APIResponse;
-use Playwright::Request;
-use Playwright::AndroidSocket;
-use Playwright::Browser;
-use Playwright::Error;
-use Playwright::Video;
-use Playwright::TimeoutError;
-use Playwright::Android;
-use Playwright::Response;
-use Playwright::Keyboard;
-use Playwright::Locator;
-use Playwright::BrowserContext;
-use Playwright::Tracing;
-use Playwright::Dialog;
-use Playwright::APIResponseAssertions;
-use Playwright::Electron;
 use Playwright::Download;
+use Playwright::Selectors;
+use Playwright::ElementHandle;
+use Playwright::Touchscreen;
+use Playwright::Frame;
+use Playwright::Logger;
+use Playwright::AndroidDevice;
+use Playwright::FormData;
+use Playwright::TimeoutError;
+use Playwright::AndroidSocket;
+use Playwright::Keyboard;
+use Playwright::Response;
+use Playwright::WebSocket;
+use Playwright::AndroidInput;
+use Playwright::Coverage;
+use Playwright::Browser;
+use Playwright::RequestOptions;
+use Playwright::JSHandle;
 use Playwright::FrameLocator;
+use Playwright::FileChooser;
+use Playwright::ConsoleMessage;
+use Playwright::Worker;
+use Playwright::PageAssertions;
+use Playwright::LocatorAssertions;
+use Playwright::APIRequest;
 use Playwright::PlaywrightAssertions;
+use Playwright::PlaywrightException;
+use Playwright::APIRequestContext;
+use Playwright::Locator;
+use Playwright::Dialog;
+use Playwright::Error;
+use Playwright::Route;
+use Playwright::BrowserServer;
+use Playwright::Mouse;
+use Playwright::BrowserContext;
+use Playwright::AndroidWebView;
+use Playwright::ScreenshotAssertions;
+use Playwright::BrowserType;
+use Playwright::Request;
 use Playwright::Page;
+use Playwright::Video;
+use Playwright::APIResponseAssertions;
+use Playwright::Tracing;
+use Playwright::WebSocketFrame;
+use Playwright::Electron;
+use Playwright::Android;
+use Playwright::APIResponse;
+use Playwright::Accessibility;
+use Playwright::CDPSession;
 use Playwright::Mouse;
 use Playwright::Keyboard;
 
@@ -74,7 +74,7 @@ Playwright::ModuleList - Playwright sub classes.
 
 =head1 VERSION
 
-version 1.210
+version 1.251
 
 =head1 SEE ALSO
 

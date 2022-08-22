@@ -9,12 +9,13 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 use Chart::Plotly::Trace::Parcats::Dimension;
 use Chart::Plotly::Trace::Parcats::Domain;
 use Chart::Plotly::Trace::Parcats::Labelfont;
+use Chart::Plotly::Trace::Parcats::Legendgrouptitle;
 use Chart::Plotly::Trace::Parcats::Line;
 use Chart::Plotly::Trace::Parcats::Stream;
 use Chart::Plotly::Trace::Parcats::Tickfont;
 use Chart::Plotly::Trace::Parcats::Transform;
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: Parallel categories diagram for multidimensional categorical data.
 
@@ -51,8 +52,8 @@ sub type {
 }
 
 has arrangement => (
-    is  => "rw",
-    isa => enum( [ "perpendicular", "freeform", "fixed" ] ),
+    is            => "rw",
+    isa           => enum( [ "perpendicular", "freeform", "fixed" ] ),
     documentation =>
       "Sets the drag interaction mode for categories and dimensions. If `perpendicular`, the categories can only move along a line perpendicular to the paths. If `freeform`, the categories can freely move on the plane. If `fixed`, the categories and dimensions are stationary.",
 );
@@ -63,15 +64,15 @@ has bundlecolors => ( is            => "rw",
 );
 
 has counts => (
-    is  => "rw",
-    isa => "Num|ArrayRef[Num]",
+    is            => "rw",
+    isa           => "Num|ArrayRef[Num]",
     documentation =>
       "The number of observations represented by each state. Defaults to 1 so that each state represents one observation",
 );
 
 has countssrc => ( is            => "rw",
                    isa           => "Str",
-                   documentation => "Sets the source reference on plot.ly for  counts .",
+                   documentation => "Sets the source reference on Chart Studio Cloud for `counts`.",
 );
 
 has dimensions => ( is  => "rw",
@@ -81,42 +82,45 @@ has domain => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Parcats::Domain", );
 
 has hoverinfo => (
-    is  => "rw",
-    isa => "Str",
+    is            => "rw",
+    isa           => "Str",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
 
 has hoveron => (
-    is  => "rw",
-    isa => enum( [ "category", "color", "dimension" ] ),
+    is            => "rw",
+    isa           => enum( [ "category", "color", "dimension" ] ),
     documentation =>
       "Sets the hover interaction mode for the parcats diagram. If `category`, hover interaction take place per category. If `color`, hover interactions take place per color per category. If `dimension`, hover interactions take place across all categories per dimension.",
 );
 
 has hovertemplate => (
-    is  => "rw",
-    isa => "Str",
+    is            => "rw",
+    isa           => "Str",
     documentation =>
-      "Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example \"y: %{y}\". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example \"Price: %{y:\$.2f}\". https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format for details on the formatting syntax. Dates are formatted using d3-time-format's syntax %{variable|d3-time-format}, for example \"Day: %{2019-01-01|%A}\". https://github.com/d3/d3-3.x-api-reference/blob/master/Time-Formatting.md#format for details on the date formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variables `count`, `probability`, `category`, `categorycount`, `colorcount` and `bandcolorcount`. Anything contained in tag `<extra>` is displayed in the secondary box, for example \"<extra>{fullData.name}</extra>\". To hide the secondary box completely, use an empty tag `<extra></extra>`.",
+      "Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example \"y: %{y}\" as well as %{xother}, {%_xother}, {%_xother_}, {%xother_}. When showing info for several points, *xother* will be added to those with different x positions from the first point. An underscore before or after *(x|y)other* will add a space on that side, only when this field is shown. Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example \"Price: %{y:\$.2f}\". https://github.com/d3/d3-format/tree/v1.4.5#d3-format for details on the formatting syntax. Dates are formatted using d3-time-format's syntax %{variable|d3-time-format}, for example \"Day: %{2019-01-01|%A}\". https://github.com/d3/d3-time-format/tree/v2.2.3#locale_format for details on the date formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plotly.com/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variables `count`, `probability`, `category`, `categorycount`, `colorcount` and `bandcolorcount`. Anything contained in tag `<extra>` is displayed in the secondary box, for example \"<extra>{fullData.name}</extra>\". To hide the secondary box completely, use an empty tag `<extra></extra>`.",
 );
 
 has labelfont => ( is  => "rw",
                    isa => "Maybe[HashRef]|Chart::Plotly::Trace::Parcats::Labelfont", );
 
+has legendgrouptitle => ( is  => "rw",
+                          isa => "Maybe[HashRef]|Chart::Plotly::Trace::Parcats::Legendgrouptitle", );
+
 has line => ( is  => "rw",
               isa => "Maybe[HashRef]|Chart::Plotly::Trace::Parcats::Line", );
 
 has pmeta => (
-    is  => "rw",
-    isa => "Any|ArrayRef[Any]",
+    is            => "rw",
+    isa           => "Any|ArrayRef[Any]",
     documentation =>
       "Assigns extra meta information associated with this trace that can be used in various text attributes. Attributes such as trace `name`, graph, axis and colorbar `title.text`, annotation `text` `rangeselector`, `updatemenues` and `sliders` `label` text all support `meta`. To access the trace `meta` values in an attribute in the same trace, simply use `%{meta[i]}` where `i` is the index or key of the `meta` item in question. To access trace `meta` in layout attributes, use `%{data[n[.meta[i]}` where `i` is the index or key of the `meta` and `n` is the trace index.",
 );
 
 has metasrc => ( is            => "rw",
                  isa           => "Str",
-                 documentation => "Sets the source reference on plot.ly for  meta .",
+                 documentation => "Sets the source reference on Chart Studio Cloud for `meta`.",
 );
 
 has name => ( is            => "rw",
@@ -125,8 +129,8 @@ has name => ( is            => "rw",
 );
 
 has sortpaths => (
-    is  => "rw",
-    isa => enum( [ "forward", "backward" ] ),
+    is            => "rw",
+    isa           => enum( [ "forward", "backward" ] ),
     documentation =>
       "Sets the path sorting algorithm. If `forward`, sort paths based on dimension categories from left to right. If `backward`, sort paths based on dimensions categories from right to left.",
 );
@@ -141,21 +145,21 @@ has transforms => ( is  => "rw",
                     isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Parcats::Transform]", );
 
 has uid => (
-    is  => "rw",
-    isa => "Str",
+    is            => "rw",
+    isa           => "Str",
     documentation =>
       "Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.",
 );
 
 has uirevision => (
-    is  => "rw",
-    isa => "Any",
+    is            => "rw",
+    isa           => "Any",
     documentation =>
       "Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.",
 );
 
 has visible => (
-    is => "rw",
+    is            => "rw",
     documentation =>
       "Determines whether or not this trace is visible. If *legendonly*, the trace is not drawn, but can appear as a legend item (provided that the legend itself is visible).",
 );
@@ -175,7 +179,7 @@ Chart::Plotly::Trace::Parcats - Parallel categories diagram for multidimensional
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -272,7 +276,7 @@ The number of observations represented by each state. Defaults to 1 so that each
 
 =item * countssrc
 
-Sets the source reference on plot.ly for  counts .
+Sets the source reference on Chart Studio Cloud for `counts`.
 
 =item * dimensions
 
@@ -288,9 +292,11 @@ Sets the hover interaction mode for the parcats diagram. If `category`, hover in
 
 =item * hovertemplate
 
-Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example "y: %{y}". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example "Price: %{y:$.2f}". https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format for details on the formatting syntax. Dates are formatted using d3-time-format's syntax %{variable|d3-time-format}, for example "Day: %{2019-01-01|%A}". https://github.com/d3/d3-3.x-api-reference/blob/master/Time-Formatting.md#format for details on the date formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variables `count`, `probability`, `category`, `categorycount`, `colorcount` and `bandcolorcount`. Anything contained in tag `<extra>` is displayed in the secondary box, for example "<extra>{fullData.name}</extra>". To hide the secondary box completely, use an empty tag `<extra></extra>`.
+Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example "y: %{y}" as well as %{xother}, {%_xother}, {%_xother_}, {%xother_}. When showing info for several points, *xother* will be added to those with different x positions from the first point. An underscore before or after *(x|y)other* will add a space on that side, only when this field is shown. Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example "Price: %{y:$.2f}". https://github.com/d3/d3-format/tree/v1.4.5#d3-format for details on the formatting syntax. Dates are formatted using d3-time-format's syntax %{variable|d3-time-format}, for example "Day: %{2019-01-01|%A}". https://github.com/d3/d3-time-format/tree/v2.2.3#locale_format for details on the date formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plotly.com/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variables `count`, `probability`, `category`, `categorycount`, `colorcount` and `bandcolorcount`. Anything contained in tag `<extra>` is displayed in the secondary box, for example "<extra>{fullData.name}</extra>". To hide the secondary box completely, use an empty tag `<extra></extra>`.
 
 =item * labelfont
+
+=item * legendgrouptitle
 
 =item * line
 
@@ -300,7 +306,7 @@ Assigns extra meta information associated with this trace that can be used in va
 
 =item * metasrc
 
-Sets the source reference on plot.ly for  meta .
+Sets the source reference on Chart Studio Cloud for `meta`.
 
 =item * name
 
@@ -336,7 +342,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

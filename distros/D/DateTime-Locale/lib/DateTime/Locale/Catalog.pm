@@ -3,7 +3,7 @@ package DateTime::Locale::Catalog;
 use strict;
 use warnings;
 
-our $VERSION = '1.35';
+our $VERSION = '1.36';
 
 1;
 
@@ -21,7 +21,7 @@ DateTime::Locale::Catalog - Provides a catalog of all valid locale names
 
 =head1 VERSION
 
-version 1.35
+version 1.36
 
 =head1 DESCRIPTION
 
@@ -102,7 +102,7 @@ The available locales are:
  bas-CM           Basaa Cameroon                              Ɓàsàa Kàmɛ̀rûn
  be               Belarusian                                  беларуская
  be-BY            Belarusian Belarus                          беларуская Беларусь
- be-tarask        Belarusian                                  беларуская
+ be-tarask        Belarusian Taraskievica orthography         беларуская TARASK
  bem              Bemba                                       Ichibemba
  bem-ZM           Bemba Zambia                                Ichibemba Zambia
  bez              Bena                                        Hibena

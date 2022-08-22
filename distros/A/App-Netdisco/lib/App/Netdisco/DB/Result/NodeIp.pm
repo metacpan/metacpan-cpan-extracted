@@ -92,7 +92,7 @@ See also the C<node_sightings> helper routine, below.
 =cut
 
 __PACKAGE__->has_many( nodes => 'App::Netdisco::DB::Result::Node',
-  { 'foreign.mac' => 'self.mac' } );
+  { 'foreign.mac' => 'self.mac' }, { order_by => { '-desc' => 'time_last' }} );
 
 =head2 netbios
 
@@ -180,7 +180,7 @@ sub node_sightings {
 
     return $row
       ->nodes({}, {
-        '+columns' => [qw/ device.dns /],
+        '+columns' => [qw/ device.dns device.name /],
         join => 'device',
       })
       ->search_rs({}, $search_attr)

@@ -5,7 +5,7 @@ Getopt::EX::Hashed - Hash store object automation for Getopt::Long
 
 # VERSION
 
-Version 1.03
+Version 1.05
 
 # SYNOPSIS
 
@@ -116,10 +116,23 @@ is given.
         To produce accessor method, `is` parameter is necessary.  Set the
         value `ro` for read-only, `rw` for read-write.
 
+        Read-write accessor has a lvalue attribute, so it can be assigned.
+        You can use like this:
+
+            $app->foo //= 1;
+
+        which is simpler than:
+
+            $app->foo(1) unless defined $app->foo;
+
         If you want to make accessor for all following members, use
-        `configure` and set `DEFAULT` parameter.
+        `configure` to set `DEFAULT` parameter.
 
             Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
+
+        If you don't like assignable accessor, configure `ACCESSOR_LVALUE`
+        parameter to 0.  Because accessor is generated at the time of `new`,
+        this value is effective for all members.
 
     - **default** => _value_ | _coderef_
 
@@ -145,7 +158,7 @@ is given.
         When called, hash object is passed as `$_`.
 
             has [ qw(left right both) ] => '=i';
-            has "+both" => action => sub {
+            has "+both" => sub {
                 $_->{left} = $_->{right} = $_[1];
             };
 
@@ -153,12 +166,12 @@ is given.
         spec parameter does not matter and not required.
 
             has ARGV => default => [];
-            has "<>" => action => sub {
+            has "<>" => sub {
                 push @{$_->{ARGV}}, $_[0];
             };
 
     Following parameters are all for data validation.  First `must` is a
-    generic validator and can implement anything.  Others are shorthand
+    generic validator and can implement anything.  Others are shortcut
     for common rules.
 
     - **must** => _coderef_ | \[ _coderef_ ... \]
@@ -222,7 +235,7 @@ is given.
 
 - **getopt** \[ _arrayref_ \]
 
-    Call appropiate function defined in caller's context to process
+    Call appropriate function defined in caller's context to process
     options.
 
         $obj->getopt
@@ -279,11 +292,16 @@ is given.
 
         Set function name called from `getopt` method.
 
-    - **ACCESSOR\_PREFIX**
+    - **ACCESSOR\_PREFIX** (default: '')
 
         When specified, it is prepended to the member name to make accessor
         method.  If `ACCESSOR_PREFIX` is defined as `opt_`, accessor for
         member `file` will be `opt_file`.
+
+    - **ACCESSOR\_LVALUE** (default: 1)
+
+        If true, read-write accessors have lvalue attribute.  Set zero if you
+        don't like that behavior.
 
     - **DEFAULT**
 
@@ -303,9 +321,9 @@ is given.
 
 # SEE ALSO
 
-[Getopt::Long](https://metacpan.org/pod/Getopt::Long)
+[Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong)
 
-[Getopt::EX](https://metacpan.org/pod/Getopt::EX), [Getopt::EX::Long](https://metacpan.org/pod/Getopt::EX::Long)
+[Getopt::EX](https://metacpan.org/pod/Getopt%3A%3AEX), [Getopt::EX::Long](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3ALong)
 
 # AUTHOR
 
@@ -317,7 +335,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2021 Kazumasa Utashiro
+Copyright 2021-2022 Kazumasa Utashiro
 
 # LICENSE
 

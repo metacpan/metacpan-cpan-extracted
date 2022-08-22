@@ -3,7 +3,7 @@ package Net::DNS::Resolver::Mock;
 use strict;
 use warnings;
 
-our $VERSION = '1.20200215'; # VERSION
+our $VERSION = '1.20220817'; # VERSION
 
 use base 'Net::DNS::Resolver';
 
@@ -70,7 +70,7 @@ sub send {
         die $die_on->{ "$name $type" };
     }
 
-    $name =~ s/\.$//;
+    $name =~ s/\.$// unless $name eq '.';
 
     my $FakeZone = $self->{ 'zonefile' };
 

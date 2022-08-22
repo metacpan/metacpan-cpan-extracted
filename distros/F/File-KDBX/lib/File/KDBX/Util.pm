@@ -17,7 +17,7 @@ use Time::Piece 1.33;
 use boolean;
 use namespace::clean -except => 'import';
 
-our $VERSION = '0.905'; # VERSION
+our $VERSION = '0.906'; # VERSION
 
 our %EXPORT_TAGS = (
     assert      => [qw(DEBUG assert)],
@@ -870,7 +870,7 @@ File::KDBX::Util - Utility functions for working with KDBX files
 
 =head1 VERSION
 
-version 0.905
+version 0.906
 
 =head1 FUNCTIONS
 

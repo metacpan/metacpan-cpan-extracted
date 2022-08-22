@@ -293,6 +293,12 @@ sub html {
     </div>
     [% END %]
 
+    [% IF doc.header_defined.colophon %]
+    <div class="amw-impressum amw-text-colophon" id="amw-impressum-colophon">
+    [% doc.header_as_html.colophon %]
+    </div>
+    [% END %]
+
 
   </div>
   [% END %]
@@ -1070,6 +1076,12 @@ pdfkeywords={[% tex_metadata.keywords %]}%
                  \bigskip
                [% END %]
 
+               [% IF doc.header_defined.colophon %]
+                 [% doc.header_as_latex.colophon %]
+                 \bigskip
+               [% END %]
+
+
           \strut
           \end{small}
           \end{center}
@@ -1180,6 +1192,12 @@ pdfkeywords={[% tex_metadata.keywords %]}%
          [% doc.header_as_latex.publisher %]
          \bigskip
        [% END %]
+
+       [% IF doc.header_defined.colophon %]
+         [% doc.header_as_latex.colophon %]
+         \bigskip
+       [% END %]
+
    [% END %]
 [% ELSE %]
 \strut

@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace histogram.
 
@@ -34,27 +34,27 @@ sub TO_JSON {
 }
 
 has array => (
-      is  => "rw",
-      isa => "ArrayRef|PDL",
+      is            => "rw",
+      isa           => "ArrayRef|PDL",
       documentation =>
         "Sets the data corresponding the length of each error bar. Values are plotted relative to the underlying data.",
 );
 
 has arrayminus => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
       "Sets the data corresponding the length of each error bar in the bottom (left) direction for vertical (horizontal) bars Values are plotted relative to the underlying data.",
 );
 
 has arrayminussrc => ( is            => "rw",
                        isa           => "Str",
-                       documentation => "Sets the source reference on plot.ly for  arrayminus .",
+                       documentation => "Sets the source reference on Chart Studio Cloud for `arrayminus`.",
 );
 
 has arraysrc => ( is            => "rw",
                   isa           => "Str",
-                  documentation => "Sets the source reference on plot.ly for  array .",
+                  documentation => "Sets the source reference on Chart Studio Cloud for `array`.",
 );
 
 has color => ( is            => "rw",
@@ -66,8 +66,8 @@ has copy_ystyle => ( is  => "rw",
                      isa => "Bool", );
 
 has symmetric => (
-    is  => "rw",
-    isa => "Bool",
+    is            => "rw",
+    isa           => "Bool",
     documentation =>
       "Determines whether or not the error bars have the same length in both direction (top/bottom for vertical bars, left/right for horizontal bars.",
 );
@@ -84,15 +84,15 @@ has tracerefminus => ( is  => "rw",
                        isa => "Int", );
 
 has value => (
-    is  => "rw",
-    isa => "Num",
+    is            => "rw",
+    isa           => "Num",
     documentation =>
       "Sets the value of either the percentage (if `type` is set to *percent*) or the constant (if `type` is set to *constant*) corresponding to the lengths of the error bars.",
 );
 
 has valueminus => (
-    is  => "rw",
-    isa => "Num",
+    is            => "rw",
+    isa           => "Num",
     documentation =>
       "Sets the value of either the percentage (if `type` is set to *percent*) or the constant (if `type` is set to *constant*) corresponding to the lengths of the error bars in the bottom (left) direction for vertical (horizontal) bars",
 );
@@ -122,7 +122,7 @@ Chart::Plotly::Trace::Histogram::Error_x - This attribute is one of the possible
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -169,11 +169,11 @@ Sets the data corresponding the length of each error bar in the bottom (left) di
 
 =item * arrayminussrc
 
-Sets the source reference on plot.ly for  arrayminus .
+Sets the source reference on Chart Studio Cloud for `arrayminus`.
 
 =item * arraysrc
 
-Sets the source reference on plot.ly for  array .
+Sets the source reference on Chart Studio Cloud for `array`.
 
 =item * color
 
@@ -217,7 +217,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

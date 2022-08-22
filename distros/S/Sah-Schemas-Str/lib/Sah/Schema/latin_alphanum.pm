@@ -3,9 +3,9 @@ package Sah::Schema::latin_alphanum;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-05'; # DATE
+our $DATE = '2022-07-09'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 our $schema = [str => {
     summary => 'String containing only zero or more Latin letters/digits, i.e. A-Za-z0-9',
@@ -34,7 +34,7 @@ Sah::Schema::latin_alphanum - String containing only zero or more Latin letters/
 
 =head1 VERSION
 
-This document describes version 0.009 of Sah::Schema::latin_alphanum (from Perl distribution Sah-Schemas-Str), released on 2022-07-05.
+This document describes version 0.011 of Sah::Schema::latin_alphanum (from Perl distribution Sah-Schemas-Str), released on 2022-07-09.
 
 =head1 SYNOPSIS
 

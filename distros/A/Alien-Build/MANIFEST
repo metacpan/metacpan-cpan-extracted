@@ -15,6 +15,8 @@ SUPPORT
 author.yml
 corpus/ab_pkgconfig/gsl.pc
 corpus/ab_pkgconfig/test.pc
+corpus/alien_build_plugin_digest_shapp/foo.txt
+corpus/alien_build_plugin_digest_shapp/foo.txt.gz
 corpus/alien_build_plugin_fetch_curlcommand/dir/foo-1.00.tar
 corpus/alien_build_plugin_fetch_curlcommand/dir/foo-1.01.tar
 corpus/alien_build_plugin_fetch_curlcommand/dir/foo-1.02.tar
@@ -193,6 +195,8 @@ lib/Alien/Build/Manual/AlienUser.pod
 lib/Alien/Build/Manual/Contributing.pod
 lib/Alien/Build/Manual/FAQ.pod
 lib/Alien/Build/Manual/PluginAuthor.pod
+lib/Alien/Build/Manual/image/PluginAuthor-flowchart.png
+lib/Alien/Build/Manual/image/PluginAuthor-flowchart.svg
 lib/Alien/Build/Plugin.pm
 lib/Alien/Build/Plugin/Build.pod
 lib/Alien/Build/Plugin/Build/Autoconf.pm
@@ -215,6 +219,10 @@ lib/Alien/Build/Plugin/Decode/DirListing.pm
 lib/Alien/Build/Plugin/Decode/DirListingFtpcopy.pm
 lib/Alien/Build/Plugin/Decode/HTML.pm
 lib/Alien/Build/Plugin/Decode/Mojo.pm
+lib/Alien/Build/Plugin/Digest.pod
+lib/Alien/Build/Plugin/Digest/Negotiate.pm
+lib/Alien/Build/Plugin/Digest/SHA.pm
+lib/Alien/Build/Plugin/Digest/SHAPP.pm
 lib/Alien/Build/Plugin/Download.pod
 lib/Alien/Build/Plugin/Download/Negotiate.pm
 lib/Alien/Build/Plugin/Extract.pod
@@ -304,6 +312,9 @@ t/alien_build_plugin_decode_dirlisting.t
 t/alien_build_plugin_decode_dirlistingftpcopy.t
 t/alien_build_plugin_decode_html.t
 t/alien_build_plugin_decode_mojo.t
+t/alien_build_plugin_digest_negotiate.t
+t/alien_build_plugin_digest_sha.t
+t/alien_build_plugin_digest_shapp.t
 t/alien_build_plugin_download_negotiate.t
 t/alien_build_plugin_extract_archivetar.t
 t/alien_build_plugin_extract_archivezip.t
@@ -358,6 +369,7 @@ t/test_alien_canplatypus.t
 t/test_alien_diag.t
 t/test_alien_run.t
 t/test_alien_synthetic.t
+weaver.ini
 xt/author/critic.t
 xt/author/eol.t
 xt/author/filename.t

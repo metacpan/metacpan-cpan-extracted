@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More 0.88;
+use Test::More 0.96;
 use Test::Warnings 0.009 ':no_end_test', ':all';
 use Test::DZil;
 use Path::Tiny;

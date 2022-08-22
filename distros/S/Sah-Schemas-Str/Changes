@@ -1,3 +1,18 @@
+0.011   2022-07-09  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Change mention of Sah::Schema::re_from_str to
+          Sah::PSchema::re_from_str.
+
+
+0.010   2022-07-09  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention re_from_str schema.
+
+
 0.009   2022-07-05  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

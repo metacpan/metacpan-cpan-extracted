@@ -27,15 +27,17 @@ Prerequisites
 Debian/Ubuntu
 -------------
 
-  apt-get install libgtk2.0-dev libgif-dev libjpeg-dev libtiff-dev libxpm-dev
-      libwebp-dev libfribidi-dev libharfbuzz-dev libthai0-dev
+  apt-get install libgtk3.0-dev libgif-dev libjpeg-dev libtiff-dev libxpm-dev 
+      libwebp-dev libfribidi-dev libharfbuzz-dev libthai-dev libheif-dev
 
 OpenSUSE
 --------
 
-  zypper install gtk2-devel giflib-devel libjpeg-devel libtiff-devel
+  zypper install gtk3-devel giflib-devel libjpeg-devel libtiff-devel 
       libXpm-devel libXrandr-devel libXcomposite-devel libXcursor-devel
-      libfribidi-devel libwebp-devel libharfbuzz-devel libthai-devel
+      libfribidi-devel libwebp-devel libharfbuzz-devel libthai-devel 
+      libheif-devel
+
 
 Solaris
 -------
@@ -53,8 +55,8 @@ Cygwin
 
 - install prerequisites:
 
-   apt-cyg install libgtk2.0-devel libfribidi-devel libgif-devel libjpeg-devel libtiff-devel libXpm-devel
-        libwebp-devel libharfbuzz-devel libthai-devel
+   apt-cyg install libgtk3.0-devel libfribidi-devel libgif-devel libjpeg-devel libtiff-devel libXpm-devel
+        libwebp-devel libharfbuzz-devel libthai-devel libheif-devel
 
 Graphic libraries
 -----------------
@@ -70,6 +72,9 @@ libraries can be compiled in on all platforms:
    - libgif
    - libtiff
    - libwebp,libwebpdemux,libwebpmux
+   - libheif
+
+(libheif is not widespread yet. See Prima/Image/heif.pm for details)
 
 Win32
 -----
@@ -226,7 +231,7 @@ Copyright
 
 (c) 1997-2003 The Protein Laboratory, University of Copenhagen
 
-(c) 1997-2021 Dmitry Karasik
+(c) 1997-2022 Dmitry Karasik
 
 Author
 ======

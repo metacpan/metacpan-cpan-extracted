@@ -22,10 +22,10 @@ sub register_app {
     $routes->get(
         '/' => sub {
             my $c = shift;
-            $c->stash( stylesheets          => $dash_app->()->_rendered_stylesheets,
-                       external_stylesheets => $dash_app->()->_rendered_external_stylesheets,
-                       scripts              => $dash_app->()->_rendered_scripts,
-                       title                => $dash_app->()->app_name
+            $c->stash( perl_dash_mojo_backend_stylesheets          => $dash_app->()->_rendered_stylesheets,
+                       perl_dash_mojo_backend_external_stylesheets => $dash_app->()->_rendered_external_stylesheets,
+                       perl_dash_mojo_backend_scripts              => $dash_app->()->_rendered_scripts,
+                       perl_dash_mojo_backend_title                => $dash_app->()->app_name
             );
             $c->render( template => 'index' );
         }
@@ -33,16 +33,17 @@ sub register_app {
 
     my $dist_name = 'Dash';
     $routes->get(
-        '/_dash-component-suites/:namespace/*asset' => sub {
+        '/_dash-component-suites/:perl_dash_mojo_backend_namespace/*perl_dash_mojo_backend_asset' => sub {
 
             # TODO Component registry to find assets file in other dists
             my $c    = shift;
-            my $file = $dash_app->()->_filename_from_file_with_fingerprint( $c->stash('asset') );
+            my $file = $dash_app->()->_filename_from_file_with_fingerprint( $c->stash('perl_dash_mojo_backend_asset') );
 
             $c->reply->file(
-                       File::ShareDir::dist_file( $dist_name,
-                                                  Path::Tiny::path( 'assets', $c->stash('namespace'), $file )->canonpath
-                       )
+                   File::ShareDir::dist_file( $dist_name,
+                                              Path::Tiny::path( 'assets', $c->stash('perl_dash_mojo_backend_namespace'),
+                                                                $file )->canonpath
+                   )
             );
         }
     );
@@ -102,7 +103,7 @@ Dash::Backend::Mojolicious::Setup
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 AUTHOR
 
@@ -110,7 +111,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 
@@ -130,7 +131,7 @@ __DATA__
 </div>
 
         <footer>
-            <%== $scripts %>
+            <%== $perl_dash_mojo_backend_scripts %>
         </footer>
 
 
@@ -140,10 +141,10 @@ __DATA__
     <head>
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
       <meta charset="UTF-8">
-        <title><%= $title %></title>
+        <title><%= $perl_dash_mojo_backend_title %></title>
         <link rel="icon" type="image/x-icon" href="/_favicon.ico?v=1.7.0">
-        <%== $stylesheets %>
-        <%== $external_stylesheets %>
+        <%== $perl_dash_mojo_backend_stylesheets %>
+        <%== $perl_dash_mojo_backend_external_stylesheets %>
     </head>
     <body>
         

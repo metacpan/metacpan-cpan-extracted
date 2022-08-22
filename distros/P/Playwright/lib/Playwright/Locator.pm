@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Locator;
-$Playwright::Locator::VERSION = '1.210';
+$Playwright::Locator::VERSION = '1.251';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,111 +22,21 @@ sub spec {
     return $Playwright::spec->{'Locator'}{members};
 }
 
-sub allInnerTexts {
+sub screenshot {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'allInnerTexts',
+        command => 'screenshot',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub evaluateHandle {
+sub dblclick {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'evaluateHandle',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub dispatchEvent {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'dispatchEvent',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub evaluateAll {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'evaluateAll',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub count {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'count',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub boundingBox {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'boundingBox',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub hover {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'hover',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub isEnabled {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'isEnabled',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub selectOption {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'selectOption',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub textContent {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'textContent',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub filter {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'filter',
+        command => 'dblclick',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -142,31 +52,51 @@ sub focus {
     );
 }
 
-sub first {
+sub boundingBox {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'first',
+        command => 'boundingBox',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub screenshot {
+sub getAttribute {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'screenshot',
+        command => 'getAttribute',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub type {
+sub hover {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'type',
+        command => 'hover',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub elementHandles {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'elementHandles',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub evaluateHandle {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'evaluateHandle',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -182,11 +112,81 @@ sub fill {
     );
 }
 
+sub press {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'press',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub allTextContents {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'allTextContents',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub highlight {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'highlight',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub page {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'page',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub tap {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'tap',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub type {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'type',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub isEnabled {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'isEnabled',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub isDisabled {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'isDisabled',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -202,11 +202,61 @@ sub check {
     );
 }
 
-sub inputValue {
+sub evaluate {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'inputValue',
+        command => 'evaluate',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub allInnerTexts {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'allInnerTexts',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub nth {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'nth',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub dispatchEvent {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'dispatchEvent',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub uncheck {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'uncheck',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub dragTo {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'dragTo',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -222,11 +272,151 @@ sub click {
     );
 }
 
-sub scrollIntoViewIfNeeded {
+sub filter {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'scrollIntoViewIfNeeded',
+        command => 'filter',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub selectText {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'selectText',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub first {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'first',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub frameLocator {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'frameLocator',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub isChecked {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'isChecked',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub isEditable {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'isEditable',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub waitFor {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'waitFor',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub count {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'count',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub innerText {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'innerText',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub innerHTML {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'innerHTML',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub locator {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'locator',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub elementHandle {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'elementHandle',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub inputValue {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'inputValue',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub evaluateAll {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'evaluateAll',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub last {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'last',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -252,141 +442,11 @@ sub isVisible {
     );
 }
 
-sub highlight {
+sub selectOption {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'highlight',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub getAttribute {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'getAttribute',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub dragTo {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'dragTo',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub isEditable {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'isEditable',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub frameLocator {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'frameLocator',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub evaluate {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'evaluate',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub allTextContents {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'allTextContents',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub innerText {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'innerText',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub selectText {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'selectText',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub elementHandles {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'elementHandles',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub nth {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'nth',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub waitFor {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'waitFor',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub last {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'last',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub tap {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'tap',
+        command => 'selectOption',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -402,81 +462,11 @@ sub setInputFiles {
     );
 }
 
-sub uncheck {
+sub scrollIntoViewIfNeeded {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'uncheck',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub innerHTML {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'innerHTML',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub isChecked {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'isChecked',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub locator {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'locator',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub isDisabled {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'isDisabled',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub dblclick {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'dblclick',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub elementHandle {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'elementHandle',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub press {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'press',
+        command => 'scrollIntoViewIfNeeded',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -487,6 +477,16 @@ sub isHidden {
     return $self->_api_request(
         args    => [@_],
         command => 'isHidden',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub textContent {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'textContent',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -516,7 +516,7 @@ Playwright::Locator - Automatically generated class for Playwright::Locator
 
 =head1 VERSION
 
-version 1.210
+version 1.251
 
 =head1 CONSTRUCTOR
 
@@ -527,71 +527,17 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 allInnerTexts(@args)
+=head2 screenshot(@args)
 
-Execute the Locator::allInnerTexts playwright routine.
+Execute the Locator::screenshot playwright routine.
 
-See L<https://playwright.dev/api/class-Locator#Locator-allInnerTexts> for more information.
+See L<https://playwright.dev/api/class-Locator#Locator-screenshot> for more information.
 
-=head2 evaluateHandle(@args)
+=head2 dblclick(@args)
 
-Execute the Locator::evaluateHandle playwright routine.
+Execute the Locator::dblclick playwright routine.
 
-See L<https://playwright.dev/api/class-Locator#Locator-evaluateHandle> for more information.
-
-=head2 dispatchEvent(@args)
-
-Execute the Locator::dispatchEvent playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-dispatchEvent> for more information.
-
-=head2 evaluateAll(@args)
-
-Execute the Locator::evaluateAll playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-evaluateAll> for more information.
-
-=head2 count(@args)
-
-Execute the Locator::count playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-count> for more information.
-
-=head2 boundingBox(@args)
-
-Execute the Locator::boundingBox playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-boundingBox> for more information.
-
-=head2 hover(@args)
-
-Execute the Locator::hover playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-hover> for more information.
-
-=head2 isEnabled(@args)
-
-Execute the Locator::isEnabled playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-isEnabled> for more information.
-
-=head2 selectOption(@args)
-
-Execute the Locator::selectOption playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-selectOption> for more information.
-
-=head2 textContent(@args)
-
-Execute the Locator::textContent playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-textContent> for more information.
-
-=head2 filter(@args)
-
-Execute the Locator::filter playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-filter> for more information.
+See L<https://playwright.dev/api/class-Locator#Locator-dblclick> for more information.
 
 =head2 focus(@args)
 
@@ -599,23 +545,35 @@ Execute the Locator::focus playwright routine.
 
 See L<https://playwright.dev/api/class-Locator#Locator-focus> for more information.
 
-=head2 first(@args)
+=head2 boundingBox(@args)
 
-Execute the Locator::first playwright routine.
+Execute the Locator::boundingBox playwright routine.
 
-See L<https://playwright.dev/api/class-Locator#Locator-first> for more information.
+See L<https://playwright.dev/api/class-Locator#Locator-boundingBox> for more information.
 
-=head2 screenshot(@args)
+=head2 getAttribute(@args)
 
-Execute the Locator::screenshot playwright routine.
+Execute the Locator::getAttribute playwright routine.
 
-See L<https://playwright.dev/api/class-Locator#Locator-screenshot> for more information.
+See L<https://playwright.dev/api/class-Locator#Locator-getAttribute> for more information.
 
-=head2 type(@args)
+=head2 hover(@args)
 
-Execute the Locator::type playwright routine.
+Execute the Locator::hover playwright routine.
 
-See L<https://playwright.dev/api/class-Locator#Locator-type> for more information.
+See L<https://playwright.dev/api/class-Locator#Locator-hover> for more information.
+
+=head2 elementHandles(@args)
+
+Execute the Locator::elementHandles playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-elementHandles> for more information.
+
+=head2 evaluateHandle(@args)
+
+Execute the Locator::evaluateHandle playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-evaluateHandle> for more information.
 
 =head2 fill(@args)
 
@@ -623,11 +581,53 @@ Execute the Locator::fill playwright routine.
 
 See L<https://playwright.dev/api/class-Locator#Locator-fill> for more information.
 
+=head2 press(@args)
+
+Execute the Locator::press playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-press> for more information.
+
+=head2 allTextContents(@args)
+
+Execute the Locator::allTextContents playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-allTextContents> for more information.
+
+=head2 highlight(@args)
+
+Execute the Locator::highlight playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-highlight> for more information.
+
 =head2 page(@args)
 
 Execute the Locator::page playwright routine.
 
 See L<https://playwright.dev/api/class-Locator#Locator-page> for more information.
+
+=head2 tap(@args)
+
+Execute the Locator::tap playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-tap> for more information.
+
+=head2 type(@args)
+
+Execute the Locator::type playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-type> for more information.
+
+=head2 isEnabled(@args)
+
+Execute the Locator::isEnabled playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-isEnabled> for more information.
+
+=head2 isDisabled(@args)
+
+Execute the Locator::isDisabled playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-isDisabled> for more information.
 
 =head2 check(@args)
 
@@ -635,11 +635,41 @@ Execute the Locator::check playwright routine.
 
 See L<https://playwright.dev/api/class-Locator#Locator-check> for more information.
 
-=head2 inputValue(@args)
+=head2 evaluate(@args)
 
-Execute the Locator::inputValue playwright routine.
+Execute the Locator::evaluate playwright routine.
 
-See L<https://playwright.dev/api/class-Locator#Locator-inputValue> for more information.
+See L<https://playwright.dev/api/class-Locator#Locator-evaluate> for more information.
+
+=head2 allInnerTexts(@args)
+
+Execute the Locator::allInnerTexts playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-allInnerTexts> for more information.
+
+=head2 nth(@args)
+
+Execute the Locator::nth playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-nth> for more information.
+
+=head2 dispatchEvent(@args)
+
+Execute the Locator::dispatchEvent playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-dispatchEvent> for more information.
+
+=head2 uncheck(@args)
+
+Execute the Locator::uncheck playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-uncheck> for more information.
+
+=head2 dragTo(@args)
+
+Execute the Locator::dragTo playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-dragTo> for more information.
 
 =head2 click(@args)
 
@@ -647,11 +677,95 @@ Execute the Locator::click playwright routine.
 
 See L<https://playwright.dev/api/class-Locator#Locator-click> for more information.
 
-=head2 scrollIntoViewIfNeeded(@args)
+=head2 filter(@args)
 
-Execute the Locator::scrollIntoViewIfNeeded playwright routine.
+Execute the Locator::filter playwright routine.
 
-See L<https://playwright.dev/api/class-Locator#Locator-scrollIntoViewIfNeeded> for more information.
+See L<https://playwright.dev/api/class-Locator#Locator-filter> for more information.
+
+=head2 selectText(@args)
+
+Execute the Locator::selectText playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-selectText> for more information.
+
+=head2 first(@args)
+
+Execute the Locator::first playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-first> for more information.
+
+=head2 frameLocator(@args)
+
+Execute the Locator::frameLocator playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-frameLocator> for more information.
+
+=head2 isChecked(@args)
+
+Execute the Locator::isChecked playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-isChecked> for more information.
+
+=head2 isEditable(@args)
+
+Execute the Locator::isEditable playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-isEditable> for more information.
+
+=head2 waitFor(@args)
+
+Execute the Locator::waitFor playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-waitFor> for more information.
+
+=head2 count(@args)
+
+Execute the Locator::count playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-count> for more information.
+
+=head2 innerText(@args)
+
+Execute the Locator::innerText playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-innerText> for more information.
+
+=head2 innerHTML(@args)
+
+Execute the Locator::innerHTML playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-innerHTML> for more information.
+
+=head2 locator(@args)
+
+Execute the Locator::locator playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-locator> for more information.
+
+=head2 elementHandle(@args)
+
+Execute the Locator::elementHandle playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-elementHandle> for more information.
+
+=head2 inputValue(@args)
+
+Execute the Locator::inputValue playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-inputValue> for more information.
+
+=head2 evaluateAll(@args)
+
+Execute the Locator::evaluateAll playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-evaluateAll> for more information.
+
+=head2 last(@args)
+
+Execute the Locator::last playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-last> for more information.
 
 =head2 setChecked(@args)
 
@@ -665,89 +779,11 @@ Execute the Locator::isVisible playwright routine.
 
 See L<https://playwright.dev/api/class-Locator#Locator-isVisible> for more information.
 
-=head2 highlight(@args)
+=head2 selectOption(@args)
 
-Execute the Locator::highlight playwright routine.
+Execute the Locator::selectOption playwright routine.
 
-See L<https://playwright.dev/api/class-Locator#Locator-highlight> for more information.
-
-=head2 getAttribute(@args)
-
-Execute the Locator::getAttribute playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-getAttribute> for more information.
-
-=head2 dragTo(@args)
-
-Execute the Locator::dragTo playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-dragTo> for more information.
-
-=head2 isEditable(@args)
-
-Execute the Locator::isEditable playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-isEditable> for more information.
-
-=head2 frameLocator(@args)
-
-Execute the Locator::frameLocator playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-frameLocator> for more information.
-
-=head2 evaluate(@args)
-
-Execute the Locator::evaluate playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-evaluate> for more information.
-
-=head2 allTextContents(@args)
-
-Execute the Locator::allTextContents playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-allTextContents> for more information.
-
-=head2 innerText(@args)
-
-Execute the Locator::innerText playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-innerText> for more information.
-
-=head2 selectText(@args)
-
-Execute the Locator::selectText playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-selectText> for more information.
-
-=head2 elementHandles(@args)
-
-Execute the Locator::elementHandles playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-elementHandles> for more information.
-
-=head2 nth(@args)
-
-Execute the Locator::nth playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-nth> for more information.
-
-=head2 waitFor(@args)
-
-Execute the Locator::waitFor playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-waitFor> for more information.
-
-=head2 last(@args)
-
-Execute the Locator::last playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-last> for more information.
-
-=head2 tap(@args)
-
-Execute the Locator::tap playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-tap> for more information.
+See L<https://playwright.dev/api/class-Locator#Locator-selectOption> for more information.
 
 =head2 setInputFiles(@args)
 
@@ -755,59 +791,23 @@ Execute the Locator::setInputFiles playwright routine.
 
 See L<https://playwright.dev/api/class-Locator#Locator-setInputFiles> for more information.
 
-=head2 uncheck(@args)
+=head2 scrollIntoViewIfNeeded(@args)
 
-Execute the Locator::uncheck playwright routine.
+Execute the Locator::scrollIntoViewIfNeeded playwright routine.
 
-See L<https://playwright.dev/api/class-Locator#Locator-uncheck> for more information.
-
-=head2 innerHTML(@args)
-
-Execute the Locator::innerHTML playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-innerHTML> for more information.
-
-=head2 isChecked(@args)
-
-Execute the Locator::isChecked playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-isChecked> for more information.
-
-=head2 locator(@args)
-
-Execute the Locator::locator playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-locator> for more information.
-
-=head2 isDisabled(@args)
-
-Execute the Locator::isDisabled playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-isDisabled> for more information.
-
-=head2 dblclick(@args)
-
-Execute the Locator::dblclick playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-dblclick> for more information.
-
-=head2 elementHandle(@args)
-
-Execute the Locator::elementHandle playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-elementHandle> for more information.
-
-=head2 press(@args)
-
-Execute the Locator::press playwright routine.
-
-See L<https://playwright.dev/api/class-Locator#Locator-press> for more information.
+See L<https://playwright.dev/api/class-Locator#Locator-scrollIntoViewIfNeeded> for more information.
 
 =head2 isHidden(@args)
 
 Execute the Locator::isHidden playwright routine.
 
 See L<https://playwright.dev/api/class-Locator#Locator-isHidden> for more information.
+
+=head2 textContent(@args)
+
+Execute the Locator::textContent playwright routine.
+
+See L<https://playwright.dev/api/class-Locator#Locator-textContent> for more information.
 
 =head2 on(@args)
 

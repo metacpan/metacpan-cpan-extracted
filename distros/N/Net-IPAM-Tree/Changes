@@ -1,5 +1,9 @@
 Revision history for Net-IPAM-Tree
 
+4.00    Thu, 18 Aug 2022 17:48:25 +0200
+        - bump Net::IPAM::IP requirement
+        - adjusted tests for new IP version
+
 3.02    Sun, 17 Apr 2022 21:53:31 +0200
         - better superset algo
 

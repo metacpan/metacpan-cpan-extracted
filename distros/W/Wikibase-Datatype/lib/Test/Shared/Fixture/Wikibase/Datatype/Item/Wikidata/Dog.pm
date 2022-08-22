@@ -11,7 +11,7 @@ use Wikibase::Datatype::Statement;
 use Wikibase::Datatype::Value::Item;
 use Wikibase::Datatype::Value::Monolingual;
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
 
 sub new {
 	my $class = shift;

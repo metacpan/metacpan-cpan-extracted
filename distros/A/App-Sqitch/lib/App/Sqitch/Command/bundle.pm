@@ -17,7 +17,7 @@ use namespace::autoclean;
 extends 'App::Sqitch::Command';
 with 'App::Sqitch::Role::ContextCommand';
 
-our $VERSION = 'v1.2.1'; # VERSION
+our $VERSION = 'v1.3.0'; # VERSION
 
 has from => (
     is       => 'ro',
@@ -127,22 +127,6 @@ sub execute {
     }
 
     return $self;
-}
-
-sub _mkpath {
-    my ( $self, $dir ) = @_;
-    $self->debug( '    ', __x 'Created {file}', file => $dir )
-        if make_path $dir, { error => \my $err };
-
-    my $diag = shift @{ $err } or return $self;
-
-    my ( $path, $msg ) = %{ $diag };
-    hurl bundle => __x(
-        'Error creating {path}: {error}',
-        path  => $path,
-        error => $msg,
-    ) if $path;
-    hurl bundle => $msg;
 }
 
 sub _copy_if_modified {
@@ -375,7 +359,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 License
 
-Copyright (c) 2012-2021 iovation Inc., David E. Wheeler
+Copyright (c) 2012-2022 iovation Inc., David E. Wheeler
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

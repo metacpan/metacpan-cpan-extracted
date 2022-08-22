@@ -11,6 +11,7 @@ my @files = (
     'lib/App/Docmake.pm',
     'lib/App/XML/DocBook/Builder.pm',
     'lib/App/XML/DocBook/Docmake.pm',
+    'lib/App/XML/DocBook/Docmake/CmdComponent.pm',
     't/00-compile.t',
     't/01-use.t'
 );

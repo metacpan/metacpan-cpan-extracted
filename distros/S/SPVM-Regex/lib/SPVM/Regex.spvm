@@ -3,6 +3,7 @@ class Regex {
   use Regex::Replacer;
   use Regex::Re2;
   use Hash;
+  use List;
   
   has re2 : Regex::Re2;
   has captures : ro string[];
@@ -10,13 +11,7 @@ class Regex {
   has match_length : ro int;
   has replaced_count : ro int;
   
-  static method new : Regex ($pattern_and_flags : string[]...) {
-    
-    my $pattern = $pattern_and_flags->[0];
-    my $flags = (string)undef;
-    if (@$pattern_and_flags > 1) {
-      $flags = $pattern_and_flags->[1];
-    }
+  static method new : Regex ($pattern : string, $flags = undef : string) {
     
     my $self = new Regex;
     
@@ -35,12 +30,11 @@ class Regex {
   
   private native method compile : void ($pattern : string);
   
-  method match : int ($string : string) {
-    my $offset = 0;
-    return $self->match_offset($string, \$offset);
+  method match : int ($string : string, $offset = 0 : int, $length = -1 : int) {
+    return $self->match_forward($string, \$offset, $length);
   }
 
-  native method match_offset : int ($string : string, $offset : int*);
+  native method match_forward : int ($string : string, $offset : int*, $length = -1 : int);
 
   method cap1 : string () { return $self->captures->[1]; }
   method cap2 : string () { return $self->captures->[2]; }
@@ -63,43 +57,19 @@ class Regex {
   method cap19 : string () { return $self->captures->[19]; }
   method cap20 : string () { return $self->captures->[20]; }
 
-  method replace  : string ($string : string, $replace_string : string) {
-    my $offset = 0;
-    return $self->replace_common($string, \$offset, $replace_string, {global => 0});
+  method replace  : string ($string : string, $replace : object of string|Regex::Replacer, $offset = 0 : int, $length = -1 : int, $options = undef : object[]) {
+    return $self->replace_common($string, $replace, \$offset, $length, $options);
   }
   
-  method replace_cb  : string ($string : string, $replace_cb : Regex::Replacer) {
-    my $offset = 0;
-    return $self->replace_common($string, \$offset, $replace_cb, {global => 0});
+  method replace_g  : string ($string : string, $replace : object of string|Regex::Replacer, $offset = 0 : int, $length = -1 : int, $options = undef : object[]) {
+    my $new_options_list = List->new($options);
+    $new_options_list->push("global");
+    $new_options_list->push(1);
+    $options = $new_options_list->to_array;
+    return $self->replace_common($string, $replace, \$offset, $length, $options);
   }
   
-  method replace_g  : string ($string : string, $replace_string : string) {
-    my $offset = 0;
-    return $self->replace_common($string, \$offset, $replace_string, {global => 1});
-  }
-  
-  method replace_g_cb  : string ($string : string, $replace_cb : Regex::Replacer) {
-    my $offset = 0;
-    return $self->replace_common($string, \$offset, $replace_cb, {global => 1});
-  }
-  
-  method replace_offset  : string ($string : string, $offset_ref : int*, $replace : string) {
-    return $self->replace_common($string, $offset_ref, $replace, {global => 0});
-  }
-  
-  method replace_cb_offset  : string ($string : string, $offset_ref : int*, $replace_cb : Regex::Replacer) {
-    return $self->replace_common($string, $offset_ref, $replace_cb, {global => 0});
-  }
-  
-  method replace_g_offset  : string ($string : string, $offset_ref : int*, $replace : string) {
-    return $self->replace_common($string, $offset_ref, $replace, {global => 1});
-  }
-  
-  method replace_g_cb_offset  : string ($string : string, $offset_ref : int*, $replace_cb : Regex::Replacer) {
-    return $self->replace_common($string, $offset_ref, $replace_cb, {global => 1});
-  }
-  
-  private precompile method replace_common : string ($string : string, $offset_ref : int*, $replace : object, $options : object[]) {
+  precompile method replace_common : string ($string : string, $replace : object of string|Regex::Replacer, $offset_ref : int*, $length = -1 : int, $options = undef : object[]) {
     
     my $opt = Hash->new($options);
     
@@ -112,23 +82,32 @@ class Regex {
     }
     
     unless ($string) {
-      die "The string must be specified";
+      die "The string must be defined";
     }
     
-    if ($offset < 0) {
+    unless ($offset >= 0) {
       die "The offset must be greater than or equal to 0";
+    }
+    
+    my $string_length = length $string;
+    
+    if ($length == -1) {
+      $length = $string_length - $offset;
+    }
+    
+    unless ($offset + $length <= $string_length) {
+      die "The offset + the length must be less than or equal to the length of the string";
     }
     
     my $result : string;
     my $result_buffer = StringBuffer->new;
-    my $string_length = length $string;
     $result_buffer->push($string);
     
     my $match_count = 0;
     while (1) {
-      my $result_buffer_value = $result_buffer->to_string;
+      my $result_buffer_value = $result_buffer->value;
       
-      my $match = $self->match_offset($result_buffer_value, \$offset);
+      my $match = $self->match_forward($result_buffer_value, \$offset, $length);
       
       if ($match) {
         $match_count++;
@@ -146,7 +125,7 @@ class Regex {
         $replace_string = $replacer->($self);
       }
       else {
-        die "The replace argument must be a string or a Regex::Replacer object";
+        die "The replacement must be a string or a Regex::Replacer object";
       }
       
       my $replace_string_length = length $replace_string;
@@ -164,6 +143,7 @@ class Regex {
       
       my $next_offset = $match_start + $replace_string_length;
       $offset = $next_offset;
+      $length -= $offset;
     }
     
     $result = $result_buffer->to_string;

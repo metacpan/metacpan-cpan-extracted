@@ -20,6 +20,16 @@
 #######################################################################
 
 
+2022-08-22  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000631 released
+
+        * Updated Instruction Set WordPress_is.pm.
+
+	* Added newline to test of prompt in FA_Core.pm
+
+	* Updated epel release in Makefile.PL
+
 2022-05-24  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000629 released

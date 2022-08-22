@@ -264,7 +264,8 @@ SKIP: {
   	\?date_birth_spouse=\d\d.\d\d.\d\d\d\d
   	\&date_birth=01.01.1970
   	\&date_birth_kid_1=\d\d.\d\d.\d\d\d\d
-  	\&date_birth_kid_2=\d\d.\d\d.\d\d\d\d$"x,'Got the expected HTTP query string');
+  	\&date_birth_kid_2=\d\d.\d\d.\d\d\d\d
+  	(?:\&fool=)?$"x,'Got the expected HTTP query string');
 
     undef $main::_STDOUT_;
     undef $main::_STDERR_;

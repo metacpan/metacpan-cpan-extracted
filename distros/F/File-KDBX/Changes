@@ -1,8 +1,15 @@
 Revision history for File-KDBX.
 
+0.906     2022-08-16 19:44:09-0600
+  * Fixed bug where dumping a fresh database could write wrong-sized encryption IV, making the resulting
+    serialization unreadable by some KeePass implementations. Thanks HIGHTOWE.
+  * Fixed bugs preventing the use of memory protection with fresh databases. Thanks HIGHTOWE.
+  * Fixed the transform_rounds method to work with Argon KDF; this now maps to the Argon iterations value if
+    the current KDF is Argon. Thanks HIGHTOWE.
+
 0.905     2022-08-06 12:12:42-0600
-  * Declare Time::Local 1.19 as a required dependency.
-  * Declare CryptX 0.055 as a required dependency. Thanks HIGHTOWE.
+  * Declared Time::Local 1.19 as a required dependency.
+  * Declared CryptX 0.055 as a required dependency. Thanks HIGHTOWE.
   * Fixed minor documentation errors.
 
 0.904     2022-07-07 21:51:17-0600
@@ -18,7 +25,7 @@ Revision history for File-KDBX.
   * Added support for 32-bit perls.
   * API change: Rename iterator accessors on group to all_*.
   * Declared perl 5.10.0 prerequisite. I have no intention of supporting 5.8 or earlier.
-  * Fixed more other broken tests -- thanks CPAN testers.
+  * Fixed more other broken tests. Thanks CPAN testers.
 
 0.901     2022-05-02 01:18:13-0600
 

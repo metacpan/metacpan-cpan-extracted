@@ -34,10 +34,10 @@
    "resources" : {
       "homepage" : "https://metacpan.org/dist/Venus"
    },
-   "version" : "1.10",
+   "version" : "1.23",
    "x_authority" : "cpan:AWNCORP",
    "x_generated_by_perl" : "v5.32.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Apache-2.0"
 }
 

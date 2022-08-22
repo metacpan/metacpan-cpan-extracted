@@ -3,11 +3,11 @@
 #     Dmitry Karasik <dk@plab.ku.dk>
 use strict;
 use warnings;
-use Prima::ScrollWidget;
+use Prima::Widget::ScrollWidget;
 
 package Prima::ImageViewer;
 use vars qw(@ISA);
-@ISA = qw( Prima::ScrollWidget);
+@ISA = qw( Prima::Widget::ScrollWidget);
 
 sub profile_default
 {
@@ -17,6 +17,7 @@ sub profile_default
 		image        => undef,
 		imageFile    => undef,
 		stretch      => 0,
+		scaling      => ist::Box,
 		zoom         => 1,
 		zoomPrecision=> 100,
 		alignment    => ta::Left,
@@ -49,9 +50,10 @@ sub init
 	for ( qw( zoom integralScreen integralImage))
 		{ $self-> {$_} = 1; }
 	$self-> {zoomPrecision} = 10;
+	$self-> {scaling} = ist::Box;
 	my %profile = $self-> SUPER::init(@_);
 	$self-> { imageFile}     = $profile{ imageFile};
-	for ( qw( image zoomPrecision zoom autoZoom stretch alignment valignment quality)) {
+	for ( qw( image zoomPrecision zoom autoZoom stretch alignment valignment quality scaling)) {
 		$self-> $_($profile{$_});
 	}
 	return %profile;
@@ -130,6 +132,61 @@ sub on_paint
 
 PAINT:
 	$canvas-> clear( $atx, $aty, $atx + $imXz, $aty + $imYz) if $self-> {icon};
+
+	if ( $self-> {scaling} != ist::Box && ( $imXz != $imX || $imYz != $imY ) ) {
+		my (
+			$xFrom, $yFrom,
+			$xDestLen, $yDestLen,
+			$xLen, $yLen
+		) = (
+			0, 0,
+			$imXz, $imYz,
+			$imXz, $imYz
+		);
+		if ( $iS > $iI ) {
+			# scaling kernel may need pixels beyond the cliprect
+			my $ks = {
+				ist::Triangle,  1,
+				ist::Quadratic, 2,
+				ist::Sinc,      4,
+				ist::Hermite,   1,
+				ist::Cubic,     2,
+				ist::Gaussian,  2,
+			}->{$self->{scaling}};
+
+			if ( $xDest >= $iI * $ks) {
+				$xDest -= $iI * $ks;
+				$imXz  += $iS * $ks;
+				$imX   += $iI * $ks;
+				$xFrom += $iS * $ks;
+			}
+			if ( $xDest + $imX <= $self->{imageX} - $iI * $ks ) {
+				$imX   += $iI * $ks;
+				$imXz  += $iS * $ks;
+			}
+			if ( $yDest >= $iI * $ks ) {
+				$yDest -= $iI * $ks;
+				$imYz  += $iS * $ks;
+				$imY   += $iI * $ks;
+				$yFrom += $iS * $ks;
+			}
+			if ( $yDest + $imY <= $self->{imageY} - $iI * $ks ) {
+				$imY   += $iI * $ks;
+				$imYz  += $iS * $ks;
+			}
+		}
+		my $i = $self->{image}->extract( $xDest, $yDest, $imX, $imY );
+		$i->scaling( $self->{scaling} );
+		$i->size( $imXz, $imYz );
+		return $canvas-> put_image_indirect(
+			$i,
+			$atx, $aty,
+			$xFrom, $yFrom,
+			$xDestLen, $yDestLen,
+			$xLen, $yLen,
+			rop::CopyPut
+		);
+	}
 
 	return $canvas-> put_image_indirect(
 		$self-> {image},
@@ -300,6 +357,8 @@ sub set_zoom
 	my $dv = int( $mul * ( $zoom - int( $zoom)) + 0.5);
 	$dv-- if ($dv % 2) and ( $dv % 5);
 	$zoom = int($zoom) + $dv / $mul;
+	return if $zoom == $self-> {zoom};
+
 	$dv = 0 if $dv >= $mul;
 	my ($r,$n,$m) = (1,$mul,$dv);
 	while(1) {
@@ -307,7 +366,6 @@ sub set_zoom
 		last unless $r;
 		($m,$n) = ($n,$r);
 	}
-	return if $zoom == $self-> {zoom};
 
 	$self-> {zoom} = $zoom;
 	$self-> {integralScreen} = int( $mul / $n) * int( $zoom) + int( $dv / $n);
@@ -441,6 +499,17 @@ sub zoomPrecision{($#_)?$_[0]-> set_zoom_precision($_[1]):return $_[0]-> {zoomPr
 sub quality      {($#_)?$_[0]-> set_quality($_[1]):return $_[0]-> {quality}}
 sub stretch      {($#_)?$_[0]-> set_stretch($_[1]):return $_[0]-> {stretch}}
 
+sub scaling
+{
+	return $_[0]->{scaling} unless $#_;
+
+	my ( $self, $scaling ) = @_;
+	$scaling = ist::Box if $scaling < ist::Box || $scaling > ist::Max;
+	return if $self->{scaling} == $scaling;
+	$self->{scaling} = $scaling;
+	$self->repaint;
+}
+
 sub PreviewImage_HeaderReady
 {
 	my ( $self, $image, $extras) = @_;
@@ -535,9 +604,9 @@ Prima::ImageViewer - standard image, icon, and bitmap viewer class.
 The module contains C<Prima::ImageViewer> class, which provides
 image displaying functionality, including different zoom levels.
 
-C<Prima::ImageViewer> is a descendant of C<Prima::ScrollWidget>
+C<Prima::ImageViewer> is a descendant of C<Prima::Widget::ScrollWidget>
 and inherits its document scrolling behavior and programming interface.
-See L<Prima::ScrollWidget> for details.
+See L<Prima::Widget::ScrollWidget> for details.
 
 =head1 API
 
@@ -571,6 +640,14 @@ an instance of C<Prima::Image>, C<Prima::Icon>, or C<Prima::DeviceBitmap> class.
 
 Set the image FILE to be loaded and displayed. Is rarely used since does not return
 a loading success flag.
+
+=item scaling ist::XX
+
+Applies scaling when drawing an image.
+
+Default: C<ist::Box>, default cheap scaling.
+
+Warning: scaling types above the C<ist::Box> might be somewhat expensive
 
 =item stretch BOOLEAN
 
@@ -735,6 +812,6 @@ Dmitry Karasik, E<lt>dmitry@karasik.eu.orgE<gt>.
 
 =head1 SEE ALSO
 
-L<Prima>, L<Prima::Image>, L<Prima::ScrollWidget>, L<Prima::Dialog::ImageDialog>, F<examples/iv.pl>.
+L<Prima>, L<Prima::Image>, L<Prima::Widget::ScrollWidget>, L<Prima::Dialog::ImageDialog>, F<examples/iv.pl>.
 
 =cut

@@ -6,7 +6,7 @@ use Test::More;
 use Test::Spelling 0.12;
 use Pod::Wordlist;
 
-set_spell_cmd('aspell list');
+set_spell_cmd('aspell --master=en_US list');
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
@@ -31,12 +31,14 @@ David
 Denaxas
 FWILES
 Father
+Felix
 Fiegehenn
 Finch
 Form
 Froehlich
 Gavin
 Ghedini
+Gil
 Gisle
 Gondwana
 Graeme
@@ -49,6 +51,7 @@ Hedlund
 Hukins
 Ian
 Jacob
+James
 Julien
 Kapranoff
 Karaban
@@ -59,22 +62,25 @@ Lance
 Lipcon
 Lukas
 MARKSTOS
+Magno
 Mai
 Mann
 Mark
 Mike
 Olaf
 Ondrej
+Ostmann
 Peter
 Peters
 Rabbitson
+Raspass
 Rezic
 Robert
 Rolf
 Schilli
 Sean
 Sjogren
-Skytta
+Skyttä
 Slaven
 Spiros
 Steinbrunner
@@ -112,6 +118,8 @@ davidrw
 denaxas
 dot
 dsteinbrunner
+felix
+gilmagno
 gisle
 github
 gpeters
@@ -119,6 +127,7 @@ hfroehlich
 iank
 jefflee
 john9art
+jraspass
 ka
 lib
 lw

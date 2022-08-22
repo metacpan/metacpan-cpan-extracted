@@ -43,6 +43,25 @@ sub does {
   return $self->DOES(@args);
 }
 
+sub EXPORT {
+  my ($self, $into) = @_;
+
+  return [];
+}
+
+sub IMPORT {
+  my ($self, $into) = @_;
+
+  no strict 'refs';
+  no warnings 'redefine';
+
+  for my $name (@{$self->EXPORT($into)}) {
+    *{"${into}::${name}"} = \&{"@{[$self->NAME]}::${name}"};
+  }
+
+  return $self;
+}
+
 sub meta {
   my ($self) = @_;
 

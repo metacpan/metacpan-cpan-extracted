@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI 0.057001;
+package Term::CLI 0.058002;
 
 use 5.014;
 use warnings;
@@ -321,7 +321,7 @@ Term::CLI - CLI interpreter based on Term::ReadLine
 
 =head1 VERSION
 
-version 0.057001
+version 0.058002
 
 =head1 SYNOPSIS
 

@@ -150,7 +150,7 @@ my $guess_cfg = {
     'default' =>   'ncurses'
   },
   'next'      => [ ''                       , '-lcurses -ltermcap'        ],
-  'openbsd'   => [ ''                       , '-lcurses -ltermcap'        ],  
+  'openbsd'   => [ ''                       , '-lcurses -ltermcap'        ],
   'os2'       => {
     'bsd'     => [ ''                       , '-lcurses -ltermcap'        ],
     'ncurses' => [ ''                       , '-lncurses'                 ],
@@ -356,7 +356,7 @@ sub defaultLibTypeForOs($) {
 
     if (ref $guess eq 'HASH') {
         # For this platform, we have a choice of Curses library.
-        
+
         $libType = $guess->{'default'};
     }
     return $libType;
@@ -413,8 +413,8 @@ sub makeConfigH($) {
             print STDERR <<"EOW";
 
 I'm sorry, but I couldn't find a hints file that was configured for
-your OS (named $candidate).  You will need to create and configure a 
-"c-config.h" file for yourself.  Please see the "INSTALL" directions 
+your OS (named $candidate).  You will need to create and configure a
+"c-config.h" file for yourself.  Please see the "INSTALL" directions
 for pointers on how to do this.
 EOW
             exit 1;
@@ -574,7 +574,7 @@ if ($forms and $form_inc !~ m{-I} and -f('/usr/include/form.h')) {
 
 my $clean = 'CursesDef.h c-config.h cdemo testsym testint testtyp *.i *.s';
 my $realc = $gen
-    ? 'list.syms Curses.pm ' . 
+    ? 'list.syms Curses.pm ' .
       'CursesFun.c CursesVar.c CursesCon.c CursesTyp.h CursesBoot.c'
     : "";
 
@@ -601,13 +601,19 @@ sub MY::postamble {
     my $echo = $OSNAME eq 'VMS' ? 'write sys$output' : 'echo';
     my $objext = $OSNAME eq 'MSWin32' ? 'obj' : 'o';
     my $mf   = <<EOM;
+
 CursesDef.h: c-config.h Makefile.PL list.syms
-	\$(PERL) test.syms $args{COMPONENTS}
+	CC='\$(CC)' \\
+	INC='\$(INC)' \\
+	CCFLAGS='\$(CCFLAGS)' \\
+	LDLOADLIBS='\$(LDLOADLIBS)' \\
+	LDDLFLAGS='\$(LDDLFLAGS)' \\
+	\$(PERL) test.syms \$(TEST_SYMS_OPTS) $args{COMPONENTS}
 
 c-config.h:
 	@ $echo "You need to make a c-config.h.  See the INSTALL document.";
 	@ exit 1
-cdemo: cdemo.$objext c-config.h
+cdemo: cdemo.c c-config.h
 EOM
 
     if ($OSNAME eq 'VMS') {

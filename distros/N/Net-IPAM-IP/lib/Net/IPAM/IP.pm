@@ -1,6 +1,6 @@
 package Net::IPAM::IP;
 
-our $VERSION = '3.10';
+our $VERSION = '4.01';
 
 use 5.10.0;
 use strict;
@@ -13,6 +13,8 @@ use Net::IPAM::Util ();
 
 use Exporter 'import';
 our @EXPORT_OK = qw(sort_ip);
+
+use constant Is4in6_Prefix => "\x00" x 10 . "\xff\xff";
 
 =head1 NAME
 
@@ -59,10 +61,6 @@ Net::IPAM::IP - A library for reading, formatting, sorting and converting IP-add
 
 Parse the input string as IPv4/IPv6 address and returns the IP address object.
 
-IPv4-mapped-IPv6 addresses are normalized and sorted as IPv4 addresses.
-
-  ::ffff:1.2.3.4    => 1.2.3.4
-
 Returns undef on illegal input.
 
 =cut
@@ -83,18 +81,8 @@ sub new {
 
   # IPv4-mapped-IPv6
   if ( index( $input, '.' ) >= 0 ) {
-    my $ip4m6 = $input;
-
-    # remove leading ::ffff: or return undef
-    return unless $ip4m6 =~ s/^::ffff://i;
-
-    my $n = Socket::inet_pton( Socket::AF_INET, $ip4m6 );
-    return unless defined $n;
-
-    $self->{version} = 4;
-    $self->{ip4in6}  = 1;
-    $self->{binary}  = 4 . $n;
-    return $self;
+    # allow only IPv4-mapped-IPv6 in mixed mode
+    return unless $input =~ m/^::ffff:/m;
   }
 
   # IPv6 address
@@ -131,15 +119,6 @@ sub new_from_bytes {
     return $self;
   }
   elsif ( length($n) == 16 ) {
-
-    # check for IPv4-mapped IPv6 address ::ffff:1.2.3.4
-    if ( index( $n, "\x00" x 10 . "\xff\xff" ) == 0 ) {
-      $self->{version} = 4;
-      $self->{ip4in6}  = 1;
-      $self->{binary}  = 4 . substr( $n, 12 );
-      return $self;
-    }
-
     $self->{version} = 6;
     $self->{binary}  = 6 . $n;
     return $self;
@@ -239,8 +218,6 @@ Compare IP objects, returns -1, 0, +1
 
 Fast bytewise lexical comparison of the binary representation in network byte order.
 
-IPv4 addresses are B<always> treated as smaller than IPv6 addresses (::ffff:0.0.0.0 < ::)
-
 For even faster sorting import L</sort_ip>.
 
 =cut
@@ -303,6 +280,12 @@ sub to_string {
   # handle bug in Socket::inet_ntop for deprecated IPv4-compatible-IPv6 addresses
   # ::aaaa:bbbb are returned as ::hex(aa).hex(aa).hex(bb).hex(bb) = ::170.170.187.187
   # e.g: ::cafe:affe => ::202.254.175.254
+
+  # handle IPv4MappedIPv6 address special
+  if ( substr( $n, 0, 12 ) eq Is4in6_Prefix ) {
+    # concat ::ffff:1.2.3.4
+    return $_[0]->{as_string} = '::ffff:' . Socket::inet_ntop( Socket::AF_INET, substr( $n, -4 ) );
+  }
 
   my $str = Socket::inet_ntop( Socket::AF_INET6, $n );
 
@@ -485,6 +468,21 @@ sub bytes {
   substr( $_[0]->{binary}, 1 );
 }
 
+=head2 is4in6
+
+  $ip = Net::IPAM::IP->new('::ffff:1.2.3.4')
+  if ( $ip->is4in6 ) {
+     ...
+  }
+
+Returns true if the IP address is a IPv4-mapped IPv6 address.
+
+=cut
+
+sub is4in6 {
+  return substr( $_[0]->{binary}, 1, 12 ) eq Is4in6_Prefix;
+}
+
 =head1 FUNCTIONS
 
 =head2 sort_ip
@@ -596,7 +594,7 @@ L<Net::IPAM::Tree>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2020-2021 by Karl Gaissmaier.
+This software is copyright (c) 2020-2022 by Karl Gaissmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

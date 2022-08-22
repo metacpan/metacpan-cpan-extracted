@@ -1189,7 +1189,7 @@ prima_xft_fonts( PFont array, const char *facename, const char * encoding, int *
 					if ( hash_fetch( names, f-> name, strlen( f-> name))) continue;
 					hash_store( names, f-> name, strlen( f-> name), ( void*)1);
 				}
-				strncpy( f-> encoding, encoding, 255);
+				strlcpy( f-> encoding, encoding, 255);
 				f++;
 			}
 		} else if ( facename) {
@@ -1200,7 +1200,7 @@ prima_xft_fonts( PFont array, const char *facename, const char * encoding, int *
 				if ( !std_charsets[j]. enabled) continue;
 				if ( FcCharSetIntersectCount( c, std_charsets[j]. fcs) >= std_charsets[j]. glyphs - 1) {
 					*f = *tmpl;
-					strncpy( f-> encoding, std_charsets[j]. name, 255);
+					strlcpy( f-> encoding, std_charsets[j]. name, 255);
 					f++;
 				}
 			}
@@ -1385,7 +1385,7 @@ get_box( Handle self, Point * ovx, int advance )
 	pt[3].x = pt[2]. x = advance + ovx->y;
 	pt[0].x = pt[1]. x = - ovx->x;
 
-	if ( !XX-> flags. paint_base_line) {
+	if ( !XX-> flags. base_line) {
 		int i;
 		for ( i = 0; i < 4; i++) pt[i]. y += XX-> font-> font. descent;
 	}
@@ -1436,8 +1436,8 @@ create_no_aa_font( XftFont * font)
 
 #define SORT(a,b)       { int swp; if ((a) > (b)) { swp=(a); (a)=(b); (b)=swp; }}
 #define REVERT(a)       (XX-> size. y - (a) - 1)
-#define SHIFT(a,b)      { (a) += XX-> gtransform. x + XX-> btransform. x; \
-									(b) += XX-> gtransform. y + XX-> btransform. y; }
+#define SHIFT(a,b)      { (a) += XX-> transform. x + XX-> btransform. x; \
+			(b) += XX-> transform. y + XX-> btransform. y; }
 #define RANGE(a)        { if ((a) < -16383) (a) = -16383; else if ((a) > 16383) a = 16383; }
 #define RANGE2(a,b)     RANGE(a) RANGE(b)
 #define RANGE4(a,b,c,d) RANGE(a) RANGE(b) RANGE(c) RANGE(d)
@@ -1665,7 +1665,7 @@ setup_alpha(PDrawableSysData selfxx, XftColor * xftcolor, XftFont ** font)
 {
 	if ( XX-> flags. layered || !XX->type.bitmap) {
 		if ( selfxx->flags.antialias ) {
-			float div = 65535.0 / (float)(xftcolor->color.alpha = (selfxx->paint_alpha << 8));
+			float div = 65535.0 / (float)(xftcolor->color.alpha = (selfxx->alpha << 8));
 			xftcolor->color.red   = (float) xftcolor->color.red   / div;
 			xftcolor->color.green = (float) xftcolor->color.green / div;
 			xftcolor->color.blue  = (float) xftcolor->color.blue  / div;
@@ -1708,7 +1708,7 @@ paint_text_background( Handle self, Point * p, int x, int y )
 	i = p[2].y; p[2].y = p[3].y; p[3].y = i;
 
 	apc_gp_fill_poly( self, 4, p);
-	apc_gp_set_rop( self, XX-> paint_rop);
+	apc_gp_set_rop( self, XX-> rop);
 	apc_gp_set_color( self, XX-> fore. color);
 	apc_gp_set_fill_pattern( self, fp);
 }
@@ -1880,7 +1880,7 @@ prima_xft_text_out( Handle self, const char * text, int x, int y, int len, int f
 	FcChar32 *ucs4;
 	XftColor xftcolor;
 	XftFont *font = XX-> font-> xft;
-	int rop = XX-> paint_rop;
+	int rop = XX-> rop;
 	Point baseline;
 
 	if ( len == 0) return true;
@@ -1889,7 +1889,7 @@ prima_xft_text_out( Handle self, const char * text, int x, int y, int len, int f
 	setup_alpha( XX, &xftcolor, &font );
 
 	/* paint background if opaque */
-	if ( XX-> flags. paint_opaque) {
+	if ( XX-> flags. opaque) {
 		Point * p = prima_xft_get_text_box( self, text, len, flags);
 		paint_text_background( self, p, x, y );
 		free( p);
@@ -1901,7 +1901,7 @@ prima_xft_text_out( Handle self, const char * text, int x, int y, int len, int f
 	baseline.x = - PDrawable(self)-> font. descent * XX-> xft_font_sin;
 	baseline.y = - PDrawable(self)-> font. descent * ( 1 - XX-> xft_font_cos )
 					+ XX-> font-> font. descent;
-	if ( !XX-> flags. paint_base_line) {
+	if ( !XX-> flags. base_line) {
 		x += baseline.x;
 		y += baseline.y;
 	}
@@ -1950,7 +1950,7 @@ prima_xft_glyphs_out( Handle self, PGlyphsOutRec t, int x, int y)
 	DEFXX;
 	XftColor xftcolor;
 	XftFont *font = XX-> font-> xft;
-	int rop = XX-> paint_rop;
+	int rop = XX-> rop;
 	Point baseline;
 		
 	t-> flags |= toAddOverhangs; /* for overstriking etc */
@@ -1961,7 +1961,7 @@ prima_xft_glyphs_out( Handle self, PGlyphsOutRec t, int x, int y)
 	setup_alpha( XX, &xftcolor, &font );
 
 	/* paint background if opaque */
-	if ( XX-> flags. paint_opaque) {
+	if ( XX-> flags. opaque) {
 		Point * p = prima_xft_get_glyphs_box( self, t);
 		paint_text_background( self, p, x, y );
 		free( p);
@@ -1973,7 +1973,7 @@ prima_xft_glyphs_out( Handle self, PGlyphsOutRec t, int x, int y)
 	baseline.x = - PDrawable(self)-> font. descent * XX-> xft_font_sin;
 	baseline.y = - PDrawable(self)-> font. descent * ( 1 - XX-> xft_font_cos )
 					+ XX-> font-> font. descent;
-	if ( !XX-> flags. paint_base_line) {
+	if ( !XX-> flags. base_line) {
 		x += baseline.x;
 		y += baseline.y;
 	}
@@ -2410,7 +2410,7 @@ prima_xft_mapper_query_ranges(PFont font, int * count, unsigned int * flags)
 	char name[256];
 	XftFont * xft = NULL;
 	unsigned long * ranges;
-	strncpy(name, font->name, 256);
+	strlcpy(name, font->name, 256);
 	prima_xft_font_pick( NULL_HANDLE, font, font, NULL, &xft);
 	*flags = 0 | MAPPER_FLAGS_SYNTHETIC_PITCH;
 	if ( !xft || strcmp( font->name, name ) != 0 ) {
@@ -2605,7 +2605,7 @@ prima_xft_init_font_substitution(void)
 			if (( f = prima_font_mapper_save_font(guts.default_font.name, 0)) != NULL ) {
 				f->is_utf8 = guts.default_font.is_utf8;
 				f->undef.name = 0;
-				strncpy(f->family, guts.default_font.family,256);
+				strlcpy(f->family, guts.default_font.family,256);
 				f->undef.vector = 0;
 				f->vector = guts.default_font.vector;
 				f->undef.pitch = 0;

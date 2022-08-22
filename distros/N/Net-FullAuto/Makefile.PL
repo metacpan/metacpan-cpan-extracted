@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000629';
+our $VERSION='1.0000630';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -1191,7 +1191,7 @@ END
       my $yins=`yum list installed`;
       unless (-1<index $yins,'figlet') {
          fa_system("sudo wget http://dl.fedoraproject.org/pub/epel/7/x86_64/".
-                   "Packages/e/epel-release-7-11.noarch.rpm");
+                   "Packages/e/epel-release-7-14.noarch.rpm");
          fa_system("sudo rpm -Uvh epel-release*rpm");
          fa_system("sudo yum -y install 'figlet'");
          unless (-e '/usr/local/bin/figlet') {

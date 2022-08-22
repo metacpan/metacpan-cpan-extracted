@@ -124,6 +124,22 @@ sub region
 	return $self->SUPER::region(@_);
 }
 
+sub graphic_context_push
+{
+	my $self = shift;
+	my $ok = $self->SUPER::graphic_context_push;
+	push @{ $self->{code} }, [ 'graphic_context_push' ] if $ok;
+	return $ok;
+}
+
+sub graphic_context_pop
+{
+	my $self = shift;
+	my $ok = $self->SUPER::graphic_context_pop;
+	push @{ $self->{code} }, [ 'graphic_context_pop' ] if $ok;
+	return $ok;
+}
+
 sub width  { $_[0]->{size}->[0] }
 sub height { $_[0]->{size}->[1] }
 
@@ -147,6 +163,8 @@ sub execute
 	my $actual_rgn = $rgn;
 	my @tx   = $canvas-> translate;
 	my @fpo  = $canvas-> fillPatternOffset;
+
+	return unless $self->graphic_context_push;
 	$canvas->translate($x + $tx[0], $y + $tx[1]);
 
 	for my $cmd ( @{ $self->{code} } ) {
@@ -180,14 +198,7 @@ sub execute
 		}
 	}
 
-	$canvas->$_($save{$_}) for @props;
-	$canvas->fillPatternOffset(@fpo);
-	$canvas->translate(@tx);
-	if ( $rgn ) {
-		$canvas->region($rgn);
-	} else {
-		$canvas->clipRect(@clip);
-	}
+	$self->graphic_context_pop;
 }
 
 1;

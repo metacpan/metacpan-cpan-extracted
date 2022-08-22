@@ -1,6 +1,6 @@
 package HTTP::Any;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 1;
 
@@ -37,6 +37,8 @@ HTTP::Any - a common interface for HTTP clients (LWP, AnyEvent::HTTP, Curl)
 =head1 MOTIVATION
 
 LWP, AnyEvent::HTTP, Curl - each of them has its advantages, disadvantages and peculiarities. The HTTP::Any modules were created during the process of investigation of the strong and weak sides of those above-mentioned HTTP clients. They allow quick switching between them to use the best one for each definite case.
+
+If you only need  Net::Curl then see it L<HTTP::Curl>
 
 =head1 DESCRIPTION
 
@@ -80,7 +82,7 @@ Why would not make a simple one-line connection? Because of better flexibility a
 
  or
 
- my ($is_success, $body, $headers, $redirects) = HTTP::Any::LWP::do_http($easy, $url, $opt);
+ my ($is_success, $body, $headers, $redirects) = HTTP::Any::Curl::do_http($easy, $url, $opt);
 
 =head3 Curl with Multi
 
@@ -196,6 +198,8 @@ However, this state can be changed in future.
 
 When max_size options will be triggered, 'client-aborted' header will added with 'max_size' value.
 
+Atention, when max_size is used with compressed, then the size is calculated differently: Curl - uncompressed, AnyEvent and LWP compressed.
+
 =item max_redirect
 
 The limit of how many times it will obey redirection responses in a given request cycle.
@@ -289,5 +293,7 @@ L<AnyEvent::HTTP>
 L<LWP>
 
 L<Net::Curl::Multi::EV>
+
+L<HTTP::Curl>
 
 =cut

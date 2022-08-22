@@ -25,6 +25,8 @@
 #  define XS_INTERNAL(name)  static XS(name)
 #endif
 
+static bool capture_times;
+
 /* There's no reason these have to match those in Future.pm but for now we
  * might as well just copy the same values
  */
@@ -86,6 +88,10 @@ struct FutureXS
   AV *on_cancel;  // values are CVs directly
   AV *revoke_when_ready; // values are struct FutureXSRevocation ptrs directly.
 
+  HV *udata;
+
+  struct timeval btime, rtime;
+
   /* For convergents
    * TODO: consider making this an optional extra part of the body, only
    * allocated when required
@@ -115,8 +121,11 @@ static struct FutureXS *S_get_future(pTHX_ SV *sv)
   return INT2PTR(struct FutureXS *, SvIV(SvRV(sv)));
 }
 
-SV *Future_new(pTHX)
+SV *Future_new(pTHX_ const char *cls)
 {
+  if(!cls)
+    cls = "Future::XS";
+
   struct FutureXS *self;
   Newx(self, 1, struct FutureXS);
 
@@ -126,6 +135,13 @@ SV *Future_new(pTHX)
 
   self->label = NULL;
 
+  if(capture_times)
+    gettimeofday(&self->btime, NULL);
+  else
+    self->btime = (struct timeval){ 0 };
+
+  self->rtime = (struct timeval){ 0 };
+
   self->result  = NULL;
   self->failure = NULL;
 
@@ -133,14 +149,23 @@ SV *Future_new(pTHX)
   self->on_cancel = NULL;
   self->revoke_when_ready = NULL;
 
+  self->udata = NULL;
+
   self->subs = NULL;
 
   self->precedent_f = NULL;
 
   SV *ret = newSV(0);
-  sv_setref_pv(ret, "Future::XS", self);
+  sv_setref_pv(ret, cls, self);
 
   return ret;
+}
+
+#define future_new_proto(f1)  Future_new_proto(aTHX_ f1)
+SV *Future_new_proto(pTHX_ SV *f1)
+{
+  assert(f1 && SvROK(f1) && SvRV(f1));
+  return future_new(HvNAME(SvSTASH(SvRV(f1))));
 }
 
 #define destroy_callbacks(self)  S_destroy_callbacks(aTHX_ self)
@@ -188,6 +213,8 @@ void Future_destroy(pTHX_ SV *f)
     Safefree(rev);
   }
   SvREFCNT_dec(revocationsav);
+
+  SvREFCNT_dec((SV *)self->udata);
 
   if(self->subs) {
     SvREFCNT_dec((SV *)self->subs);
@@ -316,7 +343,7 @@ static SV *S_invoke_seq_callback(pTHX_ struct FutureXS *self, SV *selfsv, struct
     SV *fseq = cb->seq.f;
 
     if(!fseq)
-      fseq = future_new();
+      fseq = future_new_proto(selfsv);
 
     future_failv(fseq, &ERRSV, 1);
 
@@ -331,6 +358,15 @@ static SV *S_invoke_seq_callback(pTHX_ struct FutureXS *self, SV *selfsv, struct
 
   FREETMPS;
   LEAVE;
+
+  if(!sv_is_future(f2)) {
+    SV *result = f2;
+
+    // TODO: strictness check
+
+    f2 = future_new_proto(selfsv);
+    future_donev(f2, &result, 1);
+  }
 
   return f2;
 }
@@ -445,7 +481,8 @@ static void S_mark_ready(pTHX_ struct FutureXS *self, SV *selfsv, const char *st
 {
   self->ready = true;
   // TODO: self->ready_at
-  // TODO: self->rtime
+  if(capture_times)
+    gettimeofday(&self->rtime, NULL);
 
   if(self->precedent_f) {
     SvREFCNT_dec(self->precedent_f);
@@ -490,7 +527,7 @@ static SV *S_make_sequence(pTHX_ SV *f1, struct FutureXSCallback *cb)
     return f2;
   }
 
-  SV *fseq = future_new();
+  SV *fseq = future_new_proto(f1);
   if(cb->flags & CB_SEQ_CANCEL)
     future_on_cancel(fseq, f1);
 
@@ -667,9 +704,30 @@ void Future_on_fail(pTHX_ SV *f, SV *code)
     push_callback(self, wrap_cb(self, &cb));
 }
 
-AV *Future_get_result_av(pTHX_ SV *f)
+#define future_await(f)  Future_await(aTHX_ f)
+static void Future_await(pTHX_ SV *f)
+{
+  dSP;
+
+  ENTER;
+  SAVETMPS;
+
+  PUSHMARK(SP);
+  mXPUSHs(newSVsv(f));
+  PUTBACK;
+
+  call_method("await", G_VOID);
+
+  FREETMPS;
+  LEAVE;
+}
+
+AV *Future_get_result_av(pTHX_ SV *f, bool await)
 {
   struct FutureXS *self = get_future(f);
+
+  if(await && !self->ready)
+    future_await(f);
 
   if(!self->ready)
     croak("%" SVf " is not yet ready", SVfARG(f));
@@ -699,7 +757,8 @@ AV *Future_get_failure_av(pTHX_ SV *f)
 {
   struct FutureXS *self = get_future(f);
 
-  // TODO: await unless ready
+  if(!self->ready)
+    future_await(f);
 
   if(!self->failure)
     return NULL;
@@ -781,13 +840,15 @@ SV *Future_without_cancel(pTHX_ SV *f)
   return ret;
 }
 
-SV *Future_then(pTHX_ SV *f, SV *thencode, SV *elsecode)
+SV *Future_then(pTHX_ SV *f, U32 flags, SV *thencode, SV *elsecode)
 {
   struct FutureXSCallback cb = {
     .flags        = CB_SEQ_ANY|CB_RESULT,
     .seq.thencode = thencode,
     .seq.elsecode = elsecode,
   };
+  if(flags & FUTURE_THEN_WITH_F)
+    cb.flags |= CB_SELF;
 
   return make_sequence(f, &cb);
 }
@@ -803,7 +864,7 @@ SV *Future_followed_by(pTHX_ SV *f, SV *code)
   return make_sequence(f, &cb);
 }
 
-SV *Future_thencatch(pTHX_ SV *f, SV *thencode, HV *catches, SV *elsecode)
+SV *Future_thencatch(pTHX_ SV *f, U32 flags, SV *thencode, HV *catches, SV *elsecode)
 {
   struct FutureXSCallback cb = {
     .flags        = CB_SEQ_ANY|CB_RESULT,
@@ -811,14 +872,32 @@ SV *Future_thencatch(pTHX_ SV *f, SV *thencode, HV *catches, SV *elsecode)
     .seq.elsecode = elsecode,
     .seq.catches  = catches,
   };
+  if(flags & FUTURE_THEN_WITH_F)
+    cb.flags |= CB_SELF;
 
   return make_sequence(f, &cb);
 }
 
-#define future_new_subsv(subs, n)  S_future_new_subsv(aTHX_ subs, n)
-static SV *S_future_new_subsv(pTHX_ SV **subs, size_t n)
+#define future_new_subsv(cls, subs, n)  S_future_new_subsv(aTHX_ cls, subs, n)
+static SV *S_future_new_subsv(pTHX_ const char *cls, SV **subs, size_t n)
 {
-  SV *f = future_new();
+  HV *future_xs_stash = get_hv("Future::XS::", 0);
+  assert(future_xs_stash);
+
+  /* Find the best prototype; pick the first derived instance if there is
+   * one */
+  SV *proto = NULL;
+  for(Size_t i = 0; i < n; i++) {
+    if(!SvROK(subs[i]) || !SvOBJECT(SvRV(subs[i])))
+      croak("Expected a Future, got %" SVf, SVfARG(subs[i]));
+
+    if(SvSTASH(SvRV(subs[i])) != future_xs_stash) {
+      proto = subs[i];
+      break;
+    }
+  }
+
+  SV *f = proto ? future_new_proto(proto) : future_new(cls);
   struct FutureXS *self = get_future(f);
 
   if(!self->subs)
@@ -869,9 +948,9 @@ XS_INTERNAL(sub_on_ready_waitall)
   mark_ready(self, f, "wait_all");
 }
 
-SV *Future_new_waitallv(pTHX_ SV **subs, size_t n)
+SV *Future_new_waitallv(pTHX_ const char *cls, SV **subs, size_t n)
 {
-  SV *f = future_new_subsv(subs, n);
+  SV *f = future_new_subsv(cls, subs, n);
   struct FutureXS *self = get_future(f);
 
   self->pending_subs = 0;
@@ -936,9 +1015,9 @@ XS_INTERNAL(sub_on_ready_waitany)
   mark_ready(self, f, "wait_any");
 }
 
-SV *Future_new_waitanyv(pTHX_ SV **subs, size_t n)
+SV *Future_new_waitanyv(pTHX_ const char *cls, SV **subs, size_t n)
 {
-  SV *f = future_new_subsv(subs, n);
+  SV *f = future_new_subsv(cls, subs, n);
   struct FutureXS *self = get_future(f);
 
   if(!n) {
@@ -1027,9 +1106,9 @@ XS_INTERNAL(sub_on_ready_needsall)
   }
 }
 
-SV *Future_new_needsallv(pTHX_ SV **subs, size_t n)
+SV *Future_new_needsallv(pTHX_ const char *cls, SV **subs, size_t n)
 {
-  SV *f = future_new_subsv(subs, n);
+  SV *f = future_new_subsv(cls, subs, n);
   struct FutureXS *self = get_future(f);
 
   if(!n) {
@@ -1115,9 +1194,9 @@ XS_INTERNAL(sub_on_ready_needsany)
   }
 }
 
-SV *Future_new_needsanyv(pTHX_ SV **subs, size_t n)
+SV *Future_new_needsanyv(pTHX_ const char *cls, SV **subs, size_t n)
 {
-  SV *f = future_new_subsv(subs, n);
+  SV *f = future_new_subsv(cls, subs, n);
   struct FutureXS *self = get_future(f);
 
   if(!n) {
@@ -1211,6 +1290,18 @@ Size_t Future_mPUSH_subs(pTHX_ SV *f, enum FutureSubFilter filter)
   return ret;
 }
 
+struct timeval Future_get_btime(pTHX_ SV *f)
+{
+  struct FutureXS *self = get_future(f);
+  return self->btime;
+}
+
+struct timeval Future_get_rtime(pTHX_ SV *f)
+{
+  struct FutureXS *self = get_future(f);
+  return self->rtime;
+}
+
 void Future_set_label(pTHX_ SV *f, SV *label)
 {
   struct FutureXS *self = get_future(f);
@@ -1226,6 +1317,27 @@ SV *Future_get_label(pTHX_ SV *f)
   struct FutureXS *self = get_future(f);
 
   return self->label;
+}
+
+void Future_set_udata(pTHX_ SV *f, SV *key, SV *value)
+{
+  struct FutureXS *self = get_future(f);
+
+  if(!self->udata)
+    self->udata = newHV();
+
+  hv_store_ent(self->udata, key, newSVsv(value), 0);
+}
+
+SV *Future_get_udata(pTHX_ SV *f, SV *key)
+{
+  struct FutureXS *self = get_future(f);
+
+  if(!self->udata)
+    return &PL_sv_undef;
+
+  HE *he = hv_fetch_ent(self->udata, key, 0, 0);
+  return he ? HeVAL(he) : &PL_sv_undef;
 }
 
 /* DMD_HELPER assistants */
@@ -1276,14 +1388,16 @@ static int dumpstruct(pTHX_ DMDContext *ctx, const SV *sv)
   struct FutureXS *self = INT2PTR(struct FutureXS *, SvIV((SV *)sv));
 
   DMD_DUMP_STRUCT(ctx, "Future::XS/FutureXS", self, sizeof(struct FutureXS),
-    9, ((const DMDNamedField []){
+    11, ((const DMDNamedField []){
       {"ready",                    DMD_FIELD_BOOL, .b   = self->ready},
       {"cancelled",                DMD_FIELD_BOOL, .b   = self->cancelled},
+      {"the label SV",             DMD_FIELD_PTR,  .ptr = self->label},
       {"the result AV",            DMD_FIELD_PTR,  .ptr = self->result},
       {"the failure AV",           DMD_FIELD_PTR,  .ptr = self->failure},
       {"the callbacks AV",         DMD_FIELD_PTR,  .ptr = self->callbacks},
       {"the on_cancel AV",         DMD_FIELD_PTR,  .ptr = self->on_cancel},
       {"the revoke_when_ready AV", DMD_FIELD_PTR,  .ptr = self->revoke_when_ready},
+      {"the udata HV",             DMD_FIELD_PTR,  .ptr = self->udata},
       {"the subs AV",              DMD_FIELD_PTR,  .ptr = self->subs},
       {"the pending sub count",    DMD_FIELD_UINT, .n   = self->pending_subs},
     })
@@ -1305,9 +1419,28 @@ static int dumpstruct(pTHX_ DMDContext *ctx, const SV *sv)
 }
 #endif
 
+static bool getenv_bool(const char *key)
+{
+  const char *val = getenv(key);
+  if(!val || !val[0])
+    return false;
+  if(val[0] == '0' && strlen(val) == 1)
+    return false;
+  return true;
+}
+
 void Future_boot(pTHX)
 {
 #ifdef HAVE_DMD_HELPER
   DMD_SET_PACKAGE_HELPER("Future::XS", dumpstruct);
 #endif
+
+  bool debug = getenv_bool("PERL_FUTURE_DEBUG");
+  /* TODO: store and use debug for more things */
+
+  capture_times = debug || getenv_bool("PERL_FUTURE_TIMES");
+
+  if(capture_times) {
+    sv_setsv(get_sv("Future::TIMES", GV_ADDMULTI), &PL_sv_yes);
+  }
 }

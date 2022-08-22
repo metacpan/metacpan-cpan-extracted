@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace isosurface.
 
@@ -34,17 +34,17 @@ sub TO_JSON {
 }
 
 has maxpoints => (
-    is  => "rw",
-    isa => "Num",
+    is            => "rw",
+    isa           => "Num",
     documentation =>
       "Sets the maximum number of points to keep on the plots from an incoming stream. If `maxpoints` is set to *50*, only the newest 50 points will be displayed on the plot.",
 );
 
 has token => (
-    is  => "rw",
-    isa => "Str",
+    is            => "rw",
+    isa           => "Str",
     documentation =>
-      "The stream id number links a data trace on a plot with a stream. See https://plot.ly/settings for more details.",
+      "The stream id number links a data trace on a plot with a stream. See https://chart-studio.plotly.com/settings for more details.",
 );
 
 __PACKAGE__->meta->make_immutable();
@@ -62,7 +62,7 @@ Chart::Plotly::Trace::Isosurface::Stream - This attribute is one of the possible
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -918,7 +918,7 @@ Sets the maximum number of points to keep on the plots from an incoming stream. 
 
 =item * token
 
-The stream id number links a data trace on a plot with a stream. See https://plot.ly/settings for more details.
+The stream id number links a data trace on a plot with a stream. See https://chart-studio.plotly.com/settings for more details.
 
 =back
 
@@ -928,7 +928,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

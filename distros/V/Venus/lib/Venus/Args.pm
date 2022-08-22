@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Venus::Class;
+use Venus::Class 'attr', 'base', 'with';
 
 base 'Venus::Kind::Utility';
 

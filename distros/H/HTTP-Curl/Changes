@@ -1,4 +1,10 @@
-Revision history for Perl extension HTTP::Any.
+Revision history for Perl extension HTTP::Curl.
+
+1.04  2022-08-19
+	- do not parse responce headers two time when on_header used
+
+1.03  2022-08-08
+	- clone from HTTP::Any::Curl
 
 1.02  2022-04-20
 	- fixed URL for HTTP::Any::Curl when redirect via proxy

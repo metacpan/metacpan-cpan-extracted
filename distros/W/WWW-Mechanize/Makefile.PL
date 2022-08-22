@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Getopt::Long" => 0,
-    "HTML::Form" => "1.00",
+    "HTML::Form" => "6.08",
     "HTML::HeadParser" => 0,
     "HTML::TokeParser" => 0,
     "HTML::TreeBuilder" => 5,
@@ -64,7 +64,7 @@ my %WriteMakefileArgs = (
     "bytes" => 0,
     "lib" => 0
   },
-  "VERSION" => "2.13",
+  "VERSION" => "2.15",
   "test" => {
     "TESTS" => "t/*.t t/local/*.t t/mech-dump/*.t"
   }
@@ -79,7 +79,7 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "FindBin" => 0,
   "Getopt::Long" => 0,
-  "HTML::Form" => "1.00",
+  "HTML::Form" => "6.08",
   "HTML::HeadParser" => 0,
   "HTML::TokeParser" => 0,
   "HTML::TreeBuilder" => 5,

@@ -2,7 +2,7 @@ package DBIx::Connector::Retry::MySQL;
 
 # ABSTRACT: MySQL-specific DBIx::Connector with retry support
 use version;
-our $VERSION = 'v1.0.0'; # VERSION
+our $VERSION = 'v1.0.1'; # VERSION
 
 use strict;
 use warnings;
@@ -14,7 +14,7 @@ extends 'DBIx::Connector::Retry';
 use Scalar::Util           qw( weaken );
 use Storable               qw( dclone );
 use Types::Standard        qw( Bool HashRef InstanceOf ClassName );
-use Types::Common::Numeric qw( PositiveOrZeroNum );
+use Types::Common::Numeric qw( PositiveOrZeroNum PositiveOrZeroInt );
 use Time::HiRes            qw( sleep );
 
 use Algorithm::Backoff::RetryTimeouts;
@@ -234,7 +234,26 @@ has aggressive_timeouts => (
     isa      => Bool,
     required => 0,
     default  => 0,
-    lazy     => 1,
+);
+
+#pod =head2 retries_before_error_prefix
+#pod
+#pod Controls the number of retries (not tries) needed before the exception message starts
+#pod using the statistics prefix, which looks something like this:
+#pod
+#pod     Failed run coderef: Out of retries, attempts: 5 / 4, timer: 34.5 / 50.0 sec
+#pod
+#pod The default is 1, which means a failed first attempt (like a non-transient failure) will
+#pod show a normal exception, and the second attempt will use the prefix.  You can set this to
+#pod 0 to always show the prefix, or a large number like 99 to keep the exception clean.
+#pod
+#pod =cut
+
+has retries_before_error_prefix => (
+    is       => 'rw',
+    isa      => PositiveOrZeroInt,
+    required => 0,
+    default  => 1,
 );
 
 #pod =head2 parse_error_class
@@ -263,7 +282,6 @@ has enable_retry_handler => (
     isa      => Bool,
     required => 0,
     default  => 1,
-    lazy     => 1,
 );
 
 # Alias for backwards-compatibility
@@ -344,6 +362,10 @@ sub _set_retry_session_timeouts {
 
     local $@;
     eval {
+        # Don't let outside handlers ruin our error checking.  This expires before our
+        # 'die' statement below.
+        local $SIG{__DIE__};
+
         my $dbh = $self->{_dbh};
         if ($dbh) {
             $dbh->do("SET SESSION $_=$timeout") for $self->_timeout_set_list('session');
@@ -445,8 +467,8 @@ sub _reset_timers_and_timeouts {
 sub _reset_and_die {
     my ($self, $fail_reason) = @_;
 
-    # First error: just pass it unaltered
-    die $self->last_exception if $self->failed_attempt_count <= 1;
+    # First error (by default): just pass it unaltered
+    die $self->last_exception if $self->failed_attempt_count <= $self->retries_before_error_prefix;
 
     my $timer = $self->_timer;
     my $error = sprintf(
@@ -470,6 +492,10 @@ sub _reset_and_die {
 #pod =head2 Savepoints and nested transactions
 #pod
 #pod See L<DBIx::Connector::Retry/Savepoints and nested transactions>.
+#pod
+#pod =head2 (Ab)using $dbh directly
+#pod
+#pod See L<DBIx::Connector::Retry/(Ab)using $dbh directly>.
 #pod
 #pod =head2 Connection modes
 #pod
@@ -499,7 +525,7 @@ DBIx::Connector::Retry::MySQL - MySQL-specific DBIx::Connector with retry suppor
 
 =head1 VERSION
 
-version v1.0.0
+version v1.0.1
 
 =head1 SYNOPSIS
 
@@ -617,6 +643,17 @@ engine would set it to.
 Default is off.  Obviously, this setting makes no sense if C<max_actual_duration>
 within L</timeout_options> is disabled.
 
+=head2 retries_before_error_prefix
+
+Controls the number of retries (not tries) needed before the exception message starts
+using the statistics prefix, which looks something like this:
+
+    Failed run coderef: Out of retries, attempts: 5 / 4, timer: 34.5 / 50.0 sec
+
+The default is 1, which means a failed first attempt (like a non-transient failure) will
+show a normal exception, and the second attempt will use the prefix.  You can set this to
+0 to always show the prefix, or a large number like 99 to keep the exception clean.
+
 =head2 parse_error_class
 
 The class used for MySQL error parsing.  By default, it's L<DBIx::ParseError::MySQL>, but
@@ -638,6 +675,10 @@ See L<DBIx::Connector::Retry/$dbh settings>.
 
 See L<DBIx::Connector::Retry/Savepoints and nested transactions>.
 
+=head2 (Ab)using $dbh directly
+
+See L<DBIx::Connector::Retry/(Ab)using $dbh directly>.
+
 =head2 Connection modes
 
 Due to the caveats of L<DBIx::Connector::Retry/Fixup mode>, C<fixup> mode is changed to
@@ -656,7 +697,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 - 2021 by Grant Street Group.
+This software is Copyright (c) 2020 - 2022 by Grant Street Group.
 
 This is free software, licensed under:
 

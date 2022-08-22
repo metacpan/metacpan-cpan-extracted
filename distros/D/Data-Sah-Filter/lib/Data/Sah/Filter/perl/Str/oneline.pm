@@ -5,14 +5,19 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-04'; # DATE
+our $DATE = '2022-07-16'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 sub meta {
     +{
         v => 1,
         summary => 'Replace newlines with spaces',
+        examples => [
+            {value=>"a"},
+            {value=>"a\nb", filtered_value=>"a b"},
+            {value=>"a\n\n\nb\n", filtered_value=>"a   b "},
+        ],
     };
 }
 
@@ -44,13 +49,34 @@ Data::Sah::Filter::perl::Str::oneline - Replace newlines with spaces
 
 =head1 VERSION
 
-This document describes version 0.010 of Data::Sah::Filter::perl::Str::oneline (from Perl distribution Data-Sah-Filter), released on 2022-07-04.
+This document describes version 0.011 of Data::Sah::Filter::perl::Str::oneline (from Perl distribution Data-Sah-Filter), released on 2022-07-16.
 
 =head1 SYNOPSIS
 
-Use in Sah schema's C<prefilters> (or C<postfilters>) clause:
+=head2 Using in Sah schema's C<prefilters> (or C<postfilters>) clause
 
- ["str","prefilters",["Str::oneline"]]
+ ["str","prefilters",[["Str::oneline"]]]
+
+=head2 Using with L<Data::Sah>:
+
+ use Data::Sah qw(gen_validator);
+ 
+ my $schema = ["str","prefilters",[["Str::oneline"]]];
+ my $validator = gen_validator($schema);
+ if ($validator->($some_data)) { print 'Valid!' }
+
+=head2 Using with L<Data::Sah:Filter> directly:
+
+ use Data::Sah::Filter qw(gen_filter);
+
+ my $filter = gen_filter([["Str::oneline"]]);
+ my $filtered_value = $filter->($some_data);
+
+=head2 Sample data and filtering results
+
+ "a" # valid, unchanged
+ "a\nb" # valid, becomes "a b"
+ "a\n\n\nb\n" # valid, becomes "a   b "
 
 =head1 DESCRIPTION
 

@@ -39,6 +39,10 @@ t/plugin-spec-renderer-options.t
 t/plugin-spec-renderer-standalone.t
 t/plugin-spec-renderer-v3.t
 t/spec/bundlecheck.json
+t/spec/swagger/parameters/body.yaml
+t/spec/swagger/paths/ref.yaml
+t/spec/swagger/responses/ok.yaml
+t/spec/swagger/swagger.yaml
 t/spec/v2-petstore.json
 t/spec/v3-invalid_file_refs.yaml
 t/spec/v3-invalid_file_refs_no_path.yaml
@@ -56,6 +60,7 @@ t/v2-formats.t
 t/v2-headers.t
 t/v2-id-prop.t
 t/v2-readonly.t
+t/v2-swagger.t
 t/v2-tutorial.t
 t/v2-validate-schema.t
 t/v3-basic.t

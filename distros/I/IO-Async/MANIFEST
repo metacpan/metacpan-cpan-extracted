@@ -46,11 +46,7 @@ lib/IO/Async/Timer.pm
 lib/IO/Async/Timer/Absolute.pm
 lib/IO/Async/Timer/Countdown.pm
 lib/IO/Async/Timer/Periodic.pm
-LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01timequeue.t
 t/02os.t
@@ -118,3 +114,7 @@ t/99pod.t
 t/RoutineTester.pm
 t/StupidLoop.pm
 t/TimeAbout.pm
+README
+LICENSE
+META.yml
+META.json

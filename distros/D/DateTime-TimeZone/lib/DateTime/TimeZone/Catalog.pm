@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.52';
+our $VERSION = '2.53';
 
 our @ALL =
 qw(
@@ -165,7 +165,6 @@ qw(
   Antarctica/Palmer
   Antarctica/Rothera
   Antarctica/Troll
-  Antarctica/Vostok
   Asia/Almaty
   Asia/Amman
   Asia/Anadyr
@@ -179,7 +178,6 @@ qw(
   Asia/Barnaul
   Asia/Beirut
   Asia/Bishkek
-  Asia/Brunei
   Asia/Chita
   Asia/Choibalsan
   Asia/Colombo
@@ -205,7 +203,6 @@ qw(
   Asia/Khandyga
   Asia/Kolkata
   Asia/Krasnoyarsk
-  Asia/Kuala_Lumpur
   Asia/Kuching
   Asia/Macau
   Asia/Magadan
@@ -249,7 +246,6 @@ qw(
   Atlantic/Cape_Verde
   Atlantic/Faroe
   Atlantic/Madeira
-  Atlantic/Reykjavik
   Atlantic/South_Georgia
   Atlantic/Stanley
   Australia/Adelaide
@@ -268,7 +264,6 @@ qw(
   EET
   EST
   EST5EDT
-  Europe/Amsterdam
   Europe/Andorra
   Europe/Astrakhan
   Europe/Athens
@@ -278,23 +273,19 @@ qw(
   Europe/Bucharest
   Europe/Budapest
   Europe/Chisinau
-  Europe/Copenhagen
   Europe/Dublin
   Europe/Gibraltar
   Europe/Helsinki
   Europe/Istanbul
   Europe/Kaliningrad
-  Europe/Kiev
   Europe/Kirov
+  Europe/Kyiv
   Europe/Lisbon
   Europe/London
-  Europe/Luxembourg
   Europe/Madrid
   Europe/Malta
   Europe/Minsk
-  Europe/Monaco
   Europe/Moscow
-  Europe/Oslo
   Europe/Paris
   Europe/Prague
   Europe/Riga
@@ -303,7 +294,6 @@ qw(
   Europe/Saratov
   Europe/Simferopol
   Europe/Sofia
-  Europe/Stockholm
   Europe/Tallinn
   Europe/Tirane
   Europe/Ulyanovsk
@@ -316,13 +306,8 @@ qw(
   Europe/Zurich
   HST
   Indian/Chagos
-  Indian/Christmas
-  Indian/Cocos
-  Indian/Kerguelen
-  Indian/Mahe
   Indian/Maldives
   Indian/Mauritius
-  Indian/Reunion
   MET
   MST
   MST7MDT
@@ -331,12 +316,10 @@ qw(
   Pacific/Auckland
   Pacific/Bougainville
   Pacific/Chatham
-  Pacific/Chuuk
   Pacific/Easter
   Pacific/Efate
   Pacific/Fakaofo
   Pacific/Fiji
-  Pacific/Funafuti
   Pacific/Galapagos
   Pacific/Gambier
   Pacific/Guadalcanal
@@ -346,7 +329,6 @@ qw(
   Pacific/Kiritimati
   Pacific/Kosrae
   Pacific/Kwajalein
-  Pacific/Majuro
   Pacific/Marquesas
   Pacific/Nauru
   Pacific/Niue
@@ -355,14 +337,11 @@ qw(
   Pacific/Pago_Pago
   Pacific/Palau
   Pacific/Pitcairn
-  Pacific/Pohnpei
   Pacific/Port_Moresby
   Pacific/Rarotonga
   Pacific/Tahiti
   Pacific/Tarawa
   Pacific/Tongatapu
-  Pacific/Wake
-  Pacific/Wallis
   UTC
   WET
 );
@@ -537,7 +516,6 @@ Mawson
 Palmer
 Rothera
 Troll
-Vostok
 ) ],
   'Asia' => [ qw(
 Almaty
@@ -553,7 +531,6 @@ Bangkok
 Barnaul
 Beirut
 Bishkek
-Brunei
 Chita
 Choibalsan
 Colombo
@@ -579,7 +556,6 @@ Kathmandu
 Khandyga
 Kolkata
 Krasnoyarsk
-Kuala_Lumpur
 Kuching
 Macau
 Magadan
@@ -625,7 +601,6 @@ Canary
 Cape_Verde
 Faroe
 Madeira
-Reykjavik
 South_Georgia
 Stanley
 ) ],
@@ -643,7 +618,6 @@ Perth
 Sydney
 ) ],
   'Europe' => [ qw(
-Amsterdam
 Andorra
 Astrakhan
 Athens
@@ -653,23 +627,19 @@ Brussels
 Bucharest
 Budapest
 Chisinau
-Copenhagen
 Dublin
 Gibraltar
 Helsinki
 Istanbul
 Kaliningrad
-Kiev
 Kirov
+Kyiv
 Lisbon
 London
-Luxembourg
 Madrid
 Malta
 Minsk
-Monaco
 Moscow
-Oslo
 Paris
 Prague
 Riga
@@ -678,7 +648,6 @@ Samara
 Saratov
 Simferopol
 Sofia
-Stockholm
 Tallinn
 Tirane
 Ulyanovsk
@@ -692,25 +661,18 @@ Zurich
 ) ],
   'Indian' => [ qw(
 Chagos
-Christmas
-Cocos
-Kerguelen
-Mahe
 Maldives
 Mauritius
-Reunion
 ) ],
   'Pacific' => [ qw(
 Apia
 Auckland
 Bougainville
 Chatham
-Chuuk
 Easter
 Efate
 Fakaofo
 Fiji
-Funafuti
 Galapagos
 Gambier
 Guadalcanal
@@ -720,7 +682,6 @@ Kanton
 Kiritimati
 Kosrae
 Kwajalein
-Majuro
 Marquesas
 Nauru
 Niue
@@ -729,14 +690,11 @@ Noumea
 Pago_Pago
 Palau
 Pitcairn
-Pohnpei
 Port_Moresby
 Rarotonga
 Tahiti
 Tarawa
 Tongatapu
-Wake
-Wallis
 ) ],
 
 );
@@ -1570,7 +1528,7 @@ Africa/Dar_es_Salaam
 ) ],
   'ua' => [ qw(
 Europe/Simferopol
-Europe/Kiev
+Europe/Kyiv
 Europe/Uzhgorod
 Europe/Zaporozhye
 ) ],
@@ -1752,10 +1710,12 @@ our %LINKS =
   'Antarctica/McMurdo' => 'Pacific/Auckland',
   'Antarctica/South_Pole' => 'Pacific/Auckland',
   'Antarctica/Syowa' => 'Asia/Riyadh',
-  'Arctic/Longyearbyen' => 'Europe/Oslo',
+  'Antarctica/Vostok' => 'Asia/Urumqi',
+  'Arctic/Longyearbyen' => 'Europe/Berlin',
   'Asia/Aden' => 'Asia/Riyadh',
   'Asia/Ashkhabad' => 'Asia/Ashgabat',
   'Asia/Bahrain' => 'Asia/Qatar',
+  'Asia/Brunei' => 'Asia/Kuching',
   'Asia/Calcutta' => 'Asia/Kolkata',
   'Asia/Chongqing' => 'Asia/Shanghai',
   'Asia/Chungking' => 'Asia/Shanghai',
@@ -1764,6 +1724,7 @@ our %LINKS =
   'Asia/Istanbul' => 'Europe/Istanbul',
   'Asia/Kashgar' => 'Asia/Urumqi',
   'Asia/Katmandu' => 'Asia/Kathmandu',
+  'Asia/Kuala_Lumpur' => 'Asia/Singapore',
   'Asia/Kuwait' => 'Asia/Riyadh',
   'Asia/Macao' => 'Asia/Macau',
   'Asia/Muscat' => 'Asia/Dubai',
@@ -1776,7 +1737,8 @@ our %LINKS =
   'Asia/Ulan_Bator' => 'Asia/Ulaanbaatar',
   'Asia/Vientiane' => 'Asia/Bangkok',
   'Atlantic/Faeroe' => 'Atlantic/Faroe',
-  'Atlantic/Jan_Mayen' => 'Europe/Oslo',
+  'Atlantic/Jan_Mayen' => 'Europe/Berlin',
+  'Atlantic/Reykjavik' => 'Africa/Abidjan',
   'Atlantic/St_Helena' => 'Africa/Abidjan',
   'Australia/ACT' => 'Australia/Sydney',
   'Australia/Canberra' => 'Australia/Sydney',
@@ -1813,19 +1775,26 @@ our %LINKS =
   'Etc/UTC' => 'UTC',
   'Etc/Universal' => 'UTC',
   'Etc/Zulu' => 'UTC',
+  'Europe/Amsterdam' => 'Europe/Brussels',
   'Europe/Belfast' => 'Europe/London',
   'Europe/Bratislava' => 'Europe/Prague',
   'Europe/Busingen' => 'Europe/Zurich',
+  'Europe/Copenhagen' => 'Europe/Berlin',
   'Europe/Guernsey' => 'Europe/London',
   'Europe/Isle_of_Man' => 'Europe/London',
   'Europe/Jersey' => 'Europe/London',
+  'Europe/Kiev' => 'Europe/Kyiv',
   'Europe/Ljubljana' => 'Europe/Belgrade',
+  'Europe/Luxembourg' => 'Europe/Brussels',
   'Europe/Mariehamn' => 'Europe/Helsinki',
+  'Europe/Monaco' => 'Europe/Paris',
   'Europe/Nicosia' => 'Asia/Nicosia',
+  'Europe/Oslo' => 'Europe/Berlin',
   'Europe/Podgorica' => 'Europe/Belgrade',
   'Europe/San_Marino' => 'Europe/Rome',
   'Europe/Sarajevo' => 'Europe/Belgrade',
   'Europe/Skopje' => 'Europe/Belgrade',
+  'Europe/Stockholm' => 'Europe/Berlin',
   'Europe/Tiraspol' => 'Europe/Chisinau',
   'Europe/Vaduz' => 'Europe/Zurich',
   'Europe/Vatican' => 'Europe/Rome',
@@ -1838,10 +1807,15 @@ our %LINKS =
   'GMT0' => 'UTC',
   'Greenwich' => 'UTC',
   'Hongkong' => 'Asia/Hong_Kong',
-  'Iceland' => 'Atlantic/Reykjavik',
+  'Iceland' => 'Africa/Abidjan',
   'Indian/Antananarivo' => 'Africa/Nairobi',
+  'Indian/Christmas' => 'Asia/Bangkok',
+  'Indian/Cocos' => 'Asia/Yangon',
   'Indian/Comoro' => 'Africa/Nairobi',
+  'Indian/Kerguelen' => 'Indian/Maldives',
+  'Indian/Mahe' => 'Asia/Dubai',
   'Indian/Mayotte' => 'Africa/Nairobi',
+  'Indian/Reunion' => 'Asia/Dubai',
   'Iran' => 'Asia/Tehran',
   'Israel' => 'Asia/Jerusalem',
   'JST-9' => 'Asia/Tokyo',
@@ -1856,14 +1830,20 @@ our %LINKS =
   'NZ-CHAT' => 'Pacific/Chatham',
   'Navajo' => 'America/Denver',
   'PRC' => 'Asia/Shanghai',
+  'Pacific/Chuuk' => 'Pacific/Port_Moresby',
   'Pacific/Enderbury' => 'Pacific/Kanton',
+  'Pacific/Funafuti' => 'Pacific/Tarawa',
   'Pacific/Johnston' => 'Pacific/Honolulu',
+  'Pacific/Majuro' => 'Pacific/Tarawa',
   'Pacific/Midway' => 'Pacific/Pago_Pago',
-  'Pacific/Ponape' => 'Pacific/Pohnpei',
+  'Pacific/Pohnpei' => 'Pacific/Guadalcanal',
+  'Pacific/Ponape' => 'Pacific/Guadalcanal',
   'Pacific/Saipan' => 'Pacific/Guam',
   'Pacific/Samoa' => 'Pacific/Pago_Pago',
-  'Pacific/Truk' => 'Pacific/Chuuk',
-  'Pacific/Yap' => 'Pacific/Chuuk',
+  'Pacific/Truk' => 'Pacific/Port_Moresby',
+  'Pacific/Wake' => 'Pacific/Tarawa',
+  'Pacific/Wallis' => 'Pacific/Tarawa',
+  'Pacific/Yap' => 'Pacific/Port_Moresby',
   'Poland' => 'Europe/Warsaw',
   'Portugal' => 'Europe/Lisbon',
   'ROC' => 'Asia/Taipei',
@@ -1890,7 +1870,7 @@ our %LINKS =
 
 ;
 
-sub OlsonVersion { '2022a' }
+sub OlsonVersion { '2022b' }
 
 
 1;
@@ -2068,7 +2048,6 @@ so that applications can easily present a list of timezones.
   Antarctica/Mawson
   Antarctica/Rothera
   Antarctica/Troll
-  Antarctica/Vostok
   Antarctica/Macquarie
   Antarctica/Palmer
 
@@ -2085,7 +2064,6 @@ so that applications can easily present a list of timezones.
   Asia/Bangkok
   Asia/Beirut
   Asia/Bishkek
-  Asia/Brunei
   Asia/Choibalsan
   Asia/Colombo
   Asia/Damascus
@@ -2106,7 +2084,6 @@ so that applications can easily present a list of timezones.
   Asia/Karachi
   Asia/Kathmandu
   Asia/Kolkata
-  Asia/Kuala_Lumpur
   Asia/Kuching
   Asia/Macau
   Asia/Makassar
@@ -2161,7 +2138,6 @@ so that applications can easily present a list of timezones.
   Atlantic/Canary
   Atlantic/Faroe
   Atlantic/Madeira
-  Atlantic/Reykjavik
   Atlantic/Bermuda
 
 =head3 Australia
@@ -2180,7 +2156,6 @@ so that applications can easily present a list of timezones.
 
 =head3 Europe
 
-  Europe/Amsterdam
   Europe/Andorra
   Europe/Astrakhan
   Europe/Athens
@@ -2190,23 +2165,19 @@ so that applications can easily present a list of timezones.
   Europe/Bucharest
   Europe/Budapest
   Europe/Chisinau
-  Europe/Copenhagen
   Europe/Dublin
   Europe/Gibraltar
   Europe/Helsinki
   Europe/Istanbul
   Europe/Kaliningrad
-  Europe/Kiev
   Europe/Kirov
+  Europe/Kyiv
   Europe/Lisbon
   Europe/London
-  Europe/Luxembourg
   Europe/Madrid
   Europe/Malta
   Europe/Minsk
-  Europe/Monaco
   Europe/Moscow
-  Europe/Oslo
   Europe/Paris
   Europe/Prague
   Europe/Riga
@@ -2215,7 +2186,6 @@ so that applications can easily present a list of timezones.
   Europe/Saratov
   Europe/Simferopol
   Europe/Sofia
-  Europe/Stockholm
   Europe/Tallinn
   Europe/Tirane
   Europe/Ulyanovsk
@@ -2229,12 +2199,7 @@ so that applications can easily present a list of timezones.
 
 =head3 Indian
 
-  Indian/Mahe
   Indian/Mauritius
-  Indian/Reunion
-  Indian/Kerguelen
-  Indian/Christmas
-  Indian/Cocos
   Indian/Chagos
   Indian/Maldives
 
@@ -2244,11 +2209,9 @@ so that applications can easily present a list of timezones.
   Pacific/Auckland
   Pacific/Bougainville
   Pacific/Chatham
-  Pacific/Chuuk
   Pacific/Efate
   Pacific/Fakaofo
   Pacific/Fiji
-  Pacific/Funafuti
   Pacific/Gambier
   Pacific/Guadalcanal
   Pacific/Guam
@@ -2256,7 +2219,6 @@ so that applications can easily present a list of timezones.
   Pacific/Kiritimati
   Pacific/Kosrae
   Pacific/Kwajalein
-  Pacific/Majuro
   Pacific/Marquesas
   Pacific/Nauru
   Pacific/Niue
@@ -2265,14 +2227,11 @@ so that applications can easily present a list of timezones.
   Pacific/Pago_Pago
   Pacific/Palau
   Pacific/Pitcairn
-  Pacific/Pohnpei
   Pacific/Port_Moresby
   Pacific/Rarotonga
   Pacific/Tahiti
   Pacific/Tarawa
   Pacific/Tongatapu
-  Pacific/Wake
-  Pacific/Wallis
   Pacific/Easter
   Pacific/Galapagos
   Pacific/Honolulu
@@ -3346,7 +3305,7 @@ so that applications can easily present a list of timezones.
 =head3 Ukraine (UA)
 
   Europe/Simferopol - Crimea
-  Europe/Kiev - Ukraine (most areas)
+  Europe/Kyiv - Ukraine (most areas)
   Europe/Uzhgorod - Transcarpathia
   Europe/Zaporozhye - Zaporozhye and east Lugansk
 
@@ -3531,10 +3490,12 @@ A linked zone is an alias from one name to another.
   Antarctica/McMurdo => Pacific/Auckland
   Antarctica/South_Pole => Pacific/Auckland
   Antarctica/Syowa => Asia/Riyadh
-  Arctic/Longyearbyen => Europe/Oslo
+  Antarctica/Vostok => Asia/Urumqi
+  Arctic/Longyearbyen => Europe/Berlin
   Asia/Aden => Asia/Riyadh
   Asia/Ashkhabad => Asia/Ashgabat
   Asia/Bahrain => Asia/Qatar
+  Asia/Brunei => Asia/Kuching
   Asia/Calcutta => Asia/Kolkata
   Asia/Chongqing => Asia/Shanghai
   Asia/Chungking => Asia/Shanghai
@@ -3543,6 +3504,7 @@ A linked zone is an alias from one name to another.
   Asia/Istanbul => Europe/Istanbul
   Asia/Kashgar => Asia/Urumqi
   Asia/Katmandu => Asia/Kathmandu
+  Asia/Kuala_Lumpur => Asia/Singapore
   Asia/Kuwait => Asia/Riyadh
   Asia/Macao => Asia/Macau
   Asia/Muscat => Asia/Dubai
@@ -3555,7 +3517,8 @@ A linked zone is an alias from one name to another.
   Asia/Ulan_Bator => Asia/Ulaanbaatar
   Asia/Vientiane => Asia/Bangkok
   Atlantic/Faeroe => Atlantic/Faroe
-  Atlantic/Jan_Mayen => Europe/Oslo
+  Atlantic/Jan_Mayen => Europe/Berlin
+  Atlantic/Reykjavik => Africa/Abidjan
   Atlantic/St_Helena => Africa/Abidjan
   Australia/ACT => Australia/Sydney
   Australia/Canberra => Australia/Sydney
@@ -3592,19 +3555,26 @@ A linked zone is an alias from one name to another.
   Etc/UTC => UTC
   Etc/Universal => UTC
   Etc/Zulu => UTC
+  Europe/Amsterdam => Europe/Brussels
   Europe/Belfast => Europe/London
   Europe/Bratislava => Europe/Prague
   Europe/Busingen => Europe/Zurich
+  Europe/Copenhagen => Europe/Berlin
   Europe/Guernsey => Europe/London
   Europe/Isle_of_Man => Europe/London
   Europe/Jersey => Europe/London
+  Europe/Kiev => Europe/Kyiv
   Europe/Ljubljana => Europe/Belgrade
+  Europe/Luxembourg => Europe/Brussels
   Europe/Mariehamn => Europe/Helsinki
+  Europe/Monaco => Europe/Paris
   Europe/Nicosia => Asia/Nicosia
+  Europe/Oslo => Europe/Berlin
   Europe/Podgorica => Europe/Belgrade
   Europe/San_Marino => Europe/Rome
   Europe/Sarajevo => Europe/Belgrade
   Europe/Skopje => Europe/Belgrade
+  Europe/Stockholm => Europe/Berlin
   Europe/Tiraspol => Europe/Chisinau
   Europe/Vaduz => Europe/Zurich
   Europe/Vatican => Europe/Rome
@@ -3617,10 +3587,15 @@ A linked zone is an alias from one name to another.
   GMT0 => UTC
   Greenwich => UTC
   Hongkong => Asia/Hong_Kong
-  Iceland => Atlantic/Reykjavik
+  Iceland => Africa/Abidjan
   Indian/Antananarivo => Africa/Nairobi
+  Indian/Christmas => Asia/Bangkok
+  Indian/Cocos => Asia/Yangon
   Indian/Comoro => Africa/Nairobi
+  Indian/Kerguelen => Indian/Maldives
+  Indian/Mahe => Asia/Dubai
   Indian/Mayotte => Africa/Nairobi
+  Indian/Reunion => Asia/Dubai
   Iran => Asia/Tehran
   Israel => Asia/Jerusalem
   JST-9 => Asia/Tokyo
@@ -3635,14 +3610,20 @@ A linked zone is an alias from one name to another.
   NZ-CHAT => Pacific/Chatham
   Navajo => America/Denver
   PRC => Asia/Shanghai
+  Pacific/Chuuk => Pacific/Port_Moresby
   Pacific/Enderbury => Pacific/Kanton
+  Pacific/Funafuti => Pacific/Tarawa
   Pacific/Johnston => Pacific/Honolulu
+  Pacific/Majuro => Pacific/Tarawa
   Pacific/Midway => Pacific/Pago_Pago
-  Pacific/Ponape => Pacific/Pohnpei
+  Pacific/Pohnpei => Pacific/Guadalcanal
+  Pacific/Ponape => Pacific/Guadalcanal
   Pacific/Saipan => Pacific/Guam
   Pacific/Samoa => Pacific/Pago_Pago
-  Pacific/Truk => Pacific/Chuuk
-  Pacific/Yap => Pacific/Chuuk
+  Pacific/Truk => Pacific/Port_Moresby
+  Pacific/Wake => Pacific/Tarawa
+  Pacific/Wallis => Pacific/Tarawa
+  Pacific/Yap => Pacific/Port_Moresby
   Poland => Europe/Warsaw
   Portugal => Europe/Lisbon
   ROC => Asia/Taipei

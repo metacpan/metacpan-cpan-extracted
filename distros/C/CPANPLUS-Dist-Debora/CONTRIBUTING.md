@@ -1,11 +1,11 @@
 # Contributing to CPANPLUS::Dist::Debora
 
 The code for this distribution is hosted at
-https://gitlab.com/voegelas/cpanplus-dist-debora.
+https://github.com/voegelas/CPANPLUS-Dist-Debora.
 
 Grab the latest version using the command:
 
-    git clone https://gitlab.com/voegelas/cpanplus-dist-debora.git
+    git clone https://github.com/voegelas/CPANPLUS-Dist-Debora.git
 
 You can submit code changes by forking the repository, pushing your code
 changes to your clone, and then submitting a pull request.
@@ -27,10 +27,12 @@ installed as follows:
 
     cpanp i Dist::Zilla \
         Dist::Zilla::Plugin::CopyFilesFromBuild \
-        Dist::Zilla::Plugin::Prereqs::FromCPANfile \
+        Dist::Zilla::Plugin::MakeMaker::Awesome \
+        Dist::Zilla::Plugin::MetaProvides::Package \
         Dist::Zilla::Plugin::Test::Kwalitee \
         Pod::Coverage::TrustPod \
         Test::Kwalitee \
+        Test::Pod \
         Test::Pod::Coverage \
         --format=CPANPLUS::Dist::Debora
 

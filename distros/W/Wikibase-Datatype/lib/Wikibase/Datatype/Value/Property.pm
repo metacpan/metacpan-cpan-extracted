@@ -6,7 +6,7 @@ use warnings;
 use Mo qw(build);
 use Wikibase::Datatype::Utils qw(check_property);
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
 
 extends 'Wikibase::Datatype::Value';
 
@@ -92,6 +92,8 @@ Returns string.
 
 =head1 EXAMPLE
 
+=for comment filename=create_and_print_value_property.pl
+
  use strict;
  use warnings;
 
@@ -151,6 +153,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.19
+0.20
 
 =cut

@@ -1,5 +1,5 @@
 package Password::OWASP::AbstractBaseX;
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 use Moose::Role;
 use namespace::autoclean;
 
@@ -13,6 +13,12 @@ use Try::Tiny;
 requires qw(
     crypt_password
     check_password
+);
+
+has cost => (
+    is      => 'ro',
+    isa     => 'Int',
+    default => 12,
 );
 
 has hashing => (
@@ -66,7 +72,7 @@ Password::OWASP::AbstractBaseX - Abstract base class to implement OWASP password
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 

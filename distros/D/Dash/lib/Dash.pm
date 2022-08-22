@@ -4,7 +4,7 @@ use Moo;
 use strictures 2;
 use 5.020;
 
-our $VERSION = '0.10';    # VERSION
+our $VERSION = '0.11';    # VERSION
 
 # ABSTRACT: Analytical Web Apps in Perl (Port of Plotly's Dash to Perl)
 
@@ -25,6 +25,9 @@ use namespace::clean;
 
 has app_name => ( is      => 'ro',
                   default => __PACKAGE__ );
+
+has port => ( is      => 'ro',
+              default => 8080 );
 
 has external_stylesheets => ( is      => 'rw',
                               default => sub { [] } );
@@ -199,8 +202,8 @@ sub run_server {
     #  open_browser returns inmediately
     # TODO Open browser optional
     if ( not caller(1) ) {
-        Browser::Open::open_browser('http://127.0.0.1:8080');
-        $self->backend->start( 'daemon', '-l', 'http://*:8080' );
+        Browser::Open::open_browser( 'http://127.0.0.1:' . $self->port );
+        $self->backend->start( 'daemon', '-l', 'http://*:' . $self->port );
     }
     return $self->backend;
 }
@@ -313,7 +316,7 @@ sub _update_component {
                     Dash::Exceptions::PreventUpdate->throw;
                 }
                 my $updated_property = ( split( /\./, $request->{output} ) )[-1];
-                my $props_updated = { $updated_property => $updated_value };
+                my $props_updated    = { $updated_property => $updated_value };
                 return { response => { props => $props_updated } };
             } else {
                 die 'Callback not supported';
@@ -463,7 +466,7 @@ sub _filter_resources {
     my $self          = shift;
     my $resources     = shift;
     my %params        = @_;
-    my $dev_bundles   = $params{dev_bundles} // 0;
+    my $dev_bundles   = $params{dev_bundles}   // 0;
     my $eager_loading = $params{eager_loading} // 0;
     my $serve_locally = $params{serve_locally} // 1;
 
@@ -571,7 +574,7 @@ Dash - Analytical Web Apps in Perl (Port of Plotly's Dash to Perl)
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -852,7 +855,7 @@ Using objects:
         }
     );
 
-Using objects allows to omit the keyword arguments:
+Using objects allows to omit the keyword arguments in the callback method:
 
     use Dash::Dependencies::Input;
     use Dash::Dependencies::Output;
@@ -866,7 +869,7 @@ Using objects allows to omit the keyword arguments:
         }
     );
 
-There are also factory methods to use this dependencies, which allows to omit the keyword arguments:
+There are also factory methods to use this dependencies, which allows to omit the keyword arguments for the dependencies:
 
     use Dash::Dependencies;
     ...
@@ -892,7 +895,7 @@ This can be aliased
         }
     );
 
-But if you prefer using just functions in you namespace:
+But if you prefer using just functions in your namespace:
 
     use Dash::DependenciesFunctions;
     ...
@@ -945,7 +948,7 @@ Optionally the component suite will have the Functions package and the factory m
 
 Then you just have to publish the component suite as a Perl package. For new component suites you could use whatever package name you like, but if you want to use Dash:: namespace please use Dash::Components:: to avoid future collisions with further development. Besides this will make easier to find more components.
 
-As mentioned early, I'll make an automated builder but contributions are more than welcome!! In the meantime please check L<CONTRIBUTING.md|https://github.com/pablrod/perl-Dash/blob/CONTRIBUTING.md>
+As mentioned early, I'll make an automated builder but contributions are more than welcome!! In the meantime please check L<CONTRIBUTING.md|https://github.com/pablrod/perl-Dash/blob/master/CONTRIBUTING.md>
 
 Making a component for Dash that is not React based is a little bit difficult so please first get the javascript part React based and after that, integrating it with Perl, R or Python will be easy.
 
@@ -1036,7 +1039,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

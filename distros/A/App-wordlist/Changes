@@ -1,3 +1,71 @@
+0.290   2022-08-20  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli wordlist-wordle] Allow incorrect letter to be specified.
+
+
+0.289   2022-08-20  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [cli wordlist-wordle] Tweak examples.
+
+
+0.288   2022-08-20  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix wordlist-wordle, allow multiple guesses.
+
+
+0.287   2022-08-20  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix --chars-unordered which previously never matched.
+
+        - Add CLI: wordlist-wordle.
+
+
+0.286   2022-08-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Add options: --exclude-wordlist, --exclude-wordlist-pattern,
+          --exclude-dynamic-wordlists (-D).
+
+        - Tweak Abstract.
+
+
+0.285   2022-08-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Add action: test.
+
+
+0.284   2022-07-22  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.281 & 0.281.2.
+
+
+0.283   2022-07-22  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Add FAQ.
+
+
+0.282   2022-07-22  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Add more examples (BTW, the -b feature we add in the last commit
+          can also be accomplished using wildcard -w).
+
+
+0.281.2 2022-07-22  Released-By: PERLANCAR; Urgency: medium
+
+        - Add option -b (--wordlist-bundle) to add a bundle of wordlists
+          (in Acme::CPANModules::WordListBundle::*).
+
+        - Add action 'list_selected' to list selected wordlists.
+
+        - UPDATE 2022-08-20: rename release from 0.281 to 0.281.2 due to
+          conflict.
+
+
 0.281   2021-10-24  Released-By: PERLANCAR; Urgency: high
 
         - Merge changes from 0.277 and 0.277.2.

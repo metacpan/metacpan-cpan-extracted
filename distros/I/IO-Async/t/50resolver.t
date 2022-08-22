@@ -213,7 +213,7 @@ my @expect_lo_80 = (
    { family => AF_INET, socktype => SOCK_STREAM, protocol => 0, addr => pack_sockaddr_in(80, INADDR_LOOPBACK) },
 );
 my @expect_passive_3000 = (
-   { family => AF_INET, socktype => 1, protocol => 0, addr => pack_sockaddr_in(3000, INADDR_ANY) },
+   { family => AF_INET, socktype => SOCK_STREAM, protocol => 0, addr => pack_sockaddr_in(3000, INADDR_ANY) },
 );
 
 {

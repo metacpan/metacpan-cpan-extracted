@@ -1,5 +1,10 @@
 Revision history for IPC-RunExternal
 
+0.102     2022-08-16 22:59:17+02:00 Europe/Stockholm
+    - Clean tests
+    - Fix t/TestRunExternal_01.pl so it works in BSD
+    - Add section SEE ALSO to pod.
+
 0.101     2019-07-06 02:30:28+02:00 Europe/Stockholm
     - Change author to mikkoi@cpan.org
     - Fix dist.ini, remove needless quotation marks

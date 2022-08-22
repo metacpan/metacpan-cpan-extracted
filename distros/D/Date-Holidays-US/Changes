@@ -1,0 +1,9 @@
+Revision history for Perl extension Date::Holidays::US.
+
+0.02 2022-08-20
+  - Updated Observance logic based on executive orders
+  - Added GitHub meta links
+  - Updated documentation
+
+0.01 2022-08-19
+  - original version; created by h2xs 1.23 with options

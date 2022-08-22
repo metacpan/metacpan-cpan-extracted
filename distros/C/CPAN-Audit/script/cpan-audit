@@ -6,7 +6,7 @@ use IO::Interactive qw(is_interactive);
 
 use CPAN::Audit;
 
-our $VERSION = "1.001";
+our $VERSION = "1.101";
 
 __PACKAGE__->run( @ARGV ) unless caller;
 
@@ -58,16 +58,17 @@ sub process_options {
 
 	my %params;
 	my $params = {
-		'ascii'       => \$params{ascii},
-		'f|fresh'     => \$params{fresh_check},
-		'help|h'      => \$params{help},
-		'no-color'    => \$params{no_color},
-		'no-corelist' => \$params{no_corelist},
-		'perl'        => \$params{include_perl},
-		'quiet|q'     => \$params{quiet},
-		'verbose|v'   => \$params{verbose},
-		'version'     => \$params{version},
-		'exclude=s@'  => \$params{exclude},
+		'ascii'           => \$params{ascii},
+		'f|fresh'         => \$params{fresh_check},
+		'help|h'          => \$params{help},
+		'no-color'        => \$params{no_color},
+		'no-corelist'     => \$params{no_corelist},
+		'perl'            => \$params{include_perl},
+		'quiet|q'         => \$params{quiet},
+		'verbose|v'       => \$params{verbose},
+		'version'         => \$params{version},
+		'exclude=s@'      => \$params{exclude},
+		'exclude-file=s@' => \$params{exclude_file},
 		};
 
 	my $ret = Getopt::Long::GetOptionsFromArray( $args, $options, %$params ) or $class->usage(EXIT_USAGE);
@@ -93,7 +94,7 @@ cpan-audit - Audit CPAN modules
 
 =head1 SYNOPSIS
 
-cpan-audit [options] [command]
+cpan-audit [command] [options]
 
 Commands:
 
@@ -105,16 +106,17 @@ Commands:
 
 Options:
 
-    --ascii         use ascii output
-    --freshcheck|f  check the database for freshness (CPAN::Audit::FreshnessCheck)
-    --help|h        show the help message and exit
-    --no-color      switch off colors
-    --no-corelist   ignore modules bundled with perl version
-    --perl          include perl advisories
-    --quiet         be quiet
-    --verbose       be verbose
-    --version       show the version and exit
-    --exclude <str> exclude/ignore the specified advisory/cve (multiple)
+    --ascii               use ascii output
+    --freshcheck|f        check the database for freshness (CPAN::Audit::FreshnessCheck)
+    --help|h              show the help message and exit
+    --no-color            switch off colors
+    --no-corelist         ignore modules bundled with perl version
+    --perl                include perl advisories
+    --quiet               be quiet
+    --verbose             be verbose
+    --version             show the version and exit
+    --exclude <str>       exclude/ignore the specified advisory/cve (multiple)
+    --exclude-file <file> read exclude/ignore patterns from file
 
 Examples:
 
@@ -131,6 +133,7 @@ Examples:
     cpan-audit installed local/
     cpan-audit installed local/ --exclude CVE-2011-4116
     cpan-audit installed local/ --exclude CVE-2011-4116 --exclude CVE-2011-123
+    cpan-audit installed local/ --exclude-file ignored-cves.txt
 
     cpan-audit show CPANSA-Mojolicious-2018-03
 

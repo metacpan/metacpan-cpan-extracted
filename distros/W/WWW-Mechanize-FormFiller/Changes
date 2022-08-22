@@ -1,5 +1,9 @@
 Revision history for Perl extension WWW::Mechanize::FormFiller.
 
+0.13 20220816
+  . Address changes in HTML::Form 6.08
+    Thanks to Julien and Slaven for alerting me to this change!
+
 0.12 20170119
   . Prerequisite fix, no need to update
   - Data::Tagset was not listed as an installation prerequisite

@@ -15,7 +15,7 @@ use namespace::autoclean;
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = 'v1.2.1'; # VERSION
+our $VERSION = 'v1.3.0'; # VERSION
 
 BEGIN {
     # We tell the Oracle connector which encoding to use. The last part of the
@@ -423,19 +423,22 @@ sub is_deployed_tag {
 
 sub are_deployed_changes {
     my $self = shift;
+    @{ $self->dbh->selectcol_arrayref(
+        'SELECT change_id FROM changes WHERE ' . _change_id_in(scalar @_),
+        undef,
+        map { $_->id } @_,
+    ) };
+}
+
+sub _change_id_in {
+    my $i = shift;
     my @qs;
-    my $i = @_;
     while ($i > 250) {
         push @qs => 'change_id IN (' . join(', ' => ('?') x 250) . ')';
         $i -= 250;
     }
     push @qs => 'change_id IN (' . join(', ' => ('?') x $i) . ')' if $i > 0;
-    my $expr = join ' OR ', @qs;
-    @{ $self->dbh->selectcol_arrayref(
-        "SELECT change_id FROM changes WHERE $expr",
-        undef,
-        map { $_->id } @_,
-    ) };
+    return join ' OR ', @qs;
 }
 
 sub _registry_variable {
@@ -809,7 +812,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 License
 
-Copyright (c) 2012-2021 iovation Inc., David E. Wheeler
+Copyright (c) 2012-2022 iovation Inc., David E. Wheeler
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -1,0 +1,873 @@
+#!perl
+
+use 5.010001;
+use strict;
+use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-08-08'; # DATE
+our $DIST = 'App-orgadb'; # DIST
+our $VERSION = '0.005'; # VERSION
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    summary => 'Select entries and fields from Org addressbook',
+    url => '/App/orgadb/select',
+    log => 1,
+    config_filename => ['orgadb.conf', 'orgadb-sel.conf'],
+);
+
+$cmdline->run;
+
+# ABSTRACT: Select entries and fields from Org addressbook
+# PODNAME: orgadb-sel
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+orgadb-sel - Select entries and fields from Org addressbook
+
+=head1 VERSION
+
+This document describes version 0.005 of orgadb-sel (from Perl distribution App-orgadb), released on 2022-08-08.
+
+=head1 SYNOPSIS
+
+First, create a configuration file F<~/.config/orgadb.conf> containing something
+like the following (use INI syntax, or L<IOD> to be more exact):
+
+ ; specify your addressbook files here
+ files = ~/addressbook.org
+ files = /path/to/another-addressbook.org
+
+Suppose you have F<~/addressbook.org> like the following (entries are written as
+level-2 headings, level 1 is used for categories, hierarchical categories can be
+written using breadcrumb-style notation with ">" separator):
+
+ * family
+ ** iwan
+ - home phone :: 555-1234-567
+ - cell :: 555-8765-432
+ - address ::
+   + street :: Jl Mangga 123
+   + city :: Bandung
+   + postcode :: 40123
+   + country :: Indonesia
+ ** restu
+ - cell :: 555-1234-568
+ ** satya
+
+ * family > wife's
+ ** roger
+ ** emily
+ ** cynthia
+
+ * work > acme inc
+ ** bugs
+ ** daffy
+
+ * work > acme inc > ex
+ ** marvin
+
+ * work > newsradio
+ ** dave
+ ** lisa
+ - cell :: 555-1234-710
+ - home phone :: 555-1234-712
+ - note ::
+   + [2022-07-03] :: do not call after office hours
+ ** joe
+ - cell :: 555-1234-569
+ - cell :: 555-1234-570
+ ** beth
+
+ * work > newsradio > ex
+ ** matthew
+
+=head2 Listing all entries
+
+To list all entries (categories will be shown as path prefix):
+
+ % orgadb-sel
+ ** family/iwan
+ ** family/restu
+ ** family/satya
+ ** family > wife's/roger
+ ** family > wife's/emily
+ ** family > wife's/cynthia
+ ** work > acme inc/bugs
+ ** work > acme inc/daffy
+ ** work > acme inc > ex/ marvin
+ ** work > newsradio/dave
+ ** work > newsradio/lisa
+ ** work > newsradio/joe
+ ** work > newsradio/beth
+ ** work > newsradio > ex/matthew
+
+=head2 Searching entries
+
+To list entries that match the string 'sa':
+
+ % orgadb-sel sa
+ ** family/satya
+ ** work > newsradio/lisa
+
+To hide the category prefix, use C<-C> (C<--hide-category>):
+
+ % orgadb-sel -C sa
+ ** satya
+ ** lisa
+
+=head2 Searching categories
+
+To search against the category, use the C<-c> option:
+
+ % orgadb-sel sa -c work; # search for 'sa' from work
+ ** work > newsradio/lisa
+
+ % orgadb-sel -c work; # list all entries from work
+ ** work > newsradio/dave
+ ** work > newsradio/lisa
+ ** work > newsradio/joe
+ ** work > newsradio/beth
+ ** work > newsradio > ex/matthew
+
+To display Lisa's full entry:
+
+ % orgadb-sel lisa -l
+ ** work > newsradio/lisa
+ - cell :: 555-1234-710
+ - home phone :: 555-1234-712
+ - note ::
+   + [2022-07-03] :: do not call after office hours
+
+ % orgadb-sel lisa -Cl  ;# do not show the category
+ ** lisa
+ - cell :: 555-1234-710
+ - home phone :: 555-1234-712
+ - note ::
+   + [2022-07-03] :: do not call after office hours
+
+ % orgadb-sel lisa -El  ;# do not show the entry line
+ - cell :: 555-1234-710
+ - home phone :: 555-1234-712
+ - note ::
+   + [2022-07-03] :: do not call after office hours
+
+=head2 Searching fields
+
+To get Lisa's cell phone number (search against field):
+
+ % orgadb-sel lisa cell
+ ** work > newsradio/lisa
+ - cell :: 555-1234-710
+
+To get Lisa's cell phone number (only the number, without the entry headline or
+the field name):
+
+ % orgadb-sel lisa cell -E -N
+ 555-1234-710
+
+To get all Lisa's phone numbers:
+
+ % orgadb-sel lisa -E '/phone|cell/'
+ - cell :: 555-1234-710
+ - home phone :: 555-1234-712
+
+You can also search subfields. For example, to show Iwan's postcode field value
+under the address field:
+
+ % orgadb-sel iwan address postcode -EN
+ 40123
+
+=head2 Formatting
+
+You can apply one or more formatters to field values:
+
+ % orgadb-sel lisa cell --formatter Str::remove_non_digit -EN
+ 5551234710
+
+=head2 Shell mode
+
+Instead of selecting one time and exiting, you can instruct B<orgadb> to enter
+shell mode, where you can issue multiple select commands without re-reading the
+Org addressbook files repeatedly. For example:
+
+ % orgadb-sel -s
+ > select lisa
+ ...
+ > select lisa -l
+ ...
+ > select lisa cell -E -N
+ ...
+ > exit
+
+ % _
+
+When the addressbook files change on disk, the files will be re-read.
+
+=head2 Password book
+
+Aside from a regular addressbook, you can also use B<orgadb> with password books
+(a file you store passwords in). B<orgadb> can read GnuPG-encrypted files, where
+the decrypted content is read into memory and not stored in temporary files. You
+can then use shell mode (C<-s>) to repeatedly query the password book without
+re-reading and re-decrypting everytime. For example, suppose you have a password
+book like this:
+
+ # -*- Mode: org -*-
+ * persona > perlancar
+ ** google (perlancar)
+ - username :: perlancar
+ - pass :: secret1
+ - security question :: favorite dog in the whole wide world?
+ - security answer :: impossible to pick one
+ - log ::
+   + [2022-07-04 Mon] :: change password
+   + [2017-08-01] :: create
+ ** twitter (perlancar)
+ - username :: perlancar
+ - pass :: secret2
+ * persona > steven
+ ** google (steven123123)
+ - username :: steven123123
+ - phone :: 555-123-2345
+ - pass :: secret3
+
+and you store it in C<~/passwords.gpg>. Then to query passwords:
+
+ # What's my (perlancar)'s google password?
+ % orgadb-sel -f ~/passwords.gpg /google.+perlancar/ pass -EN
+ secret1
+
+ # What's my (steven)'s phone used in the google account?
+ % orgadb-sel -f ~/passwords.gpg /google.+steven/ '/phone|cell/' -EN
+ 555-123-2345
+
+Or, in shell mode:
+
+ % orgadb-sel -f ~/passwords.gpg -s
+ > select /google.+perlancar/ pass -EN
+ secret1
+ > select /google.+steven/ '/phone|cell/' -EN
+ 555-123-2345
+ > exit
+
+ % _
+
+=head1 DESCRIPTION
+
+B<App::orgadb> is a set of CLIs for addressbook written in Org format. It
+currently contains:
+
+=over
+
+=item * orgadb-sel
+
+CLI to list/select addressbook entries and fields.
+
+=back
+
+The addressbook must be written following a certain structure, as shown in the
+Synopsis. The first heading level is for putting categories. The second heading
+level is where you put all your entries. Fields are written in description list.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--count>
+
+Return just the number of matching entries instead of showing them.
+
+=back
+
+=head2 Color options
+
+=over
+
+=item B<--color-theme-json>=I<s>
+
+See C<--color-theme>.
+
+=item B<--color-theme>=I<s>
+
+=item B<--color>=I<s>
+
+Whether to use color.
+
+Default value:
+
+ "auto"
+
+Valid values:
+
+ ["auto","always","never"]
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<s>
+
+Set path to configuration file.
+
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+ [profile=dev]
+ username=foo
+ pass=beaver
+ 
+ [profile=production]
+ username=bar
+ pass=honey
+
+When you specify C<--config-profile=dev>, C<username> will be set to C<foo> and
+C<password> to C<beaver>. When you specify C<--config-profile=production>,
+C<username> will be set to C<bar> and C<password> to C<honey>.
+
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+If you specify C<--no-config>, the application will not read any configuration
+file.
+
+
+=back
+
+=head2 Display options
+
+=over
+
+=item B<--detail>, B<-l>
+
+=item B<--formatter>=I<s@>
+
+Add one or more formatters to display field value.
+
+Specify one or more formatters to apply to the field value before displaying.
+
+A formatter is name of C<Data::Sah::Filter::perl::*> module, without the prefix.
+For example: C<Str::uc> will convert the field value to uppercase. Another
+formatter, C<Str::remove_comment> can remove comment.
+
+A formatter can have arguments, which is specified using this format:
+
+ [FORMATTER_NAME, {ARG1NAME => ARG1VAL, ...}]
+
+If formatter name begins with C<[> character, it will be parsed as JSON. Example:
+
+ ['Str::remove_comment', {'style':'cpp'}]
+
+
+Can be specified multiple times.
+
+=item B<--formatters-json>=I<s>
+
+Add one or more formatters to display field value (JSON-encoded).
+
+See C<--formatter>.
+
+=item B<--hide-category>, B<-C>
+
+Do not show category.
+
+=item B<--hide-entry>, B<-E>
+
+Do not show entry headline.
+
+=item B<--hide-field-name>, B<-N>
+
+Do not show field names, just show field values.
+
+=back
+
+=head2 Entry selection options
+
+=over
+
+=item B<--entry>=I<s>
+
+Find entry by string or regex search against its title.
+
+Can also be specified as the 1st command-line argument.
+
+=item B<--filter-entries-by-field>=I<s@>
+
+Find entry by the fields or subfields it has.
+
+The format of each entry_by_field is one of:
+
+ str
+ /re/
+ str = str2
+ str = /re2/
+ /re/ = str2
+ /re/ = /re2/
+
+That is, it can search for a string (C<str>) or regex (C<re>) in the field name,
+and optionally also search for a string (C<str2>) or regex (C<re2>) in the field
+value.
+
+
+Can be specified multiple times.
+
+=item B<--filter-entries-by-fields-json>=I<s>
+
+Find entry by the fields or subfields it has (JSON-encoded).
+
+See C<--filter-entries-by-field>.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+If you specify C<--no-env>, the application wil not read any environment
+variable.
+
+
+=back
+
+=head2 Field selection options
+
+=over
+
+=item B<--field>=I<s@>
+
+Find (sub)fields by string or regex search.
+
+Can also be specified as the 2nd command-line argument and onwards.
+
+Can be specified multiple times.
+
+=item B<--fields-json>=I<s>
+
+Find (sub)fields by string or regex search (JSON-encoded).
+
+See C<--field>.
+
+Can also be specified as the 2nd command-line argument and onwards.
+
+=back
+
+=head2 Filter options
+
+=over
+
+=item B<--category>=I<s>, B<-c>
+
+Find entry by string or regex search against the category title.
+
+=back
+
+=head2 Input options
+
+=over
+
+=item B<--file>=I<s@>, B<-f>
+
+Path to addressbook file.
+
+Can be specified multiple times.
+
+=item B<--files-json>=I<s>
+
+Path to addressbook files (JSON-encoded).
+
+See C<--file>.
+
+=item B<--no-reload-files-on-change>
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<fatal>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Mode options
+
+=over
+
+=item B<--shell>, B<-s>
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Result options
+
+=over
+
+=item B<--num-entries>=I<s>
+
+Specify maximum number of entries to return (0 means unlimited).
+
+=item B<--num-fields>=I<s>
+
+Specify maximum number of fields (per entry) to return (0 means unlimited).
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C orgadb-sel orgadb-sel
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete orgadb-sel 'p/*/`orgadb-sel`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 FAQ
+
+=head2 Why doesn't 'orgadb-sel' list all my entries? It returns nothing.
+
+ % orgadb-sel
+ % _
+
+Probably because the addressbook is not written following the expected
+structure, where the entries should be as I<level-2> headings. You might use the
+level-1 heading:
+
+ * jimmy
+ - cell :: 555-123-4567
+ * john
+ * jack
+
+or use deeper-than-level-2 heading:
+
+ * friends
+ ** high school
+ *** jimmy
+ - cell :: 555-123-4567
+ *** john
+ *** jack
+
+This is the correct structure:
+
+ * friends > high school
+ ** jimmy
+ - cell :: 555-123-4567
+ ** john
+ ** jack
+
+When queried:
+
+ % orgadb-sel
+ friends > high school/jimmy
+ friends > high school/john
+ friends > high school/jack
+
+=head2 Why can't I search against entry fields? It returns nothing. (I can list entries.)
+
+ % orgadb-sel jimmy cell
+ % _
+
+Probably because the addressbook is not written following the expected
+structure, where you should use a description list. A common mistake is writing
+a description list like this:
+
+ ** jimmy
+ - cell: 555-123-4567
+
+This is still an unordered list in Org, you have to use C< :: > (space, followed
+by two colons, followed by another space) as the separator:
+
+ ** jimmy
+ - cell :: 555-123-4567
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/s1/.config/orgadb.conf>, F</home/s1/.config/orgadb-sel.conf>, F</home/s1/orgadb.conf>, F</home/s1/orgadb-sel.conf>, F</etc/orgadb.conf>, or F</etc/orgadb-sel.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
+
+List of available configuration parameters:
+
+ category (see --category)
+ color (see --color)
+ color_theme (see --color-theme)
+ count (see --count)
+ detail (see --detail)
+ entry (see --entry)
+ fields (see --field)
+ files (see --file)
+ filter_entries_by_fields (see --filter-entries-by-field)
+ format (see --format)
+ formatters (see --formatter)
+ hide_category (see --hide-category)
+ hide_entry (see --hide-entry)
+ hide_field_name (see --hide-field-name)
+ log_level (see --log-level)
+ naked_res (see --naked-res)
+ num_entries (see --num-entries)
+ num_fields (see --num-fields)
+ reload_files_on_change (see --no-reload-files-on-change)
+ shell (see --shell)
+
+=head1 ENVIRONMENT
+
+=head2 BI1ITQYCX1_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F</home/s1/.config/orgadb.conf>
+
+F</home/s1/.config/orgadb-sel.conf>
+
+F</home/s1/orgadb.conf>
+
+F</home/s1/orgadb-sel.conf>
+
+F</etc/orgadb.conf>
+
+F</etc/orgadb-sel.conf>
+
+=head2 ~/.orgadb_sel_history
+
+Store shell's command history for B<orgadb-sel>.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-orgadb>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-orgadb>.
+
+=head1 SEE ALSO
+
+L<orgsel> (from L<App::orgsel>) is a more generic selection tool for Org
+document.
+
+Other CLI's in this distribution.
+
+Information about the Org format: L<https://orgmode.org>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-orgadb>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

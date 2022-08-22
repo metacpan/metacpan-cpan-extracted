@@ -17,79 +17,79 @@
 use strict;
 use warnings;
 
-use File::Basename qw/basename/;
-use Getopt::Long qw/GetOptionsFromArray/;
-use List::Util qw/sum/;
-use Music::AtonalUtil   ();
-use Music::LilyPondUtil ();
-use Music::Scala        ();
-use Music::Scales qw/get_scale_nums/;
-use Music::Tempo qw/bpm_to_ms ms_to_bpm/;
+use File::Basename       qw/basename/;
+use Getopt::Long         qw/GetOptionsFromArray/;
+use List::Util           qw/sum/;
+use Music::AtonalUtil    ();
+use Music::LilyPondUtil  ();
+use Music::Scala         ();
+use Music::Scales        qw/get_scale_nums/;
+use Music::Tempo         qw/bpm_to_ms ms_to_bpm/;
 use Music::Tension::Cope ();
 # untested with --tension
 #use Music::Tension::PlompLevelt ();
 use Parse::Range qw/parse_range/;
 use Scalar::Util qw/looks_like_number/;
-use Try::Tiny;
 
 my $PROG_NAME = basename($0);
 
 my %modes = (
-  adjacent_interval_content => \&adjacent_interval_content,
-  basic                     => \&basic,
-  beats2set                 => \&beats2set,
-  circular_permute          => \&circular_permute,
-  combos                    => \&combos,
-  complement                => \&complement,
-  equivs                    => \&equivs,
-  findall                   => \&findall,
-  findin                    => \&findin,
-  fnums                     => \&fnums,
-  forte2pcs                 => \&forte2pcs,
-  freq2pitch                => \&freq2pitch,
-  gen_melody                => \&gen_melody,
-  half_prime_form           => \&half_prime_form,
-  interval_class_content    => \&interval_class_content,
-  intervals2pcs             => \&intervals2pcs,
-  invariance_matrix         => \&invariance_matrix,
-  invariants                => \&invariants,
-  invert                    => \&invert,
-  ly2pitch                  => \&ly2pitch,
-  ly2struct                 => \&ly2struct,
-  multiply                  => \&multiply,
-  normal_form               => \&normal_form,
-  notes2time                => \&notes2time,
-  pcs2forte                 => \&pcs2forte,
-  pcs2intervals             => \&pcs2intervals,
-  pitch2freq                => \&pitch2freq,
-  pitch2intervalclass       => \&pitch2intervalclass,
-  pitch2ly                  => \&pitch2ly,
-  prime_form                => \&prime_form,
-  recipe                    => \&recipe,
-  retrograde                => \&retrograde,
-  rotate                    => \&rotate,
-  set2beats                 => \&set2beats,
-  set_complex               => \&set_complex,
-  subsets                   => \&subsets,
-  tcis                      => \&tcis,
-  tcs                       => \&tcs,
-  tension                   => \&tension,
-  time2notes                => \&time2notes,
-  transpose                 => \&transpose,
-  transpose_invert          => \&transpose_invert,
-  variances                 => \&variances,
-  whatscalesfit             => \&whatscalesfit,
-  zrelation                 => \&zrelation,
+    adjacent_interval_content => \&adjacent_interval_content,
+    bark                      => \&bark,
+    basic                     => \&basic,
+    beats2set                 => \&beats2set,
+    circular_permute          => \&circular_permute,
+    combos                    => \&combos,
+    complement                => \&complement,
+    equivs                    => \&equivs,
+    findall                   => \&findall,
+    findin                    => \&findin,
+    fnums                     => \&fnums,
+    forte2pcs                 => \&forte2pcs,
+    freq2pitch                => \&freq2pitch,
+    gen_melody                => \&gen_melody,
+    half_prime_form           => \&half_prime_form,
+    interval_class_content    => \&interval_class_content,
+    intervals2pcs             => \&intervals2pcs,
+    invariance_matrix         => \&invariance_matrix,
+    invariants                => \&invariants,
+    invert                    => \&invert,
+    ly2pitch                  => \&ly2pitch,
+    ly2struct                 => \&ly2struct,
+    multiply                  => \&multiply,
+    normal_form               => \&normal_form,
+    notes2time                => \&notes2time,
+    pcs2forte                 => \&pcs2forte,
+    pcs2intervals             => \&pcs2intervals,
+    pitch2freq                => \&pitch2freq,
+    pitch2intervalclass       => \&pitch2intervalclass,
+    pitch2ly                  => \&pitch2ly,
+    prime_form                => \&prime_form,
+    recipe                    => \&recipe,
+    retrograde                => \&retrograde,
+    rotate                    => \&rotate,
+    set2beats                 => \&set2beats,
+    set_complex               => \&set_complex,
+    subsets                   => \&subsets,
+    tcis                      => \&tcis,
+    tcs                       => \&tcs,
+    tension                   => \&tension,
+    time2notes                => \&time2notes,
+    transpose                 => \&transpose,
+    transpose_invert          => \&transpose_invert,
+    variances                 => \&variances,
+    whatscalesfit             => \&whatscalesfit,
+    zrelation                 => \&zrelation,
 );
 
 my ( $Flag_Flat, $Flag_Lyout, $Flag_Quiet, $Flag_Tension );
 my $Flag_Record_Sep = ',';    # mostly for pitch sets e.g. 0,4,7
 my @Std_Opts        = (
-  'flats!'    => \$Flag_Flat,
-  'ly'        => \$Flag_Lyout,
-  'quiet!'    => \$Flag_Quiet,
-  'rs=s'      => \$Flag_Record_Sep,
-  'tension=s' => \$Flag_Tension,
+    'flats!'    => \$Flag_Flat,
+    'ly'        => \$Flag_Lyout,
+    'quiet!'    => \$Flag_Quiet,
+    'rs=s'      => \$Flag_Record_Sep,
+    'tension=s' => \$Flag_Tension,
 );
 
 # NOTE may false positive if there is a standalone argument option with
@@ -97,15 +97,15 @@ my @Std_Opts        = (
 # using --foo=bar instead of the risk prone --foo bar so meh.
 my @leading_args;
 while ( @ARGV and !exists $modes{ $ARGV[0] } ) {
-  push @leading_args, shift @ARGV;
+    push @leading_args, shift @ARGV;
 }
 
 GetOptionsFromArray(
-  \@leading_args,
-  @Std_Opts,
-  'help'              => \&print_help,
-  'listmodes'         => sub { print "$_\n" for sort keys %modes; exit 0 },
-  'scaledegrees|sd=i' => \my $scale_degrees,
+    \@leading_args,
+    @Std_Opts,
+    'help'              => \&print_help,
+    'listmodes'         => sub { print "$_\n" for sort keys %modes; exit 0 },
+    'scaledegrees|sd=i' => \my $scale_degrees,
 ) or print_help();
 $scale_degrees //= 12;
 my $mode = shift;
@@ -114,14 +114,14 @@ print_help() if !defined $mode or !exists $modes{$mode};
 
 my $Atu = Music::AtonalUtil->new( DEG_IN_SCALE => $scale_degrees );
 my $Lyu = Music::LilyPondUtil->new(
-  chrome => ( $Flag_Flat ? 'flats' : 'sharps' ),
-  ignore_register => 1,
-  keep_state      => 0,
-  mode            => 'relative'
+    chrome          => ( $Flag_Flat ? 'flats' : 'sharps' ),
+    ignore_register => 1,
+    keep_state      => 0,
+    mode            => 'relative'
 );
 if ( $scale_degrees != 12 ) {
-  $Lyu->ignore_register(0);
-  $Flag_Lyout = 0;
+    $Lyu->ignore_register(0);
+    $Flag_Lyout = 0;
 }
 
 my $Tension;
@@ -131,42 +131,42 @@ my $FORTE_NUMBER_RE = $Atu->forte_number_re;
 # as of 2015 "List of pitch class sets", as that new page uses A/B prime
 # form names that I call half-prime...
 my %fnum2desc = (
-  '3-5'   => 'Viennese trichord',
-  '3-9'   => 'Suspended chord',
-  '3-10'  => 'Diminished triad',
-  '3-11'  => 'Major and minor triad',
-  '3-12'  => 'Augmented triad',
-  '4-6'   => 'Dream chord',
-  '4-9'   => 'Distance model',
-  '4-18'  => 'Diminished major seventh chord',
-  '4-19'  => 'Minor major seventh chord',
-  '4-20'  => 'Major seventh chord',
-  '4-22'  => 'Mu chord',
-  '4-24'  => 'Augmented seventh chord',
-  '4-26'  => 'Minor seventh chord',
-  '4-27'  => 'Dominant seventh chord',
-  '4-28'  => 'Diminished seventh chord',
-  '4-z15' => 'All-interval tetrachord',
-  '4-z29' => 'All-interval tetrachord',
-  '5-32'  => 'Elektra chord',
-  '5-35'  => 'Pentatonic scale',
-  '5-z17' => 'Farben chord',
-  '6-30'  => 'Petrushka chord',
-  '6-34'  => 'Mystic chord',
-  '6-35'  => 'Whole tone scale',
-  '6-z17' => 'All-interval hexachord',
-  '6-z44' => '6-Z44',
-  '6-z47' => 'Blues scale',
-  '7-20'  => 'Persian scale',
-  '7-22'  => 'Double harmonic scale',
-  '7-24'  => 'Enigmatic scale',
-  '7-25'  => 'Blues scale',
-  '7-30'  => 'Neapolitan scale',
-  '7-33'  => 'Major Locrian scale',
-  '7-34'  => 'Half diminished scale',
-  '7-35'  => 'Diatonic scale',
-  '8-23'  => 'Bebop scale',
-  '8-28'  => 'Octatonic scale',
+    '3-5'   => 'Viennese trichord',
+    '3-9'   => 'Suspended chord',
+    '3-10'  => 'Diminished triad',
+    '3-11'  => 'Major and minor triad',
+    '3-12'  => 'Augmented triad',
+    '4-6'   => 'Dream chord',
+    '4-9'   => 'Distance model',
+    '4-18'  => 'Diminished major seventh chord',
+    '4-19'  => 'Minor major seventh chord',
+    '4-20'  => 'Major seventh chord',
+    '4-22'  => 'Mu chord',
+    '4-24'  => 'Augmented seventh chord',
+    '4-26'  => 'Minor seventh chord',
+    '4-27'  => 'Dominant seventh chord',
+    '4-28'  => 'Diminished seventh chord',
+    '4-z15' => 'All-interval tetrachord',
+    '4-z29' => 'All-interval tetrachord',
+    '5-32'  => 'Elektra chord',
+    '5-35'  => 'Pentatonic scale',
+    '5-z17' => 'Farben chord',
+    '6-30'  => 'Petrushka chord',
+    '6-34'  => 'Mystic chord',
+    '6-35'  => 'Whole tone scale',
+    '6-z17' => 'All-interval hexachord',
+    '6-z44' => '6-Z44',
+    '6-z47' => 'Blues scale',
+    '7-20'  => 'Persian scale',
+    '7-22'  => 'Double harmonic scale',
+    '7-24'  => 'Enigmatic scale',
+    '7-25'  => 'Blues scale',
+    '7-30'  => 'Neapolitan scale',
+    '7-33'  => 'Major Locrian scale',
+    '7-34'  => 'Half diminished scale',
+    '7-35'  => 'Diatonic scale',
+    '8-23'  => 'Bebop scale',
+    '8-28'  => 'Octatonic scale',
 );
 
 $modes{$mode}->(@ARGV);
@@ -179,975 +179,947 @@ exit 0;
 # TODO move back to List::MoreUtils if that module is fixed up or some
 # replacement with fewer open critical bugs is written.
 sub all(&@) {
-  my $test = shift;
-  for (@_) {
-    return 0 unless &$test;
-  }
-  return 1;
+    my $test = shift;
+    for (@_) {
+        return 0 unless &$test;
+    }
+    return 1;
 }
 
 sub _ms2abbr_time {
-  my $difference = int shift;
+    my $difference = int shift;
 
-  return "0ms" if $difference == 0;
+    return "0ms" if $difference == 0;
 
-  my $ms = $difference % 1000;
-  $difference = ( $difference - $ms ) / 1000;
-  my $seconds = $difference % 60;
-  $difference = ( $difference - $seconds ) / 60;
-  my $minutes = $difference % 60;
-  $difference = ( $difference - $minutes ) / 60;
+    my $ms = $difference % 1000;
+    $difference = ( $difference - $ms ) / 1000;
+    my $seconds = $difference % 60;
+    $difference = ( $difference - $seconds ) / 60;
+    my $minutes = $difference % 60;
+    $difference = ( $difference - $minutes ) / 60;
 
-  #  my $hours = $difference;
-  my $hours = $difference % 24;
-  $difference = ( $difference - $hours ) / 24;
-  my $days  = $difference % 7;
-  my $weeks = ( $difference - $days ) / 7;
+    #  my $hours = $difference;
+    my $hours = $difference % 24;
+    $difference = ( $difference - $hours ) / 24;
+    my $days  = $difference % 7;
+    my $weeks = ( $difference - $days ) / 7;
 
-  # better way to do this?
-  my $temp = ($weeks) ? "${weeks}w " : q{};
-  $temp .= ($days)    ? "${days}d "    : q{};
-  $temp .= ($hours)   ? "${hours}h "   : q{};
-  $temp .= ($minutes) ? "${minutes}m " : q{};
-  $temp .= ($seconds) ? "${seconds}s " : q{};
-  $temp .= ($ms)      ? "${ms}ms"      : q{};
-  return $temp;
+    # better way to do this?
+    my $temp = ($weeks) ? "${weeks}w " : q{};
+    $temp .= ($days) ? "${days}d " : q{};
+    $temp .= ($hours) ? "${hours}h " : q{};
+    $temp .= ($minutes) ? "${minutes}m " : q{};
+    $temp .= ($seconds) ? "${seconds}s " : q{};
+    $temp .= ($ms) ? "${ms}ms" : q{};
+    return $temp;
 }
 
 # utility for whatscalesfit
 sub _fit_scale {
-  my ( $scale, $pset, $scale_set, $is_dsc ) = @_;
+    my ( $scale, $pset, $scale_set, $is_dsc ) = @_;
 
-  my $dsc_flag = $is_dsc ? 'DSC' : ' ';
+    my $dsc_flag = $is_dsc ? 'DSC' : ' ';
 
-  for my $transpose ( 0 .. 11 ) {
-    my @scale_nums = map { my $t = $_ + $transpose; $t } @$scale_set;
-    my %seen;
-    @seen{ map { my $p = $_ % $scale_degrees; $p } @scale_nums } = ();
-    if ( all { exists $seen{$_} } @$pset ) {
-      my $tonic = $Lyu->p2ly($transpose);
-      $tonic =~ s/is/#/;
-      $tonic =~ s/es/b/;
+    for my $transpose ( 0 .. 11 ) {
+        my @scale_nums = map { my $t = $_ + $transpose; $t } @$scale_set;
+        my %seen;
+        @seen{ map { my $p = $_ % $scale_degrees; $p } @scale_nums } = ();
+        if ( all { exists $seen{$_} } @$pset ) {
+            my $tonic = $Lyu->p2ly($transpose);
+            $tonic =~ s/is/#/;
+            $tonic =~ s/es/b/;
 
-      my $scale_fmt = join '', ('%-6s') x @scale_nums;
-      my $scale_notes = sprintf $scale_fmt, $Lyu->p2ly(@scale_nums);
+            my $scale_fmt   = join '', ('%-6s') x @scale_nums;
+            my $scale_notes = sprintf $scale_fmt, $Lyu->p2ly(@scale_nums);
 
-      printf "%-3s%-18s%-8s%s\n", "\u$tonic", "\u$scale", $dsc_flag, $scale_notes;
+            printf "%-3s%-18s%-8s%s\n", "\u$tonic", "\u$scale", $dsc_flag, $scale_notes;
+        }
     }
-  }
 }
 
 sub _init_scala {
-  my ( $cf, $cp, $file ) = @_;
-  $cf //= 440;    # A440
-  $cp //= 69;
+    my ( $cf, $cp, $file ) = @_;
+    $cf //= 440;    # A440
+    $cp //= 69;
 
-  my $scala = Music::Scala->new(
-    concertfreq  => $cf,
-    concertpitch => $cp,
-  );
-  my $p2f = sub { $scala->pitch2freq( $_[0] ) };
-  if ( defined $file ) {
-    $scala->read_scala($file);
-    my @ratios = $scala->get_ratios;
-    if ( @ratios != 12 or !$scala->is_octavish ) {
-      # XXX until figure out .kbm file support
-      die "scala scales must be 12-tone and octave bounded\n";
+    my $scala = Music::Scala->new(
+        concertfreq  => $cf,
+        concertpitch => $cp,
+    );
+    my $p2f = sub { $scala->pitch2freq( $_[0] ) };
+    if ( defined $file ) {
+        $scala->read_scala($file);
+        my @ratios = $scala->get_ratios;
+        if ( @ratios != 12 or !$scala->is_octavish ) {
+            # XXX until figure out .kbm file support
+            die "scala scales must be 12-tone and octave bounded\n";
+        }
+        $p2f = sub { $scala->interval2freq( $_[0] - $scala->get_concertpitch ) };
     }
-    $p2f = sub { $scala->interval2freq( $_[0] - $scala->get_concertpitch ) };
-  }
 
-  return $scala, $p2f;
+    return $scala, $p2f;
 }
 
 sub _init_tension {
-  my ( $override, $ref_freq ) = @_;
-  $Flag_Tension = $override if defined $override;
+    my ( $override, $ref_freq ) = @_;
+    $Flag_Tension = $override if defined $override;
 
-  if ( defined $Flag_Tension ) {
-    if ( $Flag_Tension eq 'cope' ) {
-      $Tension =
-        Music::Tension::Cope->new(
-        defined $ref_freq ? ( reference_frequency => $ref_freq ) : () );
-      # untested with --tension
-      #   } elsif ( $Flag_Tension eq 'pl' ) {
-      #     $Tension = Music::Tension::PlompLevelt->new;
-    } else {
-      die "unknown tension method '$Flag_Tension'\n";
+    if ( defined $Flag_Tension ) {
+        if ( $Flag_Tension eq 'cope' ) {
+            $Tension =
+              Music::Tension::Cope->new(
+                defined $ref_freq ? ( reference_frequency => $ref_freq ) : () );
+            # untested with --tension
+            #   } elsif ( $Flag_Tension eq 'pl' ) {
+            #     $Tension = Music::Tension::PlompLevelt->new;
+        } else {
+            die "unknown tension method '$Flag_Tension'\n";
+        }
     }
-  }
 }
 
 sub adjacent_interval_content {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts, 'scaledegrees|sd=i' => \my $sd );
-  $Atu->scale_degrees($sd) if $sd;
-  emit_pitch_set(
-    scalar $Atu->adjacent_interval_content( args2pitchset(@args) ),
-    lyflag => 0,
-    rs     => '',
-  );
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts, 'scaledegrees|sd=i' => \my $sd );
+    $Atu->scale_degrees($sd) if $sd;
+    emit_pitch_set(
+        scalar $Atu->adjacent_interval_content( args2pitchset(@args) ),
+        lyflag => 0,
+        rs     => '',
+    );
 }
 
 sub args2pitchset {
-  my (@args) = @_;
+    my (@args) = @_;
 
-  if ( !@args or ( @args == 1 and $args[0] eq '-' ) ) {
-    chomp( @args = readline *STDIN );
-  }
-
-  my $pitch_set;
-  if ( $args[0] =~ m/($FORTE_NUMBER_RE)/ ) {
-    $pitch_set = $Atu->forte2pcs($1);
-    die "unknown Forte Number '$args[0]'\n" if !defined $pitch_set;
-  } else {
-    for my $arg (@args) {
-      for my $p ( $arg =~ /(-?\d+|\w+)/g ) {
-        # NOTE this tosses out 's' or 'r' silent or rest stuff as those do not
-        # matter for the mostly atonal routines this code handles.
-        push @$pitch_set, grep defined, $Lyu->notes2pitches($p);
-      }
+    if ( !@args or ( @args == 1 and $args[0] eq '-' ) ) {
+        chomp( @args = readline *STDIN );
     }
-  }
 
-  return $pitch_set;
+    my $pitch_set;
+    if ( $args[0] =~ m/($FORTE_NUMBER_RE)/ ) {
+        $pitch_set = $Atu->forte2pcs($1);
+        die "unknown Forte Number '$args[0]'\n" if !defined $pitch_set;
+    } else {
+        for my $arg (@args) {
+            for my $p ( $arg =~ /(-?\d+|\w+)/g ) {
+                # NOTE this tosses out 's' or 'r' silent or rest stuff as those do not
+                # matter for the mostly atonal routines this code handles.
+                push @$pitch_set, grep defined, $Lyu->notes2pitches($p);
+            }
+        }
+    }
+
+    return $pitch_set;
+}
+
+sub bark {
+    for my $freq ( @{ pitch2freq( \42, @_ ) } ) {
+        printf "%.2f\n", $Atu->bark_scale($freq);
+    }
 }
 
 sub basic {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
-  $Lyu->chrome('flats') if $Flag_Flat;
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
+    $Lyu->chrome('flats') if $Flag_Flat;
 
-  my $pset       = args2pitchset(@args);
-  my $prime_form = $Atu->prime_form($pset);
+    my $pset       = args2pitchset(@args);
+    my $prime_form = $Atu->prime_form($pset);
 
-  emit_pitch_set( $prime_form, rs => $Flag_Record_Sep );
-  emit_pitch_set(
-    scalar $Atu->interval_class_content($pset),
-    lyflag => 0,
-    rs     => '',
-  );
+    emit_pitch_set( $prime_form, rs => $Flag_Record_Sep );
+    emit_pitch_set(
+        scalar $Atu->interval_class_content($pset),
+        lyflag => 0,
+        rs     => '',
+    );
 
-  my $forte = $Atu->pcs2forte($pset) // '';
-  print $forte, ( exists $fnum2desc{$forte} ? "\t$fnum2desc{$forte}" : '' ), "\n";
+    my $forte = $Atu->pcs2forte($pset) // '';
+    print $forte, ( exists $fnum2desc{$forte} ? "\t$fnum2desc{$forte}" : '' ), "\n";
 
-  my $half_prime = $Atu->half_prime_form($pset);
-  if ( "@$half_prime" ne "@$prime_form" ) {
-    emit_pitch_set( $half_prime, has_nl => 1, rs => $Flag_Record_Sep );
-    print "\thalf_prime\n";
-  }
+    my $half_prime = $Atu->half_prime_form($pset);
+    if ( "@$half_prime" ne "@$prime_form" ) {
+        emit_pitch_set( $half_prime, has_nl => 1, rs => $Flag_Record_Sep );
+        print "\thalf_prime\n";
+    }
 
-  if ($Flag_Tension) {
-    _init_tension();
-    my ( $sum, $min, $max, undef ) = $Tension->vertical($pset);
-    printf "%.03f  %.03f  %.03f\n", $sum, $min, $max;
-  }
+    if ($Flag_Tension) {
+        _init_tension();
+        my ( $sum, $min, $max, undef ) = $Tension->vertical($pset);
+        printf "%.03f  %.03f  %.03f\n", $sum, $min, $max;
+    }
 }
 
 # Converts [x..x..x...x.x...] form to (0,3,6,10,12) set form
 sub beats2set {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts, 'scaledegrees|sd=i' => \my $sd, )
-    or print_help();
-  if ($sd) {
-    $Atu->scale_degrees($sd);
-  } else {
-    $sd = $Atu->scale_degrees;
-  }
-
-  my $arg = "@ARGV";
-  $arg =~ tr/x.//cd;
-
-  my @set;
-  my $i = 0;
-  for my $l ( split //, $arg ) {
-    if ( $l eq 'x' ) {
-      push @set, $i;
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts, 'scaledegrees|sd=i' => \my $sd, )
+      or print_help();
+    if ($sd) {
+        $Atu->scale_degrees($sd);
+    } else {
+        $sd = $Atu->scale_degrees;
     }
-    $i++;
-  }
-  die "error: beats in input exceeds available ($i > $sd)\n" if $i > $sd;
-  if ( $i < $sd ) {
-    warn "notice: incomplete beats ($i < $sd)\n" unless $Flag_Quiet;
-  }
 
-  my $lyify = $Flag_Lyout;
-  if ( $sd != 12 ) {
-    $lyify = 0;
-  }
-  emit_pitch_set( \@set, lyflag => $lyify, rs => $Flag_Record_Sep );
+    my $arg = "@ARGV";
+    $arg =~ tr/x.//cd;
+
+    my @set;
+    my $i = 0;
+    for my $l ( split //, $arg ) {
+        if ( $l eq 'x' ) {
+            push @set, $i;
+        }
+        $i++;
+    }
+    die "error: beats in input exceeds available ($i > $sd)\n" if $i > $sd;
+    if ( $i < $sd ) {
+        warn "notice: incomplete beats ($i < $sd)\n" unless $Flag_Quiet;
+    }
+
+    my $lyify = $Flag_Lyout;
+    if ( $sd != 12 ) {
+        $lyify = 0;
+    }
+    emit_pitch_set( \@set, lyflag => $lyify, rs => $Flag_Record_Sep );
 }
 
-# TODO but would also need means to encode all the different possible
-# rules that could be passed to this - probably easier to write a temp
-# script and just list the required data structures.
-#sub check_melody {
-#  my (@args) = @_;
-#  # copied from ly2pitch sub to obtain a list of pitch numbers
-#  GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
-#
-#  my $mode = 'absolute';
-#  GetOptionsFromArray( \@args, @Std_Opts, 'relative=s' => \my $relative, )
-#    or print_help();
-#
-#  $Lyu->ignore_register(0);
-#  $Lyu->keep_state(1);
-#  $Lyu->sticky_state(1);
-#  if ( defined $relative ) {
-#    if ( $relative =~ m/^\d+$/ ) {
-#      die "error: relative must be note name\n";
-#    }
-#    $Lyu->mode('relative');
-#    $Lyu->prev_note($relative);
-#  } else {
-#    $Lyu->mode('absolute');
-#  }
-#
-#  my @notes;
-#  if ( !@args or ( @args == 1 and $args[0] eq '-' ) ) {
-#    chomp( @args = readline *STDIN );
-#  }
-#
-#  # split input, as lilypond ' really do not suit the Unix shell, so
-#  # are best enclosed in "" blocks
-#  for my $arg (@args) {
-#    push @notes, split ' ', $arg;
-#  }
-#
-#  if ( !@notes ) {
-#    die "Usage: $0 check_melody [--relative=note] [-|notes...]\n";
-#  }
-#
-#  my @pitches = $Lyu->notes2pitches(@notes);
-#  my ($is_ok, $results) = $Atu->check_melody(TODO params, \@pitches);
-#  if (!$is_ok) {
-#    warn "fail\n";
-#    use Data::Dumper; warn Dumper $results;
-#    exit 1;
-#  }
-#}
-
 sub circular_permute {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
-  $Lyu->chrome('flats') if $Flag_Flat;
-  emit_pitch_set( $Atu->circular_permute( args2pitchset(@args) ) );
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
+    $Lyu->chrome('flats') if $Flag_Flat;
+    emit_pitch_set( $Atu->circular_permute( args2pitchset(@args) ) );
 }
 
 sub combos {
-  my (@args) = @_;
-  my $mode = 'absolute';
-  GetOptionsFromArray(
-    \@args, @Std_Opts,
-    'concertfreq|cf=s'  => \my $concert_freq,
-    'concertpitch|cp=s' => \my $concert_pitch,
-    'pitches'           => \my $Flag_Pitches,
-    'relative=s'        => \my $relative,
-    'scala=s'           => \my $scala_file,
-  ) or print_help();
-  $Lyu->chrome('flats') if $Flag_Flat;
+    my (@args) = @_;
+    my $mode = 'absolute';
+    GetOptionsFromArray(
+        \@args, @Std_Opts,
+        'concertfreq|cf=s'  => \my $concert_freq,
+        'concertpitch|cp=s' => \my $concert_pitch,
+        'pitches'           => \my $Flag_Pitches,
+        'relative=s'        => \my $relative,
+        'scala=s'           => \my $scala_file,
+    ) or print_help();
+    $Lyu->chrome('flats') if $Flag_Flat;
 
-  $Lyu->ignore_register(0);
-  $Lyu->keep_state(1);
-  $Lyu->sticky_state(1);
-  if ( defined $relative ) {
-    if ( $relative =~ m/^\d+$/ ) {
-      die "error: relative must be note name\n";
-    }
-    $Lyu->mode('relative');
-    $Lyu->prev_note($relative);
-  } else {
-    $Lyu->mode('absolute');
-  }
-
-  my ( $scala, $p2f ) = _init_scala( $concert_freq, $concert_pitch, $scala_file );
-
-  my @freqs;
-  if ( !@args or ( @args == 1 and $args[0] eq '-' ) ) {
-    while ( my $line = readline *STDIN ) {
-      push @freqs, split ' ', $line;
-    }
-  } else {
-    for my $arg (@args) {
-      push @freqs, split ' ', $arg;
-    }
-  }
-
-  if ( @freqs < 2 ) {
-    die "Usage: $0 combos [--pitches [--relative=note]] f1 f2 [f3...]\n";
-  }
-
-  # turn on pitch mode if first note looks more a note than a number
-  if ( $Flag_Pitches or $freqs[0] =~ m/[a-g]/ ) {
-    @freqs = map $p2f->($_), $Lyu->notes2pitches(@freqs);
-  }
-
-  for my $i ( 1 .. $#freqs ) {
-    my $plus  = $freqs[0] + $freqs[1];
-    my $minus = $freqs[$i] - $freqs[0];
-
-    # (try to) Figure out MIDI pitch of combination tone, and what the
-    # error is due to presumed equal temperament tuning of said MIDI
-    # pitches.
-    my $plus_pitch  = 0;
-    my $minus_pitch = 0;
-    my $plus_delta  = 0;
-    my $minus_delta = 0;
-    my $errstr      = '';
-    try {
-      $plus_pitch  = $scala->freq2pitch($plus);
-      $minus_pitch = $scala->freq2pitch($minus);
-      $plus_delta  = $p2f->($plus_pitch) - $plus;
-      $minus_delta = $p2f->($minus_pitch) - $minus;
-    }
-    catch {
-      $errstr = "\t/!\\ pitch out of bounds";
-    };
-
-    # best effort to get a note name, revert to pitch numbers if out of range
-    if ( $Flag_Lyout and length $errstr == 0 ) {
-      try {
-        $plus_pitch  = $Lyu->p2ly($plus_pitch);
-        $minus_pitch = $Lyu->p2ly($minus_pitch);
-      }
-      catch {
-        $errstr = "\t/!\\ ly note out of bounds";
-      };
+    $Lyu->ignore_register(0);
+    $Lyu->keep_state(1);
+    $Lyu->sticky_state(1);
+    if ( defined $relative ) {
+        if ( $relative =~ m/^\d+$/ ) {
+            die "error: relative must be note name\n";
+        }
+        $Lyu->mode('relative');
+        $Lyu->prev_note($relative);
+    } else {
+        $Lyu->mode('absolute');
     }
 
-    printf "%.2f+%.2f = %.2f\t(%s error %.2f)%s\n", $freqs[0], $freqs[$i],
-      $plus,
-      $plus_pitch, $plus_delta, $errstr;
-    printf "%.2f-%.2f = %.2f\t(%s error %.2f)%s\n", $freqs[$i], $freqs[0],
-      $minus,
-      $minus_pitch, $minus_delta, $errstr;
-  }
+    my ( $scala, $p2f ) = _init_scala( $concert_freq, $concert_pitch, $scala_file );
+
+    my @freqs;
+    if ( !@args or ( @args == 1 and $args[0] eq '-' ) ) {
+        while ( my $line = readline *STDIN ) {
+            push @freqs, split ' ', $line;
+        }
+    } else {
+        for my $arg (@args) {
+            push @freqs, split ' ', $arg;
+        }
+    }
+
+    if ( @freqs < 2 ) {
+        die "Usage: $0 combos [--pitches [--relative=note]] f1 f2 [f3...]\n";
+    }
+
+    # turn on pitch mode if first note looks more a note than a number
+    if ( $Flag_Pitches or $freqs[0] =~ m/[a-g]/ ) {
+        @freqs = map $p2f->($_), $Lyu->notes2pitches(@freqs);
+    }
+
+    for my $i ( 1 .. $#freqs ) {
+        my $plus  = $freqs[0] + $freqs[1];
+        my $minus = $freqs[$i] - $freqs[0];
+
+        # (try to) Figure out MIDI pitch of combination tone, and what the
+        # error is due to presumed equal temperament tuning of said MIDI
+        # pitches.
+        my $plus_pitch  = 0;
+        my $minus_pitch = 0;
+        my $plus_delta  = 0;
+        my $minus_delta = 0;
+        my $errstr      = '';
+        eval {
+            $plus_pitch  = $scala->freq2pitch($plus);
+            $minus_pitch = $scala->freq2pitch($minus);
+            $plus_delta  = $p2f->($plus_pitch) - $plus;
+            $minus_delta = $p2f->($minus_pitch) - $minus;
+        };
+        $errstr = "\t/!\\ pitch out of bounds" if $@;
+
+        # best effort to get a note name, revert to pitch numbers if out of range
+        if ( $Flag_Lyout and length $errstr == 0 ) {
+            eval {
+                $plus_pitch  = $Lyu->p2ly($plus_pitch);
+                $minus_pitch = $Lyu->p2ly($minus_pitch);
+            };
+            $errstr = "\t/!\\ ly note out of bounds" if $@;
+        }
+
+        printf "%.2f+%.2f = %.2f\t(%s error %.2f)%s\n", $freqs[0], $freqs[$i],
+          $plus,
+          $plus_pitch, $plus_delta, $errstr;
+        printf "%.2f-%.2f = %.2f\t(%s error %.2f)%s\n", $freqs[$i], $freqs[0],
+          $minus,
+          $minus_pitch, $minus_delta, $errstr;
+    }
 }
 
 sub complement {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
-  $Lyu->chrome('flats') if $Flag_Flat;
-  emit_pitch_set( $Atu->complement( args2pitchset(@args) ) );
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
+    $Lyu->chrome('flats') if $Flag_Flat;
+    emit_pitch_set( $Atu->complement( args2pitchset(@args) ) );
 }
 
 sub emit_pitch_set {
-  my ( $pset, %params ) = @_;
+    my ( $pset, %params ) = @_;
 
-  my $lyify = exists $params{lyflag} ? $params{lyflag} : $Flag_Lyout;
-  my $rs    = exists $params{rs}     ? $params{rs}     : ' ';
+    my $lyify = exists $params{lyflag} ? $params{lyflag} : $Flag_Lyout;
+    my $rs    = exists $params{rs}     ? $params{rs}     : ' ';
 
-  my $has_nl = exists $params{has_nl} ? $params{has_nl} : 0;
-  my $str = '';
-  for my $i (@$pset) {
-    if ( ref $i eq 'ARRAY' ) {
-      $has_nl = emit_pitch_set( $i, %params );
-    } else {
-      $str .= ( $lyify ? $Lyu->p2ly($i) : $i ) . $rs;
+    my $has_nl = exists $params{has_nl} ? $params{has_nl} : 0;
+    my $str    = '';
+    for my $i (@$pset) {
+        if ( ref $i eq 'ARRAY' ) {
+            $has_nl = emit_pitch_set( $i, %params );
+        } else {
+            $str .= ( $lyify ? $Lyu->p2ly($i) : $i ) . $rs;
+        }
     }
-  }
-  $str =~ s/$rs\z//;
-  $str .= "\n" unless $has_nl;
-  print $str;
-  return 1;
+    $str =~ s/$rs\z//;
+    $str .= "\n" unless $has_nl;
+    print $str;
+    return 1;
 }
 
 sub equivs {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
-  $Lyu->chrome('flats') if $Flag_Flat;
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
+    $Lyu->chrome('flats') if $Flag_Flat;
 
-  my ( @transpose, @transpose_invert, %seen );
-  my $pset = args2pitchset(@args);
+    my ( @transpose, @transpose_invert, %seen );
+    my $pset = args2pitchset(@args);
 
-  for my $i ( 0 .. $Atu->scale_degrees - 1 ) {
-    my $set = ( $Atu->normal_form( $Atu->transpose( $i, $pset ) ) )[0];
-    if ( !$seen{"@$set"}++ ) {
-      push @transpose, $set;
-      my $iset =
-        ( $Atu->normal_form( $Atu->transpose_invert( $i, 0, $pset ) ) )[0];
-      push @transpose_invert, $iset if !$seen{"@$iset"}++;
+    for my $i ( 0 .. $Atu->scale_degrees - 1 ) {
+        my $set = ( $Atu->normal_form( $Atu->transpose( $i, $pset ) ) )[0];
+        if ( !$seen{"@$set"}++ ) {
+            push @transpose, $set;
+            my $iset =
+              ( $Atu->normal_form( $Atu->transpose_invert( $i, 0, $pset ) ) )[0];
+            push @transpose_invert, $iset if !$seen{"@$iset"}++;
+        }
     }
-  }
 
-  emit_pitch_set( \@transpose )        if @transpose;
-  emit_pitch_set( \@transpose_invert ) if @transpose_invert;
+    emit_pitch_set( \@transpose )        if @transpose;
+    emit_pitch_set( \@transpose_invert ) if @transpose_invert;
 }
 
 sub findall {
-  my (@args) = @_;
-  GetOptionsFromArray(
-    \@args, @Std_Opts,
-    'exclude=s' => \my $excludes,
-    'fn=s'      => \my $desired_forte_nums,
-    'root=s'    => \my $root_pitch
-  );
-  $Lyu->chrome('flats') if $Flag_Flat;
+    my (@args) = @_;
+    GetOptionsFromArray(
+        \@args, @Std_Opts,
+        'exclude=s' => \my $excludes,
+        'fn=s'      => \my $desired_forte_nums,
+        'root=s'    => \my $root_pitch
+    );
+    $Lyu->chrome('flats') if $Flag_Flat;
 
-  my $desired = args2pitchset(@args);
-  my %excludes;
-  @excludes{ $Lyu->notes2pitches( split /[, ]+/, $excludes ) } = ()
-    if defined $excludes;
-  $root_pitch = $Lyu->notes2pitches($root_pitch) if defined $root_pitch;
-  my $fn_re;
-  if ( defined $desired_forte_nums ) {
-    $fn_re = '^[' . join( '', parse_range($desired_forte_nums) ) . ']$';
-  }
-
-  my $fnums = $Atu->fnums;
-  for my $fnum ( sort keys %$fnums ) {
+    my $desired = args2pitchset(@args);
+    my %excludes;
+    @excludes{ $Lyu->notes2pitches( split /[, ]+/, $excludes ) } = ()
+      if defined $excludes;
+    $root_pitch = $Lyu->notes2pitches($root_pitch) if defined $root_pitch;
+    my $fn_re;
     if ( defined $desired_forte_nums ) {
-      ( my $prefix = $fnum ) =~ s/[-].+//;
-      next if $prefix !~ m/$fn_re/;
+        $fn_re = '^[' . join( '', parse_range($desired_forte_nums) ) . ']$';
     }
-    _findps( $fnums->{$fnum}, $desired, $root_pitch, \%excludes, $fnum );
-  }
+
+    my $fnums = $Atu->fnums;
+    for my $fnum ( sort keys %$fnums ) {
+        if ( defined $desired_forte_nums ) {
+            ( my $prefix = $fnum ) =~ s/[-].+//;
+            next if $prefix !~ m/$fn_re/;
+        }
+        _findps( $fnums->{$fnum}, $desired, $root_pitch, \%excludes, $fnum );
+    }
 }
 
 sub findin {
-  my (@args) = @_;
-  GetOptionsFromArray(
-    \@args, @Std_Opts,
-    'exclude=s'    => \my $excludes,
-    'pitchset|P=s' => \my $base_input,
-    'root=s'       => \my $root_pitch
-  ) or print_help();
+    my (@args) = @_;
+    GetOptionsFromArray(
+        \@args, @Std_Opts,
+        'exclude=s'    => \my $excludes,
+        'pitchset|P=s' => \my $base_input,
+        'root=s'       => \my $root_pitch
+    ) or print_help();
 
-  die "error: atonal-util findin needs --pitchset=... option\n"
-    if !defined $base_input;
+    die "error: atonal-util findin needs --pitchset=... option\n"
+      if !defined $base_input;
 
-  $Lyu->chrome('flats') if $Flag_Flat;
+    $Lyu->chrome('flats') if $Flag_Flat;
 
-  my $ps_base;
-  if ( $base_input =~ m/^\d-/ ) {
-    $ps_base = $Atu->forte2pcs($base_input);
-    die "unknown Forte Number '$base_input'\n" if !defined $ps_base;
-  } else {
-    $ps_base = args2pitchset( split /[ ,]/, $base_input );
-  }
-  my $desired = args2pitchset(@args);
-  my %excludes;
-  @excludes{ $Lyu->notes2pitches( split /[, ]+/, $excludes ) } = ()
-    if defined $excludes;
-  $root_pitch = $Lyu->notes2pitches($root_pitch) if defined $root_pitch;
+    my $ps_base;
+    if ( $base_input =~ m/^\d-/ ) {
+        $ps_base = $Atu->forte2pcs($base_input);
+        die "unknown Forte Number '$base_input'\n" if !defined $ps_base;
+    } else {
+        $ps_base = args2pitchset( split /[ ,]/, $base_input );
+    }
+    my $desired = args2pitchset(@args);
+    my %excludes;
+    @excludes{ $Lyu->notes2pitches( split /[, ]+/, $excludes ) } = ()
+      if defined $excludes;
+    $root_pitch = $Lyu->notes2pitches($root_pitch) if defined $root_pitch;
 
-  if ( @$desired > @$ps_base ) {
-    die "cannot desire more than is present\n";
-  }
+    if ( @$desired > @$ps_base ) {
+        die "cannot desire more than is present\n";
+    }
 
-  _findps( $ps_base, $desired, $root_pitch, \%excludes );
+    _findps( $ps_base, $desired, $root_pitch, \%excludes );
 }
 
 sub _findps {
-  my ( $ps_base, $desired, $root_pitch, $excludes, $fnum ) = @_;
-  $fnum //= '-';
-  $excludes //= {};
+    my ( $ps_base, $desired, $root_pitch, $excludes, $fnum ) = @_;
+    $fnum     //= '-';
+    $excludes //= {};
 
-  _init_tension() if $Flag_Tension;
+    _init_tension() if $Flag_Tension;
 
-  my $ps_width = 24 - ( $Flag_Lyout ? 0 : 6 );
+    my $ps_width = 24 - ( $Flag_Lyout ? 0 : 6 );
 
-TRANS: for my $i ( 0 .. $Atu->scale_degrees - 1 ) {
-    my %tps;
-    @tps{ @{ $Atu->transpose( $i, $ps_base ) } } = ();
-    if ( all { exists $tps{$_} } @$desired ) {
-      my @pitches = @{ $Atu->transpose( $i, $ps_base ) };
-      next if defined $root_pitch and $pitches[0] != $root_pitch;
-      if (%$excludes) {
-        for my $p (@pitches) {
-          next TRANS if exists $excludes->{$p};
+  TRANS: for my $i ( 0 .. $Atu->scale_degrees - 1 ) {
+        my %tps;
+        @tps{ @{ $Atu->transpose( $i, $ps_base ) } } = ();
+        if ( all { exists $tps{$_} } @$desired ) {
+            my @pitches = @{ $Atu->transpose( $i, $ps_base ) };
+            next if defined $root_pitch and $pitches[0] != $root_pitch;
+            if (%$excludes) {
+                for my $p (@pitches) {
+                    next TRANS if exists $excludes->{$p};
+                }
+            }
+
+            my $tstr = '';
+            if ($Flag_Tension) {
+                $tstr = sprintf "\t%.03f  %.03f  %.03f", $Tension->vertical( \@pitches );
+            }
+
+            @pitches = $Lyu->p2ly(@pitches) if $Flag_Lyout;
+
+            printf "%s\tT(%d)\t%-${ps_width}s%s\n", $fnum, $i, join( ',', @pitches ), $tstr;
         }
-      }
-
-      my $tstr = '';
-      if ($Flag_Tension) {
-        $tstr = sprintf "\t%.03f  %.03f  %.03f", $Tension->vertical( \@pitches );
-      }
-
-      @pitches = $Lyu->p2ly(@pitches) if $Flag_Lyout;
-
-      printf "%s\tT(%d)\t%-${ps_width}s%s\n", $fnum, $i, join( ',', @pitches ), $tstr;
     }
-  }
 
-TRANSINV: for my $i ( 0 .. $Atu->scale_degrees - 1 ) {
-    my %ips;
-    @ips{ @{ $Atu->transpose_invert( $i, 0, $ps_base ) } } = ();
-    if ( all { exists $ips{$_} } @$desired ) {
-      my @pitches = @{ $Atu->transpose_invert( $i, 0, $ps_base ) };
-      next if defined $root_pitch and $pitches[0] != $root_pitch;
-      if (%$excludes) {
-        for my $p (@pitches) {
-          next TRANSINV if exists $excludes->{$p};
+  TRANSINV: for my $i ( 0 .. $Atu->scale_degrees - 1 ) {
+        my %ips;
+        @ips{ @{ $Atu->transpose_invert( $i, 0, $ps_base ) } } = ();
+        if ( all { exists $ips{$_} } @$desired ) {
+            my @pitches = @{ $Atu->transpose_invert( $i, 0, $ps_base ) };
+            next if defined $root_pitch and $pitches[0] != $root_pitch;
+            if (%$excludes) {
+                for my $p (@pitches) {
+                    next TRANSINV if exists $excludes->{$p};
+                }
+            }
+
+            my $tstr = '';
+            if ($Flag_Tension) {
+                $tstr = sprintf "\t%.03f  %.03f  %.03f", $Tension->vertical( \@pitches );
+            }
+
+            @pitches = $Lyu->p2ly(@pitches) if $Flag_Lyout;
+
+            printf "%s\tTi(%d)\t%-${ps_width}s%s\n", $fnum, $i,
+              join( ',', @pitches ), $tstr;
         }
-      }
-
-      my $tstr = '';
-      if ($Flag_Tension) {
-        $tstr = sprintf "\t%.03f  %.03f  %.03f", $Tension->vertical( \@pitches );
-      }
-
-      @pitches = $Lyu->p2ly(@pitches) if $Flag_Lyout;
-
-      printf "%s\tTi(%d)\t%-${ps_width}s%s\n", $fnum, $i,
-        join( ',', @pitches ), $tstr;
     }
-  }
 }
 
 sub fnums {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
-  _init_tension('cope') if $Flag_Tension;
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
+    _init_tension('cope') if $Flag_Tension;
 
-  my $fns = $Atu->fnums;
-  for my $fn ( sort keys %$fns ) {
-    my $pset = $fns->{$fn};
-    my $icc  = $Atu->interval_class_content($pset);
+    my $fns = $Atu->fnums;
+    for my $fn ( sort keys %$fns ) {
+        my $pset = $fns->{$fn};
+        my $icc  = $Atu->interval_class_content($pset);
 
-    my $tstr = '';
-    if ($Flag_Tension) {
-      $tstr = sprintf "\t%.03f  %.03f  %.03f", $Tension->vertical($pset);
+        my $tstr = '';
+        if ($Flag_Tension) {
+            $tstr = sprintf "\t%.03f  %.03f  %.03f", $Tension->vertical($pset);
+        }
+
+        printf "%s\t%-16s\t%-8s%s\n", $fn, join( ',', @$pset ),
+          join( '', @$icc ), $tstr;
     }
-
-    printf "%s\t%-16s\t%-8s%s\n", $fn, join( ',', @$pset ),
-      join( '', @$icc ), $tstr;
-  }
 }
 
 sub forte2pcs {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
 
-  emit_pitch_set( $Atu->forte2pcs( $args[0] ), rs => $Flag_Record_Sep );
+    emit_pitch_set( $Atu->forte2pcs( $args[0] ), rs => $Flag_Record_Sep );
 }
 
 sub freq2pitch {
-  my (@args) = @_;
-  my $mode = 'absolute';
-  GetOptionsFromArray(
-    \@args,
-    @Std_Opts,
-    'concertfreq|cf=s'  => \my $concert_freq,
-    'concertpitch|cp=s' => \my $concert_pitch,
-    'relative=s'        => \my $relative,
-    'scala=s'           => \my $scala_file,
-  ) or print_help();
+    my (@args) = @_;
+    my $mode = 'absolute';
+    GetOptionsFromArray(
+        \@args,
+        @Std_Opts,
+        'concertfreq|cf=s'  => \my $concert_freq,
+        'concertpitch|cp=s' => \my $concert_pitch,
+        'relative=s'        => \my $relative,
+        'scala=s'           => \my $scala_file,
+    ) or print_help();
 
-  my ( $scala, $p2f ) = _init_scala( $concert_freq, $concert_pitch, $scala_file );
+    my ( $scala, $p2f ) = _init_scala( $concert_freq, $concert_pitch, $scala_file );
 
-  if ( !@args or ( @args == 1 and $args[0] eq '-' ) ) {
-    chomp( @args = readline *STDIN );
-  }
+    if ( !@args or ( @args == 1 and $args[0] eq '-' ) ) {
+        chomp( @args = readline *STDIN );
+    }
 
-  # Not the default, so if things persist or chain due to some rewrite,
-  # would need to save the old or create a new object or whatever
-  $Lyu->keep_state(1);
-  $Lyu->mode('absolute');
+    # Not the default, so if things persist or chain due to some rewrite,
+    # would need to save the old or create a new object or whatever
+    $Lyu->keep_state(1);
+    $Lyu->mode('absolute');
 
-  for my $freq ( grep looks_like_number $_, map { split ' ', $_ } @args ) {
-    die "frequency '$freq' out of range" if $freq < 8 or $freq > 4200;
+    for my $freq ( grep looks_like_number $_, map { split ' ', $_ } @args ) {
+        die "frequency '$freq' out of range" if $freq < 8 or $freq > 4200;
 
-    my $p = $scala->freq2pitch($freq);
-    $p = $Lyu->p2ly($p) if $Flag_Lyout;
-    printf "%.2f\t%s\n", $freq, $p;
-  }
+        my $p = $scala->freq2pitch($freq);
+
+        # how off is the frequency from the given scale and concertfreq?
+        my $pitch_freq = $scala->pitch2freq($p);
+        my $error      = $freq - $pitch_freq;
+
+        $p = $Lyu->p2ly($p) if $Flag_Lyout;
+
+        my $percent = abs($error) / $pitch_freq * 100;
+
+        printf "%.2f\t%s\t%+.2f\t%.2f%%\n", $freq, $p, $error, $percent;
+    }
 }
 
 sub gen_melody {
-  my (@args) = @_;
-  $Flag_Record_Sep = ' ';    # for easier feeding to ly-fu
-  GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
-  $Lyu->chrome('flats') if $Flag_Flat;
-  emit_pitch_set( $Atu->gen_melody, rs => $Flag_Record_Sep );
+    my (@args) = @_;
+    $Flag_Record_Sep = ' ';    # for easier feeding to ly-fu
+    GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
+    $Lyu->chrome('flats') if $Flag_Flat;
+    emit_pitch_set( $Atu->gen_melody, rs => $Flag_Record_Sep );
 }
 
 sub half_prime_form {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
-  $Lyu->chrome('flats') if $Flag_Flat;
-  emit_pitch_set( scalar $Atu->half_prime_form( args2pitchset(@args) ),
-    rs => $Flag_Record_Sep );
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
+    $Lyu->chrome('flats') if $Flag_Flat;
+    emit_pitch_set( scalar $Atu->half_prime_form( args2pitchset(@args) ),
+        rs => $Flag_Record_Sep );
 }
 
 sub interval_class_content {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts, 'scaledegrees|sd=i' => \my $sd );
-  $Atu->scale_degrees($sd) if $sd;
-  emit_pitch_set(
-    scalar $Atu->interval_class_content( args2pitchset(@args) ),
-    lyflag => 0,
-    rs     => '',
-  );
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts, 'scaledegrees|sd=i' => \my $sd );
+    $Atu->scale_degrees($sd) if $sd;
+    emit_pitch_set(
+        scalar $Atu->interval_class_content( args2pitchset(@args) ),
+        lyflag => 0,
+        rs     => '',
+    );
 }
 
 sub intervals2pcs {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts, 'pitch|n=s' => \my $start_pitch )
-    or print_help();
-  $start_pitch = $Lyu->notes2pitches( $start_pitch // 0 );
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts, 'pitch|n=s' => \my $start_pitch )
+      or print_help();
+    $start_pitch = $Lyu->notes2pitches( $start_pitch // 0 );
 
-  $Lyu->ignore_register(0);
+    $Lyu->ignore_register(0);
 
-  emit_pitch_set( $Atu->intervals2pcs( $start_pitch, args2pitchset(@args) ),
-    rs => $Flag_Record_Sep );
+    emit_pitch_set( $Atu->intervals2pcs( $start_pitch, args2pitchset(@args) ),
+        rs => $Flag_Record_Sep );
 }
 
 sub invariance_matrix {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts );
-  emit_pitch_set(
-    $Atu->invariance_matrix( args2pitchset(@args) ),
-    lyflag => 0,
-    rs     => $Flag_Record_Sep
-  );
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts );
+    emit_pitch_set(
+        $Atu->invariance_matrix( args2pitchset(@args) ),
+        lyflag => 0,
+        rs     => $Flag_Record_Sep
+    );
 }
 
 sub invariants {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
-  $Lyu->chrome('flats') if $Flag_Flat;
-  my $ps = args2pitchset(@args);
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
+    $Lyu->chrome('flats') if $Flag_Flat;
+    my $ps = args2pitchset(@args);
 
-  my %seen;
-  @seen{@$ps} = ();
+    my %seen;
+    @seen{@$ps} = ();
 
-  my $icc = scalar $Atu->interval_class_content($ps);
-  warn '[',
-    join( ',', map { $Flag_Lyout ? $Lyu->p2ly($_) : $_ } @$ps ),
-    '] icc ', join( '', @$icc ), "\n";
+    my $icc = scalar $Atu->interval_class_content($ps);
+    warn '[',
+      join( ',', map { $Flag_Lyout ? $Lyu->p2ly($_) : $_ } @$ps ),
+      '] icc ', join( '', @$icc ), "\n";
 
-  my $ps_len = 2 + @$ps * ( $Flag_Lyout ? 3 : 2 );
+    my $ps_len = 2 + @$ps * ( $Flag_Lyout ? 3 : 2 );
 
-  for my $t ( 0 .. $Atu->scale_degrees - 1 ) {
-    my $tps = $Atu->transpose( $t, $ps );
-    my @t_invary;
-    for my $p (@$tps) {
-      push @t_invary, $p if exists $seen{$p};
+    for my $t ( 0 .. $Atu->scale_degrees - 1 ) {
+        my $tps = $Atu->transpose( $t, $ps );
+        my @t_invary;
+        for my $p (@$tps) {
+            push @t_invary, $p if exists $seen{$p};
+        }
+        if (@t_invary) {
+            my $fn = $Atu->pcs2forte( \@t_invary );
+            printf "%-6s [ %-${ps_len}s ] %s [ %-${ps_len}s ]", "T($t)",
+              join( ',', map { $Flag_Lyout ? $Lyu->p2ly($_) : $_ } @$tps ),
+              'ivars',
+              join( ',', map { $Flag_Lyout ? $Lyu->p2ly($_) : $_ } @t_invary );
+            print ' ', $fn if defined $fn;
+            print "\n";
+        }
     }
-    if (@t_invary) {
-      my $fn = $Atu->pcs2forte( \@t_invary );
-      printf "%-6s [ %-${ps_len}s ] %s [ %-${ps_len}s ]", "T($t)",
-        join( ',', map { $Flag_Lyout ? $Lyu->p2ly($_) : $_ } @$tps ),
-        'ivars',
-        join( ',', map { $Flag_Lyout ? $Lyu->p2ly($_) : $_ } @t_invary );
-      print ' ', $fn if defined $fn;
-      print "\n";
-    }
-  }
 
-  for my $t ( 0 .. $Atu->scale_degrees - 1 ) {
-    my $ips = $Atu->transpose_invert( $t, 0, $ps );
-    my @i_invary;
-    for my $p (@$ips) {
-      push @i_invary, $p if exists $seen{$p};
+    for my $t ( 0 .. $Atu->scale_degrees - 1 ) {
+        my $ips = $Atu->transpose_invert( $t, 0, $ps );
+        my @i_invary;
+        for my $p (@$ips) {
+            push @i_invary, $p if exists $seen{$p};
+        }
+        if (@i_invary) {
+            my $fn = $Atu->pcs2forte( \@i_invary );
+            printf "%-6s [ %-${ps_len}s ] %s [ %-${ps_len}s ]", "Ti($t)",
+              join( ',', map { $Flag_Lyout ? $Lyu->p2ly($_) : $_ } @$ips ),
+              'ivars',
+              join( ',', map { $Flag_Lyout ? $Lyu->p2ly($_) : $_ } @i_invary );
+            print ' ', $fn if defined $fn;
+            print "\n";
+        }
     }
-    if (@i_invary) {
-      my $fn = $Atu->pcs2forte( \@i_invary );
-      printf "%-6s [ %-${ps_len}s ] %s [ %-${ps_len}s ]", "Ti($t)",
-        join( ',', map { $Flag_Lyout ? $Lyu->p2ly($_) : $_ } @$ips ),
-        'ivars',
-        join( ',', map { $Flag_Lyout ? $Lyu->p2ly($_) : $_ } @i_invary );
-      print ' ', $fn if defined $fn;
-      print "\n";
-    }
-  }
 }
 
 sub invert {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts, 'axis|n=s' => \my $axis, )
-    or print_help();
-  $Lyu->chrome('flats') if $Flag_Flat;
-  $axis = defined $axis ? $Lyu->notes2pitches($axis) : 0;
-  emit_pitch_set( $Atu->invert( $axis, args2pitchset(@args) ),
-    rs => $Flag_Record_Sep );
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts, 'axis|n=s' => \my $axis, )
+      or print_help();
+    $Lyu->chrome('flats') if $Flag_Flat;
+    $axis = defined $axis ? $Lyu->notes2pitches($axis) : 0;
+    emit_pitch_set( $Atu->invert( $axis, args2pitchset(@args) ),
+        rs => $Flag_Record_Sep );
 }
 
 sub ly2pitch {
-  my (@args) = @_;
-  my $mode = 'absolute';
-  GetOptionsFromArray( \@args, @Std_Opts, 'relative=s' => \my $relative, )
-    or print_help();
+    my (@args) = @_;
+    my $mode = 'absolute';
+    GetOptionsFromArray( \@args, @Std_Opts, 'relative=s' => \my $relative, )
+      or print_help();
 
-  $Lyu->ignore_register(0);
-  $Lyu->keep_state(1);
-  $Lyu->sticky_state(1);
-  if ( defined $relative ) {
-    if ( $relative =~ m/^\d+$/ ) {
-      die "error: relative must be note name\n";
+    $Lyu->ignore_register(0);
+    $Lyu->keep_state(1);
+    $Lyu->sticky_state(1);
+    if ( defined $relative ) {
+        if ( $relative =~ m/^\d+$/ ) {
+            die "error: relative must be note name\n";
+        }
+        $Lyu->mode('relative');
+        $Lyu->prev_note($relative);
+    } else {
+        $Lyu->mode('absolute');
     }
-    $Lyu->mode('relative');
-    $Lyu->prev_note($relative);
-  } else {
-    $Lyu->mode('absolute');
-  }
 
-  my @notes;
-  if ( !@args or ( @args == 1 and $args[0] eq '-' ) ) {
-    chomp( @args = readline *STDIN );
-  }
+    my @notes;
+    if ( !@args or ( @args == 1 and $args[0] eq '-' ) ) {
+        chomp( @args = readline *STDIN );
+    }
 
-  # split input, as lilypond ' really do not suit the Unix shell, so
-  # are best enclosed in "" blocks
-  for my $arg (@args) {
-    push @notes, split ' ', $arg;
-  }
+    # split input, as lilypond ' really do not suit the Unix shell, so
+    # are best enclosed in "" blocks
+    for my $arg (@args) {
+        push @notes, split ' ', $arg;
+    }
 
-  if ( !@notes ) {
-    die "Usage: $0 ly2pitch [--relative=note] [-|notes...]\n";
-  }
+    if ( !@notes ) {
+        die "Usage: $0 ly2pitch [--relative=note] [-|notes...]\n";
+    }
 
-  print join( ' ', $Lyu->notes2pitches(@notes) ), "\n";
+    print join( ' ', $Lyu->notes2pitches(@notes) ), "\n";
 }
 
 sub ly2struct {
-  my (@args) = @_;
-  my $mode   = 'absolute';
-  my $beats  = 4;
-  my $tempo  = 60;
-  GetOptionsFromArray(
-    \@args, @Std_Opts,
-    'beats=i'           => \$beats,
-    'concertfreq|cf=s'  => \my $concert_freq,
-    'concertpitch|cp=s' => \my $concert_pitch,
-    'relative=s'        => \my $relative,
-    'scala=s'           => \my $scala_file,
-    'tempo=i'           => \$tempo,
-  ) or print_help();
+    my (@args) = @_;
+    my $mode   = 'absolute';
+    my $beats  = 4;
+    my $tempo  = 60;
+    GetOptionsFromArray(
+        \@args, @Std_Opts,
+        'beats=i'           => \$beats,
+        'concertfreq|cf=s'  => \my $concert_freq,
+        'concertpitch|cp=s' => \my $concert_pitch,
+        'relative=s'        => \my $relative,
+        'scala=s'           => \my $scala_file,
+        'tempo=i'           => \$tempo,
+    ) or print_help();
 
-  my $beat_ms = bpm_to_ms( $tempo, $beats );
-  my ( $scala, $p2f ) = _init_scala( $concert_freq, $concert_pitch, $scala_file );
+    my $beat_ms = bpm_to_ms( $tempo, $beats );
+    my ( $scala, $p2f ) = _init_scala( $concert_freq, $concert_pitch, $scala_file );
 
-  $Lyu->ignore_register(0);
-  $Lyu->keep_state(1);
-  $Lyu->sticky_state(1);
-  if ( defined $relative ) {
-    if ( $relative =~ m/^\d+$/ ) {
-      die "error: relative must be note name\n";
+    $Lyu->ignore_register(0);
+    $Lyu->keep_state(1);
+    $Lyu->sticky_state(1);
+    if ( defined $relative ) {
+        if ( $relative =~ m/^\d+$/ ) {
+            die "error: relative must be note name\n";
+        }
+        $Lyu->mode('relative');
+        $Lyu->prev_note($relative);
+    } else {
+        $Lyu->mode('absolute');
     }
-    $Lyu->mode('relative');
-    $Lyu->prev_note($relative);
-  } else {
-    $Lyu->mode('absolute');
-  }
 
-  my @notes;
-  if ( !@args or ( @args == 1 and $args[0] eq '-' ) ) {
-    chomp( @args = readline *STDIN );
-  }
-
-  # split input, as lilypond ' really do not suit the Unix shell, so
-  # are best enclosed in "" blocks
-  for my $arg (@args) {
-    push @notes, split ' ', $arg;
-  }
-
-  if ( !@notes ) {
-    die "Usage: $0 ly2pitch [--relative=note] [-|notes...]\n";
-  }
-
-  my $prev_dur = $beat_ms / 4;
-  for my $note (@notes) {
-    my $pitch = $Lyu->notes2pitches($note);
-    die "pitch '$pitch' out of range\n"
-      if defined $pitch and ( $pitch < 0 or $pitch > 108 );
-    my $duration;
-    if (
-      $note =~ m{ (?<dur>\d+) (?<dots>[.]+)? (?:\*(?<rnumer>\d+)/(?<rdenom>\d+))? }x )
-    {
-      my $dur   = $beats / $+{dur};
-      my $dots  = exists $+{dots} ? length $+{dots} : 0;
-      my $ratio = exists $+{rnumer} ? $+{rnumer} / $+{rdenom} : 1;
-      $dur *= $ratio;
-      $duration = ( 2 * $dur - ( $dur / 2**$dots ) ) * $beat_ms;
+    my @notes;
+    if ( !@args or ( @args == 1 and $args[0] eq '-' ) ) {
+        chomp( @args = readline *STDIN );
     }
-    $duration //= $prev_dur;
-    my $freq = ( defined $pitch and $pitch != 0 ) ? $p2f->($pitch) : 0;
-    # zero precision due to Arduino tone call accepting integers
-    printf "\t{ %.0f, %.0f },\t/* %s */\n", $freq, $duration, $note;
-    $prev_dur = $duration;
-  }
+
+    # split input, as lilypond ' really do not suit the Unix shell, so
+    # are best enclosed in "" blocks
+    for my $arg (@args) {
+        push @notes, split ' ', $arg;
+    }
+
+    if ( !@notes ) {
+        die "Usage: $0 ly2pitch [--relative=note] [-|notes...]\n";
+    }
+
+    my $prev_dur = $beat_ms / 4;
+    for my $note (@notes) {
+        my $pitch = $Lyu->notes2pitches($note);
+        die "pitch '$pitch' out of range\n"
+          if defined $pitch and ( $pitch < 0 or $pitch > 108 );
+        my $duration;
+        if (
+            $note =~ m{ (?<dur>\d+) (?<dots>[.]+)? (?:\*(?<rnumer>\d+)/(?<rdenom>\d+))? }x )
+        {
+            my $dur   = $beats / $+{dur};
+            my $dots  = exists $+{dots}   ? length $+{dots}         : 0;
+            my $ratio = exists $+{rnumer} ? $+{rnumer} / $+{rdenom} : 1;
+            $dur *= $ratio;
+            $duration = ( 2 * $dur - ( $dur / 2**$dots ) ) * $beat_ms;
+        }
+        $duration //= $prev_dur;
+        my $freq = ( defined $pitch and $pitch != 0 ) ? $p2f->($pitch) : 0;
+        # zero precision due to Arduino tone call accepting integers
+        printf "\t{ %.0f, %.0f },\t/* %s */\n", $freq, $duration, $note;
+        $prev_dur = $duration;
+    }
 }
 
 sub multiply {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts, 'factor|n=s' => \my $factor, )
-    or print_help();
-  $Lyu->chrome('flats') if $Flag_Flat;
-  $factor //= 1;
-  die "factor must be number\n" unless looks_like_number $factor;
-  emit_pitch_set( $Atu->multiply( $factor, args2pitchset(@args) ) );
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts, 'factor|n=s' => \my $factor, )
+      or print_help();
+    $Lyu->chrome('flats') if $Flag_Flat;
+    $factor //= 1;
+    die "factor must be number\n" unless looks_like_number $factor;
+    emit_pitch_set( $Atu->multiply( $factor, args2pitchset(@args) ) );
 }
 
 sub normal_form {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
-  $Lyu->chrome('flats') if $Flag_Flat;
-  emit_pitch_set( ( $Atu->normal_form( args2pitchset(@args) ) )[0],
-    rs => $Flag_Record_Sep );
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
+    $Lyu->chrome('flats') if $Flag_Flat;
+    emit_pitch_set( ( $Atu->normal_form( args2pitchset(@args) ) )[0],
+        rs => $Flag_Record_Sep );
 }
 
 sub notes2time {
-  my (@args)   = @_;
-  my $beats    = 4;
-  my $tempo    = 60;
-  my $fraction = 1;
-  GetOptionsFromArray(
-    \@args,
-    'beats=i'    => \$beats,
-    'ms!'        => \my $in_ms,
-    'tempo=i'    => \$tempo,
-    'fraction=s' => \$fraction,
-  ) or print_help();
+    my (@args)   = @_;
+    my $beats    = 4;
+    my $tempo    = 60;
+    my $fraction = 1;
+    GetOptionsFromArray(
+        \@args,
+        'beats=i'    => \$beats,
+        'ms!'        => \my $in_ms,
+        'tempo=i'    => \$tempo,
+        'fraction=s' => \$fraction,
+    ) or print_help();
 
-  if ( !looks_like_number($fraction) ) {
-    if ( $fraction =~ m#^(\d+)/(\d+)$# ) {
-      $fraction = $1 / $2;
-    } else {
-      die "unknown fraction: $fraction (expect 2/3 or such)\n";
+    if ( !looks_like_number($fraction) ) {
+        if ( $fraction =~ m#^(\d+)/(\d+)$# ) {
+            $fraction = $1 / $2;
+        } else {
+            die "unknown fraction: $fraction (expect 2/3 or such)\n";
+        }
     }
-  }
 
-  my @durations;
-  for my $notespec ( map { split ' ' } @args ) {
-    if ( $notespec =~
-      m{ (?<dur>\d+) (?<dots>[.]{1,10})? (?:\*(?<rnumer>\d+)/(?<rdenom>\d+))? }x ) {
-      my $dur   = $beats / $+{dur};
-      my $dots  = exists $+{dots} ? length $+{dots} : 0;
-      my $ratio = exists $+{rnumer} ? $+{rnumer} / $+{rdenom} : 1;
+    my @durations;
+    for my $notespec ( map { split ' ' } @args ) {
+        if ( $notespec =~
+            m{ (?<dur>\d+) (?<dots>[.]{1,10})? (?:\*(?<rnumer>\d+)/(?<rdenom>\d+))? }x ) {
+            my $dur   = $beats / $+{dur};
+            my $dots  = exists $+{dots}   ? length $+{dots}         : 0;
+            my $ratio = exists $+{rnumer} ? $+{rnumer} / $+{rdenom} : 1;
 
-      # Arbitrary limit to just nine dots, which is about three times longer
-      # than I think I've ever seen in notation.
-      die "error: too many dots in dotted note\n" if $dots > 9;
+            # Arbitrary limit to just nine dots, which is about three times longer
+            # than I think I've ever seen in notation.
+            die "error: too many dots in dotted note\n" if $dots > 9;
 
-      $dur *= $fraction;
-      $dur *= $ratio;
-      push @durations, 2 * $dur - ( $dur / 2**$dots );
-    } elsif ( !@durations ) {
-      die "unable to parse duration from '$notespec'\n";
-    } else {
-      # assume repeated duration
-      push @durations, $durations[-1];
+            $dur *= $fraction;
+            $dur *= $ratio;
+            push @durations, 2 * $dur - ( $dur / 2**$dots );
+        } elsif ( !@durations ) {
+            die "unable to parse duration from '$notespec'\n";
+        } else {
+            # assume repeated duration
+            push @durations, $durations[-1];
+        }
     }
-  }
 
-  my $beat_ms = bpm_to_ms( $tempo, $beats );
-  for my $d (@durations) {
-    my $d_ms = $d * $beat_ms;
-    print( ( $in_ms ? $d_ms : _ms2abbr_time($d_ms) ), "\n" );
-  }
+    my $beat_ms = bpm_to_ms( $tempo, $beats );
+    for my $d (@durations) {
+        my $d_ms = $d * $beat_ms;
+        print( ( $in_ms ? $d_ms : _ms2abbr_time($d_ms) ), "\n" );
+    }
 
-  if ( @durations > 1 ) {
-    my $total_ms = sum(@durations) * $beat_ms;
-    print( '= ' . ( $in_ms ? $total_ms : _ms2abbr_time($total_ms) ), "\n" );
-  }
+    if ( @durations > 1 ) {
+        my $total_ms = sum(@durations) * $beat_ms;
+        print( '= ' . ( $in_ms ? $total_ms : _ms2abbr_time($total_ms) ), "\n" );
+    }
 }
 
 sub pcs2forte {
-  my (@args) = @_;
-  my $fn = $Atu->pcs2forte( args2pitchset(@args) ) || "";
-  print $fn, "\n";
+    my (@args) = @_;
+    my $fn = $Atu->pcs2forte( args2pitchset(@args) ) || "";
+    print $fn, "\n";
 }
 
 sub pcs2intervals {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
 
-  $Lyu->ignore_register(0);
+    $Lyu->ignore_register(0);
 
-  emit_pitch_set(
-    $Atu->pcs2intervals( args2pitchset(@args) ),
-    lyflag => 0,
-    rs     => $Flag_Record_Sep,
-  );
+    emit_pitch_set(
+        $Atu->pcs2intervals( args2pitchset(@args) ),
+        lyflag => 0,
+        rs     => $Flag_Record_Sep,
+    );
 }
 
 sub pitch2freq {
-  my (@args) = @_;
-  my $mode = 'absolute';
-  GetOptionsFromArray(
-    \@args,
-    'concertfreq|cf=s'  => \my $concert_freq,
-    'concertpitch|cp=s' => \my $concert_pitch,
-    'relative=s'        => \my $relative,
-    'scala=s'           => \my $scala_file,
-  ) or print_help();
-
-  my ( $scala, $p2f ) = _init_scala( $concert_freq, $concert_pitch, $scala_file );
-
-  $Lyu->ignore_register(0);
-  $Lyu->keep_state(1);
-  $Lyu->sticky_state(1);
-  if ( defined $relative ) {
-    if ( $relative =~ m/^\d+$/ ) {
-      die "error: relative must be note name\n";
+    my (@args) = @_;
+    my $emit = 1;
+    if ( ref $args[0] ne '' ) {
+        shift @args;
+        $emit = 0;
     }
-    $Lyu->mode('relative');
-    $Lyu->prev_note($relative);
-  } else {
-    $Lyu->mode('absolute');
-  }
+    my $mode = 'absolute';
+    GetOptionsFromArray(
+        \@args,
+        'concertfreq|cf=s'  => \my $concert_freq,
+        'concertpitch|cp=s' => \my $concert_pitch,
+        'relative=s'        => \my $relative,
+        'scala=s'           => \my $scala_file,
+    ) or print_help();
 
-  if ( !@args or ( @args == 1 and $args[0] eq '-' ) ) {
-    chomp( @args = readline *STDIN );
-  }
+    my ( $scala, $p2f ) = _init_scala( $concert_freq, $concert_pitch, $scala_file );
 
-  # If pitch must int() it, otherwise feed to lilypond for conversion so
-  # do not first need to call ly2pitch on the input.
-  for my $pitch (
-    map { looks_like_number $_ ? int $_ : $Lyu->notes2pitches($_) }
-    map { split ' ', $_ } @args
+    $Lyu->ignore_register(0);
+    $Lyu->keep_state(1);
+    $Lyu->sticky_state(1);
+    if ( defined $relative ) {
+        if ( $relative =~ m/^\d+$/ ) {
+            die "error: relative must be note name\n";
+        }
+        $Lyu->mode('relative');
+        $Lyu->prev_note($relative);
+    } else {
+        $Lyu->mode('absolute');
+    }
+
+    if ( !@args or ( @args == 1 and $args[0] eq '-' ) ) {
+        chomp( @args = readline *STDIN );
+    }
+
+    # If pitch must int() it, otherwise feed to lilypond for conversion so
+    # do not first need to call ly2pitch on the input.
+    my @ret;
+    for my $pitch (
+        map { looks_like_number $_ ? int $_ : $Lyu->notes2pitches($_) }
+        map { split ' ', $_ } @args
     ) {
-    die "pitch '$pitch' out of range\n" if $pitch < 0 or $pitch > 108;
-    printf "%d\t%.2f\n", $pitch, $p2f->($pitch);
-  }
+        die "pitch '$pitch' out of range\n" if $pitch < 0 or $pitch > 108;
+        if ($emit) {
+            printf "%d\t%.2f\n", $pitch, $p2f->($pitch);
+        } else {
+            push @ret, $p2f->($pitch);
+        }
+    }
+    return \@ret unless $emit;
 }
 
 sub pitch2intervalclass {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
-  $Lyu->chrome('flats') if $Flag_Flat;
-  die "$0 pitch2intervalclass pitch\n"
-    unless defined $args[0] and $args[0] =~ m/^\d+$/;
-  print $Atu->pitch2intervalclass( $args[0] ), "\n";
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
+    $Lyu->chrome('flats') if $Flag_Flat;
+    die "$0 pitch2intervalclass pitch\n"
+      unless defined $args[0] and $args[0] =~ m/^\d+$/;
+    print $Atu->pitch2intervalclass( $args[0] ), "\n";
 }
 
 sub pitch2ly {
-  my (@args) = @_;
-  my $mode = 'absolute';
-  GetOptionsFromArray( \@args, @Std_Opts, 'mode=s' => \$mode, )
-    or print_help();
+    my (@args) = @_;
+    my $mode = 'absolute';
+    GetOptionsFromArray( \@args, @Std_Opts, 'mode=s' => \$mode, )
+      or print_help();
 
-  # Not the default, so if things persist or chain due to some rewrite,
-  # would need to save the old or create a new object or whatever
-  $Lyu->keep_state(1);
+    # Not the default, so if things persist or chain due to some rewrite,
+    # would need to save the old or create a new object or whatever
+    $Lyu->keep_state(1);
 
-  $Lyu->mode($mode) if defined $mode;
+    $Lyu->mode($mode) if defined $mode;
 
-  my @pitches;
-  if ( !@args or ( @args == 1 and $args[0] eq '-' ) ) {
-    chomp( @args = readline *STDIN );
-    for my $arg (@args) {
-      push @pitches, split ' ', $arg;
+    my @pitches;
+    if ( !@args or ( @args == 1 and $args[0] eq '-' ) ) {
+        chomp( @args = readline *STDIN );
+        for my $arg (@args) {
+            push @pitches, split ' ', $arg;
+        }
+    } else {
+        @pitches = @args;
     }
-  } else {
-    @pitches = @args;
-  }
 
-  print join( ' ', $Lyu->p2ly(@pitches) ), "\n";
+    print join( ' ', $Lyu->p2ly(@pitches) ), "\n";
 }
 
 sub prime_form {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
-  $Lyu->chrome('flats') if $Flag_Flat;
-  emit_pitch_set( $Atu->prime_form( args2pitchset(@args) ),
-    rs => $Flag_Record_Sep );
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
+    $Lyu->chrome('flats') if $Flag_Flat;
+    emit_pitch_set( $Atu->prime_form( args2pitchset(@args) ),
+        rs => $Flag_Record_Sep );
 }
 
 sub print_help {
-  warn <<"END_USAGE";
+    warn <<"END_USAGE";
 Usage: $PROG_NAME [options] mode mode-args
 
 Atonal music analysis utilities. Options:
@@ -1193,241 +1165,239 @@ interval class content (and Forte Number, if possible):
 Run perldoc(1) on $PROG_NAME for additional documentation.
 
 END_USAGE
-  exit 64;
+    exit 64;
 }
 
 sub recipe {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts, 'file=s' => \my $rfile )
-    or print_help();
-  $Lyu->chrome('flats') if $Flag_Flat;
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts, 'file=s' => \my $rfile )
+      or print_help();
+    $Lyu->chrome('flats') if $Flag_Flat;
 
-  my $ps  = args2pitchset(@args);
-  my $wps = [@$ps];
+    my $ps  = args2pitchset(@args);
+    my $wps = [@$ps];
 
-  open my $fh, '<', $rfile or die "could not open '$rfile': $!\n";
-  try {
-    while ( my $line = readline $fh ) {
-      my ( $method, @margs ) = split ' ', $line;
-      next if !$method or $method =~ m/^[\s#]/;
-      chomp @margs;
-      die "not a ", ref $Atu, " method" unless $Atu->can($method);
-      $wps = $Atu->$method( @margs, $wps );
-    }
-  }
-  catch {
-    die "recipe error at '$rfile' line $.: $_\n";
-  };
-  emit_pitch_set( $wps, rs => $Flag_Record_Sep );
+    open my $fh, '<', $rfile or die "could not open '$rfile': $!\n";
+    eval {
+        while ( my $line = readline $fh ) {
+            my ( $method, @margs ) = split ' ', $line;
+            next if !$method or $method =~ m/^[\s#]/;
+            chomp @margs;
+            die "not a ", ref $Atu, " method" unless $Atu->can($method);
+            $wps = $Atu->$method( @margs, $wps );
+        }
+    };
+    die "recipe error at '$rfile' line $.: $@" if $@;
+    emit_pitch_set( $wps, rs => $Flag_Record_Sep );
 }
 
 sub retrograde {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
-  $Lyu->chrome('flats') if $Flag_Flat;
-  emit_pitch_set( $Atu->retrograde( args2pitchset(@args) ),
-    rs => $Flag_Record_Sep );
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
+    $Lyu->chrome('flats') if $Flag_Flat;
+    emit_pitch_set( $Atu->retrograde( args2pitchset(@args) ),
+        rs => $Flag_Record_Sep );
 }
 
 sub rotate {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts, 'rotate|n=s' => \my $r, )
-    or print_help();
-  $Lyu->chrome('flats') if $Flag_Flat;
-  $r //= 0;
-  die "rotate must be number\n" unless looks_like_number $r;
-  emit_pitch_set( $Atu->rotate( $r, args2pitchset(@args) ),
-    rs => $Flag_Record_Sep );
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts, 'rotate|n=s' => \my $r, )
+      or print_help();
+    $Lyu->chrome('flats') if $Flag_Flat;
+    $r //= 0;
+    die "rotate must be number\n" unless looks_like_number $r;
+    emit_pitch_set( $Atu->rotate( $r, args2pitchset(@args) ),
+        rs => $Flag_Record_Sep );
 }
 
 sub set2beats {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts, 'scaledegrees|sd=i' => \my $sd, )
-    or print_help();
-  if ($sd) {
-    $Atu = Music::AtonalUtil->new( DEG_IN_SCALE => $sd );
-  } else {
-    $sd = $Atu->scale_degrees;
-  }
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts, 'scaledegrees|sd=i' => \my $sd, )
+      or print_help();
+    if ($sd) {
+        $Atu = Music::AtonalUtil->new( DEG_IN_SCALE => $sd );
+    } else {
+        $sd = $Atu->scale_degrees;
+    }
 
-  $Lyu->ignore_register(0) if $sd != 12;
+    $Lyu->ignore_register(0) if $sd != 12;
 
-  my $pset = args2pitchset(@args);
-  my %set;
-  @set{@$pset} = ();
-  my $beats;
-  for my $n ( 0 .. $sd - 1 ) {
-    $beats .= exists $set{$n} ? 'x' : '.';
-  }
-  print $beats, "\n";
+    my $pset = args2pitchset(@args);
+    my %set;
+    @set{@$pset} = ();
+    my $beats;
+    for my $n ( 0 .. $sd - 1 ) {
+        $beats .= exists $set{$n} ? 'x' : '.';
+    }
+    print $beats, "\n";
 }
 
 sub set_complex {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
-  $Lyu->chrome('flats') if $Flag_Flat;
-  emit_pitch_set( $Atu->set_complex( args2pitchset(@args) ),
-    rs => $Flag_Record_Sep );
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
+    $Lyu->chrome('flats') if $Flag_Flat;
+    emit_pitch_set( $Atu->set_complex( args2pitchset(@args) ),
+        rs => $Flag_Record_Sep );
 }
 
 sub subsets {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts, 'length|len=i' => \my $l, )
-    or print_help();
-  $Lyu->chrome('flats') if $Flag_Flat;
-  $l //= -1;
-  emit_pitch_set( $Atu->subsets( $l, args2pitchset(@args) ),
-    rs => $Flag_Record_Sep );
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts, 'length|len=i' => \my $l, )
+      or print_help();
+    $Lyu->chrome('flats') if $Flag_Flat;
+    $l //= -1;
+    emit_pitch_set( $Atu->subsets( $l, args2pitchset(@args) ),
+        rs => $Flag_Record_Sep );
 }
 
 sub stdin2pitchsets {
-  my @ss;
-  while ( my $line = readline *STDIN ) {
-    my @pset;
-    if ( $line =~ m/($FORTE_NUMBER_RE)/ ) {
-      @pset = @{ $Atu->forte2pcs($1) };
-      die "unknown Forte Number '$1'\n" if !@pset;
-    } else {
-      for my $p ( $line =~ /([-\d\w]+)/g ) {
-        push @pset, $Lyu->notes2pitches($p);
-      }
+    my @ss;
+    while ( my $line = readline *STDIN ) {
+        my @pset;
+        if ( $line =~ m/($FORTE_NUMBER_RE)/ ) {
+            @pset = @{ $Atu->forte2pcs($1) };
+            die "unknown Forte Number '$1'\n" if !@pset;
+        } else {
+            for my $p ( $line =~ /([-\d\w]+)/g ) {
+                push @pset, $Lyu->notes2pitches($p);
+            }
+        }
+        push @ss, \@pset;
     }
-    push @ss, \@pset;
-  }
 
-  return \@ss;
+    return \@ss;
 }
 
 sub tcs {
-  my (@args) = @_;
-  emit_pitch_set( $Atu->tcs( args2pitchset(@args) ), lyflag => 0 );
+    my (@args) = @_;
+    emit_pitch_set( $Atu->tcs( args2pitchset(@args) ), lyflag => 0 );
 }
 
 sub tcis {
-  my (@args) = @_;
-  emit_pitch_set( $Atu->tcis( args2pitchset(@args) ), lyflag => 0 );
+    my (@args) = @_;
+    emit_pitch_set( $Atu->tcis( args2pitchset(@args) ), lyflag => 0 );
 }
 
 sub tension {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
 
-  $Flag_Tension = 'cope' unless defined $Flag_Tension;
-  _init_tension();
+    $Flag_Tension = 'cope' unless defined $Flag_Tension;
+    _init_tension();
 
-  my ( $t_avg, $t_min, $t_max, $t_ref ) =
-    $Tension->vertical( args2pitchset(@args) );
-  printf "%.03f  %.03f  %.03f\t%s\n", $t_avg, $t_min, $t_max,
-    join( ',', @$t_ref );
+    my ( $t_avg, $t_min, $t_max, $t_ref ) =
+      $Tension->vertical( args2pitchset(@args) );
+    printf "%.03f  %.03f  %.03f\t%s\n", $t_avg, $t_min, $t_max,
+      join( ',', @$t_ref );
 }
 
 sub time2notes {
-  my (@args) = @_;
-  my $beats  = 4;
-  my $tempo  = 60;
-  GetOptionsFromArray(
-    \@args,
-    'beats=i' => \$beats,
-    'tempo=i' => \$tempo,
-  ) or print_help();
+    my (@args) = @_;
+    my $beats  = 4;
+    my $tempo  = 60;
+    GetOptionsFromArray(
+        \@args,
+        'beats=i' => \$beats,
+        'tempo=i' => \$tempo,
+    ) or print_help();
 
-  for my $durms (@args) {
-    die "argument $durms not a number\n" if !looks_like_number $durms;
-    my $dur = 1 / ( ms_to_bpm( $durms, $beats ) / $tempo );
-    # Cheat with lilypond multiplier syntax; breaking things down into c4~ c16.
-    # would of course be more work.
-    $dur = 100 * sprintf "%.2f", $dur;
-    print "c$beats*$dur/100\n";
-  }
+    for my $durms (@args) {
+        die "argument $durms not a number\n" if !looks_like_number $durms;
+        my $dur = 1 / ( ms_to_bpm( $durms, $beats ) / $tempo );
+        # Cheat with lilypond multiplier syntax; breaking things down into c4~ c16.
+        # would of course be more work.
+        $dur = 100 * sprintf "%.2f", $dur;
+        print "c$beats*$dur/100\n";
+    }
 
-  if ( @args > 1 ) {
-    my $total_ms = sum(@args);
-    my $dur = 1 / ( ms_to_bpm( $total_ms, $beats ) / $tempo );
-    $dur = 100 * sprintf "%.2f", $dur;
-    print "= c$beats*$dur/100\n";
-  }
+    if ( @args > 1 ) {
+        my $total_ms = sum(@args);
+        my $dur      = 1 / ( ms_to_bpm( $total_ms, $beats ) / $tempo );
+        $dur = 100 * sprintf "%.2f", $dur;
+        print "= c$beats*$dur/100\n";
+    }
 }
 
 sub transpose {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts, 'transpose|n=s' => \my $t, )
-    or print_help();
-  $Lyu->chrome('flats') if $Flag_Flat;
-  $t //= 0;
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts, 'transpose|n=s' => \my $t, )
+      or print_help();
+    $Lyu->chrome('flats') if $Flag_Flat;
+    $t //= 0;
 
-  my $pset = args2pitchset(@args);
+    my $pset = args2pitchset(@args);
 
-  # if a number, transpose by that; if note, transpose to that note
-  if ( !looks_like_number($t) ) {
-    $t = $Lyu->notes2pitches($t) - $pset->[0];
-  }
-  emit_pitch_set( $Atu->transpose( $t, $pset ), rs => $Flag_Record_Sep );
+    # if a number, transpose by that; if note, transpose to that note
+    if ( !looks_like_number($t) ) {
+        $t = $Lyu->notes2pitches($t) - $pset->[0];
+    }
+    emit_pitch_set( $Atu->transpose( $t, $pset ), rs => $Flag_Record_Sep );
 }
 
 sub transpose_invert {
-  my (@args) = @_;
-  GetOptionsFromArray(
-    \@args, @Std_Opts,
-    'axis|a=s'      => \my $axis,
-    'transpose|t=s' => \my $t,
-  ) or print_help();
-  $Lyu->chrome('flats') if $Flag_Flat;
+    my (@args) = @_;
+    GetOptionsFromArray(
+        \@args, @Std_Opts,
+        'axis|a=s'      => \my $axis,
+        'transpose|t=s' => \my $t,
+    ) or print_help();
+    $Lyu->chrome('flats') if $Flag_Flat;
 
-  my $pset = args2pitchset(@args);
+    my $pset = args2pitchset(@args);
 
-  $axis = defined $axis ? $Lyu->notes2pitches($axis) : 0;
+    $axis = defined $axis ? $Lyu->notes2pitches($axis) : 0;
 
-  # if a number, transpose by that; if note, transpose to that note
-  $t //= 0;
-  if ( !looks_like_number($t) ) {
-    $t = $Lyu->notes2pitches($t) - $pset->[0];
-  }
+    # if a number, transpose by that; if note, transpose to that note
+    $t //= 0;
+    if ( !looks_like_number($t) ) {
+        $t = $Lyu->notes2pitches($t) - $pset->[0];
+    }
 
-  emit_pitch_set( $Atu->transpose_invert( $t, $axis, $pset ),
-    rs => $Flag_Record_Sep );
+    emit_pitch_set( $Atu->transpose_invert( $t, $axis, $pset ),
+        rs => $Flag_Record_Sep );
 }
 
 sub variances {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
-  $Lyu->chrome('flats') if $Flag_Flat;
-  emit_pitch_set( [ $Atu->variances( @{ stdin2pitchsets() } ) ],
-    rs => $Flag_Record_Sep );
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
+    $Lyu->chrome('flats') if $Flag_Flat;
+    emit_pitch_set( [ $Atu->variances( @{ stdin2pitchsets() } ) ],
+        rs => $Flag_Record_Sep );
 }
 
 sub whatscalesfit {
-  my (@args) = @_;
-  GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
-  $Lyu->chrome('flats') if $Flag_Flat;
+    my (@args) = @_;
+    GetOptionsFromArray( \@args, @Std_Opts ) or print_help();
+    $Lyu->chrome('flats') if $Flag_Flat;
 
-  my $pset = args2pitchset(@args);
-  for my $p (@$pset) {
-    $p %= $scale_degrees;
-  }
-
-  my @scales = qw/major dorian phrygian lydian mixolydian aeolian locrian blues/;
-  push @scales, "harmonic minor", "melodic minor", "hungarian minor";
-
-  for my $scale (@scales) {
-    my @asc = get_scale_nums($scale);
-    _fit_scale( $scale, $pset, \@asc );
-
-    my @dsc = get_scale_nums( $scale, 1 );
-    if ( join( ' ', @asc ) ne join( ' ', reverse @dsc ) ) {
-      _fit_scale( $scale, $pset, \@dsc, 1 );
+    my $pset = args2pitchset(@args);
+    for my $p (@$pset) {
+        $p %= $scale_degrees;
     }
-  }
+
+    my @scales = qw/major dorian phrygian lydian mixolydian aeolian locrian blues/;
+    push @scales, "harmonic minor", "melodic minor", "hungarian minor";
+
+    for my $scale (@scales) {
+        my @asc = get_scale_nums($scale);
+        _fit_scale( $scale, $pset, \@asc );
+
+        my @dsc = get_scale_nums( $scale, 1 );
+        if ( join( ' ', @asc ) ne join( ' ', reverse @dsc ) ) {
+            _fit_scale( $scale, $pset, \@dsc, 1 );
+        }
+    }
 }
 
 sub zrelation {
-  emit_pitch_set( [ $Atu->zrelation( @{ stdin2pitchsets() } ) ], lyflag => 0 );
+    emit_pitch_set( [ $Atu->zrelation( @{ stdin2pitchsets() } ) ], lyflag => 0 );
 }
 
 END {
-  # Report problems when writing to stdout (perldoc perlopentut)
-  unless ( close(STDOUT) ) {
-    die "error: problem closing STDOUT: $!\n";
-  }
+    # Report problems when writing to stdout (perldoc perlopentut)
+    unless ( close(STDOUT) ) {
+        die "error: problem closing STDOUT: $!\n";
+    }
 }
 
 __END__
@@ -1521,6 +1491,13 @@ conventions or input they accept.
 
 Various global flags (listed above) can be specified as options to modes
 where they make sense.
+
+=head2 B<bark> I<pitches...>
+
+Coverts the given pitches or note names into Bark scale numbers, by way
+of B<pitch2freq>. Supports the same arguments as B<pitch2freq>.
+
+See "Voice Leading" by David Huron for practical uses of critical bands.
 
 =head2 B<basic> I<pitch_set>
 

@@ -1,5 +1,5 @@
 ---
-abstract: 'HTTP interface for Net::Curl (clone HTTP::Any::Curl)'
+abstract: 'HTTP interface for Net::Curl (clone of HTTP::Any::Curl)'
 author:
   - <kni@cpan.org>
 build_requires:
@@ -19,5 +19,5 @@ no_index:
     - inc
 requires:
   Net::Curl: '0.29'
-version: '1.03'
+version: '1.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

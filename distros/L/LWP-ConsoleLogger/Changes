@@ -1,8 +1,11 @@
 Revision history for LWP-ConsoleLogger
 
-0.000044  2022-04-21 14:20:07Z
+1.000000  2022-08-17 18:19:05Z
+    - This module is no longer considered to be beta
     - Document that Everywhere can be used with the -M switch (GH#22) (Olaf
       Alders)
+    - Recognise subtype soap+xml (GH#25) (David Precious)
+    - Drop dependency on URI::Query
 
 0.000043  2021-03-04 19:00:40Z
     - Ensure that a silent logger is actually silent (GH#21) (Olaf Alders)

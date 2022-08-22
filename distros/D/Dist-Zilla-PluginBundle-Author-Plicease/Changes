@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.71      2022-08-13 14:33:06 -0600
+  - Add [Author::Plicease::PkgVersionBlock]
+
 2.70      2022-05-30 11:33:54 -0600
   - Do not attempt to add negative perlcritic configs [-whatever]
 

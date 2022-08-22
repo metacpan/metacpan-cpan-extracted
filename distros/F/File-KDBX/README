@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.905
+    version 0.906
 
 SYNOPSIS
 
@@ -145,7 +145,8 @@ ATTRIBUTES
 
  comment
 
-    A text string associated with the database. Often unset.
+    A text string associated with the database stored unencrypted in the
+    file header. Often unset.
 
  cipher_id
 
@@ -181,8 +182,8 @@ ATTRIBUTES
  transform_rounds
 
     The number of rounds or iterations used in the key derivation function.
-    Increasing this number makes loading and saving the database slower by
-    design in order to make dictionary and brute force attacks more costly.
+    Increasing this number makes loading and saving the database slower in
+    order to make dictionary and brute force attacks more costly.
 
  encryption_iv
 

@@ -1,6 +1,8 @@
 #!perl
 
-use 5.010000;
+# was at 5.010, but some Windows smoke box ignored the MIN_PERL_VERSION
+# and then failed all over the 5.14 features in a *.t file.
+use 5.014000;
 
 use strict;
 use warnings;
@@ -52,7 +54,7 @@ my %params = (
     'IPC::Run3'               => 0,
     'JSON'                    => 0,
     'List::Util'              => 0,
-    'Music::AtonalUtil'       => 1.14,
+    'Music::AtonalUtil'       => 1.17,
     'Music::Canon'            => 2.00,
     'Music::Chord::Positions' => 0,
     'Music::LilyPondUtil'     => 0.10,
@@ -64,7 +66,6 @@ my %params = (
     'Scalar::Util'            => 0,
     'Text::Roman'             => 0,
     'Text::Wrap'              => 0,
-    'Try::Tiny'               => 0,
   },
 
   META_MERGE => {

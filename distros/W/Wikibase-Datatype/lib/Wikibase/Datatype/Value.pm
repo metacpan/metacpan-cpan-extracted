@@ -6,7 +6,7 @@ use warnings;
 use Mo qw(build is);
 use Mo::utils qw(check_required);
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
 
 has value => (
 	is => 'ro',
@@ -97,6 +97,8 @@ Returns string.
 
 =head1 EXAMPLE
 
+=for comment filename=create_and_print_value.pl
+
  use strict;
  use warnings;
 
@@ -131,6 +133,10 @@ L<Mo::utils>.
 
 =over
 
+=item L<Wikibase::Datatype::Value::Globecoordinate>
+
+Wikibase globe coordinate value datatype.
+
 =item L<Wikibase::Datatype::Value::Item>
 
 Wikibase item value datatype.
@@ -138,6 +144,14 @@ Wikibase item value datatype.
 =item L<Wikibase::Datatype::Value::Monolingual>
 
 Wikibase monolingual value datatype.
+
+=item L<Wikibase::Datatype::Value::Property>
+
+Wikibase property value datatype.
+
+=item L<Wikibase::Datatype::Value::Quantity>
+
+Wikibase quantity value datatype.
 
 =item L<Wikibase::Datatype::Value::String>
 
@@ -167,6 +181,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.19
+0.20
 
 =cut

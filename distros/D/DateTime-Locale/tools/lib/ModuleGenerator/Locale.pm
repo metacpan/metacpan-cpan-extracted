@@ -8,9 +8,9 @@ use warnings;
 use feature qw( postderef signatures );
 use namespace::autoclean;
 
-use Carp qw( confess );
+use Carp                   qw( confess );
 use DateTime::Locale::Util qw( parse_locale_code );
-use JSON::MaybeXS qw( decode_json );
+use JSON::MaybeXS          qw( decode_json );
 use Specio::Declare;
 use Specio::Library::Builtins;
 use Specio::Library::Perl 0.42;

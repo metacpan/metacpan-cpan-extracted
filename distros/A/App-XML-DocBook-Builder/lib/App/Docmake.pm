@@ -1,5 +1,5 @@
 package App::Docmake;
-$App::Docmake::VERSION = '0.1003';
+$App::Docmake::VERSION = '0.1004';
 use 5.014;
 use strict;
 use warnings;
@@ -21,7 +21,7 @@ App::Docmake - translate DocBook/XML to other formats
 
 =head1 VERSION
 
-version 0.1003
+version 0.1004
 
 =head1 SYNOPSIS
 
@@ -35,6 +35,10 @@ version 0.1003
 
 Created as a shorthand namespace so people can say
 C<cpanm App::Docmake> or similar.
+
+=head1 SEE ALSO
+
+L<App::XML::DocBook::Docmake>
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
@@ -128,7 +132,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Shlomi Fish.
+This software is Copyright (c) 2022 by Shlomi Fish.
 
 This is free software, licensed under:
 

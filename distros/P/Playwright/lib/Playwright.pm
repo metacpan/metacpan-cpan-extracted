@@ -1,5 +1,5 @@
 package Playwright;
-$Playwright::VERSION = '1.210';
+$Playwright::VERSION = '1.251';
 use strict;
 use warnings;
 
@@ -99,18 +99,18 @@ sub BEGIN {
 sub new ( $class, %options ) {
 
     #XXX yes, this is a race, so we need retries in _start_server
-    my $port    = Net::EmptyPort::empty_port();
+    my $port    = $options{port}    // Net::EmptyPort::empty_port();
     my $timeout = $options{timeout} // 30;
     my $self    = bless(
         {
             ua      => $options{ua} // LWP::UserAgent->new(),
             port    => $port,
             debug   => $options{debug},
-            cleanup => $options{cleanup} // 1,
+            cleanup => ( $options{cleanup} || !$options{port} ) // 1,
             pid     => _start_server(
                 $port, $timeout, $options{debug}, $options{cleanup} // 1
             ),
-            parent  => $$,
+            parent  => $$ // 'bogus',    # Oh lawds, this can be undef sometimes
             timeout => $timeout,
         },
         $class
@@ -212,7 +212,9 @@ sub quit ($self) {
 
     # Prevent destructor from firing in child processes so we can do things like async()
     # This should also prevent the waitpid below from deadlocking due to two processes waiting on the same pid.
-    return unless $$ == $self->{parent};
+    my $ppid = $$ // 'hokum'
+      ;    # If $$ is undef both here and in the parent, let's just keep going
+    return unless $ppid == $self->{parent};
 
     # Prevent destructor from firing in the event the caller instructs it to not fire
     return unless $self->{cleanup};
@@ -222,6 +224,7 @@ sub quit ($self) {
 
     $self->{killed} = 1;
     print "Attempting to terminate server process...\n" if $self->{debug};
+
     Playwright::Util::request( 'GET', 'shutdown', $self->{port}, $self->{ua} );
 
     # 0 is always WCONTINUED, 1 is always WNOHANG, and POSIX is an expensive import
@@ -251,10 +254,19 @@ sub DESTROY ($self) {
 sub _start_server ( $port, $timeout, $debug, $cleanup ) {
     $debug = $debug ? '--debug' : '';
 
+    # Check if the port is already live, and short-circuit if this is the case.
+    if ( Net::EmptyPort::wait_port( $port, 1 ) ) {
+        print "Re-using playwright server on port $port...\n" if $debug;
+
+        # Set the PID as something bogus, we don't really care as we won't kill it
+        return "REUSE";
+    }
+
     $ENV{DEBUG} = 'pw:api' if $debug;
     my $pid = fork // confess("Could not fork");
     if ($pid) {
-        print "Waiting for port to come up...\n" if $debug;
+        print "Waiting for playwright server on port $port to come up...\n"
+          if $debug;
         Net::EmptyPort::wait_port( $port, $timeout )
           or confess("Server never came up after 30s!");
         print "done\n" if $debug;
@@ -292,7 +304,7 @@ Playwright - Perl client for Playwright
 
 =head1 VERSION
 
-version 1.210
+version 1.251
 
 =head1 SYNOPSIS
 
@@ -357,11 +369,6 @@ From there it's recommended you use the latest version of node:
 
     nvm install node
     nvm use node
-
-=head2 Questions?
-
-Feel free to join the Playwright slack server, as there is a dedicated #playwright-perl channel which I, the module author, await your requests in.
-L<https://aka.ms/playwright-slack>
 
 =head2 Documentation for Playwright Subclasses
 
@@ -476,6 +483,12 @@ Passing the cleanup => 0 parameter to new() will prevent DESTROY() from cleaning
 Be aware that this will prevent debug => 1 from printing extra messages from playwright_server itself, as we redirect the output streams in this case so as not to fill your current session with prints later.
 
 A convenience script has been provided to clean up these orphaned instances, `reap_playwright_servers` which will kill all extant `playwright_server` processes.
+
+=head2 Running multiple clients against the same playwright server
+
+To save on memory, this is a good idea.  Pass the 'port' argument to the constructor, and we'll re-use anything listening on that port locally, and be sure to use it when starting up.
+
+This will also set the cleanup flag to false, so be sure you run `reap_playwright_servers` when you are sure that all testing on this server is done.
 
 =head2 Taking videos, Making Downloads
 

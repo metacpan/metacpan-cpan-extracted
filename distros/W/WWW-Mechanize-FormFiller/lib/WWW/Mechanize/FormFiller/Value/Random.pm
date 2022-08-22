@@ -4,7 +4,7 @@ use base 'WWW::Mechanize::FormFiller::Value';
 use Data::Random qw(rand_enum);
 
 use vars qw( $VERSION );
-$VERSION = '0.12';
+$VERSION = '0.13';
 
 sub new {
   my ($class,$name,@values) = @_;

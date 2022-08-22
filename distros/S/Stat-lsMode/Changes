@@ -1,0 +1,8 @@
+Release history for Stat-lsMode
+
+0.51 Tue 16 Aug 2022
+	- Support for Solaris door file type
+	- Perl 5.6 minimum requirement
+
+0.50 Mon 20 Apr 1998
+	- Initial release

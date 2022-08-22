@@ -28,6 +28,7 @@ Company
 Data
 Date
 Dictionary
+Dropbox
 Gianni
 Match
 MatchList
@@ -40,7 +41,16 @@ Spatial
 TimeEstimate
 UK
 UserInput
+capitalisation
+customise
+customised
 gianni
+hypothesise
 lib
+localisation
+localised
+recognisable
 scripts
+serialisation
+serialised
 zxcvbn

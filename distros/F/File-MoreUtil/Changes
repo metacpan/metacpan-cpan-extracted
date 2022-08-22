@@ -1,3 +1,10 @@
+0.626   2022-08-08  Released-By: PERLANCAR; Urgency: medium
+
+        - Add functions: dir_only_has_{files,dot_files,non_dot_files}.
+
+        - [doc] Document rationale for file_exists().
+
+
 0.625   2021-10-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Add functions: dir_not_empty() and its alias dir_has_entries().

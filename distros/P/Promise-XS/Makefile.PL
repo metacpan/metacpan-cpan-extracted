@@ -1,4 +1,4 @@
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker::CPANfile;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
@@ -29,12 +29,5 @@ WriteMakefile(
                 web => 'https://github.com/FGasper/p5-Promise-XS/issues',
             },
         },
-    },
-
-    TEST_REQUIRES => {
-        'Test::More' => 0,
-        'Test::Deep' => 0,
-        'Test::FailWarnings' => 0,
-        'File::Temp' => 0,
     },
 );

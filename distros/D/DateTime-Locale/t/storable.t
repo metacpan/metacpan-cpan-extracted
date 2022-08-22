@@ -10,7 +10,7 @@ use Test::File::ShareDir::Dist { 'DateTime-Locale' => 'share' };
 
 use DateTime::Locale;
 use File::Spec;
-use File::Temp qw( tempdir );
+use File::Temp          qw( tempdir );
 use IPC::System::Simple qw( capturex );
 use Storable;
 

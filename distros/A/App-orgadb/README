@@ -1,16 +1,16 @@
 NAME
-    App::orgadb - An opinionated Org addressbook tool
+    App::orgadb - An opinionated Org addressbook toolset
 
 VERSION
-    This document describes version 0.004 of App::orgadb (from Perl
-    distribution App-orgadb), released on 2022-07-04.
+    This document describes version 0.005 of App::orgadb (from Perl
+    distribution App-orgadb), released on 2022-08-08.
 
 SYNOPSIS
 FUNCTIONS
-  select_addressbook_entries
+  select
     Usage:
 
-     select_addressbook_entries(%args) -> [$status_code, $reason, $payload, \%result_meta]
+     select(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Select Org addressbook entries/fields/subfields.
 
@@ -28,6 +28,10 @@ FUNCTIONS
 
     *   color_theme => *perl::colortheme::modname_with_optional_args*
 
+    *   count => *true*
+
+        Return just the number of matching entries instead of showing them.
+
     *   detail => *bool*
 
     *   entry => *str_or_re*
@@ -41,6 +45,23 @@ FUNCTIONS
     *   files => *array[filename]*
 
         Path to addressbook files.
+
+    *   filter_entries_by_fields => *array[str]*
+
+        Find entry by the fields or subfields it has.
+
+        The format of each entry_by_field is one of:
+
+         str
+         /re/
+         str = str2
+         str = /re2/
+         /re/ = str2
+         /re/ = /re2/
+
+        That is, it can search for a string ("str") or regex ("re") in the
+        field name, and optionally also search for a string ("str2") or
+        regex ("re2") in the field value.
 
     *   formatters => *array[str]*
 
@@ -113,6 +134,9 @@ SOURCE
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTOR
+    perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull
     requests on GitHub.
@@ -124,10 +148,10 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.

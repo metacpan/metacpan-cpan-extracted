@@ -6,7 +6,7 @@ use DBI;
 use DBD::Pg;
 use Getopt::Long;
 use File::Spec;
-our $VERSION = '3.35';
+our $VERSION = '3.36';
 
 Getopt::Long::Configure (qw(bundling));
 
@@ -251,27 +251,35 @@ sub sequences_are {
 sub functions_are {
     my $schema = shift;
     my $sth = $dbh->prepare(q{
-        SELECT p.proname, md5(p.prosrc) as md5, proargtypes::text
+        SELECT p.proname, md5(p.prosrc) as md5, oidvectortypes(proargtypes) as proargs
           FROM pg_catalog.pg_proc p
           JOIN pg_catalog.pg_namespace n ON p.pronamespace = n.oid
          WHERE n.nspname = ?
-         ORDER BY p.proname
+         ORDER BY p.proname, proargs
     });
     my $allfuncs = $dbh->selectall_arrayref($sth, undef, $schema);
     return unless $allfuncs && @$allfuncs;
-    my @funcs=map{$_->[0]} @$allfuncs;
+    my @funcs = do {
+        my %seen;
+        grep { !$seen{$_}++ } map { $_->[0] } @$allfuncs;
+    };
     print "SELECT functions_are('$schema', ARRAY[\n    '",
         join("',\n    '", @funcs),
         "'\n]);\n\n";
     $total_tests++;
     for my $row (@$allfuncs) {
-        my ($proname, $md5, $proargs)=@$row;
-        print qq{SELECT is(md5(p.prosrc), '$md5', 'Function $proname body should match checksum')
-  FROM pg_catalog.pg_proc p
-  JOIN pg_catalog.pg_namespace n ON p.pronamespace = n.oid
- WHERE n.nspname = '$schema'
-   AND proname = '$proname'
-   AND proargtypes::text = '$proargs';\n\n};
+        my ($proname, $md5, $proargs) = @$row;
+        print "SELECT is(\n",
+                 "    md5(p.prosrc), '$md5',\n",
+                 "    'Function $schema.$proname($proargs) body should match checksum'\n",
+                 ")\n",
+                 "   FROM pg_catalog.pg_namespace n\n",
+                 "   LEFT JOIN pg_catalog.pg_proc p\n",
+                 "     ON p.pronamespace = n.oid\n",
+                 "    AND proname = '$proname'\n",
+                 "    AND oidvectortypes(proargtypes) = '$proargs'\n",
+                 "  WHERE n.nspname = '$schema';\n\n"
+        ;
         $total_tests++;
     }
 #
@@ -396,7 +404,7 @@ sub columns_are {
             : ('col_is_null( ', 'allow NULL');
         my ($def_fn, $def_desc) = $col->[3]
             ? ('col_has_default(  ', '')
-            : ('col_hasnt_default(', ' not ');
+            : ('col_hasnt_default(', ' not');
         print "SELECT has_column(       '$schema', '$table', '$col->[0]', '$desc should exist');\n",
             "SELECT col_type_is(      '$schema', '$table', '$col->[0]', '$col->[1]', '$desc should be type $col->[1]');\n",
             "SELECT $null_fn     '$schema', '$table', '$col->[0]', '$desc should $null_desc');\n",
@@ -418,11 +426,12 @@ sub triggers_are {
       FROM pg_catalog.pg_trigger t
       JOIN pg_catalog.pg_class ct     ON ct.oid = t.tgrelid
       JOIN pg_catalog.pg_namespace nt ON nt.oid = ct.relnamespace
-      JOIN pg_catalog.pg_proc p       ON p.oid = t.tgfoid
+      JOIN pg_catalog.pg_proc p       ON p.oid  = t.tgfoid
       JOIN pg_catalog.pg_namespace ni ON ni.oid = p.pronamespace
      WHERE nt.nspname = ?
        AND ct.relname = ?
        AND NOT t.tgisinternal
+     ORDER BY t.tgname, ni.nspname, p.proname
     }, undef, $schema, $table);
 
     return unless $triggers && @{ $triggers };
@@ -656,6 +665,6 @@ David E. Wheeler <dwheeler@cpan.org>
 
 =head1 Copyright
 
-Copyright (c) 2009-2018 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2009-2022 David E. Wheeler. Some Rights Reserved.
 
 =cut

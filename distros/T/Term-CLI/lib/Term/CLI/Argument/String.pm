@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Argument::String 0.057001;
+package Term::CLI::Argument::String 0.058002;
 
 use 5.014;
 use warnings;
@@ -67,7 +67,7 @@ Term::CLI::Argument::String - class for basic string arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.057001
+version 0.058002
 
 =head1 SYNOPSIS
 

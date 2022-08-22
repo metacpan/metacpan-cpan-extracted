@@ -12,7 +12,7 @@ share {
   plugin 'Build::Autoconf';
   build [
     '%{autoreconf} -if --warnings=all',
-    '%{configure}',
+    '%{configure} --disable-net',
     '%{make}',
     '%{make} install',
   ];

@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace volume.
 
@@ -34,22 +34,22 @@ sub TO_JSON {
 }
 
 has fill => (
-    is  => "rw",
-    isa => "Num",
+    is            => "rw",
+    isa           => "Num",
     documentation =>
       "Sets the fill ratio of the `slices`. The default fill value of the `slices` is 1 meaning that they are entirely shaded. On the other hand Applying a `fill` ratio less than one would allow the creation of openings parallel to the edges.",
 );
 
 has locations => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
       "Specifies the location(s) of slices on the axis. When not specified slices would be created for all points of the axis z except start and end.",
 );
 
 has locationssrc => ( is            => "rw",
                       isa           => "Str",
-                      documentation => "Sets the source reference on plot.ly for  locations .",
+                      documentation => "Sets the source reference on Chart Studio Cloud for `locations`.",
 );
 
 has show => ( is            => "rw",
@@ -72,7 +72,7 @@ Chart::Plotly::Trace::Volume::Slices::Z - This attribute is one of the possible 
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -1283,7 +1283,7 @@ Specifies the location(s) of slices on the axis. When not specified slices would
 
 =item * locationssrc
 
-Sets the source reference on plot.ly for  locations .
+Sets the source reference on Chart Studio Cloud for `locations`.
 
 =item * show
 
@@ -1297,7 +1297,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

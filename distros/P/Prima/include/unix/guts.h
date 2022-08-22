@@ -149,7 +149,7 @@ typedef struct _PrimaXImage
 #define CACHE_A8             6
 
 typedef struct {
-	int type;
+	int type, alpha;
 	PrimaXImage *image;
 	PrimaXImage *icon;
 } ImageCache;
@@ -544,6 +544,16 @@ typedef struct
 	unsigned int red_mask,  green_mask,  blue_mask,  alpha_mask;
 } RGBABitDescription, *PRGBABitDescription;
 
+#define DEV_R(descr,val) (((((uint32_t)(val)) << (descr)->red_range  ) >> 8) << (descr)->red_shift)
+#define DEV_G(descr,val) (((((uint32_t)(val)) << (descr)->green_range) >> 8) << (descr)->green_shift)
+#define DEV_B(descr,val) (((((uint32_t)(val)) << (descr)->blue_range ) >> 8) << (descr)->blue_shift )
+#define DEV_A(descr,val) (((((uint32_t)(val)) << (descr)->alpha_range) >> 8) << (descr)->alpha_shift)
+#define DEV_RGB(descr,r,g,b)        ( DEV_R(descr,r) | DEV_G(descr,g) | DEV_B(descr,b) )
+#define DEV_RGBA(descr,r,g,b,a)     ( DEV_RGB(descr,r,g,b) | DEV_A(descr,a) )
+#define COLOR2DEV_RGB(descr,color)  ( DEV_RGB(descr,COLOR_R(color),COLOR_G(color),COLOR_B(color) ) )
+#define PALETTE2DEV_RGB(descr,p)  ( DEV_RGB(descr,p.r,p.g,p.b) )
+#define COLOR2DEV_RGBA(descr,color,alpha) ( DEV_RGBA(descr,COLOR_R(color),COLOR_G(color),COLOR_B(color),alpha ) )
+
 typedef struct
 {
 	int status; /* -1 not ok to use, 0 not initialized, 1, ok to use */
@@ -776,7 +786,7 @@ extern UnixGuts  guts;
 extern UnixGuts* pguts;
 
 #define XCHECKPOINT						\
-	STMT_START {							\
+	{							\
 		pguts-> ri[ pguts-> ri_head]. line = __LINE__;			\
 		pguts-> ri[ pguts-> ri_head]. file = __FILE__;			\
 		pguts-> ri[ pguts-> ri_head]. request = NextRequest(DISP);	\
@@ -786,9 +796,9 @@ extern UnixGuts* pguts;
 		if ( pguts-> ri_tail == pguts-> ri_head) {			\
 			pguts-> ri_tail++;					\
 			if ( pguts-> ri_tail >= REQUEST_RING_SIZE)		\
-				pguts-> ri_tail = 0;					\
+				pguts-> ri_tail = 0;				\
 		}								\
-	} STMT_END
+	}
 
 #define APC_BAD_SIZE INT_MAX
 #define APC_BAD_ORIGIN INT_MAX
@@ -814,7 +824,7 @@ typedef struct _drawable_sys_data
 	XDrawable gdrawable;
 	XWindow parent;
 	Point origin, size, bsize;
-	Point transform, gtransform, btransform;
+	Point transform, btransform;
 	Point ackOrigin, ackSize, ackFrameSize;
 	int menuHeight;
 	int menuColorImmunity;
@@ -832,24 +842,24 @@ typedef struct _drawable_sys_data
 	ColorSet colors;
 	Region invalid_region, paint_region, current_region, cached_region;
 	XRectangle clip_rect;
-	FillPattern fill_pattern, saved_fill_pattern;
-	Point fill_pattern_offset, saved_fill_pattern_offset;
-	int fill_mode, saved_fill_mode;
-	Pixmap fp_pixmap;
+	FillPattern fill_pattern;
+	Point fill_pattern_offset;
+	int fill_mode;
+	Pixmap fp_tile, fp_stipple, fp_render_pen;
+	XID fp_render_picture;
 #if defined(sgi) && !defined(__GNUC__)
 /* multiple compilation and runtime errors otherwise. must be some alignment tricks */
 	char dummy_b_1[2];
 #endif
-	int rop, paint_rop;
-	int rop2, paint_rop2;
-	int alpha, paint_alpha;
+	int rop;
+	int rop2;
+	int alpha;
 	int line_style;
-	float line_width, paint_line_width, miter_limit;
-	unsigned char *dashes, *paint_dashes;
-	int ndashes, paint_ndashes;
+	float line_width, miter_limit;
+	unsigned char *dashes;
+	int ndashes;
 	Point clip_mask_extent, shape_extent, shape_offset;
 	PCachedFont font;
-	Font saved_font;
 	Point cursor_pos;
 	Point cursor_size;
 	CustomPointer user_pointer;
@@ -859,7 +869,6 @@ typedef struct _drawable_sys_data
 	XWindow client;
 	struct {
 		unsigned antialias                : 1;
-		unsigned saved_antialias          : 1;
 		unsigned base_line                : 1;
 		unsigned brush_fore               : 1;
 		unsigned brush_back               : 1;
@@ -885,8 +894,6 @@ typedef struct _drawable_sys_data
 		unsigned kill_current_region      : 1;
 		unsigned opaque                   : 1;
 		unsigned paint                    : 1;
-		unsigned paint_base_line          : 1;
-		unsigned paint_opaque             : 1;
 		unsigned paint_pending            : 1;
 		unsigned pointer_obscured         : 1;
 		unsigned position_determined      : 1;
@@ -911,6 +918,7 @@ typedef struct _drawable_sys_data
 	int borderIcons;
 	XVisualInfo * visual;
 	Colormap colormap;
+	PList gc_stack;
 #ifdef USE_XFT
 	XftDraw  * xft_drawable;
 	uint32_t * xft_map8;
@@ -930,6 +938,37 @@ typedef struct _drawable_sys_data
 #define XF_IN_PAINT(x)  ((x)->flags.paint)
 #define XF_LAYERED(x)  ((x)->flags.layered)
 #define XFLUSH          if (XX->flags.force_flush) XFlush(DISP)
+
+typedef struct _PaintState
+{
+	Bool in_paint;
+	struct {
+		Brush fore, back;
+		GC gc;
+		GCList *gcl;
+		struct gc_head* gc_pool;
+		Region region;
+		Pixmap tile, stipple;
+		Bool kill_tile, kill_stipple;
+	} paint;
+	struct {
+		Color fore, back;
+		XGCValues gcv;
+	} nonpaint;
+	int alpha, fill_mode, n_dashes, rop, rop2;
+	Bool antialias, text_opaque, text_baseline, null_hatch;
+	Point fill_pattern_offset, transform;
+	Handle fill_image;
+	FillPattern fill_pattern;
+	Font font;
+	float line_width, miter_limit;
+	unsigned char *dashes;
+
+	unsigned int user_data_size;
+	GCStorageFunction * user_destructor;
+	void *user_data, *user_context;
+	char user_data_buf[1]; /* this needs to be the last */
+} PaintState, *PPaintState;
 
 #define MenuTimerMessage   1021
 
@@ -1104,8 +1143,11 @@ prima_save_xerror_event( XErrorEvent *xr);
 extern void
 prima_restore_xerror_event( XErrorEvent *xr);
 
-extern void
+extern struct gc_head*
 prima_get_gc( PDrawableSysData);
+
+extern void
+prima_get_fill_pattern_offsets( Handle self, int * x, int * y );
 
 extern void
 prima_rebuild_watchers( void);
@@ -1184,7 +1226,7 @@ extern Bool
 prima_create_icon_pixmaps( Handle bw_icon, Pixmap *xor, Pixmap *and);
 
 extern ImageCache*
-prima_image_cache( PImage img, int type);
+prima_image_cache( PImage img, int type, int alpha);
 
 extern Bool
 prima_put_ximage( XDrawable win, GC gc, PrimaXImage *i,
@@ -1213,14 +1255,21 @@ prima_std_pixmap( Handle self, int type);
 #define CREATE_ARGB_PICTURE(drawable, depth, target) \
 	if ( guts.render_extension) target = prima_render_create_picture(drawable, depth)
 
+#define CLEANUP_RENDER_STIPPLES(self) \
+	if (guts.render_extension) prima_render_cleanup_stipples(self)
+
 extern Picture
 prima_render_create_picture(XDrawable drawable, int depth);
+
+void
+prima_render_cleanup_stipples(Handle self);
 
 #else
 
 #define CREATE_ARGB_PICTURE(drawable, depth, target)
 #define DELETE_ARGB_PICTURE(x)
 #define CLIP_ARGB_PICTURE(x,region)
+#define CLEANUP_RENDER_STIPPLES(self)
 
 #endif
 
@@ -1374,7 +1423,7 @@ extern XCharStruct *
 prima_char_struct( XFontStruct * xs, void * c, Bool wide);
 
 extern Color**
-prima_standard_colors(void);
+prima_standard_colors(int * n_classes);
 
 struct MsgDlg {
 	struct MsgDlg * next;

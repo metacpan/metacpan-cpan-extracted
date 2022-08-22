@@ -4,8 +4,6 @@ lib/Net/IPAM/Block.pm
 lib/Net/IPAM/Block/Private.pm
 LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
 README
 t/00-load.t
 t/01-new.t
@@ -20,7 +18,10 @@ t/10-errors.t
 t/11-subclassing.t
 t/12-diff.t
 t/13-overload.t
+t/14-serialization.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 xt/boilerplate.t
+META.yml
+META.json

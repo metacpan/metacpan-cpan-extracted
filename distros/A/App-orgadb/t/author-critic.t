@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/orgadb.pm','lib/App/orgadb/Common.pm','lib/App/orgadb/Shell.pm','lib/App/orgadb/Shell/Commands.pm','script/orgadb'];
+my $filenames = ['lib/App/orgadb.pm','lib/App/orgadb/Common.pm','lib/App/orgadb/Select/Shell.pm','lib/App/orgadb/Select/Shell/Commands.pm','script/orgadb-sel'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

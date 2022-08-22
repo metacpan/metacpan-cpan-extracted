@@ -33,11 +33,11 @@ no_index:
 provides:
   Test::Pod::CoverageChange:
     file: lib/Test/Pod/CoverageChange.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Exporter: '0'
   File::Find::Rule: '0'
-  List::Util: '0'
+  List::Util: '1.43'
   Module::Path: '0'
   Path::Tiny: '0'
   Pod::Checker: '0'
@@ -52,7 +52,7 @@ resources:
   bugtracker: https://github.com/binary-com/perl-Test-Pod-CoverageChange/issues
   homepage: https://github.com/binary-com/perl-Test-Pod-CoverageChange
   repository: https://github.com/binary-com/perl-Test-Pod-CoverageChange.git
-version: '0.002'
+version: '0.003'
 x_authority: cpan:DERIV
 x_contributors:
   - 'chylli-binary <chylli@binary.com>'

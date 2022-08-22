@@ -11,6 +11,11 @@
 #  define CvXSUBANY_sv_set(cv, sv)  (CvXSUBANY(cv).any_ptr = (sv))
 #endif
 
+#ifdef CvREFCOUNTED_ANYSV
+#  define HAVE_CVREFCOUNTED_ANYSV
+#endif
+
+#ifndef HAVE_CVREFCOUNTED_ANYSV
 static int free_anysv_refcounted(pTHX_ SV *sv, MAGIC *mg)
 {
   SvREFCNT_dec(CvXSUBANY_sv((CV *)sv));
@@ -20,11 +25,16 @@ static int free_anysv_refcounted(pTHX_ SV *sv, MAGIC *mg)
 static MGVTBL vtbl_anysv_refcounted = {
   .svt_free = &free_anysv_refcounted,
 };
+#endif
 
 #define cv_set_anysv_refcounted(cv, sv)  S_cv_set_anysv_refcounted(aTHX_ cv, sv)
 static void S_cv_set_anysv_refcounted(pTHX_ CV *cv, SV *sv)
 {
   CvXSUBANY_sv_set(cv, sv);
 
+#ifdef HAVE_CVREFCOUNTED_ANYSV
+  CvREFCOUNTED_ANYSV_on(cv);
+#else
   sv_magicext((SV *)cv, NULL, PERL_MAGIC_ext, &vtbl_anysv_refcounted, NULL, 0);
+#endif
 }

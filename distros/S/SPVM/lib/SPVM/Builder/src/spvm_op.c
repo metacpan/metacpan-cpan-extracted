@@ -97,28 +97,63 @@
 const char* const* SPVM_OP_C_ID_NAMES(void) {
 
   static const char* const id_names[] = {
+    "grammar",
+    "list",
+    "pushmark",
+    "do_nothing",
+    "name",
+    "descriptor",
+    "current_class",
+    "class",
+    "extends",
+    "class_block",
+    "end_of_file",
     "if",
     "unless",
     "elsif",
     "else",
+    "condition",
+    "condition_not",
+    "switch",
+    "case",
+    "default",
+    "switch_condition",
+    "break",
     "for",
     "while",
-    "null",
-    "list",
-    "pushmark",
-    "grammar",
-    "name",
-    "class",
+    "loop",
+    "loop_increment",
+    "last",
+    "next",
     "my",
     "field",
     "method",
     "enum",
-    "descriptor",
     "enumeration_value",
-    "block",
     "enum_block",
-    "class_block",
+    "block",
+    "eval",
     "type",
+    "mutable",
+    "void",
+    "byte",
+    "short",
+    "int",
+    "long",
+    "float",
+    "double",
+    "string",
+    "object",
+    "dot3",
+    "of",
+    "use",
+    "as",
+    "alias",
+    "require",
+    "if_require",
+    "init",
+    "interface",
+    "return",
     "constant",
     "inc",
     "dec",
@@ -147,36 +182,13 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "assign",
     "call_method",
     "field_access",
-    "use",
-    "return",
-    "last",
-    "next",
-    "loop",
     "var",
     "convert",
     "undef",
     "array_length",
-    "condition",
-    "condition_not",
     "die",
-    "switch",
-    "case",
-    "default",
-    "switch_condition",
-    "void",
-    "eval",
-    "block_end",
     "exception_var",
     "new",
-    "stab",
-    "byte",
-    "short",
-    "int",
-    "long",
-    "float",
-    "double",
-    "string",
-    "object",
     "weaken",
     "weaken_field",
     "unweaken",
@@ -185,14 +197,10 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "isweak_field",
     "special_assign",
     "concat",
-    "set",
-    "get",
     "class_var",
     "class_var_access",
     "array_init",
     "bool",
-    "loop_increment",
-    "self",
     "check_convert",
     "numeric_eq",
     "numeric_ne",
@@ -209,35 +217,23 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "string_le",
     "string_cmp",
     "isa",
+    "is_type",
     "sequence",
-    "precompile",
     "scalar",
     "array_field_access",
     "reference",
     "deref",
-    "dot3",
     "string_length",
-    "rw",
-    "ro",
-    "wo",
-    "init",
-    "require",
-    "if_require",
     "current_class_name",
     "free_tmp",
     "refcnt",
     "allow",
-    "break",
     "warn",
     "print",
     "refop",
     "dump",
     "true",
     "false",
-    "current_class",
-    "as",
-    "mutable",
-    "end_of_file",
     "divide_unsigned_int",
     "divide_unsigned_long",
     "remainder_unsigned_int",
@@ -246,18 +242,11 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "is_read_only",
     "make_read_only",
     "copy",
-    "interface",
     "has_impl",
-    "element",
-    "oarray",
-    "alias",
-    "of",
-    "required",
     "class_id",
     "error_code",
     "set_error_code",
     "error",
-    "extends",
   };
   
   return id_names;
@@ -366,7 +355,10 @@ int32_t SPVM_OP_is_rel_op(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_STRING_LE:
     case SPVM_OP_C_ID_STRING_CMP:
     case SPVM_OP_C_ID_ISA:
+    case SPVM_OP_C_ID_IS_TYPE:
+    {
       return 1;
+    }
   }
   
   return 0;
@@ -708,7 +700,7 @@ SPVM_OP* SPVM_OP_cut_op(SPVM_COMPILER* compiler, SPVM_OP* op_target) {
   SPVM_OP_get_before(compiler, op_target, &op_before, &next_is_child);
   
   // Stab
-  SPVM_OP* op_stab = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_STAB, op_target->file, op_target->line);
+  SPVM_OP* op_stab = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_DO_NOTHING, op_target->file, op_target->line);
   if (next_is_child) {
     
     // One child
@@ -1240,7 +1232,7 @@ SPVM_OP* SPVM_OP_build_while_statement(SPVM_COMPILER* compiler, SPVM_OP* op_whil
   SPVM_OP* op_loop = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_LOOP, op_while->file, op_while->line);
   
   // Init statement. This is null.
-  SPVM_OP* op_operand_init = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NULL, op_while->file, op_while->line);
+  SPVM_OP* op_operand_init = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_DO_NOTHING, op_while->file, op_while->line);
   
   // Condition
   assert(op_operand_condition->moresib == 0);
@@ -1255,7 +1247,7 @@ SPVM_OP* SPVM_OP_build_while_statement(SPVM_COMPILER* compiler, SPVM_OP* op_whil
   op_block_statements->uv.block->id = SPVM_BLOCK_C_ID_LOOP_STATEMENTS;
   
   // Next value. This is null.
-  SPVM_OP* op_operand_increment = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NULL, op_while->file, op_while->line);
+  SPVM_OP* op_operand_increment = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_DO_NOTHING, op_while->file, op_while->line);
 
   SPVM_OP* op_block_init = SPVM_OP_new_op_block(compiler, op_while->file, op_while->line);
   op_block_init->uv.block->id = SPVM_BLOCK_C_ID_LOOP_INIT;
@@ -1454,9 +1446,12 @@ int32_t SPVM_OP_get_mem_id(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_STRING_LE:
     case SPVM_OP_C_ID_STRING_CMP:
     case SPVM_OP_C_ID_ISA:
+    case SPVM_OP_C_ID_IS_TYPE:
     case SPVM_OP_C_ID_ISWEAK_FIELD:
     case SPVM_OP_C_ID_HAS_IMPL:
+    {
       return 0;
+    }
     default: {
       SPVM_OP* op_var = SPVM_OP_get_target_op_var(compiler, op);
       
@@ -1519,6 +1514,7 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_STRING_LE:
     case SPVM_OP_C_ID_STRING_CMP:
     case SPVM_OP_C_ID_ISA:
+    case SPVM_OP_C_ID_IS_TYPE:
     case SPVM_OP_C_ID_IF:
     case SPVM_OP_C_ID_ISWEAK_FIELD:
     case SPVM_OP_C_ID_IS_READ_ONLY:
@@ -2049,6 +2045,12 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
         if (class->category == SPVM_CLASS_C_CATEGORY_MULNUM) {
           SPVM_COMPILER_error(compiler, "The interface statement can't be used in the definition of the multi-numeric type at %s line %d", op_decl->file, op_decl->line);
         }
+        const char* interface_name = op_decl->uv.interface->class_name;
+        
+        if (strcmp(class->name, interface_name) == 0) {
+          SPVM_COMPILER_error(compiler, "The interface name specified by the interface statement must be different from the name of the current interface at %s line %d", op_decl->file, op_decl->line);
+        }
+        
         SPVM_LIST_push(class->interface_decls, op_decl->uv.interface);
       }
       // Class var declarations
@@ -2376,21 +2378,6 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
         // Method having interface_t descriptor must be method
         if (method->is_class_method) {
           SPVM_COMPILER_error(compiler, "The method defined in the interface must be an instance method at %s line %d", method->op_method->file, method->op_method->line);
-        }
-        
-        // If class is interface, the method must not be native
-        if (method->is_native) {
-          SPVM_COMPILER_error(compiler, "The method defined in the interface can't have the method descriptor \"native\" at %s line %d", method->op_method->file, method->op_method->line);
-        }
-
-        // If class is interface, the method must not be precompile
-        if (method->is_precompile) {
-          SPVM_COMPILER_error(compiler, "The method defined in the interface can't have the method descriptor \"precompile\" at %s line %d", method->op_method->file, method->op_method->line);
-        }
-        
-        // If class is interface, the method must not be precompile
-        if (method->op_block) {
-          SPVM_COMPILER_error(compiler, "The method defined in the interface can't have the block at %s line %d", method->op_method->file, method->op_method->line);
         }
       }
       else if (class->category == SPVM_CLASS_C_CATEGORY_CLASS) {
@@ -3128,20 +3115,19 @@ SPVM_OP* SPVM_OP_build_comparison_op(SPVM_COMPILER* compiler, SPVM_OP* op_compar
   return op_assign;
 }
 
-SPVM_OP* SPVM_OP_build_isa(SPVM_COMPILER* compiler, SPVM_OP* op_isa, SPVM_OP* op_operand, SPVM_OP* op_type) {
+SPVM_OP* SPVM_OP_build_is_type(SPVM_COMPILER* compiler, SPVM_OP* op_is_type, SPVM_OP* op_operand, SPVM_OP* op_type) {
   
   // Build op
-  SPVM_OP_insert_child(compiler, op_isa, op_isa->last, op_operand);
-  SPVM_OP_insert_child(compiler, op_isa, op_isa->last, op_type);
+  SPVM_OP_insert_child(compiler, op_is_type, op_is_type->last, op_operand);
+  SPVM_OP_insert_child(compiler, op_is_type, op_is_type->last, op_type);
 
-  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "$.condition_flag", op_isa->file, op_isa->line);
+  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "$.condition_flag", op_is_type->file, op_is_type->line);
   SPVM_OP* op_var = SPVM_OP_new_op_var(compiler, op_name_var);
-  SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_isa->file, op_isa->line);
-  SPVM_OP_build_assign(compiler, op_assign, op_var, op_isa);
+  SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_is_type->file, op_is_type->line);
+  SPVM_OP_build_assign(compiler, op_assign, op_var, op_is_type);
   
   return op_assign;
 }
-
 
 SPVM_OP* SPVM_OP_build_binary_op(SPVM_COMPILER* compiler, SPVM_OP* op_bin, SPVM_OP* op_first, SPVM_OP* op_last) {
   
@@ -3356,7 +3342,7 @@ SPVM_OP* SPVM_OP_build_return(SPVM_COMPILER* compiler, SPVM_OP* op_return, SPVM_
   return op_return;
 }
 
-SPVM_OP* SPVM_OP_build_value_op_statement(SPVM_COMPILER* compiler, SPVM_OP* op_value_op) {
+SPVM_OP* SPVM_OP_build_operator_statement(SPVM_COMPILER* compiler, SPVM_OP* op_value_op) {
   
   // Free tmp vars at end of value_op statement
   SPVM_OP* op_free_tmp = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_FREE_TMP, op_value_op->file, op_value_op->line);
@@ -3493,7 +3479,7 @@ SPVM_OP* SPVM_OP_build_array_type(SPVM_COMPILER* compiler, SPVM_OP* op_type_chil
     SPVM_OP_insert_child(compiler, op_type, op_type->last, op_operand_length);
   }
   else {
-    SPVM_OP* op_null = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NULL, op_type_child->file, op_type_child->line);
+    SPVM_OP* op_null = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_DO_NOTHING, op_type_child->file, op_type_child->line);
     SPVM_OP_insert_child(compiler, op_type, op_type->last, op_null);
   }
 

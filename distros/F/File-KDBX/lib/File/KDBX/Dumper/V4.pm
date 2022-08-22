@@ -19,7 +19,7 @@ use namespace::clean;
 
 extends 'File::KDBX::Dumper';
 
-our $VERSION = '0.905'; # VERSION
+our $VERSION = '0.906'; # VERSION
 
 has _binaries_written => {}, is => 'ro';
 
@@ -238,6 +238,12 @@ sub _write_body {
     my $cipher = $kdbx->cipher(key => $final_key);
     $fh = File::KDBX::IO::Crypt->new($fh, cipher => $cipher);
 
+    my $got_iv_size = length($kdbx->headers->{+HEADER_ENCRYPTION_IV});
+    my $iv_size = $cipher->iv_size;
+    alert "Encryption IV should be $iv_size bytes long",
+        got         => $got_iv_size,
+        expected    => $iv_size if $got_iv_size != $iv_size;
+
     my $compress = $kdbx->headers->{+HEADER_COMPRESSION_FLAGS};
     if ($compress == COMPRESSION_GZIP) {
         load_optional('IO::Compress::Gzip');
@@ -374,7 +380,7 @@ File::KDBX::Dumper::V4 - Dump KDBX4 files
 
 =head1 VERSION
 
-version 0.905
+version 0.906
 
 =head1 BUGS
 

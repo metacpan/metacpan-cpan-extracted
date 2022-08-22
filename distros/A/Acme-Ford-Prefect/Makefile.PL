@@ -15,7 +15,7 @@ my %WriteMakefileArgs = (
   "ABSTRACT"           => "Test Module for Alien::Base",
   "AUTHOR"             => "Graham Ollis <plicease\@cpan.org>, Joel Berger",
   "CONFIGURE_REQUIRES" => {
-    "Acme::Alien::DontPanic" => "2.5100",
+    "Acme::Alien::DontPanic" => "2.5900",
     "Alien::Base::Wrapper"   => "1.02",
     "ExtUtils::MakeMaker"    => 0
   },
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test2::V0"              => "0.000121",
     "Test::Alien::Diag"      => 0
   },
-  "VERSION" => "2.5100",
+  "VERSION" => "2.5900",
   "test"    => {
     "TESTS" => "t/*.t"
   }

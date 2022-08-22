@@ -1,5 +1,11 @@
-libterm-cli-perl (0.057001-1) unstable; urgency=low
+libterm-cli-perl (0.058002-1) unstable; urgency=low
 
   * Upstream release.
 
- -- Steven Bakker <steven.bakker@ams-ix.net>  Wed, 20 Apr 2022 16:10:36 +0200
+ -- Steven Bakker <sbakker@cpan.org>  Mon, 22 Jul 2022 17:15:48 +0200
+
+libterm-cli-perl (0.058001-1) unstable; urgency=low
+
+  * Upstream release.
+
+ -- Steven Bakker <sbakker@cpan.org>  Thu, 21 Jul 2022 18:17:16 +0200

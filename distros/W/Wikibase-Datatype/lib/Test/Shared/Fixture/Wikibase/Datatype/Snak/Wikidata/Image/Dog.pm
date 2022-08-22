@@ -6,7 +6,7 @@ use warnings;
 
 use Wikibase::Datatype::Value::String;
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
 
 sub new {
 	my $class = shift;
@@ -90,6 +90,8 @@ Returns string.
 
 =head1 EXAMPLE
 
+=for comment filename=fixture_create_and_print_snak_wd_image_dog.pl
+
  use strict;
  use warnings;
 
@@ -141,6 +143,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.19
+0.20
 
 =cut

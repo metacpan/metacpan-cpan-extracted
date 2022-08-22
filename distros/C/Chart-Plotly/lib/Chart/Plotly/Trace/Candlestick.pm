@@ -9,11 +9,12 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 use Chart::Plotly::Trace::Candlestick::Decreasing;
 use Chart::Plotly::Trace::Candlestick::Hoverlabel;
 use Chart::Plotly::Trace::Candlestick::Increasing;
+use Chart::Plotly::Trace::Candlestick::Legendgrouptitle;
 use Chart::Plotly::Trace::Candlestick::Line;
 use Chart::Plotly::Trace::Candlestick::Stream;
 use Chart::Plotly::Trace::Candlestick::Transform;
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: The candlestick is a style of financial chart describing open, high, low and close for a given `x` coordinate (most likely time). The boxes represent the spread between the `open` and `close` values and the lines represent the spread between the `low` and `high` values Sample points where the close value is higher (lower) then the open value are called increasing (decreasing). By default, increasing candles are drawn in green whereas decreasing are drawn in red.
 
@@ -56,19 +57,19 @@ has close => ( is            => "rw",
 
 has closesrc => ( is            => "rw",
                   isa           => "Str",
-                  documentation => "Sets the source reference on plot.ly for  close .",
+                  documentation => "Sets the source reference on Chart Studio Cloud for `close`.",
 );
 
 has customdata => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
       "Assigns extra data each datum. This may be useful when listening to hover, click and selection events. Note that, *scatter* traces also appends customdata items in the markers DOM elements",
 );
 
 has customdatasrc => ( is            => "rw",
                        isa           => "Str",
-                       documentation => "Sets the source reference on plot.ly for  customdata .",
+                       documentation => "Sets the source reference on Chart Studio Cloud for `customdata`.",
 );
 
 has decreasing => ( is  => "rw",
@@ -81,19 +82,19 @@ has high => ( is            => "rw",
 
 has highsrc => ( is            => "rw",
                  isa           => "Str",
-                 documentation => "Sets the source reference on plot.ly for  high .",
+                 documentation => "Sets the source reference on Chart Studio Cloud for `high`.",
 );
 
 has hoverinfo => (
-    is  => "rw",
-    isa => "Str|ArrayRef[Str]",
+    is            => "rw",
+    isa           => "Str|ArrayRef[Str]",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
 
 has hoverinfosrc => ( is            => "rw",
                       isa           => "Str",
-                      documentation => "Sets the source reference on plot.ly for  hoverinfo .",
+                      documentation => "Sets the source reference on Chart Studio Cloud for `hoverinfo`.",
 );
 
 has hoverlabel => ( is  => "rw",
@@ -106,29 +107,39 @@ has hovertext => ( is            => "rw",
 
 has hovertextsrc => ( is            => "rw",
                       isa           => "Str",
-                      documentation => "Sets the source reference on plot.ly for  hovertext .",
+                      documentation => "Sets the source reference on Chart Studio Cloud for `hovertext`.",
 );
 
 has ids => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
       "Assigns id labels to each datum. These ids for object constancy of data points during animation. Should be an array of strings, not numbers or any other type.",
 );
 
 has idssrc => ( is            => "rw",
                 isa           => "Str",
-                documentation => "Sets the source reference on plot.ly for  ids .",
+                documentation => "Sets the source reference on Chart Studio Cloud for `ids`.",
 );
 
 has increasing => ( is  => "rw",
                     isa => "Maybe[HashRef]|Chart::Plotly::Trace::Candlestick::Increasing", );
 
 has legendgroup => (
-    is  => "rw",
-    isa => "Str",
+    is            => "rw",
+    isa           => "Str",
     documentation =>
       "Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.",
+);
+
+has legendgrouptitle => ( is  => "rw",
+                          isa => "Maybe[HashRef]|Chart::Plotly::Trace::Candlestick::Legendgrouptitle", );
+
+has legendrank => (
+    is            => "rw",
+    isa           => "Num",
+    documentation =>
+      "Sets the legend rank for this trace. Items and groups with smaller ranks are presented on top/left side while with `*reversed* `legend.traceorder` they are on bottom/right side. The default legendrank is 1000, so that you can use ranks less than 1000 to place certain items before all unranked items, and ranks greater than 1000 to go after all unranked items.",
 );
 
 has line => ( is  => "rw",
@@ -141,19 +152,19 @@ has low => ( is            => "rw",
 
 has lowsrc => ( is            => "rw",
                 isa           => "Str",
-                documentation => "Sets the source reference on plot.ly for  low .",
+                documentation => "Sets the source reference on Chart Studio Cloud for `low`.",
 );
 
 has pmeta => (
-    is  => "rw",
-    isa => "Any|ArrayRef[Any]",
+    is            => "rw",
+    isa           => "Any|ArrayRef[Any]",
     documentation =>
       "Assigns extra meta information associated with this trace that can be used in various text attributes. Attributes such as trace `name`, graph, axis and colorbar `title.text`, annotation `text` `rangeselector`, `updatemenues` and `sliders` `label` text all support `meta`. To access the trace `meta` values in an attribute in the same trace, simply use `%{meta[i]}` where `i` is the index or key of the `meta` item in question. To access trace `meta` in layout attributes, use `%{data[n[.meta[i]}` where `i` is the index or key of the `meta` and `n` is the trace index.",
 );
 
 has metasrc => ( is            => "rw",
                  isa           => "Str",
-                 documentation => "Sets the source reference on plot.ly for  meta .",
+                 documentation => "Sets the source reference on Chart Studio Cloud for `meta`.",
 );
 
 has name => ( is            => "rw",
@@ -173,12 +184,12 @@ has open => ( is            => "rw",
 
 has opensrc => ( is            => "rw",
                  isa           => "Str",
-                 documentation => "Sets the source reference on plot.ly for  open .",
+                 documentation => "Sets the source reference on Chart Studio Cloud for `open`.",
 );
 
 has selectedpoints => (
-    is  => "rw",
-    isa => "Any",
+    is            => "rw",
+    isa           => "Any",
     documentation =>
       "Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.",
 );
@@ -193,43 +204,43 @@ has stream => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Candlestick::Stream", );
 
 has text => (
-    is  => "rw",
-    isa => "Str|ArrayRef[Str]",
+    is            => "rw",
+    isa           => "Str|ArrayRef[Str]",
     documentation =>
       "Sets hover text elements associated with each sample point. If a single string, the same string appears over all the data points. If an array of string, the items are mapped in order to this trace's sample points.",
 );
 
 has textsrc => ( is            => "rw",
                  isa           => "Str",
-                 documentation => "Sets the source reference on plot.ly for  text .",
+                 documentation => "Sets the source reference on Chart Studio Cloud for `text`.",
 );
 
 has transforms => ( is  => "rw",
                     isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Candlestick::Transform]", );
 
 has uid => (
-    is  => "rw",
-    isa => "Str",
+    is            => "rw",
+    isa           => "Str",
     documentation =>
       "Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.",
 );
 
 has uirevision => (
-    is  => "rw",
-    isa => "Any",
+    is            => "rw",
+    isa           => "Any",
     documentation =>
       "Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.",
 );
 
 has visible => (
-    is => "rw",
+    is            => "rw",
     documentation =>
       "Determines whether or not this trace is visible. If *legendonly*, the trace is not drawn, but can appear as a legend item (provided that the legend itself is visible).",
 );
 
 has whiskerwidth => (
-    is  => "rw",
-    isa => "Num",
+    is            => "rw",
+    isa           => "Num",
     documentation =>
       "Sets the width of the whiskers relative to the box' width. For example, with 1, the whiskers are as wide as the box(es).",
 );
@@ -240,29 +251,63 @@ has x => ( is            => "rw",
 );
 
 has xaxis => (
-    is => "rw",
+    is            => "rw",
     documentation =>
       "Sets a reference between this trace's x coordinates and a 2D cartesian x axis. If *x* (the default value), the x coordinates refer to `layout.xaxis`. If *x2*, the x coordinates refer to `layout.xaxis2`, and so on.",
 );
 
 has xcalendar => ( is  => "rw",
                    isa => enum(
-                           [ "gregorian", "chinese", "coptic", "discworld", "ethiopian", "hebrew", "islamic", "julian",
-                             "mayan", "nanakshahi", "nepali", "persian", "jalali", "taiwan", "thai", "ummalqura"
+                           [ "chinese", "coptic", "discworld",  "ethiopian", "gregorian", "hebrew", "islamic", "jalali",
+                             "julian",  "mayan",  "nanakshahi", "nepali",    "persian",   "taiwan", "thai", "ummalqura"
                            ]
                    ),
                    documentation => "Sets the calendar system to use with `x` date data.",
 );
 
+has xhoverformat => (
+    is            => "rw",
+    isa           => "Str",
+    documentation =>
+      "Sets the hover text formatting rulefor `x`  using d3 formatting mini-languages which are very similar to those in Python. For numbers, see: https://github.com/d3/d3-format/tree/v1.4.5#d3-format. And for dates see: https://github.com/d3/d3-time-format/tree/v2.2.3#locale_format. We add two items to d3's date formatter: *%h* for half of the year as a decimal number as well as *%{n}f* for fractional seconds with n digits. For example, *2016-10-13 09:15:23.456* with tickformat *%H~%M~%S.%2f* would display *09~15~23.46*By default the values are formatted using `xaxis.hoverformat`.",
+);
+
+has xperiod => (
+    is            => "rw",
+    isa           => "Any",
+    documentation =>
+      "Only relevant when the axis `type` is *date*. Sets the period positioning in milliseconds or *n* on the x axis. Special values in the form of *n* could be used to declare the number of months. In this case `n` must be a positive integer.",
+);
+
+has xperiod0 => (
+    is            => "rw",
+    isa           => "Any",
+    documentation =>
+      "Only relevant when the axis `type` is *date*. Sets the base for period positioning in milliseconds or date string on the x0 axis. When `x0period` is round number of weeks, the `x0period0` by default would be on a Sunday i.e. 2000-01-02, otherwise it would be at 2000-01-01.",
+);
+
+has xperiodalignment => (
+      is            => "rw",
+      isa           => enum( [ "start", "middle", "end" ] ),
+      documentation => "Only relevant when the axis `type` is *date*. Sets the alignment of data points on the x axis.",
+);
+
 has xsrc => ( is            => "rw",
               isa           => "Str",
-              documentation => "Sets the source reference on plot.ly for  x .",
+              documentation => "Sets the source reference on Chart Studio Cloud for `x`.",
 );
 
 has yaxis => (
-    is => "rw",
+    is            => "rw",
     documentation =>
       "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.",
+);
+
+has yhoverformat => (
+    is            => "rw",
+    isa           => "Str",
+    documentation =>
+      "Sets the hover text formatting rulefor `y`  using d3 formatting mini-languages which are very similar to those in Python. For numbers, see: https://github.com/d3/d3-format/tree/v1.4.5#d3-format. And for dates see: https://github.com/d3/d3-time-format/tree/v2.2.3#locale_format. We add two items to d3's date formatter: *%h* for half of the year as a decimal number as well as *%{n}f* for fractional seconds with n digits. For example, *2016-10-13 09:15:23.456* with tickformat *%H~%M~%S.%2f* would display *09~15~23.46*By default the values are formatted using `yaxis.hoverformat`.",
 );
 
 __PACKAGE__->meta->make_immutable();
@@ -280,7 +325,7 @@ Chart::Plotly::Trace::Candlestick - The candlestick is a style of financial char
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -344,7 +389,7 @@ Sets the close values.
 
 =item * closesrc
 
-Sets the source reference on plot.ly for  close .
+Sets the source reference on Chart Studio Cloud for `close`.
 
 =item * customdata
 
@@ -352,7 +397,7 @@ Assigns extra data each datum. This may be useful when listening to hover, click
 
 =item * customdatasrc
 
-Sets the source reference on plot.ly for  customdata .
+Sets the source reference on Chart Studio Cloud for `customdata`.
 
 =item * decreasing
 
@@ -362,7 +407,7 @@ Sets the high values.
 
 =item * highsrc
 
-Sets the source reference on plot.ly for  high .
+Sets the source reference on Chart Studio Cloud for `high`.
 
 =item * hoverinfo
 
@@ -370,7 +415,7 @@ Determines which trace information appear on hover. If `none` or `skip` are set,
 
 =item * hoverinfosrc
 
-Sets the source reference on plot.ly for  hoverinfo .
+Sets the source reference on Chart Studio Cloud for `hoverinfo`.
 
 =item * hoverlabel
 
@@ -380,7 +425,7 @@ Same as `text`.
 
 =item * hovertextsrc
 
-Sets the source reference on plot.ly for  hovertext .
+Sets the source reference on Chart Studio Cloud for `hovertext`.
 
 =item * ids
 
@@ -388,13 +433,19 @@ Assigns id labels to each datum. These ids for object constancy of data points d
 
 =item * idssrc
 
-Sets the source reference on plot.ly for  ids .
+Sets the source reference on Chart Studio Cloud for `ids`.
 
 =item * increasing
 
 =item * legendgroup
 
 Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.
+
+=item * legendgrouptitle
+
+=item * legendrank
+
+Sets the legend rank for this trace. Items and groups with smaller ranks are presented on top/left side while with `*reversed* `legend.traceorder` they are on bottom/right side. The default legendrank is 1000, so that you can use ranks less than 1000 to place certain items before all unranked items, and ranks greater than 1000 to go after all unranked items.
 
 =item * line
 
@@ -404,7 +455,7 @@ Sets the low values.
 
 =item * lowsrc
 
-Sets the source reference on plot.ly for  low .
+Sets the source reference on Chart Studio Cloud for `low`.
 
 =item * pmeta
 
@@ -412,7 +463,7 @@ Assigns extra meta information associated with this trace that can be used in va
 
 =item * metasrc
 
-Sets the source reference on plot.ly for  meta .
+Sets the source reference on Chart Studio Cloud for `meta`.
 
 =item * name
 
@@ -428,7 +479,7 @@ Sets the open values.
 
 =item * opensrc
 
-Sets the source reference on plot.ly for  open .
+Sets the source reference on Chart Studio Cloud for `open`.
 
 =item * selectedpoints
 
@@ -446,7 +497,7 @@ Sets hover text elements associated with each sample point. If a single string, 
 
 =item * textsrc
 
-Sets the source reference on plot.ly for  text .
+Sets the source reference on Chart Studio Cloud for `text`.
 
 =item * transforms
 
@@ -478,13 +529,33 @@ Sets a reference between this trace's x coordinates and a 2D cartesian x axis. I
 
 Sets the calendar system to use with `x` date data.
 
+=item * xhoverformat
+
+Sets the hover text formatting rulefor `x`  using d3 formatting mini-languages which are very similar to those in Python. For numbers, see: https://github.com/d3/d3-format/tree/v1.4.5#d3-format. And for dates see: https://github.com/d3/d3-time-format/tree/v2.2.3#locale_format. We add two items to d3's date formatter: *%h* for half of the year as a decimal number as well as *%{n}f* for fractional seconds with n digits. For example, *2016-10-13 09:15:23.456* with tickformat *%H~%M~%S.%2f* would display *09~15~23.46*By default the values are formatted using `xaxis.hoverformat`.
+
+=item * xperiod
+
+Only relevant when the axis `type` is *date*. Sets the period positioning in milliseconds or *n* on the x axis. Special values in the form of *n* could be used to declare the number of months. In this case `n` must be a positive integer.
+
+=item * xperiod0
+
+Only relevant when the axis `type` is *date*. Sets the base for period positioning in milliseconds or date string on the x0 axis. When `x0period` is round number of weeks, the `x0period0` by default would be on a Sunday i.e. 2000-01-02, otherwise it would be at 2000-01-01.
+
+=item * xperiodalignment
+
+Only relevant when the axis `type` is *date*. Sets the alignment of data points on the x axis.
+
 =item * xsrc
 
-Sets the source reference on plot.ly for  x .
+Sets the source reference on Chart Studio Cloud for `x`.
 
 =item * yaxis
 
 Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.
+
+=item * yhoverformat
+
+Sets the hover text formatting rulefor `y`  using d3 formatting mini-languages which are very similar to those in Python. For numbers, see: https://github.com/d3/d3-format/tree/v1.4.5#d3-format. And for dates see: https://github.com/d3/d3-time-format/tree/v2.2.3#locale_format. We add two items to d3's date formatter: *%h* for half of the year as a decimal number as well as *%{n}f* for fractional seconds with n digits. For example, *2016-10-13 09:15:23.456* with tickformat *%H~%M~%S.%2f* would display *09~15~23.46*By default the values are formatted using `yaxis.hoverformat`.
 
 =back
 
@@ -494,7 +565,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

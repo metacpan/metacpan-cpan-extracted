@@ -2,11 +2,10 @@ package Prima::Notebooks;
 
 use strict;
 use warnings;
-use Prima qw(IntUtils ScrollWidget);
+use Prima qw(Widget::ScrollWidget);
 
 package Prima::TabSet;
-use vars qw(@ISA);
-@ISA = qw(Prima::Widget Prima::MouseScroller);
+use base qw(Prima::Widget Prima::Widget::MouseScroller);
 
 
 {
@@ -1562,7 +1561,7 @@ sub geomSize
 
 package Prima::ScrollNotebook;
 use vars qw(@ISA);
-@ISA = qw(Prima::ScrollGroup);
+@ISA = qw(Prima::Widget::ScrollGroup);
 
 for ( qw(pageIndex insert_page delete_page),
 		keys %Prima::TabbedNotebook::notebookProps) {

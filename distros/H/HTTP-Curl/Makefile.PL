@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
 	NAME         => "HTTP::Curl",
-	ABSTRACT     => 'HTTP interface for Net::Curl (clone HTTP::Any::Curl)',
+	ABSTRACT     => 'HTTP interface for Net::Curl (clone of HTTP::Any::Curl)',
 	AUTHOR       => '<kni@cpan.org>',
 	LICENSE      => "perl",
 	VERSION_FROM => "HTTP/Curl.pm",

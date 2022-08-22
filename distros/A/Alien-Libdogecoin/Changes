@@ -1,4 +1,7 @@
 Revision history for Alien::Libdogecoin
 
-0.1.0 2022-08-11 19:10:49 America/Los_Angeles
+0.1.1.1 2022-08-13 14:15:55 America/Los_Angeles
+    - build without networking, to work around libevent.h dependency
+
+0.1.1 2022-08-11 19:10:49 America/Los_Angeles
     - initial release, supporting libdogecoin 0.1.0

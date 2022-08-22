@@ -13,13 +13,13 @@ use FFI::Platypus::Buffer qw( scalar_to_buffer );
 use FFI::Platypus::Buffer qw( buffer_to_scalar );
 
 # ABSTRACT: Convert string scalar to a buffer as a pointer / size_t combination
-our $VERSION = '1.58'; # VERSION
+our $VERSION = '2.00'; # VERSION
 
 
 my @stack;
 
 *arguments_set_size_t
-  = FFI::Platypus->new( api => 1 )->sizeof('size_t') == 4
+  = FFI::Platypus->new( api => 2 )->sizeof('size_t') == 4
   ? \&arguments_set_uint32
   : \&arguments_set_uint64;
 
@@ -61,7 +61,7 @@ FFI::Platypus::Type::PointerSizeBuffer - Convert string scalar to a buffer as a 
 
 =head1 VERSION
 
-version 1.58
+version 2.00
 
 =head1 SYNOPSIS
 
@@ -75,9 +75,9 @@ In your C code:
 
 In your Platypus::FFI code:
 
- use FFI::Platypus;
+ use FFI::Platypus 2.00;
  
- my $ffi = FFI::Platypus->new( api => 1 );
+ my $ffi = FFI::Platypus->new( api => 2 );
  $ffi->load_custom_type('::PointerSizeBuffer' => 'buffer');
  
  $ffi->attach(function_with_buffer => ['buffer'] => 'void');

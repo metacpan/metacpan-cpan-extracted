@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::be_tarask - Locale data examples for the Belarusian (be-tarask) locale
+DateTime::Locale::be_tarask - Locale data examples for the Belarusian Taraskievica orthography (be-tarask) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-Belarusian locale.
+Belarusian Taraskievica orthography locale.
 
 =head2 Days
 

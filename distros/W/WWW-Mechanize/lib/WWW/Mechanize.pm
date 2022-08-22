@@ -6,7 +6,7 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = '2.13';
+our $VERSION = '2.15';
 
 use Tie::RefHash ();
 use HTTP::Request 1.30 ();
@@ -751,7 +751,8 @@ sub form_with_fields {
 sub all_forms_with {
     my ( $self, %spec ) = @_;
 
-    my @forms = $self->forms;
+    my $action = delete $spec{action};
+    my @forms = grep { !$action || $_->action eq $action } $self->forms;
     foreach my $attr ( keys %spec ) {
         @forms = grep _equal( $spec{$attr}, $_->attr($attr) ), @forms or return;
     }
@@ -828,7 +829,16 @@ sub field {
     }
     else {
         if ( ref($value) eq 'ARRAY' ) {
-            $form->param($name, $value);
+            my $input = $form->find_input($name);
+
+            if ( $input->type eq 'file' ) {
+                $input->file( shift @$value );
+                $input->filename( shift @$value );
+                $input->headers( @$value );
+            }
+            else {
+                $form->param($name, $value);
+            }
         }
         else {
             $form->value($name => $value);
@@ -920,10 +930,20 @@ sub set_fields {
     FIELD:
     for my $field ( keys %fields ) {
         my $value = $fields{$field};
+        my $number = 1;
 
         if ( ref $value eq 'ARRAY' ) {
-            $form->find_input( $field, undef,
-                         $value->[1])->value($value->[0] );
+            my $input = $form->find_input($field) or next FIELD;
+
+            # Honor &submit_form's documentation, that says that a
+            # "file" input's value can be in the form of
+            # "[[$filepath, $filename], 1]".
+            if (
+                $input->type ne 'file'
+                || ( $input->type eq 'file' && ref( $value->[0] ) eq 'ARRAY' )
+            ) {
+                ( $value, $number ) = ( $value->[0], $value->[1] );
+            }
         }
         else {
             if ( ref $value eq 'SCALAR' ) {
@@ -941,9 +961,8 @@ sub set_fields {
                 }
                 $value = $possible_values[ $$value ];
             }
-
-            $form->value($field => $value);
         }
+        $self->field($field, $value, $number);
     }
 }
 
@@ -1242,6 +1261,15 @@ sub quiet {
     $self->{quiet} = $_[0] if @_;
 
     return $self->{quiet};
+}
+
+
+sub autocheck {
+    my $self = shift;
+
+    $self->{autocheck} = $_[0] if @_;
+
+    return $self->{autocheck};
 }
 
 
@@ -1863,7 +1891,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 2.13
+version 2.15
 
 =head1 SYNOPSIS
 
@@ -2031,11 +2059,12 @@ are errors, not warnings.
 The default value is ON, unless it's being subclassed, in which
 case it is OFF.  This means that standalone L<WWW::Mechanize> instances
 have autocheck turned on, which is protective for the vast majority
-of Mech users who don't bother checking the return value of get()
-and post() and can't figure why their code fails. However, if
-L<WWW::Mechanize> is subclassed, such as for L<Test::WWW::Mechanize>
-or L<Test::WWW::Mechanize::Catalyst>, this may not be an appropriate
-default, so it's off.
+of Mech users who don't bother checking the return value of
+C<L<< get()|/"$mech->get( $uri )" >>>
+and C<L<< post()|/"$mech->post( $uri, content => $content )" >>> and can't
+figure why their code fails. However, if L<WWW::Mechanize> is subclassed, such
+as for L<Test::WWW::Mechanize> or L<Test::WWW::Mechanize::Catalyst>, this may
+not be an appropriate default, so it's off.
 
 =item * C<< noproxy => [0|1] >>
 
@@ -2865,8 +2894,6 @@ Note that this functionality requires libwww-perl 5.69 or higher.
 
 Searches for forms with arbitrary attribute/value pairs within the E<lt>formE<gt>
 tag.
-(Currently does not work for attribute C<action> due to implementation details
-of L<HTML::Form>.)
 When given more than one pair, all criteria must match.
 Using C<undef> as value means that the attribute in question must not be present.
 
@@ -2876,9 +2903,6 @@ All matching forms (perhaps none) are returned as a list of L<HTML::Form> object
 
 Searches for forms with arbitrary attribute/value pairs within the E<lt>formE<gt>
 tag.
-(Currently does not work for attribute C<action> due to implementation details
-of L<HTML::Form>. Use C<L<< form_action()|/"$mech->form_action( $action )" >>>
-instead.)
 When given more than one pair, all criteria must match.
 Using C<undef> as value means that the attribute in question must not be present.
 
@@ -2910,11 +2934,32 @@ These methods allow you to set the values of fields in a given form.
 
 =head2 $mech->field( $name, \@values, $number )
 
+=head2 $mech->field( $name, \@file_upload_values, $number )
+
 Given the name of a field, set its value to the value specified.
 This applies to the current form (as set by the
 C<L<< form_name()|/"$mech->form_name( $name [, \%args ] )" >>> or
 C<L<< form_number()|/"$mech->form_number($number)" >>>
 method or defaulting to the first form on the page).
+
+If the field is of type "file", its value should be an arrayref. Example:
+
+    $mech->field( $file_input, ['/tmp/file.txt'] );
+
+Value examples for "file" inputs, followed by explanation of what each
+index mean:
+
+    # 0: filepath      1: filename    3: headers
+    ['/tmp/file.txt']
+    ['/tmp/file.txt', 'filename.txt']
+    ['/tmp/file.txt', 'filename.txt', @headers]
+    ['/tmp/file.txt', 'filename.txt', Content => 'some content']
+    [undef,           'filename.txt', Content => 'content here']
+
+Index 0 is the I<filepath> that will be read from disk. Index 1 is the
+filename which will be used in the HTTP request body; if not given,
+filepath (index 0) is used instead. If C<<Content => 'content here'>> is
+used as shown, then I<filepath> will be ignored.
 
 The optional C<$number> parameter is used to distinguish between two fields
 with the same name.  The fields are numbered from 1.
@@ -2946,6 +2991,8 @@ false and calls C<< $self->warn() >> with an error message.
 
 =head2 $mech->set_fields( $name => \$value_instance_number )
 
+=head2 $mech->set_fields( $name => \@file_upload )
+
 This method sets multiple fields of the current form. It takes a list
 of field name and value pairs. If there is more than one field with
 the same name, the first one found is set. If you want to select which
@@ -2954,6 +3001,19 @@ which has the field value and its number as the 2 elements.
 
         # set the second $name field to 'foo'
         $mech->set_fields( $name => [ 'foo', 2 ] );
+
+The value of a field of type "file" should be an arrayref as described
+in C<L<< field()|$mech->field( $name, $value, $number ) >>>. Examples:
+
+        $mech->set_fields( $file_field => ['/tmp/file.txt'] );
+        $mech->set_fields( $file_field => ['/tmp/file.txt', 'filename.txt'] );
+
+The value for a "file" input can also be an arrayref containing an
+arrayref and a number, as documented in
+C<L<< submit_form()|$mech->submit_form( ... ) >>>.
+The number will be used to find the field in the form. Example:
+
+        $mech->set_fields( $file_field => [['/tmp/file.txt'], 1] );
 
 The fields are numbered from 1.
 
@@ -3224,6 +3284,18 @@ Allows you to suppress warnings to the screen.
     $mech->quiet(0); # turns on warnings (the default)
     $mech->quiet(1); # turns off warnings
     $mech->quiet();  # returns the current quietness status
+
+=head2 $mech->autocheck(true/false)
+
+Allows you to enable and disable autochecking.
+
+Autocheck checks each request made to see if it was successful. This saves you
+the trouble of manually checking yourself. Any errors found are errors, not
+warnings. Please see C<L<< new|/"new()" >>> for more details.
+
+    $mech->autocheck(1); # turns on automatic request checking (the default)
+    $mech->autocheck(0); # turns off automatic request checking
+    $mech->autocheck();  # returns the current autocheck status
 
 =head2 $mech->stack_depth( $max_depth )
 

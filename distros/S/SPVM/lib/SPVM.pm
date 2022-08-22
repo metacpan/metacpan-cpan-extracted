@@ -1,6 +1,6 @@
 package SPVM;
 
-our $VERSION = '0.9638';
+our $VERSION = '0.9643';
 
 use 5.008007;
 use strict;
@@ -414,7 +414,7 @@ SPVM Language Specification.
 
 =over 2
 
-=item * L<Language Specification|SPVM::Document::LanguageSpecification>
+=item * L<Language Specification|SPVM::Document::Language>
 
 =back
 

@@ -4,6 +4,7 @@ requires "Pod::Coverage";
 requires "Test::More";
 requires "Test::Pod::Coverage";
 requires "constant";
+requires "List::Util", ">= 1.43";
 
 on 'test' => sub {
     requires "File::Spec";

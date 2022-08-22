@@ -1564,6 +1564,78 @@ void ObjectPad__need_PLparser(pTHX)
   }
 }
 
+/* used by XSUB deconstruct_object */
+#define deconstruct_object_class(av, classmeta, offset)  S_deconstruct_object_class(aTHX_ av, classmeta, offset)
+static U32 S_deconstruct_object_class(pTHX_ AV *backingav, ClassMeta *classmeta, FIELDOFFSET offset)
+{
+  dSP;
+  U32 retcount = 0;
+  AV *fields = classmeta->direct_fields;
+  U32 nfields = av_count(fields);
+
+  EXTEND(SP, nfields * 2);
+
+  FIELDOFFSET i;
+  for(i = 0; i < nfields; i++) {
+    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
+
+    mPUSHs(newSVpvf("%" SVf ".%" SVf,
+        SVfARG(classmeta->name), SVfARG(fieldmeta->name)));
+
+    SV *value = AvARRAY(backingav)[offset + fieldmeta->fieldix];
+    switch(SvPV_nolen(fieldmeta->name)[0]) {
+      case '$':
+        value = newSVsv(value);
+        break;
+
+      case '@':
+        value = newRV_noinc((SV *)newAVav((AV *)SvRV(value)));
+        break;
+
+      case '%':
+        value = newRV_noinc((SV *)newHVhv((HV *)SvRV(value)));
+        break;
+    }
+
+    mPUSHs(value);
+
+    retcount += 2;
+  }
+
+  PUTBACK;
+
+  return retcount;
+}
+
+/* used by XSUB ref_field */
+#define ref_field_class(want_fieldname, backingav, classmeta, offset)  S_ref_field_class(aTHX_ want_fieldname, backingav, classmeta, offset)
+static SV *S_ref_field_class(pTHX_ SV *want_fieldname, AV *backingav, ClassMeta *classmeta, FIELDOFFSET offset)
+{
+  AV *fields = classmeta->direct_fields;
+  U32 nfields = av_count(fields);
+
+  FIELDOFFSET i;
+  for(i = 0; i < nfields; i++) {
+    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
+
+    if(!sv_eq(want_fieldname, fieldmeta->name))
+      continue;
+
+    /* found it */
+    SV *sv = AvARRAY(backingav)[offset + fieldmeta->fieldix];
+    switch(SvPV_nolen(fieldmeta->name)[0]) {
+      case '$':
+        return newRV_inc(sv);
+
+      case '@':
+      case '%':
+        return newSVsv(sv);
+    }
+  }
+
+  return NULL;
+}
+
 MODULE = Object::Pad    PACKAGE = Object::Pad::MOP::Class
 
 INCLUDE: mop-class.xsi
@@ -1622,6 +1694,125 @@ register(class, name, ...)
 
     register_field_attribute(savepv(SvPV_nolen(name)), funcs, funcdata);
   }
+
+MODULE = Object::Pad    PACKAGE = Object::Pad::MetaFunctions
+
+SV *
+metaclass(SV *obj)
+  CODE:
+  {
+    if(!SvROK(obj) || !SvOBJECT(SvRV(obj)))
+      croak("Expected an object reference to metaclass");
+
+    HV *stash = SvSTASH(SvRV(obj));
+
+    GV **gvp = (GV **)hv_fetchs(stash, "META", 0);
+    if(!gvp)
+      croak("Unable to find ClassMeta for %" HEKf, HEKfARG(HvNAME_HEK(stash)));
+
+    RETVAL = newSVsv(GvSV(*gvp));
+  }
+  OUTPUT:
+    RETVAL
+
+void
+deconstruct_object(SV *obj)
+  PPCODE:
+  {
+    if(!SvROK(obj) || !SvOBJECT(SvRV(obj)))
+      croak("Expected an object reference to deconstruct_object");
+
+    ClassMeta *classmeta = mop_get_class_for_stash(SvSTASH(SvRV(obj)));
+
+    AV *backingav = (AV *)get_obj_backingav(obj, classmeta->repr, true);
+
+    U32 retcount = 0;
+
+    PUSHs(sv_mortalcopy(classmeta->name));
+    retcount++;
+
+    PUTBACK;
+
+    while(classmeta) {
+      retcount += deconstruct_object_class(backingav, classmeta, 0);
+
+      AV *roles = classmeta->cls.direct_roles;
+      U32 nroles = av_count(roles);
+      for(U32 i = 0; i < nroles; i++) {
+        RoleEmbedding *embedding = (RoleEmbedding *)AvARRAY(roles)[i];
+
+        retcount += deconstruct_object_class(backingav, embedding->rolemeta, embedding->offset);
+      }
+
+      classmeta = classmeta->cls.supermeta;
+    }
+
+    SPAGAIN;
+    XSRETURN(retcount);
+  }
+
+SV *
+ref_field(SV *fieldname, SV *obj)
+  CODE:
+  {
+    SV *want_classname = NULL, *want_fieldname;
+
+    if(!SvROK(obj) || !SvOBJECT(SvRV(obj)))
+      croak("Expected an object reference to ref_field");
+
+    SvGETMAGIC(fieldname);
+
+    char *s = SvPV_nolen(fieldname);
+    char *dotpos;
+    if((dotpos = strchr(s, '.'))) {
+      U32 flags = SvUTF8(fieldname) ? SVf_UTF8 : 0;
+      want_classname = newSVpvn_flags(s, dotpos - s, flags);
+      want_fieldname = newSVpvn_flags(dotpos + 1, strlen(dotpos + 1), flags);
+    }
+    else {
+      want_fieldname = SvREFCNT_inc(fieldname);
+    }
+
+    SAVEFREESV(want_classname);
+    SAVEFREESV(want_fieldname);
+
+    ClassMeta *classmeta = mop_get_class_for_stash(SvSTASH(SvRV(obj)));
+
+    AV *backingav = (AV *)get_obj_backingav(obj, classmeta->repr, true);
+
+    while(classmeta) {
+      if(!want_classname || sv_eq(want_classname, classmeta->name)) {
+        RETVAL = ref_field_class(want_fieldname, backingav, classmeta, 0);
+        if(RETVAL)
+          goto done;
+      }
+
+      AV *roles = classmeta->cls.direct_roles;
+      U32 nroles = av_count(roles);
+      for(U32 i = 0; i < nroles; i++) {
+        RoleEmbedding *embedding = (RoleEmbedding *)AvARRAY(roles)[i];
+
+        if(!want_classname || sv_eq(want_classname, embedding->rolemeta->name)) {
+          RETVAL = ref_field_class(want_fieldname, backingav, embedding->rolemeta, embedding->offset);
+          if(RETVAL)
+            goto done;
+        }
+      }
+
+      classmeta = classmeta->cls.supermeta;
+    }
+
+    if(want_classname)
+      croak("Could not find a field called %" SVf " in class %" SVf,
+        SVfARG(want_fieldname), SVfARG(want_classname));
+    else
+      croak("Could not find a field called %" SVf " in any class",
+        SVfARG(want_fieldname));
+done:
+    ;
+  }
+  OUTPUT:
+    RETVAL
 
 BOOT:
   XopENTRY_set(&xop_methstart, xop_name, "methstart");

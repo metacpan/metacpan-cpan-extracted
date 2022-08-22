@@ -2,7 +2,7 @@ These are notes for the maintainer.
 
 Steps to release:
 
-  - Update HISTORY file with description of new stuff and release date.
+  - Update ChangeLog file with description of new stuff and release date.
 
   - Update version number in Curses.pm (search for VERSION).
 
@@ -13,6 +13,7 @@ Steps to release:
     perl Makefile.PL PANELS MENUS FORMS
     make
     perl -Mblib -MCurses -e1
+    perl demo
 
   - Make a tarball:
 
@@ -58,7 +59,7 @@ But the changes are modest, so it should be possible some day to
 generate new files, diff to see what changed, and put those changes
 into the Gen programs.
 
-Originally, what is in gen.tar was a directory name 'gen' in the Curses
+Originally, what is in gen.tar was a directory named 'gen' in the Curses
 package on CPAN, and CPAN unfortunately indexes the Perl modules in there as
 public modules.  And because make.Curses.pm contains the perldoc stuff for
 Curses.pm, people have even been mislead into using that unmaintained file

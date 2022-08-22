@@ -1,4 +1,4 @@
-package NewFangle 0.08 {
+package NewFangle 0.09 {
 
   use strict;
   use warnings;
@@ -46,7 +46,7 @@ NewFangle - Unofficial Perl NewRelic SDK
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -112,7 +112,10 @@ For instance:
 
  my $bool = newrelic_configure_log($filename, $level);
 
-Configure the C SDK's logging system.  C<$level> should be one of:
+Configure the C SDK's logging system.  If the literal string C<stdout> 
+or C<stdout> is specified for C<$filename>, then the logs will be 
+written to standard output or standard error, respectively.  C<$level> 
+should be one of:
 
 =over 4
 
@@ -210,7 +213,7 @@ Owen Allsopp (ALLSOPP)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Graham Ollis.
+This software is copyright (c) 2020-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

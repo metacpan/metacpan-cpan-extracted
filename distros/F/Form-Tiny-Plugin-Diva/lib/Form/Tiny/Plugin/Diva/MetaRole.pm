@@ -1,10 +1,8 @@
 package Form::Tiny::Plugin::Diva::MetaRole;
-
+$Form::Tiny::Plugin::Diva::MetaRole::VERSION = '1.03';
 use v5.10;
 use strict;
 use warnings;
-
-our $VERSION = '1.02';
 
 use Moo::Role;
 

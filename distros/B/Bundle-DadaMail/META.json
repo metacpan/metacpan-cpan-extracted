@@ -4,13 +4,13 @@
       "JJSIMONI <justin@dadamailproject.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Bundle-DadaMail",
    "no_index" : {
@@ -37,6 +37,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.0.14",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "v0.0.16",
+   "x_serialization_backend" : "JSON::PP version 4.11"
 }

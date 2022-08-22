@@ -31,7 +31,7 @@ subtest 'Stats' => sub {
     ->json_is('/delayed_jobs'  => 0)->json_is('/enqueued_jobs'    => 2)
     ->json_is('/failed_jobs'   => 0)->json_is('/finished_jobs'    => 1)
     ->json_is('/inactive_jobs' => 1)->json_is('/inactive_workers' => 0)
-    ->json_has('/uptime');
+    ->json_is('/workers' => 0)->json_has('/uptime');
 };
 
 subtest 'Jobs' => sub {

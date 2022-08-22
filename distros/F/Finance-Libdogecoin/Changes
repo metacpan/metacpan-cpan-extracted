@@ -1,0 +1,8 @@
+Revision history for UNIVERSAL::can
+
+1.20220815.1712 2022-08-15 10:12:39-07:00 America/Los_Angeles
+    - make Changes auto-versioning work
+    - improve backwards compatibility to Perl 5.12
+
+Finance-Libdogecoin-1.20220814.2215:
+    - first release!

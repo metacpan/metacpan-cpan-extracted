@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::WebSocket;
-$Playwright::WebSocket::VERSION = '1.210';
+$Playwright::WebSocket::VERSION = '1.251';
 use parent 'Playwright::Base';
 
 sub new {
@@ -32,26 +32,6 @@ sub waitForFrameReceived {
     );
 }
 
-sub isClosed {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'isClosed',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub socketError {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'socketError',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub waitForEvent2 {
     my $self = shift;
     return $self->_api_request(
@@ -62,11 +42,11 @@ sub waitForEvent2 {
     );
 }
 
-sub frameSent {
+sub waitForEvent {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'frameSent',
+        command => 'waitForEvent',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -92,6 +72,16 @@ sub close {
     );
 }
 
+sub socketError {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'socketError',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub frameReceived {
     my $self = shift;
     return $self->_api_request(
@@ -102,11 +92,21 @@ sub frameReceived {
     );
 }
 
-sub waitForEvent {
+sub frameSent {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'waitForEvent',
+        command => 'frameSent',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub isClosed {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'isClosed',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -166,7 +166,7 @@ Playwright::WebSocket - Automatically generated class for Playwright::WebSocket
 
 =head1 VERSION
 
-version 1.210
+version 1.251
 
 =head1 CONSTRUCTOR
 
@@ -183,29 +183,17 @@ Execute the WebSocket::waitForFrameReceived playwright routine.
 
 See L<https://playwright.dev/api/class-WebSocket#WebSocket-waitForFrameReceived> for more information.
 
-=head2 isClosed(@args)
-
-Execute the WebSocket::isClosed playwright routine.
-
-See L<https://playwright.dev/api/class-WebSocket#WebSocket-isClosed> for more information.
-
-=head2 socketError(@args)
-
-Execute the WebSocket::socketError playwright routine.
-
-See L<https://playwright.dev/api/class-WebSocket#WebSocket-socketError> for more information.
-
 =head2 waitForEvent2(@args)
 
 Execute the WebSocket::waitForEvent2 playwright routine.
 
 See L<https://playwright.dev/api/class-WebSocket#WebSocket-waitForEvent2> for more information.
 
-=head2 frameSent(@args)
+=head2 waitForEvent(@args)
 
-Execute the WebSocket::frameSent playwright routine.
+Execute the WebSocket::waitForEvent playwright routine.
 
-See L<https://playwright.dev/api/class-WebSocket#WebSocket-frameSent> for more information.
+See L<https://playwright.dev/api/class-WebSocket#WebSocket-waitForEvent> for more information.
 
 =head2 url(@args)
 
@@ -219,17 +207,29 @@ Execute the WebSocket::close playwright routine.
 
 See L<https://playwright.dev/api/class-WebSocket#WebSocket-close> for more information.
 
+=head2 socketError(@args)
+
+Execute the WebSocket::socketError playwright routine.
+
+See L<https://playwright.dev/api/class-WebSocket#WebSocket-socketError> for more information.
+
 =head2 frameReceived(@args)
 
 Execute the WebSocket::frameReceived playwright routine.
 
 See L<https://playwright.dev/api/class-WebSocket#WebSocket-frameReceived> for more information.
 
-=head2 waitForEvent(@args)
+=head2 frameSent(@args)
 
-Execute the WebSocket::waitForEvent playwright routine.
+Execute the WebSocket::frameSent playwright routine.
 
-See L<https://playwright.dev/api/class-WebSocket#WebSocket-waitForEvent> for more information.
+See L<https://playwright.dev/api/class-WebSocket#WebSocket-frameSent> for more information.
+
+=head2 isClosed(@args)
+
+Execute the WebSocket::isClosed playwright routine.
+
+See L<https://playwright.dev/api/class-WebSocket#WebSocket-isClosed> for more information.
 
 =head2 waitForFrameSent(@args)
 

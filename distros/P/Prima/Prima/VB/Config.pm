@@ -60,11 +60,11 @@ sub classes
 		RTModule => 'Prima::InputLine',
 		module   => 'Prima::VB::CoreClasses',
 	},
-	'Prima::ScrollWidget' => {
+	'Prima::Widget::ScrollWidget' => {
 		icon     => 'VB::classes.gif:21',
 		page     => 'Abstract',
 		class    => 'Prima::VB::ScrollWidget',
-		RTModule => 'Prima::ScrollWidget',
+		RTModule => 'Prima::Widget::ScrollWidget',
 		module   => 'Prima::VB::CoreClasses',
 	},
 	'Prima::Widget' => {
@@ -261,6 +261,13 @@ sub classes
 		class  => 'Prima::VB::AbstractGrid',
 		page   => 'Abstract',
 		icon   => 'VB::classes.gif:33',
+		module   => 'Prima::VB::CoreClasses',
+	},
+	'Prima::DetailedOutline' => {
+		icon     => 'VB::classes.gif:35',
+		page     => 'Additional',
+		class    => 'Prima::VB::DetailedOutline',
+		RTModule => 'Prima::DetailedOutline',
 		module   => 'Prima::VB::CoreClasses',
 	},
 	);

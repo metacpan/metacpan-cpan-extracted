@@ -1,5 +1,12 @@
 Revision history for Perl Acme-Alien-DontPanic
 
+2.5900    2022-08-16 09:50:03 -0600
+  - Require Alien::Build 2.59
+  - Check cryptographic signature via Digest::Negotiate (gh#11)
+
+2.5300    2022-08-12 14:26:36 -0600
+  - Require Alien::Build 2.53
+
 2.5100    2022-08-03 09:58:42 -0600
   - Require Alien::Build 2.51
 

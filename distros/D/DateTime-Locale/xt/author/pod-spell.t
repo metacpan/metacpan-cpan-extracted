@@ -441,6 +441,7 @@ Taita
 Tajik
 Tamazight
 Tanii
+Taraskievica
 Taroko
 Tasawaq
 Tene

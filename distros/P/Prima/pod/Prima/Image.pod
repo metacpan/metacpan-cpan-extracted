@@ -703,6 +703,12 @@ is used as a transparency value.
 When C<::autoMasking> set to C<am::MaskIndex>, INDEXth
 color in teh current palette is used as a transparency value.
 
+=item maskLineSize INTEGER
+
+A read-only property, returning the length of mask row in bytes, as
+represented internally in memory. Data returned by C<::mask> property are
+aligned with C<::maskLineSize> bytes per row.
+
 =item maskType INTEGER
 
 Is either C<im::bpp1> (1) or C<im::bpp8> (8). The latter can be used
@@ -763,7 +769,9 @@ it can not load and save images.
 
 See L<Prima::image-load> for details.
 
-This method can be called without object instance.
+This method can be called without object instance:
+
+   perl -MData::Dumper=Dumper -MPrima::noX11 -MPrima -le 'print Dumper(Prima::Image->codecs)'
 
 =item dup
 
@@ -809,6 +817,11 @@ and
 See L<Prima::image-load> for details.
 
 NB! When loading from streams on win32, mind C<binmode>.
+
+=item load_stream BASE64_STRING, %OPTIONS
+
+Decodes BASE64_STRING and tries to load an image from it.
+Returns image reference(s) on success, or C<undef> on failure; also C<$@> is set in this case.
 
 =item map COLOR
 
@@ -881,6 +894,17 @@ Note that when saving to a stream, C<codecID> must be explicitly given in C<%PAR
 See L<Prima::image-load> for details.
 
 NB! When saving to streams on win32, mind C<binmode>.
+
+=item save_stream BASE64_STRING, %OPTIONS
+
+Saves image into a datastream and return it encoded in base64.
+Unless C<$OPTIONS{codecID}> or C<$image->{extras}->{codecID}> is set, tries to find the best codec for the job.
+
+Returns encoded content on success, or C<undef> on failure; C<$@> is set in the latter case.
+
+=item scanline Y
+
+Returns a scaline from Y in the same raw format as C<data>
 
 =item shear X, Y
 
@@ -957,21 +981,24 @@ Copies information from DATA and MASK images into C<::data>
 and C<::mask> property. DATA and MASK are expected to be images
 of same dimension.
 
-=item create_combined DATA, MASK
+=item create_combined DATA, MASK, %SET
 
-Same as C<combine>, but to be called as constructor.
+Same as C<combine>, but to be called as constructor, and sets properties in C<%SET>
 
 =item image %opt
 
 Renders icon graphics on a newly created I<Prima::Image> object instance
 upon black background.  If C<$opt{background}> is given, it is used instead.
 
+=item maskline Y
+
+Returns a mask scanline from Y in the same raw format as C<mask>
 
 =item premultiply_alpha CONSTANT_OR_IMAGE = undef
 
 Applies premultiplication formula to each pixel
 
-   pixel = pixel * alpha / 256
+   pixel = pixel * alpha / 255
 
 where alpha is the corresponding alpha value for each coordinate.
 Only applicable when C<maskType> is <im::bpp8>.

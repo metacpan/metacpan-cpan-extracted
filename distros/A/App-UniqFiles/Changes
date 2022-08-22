@@ -1,3 +1,12 @@
+0.134   2022-08-19  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add CLI dupe-files with the default of showing duplicate
+          files.
+
+        - [ux] Add --detail (-l) as shortcut for --show-digest --show-size
+          --show-count.
+
+
 0.133   2022-05-09  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

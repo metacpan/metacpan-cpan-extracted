@@ -1,17 +1,21 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
 package IO::Async::Future;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.801';
+our $VERSION = '0.802';
 
 use base qw( Future );
 Future->VERSION( '0.05' ); # to respect subclassing
+
+# Newer versions of Future have a proper subclassing-data API; for older
+#   versions we just treat it as a hashref
+use constant FUTURE_HAS_UDATA => defined Future->can( "udata" );
 
 use Carp;
 
@@ -67,11 +71,19 @@ sub new
    my $proto = shift;
    my $self = $proto->SUPER::new;
 
+   my $loop;
    if( ref $proto ) {
-      $self->{loop} = $proto->{loop};
+      $loop = $proto->loop;
    }
    else {
-      $self->{loop} = shift;
+      $loop = shift;
+   }
+
+   if( FUTURE_HAS_UDATA ) {
+      $self->set_udata( loop => $loop );
+   }
+   else {
+      $self->{loop} = $loop;
    }
 
    return $self;
@@ -92,13 +104,13 @@ Returns the underlying L<IO::Async::Loop> object.
 sub loop
 {
    my $self = shift;
-   return $self->{loop};
+   return FUTURE_HAS_UDATA ? $self->udata( "loop" ) : $self->{loop};
 }
 
 sub await
 {
    my $self = shift;
-   $self->{loop}->await( $self );
+   $self->loop->await( $self );
 }
 
 =head2 done_later

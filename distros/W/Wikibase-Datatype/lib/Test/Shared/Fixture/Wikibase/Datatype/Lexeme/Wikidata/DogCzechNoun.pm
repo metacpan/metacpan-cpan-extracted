@@ -9,7 +9,7 @@ use Test::Shared::Fixture::Wikibase::Datatype::Sense::Wikidata::Dog;
 use Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::GrammaticalGender::Masculine;
 use Wikibase::Datatype::Value::Monolingual;
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
 
 sub new {
 	my $class = shift;

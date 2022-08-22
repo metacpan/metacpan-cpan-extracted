@@ -9,6 +9,8 @@ use Test::Fatal;
 use Test::Identity;
 use Test::Refcount;
 
+use Time::HiRes qw( gettimeofday tv_interval );
+
 use Exporter 'import';
 our @EXPORT = qw(
    test_future_done
@@ -24,7 +26,11 @@ our @EXPORT = qw(
    test_future_wait_any
    test_future_needs_all
    test_future_needs_any
+   test_future_get
+   test_future_subclass
+   test_future_times
    test_future_label
+   test_future_udata
 );
 
 sub test_future_done
@@ -602,6 +608,54 @@ sub test_future_then
       is( exception { $f1->done; }, undef,
          'Dropping $fseq does not cause $f1->done to die' );
    }
+
+   # Non-future return is upgraded
+   {
+      my $f1 = $class->new;
+
+      my $fseq = $f1->then( sub { "result" } );
+      my $fseq2 = $f1->then( sub { $class->done } );
+
+      is( exception { $f1->done }, undef,
+          '->done with non-future return from ->then does not die' );
+
+      is( scalar $fseq->result, "result",
+          'non-future return from ->then is upgraded' );
+
+      ok( $fseq2->is_ready, '$fseq2 is ready after failure of $fseq' );
+
+      my $fseq3;
+      is( exception { $fseq3 = $f1->then( sub { "result" } ) }, undef,
+         'non-future return from ->then on immediate does not die' );
+
+      is( scalar $fseq3->result, "result",
+          'non-future return from ->then on immediate is upgraded' );
+   }
+
+   # then_with_f
+   {
+      my $f1 = $class->new;
+
+      my $f2;
+      my $fseq = $f1->then_with_f(
+         sub {
+            identical( $_[0], $f1, 'then_with_f block passed $f1' );
+            is( $_[1], "f1 result", 'then_with_f block pased result of $f1' );
+            return $f2 = $class->new;
+         }
+      );
+
+      ok( defined $fseq, '$fseq defined' );
+
+      $f1->done( "f1 result" );
+
+      ok( defined $f2, '$f2 defined after $f1->done' );
+
+      $f2->done( "f2 result" );
+
+      ok( $fseq->is_ready, '$fseq is done after $f2 done' );
+      is( scalar $fseq->result, "f2 result", '$fseq->result returns results' );
+   }
 }
 
 sub test_future_else
@@ -742,6 +796,54 @@ sub test_future_else
 
       ok( $f2->is_cancelled, '$f2 cancelled by $fseq cancel' );
    }
+
+   # Non-future return is upgraded
+   {
+      my $f1 = $class->new;
+
+      my $fseq = $f1->else( sub { "result" } );
+      my $fseq2 = $f1->else( sub { $class->done } );
+
+      is( exception { $f1->fail( "failed\n" ) }, undef,
+          '->fail with non-future return from ->else does not die' );
+
+      is( scalar $fseq->result, "result",
+          'non-future return from ->else is upgraded' );
+
+      ok( $fseq2->is_ready, '$fseq2 is ready after failure of $fseq' );
+
+      my $fseq3;
+      is( exception { $fseq3 = $f1->else( sub { "result" } ) }, undef,
+         'non-future return from ->else on immediate does not die' );
+
+      is( scalar $fseq3->result, "result",
+          'non-future return from ->else on immediate is upgraded' );
+   }
+
+   # else_with_f
+   {
+      my $f1 = $class->new;
+
+      my $f2;
+      my $fseq = $f1->else_with_f(
+         sub {
+            identical( $_[0], $f1, 'else_with_f block passed $f1' );
+            is( $_[1], "f1 failure\n", 'else_with_f block pased failure of $f1' );
+            return $f2 = $class->new;
+         }
+      );
+
+      ok( defined $fseq, '$fseq defined' );
+
+      $f1->fail( "f1 failure\n" );
+
+      ok( defined $f2, '$f2 defined after $f1->fail' );
+
+      $f2->done( "f2 result" );
+
+      ok( $fseq->is_ready, '$fseq is done after $f2 done' );
+      is( scalar $fseq->result, "f2 result", '$fseq->result returns results' );
+   }
 }
 
 sub test_future_thenelse
@@ -817,6 +919,26 @@ sub test_future_thenelse
 
       ok( $fseq->is_ready, '$fseq is ready after $fdone fail' );
       ok( scalar $fseq->failure, '$fseq failed after $fdone fail' );
+   }
+
+   # then_with_f
+   {
+      my $f1 = $class->new;
+
+      my $fseq = $f1->then_with_f(
+         sub {
+            identical( $_[0], $f1, 'then_with_f done block passed $f1' );
+            is( $_[1], "f1 result", 'then_with_f done block passed result of $f1' );
+            $class->done;
+         },
+         sub {
+            die "then_with_f fail block should not be called";
+         },
+      );
+
+      $f1->done( "f1 result" );
+
+      ok( $fseq->is_ready, '$fseq is ready after $f1 done' );
    }
 }
 
@@ -966,6 +1088,29 @@ sub test_future_followedby
       ok( $fseq->is_ready, '$fseq is ready after code exception on immediate' );
       is( scalar $fseq->failure, "It fails\n", '$fseq->failure after code exception on immediate' );
    }
+
+   # Non-future return is upgraded
+   {
+      my $f1 = $class->new;
+
+      my $fseq = $f1->followed_by( sub { "result" } );
+      my $fseq2 = $f1->followed_by( sub { $class->done } );
+
+      is( exception { $f1->done }, undef,
+          '->done with non-future return from ->followed_by does not die' );
+
+      is( scalar $fseq->result, "result",
+          'non-future return from ->followed_by is upgraded' );
+
+      ok( $fseq2->is_ready, '$fseq2 is ready after failure of $fseq' );
+
+      my $fseq3;
+      is( exception { $fseq3 = $f1->followed_by( sub { "result" } ) }, undef,
+         'non-future return from ->followed_by on immediate does not die' );
+
+      is( scalar $fseq3->result, "result",
+          'non-future return from ->followed_by on immediate is upgraded' );
+   }
 }
 
 sub test_future_catch
@@ -1053,6 +1198,44 @@ sub test_future_catch
                   test => sub { $class->done( 1234 ) },
                   sub { die "then &fail should not be invoked" } )->result ),
          1234, 'catch semantics via ->then' );
+   }
+
+   # catch_with_f
+   {
+      my $f1 = $class->new;
+
+      my $fseq = $f1->catch_with_f(
+         test => sub {
+            identical( $_[0], $f1, '$f1 passed to catch code' );
+            is( $_[1], "f1 failure\n", '$f1 failure message passed to catch code' );
+            $class->done;
+         },
+      );
+
+      ok( defined $fseq, 'defined $fseq' );
+      isa_ok( $fseq, $class, '$fseq' );
+
+      $f1->fail( "f1 failure\n", test => );
+
+      ok( $fseq->is_ready, '$fseq is done after $f1 fail' );
+   }
+
+   # catch via 'then_with_f'
+   {
+      my $f1 = $class->new;
+
+      my $fseq = $f1->then_with_f(
+         sub { die "then &done should not be invoked" },
+         test => sub {
+            identical( $_[0], $f1, '$f1 passed to catch code' );
+            is( $_[1], "f1 failure\n", '$f1 failure message passed to catch code' );
+            $class->done;
+         }
+      );
+
+      $f1->fail( "f1 failure\n", test => );
+
+      ok( $fseq->is_ready, '$fseq is done after $f1 fail' );
    }
 }
 
@@ -1743,6 +1926,270 @@ sub test_future_needs_any
    }
 }
 
+sub test_future_get
+{
+   my ( $class ) = @_;
+
+   # ->get on immediate done
+   {
+      my $f = $class->done( result => "here" );
+
+      is_deeply( [ $f->get ], [ result => "here" ], 'Result of ->get on done future' );
+   }
+
+   # ->get on immediate fail
+   {
+      my $f = $class->fail( "Something broke" );
+
+      like( exception { $f->get }, qr/^Something broke at /, 'Exception from ->get on failed future' );
+   }
+
+   # ->get on cancelled
+   {
+      my $f = $class->new;
+      $f->cancel;
+
+      like( exception { $f->get }, qr/cancelled/, 'Exception from ->get on cancelled future' );
+   }
+
+   # ->get while pending without await
+   {
+      my $f = $class->new;
+
+      like( exception { $f->get }, qr/ is not yet complete /, 'Exception from ->get on pending future' );
+   }
+
+   # ->get invokes ->await
+   {
+      no strict 'refs';
+      no warnings 'redefine';
+      local *{"${class}::await"} = sub {
+         shift->done( "result of await" );
+      };
+
+      my $f = $class->new;
+
+      is( scalar $f->get, "result of await", 'Result of ->get with overloaded ->await' );
+   }
+
+   # ->failure invokes ->await
+   {
+      no strict 'refs';
+      no warnings 'redefine';
+      local *{"${class}::await"} = sub {
+         shift->fail( "Oopsie\n" );
+      };
+
+      my $f = $class->new;
+
+      is( scalar $f->failure, "Oopsie\n", 'Result of ->failure with overloaded ->await' );
+   }
+}
+
+sub test_future_subclass
+{
+   my ( $class ) = @_;
+
+   package t::Future::Subclass {}
+   local @t::Future::Subclass::ISA = ( $class );
+
+   # constructors
+   {
+      my $f;
+
+      isa_ok( $f = t::Future::Subclass->new,
+              "t::Future::Subclass",
+              'Subclass->new' );
+      $f->cancel;
+
+      isa_ok( t::Future::Subclass->done(1),
+              "t::Future::Subclass",
+              'Subclass->done' );
+
+      isa_ok( t::Future::Subclass->fail("Oops\n"),
+              "t::Future::Subclass",
+              'Subclass->fail' );
+   }
+
+   # subclass->...
+   {
+      my $f = t::Future::Subclass->new;
+      my @seq;
+
+      isa_ok( $seq[@seq] = $f->then( sub {} ),
+              "t::Future::Subclass",
+              '$f->then' );
+
+      isa_ok( $seq[@seq] = $f->else( sub {} ),
+              "t::Future::Subclass",
+              '$f->and_then' );
+
+      isa_ok( $seq[@seq] = $f->then_with_f( sub {} ),
+              "t::Future::Subclass",
+              '$f->then_with_f' );
+
+      isa_ok( $seq[@seq] = $f->else_with_f( sub {} ),
+              "t::Future::Subclass",
+              '$f->else_with_f' );
+
+      isa_ok( $seq[@seq] = $f->followed_by( sub {} ),
+              "t::Future::Subclass",
+              '$f->followed_by' );
+
+      isa_ok( $seq[@seq] = $f->transform(),
+              "t::Future::Subclass",
+              '$f->transform' );
+
+      $_->cancel for @seq;
+   }
+
+   # immediate subclass->...
+   {
+      my $fdone = t::Future::Subclass->done;
+      my $ffail = t::Future::Subclass->fail( "Oop\n" );
+
+      isa_ok( $fdone->then( sub { 1 } ),
+              "t::Future::Subclass",
+              'immediate $f->then' );
+
+      isa_ok( $ffail->else( sub { 1 } ),
+              "t::Future::Subclass",
+              'immediate $f->else' );
+
+      isa_ok( $fdone->then_with_f( sub {} ),
+              "t::Future::Subclass",
+              'immediate $f->then_with_f' );
+
+      isa_ok( $ffail->else_with_f( sub {} ),
+              "t::Future::Subclass",
+              'immediate $f->else_with_f' );
+
+      isa_ok( $fdone->followed_by( sub {} ),
+              "t::Future::Subclass",
+              '$f->followed_by' );
+   }
+
+   # immediate->followed_by( sub { subclass } )
+   {
+      my $f = t::Future::Subclass->new;
+      my $seq;
+
+      isa_ok( $seq = $class->done->followed_by( sub { $f } ),
+              "t::Future::Subclass",
+              'imm->followed_by $f' );
+
+      $seq->cancel;
+   }
+
+   # convergents
+   {
+      my $f = t::Future::Subclass->new;
+      my @seq;
+
+      isa_ok( $seq[@seq] = $class->wait_all( $f ),
+              "t::Future::Subclass",
+              '$class->wait_all( $f )' );
+
+      isa_ok( $seq[@seq] = $class->wait_any( $f ),
+              "t::Future::Subclass",
+              '$class->wait_any( $f )' );
+
+      isa_ok( $seq[@seq] = $class->needs_all( $f ),
+              "t::Future::Subclass",
+              '$class->needs_all( $f )' );
+
+      isa_ok( $seq[@seq] = $class->needs_any( $f ),
+              "t::Future::Subclass",
+              '$class->needs_any( $f )' );
+
+      my $imm = $class->done;
+
+      isa_ok( $seq[@seq] = $class->wait_all( $imm, $f ),
+              "t::Future::Subclass",
+              '$class->wait_all( $imm, $f )' );
+
+      # Pick the more derived subclass even if all are pending
+
+      isa_ok( $seq[@seq] = $class->wait_all( $class->new, $f ),
+              "t::Future::Subclass",
+              '$class->wait_all( $class->new, $f' );
+
+      $_->cancel for @seq;
+   }
+
+   # empty convergents (RT97537)
+   {
+      my $f;
+
+      isa_ok( $f = t::Future::Subclass->wait_all(),
+              "t::Future::Subclass",
+              'subclass ->wait_all' );
+
+      isa_ok( $f = t::Future::Subclass->wait_any(),
+              "t::Future::Subclass",
+              'subclass ->wait_any' );
+      $f->failure;
+
+      isa_ok( $f = t::Future::Subclass->needs_all(),
+              "t::Future::Subclass",
+              'subclass ->needs_all' );
+
+      isa_ok( $f = t::Future::Subclass->needs_any(),
+              "t::Future::Subclass",
+              'subclass ->needs_any' );
+      $f->failure;
+   }
+
+   # ->get calls the correct await
+   {
+      my $f = t::Future::Subclass->new;
+
+      my $called;
+      no warnings 'once';
+      local *t::Future::Subclass::await = sub {
+         $called++;
+         identical( $_[0], $f, '->await is called on $f' );
+         $_[0]->done( "Result here" );
+      };
+
+      is_deeply( [ $f->get ],
+                 [ "Result here" ],
+                 'Result from ->get' );
+
+      ok( $called, '$f->await called' );
+   }
+}
+
+sub test_future_times
+{
+   my ( $class ) = @_;
+
+   $Future::TIMES or
+      BAIL_OUT( "Need to set \$Future::TIMES = 1" );
+
+   my $before = [ gettimeofday ];
+
+   my $future = $class->new;
+
+   ok( defined $future->btime, '$future has btime with $TIMES=1' );
+   ok( tv_interval( $before, $future->btime ) >= 0, '$future btime is not earlier than $before' );
+
+   $future->done;
+
+   ok( defined $future->rtime, '$future has rtime with $TIMES=1' );
+   ok( tv_interval( $future->btime, $future->rtime ) >= 0, '$future rtime is not earlier than btime' );
+   ok( tv_interval( $future->rtime ) >= 0, '$future rtime is not later than now' );
+
+   ok( defined $future->elapsed, '$future has ->elapsed time' );
+   ok( $future->elapsed >= 0, '$future elapsed time >= 0' );
+
+   my $imm = $class->done;
+
+   ok( defined $imm->rtime, 'Immediate future has rtime' );
+   ok( defined $imm->elapsed, 'Immediate future has ->elapsed time' );
+   ok( $imm->elapsed >= 0, 'Immediate future elapsed time >= 0' );
+}
+
 sub test_future_label
 {
    my ( $class ) = @_;
@@ -1752,6 +2199,21 @@ sub test_future_label
    identical( $f->set_label( "the label" ), $f, '->set_label returns $f' );
 
    is( $f->label, "the label", '->label returns the label' );
+
+   $f->cancel;
+}
+
+sub test_future_udata
+{
+   my ( $class ) = @_;
+
+   my $f = $class->new;
+
+   my $datum = [ "the datum" ];
+
+   identical( $f->set_udata( a_field => $datum ), $f, '->set_udata returns $f' );
+
+   identical( $f->udata( "a_field" ), $datum, '->udata returns the datum' );
 
    $f->cancel;
 }

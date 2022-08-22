@@ -6,7 +6,7 @@ use warnings;
 
 use Test::Shared::Fixture::Wikibase::Datatype::Value::Item::Wikidata::Douglas;
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
 
 sub new {
 	my $class = shift;
@@ -88,6 +88,8 @@ Returns string.
 
 =head1 EXAMPLE
 
+=for comment filename=fixture_create_and_print_snak_wd_givenname_douglas.pl
+
  use strict;
  use warnings;
 
@@ -140,6 +142,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.19
+0.20
 
 =cut

@@ -1,5 +1,5 @@
 package Variable::OnDestruct;
-$Variable::OnDestruct::VERSION = '0.05';
+$Variable::OnDestruct::VERSION = '0.06';
 use strict;
 use warnings FATAL => 'all';
 use Exporter 5.57 'import';
@@ -7,6 +7,7 @@ use XSLoader;
 
 ##no critic (ProhibitAutomaticExportation)
 our @EXPORT = qw/on_destruct/;
+our @EXPORT_OK = qw/on_destruct_fifo/;
 
 XSLoader::load('Variable::OnDestruct', __PACKAGE__->VERSION);
 
@@ -26,7 +27,7 @@ Variable::OnDestruct - Call a subroutine on destruction of a variable.
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -47,6 +48,10 @@ This module allows you to let a function be called when a variable gets destroye
 =head2 on_destruct $variable, \&sub;
 
 This function adds a destructor to a variable. It is exported by default.
+
+=head2 on_destruct_fifo $variable, \&sub;
+
+This function adds a destructor to a variable. When adding multiple destructors, this will execute them in fifo order, unlike C<on_destruct> which will handle them in lifo order.
 
 =head1 AUTHOR
 

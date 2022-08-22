@@ -4,7 +4,7 @@
       "David E. Wheeler <dwheeler@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -39,7 +39,7 @@
    "provides" : {
       "TAP::Parser::SourceHandler::pgTAP" : {
          "file" : "lib/TAP/Parser/SourceHandler/pgTAP.pm",
-         "version" : "3.35"
+         "version" : "3.36"
       }
    },
    "release_status" : "stable",
@@ -55,6 +55,6 @@
          "url" : "https://github.com/theory/tap-parser-sourcehandler-pgtap"
       }
    },
-   "version" : "3.35",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "3.36",
+   "x_serialization_backend" : "JSON::PP version 4.11"
 }

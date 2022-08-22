@@ -17,7 +17,7 @@ t/05-inet-x2y-true-pp.t
 t/06-subclassing.t
 t/07-addrs_and_names.t
 t/08-caching.t
-t/manifest.t
+t/09-serialization.t
 t/pod-coverage.t
 t/pod.t
 xt/boilerplate.t

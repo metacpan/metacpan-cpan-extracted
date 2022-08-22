@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace parcats.
 
@@ -34,20 +34,20 @@ sub TO_JSON {
 }
 
 has categoryarray => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
       "Sets the order in which categories in this dimension appear. Only has an effect if `categoryorder` is set to *array*. Used with `categoryorder`.",
 );
 
 has categoryarraysrc => ( is            => "rw",
                           isa           => "Str",
-                          documentation => "Sets the source reference on plot.ly for  categoryarray .",
+                          documentation => "Sets the source reference on Chart Studio Cloud for `categoryarray`.",
 );
 
 has categoryorder => (
-    is  => "rw",
-    isa => enum( [ "trace", "category ascending", "category descending", "array" ] ),
+    is            => "rw",
+    isa           => enum( [ "trace", "category ascending", "category descending", "array" ] ),
     documentation =>
       "Specifies the ordering logic for the categories in the dimension. By default, plotly uses *trace*, which specifies the order that is present in the data supplied. Set `categoryorder` to *category ascending* or *category descending* if order should be determined by the alphanumerical order of the category names. Set `categoryorder` to *array* to derive the ordering from the attribute `categoryarray`. If a category is not found in the `categoryarray` array, the sorting behavior for that attribute will be identical to the *trace* mode. The unspecified categories will follow the categories in `categoryarray`.",
 );
@@ -67,27 +67,27 @@ has label => ( is            => "rw",
 );
 
 has ticktext => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
       "Sets alternative tick labels for the categories in this dimension. Only has an effect if `categoryorder` is set to *array*. Should be an array the same length as `categoryarray` Used with `categoryorder`.",
 );
 
 has ticktextsrc => ( is            => "rw",
                      isa           => "Str",
-                     documentation => "Sets the source reference on plot.ly for  ticktext .",
+                     documentation => "Sets the source reference on Chart Studio Cloud for `ticktext`.",
 );
 
 has values => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
       "Dimension values. `values[n]` represents the category value of the `n`th point in the dataset, therefore the `values` vector for all dimensions must be the same (longer vectors will be truncated).",
 );
 
 has valuessrc => ( is            => "rw",
                    isa           => "Str",
-                   documentation => "Sets the source reference on plot.ly for  values .",
+                   documentation => "Sets the source reference on Chart Studio Cloud for `values`.",
 );
 
 has visible => (
@@ -111,7 +111,7 @@ Chart::Plotly::Trace::Parcats::Dimension - This attribute is one of the possible
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -184,7 +184,7 @@ Sets the order in which categories in this dimension appear. Only has an effect 
 
 =item * categoryarraysrc
 
-Sets the source reference on plot.ly for  categoryarray .
+Sets the source reference on Chart Studio Cloud for `categoryarray`.
 
 =item * categoryorder
 
@@ -206,7 +206,7 @@ Sets alternative tick labels for the categories in this dimension. Only has an e
 
 =item * ticktextsrc
 
-Sets the source reference on plot.ly for  ticktext .
+Sets the source reference on Chart Studio Cloud for `ticktext`.
 
 =item * values
 
@@ -214,7 +214,7 @@ Dimension values. `values[n]` represents the category value of the `n`th point i
 
 =item * valuessrc
 
-Sets the source reference on plot.ly for  values .
+Sets the source reference on Chart Studio Cloud for `values`.
 
 =item * visible
 
@@ -228,7 +228,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

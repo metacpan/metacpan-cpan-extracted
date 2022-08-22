@@ -9,8 +9,10 @@ plugin 'Probe::CommandLine' => (
 
 share {
 
+  start_url 'https://alienfile.org/dontpanic/';
+  digest SHA256 => 'd6f7603c0bf0d3994631bdeab59d38fa7ce5eccf53be04047dd1e83b312a7b5a';
+
   plugin Download => (
-    url     => 'https://alienfile.org/dontpanic/',
     version => qr/([0-9\.]+)\.tar\.gz$/,
   );
   plugin Extract => 'tar.gz';

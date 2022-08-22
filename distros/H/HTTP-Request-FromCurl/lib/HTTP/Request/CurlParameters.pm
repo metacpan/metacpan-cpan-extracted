@@ -14,7 +14,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.43';
+our $VERSION = '0.46';
 
 =head1 NAME
 
@@ -199,6 +199,20 @@ The timeout for the request
 =cut
 
 has unix_socket => (
+    is => 'ro',
+);
+
+=item *
+
+C<local_address>
+
+    local_address => '192.0.2.116'
+
+The local network address to bind to when making the request
+
+=cut
+
+has local_address => (
     is => 'ro',
 );
 
@@ -496,9 +510,9 @@ sub as_lwp_snippet( $self, %options ) {
 
     if( $self->insecure ) {
         push @preamble, 'use IO::Socket::SSL;';
-        $ssl_options{ SSL_verify_mode } = 'IO::Socket::SSL::SSL_VERIFY_NONE';
-        $ssl_options{ SSL_hostname    } = '""';
-        $ssl_options{ verify_hostname } = '""';
+        $ssl_options{ SSL_verify_mode } = \'IO::Socket::SSL::SSL_VERIFY_NONE';
+        $ssl_options{ SSL_hostname    } = '';
+        $ssl_options{ verify_hostname } = '';
     };
 
     if( $self->cert ) {
@@ -511,10 +525,11 @@ sub as_lwp_snippet( $self, %options ) {
     };
     my $constructor_args = join ",",
                            $self->_pairlist([
-                                        send_te => 0,
-                               maybe timeout    => $self->timeout,
-                               maybe cookie_jar => $init_cookie_jar->{code},
-                               maybe SSL_options => keys %ssl_options ? \%ssl_options : undef,
+                                     send_te => 0,
+                               maybe local_address => $self->local_address,
+                               maybe timeout       => $self->timeout,
+                               maybe cookie_jar    => $init_cookie_jar->{code},
+                               maybe SSL_options   => keys %ssl_options ? \%ssl_options : undef,
                            ], '')
                            ;
     if( defined( my $credentials = $self->credentials )) {
@@ -597,9 +612,10 @@ sub as_http_tiny_snippet( $self, %options ) {
     my $constructor_args = join ",",
                            $self->_pairlist([
                                      @ssl,
-                               maybe timeout => $self->timeout,
-                               maybe cookie_jar => $init_cookie_jar->{code},
-                               maybe SSL_options => keys %ssl_options ? \%ssl_options : undef,
+                               maybe timeout       => $self->timeout,
+                               maybe local_address => $self->local_address,
+                               maybe cookie_jar    => $init_cookie_jar->{code},
+                               maybe SSL_options   => keys %ssl_options ? \%ssl_options : undef,
                            ], '')
                            ;
     if( defined( my $credentials = $self->credentials )) {

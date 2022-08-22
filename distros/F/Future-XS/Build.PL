@@ -21,6 +21,7 @@ my $build = Module::Build->new(
       'perl' => '5.014',
    },
    test_requires => {
+      'Test::Fatal' => 0,
       'Test::Identity' => 0,
       'Test::More' => '0.88', # done_testing
       'Test::Refcount' => 0,

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.52';
+our $VERSION = '2.53';
 
 use parent 'DateTime::TimeZone';
 
@@ -95,7 +95,7 @@ DateTime::TimeZone::OffsetOnly - A DateTime::TimeZone object that just contains 
 
 =head1 VERSION
 
-version 2.52
+version 2.53
 
 =head1 SYNOPSIS
 
@@ -103,10 +103,9 @@ version 2.52
 
 =head1 DESCRIPTION
 
-This class is used to provide the DateTime::TimeZone API needed by
-DateTime.pm, but with a fixed offset.  An object in this class always
-returns the same offset as was given in its constructor, regardless of
-the date.
+This class is used to provide the DateTime::TimeZone API needed by DateTime.pm,
+but with a fixed offset.  An object in this class always returns the same
+offset as was given in its constructor, regardless of the date.
 
 =head1 USAGE
 
@@ -115,14 +114,14 @@ C<category()> method returns undef.
 
 =head2 DateTime::TimeZone::OffsetOnly->new ( offset => $offset )
 
-The value given to the offset parameter must be a string such as
-"+0300".  Strings will be converted into numbers by the
+The value given to the offset parameter must be a string such as "+0300".
+Strings will be converted into numbers by the
 C<DateTime::TimeZone::offset_as_seconds()> function.
 
 =head2 $tz->offset_for_datetime( $datetime )
 
-No matter what date is given, the offset provided to the constructor
-is always used.
+No matter what date is given, the offset provided to the constructor is always
+used.
 
 =head2 $tz->name()
 

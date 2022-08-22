@@ -1,3 +1,8 @@
+0.912   2022-08-20  Released-By: PERLANCAR; Urgency: low
+
+        - Note about Module::List::More & Regexp::From::String pp/noncore.
+
+
 0.911   2021-12-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Support dynamic default value via x.perl.default_value_rules.

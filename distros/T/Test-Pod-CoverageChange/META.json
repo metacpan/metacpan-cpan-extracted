@@ -48,7 +48,7 @@
          "requires" : {
             "Exporter" : "0",
             "File::Find::Rule" : "0",
-            "List::Util" : "0",
+            "List::Util" : "1.43",
             "Module::Path" : "0",
             "Path::Tiny" : "0",
             "Pod::Checker" : "0",
@@ -83,7 +83,7 @@
    "provides" : {
       "Test::Pod::CoverageChange" : {
          "file" : "lib/Test/Pod/CoverageChange.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -98,7 +98,7 @@
          "web" : "https://github.com/binary-com/perl-Test-Pod-CoverageChange"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_authority" : "cpan:DERIV",
    "x_contributors" : [
       "chylli-binary <chylli@binary.com>",

@@ -2,7 +2,7 @@ package Password::OWASP;
 use warnings;
 use strict;
 
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 
 # ABSTRACT: OWASP recommendations for password storage in perl
 
@@ -20,7 +20,7 @@ Password::OWASP - OWASP recommendations for password storage in perl
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 

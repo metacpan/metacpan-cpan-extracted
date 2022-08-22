@@ -6,7 +6,7 @@ use warnings;
 
 use Exporter 'import';
 
-our $VERSION = '0.01';
+our $VERSION = '1.01';
 
 our @EXPORT_OK = qw(quoted_string one_of_quoted not_one_of_quoted);
 
@@ -14,46 +14,61 @@ our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 use Carp;
 
+
+
 sub quoted_string {
-  my ($string) = @_;
-  croak("Argument must be a scalar") if ref($string);
-  $string = "" if !defined($string);
-  my $result;
-  if (index($string, "'") >= 0) {
-    my @array;
-    foreach my $substr (grep{length($_)} split(/('+)/, $string)) {
-      my $q = substr($substr, 0, 1) eq "'" ? '"' : "'";
-      push(@array, "${q}${substr}${q}");
-    }
-    $result = 'concat(' . join(',', @array) . ')';
+  @_ == 1 or croak("Wrong number of arguments");
+  my $arg = shift;
+  my $arg_scalar;
+  if (ref($arg)) {
+    croak("Argument must be a string or a reference to an array") unless ref($arg) eq 'ARRAY';
   } else {
-    $result = "'$string'";
+    $arg_scalar = 1;
+    $arg = "" if !defined($arg);
+    $arg = [$arg];
   }
-  return $result;
+  my @result;
+  foreach my $string (@{$arg}) {
+    if (index($string, "'") >= 0) {
+      my @array;
+      foreach my $substr (grep{length($_)} split(/('+)/, $string)) {
+        my $q = substr($substr, 0, 1) eq "'" ? '"' : "'";
+        push(@array, "${q}${substr}${q}");
+      }
+      push(@result, 'concat(' . join(',', @array) . ')');
+    } else {
+      push(@result, "'$string'");
+    }
+  }
+  return ($arg_scalar ? $result[0] : \@result);
 }
 
 
 sub one_of_quoted {
-  @_ > 1 or croak("Too few arguments");
-  my $name = shift;
-  my @valArray;
-  foreach my $val (@_) {
-    # Just for performance: call quoted_string() only if really needed.
-    push(@valArray, index($val, "'") >= 0 ? quoted_string($val) : "'$val'");
+  @_ > 0 or croak("Too few arguments");
+  my ($array, $name) = @_;
+  ref($array) eq 'ARRAY' or croak("Argument 1 must be an ARRAY ref");
+  if (defined($name)) {
+    ref($name) and croak("Argument 2 must be a scalar");
+    return "$name=" . join(" or $name=", @{quoted_string($array)});
+  } else {
+    my $values = quoted_string($array);
+    return sub { return "$_[0]=" . join(" or $_[0]=", @{$values}); };
   }
-  return "$name=" . join(" or $name=", @valArray);
 }
 
 
 sub not_one_of_quoted {
-  @_ > 1 or croak("Too few arguments");
-  my $name = shift;
-  my @valArray;
-  foreach my $val (@_) {
-    # Just for performance: call quoted_string() only if really needed.
-    push(@valArray, index($val, "'") >= 0 ? quoted_string($val) : "'$val'");
+  @_ > 0 or croak("Too few arguments");
+  my ($array, $name) = @_;
+  ref($array) eq 'ARRAY' or croak("Argument 1 must be an ARRAY ref");
+  if (defined($name)) {
+    ref($name) and croak("Argument 2 must be a scalar");
+    return "$name!=" . join(" and $name!=", @{quoted_string($array)});
+  } else {
+    my $values = quoted_string($array);
+    return sub { return "$_[0]!=" . join(" and $_[0]!=", @{$values}); };
   }
-  return "$name!=" . join(" and $name!=", @valArray);
 }
 
 
@@ -71,12 +86,12 @@ __END__
 
 =head1 NAME
 
-XML::XPath::Helper::String - Helper functions for xpath expression
+XML::XPath::Helper::String - Helper functions for xpath expression.
 
 
 =head1 VERSION
 
-Version 0.01
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -104,15 +119,22 @@ functions.
 
 =head2 FUNCTIONS
 
-=head3 C<quoted_string(I<STRING>)>
+=over
+
+=item C<quoted_string(I<ARG>)>
 
 This function makes it easier to create xpath expressions seaching for values
 that contains single quotes. The problem with xpath is that it does not
 support an escape character, so you have to use a C<concat(...)> in such
 cases. This function creates a C<concat(...)> expression if needed.
 
-If I<C<STRING>> does not contain any single quote, then the function returns
-I<C<STRING>> enclosed in single quotes. So this
+I<C<ARG>> must be a string or a reference to an array of strings. If it is a
+string, the the function returns a string. If it is an array reference, then
+the function returns an array reference.
+
+For each string in I<C<ARG>> the function does the following: if the string
+does not contain any single quote, then the result is the string enclosed in
+single quotes. So this
 
    print(quoted_string("hello"), "\n");
 
@@ -130,23 +152,40 @@ prints:
    concat("'",'this',"'",' that "x" ',"'''")
 
 
-=head3 C<one_of_quoted(I<NAME>, I<VALUES>)>
+=item C<one_of_quoted(I<VALUES>, I<NAME>)>
 
-This functions takes two or more string arguments. I<C<NAME>> should be the
-name of an XML node. The function creates an xpath expressions checking if
-I<C<NAME>> contains one of the values in I<C<VALUES>>. It calls
-C<quoted_string> if needed. Example:
+=item C<one_of_quoted(I<VALUES>)>
+
+This function creates an xpath expressions checking if I<C<NAME>> contains one
+of the values in I<C<VALUES>>. It calls C<quoted_string> to handle single
+quotes correctly. Example:
 
 This
 
-   print(one_of_quoted("foo", "'a'", "b'''cd", "e"), "\n");
+   print(one_of_quoted(["'a'", "b'''cd", "e"], "foo"), "\n");
 
 prints
 
    foo=concat("'",'a',"'") or foo=concat('b',"'''",'cd') or foo='e'
 
+If I<C<NAME>> is not specified, then the function returns a closure that takes
+one argument and produces the expression when called. Example:
 
-=head3 C<not_one_of_quoted(I<NAME>, I<VALUES>)>
+This
+
+   my $closure = one_of_quoted(["'a'", "b'''cd", "e"]);
+   print($closure->("foo"), "\n",
+         $closure->("bar"), "\n");
+
+prints
+
+   foo=concat("'",'a',"'") or foo=concat('b',"'''",'cd') or foo='e'
+   bar=concat("'",'a',"'") or bar=concat('b',"'''",'cd') or bar='e'
+
+
+=item C<not_one_of_quoted(I<VALUES>, I<NAME>)>
+
+=item C<not_one_of_quoted(I<VALUES>)>
 
 Like C<one_of_quoted> but creates an xpath expressions checking if
 I<C<NAME>> contains B<none> of the values in I<C<VALUES>>. Example:
@@ -160,6 +199,8 @@ prints:
    foo!=concat("'",'a',"'") and foo!=concat('b',"'''",'cd') and foo!='e'
 
 
+=back
+
 =head1 AUTHOR
 
 Abdul al Hazred, C<< <451 at gmx.eu> >>
@@ -169,8 +210,6 @@ Abdul al Hazred, C<< <451 at gmx.eu> >>
 Please report any bugs or feature requests to C<bug-xml-xpath-helper-string at rt.cpan.org>, or through
 the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=XML-XPath-Helper-String>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-
 
 
 =head1 SUPPORT
@@ -205,6 +244,11 @@ This software is copyright (c) 2022 by Abdul al Hazred.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+
+=head1 SEE ALSO
+
+L<XML::LibXML>
 
 
 =cut

@@ -14,7 +14,7 @@ use Ref::Util qw(is_arrayref is_plain_arrayref is_plain_hashref is_ref);
 use Scalar::Util qw(blessed weaken);
 use namespace::clean;
 
-our $VERSION = '0.905'; # VERSION
+our $VERSION = '0.906'; # VERSION
 
 fieldhashes \my (%KDBX, %PARENT, %TXNS, %REFS, %SIGNALS);
 
@@ -391,9 +391,9 @@ sub _txns   { $TXNS{$_[0]} //= [] }
 sub _commit { die 'Not implemented' }
 
 # Get a reference to an object that represents an object's committed state. If there is no pending
-# transaction, this is just $self. If there is a transaction, this is the snapshot take before the transaction
-# began. This method is private because it provides direct access to the actual snapshot. It is important that
-# the snapshot not be changed or a rollback would roll back to an altered state.
+# transaction, this is just $self. If there is a transaction, this is the snapshot taken immediately before
+# the transaction began. This method is private because it provides direct access to the actual snapshot. It
+# is important that the snapshot not be changed or a rollback would roll back to an altered state.
 # This is used by File::KDBX::Dumper::XML so as to not dump uncommitted changes.
 sub _committed {
     my $self = shift;
@@ -526,7 +526,7 @@ File::KDBX::Object - A KDBX database object
 
 =head1 VERSION
 
-version 0.905
+version 0.906
 
 =head1 DESCRIPTION
 

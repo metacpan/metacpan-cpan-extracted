@@ -9,12 +9,13 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 use Chart::Plotly::Trace::Indicator::Delta;
 use Chart::Plotly::Trace::Indicator::Domain;
 use Chart::Plotly::Trace::Indicator::Gauge;
+use Chart::Plotly::Trace::Indicator::Legendgrouptitle;
 use Chart::Plotly::Trace::Indicator::Number;
 use Chart::Plotly::Trace::Indicator::Stream;
 use Chart::Plotly::Trace::Indicator::Title;
 use Chart::Plotly::Trace::Indicator::Transform;
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: An indicator is used to visualize a single `value` along with some contextual information such as `steps` or a `threshold`, using a combination of three visual elements: a number, a delta, and/or a gauge. Deltas are taken with respect to a `reference`. Gauges can be either angular or bullet (aka linear) gauges.
 
@@ -51,22 +52,22 @@ sub type {
 }
 
 has align => (
-    is  => "rw",
-    isa => enum( [ "left", "center", "right" ] ),
+    is            => "rw",
+    isa           => enum( [ "left", "center", "right" ] ),
     documentation =>
       "Sets the horizontal alignment of the `text` within the box. Note that this attribute has no effect if an angular gauge is displayed: in this case, it is always centered",
 );
 
 has customdata => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
       "Assigns extra data each datum. This may be useful when listening to hover, click and selection events. Note that, *scatter* traces also appends customdata items in the markers DOM elements",
 );
 
 has customdatasrc => ( is            => "rw",
                        isa           => "Str",
-                       documentation => "Sets the source reference on plot.ly for  customdata .",
+                       documentation => "Sets the source reference on Chart Studio Cloud for `customdata`.",
 );
 
 has delta => ( is  => "rw",
@@ -79,32 +80,42 @@ has gauge => ( is  => "rw",
                isa => "Maybe[HashRef]|Chart::Plotly::Trace::Indicator::Gauge", );
 
 has ids => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
       "Assigns id labels to each datum. These ids for object constancy of data points during animation. Should be an array of strings, not numbers or any other type.",
 );
 
 has idssrc => ( is            => "rw",
                 isa           => "Str",
-                documentation => "Sets the source reference on plot.ly for  ids .",
+                documentation => "Sets the source reference on Chart Studio Cloud for `ids`.",
+);
+
+has legendgrouptitle => ( is  => "rw",
+                          isa => "Maybe[HashRef]|Chart::Plotly::Trace::Indicator::Legendgrouptitle", );
+
+has legendrank => (
+    is            => "rw",
+    isa           => "Num",
+    documentation =>
+      "Sets the legend rank for this trace. Items and groups with smaller ranks are presented on top/left side while with `*reversed* `legend.traceorder` they are on bottom/right side. The default legendrank is 1000, so that you can use ranks less than 1000 to place certain items before all unranked items, and ranks greater than 1000 to go after all unranked items.",
 );
 
 has pmeta => (
-    is  => "rw",
-    isa => "Any|ArrayRef[Any]",
+    is            => "rw",
+    isa           => "Any|ArrayRef[Any]",
     documentation =>
       "Assigns extra meta information associated with this trace that can be used in various text attributes. Attributes such as trace `name`, graph, axis and colorbar `title.text`, annotation `text` `rangeselector`, `updatemenues` and `sliders` `label` text all support `meta`. To access the trace `meta` values in an attribute in the same trace, simply use `%{meta[i]}` where `i` is the index or key of the `meta` item in question. To access trace `meta` in layout attributes, use `%{data[n[.meta[i]}` where `i` is the index or key of the `meta` and `n` is the trace index.",
 );
 
 has metasrc => ( is            => "rw",
                  isa           => "Str",
-                 documentation => "Sets the source reference on plot.ly for  meta .",
+                 documentation => "Sets the source reference on Chart Studio Cloud for `meta`.",
 );
 
 has mode => (
-    is  => "rw",
-    isa => "Str",
+    is            => "rw",
+    isa           => "Str",
     documentation =>
       "Determines how the value is displayed on the graph. `number` displays the value numerically in text. `delta` displays the difference to a reference value in text. Finally, `gauge` displays the value graphically on an axis.",
 );
@@ -127,15 +138,15 @@ has transforms => ( is  => "rw",
                     isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Indicator::Transform]", );
 
 has uid => (
-    is  => "rw",
-    isa => "Str",
+    is            => "rw",
+    isa           => "Str",
     documentation =>
       "Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.",
 );
 
 has uirevision => (
-    is  => "rw",
-    isa => "Any",
+    is            => "rw",
+    isa           => "Any",
     documentation =>
       "Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.",
 );
@@ -146,7 +157,7 @@ has value => ( is            => "rw",
 );
 
 has visible => (
-    is => "rw",
+    is            => "rw",
     documentation =>
       "Determines whether or not this trace is visible. If *legendonly*, the trace is not drawn, but can appear as a legend item (provided that the legend itself is visible).",
 );
@@ -166,7 +177,7 @@ Chart::Plotly::Trace::Indicator - An indicator is used to visualize a single `va
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -245,7 +256,7 @@ Assigns extra data each datum. This may be useful when listening to hover, click
 
 =item * customdatasrc
 
-Sets the source reference on plot.ly for  customdata .
+Sets the source reference on Chart Studio Cloud for `customdata`.
 
 =item * delta
 
@@ -259,7 +270,13 @@ Assigns id labels to each datum. These ids for object constancy of data points d
 
 =item * idssrc
 
-Sets the source reference on plot.ly for  ids .
+Sets the source reference on Chart Studio Cloud for `ids`.
+
+=item * legendgrouptitle
+
+=item * legendrank
+
+Sets the legend rank for this trace. Items and groups with smaller ranks are presented on top/left side while with `*reversed* `legend.traceorder` they are on bottom/right side. The default legendrank is 1000, so that you can use ranks less than 1000 to place certain items before all unranked items, and ranks greater than 1000 to go after all unranked items.
 
 =item * pmeta
 
@@ -267,7 +284,7 @@ Assigns extra meta information associated with this trace that can be used in va
 
 =item * metasrc
 
-Sets the source reference on plot.ly for  meta .
+Sets the source reference on Chart Studio Cloud for `meta`.
 
 =item * mode
 
@@ -309,7 +326,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

@@ -105,6 +105,7 @@ t/20-modules/Error-TypeTiny-WrongNumberOfParameters/basic.t
 t/20-modules/Error-TypeTiny/basic.t
 t/20-modules/Error-TypeTiny/stacktrace.t
 t/20-modules/Eval-TypeTiny-CodeAccumulator/basic.t
+t/20-modules/Eval-TypeTiny-CodeAccumulator/callback.t
 t/20-modules/Eval-TypeTiny/aliases-devel-lexalias.t
 t/20-modules/Eval-TypeTiny/aliases-native.t
 t/20-modules/Eval-TypeTiny/aliases-padwalker.t
@@ -144,6 +145,7 @@ t/20-modules/Type-Params/compile-named-oo-pp.t
 t/20-modules/Type-Params/compile-named-oo.t
 t/20-modules/Type-Params/compile-named.t
 t/20-modules/Type-Params/defaults.t
+t/20-modules/Type-Params/goto_next.t
 t/20-modules/Type-Params/hashorder.t
 t/20-modules/Type-Params/methods.t
 t/20-modules/Type-Params/mixednamed.t

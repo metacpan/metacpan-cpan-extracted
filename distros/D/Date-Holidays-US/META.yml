@@ -1,0 +1,27 @@
+---
+abstract: 'Date::Holidays Adapter for US Federal holidays'
+author:
+  - 'Michael R. Davis'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Date-Holidays-US
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '0'
+  POSIX: '0'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-Date-Holidays-US/issues
+  homepage: https://github.com/mrdvt92/perl-Date-Holidays-US
+  repository: https://github.com/mrdvt92/perl-Date-Holidays-US.git
+version: '0.02'

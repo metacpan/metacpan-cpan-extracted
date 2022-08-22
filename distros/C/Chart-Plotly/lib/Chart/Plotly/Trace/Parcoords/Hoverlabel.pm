@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Parcoords::Hoverlabel::Font;
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace parcoords.
 
@@ -59,8 +59,8 @@ has font => ( is  => "rw",
               isa => "Maybe[HashRef]|Chart::Plotly::Trace::Parcoords::Hoverlabel::Font", );
 
 has namelength => (
-    is  => "rw",
-    isa => "Int|ArrayRef[Int]",
+    is            => "rw",
+    isa           => "Int|ArrayRef[Int]",
     documentation =>
       "Sets the length (in number of characters) of the trace name in the hover labels for this trace. -1 shows the whole name regardless of length. 0-3 shows the first 0-3 characters, and an integer >3 will show the whole name if it is less than that many characters, but if it is longer, will truncate to `namelength - 3` characters and add an ellipsis.",
 );
@@ -85,7 +85,7 @@ Chart::Plotly::Trace::Parcoords::Hoverlabel - This attribute is one of the possi
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -182,7 +182,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

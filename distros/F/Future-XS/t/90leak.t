@@ -76,4 +76,9 @@ no_growth {
    $f->set_label( "A string label here" );
 } 'Future::XS->set_label does not leak';
 
+no_growth {
+   my $f = Future::XS->new;
+   $f->set_udata( datum => [] );
+} 'Future::XS->set_label does not leak';
+
 done_testing;

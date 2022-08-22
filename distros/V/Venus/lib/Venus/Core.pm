@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-# VARIABLES
+# STATE
 
 state $cache = {};
 
@@ -28,7 +28,7 @@ sub ATTR {
   no warnings 'redefine';
 
   *{"@{[$self->NAME]}::$attr"}
-    = sub { @_ = ($_[0], $attr, @_[1 .. $#_]); goto \&attr }
+    = sub { @_ = ($_[0], $attr, @_[1 .. $#_]); goto \&ITEM }
       if !$self->can($attr);
 
   my $index = int(keys(%{$${"@{[$self->NAME]}::META"}{ATTR}})) + 1;
@@ -49,7 +49,7 @@ sub BASE {
 
   no strict 'refs';
 
-  if (!keys(%{"${base}::"}) || (!${"${base}::META"} && !$$cache{$base}++)) {
+  if (!grep !/\A[^:]+::\z/, keys(%{"${base}::"})) {
     local $@; eval "require $base"; die $@ if $@;
   }
 
@@ -120,6 +120,10 @@ sub FROM {
 
   $base->AUDIT($self->NAME) if $base->can('AUDIT');
 
+  no warnings 'redefine';
+
+  $base->IMPORT($self->NAME);
+
   return $self;
 }
 
@@ -127,6 +131,14 @@ sub IMPORT {
   my ($self, $into) = @_;
 
   return $self;
+}
+
+sub ITEM {
+  my ($self, $name, @args) = @_;
+
+  return undef if !$name;
+  return $self->{$name} if !int @args;
+  return $self->{$name} = $args[0];
 }
 
 sub META {
@@ -144,7 +156,7 @@ sub MIXIN {
 
   no strict 'refs';
 
-  if (!keys(%{"${mixin}::"}) && !${"${mixin}::META"} && !$$cache{$mixin}++) {
+  if (!grep !/\A[^:]+::\z/, keys(%{"${mixin}::"})) {
     local $@; eval "require $mixin"; die $@ if $@;
   }
 
@@ -172,7 +184,7 @@ sub ROLE {
 
   no strict 'refs';
 
-  if (!keys(%{"${role}::"}) || (!${"${role}::META"} && !$$cache{$role}++)) {
+  if (!grep !/\A[^:]+::\z/, keys(%{"${role}::"})) {
     local $@; eval "require $role"; die $@ if $@;
   }
 
@@ -208,14 +220,6 @@ sub TEST {
   $role->AUDIT($self->NAME) if $role->can('AUDIT');
 
   return $self;
-}
-
-sub attr {
-  my ($self, $name, @args) = @_;
-
-  return undef if !$name;
-  return $self->{$name} if !int@args;
-  return $self->{$name} = $args[0];
 }
 
 1;
@@ -976,8 +980,8 @@ I<Since C<1.00>>
   FROM(Str $name) (Str | Object)
 
 The FROM method is a class building lifecycle hook which registers a base class
-for the calling package, automatically invoking the L</AUDIT> hook on the base
-class.
+for the calling package, automatically invoking the L</AUDIT> and L</IMPORT>
+hooks on the base class.
 
 I<Since C<1.00>>
 
@@ -1098,6 +1102,64 @@ I<Since C<1.00>>
   my $user = User->BLESS;
 
   # bless({}, 'User')
+
+=back
+
+=cut
+
+=head2 item
+
+  ITEM(Str $name, Any @args) (Str | Object)
+
+The ITEM method is a class instance lifecycle hook which is responsible for
+I<"getting"> and I<"setting"> instance items (or attributes). By default, all
+class attributes are dispatched to this method.
+
+I<Since C<1.11>>
+
+=over 4
+
+=item item example 1
+
+  package User;
+
+  use base 'Venus::Core';
+
+  User->ATTR('name');
+
+  package main;
+
+  my $user = User->BLESS;
+
+  # bless({}, 'User')
+
+  my $item = $user->ITEM('name', 'unknown');
+
+  # "unknown"
+
+=back
+
+=over 4
+
+=item item example 2
+
+  package User;
+
+  use base 'Venus::Core';
+
+  User->ATTR('name');
+
+  package main;
+
+  my $user = User->BLESS;
+
+  # bless({}, 'User')
+
+  $user->ITEM('name', 'known');
+
+  my $item = $user->ITEM('name');
+
+  # "known"
 
 =back
 

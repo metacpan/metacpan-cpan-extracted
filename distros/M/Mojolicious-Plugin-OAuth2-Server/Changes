@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-OAuth2-Server
 
+0.51     2022-08-15
+        - Bump min perl version to 5.16 (as per core Mojolicious)
+
 0.50     2022-08-08
         - Allow client_id / client_secret in body params (GH #28)
 

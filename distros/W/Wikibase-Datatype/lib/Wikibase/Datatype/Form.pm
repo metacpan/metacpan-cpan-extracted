@@ -6,7 +6,7 @@ use warnings;
 use Mo qw(build default is);
 use Mo::utils qw(check_array_object);
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
 
 has grammatical_features => (
 	default => [],
@@ -149,6 +149,8 @@ Returns reference to array of Wikibase::Datatype::Statement items.
 
 =head1 EXAMPLE
 
+=for comment filename=create_and_print_form.pl
+
  use strict;
  use warnings;
 
@@ -245,6 +247,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.19
+0.20
 
 =cut

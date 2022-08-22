@@ -1,0 +1,69 @@
+=head1 InvestSim - Simulateur d'investissement locatif
+
+=head2 DESCRIPTION
+
+A Perl/Tk application to simulate the return of a rental property investment.
+This is tuned for French taxes and benefits and, given that, the application is
+entirely localized in French.
+
+Install with:
+
+    sudo apt-get install perl make tcl tk tcllib tklib
+    cpan App::InvestSim
+
+And then run it with:
+
+    investment_simulator
+
+Alternatively, you can download a pre-built Windows binary from the GitHub release
+page of the project. That binary is a self-installing archive. On the first run it
+will unzip itself in a temporary folder, so that first run is quite slow. Subsequent
+runs are faster to launch.
+
+=head2 MANUAL INSTALLATION FROM SOURCE
+
+=head3 REQUIREMENTS
+
+    # You probably already have these 3 programs.
+    sudo apt-get install perl make git
+
+    # You need tcl/tk installed for the GUI of the program
+    sudo apt-get install tcl tk tcllib tklib
+
+    # These Perl modules are needed too, but they are installed
+    # automatically if you install the program with cpan:
+    cpan Tkx CLDR::Number File::HomeDir File::ShareDir File::ShareDir::Install
+
+=head3 INSTALLATION
+
+Once you have the requirements above installed, you can run the following
+commands to install the program:
+
+    git clone https://github.com/mkende/investment_simulator.git
+    cd investment_simulator
+    perl Makefile.PL
+    make
+    sudo make install
+
+=head2 DISTRIBUTION
+
+=head3 Creating a self installing Windows binary
+
+If you have a working Windows Perl and TCL/Tk installation, you can create a
+self installing binary using the C<Par-Packer> module:
+
+    pp -o investment_simulator.exe -c -x -A pp_includes.txt -I lib \
+        --link=C:\TclTk\8.6.9\bin\zlib1.dll script\investment_simulator \
+        --gui -M CLDR::Number::Role::Format -cd par.cache \
+        -a res\icon.ico;res\icon.ico
+
+The C<pp_includes.txt> file should contain the following content (of course,
+the path should be fixed for the version of TCL, Tk, and tklib that you
+have installed):
+
+    C:\TclTk\8.6.9\bin\tcl86.dll;tcl\bin\tcl86.dll
+    C:\TclTk\8.6.9\bin\tk86.dll;tcl\bin\tk86.dll
+    C:\TclTk\8.6.9\lib\tcl8;tcl\lib\tcl8
+    C:\TclTk\8.6.9\lib\tcl8.6;tcl\lib\tcl8.6
+    C:\TclTk\8.6.9\lib\tk8.6;tcl\lib\tk8.6
+    C:\TclTk\8.6.9\lib\tklib0.6\tooltip;tcl\lib\tooltip

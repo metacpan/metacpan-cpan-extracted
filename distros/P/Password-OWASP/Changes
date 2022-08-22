@@ -2,6 +2,14 @@ Revision history for Password-OWASP
 
 TODO: Look into PBKDF2
 
+0.004     2022-08-16 13:42:59Z
+
+    * Bump version of Authen::Passphrase::Scrypt (CPANTesters)
+
+0.003     2022-08-12 21:15:15Z
+
+    * Allow workfactor/cost to be tweaked on construction
+
 0.002     2022-08-12 19:06:39Z
 
     * Maintainer release

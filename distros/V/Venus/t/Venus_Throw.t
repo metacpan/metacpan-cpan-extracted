@@ -88,6 +88,7 @@ $test->for('integrates');
 
 =attributes
 
+name: rw, opt, Str
 message: rw, opt, Str
 package: ro, opt, Str
 parent: ro, opt, Str, C<'Venus::Error'>
@@ -281,6 +282,8 @@ $test->for('example', 5, 'error', sub {
     message => 'Example error (no thing)!',
   });
 
+  # No::Thing does not exist
+
   # Exception! Venus::Throw::Error (isa Venus::Error)
 
 =cut
@@ -290,6 +293,37 @@ $test->for('example', 6, 'error', sub {
   ok my $result = $tryable->error(\my $error)->result;
   ok $error->isa('Venus::Throw::Error');
   ok $error->isa('Venus::Error');
+
+  $result
+});
+
+=example-7 error
+
+  # given: synopsis;
+
+  my $error = $throw->error({
+    name => 'on.test.error',
+    context => 'Test.error',
+    message => 'Something failed!',
+  });
+
+  # bless({
+  #   ...,
+  #   "context"  => "Test.error",
+  #   "message"  => "Something failed!",
+  #   "name"  => "on_test_error",
+  # }, "Main::Error")
+
+=cut
+
+$test->for('example', 7, 'error', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error->isa('Main::Error');
+  ok $error->isa('Venus::Error');
+  ok $error->message eq 'Something failed!';
+  ok $error->context eq 'Test.error';
+  ok $error->name eq 'on_test_error';
 
   $result
 });

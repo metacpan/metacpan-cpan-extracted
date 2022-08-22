@@ -1,5 +1,10 @@
 Revision history for Perl extension Business::CreditCard.
 
+0.39  Fri 19 Aug 2022 01:37:55 PM PDT
+        - Documentation updates
+        - This is the current, official, up-to-date release of
+          Business::CreditCard.
+
 0.36  Tue Jun 14 11:36:05 PDT 2016
         - Allow (and doc) import of receipt_cardtype
         - validate_card() is a new synonym for validate(), starting a long-term

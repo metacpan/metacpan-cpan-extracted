@@ -7,7 +7,7 @@ use Error::Pure qw(err);
 use Mo qw(build default is);
 use Mo::utils qw(check_array_object check_number check_number_of_items);
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
 
 has aliases => (
 	default => [],
@@ -309,6 +309,8 @@ Returns string.
 
 =head1 EXAMPLE
 
+=for comment filename=create_and_print_item.pl
+
  use strict;
  use warnings;
 
@@ -598,6 +600,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.19
+0.20
 
 =cut

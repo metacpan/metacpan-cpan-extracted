@@ -18,9 +18,9 @@
 MODULE = Future::XS    PACKAGE = Future::XS
 
 SV *
-new(char *class)
+new(char *cls)
   CODE:
-    RETVAL = future_new();
+    RETVAL = future_new(cls);
   OUTPUT:
     RETVAL
 
@@ -78,7 +78,7 @@ done(SV *self, ...)
     if(sv_is_future(self))
       RETVAL = SvREFCNT_inc(ST(0));
     else
-      RETVAL = future_new();
+      RETVAL = future_new(SvPV_nolen(ST(0)));
 
     future_donev(RETVAL, &ST(1), items - 1);
   OUTPUT:
@@ -103,7 +103,7 @@ fail(SV *self, ...)
     if(sv_is_future(self))
       RETVAL = SvREFCNT_inc(ST(0));
     else
-      RETVAL = future_new();
+      RETVAL = future_new(SvPV_nolen(ST(0)));
 
     future_failv(RETVAL, &ST(1), items - 1);
   OUTPUT:
@@ -126,9 +126,18 @@ on_ready(SV *self, SV *code)
     RETVAL
 
 void
+await(SV *self)
+  CODE:
+    croak("%" SVf " is not yet complete and does not provide an ->await method",
+      SVfARG(self));
+
+void
 result(SV *self)
+  ALIAS:
+    result = FALSE
+    get    = TRUE
   PPCODE:
-    AV *result = future_get_result_av(self);
+    AV *result = future_get_result_av(self, ix);
     if(GIMME_V == G_LIST) {
       XPUSHs_from_AV(result);
       XSRETURN(av_count(result));
@@ -193,6 +202,9 @@ without_cancel(SV *self)
 
 SV *
 then(SV *self, ...)
+  ALIAS:
+    then        = 0
+    then_with_f = FUTURE_THEN_WITH_F
   CODE:
     items--; /* account for self */
 
@@ -214,23 +226,29 @@ then(SV *self, ...)
       for(int i = 0; i < items/2; i++)
         hv_store_ent(catches, ST(2 + i*2), newSVsv(ST(2 + i*2 + 1)), 0);
 
-      RETVAL = future_thencatch(self, thencode, catches, elsecode);
+      RETVAL = future_thencatch(self, ix, thencode, catches, elsecode);
     }
     else {
-      RETVAL = future_then(self, thencode, elsecode);
+      RETVAL = future_then(self, ix, thencode, elsecode);
     }
   OUTPUT:
     RETVAL
 
 SV *
 else(SV *self, SV *code)
+  ALIAS:
+    else        = 0
+    else_with_f = FUTURE_THEN_WITH_F
   CODE:
-    RETVAL = future_then(self, NULL, code);
+    RETVAL = future_then(self, ix, NULL, code);
   OUTPUT:
     RETVAL
 
 SV *
 catch(SV *self, ...)
+  ALIAS:
+    catch        = 0
+    catch_with_f = FUTURE_THEN_WITH_F
   CODE:
     items--; /* account for self */
 
@@ -245,7 +263,7 @@ catch(SV *self, ...)
     for(int i = 0; i < items/2; i++)
       hv_store_ent(catches, ST(1 + i*2), newSVsv(ST(1 + i*2 + 1)), 0);
 
-    RETVAL = future_thencatch(self, NULL, catches, elsecode);
+    RETVAL = future_thencatch(self, ix, NULL, catches, elsecode);
   OUTPUT:
     RETVAL
 
@@ -257,30 +275,30 @@ followed_by(SV *self, SV *code)
     RETVAL
 
 SV *
-wait_all(SV *self, ...)
+wait_all(SV *cls, ...)
   CODE:
-    RETVAL = future_new_waitallv(&ST(1), items - 1);
+    RETVAL = future_new_waitallv(SvPV_nolen(cls), &ST(1), items - 1);
   OUTPUT:
     RETVAL
 
 SV *
-wait_any(SV *self, ...)
+wait_any(SV *cls, ...)
   CODE:
-    RETVAL = future_new_waitanyv(&ST(1), items - 1);
+    RETVAL = future_new_waitanyv(SvPV_nolen(cls), &ST(1), items - 1);
   OUTPUT:
     RETVAL
 
 SV *
-needs_all(SV *self, ...)
+needs_all(SV *cls, ...)
   CODE:
-    RETVAL = future_new_needsallv(&ST(1), items - 1);
+    RETVAL = future_new_needsallv(SvPV_nolen(cls), &ST(1), items - 1);
   OUTPUT:
     RETVAL
 
 SV *
-needs_any(SV *self, ...)
+needs_any(SV *cls, ...)
   CODE:
-    RETVAL = future_new_needsanyv(&ST(1), items - 1);
+    RETVAL = future_new_needsanyv(SvPV_nolen(cls), &ST(1), items - 1);
   OUTPUT:
     RETVAL
 
@@ -299,6 +317,32 @@ pending_futures(SV *self)
     XSRETURN(count);
 
 SV *
+btime(SV *self)
+  ALIAS:
+    btime = 0
+    rtime = 1
+  CODE:
+  {
+    struct timeval t;
+    switch(ix) {
+      case 0: t = future_get_btime(self); break;
+      case 1: t = future_get_rtime(self); break;
+    }
+
+    RETVAL = &PL_sv_undef;
+
+    if(t.tv_sec) {
+      AV *retav = newAV();
+      av_push(retav, newSViv(t.tv_sec));
+      av_push(retav, newSViv(t.tv_usec));
+
+      RETVAL = newRV_noinc((SV *)retav);
+    }
+  }
+  OUTPUT:
+    RETVAL
+
+SV *
 set_label(SV *self, SV *label)
   CODE:
     future_set_label(self, label);
@@ -310,6 +354,21 @@ SV *
 label(SV *self)
   CODE:
     RETVAL = future_get_label(self);
+  OUTPUT:
+    RETVAL
+
+SV *
+set_udata(SV *self, SV *name, SV *value)
+  CODE:
+    future_set_udata(self, name, value);
+    RETVAL = SvREFCNT_inc(self);
+  OUTPUT:
+    RETVAL
+
+SV *
+udata(SV *self, SV *name)
+  CODE:
+    RETVAL = newSVsv(future_get_udata(self, name));
   OUTPUT:
     RETVAL
 

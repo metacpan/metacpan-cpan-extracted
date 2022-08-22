@@ -8,7 +8,7 @@ use FFI::Platypus::Function;
 use FFI::Platypus::Type;
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '1.58'; # VERSION
+our $VERSION = '2.00'; # VERSION
 
 # Platypus-Man,
 # Platypus-Man,
@@ -57,8 +57,12 @@ sub new
   {
     Carp::croak("Please do not use the experimental version of api = 1, instead require FFI::Platypus 1.00 or better");
   }
+  elsif($experimental == 2)
+  {
+    Carp::croak("Please do not use the experimental version of api = 2, instead require FFI::Platypus 2.00 or better");
+  }
 
-  if(defined $api && $api > 1 && $experimental != $api)
+  if(defined $api && $api > 2 && $experimental != $api)
   {
     Carp::cluck("Enabling development API version $api prior to FFI::Platypus $api.00");
   }
@@ -593,14 +597,14 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 1.58
+version 2.00
 
 =head1 SYNOPSIS
 
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  
- # for all new code you should use api => 1
- my $ffi = FFI::Platypus->new( api => 1 );
+ # for all new code you should use api => 2
+ my $ffi = FFI::Platypus->new( api => 2 );
  $ffi->lib(undef); # search libc
  
  # call dynamically
@@ -697,7 +701,7 @@ for free.  You should even consider updating existing modules to
 use API level 1 where feasible.  How do I do that you might ask?
 Simply pass in the API level to the platypus constructor.
 
- my $ffi = FFI::Platypus->new( api => 1 );
+ my $ffi = FFI::Platypus->new( api => 2 );
 
 The Platypus documentation has already been updated to assume API
 level 1.
@@ -708,7 +712,7 @@ level 1.
 
 =head2 new
 
- my $ffi = FFI::Platypus->new( api => 1, %options);
+ my $ffi = FFI::Platypus->new( api => 2, %options);
 
 Create a new instance of L<FFI::Platypus>.
 
@@ -738,17 +742,13 @@ on the differences.
 
 =item C<1>
 
-Enable the next generation type parser which allows pass-by-value records
-and type decoration on basic types.  Using API level 1 prior to Platypus
-version 1.00 will trigger a (noisy) warning.
-
-All new code should be written with this set to 1!  The Platypus documentation
-assumes this api level is set.
+Enable version 1 API type parser which allows pass-by-value records
+and type decoration on basic types.
 
 =item C<2>
 
-Enable version 2 API, which is currently experimental.  Using API level 2 prior
-to Platypus version 2.00 will trigger a (noisy) warning.
+Enable version 2 API. All new code should be written with this set to 1!
+The Platypus documentation assumes this api level is set.
 
 API version 2 is identical to version 1, except:
 
@@ -763,6 +763,11 @@ This fixes a long standing design bug in Platypus.
 This replicates the behavior of array argument types with no size.  So the types C<sint8*> and C<sint8[]>
 behave identically when an array reference is passed in.  They differ in that, as before, you can
 pass a scalar reference into type C<sint8*>.
+
+=item The fixed string type can be specified without pointer modifier
+
+That is you can use C<string(10)> instead of C<string(10)*> as you were previously able to
+in API 0.
 
 =back
 
@@ -1301,9 +1306,9 @@ that are related to types.
 
 =head2 Integer conversions
 
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  
- my $ffi = FFI::Platypus->new( api => 1 );
+ my $ffi = FFI::Platypus->new( api => 2 );
  $ffi->lib(undef);
  
  $ffi->attach(puts => ['string'] => 'int');
@@ -1320,14 +1325,14 @@ includes the standard c library.
 =head2 libnotify
 
  use FFI::CheckLib;
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  
  # NOTE: I ported this from anoter Perl FFI library and it seems to work most
  # of the time, but also seems to SIGSEGV sometimes.  I saw the same behavior
  # in the old version, and am not really familiar with the libnotify API to
  # say what is the cause.  Patches welcome to fix it.
  
- my $ffi = FFI::Platypus->new( api => 1 );
+ my $ffi = FFI::Platypus->new( api => 2 );
  $ffi->lib(find_lib_or_exit lib => 'notify');
  
  $ffi->attach(notify_init   => ['string'] => 'void');
@@ -1377,10 +1382,10 @@ We are really calling the C function C<notify_notification_new>.
 
 =head2 Allocating and freeing memory
 
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  use FFI::Platypus::Memory qw( malloc free memcpy );
  
- my $ffi = FFI::Platypus->new( api => 1 );
+ my $ffi = FFI::Platypus->new( api => 2 );
  my $buffer = malloc 12;
  
  memcpy $buffer, $ffi->cast('string' => 'opaque', "hello there"), length "hello there\0";
@@ -1396,11 +1401,11 @@ L<FFI::Platypus::Memory> module.
 
 =head2 structured data records
 
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  use FFI::C;
  
  my $ffi = FFI::Platypus->new(
-   api => 1,
+   api => 2,
    lib => [undef],
  );
  FFI::C->ffi($ffi);
@@ -1466,10 +1471,10 @@ using it as a return type!
 =head2 libuuid
 
  use FFI::CheckLib;
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  use FFI::Platypus::Memory qw( malloc free );
  
- my $ffi = FFI::Platypus->new( api => 1 );
+ my $ffi = FFI::Platypus->new( api => 2 );
  $ffi->lib(find_lib_or_exit lib => 'uuid');
  $ffi->type('string(37)*' => 'uuid_string');
  $ffi->type('record(16)*' => 'uuid_t');
@@ -1496,9 +1501,9 @@ this case it is simply 16 bytes).  We also know that the strings
 
 =head2 puts and getpid
 
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  
- my $ffi = FFI::Platypus->new( api => 1 );
+ my $ffi = FFI::Platypus->new( api => 2 );
  $ffi->lib(undef);
  
  $ffi->attach(puts => ['string'] => 'int');
@@ -1511,10 +1516,10 @@ C<getpid> is available on Unix type platforms.
 
 =head2 Math library
 
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  use FFI::CheckLib;
  
- my $ffi = FFI::Platypus->new( api => 1 );
+ my $ffi = FFI::Platypus->new( api => 2 );
  $ffi->lib(undef);
  $ffi->attach(puts => ['string'] => 'int');
  $ffi->attach(fdim => ['double','double'] => 'double');
@@ -1538,9 +1543,9 @@ use C<undef> as the library to find them.
 
 =head2 Strings
 
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  
- my $ffi = FFI::Platypus->new( api => 1 );
+ my $ffi = FFI::Platypus->new( api => 2 );
  $ffi->lib(undef);
  $ffi->attach(puts => ['string'] => 'int');
  $ffi->attach(strlen => ['string'] => 'int');
@@ -1570,9 +1575,9 @@ the L<Encode> module.
 =head2 Attach function from pointer
 
  use FFI::TinyCC;
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  
- my $ffi = FFI::Platypus->new( api => 1 );
+ my $ffi = FFI::Platypus->new( api => 2 );
  my $tcc = FFI::TinyCC->new;
  
  $tcc->compile_string(q{
@@ -1607,12 +1612,12 @@ just-in-time (JIT) compilation service for FFI.
  use constant ZMQ_REQ => 3;
  use constant ZMQ_REP => 4;
  use FFI::CheckLib qw( find_lib_or_exit );
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  use FFI::Platypus::Memory qw( malloc );
  use FFI::Platypus::Buffer qw( scalar_to_buffer buffer_to_scalar );
  
  my $endpoint = "ipc://zmq-ffi-$$";
- my $ffi = FFI::Platypus->new( api => 1 );
+ my $ffi = FFI::Platypus->new( api => 2 );
  
  $ffi->lib(undef); # for puts
  $ffi->attach(puts => ['string'] => 'int');
@@ -1696,7 +1701,7 @@ implemented using FFI called L<ZMQ::FFI>.
 
 =head2 libarchive
 
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  use FFI::CheckLib qw( find_lib_or_exit );
  
  # This example uses FreeBSD's libarchive to list the contents of any
@@ -1704,7 +1709,7 @@ implemented using FFI called L<ZMQ::FFI>.
  # the ArchiveWrite class that could be used for writing archive formats
  # supported by libarchive
  
- my $ffi = FFI::Platypus->new( api => 1 );
+ my $ffi = FFI::Platypus->new( api => 2 );
  $ffi->lib(find_lib_or_exit lib => 'archive');
  $ffi->type('object(Archive)'      => 'archive_t');
  $ffi->type('object(ArchiveRead)'  => 'archive_read_t');
@@ -1821,7 +1826,7 @@ Rather than this:
 
 =head2 unix open
 
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  
  {
    package FD;
@@ -1834,7 +1839,7 @@ Rather than this:
    use constant OUT => bless \do { my $out=1 }, __PACKAGE__;
    use constant ERR => bless \do { my $err=2 }, __PACKAGE__;
  
-   my $ffi = FFI::Platypus->new( api => 1, lib => [undef]);
+   my $ffi = FFI::Platypus->new( api => 2, lib => [undef]);
  
    $ffi->type('object(FD,int)' => 'fd');
  
@@ -1871,12 +1876,12 @@ functions.
 
 =head2 bzip2
 
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  use FFI::CheckLib qw( find_lib_or_die );
  use FFI::Platypus::Buffer qw( scalar_to_buffer buffer_to_scalar );
  use FFI::Platypus::Memory qw( malloc free );
  
- my $ffi = FFI::Platypus->new( api => 1 );
+ my $ffi = FFI::Platypus->new( api => 2 );
  $ffi->lib(find_lib_or_die lib => 'bz2');
  
  $ffi->attach(
@@ -1954,10 +1959,10 @@ wrapper function will be returned back to the original caller.
 =head2 The Win32 API
 
  use utf8;
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  
  my $ffi = FFI::Platypus->new(
-   api  => 1,
+   api  => 2,
    lib  => [undef],
  );
  
@@ -2027,10 +2032,10 @@ C<lib/Foo.pm>:
  
  use strict;
  use warnings;
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  
  {
-   my $ffi = FFI::Platypus->new( api => 1 );
+   my $ffi = FFI::Platypus->new( api => 2 );
  
    $ffi->type('object(Foo)' => 'foo_t');
    $ffi->mangler(sub {
@@ -2362,18 +2367,21 @@ the development package for C<libffi> as prereqs for this module.
 
 Type definitions for Platypus.
 
-=item L<FFI::Platypus::Record>
-
-Define structured data records (C "structs") for use with
-Platypus.
-
 =item L<FFI::C>
 
-Another interface for defining structured data records for use
-with Platypus.  Its advantage over L<FFI::Platypus::Record> is
-that it supports C<union>s and nested data structures.  Its
-disadvantage is that it doesn't support passing C<struct>s
-by-value.
+Interface for defining structured data records for use with
+Platypus.  It supports C C<struct>, C<union>, nested structures
+and arrays of all of those.  It only supports passing these
+types by reference or pointer, so if you need to pass structured
+data by value see L<FFI::Platypus::Record> below.
+
+=item L<FFI::Platypus::Record>
+
+Interface for defining structured data records for use with
+Platypus.  Included in the Platypus core.  Supports pass by
+value which is uncommon in C, but frequently used in languages
+like Rust and Go.  Consider using L<FFI::C> instead if you
+don't need to pass by value.
 
 =item L<FFI::Platypus::API>
 

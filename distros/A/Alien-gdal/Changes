@@ -1,5 +1,9 @@
 Revision history for Alien::gdal
 
+1.31 2022-08-17
+    - share builds: rework rpath updates on unices
+      as the changes were being overridden before install
+
 1.30 2022-04-13
     - share builds: update rpaths of libgdal dylibs on macs
 

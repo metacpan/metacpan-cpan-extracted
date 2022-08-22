@@ -11,11 +11,11 @@ use Test::Fatal;
 use Cwd qw( abs_path cwd );
 use DateTime::TimeZone::Local;
 use DateTime::TimeZone::Local::Unix;
-use File::Basename qw( basename );
+use File::Basename        qw( basename );
 use File::Spec::Functions qw( catdir catfile curdir );
-use File::Path qw( mkpath );
-use File::Temp qw( tempdir );
-use Sys::Hostname qw( hostname );
+use File::Path            qw( mkpath );
+use File::Temp            qw( tempdir );
+use Sys::Hostname         qw( hostname );
 use Try::Tiny;
 
 plan skip_all => 'HPUX is weird'

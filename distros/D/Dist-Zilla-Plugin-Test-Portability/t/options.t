@@ -3,14 +3,15 @@ use warnings;
 use Test::More;
 
 use Test::DZil;
+use List::Util 'first';
 
 my $config = simple_ini();
 
 my $end = 'run_tests\(\);';
 
 my @tests = (
-    [ {             }, qr/  if \$@;\n+$end$/m ],
-    [ {options => ''}, qr/  if \$@;\n+$end$/m ],
+    [ {             }, qr/use Test::Portability::Files;\n+$end$/m ],
+    [ {options => ''}, qr/use Test::Portability::Files;\n+$end$/m ],
     [ {options => 'test_case => 0'}, qr/\n\Qoptions(test_case => 0);\E\n$end$/m ],
     [ {options => 'test_space=0,test_dos_length=1'}, qr/\n\Qoptions(test_dos_length => 1, test_space => 0);\E\n$end/m ],
 );
@@ -23,7 +24,7 @@ foreach my $test ( @tests ) {
     my $dzil = new_dzil(port_test_plug($opts));
     $dzil->build;
 
-    my $t = (grep { $_->name eq 'xt/author/portability.t' } @{ $dzil->files })[0];
+    my $t = first { $_->name eq 'xt/author/portability.t' } @{ $dzil->files };
     like($t->content, $qr, 'options merged successfully');
 }
 

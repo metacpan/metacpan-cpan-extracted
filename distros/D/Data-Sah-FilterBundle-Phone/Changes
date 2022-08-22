@@ -1,0 +1,51 @@
+0.008   2020-06-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Add filters: Float::check_int, Float::check_has_fraction (currently
+          perl only).
+
+
+0.007   2020-06-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Add filters: Float::{ceil,floor,round} (currently perl only).
+
+
+0.006   2020-05-31  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+
+	- [incompatible] Rename filter 'Str::lowcase' to 'Str::lowercase'.
+
+        - Reinstate filter 'Str::downcase' [RT#132743].
+
+        - [ux] add aliases 'Str::uc' & 'Str::uppercase' for 'Str::upcase',
+          'Str::lc' for 'Str::downcase'.
+
+        - Add filters 'Str::ucfirst' & 'Str::lcfirst'.
+
+
+0.005   2020-05-30  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+
+	- [incompatible] Rename rule 'Str::downcase' to the more familiar
+          'Str::lowcase'. UPDATE: 'Str::downcase' restored in 0.006.
+
+
+0.004   2020-02-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Add filter: Str::replace_map.
+
+
+0.003   2020-02-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Add might_fail support (like in Data::Sah::Coerce) in the filter
+	  rules. We want it after all to use filter rules as checkers. Add
+	  return_type 'val' as well as 'str_errmsg+val'.
+
+	- Add filter: Str::check (perl only for now, mostly to demo might_fail).
+
+
+0.002   2020-02-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Add filter rules: Str::upcase, Str::downcase.
+
+
+0.001   2020-02-10  Released-By: PERLANCAR
+
+        - First release.

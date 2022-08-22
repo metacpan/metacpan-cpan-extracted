@@ -6,7 +6,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-    $VERSION = '0.16';
+    $VERSION = '0.17';
 }
 
 =encoding utf-8
@@ -264,7 +264,8 @@ sub use_event {
         $cr->(@args);
     }
     else {
-        die( __PACKAGE__ . ": unknown event engine: $name" );
+        my @known = sort keys %{ DEFERRAL_CR() };
+        die( __PACKAGE__ . ": unknown event engine: $name (must be one of: @known)" );
     }
 }
 

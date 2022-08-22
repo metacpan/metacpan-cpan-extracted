@@ -1,5 +1,11 @@
 Revision history for Perl extension Test::Warn.
 
+0.37  2022-08-13
+        Merged PR:
+        - allow duplicate warnings when using warnings_exist
+          https://github.com/hanfried/test-warn/pull/8
+          thx to Masahiro Honma (hiratara)
+
 0.36  2018-06-23
         - Added provide section to META.yml via changing Makefile.PL
 

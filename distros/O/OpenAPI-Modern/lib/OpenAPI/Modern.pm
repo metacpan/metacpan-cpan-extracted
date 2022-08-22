@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package OpenAPI::Modern; # git description: v0.030-4-g3022412
+package OpenAPI::Modern; # git description: v0.031-9-g4672327
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.031';
+our $VERSION = '0.032';
 
 use 5.020;
 use Moo;
@@ -24,7 +24,7 @@ use Feature::Compat::Try;
 use Encode 2.89;
 use URI::Escape ();
 use JSON::Schema::Modern 0.551;
-use JSON::Schema::Modern::Utilities 0.531 qw(jsonp unjsonp canonical_uri E abort is_equal);
+use JSON::Schema::Modern::Utilities 0.531 qw(jsonp unjsonp canonical_uri E abort is_equal is_elements_unique);
 use JSON::Schema::Modern::Document::OpenAPI;
 use MooX::HandlesVia;
 use MooX::TypeTiny 0.002002;
@@ -153,7 +153,7 @@ sub validate_request ($self, $request, $options = {}) {
       }
 
       if (_body_size($request)) {
-        ()= $self->_validate_body_content($state, $body_obj->{content}, $request);
+        $self->_validate_body_content($state, $body_obj->{content}, $request);
       }
       elsif ($body_obj->{required}) {
         ()= E({ %$state, keyword => 'required' }, 'request body is required but missing');
@@ -230,7 +230,7 @@ sub validate_response ($self, $response, $options = {}) {
         $header_name, $header_obj, [ _header($response, $header_name) ]);
     }
 
-    ()= $self->_validate_body_content({ %$state, data_path => jsonp($state->{data_path}, 'body') },
+    $self->_validate_body_content({ %$state, data_path => jsonp($state->{data_path}, 'body') },
         $response_obj->{content}, $response)
       if exists $response_obj->{content} and _body_size($response);
   }
@@ -312,9 +312,13 @@ sub find_path ($self, $request, $options) {
     croak 'servers not yet supported when matching request URIs'
       if exists $schema->{servers} and $schema->{servers}->@*;
 
+    # sorting (ascii-wise) gives us the desired results that concrete path components sort ahead of
+    # templated components, except when the concrete component is a non-ascii character or matches [|}~].
     foreach $path_template (sort keys $schema->{paths}->%*) {
       my $path_pattern = $path_template =~ s!\{[^/}]+\}!([^/?#]*)!gr;
       next if $uri_path !~ m/^$path_pattern$/;
+
+      $options->{path_template} = $path_template;
 
       # perldoc perlvar, @-: $n coincides with "substr $_, $-[n], $+[n] - $-[n]" if "$-[n]" is defined
       my @capture_values = map
@@ -322,7 +326,10 @@ sub find_path ($self, $request, $options) {
       my @capture_names = ($path_template =~ m!\{([^/?#}]+)\}!g);
       my %path_captures; @path_captures{@capture_names} = @capture_values;
 
-      $options->{path_template} = $path_template;
+      my $indexes = [];
+      return E({ %$state, keyword => 'paths' }, 'duplicate path capture name %s', $capture_names[$indexes->[0]])
+        if not is_elements_unique(\@capture_names, $indexes);
+
       return E({ %$state, keyword => 'paths' }, 'provided path_captures values do not match request URI')
         if $options->{path_captures} and not is_equal($options->{path_captures}, \%path_captures);
 
@@ -347,7 +354,7 @@ sub find_path ($self, $request, $options) {
   return E({ %$state, keyword => 'paths', _schema_path_suffix => $path_template },
       'provided path_captures names do not match path template "%s"', $path_template)
     if exists $options->{path_captures}
-      and not is_equal([ sort keys $options->{path_captures}->%*], [ sort @capture_names ]);
+      and not is_equal([ sort keys $options->{path_captures}->%* ], [ sort @capture_names ]);
 
   if (not $request) {
     $options->@{qw(path_template operation_id)} =
@@ -529,12 +536,12 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
       'could not decode content as %s: %s', $media_type, $e =~ s/^(.*)\n/$1/r);
   }
 
-  return 1 if not defined $schema;
+  return if not defined $schema;
 
   $state = { %$state, schema_path => jsonp($state->{schema_path}, 'content', $media_type, 'schema') };
   my $result = $self->_evaluate_subschema($content_ref->$*, $schema, $state);
 
-  return 1 if not is_ref($result);  # schema is an empty hash or boolean true
+  return if not is_ref($result);  # empty + valid result
 
   my $type = (split('/', $state->{data_path}, 3))[1];
   my $keyword = $type eq 'request' ? 'readOnly' : $type eq 'response' ? 'writeOnly' : die "unknown type $type";
@@ -545,8 +552,6 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
       error => ($keyword =~ s/O/-o/r).' value is present',
     );
   }
-
-  return !!$result;
 }
 
 # wrap a result object around the errors
@@ -580,12 +585,8 @@ sub _resolve_ref ($self, $ref, $state) {
 
 # evaluates data against the subschema at the current state location
 sub _evaluate_subschema ($self, $data, $schema, $state) {
-  return 1 if is_plain_hashref($schema) ? !keys(%$schema) : $schema; # true schema
-
-  if (is_plain_hashref($schema)) {
-    return 1 if !keys(%$schema);
-  }
-  else {
+  # boolean schema
+  if (not is_plain_hashref($schema)) {
     return 1 if $schema;
 
     my @location = unjsonp($state->{data_path});
@@ -596,8 +597,9 @@ sub _evaluate_subschema ($self, $data, $schema, $state) {
       : $location[-2] eq 'header' ? join(' ', @location[-3..-2])
       : $location[-2];  # cookie
     return E($state, '%s not permitted', $location);
-    return E($state, 'thingy not permitted');
   }
+
+  return 1 if !keys(%$schema);  # schema is {}
 
   # treat numeric-looking data as a string, unless "type" explicitly requests number or integer.
   if (is_plain_hashref($schema) and exists $schema->{type} and not is_plain_arrayref($schema->{type})
@@ -694,7 +696,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI docume
 
 =head1 VERSION
 
-version 0.031
+version 0.032
 
 =head1 SYNOPSIS
 
@@ -880,7 +882,8 @@ L<JSON::Schema::Modern::Result> object.
 
 The second argument is an optional hashref that contains extra information about the request, corresponding to
 the values expected by L</find_path> below. It is populated with some information about the request:
-pass it to a later L</validate_response> to improve performance.
+save it and pass it to a later L</validate_response> (corresponding to a response for this request)
+to improve performance.
 
 =head2 validate_response
 

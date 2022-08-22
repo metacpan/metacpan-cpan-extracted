@@ -85,7 +85,6 @@ sub repaint
 	$fader->clear;
 	render_text;
 
-	
 	my ( $dx, $dy ) = (0, 0);
 	my ( $cw, $ch ) = $fader->size;
 	my ( $tw, $th ) = $texter->size;
@@ -100,7 +99,7 @@ sub repaint
 		$dx += $xangle;
 		$dy ++;
 	}
-	$canvas->put_image(0,0,$fader,rop::Premultiply);
+	$canvas->put_image(0,0,$fader,rop::SrcOver);
 
 	$yofs += $ch / 100; 
 	$w->Image->repaint;

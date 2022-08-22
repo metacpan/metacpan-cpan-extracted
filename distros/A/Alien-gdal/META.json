@@ -31,7 +31,6 @@
             "Alien::patch" : "0",
             "Alien::patchelf" : "0",
             "Alien::proj" : "1.24",
-            "Alien::spatialite" : "0",
             "Alien::sqlite" : "1.02",
             "Archive::Tar" : "0",
             "Config" : "0",
@@ -95,15 +94,14 @@
          "url" : "https://github.com/shawnlaffan/perl-alien-gdal"
       }
    },
-   "version" : "1.30",
+   "version" : "1.31",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 2.48",
+      "generated_by" : "Alien::Build::MM version 2.59",
       "requires" : {
          "share" : {
             "Alien::geos::af" : "0",
             "Alien::libtiff" : "0",
             "Alien::proj" : "0",
-            "Alien::spatialite" : "0",
             "Alien::sqlite" : "0",
             "Archive::Tar" : "0",
             "Config" : "0",
@@ -118,5 +116,5 @@
          "system" : {}
       }
    },
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

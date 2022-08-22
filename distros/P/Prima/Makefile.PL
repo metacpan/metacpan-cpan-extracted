@@ -131,8 +131,8 @@ options:
     WITH_FRIBIDI      - compile with/without fribidi (default 1)
     WITH_HARFBUZZ     - compile with/without harfbuzz (default 1), X only
     WITH_ICONV        - compile with/without iconv (default 1), X only
-    WITH_GTK2         - compile with/without GTK2 (default 1), X only
-    WITH_GTK3         - compile with/without GTK3 (default 0), X only
+    WITH_GTK3         - compile with/without GTK3 (default 1), X only
+    WITH_GTK2         - compile with/without GTK2 (default 0), X only
     WITH_OPENMP       - compile with/without openmp (default 1)
     WITH_COCOA        - compile with/without Cocoa (default 1), MacOSX only
     WITH_LIBTHAI      - compile with/without libthai (default 1)
@@ -189,8 +189,8 @@ sub setup_argv
 		WITH_HARFBUZZ => 1,
 		WITH_FRIBIDI   => 1,
 		WITH_ICONV    => 1,
-		WITH_GTK2     => 1,
-		WITH_GTK3     => 0,
+		WITH_GTK2     => 0,
+		WITH_GTK3     => 1,
 		WITH_OPENMP   => 1,
 		WITH_COCOA    => ($^O eq 'darwin'),
 		WITH_LIBTHAI  => 1,
@@ -564,6 +564,7 @@ sub cc_command_line
 	$cc .= ' ' . join(' ', map { "$CLIBPATHFLAG$_"} @LIBPATH) unless $compile_only || ( $compiler_type eq 'cl');
 	$cc .= " $srcf";
 	return $cc if $compile_only;
+
 	$cc .= " $passthru_options{LDDLFLAGS}" if gcc;
 	$cc .= " $CLINKPREFIX";
 	$cc .= " $LDFLAGS";
@@ -571,6 +572,8 @@ sub cc_command_line
 	$cc .= ' ' . join(' ', map { "$LDLIBFLAG$_$LD_LIB_EXT"} @LIBS);
 	$cc .= " $passthru_options{LIBS}" if length $passthru_options{LIBS};
 	$cc .= " $cmd_options{EXTRA_LDFLAGS}" if length $cmd_options{EXTRA_LDFLAGS};
+	$cc =~ s/\-bundle// if $^O eq 'darwin';
+
 	return $cc;
 }
 
@@ -1065,6 +1068,7 @@ sub setup_defines
 	have_funcs_in( 'stdlib.h', 'reallocf');
 	have_funcs_in( 'strings.h', 'bzero');
 	have_funcs_in( 'string.h', 'memmem');
+	have_funcs_in( 'string.h', 'strlcpy');
 	have_funcs_in( 'unistd.h', 'eaccess');
 	if ( $Win32) {
 		have_type( "BOOLEAN", "windows.h");
@@ -1765,6 +1769,10 @@ WARN:
 Consider fixing your installation.
 
 LIBTHAI
+	$END .= <<LIBTHAI if $Win32 and not $cygwin;
+Get libthai binary from http://prima.eu.org/download/libthai-0.1.29-win64.zip
+
+LIBTHAI
 }
 
 sub generate_win32_def
@@ -1847,7 +1855,7 @@ sub setup_codecs
 
 	my @codec_libpath = $Config{installsitearch};
 	my @warn_codecs;
-	my $webp_version;
+	my ($webp_version, $heif_version);
 	CODEC: for my $cx ( @codecs) {
 		my @inc;
 		my $foundlib;
@@ -1863,6 +1871,11 @@ sub setup_codecs
 					$found = 1;
 					$webp_version = $1 * 0x10000 + $2 * 0x100 + $3
 						if $MODVERSIONS{libwebp} =~ /^(\d+).(\d+).(\d+)/;
+				}
+			} elsif ( $codec eq 'heif') {
+				if ( pkgconfig('libheif')) {
+					$heif_version = $1 * 100 + $2 if
+						$MODVERSIONS{libheif} =~ /^(\d+).(\d+).\d+/;
 				}
 			} elsif ( $codec eq 'png') {
 				$found = 1 if pkgconfig('libpng');
@@ -1966,6 +1979,13 @@ VER
 			$PASSIVE_CODECS{'img/codec_webp.c'} = 1;
 		}
 	}
+	if ( defined $heif_version ) {
+		if ( $heif_version < 112 ) {
+			printlog "** Warning: libheif version is too low, at least 1.12.0 is needed, skipping\n";
+			@ACTIVE_CODECS = grep { !/heif/ } @ACTIVE_CODECS;
+			$PASSIVE_CODECS{'img/codec_heif.c'} = 1;
+		}
+	}
 
 	unless ( @ACTIVE_CODECS) {
 		$binary_prereq = $prereq;
@@ -2010,6 +2030,9 @@ able to work with the corresponding image formats.
 Please follow the instructions in README file.
 
 NOCODECS
+		$END .= <<LIBHEIF if $Win32 and not $cygwin and grep {/heif/} @warn_codecs;
+Get libheif binary from http://prima.eu.org/download/libheif-1.12.0-win64.zip
+LIBHEIF
 	}
 	push @ACTIVE_CODECS, @builtin_codecs;
 }
@@ -2344,7 +2367,7 @@ sub command_bindist
 		my $f = "$File::Find::dir/$_";
 		return if $f =~ /include.generic|\.git|\.swp|\.log|blib|dll.base|dll.exp|Prima.bs|Prima.def/;
 		return if $f =~ /\.(c|cls|h)$/i;
-		return if $f =~ /$CWD.(img|include|win32|unix|Makefile.old)/i;
+		return if $f =~ /$CWD.(img|include|win32|unix|api|class|Makefile.old)/i;
 		if ( -d $f) {
 			$f =~ s/^$CWD/$DISTNAME/;
 			push @dirs, $f;

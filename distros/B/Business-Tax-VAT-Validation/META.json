@@ -4,13 +4,13 @@
       "David Precious <davidp@preshweb.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Business-Tax-VAT-Validation",
    "no_index" : {
@@ -49,6 +49,6 @@
          "url" : "https://github.com/bigpresh/Business-Tax-VAT-Validation"
       }
    },
-   "version" : "1.21",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "1.23",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

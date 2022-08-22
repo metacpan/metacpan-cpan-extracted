@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Indicator::Delta::Decreasing;
 use Chart::Plotly::Trace::Indicator::Delta::Font;
 use Chart::Plotly::Trace::Indicator::Delta::Increasing;
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace indicator.
 
@@ -51,6 +51,11 @@ has position => ( is            => "rw",
                   documentation => "Sets the position of delta with respect to the number.",
 );
 
+has prefix => ( is            => "rw",
+                isa           => "Str",
+                documentation => "Sets a prefix appearing before the delta.",
+);
+
 has reference => (
           is            => "rw",
           isa           => "Num",
@@ -62,11 +67,16 @@ has relative => ( is            => "rw",
                   documentation => "Show relative change",
 );
 
+has suffix => ( is            => "rw",
+                isa           => "Str",
+                documentation => "Sets a suffix appearing next to the delta.",
+);
+
 has valueformat => (
-    is  => "rw",
-    isa => "Str",
+    is            => "rw",
+    isa           => "Str",
     documentation =>
-      "Sets the value formatting rule using d3 formatting mini-language which is similar to those of Python. See https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format",
+      "Sets the value formatting rule using d3 formatting mini-languages which are very similar to those in Python. For numbers, see: https://github.com/d3/d3-format/tree/v1.4.5#d3-format.",
 );
 
 __PACKAGE__->meta->make_immutable();
@@ -84,7 +94,7 @@ Chart::Plotly::Trace::Indicator::Delta - This attribute is one of the possible o
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -147,6 +157,10 @@ Serialize the trace to JSON. This method should be called only by L<JSON> serial
 
 Sets the position of delta with respect to the number.
 
+=item * prefix
+
+Sets a prefix appearing before the delta.
+
 =item * reference
 
 Sets the reference value to compute the delta. By default, it is set to the current value.
@@ -155,9 +169,13 @@ Sets the reference value to compute the delta. By default, it is set to the curr
 
 Show relative change
 
+=item * suffix
+
+Sets a suffix appearing next to the delta.
+
 =item * valueformat
 
-Sets the value formatting rule using d3 formatting mini-language which is similar to those of Python. See https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format
+Sets the value formatting rule using d3 formatting mini-languages which are very similar to those in Python. For numbers, see: https://github.com/d3/d3-format/tree/v1.4.5#d3-format.
 
 =back
 
@@ -167,7 +185,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

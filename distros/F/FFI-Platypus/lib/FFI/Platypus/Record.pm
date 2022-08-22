@@ -11,21 +11,21 @@ use constant 1.32 ();
 our @EXPORT = qw( record_layout record_layout_1 );
 
 # ABSTRACT: FFI support for structured records data
-our $VERSION = '1.58'; # VERSION
+our $VERSION = '2.00'; # VERSION
 
 
 sub record_layout_1
 {
   if(@_ % 2 == 0)
   {
-    my $ffi = FFI::Platypus->new( api => 1 );
+    my $ffi = FFI::Platypus->new( api => 2);
     unshift @_, $ffi;
     goto &record_layout;
   }
   elsif(defined $_[0] && ref($_[0]) eq 'ARRAY')
   {
     my @args = @{ shift @_ };
-    unshift @args, api => 1;
+    unshift @args, api => 2;
     unshift @_, \@args;
     goto &record_layout;
   }
@@ -204,7 +204,7 @@ FFI::Platypus::Record - FFI support for structured records data
 
 =head1 VERSION
 
-version 1.58
+version 2.00
 
 =head1 SYNOPSIS
 
@@ -235,9 +235,9 @@ Perl:
  
  package main;
  
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  
- my $ffi = FFI::Platypus->new( api => 1 );
+ my $ffi = FFI::Platypus->new( api => 2 );
  $ffi->lib("myperson.so");
  $ffi->type("record(MyPerson)" => 'MyPerson');
  
@@ -269,6 +269,10 @@ L<FFI::Platypus>, though it may have other applications.
 Before you get to deep into using this class you should also consider
 the L<FFI::C>, which provides some overlapping functionality.  Briefly,
 it comes down to this:
+
+(The tl;dr is: use this class when you need to pass by value (since
+L<FFI::C> does not support pass by value) and use L<FFI::C> in all
+other circumstances).
 
 =over 4
 
@@ -332,14 +336,14 @@ of L<FFI::Platypus> as the first argument in order to use its type
 aliases.  Alternatively you may provide constructor arguments that will
 be passed to the internal platypus instance.  Thus this is the same:
 
- my $ffi = FFI::Platypus->new( lang => 'Rust', api => 1 );
+ my $ffi = FFI::Platypus->new( lang => 'Rust', api => 2 );
  record_layout_1( $ffi, ... );
  # same as:
  record_layout_1( [ lang => 'Rust' ], ... );
 
 and this is the same:
 
- my $ffi = FFI::Platypus->new( api => 1 );
+ my $ffi = FFI::Platypus->new( api => 2 );
  record_layout_1( $ffi, ... );
  # same as:
  record_layout_1( ... );

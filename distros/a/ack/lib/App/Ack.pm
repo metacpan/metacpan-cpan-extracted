@@ -16,8 +16,8 @@ A container for functions for the ack program.
 our $VERSION;
 our $COPYRIGHT;
 BEGIN {
-    $VERSION = 'v3.5.0'; # Check https://beyondgrep.com/ for updates
-    $COPYRIGHT = 'Copyright 2005-2021 Andy Lester.';
+    $VERSION = 'v3.6.0'; # Check https://beyondgrep.com/ for updates
+    $COPYRIGHT = 'Copyright 2005-2022 Andy Lester.';
 }
 our $STANDALONE = 0;
 our $ORIGINAL_PROGRAM_NAME;
@@ -450,7 +450,7 @@ sub show_help_rgb {
 ack allows customization of the colors it uses when presenting matches
 onscreen.  See the "ACK COLORS" section of the ack manual (ack --man).
 
-Colors may be specified as "rggNNN" where "NNN" is a triplet of digits
+Colors may be specified as "rgbNNN" where "NNN" is a triplet of digits
 from 0 to 5 specifying the intensity of red, green and blue, respectively.
 
 Here is a grid of the 216 possible values for NNN.
@@ -694,7 +694,7 @@ sub is_lowercase {
     # Get rid of any literal backslashes first to avoid confusion.
     $pat =~ s/\\\\//g;
 
-    my $metacharacter = qr/
+    my $metacharacter = qr{
         |\\A                # Beginning of string
         |\\B                # Not word boundary
         |\\c[a-zA-Z]        # Control characters
@@ -712,7 +712,7 @@ sub is_lowercase {
         |\\X                # ???
         |\\x[0-9A-Fa-f]{2}  # Hex sequence
         |\\Z                # End of string
-    /x;
+    }x;
     $pat =~ s/$metacharacter//g;
 
     my $name = qr/[_A-Za-z][_A-Za-z0-9]*?/;

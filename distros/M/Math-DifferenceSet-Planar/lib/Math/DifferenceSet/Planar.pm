@@ -27,7 +27,7 @@ use constant _F_ETA        => 11;   # "eta" value, initially undef
 use constant _F_PEAK       => 12;   # peak elements arrayref, initially undef
 use constant _NFIELDS      => 13;
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 our $_LOG_MAX_ORDER  = 22.1807;         # limit for integer exponentiation
 our $_MAX_ENUM_COUNT = 32768;           # limit for stored rotator set size
@@ -660,6 +660,10 @@ sub translate {
         $that->[_F_ZETA] = addmod($z,
             mulmod($delta, $this->[_F_ORDER]-1, $modulus), $modulus);
     }
+    if (defined (my $e = $that->[_F_ETA])) {
+        $that->[_F_ETA] = addmod($e,
+            mulmod($delta, $this->[_F_BASE]-1, $modulus), $modulus);
+    }
     return $that;
 }
 
@@ -745,6 +749,7 @@ sub multiply {
         $that->[_F_LOG] = mulmod($log, $factor, $modulus);
     }
     $that->[_F_ZETA] &&= mulmod($that->[_F_ZETA], $factor, $modulus);
+    $that->[_F_ETA]  &&= mulmod($that->[_F_ETA],  $factor, $modulus);
     return $that;
 }
 
@@ -968,7 +973,7 @@ Math::DifferenceSet::Planar - object class for planar difference sets
 
 =head1 VERSION
 
-This documentation refers to version 0.016 of Math::DifferenceSet::Planar.
+This documentation refers to version 0.017 of Math::DifferenceSet::Planar.
 
 =head1 SYNOPSIS
 
@@ -1090,8 +1095,8 @@ of D.  If t is coprime to n but either identical to 1 (mod n) or not a
 multiplier, it is called a rotator.  Rotators of planar difference sets
 are also rotators of planes as translates of a difference set are mapped
 to translates of the rotated set.  We call a minimal set of rotators
-spanning all plane rotations a rotator base.  Another commonly used term
-would be complete residue system.
+spanning all plane rotations a rotator base.  A perhaps more commonly
+used term would be complete residue system.
 
 Math::DifferenceSet::Planar provides examples of small cyclic planar
 difference sets constructed from finite fields.  It is primarily intended
@@ -1144,26 +1149,26 @@ large elements.  The first set in that ordering is the one with
 the largest gap between consecutive elements just left of zero.
 We call this set gap-canonical.
 
-As I<order_base> is (conjecturally) always a multiplier, multiplying a
-planar difference set by I<order_base> will yield a translation of the
-original set.  We call the translation amount I<eta>.
+As divisors of the order, like I<order_base> and I<order> itself, are
+always multipliers, multiplying a planar difference set by I<order_base>
+or I<order> will yield translations of the original set.  The translation
+amount upon multiplying a set with its I<order_base> or with its I<order>
+we call I<eta> or I<zeta>, respectively.
 
-A slightly weaker conjecture asserts that I<order> itself is a multiplier.
-We call the translation amount, upon multiplying a set by its order,
-I<zeta>.  Eta and zeta values could be used for yet more choices of
-canonical representatives of planes.  This library provides, by the
-name of I<zeta_canonize>, one example looking particularly useful.
+If I<eta> is zero, so is I<zeta>, and every plane has at least one
+such set.  With some additional condition for uniqueness this yields
+another kind of choice of a canonical representative.  This library
+provides it by the name of I<zeta_canonize>.
 
 Yet another conjecture asserts that for any two planar difference sets
 of the same order there is a linear function mapping one of them to
-the other.  It may be an intermediate step to proving the prime power
-conjecture, and it is relevant for some of the algorithms implemented
-here.  Notably, it gives rise to the notion of a "logarithm" identifying
-sets or planes by their linear relationship with some reference set.
-If there was a consensus among math libraries on the choice of a reference
-set and of a particular solution from the solution space of the linear
-equation, such libraries could identify any such set by only two numbers
-and be interoperable.
+the other.  This is relevant for some of the algorithms implemented here.
+Notably, it gives rise to the notion of a "logarithm" identifying sets or
+planes by their linear relationship with some reference set.  If there
+was a consensus among researchers on the choice of a reference set and
+of a particular solution from the solution space of the linear equation,
+math libraries could identify any such set by only two uniquely chosen
+numbers and be interoperable.
 
 Such a convention would be an analogy for planar difference sets to what
 Conway polynomials are for finite fields.  The choice, however, is not an
@@ -1174,7 +1179,7 @@ actually based on Conway polynomials, seem to share this disadvantage.
 
 Thus, this library makes use of linear mappings without exposing their
 "logarithm" aspect.  We prefer to postpone any suggestion for this
-standardization until we are confident it is ecologically preferable.
+standardization until we are confident it is economically preferable.
 The library offers methods to find linear mappings between arbitrary sets,
 so users can pick their own reference sets and treat linear mappings
 relative to them as absolute.
@@ -1312,7 +1317,7 @@ End quote.
 Before it was deprecated, the I<check_elements> method in general and
 its parametrizations in particular were already flagged as experimental.
 
-Progress could indeed be made by replacing the non-conclusive multiplier
+Progress has indeed been made by replacing the non-conclusive multiplier
 check by the conclusive linear mapping check: The conjecture that any two
 sets of same order can be mapped to each other with a linear function, and
 an efficient way to find such a function, now constitute a very practical
@@ -1632,25 +1637,16 @@ C<$delta - 1>.
 
 =item I<eta>
 
-The prime power conjecture of planar difference sets states that any
-such set has prime power order.  This would also be implied by the
-stronger conjecture that all finite projective planes have prime power
-order.  Another conjecture asserts that the prime number is a multiplier
-of the set.  Thus multiplying the set by the prime is equivalent to
-a translation.  The translation amount is called I<eta> here and the
-method I<eta> returns its value.
-
-The method has no safeguard to check if for its invocant the prime
-multiplier conjecture actually holds.  With a counterexample, it would
-just return some meaningless value.
+The sets provided by this module have prime power order and thus the prime
+is a divisor of the order and a multiplier.  This means, multiplying
+the set by the prime is equivalent to a translation.  The translation
+amount is called I<eta> here and the method I<eta> returns its value.
 
 =item I<zeta>
 
-Another multiplier conjecture asserts that the order of a set is a
-multiplier.  The translation amount from multiplying by the order is
-called I<zeta> here.  For sets with prime order, I<zeta> and I<eta>
-are equal.  The return value will be correct only for sets satisfying
-the order multiplier conjecture, otherwise meaningless.
+The translation amount from multiplying a set by its order is called
+I<zeta> here, and the method I<zeta> returns its value.  For sets with
+prime order, I<zeta> and I<eta> are of course equal.
 
 =back
 
@@ -1722,7 +1718,7 @@ first component.
 
 Technically, the list will be created using I<find_linear_map> and
 I<multipliers>.  The completeness of the solution space thus depends on
-the I<3n> multipliers conjecture, asserting that each set has precisely
+the I<3n multipliers> conjecture, asserting that each set has precisely
 I<3E<183>n> multipliers.
 
 =back
@@ -1867,10 +1863,6 @@ L<File::ShareDir::Install>,
 
 =item *
 
-L<File::Spec>,
-
-=item *
-
 L<Test::More>.
 
 =back
@@ -1909,13 +1901,6 @@ about it and address the issue.
 The verify_elements() method currently builds a complete operator table
 in memory.  This does not scale very well in terms of either space or
 time for larger sets.
-
-Other methods for verifying difference sets are still under development.
-The current version of check_elements() may be considered a first step.
-As sets with multipliers are much rarer than sets with unique small
-differences, multiplier checks could speed up verification considerably.
-Note, however, that the multiplier check as implemented here is based
-on conjectural matter and thus might inaccurately reject some sets.
 
 Bug reports and suggestions are welcome.
 Please submit them through the github issue tracker,

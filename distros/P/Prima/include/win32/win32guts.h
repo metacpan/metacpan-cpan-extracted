@@ -27,7 +27,7 @@ typedef HANDLE SOCKETHANDLE;
 #endif
 
 #undef  HWND_DESKTOP
-#define HWND_DESKTOP         guts. desktopWindow
+#define HWND_DESKTOP         guts. desktop_window
 
 
 #ifdef UNICODE
@@ -89,7 +89,6 @@ typedef HANDLE SOCKETHANDLE;
 #define stbPen          0x01
 #define stbBrush        0x02
 #define stbText         0x04
-#define stbBacking      0x08
 #define stbGDIMask      0x0F
 #define stbGPBrush      0x10
 
@@ -108,24 +107,24 @@ typedef HANDLE SOCKETHANDLE;
 	else \
 		err_msg( rc, NULL)
 
-#define apcErr( err) guts.apcError = err
+#define apcErr( err) guts.apc_error = err
 #define apiErr {           \
 	rc = GetLastError();    \
-	guts.apcError = errApcError; \
+	guts.apc_error = errApcError; \
 	apcWarn;                \
 }
 #define apiAltErr( err) {  \
-	guts.apcError = errApcError; \
+	guts.apc_error = errApcError; \
 	rc = err;               \
 	apcWarn;                \
 }
 #define apiErrRet         { apiErr;               return false; }
 #define apcErrRet(err)    { apcErr(err);          return false; }
-#define apcErrClear       { guts.apcError = errOk;              }
+#define apcErrClear       { guts.apc_error = errOk;              }
 
 #define GPCALL rc = (DWORD)
 #define apiGPErr { \
-	guts.apcError = errApcError; \
+	guts.apc_error = errApcError; \
 	if ( debug ) \
 		warn( "win32 error 0x%x: '%s' at line %d in %s\n", (unsigned int)rc, \
 			err_msg_gplus( rc, NULL), __LINE__, __FILE__);   \
@@ -134,7 +133,7 @@ typedef HANDLE SOCKETHANDLE;
 #define apiGPErrCheck if (rc) apiGPErr;
 #define apiGPErrCheckRet(f) if (rc) { apiGPErr; return f; }
 #define apiHErr(hr) {           \
-	guts.apcError = errApcError; \
+	guts.apc_error = errApcError; \
 	rc = hr;                \
 	apcWarn;                \
 }
@@ -145,8 +144,8 @@ typedef HANDLE SOCKETHANDLE;
 #define dobjCheck(handle) if ((( PObject)handle)-> stage == csDead) return
 
 #define SHIFT_X(X)    X + sys gp_transform.x
-#define SHIFT_Y(Y)    sys lastSize.y - (Y) - 1 + sys gp_transform.y
-#define SHIFT_XY(X,Y) X += sys gp_transform.x,Y = sys lastSize.y - (Y) - 1 + sys gp_transform.y
+#define SHIFT_Y(Y)    sys last_size.y - (Y) - 1 + sys gp_transform.y
+#define SHIFT_XY(X,Y) X += sys gp_transform.x,Y = sys last_size.y - (Y) - 1 + sys gp_transform.y
 
 typedef struct _HandleOptions_ {
 	unsigned aptWM_PAINT             : 1;       // true if inside WM_PAINT
@@ -189,95 +188,94 @@ typedef struct _HandleOptions_ {
 
 typedef struct _WinGuts
 {
-	HINSTANCE      instance;           // application instance
-	int            cmdShow;            // run command state
-	int            appLock;            // application lock count
-	int            pointerLock;        // pointer lock count
-	DWORD          mainThreadId;       // Id of main thread
-	Point          displayResolution;  // screen resolution in ppi
-	char           defaultFixedFont    [ 256];
-	char           defaultVariableFont [ 256];
-	char           defaultSystemFont   [ 256];
-	Font           windowFont;         // window default font
-	Font           menuFont;           // menu default font
-	Font           msgFont;            // message default font
-	Font           capFont;            // caption default font
-	BITMAPINFO     displayBMInfo;      // display bpp & size
-	HWND           desktopWindow;      // GetDesktopWindow() result
-	Bool           insertMode;         // fake insert mode
-	Point          iconSizeLarge;
-	Point          iconSizeSmall;
-	Point          pointerSize;
-	BYTE           keyState[ 256];     // application key buffer state
-	BYTE           emptyKeyState[ 256];// just zeros
-	BYTE          *currentKeyState;    // current virtual key buffer state
-	HKL            keyLayout;          // key layout, most likely latin for Ctrl+Key mapping
-	NONCLIENTMETRICSW ncmData;         // windows system data
-	List           transp;             // transparent controls list
-	int            topWindows;         // count of top-level windows in app
-	Bool           focSysDisabled;     // focus system disabled
-	Bool           focSysGranted;      // SetFocus() was called inside apc_widget_set_focused
-	Bool           focSysDialog;       // system dialog is in action
-	UINT           errorMode;          // SetErrorMode() result
-	DWORD          version;            // GetVersion() cached result
-	Point          smDblClk;           // cached SM_CxDOUBLECLK values
-	int            socket_version;     // socket behavior type
-	List           files;              // List of active File objects
-	int            mouseTimer;         // is mouse timer started
-	Bool           popupActive;        // flag to avoid double popup activation
-	Bool           pointerInvisible;
-	HWND           console;            // win32-bound console window
-	Byte           msgMask[100];       // 800 user-defined messages allowed
+	HINSTANCE      instance;            // application instance
+	int            cmd_show;            // run command state
+	int            app_lock;            // application lock count
+	int            pointer_lock;        // pointer lock count
+	DWORD          main_thread_id;      // Id of main thread
+	Point          display_resolution;  // screen resolution in ppi
+	char           default_fixed_font    [256];
+	char           default_variable_font [256];
+	char           default_system_font   [256];
+	Font           window_font;         // window default font
+	Font           menu_font;           // menu default font
+	Font           msg_font;            // message default font
+	Font           cap_font;            // caption default font
+	BITMAPINFO     display_bm_info;     // display bpp & size
+	HWND           desktop_window;      // GetDesktopWindow() result
+	Bool           insert_mode;         // fake insert mode
+	Point          icon_size_large;
+	Point          icon_size_small;
+	Point          pointer_size;
+	BYTE           key_state[ 256];      // application key buffer state
+	BYTE           empty_key_state[ 256];// just zeros
+	BYTE          *current_key_state;    // current virtual key buffer state
+	HKL            key_layout;           // key layout, most likely latin for Ctrl+Key mapping
+	NONCLIENTMETRICSW ncmData;           // windows system data
+	List           transp;               // transparent controls list
+	int            top_windows;          // count of top-level windows in app
+	Bool           sys_focus_disabled;   // focus system disabled
+	Bool           sys_focus_granted;    // SetFocus() was called inside apc_widget_set_focused
+	Bool           sys_focus_dialog;     // system dialog is in action
+	UINT           error_mode;           // SetErrorMode() result
+	DWORD          version;              // GetVersion() cached result
+	Point          cmDOUBLECLK;          // cached SM_CxDOUBLECLK values
+	int            socket_version;       // socket behavior type
+	List           files;                // List of active File objects
+	int            mouse_timer;          // is mouse timer started
+	Bool           popup_active;         // flag to avoid double popup activation
+	Bool           pointer_invisible;
+	HWND           console;              // win32-bound console window
 // socket variables
-	List           sockets;            // List of watchable sockets
-	HANDLE         socketMutex;        // thread semaphore
-	HANDLE         socketThread;       // thread id
-	Bool           socketPostSync;     // semaphore
-	Bool           dont_xlate_message; // one-time stopper to TranslateMessage() call
-	int            utf8_prepend_0x202D;// newer windows do automatic bidi conversion, this is to cancel it
+	List           sockets;              // List of watchable sockets
+	HANDLE         socket_mutex;         // thread semaphore
+	HANDLE         socket_thread;        // thread id
+	Bool           socket_post_sync;     // semaphore
+	Bool           dont_xlate_message;   // one-time stopper to TranslateMessage() call
+	int            utf8_prepend_0x202D;  // newer windows do automatic bidi conversion, this is to cancel it
 	WCHAR *      (*alloc_utf8_to_wchar_visual)(const char*,int,int*);
-	ULONG_PTR      gdiplusToken;       // GDI+ handle
+	ULONG_PTR      gdiplus_token;        // GDI+ handle
 	Handle         clipboards[2];
 	Bool           ole_initialized;
-	void*          dndDataSender;      // IDropTarget.DragEnter.DataObject dnd storage object
-	void*          dndDataReceiver;    // CLIPBOARD_DND storage object
-	Bool           dndInsideEvent;     // to distinguish whether the clipboard is read-only or not
-	Bool           dndDefaultCursors;
-	void*          dragSource;         // not null if dragging
-	Handle         dragSourceWidget;   //
-	Handle         dragTarget;         // last successful drop
-	WORD           language_id;        // default shaping language
+	void*          dnd_data_sender;      // IDropTarget.DragEnter.DataObject dnd storage object
+	void*          dnd_data_receiver;    // CLIPBOARD_DND storage object
+	Bool           dnd_inside_event;     // to distinguish whether the clipboard is read-only or not
+	Bool           dnd_default_cursors;
+	void*          drag_source;          // not null if dragging
+	Handle         drag_source_widget;   //
+	Handle         drag_target;          // last successful drop
+	WORD           language_id;          // default shaping language
 	char           language_descr[32];
 	Bool           application_stop_signal;
-	long           apcError;
+	long           apc_error;
 } WinGuts, *PWinGuts;
 
 typedef struct _WindowData
 {
-	int    borderIcons;
-	int    borderStyle;
-	Point  hiddenPos;
-	Point  hiddenSize;
-	int    state;
-	Handle oldFoc;
-	HWND   oldActive;
-	PHash  effects;
+	int            border_icons;
+	int            border_style;
+	Point          hidden_pos;
+	Point          hidden_size;
+	int            state;
+	Handle         old_foc;
+	HWND           old_active;
+	PHash          effects;
 } WindowData;
 
 typedef struct _TimerData
 {
-	int  timeout;
+	int            timeout;
 } TimerData;
 
 typedef struct _MenuItemData
 {
-	int  saved_dc;
+	int            saved_dc;
 } MenuItemData;
 
 typedef struct _FileData
 {
-	SOCKETHANDLE object;
-	int          type;
+	SOCKETHANDLE   object;
+	int            type;
 } FileData;
 
 typedef struct
@@ -288,14 +286,20 @@ typedef struct
 
 
 typedef struct _XLOGPALETTE {
-	WORD         palVersion;
-	WORD         palNumEntries;
-	PALETTEENTRY palPalEntry[ 256];
+	WORD           palVersion;
+	WORD           palNumEntries;
+	PALETTEENTRY   palPalEntry[ 256];
 } XLOGPALETTE, *PXLOGPALETTE;
 
+typedef struct {
+	UINT           flags;
+	UINT           count;
+	ARGB           entries[256];
+} XColorPalette, *PXColorPalette;
+
 typedef struct _XBITMAPINFO {
-	BITMAPINFOHEADER bmiHeader;
-	RGBQUAD          bmiColors[ 256];
+	BITMAPINFOHEADER header;
+	RGBQUAD          colors[ 256];
 } XBITMAPINFO, *PXBITMAPINFO;
 
 #define BM_NONE    0
@@ -306,24 +310,24 @@ typedef struct _XBITMAPINFO {
 
 typedef struct _ImageCache
 {
-	int         cacheType;
-	XBITMAPINFO rawHeader;
-	Byte*       rawBits;
-	Bool        freeBits;
-	HBITMAP     bitmap; /* copy of sys bm, if any */
+	int            cache_type;
+	XBITMAPINFO    raw_header;
+	Byte*          raw_bits;
+	Bool           free_bits;
+	HBITMAP        bitmap; /* copy of sys bm, if any */
 } ImageCache;
 
 typedef struct _ImageData
 {
-	HRGN        imgCachedRegion;
-	uint32_t*   argbBits;
-	ImageCache  cache;
+	HRGN           img_cached_region;
+	uint32_t*      argb_bits;
+	ImageCache     cache;
 } ImageData;
 
 typedef struct _PrinterData
 {
 	PRINTER_INFO_2 ppi;
-	char           defPrnBuf[ 256];
+	char           def_prn_buf[256];
 	char          *device;
 	char          *driver;
 	char          *port;
@@ -331,130 +335,143 @@ typedef struct _PrinterData
 
 typedef struct _PaintSaveData
 {
-	Bool        antialias;
-	int         alpha;
-	Color       lbs[2];
-	Bool        fillMode;
-	float       lineWidth;
-	int         lineEnd;
-	int         lineJoin;
-	unsigned char * linePattern;
-	int         linePatternLen;
-	float       miterLimit;
-	FillPattern fillPattern;
-	Point       fillPatternOffset;
-	int         rop;
-	int         rop2;
-	Point       transform;
-	Font        font;
-	Bool        textOpaque;
-	Bool        textOutB;
+	Bool           antialias, fill_mode;
+	int            alpha;
+	Color          fg, bg;
+	float          line_width;
+	int            line_end, line_join;
+	unsigned char *line_pattern;
+	int            line_pattern_len;
+	float          miter_limit;
+	FillPattern    fill_pattern;
+	Point          fill_pattern_offset;
+	int            rop, rop2;
+	Point          transform;
+	Font           font;
+	Bool           text_opaque, text_out_baseline;
 } PaintSaveData, *PPaintSaveData;
 
-typedef struct _PatResource
+typedef struct
 {
-	DWORD  dotsCount;
-	DWORD* dotsPtr;
-	DWORD  dots[ 1];
-} PatResource, *PPatResource;
-
-typedef struct _EXTPEN
-{
-	Bool            actual;
-	DWORD           style;
-	DWORD           lineEnd;
-	DWORD           lineJoin;
-	float           lineWidth;
-	PatResource  *  patResource;
-} EXTPEN, *PEXTPEN;
-
-typedef struct _EXTLOGBRUSH
-{
-	LOGBRUSH     lb;
-	COLORREF     backColor;
-	FillPattern  pattern;
-} EXTLOGBRUSH, *PEXTLOGBRUSH;
+	DWORD          count;
+	DWORD*         ptr;
+	DWORD          dots[1];
+} LinePattern, *PLinePattern;
 
 typedef struct _DIBMONOBRUSH
 {
-	BITMAPINFOHEADER bmiHeader;
-	RGBQUAD          bmiColors[2];
-	unsigned char    bmiData[32];
+	BITMAPINFOHEADER header;
+	RGBQUAD         colors[2];
+	unsigned char   data[32];
 } DIBMONOBRUSH, *PDIBMONOBRUSH;
-
-typedef struct _Stylus
-{
-	LOGPEN       pen;
-	EXTLOGBRUSH  brush;
-	EXTPEN       extPen;
-} Stylus, *PStylus;
-
-typedef struct _DCStylus
-{
-	Stylus        s;
-	int           refcnt;
-	HPEN          hpen;
-	HBRUSH        hbrush;
-} DCStylus, *PDCStylus;
 
 typedef struct _DCFont
 {
-	Font          font;
-	int           refcnt;
-	HFONT         hfont;
+	Font             font;
+	int              refcnt;
+	HFONT            hfont;
 } DCFont, *PDCFont;
 
-#define GP_BRUSH_SOLID       0
-#define GP_BRUSH_FILLPATTERN 1
-#define GP_SOLID_PEN         2
+#define DCO_PEN           0
+#define DCO_BRUSH         1
+#define DCO_GP_PEN        2
+#define DCO_GP_BRUSH      3
+#define DCO_COUNT         4
 
-typedef struct _GPStylus
-{
-	int type, opaque;
-	uint32_t fg, bg;
-	FillPattern fill;
-} GPStylus, *PGPStylus;
+typedef struct {
+	int            type;
+	int            refcnt;
+	HANDLE         handle;
+	Bool           cached;
+	unsigned int   rq_size;
+	void          *rq;
+	char           rq_buf[1];
+} DCObject, *PDCObject;
 
-typedef struct _DCGPStylus
+typedef struct {
+	int            type;
+	LOGPEN         logpen;
+	Bool           geometric;
+	DWORD          style;
+	DWORD          line_end;
+	DWORD          line_join;
+	LinePattern   *line_pattern;
+} RQPen, *PRQPen;
+
+typedef struct {
+	int            type;
+	LOGBRUSH       logbrush;
+	COLORREF       back_color;
+	FillPattern    fill_pattern;
+} RQBrush, *PRQBrush;
+
+typedef struct
 {
-	GPStylus s;
-	int refcnt;
-	GpBrush * brush;
-	GpPen   * pen;
-} DCGPStylus, *PDCGPStylus;
+	int            type;
+	uint32_t       fg, line_width;
+} RQGPPen, *PRQGPPen;
+
+typedef struct
+{
+	int            type;
+	uint32_t       fg, bg, opaque;
+	FillPattern    fill_pattern;
+} RQGPBrush, *PRQGPBrush;
+
+typedef struct _PaintState
+{
+	Bool               in_paint;
+	struct {
+		int        stylus_flags;
+		PDCObject  dc_obj[DCO_COUNT];
+		RQPen      rq_pen;
+		RQBrush    rq_brush;
+		PDCFont    dc_font;
+		float      font_sin, font_cos, line_width;
+	} paint;
+	struct {
+		HPALETTE   palette;
+	} nonpaint;
+	PaintSaveData      common;
+	Handle             fill_image;
+
+	unsigned int       user_data_size;
+	GCStorageFunction *user_destructor;
+	void              *user_data, *user_context;
+	char               user_data_buf[1]; /* this needs to be the last */
+} PaintState, *PPaintState;
+
 
 typedef struct _DrawableData
 {
 	/* Drawable basic data*/
-	HDC            ps;                      // general HDC
-	GpGraphics    *graphics;                // GDI+ context
-	PAINTSTRUCT    paintStruc;              // HDC counterpart
-	HBITMAP        bm;                      // cached bitmap
-	HPALETTE       pal;                     // cached palette
+	HDC            ps;                  // general HDC
+	GpGraphics    *graphics;            // GDI+ context
+	PAINTSTRUCT    paint_struct;        // HDC counterpart
+	HBITMAP        bm;                  // cached bitmap
+	HPALETTE       pal;                 // cached palette
+	PList          gc_stack;            // push/pop
 
-	/* stylus and font hash management fields */
-	PDCStylus      stylusResource;          // current stylus pointer
-	int            stylusFlags;             // stylus resource cache( stbXXXX)
-	Stylus         stylus;                  // widgets stylus record
-	PDCFont        fontResource;            // font resource pointer
-	PDCGPStylus    stylusGPResource;        // GDI+ resource pointer
+	/* pen, brush, and font hash management fields */
+	int            stylus_flags;        // stylus resource cache( stbXXXX)
+	PDCObject      current_dc_obj[DCO_COUNT];
+	RQPen          rq_pen;
+	RQBrush        rq_brush;
+	PDCFont        dc_font;
 
 	/* Stock objects of HDC - to be restored after paint mode */
-	HPEN           stockPen;
-	HBRUSH         stockBrush;
-	HFONT          stockFont;
-	HBITMAP        stockBM;
-	HPALETTE       stockPalette;
+	HPEN           stock_pen;
+	HBRUSH         stock_brush;
+	HFONT          stock_font;
+	HBITMAP        stock_bitmap;
+	HPALETTE       stock_palette;
 
 	/* HDC info fields */
-	int            bpp;                     // bits per pixel
-	Point          res;                     // resolution
+	int            bpp;                 // bits per pixel
+	Point          res;                 // resolution
 
 	/* for opaque stroke emulation */
-	int            currentROP;
-	int            currentROP2;
 	int            alpha;
-	HPEN	       opaquePen;
 
 	/* cached GetTextMetrics */
 	BYTE           tmPitchAndFamily;
@@ -463,74 +480,72 @@ typedef struct _DrawableData
 	float          font_sin, font_cos;
 
 	/* HDC attributes storage outside paint mode */
-	Color          lbs[2];
-	int            fillMode, psFillMode;
-	float          lineWidth;
-	int            lineEnd;
-	int            lineJoin;
-	unsigned char *linePattern;
-	int            linePatternLen;
-	FillPattern    fillPattern;
-	FillPattern    fillPattern2;
-	Point          fillPatternOffset;
+	Color          fg, bg;
+	int            fill_mode;
+	float          line_width;
+	int            line_end;
+	int            line_join;
+	unsigned char *line_pattern;
+	int            line_pattern_len;
+	FillPattern    fill_pattern;
+	Point          fill_pattern_offset;
 	int            rop;
 	int            rop2;
-	float          miterLimit;
+	float          miter_limit;
 	Point          transform;
 	Point          gp_transform;
-	PPaintSaveData psd;                     // Their values during paint saved in sys psd
 
 	/* Basic widget fields */
-	HWND           handle;                  // Windows handle of a widget
-	HWND           owner;                   // Windows owner of a widget
-	HWND           parent;                  // Windows parent of a widget
-	HWND           parentHandle;
-	int            className;               // class name ( WC_XXX)
+	HWND           handle;              // Windows handle of a widget
+	HWND           owner;               // Windows owner of a widget
+	HWND           parent;              // Windows parent of a widget
+	HWND           parent_handle;
+	int            class_name;          // class name ( WC_XXX)
 
 	/* Widget properties */
-	HandleOptions  options;                 // apt_XXX settings
-	ColorSet       viewColors;              // widget color palette
-	PXLOGPALETTE   p256;                    // cached squeezed palette
-	void *         recreateData;            // ViewProfile custom area
+	HandleOptions  options;             // apt_XXX settings
+	ColorSet       view_colors;         // widget color palette
+	PXLOGPALETTE   p256;                // cached squeezed palette
+	void *         recreate_data;       // ViewProfile custom area
 
 	/* Custom data for widget paint in optBuffered state */
-	HDC            ps2;                     // original HDC
-	HPALETTE       pal2;                    // original palette
-	Point          transform2;              // necessary additional transposition
+	HDC            ps2;                 // original HDC
+	HPALETTE       pal2;                // original palette
+	Point          transform2;          // necessary additional transposition
 
 	/* Positioning support fields */
-	Point          lastSize;                // last actual size
-	int            sizeLockLevel;           // size locking flag
-	int            yOverride;               // special cached height value. Used in WM_SIZE<->WM_MOVE interactions
+	Point          last_size;           // last actual size
+	int            size_lock_level;     // size locking flag
+	int            y_override;          // special cached height value. Used in WM_SIZE<->WM_MOVE interactions
 
 	/* Widget attributes - timers, cursor, pointers, menu, shape */
-	Point          cursorPos;               // cursor position
-	Point          cursorSize;              // cursor size
-	HCURSOR        pointer;                 // pointer handle
-	HCURSOR        pointer2;                // user pointer data
-	int            pointerId;               // pointer id
-	Handle         lastMenu;                // last menu activated by WM_INITMENU or WM_INITMENUPOPUP
-	Point          extraBounds;             // used in region calculations
-	Point          extraPos;                // used in region calculations
-	Point          layeredPos;              // delayed layered window positioning
+	Point          cursor_pos;          // cursor position
+	Point          cursor_size;         // cursor size
+	HCURSOR        pointer;             // pointer handle
+	HCURSOR        pointer2;            // user pointer data
+	int            pointer_id;          // pointer id
+	Handle         last_menu;           // last menu activated by WM_INITMENU or WM_INITMENUPOPUP
+	Point          extra_bounds;        // used in region calculations
+	Point          extra_pos;           // used in region calculations
+	Point          layered_pos;         // delayed layered window positioning
 
 	/* Widget DND stuff */
-	void*          dropTarget;
+	void*          drop_target;
 
 	/* Layered subpaint */
-	Point          layeredPaintOffset;
-	HDC            layeredPaintSurface;
-	HRGN           layeredParentRegion;
+	Point          layered_paint_offset;
+	HDC            layered_paint_surface;
+	HRGN           layered_parent_region;
 
 	/* alpha text amulation */
-	HDC            alphaArenaDC;
-	HBITMAP        alphaArenaBitmap;
-	uint32_t*      alphaArenaPtr;
-	Point          alphaArenaSize;
-	Bool           alphaArenaFontChanged;
-	HFONT          alphaArenaStockFont;
-	HBITMAP        alphaArenaStockBitmap;
-	uint32_t*      alphaArenaPalette;
+	HDC            alpha_arena_dc;
+	HBITMAP        alpha_arena_bitmap;
+	uint32_t*      alpha_arena_ptr;
+	Point          alpha_arena_size;
+	Bool           alpha_arena_font_changed;
+	HFONT          alpha_arena_stock_font;
+	HBITMAP        alpha_arena_stock_bitmap;
+	uint32_t*      alpha_arena_palette;
 
 	/* Other class-specific data */
 	union {
@@ -559,53 +574,51 @@ typedef struct _KeyPacket
 	int      mod;
 } KeyPacket, *PKeyPacket;
 
-typedef struct _MusClkRec {
+typedef struct _MouseClickRec {
 	Bool    pending;
 	UINT    emsg;
 	MSG     msg;
-} MusClkRec;
+} MouseClickRec;
 
-#define STYLUS_USE_PEN( __ps)                              \
-	if ( !( sys stylusFlags & stbPen)) {                    \
-		if ( __ps)                                           \
-			SelectObject( __ps, sys stylusResource-> hpen);   \
-		sys stylusFlags |= stbPen;                           \
+#define STYLUS_USE_PEN                                               \
+	if ( !( sys stylus_flags & stbPen)) {                        \
+		if ( select_pen(self))                               \
+		   sys stylus_flags |= stbPen;                       \
 	}
 
-#define STYLUS_USE_BRUSH( __ps)                            \
-	if ( !( sys stylusFlags & stbBrush)) {                  \
-		if ( __ps)                                           \
-			SelectObject( __ps, sys stylusResource-> hbrush); \
-		sys stylusFlags |= stbBrush;                         \
-	}
-
-#define STYLUS_USE_TEXT( __ps)                             \
-	if ( !( sys stylusFlags & stbText)) {                   \
-		if ( __ps)                                           \
-			SetTextColor( __ps, sys stylus. pen. lopnColor);  \
-		sys stylusFlags |= stbText;                          \
-	}
-
-#define STYLUS_USE_BACKING( __ps)                          \
-	if ( !( sys stylusFlags & stbBacking)) {                \
-		if ( __ps)                                           \
-			SetBkColor( __ps, sys stylus. brush. backColor);  \
-		sys stylusFlags |= stbBacking;                       \
+#define STYLUS_USE_BRUSH                                             \
+	if ( !( sys stylus_flags & stbBrush)) {                      \
+		if ( select_brush(self))                             \
+		   sys stylus_flags |= stbBrush;                     \
 	}
 
 
-#define STYLUS_USE_GP_BRUSH                          \
-	if ( !( sys stylusFlags & stbGPBrush)) {                \
-		if ( stylus_gp_alloc(self) == NULL ) return false; \
-		sys stylusFlags |= stbGPBrush;                      \
+#define STYLUS_USE_TEXT                                              \
+	if ( !( sys stylus_flags & stbText)) {                       \
+		if (sys ps)                                          \
+			SetTextColor(sys ps, sys rq_pen.logpen.lopnColor);\
+		sys stylus_flags |= stbText;                         \
 	}
 
-#define STYLUS_FREE_GP_BRUSH sys stylusFlags &= ~stbGPBrush
+#define STYLUS_USE_GP_BRUSH                                          \
+	if ( !( sys stylus_flags & stbGPBrush)) {                    \
+		if ( select_gp_brush(self))                          \
+			sys stylus_flags |= stbGPBrush;              \
+	}
 
-#define psDot         "\3\3"
-#define psDash        "\x16\6"
-#define psDashDot     "\x9\6\3\6"
-#define psDashDotDot  "\x9\3\3\3\3\3"
+#define STYLUS_FREE_PEN              sys stylus_flags &= ~stbPen
+#define STYLUS_FREE_BRUSH            sys stylus_flags &= ~stbBrush
+#define STYLUS_FREE_PEN_AND_BRUSH    sys stylus_flags &= ~(stbBrush|stbPen)
+#define STYLUS_FREE_GP_PEN
+#define STYLUS_FREE_GP_BRUSH         sys stylus_flags &= ~stbGPBrush
+#define STYLUS_FREE_GP               sys stylus_flags &= ~stbGPBrush
+#define STYLUS_FREE_ALL              sys stylus_flags &= ~(stbGPBrush|stbBrush|stbPen|stbText)
+#define STYLUS_FREE_TEXT             sys stylus_flags &= ~stbText
+
+#define CURRENT_PEN      ((HPEN)  sys current_dc_obj[DCO_PEN]->handle)
+#define CURRENT_BRUSH    ((HBRUSH)sys current_dc_obj[DCO_BRUSH]->handle)
+#define CURRENT_GP_PEN   ((GpPen*)( sys current_dc_obj[DCO_GP_PEN]   ? sys current_dc_obj[DCO_GP_PEN]->handle   : NULL))
+#define CURRENT_GP_BRUSH ((GpPen*)( sys current_dc_obj[DCO_GP_BRUSH] ? sys current_dc_obj[DCO_GP_BRUSH]->handle : NULL))
 
 #define csAxEvents csFrozen
 
@@ -614,56 +627,66 @@ typedef struct _MusClkRec {
 #define is_apt( option)            ( sys options. option)
 #define apt_assign( option, value) ( sys options. option = (value)?1:0)
 
-#define is_declipped( handle)      (                                                    \
-	handle && ( dsys(handle) className != WC_FRAME ) &&                                  \
-	( !dsys(handle)options.aptClipOwner || ((( PWidget)handle)-> owner == application))  \
+#define is_declipped( handle)      (                                                        \
+	handle && ( dsys(handle) class_name != WC_FRAME ) &&                                \
+	( !dsys(handle)options.aptClipOwner || ((( PWidget)handle)-> owner == application)) \
 )
 
-#define is_declipped_child( handle) (                                                   \
-	handle && ( dsys(handle) className != WC_FRAME ) &&                                  \
-	!dsys(handle)options.aptClipOwner                                                    \
+#define is_declipped_child( handle) (                                                       \
+	handle && ( dsys(handle) class_name != WC_FRAME ) &&                                \
+	!dsys(handle)options.aptClipOwner                                                   \
 )
 
 #define palette_create image_create_palette
 
 typedef struct _ItemRegRec {
-	int   cmd;
-	void *item;
+	int            cmd;
+	void          *item;
 } ItemRegRec, *PItemRegRec;
 
-extern Bool         appDead;
-extern Bool         debug;
-extern DIBMONOBRUSH bmiHatch;
-extern PHash        fontMan;
-extern PHash        myfontMan;
-extern int          FONTSTRUCSIZE;
-extern WinGuts      guts;
-extern PHash        imageMan;
-extern PHash        menuMan;
-extern MusClkRec    musClk;
-extern PHash        patMan;
-extern DWORD        rc;
-extern PHash        stylusMan;
-extern PHash        stylusGpMan;
-extern HBRUSH       hBrushHollow;
-extern PatResource  hPatHollow;
-extern HPEN         hPenHollow;
-extern PHash        regnodeMan;
-extern Handle       lastMouseOver;
-extern int          timeDefsCount;
-extern PItemRegRec  timeDefs;
-extern PHash        menuBitmapMan;
-extern HBITMAP      uncheckedBitmap;
-extern PHash        scriptCacheMan;
-extern HCURSOR      arrowCursor;
+extern Bool            app_dead;
+extern Bool            debug;
+extern int             FONTSTRUCSIZE;
+extern WinGuts         guts;
+extern Handle          last_mouse_over;
+extern PHash           mgr_fonts;
+extern PHash           mgr_myfonts;
+extern PHash           mgr_images;
+extern PHash           mgr_menu;
+extern PHash           mgr_menu_bitmaps;
+extern PHash           mgr_patterns;
+extern PHash           mgr_registry;
+extern PHash           mgr_scripts;
+extern PHash           mgr_styli;
+extern MouseClickRec   mouse_click;
+extern DWORD           rc;
+extern HCURSOR         std_arrow_cursor;
+extern HBRUSH          std_hollow_brush;
+extern LinePattern     std_hollow_line_pattern;
+extern HPEN            std_hollow_pen;
+extern HBITMAP         std_unchecked_bitmap;
+extern int             time_defs_count;
+extern PItemRegRec     time_defs;
 
 LRESULT CALLBACK    generic_app_handler      ( HWND win, UINT  msg, WPARAM mp1, LPARAM mp2);
 LRESULT CALLBACK    generic_frame_handler    ( HWND win, UINT  msg, WPARAM mp1, LPARAM mp2);
 LRESULT CALLBACK    layered_frame_handler    ( HWND win, UINT  msg, WPARAM mp1, LPARAM mp2);
 LRESULT CALLBACK    generic_view_handler     ( HWND win, UINT  msg, WPARAM mp1, LPARAM mp2);
 
+extern Bool         aa_text_out( Handle self, int x, int y, void * text, int len, Bool wide);
+extern Bool         aa_glyphs_out( Handle self, PGlyphsOutRec t, int x, int y, int * text_advance, HFONT font);
+extern void         aa_free_arena(Handle self, Bool for_reuse);
+extern WCHAR *      alloc_utf8_to_wchar( const char * utf8, int length, int * mb_len);
+extern WCHAR *      alloc_utf8_to_wchar_visual( const char * utf8, int length, int * mb_len);
+extern WCHAR *      alloc_ascii_to_wchar( const char * text, int length);
+extern char *       alloc_wchar_to_utf8( WCHAR * src, int * len );
+extern int          apcUpdateWindow( HWND wnd );
 extern int          arc_completion( double * angleStart, double * angleEnd, int * needFigure);
 extern Bool         add_font_to_hash( const PFont key, const PFont font, Bool addSizeEntry);
+extern char *       cf2name( UINT cf );
+extern void         char2wchar( WCHAR * dest, char * src, int lim);
+extern void         cleanup_gc_stack(Handle self, Bool all);
+extern Bool         clipboard_get_data(int cfid, PClipboardDataRec c, void * p1, void * p2);
 extern void         cm_squeeze_palette( PRGBColor source, int srcColors, PRGBColor dest, int destColors);
 extern Bool         create_font_hash( void);
 extern Bool         cursor_update( Handle self);
@@ -673,6 +696,17 @@ extern HDC          dc_compat_alloc( HDC compatDC);
 extern void         dc_compat_free( void);
 extern void         dbm_recreate( Handle self);
 extern Bool         destroy_font_hash( void);
+extern Bool         dnd_clipboard_create(void);
+extern void         dnd_clipboard_destroy(void);
+extern Bool         dnd_clipboard_open(void);
+extern Bool         dnd_clipboard_close(void);
+extern Bool         dnd_clipboard_clear(void);
+extern PList        dnd_clipboard_get_formats(void);
+extern Bool         dnd_clipboard_get_data( Handle id, PClipboardDataRec c);
+extern Bool         dnd_clipboard_has_format( Handle id);
+extern Bool         dnd_clipboard_set_data( Handle id, PClipboardDataRec c);
+extern PList        dnd_clipboard_get_formats();
+extern void         dpi_change(void);
 extern char *       err_msg( DWORD errId, char * buffer);
 extern char *       err_msg_gplus( GpStatus errId, char * buffer);
 extern PDCFont      font_alloc( Font * data);
@@ -684,77 +718,60 @@ extern void         font_logfont2font( LOGFONTW * lf, Font * font, Point * resol
 extern void         font_pp2font( char * presParam, Font * font);
 extern void         font_textmetric2font( TEXTMETRICW * tm, Font * fm, Bool readOnly);
 extern Bool         get_font_from_hash( PFont font, Bool bySize);
-extern Point        get_window_borders( int borderStyle);
+extern Point        get_window_borders( int border_style);
+extern void         gp_get_text_box( Handle self, ABC * abc, Point * pt);
+extern void         gp_get_text_widths( Handle self, const char* text, int len, int flags, ABC * extents);
 extern Bool         hwnd_check_limits( int x, int y, Bool uint);
 extern void         hwnd_enter_paint( Handle self);
 extern Handle       hwnd_frame_top_level( Handle self);
 extern void         hwnd_leave_paint( Handle self);
+extern Bool         hwnd_lock( Bool lock);
 extern Handle       hwnd_to_view( HWND win);
 extern Handle       hwnd_top_level( Handle self);
 extern Handle       hwnd_layered_top_level( Handle self);
 extern Bool         hwnd_repaint_layered( Handle self, Bool now);
-extern HICON        image_make_icon_handle( Handle img, Point size, Point * hotSpot);
-extern void         image_query_bits( Handle self, Bool forceNewImage);
 extern void         image_argb_query_bits( Handle self);
+extern HICON        image_make_icon_handle( Handle img, Point size, Point * hot_spot);
+extern HBITMAP      image_create_argb_dib_section( HDC dc, int w, int h, uint32_t ** ptr);
 extern HBITMAP      image_create_bitmap_by_type( Handle self, HPALETTE pal, XBITMAPINFO * bitmapinfo, int bm_type);
 extern HBITMAP      image_create_bitmap( Handle self );
-extern HBITMAP      image_create_argb_dib_section( HDC dc, int w, int h, uint32_t ** ptr);
+extern BITMAPINFO*  image_create_color_pattern_dib( Handle self);
+extern void *       image_create_dib(Handle image, Bool global_alloc);
+extern GpTexture*   image_create_gp_pattern( Handle self, Handle image, unsigned int alpha );
+extern BITMAPINFO*  image_create_mono_pattern_dib(Handle self, COLORREF fg, COLORREF bg);
 extern HPALETTE     image_create_palette( Handle self);
 extern void         image_destroy_cache( Handle self);
+extern void         image_fill_bitmap_cache( Handle self, int bm_type, Handle optimize_for_surface);
 extern BITMAPINFO*  image_fill_bitmap_info( Handle self, XBITMAPINFO * bi, int bm_type);
+extern void         image_query_bits( Handle self, Bool forceNewImage);
+extern Bool         is_dwm_enabled(void);
 extern void         mod_free( BYTE * modState);
 extern BYTE *       mod_select( int mod);
 extern Bool         palette_change( Handle self);
 extern long         palette_match( Handle self, long color);
-extern int          palette_match_color( XLOGPALETTE * lp, long clr, int * diffFactor);
-extern PPatResource patres_fetch( unsigned char * pattern, int len);
+extern int          palette_match_color( XLOGPALETTE * lp, long clr, int * diff_factor);
+extern PLinePattern patres_fetch( unsigned char * pattern, int len);
 extern UINT         patres_user( unsigned char * pattern, int len);
-extern void         process_transparents( Handle self);
-extern long         remap_color( long clr, Bool toSystem);
-extern void         socket_rehash( void);
-extern PDCStylus    stylus_alloc( PStylus data);
-extern void         stylus_change( Handle self);
-extern void         stylus_clean( void);
-extern Bool         stylus_complex( PStylus stylus, HDC dc);
-extern Bool         stylus_extpenned( PStylus stylus);
-extern void         stylus_free( PDCStylus res, Bool permanent);
-extern DWORD        stylus_get_extpen_style( PStylus s);
-extern GpBrush*     stylus_gp_alloc(Handle self);
-extern void         stylus_gp_clean( void);
-extern void         stylus_gp_free( PDCGPStylus res, Bool permanent);
-extern GpPen*       stylus_gp_get_pen(int lineWidth, uint32_t color);
-extern HRGN         region_create( Handle mask);
-extern WCHAR *      alloc_utf8_to_wchar( const char * utf8, int length, int * mb_len);
-extern WCHAR *      alloc_utf8_to_wchar_visual( const char * utf8, int length, int * mb_len);
-extern WCHAR *      alloc_ascii_to_wchar( const char * text, int length);
-extern char *       alloc_wchar_to_utf8( WCHAR * src, int * len );
-extern void         wchar2char( char * dest, WCHAR * src, int lim);
-extern void         char2wchar( WCHAR * dest, char * src, int lim);
-extern int          apcUpdateWindow( HWND wnd );
-extern void         reset_system_fonts(void);
-extern void         register_mapper_fonts(void);
-extern void         dpi_change(void);
-extern Bool         is_dwm_enabled(void);
-extern Bool         dnd_clipboard_create(void);
-extern void         dnd_clipboard_destroy(void);
-extern Bool         dnd_clipboard_open(void);
-extern Bool         dnd_clipboard_close(void);
-extern Bool         dnd_clipboard_clear(void);
-extern PList        dnd_clipboard_get_formats(void);
-extern Bool         dnd_clipboard_get_data( Handle id, PClipboardDataRec c);
-extern Bool         dnd_clipboard_has_format( Handle id);
-extern Bool         dnd_clipboard_set_data( Handle id, PClipboardDataRec c);
-extern PList        dnd_clipboard_get_formats();
-extern char *       cf2name( UINT cf );
-extern Bool         clipboard_get_data(int cfid, PClipboardDataRec c, void * p1, void * p2);
-extern void *       image_create_dib(Handle image, Bool global_alloc);
-extern Bool         HWND_lock( Bool lock);
 extern Bool         process_msg( MSG * msg);
-extern Bool         aa_text_out( Handle self, int x, int y, void * text, int len, Bool wide);
-extern Bool         aa_glyphs_out( Handle self, PGlyphsOutRec t, int x, int y, int * text_advance, HFONT font);
-extern void         aa_free_arena(Handle self, Bool for_reuse);
-extern void         gp_get_text_widths( Handle self, const char* text, int len, int flags, ABC * extents);
-extern void         gp_get_text_box( Handle self, ABC * abc, Point * pt);
+extern void         process_transparents( Handle self);
+extern HRGN         region_create( Handle mask);
+extern void         register_mapper_fonts(void);
+extern long         remap_color( long clr, Bool toSystem);
+extern void         reset_system_fonts(void);
+extern void         socket_rehash( void);
+extern Bool         select_pen(Handle self);
+extern Bool         select_brush(Handle self);
+extern Bool         select_gp_brush(Handle self);
+extern void         stylus_clean( void);
+extern PDCObject    stylus_fetch( void * key );
+extern Bool         stylus_is_complex(Handle self);
+extern Bool         stylus_is_geometric( Handle self);
+extern void         stylus_release( Handle self );
+extern DWORD        stylus_get_extpen_style( Handle self );
+extern GpPen*       stylus_gp_get_pen(int line_width, uint32_t color);
+extern HPEN         stylus_get_pen( DWORD style, DWORD line_width, COLORREF color );
+extern HBRUSH       stylus_get_solid_brush( COLORREF color );
+extern void         wchar2char( char * dest, WCHAR * src, int lim);
 
 /* compatibility to MSVC 6 */
 #ifndef GWLP_USERDATA

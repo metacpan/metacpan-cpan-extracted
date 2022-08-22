@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,7 +28,7 @@ no_index:
 provides:
   Smart::Args::TypeTiny:
     file: lib/Smart/Args/TypeTiny.pm
-    version: '0.12'
+    version: '0.13'
   Smart::Args::TypeTiny::Check:
     file: lib/Smart/Args/TypeTiny/Check.pm
 requires:
@@ -37,7 +37,8 @@ requires:
 resources:
   bugtracker: https://github.com/akiym/Smart-Args-TypeTiny/issues
   homepage: https://github.com/akiym/Smart-Args-TypeTiny
-  repository: git://github.com/akiym/Smart-Args-TypeTiny.git
-version: '0.12'
+  repository: https://github.com/akiym/Smart-Args-TypeTiny.git
+version: '0.13'
 x_authority: cpan:AKIYM
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

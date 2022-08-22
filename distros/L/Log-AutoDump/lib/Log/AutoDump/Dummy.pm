@@ -11,11 +11,11 @@ Log::AutoDump::Dummy - Do nothing.
 
 =head1 VERSION
 
-Version 0.17
+Version 0.20
 
 =cut
 
-our $VERSION = '0.17';
+our $VERSION = '0.20';
 
 $VERSION = eval $VERSION;
 
@@ -76,6 +76,10 @@ This is the core method called by the following (preferred) methods, using the b
  FATAL => 0
 
 =cut
+
+sub history_length { return shift }
+
+sub history { return [] }
 
 sub msg { return shift }
 

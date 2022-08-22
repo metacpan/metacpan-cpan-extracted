@@ -25,12 +25,13 @@ my $cidrs = [
     255.255.255.255/7
     ::
     ::ffff:0.0.0.0
+    ::8000:0:0/81
     ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
     FE80::/10
     10.0.0.0-10.0.0.31
     fe80::0-fe80::ffff
     ::ffff:1.2.3.0-::ffff:1.2.3.3
-    )
+  )
 ];
 
 my $ranges = [
@@ -39,15 +40,15 @@ my $ranges = [
     10.0.0.0-10.0.0.30
     fe80::0-fe80::fffe
     ::ffff:1.2.3.0-::ffff:1.2.3.2
-    )
+  )
 ];
 
 foreach my $tt (@$cidrs) {
-  ok( Net::IPAM::Block->new($tt)->is_cidr, "is_cidr($tt)" );
+  is( Net::IPAM::Block->new($tt)->is_cidr, 1, "is_cidr($tt)" );
 }
 
 foreach my $tt (@$ranges) {
-  ok( !Net::IPAM::Block->new($tt)->is_cidr, "!is_cidr($tt)" );
+  is( !Net::IPAM::Block->new($tt)->is_cidr, 1, "!is_cidr($tt)" );
 }
 
 done_testing();

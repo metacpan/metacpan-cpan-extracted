@@ -4,13 +4,13 @@
       "Details <details -at- cpan -dot- org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Finance-Currency-Convert-ECBdaily",
    "no_index" : {
@@ -39,5 +39,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.05"
+   "version" : 0.08,
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

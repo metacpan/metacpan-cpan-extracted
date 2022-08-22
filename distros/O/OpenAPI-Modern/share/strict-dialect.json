@@ -1,6 +1,6 @@
 {
     "title": "a OpenAPI 3.1 Schema Object Dialect",
-    "description": "OpenAPI 3.1 Schema Object Dialect that prohibits unrecognized keywords",
+    "description": "OpenAPI 3.1 Schema Object Dialect that prohibits unrecognized keywords other than those starting with x-",
     "$id": "https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/strict-dialect.json",
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$vocabulary": {

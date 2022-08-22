@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '1.03';
+our $VERSION = '1.05';
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ Getopt::EX::Hashed - Hash store object automation for Getopt::Long
 
 =head1 VERSION
 
-Version 1.03
+Version 1.05
 
 =head1 SYNOPSIS
 
@@ -63,6 +63,7 @@ my %DefaultConfig = (
     GETOPT             => 'GetOptions',
     GETOPT_FROM_ARRAY  => 'GetOptionsFromArray',
     ACCESSOR_PREFIX    => '',
+    ACCESSOR_LVALUE    => 1,
     DEFAULT            => [],
     INVALID_MSG        => \&_invalid_msg,
     );
@@ -154,7 +155,7 @@ sub new {
 	if (my $is = $param{is}) {
 	    no strict 'refs';
 	    my $access = $config->{ACCESSOR_PREFIX} . $name;
-	    *{"$class\::$access"} = _accessor($is, $name)
+	    *{"$class\::$access"} = _accessor($is, $name, $config->{ACCESSOR_LVALUE})
 		unless ${"$class\::"}{$access};
 	}
 	$obj->{$name} = do {
@@ -202,6 +203,25 @@ sub _conf   { $_[0]->{__Config__} }
 sub _member { $_[0]->{__Member__} }
 
 sub _accessor {
+    my($is, $name, $lvalue) = @_;
+    $is = 'lv' if $lvalue && $is eq 'rw';
+    {
+	ro => sub {
+	    $#_ and die "$name is readonly\n";
+	    $_[0]->{$name};
+	},
+	rw => sub {
+	    $#_ and do { $_[0]->{$name} = $_[1]; return $_[0] };
+	    $_[0]->{$name};
+	},
+	lv => sub :lvalue {
+	    $#_ and do { $_[0]->{$name} = $_[1]; return $_[0] };
+	    $_[0]->{$name};
+	},
+    }->{$is} or die "$name has invalid 'is' parameter.\n";
+}
+
+sub __accessor {
     my($is, $name) = @_;
     {
 	ro => sub {
@@ -209,6 +229,10 @@ sub _accessor {
 	    $_[0]->{$name};
 	},
 	rw => sub {
+	    $#_ and do { $_[0]->{$name} = $_[1]; return $_[0] };
+	    $_[0]->{$name};
+	},
+	lv => sub :lvalue {
 	    $#_ and do { $_[0]->{$name} = $_[1]; return $_[0] };
 	    $_[0]->{$name};
 	}
@@ -434,10 +458,23 @@ There is no difference with ones in C<spec> parameter.
 To produce accessor method, C<is> parameter is necessary.  Set the
 value C<ro> for read-only, C<rw> for read-write.
 
+Read-write accessor has a lvalue attribute, so it can be assigned.
+You can use like this:
+
+    $app->foo //= 1;
+
+which is simpler than:
+
+    $app->foo(1) unless defined $app->foo;
+
 If you want to make accessor for all following members, use
-C<configure> and set C<DEFAULT> parameter.
+C<configure> to set C<DEFAULT> parameter.
 
     Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
+
+If you don't like assignable accessor, configure C<ACCESSOR_LVALUE>
+parameter to 0.  Because accessor is generated at the time of C<new>,
+this value is effective for all members.
 
 =item B<default> => I<value> | I<coderef>
 
@@ -463,7 +500,7 @@ is the first parameter.
 When called, hash object is passed as C<$_>.
 
     has [ qw(left right both) ] => '=i';
-    has "+both" => action => sub {
+    has "+both" => sub {
         $_->{left} = $_->{right} = $_[1];
     };
 
@@ -471,14 +508,14 @@ You can use this for C<< "<>" >> to catch everything.  In that case,
 spec parameter does not matter and not required.
 
     has ARGV => default => [];
-    has "<>" => action => sub {
+    has "<>" => sub {
         push @{$_->{ARGV}}, $_[0];
     };
 
 =back
 
 Following parameters are all for data validation.  First C<must> is a
-generic validator and can implement anything.  Others are shorthand
+generic validator and can implement anything.  Others are shortcut
 for common rules.
 
 =over 7
@@ -551,7 +588,7 @@ the hash reference as a first argument, but it is not necessary.
 
 =item B<getopt> [ I<arrayref> ]
 
-Call appropiate function defined in caller's context to process
+Call appropriate function defined in caller's context to process
 options.
 
     $obj->getopt
@@ -611,11 +648,16 @@ Produce alias with underscores removed.
 
 Set function name called from C<getopt> method.
 
-=item B<ACCESSOR_PREFIX>
+=item B<ACCESSOR_PREFIX> (default: '')
 
 When specified, it is prepended to the member name to make accessor
 method.  If C<ACCESSOR_PREFIX> is defined as C<opt_>, accessor for
 member C<file> will be C<opt_file>.
+
+=item B<ACCESSOR_LVALUE> (default: 1)
+
+If true, read-write accessors have lvalue attribute.  Set zero if you
+don't like that behavior.
 
 =item B<DEFAULT>
 
@@ -653,7 +695,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2021 Kazumasa Utashiro
+Copyright 2021-2022 Kazumasa Utashiro
 
 =head1 LICENSE
 
@@ -664,4 +706,5 @@ it under the same terms as Perl itself.
 
 #  LocalWords:  Accessor param ro rw accessor undef coderef qw ARGV
 #  LocalWords:  validator qr GETOPT GetOptions getopt obj optspec foo
-#  LocalWords:  Kazumasa Utashiro min
+#  LocalWords:  Kazumasa Utashiro min lvalue arrayref regex regexpref
+#  LocalWords:  argv GetOptionsFromArray

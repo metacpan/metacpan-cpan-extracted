@@ -5,14 +5,19 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-04'; # DATE
+our $DATE = '2022-07-16'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 sub meta {
     +{
         v => 1,
         summary => 'Remove non-digit characters',
+        examples => [
+            {value=>"5551234567"},
+            {value=>"555-123-4567", filtered_value=>"5551234567"},
+            {value=>"(555) 123-4567", filtered_value=>"5551234567"},
+        ],
     };
 }
 
@@ -49,13 +54,34 @@ Data::Sah::Filter::perl::Str::remove_nondigit - Remove non-digit characters
 
 =head1 VERSION
 
-This document describes version 0.010 of Data::Sah::Filter::perl::Str::remove_nondigit (from Perl distribution Data-Sah-Filter), released on 2022-07-04.
+This document describes version 0.011 of Data::Sah::Filter::perl::Str::remove_nondigit (from Perl distribution Data-Sah-Filter), released on 2022-07-16.
 
 =head1 SYNOPSIS
 
-Use in Sah schema's C<prefilters> (or C<postfilters>) clause:
+=head2 Using in Sah schema's C<prefilters> (or C<postfilters>) clause
 
- ["str","prefilters",["Str::remove_nondigit"]]
+ ["str","prefilters",[["Str::remove_nondigit"]]]
+
+=head2 Using with L<Data::Sah>:
+
+ use Data::Sah qw(gen_validator);
+ 
+ my $schema = ["str","prefilters",[["Str::remove_nondigit"]]];
+ my $validator = gen_validator($schema);
+ if ($validator->($some_data)) { print 'Valid!' }
+
+=head2 Using with L<Data::Sah:Filter> directly:
+
+ use Data::Sah::Filter qw(gen_filter);
+
+ my $filter = gen_filter([["Str::remove_nondigit"]]);
+ my $filtered_value = $filter->($some_data);
+
+=head2 Sample data and filtering results
+
+ 5551234567 # valid, unchanged
+ "555-123-4567" # valid, becomes 5551234567
+ "(555) 123-4567" # valid, becomes 5551234567
 
 =for Pod::Coverage ^(meta|filter)$
 

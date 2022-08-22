@@ -10,9 +10,9 @@ use Data::Sah::FilterCommon;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-04'; # DATE
+our $DATE = '2022-07-16'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 our @EXPORT_OK = qw(gen_filter);
 
@@ -124,7 +124,7 @@ Data::Sah::Filter - Filtering for Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.010 of Data::Sah::Filter (from Perl distribution Data-Sah-Filter), released on 2022-07-04.
+This document describes version 0.011 of Data::Sah::Filter (from Perl distribution Data-Sah-Filter), released on 2022-07-16.
 
 =head1 SYNOPSIS
 

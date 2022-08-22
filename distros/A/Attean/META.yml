@@ -65,4 +65,4 @@ resources:
   homepage: https://metacpan.org/release/Attean
   license: http://dev.perl.org/licenses/
   repository: https://github.com/kasei/attean/
-version: '0.031'
+version: '0.032'

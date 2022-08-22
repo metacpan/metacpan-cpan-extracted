@@ -5,8 +5,7 @@ use URI;
 use Carp ();
 use Encode ();
 
-use vars qw($VERSION);
-our $VERSION = '6.07';
+our $VERSION = '6.10';
 
 my %form_tags = map {$_ => 1} qw(input textarea button select option);
 
@@ -49,7 +48,7 @@ sub parse
 
     require HTML::TokeParser;
     my $p = HTML::TokeParser->new(ref($html) ? $html->decoded_content(ref => 1) : \$html);
-    die "Failed to create HTML::TokeParser object" unless $p;
+    Carp::croak "Failed to create HTML::TokeParser object" unless $p;
 
     my $base_uri = delete $opt{base};
     my $charset = delete $opt{charset};
@@ -251,8 +250,7 @@ sub push_input
 
 BEGIN {
     # Set up some accessors
-    for (qw(method action enctype accept_charset)) {
-	my $m = $_;
+    for my $m (qw(method action enctype accept_charset)) {
 	no strict 'refs';
 	*{$m} = sub {
 	    my $self = shift;
@@ -300,8 +298,8 @@ sub inputs
 
 sub find_input
 {
-    my($self, $name, $type, $no) = @_;
-    die "Invalid index $no"
+    my($self, $selector, $type, $no) = @_;
+    Carp::croak "Invalid index $no"
         if defined $no && $no < 1;
     if (wantarray) {
         warn "find_input called in list context with index specified\n"
@@ -309,7 +307,20 @@ sub find_input
 	my @res;
 	my $c;
 	for (@{$self->{'inputs'}}) {
-	    next if defined($name) && !$_->selected($name);
+        if ( defined($selector) ) {
+
+            # an input that explicitly has no name
+            if ( ref($selector) eq 'SCALAR' ) {
+                next
+                  if !defined($$selector) && $_->{name};
+            }
+
+            # an input that does not fit this selector
+            else {
+                next
+                  if !$_->selected($selector);
+            }
+        }
 	    next if $type && $type ne $_->{type};
 	    $c++;
 	    next if $no && $no != $c;
@@ -321,7 +332,20 @@ sub find_input
     else {
 	$no ||= 1;
 	for (@{$self->{'inputs'}}) {
-	    next if defined($name) && !$_->selected($name);
+        if ( defined($selector) ) {
+
+            # an input that explicitly has no name
+            if ( ref($selector) eq 'SCALAR' ) {
+                next
+                  if !defined($$selector) && $_->{name};
+            }
+
+            # an input that does not fit this selector
+            else {
+                next
+                  if !$_->selected($selector);
+            }
+        }
 	    next if $type && $type ne $_->{type};
 	    next if --$no;
 	    return $_;
@@ -368,7 +392,7 @@ sub param {
 
         if (@_) {
             # set
-            die "No '$name' parameter exists" unless @inputs;
+            Carp::croak "No '$name' parameter exists" unless @inputs;
 	    my @v = @_;
 	    @v = @{$v[0]} if @v == 1 && ref($v[0]);
             while (@v) {
@@ -385,7 +409,7 @@ sub param {
                     }
                     $err ||= $@;
                 }
-                die $err if $err;
+                Carp::croak $err if $err;
             }
 
 	    # the rest of the input should be cleared
@@ -790,11 +814,13 @@ sub add_to_form
 	return $self->SUPER::add_to_form($form);
     }
 
-    die "Assert" if @{$self->{menu}} != 1;
+    Carp::croak "Assert" if @{$self->{menu}} != 1;
     my $m = $self->{menu}[0];
     $m->{disabled}++ if delete $self->{option_disabled};
 
-    my $prev = $form->find_input($self->{name}, $self->{type}, $self->{idx});
+    # if there was no name we have to search for an input that explicitly has
+    # no name either, because otherwise the name attribute would be ignored
+    my $prev = $form->find_input($self->{name} || \undef, $self->{type}, $self->{idx});
     return $self->SUPER::add_to_form($form) unless $prev;
 
     # merge menus
@@ -953,6 +979,7 @@ sub click
     my($self,$form,$x,$y) = @_;
     for ($x, $y) { $_ = 1 unless defined; }
     local($self->{clicked}) = [$x,$y];
+    local($self->{value})   = "" unless defined $self->value;
     return $form->make_request;
 }
 
@@ -1030,7 +1057,8 @@ sub form_name_value {
     my $filename = $self->filename;
     my @headers = $self->headers;
     my $content = $self->content;
-    if (defined $content) {
+    my %headers = @headers;
+    if (defined $content || grep m/^Content$/i, keys %headers) {
 	$filename = $file unless defined $filename;
 	$file = undef;
 	unshift(@headers, "Content" => $content);
@@ -1045,7 +1073,7 @@ sub form_name_value {
 	my $fn = shift @$file;
 	push(@headers, @$file);
 	$file = $f;
-	$filename = $fn unless defined $filename;
+	$filename = $fn;
     }
 
     return ($name => [$file, $filename, @headers]);
@@ -1078,7 +1106,7 @@ HTML::Form - Class that represents an HTML form element
 
 =head1 VERSION
 
-version 6.07
+version 6.10
 
 =head1 SYNOPSIS
 
@@ -1267,18 +1295,29 @@ This method is used to locate specific inputs within the form.  All
 inputs that match the arguments given are returned.  In scalar context
 only the first is returned, or C<undef> if none match.
 
-If $selector is not C<undef>, then the input's name, id, class attribute must
-match.  A selector prefixed with '#' must match the id attribute of the input.
-A selector prefixed with '.' matches the class attribute.  A selector prefixed
-with '^' or with no prefix matches the name attribute.
+If C<$selector> is not C<undef>, then the input's I<name>, I<id> or I<class>
+attribute must match.
+A selector prefixed with '#' must match the I<id> attribute of the input.
+A selector prefixed with '.' matches the I<class> attribute. A selector prefixed
+with '^' or with no prefix matches the I<name> attribute.
 
-If $type is not C<undef>, then the input must have the specified type.
+    my @by_id         = $form->find_input( '#some-id' );
+    my @by_class      = $form->find_input( '.some-class' );
+    my @by_name       = $form->find_input( '^some-name' );
+    my @also_by_name  = $form->find_input( 'some-name' );
+
+If you want to find an input that has no I<name> at all, pass in a reference
+to C<undef>.
+
+    my @nameless_inputs = $form->find_input( \undef );
+
+If C<$type> is not C<undef>, then the input must have the specified type.
 The following type names are used: "text", "password", "hidden",
 "textarea", "file", "image", "submit", "radio", "checkbox" and "option".
 
-The $index is the sequence number of the input matched where 1 is the
-first.  If combined with $name and/or $type, then it selects the I<n>th
-input with the given name and/or type.
+The C<$index> is the sequence number of the input matched where 1 is the
+first.  If combined with C<$selector> and/or C<$type>, then it selects the
+I<n>th input with the given I<name> and/or type.
 
 =item $value = $form->value( $selector )
 

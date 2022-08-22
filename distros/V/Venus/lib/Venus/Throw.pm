@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Venus::Class;
+use Venus::Class 'attr', 'base', 'with';
 
 base 'Venus::Kind::Utility';
 
@@ -13,6 +13,7 @@ with 'Venus::Role::Stashable';
 
 # ATTRIBUTES
 
+attr 'name';
 attr 'message';
 attr 'package';
 attr 'parent';
@@ -43,6 +44,7 @@ sub error {
 
   require Venus::Error;
 
+  my $name = $self->name;
   my $context = $self->context || (caller(1))[3];
   my $package = $self->package || join('::', map ucfirst, (caller(0))[0], 'error');
   my $parent = $self->parent;
@@ -51,6 +53,7 @@ sub error {
   $data //= {};
   $data->{context} //= $context;
   $data->{message} //= $message if $message;
+  $data->{name} //= $name if $name;
 
   if (%{$self->stash}) {
     $data->{'$stash'} //= $self->stash;
@@ -122,6 +125,14 @@ objects).
 =head1 ATTRIBUTES
 
 This package has the following attributes:
+
+=cut
+
+=head2 name
+
+  name(Str)
+
+This attribute is read-write, accepts C<(Str)> values, and is optional.
 
 =cut
 
@@ -316,7 +327,30 @@ I<Since C<0.01>>
     message => 'Example error (no thing)!',
   });
 
+  # No::Thing does not exist
+
   # Exception! Venus::Throw::Error (isa Venus::Error)
+
+=back
+
+=over 4
+
+=item error example 7
+
+  # given: synopsis;
+
+  my $error = $throw->error({
+    name => 'on.test.error',
+    context => 'Test.error',
+    message => 'Something failed!',
+  });
+
+  # bless({
+  #   ...,
+  #   "context"  => "Test.error",
+  #   "message"  => "Something failed!",
+  #   "name"  => "on_test_error",
+  # }, "Main::Error")
 
 =back
 

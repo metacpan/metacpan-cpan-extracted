@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+
+use 5.022;
+use strict;
+use warnings;
+
+use File::ShareDir qw(dist_dir);
+use File::Spec::Functions qw(abs2rel canonpath catfile updir);
+use FindBin;
+
+my $res_dir;
+
+# This block is used to find the Tcl DLL when run as a PAR-Packer packages
+# program. It needs to appear before the `use Tkx` call.
+BEGIN {
+  if (exists $ENV{PAR_0}) {
+    $ENV{PERL_TCL_DL_PATH} = catfile($ENV{PAR_TEMP}, 'inc', 'tcl', 'bin', 'tcl86.dll');
+    $res_dir = catfile($ENV{PAR_TEMP}, 'inc', 'res');
+  } else {
+    my $res = catfile($FindBin::Bin, updir(), 'res');
+    if (! -d $res) {
+      # If the directory does not exist next to the binary, we’re assuming that
+      # the tool was `make install`-ed.
+      $res = dist_dir('App-InvestSim');
+    }
+    # We're using a relative path here because, when running on Cygwin but with
+    # a Windows Tcl, this will allow the path to be compatible with both Cygwin
+    # and Tcl (which seems to be forgiving of the '/' and '\' in the paths).
+    # Note that this will not work if the relative path is invalid on Windows
+    # (e.g. because the current and dest directories are on different drives).
+    # But this should not happen here.
+    $res_dir =  abs2rel(canonpath($res));
+  }
+}
+
+use App::InvestSim;
+
+App::InvestSim::run($res_dir);
+
+=pod
+
+=head1 Investment Simulator
+
+See the main L<README|https://metacpan.org/dist/App-InvestSim/source/README.pod>
+file of this distribution for more details on how to install and use this tool.
+
+=cut

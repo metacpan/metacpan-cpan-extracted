@@ -1,5 +1,9 @@
 Revision history for Perl extension Smart-Args-TypeTiny
 
+0.13 2022-08-16T19:28:32Z
+
+    - fix failing test with Type::Tiny >= 1.016005
+
 0.12 2017-10-29T13:41:32Z
 
     - stable Smart::Args::TypeTiny::Check API

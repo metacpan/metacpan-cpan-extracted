@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 use parent qw(CPANPLUS::Dist::Debora::Package);
 
@@ -24,11 +24,20 @@ use CPANPLUS::Dist::Debora::Util
     qw(can_run run slurp_utf8 spew_utf8 is_testing);
 use CPANPLUS::Error qw(error);
 
-# Replace some package names.
+# Add some package names.
 my %OBSOLETES_FOR = (
-    'ack'                 => [qw(perl-App-Ack)],
+    'ack'         => [qw(perl-App-Ack)],
+    'Alien-Build' => [qw{
+        perl-Alien-Base
+        perl-Alien-Build-Plugin-Decode-HTML
+        perl-Alien-Build-Plugin-Decode-Mojo
+        perl-Alien-Build-tests
+    }],
     'App-Licensecheck'    => [qw(perl-App-Licensecheck)],
     'App-perlbrew'        => [qw(perl-App-perlbrew)],
+    'Catalyst-Runtime'    => [qw{perl-Catalyst-Runtime-scripts}],
+    'Encode'              => [qw{perl-Encode-devel perl-encoding}],
+    'Module-CoreList'     => [qw{perl-Module-CoreList-tools}],
     'Mojolicious'         => [qw(perl-Test-Mojo)],
     'Perl-Critic'         => [qw(perl-Test-Perl-Critic-Policy)],
     'perl-ldap'           => [qw(perl-LDAP)],
@@ -40,14 +49,11 @@ my %OBSOLETES_FOR = (
 
 # Add additional capabilities to some packages.
 my %PROVIDES_FOR = (
-    'Catalyst-Runtime' => [qw{perl-Catalyst-Runtime-scripts}],
-    'Encode'           => [qw{perl-Encode-devel perl-encoding}],
-    'libwww-perl'      => [qw{
+    'libwww-perl' => [qw{
         perl(LWP::Debug::TraceHTTP::Socket)
         perl(LWP::Protocol::http::Socket)
         perl(LWP::Protocol::http::SocketMethods)
     }],
-    'Module-CoreList'  => [qw{perl-Module-CoreList-tools}],
     'Moose'            => [qw{perl(Moose::Conflicts)}],
     'Package-Stash'    => [qw{perl(Package::Stash::Conflicts)}],
     'XS-Parse-Keyword' => [qw{perl(:XS_Parse_Keyword_ABI_2)}],
@@ -335,12 +341,21 @@ if ($package->is_noarch) {
     $OUT .= "BuildArch: noarch\n";
 }
 
+# See "Renaming/Replacing or Removing Existing Packages" in the Fedora
+# documentation.
+my $evr = $package->version . q{-} . $package->release;
+if ($epoch) {
+    $evr = $epoch . q{:} . $package->version;
+}
+my $escaped_evr = $escape->($evr);
+
 for my $name (@{$package->provides}) {
-    $OUT .= 'Provides:  ' . $escape->($name) . "\n";
+    $OUT .= sprintf "Provides:  %s\n", $escape->($name);
 }
 
 for my $name (@{$package->obsoletes}) {
-    $OUT .= 'Obsoletes: ' . $escape->($name) . "\n";
+    $OUT .= sprintf "Provides:  %s = %s\n", $escape->($name), $escaped_evr;
+    $OUT .= sprintf "Obsoletes: %s < %s\n", $escape->($name), $escaped_evr;
 }
 
 $OUT .= "AutoProv:  1\n";
@@ -540,7 +555,7 @@ CPANPLUS::Dist::Debora::Package::RPM - Create binary RPM packages
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

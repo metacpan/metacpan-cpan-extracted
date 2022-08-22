@@ -2,6 +2,7 @@ use v5.10;
 use strict;
 use warnings;
 use Test::More;
+use Form::Diva;
 
 use lib 't/lib';
 use TestForm;
@@ -61,7 +62,7 @@ subtest 'test diva datavalues' => sub {
 			id => 'form-field-shown_no_label',
 			name => 'shown_no_label',
 			type => 'email',
-			label => 'Shown_no_label',    # TODO: this needs fixing inside Form::Diva
+			label => Form::Diva->VERSION >= 1.04 ? '' : 'Shown_no_label',
 			value => '--shown-no-label-value--',
 		}
 	];
@@ -77,3 +78,4 @@ subtest 'test diva datavalues' => sub {
 };
 
 done_testing;
+

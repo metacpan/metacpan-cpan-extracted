@@ -1,0 +1,46 @@
+---
+abstract: "Simulateur d'investissement locatif"
+author:
+  - 'Mathias Kende <mathias@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - finance
+  - investment
+  - simulator
+  - property
+  - real-estate
+  - loan
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-InvestSim
+no_index:
+  directory:
+    - t
+    - inc
+  namespace:
+    - App::InvestSim
+requires:
+  CLDR::Number: '0'
+  Data::Dumper: '0'
+  Exporter: '0'
+  File::HomeDir: '0'
+  File::ShareDir: '0'
+  File::Spec::Functions: '0'
+  FindBin: '0'
+  Hash::Util: '0'
+  List::Util: '0'
+  Safe: '0'
+  Tkx: '0'
+  perl: '5.022'
+resources:
+  bugtracker: https://github.com/mkende/investment_simulator/issues
+  repository: https://github.com/mkende/investment_simulator
+version: v1.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

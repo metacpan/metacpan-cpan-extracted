@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::AndroidSocket;
-$Playwright::AndroidSocket::VERSION = '1.210';
+$Playwright::AndroidSocket::VERSION = '1.251';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,16 +20,6 @@ sub new {
 
 sub spec {
     return $Playwright::spec->{'AndroidSocket'}{members};
-}
-
-sub data {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'data',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
 }
 
 sub close {
@@ -47,6 +37,16 @@ sub write {
     return $self->_api_request(
         args    => [@_],
         command => 'write',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub data {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'data',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -96,7 +96,7 @@ Playwright::AndroidSocket - Automatically generated class for Playwright::Androi
 
 =head1 VERSION
 
-version 1.210
+version 1.251
 
 =head1 CONSTRUCTOR
 
@@ -106,12 +106,6 @@ You shouldn't have to call this directly.
 Instead it should be returned to you as the result of calls on Playwright objects, or objects it returns.
 
 =head1 METHODS
-
-=head2 data(@args)
-
-Execute the AndroidSocket::data playwright routine.
-
-See L<https://playwright.dev/api/class-AndroidSocket#AndroidSocket-data> for more information.
 
 =head2 close(@args)
 
@@ -124,6 +118,12 @@ See L<https://playwright.dev/api/class-AndroidSocket#AndroidSocket-close> for mo
 Execute the AndroidSocket::write playwright routine.
 
 See L<https://playwright.dev/api/class-AndroidSocket#AndroidSocket-write> for more information.
+
+=head2 data(@args)
+
+Execute the AndroidSocket::data playwright routine.
+
+See L<https://playwright.dev/api/class-AndroidSocket#AndroidSocket-data> for more information.
 
 =head2 on(@args)
 

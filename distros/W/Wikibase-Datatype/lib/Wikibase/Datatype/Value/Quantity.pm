@@ -8,7 +8,7 @@ use Mo qw(build is);
 use Mo::utils qw(check_number);
 use Wikibase::Datatype::Utils qw(check_entity);
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
 
 extends 'Wikibase::Datatype::Value';
 
@@ -176,6 +176,8 @@ Returns string.
 
 =head1 EXAMPLE1
 
+=for comment filename=create_and_print_value_quantity1.pl
+
  use strict;
  use warnings;
 
@@ -207,6 +209,8 @@ Returns string.
  # Value: 10
 
 =head1 EXAMPLE2
+
+=for comment filename=create_and_print_value_quantity2.pl
 
  use strict;
  use warnings;
@@ -274,6 +278,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.19
+0.20
 
 =cut

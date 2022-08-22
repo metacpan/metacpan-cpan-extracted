@@ -215,7 +215,16 @@ Native APIs have its IDs. These IDs are permanently same for the binary compatib
   198 get_args_stack_length
   199 set_args_stack_length
   200 dumpc
-
+  201 check_flag_pointer_dont_free
+  202 enable_flag_pointer_dont_free
+  203 disable_flag_pointer_dont_free
+  204 get_pointer_length
+  205 set_pointer_length
+  206 get_pointer_any_info
+  207 set_pointer_any_info
+  208 is_class
+  209 is_pointer_class
+  
 =head2 class_vars_heap
 
   void* class_vars_heap;
@@ -2135,6 +2144,68 @@ The alias for the following code using L</"dump">.
 
   const char* ret = env->get_chars(env, stack, SPVM_API_dump(env, stack, object));
 
+=head2 check_flag_pointer_dont_free
+
+  int32_t (*check_flag_pointer_dont_free)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+
+Check the flag that indicates that the pointer set by L</"set_pointer"> doesn't need to be freed.
+
+If true, return C<1>. Otherwise return C<0>.
+
+The default value is C<0>.
+
+=head2 enable_flag_pointer_dont_free
+
+  void (*enable_flag_pointer_dont_free)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+
+Enable the flag that indicates that the pointer set by L</"set_pointer"> doesn't need to be freed.
+
+=head2 disable_flag_pointer_dont_free
+
+  void (*disable_flag_pointer_dont_free)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+
+Disable the flag that indicates that the pointer set by L</"set_pointer"> doesn't need to be freed.
+
+=head2 get_pointer_length
+
+  int32_t (*get_pointer_length)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+
+Get the length of the array set by L</"set_pointer">. The default value is C<0>.
+
+=head2 set_pointer_length
+
+  void (*set_pointer_length)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t length);
+
+Set the length of the array set by L</"set_pointer">. It is useful when the data is the pointer to an array.
+
+=head2 get_pointer_any_info
+
+  void* (*get_pointer_any_info)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+
+Get the any infomation of the pointer set by L</"set_pointer">.
+
+=head2 set_pointer_any_info
+
+  void (*set_pointer_any_info)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* any_info);
+
+Set the any infomation of the pointer set by L</"set_pointer">.
+
+=head2 is_class
+
+  int32_t (*is_class)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+
+If the object is a instance of a class, returns C<1>, otherwise returns C<0>.
+
+If the object is C<NULL>, returns C<0>.
+
+=head2 is_pointer_class
+
+  int32_t (*is_pointer_class)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+
+If the object is a instance of a pointer class, returns C<1>, otherwise returns C<0>.
+
+If the object is C<NULL>, returns C<0>.
+
 =head1 Compiler Native API
 
 L<SPVM::Document::NativeAPI::Compiler>
@@ -2180,6 +2251,7 @@ L<SPVM::Document::NativeAPI::Allocator>
   18 SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS
   19 SPVM_NATIVE_C_BASIC_TYPE_ID_COMMAND_INFO_CLASS
   20 SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS
+  21 SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS
 
 These IDs are permanently same for the binary compatibility after the future release C<v1.0>.
 
@@ -2259,6 +2331,14 @@ The basic type ID of L<BOOL|SPVM::BOOL> type.
 
 The basic type ID of L<Error|SPVM::Error> type.
 
+=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS
+
+The basic type ID of L<Error::System|SPVM::Error::System> type.
+
+=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS
+
+The basic type ID of L<Error::NotSupported|SPVM::Error::NotSupported> type.
+
 =head2 Constant Values of Basic Type Categories
 
   0 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_UNKNOWN
@@ -2317,7 +2397,8 @@ The basic type category for the any object type.
 =head2 Class IDs
 
   1  SPVM_NATIVE_C_CLASS_ID_ERROR
-  2  SPVM_NATIVE_C_CLASS_ID_ERROR
+  2  SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM
+  3  SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED
 
 These IDs are permanently same for the binary compatibility after the future release C<v1.0>.
 
@@ -2325,9 +2406,13 @@ These IDs are permanently same for the binary compatibility after the future rel
 
 The class id of L<Error|SPVM::Error> class.
 
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_UNKNOWN
+=head3 SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM
 
-The basic type is unknown.
+The class id of L<Error::System|SPVM::Error::System> class.
+
+=head3 SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED
+
+The class id of L<Error::NotSupported|SPVM::Error::NotSupported> class.
 
 =head1 Utility Functions
 

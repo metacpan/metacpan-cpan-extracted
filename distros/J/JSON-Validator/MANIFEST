@@ -123,6 +123,8 @@ t/spec/remotes/baseUriChange/folderInteger.json
 t/spec/remotes/baseUriChangeFolder/folderInteger.json
 t/spec/remotes/baseUriChangeFolderInSubschema/folderInteger.json
 t/spec/remotes/integer.json
+t/spec/remotes/locationIndependentIdentifierDraft4.json
+t/spec/remotes/locationIndependentIdentifierPre2019.json
 t/spec/remotes/name-defs.json
 t/spec/remotes/name.json
 t/spec/remotes/subSchemas-defs.json

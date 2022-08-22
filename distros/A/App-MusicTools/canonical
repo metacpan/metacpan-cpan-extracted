@@ -1,6 +1,6 @@
 #!perl
 
-# Compute canon voices via the Music::Canon module, though this script
+# Computes canon voices via the Music::Canon module, though this script
 # comes from the App::MusicTools distribution.
 #
 # Run perldoc(1) on this file for additional documentation.
@@ -17,7 +17,6 @@ use Getopt::Long qw/GetOptionsFromArray/;
 
 use Music::Canon        ();
 use Music::LilyPondUtil ();
-use Try::Tiny;
 
 my $PROG_NAME = basename($0);
 
@@ -33,6 +32,7 @@ my @Std_Opts              = (
   'contrary|c!'    => \my $Flag_Contrary,
   'duration=s'     => \$Flag_Duration,
   'flats!'         => \my $Flag_Flats,
+  'map!'           => \my $Flag_Map,
   'raw!'           => \my $Flag_Raw,
   'relative|rel=s' => \my $Flag_Relative,
   'retrograde|r!'  => \my $Flag_Retrograde,
@@ -55,9 +55,9 @@ my $mode = shift;
 emit_help() if !defined $mode or !exists $Modes{$mode};
 
 my $ret;
-try { $ret = $Modes{$mode}->(@ARGV) }
-catch {
-  warn "$PROG_NAME: $_";
+eval { $ret = $Modes{$mode}->(@ARGV) };
+if ($@) {
+  warn "$PROG_NAME: $@";
   $ret = 65;    # assume input data error
 };
 exit $ret;
@@ -133,86 +133,6 @@ sub _reverse_rhythm {
   }
 }
 
-sub emit_help {
-  warn <<"EOH";
-Usage: $PROG_NAME [global opts] mode [mode opts] args
-
-Compute canon voices via the Music::Canon module. The modes are:
-
-  exact - exact interval canon for given input notes
-  modal - modal interval canon          "
-
-Raw pitch numbers or lilypond note names are accepted. Examples:
-
-  \$ $PROG_NAME --contrary --retrograde exact c cis d
-  \$ $PROG_NAME --transpose=12 exact c e g
-  \$ $PROG_NAME --raw --contrary exact 1 2 3
-
-  \$ $PROG_NAME modal --input=lydian --output=locrian c e g
-
-Run perldoc(1) on $PROG_NAME for additional documentation.
-
-EOH
-  exit 64;
-}
-
-sub emit_help_exact {
-  warn <<"EOH";
-Usage: $PROG_NAME [opts] exact [exactopts] note1 note2 .. noteN
-
-Exact interval mapping. Options include:
-
-  --contrary     Compute canon in contrary motion.
-  --duration=N   Set default duration value.
-  --flats        Print notes with flats instead of sharps.
-  --raw          Emit raw pitch numbers in output instead of note names.
-  --relative=N   Input is relative to lilypond note N (absolute notation is
-                 assumed by default otherwise).
-  --retrograde   Reverse the output voice.
-  --transpose=N  Transpose output voice by semitones or to a lilypond note.
-
-Run perldoc(1) on $PROG_NAME for additional documentation.
-
-EOH
-  exit 64;
-}
-
-sub emit_help_modal {
-  warn <<"EOH";
-Usage: $PROG_NAME [opts] modal --input=mode --output=mode notes...
-
-Modal interval mapping. In particular:
-
-  --chrome=N     Chrome weighting. Default is 0. See Music::Canon.
-  --duration=N   Set default duration value.
-
-  --ep=N         Set the start and end pitch via set_modal_pitches().
-  --sp=N         Necessary if phrase begins on non-tonic scale degree.
-
-  --input=mode   Set the input and output modes. These may be Music::Scales
-  --output=mode  names, or Forte Numbers. Major to Major used by default.
-
-  --nos          Allow for non-octave scales. Necessary if doing crazy
-                 things with intervals in the --input or --output options.
-
-  --undef=N      Use N for notes that cannot be converted.
-
-General options include:
-
-  --contrary     Compute canon in contrary motion.
-  --flats        Print notes with flats instead of sharps.
-  --raw          Emit raw pitch numbers in output instead of note names.
-  --relative=N   Input is relative to lilypond note N (absolute notation is
-                 assumed by default otherwise).
-  --retrograde   Reverse the output voice.
-  --transpose=N  Transpose output voice by semitones or to a lilypond note.
-
-Run perldoc(1) on $PROG_NAME for additional documentation.
-
-EOH
-  exit 64;
-}
-
 sub do_exact {
   my @args = @_;
   GetOptionsFromArray( \@args, @Std_Opts, 'help|h' => \&emit_help_exact, )
@@ -262,18 +182,9 @@ sub do_exact {
     $new_phrase[$i] .= $rhythm[$i] unless $new_phrase[$i] =~ m/\d/;
   }
 
-  # As a not-compatible change, this *always* used to emit space-
-  # delimited values though for multicolumness (and to avoid a
-  # subsequent `tr ' ' '\n'`) switched output to be delimited by
-  # newlines.
-  if ($is_multicolumn) {
-    while (@new_phrase) {
-      say join( ' ', grep { defined } shift @new_phrase, shift @restofline );
-    }
-  } else {
-    print join( ' ', @new_phrase ), "\n";
-  }
-  return 0;
+  emit_phrase( $is_multicolumn, \@args, \@new_phrase, \@restofline );
+
+  return 0;    # used as exit code
 }
 
 sub do_modal {
@@ -338,14 +249,131 @@ sub do_modal {
     $new_phrase[$i] .= $rhythm[$i] unless $new_phrase[$i] =~ m/\d/;
   }
 
+  emit_phrase( $is_multicolumn, \@args, \@new_phrase, \@restofline );
+
+  return 0;    # used as exit code
+}
+
+sub emit_help {
+  warn <<"EOH";
+Usage: $PROG_NAME [global opts] mode [mode opts] args
+
+Compute canon voices via the Music::Canon module. The modes are:
+
+  exact - exact interval canon for given input notes
+  modal - modal interval canon          "
+
+Raw pitch numbers or lilypond note names (though only in the default
+"nederlands" language) are accepted. Examples:
+
+  \$ $PROG_NAME --contrary --retrograde exact c cis d
+  \$ $PROG_NAME --transpose=12 exact c ees g
+  \$ $PROG_NAME --raw --contrary exact 1 2 3
+
+  \$ $PROG_NAME modal --input=lydian --output=locrian c e g
+
+Global options (which may also be given to the mode) include:
+
+  --contrary     Compute canon in contrary motion.
+  --duration=N   Set default duration value.
+  --flats        Print notes with flats instead of sharps.
+  --map          Prints original and output notes or numbers one per line.
+  --raw          Emit raw pitch numbers in output instead of note names.
+  --relative=N   Input is relative to lilypond note N (absolute notation is
+                 assumed by default otherwise).
+  --retrograde   Reverse the output voice.
+  --transpose=N  Transpose output voice by semitones or to a lilypond note.
+
+Run perldoc(1) on $PROG_NAME for additional documentation.
+
+EOH
+  exit 64;
+}
+
+sub emit_help_exact {
+  warn <<"EOH";
+Usage: $PROG_NAME [opts] exact [exactopts] note1 note2 .. noteN
+
+Exact interval mapping. Options include:
+
+  --contrary     Compute canon in contrary motion.
+  --duration=N   Set default duration value.
+  --flats        Print notes with flats instead of sharps.
+  --map          Prints original and output notes or numbers one per line.
+  --raw          Emit raw pitch numbers in output instead of note names.
+  --relative=N   Input is relative to lilypond note N (absolute notation is
+                 assumed by default otherwise).
+  --retrograde   Reverse the output voice.
+  --transpose=N  Transpose output voice by semitones or to a lilypond note.
+
+Raw pitch numbers or lilypond note names (though only in the default
+"nederlands" language) are accepted.
+
+Run perldoc(1) on $PROG_NAME for additional documentation.
+
+EOH
+  exit 64;
+}
+
+sub emit_help_modal {
+  warn <<"EOH";
+Usage: $PROG_NAME [opts] modal --input=mode --output=mode notes...
+
+Modal interval mapping. In particular:
+
+  --chrome=N     Chrome weighting. Default is 0. See Music::Canon.
+  --duration=N   Set default duration value.
+
+  --ep=N         Set the start and end pitch via set_modal_pitches().
+  --sp=N         Necessary if phrase begins on non-tonic scale degree.
+
+  --input=mode   Set the input and output modes. These may be Music::Scales
+  --output=mode  names, or Forte Numbers. Major to Major used by default.
+
+  --nos          Allow for non-octave scales. Necessary if doing crazy
+                 things with intervals in the --input or --output options.
+
+  --undef=N      Use N for notes that cannot be converted.
+
+General options include:
+
+  --contrary     Compute canon in contrary motion.
+  --flats        Print notes with flats instead of sharps.
+  --map          Prints original and output notes or numbers one per line.
+  --raw          Emit raw pitch numbers in output instead of note names.
+  --relative=N   Input is relative to lilypond note N (absolute notation is
+                 assumed by default otherwise).
+  --retrograde   Reverse the output voice.
+  --transpose=N  Transpose output voice by semitones or to a lilypond note.
+
+Raw pitch numbers or lilypond note names (though only in the default
+"nederlands" language) are accepted.
+
+Run perldoc(1) on $PROG_NAME for additional documentation.
+
+EOH
+  exit 64;
+}
+
+sub emit_phrase {
+  my ( $is_multicolumn, $orig, $new, $rest ) = @_;
+
+  $is_multicolumn = 1 if $Flag_Map;
+
+  # As a not-compatible change, this *always* used to emit space-
+  # delimited values though for multicolumness (and to avoid a
+  # subsequent `tr ' ' '\n'`) switched output to be delimited by
+  # newlines.
   if ($is_multicolumn) {
-    while (@new_phrase) {
-      say join( ' ', grep { defined } shift @new_phrase, shift @restofline );
+    while (@$new) {
+      say join( ' ',
+        $Flag_Map ? shift @$orig : (),
+        grep { defined } shift @$new,
+        shift @$rest );
     }
   } else {
-    print join( ' ', @new_phrase ), "\n";
+    print join( ' ', @$new ), "\n";
   }
-  return 0;
 }
 
 __END__
@@ -357,10 +385,14 @@ canonical - compute canon voices via the Music::Canon module
 =head1 SYNOPSIS
 
   $ canonical --contrary --retrograde exact c cis d
-  $ canonical --transpose=12 exact c e g
+  $ canonical --transpose=12 exact c ees g
   $ canonical --raw --contrary exact 1 2 3
 
   $ canonical modal --input=lydian --output=locrian c e g
+
+Raw pitch numbers or lilypond note names (though only in the default
+"nederlands" language) are accepted. Consult the C<lilypond> "Notation
+Reference" section "Note names in other languages" for the syntax.
 
 =head1 DESCRIPTION
 
@@ -403,6 +435,12 @@ Print notes with flats instead of sharps.
 =item B<--help>
 
 Emits help and exits the program.
+
+=item B<--map> B<--nomap>
+
+Whether to show the original input pitch numbers or note names one per
+line alongside the corresponding output pitch number or note name.
+Disabled by default.
 
 =item B<--raw> B<--noraw>
 
@@ -546,6 +584,24 @@ provided this information is not in the first column.
 
   $ (echo 0 4. f; echo 2 8 p; echo 4 4 ff) | canonical -t c exact
 
+Mapping may be used to construct hash lookup tables for given inputs,
+with suitable doctoring of the mapped data. This allows the use of pre-
+computed canonic mappings in other programming languages, for example.
+
+  $ canonical exact --relative=c --map 1 2 3 4
+  1 cis
+  2 d
+  3 dis
+  4 e
+  $ echo '(setf *h* (make-hash-table))' > x
+  $ canonical exact --relative=c --map 1 2 3 4 \
+    | awk '{printf "(setf (gethash '\''%s *h*) '\''%s)\n", $1, $2}' >> x
+  $ clisp -repl x
+  [1]> (gethash 3 *h*)
+  dis ;
+  t
+  [2]> 
+
 =head1 FILES
 
 A ZSH completion script is available in the C<zsh-compdef/> directory of 
@@ -564,7 +620,7 @@ L<http://github.com/thrig/App-MusicTools>
 =head1 SEE ALSO
 
 L<http://www.lilypond.org/> and in particular the Learning and Notation
-manuals should be consulted to understand lilypond note syntax. Or, use
+manuals should be consulted to understand C<lilypond> note syntax. Or, use
 raw pitch numbers.
 
 L<http://en.wikipedia.org/wiki/Forte_number>

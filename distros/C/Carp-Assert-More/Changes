@@ -1,5 +1,28 @@
 Revision history for Perl extension Carp::Assert::More.
 
+
+2.1.0   Mon Aug 15 19:54:27 CDT 2022
+        [ENHANCEMENTS]
+        Add diagnostic strings to the failures. For example:
+
+            assert_nonblank( [ 'foo' ], 'This should be nonblank' );
+
+        would fail with:
+
+            Assertion (This should be nonblank) failed!
+
+        but now fails with:
+
+            Assertion (This should be nonblank) failed!
+            Value is a reference to ARRAY.
+
+        Similar changes have been made to:
+        * assert_all_keys_in
+        * assert_keys_are
+        * assert_empty
+        * assert_nonempty
+
+
 2.0.1   Fri Aug 13 11:57:15 CDT 2021
         [FIXES]
         assert_all_keys_in() mistakenly required a non-empty list of

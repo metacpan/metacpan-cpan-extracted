@@ -8,7 +8,7 @@ package IO::Async::Loop;
 use strict;
 use warnings;
 
-our $VERSION = '0.801';
+our $VERSION = '0.802';
 
 # When editing this value don't forget to update the docs below
 use constant NEED_API_VERSION => '0.33';

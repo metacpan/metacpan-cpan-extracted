@@ -12,7 +12,7 @@ use Path::Tiny;
 use File::ShareDir qw(dist_file);
 use utf8;
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 my $ORCA_COMMAND = 'orca';
 
@@ -58,9 +58,8 @@ sub orca {
         # For now have to explicitly specify -d as otherwise orca would
         #  not be able to store output to a different path other than cwd.
         # See https://github.com/plotly/orca/issues/101
-        my @orca_line = (
-                 $ORCA_COMMAND, 'graph', $tmp_json, '--plotlyjs', $plotlyjs, '-d', $file->parent, '-o', $file->basename,
-                 ( $format ? ( '--format', $format ) : () ) );
+        my @orca_line = ( $ORCA_COMMAND, 'graph', $tmp_json, '--plotlyjs', $plotlyjs, '-d', $file->parent,
+                          '-o', $file->basename, ( $format ? ( '--format', $format ) : () ) );
         for my $arg (qw(mathjax scale width height)) {
             if ( my $val = $params{$arg} ) {
                 push @orca_line, ( "--${arg}", $val );
@@ -133,7 +132,7 @@ Chart::Plotly::Image::Orca - Export static images of Plotly charts using orca
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -276,7 +275,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

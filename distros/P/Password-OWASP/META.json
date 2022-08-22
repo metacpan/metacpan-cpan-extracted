@@ -52,7 +52,7 @@
             "Authen::Passphrase" : "0",
             "Authen::Passphrase::Argon2" : "0",
             "Authen::Passphrase::BlowfishCrypt" : "0",
-            "Authen::Passphrase::Scrypt" : "0",
+            "Authen::Passphrase::Scrypt" : "0.002",
             "Digest::SHA" : "0",
             "Moose" : "0",
             "Moose::Role" : "0",
@@ -64,6 +64,7 @@
       },
       "test" : {
          "requires" : {
+            "Authen::Passphrase::Scrypt" : "0.002",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
@@ -78,27 +79,27 @@
    "provides" : {
       "Password::OWASP" : {
          "file" : "lib/Password/OWASP.pm",
-         "version" : "0.002"
+         "version" : "0.004"
       },
       "Password::OWASP::AbstractBase" : {
          "file" : "lib/Password/OWASP/AbstractBase.pm",
-         "version" : "0.002"
+         "version" : "0.004"
       },
       "Password::OWASP::AbstractBaseX" : {
          "file" : "lib/Password/OWASP/AbstractBaseX.pm",
-         "version" : "0.002"
+         "version" : "0.004"
       },
       "Password::OWASP::Argon2" : {
          "file" : "lib/Password/OWASP/Argon2.pm",
-         "version" : "0.002"
+         "version" : "0.004"
       },
       "Password::OWASP::Bcrypt" : {
          "file" : "lib/Password/OWASP/Bcrypt.pm",
-         "version" : "0.002"
+         "version" : "0.004"
       },
       "Password::OWASP::Scrypt" : {
          "file" : "lib/Password/OWASP/Scrypt.pm",
-         "version" : "0.002"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -109,9 +110,9 @@
          "web" : "https://gitlab.com/waterkip/p5-password-owasp"
       }
    },
-   "version" : "0.002",
+   "version" : "0.004",
    "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.31",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "BSD"
 }
 

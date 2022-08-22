@@ -7,7 +7,7 @@ use Text::ParseWords qw( shellwords );
 use Capture::Tiny qw( capture );
 
 # ABSTRACT: Alien::Build command sequence
-our $VERSION = '2.52'; # VERSION
+our $VERSION = '2.59'; # VERSION
 
 
 sub new
@@ -134,8 +134,6 @@ sub execute
   my($self, $build) = @_;
   my $intr = $build->meta->interpolator;
 
-  my $prop = $build->_command_prop;
-
   foreach my $command (@{ $self->{commands} })
   {
     if(ref($command) eq 'CODE')
@@ -160,7 +158,7 @@ sub execute
             die "external command failed" if $args->{exit};
             my $out = $args->{out};
             chomp $out;
-            _apply($dest, $prop, $out);
+            _apply($dest, $build->_command_prop, $out);
           };
         }
         else
@@ -169,7 +167,7 @@ sub execute
         }
       }
 
-      ($command, @args) = map { $intr->interpolate($_, $prop) } ($command, @args);
+      ($command, @args) = map { $intr->interpolate($_, $build) } ($command, @args);
 
       if($code)
       {
@@ -182,7 +180,7 @@ sub execute
     }
     else
     {
-      my $command = $intr->interpolate($command,$prop);
+      my $command = $intr->interpolate($command, $build);
       _run_string $build, $command;
     }
   }
@@ -202,7 +200,7 @@ Alien::Build::CommandSequence - Alien::Build command sequence
 
 =head1 VERSION
 
-version 2.52
+version 2.59
 
 =head1 CONSTRUCTOR
 

@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Argument 0.057001;
+package Term::CLI::Argument 0.058002;
 
 use 5.014;
 use warnings;
@@ -93,7 +93,7 @@ Term::CLI::Argument - generic parent class for arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.057001
+version 0.058002
 
 =head1 SYNOPSIS
 
@@ -244,18 +244,53 @@ Modifications may result in unexpected behaviour.
 
 =back
 
+=head1 BUNDLED SUB-CLASSES
+
+The L<Term::CLI|Term::CLI>(3p) distribution comes bundled with a number of
+arugment classes.
+
+=over
+
+=item L<Term::CLI::Argument::Bool>
+
+Parse, complete, and validate boolean arguments.
+
+=item L<Term::CLI::Argument::Enum>
+
+Parse, complete, and validate "enum"-like arguments (pre-defined lists of words).
+
+=item L<Term::CLI::Argument::Filename>
+
+Parse, complete, and validate file/path names.
+
+=item L<Term::CLI::Argument::Number>
+
+Parse and validate numbers.
+
+=item L<Term::CLI::Argument::String>
+
+Parse and validate generic strings.
+
+=item L<Term::CLI::Argument::TypeTiny>
+
+Parse and validate L<Type::Tiny>(3p) arguments.
+
+=back
+
+
 =head1 SEE ALSO
 
-L<Term::CLI::Argument::String>(3p),
-L<Term::CLI::Argument::Number>(3p),
+L<Term::CLI>(3p),
 L<Term::CLI::Argument::Enum>(3p),
 L<Term::CLI::Argument::Filename>(3p),
-L<Term::CLI::Element>(3p),
-L<Term::CLI>(3p).
+L<Term::CLI::Argument::Number>(3p),
+L<Term::CLI::Argument::String>(3p),
+L<Term::CLI::Argument::TypeTiny>(3p),
+L<Term::CLI::Element>(3p).
 
 =head1 AUTHOR
 
-Steven Bakker E<lt>sbakker@cpan.orgE<gt>, 2018.
+Steven Bakker E<lt>sbakker@cpan.orgE<gt>, 2018-2022.
 
 =head1 COPYRIGHT AND LICENSE
 

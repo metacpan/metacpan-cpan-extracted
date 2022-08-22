@@ -12,7 +12,7 @@ my @bad_table=(
 );
 
 use Test::More tests => 4; #haha no scalar(@test_table) + scalar(@bad_table);
-use Business::CreditCard qw( :NEW );
+use Business::CreditCard qw( 0.36 :NEW );
 
 foreach my $card (@test_table) {
   ok( validate_card($card), "validate_card($card)" );

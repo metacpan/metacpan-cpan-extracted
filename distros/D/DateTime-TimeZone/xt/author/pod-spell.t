@@ -26,7 +26,6 @@ Algiers
 Almaty
 America
 Amman
-Amsterdam
 Anadyr
 Anchorage
 Andorra
@@ -84,7 +83,6 @@ Bougainville
 Brisbane
 Broken_Hill
 Bron
-Brunei
 Brussels
 Bucharest
 Budapest
@@ -120,11 +118,7 @@ Chihuahua
 Chisinau
 Chita
 Choibalsan
-Christmas
-Chuuk
-Cocos
 Colombo
-Copenhagen
 Cordoba
 Costa
 Costa_Rica
@@ -183,7 +177,6 @@ Floating
 Fort_Nelson
 Fortaleza
 FromEnv
-Funafuti
 Futuna
 GF
 GG
@@ -261,10 +254,8 @@ Karen
 Kathmandu
 Keenan
 Kentucky
-Kerguelen
 Khandyga
 Khartoum
-Kiev
 Kiritimati
 Kirov
 Kitts
@@ -272,9 +263,9 @@ Knox
 Kolkata
 Kosrae
 Krasnoyarsk
-Kuala_Lumpur
 Kuching
 Kwajalein
+Kyiv
 LK
 LV
 LY
@@ -292,7 +283,6 @@ London
 Lord_Howe
 Los_Angeles
 Louisville
-Luxembourg
 MET
 MF
 MH
@@ -308,8 +298,6 @@ Macquarie
 Madeira
 Madrid
 Magadan
-Mahe
-Majuro
 Makassar
 Maki
 Maldives
@@ -341,7 +329,6 @@ Minsk
 Miquelon
 Mohammad
 Molchanov
-Monaco
 Moncton
 Monrovia
 Monterrey
@@ -373,7 +360,6 @@ Olaf
 OlsonDB
 Omsk
 Oral
-Oslo
 PN
 PST8PDT
 PY
@@ -395,7 +381,6 @@ Phoenix
 Pinkowitz
 Pitcairn
 Plurinational
-Pohnpei
 Pontianak
 Port_Moresby
 Port_au_Prince
@@ -419,8 +404,6 @@ Rata
 Recife
 Regina
 Resolute
-Reunion
-Reykjavik
 Rica
 Riga
 Rio_Branco
@@ -465,7 +448,6 @@ Sri
 St_Johns
 Stanley
 Starman
-Stockholm
 Storable
 Subclass
 Subclasses
@@ -531,12 +513,9 @@ Vilnius
 Vincennes
 Vladivostok
 Volgograd
-Vostok
 WET
 WF
 WS
-Wake
-Wallis
 Warsaw
 Whitehorse
 Wilk

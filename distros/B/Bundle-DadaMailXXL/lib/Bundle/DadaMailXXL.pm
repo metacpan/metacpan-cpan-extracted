@@ -1,6 +1,6 @@
 package Bundle::DadaMailXXL;
 
-$VERSION = '0.0.7';
+$VERSION = '0.0.8';
 
 1;
 
@@ -8,7 +8,7 @@ __END__
 
 =head1 NAME 
 
-C<Bundle::DadaMailXXL> - CPAN Bundle for required CPAN modules used in Dada Mail
+C<Bundle::DadaMailXXL> - CPAN Bundle of ALL CPAN modules used in Dada Mail
 
 =head1 SYNOPSIS
 
@@ -18,13 +18,9 @@ or similar CPAN module installer method
 
 =head1 Description
 
-C<Bundle::DadaMailXXL> is a CPAN Bundle of I<required> CPAN modules used by Dada Mail. It also lists C<Bundle::DadaMail> which is the Bundle that holds optional CPAN modules used by Dada Mail. 
+C<Bundle::DadaMailXXL> is a CPAN Bundle of ALL CPAN modules used by Dada Mail. 
 
-Dada Mail is a self-hosted mailing list manager and the distribution does include the CPAN modules that it requires. This bundle keeps track of those modules, as well as gives you an easy way to install them via CPAN into your Perl environment. 
-
-The copies of the CPAN module that Dada Mail provides may very well be out of date, or contain bugs, so having versions that are up to date is generally a good idea. We treat bugs/problems introduced from using the most up-to-date Perl modules in Dada Mail (rather than something we ship with the app's distro) a bug those should be reported: 
-
-L<https://github.com/justingit/dada-mail/issues>
+C<Bundle::DadaMailXXL> will pull modules listed in C<Bundle::DadaMail::IncludedInDistribution> (CPAN modules usually bundled within the distro) and C<Bundle::DadaMail> (modules required, but not bundled within the distribution).
 
 =head1 See Also
 
@@ -32,176 +28,77 @@ L<http://dadamailproject.com>
 
 L<https://github.com/justingit/Bundle-DadaMailXXL>
 
+
 =head1 CONTENTS
 
-Bundle::DadaMail
+AWS:Signature4 - used for Amazon SES 
 
-Try::Tiny
+CSS::Inliner - Used in inlining CSS in HTML email messages. Important for making sure HTML messages look correctly in most all readers.
 
-CGI
+CSS::Packer - minifies CSS used in HTML email messages
 
-CGI::Application
+DateTime::Event::Recurrence - used for scheduled mass mailings
 
-CGI::Session
+DateTime - used for scheduled mass mailings, amazingly, not required
 
-CGI::Session::ExpireSessions
+Digest::HMAC - 
 
-Class::Accessor
+Digest::SHA - for Amazon SES, should be in core
 
-Class::Accessor::Chained::Fast
+Digest::SHA1
 
-Data::Page
+Google::reCAPTCHA
 
-Date::Format
+Gravatar::URL
 
-Digest 
+HTML::Element - used for Dada Mail's "Magic" templates, as well as manipulating HTML documents
 
-Digest::MD5
+HTML::FormatText::WithLinks - Plaintext to HTML
 
-Digest::Perl::MD5
+HTML::Packer - minifies HTML used in HTML email messages
 
-Email::Address
+HTML::Scrubber - removes Javascript in messages - think discussion lists
 
-Email::Address::XS
+HTML::Tree - used for Dada Mail's "Magic" templates, as well as manipulating HTML documents
 
-Email::Find
+HTML::TreeBuilder -  used for Dada Mail's "Magic" templates, as well as manipulating HTML documents
 
-Email::Valid
-
-Exporter::Lite
-
-File::Spec
-
-File::Slurper
-
-Data::Google::Visualization::DataTable
-
-HTML::Entities::Numbered
-
-HTML::Tagset
-
-HTML::Template
-
-HTML::Tiny
-
-HTML::Tree
-
-Data::Pageset
-
-HTML::Template::Expr
-
-HTTP::Date
-
-HTML::TextToHTML
-
-IO::Stringy
-
-Bundle::libnet
-
-Mail::DeliveryStatus::BounceParser 
-
-Mail::Address
-
-Mail::Cap
-
-Mail::Field
-
-Mail::Field::AddrList
-
-Mail::Field::Date
-
-Mail::Filter
-
-Mail::Header
-
-Mail::Internet 
-
-Mail::Mailer
-
-Mail::Mailer::qmail 	  	 
-
-Mail::Mailer::rfc822 	  	 
-
-Mail::Mailer::sendmail 	  	 
-
-Mail::Mailer::smtp 	  	 
-
-Mail::Mailer::testfile 	 
-
-Mail::POP3Client 
-
-Mail::Send
-
-Mail::Util
-
-Mail::Verp
-
-MD5
-
-MIME::EncWords
-
-MIME::Type
-
-MIME::Types
-
-MIME::Tools
-
-Net::SMTP
-
-Net::SMTP_auth
-
-Number::Bytes::Human
-
-Parse::RecDescent
-
-Text::Balanced
-
-PHP::Session
-
-Scalar::Util
-
-List::Util 
-
-Text::CSV
-
-Text::Markdown
-
-Text::Tabs
-
-Text::Wrap
-
-Time::Local
-
-Time::Piece
-
-Try::Tiny
-
-URI
-
-URI::Escape
-
-Crypt::CipherSaber
-
-Net::Domain
-
-DBI
-
-MIME::Base64
-
-Net::DNS
-
-Net::SMTP::SSL
+HTTP::BrowserDetect - Makes reporting of user agents prettier
 
 IO::Socket::SSL
 
-Crypt::Rijndael
+Net::Domain
 
-HTML::Tiny
+Net::DNS
 
-Authen::SASL
+Net::IMAP::Simple - use for IMAP access
 
-YAML::Tiny
+Net::IP - used for anonymizing IPV6
 
-Text::FrontMatter::YAML
+Time::Piece - used in templates for https://dadamailproject.com/d/features-email_template_syntax.pod.html#Flexible-Date-and-Time-formats, should be in core
 
-HTML::Menu::Select
+WWW::StopForumSpam
+
+XML::FeedPP - for sending out RSS feeds as mass mailings
+
+XML::LibXML - for Amazon SES
+
+XMLRPC::Lite
+
+YAML - is it used? 
+
+Image::Resize - used for resizing images
+
+Image::Scale - used for resizing images
+
+Image::Magick - used for resizing images
+
+LWP::Protocol::https
+
+LWP::Protocol::Net::Curl
+
+Bundle::DadaMail::IncludedInDistribution
+
+Bundle::DadaMail
+
+

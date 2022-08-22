@@ -70,6 +70,10 @@ my %WriteMakefileArgs = (
     "lib/Alien/Build/Plugin/Decode/DirListingFtpcopy.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Decode/DirListingFtpcopy.pm",
     "lib/Alien/Build/Plugin/Decode/HTML.pm"              => "\$(INST_LIB)/Alien/Build/Plugin/Decode/HTML.pm",
     "lib/Alien/Build/Plugin/Decode/Mojo.pm"              => "\$(INST_LIB)/Alien/Build/Plugin/Decode/Mojo.pm",
+    "lib/Alien/Build/Plugin/Digest.pod"                  => "\$(INST_LIB)/Alien/Build/Plugin/Digest.pod",
+    "lib/Alien/Build/Plugin/Digest/Negotiate.pm"         => "\$(INST_LIB)/Alien/Build/Plugin/Digest/Negotiate.pm",
+    "lib/Alien/Build/Plugin/Digest/SHA.pm"               => "\$(INST_LIB)/Alien/Build/Plugin/Digest/SHA.pm",
+    "lib/Alien/Build/Plugin/Digest/SHAPP.pm"             => "\$(INST_LIB)/Alien/Build/Plugin/Digest/SHAPP.pm",
     "lib/Alien/Build/Plugin/Download.pod"                => "\$(INST_LIB)/Alien/Build/Plugin/Download.pod",
     "lib/Alien/Build/Plugin/Download/Negotiate.pm"       => "\$(INST_LIB)/Alien/Build/Plugin/Download/Negotiate.pm",
     "lib/Alien/Build/Plugin/Extract.pod"                 => "\$(INST_LIB)/Alien/Build/Plugin/Extract.pod",
@@ -136,7 +140,7 @@ my %WriteMakefileArgs = (
     "Test2::API" => "1.302096",
     "Test2::V0"  => "0.000121"
   },
-  "VERSION" => "2.52",
+  "VERSION" => "2.59",
   "test"    => {
     "TESTS" => "t/*.t"
   }

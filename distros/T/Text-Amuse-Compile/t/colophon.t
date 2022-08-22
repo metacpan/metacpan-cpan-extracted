@@ -6,7 +6,7 @@ use warnings;
 use Text::Amuse::Compile;
 use Text::Amuse::Compile::Devel qw/explode_epub/;
 use Path::Tiny;
-use Test::More tests => 32;
+use Test::More tests => 38;
 
 my $muse = <<"MUSE";
 #title My title
@@ -22,6 +22,7 @@ my %values = (
               seriesname => 'My series',
               seriesnumber => '69bis',
               publisher => 'My publisher <br> Publisher address <br> city',
+              colophon => 'XXXX<br>XXXX',
              );
 
 foreach my $k (keys %values) {

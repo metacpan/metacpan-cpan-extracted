@@ -41,6 +41,8 @@ sub test_card_identification {
                 '12345678'  => 'Isracard',
                 '123456780' => 'Isracard',
                 '60xx xxxx xxxx xxxx' => 'Discover card', #discover w/2 digits
+                '3056xxxxxxxxxxxx' => 'Discover card',
+                '3056111111111110' => 'Discover card',
         );
         while( my ($k, $v)=each(%test_table) ){
                 if(cardtype($k) ne $v){

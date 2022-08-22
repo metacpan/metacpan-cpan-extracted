@@ -26,96 +26,191 @@ extern "C" {
 #define DHANDLE(x) dsys(x) handle
 
 // Stylus section
-PDCStylus
-stylus_alloc( PStylus data)
+
+static int
+stylus_get_key_size( int type )
 {
-	Bool extPen = data-> extPen. actual;
-	PDCStylus ret = ( PDCStylus) hash_fetch( stylusMan, data, sizeof( Stylus) - ( extPen ? 0 : sizeof( EXTPEN)));
-	if ( ret == NULL) {
-		LOGPEN p;
-		LOGBRUSH * b;
-		LOGBRUSH   xbrush;
-
-		if ( hash_count( stylusMan) > 128)
-			stylus_clean();
-
-		ret = ( PDCStylus) malloc( sizeof( DCStylus));
-		if ( !ret) return NULL;
-
-		memcpy( &ret-> s, data, sizeof( Stylus));
-		ret-> refcnt = 0;
-		p = ret-> s. pen;
-
-		if ( !extPen) {
-			if ( !( ret-> hpen = CreatePenIndirect( &p))) {
-				apiErr;
-				ret-> hpen = CreatePen( PS_SOLID, 0, 0);
-			}
-		} else {
-			int i, delta = p. lopnWidth. x > 1 ? p. lopnWidth. x - 1 : 0;
-			LOGBRUSH pb;
-			pb. lbStyle = BS_SOLID;
-			pb. lbColor = ret-> s. pen. lopnColor;
-			pb. lbHatch = 0;
-			for ( i = 1; i < ret-> s. extPen. patResource-> dotsCount; i += 2)
-				ret-> s. extPen. patResource-> dotsPtr[ i] += delta;
-			if ( !( ret-> hpen   = ExtCreatePen( ret-> s. extPen. style, p. lopnWidth. x, &pb,
-				ret-> s. extPen. patResource-> dotsCount,
-				ret-> s. extPen. patResource-> dotsPtr
-			))) {
-				apiErr;
-				ret-> hpen = CreatePen( PS_SOLID, 0, 0);
-			}
-			for ( i = 1; i < ret-> s. extPen. patResource-> dotsCount; i += 2)
-				ret-> s. extPen. patResource-> dotsPtr[ i] -= delta;
-		}
-		b = &ret-> s. brush. lb;
-		if ( ret-> s. brush. lb. lbStyle == BS_DIBPATTERNPT) {
-			if ( ret-> s. brush. backColor == ret-> s. pen. lopnColor) {
-				// workaround Win32 bug with mono bitmaps -
-				// if color and backColor are the same, but fill pattern present, backColor
-				// value is ignored by some unknown, but certainly important reason :)
-				xbrush. lbStyle = BS_SOLID;
-				xbrush. lbColor = ret-> s. pen. lopnColor;
-				xbrush. lbHatch = 0;
-				b = &xbrush;
-			} else {
-				int i;
-				for ( i = 0; i < 8; i++) bmiHatch. bmiData[ i * 4] = ret-> s. brush. pattern[ i];
-				bmiHatch. bmiColors[ 0]. rgbRed   =  ( ret-> s. brush. backColor & 0xFF);
-				bmiHatch. bmiColors[ 0]. rgbGreen = (( ret-> s. brush. backColor >> 8) & 0xFF);
-				bmiHatch. bmiColors[ 0]. rgbBlue  = (( ret-> s. brush. backColor >> 16) & 0xFF);
-				bmiHatch. bmiColors[ 1]. rgbRed   =  ( ret-> s. pen. lopnColor & 0xFF);
-				bmiHatch. bmiColors[ 1]. rgbGreen = (( ret-> s. pen. lopnColor >> 8) & 0xFF);
-				bmiHatch. bmiColors[ 1]. rgbBlue  = (( ret-> s. pen. lopnColor >> 16) & 0xFF);
-			}
-		}
-		if ( !( ret-> hbrush = CreateBrushIndirect( b))) {
-			apiErr;
-			ret-> hbrush = CreateSolidBrush( RGB( 255, 255, 255));
-		}
-		hash_store( stylusMan, &ret-> s, sizeof( Stylus) - ( data-> extPen. actual ? 0 : sizeof( EXTPEN)), ret);
+	switch (type) {
+	case DCO_PEN     : return sizeof(RQPen);     break;
+	case DCO_BRUSH   : return sizeof(RQBrush);   break;
+	case DCO_GP_PEN  : return sizeof(RQGPPen);   break;
+	case DCO_GP_BRUSH: return sizeof(RQGPBrush); break;
+	default: return 0;
 	}
-	ret-> refcnt++;
+}
+
+/*
+void
+dump_key(void * key, int size)
+{
+	Byte *k = (Byte*) key;
+	int type = *((int*) key);
+	int sz = stylus_get_key_size(type);
+	int i;
+	char buf[20000], *ptr = buf, xx[256];
+	buf[0] = 0;
+	if (size > 0) sz = size;
+	for ( i = 0; i < sz; i++) {
+		snprintf( xx, 256, "%02x ", k[i]);
+		strcat(buf, xx);
+	}
+	warn("[%x] %s\n", type, buf);
+}
+*/
+
+static PDCObject
+stylus_alloc(int type)
+{
+	int size;
+	PDCObject ret;
+
+	size = stylus_get_key_size(type);
+	if ( !( ret = (PDCObject) malloc(sizeof(DCObject) + size - 1))) {
+		warn("Not enough memory");
+		return false;
+	}
+
+	bzero(ret, sizeof(DCObject) + size - 1);
+	ret-> type    = type;
+	ret-> rq_size = size;
+	ret-> rq      = &ret-> rq_buf;
+
 	return ret;
 }
 
-void
-stylus_free( PDCStylus res, Bool permanent)
+PDCObject
+stylus_fetch( void * key )
 {
-	if ( !res || --res-> refcnt > 0) return;
-	if ( !permanent) {
-		res-> refcnt = 0;
-		return;
-	}
-	if ( res-> hpen)   DeleteObject( res-> hpen);
-	if ( res-> hbrush) DeleteObject( res-> hbrush);
-	res-> hbrush = NULL;
-	res-> hpen = NULL;
-	hash_delete( stylusMan, &res-> s, sizeof( Stylus) - ( res-> s. extPen. actual ? 0 : sizeof( EXTPEN)), true);
+	PDCObject cached;
+	int type = *((int*) key);
+	int size = stylus_get_key_size(type);
+	if (( cached = (PDCObject) hash_fetch( mgr_styli, key, size)) != NULL )
+		return cached;
+	if (( cached = stylus_alloc(type)) == NULL)
+		return NULL;
+	cached-> cached = true;
+	if ( hash_count( mgr_styli) > 128)
+		stylus_clean();
+	memcpy( cached-> rq, key, size );
+	hash_store( mgr_styli, key, size, cached);
+	return cached;
 }
 
-static Bool _st_cleaner( PDCStylus s, int keyLen, void * key, void * dummy) {
+HPEN
+stylus_get_pen( DWORD style, DWORD line_width, COLORREF color )
+{
+	RQPen ss;
+	PDCObject dcobj;
+	bzero(&ss, sizeof(ss));
+	ss.type               = DCO_PEN;
+	ss.logpen.lopnStyle   = style;
+	ss.logpen.lopnWidth.x = line_width;
+	ss.logpen.lopnColor   = color;
+	if (( dcobj = stylus_fetch(&ss)) == NULL)
+		return 0;
+	if ( !dcobj-> handle ) {
+		if (( dcobj-> handle = CreatePen( style, line_width, color )) == 0)
+			apiErr;
+	}
+	return (HPEN) dcobj->handle;
+}
+
+HBRUSH
+stylus_get_solid_brush( COLORREF color )
+{
+	RQBrush ss;
+	PDCObject dcobj;
+	bzero(&ss, sizeof(ss));
+	ss.type             = DCO_BRUSH;
+	ss.logbrush.lbStyle = BS_SOLID;
+	ss.logbrush.lbColor = color;
+	ss.logbrush.lbHatch = (LONG_PTR) 0;
+	if (( dcobj = stylus_fetch(&ss)) == NULL)
+		return 0;
+	if ( !dcobj-> handle ) {
+		if (( dcobj-> handle = CreateSolidBrush( color )) == 0)
+			apiErr;
+	}
+
+	return (HBRUSH) dcobj->handle;
+}
+
+static void
+stylus_free( PDCObject res, Bool permanent)
+{
+	if ( !res || --res-> refcnt > 0)
+		return;
+
+	if ( res-> cached ) {
+		void *p = NULL;
+		if ( !permanent) {
+			res-> refcnt = 0;
+			return;
+		}
+		p = hash_delete( mgr_styli, res->rq, res-> rq_size, false);
+		if ( p && p != res ) {
+			warn("panic: bad stylus hash %p ne %p\n", p, res);
+			return;
+		}
+
+	}
+
+	switch ( res-> type ) {
+	case DCO_PEN:
+	case DCO_BRUSH:
+		DeleteObject( res-> handle );
+		break;
+	case DCO_GP_PEN:
+		GdipDeletePen((GpPen*) res-> handle);
+		break;
+	case DCO_GP_BRUSH:
+		GdipDeleteBrush((GpBrush*) res-> handle);
+		break;
+	}
+
+	free(res);
+}
+
+static void
+stylus_release_current( Handle self, int index, Bool force_deselect )
+{
+	if ( sys current_dc_obj[index] ) {
+		if ( !sys current_dc_obj[index]->cached || force_deselect ) {
+			switch ( index ) {
+			case DCO_PEN:
+				SelectObject( sys ps, sys stock_pen );
+				break;
+			case DCO_BRUSH:
+				SelectObject( sys ps, sys stock_brush );
+				break;
+			}
+		}
+		stylus_free( sys current_dc_obj[index], 0);
+		sys current_dc_obj[index] = NULL;
+	}
+}
+
+static void
+stylus_replace_current( Handle self, int index, PDCObject new_stylus )
+{
+	stylus_release_current(self, index, 0);
+	sys current_dc_obj[index] = new_stylus;
+	new_stylus-> refcnt++;
+	if ( index == DCO_PEN || index == DCO_BRUSH )
+		SelectObject( sys ps, new_stylus-> handle );
+}
+
+void
+stylus_release( Handle self )
+{
+	int i;
+	for ( i = 0; i < DCO_COUNT; i++)
+		stylus_release_current(self, i, 1);
+}
+
+static Bool
+stylus_cleaner( PDCObject s, int keyLen, void * key, void * dummy)
+{
 	if ( s-> refcnt <= 0) stylus_free( s, true);
 	return false;
 }
@@ -123,231 +218,351 @@ static Bool _st_cleaner( PDCStylus s, int keyLen, void * key, void * dummy) {
 void
 stylus_clean()
 {
-	hash_first_that( stylusMan, _st_cleaner, NULL, NULL, NULL);
+	hash_first_that( mgr_styli, stylus_cleaner, NULL, NULL, NULL);
 }
 
 Bool
-stylus_extpenned( PStylus s)
+select_pen( Handle self )
 {
-	if ( s-> pen. lopnWidth. x > 1) {
-		if ( s-> pen. lopnStyle == PS_NULL)
+	RQPen key = sys rq_pen;
+	PDCObject ret;
+
+	if ( ! sys ps ) return false;
+
+	key.type = DCO_PEN;
+	if ( !key.geometric ) {
+		key.style = key.line_end = key.line_join = 0;
+		key.line_pattern = NULL;
+	}
+	if (( ret = stylus_fetch(&key)) == NULL )
+		return false;
+	if ( ret-> handle )
+		goto SUCCESS;
+
+	if ( key.geometric ) {
+		LOGBRUSH pb;
+		int i, delta;
+		PLinePattern pat;
+
+		pb.lbStyle = BS_SOLID;
+		pb.lbColor = key.logpen.lopnColor;
+		pb.lbHatch = 0;
+
+		delta = (key.logpen.lopnWidth.x > 1) ? key.logpen.lopnWidth.x - 1 : 0;
+		pat = key.line_pattern;
+		for ( i = 1; i < pat->count; i += 2)
+			pat->dots[i] += delta;
+		ret-> handle = ExtCreatePen(
+			key.style,
+			key.logpen.lopnWidth.x, &pb,
+			pat->count, pat->ptr
+		);
+		for ( i = 1; i < pat->count; i += 2)
+			pat->dots[i] -= delta;
+	} else
+		ret-> handle = CreatePenIndirect( &key.logpen);
+
+	if ( !ret-> handle ) {
+		apiErr;
+		ret-> handle = CreatePen( PS_SOLID, 0, 0);
+	}
+
+SUCCESS:
+	stylus_replace_current( self, DCO_PEN, ret );
+	return true;
+}
+
+Bool
+select_brush( Handle self)
+{
+	COLORREF fg;
+	RQBrush key;
+	PDCObject ret;
+	LOGBRUSH b;
+	Bool mono_workaround = false;
+
+	/* image brush is not cacheable */
+	fg = sys rq_pen.logpen.lopnColor;
+	if ( var fillPatternImage ) {
+		b.lbHatch = (LONG_PTR) 0;
+
+		if ( PImage(var fillPatternImage)->type == imBW && !dsys(var fillPatternImage)options.aptIcon ) {
+			if ( sys rq_brush.back_color == fg )
+				mono_workaround = true;
+			else
+				b.lbHatch = (LONG_PTR) image_create_mono_pattern_dib(var fillPatternImage,fg,sys rq_brush.back_color);
+		} else
+			b.lbHatch = (LONG_PTR) image_create_color_pattern_dib(var fillPatternImage);
+
+		if ( b.lbHatch ) {
+			HBRUSH h;
+			b.lbStyle = BS_DIBPATTERNPT;
+			b.lbColor = DIB_RGB_COLORS;
+			h = CreateBrushIndirect(&b);
+			free((void *) b.lbHatch);
+			if ( h != 0 ) {
+				if (( ret = stylus_alloc(DCO_BRUSH)) == NULL ) {
+					DeleteObject(h);
+					return false;
+				}
+				ret->handle = h;
+				goto SUCCESS;
+			} else
+				apiErr;
+		}
+	}
+
+	/* fix the key */
+	key = sys rq_brush;
+	if ( key.logbrush.lbStyle == BS_DIBPATTERNPT)
+		key.logbrush.lbHatch = (LONG_PTR)0;
+	if ( key.logbrush.lbStyle == BS_DIBPATTERNPT && key.back_color == fg)
+		mono_workaround = true;
+	if ( mono_workaround ) {
+		/* workaround Win32 bug with mono bitmaps -
+		if color and backColor are the same, but fill pattern present, backColor
+		value is ignored by some unknown, but certainly important reason :) */
+		key.logbrush.lbStyle = BS_SOLID;
+		key.logbrush.lbColor = fg;
+		key.logbrush.lbHatch = 0;
+	}
+
+	/* have the brush? */
+	key.type = DCO_BRUSH;
+	if (( ret = stylus_fetch( &key )) == NULL)
+		return false;
+	if ( ret-> handle )
+		goto SUCCESS;
+
+	/* create new one */
+	b = key.logbrush;
+	if ( key.logbrush.lbStyle == BS_DIBPATTERNPT) {
+		int i;
+		static DIBMONOBRUSH bmi_hatch = {
+			{ sizeof( BITMAPINFOHEADER), 8, 8, 1, 1, BI_RGB, 0, 0, 0, 2, 2},
+			{{0,0,0,0}, {0,0,0,0}}
+		};
+		for ( i = 0; i < 8; i++)
+			bmi_hatch.data[i * 4] = key.fill_pattern[i];
+		bmi_hatch.colors[0].rgbRed   =  ( key.back_color & 0xFF);
+		bmi_hatch.colors[0].rgbGreen = (( key.back_color >> 8) & 0xFF);
+		bmi_hatch.colors[0].rgbBlue  = (( key.back_color >> 16) & 0xFF);
+		bmi_hatch.colors[1].rgbRed   =  ( fg & 0xFF);
+		bmi_hatch.colors[1].rgbGreen = (( fg >> 8) & 0xFF);
+		bmi_hatch.colors[1].rgbBlue  = (( fg >> 16) & 0xFF);
+		b.lbHatch = (LONG_PTR) &bmi_hatch;
+	}
+
+	if ( !( ret-> handle = CreateBrushIndirect(&b))) {
+		apiErr;
+		ret-> handle = CreateSolidBrush(fg);
+	}
+
+SUCCESS:
+	stylus_replace_current( self, DCO_BRUSH, ret);
+	return true;
+}
+
+Bool
+stylus_is_geometric( Handle self )
+{
+	LOGPEN *s = & sys rq_pen.logpen;
+	if ( s-> lopnWidth.x > 1) {
+		if ( s-> lopnStyle == PS_NULL)
 			return false;
 		return true;
-	} else if ( s-> pen. lopnStyle == PS_USERSTYLE)
+	} else if ( s-> lopnStyle == PS_USERSTYLE)
 		return true;
 	return false;
 }
 
 Bool
-stylus_complex( PStylus s, HDC dc)
+stylus_is_complex( Handle self )
 {
 	int rop;
-	if ( s-> brush. lb. lbStyle == BS_DIBPATTERNPT)
+
+	if ( sys rq_brush.logbrush.lbStyle == BS_DIBPATTERNPT)
 		return true;
-	if (( s-> pen. lopnStyle != PS_SOLID) &&
-		( s-> pen. lopnStyle != PS_NULL))
+
+	if (
+		( sys rq_pen.logpen.lopnStyle != PS_SOLID) &&
+		( sys rq_pen.logpen.lopnStyle != PS_NULL)
+	)
 		return true;
-	rop = GetROP2( dc);
-	if (( rop != R2_COPYPEN) &&
+
+	rop = GetROP2( sys ps);
+	if (
+		( rop != R2_COPYPEN) &&
 		( rop != R2_WHITE  ) &&
 		( rop != R2_NOP    ) &&
-		( rop != R2_BLACK  )) return true;
+		( rop != R2_BLACK  )
+	)
+		return true;
+
 	return false;
 }
-
 
 DWORD
-stylus_get_extpen_style( PStylus s)
+stylus_get_extpen_style( Handle self )
 {
-	return s-> extPen. lineEnd | s-> pen. lopnStyle | s-> extPen. lineJoin | PS_GEOMETRIC;
+	RQPen *s = & sys rq_pen;
+	return s-> logpen.lopnStyle | s-> line_end | s-> line_join | PS_GEOMETRIC;
 }
 
-void
-stylus_gp_free( PDCGPStylus res, Bool permanent)
+static PDCObject
+alloc_gp_image_brush( Handle self )
 {
-	if ( !res || --res-> refcnt > 0) return;
-	if ( !permanent) {
-		res-> refcnt = 0;
-		return;
+	GpTexture *t;
+	PDCObject ret;
+
+	if (( t = image_create_gp_pattern( self, var fillPatternImage, sys alpha )) == NULL)
+		return NULL;
+
+	if (( ret = stylus_alloc(DCO_GP_BRUSH)) == NULL) {
+		GdipDeleteBrush((GpBrush*) t);
+		return NULL;
 	}
-	if ( res-> brush) GdipDeleteBrush( res-> brush);
-	res-> brush = NULL;
-	if ( res-> pen ) GdipDeletePen(res-> pen);
-	res-> pen = NULL;
-	hash_delete( stylusGpMan, &res-> s, sizeof( GPStylus), true);
+	ret->handle = t;
+
+	return ret;
 }
 
-static Bool _gp_cleaner( PDCGPStylus s, int keyLen, void * key, void * dummy) {
-	if ( s-> refcnt <= 0) stylus_gp_free( s, true);
-	return false;
-}
-
-void
-stylus_gp_clean()
+Bool
+select_gp_brush(Handle self)
 {
-	hash_first_that( stylusGpMan, _gp_cleaner, nil, nil, nil);
-}
-
-static PDCGPStylus
-stylus_gp_fetch( GPStylus * key)
-{
-	PDCGPStylus cached;
-
-	cached = ( PDCGPStylus) hash_fetch( stylusGpMan, key, sizeof(GPStylus));
-
-	if ( cached == NULL ) {
-		if (( cached = malloc(sizeof(DCGPStylus))) == NULL) {
-			warn("Not enough memory");
-			return NULL;
-		}
-		memset( cached, 0, sizeof(DCGPStylus));
-		cached->s = *key;
-		if ( hash_count( stylusGpMan) > 128)
-			stylus_gp_clean();
-		hash_store( stylusGpMan, key, sizeof(GPStylus), cached);
-	}
-
-	return cached;
-}
-
-GpBrush*
-stylus_gp_alloc(Handle self)
-{
-	GPStylus key;
-	DCGPStylus *cached;
 	int r,g,b;
-	PStylus s = & sys stylus;
+	COLORREF fg, bg;
+	RQGPBrush key;
+	PDCObject ret;
+	Bool is_solid;
+	POINT offset;
 
-	if ( sys stylusGPResource) {
-		stylus_gp_free( sys stylusGPResource, 0);
-		sys stylusGPResource = NULL;
+	is_solid = sys rq_brush.logbrush.lbStyle == BS_SOLID;
+
+	if ( var fillPatternImage ) {
+		if (( ret = alloc_gp_image_brush(self)) != NULL )
+			goto SUCCESS;
+		else
+			is_solid = true;
 	}
 
 	memset(&key, 0, sizeof(key));
-
-	b = (s->pen.lopnColor >> 16) & 0xff;
-	g = (s->pen.lopnColor & 0xff00) >> 8;
-	r = s->pen.lopnColor & 0xff;
+	key.type = DCO_GP_BRUSH;
+	fg = sys rq_pen.logpen.lopnColor;
+	bg = sys rq_brush.back_color;
+	b = (fg >> 16) & 0xff;
+	g = (fg & 0xff00) >> 8;
+	r = fg & 0xff;
 	key.fg = (sys alpha << 24) | (r << 16) | (g << 8) | b;
-	if ( s-> brush. lb. lbStyle != BS_SOLID ) {
-		key.opaque = (sys currentROP2 == ropCopyPut) ? 1 : 0;
-		b = (s->brush.backColor >> 16) & 0xff;
-		g = (s->brush.backColor & 0xff00) >> 8;
-		r = s->brush.backColor & 0xff;
+	key.opaque = sys rop2 == ropCopyPut;
+	if ( !is_solid ) {
+		key.opaque = (sys rop2 == ropCopyPut) ? 1 : 0;
+		b = (bg >> 16) & 0xff;
+		g = (bg & 0xff00) >> 8;
+		r =  bg & 0xff;
 		key.bg = (sys alpha << 24) | (r << 16) | (g << 8) | b;
-		*key.fill = *sys fillPattern;
+		*key.fill_pattern = *sys fill_pattern;
 	}
 
-	if ((cached = stylus_gp_fetch(&key)) == NULL)
-		return NULL;
+	if ((ret = stylus_fetch(&key)) == NULL)
+		return false;
 
-	if ( cached->brush == NULL ) {
-		if ( s-> brush. lb. lbStyle == BS_SOLID ) {
-			GpSolidFill *f;
-			GPCALL GdipCreateSolidFill((ARGB)key.fg, &f);
-			if ( rc ) goto FAIL;
+	if ( ret->handle )
+		goto SUCCESS;
+	if ( is_solid ) {
+		GpSolidFill *f;
+		GPCALL GdipCreateSolidFill((ARGB)key.fg, &f);
+		if ( rc ) goto FAIL;
 
-			cached->brush = (GpBrush*)f;
-		} else {
-			GpBitmap * b;
-			GpTexture * t;
-			uint32_t x, y, fp[64], *fpp, bg;
+		ret->handle = f;
+	} else {
+		GpBitmap * b;
+		GpTexture * t;
+		uint32_t x, y, fp[64], *fpp, bg;
 
-			bg = key.opaque ? key.bg : 0x00000000;
-			for ( y = 0, fpp = fp; y < 8; y++) {
-				Byte src = sys fillPattern[y];
-				for ( x = 0; x < 8; x++)
-					*(fpp++) = (src & ( 1 << x )) ? key.fg : bg;
+		bg = key.opaque ? key.bg : 0x00000000;
+		for ( y = 0, fpp = fp; y < 8; y++) {
+			int yy = (y + 8) % 8;
+			Byte src = sys fill_pattern[yy];
+			for ( x = 0; x < 8; x++) {
+				int xx = x % 8;
+				*(fpp++) = (src & ( 1 << xx )) ? key.fg : bg;
 			}
-
-			GPCALL GdipCreateBitmapFromScan0( 8, 8, 32, PixelFormat32bppARGB, (BYTE*)fp, &b);
-			apiGPErrCheck;
-			if ( rc ) goto FAIL;
-
-			GPCALL GdipCreateTexture((GpImage*) b, WrapModeTile, &t);
-			apiGPErrCheck;
-			GdipDisposeImage((GpImage*) b);
-			if ( rc ) goto FAIL;
-
-			cached->brush = (GpBrush*) t;
 		}
+
+		GPCALL GdipCreateBitmapFromScan0( 8, 8, 32, PixelFormat32bppARGB, (BYTE*)fp, &b);
+		apiGPErrCheck;
+		if ( rc ) goto FAIL;
+
+		GPCALL GdipCreateTexture((GpImage*) b, WrapModeTile, &t);
+		apiGPErrCheck;
+		GdipDisposeImage((GpImage*) b);
+		if ( rc ) goto FAIL;
+
+		ret->handle = t;
 	}
 
-	cached-> refcnt++;
-	sys stylusGPResource = cached;
-	return cached;
+SUCCESS:
+	GetBrushOrgEx( sys ps, &offset);
+	GdipResetTextureTransform((GpTexture*) ret->handle);
+	GdipTranslateTextureTransform((GpTexture*) ret->handle,offset.x,offset.y,MatrixOrderPrepend);
+	stylus_replace_current( self, DCO_GP_BRUSH, ret );
+	return true;
 
 FAIL:
-	hash_delete( stylusGpMan, &key, sizeof(key), true);
-	return NULL;
+	hash_delete( mgr_styli, &key, sizeof(key), true);
+	return false;
 }
 
-void
-stylus_change( Handle self)
-{
-	PDCStylus p;
-	PDCStylus newP;
-
-	if ( is_apt( aptDCChangeLock)) return;
-	sys stylusFlags &= ~stbGPBrush;
-
-	p    = sys stylusResource;
-	newP = stylus_alloc( &sys stylus);
-	if ( p != newP) {
-		sys stylusResource = newP;
-		sys stylusFlags &= stbGPBrush;
-	}
-	stylus_free( p, false);
-}
-
+/* not using GpPens for Prima representation, but for internal painting only */
 GpPen*
-stylus_gp_get_pen(int lineWidth, uint32_t color)
+stylus_gp_get_pen(int line_width, uint32_t color)
 {
-	GPStylus key;
-	PDCGPStylus cached;
+	RQGPPen key;
+	PDCObject cached;
 
 	memset( &key, 0, sizeof(key));
-	key.type   = GP_SOLID_PEN;
-	key.fg     = color;
-	key.opaque = lineWidth;
-	if (( cached = stylus_gp_fetch(&key)) == NULL)
+	key.type       = DCO_GP_PEN;
+	key.fg         = color;
+	key.line_width = line_width;
+	if (( cached = stylus_fetch(&key)) == NULL)
 		return NULL;
 
-	if ( cached->pen == NULL ) {
-		GPCALL GdipCreatePen1(color, lineWidth, UnitPixel, &cached->pen);
+	if ( !cached->handle ) {
+		GPCALL GdipCreatePen1(color, line_width, UnitPixel, (GpPen**) &cached->handle);
 		apiGPErrCheck;
 		if ( rc ) goto FAIL;
 	}
 
-	return cached->pen;
+	return (GpPen*) cached->handle;
 
 FAIL:
-	hash_delete( stylusGpMan, &key, sizeof(key), true);
+	hash_delete( mgr_styli, &key, sizeof(key), true);
 	return NULL;
 }
 
-PPatResource
+PLinePattern
 patres_fetch( unsigned char * pattern, int len)
 {
 	int i;
-	PPatResource r = ( PPatResource) hash_fetch( patMan, pattern, len);
+	PLinePattern r = ( PLinePattern) hash_fetch( mgr_patterns, pattern, len);
 	if ( r)
 		return r;
 
-	r = ( PPatResource) malloc( sizeof( PatResource) + sizeof( DWORD) * len);
-	if ( !r) return &hPatHollow;
+	r = ( PLinePattern) malloc( sizeof( LinePattern) + sizeof( DWORD) * len);
+	if ( !r) return &std_hollow_line_pattern;
 
-	r-> dotsCount = len;
-	r-> dotsPtr   = r-> dots;
+	r-> count = len;
+	r-> ptr   = r-> dots;
 	for ( i = 0; i < len; i++) {
 		DWORD x = ( DWORD) pattern[ i];
 		if ( i & 1)
 			x++;
 		else
 			if ( x > 0) x--;
-		r-> dots[ i] = x;
+		r-> dots[i] = x;
 	}
-	hash_store( patMan, pattern, len, r);
+	hash_store( mgr_patterns, pattern, len, r);
 	return r;
 }
 
@@ -562,13 +777,13 @@ font_alloc( Font * data)
 {
 	char key[sizeof(Font)];
 	int keyLen = build_dcfont_key( data, (unsigned char*)key);
-	PDCFont ret = ( PDCFont) hash_fetch( fontMan, key, keyLen);
+	PDCFont ret = ( PDCFont) hash_fetch( mgr_fonts, key, keyLen);
 
 	if ( ret == NULL) {
 		LOGFONTW logfont;
 		PFont   f;
 
-		if ( hash_count( fontMan) > 128)
+		if ( hash_count( mgr_fonts) > 128)
 			font_clean();
 
 		ret = ( PDCFont) malloc( sizeof( DCFont));
@@ -584,7 +799,7 @@ font_alloc( Font * data)
 			ret-> hfont = CreateFontIndirectW( &lf);
 		}
 		keyLen = build_dcfont_key( &ret-> font, (unsigned char*)key);
-		hash_store( fontMan, key, keyLen, ret);
+		hash_store( mgr_fonts, key, keyLen, ret);
 	}
 	ret-> refcnt++;
 	return ret;
@@ -606,7 +821,7 @@ font_free( PDCFont res, Bool permanent)
 		res-> hfont = NULL;
 	}
 	keyLen = build_dcfont_key( &res-> font, (unsigned char*)key);
-	hash_delete( fontMan, key, keyLen, true);
+	hash_delete( mgr_fonts, key, keyLen, true);
 }
 
 void
@@ -616,12 +831,12 @@ font_change( Handle self, Font * font)
 	PDCFont newP;
 	if ( is_apt( aptDCChangeLock)) return;
 
-	sys alphaArenaFontChanged = true;
-	p    = sys fontResource;
-	newP = ( sys fontResource = font_alloc( font));
-	if ( sys alphaArenaStockFont ) {
-		SelectObject( sys alphaArenaDC, sys alphaArenaStockFont );
-		sys alphaArenaFontChanged = true;
+	sys alpha_arena_font_changed = true;
+	p    = sys dc_font;
+	newP = ( sys dc_font = font_alloc( font));
+	if ( sys alpha_arena_stock_font ) {
+		SelectObject( sys alpha_arena_dc, sys alpha_arena_stock_font );
+		sys alpha_arena_font_changed = true;
 	}
 	font_free( p, false);
 	if ( sys ps)
@@ -631,7 +846,7 @@ font_change( Handle self, Font * font)
 void
 font_clean()
 {
-	hash_first_that( fontMan, _ft_cleaner, NULL, NULL, NULL);
+	hash_first_that( mgr_fonts, _ft_cleaner, NULL, NULL, NULL);
 }
 
 static char* encodings[] = {
@@ -785,7 +1000,7 @@ register_mapper_fonts(void)
 	LOGFONTW elf;
 
 	/* MS Shell Dlg is a virtual font, not reported by enum */
-	prima_font_mapper_save_font(guts.windowFont.name, 0);
+	prima_font_mapper_save_font(guts.window_font.name, 0);
 
 	if ( !( dc = dc_alloc()))
 		return;
@@ -798,18 +1013,18 @@ register_mapper_fonts(void)
 void
 reset_system_fonts(void)
 {
-	memset( &guts. windowFont, 0, sizeof( Font));
-	strcpy( guts. windowFont. name, DEFAULT_WIDGET_FONT);
-	guts. windowFont. size  = DEFAULT_WIDGET_FONT_SIZE;
-	guts. windowFont. undef. width = guts. windowFont. undef. height = guts. windowFont. undef. vector = 1;
-	apc_font_pick( NULL_HANDLE, &guts. windowFont, &guts. windowFont);
+	memset( &guts. window_font, 0, sizeof( Font));
+	strcpy( guts. window_font. name, DEFAULT_WIDGET_FONT);
+	guts. window_font. size  = DEFAULT_WIDGET_FONT_SIZE;
+	guts. window_font. undef. width = guts. window_font. undef. height = guts. window_font. undef. vector = 1;
+	apc_font_pick( NULL_HANDLE, &guts. window_font, &guts. window_font);
 
 	guts. ncmData. cbSize = sizeof( NONCLIENTMETRICSW);
 	if ( !SystemParametersInfoW( SPI_GETNONCLIENTMETRICS, sizeof( NONCLIENTMETRICSW),
 		( PVOID) &guts. ncmData, 0)) apiErr;
-	font_logfont2font( &guts.ncmData.lfMenuFont,    &guts.menuFont, &guts.displayResolution);
-	font_logfont2font( &guts.ncmData.lfMessageFont, &guts.msgFont,  &guts.displayResolution);
-	font_logfont2font( &guts.ncmData.lfCaptionFont, &guts.capFont,  &guts.displayResolution);
+	font_logfont2font( &guts.ncmData.lfMenuFont,    &guts.menu_font, &guts.display_resolution);
+	font_logfont2font( &guts.ncmData.lfMessageFont, &guts.msg_font,  &guts.display_resolution);
+	font_logfont2font( &guts.ncmData.lfCaptionFont, &guts.cap_font,  &guts.display_resolution);
 }
 
 void
@@ -826,7 +1041,7 @@ font_logfont2font( LOGFONTW * lf, Font * f, Point * res)
 	DeleteObject( SelectObject( dc, hf));
 	dc_free();
 
-	if ( !res) res = &guts. displayResolution;
+	if ( !res) res = &guts. display_resolution;
 	bzero( f, sizeof(Font));
 	f-> height              = tm. tmHeight;
 	f-> size                = ( f-> height - tm. tmInternalLeading) * 72.0 / res-> y + 0.5;
@@ -867,7 +1082,7 @@ void
 font_textmetric2font( TEXTMETRICW * tm, Font * fm, Bool readonly)
 {
 	if ( !readonly) {
-		fm-> size            = ( tm-> tmHeight - tm-> tmInternalLeading) * 72.0 / guts. displayResolution.y + 0.5;
+		fm-> size            = ( tm-> tmHeight - tm-> tmInternalLeading) * 72.0 / guts. display_resolution.y + 0.5;
 		fm-> width           = tm-> tmAveCharWidth;
 		fm-> height          = tm-> tmHeight;
 		fm-> style           = 0 |
@@ -907,7 +1122,7 @@ font_pp2font( char * presParam, Font * f)
 	} else
 		f-> size = 10;
 
-	strncpy( f-> name, p, 255);
+	strlcpy( f-> name, p, 255);
 	p = f-> name;
 	f-> style = 0;
 	f-> pitch = fpDefault;
@@ -927,7 +1142,7 @@ font_pp2font( char * presParam, Font * f)
 PFont
 apc_font_default( PFont font)
 {
-	*font = guts. windowFont;
+	*font = guts. window_font;
 	font-> pitch = fpDefault;
 	font-> vector = fvDefault;
 	return font;
@@ -937,7 +1152,7 @@ int
 apc_font_load( Handle self, char* filename)
 {
 	int ret = AddFontResource(( LPCTSTR) filename );
-	if (ret) hash_store( myfontMan, filename, strlen(filename), (void*)NULL);
+	if (ret) hash_store( mgr_myfonts, filename, strlen(filename), (void*)NULL);
 	return ret;
 }
 
@@ -1168,7 +1383,7 @@ font_font2gp_internal( PFont font, Point res, Bool forceSize, HDC theDC)
 			}
 			font_textmetric2font( &es. tm, font, true);
 			font-> direction = 0;
-			strncpy( font-> family, es. family, LF_FULLFACESIZE);
+			strlcpy( font-> family, es. family, LF_FULLFACESIZE);
 			font-> is_utf8.family = es.is_utf8_family;
 			font-> size     = ( es. tm. tmHeight - es. tm. tmInternalLeading) * 72.0 / res.y + 0.5;
 			font-> width    = es. lf. lfWidth;
@@ -1201,7 +1416,7 @@ font_font2gp_internal( PFont font, Point res, Bool forceSize, HDC theDC)
 				font-> width = tm. tmAveCharWidth;
 
 			font_textmetric2font( &tm, font, true);
-			strncpy( font-> family, es. family, LF_FULLFACESIZE);
+			strlcpy( font-> family, es. family, LF_FULLFACESIZE);
 			font-> is_utf8.family = es.is_utf8_family;
 			out( fvOutline);
 		}
@@ -1224,10 +1439,10 @@ font_font2gp_internal( PFont font, Point res, Bool forceSize, HDC theDC)
 		if ( es. usePitch) {
 			switch ( font->pitch ) {
 			case fpFixed:
-				strcpy( font-> name, guts. defaultFixedFont);
+				strcpy( font-> name, guts. default_fixed_font);
 				break;
 			case fpVariable:
-				strcpy( font-> name, guts. defaultVariableFont);
+				strcpy( font-> name, guts. default_variable_font);
 				break;
 			}
 			font-> pitch = fpDefault;
@@ -1240,7 +1455,7 @@ font_font2gp_internal( PFont font, Point res, Bool forceSize, HDC theDC)
 		ret = font_font2gp( font, res, forceSize, dc);
 		// if that alternative match succeeded with name subplaced again, skip
 		// that result and use DEFAULT_SYSTEM_FONT match
-		if (( ogp == fpFixed) && ( strcmp( font-> name, guts. defaultFixedFont) != 0)) {
+		if (( ogp == fpFixed) && ( strcmp( font-> name, guts. default_fixed_font) != 0)) {
 			strcpy( font-> name, DEFAULT_SYSTEM_FONT);
 			font-> pitch = fpDefault;
 			ret = font_font2gp( font, res, forceSize, dc);
@@ -1250,7 +1465,7 @@ font_font2gp_internal( PFont font, Point res, Bool forceSize, HDC theDC)
 	}
 
 	// font not found, so use general representation for height and width
-	strcpy( font-> name, guts. defaultSystemFont);
+	strcpy( font-> name, guts. default_system_font);
 	if ( recursiveFF == 0)
 	{
 		// trying to catch default font with correct values
@@ -1263,7 +1478,7 @@ font_font2gp_internal( PFont font, Point res, Bool forceSize, HDC theDC)
 		int r;
 		// if not succeeded, to avoid recursive call use "wild guess".
 		// This could be achieved if system does not have "System" font
-		*font = guts. windowFont;
+		*font = guts. window_font;
 		font-> pitch = fpDefault;
 		recursiveFF++;
 		r = ( recursiveFF < 3) ? font_font2gp( font, res, forceSize, dc) : fvBitmap;
@@ -1569,7 +1784,7 @@ apc_lookup_color( const char * colorName)
 
 #define xcmp( name, stlen, retval)  if (( len == stlen) && ( strcmp( name, buf) == 0)) return retval
 
-	strncpy( buf, colorName, 255);
+	strlcpy( buf, colorName, 255);
 	len = strlen( buf);
 	for ( b = buf; *b; b++) *b = tolower(*b);
 
@@ -1728,114 +1943,130 @@ void
 hwnd_enter_paint( Handle self)
 {
 	Point res;
-	GetObject( sys stockPen   = GetCurrentObject( sys ps, OBJ_PEN),
-		sizeof( LOGPEN), &sys stylus. pen);
-	GetObject( sys stockBrush = GetCurrentObject( sys ps, OBJ_BRUSH),
-		sizeof( LOGBRUSH), &sys stylus. brush);
-	sys stockFont      = GetCurrentObject( sys ps, OBJ_FONT);
-	if ( !sys stockPalette)
-		sys stockPalette = GetCurrentObject( sys ps, OBJ_PAL);
-	font_free( sys fontResource, false);
-	sys stylusResource = NULL;
-	sys stylusGPResource = NULL;
-	sys fontResource   = NULL;
-	sys stylusFlags    = 0;
-	sys stylus. extPen. actual = false;
+	HDC save_ps;
+
+	save_ps = sys ps;
+	sys ps = 0;
+	apc_gp_push(self, NULL, NULL, 0);
+	sys ps = save_ps;
+
+	SetGraphicsMode( sys ps, GM_ADVANCED);
+	sys stock_pen   = GetCurrentObject( sys ps, OBJ_PEN);
+	sys stock_brush = GetCurrentObject( sys ps, OBJ_BRUSH);
+	sys stock_font  = GetCurrentObject( sys ps, OBJ_FONT);
+	if ( !sys stock_palette)
+		sys stock_palette = GetCurrentObject( sys ps, OBJ_PAL);
+	font_free( sys dc_font, false);
+	stylus_release(self);
+	sys dc_font   = NULL;
+	sys stylus_flags    = 0;
 	apt_set( aptDCChangeLock);
 	sys bpp = GetDeviceCaps( sys ps, BITSPIXEL);
 	if ( is_apt( aptWinPS) && self != prima_guts.application) {
-		apc_gp_set_color( self, sys viewColors[ ciFore]);
-		apc_gp_set_back_color( self, sys viewColors[ ciBack]);
+		apc_gp_set_color( self, sys view_colors[ ciFore]);
+		apc_gp_set_back_color( self, sys view_colors[ ciBack]);
 	} else {
-		apc_gp_set_color( self, remap_color(sys lbs[0],false));
-		apc_gp_set_back_color( self, remap_color(sys lbs[1],false));
+		apc_gp_set_color( self, remap_color(sys fg,false));
+		apc_gp_set_back_color( self, remap_color(sys bg,false));
 	}
-
-	if ( sys psd == NULL) sys psd = ( PPaintSaveData) malloc( sizeof( PaintSaveData));
-	if ( sys psd == NULL) return;
 
 	apc_gp_set_alpha( self, sys alpha);
 	apc_gp_set_antialias( self, is_apt( aptGDIPlus));
 	apc_gp_set_text_opaque( self, is_apt( aptTextOpaque));
 	apc_gp_set_text_out_baseline( self, is_apt( aptTextOutBaseline));
-	apc_gp_set_fill_mode( self, sys fillMode);
-	apc_gp_set_fill_pattern_offset( self, sys fillPatternOffset);
-	apc_gp_set_line_width( self, sys lineWidth);
-	apc_gp_set_line_end( self, sys lineEnd);
-	apc_gp_set_line_join( self, sys lineJoin);
+	apc_gp_set_fill_mode( self, sys fill_mode);
+	apc_gp_set_fill_pattern_offset( self, sys fill_pattern_offset);
+	apc_gp_set_line_width( self, sys line_width);
+	apc_gp_set_line_end( self, sys line_end);
+	apc_gp_set_line_join( self, sys line_join);
 	apc_gp_set_line_pattern( self,
-		( Byte*)(( sys linePatternLen > sizeof(sys linePattern)) ? sys linePattern : ( Byte*)&sys linePattern),
-		sys linePatternLen);
-	apc_gp_set_miter_limit( self, sys miterLimit);
+		( Byte*)(( sys line_pattern_len > sizeof(sys line_pattern)) ? sys line_pattern : ( Byte*)&sys line_pattern),
+		sys line_pattern_len);
+	apc_gp_set_miter_limit( self, sys miter_limit);
 	apc_gp_set_rop( self, sys rop);
 	apc_gp_set_rop2( self, sys rop2);
 	apc_gp_set_transform( self, sys transform. x, sys transform. y);
-	apc_gp_set_fill_pattern( self, sys fillPattern2);
-	sys psd-> alpha          = sys alpha;
-	sys psd-> antialias      = is_apt( aptGDIPlus);
-	sys psd-> font           = var font;
-	sys psd-> fillMode       = sys fillMode;
-	sys psd-> fillPatternOffset = sys fillPatternOffset;
-	sys psd-> lineWidth      = sys lineWidth;
-	sys psd-> lineEnd        = sys lineEnd;
-	sys psd-> lineJoin       = sys lineJoin;
-	sys psd-> linePattern    = sys linePattern;
-	sys psd-> linePatternLen = sys linePatternLen;
-	sys psd-> rop            = sys rop;
-	sys psd-> rop2           = sys rop2;
-	sys psd-> transform      = sys transform;
-	sys psd-> textOpaque     = is_apt( aptTextOpaque);
-	sys psd-> textOutB       = is_apt( aptTextOutBaseline);
-	sys psd-> antialias      = is_apt( aptGDIPlus);
+	if ( var fillPatternImage )
+		apc_gp_set_fill_image( self, var fillPatternImage);
+	else
+		apc_gp_set_fill_pattern( self, sys fill_pattern);
 
 	apt_clear( aptDCChangeLock);
-	stylus_change( self);
+	sys stylus_flags = 0;
 	apc_gp_set_font( self, &var font);
 	res = apc_gp_get_resolution(self);
 	var font. resolution = res. y * 0x10000 + res. x;
 	SetStretchBltMode( sys ps, COLORONCOLOR);
 }
 
+static void
+gc_stack_free( Handle self, PPaintState state)
+{
+	if ( state-> fill_image )
+		unprotect_object( state-> fill_image );
+	if ( state-> in_paint) {
+		int i;
+		for ( i = 0; i < DCO_COUNT; i++)
+			stylus_free(state->paint.dc_obj[i], 0);
+	}
+	if ( state-> user_destructor )
+		state-> user_destructor(self, state->user_data, state->user_data_size, state->in_paint);
+	free(state);
+}
+
+static Bool
+gc_stack_free_paints_only( Handle item, void * p)
+{
+	PPaintState state = ( PPaintState ) item;
+	if ( !state->in_paint) return true;
+	gc_stack_free((Handle) p, state);
+	return false;
+}
+
+static Bool
+gc_stack_free_all( Handle item, void * p)
+{
+	gc_stack_free((Handle) p, ( PPaintState ) item);
+	return false;
+}
+
+void
+cleanup_gc_stack(Handle self, Bool all)
+{
+	if ( !sys gc_stack ) return;
+
+	if ( all ) {
+		list_first_that(sys gc_stack, &gc_stack_free_all, (void*) self);
+		plist_destroy(sys gc_stack);
+		sys gc_stack = NULL;
+	} else
+		list_grep(sys gc_stack, &gc_stack_free_paints_only, (void*) self);
+}
+
 void
 hwnd_leave_paint( Handle self)
 {
+	HDC save_ps;
+	cleanup_gc_stack(self, 0);
 	if ( sys graphics) {
 		GdipDeleteGraphics(sys graphics);
 		sys graphics = NULL;
 	}
-	SelectObject( sys ps,  sys stockPen);
-	SelectObject( sys ps,  sys stockBrush);
-	SelectObject( sys ps,  sys stockFont);
-	SelectPalette( sys ps, sys stockPalette, 0);
-	sys stockPen = NULL;
-	sys stockBrush = NULL;
-	sys stockFont = NULL;
-	sys stockPalette = NULL;
-	stylus_free( sys stylusResource, false);
-	if ( sys opaquePen ) {
-		DeleteObject( sys opaquePen );
-		sys opaquePen = NULL;
-	}
-	if ( sys psd != NULL) {
-		var font           = sys psd-> font;
-		sys alpha          = sys psd-> alpha;
-		sys fillMode       = sys psd-> fillMode;
-		sys fillPatternOffset  = sys psd-> fillPatternOffset;
-		sys lineWidth      = sys psd-> lineWidth;
-		sys lineEnd        = sys psd-> lineEnd;
-		sys lineJoin       = sys psd-> lineJoin;
-		sys linePattern    = sys psd-> linePattern;
-		sys linePatternLen = sys psd-> linePatternLen;
-		sys rop            = sys psd-> rop;
-		sys rop2           = sys psd-> rop2;
-		sys transform      = sys psd-> transform;
-		apt_assign( aptTextOpaque,      sys psd-> textOpaque);
-		apt_assign( aptTextOutBaseline, sys psd-> textOutB);
-		apt_assign( aptGDIPlus,         sys psd-> antialias);
-		free( sys psd);
-		sys psd = NULL;
-	}
+	SelectObject( sys ps,  sys stock_pen);
+	SelectObject( sys ps,  sys stock_brush);
+	SelectObject( sys ps,  sys stock_font);
+	SelectPalette( sys ps, sys stock_palette, 0);
+	sys stock_pen = NULL;
+	sys stock_brush = NULL;
+	sys stock_font = NULL;
+	sys stock_palette = NULL;
+	stylus_release(self);
 	sys bpp = 0;
+
+	save_ps = sys ps;
+	sys ps = 0;
+	apc_gp_pop(self, NULL);
+	sys ps = save_ps;
 }
 
 Bool
@@ -1869,7 +2100,7 @@ Handle
 hwnd_top_level( Handle self)
 {
 	while ( self) {
-		if ( sys className == WC_FRAME) return self;
+		if ( sys class_name == WC_FRAME) return self;
 		self = var owner;
 	}
 	return NULL_HANDLE;
@@ -1879,7 +2110,7 @@ Handle
 hwnd_frame_top_level( Handle self)
 {
 	while ( self && ( self != prima_guts.application)) {
-		if (( sys className == WC_FRAME) ||
+		if (( sys class_name == WC_FRAME) ||
 			( !is_apt( aptClipOwner) && ( var owner != prima_guts.application))) return self;
 		self = var owner;
 	}
@@ -1890,7 +2121,7 @@ Handle
 hwnd_layered_top_level( Handle self)
 {
 	while ( self && ( self != prima_guts.application)) {
-		if (( sys className == WC_FRAME) ||
+		if (( sys class_name == WC_FRAME) ||
 			(!is_apt( aptClipOwner) || (var owner == prima_guts.application))) return self;
 		self = var owner;
 	}
@@ -1921,8 +2152,8 @@ mod_select( int mod)
 	ks-> ks[ VK_CONTROL] = ( mod & kmCtrl ) ? 0x80 : 0;
 	ks-> ks[ VK_SHIFT  ] = ( mod & kmShift) ? 0x80 : 0;
 	SetKeyboardState( ks-> ks);
-	ks-> gks = guts. currentKeyState;
-	guts. currentKeyState = ks-> ks;
+	ks-> gks = guts. current_key_state;
+	guts. current_key_state = ks-> ks;
 	return ( BYTE*) ks;
 }
 
@@ -1936,7 +2167,7 @@ mod_free( BYTE * modState)
 	ks-> ks[ VK_CONTROL] = ks-> kss[ 1];
 	ks-> ks[ VK_SHIFT  ] = ks-> kss[ 2];
 	SetKeyboardState( ks-> ks);
-	guts. currentKeyState = ks-> gks;
+	guts. current_key_state = ks-> gks;
 	free( ks);
 }
 
@@ -2003,8 +2234,8 @@ palette_change( Handle self)
 	PRGBColor p;
 	PRGBColor d;
 	int nColors = ( 1 << (
-		guts. displayBMInfo. bmiHeader. biBitCount *
-		guts. displayBMInfo. bmiHeader. biPlanes
+		guts. display_bm_info. bmiHeader. biBitCount *
+		guts. display_bm_info. bmiHeader. biPlanes
 	)) & 0x1FF;
 	int i;
 	HPALETTE pal;
@@ -2079,13 +2310,13 @@ palette_change( Handle self)
 }
 
 int
-palette_match_color( XLOGPALETTE * lp, long clr, int * diffFactor)
+palette_match_color( XLOGPALETTE * lp, long clr, int * diff_factor)
 {
 	int diff = 0x10000, cdiff = 0, ret = 0, nCol = lp-> palNumEntries;
 	RGBColor color;
 
 	if ( nCol == 0) {
-		if ( diffFactor) *diffFactor = 0;
+		if ( diff_factor) *diff_factor = 0;
 		return clr;
 	}
 
@@ -2106,7 +2337,7 @@ palette_match_color( XLOGPALETTE * lp, long clr, int * diffFactor)
 		}
 	}
 
-	if ( diffFactor) *diffFactor = cdiff;
+	if ( diff_factor) *diff_factor = cdiff;
 	return ret;
 }
 

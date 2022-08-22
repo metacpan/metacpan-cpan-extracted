@@ -1,8 +1,9 @@
 package App::XML::DocBook::Builder;
-$App::XML::DocBook::Builder::VERSION = '0.1003';
+$App::XML::DocBook::Builder::VERSION = '0.1004';
 use 5.014;
 use strict;
 use warnings;
+use autodie;
 
 sub new
 {
@@ -25,10 +26,9 @@ sub initialize_makefiles
 
     my $redirect_makefile = "docmake.mak";
 
-    open my $docbook_mak, ">", $redirect_makefile
-        or die "Could not open Makefile for writing";
+    open my $docbook_mak, ">", $redirect_makefile;
 
-    print $docbook_mak <<"EOF";
+    print {$docbook_mak} <<"EOF";
 DOCBOOK_MAK_PATH = $inst_dir
 
 DOCBOOK_MAK_MAKEFILES_PATH = \$(DOCBOOK_MAK_PATH)/share/make/
@@ -39,10 +39,12 @@ EOF
     close($docbook_mak);
 
     open my $main_mak, ">", "Makefile.main";
-    print $main_mak "DOC = "
+    print {$main_mak} "DOC = "
         . $args->{doc_base}
         . "\n\ninclude $redirect_makefile\n\n";
     close($main_mak);
+
+    return;
 }
 
 
@@ -60,7 +62,7 @@ App::XML::DocBook::Builder - Build DocBook/XML files.
 
 =head1 VERSION
 
-version 0.1003
+version 0.1004
 
 =head1 SYNOPSIS
 
@@ -186,7 +188,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Shlomi Fish.
+This software is Copyright (c) 2022 by Shlomi Fish.
 
 This is free software, licensed under:
 

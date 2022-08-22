@@ -370,11 +370,11 @@ KEYWORDS
     Since version 0.33.
 
        role Name {
-          field $field;
+          field $f;
     
-          BUILD { $field = "a value" }
+          BUILD { $f = "a value"; }
     
-          method field { return $field }
+          method field { return $f; }
        }
 
     Since version 0.57 a role can declare that it provides another role:
@@ -453,10 +453,10 @@ KEYWORDS
     no name is given, the name of the field is used. A single prefix
     character _ will be removed if present.
 
-       field $field :reader;
+       field $x :reader;
     
        # equivalent to
-       field $field;  method field { return $field }
+       field $x;  method x { return $x }
 
     Since version 0.55 these are permitted on any field type, but prior
     versions only allowed them on scalar fields. The reader method behaves
@@ -479,10 +479,10 @@ KEYWORDS
     arguments. If no name is given, the name of the field is used prefixed
     by set_. A single prefix character _ will be removed if present.
 
-       field $field :writer;
+       field $x :writer;
     
        # equivalent to
-       field $field;  method set_field { $field = shift; return $self }
+       field $x;  method set_x { $x = shift; return $self }
 
     Since version 0.28 a generated writer method will return the object
     invocant itself, allowing a chaining style.
@@ -505,10 +505,10 @@ KEYWORDS
     the name of the field is used. A single prefix character _ will be
     removed if present.
 
-       field $field :mutator;
+       field $x :mutator;
     
        # equivalent to
-       field $field;  method field :lvalue { $field }
+       field $x;  method x :lvalue { $x }
 
     Since version 0.28 all of these generated accessor methods will include
     argument checking similar to that used by subroutine signatures, to
@@ -530,14 +530,14 @@ KEYWORDS
     false) then the field is not modified. In either case, the value of the
     field is then returned.
 
-       field $field :accessor;
+       field $x :accessor;
     
        # equivalent to
-       field $field;
+       field $x;
     
        method field {
-          $field = shift if @_;
-          return $field;
+          $x = shift if @_;
+          return $x;
        }
 
   :weak
@@ -549,7 +549,8 @@ KEYWORDS
     is given, and to a :writer accessor method. Note that this only applies
     to automatically generated code; not normal code written in regular
     method bodies. If you assign into the field variable you must remember
-    to call Scalar::Util::weaken yourself.
+    to call Scalar::Util::weaken (or builtin::weaken on Perl 5.36 or above)
+    yourself.
 
   :param, :param(NAME)
 
@@ -600,9 +601,9 @@ KEYWORDS
     Loop control expressions that are known at compiletime to affect a loop
     that they appear within are permitted.
 
-       field $field { foreach(@list) { next; } }       # this is fine
+       field $x { foreach(@list) { next; } }       # this is fine
     
-       field $field { LOOP: while(1) { last LOOP; } }  # this is fine too
+       field $x { LOOP: while(1) { last LOOP; } }  # this is fine too
 
  has
 

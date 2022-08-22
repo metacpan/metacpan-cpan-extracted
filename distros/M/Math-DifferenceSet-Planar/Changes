@@ -1,5 +1,9 @@
 Revision history for Perl extension Math::DifferenceSet::Planar.
 
+0.017   Thu, 18 Aug 2022 21:29:14 +0200
+        - bug fix: eta() could give wrong results
+        - improved tests and documentation
+
 0.016   Sat, 16 Jul 2022 22:11:14 +0200
         - bug fix for a corner case in find_delta
         - integration of linear mapping algorithms

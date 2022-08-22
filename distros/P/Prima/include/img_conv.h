@@ -16,6 +16,33 @@
 extern "C" {
 #endif
 
+typedef void SimpleConvProc( Byte * srcData, Byte * dstData, int count);
+typedef SimpleConvProc *PSimpleConvProc;
+
+typedef struct {
+	ColorPixel color;
+	ColorPixel backColor;
+	int rop;
+	Bool transparent;
+	FillPattern pattern;
+	Point patternOffset;
+	Handle tile;
+	unsigned char * linePattern;
+	PBoxRegionRec region;
+	Point translate;
+} ImgPaintContext, *PImgPaintContext;
+
+typedef void BitBltProc( Byte * src, Byte * dst, int count);
+typedef BitBltProc *PBitBltProc;
+
+#define dBLEND_FUNC(name) void name( \
+	const Byte * src, const Byte src_inc, \
+	const Byte * src_a, const Byte src_a_inc,\
+	Byte * dst, \
+	const Byte * dst_a, const Byte dst_a_inc,\
+	int bytes)
+
+typedef dBLEND_FUNC(BlendFunc);
 
 /* initializer routine */
 extern void init_image_support(void);
@@ -28,6 +55,7 @@ extern void ic_type_convert( Handle self, Byte * dstData, PRGBColor dstPal, int 
 extern Bool itype_supported( int type);
 extern Bool itype_importable( int type, int *newtype, void **from_proc, void **to_proc);
 extern Bool iconvtype_supported( int conv);
+extern Byte rop_1bit_transform(Byte fore, Byte back, Byte rop);
 
 /* palette routines */
 extern void cm_init_colormap( void);
@@ -35,6 +63,7 @@ extern void cm_reverse_palette( PRGBColor source, PRGBColor dest, int colors);
 extern void cm_squeeze_palette( PRGBColor source, int srcColors, PRGBColor dest, int destColors);
 extern Byte cm_nearest_color( RGBColor color, int palSize, PRGBColor palette);
 extern void cm_fill_colorref( PRGBColor fromPalette, int fromColorCount, PRGBColor toPalette, int toColorCount, Byte * colorref);
+extern void cm_colorref_4to8( Byte * src16, Byte * dst256 );
 extern U16* cm_study_palette( RGBColor * palette, int pal_size);
 extern Bool cm_optimized_palette( Byte * data, int lineSize, int width, int height, RGBColor * palette, int * max_pal_size);
 extern void cm_reduce_palette4( Byte * srcData, int srcLine, int width, int height, RGBColor * srcPalette, int srcPalSize, RGBColor * dstPalette, int * dstPalSize);
@@ -86,6 +115,10 @@ extern void bc_rgb_byte_ed( Byte * source, Byte * dest, int count, int * err_buf
 extern void bc_rgb_byte_op( RGBColor * src, Byte * dest, int count, U16 * tree, RGBColor * palette, int * err_buf);
 extern void bc_rgb_byte_nop( RGBColor * src, Byte * dest, int count, U16 * tree, RGBColor * palette);
 extern void bc_rgb_graybyte( Byte * source, register Byte * dest, register int count);
+extern void bc_mono_Short( Byte * source, Byte * dest, register unsigned int count, Short fore, Short back);
+extern void bc_mono_Long( Byte * source, Byte * dest, register unsigned int count, Long fore, Long back);
+extern void bc_mono_float( Byte * source, Byte * dest, register unsigned int count, float fore, float back);
+extern void bc_mono_double( Byte * source, Byte * dest, register unsigned int count, double fore, double back);
 
 /* bitstroke stretching types */
 
@@ -138,8 +171,11 @@ extern void bs_Complex_out( Complex * srcData, Complex * dstData, int w, int x, 
 extern void bs_DComplex_out( DComplex * srcData, DComplex * dstData, int w, int x, int absx, long step);
 
 /* bitstroke copy routines */
+extern void bc_byte_put( Byte * source, Byte * dest, unsigned int count, BitBltProc * blt, Byte * colorref);
 extern void bc_nibble_copy( Byte * source, Byte * dest, unsigned int from, unsigned int width);
+extern void bc_nibble_put( Byte * source, unsigned int from, unsigned int width, Byte * dest, unsigned int to, BitBltProc * blt, Byte * colorref8to4);
 extern void bc_mono_copy( Byte * source, Byte * dest, unsigned int from, unsigned int width);
+extern void bc_mono_put( Byte * source, unsigned int from, unsigned int width, Byte * dest, unsigned int to, BitBltProc * blt);
 
 /* image conversion routines */
 #define BC(from,to,conv) void ic_##from##_##to##_ict##conv( Handle self, Byte * dstData, PRGBColor dstPal, int dstType, int * dstPalSize, Bool palSize_only)
@@ -266,23 +302,13 @@ extern void bc_rgb_irgb( Byte * source, Byte * dest, int count);
 extern void bc_rgb_rgbi( Byte * source, Byte * dest, int count);
 extern void bc_rgb_ibgr( Byte * source, Byte * dest, int count);
 extern void bc_rgb_bgri( Byte * source, Byte * dest, int count);
+extern void bc_rgba_rgb_a( Byte * rgba_source, Byte * rgb_dest, Byte * a_dest, int count);
+extern void bc_rgba_bgr_a( Byte * rgba_source, Byte * bgr_dest, Byte * a_dest, int count);
+extern void bc_rgb_a_rgba( Byte * rgb_source, Byte * a_source, Byte * rgba_dest, int count);
+extern void bc_bgr_a_rgba( Byte * bgr_source, Byte * a_source, Byte * rgba_dest, int count);
 
 
 /* misc */
-typedef void SimpleConvProc( Byte * srcData, Byte * dstData, int count);
-typedef SimpleConvProc *PSimpleConvProc;
-
-typedef struct {
-	ColorPixel color;
-	ColorPixel backColor;
-	int rop;
-	Bool transparent;
-	FillPattern pattern;
-	Point patternOffset;
-	unsigned char * linePattern;
-	PBoxRegionRec region;
-	Point translate;
-} ImgPaintContext, *PImgPaintContext;
 
 extern void ibc_repad( Byte * source, Byte * dest, int srcLineSize, int dstLineSize, int srcDataSize, int dstDataSize, int srcBPP, int dstBPP, void * bit_conv_proc, Bool reverse);
 extern void img_fill_dummy( PImage dummy, int w, int h, int type, Byte * data, RGBColor * palette);
@@ -297,6 +323,11 @@ extern void img_premultiply_alpha_constant( Handle self, int alpha);
 extern void img_premultiply_alpha_map( Handle self, Handle alpha);
 extern Bool img_polyline( Handle dest, int n_points, Point * points, PImgPaintContext ctx);
 extern Bool img_flood_fill( Handle self, int x, int y, ColorPixel color, Bool single_border, PImgPaintContext ctx);
+extern PBitBltProc img_find_blt_proc( int rop );
+extern void img_find_blend_proc( int rop, BlendFunc ** blend1, BlendFunc ** blend2 );
+extern Bool img_resample_colors( Handle dest, int bpp, PImgPaintContext ctx);
+extern void img_fill_alpha_buf( Byte * dst, Byte * src, int width, int bpp);
+
 
 /* regions */
 typedef Bool RegionCallbackFunc( int x, int y, int w, int h, void * param);

@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace table.
 
@@ -38,7 +38,7 @@ has color => ( is  => "rw",
 
 has colorsrc => ( is            => "rw",
                   isa           => "Str",
-                  documentation => "Sets the source reference on plot.ly for  color .",
+                  documentation => "Sets the source reference on Chart Studio Cloud for `color`.",
 );
 
 has width => ( is  => "rw",
@@ -46,7 +46,7 @@ has width => ( is  => "rw",
 
 has widthsrc => ( is            => "rw",
                   isa           => "Str",
-                  documentation => "Sets the source reference on plot.ly for  width .",
+                  documentation => "Sets the source reference on Chart Studio Cloud for `width`.",
 );
 
 __PACKAGE__->meta->make_immutable();
@@ -64,7 +64,7 @@ Chart::Plotly::Trace::Table::Cells::Line - This attribute is one of the possible
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -126,13 +126,13 @@ Serialize the trace to JSON. This method should be called only by L<JSON> serial
 
 =item * colorsrc
 
-Sets the source reference on plot.ly for  color .
+Sets the source reference on Chart Studio Cloud for `color`.
 
 =item * width
 
 =item * widthsrc
 
-Sets the source reference on plot.ly for  width .
+Sets the source reference on Chart Studio Cloud for `width`.
 
 =back
 
@@ -142,7 +142,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

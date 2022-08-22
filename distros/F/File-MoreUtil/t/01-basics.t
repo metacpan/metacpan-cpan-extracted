@@ -22,6 +22,9 @@ use File::MoreUtil qw(
                          dir_has_non_subdirs
                          dir_has_dot_subdirs
                          dir_has_non_dot_subdirs
+                         dir_only_has_files
+                         dir_only_has_dot_files
+                         dir_only_has_non_dot_files
 
                          get_dir_entries
                          get_dir_dot_entries
@@ -90,8 +93,16 @@ subtest "dir_empty, dir_not_empty, dir_has_*files, dir_has_*subdirs" => sub {
     mkdir "hasfiles", 0755;
     write_text("hasfiles/1", "");
 
+    mkdir "hasfiles_and_dirs", 0755;
+    write_text("hasfiles_and_dirs/1", "");
+    mkdir("hasfiles_and_dirs/d2", "");
+
     mkdir "hasdotfiles", 0755;
     write_text("hasdotfiles/.1", "");
+
+    mkdir "hasdotfiles_and_nondotfiles", 0755;
+    write_text("hasdotfiles_and_nondotfiles/.1", "");
+    write_text("hasdotfiles_and_nondotfiles/2", "");
 
     mkdir "hasdotdirs", 0755;
     mkdir "hasdotdirs/.1";
@@ -127,10 +138,20 @@ subtest "dir_empty, dir_not_empty, dir_has_*files, dir_has_*subdirs" => sub {
 
     ok(!dir_has_files("empty"));
     ok(!dir_has_files("doesntexist"));
+    ok( dir_has_files("hasfiles_and_dirs"));
     ok( dir_has_files("hasfiles"));
     ok( dir_has_files("hasdotfiles"));
     ok(!dir_has_files("hassubdirs"));
     ok(!dir_has_files("hasdotsubdirs"));
+
+    ok(!dir_only_has_files("empty"));
+    ok(!dir_only_has_files("doesntexist"));
+    ok( dir_only_has_files("hasfiles"));
+    ok(!dir_only_has_files("hasfiles_and_dirs"));
+    ok( dir_only_has_files("hasdotfiles"));
+    ok(!dir_only_has_files("hassubdirs"));
+    ok(!dir_only_has_files("hasdotsubdirs"));
+    ok( dir_only_has_files("hasdotfiles_and_nondotfiles"));
 
     ok(!dir_has_dot_files("empty"));
     ok(!dir_has_dot_files("doesntexist"));
@@ -138,6 +159,15 @@ subtest "dir_empty, dir_not_empty, dir_has_*files, dir_has_*subdirs" => sub {
     ok( dir_has_dot_files("hasdotfiles"));
     ok(!dir_has_dot_files("hassubdirs"));
     ok(!dir_has_dot_files("hasdotsubdirs"));
+    ok( dir_has_dot_files("hasdotfiles_and_nondotfiles"));
+
+    ok(!dir_only_has_dot_files("empty"));
+    ok(!dir_only_has_dot_files("doesntexist"));
+    ok(!dir_only_has_dot_files("hasfiles"));
+    ok( dir_only_has_dot_files("hasdotfiles"));
+    ok(!dir_only_has_dot_files("hassubdirs"));
+    ok(!dir_only_has_dot_files("hasdotsubdirs"));
+    ok(!dir_only_has_dot_files("hasdotfiles_and_nondotfiles"));
 
     ok(!dir_has_non_dot_files("empty"));
     ok(!dir_has_non_dot_files("doesntexist"));
@@ -145,6 +175,15 @@ subtest "dir_empty, dir_not_empty, dir_has_*files, dir_has_*subdirs" => sub {
     ok(!dir_has_non_dot_files("hasdotfiles"));
     ok(!dir_has_non_dot_files("hassubdirs"));
     ok(!dir_has_non_dot_files("hasdotsubdirs"));
+    ok( dir_has_non_dot_files("hasdotfiles_and_nondotfiles"));
+
+    ok(!dir_only_has_non_dot_files("empty"));
+    ok(!dir_only_has_non_dot_files("doesntexist"));
+    ok( dir_only_has_non_dot_files("hasfiles"));
+    ok(!dir_only_has_non_dot_files("hasdotfiles"));
+    ok(!dir_only_has_non_dot_files("hassubdirs"));
+    ok(!dir_only_has_non_dot_files("hasdotsubdirs"));
+    ok(!dir_only_has_non_dot_files("hasdotfiles_and_nondotfiles"));
 
     ok(!dir_has_subdirs("empty"));
     ok(!dir_has_subdirs("doesntexist"));

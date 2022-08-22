@@ -27,7 +27,7 @@ If you process UTF-8 encoded files which contain faulty characters, you will get
 
 Use the iconv (libc6-dev Linux package) tool, to preprocess the data and discard faulty characters:
 
-  $ iconv -c -f UTF-8 -t UTF-8 marc21.utf8.raw | catmandu convert MARC to JSON
+  $ iconv -c -f UTF-8 -t UTF-8 marc21.utf8.raw | catmandu convert MARC --type RAW to JSON
 
 =head2 Convert a decomposed UTF-8 file to a combined UTF-8 file and vice versa
 
@@ -36,7 +36,7 @@ For example, the character ä can be represented as
 "ä", that is the codepoint U+00E4 (two bytes c3 a4 in UTF-8 encoding), or as
 "ä", that is the two codepoints U+0061 U+0308 (three bytes 61 cc 88 in UTF-8).
 
-The uconf (libicu-dev Linux package) tool can be used to convert these types of
+The uconv tool (from the libicu-dev Linux package) can be used to convert these types of
 files:
 
     $ uconv -x any-nfc < decomposed.txt > combined.txt
@@ -82,8 +82,8 @@ The C<marc_map> Fix can get one or more subfields to extract from MARC:
 
 =head2 Create a CSV file which contains a repeated field
 
-In the example below the 650a field can be repeated in some marc records.
-We will join all the repetitions in an comma delimited list for each record.
+In the example below the 650a field can be repeated in some MARC records.
+We will join all the repetitions in a comma delimited list for each record.
 
    $ catmandu convert MARC to CSV --fix 'marc_map(650a,subject,join:","); retain(subject)' < data.mrc
 
@@ -93,28 +93,28 @@ In the previous example we saw how all subjects can be printed using a few Fix c
 When a subject is repeated in a record, it will be written on one line joined by a comma:
 
     subject1
-    subject2, subject3
+    subject2,subject3
     subject4
 
-In the example over record 1 contained 'subject1', record 2 'subject2' and 'subject3' and
-record 3 'subject4'. What should we use when we want a list of all values in a long list?
+In this example, record 1 contained 'subject1', record 2 'subject2' and 'subject3' and
+record 3 'subject4'. What should we use when we want a list of all values in a single long list?
 
 In the example below we'll print all ISBN numbers in a batch of MARC records in one long list
 using the Text exporter:
 
-  $ catmandu convert MARC to Text --field_sep "\n" --fix 'marc_map(020a,isbn.\$append); retain(isbn)' < data.mrc
+  $ catmandu convert MARC to Text --field_sep "\n" --fix 'marc_map(020a,isbn.$append); retain(isbn)' < data.mrc
 
-The first new thing is the C<$append> in the marc_map. This will create in C<isbn> a
-list of all ISBN numbers found in the C<020a> field. Because C<$> signs have a special meaning on
-the command line they need to be escaped with a backslash C<\>. The C<Text> exporter with the C<field_sep>
-option will make use all the list in the C<isbn> field are written on a new line.
+The first new thing is C<$append> in the marc_map. This will create in C<isbn> a
+list of all ISBN numbers found in the C<020a> field. 
+The C<Text> exporter with the C<field_sep>
+option will use all list values in the C<isbn> field and writ them using new line as separator.
 
 =head2 Create a list of all unique ISBN numbers in the data
 
 Given the result of the previous command, it is now easy to create a unique list of ISBN numbers
 with the UNIX C<uniq> command:
 
- $ catmandu convert MARC to Text --field_sep "\n" --fix 'marc_map(020a,isbn.\$append); retain(isbn)' < data.mrc | uniq
+ $ catmandu convert MARC to Text --field_sep "\n" --fix 'marc_map(020a,isbn.$append); retain(isbn)' < data.mrc | sort | uniq
 
 =head2 Create a list of the number of subjects per record
 
@@ -123,7 +123,7 @@ in this list for each record. The CSV file will contain the C<_id> (record
 identifier) and C<subject> the number of 650a fields.
 
 Writing all Fixes on the command line can become tedious. In Catmandu it is possible
-to create a Fix script which contains all the Fix commands.
+to create a Fix script that contains all the Fix commands.
 
 Open a text editor and create the C<myfix.fix> file with content:
 
@@ -150,13 +150,13 @@ Open a text editor and create the C<myfix.fix> file with content:
 
     retain(isbn)                  # only keep this field
 
-All the text after the C<#> sign are inline code comments.
+Text after the C<#> sign are inline code comments.
 
 And run the command:
 
     $ catmandu convert MARC to Text --field_sep "\n" --fix myfix.fix < data.mrc
 
-=head2 Show which MARC record don't contain a 900a field matching some list of values
+=head2 Show which MARC records don't contain a 900a field matching some list of values
 
 First we need to create a list of keys that need to be matched against our MARC records.
 In the example below we create a CSV file with a C<key> , C<value>
@@ -193,7 +193,7 @@ And now run the command:
 
 To process this information we need to create a Fix script like the
 one below (line numbers are added here to explain the working of this script
-but don't need to be included in the script):
+but should not be included in the script):
 
     01: marc_map('***',text.$append)
     02:

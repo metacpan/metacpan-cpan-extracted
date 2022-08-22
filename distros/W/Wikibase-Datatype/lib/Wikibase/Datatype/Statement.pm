@@ -11,7 +11,7 @@ use Readonly;
 
 Readonly::Array our @RANKS => qw(normal preferred deprecated);
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
 
 has id => (
 	is => 'ro',
@@ -188,6 +188,8 @@ Returns Wikibase::Datatype::Snak instance.
 
 =head1 EXAMPLE
 
+=for comment filename=create_and_print_statement.pl
+
  use strict;
  use warnings;
 
@@ -320,6 +322,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.19
+0.20
 
 =cut

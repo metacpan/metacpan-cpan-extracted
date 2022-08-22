@@ -8,7 +8,7 @@ package IO::Async::Test;
 use strict;
 use warnings;
 
-our $VERSION = '0.801';
+our $VERSION = '0.802';
 
 use Exporter 'import';
 our @EXPORT = qw(
@@ -124,11 +124,13 @@ Defaults to 10 seconds.
 
 =cut
 
+our $Level = 0;
+
 sub wait_for(&@)
 {
    my ( $cond, %opts ) = @_;
 
-   my ( undef, $callerfile, $callerline ) = caller;
+   my ( undef, $callerfile, $callerline ) = caller( $Level );
 
    my $timedout = 0;
    my $timerid = $loop->watch_time(
@@ -187,6 +189,7 @@ sub wait_for_stream(&$$)
       }
    );
 
+   local $Level = $Level + 1;
    # Have to defeat the prototype... grr I hate these
    &wait_for( $cond );
 
@@ -211,6 +214,7 @@ sub wait_for_future
 {
    my ( $future ) = @_;
 
+   local $Level = $Level + 1;
    wait_for { $future->is_ready };
 
    return $future;

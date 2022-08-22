@@ -36,10 +36,6 @@ my(%params) =
 		AUTHOR   => 'Leon Brocard <acme@astray.com>',
 		ABSTRACT => "Interface to AT&T's GraphViz. Deprecated. See GraphViz2",
 	) : (),
-	clean =>
-	{
-		FILES => 'blib/* Makefile MANIFEST GraphViz-*'
-	},
 	dist =>
 	{
 		'COMPRESS' => 'gzip -9f',

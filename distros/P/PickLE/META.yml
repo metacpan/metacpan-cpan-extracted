@@ -1,0 +1,66 @@
+---
+abstract: 'An electronic component pick list application and file parser library.'
+author:
+  - 'Nathan Campos <nathan@innoveworkshop.com>'
+build_requires:
+  Test::Exception: '0.43'
+configure_requires:
+  Minilla: v3.1.19
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PickLE
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::pickle::OptArgs:
+    file: lib/App/pickle/OptArgs.pm
+  App::pickle::export:
+    file: lib/App/pickle/export.pm
+  App::pickle::import:
+    file: lib/App/pickle/import.pm
+  PickLE:
+    file: lib/PickLE.pm
+    version: v0.1.0
+  PickLE::Category:
+    file: lib/PickLE/Category.pm
+  PickLE::Component:
+    file: lib/PickLE/Component.pm
+  PickLE::Converter::EagleBOM:
+    file: lib/PickLE/Converter/EagleBOM.pm
+  PickLE::Document:
+    file: lib/PickLE/Document.pm
+  PickLE::Exporter::HTML:
+    file: lib/PickLE/Exporter/HTML.pm
+  PickLE::Exporter::JSON:
+    file: lib/PickLE/Exporter/JSON.pm
+  PickLE::Property:
+    file: lib/PickLE/Property.pm
+requires:
+  JSON::MaybeXS: '1.004003'
+  Mojolicious: '9.26'
+  Moo: '2.005004'
+  OptArgs2: v0.0.11
+  Text::CSV: '2.01'
+  XML::Writer: '0.900'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/nathanpc/pickle/issues
+  homepage: https://github.com/nathanpc/pickle
+  repository: https://github.com/nathanpc/pickle.git
+version: v0.1.0
+x_authority: cpan:NATHANPC
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -3,6 +3,23 @@ use warnings;
 
 use Test::More;
 use Prima::sys::Test;
+use Prima::Application;
+
+## image fill patterns:
+# mono with mostly 0s
+my $fp0m = Prima::Image->new( type => im::BW, size => [2,2] );
+$fp0m->pixel(1,1,0xffffff);
+# mono with mostly 1s
+my $fp1m = Prima::Image->new( type => im::BW, size => [2,2] );
+$fp1m->pixel(0,0,0xffffff);
+$fp1m->pixel(0,1,0xffffff);
+$fp1m->pixel(1,0,0xffffff);
+# their colored clones
+my $fp0a = $fp0m->clone( type => 1 );
+my $fp1a = $fp1m->clone( type => 1 );
+my $fp0c = $fp0m->clone( type => 4 );
+my $fp1c = $fp1m->clone( type => 4 );
+
 
 my $x = Prima::DeviceBitmap-> create( type => dbt::Bitmap, width => 8, height => 8);
 
@@ -28,6 +45,7 @@ $x-> lineWidth( 1);
 is( $x-> pixel( 2, 4), 0, "lineWidth");
 is( $x-> pixel( 5, 3), 0, "lineWidth");
 
+$x->rop2(rop::CopyPut);
 $x-> color( cl::White);
 $x-> bar( 0, 0, 7, 7);
 $x-> color( cl::Black);
@@ -39,7 +57,8 @@ $bl-> type( im::Byte);
 my $bl1 = $bl->data;
 SKIP: {
 	skip "bad graphics driver", 2 unless
-		unpack('H*', $bl1) eq (('ff00' x 4).('00ff' x 4))x4;
+		unpack('H*', $bl1) eq (('ff00' x 4).('00ff' x 4))x4 or
+		unpack('H*', $bl1) eq (('00ff' x 4).('ff00' x 4))x4;
 
 $x-> fillPattern( fp::SimpleDots);
 $x-> fillPatternOffset(1,0);
@@ -78,7 +97,75 @@ $x-> rop( rop::XorPut);
 $x-> bar( 0, 0, 1, 1);
 $x-> rop( rop::CopyPut);
 is( $x-> pixel( 0, 0), 0, "rob paint" );
-
 $x-> destroy;
+
+
+my $subtest;
+sub check
+{
+	my ($test, $sum, $fp, %opt) = @_;
+	$x->set(%opt, fillPattern => $fp);
+	$x->bar(0,0,7,7);
+	my $xsum = $x->image->extract(0,0,2,2)->clone(type => im::Byte)->sum / 255;
+	$xsum = int($xsum * 10 + .5) / 10;
+	is( $xsum, $sum, "$test on $subtest");
+}
+
+my $can_argb = $::application->get_system_value(sv::LayeredWidgets);
+for my $aa ( 0, 1 ) {
+for my $subtype ( dbt::Bitmap, dbt::Pixmap, dbt::Layered ) {
+	if ( $subtype == dbt::Bitmap ) {
+		$subtest = 'bitmap';
+	} elsif ( $subtype == dbt::Pixmap ) {
+		$subtest = 'pixmap';
+	} else {
+		$subtest = 'layered';
+		unless ( $can_argb ) {
+			diag "skipped layered\n";
+			next;
+		}
+	}
+	$subtest .= '.aa' if $aa;
+
+	$x = Prima::DeviceBitmap-> create( type => $subtype, width => 8, height => 8, antialias => $aa);
+
+	$x->rop2(rop::CopyPut);
+	check( "fp0m WB", 1, $fp0m, color => cl::White, backColor => cl::Black );
+	check( "fp0m BW", 3, $fp0m, color => cl::Black, backColor => cl::White );
+	check( "fp1m WB", 3, $fp1m, color => cl::White, backColor => cl::Black );
+	check( "fp1m WB", 3, $fp1m, color => cl::White, backColor => cl::Black );
+	check( "fpXm WW", 4, $fp0m, color => cl::White, backColor => cl::White );
+	check( "fpXm BB", 0, $fp1m, color => cl::Black, backColor => cl::Black );
+
+	$x->rop2(rop::NoOper);
+	$x->backColor(cl::White);
+	$x->clear;
+	check( "fpXm BT", 1, $fp1m, color => cl::Black, backColor => cl::Black );
+	$x->rop2(rop::CopyPut);
+
+	check( "fp0a", 1, $fp0a, color => cl::White, backColor => cl::Black );
+	check( "fp1a", 3, $fp1a, color => cl::White, backColor => cl::Black );
+	check( "fpXa", 3, $fp1a, color => cl::White, backColor => cl::White );
+	check( "fp0c", 1, $fp0c, color => cl::White, backColor => cl::Black );
+	check( "fp1c", 3, $fp1c, color => cl::White, backColor => cl::Black );
+	check( "fpXc", 3, $fp1c, color => cl::White, backColor => cl::White );
+}}
+
+if ( $can_argb  ) {
+	my $mask1x0 = Prima::Image->new( size => [2,2], type => im::BW, data => "\1" x 8);
+	my $mask8x8 = Prima::Image->new( size => [2,2], type => im::Byte, data => "\x80" x 8);
+	my $mask8xf = Prima::Image->new( size => [2,2], type => im::Byte, data => "\xff" x 8);
+
+	$x = Prima::DeviceBitmap-> create( type => dbt::Layered, width => 8, height => 8, antialias => 1);
+	$x->clear;
+	check( "fpi0m", 1, Prima::Icon->create_combined( $fp0m, $mask1x0 ), color => cl::White, backColor => cl::White);
+	$x->backColor(cl::White);
+	$x->clear;
+	check( "fpi8c", 3.5, Prima::Icon->create_combined( $fp1c, $mask8x8 ));
+	$x->clear;
+	check( "fpifc", 3, Prima::Icon->create_combined( $fp1c, $mask8xf ));
+
+}
+
 
 done_testing;

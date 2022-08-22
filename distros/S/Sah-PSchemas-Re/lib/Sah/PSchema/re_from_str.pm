@@ -3,9 +3,9 @@ package Sah::PSchema::re_from_str;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-09'; # DATE
+our $DATE = '2022-08-20'; # DATE
 our $DIST = 'Sah-PSchemas-Re'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 sub meta {
     return +{
@@ -66,7 +66,7 @@ Sah::PSchema::re_from_str - Regexp object from string (parameterized)
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::PSchema::re_from_str (from Perl distribution Sah-PSchemas-Re), released on 2022-07-09.
+This document describes version 0.002 of Sah::PSchema::re_from_str (from Perl distribution Sah-PSchemas-Re), released on 2022-08-20.
 
 =for Pod::Coverage ^(.+)$
 
@@ -79,6 +79,8 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-PSchem
 Source repository is at L<https://github.com/perlancar/perl-Sah-PSchemas-Re>.
 
 =head1 SEE ALSO
+
+L<Sah::Schema::re_from_str>, a non-parameterized version of this schema.
 
 L<Regexp::From::String>
 
@@ -99,9 +101,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,5 +1,10 @@
-README
-MANIFEST
-lsMode.pm
+Changes
 Makefile.PL
+inc/boilerplate.pl
+lib/Stat/lsMode.pm
 t/t.t
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+LICENSE
+README

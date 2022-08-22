@@ -1,7 +1,8 @@
 package Data::Password::zxcvbn::Match::UserInput;
 use Moo;
+use mro;
 extends 'Data::Password::zxcvbn::Match::Dictionary';
-our $VERSION = '1.0.4'; # VERSION
+our $VERSION = '1.0.6'; # VERSION
 # ABSTRACT: match class for words that match other user-supplied information
 
 
@@ -53,7 +54,7 @@ sub make {
     # them when providing feedback
     my %user_dicts;
     for my $field (keys %{$user_input}) {
-        my $value = $user_input->{$field};
+        my $value = $user_input->{$field} or next;
         $user_dicts{$field} = {
             $class->_split_to_hash($value,$WORD_BOUNDARY_SPLIT_MORE_RE),
             $class->_split_to_hash($value,$WORD_BOUNDARY_SPLIT_LESS_RE),
@@ -104,7 +105,7 @@ Data::Password::zxcvbn::Match::UserInput - match class for words that match othe
 
 =head1 VERSION
 
-version 1.0.4
+version 1.0.6
 
 =head1 DESCRIPTION
 
@@ -162,7 +163,7 @@ Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by BroadBean UK, a CareerBuilder Company.
+This software is copyright (c) 2022 by BroadBean UK, a CareerBuilder Company.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

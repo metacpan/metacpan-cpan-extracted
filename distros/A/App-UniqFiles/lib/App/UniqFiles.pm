@@ -6,11 +6,12 @@ use warnings;
 use Log::ger;
 
 use Exporter qw(import);
+use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-09'; # DATE
+our $DATE = '2022-08-19'; # DATE
 our $DIST = 'App-UniqFiles'; # DIST
-our $VERSION = '0.133'; # VERSION
+our $VERSION = '0.134'; # VERSION
 
 our @EXPORT_OK = qw(uniq_files);
 
@@ -70,11 +71,11 @@ Note that this routine does not compute digest for files which have unique
 sizes, so they will show up as empty.
 
 _
-            schema => 'bool*',
+            schema => 'true*',
         },
         show_size => {
             summary => 'Show the size for each file',
-            schema => 'bool*',
+            schema => 'true*',
         },
         # TODO add option follow_symlinks?
         report_unique => {
@@ -124,13 +125,13 @@ _
 
 Can be set to either 0, 1, 2.
 
-If set to 2 (the default), will only return the first of duplicate items. For
-example: `file1` contains text 'a', `file2` 'b', `file3` 'a'. Only `file1` will
-be returned because `file2` is unique and `file3` contains 'a' (already
-represented by `file1`).
+If set to 2 (the default for `uniq-files`), will only return the first of
+duplicate items. For example: `file1` contains text 'a', `file2` 'b', `file3`
+'a'. Only `file1` will be returned because `file2` is unique and `file3`
+contains 'a' (already represented by `file1`).
 
-If set to 1, will return all the the duplicate files. From the above example:
-`file1` and `file3` will be returned.
+If set to 1 (the default for `dupe-files`), will return all the the duplicate
+files. From the above example: `file1` and `file3` will be returned.
 
 If set to 3, will return all but the first of duplicate items. From the above
 example: `file3` will be returned. This is useful if you want to keep only one
@@ -188,6 +189,11 @@ duplicate, and so on.
 _
             cmdline_aliases => {count=>{}, c=>{}},
         },
+        detail => {
+            summary => 'Show details (a.k.a. --show-digest, --show-size, --show-count)',
+            schema => 'true*',
+            cmdline_aliases => {l=>{}},
+        },
     },
     examples => [
         {
@@ -198,8 +204,8 @@ _
             'x.doc.show_result' => 0,
         },
         {
-            summary   => 'List all files which have duplicate contents',
-            src       => 'uniq-files -d *',
+            summary   => 'List all files (recursively, and in detail) which have duplicate contents (all duplicate copies)',
+            src       => 'uniq-files -R -l -d *',
             src_plang => 'bash',
             test      => 0,
             'x.doc.show_result' => 0,
@@ -249,6 +255,12 @@ sub uniq_files {
     my $digest_args      = $args{digest_args};
     my $algorithm        = $args{algorithm}        // ($digest_args ? 'Digest' : 'md5');
     my $group_by_digest  = $args{group_by_digest};
+
+    if ($args{detail}) {
+        $show_digest = 1;
+        $show_size = 1;
+        $show_count = 1;
+    }
 
     if ($recurse) {
         $files = [ map {
@@ -396,6 +408,36 @@ sub uniq_files {
     [200, "OK", \@rows, \%resmeta];
 }
 
+gen_modified_sub(
+    base_name => 'uniq_files',
+    output_name => 'dupe_files',
+    modify_args => {
+        report_unique => sub {
+            $_[0]{schema} = [bool => {default=>0}];
+        },
+        report_duplicate => sub {
+            $_[0]{schema} = [int => {in=>[0,1,2,3], default=>1}];
+        },
+    },
+    modify_meta => sub {
+        $_[0]{examples} = [
+            {
+                summary   => 'List all files (recursively, and in detail) which have duplicate contents (all duplicate copies)',
+                src       => 'dupe-files -lR *',
+                src_plang => 'bash',
+                test      => 0,
+                'x.doc.show_result' => 0,
+            },
+        ];
+    },
+    output_code => sub {
+        my %args = @_;
+        $args{report_unique} //= 0;
+        $args{report_duplicate} //= 1;
+        uniq_files(%args);
+    },
+);
+
 1;
 # ABSTRACT: Report or omit duplicate file contents
 
@@ -411,7 +453,7 @@ App::UniqFiles - Report or omit duplicate file contents
 
 =head1 VERSION
 
-This document describes version 0.133 of App::UniqFiles (from Perl distribution App-UniqFiles), released on 2022-05-09.
+This document describes version 0.134 of App::UniqFiles (from Perl distribution App-UniqFiles), released on 2022-08-19.
 
 =head1 SYNOPSIS
 
@@ -420,6 +462,113 @@ This document describes version 0.133 of App::UniqFiles (from Perl distribution 
 =head1 NOTES
 
 =head1 FUNCTIONS
+
+
+=head2 dupe_files
+
+Usage:
+
+ dupe_files(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Report or omit duplicate file contents.
+
+Given a list of filenames, will check each file size and content for duplicate
+content. Interface is a bit like the C<uniq> Unix command-line program.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<algorithm> => I<str>
+
+What algorithm is used to compute the digest of the content.
+
+The default is to use C<md5>. Some algorithms supported include C<crc32>, C<sha1>,
+C<sha256>, as well as C<Digest> to use Perl L<Digest> which supports a lot of
+other algorithms, e.g. C<SHA-1>, C<BLAKE2b>.
+
+If set to '', 'none', or 'size', then digest will be set to file size. This
+means uniqueness will be determined solely from file size. This can be quicker
+but will generate a false positive when two files of the same size are deemed as
+duplicate even though their content may be different.
+
+=item * B<detail> => I<true>
+
+Show details (a.k.a. --show-digest, --show-size, --show-count).
+
+=item * B<digest_args> => I<array>
+
+Some Digest algorithms require arguments, you can pass them here.
+
+=item * B<files>* => I<array[str]>
+
+=item * B<group_by_digest> => I<bool>
+
+Sort files by its digest (or size, if not computing digest), separate each different digest.
+
+=item * B<recurse> => I<bool>
+
+If set to true, will recurse into subdirectories.
+
+=item * B<report_duplicate> => I<int> (default: 1)
+
+Whether to return duplicate items.
+
+Can be set to either 0, 1, 2.
+
+If set to 2 (the default for C<uniq-files>), will only return the first of
+duplicate items. For example: C<file1> contains text 'a', C<file2> 'b', C<file3>
+'a'. Only C<file1> will be returned because C<file2> is unique and C<file3>
+contains 'a' (already represented by C<file1>).
+
+If set to 1 (the default for C<dupe-files>), will return all the the duplicate
+files. From the above example: C<file1> and C<file3> will be returned.
+
+If set to 3, will return all but the first of duplicate items. From the above
+example: C<file3> will be returned. This is useful if you want to keep only one
+copy of the duplicate content. You can use the output of this routine to C<mv> or
+C<rm>.
+
+If set to 0, duplicate items will not be returned.
+
+=item * B<report_unique> => I<bool> (default: 0)
+
+Whether to return unique items.
+
+=item * B<show_count> => I<bool> (default: 0)
+
+Whether to return each file content's number of occurence.
+
+1 means the file content is only encountered once (unique), 2 means there is one
+duplicate, and so on.
+
+=item * B<show_digest> => I<true>
+
+Show the digest value (or the size, if not computing digest) for each file.
+
+Note that this routine does not compute digest for files which have unique
+sizes, so they will show up as empty.
+
+=item * B<show_size> => I<true>
+
+Show the size for each file.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
 
 
 =head2 uniq_files
@@ -452,6 +601,10 @@ means uniqueness will be determined solely from file size. This can be quicker
 but will generate a false positive when two files of the same size are deemed as
 duplicate even though their content may be different.
 
+=item * B<detail> => I<true>
+
+Show details (a.k.a. --show-digest, --show-size, --show-count).
+
 =item * B<digest_args> => I<array>
 
 Some Digest algorithms require arguments, you can pass them here.
@@ -472,13 +625,13 @@ Whether to return duplicate items.
 
 Can be set to either 0, 1, 2.
 
-If set to 2 (the default), will only return the first of duplicate items. For
-example: C<file1> contains text 'a', C<file2> 'b', C<file3> 'a'. Only C<file1> will
-be returned because C<file2> is unique and C<file3> contains 'a' (already
-represented by C<file1>).
+If set to 2 (the default for C<uniq-files>), will only return the first of
+duplicate items. For example: C<file1> contains text 'a', C<file2> 'b', C<file3>
+'a'. Only C<file1> will be returned because C<file2> is unique and C<file3>
+contains 'a' (already represented by C<file1>).
 
-If set to 1, will return all the the duplicate files. From the above example:
-C<file1> and C<file3> will be returned.
+If set to 1 (the default for C<dupe-files>), will return all the the duplicate
+files. From the above example: C<file1> and C<file3> will be returned.
 
 If set to 3, will return all but the first of duplicate items. From the above
 example: C<file3> will be returned. This is useful if you want to keep only one
@@ -498,14 +651,14 @@ Whether to return each file content's number of occurence.
 1 means the file content is only encountered once (unique), 2 means there is one
 duplicate, and so on.
 
-=item * B<show_digest> => I<bool>
+=item * B<show_digest> => I<true>
 
 Show the digest value (or the size, if not computing digest) for each file.
 
 Note that this routine does not compute digest for files which have unique
 sizes, so they will show up as empty.
 
-=item * B<show_size> => I<bool>
+=item * B<show_size> => I<true>
 
 Show the size for each file.
 

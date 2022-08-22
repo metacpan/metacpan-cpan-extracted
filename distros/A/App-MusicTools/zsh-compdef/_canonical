@@ -21,6 +21,7 @@ _canonical() {
     '--duration=[default duration]:value:(1 2 4 8 16 32)' \
     '(--raw --noflats)--flats[print notes as flats]' \
     '(- *)--help[emit help and exit]' \
+    '(--nomap)--map[show original in addition to calculated values]' \
     '(--noraw)--raw[emit pitch numbers not note names]' \
     {--relative=,--rel=}'[input relative to]:note:_values "note" $notes' \
     '(--noretrograde)'{--retrograde,-r}'[reverse output phrase]' \
@@ -56,6 +57,7 @@ _canonical_exact() {
     '--duration=[default duration]:value:(1 2 4 8 16 32)' \
     '(--raw --noflats)--flats[print notes as flats]' \
     '(- *)--help[emit help and exit]' \
+    '(--nomap)--map[show original in addition to calculated values]' \
     '(--noraw)--raw[emit pitch numbers not note names]' \
     {--relative=,--rel=}'[input relative to]:note:_values "note" $notes' \
     '(--noretrograde)'{--retrograde,-r}'[reverse output phrase]' \
@@ -68,6 +70,7 @@ _canonical_modal() {
     '--duration=[default duration]:value:(1 2 4 8 16 32)' \
     '(--raw --noflats)--flats[print notes as flats]' \
     '(- *)--help[emit help and exit]' \
+    '(--nomap)--map[show original in addition to calculated values]' \
     '(--noraw)--raw[emit pitch numbers not note names]' \
     {--relative=,--rel=}'[input relative to]:note:_values "note" $notes' \
     '(--noretrograde)'{--retrograde,-r}'[reverse output phrase]' \

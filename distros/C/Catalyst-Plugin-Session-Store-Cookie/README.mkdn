@@ -12,14 +12,18 @@ Catalyst::Plugin::Session::Store::Cookie - Store session data in the cookie
       Session::Store::Cookie
     /;
 
-    my %store_config = (
+    __PACKAGE__->config(
       'Plugin::Session' => {
         storage_cookie_name => ...,
         storage_cookie_expires => ...,
         storage_secret_key => ...,
+        storage_cookie_secure => ...,
+        storage_cookie_httponly => ...,
+        storage_cookie_samesite => ...,
+      },
+      ## More configuration
     );
 
-    __PACKAGE__->config('Plugin::Session::Store::Cookie' => \%store_config);
     __PACKAGE__->setup;
 
 # DESCRIPTION
@@ -40,8 +44,8 @@ on the cookie.  Also, that cookie data becomes part of every request so that
 will increase overhead on the request side of the network.  In other words a big
 cookie means more data over the wire (maybe you are paying by the byte...?)
 
-Also there are some questions as to the security of this approach.  We encrypt 
-information with [Session::Storage::Secure](https://metacpan.org/pod/Session::Storage::Secure) so you should review that and the
+Also there are some questions as to the security of this approach.  We encrypt
+information with [Session::Storage::Secure](https://metacpan.org/pod/Session%3A%3AStorage%3A%3ASecure) so you should review that and the
 notes that it includes.  Using this without SSL/HTTPS is not recommended.  Buyer
 beware.
 
@@ -84,23 +88,88 @@ right balance.
 
 ## storage\_secret\_key
 
-Used to fill the 'secret\_key' initialization parameter for [Session::Storage::Secure](https://metacpan.org/pod/Session::Storage::Secure).
+Used to fill the 'secret\_key' initialization parameter for [Session::Storage::Secure](https://metacpan.org/pod/Session%3A%3AStorage%3A%3ASecure).
 Don't let this be something you can guess or something that escapes into the
 wild...
 
 There is no default for this, you need to supply.
 
+## storage\_cookie\_secure
+
+If this attribute **set to 0** the cookie will not have the secure flag.
+
+If this attribute **set to 1** the cookie sent by the server to the client
+will get the secure flag that tells the browser to send this cookie back to
+the server only via HTTPS.
+
+If this attribute **set to 2** then the cookie will get the secure flag only if
+the request that caused cookie generation was sent over https (this option is
+not good if you are mixing https and http in your application).
+
+Default value is 0.
+
+## storage\_cookie\_httponly
+
+If this attribute **set to 0**, the cookie will not have HTTPOnly flag.
+
+If this attribute **set to 1**, the cookie will got HTTPOnly flag that should
+prevent client side Javascript accessing the cookie value - this makes some
+sort of session hijacking attacks significantly harder. Unfortunately not all
+browsers support this flag (MSIE 6 SP1+, Firefox 3.0.0.6+, Opera 9.5+); if
+a browser is not aware of HTTPOnly the flag will be ignored.
+
+Default value is 1.
+
+Note1: Many people are confused by the name "HTTPOnly" - it **does not mean**
+that this cookie works only over HTTP and not over HTTPS.
+
+Note2: This parameter requires Catalyst::Runtime 5.80005 otherwise is skipped.
+
+## storage\_cookie\_samesite
+
+This attribute configures the value of the
+[SameSite](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite)
+flag.
+
+If set to None, the cookie will be sent when making cross origin requests,
+including following links from other origins. This requires the
+["cookie\_secure"](#cookie_secure) flag to be set.
+
+If set to Lax, the cookie will not be included when embedded in or fetched from
+other origins, but will be included when following cross origin links.
+
+If set to Strict, the cookie will not be included for any cross origin requests,
+including links from different origins.
+
+Default value is `Lax`. This is the default modern browsers use.
+
+Note: This parameter requires Catalyst::Runtime 5.90125 otherwise is skipped.
+
+## sereal\_decoder\_options
+
+## sereal\_encoder\_options
+
+This should be a hashref of options passed to init args of same name in
+[Session::Storage::Secure](https://metacpan.org/pod/Session%3A%3AStorage%3A%3ASecure).  Defaults to:
+
+    sereal_encoder_options => +{ snappy => 1, stringify_unknown => 1 },
+    sereal_decoder_options => +{ validate_utf8 => 1 },
+
+Please note the default **allows** object serealization.  You may wish to
+not allow this for production setups.
+
 # AUTHOR
 
 John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+Alexander Hartmaier [email:abraxxa@cpan.org](email:abraxxa@cpan.org)
 
 # SEE ALSO
 
-[Catalyst](https://metacpan.org/pod/Catalyst), [Catalyst::Plugin::Session](https://metacpan.org/pod/Catalyst::Plugin::Session), [Session::Storage::Secure](https://metacpan.org/pod/Session::Storage::Secure)
+[Catalyst](https://metacpan.org/pod/Catalyst), [Catalyst::Plugin::Session](https://metacpan.org/pod/Catalyst%3A%3APlugin%3A%3ASession), [Session::Storage::Secure](https://metacpan.org/pod/Session%3A%3AStorage%3A%3ASecure)
 
 # COPYRIGHT & LICENSE
 
-Copyright 2015, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+Copyright 2022, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

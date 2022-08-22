@@ -1,0 +1,54 @@
+{
+   "abstract" : "format file modes like the C<ls -l> command does",
+   "author" : [
+      "Mark-Jason Dominus"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Stat-lsMode",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {},
+      "configure" : {},
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {}
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Stat-lsMode"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ap/Stat-lsMode.git",
+         "web" : "https://github.com/ap/Stat-lsMode"
+      }
+   },
+   "version" : "0.51",
+   "x_copyright" : {
+      "holder" : "Mark-Jason Dominus",
+      "year" : 1998
+   },
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

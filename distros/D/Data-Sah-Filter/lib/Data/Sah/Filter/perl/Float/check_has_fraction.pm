@@ -4,12 +4,10 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Data::Dmp;
-
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-04'; # DATE
+our $DATE = '2022-07-16'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 sub meta {
     +{
@@ -54,13 +52,29 @@ Data::Sah::Filter::perl::Float::check_has_fraction - Check that a floating point
 
 =head1 VERSION
 
-This document describes version 0.010 of Data::Sah::Filter::perl::Float::check_has_fraction (from Perl distribution Data-Sah-Filter), released on 2022-07-04.
+This document describes version 0.011 of Data::Sah::Filter::perl::Float::check_has_fraction (from Perl distribution Data-Sah-Filter), released on 2022-07-16.
 
 =head1 SYNOPSIS
 
-Use in Sah schema's C<prefilters> (or C<postfilters>) clause:
+=head2 Using in Sah schema's C<prefilters> (or C<postfilters>) clause
 
- ["str","prefilters",["Float::check_has_fraction"]]
+ ["str","prefilters",[["Float::check_has_fraction"]]]
+
+=head2 Using with L<Data::Sah>:
+
+ use Data::Sah qw(gen_validator);
+ 
+ my $schema = ["str","prefilters",[["Float::check_has_fraction"]]];
+ my $validator = gen_validator($schema);
+ if ($validator->($some_data)) { print 'Valid!' }
+
+=head2 Using with L<Data::Sah:Filter> directly:
+
+ use Data::Sah::Filter qw(gen_filter);
+
+ my $filter = gen_filter([["Float::check_has_fraction"]]);
+ # $errmsg will be empty/undef when filtering succeeds
+ my ($errmsg, $filtered_value) = $filter->($some_data);
 
 =head1 DESCRIPTION
 

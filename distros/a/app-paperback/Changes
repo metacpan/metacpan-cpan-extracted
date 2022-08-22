@@ -1,0 +1,32 @@
+Revision history for Perl module and script App::paperback.
+
+0.42  Mon Aug 22 12:00:00 2022
+	-  Drop o switch in matches (William Lindley) and some useless variables
+
+0.41  Mon Aug 22 07:00:00 2022
+	- Typo fixed (thanks go to William Lindley)
+
+0.40  Sun Aug 21 18:00:00 2022
+	- Perlify some ifs and elses with postfix notation
+
+0.39  Sun Aug 21 12:00:00 2022
+	- Add CONTRIBUTING.md
+
+0.38  Sun Aug 21 08:00:00 2022
+	- Mark as stable
+
+0.37  Sun Aug 21 07:00:00 2022
+	- Add META file as expected by CPAN
+
+0.36  Sat Aug 20 21:00:00 2022
+	- Replace Unicode characters with ASCII, for cleaner output on Windows
+
+0.35  Sat Aug 20 17:00:00 2022
+	- Exclude Git bookkeeping from distribution ;)
+
+0.34  Sat Aug 20 16:00:00 2022
+	- Synchronize min Perl needed to install and run to v5.10
+
+0.33  Sat Aug 20 13:00:00 2022
+	- First public version
+

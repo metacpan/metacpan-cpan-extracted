@@ -2,29 +2,29 @@ package SPVM::Regex::Replacer;
 
 1;
 
-=head1 NAME
+=head1 Name
 
 SPVM::Regex::Replacer - Interface Type for Regex Replacement Callback
 
-=head1 SYNOPSYS
+=head1 Usage
   
   use Regex::Replacer;
   use Regex;
   
   my $replacer = (Regex::Replacer)method : string ($re : Regex) {
-    my $replaced_string_match = "AB" . $re->captures->[0] . "C";
+    my $replaced_string_match = "AB" . $re->cap1 . "C";
     return $replaced_string_match;
   });
   
   my $string = "abc";
   my $re = Regex->new("ab(c)");
-  my $replaced_string = $re->replace_all_cb($string, 0, $replacer);
+  my $replaced_string = $re->replace_g($string, $replacer);
 
-=head1 DESCRIPTION
+=head1 Description
 
 L<Regex::Replacer|SPVM::Regex::Replacer> is the interface type for the regex replacement callback.
 
-=head1 INTERFACE METHODS
+=head1 Interface Methods
 
   required method : string ($re : Regex)
 

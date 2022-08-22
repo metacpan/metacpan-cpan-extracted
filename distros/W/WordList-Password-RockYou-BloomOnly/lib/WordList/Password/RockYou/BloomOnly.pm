@@ -1,11 +1,13 @@
 package WordList::Password::RockYou::BloomOnly;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-24'; # DATE
-our $DIST = 'WordList-Password-RockYou-BloomOnly'; # DIST
-our $VERSION = '0.002'; # VERSION
-
+use strict;
+use warnings;
 use parent qw(WordList);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-08-20'; # DATE
+our $DIST = 'WordList-Password-RockYou-BloomOnly'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 our $SORT = 'popularity';
 
@@ -24,12 +26,12 @@ sub word_exists {
 
         my $dir;
         eval {
-            $dir = dist_dir('WordList-Password-RockYou-BloomOnly');
+            $dir = File::ShareDir::dist_dir('WordList-Password-RockYou-BloomOnly');
         };
         if ($@) {
             $dir = "share";
         }
-        (-d $dir) or die "Can't find share dir";
+        (-d $dir) or die "Can't find share dir".($@ ? ": $@" : "");
         my $path = "$dir/bloom";
         (-f $path) or die "Can't find bloom filter data file '$path'";
         $bloom = Algorithm::BloomFilter->deserialize(File::Slurper::read_binary($path));
@@ -52,7 +54,7 @@ WordList::Password::RockYou::BloomOnly - RockYou password wordlist (~14.3mil pas
 
 =head1 VERSION
 
-This document describes version 0.002 of WordList::Password::RockYou::BloomOnly (from Perl distribution WordList-Password-RockYou-BloomOnly), released on 2020-05-24.
+This document describes version 0.003 of WordList::Password::RockYou::BloomOnly (from Perl distribution WordList-Password-RockYou-BloomOnly), released on 2022-08-20.
 
 =head1 DESCRIPTION
 
@@ -77,6 +79,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/WordList-P
 
 Source repository is at L<https://github.com/perlancar/perl-WordList-Password-RockYou-BloomOnly>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-Password-RockYou-BloomOnly>
@@ -84,16 +115,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

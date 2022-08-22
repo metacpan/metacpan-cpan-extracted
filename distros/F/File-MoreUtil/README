@@ -2,8 +2,8 @@ NAME
     File::MoreUtil - File-related utilities
 
 VERSION
-    This document describes version 0.625 of File::MoreUtil (from Perl
-    distribution File-MoreUtil), released on 2021-10-13.
+    This document describes version 0.626 of File::MoreUtil (from Perl
+    distribution File-MoreUtil), released on 2022-08-08.
 
 SYNOPSIS
      use File::MoreUtil qw(
@@ -56,6 +56,13 @@ FUNCTIONS
     This function performs the following test:
 
      !(-l "sym") && (-e _) || (-l _)
+
+    Which one should you use: "-e" or "file_exists"? It depends on whether
+    you want to consider a broken symlink as "existing" or not. Sometimes
+    one is more appropriate than the other. If you use "-e", your
+    application might overwrite a (temporarily) broken symlink; on the other
+    hand if you use "file_exists", your application will see a file as
+    existing but gets confused when it cannot open it.
 
   l_abs_path
     Usage:
@@ -169,6 +176,33 @@ FUNCTIONS
     Will return true if $dir exists and has one or more non-dot
     subdirectories (i.e. subdirectories with names not beginning with a dot)
     in it. A symlink to a directory does *NOT* count as subdirectory.
+
+  dir_only_has_files
+    Usage:
+
+     dir_only_has_files($dir) => BOOL
+
+    Will return true if $dir exists and has one or more plain files in it
+    *and* does not have anything else. See "dir_has_files" for the
+    definition of plain files.
+
+  dir_only_has_dot_files
+    Usage:
+
+     dir_only_has_dot_files($dir) => BOOL
+
+    Will return true if $dir exists and has one or more plain dot files in
+    it *and* does not have anything else. See "dir_has_files" for the
+    definition of plain files.
+
+  dir_only_has_non_dot_files
+    Usage:
+
+     dir_only_has_non_dot_files($dir) => BOOL
+
+    Will return true if $dir exists and has one or more plain non-dot files
+    in it *and* does not have anything else. See "dir_has_files" for the
+    definition of plain files.
 
   get_dir_entries
     Usage:
@@ -305,7 +339,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/perlancar/perl-File-MoreUtil>.
+    <https://github.com/perlancar/perl-SHARYANTO-File-Util>.
 
 SEE ALSO
     App::FileTestUtils includes CLI's for functions like "dir_empty", etc.
@@ -327,13 +361,13 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2019, 2017, 2015, 2014, 2013
+    This software is copyright (c) 2022, 2020, 2019, 2017, 2015, 2014, 2013
     by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

@@ -6,7 +6,7 @@ use Type::Library -base;
 use Types::Standard qw/Dict Int Map Num/;
 
 my $Feature = __PACKAGE__->add_type(
-    constraint => q{ List::MoreUtils::all { $_ eq int and $_ > 0 } keys %$_ },
+    constraint => q!List::MoreUtils::all { $_ > 0 } keys %$_!,
     name => 'Feature',
     parent => Map[Int, Num],
 );

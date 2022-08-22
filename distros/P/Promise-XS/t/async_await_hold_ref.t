@@ -4,11 +4,13 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::FailWarnings;
+use Test::FailWarnings -allow_deps => 1;
 
 if ($^V ge v5.16.0 && $^V le v5.25.0) {
     plan skip_all => "Future::AsyncAwait breaks on this perl ($^V). See https://rt.cpan.org/Public/Bug/Display.html?id=137723.";
 }
+
+use Promise::XS;
 
 BEGIN {
     for my $req ( qw( Future::AsyncAwait  AnyEvent ) ) {
@@ -19,8 +21,6 @@ BEGIN {
         plan skip_all => "Future::AsyncAwait ($Future::AsyncAwait::VERSION) is too old.";
     };
 }
-
-use Promise::XS;
 
 use Future::AsyncAwait future_class => 'Promise::XS::Promise';
 

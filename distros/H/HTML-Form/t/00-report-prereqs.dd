@@ -2,6 +2,9 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0'
+                                      },
+                        'suggests' => {
+                                        'JSON::PP' => '2.27300'
                                       }
                       },
        'develop' => {
@@ -34,10 +37,10 @@ do { my $x = {
                                       'HTML::TokeParser' => '0',
                                       'HTTP::Request' => '6',
                                       'HTTP::Request::Common' => '6.03',
+                                      'Test::More' => '0.96',
                                       'URI' => '1.10',
                                       'perl' => '5.008001',
-                                      'strict' => '0',
-                                      'vars' => '0'
+                                      'strict' => '0'
                                     }
                     },
        'test' => {
@@ -48,9 +51,7 @@ do { my $x = {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'HTTP::Response' => '0',
-                                   'Test' => '0',
-                                   'Test::More' => '0',
-                                   'lib' => '0',
+                                   'Test::More' => '0.96',
                                    'warnings' => '0'
                                  }
                  }

@@ -18,16 +18,18 @@ shift @lines if $lines[0]=~/^TAP version /; #extra line in new TAP
 my @expected=(
 "warn_2 at $file line 12.",
 'ok 1',
+"warn_1 at $file line 17.",
 'ok 2',
-"warn_2 at $file line 21.",
-'not ok 3',
-"warn_2 at $file line 27.",
-'ok 4',
-"warn_2 at $file line 31.",
-'not ok 5',
-qr/^Use of uninitialized value (?:\$a\s+)?in addition \(\+\) at \Q$file\E line 36\.$/,
-'ok 6',
-'1..6'
+'ok 3',
+"warn_2 at $file line 26.",
+'not ok 4',
+"warn_2 at $file line 32.",
+'ok 5',
+"warn_2 at $file line 36.",
+'not ok 6',
+qr/^Use of uninitialized value (?:\$a\s+)?in addition \(\+\) at \Q$file\E line 41\.$/,
+'ok 7',
+'1..7'
 );
 foreach my $i (0..$#expected) {
   if ($expected[$i]=~/^\(\?\^?\w*-?\w*:/) {

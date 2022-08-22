@@ -24,7 +24,11 @@ t/10wait_all.t
 t/11wait_any.t
 t/12needs_all.t
 t/13needs_any.t
+t/20get.t
+t/20subclass.t
+t/21times.t
 t/24label.t
+t/27udata.t
 t/90leak.t
 t/99pod.t
 t/lib/FutureTests.pm

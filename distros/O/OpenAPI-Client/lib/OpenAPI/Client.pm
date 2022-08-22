@@ -9,7 +9,7 @@ use Scalar::Util qw(blessed);
 
 use constant DEBUG => $ENV{OPENAPI_CLIENT_DEBUG} || 0;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 has base_url => sub {
   my $self      = shift;
@@ -129,7 +129,7 @@ sub _build_tx {
     [@$route{qw(method path)}],
     {
       body => sub {
-        my $name = shift;
+        my ($name, $param) = @_;
 
         if (exists $params->{$name}) {
           $content{json} = $params->{$name};
@@ -145,25 +145,25 @@ sub _build_tx {
         return {exists => $params->{$name}, value => $params->{$name}};
       },
       formData => sub {
-        my $name  = shift;
+        my ($name, $param) = @_;
         my $value = _param_as_array($name => $params);
         $content{form}{$name} = $params->{$name};
         return {exists => !!@$value, value => $value};
       },
       header => sub {
-        my $name  = shift;
+        my ($name, $param) = @_;
         my $value = _param_as_array($name => $params);
         $headers{$name} = $value;
         return {exists => !!@$value, value => $value};
       },
       path => sub {
-        my $name = shift;
+        my ($name, $param) = @_;
         return {exists => exists $params->{$name}, value => $params->{$name}};
       },
       query => sub {
-        my $name  = shift;
+        my ($name, $param) = @_;
         my $value = _param_as_array($name => $params);
-        $url->query->param($name => $value);
+        $url->query->param($name => _coerce_collection_format($value, $param));
         return {exists => !!@$value, value => $value};
       },
     }
@@ -188,6 +188,16 @@ sub _build_tx {
   $self->emit(after_build_tx => $tx);
 
   return $tx;
+}
+
+sub _coerce_collection_format {
+  my ($value, $param) = @_;
+  my $format = $param->{collectionFormat} || ($param->{type} eq 'array' ? 'csv' : '');
+  return $value if !$format or $format eq 'multi';
+  return join "|",  @$value if $format eq 'pipes';
+  return join " ",  @$value if $format eq 'ssv';
+  return join "\t", @$value if $format eq 'tsv';
+  return join ",",  @$value;
 }
 
 sub _param_as_array {

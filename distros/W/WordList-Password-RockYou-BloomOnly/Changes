@@ -1,3 +1,8 @@
+0.003   2022-08-20  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Forgot to qualify function, pass error message.
+
+
 0.002   2020-05-24  Released-By: PERLANCAR; Urgency: medium
 
 	- Update bloom filter, size=33M (previously 66M), k=13, false-positive

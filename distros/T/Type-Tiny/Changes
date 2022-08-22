@@ -7,6 +7,16 @@ Home page:    <https://metacpan.org/release/Type-Tiny>
 Bug tracker:  <https://github.com/tobyink/p5-type-tiny/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+1.016008	2022-08-14
+
+ - Added: Type::Params now has a `goto_next` option, which if set to a
+   coderef will generate a signature which on success, instead of returning
+   @_, passes @_ to the coderef. If `goto_next` is set to true, the
+   signature instead expects to be passed such a coderef as its first
+   argument.
+ - Eval::TypeTiny::CodeAccumulator now better handles placeholders.
+ - Type::Params `wrap_subs` and `wrap_methods` internally use `goto_next`.
+
 1.016007	2022-08-04
 
  - Added: Type::Params now has a `strictness` option, which if set to false

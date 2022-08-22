@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Venus::Class;
+use Venus::Class 'base';
 
 base 'Venus::Name';
 
@@ -115,6 +115,7 @@ sub call {
     my $throw;
     my $error = qq(Attempt to call undefined class method in package "$class");
     $throw = $self->throw;
+    $throw->name('on.call.undefined');
     $throw->message($error);
     $throw->stash(package => $self->package);
     $throw->stash(routine => $func);
@@ -133,6 +134,7 @@ sub call {
     my $throw;
     my $error = qq(Unable to locate class method "$func" via package "$class");
     $throw = $self->throw;
+    $throw->name('on.call.missing');
     $throw->message($error);
     $throw->stash(package => $self->package);
     $throw->stash(routine => $func);
@@ -206,6 +208,7 @@ sub cop {
     my $throw;
     my $error = qq(Attempt to cop undefined object method from package "$class");
     $throw = $self->throw;
+    $throw->name('on.cop.undefined');
     $throw->message($error);
     $throw->stash(package => $self->package);
     $throw->stash(routine => $func);
@@ -218,6 +221,7 @@ sub cop {
     my $throw;
     my $error = qq(Unable to locate object method "$func" via package "$class");
     $throw = $self->throw;
+    $throw->name('on.cop.missing');
     $throw->message($error);
     $throw->stash(package => $self->package);
     $throw->stash(routine => $func);
@@ -260,6 +264,7 @@ sub eval {
   if (my $error = $@) {
     my $throw;
     $throw = $self->throw;
+    $throw->name('on.eval');
     $throw->message($error);
     $throw->stash(package => $self->package);
     $throw->error;
@@ -349,6 +354,7 @@ sub load {
     my $throw;
     $error = qq(Error attempting to load $class: @{[$error || 'cause unknown']});
     $throw = $self->throw;
+    $throw->name('on.load');
     $throw->message($error);
     $throw->stash(package => $self->package);
     $throw->error;

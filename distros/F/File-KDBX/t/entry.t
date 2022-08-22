@@ -84,6 +84,17 @@ subtest 'Accessors' => sub {
     $entry->creation_time('2022-02-02 12:34:56');
     cmp_ok $entry->creation_time->epoch, '==', 1643805296, 'Creation time coerced into a Time::Piece (epoch)';
     is $entry->creation_time->datetime, '2022-02-02T12:34:56', 'Creation time coerced into a Time::Piece';
+
+    $entry->username('foo');
+    cmp_deeply $entry->strings->{UserName}, {
+        value   => 'foo',
+    }, 'Username setter works';
+
+    $entry->password('bar');
+    cmp_deeply $entry->strings->{Password}, {
+        value   => 'bar',
+        protect => bool(1),
+    }, 'Password setter works';
 };
 
 subtest 'Custom icons' => sub {
@@ -167,6 +178,34 @@ subtest 'Auto-type' => sub {
 
     (undef, my $keys) = @{$entries->next};
     is $keys, 'blah', 'Select the correct association';
+};
+
+subtest 'Memory protection' => sub {
+    my $kdbx = File::KDBX->new;
+
+    is exception { $kdbx->lock }, undef, 'Can lock empty database';
+    $kdbx->unlock;  # should be no-op since nothing was locked
+
+    my $entry = $kdbx->root->add_entry(
+        title    => 'My Bank',
+        username => 'mreynolds',
+        password => 's3cr3t',
+    );
+    $entry->string(Custom => 'foo', protect => 1);
+    $entry->binary(Binary => 'bar', protect => 1);
+    $entry->binary(UnprotectedBinary => 'baz');
+
+    is exception { $kdbx->lock }, undef, 'Can lock new database';
+    is $entry->username, 'mreynolds', 'UserName does not get locked';
+    is $entry->password, undef, 'Password is lockable';
+    is $entry->string_value('Custom'), undef, 'Custom is lockable';
+    is $entry->binary_value('Binary'), undef, 'Binary is lockable';
+    is $entry->binary_value('UnprotectedBinary'), 'baz', 'Unprotected binary does not get locked';
+
+    $kdbx->unlock;
+    is $entry->password, 's3cr3t', 'Password is unlockable';
+    is $entry->string_value('Custom'), 'foo', 'Custom is unlockable';
+    is $entry->binary_value('Binary'), 'bar', 'Binary is unlockable';
 };
 
 done_testing;

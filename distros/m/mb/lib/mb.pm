@@ -13,7 +13,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.46';
+$VERSION = '0.47';
 $VERSION = $VERSION;
 
 # internal use
@@ -226,7 +226,7 @@ END
         for (@ARGV) {
 
             # has space
-            if (/\A (?:$x)*? [ ] /oxms) {
+            if (/\A (?:$x)*? [ ] /xms) {
                 if (my @glob = mb::dosglob(qq{"$_"})) {
                     push @argv, @glob;
                 }
@@ -236,7 +236,7 @@ END
             }
 
             # has wildcard metachar
-            elsif (/\A (?:$x)*? [*?] /oxms) {
+            elsif (/\A (?:$x)*? [*?] /xms) {
                 if (my @glob = mb::dosglob($_)) {
                     push @argv, @glob;
                 }
@@ -507,7 +507,7 @@ sub mb::index_byte ($$;$) {
                 return $pos;
             }
         }
-        if (CORE::substr($str,$pos) =~ /\A($x)/oxms) {
+        if (CORE::substr($str,$pos) =~ /\A($x)/xms) {
             $pos += CORE::length($1);
         }
         else {
@@ -696,7 +696,7 @@ sub mb::rindex_byte ($$;$) {
         if (CORE::substr($str,$pos,CORE::length($substr)) eq $substr) {
             $rindex = $pos;
         }
-        if (CORE::substr($str,$pos) =~ /\A($x)/oxms) {
+        if (CORE::substr($str,$pos) =~ /\A($x)/xms) {
             $pos += CORE::length($1);
         }
         else {
@@ -3911,10 +3911,10 @@ sub list_all_ASCII_by_hyphen {
             $hyphened[$i+0] = ($hyphened[$i+0] eq '\\-') ? '-' : $hyphened[$i+0];
             $hyphened[$i+2] = ($hyphened[$i+2] eq '\\-') ? '-' : $hyphened[$i+2];
             if (0) { }
-            elsif ($hyphened[$i+0] !~ m/\A [\x00-\x7F] \z/oxms) {
+            elsif ($hyphened[$i+0] !~ m/\A [\x00-\x7F] \z/xms) {
                 confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not US-ASCII});
             }
-            elsif ($hyphened[$i+2] !~ m/\A [\x00-\x7F] \z/oxms) {
+            elsif ($hyphened[$i+2] !~ m/\A [\x00-\x7F] \z/xms) {
                 confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not US-ASCII});
             }
             elsif ($hyphened[$i+0] gt $hyphened[$i+2]) {
@@ -5358,11 +5358,6 @@ This software is a source code filter, a transpiler-modulino.
 Perl is said to have been able to handle Unicode since version 5.8.
 However, unlike JPerl, "Easy jobs must be easy" has been lost.
 
-In Shift_JIS and similar encodings(Big5, Big5-HKSCS, GB18030, GBK, Sjis, CP932) have any DAMEMOJI who have metacharacters at second octet.
-Which characters are DAMEMOJI is depends on whether the enclosing delimiter is single quote or double quote.
-
-This software escapes DAMEMOJI in your script, generate a new script and run it.
-
 There are some MBCS encodings in the world.
 
 =over 2
@@ -5382,7 +5377,12 @@ There are some MBCS encodings in the world.
 These encodings are still used today in most areas except the world wide web.
 Even if you are an avid Unicode proponent, you cannot change this fact.
 
-This software does ...
+In Shift_JIS and similar encodings(Big5, Big5-HKSCS, GB18030, GBK, Sjis, CP932) have any DAMEMOJI who have metacharacters at second octet.
+Which characters are DAMEMOJI is depends on whether the enclosing delimiter is single quote or double quote.
+
+This software escapes DAMEMOJI in your script, generate a new script and run it.
+
+This software has the following features
 
 =over 2
 
@@ -5466,6 +5466,8 @@ The necessary terms are listed below. Maybe world wide web will help you.
 
 =item * DAMEMOJI
 
+=item * CHANTOSHITAMOJI
+
 =item * GAIJI
 
 =item * GETA, GETA-MOJI, GETA-MARK
@@ -5483,7 +5485,7 @@ The encodings supported by this software and their range of octets are as follow
              00..7F
              https://en.wikipedia.org/wiki/Big5
              * needs multibyte anchoring
-             * unsafe US-ASCII casefolding of 2nd octet
+             * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
              * needs escaping meta char of 2nd octet
              * and DAMEMOJI samples, here
                [@](40) 　(A140) ＼(A240) ｗ(A340) 一(A440) 世(A540) 共(A640) 作(A740) 杓(A840) 咖(A940) 昇(AA40) 陂(AB40) 拯(AC40) 耐(AD40) 哦(AE40) 浬(AF40) 虔(B040) 娼(B140) 毫(B240) 莆(B340) 婷(B440) 溉(B540) 詔(B640) 媳(B740) 睹(B840) 辟(B940) 愿(BA40) 罰(BB40) 劇(BC40) 瑾(BD40) 輥(BE40) 濃(BF40) 錐(C040) 瞧(C140) 駿(C240) 鞭(C340) 願(C440) 護(C540) 讖(C640) す(C740) 乂(C940) 汌(CA40) 杙(CB40) 坨(CC40) 泒(CD40) 哃(CE40) 柜(CF40) 穾(D040) 唊(D140) 毨(D240) 笄(D340) 酎(D440) 崰(D540) 淐(D640) 耞(D740) 釫(D840) 惲(D940) 湨(DA40) 罦(DB40) 軹(DC40) 媷(DD40) 毹(DE40) 稛(DF40) 觡(E040) 凘(E140) 榠(E240) 禗(E340) 裰(E440) 噚(E540) 澍(E640) 膞(E740) 踔(E840) 噳(E940) 澢(EA40) 蕀(EB40) 錋(EC40) 檕(ED40) 蕷(EE40) 鞞(EF40) 璸(F040) 蹛(F140) 徿(F240) 譑(F340) 嚵(F440) 鏼(F540) 蠩(F640) 糴(F740) 讌(F840) 纘(F940) 
@@ -5502,7 +5504,7 @@ The encodings supported by this software and their range of octets are as follow
              00..7F
              https://en.wikipedia.org/wiki/Hong_Kong_Supplementary_Character_Set
              * needs multibyte anchoring
-             * unsafe US-ASCII casefolding of 2nd octet
+             * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
              * needs escaping meta char of 2nd octet
              * and DAMEMOJI samples, here
                [@](40) 倻(8C40) 蕋(8F40) 趩(9040) 媁(9340) 銉(9440) 桇(9640) 愌(9740) 䄉(9940) 鋣(9A40) 嵛(9C40) 籖(9F40) 　(A140) ＼(A240) ｗ(A340) 一(A440) 世(A540) 共(A640) 作(A740) 杓(A840) 咖(A940) 昇(AA40) 陂(AB40) 拯(AC40) 耐(AD40) 哦(AE40) 浬(AF40) 虔(B040) 娼(B140) 毫(B240) 莆(B340) 婷(B440) 溉(B540) 詔(B640) 媳(B740) 睹(B840) 辟(B940) 愿(BA40) 罰(BB40) 劇(BC40) 瑾(BD40) 輥(BE40) 濃(BF40) 錐(C040) 瞧(C140) 駿(C240) 鞭(C340) 願(C440) 護(C540) 讖(C640) す(C740) Л(C840) 乂(C940) 汌(CA40) 杙(CB40) 坨(CC40) 泒(CD40) 哃(CE40) 柜(CF40) 穾(D040) 唊(D140) 毨(D240) 笄(D340) 酎(D440) 崰(D540) 淐(D640) 耞(D740) 釫(D840) 惲(D940) 湨(DA40) 罦(DB40) 軹(DC40) 媷(DD40) 毹(DE40) 稛(DF40) 觡(E040) 凘(E140) 榠(E240) 禗(E340) 裰(E440) 噚(E540) 澍(E640) 膞(E740) 踔(E840) 噳(E940) 澢(EA40) 蕀(EB40) 錋(EC40) 檕(ED40) 蕷(EE40) 鞞(EF40) 璸(F040) 蹛(F140) 徿(F240) 譑(F340) 嚵(F440) 鏼(F540) 蠩(F640) 糴(F740) 讌(F840) 纘(F940) 廹(FC40) 鑂(FE40) 
@@ -5531,7 +5533,7 @@ The encodings supported by this software and their range of octets are as follow
              00..7F
              https://en.wikipedia.org/wiki/GB_18030
              * needs multibyte anchoring
-             * unsafe US-ASCII casefolding of 2nd-4th octet
+             * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd-4th octet
              * needs escaping meta char of 2nd octet
              * and DAMEMOJI samples, here
                [@](40) 丂(8140) 侤(8240) 傽(8340) 凘(8440) 匑(8540) 咢(8640) 嘆(8740) 園(8840) 堾(8940) 夽(8A40) 婡(8B40) 孈(8C40) 岪(8D40) 嶡(8E40) 廆(8F40) 怈(9040) 慇(9140) 扏(9240) 揁(9340) 擛(9440) 旲(9540) 朄(9640) 桜(9740) 楡(9840) 橜(9940) 欯(9A40) 汙(9B40) 淍(9C40) 滰(9D40) 濦(9E40) 烜(9F40) 燖(A040) ˊ(A840) 〡(A940) 狜(AA40) 獲(AB40) 珸(AC40) 瑻(AD40) 瓳(AE40) 疈(AF40) 癅(B040) 盄(B140) 睝(B240) 矦(B340) 碄(B440) 礍(B540) 禓(B640) 稝(B740) 窣(B840) 笯(B940) 篅(BA40) 籃(BB40) 粿(BC40) 紷(BD40) 継(BE40) 緻(BF40) 繞(C040) 罖(C140) 翤(C240) 聾(C340) 腀(C440) 臔(C540) 艪(C640) 茾(C740) 菮(C840) 葽(C940) 蔃(CA40) 薂(CB40) 藹(CC40) 虭(CD40) 蜙(CE40) 螥(CF40) 蠤(D040) 袬(D140) 褸(D240) 覢(D340) 訞(D440) 誁(D540) 諤(D640) 譆(D740) 谸(D840) 貮(D940) 贎(DA40) 跕(DB40) 蹳(DC40) 軥(DD40) 轅(DE40) 這(DF40) 郂(E040) 酅(E140) 釦(E240) 鉆(E340) 銨(E440) 錊(E540) 鍬(E640) 鏎(E740) 鐯(E840) 锧(E940) 闌(EA40) 隌(EB40) 霡(EC40) 鞞(ED40) 頏(EE40) 顯(EF40) 餈(F040) 馌(F140) 駺(F240) 驚(F340) 鬇(F440) 魼(F540) 鯜(F640) 鰼(F740) 鳣(F840) 鵃(F940) 鶣(FA40) 鸃(FB40) 麫(FC40) 鼲(FD40) 兀(FE40) 
@@ -5550,7 +5552,7 @@ The encodings supported by this software and their range of octets are as follow
              00..7F
              https://en.wikipedia.org/wiki/GBK_(character_encoding)
              * needs multibyte anchoring
-             * unsafe US-ASCII casefolding of 2nd octet
+             * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
              * needs escaping meta char of 2nd octet
              * and DAMEMOJI samples, here
                [@](40) 丂(8140) 侤(8240) 傽(8340) 凘(8440) 匑(8540) 咢(8640) 嘆(8740) 園(8840) 堾(8940) 夽(8A40) 婡(8B40) 孈(8C40) 岪(8D40) 嶡(8E40) 廆(8F40) 怈(9040) 慇(9140) 扏(9240) 揁(9340) 擛(9440) 旲(9540) 朄(9640) 桜(9740) 楡(9840) 橜(9940) 欯(9A40) 汙(9B40) 淍(9C40) 滰(9D40) 濦(9E40) 烜(9F40) 燖(A040) ˊ(A840) 〡(A940) 狜(AA40) 獲(AB40) 珸(AC40) 瑻(AD40) 瓳(AE40) 疈(AF40) 癅(B040) 盄(B140) 睝(B240) 矦(B340) 碄(B440) 礍(B540) 禓(B640) 稝(B740) 窣(B840) 笯(B940) 篅(BA40) 籃(BB40) 粿(BC40) 紷(BD40) 継(BE40) 緻(BF40) 繞(C040) 罖(C140) 翤(C240) 聾(C340) 腀(C440) 臔(C540) 艪(C640) 茾(C740) 菮(C840) 葽(C940) 蔃(CA40) 薂(CB40) 藹(CC40) 虭(CD40) 蜙(CE40) 螥(CF40) 蠤(D040) 袬(D140) 褸(D240) 覢(D340) 訞(D440) 誁(D540) 諤(D640) 譆(D740) 谸(D840) 貮(D940) 贎(DA40) 跕(DB40) 蹳(DC40) 軥(DD40) 轅(DE40) 這(DF40) 郂(E040) 酅(E140) 釦(E240) 鉆(E340) 銨(E440) 錊(E540) 鍬(E640) 鏎(E740) 鐯(E840) 锧(E940) 闌(EA40) 隌(EB40) 霡(EC40) 鞞(ED40) 頏(EE40) 顯(EF40) 餈(F040) 馌(F140) 駺(F240) 驚(F340) 鬇(F440) 魼(F540) 鯜(F640) 鰼(F740) 鳣(F840) 鵃(F940) 鶣(FA40) 鸃(FB40) 麫(FC40) 鼲(FD40) 兀(FE40) 
@@ -5571,7 +5573,7 @@ The encodings supported by this software and their range of octets are as follow
              00..7F
              https://en.wikipedia.org/wiki/Shift_JIS
              * needs multibyte anchoring
-             * unsafe US-ASCII casefolding of 2nd octet
+             * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
              * needs escaping meta char of 2nd octet
              * and DAMEMOJI samples, here
                [@](40) 　(8140) ァ(8340) А(8440) 院(8940) 魁(8A40) 機(8B40) 掘(8C40) 后(8D40) 察(8E40) 宗(8F40) 拭(9040) 繊(9140) 叩(9240) 邸(9340) 如(9440) 鼻(9540) 法(9640) 諭(9740) 蓮(9840) 僉(9940) 咫(9A40) 奸(9B40) 廖(9C40) 戞(9D40) 曄(9E40) 檗(9F40) 漾(E040) 瓠(E140) 磧(E240) 紂(E340) 隋(E440) 蕁(E540) 襦(E640) 蹇(E740) 錙(E840) 顱(E940) 鵝(EA40) 
@@ -5591,7 +5593,7 @@ The encodings supported by this software and their range of octets are as follow
              https://en.wikipedia.org/wiki/Unified_Hangul_Code
              * needs multibyte anchoring
              * needs no escaping meta char of 2nd octet
-             * unsafe US-ASCII casefolding of 2nd octet
+             * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
   ------------------------------------------------------------------------------
   utf8 (UTF-8)
              1st       2nd       3rd       4th
@@ -5748,6 +5750,7 @@ $mb::ORIG_PROGRAM_NAME means $0 before transpiled it
 
 Write scripts the usual way.
 Running an US-ASCII script using mb.pm allows you to treat multibyte code points as I/O data.
+You can select MBCS encoding of I/O by an option when executing mb.pm command.
 
 =head2 On other hand, if you want to write octet-oriented scripts from now on, or port existing octet-oriented scripts to mb.pm
 
@@ -5843,7 +5846,23 @@ When you need multibyte functionally, you need to use subroutines in the "mb" pa
 
 =head1 What are DAMEMOJI?
 
-In single quote, DAMEMOJI are double-byte characters that include the following metacharacters ('', q{}, <<'END', qw{}, m'', s''', split(''), split(m''), and qr'')
+Single quotes are follows
+
+  ------------------------------------------------------------------
+  single quotes
+  ------------------------------------------------------------------
+  ''
+  q{}
+  <<'END'
+  qw{}
+  m''
+  s'''
+  split('')
+  split(m'')
+  qr''
+  ------------------------------------------------------------------
+ 
+In single quote, DAMEMOJI are double-byte characters that include the following metacharacters
 
   ------------------------------------------------------------------
   hex   character as US-ASCII
@@ -5851,7 +5870,28 @@ In single quote, DAMEMOJI are double-byte characters that include the following 
   5C    [\]    backslashed escapes
   ------------------------------------------------------------------
 
-In double quote, DAMEMOJI are double-byte characters that include the following metacharacters ("", qq{}, <<END, <<"END", ``, qx{}, <<`END`, //, m//, ??, s///, split(//), split(m//), and qr//)
+Double quotes are follows
+
+  ------------------------------------------------------------------
+  double quotes
+  ------------------------------------------------------------------
+  ""
+  qq{}
+  <<END
+  <<"END"
+  ``
+  qx{}
+  <<`END`
+  //
+  m//
+  ??
+  s///
+  split(//)
+  split(m//)
+  qr//
+  ------------------------------------------------------------------
+
+In double quote, DAMEMOJI are double-byte characters that include the following metacharacters
 
   ------------------------------------------------------------------
   hex   character as US-ASCII
@@ -6065,7 +6105,73 @@ in perl interpreter memory,
                  "マ"          [83] [7D]
     -----------------------------------------
 
+=head1 What are CHANTOSHITAMOJI?
+
+CHANTOSHITAMOJI is CHANTO-SHITA-MOJI.
+It means qr/[A-Za-z]/, "NOT DAMEMOJI".
+
+CHANTOSHITAMOJI are follows
+
+  ------------------------------------------------------------------
+  hex   character as US-ASCII
+  ------------------------------------------------------------------
+  41    [A]    US-ASCII A
+  42    [B]    US-ASCII B
+  43    [C]    US-ASCII C
+  44    [D]    US-ASCII D
+  45    [E]    US-ASCII E
+  46    [F]    US-ASCII F
+  47    [G]    US-ASCII G
+  48    [H]    US-ASCII H
+  49    [I]    US-ASCII I
+  4A    [J]    US-ASCII J
+  4B    [K]    US-ASCII K
+  4C    [L]    US-ASCII L
+  4D    [M]    US-ASCII M
+  4E    [N]    US-ASCII N
+  4F    [O]    US-ASCII O
+  50    [P]    US-ASCII P
+  51    [Q]    US-ASCII Q
+  52    [R]    US-ASCII R
+  53    [S]    US-ASCII S
+  54    [T]    US-ASCII T
+  55    [U]    US-ASCII U
+  56    [V]    US-ASCII V
+  57    [W]    US-ASCII W
+  58    [X]    US-ASCII X
+  59    [Y]    US-ASCII Y
+  5A    [Z]    US-ASCII Z
+  61    [a]    US-ASCII a
+  62    [b]    US-ASCII b
+  63    [c]    US-ASCII c
+  64    [d]    US-ASCII d
+  65    [e]    US-ASCII e
+  66    [f]    US-ASCII f
+  67    [g]    US-ASCII g
+  68    [h]    US-ASCII h
+  69    [i]    US-ASCII i
+  6A    [j]    US-ASCII j
+  6B    [k]    US-ASCII k
+  6C    [l]    US-ASCII l
+  6D    [m]    US-ASCII m
+  6E    [n]    US-ASCII n
+  6F    [o]    US-ASCII o
+  70    [p]    US-ASCII p
+  71    [q]    US-ASCII q
+  72    [r]    US-ASCII r
+  73    [s]    US-ASCII s
+  74    [t]    US-ASCII t
+  75    [u]    US-ASCII u
+  76    [v]    US-ASCII v
+  77    [w]    US-ASCII w
+  78    [x]    US-ASCII x
+  79    [y]    US-ASCII y
+  7A    [z]    US-ASCII z
+  ------------------------------------------------------------------
+
 =head1 MBCS character casing
+
+mb.pm modulino solves the CHANTOSHITAMOJI problem.
 
 (The automatic translation of this part may be not correct.
 Please refer to the original text.)
@@ -6073,9 +6179,11 @@ Please refer to the original text.)
 In mb.pm environment, lc("(halfwidth)A") makes "(halfwidth)a", however lc("乙") keeps "乙", not "兀", moreover lc("(fullwidth)Ａ") keeps "(fullwidth)Ａ", not "(fullwidth)ａ".
 For easy to use like JPerl, "lc()" and "uc()" do not work for MBCS encoding that is not US-ASCII.
 
-"DBCS," "ZENKAKU(full-width) characters," and "KANJI" are often intentionally misused as having the same meaning.
-In other words, full-width alphabetic characters are treated as KANJI.
+"DBCS," "ZENKAKU(fullwidth) characters," and "KANJI" are often intentionally misused as having the same meaning.
+In other words, fullwidth alphabetic characters are treated as KANJI.
 In that case, it is desirable that those characters are not converted by lc() and uc().
+
+UHC is very excellent encoding since not containing DAMEMOJI, but on the other hand it contains a lot of CHANTOSHITAMOJI.
 
     ----------------------------------------------------------------------------------------------
                                                bare Perl4, bare Perl5     mb.pm modulino
@@ -6164,8 +6272,6 @@ This software automatically transpiles MBCS literal strings in scripts to octet-
   `MBCS-quotee`                              `OO-quotee`
   /MBCS-quotee/cgimosx                       m{\G${mb::_anchor}@{[mb::_ignorecase(qr/OO-quotee/mosx)]}@{[mb::_m_passed()]}}cg
   /MBCS-quotee/cgmosx                        m{\G${mb::_anchor}@{[qr/OO-quotee/mosx ]}@{[mb::_m_passed()]}}cg
-  ?MBCS-quotee?cgimosx                       m{\G${mb::_anchor}@{[mb::_ignorecase(qr?OO-quotee?mosx)]}@{[mb::_m_passed()]}}cg
-  ?MBCS-quotee?cgmosx                        m{\G${mb::_anchor}@{[qr?OO-quotee?mosx ]}@{[mb::_m_passed()]}}cg
   <MBCS-quotee>                              <OO-quotee>
   q/MBCS-quotee/                             q/OO-quotee/
   qx'MBCS-quotee'                            qx'OO-quotee'
@@ -7048,7 +7154,7 @@ But this software helps it.
       for (@ARGV) {
   
           # has space
-          if (/\A (?:$x)*? [ ] /oxms) {
+          if (/\A (?:$x)*? [ ] /xms) {
               if (my @glob = mb::dosglob(qq{"$_"})) {
                   push @argv, @glob;
               }
@@ -7058,7 +7164,7 @@ But this software helps it.
           }
   
           # has wildcard metachar
-          elsif (/\A (?:$x)*? [*?] /oxms) {
+          elsif (/\A (?:$x)*? [*?] /xms) {
               if (my @glob = mb::dosglob($_)) {
                   push @argv, @glob;
               }
@@ -7387,7 +7493,7 @@ Making one script for information processing, and other one for encoding convers
     |            Digital octet string            |
     +--------------------------------------------+
 
-It is impossible to get agreement changing in the character string processing model at Perl 5.8 from majority of Perl programmers.
+Perl 5.8's string model will not be accepted by common people.
 
 Information processing model of UNIX/C-ism, 
 Information processing model of perl3 or later, and
@@ -7876,6 +7982,11 @@ This software is distributed in the hope that it will be useful, but WITHOUT ANY
  http://www.rakunet.org/tsnet/TSperl/12/379.html
  http://www.rakunet.org/tsnet/TSperl/12/380.html
  http://www.rakunet.org/tsnet/TSperl/12/382.html
+
+ TSNETWiki
+ https://rakunet.org/wik/index.php
+ https://rakunet.org/wik/index.php?TSperl
+ https://rakunet.org/wik/index.php?Perl
 
  ruby-list
  http://blade.nagaokaut.ac.jp/ruby/ruby-list/index.shtml

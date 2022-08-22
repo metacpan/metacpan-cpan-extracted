@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # This program is a test executable to be run by IPC::RunExternal::runexternal()
 # when testing the function. We need this for testing the timeouts.

@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace table.
 
@@ -34,15 +34,15 @@ sub TO_JSON {
 }
 
 has color => (
-        is  => "rw",
-        isa => "Str|ArrayRef[Str]",
+        is            => "rw",
+        isa           => "Str|ArrayRef[Str]",
         documentation =>
           "Sets the cell fill color. It accepts either a specific color or an array of colors or a 2D array of colors.",
 );
 
 has colorsrc => ( is            => "rw",
                   isa           => "Str",
-                  documentation => "Sets the source reference on plot.ly for  color .",
+                  documentation => "Sets the source reference on Chart Studio Cloud for `color`.",
 );
 
 __PACKAGE__->meta->make_immutable();
@@ -60,7 +60,7 @@ Chart::Plotly::Trace::Table::Cells::Fill - This attribute is one of the possible
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -124,7 +124,7 @@ Sets the cell fill color. It accepts either a specific color or an array of colo
 
 =item * colorsrc
 
-Sets the source reference on plot.ly for  color .
+Sets the source reference on Chart Studio Cloud for `color`.
 
 =back
 
@@ -134,7 +134,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

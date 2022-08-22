@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.52';
+our $VERSION = '2.53';
 
 use DateTime::Duration;
 use DateTime::TimeZone::OlsonDB;
@@ -410,7 +410,7 @@ sub _first_no_dst_rule {
     my $self = shift;
 
     return first { !$_->offset_from_std }
-    sort { $a->min_year <=> $b->min_year } $self->rules;
+        sort { $a->min_year <=> $b->min_year } $self->rules;
 }
 
 1;

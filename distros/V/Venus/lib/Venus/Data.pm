@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Venus::Class 'base', 'attr';
+use Venus::Class 'attr', 'base';
 
 base 'Venus::Path';
 

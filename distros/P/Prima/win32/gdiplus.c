@@ -64,11 +64,11 @@ apc_gp_set_alpha( Handle self, int alpha)
 	}
 
 	if ( sys ps && sys graphics )
-		stylus_change( self);
+		STYLUS_FREE_GP_BRUSH;
 
-	if ( sys alphaArenaPalette ) {
-		free(sys alphaArenaPalette);
-		sys alphaArenaPalette = NULL;
+	if ( sys alpha_arena_palette ) {
+		free(sys alpha_arena_palette);
+		sys alpha_arena_palette = NULL;
 	}
 
 	return true;
@@ -111,9 +111,44 @@ apc_gp_get_antialias( Handle self)
 Bool
 apc_gp_aa_bar( Handle self, double x1, double y1, double x2, double y2)
 {
-	double dy = sys lastSize. y;
+	double dy = sys last_size. y;
 	Point t = sys gp_transform;
 	objCheck false;
+
+	if (( is_apt(aptDeviceBitmap) && ((PDeviceBitmap)self)->type == dbtBitmap)) {
+		PImage pt;
+		if ( sys alpha < 127 ) return true;
+
+		/* emulate transparency on a bitmap by xor/and */
+		if (
+			sys rop2 == ropNoOper &&
+			sys rq_brush.logbrush.lbStyle == BS_DIBPATTERNPT && (
+				(( pt = (PImage) var fillPatternImage ) == NULL ) ||
+				(
+					( pt-> type == imBW ) &&
+					!dsys(pt)options.aptIcon
+				)
+			)
+		) {
+			Bool ok;
+			Color fg, bg;
+			int rop = apc_gp_get_rop(self);
+			fg = apc_gp_get_color(self);
+			bg = apc_gp_get_back_color(self);
+			apc_gp_set_color(self, 0);
+			apc_gp_set_back_color(self, 0xffffff);
+			apc_gp_set_rop(self, ropAndPut);
+			ok = apc_gp_bar(self, x1 + .5, y1 + .5, x2 + .5, y2 + .5);
+			apc_gp_set_rop(self, ropXor);
+			apc_gp_set_color(self, fg);
+			apc_gp_set_back_color(self, 0);
+			ok |= apc_gp_bar(self, x1 + .5, y1 + .5, x2 + .5, y2 + .5);
+			apc_gp_set_rop(self, rop);
+			apc_gp_set_back_color(self, bg);
+			return ok;
+		}
+		return apc_gp_bar(self, x1 + .5, y1 + .5, x2 + .5, y2 + .5);
+	}
 
 	x2 -= x1 - 1;
 	y2 -= y1 - 1;
@@ -121,9 +156,10 @@ apc_gp_aa_bar( Handle self, double x1, double y1, double x2, double y2)
 	y1 = t.y + dy - y1 - y2;
 
 	STYLUS_USE_GP_BRUSH;
+	if ( !CURRENT_GP_BRUSH ) return false;
 	GPCALL GdipFillRectangle(
 		sys graphics,
-		sys stylusGPResource-> brush,
+		CURRENT_GP_BRUSH,
 		x1, y1, x2, y2
 	);
 	apiGPErrCheckRet(false);
@@ -135,10 +171,55 @@ Bool
 apc_gp_aa_fill_poly( Handle self, int numPts, NPoint * points)
 {
 	int i;
-	double dy = sys lastSize. y;
+	double dy = sys last_size. y;
 	Point t = sys gp_transform;
 	GpPointF *p;
 	objCheck false;
+
+	if (( is_apt(aptDeviceBitmap) && ((PDeviceBitmap)self)->type == dbtBitmap)) {
+		Bool ok;
+		Point *p;
+		PImage pt;
+		if ( sys alpha < 127 ) return true;
+
+		if ( !( p = malloc(( numPts + 1) * sizeof( Point)))) return false;
+		for ( i = 0; i < numPts; i++) {
+			p[i].x = points[i].x + .5;
+			p[i].y = points[i].y + .5;
+		}
+
+		/* emulate transparency on a bitmap by xor/and */
+		if (
+			sys rop2 == ropNoOper &&
+			sys rq_brush.logbrush.lbStyle == BS_DIBPATTERNPT && (
+				(( pt = (PImage) var fillPatternImage ) == NULL) ||
+				(
+					( pt-> type == imBW ) &&
+					!dsys(pt)options.aptIcon
+				)
+			)
+		) {
+			Bool ok;
+			Color fg, bg;
+			int rop = apc_gp_get_rop(self);
+			fg = apc_gp_get_color(self);
+			bg = apc_gp_get_back_color(self);
+			apc_gp_set_color(self, 0);
+			apc_gp_set_back_color(self, 0xffffff);
+			apc_gp_set_rop(self, ropAndPut);
+			ok = apc_gp_fill_poly( self, numPts, p );
+			apc_gp_set_rop(self, ropXor);
+			apc_gp_set_color(self, fg);
+			apc_gp_set_back_color(self, 0);
+			ok |= apc_gp_fill_poly( self, numPts, p );
+			apc_gp_set_rop(self, rop);
+			apc_gp_set_back_color(self, bg);
+			return ok;
+		} else
+			ok = apc_gp_fill_poly( self, numPts, p );
+		free(p);
+		return ok;
+	}
 
 	if ((p = malloc( sizeof(GpPointF) * numPts)) == NULL)
 		return false;
@@ -149,11 +230,12 @@ apc_gp_aa_fill_poly( Handle self, int numPts, NPoint * points)
 	}
 
 	STYLUS_USE_GP_BRUSH;
+	if ( !CURRENT_GP_BRUSH ) return false;
 	GPCALL GdipFillPolygon(
 		sys graphics,
-		sys stylusGPResource-> brush,
+		CURRENT_GP_BRUSH,
 		p, numPts,
-		((sys psFillMode & fmWinding) == fmAlternate) ?
+		((sys fill_mode & fmWinding) == fmAlternate) ?
 			FillModeAlternate : FillModeWinding
 	);
 	apiGPErrCheckRet(false);
@@ -168,24 +250,24 @@ apc_gp_aa_fill_poly( Handle self, int numPts, NPoint * points)
 void
 aa_free_arena(Handle self, Bool for_reuse)
 {
-	if ( !for_reuse && sys alphaArenaPalette ) {
-		free(sys alphaArenaPalette);
-		sys alphaArenaPalette = NULL;
+	if ( !for_reuse && sys alpha_arena_palette ) {
+		free(sys alpha_arena_palette);
+		sys alpha_arena_palette = NULL;
 	}
 
-	if ( !sys alphaArenaDC)
+	if ( !sys alpha_arena_dc)
 		return;
 
-	if (sys alphaArenaStockFont)
-		SelectObject( sys alphaArenaDC, sys alphaArenaStockFont);
-	SelectObject( sys alphaArenaDC, sys alphaArenaStockBitmap);
-	DeleteObject( sys alphaArenaBitmap );
-	sys alphaArenaBitmap = NULL;
-	sys alphaArenaStockFont = NULL;
-	sys alphaArenaStockBitmap = NULL;
+	if (sys alpha_arena_stock_font)
+		SelectObject( sys alpha_arena_dc, sys alpha_arena_stock_font);
+	SelectObject( sys alpha_arena_dc, sys alpha_arena_stock_bitmap);
+	DeleteObject( sys alpha_arena_bitmap );
+	sys alpha_arena_bitmap = NULL;
+	sys alpha_arena_stock_font = NULL;
+	sys alpha_arena_stock_bitmap = NULL;
 	if ( !for_reuse ) {
-		DeleteDC(sys alphaArenaDC);
-		sys alphaArenaDC = NULL;
+		DeleteDC(sys alpha_arena_dc);
+		sys alpha_arena_dc = NULL;
 	}
 
 }
@@ -205,40 +287,40 @@ aa_make_arena(Handle self)
 		}
 	}
 
-	if ( w < sys alphaArenaSize.x || h < sys alphaArenaSize.y || !sys alphaArenaDC ) {
+	if ( w < sys alpha_arena_size.x || h < sys alpha_arena_size.y || !sys alpha_arena_dc ) {
 		HDC dc;
-		if ( sys alphaArenaBitmap ) {
+		if ( sys alpha_arena_bitmap ) {
 			aa_free_arena(self, true);
 		} else {
-			if (!( sys alphaArenaDC = CreateCompatibleDC(0)))
+			if (!( sys alpha_arena_dc = CreateCompatibleDC(0)))
 				return false;
-			SetTextAlign(sys alphaArenaDC, TA_BOTTOM);
-			SetBkMode( sys alphaArenaDC, TRANSPARENT);
-			SetTextColor( sys alphaArenaDC, 0xffffff);
+			SetTextAlign(sys alpha_arena_dc, TA_BOTTOM);
+			SetBkMode( sys alpha_arena_dc, TRANSPARENT);
+			SetTextColor( sys alpha_arena_dc, 0xffffff);
 		}
 
-		sys alphaArenaSize.x = sys alphaArenaSize.y = w * 4;
+		sys alpha_arena_size.x = sys alpha_arena_size.y = w * 4;
 
 		dc = dc_alloc();
-		if ( !( sys alphaArenaBitmap = image_create_argb_dib_section(
-			dc, sys alphaArenaSize.x, sys alphaArenaSize.y, &sys alphaArenaPtr
+		if ( !( sys alpha_arena_bitmap = image_create_argb_dib_section(
+			dc, sys alpha_arena_size.x, sys alpha_arena_size.y, &sys alpha_arena_ptr
 		))) {
 			dc_free();
 			return false;
 		}
 		dc_free();
 
-		sys alphaArenaStockBitmap = SelectObject( sys alphaArenaDC, sys alphaArenaBitmap);
-		sys alphaArenaStockFont = NULL;
-		sys alphaArenaFontChanged = true;
+		sys alpha_arena_stock_bitmap = SelectObject( sys alpha_arena_dc, sys alpha_arena_bitmap);
+		sys alpha_arena_stock_font = NULL;
+		sys alpha_arena_font_changed = true;
 	}
 
-	if ( sys alphaArenaFontChanged || !sys alphaArenaStockFont) {
+	if ( sys alpha_arena_font_changed || !sys alpha_arena_stock_font) {
 		HFONT f;
-		f = SelectObject( sys alphaArenaDC, sys fontResource-> hfont );
-		if ( !sys alphaArenaStockFont )
-			sys alphaArenaStockFont = f;
-		sys alphaArenaFontChanged = false;
+		f = SelectObject( sys alpha_arena_dc, sys dc_font-> hfont );
+		if ( !sys alpha_arena_stock_font )
+			sys alpha_arena_stock_font = f;
+		sys alpha_arena_font_changed = false;
 	}
 
 	return true;
@@ -254,17 +336,17 @@ aa_render( Handle self, int x, int y, NPoint* delta, ABCFLOAT * abc, int advance
 	Point sz;
 
 	/* replace white to our color + alpha, calculate minimal affected box */
-	p = sys alphaArenaPtr;
-	palette = sys alphaArenaPalette;
+	p = sys alpha_arena_ptr;
+	palette = sys alpha_arena_palette;
 	for (
 		i = maxy = maxx = 0,
-			minx = sys alphaArenaSize.x - 1,
-			miny = sys alphaArenaSize.y - 1;
-		i < sys alphaArenaSize.y;
+			minx = sys alpha_arena_size.x - 1,
+			miny = sys alpha_arena_size.y - 1;
+		i < sys alpha_arena_size.y;
 		i++
 	) {
 		Bool match = false;
-		for ( j = 0; j < sys alphaArenaSize.x; j++, p++) {
+		for ( j = 0; j < sys alpha_arena_size.x; j++, p++) {
 			if (1 || *p != 0) {
 				register Byte *argb = (Byte*) p;
 				*p = palette[argb[0] + argb[1] + argb[2]];
@@ -305,7 +387,7 @@ aa_render( Handle self, int x, int y, NPoint* delta, ABCFLOAT * abc, int advance
 	}
 
 	/* calculate the aperture */
-	sz = sys alphaArenaSize;
+	sz = sys alpha_arena_size;
 	x -= sz.x/2;
 	y -= sz.y/2;
 	if ( is_apt( aptTextOutBaseline)) {
@@ -320,8 +402,8 @@ aa_render( Handle self, int x, int y, NPoint* delta, ABCFLOAT * abc, int advance
 	/* minimize the blit rectangle */
 	{
 		int m, n;
-		m = sys alphaArenaSize.y - maxy - 1;
-		n = sys alphaArenaSize.y - miny - 1;
+		m = sys alpha_arena_size.y - maxy - 1;
+		n = sys alpha_arena_size.y - miny - 1;
 		miny = m;
 		maxy = n;
 	}
@@ -335,7 +417,7 @@ aa_render( Handle self, int x, int y, NPoint* delta, ABCFLOAT * abc, int advance
 	bf.AlphaFormat         = AC_SRC_ALPHA;
 	return AlphaBlend(
 		sys ps,           x + minx, y + miny,   sz.x, sz.y,
-		sys alphaArenaDC, minx, miny,           sz.x, sz.y,
+		sys alpha_arena_dc, minx, miny,           sz.x, sz.y,
 		bf);
 }
 
@@ -344,17 +426,17 @@ Bool
 aa_fill_palette(Handle self)
 {
 	int i,j,r,g,b;
-	PStylus s = & sys stylus;
+	COLORREF fg = sys rq_pen.logpen.lopnColor;
 
-	if ( sys alphaArenaPalette )
+	if ( sys alpha_arena_palette )
 		return true;
 
-	if ( !( sys alphaArenaPalette = malloc(4 * 256 * 3)))
+	if ( !( sys alpha_arena_palette = malloc(4 * 256 * 3)))
 		return false;
 
-	b = (s->pen.lopnColor >> 16) & 0xff;
-	g = (s->pen.lopnColor & 0xff00) >> 8;
-	r = s->pen.lopnColor & 0xff;
+	b = (fg >> 16) & 0xff;
+	g = (fg & 0xff00) >> 8;
+	r =  fg & 0xff;
 
 	for ( i = j = 0; i < 256; i++) {
 		uint32_t a = sys alpha * i / 255;
@@ -364,9 +446,9 @@ aa_fill_palette(Handle self)
 			((g * a / 255 ) << 8)  |
 			( b * a / 255 )
 			;
-		sys alphaArenaPalette[j++] = a;
-		sys alphaArenaPalette[j++] = a;
-		sys alphaArenaPalette[j++] = a;
+		sys alpha_arena_palette[j++] = a;
+		sys alpha_arena_palette[j++] = a;
+		sys alpha_arena_palette[j++] = a;
 	}
 
 	return true;
@@ -383,16 +465,16 @@ aa_text_out( Handle self, int x, int y, void * text, int len, Bool wide)
 
 	for ( i = 0; i < len; i++) {
 		ABCFLOAT abc;
-		memset(sys alphaArenaPtr, 0, sys alphaArenaSize.x * sys alphaArenaSize.y * 4);
+		memset(sys alpha_arena_ptr, 0, sys alpha_arena_size.x * sys alpha_arena_size.y * 4);
 		if ( wide ) {
 			if (!GetCharABCWidthsFloatW( sys ps, ((WCHAR*)text)[i], ((WCHAR*)text)[i], &abc)) apiErrRet;
 		} else {
 			if (!GetCharABCWidthsFloatA( sys ps, ((char *)text)[i], ((char *)text)[i], &abc)) apiErrRet;
 		}
 		if ( wide ) {
-			if (!TextOutW( sys alphaArenaDC, sys alphaArenaSize.x/2, sys alphaArenaSize.y/2, ((WCHAR*)text) + i, 1)) apiErrRet;
+			if (!TextOutW( sys alpha_arena_dc, sys alpha_arena_size.x/2, sys alpha_arena_size.y/2, ((WCHAR*)text) + i, 1)) apiErrRet;
 		} else {
-			if (!TextOutA( sys alphaArenaDC, sys alphaArenaSize.x/2, sys alphaArenaSize.y/2, ((char *)text) + i, 1)) apiErrRet;
+			if (!TextOutA( sys alpha_arena_dc, sys alpha_arena_size.x/2, sys alpha_arena_size.y/2, ((char *)text) + i, 1)) apiErrRet;
 		}
 		if ( !aa_render(self, x, y, &delta, &abc, -1, 0, 0))
 			return false;
@@ -415,17 +497,17 @@ aa_glyphs_out( Handle self, PGlyphsOutRec t, int x, int y, int * text_advance, H
 	if ( text_advance )
 		*text_advance = 0;
 
-	f = SelectObject( sys alphaArenaDC, font );
-	if ( !sys alphaArenaStockFont )
-		sys alphaArenaStockFont = f;
-	sys alphaArenaFontChanged = false;
+	f = SelectObject( sys alpha_arena_dc, font );
+	if ( !sys alpha_arena_stock_font )
+		sys alpha_arena_stock_font = f;
+	sys alpha_arena_font_changed = false;
 
 	for ( i = 0; i < t->len; i++) {
 		ABCFLOAT abc, *pabc;
 		int adv, dx, dy;
-		memset(sys alphaArenaPtr, 0, sys alphaArenaSize.x * sys alphaArenaSize.y * 4);
-		if ( !ExtTextOutW(sys alphaArenaDC,
-			sys alphaArenaSize.x/2, sys alphaArenaSize.y/2,
+		memset(sys alpha_arena_ptr, 0, sys alpha_arena_size.x * sys alpha_arena_size.y * 4);
+		if ( !ExtTextOutW(sys alpha_arena_dc,
+			sys alpha_arena_size.x/2, sys alpha_arena_size.y/2,
 			ETO_GLYPH_INDEX, NULL, (LPCWSTR)(t->glyphs) + i, 1, 
 			NULL
 		))

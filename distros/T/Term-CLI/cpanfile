@@ -30,6 +30,7 @@ requires "warnings" => "1.00";
 
 on 'test' => sub {
   requires "Capture::Tiny" => "0.25";
+  requires "Data::Dumper" => "0";
   requires "File::Temp" => "0.22";
   requires "Test::Class" => "0";
   requires "Test::Compile" => "v1.2.0";
@@ -37,6 +38,7 @@ on 'test' => sub {
   requires "Test::MockModule" => "0.05";
   requires "Test::More" => "1.001002";
   requires "Test::Output" => "1.03";
+  requires "Types::Common::String" => "0";
   requires "charnames" => "0";
   requires "perl" => "5.014_001";
   requires "strict" => "1.00";

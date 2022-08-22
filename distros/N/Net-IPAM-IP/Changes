@@ -1,5 +1,11 @@
 Revision history for Net-IPAM-IP
 
+4.01    Fri, 19 Aug 2022 13:01:53 +0200
+        * glitch in test plan
+
+4.00    Thu, 18 Aug 2022 17:37:09 +0200
+        * INCOMPATIBLE CHANGE in IPv4-mapped Iv6 handling
+
 3.10    Wed, 27 Apr 2022 14:45:27 +0200
         * add serialization method TO_JSON
 

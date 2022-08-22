@@ -80,6 +80,7 @@ sub ok_magic {
     ], $note // 'KDBX magic numbers are correct';
 }
 
+# Returns parameters for a fast KDF so that running tests isn't pointlessly slow.
 sub fast_kdf {
     my $uuid = shift // KDF_UUID_AES;
     my $params = {

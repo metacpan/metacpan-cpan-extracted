@@ -1,34 +1,29 @@
 ---
 abstract: 'atonal music analysis and composition'
 author:
-  - 'Jeremy Mates <jmates@cpan.org>'
+  - 'Jeremy Mates <jeremy.mates@gmail.com>'
 build_requires:
-  Pod::Coverage: '0.18'
   Test::Most: '0'
-  Test::Pod: '1.22'
-  Test::Pod::Coverage: '1.08'
   lib: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.48'
-  strict: '0'
+  Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Music-AtonalUtil
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  Music::AtonalUtil:
+    file: lib/Music/AtonalUtil.pm
+    version: '1.18'
 requires:
   Algorithm::Combinatorics: '0'
   Carp: '0'
-  List::Util: '0'
+  List::Util: '1.44'
   Scalar::Util: '0'
-  perl: '5.010000'
 resources:
-  repository: git://github.com/thrig/Music-AtonalUtil.git
-version: '1.15'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  license: http://www.perlfoundation.org/artistic_license_2_0
+version: '1.18'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,4 +1,4 @@
-package NewFangle::Segment 0.08 {
+package NewFangle::Segment 0.09 {
 
   use strict;
   use warnings;
@@ -46,7 +46,7 @@ NewFangle::Segment - NewRelic segment class
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -111,7 +111,7 @@ Owen Allsopp (ALLSOPP)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Graham Ollis.
+This software is copyright (c) 2020-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

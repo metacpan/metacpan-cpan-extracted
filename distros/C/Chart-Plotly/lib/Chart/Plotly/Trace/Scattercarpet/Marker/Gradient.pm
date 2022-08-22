@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scattercarpet.
 
@@ -34,20 +34,20 @@ sub TO_JSON {
 }
 
 has color => (
-    is  => "rw",
-    isa => "Str|ArrayRef[Str]",
+    is            => "rw",
+    isa           => "Str|ArrayRef[Str]",
     documentation =>
       "Sets the final color of the gradient fill: the center color for radial, the right for horizontal, or the bottom for vertical.",
 );
 
 has colorsrc => ( is            => "rw",
                   isa           => "Str",
-                  documentation => "Sets the source reference on plot.ly for  color .",
+                  documentation => "Sets the source reference on Chart Studio Cloud for `color`.",
 );
 
 has typesrc => ( is            => "rw",
                  isa           => "Str",
-                 documentation => "Sets the source reference on plot.ly for  type .",
+                 documentation => "Sets the source reference on Chart Studio Cloud for `type`.",
 );
 
 __PACKAGE__->meta->make_immutable();
@@ -65,7 +65,7 @@ Chart::Plotly::Trace::Scattercarpet::Marker::Gradient - This attribute is one of
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -131,11 +131,11 @@ Sets the final color of the gradient fill: the center color for radial, the righ
 
 =item * colorsrc
 
-Sets the source reference on plot.ly for  color .
+Sets the source reference on Chart Studio Cloud for `color`.
 
 =item * typesrc
 
-Sets the source reference on plot.ly for  type .
+Sets the source reference on Chart Studio Cloud for `type`.
 
 =back
 
@@ -145,7 +145,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

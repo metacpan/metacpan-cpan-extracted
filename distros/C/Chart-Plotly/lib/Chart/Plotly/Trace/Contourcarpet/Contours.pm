@@ -9,7 +9,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 use Chart::Plotly::Trace::Contourcarpet::Contours::ImpliedEdits;
 use Chart::Plotly::Trace::Contourcarpet::Contours::Labelfont;
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace contourcarpet.
 
@@ -37,8 +37,8 @@ sub TO_JSON {
 }
 
 has coloring => (
-    is  => "rw",
-    isa => enum( [ "fill", "lines", "none" ] ),
+    is            => "rw",
+    isa           => enum( [ "fill", "lines", "none" ] ),
     documentation =>
       "Determines the coloring method showing the contour values. If *fill*, coloring is done evenly between each contour level If *lines*, coloring is done on the contour lines. If *none*, no coloring is applied on this trace.",
 );
@@ -55,15 +55,15 @@ has labelfont => ( is  => "rw",
                    isa => "Maybe[HashRef]|Chart::Plotly::Trace::Contourcarpet::Contours::Labelfont", );
 
 has labelformat => (
-    is  => "rw",
-    isa => "Str",
+    is            => "rw",
+    isa           => "Str",
     documentation =>
-      "Sets the contour label formatting rule using d3 formatting mini-language which is very similar to Python, see: https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format",
+      "Sets the contour label formatting rule using d3 formatting mini-languages which are very similar to those in Python. For numbers, see: https://github.com/d3/d3-format/tree/v1.4.5#d3-format.",
 );
 
 has operation => (
-    is  => "rw",
-    isa => enum( [ "=", "<", ">=", ">", "<=", "[]", "()", "[)", "(]", "][", ")(", "](", ")[" ] ),
+    is            => "rw",
+    isa           => enum( [ "=", "<", ">=", ">", "<=", "[]", "()", "[)", "(]", "][", ")(", "](", ")[" ] ),
     documentation =>
       "Sets the constraint operation. *=* keeps regions equal to `value` *<* and *<=* keep regions less than `value` *>* and *>=* keep regions greater than `value` *[]*, *()*, *[)*, and *(]* keep regions inside `value[0]` to `value[1]` *][*, *)(*, *](*, *)[* keep regions outside `value[0]` to value[1]` Open vs. closed intervals make no difference to constraint display, but all versions are allowed for consistency with filter transforms.",
 );
@@ -74,8 +74,8 @@ has showlabels => ( is            => "rw",
 );
 
 has showlines => (
-    is  => "rw",
-    isa => "Bool",
+    is            => "rw",
+    isa           => "Bool",
     documentation =>
       "Determines whether or not the contour lines are drawn. Has an effect only if `contours.coloring` is set to *fill*.",
 );
@@ -91,8 +91,8 @@ has start => ( is            => "rw",
 );
 
 has value => (
-    is  => "rw",
-    isa => "Any",
+    is            => "rw",
+    isa           => "Any",
     documentation =>
       "Sets the value or values of the constraint boundary. When `operation` is set to one of the comparison values (=,<,>=,>,<=) *value* is expected to be a number. When `operation` is set to one of the interval values ([],(),[),(],][,)(,](,)[) *value* is expected to be an array of two numbers where the first is the lower bound and the second is the upper bound.",
 );
@@ -112,7 +112,7 @@ Chart::Plotly::Trace::Contourcarpet::Contours - This attribute is one of the pos
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -201,7 +201,7 @@ Sets the end contour level value. Must be more than `contours.start`
 
 =item * labelformat
 
-Sets the contour label formatting rule using d3 formatting mini-language which is very similar to Python, see: https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format
+Sets the contour label formatting rule using d3 formatting mini-languages which are very similar to those in Python. For numbers, see: https://github.com/d3/d3-format/tree/v1.4.5#d3-format.
 
 =item * operation
 
@@ -235,7 +235,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

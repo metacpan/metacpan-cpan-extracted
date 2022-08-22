@@ -298,6 +298,7 @@ sub request_identical_ok( $test ) {
     for (@$cmd) {
         s!\$(url)\b!$server->$1!ge;
         s!\$(port)\b!$server->$1!ge;
+        s!\$(host)\b!$server->url->host!ge;
         s!\$(tempfile)\b!$tempfile!g;
         s!\$(tempoutput)\b!$tempoutput!g;
         s!\$(tempcookies)\b!$tempcookies!g;

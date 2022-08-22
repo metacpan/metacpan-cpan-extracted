@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::AndroidWebView;
-$Playwright::AndroidWebView::VERSION = '1.210';
+$Playwright::AndroidWebView::VERSION = '1.251';
 use parent 'Playwright::Base';
 
 sub new {
@@ -42,21 +42,21 @@ sub page {
     );
 }
 
-sub close {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'close',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub pid {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'pid',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub close {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'close',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -106,7 +106,7 @@ Playwright::AndroidWebView - Automatically generated class for Playwright::Andro
 
 =head1 VERSION
 
-version 1.210
+version 1.251
 
 =head1 CONSTRUCTOR
 
@@ -129,17 +129,17 @@ Execute the AndroidWebView::page playwright routine.
 
 See L<https://playwright.dev/api/class-AndroidWebView#AndroidWebView-page> for more information.
 
-=head2 close(@args)
-
-Execute the AndroidWebView::close playwright routine.
-
-See L<https://playwright.dev/api/class-AndroidWebView#AndroidWebView-close> for more information.
-
 =head2 pid(@args)
 
 Execute the AndroidWebView::pid playwright routine.
 
 See L<https://playwright.dev/api/class-AndroidWebView#AndroidWebView-pid> for more information.
+
+=head2 close(@args)
+
+Execute the AndroidWebView::close playwright routine.
+
+See L<https://playwright.dev/api/class-AndroidWebView#AndroidWebView-close> for more information.
 
 =head2 on(@args)
 

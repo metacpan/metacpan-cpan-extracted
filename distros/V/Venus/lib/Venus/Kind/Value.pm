@@ -11,7 +11,7 @@ use overload (
   fallback => 1,
 );
 
-use Venus::Class;
+use Venus::Class 'base', 'with';
 
 base 'Venus::Kind';
 

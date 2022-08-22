@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.88.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,30 +12,33 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 033045b0711c72f1e6dc8cf4c67bf3387e75e497 Changes
-SHA1 27cf078faac611b6a6bb94ab8dd9d9b463defb6c LICENSE
-SHA1 8d780a0fb28ce38c43dee511c3f001915851988c MANIFEST
-SHA1 b645b22375fda115bbc1cbe10a9bfdb5dbadedc7 META.json
-SHA1 e2ac1b644fda2f3cf107122f8785e95c3a21005c META.yml
-SHA1 bac89d1c72ca285b7b1ba54b06ce7a37a10eac1a Makefile.PL
-SHA1 348ff85123552f48fbc76ff4d160baad324a046d README
-SHA1 bae8f16fe5b8334712862cf86173e6c23d8149bc eg/fortefy
-SHA1 1890a36796de7830b862db261ffc2bbb28babcec lib/Music/AtonalUtil.pm
-SHA1 7b04c2526e27edb61352c8d7742da25c6d8f3dda t/00-load.t
-SHA1 eaf34be7524d844dbef08cd6cad615db59f24cd8 t/Music-AtonalUtil.t
-SHA1 7d281bb36f065ea02988058870699261a4990770 t/forte2pcs2forte.t
-SHA1 2f70716eff94252f7c070b82a5ae6ea479d3bef2 t/pod-coverage.t
-SHA1 f8243bd368331d5d9635e89bcc00f910cc100815 t/pod.t
+SHA256 a797c4e9b735641fbda2b2e3fced17cc9c9124dfcbee0de128e5ccf1c8343f63 Build.PL
+SHA256 a11ed546e813b150e1657a61f334637c53f68546ba3de5837453efddde6600c4 Changes
+SHA256 79528e2cef2d48c4aebb70d5ee1a49778f7d082ca917b85ecfcb1286d00ded61 LICENSE
+SHA256 f67f9f1d404fc679a47acd3ab031d6b47aa371eb4ac7eec1dfddae251a40f0f5 MANIFEST
+SHA256 61f04cbaa66ddd40937ec53081cce2b411ec9a8f74f30140c8f780e1dcbe535a META.json
+SHA256 ac60df7e678a35d9a7d58182f0d3125429750b8e414ab9317e61b2d0d2065447 META.yml
+SHA256 7c9a7b9b3a0c88814d6fae48a95ff9c3e3ab8d39a0675430a542cf23d63cc2b1 README
+SHA256 2fe452244141dee67cfc4c0c39e65dc2f2552c08ca7314ed1ccb18195749c2e4 eg/fortefy
+SHA256 304077c1d7f4124908c6a852f1ce4dec954e1ac89c749a36012cc4544be3bdc0 lib/Music/AtonalUtil.pm
+SHA256 dc275c058854ee8364e858887704d881823f2f864fab096112518a5132713d95 t/00-load.t
+SHA256 3af8c9e0862a58b0bf2c39703bef4717a609ac255e03ff74046cc78cb3cb0e9c t/Music-AtonalUtil.t
+SHA256 1fe680781676a71d650f9ccbee13e9c993b57f327064d5432d67f9bdc391d880 t/forte2pcs2forte.t
+SHA256 45adced8a1b66f71a7653df6b99565034df8f4a326af4c309436da2cb994684c t/pod-coverage.t
+SHA256 e7fcea91bb2c7b65a4d18780db4fadd16bc5e94b2f907808753d07d4d5b5f76e t/pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJXWXRSAAoJEKSYBH5dablg6vwIAIq/sCUIDyZhCJqdNcvCMDjY
-4wL2QvU5jVKSNv9cOwq7yuWifQ02MN0O16w/mrluUC0rFJTInavTc6b8AitlSKSs
-xaX1iXBlSVIxZbmEUJ8x7sBk6CUmjEToB2qaxFphnXoZrudUND2I0oxCfsjRq5hF
-A2EpP8mZuoBUJxhMpHfmmlr/T5OX3uOqr7uZDyDY68qnYwYwx672WDEUhfOj3A8Z
-2S+lMpupNZ137BCWw97rheQsxg+YLrL22BEKwIt0OBaeGvzqehlhaynWa2wLJapL
-2usCp6mL09K//tGOT4OafL74GcpGhFJEINjBQxaJzKUx5KTFi76a7WdqMSmB8vs=
-=PbCg
+iQGzBAEBAwAdFiEElPO2YAAs9b/plKLEs1lvXE/ryKcFAmL8a+kACgkQs1lvXE/r
+yKdvZgv7BFQLUy+rwkpAtfz0DF19VRvqMEPCTd8OjPDEobunihkHlaCBJM0ddYbm
+gJxZplh6jRWu4+ftMYBKUoScyY8Zz9Oose+fE5j2QAsYclKg6TpYKbO3vvnw14Dt
+3WN0LgWvC5oGYpURzu4jYRTVMmsbIUON7sCdeRt7IdMQocekOEW6luA8liNwb+Qe
+lRNbVNXaiWZ6DgJw2KLn9EOCFoqcegm9Fl3a/2O99kiB525AFKivycBFbG4K/hpp
+NRcmF9D+DqB5O/CXVMAM5xuPeLCvmJlDi0XP2AS1FKdUftoAIQtOj/G2IYDy6E18
+C2PJ+NxIRDLX3mdivqvDIV5Rre+DL9HI90xPo47jSQCqp1KMgmBHHOlKlcRh+KQ5
+JpbThQzq0ECfPyaB/YzL6BWlSEGU9rk986f9t9xaCumyIkm/mxQP0irVbonk2Q2M
+cUXMZAPoRhVwCpJVlSxQmbVYrlDE6hg9clICszc0htomhLoup6We4fhTPBSVxzKj
+9eA5Tz68
+=IA6a
 -----END PGP SIGNATURE-----

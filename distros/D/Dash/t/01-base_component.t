@@ -18,9 +18,9 @@ my $undefined_namespace = 'no_namespace';
 is( $base->DashNamespace(), $undefined_namespace );
 
 is_deeply( $base->TO_JSON,
-           { type      => 'BaseComponent',
-             namespace => $undefined_namespace,
-             props     => { children => undef }
+           {  type      => 'BaseComponent',
+              namespace => $undefined_namespace,
+              props     => { children => undef }
            },
            'Hash representation match that expected by dash_renderer.js'
 );

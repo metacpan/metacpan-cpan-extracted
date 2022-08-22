@@ -71,7 +71,7 @@ package Catmandu::Importer::MARC::Line;
 use Catmandu::Sane;
 use Moo;
 
-our $VERSION = '1.271';
+our $VERSION = '1.281';
 
 with 'Catmandu::Importer';
 
@@ -122,12 +122,17 @@ sub generator {
                     # check if field has content
                     if ($sf) {
                         # get subfield codes by pattern
-                        my @sf_codes = $sf =~ m/\s?\$([a-z0-9])\s/g;
+                        # some special characters are allowed as subfiled codes in local defined field
+                        # see https://www.loc.gov/marc/96principl.html#eight 8.4.2.3.
+                        my @sf_codes = $sf =~ m/\s?\$([a-z0-9!"#\$%&'\(\)\*\+'-\.\/:;<=>])\s/g;
 
                         # split string by subfield code pattern
                         my @sf_values
-                            = grep {length $_} split /\s?\$[a-z0-9]\s/, $sf;
-
+                            = grep {length $_}
+                                split
+                                /\s?\$[a-z0-9!"#\$%&'\(\)\*\+'-\.\/:;<=>]\s/,
+                                $sf;
+                           
                         if (scalar @sf_codes != scalar @sf_values) {
                             warn
                                 'different number of subfield codes and values';

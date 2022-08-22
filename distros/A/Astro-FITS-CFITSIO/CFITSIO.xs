@@ -1883,7 +1883,7 @@ ffcpht(infptr,outfptr,firstrow,nrows,status)
 	int &status
 	ALIAS:
 		Astro::FITS::CFITSIO::fits_copy_hdutab = 1
-		fitsfilePtr::create_copy_hdutab = 2
+		fitsfilePtr::copy_hdutab = 2
 	OUTPUT:
 		status
 

@@ -9,4 +9,5 @@ t/test.t
 t/agreements.t
 t/validation.t
 t/validate_card.t
+CONTRIBUTING.md
 META.json                                Module JSON meta-data (added by MakeMaker)

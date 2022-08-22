@@ -54,7 +54,9 @@ INTERFACE
     Create accessor methods and helper methods in your class. Following
     helper methods will be created automatically.
 
-    $your_object->is_dirty; =item $your_object->is_dirty("field_name");
+    $your_object->is_dirty;
+
+    $your_object->is_dirty("field_name");
 
       Check that the instance is modified. If it's true, you should store
       this instance into some place through using <to_hash> method.

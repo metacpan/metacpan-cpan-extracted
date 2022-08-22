@@ -132,6 +132,9 @@ SV *ObjectPad_get_obj_backingav(pTHX_ SV *self, enum ReprType repr, bool create)
 #define mop_create_class(type, name)  ObjectPad_mop_create_class(aTHX_ type, name)
 ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name);
 
+#define mop_get_class_for_stash(stash)  ObjectPad_mop_get_class_for_stash(aTHX_ stash)
+ClassMeta *ObjectPad_mop_get_class_for_stash(pTHX_ HV *stash);
+
 #define mop_class_set_superclass(class, super)  ObjectPad_mop_class_set_superclass(aTHX_ class, super)
 void ObjectPad_mop_class_set_superclass(pTHX_ ClassMeta *class, SV *superclassname);
 

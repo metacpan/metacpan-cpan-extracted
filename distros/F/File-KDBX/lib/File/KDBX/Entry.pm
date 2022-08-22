@@ -21,7 +21,7 @@ use namespace::clean;
 
 extends 'File::KDBX::Object';
 
-our $VERSION = '0.905'; # VERSION
+our $VERSION = '0.906'; # VERSION
 
 my $PLACEHOLDER_MAX_DEPTH = 10;
 my %PLACEHOLDERS;
@@ -129,14 +129,16 @@ sub string {
 
     return $self->{strings}{$key} = $args{value} if is_plain_hashref($args{value});
 
+    # Auto-vivify the standard strings.
+    if (!exists $self->{strings}{$key} && $STANDARD_STRINGS{$key}) {
+        $args{value} //= '';
+        $args{protect} //= true if $self->_protect($key);
+    }
+
     while (my ($field, $value) = each %args) {
         $self->{strings}{$key}{$field} = $value;
     }
 
-    # Auto-vivify the standard strings.
-    if ($STANDARD_STRINGS{$key}) {
-        return $self->{strings}{$key} //= {value => '', $self->_protect($key) ? (protect => true) : ()};
-    }
     return $self->{strings}{$key};
 }
 
@@ -681,7 +683,7 @@ File::KDBX::Entry - A KDBX database entry
 
 =head1 VERSION
 
-version 0.905
+version 0.906
 
 =head1 DESCRIPTION
 

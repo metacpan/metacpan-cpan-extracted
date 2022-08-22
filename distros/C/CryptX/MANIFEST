@@ -1057,6 +1057,7 @@ t/mbi_ltm_bigintpm.t
 t/mbi_ltm_biglog.t
 t/mbi_ltm_bigroot.t
 t/mbi_ltm_bugs.t
+t/mbi_ltm_latest.t
 t/mbi_ltm_mbi-from-big-scalar.t
 t/mbi_ltm_storable.t
 t/mode_cbc.t

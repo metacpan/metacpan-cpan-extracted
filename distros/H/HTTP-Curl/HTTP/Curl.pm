@@ -2,7 +2,7 @@ package HTTP::Curl;
 
 use strict;
 use warnings;
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use Net::Curl::Easy qw(/^CURLOPT_/ CURLE_OK CURLINFO_EFFECTIVE_URL CURLE_WRITE_ERROR CURLE_OPERATION_TIMEDOUT CURLE_RECV_ERROR);
 
@@ -65,7 +65,7 @@ sub _prepare {
 	my $on_header = $$opt{on_header};
 	my $on_body   = $$opt{on_body};
 
-	$easy->setopt(CURLOPT_WRITEHEADER, \ my $headers);
+	$easy->setopt(CURLOPT_WRITEHEADER, \ my $_headers);
 
 	my $body = "";
 	$easy->setopt(CURLOPT_FILE, \$body) unless $on_body;
@@ -83,6 +83,8 @@ sub _prepare {
 
 	$easy->setopt(CURLOPT_FORBID_REUSE, $$opt{persistent} ? 0 : 1) if exists $$opt{persistent};
 
+	my ($is_success, $headers, $redirects);
+
 	my $max_size = $$opt{max_size};
 	my $aborted_by_max_size = 0;
 
@@ -94,7 +96,7 @@ sub _prepare {
 			my $size = length $data;
 			$body_size += $size;
 			if ($on_header) {
-				my ($is_success, $headers, $redirects) = _headers($easy, $url, $headers);
+				($is_success, $headers, $redirects) = _headers($easy, $url, $_headers);
 				my $r = $on_header->($is_success, $headers, $redirects);
 				$on_header = undef;
 				$r or return 0;
@@ -118,8 +120,8 @@ sub _prepare {
 	my $finish = sub {
 		my ($easy, $result) = @_;
 
-		if ($headers) {
-			my ($is_success, $headers, $redirects) = _headers($easy, $url, $headers);
+		if ($_headers) {
+			($is_success, $headers, $redirects) = _headers($easy, $url, $_headers) unless $headers;
 			if ($result == CURLE_WRITE_ERROR and $aborted_by_max_size) {
 				$is_success = 0;
 				$$headers{"Status"} = 599;
@@ -275,6 +277,7 @@ HTTP::Curl - HTTP interface for Net::Curl (clone of HTTP::Any::Curl)
  use Net::Curl::Multi;
  use Net::Curl::Multi::EV;
  use HTTP::Curl;
+
  my $multi = Net::Curl::Multi->new();
  my $curl_ev = Net::Curl::Multi::EV::curl_ev($multi);
  my $easy = Net::Curl::Easy->new();

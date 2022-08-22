@@ -1,6 +1,6 @@
 package Net::IPAM::Tree;
 
-our $VERSION = '3.02';
+our $VERSION = '4.00';
 
 use 5.10.0;
 use strict;

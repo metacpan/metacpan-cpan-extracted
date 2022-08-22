@@ -4,7 +4,7 @@
       "Takumi Akiyama <t.akiym@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.13",
+   "generated_by" : "Minilla/v3.1.19",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,7 @@
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -57,7 +57,7 @@
    "provides" : {
       "Smart::Args::TypeTiny" : {
          "file" : "lib/Smart/Args/TypeTiny.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "Smart::Args::TypeTiny::Check" : {
          "file" : "lib/Smart/Args/TypeTiny/Check.pm"
@@ -70,11 +70,13 @@
       },
       "homepage" : "https://github.com/akiym/Smart-Args-TypeTiny",
       "repository" : {
-         "url" : "git://github.com/akiym/Smart-Args-TypeTiny.git",
+         "type" : "git",
+         "url" : "https://github.com/akiym/Smart-Args-TypeTiny.git",
          "web" : "https://github.com/akiym/Smart-Args-TypeTiny"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_authority" : "cpan:AKIYM",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 1
 }

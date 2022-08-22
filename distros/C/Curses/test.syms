@@ -1,6 +1,6 @@
 #!../../perl
 ##
-##  test.syms -- test for function/variable symbols 
+##  test.syms -- test for function/variable symbols
 ##
 ##  Set the environment variable CURSES_VERBOSE to see the details of the
 ##  testing.
@@ -27,33 +27,19 @@ my $verbose;
 
 sub makeCompileCommand($) {
     my ($compileR) = @_;
-    
+
     #  Get a compile command so we can test for curses symbols.
     # (There has got to be an easier way.  Blech.)
     #
 
     my $compile = '#CC# #DEFS# #INCS# #CFLAGS# #FILE# #LFLAGS# #LIBS#' .
         ($verbose ? '' : '#NULL#');
-    my $makefile = ($OSNAME =~ /VMS/) ? "Descrip.MMS" : "Makefile";
 
-    my ($cc, $inc, $ccflags, $ldloadlibs, $lddlflags);
-
-    open MAKEFILE, "< $makefile" or 
-        die "Can't open make file '$makefile' errno=$ERRNO";
-    while (<MAKEFILE>) {
-
-        if (/^CC\s*=\s*(.*)/) { 
-            $cc = $1;
-        } elsif (/^INC\s*=\s*(.*)/) { 
-            $inc = $1;
-        } elsif (/^CCFLAGS\s*=\s*(.*)/) { 
-            $ccflags = $1;
-        } elsif (/^LDLOADLIBS\s*=\s*(.*)/) { 
-            $ldloadlibs = $1;
-        } elsif (/^LDDLFLAGS\s*=\s*(.*)/) {
-            $lddlflags = $1;
-        }
-    }
+    my $cc         = $ENV{'CC'};
+    my $inc        = $ENV{'INC'};
+    my $ccflags    = $ENV{'CCFLAGS'};
+    my $ldloadlibs = $ENV{'LDLOADLIBS'};
+    my $lddlflags  = $ENV{'LDDLFLAGS'};
 
     if (defined($cc)) {
         $compile =~ s{#CC#}{$cc};
@@ -80,7 +66,6 @@ sub makeCompileCommand($) {
         }
         $compile =~ s{#LFLAGS#}{$lflags};
     }
-    close MAKEFILE;
 
     #  Left to handle: DEFS/FILE/NULL
     #  DEFS  => "cc" define of "SYM" to "_C_SYM_"
@@ -104,7 +89,7 @@ sub makeCompileCommand($) {
         $compile =~ s{#FILE#}{-o _C_FILE_ _C_FILE_.c};
         $compile =~ s{#NULL#}{>/dev/null 2>&1};
     }
-    
+
     if ($compile =~ m{#.+#}) {
         die "OOPS: internal error constructing a compile command.  " .
             "We failed to substitute for a #xxx# substitution variable " .
@@ -152,7 +137,7 @@ while (@ARGV) {
 	open STDERR, ">&LOG"     or die "Can't redirect STDERR: $!\n";
 
 	next;
-    };	
+    };
     $arg =~ /^-/ and Usage("Unknown option: $arg");
     Usage("Unknown argument: $arg");
 }
@@ -187,17 +172,17 @@ print OUTH <<'EOHDR';
 
 EOHDR
 
-print OUTH 
+print OUTH
     $panels ? "#define " : "#undef  ",
     "C_PANELFUNCTION         /* Add in panel library function?             */",
     "\n\n";
 
-print OUTH 
+print OUTH
     $menus ? "#define " : "#undef  ",
     "C_MENUFUNCTION         /* Add in menu library function?              */",
     "\n\n";
 
-print OUTH 
+print OUTH
     $forms ? "#define " : "#undef  ",
     "C_FORMFUNCTION          /* Add in form library function?              */",
     "\n\n";
@@ -222,7 +207,7 @@ while (<IN>) {
     unless (defined $sym and defined $file) {
 	warn "WARNING: internal error on symbol $_\n";
     }
-    
+
     my $cmd;
     $cmd = $compile;  # initial value
     my $symargs = $sym . (defined($args) ? $args : '');
@@ -300,7 +285,7 @@ sub Usage {
 Usage: find_syms [options]
 where options include:
 
-   -h         This message.   
+   -h         This message.
    -v         Verbose.  Tell you more than you want to know about
               how the Curses symbols are being determined.
    -l <file>  Create file <file> and dump output into it.

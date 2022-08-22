@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Dialog;
-$Playwright::Dialog::VERSION = '1.210';
+$Playwright::Dialog::VERSION = '1.251';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,16 +20,6 @@ sub new {
 
 sub spec {
     return $Playwright::spec->{'Dialog'}{members};
-}
-
-sub type {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'type',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
 }
 
 sub dismiss {
@@ -57,6 +47,16 @@ sub message {
     return $self->_api_request(
         args    => [@_],
         command => 'message',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub type {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'type',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -116,7 +116,7 @@ Playwright::Dialog - Automatically generated class for Playwright::Dialog
 
 =head1 VERSION
 
-version 1.210
+version 1.251
 
 =head1 CONSTRUCTOR
 
@@ -126,12 +126,6 @@ You shouldn't have to call this directly.
 Instead it should be returned to you as the result of calls on Playwright objects, or objects it returns.
 
 =head1 METHODS
-
-=head2 type(@args)
-
-Execute the Dialog::type playwright routine.
-
-See L<https://playwright.dev/api/class-Dialog#Dialog-type> for more information.
 
 =head2 dismiss(@args)
 
@@ -150,6 +144,12 @@ See L<https://playwright.dev/api/class-Dialog#Dialog-defaultValue> for more info
 Execute the Dialog::message playwright routine.
 
 See L<https://playwright.dev/api/class-Dialog#Dialog-message> for more information.
+
+=head2 type(@args)
+
+Execute the Dialog::type playwright routine.
+
+See L<https://playwright.dev/api/class-Dialog#Dialog-type> for more information.
 
 =head2 accept(@args)
 

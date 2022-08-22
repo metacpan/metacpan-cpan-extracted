@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 219ab1252a4b9511fd8fe79ec5537d427b6110538b03ee5f2958351e224edce5 Changes
+SHA256 952755f5e946192da9050b41d61bfc56587b75ea44864fdf2fec98830bc9520c LICENSE
+SHA256 cd7db2a1a448353fcc227dae6625ee3a1648ce3ff88ca4e4764758a34aec5b3b MANIFEST
+SHA256 05fbb8bf678b6f1358d0edde04404bf30654deb5855cccf4dc2ea6b31ef55a92 META.yml
+SHA256 6059174edb7f6859595fd9c10f6f56e1532db5d3d951f257e44865b4b7dd1d31 Makefile.PL
+SHA256 0792d7125f52d476d3c70340cb6112cc55548bd744402b4bf381c198c045f37e README
+SHA256 9b9c224673f89e19e9efc87ce4ef9eb19e2ebbf2684680051c8b994045e46bcb Socket.pm
+SHA256 e153af2f30da6cf48d8a934750b3be62eec4809e86b585c27748184c5690c7f9 examples/check_socket.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 8d12ece5484bf694faf62a7989ad7b8274646022ea4c4267ce5e19d4e6a4b8f4 t/Check-Socket/01-use.t
+SHA256 fceef4eab487dcee6151b0386b1539ff2baa55820621b1179327b910debc768c t/Check-Socket/02-version.t
+SHA256 c8024b30d91a2561f6fbb71cec98e793894be2dfc36f6acb22f9dc4875913658 t/Check-Socket/03-check_socket-fake-true.t
+SHA256 3fd5035ffb6d6cfddfa2908ff4d085b5abcd51a27107595eab071403d01b0ebb t/Check-Socket/04-check_socket-fake-false.t
+SHA256 d8f142d34c6119fec795808ff4e6ebd195e00d05d35b9be2ad303cc62418735a t/Check-Socket/05-check_socket.t
+SHA256 31ee8477b7395b4d680049ff80322f16ade3fc5d960d7a5bd932d310fc7baa45 xt/Check-Socket/01-pod_coverage.t
+SHA256 e4292f706ed495476117fed74f16e0ca7efc7039b2f5e885a89767317729bc17 xt/Check-Socket/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmL+KLkACgkQgmqNLzlX
+aReFsQv/ZbprbxIptmGSgIOxzfS5xG7N9O7JmWtb5w4NBUKVnylLs1jB2oMj3RXI
+JMO63sSCHVv9Ed+STcW4vS9uZoJoHlYdeF+4nWTAEjmYgXHsnWMTdurR7IenBAYj
+Sbm8ibkB066C/5+XIHylUTbHG+tEJBcBx1rYzKTb3g5CKwBpOITAKNEQKbltkPr3
+p4akamy3V5oDuTJMu9tTlmp0cnnCcm5BuGZAuUyG63VJfuqTK41MtOazY04qMvpY
+VoKAaXMmjZwRglP0d5wE4G/AquKbE2uReKsMXVlmC0dFZlksqmgxRI+R4bI83Orp
+TreLHqR7/3IMFuyAvYgh6aS8jOSdnZTyxjF5K1lEn9hAmH8FZWNQdi4rcHrjHImx
+lIPAodaTx28HCSuhSZ5nG7vPqYzQe2DRVr+PqlW/dm3v85Ur4nY1YNygr8ap8dw8
+bhHxlihUtnPTeYOZP8D0H8htjY/6pcbffG7eSEB5ckLrFaB3MHVRhFqPnTbMHbbj
+uu2j6sEn
+=qRmZ
+-----END PGP SIGNATURE-----

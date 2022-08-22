@@ -93,19 +93,84 @@ my $configure_wordpress=sub {
    my $selection=$_[0]||'';
    my $domain_url=$_[1]||'';
    $domain_url=~s/^\s*https?:\/\/w?w?w?\.?//;
-   my $service_and_cert_password=$_[2]||'';
-   my $email_address=$_[3]||'';
-   my $stripe_publish_key=$_[4]||'';
-   my $stripe_secret_key=$_[5]||'';
-   my $recaptcha_publish_key=$_[6]||'';
-   my $recpatcha_secret_key=$_[7]||'';
+   my $skip_certbot=$_[2]||'';
+   my $service_and_cert_password=$_[3]||'';
+   my $email_address=$_[4]||'';
+   my $stripe_publish_key=$_[5]||'';
+   my $stripe_secret_key=$_[6]||'';
+   my $recaptcha_publish_key=$_[7]||'';
+   my $recpatcha_secret_key=$_[8]||'';
    my ($stdout,$stderr)=('','');
    my $handle=connect_shell();my $connect_error='';
    my $build_php=0;
    my $sudo=($^O eq 'cygwin')?'':
          'sudo env "LD_LIBRARY_PATH='.
          '/usr/local/lib64:$LD_LIBRARY_PATH" '.
-         '"PATH=/usr/local/mysql/scripts:$PATH" ';
+         '"PATH=/usr/local/bin:$PATH" '.
+         'PKG_CONFIG_PATH=/usr/lib64/pkgconfig ';
+   ($stdout,$stderr)=$handle->cmd($sudo.'id www-data');
+   if ($stdout=~/no such user/s || $stderr=~/no such user/s) {
+      ($stdout,$stderr)=$handle->cmd($sudo.'groupadd www-data');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'adduser -r -m -g www-data www-data');
+      $handle->print($sudo.'passwd www-data');
+      my $prompt=$handle->prompt();
+      while (1) {
+         my $output.=fetch($handle);
+         last if $output=~/$prompt/;
+         print $output;
+         if (-1<index $output,'New password:') {
+            $handle->print($service_and_cert_password);
+            $output='';
+            next;
+         } elsif (-1<index $output,'Retype new password:') {
+            $handle->print($service_and_cert_password);
+            $output='';
+            next;
+         }
+      }
+      ($stdout,$stderr)=$handle->cmd($sudo.'id');
+      if ($stdout=~/[(]root[)]/ || $stdout=~/[(]root[)]/) {
+         ($stdout,$stderr)=$handle->cmd(
+            'echo "www-data ALL=(ALL) NOPASSWD:ALL" > '.
+            '/etc/sudoers.d/www-data'); 
+      }
+      print "\n\n   Login as www-data and re-run the WordPress ",
+            "installation\n\n";
+      cleanup;
+   }
+#cleanup;
+   unless ($^O eq 'cygwin') {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'find /etc/ld.so.conf.d -type f | xargs grep /usr/local/lib');
+      my $flag=0;
+      unless ($stdout) {
+         ($stdout,$stderr)=$handle->cmd('echo /usr/local/lib > '.
+            '~/local.conf');
+         $flag=1;
+      }
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'find /etc/ld.so.conf.d -type f | xargs grep /usr/local/lib64');
+      unless ($stdout) {
+         ($stdout,$stderr)=$handle->cmd('echo /usr/local/lib64 >> '.
+            '~/local.conf');
+         $flag=1;
+      }
+      if ($flag) {
+         ($stdout,$stderr)=$handle->cmd($sudo.'chmod -v 644 ~/local.conf',
+            '__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'mv -v ~/local.conf /etc/ld.so.conf.d','__display__');
+      }
+      ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig');
+      ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig /usr/local/lib64');
+   }
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'find /etc/ld.so.conf.d -type f | xargs grep /usr/local/lib64');
+   unless ($stdout) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'echo /usr/local/lib64 >> /etc/ld.so.conf.d/local.conf'); 
+   }
    ($stdout,$stderr)=$handle->cmd($sudo.
       "hostnamectl set-hostname $domain_url");
    ($stdout,$stderr)=setup_aws_security(
@@ -212,21 +277,21 @@ my $configure_wordpress=sub {
          'mkdir -vp /var/www/html','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'chmod 755 ~');
       ($stdout,$stderr)=$handle->cmd($sudo.'yum clean all');
-      ($stdout,$stderr)=$handle->cmd($sudo.'yum grouplist hidden');
+      ($stdout,$stderr)=$handle->cmd($sudo.'yum grouplist hidden','90');
       ($stdout,$stderr)=$handle->cmd($sudo.'yum groups mark convert');
       ($stdout,$stderr)=$handle->cmd($sudo.
          "yum -y groupinstall 'Development tools'",'__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'yum -y install icu cyrus-sasl openssl-devel'.
+         'yum -y install icu cyrus-sasl'.
          ' cyrus-sasl-devel libtool-ltdl-devel libjpeg-turbo-devel'.
          ' freetype-devel libpng-devel java-1.7.0-openjdk-devel'.
          ' unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel'.
          ' ncurses-devel xmlto autoconf libmcrypt libmcrypt-devel'.
-         ' libcurl libcurl-devel libicu libicu-devel re2c'.
+         ' libcurl libcurl-devel libicu libicu-devel gnu-utils'.
          ' libpng-devel.x86_64 freetype-devel.x86_64 expat-devel'.
          ' oniguruma oniguruma-devel tcl tcl-devel git-all'.
          ' lzip libffi-devel libc-client-devel texinfo cmake'.
-         ' systemd-devel bind-utils mailx',
+         ' systemd-devel bind-utils mailx sendmail',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'yum -y update','__display__');
@@ -407,7 +472,7 @@ if ($do==1) {
          'https://dl.fedoraproject.org/pub/epel/'.
          'epel-release-latest-7.noarch.rpm','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'yum -y install uuid-devel '.
-         'pkgconfig libtool gmp-devel '.
+         'pkgconfig libtool '.
          'mpfr-devel libmpc-devel','__display__');
    }
 
@@ -632,6 +697,30 @@ if ($do==1) {
    $stdout=~s/^.*?GCC[)]\s+?([^\s]+)\s+Copyright.*$/$1/s;
    if ($stdout ne $verss) {
       ($stdout,$stderr)=$handle->cwd('/opt/source');
+      my $done=0;my $gittry=0;
+      while ($done==0) {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'git clone --recursive '.
+            'https://gitlab.freedesktop.org/pkg-config/pkg-config.git',
+            '__display__');
+         if (++$gittry>5) {
+            print "\n\n   FATAL ERROR: $stderr\n\n";
+            cleanup();
+         }
+         my $gittest='Connection reset by peer|'.
+                     'Could not read from remote repository';
+         $done=1 if $stderr!~/$gittest/s;
+         last if $done;
+         sleep 30;
+      }
+      ($stdout,$stderr)=$handle->cwd('pkg-config');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         './autogen.sh --with-internal-glib','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make install','__display__');
+      ($stdout,$stderr)=$handle->cwd('/opt/source');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'wget --random-wait --progress=dot '.
          'http://ftp.gnu.org/gnu/autoconf/autoconf-latest.tar.gz',
@@ -709,28 +798,25 @@ if ($do==1) {
    ($stdout,$stderr)=$handle->cmd($sudo.
       'wget -qO- https://zlib.net');
    $stdout=~s/^.*?Current release:.*?zlib (.*?)[<].*$/$1/s;
+   my $latest=$stdout;
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "git checkout v$stdout",'__display__');
+      'git pull','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "git checkout v$latest",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       './configure','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make install','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'wget -qO- http://xmlsoft.org/news.html');
-   $stdout=~s/^.*?public releases.*?v(.*?):.*$/$1/s;
-   my $lxmlver=$stdout;
+      'wget -qO- https://en.wikipedia.org/wiki/Libxml2');
+   $stdout=~s/^.*?Stable release.*?-data["][>][<][^>]+[>](.*?)[<].*$/$1/s;
+   my $sslv=$stdout;
+   my $sslr=$sslv;
+   $sslr=~s/\./\[\.\]/g;
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "ls -1 /usr/local/lib | grep libxml2.so.$lxmlver");
+      "strings /usr/local/lib/libxml2.so | grep v$sslr");
    unless ($stdout) {
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'ls -1 | grep libxml2');
-      if ($stdout=~/^\s*libxml2\s*$/s) {
-         ($stdout,$stderr)=$handle->cmd($sudo.
-             'rm -rvf libxml2-old','__display__');
-         ($stdout,$stderr)=$handle->cmd($sudo.
-             'mv -v libxml2 libxml2-old','__display__');
-      }
       my $done=0;my $gittry=0;
       while ($done==0) {
          ($stdout,$stderr)=$handle->cmd($sudo.
@@ -748,7 +834,9 @@ if ($do==1) {
       }
       ($stdout,$stderr)=$handle->cwd('libxml2');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "git checkout v$lxmlver",'__display__');
+         'git pull','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "git checkout v$sslv",'__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          '"ACLOCAL_PATH=/usr/share/aclocal" '.
          './autogen.sh','__display__');
@@ -758,8 +846,7 @@ if ($do==1) {
          'make install','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'cp -v libxml-2.0.pc /usr/lib64/pkgconfig','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'ldconfig -v','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig');
       $build_php=1;
    } else {
       print "libxml2 is up to date.\n";
@@ -781,8 +868,7 @@ if ($do==1) {
       'make install','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'cp -v sqlite3.pc /usr/lib64/pkgconfig','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'ldconfig -v','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'wget --random-wait --progress=dot '.
@@ -803,7 +889,7 @@ if ($do==1) {
    ($stdout,$stderr)=$handle->cmd($sudo.
       'wget -qO- https://en.wikipedia.org/wiki/OpenSSL');
    $stdout=~s/^.*?Stable release.*?-data["][>](.*?) *[(].*$/$1/s;
-   my $sslv=$stdout;
+   $sslv=$stdout;
    ($stdout,$stderr)=$handle->cmd($sudo.
       'ls -1 | grep openssl');
    my $ssldir=0;
@@ -841,14 +927,13 @@ if ($do==1) {
          'openssl/raw/master/rpm/openssl.spec',
          '__display__');
       my $sslr=$sslv;
-      $sslr=~s/\./_/g;
-$sslr='1_1_1l';
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "git checkout OpenSSL_$sslr",'__display__');
+         'git pull','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "git checkout openssl-$sslv",'__display__');
       if ($ssllib!~/$sslv/s) {
          ($stdout,$stderr)=$handle->cmd($sudo.
-            './config LDFLAGS="-Wl,-rpath /usr/local/lib -Wl,'.
-            '-rpath /usr/local/lib64"','__display__');
+            './config -Wl,-rpath=/usr/local/lib64','__display__');
          ($stdout,$stderr)=$handle->cmd($sudo.
             'make install','__display__');
          ($stdout,$stderr)=$handle->cmd($sudo.
@@ -857,14 +942,7 @@ $sslr='1_1_1l';
          ($stdout,$stderr)=$handle->cmd($sudo.
             'cp -v *.pc /usr/local/lib/pkgconfig',
             '__display__');
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            'ldconfig -v','__display__');
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            'ln -s /usr/local/lib64/libssl.so.1.1 '.
-            '/usr/lib64/libssl.so.1.1');
-         ($stdout,$stderr)=$handle->cmd($sudo.
-           'ln -s /usr/local/lib64/libcrypto.so.1.1 '.
-            '/usr/lib64/libcrypto.so.1.1');
+         ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig');
          $build_php=1;
       } else {
          print "libssl is up to date.\n";
@@ -901,12 +979,11 @@ $do=1;
 if ($do==1) { # INSTALL LATEST VERSION OF PYTHON
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'wget -qO- https://www.python.org/downloads/release');
-   $stdout=~s/^.*list-row-container menu.*?Python (.*?)[<].*$/$1/s;
+      'wget -qO- https://www.python.org/downloads/source');
+   $stdout=~s/^.*Latest Python 3 Release - Python (.*?)[<].*$/$1/s;
    my $version=$stdout;
-   $stdout=~s/\.[0-9]$//;
    ($stdout,$stderr)=$handle->cmd(
-      "if test -f /usr/local/bin/python$stdout; then echo Exists; fi");
+      "if test -f /usr/local/bin/python-$stdout; then echo Exists; fi");
    unless ($stdout=~/Exists/s) {
       ($stdout,$stderr)=$handle->cmd($sudo.
          'wget --random-wait --progress=dot '.
@@ -933,7 +1010,7 @@ if ($do==1) { # INSTALL LATEST VERSION OF PYTHON
          'sed -i "s/lib -lssl/lib64 -lssl/" Modules/Setup');
       ($stdout,$stderr)=$handle->cmd($sudo.
          './configure --prefix=/usr/local --exec-prefix=/usr/local '.
-         '--enable-optimizations LDFLAGS="-Wl,-rpath /usr/local/lib" '.
+         '--enable-optimizations LDFLAGS="-Wl,--enable-new-dtags,-rpath /usr/local/lib" '.
          '--with-openssl=/usr/local','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'make','7200','__display__');
@@ -949,6 +1026,15 @@ if ($do==1) { # INSTALL LATEST VERSION OF PYTHON
       ($stdout,$stderr)=$handle->cmd($sudo.
          "/usr/local/bin/python$version -m pip install ".
          "--upgrade pip setuptools wheel",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "/usr/local/bin/python$version -m pip install Jinja2",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "/usr/local/bin/python$version -m pip install gperf",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "/usr/local/bin/python$version -m pip install matplotlib",
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          "/usr/local/bin/python$version -m pip install pyasn1",
@@ -969,11 +1055,14 @@ if ($do==1) { # INSTALL LATEST VERSION OF PYTHON
       unless ($^O eq 'cygwin') {
          ($stdout,$stderr)=$handle->cmd('echo /usr/local/lib > '.
             '~/local.conf','__display__');
+         ($stdout,$stderr)=$handle->cmd('echo /usr/local/lib64 >> '.
+            '~/local.conf','__display__');
          ($stdout,$stderr)=$handle->cmd($sudo.'chmod -v 644 ~/local.conf',
             '__display__');
          ($stdout,$stderr)=$handle->cmd($sudo.
             'mv -v ~/local.conf /etc/ld.so.conf.d','__display__');
          ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig');
+         ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig /usr/local/lib64');
       } else {
          ($stdout,$stderr)=$handle->cmd(
             "python$version -m pip install awscli",
@@ -1003,6 +1092,8 @@ if ($do==1) { # INSTALL LATEST VERSION OF NGINX
    # https://www.wpwhitesecurity.com/creating-mysql-wordpress-database/
    ($stdout,$stderr)=$handle->cwd("/opt/source");
    ($stdout,$stderr)=$handle->cmd($sudo.
+      'rm -rvf /opt/source/nginx*','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'rm -rvf /etc/nginx','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "wget -qO- https://nginx.org/en/download.html");
@@ -1014,39 +1105,24 @@ if ($do==1) { # INSTALL LATEST VERSION OF NGINX
    ($stdout,$stderr)=$handle->cwd($nginx);
    ($stdout,$stderr)=$handle->cmd($sudo."mkdir -vp objs/lib",'__display__');
    ($stdout,$stderr)=$handle->cwd("objs/lib");
-   ($stdout,$stderr)=$handle->cmd(
-      "wget --no-check-certificate -qO- https://ftp.pcre.org/pub/pcre/");
-   my %pcre=();
-   my %conv=(
-      Jan => 0, Feb => 1, Mar => 2, Apr => 3, May => 4, Jun => 5, Jul => 6,
-      Aug => 7, Sep => 8, Oct => 9, Nov => 10, Dec => 11
-   );
-   foreach my $line (split /\n/, $stdout) {
-      last unless $line;
-      $line=~/^.*?["](.*?)["].*(\d\d-\w\w\w-\d\d\d\d \d\d:\d\d).*(\d+\w).*$/;
-      my $file=$1;my $date=$2;my $size=$3;
-      next if $file=~/^pcre2|\.sig$|\.tar\.gz$|\.tar\.bz2$/;
-      next if $file!~/\.zip$/;
-      next unless $date;
-      $date=~/^(\d\d)-(\w\w\w)-(\d\d\d\d) (\d\d):(\d\d)$/;
-      my $day=$1;my $month=$2;my $year=$3;my $hour=$4,my $minute=$5;
-      my $timestamp=timelocal(0,$minute,$hour,$day,$conv{$month},--$year);
-      $pcre{$timestamp}=[$file,$size];
+   my $done=0;my $gittry=0;
+   while ($done==0) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git clone https://github.com/PhilipHazel/pcre2.git',
+         '__display__');
+      if (++$gittry>5) {
+         print "\n\n   FATAL ERROR: $stderr\n\n";
+         cleanup();
+      }
+      my $gittest='Connection reset by peer|'.
+                  'Could not read from remote repository';
+      $done=1 if $stderr!~/$gittest/s;
+      last if $done;
+      sleep 30;
    }
-   my $latest=(reverse sort keys %pcre)[0];
-   my $pcre=$pcre{$latest}->[0];
-   $pcre=~s/\.[^\.]+$//;
-   my $checksum='';
-   foreach my $cnt (1..3) {
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "wget --random-wait --progress=dot ".
-         "https://ftp.pcre.org/pub/pcre/$pcre.tar.gz",'__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "tar xvf $pcre.tar.gz",'__display__');
-      last unless $stderr;
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "rm -rfv $pcre.tar.gz",'__display__');
-   }
+   ($stdout,$stderr)=$handle->cwd("pcre2");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      './autogen.sh','__display__');
    ($stdout,$stderr)=$handle->cwd("/opt/source");
    # https://www.liberiangeek.net/2015/10/
    # how-to-install-self-signed-certificates-on-nginx-webserver/
@@ -1191,7 +1267,7 @@ END
                   '--lock-path=/var/run/nginx.lock '.
                   '--error-log-path=/var/log/nginx/error.log '.
                   '--http-log-path=/var/log/nginx/access.log '.
-                  "--with-http_ssl_module --with-pcre=objs/lib/$pcre ".
+                  "--with-http_ssl_module --with-pcre=objs/lib/pcre2 ".
                   "--with-zlib=/opt/source/zlib ".
                   '--with-http_gzip_static_module '.
                   '--with-http_ssl_module '.
@@ -1201,9 +1277,11 @@ END
                   '--without-http_uwsgi_module '.
                   '--with-http_v2_module '.
                   '--with-openssl=/opt/source/openssl';
-   ($stdout,$stderr)=$handle->cmd($sudo.$make_nginx,'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i 's/-Werror //' ./objs/Makefile");
+      'LDFLAGS="-Wl,--enable-new-dtags,-rpath /usr/lib64 -Wl,'.
+      '--enable-new-dtags,-rpath /usr/local/lib64" '.
+      $make_nginx,'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'make','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
    # https://www.liberiangeek.net/2015/10/
    # how-to-install-self-signed-certificates-on-nginx-webserver/
@@ -1242,7 +1320,7 @@ END
        '%NL%            deny all;'.
        '%NL%        }'.
        '%NL%'.
-       '%NL%        location ~ /\. {'.
+       '%NL%        location ~ /\\. {'.
        '%NL%            deny all;'.
        '%NL%            access_log off;'.
        '%NL%            log_not_found off;'.
@@ -1348,7 +1426,7 @@ END
    } else {
       ($stdout,$stderr)=$handle->cmd($sudo.
          "sed -i \'s/server_name  localhost/".
-         "server_name $domain_url/\' ".
+         "server_name $domain_url www.$domain_url/\' ".
          "$nginx_path/nginx/nginx.conf");
       ($stdout,$stderr)=$handle->cmd($sudo.
          "sed -i 's/#user  nobody;/user  www-data;/' ".
@@ -1363,14 +1441,16 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.
          'service nginx start','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'service nginx status -l','__display__');
+         'service nginx status -l --no-pager','__display__');
       ($stdout,$stderr)=$handle->cwd("$nginx_path/nginx");
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'yum -y install certbot-nginx','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'certbot -n --nginx --debug --agree-tos --email '.
-         "$email_address -d $domain_url",
-         '__display__');
+      unless ($skip_certbot) {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'yum -y install certbot-nginx','__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'certbot -n --nginx --debug --agree-tos --expand --email '.
+            "$email_address -d $domain_url -d www.$domain_url",
+            '__display__');
+      }
       # https://ssldecoder.org
       ($stdout,$stderr)=$handle->cmd($sudo.
          'systemctl enable nginx.service','__display__');
@@ -1378,7 +1458,7 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.
          'service nginx restart','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'service nginx status -l','__display__');
+         'service nginx status -l --no-pager','__display__');
    }
 }
 
@@ -1414,6 +1494,108 @@ END
       $build_php=1;
    } else {
       print "cmake is up to date.\n";
+   }
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget -qO- https://gmplib.org/');
+   $stdout=~s/^.*?Download:.*?href=["]([^"]+)["].*$/$1/s;
+   my $gmpver=$stdout;
+   my $gmpftp=$stdout;
+   $gmpver=~s/^.*-(.*?)\.tar\..z$/$1/s;
+   $gmpver=~s/[.]/\[\.\]/g;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "strings /usr/local/lib/libgmp.so | grep $gmpver");
+   unless ($stdout) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'wget --random-wait --progress=dot '.
+         "https:$gmpftp",
+         '__display__');
+      $gmpftp=~s/^.*\/(.*)$/$1/;
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "tar xvf $gmpftp",'__display__');
+      $gmpftp=~s/\.tar\..z$//;
+      ($stdout,$stderr)=$handle->cwd($gmpftp);
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         './configure','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make install','__display__');
+   } else {
+      print "libgmp is up to date.\n";
+   }
+   my $done=0;my $gittry=0;
+   while ($done==0) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git clone --recursive https://git.lysator.liu.se/nettle/nettle.git',
+         '__display__');
+      if (++$gittry>5) {
+         print "\n\n   FATAL ERROR: $stderr\n\n";
+         cleanup();
+      }
+      my $gittest='Connection reset by peer|'.
+                  'Could not read from remote repository';
+      $done=1 if $stderr!~/$gittest/s;
+      last if $done;
+      sleep 30;
+   }
+   ($stdout,$stderr)=$handle->cwd('nettle');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'git tag -l');
+   my %hash=();my $savepiece=0;my $saveline='';
+   foreach my $line (split /\n/,$stdout) {
+      my $piece=$line;
+      $piece=~s/^.*release_(.*)$/$1/;
+      next if $piece!~/^\d+$/;
+      next if $piece<$savepiece;
+      $savepiece=$piece;
+      $saveline=$line;
+   }
+   $saveline='nettle_3.4.1_release_20181204';
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "git checkout $saveline",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      './.bootstrap','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      './configure CC=\'gcc -std=gnu99\' '.
+      '--prefix=/usr '.
+      '--disable-documentation --with-lib-path=/usr/local/lib64',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make install','__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget -qO- https://gnutls.org/download.html');
+   $stdout=~s/^.*Current stable.*?href=["]([^"]+?)["].*$/$1/s;
+   my $path=$stdout;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "wget -qO- $path");
+   $stdout=~s/^.*?href=["](gnutls-[^"]+?)["].*$/$1/s;
+   my $file=$stdout;
+   $stdout=~s/gnutls-//;
+   $stdout=~s/.tar.xz$//;
+   $stdout=~s/\./\[\.\]/g;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "strings /usr/local/lib64/libgnutls.so | grep $stdout");
+   unless ($stdout) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "wget --random-wait --progress=dot "."$path/$file",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "chown -v $username:$username $file",'__display__')
+         if $^O ne 'cygwin';
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "tar xvf $file",'__display__');
+      #($stdout,$stderr)=$handle->cmd($sudo.
+      #   "rm -rvf $file",'__display__');
+      $file=~s/.tar.xz//;
+      ($stdout,$stderr)=$handle->cwd($file);
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         './configure --with-included-libtasn1 '.
+         '--with-included-unistring --without-p11-kit',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make install','__display__');
+   } else {
+      print "libgnutls is up to date.\n";
    }
 
    #
@@ -1455,6 +1637,16 @@ END
    print $install_mysql;sleep 10;
    print "\n\n";
    ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'ls -1 /opt/source/mariadb');
+   if ($stdout=~/libmariadb/) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mkdir -vp /opt/mariadb','__display__');
+      ($stdout,$stderr)=$handle->cwd('/opt/source/mariadb');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mv -fv *rpm /opt/mariadb','__display__');
+   }
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.'which mysql');
    my $mysql_status='';my $mysql_version='';
    if ($stdout=~/\/mysql/) {
@@ -1479,8 +1671,7 @@ END
             "yum -y erase $pkg",'__display__');
       }
       ($stdout,$stderr)=$handle->cwd('/opt/source');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'ls -1 /opt','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'ls -1 /opt');
       if ($stdout!~/mariadb/i) {
          my $done=0;my $gittry=0;
          while ($done==0) {
@@ -1499,11 +1690,21 @@ END
          }
          ($stdout,$stderr)=$handle->cwd('mariadb');
          ($stdout,$stderr)=$handle->cmd($sudo.
+            'yum-complete-transaction',
+            '__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
             'yum-builddep -y mariadb-server',
             '__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'git clean -xffd && git submodule '.
+            'foreach --recursive git clean -xffd',
+            '__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'mkdir -v build-mariadb','__display__');
+         ($stdout,$stderr)=$handle->cwd('build-mariadb');
          # https://www.linuxfromscratch.org/blfs/view/cvs/server/mariadb.html
          ($stdout,$stderr)=$handle->cmd($sudo.
-            '/usr/local/bin/cmake -DWITH_SSL=yes '.
+            '/usr/local/bin/cmake .. -DWITH_SSL=yes '.
             '-DSKIP_TESTS=ON '.
             '-DMYSQL_DATADIR=/var/lib/mysql '.
             '-DCMAKE_INSTALL_PREFIX=/usr/local/mysql '.
@@ -1512,6 +1713,7 @@ END
             '-DINSTALL_SYSTEMD_UNITDIR=/etc/systemd/system '.
             '-DOPENSSL_INCLUDE_DIR=/usr/local/include/openssl '.
             '-DOPENSSL_SSL_LIBRARY=/usr/local/lib64/libssl.so '.
+            '-DDOWNLOAD_EXTRACT_TIMESTAMP=ON '.
             '-DOPENSSL_CRYPTO_LIBRARY='.
             '/usr/local/lib64/libcrypto.so',
             '3600','__display__');
@@ -1523,6 +1725,9 @@ END
             '__display__');
          ($stdout,$stderr)=$handle->cwd('mariadb');
       }
+      ($stdout,$stderr)=$handle->cwd('..');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'systemctl daemon-reload','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'groupadd mysql');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1546,8 +1751,9 @@ END
          'chown -v mysql:root /var/lib/mysql','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'chmod -v 700 /var/lib/mysql','__display__');
+      ($stdout,$stderr)=$handle->cwd('/usr/local/mysql');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'scripts/mysql_install_db --user=mysql '.
+         './scripts/mariadb-install-db --user=mysql '.
          '--datadir=/var/lib/mysql','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'ln -s /usr/local/mysql/bin/mariadb /bin/mysql');
@@ -1653,9 +1859,9 @@ END
          '__display__');
       sleep 2;
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'service mysql start','__display__');
+         'service mysql start --no-block','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'service mysql status -l','__display__');
+         'service mysql status --no-pager -l','__display__');
       print "MYSQL START STDOUT=$stdout and STDERR=$stderr<==\n";sleep 5;
       print "\n\n\n\n\n\n\nWE SHOULD HAVE INSTALLED MARIADB=$stdout<==\n\n\n\n\n\n\n";
       sleep 5;
@@ -1797,7 +2003,7 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'wget -qO- https://libzip.org/');
    $stdout=~s/^.*?Current version is (.*?)[<].*$/$1/s;
-   $stdout='1.6.1';
+   $stdout=~s/\./\[\.\]/g;
    ($stdout,$stderr)=$handle->cmd($sudo.
       "strings /usr/local/lib64/libzip.so | grep $stdout");
    unless ($stdout) {
@@ -1820,8 +2026,8 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.
          'git -P tag -l','__display__');
       $stdout=~s/^.*\n(rel-\d-\d-\d).*$/$1/s;
-$stdout='rel-1-6-1';
-#$stdout='v1.8.0';
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git pull','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          "git checkout $stdout",'__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1843,12 +2049,15 @@ $stdout='rel-1-6-1';
       ($stdout,$stderr)=$handle->cmd($sudo.
          'cp -v libzip.pc /usr/lib64/pkgconfig',
          '__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'ldconfig -v','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig');
       $build_php=1;
    } else {
       print "libzip is up to date\n";
    }
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget -qO- https://github.com/systemd/systemd/releases/latest');
+   $stdout=~s///;
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'wget -qO- https://doc.libsodium.org/#downloading-libsodium');
@@ -1881,6 +2090,8 @@ $stdout='rel-1-6-1';
       }
       ($stdout,$stderr)=$handle->cwd('libsodium');
       ($stdout,$stderr)=$handle->cmd($sudo.
+         'git pull','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
          'git checkout -b remotes/origin/stable',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1892,12 +2103,187 @@ $stdout='rel-1-6-1';
       ($stdout,$stderr)=$handle->cmd($sudo.
          'cp -v libsodium.pc /usr/lib64/pkgconfig',
          '__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'ldconfig -v','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig');
       $build_php=1;
    } else {
       print "libsodium is up to date.\n";
    }
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget -qO- https://github.com/skvadrik/re2c/releases/latest');
+   $stdout=~s/^.*Release (\d+\..*?)\s+.*$/$1/s;
+   my $latest=$stdout;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "wget --random-wait --progress=dot ".
+      "https://github.com/skvadrik/re2c/archive/refs/tags/$latest.tar.gz",
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "tar zxvf $latest.tar.gz",'__display__');
+   ($stdout,$stderr)=$handle->cwd("re2c-$latest");
+   $sudo=($^O eq 'cygwin')?'':
+      'sudo env "LD_LIBRARY_PATH='.
+      '/usr/local/lib64:$LD_LIBRARY_PATH" ';
+   ($stdout,$stderr)=$handle->cmd($sudo.'./autogen.sh','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'LDFLAGS="-Wl,-rpath /usr/lib64 -Wl,'.
+      '-rpath /usr/local/lib64" '.
+      './configure','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'./configure','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'ln -s /usr/local/bin/re2c /usr/bin/re2c');
+   $sudo=($^O eq 'cygwin')?'':
+      'sudo env "LD_LIBRARY_PATH='.
+      '/usr/local/lib64:$LD_LIBRARY_PATH" '.
+      '"PATH=/usr/local/mysql/scripts:/usr/local/bin:$PATH" ';
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   # https://ninja-build.org/
+   $done=0;$gittry=0;
+   while ($done==0) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git clone https://github.com/ninja-build/ninja.git',
+         '__display__');
+      if (++$gittry>5) {
+         print "\n\n   FATAL ERROR: $stderr\n\n";
+         cleanup();
+      }
+      my $gittest='Connection reset by peer|'.
+                  'Could not read from remote repository';
+      $done=1 if $stderr!~/$gittest/s;
+      last if $done;
+      sleep 30;
+   }
+   ($stdout,$stderr)=$handle->cwd('ninja');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'git pull','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'git checkout release','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/bin/cmake -Bbuild-cmake -H.','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/bin/cmake --build build-cmake','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cp -v ./build-cmake/ninja /usr/local/bin','__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget -qO- https://www.gnu.org/software/gperf/');
+   $stdout=~s/^.*latest release is.*?["](.*?)["].*$/$1/s;
+   $latest=$stdout;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "wget --random-wait --progress=dot ".
+      $latest,'__display__');
+   $latest=~s/^.*\/(.*).tar.gz/$1/s;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "tar zxvf $latest.tar.gz",'__display__');
+   ($stdout,$stderr)=$handle->cwd($latest);
+   ($stdout,$stderr)=$handle->cmd($sudo.'./configure','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget -qO- https://www.gnu.org/software/gettext/');
+   $stdout=~s/^.*latest release is.*?["](.*?)["].*$/$1/s;
+   $latest=$stdout;
+   $stdout=~s/^.*\/(.*).tar.gz$/$1/;
+   $stdout=~s/\./\[\.\]/g;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "strings /usr/local/lib/libgettextlib.so | grep $stdout");
+   unless ($stdout) { 
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "wget --random-wait --progress=dot ".$latest,
+         '__display__');
+      $latest=~s/^.*\/(.*)$/$1/s;
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "tar xvf $latest",'__display__');
+      $latest=~s/.tar.gz$//;
+      ($stdout,$stderr)=$handle->cwd($latest);
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         './configure','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make install','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig');
+   } else {
+      print "libgettestlib is up to date\n";
+   }
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget -qO- https://en.wikipedia.org/wiki/util-linux');
+   $stdout=~s/^.*Stable release.*?>(\d+\..*?)\s+\/.*$/$1/s;
+   $latest=$stdout;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "strings /usr/local/lib64/libmount.so | grep $latest");
+   unless ($stdout) {
+      my $done=0;my $gittry=0;
+      while ($done==0) {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'git clone https://github.com/util-linux/util-linux.git',
+            '__display__');
+         if (++$gittry>5) {
+            print "\n\n   FATAL ERROR: $stderr\n\n";
+            cleanup();
+         }
+         my $gittest='Connection reset by peer|'.
+                     'Could not read from remote repository';
+         $done=1 if $stderr!~/$gittest/s;
+         last if $done;
+         sleep 30;
+      }
+      ($stdout,$stderr)=$handle->cwd('util-linux');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git pull','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "git checkout v$latest",'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "./autogen.sh",'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "./configure --prefix=/usr/local --exec-prefix=/usr/local ".
+         "--includedir=/usr/local/include --libdir=/usr/local/lib64",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "make install",'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig');
+   } else {
+      print "libmount is up to date\n";
+   }
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'yum -y install libcap-devel','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget -qO- https://github.com/systemd/systemd/releases/latest');
+   $stdout=~s/^.*Release systemd (\w+).*$/$1/s;
+   my $version=$stdout;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "wget --random-wait --progress=dot ".
+      "https://github.com/systemd/systemd/archive/refs/tags/$version.tar.gz",
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "tar xvf $version.tar.gz",'__display__');
+   $version=~s/v//;
+   ($stdout,$stderr)=$handle->cwd("systemd-$version");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig:$PKG_CONFIG_PATH '.
+      'LDFLAGS="-Wl,-rpath /usr/lib64 -Wl,'.
+      '-rpath /usr/local/lib64" '.
+      './configure','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -zi \'s/default/\x00/g; s/\(loop-util.c.o.d[^\x00]*\x00\)/\1 '.
+      '-DLO_FLAGS_DIRECT_IO=0 -DLOOP_SET_DIRECT_IO=0/; s/\x00/default/g\' '.
+      'build/build.ninja','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -zi \'s/_s __VA_OPT__(,) /_s, ## /g\' src/shared/udev-util.h',
+      '__display__');
+   #($stdout,$stderr)=$handle->cmd($sudo.
+   #   'sed -zi \'s/fPIC/\x00/g; s/\(resolved-dns-dnssec.c.o[^\x00]*\x00\)/\1 '.
+   #   '-DGCRYPT_VERSION_NUMBER=11/; s/\x00/fPIC/g\' '.
+   #   'build/build.ninja','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -zi \'s/TEST_CODE=1/\x00/g; '.
+      's/\(src_resolve_resolved-dns-dnssec.c.o[^\x00]*\x00\)/\1 '.
+      '-DGCRYPT_VERSION_NUMBER=11/; s/\x00/TEST_CODE=1/g\' '.
+      'build/build.ninja','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "make install",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig');
+   ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig /usr/local/lib64');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'wget -qO- https://www.php.net/releases/index.php');
@@ -1936,11 +2322,14 @@ $stdout='rel-1-6-1';
       }
       ($stdout,$stderr)=$handle->cwd('php-src');
       ($stdout,$stderr)=$handle->cmd($sudo.
+         'git pull','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
          "git checkout php-$phpv",'__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          './buildconf --force','__display__');
       my $pear=($vn eq 8)?'--with-pear ':'';
       ($stdout,$stderr)=$handle->cmd($sudo.
+         'PKG_CONFIG_PATH=/usr/lib64/pkgconfig:$PKG_CONFIG_PATH '.
          './configure --prefix=/usr/local/php'.$vn.' '.
          '--with-config-file-path=/usr/local/php'.$vn.'/etc '.
          '--with-config-file-scan-dir=/usr/local/php'.$vn.'/etc/conf.d '.
@@ -1967,7 +2356,6 @@ $stdout='rel-1-6-1';
          '--with-pdo-mysql=mysqlnd '.
          '--with-pdo-sqlite '.
          '--disable-phpdbg '.
-         '--disable-phpdbg-webhelper '.
          '--enable-opcache '.
          '--with-openssl '.
          '--enable-simplexml '.
@@ -1978,7 +2366,7 @@ $stdout='rel-1-6-1';
          '--with-zlib '.
          '--with-libdir=lib64 '.
          '--with-kerberos','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.'make -j2',300,'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'make LIBS="-lssl -lcrypto" -j2',300,'__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'ln -s /usr/local/php'.$vn.'/bin/php /usr/local/bin/php');
@@ -2074,7 +2462,7 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.
          'service php-fpm start','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'service php-fpm status -l','__display__');
+         'service php-fpm status -l --no-pager','__display__');
       $prompt=$handle->prompt();
       ($stdout,$stderr)=$handle->cwd('/opt/source');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -2115,20 +2503,22 @@ END
          '/usr/local/php'.$vn.'/etc/conf.d/mailparse.ini"');
       ($stdout,$stderr)=$handle->cwd('/opt/source');
       ($stdout,$stderr)=$handle->cmd($sudo.
+         'wget -qO- https://imagemagick.org/script/index.php');
+      $stdout=~s/^.*current release [^>]+[>](.*?)[<].*$/$1/s;
+      ($stdout,$stderr)=$handle->cmd($sudo.
          'wget --random-wait --progress=dot '.
-         'https://download.imagemagick.org/'.
-         'ImageMagick/download/ImageMagick.zip',
+         'https://imagemagick.org/archive/ImageMagick.tar.gz',
          '__display__');
       sleep 2;
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'unzip -o ImageMagick.zip','__display__');
+         'tar xvf ImageMagick.tar.gz','__display__');
       ($stdout,$stderr)=$handle->cwd('ImageMag*');
       ($stdout,$stderr)=$handle->cmd($sudo.
          './configure --with-modules','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'make install','3600','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'ldconfig -v /usr/local/lib','__display__');
+         'ldconfig /usr/local/lib');
       ($stdout,$stderr)=$handle->cwd('/opt/source');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'wget -qO- https://pecl.php.net/package/imagick','300');
@@ -2149,7 +2539,7 @@ END
       sleep 2;
       ($stdout,$stderr)=$handle->cmd($sudo.'service php-fpm start',
          '__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.'service php-fpm status -l',
+      ($stdout,$stderr)=$handle->cmd($sudo.'service php-fpm status -l --no-pager',
          '__display__');
    } elsif (-e '/opt/cpanel/ea-php70') {
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -2311,6 +2701,8 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       '/usr/local/bin/wp plugin activate really-simple-ssl '.
       '--path=/var/www/html/wordpress','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig');
+   ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig /usr/local/lib64');
 
 $do=0;
 if ($do==1) {
@@ -2387,9 +2779,11 @@ my $standup_wordpress=sub {
    my $recaptcha_pub="]I[{'recaptcha_keys',1}";
    my $recaptcha_sec="]I[{'recaptcha_keys',2}";
    my $domain_url="]I[{'domain_url',1}";
+   my $skip_certbot="]I[{'domain_url',2}";
    my $cnt=0;
-   $configure_wordpress->($catalyst,$domain_url,$password,$email_address,$stripe_pub,
-                          $stripe_sec,$recaptcha_pub,$recaptcha_sec);
+   $configure_wordpress->($catalyst,$domain_url,$skip_certbot,
+      $password,$email_address,$stripe_pub,$stripe_sec,$recaptcha_pub,
+      $recaptcha_sec);
    return '{choose_demo_setup}<';
 
 };
@@ -2753,8 +3147,10 @@ our $domain_url=sub {
           if $diff;
    use Net::FullAuto;
    my $handle=connect_shell();
+print 'ok';
    my ($stdout,$stderr)=$handle->cmd("wget -qO- https://icanhazip.com");
    my $public_ip=$stdout if $stdout=~/^\d+\.\d+\.\d+\.\d+\s*/s;
+print 'ok';
    unless ($public_ip) {
       require Sys::Hostname;
       import Sys::Hostname;
@@ -2783,8 +3179,11 @@ END
 
    A      @                       $public_ip
 
-   Domain URL
+   Domain URL 
                 ]I[{1,'fullauto.com',46}
+
+   Skip Certbot
+                ]I[{2,'X',5}
 
 END
 

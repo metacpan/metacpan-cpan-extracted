@@ -16,19 +16,12 @@ use Encode 'decode';
 # SPVM::Builder::Util is used from Makefile.PL
 # so this module must be wrote as pure perl script, not contain XS functions.
 
-sub need_generate {
-  my ($opt) = @_;
+sub get_spvm_core_files {
   
-  my $force = $opt->{force};
-  my $input_files = $opt->{input_files};
-  my $output_file = $opt->{output_file};
-  
-  # SPVM::Builder modules
   my @spvm_core_files;
-  my $spvm_core_files_mtime_max;
-  if (my $builder_loaded_file = $INC{'SPVM/Builder.pm'}) {
+  if (my $builder_loaded_file = $INC{'SPVM/Builder/Util.pm'}) {
     my $builder_loaded_dir = $builder_loaded_file;
-    $builder_loaded_dir =~ s|SPVM/Builder\.pm$||;
+    $builder_loaded_dir =~ s|[/\\]SPVM/Builder/Util\.pm$||;
     
     # SPVM::Builder module files
     my $spvm_builder_module_file_names = &get_spvm_builder_module_file_names();
@@ -59,13 +52,31 @@ sub need_generate {
       }
       push @spvm_core_files, $spvm_core_source_file;
     }
-    
-    $spvm_core_files_mtime_max = 0;
-    for my $spvm_core_file (@spvm_core_files) {
-      my $spvm_core_file_mtime = (stat($spvm_core_file))[9];
-      if ($spvm_core_file_mtime > $spvm_core_files_mtime_max) {
-        $spvm_core_files_mtime_max = $spvm_core_file_mtime;
-      }
+  }
+  
+  unless (@spvm_core_files) {
+    confess "[Unexpected Error]SPVM source files are not found";
+  }
+  
+  return \@spvm_core_files;
+}
+
+sub need_generate {
+  my ($opt) = @_;
+  
+  my $force = $opt->{force};
+  my $input_files = $opt->{input_files};
+  my $output_file = $opt->{output_file};
+  
+  # SPVM::Builder modules
+  my @spvm_core_files = @{&get_spvm_core_files};
+  
+  my $spvm_core_files_mtime_max;
+  $spvm_core_files_mtime_max = 0;
+  for my $spvm_core_file (@spvm_core_files) {
+    my $spvm_core_file_mtime = (stat($spvm_core_file))[9];
+    if ($spvm_core_file_mtime > $spvm_core_files_mtime_max) {
+      $spvm_core_files_mtime_max = $spvm_core_file_mtime;
     }
   }
 
@@ -330,7 +341,7 @@ sub create_make_rule {
   elsif ($category eq 'precompile') {
     push @deps, $spvm_file;
   }
-
+  
   # Shared library file
   my $dynamic_lib_rel_file = convert_class_name_to_dynamic_lib_rel_file($class_name, $category);
   my $dynamic_lib_file = "blib/lib/$dynamic_lib_rel_file";
@@ -437,6 +448,7 @@ sub get_spvm_core_common_source_file_names {
     spvm_runtime.c
     spvm_strerror.c
     spvm_string_buffer.c
+    spvm_api_vm.c
   );
   
   return \@spvm_core_source_file_names;
@@ -502,6 +514,7 @@ sub get_spvm_core_header_file_names {
     spvm_weaken_backref.h
     spvm_yacc.h
     spvm_yacc_util.h
+    spvm_api_vm.h
   );
   
   return \@spvm_core_header_file_names;

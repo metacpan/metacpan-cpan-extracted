@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.029000
+    version 2.030000
 
 SYNOPSIS
 
@@ -75,7 +75,7 @@ METHODS
     explained below under SEARCH SPEC.
 
     Returns a MetaCPAN::Client::Author object on a simple search (PAUSE
-    ID), or a MetaCPAN::Client::ResultSet object propagated with
+    ID), or a MetaCPAN::Client::ResultSet object populated with
     MetaCPAN::Client::Author objects on a complex (search spec based)
     search.
 
@@ -95,7 +95,7 @@ METHODS
     searches, it is explained below under SEARCH SPEC.
 
     Returns a MetaCPAN::Client::Distribution object on a simple search
-    (distribution name), or a MetaCPAN::Client::ResultSet object propagated
+    (distribution name), or a MetaCPAN::Client::ResultSet object populated
     with MetaCPAN::Client::Distribution objects on a complex (search spec
     based) search.
 
@@ -127,7 +127,7 @@ METHODS
     it is explained below under SEARCH SPEC.
 
     Returns a MetaCPAN::Client::Release object on a simple search (release
-    name), or a MetaCPAN::Client::ResultSet object propagated with
+    name), or a MetaCPAN::Client::ResultSet object populated with
     MetaCPAN::Client::Release objects on a complex (search spec based)
     search.
 
@@ -147,7 +147,7 @@ METHODS
     explained below under SEARCH SPEC.
 
     Returns a MetaCPAN::Client::Module object on a simple search (module
-    name), or a MetaCPAN::Client::ResultSet object propagated with
+    name), or a MetaCPAN::Client::ResultSet object populated with
     MetaCPAN::Client::Module objects on a complex (search spec based)
     search.
 

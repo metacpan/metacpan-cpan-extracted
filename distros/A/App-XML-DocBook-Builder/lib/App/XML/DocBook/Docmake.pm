@@ -1,12 +1,16 @@
 package App::XML::DocBook::Docmake;
-$App::XML::DocBook::Docmake::VERSION = '0.1003';
+$App::XML::DocBook::Docmake::VERSION = '0.1004';
 use 5.014;
 use strict;
 use warnings;
 
 use Getopt::Long qw/ GetOptionsFromArray /;
-use File::Path qw/ mkpath /;
-use Pod::Usage qw/ pod2usage /;
+use File::Path   qw/ mkpath /;
+use Pod::Usage   qw/ pod2usage /;
+
+use File::ShouldUpdate v0.2.0 qw/ should_update_multi /;
+
+use App::XML::DocBook::Docmake::CmdComponent ();
 
 
 use Class::XSAccessor {
@@ -24,7 +28,7 @@ use Class::XSAccessor {
             _real_mode
             _xslt_mode
             _xslt_stringparams
-            )
+        )
     ]
 };
 
@@ -63,6 +67,20 @@ sub new
     $self->_init(@_);
 
     return $self;
+}
+
+sub _calc_modes_hash
+{
+    my ( $self, ) = @_;
+
+    return \%modes;
+}
+
+sub _lookup_mode_struct
+{
+    my ( $self, $mode ) = @_;
+
+    return $self->_calc_modes_hash()->{$mode};
 }
 
 sub _init
@@ -130,7 +148,7 @@ sub _init
 
     my $mode = shift(@$argv);
 
-    my $mode_struct = $modes{$mode};
+    my $mode_struct = $self->_lookup_mode_struct($mode);
 
     if ($mode_struct)
     {
@@ -184,7 +202,7 @@ sub _exec_command
 
     my $stderr = $trap->stderr();
 
-    if ( not( ( defined($exit_code) ) and ( !$exit_code ) ) )
+    if ( not( defined($exit_code) and ( !$exit_code ) ) )
     {
         if ( $stderr =~ m#Attempt to load network entity# )
         {
@@ -240,32 +258,14 @@ EOF
 
 sub _is_older
 {
-    my $self = shift;
+    my ( $self, $result_fn, $source_fn ) = @_;
 
-    my $file1 = shift;
-    my $file2 = shift;
-
-    my @stat1 = stat($file1);
-    my @stat2 = stat($file2);
-
-    if ( !@stat2 )
-    {
-        die "Input file '$file1' does not exist.";
-    }
-    elsif ( !@stat1 )
-    {
-        return 1;
-    }
-    else
-    {
-        return ( $stat1[9] <= $stat2[9] );
-    }
+    return should_update_multi( [ $result_fn, ], ':', [ $source_fn, ] );
 }
 
 sub _should_update_output
 {
-    my $self = shift;
-    my $args = shift;
+    my ( $self, $args ) = @_;
 
     return $self->_is_older( $args->{output}, $args->{input} );
 }
@@ -281,6 +281,8 @@ sub _mkdir
     my ( $self, $dir ) = @_;
 
     mkpath($dir);
+
+    return;
 }
 
 sub _run_mode_manpages
@@ -332,8 +334,7 @@ sub _is_xhtml
 
 sub _calc_output_param_for_xslt
 {
-    my $self = shift;
-    my $args = shift;
+    my ( $self, $args ) = @_;
 
     my $output_path = $self->_output_path();
     if ( defined( $args->{output_path} ) )
@@ -364,8 +365,7 @@ sub _calc_output_param_for_xslt
 
 sub _calc_make_output_param_for_xslt
 {
-    my $self = shift;
-    my $args = shift;
+    my ( $self, $args ) = @_;
 
     my $output_path = $self->_calc_output_param_for_xslt($args);
 
@@ -383,18 +383,18 @@ sub _pre_proc_command
 {
     my ( $self, $args ) = @_;
 
-    my $input_file  = $args->{input};
-    my $output_file = $args->{output};
-    my $template    = $args->{template};
-    my $xsltproc    = ( $args->{xsltproc} // ( die "no xsltproc key" ) );
+    my $input_fn  = $args->{input};
+    my $output_fn = $args->{output};
+    my $template  = $args->{template};
+    my $xsltproc  = ( $args->{xsltproc} // ( die "no xsltproc key" ) );
 
     return +{
         xsltproc => $xsltproc,
         cmd      => [
             map {
                       ( ref($_) eq '' ) ? $_
-                    : $_->is_output()   ? $output_file
-                    : $_->is_input()    ? $input_file
+                    : $_->is_output()   ? $output_fn
+                    : $_->is_input()    ? $input_fn
 
                     # Not supposed to happen
                     : do { die "Unknown Argument in Command Template."; }
@@ -405,24 +405,18 @@ sub _pre_proc_command
 
 sub _run_input_output_cmd
 {
-    my $self = shift;
-    my $args = shift;
+    my ( $self, $args ) = @_;
 
-    my $input_file       = $args->{input};
-    my $output_file      = $args->{output};
-    my $make_output_file = $args->{make_output};
-
-    if ( !defined($make_output_file) )
-    {
-        $make_output_file = $output_file;
-    }
+    my $input_fn       = $args->{input};
+    my $output_fn      = $args->{output};
+    my $make_output_fn = $args->{make_output} // $output_fn;
 
     if (
         ( !$self->_make_like() )
         || $self->_should_update_output(
             {
-                input  => $input_file,
-                output => $make_output_file,
+                input  => $input_fn,
+                output => $make_output_fn,
             }
         )
         )
@@ -465,8 +459,7 @@ sub _calc_template_string_params
 
 sub _run_xslt
 {
-    my $self = shift;
-    my $args = shift;
+    my ( $self, $args ) = @_;
 
     my @stylesheet_params = ( $self->_calc_default_xslt_stylesheet() );
 
@@ -475,7 +468,7 @@ sub _run_xslt
         @stylesheet_params = ( $self->_stylesheet() );
     }
 
-    my @base_path_params = ();
+    my @base_path_params;
 
     if ( defined( $self->_base_path() ) )
     {
@@ -503,8 +496,7 @@ sub _run_xslt
 
 sub _run_xslt_and_from_fo
 {
-    my $self = shift;
-    my $args = shift;
+    my ( $self, $args ) = @_;
 
     my $xslt_output_path = $self->_output_path();
 
@@ -584,26 +576,6 @@ sub _output_cmd_comp
     );
 }
 
-package App::XML::DocBook::Docmake::CmdComponent;
-$App::XML::DocBook::Docmake::CmdComponent::VERSION = '0.1003';
-use Class::XSAccessor {
-    accessors => [
-
-        qw(
-            is_input
-            is_output
-            )
-    ]
-};
-
-sub new
-{
-    my ( $class, $self ) = @_;
-    return bless $self, $class;
-}
-
-1;
-
 
 1;
 
@@ -619,7 +591,7 @@ App::XML::DocBook::Docmake - translate DocBook/XML to other formats
 
 =head1 VERSION
 
-version 0.1003
+version 0.1004
 
 =head1 SYNOPSIS
 
@@ -735,7 +707,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Shlomi Fish.
+This software is Copyright (c) 2022 by Shlomi Fish.
 
 This is free software, licensed under:
 

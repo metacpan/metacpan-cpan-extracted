@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 use Chart::Plotly::Image::Orca;
 use Chart::Plotly::Image::Orca::Client;
@@ -43,7 +43,7 @@ sub save_image {
           . "Please install Chart::Kaleido::Plotly (recommended) or Alien::Plotly::Orca. ";
     }
     my $func_save = "_save_image_$engine";
-    no strict 'refs';            ## no critic
+    no strict 'refs';    ## no critic
     return $func_save->(%params);
 }
 
@@ -67,7 +67,9 @@ sub _save_image_kaleido {
     _has_kaleido();
 
     # Chart::Kaleido::Plotly's interface uses plotlyjs not plotly
-    $params{plotlyjs} ||= delete $params{plotly};
+    if ( my $plotlyjs_via_plotly_param = delete $params{plotly} ) {
+        $params{plotlyjs} ||= $plotlyjs_via_plotly_param;
+    }
     my %kaleido_params =
       map { exists $params{$_} ? ( $_ => delete $params{$_} ) : () } @{ Chart::Kaleido::Plotly->scope_flags };
     my $kaleido = Chart::Kaleido::Plotly->new(%kaleido_params);
@@ -101,7 +103,7 @@ Chart::Plotly::Image - Export static images of Plotly charts
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -203,7 +205,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

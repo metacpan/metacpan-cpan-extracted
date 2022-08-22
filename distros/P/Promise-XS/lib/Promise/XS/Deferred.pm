@@ -58,6 +58,8 @@ that warning. (It’s generally better, of course, to handle all errors.)
 
 *is_in_progress = *is_pending;
 
+our $_NOTHING_CR = sub { };
+
 #----------------------------------------------------------------------
 # Undocumented, by design:
 
@@ -66,6 +68,8 @@ sub set_deferral_AnyEvent() {
 
     ___set_deferral_generic(
         AnyEvent->can('postpone') || \&_anyevent_postpone_compat,
+        undef,
+        _DEFER_ANYEVENT(),
     );
 }
 
@@ -75,6 +79,8 @@ sub set_deferral_IOAsync {
     ___set_deferral_generic(
         $loop->can('later') || \&_ioasync_later_compat,
         $loop,
+        _DEFER_IOASYNC(),
+        sub { $loop->stop() },
     );
 }
 
@@ -84,6 +90,8 @@ sub set_deferral_Mojo() {
     ___set_deferral_generic(
         Mojo::IOLoop->can('next_tick') || \&_mojo_next_tick_compat,
         'Mojo::IOLoop',
+        _DEFER_MOJO(),
+        sub { Mojo::IOLoop->stop() },
     );
 }
 
@@ -123,3 +131,13 @@ sub _mojo_next_tick_compat {
 }
 
 1;
+
+__END__
+
+sub _ioasync_wait_promise {
+    my $loop = $_[1];
+
+    $_[0]->catch(\&_NOTHING)->finally(sub { $loop->stop() } );
+
+    $loop->run();
+}

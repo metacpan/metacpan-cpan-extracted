@@ -9,9 +9,10 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 use Chart::Plotly::Trace::Carpet::Aaxis;
 use Chart::Plotly::Trace::Carpet::Baxis;
 use Chart::Plotly::Trace::Carpet::Font;
+use Chart::Plotly::Trace::Carpet::Legendgrouptitle;
 use Chart::Plotly::Trace::Carpet::Stream;
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: The data describing carpet axis layout is set in `y` and (optionally) also `x`. If only `y` is present, `x` the plot is interpreted as a cheater plot and is filled in using the `y` values. `x` and `y` may either be 2D arrays matching with each dimension matching that of `a` and `b`, or they may be 1D arrays with total length equal to that of `a` and `b`.
 
@@ -53,8 +54,8 @@ has a => ( is            => "rw",
 );
 
 has a0 => (
-    is  => "rw",
-    isa => "Num",
+    is            => "rw",
+    isa           => "Num",
     documentation =>
       "Alternate to `a`. Builds a linear space of a coordinates. Use with `da` where `a0` is the starting coordinate and `da` the step.",
 );
@@ -64,7 +65,7 @@ has aaxis => ( is  => "rw",
 
 has asrc => ( is            => "rw",
               isa           => "Str",
-              documentation => "Sets the source reference on plot.ly for  a .",
+              documentation => "Sets the source reference on Chart Studio Cloud for `a`.",
 );
 
 has b => ( is            => "rw",
@@ -73,8 +74,8 @@ has b => ( is            => "rw",
 );
 
 has b0 => (
-    is  => "rw",
-    isa => "Num",
+    is            => "rw",
+    isa           => "Num",
     documentation =>
       "Alternate to `b`. Builds a linear space of a coordinates. Use with `db` where `b0` is the starting coordinate and `db` the step.",
 );
@@ -84,40 +85,40 @@ has baxis => ( is  => "rw",
 
 has bsrc => ( is            => "rw",
               isa           => "Str",
-              documentation => "Sets the source reference on plot.ly for  b .",
+              documentation => "Sets the source reference on Chart Studio Cloud for `b`.",
 );
 
 has carpet => (
-    is  => "rw",
-    isa => "Str",
+    is            => "rw",
+    isa           => "Str",
     documentation =>
       "An identifier for this carpet, so that `scattercarpet` and `contourcarpet` traces can specify a carpet plot on which they lie",
 );
 
 has cheaterslope => (
-    is  => "rw",
-    isa => "Num",
-    documentation =>
-      "The shift applied to each successive row of data in creating a cheater plot. Only used if `x` is been ommitted.",
+     is            => "rw",
+     isa           => "Num",
+     documentation =>
+       "The shift applied to each successive row of data in creating a cheater plot. Only used if `x` is been omitted.",
 );
 
 has color => (
-    is  => "rw",
-    isa => "Str",
+    is            => "rw",
+    isa           => "Str",
     documentation =>
       "Sets default for all colors associated with this axis all at once: line, font, tick, and grid colors. Grid color is lightened by blending this with the plot background Individual pieces can override this.",
 );
 
 has customdata => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
       "Assigns extra data each datum. This may be useful when listening to hover, click and selection events. Note that, *scatter* traces also appends customdata items in the markers DOM elements",
 );
 
 has customdatasrc => ( is            => "rw",
                        isa           => "Str",
-                       documentation => "Sets the source reference on plot.ly for  customdata .",
+                       documentation => "Sets the source reference on Chart Studio Cloud for `customdata`.",
 );
 
 has da => ( is            => "rw",
@@ -134,27 +135,37 @@ has font => ( is  => "rw",
               isa => "Maybe[HashRef]|Chart::Plotly::Trace::Carpet::Font", );
 
 has ids => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
       "Assigns id labels to each datum. These ids for object constancy of data points during animation. Should be an array of strings, not numbers or any other type.",
 );
 
 has idssrc => ( is            => "rw",
                 isa           => "Str",
-                documentation => "Sets the source reference on plot.ly for  ids .",
+                documentation => "Sets the source reference on Chart Studio Cloud for `ids`.",
+);
+
+has legendgrouptitle => ( is  => "rw",
+                          isa => "Maybe[HashRef]|Chart::Plotly::Trace::Carpet::Legendgrouptitle", );
+
+has legendrank => (
+    is            => "rw",
+    isa           => "Num",
+    documentation =>
+      "Sets the legend rank for this trace. Items and groups with smaller ranks are presented on top/left side while with `*reversed* `legend.traceorder` they are on bottom/right side. The default legendrank is 1000, so that you can use ranks less than 1000 to place certain items before all unranked items, and ranks greater than 1000 to go after all unranked items.",
 );
 
 has pmeta => (
-    is  => "rw",
-    isa => "Any|ArrayRef[Any]",
+    is            => "rw",
+    isa           => "Any|ArrayRef[Any]",
     documentation =>
       "Assigns extra meta information associated with this trace that can be used in various text attributes. Attributes such as trace `name`, graph, axis and colorbar `title.text`, annotation `text` `rangeselector`, `updatemenues` and `sliders` `label` text all support `meta`. To access the trace `meta` values in an attribute in the same trace, simply use `%{meta[i]}` where `i` is the index or key of the `meta` item in question. To access trace `meta` in layout attributes, use `%{data[n[.meta[i]}` where `i` is the index or key of the `meta` and `n` is the trace index.",
 );
 
 has metasrc => ( is            => "rw",
                  isa           => "Str",
-                 documentation => "Sets the source reference on plot.ly for  meta .",
+                 documentation => "Sets the source reference on Chart Studio Cloud for `meta`.",
 );
 
 has name => ( is            => "rw",
@@ -171,41 +182,41 @@ has stream => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Carpet::Stream", );
 
 has uid => (
-    is  => "rw",
-    isa => "Str",
+    is            => "rw",
+    isa           => "Str",
     documentation =>
       "Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.",
 );
 
 has uirevision => (
-    is  => "rw",
-    isa => "Any",
+    is            => "rw",
+    isa           => "Any",
     documentation =>
       "Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.",
 );
 
 has visible => (
-    is => "rw",
+    is            => "rw",
     documentation =>
       "Determines whether or not this trace is visible. If *legendonly*, the trace is not drawn, but can appear as a legend item (provided that the legend itself is visible).",
 );
 
 has x => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
+    is            => "rw",
+    isa           => "ArrayRef|PDL",
     documentation =>
-      "A two dimensional array of x coordinates at each carpet point. If ommitted, the plot is a cheater plot and the xaxis is hidden by default.",
+      "A two dimensional array of x coordinates at each carpet point. If omitted, the plot is a cheater plot and the xaxis is hidden by default.",
 );
 
 has xaxis => (
-    is => "rw",
+    is            => "rw",
     documentation =>
       "Sets a reference between this trace's x coordinates and a 2D cartesian x axis. If *x* (the default value), the x coordinates refer to `layout.xaxis`. If *x2*, the x coordinates refer to `layout.xaxis2`, and so on.",
 );
 
 has xsrc => ( is            => "rw",
               isa           => "Str",
-              documentation => "Sets the source reference on plot.ly for  x .",
+              documentation => "Sets the source reference on Chart Studio Cloud for `x`.",
 );
 
 has y => ( is            => "rw",
@@ -214,14 +225,14 @@ has y => ( is            => "rw",
 );
 
 has yaxis => (
-    is => "rw",
+    is            => "rw",
     documentation =>
       "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.",
 );
 
 has ysrc => ( is            => "rw",
               isa           => "Str",
-              documentation => "Sets the source reference on plot.ly for  y .",
+              documentation => "Sets the source reference on Chart Studio Cloud for `y`.",
 );
 
 __PACKAGE__->meta->make_immutable();
@@ -239,7 +250,7 @@ Chart::Plotly::Trace::Carpet - The data describing carpet axis layout is set in 
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -307,7 +318,7 @@ Alternate to `a`. Builds a linear space of a coordinates. Use with `da` where `a
 
 =item * asrc
 
-Sets the source reference on plot.ly for  a .
+Sets the source reference on Chart Studio Cloud for `a`.
 
 =item * b
 
@@ -321,7 +332,7 @@ Alternate to `b`. Builds a linear space of a coordinates. Use with `db` where `b
 
 =item * bsrc
 
-Sets the source reference on plot.ly for  b .
+Sets the source reference on Chart Studio Cloud for `b`.
 
 =item * carpet
 
@@ -329,7 +340,7 @@ An identifier for this carpet, so that `scattercarpet` and `contourcarpet` trace
 
 =item * cheaterslope
 
-The shift applied to each successive row of data in creating a cheater plot. Only used if `x` is been ommitted.
+The shift applied to each successive row of data in creating a cheater plot. Only used if `x` is been omitted.
 
 =item * color
 
@@ -341,7 +352,7 @@ Assigns extra data each datum. This may be useful when listening to hover, click
 
 =item * customdatasrc
 
-Sets the source reference on plot.ly for  customdata .
+Sets the source reference on Chart Studio Cloud for `customdata`.
 
 =item * da
 
@@ -359,7 +370,13 @@ Assigns id labels to each datum. These ids for object constancy of data points d
 
 =item * idssrc
 
-Sets the source reference on plot.ly for  ids .
+Sets the source reference on Chart Studio Cloud for `ids`.
+
+=item * legendgrouptitle
+
+=item * legendrank
+
+Sets the legend rank for this trace. Items and groups with smaller ranks are presented on top/left side while with `*reversed* `legend.traceorder` they are on bottom/right side. The default legendrank is 1000, so that you can use ranks less than 1000 to place certain items before all unranked items, and ranks greater than 1000 to go after all unranked items.
 
 =item * pmeta
 
@@ -367,7 +384,7 @@ Assigns extra meta information associated with this trace that can be used in va
 
 =item * metasrc
 
-Sets the source reference on plot.ly for  meta .
+Sets the source reference on Chart Studio Cloud for `meta`.
 
 =item * name
 
@@ -393,7 +410,7 @@ Determines whether or not this trace is visible. If *legendonly*, the trace is n
 
 =item * x
 
-A two dimensional array of x coordinates at each carpet point. If ommitted, the plot is a cheater plot and the xaxis is hidden by default.
+A two dimensional array of x coordinates at each carpet point. If omitted, the plot is a cheater plot and the xaxis is hidden by default.
 
 =item * xaxis
 
@@ -401,7 +418,7 @@ Sets a reference between this trace's x coordinates and a 2D cartesian x axis. I
 
 =item * xsrc
 
-Sets the source reference on plot.ly for  x .
+Sets the source reference on Chart Studio Cloud for `x`.
 
 =item * y
 
@@ -413,7 +430,7 @@ Sets a reference between this trace's y coordinates and a 2D cartesian y axis. I
 
 =item * ysrc
 
-Sets the source reference on plot.ly for  y .
+Sets the source reference on Chart Studio Cloud for `y`.
 
 =back
 
@@ -423,7 +440,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

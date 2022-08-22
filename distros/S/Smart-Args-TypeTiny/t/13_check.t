@@ -32,14 +32,17 @@ subtest 'check_type' => sub {
 
 subtest 'type' => sub {
     is type('Foo'), type_name('Foo');
-    is type(InstanceOf['Foo']), type_name('InstanceOf["Foo"]');
-    is type(Str), type_name('Str');
+    my $instance_of_foo = InstanceOf['Foo'];
+    is type($instance_of_foo), exact_ref($instance_of_foo);
+    my $str = Str;
+    is type($str), exact_ref($str);
     is type('Str'), type_name('Str');
 };
 
 subtest 'type_role' => sub {
     is type_role('Bar'), type_name('Bar');
-    is type_role(ConsumerOf['Bar']), type_name('ConsumerOf["Bar"]');
+    my $consumer_of_bar = ConsumerOf['Bar'];
+    is type($consumer_of_bar), exact_ref($consumer_of_bar);
 };
 
 done_testing;

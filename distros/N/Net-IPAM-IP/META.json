@@ -36,13 +36,13 @@
    "provides" : {
       "Net::IPAM::IP" : {
          "file" : "lib/Net/IPAM/IP.pm",
-         "version" : "3.10"
+         "version" : "4.01"
       },
       "Net::IPAM::Util" : {
          "file" : "lib/Net/IPAM/Util.pm"
       }
    },
    "release_status" : "stable",
-   "version" : "3.10",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "4.01",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

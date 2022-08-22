@@ -50,7 +50,7 @@ Smart::Args::TypeTiny - We are smart, smart for you
 
 # DESCRIPTION
 
-Smart::Args::TypeTiny provides [Smart::Args](https://metacpan.org/pod/Smart::Args)-like argument validator using [Type::Tiny](https://metacpan.org/pod/Type::Tiny).
+Smart::Args::TypeTiny provides [Smart::Args](https://metacpan.org/pod/Smart%3A%3AArgs)-like argument validator using [Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny).
 
 ## IMCOMPATIBLE CHANGES WITH Smart::Args
 
@@ -105,11 +105,11 @@ Smart::Args::TypeTiny provides [Smart::Args](https://metacpan.org/pod/Smart::Arg
     Check parameters and fills them into lexical variables. All the parameters are mandatory by default.
     The hashref of all parameters is returned.
 
-    `$rule` can be any one of type name, [Type::Tiny](https://metacpan.org/pod/Type::Tiny)'s type constraint object, or hashref have these parameters:
+    `$rule` can be any one of type name, [Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny)'s type constraint object, or hashref have these parameters:
 
     - isa `Str|Object`
 
-        Type name or [Type::Tiny](https://metacpan.org/pod/Type::Tiny)'s type constraint.
+        Type name or [Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny)'s type constraint.
 
         - Types::Standard
 
@@ -139,7 +139,7 @@ Smart::Args::TypeTiny provides [Smart::Args](https://metacpan.org/pod/Smart::Arg
 
     - does `Str|Object`
 
-        Role name or [Type::Tiny](https://metacpan.org/pod/Type::Tiny)'s type constraint object.
+        Role name or [Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny)'s type constraint object.
 
     - optional `Bool`
 
@@ -179,9 +179,9 @@ For optimization calling subroutine in runtime type check, you can overwrite `ch
 
 # SEE ALSO
 
-[Smart::Args](https://metacpan.org/pod/Smart::Args), [Data::Validator](https://metacpan.org/pod/Data::Validator), [Params::Validate](https://metacpan.org/pod/Params::Validate), [Params::ValidationCompiler](https://metacpan.org/pod/Params::ValidationCompiler)
+[Smart::Args](https://metacpan.org/pod/Smart%3A%3AArgs), [Data::Validator](https://metacpan.org/pod/Data%3A%3AValidator), [Params::Validate](https://metacpan.org/pod/Params%3A%3AValidate), [Params::ValidationCompiler](https://metacpan.org/pod/Params%3A%3AValidationCompiler)
 
-[Type::Tiny](https://metacpan.org/pod/Type::Tiny), [Types::Standard](https://metacpan.org/pod/Types::Standard), [Mouse::Util::TypeConstraints](https://metacpan.org/pod/Mouse::Util::TypeConstraints)
+[Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny), [Types::Standard](https://metacpan.org/pod/Types%3A%3AStandard), [Mouse::Util::TypeConstraints](https://metacpan.org/pod/Mouse%3A%3AUtil%3A%3ATypeConstraints)
 
 # LICENSE
 

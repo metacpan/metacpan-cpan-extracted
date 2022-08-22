@@ -2,8 +2,8 @@
  * Filename : exec.xs
  * 
  * Author   : Reini Urban
- * Date     : Mi 10. Aug 14:48:49 CEST 2022
- * Version  : 1.62
+ * Date     : Di 16. Aug 7:59:10 CEST 2022
+ * Version  : 1.64
  *
  */
 
@@ -22,7 +22,10 @@ typedef struct {
     int x_fdebug ;
 #ifdef WIN32
     int x_write_started;
-    int x_pipe_pid;
+    HANDLE x_pipe_pid;
+# define PID_T HANDLE
+#else
+# define PID_T int
 #endif
 } my_cxt_t;
  
@@ -63,10 +66,10 @@ START_MY_CXT
 typedef struct {
     SV *	sv;
     int		idx;
-#ifdef USE_THREADS
-    struct perl_thread *	parent;
-#elif defined USE_ITHREADS
+#ifdef USE_ITHREADS
     PerlInterpreter *		parent;
+#elif defined OLD_PTHREADS_API
+    struct perl_thread *	parent;
 #endif
 } thrarg;
 
@@ -80,11 +83,11 @@ pipe_write(void *args)
     int    pipe_out = PIPE_OUT(sv) ;
     int rawread_eof = 0;
     int r,w,len;
-#ifdef USE_THREADS
-    /* use the parent's perl thread context */
-    SET_THR(targ->parent);
-#elif defined USE_ITHREADS
+#ifdef USE_ITHREADS
     PERL_SET_THX(targ->parent);
+#elif defined OLD_PTHREADS_API
+    /* old 5.005 threads. use the parent's perl thread context */
+    SET_THR(targ->parent);
 #endif
     {
     dMY_CXT;
@@ -122,7 +125,7 @@ pipe_write(void *args)
                    warn ("*pipe_write(%d) closing pipe_out errno = %d %s\n", 
 			idx, errno, Strerror(errno)) ;
                 close(pipe_out) ;
-		CloseHandle((HANDLE)pipe_pid);
+		CloseHandle(pipe_pid);
 		write_started = 0;
 		return;
 	    }
@@ -132,7 +135,7 @@ pipe_write(void *args)
                warn ("*pipe_write(%d) closing pipe_out errno = %d %s\n", 
 		idx, errno, Strerror(errno)) ;
 	    close(pipe_out);
-	    CloseHandle((HANDLE)pipe_pid);
+	    CloseHandle(pipe_pid);
 	    write_started = 0;
 	    return;
 	}
@@ -167,10 +170,10 @@ pipe_read(SV *sv, int idx, int maxlen)
     if (!write_started) {
 	thrarg *targ = (thrarg*)malloc(sizeof(thrarg));
 	targ->sv = sv; targ->idx = idx;
-#ifdef USE_THREADS
-	targ->parent = THR;
-#elif defined USE_ITHREADS
+#if defined USE_ITHREADS
 	targ->parent = aTHX;
+#elif defined OLD_PTHREADS_API
+	targ->parent = THR;
 #endif
 	/* thread handle is closed when pipe_write() returns */
 	_beginthread(pipe_write,0,(void *)targ);
@@ -210,7 +213,7 @@ pipe_read(SV *sv, int idx, int maxlen)
     int    pipe_in  = PIPE_IN(sv) ;
     int    pipe_out = PIPE_OUT(sv) ;
 #if (PERL_VERSION < 17 || (PERL_VERSION == 17 && PERL_SUBVERSION < 6)) && defined(HAVE_WAITPID)
-    int    pipe_pid = PIPE_PID(sv) ;
+    PID_T pipe_pid = (PID_T)PIPE_PID(sv) ;
 #endif
 
     int r ;
@@ -387,8 +390,8 @@ spawnCommand(PerlIO *fil, char *command, char *parameters[], int *p0, int *p1)
     close(c[READER]);
 
     /* spawn child process (which inherits the redirected std handles) */
-    pipe_pid = spawnvp(P_NOWAIT, command, parameters);
-    if (pipe_pid == -1) {
+    pipe_pid = (PID_T)spawnvp(P_NOWAIT, command, parameters);
+    if (pipe_pid == (PID_T)-1) {
 	PerlIO_close( fil );
 	croak("Can't spawn %s", command);
     }

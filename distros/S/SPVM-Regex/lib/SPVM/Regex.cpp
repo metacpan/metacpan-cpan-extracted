@@ -52,11 +52,13 @@ int32_t SPVM__Regex__compile(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__Regex__match_offset(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Regex__match_forward(SPVM_ENV* env, SPVM_VALUE* stack) {
   (void)env;
   (void)stack;
   
   int32_t e = 0;
+  
+  int32_t items = env->get_args_stack_length(env, stack);
   
   void* obj_self = stack[0].oval;
   
@@ -74,9 +76,21 @@ int32_t SPVM__Regex__match_offset(SPVM_ENV* env, SPVM_VALUE* stack) {
   if (offset < 0) {
     return env->die(env, stack, "The string offset must be greater than or equal to 0", FILE_NAME, __LINE__);
   }
-  if (!(offset < string_length)) {
-    stack[0].ival = 0;
-    return 0;
+  
+  int32_t length;
+  if (items > 3) {
+    length = stack[3].ival;
+  }
+  else {
+    length = -1;
+  }
+  
+  if (length < 0) {
+    length = string_length - offset;
+  }
+  
+  if (!(offset + length <= string_length)) {
+    return env->die(env, stack, "The offset + the length must be less than or equal to the length of the string", FILE_NAME, __LINE__);
   }
   
   void* obj_re2 = env->get_field_object_by_name_v2(env, stack, obj_self, "Regex", "re2", &e, FILE_NAME, __LINE__);
@@ -94,7 +108,7 @@ int32_t SPVM__Regex__match_offset(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t doller0_and_captures_length = captures_length + 1;
   
   std::vector<re2::StringPiece> submatch(doller0_and_captures_length);
-  int32_t match = re2->Match(stp_string, offset, string_length, re2::RE2::Anchor::UNANCHORED, submatch.data(), doller0_and_captures_length);
+  int32_t match = re2->Match(stp_string, offset, offset + length, re2::RE2::Anchor::UNANCHORED, submatch.data(), doller0_and_captures_length);
   
   if (match) {
     // Captures

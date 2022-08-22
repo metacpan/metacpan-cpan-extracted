@@ -30,9 +30,14 @@ sub build_self {
 
   $self->SUPER::build_self($data);
   for my $item (qw(name abstract tagline synopsis description)) {
-    @{$self->find(undef, $item)} || $self->throw->error({
-      message => "Test missing pod section =$item",
-    });
+    if (!@{$self->find(undef, $item)}) {
+      my $throw;
+      $throw = $self->throw;
+      $throw->name('on.build');
+      $throw->message("Test missing pod section =$item");
+      $throw->stash(section => $item);
+      $throw->error;
+    }
   }
 
   return $self;
@@ -1043,7 +1048,8 @@ sub test_for_includes {
 
   my $results = [];
 
-  push @$results, $self->$code($_) for map [split /\:\s*/], split /\n/, $data;
+  push @$results, $self->$code($_)
+    for map [split /\:\s*/], grep /\w/, grep !/^#/, split /\n/, $data;
 
   return $results;
 }

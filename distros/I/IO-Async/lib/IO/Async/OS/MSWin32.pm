@@ -8,7 +8,7 @@ package IO::Async::OS::MSWin32;
 use strict;
 use warnings;
 
-our $VERSION = '0.801';
+our $VERSION = '0.802';
 
 our @ISA = qw( IO::Async::OS::_Base );
 

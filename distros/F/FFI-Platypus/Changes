@@ -1,5 +1,29 @@
 Revision history for FFI-Platypus
 
+2.00      2022-08-12 13:58:51 -0600
+  - Production release identical to 1.91_01
+
+1.91_01   2022-07-05 07:41:07 -0400
+  - Setting the env environment V variable to a true value now will override the
+    verbose option on FFI::Build.  This allows modules that use it to display verbose
+    output without having to change the .fbx files.  This mirrors the behavior of
+    how FFI-Platypus itself works. (gh#369)
+
+1.90_02   2022-06-27 08:33:31 -0600
+  - Documentation updates for API = 2 (gh#340, gh#368)
+
+1.90_01   2022-06-24 11:03:35 -0500
+  - api = 2 is no longer experimental (gh#365)
+
+1.61_01   2022-06-23 16:16:43 -0500
+  - Added experimental modules FFI::Build::Plugin and FFI::Build::PluginData (gh#351)
+
+1.60_01   2022-06-23 15:49:42 -0500
+  - Updated installer
+
+1.59_01   2022-06-19 07:47:49 -0600
+  - Internal refactor (gh#361)
+
 1.58      2022-06-19 06:19:42 -0600
   - TypeParser version 2 accept string(10) as alias for string(10)* (gh#346, gh#359)
 

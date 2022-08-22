@@ -38,6 +38,7 @@ sub prepare_build_args {
   my ($factory, $c, @args) = @_;
   my %args = $factory->prepare_args(@args);
   my %merged_args = %{$factory->{merged_args}||+{}};
+
   return (%merged_args, %args, ctx=>$c);
 }
 

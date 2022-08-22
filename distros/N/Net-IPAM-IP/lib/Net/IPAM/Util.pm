@@ -147,6 +147,7 @@ sub inet_pton_pp {
   # modify @_ = (AF_INETx, $ip) => @_ = ($ip)
   my $v = shift;
   goto &_inet_pton_v4_pp if $v == Socket::AF_INET;
+  goto &_inet_pton_v4in6_pp if $_[0] =~ m/^::ffff:/i;
   goto &_inet_pton_v6_pp;
 }
 
@@ -201,6 +202,13 @@ sub _inet_pton_v4_pp {
   return unless $_[0] eq join( '.', unpack( 'C4', $n ) );
 
   return $n;
+}
+
+sub _inet_pton_v4in6_pp {
+  # skip ::ffff:
+  my $n = _inet_pton_v4_pp(substr($_[0], 7)) // return;
+  # back ::ffff:
+  return pack('n6', 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xffff) . $n;
 }
 
 sub _inet_pton_v6_pp {
@@ -271,7 +279,7 @@ L<Net::IPAM::Tree>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2020 by Karl Gaissmaier.
+This software is copyright (c) 2020-2022 by Karl Gaissmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::Str - Various string schemas
 
 VERSION
-    This document describes version 0.009 of Sah::Schemas::Str (from Perl
-    distribution Sah-Schemas-Str), released on 2022-07-05.
+    This document describes version 0.011 of Sah::Schemas::Str (from Perl
+    distribution Sah-Schemas-Str), released on 2022-07-09.
 
 SAH SCHEMAS
     The following schemas are included in this distribution:

@@ -1,3 +1,29 @@
+0.058002 -- 2022-08-22
+
+    [Bug fixes]
+
+    Term::CLI::Argument::TypeTiny
+        - Small POD fixes (mostly to pass pod coverage).
+
+0.058001 -- 2022-07-21
+
+    Acknowledgements to djerius for contributing Term::CLI::Argument::Tree
+    and Term::CLI::Argument::TypeTiny.
+
+    [Enhancements]
+
+    Term::CLI::Argument::TypeTiny [djerius]
+        - Argument which validates/coerces against Type::Tiny types.
+
+    Term::CLI::Argument::Tree [djerius]
+        - Hierarchical/tree argument type
+    
+    [Building / Testing / Packaging]
+
+        - Shift numbers in unit tests to accomodate new tests.
+        - Add a build script for Fedora RPMs.
+        - Add a build script for Debian DEBs.
+
 0.057001 -- 2022-04-20
 
     Acknowledgements to djerius for various fixes, enhancements, and

@@ -21,7 +21,7 @@ use namespace::autoclean;
 use File::ShareDir qw( dist_file );
 use File::Spec;
 
-our $VERSION = '1.35';
+our $VERSION = '1.36';
 
 #<<<
 ### :start CLDRVersion:
@@ -907,8 +907,9 @@ our %Names = (
   "Basaa Cameroon" => "bas-CM",
   Basque => "eu",
   "Basque Spain" => "eu-ES",
-  Belarusian => "be-tarask",
+  Belarusian => "be",
   "Belarusian Belarus" => "be-BY",
+  "Belarusian Taraskievica orthography" => "be-tarask",
   Bemba => "bem",
   "Bemba Zambia" => "bem-ZM",
   Bena => "bez",
@@ -2224,7 +2225,8 @@ our %NativeNames = (
   "\N{U+0395}\N{U+03bb}\N{U+03bb}\N{U+03b7}\N{U+03bd}\N{U+03b9}\N{U+03ba}\N{U+03ac} \N{U+039a}\N{U+03cd}\N{U+03c0}\N{U+03c1}\N{U+03bf}\N{U+03c2}" => "el-CY",
   "\N{U+0430}\N{U+0437}\N{U+04d9}\N{U+0440}\N{U+0431}\N{U+0430}\N{U+0458}\N{U+04b9}\N{U+0430}\N{U+043d} \N{U+0410}\N{U+0437}\N{U+04d9}\N{U+0440}\N{U+0431}\N{U+0430}\N{U+0458}\N{U+04b9}\N{U+0430}\N{U+043d} \N{U+041a}\N{U+0438}\N{U+0440}\N{U+0438}\N{U+043b}" => "az-Cyrl-AZ",
   "\N{U+0430}\N{U+0437}\N{U+04d9}\N{U+0440}\N{U+0431}\N{U+0430}\N{U+0458}\N{U+04b9}\N{U+0430}\N{U+043d} \N{U+041a}\N{U+0438}\N{U+0440}\N{U+0438}\N{U+043b}" => "az-Cyrl",
-  "\N{U+0431}\N{U+0435}\N{U+043b}\N{U+0430}\N{U+0440}\N{U+0443}\N{U+0441}\N{U+043a}\N{U+0430}\N{U+044f}" => "be-tarask",
+  "\N{U+0431}\N{U+0435}\N{U+043b}\N{U+0430}\N{U+0440}\N{U+0443}\N{U+0441}\N{U+043a}\N{U+0430}\N{U+044f}" => "be",
+  "\N{U+0431}\N{U+0435}\N{U+043b}\N{U+0430}\N{U+0440}\N{U+0443}\N{U+0441}\N{U+043a}\N{U+0430}\N{U+044f} TARASK" => "be-tarask",
   "\N{U+0431}\N{U+0435}\N{U+043b}\N{U+0430}\N{U+0440}\N{U+0443}\N{U+0441}\N{U+043a}\N{U+0430}\N{U+044f} \N{U+0411}\N{U+0435}\N{U+043b}\N{U+0430}\N{U+0440}\N{U+0443}\N{U+0441}\N{U+044c}" => "be-BY",
   "\N{U+0431}\N{U+043e}\N{U+0441}\N{U+0430}\N{U+043d}\N{U+0441}\N{U+043a}\N{U+0438} \N{U+0411}\N{U+043e}\N{U+0441}\N{U+043d}\N{U+0430} \N{U+0438} \N{U+0425}\N{U+0435}\N{U+0440}\N{U+0446}\N{U+0435}\N{U+0433}\N{U+043e}\N{U+0432}\N{U+0438}\N{U+043d}\N{U+0430} \N{U+045b}\N{U+0438}\N{U+0440}\N{U+0438}\N{U+043b}\N{U+0438}\N{U+0446}\N{U+0430}" => "bs-Cyrl-BA",
   "\N{U+0431}\N{U+043e}\N{U+0441}\N{U+0430}\N{U+043d}\N{U+0441}\N{U+043a}\N{U+0438} \N{U+045b}\N{U+0438}\N{U+0440}\N{U+0438}\N{U+043b}\N{U+0438}\N{U+0446}\N{U+0430}" => "bs-Cyrl",
@@ -2512,7 +2514,7 @@ our %ISO639Aliases = (
   "baq-ES" => "eu-ES",
   bel => "be",
   "bel-BY" => "be-BY",
-  "bel-Tarask" => "be-tarask",
+  "bel-TARASK" => "be-tarask",
   ben => "bn",
   "ben-BD" => "bn-BD",
   "ben-IN" => "bn-IN",
@@ -6192,7 +6194,7 @@ DateTime::Locale::Data - Locale data generated from CLDR
 
 =head1 VERSION
 
-version 1.35
+version 1.36
 
 =head1 DESCRIPTION
 

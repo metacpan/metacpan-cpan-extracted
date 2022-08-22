@@ -1,7 +1,7 @@
 # Add your requirements here
 requires 'perl', 'v5.10.0'; # for kwalitee
 
-requires 'DBIx::Connector::Retry', 'v0.900.2';
+requires 'DBIx::Connector::Retry', 'v0.900.3';
 requires 'Moo';
 
 requires 'Scalar::Util';

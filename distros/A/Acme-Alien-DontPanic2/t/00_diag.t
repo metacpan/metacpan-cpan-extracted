@@ -13,6 +13,7 @@ $modules{$_} = $_ for qw(
   Alien::Base
   Alien::Build
   Alien::Build::MB
+  Alien::Build::Plugin::Digest::Negotiate
   File::Temp
   Inline
   Inline::C

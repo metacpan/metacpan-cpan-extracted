@@ -2,14 +2,14 @@ use strict;
 use warnings;
 use version;
 
-use Capture::Tiny qw( capture_stderr );
-use LWP::UserAgent ();
+use Capture::Tiny   qw( capture_stderr );
+use LWP::UserAgent  ();
 use Module::Runtime qw( require_module );
-use Path::Tiny qw( path );
+use Path::Tiny      qw( path );
 use Test::Warnings;
 use Test::Fatal qw( exception );
-use Test::More;
-use Try::Tiny qw( catch try );
+use Test::More import => [qw( diag done_testing is ok skip )];
+use Try::Tiny      qw( catch try );
 use WWW::Mechanize ();
 
 use LWP::ConsoleLogger::Everywhere ();

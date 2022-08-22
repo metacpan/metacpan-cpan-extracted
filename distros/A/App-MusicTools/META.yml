@@ -14,7 +14,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.48'
   strict: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,7 +32,7 @@ requires:
   IPC::Run3: '0'
   JSON: '0'
   List::Util: '0'
-  Music::AtonalUtil: '1.14'
+  Music::AtonalUtil: '1.17'
   Music::Canon: '2'
   Music::Chord::Positions: '0'
   Music::LilyPondUtil: '0.1'
@@ -44,9 +44,8 @@ requires:
   Scalar::Util: '0'
   Text::Roman: '0'
   Text::Wrap: '0'
-  Try::Tiny: '0'
   perl: '5.014000'
 resources:
   repository: git://github.com/thrig/App-MusicTools.git
-version: '1.29'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '1.32'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

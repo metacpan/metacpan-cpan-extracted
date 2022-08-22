@@ -118,6 +118,8 @@ It must be noted that some information methods like get_text_width()
 work even under the disabled state; the object is switched to
 the information state implicitly if it is necessary.
 
+See also: L<graphic_context>.
+
 =head2 Color space
 
 Graphic context and canvas operations rely completely
@@ -205,10 +207,10 @@ export its palette to an output device, because images usually are not
 subject to automatic dithering algorithms. Prima::ImageViewer module
 employs this scheme.
 
-=head2 Antialiasing and alpha
+=head2 Antialiasing and alpha (render mode)
 
 If the system has capability for antialiased drawing and alpha rendering, Prima
-can use it. The antialiasing can be turned on by calling
+can use it. The render mode can be turned on by calling
 
    $drawable->antialias(1)
 
@@ -251,6 +253,16 @@ well.
 To see if alpha and antialiasing is supported on the system, check
 C<sv::Antialias> value. To see if a particular drawable supports alpha
 layering, check C<can_draw_alpha> method.
+
+Note that in the render mode, all painting operations treat alpha channel
+differently, which can have a dramatic difference on layered surfaces. In the
+normal mode, the alpha channel is completely ignored, and using normal mode
+paints on a layered widget always produces a translucent window, because the
+alpha value will always be 0 and color bits are assumed to be already
+premultiplied. In the render mode, alpha channel is addressed by C<alpha>
+property when drawing primitives, or in C<mask> property when drawing icons
+(again, drawing images and non-layered bitmaps assumes alpha = 0). The same is
+valid for fill pattern images and fill pattern icons.
 
 =head2 Monochrome bitmaps
 
@@ -643,18 +655,31 @@ supports only Copy and NoOp.
 The raster operations apply to all graphic primitives except SetPixel.
 
 Note for layering: using layered images and device bitmaps with
-C<put_image> and C<stretch_image> can only use C<rop::SrcCopy> and C<rop::SrcOver>
-raster operations on OS-provided surfaces.
+C<put_image> and C<stretch_image> can only use C<rop::SrcCopy> and C<rop::Blend>
+raster operations on OS-provided surfaces. See more on C<rop::Blend> below.
 
 Also, C<rop::AlphaCopy> operation is available for accessing alpha bits only.
 When used, the source image is treated as alpha mask, and therefore it has to
 be grayscale.  It can be used to apply the alpha bits independently, without
 need to construct an Icon object.
 
+=head3 rop::Blend
+
+C<rop::Blend> is same as C<rop::SrcCopy> except the source pixels are assumed
+to be already premultiplied with the source alpha. This is the default ROP
+when drawing with 8-bit icon masks or on layered surfaces, and it reflects the
+expectation of the OS that images come premultiplied.
+
+This is the only blending operator supported on the widgets and bitmaps, and it
+is advised to premultiply image pixels prior to drawing images using it with
+calls to C<Image.premultiply_alpha>. Image drawing supports this operator in
+case these premultiplied images are to be used not only on native surfaces but
+also on Prima images.
+
 =head3 Additional ROPs
 
 Prima implements extra features for compositing on images outside the
-begin_paint/end_paint brackets. It supports the following 12 Porter-Duff
+begin_paint/end_paint brackets. It supports the following 12+1 Porter-Duff
 operators and some selected Photoshop blend operators:
 
 =for podview 
@@ -666,6 +691,7 @@ operators and some selected Photoshop blend operators:
 <img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/rop3.png">
 <!--
 
+   rop::Blend
    rop::Clear            rop::Add
    rop::Xor              rop::Multiply
    rop::SrcOver          rop::Screen
@@ -714,21 +740,16 @@ images outside begin_paint/end_paint with all Porter-Duff and Photoshop raster o
    $image->rop( rop::alpha( rop::SrcOver, 128 ));
    $image->ellipse( 5, 5, 5, 5 );
 
-Note that when the raster operation is set to C<rop::SrcOver> (default), the
+Note that when the raster operation is set to C<rop::SrcOver>, the
 fully identical effect can be achieved by
 
    $image->alpha(128);
    $image->ellipse( 5, 5, 5, 5 );
 
-as well. In both cases, the values of C<color> and C<backColor> are internally
-premultiplied with the alpha.
+as well.
 
 When used with icons, their source and/or destination alpha channels are additionally
 multiplied with these values.
-
-=item rop::Premultiply
-
-When this bit is set, source pixels will be multiplied with alpha before blending
 
 =item rop::ConstantColor
 
@@ -739,9 +760,7 @@ solid green shade with a mask loaded from file.
 
     $src->load('8-bit gray mask.png');
     $dst->color(cl::LightGreen);
-    $dst->put_image( 0,0,$src,rop::SrcOver | rop::ConstantColor | rop::Premultiply);
-
-Also, remember C<rop::Premultiply> for proper results.
+    $dst->put_image( 0,0,$src,rop::SrcOver | rop::ConstantColor);
 
 =back
 
@@ -840,14 +859,25 @@ over them.
 
 Default value: C<fm::Winding|fm::Overlay>
 
-=item fillPattern ( [ @PATTERN ] ) or ( fp::XXX )
+=item fillPattern ( [ @PATTERN ] ) or ( fp::XXX ) or IMAGE
 
 Selects 8x8 fill pattern that affects primitives that plot filled shapes:
 bar(), fill_chord(), fill_ellipse(), fillpoly(), fill_sector(), floodfill().
 
-Accepts either a C<fp::> constant or a reference to an array of 8 integers,
-each representing 8 bits of each line in a pattern, where the first integer
-is the topmost pattern line, and the bit 0x80 is the leftmost pixel in the line.
+Accepts either a C<fp::> constant or a reference to an array of 8 integers, or
+an image reference. In all cases, except where the image is colored, treats 0s
+in the pattern as the curently selected C<backColor>, and 1s as C<color>. When
+C<rop2> is set to C<rop::NoOper>, treats 0s as fully transparent pixels.
+Additionally, in the render mode respects the C<alpha> property.
+
+Note: Drawing
+over monochome bitmap or image will not respect its C<rop> on Win32.
+
+Depending on the parameters, treats the input as follows:
+
+=over
+
+=item fp:: constant
 
 There are some predefined patterns, that can be referred via C<fp::> constants:
 
@@ -878,6 +908,14 @@ There are some predefined patterns, that can be referred via C<fp::> constants:
 ( the actual patterns are hardcoded in primguts.c )
 The default pattern is fp::Solid.
 
+On a get-call, does not return the C<fp::> value but the corresponding array (see below).
+
+=item Array
+
+Wants an 8-item array where each item is a byte value, representing 8 bits of
+each line in a pattern.  The first integer is the topmost pattern line, and the
+bit 0x80 is the leftmost pixel in the line.
+
 An example below shows encoding of fp::Parquet pattern:
 
    # 76543210
@@ -894,11 +932,27 @@ An example below shows encoding of fp::Parquet pattern:
 
    $d-> fillPattern([ 0x51, 0x22, 0x15, 0x88, 0x45, 0x22, 0x54, 0x88 ]);
 
-On a get-call always returns an array, never a C<fp::> constant.
+=item Monochrome image
+
+Like the I<array> above, wants an image consisting of 0s and 1s where these would represent
+canvas color and backColor, when rendered.
+
+=item Color image
+
+Ignores color, and backColor, and rop2.
+Just uses the tiles and the current C<alpha> value.
+
+=item Icon
+
+Ignores color, backColor, and rop2. Uses the alpha pixel values from the
+icon's mask and the current C<alpha> value.
+
+=back
 
 =item fillPatternOffset X, Y
 
-Origin coordinates for the C<fillPattern>, from 0 to 7.
+Origin coordinates for the C<fillPattern>. Image patterns origin (0,0) is
+system-dependent.
 
 =item font \%FONT
 
@@ -1924,6 +1978,21 @@ Context used: font, textOutBaseline
 =for podview </cut>
 
 =for html -->
+
+=item graphic_context %GC, $CALLBACK
+
+A shortcut method that saves the graphic context, applies changes in %GC, calls $CALLBACK,
+and finally restores the context. F ex:
+
+   $self->graphic_context( fillPattern => fp::Solid, sub { $self-> bar(..) } );
+
+=item graphic_context_pop
+
+Restores the graphic context properties from the stack.
+
+=item graphic_context_push
+
+Saves the graphic context properties on the stack.
 
 =item has_alpha_layer
 

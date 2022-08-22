@@ -1,3 +1,7 @@
+0.1004  2022-08-18
+    - Refactorings
+        - New runtime dep: https://metacpan.org/pod/File::ShouldUpdate .
+
 0.1003  2020-11-26
     - Try to handle the lack of local DocBook 5/XSL resources more gracefully.
         - https://github.com/shlomif/fortune-mod/issues/45

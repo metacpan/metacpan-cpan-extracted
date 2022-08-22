@@ -19,13 +19,13 @@ name: Sah-PSchemas-Re
 provides:
   Data::Sah::Filter::perl::Re::re_from_str:
     file: lib/Data/Sah/Filter/perl/Re/re_from_str.pm
-    version: '0.001'
+    version: '0.002'
   Sah::PSchema::re_from_str:
     file: lib/Sah/PSchema/re_from_str.pm
-    version: '0.001'
+    version: '0.002'
   Sah::PSchemas::Re:
     file: lib/Sah/PSchemas/Re.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   perl: '5.010001'
   strict: '0'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-PSchemas-Re
   homepage: https://metacpan.org/release/Sah-PSchemas-Re
   repository: git://github.com/perlancar/perl-Sah-PSchemas-Re.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -312,7 +312,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::PERLANCAR::Contributing
               name: '@Author::PERLANCAR/PERLANCAR/Contributing'
-              version: '0.292'
+              version: '0.293'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
@@ -320,7 +320,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.783'
+              version: '0.784'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

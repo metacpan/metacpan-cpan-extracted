@@ -318,11 +318,11 @@ share {
       #\&update_pkg_conf_path,
       \&cleanup_ldflags,
       "%{configure} $config_flags $config_args $drivers_to_disable $build_static",
-      \&pause,
+      #\&pause,
       $make_cmd,
-      \&patch_rpaths,
       \&patch_pkgconfig,
       $make_inst_cmd,
+      \&patch_rpaths,
     ];
   }
 };
@@ -367,7 +367,15 @@ sub patch_rpaths {
       );
 
   $build->log ("Prepending rpaths with $alien_rpath_text");
-  
+
+
+  my $dest_dir;
+  if($build->meta_prop->{destdir})
+  {
+    $dest_dir = $ENV{DESTDIR};
+  }
+  $build->log('DEST DIR IS: ' . $dest_dir); 
+
   #  need to also do the bin dir - those files only need to have $ORIGIN/../lib added
   use File::Find::Rule;
   my (@so_files)
@@ -375,7 +383,7 @@ sub patch_rpaths {
       File::Find::Rule
               ->file()
               ->name( qr/^libgdal.so/ )
-              ->in( getcwd() );
+              ->in( $dest_dir );
   
   foreach my $so_file (@so_files) {
     my ($old_rpath, $result, $stderr, @errors);
@@ -393,11 +401,11 @@ sub patch_rpaths {
   #  surely we could just use one of the alien props to get the dir?
   my (@gdalinfo_files)
     = grep {not -l $_}
-      grep {$_ =~ m|apps/\.libs|}  #  must be in the .libs dir
+      grep {$_ =~ m|bin|}  #  must be in the bin dir
       File::Find::Rule
               ->file()
               ->name( 'gdalinfo' )
-              ->in( getcwd() );
+              ->in( $dest_dir );
   my @binaries
     = grep {$_ !~ /\.o$/}  #  no object files
       map {path($_)->parent->children} @gdalinfo_files;
@@ -415,6 +423,7 @@ sub patch_rpaths {
     warn $stderr if $stderr;
   }
 
+#my $xy = <STDIN>;
   return;
 }
 
@@ -653,9 +662,9 @@ sub remove_gitfw_from_path {
 }
 
 sub pause {
-    return;  #  re-enable in case of debug
-    return if $on_automated_rig;
-    return if !$on_windows;
+#    return;  #  re-enable in case of debug
+#    return if $on_automated_rig;
+#    return if !$on_windows;
 
     say "CONTINUE?";
     my $response = <>;

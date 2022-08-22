@@ -1,29 +1,29 @@
-use strict;
-use warnings;
+package LWP::ConsoleLogger;
+
+use Moo;
+use MooX::StrictConstructor;
 
 use 5.006;
 
-package LWP::ConsoleLogger;
-our $VERSION = '0.000044';
+our $VERSION = '1.000000';
+
 use Data::Printer { end_separator => 1, hash_separator => ' => ' };
-use DateTime            ();
-use HTML::Restrict      ();
-use HTTP::Body          ();
-use HTTP::CookieMonster ();
-use JSON::MaybeXS qw( decode_json );
-use List::AllUtils qw( any apply none );
-use Log::Dispatch ();
-use Moo;
-use MooX::StrictConstructor;
-use Parse::MIME qw( parse_mime_type );
-use Ref::Util qw( is_blessed_ref );
-use Term::Size::Any ();
+use DateTime                          ();
+use HTML::Restrict                    ();
+use HTTP::Body                        ();
+use HTTP::CookieMonster               ();
+use JSON::MaybeXS                     qw( decode_json );
+use List::AllUtils                    qw( any apply none );
+use Log::Dispatch                     ();
+use Parse::MIME                       qw( parse_mime_type );
+use Ref::Util                         qw( is_blessed_ref );
+use Term::Size::Any                   ();
 use Text::SimpleTable::AutoWidth 0.09 ();
-use Try::Tiny qw( catch try );
-use Types::Common::Numeric qw( PositiveInt );
-use Types::Standard qw( ArrayRef Bool CodeRef InstanceOf );
-use URI::QueryParam qw();
-use XML::Simple qw( XMLin );
+use Try::Tiny                         qw( catch try );
+use Types::Common::Numeric            qw( PositiveInt );
+use Types::Standard                   qw( ArrayRef Bool CodeRef InstanceOf );
+use URI::QueryParam                   qw();
+use XML::Simple                       qw( XMLin );
 
 my $json_regex = qr{vnd.*\+json};
 
@@ -362,8 +362,11 @@ sub _get_content {
     my ( $type, $subtype ) = apply { lc $_ } parse_mime_type($content_type);
     if (
         ( $type ne 'text' )
-        && ( none { $_ eq $subtype }
-            ( 'javascript', 'html', 'json', 'xml', 'x-www-form-urlencoded', )
+        && (
+            none { $_ eq $subtype } (
+                'javascript', 'html', 'json', 'xml', 'soap+xml',
+                'x-www-form-urlencoded',
+            )
         )
         && $subtype !~ m{$json_regex}
     ) {
@@ -553,7 +556,7 @@ LWP::ConsoleLogger - LWP tracing and debugging
 
 =head1 VERSION
 
-version 0.000044
+version 1.000000
 
 =head1 SYNOPSIS
 
@@ -659,9 +662,6 @@ Sample output might look like this.
     '--------------------------+-------------------------------'
 
 =head1 DESCRIPTION
-
-BETA BETA BETA.  This is currently an experiment.  Things could change.  Please
-adjust accordingly.
 
 It can be hard (or at least tedious) to debug mechanize scripts.  LWP::Debug is
 deprecated.  It suggests you write your own debugging handlers, set up a proxy
@@ -878,9 +878,9 @@ parameter to constrain the tables to an arbitrary width.
 
 =head1 CAVEATS
 
-Aside from the BETA warnings, I should say that I've written this to suit my
-needs and there are a lot of things I haven't considered.  For example, I'm
-mostly assuming that the content will be text, HTML, JSON or XML.
+I've written this to suit my needs and there are a lot of things I haven't
+considered.  For example, I'm mostly assuming that the content will be text,
+HTML, JSON or XML.
 
 The test suite is not very robust either.  If you'd like to contribute to this
 module and you can't find an appropriate test, do add something to the example

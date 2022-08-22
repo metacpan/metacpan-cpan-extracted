@@ -23,7 +23,7 @@ sub add_default_response {
 
   my $definitions = $self->data->{definitions} ||= {};
   $definitions->{$params->{name}} ||= $params->{schema};
-  my $ref = {'$ref' => "#/definitions/$params->{name}"};
+  my $ref = {'$ref' => sprintf '%s#/definitions/%s', $self->id, $params->{name}};
   $self->_register_ref($ref, schema => $definitions->{$params->{name}});
 
   for my $route ($self->routes->each) {
@@ -238,7 +238,7 @@ sub _coerce_default_value {
 sub _coerce_parameter_format {
   my ($self, $val, $param) = @_;
   return unless $val->{exists};
-  return unless my $format = $param->{collectionFormat};
+  return unless my $format = $param->{collectionFormat} || ($param->{type} eq 'array' ? 'csv' : '');
   return $val->{value} = ref $val->{value} eq 'ARRAY' ? $val->{value} : [$val->{value}] if $format eq 'multi';
 
   $val->{value} = $val->{value}[0] // '' if ref $val->{value} eq 'ARRAY';
@@ -609,8 +609,9 @@ key/value pairs representing the request parameters. Example:
 
   %req = (
     body => sub {
-      my ($param_name, $param_for_request) = shift;
-      return {exists => 1, value => \%all_params} unless defined $param_name;
+      my ($name, $param) = shift;
+      # $param = {name => $name, in => ..., schema => ..., ...}
+      return {exists => 1, value => \%all_params} unless defined $name;
       return {exists => 1, value => "..."};
     },
     formData => {email => "..."},
@@ -648,8 +649,9 @@ key/value pairs representing the response parameters. Example:
 
   %res = (
     body => sub {
-      my ($param_name, $param_for_response) = shift;
-      return {exists => 1, value => \%all_params} unless defined $param_name;
+      my ($name, $param) = shift;
+      # $param = {name => $name, in => ..., ...}
+      return {exists => 1, value => \%all_params} unless defined $name;
       return {accept => "application/json", exists => 1, value => "..."};
     },
     header => {"Location" => "..."},

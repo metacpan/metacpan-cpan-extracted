@@ -33,7 +33,7 @@ Readonly::Array our @SNAK_TYPES => qw(
 	value
 );
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
 
 has datatype => (
 	is => 'ro',
@@ -212,6 +212,8 @@ Returns string.
 
 =head1 EXAMPLE
 
+=for comment filename=create_and_print_snak.pl
+
  use strict;
  use warnings;
 
@@ -288,6 +290,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.19
+0.20
 
 =cut

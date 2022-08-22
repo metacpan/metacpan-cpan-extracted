@@ -7,7 +7,7 @@ Attean::SimpleQueryEvaluator - Simple query evaluator
 
 =head1 VERSION
 
-This document describes Attean::SimpleQueryEvaluator version 0.031
+This document describes Attean::SimpleQueryEvaluator version 0.032
 
 =head1 SYNOPSIS
 
@@ -34,7 +34,7 @@ model, and returns a query result.
 use Attean::Algebra;
 use Attean::Expression;
 
-package Attean::SimpleQueryEvaluator 0.031 {
+package Attean::SimpleQueryEvaluator 0.032 {
 	use Moo;
 	use Encode qw(encode);
 	use Attean::RDF;
@@ -585,7 +585,7 @@ appended to C<< @new_vars >> as it is created.
 	}
 }
 
-package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.031 {
+package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.032 {
 	use Moo;
 	use Attean::RDF;
 	use Scalar::Util qw(blessed);
@@ -982,6 +982,13 @@ package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.031 {
 				} elsif ($func eq 'REGEX') {
 					my ($value, $pattern)	= map { $_->value } @operands;
 					return ($value =~ /$pattern/) ? $true : $false;
+				} elsif ($func eq 'INVOKE') {
+					my $furi		= shift(@operands)->value;
+					my $func		= Attean->get_global_function($furi);
+					unless (ref($func)) {
+						die "No extension registered for <$furi>";
+					}
+					return $func->(@operands);
 				}
 				die "Unimplemented FunctionExpression evaluation: " . $expr->operator;
 			};
@@ -1065,6 +1072,26 @@ package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.031 {
 						return Attean::Literal->new(join($sep, sort @strings));
 					};
 				}
+			} elsif ($agg eq 'CUSTOM') {
+				my $iri	= $expr->custom_iri;
+				my $data	= Attean->get_global_aggregate($iri);
+				unless ($data) {
+					die "No extension aggregate registered for <$iri>";
+				}
+				my $start	= $data->{'start'};
+				my $process	= $data->{'process'};
+				my $finalize	= $data->{'finalize'};
+
+				my $impl	= $self->impl($child, $active_graph);
+				return sub {
+					my ($rows, %args)	= @_;
+					my $thunk	= $start->();
+					foreach my $r (@$rows) {
+						my $t	= $impl->( $r, %args );
+						$process->($thunk, $t);
+					}
+					return $finalize->($thunk);
+				};
 			}
 			die "Unimplemented AggregateExpression evaluation: " . $expr->operator;
 		} elsif ($expr->isa('Attean::CastExpression')) {

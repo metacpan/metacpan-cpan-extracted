@@ -14,7 +14,7 @@ WriteMakefile(
     },
     dist => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     ( $ExtUtils::MakeMaker::VERSION >= 6.3002 ? ( 'LICENSE' => 'perl', ) : () ),
-    ( $] < 5.008 && $] > 5.011 ) ? () : ( INSTALLDIRS => 'perl' ),
+    ( $] >= 5.008 && $] < 5.011 ) ? ( INSTALLDIRS => 'perl' ) : (),
 
     # If under a version with Maketext in core, overwrite that core file.
     META_MERGE => {

@@ -10,7 +10,7 @@ use Carp::Assert::More;
 use Test::Exception;
 
 subtest assert_keys_are => sub {
-    plan tests => 8;
+    plan tests => 10;
 
     my $monolith = {
         depth  => 1,
@@ -48,13 +48,25 @@ subtest assert_keys_are => sub {
     );
     throws_ok(
         sub { assert_keys_are( $monolith, [] ) },
-        qr/Assertion.*failed/,
+        qr/Assertion.*failed.+Key "(depth|height|width)" is not a valid key\./sm,
         'Empty key list fails for non-empty object'
     );
     throws_ok(
         sub { assert_keys_are( {}, \@object_keys ) },
-        qr/Assertion.*failed/,
+        qr/Assertion.*failed.+Key "(depth|height|width)" is not in the hash\./sm,
         'Empty hash fails for non-empty key list'
+    );
+
+    throws_ok(
+        sub { assert_keys_are( $monolith, {} ) },
+        qr/Assertion.*failed!.+Argument for array of keys is not an arrayref\./sm,
+        'Fails on a non-array list of keys'
+    );
+
+    throws_ok(
+        sub { assert_keys_are( [], \@object_keys ) },
+        qr/Assertion.*failed!.+Argument for hash is not a hashref\./sm,
+        'Fails on a non-hashref hash'
     );
 };
 

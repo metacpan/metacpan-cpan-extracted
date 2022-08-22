@@ -17,12 +17,5 @@ which can be built and installed via:
 
 DEPENDENCIES
 
-Some knowledge of lilypond and music theory may well benefit the user. See the
-Makefile.PL for module dependencies.
-
-COPYRIGHT AND LICENCE
-
-Copyright (C) 2012-2016 Jeremy Mates
-
-This module is free software; you can redistribute it and/or modify it
-under the Artistic License (2.0).
+Some knowledge of lilypond and music theory may well benefit the user.
+See the Makefile.PL for module dependencies.

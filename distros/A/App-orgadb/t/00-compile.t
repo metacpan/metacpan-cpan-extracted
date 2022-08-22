@@ -11,12 +11,12 @@ plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 my @module_files = (
     'App/orgadb.pm',
     'App/orgadb/Common.pm',
-    'App/orgadb/Shell.pm',
-    'App/orgadb/Shell/Commands.pm'
+    'App/orgadb/Select/Shell.pm',
+    'App/orgadb/Select/Shell/Commands.pm'
 );
 
 my @scripts = (
-    'script/orgadb'
+    'script/orgadb-sel'
 );
 
 # no fake home requested

@@ -16,7 +16,7 @@ use namespace::clean;
 
 extends 'File::KDBX::Dumper';
 
-our $VERSION = '0.905'; # VERSION
+our $VERSION = '0.906'; # VERSION
 
 sub _write_headers {
     my $self = shift;
@@ -30,6 +30,11 @@ sub _write_headers {
     # this far
     local $headers->{+HEADER_TRANSFORM_SEED} = $kdbx->transform_seed;
     local $headers->{+HEADER_TRANSFORM_ROUNDS} = $kdbx->transform_rounds;
+
+    my $got_iv_size = length($headers->{+HEADER_ENCRYPTION_IV});
+    alert 'Encryption IV should be exactly 16 bytes long',
+        got         => $got_iv_size,
+        expected    => 16 if $got_iv_size != 16;
 
     if (nonempty (my $comment = $headers->{+HEADER_COMMENT})) {
         $buf .= $self->_write_header($fh, HEADER_COMMENT, $comment);
@@ -187,7 +192,7 @@ File::KDBX::Dumper::V3 - Dump KDBX3 files
 
 =head1 VERSION
 
-version 0.905
+version 0.906
 
 =head1 BUGS
 

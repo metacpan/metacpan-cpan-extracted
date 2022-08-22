@@ -37,7 +37,7 @@ ansicolumn \[options\] \[file ...\]
     --[no-]pagebreak     allow page break
     --border-style=#     border style
     --[no-]ignore-space  ignore space in table output
-    --[no-]white-space   allow white spaces at the top of each panes
+    --[no-]white-space   allow white spaces at the top of each pane
     --[no-]isolation     page-end line isolation
     --tabstop=#          tab-stop character
     --tabhead=#          tab-head character
@@ -47,7 +47,7 @@ ansicolumn \[options\] \[file ...\]
 
 # VERSION
 
-Version 1.19
+Version 1.20
 
 # DESCRIPTION
 
@@ -91,7 +91,7 @@ default, from the standard input.
 
 - **-o**#, **--output-separator**=#
 
-    When used **--table** or **-t** option, each columns are joined by two
+    When used **--table** or **-t** option, each column are joined by two
     space characters (' ') by default.  This option will change it.
 
 - **-R**_columns_, **--table-right**=_columns_
@@ -149,7 +149,7 @@ default, from the standard input.
 
 - **-W**, **--widen**
 
-    Use full width of the terminal.  Each panes are expanded to fill
+    Use full width of the terminal.  Each pane is expanded to fill
     terminal width, unless **--pane-width** is specified.
 
 - **-p**, **--paragraph**
@@ -179,7 +179,7 @@ default, from the standard input.
 
 - **--column-unit**=#, **--cu**=#
 
-    Each columns are placed at the unit of 8 by default.  This option
+    Each column is placed at the unit of 8 by default.  This option
     changes the number of the unit.
 
 - **--linestyle**=`none`|`truncate`|`wrap`|`wordwrap`, **--ls**=`...`
@@ -264,8 +264,8 @@ default, from the standard input.
 
 - **--**\[**no-**\]**white-space**
 
-    Allow white spaces at the top of each panes, or clean them up.
-    Default true.  Negated by **--document** option.
+    Allow white spaces at the top of each pane, or clean them up.  Default
+    true.  Negated by **--document** option.
 
 - **--**\[**no-**\]**isolation**
 

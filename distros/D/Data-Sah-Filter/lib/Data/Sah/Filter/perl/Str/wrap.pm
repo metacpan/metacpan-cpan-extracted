@@ -4,12 +4,10 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Data::Dmp;
-
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-04'; # DATE
+our $DATE = '2022-07-16'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 sub meta {
     +{
@@ -21,6 +19,11 @@ sub meta {
                 default => 72,
             },
         },
+        examples => [
+            {value=>"foo"},
+            {value=>"foo foo foo foo"},
+            {value=>"foo foo foo foo", filter_args=>{columns=>4}, filtered_value=>"foo\nfoo\nfoo"},
+        ],
     };
 }
 
@@ -59,13 +62,34 @@ Data::Sah::Filter::perl::Str::wrap - Wrap text
 
 =head1 VERSION
 
-This document describes version 0.010 of Data::Sah::Filter::perl::Str::wrap (from Perl distribution Data-Sah-Filter), released on 2022-07-04.
+This document describes version 0.011 of Data::Sah::Filter::perl::Str::wrap (from Perl distribution Data-Sah-Filter), released on 2022-07-16.
 
 =head1 SYNOPSIS
 
-Use in Sah schema's C<prefilters> (or C<postfilters>) clause:
+=head2 Using in Sah schema's C<prefilters> (or C<postfilters>) clause
 
- ["str","prefilters",["Str::wrap"]]
+ ["str","prefilters",[["Str::wrap"]]]
+
+=head2 Using with L<Data::Sah>:
+
+ use Data::Sah qw(gen_validator);
+ 
+ my $schema = ["str","prefilters",[["Str::wrap"]]];
+ my $validator = gen_validator($schema);
+ if ($validator->($some_data)) { print 'Valid!' }
+
+=head2 Using with L<Data::Sah:Filter> directly:
+
+ use Data::Sah::Filter qw(gen_filter);
+
+ my $filter = gen_filter([["Str::wrap"]]);
+ my $filtered_value = $filter->($some_data);
+
+=head2 Sample data and filtering results
+
+ "foo" # valid, unchanged
+ "foo foo foo foo" # valid, unchanged
+ "foo foo foo foo" # filtered with args {columns=>4}, valid, becomes "foo\nfoo\nfoo\nfoo"
 
 =head1 DESCRIPTION
 

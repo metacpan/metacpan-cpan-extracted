@@ -9,8 +9,8 @@
 
 #define SORT(a,b)	{ int swp; if ((a) > (b)) { swp=(a); (a)=(b); (b)=swp; }}
 #define REVERT(a)	(XX-> size. y - (a) - 1)
-#define SHIFT(a,b)	{ (a) += XX-> gtransform. x + XX-> btransform. x; \
-									(b) += XX-> gtransform. y + XX-> btransform. y; }
+#define SHIFT(a,b)	{ (a) += XX-> transform. x + XX-> btransform. x; \
+									(b) += XX-> transform. y + XX-> btransform. y; }
 #define RANGE(a)        { if ((a) < -16383) (a) = -16383; else if ((a) > 16383) a = 16383; }
 #define RANGE2(a,b)     RANGE(a) RANGE(b)
 #define RANGE4(a,b,c,d) RANGE(a) RANGE(b) RANGE(c) RANGE(d)
@@ -23,22 +23,22 @@
 #define COLOR_B16(x) (((x)<<8)&0xFF00)
 
 static int rop_map[] = {
-	GXcopy	/* ropCopyPut */,		/* dest  = src */
-	GXxor	/* ropXorPut */,		/* dest ^= src */
-	GXand	/* ropAndPut */,		/* dest &= src */
-	GXor		/* ropOrPut */,			/* dest |= src */
-	GXcopyInverted /* ropNotPut */,		/* dest = !src */
-	GXinvert	/* ropInvert */,		/* dest = !dest */
-	GXclear	/* ropBlackness */,		/* dest = 0 */
-	GXandReverse	/* ropNotDestAnd */,		/* dest = (!dest) & src */
-	GXorReverse	/* ropNotDestOr */,		/* dest = (!dest) | src */
-	GXset	/* ropWhiteness */,		/* dest = 1 */
-	GXandInverted /* ropNotSrcAnd */,		/* dest &= !src */
-	GXorInverted	/* ropNotSrcOr */,		/* dest |= !src */
-	GXequiv	/* ropNotXor */,		/* dest ^= !src */
-	GXnand	/* ropNotAnd */,		/* dest = !(src & dest) */
-	GXnor	/* ropNotOr */,			/* dest = !(src | dest) */
-	GXnoop	/* ropNoOper */			/* dest = dest */
+	GXcopy	       /* ropCopyPut    */, /* dest  = src          */
+	GXxor	       /* ropXorPut     */, /* dest ^= src          */
+	GXand	       /* ropAndPut     */, /* dest &= src          */
+	GXor	       /* ropOrPut      */, /* dest |= src          */
+	GXcopyInverted /* ropNotPut     */, /* dest = !src          */
+	GXinvert       /* ropInvert     */, /* dest = !dest         */
+	GXclear	       /* ropBlackness  */, /* dest = 0             */
+	GXandReverse   /* ropNotDestAnd */, /* dest = (!dest) & src */
+	GXorReverse    /* ropNotDestOr  */, /* dest = (!dest) | src */
+	GXset          /* ropWhiteness  */, /* dest = 1             */
+	GXandInverted  /* ropNotSrcAnd  */, /* dest &= !src         */
+	GXorInverted   /* ropNotSrcOr   */, /* dest |= !src         */
+	GXequiv        /* ropNotXor     */, /* dest ^= !src         */
+	GXnand         /* ropNotAnd     */, /* dest = !(src & dest) */
+	GXnor          /* ropNotOr      */, /* dest = !(src | dest) */
+	GXnoop         /* ropNoOper     */  /* dest = dest          */
 };
 
 int
@@ -50,18 +50,18 @@ prima_rop_map( int rop)
 		return rop_map[ rop];
 }
 
-void
+struct gc_head*
 prima_get_gc( PDrawableSysData selfxx)
 {
 	XGCValues gcv;
 	Bool bitmap, layered;
 	struct gc_head *gc_pool;
 
-	if ( XX-> gc && XX-> gcl) return;
+	if ( XX-> gc && XX-> gcl) return NULL;
 
 	if ( XX-> gc || XX-> gcl) {
 		warn( "UAG_010: internal error");
-		return;
+		return NULL;
 	}
 
 	bitmap = XT_IS_BITMAP(XX) ? true : false;
@@ -78,6 +78,30 @@ prima_get_gc( PDrawableSysData selfxx)
 			XX->gcl->gc = XX-> gc;
 	}
 	if ( XX-> gcl) XX->gc = XX->gcl->gc;
+	return gc_pool;
+}
+
+void
+prima_get_fill_pattern_offsets( Handle self, int * x, int * y )
+{
+	DEFXX;
+	int w, h;
+	int Y = XX-> size.y;
+	if ( XX-> fp_stipple || XX-> fp_tile ) {
+		Handle i = PDrawable(self)->fillPatternImage;
+		h = PDrawable(i)-> h;
+		w = PDrawable(i)-> w;
+	} else {
+		h = 8;
+		w = 8;
+	}
+
+	*x = XX->fill_pattern_offset.x + XX->btransform.x;
+	*y = Y - XX->fill_pattern_offset.y - XX->btransform.y;
+	while (*x < 0) *x += w;
+	while (*y < 0) *y += h;
+	*x %= w;
+	*y %= h;
 }
 
 void
@@ -138,9 +162,10 @@ prima_prepare_drawable_for_painting( Handle self, Bool inside_on_paint)
 	int w, h;
 	XRectangle r;
 
+	apc_gp_push( self, NULL, NULL, 0);
+
 	XF_IN_PAINT(XX) = true;
 	XX-> btransform. x = XX-> btransform. y = 0;
-	XX-> gcv. ts_x_origin = XX-> gcv. ts_y_origin = 0;
 	if ( inside_on_paint && XX-> udrawable && is_opt( optBuffered) && !is_opt( optInDrawInfo) ) {
 		if ( XX-> invalid_region) {
 			XClipBox( XX-> invalid_region, &r);
@@ -157,23 +182,12 @@ prima_prepare_drawable_for_painting( Handle self, Bool inside_on_paint)
 		XX-> gdrawable = XCreatePixmap( DISP, XX-> udrawable, w, h, XX->visual->depth);
 		XCHECKPOINT;
 		if (!XX-> gdrawable) goto Unbuffered;
-		XX-> gcv. ts_x_origin = -r.x;
-		XX-> gcv. ts_y_origin = -r.y;
 	} else if ( XX-> udrawable && !XX-> gdrawable) {
 Unbuffered:
 		XX-> gdrawable = XX-> udrawable;
 	}
 
-	XX-> paint_rop = XX-> rop;
-	XX-> paint_rop2 = XX-> rop2;
-	XX-> paint_alpha = XX-> alpha;
-	XX-> paint_line_width = XX-> line_width;
-	XX-> flags. paint_base_line = XX-> flags. base_line;
-	XX-> flags. paint_opaque    = XX-> flags. opaque;
-	XX-> saved_font = PDrawable( self)-> font;
 	XX-> gcv. clip_mask = None;
-	XX-> gtransform = XX-> transform;
-	XX-> fill_mode = XX->saved_fill_mode;
 
 	prima_get_gc( XX);
 	XX-> gcv. subwindow_mode = (XX->flags.clip_by_children ? ClipByChildren : IncludeInferiors);
@@ -181,23 +195,12 @@ Unbuffered:
 	XChangeGC( DISP, XX-> gc, mask, &XX-> gcv);
 	XCHECKPOINT;
 
+
 	if ( XX-> dashes) {
-		dDASH_FIX( XX-> paint_line_width, XX-> dashes, XX-> ndashes);
+		dDASH_FIX( XX-> line_width, XX-> dashes, XX-> ndashes);
 		DASH_FIX;
 		XSetDashes( DISP, XX-> gc, 0, DASHES);
-		XX-> paint_ndashes = XX-> ndashes;
-		if (( XX-> paint_dashes = malloc( XX-> ndashes)))
-			memcpy( XX-> paint_dashes, XX-> dashes, XX-> ndashes);
-		XX-> line_style = ( XX-> paint_rop2 == ropCopyPut) ? LineDoubleDash : LineOnOffDash;
 	} else {
-		XX-> paint_dashes = malloc(1);
-		if ( XX-> ndashes < 0) {
-			XX-> paint_dashes[0] = '\0';
-			XX-> paint_ndashes = 0;
-		} else {
-			XX-> paint_dashes[0] = '\1';
-			XX-> paint_ndashes = 1;
-		}
 		XX-> line_style = LineSolid;
 	}
 
@@ -228,14 +231,20 @@ Unbuffered:
 	XX-> clip_mask_extent. x = XX-> clip_mask_extent. y = 0;
 	XX-> flags. xft_clip = 0;
 
-	apc_gp_set_antialias( self, XX-> flags.saved_antialias);
+	apc_gp_set_alpha( self, XX-> alpha);
+	apc_gp_set_antialias( self, XX-> flags.antialias);
 	apc_gp_set_color( self, XX-> saved_fore);
 	apc_gp_set_back_color( self, XX-> saved_back);
-	memcpy( XX-> saved_fill_pattern, XX-> fill_pattern, sizeof( FillPattern));
-	XX-> fill_pattern[0]++; /* force  */
-	apc_gp_set_fill_pattern( self, XX-> saved_fill_pattern);
-	XX-> saved_fill_pattern_offset = XX-> fill_pattern_offset;
-	apc_gp_set_fill_pattern_offset( self, XX-> saved_fill_pattern_offset);
+
+	if ( PDrawable(self)-> fillPatternImage ) {
+		apc_gp_set_fill_image( self, PDrawable(self)-> fillPatternImage);
+	} else {
+		FillPattern fp;
+		memcpy( fp, XX->fill_pattern, sizeof(fp));
+		XX-> fill_pattern[0]++; /* force  */
+		apc_gp_set_fill_pattern( self, fp);
+	}
+	apc_gp_set_fill_pattern_offset( self, XX-> fill_pattern_offset);
 
 	if ( !XX-> flags. reload_font && XX-> font && XX-> font-> id) {
 		XSetFont( DISP, XX-> gc, XX-> font-> id);
@@ -246,11 +255,100 @@ Unbuffered:
 	}
 }
 
+static void
+gc_stack_free( Handle self, PPaintState state)
+{
+	if ( state-> dashes )
+		free(state->dashes);
+	if ( state-> in_paint ) {
+		if ( state-> paint.gcl)
+			TAILQ_INSERT_HEAD(state->paint.gc_pool, state->paint.gcl, gc_link);
+		if ( state-> paint.region )
+			XDestroyRegion( state-> paint.region );
+		if ( state-> paint.kill_tile )
+			XFreePixmap( DISP, state-> paint.tile);
+		if ( state-> paint.kill_stipple )
+			XFreePixmap( DISP, state-> paint.stipple);
+	}
+	if ( state-> fill_image )
+		unprotect_object( state-> fill_image );
+	if ( state-> user_destructor )
+		state-> user_destructor(self, state->user_data, state->user_data_size, state->in_paint);
+	free(state);
+}
+
+static Bool
+gc_stack_free_paints_only( Handle item, void * p)
+{
+	PPaintState state = ( PPaintState ) item;
+	if ( !state->in_paint) return true;
+	gc_stack_free((Handle) p, state);
+	return false;
+}
+
+static Bool
+gc_stack_free_all( Handle item, void * p)
+{
+	gc_stack_free((Handle) p, ( PPaintState ) item);
+	return false;
+}
+
+static void
+cleanup_gc_stack(Handle self, Bool all)
+{
+	DEFXX;
+	if ( XX && XX-> gc_stack ) {
+		if ( all ) {
+			list_first_that(XX-> gc_stack, &gc_stack_free_all, (void*) self);
+			plist_destroy(XX-> gc_stack);
+			XX-> gc_stack = NULL;
+		} else
+			list_grep(XX-> gc_stack, &gc_stack_free_paints_only, (void*) self);
+	}
+}
+
+/* COW the pixmaps on the stack */
+static void
+cleanup_stipples( Handle self )
+{
+	DEFXX;
+	Bool kill = false;
+
+	if ( XX-> gc_stack ) {
+		int i;
+		for ( i = XX->gc_stack->count - 1; i >= 0; i--) {
+			PPaintState state = ( PPaintState ) XX->gc_stack->items[i];
+			if ( !state->paint.tile || !state->paint.stipple)
+				continue;
+
+			if ( state-> paint.tile    && state->paint.tile == XX-> fp_tile   )
+				state-> paint.kill_tile    = true;
+			if ( state-> paint.stipple && state->paint.tile == XX-> fp_stipple)
+				state-> paint.kill_stipple = true;
+			kill = false;
+			break;
+		}
+	}
+
+	if ( kill ) {
+		if ( XX-> fp_tile )
+			XFreePixmap( DISP, XX-> fp_tile);
+		if ( XX-> fp_stipple )
+			XFreePixmap( DISP, XX-> fp_stipple);
+	}
+
+	XX-> fp_stipple = XX-> fp_tile = 0;
+}
+
 void
 prima_cleanup_drawable_after_painting( Handle self)
 {
 	DEFXX;
+
+	cleanup_gc_stack(self, 0);
+	cleanup_stipples(self);
 	DELETE_ARGB_PICTURE(XX->argb_picture);
+	CLEANUP_RENDER_STIPPLES(self);
 #ifdef USE_XFT
 	prima_xft_gp_destroy( self );
 #endif
@@ -287,150 +385,258 @@ prima_cleanup_drawable_after_painting( Handle self)
 		XX-> btransform. x = XX-> btransform. y = 0;
 	}
 	prima_release_gc(XX);
-	memcpy( XX-> fill_pattern, XX-> saved_fill_pattern, sizeof( FillPattern));
-	XX-> fill_pattern_offset = XX-> saved_fill_pattern_offset;
 	if ( XX-> font && ( --XX-> font-> refCnt <= 0)) {
 		prima_free_rotated_entry( XX-> font);
 		XX-> font-> refCnt = 0;
 	}
-	if ( XX-> paint_dashes) {
-		free(XX->paint_dashes);
-		XX-> paint_dashes = NULL;
-	}
-	XX-> paint_ndashes = 0;
-	XF_IN_PAINT(XX) = false;
-	PDrawable( self)-> font = XX-> saved_font;
 	if ( XX-> paint_region) {
 		XDestroyRegion( XX-> paint_region);
 		XX-> paint_region = NULL;
 	}
+	XF_IN_PAINT(XX) = false;
 	XFlush(DISP);
+	apc_gp_pop(self, NULL);
 }
 
 #define PURE_FOREGROUND if (!XX->flags.brush_fore) {\
 	XSetForeground( DISP, XX-> gc, XX-> fore. primary);\
 	XX->flags.brush_fore=1;\
 }\
-if (!XX->flags.brush_back && XX-> paint_rop2 == ropCopyPut) {\
+if (!XX->flags.brush_back && XX-> rop2 == ropCopyPut) {\
 	XSetBackground( DISP, XX-> gc, XX-> back. primary);\
 	XX->flags.brush_back=1;\
 }\
 XSetFillStyle( DISP, XX-> gc, FillSolid);\
 
-Bool
-prima_make_brush( DrawableSysData * XX, int colorIndex)
+static Bool
+make_tiled_brush( Handle self, int colorIndex)
 {
-	Pixmap p;
-	if ( XT_IS_BITMAP(XX) || ( guts. idepth == 1)) {
-		int i;
-		FillPattern mix, *p1, *p2;
-		if ( colorIndex > 0) return false;
-		p1 = &guts. ditherPatterns[ 64 - (XX-> fore. primary ? 64 : XX-> fore. balance)];
-		p2 = &guts. ditherPatterns[ 64 - (XX-> back. primary ? 64 : XX-> back. balance)];
-		for ( i = 0; i < sizeof( FillPattern); i++)
-			mix[i] = ((*p1)[i] & XX-> fill_pattern[i]) | ((*p2)[i] & ~XX-> fill_pattern[i]);
-		XSetForeground( DISP, XX-> gc, 1);
-		XSetBackground( DISP, XX-> gc, 0);
-		XX-> flags. brush_fore = 0;
-		XX-> flags. brush_back = 0;
-		if (
-			( memcmp( mix, fillPatterns[ fpSolid], sizeof( FillPattern)) != 0) &&
-			( p = prima_get_hatch( &mix))
-			) {
-			XSetStipple( DISP, XX-> gc, p);
-			XSetFillStyle( DISP, XX-> gc, FillOpaqueStippled);
-		} else
-			XSetFillStyle( DISP, XX-> gc, FillSolid);
-	} else if ( XX-> flags. brush_null_hatch) {
-		if ( colorIndex > 0) return false;
-		if ( XX-> fore. balance) {
-			p = prima_get_hatch( &guts. ditherPatterns[ XX-> fore. balance]);
-			if ( p) {
-				XSetStipple( DISP, XX-> gc, p);
-				XSetFillStyle( DISP, XX-> gc, FillOpaqueStippled);
-				XSetBackground( DISP, XX-> gc, XX-> fore. secondary);
-				XX-> flags. brush_back = 0;
-			} else /* failure */
-				XSetFillStyle( DISP, XX-> gc, FillSolid);
-		} else
-			XSetFillStyle( DISP, XX-> gc, FillSolid);
+	DEFXX;
+	/* custom image */
+	if ( colorIndex > 0) return false;
+	XCHECKPOINT;
+	if ( XX-> fp_stipple) {
+		XSetStipple( DISP, XX-> gc, XX-> fp_stipple);
+		XCHECKPOINT;
 		if (!XX->flags.brush_fore) {
 			XSetForeground( DISP, XX-> gc, XX-> fore. primary);
 			XX->flags.brush_fore = 1;
 		}
-	} else if ( XX->fore.balance == 0 && XX->back.balance == 0) {
-		if ( colorIndex > 0) return false;
-
-		p = prima_get_hatch( &XX-> fill_pattern);
-		XSetFillStyle( DISP, XX-> gc, p ? FillOpaqueStippled : FillSolid);
-		if ( p) XSetStipple( DISP, XX-> gc, p);
-		if (!XX->flags.brush_fore) {
-			XSetForeground( DISP, XX-> gc, XX-> fore. primary);
-			XX->flags.brush_fore = 1;
-		}
-		if (p && !XX->flags.brush_back) {
+		if (!XX->flags.brush_back) {
 			XSetBackground( DISP, XX-> gc, XX-> back. primary);
 			XX->flags.brush_back = 1;
 		}
+		XSetFillStyle( DISP, XX-> gc,
+			(XX->rop2 == ropNoOper) ? FillStippled : FillOpaqueStippled);
 	} else {
-		switch ( colorIndex) {
-		case 0: /* back mix */
-			if ( XX-> back. balance) {
-				p = prima_get_hatch( &guts. ditherPatterns[ XX-> back. balance]);
-				if ( p) {
-					XSetStipple( DISP, XX-> gc, p);
-					XSetFillStyle( DISP, XX-> gc, FillOpaqueStippled);
-					XSetBackground( DISP, XX-> gc, XX-> back. secondary);
-				} else  /* failure */
-					XSetFillStyle( DISP, XX-> gc, FillSolid);
-			} else
-				XSetFillStyle( DISP, XX-> gc, FillSolid);
-			XSetForeground( DISP, XX-> gc, XX-> back. primary);
+		XSetTile( DISP, XX-> gc, XX-> fp_tile);
+		XCHECKPOINT;
+		XSetFillStyle( DISP, XX-> gc, FillTiled);
+	}
+	return true;
+}
+
+static Bool
+make_mono_brush( Handle self, int colorIndex)
+{
+	DEFXX;
+	int i, mode = -1;
+	FillPattern mix, *p1, *p2;
+	Pixmap p;
+
+	switch (colorIndex) {
+	case 0:
+		if (
+			(XX->rop2 == ropCopyPut) ||
+			( memcmp( XX->fill_pattern, fillPatterns[ fpSolid], sizeof( FillPattern)) == 0)
+		) {
+			p1 = &guts. ditherPatterns[ 64 - (XX-> fore. primary ? 64 : XX-> fore. balance)];
+			p2 = &guts. ditherPatterns[ 64 - (XX-> back. primary ? 64 : XX-> back. balance)];
+			for ( i = 0; i < sizeof( FillPattern); i++)
+				mix[i] = ((*p1)[i] & XX-> fill_pattern[i]) | ((*p2)[i] & ~XX-> fill_pattern[i]);
+			XSetForeground( DISP, XX-> gc, 1);
+			XSetBackground( DISP, XX-> gc, 0);
+			XX-> flags. brush_fore = 0;
 			XX-> flags. brush_back = 0;
-			break;
-		case 1: /* fore mix */
-			if ( memcmp( XX-> fill_pattern, fillPatterns[fpEmpty], sizeof(FillPattern))==0)
-				return false;
-			if ( XX-> fore. balance) {
-				int i;
-				FillPattern fp;
-				memcpy( &fp, &guts. ditherPatterns[ XX-> fore. balance], sizeof(FillPattern));
-				for ( i = 0; i < 8; i++)
-					fp[i] &= XX-> fill_pattern[i];
-				p = prima_get_hatch( &fp);
-			} else
-				p = prima_get_hatch( &XX-> fill_pattern);
+			if ( memcmp( mix, fillPatterns[ fpSolid], sizeof( FillPattern)) == 0) {
+				XSetFillStyle( DISP, XX-> gc, FillSolid);
+				return true;
+			}
+			mode = FillOpaqueStippled;
+		} else {
+			XSetForeground( DISP, XX-> gc, XX->fore.primary);
+			XX-> flags. brush_fore = 0;
+
+			p1 = &guts. ditherPatterns[XX-> fore.balance];
+			for ( i = 0; i < sizeof( FillPattern); i++)
+				mix[i] = (*p1)[i] & XX-> fill_pattern[i];
+			mode = FillStippled;
+		}
+		break;
+	case 1:
+		if (
+			(XX->rop2 == ropCopyPut) ||
+			( memcmp( XX->fill_pattern, fillPatterns[ fpSolid], sizeof( FillPattern)) == 0) ||
+			! XX-> fore.balance
+		)
+			return false;
+
+		XSetForeground( DISP, XX-> gc, XX->fore.secondary);
+
+		p1 = &guts. ditherPatterns[64 - XX-> fore.balance];
+		for ( i = 0; i < sizeof( FillPattern); i++)
+			mix[i] = (*p1)[i] & XX-> fill_pattern[i];
+
+		mode = FillStippled;
+		break;
+	default:
+		return false;
+	}
+
+	if (( p = prima_get_hatch( &mix)) != 0 ) {
+		XSetStipple( DISP, XX-> gc, p);
+		XSetFillStyle( DISP, XX-> gc, mode);
+	} else
+		XSetFillStyle( DISP, XX-> gc, FillSolid);
+
+	return true;
+}
+
+static Bool
+make_null_brush( Handle self, int colorIndex )
+{
+	DEFXX;
+	Pixmap p;
+	if ( colorIndex > 0) return false;
+	if ( XX-> fore. balance) {
+		p = prima_get_hatch( &guts. ditherPatterns[ XX-> fore. balance]);
+		if ( p) {
+			XSetStipple( DISP, XX-> gc, p);
+			XSetFillStyle( DISP, XX-> gc, FillOpaqueStippled);
+			XSetBackground( DISP, XX-> gc, XX-> fore. secondary);
+			XX-> flags. brush_back = 0;
+		} else /* failure */
+			XSetFillStyle( DISP, XX-> gc, FillSolid);
+	} else
+		XSetFillStyle( DISP, XX-> gc, FillSolid);
+	if (!XX->flags.brush_fore) {
+		XSetForeground( DISP, XX-> gc, XX-> fore. primary);
+		XX->flags.brush_fore = 1;
+	}
+	return true;
+}
+
+
+static Bool
+make_solid_brush( Handle self, int colorIndex )
+{
+	DEFXX;
+	Pixmap p;
+	if ( colorIndex > 0) return false;
+
+	p = prima_get_hatch( &XX-> fill_pattern);
+	XSetFillStyle( DISP, XX-> gc, p ?
+		((XX->rop2 == ropNoOper) ? FillStippled : FillOpaqueStippled) :
+		FillSolid);
+	if ( p) XSetStipple( DISP, XX-> gc, p);
+	if (!XX->flags.brush_fore) {
+		XSetForeground( DISP, XX-> gc, XX-> fore. primary);
+		XX->flags.brush_fore = 1;
+	}
+	if (p && !XX->flags.brush_back) {
+		XSetBackground( DISP, XX-> gc, XX-> back. primary);
+		XX->flags.brush_back = 1;
+	}
+	return true;
+}
+
+static Bool
+make_dithered_brush( Handle self, int colorIndex )
+{
+	DEFXX;
+	Pixmap p;
+
+	switch ( colorIndex) {
+	case 0: /* back mix */
+		if ( XX->rop2 == ropNoOper) {
+			XSetFunction( DISP, XX-> gc, GXnoop);
+			return true;
+		}
+
+		if ( XX-> back. balance) {
+			p = prima_get_hatch( &guts. ditherPatterns[ XX-> back. balance]);
+			if ( p) {
+				XSetStipple( DISP, XX-> gc, p);
+				XSetFillStyle( DISP, XX-> gc, FillOpaqueStippled);
+				XSetBackground( DISP, XX-> gc, XX-> back. secondary);
+			} else  /* failure */
+				XSetFillStyle( DISP, XX-> gc, FillSolid);
+		} else
+			XSetFillStyle( DISP, XX-> gc, FillSolid);
+		XSetForeground( DISP, XX-> gc, XX-> back. primary);
+		XX-> flags. brush_back = 0;
+		break;
+	case 1: /* fore mix */
+		if ( memcmp( XX-> fill_pattern, fillPatterns[fpEmpty], sizeof(FillPattern))==0)
+			return false;
+		if ( XX-> fore. balance) {
+			int i;
+			FillPattern fp;
+			memcpy( &fp, &guts. ditherPatterns[ XX-> fore. balance], sizeof(FillPattern));
+			for ( i = 0; i < 8; i++)
+				fp[i] &= XX-> fill_pattern[i];
+			p = prima_get_hatch( &fp);
+		} else
+			p = prima_get_hatch( &XX-> fill_pattern);
+		if ( !p) return false;
+
+		XSetStipple( DISP, XX-> gc, p);
+		XSetFillStyle( DISP, XX-> gc, FillStippled);
+		if ( !XX-> flags. brush_fore) {
+			XSetForeground( DISP, XX-> gc, XX-> fore. primary);
+			XX-> flags. brush_fore = 1;
+		}
+		break;
+	case 2: /* fore mix with fill pattern */
+		if ( memcmp( XX-> fill_pattern, fillPatterns[fpEmpty], sizeof(FillPattern))==0)
+			return false;
+		if ( XX-> fore. balance ) {
+			int i;
+			FillPattern fp;
+			memcpy( &fp, &guts. ditherPatterns[ XX-> fore. balance], sizeof(FillPattern));
+			for ( i = 0; i < 8; i++)
+				fp[i] = (~fp[i]) & XX-> fill_pattern[i];
+			p = prima_get_hatch( &fp);
 			if ( !p) return false;
 			XSetStipple( DISP, XX-> gc, p);
 			XSetFillStyle( DISP, XX-> gc, FillStippled);
-			if ( !XX-> flags. brush_fore) {
-				XSetForeground( DISP, XX-> gc, XX-> fore. primary);
-				XX-> flags. brush_fore = 1;
-			}
+			XSetForeground( DISP, XX-> gc, XX-> fore. secondary);
+			XX-> flags. brush_fore = 0;
 			break;
-		case 2: /* fore mix with fill pattern */
-			if ( memcmp( XX-> fill_pattern, fillPatterns[fpEmpty], sizeof(FillPattern))==0)
-				return false;
-			if ( XX-> fore. balance ) {
-				int i;
-				FillPattern fp;
-				memcpy( &fp, &guts. ditherPatterns[ XX-> fore. balance], sizeof(FillPattern));
-				for ( i = 0; i < 8; i++)
-					fp[i] = (~fp[i]) & XX-> fill_pattern[i];
-				p = prima_get_hatch( &fp);
-				if ( !p) return false;
-				XSetStipple( DISP, XX-> gc, p);
-				XSetFillStyle( DISP, XX-> gc, FillStippled);
-				XSetForeground( DISP, XX-> gc, XX-> fore. secondary);
-				XX-> flags. brush_fore = 0;
-				break;
-			} else
-				return false;
-		default:
+		} else
 			return false;
-		}
+	default:
+		return false;
 	}
+
 	return true;
+}
+
+Bool
+prima_make_brush( Handle self, int colorIndex)
+{
+	DEFXX;
+	if ( XX-> fp_stipple || XX-> fp_tile ) {
+		return make_tiled_brush( self, colorIndex );
+	} else if ( XT_IS_BITMAP(XX) || ( guts. idepth == 1)) {
+		return make_mono_brush( self, colorIndex );
+	} else if ( XX-> flags. brush_null_hatch ) {
+		return make_null_brush( self, colorIndex );
+	} else if ( XX->fore.balance == 0 && XX->back.balance == 0) {
+		return make_solid_brush( self, colorIndex );
+	} else {
+		return make_dithered_brush( self, colorIndex );
+	}
 }
 
 Bool
@@ -445,6 +651,7 @@ apc_gp_done( Handle self)
 {
 	DEFXX;
 	if (!XX) return false;
+	cleanup_gc_stack(self, 1);
 	if ( XX-> dashes) {
 		free(XX-> dashes);
 		XX-> dashes = NULL;
@@ -531,9 +738,9 @@ calculate_ellipse_divergence(void)
 
 #define ELLIPSE_RECT x - ( dX + 1) / 2 + 1, y - dY / 2, dX-guts.ellipseDivergence.x, dY-guts.ellipseDivergence.y
 #define FILL_ANTIDEFECT_REPAIRABLE (((XX->fill_mode & fmOverlay) != 0) && \
-		( rop_map[XX-> paint_rop] == GXcopy ||\
-		rop_map[XX-> paint_rop] == GXset  ||\
-		rop_map[XX-> paint_rop] == GXclear))
+		( rop_map[XX-> rop] == GXcopy ||\
+		rop_map[XX-> rop] == GXset  ||\
+		rop_map[XX-> rop] == GXclear))
 #define FILL_ANTIDEFECT_OPEN {\
 XGCValues gcv;\
 gcv. line_width = 1;\
@@ -542,7 +749,7 @@ XChangeGC( DISP, XX-> gc, GCLineWidth, &gcv);\
 }
 #define FILL_ANTIDEFECT_CLOSE {\
 XGCValues gcv;\
-gcv. line_width = XX-> paint_line_width + .5;\
+gcv. line_width = XX-> line_width + .5;\
 XChangeGC( DISP, XX-> gc, GCLineWidth, &gcv);\
 }
 
@@ -583,7 +790,7 @@ apc_gp_bar( Handle self, int x1, int y1, int x2, int y2)
 	SHIFT( x1, y1); SHIFT( x2, y2);
 	SORT( x1, x2); SORT( y1, y2);
 	RANGE4( x1, y1, x2, y2);
-	while ( prima_make_brush( XX, mix++))
+	while ( prima_make_brush( self, mix++))
 		XFillRectangle( DISP, XX-> gdrawable, XX-> gc, x1, REVERT( y2), x2 - x1 + 1, y2 - y1 + 1);
 	XCHECKPOINT;
 	XFLUSH;
@@ -611,7 +818,7 @@ apc_gp_bars( Handle self, int nr, Rect *rr)
 		rp->height = rr->top - rr->bottom + 1;
 	}
 
-	while ( prima_make_brush( XX, mix++))
+	while ( prima_make_brush( self, mix++))
 		XFillRectangles( DISP, XX-> gdrawable, XX-> gc, r, nr);
 
 	XCHECKPOINT;
@@ -743,8 +950,8 @@ apc_gp_draw_poly( Handle self, int n, Point *pp)
 {
 	DEFXX;
 	int i;
-	int x = XX-> gtransform. x + XX-> btransform. x;
-	int y = XX-> size. y - 1 - XX-> gtransform. y - XX-> btransform. y;
+	int x = XX-> transform. x + XX-> btransform. x;
+	int y = XX-> size. y - 1 - XX-> transform. y - XX-> btransform. y;
 	XPoint *p;
 
 	if ( PObject( self)-> options. optInDrawInfo) return false;
@@ -772,8 +979,8 @@ apc_gp_draw_poly2( Handle self, int np, Point *pp)
 {
 	DEFXX;
 	int i;
-	int x = XX-> gtransform. x + XX-> btransform. x;
-	int y = XX-> size. y - 1 - XX-> gtransform. y - XX-> btransform. y;
+	int x = XX-> transform. x + XX-> btransform. x;
+	int y = XX-> size. y - 1 - XX-> transform. y - XX-> btransform. y;
 	XSegment *s;
 	int n = np / 2;
 
@@ -837,7 +1044,7 @@ apc_gp_fill_chord( Handle self, int x, int y, int dX, int dY, double angleStart,
 	XSetArcMode( DISP, XX-> gc, ArcChord);
 	FILL_ANTIDEFECT_OPEN;
 
-	while ( prima_make_brush( XX, mix++)) {
+	while ( prima_make_brush( self, mix++)) {
 		compl = arc_completion( &angleStart, &angleEnd, &needf);
 		while ( compl--) {
 			XFillArc( DISP, XX-> gdrawable, XX-> gc, x - ( dX + 1) / 2 + 1, y - dY / 2, dX, dY, 0, 64*360);
@@ -875,7 +1082,7 @@ apc_gp_fill_ellipse( Handle self, int x, int y,  int dX, int dY)
 	y = REVERT( y);
 
 	FILL_ANTIDEFECT_OPEN;
-	while ( prima_make_brush( XX, mix++)) {
+	while ( prima_make_brush( self, mix++)) {
 		XFillArc( DISP, XX-> gdrawable, XX-> gc, x - ( dX + 1) / 2 + 1, y - dY / 2, dX, dY, 0, 64*360);
 		if ( FILL_ANTIDEFECT_REPAIRABLE)
 			XDrawArc( DISP, XX-> gdrawable, XX-> gc, x - ( dX + 1) / 2 + 1, y - dY / 2, dX-1, dY-1, 0, 64*360);
@@ -899,17 +1106,17 @@ apc_gp_fill_poly( Handle self, int numPts, Point *points)
 	if ( !( p = malloc(( numPts + 1) * sizeof( XPoint)))) return false;
 
 	for ( i = 0; i < numPts; i++) {
-		p[i]. x = (short)points[i]. x + XX-> gtransform. x + XX-> btransform. x;
-		p[i]. y = (short)REVERT(points[i]. y + XX-> gtransform. y + XX-> btransform. y);
+		p[i]. x = (short)points[i]. x + XX-> transform. x + XX-> btransform. x;
+		p[i]. y = (short)REVERT(points[i]. y + XX-> transform. y + XX-> btransform. y);
 		RANGE2(p[i].x, p[i].y);
 	}
-	p[numPts]. x = (short)points[0]. x + XX-> gtransform. x + XX-> btransform. x;
-	p[numPts]. y = (short)REVERT(points[0]. y + XX-> gtransform. y + XX-> btransform. y);
+	p[numPts]. x = (short)points[0]. x + XX-> transform. x + XX-> btransform. x;
+	p[numPts]. y = (short)REVERT(points[0]. y + XX-> transform. y + XX-> btransform. y);
 	RANGE2(p[numPts].x, p[numPts].y);
 
 	FILL_ANTIDEFECT_OPEN;
 	if ( guts. limits. XFillPolygon >= numPts) {
-		while ( prima_make_brush( XX, mix++)) {
+		while ( prima_make_brush( self, mix++)) {
 			XFillPolygon( DISP, XX-> gdrawable, XX-> gc, p, numPts, ComplexShape, CoordModeOrigin);
 			if ( FILL_ANTIDEFECT_REPAIRABLE) {
 				XDrawLines( DISP, XX-> gdrawable, XX-> gc, p, numPts+1, CoordModeOrigin);
@@ -940,7 +1147,7 @@ apc_gp_fill_sector( Handle self, int x, int y, int dX, int dY, double angleStart
 	XSetArcMode( DISP, XX-> gc, ArcPieSlice);
 
 	FILL_ANTIDEFECT_OPEN;
-	while ( prima_make_brush( XX, mix++)) {
+	while ( prima_make_brush( self, mix++)) {
 		compl = arc_completion( &angleStart, &angleEnd, &needf);
 		while ( compl--) {
 			XFillArc( DISP, XX-> gdrawable, XX-> gc, x - ( dX + 1) / 2 + 1, y - dY / 2, dX, dY, 0, 64*360);
@@ -988,10 +1195,7 @@ color_to_pixel( Handle self, Color color, int depth)
 		case 16:
 		case 24:
 		case 32:
-			pv =
-				(((COLOR_R(color) << bd-> red_range  ) >> 8) << bd->   red_shift) |
-				(((COLOR_G(color) << bd-> green_range) >> 8) << bd-> green_shift) |
-				(((COLOR_B(color) << bd-> blue_range ) >> 8) << bd->  blue_shift);
+			pv = COLOR2DEV_RGB(bd,color);
 			if ( guts.machine_byte_order != guts.byte_order)
 				switch( depth) {
 				case 16:
@@ -1189,13 +1393,13 @@ apc_gp_flood_fill( Handle self, int x, int y, Color color, Bool singleBorder)
 		return false;
 	bzero( s. lists, ( s. clip. bottom - s. clip. top + 1) * sizeof( void*));
 
-	prima_make_brush( XX, mix++);
+	prima_make_brush( self, mix++);
 	if ( fs_get_pixel( &s, x, y)) {
 		fill( &s, x, y, -1, x, x);
 		ret = true;
 	}
 
-	while ( prima_make_brush( XX, mix++)) {
+	while ( prima_make_brush( self, mix++)) {
 		for ( y = 0; y < s. clip. bottom - s. clip. top + 1; y++)
 			if ( s. lists[y])
 				for ( x = 0; x < s.lists[y]-> count; x += 2)
@@ -1364,13 +1568,13 @@ apc_gp_line( Handle self, int x1, int y1, int x2, int y2)
 	SHIFT( x1, y1); SHIFT( x2, y2);
 	RANGE4(x1, y1, x2, y2); /* not really correct */
 	PURE_FOREGROUND;
-	if (((int)(XX-> paint_line_width + .5) == 0) && (x1 == x2 || y1 == y2)) {
+	if (((int)(XX-> line_width + .5) == 0) && (x1 == x2 || y1 == y2)) {
 		XGCValues gcv;
 		gcv. line_width = 1;
 		XChangeGC( DISP, XX-> gc, GCLineWidth, &gcv);
 	}
 	XDrawLine( DISP, XX-> gdrawable, XX-> gc, x1, REVERT( y1), x2, REVERT( y2));
-	if (((int)(XX-> paint_line_width + .5) == 0) && (x1 == x2 || y1 == y2)) {
+	if (((int)(XX-> line_width + .5) == 0) && (x1 == x2 || y1 == y2)) {
 		XGCValues gcv;
 		gcv. line_width = 0;
 		XChangeGC( DISP, XX-> gc, GCLineWidth, &gcv);
@@ -1383,7 +1587,7 @@ Bool
 apc_gp_rectangle( Handle self, int x1, int y1, int x2, int y2)
 {
 	DEFXX;
-	int lw = XX-> paint_line_width + .5;
+	int lw = XX-> line_width + .5;
 
 	if ( PObject( self)-> options. optInDrawInfo) return false;
 	if ( !XF_IN_PAINT(XX)) return false;
@@ -1464,19 +1668,13 @@ apc_gp_set_pixel( Handle self, int x, int y, Color color)
 int
 apc_gp_get_alpha( Handle self)
 {
-	DEFXX;
-	if ( XF_IN_PAINT(XX)) {
-		return XX-> paint_alpha;
-	} else {
-		return XX-> alpha;
-	}
+	return X(self)-> alpha;
 }
 
 Bool
 apc_gp_get_antialias( Handle self)
 {
-	DEFXX;
-	return XF_IN_PAINT(XX) ? XX-> flags.antialias : XX->flags.saved_antialias;
+	return X(self)-> flags.antialias;
 }
 
 Color
@@ -1544,8 +1742,7 @@ apc_gp_get_font_languages( Handle self)
 int
 apc_gp_get_fill_mode( Handle self)
 {
-	DEFXX;
-	return XF_IN_PAINT(XX) ? XX->fill_mode : XX->saved_fill_mode;
+	return X(self)->fill_mode;
 }
 
 FillPattern *
@@ -1611,32 +1808,22 @@ apc_gp_get_line_join( Handle self)
 float
 apc_gp_get_line_width( Handle self)
 {
-	DEFXX;
-	return XF_IN_PAINT(XX) ? XX-> paint_line_width : XX-> line_width;
+	return X(self)-> line_width;
 }
 
 int
 apc_gp_get_line_pattern( Handle self, unsigned char *dashes)
 {
 	DEFXX;
-	int n;
-	if ( XF_IN_PAINT(XX)) {
-		n = XX-> paint_ndashes;
-		if ( XX-> paint_dashes)
-			memcpy( dashes, XX-> paint_dashes, n);
-		else
-			bzero( dashes, n);
+	int n = XX-> ndashes;
+	if ( n < 0) {
+		n = 0;
+		strcpy(( char*) dashes, "");
+	} else if ( n == 0) {
+		n = 1;
+		strcpy(( char*) dashes, "\1");
 	} else {
-		n = XX-> ndashes;
-		if ( n < 0) {
-			n = 0;
-			strcpy(( char*) dashes, "");
-		} else if ( n == 0) {
-			n = 1;
-			strcpy(( char*) dashes, "\1");
-		} else {
-			memcpy( dashes, XX-> dashes, n);
-		}
+		memcpy( dashes, XX-> dashes, n);
 	}
 	return n;
 }
@@ -1659,55 +1846,31 @@ apc_gp_get_resolution( Handle self)
 int
 apc_gp_get_rop( Handle self)
 {
-	DEFXX;
-	if ( XF_IN_PAINT(XX)) {
-		return XX-> paint_rop;
-	} else {
-		return XX-> rop;
-	}
+	return X(self)-> rop;
 }
 
 int
 apc_gp_get_rop2( Handle self)
 {
-	DEFXX;
-	if ( XF_IN_PAINT(XX))
-		return XX-> paint_rop2;
-	else
-		return XX-> rop2;
+	return X(self)-> rop2;
 }
 
 Point
 apc_gp_get_transform( Handle self)
 {
-	DEFXX;
-	if ( XF_IN_PAINT(XX)) {
-		return XX-> gtransform;
-	} else {
-		return XX-> transform;
-	}
+	return X(self)-> transform;
 }
 
 Bool
 apc_gp_get_text_opaque( Handle self)
 {
-	DEFXX;
-	if ( XF_IN_PAINT(XX)) {
-		return XX-> flags. paint_opaque ? true : false;
-	} else {
-		return XX-> flags. opaque ? true : false;
-	}
+	return X(self)-> flags. opaque ? true : false;
 }
 
 Bool
 apc_gp_get_text_out_baseline( Handle self)
 {
-	DEFXX;
-	if ( XF_IN_PAINT(XX)) {
-		return XX-> flags. paint_base_line ? true : false;
-	} else {
-		return XX-> flags. base_line ? true : false;
-	}
+	return X(self)-> flags. base_line ? true : false;
 }
 
 Bool
@@ -1715,16 +1878,18 @@ apc_gp_set_alpha( Handle self, int alpha)
 {
 	DEFXX;
 
-	if (XT_IS_BITMAP(XX) || (( XT_IS_PIXMAP(XX) || XT_IS_APPLICATION(XX)) && guts.depth==1))
-		alpha = 255;
-	if ( !guts.render_extension)
-		alpha = 255;
-
 	if ( XF_IN_PAINT(XX)) {
-		if ( XX-> paint_alpha == alpha)
+		if (XT_IS_BITMAP(XX) || (( XT_IS_PIXMAP(XX) || XT_IS_APPLICATION(XX)) && guts.depth==1))
+			alpha = 255;
+		if ( !guts.render_extension)
+			alpha = 255;
+
+		if ( XX-> alpha == alpha)
 			return true;
-		XX-> paint_alpha = alpha;
+		XX-> alpha = alpha;
 		guts.xrender_pen_dirty = true;
+		if ( PDrawable(self)-> fillPatternImage )
+			apc_gp_set_fill_image( self, PDrawable(self)-> fillPatternImage);
 	} else {
 		XX-> alpha = alpha;
 	}
@@ -1741,11 +1906,7 @@ apc_gp_set_antialias( Handle self, Bool antialias )
 		if ( !guts.render_extension)
 			return false;
 	}
-	if ( XF_IN_PAINT(XX) ) {
-		XX-> flags.antialias = antialias;
-	} else {
-		XX-> flags.saved_antialias = antialias;
-	}
+	XX-> flags.antialias = antialias;
 	return true;
 }
 
@@ -1756,8 +1917,7 @@ apc_gp_set_back_color( Handle self, Color color)
 	if ( XF_IN_PAINT(XX)) {
 		prima_allocate_color( self, color, &XX-> back);
 		XX-> flags. brush_back = 0;
-		if ( !XX-> flags. brush_null_hatch)
-			guts.xrender_pen_dirty = true;
+		guts.xrender_pen_dirty = true;
 	} else
 		XX-> saved_back = color;
 	return true;
@@ -1771,8 +1931,76 @@ apc_gp_set_color( Handle self, Color color)
 		prima_allocate_color( self, color, &XX-> fore);
 		XX-> flags. brush_fore = 0;
 		guts.xrender_pen_dirty = true;
-	} else
+	} else {
 		XX-> saved_fore = color;
+	}
+	return true;
+}
+
+static Pixmap
+create_tile( Handle self, Handle image, Bool mono )
+{
+	DEFXX;
+	Pixmap px;
+	int depth, flag;
+	PImage i = (PImage) image;
+	ImageCache *cache;
+	GC gc;
+	XGCValues gcv;
+
+	if ( mono || XT_IS_BITMAP(XX)) {
+		depth = 1;
+		flag = CACHE_BITMAP;
+	} else if ( XF_LAYERED(XX) || XX->alpha < 255 || XX->flags.antialias ) {
+		depth = guts.argb_depth;
+		flag = X(image)->type.icon ? CACHE_LAYERED_ALPHA : CACHE_LAYERED;
+	} else {
+		depth = guts.depth;
+		flag = CACHE_PIXMAP;
+	}
+
+	px = XCreatePixmap( DISP, guts.root, i->w, i->h, depth);
+	XCHECKPOINT;
+	if ( !px ) return 0;
+
+	if (!(cache = prima_image_cache((PImage) image, flag, mono ? 255 : XX->alpha))) {
+		XFreePixmap(DISP, px);
+		return 0;
+	}
+
+	gcv.graphics_exposures = 0;
+	gcv.foreground = 0xffffffff;
+	gcv.background = 0;
+	if ( !( gc = XCreateGC( DISP, px, GCGraphicsExposures|GCForeground|GCBackground, &gcv))) {
+		XFreePixmap(DISP, px);
+		return 0;
+	}
+	XCHECKPOINT;
+
+	prima_put_ximage( px, gc, cache->image, 0,0,0,0, i->w, i->h);
+	XFreeGC(DISP, gc);
+
+	return px;
+}
+
+Bool
+apc_gp_set_fill_image( Handle self, Handle image)
+{
+	DEFXX;
+	PImage i = (PImage) image;
+
+	if ( !XF_IN_PAINT(XX)) return false;
+	if ( i->stage != csNormal ) return false;
+
+	cleanup_stipples(self);
+	if ( i->type == imBW && !X(image)->type.icon)
+		XX->fp_stipple = create_tile(self, image, 1);
+	else
+		XX->fp_tile    = create_tile(self, image, 0);
+	XCHECKPOINT;
+
+	guts.xrender_pen_dirty = true;
+
 	return true;
 }
 
@@ -1784,14 +2012,13 @@ apc_gp_set_fill_mode( Handle self, int fillMode)
 	XGCValues gcv;
 
 	fill_rule = ((fillMode & fmWinding) == fmAlternate) ? EvenOddRule : WindingRule;
+	XX-> fill_mode = fillMode;
 	if ( XF_IN_PAINT(XX)) {
 		gcv. fill_rule = fill_rule;
-		XX-> fill_mode = fillMode;
 		XChangeGC( DISP, XX-> gc, GCFillRule, &gcv);
 		XCHECKPOINT;
 	} else {
 		XX-> gcv. fill_rule = fill_rule;
-		XX-> saved_fill_mode = fillMode;
 	}
 	return true;
 }
@@ -1800,13 +2027,25 @@ Bool
 apc_gp_set_fill_pattern( Handle self, FillPattern pattern)
 {
 	DEFXX;
-	if ( memcmp( pattern, XX-> fill_pattern, sizeof(FillPattern)) == 0)
+	if ( memcmp( pattern, XX-> fill_pattern, sizeof(FillPattern)) == 0) {
+		if ( XF_IN_PAINT(XX))
+			cleanup_stipples(self);
 		return true;
+	}
 	XX-> flags. brush_null_hatch =
-	( memcmp( pattern, fillPatterns[fpSolid], sizeof(FillPattern)) == 0);
+		( memcmp( pattern, fillPatterns[fpSolid], sizeof(FillPattern)) == 0);
 	memcpy( XX-> fill_pattern, pattern, sizeof( FillPattern));
-	if ( XF_IN_PAINT(XX))
+
+	if ( XF_IN_PAINT(XX)) {
+		XGCValues gcv;
+		cleanup_stipples(self);
 		guts.xrender_pen_dirty = true;
+
+		prima_get_fill_pattern_offsets(self, &gcv.ts_x_origin, &gcv.ts_y_origin);
+		XChangeGC( DISP, XX-> gc, GCTileStipXOrigin | GCTileStipYOrigin, &gcv);
+		XCHECKPOINT;
+	}
+
 	return true;
 }
 
@@ -1816,19 +2055,13 @@ apc_gp_set_fill_pattern_offset( Handle self, Point fpo)
 	DEFXX;
 	XGCValues gcv;
 
-	fpo. y = 8 - fpo.y;
 	XX-> fill_pattern_offset = fpo;
 
 	if ( XF_IN_PAINT(XX)) {
-		gcv. ts_x_origin = fpo. x;
-		gcv. ts_y_origin = fpo. y;
+		prima_get_fill_pattern_offsets(self, &gcv.ts_x_origin, &gcv.ts_y_origin);
 		XChangeGC( DISP, XX-> gc, GCTileStipXOrigin | GCTileStipYOrigin, &gcv);
 		XCHECKPOINT;
-		if ( !XX-> flags. brush_null_hatch)
-			guts.xrender_pen_dirty = true;
-	} else {
-		XX-> gcv. ts_x_origin = fpo. x;
-		XX-> gcv. ts_y_origin = fpo. y;
+		guts.xrender_pen_dirty = true;
 	}
 	return true;
 }
@@ -1892,11 +2125,11 @@ apc_gp_set_line_width( Handle self, float line_width)
 	DEFXX;
 	XGCValues gcv;
 
+	XX-> line_width = line_width;
 	if ( XF_IN_PAINT(XX)) {
-		XX-> paint_line_width = line_width;
 		gcv. line_width = line_width +.5;
-		if ( !( XX-> paint_ndashes == 0 || (XX-> paint_ndashes == 1 && XX-> paint_dashes[0] == 1))) {
-			dDASH_FIX( line_width, XX-> paint_dashes, XX-> paint_ndashes);
+		if ( !( XX-> ndashes == 0 || (XX-> ndashes == 1 && XX-> dashes[0] == 1))) {
+			dDASH_FIX( line_width, XX->dashes, XX->ndashes);
 			DASH_FIX;
 			XSetDashes( DISP, XX-> gc, 0, DASHES);
 		}
@@ -1904,7 +2137,6 @@ apc_gp_set_line_width( Handle self, float line_width)
 		XCHECKPOINT;
 	} else {
 		XX-> gcv. line_width = line_width + .5;
-		XX-> line_width = line_width;
 	}
 	return true;
 }
@@ -1922,32 +2154,29 @@ apc_gp_set_line_pattern( Handle self, unsigned char *pattern, int len)
 		} else {
 			dDASH_FIX(XX-> line_width, pattern, len);
 			DASH_FIX;
-			gcv. line_style = ( XX-> paint_rop2 == ropNoOper) ? LineOnOffDash : LineDoubleDash;
+			gcv. line_style = ( XX-> rop2 == ropNoOper) ? LineOnOffDash : LineDoubleDash;
 			XSetDashes( DISP, XX-> gc, 0, DASHES);
 			XChangeGC( DISP, XX-> gc, GCLineStyle, &gcv);
 		}
 		XX-> line_style = gcv. line_style;
-		free(XX->paint_dashes);
-		if (( XX-> paint_dashes = malloc( len)))
-			memcpy( XX-> paint_dashes, pattern, len);
-		XX-> paint_ndashes = len;
-	} else {
-		free( XX-> dashes);
-		if ( len == 0) {					/* lpNull */
-			XX-> dashes = NULL;
-			XX-> ndashes = -1;
-			XX-> gcv. line_style = LineSolid;
-		} else if ( len == 1 && pattern[0] == 1) {	/* lpSolid */
-			XX-> dashes = NULL;
-			XX-> ndashes = 0;
-			XX-> gcv. line_style = LineSolid;
-		} else {						/* the rest */
-			XX-> dashes = malloc( len);
-			memcpy( XX-> dashes, pattern, len);
-			XX-> ndashes = len;
-			XX-> gcv. line_style = ( XX-> rop2 == ropNoOper) ? LineOnOffDash : LineDoubleDash;
-		}
 	}
+
+	if (XX->dashes) free( XX-> dashes);
+	if ( len == 0) {					/* lpNull */
+		XX-> dashes = NULL;
+		XX-> ndashes = -1;
+		XX-> gcv. line_style = LineSolid;
+	} else if ( len == 1 && pattern[0] == 1) {	/* lpSolid */
+		XX-> dashes = NULL;
+		XX-> ndashes = 0;
+		XX-> gcv. line_style = LineSolid;
+	} else {						/* the rest */
+		XX-> dashes = malloc( len);
+		memcpy( XX-> dashes, pattern, len);
+		XX-> ndashes = len;
+		XX-> gcv. line_style = ( XX-> rop2 == ropNoOper) ? LineOnOffDash : LineDoubleDash;
+	}
+
 	return true;
 }
 
@@ -1974,14 +2203,14 @@ apc_gp_set_rop( Handle self, int rop)
 	if ( XF_IN_PAINT(XX)) {
 		if ( rop < 0 || rop >= sizeof( rop_map)/sizeof(int))
 			rop = ropNoOper;
-		XX-> paint_rop = rop;
 		XSetFunction( DISP, XX-> gc, function);
 		guts.xrender_pen_dirty = true;
 		XCHECKPOINT;
 	} else {
 		XX-> gcv. function = function;
-		XX-> rop = rop;
 	}
+
+	XX-> rop = rop;
 	return true;
 }
 
@@ -1990,8 +2219,8 @@ apc_gp_set_rop2( Handle self, int rop)
 {
 	DEFXX;
 	if ( XF_IN_PAINT(XX)) {
-		if ( XX-> paint_rop2 == rop) return true;
-		XX-> paint_rop2 = ( rop == ropCopyPut) ? ropCopyPut : ropNoOper;
+		if ( XX-> rop2 == rop) return true;
+		XX-> rop2 = ( rop == ropCopyPut) ? ropCopyPut : ropNoOper;
 		if ( XX-> line_style != LineSolid) {
 			XGCValues gcv;
 			gcv. line_style = ( rop == ropCopyPut) ? LineDoubleDash : LineOnOffDash;
@@ -1999,9 +2228,9 @@ apc_gp_set_rop2( Handle self, int rop)
 		}
 		guts.xrender_pen_dirty = true;
 	} else {
-		XX-> rop2 = rop;
 		if ( XX-> gcv. line_style != LineSolid)
 			XX-> gcv. line_style = ( rop == ropCopyPut) ? LineDoubleDash : LineOnOffDash;
+		XX-> rop2 = rop;
 	}
 	return true;
 }
@@ -2010,37 +2239,22 @@ Bool
 apc_gp_set_transform( Handle self, int x, int y)
 {
 	DEFXX;
-	if ( XF_IN_PAINT(XX)) {
-		XX-> gtransform. x = x;
-		XX-> gtransform. y = y;
-	} else {
-		XX-> transform. x = x;
-		XX-> transform. y = y;
-	}
+	XX-> transform. x = x;
+	XX-> transform. y = y;
 	return true;
 }
 
 Bool
 apc_gp_set_text_opaque( Handle self, Bool opaque)
 {
-	DEFXX;
-	if ( XF_IN_PAINT(XX)) {
-		XX-> flags. paint_opaque = !!opaque;
-	} else {
-		XX-> flags. opaque = !!opaque;
-	}
+	X(self)-> flags. opaque = !!opaque;
 	return true;
 }
 
 Bool
 apc_gp_set_text_out_baseline( Handle self, Bool baseline)
 {
-	DEFXX;
-	if ( XF_IN_PAINT(XX)) {
-		XX-> flags. paint_base_line = !!baseline;
-	} else {
-		XX-> flags. base_line = !!baseline;
-	}
+	X(self)-> flags. base_line = !!baseline;
 	return true;
 }
 
@@ -2048,5 +2262,157 @@ ApiHandle
 apc_gp_get_handle( Handle self)
 {
 	return ( ApiHandle) X(self)-> gdrawable;
+}
+
+Bool
+apc_gp_push(Handle self, GCStorageFunction * destructor, void * user_data, unsigned int user_data_size)
+{
+	DEFXX;
+	int size;
+	PPaintState state;
+
+	if ( !XX-> gc_stack ) {
+		if ( !( XX-> gc_stack = plist_create(4,4))) return false;
+	}
+	size = sizeof(PaintState) + user_data_size;
+	if ( !( state = malloc(size))) return false;
+	if ( list_add( XX-> gc_stack, (Handle) state) < 0) return false;
+
+	bzero(state, size);
+	state->user_data = state->user_data_buf;
+	memcpy( state-> user_data, user_data, user_data_size);
+	state->user_data_size = user_data_size;
+	state->user_destructor = destructor;
+
+	state->in_paint = XF_IN_PAINT(XX);
+
+	state->antialias     = XX-> flags.antialias;
+	state->fill_mode     = XX-> fill_mode;
+	state->alpha         = XX-> alpha;
+	state->line_width    = XX-> line_width;
+	state->n_dashes      = XX-> ndashes;
+	if ( XX-> dashes && (( state->dashes = malloc( XX-> ndashes)) != NULL))
+		memcpy( state->dashes, XX-> dashes, XX->ndashes);
+	state->rop           = XX->rop;
+	state->rop2          = XX->rop2;
+	state->transform     = XX->transform;
+	state->text_baseline = XX->flags.base_line;
+	state->text_opaque   = XX->flags.opaque;
+	if ( state-> in_paint ) {
+		state->paint.fore    = XX->fore;
+		state->paint.back    = XX->back;
+		state->paint.stipple = XX->fp_stipple;
+		state->paint.tile    = XX->fp_tile;
+		state->paint.gc      = XX-> gc;
+		state->paint.gcl     = XX-> gcl;
+		XX->gcl = NULL;
+		XX->gc = NULL;
+		state->paint.gc_pool = prima_get_gc(XX);
+		XCopyGC( DISP, state->paint.gc, (1 << (GCLastBit + 1)) - 1, XX->gc);
+		XCHECKPOINT;
+
+		if ( XX-> current_region ) {
+			state->paint.region = XCreateRegion();
+			XUnionRegion( state->paint.region, XX-> current_region, state->paint.region);
+			XSetRegion( DISP, state->paint.gc, state->paint.region );
+			XCHECKPOINT;
+		} else
+			state->paint.region = 0;
+	} else {
+		state->nonpaint.gcv  = XX->gcv;
+		state->nonpaint.fore = XX->saved_fore;
+		state->nonpaint.back = XX->saved_back;
+	}
+	state->miter_limit = XX->miter_limit;
+	memcpy( state->fill_pattern, XX->fill_pattern, sizeof(FillPattern));
+	state->fill_pattern_offset = XX->fill_pattern_offset;
+	state->null_hatch = XX->flags.brush_null_hatch;
+	state->font = PDrawable(self)->font;
+
+	if ( PDrawable(self)->fillPatternImage )
+		protect_object( state->fill_image = PDrawable(self)->fillPatternImage );
+	return true;
+}
+
+Bool
+apc_gp_pop( Handle self, void * user_data)
+{
+	DEFXX;
+	PPaintState state;
+
+	if ( !XX-> gc_stack ) return false;
+	if ( XX-> gc_stack-> count <= 0 ) return false;
+	if ( !( state = ( PPaintState) list_at( XX-> gc_stack, XX-> gc_stack-> count - 1))) return false;
+	list_delete_at( XX-> gc_stack, XX-> gc_stack->count - 1);
+
+	if ( user_data )
+		memcpy( user_data, state->user_data, state->user_data_size);
+
+	XX-> flags.antialias  = state->antialias;
+	XX-> fill_mode        = state->fill_mode;
+	XX-> alpha            = state-> alpha;
+	XX-> line_width       = state-> line_width;
+	if ( XX->dashes ) free( XX-> dashes);
+	XX->dashes            = state->dashes;
+	XX->ndashes           = state->n_dashes;
+	XX->rop               = state->rop;
+	XX->rop2              = state->rop2;
+	XX->transform         = state->transform;
+	XX->flags. base_line  = state->text_baseline;
+	XX->flags. opaque     = state->text_opaque;
+	if ( state-> in_paint ) {
+		XX->fore = state->paint.fore;
+		XX->back = state->paint.back;
+		XX-> flags.brush_fore = 0;
+		XX-> flags.brush_back = 0;
+		PDrawable(self)->font = state->font;
+		apc_gp_set_font(self, &PDrawable(self)->font);
+
+		if ( XX->fp_stipple != state->paint.stipple ) {
+			if ( XX-> fp_stipple )
+				XFreePixmap( DISP, XX->fp_stipple);
+			XX->fp_stipple = state->paint.stipple;
+		}
+		if ( XX->fp_tile != state->paint.tile ) {
+			if ( XX-> fp_tile )
+				XFreePixmap( DISP, XX->fp_tile);
+			XX->fp_tile = state->paint.tile;
+		}
+
+		prima_release_gc(XX);
+		XX->gc  = state->paint.gc;
+		XX->gcl = state->paint.gcl;
+
+		if ( XX-> current_region && XX-> flags. kill_current_region )
+			XDestroyRegion( XX-> current_region );
+		XX-> current_region = state-> paint.region;
+		if ( !state-> paint.region ) {
+			XRectangle r = {0,0,XX->size.x,XX->size.y};
+			XX-> current_region = XCreateRegion();
+			XUnionRectWithRegion( &r, XX->current_region, XX->current_region);
+		}
+		XX-> flags. kill_current_region = 1;
+#ifdef USE_XFT
+		if ( XX-> xft_drawable) prima_xft_update_region( self);
+#endif
+		CLIP_ARGB_PICTURE(XX->argb_picture, XX->current_region);
+		guts.xrender_pen_dirty = true;
+	} else {
+		XX->gcv = state->nonpaint.gcv;
+		XX->saved_fore = state->nonpaint.fore;
+		XX->saved_back = state->nonpaint.back ;
+	}
+
+	memcpy( XX->fill_pattern, state->fill_pattern, sizeof(FillPattern));
+	XX-> fill_pattern_offset = state->fill_pattern_offset;
+	XX-> flags.brush_null_hatch = state->null_hatch;
+	XX->miter_limit = state->miter_limit;
+
+	if (PDrawable(self)->fillPatternImage)
+		unprotect_object(PDrawable(self)->fillPatternImage);
+	PDrawable(self)->fillPatternImage = state-> fill_image;
+
+	free(state);
+	return true;
 }
 

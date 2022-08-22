@@ -1,6 +1,14 @@
 Changelog for DBIx-Connector-Retry-MySQL
 
-v1.0.0 2021-05-04T15:10:03
+v1.0.1 2022-08-18T20:53:48
+ - Pull request #2: SM-3756 (Brendan Byrd)
+ - Update README / LICENSE / Makefile (Brendan Byrd)
+ - Add retries_before_error_prefix setting (Brendan Byrd)
+ - Add caveat linkage about using dbh/connect methods (Brendan Byrd)
+ - Remove special __DIE__ handlers when running SET SESSION commands
+   (Brendan Byrd)
+
+v1.0.0 2021-05-04T15:09:01
  - Update README (Brendan Byrd)
  - Turn off retry_debug in unit tests (Brendan Byrd)
  - Switch to an in-memory SQLite DB for base unit tests (Brendan Byrd)

@@ -7,14 +7,14 @@ use FFI::Platypus;
 use Scalar::Util qw( readonly );
 
 # ABSTRACT: Convert a pointer to a string and back
-our $VERSION = '1.58'; # VERSION
+our $VERSION = '2.00'; # VERSION
 
 
 use constant _incantation =>
   $^O eq 'MSWin32' && do { require Config; $Config::Config{archname} =~ /MSWin32-x64/ }
   ? 'Q'
   : 'L!';
-use constant _pointer_buffer => "P" . FFI::Platypus->new( api => 1 )->sizeof('opaque');
+use constant _pointer_buffer => "P" . FFI::Platypus->new( api => 2 )->sizeof('opaque');
 
 my @stack;
 
@@ -76,7 +76,7 @@ FFI::Platypus::Type::StringPointer - Convert a pointer to a string and back
 
 =head1 VERSION
 
-version 1.58
+version 2.00
 
 =head1 SYNOPSIS
 
@@ -95,9 +95,9 @@ In your C code:
 
 In your Platypus::FFI code:
 
- use FFI::Platypus;
+ use FFI::Platypus 2.00;
  
- my $ffi = FFI::Platypus->new( api => 1 );
+ my $ffi = FFI::Platypus->new( api => 2 );
  $ffi->load_custom_type('::StringPointer' => 'string_pointer');
  
  $ffi->attach(string_pointer_argument => ['string_pointer'] => 'void');

@@ -1,5 +1,11 @@
 Revision history for Net-IPAM-Block
 
+6.01    Fri, 19 Aug 2022 14:12:55 +0200
+        * glitch in test plan
+
+6.00    Thu, 18 Aug 2022 17:34:09 +0200
+        * INCOMPATIBLE CHANGE in IPv4-mapped IP handling in Net::IPAM::IP v4.00
+
 5.20    Mon, 18 Jul 2022 16:54:04 +0200
         * replace recursive func in to_cidrs with a stack and iteration
 

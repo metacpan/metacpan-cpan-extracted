@@ -125,35 +125,29 @@ then.
 
 6) make
 
-   `make' will first run a program called `test.syms' that investigates
-   what the Curses libraries are like on your system and records the
-   results in the file "CursesDef.h".
+   'make' starts off by creating the file "CursesDef.h", by running the
+   program 'test.syms'.  You will see hundreds of messages telling you which
+   functions it found in your system Curses library and which ones it didn't.
+   It is a very common build failure mode for it not to find any of the
+   functions.  If you see that happening, stop and see TROUBLESHOOTING below.
 
-   test.syms is very brittle -- it works via test compiles, and if any
-   number of things goes wrong with the test compile, it makes bad
-   assumptions, usually that you don't have a certain function in your
-   Curses library.  If test.syms tells you it can't find functions that
-   you think you have, run test.syms manually with the -v (verbose) option.
-   That will show you the error messages from the test compiles and you
-   can figure out what's going wrong and fix it.  Typically, you'll find
-   that you need to do better on your CURSES_* environment variables
-   (see above).
+   'make' will then try to compile "Curses.c".  If you get any undefined
+   curses symbols, it means that your curses really doesn't have those
+   functions, and you should edit "CursesDef.h" and/or "c-config.h" and change
+   the #define to #undef for that function.
 
-   Alternatively, if you see that test.syms is picking the wrong
-   values, you can edit "CursesDef.h" by hand and follow the
-   directions.  If you have to "roll your own", be sure to save a
-   copy.  A "make clean" will delete "CursesDef.h".
+   If you get other compile errors, it is probably because the curses include
+   file and the perl include files are conflicting.  You'll have to figure out
+   what's wrong and add proper C code to "c-config.h".  See
+   "hints/c-sunos.sysv.h" for an example of how to do this.
 
-   `make' will then try to compile "Curses.c".  If you get any
-   undefined curses symbols, it means that your curses really doesn't
-   have those functions, and you should edit "CursesDef.h" and/or
-   "c-config.h" and change the #define to #undef for that function.
+   We have seen a weird case in which the builder is unable to find the system
+   Curses library even though it is in the linker's default search path and
+   you give its name with CURSES_LDFLAGS.  Until we figure out what causes
+   that, you can work around it by adding a LDLOADLIBS= argument to 'make'.
+   For a certain MacOS system in August 2022, this worked:
 
-   If you get other compile errors, it is probably because the curses
-   include file and the perl include files are conflicting.  You'll
-   have to figure out what's wrong and add proper C code to
-   "c-config.h".  See "hints/c-sunos.sysv.h" for an example of how to
-   do this.
+     $ make LDLOADLIBS=-lncurses
 
 7) Test the distribution:
 
@@ -166,22 +160,15 @@ then.
 
    "gdc" is a digital clock ported from the "ncurses" distribution.
 
-   As mentioned in the "README", the demo is not intended to be an
-   exhaustive test of all the possible Curses functions.  If it
-   doesn't do all the functions correctly, it may be a Curses bug or
-   it may be a problem with your system's "libcurses.a".  There's no
-   getting around the fact that you need to be conversant in how your
-   system's "libcurses.a" works to be able to use Curses most
-   effectively.
+   As mentioned in the "README", the demo is not intended to be an exhaustive
+   test of all the possible Curses functions.  If it doesn't do all the
+   functions correctly, it may be a Curses bug or it may be a problem with
+   your system's "libcurses.a".  There's no getting around the fact that you
+   need to be conversant in how your system's "libcurses.a" works to be able
+   to use Curses most effectively.
 
-   For "demo", you can try:
+   If the tests fail, see TROUBLESHOOTING below.
 
-   make cdemo
-
-   This will try to compile a pure-C version of the "demo".  If you
-   see the same errors in it that you see in "demo", it means there's
-   a bug in your libcurses.
-   
 8) Doing a :
 
    make install
@@ -196,6 +183,63 @@ then.
    "Curses.pm") for incompatibilities with other Perl programs.  Also
    check the end of the "README" for problems that may exist for your
    particular libcurses.a or operating system.
+
+
+TROUBLESHOOTING
+
+   Virtually all failures people experience with the Curses module are due to
+   failures with the system Curses library (libcurses), so if "perl demo"
+   doesn't work, to isolate the problem, try running the program 'cdemo',
+   which does the same things from C, i.e. not inolving Perl at all.
+
+     $ make cdemo
+     $ ./cdemo
+
+   'cdemo' is compiled from C, using the same compilation and linking options
+   as the Perl module.  If it fails, then your problem has nothing to do with
+   Perl.
+
+   When there is a problem with the system Curses library, it is almost always
+   that the build system didn't find it at all.  That doesn't produce the nice
+   build error message you might expect, because the build system is designed
+   to deal with Curses libraries that are missing various functions, and when
+   it can't find the library at all, tends to proceed happily as if the
+   library is there but just missing _all_ the functions.  You don't see a
+   problem until run time.
+
+   But it is easy to see if your problem is a with the system Curses library
+   not being found.  You'll see hundreds of messages when you run 'make' as
+   the builder investigates your system Curses library telling you that it's
+   not finding any of the Curses functions.
+
+   The first thing 'make' does is create the file "CursesDef.h" by running the
+   program 'test.syms', which investigates what the Curses libraries are like
+   on your system.
+
+   test.syms is very brittle -- it works via test compiles, and if any number
+   of things goes wrong with the test compile, it makes bad assumptions,
+   usually that you don't have a certain function in your Curses library.  If
+   test.syms tells you it can't find functions that you think you have, run
+   the make with variable TEST_SYMS_OPTS set to "-v":
+
+     $ make TEST_SYMS_OPTS=-v
+     
+   That will show you the error messages from the test compiles and you can
+   figure out what's going wrong and fix it.  Typically, you'll find that you
+   need to do better on your CURSES_* environment variables (see above).
+
+   Alternatively, if you see that test.syms is picking the wrong values, you
+   can edit "CursesDef.h" by hand and follow the directions.  If you have to
+   "roll your own", be sure to save a copy.  A "make clean" will delete
+   "CursesDef.h".
+
+
+
+
+(But if you were watching, you would have seen
+   hundreds of informational messages telling you that the build system was
+   not finding any of the Curses functions in the library).
+
 
 
 HP-UX

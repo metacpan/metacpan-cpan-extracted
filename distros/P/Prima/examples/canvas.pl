@@ -1,14 +1,14 @@
 use strict;
 use warnings;
 
-use Prima qw(ScrollWidget);
+use Prima qw(Widget::ScrollWidget);
 # A widget with two scrollbars. Contains set of objects, that know
 # how to draw themselves. The graphic objects hierarchy starts
 # from Prima::CanvasObject:: class
 
 package Prima::Canvas;
 use vars qw(@ISA);
-@ISA = qw(Prima::ScrollWidget);
+@ISA = qw(Prima::Widget::ScrollWidget);
 
 sub profile_default
 {
@@ -69,6 +69,7 @@ sub on_paint
 		);
 		%props = map { $_ => 1 } @uses;
 
+		$canvas-> fillPatternOffset( @r[0,1] );
 		$canvas-> translate( @r[4,5]);
 		$canvas-> clipRect( @r[0..3]);
 		$obj-> on_paint( $canvas, $r[6]-$r[4], $r[7]-$r[5]);
@@ -1757,12 +1758,35 @@ menuItems => [
 				sort grep { !m/AUTOLOAD|constant|BEGIN|END/ } keys %le:: ]],
 		['Line ~join' => [ map { [ "lj:lineJoin=$_", $_, \&set_constant ] }
 				sort grep { !m/AUTOLOAD|constant|BEGIN|END/ } keys %lj:: ]],
-		['Fill ~pattern' => [ map { [ "fp:fillPattern=$_", $_, \&set_constant ] }
-				sort grep { !m/AUTOLOAD|constant|BEGIN|END/ } keys %fp:: ]],
-		['~Rop' => [ map { [ "rop:rop=$_", $_, \&set_constant ] }
-				sort grep { !m/AUTOLOAD|constant|BEGIN|END/ } keys %rop:: ]],
-		['Rop~2' => [ map { [ "rop:rop2=$_", $_, \&set_constant ] }
-				sort grep { !m/AUTOLOAD|constant|BEGIN|END/ } keys %rop:: ]],
+		['Fill ~pattern' => [
+				[ Icon   => Icon   => \&set_fill_pattern ],
+				[ Bitmap => Bitmap => \&set_fill_pattern ],
+				[],
+				map { [ "fp:fillPattern=$_", $_, \&set_fill_pattern ] }
+					sort grep { !m/AUTOLOAD|constant|BEGIN|END/ } keys %fp::
+		]],
+		['~Rop' => [ map { [ "rop:rop=$_", $_, \&set_constant ] } qw(
+				CopyPut
+				XorPut
+				AndPut
+				OrPut
+				NotPut
+				Invert
+				Blackness
+				NotDestAnd
+				NotDestOr
+				Whiteness
+				NotSrcAnd
+				NotSrcOr
+				NotXor
+				NotAnd
+				NotOr
+				NoOper
+		)]],
+		['Rop~2' => [ map { [ "rop:rop2=$_", $_, \&set_constant ] } qw(
+				CopyPut
+				NoOper
+		)]],
 		['Fill r~ule' => [ map { [ "fm:fillMode=$_", $_, \&set_constant ] }
 				sort grep { !m/AUTOLOAD|constant|BEGIN|END/ } keys %fm:: ]],
 		[],
@@ -1788,6 +1812,10 @@ menuItems => [
 			['Set arrowhead ~size' => [
 				map {["arrow=$_", $_, \&set_arrowhead]} 1,2,3,4,5
 			]],
+		]],
+		['Filled shapes' => [
+			['fillBackColor'    => '~Fill back color' => \&set_color],
+			['outlineBackColor' => '~Outline back color' => \&set_color],
 		]],
 		['Te~xt' => [
 			['font' => '~Font' => \&set_font],
@@ -1913,6 +1941,7 @@ sub set_color
 	my ( $self, $property) = @_;
 	my $obj;
 	return unless $obj = $self-> Canvas-> focused_object;
+	return unless $obj->can($property);
 	$colordialog = Prima::Dialog::ColorDialog-> create unless $colordialog;
 	$colordialog-> value( $obj-> $property());
 	$obj-> $property( $colordialog-> value) if $colordialog-> execute != mb::Cancel;
@@ -1926,6 +1955,22 @@ sub set_font
 	$fontdialog = Prima::Dialog::FontDialog-> create unless $fontdialog;
 	$fontdialog-> logFont( $obj-> font);
 	$obj-> font( $fontdialog-> logFont) if $fontdialog-> execute != mb::Cancel;
+}
+
+sub set_fill_pattern
+{
+	my ( $self, $fp) = @_;
+	my $obj;
+	return unless $obj = $self-> Canvas-> focused_object;
+
+	if ( $fp eq 'Icon') {
+		$obj-> fillPattern($logo);
+	} elsif ( $fp eq 'Bitmap') {
+		$obj-> fillPattern($bitmap->image);
+	} else {
+		return unless $fp =~ /^(\w+)\:(\w+)\=(.*)$/;
+		$obj-> $2( eval "$1::$3");
+	}
 }
 
 sub set_line_width
@@ -2071,7 +2116,7 @@ sub set_text_flags
 }
 
 insert( $c, 'Button', origin => [ 0, 0]);
-insert( $c, 'Rectangle', linePattern => lp::DotDot, lineWidth => 10, origin => [ 50, 50]);
+insert( $c, 'Rectangle', linePattern => lp::DotDot, lineWidth => 10, origin => [ 50, 50], fillPattern => $logo);
 insert( $c, 'Line', origin => [ 200, 200], antialias => 1);
 insert( $c, 'Polygon', origin => [ 150, 150]);
 insert( $c, 'Bitmap', origin => [ 350, 350], backColor => cl::LightGreen, color => cl::Green);

@@ -12,7 +12,7 @@ use App::Sqitch::Types qw(DBH ArrayRef HashRef URIDB Str);
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = 'v1.2.1'; # VERSION
+our $VERSION = 'v1.3.0'; # VERSION
 
 sub key    { 'snowflake' }
 sub name   { 'Snowflake' }
@@ -277,7 +277,7 @@ sub _verbose_opts {
 # * Scalar variables like the array constructor can't be used in WHERE clauses
 #   https://support.snowflake.net/s/case/5000Z000010wX7yQAE/
 sub _listagg_format {
-    return q{listagg(%s, ' ')};
+    return q{listagg(%1$s, ' ') WITHIN GROUP (ORDER BY %1$s)};
 }
 
 sub _ts_default { 'current_timestamp' }
@@ -708,7 +708,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 License
 
-Copyright (c) 2012-2021 iovation Inc., David E. Wheeler
+Copyright (c) 2012-2022 iovation Inc., David E. Wheeler
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

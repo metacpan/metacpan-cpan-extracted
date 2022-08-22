@@ -27,11 +27,11 @@ requires:
   Carp: '0'
   Mojolicious: '7.76'
   Net::OAuth2::AuthorizationServer: '0.26'
-  perl: '5.010001'
+  perl: '5.016'
 resources:
   bugtracker: https://github.com/Humanstate/mojolicious-plugin-oauth2-server/issues
   homepage: https://metacpan.org/module/Mojolicious::Plugin::OAuth2::Server
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Humanstate/mojolicious-plugin-oauth2-server
-version: '0.50'
+version: '0.51'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

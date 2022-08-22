@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN {
 	$Eval::TypeTiny::CodeAccumulator::AUTHORITY  = 'cpan:TOBYINK';
-	$Eval::TypeTiny::CodeAccumulator::VERSION    = '1.016007';
+	$Eval::TypeTiny::CodeAccumulator::VERSION    = '1.016008';
 }
 
 $Eval::TypeTiny::CodeAccumulator::VERSION =~ tr/_//d;
@@ -59,17 +59,23 @@ sub add_placeholder {
 	my ( $self, $for ) = ( shift, @_ );
 	my $indent = $self->{indent} || '';
 
-	$self->{placeholders}{$for} = @{ $self->{code} };
-	push @{ $self->{code} }, "$indent# placeholder for $for";
+	$self->{placeholders}{$for} = [
+		scalar( @{ $self->{code} } ),
+		$self->{indent},
+	];
+	push @{ $self->{code} }, "$indent# placeholder [ $for ]";
 
-	$self;
+	if ( defined wantarray ) {
+		return sub { $self->fill_placeholder( $for, @_ ) };
+	}
 }
 
 sub fill_placeholder {
 	my ( $self, $for, @lines ) = ( shift, @_ );
 
-	my $line_number = delete $self->{placeholders}{$for};
-	splice( @{ $self->{code} }, $line_number, 1, @lines );
+	my ( $line_number, $indent ) = @{ delete $self->{placeholders}{$for} or die };
+	my @indented_lines = map { $indent . $_ } map { split /\n/ } @lines;
+	splice( @{ $self->{code} }, $line_number, 1, @indented_lines );
 
 	$self;
 }
@@ -88,7 +94,15 @@ sub add_variable {
 	$actual_name;
 }
 
-sub finalize {}
+sub finalize {
+	my $self = shift;
+
+	for my $p ( values %{ $self->{placeholders} } ) {
+		splice( @{ $self->{code} }, $p->[0], 1 );
+	}
+
+	$self;
+}
 
 sub compile {
 	my $self = shift;
@@ -172,7 +186,7 @@ Returns the source code so far.
 
 Returns the same description given to the constructor, if any.
 
-=item C<< add_line( $line_of_code ) >>
+=item C<< add_line( @lines_of_code ) >>
 
 Adds the next line of code.
 
@@ -201,11 +215,12 @@ continue to refer to the variable with that returned name, just in case.
 
 Adds a line of code which is just a comment, but remembers its line number.
 
-=item C<< fill_placeholder( $placeholder_name, $line_of_code ) >>
+=item C<< fill_placeholder( $placeholder_name, @lines_of_code ) >>
 
 Goes back to a previously inserted placeholder and replaces it with code.
 
-Currently doesn't play nice with indentation.
+As an alternative, C<add_placeholder> returns a coderef, which you can call
+like C<< $callback->( @lines_of_code ) >>.
 
 =item C<< compile() >>
 
@@ -213,8 +228,10 @@ Compiles the code and returns it as a coderef.
 
 =item C<< finalize() >>
 
-This method does nothing but is called by C<compile> just before compiling
-the code. It may be useful if subclassing this class.
+This method is called by C<compile> just before compiling the code. All it
+does is remove unfilled placeholder comments. It is not intended for end
+users to call, but is documented as it may be a useful hook if you are
+subclassing this class.
 
 =back
 

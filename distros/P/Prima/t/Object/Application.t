@@ -34,6 +34,7 @@ SKIP: {
 		backColor => cl::Black,
 		onPaint => sub {
 			my $w = shift;
+			$w->rop2(rop::CopyPut);
 			$w->fillPattern(fp::SimpleDots);
 			$w->bar(0,0,$w->size);
 			set_flag;
@@ -41,12 +42,13 @@ SKIP: {
 	);
 	$w->show;
 	$w->bring_to_front;
-	wait_flag;
+	skip "x11 server overloaded", 1 unless wait_flag;
 	select(undef,undef,undef,0.1);
 
 	my $i = $a->get_image(1,1,2,1);
 	ok( $i && $i->width == 2 && $i->height == 1, "some bitmap grabbing succeeded");
 	skip "no bitmap", 1 unless $i;
+
 	$i->type(im::BW);
 	my ( $a, $b ) = ( $i->pixel(0,0), $i->pixel(1,0) );
 	($a,$b) = ($b,$a) if $b < $a;

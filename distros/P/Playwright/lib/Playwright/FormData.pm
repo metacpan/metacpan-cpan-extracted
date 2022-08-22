@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::FormData;
-$Playwright::FormData::VERSION = '1.210';
+$Playwright::FormData::VERSION = '1.251';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,21 +22,21 @@ sub spec {
     return $Playwright::spec->{'FormData'}{members};
 }
 
-sub set {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'set',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub create {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'create',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub set {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'set',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -86,7 +86,7 @@ Playwright::FormData - Automatically generated class for Playwright::FormData
 
 =head1 VERSION
 
-version 1.210
+version 1.251
 
 =head1 CONSTRUCTOR
 
@@ -97,17 +97,17 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 set(@args)
-
-Execute the FormData::set playwright routine.
-
-See L<https://playwright.dev/api/class-FormData#FormData-set> for more information.
-
 =head2 create(@args)
 
 Execute the FormData::create playwright routine.
 
 See L<https://playwright.dev/api/class-FormData#FormData-create> for more information.
+
+=head2 set(@args)
+
+Execute the FormData::set playwright routine.
+
+See L<https://playwright.dev/api/class-FormData#FormData-set> for more information.
 
 =head2 on(@args)
 

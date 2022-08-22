@@ -1,6 +1,6 @@
 package Catalyst::View::BasePerRequest;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 our $DEFAULT_FACTORY = 'Catalyst::View::BasePerRequest::Factory';
 
 use Moose;
@@ -13,10 +13,38 @@ extends 'Catalyst::View';
 has 'catalyst_component_name' => (is=>'ro');
 has 'app' => (is=>'ro');
 has 'ctx' => (is=>'ro');
+has 'root' => (is=>'ro', required=>1, default=>sub { shift });
+has 'parent' => (is=>'ro', predicate=>'has_parent');
 has 'content_type' => (is=>'ro', required=>0, predicate=>'has_content_type');
 has 'code' => (is=>'rw', predicate=>'has_code');
 has 'status_codes' => (is=>'rw', predicate=>'has_status_codes');
+has 'injected_views' => (is=>'rw', predicate=>'has_injected_views');
 has 'forwarded_args' => (is=>'rw', predicate=>'has_forwarded_args');
+
+sub views {
+  my ($app, %views) = @_;
+  $app->config->{views} = \%views;
+}
+
+sub view {
+  my ($app, $method, @args) = @_;
+  if(scalar(@args) > 1) {
+    $app->config->{views}{$method} = \@args;
+  } else {
+    $app->config->{views}{$method} = $args[0];
+  }
+}
+
+sub set_content_type {
+  my ($app, $ct) = @_;
+  $app->config->{content_type} = $ct;
+}
+
+sub set_status_codes {
+  my $app = shift;
+  my $codes = ref($_[0]) ? shift : [shift];
+  $app->config->{status_codes} = $codes;
+}
 
 sub COMPONENT {
   my ($class, $app, $args) = @_;
@@ -25,9 +53,42 @@ sub COMPONENT {
   $merged_args = $class->modify_init_args($app, $merged_args) if $class->can('modify_init_args');
   my %status_codes = $class->inject_http_status_helpers($merged_args);
   $merged_args->{status_codes} = \%status_codes if scalar(keys(%status_codes));
+  my @injected_views = $class->inject_view_helpers($merged_args);
+  $merged_args->{injected_views} = \@injected_views if scalar @injected_views;
 
   my $factory_class = Module::Runtime::use_module($class->factory_class($app, $merged_args));
   return my $factory = $class->build_factory($factory_class, $app, $merged_args);
+}
+
+sub inject_view_helpers {
+  my ($class, $merged_args) = @_;
+  if(my $views = $merged_args->{views}) {
+    require Sub::Util;
+    foreach my $method (keys %$views) {
+      my ($view_name, @args_proto) = ();
+      my $options_proto = $views->{$method};
+
+      my $global_args_generator;
+      if( (ref($options_proto)||'') eq 'ARRAY') {
+        ($view_name, @args_proto) = @$options_proto;
+        $global_args_generator = (ref($args_proto[0])||'') eq 'CODE' ?
+          shift(@args_proto) :
+            sub { @args_proto };
+      } else {
+        $view_name = $options_proto;
+      }
+
+      no strict 'refs';
+      *{"${class}::${method}"} = Sub::Util::set_subname "${class}::${method}" => sub {
+        my ($self, @args) = @_;
+        my @global_args = $global_args_generator ? $global_args_generator->($self, $self->ctx, @args) : ();
+
+        return $self->ctx->view($view_name, @global_args, parent=>$self, root=>$self->root, @args);
+      }; 
+    }
+    return keys %$views;
+  }
+  return ();
 }
 
 sub inject_http_status_helpers {
@@ -429,6 +490,35 @@ Alternatively using L</"RESPONSE HELPERS">:
     __PACKAGE__->config(namespace=>'');
     __PACKAGE__->meta->make_immutable;
 
+=head1 ATTRIBUTES
+
+The following Moose attributes are considered part of this classes public API
+
+=head2 app
+
+The string namespace of your L<Catalyst> application.
+
+=head2 ctx
+
+The current L<Catalyst> context
+
+=head2 root
+
+The root view object (that is the top view that was called first, usually from
+the controller).  
+
+=head2 parent
+
+=head2 has_parent
+
+If the view was called from another view, that first view is set as the parent.
+
+=head2 injected_views
+
+=head2 has_injected_views
+
+An arrayref of the method names associated with any injected views.
+
 =head1 METHODS
 
 The following methods are considered part of this classes public API
@@ -533,6 +623,112 @@ Wraps an existing content with new content.  Throws an exception if the named co
       return "wrapped $footer end wrap";
     });
 
+=head1 VIEW INJECTION
+
+Usually when building a website of more than toy complexity you will find that you will
+decompose your site into sub views and view wrappers.  Although you can call the C<view>
+method on the context, I think its more in the spirit of the idea of a strong or structured
+view to have a view declare upfront what views its calling as sub views.  That lets you
+have more central control over view initalization and decouples how you are calling your
+views from the actual underlying views.  It can also tidy up some of the code and lastly
+makes it easy to immediately know what views are needed for the current one.  This can
+help with later refactoring (I've worked on projects where sub views got detached from
+actual use but nobody ever cleaned them up.)
+
+To inject a view into the current one, you need to declare it in configuration:
+
+    __PACKAGE__->config(
+      content_type=>'text/html', 
+      status_codes=>[200,404,400],
+      views=>+{
+        layout1 => [ Layout => sub { my ($self, $c) = @_; return title=>'Hey!' } ],
+        layout2 => [ Layout => (title=>'Yeah!') ],
+        layout3 => 'Layout',
+      },
+    );
+
+Basically this is a hashref under the C<views> key, where each key in the hashref is the name
+of the method you are injecting into the current view which is responsible for creating the
+sub view and the value is one of three options:
+
+=over
+
+=item A scalar value
+
+    __PACKAGE__->config(
+      content_type=>'text/html', 
+      status_codes=>[200,404,400],
+      views=>+{
+        layout => 'Layout',
+      },
+    );
+
+This is the simplest option, it just injects a method that will call the named view and pass
+any arguments from the method but does not add any global arguments.
+
+=item An arrayref
+
+    __PACKAGE__->config(
+      content_type=>'text/html', 
+      status_codes=>[200,404,400],
+      views=>+{
+        layout => [ Layout => (title=>'Yeah!') ],
+      },
+    );
+
+This option allows you to set some argument defaults to the view called.  The first item in the
+arrayref must be the real name of the view, followed by arguments which are merged with any provided
+to the method.
+
+=item A coderef
+
+    __PACKAGE__->config(
+      content_type=>'text/html', 
+      status_codes=>[200,404,400],
+      views=>+{
+        layout => [ Layout => sub { my ($self, $c) = @_; return title=>'Hey!' } ],
+      },
+    );
+
+The most complex option, you should probably reserve for very special needs.  Basically this coderef
+will be called with the current view instance and Catalyst context; it should return arguments which
+with then be merged and treated as in the arrayref option.
+
+=back
+
+Now you can call for the sub view via a simple method call on the view, rather than via the context:
+
+    package Example::View::Hello;
+
+    use Moose;
+
+    extends 'Catalyst::View::BasePerRequest';
+
+    has name => (is=>'ro', required=>1);
+    has age => (is=>'ro', required=>1);
+
+
+    sub render {
+      my ($self, $c) = @_;
+
+      return $self->layout(title=>'Hello!', sub {
+        my $layout = shift;
+        return "Hello @{[$self->name]}; you are @{[$self->age]} years old!";  
+      });
+    }
+
+
+    __PACKAGE__->config(
+      content_type=>'text/html', 
+      status_codes=>[200,404,400],
+      views=>+{
+        layout => 'Layout',
+      },
+    );
+
+    __PACKAGE__->meta->make_immutable;
+
+
 =head1 RESPONSE HELPERS
 
 When you create a view instance the actual response is not send to the client until
@@ -594,6 +790,9 @@ view subclass in order to control or otherwise influence how the view works.
 Runs when C<COMPONENT> is called during C<setup_components>.  This gets a reference
 to the merged arguments from all configuration.  You should return this reference
 after modification.
+
+This is for modifying or adding arguments that are application scoped rather than context
+scoped.  
 
 =head2 prepare_build_args
 

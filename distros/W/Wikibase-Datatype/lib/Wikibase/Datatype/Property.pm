@@ -27,7 +27,7 @@ Readonly::Hash our %DATA_TYPES => (
 	'wikibase-property' => 'Wikibase::Datatype::Value::Property',
 );
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
 
 has aliases => (
 	default => [],
@@ -344,6 +344,8 @@ Returns string.
 
 =head1 EXAMPLE
 
+=for comment filename=create_and_print_property.pl
+
  use strict;
  use warnings;
 
@@ -494,6 +496,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.19
+0.20
 
 =cut

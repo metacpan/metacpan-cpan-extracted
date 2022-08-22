@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::Test::Portability; # git description: v2.000007-18-g926f8c4
+package Dist::Zilla::Plugin::Test::Portability; # git description: v2.001000-19-gc84ea5c
 # ABSTRACT: Author tests for portability
 
-our $VERSION = '2.001000';
+our $VERSION = '2.001001';
 
 use Moose;
 with qw/
@@ -14,7 +14,9 @@ with qw/
     Dist::Zilla::Role::TextTemplate
 /;
 use Dist::Zilla::File::InMemory;
-use Data::Section -setup;
+use Sub::Exporter::ForMethods 'method_installer';
+use Data::Section 0.004 { installer => method_installer }, '-setup';
+use namespace::autoclean;
 
 has options => (
   is      => 'ro',
@@ -56,7 +58,7 @@ sub gather_files {
 
     my $opts = '';
     if (%options) {
-        $opts = join ', ', map { "$_ => $options{$_}" } sort keys %options;
+        $opts = join ', ', map "$_ => $options{$_}", sort keys %options;
         $opts = "options($opts);";
     }
 
@@ -76,7 +78,6 @@ sub gather_files {
 }
 
 __PACKAGE__->meta->make_immutable;
-no Moose;
 1;
 
 #pod =pod
@@ -133,7 +134,7 @@ Dist::Zilla::Plugin::Test::Portability - Author tests for portability
 
 =head1 VERSION
 
-version 2.001000
+version 2.001001
 
 =for test_synopsis BEGIN { die "SKIP: synopsis isn't perl code" }
 
@@ -170,6 +171,12 @@ Inserts the given options into the generated test file.
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-Portability>
 (or L<bug-Dist-Zilla-Plugin-Test-Portability@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-Test-Portability@rt.cpan.org>).
 
+There is also a mailing list available for users of this distribution, at
+L<http://dzil.org/#mailing-list>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
+
 =head1 AUTHORS
 
 =over 4
@@ -190,7 +197,7 @@ Mike Doherty <doherty@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Marcel Gruenauer Mike Doherty Randy Stauner Kent Fredric Peter Vereshagin Dave Rolsky
+=for stopwords Karen Etheridge Marcel Gruenauer Mike Doherty Randy Stauner Dave Rolsky Graham Knop Kent Fredric Peter Vereshagin
 
 =over 4
 
@@ -216,21 +223,29 @@ Randy Stauner <randy@magnificent-tears.com>
 
 =item *
 
+Dave Rolsky <autarch@urth.org>
+
+=item *
+
+Graham Knop <haarg@haarg.org>
+
+=item *
+
+Karen Etheridge <github@froods.org>
+
+=item *
+
 Kent Fredric <kentfredric@gmail.com>
 
 =item *
 
 Peter Vereshagin <peter@vereshagin.org>
 
-=item *
-
-Dave Rolsky <autarch@urth.org>
-
 =back
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2010 by Karen Etheridge.
+This software is copyright (c) 2010 by Mike Doherty.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -244,8 +259,6 @@ use warnings;
 
 use Test::More;
 
-eval 'use Test::Portability::Files';
-plan skip_all => 'Test::Portability::Files required for testing portability'
-    if $@;
+use Test::Portability::Files;
 {{$opts}}
 run_tests();

@@ -41,6 +41,9 @@ corpus/ffi_build_mm/project1/ffi/z.c
 corpus/ffi_build_mm/project1/t/ffi/a.c
 corpus/ffi_build_mm/project1/t/ffi/b.c
 corpus/ffi_build_mm/project1/t/ffi/c.c
+corpus/ffi_build_plugin/lib1/FFI/Build/Plugin/blank.txt
+corpus/ffi_build_plugin/lib2/FFI/Build/Plugin/Foo1.pm
+corpus/ffi_build_plugin/lib2/FFI/Build/Plugin/Foo2.pm
 corpus/ffi_probe_runner/bar.c
 corpus/ffi_probe_runner/foo.c
 corpus/memory/arg_array.pl
@@ -158,6 +161,8 @@ lib/FFI/Build/File/Library.pm
 lib/FFI/Build/File/Object.pm
 lib/FFI/Build/MM.pm
 lib/FFI/Build/Platform.pm
+lib/FFI/Build/Plugin.pm
+lib/FFI/Build/PluginData.pm
 lib/FFI/Platypus.pm
 lib/FFI/Platypus.xs
 lib/FFI/Platypus/API.pm
@@ -242,6 +247,8 @@ t/ffi_build_file_library.t
 t/ffi_build_file_object.t
 t/ffi_build_mm.t
 t/ffi_build_platform.t
+t/ffi_build_plugin.t
+t/ffi_build_plugindata.t
 t/ffi_platypus.t
 t/ffi_platypus_api.t
 t/ffi_platypus_buffer.t

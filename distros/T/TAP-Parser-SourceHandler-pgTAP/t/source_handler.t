@@ -20,7 +20,7 @@ $dir    = catdir curdir, 't', 'bin' unless -d $dir;
 {
     my $class = 'TAP::Parser::SourceHandler::pgTAP';
     my $test  = File::Spec->catfile( 't', 'source.pg' );
-    my $psql  = File::Spec->catfile( $dir, 'psql' );
+    my $psql  = File::Spec->catfile( $dir, "psql$ext" );
     my @command = qw(
       --no-psqlrc
       --no-align

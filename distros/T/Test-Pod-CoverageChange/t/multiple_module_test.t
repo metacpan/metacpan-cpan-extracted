@@ -39,7 +39,7 @@ subtest 'every modules will check in the process' => sub {
 };
 
 subtest 'modules order does not matter' => sub {
-    Test::Pod::CoverageChange::pod_coverage_syntax_ok(path => [$test_module_path->@[2,1,0]],
+    Test::Pod::CoverageChange::pod_coverage_syntax_ok(path => [@{$test_module_path}[2,1,0]],
         allowed_naked_packages => {'t::Nopod' => 3, 't::PartiallyCoveredPod' => 2});
     done_testing;
 };

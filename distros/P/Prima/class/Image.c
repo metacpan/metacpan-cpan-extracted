@@ -329,6 +329,10 @@ Image_done( Handle self)
 		free(var->regionData);
 		var->regionData = NULL;
 	}
+	if ( var->fillPatternImage ) {
+		unprotect_object(var-> fillPatternImage);
+		var->fillPatternImage = NULL_HANDLE;
+	}
 	apc_image_destroy( self);
 	my->make_empty( self);
 	inherited done( self);
@@ -917,6 +921,51 @@ Image_update_change( Handle self)
 	var->statsCache = 0;
 }
 
+typedef struct _PaintState
+{
+	Bool antialias;
+	int rop;
+	PRegionRec region;
+} PaintState, *PPaintState;
+
+static void
+gc_destroy( Handle self, void * user_data, unsigned int user_data_size, Bool in_paint)
+{
+	PPaintState state = ( PPaintState ) user_data;
+	if ( state-> region ) free( state-> region );
+}
+
+Bool
+Image_graphic_context_push(Handle self)
+{
+	PaintState state;
+
+	if (opt_InPaint) return inherited graphic_context_push(self);
+
+	state.antialias = var->antialias;
+	state.rop       = var-> extraROP;
+	state.region    = var->regionData ? Region_clone_data(NULL_HANDLE, var->regionData) : NULL;
+
+	return apc_gp_push(self, gc_destroy, &state, sizeof(state));
+}
+
+Bool
+Image_graphic_context_pop(Handle self)
+{
+	Bool ok;
+	PaintState state;
+	if (opt_InPaint) return inherited graphic_context_pop(self);
+
+	ok = apc_gp_pop( self, &state);
+	if ( ok) {
+		var-> antialias = state.antialias;
+		var-> extraROP  = state.rop;
+		if ( var-> regionData ) free( var-> regionData );
+		var-> regionData = state.region;
+	}
+	return ok;
+}
+
 double
 Image_stats( Handle self, Bool set, int index, double value)
 {
@@ -1237,14 +1286,24 @@ Image_pixel( Handle self, Bool set, int x, int y, SV * pixel)
 			}
 			break;
 		case imbpp16 :
-			*(Short*)(var->data+(var->lineSize*y+(x<<1)))=color;
+			{
+				int32_t color = SvIV( pixel);
+				if ( color > INT16_MAX ) color = INT16_MAX;
+				if ( color < INT16_MIN ) color = INT16_MIN;
+				*(Short*)(var->data+(var->lineSize*y+(x<<1)))=color;
+			}
 			break;
 		case imbpp24 :
 			(void) LONGtoBGR(color,rgb);
 			memcpy((var->data + (var->lineSize*y+x*3)),&rgb,sizeof(RGBColor));
 			break;
 		case imbpp32 :
-			*(Long*)(var->data+(var->lineSize*y+(x<<2)))=color;
+			{
+				IV color = SvIV(pixel);
+				if ( color > INT32_MAX ) color = INT32_MAX;
+				if ( color < INT32_MIN ) color = INT32_MIN;
+				*(Long*)(var->data+(var->lineSize*y+(x<<2)))=color;
+			}
 			break;
 		default:
 			return NULL_SV;
@@ -1665,13 +1724,31 @@ color2pixel( Handle self, Color color, Byte * pixel)
 		pixel[0] = cm_nearest_color(rgb,var->palSize,var->palette);
 		break;
 	case imShort :
+		if ( color > INT16_MAX ) color = INT16_MAX;
 		*((Short*)pixel) = color;
 		break;
 	case imRGB :
 		memcpy( pixel, &rgb, 3);
 		break;
 	case imLong :
+		if ( color > INT32_MAX ) color = INT32_MAX;
 		*((Long*)pixel) = color;
+		break;
+	case imFloat:
+		*((float*)pixel) = color;
+		break;
+	case imDouble:
+		*((double*)pixel) = color;
+		break;
+	case imComplex:
+	case imTrigComplex:
+		((float*)pixel)[0] = color;
+		((float*)pixel)[1] = color;
+		break;
+	case imDComplex:
+	case imTrigDComplex:
+		((double*)pixel)[0] = color;
+		((double*)pixel)[1] = color;
 		break;
 	default:
 		croak("Not implemented yet");
@@ -1683,21 +1760,24 @@ prepare_fill_context(Handle self, Point translate, PImgPaintContext ctx)
 {
 	FillPattern * p = &ctx->pattern;
 
+	bzero(ctx, sizeof(ImgPaintContext));
 	color2pixel( self, my->get_color(self), ctx->color);
 	color2pixel( self, my->get_backColor(self), ctx->backColor);
 
-	ctx-> rop = var-> extraROP |
-		(( var-> alpha < 255 ) ?
-			ropSrcAlpha | ( var-> alpha << ropSrcAlphaShift ) :
-			0
-		);
+	ctx-> rop = var-> extraROP;
+	if ( var->alpha < 255 ) {
+		ctx-> rop &= ~(0xff << ropSrcAlphaShift);
+		ctx-> rop |= ropSrcAlpha | ( var-> alpha << ropSrcAlphaShift );
+	}
 	ctx-> region = var->regionData ? &var->regionData-> data. box : NULL;
 	ctx-> patternOffset = my->get_fillPatternOffset(self);
-	ctx-> patternOffset.x -= translate.x;
-	ctx-> patternOffset.y -= translate.y;
 	ctx-> transparent = my->get_rop2(self) == ropNoOper;
 
-	if ( my-> fillPattern == Drawable_fillPattern) {
+	ctx-> tile = NULL_HANDLE;
+	if ( var-> fillPatternImage ) {
+		memset( p, 0xff, sizeof(FillPattern));
+		ctx-> tile = var-> fillPatternImage;
+	} else if ( my-> fillPattern == Drawable_fillPattern) {
 		FillPattern * fp = apc_gp_get_fill_pattern( self);
 		if ( fp )
 			memcpy( p, fp, sizeof(FillPattern));
@@ -1723,13 +1803,14 @@ prepare_fill_context(Handle self, Point translate, PImgPaintContext ctx)
 static void
 prepare_line_context( Handle self, unsigned char * lp, ImgPaintContext * ctx)
 {
+	bzero(ctx, sizeof(ImgPaintContext));
 	color2pixel( self, my->get_color(self), ctx->color);
 	color2pixel( self, my->get_backColor(self), ctx->backColor);
-	ctx-> rop = var-> extraROP |
-		(( var-> alpha < 255 ) ?
-			ropSrcAlpha | ( var-> alpha << ropSrcAlphaShift ) :
-			0
-		);
+	ctx-> rop = var-> extraROP;
+	if ( var->alpha < 255 ) {
+		ctx-> rop &= ~(0xff << ropSrcAlphaShift);
+		ctx-> rop |= ropSrcAlpha | ( var-> alpha << ropSrcAlphaShift );
+	}
 	ctx->region = var->regionData ? &var->regionData-> data. box : NULL;
 	ctx->transparent = my->get_rop2(self) == ropNoOper;
 	ctx->translate = my->get_translate(self);
@@ -1950,22 +2031,6 @@ Image_premultiply_alpha( Handle self, SV * alpha)
 		my-> set_type( self, oldType );
 	else
 		my-> update_change( self );
-}
-
-int
-Image_alpha( Handle self, Bool set, int alpha)
-{
-	if ( is_opt(optInDraw) || is_opt(optInDrawInfo))
-		return inherited alpha(self,set,alpha);
-
-	if (set) {
-		if ( alpha < 0 ) alpha = 0;
-		if ( alpha > 255 ) alpha = 255;
-		if (( alpha < 255 ) && !my->can_draw_alpha(self))
-			alpha = 255;
-		inherited alpha(self,set,alpha);
-	}
-	return var->alpha;
 }
 
 Bool
@@ -2200,15 +2265,11 @@ Image_clear(Handle self, double x1, double y1, double x2, double y2)
 		return inherited clear( self, x1, y1, x2, y2);
 	else if ( !full && var->antialias ) {
 		Bool ok;
-		Color color;
-		FillPattern fp;
-		color = apc_gp_get_color(self);
-		memcpy(&fp, apc_gp_get_fill_pattern(self), sizeof(FillPattern));
+		if ( !my->graphic_context_push(self)) return false;
 		apc_gp_set_color(self, apc_gp_get_back_color(self));
 		apc_gp_set_fill_pattern(self, fillPatterns[fpSolid]);
 		ok = primitive( self, 1, "snnnn", "rectangle", x1, y1, x2, y2);
-		apc_gp_set_fill_pattern(self, fp);
-		apc_gp_set_color(self, color);
+		my->graphic_context_pop(self);
 		return ok;
 	} else {
 		_x1 = x1;
@@ -2221,6 +2282,7 @@ Image_clear(Handle self, double x1, double y1, double x2, double y2)
 			_x2 = var-> w - 1;
 			_y2 = var-> h - 1;
 		}
+		bzero(&ctx, sizeof(ctx));
 		t = my->get_translate(self);
 		_x1 += t.x;
 		_y1 += t.y;

@@ -45,7 +45,7 @@ e.g., `use Promise::XS qw(deferred)`.
 
 This module exposes a Promise interface with its major parts
 implemented in XS for speed. It is a fork and refactor of
-[AnyEvent::XSPromises](https://metacpan.org/pod/AnyEvent::XSPromises). That module’s interface, a “bare-bones”
+[AnyEvent::XSPromises](https://metacpan.org/pod/AnyEvent%3A%3AXSPromises). That module’s interface, a “bare-bones”
 subset of that from [Promises](https://metacpan.org/pod/Promises), is retained.
 
 # STATUS
@@ -74,7 +74,7 @@ call “array references”). So whereas in ECMAScript you do:
 - Promise resolutions and rejections may contain multiple values.
 (But see ["AVOID MULTIPLES"](#avoid-multiples) below.)
 
-See [Promise::ES6](https://metacpan.org/pod/Promise::ES6) for an interface that imitates ECMAScript promises
+See [Promise::ES6](https://metacpan.org/pod/Promise%3A%3AES6) for an interface that imitates ECMAScript promises
 more closely.
 
 # AVOID MULTIPLES
@@ -123,7 +123,7 @@ Given the following …
 
 # **EXPERIMENTAL:** ASYNC/AWAIT SUPPORT
 
-This module is [Promise::AsyncAwait](https://metacpan.org/pod/Promise::AsyncAwait)-compatible.
+This module is [Promise::AsyncAwait](https://metacpan.org/pod/Promise%3A%3AAsyncAwait)-compatible.
 Once you load that module you can do nifty stuff like:
 
     use Promise::AsyncAwait;
@@ -160,12 +160,12 @@ an event loop interface. This library supports three such interfaces:
 
         Promise::XS::use_event('AnyEvent');
 
-- [IO::Async](https://metacpan.org/pod/IO::Async) - note the need for an [IO::Async::Loop](https://metacpan.org/pod/IO::Async::Loop) instance
+- [IO::Async](https://metacpan.org/pod/IO%3A%3AAsync) - note the need for an [IO::Async::Loop](https://metacpan.org/pod/IO%3A%3AAsync%3A%3ALoop) instance
 as argument:
 
         Promise::XS::use_event('IO::Async', $loop_object);
 
-- [Mojo::IOLoop](https://metacpan.org/pod/Mojo::IOLoop):
+- [Mojo::IOLoop](https://metacpan.org/pod/Mojo%3A%3AIOLoop):
 
         Promise::XS::use_event('Mojo::IOLoop');
 
@@ -180,10 +180,10 @@ will throw a warning if it survives until global destruction.
 
 # SUBCLASSING
 
-You can re-bless a [Promise::XS::Promise](https://metacpan.org/pod/Promise::XS::Promise) instance into a different class,
+You can re-bless a [Promise::XS::Promise](https://metacpan.org/pod/Promise%3A%3AXS%3A%3APromise) instance into a different class,
 and `then()`, `catch()`, and `finally()` will assign their newly-created
 promise into that other class. (It follows that the other class must subclass
-[Promise::XS::Promise](https://metacpan.org/pod/Promise::XS::Promise).) This can be useful, e.g., for implementing
+[Promise::XS::Promise](https://metacpan.org/pod/Promise%3A%3AXS%3A%3APromise).) This can be useful, e.g., for implementing
 mid-flight controls like cancellation.
 
 # TODO
@@ -198,7 +198,7 @@ Windows. There may be a workaround possible, but none is implemented for now.
 
 # SEE ALSO
 
-Besides [AnyEvent::XSPromises](https://metacpan.org/pod/AnyEvent::XSPromises) and [Promises](https://metacpan.org/pod/Promises), you may like [Promise::ES6](https://metacpan.org/pod/Promise::ES6),
+Besides [AnyEvent::XSPromises](https://metacpan.org/pod/AnyEvent%3A%3AXSPromises) and [Promises](https://metacpan.org/pod/Promises), you may like [Promise::ES6](https://metacpan.org/pod/Promise%3A%3AES6),
 which mimics [ECMAScript’s “Promise” class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) as much as possible.
 It can even
 (experimentally) use this module as a backend, which helps but is still

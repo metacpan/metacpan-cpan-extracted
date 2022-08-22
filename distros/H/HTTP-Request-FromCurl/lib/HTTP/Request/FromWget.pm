@@ -15,7 +15,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.43';
+our $VERSION = '0.46';
 
 =head1 NAME
 
@@ -141,6 +141,7 @@ provide a cookie jar in your user agent.
 
 our @option_spec = (
     'auth-no-challenge',     # ignored
+    'bind-address=s',
     'body-data=s',
     'body-file=s',
     'buffer!',
@@ -434,6 +435,7 @@ sub _build_request( $self, $uri, $options, %build_options ) {
             uri    => $uri,
             headers => \%headers,
             body   => $body,
+            maybe local_address => $options->{local_address},
             maybe cert => $options->{certificate},
             maybe capath => $options->{'ca-directory'},
             maybe credentials => $options->{ user },

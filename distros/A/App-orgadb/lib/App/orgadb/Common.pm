@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-04'; # DATE
+our $DATE = '2022-08-08'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our %argspecs_common = (
     files => {
@@ -20,15 +20,12 @@ our %argspecs_common = (
         cmdline_aliases=>{f=>{}},
         tags => ['category:input'],
     },
-    shell => {
-        schema => 'true*',
-        cmdline_aliases=>{s=>{}},
-        tags => ['category:mode'],
-    },
     reload_files_on_change => {
         schema => 'bool*',
         default => 1,
+        tags => ['category:input'],
     },
+
     color => {
         summary => 'Whether to use color',
         schema => ['str*', in=>[qw/auto always never/]],
@@ -38,6 +35,12 @@ our %argspecs_common = (
     color_theme => {
         schema => 'perl::colortheme::modname_with_optional_args*',
         tags => ['category:color'],
+    },
+
+    shell => {
+        schema => 'true*',
+        cmdline_aliases=>{s=>{}},
+        tags => ['category:mode'],
     },
 );
 
@@ -55,19 +58,45 @@ our %argspecopt0_entry = (
         summary => 'Find entry by string or regex search against its title',
         schema => 'str_or_re*',
         pos => 0,
-        tags => ['category:filter'],
+        tags => ['category:entry-selection'],
+    },
+);
+
+our %argspecopt_filter_entry_by_fields = (
+    filter_entries_by_fields => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'filter_entries_by_field',
+        summary => 'Find entry by the fields or subfields it has',
+        schema => ['array*', of=> 'str*'],
+        tags => ['category:entry-selection'],
+        description => <<'_',
+
+The format of each entry_by_field is one of:
+
+    str
+    /re/
+    str = str2
+    str = /re2/
+    /re/ = str2
+    /re/ = /re2/
+
+That is, it can search for a string (`str`) or regex (`re`) in the field name,
+and optionally also search for a string (`str2`) or regex (`re2`) in the field
+value.
+
+_
     },
 );
 
 our %argspecopt1_field = (
     fields => {
+        summary => 'Find (sub)fields by string or regex search',
         'x.name.is_plural' => 1,
         'x.name.singular' => 'field',
-        summary => 'Find (sub)fields by string or regex search',
         schema => ['array*', of=>'str_or_re*'],
         pos => 1,
         slurpy => 1,
-        tags => ['category:filter'],
+        tags => ['category:field-selection'],
     },
 );
 
@@ -97,6 +126,10 @@ our %argspecs_select = (
         schema => 'bool*',
         cmdline_aliases => {l=>{}},
         tags => ['category:display'],
+    },
+    count => {
+        summary => 'Return just the number of matching entries instead of showing them',
+        schema => 'true*',
     },
     formatters => {
         'x.name.is_plural' => 1,
@@ -134,6 +167,8 @@ _
         schema => 'uint*',
         tags => ['category:result'],
     },
+
+    %argspecopt_filter_entry_by_fields,
 );
 
 1;
@@ -151,7 +186,7 @@ App::orgadb::Common
 
 =head1 VERSION
 
-This document describes version 0.004 of App::orgadb::Common (from Perl distribution App-orgadb), released on 2022-07-04.
+This document describes version 0.005 of App::orgadb::Common (from Perl distribution App-orgadb), released on 2022-08-08.
 
 =head1 HOMEPAGE
 
@@ -178,9 +213,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

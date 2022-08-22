@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Indicator::Title::Font;
 
-our $VERSION = '0.041';    # VERSION
+our $VERSION = '0.042';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace indicator.
 
@@ -36,8 +36,8 @@ sub TO_JSON {
 }
 
 has align => (
-    is  => "rw",
-    isa => enum( [ "left", "center", "right" ] ),
+    is            => "rw",
+    isa           => enum( [ "left", "center", "right" ] ),
     documentation =>
       "Sets the horizontal alignment of the title. It defaults to `center` except for bullet charts for which it defaults to right.",
 );
@@ -65,7 +65,7 @@ Chart::Plotly::Trace::Indicator::Title - This attribute is one of the possible o
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -136,7 +136,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

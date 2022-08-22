@@ -58,10 +58,12 @@ static Handle xdup( Handle self, Bool icon)
 	pset_H( owner,        var-> owner);
 	pset_i( width,        var-> w);
 	pset_i( height,       var-> h);
-	if ( icon && var-> type == dbtLayered) {
+	if ( var-> type == dbtLayered) {
 		pset_i( type,      imRGB);
-		pset_i( maskType,  imbpp8);
-		pset_i( autoMasking, 0);
+		if ( icon ) {
+			pset_i( maskType,  imbpp8);
+			pset_i( autoMasking, 0);
+		}
 		rop = ropSrcCopy;
 	} else {
 		pset_i( type,      (var-> type == dbtBitmap) ? imBW : imRGB);
@@ -72,7 +74,9 @@ static Handle xdup( Handle self, Bool icon)
 	sv_free(( SV *) profile);
 	i = ( PDrawable) h;
 	s = i-> self-> get_size( h);
+	i-> options.optReadonlyPaint = 1;
 	i-> self-> begin_paint( h);
+	i-> options.optReadonlyPaint = 0;
 	i-> self-> put_image_indirect( h, self, 0, 0, 0, 0, s.x, s.y, s.x, s.y, rop);
 	i-> self-> end_paint( h);
 	--SvREFCNT( SvRV( i-> mate));

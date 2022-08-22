@@ -1,0 +1,35 @@
+lib/App/InvestSim.pm
+lib/App/InvestSim/Config.pm
+lib/App/InvestSim/Finance.pm
+lib/App/InvestSim/GUI.pm
+lib/App/InvestSim/LiteGUI.pm
+lib/App/InvestSim/Values.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README.pod
+res/icon.ico
+res/icon_32.ico
+res/icon_bw.ico
+res/LICENCE.txt
+res/sources/icon.svg
+res/sources/icon_128.png
+res/sources/icon_256.png
+res/sources/icon_32.png
+res/sources/icon_48.png
+res/sources/icon_512.png
+res/sources/icon_64.png
+res/sources/icon_72.png
+res/sources/icon_96.png
+res/sources/icon_bw.svg
+res/sources/icon_bw_128.png
+res/sources/icon_bw_256.png
+res/sources/icon_bw_32.png
+res/sources/icon_bw_48.png
+res/sources/icon_bw_512.png
+res/sources/icon_bw_64.png
+res/sources/icon_bw_72.png
+res/sources/icon_bw_96.png
+script/investment_simulator
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

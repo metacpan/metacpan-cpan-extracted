@@ -6,7 +6,7 @@ use 5.008004;
 use Carp ();
 
 # ABSTRACT: Bundle foreign code with your Perl module
-our $VERSION = '1.58'; # VERSION
+our $VERSION = '2.00'; # VERSION
 
 
 package FFI::Platypus;
@@ -150,7 +150,7 @@ FFI::Platypus::Bundle - Bundle foreign code with your Perl module
 
 =head1 VERSION
 
-version 1.58
+version 2.00
 
 =head1 SYNOPSIS
 
@@ -199,10 +199,10 @@ C<lib/Foo.pm>:
  
  use strict;
  use warnings;
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  
  {
-   my $ffi = FFI::Platypus->new( api => 1 );
+   my $ffi = FFI::Platypus->new( api => 2 );
  
    $ffi->type('object(Foo)' => 'foo_t');
    $ffi->mangler(sub {
@@ -320,7 +320,7 @@ This might start to look a little like a Perl module, and when we look at the Pe
 code that binds to this code, you will see why.  First lets prepare the
 L<FFI::Platypus> instance and specify the correct api version:
 
- my $ffi = FFI::Platypus->new( api => 1 );
+ my $ffi = FFI::Platypus->new( api => 2 );
 
 The bundle interface is only supported with api version 1, so if you try to use
 version 0 it will not work.  Next we define an object type for C<foo_t> which will
@@ -355,8 +355,8 @@ dist is named C<Foo-Bar> but your specific class is named C<Foo::Bar::Baz>, you'
 want something like this:
 
  package Foo::Bar::Baz;
- use FFI::Platypus 1.00;
- my $ffi = FFI::Platypus->new( api => 1 );
+ use FFI::Platypus 2.00;
+ my $ffi = FFI::Platypus->new( api => 2 );
  $ffi->bundle('Foo::Bar');
  ...
 
@@ -539,12 +539,12 @@ C<lib/Init.pm>:
  
  use strict;
  use warnings;
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  
  our $VERSION = '1.00';
  
  {
-   my $ffi = FFI::Platypus->new( api => 1 );
+   my $ffi = FFI::Platypus->new( api => 2 );
  
    my $say = $ffi->closure(sub {
      my $string = shift;
@@ -617,12 +617,12 @@ C<lib/Answer.pm>:
  
  use strict;
  use warnings;
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  use Exporter qw( import );
  
  our @EXPORT = qw( answer );
  
- my $ffi = FFI::Platypus->new( api => 1 );
+ my $ffi = FFI::Platypus->new( api => 2 );
  $ffi->bundle;
  $ffi->attach( answer => [] => 'int' );
  
@@ -702,10 +702,10 @@ C<lib/Bzip2.pm>:
  
  use strict;
  use warnings;
- use FFI::Platypus 1.00;
+ use FFI::Platypus 2.00;
  use FFI::Platypus::Memory qw( free );
  
- my $ffi = FFI::Platypus->new( api => 1 );
+ my $ffi = FFI::Platypus->new( api => 2 );
  $ffi->bundle;
  
  $ffi->mangler(sub {

@@ -38,7 +38,7 @@ WriteMakefile1(
         provides => {
             'Test::Warn' => {
                 file => 'Warn.pm',
-                version => '0.36',
+                version => '0.37',
             },
         },
     },

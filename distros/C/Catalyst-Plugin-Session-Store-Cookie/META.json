@@ -1,0 +1,57 @@
+{
+   "abstract" : "Store session data in the client cookie",
+   "author" : [
+      "John Napiorkowski <jjnapiork@cpan.org>",
+      "Alexander Hartmaier <abraxxa@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Catalyst-Plugin-Session-Store-Cookie",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Plugin::Session" : "0.40",
+            "MRO::Compat" : "0.12",
+            "Moose" : "2.1403",
+            "Session::Storage::Secure" : "0.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Catalyst" : "5.90030",
+            "Catalyst::Plugin::Session::State::Cookie" : "0.17",
+            "Test::Most" : "0.34",
+            "Test::WWW::Mechanize::Catalyst" : "0.60"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jjn1056/Catalyst-Plugin-Session-Store-Cookie/issues"
+      },
+      "homepage" : "https://github.com/jjn1056/Catalyst-Plugin-Session-Store-Cookie",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jjn1056/Catalyst-Plugin-Session-Store-Cookie",
+         "web" : "https://github.com/jjn1056/Catalyst-Plugin-Session-Store-Cookie"
+      }
+   },
+   "version" : "0.004",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

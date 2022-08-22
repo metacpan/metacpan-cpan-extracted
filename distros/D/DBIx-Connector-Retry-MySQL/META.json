@@ -4,7 +4,7 @@
       "Grant Street Group <developers@grantstreet.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -27,7 +27,7 @@
       "runtime" : {
          "requires" : {
             "Algorithm::Backoff::RetryTimeouts" : "0",
-            "DBIx::Connector::Retry" : "v0.900.2",
+            "DBIx::Connector::Retry" : "v0.900.3",
             "DBIx::ParseError::MySQL" : "0",
             "Moo" : "0",
             "Scalar::Util" : "0",
@@ -55,7 +55,7 @@
    "provides" : {
       "DBIx::Connector::Retry::MySQL" : {
          "file" : "lib/DBIx/Connector/Retry/MySQL.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       }
    },
    "release_status" : "stable",
@@ -69,9 +69,9 @@
          "web" : "https://github.com/GrantStreetGroup/DBIx-Connector-Retry-MySQL"
       }
    },
-   "version" : "v1.0.0",
-   "x_generated_by_perl" : "v5.18.2",
-   "x_serialization_backend" : "JSON::XS version 4.02",
+   "version" : "v1.0.1",
+   "x_generated_by_perl" : "v5.20.1",
+   "x_serialization_backend" : "JSON::XS version 4.03",
    "x_spdx_expression" : "Artistic-2.0",
    "x_static_install" : 1
 }

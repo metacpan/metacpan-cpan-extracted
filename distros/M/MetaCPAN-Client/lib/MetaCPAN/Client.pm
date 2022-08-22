@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client;
 # ABSTRACT: A comprehensive, DWIM-featured client to the MetaCPAN API
-$MetaCPAN::Client::VERSION = '2.029000';
+$MetaCPAN::Client::VERSION = '2.030000';
 use Moo;
 use Carp;
 use Ref::Util qw< is_arrayref is_hashref is_ref >;
@@ -448,7 +448,7 @@ MetaCPAN::Client - A comprehensive, DWIM-featured client to the MetaCPAN API
 
 =head1 VERSION
 
-version 2.029000
+version 2.030000
 
 =head1 SYNOPSIS
 
@@ -517,7 +517,7 @@ reference. Since it is common to many other searches, it is explained below
 under C<SEARCH SPEC>.
 
 Returns a L<MetaCPAN::Client::Author> object on a simple search (PAUSE ID), or
-a L<MetaCPAN::Client::ResultSet> object propagated with
+a L<MetaCPAN::Client::ResultSet> object populated with
 L<MetaCPAN::Client::Author> objects on a complex (L<search spec based|/"SEARCH SPEC">) search.
 
 =head2 cover
@@ -536,7 +536,7 @@ defined by a hash reference. Since it is common to many other searches, it is
 explained below under C<SEARCH SPEC>.
 
 Returns a L<MetaCPAN::Client::Distribution> object on a simple search
-(distribution name), or a L<MetaCPAN::Client::ResultSet> object propagated with
+(distribution name), or a L<MetaCPAN::Client::ResultSet> object populated with
 L<MetaCPAN::Client::Distribution> objects on a complex (L<search spec based|/"SEARCH SPEC">)
 search.
 
@@ -568,7 +568,7 @@ a hash reference. Since it is common to many other searches, it is explained
 below under C<SEARCH SPEC>.
 
 Returns a L<MetaCPAN::Client::Release> object on a simple search (release name),
-or a L<MetaCPAN::Client::ResultSet> object propagated with
+or a L<MetaCPAN::Client::ResultSet> object populated with
 L<MetaCPAN::Client::Release> objects on a complex (L<search spec based|/"SEARCH SPEC">) search.
 
 =head2 mirror
@@ -587,7 +587,7 @@ reference. Since it is common to many other searches, it is explained below
 under C<SEARCH SPEC>.
 
 Returns a L<MetaCPAN::Client::Module> object on a simple search (module name), or
-a L<MetaCPAN::Client::ResultSet> object propagated with
+a L<MetaCPAN::Client::ResultSet> object populated with
 L<MetaCPAN::Client::Module> objects on a complex (L<search spec based|/"SEARCH SPEC">) search.
 
 =head2 package

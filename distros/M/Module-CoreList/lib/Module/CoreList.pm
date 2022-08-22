@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20220720';
+our $VERSION = '5.20220820';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -395,6 +395,7 @@ sub changes_between {
     5.037000 => '2022-05-27',
     5.037001 => '2022-06-20',
     5.037002 => '2022-07-20',
+    5.037003 => '2022-08-20',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -19660,6 +19661,47 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.037003 => {
+        delta_from => 5.037002,
+        changed => {
+            'B'                     => '1.86',
+            'B::Deparse'            => '1.68',
+            'B::Op_private'         => '5.037003',
+            'Config'                => '5.037003',
+            'Digest::SHA'           => '6.03',
+            'DynaLoader'            => '1.53',
+            'Encode'                => '3.19',
+            'Encode::Alias'         => '2.25',
+            'ExtUtils::PL2Bat'      => '0.005',
+            'File::Find'            => '1.41',
+            'Filter::Util::Call'    => '1.64',
+            'HTTP::Tiny'            => '0.082',
+            'JSON::PP'              => '4.11',
+            'JSON::PP::Boolean'     => '4.11',
+            'List::Util'            => '1.63',
+            'List::Util::XS'        => '1.63',
+            'Memoize'               => '1.10',
+            'Memoize::AnyDBM_File'  => '1.10',
+            'Memoize::Expire'       => '1.10',
+            'Memoize::NDBM_File'    => '1.10',
+            'Memoize::SDBM_File'    => '1.10',
+            'Memoize::Storable'     => '1.10',
+            'Module::CoreList'      => '5.20220820',
+            'Module::CoreList::Utils'=> '5.20220820',
+            'NDBM_File'             => '1.16',
+            'Opcode'                => '1.60',
+            'Scalar::Util'          => '1.63',
+            'Socket'                => '2.036',
+            'Sub::Util'             => '1.63',
+            'XS::APItest'           => '1.25',
+            'attributes'            => '0.35',
+            'threads'               => '2.29',
+        },
+        removed => {
+            'Memoize::ExpireFile'   => 1,
+            'Memoize::ExpireTest'   => 1,
+        }
+    },
 );
 
 sub is_core
@@ -20984,6 +21026,13 @@ sub is_core
         removed => {
         }
     },
+    5.037003 => {
+        delta_from => 5.037002,
+        changed => {
+        },
+        removed => {
+        }
+    },
 );
 
 %deprecated = _undelta(\%deprecated);
@@ -21180,8 +21229,6 @@ sub is_core
     'Memoize'               => 'cpan',
     'Memoize::AnyDBM_File'  => 'cpan',
     'Memoize::Expire'       => 'cpan',
-    'Memoize::ExpireFile'   => 'cpan',
-    'Memoize::ExpireTest'   => 'cpan',
     'Memoize::NDBM_File'    => 'cpan',
     'Memoize::SDBM_File'    => 'cpan',
     'Memoize::Storable'     => 'cpan',
@@ -21607,14 +21654,12 @@ sub is_core
     'Math::BigRat::Trace'   => undef,
     'Math::Complex'         => undef,
     'Math::Trig'            => undef,
-    'Memoize'               => undef,
-    'Memoize::AnyDBM_File'  => undef,
-    'Memoize::Expire'       => undef,
-    'Memoize::ExpireFile'   => undef,
-    'Memoize::ExpireTest'   => undef,
-    'Memoize::NDBM_File'    => undef,
-    'Memoize::SDBM_File'    => undef,
-    'Memoize::Storable'     => undef,
+    'Memoize'               => 'https://rt.cpan.org/Dist/Display.html?Name=Memoize',
+    'Memoize::AnyDBM_File'  => 'https://rt.cpan.org/Dist/Display.html?Name=Memoize',
+    'Memoize::Expire'       => 'https://rt.cpan.org/Dist/Display.html?Name=Memoize',
+    'Memoize::NDBM_File'    => 'https://rt.cpan.org/Dist/Display.html?Name=Memoize',
+    'Memoize::SDBM_File'    => 'https://rt.cpan.org/Dist/Display.html?Name=Memoize',
+    'Memoize::Storable'     => 'https://rt.cpan.org/Dist/Display.html?Name=Memoize',
     'Module::Load'          => undef,
     'Module::Load::Conditional'=> undef,
     'Module::Loaded'        => undef,

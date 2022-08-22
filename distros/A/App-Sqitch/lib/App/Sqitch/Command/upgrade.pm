@@ -7,14 +7,13 @@ use utf8;
 use Moo;
 use App::Sqitch::Types qw(URI Maybe Str Bool HashRef);
 use Locale::TextDomain qw(App-Sqitch);
-use Type::Utils qw(enum);
 use App::Sqitch::X qw(hurl);
 use List::Util qw(first);
 use namespace::autoclean;
 extends 'App::Sqitch::Command';
 with 'App::Sqitch::Role::ConnectingCommand';
 
-our $VERSION = 'v1.2.1'; # VERSION
+our $VERSION = 'v1.3.0'; # VERSION
 
 has target => (
     is  => 'ro',
@@ -125,7 +124,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 License
 
-Copyright (c) 2012-2021 iovation Inc., David E. Wheeler
+Copyright (c) 2012-2022 iovation Inc., David E. Wheeler
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
