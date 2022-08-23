@@ -1,3 +1,17 @@
+0.34	- 23 Aug 2022, H.Merijn Brand
+    * It's 2021
+    * Add generated static docs for github
+    * It's 2022
+    * Added 5.35.8
+    * Add PERL_USE_UNSHARED_KEYS_IN_LARGE_HASHES
+    * Add NO_PERL_INTERNAL_RAND_SEED
+    * Add NO_PERL_RAND_SEED
+    * Add NO_HASH_SEED
+    * Add PERL_HASH_NO_SBOX32
+    * Add PERL_HASH_USE_SBOX32
+    * Added 5.36.0
+    * Added 5.37.3
+
 0.33	- 18 Dec 2020, H.Merijn Brand
     * Release for sync with core (no changes but the version number)
 

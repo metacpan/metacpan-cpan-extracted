@@ -14,7 +14,8 @@ my $builder = Module::Build->new(
   'build_requires' => {
     'Module::Build' => '0.28',
     'Test::More' => '0',
-    'lib' => '0'
+    'lib' => '0',
+    'threads::shared' => '0'
   },
   'configure_requires' => {
     'Module::Build' => '0.28'

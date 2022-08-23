@@ -8,7 +8,7 @@ use Catalyst::Utils;
 extends 'Catalyst::Plugin::Session::Store';
 with 'Catalyst::ClassData';
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 __PACKAGE__->mk_classdata($_)
   for qw/_secure_store _store_cookie_name _store_cookie_expires
@@ -17,11 +17,28 @@ __PACKAGE__->mk_classdata($_)
 sub get_session_data {
   my ($self, $key) = @_;
   $self->_needs_early_session_finalization(1);
+
+  # Don't decode if we've decoded this context already.
+  return $self->{__cookie_session_store_cache__}->{$key} if
+    exists($self->{__cookie_session_store_cache__}) &&
+      exists($self->{__cookie_session_store_cache__}->{$key});
+
   my $cookie = $self->req->cookie($self->_store_cookie_name);
   $self->{__cookie_session_store_cache__} = defined($cookie) ?
-    $self->_secure_store->decode($cookie->value) : {};
+    $self->_decode_secure_store($cookie, $key) : +{};
 
   return $self->{__cookie_session_store_cache__}->{$key};
+}
+
+sub _decode_secure_store {
+  my ($self, $cookie, $key) = @_;
+  my $decoded = eval {
+    $self->_secure_store->decode($cookie->value);
+  } || do {
+    $self->log->error("Issue decoding cookie for key '$key': $@");
+    return +{};
+  };
+  return $decoded;
 }
 
 sub store_session_data {

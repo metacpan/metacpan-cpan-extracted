@@ -1,5 +1,9 @@
 Revision history for Perl extension Getopt-EX-Hashed
 
+1.0501 2022-08-23T01:05:14Z
+
+    - update document structure
+
 1.05 2022-08-22T07:50:55Z
 
     - make assignable accessor as a default action (is => 'rw')

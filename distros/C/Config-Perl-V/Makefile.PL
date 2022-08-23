@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright PROCURA B.V. (c) 2009-2020 H.Merijn Brand
+# Copyright PROCURA B.V. (c) 2009-2022 H.Merijn Brand
 
 use strict;
 
@@ -29,8 +29,7 @@ my $rv = WriteMakefile (%wm);
 
 package MY;
 
-sub postamble
-{
+sub postamble {
     join "\n" =>
 	'cover test_cover:',
 	'	ccache -C',
@@ -46,10 +45,20 @@ sub postamble
 	'	perl sandbox/genMETA.pl',
 	'	ls -l */META.yml',
 	'',
-	'tgzdist:	checkmeta fixmeta $(DISTVNAME).tar.gz distcheck',
+	'tgzdist:	doc checkmeta fixmeta $(DISTVNAME).tar.gz distcheck',
 	'	-@mv -f $(DISTVNAME).tar.gz $(DISTVNAME).tgz',
 	'	-@cpants_lint.pl $(DISTVNAME).tgz',
 	'	-@rm -f Debian_CPANTS.txt',
+	'',
+	'doc docs:		doc/Config-Perl-V.md doc/Config-Perl-V.html doc/Config-Perl-V.man',
+	'doc/Config-Perl-V.md:		V.pm',
+	'	pod2markdown  < $? > $@',
+	'doc/Config-Perl-V.html:	V.pm',
+	'	pod2html      < $? 2>&1 | grep -v "^Cannot find" > $@',
+	'doc/Config-Perl-V.3:		V.pm',
+	'	pod2man       < $? > $@',
+	'doc/Config-Perl-V.man:	doc/Config-Perl-V.3',
+	'	nroff -mandoc < $? > $@',
 	'';
     } # postamble
 

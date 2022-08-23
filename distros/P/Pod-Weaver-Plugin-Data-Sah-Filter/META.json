@@ -55,7 +55,7 @@
    "provides" : {
       "Pod::Weaver::Plugin::Data::Sah::Filter" : {
          "file" : "lib/Pod/Weaver/Plugin/Data/Sah/Filter.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/perlancar/perl-Pod-Weaver-Plugin-Data-Sah-Filter"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

@@ -1,5 +1,13 @@
 Revision history for Perl extension CryptoTron::AddrTools.
 
+0.05 Added required modules in Makefile.pl
+
+0.04  Mayor changes in AddrTools.pm. Updated documentation.
+
+0.03  Mayor changes in AddrTools.pm. Added documentation.
+
+0.02  Mayor changes in AddrTools.pm
+
 0.01  Mon Aug 22 20:33:38 2022
 	- original version; created by h2xs 1.23 with options
 		-AX --skip-exporter --use-new-tests -n CryptoTron::AddrTools

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use parent 'Syntax::SourceHighlight';
 
-our $VERSION = '2.1.2';
+our $VERSION = '2.1.3';
 
 sub langNames {
     my $self = shift;
@@ -69,7 +69,12 @@ These are missing:
 
 =item
 
-C<getFileName()>
+C<open()> – invoked automatically after Perl object creation
+
+=item
+
+C<getFileName()> – it does the same as C<getMappedFileName()> but without
+opening the mapping file first
 
 =item
 

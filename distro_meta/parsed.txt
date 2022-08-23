@@ -80541,3 +80541,14 @@ P/PE/PERLANCAR/WordListRole-Bloom-0.007.tar.gz
 S/SI/SIMBABQUE/WWW-Mechanize-2.15.tar.gz
 C/CO/CORION/WWW-Mechanize-FormFiller-0.13.tar.gz
 A/AA/AAHAZRED/XML-XPath-Helper-String-1.01.tar.gz
+J/JJ/JJNAPIORK/Catalyst-Plugin-Session-Store-Cookie-0.005.tar.gz
+J/JJ/JJNAPIORK/Catalyst-View-BasePerRequest-0.008.tar.gz
+N/NI/NICS/Catmandu-DBI-0.12.tar.gz
+H/HM/HMBRAND/Config-Perl-V-0.34.tgz
+Z/ZT/ZTENRETEP/CryptoTron-AddrTools-0.05.tar.gz
+U/UT/UTASHIRO/Getopt-EX-Hashed-1.0501.tar.gz
+O/OV/OVID/MooseX-Extended-0.29.tar.gz
+P/PE/PERLANCAR/Pod-Weaver-Plugin-Data-Sah-Filter-0.005.tar.gz
+Z/ZT/ZTENRETEP/ScalarTypes-NumericTypes-0.02.tar.gz
+M/MA/MATLIB/Syntax-SourceHighlight-2.1.3.tar.gz
+L/LE/LEONT/Thread-Csp-0.009.tar.gz

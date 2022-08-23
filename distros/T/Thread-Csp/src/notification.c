@@ -4,22 +4,11 @@
 #include "ppport.h"
 
 #include "notification.h"
+#include "fd.h"
 
 void notification_init(Notification* notification) {
 	*notification = -1;
 }
-
-static SV* S_io_fdopen(pTHX_ int fd, const char* packagename) {
-    PerlIO* pio = PerlIO_fdopen(fd, "r");
-    GV* gv = newGVgen(packagename);
-    SV* ret = newRV_noinc((SV*)gv);
-    IO* io = GvIOn(gv);
-    IoTYPE(io) = '<';
-    IoIFP(io) = pio;
-    IoOFP(io) = pio;
-    return ret;
-}
-#define io_fdopen(fd, packagename) S_io_fdopen(aTHX_ fd, packagename)
 
 SV* S_notification_create(pTHX_ Notification* notification) {
 	if (*notification != -1)

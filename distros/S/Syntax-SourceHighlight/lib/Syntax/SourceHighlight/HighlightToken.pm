@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use parent 'Syntax::SourceHighlight';
 
-our $VERSION = '2.1.2';
+our $VERSION = '2.1.3';
 
 sub new {
     die "Invalid call to "

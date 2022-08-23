@@ -47,13 +47,14 @@ GNU Source Highlight project home page is
 
 WriteMakefile(
     NAME             => 'Syntax::SourceHighlight',
-    VERSION          => '2.1.2',
+    VERSION          => '2.1.3',
     MIN_PERL_VERSION => v5.10,
     ABSTRACT         => 'Perl Binding to GNU Source Highlight',
     LICENSE          => 'unrestricted',
     AUTHOR =>
       [ 'Thomas Chust <chust@web.de>', 'Matt Latusek <matlib@matlibhax.com>' ],
     CONFIGURE_REQUIRES => { 'ExtUtils::PkgConfig' => '1.12' },
+    PREREQ_PM          => { 'DynaLoader'          => 0, },
     META_MERGE         => {
         'meta-spec' => { version => 2 },
         resources   => {

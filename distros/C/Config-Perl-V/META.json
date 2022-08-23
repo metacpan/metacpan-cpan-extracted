@@ -1,24 +1,37 @@
 {
-   "author" : [
-      "H.Merijn Brand <h.m.brand@xs4all.nl>"
-      ],
+   "abstract" : "Structured data retrieval of perl -V output",
+   "provides" : {
+      "Config::Perl::V" : {
+         "version" : "0.34",
+         "file" : "V.pm"
+         }
+      },
    "dynamic_config" : 1,
-   "version" : "0.33",
+   "meta-spec" : {
+      "version" : 2,
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+      },
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/Tux/Config-Perl-V",
+         "type" : "git",
+         "web" : "https://github.com/Tux/Config-Perl-V"
+         },
+      "bugtracker" : {
+         "web" : "https://github.com/Tux/Config-Perl-V/issues"
+         },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+         ]
+      },
+   "license" : [
+      "perl_5"
+      ],
+   "version" : "0.34",
    "prereqs" : {
       "build" : {
          "requires" : {
             "perl" : "5.006"
-            }
-         },
-      "runtime" : {
-         "requires" : {
-            "perl" : "5.006",
-            "Config" : "0"
-            }
-         },
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
             }
          },
       "test" : {
@@ -26,36 +39,23 @@
             "Test::NoWarnings" : "0",
             "Test::More" : "0"
             }
+         },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+            }
+         },
+      "runtime" : {
+         "requires" : {
+            "Config" : "0",
+            "perl" : "5.006"
+            }
          }
       },
-   "license" : [
-      "perl_5"
+   "name" : "Config-Perl-V",
+   "author" : [
+      "H.Merijn Brand <h.m.brand@xs4all.nl>"
       ],
    "release_status" : "stable",
-   "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-         ],
-      "repository" : {
-         "web" : "https://github.com/Tux/Config-Perl-V",
-         "type" : "git",
-         "url" : "https://github.com/Tux/Config-Perl-V"
-         },
-      "bugtracker" : {
-         "web" : "https://github.com/Tux/Config-Perl-V/issues"
-         }
-      },
-   "generated_by" : "Author",
-   "provides" : {
-      "Config::Perl::V" : {
-         "file" : "V.pm",
-         "version" : "0.33"
-         }
-      },
-   "meta-spec" : {
-      "version" : 2,
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
-      },
-   "abstract" : "Structured data retrieval of perl -V output",
-   "name" : "Config-Perl-V"
+   "generated_by" : "Author"
    }

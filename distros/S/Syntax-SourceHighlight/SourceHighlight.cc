@@ -455,6 +455,7 @@ XS (lm_new)
 	SV *obj;
 	cpptry (
 		 lm = s3 ? new LangMap (s2, s3) : new LangMap (s2);
+		 lm->open();
 		 obj = create_object ((void *) lm, clss);
 	);
 	if (*exception)

@@ -54,4 +54,15 @@ subtest 'Fifth', sub {
 	$q->close;
 	is($r->get(), 13);
 };
+
+subtest 'Thread', sub {
+	use threads::shared;
+
+	my @value :shared = 42;
+	my $q = Thread::Csp::Channel->new;
+	my $r = Thread::Csp->spawn('Basic', 'Basic::two', \@value);
+	is($r->get, 12);
+	is($value[0], 24);
+};
+
 done_testing();

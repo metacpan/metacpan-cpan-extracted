@@ -29,6 +29,10 @@ t/35_plv52910g.t
 t/36_plv5300.t
 t/37_plv53111qm.t
 t/38_plv5320tld.t
+t/39_plv5340tqm.t
+t/40_plv5358dnqm.t
+t/41_plv5360dnqm.t
+t/42_plv5373tld.t
 examples/show-v.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

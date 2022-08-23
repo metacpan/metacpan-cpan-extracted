@@ -1,5 +1,5 @@
 package Thread::Csp::Promise;
-$Thread::Csp::Promise::VERSION = '0.008';
+$Thread::Csp::Promise::VERSION = '0.009';
 use strict;
 use warnings;
 
@@ -23,7 +23,7 @@ Thread::Csp::Promise - Promises for thread return values.
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.020000",
   "NAME" => "MooseX::Extended",
   "PREREQ_PM" => {
-    "B::Hooks::AtRuntime" => 7,
+    "B::Hooks::AtRuntime" => 8,
     "Carp" => 0,
     "Data::Printer" => 0,
     "Exporter" => 0,
@@ -64,7 +64,7 @@ my %WriteMakefileArgs = (
     "base" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.28",
+  "VERSION" => "0.29",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -72,7 +72,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "B::Hooks::AtRuntime" => 7,
+  "B::Hooks::AtRuntime" => 8,
   "Capture::Tiny" => 0,
   "Carp" => 0,
   "Data::Printer" => 0,

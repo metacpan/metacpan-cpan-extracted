@@ -5,9 +5,9 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'CryptoTron::AddrTools',
     VERSION_FROM      => 'lib/CryptoTron/AddrTools.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
-    PREREQ_PM         => {}, # e.g., Module::Name => 1.1
+    PREREQ_PM         => {'Try::Catch' => '1.1.0', 'Bitcoin::Crypto::Base58' => '1.007'}, # e.g., Module::Name => 1.1
     ABSTRACT_FROM     => 'lib/CryptoTron/AddrTools.pm', # retrieve abstract from module
-    AUTHOR            => 'root <root@>',
+    AUTHOR            => 'Dr. Peter Netz <ztenretep@cpan.org>',
     #LICENSE           => 'perl',
     #Value must be from legacy list of licenses here
     #http://search.cpan.org/perldoc?Module%3A%3ABuild%3A%3AAPI

@@ -1,6 +1,6 @@
 package Catalyst::View::BasePerRequest;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 our $DEFAULT_FACTORY = 'Catalyst::View::BasePerRequest::Factory';
 
 use Moose;
@@ -13,8 +13,8 @@ extends 'Catalyst::View';
 has 'catalyst_component_name' => (is=>'ro');
 has 'app' => (is=>'ro');
 has 'ctx' => (is=>'ro');
-has 'root' => (is=>'ro', required=>1, default=>sub { shift });
-has 'parent' => (is=>'ro', predicate=>'has_parent');
+has 'root' => (is=>'rw', required=>1, default=>sub { shift });
+has 'parent' => (is=>'rw', predicate=>'has_parent');
 has 'content_type' => (is=>'ro', required=>0, predicate=>'has_content_type');
 has 'code' => (is=>'rw', predicate=>'has_code');
 has 'status_codes' => (is=>'rw', predicate=>'has_status_codes');
@@ -82,8 +82,12 @@ sub inject_view_helpers {
       *{"${class}::${method}"} = Sub::Util::set_subname "${class}::${method}" => sub {
         my ($self, @args) = @_;
         my @global_args = $global_args_generator ? $global_args_generator->($self, $self->ctx, @args) : ();
+        my $view = $self->ctx->view($view_name, @global_args, @args);
 
-        return $self->ctx->view($view_name, @global_args, parent=>$self, root=>$self->root, @args);
+        $view->root($self->root);
+        $view->parent($self);
+
+        return $view;
       }; 
     }
     return keys %$views;

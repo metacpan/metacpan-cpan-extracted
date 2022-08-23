@@ -1,6 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst::Plugin::Session::Store::Cookie.
 
-0.004 - 2021-08-21
+0.005 - 2022-08-23
+  - If the cookie get corrupted such that serial fails to decode, we now
+    detect that situation and automatically clear the cookie.
+
+0.004 - 2022-08-21
   - Add storage_cookie_secure, storage_cookie_httponly and
     storage_cookie_samesite options
     with the same defaults as Catalyst::Plugin::Session::State::Cookie

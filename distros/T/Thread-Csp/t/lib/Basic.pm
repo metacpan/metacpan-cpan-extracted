@@ -19,4 +19,10 @@ sub closed {
 	return $result;
 }
 
+sub two {
+	my $ref = shift;
+	$ref->[0] = 24;
+	return 12;
+}
+
 1;

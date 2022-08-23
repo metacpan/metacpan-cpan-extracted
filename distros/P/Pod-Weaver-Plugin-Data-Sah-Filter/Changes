@@ -1,3 +1,8 @@
+0.005   2022-07-16  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix calling filter code when might_fail=1.
+
+
 0.004   2022-07-16  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Use Require::Hook::Source::DzilBuild and force reload

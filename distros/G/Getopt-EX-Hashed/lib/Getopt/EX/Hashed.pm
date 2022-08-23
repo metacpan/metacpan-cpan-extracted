@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '1.05';
+our $VERSION = '1.0501';
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ Getopt::EX::Hashed - Hash store object automation for Getopt::Long
 
 =head1 VERSION
 
-Version 1.05
+Version 1.0501
 
 =head1 SYNOPSIS
 
@@ -155,8 +155,10 @@ sub new {
 	if (my $is = $param{is}) {
 	    no strict 'refs';
 	    my $access = $config->{ACCESSOR_PREFIX} . $name;
-	    *{"$class\::$access"} = _accessor($is, $name, $config->{ACCESSOR_LVALUE})
-		unless ${"$class\::"}{$access};
+	    unless (${"$class\::"}{$access}) {
+		$is = 'lv' if $config->{ACCESSOR_LVALUE} && $is eq 'rw';
+		*{"$class\::$access"} = _accessor($is, $name);
+	    }
 	}
 	$obj->{$name} = do {
 	    local $_ = $param{default};
@@ -203,25 +205,6 @@ sub _conf   { $_[0]->{__Config__} }
 sub _member { $_[0]->{__Member__} }
 
 sub _accessor {
-    my($is, $name, $lvalue) = @_;
-    $is = 'lv' if $lvalue && $is eq 'rw';
-    {
-	ro => sub {
-	    $#_ and die "$name is readonly\n";
-	    $_[0]->{$name};
-	},
-	rw => sub {
-	    $#_ and do { $_[0]->{$name} = $_[1]; return $_[0] };
-	    $_[0]->{$name};
-	},
-	lv => sub :lvalue {
-	    $#_ and do { $_[0]->{$name} = $_[1]; return $_[0] };
-	    $_[0]->{$name};
-	},
-    }->{$is} or die "$name has invalid 'is' parameter.\n";
-}
-
-sub __accessor {
     my($is, $name) = @_;
     {
 	ro => sub {
@@ -235,7 +218,7 @@ sub __accessor {
 	lv => sub :lvalue {
 	    $#_ and do { $_[0]->{$name} = $_[1]; return $_[0] };
 	    $_[0]->{$name};
-	}
+	},
     }->{$is} or die "$name has invalid 'is' parameter.\n";
 }
 
@@ -386,9 +369,7 @@ is given.
 
 =head1 FUNCTION
 
-=over 7
-
-=item B<has>
+=head2 B<has>
 
 Declare option parameters in a form of:
 
@@ -458,8 +439,8 @@ There is no difference with ones in C<spec> parameter.
 To produce accessor method, C<is> parameter is necessary.  Set the
 value C<ro> for read-only, C<rw> for read-write.
 
-Read-write accessor has a lvalue attribute, so it can be assigned.
-You can use like this:
+Read-write accessor has lvalue attribute, so it can be assigned.  You
+can use like this:
 
     $app->foo //= 1;
 
@@ -526,15 +507,13 @@ Parameter C<must> takes a code reference to validate option values.
 It takes same arguments as C<action> and returns boolean.  With next
 example, option B<--answer> takes only 42 as a valid value.
 
-    has answer =>
-        spec => '=i',
+    has answer => '=i',
         must => sub { $_[1] == 42 };
 
 If multiple code reference is given, all code have to return true.
 
-    has answer =>
-        spec => '=i',
-        must =>[ sub { $_[1] >= 42 }, sub { $_[1] <= 42 } ];
+    has answer => '=i',
+        must => [ sub { $_[1] >= 42 }, sub { $_[1] <= 42 } ];
 
 =item B<min> => I<number>
 
@@ -566,17 +545,13 @@ value in the list.  Otherwise it causes validation error.
 
 =back
 
-=back
-
 =head1 METHOD
 
-=over 7
-
-=item B<new>
+=head2 B<new>
 
 Class method to get initialized hash object.
 
-=item B<optspec>
+=head2 B<optspec>
 
 Return option specification list which can be given to C<GetOptions>
 function.
@@ -586,7 +561,7 @@ function.
 C<GetOptions> has a capability of storing values in a hash, by giving
 the hash reference as a first argument, but it is not necessary.
 
-=item B<getopt> [ I<arrayref> ]
+=head2 B<getopt> [ I<arrayref> ]
 
 Call appropriate function defined in caller's context to process
 options.
@@ -601,7 +576,7 @@ are shortcut for:
 
     GetOptionsFromArray(\@argv, $obj->optspec)
 
-=item B<use_keys> I<keys>
+=head2 B<use_keys> I<keys>
 
 Because hash keys are protected by C<Hash::Util::lock_keys>, accessing
 non-existent member causes an error.  Use this function to declare new
@@ -617,7 +592,7 @@ If you want to access arbitrary keys, unlock the object.
 You can change this behavior by C<configure> with C<LOCK_KEYS>
 parameter.
 
-=item B<configure> B<label> => I<value>, ...
+=head2 B<configure> B<label> => I<value>, ...
 
 Use class method C<< Getopt::EX::Hashed->configure() >> before
 creating an object; this information is stored in the area unique for
@@ -673,11 +648,9 @@ following hash entries.  Declare C<< DEFAULT => [] >> to reset.
 
 =back
 
-=item B<reset>
+=head2 B<reset>
 
 Reset the class to the original state.
-
-=back
 
 =head1 SEE ALSO
 

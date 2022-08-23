@@ -1,7 +1,7 @@
 {
    "abstract" : "Perl extension for use with crypto coin Tron addresses",
    "author" : [
-      "root <root@>"
+      "Dr. Peter Netz <ztenretep@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
@@ -31,10 +31,13 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "Bitcoin::Crypto::Base58" : "1.007",
+            "Try::Catch" : "v1.1.0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.11"
 }

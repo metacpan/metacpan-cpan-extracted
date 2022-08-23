@@ -2,7 +2,7 @@ NAME
     MooseX::Extended - Extend Moose with safe defaults and useful features
 
 VERSION
-    version 0.28
+    version 0.29
 
 SYNOPSIS
         package My::Names {
@@ -391,16 +391,26 @@ INVALID ATTRIBUTE DEFINITIONS
     sometimes useful to be able to define an "init_arg" for unit testing.)
 
 BUGS AND LIMITATIONS
-    When using Test::Compile, there are intermittent segfaults with
-    MooseX::Extended unless you use "exclude => ['immutable']". We are still
-    trying to figure out wy this is happening. We are not aware of any
-    production code affected by this.
+    You cannot (at this time) use "multi" subs with the debugger. This is
+    due to a bug in Syntax::Keyword::MultiSub that should be fixed in the
+    next release of that module.
+
+    If you must have multisubs and the debugger, the follow patch to
+    Syntax::Keyword::MultiSub fixes the issue:
+
+        --- old/lib/Syntax/Keyword/MultiSub.xs  2021-12-16 10:59:30 +0000
+        +++ new/lib/Syntax/Keyword/MultiSub.xs  2022-08-12 10:23:06 +0000
+        @@ -129,6 +129,7 @@
+         redo:
+             switch(o->op_type) {
+               case OP_NEXTSTATE:
+        +      case OP_DBSTATE:
+                 o = o->op_next;
+                 goto redo;
 
     See also:
 
-    *   The github issue <https://github.com/Ovid/moosex-extreme/issues/41>
-
-    *   Perlmonks discussion <https://perlmonks.org/?node_id=11145964>
+    *   The github issue <https://github.com/Ovid/moosex-extended/issues/45>
 
 MANUAL
     *   MooseX::Extended::Manual::Tutorial

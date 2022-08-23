@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use parent 'DynaLoader';
 
-our $VERSION = '2.1.2';
+our $VERSION = '2.1.3';
 
 use Syntax::SourceHighlight::SourceHighlight;
 use Syntax::SourceHighlight::LangMap;
@@ -45,15 +45,15 @@ Syntax::SourceHighlight - Perl Binding to GNU Source Highlight
 
 =head1 SYNOPSIS
 
-  use Syntax::SourceHighlight;
+    use Syntax::SourceHighlight;
 
-  my $hl = Syntax::SourceHighlight->new('esc.outlang');
-  my $lm = Syntax::SourceHighlight::LangMap->new();
+    my $hl = Syntax::SourceHighlight->new('esc.outlang');
+    my $lm = Syntax::SourceHighlight::LangMap->new();
 
-  print $hl->highlightString(
-    "my $_ = 42;\n",
-    $lm->getMappedFileName('perl')
-  );
+    print $hl->highlightString(
+        "my \$_ = 42;\n",
+        $lm->getMappedFileName('perl')
+    );
 
 =head1 DESCRIPTION
 
@@ -517,11 +517,12 @@ L<https://www.gnu.org/software/src-highlite/>.
 
 =item
 
-Thomas Chust, L<chust@web.de|mailto:chust@web.de>
+Matt Latusek, L<matlib@matlibhax.com|mailto:matlib@matlibhax.com> (current
+maintainer)
 
 =item
 
-Matt Latusek, L<matlib@matlibhax.com|mailto:matlib@matlibhax.com>
+Thomas Chust, L<chust@web.de|mailto:chust@web.de>
 
 =back
 

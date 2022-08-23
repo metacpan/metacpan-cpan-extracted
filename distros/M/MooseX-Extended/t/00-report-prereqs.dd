@@ -20,7 +20,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'B::Hooks::AtRuntime' => '7',
+                                      'B::Hooks::AtRuntime' => '8',
                                       'Carp' => '0',
                                       'Data::Printer' => '0',
                                       'Exporter' => '0',

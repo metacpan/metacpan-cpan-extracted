@@ -19,7 +19,7 @@ name: Pod-Weaver-Plugin-Data-Sah-Filter
 provides:
   Pod::Weaver::Plugin::Data::Sah::Filter:
     file: lib/Pod/Weaver/Plugin/Data/Sah/Filter.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Data::Cmp: '0.002'
   Data::Dmp: '0.241'
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Data-Sah-Filter
   homepage: https://metacpan.org/release/Pod-Weaver-Plugin-Data-Sah-Filter
   repository: git://github.com/perlancar/perl-Pod-Weaver-Plugin-Data-Sah-Filter.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

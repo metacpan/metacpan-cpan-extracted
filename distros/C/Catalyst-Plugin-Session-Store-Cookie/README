@@ -1,5 +1,5 @@
 This archive contains the distribution Catalyst-Plugin-Session-Store-Cookie,
-version 0.004:
+version 0.005:
 
   Store session data in the client cookie
 

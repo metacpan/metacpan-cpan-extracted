@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst-View-BasePerRequest.
 
+0.008 - 2022-08-22
+  - Be more careful with @args in injected view helper
+
 0.007 - 2022-08-21
   - added root and parent attributes
   - added view injection

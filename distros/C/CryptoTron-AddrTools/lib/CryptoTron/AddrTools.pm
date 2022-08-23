@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 # Set the package version. 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # Load the Perl pragma Exporter.
 use Exporter;
@@ -130,8 +130,6 @@ sub chk_hex_addr {
 
 1;
 __END__
-# Below is stub documentation for your module.
-
 =head1 NAME
 
 CryptoTron::AddrTools - Perl extension for use with crypto coin Tron addresses
@@ -158,16 +156,16 @@ CryptoTron::AddrTools - Perl extension for use with crypto coin Tron addresses
 
 =head1 DESCRIPTION
 
-The package is intended to simplify the work with crypto coin tron addresses.
-There are two types of Tron addresse usable, one in Base58 and one in Hex
+The package is intended to simplify the work with addresses of the crypto coin
+Tron. There are two types of Tron addresse usable, one in Base58 and one in Hex
 represenation.
 
 Method to_hex_addr() converts a Base58 address to a Hex address. 
 
 Method to_base58_addr() converts a Hex address to a Base58 address.
 
-The methods chk_base58_addr() and chk_hex_addr returns 0 (false) or
-1 (true), depending on valid Base58 or Hhex addresses. 
+The methods chk_base58_addr() and chk_hex_addr return 0 (false) or
+1 (true), depending on valid Base58 or Hex addresses. 
 
 =head1 SEE ALSO
 

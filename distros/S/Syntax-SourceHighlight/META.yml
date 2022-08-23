@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::PkgConfig: '1.12'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: unrestricted
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,9 +19,10 @@ no_index:
     - t
     - inc
 requires:
+  DynaLoader: '0'
   perl: v5.10.0
 resources:
   bugtracker: https://gitlab.com/Matlib/Syntax-SourceHighlight/-/issues
   repository: https://gitlab.com/Matlib/Syntax-SourceHighlight.git
-version: v2.1.2
+version: v2.1.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

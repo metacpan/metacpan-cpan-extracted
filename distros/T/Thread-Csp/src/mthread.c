@@ -20,25 +20,22 @@
 
 static Refcount thread_counter;
 
-static int (*old_hook)(pTHX);
-
-static int S_threadhook(pTHX) {
-	int result = thread_counter > 1 ? 1 : old_hook(aTHX);
-	refcount_destroy(&result);
-	return result;
-}
-
 void global_init(pTHX) {
 	if (!refcount_inited(&thread_counter)) {
 		refcount_init(&thread_counter, 1);
-
-		old_hook = PL_threadhook;
-		PL_threadhook = S_threadhook;
 
 		mark_clonable_pvs("Thread::Csp::Channel");
 	}
 	if (!PL_perl_destruct_level)
 		PL_perl_destruct_level = 1;
+
+	SV* threads = get_sv("threads::threads", GV_ADD);
+	if (SvTRUE(threads))
+		Perl_warn(aTHX_ "Mixing threads.pm and threads::csp is not advisable");
+	else
+		sv_setpvs(threads, "threads::csp");
+
+	mark_clonable_pvs("threads::shared::tie");
 }
 
 static void thread_count_inc() {
@@ -57,7 +54,8 @@ static void xs_init(pTHX) {
 }
 
 typedef struct mthread {
-	Promise* input;
+	Promise* at_inc;
+	Promise* arguments;
 	Promise* output;
 } mthread;
 
@@ -74,7 +72,8 @@ run_thread(void* arg) {
 	thread_count_inc();
 
 	mthread* thread = (mthread*)arg;
-	Promise* input = thread->input;
+	Promise* at_inc_promise = thread->at_inc;
+	Promise* arguments = thread->arguments;
 	Promise* output = thread->output;
 	free(thread);
 
@@ -87,28 +86,29 @@ run_thread(void* arg) {
 	TRY {
 		mark_clonable_pvs("Thread::Csp::Channel");
 
-		AV* to_run = (AV*)sv_2mortal(promise_get(input));
-		promise_refcount_dec(input);
+		AV* at_inc = (AV*)sv_2mortal(promise_get(at_inc_promise));
+		promise_refcount_dec(at_inc_promise);
 
 		SvREFCNT_dec(GvAV(PL_incgv));
-		GvAV(PL_incgv) = (AV*)*av_fetch(to_run, 0, FALSE);
+		GvAV(PL_incgv) = at_inc;
 
 		load_module(PERL_LOADMOD_NOIMPORT, newSVpvs("Thread::Csp"), NULL);
 
-		SV* module = *av_fetch(to_run, 1, FALSE);
+		AV* to_run = (AV*)sv_2mortal(promise_get(arguments));
+		SV* module = *av_fetch(to_run, 0, FALSE);
 		load_module(PERL_LOADMOD_NOIMPORT, SvREFCNT_inc(module), NULL);
 
 		dSP;
 		PUSHMARK(SP);
 		IV len = av_len(to_run) + 1;
 		int i;
-		for(i = 3; i < len; i++) {
+		for(i = 2; i < len; i++) {
 			SV** entry = av_fetch(to_run, i, FALSE);
 			XPUSHs(*entry);
 		}
 		PUTBACK;
 
-		SV** call_ptr = av_fetch(to_run, 2, FALSE);
+		SV** call_ptr = av_fetch(to_run, 1, FALSE);
 		call_sv(*call_ptr, G_SCALAR);
 		SPAGAIN;
 		promise_set_value(output, POPs);
@@ -129,12 +129,11 @@ run_thread(void* arg) {
 Promise* S_thread_spawn(pTHX_ AV* to_run) {
 	static const size_t stack_size = 512 * 1024;
 
-	av_unshift(to_run, 1);
-	av_store(to_run, 0, (SV*)GvAVn(PL_incgv));
-
 	mthread* mthread = calloc(1, sizeof(*mthread));
-	Promise* input = promise_alloc(2);
-	mthread->input = input;
+	Promise* at_inc = promise_alloc(2);
+	mthread->at_inc = at_inc;
+	Promise* arguments = promise_alloc(2);
+	mthread->arguments = arguments;
 	Promise* output = promise_alloc(2);
 	mthread->output = output;
 
@@ -168,8 +167,10 @@ Promise* S_thread_spawn(pTHX_ AV* to_run) {
 #endif
 
 	/* This blocks on the other thread, so must run last */
-	promise_set_value(input, (SV*)to_run);
-	promise_refcount_dec(input);
+	promise_set_value(at_inc, (SV*)GvAVn(PL_incgv));
+	promise_refcount_dec(at_inc);
+	promise_set_value(arguments, (SV*)to_run);
+	promise_refcount_dec(arguments);
 
 	return output;
 }

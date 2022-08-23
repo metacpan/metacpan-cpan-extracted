@@ -1,5 +1,8 @@
 Revision history for Thread-Csp
 
+0.009     2022-08-23 12:43:58+02:00 Europe/Amsterdam
+          - Allow for passing of threads::shared values
+
 0.008     2022-02-24 17:08:54+01:00 Europe/Amsterdam
           - Revert using socketpair
           - Use PerlProc_pipe instead of pipe

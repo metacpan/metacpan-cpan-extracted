@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => "0.34",
     "Test::WWW::Mechanize::Catalyst" => "0.60"
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
