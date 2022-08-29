@@ -11,7 +11,7 @@ use File::Temp;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-07-16'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Data-Sah-Filter'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 sub _process_filter_module {
     no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
@@ -22,10 +22,6 @@ sub _process_filter_module {
 
     my $filename = $input->{filename};
 
-    # force reload
-    (my $package_pm = "$package.pm") =~ s!::!/!g;
-    delete $INC{$package_pm};
-
     require Require::Hook::Source::DzilBuild;
     local @INC = (Require::Hook::Source::DzilBuild->new(zilla => $input->{zilla}, debug=>1), @INC);
 
@@ -34,7 +30,11 @@ sub _process_filter_module {
         my $package_pm = $package;
         $package_pm =~ s!::!/!g;
         $package_pm .= ".pm";
-        require $package_pm;
+
+        # force reload
+        delete $INC{$package_pm};
+
+        { no warnings 'redefine'; require $package_pm; }
 
         {
             no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
@@ -81,14 +81,12 @@ sub _process_filter_module {
             push @pod, "=head2 Sample data and filtering results\n\n";
             for my $eg (@{ $meta->{examples} }) {
                 my $filter_rule = ["$rule_cat\::$rule_desc", $eg->{filter_args} // {}];
-                my $filter_code = Data::Sah::Filter::gen_filter(filter_names=>[$filter_rule]);
+                my $filter_code = Data::Sah::Filter::gen_filter(
+                    filter_names=>[$filter_rule],
+                    return_type => 'str_errmsg+val',
+                );
                 my ($actual_errmsg, $actual_filtered_value);
-                if ($meta->{might_fail}) {
-                    ($actual_errmsg, $actual_filtered_value) = @{ $filter_code->($eg->{value}) };
-                } else {
-                    $actual_filtered_value = $filter_code->($eg->{value});
-                    $actual_errmsg = undef;
-                }
+                ($actual_errmsg, $actual_filtered_value) = @{ $filter_code->($eg->{value}) };
                 my $correct_filtered_value = exists($eg->{filtered_value}) ?
                     $eg->{filtered_value} : $eg->{value};
                 push @pod, " ", dmp($eg->{value}), " #",
@@ -220,7 +218,7 @@ Pod::Weaver::Plugin::Data::Sah::Filter - Plugin to use when building Data::Sah::
 
 =head1 VERSION
 
-This document describes version 0.005 of Pod::Weaver::Plugin::Data::Sah::Filter (from Perl distribution Pod-Weaver-Plugin-Data-Sah-Filter), released on 2022-07-16.
+This document describes version 0.006 of Pod::Weaver::Plugin::Data::Sah::Filter (from Perl distribution Pod-Weaver-Plugin-Data-Sah-Filter), released on 2022-07-16.
 
 =head1 SYNOPSIS
 

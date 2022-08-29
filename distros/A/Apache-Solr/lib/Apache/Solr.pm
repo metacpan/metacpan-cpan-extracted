@@ -8,7 +8,7 @@
 
 package Apache::Solr;
 use vars '$VERSION';
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 
 use warnings;
@@ -398,12 +398,15 @@ sub expandExtract(@)
 
 
 # probably more config later, currently only one column
+# "also-per-field" means, not only $set.$more, but also f.$field.$set.$more
 my %sets =   #also-per-field?
-  ( facet => [1]
-  , hl    => [1]
-  , mlt   => [0]
-  , stats => [0]
-  , group => [0]
+  ( expand  => [0]
+  , facet   => [1]
+  , hl      => [1]
+  , mlt     => [0]
+  , stats   => [0]
+  , suggest => [0]
+  , group   => [0]
   );
  
 sub expandSelect(@)
@@ -506,16 +509,17 @@ sub request($$;$$)
         $req       = HTTP::Request->new
           ( POST => $url
           , [ Content_Type        => $body_ct
-            , Contend_Disposition => 'form-data; name="content"'
+            , Content_Disposition => 'form-data; name="content"'
             ]
           , (ref $body eq 'SCALAR' ? $$body : $body)
           );
     }
 
-#warn $req->as_string;
     $result->request($req);
 
     my $resp = $self->agent->request($req);
+#use Data::Dumper;
+#warn Dumper $resp;
     $result->response($resp);
     $resp;
 }

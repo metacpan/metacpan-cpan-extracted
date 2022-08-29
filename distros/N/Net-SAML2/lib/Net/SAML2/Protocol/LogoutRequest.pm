@@ -1,13 +1,11 @@
-use strict;
-use warnings;
 package Net::SAML2::Protocol::LogoutRequest;
-our $VERSION = '0.57'; # VERSION
-
 use Moose;
+our $VERSION = '0.59'; # VERSION
 use MooseX::Types::Common::String qw/ NonEmptySimpleStr /;
 use MooseX::Types::URI qw/ Uri /;
 use Net::SAML2::XML::Util qw/ no_comments /;
 use XML::Generator;
+use URN::OASIS::SAML2 qw(:urn);
 
 with 'Net::SAML2::Role::ProtocolMessage';
 
@@ -16,8 +14,48 @@ with 'Net::SAML2::Role::ProtocolMessage';
 
 has 'session'       => (isa => NonEmptySimpleStr, is => 'ro', required => 1);
 has 'nameid'        => (isa => NonEmptySimpleStr, is => 'ro', required => 1);
-has 'nameid_format' => (isa => NonEmptySimpleStr, is => 'ro', required => 0);
-has 'destination'   => (isa => NonEmptySimpleStr, is => 'ro', required => 0);
+has 'nameid_format' => (
+    isa       => NonEmptySimpleStr,
+    is        => 'ro',
+    required  => 0,
+    predicate => 'has_nameid_format'
+);
+has 'destination' => (
+    isa       => NonEmptySimpleStr,
+    is        => 'ro',
+    required  => 0,
+    predicate => 'has_destination'
+);
+
+has sp_provided_id => (
+    isa       => NonEmptySimpleStr,
+    is        => 'ro',
+    required  => 0,
+    predicate => 'has_sp_provided_id'
+);
+
+has affiliation_group_id => (
+    isa       => NonEmptySimpleStr,
+    is        => 'ro',
+    required  => 0,
+    predicate => 'has_affiliation_group_id'
+);
+
+has include_name_qualifier =>
+    (isa => 'Bool', is => 'ro', required => 0, default => 0);
+
+around BUILDARGS => sub {
+    my $orig = shift;
+    my $self = shift;
+    my %args = @_;
+
+    if ($args{nameid_format} && $args{nameid_format} eq 'urn:oasis:names:tc:SAML:2.0:nameidformat:persistent') {
+        $args{include_name_qualifier} = 1;
+    }
+
+    return $self->$orig(%args);
+};
+
 
 
 sub new_from_xml {
@@ -26,57 +64,72 @@ sub new_from_xml {
     my $dom = no_comments($args{xml});
 
     my $xpath = XML::LibXML::XPathContext->new($dom);
-    $xpath->registerNs('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
-    $xpath->registerNs('samlp', 'urn:oasis:names:tc:SAML:2.0:protocol');
+    $xpath->registerNs('saml',  URN_ASSERTION);
+    $xpath->registerNs('samlp', URN_PROTOCOL);
 
     my %params = (
-        id            => $xpath->findvalue('/samlp:LogoutRequest/@ID'),
-        session       => $xpath->findvalue('/samlp:LogoutRequest/samlp:SessionIndex'),
-        issuer        => $xpath->findvalue('/samlp:LogoutRequest/saml:Issuer'),
-        nameid        => $xpath->findvalue('/samlp:LogoutRequest/saml:NameID'),
-        destination   => $xpath->findvalue('/samlp:LogoutRequest/@Destination'),
+        id          => $xpath->findvalue('/samlp:LogoutRequest/@ID'),
+        session     => $xpath->findvalue('/samlp:LogoutRequest/samlp:SessionIndex'),
+        issuer      => $xpath->findvalue('/samlp:LogoutRequest/saml:Issuer'),
+        nameid      => $xpath->findvalue('/samlp:LogoutRequest/saml:NameID'),
+        destination => $xpath->findvalue('/samlp:LogoutRequest/@Destination'),
     );
 
-    my $nameid_format = $xpath->findvalue('/samlp:LogoutRequest/saml:NameID/@Format');
-    if ( $nameid_format ne '' ) { $params{nameid_format} = $nameid_format; }
+    my $nameid_format
+        = $xpath->findvalue('/samlp:LogoutRequest/saml:NameID/@Format');
 
-    my $self = $class->new(
-        %params
-    );
+    $params{nameid_format} = $nameid_format
+        if NonEmptySimpleStr->check($nameid_format);
 
-    return $self;
+    $params{include_name_qualifier} = $args{include_name_qualifier}
+        if $args{include_name_qualifier};
+
+    return $class->new(%params);
 }
 
 
 sub as_xml {
-    my ($self) = @_;
+    my $self = shift;
 
-    my $x = XML::Generator->new(':pretty');
-    my $saml  = ['saml' => 'urn:oasis:names:tc:SAML:2.0:assertion'];
-    my $samlp = ['samlp' => 'urn:oasis:names:tc:SAML:2.0:protocol'];
+    my $x     = XML::Generator->new(':pretty=0');
+    my $saml  = ['saml'  => URN_ASSERTION];
+    my $samlp = ['samlp' => URN_PROTOCOL];
+
 
     $x->xml(
         $x->LogoutRequest(
             $samlp,
-            { ID => $self->id,
-              IssueInstant => $self->issue_instant,
-              Destination => $self->destination,
-              Version => '2.0' },
-            $x->Issuer(
-                $saml,
-                $self->issuer,
-            ),
+            {
+                ID           => $self->id,
+                IssueInstant => $self->issue_instant,
+                $self->has_destination
+                ? (Destination => $self->destination)
+                : (),
+                Version => '2.0'
+            },
+            $x->Issuer($saml, $self->issuer),
             $x->NameID(
                 $saml,
-                { Format => $self->nameid_format,
-                  NameQualifier => $self->destination,
-                  SPNameQualifier => $self->issuer },
-                $self->nameid,
+                {
+                    $self->has_nameid_format
+                    ? (Format => $self->nameid_format)
+                    : (),
+                    $self->has_sp_provided_id ? (
+                        SPProvidedID => $self->sp_provided_id
+                    ) : (),
+                    $self->include_name_qualifier
+                    ? (
+                        $self->has_destination
+                        ? (NameQualifier => $self->destination)
+                        : (),
+                        SPNameQualifier =>
+                        $self->has_affiliation_group_id ? $self->affiliation_group_id : $self->issuer
+                        )
+                    : (),
+                },
+                $self->nameid
             ),
-            $x->SessionIndex(
-                $samlp,
-                $self->session,
-            ),
+            $x->SessionIndex($samlp, $self->session),
         )
     );
 }
@@ -95,7 +148,7 @@ Net::SAML2::Protocol::LogoutRequest - SAML2 LogoutRequest Protocol object
 
 =head1 VERSION
 
-version 0.57
+version 0.59
 
 =head1 SYNOPSIS
 

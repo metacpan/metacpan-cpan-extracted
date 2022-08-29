@@ -1,3 +1,10 @@
+0.242   2022-08-28  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] Avoid 'Modification of a read-only value attempted'
+          error because we still dumped a scalarref object as
+          bless(\1,'Foo').
+
+
 0.241   2021-06-24  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Make fixup of circular references nicer by showing the

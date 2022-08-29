@@ -7,16 +7,16 @@ build_requires:
   HTTP::Date: '0'
   Test2::API: '1.302086'
   Test2::Plugin::FauxHomeDir: '0'
-  Test2::V0: '0.000060'
+  Test2::V0: '0.000121'
   URI::file: '0'
-  perl: '5.010001'
+  perl: '5.020'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   Git::Wrapper: '0'
   Sort::Versions: '0'
-  perl: '5.010001'
+  perl: '5.020'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,7 +25,7 @@ name: App-cpangitify
 recommends:
   PerlX::Maybe::XS: '0'
 requires:
-  Archive::Extract: '0'
+  Archive::Libarchive::Extract: '0'
   CPAN::ReleaseHistory: '0'
   File::Copy::Recursive: '0'
   File::chdir: '0'
@@ -37,16 +37,17 @@ requires:
   PerlX::Maybe: '0.003'
   Test2::API: '1.302086'
   URI: '0'
-  perl: '5.010001'
+  experimental: '0'
+  perl: '5.020'
 resources:
   bugtracker: https://github.com/uperl/App-cpangitify/issues
   homepage: https://metacpan.org/pod/App::cpangitify
   repository: git://github.com/uperl/App-cpangitify.git
-version: '0.18'
+version: '0.19'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Mohammad S Anwar (MANWAR)'
-x_generated_by_perl: v5.33.9
+x_generated_by_perl: v5.35.10
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

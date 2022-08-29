@@ -67,7 +67,8 @@ int32_t SPVM_TYPE_is_float_object_type(SPVM_COMPILER* compiler, int32_t basic_ty
 int32_t SPVM_TYPE_is_double_object_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_bool_object_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 
-int32_t SPVM_TYPE_is_integral_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
+int32_t SPVM_TYPE_is_integer_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
+int32_t SPVM_TYPE_is_integer_type_within_int(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_numeric_ref_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_mulnum_ref_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_numeric_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
@@ -115,14 +116,14 @@ int32_t SPVM_TYPE_is_not_found_class_type(SPVM_COMPILER* compiler, int32_t basic
 
 int32_t SPVM_TYPE_is_string_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 
-int32_t SPVM_TYPE_check_assignability(
+int32_t SPVM_TYPE_can_assign(
   SPVM_COMPILER* compiler,
   int32_t dist_type_basic_type_id, int32_t dist_type_dimension, int32_t dist_type_flag,
   int32_t src_type_basic_type_id, int32_t src_type_dimension, int32_t src_type_flag,
   SPVM_CONSTANT* src_constant, int32_t* need_implicite_conversion, int32_t* narrowing_conversion_error, int32_t* mutable_invalid
 );
 
-int32_t SPVM_TYPE_check_castability(
+int32_t SPVM_TYPE_can_cast(
   SPVM_COMPILER* compiler,
   int32_t cast_type_basic_type_id, int32_t cast_type_dimension, int32_t cast_type_flag,
   int32_t src_type_basic_type_id, int32_t src_type_dimension, int32_t src_type_flag

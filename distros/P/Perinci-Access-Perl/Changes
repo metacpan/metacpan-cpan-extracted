@@ -1,3 +1,21 @@
+0.898   2022-08-25  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.895 & 0.895.2, 0.896 & 0.896.2.
+
+        - [bugfix] module_source() will return undef for path when source
+          is from a hook.
+
+
+0.896.2 2022-08-22  Released-By: PERLANCAR; Urgency: high
+
+        - Update dependency version Module::Installed 0.011.
+
+        - [ux] Show error message from module_source().
+
+        - UPDATE 2022-08-25: rename release from 0.896 to 0.896.2 due to
+          conflict.
+
+
 0.897   2021-08-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Replace test dependency-to-Data::Sah::Resolve 0.10 to test
@@ -10,9 +28,21 @@
 	  0.010+.
 
 
-0.895   2021-08-01  Released-By: PERLANCAR; Urgency: medium
+0.895.2 2021-08-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Update test to newer Data::Sah::Normalize (0.051) (RT#138213).
+
+        - UPDATE 2022-08-25: rename release from 0.895 to 0.895.2 due to
+          conflict.
+
+
+0.895   2022-06-10  Released-By: PERLANCAR; Urgency: medium
+
+        - Replace Module::Path::More with Module::Installed::Tiny to
+          support require hooks.
+
+        - Update tests to adjust with Data::Sah::Normalize 0.051 & Sah
+          0.9.47 (no more extras part in schema).
 
 
 0.894   2021-05-11  Released-By: PERLANCAR; Urgency: medium

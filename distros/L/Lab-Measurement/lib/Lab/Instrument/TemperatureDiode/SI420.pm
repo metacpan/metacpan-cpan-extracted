@@ -1,6 +1,6 @@
 package Lab::Instrument::TemperatureDiode::SI420;
 #ABSTRACT: SI420 (???)
-$Lab::Instrument::TemperatureDiode::SI420::VERSION = '3.821';
+$Lab::Instrument::TemperatureDiode::SI420::VERSION = '3.822';
 use v5.20;
 
 use strict;
@@ -89,7 +89,7 @@ Lab::Instrument::TemperatureDiode::SI420 - SI420 (???)
 
 =head1 VERSION
 
-version 3.821
+version 3.822
 
 =head1 COPYRIGHT AND LICENSE
 

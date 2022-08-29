@@ -385,6 +385,50 @@ subtest diag => sub {
     );
 };
 
+subtest instance_dir => sub {
+    my $instdir = tempdir(CLEANUP => 1);
+    my $one     = $CLASS->new(cache_dir => tempdir(CLEANUP => 1), instance_dir => $instdir);
+
+    $one->add_driver(
+        $driver => (
+            name => 'xyz',
+            driver_args => {$caller && $caller->can('DBD_DRIVER') ? (dbd_driver => $caller->DBD_DRIVER) : ()},
+            build       => sub {
+                my $class = shift;
+                my ($db) = @_;
+
+                $db->load_sql(quickdb => lc("t/schema/$driver.sql"));
+
+                my $dbh = $db->connect;
+                isa_ok($dbh, ['DBI::db'], "Connected");
+
+                ok($dbh->do("INSERT INTO quick_test(test_val) VALUES('base')"), "Insert success");
+
+                my $sth = $dbh->prepare('SELECT * FROM quick_test WHERE test_val = ?');
+                $sth->execute('base');
+                my $all = $sth->fetchall_arrayref({});
+                is(
+                    $all,
+                    [{test_val => 'base', test_id => 1}],
+                    "Got the inserted row"
+                );
+            },
+        )
+    );
+
+    my $db = $one->fetch_db('xyz');
+    opendir(my $dh, $instdir) or die "Could not open dir: $!";
+
+    my $found = 0;
+    for my $path (readdir($dh)) {
+        next unless $path =~ m/^\Q$ENV{USER}\E-.*$/;
+        is("$instdir/$path", $db->dir, "Database was stored in the instance dir");
+        $found++;
+    }
+
+    is($found, 1, "Found exactly 1 data dir");
+};
+
 # If run directly
 done_testing() unless $caller;
 

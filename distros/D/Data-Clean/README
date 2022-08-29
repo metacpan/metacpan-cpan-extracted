@@ -2,8 +2,8 @@ NAME
     Data::Clean - Clean data structure
 
 VERSION
-    This document describes version 0.507 of Data::Clean (from Perl
-    distribution Data-Clean), released on 2020-04-07.
+    This document describes version 0.508 of Data::Clean (from Perl
+    distribution Data-Clean), released on 2022-08-28.
 
 SYNOPSIS
      use Data::Clean;
@@ -79,7 +79,8 @@ METHODS
     *   !clone_func (str)
 
         Set fully qualified name of clone function to use. The default is to
-        use "Clone::PP::clone".
+        get the value of the environment "PERL_DATA_CLEAN_CLONE_FUNC" or use
+        the default "Clone::PP::clone".
 
         The clone module (all but the last part of the "!clone_func" value)
         will automatically be loaded using "require()".
@@ -186,6 +187,10 @@ METHODS
     Clean $data. Clone $data first.
 
 ENVIRONMENT
+    *   PERL_DATA_CLEAN_CLONE_FUNC
+
+        String. Set default for "!clone_func" option.
+
     *   LOG_CLEANSER_CODE => BOOL (default: 0)
 
         Can be enabled if you want to see the generated cleanser code. It is
@@ -202,23 +207,39 @@ HOMEPAGE
 SOURCE
     Source repository is at <https://github.com/perlancar/perl-Data-Clean>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Clean>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Related modules: Data::Rmap, Hash::Sanitize, Data::Walk.
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016 by
+    perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Clean>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

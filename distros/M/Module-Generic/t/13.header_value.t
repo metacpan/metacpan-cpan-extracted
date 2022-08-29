@@ -4,6 +4,7 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
+    use vars qw( $DEBUG );
     use Test::More;
     use DateTime;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
@@ -13,6 +14,9 @@ BEGIN
 {
     use_ok( 'Module::Generic::HeaderValue' );
 };
+
+use strict;
+use warnings;
 
 subtest 'parse' => sub
 {
@@ -29,7 +33,6 @@ subtest 'parse' => sub
 
     foreach my $t ( @$tests )
     {
-        my $res = $t->{expect};
         my $res = Module::Generic::HeaderValue->new_from_multi( $t->{test}, { debug => $DEBUG });
         ok( $res );
         SKIP:
@@ -52,7 +55,7 @@ subtest 'parse' => sub
                 foreach my $att ( sort( keys( %$def ) ) )
                 {
                     diag( "Does param '$att' exists? ", $elem->params->exists( $att ) ? 'yes' : 'no' ) if( $DEBUG );
-                    $def->{ $all } eq $elem->param( $all ) or ++$fail, last ELEM;
+                    $def->{ $att } eq $elem->param( $att ) or ++$fail, last ELEM;
                 }
             }
         

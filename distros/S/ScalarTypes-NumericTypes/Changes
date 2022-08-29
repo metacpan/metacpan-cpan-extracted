@@ -1,8 +1,36 @@
 Revision history for Perl extension ScalarTypes::NumericTypes.
 
-0.02  Added new methods to the package
+0.11  2022-08-25
+        - Minor changes in the documentation.
 
-0.01  Tue Aug 23 13:22:37 2022
+0.10  2022-08-25
+        - Changes in the documentation.
+
+0.09  2022-08-25
+        - Error correction in the documentation.
+
+0.08  2022-08-25
+        - Major changes in some methods. Changes in the documentation.
+
+0.07  2022-08-24
+        - Changes in the documentation.
+
+0.06  2022-08-24
+        - Changes in the documentation.
+
+0.05  2022-08-24
+        - New methods to the package added. Changes in the documentation.
+
+0.04  2022-08-23
+        - Changes in the documentation.
+
+0.03  2022-08-23
+        - Prepare a more detailed documentation.
+
+0.02  2022-08-23
+        - Added new methods to the package.
+
+0.01  2022-08-23 13:22:37
 	- original version; created by h2xs 1.23 with options
 		-AX --skip-exporter --use-new-tests -n ScalarTypes::NumericTypes
 

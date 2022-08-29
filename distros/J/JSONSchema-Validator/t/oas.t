@@ -6,6 +6,7 @@ use Test::More;
 
 use lib 't/lib';
 
+use Data::Dumper;
 use Helper qw/test_dir detect_warnings/;
 use JSONSchema::Validator;
 use JSONSchema::Validator::Util qw/get_resource decode_content/;
@@ -58,8 +59,9 @@ for my $validator_class (@{$JSONSchema::Validator::OAS_VALIDATORS}) {
                     }
                 );
                 if ($t->{valid_res}) {
-                    is $result, 1, 'res: ' . $test_name;
-                    is @$errors, 0, 'res: ' . $test_name . '; errors is empty';
+                    is( $result, 1, 'res: ' . $test_name);
+                    is( @$errors, 0, 'res: ' . $test_name . '; errors is empty')
+                        or diag Dumper($errors);
                 } else {
                     is $result, 0, 'res: ' . $test_name;
                     ok @$errors > 0, 'res: ' . $test_name . '; errors is not empty';

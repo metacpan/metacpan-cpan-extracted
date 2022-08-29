@@ -6,6 +6,7 @@ BEGIN
     use Test2::IPC;
     use Test2::V0;
     use lib './lib';
+    use vars qw( $DEBUG $IS_SUPPORTED );
     use Errno;
     use POSIX ":sys_wait_h";
     use ok( 'Module::Generic::SharedMem' ) || bail_out( "Unable to load Module::Generic::SharedMem" );
@@ -18,6 +19,9 @@ BEGIN
     }
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
+
+use strict;
+use warnings;
 
 SKIP:
 {

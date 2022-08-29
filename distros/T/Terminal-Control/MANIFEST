@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+CONTRIBUTING.md
+t/Terminal-Control.t
+lib/Terminal/Control.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

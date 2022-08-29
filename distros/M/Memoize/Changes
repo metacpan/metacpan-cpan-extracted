@@ -1,8 +1,17 @@
 Release history for Memoize
 
+1.12  Mon 29 Aug 2022
+  * No functional changes
+  * Test fixes
+
+1.11  Sun 28 Aug 2022
+  * Large test suite refactor
+  * Additional tests
+  * Updated packaging and package metadata
+
 1.10  Thu 11 Aug 2022
   * No warning when NORMALIZER returns undef (RT #143921).
-	This was a backcompat breakage in 1.09
+    This was a backcompat breakage in 1.09
 
 1.09  Mon 01 Aug 2022
   * Skip for thread safety tests on Perl 5.10.0

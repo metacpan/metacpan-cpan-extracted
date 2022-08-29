@@ -1,14 +1,16 @@
 use strict;
 use warnings;
 package Net::SAML2::SP;
-our $VERSION = '0.57'; # VERSION
+our $VERSION = '0.59'; # VERSION
 
 use Moose;
 
 use Carp qw(croak);
 use Crypt::OpenSSL::X509;
 use Digest::MD5 ();
+use List::Util qw(first none);
 use MooseX::Types::URI qw/ Uri /;
+use MooseX::Types::Common::String qw/ NonEmptySimpleStr /;
 use Net::SAML2::Binding::POST;
 use Net::SAML2::Binding::Redirect;
 use Net::SAML2::Binding::SOAP;
@@ -27,9 +29,9 @@ has 'url'    => (isa => Uri, is => 'ro', required => 1, coerce => 1);
 has 'id'     => (isa => 'Str', is => 'ro', required => 1);
 has 'cert'   => (isa => 'Str', is => 'ro', required => 1);
 has 'key'    => (isa => 'Str', is => 'ro', required => 1);
-has 'cacert' => (isa => 'Maybe[Str]', is => 'ro', required => 1);
+has 'cacert' => (isa => 'Str', is => 'rw', required => 0, predicate => 'has_cacert');
 
-has 'error_url'        => (isa => 'Str', is => 'ro', required => 1);
+has 'error_url'        => (isa => Uri, is => 'ro', required => 1, coerce => 1);
 has 'org_name'         => (isa => 'Str', is => 'ro', required => 1);
 has 'org_display_name' => (isa => 'Str', is => 'ro', required => 1);
 has 'org_contact'      => (isa => 'Str', is => 'ro', required => 1);
@@ -125,6 +127,16 @@ around BUILDARGS => sub {
     if (!@{$args{assertion_consumer_service}}) {
       croak("You don't have any Assertion Consumer Services configured!");
     }
+
+    my $acs_index = 1;
+    if (none { $_->{index} } @{$args{assertion_consumer_service}}) {
+        foreach (@{$args{assertion_consumer_service}}) {
+            $_->{index} = $acs_index;
+            ++$acs_index;
+        }
+    }
+
+
     return $self->$orig(%args);
 };
 
@@ -139,16 +151,14 @@ sub _build_cert_text {
 
 
 sub authn_request {
-    my ($self, $destination, $nameid_format) = @_;
-
-    my $authnreq = Net::SAML2::Protocol::AuthnRequest->new(
+    my $self = shift;
+    return Net::SAML2::Protocol::AuthnRequest->new(
         issueinstant  => DateTime->now,
         issuer        => $self->id,
-        destination   => $destination,
-        nameid_format => $nameid_format,
+        destination   => $_[0],
+        nameid_format => $_[1],
     );
 
-    return $authnreq;
 }
 
 
@@ -156,11 +166,13 @@ sub logout_request {
     my ($self, $destination, $nameid, $nameid_format, $session) = @_;
 
     my $logout_req = Net::SAML2::Protocol::LogoutRequest->new(
-        issuer        => $self->id,
-        destination   => $destination,
-        nameid        => $nameid,
-        nameid_format => $nameid_format,
-        session       => $session,
+        issuer      => $self->id,
+        destination => $destination,
+        nameid      => $nameid,
+        session     => $session,
+        NonEmptySimpleStr->check($nameid_format)
+            ? (nameid_format => $nameid_format)
+            : (),
     );
 
     return $logout_req;
@@ -228,7 +240,11 @@ sub slo_redirect_binding {
 sub soap_binding {
     my ($self, $ua, $idp_url, $idp_cert) = @_;
 
-    my $soap = Net::SAML2::Binding::SOAP->new(
+    if (!$self->has_cacert) {
+        croak("Unable to create SOAP binding, no CA certificate provided");
+    }
+
+    return Net::SAML2::Binding::SOAP->new(
         ua       => $ua,
         key      => $self->key,
         cert     => $self->cert,
@@ -236,19 +252,15 @@ sub soap_binding {
         idp_cert => $idp_cert,
         cacert   => $self->cacert,
     );
-
-    return $soap;
 }
 
 
 sub post_binding {
     my ($self) = @_;
 
-    my $post = Net::SAML2::Binding::POST->new(
-        cacert => $self->cacert,
+    return Net::SAML2::Binding::POST->new(
+        $self->has_cacert ? (cacert => $self->cacert) : ()
     );
-
-    return $post;
 }
 
 
@@ -258,13 +270,18 @@ sub generate_sp_desciptor_id {
 }
 
 
-my $md = ['md' => 'urn:oasis:names:tc:SAML:2.0:metadata'];
-my $ds = ['ds' => 'http://www.w3.org/2000/09/xmldsig#'];
+my $md = ['md' => URN_METADATA];
+my $ds = ['ds' => URN_SIGNATURE];
 
 sub generate_metadata {
     my $self = shift;
 
     my $x = XML::Generator->new(':pretty', conformance => 'loose');
+
+    my $error_uri = $self->error_url;
+    if (!$error_uri->scheme) {
+        $error_uri = $self->url . $self->error_url;
+    }
 
     return $x->EntityDescriptor(
         $md,
@@ -277,9 +294,8 @@ sub generate_metadata {
             {
                 AuthnRequestsSigned        => $self->authnreq_signed,
                 WantAssertionsSigned       => $self->want_assertions_signed,
-                errorURL                   => $self->url . $self->error_url,
-                protocolSupportEnumeration =>
-                    'urn:oasis:names:tc:SAML:2.0:protocol',
+                errorURL                   => $error_uri,
+                protocolSupportEnumeration => URN_PROTOCOL,
             },
 
             $self->_generate_key_descriptors($x),
@@ -352,21 +368,7 @@ sub _generate_single_logout_service {
 sub _generate_assertion_consumer_service {
     my $self = shift;
     my $x    = shift;
-
-    my @services = @{ $self->assertion_consumer_service };
-    my $size     = @services;
-
-    my @acs;
-    for (my $i = 0; $i < $size; ++$i) {
-        push(
-            @acs,
-            $x->AssertionConsumerService(
-                $md, { %{ $services[$i] }, index => $i + 1, },
-            )
-        );
-    }
-    return @acs;
-
+    return map { $x->AssertionConsumerService($md, $_) } @{ $self->assertion_consumer_service };
 }
 
 
@@ -392,6 +394,13 @@ sub metadata {
     return $signer->sign($metadata);
 }
 
+
+sub get_default_assertion_service {
+    my $self = shift;
+    return first { $_->{isDefault} eq 1 || $_->{isDefault} eq 'true' }
+        @{ $self->assertion_consumer_service };
+}
+
 __PACKAGE__->meta->make_immutable;
 
 __END__
@@ -406,7 +415,7 @@ Net::SAML2::SP - Net::SAML2::SP - SAML Service Provider object
 
 =head1 VERSION
 
-version 0.57
+version 0.59
 
 =head1 SYNOPSIS
 
@@ -492,7 +501,7 @@ Services
     {
         Binding => BINDING_HTTP_POST,
         Location => https://foo.example.com/your-post-endpoint,
-    }
+    },
     {
         Binding => BINDING_HTTP_ARTIFACT,
         Location => https://foo.example.com/your-artifact-endpoint,
@@ -509,16 +518,19 @@ This expects an array of hash refs where you define one or more Assertion
 Consumer Services.
 
   [
-    # Order decides the index
+    # Order decides the index if not supplied, else we assume you have an index
     {
         Binding => BINDING_HTTP_POST,
         Location => https://foo.example.com/your-post-endpoint,
         isDefault => 'false',
-    }
+        # optionally
+        index => 1,
+    },
     {
         Binding => BINDING_HTTP_ARTIFACT,
         Location => https://foo.example.com/your-artifact-endpoint,
         isDefault => 'true',
+        index => 2,
     }
   ]
 
@@ -584,6 +596,10 @@ Generate the metadata XML document for this SP.
 =head2 metadata( )
 
 Returns the metadata XML document for this SP.
+
+=head2 get_default_assertion_service
+
+Return the assertion service which is the default
 
 =head1 AUTHOR
 

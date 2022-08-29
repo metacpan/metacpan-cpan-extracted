@@ -1,0 +1,12 @@
+Revision history for Perl extension Terminal::Control.
+
+0.02  2022-08-28
+        - Methods added. Changes in documentation.
+
+0.02  2022-08-27
+        - Changes in the methods. Update of documentation. Added CONTRIBUTING.md
+
+0.01  Fri Aug 26 08:22:18 2022
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Terminal::Control
+

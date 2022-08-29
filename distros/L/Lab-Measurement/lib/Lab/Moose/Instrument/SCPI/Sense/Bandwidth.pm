@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Sense::Bandwidth;
-$Lab::Moose::Instrument::SCPI::Sense::Bandwidth::VERSION = '3.821';
+$Lab::Moose::Instrument::SCPI::Sense::Bandwidth::VERSION = '3.822';
 #ABSTRACT: Role for the SCPI SENSe:BANDwidth subsystem
 
 use v5.20;
@@ -95,7 +95,7 @@ Lab::Moose::Instrument::SCPI::Sense::Bandwidth - Role for the SCPI SENSe:BANDwid
 
 =head1 VERSION
 
-version 3.821
+version 3.822
 
 =head1 METHODS
 

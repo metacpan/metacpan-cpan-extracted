@@ -1,0 +1,32 @@
+---
+abstract: 'Require that Alien::Build based aliens only fetch from an allow list of hosts'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test2::V0: '0.000121'
+  Test::Alien::Build: '0'
+  perl: '5.008004'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008004'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Build-Plugin-Fetch-HostAllowList
+requires:
+  Alien::Build::Plugin: '0'
+  URI: '0'
+  perl: '5.008004'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/PerlAlien/Alien-Build-Plugin-Fetch-HostAllowList/issues
+  homepage: https://metacpan.org/pod/Alien::Build::Plugin::Fetch::HostAllowList
+  repository: git://github.com/PerlAlien/Alien-Build-Plugin-Fetch-HostAllowList.git
+version: '0.01'
+x_generated_by_perl: v5.37.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

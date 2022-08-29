@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-PPPort
 
+0.010     2022-08-29 16:27:59+02:00 Europe/Amsterdam
+          - Never remove own ppport.h file on override
+
 0.009     2021-10-29 15:31:44+02:00 Europe/Amsterdam
           - Add override attribute
 

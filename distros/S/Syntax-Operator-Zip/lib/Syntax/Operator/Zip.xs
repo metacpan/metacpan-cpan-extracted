@@ -23,9 +23,9 @@ static OP *pp_zip(pTHX)
 
   SP = PL_stack_base + lhs_mark;
 
-  if(GIMME == G_VOID)
+  if(GIMME_V == G_VOID)
     return NORMAL;
-  if(GIMME == G_SCALAR) {
+  if(GIMME_V == G_SCALAR) {
     int count = 0;
     if(lhs_count > count)
       count = lhs_count;
@@ -93,9 +93,9 @@ static OP *pp_mesh(pTHX)
 
   SP = PL_stack_base + lhs_mark;
 
-  if(GIMME == G_VOID)
+  if(GIMME_V == G_VOID)
     return NORMAL;
-  if(GIMME == G_SCALAR) {
+  if(GIMME_V == G_SCALAR) {
     EXTEND(SP, 1);
     mPUSHi(count * 2);
     RETURN;

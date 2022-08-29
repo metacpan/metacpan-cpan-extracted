@@ -1,5 +1,8 @@
 Revision history for perl Net::Proxmox::VE
 
+0.36 2022-08-25
+- Relicense to MIT. See GH#11
+
 0.35 2019-08-03
 - Adjusting prerequisites only.
 - Rework the dist.ini file.

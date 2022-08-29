@@ -7,6 +7,7 @@ BEGIN
     use warnings;
     use utf8;
     use lib './lib';
+    use vars qw( $DEBUG );
     use File::Which;
     use POSIX ();
     use open ':std' => ':utf8';
@@ -24,6 +25,9 @@ BEGIN
     }
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
+
+use strict;
+use warnings;
 
 # diag( "Environment variables: ", Dumper( \%ENV ) );
 
@@ -75,7 +79,7 @@ else
 }
 if( !defined( $n ) )
 {
-    diag( "Error: '$Module::Generic::Number::ERROR'" );
+    diag( "Error: '", Module::Generic::Number->error, "'" );
     BAIL_OUT( Module::Generic::Number->error );
 }
 # diag( "Space between symbol and number is '", $n->space, "'." );

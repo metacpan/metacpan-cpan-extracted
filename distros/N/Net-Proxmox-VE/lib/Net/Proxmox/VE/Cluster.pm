@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE::Cluster;
-$Net::Proxmox::VE::Cluster::VERSION = '0.35';
+$Net::Proxmox::VE::Cluster::VERSION = '0.36';
 use parent 'Exporter';
 
 our @EXPORT  =
@@ -382,7 +382,7 @@ Net::Proxmox::VE::Cluster - Functions for the 'cluster' portion of the API
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 SYNOPSIS
 
@@ -848,14 +848,15 @@ L<Net::Proxmox::VE>
 
 =head1 AUTHOR
 
-Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@bytefoundry.com.au>
+Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Dean Hamstad.
+This software is Copyright (c) 2022 by Dean Hamstad.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut
 

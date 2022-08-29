@@ -2,6 +2,8 @@ package Test2::Plugin::HTTPTinyFile;
 
 use strict;
 use warnings;
+use 5.020;
+use experimental qw( signatures );
 use HTTP::Tiny;
 use HTTP::Date qw( time2str );
 use URI;
@@ -9,10 +11,9 @@ use Test2::API qw( context );
 
 my $request_method = \&HTTP::Tiny::request;
 
-my $request_wrapper = sub
+my $request_wrapper = sub ($self, $method, $url, $args)
 {
   # TODO options to support 'If-Modified-Since' see PAUSE::Packages
-  my($self, $method, $url, $args) = @_;
   my $uri = URI->new($url);
 
   my $ctx = context();
@@ -103,7 +104,7 @@ my $request_wrapper = sub
   }
   else
   {
-    $request_method->(@_);
+    $request_method->($self, $method, $url, $args);
   }
 };
 
@@ -114,89 +115,78 @@ package
 
 use Test2::API qw( context );
 
-sub TIEHASH
+sub TIEHASH ($class)
 {
-  my($class) = @_;
   bless {}, $class;
 }
 
-sub FETCH
+sub FETCH ($self, $key)
 {
-  my($self, $key) = @_;
   my $ctx = context();
   $ctx->note("header FETCH $key");
   $ctx->release;
   $self->{$key};
 }
 
-sub STORE
+sub STORE ($self, $key, $value)
 {
-  my($self, $key, $value) = @_;
   my $ctx = context();
   $ctx->note("header STORE $key $value");
   $ctx->release;
   $self->{$key} = $value;
 }
 
-sub DELETE
+sub DELETE ($self, $key)
 {
-  my($self, $key) = @_;
   my $ctx = context();
   $ctx->note("header DELETE $key");
   $ctx->release;
   delete $self->{$key};
 }
 
-sub CLEAR
+sub CLEAR ($self)
 {
-  my($self) = @_;
   my $ctx = context();
   $ctx->note("header CLEAR");
   $ctx->release;
   %$self = ();
 }
 
-sub EXISTS
+sub EXISTS ($self, $key)
 {
-  my($self, $key) = @_;
   my $ctx = context();
   $ctx->note("header EXISTS $key");
   $ctx->release;
   exists $self->{$key};
 }
 
-sub FIRSTKEY
+sub FIRSTKEY ($self)
 {
-  my($self) = @_;
   die "TODO";
 }
 
-sub NEXTKEY
+sub NEXTKEY ($self, $lastkey)
 {
-  my($self, $lastkey) = @_;
   die "TODO";
 }
 
-sub SCALAR
+sub SCALAR ($self)
 {
-  my($self) = @_;
   my $ctx = context();
   $ctx->note("header SCALAR");
   $ctx->release;
   scalar %$self;
 }
 
-sub DESTROY
+sub DESTROY ($self)
 {
-  my($self) = @_;
   my $ctx = context();
   $ctx->note("header DESTROY");
   $ctx->release;
 }
 
-sub UNTIE
+sub UNTIE ($self)
 {
-  my($self) = @_;
   my $ctx = context();
   $ctx->note("header UNTIE");
   $ctx->release;

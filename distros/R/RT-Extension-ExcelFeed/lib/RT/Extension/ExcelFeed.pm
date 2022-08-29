@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::ExcelFeed;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 

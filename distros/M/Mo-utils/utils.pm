@@ -11,7 +11,7 @@ use Scalar::Util qw(blessed);
 Readonly::Array our @EXPORT_OK => qw(check_array check_array_object check_bool
 	check_isa check_length check_number check_number_of_items check_required);
 
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 
 sub check_array {
 	my ($self, $key) = @_;
@@ -308,6 +308,8 @@ Returns undef.
 
 =head1 EXAMPLE1
 
+=for comment filename=check_array_ok.pl
+
  use strict;
  use warnings;
 
@@ -325,6 +327,8 @@ Returns undef.
  # ok
 
 =head1 EXAMPLE2
+
+=for comment filename=check_array_fail.pl
 
  use strict;
  use warnings;
@@ -347,6 +351,8 @@ Returns undef.
 
 =head1 EXAMPLE3
 
+=for comment filename=check_array_object_ok.pl
+
  use strict;
  use warnings;
 
@@ -367,6 +373,8 @@ Returns undef.
  # ok
 
 =head1 EXAMPLE4
+
+=for comment filename=check_array_object_fail.pl
 
  use strict;
  use warnings;
@@ -391,6 +399,8 @@ Returns undef.
 
 =head1 EXAMPLE5
 
+=for comment filename=check_bool_ok.pl
+
  use strict;
  use warnings;
 
@@ -409,6 +419,8 @@ Returns undef.
  # ok
 
 =head1 EXAMPLE6
+
+=for comment filename=check_bool_fail.pl
 
  use strict;
  use warnings;
@@ -431,6 +443,8 @@ Returns undef.
 
 =head1 EXAMPLE7
 
+=for comment filename=check_isa_ok.pl
+
  use strict;
  use warnings;
 
@@ -449,6 +463,8 @@ Returns undef.
  # ok
 
 =head1 EXAMPLE8
+
+=for comment filename=check_isa_fail.pl
 
  use strict;
  use warnings;
@@ -470,6 +486,8 @@ Returns undef.
 
 =head1 EXAMPLE9
 
+=for comment filename=check_length_ok.pl
+
  use strict;
  use warnings;
 
@@ -489,6 +507,8 @@ Returns undef.
  # ok
 
 =head1 EXAMPLE10
+
+=for comment filename=check_length_fail.pl
 
  use strict;
  use warnings;
@@ -510,6 +530,8 @@ Returns undef.
 
 =head1 EXAMPLE11
 
+=for comment filename=check_number_ok.pl
+
  use strict;
  use warnings;
 
@@ -527,6 +549,8 @@ Returns undef.
  # ok
 
 =head1 EXAMPLE12
+
+=for comment filename=check_number_fail.pl
 
  use strict;
  use warnings;
@@ -547,6 +571,8 @@ Returns undef.
  # #Error [...utils.pm:?] Parameter 'key' must be a number.
 
 =head1 EXAMPLE13
+
+=for comment filename=check_number_of_items_ok.pl
 
  use strict;
  use warnings;
@@ -591,6 +617,8 @@ Returns undef.
 
 =head1 EXAMPLE14
 
+=for comment filename=check_number_of_items_fail.pl
+
  use strict;
  use warnings;
 
@@ -634,6 +662,8 @@ Returns undef.
 
 =head1 EXAMPLE15
 
+=for comment filename=check_required_ok.pl
+
  use strict;
  use warnings;
 
@@ -651,6 +681,8 @@ Returns undef.
  # ok
 
 =head1 EXAMPLE16
+
+=for comment filename=check_required_fail.pl
 
  use strict;
  use warnings;
@@ -705,6 +737,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.10
+0.11
 
 =cut

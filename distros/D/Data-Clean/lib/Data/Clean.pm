@@ -1,12 +1,14 @@
 package Data::Clean;
 
-our $DATE = '2020-04-07'; # DATE
-our $VERSION = '0.507'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-08-28'; # DATE
+our $DIST = 'Data-Clean'; # DIST
+our $VERSION = '0.508'; # VERSION
 
 sub new {
     my ($class, %opts) = @_;
@@ -19,7 +21,7 @@ sub new {
         require $mod_pm;
     }
     $self->{_cd} = $cd;
-    $self->{_code} = eval $cd->{src};
+    $self->{_code} = eval $cd->{src}; ## no critic: BuiltinFunctions::ProhibitStringyEval
     {
         last unless $cd->{clone_func} =~ /(.+)::(.+)/;
         (my $mod_pm = "$1.pm") =~ s!::!/!g;
@@ -155,7 +157,8 @@ sub _generate_cleanser_code {
     $cd->{modules}{'Data::Dmp'} //= 0 if $opts->{'!debug'};
 
     if (!$cd->{clone_func}) {
-        $cd->{clone_func} = 'Clone::PP::clone';
+        $cd->{clone_func} = $ENV{PERL_DATA_CLEAN_CLONE_FUNC} //
+            'Clone::PP::clone';
     }
     {
         last unless $cd->{clone_func} =~ /(.+)::(.+)/;
@@ -307,7 +310,7 @@ sub clean_in_place {
 }
 
 sub clone_and_clean {
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
     my ($self, $data) = @_;
     my $clone = &{$self->{_cd}{clone_func}}($data);
@@ -329,7 +332,7 @@ Data::Clean - Clean data structure
 
 =head1 VERSION
 
-This document describes version 0.507 of Data::Clean (from Perl distribution Data-Clean), released on 2020-04-07.
+This document describes version 0.508 of Data::Clean (from Perl distribution Data-Clean), released on 2022-08-28.
 
 =head1 SYNOPSIS
 
@@ -410,7 +413,8 @@ array-based objects because they will be recursed instead.
 
 =item * !clone_func (str)
 
-Set fully qualified name of clone function to use. The default is to use
+Set fully qualified name of clone function to use. The default is to get the
+value of the environment C<PERL_DATA_CLEAN_CLONE_FUNC> or use the default
 C<Clone::PP::clone>.
 
 The clone module (all but the last part of the C<!clone_func> value) will
@@ -527,6 +531,10 @@ Clean $data. Clone $data first.
 
 =over
 
+=item * PERL_DATA_CLEAN_CLONE_FUNC
+
+String. Set default for C<!clone_func> option.
+
 =item * LOG_CLEANSER_CODE => BOOL (default: 0)
 
 Can be enabled if you want to see the generated cleanser code. It is logged at
@@ -546,14 +554,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-Clean
 
 Source repository is at L<https://github.com/perlancar/perl-Data-Clean>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Clean>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 Related modules: L<Data::Rmap>, L<Hash::Sanitize>, L<Data::Walk>.
@@ -562,11 +562,37 @@ Related modules: L<Data::Rmap>, L<Hash::Sanitize>, L<Data::Walk>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Clean>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

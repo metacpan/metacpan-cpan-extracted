@@ -12,6 +12,8 @@ SYNOPSIS
 
        find .. -print0 | cv -0r
 
+       cv --sort ...
+
 FEATURES
     CV is supposed to work similar to the venerable XV image viewer, just
     faster. Why faster?
@@ -107,7 +109,7 @@ DESCRIPTION
      q            quit the program
      <            half the image size
      >            double the image size
-     ,            shrink the image by 10%
+     ,            shrink the image by ~9% (opposite of .)
      .            enlarge the image by 10%
      n            reset to normal size
      m            maximize to screensize
@@ -117,7 +119,6 @@ DESCRIPTION
      u            uncrop
      r            set scaling mode to 'nearest' (fastest)
      s            set scaling mode to 'bilinear' (default)
-     shift-s      set scaling mode to 'hyper' (slowest)
      t            rotate clockwise 90°
      T            rotate counterclockwise°
      a            apply all rotations loslessly to a jpeg file (using exiftran)
@@ -242,13 +243,8 @@ ENVIRONMENT VARIABLES
 
     CV_MPLAYER
         Program used to play all sorts of video files. Unlike
-        "CV_AUDIO_PLAYER", this really must be one of the "mplayer",
-        "mplayer2" or "mpv" programs, or something that is very command-line
-        compatible to them.
-
-        Currently, if this string contains the substring "mpv", then it is
-        assumed to be mpv-compatible, otherwise it is assumed to be
-        mplayer-compatible.
+        "CV_AUDIO_PLAYER", this really must be some version of the "mpv"
+        programs, or something that is very command-line compatible to them.
 
         Note: for video-thumbnailing, mplayer is still used (and hardcoded).
 

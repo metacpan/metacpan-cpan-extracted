@@ -48,9 +48,15 @@ Example:
 
     read -a color < <( ansiecho -S ZE K/544 K/454 K/445 )
 
+=begin html
+
+<p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-ansiecho/main/images/synopsis.png">
+
+=end html
+
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 DESCRIPTION
 
@@ -324,10 +330,10 @@ always correspond to the character itself.
 
 =head1 COLOR SPEC
 
-This is a brief summary.  Read L<Getopt::EX::Colormap/COLOR SPEC> for
+This is a brief summary.  Read L<Term::ANSIColor::Concise/COLOR SPEC> for
 complete description.  Try next command to see 256 color table.
 
-    perl -MGetopt::EX::Colormap=:all -E colortable
+    perl -MTerm::ANSIColor::Concise::Table=:all -E colortable
 
 Color specification is a combination of single uppercase character
 representing 8 colors, and alternative (usually brighter) colors in
@@ -354,7 +360,7 @@ terminal :
 or color names enclosed by angle bracket :
 
     <red> <blue> <green> <cyan> <magenta> <yellow>
-    <aliceblue> <honeydue> <hotpink> <mooccasin>
+    <aliceblue> <honeydew> <hotpink> <moccasin>
     <medium_aqua_marine>
 
 with other special effects :
@@ -402,9 +408,7 @@ C<GETOPTEX_RGB24> environment variable to produce full-color sequence.
 
 From CPAN archive:
 
-    $ cpanm App::ansiecho
-    or
-    $ curl -sL http://cpanmin.us | perl - App::ansiecho
+    cpanm App::ansiecho
 
 From GIT repository:
 
@@ -414,7 +418,7 @@ From GIT repository:
 
 L<perlop/"Quote and Quote-like Operators">
 
-L<Getopt::EX::Colormap>
+L<Term::ANSIColor::Concise>
 
 L<https://en.wikipedia.org/wiki/ANSI_escape_code>
 

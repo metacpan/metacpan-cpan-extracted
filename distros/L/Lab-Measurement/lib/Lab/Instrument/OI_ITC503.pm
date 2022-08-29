@@ -1,6 +1,6 @@
 package Lab::Instrument::OI_ITC503;
 #ABSTRACT: Oxford Instruments ITC503 Intelligent Temperature Control
-$Lab::Instrument::OI_ITC503::VERSION = '3.821';
+$Lab::Instrument::OI_ITC503::VERSION = '3.822';
 use v5.20;
 
 use strict;
@@ -428,7 +428,7 @@ Lab::Instrument::OI_ITC503 - Oxford Instruments ITC503 Intelligent Temperature C
 
 =head1 VERSION
 
-version 3.821
+version 3.822
 
 =head1 SYNOPSIS
 

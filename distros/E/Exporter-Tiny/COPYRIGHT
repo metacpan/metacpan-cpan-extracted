@@ -3,9 +3,18 @@ Upstream-Name: Exporter-Tiny
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Exporter-Tiny
 
-Files: README
- lib/Exporter/Tiny.pm
- lib/Exporter/Tiny/Manual/Etc.pod
+Files: NEWS
+ TODO
+ inc/Test/Fatal.pm
+ inc/Test/Requires.pm
+ inc/Try/Tiny.pm
+ inc/archaic/Test/Builder/Module.pm
+ inc/archaic/Test/Builder/Tester.pm
+ inc/archaic/Test/Builder/Tester/Color.pm
+Copyright: Unknown
+License: Unknown
+
+Files: lib/Exporter/Tiny/Manual/Etc.pod
  lib/Exporter/Tiny/Manual/Exporting.pod
  lib/Exporter/Tiny/Manual/Importing.pod
  lib/Exporter/Tiny/Manual/QuickStart.pod
@@ -26,16 +35,6 @@ Files: lib/Exporter/Shiny.pm
 Copyright: This software is copyright (c) 2014, 2017 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: TODO
- inc/Test/Fatal.pm
- inc/Test/Requires.pm
- inc/Try/Tiny.pm
- inc/archaic/Test/Builder/Module.pm
- inc/archaic/Test/Builder/Tester.pm
- inc/archaic/Test/Builder/Tester/Color.pm
-Copyright: Unknown
-License: Unknown
-
 Files: COPYRIGHT
  CREDITS
  INSTALL
@@ -48,13 +47,18 @@ Files: Changes
  META.json
  META.yml
  doap.ttl
-Copyright: Copyright 2020 Toby Inkster.
+Copyright: Copyright 2022 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/11noncode.t
  t/12noncodegenerators.t
  t/13doesntexist.t
 Copyright: This software is copyright (c) 2018 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: README
+ lib/Exporter/Tiny.pm
+Copyright: This software is copyright (c) 2013-2014, 2017, 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: dist.ini
@@ -67,28 +71,32 @@ Files: inc/archaic/Test/More.pm
 Copyright: Copyright 2001-2008 by Michael G Schwern <schwern@pobox.com>.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: inc/archaic/Test/Builder/IO/Scalar.pm
-Copyright: Copyright (c) 1996 by Eryq.  All rights reserved.
- Copyright (c) 1999,2001 by ZeeGee Software Inc.  All rights reserved.
+Files: inc/archaic/Test/Builder.pm
+Copyright: Copyright 2002-2008 by chromatic <chromatic@wgz.org> and.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: SIGNATURE
 Copyright: None
 License: public-domain
 
-Files: inc/archaic/Test/Builder.pm
-Copyright: Copyright 2002-2008 by chromatic <chromatic@wgz.org> and.
+Files: t/14lexical.t
+Copyright: This software is copyright (c) 2022 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/archaic/Test/Builder/IO/Scalar.pm
+Copyright: Copyright (c) 1996 by Eryq.  All rights reserved.
+ Copyright (c) 1999,2001 by ZeeGee Software Inc.  All rights reserved.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2020 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2020 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  

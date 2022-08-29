@@ -1,3 +1,8 @@
+0.124   2022-08-28  Released-By: PERLANCAR; Urgency: medium
+
+        - Add summaries to subcommands completion.
+
+
 0.123   2021-10-21  Released-By: PERLANCAR; Urgency: medium
 
 	- Generate code that passes standard perlcritic tests.

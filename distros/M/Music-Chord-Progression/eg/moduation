@@ -9,9 +9,11 @@ use Music::Scales qw(get_scale_notes);
 
 my $score = setup_score();
 
+# get 4 notes of the C pentatonic scale
 my @pitches = get_scale_notes('C', 'pentatonic');
 my @notes = map { $pitches[int rand @pitches] } 1 .. 4;
 
+# play the 8-bar progression for each note
 for my $note (@notes) {
     my $prog = Music::Chord::Progression->new(
         scale_note => $note,
@@ -20,8 +22,7 @@ for my $note (@notes) {
     my $chords = $prog->generate;
 
     for my $chord (@$chords) {
-        my @chord = midi_format(@$chord);
-        $score->n('wn', @chord);
+        $score->n('wn', midi_format(@$chord));
     }
     print $note, ': ', ddc($chords);
 }

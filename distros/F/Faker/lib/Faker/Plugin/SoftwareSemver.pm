@@ -1,38 +1,139 @@
 package Faker::Plugin::SoftwareSemver;
 
-use 5.014;
+use 5.018;
 
 use strict;
 use warnings;
 
-use registry;
-use routines;
+use Venus::Class 'base';
 
-use Data::Object::Class;
-use Data::Object::ClassHas;
-
-extends 'Data::Object::Plugin';
-
-our $VERSION = '1.04'; # VERSION
-
-# ATTRIBUTES
-
-has 'faker' => (
-  is => 'ro',
-  isa => 'ConsumerOf["Faker::Maker"]',
-  req => 1,
-);
+base 'Faker::Plugin';
 
 # METHODS
 
-method execute() {
-  my $faker = $self->faker;
+sub execute {
+  my ($self, $data) = @_;
 
-  my $options = {
-    number_markers => 1
-  };
+  return $self->process_markers(
+    $self->faker->random->select(data_for_software_semver()),
+    'numbers',
+  );
+}
 
-  return $faker->process(['software', 'semver'], $options);
+sub data_for_software_semver {
+  state $software_semver = [
+    '0.#.#',
+    '#.#.#',
+    '#.##.##',
+  ]
 }
 
 1;
+
+
+
+=head1 NAME
+
+Faker::Plugin::SoftwareSemver - Software Semver
+
+=cut
+
+=head1 ABSTRACT
+
+Software Semver for Faker
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Faker::Plugin::SoftwareSemver;
+
+  my $plugin = Faker::Plugin::SoftwareSemver->new;
+
+  # bless(..., "Faker::Plugin::SoftwareSemver")
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides methods for generating fake data for software semver.
+
+=encoding utf8
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Faker::Plugin>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 execute
+
+  execute(HashRef $data) (Str)
+
+The execute method returns a returns a random fake software semver.
+
+I<Since C<1.10>>
+
+=over 4
+
+=item execute example 1
+
+  package main;
+
+  use Faker::Plugin::SoftwareSemver;
+
+  my $plugin = Faker::Plugin::SoftwareSemver->new;
+
+  # bless(..., "Faker::Plugin::SoftwareSemver")
+
+  # my $result = $plugin->execute;
+
+  # "1.4.0";
+
+  # my $result = $plugin->execute;
+
+  # "4.6.8";
+
+  # my $result = $plugin->execute;
+
+  # "5.0.7";
+
+=back
+
+=cut
+
+=head2 new
+
+  new(HashRef $data) (Plugin)
+
+The new method returns a new instance of the class.
+
+I<Since C<1.10>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Faker::Plugin::SoftwareSemver;
+
+  my $plugin = Faker::Plugin::SoftwareSemver->new;
+
+  # bless(..., "Faker::Plugin::SoftwareSemver")
+
+=back
+
+=cut

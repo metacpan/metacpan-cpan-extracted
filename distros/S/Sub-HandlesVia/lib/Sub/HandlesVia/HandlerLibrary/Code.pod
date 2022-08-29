@@ -14,7 +14,13 @@ Sub::HandlesVia::HandlerLibrary::Code - library of code-related methods
       handles_via => 'Code',
       handles => {
         'my_execute' => 'execute',
+        'my_execute_list' => 'execute_list',
         'my_execute_method' => 'execute_method',
+        'my_execute_method_list' => 'execute_method_list',
+        'my_execute_method_scalar' => 'execute_method_scalar',
+        'my_execute_method_void' => 'execute_method_void',
+        'my_execute_scalar' => 'execute_scalar',
+        'my_execute_void' => 'execute_void',
       },
     );
   }
@@ -32,8 +38,22 @@ Calls the coderef, passing it any arguments.
   my $coderef = sub { 'code' };
   my $object  = My::Class->new( attr => $coderef );
   
-  # $coderef->( 1, 2, 3 )
+  # Calls: $coderef->( 1, 2, 3 )
   $object->my_execute( 1, 2, 3 );
+
+=head2 C<< execute_list( @args ) >>
+
+Calls the coderef, passing it any arguments, and forcing list context. If called in scalar context, returns an arrayref.
+
+  my $context;
+  my $coderef = sub { $context = wantarray(); 'code' };
+  my $object  = My::Class->new( attr => $coderef );
+  
+  # Calls: $coderef->( 1, 2, 3 )
+  my $result = $object->my_execute_list( 1, 2, 3 );
+  
+  say Dumper( $result );  ## ==> [ 'code' ]
+  say $context;           ## ==> true
 
 =head2 C<< execute_method( @args ) >>
 
@@ -42,8 +62,78 @@ Calls the coderef as if it were a method, passing any arguments.
   my $coderef = sub { 'code' };
   my $object  = My::Class->new( attr => $coderef );
   
-  # $coderef->( $object, 1, 2, 3 )
+  # Calls: $coderef->( $object, 1, 2, 3 )
   $object->my_execute_method( 1, 2, 3 );
+
+=head2 C<< execute_method_list( @args ) >>
+
+Calls the coderef as if it were a method, passing any arguments, and forcing list context. If called in scalar context, returns an arrayref.
+
+  my $context;
+  my $coderef = sub { $context = wantarray(); 'code' };
+  my $object  = My::Class->new( attr => $coderef );
+  
+  # Calls: $coderef->( $object, 1, 2, 3 )
+  my $result = $object->my_execute_method_list( 1, 2, 3 );
+  
+  say Dumper( $result );  ## ==> [ 'code' ]
+  say $context;           ## ==> true
+
+=head2 C<< execute_method_scalar( @args ) >>
+
+Calls the coderef as if it were a method, passing any arguments, and forcing scalar context.
+
+  my $context;
+  my $coderef = sub { $context = wantarray(); 'code' };
+  my $object  = My::Class->new( attr => $coderef );
+  
+  # Calls: $coderef->( $object, 1, 2, 3 )
+  my $result = $object->my_execute_method_scalar( 1, 2, 3 );
+  
+  say $result;  ## ==> 'code'
+  say $context; ## ==> false
+
+=head2 C<< execute_method_void( @args ) >>
+
+Calls the coderef as if it were a method, passing any arguments, and forcing void context. Returns undef.
+
+  my $context;
+  my $coderef = sub { $context = wantarray(); 'code' };
+  my $object  = My::Class->new( attr => $coderef );
+  
+  # Calls: $coderef->( $object, 1, 2, 3 )
+  my $result = $object->my_execute_method_void( 1, 2, 3 );
+  
+  say $result;  ## ==> undef
+  say $context; ## ==> undef
+
+=head2 C<< execute_scalar( @args ) >>
+
+Calls the coderef, passing it any arguments, and forcing scalar context.
+
+  my $context;
+  my $coderef = sub { $context = wantarray(); 'code' };
+  my $object  = My::Class->new( attr => $coderef );
+  
+  # Calls: $coderef->( 1, 2, 3 )
+  my $result = $object->my_execute_scalar( 1, 2, 3 );
+  
+  say $result;  ## ==> 'code'
+  say $context; ## ==> false
+
+=head2 C<< execute_void( @args ) >>
+
+Calls the coderef, passing it any arguments, and forcing void context. Returns undef.
+
+  my $context;
+  my $coderef = sub { $context = wantarray(); 'code' };
+  my $object  = My::Class->new( attr => $coderef );
+  
+  # Calls: $coderef->( 1, 2, 3 )
+  my $result = $object->my_execute_void( 1, 2, 3 );
+  
+  say $result;  ## ==> undef
+  say $context; ## ==> undef
 
 =head1 EXTENDED EXAMPLES
 

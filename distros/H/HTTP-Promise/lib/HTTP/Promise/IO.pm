@@ -26,6 +26,7 @@ BEGIN
         IPPROTO_TCP
         TCP_NODELAY
         pack_sockaddr_in
+        INADDR_ANY
     );
     use Time::HiRes qw( time );
     use constant ERROR_EINTR => ( abs( Errno::EINTR ) * -1 );
@@ -174,6 +175,31 @@ sub connect
         alarm(0);
     };
     return( $self->error( "Failed to resolve host name '$host': timeout" ) ) if( $@ =~ /timeout/i );
+    
+    my( $lport, $laddr );
+    $lport = $opts->{local_port} if( exists( $opts->{local_port} ) && defined( $opts->{local_port} ) );
+    $laddr = defined( $opts->{local_host} )
+        ? Socket::inet_aton( $opts->{local_host} )
+        : INADDR_ANY;
+    return( $self->error( "Bad local host provided \"$opts->{local_host}\": $!" ) ) if( !defined( $laddr ) );
+    
+    if( defined( $lport ) ||
+        ( $laddr ne INADDR_ANY ) )
+    {
+        my $local_sock_addr = Socket::pack_sockaddr_in( ( $lport // 0 ), $laddr ) || 
+            return( $self->error( "Cannot resolve local host: $opts->{local_host} (port: $opts->{local_port}): $!" ) );
+        CORE::bind( $sock, $local_sock_addr ) || do
+        {
+            if( $laddr ne INADDR_ANY )
+            {
+                return( $self->error( "Unable to bind to local host \"$opts->{local_host}\": $!" ) );
+            }
+            else
+            {
+                return( $self->error( "Unable to bind to local port \"$opts->{local_port}\": $!" ) );
+            }
+        };
+    }
 
     RETRY:
     CORE::socket( $sock, Socket::sockaddr_family( $sock_addr ), SOCK_STREAM, 0 ) ||
@@ -249,6 +275,8 @@ sub connect_ssl
         PeerHost => $host,
         PeerPort => $port,
         Timeout  => $timeout,
+        ( defined( $opts->{local_host} ) ? ( LocalHost => $opts->{local_host} ) : () ),
+        ( defined( $opts->{local_port} ) ? ( LocalPort => $opts->{local_port} ) : () ),
         %$ssl_opts,
     ) or return( $self->error( "Cannot create SSL connection: " . IO::Socket::SSL::errstr() ) );
     $new->_set_sockopts( $sock );
@@ -324,6 +352,8 @@ sub connect_ssl_over_proxy
         PeerHost => "$host",
         PeerPort => "$port",
         Timeout  => "$timeout",
+        ( defined( $opts->{local_host} ) ? ( LocalHost => $opts->{local_host} ) : () ),
+        ( defined( $opts->{local_port} ) ? ( LocalPort => $opts->{local_port} ) : () ),
         %$ssl_opts
     ) or return( $self->error( "Cannot start SSL connection: " . IO::Socket::SSL::errstr() ) );
     $new->_set_sockopts( $sock );

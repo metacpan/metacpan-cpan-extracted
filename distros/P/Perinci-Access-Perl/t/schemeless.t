@@ -378,7 +378,7 @@ subtest "opt: {allow,deny}_paths" => sub {
         status => 200,
         posttest => sub {
             my ($res) = @_;
-            ok(@{$res->[2]} == 2, "number of results"); # fruits, animals
+            is(scalar(@{$res->[2]}), 3, "number of results"); # fruits, animals, simple
         },
     );
     test_request(

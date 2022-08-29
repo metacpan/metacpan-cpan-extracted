@@ -8,7 +8,7 @@
 
 package Apache::Solr::Tables;
 use vars '$VERSION';
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 use base 'Exporter';
 
@@ -19,15 +19,20 @@ captureAttr
 clustering
 clustering.collection
 clustering.results
+collectElevatedDocsWhenCollapsing
 commit
 debug
 debug.explain.structured
 echoHandler
 enableElevation
 exclusive
+expand
+expand.nullGroup
 extractOnly
 facet
+facet.contains.ignoreCase
 facet.date.hardend
+facet.exists
 facet.missing
 facet.range.hardend
 facet.zeros
@@ -38,30 +43,50 @@ group.main
 group.ngroups
 group.truncate
 hl
+hl.highlightMultiTerm
 hl.mergeContiguous
 hl.requireFieldMatch
 hl.useFastVectorHighlighter
+hl.usePhraseHighlighter
+ignoreStopwords
 indent
 literalsOverride
 lowernames
+matchText
 mlt
+mlt.boost
+mlt.match.include
 omitHeader
 overwrite
+skipAltTokens
 spellcheck
+spellcheck.build
 spellcheck.collate
+spellcheck.collateExtendedResults
+spellcheck.extendResults
+spellcheck.onlyMorePopular
+spellcheck.reload
 stats
+suggest
+suggest.build
+suggest.buildAll
+suggest.reload
+suggest.reloadAll
 terms
 terms.lower.incl
 terms.raw
+terms.stats
+terms.ttf
 terms.upper.incl
 tv
 tv.all
 tv.df
 tv.offsets
+tv.payloads
 tv.positions
 tv.tf
 tv.tf_idf
-
+xmlOffsetAdjust
  /;
 
 our %introduced = qw/

@@ -31,7 +31,7 @@ qx.Class.define("callbackery.ui.Footer", {
             else {
                 company = cfg.company_name;
             }
-            who += this.tr(', %1.', company);
+            who += this.tr(', %1', company);
         }
         if (support) {
             who += ' ' + support;

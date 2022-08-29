@@ -10,7 +10,7 @@ use Readonly;
 our $ERROR_MESSAGE;
 Readonly::Array our @EXPORT_OK => qw(check_fork $ERROR_MESSAGE);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 sub check_fork {
 	my ($config_hr, $os) = @_;
@@ -54,7 +54,7 @@ Check::Fork - Check fork functionality.
 
  use Check::Fork qw(check_fork $ERROR_MESSAGE);
 
- my $ret = check_fork();
+ my $ret = check_fork($config_hr, $os);
  print $ERROR_MESSAGE."\n";
 
 =head1 DESCRIPTION
@@ -69,9 +69,14 @@ Extra thing is error message which describe issue.
 
 =head2 C<check_fork>
 
- my $ret = check_fork();
+ my $ret = check_fork($config_hr, $os);
 
 Check possibility of forking functionality on system.
+
+Variable C<$config_hr> is primarily for testing and default is C<\%Config::Config>.
+
+Variable C<$os> is primarily for testing and default is C<$^O>.
+
 Return value is 1 as possible fork() or 0 as not possible fork().
 If return value is 0, set C<$ERROR_MESSAGE> variable.
 
@@ -146,6 +151,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

@@ -1,5 +1,12 @@
 Revision history for JSONSchema-Validator
 
+0.011  2022-08-24
+    - Added checking params from schema
+    - Fixed incorrectly handle array parameters
+    - Added expectation and actual to type mismatch errors
+    - Added the URI of the followed $ref
+    - Improved documentation and tests
+
 0.010  2021-12-01
     - Added verbosity to test (uid66)
     - Fixed bug with $ref and sibling $id

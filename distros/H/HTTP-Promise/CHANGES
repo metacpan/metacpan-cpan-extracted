@@ -1,6 +1,12 @@
 Revision history for Perl module HTTP::Promise
 
-v0.1.6 2022-08-06T19:48:15+0900
+v0.2.0 2022-08-24T10:28:44+0900
+    - Added exportable class function fetch
+    - Corrected an ineffective local_address option and method
+    - Added the local_host and local_port options and methods in HTTP::Promise
+    - Changed HTTP::Promise::IO to support local host and port when making connections
+
+v0.1.6 2022-08-06T19:48:15Z +0900
     - Attempting to correct an issue with THAWing HTTP::Promise::Message
 
 v0.1.5 2022-08-06T13:57:59Z +0900

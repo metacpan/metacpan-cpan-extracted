@@ -1,0 +1,2273 @@
+NAME
+
+    Faker - Fake Data Generator
+
+ABSTRACT
+
+    Extensible Fake Data Generator
+
+VERSION
+
+    1.10
+
+SYNOPSIS
+
+      package main;
+    
+      use Faker;
+    
+      my $faker = Faker->new('en-us');
+    
+      # my $first_name = $faker->person_name;
+    
+      # "Russel Krajcik"
+    
+      # my $last_name = $faker->person_name;
+    
+      # "Alayna Josephine Kunde"
+
+DESCRIPTION
+
+    This distribution provides a library of fake data generators and a
+    framework for extending the library via plugins.
+
+ATTRIBUTES
+
+    This package has the following attributes:
+
+ caches
+
+      caches(HashRef $data) (Object)
+
+    The caches attribute holds the cached values returned from "cache".
+
+    Since 1.10
+
+    caches example 1
+
+        # given: synopsis
+      
+        package main;
+      
+        my $caches = $faker->caches;
+      
+        # bless({value => {}}, 'Venus::Hash')
+
+    caches example 2
+
+        # given: synopsis
+      
+        package main;
+      
+        my $caches = $faker->caches({});
+      
+        # bless({value => {}}, 'Venus::Hash')
+
+ locales
+
+      locales(ArrayRef $data) (Object)
+
+    The locales attribute holds the locales used to find and generate
+    localized data.
+
+    Since 1.10
+
+    locales example 1
+
+        # given: synopsis
+      
+        package main;
+      
+        my $locales = $faker->locales;
+      
+        # bless({value => []}, 'Venus::Array')
+
+    locales example 2
+
+        # given: synopsis
+      
+        package main;
+      
+        my $locales = $faker->locales([]);
+      
+        # bless({value => []}, 'Venus::Array')
+
+INTEGRATES
+
+    This package integrates behaviors from:
+
+    Venus::Role::Buildable
+
+    Venus::Role::Coercible
+
+    Venus::Role::Doable
+
+    Venus::Role::Proxyable
+
+METHODS
+
+    This package provides the following methods:
+
+ address_city_name
+
+      address_city_name(HashRef $data) (Str)
+
+    The address_city_name method returns a random address city name.
+
+    Since 1.10
+
+    address_city_name example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $address_city_name = $faker->address_city_name;
+      
+        # "West Jamison"
+      
+        # $address_city_name = $faker->address_city_name;
+      
+        # "Mayertown"
+      
+        # $address_city_name = $faker->address_city_name;
+      
+        # "Juliaborough"
+
+ address_city_prefix
+
+      address_city_prefix(HashRef $data) (Str)
+
+    The address_city_prefix method returns a random address city prefix.
+
+    Since 1.10
+
+    address_city_prefix example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $address_city_prefix = $faker->address_city_prefix;
+      
+        # "West"
+      
+        # $address_city_prefix = $faker->address_city_prefix;
+      
+        # "West"
+      
+        # $address_city_prefix = $faker->address_city_prefix;
+      
+        # "Lake"
+
+ address_city_suffix
+
+      address_city_suffix(HashRef $data) (Str)
+
+    ok $address_city_suffix method returns a random address city suffix.
+
+    Since 1.10
+
+    address_city_suffix example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $address_city_suffix = $faker->address_city_suffix;
+      
+        # "borough"
+      
+        # $address_city_suffix = $faker->address_city_suffix;
+      
+        # "view"
+      
+        # $address_city_suffix = $faker->address_city_suffix;
+      
+        # "haven"
+
+ address_country_name
+
+      address_country_name(HashRef $data) (Str)
+
+    The address_country_name method returns a random address country name.
+
+    Since 1.10
+
+    address_country_name example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $address_country_name = $faker->address_country_name;
+      
+        # "Greenland"
+      
+        # $address_country_name = $faker->address_country_name;
+      
+        # "Ireland"
+      
+        # $address_country_name = $faker->address_country_name;
+      
+        # "Svalbard & Jan Mayen Islands"
+
+ address_latitude
+
+      address_latitude(HashRef $data) (Str)
+
+    The address_latitude method returns a random address latitude.
+
+    Since 1.10
+
+    address_latitude example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $address_latitude = $faker->address_latitude;
+      
+        # 30.843133
+      
+        # $address_latitude = $faker->address_latitude;
+      
+        # 77.079663
+      
+        # $address_latitude = $faker->address_latitude;
+      
+        # -41.660985
+
+ address_line1
+
+      address_line1(HashRef $data) (Str)
+
+    The address_line1 method returns a random address line1.
+
+    Since 1.10
+
+    address_line1 example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $address_line1 = $faker->address_line1;
+      
+        # "44084 Mayer Brook"
+      
+        # $address_line1 = $faker->address_line1;
+      
+        # "4 Amalia Terrace"
+      
+        # $address_line1 = $faker->address_line1;
+      
+        # "20370 Emard Street"
+
+ address_line2
+
+      address_line2(HashRef $data) (Str)
+
+    The address_line2 method returns a random address line2.
+
+    Since 1.10
+
+    address_line2 example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $address_line2 = $faker->address_line2;
+      
+        # "Mailbox 1408"
+      
+        # $address_line2 = $faker->address_line2;
+      
+        # "Mailbox 684"
+      
+        # $address_line2 = $faker->address_line2;
+      
+        # "Suite 076"
+
+ address_lines
+
+      address_lines(HashRef $data) (Str)
+
+    The address_lines method returns a random address lines.
+
+    Since 1.10
+
+    address_lines example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $address_lines = $faker->address_lines;
+      
+        # "4 Koelpin Plaza Unit 694\nWest Viviane, IA 37022"
+      
+        # $address_lines = $faker->address_lines;
+      
+        # "90558 Greenholt Orchard\nApt. 250\nPfannerstillberg, New Mexico 52836"
+      
+        # $address_lines = $faker->address_lines;
+      
+        # "68768 Weissnat Point\nRitchieburgh, New Mexico 53892"
+
+ address_longitude
+
+      address_longitude(HashRef $data) (Str)
+
+    The address_longitude method returns a random address longitude.
+
+    Since 1.10
+
+    address_longitude example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $address_longitude = $faker->address_longitude;
+      
+        # 30.843133
+      
+        # $address_longitude = $faker->address_longitude;
+      
+        # 77.079663
+      
+        # $address_longitude = $faker->address_longitude;
+      
+        # -41.660985
+
+ address_number
+
+      address_number(HashRef $data) (Str)
+
+    The address_number method returns a random address number.
+
+    Since 1.10
+
+    address_number example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $address_number = $faker->address_number;
+      
+        # 8140
+      
+        # $address_number = $faker->address_number;
+      
+        # 5684
+      
+        # $address_number = $faker->address_number;
+      
+        # 57694
+
+ address_postal_code
+
+      address_postal_code(HashRef $data) (Str)
+
+    The address_postal_code method returns a random address postal code.
+
+    Since 1.10
+
+    address_postal_code example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $address_postal_code = $faker->address_postal_code;
+      
+        # 14084
+      
+        # $address_postal_code = $faker->address_postal_code;
+      
+        # "84550-7694"
+      
+        # $address_postal_code = $faker->address_postal_code;
+      
+        # 43908
+
+ address_region_name
+
+      address_region_name(HashRef $data) (Str)
+
+    The address_region_name method returns a random address region name.
+
+    Since 1.10
+
+    address_region_name example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $address_region_name = $faker->address_region_name;
+      
+        # "Massachusetts"
+      
+        # $address_region_name = $faker->address_region_name;
+      
+        # "MO"
+      
+        # $address_region_name = $faker->address_region_name;
+      
+        # "NE"
+
+ address_state_abbr
+
+      address_state_abbr(HashRef $data) (Str)
+
+    The address_state_abbr method returns a random address state abbr.
+
+    Since 1.10
+
+    address_state_abbr example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $address_state_abbr = $faker->address_state_abbr;
+      
+        # "KY"
+      
+        # $address_state_abbr = $faker->address_state_abbr;
+      
+        # "ME"
+      
+        # $address_state_abbr = $faker->address_state_abbr;
+      
+        # "TX"
+
+ address_state_name
+
+      address_state_name(HashRef $data) (Str)
+
+    The address_state_name method returns a random address state name.
+
+    Since 1.10
+
+    address_state_name example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $address_state_name = $faker->address_state_name;
+      
+        # "Kentucky"
+      
+        # $address_state_name = $faker->address_state_name;
+      
+        # "Massachusetts"
+      
+        # $address_state_name = $faker->address_state_name;
+      
+        # "Texas"
+
+ address_street_address
+
+      address_street_address(HashRef $data) (Str)
+
+    The address_street_address method returns a random address street
+    address.
+
+    Since 1.10
+
+    address_street_address example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $address_street_address = $faker->address_street_address;
+      
+        # "4084 Mayer Brook Suite 94"
+      
+        # $address_street_address = $faker->address_street_address;
+      
+        # "9908 Mustafa Harbor Suite 828"
+      
+        # $address_street_address = $faker->address_street_address;
+      
+        # "958 Greenholt Orchard"
+
+ address_street_name
+
+      address_street_name(HashRef $data) (Str)
+
+    The address_street_name method returns a random address street name.
+
+    Since 1.10
+
+    address_street_name example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $address_street_name = $faker->address_street_name;
+      
+        # "Russel Parkway"
+      
+        # $address_street_name = $faker->address_street_name;
+      
+        # "Mayer Brook"
+      
+        # $address_street_name = $faker->address_street_name;
+      
+        # "Kuhic Path"
+
+ address_street_suffix
+
+      address_street_suffix(HashRef $data) (Str)
+
+    The address_street_suffix method returns a random address street
+    suffix.
+
+    Since 1.10
+
+    address_street_suffix example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $address_street_suffix = $faker->address_street_suffix;
+      
+        # "Key"
+      
+        # $address_street_suffix = $faker->address_street_suffix;
+      
+        # "Mission"
+      
+        # $address_street_suffix = $faker->address_street_suffix;
+      
+        # "Street"
+
+ color_hex_code
+
+      color_hex_code(HashRef $data) (Str)
+
+    The color_hex_code method returns a random color hex code.
+
+    Since 1.10
+
+    color_hex_code example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $color_hex_code = $faker->color_hex_code;
+      
+        # "#57bb49"
+      
+        # $color_hex_code = $faker->color_hex_code;
+      
+        # "#6c1e68"
+      
+        # $color_hex_code = $faker->color_hex_code;
+      
+        # "#db3fb2"
+
+ color_name
+
+      color_name(HashRef $data) (Str)
+
+    The color_name method returns a random color name.
+
+    Since 1.10
+
+    color_name example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $color_name = $faker->color_name;
+      
+        # "GhostWhite"
+      
+        # $color_name = $faker->color_name;
+      
+        # "Khaki"
+      
+        # $color_name = $faker->color_name;
+      
+        # "SeaGreen"
+
+ color_rgb_colorset
+
+      color_rgb_colorset(HashRef $data) (Str)
+
+    The color_rgb_colorset method returns a random color rgb colorset.
+
+    Since 1.10
+
+    color_rgb_colorset example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $color_rgb_colorset = $faker->color_rgb_colorset;
+      
+        # [28, 112, 22]
+      
+        # $color_rgb_colorset = $faker->color_rgb_colorset;
+      
+        # [219, 63, 178]
+      
+        # $color_rgb_colorset = $faker->color_rgb_colorset;
+      
+        # [176, 217, 21]
+
+ color_rgb_colorset_css
+
+      color_rgb_colorset_css(HashRef $data) (Str)
+
+    The color_rgb_colorset_css method returns a random color rgb colorset
+    css.
+
+    Since 1.10
+
+    color_rgb_colorset_css example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $color_rgb_colorset_css = $faker->color_rgb_colorset_css;
+      
+        # "rgb(108, 30, 104)"
+      
+        # $color_rgb_colorset_css = $faker->color_rgb_colorset_css;
+      
+        # "rgb(122, 147, 147)"
+      
+        # $color_rgb_colorset_css = $faker->color_rgb_colorset_css;
+      
+        # "rgb(147, 224, 22)"
+
+ color_safe_hex_code
+
+      color_safe_hex_code(HashRef $data) (Str)
+
+    The color_safe_hex_code method returns a random color safe hex code.
+
+    Since 1.10
+
+    color_safe_hex_code example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $color_safe_hex_code = $faker->color_safe_hex_code;
+      
+        # "#ff0057"
+      
+        # $color_safe_hex_code = $faker->color_safe_hex_code;
+      
+        # "#ff006c"
+      
+        # $color_safe_hex_code = $faker->color_safe_hex_code;
+      
+        # "#ff00db"
+
+ color_safe_name
+
+      color_safe_name(HashRef $data) (Str)
+
+    The color_safe_name method returns a random color safe name.
+
+    Since 1.10
+
+    color_safe_name example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $color_safe_name = $faker->color_safe_name;
+      
+        # "purple"
+      
+        # $color_safe_name = $faker->color_safe_name;
+      
+        # "teal"
+      
+        # $color_safe_name = $faker->color_safe_name;
+      
+        # "fuchsia"
+
+ company_description
+
+      company_description(HashRef $data) (Str)
+
+    The company_description method returns a random company description.
+
+    Since 1.10
+
+    company_description example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $company_description = $faker->company_description;
+      
+        # "Excels at full-range synchronised implementations"
+      
+        # $company_description = $faker->company_description;
+      
+        # "Provides logistical ameliorated methodologies"
+      
+        # $company_description = $faker->company_description;
+      
+        # "Offering hybrid future-proofed applications"
+
+ company_name
+
+      company_name(HashRef $data) (Str)
+
+    The company_name method returns a random company name.
+
+    Since 1.10
+
+    company_name example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $company_name = $faker->company_name;
+      
+        # "Johnston-Steuber"
+      
+        # $company_name = $faker->company_name;
+      
+        # "Skiles-Mayer"
+      
+        # $company_name = $faker->company_name;
+      
+        # "Miller and Sons"
+
+ company_name_suffix
+
+      company_name_suffix(HashRef $data) (Str)
+
+    The company_name_suffix method returns a random company name suffix.
+
+    Since 1.10
+
+    company_name_suffix example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $company_name_suffix = $faker->company_name_suffix;
+      
+        # "Inc."
+      
+        # $company_name_suffix = $faker->company_name_suffix;
+      
+        # "Incorporated"
+      
+        # $company_name_suffix = $faker->company_name_suffix;
+      
+        # "Ventures"
+
+ company_tagline
+
+      company_tagline(HashRef $data) (Str)
+
+    The company_tagline method returns a random company tagline.
+
+    Since 1.10
+
+    company_tagline example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $company_tagline = $faker->company_tagline;
+      
+        # "transform revolutionary supply-chains"
+      
+        # $company_tagline = $faker->company_tagline;
+      
+        # "generate front-end web-readiness"
+      
+        # $company_tagline = $faker->company_tagline;
+      
+        # "iterate back-end content"
+
+ internet_domain_name
+
+      internet_domain_name(HashRef $data) (Str)
+
+    The internet_domain_name method returns a random internet domain name.
+
+    Since 1.10
+
+    internet_domain_name example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $internet_domain_name = $faker->internet_domain_name;
+      
+        # "steuber-krajcik.org"
+      
+        # $internet_domain_name = $faker->internet_domain_name;
+      
+        # "miller-and-sons.com"
+      
+        # $internet_domain_name = $faker->internet_domain_name;
+      
+        # "witting-entertainment.com"
+
+ internet_domain_tld
+
+      internet_domain_tld(HashRef $data) (Str)
+
+    The internet_domain_tld method returns a random internet domain tld.
+
+    Since 1.10
+
+    internet_domain_tld example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $internet_domain_tld = $faker->internet_domain_tld;
+      
+        # "com"
+      
+        # $internet_domain_tld = $faker->internet_domain_tld;
+      
+        # "com"
+      
+        # $internet_domain_tld = $faker->internet_domain_tld;
+      
+        # "org"
+
+ internet_domain_word
+
+      internet_domain_word(HashRef $data) (Str)
+
+    The internet_domain_word method returns a random internet domain word.
+
+    Since 1.10
+
+    internet_domain_word example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $internet_domain_word = $faker->internet_domain_word;
+      
+        # "bode-and-sons"
+      
+        # $internet_domain_word = $faker->internet_domain_word;
+      
+        # "mayer-balistreri-and-miller"
+      
+        # $internet_domain_word = $faker->internet_domain_word;
+      
+        # "kerluke-waelchi"
+
+ internet_email_address
+
+      internet_email_address(HashRef $data) (Str)
+
+    The internet_email_address method returns a random internet email
+    address.
+
+    Since 1.10
+
+    internet_email_address example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $internet_email_address = $faker->internet_email_address;
+      
+        # "russel54\@mayer-balistreri-and-miller.com"
+      
+        # $internet_email_address = $faker->internet_email_address;
+      
+        # "viviane82\@rempel-entertainment.com"
+      
+        # $internet_email_address = $faker->internet_email_address;
+      
+        # "yborer\@outlook.com"
+
+ internet_email_domain
+
+      internet_email_domain(HashRef $data) (Str)
+
+    The internet_email_domain method returns a random internet email
+    domain.
+
+    Since 1.10
+
+    internet_email_domain example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $internet_email_domain = $faker->internet_email_domain;
+      
+        # "icloud.com"
+      
+        # $internet_email_domain = $faker->internet_email_domain;
+      
+        # "icloud.com"
+      
+        # $internet_email_domain = $faker->internet_email_domain;
+      
+        # "yahoo.com"
+
+ internet_ip_address
+
+      internet_ip_address(HashRef $data) (Str)
+
+    The internet_ip_address method returns a random internet ip address.
+
+    Since 1.10
+
+    internet_ip_address example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $internet_ip_address = $faker->internet_ip_address;
+      
+        # "108.20.219.127"
+      
+        # $internet_ip_address = $faker->internet_ip_address;
+      
+        # "7680:93e0:88b2:06a0:c512:99e4:e8a9:7d48"
+      
+        # $internet_ip_address = $faker->internet_ip_address;
+      
+        # "89.236.15.220"
+
+ internet_ip_address_v4
+
+      internet_ip_address_v4(HashRef $data) (Str)
+
+    The internet_ip_address_v4 method returns a random internet ip address
+    v4.
+
+    Since 1.10
+
+    internet_ip_address_v4 example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $internet_ip_address_v4 = $faker->internet_ip_address_v4;
+      
+        # "87.28.108.20"
+      
+        # $internet_ip_address_v4 = $faker->internet_ip_address_v4;
+      
+        # "127.122.176.213"
+      
+        # $internet_ip_address_v4 = $faker->internet_ip_address_v4;
+      
+        # "147.136.6.197"
+
+ internet_ip_address_v6
+
+      internet_ip_address_v6(HashRef $data) (Str)
+
+    The internet_ip_address_v6 method returns a random internet ip address
+    v6.
+
+    Since 1.10
+
+    internet_ip_address_v6 example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $internet_ip_address_v6 = $faker->internet_ip_address_v6;
+      
+        # "57bb:1c70:6c1e:14c3:db3f:7fb1:7a93:b0d9"
+      
+        # $internet_ip_address_v6 = $faker->internet_ip_address_v6;
+      
+        # "7680:93e0:88b2:06a0:c512:99e4:e8a9:7d48"
+      
+        # $internet_ip_address_v6 = $faker->internet_ip_address_v6;
+      
+        # "7f27:7009:5984:ec03:0f75:dc22:f8d4:d951"
+
+ internet_url
+
+      internet_url(HashRef $data) (Str)
+
+    The internet_url method returns a random internet url.
+
+    Since 1.10
+
+    internet_url example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $internet_url = $faker->internet_url;
+      
+        # "https://krajcik-skiles-and-mayer.com/"
+      
+        # $internet_url = $faker->internet_url;
+      
+        # "http://heidenreich-beier.co/"
+      
+        # $internet_url = $faker->internet_url;
+      
+        # "https://goldner-mann-and-emard.org/"
+
+ jargon_adjective
+
+      jargon_adjective(HashRef $data) (Str)
+
+    The jargon_adjective method returns a random jargon adjective.
+
+    Since 1.10
+
+    jargon_adjective example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $jargon_adjective = $faker->jargon_adjective;
+      
+        # "virtual"
+      
+        # $jargon_adjective = $faker->jargon_adjective;
+      
+        # "killer"
+      
+        # $jargon_adjective = $faker->jargon_adjective;
+      
+        # "cutting-edge"
+
+ jargon_adverb
+
+      jargon_adverb(HashRef $data) (Str)
+
+    The jargon_adverb method returns a random jargon adverb.
+
+    Since 1.10
+
+    jargon_adverb example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $jargon_adverb = $faker->jargon_adverb;
+      
+        # "future-proofed"
+      
+        # $jargon_adverb = $faker->jargon_adverb;
+      
+        # "managed"
+      
+        # $jargon_adverb = $faker->jargon_adverb;
+      
+        # "synchronised"
+
+ jargon_noun
+
+      jargon_noun(HashRef $data) (Str)
+
+    The jargon_noun method returns a random jargon noun.
+
+    Since 1.10
+
+    jargon_noun example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $jargon_noun = $faker->jargon_noun;
+      
+        # "action-items"
+      
+        # $jargon_noun = $faker->jargon_noun;
+      
+        # "technologies"
+      
+        # $jargon_noun = $faker->jargon_noun;
+      
+        # "applications"
+
+ jargon_term_prefix
+
+      jargon_term_prefix(HashRef $data) (Str)
+
+    The jargon_term_prefix method returns a random jargon term prefix.
+
+    Since 1.10
+
+    jargon_term_prefix example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $jargon_term_prefix = $faker->jargon_term_prefix;
+      
+        # "encompassing"
+      
+        # $jargon_term_prefix = $faker->jargon_term_prefix;
+      
+        # "full-range"
+      
+        # $jargon_term_prefix = $faker->jargon_term_prefix;
+      
+        # "systematic"
+
+ jargon_term_suffix
+
+      jargon_term_suffix(HashRef $data) (Str)
+
+    The jargon_term_suffix method returns a random jargon term suffix.
+
+    Since 1.10
+
+    jargon_term_suffix example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $jargon_term_suffix = $faker->jargon_term_suffix;
+      
+        # "flexibilities"
+      
+        # $jargon_term_suffix = $faker->jargon_term_suffix;
+      
+        # "graphical user interfaces"
+      
+        # $jargon_term_suffix = $faker->jargon_term_suffix;
+      
+        # "standardization"
+
+ jargon_verb
+
+      jargon_verb(HashRef $data) (Str)
+
+    The jargon_verb method returns a random jargon verb.
+
+    Since 1.10
+
+    jargon_verb example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $jargon_verb = $faker->jargon_verb;
+      
+        # "harness"
+      
+        # $jargon_verb = $faker->jargon_verb;
+      
+        # "strategize"
+      
+        # $jargon_verb = $faker->jargon_verb;
+      
+        # "exploit"
+
+ lorem_paragraph
+
+      lorem_paragraph(HashRef $data) (Str)
+
+    The lorem_paragraph method returns a random lorem paragraph.
+
+    Since 1.10
+
+    lorem_paragraph example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $lorem_paragraph = $faker->lorem_paragraph;
+      
+        # "deleniti fugiat in accusantium animi corrupti dolores. eos ..."
+      
+        # $lorem_paragraph = $faker->lorem_paragraph;
+      
+        # "ducimus placeat autem ut sit adipisci asperiores quae ipsum..."
+      
+        # $lorem_paragraph = $faker->lorem_paragraph;
+      
+        # "dignissimos est magni quia aut et hic eos architecto repudi..."
+
+ lorem_paragraphs
+
+      lorem_paragraphs(HashRef $data) (Str)
+
+    The lorem_paragraphs method returns a random lorem paragraphs.
+
+    Since 1.10
+
+    lorem_paragraphs example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $lorem_paragraphs = $faker->lorem_paragraphs;
+      
+        # "eligendi laudantium provident assumenda voluptates sed iu..."
+      
+        # $lorem_paragraphs = $faker->lorem_paragraphs;
+      
+        # "accusantium ex pariatur perferendis voluptate iusto iure fu..."
+      
+        # $lorem_paragraphs = $faker->lorem_paragraphs;
+      
+        # "sit ut molestiae consequatur error tempora inventore est so..."
+
+ lorem_sentence
+
+      lorem_sentence(HashRef $data) (Str)
+
+    The lorem_sentence method returns a random lorem sentence.
+
+    Since 1.10
+
+    lorem_sentence example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $lorem_sentence = $faker->lorem_sentence;
+      
+        # "vitae et eligendi laudantium provident assumenda voluptates..."
+      
+        # $lorem_sentence = $faker->lorem_sentence;
+      
+        # "aspernatur qui ad error numquam illum sunt cupiditate recus..."
+      
+        # $lorem_sentence = $faker->lorem_sentence;
+      
+        # "incidunt ut ratione sequi non illum laborum dolorum et earu..."
+
+ lorem_sentences
+
+      lorem_sentences(HashRef $data) (Str)
+
+    The lorem_sentences method returns a random lorem sentences.
+
+    Since 1.10
+
+    lorem_sentences example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $lorem_sentences = $faker->lorem_sentences;
+      
+        # "vero deleniti fugiat in accusantium animi corrupti. et eos ..."
+      
+        # $lorem_sentences = $faker->lorem_sentences;
+      
+        # "enim accusantium aliquid id reprehenderit consequatur ducim..."
+      
+        # $lorem_sentences = $faker->lorem_sentences;
+      
+        # "reprehenderit ut autem cumque ea sint dolorem impedit et qu..."
+
+ lorem_word
+
+      lorem_word(HashRef $data) (Str)
+
+    The lorem_word method returns a random lorem word.
+
+    Since 1.10
+
+    lorem_word example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $lorem_word = $faker->lorem_word;
+      
+        # "nisi"
+      
+        # $lorem_word = $faker->lorem_word;
+      
+        # "nihil"
+      
+        # $lorem_word = $faker->lorem_word;
+      
+        # "vero"
+
+ lorem_words
+
+      lorem_words(HashRef $data) (Str)
+
+    The lorem_words method returns a random lorem words.
+
+    Since 1.10
+
+    lorem_words example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $lorem_words = $faker->lorem_words;
+      
+        # "aut vitae et eligendi laudantium"
+      
+        # $lorem_words = $faker->lorem_words;
+      
+        # "accusantium animi corrupti dolores aliquid"
+      
+        # $lorem_words = $faker->lorem_words;
+      
+        # "eos pariatur quia corporis illo"
+
+ new
+
+      new(Str $data | ArrayRef $data | HashRef $data) (Faker)
+
+    The new method returns a new instance of the class.
+
+    Since 1.10
+
+    new example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $first_name = $faker->person_name;
+      
+        # "Russel Krajcik"
+
+    new example 2
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new(['en-us', 'es-es']);
+      
+        # my $first_name = $faker->person_name;
+      
+        # "Rafael Loera"
+
+    new example 3
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new({locales => ['en-us']});
+      
+        # my $first_name = $faker->person_name;
+      
+        # "Russel Krajcik"
+
+ payment_card_american_express
+
+      payment_card_american_express(HashRef $data) (Str)
+
+    The payment_card_american_express method returns a random payment card
+    american express.
+
+    Since 1.10
+
+    payment_card_american_express example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $payment_card_american_express = $faker->payment_card_american_express;
+      
+        # 34140844684550
+      
+        # $payment_card_american_express = $faker->payment_card_american_express;
+      
+        # 37945443908982
+      
+        # $payment_card_american_express = $faker->payment_card_american_express;
+      
+        # 34370225828820
+
+ payment_card_discover
+
+      payment_card_discover(HashRef $data) (Str)
+
+    The payment_card_discover method returns a random payment card
+    discover.
+
+    Since 1.10
+
+    payment_card_discover example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $payment_card_discover = $faker->payment_card_discover;
+      
+        # 601131408446845
+      
+        # $payment_card_discover = $faker->payment_card_discover;
+      
+        # 601107694544390
+      
+        # $payment_card_discover = $faker->payment_card_discover;
+      
+        # 601198220370225
+
+ payment_card_expiration
+
+      payment_card_expiration(HashRef $data) (Str)
+
+    The payment_card_expiration method returns a random payment card
+    expiration.
+
+    Since 1.10
+
+    payment_card_expiration example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $payment_card_expiration = $faker->payment_card_expiration;
+      
+        # "02/24"
+      
+        # $payment_card_expiration = $faker->payment_card_expiration;
+      
+        # "11/23"
+      
+        # $payment_card_expiration = $faker->payment_card_expiration;
+      
+        # "09/24"
+
+ payment_card_mastercard
+
+      payment_card_mastercard(HashRef $data) (Str)
+
+    The payment_card_mastercard method returns a random payment card
+    mastercard.
+
+    Since 1.10
+
+    payment_card_mastercard example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $payment_card_mastercard = $faker->payment_card_mastercard;
+      
+        # 521408446845507
+      
+        # $payment_card_mastercard = $faker->payment_card_mastercard;
+      
+        # 554544390898220
+      
+        # $payment_card_mastercard = $faker->payment_card_mastercard;
+      
+        # 540225828820558
+
+ payment_card_number
+
+      payment_card_number(HashRef $data) (Str)
+
+    The payment_card_number method returns a random payment card number.
+
+    Since 1.10
+
+    payment_card_number example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $payment_card_number = $faker->payment_card_number;
+      
+        # 453208446845507
+      
+        # $payment_card_number = $faker->payment_card_number;
+      
+        # 37443908982203
+      
+        # $payment_card_number = $faker->payment_card_number;
+      
+        # 491658288205589
+
+ payment_card_visa
+
+      payment_card_visa(HashRef $data) (Str)
+
+    The payment_card_visa method returns a random payment card visa.
+
+    Since 1.10
+
+    payment_card_visa example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $payment_card_visa = $faker->payment_card_visa;
+      
+        # 453214084468
+      
+        # $payment_card_visa = $faker->payment_card_visa;
+      
+        # 402400715076
+      
+        # $payment_card_visa = $faker->payment_card_visa;
+      
+        # 492954439089
+
+ payment_vendor
+
+      payment_vendor(HashRef $data) (Str)
+
+    The payment_vendor method returns a random payment vendor.
+
+    Since 1.10
+
+    payment_vendor example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $payment_vendor = $faker->payment_vendor;
+      
+        # "Visa"
+      
+        # $payment_vendor = $faker->payment_vendor;
+      
+        # "MasterCard"
+      
+        # $payment_vendor = $faker->payment_vendor;
+      
+        # "American Express"
+
+ person_first_name
+
+      person_first_name(HashRef $data) (Str)
+
+    The person_first_name method returns a random person first name.
+
+    Since 1.10
+
+    person_first_name example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $person_first_name = $faker->person_first_name;
+      
+        # "Haskell"
+      
+        # $person_first_name = $faker->person_first_name;
+      
+        # "Jamison"
+      
+        # $person_first_name = $faker->person_first_name;
+      
+        # "Keeley"
+
+ person_formal_name
+
+      person_formal_name(HashRef $data) (Str)
+
+    The person_formal_name method returns a random person formal name.
+
+    Since 1.10
+
+    person_formal_name example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $person_formal_name = $faker->person_formal_name;
+      
+        # "Russel Krajcik"
+      
+        # $person_formal_name = $faker->person_formal_name;
+      
+        # "Miss Josephine Forest Beier DDS"
+      
+        # $person_formal_name = $faker->person_formal_name;
+      
+        # "Duncan Mann"
+
+ person_gender
+
+      person_gender(HashRef $data) (Str)
+
+    The person_gender method returns a random person gender.
+
+    Since 1.10
+
+    person_gender example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $person_gender = $faker->person_gender;
+      
+        # "male"
+      
+        # $person_gender = $faker->person_gender;
+      
+        # "male"
+      
+        # $person_gender = $faker->person_gender;
+      
+        # "female"
+
+ person_last_name
+
+      person_last_name(HashRef $data) (Str)
+
+    The person_last_name method returns a random person last name.
+
+    Since 1.10
+
+    person_last_name example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $person_last_name = $faker->person_last_name;
+      
+        # "Heaney"
+      
+        # $person_last_name = $faker->person_last_name;
+      
+        # "Johnston"
+      
+        # $person_last_name = $faker->person_last_name;
+      
+        # "Steuber"
+
+ person_name
+
+      person_name(HashRef $data) (Str)
+
+    The person_name method returns a random person name.
+
+    Since 1.10
+
+    person_name example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $person_name = $faker->person_name;
+      
+        # "Russel Krajcik"
+      
+        # $person_name = $faker->person_name;
+      
+        # "Alayna Josephine Kunde"
+      
+        # $person_name = $faker->person_name;
+      
+        # "Viviane Fritsch"
+
+ person_name_prefix
+
+      person_name_prefix(HashRef $data) (Str)
+
+    The person_name_prefix method returns a random person name prefix.
+
+    Since 1.10
+
+    person_name_prefix example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $person_name_prefix = $faker->person_name_prefix;
+      
+        # "Mr."
+      
+        # $person_name_prefix = $faker->person_name_prefix;
+      
+        # "Mr."
+      
+        # $person_name_prefix = $faker->person_name_prefix;
+      
+        # "Sir"
+
+ person_name_suffix
+
+      person_name_suffix(HashRef $data) (Str)
+
+    The person_name_suffix method returns a random person name suffix.
+
+    Since 1.10
+
+    person_name_suffix example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $person_name_suffix = $faker->person_name_suffix;
+      
+        # "I"
+      
+        # $person_name_suffix = $faker->person_name_suffix;
+      
+        # "I"
+      
+        # $person_name_suffix = $faker->person_name_suffix;
+      
+        # "II"
+
+ software_author
+
+      software_author(HashRef $data) (Str)
+
+    The software_author method returns a random software author.
+
+    Since 1.10
+
+    software_author example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $software_author = $faker->software_author;
+      
+        # "Jamison Skiles"
+      
+        # $software_author = $faker->software_author;
+      
+        # "Josephine Kunde"
+      
+        # $software_author = $faker->software_author;
+      
+        # "Darby Boyer"
+
+ software_name
+
+      software_name(HashRef $data) (Str)
+
+    The software_name method returns a random software name.
+
+    Since 1.10
+
+    software_name example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $software_name = $faker->software_name;
+      
+        # "Job"
+      
+        # $software_name = $faker->software_name;
+      
+        # "Zamit"
+      
+        # $software_name = $faker->software_name;
+      
+        # "Stronghold"
+
+ software_semver
+
+      software_semver(HashRef $data) (Str)
+
+    The software_semver method returns a random software semver.
+
+    Since 1.10
+
+    software_semver example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $software_semver = $faker->software_semver;
+      
+        # "1.4.0"
+      
+        # $software_semver = $faker->software_semver;
+      
+        # "4.6.8"
+      
+        # $software_semver = $faker->software_semver;
+      
+        # "5.0.7"
+
+ software_version
+
+      software_version(HashRef $data) (Str)
+
+    The software_version method returns a random software version.
+
+    Since 1.10
+
+    software_version example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $software_version = $faker->software_version;
+      
+        # 1.4
+      
+        # $software_version = $faker->software_version;
+      
+        # "0.4.4"
+      
+        # $software_version = $faker->software_version;
+      
+        # "0.4.5"
+
+ telephone_number
+
+      telephone_number(HashRef $data) (Str)
+
+    The telephone_number method returns a random telephone number.
+
+    Since 1.10
+
+    telephone_number example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $telephone_number = $faker->telephone_number;
+      
+        # "01408446845"
+      
+        # $telephone_number = $faker->telephone_number;
+      
+        # "769-454-4390"
+      
+        # $telephone_number = $faker->telephone_number;
+      
+        # "1-822-037-0225x82882"
+
+ user_login
+
+      user_login(HashRef $data) (Str)
+
+    The user_login method returns a random user login.
+
+    Since 1.10
+
+    user_login example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $user_login = $faker->user_login;
+      
+        # "Russel44"
+      
+        # $user_login = $faker->user_login;
+      
+        # "aMayer7694"
+      
+        # $user_login = $faker->user_login;
+      
+        # "Amalia89"
+
+ user_password
+
+      user_password(HashRef $data) (Str)
+
+    The user_password method returns a random user password.
+
+    Since 1.10
+
+    user_password example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $user_password = $faker->user_password;
+      
+        # "48R+a}[Lb?&0725"
+      
+        # $user_password = $faker->user_password;
+      
+        # ",0w\$h4155>*0M"
+      
+        # $user_password = $faker->user_password;
+      
+        # ")P2^'q695a}8GX"
+
+FEATURES
+
+    This package provides the following features:
+
+    plugins-feature
+
+      This package loads and dispatches calls to plugins (the fake data
+      generators) which allow for extending the library in
+      environment-specific ways.
+
+      example 1
+
+        package Faker::Plugin::HttpContentType;
+      
+        use base 'Faker::Plugin';
+      
+        sub execute {
+          'video/mpeg'
+        }
+      
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new;
+      
+        my $http_content_type = $faker->http_content_type;
+      
+        # "video/mpeg"
+
+      example 2
+
+        package Faker::Plugin::HttpContentType;
+      
+        use base 'Faker::Plugin';
+      
+        sub execute {
+          'video/mpeg'
+        }
+      
+        package main;
+      
+        my $plugin = Faker::Plugin::HttpContentType->new;
+      
+        my $http_content_type = $plugin->execute;
+      
+        # "video/mpeg"
+
+    locales-feature
+
+      This package can be configured to return localized fake data,
+      typically organized under namespaces specific to the locale
+      specified.
+
+      example 1
+
+        package Faker::Plugin::Dothraki::RandomPhrase;
+      
+        use base 'Faker::Plugin';
+      
+        sub execute {
+          'Hash yer dothrae chek asshekh?'
+        }
+      
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('dothraki');
+      
+        my $random_phrase = $faker->random_phrase;
+      
+        # "Hash yer dothrae chek asshekh?"
+
+      example 2
+
+        package Faker::Plugin::Klingon::RandomPhrase;
+      
+        use base 'Faker::Plugin';
+      
+        sub execute {
+          'nuqDaq ’oH puchpa’’e’'
+        }
+      
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('klingon');
+      
+        my $random_phrase = $faker->random_phrase;
+      
+        # "nuqDaq ’oH puchpa’’e’"
+
+      example 3
+
+        package Faker::Plugin::Dothraki::RandomPhrase;
+      
+        use base 'Faker::Plugin';
+      
+        sub execute {
+          'Hash yer dothrae chek asshekh?'
+        }
+      
+        package Faker::Plugin::Klingon::RandomPhrase;
+      
+        use base 'Faker::Plugin';
+      
+        sub execute {
+          'nuqDaq ’oH puchpa’’e’'
+        }
+      
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new(['dothraki', 'klingon']);
+      
+        my $random_phrase = $faker->random_phrase;
+      
+        # "nuqDaq ’oH puchpa’’e’"
+      
+        # $random_phrase = $faker->random_phrase;
+      
+        # "Hash yer dothrae chek asshekh?"
+      
+        # $random_phrase = $faker->random_phrase;
+      
+        # "nuqDaq ’oH puchpa’’e’"
+      
+        # $random_phrase = $faker->random_phrase;
+      
+        # "nuqDaq ’oH puchpa’’e’"
+
+    caching-feature
+
+      Often one generator's fake data is composed of the output from other
+      generators. Caching can be used to make generators faster, and to
+      make fake data more realistic.
+
+      example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        my $person_first_name = $faker->person_first_name;
+      
+        # "Jordi"
+      
+        my $person_last_name = $faker->person_last_name;
+      
+        # "Smitham"
+      
+        my $internet_email_address = $faker->internet_email_address;
+      
+        # "deshaun8768@hotmail.com"
+      
+        $person_first_name = $faker->cache('person_first_name');
+      
+        # "Arlene"
+      
+        $person_last_name = $faker->cache('person_last_name');
+      
+        # "Cassin"
+      
+        $internet_email_address = $faker->internet_email_address;
+      
+        # "arlene6025@proton.me"
+
+AUTHORS
+
+    Awncorp, awncorp@cpan.org
+

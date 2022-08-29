@@ -7,6 +7,7 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
+NEWS
 README
 SIGNATURE
 TODO
@@ -42,3 +43,4 @@ t/10no.t
 t/11noncode.t
 t/12noncodegenerators.t
 t/13doesntexist.t
+t/14lexical.t

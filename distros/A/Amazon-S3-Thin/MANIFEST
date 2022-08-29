@@ -16,6 +16,7 @@ minil.toml
 t/00_compile.t
 t/01_accessors.t
 t/01_new.t
+t/02_credentials_ecs_container.t
 t/02_credentials_metadata.t
 t/02_signer_v2.t
 t/02_signer_v4.t

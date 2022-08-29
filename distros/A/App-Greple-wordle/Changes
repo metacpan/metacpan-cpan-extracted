@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-wordle
 
+0.12 2022-08-26T08:19:39Z
+
+    - change --try option to --trial
+
 0.11 2022-05-03T00:36:16Z
 
     - show help message

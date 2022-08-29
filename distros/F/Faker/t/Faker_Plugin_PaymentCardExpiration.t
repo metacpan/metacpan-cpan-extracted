@@ -1,11 +1,15 @@
-use 5.014;
+package main;
+
+use 5.018;
 
 use strict;
 use warnings;
-use routines;
 
-use Test::Auto;
 use Test::More;
+use Venus::Test;
+
+my $test = test(__FILE__);
+my $seed = 42;
 
 =name
 
@@ -13,88 +17,162 @@ Faker::Plugin::PaymentCardExpiration
 
 =cut
 
-=abstract
+$test->for('name');
 
-Payment Card Expiration Plugin for Faker
+=tagline
+
+Payment Card Expiration
 
 =cut
 
+$test->for('tagline');
+
+=abstract
+
+Payment Card Expiration for Faker
+
+=cut
+
+$test->for('abstract');
+
 =includes
 
+method: new
 method: execute
 
 =cut
 
-=libraries
-
-Types::Standard
-
-=cut
+$test->for('includes');
 
 =synopsis
 
   package main;
 
-  use Faker;
   use Faker::Plugin::PaymentCardExpiration;
 
-  my $f = Faker->new;
-  my $p = Faker::Plugin::PaymentCardExpiration->new(faker => $f);
+  my $plugin = Faker::Plugin::PaymentCardExpiration->new;
 
-  my $plugin = $p;
-
-=cut
-
-=inherits
-
-Data::Object::Plugin
+  # bless(..., "Faker::Plugin::PaymentCardExpiration")
 
 =cut
 
-=attributes
+$test->for('synopsis', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Faker::Plugin::PaymentCardExpiration');
 
-faker: ro, req, ConsumerOf["Faker::Maker"]
-
-=cut
+  $result
+});
 
 =description
 
-This package provides methods for generating fake payment card expiration data.
+This package provides methods for generating fake data for payment card expiration.
+
++=encoding utf8
 
 =cut
+
+$test->for('description');
+
+=inherits
+
+Faker::Plugin
+
+=cut
+
+$test->for('inherits');
 
 =method execute
 
-The execute method returns a random fake payment card expiration.
+The execute method returns a returns a random fake payment card expiration.
 
 =signature execute
 
-execute() : Str
+  execute(HashRef $data) (Str)
+
+=metadata execute
+
+{
+  since => '1.10',
+}
 
 =example-1 execute
 
-  # given: synopsis
+  package main;
 
-  $p->execute;
+  use Faker::Plugin::PaymentCardExpiration;
+
+  my $plugin = Faker::Plugin::PaymentCardExpiration->new;
+
+  # bless(..., "Faker::Plugin::PaymentCardExpiration")
+
+  # my $result = $plugin->execute;
+
+  # "02/24";
+
+  # my $result = $plugin->execute;
+
+  # "11/23";
+
+  # my $result = $plugin->execute;
+
+  # "09/24";
 
 =cut
 
-package main;
-
-my $test = testauto(__FILE__);
-
-my $subs = $test->standard;
-
-$subs->synopsis(fun($tryable) {
+$test->for('example', 1, 'execute', sub {
+  my ($tryable) = @_;
   ok my $result = $tryable->result;
+  ok $result->isa('Faker::Plugin::PaymentCardExpiration');
+  ok $result->faker;
+  ok $result->faker->random->reseed($seed);
+  ok $result->faker->random->make; # reset randomizer
+  is $result->execute, "02/24";
+  ok $result->faker->random->make; # reset randomizer
+  is $result->execute, "11/23";
+  ok $result->faker->random->make; # reset randomizer
+  is $result->execute, "09/24";
 
   $result
 });
 
-$subs->example(-1, 'execute', 'method', fun($tryable) {
+=method new
+
+The new method returns a new instance of the class.
+
+=signature new
+
+  new(HashRef $data) (Plugin)
+
+=metadata new
+
+{
+  since => '1.10',
+}
+
+=example-1 new
+
+  package main;
+
+  use Faker::Plugin::PaymentCardExpiration;
+
+  my $plugin = Faker::Plugin::PaymentCardExpiration->new;
+
+  # bless(..., "Faker::Plugin::PaymentCardExpiration")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
   ok my $result = $tryable->result;
+  ok $result->isa('Faker::Plugin::PaymentCardExpiration');
+  ok $result->faker;
 
   $result
 });
+
+# END
+
+$test->render('lib/Faker/Plugin/PaymentCardExpiration.pod') if $ENV{RENDER};
 
 ok 1 and done_testing;

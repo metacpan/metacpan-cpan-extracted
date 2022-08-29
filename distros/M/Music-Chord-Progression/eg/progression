@@ -18,8 +18,7 @@ my $prog = Music::Chord::Progression->new(
 my $chords = $prog->generate;
 
 for my $chord (@$chords) {
-    my @chord = midi_format(@$chord);
-    $score->n('wn', @chord);
+    $score->n('wn', midi_format(@$chord));
 }
 
 $score->write_score("$0.mid");

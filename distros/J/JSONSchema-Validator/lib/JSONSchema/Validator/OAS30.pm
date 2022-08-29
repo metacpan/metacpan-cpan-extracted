@@ -212,7 +212,11 @@ sub _validate_params {
     for my $type (keys %$schema_params) {
         next unless %{$schema_params->{$type}};
         # skip validation if user not specify getter for such params type
-        next unless $get_user_param->{$type};
+        if (not exists $get_user_param->{$type}) {
+            push @{$ctx->{errors}}, error(message => qq{schema specifies '$type' parameters, but '$type' parameter missing in instance data});
+            $result = 0;
+            next;
+        }
         my $r = $self->_validate_type_params($ctx, $type, $schema_params->{$type}, $get_user_param->{$type});
         $result = 0 unless $r;
     }
@@ -244,29 +248,25 @@ sub _validate_type_params {
 
         next unless $data_ptr->xget('schema') || $data_ptr->xget('content');
 
-        $value = [$value] if ref $value ne 'ARRAY';
+        my ($r, $errors, $warnings);
 
-        for my $v (@$value) {
-            my ($r, $errors, $warnings);
-
-            if ($data_ptr->xget('schema')) {
-                my $schema_ptr = $data_ptr->xget('schema');
-                ($r, $errors, $warnings) = $self->validate_schema($v,
-                    schema => $schema_ptr->value,
-                    path => '/',
-                    direction => $ctx->{direction},
-                    scope => $schema_ptr->scope
-                );
-            } elsif ($data_ptr->xget('content')) {
-                ($r, $errors, $warnings) = $self->_validate_content($ctx, $data_ptr, undef, $v);
-            }
-
-            unless ($r) {
-                push @{$ctx->{errors}}, error(message => qq{$type param "$param" has error}, context => $errors);
-                $result = 0;
-            }
-            push @{$ctx->{warnings}}, error(message => qq{$type param "$param" has warning}, context => $warnings) if @$warnings;
+        if ($data_ptr->xget('schema')) {
+            my $schema_ptr = $data_ptr->xget('schema');
+            ($r, $errors, $warnings) = $self->validate_schema($value,
+                schema => $schema_ptr->value,
+                path => '/',
+                direction => $ctx->{direction},
+                scope => $schema_ptr->scope
+            );
+        } elsif ($data_ptr->xget('content')) {
+            ($r, $errors, $warnings) = $self->_validate_content($ctx, $data_ptr, undef, $value);
         }
+
+        unless ($r) {
+            push @{$ctx->{errors}}, error(message => qq{$type param "$param" has error}, context => $errors);
+            $result = 0;
+        }
+        push @{$ctx->{warnings}}, error(message => qq{$type param "$param" has warning}, context => $warnings) if @$warnings;
     }
 
     return $result;
@@ -286,12 +286,12 @@ sub _validate_content {
     if ($content_type) {
         $ctype_ptr = $content_ptr->xget($content_type);
         unless ($ctype_ptr) {
-            return 0, [error(message => qq{content with content-type $content_type is omit in schema})], [];
+            return 0, [error(message => qq{content with content-type $content_type is not in schema})], [];
         }
     } else {
         my $mtype_map = $content_ptr->value;
         my @keys = $content_ptr->keys(raw => 1);
-        return 0, [error(message => qq{schema must has exactly one content_type})], [] unless scalar(@keys) == 1;
+        return 0, [error(message => qq{content type not specified; schema must have exactly one content_type})], [] unless scalar(@keys) == 1;
 
         $content_type = $keys[0];
         $ctype_ptr = $content_ptr->xget($content_type);
@@ -415,7 +415,7 @@ JSONSchema::Validator::OAS30 - Validator for OpenAPI Specification 3.0
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

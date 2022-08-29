@@ -13,17 +13,27 @@ use File::Spec;
 use File::Which;
 use Cwd;
 
+my $GMAKE_PATH = _find_gmake();
+
+if (!$GMAKE_PATH) {
+    die "GNU Make ($Config{'gmake'}) is required.\n";
+}
+elsif (!-x $GMAKE_PATH) {
+    if ($!) {
+        die "Failed to detect if GNU Make ($GMAKE_PATH) is executable: $!\n";
+    }
+
+    die "GNU Make ($GMAKE_PATH) is not executable.\n";
+}
+
+my $ATOMIC_ENV_KEY = 'JS_QUICKJS_LINK_LIBATOMIC';
+
 my $PERL_QJS_MAKEFILE_PATH = File::Spec->catfile( Cwd::getcwd(), 'Makefile.quickjs');
 
 my $libpath = File::Spec->catfile('quickjs', 'libquickjs.a');
 
 # quickjs needs these; pre-5.20 perls didn’t include libpthread:
 my @libs = qw(-lm -ldl -lpthread);
-
-# RaspiOS needs this:
-if (_can_link_libatomic()) {
-    push @libs, '-latomic';
-}
 
 if (_need_librt()) {
     push @libs, '-lrt';
@@ -35,7 +45,12 @@ if (!_stdatomic_h_exists()) {
     _avoid_stdatomic_h();
 }
 
-make_libquickjs();
+make_libquickjs_makefile();
+
+# RaspiOS needs this; others may, too:
+if (_should_link_libatomic()) {
+    push @libs, '-latomic';
+}
 
 WriteMakefile(
     NAME              => 'JavaScript::QuickJS',
@@ -74,6 +89,25 @@ WriteMakefile(
         },
     },
 );
+
+#----------------------------------------------------------------------
+
+# CPAN offers Alien::gmake, but there’s a significant dependency tree
+# involved there.
+sub _find_gmake {
+    my $gmake;
+
+    if (my $make = File::Which::which($Config{'make'})) {
+        my $out = `$make --version`;
+        if ($out =~ m<gnu>i) {
+            $gmake = $make;
+        }
+    }
+
+    $gmake ||= File::Which::which($Config{'gmake'});
+
+    return $gmake;
+}
 
 sub _tweak_for_os {
     my %bsd_fix = (
@@ -173,21 +207,49 @@ sub _need_librt {
     return $_cached_need_librt = $ok;
 }
 
-sub _can_link_libatomic {
-    my $dir = File::Temp::tempdir( CLEANUP => 1 );
-    open my $fh, '>', "$dir/test.c";
-    syswrite $fh, join(
-        "\n",
-        'int main() { return 0; }',
-    );
+sub _should_link_libatomic {
+    -e $PERL_QJS_MAKEFILE_PATH or die "Need quickjs makefile!";
 
-    print "Checking whether this system can link libatomic …\n";
+    my $env_value = $ENV{$ATOMIC_ENV_KEY};
 
-    my $ok = !system $Config{'cc'}, "$dir/test.c", '-latomic';
+    if (defined $env_value) {
+        if ($env_value) {
+            if ($env_value ne '1') {
+                die "Set $ATOMIC_ENV_KEY to 1 or a falsy value.\n";
+            }
 
-    print "\t… " . ($ok ? 'Looks like it.' : 'Guess not.') . "\n";
+            print "You’ve forcibly enabled linking against libatomic.\n";
+            return 1;
+        }
+        else {
+            print "You’ve forcibly disabled linking against libatomic.\n";
+            return 0;
+        }
+    }
 
-    return $ok;
+    print "Does QuickJS need -latomic? (compiling core object file) …\n";
+
+    my $rel_objpath = File::Spec->catfile( qw( .obj quickjs.nolto.o ) );
+    my $objpath = File::Spec->catfile( 'quickjs', $rel_objpath );
+
+    my $needs_libatomic;
+
+    eval {
+        system $GMAKE_PATH, '-C', 'quickjs', '-f', $PERL_QJS_MAKEFILE_PATH, $rel_objpath;
+        die if $?;
+        my $objbin = File::Slurper::read_binary($objpath);
+
+        $needs_libatomic = -1 != index($objbin, '__atomic_fetch_sub_');
+    };
+
+    if ($@) {
+        print "\tFailed to detect (assuming no): $@";
+    }
+    else {
+        print "\t… " . ($needs_libatomic ? 'Looks like it.' : 'Guess not.') . "\n";
+    }
+
+    return $needs_libatomic;
 }
 
 sub _stdatomic_h_exists {
@@ -229,7 +291,7 @@ sub _avoid_stdatomic_h {
     File::Slurper::write_binary($qjs_libc_path, $quickjs_libc_c);
 }
 
-sub make_libquickjs {
+sub make_libquickjs_makefile {
     my $mfpath = File::Spec->catfile('quickjs', 'Makefile');
 
     open my $rfh, '<', $mfpath or die "open Makefile: $!";
@@ -261,20 +323,12 @@ package MY;
 
 use Config;
 
-sub _gmake_path {
-
-    # QuickJS requires GNU make.
-    return ( ($^O =~ m<bsd>i) ? $Config{'gmake'} : '$(MAKE)' );
-}
-
 sub postamble {
-    my $gmake_path = _gmake_path();
-
     return <<"MAKE_FRAG"
 
 .PHONY:
 build-quickjs:
-\t$gmake_path -C quickjs -f '$PERL_QJS_MAKEFILE_PATH' libquickjs.a
+\t$GMAKE_PATH -C quickjs -f '$PERL_QJS_MAKEFILE_PATH' libquickjs.a
 MAKE_FRAG
 }
 

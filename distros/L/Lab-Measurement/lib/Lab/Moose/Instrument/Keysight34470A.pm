@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Keysight34470A;
-$Lab::Moose::Instrument::Keysight34470A::VERSION = '3.821';
+$Lab::Moose::Instrument::Keysight34470A::VERSION = '3.822';
 #ABSTRACT: Keysight 34470A digital multimeter.
 
 use v5.20;
@@ -38,7 +38,7 @@ Lab::Moose::Instrument::Keysight34470A - Keysight 34470A digital multimeter.
 
 =head1 VERSION
 
-version 3.821
+version 3.822
 
 =head1 DESCRIPTION
 

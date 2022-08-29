@@ -1,7 +1,9 @@
+use 5.020;
 use lib 't/lib';
 use Test2::Plugin::FauxHomeDir;
 use Test2::Plugin::HTTPTinyFile;
 use Test2::V0 -no_srand => 1;
+use experimental qw( signatures );
 use App::cpangitify;
 use File::Glob qw( bsd_glob );
 use Capture::Tiny qw( capture_merged );
@@ -10,8 +12,7 @@ use URI::file;
 use Path::Class qw( file dir );
 use Git::Wrapper;
 
-$App::cpangitify::_run_cb = sub {
-  my($git, @command) = @_;
+$App::cpangitify::_run_cb = sub ($git, @command) {
   note "+ git @command";
 };
 
@@ -86,9 +87,8 @@ pass 'okay';
 
 done_testing;
 
-sub mycheck
+sub mycheck ($tag)
 {
-  my $tag = shift;
   $git->checkout($tag);
   subtest "version $tag" => sub {
     plan tests => @yes + @no;

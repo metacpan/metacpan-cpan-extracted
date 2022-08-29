@@ -25,6 +25,7 @@ BEGIN {
       'my_count' => 'count',
       'my_defined' => 'defined',
       'my_delete' => 'delete',
+      'my_delete_where' => 'delete_where',
       'my_elements' => 'elements',
       'my_exists' => 'exists',
       'my_for_each_key' => 'for_each_key',
@@ -109,6 +110,23 @@ subtest 'Testing my_delete' => sub {
     ok( !(exists $object->attr->{foo}), q{exists $object->attr->{foo} is false} );
   };
   is( $e, undef, 'no exception thrown running delete example' );
+};
+
+## delete_where
+
+can_ok( 'My::Class', 'my_delete_where' );
+
+subtest 'Testing my_delete_where' => sub {
+  my $e = exception {
+    my $object = My::Class->new( attr => { foo => 0, bar => 1, baz => 2 } );
+    $object->my_delete_where( sub { $_ eq 'foo' or $_ eq 'bar' } );
+    is_deeply( $object->attr, { baz => 2 }, q{$object->attr deep match} );
+    
+    my $object2 = My::Class->new( attr => { foo => 0, bar => 1, baz => 2 } );
+    $object2->my_delete_where( qr/^b/ );
+    is_deeply( $object2->attr, { foo => 0 }, q{$object2->attr deep match} );
+  };
+  is( $e, undef, 'no exception thrown running delete_where example' );
 };
 
 ## elements

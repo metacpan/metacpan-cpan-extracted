@@ -1,6 +1,7 @@
 Changes
 examples/check_fork.pl
 Fork.pm
+Fork/HardcodedUsage.pod
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

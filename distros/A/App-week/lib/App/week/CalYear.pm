@@ -36,6 +36,7 @@ my %config = (
     crashspace => undef,
     tabify     => undef,
     shortmonth => undef,
+    weeknumber => 0,	# 0)none 1)us 2)standard 3)iso
 );
 lock_keys %config;
 
@@ -47,7 +48,9 @@ sub Configure {
 
 sub CalYear {
     my $year = sprintf "%4d", shift;
-    my $cal = normalize(cal($year));
+    my $cal = normalize(
+	$config{weeknumber} > 1 ? gcal($year) : cal($year)
+	);
     my @cal = split /\n/, $cal, -1;
     my @monthline = do {
 	map  { $_ - 2 }                 # 2 lines up
@@ -72,7 +75,8 @@ sub CalYear {
 	}
     }
 
-    tidy_up(\@month);
+    insert_week_number(@month[1..12]) if $config{weeknumber} == 1;
+    tidy_up(@month[1..12]);
 
     my $wareki = $config{wareki} // $month[1][1] =~ /火/;
     for my $month (&show_year($year)) {
@@ -112,18 +116,40 @@ sub cal {
     $_;
 }
 
-sub tidy_up {
-    my $cals = shift;
-    for my $month (@{$cals}[1..12]) {
-	for (@{$month}) {
-	    $_ = " $_ ";
+sub gcal {
+    my $option = shift;
+    my $iso = '--iso-week-number=' . ($config{weeknumber} == 2 ? 'no' : 'yes');
+    my $exec = "gcal -i -H no $iso -K $option";
+    local $_ = qx/$exec/;
+    $_;
+}
+
+sub insert_week_number {
+    my $n = 1;
+    for my $month (@_) {
+	$month->[0] .= '   ';
+	$month->[1] .= ' CW';
+	for (@{$month}[2..7]) {
+	    my $cw = /\S/ ? sprintf(' %02d', $n) : '   ';
+	    $n++ if /\S$/;
+	    $_ .= $cw;
 	}
+    }
+}
+
+sub tidy_up {
+    for my $month (@_) {
+	# insert frame
+	$_ = " $_ " for @$month;
+	# fix month name:
 	for ($month->[0]) {
-	    ## Fix month name:
-	    ## 1) Take care of cal(1) multibyte string bug.
-	    ## 2) Normalize off-to-right to off-to-left.
-	    while (/^ (( +)\S+( +))$/ and length($2) >= length($3)) {
-		$_ = "$1 ";
+	    # 1) Take care of cal(1) multibyte string bug.
+	    # 2) Normalize off-to-right to off-to-left.
+	    if (/^( +)(\S+)( +)$/) {
+		my $sp = length $1.$3;
+		my $left = int $sp / 2;
+		my $right = $left + $sp % 2;
+		$_ = ' ' x $left . $2 . ' ' x $right;
 	    }
 	}
     }
@@ -134,9 +160,9 @@ sub fielder {
     use Unicode::EastAsianWidth;
     my $dow_re = qr/\p{InFullwidth}|[ \S]\S/;
     $dow_line =~ m{^   (\s*)
-		       ( (?: $dow_re [ ]){6} $dow_re ) (\s+)
-		       ( (?: $dow_re [ ]){6} $dow_re ) (\s+)
-		       ( (?: $dow_re [ ]){6} $dow_re )
+		       ( (?: $dow_re [ ]){6} $dow_re (?:[ ]CW)? ) (\s+)
+		       ( (?: $dow_re [ ]){6} $dow_re (?:[ ]CW)? ) (\s+)
+		       ( (?: $dow_re [ ]){6} $dow_re (?:[ ]CW)? )
     }x or die "cal(1): unexpected day-of-week line.";
     my $w = vwidth $2;
     my @w = (length $1, $w, length $3, $w, length $5, $w);

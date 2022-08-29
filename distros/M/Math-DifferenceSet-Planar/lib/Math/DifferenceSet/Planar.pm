@@ -27,7 +27,7 @@ use constant _F_ETA        => 11;   # "eta" value, initially undef
 use constant _F_PEAK       => 12;   # peak elements arrayref, initially undef
 use constant _NFIELDS      => 13;
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 our $_LOG_MAX_ORDER  = 22.1807;         # limit for integer exponentiation
 our $_MAX_ENUM_COUNT = 32768;           # limit for stored rotator set size
@@ -635,6 +635,9 @@ sub elements       { @{ $_[0]->[_F_ELEMENTS]          } }
 sub element        {    $_[0]->[_F_ELEMENTS]->[$_[1]]   }
 sub start_element  {    $_[0]->[_F_ELEMENTS]->[   0 ]   }
 
+sub min_element { $_[0]->[_F_ELEMENTS]->[$_[0]->[_F_INDEX_MIN]  ] }
+sub max_element { $_[0]->[_F_ELEMENTS]->[$_[0]->[_F_INDEX_MIN]-1] }
+
 # @e  = $ds->elements_sorted;
 sub elements_sorted {
     my ($this) = @_;
@@ -664,6 +667,7 @@ sub translate {
         $that->[_F_ETA] = addmod($e,
             mulmod($delta, $this->[_F_BASE]-1, $modulus), $modulus);
     }
+    $this->[_F_PEAK] = undef;
     return $that;
 }
 
@@ -750,6 +754,7 @@ sub multiply {
     }
     $that->[_F_ZETA] &&= mulmod($that->[_F_ZETA], $factor, $modulus);
     $that->[_F_ETA]  &&= mulmod($that->[_F_ETA],  $factor, $modulus);
+    $this->[_F_PEAK] = undef;
     return $that;
 }
 
@@ -973,7 +978,7 @@ Math::DifferenceSet::Planar - object class for planar difference sets
 
 =head1 VERSION
 
-This documentation refers to version 0.017 of Math::DifferenceSet::Planar.
+This documentation refers to version 0.018 of Math::DifferenceSet::Planar.
 
 =head1 SYNOPSIS
 
@@ -996,6 +1001,8 @@ This documentation refers to version 0.017 of Math::DifferenceSet::Planar.
   @e  = $ds->elements_sorted;
   $e0 = $ds->element(0);
   $e0 = $ds->start_element;             # equivalent
+  $e0 = $ds->min_element;
+  $e0 = $ds->max_element;
   $np = $ds->n_planes;
   $p  = $ds->order_base;
   $n  = $ds->order_exponent;
@@ -1182,7 +1189,7 @@ Thus, this library makes use of linear mappings without exposing their
 standardization until we are confident it is economically preferable.
 The library offers methods to find linear mappings between arbitrary sets,
 so users can pick their own reference sets and treat linear mappings
-relative to them as absolute.
+relative to them as absolute.  But see also the L</ROADMAP> section below.
 
 =head1 CLASS VARIABLES
 
@@ -1563,6 +1570,14 @@ C<($ds-E<gt>elements)[$index]>, only more efficient.
 
 C<$ds-E<gt>start_element> is equivalent to C<$ds-E<gt>element(0)>.
 
+=item I<min_element>
+
+C<$ds-E<gt>min_element> returns the smallest element of the set.
+
+=item I<max_element>
+
+C<$ds-E<gt>max_element> returns the largest element of the set.
+
 =item I<n_planes>
 
 C<$ds-E<gt>n_planes> returns the number of distinct planes that can
@@ -1908,6 +1923,30 @@ L<https://github.com/mhasch/perl-Math-DifferenceSet-Planar/issues>.
 
 More information for potential contributors can be found in the file
 named F<CONTRIBUTING> in this distribution.
+
+=head1 ROADMAP
+
+Except possibly for small corrections, the series of beta releases is
+now drawing to an end, and work on release 1.0 has begun.  This will
+maintain most of the current API but also include major changes.
+
+We will drop the limitation on from_elements() to require a set
+size that is represented in the database.  The database will be more
+space-efficient, so that we can ship more sets, and the sets there will
+provide shortcuts to searches that can also be carried out without them.
+
+The internal data format will be extended to speed up some algorithms,
+particularly the logarithm calculation and set verification.  And yes,
+we will finally settle on a logarithm base set for each order, and thus
+give each set a unique identification by two numbers (three, if the
+order is taken into account), and we will expose both directions of the
+mapping between sets and logarithms as methods.
+
+Releases after 1.0 will of course reflect research progress, as
+we get along, and also work towards other goals mentioned in the
+CONTRIBUTING agenda.  In particular, we intend to cover more geometric
+and algebraic aspects of planar difference sets.  We will also look out
+for opportunities to interface with more generic set types.
 
 =head1 SEE ALSO
 

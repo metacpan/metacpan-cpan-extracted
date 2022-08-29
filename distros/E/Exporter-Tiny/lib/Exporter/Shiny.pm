@@ -7,7 +7,7 @@ use warnings;
 use Exporter::Tiny ();
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.002002';
+our $VERSION   = '1.004000';
 
 sub import {
 	my $me     = shift;
@@ -86,7 +86,7 @@ nothing stopping you doing that yourself.
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=Exporter-Tiny>.
+L<https://github.com/tobyink/p5-exporter-tiny/issues>.
 
 =head1 SEE ALSO
 

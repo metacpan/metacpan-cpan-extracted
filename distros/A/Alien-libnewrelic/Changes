@@ -1,5 +1,9 @@
 Revision history for Alien-libnewrelic
 
+0.08      2022-08-25 04:26:29 -0600
+  - Patch libnewrelic for use oldptr after realloc
+    (based on https://github.com/newrelic/c-sdk/pull/34) (gh#13)
+
 0.07      2021-04-24 09:21:09 -0600
   - Moved to new GitHub org
   - Patch to fix header guard included but unreleased in upstream (gh#9)

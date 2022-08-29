@@ -283,7 +283,7 @@ struct spvm_env {
   int32_t (*get_class_id)(SPVM_ENV* env, const char* class_name);
   SPVM_VALUE* (*new_stack)(SPVM_ENV* env);
   void (*free_stack)(SPVM_ENV* env, SPVM_VALUE* stack);
-  int32_t (*get_instance_method_id_super)(SPVM_ENV* env, void* object, const char* method_name);
+  void* reserved186;
   void* (*new_memory_env)(SPVM_ENV* env, size_t byte_size);
   void (*free_memory_env)(SPVM_ENV* env, void* block);
   int32_t (*get_memory_blocks_count_env)(SPVM_ENV* env);
@@ -298,15 +298,30 @@ struct spvm_env {
   int32_t (*get_args_stack_length)(SPVM_ENV* env, SPVM_VALUE* stack);
   void (*set_args_stack_length)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t args_length);
   const char* (*dumpc)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
-  int32_t (*check_flag_pointer_dont_free)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
-  void (*enable_flag_pointer_dont_free)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
-  void (*disable_flag_pointer_dont_free)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
-  int32_t (*get_pointer_length)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
-  void (*set_pointer_length)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t length);
-  void* (*get_pointer_any_info)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
-  void (*set_pointer_any_info)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* any_info);
+  void* (*new_pointer_with_fields_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, void* pointer, int32_t fields_length);
+  void* (*new_pointer_with_fields)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, void* pointer, int32_t fields_length);
+  void* (*new_pointer_with_fields_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, void* pointer, int32_t fields_length, int32_t* error, const char* file, int32_t line);
+  void* reserved204;
+  void* reserved205;
+  void* reserved206;
+  void* reserved207;
   int32_t (*is_class)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
   int32_t (*is_pointer_class)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+  int32_t (*get_pointer_fields_length)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+  int8_t (*get_pointer_field_byte)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index);
+  int16_t (*get_pointer_field_short)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index);
+  int32_t (*get_pointer_field_int)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index);
+  int64_t (*get_pointer_field_long)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index);
+  float (*get_pointer_field_float)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index);
+  double (*get_pointer_field_double)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index);
+  void* (*get_pointer_field_pointer)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index);
+  void (*set_pointer_field_byte)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index, int8_t value);
+  void (*set_pointer_field_short)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index, int16_t value);
+  void (*set_pointer_field_int)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index, int32_t value);
+  void (*set_pointer_field_long)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index, int64_t value);
+  void (*set_pointer_field_float)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index, float value);
+  void (*set_pointer_field_double)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index, double value);
+  void (*set_pointer_field_pointer)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index, void* value);
 };
 
 struct spvm_env_runtime {

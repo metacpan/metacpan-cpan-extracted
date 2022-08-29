@@ -9,8 +9,9 @@ Apache::Solr::Result - Apache Solr (Lucene) result container
   # All operations return a ::Result object
   my $result = $solr->select(...);
 
-  $result or die $result->solrError; # error reported by Solr
-  $result or die $result->errors;    # any error caught by this object
+  $result->success or die $result->solrError; # error reported by Solr
+  $result->success or die $result->errors;    # any error caught by this object
+  if($result)  # same as if($result->success)
 
   # Lots of trace information included
   $result->showTimings;
@@ -41,7 +42,7 @@ Apache::Solr::Result - Apache Solr (Lucene) result container
   params      <required>
   request     undef
   response    undef
-  sequential  undef
+  sequential  false
 
 =over 2
 
@@ -145,9 +146,9 @@ Return information which relates to the selected $document.
 
 =item $obj-E<gt>B<nextSelected>(%options)
 
-[0.95] Produces the next document, or C<undef> when there are none
-left.  [1.06] Use L<selected()|Apache::Solr::Result/"in response to a select()"> or Apache::Solr::Result subroutine new option start to give a starting
-point.  [1.06]  The C<%options> are passed to L<selected()|Apache::Solr::Result/"in response to a select()">.
+[0.95] Produces the next document, or C<undef> when there are none left.
+[1.06] Use L<selected()|Apache::Solr::Result/"in response to a select()"> or search parameter C<start> to give a starting
+point.  [1.06] The C<%options> are passed to L<selected()|Apache::Solr::Result/"in response to a select()">.
 
 example: 
 
@@ -214,9 +215,20 @@ So: their sort order is lost.
 
 =over 4
 
+=item $obj-E<gt>B<fullPageSize>()
+
+[1.07] Returns the page size of all of the full returned pages.  The last page
+is probably smaller.
+
 =item $obj-E<gt>B<replaceParams>(HASH, $oldparams)
 
 =item $obj-E<gt>B<selectedPage>($pagenr)
+
+The L<selected()|Apache::Solr::Result/"in response to a select()"> documents are retreived in pages, each of size
+L<fullPageSize()|Apache::Solr::Result/"Helpers"> (although the last page may be shorter).  Each
+page is separately downloaded when used.  Each page is also a
+full C<Apache::Solr::Result> object with request, response, and timing
+information.
 
 =item $obj-E<gt>B<selectedPageLoad>($rank, $client)
 
@@ -225,6 +237,8 @@ Query the database for the next page of results.
 =item $obj-E<gt>B<selectedPageNr>($rank)
 
 =item $obj-E<gt>B<selectedPageSize>()
+
+[1.07] DEPRECATED.  Use L<fullPageSize()|Apache::Solr::Result/"Helpers">.
 
 =item $obj-E<gt>B<selectedPages>()
 
@@ -245,8 +259,8 @@ file-handle (probably STDOUT).
 
 =head1 SEE ALSO
 
-This module is part of Apache-Solr distribution version 1.06,
-built on July 08, 2022. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Apache-Solr distribution version 1.07,
+built on August 26, 2022. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -26,12 +26,15 @@
 #include <webp/decode.h>
 #endif
 
+#if JXL
+#include <jxl/decode.h>
+#include "jxl/thread_parallel_runner.h"
+#endif
+
 #include "perlmulticore.h"
 
 #define IW 80 /* MUST match Schnauzer.pm! */
 #define IH 60 /* MUST match Schnauzer.pm! */
-
-#define RAND (seed = (seed + 7141) * 54773 % 134456)
 
 #define LINELENGTH 240
 
@@ -259,6 +262,45 @@ static void cv_jpeg_mem_src (j_decompress_ptr cinfo, void *buf, size_t buflen)
 
 /////////////////////////////////////////////////////////////////////////////
 
+/* great, the jpeg-xl reference implementaton requires us to parse bmff files */
+
+struct bmff_box
+{
+  char type[4];
+  const uint8_t *ptr;
+  size_t size;
+};
+
+static int
+bmff_parse_box (struct bmff_box *box, const uint8_t **next_in, size_t *avail_in)
+{
+  if (*avail_in < 8)
+    return 0;
+
+  box->size = ((*next_in)[0] << 24)
+            | ((*next_in)[1] << 16)
+            | ((*next_in)[2] <<  8)
+            | ((*next_in)[3]      );
+
+  if (box->size < 8)
+    return 0;
+
+  if (*avail_in < box->size)
+    return 0;
+
+  memcpy (box->type, *next_in + 4, 4);
+  box->ptr = *next_in + 8;
+
+  *next_in  += box->size;
+  *avail_in -= box->size;
+
+  box->size -= 8;
+
+  return 1;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+
 MODULE = Gtk2::CV PACKAGE = Gtk2::CV
 
 PROTOTYPES: ENABLE
@@ -377,12 +419,15 @@ filetype (SV *image_data)
 {
         STRLEN data_len;
         U8 *data = SvPVbyte (image_data, data_len);
+        static const unsigned char jxl_header[] = {
+           0, 0, 0, 0x0c, 0x4a, 0x58, 0x4c, 0x20, 0x0d, 0xa, 0x87, 0x0a
+        };
 
         if (data_len >= 20
             && data[0] == 0xff
             && data[1] == 0xd8
             && data[2] == 0xff)
-	  RETVAL = "jpg";
+	  RETVAL = "image/jpeg";
         else if (data_len >= 12
             && data[ 0] == (U8)'R'
             && data[ 1] == (U8)'I'
@@ -392,7 +437,7 @@ filetype (SV *image_data)
             && data[ 9] == (U8)'E'
             && data[10] == (U8)'B'
             && data[11] == (U8)'P')
-          RETVAL = "webp";
+          RETVAL = "image/webp";
         else if (data_len >= 16
             && data[ 0] == 0x89
             && data[ 1] == (U8)'P'
@@ -402,9 +447,46 @@ filetype (SV *image_data)
             && data[ 5] == 0x0a
             && data[ 6] == 0x1a
             && data[ 7] == 0x0a)
-          RETVAL = "png";
+          RETVAL = "image/png";
+        else if (data_len >= sizeof (jxl_header) && memcmp (data, jxl_header, sizeof (jxl_header)) == 0)
+          RETVAL = "image/jxl"; // todo: might want to use JxlSignatureCheck
+        else if (data_len >= 2
+            && data[0] == 0xff
+            && data[1] == 0x0a)
+          RETVAL = "image/jxl";
+        else if (data_len >= 13
+                 && data[0] == 'G'
+                 && data[1] == 'I'
+                 && data[2] == 'F'
+                 && data[3] == '8'
+                 //&& (data[4] == '7' || data[4] == '9')
+                 && data[5] == 'a')
+          {
+            RETVAL = "image/gif";
+
+            // now see if its animated - we require the netscape application header for this
+            int ofs = 13;
+
+            if (data[10] & 0x80)
+              ofs += (1 << ((data[10] & 7) + 1)) * 3;
+
+            if (data_len >= ofs + 2 + 1 + 11)
+              {
+
+                // skip a graphic control extension block. we assume
+                // there is at most one such block - while the NAB
+                // has to come firstz, some files do not obey this
+                if (data[ofs] == 0x21 && data[ofs + 1] == 0xf9)
+                  ofs += 3 + data[ofs + 2] + 1;
+
+                if (data_len >= ofs + 2 + 1 + 11)
+                  if (!memcmp (data + ofs, "\x21\xff\x0bNETSCAPE2.0", sizeof ("\x21\xff\x0bNETSCAPE2.0") - 1))
+                    RETVAL = "video/gif";
+              }
+          }
+
         else
-          RETVAL = "other";
+          XSRETURN_UNDEF;
 }
 	OUTPUT:
         RETVAL
@@ -493,6 +575,142 @@ decode_webp (SV *image_data, int thumbnail = 0, int iw = 0, int ih = 0)
         perlinterp_acquire ();
 #else
 	croak ("load_webp: webp not enabled at compile time");
+#endif
+}
+	OUTPUT:
+        RETVAL
+
+GdkPixbuf_noinc *
+decode_jxl (SV *image_data, int thumbnail = 0, int iw = 0, int ih = 0)
+	CODE:
+{
+#if JXL
+	JxlDecoder *dec;
+        JxlBasicInfo info;
+        const uint8_t *next_in = (uint8_t *)SvPVbyte_nolen (image_data);
+        size_t avail_in = SvCUR (image_data);
+        const char *error = 0;
+        JxlDecoderStatus status;
+        static void *runner_cache;
+        void *runner = 0;
+
+        RETVAL = 0;
+
+        if (runner_cache)
+          runner = runner_cache;
+        else
+          runner = JxlThreadParallelRunnerCreate (0, JxlThreadParallelRunnerDefaultNumWorkerThreads ());
+
+        runner_cache = 0;
+
+        perlinterp_release ();
+
+        dec = JxlDecoderCreate (0);
+
+        error = "JxlDecoderCreate failed";
+        if (!dec)
+          goto done;
+
+        status = JxlDecoderSetParallelRunner (dec, JxlThreadParallelRunner, runner);
+        error = "JxlDecoderSetParallelRunner failed";
+        if (status != JXL_DEC_SUCCESS)
+          goto done;
+
+        error = "JxlDecoderSubscribeEvents failed";
+        status = JxlDecoderSubscribeEvents (dec, JXL_DEC_BASIC_INFO | JXL_DEC_FULL_IMAGE);
+	if (status != JXL_DEC_SUCCESS)
+          goto done;
+
+        status = JxlDecoderSetInput (dec, next_in, avail_in);
+        error = "JxlDecoderSetInput failed";
+        if (status != JXL_DEC_SUCCESS)
+          goto done;
+
+        for (;;)
+          {
+	    status = JxlDecoderProcessInput (dec);
+	  
+            switch (status)
+              {
+	        case JXL_DEC_FULL_IMAGE:
+                  error = 0;
+                  goto done;
+
+                case JXL_DEC_ERROR:
+                  error = "JxlDecoderProcessInput failed";
+                  goto done;
+
+	        case JXL_DEC_NEED_MORE_INPUT:
+                  error = "incomplete file";
+                  goto done;
+
+	        case JXL_DEC_SUCCESS:
+                  error = "incomplete decode";
+                  goto done;
+
+                case JXL_DEC_BASIC_INFO:
+                  {
+                    status = JxlDecoderGetBasicInfo (dec, &info);
+                    error = "JxlDecoderGetBasicInfo failed";
+	            if (status != JXL_DEC_SUCCESS)
+                      goto done;
+
+                    RETVAL = gdk_pixbuf_new (GDK_COLORSPACE_RGB, !!info.alpha_bits, 8, info.xsize, info.ysize);
+                    error = "unable to allocate pixbuf";
+                    if (!RETVAL)
+                      goto done;
+
+	            JxlPixelFormat format = {
+                      info.alpha_bits ? 4 : 3,
+                      JXL_TYPE_UINT8,
+                      JXL_NATIVE_ENDIAN,
+                      gdk_pixbuf_get_rowstride (RETVAL)
+                    };
+
+                    // cannot use gdk_pixbuf_get_byte_length because that does
+                    // not return the size of the buffer, but the size of the buffer without
+                    // the last padding bytes. the internal buffer is rowstride * ysize,
+                    // and this is what the jxl decoder needs. none of this is documented
+                    // in either library, of course.
+
+                    status = JxlDecoderSetImageOutBuffer (
+                      dec,
+                      &format,
+                      gdk_pixbuf_get_pixels (RETVAL),
+                      gdk_pixbuf_get_rowstride (RETVAL) * info.ysize
+                    );
+                    error = "JxlDecoderSetImageOutBuffer failed";
+                    if (status != JXL_DEC_SUCCESS)
+                      goto done;
+                  }
+                  break;
+
+                default:
+	          error = "unexpected event";
+                  goto done;
+              }
+          }
+
+	done:
+        if (dec)
+	  JxlDecoderDestroy (dec);
+
+        perlinterp_acquire ();
+
+        if (runner_cache)
+          JxlThreadParallelRunnerDestroy (runner);
+
+        runner_cache = runner;
+
+        if (error)
+          {
+            if (RETVAL)
+              g_object_unref (RETVAL);
+
+            croak ("load_jxl: %s (status %d)", error, status);
+          }
+#else
+	croak ("load_jxl: jpeg-xl not enabled at compile time");
 #endif
 }
 	OUTPUT:
@@ -691,7 +909,7 @@ foldcase (SV *pathsv)
 	STRLEN plen;
         U8 *path = (U8 *)SvPV (pathsv, plen);
         U8 *pend = path + plen;
-        U8 dst [plen * 6 * 3], *dstp = dst;
+        U8 dst [plen * 8 * 3], *dstp = dst;
 
         while (path < pend)
           {
@@ -703,11 +921,12 @@ foldcase (SV *pathsv)
               *dstp++ = *path++ + ('a' - 'A');
             else if (ch >= '0' && ch <= '9')
               {
+                /* version sort, up to 8 digits */
                 STRLEN el, nl = 0;
                 while (*path >= '0' && *path <= '9' && path < pend)
                   path++, nl++;
 
-                for (el = nl; el < 6; el++)
+                for (el = nl; el < 8; el++)
                   *dstp++ = '0';
 
                 memcpy (dstp, path - nl, nl);

@@ -1,3 +1,21 @@
+0.006   2022-08-26  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schemas: json_str::array, json_str::hash.
+
+
+0.005   2022-08-25  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schema: json_or_str.
+
+
+0.004   2022-08-25  Released-By: PERLANCAR; Urgency: medium
+
+        - [schema any_from_json] [bugfix] Allow hash/array/undef to be passed
+          unfiltered.
+
+        - [ux][doc] Add description to the schemas.
+
+
 0.003   2021-09-29  Released-By: PERLANCAR; Urgency: medium
 
 	- [schema array_from_json, hash_from_json] Do not coerce if already

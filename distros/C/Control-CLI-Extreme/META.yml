@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.36'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,12 +17,12 @@ name: Control-CLI-Extreme
 provides:
   Control::CLI::Extreme:
     file: lib/Control/CLI/Extreme.pm
-    version: '1.06'
+    version: '1.07'
 requires:
   Control::CLI: '2.02'
   perl: v5.6.0
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Control-CLI-Extreme
   license: http://dev.perl.org/licenses/
-version: '1.06'
+version: '1.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

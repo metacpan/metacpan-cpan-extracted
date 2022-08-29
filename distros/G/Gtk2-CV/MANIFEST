@@ -12,6 +12,7 @@ lib/Gtk2/CV/Plugin.pm
 lib/Gtk2/CV/Plugin/NameCluster.pm
 lib/Gtk2/CV/Plugin/PatRenamer.pm
 lib/Gtk2/CV/Plugin/RCluster.pm
+lib/Gtk2/CV/Plugin/MetaCluster.pm
 lib/Gtk2/CV/Progress.pm
 lib/Gtk2/CV/Jobber.pm
 

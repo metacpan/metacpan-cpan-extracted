@@ -442,7 +442,7 @@ JSONSchema::Validator::Format - Formats of JSON Schema specification
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 AUTHORS
 

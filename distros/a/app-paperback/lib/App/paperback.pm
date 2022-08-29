@@ -3,16 +3,11 @@ package App::paperback;
 use v5.10;
 use strict;
 # use warnings;
-our $VERSION = "v0.42";
+our $VERSION = "1.09";
 
-use Exporter;
-our @ISA    = qw(Exporter);
-our @EXPORT = qw(openInputFile openOutputFile newPageInOutputFile
-	copyPageFromInputToOutput closeInputFile closeOutputFile);
-
-my ($GformNr, $GinFile, $GpageObjNr, $Groot, $Gpos, $GobjNr, $Gstream, $GoWid, $GoHei);
+my ($GinFile, $GpageObjNr, $Groot, $Gpos, $GobjNr, $Gstream, $GoWid, $GoHei);
 my (@Gkids, @Gcounts, @GformBox, @Gobject, @Gparents, @Gto_be_created);
-my (%Gold, %Gresources, %GpageXObject, %GoldObject);
+my (%Gold, %GpageXObject, %GoldObject);
 
 # ISO 216 paper sizes in pt:
 my $AH = 841.8898; # [A] A4 ~ 297 mm (H)
@@ -40,7 +35,10 @@ my $IH =  $HW; # [I] US Legal Quarter (H)
 my $IW =  $FW; # [I] US Legal Quarter (W)
 
 # Page reordering and position offset schemas for "4 up":
-my @P_4_UP = (16,1,13,4,2,15,3,14,12,5,9,8,6,11,7,10);
+my @P_4UP_13PLUS = (16,1,13,4,2,15,3,14,12,5,9,8,6,11,7,10);
+my @P_4UP_9PLUS = (12,1,9,4,2,11,3,10,6,7,9999,9999,8,5);
+my @P_4UP_5PLUS = (8,1,5,4,2,7,3,6);
+my @P_4UP_1PLUS = (4,1,9999,9999,2,3);
 my @X_A6_ON_A4 = (0,$CW,$CW,$AW,0,$CW,$CW,$AW,0,$CW,$CW,$AW,0,$CW,$CW,$AW);
 my @Y_A6_ON_A4 = ($CG,$CG,$CH,$CH,$CG,$CG,$CH,$CH,$CG,$CG,$CH,$CH,$CG,$CG,$CH,$CH);
 my @X_QT_ON_LT = (0,$FW,$FW,$DW,0,$FW,$FW,$DW,0,$FW,$FW,$DW,0,$FW,$FW,$DW);
@@ -49,13 +47,16 @@ my @X_QG_ON_LG = (0,$IW,$IW,$GW,0,$IW,$IW,$GW,0,$IW,$IW,$GW,0,$IW,$IW,$GW);
 my @Y_QG_ON_LG = ($IH,$IH,$IH,$IH,$IH,$IH,$IH,$IH,$IH,$IH,$IH,$IH,$IH,$IH,$IH,$IH);
 
 # Page reordering and position offset schemas for "2 up":
-my @P_2_UP = (16,1,15,2,14,3,13,4,12,5,11,6,10,7,9,8);
-my @Y_A5_ON_A4 = ($BG,0,$AH,$BG,$BG,0,$AH,$BG,$BG,0,$AH,$BG,$BG,0,$AH,$BG);
+my @P_2UP_13PLUS = (1,16,2,15,3,14,4,13,5,12,6,11,7,10,8,9);
+my @P_2UP_9PLUS = (1,12,2,11,3,10,4,9,5,8,6,7);
+my @P_2UP_5PLUS = (1,8,2,7,3,6,4,5);
+my @P_2UP_1PLUS = (1,4,2,3);
 my @X_A5_ON_A4 = ($BH,$BH,0,0,$BH,$BH,0,0,$BH,$BH,0,0,$BH,$BH,0,0);
-my @Y_HT_ON_LT = ($EW,0,$DH,$EW,$EW,0,$DH,$EW,$EW,0,$DH,$EW,$EW,0,$DH,$EW);
+my @Y_A5_ON_A4 = ($BG,0,$AH,$BG,$BG,0,$AH,$BG,$BG,0,$AH,$BG,$BG,0,$AH,$BG);
 my @X_HT_ON_LT = ($EH,$EH,0,0,$EH,$EH,0,0,$EH,$EH,0,0,$EH,$EH,0,0);
-my @Y_HG_ON_LG = ($HW,0,$GH,$HW,$HW,0,$GH,$HW,$HW,0,$GH,$HW,$HW,0,$GH,$HW);
+my @Y_HT_ON_LT = ($EW,0,$DH,$EW,$EW,0,$DH,$EW,$EW,0,$DH,$EW,$EW,0,$DH,$EW);
 my @X_HG_ON_LG = ($HH,$HH,0,0,$HH,$HH,0,0,$HH,$HH,0,0,$HH,$HH,0,0);
+my @Y_HG_ON_LG = ($HW,0,$GH,$HW,$HW,0,$GH,$HW,$HW,0,$GH,$HW,$HW,0,$GH,$HW);
 
 my ( $IN_FILE, $OUT_FILE );
 
@@ -67,7 +68,7 @@ sub main {
   my $num_pag_input; my $pgSizeInput;
   my $numPagImposed = 0;
   my $sayUsage = "Usage: paperback file.pdf (will produce 'file-paperback.pdf').";
-  my $sayVersion = "This is paperback ${VERSION}, (c) 2022 Hector M. Monacci.";
+  my $sayVersion = "This is paperback v${VERSION}, (c) 2022 Hector M. Monacci.";
   my $sayHelp = <<"END_MESSAGE";
 
 ${sayUsage}
@@ -95,8 +96,8 @@ ISO 216 normalised (international) page sizes:
 ANSI normalised (US) page sizes:
 
   Input page sizes Quarter Letter (4.25 x 5.5 in) and Half Letter (5.5
-  x 8,5 in) produce a Letter output page size (8.5 x 11 in). Input
-  page sizes Quarter Legal (4.25 x 7 in) and Half Legal (7 x 8,5 in)
+  x 8.5 in) produce a Letter output page size (8.5 x 11 in). Input
+  page sizes Quarter Legal (4.25 x 7 in) and Half Legal (7 x 8.5 in)
   produce a Legal output page size (8.5 x 14 in). Four Quarter-Letter
   pages will be put on each Letter page, two Half-Letter pages will be
   put on each Letter page, four Quarter-Legal pages will be put on each
@@ -104,44 +105,60 @@ ANSI normalised (US) page sizes:
   Before that, input pages will be reordered and reoriented so as to 
   produce a final PDF fit for duplex 'long-edge-flip' printing.
 
+For further details, please try 'perldoc paperback'.
+
 ${sayVersion}
 END_MESSAGE
 
-  die "[!] $sayUsage\n"
+  die "[!] ${sayUsage}\n"
     if ! defined $input;
-  do {print STDERR "$sayHelp" and exit}
+  do {print STDERR "${sayHelp}" and exit}
     if $input =~ "^-h\$" or $input =~ "^--help\$";
   do {print STDERR "${sayVersion}\n" and exit}
     if $input =~ "^-v\$" or $input =~ "^--version\$";
-  die "[!] File '$input' can't be found or read.\n"
+  die "[!] File '${input}' can't be found or read.\n"
     unless -r $input;
   ($num_pag_input, $pgSizeInput) = openInputFile($input);
-  die "[!] File '$input' is not a valid v1.4 PDF file.\n"
+  die "[!] File '${input}' is not a valid v1.4 PDF file.\n"
     if $num_pag_input == 0;
 
-  my ($rot_extra, $pagesPerSheet, @x, @y, @p);
+  my ($pgPerOutputPage, @x, @y);
   for ($pgSizeInput) {
-       if ($_ eq "A6") { $pagesPerSheet = 4; @x = @X_A6_ON_A4; @y = @Y_A6_ON_A4; }
-    elsif ($_ eq "A5") { $pagesPerSheet = 2; @x = @X_A5_ON_A4; @y = @Y_A5_ON_A4; }
-    elsif ($_ eq "QT") { $pagesPerSheet = 4; @x = @X_QT_ON_LT; @y = @Y_QT_ON_LT; }
-    elsif ($_ eq "QG") { $pagesPerSheet = 4; @x = @X_QG_ON_LG; @y = @Y_QG_ON_LG; }
-    elsif ($_ eq "HT") { $pagesPerSheet = 2; @x = @X_HT_ON_LT; @y = @Y_HT_ON_LT; }
-    elsif ($_ eq "HG") { $pagesPerSheet = 2; @x = @X_HG_ON_LG; @y = @Y_HG_ON_LG; }
-    else {die "[!] Bad page size ($pgSizeInput). See 'paperback -h' to learn more.\n"}
+    if    ($_ eq "A6") { $pgPerOutputPage = 4; @x = @X_A6_ON_A4; @y = @Y_A6_ON_A4; }
+    elsif ($_ eq "A5") { $pgPerOutputPage = 2; @x = @X_A5_ON_A4; @y = @Y_A5_ON_A4; }
+    elsif ($_ eq "QT") { $pgPerOutputPage = 4; @x = @X_QT_ON_LT; @y = @Y_QT_ON_LT; }
+    elsif ($_ eq "QG") { $pgPerOutputPage = 4; @x = @X_QG_ON_LG; @y = @Y_QG_ON_LG; }
+    elsif ($_ eq "HT") { $pgPerOutputPage = 2; @x = @X_HT_ON_LT; @y = @Y_HT_ON_LT; }
+    elsif ($_ eq "HG") { $pgPerOutputPage = 2; @x = @X_HG_ON_LG; @y = @Y_HG_ON_LG; }
+    else {die "[!] Bad page size (${pgSizeInput}). See 'paperback -h' to learn more.\n"}
   }
 
-  my $rotation;
-  my $target_page;
   my ($name) = $input =~ /(.+)\.[^.]+$/;
-  my $num_pliegos;
-
   openOutputFile("${name}-paperback.pdf");
-  $num_pliegos = $num_pag_input >> 4;
-  ($rot_extra, @p) = $pagesPerSheet == 4 ? (0, @P_4_UP) : (90, @P_2_UP);
-  for (0..$num_pliegos) {
+  my ($rot_extra, @p);
+  if ($pgPerOutputPage == 4) {
+    $rot_extra = 0;
+    for ($num_pag_input) {
+      if    ($_ >= 13) { @p = @P_4UP_13PLUS; }
+      elsif ($_ >= 9 ) { @p = @P_4UP_9PLUS;  } 
+      elsif ($_ >= 5 ) { @p = @P_4UP_5PLUS;  } 
+      else             { @p = @P_4UP_1PLUS;  }
+    }
+  } else {
+    $rot_extra = 90;
+    for ($num_pag_input) {
+      if    ($_ >= 13) { @p = @P_2UP_13PLUS; } 
+      elsif ($_ >= 9 ) { @p = @P_2UP_9PLUS;  } 
+      elsif ($_ >= 5 ) { @p = @P_2UP_5PLUS;  } 
+      else             { @p = @P_2UP_1PLUS;  }
+    }
+  }
+  my $lastSignature = $num_pag_input >> 4;
+  my ($rotation, $target_page);
+  for (my $thisSignature = 0; $thisSignature <= $lastSignature; ++$thisSignature) {
     for (0..15) {
-      newPageInOutputFile() unless $_ % $pagesPerSheet > 0 or $numPagImposed == 0;
-      $target_page = $p[$_] + ($numPagImposed >> 4) * 16;
+      newPageInOutputFile() if $_ % $pgPerOutputPage == 0;
+      $target_page = $p[$_] + 16 * $thisSignature;
       next if $target_page > $num_pag_input;
 
       $rotation = $_ % 4 > 1 ? $rot_extra + 180 : $rot_extra;
@@ -182,17 +199,16 @@ sub copyPageFromInputToOutput {
   my $y          = $param->{'y'}      or 0;
   my $rotate     = $param->{'rotate'} or 0;
 
-  ++$GformNr;
-  my $name = "Fm${GformNr}";
+  state $formNr; # Este uso de "state" requiere v5.10 (que salió en 2007)
+  ++$formNr;
+
+  my $name = "Fm${formNr}";
   my $refNr = getPage( $pagenumber );
   die "[!] Page ${pagenumber} in ${GinFile} can't be used. Concatenate streams!" 
-  	if !defined $refNr;
+    if !defined $refNr;
   die "[!] Page ${pagenumber} doesn't exist in file ${GinFile}" if !$refNr;
 
-  $Gstream .= ( defined $x and defined $y and defined $rotate ) ?
-    "q\n" . calcMatrix($x, $y, $rotate) ."\n/Gs0 gs\n/${name} Do\nQ\n" :
-    "\n/Gs0 gs\n/${name} Do\n";
-
+  $Gstream .= "q\n" . calcRotateMatrix($x, $y, $rotate) ."\n/Gs0 gs\n/${name} Do\nQ\n";
   $GpageXObject{$name} = $refNr;
 
   return;
@@ -232,14 +248,16 @@ sub writePageResourceDict {
   my $resourceDict = $_[0];
   my $resourceObject;
 
+  state %resources;
+
   # Found one identical, use it:
-  return $Gresources{$resourceDict} if exists $Gresources{$resourceDict};
+  return $resources{$resourceDict} if exists $resources{$resourceDict};
   ++$GobjNr;
   # Save first 10 resources:
-  $Gresources{$resourceDict} = $GobjNr if keys(%Gresources) < 10;
+  $resources{$resourceDict} = $GobjNr if keys(%resources) < 10;
   $resourceObject = $GobjNr;
   $Gobject[$GobjNr] = $Gpos;
-  $resourceDict   = "${GobjNr} 0 obj<<${resourceDict}>>endobj\n";
+  $resourceDict = "${GobjNr} 0 obj<<${resourceDict}>>endobj\n";
   $Gpos += syswrite $OUT_FILE, $resourceDict;
   return $resourceObject;
 }
@@ -261,7 +279,7 @@ sub writePageStream {
 ##########################################################
 sub writePageResources {
 ##########################################################
-  my $parent = $_[0]; my $resourceObject = $_[1];
+  my ($parent, $resourceObject) = ($_[0], $_[1]);
   $Gpos += syswrite $OUT_FILE, "${GpageObjNr} 0 obj<</Type/Page/Parent ${parent} 0 "
     . "R/Contents ${GobjNr} 0 R/Resources ${resourceObject} 0 R>>endobj\n";
   push @{ $Gkids[0] }, $GpageObjNr;
@@ -317,8 +335,8 @@ sub closeOutputFile {
 sub writePageNodes {
 ##########################################################
   my $qtyChildren = $_[0];
-  my $i     = 0;
-  my $j     = 1;
+  my $i = 0;
+  my $j = 1;
   my $nodeObj;
 
   while ( $qtyChildren < $#{ $Gkids[$i] } ) {
@@ -387,10 +405,10 @@ sub writeEndNode {
 
 
 ##########################################################
-sub calcMatrix {
+sub calcRotateMatrix {
 ##########################################################
-  my $x = $_[0]; my $y = $_[1]; my $rotate = $_[2];
-  my $str = "1 0 0 1 ${x} ${y} cm\n";
+  my $rotate = $_[2];
+  my $str = "1 0 0 1 $_[0] $_[1] cm\n";
 
   if ($rotate) {
     my $upperX = 0; my $upperY = 0;
@@ -436,7 +454,7 @@ sub getRootFromXrefSection {
   ($incoming_line, $qty, $i) = extractContent();
 
   while ($qty) {
-    for ( my $l = 1 ; $l <= $qty ; ++$l ) {
+    for (1..$qty) {
       sysread $IN_FILE, $incoming_line, 20;
       if ( $incoming_line =~ m'^\s?(\d+) \d+ (\w)\s*' ) {
         $GoldObject{$i} = int($1) unless $2 ne "n" or exists $GoldObject{$i};
@@ -448,7 +466,7 @@ sub getRootFromXrefSection {
 
   while ($incoming_line) {
     $buf .= $incoming_line;
-    $rooty = $1 if $buf =~ m'\/Root\s+(\d+)\s{1,2}\d+\s{1,2}R'so;
+    $rooty = $1 if $buf =~ m'\/Root\s+(\d+)\s+\d+\s+R's;
     last if $rooty;
     sysread $IN_FILE, $incoming_line, 30;
   }
@@ -467,6 +485,7 @@ sub getObject {
 
   sysseek $IN_FILE, $offs, 0;
   sysread $IN_FILE, $buf, $size;
+
   return $buf;
 }
 
@@ -474,21 +493,20 @@ sub getObject {
 ##########################################################
 sub writeToBeCreated {
 ##########################################################
-  my $elObje = $_[0];
-  my ( $out_line, $part, $strPos);
+  my ($elObje, $out_line, $part, $strPos, $old_one, $new_one);
 
   for (@Gto_be_created) {
-    my $old_one = $_->[0];
-    my $new_one = $_->[1];
+    $old_one = $_->[0];
+    $new_one = $_->[1];
     $elObje = getObject($old_one);
-    if ( $elObje =~ m'^(\d+ \d+ obj\s*<<)(.+)(>>\s*stream)'os ) {
+    if ( $elObje =~ m'^(\d+ \d+ obj\s*<<)(.+)(>>\s*stream)'s ) {
       $part = $2;
       $strPos = length($1) + length($2) + length($3);
       renew_ddR_and_populate_to_be_created($part);
       $out_line = "${new_one} 0 obj\n<<${part}>>stream";
       $out_line .= substr( $elObje, $strPos );
     } else {
-      $elObje = substr( $elObje, length($1) ) if $elObje =~ m'^(\d+ \d+ obj\s*)'os;
+      $elObje = substr( $elObje, length($1) ) if $elObje =~ m'^(\d+ \d+ obj\s*)'s;
       renew_ddR_and_populate_to_be_created($elObje);
       $out_line = "${new_one} 0 obj ${elObje}";
     }
@@ -507,7 +525,7 @@ sub getInputPageDimensions {
   my $elObje = getObject($Groot);
 
   # Find pages:
-  return "unknown" unless $elObje =~ m'/Pages\s+(\d+)\s{1,2}\d+\s{1,2}R'os;
+  return "unknown" unless $elObje =~ m'/Pages\s+(\d+)\s+\d+\s+R's;
   $elObje = getObject($1);
 
   $elObje = xformObjForThisPage($elObje, 1);
@@ -517,44 +535,25 @@ sub getInputPageDimensions {
   my $measuresInMm = int($GformBox[2] / 72 * 25.4) . " x "
     . int($GformBox[3] / 72 * 25.4) . " mm";
 
-  if ($multi > 119_780 and $multi < 121_780) { # US 1/4 letter: 120780
-    $GoWid  = $DW;
-    $GoHei = $DH;
-    return "QT";
-  }
-  if ($multi > 123_443 and $multi < 125_443) { # ISO A6: 124443
-    $GoWid  = $AW;
-    $GoHei = $AH;
-    return "A6";
-  }
-  if ($multi > 152_720 and $multi < 154_720) { # US 1/4 legal: 153720
-    $GoWid  = $GW;
-    $GoHei = $GH;
-    return "QG";
-  }
-  if ($multi > 241_352 and $multi < 243_352) { # US 1/2 Letter ("statement"): 242352
-    $GoWid  = $DW;
-    $GoHei = $DH;
-    return "HT";
-  } 
-  if ($multi > 248_305 and $multi < 250_305) { # ISO A5: 249305
-    $GoWid  = $AW;
-    $GoHei = $AH;
-    return "A5";
-  }
-  if ($multi > 307_448 and $multi < 309_448) { # US 1/2 legal: 308448
-    $GoWid  = $GW;
-    $GoHei = $GH;
-    return "HG";
-  }
-  if ($multi > 483_704 and $multi < 485_704) { # US letter: 484704
-    return "USletter, ${measuresInMm}";
-  }
-  if ($multi > 499_395 and $multi < 501_395) { # ISO A4: 500395
-    return "A4, ${measuresInMm}";
-  }
-  if ($multi > 615_896 and $multi < 617_896) { # US legal: 616896
-    return "USlegal, ${measuresInMm}";
+  for ($multi) {
+    # US 1/4 letter: 120780
+    if ($_ > 119_780 and $_ < 121_780) {$GoWid = $DW; $GoHei = $DH; return "QT";}
+    # ISO A6: 124443
+    if ($_ > 123_443 and $_ < 125_443) {$GoWid = $AW; $GoHei = $AH; return "A6";}
+    # US 1/4 legal: 153720
+    if ($_ > 152_720 and $_ < 154_720) {$GoWid = $GW; $GoHei = $GH; return "QG";}
+    # US 1/2 Letter ("statement"): 242352
+    if ($_ > 241_352 and $_ < 243_352) {$GoWid = $DW; $GoHei = $DH; return "HT";}
+    # ISO A5: 249305
+    if ($_ > 248_305 and $_ < 250_305) {$GoWid = $AW; $GoHei = $AH; return "A5";}
+    # US 1/2 legal: 308448
+    if ($_ > 307_448 and $_ < 309_448) {$GoWid = $GW; $GoHei = $GH; return "HG";}
+    # US letter: 484704
+    if ($_ > 483_704 and $_ < 485_704) {return "USletter, ${measuresInMm}"; } 
+    # ISO A4: 500395
+    if ($_ > 499_395 and $_ < 501_395) {return "A4, ${measuresInMm}"; }
+    # US legal: 616896
+    if ($_ > 615_896 and $_ < 617_896) {return "USlegal, ${measuresInMm}";}
   }
   return "unknown, ${measuresInMm}";
 }
@@ -564,15 +563,14 @@ sub getInputPageDimensions {
 sub getPage {
 ##########################################################
   my $pagenumber = $_[0];
-
   my ( $reference, $formRes, $formCont );
 
-    # Find root:
+  # Find root:
   my $elObje = getObject($Groot);
 
   # Find pages:
   die "[!] Didn't find Pages section in '${GinFile}' - aborting" 
-    unless $elObje =~ m'/Pages\s+(\d+)\s{1,2}\d+\s{1,2}R'os;
+    unless $elObje =~ m'/Pages\s+(\d+)\s+\d+\s+R's;
   $elObje = getObject($1);
 
   $elObje = xformObjForThisPage($elObje, $pagenumber);
@@ -580,7 +578,7 @@ sub getPage {
 
   $reference = writeRes($elObje, $formRes, $formCont);
 
-  writeToBeCreated($elObje);
+  writeToBeCreated();
 
   return $reference;
 }
@@ -593,7 +591,7 @@ sub writeRes {
   my $out_line;
 
   $elObje = getObject($formCont);
-  $elObje =~ m'^(\d+ \d+ obj\s*<<)(.+)(>>\s*stream)'so;
+  $elObje =~ m'^(\d+ \d+ obj\s*<<)(.+)(>>\s*stream)'s;
   my $strPos = length($1) + length($2) + length($3);
   my $newPart = "<</Type/XObject/Subtype/Form/FormType 1/Resources ${formRes}"
     . "/BBox \[ $GformBox[0] $GformBox[1] $GformBox[2] $GformBox[3]\] ${2}";
@@ -611,26 +609,26 @@ sub writeRes {
 ##########################################################
 sub xformObjForThisPage {
 ##########################################################
-  my $elObje = $_[0]; my $pagenumber = $_[1];
-  my ( $vector, @pageObj, @pageObjBackup, $pageAccumulator);
+  my ($elObje, $pagenumber) = ($_[0], $_[1]);
+  my ($vector, @pageObj, @pageObjBackup, $pageAccumulator);
 
-  return 0 unless $elObje =~ m'/Kids\s*\[([^\]]+)'os;
+  return 0 unless $elObje =~ m'/Kids\s*\[([^\]]+)'s;
   $vector = $1;
 
   $pageAccumulator = 0;
 
-  push @pageObj, $1 while $vector =~ m'(\d+)\s{1,2}\d+\s{1,2}R'go;
+  push @pageObj, $1 while $vector =~ m'(\d+)\s+\d+\s+R'gs;
   while ( $pageAccumulator < $pagenumber ) {
     @pageObjBackup = @pageObj;
     undef @pageObj;
     for (@pageObjBackup) {
       $elObje = getObject($_);
-      if ( $elObje =~ m'/Count\s+(\d+)'os ) {
+      if ( $elObje =~ m'/Count\s+(\d+)'s ) {
         if ( ( $pageAccumulator + $1 ) < $pagenumber ) {
           $pageAccumulator += $1;
         } else {
-          $vector = $1 if $elObje =~ m'/Kids\s*\[([^\]]+)'os ;
-          push @pageObj, $1 while $vector =~ m'(\d+)\s{1,2}\d+\s{1,2}R'gso;
+          $vector = $1 if $elObje =~ m'/Kids\s*\[([^\]]+)'s ;
+          push @pageObj, $1 while $vector =~ m'(\d+)\s+\d+\s+R'gs;
           last;
         }
       } else {
@@ -651,14 +649,14 @@ sub getResources {
 
   # Assume all input PDF pages have the same dimensions as first MediaBox found:
   if (! @GformBox) {
-    if ( $obj =~ m'MediaBox\s*\[\s*([\S]+)\s+([\S]+)\s+([\S]+)\s+([\S]+)\s*\]'os ) {
+    if ( $obj =~ m'MediaBox\s*\[\s*([\S]+)\s+([\S]+)\s+([\S]+)\s+([\S]+)\s*\]'s ) {
       @GformBox = ($1, $2, $3, $4);
     }
   }
 
-  if ( $obj =~ m'/Contents\s+(\d+)'so ) {
+  if ( $obj =~ m'/Contents\s+(\d+)'s ) {
     $formCont = $1;
-  } elsif ( $obj =~ m'/Contents\s*\[\s*(\d+)\s{1,2}\d+\s{1,2}R\s*\]'so ) {
+  } elsif ( $obj =~ m'/Contents\s*\[\s*(\d+)\s+\d+\s+R\s*\]'s ) {
     $formCont = $1;
   }
 
@@ -674,8 +672,8 @@ sub getResourcesFromObj {
   my $obj = $_[0];
   my $resources;
 
-  if ( $obj =~ m'^(.+/Resources)'so ) {
-    return $1 if $obj =~ m'Resources(\s+\d+\s{1,2}\d+\s{1,2}R)'os; # Reference (95%)
+  if ( $obj =~ m'^(.+/Resources)'s ) {
+    return $1 if $obj =~ m'Resources(\s+\d+\s+\d+\s+R)'s; # Reference (95%)
     # The resources are a dictionary. The whole is copied (morfologia.pdf):
     my $k;
     ( undef, $obj ) = split /\/Resources/, $obj;
@@ -712,9 +710,9 @@ sub openInputFile {
 
   # Find pages
   return 0 unless eval { $elObje = getObject($Groot); 1; };
-  if ( $elObje =~ m'/Pages\s+(\d+)\s{1,2}\d+\s{1,2}R'os ) {
+  if ( $elObje =~ m'/Pages\s+(\d+)\s+\d+\s+R's ) {
     $elObje = getObject($1);
-    return ($1, $inputPageSize) if $elObje =~ m'/Count\s+(\d+)'os;
+    return ($1, $inputPageSize) if $elObje =~ m'/Count\s+(\d+)'s;
   }
   return 0;
 }
@@ -733,7 +731,7 @@ sub saveOldObjects {
   for (@offset) {
     $saved = $GoldObject{$_};
     $bytes -= $saved;
-    $GoldObject{$_} = [ $saved, $bytes ] if ($_ !~ m'^xref');
+    $GoldObject{$_} = [ $saved, $bytes ] if ! m'^xref';
     $bytes = $saved;
   }
 }
@@ -748,7 +746,7 @@ sub renew_ddR_and_populate_to_be_created {
     push @Gto_be_created, [ $1, ++$GobjNr ];
     return $Gold{$1} = $GobjNr;
   };
-  $_[0] =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/&$xform . ' 0 R'/oegs;
+  $_[0] =~ s/\b(\d+)\s+\d+\s+R\b/&$xform . ' 0 R'/eg;
   return;
 }
 
@@ -759,7 +757,7 @@ sub extractContent {
   my ($incoming_line, $qty, $i, $c);
 
   sysread $IN_FILE, $c, 1;
-  sysread $IN_FILE, $c, 1 while $c =~ m!\s!s;
+  sysread $IN_FILE, $c, 1 while $c =~ m'\s's;
   while ( (defined $c) and ($c ne "\n") and ($c ne "\r") ) {
     $incoming_line .= $c;
     sysread $IN_FILE, $c, 1;
@@ -786,10 +784,9 @@ sub openOutputFile {
   binmode $OUT_FILE;
   $Gpos = syswrite $OUT_FILE, $pdf_signature;
 
-  $GobjNr      = 2;  # Objeto reservado 1 para raíz y 2 para nodo lateral inicial
+  $GobjNr      = 2;  # Objeto reservado 1 para raíz y 2 para nodo de pág. inicial
   $Gparents[0] = 2;
 
-  newPageInOutputFile();
   setInitGrState();
   return;
 }
@@ -818,18 +815,19 @@ App::paperback - Copy and transform pages from a PDF into a new PDF
  my $desiredPage            = 1;
  my $newPositionXinPoints   = 100;
  my $newPositionYinPoints   = 150;
- my $rotate                 = 90;
- my ($numPages, $paperSize) = openInputFile($inputFile);
- openOutputFile($outputFile);
- newPageInOutputFile();
- copyPageFromInputToOutput( {
+ my $rotate                 = 45;
+ my ($numPages, $paperSize) = 
+   App::paperback::openInputFile($inputFile);
+ App::paperback::openOutputFile($outputFile);
+ App::paperback::newPageInOutputFile();
+ App::paperback::copyPageFromInputToOutput( {
      page   => $desiredPage,
      rotate => $rotate,
      x      => $newPositionXinPoints,
      y      => $newPositionYinPoints
  } );
- closeInputFile();
- closeOutputFile();
+ App::paperback::closeInputFile();
+ App::paperback::closeOutputFile();
 
 =head1 DESCRIPTION
 

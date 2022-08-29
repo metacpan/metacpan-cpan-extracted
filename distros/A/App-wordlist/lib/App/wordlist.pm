@@ -10,9 +10,9 @@ use List::Util qw(shuffle);
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-20'; # DATE
+our $DATE = '2022-08-28'; # DATE
 our $DIST = 'App-wordlist'; # DIST
-our $VERSION = '0.290'; # VERSION
+our $VERSION = '0.291'; # VERSION
 
 our %SPEC;
 
@@ -246,19 +246,29 @@ _
         %argspecsopt_exclude_wordlist,
 
         or => {
-            summary => 'Match any word in query instead of the default "all"',
+            summary => 'Instead of printing words that must match all queries (the default), print words that match any query',
             schema  => 'bool',
             tags => ['category:word-filtering'],
         },
         action => {
-            schema  => ['str*', in=>[
-                'list_cpan',
-                'list_installed',
-                'list_selected',
-                'grep',
-                'stat',
-                'test',
-            ]],
+            schema  => ['str*', {
+                in=>[
+                    'list_cpan',
+                    'list_installed',
+                    'list_selected',
+                    'grep',
+                    'stat',
+                    'test',
+                ],
+                'x.in.summaries' => [
+                    'List WordList::* modules on CPAN',
+                    'List WordList::* modules installed locally',
+                    'List WordList::* that are selected for use',
+                    'Grep words from selected WordList::* modules',
+                    'Show statistics for each selected WordList::* modules',
+                    'Test words against selected WordList::* modules',
+                ],
+            }],
             default => 'grep',
             cmdline_aliases => {
                 l => {
@@ -360,7 +370,18 @@ _
         },
         color => {
             summary => 'When to highlight search string/matching pattern with color',
-            schema => ['str*', in=>['never', 'always', 'auto']],
+            schema => ['str*', {
+                in=>[
+                    'never',
+                    'always',
+                    'auto',
+                ],
+                'x.in.summaries' => [
+                    'Never show color',
+                    'Show color if program is run interactively (i.e. not piped)',
+                    'Always show color, regardless of whether program is run through a pipe',
+                ],
+            }],
             default => 'auto',
         },
     },
@@ -911,6 +932,7 @@ gen_modified_sub(
     ],
     modify_meta => sub {
         $_[0]{summary} = 'Help solve Wordle';
+        delete $_[0]{'x.doc.faq'};
         $_[0]{description} = <<'_';
 
 This is a wrapper to <prog:wordlist> designed to be a convenient helper to solve
@@ -951,7 +973,6 @@ _
 
         my $chars_unordered = '';
         my $possible_letters = join '', "a".."z";
-        my $nonpresent_letters = '';
         my @new_arg;
         for my $arg (@{ $args{arg} }) {
             my @chars = split //, $arg;
@@ -1008,7 +1029,7 @@ App::wordlist - Grep words from (or test them against) WordList::*
 
 =head1 VERSION
 
-This document describes version 0.290 of App::wordlist (from Perl distribution App-wordlist), released on 2022-08-20.
+This document describes version 0.291 of App::wordlist (from Perl distribution App-wordlist), released on 2022-08-28.
 
 =head1 SYNOPSIS
 
@@ -1224,7 +1245,7 @@ Return (at most) this number of words (0 = unlimited).
 
 =item * B<or> => I<bool>
 
-Match any word in query instead of the default "all".
+Instead of printing words that must match all queries (the default), print words that match any query.
 
 =item * B<random> => I<bool>
 
@@ -1346,7 +1367,7 @@ Return (at most) this number of words (0 = unlimited).
 
 =item * B<or> => I<bool>
 
-Match any word in query instead of the default "all".
+Instead of printing words that must match all queries (the default), print words that match any query.
 
 =item * B<random> => I<bool>
 

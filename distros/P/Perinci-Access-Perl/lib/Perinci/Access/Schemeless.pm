@@ -1,10 +1,5 @@
 package Perinci::Access::Schemeless;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-01'; # DATE
-our $DIST = 'Perinci-Access-Perl'; # DIST
-our $VERSION = '0.897'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -18,10 +13,15 @@ use Perinci::Object;
 use Perinci::Sub::Normalize qw(normalize_function_metadata);
 use Perinci::Sub::Util qw(err);
 use Scalar::Util qw(blessed);
-use Module::Path::More qw(module_path);
+use Module::Installed::Tiny qw(module_source);
 use Package::Util::Lite qw(package_exists);
 use Tie::Cache;
 use URI::Split qw(uri_split uri_join);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-08-25'; # DATE
+our $DIST = 'Perinci-Access-Perl'; # DIST
+our $VERSION = '0.898'; # VERSION
 
 our $re_perl_package =
     qr/\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9][A-Za-z_0-9]*)*\z/;
@@ -245,28 +245,27 @@ sub _load_module {
     # load and cache negative result
     my $res;
     {
-        my $fullpath = module_path(module=>$pkg, find_pmc=>0, find_prefix=>1);
+        my ($source, $fullpath);
+        eval { ($source, $fullpath) = module_source($pkg, {die=>1, find_prefix=>1}) };
+        my $err = $@;
 
         # when the module path does not exist, but the package does, we can
         # ignore this error. for example: main, CORE, etc.
         my $pkg_exists = package_exists($pkg);
 
-        if (!$fullpath) {
+        if (!defined($source)) {
             last if $pkg_exists;
-            $res = [404, "Can't find module or prefix path for package $pkg"];
-            last;
-        } elsif ($fullpath !~ /\.pm$/) {
-            last if $pkg_exists;
-            $res = [405, "Can only find a prefix path for package $pkg"];
+            $res = [404, "Can't find source for module $pkg".($fullpath && $fullpath !~ /\.pm$/ ? " (but can find prefix for it at $fullpath)" : "").": $err"];
             last;
         }
-        eval { require $module_p };
+        eval $source; ## no critic: BuiltinFunctions::ProhibitStringyEval
         if ($@) {
             die if $ENV{PERINCI_ACCESS_SCHEMELESS_DEBUG};
             $res = [500, "Can't load module $pkg (probably compile error): $@"];
             last;
         }
         # load is successful
+        $INC{$module_p} = $fullpath;
         if ($self->{after_load}) {
             eval { $self->{after_load}($self, module=>$pkg) };
             if ($@) {
@@ -280,7 +279,7 @@ sub _load_module {
 }
 
 sub __inject_entity_v_date {
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
     my ($req, $meta) = @_;
 
@@ -300,7 +299,7 @@ sub __inject_entity_v_date {
 }
 
 sub get_meta {
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
     my ($self, $req) = @_;
 
@@ -414,7 +413,7 @@ sub get_code {
     # original metadata
     my $meta;
     {
-        no strict 'refs';
+        no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
         my $metas = \%{"$req->{-perl_package}::SPEC"};
         $meta = $metas->{ $req->{-uri_leaf} || ":package" };
     }
@@ -472,7 +471,7 @@ sub get_code {
 }
 
 sub request {
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
     my ($self, $action, $uri, $extra) = @_;
 
@@ -620,7 +619,7 @@ sub action_list {
     return $res if $res && $res->[0] != 405;
 
     # get all entities from this module
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
     my $spec = \%{"$req->{-perl_package}\::SPEC"};
     my $dir = $req->{-uri_dir};
     for my $e (sort keys %$spec) {
@@ -817,7 +816,7 @@ sub actionmeta_get { +{
 } }
 
 sub action_get {
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
     my ($self, $req) = @_;
     local $req->{-uri_leaf} = $req->{-uri_leaf};
@@ -1050,7 +1049,7 @@ Perinci::Access::Schemeless - Base class for Perinci::Access::Perl
 
 =head1 VERSION
 
-This document describes version 0.897 of Perinci::Access::Schemeless (from Perl distribution Perinci-Access-Perl), released on 2021-08-01.
+This document describes version 0.898 of Perinci::Access::Schemeless (from Perl distribution Perinci-Access-Perl), released on 2022-08-25.
 
 =head1 DESCRIPTION
 
@@ -1280,14 +1279,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Ac
 
 Source repository is at L<https://github.com/perlancar/perl-Perinci-Access-Perl>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Access-Perl>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Riap>, L<Rinci>
@@ -1296,11 +1287,37 @@ L<Riap>, L<Rinci>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Access-Perl>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

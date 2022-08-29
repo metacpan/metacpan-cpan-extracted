@@ -1,0 +1,146 @@
+=pod
+
+=encoding utf8
+
+=head1 Hardcoded usage of socket communication functionality
+
+This document is about hardcoded socket communication functionality which L<Check::Socket> brings in
+other Perl distributions.
+
+=head1 Distributions
+
+=over
+
+=item L<FCGI>
+
+Version checked: 0.82
+
+File: t/02-unix_domain_socket.t
+
+ # ...
+ if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bSocket\b/) {
+     plan skip_all => 'Socket extension unavailable';
+ } elsif ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bIO\b/) {
+     plan skip_all => 'IO extension unavailable';
+ } elsif ($^O eq 'os2') {
+     eval { IO::Socket::pack_sockaddr_un('/foo/bar') || 1 };
+     if ($@ !~ /not implemented/) {
+         plan skip_all => 'compiled without TCP/IP stack v4';
+     }
+ } elsif ($^O =~ m/^(?:qnx|nto|vos)$/ ) {
+     plan skip_all => "UNIX domain sockets not implemented on $^O";
+ # ...
+ } elsif ($^O eq 'MSWin32') {
+     if ($ENV{CONTINUOUS_INTEGRATION}) {
+         # https://github.com/Perl/perl5/issues/17429
+         plan skip_all => 'Skipping on Windows CI';
+     } else {
+         # https://github.com/Perl/perl5/issues/17575
+         if (! eval { socket(my $sock, PF_UNIX, SOCK_STREAM, 0) }) {
+             plan skip_all => "AF_UNIX unavailable or disabled on this platform"
+         }
+     }
+ }
+ # ...
+
+=item L<IO>
+
+Version checked: 1.48
+
+File: t/cachepropagate-unix.t
+
+ # ...
+ plan skip_all => "UNIX domain sockets not implemented on $^O"
+   if ($^O =~ m/^(?:qnx|nto|vos|MSWin32|VMS)$/);
+ # ...
+
+File: t/io_unix.t
+
+ # ...
+     if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bSocket\b/) {
+         $reason = 'Socket extension unavailable';
+     }
+     elsif ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bIO\b/) {
+         $reason = 'IO extension unavailable';
+     }
+     elsif ($^O eq 'os2') {
+         eval {IO::Socket::pack_sockaddr_un('/foo/bar') || 1}
+           or $@ !~ /not implemented/ or
+             $reason = 'compiled without TCP/IP stack v4';
+     }
+     elsif ($^O =~ m/^(?:qnx|nto|vos)$/ ) {
+         $reason = "UNIX domain sockets not implemented on $^O";
+     }
+ # ...
+     elsif ($^O eq 'MSWin32') {
+       if ($ENV{CONTINUOUS_INTEGRATION}) {
+          $reason = 'Skipping on Windows CI, see gh17575 and gh17429';
+       } else {
+        $reason = "AF_UNIX unavailable or disabled on this platform"
+          unless eval { socket(my $sock, PF_UNIX, SOCK_STREAM, 0) };
+       }
+     }
+ # ...
+
+File: t/io_sock.t
+
+ # ...
+     my $reason;
+     if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bSocket\b/) {
+         $reason = 'Socket extension unavailable';
+     }
+     elsif ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bIO\b/) {
+         $reason = 'IO extension unavailable';
+     }
+ # ...
+     $reason = q[Test out of sequence on windows] if $^O eq 'MSWin32' && $ENV{CONTINUOUS_INTEGRATION};
+     if ($reason) {
+         print "1..0 # Skip: $reason\n";
+         exit 0;
+     }
+ # ...
+
+=item L<IO::Socket::INET6>
+
+Version checked: 2.72
+
+File: t/io_sock6.t
+
+ # ...
+         my $reason;
+ # ...
+         elsif ($Config{'extensions'} !~ /\bSocket\b/) {
+             $reason = 'Socket extension unavailable';
+         }
+         elsif ($Config{'extensions'} !~ /\bIO\b/) {
+             $reason = 'IO extension unavailable';
+         }
+         if ($reason) {
+             print "1..0 # Skip: $reason\n";
+             exit 0;
+         }
+ # ...
+
+=back
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/Check-Socket>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2021-2022 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.02
+
+=cut

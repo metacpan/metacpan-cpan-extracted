@@ -1,3 +1,8 @@
+0.006   2022-07-16  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix calling gen_filter() to get error message, again.
+
+
 0.005   2022-07-16  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Fix calling filter code when might_fail=1.

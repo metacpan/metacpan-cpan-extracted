@@ -6,6 +6,7 @@ Makefile.PL
 README
 examples/A333852-essential.pl
 examples/A333852.pl
+examples/A353077.pl
 examples/numlist_sort
 examples/pds_canonize
 examples/pds_check
@@ -14,6 +15,7 @@ examples/pds_enumerate
 examples/pds_eta
 examples/pds_find_delta
 examples/pds_gap_canonize
+examples/pds_info
 examples/pds_largest_gap
 examples/pds_linear_maps
 examples/pds_multiply

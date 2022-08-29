@@ -1,0 +1,489 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#EXPORT">EXPORT</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Reference">Reference</a></li>
+      <li><a href="#Objective">Objective</a></li>
+      <li><a href="#Function-to-optimize">Function to optimize</a></li>
+      <li><a href="#Features">Features</a></li>
+      <li><a href="#Mutation">Mutation</a></li>
+      <li><a href="#Verification">Verification</a></li>
+    </ul>
+  </li>
+  <li><a href="#EXAMPLE">EXAMPLE</a></li>
+  <li><a href="#OUTPUT-PREVIEW">OUTPUT PREVIEW</a></li>
+  <li><a href="#INSTALLATION">INSTALLATION</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Optimization::NSGAII - non dominant sorting genetic algorithm for multi-objective optimization</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>Version 0.01</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>        use Optimization::NSGAII qw/ f_Optim_NSGAII /;
+        use Data::Dumper;
+
+        # D E F I N E   O B J E C T I V E S   T O   O P T I M I Z E 
+        ###########################################################
+
+        sub f_to_optimize {        
+            
+            my $x = shift;              # load input parameters (genes constituting a single individual)
+
+            # ...                       # do your things using these inputs $x-&gt;[0], $x-&gt;[1] ... 
+                                        # and produce the outputs to be minimized $f1, $f2 ...
+
+                                        # examples of things you can do include:
+                                        # - mathematical formulas in perl to define $f1, $f2, ...
+                                        # - computations with commercial software and so: 
+                                        #       - write input file using $x-&gt;[0] ...
+                                        #       - run the computation, for example with perl system() function
+                                        #            - locally or
+                                        #            - on a server for example with &#39;qsub... &#39;
+                                        #       - wait simulation to end 
+                                        #       - postprocess its output and define $f1, $f2 ...
+                                        # - ...
+            
+            my $out = [$f1,$f2,$f3];    # and finally return the set of these outputs for
+            return $out;                # this single individual of the population
+            
+        }
+
+        # D E F I N E   B O U N D S   [ A N D   I N E Q U A L I T I E S ]
+        ###################################################################
+        
+                                                    # define min and max bounds for $x-&gt;[0], $x-&gt;[1], ...
+        my $bounds = [[0,1],[0,1],[0,1]];           # example with 3 input parameters (genes) with min = 0 and max = 1:
+        
+        sub f_inequality {                          # optional inequality constraints set
+        
+            my $x =shift;
+            
+            my @ineq = 
+                (
+                 $x-&gt;[1] + 1 ,                      # equations &gt;= 0 
+                 $x-&gt;[0] + $x-&gt;[1] - 9,
+                 ...
+                 ...
+                              
+                );
+                
+            return \@ineq;
+        }
+   
+        # R U N   O P T I M I Z A T I O N
+        #################################
+
+                                                    # execute NSGA-II algorithm  
+
+        my $ref_input_output = f_Optim_NSGAII(
+            {
+                        
+                &#39;nPop&#39;          =&gt; 50,              # population size
+                &#39;nGen&#39;          =&gt; 250,             # final generation number
+                &#39;bounds&#39;        =&gt; $bounds,         # loads the previously defined bounds
+                &#39;function&#39;      =&gt; \&amp;f_to_optimize, # loads the subroutine to optimize (minimize)
+                &#39;nProc&#39;         =&gt; 8,               # how many individuals to evaluate in parallel as separate processes
+                &#39;filesDir&#39;      =&gt; &#39;/tmp&#39;,          # work directory
+                
+                
+                # optional parameters:
+                
+                &#39;verboseFinal&#39;  =&gt; 1,               # 0|1: input and output values print at final generation, for each individual of the population
+                                                      # default: print is made ( = 1)
+                &#39;f_ineq&#39;        =&gt; \&amp;f_inequality,  # subroutine describing the constraining inequality set
+                                                      # default: no constraint function
+                                                    
+                                                    # parameters for mutation        
+                                                                           
+                &#39;distrib&#39;       =&gt; [-1,0,1],        # distribution of values (for example a Gaussian distribution), used to perturb individuals
+                                                      # default: [-1,-0.5,0,0.5,1]
+                &#39;scaleDistrib&#39;  =&gt; 0.05,            # scaling of the distribution array
+                                                      # default: 0 (no perturbation will be done)
+                &#39;percentMut&#39;    =&gt; 5,               # percentage of individual that are randomly perturbated (in all their genes)
+                                                    # and also percentage of input parameters (genes) that are randomly mutated in each individual
+                                                      # default: 5%
+            },
+
+                                                    # the following is the optional set of parameters for &#39;Pareto front&#39; 2D live plot
+                                                    # if the part below is not present, no plot will be made
+
+            {
+
+                &#39;dx&#39;        =&gt; 200,                 # characters width and height of the plot
+                &#39;dy&#39;        =&gt; 40,
+                &#39;xlabel&#39;    =&gt; &#39;stiffness [N/mm]&#39;,  # horizontal and vertical axis labels
+                &#39;ylabel&#39;    =&gt; &#39;mass [kg]&#39;,
+                &#39;xlim&#39;      =&gt; [0,1],               # horizontal and vertical axis limits
+                &#39;ylim&#39;      =&gt; [0,1],
+                &#39;nfun&#39;      =&gt; [0,2],               # which function to plot from return value by f_to_optimize ($out) ; 0=f1, 1=f2 ...
+            }
+        );
+
+        # U S E   S O L U T I O N S 
+        ############################  
+
+        # for example print of the input parameters and 
+        # corresponding output functions&#39; values of the final found Pareto front
+        
+        my @ref_input = @{$ref_input_output-&gt;[0]};
+        my @ref_output = @{$ref_input_output-&gt;[1]};
+
+        print Dumper(\@ref_input);
+        print Dumper(\@ref_output);</code></pre>
+
+<h1 id="EXPORT">EXPORT</h1>
+
+<ul>
+
+<li><p>f_Optim_NSGAII</p>
+
+</li>
+</ul>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<h2 id="Reference">Reference</h2>
+
+<p>NSGAII.pm apply (with some variations) the NSGA-II algorithm described in the paper:</p>
+
+<p>A Fast and Elitist Multiobjective Genetic Algorithm:NSGA-II</p>
+
+<ul>
+
+<p>Kalyanmoy Deb, Associate Member, IEEE, Amrit Pratap, Sameer Agarwal, and T. Meyarivan</p>
+
+</ul>
+
+<h2 id="Objective">Objective</h2>
+
+<p><code>NSGAII.pm</code> performs multi-objective optimization using a genetic algorithm approach: it searches the input parameters (genes) which minimize a set of output functions and with some luck a Pareto front is produced. In the Pareto front no solution is better than the others because each solution is a trade-off.</p>
+
+<h2 id="Function-to-optimize">Function to optimize</h2>
+
+<p>This module requires to define a perl subroutine (<code>f_to_optimize</code> in the code above) which can take the input parameters and gives the corresponding outputs (in other words, it requires a subroutine to evaluate an individual of this population)</p>
+
+<h2 id="Features">Features</h2>
+
+<p>The optimization is done:</p>
+
+<ul>
+
+<li><p>considering allowed <b>boundary for each input parameter (min e max)</b></p>
+
+</li>
+<li><p>considering optional <b>set of inequality equations containing input parameters</b> (x1^2 + sqrt(x2) -x3 &gt;= 0 , ...)</p>
+
+</li>
+<li><p>with a <b>parallel evaluation</b> of the subroutine to optimize (and so of individuals) in each generation, by using perl fork() function</p>
+
+</li>
+</ul>
+
+<p>The inequalities must be given by a subroutine which calculate the error, look below in the example: basically all the LHS of the inequalities in the form &quot;... &gt;=0&quot; are put in an array.</p>
+
+<p>The number of <b>parallel evaluation</b> of <code>f_to_optimize</code>, and so the value of <code>nProc</code>, can be for example the max number of parallel <code>f_to_optimize</code> computation that you want and can:</p>
+
+<ul>
+
+<li><p>run on your pc if you run the computation locally (e.g. 4)</p>
+
+</li>
+<li><p>run on a remote server if you run (inside the <code>f_to_optimize</code>) the computation there (e.g. 256)</p>
+
+</li>
+</ul>
+
+<p><code>nPop</code> should be multiple of <code>nProc</code>, to optimize resources use, but it is not necessary.</p>
+
+<p>Problems with this modules are expected on systems not supporting fork() perl function.</p>
+
+<p>A <b>2D plot</b> can be activated to control in real time the convergence of the algorithm on two chosen output functions (to assist at the formation of the Pareto front, generation after generation).</p>
+
+<p>Each time a new generation finish, all information of the population are written in the <code>filesDir</code> directory:</p>
+
+<ul>
+
+<li><p>VPt_genXXXXX.txt: input (parameters values)</p>
+
+</li>
+<li><p>Pt_genXXXXX.txt: output (corresponding functions values)</p>
+
+</li>
+</ul>
+
+<h2 id="Mutation">Mutation</h2>
+
+<p>The implementation of the <b>mutation algorithm</b> part has been done in a <b>different way if compared to that described in the paper</b>.</p>
+
+<p>In particular <b>two mutation</b> are applied in sequence:</p>
+
+<dl>
+
+<dt id="mutation-of-all-the-input-parameters-the-genes-but-only-on-a-certain-percentage-percentMut-of-the-population">1) mutation of all the input parameters (the genes), but only on a certain percentage <code>percentMut</code> of the population:</dt>
+<dd>
+
+<p>-&gt; Small perturbation of the each gene by adding a number chosen randomly from the given <code>distrib</code> (scaled with both <code>scaleDistrib</code> and the difference between the two bounds).</p>
+
+</dd>
+<dt id="mutation-of-all-the-individuals-of-the-population-but-only-on-a-certain-percentage-percentMut-of-the-input-parameters-the-genes">2) mutation of all the individuals of the population, but only on a certain percentage <code>percentMut</code> of the input parameters (the genes)</dt>
+<dd>
+
+<p>-&gt; Random change (inside the permitted bounds)</p>
+
+</dd>
+</dl>
+
+<h2 id="Verification">Verification</h2>
+
+<p>This module has been tested, successfully, on many of the test problems defined in the paper described in the Reference section (see EXAMPLE section)</p>
+
+<p>The performance (convergence for same population number and max generation number) seems to be comparable to that described in that paper.</p>
+
+<h1 id="EXAMPLE">EXAMPLE</h1>
+
+<p><b>More examples</b> (the same test problems contained in the paper described in the Reference section) are available in the test folder (<i>NSGAII_all_examples.pl</i> containing ZDT1, ZDT2, TNK, ...).</p>
+
+<p>Here you see the <b>CONSTR</b> problem with:</p>
+
+<ul>
+
+<li><p>two input parameters $x-&gt;[0] and $x-&gt;[1]</p>
+
+</li>
+<li><p>two output functions to optimize f1 and f2</p>
+
+</li>
+<li><p>two constraining equations between the input parameters</p>
+
+</li>
+<li><p>8 process in parallel (8 subroutine f_CONTRS are evaluated in parallel as indipendent processes)</p>
+
+</li>
+</ul>
+
+<pre><code>    use Optimization::NSGAII qw/ f_Optim_NSGAII /;
+    
+    # function to minimize
+    sub f_CONSTR {
+        
+        my $x = shift;
+        
+        my $n = scalar(@$x);
+        
+        my $f1 = $x-&gt;[0];
+        my $f2 = (1 + $x-&gt;[1])/$x-&gt;[0];
+        
+        my $out = [$f1,$f2];
+        
+        return $out;
+    }
+
+    # inequality constraints set
+    sub f_inequality {
+        my $x =shift;
+        
+        # equation &gt;= 0 
+        my @ineq = 
+            (
+             $x-&gt;[1] + 9*$x-&gt;[0] - 6 ,
+            -$x-&gt;[1] + 9*$x-&gt;[0] -1 
+            );
+            
+        return \@ineq;
+    }
+
+    my $bounds = [[0.1,1],[0,5]];
+
+    my $ref_input_output = f_Optim_NSGAII(
+        {
+            &#39;nPop&#39;          =&gt; 50,
+            &#39;nGen&#39;          =&gt; 100,
+            &#39;bounds&#39;        =&gt; $bounds,
+            &#39;function&#39;      =&gt; \&amp;f_CONSTR,
+            &#39;f_ineq&#39;        =&gt; \&amp;f_inequality, 
+            &#39;nProc&#39;         =&gt; 8,
+            &#39;filesDir&#39;      =&gt; &#39;/tmp&#39;,
+            &#39;verboseFinal&#39;  =&gt; 1,
+            &#39;distrib&#39;       =&gt; [-1,-0.9,-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9],
+            &#39;scaleDistrib&#39;  =&gt; 0.05,
+            &#39;percentMut&#39;    =&gt; 5,
+        },
+        {
+            &#39;dx&#39;            =&gt; 100,
+            &#39;dy&#39;            =&gt; 40,
+            &#39;xlabel&#39;        =&gt; &#39;stiffness [N/mm]&#39;,
+            &#39;ylabel&#39;        =&gt; &#39;mass [kg]&#39;,
+            &#39;xlim&#39;          =&gt; [0.1,1],
+            &#39;ylim&#39;          =&gt; [0,10],
+            &#39;nfun&#39;          =&gt; [0,1],
+        }        
+    );</code></pre>
+
+<h1 id="OUTPUT-PREVIEW">OUTPUT PREVIEW</h1>
+
+<p>This below is a typical output of the final Pareto front (problem TNK).</p>
+
+<p>The numbers represent the rank of the points: in the initial generations you can see points of rank 1,2,3... where points with rank 1 dominate points of rank 2 and so on.</p>
+
+<p>Generation after generation all the points go on the Pareto front, so all the points become rank 1 (not dominated, nothing best is present in this population)</p>
+
+<p>The points will also expand to occupy the entire front.</p>
+
+<pre><code>                            GENERATION 250
+m|                                                                      
+a|                                                                      
+s|                                                                      
+s|                                                                      
+ |                                                                      
+[|                                                                      
+k|                                                                      
+g|  1                                                                   
+]|    11                                                                
+ |      11                                                              
+ |         1            1                                               
+ |                       11                                             
+ |                         1                                            
+ |                          11 1   1 1 1                                
+ |                                      1                               
+ |                                      1                               
+ |                                                                      
+ |                                      1                               
+ |                                      1 1                             
+ |                                         1111                         
+ |                                              1                       
+ |                                                                      
+ |                                                                      
+ |                                                                      
+ |                                                                      
+ |                                              1                       
+ |                                               11                     
+ |                                                 1                    
+ |                                                   1                  
+ |                                                                      
+ |______________________________________________________________________
+                                                       stiffness [N/mm]</code></pre>
+
+<h1 id="INSTALLATION">INSTALLATION</h1>
+
+<p>execute:</p>
+
+<p><code>cpan Optimization::NSGAII</code></p>
+
+<p>or (following the instruction in perlmodinstall)</p>
+
+<ul>
+
+<li><p>download the <i>Optimization-NSGAII-X.XX.tar.gz</i></p>
+
+</li>
+<li><p>decompress and unpack</p>
+
+<ul>
+
+<li><p><code>gzip -d Optimization-NSGAII-X.XX.tar.gz</code></p>
+
+</li>
+<li><p><code>tar -xof Optimization-NSGAII-X.XX.tar</code></p>
+
+</li>
+</ul>
+
+</li>
+<li><p><code>cd Optimization-NSGAII-X.XX</code></p>
+
+</li>
+<li><p><code>perl Makefile.PL</code></p>
+
+</li>
+<li><p><code>make</code></p>
+
+</li>
+<li><p><code>make test</code></p>
+
+</li>
+<li><p><code>make install</code></p>
+
+<p>to install it locally use this instead of <code>perl Makefile.PL</code>:</p>
+
+<p><code>perl Makefile.PL PREFIX=/my/folder</code> if you want to install it in /my/folder then you will have to use in your script: <code>use lib &quot;path/before(Optimization/NSGAII.pm);&quot;</code> before using <code>use Optimization::NSGAII qw/ f_Optim_NSGAII /;</code></p>
+
+</li>
+</ul>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Dario Rubino, <code>&lt;drubino at cpan.org&gt;</code></p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>Solutions (input-output pairs) often contain duplicates, this would require some investigation.</p>
+
+<p>Please report any bugs to <code>bug-optimization-nsgaii at rt.cpan.org</code>, or through the web interface at <a href="https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Optimization-NSGAII">https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Optimization-NSGAII</a>. I will be notified, and then you&#39;ll automatically be notified of progress on your bug as I make changes.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>You can find documentation for this module with the perldoc command.</p>
+
+<pre><code>    perldoc Optimization::NSGAII</code></pre>
+
+<p>You can also look for information at:</p>
+
+<ul>
+
+<li><p>RT: CPAN&#39;s request tracker (report bugs here)</p>
+
+<p><a href="https://rt.cpan.org/NoAuth/Bugs.html?Dist=Optimization-NSGAII">https://rt.cpan.org/NoAuth/Bugs.html?Dist=Optimization-NSGAII</a></p>
+
+</li>
+<li><p>CPAN Ratings</p>
+
+<p><a href="https://cpanratings.perl.org/d/Optimization-NSGAII">https://cpanratings.perl.org/d/Optimization-NSGAII</a></p>
+
+</li>
+<li><p>Search CPAN</p>
+
+<p><a href="https://metacpan.org/release/Optimization-NSGAII">https://metacpan.org/release/Optimization-NSGAII</a></p>
+
+</li>
+</ul>
+
+<h1 id="LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</h1>
+
+<p>This software is Copyright (c) 2022 by Dario Rubino.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>  The Artistic License 2.0 (GPL Compatible)</code></pre>
+
+
+</body>
+
+</html>
+
+

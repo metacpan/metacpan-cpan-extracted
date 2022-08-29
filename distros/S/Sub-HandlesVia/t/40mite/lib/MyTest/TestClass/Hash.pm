@@ -14,6 +14,7 @@ has attr => (
     'my_count' => 'count',
     'my_defined' => 'defined',
     'my_delete' => 'delete',
+    'my_delete_where' => 'delete_where',
     'my_elements' => 'elements',
     'my_exists' => 'exists',
     'my_for_each_key' => 'for_each_key',
@@ -29,7 +30,7 @@ has attr => (
     'my_sorted_keys' => 'sorted_keys',
     'my_values' => 'values',
   },
-  default => {},
+  default => sub { {} },
 );
 
 1;

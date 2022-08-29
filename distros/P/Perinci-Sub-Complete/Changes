@@ -1,6 +1,12 @@
-0.944   2021-05-07  Released-By: PERLANCAR; Urgency: medium
+0.945   2022-08-28  Released-By: PERLANCAR; Urgency: medium
 
-	- Adjust to Perinci::Examples 0.821 (RT#135349).
+        - Re-release 0.944 (2022-08-28). Currently still unmerged with CPAN
+          version of 0.944.
+
+
+0.944   2022-08-28  Released-By: PERLANCAR; Urgency: medium
+
+        - Force updating dependency Complete::Getopt::Long 0.481.
 
 
 0.943   2020-06-04  Released-By: PERLANCAR; Urgency: low

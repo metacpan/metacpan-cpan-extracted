@@ -1833,7 +1833,7 @@ sub lock
         $flags |= LOCK_UN if( $opts->{unlock} );
     }
     my $file = $self->filename;
-    my $io = $self->opened || return( $self->error( "File is not opened yet. You must open the file \"${file}\" first to unlock semaphore." ) );
+    my $io = $self->opened || return( $self->error( "File is not opened yet. You must open the file \"${file}\" first to lock it." ) );
     # perlport: "(VMS, RISC OS, VOS) Not implemented"
     return(1) if( $^O =~ /^(vms|riscos|vos)$/i );
     # $type = LOCK_EX if( !defined( $type ) );

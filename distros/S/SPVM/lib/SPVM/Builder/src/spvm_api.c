@@ -265,7 +265,7 @@ SPVM_ENV* SPVM_API_new_env_raw() {
     SPVM_API_get_class_id,
     SPVM_API_new_stack,
     SPVM_API_free_stack,
-    SPVM_API_get_instance_method_id_super,
+    NULL,
     SPVM_API_new_memory_env,
     SPVM_API_free_memory_env,
     SPVM_API_get_memory_blocks_count_env,
@@ -280,15 +280,30 @@ SPVM_ENV* SPVM_API_new_env_raw() {
     SPVM_API_get_args_stack_length,
     SPVM_API_set_args_stack_length,
     SPVM_API_dumpc,
-    SPVM_API_check_flag_pointer_dont_free,
-    SPVM_API_enable_flag_pointer_dont_free,
-    SPVM_API_disable_flag_pointer_dont_free,
-    SPVM_API_get_pointer_length,
-    SPVM_API_set_pointer_length,
-    SPVM_API_get_pointer_any_info,
-    SPVM_API_set_pointer_any_info,
+    SPVM_API_new_pointer_with_fields_raw,
+    SPVM_API_new_pointer_with_fields,
+    SPVM_API_new_pointer_with_fields_by_name,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
     SPVM_API_is_class,
     SPVM_API_is_pointer_class,
+    SPVM_API_get_pointer_fields_length,
+    SPVM_API_get_pointer_field_byte,
+    SPVM_API_get_pointer_field_short,
+    SPVM_API_get_pointer_field_int,
+    SPVM_API_get_pointer_field_long,
+    SPVM_API_get_pointer_field_float,
+    SPVM_API_get_pointer_field_double,
+    SPVM_API_get_pointer_field_pointer,
+    SPVM_API_set_pointer_field_byte,
+    SPVM_API_set_pointer_field_short,
+    SPVM_API_set_pointer_field_int,
+    SPVM_API_set_pointer_field_long,
+    SPVM_API_set_pointer_field_float,
+    SPVM_API_set_pointer_field_double,
+    SPVM_API_set_pointer_field_pointer,
   };
   
   SPVM_ENV* env = calloc(1, sizeof(env_init));
@@ -753,6 +768,19 @@ void* SPVM_API_new_object_by_name(SPVM_ENV* env, SPVM_VALUE* stack, const char* 
   
   void* object = env->new_object(env, stack, id);
   
+  return object;
+}
+
+SPVM_OBJECT* SPVM_API_new_pointer_with_fields_by_name(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, void* pointer, int32_t fields_length, int32_t* error, const char* file, int32_t line) {
+  *error = 0;
+  
+  int32_t id = env->get_basic_type_id(env, class_name);
+  if (id < 0) {
+    *error = 1;
+    env->die(env, stack, "The class \"%s\" is not loaded", class_name, file, line);
+    return NULL;
+  };
+  SPVM_OBJECT* object = SPVM_API_new_pointer_with_fields(env, stack, id, pointer, fields_length);
   return object;
 }
 
@@ -2261,6 +2289,16 @@ SPVM_OBJECT* SPVM_API_new_pointer(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basi
   return object;
 }
 
+SPVM_OBJECT* SPVM_API_new_pointer_with_fields(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, void* pointer, int32_t fields_length) {
+  (void)env;
+  
+  SPVM_OBJECT* object = SPVM_API_new_pointer_with_fields_raw(env, stack, basic_type_id, pointer, fields_length);
+  
+  SPVM_API_push_mortal(env, stack, object);
+  
+  return object;
+}
+
 SPVM_OBJECT* SPVM_API_new_string_nolen_raw(SPVM_ENV* env, SPVM_VALUE* stack, const char* bytes) {
   (void)env;
   
@@ -2614,6 +2652,11 @@ SPVM_OBJECT* SPVM_API_new_object_raw(SPVM_ENV* env, SPVM_VALUE* stack, int32_t b
 }
 
 SPVM_OBJECT* SPVM_API_new_pointer_raw(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, void* pointer) {
+  int32_t fields_length = 0;
+  return SPVM_API_new_pointer_with_fields_raw(env, stack, basic_type_id, pointer, fields_length);
+}
+
+SPVM_OBJECT* SPVM_API_new_pointer_with_fields_raw(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, void* pointer, int32_t fields_length) {
   (void)env;
   
   SPVM_RUNTIME* runtime = env->runtime;
@@ -2630,8 +2673,10 @@ SPVM_OBJECT* SPVM_API_new_pointer_raw(SPVM_ENV* env, SPVM_VALUE* stack, int32_t 
   if (!class) {
     return NULL;
   }
-
-  int64_t alloc_byte_size = (intptr_t)env->object_header_byte_size + sizeof(void*) * 2;
+  
+  // First data is the pointer data. The default is NULL (oval).
+  // Second data is the length of the pointer fields. The default is 0 (ival).
+  int64_t alloc_byte_size = (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * (2 + fields_length);
   
   // Create object
   SPVM_OBJECT* object = SPVM_API_new_memory_stack(env, stack, alloc_byte_size);
@@ -2640,6 +2685,7 @@ SPVM_OBJECT* SPVM_API_new_pointer_raw(SPVM_ENV* env, SPVM_VALUE* stack, int32_t 
   }
   
   *(void**)((intptr_t)object + (intptr_t)env->object_header_byte_size) = pointer;
+  *(int32_t*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE)) = fields_length;
 
   object->basic_type_id = basic_type->id;
   object->type_dimension = 0;
@@ -3032,11 +3078,6 @@ int32_t SPVM_API_get_instance_method_id_static(SPVM_ENV* env, const char* class_
 
 int32_t SPVM_API_get_instance_method_id(SPVM_ENV* env, SPVM_OBJECT* object, const char* method_name) {
   int32_t is_parent = 0;
-  return SPVM_API_get_instance_method_id_common(env, object, method_name, is_parent);
-}
-
-int32_t SPVM_API_get_instance_method_id_super(SPVM_ENV* env, SPVM_OBJECT* object, const char* method_name) {
-  int32_t is_parent = 1;
   return SPVM_API_get_instance_method_id_common(env, object, method_name, is_parent);
 }
 
@@ -3768,48 +3809,108 @@ void SPVM_API_set_args_stack_length(SPVM_ENV* env, SPVM_VALUE* stack, int32_t ar
   stack[STACK_INDEX_ARGS_LENGTH].ival = args_length;
 }
 
-int32_t SPVM_API_check_flag_pointer_dont_free(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object) {
-  (void)env;
+int32_t SPVM_API_get_pointer_fields_length(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object) {
   
-  int32_t pointer_dont_free = object->flag & SPVM_OBJECT_C_FLAG_POINTER_DONT_FREE;
+  // Get fields length
+  int32_t fields_length = *(int32_t*)((intptr_t)object + env->object_header_byte_size + sizeof(SPVM_VALUE));
   
-  return pointer_dont_free;
+  return fields_length;
 }
 
-void SPVM_API_enable_flag_pointer_dont_free(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object) {
-  (void)env;
-  
-  object->flag |= SPVM_OBJECT_C_FLAG_POINTER_DONT_FREE;
+int8_t SPVM_API_get_pointer_field_byte(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index) {
+
+  // Get field value
+  int8_t value = *(int8_t*)((intptr_t)object + env->object_header_byte_size + sizeof(SPVM_VALUE) * (2 + field_index));
+
+  return value;
 }
 
-void SPVM_API_disable_flag_pointer_dont_free(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object) {
-  (void)env;
+int16_t SPVM_API_get_pointer_field_short(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index) {
+
+  // Get field value
+  int16_t value = *(int16_t*)((intptr_t)object + env->object_header_byte_size + sizeof(SPVM_VALUE) * (2 + field_index));
   
-  object->flag &= ~SPVM_OBJECT_C_FLAG_POINTER_DONT_FREE;
+  return value;
 }
 
-int32_t SPVM_API_get_pointer_length(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object) {
-  (void)env;
+int32_t SPVM_API_get_pointer_field_int(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index) {
+
+  // Get field value
+  int32_t value = *(int32_t*)((intptr_t)object + env->object_header_byte_size + sizeof(SPVM_VALUE) * (2 + field_index));
   
-  int32_t length = object->length;
-  
-  return length;
+  return value;
 }
 
-void SPVM_API_set_pointer_length(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t length) {
-  (void)env;
+int64_t SPVM_API_get_pointer_field_long(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index) {
+
+  // Get field value
+  int64_t value = *(int64_t*)((intptr_t)object + env->object_header_byte_size + sizeof(SPVM_VALUE) * (2 + field_index));
   
-  object->length = length;
+  return value;
 }
 
-void* SPVM_API_get_pointer_any_info(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object) {
-  (void)env;
+float SPVM_API_get_pointer_field_float(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index) {
+
+  // Get field value
+  float value = *(float*)((intptr_t)object + env->object_header_byte_size + sizeof(SPVM_VALUE) * (2 + field_index));
   
-  return *(void**)((intptr_t)object + env->object_header_byte_size + sizeof(void*));
+  return value;
 }
 
-void SPVM_API_set_pointer_any_info(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, void* any_info) {
-  (void)env;
+double SPVM_API_get_pointer_field_double(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index) {
+
+  // Get field value
+  double value = *(double*)((intptr_t)object + env->object_header_byte_size + sizeof(SPVM_VALUE) * (2 + field_index));
   
-  *(void**)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(void*)) = any_info;
+  return value;
+}
+
+void* SPVM_API_get_pointer_field_pointer(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index) {
+
+  // Get field value
+  void* value = *(void**)((intptr_t)object + env->object_header_byte_size + sizeof(SPVM_VALUE) * (2 + field_index));
+  
+  return value;
+}
+
+void SPVM_API_set_pointer_field_byte(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index, int8_t value) {
+
+  // Get field value
+  *(int8_t*)((intptr_t)object + env->object_header_byte_size + sizeof(SPVM_VALUE) * (2 + field_index)) = value;
+}
+
+void SPVM_API_set_pointer_field_short(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index, int16_t value) {
+
+  // Get field value
+  *(int16_t*)((intptr_t)object + env->object_header_byte_size + sizeof(SPVM_VALUE) * (2 + field_index)) = value;
+}
+
+void SPVM_API_set_pointer_field_int(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index, int32_t value) {
+
+  // Get field value
+  *(int32_t*)((intptr_t)object + env->object_header_byte_size + sizeof(SPVM_VALUE) * (2 + field_index)) = value;
+}
+
+void SPVM_API_set_pointer_field_long(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index, int64_t value) {
+
+  // Get field value
+  *(int64_t*)((intptr_t)object + env->object_header_byte_size + sizeof(SPVM_VALUE) * (2 + field_index)) = value;
+}
+
+void SPVM_API_set_pointer_field_float(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index, float value) {
+
+  // Get field value
+  *(float*)((intptr_t)object + env->object_header_byte_size + sizeof(SPVM_VALUE) * (2 + field_index)) = value;
+}
+
+void SPVM_API_set_pointer_field_double(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index, double value) {
+
+  // Get field value
+  *(double*)((intptr_t)object + env->object_header_byte_size + sizeof(SPVM_VALUE) * (2 + field_index)) = value;
+}
+
+void SPVM_API_set_pointer_field_pointer(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index, void* value) {
+
+  // Get field value
+  *(void**)((intptr_t)object + env->object_header_byte_size + sizeof(SPVM_VALUE) * (2 + field_index)) = value;
 }

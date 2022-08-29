@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::Util;
-our $VERSION = '0.57'; # VERSION
+our $VERSION = '0.59'; # VERSION
 
 use Crypt::OpenSSL::Random qw(random_pseudo_bytes);
 
@@ -14,7 +14,7 @@ our @EXPORT_OK = qw(
 );
 
 sub generate_id {
-    return 'NETSAML2_' . unpack 'H*', random_pseudo_bytes(16);
+    return 'NETSAML2_' . unpack 'H*', random_pseudo_bytes(32);
 }
 
 
@@ -32,7 +32,7 @@ Net::SAML2::Util - Utility functions for Net:SAML2
 
 =head1 VERSION
 
-version 0.57
+version 0.59
 
 =head1 SYNOPSIS
 

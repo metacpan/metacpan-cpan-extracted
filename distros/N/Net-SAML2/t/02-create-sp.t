@@ -149,6 +149,11 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
             '1', '.. as does assertions');
         is($node->getAttribute('errorURL'),
             'http://localhost:3000/error', 'Got the correct error URI');
+        is(
+            $node->getAttribute('protocolSupportEnumeration'),
+            'urn:oasis:names:tc:SAML:2.0:protocol',
+            'Got the protocolSupportEnumeration'
+        );
 
         my $p = $node->nodePath();
 
@@ -211,6 +216,7 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
                 isDefault => 'true'
             }
         ],
+        error_url => 'https://foo.example.com/error-url',
     );
 
     my $xpath = get_xpath(
@@ -219,10 +225,15 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
         ds => URN_SIGNATURE,
     );
 
-    my @ssos
-        = $xpath->findnodes(
-        '//md:EntityDescriptor/md:SPSSODescriptor/md:AssertionConsumerService'
-        );
+
+    # Test SPSSODescriptor
+    my $node = get_single_node_ok($xpath, '//md:SPSSODescriptor');
+    is($node->getAttribute('errorURL'),
+        'https://foo.example.com/error-url', 'Got the correct error URI');
+
+    my $path = $node->nodePath;
+
+    my @ssos = $xpath->findnodes("$path/md:AssertionConsumerService");
 
     if (is(@ssos, 2, "Got two assertionConsumerService(s)")) {
 
@@ -249,6 +260,13 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
         is($ssos[1]->getAttribute('index'), 2,
             "... and has the correct index");
     }
+
+    my $default = $sp->get_default_assertion_service;
+    is($default->{Binding}, BINDING_HTTP_ARTIFACT,
+        "We found the default assertion service");
+    is($default->{Location}, 'https://foo.example.com/acs-http-artifact',
+        "... with the correct URI");
+    is($default->{index}, 2, "... and index");
 
     throws_ok(
         sub {

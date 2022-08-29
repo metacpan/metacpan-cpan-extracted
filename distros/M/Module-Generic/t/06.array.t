@@ -4,6 +4,7 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
+    use vars qw( $DEBUG );
     use Test::More qw( no_plan );
     use JSON;
     use Nice::Try;
@@ -17,6 +18,8 @@ BEGIN
 }
 # use warnings 'Module::Generic::Array';
 # no warnings 'Module::Generic::Array';
+use strict;
+use warnings;
 
 my $s = Module::Generic::Scalar->new( 'I disapprove of what you say, but I will defend to the death your right to say it' );
 my $a = $s->split( qr/[[:blank:]]+/ );
@@ -357,9 +360,9 @@ ok( !defined( $val ), 'get_null(4) out of bound returns undef' );
 $val = $a14->get_null(4)->dummy;
 ok( !defined( $val ), 'get_null(4)->dummy (using Module::Generic::Null) out of bound returns undef' );
 
-my $a = Module::Generic::Array->new( 30..39 );
+$a = Module::Generic::Array->new( 30..39 );
 is( $a->length, 10, 'array allocation for pack' );
-my $s = $a->pack( 'H2' x 10 );
+$s = $a->pack( 'H2' x 10 );
 isa_ok( $s, 'Module::Generic::Scalar', 'pack returns a Module::Generic::Scalar object' );
 is( $s->scalar, '0123456789', 'pack' );
 
@@ -591,7 +594,7 @@ subtest 'callback' => sub
         is( $to, 2, 'splice removal rejected (end position)' );
         return;
     });
-    my @removed = $test->splice( 1, 2 );
+    @removed = $test->splice( 1, 2 );
     is( scalar( @removed ), 0, 'splice removed rejected' );
     
     diag( "Removing callbacks" ) if( $DEBUG );

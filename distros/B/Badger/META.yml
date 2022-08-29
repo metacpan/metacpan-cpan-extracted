@@ -20,5 +20,5 @@ no_index:
 requires: {}
 resources:
   repository: https://github.com/abw/Badger
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

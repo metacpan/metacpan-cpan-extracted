@@ -6,7 +6,7 @@
    "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -20,6 +20,8 @@
       ]
    },
    "prereqs" : {
+      "build" : {},
+      "configure" : {},
       "runtime" : {
          "requires" : {
             "perl" : "5.006"
@@ -39,12 +41,19 @@
       "bugtracker" : {
          "web" : "https://rt.cpan.org/Dist/Display.html?Name=Memoize"
       },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/ap/Memoize.git",
          "web" : "https://github.com/ap/Memoize"
       }
    },
-   "version" : "1.10",
+   "version" : "1.12",
+   "x_copyright" : {
+      "holder" : "Mark Jason Dominus",
+      "year" : 2012
+   },
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

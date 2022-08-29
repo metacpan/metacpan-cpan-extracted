@@ -251,9 +251,10 @@ int32_t SPVM_API_VM_call_spvm_method_vm(SPVM_ENV* env, SPVM_VALUE* stack, int32_
       case SPVM_OPCODE_C_ID_END_METHOD: {
         goto label_END_OF_METHOD;
       }
-      case SPVM_OPCODE_C_ID_GOTO:
+      case SPVM_OPCODE_C_ID_GOTO: {
         opcode_rel_index = opcode->operand0;
         continue;
+      }
       case SPVM_OPCODE_C_ID_IF_EQ_ZERO: {
         if (int_vars[0] == 0) {
           opcode_rel_index = opcode->operand0;
@@ -262,45 +263,7 @@ int32_t SPVM_API_VM_call_spvm_method_vm(SPVM_ENV* env, SPVM_VALUE* stack, int32_
         break;
       }
       case SPVM_OPCODE_C_ID_IF_NE_ZERO: {
-        if (int_vars[0]) {
-          opcode_rel_index = opcode->operand0;
-          continue;
-        }
-        break;
-      }
-      case SPVM_OPCODE_C_ID_IF_EXCEPTION_CATCH: {
-        if (error) {
-          eval_error = error;
-          error = 0;
-          
-          int32_t method_id = opcode->operand1;
-          SPVM_RUNTIME_METHOD* method = SPVM_API_RUNTIME_get_method(runtime, method_id);
-          int32_t line = opcode->operand2;
-          
-          const char* method_name = SPVM_API_RUNTIME_get_constant_string_value(runtime, method->name_id, NULL);
-          SPVM_RUNTIME_CLASS* method_class = SPVM_API_RUNTIME_get_class(runtime, method->class_id);
-          const char* class_name = SPVM_API_RUNTIME_get_constant_string_value(runtime, method_class->name_id, NULL);
-          
-          // Exception stack trace
-          env->set_exception(env, stack, env->new_stack_trace_raw(env, stack, env->get_exception(env, stack), method_id, line));
-          opcode_rel_index = opcode->operand0;
-          continue;
-        }
-        break;
-      }
-      case SPVM_OPCODE_C_ID_IF_EXCEPTION_RETURN: {
-        
-        if (error) {
-          int32_t method_id = opcode->operand1;
-          SPVM_RUNTIME_METHOD* method = SPVM_API_RUNTIME_get_method(runtime, method_id);
-          int32_t line = opcode->operand2;
-          
-          const char* method_name = SPVM_API_RUNTIME_get_constant_string_value(runtime, method->name_id, NULL);
-          SPVM_RUNTIME_CLASS* method_class = SPVM_API_RUNTIME_get_class(runtime, method->class_id);
-          const char* class_name = SPVM_API_RUNTIME_get_constant_string_value(runtime, method_class->name_id, NULL);
-
-          // Exception stack trace
-          env->set_exception(env, stack, env->new_stack_trace_raw(env, stack, env->get_exception(env, stack), method_id, line));
+        if (int_vars[0] != 0) {
           opcode_rel_index = opcode->operand0;
           continue;
         }
@@ -2070,6 +2033,44 @@ int32_t SPVM_API_VM_call_spvm_method_vm(SPVM_ENV* env, SPVM_VALUE* stack, int32_
         
         break;
       }
+      case SPVM_OPCODE_C_ID_IF_EXCEPTION_CATCH: {
+        if (error) {
+          eval_error = error;
+          error = 0;
+          
+          int32_t method_id = opcode->operand1;
+          SPVM_RUNTIME_METHOD* method = SPVM_API_RUNTIME_get_method(runtime, method_id);
+          int32_t line = opcode->operand2;
+          
+          const char* method_name = SPVM_API_RUNTIME_get_constant_string_value(runtime, method->name_id, NULL);
+          SPVM_RUNTIME_CLASS* method_class = SPVM_API_RUNTIME_get_class(runtime, method->class_id);
+          const char* class_name = SPVM_API_RUNTIME_get_constant_string_value(runtime, method_class->name_id, NULL);
+          
+          // Exception stack trace
+          env->set_exception(env, stack, env->new_stack_trace_raw(env, stack, env->get_exception(env, stack), method_id, line));
+          opcode_rel_index = opcode->operand0;
+          continue;
+        }
+        break;
+      }
+      case SPVM_OPCODE_C_ID_IF_EXCEPTION_RETURN: {
+        
+        if (error) {
+          int32_t method_id = opcode->operand1;
+          SPVM_RUNTIME_METHOD* method = SPVM_API_RUNTIME_get_method(runtime, method_id);
+          int32_t line = opcode->operand2;
+          
+          const char* method_name = SPVM_API_RUNTIME_get_constant_string_value(runtime, method->name_id, NULL);
+          SPVM_RUNTIME_CLASS* method_class = SPVM_API_RUNTIME_get_class(runtime, method->class_id);
+          const char* class_name = SPVM_API_RUNTIME_get_constant_string_value(runtime, method_class->name_id, NULL);
+
+          // Exception stack trace
+          env->set_exception(env, stack, env->new_stack_trace_raw(env, stack, env->get_exception(env, stack), method_id, line));
+          opcode_rel_index = opcode->operand0;
+          continue;
+        }
+        break;
+      }
       case SPVM_OPCODE_C_ID_ISA: {
         void* object = *(void**)&object_vars[opcode->operand1];
         int32_t dist_basic_type_id = opcode->operand2;
@@ -3795,16 +3796,9 @@ int32_t SPVM_API_VM_call_spvm_method_vm(SPVM_ENV* env, SPVM_VALUE* stack, int32_
         SPVM_RUNTIME_METHOD* decl_method = SPVM_API_RUNTIME_get_method(runtime, decl_method_id);
         void* object = stack[0].oval;
         const char* decl_method_name = SPVM_API_RUNTIME_get_constant_string_value(runtime, decl_method->name_id, NULL);
-        int32_t is_call_super = opcode->operand2 & 0xFFFF;
         int32_t call_method_args_stack_length = opcode->operand2 >> 16;
         
-        int32_t call_method_id;
-        if (is_call_super) {
-          call_method_id = env->get_instance_method_id_super(env, object, decl_method_name);
-        }
-        else {
-          call_method_id = env->get_instance_method_id(env, object, decl_method_name);
-        }
+        int32_t call_method_id = env->get_instance_method_id(env, object, decl_method_name);
 
         stack_index = 0;
         if (call_method_id < 0) {

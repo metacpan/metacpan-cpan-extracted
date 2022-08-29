@@ -26,6 +26,7 @@ array[0]=$(ansiecho -s R)
 array[1]=$(ansiecho -s ZE)
 echo "${array[0]} NAME ${array[1]}"
 
-hash["NAME"]=$(ansiecho -s R)
-hash["ZE"]=$(ansiecho -s ZE)
-echo "${hash["NAME"]} NAME ${hash["ZE"]}"
+declare -A hash
+hash[NAME]=$(ansiecho -s R)
+hash[ZE]=$(ansiecho -s ZE)
+echo "${hash[NAME]} NAME ${hash[ZE]}"

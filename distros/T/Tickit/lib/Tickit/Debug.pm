@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2014-2016 -- leonerd@leonerd.org.uk
 
-package Tickit::Debug 0.72;
+package Tickit::Debug 0.73;
 
 use v5.14;
 use warnings;

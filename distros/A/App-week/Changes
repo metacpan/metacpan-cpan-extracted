@@ -1,5 +1,13 @@
 Revision history for Perl extension App-week
 
+1.0301 2022-08-29T07:07:09Z
+
+    - use Getopt::EX::Hashed new interface
+
+1.03 2022-07-25T01:44:33Z
+
+    - Introduce -W option for week number.
+
 1.0205 2022-06-12T00:05:15Z
 
     - Skip test if cal command is not installed.

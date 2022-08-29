@@ -10,9 +10,9 @@ use Data::Dmp;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-21'; # DATE
+our $DATE = '2022-08-28'; # DATE
 our $DIST = 'App-GenPericmdCompleterScript'; # DIST
-our $VERSION = '0.123'; # VERSION
+our $VERSION = '0.124'; # VERSION
 
 our @EXPORT_OK = qw(gen_pericmd_completer_script);
 
@@ -373,9 +373,12 @@ sub gen_pericmd_completer_script {
             '            if ($args->{subcommands} &&', "\n",
             '                $scn_from ne "--cmd" &&', "\n",
             '                     $type eq "arg" && $args{argpos}==0) {', "\n",
+            '                my @subc_names     = keys %{ $args->{subcommands} };', "\n",
+            '                my @subc_summaries = map { $args->{subcommands}{$_}{summary} } @subc_names;', "\n",
             '                require Complete::Util;', "\n",
             '                return Complete::Util::complete_array_elem(', "\n",
-            '                    array => [keys %{ $args->{subcommands} }],', "\n",
+            '                    array     => \\@subc_names,', "\n",
+            '                    summaries => \\@subc_summaries,', "\n",
             '                    word  => $words->[$cword]);', "\n",
             '            }', "\n",
             '', "\n",
@@ -471,7 +474,7 @@ App::GenPericmdCompleterScript - Generate Perinci::CmdLine completer script
 
 =head1 VERSION
 
-This document describes version 0.123 of App::GenPericmdCompleterScript (from Perl distribution App-GenPericmdCompleterScript), released on 2021-10-21.
+This document describes version 0.124 of App::GenPericmdCompleterScript (from Perl distribution App-GenPericmdCompleterScript), released on 2022-08-28.
 
 =head1 FUNCTIONS
 
@@ -612,13 +615,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

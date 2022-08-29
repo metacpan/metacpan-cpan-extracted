@@ -38,7 +38,7 @@ DESCRIPTION
 
 BUGS
     Please report any bugs to
-    <http://rt.cpan.org/Dist/Display.html?Queue=Exporter-Tiny>.
+    <https://github.com/tobyink/p5-exporter-tiny/issues>.
 
 SUPPORT
     IRC: support is available through in the *#moops* channel on irc.perl.org
@@ -53,7 +53,7 @@ AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+    This software is copyright (c) 2013-2014, 2017, 2022 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

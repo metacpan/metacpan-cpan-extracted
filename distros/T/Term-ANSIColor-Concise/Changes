@@ -1,0 +1,33 @@
+Revision history for Perl extension Term-ANSIColor-Concise
+
+2.01 2022-08-24T07:54:07Z
+
+2.01 2022-08-24T07:53:46Z
+
+    - version 2.01
+
+2.00_05 2022-08-23T10:00:03Z
+
+    - try not to index local package
+
+2.00_04 2022-08-22T09:33:25Z
+
+    - require Graphics::ColorNames@v3
+
+2.00_03 2022-08-19T11:55:59Z
+
+    - improve COLOR NAMES section
+
+2.00_02 2022-08-19T01:16:31Z
+
+    - deprecate V effect
+    - improve document
+
+2.00_01 2022-08-15T02:13:55Z
+
+    - export cached_ansi_color()
+
+2.00_00 2022-08-13T06:20:58Z
+
+    - Spin off from Getopt::EX::Colomap
+

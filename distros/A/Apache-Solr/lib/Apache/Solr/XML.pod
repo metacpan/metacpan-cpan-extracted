@@ -117,8 +117,8 @@ Extends L<"DETAILS" in Apache::Solr|Apache::Solr/"DETAILS">.
  
 =head1 SEE ALSO
 
-This module is part of Apache-Solr distribution version 1.06,
-built on July 08, 2022. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Apache-Solr distribution version 1.07,
+built on August 26, 2022. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

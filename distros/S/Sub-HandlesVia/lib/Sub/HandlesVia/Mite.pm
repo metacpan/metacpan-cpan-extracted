@@ -63,7 +63,7 @@ sub confess { unshift @_, 'confess'; goto \&_error_handler }
 }
 
 sub _is_compiling {
-    return !! $ENV{MITE_COMPILE};
+    defined $Mite::COMPILING and $Mite::COMPILING eq __PACKAGE__;
 }
 
 sub import {

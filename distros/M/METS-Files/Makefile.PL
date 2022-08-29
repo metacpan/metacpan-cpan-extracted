@@ -26,10 +26,14 @@ resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
 	'?Name=METS-Files';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/METS-Files';
 resources 'repository' => 'git://github.com/michal-josef-spacek/METS-Files';
+test_requires 'English' => 0;
+test_requires 'Error::Pure::Utils' => 0;
+test_requires 'File::Object' => 0;
+test_requires 'Perl6::Slurp' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.01';
+version '0.02';
 
 # Run.
 WriteAll();

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::Role::ProtocolMessage;
-our $VERSION = '0.57'; # VERSION
+our $VERSION = '0.59'; # VERSION
 
 use Moose::Role;
 
@@ -92,7 +92,7 @@ Net::SAML2::Role::ProtocolMessage - Common behaviour for Protocol messages
 
 =head1 VERSION
 
-version 0.57
+version 0.59
 
 =head1 DESCRIPTION
 

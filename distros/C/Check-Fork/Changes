@@ -1,2 +1,9 @@
+0.02 2022-08-26T11:52:58+02:00
+ - Add Check::Fork::HardcodedUsage doc.
+ - Add test for failing NetWare in fake test.
+ - Improve doc for testing variables.
+ - Fix test requires.
+ - Fix typo in test message.
+
 0.01 2022-08-18T12:49:31+02:00
  - First version.

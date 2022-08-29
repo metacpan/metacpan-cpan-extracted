@@ -1,0 +1,49 @@
+Optimization-NSGAII version 0.01
+================================
+
+DESCRIPTION
+
+	NSGAII - non dominant sorting genetic algorithm for multi-objective optimization
+
+	NSGAII.pm apply (with some variations) the NSGA-II algorithm described in the paper: 
+
+		A Fast and Elitist Multiobjective Genetic Algorithm:NSGA-II
+			Kalyanmoy Deb, Associate Member, IEEE, Amrit Pratap, Sameer Agarwal, and T. Meyarivan
+
+	NSGAII.pm performs a mathematical multi-objective optimization using a genetic algorithm approach: 
+	It searches the input parameters (genes) which minimize a set of output functions (individuals of a population) and with some luck a Pareto front is produced. 
+	In the Pareto front no solution is better than the others because each solution is a trade-off.
+
+INSTALLATION
+
+	To install this module type the following:
+	
+       cpan Optimization::NSGAII
+		
+	or, after decompressing the archive tar.gz, type the following:	
+
+	   perl Makefile.PL
+	   make
+	   make test
+	   make install
+
+DOCUMENTATION
+
+	Before installing you can execute: perldoc NSGAII.pm
+	After installing you can execute:  perldoc Optimization::NSGAII
+	
+	Or you can look to the html documentation (which could be more up to date)
+
+DEPENDENCIES
+
+	No dependencies
+	
+COPYRIGHT AND LICENCE
+
+	This software is Copyright (c) 2022 by Dario Rubino.
+
+	This is free software, licensed under:
+
+	  The Artistic License 2.0 (GPL Compatible)
+
+

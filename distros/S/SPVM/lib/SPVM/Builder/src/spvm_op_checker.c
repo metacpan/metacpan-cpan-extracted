@@ -33,7 +33,42 @@
 #include "spvm_use.h"
 #include "spvm_interface.h"
 #include "spvm_constant_string.h"
-#include "spvm_descriptor.h"
+#include "spvm_attribute.h"
+
+int32_t SPVM_OP_CHECKER_can_access(SPVM_COMPILER* compiler, SPVM_CLASS* class_from, SPVM_CLASS* class_to, int32_t access_controll_flag_to) {
+  
+  int32_t can_access = 0;
+  
+  if (access_controll_flag_to == SPVM_ATTRIBUTE_C_ID_PRIVATE) {
+    if (class_from->id == class_to->id) {
+      can_access = 1;
+    }
+    else {
+      can_access = 0;
+    }
+  }
+  else if (access_controll_flag_to == SPVM_ATTRIBUTE_C_ID_PROTECTED) {
+    if (class_from->id == class_to->id) {
+      can_access = 1;
+    }
+    else {
+      if (SPVM_BASIC_TYPE_is_super_class(compiler, class_to->type->basic_type->id, class_from->type->basic_type->id)) {
+        can_access = 1;
+      }
+      else {
+        can_access = 0;
+      }
+    }
+  }
+  else if (access_controll_flag_to == SPVM_ATTRIBUTE_C_ID_PUBLIC) {
+    can_access = 1;
+  }
+  else {
+    assert(0);
+  }
+  
+  return can_access;
+}
 
 int SPVM_OP_CHECKER_method_name_cmp(const void* method1_ptr, const void* method2_ptr) {
   
@@ -385,27 +420,13 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_TYPE* length_type = SPVM_OP_get_type(compiler, op_length_operand);
               
               assert(length_type);
-              int32_t is_length_type_integral_type_except_for_long;
-              if (SPVM_TYPE_is_integral_type(compiler, length_type->basic_type->id, length_type->dimension, length_type->flag)) {
-                SPVM_OP_CHECKER_apply_unary_numeric_widening_conversion(compiler, op_length_operand);
-                
-                SPVM_TYPE* length_type_after_conversion = SPVM_OP_get_type(compiler, op_cur->first);
-                
-                if (SPVM_TYPE_is_int_type(compiler, length_type_after_conversion->basic_type->id, length_type_after_conversion->dimension, length_type_after_conversion->flag)) {
-                  is_length_type_integral_type_except_for_long = 1;
-                }
-                else {
-                  is_length_type_integral_type_except_for_long = 0;
-                }
-              }
-              else {
-                is_length_type_integral_type_except_for_long = 0;
-              }
               
-              if (!is_length_type_integral_type_except_for_long) {
-                SPVM_COMPILER_error(compiler, "The operand of the new_string_len operator must be an integral type except for a long type at %s line %d", op_cur->file, op_cur->line);
+              if (!SPVM_TYPE_is_integer_type_within_int(compiler, length_type->basic_type->id, length_type->dimension, length_type->flag)) {
+                SPVM_COMPILER_error(compiler, "The operand of the new_string_len operator must be an integer type within int at %s line %d", op_cur->file, op_cur->line);
                 return;
               }
+
+              SPVM_OP_CHECKER_perform_integer_promotional_conversion(compiler, op_length_operand);
               
               break;
             }
@@ -439,13 +460,14 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_OP* op_switch_condition = op_cur->first;
               
               // Perform numeric widening conversion
-              SPVM_OP_CHECKER_apply_unary_numeric_widening_conversion(compiler, op_switch_condition->first->first);
               
               SPVM_TYPE* operand_type = SPVM_OP_get_type(compiler, op_switch_condition->first);
-              if (!operand_type || !(operand_type->dimension == 0 && operand_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT)) {
-                SPVM_COMPILER_error(compiler, "The condition of the switch statement must be the int type at %s line %d", op_cur->file, op_cur->line);
+              if (!SPVM_TYPE_is_integer_type_within_int(compiler, operand_type->basic_type->id, operand_type->dimension, operand_type->flag)) {
+                SPVM_COMPILER_error(compiler, "The condition of the switch statement must be an integer type within int at %s line %d", op_cur->file, op_cur->line);
                 return;
               }
+              
+              SPVM_OP_CHECKER_perform_integer_promotional_conversion(compiler, op_switch_condition->first->first);
               
               SPVM_SWITCH_INFO* switch_info = op_cur->uv.switch_info;
               SPVM_LIST* cases = switch_info->case_infos;
@@ -562,7 +584,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               else if (SPVM_TYPE_is_numeric_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag))
               {
                 // Convert byte or short type to int type
-                SPVM_OP_CHECKER_apply_unary_numeric_widening_conversion(compiler, op_first);
+                SPVM_OP_CHECKER_perform_integer_promotional_conversion(compiler, op_first);
                 if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                   return;
                 }
@@ -628,7 +650,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   
                   is_valid_type = 1;
                   
-                  SPVM_OP_CHECKER_apply_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
+                  SPVM_OP_CHECKER_perform_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
                   if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                     return;
                   }
@@ -694,7 +716,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   
                   is_valid_type = 1;
                   
-                  SPVM_OP_CHECKER_apply_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
+                  SPVM_OP_CHECKER_perform_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
                   if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                     return;
                   }
@@ -733,7 +755,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
 
               // Apply binary numeric conversion
-              SPVM_OP_CHECKER_apply_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
+              SPVM_OP_CHECKER_perform_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
               if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                 return;
               }
@@ -758,7 +780,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
 
               // Apply binary numeric conversion
-              SPVM_OP_CHECKER_apply_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
+              SPVM_OP_CHECKER_perform_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
               if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                 return;
               }
@@ -783,7 +805,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
 
               // Apply binary numeric conversion
-              SPVM_OP_CHECKER_apply_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
+              SPVM_OP_CHECKER_perform_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
               if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                 return;
               }
@@ -808,7 +830,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
 
               // Apply binary numeric conversion
-              SPVM_OP_CHECKER_apply_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
+              SPVM_OP_CHECKER_perform_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
               if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                 return;
               }
@@ -833,7 +855,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
 
               // Apply binary numeric conversion
-              SPVM_OP_CHECKER_apply_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
+              SPVM_OP_CHECKER_perform_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
               if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                 return;
               }
@@ -972,7 +994,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               
               // Left type is numeric type
               if (SPVM_TYPE_is_numeric_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_OP_CHECKER_apply_numeric_to_string_conversion(compiler, op_cur->first);
+                SPVM_OP_CHECKER_perform_numeric_to_string_conversion(compiler, op_cur->first);
                 if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                   return;
                 }
@@ -985,7 +1007,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               
               // Right operand is numeric type
               if (SPVM_TYPE_is_numeric_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-                SPVM_OP_CHECKER_apply_numeric_to_string_conversion(compiler, op_cur->last);
+                SPVM_OP_CHECKER_perform_numeric_to_string_conversion(compiler, op_cur->last);
                 if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                   return;
                 }
@@ -1143,28 +1165,12 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   SPVM_TYPE* index_type = SPVM_OP_get_type(compiler, op_index_operand);
                   
                   assert(index_type);
-                  int32_t is_length_type_integral_type_except_for_long;
-                  if (SPVM_TYPE_is_integral_type(compiler, index_type->basic_type->id, index_type->dimension, index_type->flag)) {
-                    SPVM_OP_CHECKER_apply_unary_numeric_widening_conversion(compiler, op_index_operand);
-                    
-                    SPVM_TYPE* index_type_after_conversion = SPVM_OP_get_type(compiler, op_type->last);
-                    
-                    if (SPVM_TYPE_is_int_type(compiler, index_type_after_conversion->basic_type->id, index_type_after_conversion->dimension, index_type_after_conversion->flag)) {
-                      is_length_type_integral_type_except_for_long = 1;
-                    }
-                    else {
-                      is_length_type_integral_type_except_for_long = 0;
-                    }
-                  }
-                  else {
-                    is_length_type_integral_type_except_for_long = 0;
-                  }
-                  
-                  if (!is_length_type_integral_type_except_for_long) {
+                  if (!SPVM_TYPE_is_integer_type_within_int(compiler, index_type->basic_type->id, index_type->dimension, index_type->flag)) {
                     const char* type_name = SPVM_TYPE_new_type_name(compiler, type->basic_type->id, type->dimension, type->flag);
-                    SPVM_COMPILER_error(compiler, "The array length specified by the new operator must be the int type at %s line %d", op_cur->file, op_cur->line);
+                    SPVM_COMPILER_error(compiler, "The array length specified by the new operator must be an integer type within int at %s line %d", op_cur->file, op_cur->line);
                     return;
                   }
+                  SPVM_OP_CHECKER_perform_integer_promotional_conversion(compiler, op_index_operand);
                 }
                 // Numeric type
                 else if (SPVM_TYPE_is_numeric_type(compiler, type->basic_type->id, type->dimension, type->flag)) {
@@ -1187,21 +1193,14 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                     SPVM_COMPILER_error(compiler, "The operand of the new operator can't be a pointer class type at %s line %d", op_cur->file, op_cur->line);
                     return;
                   }
-                  
-                  // Access control
-                  int32_t is_private;
-                  if (class->access_control_type == SPVM_DESCRIPTOR_C_ID_PUBLIC) {
-                    is_private = 0;
-                  }
-                  // Default
-                  else {
-                    is_private = 1;
-                  }
-                  
-                  if (is_private && !(op_cur->flag & SPVM_OP_C_FLAG_NEW_INLINE)) {
-                    if (!SPVM_OP_is_allowed(compiler, method->class->op_class, new_class->op_class)) {
-                      SPVM_COMPILER_error(compiler, "The object can't be created from the private class at %s line %d", op_cur->file, op_cur->line);
-                      return;
+
+                  if (!(op_cur->flag & SPVM_OP_C_FLAG_NEW_INLINE)) {
+                    SPVM_CLASS* cur_class = method->class;
+                    if (!SPVM_OP_is_allowed(compiler, cur_class, new_class)) {
+                      if (!SPVM_OP_CHECKER_can_access(compiler, cur_class, new_class, new_class->access_control_type)) {
+                        SPVM_COMPILER_error(compiler, "The object of the %s class \"%s\" can't be created from the current class \"%s\" at %s line %d", SPVM_ATTRIBUTE_get_name(compiler, new_class->access_control_type), new_class->name, cur_class->name, op_cur->file, op_cur->line);
+                        return;
+                      }
                     }
                   }
                 }
@@ -1219,13 +1218,13 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
               SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
               
-              // Can receive only integral type
-              if (!SPVM_TYPE_is_integral_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag) || !SPVM_TYPE_is_integral_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-                SPVM_COMPILER_error(compiler, "The left and right operand of the ^ operator must be an integral type at %s line %d", op_cur->file, op_cur->line);
+              // Can receive only integer type
+              if (!SPVM_TYPE_is_integer_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag) || !SPVM_TYPE_is_integer_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                SPVM_COMPILER_error(compiler, "The left and right operand of the ^ operator must be an integer type at %s line %d", op_cur->file, op_cur->line);
                 return;
               }
               
-              SPVM_OP_CHECKER_apply_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
+              SPVM_OP_CHECKER_perform_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
               if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                 return;
               }
@@ -1838,7 +1837,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
 
               // Apply unary widening conversion
-              SPVM_OP_CHECKER_apply_unary_numeric_widening_conversion(compiler, op_cur->first);
+              SPVM_OP_CHECKER_perform_integer_promotional_conversion(compiler, op_cur->first);
               if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                 return;
               }
@@ -1855,7 +1854,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
               
               // Apply unary widening conversion
-              SPVM_OP_CHECKER_apply_unary_numeric_widening_conversion(compiler, op_cur->first);
+              SPVM_OP_CHECKER_perform_integer_promotional_conversion(compiler, op_cur->first);
               if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                 return;
               }
@@ -1877,13 +1876,13 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
               
               // Operand must be a numeric type
-              if (!SPVM_TYPE_is_integral_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_COMPILER_error(compiler, "The operand of the ~ operator must be an integral type at %s line %d", op_cur->file, op_cur->line);
+              if (!SPVM_TYPE_is_integer_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                SPVM_COMPILER_error(compiler, "The operand of the ~ operator must be an integer type at %s line %d", op_cur->file, op_cur->line);
                 return;
               }
 
               // Apply unary widening conversion
-              SPVM_OP_CHECKER_apply_unary_numeric_widening_conversion(compiler, op_cur->first);
+              SPVM_OP_CHECKER_perform_integer_promotional_conversion(compiler, op_cur->first);
               if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                 return;
               }
@@ -1907,7 +1906,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
               
               // Apply binary numeric conversion
-              SPVM_OP_CHECKER_apply_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
+              SPVM_OP_CHECKER_perform_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
               if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                 return;
               }
@@ -1931,7 +1930,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
               
               // Apply binary numeric conversion
-              SPVM_OP_CHECKER_apply_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
+              SPVM_OP_CHECKER_perform_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
               if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                 return;
               }
@@ -1955,7 +1954,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
 
               // Apply binary numeric conversion
-              SPVM_OP_CHECKER_apply_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
+              SPVM_OP_CHECKER_perform_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
               if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                 return;
               }
@@ -1979,7 +1978,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
               
               // Apply binary numeric conversion
-              SPVM_OP_CHECKER_apply_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
+              SPVM_OP_CHECKER_perform_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
               if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                 return;
               }
@@ -2026,20 +2025,20 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
               SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
               
-              // Left operand must be integral type
-              if (!SPVM_TYPE_is_integral_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_COMPILER_error(compiler, "The left operand of the %% operator must be an integral type at %s line %d", op_cur->file, op_cur->line);
+              // Left operand must be integer type
+              if (!SPVM_TYPE_is_integer_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                SPVM_COMPILER_error(compiler, "The left operand of the %% operator must be an integer type at %s line %d", op_cur->file, op_cur->line);
                 return;
               }
 
-              // Right operand must be integral type
-              if (!SPVM_TYPE_is_integral_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-                SPVM_COMPILER_error(compiler, "The right operand of the %% operator must be an integral type at %s line %d", op_cur->file, op_cur->line);
+              // Right operand must be integer type
+              if (!SPVM_TYPE_is_integer_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                SPVM_COMPILER_error(compiler, "The right operand of the %% operator must be an integer type at %s line %d", op_cur->file, op_cur->line);
                 return;
               }
               
               // Apply binary numeric conversion
-              SPVM_OP_CHECKER_apply_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
+              SPVM_OP_CHECKER_perform_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
               if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                 return;
               }
@@ -2086,19 +2085,19 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
               SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
               
-              // Left operand must be integral type
-              if (!SPVM_TYPE_is_integral_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_COMPILER_error(compiler, "The left operand of the & operator must be an integral type at %s line %d", op_cur->file, op_cur->line);
+              // Left operand must be integer type
+              if (!SPVM_TYPE_is_integer_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                SPVM_COMPILER_error(compiler, "The left operand of the & operator must be an integer type at %s line %d", op_cur->file, op_cur->line);
                 return;
               }
 
-              // Right operand must be integral type
-              if (!SPVM_TYPE_is_integral_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-                SPVM_COMPILER_error(compiler, "The right operand of the & operator must be an integral type at %s line %d", op_cur->file, op_cur->line);
+              // Right operand must be integer type
+              if (!SPVM_TYPE_is_integer_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                SPVM_COMPILER_error(compiler, "The right operand of the & operator must be an integer type at %s line %d", op_cur->file, op_cur->line);
                 return;
               }
               
-              SPVM_OP_CHECKER_apply_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
+              SPVM_OP_CHECKER_perform_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
               if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                 return;
               }
@@ -2109,19 +2108,19 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
               SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
               
-              // Left operand must be integral type
-              if (!SPVM_TYPE_is_integral_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_COMPILER_error(compiler, "The left operand of the | operator must be an integral type at %s line %d", op_cur->file, op_cur->line);
+              // Left operand must be integer type
+              if (!SPVM_TYPE_is_integer_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                SPVM_COMPILER_error(compiler, "The left operand of the | operator must be an integer type at %s line %d", op_cur->file, op_cur->line);
                 return;
               }
 
-              // Right operand must be integral type
-              if (!SPVM_TYPE_is_integral_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-                SPVM_COMPILER_error(compiler, "The right operand of the | operator must be an integral type at %s line %d", op_cur->file, op_cur->line);
+              // Right operand must be integer type
+              if (!SPVM_TYPE_is_integer_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                SPVM_COMPILER_error(compiler, "The right operand of the | operator must be an integer type at %s line %d", op_cur->file, op_cur->line);
                 return;
               }
               
-              SPVM_OP_CHECKER_apply_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
+              SPVM_OP_CHECKER_perform_binary_numeric_conversion(compiler, op_cur->first, op_cur->last);
               if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                 return;
               }
@@ -2133,20 +2132,20 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
               
               // Left operand must be a numeric type
-              if (SPVM_TYPE_is_integral_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_OP_CHECKER_apply_unary_numeric_widening_conversion(compiler, op_cur->first);
+              if (SPVM_TYPE_is_integer_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                SPVM_OP_CHECKER_perform_integer_promotional_conversion(compiler, op_cur->first);
                 if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                   return;
                 }
               }
               else {
-                SPVM_COMPILER_error(compiler, "The left operand of the << operator must be an integral type at %s line %d", op_cur->file, op_cur->line);
+                SPVM_COMPILER_error(compiler, "The left operand of the << operator must be an integer type at %s line %d", op_cur->file, op_cur->line);
                 return;
               }
               
               // Right operand must be int type
-              if (SPVM_TYPE_is_integral_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-                SPVM_OP_CHECKER_apply_unary_numeric_widening_conversion(compiler, op_cur->last);
+              if (SPVM_TYPE_is_integer_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                SPVM_OP_CHECKER_perform_integer_promotional_conversion(compiler, op_cur->last);
                 if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                   return;
                 }
@@ -2168,20 +2167,20 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
               
               // Left operand must be a numeric type
-              if (SPVM_TYPE_is_integral_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_OP_CHECKER_apply_unary_numeric_widening_conversion(compiler, op_cur->first);
+              if (SPVM_TYPE_is_integer_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                SPVM_OP_CHECKER_perform_integer_promotional_conversion(compiler, op_cur->first);
                 if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                   return;
                 }
               }
               else {
-                SPVM_COMPILER_error(compiler, "The left operand of the >> operator must be an integral type at %s line %d", op_cur->file, op_cur->line);
+                SPVM_COMPILER_error(compiler, "The left operand of the >> operator must be an integer type at %s line %d", op_cur->file, op_cur->line);
                 return;
               }
               
               // Right operand must be int type
-              if (SPVM_TYPE_is_integral_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-                SPVM_OP_CHECKER_apply_unary_numeric_widening_conversion(compiler, op_cur->last);
+              if (SPVM_TYPE_is_integer_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                SPVM_OP_CHECKER_perform_integer_promotional_conversion(compiler, op_cur->last);
                 if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                   return;
                 }
@@ -2203,20 +2202,20 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
               
               // Left operand must be a numeric type
-              if (SPVM_TYPE_is_integral_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_OP_CHECKER_apply_unary_numeric_widening_conversion(compiler, op_cur->first);
+              if (SPVM_TYPE_is_integer_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                SPVM_OP_CHECKER_perform_integer_promotional_conversion(compiler, op_cur->first);
                 if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                   return;
                 }
               }
               else {
-                SPVM_COMPILER_error(compiler, "The left operand of the >>> operator must be an integral type at %s line %d", op_cur->file, op_cur->line);
+                SPVM_COMPILER_error(compiler, "The left operand of the >>> operator must be an integer type at %s line %d", op_cur->file, op_cur->line);
                 return;
               }
               
               // Right operand must be int type
-              if (SPVM_TYPE_is_integral_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-                SPVM_OP_CHECKER_apply_unary_numeric_widening_conversion(compiler, op_cur->last);
+              if (SPVM_TYPE_is_integer_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                SPVM_OP_CHECKER_perform_integer_promotional_conversion(compiler, op_cur->last);
                 if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                   return;
                 }
@@ -2241,7 +2240,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
               
               if (SPVM_TYPE_is_numeric_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_OP_CHECKER_apply_numeric_to_string_conversion(compiler, op_cur->first);
+                SPVM_OP_CHECKER_perform_numeric_to_string_conversion(compiler, op_cur->first);
                 if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                   return;
                 }
@@ -2259,7 +2258,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
               
               if (SPVM_TYPE_is_numeric_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_OP_CHECKER_apply_numeric_to_string_conversion(compiler, op_cur->first);
+                SPVM_OP_CHECKER_perform_numeric_to_string_conversion(compiler, op_cur->first);
                 if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                   return;
                 }
@@ -2481,20 +2480,10 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               
               SPVM_CALL_METHOD* call_method = op_call_method->uv.call_method;
               const char* method_name = call_method->method->name;
-              
-              // Access control
-              int32_t is_private;
-              if (call_method->method->access_control_type == SPVM_DESCRIPTOR_C_ID_PRIVATE) {
-                is_private = 1;
-              }
-              // Default
-              else {
-                is_private = 0;
-              }
-              
-              if (is_private) {
-                if (!SPVM_OP_is_allowed(compiler, method->class->op_class, call_method->method->class->op_class)) {
-                  SPVM_COMPILER_error(compiler, "The private method \"%s\" can't be called at %s line %d", call_method->method->name, call_method->method->class->name, op_cur->file, op_cur->line);
+
+              if (!SPVM_OP_is_allowed(compiler, method->class, call_method->method->class)) {
+                if (!SPVM_OP_CHECKER_can_access(compiler, method->class, call_method->method->class, call_method->method->access_control_type)) {
+                  SPVM_COMPILER_error(compiler, "The %s method \"%s\" of the class \"%s\" can't be called from the current class \"%s\" at %s line %d", SPVM_ATTRIBUTE_get_name(compiler, call_method->method->access_control_type), call_method->method->name, call_method->method->class->name,  method->class->name, op_cur->file, op_cur->line);
                   return;
                 }
               }
@@ -2662,11 +2651,6 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
               
               call_method->args_length = call_method_args_length;
-              
-              if (call_method->method->is_destructor) {
-                SPVM_COMPILER_error(compiler, "The DESTROY method can't be called at %s line %d", op_cur->file, op_cur->line);
-                return;
-              }
               
               // Inline expansion
               {
@@ -2864,20 +2848,12 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_CLASS_VAR* class_var = class_var_access->class_var;
               SPVM_CLASS* class_var_access_class = class_var->class;
               
-              int32_t is_private;
-              // Public flag
-              if (class_var->access_control_type == SPVM_DESCRIPTOR_C_ID_PUBLIC) {
-                is_private = 0;
-              }
-              // Default is private
-              else {
-                is_private = 1;
-              }
-
-              if (is_private && !op_cur->uv.class_var_access->inline_expansion) {
-                if (!SPVM_OP_is_allowed(compiler, method->class->op_class, class_var_access_class->op_class)) {
-                  SPVM_COMPILER_error(compiler, "The private class variable \"%s\" can't be accessed at %s line %d", op_cur->uv.class_var_access->op_name->uv.name, op_cur->file, op_cur->line);
-                  return;
+              if (!op_cur->uv.class_var_access->inline_expansion) {
+                if (!SPVM_OP_is_allowed(compiler, method->class, class_var_access_class)) {
+                  if (!SPVM_OP_CHECKER_can_access(compiler, method->class, class_var_access_class, class_var_access->class_var->access_control_type)) {
+                    SPVM_COMPILER_error(compiler, "The %s class variable \"%s\" of the class \"%s\" can't be accessed from the current class \"%s\" at %s line %d", SPVM_ATTRIBUTE_get_name(compiler, class_var_access->class_var->access_control_type), class_var->name, class_var_access_class->name,  method->class->name, op_cur->file, op_cur->line);
+                    return;
+                  }
                 }
               }
               
@@ -2903,7 +2879,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               
               // Right operand must be integer
               if (SPVM_TYPE_is_numeric_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-                SPVM_OP_CHECKER_apply_unary_numeric_widening_conversion(compiler, op_cur->last);
+                SPVM_OP_CHECKER_perform_integer_promotional_conversion(compiler, op_cur->last);
                 if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                   return;
                 }
@@ -3043,31 +3019,13 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 }
               }
 
-              // Access control
-              int32_t is_private;
-              if (field->access_control_type == SPVM_DESCRIPTOR_C_ID_PUBLIC) {
-                is_private = 0;
-              }
-              // Default
-              else {
-                // If anon method, field is public
-                if (field->class->is_anon) {
-                  is_private = 0;
-                }
-                // If multi-numeric type, field is public
-                else if (field->class->category == SPVM_CLASS_C_CATEGORY_MULNUM) {
-                  is_private = 0;
-                }
-                // Default is private
-                else {
-                  is_private = 1;
-                }
-              }
-              
-              if (is_private && !op_cur->uv.field_access->inline_expansion) {
-                if (!SPVM_OP_is_allowed(compiler, method->class->op_class, field->class->op_class)) {
-                  SPVM_COMPILER_error(compiler, "The private field \"%s\" in the class \"%s\" can't be accessed at %s line %d", op_name->uv.name, field->class->op_name->uv.name, op_cur->file, op_cur->line);
-                  return;
+              SPVM_FIELD_ACCESS* field_access = op_cur->uv.field_access;
+              if (!op_cur->uv.field_access->inline_expansion) {
+                if (!SPVM_OP_is_allowed(compiler, method->class, field->class)) {
+                  if (!SPVM_OP_CHECKER_can_access(compiler, method->class,  field_access->field->class, field_access->field->access_control_type)) {
+                    SPVM_COMPILER_error(compiler, "The %s field \"%s\" in the class \"%s\" can't be accessed from the current class \"%s\" at %s line %d", SPVM_ATTRIBUTE_get_name(compiler, field_access->field->access_control_type), field->name, field->class->name, method->class->name, op_cur->file, op_cur->line);
+                    return;
+                  }
                 }
               }
               
@@ -3229,7 +3187,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_TYPE* cast_type = SPVM_OP_get_type(compiler, op_cast);
               assert(cast_type);
               
-              int32_t castability = SPVM_TYPE_check_castability(
+              int32_t castability = SPVM_TYPE_can_cast(
                 compiler,
                 cast_type->basic_type->id, cast_type->dimension, cast_type->flag,
                 src_type->basic_type->id, src_type->dimension, src_type->flag
@@ -3282,7 +3240,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
   
 }
 
-void SPVM_OP_CHECKER_apply_numeric_to_string_conversion(SPVM_COMPILER* compiler, SPVM_OP* op_operand) {
+void SPVM_OP_CHECKER_perform_numeric_to_string_conversion(SPVM_COMPILER* compiler, SPVM_OP* op_operand) {
   
   SPVM_TYPE* type = SPVM_OP_get_type(compiler, op_operand);
   
@@ -3304,7 +3262,7 @@ void SPVM_OP_CHECKER_apply_numeric_to_string_conversion(SPVM_COMPILER* compiler,
   SPVM_OP_replace_op(compiler, op_stab, op_convert);
 }
 
-void SPVM_OP_CHECKER_apply_unary_numeric_widening_conversion(SPVM_COMPILER* compiler, SPVM_OP* op_operand) {
+void SPVM_OP_CHECKER_perform_integer_promotional_conversion(SPVM_COMPILER* compiler, SPVM_OP* op_operand) {
   
   SPVM_TYPE* type = SPVM_OP_get_type(compiler, op_operand);
   
@@ -3330,7 +3288,7 @@ void SPVM_OP_CHECKER_apply_unary_numeric_widening_conversion(SPVM_COMPILER* comp
   }
 }
 
-void SPVM_OP_CHECKER_apply_binary_numeric_conversion(SPVM_COMPILER* compiler, SPVM_OP* op_first, SPVM_OP* op_last) {
+void SPVM_OP_CHECKER_perform_binary_numeric_conversion(SPVM_COMPILER* compiler, SPVM_OP* op_first, SPVM_OP* op_last) {
   
   SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_first);
   SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_last);
@@ -4202,7 +4160,7 @@ SPVM_OP* SPVM_OP_CHECKER_check_assign(SPVM_COMPILER* compiler, SPVM_TYPE* dist_t
   int32_t narrowing_conversion_error = 0;
   int32_t mutable_invalid = 0;
   
-  int32_t assignability = SPVM_TYPE_check_assignability(
+  int32_t assignability = SPVM_TYPE_can_assign(
     compiler,
     dist_type_basic_type_id, dist_type_dimension, dist_type_flag,
     src_type_basic_type_id, src_type_dimension, src_type_flag,
@@ -4378,7 +4336,7 @@ void SPVM_OP_CHECKER_resolve_call_method(SPVM_COMPILER* compiler, SPVM_OP* op_ca
       const char* rel_method_name = method_name + 7;
       method_name = rel_method_name;
       call_parent_method = 1;
-      call_method->call_super = 1;
+      call_method->is_static_instance_method_call = 1;
     }
     else {
       // Static instance method call
@@ -4444,7 +4402,7 @@ void SPVM_OP_CHECKER_resolve_call_method(SPVM_COMPILER* compiler, SPVM_OP* op_ca
     }
     // Instance method call from class from interface
     else {
-      if (call_method->call_super) {
+      if (call_parent_method) {
         SPVM_COMPILER_error(compiler, "The method of the super class can't be called from the interface type", method_name, class->name, op_call_method->file, op_call_method->line);
         return;
       }
@@ -4480,14 +4438,32 @@ void SPVM_OP_CHECKER_resolve_field_access(SPVM_COMPILER* compiler, SPVM_OP* op_f
   SPVM_TYPE* invoker_type = SPVM_OP_get_type(compiler, op_operand);
   SPVM_CLASS* class = SPVM_HASH_get(compiler->class_symtable, invoker_type->basic_type->name, strlen(invoker_type->basic_type->name));
   const char* field_name = op_name->uv.name;
+
+  // Search the field of the super class
+  SPVM_FIELD* found_field = NULL;
+  SPVM_CLASS* parent_class = class;
   
-  SPVM_FIELD* found_field = SPVM_HASH_get(
-    class->field_symtable,
-    field_name,
-    strlen(field_name)
-  );
+  while (1) {
+    found_field = SPVM_HASH_get(
+      parent_class->field_symtable,
+      field_name,
+      strlen(field_name)
+    );
+    if (found_field) {
+      break;
+    }
+    parent_class = class->parent_class;
+    if (!parent_class) {
+      break;
+    }
+  }
+  
   if (found_field) {
     op_field_access->uv.field_access->field = found_field;
+  }
+  else {
+    SPVM_COMPILER_error(compiler, "The field \"%s\" is not defined in the class \"%s\" or the super classes at %s line %d", field_name, class->name, op_field_access->file, op_field_access->line);
+    return;
   }
 }
 
@@ -4561,27 +4537,28 @@ void SPVM_OP_CHECKER_resolve_field_offset(SPVM_COMPILER* compiler, SPVM_CLASS* c
   int32_t alignment_index = 0;
   int32_t offset = 0;
   int32_t offset_byte_size;
+  
   // 8 byte data
-  for (int32_t field_index = 0; field_index < class->fields->length; field_index++) {
-    SPVM_FIELD* field = SPVM_LIST_get(class->fields, field_index);
-    SPVM_TYPE* field_type = field->type;
+  for (int32_t merged_field_index = 0; merged_field_index < class->merged_fields->length; merged_field_index++) {
+    SPVM_FIELD* merged_field = SPVM_LIST_get(class->merged_fields, merged_field_index);
+    SPVM_TYPE* merged_field_type = merged_field->type;
     
     int32_t next_offset;
-    if (SPVM_TYPE_is_double_type(compiler, field_type->basic_type->id, field_type->dimension, field_type->flag)
-      || SPVM_TYPE_is_long_type(compiler, field_type->basic_type->id, field_type->dimension, field_type->flag)) {
+    if (SPVM_TYPE_is_double_type(compiler, merged_field_type->basic_type->id, merged_field_type->dimension, merged_field_type->flag)
+      || SPVM_TYPE_is_long_type(compiler, merged_field_type->basic_type->id, merged_field_type->dimension, merged_field_type->flag)) {
       offset_byte_size = 8;
     }
-    else if (SPVM_TYPE_is_float_type(compiler, field_type->basic_type->id, field_type->dimension, field_type->flag)
-      || SPVM_TYPE_is_int_type(compiler, field_type->basic_type->id, field_type->dimension, field_type->flag)) {
+    else if (SPVM_TYPE_is_float_type(compiler, merged_field_type->basic_type->id, merged_field_type->dimension, merged_field_type->flag)
+      || SPVM_TYPE_is_int_type(compiler, merged_field_type->basic_type->id, merged_field_type->dimension, merged_field_type->flag)) {
       offset_byte_size = 4;
     }
-    else if (SPVM_TYPE_is_short_type(compiler, field_type->basic_type->id, field_type->dimension, field_type->flag)) {
+    else if (SPVM_TYPE_is_short_type(compiler, merged_field_type->basic_type->id, merged_field_type->dimension, merged_field_type->flag)) {
       offset_byte_size = 2;
     }
-    else if (SPVM_TYPE_is_byte_type(compiler, field_type->basic_type->id, field_type->dimension, field_type->flag)) {
+    else if (SPVM_TYPE_is_byte_type(compiler, merged_field_type->basic_type->id, merged_field_type->dimension, merged_field_type->flag)) {
       offset_byte_size = 1;
     }
-    else if (SPVM_TYPE_is_object_type(compiler, field_type->basic_type->id, field_type->dimension, field_type->flag)) {
+    else if (SPVM_TYPE_is_object_type(compiler, merged_field_type->basic_type->id, merged_field_type->dimension, merged_field_type->flag)) {
       offset_byte_size = sizeof(void*);
     }
     else {
@@ -4605,13 +4582,20 @@ void SPVM_OP_CHECKER_resolve_field_offset(SPVM_COMPILER* compiler, SPVM_CLASS* c
       assert(offset % alignment_byte_size == 0);
     }
 
-    field->offset = offset;
+    merged_field->offset = offset;
     
     offset += offset_byte_size;
   }
-  
-  
+
   class->fields_byte_size = offset;
+  
+  int32_t merged_fields_original_offset = class->merged_fields_original_offset;
+  for (int32_t field_index = 0; field_index < class->fields->length; field_index++) {
+    SPVM_FIELD* merged_field = SPVM_LIST_get(class->merged_fields, field_index + merged_fields_original_offset);
+    SPVM_FIELD* field = SPVM_LIST_get(class->fields, field_index);
+    
+    field->offset = merged_field->offset;
+  }
 }
 
 void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
@@ -4731,7 +4715,7 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
               int32_t need_implicite_conversion = 0;
               int32_t narrowing_conversion_error = 0;
               int32_t mutable_invalid = 0;
-              int32_t assignability = SPVM_TYPE_check_assignability(
+              int32_t assignability = SPVM_TYPE_can_assign(
                 compiler,
                 arg_type->basic_type->id, arg_type->dimension, arg_type->flag,
                 constant_type->basic_type->id, constant_type->dimension, constant_type->flag,
@@ -4837,7 +4821,7 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
         return;
       }
 
-      // Copy has_precomile_descriptor from anon method defined class
+      // Copy has_precomile_attribute from anon method defined class
       if (method->anon_method_defined_class_name) {
         SPVM_CLASS* anon_method_defined_class = SPVM_HASH_get(compiler->class_symtable, method->anon_method_defined_class_name, strlen(method->anon_method_defined_class_name));
         SPVM_LIST_push(anon_method_defined_class->anon_methods, method);
@@ -4857,14 +4841,17 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
         SPVM_COMPILER_error(compiler, "The current class must be a class type when the class becomes a child class at %s line %d", class->op_extends->file, class->op_extends->line);
         return;
       }
-      if (parent_class->is_pointer) {
-        SPVM_COMPILER_error(compiler, "The parant class can't be a pointer class type at %s line %d", class->op_extends->file, class->op_extends->line);
-        return;
+      if (!(parent_class->is_pointer && class->is_pointer)) {
+        if (parent_class->is_pointer) {
+          SPVM_COMPILER_error(compiler, "The parant class can't be a pointer class type at %s line %d", class->op_extends->file, class->op_extends->line);
+          return;
+        }
+        if (class->is_pointer) {
+          SPVM_COMPILER_error(compiler, "The current class can't be a pointer class type when the class becomes a child class at %s line %d", class->op_extends->file, class->op_extends->line);
+          return;
+        }
       }
-      if (class->is_pointer) {
-        SPVM_COMPILER_error(compiler, "The current class can't be a pointer class type when the class becomes a child class at %s line %d", class->op_extends->file, class->op_extends->line);
-        return;
-      }
+      
       if (strcmp(class->name, parent_class->name) == 0) {
         SPVM_COMPILER_error(compiler, "The name of the parant class must be different from the name of the class at %s line %d", class->op_extends->file, class->op_extends->line);
         return;
@@ -4939,7 +4926,7 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
     for (int32_t i = 0; i < class->methods->length; i++) {
       SPVM_METHOD* method = SPVM_LIST_get(class->methods, i);
       
-      // Set method precompile flag if class have precompile descriptor
+      // Set method precompile flag if class have precompile attribute
       if (class->is_precompile) {
         int32_t can_precompile;
         if (method->is_class_var_setter) {
@@ -5012,8 +4999,8 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
     SPVM_LIST* class_stack = SPVM_LIST_new(compiler->allocator, 0, SPVM_ALLOCATOR_C_ALLOC_TYPE_TMP);
     SPVM_LIST_push(class_stack, class);
 
-    SPVM_LIST* all_fields = SPVM_LIST_new_list_permanent(compiler->allocator, 0);
-    SPVM_LIST* all_interfaces = SPVM_LIST_new_list_permanent(compiler->allocator, 0);
+    SPVM_LIST* merged_fields = SPVM_LIST_new_list_permanent(compiler->allocator, 0);
+    SPVM_LIST* merged_interfaces = SPVM_LIST_new_list_permanent(compiler->allocator, 0);
     
     SPVM_CLASS* parent_class = class->parent_class;
     while (1) {
@@ -5022,6 +5009,13 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
           SPVM_COMPILER_error(compiler, "Recursive inheritance. Found the current class \"%s\" in a super class at %s line %d", class->name, class->op_extends->file, class->op_extends->line);
           compile_error = 1;
           break;
+        }
+        
+        // Inherit destructor
+        if (!class->destructor_method) {
+          if (parent_class->destructor_method) {
+            class->destructor_method = parent_class->destructor_method;
+          }
         }
         
         SPVM_LIST_push(class_stack, parent_class);
@@ -5033,7 +5027,8 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
     }
     
     SPVM_CLASS* cur_class = class;
-    SPVM_HASH* all_field_symtable = SPVM_HASH_new(compiler->allocator, 0, SPVM_ALLOCATOR_C_ALLOC_TYPE_TMP);
+    int32_t merged_fields_original_offset_set = 0;
+    int32_t merged_fields_index = 0;
     for (int32_t class_index = class_stack->length - 1; class_index >= 0; class_index--) {
       SPVM_CLASS* class = SPVM_LIST_get(class_stack, class_index);
       
@@ -5046,6 +5041,10 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
         SPVM_FIELD* new_field;
         if (strcmp(field->class->name, cur_class->name) == 0) {
           new_field = field;
+          if (!merged_fields_original_offset_set) {
+            class->merged_fields_original_offset = merged_fields_index;
+            merged_fields_original_offset_set = 1;
+          }
         }
         // Clone field
         else {
@@ -5055,33 +5054,24 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
           new_field->type = field->type;
           new_field->access_control_type = field->access_control_type;
         }
-        SPVM_LIST_push(all_fields, new_field);
-        SPVM_FIELD* found_field = SPVM_HASH_get(all_field_symtable, new_field->name, strlen(new_field->name));
-        if (found_field) {
-          SPVM_COMPILER_error(compiler, "Fields that are defined in the super class can't be defined. The field \"%s\" is already defined in the super class at %s line %d", found_field->name, class->op_extends->file, class->op_extends->line);
-          compile_error = 1;
-          break;
-        }
-        else {
-          SPVM_HASH_set(all_field_symtable, new_field->name, strlen(new_field->name), new_field);
-        }
+        SPVM_LIST_push(merged_fields, new_field);
+        merged_fields_index++;
       }
       
       // All interfaces
       SPVM_LIST* interfaces = class->interfaces;
       for (int32_t interface_index = 0; interface_index < interfaces->length; interface_index++) {
         SPVM_CLASS* interface = SPVM_LIST_get(interfaces, interface_index);
-        SPVM_LIST_push(all_interfaces, interface);
+        SPVM_LIST_push(merged_interfaces, interface);
       }
     }
     
-    class->tmp_merged_fields = all_fields;
-    SPVM_HASH_free(all_field_symtable);
+    class->merged_fields = merged_fields;
     
     // Add parent interfaces
-    class->interfaces = all_interfaces;
-    for (int32_t i = 0; i < all_interfaces->length; i++) {
-      SPVM_CLASS* interface = SPVM_LIST_get(all_interfaces, i);
+    class->interfaces = merged_interfaces;
+    for (int32_t i = 0; i < merged_interfaces->length; i++) {
+      SPVM_CLASS* interface = SPVM_LIST_get(merged_interfaces, i);
       SPVM_CLASS* found_interface = SPVM_HASH_get(class->interface_symtable, interface->name, strlen(interface->name));
       if (!found_interface) {
         SPVM_LIST_push(class->interfaces, interface);
@@ -5099,8 +5089,6 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
   for (int32_t class_index = compiler->cur_class_base; class_index < compiler->classes->length; class_index++) {
     SPVM_CLASS* class = SPVM_LIST_get(compiler->classes, class_index);
 
-    class->fields = class->tmp_merged_fields;
-    
     for (int32_t field_index = 0; field_index < class->fields->length; field_index++) {
       SPVM_FIELD* field = SPVM_LIST_get(class->fields, field_index);
       field->index = field_index;

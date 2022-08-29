@@ -24,7 +24,10 @@ package Gtk2::CV::Schnauzer;
 use common::sense;
 use integer;
 
-our %EXCLUDE; # to be set form your .cvrc to exclude additional files
+our %EXCLUDE; # to be set from your .cvrc to exclude additional files
+our $ICONSCALE; # to be set from your .cvrc to set icon scale
+our $FONTSCALE; # to be set from your .cvrc to set icon font scale
+our $DISPLAYSCALE; # to be set from your .cvrc to set display scale (for hidpi displays)
 
 use Gtk2;
 use Gtk2::Pango;
@@ -74,6 +77,10 @@ our $UTF8_RE = qr{^
  )*
 $}x;
 
+# this basiclaly provides an overridable hook for your .cvrc
+sub filename_display_name;
+*filename_display_name = \&Glib::filename_display_name;
+
 # quote for shell, but assume it is being interactively pasted
 # input is octet string, output is unicode string
 sub shellquote_selection($) {
@@ -95,6 +102,11 @@ sub shellquote_selection($) {
    }
 }
 
+sub format_size($) {
+   # perl doesn't support %'d
+   scalar reverse join ",", unpack "(a3)*", scalar reverse "$_[0]"
+}
+
 sub regdir($) {
    $dir{$_[0]} ||= ++$dirid;
 }
@@ -112,38 +124,66 @@ sub parent_dir($) {
 
 sub IW() { 80 } # must be the same as in CV.xs(!)
 sub IH() { 60 } # must be the same as in CV.xs(!)
-sub IX() { 20 }
-sub IY() { 16 }
-sub FY() { 12 } # font-y
+
+sub default_display_scale {
+   init Gtk2::Gdk;
+
+   my $screen = Gtk2::Gdk::Screen->get_default
+      or return 1;
+
+   my $rect = $screen->get_monitor_geometry (0)
+      or return 1;
+
+   no integer;
+
+   my $dpi = $rect->width * 2.54 * 10 / $screen->get_monitor_width_mm (0);
+
+   $dpi < 110 ? 1 : $dpi / 96
+}
 
 BEGIN {
    no integer;
-   my $scale = $ENV{CV_THUMBNAIL_SCALE} || 1;
-   eval "sub ISCALE() { $scale }";
-   eval "sub IWD()    { IW * $scale }";
-   eval "sub IHD()    { IH * $scale }";
+   $ICONSCALE = $ENV{CV_THUMBNAIL_SCALE} || $ICONSCALE || 1;
+   eval "sub IWG()    { " . (int IW * $ICONSCALE   ) . " }"; # "G"eneration
+   eval "sub IHG()    { " . (int IH * $ICONSCALE   ) . " }"; # "G"eneration
+
+   $DISPLAYSCALE = $ENV{CV_DISPLAY_SCALE} || $DISPLAYSCALE || default_display_scale;
+   eval "sub IWD()    { " . (int IW * $DISPLAYSCALE) . " }"; # "D"isplay
+   eval "sub IHD()    { " . (int IH * $DISPLAYSCALE) . " }"; # "D"isplay
+   eval "sub IX()     { " . (int 20 * $DISPLAYSCALE) . " }"; # extra horizontal space
+
+   my $fsize = int 12 * ($ENV{CV_SCHNAUZER_FONTSCALE} || $FONTSCALE || $ICONSCALE) * $DISPLAYSCALE;
+   eval "sub FY()     { $fsize }";
+   eval "sub IY()     { " . (ceil 1.25 * $fsize) . " }";
 }
 
 sub SCROLL_Y()    {  1 }
 sub SCROLL_X()    { 10 }
 sub SCROLL_TIME() { 500 }
 
-sub FAST_RANGE()  { 2500 } # searching for this many entries * 2 is fast
-sub SLOW_RANGE()  {   10 } # doing this many slow ops per idle callback is ok
+sub FAST_RANGE()  { 10000 } # searching for this many entries * 2 is fast
+sub SLOW_RANGE()  {    10 } # doing this many slow ops per idle callback is ok
 
 sub F_CHECKED()  { 1 } # entry has been investigated
 sub F_ISDIR()    { 2 } # entry is certainly a directory
 sub F_HASXVPIC() { 4 } # entry (likely) has a thumbnail file
 sub F_HASPM()    { 8 } # entry has a pixmap
 
-# entries are arrays in this format:
-# [0] dir
-# [1] file
-# [2] flags
-# [3] pixmap
+# entries are arrays with these indices. the order
+# is hardcoded in several places, such as chpaths.
+sub E_DIR   () { 0 }
+sub E_FILE  () { 1 }
+sub E_FLAGS () { 2 }
+sub E_PIXMAP() { 3 }
 
-sub img {
-   scalar +(Gtk2::CV::require_image $_[0])->render_pixmap_and_mask (0.5)
+sub load_icon {
+   my $pb = Gtk2::CV::require_image $_[0];
+
+   $pb->scale_simple (IWD, IHD, "bilinear")
+}
+
+sub load_icon_pm {
+   scalar +(load_icon $_[0])->render_pixmap_and_mask (0.5)
 }
 
 my %combine;
@@ -240,18 +280,18 @@ my $dirs_layer;
 my %file_img;
 
 sub init {
-   $file_img = img "file.png";
-   $diru_img = img "dir-unvisited.png";
-   $dirv_img = img "dir-visited.png";
+   $file_img = load_icon_pm "file.png";
+   $diru_img = load_icon_pm "dir-unvisited.png";
+   $dirv_img = load_icon_pm "dir-visited.png";
   
-   $dirx_layer = Gtk2::CV::require_image "dir-xvpics.png";
-   $dire_layer = Gtk2::CV::require_image "dir-empty.png";
-   $dirs_layer = Gtk2::CV::require_image "dir-symlink.png";
+   $dirx_layer = load_icon "dir-xvpics.png";
+   $dire_layer = load_icon "dir-empty.png";
+   $dirs_layer = load_icon "dir-symlink.png";
   
    %file_img = do {
       my %logo = reverse %ext_logo;
 
-      map +($_ => img "file-$_.png"), keys %logo
+      map +($_ => load_icon_pm "file-$_.png"), keys %logo
    };
 }
 
@@ -314,11 +354,11 @@ sub {
       die "can only rotate regular files"
          unless Fcntl::S_ISREG ($job->{stat}[2]);
 
-      $rot = $rot eq "auto"      ? "-a"
-           : ($rot % 360) ==   0 ? undef
-           : ($rot % 360) ==  90 ? -9
-           : ($rot % 360) == 180 ? -1
-           : ($rot % 360) == 270 ? -2
+      $rot = $rot eq "auto" ? "-a"
+           : $rot ==   0    ? undef
+           : $rot ==  90    ? -9
+           : $rot == 180    ? -1
+           : $rot == 270    ? -2
            : die "can only rotate by 0, 90, 180 and 270 degrees";
 
       if ($rot) {
@@ -349,9 +389,16 @@ sub video_thumbnail_at {
       my $dir = File::Temp::tempdir DIR => $Gtk2::CV::FAST_TMP
          or return;
 
-      system "exec mplayer -really-quiet -noautosub -nosound -input nodefault-bindings -noconfig all -ss $time -frames 2 -vf scale=" . IW . ":-2::::::1 -vo pnm:outdir=\Q$dir\E \Q$path\E >/dev/null 2>&1 </dev/null";
+      #system "exec mpv -really-quiet -noautosub -nosound -input nodefault-bindings -noconfig all -ss $time -frames 2 -vf scale=" . IWG . ":-2::::::1 -vo pnm:outdir=\Q$dir\E \Q$path\E >/dev/null 2>&1 </dev/null";
+      system "exec mpv"
+           . " --really-quiet"
+           . " --no-terminal --sid=no --ao=null --no-config"
+           . " --access-references=no --autoload-files=no"
+           . " --start=$time --frames=2 --vf=scale=" . IWG . ":-2::::::1"
+           . " --vo=image -vo-image-format=png --vo-image-png-compression=0 -vo-image-outdir=\Q$dir\E \Q$path\E"
+           . " >/dev/null 2>&1 </dev/null";
 
-      my $pb = eval { new_from_file Gtk2::Gdk::Pixbuf "$dir/00000002.ppm" };
+      my $pb = eval { new_from_file Gtk2::Gdk::Pixbuf "$dir/00000002.png" };
 
       # mplayer can write a large number of files when a single one is requested...
       if (opendir my $fh, $dir) {
@@ -418,13 +465,14 @@ sub {
          if (IO::AIO::mmap my $data, -s $fh, IO::AIO::PROT_READ, IO::AIO::MAP_SHARED, $fh) {
             my $type = Gtk2::CV::filetype $data;
 
-            $pb = eval { $type eq "jpg" && Gtk2::CV::decode_jpeg $data, 1, IWD, IHD }
-                  || eval { $type eq "webp" && Gtk2::CV::decode_webp $data, 1, IWD, IHD }
+            $pb = eval { $type eq "image/jpeg" && Gtk2::CV::decode_jpeg $data, 1, IWG, IHG }
+                  || eval { $type eq "image/jxl" && Gtk2::CV::decode_jxl $data, 1, IWG, IHG }
+                  || eval { $type eq "image/webp" && Gtk2::CV::decode_webp $data, 1, IWG, IHG }
                   || eval {
                         my $loader = new Gtk2::Gdk::PixbufLoader;
 
                         # should set size-prepared callback to scale down, but
-                        # we only really care about this for jpegs, which are handled above.
+                        # we only really care about this for jpeg files, which are handled above.
                         #$loader->set_size (IW, IH);
 
                         $loader->write ($data);
@@ -443,12 +491,12 @@ sub {
 
       my ($w, $h) = ($pb->get_width, $pb->get_height);
 
-      if ($w * IHD > $h * IWD) {
-         $h = (int $h * IWD / $w + 0.5) || 1;
-         $w = IWD;
+      if ($w * IHG > $h * IWG) {
+         $h = (int $h * IWG / $w + 0.5) || 1;
+         $w = IWG;
       } else {
-         $w = (int $w * IHD / $h + 0.5) || 1;
-         $h = IHD;
+         $w = (int $w * IHG / $h + 0.5) || 1;
+         $h = IHG;
       }
 
       $pb = Gtk2::CV::dealpha $pb->scale_simple ($w, $h, 'tiles');
@@ -633,7 +681,7 @@ sub jobber_update {
    unless (exists $self->{map}) {
       my %map;
 
-      @map{ map "$_->[0]/$_->[1]", @{$self->{entry}} }
+      @map{ map "$_->[E_DIR]/$_->[E_FILE]", @{$self->{entry}} }
          = (0 .. $#{$self->{entry}});
 
       $self->{map} = \%map;
@@ -660,18 +708,18 @@ sub jobber_update {
          my ($w, $h, $rs) = unpack "SSS", substr $data, -6;
 
          for ($self->{entry}[$idx]) {
-            $_->[2] &= ~F_HASPM;
-            $_->[2] |= F_HASXVPIC;
-            $_->[3] = new_from_data Gtk2::Gdk::Pixbuf $data, 'rgb', 0, 8, $w, $h, $rs;
+            $_->[E_FLAGS] &= ~F_HASPM;
+            $_->[E_FLAGS] |= F_HASXVPIC;
+            $_->[E_PIXMAP] = new_from_data Gtk2::Gdk::Pixbuf $data, 'rgb', 0, 8, $w, $h, $rs;
          }
       } elsif ($job->{type} eq "unlink_thumb") {
          for ($self->{entry}[$idx]) {
-            $_->[2] &= ~(F_HASPM | F_HASXVPIC);
-            $_->[3] = undef;
+            $_->[E_FLAGS] &= ~(F_HASPM | F_HASXVPIC);
+            $_->[E_PIXMAP] = undef;
          }
       } elsif ( $job->{type} eq "rotate" ) {
         Gtk2::CV::Jobber::submit gen_thumb => "$job->{path}"
-           if $self->{entry}[$idx][2] & F_HASXVPIC;
+           if $self->{entry}[$idx][E_FLAGS] & F_HASXVPIC;
       }
 
       $self->draw_entry ($idx);
@@ -681,12 +729,12 @@ sub jobber_update {
 sub force_pixmap($$) {
    my ($self, $entry) = @_;
 
-   return if $entry->[2] & F_HASPM;
+   return if $entry->[E_FLAGS] & F_HASPM;
 
-   if ($entry->[3]) {
-      my $pb = ARRAY:: eq ref $entry->[3]
-               ? p7_to_pb @{$entry->[3]}
-               : $entry->[3];
+   if ($entry->[E_PIXMAP]) {
+      my $pb = ARRAY:: eq ref $entry->[E_PIXMAP]
+               ? p7_to_pb @{$entry->[E_PIXMAP]}
+               : $entry->[E_PIXMAP];
 
       my ($w, $h) = ($pb->get_width, $pb->get_height);
 
@@ -697,13 +745,13 @@ sub force_pixmap($$) {
          $pb = $pb->scale_simple ($w, $h, "bilinear");
       }
 
-      $entry->[3] = new Gtk2::Gdk::Pixmap $self->{window}, $w, $h, -1;
-      $entry->[3]->draw_pixbuf ($self->style->white_gc, $pb, 0, 0, 0, 0, $w, $h, "max",  0, 0);
+      $entry->[E_PIXMAP] = new Gtk2::Gdk::Pixmap $self->{window}, $w, $h, -1;
+      $entry->[E_PIXMAP]->draw_pixbuf ($self->style->white_gc, $pb, 0, 0, 0, 0, $w, $h, "max",  0, 0);
    } else {
-      $entry->[3] = $file_img{ $ext_logo{ extension $entry->[1] } } || $file_img;
+      $entry->[E_PIXMAP] = $file_img{ $ext_logo{ extension $entry->[E_FILE] } } || $file_img;
    }
 
-   $entry->[2] |= F_HASPM;
+   $entry->[E_FLAGS] |= F_HASPM;
 }
 
 # prefetch a file after a timeout
@@ -735,6 +783,7 @@ sub prefetch {
 
             aioreq_pri -1;
             aio_read $fh, $ofs, 4096, my $buffer, 0, sub {
+               return unless $id == $self->{prefetch_aio};
                return unless $self->{aio_reader};
                return delete $self->{aio_reader}
                   if $_[0] <= 0 || $ofs > 1024*1024;
@@ -771,6 +820,23 @@ sub coord {
    );
 }
 
+# newer gtk2 versions (maybe caused by xft bugs?) change the label width
+# rather erratically even with the same font, which, when size hints are
+# used, will resize the window when the label text changes. this tries to
+# work around this, by allocating more vertical pixels for rounding
+# issues and never reducing the height, ever.
+sub fix_label_jumping {
+   my ($label) = @_;
+
+   my $max;
+
+   $label->signal_connect_after (size_request => sub {
+      my $h = $_[1]->height;
+      $max = $h + 2 if $max < $h;
+      $_[1]->height ($max);
+   });
+}
+
 sub INIT_INSTANCE {
    my ($self) = @_;
 
@@ -787,8 +853,9 @@ sub INIT_INSTANCE {
    $self->pack_start (new Gtk2::HSeparator, 0, 0, 0);
    $self->pack_end   (my $labelwindow = new Gtk2::EventBox, 0, 1, 0);
    $labelwindow->add ($self->{info} = new Gtk2::Label);
+   fix_label_jumping $self->{info};
+   # make sure the text clips to the window *sigh*
    $labelwindow->signal_connect_after (size_request => sub { $_[1]->width (0) });
-   # the above 3 lines are just to make the text clip to the window *sigh*
    $self->{info}->set (selectable => 1, xalign => 0, justify => "left");
 
    $self->signal_connect (destroy => sub { %{$_[0]} = () });
@@ -1092,8 +1159,7 @@ sub emit_sel_changed {
             $self->{info_updater_group}->feed (sub {
                my $entry = pop @$todo
                   or return;
-
-               $_[0]->add (aio_stat "$entry->[0]/$entry->[1]", sub {
+               $_[0]->add (aio_stat "$entry->[E_DIR]/$entry->[E_FILE]", sub {
                   my ($size, $blocks) = (stat _)[7, 12];
                   $self->{info_size} += $size;
                   $self->{info_disk} += $blocks * 512 - $size;
@@ -1108,14 +1174,14 @@ sub emit_sel_changed {
          my $id = ++$self->{aio_sel_changed};
 
          aioreq_pri 3;
-         aio_stat "$entry->[0]/$entry->[1]", sub {
+         aio_stat "$entry->[E_DIR]/$entry->[E_FILE]", sub {
             return unless $id == $self->{aio_sel_changed};
             $self->{info}->set_text (
-               sprintf "%s: %d bytes, last modified %s (in %s)",
-                       (Glib::filename_display_name $entry->[1]),
-                       -s _,
+               sprintf "%s: %s bytes, last modified %s (in %s)",
+                       (filename_display_name $entry->[E_FILE]),
+                       (format_size -s _),
                        (strftime "%Y-%m-%d %H:%M:%S", localtime +(stat _)[9]),
-                       (Glib::filename_display_name $entry->[0]),
+                       (filename_display_name $entry->[E_DIR]),
             );
          };
       }
@@ -1183,21 +1249,21 @@ sub emit_popup {
       $menu->append (my $item = new Gtk2::MenuItem "Select");
       $item->set_submenu (my $sel = new Gtk2::Menu);
 
-      $sel->append (my $item = new Gtk2::MenuItem "By Prefix");
+      $sel->append (my $item = new Gtk2::MenuItem "By Adjacent Name");
       $item->set_submenu (my $by_pfx = new Gtk2::Menu);
 
-      my $name = $entry->[1];
+      my $name = $entry->[E_FILE];
       my %cnt;
 
       $cnt{Gtk2::CV::common_prefix_length $name, $self->{entry}[$_][1]}++
          for (max 0, $idx - FAST_RANGE) .. min ($idx + FAST_RANGE, $#{$self->{entry}});
 
       my $sum = 0;
-      for my $len (reverse 1 .. -2 + length $entry->[1]) {
+      for my $len (reverse 1 .. -2 + length $entry->[E_FILE]) {
          my $cnt = $cnt{$len}
             or next;
          $sum += $cnt;
-         my $pfx = substr $entry->[1], 0, $len;
+         my $pfx = substr $entry->[E_FILE], 0, $len;
          my $label = "$pfx*\t($sum)";
          $label =~ s/_/__/g;
          $by_pfx->append (my $item = new Gtk2::MenuItem $label);
@@ -1212,6 +1278,9 @@ sub emit_popup {
             $self->invalidate_all;
          });
       }
+
+      $sel->append (my $item = new Gtk2::MenuItem "By Adjacent Dir (Alt-A)");
+      $item->signal_connect (activate => sub { $self->selection_adjacent_dir });
 
       $sel->append (my $item = new Gtk2::MenuItem "Unselect Thumbnailed (Ctrl -)");
       $item->signal_connect (activate => sub { $self->selection_remove_thumbnailed });
@@ -1231,7 +1300,7 @@ sub emit_activate {
    $self->prefetch_cancel;
 
    my $entry = $self->{entry}[$cursor];
-   my $path = "$entry->[0]/$entry->[1]";
+   my $path = "$entry->[E_DIR]/$entry->[E_FILE]";
 
    $self->{cursor_current} = $path;
 
@@ -1305,7 +1374,7 @@ sub cursor_move {
       $self->clear_selection;
       $cursor_prev = -1;
 
-      if (!$cursor) {
+      unless (defined $cursor) {
          if ($inc < 0) {
             $cursor = $self->{offs} + $self->{page} * $self->{cols} - 1;
          } else {
@@ -1317,7 +1386,7 @@ sub cursor_move {
          }
       } else {
          my $entry = $self->{entry}[$cursor];
-         $cursor += $inc if $self->{cursor_current} eq "$entry->[0]/$entry->[1]";
+         $cursor += $inc if $self->{cursor_current} eq "$entry->[E_DIR]/$entry->[E_FILE]";
          $cursor -= $inc if $cursor < 0 || $cursor >= @{$self->{entry}};
       }
 
@@ -1452,6 +1521,81 @@ sub unlink_thumbnails {
    };
 }
 
+=item $schnauzer->selection_adjacent_dir
+
+=cut
+
+sub selection_adjacent_dir {
+   my ($self) = @_;
+
+   my $sel = $self->{sel} ||= {};
+   my @keys = sort keys %$sel;
+   my $entry = $self->{entry};
+
+   my $same_prefix = sub {
+      my ($idx, $pfx) = @_;
+
+      $idx >= 0 && $idx <= $#$entry
+         or return 0;
+
+      $pfx eq substr "$entry->[$idx][E_DIR]/", 0, length $pfx
+   };
+
+   # frst arg may be out-of-range
+   my $common_prefix = sub {
+      my ($a, $b) = @_;
+
+      $a >= 0 && $a <= $#$entry
+         or return "";
+
+      my $pfx = Gtk2::CV::common_prefix_length "$entry->[$a][E_DIR]/", "$entry->[$b][E_DIR]/";
+      $pfx = substr "$entry->[$a][E_DIR]/", 0, $pfx;
+      $pfx =~ s/[^\/]+$//;
+
+      $pfx
+   };
+
+   # find consecutive ranges
+   while (@keys) {
+      my $end = pop @keys;
+      my $beg = $end;
+
+      $beg = pop @keys
+         while @keys && $keys[-1] == $beg - 1;
+
+      # detect common dir prefix
+      my $pfx = $common_prefix->($beg, $end);
+
+      if ($same_prefix->($beg - 1, $pfx) or $same_prefix->($end + 1, $pfx)) {
+         # extend borders within same dir first
+      } else {
+         # extend borders to shallower directories
+
+         # find longer common prefix
+         my $pfxa = $common_prefix->($beg - 1, $beg);
+         my $pfxb = $common_prefix->($end + 1, $end);
+
+         $pfx = length $pfxa < length $pfxb ? $pfxb : $pfxa;
+      }
+
+      while ($same_prefix->($beg - 1, $pfx)) {
+         --$beg;
+         $sel->{$beg} = $entry->[$beg];
+      };
+
+      while ($same_prefix->($end + 1, $pfx)) {
+         ++$self->{cursor}
+            if $self->{cursor} == $end;
+
+         ++$end;
+         $sel->{$end} = $entry->[$end];
+      }
+   }
+
+   $self->invalidate_all;
+   $self->emit_sel_changed;
+}
+
 =item $schnauzer->selection_remove_thumbnailed
 
 =item $schnauzer->selection_keep_only_thumbnailed
@@ -1519,7 +1663,9 @@ sub handle_key {
 
    $self->prefetch_cancel;
 
-   if ($state * ["meta-mask", "shift-mask", "control-mask"] == ["control-mask"]) {
+   $state *= Gtk2::Accelerator->get_default_mod_mask;
+
+   if ($state == ["control-mask"]) {
       if ($key == $Gtk2::Gdk::Keysyms{g}) {
          my @sel = keys %{$self->{sel}};
          $self->generate_thumbnails (@sel ? @sel : 0 .. $#{$self->{entry}});
@@ -1554,7 +1700,13 @@ sub handle_key {
       } else {
          return 0;
       }
-   } elsif ($state * ["meta-mask", "shift-mask", "control-mask"] == ["shift-mask", "control-mask"]) {
+   } elsif ($state == ["mod1-mask"]) {
+      if ($key == $Gtk2::Gdk::Keysyms{a}) {
+         $self->selection_adjacent_dir;
+      } else {
+         return 0;
+      }
+   } elsif ($state == ["shift-mask", "control-mask"]) {
       if ($key == $Gtk2::Gdk::Keysyms{A}) {
          $self->select_range ($self->{offs}, $self->{offs} + $self->{cols} * $self->{page} - 1);
       } elsif ($key == $Gtk2::Gdk::Keysyms{D}) {
@@ -1564,7 +1716,7 @@ sub handle_key {
       } else {
          return 0;
       }
-   } elsif ($state * ["meta-mask", "shift-mask", "control-mask"] == []) {
+   } elsif ($state == []) {
       if ($key == $Gtk2::Gdk::Keysyms{Page_Up}) {
          my $value = $self->{adj}->value;
          $self->{adj}->set_value ($value >= $self->{page} ? $value - $self->{page} : 0);
@@ -1617,7 +1769,7 @@ sub handle_key {
 
          for my $entry (@{$self->{entry}}) {
             $idx++;
-            $cursor = $idx if $key gt lcfirst $entry->[1];
+            $cursor = $idx if $key gt lcfirst $entry->[E_FILE];
          }
 
          if ($cursor < @{$self->{entry}}) {
@@ -1832,7 +1984,7 @@ outer:
          if ($y > $y1 && $y < $y2
              && $x > $x1 && $x < $x2) {
             my $entry = $self->{entry}[$idx];
-            my $path = "$entry->[0]/$entry->[1]";
+            my $path = "$entry->[E_DIR]/$entry->[E_FILE]";
             my $text_gc;
 
             # selected?
@@ -1853,12 +2005,12 @@ outer:
 
             # pre-render thumb into pixmap
             $self->force_pixmap ($entry)
-               unless $entry->[2] & F_HASPM;
+               unless $entry->[E_FLAGS] & F_HASPM;
 
             $first_unchecked = $idx
-               unless $entry->[2] & F_CHECKED || defined $first_unchecked;
+               unless $entry->[E_FLAGS] & F_CHECKED || defined $first_unchecked;
 
-            my $pm = $entry->[3];
+            my $pm = $entry->[E_PIXMAP];
             my ($pw, $ph) = $pm->get_size;
 
             $self->{window}->draw_drawable ($white_gc,
@@ -1868,9 +2020,9 @@ outer:
                      $y + (     IHD - $ph) * 0.5,
                      $pw, $ph);
 
-            utf8::downgrade $entry->[1];#d# ugly workaround for Glib-bug, costs performance like nothing :)
+            utf8::downgrade $entry->[E_FILE];#d# ugly workaround for Glib-bug, costs performance like nothing :)
 
-            $layout->set_text (Glib::filename_display_name $entry->[1]);
+            $layout->set_text (filename_display_name $entry->[E_FILE]);
 
             my ($w, $h) = $layout->get_pixel_size;
 
@@ -1932,13 +2084,13 @@ sub idle_check {
 
       my $entry = $self->{entry}[$idx];
 
-      unless ($entry->[2] & F_CHECKED) {
-         $entry->[2] |= F_CHECKED;
+      unless ($entry->[E_FLAGS] & F_CHECKED) {
+         $entry->[E_FLAGS] |= F_CHECKED;
 
-         my $path = "$entry->[0]/$entry->[1]";
+         my $path = "$entry->[E_DIR]/$entry->[E_FILE]";
          $self->{idle_check}++;
 
-         if ($entry->[2] & F_HASXVPIC) {
+         if ($entry->[E_FLAGS] & F_HASXVPIC) {
             my $xvpic = xvpic $path;
             aioreq_pri -1;
             aio_open $xvpic, O_RDONLY, 0, sub {
@@ -1951,14 +2103,14 @@ sub idle_check {
                aio_readahead $fh, 0, -s $fh, sub {
                   return unless $generation == $self->{generation};
 
-                  $entry->[2] &= ~F_HASPM;
-                  $entry->[3] = read_thumb $xvpic;
+                  $entry->[E_FLAGS] &= ~F_HASPM;
+                  $entry->[E_PIXMAP] = read_thumb $xvpic;
                   $self->draw_entry ($idx);
                   $self->start_idle_check;
                };
             };
 
-         } elsif ($entry->[2] & F_ISDIR) {
+         } elsif ($entry->[E_FLAGS] & F_ISDIR) {
             aioreq_pri -1;
             aio_lstat $path, sub {
                return unless $generation == $self->{generation};
@@ -1989,8 +2141,8 @@ sub idle_check {
                   $img = $self->img_combine ($img, $dirx_layer) if $has_xvpics;
                   $img = $self->img_combine ($img, $dirs_layer) if $is_symlink;
 
-                  $entry->[2] |= F_HASPM;
-                  $entry->[3] = $img;
+                  $entry->[E_FLAGS] |= F_HASPM;
+                  $entry->[E_PIXMAP] = $img;
                   $self->draw_entry ($idx);
                   $self->start_idle_check;
                };
@@ -2001,8 +2153,8 @@ sub idle_check {
                return unless $generation == $self->{generation};
 
                if (-d _) {
-                  $entry->[2] |= F_ISDIR;
-                  $entry->[2] &= ~F_CHECKED;
+                  $entry->[E_FLAGS] |= F_ISDIR;
+                  $entry->[E_FLAGS] &= ~F_CHECKED;
                }
 
                $self->start_idle_check;
@@ -2028,13 +2180,14 @@ sub chpaths {
 
    my $all_group = $self->{chpaths_grp} = aio_group $cb;
 
-   $self->set_sensitive (0);
+   # get_parent_widnow is a hack hack., but otherwise gtk mishandles events
+   $self->get_toplevel->set_sensitive (0) if $self->get_toplevel;
    my $inhibit_guard = Gtk2::CV::Jobber::inhibit_guard;
 
    my $guard = Guard::guard {
       delete $self->{chpaths_grp};
       undef $inhibit_guard;
-      $self->set_sensitive (1);
+      $self->get_toplevel->set_sensitive (1) if $self->get_toplevel;
       $self->{draw}->grab_focus unless eval { $self->get_toplevel->get_focus };
    };
 
@@ -2149,14 +2302,14 @@ sub chpaths {
 
          if ($nosort) {
             for (\@d, \@f) {
-               my %h = map +("$_->[0]/$_->[1]" => $_), @$_;
-               @$_ = grep $_, map $h{"$_->[0]/$_->[1]"}, @$order;
+               my %h = map +("$_->[E_DIR]/$_->[E_FILE]" => $_), @$_;
+               @$_ = grep $_, map $h{"$_->[E_DIR]/$_->[E_FILE]"}, @$order;
             }
          } else {
             for (\@d, \@f) {
                @$_ = map $_->[1],
-                          sort { $a->[0] cmp $b->[0] }
-                             map [foldcase $_->[1], $_],
+                          sort { $a->[E_DIR] cmp $b->[E_DIR] }
+                             map [foldcase $_->[E_FILE], $_],
                                  @$_;
             }
          }
@@ -2326,7 +2479,7 @@ sub updir {
 sub get_paths {
    my ($self) = @_;
 
-   [ map "$_->[0]/$_->[1]", @{$self->{entry}} ]
+   [ map "$_->[E_DIR]/$_->[E_FILE]", @{$self->{entry}} ]
 }
 
 sub rescan {

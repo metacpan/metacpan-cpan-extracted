@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::HandlerLibrary::Array;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.035';
+our $VERSION   = '0.036';
 
 use Sub::HandlesVia::HandlerLibrary;
 our @ISA = 'Sub::HandlesVia::HandlerLibrary';
@@ -167,6 +167,7 @@ sub all {
 			return CORE::join "",
 				"  my \$object = $class\->new( $attr => [ 'foo', 'bar' ] );\n",
 				"  my \@list = \$object->$method;\n",
+				"  say Dumper( \\\@list ); ## ==> [ 'foo', 'bar' ]\n",
 				"\n";
 		},
 }
@@ -176,12 +177,13 @@ sub elements {
 		name      => 'Array:elements',
 		args      => 0,
 		template  => '@{$GET}',
-		documentation => 'All elements in the array, in list context.',
+		documentation => 'All elements in the array, in list context. (Essentially the same as C<all>.)',
 		_examples => sub {
 			my ( $class, $attr, $method ) = @_;
 			return CORE::join "",
 				"  my \$object = $class\->new( $attr => [ 'foo', 'bar' ] );\n",
 				"  my \@list = \$object->$method;\n",
+				"  say Dumper( \\\@list ); ## ==> [ 'foo', 'bar' ]\n",
 				"\n";
 		},
 }
@@ -191,7 +193,15 @@ sub flatten {
 		name      => 'Array:flatten',
 		args      => 0,
 		template  => '@{$GET}',
-		documentation => 'All elements in the array, in list context.',
+		documentation => 'All elements in the array, in list context. (Essentially the same as C<all>.)',
+		_examples => sub {
+			my ( $class, $attr, $method ) = @_;
+			return CORE::join "",
+				"  my \$object = $class\->new( $attr => [ 'foo', 'bar' ] );\n",
+				"  my \@list = \$object->$method;\n",
+				"  say Dumper( \\\@list ); ## ==> [ 'foo', 'bar' ]\n",
+				"\n";
+		},
 }
 
 sub get {
@@ -321,6 +331,14 @@ sub first {
 		usage     => '$coderef',
 		template  => '&List::Util::first($ARG, @{$GET})',
 		documentation => 'Like C<< List::Util::first() >>.',
+		_examples => sub {
+			my ( $class, $attr, $method ) = @_;
+			return CORE::join "",
+				"  my \$object = $class\->new( $attr => [ 'foo', 'bar', 'baz' ] );\n",
+				"  my \$found  = \$object->$method( sub { /a/ } );\n",
+				"  say \$found; ## ==> 'bar'\n",
+				"\n";
+		},
 }
 
 sub any {
@@ -332,6 +350,14 @@ sub any {
 		usage     => '$coderef',
 		template  => '&List::Util::any($ARG, @{$GET})',
 		documentation => 'Like C<< List::Util::any() >>.',
+		_examples => sub {
+			my ( $class, $attr, $method ) = @_;
+			return CORE::join "",
+				"  my \$object = $class\->new( $attr => [ 'foo', 'bar', 'baz' ] );\n",
+				"  my \$truth  = \$object->$method( sub { /a/ } );\n",
+				"  say \$truth; ## ==> true\n",
+				"\n";
+		},
 }
 
 sub first_index {
@@ -341,20 +367,16 @@ sub first_index {
 		args      => 1,
 		signature => [CodeRef],
 		usage     => '$coderef',
-		template  => $me.'::_firstidx($ARG, @{$GET})',
+		template  => 'for my $i ( 0 .. $#{$GET} ) { local *_ = \$GET->[$i]; return $i if $ARG->($_) }; return -1;',
 		documentation => 'Like C<< List::MoreUtils::first_index() >>.',
-}
-
-# Implementation from List::MoreUtils::PP.
-# Removed original prototype.
-sub _firstidx {
-	my $f = CORE::shift;
-	foreach my $i (0 .. $#_)
-	{
-		local *_ = \$_[$i];
-		return $i if $f->();
-	}
-	return -1;
+		_examples => sub {
+			my ( $class, $attr, $method ) = @_;
+			return CORE::join "",
+				"  my \$object = $class\->new( $attr => [ 'foo', 'bar', 'baz' ] );\n",
+				"  my \$found  = \$object->$method( sub { /z\$/ } );\n",
+				"  say \$found; ## ==> 2\n",
+				"\n";
+		},
 }
 
 sub reduce {
@@ -458,16 +480,17 @@ sub natatime {
 		max_args  => 2,
 		signature => [Int, Optional[CodeRef]],
 		usage     => '$n, $callback?',
-		template  => 'my $shv_iterator = '.$me.'::_natatime($ARG[1], @{$GET}); if ($ARG[2]) { while (my @shv_values = $shv_iterator->()) { $ARG[2]->(@shv_values) } } else { $shv_iterator }',
+		template  => 'my @shv_remaining = @{$GET}; my $shv_n = $ARG[1]; my $shv_iterator = sub { CORE::splice @shv_remaining, 0, $shv_n }; if ($ARG[2]) { while (my @shv_values = $shv_iterator->()) { $ARG[2]->(@shv_values) } } else { $shv_iterator }',
 		documentation => 'Given just a number, returns an iterator which reads that many elements from the array at a time. If also given a callback, calls the callback repeatedly with those values.',
-}
-
-# Implementation from List::MoreUtils::PP.
-# Removed original prototype.
-sub _natatime {
-	my $n    = CORE::shift;
-	my @list = @_;
-	return sub { CORE::splice @list, 0, $n }
+		_examples => sub {
+			my ( $class, $attr, $method ) = @_;
+			return CORE::join "",
+				"  my \$object = $class\->new( $attr => [ 'foo', 'bar', 'baz' ] );\n",
+				"  my \$iter   = \$object->$method( 2 );\n",
+				"  say Dumper( [ \$iter->() ] ); ## ==> [ 'foo', 'bar' ]\n",
+				"  say Dumper( [ \$iter->() ] ); ## ==> [ 'baz' ]\n",
+				"\n";
+		},
 }
 
 sub shallow_clone {
@@ -695,20 +718,18 @@ sub flatten_deep {
 		max_args  => 1,
 		signature => [Optional[Int]],
 		usage     => '$depth?',
-		template  => "$me\::_flatten_deep(\@{\$GET}, \$ARG)",
-		documentation => 'Flattens the arrayref into a list, including any nested arrayrefs.',
-}
-
-# callback!
-sub _flatten_deep {
-	my @array = @_;
-	my $depth = CORE::pop @array;
-	--$depth if defined($depth);
-	my @elements = CORE::map {
-		(ref eq 'ARRAY')
-			? (defined($depth) && $depth == -1) ? $_ : _flatten_deep(@$_, $depth)
-			: $_
-	} @array;
+		template  => 'my $shv_fd; $shv_fd = sub { my $d=pop; --$d if defined $d; map ref() eq "ARRAY" ? (defined $d && $d < 0) ? $_ : $shv_fd->(@$_, $d) : $_, @_ }; $shv_fd->(@{$GET}, $ARG)',
+		documentation => 'Flattens the arrayref into a list, including any nested arrayrefs. (Has the potential to loop infinitely.)',
+		_examples => sub {
+			my ( $class, $attr, $method ) = @_;
+			return CORE::join "",
+				"  my \$object = $class\->new( $attr => [ 'foo', [ 'bar', [ 'baz' ] ] ] );\n",
+				"  say Dumper( [ \$object->$method ] ); ## ==> [ 'foo', 'bar', 'baz' ]\n",
+				"\n",
+				"  my \$object2 = $class\->new( $attr => [ 'foo', [ 'bar', [ 'baz' ] ] ] );\n",
+				"  say Dumper( [ \$object->$method(1) ] ); ## ==> [ 'foo', 'bar', [ 'baz' ] ]\n",
+				"\n";
+		},
 }
 
 sub join {

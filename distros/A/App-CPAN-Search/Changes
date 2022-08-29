@@ -1,3 +1,6 @@
+0.08 2022-08-28T08:45:08+02:00
+ - Fix test of run on Windows.
+
 0.07 2022-01-06T11:03:23+01:00
  - Fix test requirements.
  - Fix 04-run.t test to run from different places.

@@ -82,6 +82,14 @@ use Test::More;
   }
 }
 
+# new_string_len
+{
+  {
+    my $source = 'class MyClass { static method main : void () { new_string_len 1L; } }';
+    compile_not_ok($source, qr|The operand of the new_string_len operator must be an integer type within int|);
+  }
+}
+
 # class_id
 {
   {
@@ -102,23 +110,23 @@ use Test::More;
 {
   {
     my $source = 'class MyClass { static method main : void () { switch (1d) { } } }';
-    compile_not_ok($source, qr'The condition of the switch statement must be the int type');
+    compile_not_ok($source, q|The condition of the switch statement must be an integer type within int|);
   }
   {
     my $source = 'class MyClass { static method main : void () { switch (1) { case Int->new(1): { } } } }';
-    compile_not_ok($source, qr'The operand of the case statement must be a constant value');
+    compile_not_ok($source, q|The operand of the case statement must be a constant value|);
   }
   {
     my $source = 'class MyClass { static method main : void () { switch (1) { case "foo": { } } } }';
-    compile_not_ok($source, qr'The operand of the case statement must be the int type');
+    compile_not_ok($source, q|The operand of the case statement must be the int type|);
   }
   {
     my $source = 'class MyClass { static method main : void () { switch (1) { case 1: { } case 1: { } } } }';
-    compile_not_ok($source, qr"The value of the case statement can't be duplicated");
+    compile_not_ok($source, q|The value of the case statement can't be duplicated|);
   }
   {
     my $source = 'class MyClass { static method main : void () { switch (1) { case 1: { } default: { } default: { } } } }';
-    compile_not_ok($source, qr'Unexpected token "default"');
+    compile_not_ok($source, q|Unexpected token "default"|);
   }
 }
 
@@ -306,7 +314,7 @@ use Test::More;
 {
   {
     my $source = 'class MyClass { static method main : void () { new int[1L]; } }';
-    compile_not_ok($source, 'The array length specified by the new operator must be the int type');
+    compile_not_ok($source, q|The array length specified by the new operator must be an integer type within int|);
   }
   {
     my $source = 'class MyClass { static method main : void () { new int; } }';
@@ -325,7 +333,7 @@ use Test::More;
   }
   {
     my $source = 'class MyClass { static method main : void () {  new Int; } }';
-    compile_not_ok($source, q|The object can't be created from the private class|);
+    compile_not_ok($source, q|The object of the private class "Int" can't be created from the current class "MyClass"|);
   }
 }
 
@@ -333,11 +341,11 @@ use Test::More;
 {
   {
     my $source = 'class MyClass { static method main : void () { 1d ^ 1; } }';
-    compile_not_ok($source, 'The left and right operand of the ^ operator must be an integral type');
+    compile_not_ok($source, 'The left and right operand of the ^ operator must be an integer type');
   }
   {
     my $source = 'class MyClass { static method main : void () { 1 ^ 1d; } }';
-    compile_not_ok($source, 'The left and right operand of the ^ operator must be an integral type');
+    compile_not_ok($source, 'The left and right operand of the ^ operator must be an integer type');
   }
 }
 
@@ -466,7 +474,7 @@ use Test::More;
 {
   {
     my $source = 'class MyClass { static method main : void () { ~ 1d; } }';
-    compile_not_ok($source, q|The operand of the ~ operator must be an integral type|);
+    compile_not_ok($source, q|The operand of the ~ operator must be an integer type|);
   }
 }
 
@@ -546,11 +554,11 @@ use Test::More;
 {
   {
     my $source = 'class MyClass { static method main : void () { "foo" % 1; } }';
-    compile_not_ok($source, q|The left operand of the % operator must be an integral type|);
+    compile_not_ok($source, q|The left operand of the % operator must be an integer type|);
   }
   {
     my $source = 'class MyClass { static method main : void () { 1 % "foo"; } }';
-    compile_not_ok($source, q|The right operand of the % operator must be an integral type|);
+    compile_not_ok($source, q|The right operand of the % operator must be an integer type|);
   }
 }
 
@@ -582,11 +590,11 @@ use Test::More;
 {
   {
     my $source = 'class MyClass { static method main : void () { "foo" & 1; } }';
-    compile_not_ok($source, q|The left operand of the & operator must be an integral type|);
+    compile_not_ok($source, q|The left operand of the & operator must be an integer type|);
   }
   {
     my $source = 'class MyClass { static method main : void () { 1 & "foo"; } }';
-    compile_not_ok($source, q|The right operand of the & operator must be an integral type|);
+    compile_not_ok($source, q|The right operand of the & operator must be an integer type|);
   }
 }
 
@@ -594,11 +602,11 @@ use Test::More;
 {
   {
     my $source = 'class MyClass { static method main : void () { "foo" | 1; } }';
-    compile_not_ok($source, q|The left operand of the \| operator must be an integral type|);
+    compile_not_ok($source, q|The left operand of the \| operator must be an integer type|);
   }
   {
     my $source = 'class MyClass { static method main : void () { 1 | "foo"; } }';
-    compile_not_ok($source, q|The right operand of the \| operator must be an integral type|);
+    compile_not_ok($source, q|The right operand of the \| operator must be an integer type|);
   }
 }
 
@@ -606,7 +614,7 @@ use Test::More;
 {
   {
     my $source = 'class MyClass { static method main : void () { "foo" << 1; } }';
-    compile_not_ok($source, q|The left operand of the << operator must be an integral type|);
+    compile_not_ok($source, q|The left operand of the << operator must be an integer type|);
   }
   {
     my $source = 'class MyClass { static method main : void () { 1 << 1d; } }';
@@ -622,7 +630,7 @@ use Test::More;
 {
   {
     my $source = 'class MyClass { static method main : void () { "foo" >> 1; } }';
-    compile_not_ok($source, q|The left operand of the >> operator must be an integral type|);
+    compile_not_ok($source, q|The left operand of the >> operator must be an integer type|);
   }
   {
     my $source = 'class MyClass { static method main : void () { 1 >> 1d; } }';
@@ -638,7 +646,7 @@ use Test::More;
 {
   {
     my $source = 'class MyClass { static method main : void () { "foo" >>> 1; } }';
-    compile_not_ok($source, q|The left operand of the >>> operator must be an integral type|);
+    compile_not_ok($source, q|The left operand of the >>> operator must be an integer type|);
   }
   {
     my $source = 'class MyClass { static method main : void () { 1 >>> 1d; } }';
@@ -733,7 +741,7 @@ use Test::More;
       'class MyClass { use MyClass2; static method main : void () { MyClass2->foo();  } }',
       'class MyClass2 { static private method foo : void () {} }'
     ];
-    compile_not_ok($source, q|The private method "foo" can't be called|);
+    compile_not_ok($source, q|The private method "foo" of the class "MyClass2" can't be called from the current class "MyClass"|);
   }
   {
     my $source = 'class MyClass { static method main : void () { &foo(); } static method foo : void ($arg0 : int, $arg1 = 0 : int) { } }';
@@ -747,10 +755,6 @@ use Test::More;
     my $source = 'class MyClass { static method main : void () { my $object = new MyClass; $object->foo(1, 2, 3); } method foo : void ($arg0 : int, $arg1 = 0 : int) { } }';
     compile_not_ok($source, q|The length of the arguments passed to the instance method "foo" in the class "MyClass" must be less than or equal to 2|);
   }
-  {
-    my $source = 'class MyClass { static method main : void () { my $object = new MyClass; $object->DESTROY; } method DESTROY : void () {} }';
-    compile_not_ok($source, q|The DESTROY method can't be called|);
-  }
 }
 
 # Class Variable Access
@@ -760,7 +764,7 @@ use Test::More;
       'class MyClass { use MyClass2; static method main : void () { $MyClass2::FOO;  } }',
       'class MyClass2 { our $FOO : private int; }'
     ];
-    compile_not_ok($source, q|The private class variable "$MyClass2::FOO" can't be accessed|);
+    compile_not_ok($source, q|The private class variable "$FOO" of the class "MyClass2" can't be accessed from the current class "MyClass"|);
   }
 }
 
@@ -788,7 +792,7 @@ use Test::More;
   }
   {
     my $source = 'class MyClass { static method main : void () { my $object = new MyClass; $object->{foo}; } }';
-    compile_not_ok($source, q|The field "foo" in the class "MyClass" is not defined|);
+    compile_not_ok($source, q|The field "foo" is not defined in the class "MyClass" or the super classes|);
   }
   {
     my $source = 'class MyClass { has x : int; static method main : void () { my $object = new MyClass; weaken $object->{x}; } }';
@@ -807,7 +811,28 @@ use Test::More;
       'class MyClass { use MyClass2; static method main : void () { my $object = new MyClass2; $object->{x};  } }',
       'class MyClass2 : public { has x : private int; }'
     ];
-    compile_not_ok($source, q|The private field "x" in the class "MyClass2" can't be accessed|);
+    compile_not_ok($source, q|The private field "x" in the class "MyClass2" can't be accessed from the current class "MyClass"|);
+  }
+  {
+    my $source = [
+      'class MyClass { use MyClass2; static method main : void () { my $object = new MyClass2; $object->{x};  } }',
+      'class MyClass2 : public { has x : protected int; }'
+    ];
+    compile_not_ok($source, q|The protected field "x" in the class "MyClass2" can't be accessed from the current class "MyClass"|);
+  }
+  {
+    my $source = [
+      'class MyClass extends MyClass2 { use MyClass2; static method main : void () { my $object = new MyClass2; $object->{x};  } }',
+      'class MyClass2 : protected { has x : protected int; }'
+    ];
+    compile_ok($source);
+  }
+  {
+    my $source = [
+      'class MyClass extends MyClass2 { use MyClass2; static method main : void () { my $object = new MyClass; $object->{x};  } }',
+      'class MyClass2 { has x : protected int; }'
+    ];
+    compile_ok($source);
   }
 }
 
@@ -1047,7 +1072,7 @@ use Test::More;
       'class MyClass extends MyClass2 { has x : int; }',
       'class MyClass2 { has x : int; }',
     ];
-    compile_not_ok($source, q|Fields that are defined in the super class can't be defined. The field "x" is already defined in the super class|);
+    compile_ok($source);
   }
   {
     my $source = [
@@ -1055,7 +1080,7 @@ use Test::More;
       'class MyClass2 extends MyClass3 {  }',
       'class MyClass3 { has x : int; }',
     ];
-    compile_not_ok($source, q|Fields that are defined in the super class can't be defined. The field "x" is already defined in the super class|);
+    compile_ok($source);
   }
 }
 

@@ -70,7 +70,7 @@
    "provides" : {
       "App::wordlist" : {
          "file" : "lib/App/wordlist.pm",
-         "version" : "0.290"
+         "version" : "0.291"
       }
    },
    "release_status" : "stable",
@@ -85,7 +85,7 @@
          "web" : "https://github.com/perlancar/perl-App-wordlist"
       }
    },
-   "version" : "0.290",
+   "version" : "0.291",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

@@ -2,11 +2,6 @@
 
 package Test::Sah::Schema;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-20'; # DATE
-our $DIST = 'Test-Sah-Schema'; # DIST
-our $VERSION = '0.010'; # VERSION
-
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
@@ -16,6 +11,11 @@ use Log::ger::App;
 use File::Spec;
 use Test::Builder;
 use Test::More ();
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-07-17'; # DATE
+our $DIST = 'Test-Sah-Schema'; # DIST
+our $VERSION = '0.011'; # VERSION
 
 my $Test = Test::Builder->new;
 
@@ -27,17 +27,6 @@ sub import {
 
     $Test->exported_to($caller);
     $Test->plan(@_);
-}
-
-sub _test_module {
-
-    my ($module, $opts) = @_;
-    my $ok = 1;
-
-    (my $module_pm = "$module.pm") =~ s!::!/!g;
-    require $module_pm;
-    my $sch = ${"$module\::schema"};
-
 }
 
 sub _set_option_defaults {
@@ -316,7 +305,7 @@ Test::Sah::Schema - Test Sah::Schema::* modules in distribution
 
 =head1 VERSION
 
-This document describes version 0.010 of Test::Sah::Schema (from Perl distribution Test-Sah-Schema), released on 2021-07-20.
+This document describes version 0.011 of Test::Sah::Schema (from Perl distribution Test-Sah-Schema), released on 2022-07-17.
 
 =head1 SYNOPSIS
 
@@ -389,14 +378,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Test-Sah-S
 
 Source repository is at L<https://github.com/perlancar/perl-Test-Sah-Schema>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Sah-Schema>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<test-sah-schema>, a command-line interface for C<sah_schema_modules_ok()>.
@@ -407,11 +388,36 @@ L<Test::Sah> to use Sah schema to test data.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Sah-Schema>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

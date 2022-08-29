@@ -10,7 +10,7 @@ use Readonly;
 
 Readonly::Scalar our $EMPTY_STR => q{};
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Constructor.
 sub new {
@@ -43,6 +43,7 @@ sub new {
 # Get img files.
 sub get_use_files {
 	my ($self, $use) = @_;
+
 	my @files;
 	if (exists $self->{'_mets'}->{$self->{'_prefix'}.'fileSec'}
 		&& exists $self->{'_mets'}->{$self->{'_prefix'}.'fileSec'}
@@ -63,6 +64,7 @@ sub get_use_files {
 			}
 		}
 	}
+
 	return @files;
 }
 
@@ -101,6 +103,7 @@ METS::Files - Class for METS files manipulation.
 =head1 SYNOPSIS
 
  use METS::Files;
+
  my $obj = METS::Files->new(
          'mets_data' => $mets_data,
  );
@@ -146,6 +149,8 @@ METS::Files - Class for METS files manipulation.
 
 =head1 EXAMPLE1
 
+=for comment filename=extract_mets_files.pl
+
  use strict;
  use warnings;
 
@@ -181,6 +186,8 @@ METS::Files - Class for METS files manipulation.
  # Usage: __SCRIPT__ mets_file
 
 =head1 EXAMPLE2
+
+=for comment filename=extract_mets_files_inline.pl
 
  use strict;
  use warnings;
@@ -259,11 +266,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Josef Špaček 2015-2020
- BSD 2-Clause License
+© 2015-2022 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

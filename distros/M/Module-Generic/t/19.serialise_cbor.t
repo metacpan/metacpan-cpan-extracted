@@ -89,8 +89,6 @@ is( $cache2->key, $cache->key, 'Module::Generic::File::Cache test value #1' );
 is( $cache2->create, $cache->create, 'Module::Generic::File::Cache test value #2' );
 is( $cache2->mode, $cache->mode, 'Module::Generic::File::Cache test value #3' );
 
-no warnings 'once';
-$Storable::forgive_me = 1;
 my $io = Module::Generic::File::IO->new( __FILE__, 'r' );
 diag( "Module::Generic::File::IO object is '$io'" ) if( $DEBUG );
 $serialised = CBOR::XS::encode_cbor( $io );

@@ -1,0 +1,41 @@
+Math-Permutation
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Math::Permutation
+
+You can also look for information at:
+
+    GitHub Repository (welcome to report bugs on the section "Issues")
+        https://github.com/E7-87-83/Math-Permutation
+
+    RT, CPAN's request tracker
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Permutation
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Math-Permutation
+
+    Search CPAN
+        https://metacpan.org/release/Math-Permutation
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2022 by Cheok-Yin Fung.
+
+This is free software, licensed under:
+
+  MIT License
+

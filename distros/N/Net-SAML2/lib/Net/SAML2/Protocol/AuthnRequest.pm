@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::Protocol::AuthnRequest;
-our $VERSION = '0.57'; # VERSION
+our $VERSION = '0.59'; # VERSION
 
 use Moose;
 use MooseX::Types::URI qw/ Uri /;
@@ -89,10 +89,8 @@ around BUILDARGS => sub {
     my $self = shift;
 
     my %params = @_;
-    if ($params{nameid_format}) {
-        unless (defined $params{nameidpolicy_format}) {
-            $params{nameidpolicy_format} = $params{nameid_format};
-        }
+    if ($params{nameid_format} && !defined $params{nameidpolicy_format}) {
+        $params{nameidpolicy_format} = $params{nameid_format};
     }
 
     return $self->$orig(%params);
@@ -228,7 +226,7 @@ Net::SAML2::Protocol::AuthnRequest - SAML2 AuthnRequest object
 
 =head1 VERSION
 
-version 0.57
+version 0.59
 
 =head1 SYNOPSIS
 

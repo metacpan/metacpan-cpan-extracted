@@ -1,3 +1,15 @@
+0.291   2022-08-28  Released-By: PERLANCAR; Urgency: medium
+
+        - [doc] Reword description for the 'or' argument.
+
+        - [cli wordlist-wordle] [doc] Tweak: remove FAQ.
+
+        - [ux] Show summaries when completing values for --action and --color.
+
+        - [build] Rebuild for improved generated completion script (shows
+          summaries of options, previously it didn't).
+
+
 0.290   2022-08-20  Released-By: PERLANCAR; Urgency: medium
 
         - [cli wordlist-wordle] Allow incorrect letter to be specified.

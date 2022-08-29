@@ -274,6 +274,7 @@ my $d5 =  {
 is_deeply(decode_xml($f5), $d5, 'example 5 xml');
 
 ### Facet prefix (term suggest)
+
 check_get     #XXX huh?  Ruby?  on -> true on index and facet
   'http://localhost:8983/solr/select?q=hatcher&wt=ruby&indent=true&facet=true&rows=0&facet.field=text&facet.prefix=xx&facet.limit=5&facet.mincount=1',
   { q => 'hatcher', wt => 'ruby', indent => 'on', rows => 0
@@ -316,7 +317,7 @@ check_get
   , facet => { date => 'timestamp', date_gap => '+1DAY'
              , date_start => 'NOW/DAY-5DAYS', date_end => 'NOW/DAY+1DAY'}
   }, 'example 7 get';
-};
+} hide => 'WARNING';
 
 my @ex = $@->exceptions;
 cmp_ok(scalar @ex, '==', 1, 'exceptions');

@@ -1,2 +1,8 @@
+0.02 2022-08-26T12:09:40+02:00
+ - Add Check::Socket::HardcodedUsage doc.
+ - Add example to doc for test of fork and socket functionality.
+ - Fix test dependencies.
+ - Regen README file.
+
 0.01 2022-08-18T13:55:31+02:00
  - First version.

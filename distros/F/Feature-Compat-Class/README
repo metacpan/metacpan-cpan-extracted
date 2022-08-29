@@ -1,0 +1,144 @@
+NAME
+
+    Feature::Compat::Class - make class syntax available
+
+SYNOPSIS
+
+       use Feature::Compat::Class;
+    
+       class Point {
+          field $x;
+          field $y;
+    
+          ADJUST {
+             $x = $y = 0;
+          }
+    
+          method move_to ($new_x, $new_y) {
+             $x = $new_x;
+             $y = $new_y;
+          }
+    
+          method describe {
+             say "A point at ($x, $y)";
+          }
+       }
+
+DESCRIPTION
+
+    This module provides the new class keyword and related others (method,
+    field and ADJUST) in a forward-compatible way.
+
+    There is a branch of Perl development source code which provides this
+    syntax, under the class named feature. If all goes well, this will
+    become available in a stable release in due course. On such perls that
+    contain the feature, this module simple enables it.
+
+    On older versions of perl before such syntax is availble in core, it is
+    currently provided instead using the Object::Pad module, imported with
+    a special set of options to configure it to only recognise the same
+    syntax as the core perl feature, thus ensuring any code using it will
+    still continue to function on that newer perl.
+
+ Perl Branch with feature 'class'
+
+    At time of writing, the use feature 'class' syntax is not part of
+    mainline perl source but is available in a branch. That branch
+    currently resides at
+    https://github.com/leonerd/perl5/tree/feature-class/. It is intended
+    this will be migrated to the main perl repository ahead of actually
+    being merged once development has progressed further.
+
+    This module is a work-in-progress, because the underlying feature-class
+    branch is too. Many of the limitations and inabilities listed below are
+    a result of the early-access nature of this branch, and are expected to
+    be lifted as work progresses towards a more featureful and complete
+    implementation.
+
+KEYWORDS
+
+    The keywords provided by this module offer a subset of the abilities of
+    those provided by Object::Pad, restricted to specifically only what is
+    commonly supported by the core syntax as well. In general, the reader
+    should first consult the documentation for the corresponding
+    Object::Pad keyword, but the following notes may be of interest:
+
+ class
+
+       class NAME { ... }
+       class NAME VERSION { ... }
+    
+       class NAME; ...
+       class NAME VERSION; ...
+
+    See also "class" in Object::Pad.
+
+    Attributes are not supported. In particular, there is no ability to
+    declare a superclass with :isa nor any roles with :does. The legacy
+    subkeywords for these are equally not supported.
+
+    The :repr attribute is also not supported; the default representation
+    type will always be selected.
+
+    The :strict(params) attribute is not available, but all constructed
+    classes will behave as if the attribute had been declared. Every
+    generated constructor will check its parameters for key names left
+    unhandled by ADJUST blocks, and throw an exception if any remain.
+
+ method
+
+       method NAME { ... }
+       method NAME;
+
+    See also "method" in Object::Pad.
+
+    Attributes are not supported, other than the usual ones provided by
+    perl itself. Of these, only :lvalue is particularly useful.
+
+    Lexical methods are not supported.
+
+ field
+
+       field $NAME;
+       field @NAME;
+       field %NAME;
+
+    See also "field" in Object::Pad.
+
+    Attributes are not supported. In particular, rather than using the
+    accessor-generator attributes you will have to create accessor methods
+    yourself; such as
+
+       field $var;
+       method var { return $var; }
+       method set_var ($new_var) { $var = $new_var; }
+
+    Field initialiser blocks are also not supported. Instead, you will have
+    to use an ADJUST block to initialise a field:
+
+       field $five;
+       ADJUST { $five = 5; }
+
+ ADJUST
+
+       ADJUST { ... }
+
+    See also "ADJUST" in Object::Pad.
+
+ Other Keywords
+
+    The following other keywords provided by Object::Pad are not supported
+    here at all:
+
+       role
+    
+       BUILD, ADJUSTPARAMS
+    
+       has
+    
+       requires
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

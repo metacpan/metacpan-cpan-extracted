@@ -52,9 +52,9 @@ Show result when succeeded.  Default true.
 
 Generate random index every time.
 
-=item B<--try>=#, B<-x>=#
+=item B<--trial>=#, B<-x>=#
 
-Set try count.  Default 6.
+Set trial count.  Default 6.
 
 =begin comment
 

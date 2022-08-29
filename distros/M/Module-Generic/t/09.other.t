@@ -5,11 +5,15 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
+    use vars qw( $DEBUG );
     use Module::Generic;
     use Module::Generic::Exception;
     use Module::Generic::File;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
+
+use strict;
+use warnings;
 
 my $o = Module::Generic->new( debug => $DEBUG );
 my $a = $o->_get_args_as_array;
@@ -204,13 +208,13 @@ my $ip4 = [qw(
     255.0.128.23
 )];
 
-my $ip4_fail = [qw(
-    256.0.128.23
-    255.0.1287.23
-    255.a.127.23
-    255 0 127 23
-    255,0,127,23
-    255012723
+my $ip4_fail = [(
+    '256.0.128.23',
+    '255.0.1287.23',
+    '255.a.127.23',
+    '255 0 127 23',
+    '255,0,127,23',
+    '255012723'
 )];
 
 my $ip6 = [qw(

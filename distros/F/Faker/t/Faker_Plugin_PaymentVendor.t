@@ -1,11 +1,15 @@
-use 5.014;
+package main;
+
+use 5.018;
 
 use strict;
 use warnings;
-use routines;
 
-use Test::Auto;
 use Test::More;
+use Venus::Test;
+
+my $test = test(__FILE__);
+my $seed = 42;
 
 =name
 
@@ -13,88 +17,162 @@ Faker::Plugin::PaymentVendor
 
 =cut
 
-=abstract
+$test->for('name');
 
-Payment Vendor Plugin for Faker
+=tagline
+
+Payment Vendor
 
 =cut
 
+$test->for('tagline');
+
+=abstract
+
+Payment Vendor for Faker
+
+=cut
+
+$test->for('abstract');
+
 =includes
 
+method: new
 method: execute
 
 =cut
 
-=libraries
-
-Types::Standard
-
-=cut
+$test->for('includes');
 
 =synopsis
 
   package main;
 
-  use Faker;
   use Faker::Plugin::PaymentVendor;
 
-  my $f = Faker->new;
-  my $p = Faker::Plugin::PaymentVendor->new(faker => $f);
+  my $plugin = Faker::Plugin::PaymentVendor->new;
 
-  my $plugin = $p;
-
-=cut
-
-=inherits
-
-Data::Object::Plugin
+  # bless(..., "Faker::Plugin::PaymentVendor")
 
 =cut
 
-=attributes
+$test->for('synopsis', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Faker::Plugin::PaymentVendor');
 
-faker: ro, req, ConsumerOf["Faker::Maker"]
-
-=cut
+  $result
+});
 
 =description
 
-This package provides methods for generating fake payment vendor data.
+This package provides methods for generating fake data for payment vendor.
+
++=encoding utf8
 
 =cut
+
+$test->for('description');
+
+=inherits
+
+Faker::Plugin
+
+=cut
+
+$test->for('inherits');
 
 =method execute
 
-The execute method returns a random fake payment vendor.
+The execute method returns a returns a random fake payment vendor.
 
 =signature execute
 
-execute() : Str
+  execute(HashRef $data) (Str)
+
+=metadata execute
+
+{
+  since => '1.10',
+}
 
 =example-1 execute
 
-  # given: synopsis
+  package main;
 
-  $p->execute;
+  use Faker::Plugin::PaymentVendor;
+
+  my $plugin = Faker::Plugin::PaymentVendor->new;
+
+  # bless(..., "Faker::Plugin::PaymentVendor")
+
+  # my $result = $plugin->execute;
+
+  # "Visa";
+
+  # my $result = $plugin->execute;
+
+  # "MasterCard";
+
+  # my $result = $plugin->execute;
+
+  # "American Express";
 
 =cut
 
-package main;
-
-my $test = testauto(__FILE__);
-
-my $subs = $test->standard;
-
-$subs->synopsis(fun($tryable) {
+$test->for('example', 1, 'execute', sub {
+  my ($tryable) = @_;
   ok my $result = $tryable->result;
+  ok $result->isa('Faker::Plugin::PaymentVendor');
+  ok $result->faker;
+  ok $result->faker->random->reseed($seed);
+  ok $result->faker->random->make; # reset randomizer
+  is $result->execute, "Visa";
+  ok $result->faker->random->make; # reset randomizer
+  is $result->execute, "MasterCard";
+  ok $result->faker->random->make; # reset randomizer
+  is $result->execute, "American Express";
 
   $result
 });
 
-$subs->example(-1, 'execute', 'method', fun($tryable) {
+=method new
+
+The new method returns a new instance of the class.
+
+=signature new
+
+  new(HashRef $data) (Plugin)
+
+=metadata new
+
+{
+  since => '1.10',
+}
+
+=example-1 new
+
+  package main;
+
+  use Faker::Plugin::PaymentVendor;
+
+  my $plugin = Faker::Plugin::PaymentVendor->new;
+
+  # bless(..., "Faker::Plugin::PaymentVendor")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
   ok my $result = $tryable->result;
+  ok $result->isa('Faker::Plugin::PaymentVendor');
+  ok $result->faker;
 
   $result
 });
+
+# END
+
+$test->render('lib/Faker/Plugin/PaymentVendor.pod') if $ENV{RENDER};
 
 ok 1 and done_testing;

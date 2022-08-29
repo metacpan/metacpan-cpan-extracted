@@ -13,6 +13,7 @@ print <<EOF;
 **
 ** Optional dependencies:
 ** apt-get install libwebp-dev
+** jpeg-xl reference implementation
 **
 
 EOF
@@ -30,6 +31,15 @@ if (!system "pkg-config --exists libwebp libwebpdemux") {
    $inc .= " " . qx<pkg-config --cflags libwebp libwebpdemux>;
    $lib .= " " . qx<pkg-config --libs   libwebp libwebpdemux>;
 }
+
+if (!system "pkg-config --exists libjxl libjxl_threads") {
+   $inc .= " -DJXL=1";
+   $inc .= " " . qx<pkg-config --cflags libjxl libjxl_threads>;
+   $lib .= " " . qx<pkg-config --libs   libjxl libjxl_threads>;
+}
+
+s/\n/ /g
+   for $inc, $lib;
 
 $pkg->add_deps ("Gtk2", "Glib");
 $pkg->set_libs ($lib);
@@ -81,6 +91,7 @@ WriteMakefile(
        'lib/Gtk2/CV/Plugin/NameCluster.pm'	=> '$(INST_LIB)/Gtk2/CV/Plugin/NameCluster.pm',
        'lib/Gtk2/CV/Plugin/PatRenamer.pm'	=> '$(INST_LIB)/Gtk2/CV/Plugin/PatRenamer.pm',
        'lib/Gtk2/CV/Plugin/RCluster.pm'		=> '$(INST_LIB)/Gtk2/CV/Plugin/RCluster.pm',
+       'lib/Gtk2/CV/Plugin/MetaCluster.pm'	=> '$(INST_LIB)/Gtk2/CV/Plugin/MetaCluster.pm',
        'lib/Gtk2/CV/Progress.pm'		=> '$(INST_LIB)/Gtk2/CV/Progress.pm',
        'lib/Gtk2/CV.pm'				=> '$(INST_LIB)/Gtk2/CV.pm',
 

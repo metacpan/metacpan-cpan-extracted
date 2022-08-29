@@ -4,7 +4,17 @@
 All modifications are made by Mark Overmeer, unless explicitly stated
 differently.
 
-version 1.06:
+version 1.07: Fri 26 Aug 09:41:03 CEST 2022
+
+	Fixes:
+	- progress 'sequential' over pages.
+	- reuse result page size over pages
+
+	Improvements:
+	- added some new booleans up to Solr 9, probably incomplete.
+	- parse requests with option "huge" [Andy Beverley]
+
+version 1.06: Fri  8 Jul 10:59:27 CEST 2022
 
 	Fixes:
 	- do no warn for long lists of pages, deep recursion.

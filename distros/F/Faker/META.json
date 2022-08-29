@@ -1,12 +1,12 @@
 {
    "abstract" : "Extensible Fake Data Generator",
    "author" : [
-      "Al Newkirk <awncorp@cpan.org>"
+      "AWNCORP <awncorp@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "apache_2_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -21,57 +21,36 @@
       },
       "runtime" : {
          "requires" : {
-            "Data::Object::Class" : "2.02",
-            "Data::Object::ClassHas" : "2.01",
-            "Data::Object::Plugin" : "0.01",
-            "Data::Object::Role" : "2.01",
-            "Data::Object::Role::Pluggable" : "0.01",
-            "Data::Object::Role::Proxyable" : "2.03",
-            "Data::Object::Role::Throwable" : "2.00",
-            "Data::Object::RoleHas" : "2.01",
-            "perl" : "5.014",
-            "routines" : "0",
-            "strict" : "0",
-            "warnings" : "0"
+            "Venus" : "1.23",
+            "perl" : "5.018"
          }
       },
       "test" : {
          "requires" : {
-            "Data::Object::Class" : "2.02",
-            "Data::Object::ClassHas" : "2.01",
-            "Data::Object::Plugin" : "0.01",
-            "Data::Object::Role" : "2.01",
-            "Data::Object::Role::Pluggable" : "0.01",
-            "Data::Object::Role::Proxyable" : "2.03",
-            "Data::Object::Role::Throwable" : "2.00",
-            "Data::Object::RoleHas" : "2.01",
-            "Test::Auto" : "0.07",
-            "perl" : "5.014",
-            "routines" : "0",
-            "strict" : "0",
-            "warnings" : "0"
+            "Venus" : "1.23",
+            "perl" : "5.018"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/cpanery/faker/issues"
+         "web" : "http://github.com/awncorp/faker/issues"
       },
-      "homepage" : "http://metacpan.org/release/Faker/",
+      "homepage" : "https://metacpan.org/dist/Faker",
+      "license" : [
+         "https://opensource.org/licenses/apache-2.0"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/cpanery/faker.git",
-         "web" : "https://github.com/cpanery/faker"
+         "url" : "git://github.com/awncorp/faker.git",
+         "web" : "http://github.com/awncorp/faker"
       }
    },
-   "version" : "1.04",
+   "version" : "1.10",
    "x_authority" : "cpan:AWNCORP",
-   "x_contributors" : [
-      "Al Newkirk <anewkirk@ana.io>"
-   ],
-   "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
-   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_spdx_expression" : "Apache-2.0"
 }
 

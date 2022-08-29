@@ -4,6 +4,7 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
+    use vars qw( $DEBUG );
     use Test::More;
     # 2021-11-01T08:12:10
     use Test::Time time => 1635754330;
@@ -16,6 +17,9 @@ BEGIN
 {
     use_ok( 'Module::Generic' );
 };
+
+use strict;
+use warnings;
 
 my $o = MyObject->new( name => 'id', value => 'hello', type => 'attribute' );
 isa_ok( $o, 'MyObject', 'new' );
@@ -157,7 +161,7 @@ my $f3 = $o->file;
 isa_ok( $f3, 'Module::Generic::File', '_set_get_file' );
 
 $o->hash = { name => 'John', type => 'human' };
-my $hash = $o->hash;
+$hash = $o->hash;
 is( ref( $hash ), 'HASH', '_set_get_hash as lvalue' );
 is_deeply( $hash, { name => 'John', type => 'human' }, '_set_get_hash value' );
 $o->hash( age => 20, location => 'Tokyo' );
@@ -225,7 +229,7 @@ isa_ok( $u, 'URI', '_set_get_uri' );
 is( $u, 'https://www.example.org', '_set_get_uri value' );
 
 $o->type( 'transaction' );
-$t = $o->type;
+my $t = $o->type;
 isa_ok( $t, 'Module::Generic::Scalar', '_set_get_scalar_as_object' );
 is( $t, 'transaction', '_set_get_scalar_as_object value' );
 
@@ -239,7 +243,7 @@ $v = $o->value;
 isa_ok( $v, 'Module::Generic::Scalar', '_set_get_scalar_as_object' );
 is( $v, 'pending', '_set_get_scalar_as_object value' );
 
-my $dt = $o->datetime;
+$dt = $o->datetime;
 is( $dt, undef, 'lvalue->get -> undef' );
 # $o->debug(4);
 $o->datetime = { dt => 'nope' };
@@ -255,7 +259,7 @@ catch( $e )
     is( $e->message, 'Value provided is not a datetime.', 'lvalue -> fatal error' );
 }
 
-my $now = DateTime->now;
+$now = DateTime->now;
 try
 {
     $o->datetime = $now;
@@ -284,10 +288,50 @@ subtest "serialisation" => sub
     my $has_base64 = $o->_has_base64(1);
     SKIP:
     {
+        my $serialiser = 'CBOR::Free';
+        if( !$o->_load_class( $serialiser ) )
+        {
+            skip( "$serialiser serialiser is not installed", ( $has_base64 ? 9 : 6 ) );
+        }
+        my $bin = $o->serialise( $test, serialiser => $serialiser, preserve_references => 1, scalar_references => 1 );
+        diag( "Error serialising data with $serialiser: ", $o->error ) if( !defined( $bin ) );
+        # diag( "Serialised data is '$bin'" ) if( $DEBUG );
+        ok( defined( $bin ) && length( $bin ), "hash is serialised with $serialiser" );
+        my $orig = $o->deserialise( data => $bin, serialiser => $serialiser );
+        diag( "Error deserialising data with $serialiser: ", $o->error ) if( !defined( $orig ) );
+        # diag( "Deserialised data is '$orig'" ) if( $DEBUG );
+        ok( defined( $orig ) && ref( $orig ) eq 'HASH', "data is deserialised with $serialiser" );
+        is_deeply( $orig => $test, 'deserialised data is identical' );
+        my $tmp_file = $o->new_tempfile;
+        my $rv = $o->serialise( $test, file => $tmp_file, serialiser => $serialiser );
+        diag( "Error serialising data to file with $serialiser: ", $o->error ) if( !defined( $rv ) );
+        ok( $rv, "Hash is serialised to $tmp_file" );
+        undef( $orig );
+        $orig = $o->deserialise( file => $tmp_file, serialiser => $serialiser );
+        diag( "Error deserialising data from file with $serialiser: ", $o->error ) if( !defined( $orig ) );
+        ok( defined( $orig ) && ref( $orig ) eq 'HASH', 'data is deserialised from file' );
+        is_deeply( $orig => $test, 'deserialised data from file is identical' );
+        $tmp_file->remove;
+        # with base64 encoding
+        if( $has_base64 )
+        {
+            $bin = $o->serialise( $test, serialiser => $serialiser, base64 => 1 );
+            diag( "Error serialising data with $serialiser and base64: ", $o->error ) if( !defined( $bin ) );
+            ok( defined( $bin ) && length( $bin ), "hash is serialised with $serialiser and base64" );
+            my $orig = $o->deserialise( data => $bin, serialiser => $serialiser, base64 => 1 );
+            diag( "Error deserialising data with $serialiser and base64: ", $o->error ) if( !defined( $orig ) );
+            # diag( "Deserialised data is '$orig'" ) if( $DEBUG );
+            ok( defined( $orig ) && ref( $orig ) eq 'HASH', "data is deserialised with $serialiser and base64" );
+            is_deeply( $orig => $test, 'deserialised data is identical' );
+        }
+    };
+
+    SKIP:
+    {
         my $serialiser = 'CBOR::XS';
         if( !$o->_load_class( $serialiser ) )
         {
-            skip( "$serialiser serialiser is not installed", 6 );
+            skip( "$serialiser serialiser is not installed", ( $has_base64 ? 9 : 6 ) );
         }
         my $bin = $o->serialise( $test, serialiser => $serialiser );
         diag( "Error serialising data with $serialiser: ", $o->error ) if( !defined( $bin ) );
@@ -327,7 +371,7 @@ subtest "serialisation" => sub
         my $serialiser = 'Sereal';
         if( !$o->_load_class( $serialiser ) )
         {
-            skip( "$serialiser serialiser is not installed", 6 );
+            skip( "$serialiser serialiser is not installed", ( $has_base64 ? 9 : 6 ) );
         }
         my $bin = $o->serialise( $test, serialiser => $serialiser );
         diag( "Error serialising data with $serialiser: ", $o->error ) if( !defined( $bin ) );
@@ -367,7 +411,7 @@ subtest "serialisation" => sub
         my $serialiser = 'Storable';
         if( !$o->_load_class( $serialiser ) )
         {
-            skip( "$serialiser serialiser is not installed", 9 );
+            skip( "$serialiser serialiser is not installed", ( $has_base64 ? 14 : 11 ) );
         }
         my $bin = $o->serialise( $test, serialiser => $serialiser );
         if( !defined( $bin ) )

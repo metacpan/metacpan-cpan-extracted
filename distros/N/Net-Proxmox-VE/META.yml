@@ -1,7 +1,7 @@
 ---
 abstract: 'Pure perl API for Proxmox virtualisation'
 author:
-  - 'Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@bytefoundry.com.au>'
+  - 'Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@fragfest.com.au>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
@@ -16,12 +16,31 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
-license: perl
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Net-Proxmox-VE
+provides:
+  Net::Proxmox::VE:
+    file: lib/Net/Proxmox/VE.pm
+    version: '0.36'
+  Net::Proxmox::VE::Access:
+    file: lib/Net/Proxmox/VE/Access.pm
+    version: '0.36'
+  Net::Proxmox::VE::Cluster:
+    file: lib/Net/Proxmox/VE/Cluster.pm
+    version: '0.36'
+  Net::Proxmox::VE::Nodes:
+    file: lib/Net/Proxmox/VE/Nodes.pm
+    version: '0.36'
+  Net::Proxmox::VE::Pools:
+    file: lib/Net/Proxmox/VE/Pools.pm
+    version: '0.36'
+  Net::Proxmox::VE::Storage:
+    file: lib/Net/Proxmox/VE/Storage.pm
+    version: '0.36'
 requires:
   Carp: '0'
   HTTP::Headers: '0'
@@ -36,13 +55,13 @@ requires:
 resources:
   homepage: https://github.com/mrproper/proxmox-ve-api-perl
   repository: https://github.com/mrproper/proxmox-ve-api-perl.git
-version: '0.35'
+version: '0.36'
 x_author_pledge:
   version: 1
 x_contributors:
   - 'damien <damien@FREEHILDEGARDEV.(none)>'
-  - 'Dean Hamstead <dean@fragfest.com.au>'
   - 'Dean Hamstead <dean.hamstead@staples.com.au>'
+  - 'Dean Hamstead <dean.hamstead@winc.com.au>'
   - 'Eric Bollengier <ebollengier@gmail.com>'
   - 'Jack Sauriol <sauriol@csh.rit.edu>'
   - 'japp-0xlabs <japp@0xlabs.com>'
@@ -51,5 +70,6 @@ x_contributors:
   - 'p5i <petr.v.ilin@gmail.com>'
   - 'Peter Valdemar Mørch <peter@morch.com>'
   - 'PIQUET Damien <piqudam@gmail.com>'
-x_generated_by_perl: v5.26.3
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: MIT

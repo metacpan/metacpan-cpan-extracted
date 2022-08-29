@@ -40,7 +40,8 @@
             "Pod::Weaver::Role::Section" : "0",
             "Require::Hook::Source::DzilBuild" : "0",
             "perl" : "5.010001",
-            "strict" : "0"
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -55,7 +56,7 @@
    "provides" : {
       "Pod::Weaver::Plugin::Data::Sah::Filter" : {
          "file" : "lib/Pod/Weaver/Plugin/Data/Sah/Filter.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -70,7 +71,7 @@
          "web" : "https://github.com/perlancar/perl-Pod-Weaver-Plugin-Data-Sah-Filter"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

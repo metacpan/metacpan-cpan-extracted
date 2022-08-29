@@ -1,16 +1,16 @@
 {
    "abstract" : "Fast, safe DBI connection and transaction management",
    "author" : [
-      "unknown"
+      "David E. Wheeler"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "DBIx-Connector",
    "no_index" : {
@@ -47,10 +47,14 @@
       ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ap/DBIx-Connector.git",
+         "url" : "https://github.com/ap/DBIx-Connector.git",
          "web" : "https://github.com/ap/DBIx-Connector"
       }
    },
-   "version" : "0.57",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "0.58",
+   "x_copyright" : {
+      "holder" : "David E. Wheeler",
+      "year" : 2016
+   },
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

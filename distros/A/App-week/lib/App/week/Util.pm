@@ -90,7 +90,7 @@ sub guess_date {
 }
 
 sub split_week {
-    state $fold = new Text::ANSI::Fold width => [ (1, 2) x 7, 1 ];
+    state $fold = new Text::ANSI::Fold width => [ (1, 2) x 8, 1 ];
     $fold->text(+shift)->chops;
 }
 

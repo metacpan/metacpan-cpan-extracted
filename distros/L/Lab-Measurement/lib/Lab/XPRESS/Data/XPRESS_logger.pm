@@ -1,6 +1,6 @@
 package Lab::XPRESS::Data::XPRESS_logger;
 #ABSTRACT: XPRESS logging module
-$Lab::XPRESS::Data::XPRESS_logger::VERSION = '3.821';
+$Lab::XPRESS::Data::XPRESS_logger::VERSION = '3.822';
 use v5.20;
 
 
@@ -600,7 +600,7 @@ Lab::XPRESS::Data::XPRESS_logger - XPRESS logging module
 
 =head1 VERSION
 
-version 3.821
+version 3.822
 
 =head1 COPYRIGHT AND LICENSE
 

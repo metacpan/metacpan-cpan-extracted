@@ -1,5 +1,11 @@
 Revision history for Perl extension JavaScript::QuickJS:
 
+0.13 Thu 25 Aug 2022
+- Detect missing gmake up-front at build time.
+- Detect at build time when linking to libatomic is necessary, and only
+  link in that case.
+- Allow direct enable/disable of linking to libatomic.
+
 0.12 Mon 6 Jan 2022
 - Add await() so Perl can wait until JS’s pending jobs finish.
 - Make eval_module() return the JS object so chaining is easier.

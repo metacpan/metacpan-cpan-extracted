@@ -1,6 +1,6 @@
 package App::ansiecho;
 
-our $VERSION = "1.01";
+our $VERSION = "1.02";
 
 use v5.14;
 use warnings;
@@ -20,30 +20,30 @@ use Pod::Usage;
 use Getopt::EX::Hashed; {
     Getopt::EX::Hashed->configure(DEFAULT => [ is => 'rw' ]);
     has debug      => "      " ;
-    has n          => "      " , action => sub { $_->{terminate} = '' };
-    has join       => " j    " , action => sub { $_->{separate} = '' };
+    has n          => "      " , action => sub { $_->terminate = '' };
+    has join       => " j    " , action => sub { $_->separate = '' };
     has escape     => " e !  " , default => 1;
     has rgb24      => "   !  " ;
     has separate   => "   =s " , default => " ";
     has help       => " h    " ;
     has version    => " v    " ;
 
-    has '+separate' => action => sub {
+    has '+separate' => sub {
 	my($name, $arg) = map "$_", @_;
-	$_->{$name} = safe_backslash($arg);
+	$_->$name = safe_backslash($arg);
     };
 
-    has '+rgb24' => action => sub {
-	$Getopt::EX::Colormap::RGB24 = !!$_[1];
+    has '+rgb24' => sub {
+	$Term::ANSIColor::Concise::RGB24 = !!$_[1];
     };
 
-    has '+help' => action => sub {
+    has '+help' => sub {
 	pod2usage
 	    -verbose  => 99,
 	    -sections => [ qw(SYNOPSIS VERSION) ];
     };
 
-    has '+version' => action => sub {
+    has '+version' => sub {
 	say "Version: $VERSION";
 	exit;
     };
@@ -76,7 +76,7 @@ sub options {
     $app;
 }
 
-use Getopt::EX::Colormap qw(colorize ansi_code);
+use Term::ANSIColor::Concise qw(ansi_color ansi_code);
 
 sub retrieve {
     my $app = shift;
@@ -102,7 +102,7 @@ sub retrieve {
 	if ($arg =~ /^-([cC])(.+)?$/) {
 	    my $target = $1 eq 'c' ? \@effect : \@style;
 	    my($color) = defined $2 ? safe_backslash($2) : $app->retrieve(1);
-	    unshift @$target, [ \&colorize, $color ];
+	    unshift @$target, [ \&ansi_color, $color ];
 	    next;
 	}
 	# -F

@@ -35,9 +35,13 @@ Example:
 
     read -a color < <( ansiecho -S ZE K/544 K/454 K/445 )
 
+<div>
+    <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-ansiecho/main/images/synopsis.png">
+</div>
+
 # VERSION
 
-Version 1.01
+Version 1.02
 
 # DESCRIPTION
 
@@ -302,10 +306,10 @@ always correspond to the character itself.
 
 # COLOR SPEC
 
-This is a brief summary.  Read ["COLOR SPEC" in Getopt::EX::Colormap](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AColormap#COLOR-SPEC) for
+This is a brief summary.  Read ["COLOR SPEC" in Term::ANSIColor::Concise](https://metacpan.org/pod/Term%3A%3AANSIColor%3A%3AConcise#COLOR-SPEC) for
 complete description.  Try next command to see 256 color table.
 
-    perl -MGetopt::EX::Colormap=:all -E colortable
+    perl -MTerm::ANSIColor::Concise::Table=:all -E colortable
 
 Color specification is a combination of single uppercase character
 representing 8 colors, and alternative (usually brighter) colors in
@@ -332,7 +336,7 @@ terminal :
 or color names enclosed by angle bracket :
 
     <red> <blue> <green> <cyan> <magenta> <yellow>
-    <aliceblue> <honeydue> <hotpink> <mooccasin>
+    <aliceblue> <honeydew> <hotpink> <moccasin>
     <medium_aqua_marine>
 
 with other special effects :
@@ -380,9 +384,7 @@ is automatically enabled.  Otherwise, use **--rgb24** option or set
 
 From CPAN archive:
 
-    $ cpanm App::ansiecho
-    or
-    $ curl -sL http://cpanmin.us | perl - App::ansiecho
+    cpanm App::ansiecho
 
 From GIT repository:
 
@@ -392,7 +394,7 @@ From GIT repository:
 
 ["Quote and Quote-like Operators" in perlop](https://metacpan.org/pod/perlop#Quote-and-Quote-like-Operators)
 
-[Getopt::EX::Colormap](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AColormap)
+[Term::ANSIColor::Concise](https://metacpan.org/pod/Term%3A%3AANSIColor%3A%3AConcise)
 
 [https://en.wikipedia.org/wiki/ANSI\_escape\_code](https://en.wikipedia.org/wiki/ANSI_escape_code)
 

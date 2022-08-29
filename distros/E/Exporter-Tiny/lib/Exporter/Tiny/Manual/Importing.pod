@@ -136,10 +136,26 @@ However, L<Import::Into> will probably provide you with a better
 approach which doesn't just work with Exporter::Tiny, but B<all>
 exporters.
 
-=head2 Lexical subs
+=head2 Lexical subs on Perl 5.37.2 and above
 
 Often you want to make use of an exported function, but don't want
 it to "pollute" your namespace.
+
+On newer versions of Perl, Exporter::Tiny can use C<export_lexically>
+from L<builtin> to give you lexical versions of exports.
+
+   {
+      use MyUtils -lexical, "frobnicate";
+      
+      frobnicate(...);  # ok
+   }
+   
+   frobnicate(...);  # not ok
+
+This functionality should be considered B<EXPERIMENTAL> until
+C<export_lexically> is included in a stable release of Perl.
+
+=head2 Lexical subs on Perl older than 5.37.2
 
 There is this L<Sub::Exporter::Lexical> thing that was designed as a
 plugin for L<Sub::Exporter>, but Exporter::Tiny's API is close enough

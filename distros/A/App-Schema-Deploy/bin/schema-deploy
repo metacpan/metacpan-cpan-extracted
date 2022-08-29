@@ -1,0 +1,103 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::Schema::Deploy;
+
+our $VERSION = 0.02;
+
+# Run.
+exit App::Schema::Deploy->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+schema-deploy - Script to deploy Schema.
+
+=head1 SYNOPSIS
+
+ schema-deploy [-h] [-p password] [-u user] [-v schema_version] [--version] dsn schema_module
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-h>
+
+Print help.
+
+=item * C<-p password>
+
+Database password.
+
+=item * C<-u user>
+
+Database user.
+
+=item * C<-v schema_version>
+
+Schema version. Only if Schema object is versioned by L<Schema::Abstract>.
+Default value is latest schema version.
+
+=item * C<--version>
+
+Print version of script.
+
+=item * C<dsn>
+
+Database DSN.
+e.g. dbi:SQLite:dbname=ex1.db
+
+=item * C<schema_module>
+
+Name of Schema module. Must be a 'DBIx::Class::Schema' instance.
+
+=back
+
+=head1 EXAMPLE
+
+ schema-deploy dbi:SQLite:dbname=commons.vote.db Schema::Commons::Vote
+
+=head1 SEE ALSO
+
+=over
+
+=item L<schema-data>
+
+Script to manipulation with data for Schema.
+
+=back
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/App-Schema-Deploy>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2022 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.02
+
+=cut

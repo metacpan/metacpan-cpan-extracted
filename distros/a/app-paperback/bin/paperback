@@ -32,7 +32,7 @@ Options:
 
 =head1 VERSION
 
-Version 0.42
+Version 1.09
 
 =head1 DESCRIPTION
 
@@ -75,6 +75,221 @@ produce a final PDF fit for duplex 'long-edge-flip' printing.
 
 =back
 
+=head1 SCHEMA EXPLANATION
+
+1. Which schema series (4up or 2up) is used depends on input PDF page
+size. For page sizes A6 (105 x 148 mm), Quarter Letter (4.25 x 5.5 in)
+and Quarter Legal (4.25 x 7 in), a 4up schema is used. For page sizes A5
+(148 x 210 mm), Half Letter (5.5 x 8.5 in) and Half Legal (7 x 8.5 in in),
+a 2up schema is used.
+
+2. What page size is used for the output PDF depends on input size page.
+For input size pages A6 or A5, the output PDF pages are A4 (210 x 297 mm);
+for input size pages Quarter Letter or Half Letter, the output PDF pages
+are Letter (8.5 x 11 in); for input size pages Quarter Legal or Half Legal,
+the output PDF pages are Legal (8.5 x 14 in).
+
+3. How many signatures are produced depends on the amount of input pages
+to be processed. Recto-verso (or duplex) printing is always assumed. Maximum
+number of pages in a signature is 16 for all schemas, but a signature is
+composed of fewer pages when the input PDF is below 16 pages.
+
+Rearranging of pages is made according the following rules.
+
+=head2 4UP SCHEMA FOR 13 INPUT PAGES OR MORE
+
+       RECTO              VERSO
+  +------+------+    +------+------+
+  |      |      |    |      |      |
+  |  16  |   1  |    |   2  |  15  |
+  |      |      |    |      |      |
+  +------+------+    +------+------+ <- cut here
+  |      |      |    |      |      |
+  |  13  |   4  |    |   3  |  14  | <- row upside down
+  |      |      |    |      |      |
+  +------+------+    +------+------+
+
+  +------+------+    +------+------+
+  |      |      |    |      |      |
+  |  12  |   5  |    |   6  |  11  |
+  |      |      |    |      |      |
+  +------+------+    +------+------+ <- cut here
+  |      |      |    |      |      |
+  |   9  |   8  |    |   7  |  10  | <- row upside down
+  |      |      |    |      |      |
+  +------+------+    +------+------+
+
+To complete the block of 16 logical pages, blank pages are inserted if
+needed. Beyond page 16, a new signature is started, with pages imposed
+this same way (these page numbers + 16, these page numbers + 32, etc).
+
+=head2 4UP SCHEMA FOR 9 TO 12 INPUT PAGES
+
+       RECTO              VERSO
+  +------+------+    +------+------+
+  |      |      |    |      |      |
+  |  12  |   1  |    |   2  |  11  |
+  |      |      |    |      |      |
+  +------+------+    +------+------+ <- cut here
+  |      |      |    |      |      |
+  |   9  |   4  |    |   3  |  10  | <- row upside down
+  |      |      |    |      |      |
+  +------+------+    +------+------+
+
+  +------+------+    +------+------+
+  |      |      |    |      |      |
+  |   6  |   7  |    |   8  |   5  |
+  |      |      |    |      |      |
+  +------+------+    +------+------+ <- cut here
+  |      |      |    |      |      |
+  |  --  |  --  |    |  --  |  --  | <- row entirely blank
+  |      |      |    |      |      |
+  +------+------+    +------+------+
+
+=head2 4UP SCHEMA FOR 5 TO 8 INPUT PAGES
+
+       RECTO              VERSO
+  +------+------+    +------+------+
+  |      |      |    |      |      |
+  |   8  |   1  |    |   2  |   7  |
+  |      |      |    |      |      |
+  +------+------+    +------+------+ <- cut here
+  |      |      |    |      |      |
+  |   5  |   4  |    |   3  |   6  | <- row upside down
+  |      |      |    |      |      |
+  +------+------+    +------+------+
+
+=head2 4UP SCHEMA FOR 1 TO 4 INPUT PAGES
+
+       RECTO              VERSO
+  +------+------+    +------+------+
+  |      |      |    |      |      |
+  |   4  |   1  |    |   2  |   3  |
+  |      |      |    |      |      |
+  +------+------+    +------+------+ <- cut here
+  |      |      |    |      |      |
+  |  --  |  --  |    |  --  |  --  | <- row entirely blank
+  |      |      |    |      |      |
+  +------+------+    +------+------+
+
+=head2 2UP SCHEMA FOR 13 INPUT PAGES OR MORE
+
+       RECTO              VERSO
+  +-------------+    +-------------+
+  |             |    |             |
+  |      1      |    |      2      |
+  |             |    |             |
+  +-------------+    +-------------+ <- fold here
+  |             |    |             |
+  |     16      |    |     15      |
+  |             |    |             |
+  +-------------+    +-------------+
+
+  +-------------+    +-------------+
+  |             |    |             |
+  |      3      |    |      4      |
+  |             |    |             |
+  +-------------+    +-------------+ <- fold here
+  |             |    |             |
+  |     14      |    |     13      |
+  |             |    |             |
+  +-------------+    +-------------+
+
+  +-------------+    +-------------+
+  |             |    |             |
+  |      5      |    |      6      |
+  |             |    |             |
+  +-------------+    +-------------+ <- fold here
+  |             |    |             |
+  |     12      |    |     11      |
+  |             |    |             |
+  +-------------+    +-------------+
+
+  +-------------+    +-------------+
+  |             |    |             |
+  |      7      |    |      8      |
+  |             |    |             |
+  +-------------+    +-------------+ <- fold here
+  |             |    |             |
+  |     10      |    |      9      |
+  |             |    |             |
+  +-------------+    +-------------+
+
+To complete the block of 16 logical pages, blank pages are inserted if
+needed. Beyond page 16, a new signature is started, with pages imposed
+this same way (these page numbers + 16, these page numbers + 32, etc).
+
+=head2 2UP SCHEMA FOR 9 TO 12 INPUT PAGES
+
+       RECTO              VERSO
+  +-------------+    +-------------+
+  |             |    |             |
+  |      1      |    |      2      |
+  |             |    |             |
+  +-------------+    +-------------+ <- fold here
+  |             |    |             |
+  |     12      |    |     11      |
+  |             |    |             |
+  +-------------+    +-------------+
+
+  +-------------+    +-------------+
+  |             |    |             |
+  |      3      |    |      4      |
+  |             |    |             |
+  +-------------+    +-------------+ <- fold here
+  |             |    |             |
+  |     10      |    |      9      |
+  |             |    |             |
+  +-------------+    +-------------+
+
+  +-------------+    +-------------+
+  |             |    |             |
+  |      5      |    |      6      |
+  |             |    |             |
+  +-------------+    +-------------+ <- fold here
+  |             |    |             |
+  |      8      |    |      7      |
+  |             |    |             |
+  +-------------+    +-------------+
+
+
+=head2 2UP SCHEMA FOR 5 TO 8 INPUT PAGES
+
+       RECTO              VERSO
+  +-------------+    +-------------+
+  |             |    |             |
+  |      1      |    |      2      |
+  |             |    |             |
+  +-------------+    +-------------+ <- fold here
+  |             |    |             |
+  |      8      |    |      7      |
+  |             |    |             |
+  +-------------+    +-------------+
+
+  +-------------+    +-------------+
+  |             |    |             |
+  |      3      |    |      4      |
+  |             |    |             |
+  +-------------+    +-------------+ <- fold here
+  |             |    |             |
+  |      6      |    |      5      |
+  |             |    |             |
+  +-------------+    +-------------+
+
+
+=head2 2UP SCHEMA FOR 1 TO 4 INPUT PAGES
+
+       RECTO              VERSO
+  +-------------+    +-------------+
+  |             |    |             |
+  |      1      |    |      2      |
+  |             |    |             |
+  +-------------+    +-------------+ <- fold here
+  |             |    |             |
+  |      4      |    |      3      |
+  |             |    |             |
+  +-------------+    +-------------+
+
 =head1 LIMITATIONS
 
 Input page sizes allowed are A5, A6, Half Letter, Quarter Letter,
@@ -86,7 +301,11 @@ files stamped as something more modern.
 
 =head1 INSTALL
 
-$ B<cpan App::paperback> (or B<sudo cpan App::paperback>)
+$ B<cpanm App::paperback> (or B<sudo cpanm App::paperback>)
+
+=head1 UNINSTALL
+
+$ B<cpanm --uninstall App::paperback> (or B<sudo cpanm --uninstall App::paperback>)
 
 =head1 AUTHOR
 

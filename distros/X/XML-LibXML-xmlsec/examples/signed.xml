@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Envelope xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+  <Data id="hello">
+     <content>Hello world</content>
+  </Data>
+  <ds:Signature>
+    <ds:SignedInfo>
+      <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+      <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+      <ds:Reference URI="#hello">
+        <ds:Transforms>
+          <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+        </ds:Transforms>
+        <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+        <ds:DigestValue>H8+/9SNyFIQUr3D4ivpWwCjRwAU=</ds:DigestValue>
+      </ds:Reference>
+    </ds:SignedInfo>
+    <ds:SignatureValue>gROBCm94jxE8tmSWiVD5Mg7V4PAg2z9720OkifhdZQ6o8BLhfO0T9tr7H/Buscdg
+HIQUY4waNbQu3r3076WasOH8iMwXb7ffzbshhBWU73juGnXZBoLZ8chWR9To6C3w
+BGwx18j9s4azI0ldh8P0atFda1SqCLHxLCjtZO/bn4A=</ds:SignatureValue>
+    <ds:KeyInfo>
+      <ds:KeyName>key.pem</ds:KeyName>
+      <ds:KeyValue>
+<ds:RSAKeyValue>
+<ds:Modulus>
+shsF7sQ/geqW9cv/8ArtK9umdP7oV5B3i2lRxGPTgFExb7auTyhwKQv71ZVZ4pXa
+UOTFtqPubfPvipP++WhMMi9PmaIO8bUmU4YYpZLrLGFbFBwJeJd4f3KISJpz4xz0
+/wGQPtvUiEjQZfNAX41rAhy7EYeflkMlKlA4M3WDc3U=
+</ds:Modulus>
+<ds:Exponent>
+AQAB
+</ds:Exponent>
+</ds:RSAKeyValue>
+</ds:KeyValue>
+      <ds:X509Data>
+         
+      </ds:X509Data>
+    </ds:KeyInfo>
+  </ds:Signature>
+</Envelope>

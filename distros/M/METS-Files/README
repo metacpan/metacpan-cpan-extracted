@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use METS::Files;
+
      my $obj = METS::Files->new(
              'mets_data' => $mets_data,
      );
@@ -138,9 +139,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © Michal Josef Špaček 2015-2020
-     BSD 2-Clause License
+    © 2015-2022 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

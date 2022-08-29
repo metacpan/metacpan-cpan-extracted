@@ -8,7 +8,7 @@
 
 package Apache::Solr::JSON;
 use vars '$VERSION';
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 use base 'Apache::Solr';
 
@@ -173,15 +173,20 @@ sub request($$;$$)
         $body      = \$self->json->encode($body);
     }
 
+    # Solr server 3.6.2 seems not to detect the JSON input from the
+    # body content, so requires this work-around
+    # https://solr.apache.org/guide/6_6/uploading-data-with-index-handlers.html#UploadingDatawithIndexHandlers-JSONUpdateConveniencePaths
+    $url =~ s!/update\?!/update/json?!;
+
     my $resp = $self->SUPER::request($url, $result, $body, $body_ct);
     my $ct   = $resp->content_type;
 
-    # At least Solr 4.0 response ct=text/plain while producing JSON
-    # my $ct = $resp->content_type;
+    # At least until Solr 4.0 response ct=text/plain while producing JSON
     # $ct =~ m/json/i
     #     or error __x"answer from solr server is not json but {type}"
     #          , type => $ct;
 
+#warn $resp->decoded_content;
     my $dec = $self->json->decode($resp->decoded_content || $resp->content);
 
 #use Data::Dumper;

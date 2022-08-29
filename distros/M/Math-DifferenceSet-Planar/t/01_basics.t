@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use File::Spec;
 
-use Test::More tests => 196;
+use Test::More tests => 198;
 BEGIN { use_ok('Math::DifferenceSet::Planar') };
 
 #########################
@@ -144,6 +144,8 @@ pds_ok($ds1, "@el1");
 my $ds1a = $ds->translate(-1);
 my @el1a = map { ($_ - 1) % 91 } @el;
 pds_ok($ds1a, "@el1a");
+is($ds1a->min_element, 0);
+is($ds1a->max_element, 90);
 
 my @se = $ds->elements_sorted;
 is("@se", "@el");

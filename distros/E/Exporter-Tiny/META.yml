@@ -25,18 +25,18 @@ optional_features: {}
 provides:
   Exporter::Shiny:
     file: lib/Exporter/Shiny.pm
-    version: '1.002002'
+    version: '1.004000'
   Exporter::Tiny:
     file: lib/Exporter/Tiny.pm
-    version: '1.002002'
+    version: '1.004000'
 requires:
   perl: '5.006001'
 resources:
   IRC: irc://irc.perl.org/#moops
   Identifier: http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/project
-  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Exporter-Tiny
+  bugtracker: https://github.com/tobyink/p5-exporter-tiny/issues
   homepage: https://metacpan.org/release/Exporter-Tiny
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-exporter-tiny.git
-version: '1.002002'
+version: '1.004000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -10,7 +10,7 @@ my %modules;
 my $post_diag;
 
 $modules{$_} = $_ for qw(
-  Archive::Extract
+  Archive::Libarchive::Extract
   CPAN::ReleaseHistory
   Capture::Tiny
   ExtUtils::MakeMaker
@@ -30,6 +30,7 @@ $modules{$_} = $_ for qw(
   Test2::V0
   URI
   URI::file
+  experimental
 );
 
 $post_diag = sub {

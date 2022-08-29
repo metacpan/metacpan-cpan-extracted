@@ -167,3 +167,7 @@ Revision history for Control-CLI
 	  some Linux distributions where the prompt is coloured using ANSI escape sequences
 	* Changed the default password prompt from '(?i)password[: ]+$' to '(?i)(?<!new )password[: ]+$' so that it
 	  does not match on prompts asking user to enter a NEW password
+
+2.11	2022-08-28
+	* Added an internal WRITEFLAG object key to keep track of direct writes to the connected device. This can
+	  be used by modules sub-classing Control::CLI to help keep in synch with the connected device

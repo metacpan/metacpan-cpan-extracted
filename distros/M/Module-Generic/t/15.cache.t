@@ -4,11 +4,11 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
+    use vars qw( $DEBUG );
     use Test2::IPC;
     use Test2::V0;
     # use Test::More;
     use POSIX ":sys_wait_h";
-    use vars qw( $DEBUG );
     $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
@@ -16,6 +16,9 @@ BEGIN
 {
     use ok( 'Module::Generic::File::Cache' );
 };
+
+use strict;
+use warnings;
 
 $Module::Generic::File::Cache::DEBUG = $DEBUG;
 

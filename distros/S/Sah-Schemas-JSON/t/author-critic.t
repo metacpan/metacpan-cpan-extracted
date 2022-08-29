@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Data/Sah/Filter/perl/JSON/check_decode.pm','lib/Data/Sah/Filter/perl/JSON/decode.pm','lib/Data/Sah/Filter/perl/JSON/decode_str.pm','lib/Sah/Schema/any_from_json.pm','lib/Sah/Schema/array_from_json.pm','lib/Sah/Schema/hash_from_json.pm','lib/Sah/Schema/json_str.pm','lib/Sah/SchemaR/any_from_json.pm','lib/Sah/SchemaR/array_from_json.pm','lib/Sah/SchemaR/hash_from_json.pm','lib/Sah/SchemaR/json_str.pm','lib/Sah/Schemas/JSON.pm'];
+my $filenames = ['lib/Data/Sah/Filter/perl/JSON/check_decode.pm','lib/Data/Sah/Filter/perl/JSON/check_decode_array.pm','lib/Data/Sah/Filter/perl/JSON/check_decode_hash.pm','lib/Data/Sah/Filter/perl/JSON/decode.pm','lib/Data/Sah/Filter/perl/JSON/decode_str.pm','lib/Sah/Schema/any_from_json.pm','lib/Sah/Schema/array_from_json.pm','lib/Sah/Schema/hash_from_json.pm','lib/Sah/Schema/json_or_str.pm','lib/Sah/Schema/json_str.pm','lib/Sah/Schema/json_str/array.pm','lib/Sah/Schema/json_str/hash.pm','lib/Sah/SchemaR/any_from_json.pm','lib/Sah/SchemaR/array_from_json.pm','lib/Sah/SchemaR/hash_from_json.pm','lib/Sah/SchemaR/json_or_str.pm','lib/Sah/SchemaR/json_str.pm','lib/Sah/SchemaR/json_str/array.pm','lib/Sah/SchemaR/json_str/hash.pm','lib/Sah/Schemas/JSON.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

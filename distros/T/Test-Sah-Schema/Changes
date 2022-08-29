@@ -1,3 +1,10 @@
+0.011   2022-07-17  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] POD fixes in Synopsis.
+
+
 0.010   2021-07-20  Released-By: PERLANCAR; Urgency: medium
 
 	- Prefer normalized schema with no extras part (the new form), give

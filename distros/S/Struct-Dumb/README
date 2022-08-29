@@ -4,37 +4,37 @@ NAME
 
 SYNOPSIS
 
-     use Struct::Dumb;
+       use Struct::Dumb;
     
-     struct Point => [qw( x y )];
+       struct Point => [qw( x y )];
     
-     my $point = Point(10, 20);
+       my $point = Point(10, 20);
     
-     printf "Point is at (%d, %d)\n", $point->x, $point->y;
+       printf "Point is at (%d, %d)\n", $point->x, $point->y;
     
-     $point->y = 30;
-     printf "Point is now at (%d, %d)\n", $point->x, $point->y;
+       $point->y = 30;
+       printf "Point is now at (%d, %d)\n", $point->x, $point->y;
 
 
-     struct Point3D => [qw( x y z )], named_constructor => 1;
+       struct Point3D => [qw( x y z )], named_constructor => 1;
     
-     my $point3d = Point3D( z => 12, x => 100, y => 50 );
+       my $point3d = Point3D( z => 12, x => 100, y => 50 );
     
-     printf "Point3d's height is %d\n", $point3d->z;
+       printf "Point3d's height is %d\n", $point3d->z;
 
 
-     struct Point3D => [qw( x y z )], predicate => "is_Point3D";
+       struct Point3D => [qw( x y z )], predicate => "is_Point3D";
     
-     my $point3d = Point3D( 1, 2, 3 );
+       my $point3d = Point3D( 1, 2, 3 );
     
-     printf "This is a Point3D\n" if is_Point3D( $point3d );
+       printf "This is a Point3D\n" if is_Point3D( $point3d );
 
 
-     use Struct::Dumb qw( -named_constructors )
+       use Struct::Dumb qw( -named_constructors )
     
-     struct Point3D => [qw( x y z )];
+       struct Point3D => [qw( x y z )];
     
-     my $point3d = Point3D( x => 100, z => 12, y => 50 );
+       my $point3d = Point3D( x => 100, z => 12, y => 50 );
 
 DESCRIPTION
 
@@ -60,19 +60,24 @@ DESCRIPTION
     argument, or attempting to invoke a stored CODE reference by passing
     argument values directly to the accessor.)
 
-     $ perl -E 'use Struct::Dumb; struct Point => [qw( x y )]; Point(30)'
-     usage: main::Point($x, $y) at -e line 1
+       $ perl -E 'use Struct::Dumb; struct Point => [qw( x y )]; Point(30)'
+       usage: main::Point($x, $y) at -e line 1
     
-     $ perl -E 'use Struct::Dumb; struct Point => [qw( x y )]; Point(10,20)->z'
-     main::Point does not have a 'z' field at -e line 1
+       $ perl -E 'use Struct::Dumb; struct Point => [qw( x y )]; Point(10,20)->z'
+       main::Point does not have a 'z' field at -e line 1
     
-     $ perl -E 'use Struct::Dumb; struct Point => [qw( x y )]; Point(1,2)->x(3)'
-     main::Point->x invoked with arguments at -e line 1.
+       $ perl -E 'use Struct::Dumb; struct Point => [qw( x y )]; Point(1,2)->x(3)'
+       main::Point->x invoked with arguments at -e line 1.
 
     Objects in this class are (currently) backed by an ARRAY reference
     store, though this is an internal implementation detail and should not
     be relied on by using code. Attempting to dereference the object as an
     ARRAY will throw an exception.
+
+    Note: That on development perls that support use feature 'class', this
+    is used instead of a blessed ARRAY reference. This implementation
+    choice should be transparent to the end-user, as all the same features
+    are supported.
 
  CONSTRUCTOR FORMS
 
@@ -170,14 +175,14 @@ NOTES
     references so it can walk the data structure looking for reference
     cycles.
 
-     use Devel::Cycle;
+       use Devel::Cycle;
     
-     {
-        no warnings 'redefine';
-        local *Point::_forbid_arrayification = sub {};
+       {
+          no warnings 'redefine';
+          local *Point::_forbid_arrayification = sub {};
     
-        memory_cycle_ok( $point );
-     }
+          memory_cycle_ok( $point );
+       }
 
 TODO
 

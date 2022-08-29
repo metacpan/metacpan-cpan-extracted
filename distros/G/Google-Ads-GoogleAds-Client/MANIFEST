@@ -26,7 +26,6 @@ examples/advanced_operations/add_display_upload_ad.pl
 examples/advanced_operations/add_dynamic_page_feed.pl
 examples/advanced_operations/add_dynamic_page_feed_asset.pl
 examples/advanced_operations/add_dynamic_search_ads.pl
-examples/advanced_operations/add_expanded_text_ad_with_upgraded_urls.pl
 examples/advanced_operations/add_local_campaign.pl
 examples/advanced_operations/add_performance_max_campaign.pl
 examples/advanced_operations/add_responsive_search_ad_with_ad_customizer.pl
@@ -40,11 +39,9 @@ examples/advanced_operations/use_portfolio_bidding_strategy.pl
 examples/authentication/generate_user_credentials.pl
 examples/basic_operations/add_ad_groups.pl
 examples/basic_operations/add_campaigns.pl
-examples/basic_operations/add_expanded_text_ads.pl
 examples/basic_operations/add_keywords.pl
 examples/basic_operations/add_responsive_search_ad.pl
 examples/basic_operations/get_ad_groups.pl
-examples/basic_operations/get_artifact_metadata.pl
 examples/basic_operations/get_campaigns.pl
 examples/basic_operations/get_expanded_text_ads.pl
 examples/basic_operations/get_keywords.pl
@@ -54,10 +51,11 @@ examples/basic_operations/remove_ad.pl
 examples/basic_operations/remove_ad_group.pl
 examples/basic_operations/remove_campaign.pl
 examples/basic_operations/remove_keyword.pl
+examples/basic_operations/search_for_google_ads_fields.pl
 examples/basic_operations/update_ad_group.pl
 examples/basic_operations/update_campaign.pl
-examples/basic_operations/update_expanded_text_ad.pl
 examples/basic_operations/update_keyword.pl
+examples/basic_operations/update_responsive_search_ad.pl
 examples/billing/add_account_budget_proposal.pl
 examples/billing/add_billing_setup.pl
 examples/billing/get_account_budget_proposals.pl
@@ -74,7 +72,7 @@ examples/campaign_management/get_all_disapproved_ads.pl
 examples/campaign_management/get_campaigns_by_label.pl
 examples/campaign_management/set_ad_parameters.pl
 examples/campaign_management/update_campaign_criterion_bid_modifier.pl
-examples/campaign_management/validate_text_ad.pl
+examples/campaign_management/validate_ad.pl
 examples/error_handling/handle_expanded_text_ad_policy_violations.pl
 examples/error_handling/handle_keyword_policy_violations.pl
 examples/error_handling/handle_partial_failure.pl
@@ -121,6 +119,7 @@ examples/misc/upload_media_bundle.pl
 examples/planning/add_keyword_plan.pl
 examples/planning/forecast_reach.pl
 examples/planning/generate_forecast_metrics.pl
+examples/planning/generate_historical_metrics.pl
 examples/planning/generate_keyword_ideas.pl
 examples/planning/get_ad_group_criterion_cpc_bid_simulations.pl
 examples/planning/get_campaign_criterion_bid_modifier_simulations.pl
@@ -1741,6 +1740,8 @@ lib/Google/Ads/GoogleAds/V11/Common/DynamicLocationSetFilter.pm
 lib/Google/Ads/GoogleAds/V11/Common/DynamicRealEstateAsset.pm
 lib/Google/Ads/GoogleAds/V11/Common/DynamicTravelAsset.pm
 lib/Google/Ads/GoogleAds/V11/Common/EnhancedCpc.pm
+lib/Google/Ads/GoogleAds/V11/Common/EventAttribute.pm
+lib/Google/Ads/GoogleAds/V11/Common/EventItemAttribute.pm
 lib/Google/Ads/GoogleAds/V11/Common/ExclusionSegment.pm
 lib/Google/Ads/GoogleAds/V11/Common/ExpandedDynamicSearchAdInfo.pm
 lib/Google/Ads/GoogleAds/V11/Common/ExpandedTextAdInfo.pm
@@ -1748,6 +1749,8 @@ lib/Google/Ads/GoogleAds/V11/Common/ExplorerAutoOptimizerSetting.pm
 lib/Google/Ads/GoogleAds/V11/Common/ExpressionRuleUserListInfo.pm
 lib/Google/Ads/GoogleAds/V11/Common/FeedAttributeOperand.pm
 lib/Google/Ads/GoogleAds/V11/Common/FinalAppUrl.pm
+lib/Google/Ads/GoogleAds/V11/Common/FlexibleRuleOperandInfo.pm
+lib/Google/Ads/GoogleAds/V11/Common/FlexibleRuleUserListInfo.pm
 lib/Google/Ads/GoogleAds/V11/Common/FrequencyCapEntry.pm
 lib/Google/Ads/GoogleAds/V11/Common/FrequencyCapKey.pm
 lib/Google/Ads/GoogleAds/V11/Common/FunctionOperand.pm
@@ -1986,6 +1989,7 @@ lib/Google/Ads/GoogleAds/V11/Enums/AudienceStatusEnum.pm
 lib/Google/Ads/GoogleAds/V11/Enums/BatchJobStatusEnum.pm
 lib/Google/Ads/GoogleAds/V11/Enums/BiddingSourceEnum.pm
 lib/Google/Ads/GoogleAds/V11/Enums/BiddingStrategyStatusEnum.pm
+lib/Google/Ads/GoogleAds/V11/Enums/BiddingStrategySystemStatusEnum.pm
 lib/Google/Ads/GoogleAds/V11/Enums/BiddingStrategyTypeEnum.pm
 lib/Google/Ads/GoogleAds/V11/Enums/BidModifierSourceEnum.pm
 lib/Google/Ads/GoogleAds/V11/Enums/BillingSetupStatusEnum.pm
@@ -2219,6 +2223,7 @@ lib/Google/Ads/GoogleAds/V11/Enums/UserListClosingReasonEnum.pm
 lib/Google/Ads/GoogleAds/V11/Enums/UserListCombinedRuleOperatorEnum.pm
 lib/Google/Ads/GoogleAds/V11/Enums/UserListCrmDataSourceTypeEnum.pm
 lib/Google/Ads/GoogleAds/V11/Enums/UserListDateRuleItemOperatorEnum.pm
+lib/Google/Ads/GoogleAds/V11/Enums/UserListFlexibleRuleOperatorEnum.pm
 lib/Google/Ads/GoogleAds/V11/Enums/UserListLogicalRuleOperatorEnum.pm
 lib/Google/Ads/GoogleAds/V11/Enums/UserListMembershipStatusEnum.pm
 lib/Google/Ads/GoogleAds/V11/Enums/UserListNumberRuleItemOperatorEnum.pm
@@ -2359,6 +2364,7 @@ lib/Google/Ads/GoogleAds/V11/Resources/CustomizerAttribute.pm
 lib/Google/Ads/GoogleAds/V11/Resources/DataPartnerLinkIdentifier.pm
 lib/Google/Ads/GoogleAds/V11/Resources/DetailedDemographic.pm
 lib/Google/Ads/GoogleAds/V11/Resources/DetailPlacementView.pm
+lib/Google/Ads/GoogleAds/V11/Resources/DisplayExpansionOptInRecommendation.pm
 lib/Google/Ads/GoogleAds/V11/Resources/DisplayKeywordView.pm
 lib/Google/Ads/GoogleAds/V11/Resources/DistanceView.pm
 lib/Google/Ads/GoogleAds/V11/Resources/DomainCategory.pm
@@ -2490,6 +2496,7 @@ lib/Google/Ads/GoogleAds/V11/Resources/ThirdPartyAppAnalyticsSettings.pm
 lib/Google/Ads/GoogleAds/V11/Resources/TopicConstant.pm
 lib/Google/Ads/GoogleAds/V11/Resources/TopicView.pm
 lib/Google/Ads/GoogleAds/V11/Resources/TrackingSetting.pm
+lib/Google/Ads/GoogleAds/V11/Resources/UpgradeLocalCampaignToPerformanceMaxRecommendation.pm
 lib/Google/Ads/GoogleAds/V11/Resources/UpgradeSmartShoppingCampaignToPerformanceMaxRecommendation.pm
 lib/Google/Ads/GoogleAds/V11/Resources/UseBroadMatchKeywordRecommendation.pm
 lib/Google/Ads/GoogleAds/V11/Resources/UserInterest.pm
@@ -2622,16 +2629,27 @@ lib/Google/Ads/GoogleAds/V11/Services/AssetSetService/MutateAssetSetResult.pm
 lib/Google/Ads/GoogleAds/V11/Services/AssetSetService/MutateAssetSetsRequest.pm
 lib/Google/Ads/GoogleAds/V11/Services/AssetSetService/MutateAssetSetsResponse.pm
 lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService.pm
+lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/AudienceCompositionAttribute.pm
+lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/AudienceCompositionAttributeCluster.pm
+lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/AudienceCompositionMetrics.pm
+lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/AudienceCompositionSection.pm
 lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/AudienceInsightsAttribute.pm
 lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/AudienceInsightsAttributeMetadata.pm
 lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/AudienceInsightsCategory.pm
+lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/AudienceInsightsDynamicLineup.pm
 lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/AudienceInsightsEntity.pm
 lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/AudienceInsightsTopic.pm
 lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/BasicInsightsAudience.pm
+lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/DynamicLineupAttributeMetadata.pm
+lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/GenerateAudienceCompositionInsightsRequest.pm
+lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/GenerateAudienceCompositionInsightsResponse.pm
 lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/GenerateInsightsFinderReportRequest.pm
 lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/GenerateInsightsFinderReportResponse.pm
+lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/InsightsAudience.pm
+lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/InsightsAudienceAttributeGroup.pm
 lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/ListAudienceInsightsAttributesRequest.pm
 lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/ListAudienceInsightsAttributesResponse.pm
+lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/YouTubeChannelAttributeMetadata.pm
 lib/Google/Ads/GoogleAds/V11/Services/AudienceService.pm
 lib/Google/Ads/GoogleAds/V11/Services/AudienceService/AudienceOperation.pm
 lib/Google/Ads/GoogleAds/V11/Services/AudienceService/MutateAudienceResult.pm
@@ -3052,6 +3070,8 @@ lib/Google/Ads/GoogleAds/V11/Services/PaymentsAccountService.pm
 lib/Google/Ads/GoogleAds/V11/Services/PaymentsAccountService/ListPaymentsAccountsRequest.pm
 lib/Google/Ads/GoogleAds/V11/Services/PaymentsAccountService/ListPaymentsAccountsResponse.pm
 lib/Google/Ads/GoogleAds/V11/Services/ReachPlanService.pm
+lib/Google/Ads/GoogleAds/V11/Services/ReachPlanService/AdvancedProductTargeting.pm
+lib/Google/Ads/GoogleAds/V11/Services/ReachPlanService/AudienceTargeting.pm
 lib/Google/Ads/GoogleAds/V11/Services/ReachPlanService/CampaignDuration.pm
 lib/Google/Ads/GoogleAds/V11/Services/ReachPlanService/EffectiveFrequencyBreakdown.pm
 lib/Google/Ads/GoogleAds/V11/Services/ReachPlanService/EffectiveFrequencyLimit.pm
@@ -3078,6 +3098,8 @@ lib/Google/Ads/GoogleAds/V11/Services/ReachPlanService/ProductMetadata.pm
 lib/Google/Ads/GoogleAds/V11/Services/ReachPlanService/ReachCurve.pm
 lib/Google/Ads/GoogleAds/V11/Services/ReachPlanService/ReachForecast.pm
 lib/Google/Ads/GoogleAds/V11/Services/ReachPlanService/Targeting.pm
+lib/Google/Ads/GoogleAds/V11/Services/ReachPlanService/YouTubeSelectLineUp.pm
+lib/Google/Ads/GoogleAds/V11/Services/ReachPlanService/YouTubeSelectSettings.pm
 lib/Google/Ads/GoogleAds/V11/Services/RecommendationService.pm
 lib/Google/Ads/GoogleAds/V11/Services/RecommendationService/ApplyRecommendationOperation.pm
 lib/Google/Ads/GoogleAds/V11/Services/RecommendationService/ApplyRecommendationRequest.pm

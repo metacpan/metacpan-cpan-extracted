@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-package Tickit 0.72;
+package Tickit 0.73;
 
 use v5.14;
 use warnings;
@@ -565,19 +565,20 @@ sub run
    }
 
    my $term = $self->_tickit->term;
-   $SIG{__DIE__} = sub {
-      return if $^S;
-      my ( $err ) = @_;
 
-      # Teardown before application exit so the message appears properly
-      $term->teardown;
-      die $err;
-   };
-
-   $self->_tickit->run;
+   my $err = (defined eval {
+      $self->_tickit->run;
+      1;
+   }) ? undef : $@;
 
    if( my $widget = $self->{root_widget} ) {
       $widget->set_window( undef );
+   }
+
+   if( defined $err ) {
+      # Teardown before application exit so the message appears properly
+      $term->teardown;
+      die $err;
    }
 }
 

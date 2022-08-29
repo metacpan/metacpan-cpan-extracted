@@ -77,7 +77,8 @@ sub _test_module {
         42;
 END
 
-    is($ret, $js, 'eval_module() returns JS object');
+    # Stringify for Devel::Cover …
+    is("$ret", "$js", 'eval_module() returns JS object');
 
     is( $retval, 42, "$label: module imported and used" );
 

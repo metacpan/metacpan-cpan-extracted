@@ -1,0 +1,194 @@
+{
+   "abstract" : "utilities for the simplest elements of Perl",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Hydrogen",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         },
+         "requires" : {
+            "Mite" : "0",
+            "Module::Runtime" : "0",
+            "Path::Tiny" : "0",
+            "Sub::HandlesVia" : "0",
+            "Types::Standard" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Exporter::Shiny" : "1.004000",
+            "List::Util" : "1.54",
+            "Scalar::Util" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Hydrogen" : {
+         "file" : "lib/Hydrogen.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::Array" : {
+         "file" : "lib/Hydrogen/Array.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::ArrayRef" : {
+         "file" : "lib/Hydrogen/ArrayRef.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::Bool" : {
+         "file" : "lib/Hydrogen/Bool.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::Code" : {
+         "file" : "lib/Hydrogen/Code.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::CodeRef" : {
+         "file" : "lib/Hydrogen/CodeRef.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::Counter" : {
+         "file" : "lib/Hydrogen/Counter.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::Curry::ArrayRef" : {
+         "file" : "lib/Hydrogen/Curry/ArrayRef.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::Curry::Bool" : {
+         "file" : "lib/Hydrogen/Curry/Bool.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::Curry::CodeRef" : {
+         "file" : "lib/Hydrogen/Curry/CodeRef.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::Curry::Counter" : {
+         "file" : "lib/Hydrogen/Curry/Counter.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::Curry::HashRef" : {
+         "file" : "lib/Hydrogen/Curry/HashRef.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::Curry::Number" : {
+         "file" : "lib/Hydrogen/Curry/Number.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::Curry::Scalar" : {
+         "file" : "lib/Hydrogen/Curry/Scalar.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::Curry::String" : {
+         "file" : "lib/Hydrogen/Curry/String.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::Hash" : {
+         "file" : "lib/Hydrogen/Hash.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::HashRef" : {
+         "file" : "lib/Hydrogen/HashRef.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::Number" : {
+         "file" : "lib/Hydrogen/Number.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::Scalar" : {
+         "file" : "lib/Hydrogen/Scalar.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::String" : {
+         "file" : "lib/Hydrogen/String.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::Topic::ArrayRef" : {
+         "file" : "lib/Hydrogen/Topic/ArrayRef.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::Topic::Bool" : {
+         "file" : "lib/Hydrogen/Topic/Bool.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::Topic::CodeRef" : {
+         "file" : "lib/Hydrogen/Topic/CodeRef.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::Topic::Counter" : {
+         "file" : "lib/Hydrogen/Topic/Counter.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::Topic::HashRef" : {
+         "file" : "lib/Hydrogen/Topic/HashRef.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::Topic::Number" : {
+         "file" : "lib/Hydrogen/Topic/Number.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::Topic::Scalar" : {
+         "file" : "lib/Hydrogen/Topic/Scalar.pm",
+         "version" : "0.015"
+      },
+      "Hydrogen::Topic::String" : {
+         "file" : "lib/Hydrogen/Topic/String.pm",
+         "version" : "0.015"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tobyink/p5-hydrogen/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Hydrogen",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-hydrogen.git",
+         "web" : "https://github.com/tobyink/p5-hydrogen"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Hydrogen/project"
+   },
+   "version" : "0.015",
+   "x_serialization_backend" : "JSON::PP version 4.09",
+   "x_static_install" : 1
+}

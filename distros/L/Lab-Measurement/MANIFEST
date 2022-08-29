@@ -17,6 +17,7 @@ examples/Sweeps/coulomb-diamonds.pl
 examples/Sweeps/frequency-sweep.pl
 examples/Sweeps/gate-frequency-sweep.pl
 examples/Sweeps/gate-trace.pl
+examples/Sweeps/gate-vna.pl
 examples/Sweeps/manual-T-IV-freq.pl
 examples/Sweeps/manual.pl
 examples/Sweeps/pulsewidth-sweep.pl

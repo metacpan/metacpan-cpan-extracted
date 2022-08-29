@@ -74,7 +74,13 @@ is(scalar @{ $assertion->attributes->{EmailAddress} }, 1);
 is(scalar @{ $assertion->attributes->{Phone2} }, 3);
 
 is($assertion->session, 's2b087bdce06dbbf9cd4662af82b8b853d4d285c01', 'Session ID is correct');
-is($assertion->nameid,  'nKdwzcgBYGt42xovLuctZ60tyafv', 'Name ID is correct');
+
+is($assertion->nameid, 'nKdwzcgBYGt42xovLuctZ60tyafv', 'Name ID is correct');
+is(
+    $assertion->nameid_format,
+    'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
+    '.. and Name ID format is also correct'
+);
 
 cmp_deeply(
     $assertion->attributes,

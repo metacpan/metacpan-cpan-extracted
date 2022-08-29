@@ -1,0 +1,26 @@
+Changes
+ignore.txt
+lib/Glitch.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-glitch.t
+t/02-glitch.t
+t/03-glitch.t
+t/04-glitch-config.t
+t/05-glitch-config-json.t
+t/06-glitch-config-multi.t
+t/glitch-one.conf
+t/glitch-three.conf
+t/glitch-two.conf
+t/lib/Glitches.pm
+t/lib/GlitchesFromConfigOne.pm
+t/lib/GlitchesFromConfigThree.pm
+t/lib/GlitchesFromConfigTwo.pm
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

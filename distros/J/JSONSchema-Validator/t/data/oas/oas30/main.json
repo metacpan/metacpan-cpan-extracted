@@ -368,6 +368,9 @@
                     ]
                 },
                 "ctype_res" : "application/json",
+                "header_res" : {
+                    "X-SERVER-sUPPoRTED-vERSIONs" : [ 2, 3 ]
+                },
 
                 "valid_req": true,
                 "valid_res": true
@@ -418,6 +421,9 @@
                     ]
                 },
                 "ctype_res" : "application/json",
+                "header_res" : {
+                    "X-SERVER-sUPPoRTED-vERSIONs" : [ 2, 3 ]
+                },
 
                 "valid_req": true,
                 "valid_res": true
@@ -468,6 +474,9 @@
                     ]
                 },
                 "ctype_res" : "application/json",
+                "header_res" : {
+                    "X-SERVER-sUPPoRTED-vERSIONs" : [ 2, 3 ]
+                },
 
                 "valid_req": false,
                 "valid_res": false
@@ -517,6 +526,9 @@
                     ]
                 },
                 "ctype_res" : "application/json",
+                "header_res" : {
+                    "X-SERVER-sUPPoRTED-vERSIONs" : [ 2, 3 ]
+                },
 
                 "valid_req": false,
                 "valid_res": false
@@ -620,6 +632,9 @@
                     ]
                 },
                 "ctype_res" : "application/json",
+                "header_res" : {
+                    "X-SERVER-sUPPoRTED-vERSIONs" : [ 2, 3 ]
+                },
 
                 "valid_req": false,
                 "valid_res": false
@@ -733,6 +748,9 @@
                     ]
                 },
                 "ctype_res" : "application/json",
+                "header_res" : {
+                    "X-SERVER-sUPPoRTED-vERSIONs" : [ 2, 3 ]
+                },
 
                 "valid_req": false,
                 "valid_res": true
@@ -869,6 +887,30 @@
 
                 "valid_req": true,
                 "valid_res": true
+            },
+
+            {
+                "description": "failure to specify \"header\" parameter fails validation on schemas that contain them; github issue 29",
+                "method" : "post",
+                "openapi_path" : "/company/{company}/pets",
+
+                "path" : {
+                    "company" : "skbkontur"
+                },
+                "query" : {
+                    "params" : "{ \"theme\" : \"butterfly\", \"offset\" : 10 }",
+                    "optional_param" : "optional",
+                    "int_param" : "123"
+                },
+                "body_req" : null,
+                "ctype_req" : "application/json",
+
+                "status" : "200",
+                "body_res" : {},
+                "ctype_res" : "application/json",
+
+                "valid_req": false,
+                "valid_res": false
             }
         ]
     }

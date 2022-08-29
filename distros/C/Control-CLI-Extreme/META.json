@@ -4,7 +4,7 @@
       "Ludovico Stevens <lstevens@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,7 @@
    "provides" : {
       "Control::CLI::Extreme" : {
          "file" : "lib/Control/CLI/Extreme.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       }
    },
    "release_status" : "stable",
@@ -47,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.06",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "1.07",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

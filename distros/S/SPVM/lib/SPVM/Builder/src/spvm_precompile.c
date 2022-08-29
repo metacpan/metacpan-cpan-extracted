@@ -391,42 +391,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_PRECOMPILE* precompile, SP
       case SPVM_OPCODE_C_ID_IF_NE_ZERO: {
         SPVM_STRING_BUFFER_add(string_buffer, "  if (");
         SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
-        SPVM_STRING_BUFFER_add(string_buffer, ") { goto L");
+        SPVM_STRING_BUFFER_add(string_buffer, " != 0) { goto L");
         SPVM_STRING_BUFFER_add_int(string_buffer, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, "; }\n");
-        break;
-      }
-      case SPVM_OPCODE_C_ID_IF_EXCEPTION_CATCH: {
-        int32_t line = opcode->operand2;
-        
-        SPVM_STRING_BUFFER_add(string_buffer, "  if (error) {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    int32_t line = ");
-        SPVM_STRING_BUFFER_add_int(string_buffer, line);
-        SPVM_STRING_BUFFER_add(string_buffer, ";\n"
-                                              "    eval_error = error;\n"
-                                              "    error = 0;\n"
-                                              "    int32_t method_id = env->api->runtime->get_method_id_by_name(env->runtime, CURRENT_CLASS_NAME, CURRENT_METHOD_NAME);\n"
-                                              "    env->set_exception(env, stack, env->new_stack_trace_raw(env, stack, env->get_exception(env, stack), method_id, line));\n"
-                                              "    goto L");
-        SPVM_STRING_BUFFER_add_int(string_buffer,  opcode->operand0);
-        SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "  }\n");
-        
-        break;
-      }
-      case SPVM_OPCODE_C_ID_IF_EXCEPTION_RETURN: {
-        int32_t line = opcode->operand2;
-        
-        SPVM_STRING_BUFFER_add(string_buffer, "  if (error) {\n"
-                                              "    int32_t line = ");
-        SPVM_STRING_BUFFER_add_int(string_buffer, line);
-        SPVM_STRING_BUFFER_add(string_buffer, ";\n"
-                                              "    int32_t method_id = env->api->runtime->get_method_id_by_name(env->runtime, CURRENT_CLASS_NAME, CURRENT_METHOD_NAME);\n"
-                                              "    env->set_exception(env, stack, env->new_stack_trace_raw(env, stack, env->get_exception(env, stack), method_id, line));\n"
-                                              "    goto L");
-        SPVM_STRING_BUFFER_add_int(string_buffer, opcode->operand0);
-        SPVM_STRING_BUFFER_add(string_buffer, ";\n"
-                                              "  }\n");
         break;
       }
       case SPVM_OPCODE_C_ID_LOOKUP_SWITCH: {
@@ -2303,6 +2270,39 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_PRECOMPILE* precompile, SP
         SPVM_STRING_BUFFER_add(string_buffer, "  env->set_exception(env, stack, NULL);\n");
         break;
       }
+      case SPVM_OPCODE_C_ID_IF_EXCEPTION_CATCH: {
+        int32_t line = opcode->operand2;
+        
+        SPVM_STRING_BUFFER_add(string_buffer, "  if (error) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "    int32_t line = ");
+        SPVM_STRING_BUFFER_add_int(string_buffer, line);
+        SPVM_STRING_BUFFER_add(string_buffer, ";\n"
+                                              "    eval_error = error;\n"
+                                              "    error = 0;\n"
+                                              "    int32_t method_id = env->api->runtime->get_method_id_by_name(env->runtime, CURRENT_CLASS_NAME, CURRENT_METHOD_NAME);\n"
+                                              "    env->set_exception(env, stack, env->new_stack_trace_raw(env, stack, env->get_exception(env, stack), method_id, line));\n"
+                                              "    goto L");
+        SPVM_STRING_BUFFER_add_int(string_buffer,  opcode->operand0);
+        SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "  }\n");
+        
+        break;
+      }
+      case SPVM_OPCODE_C_ID_IF_EXCEPTION_RETURN: {
+        int32_t line = opcode->operand2;
+        
+        SPVM_STRING_BUFFER_add(string_buffer, "  if (error) {\n"
+                                              "    int32_t line = ");
+        SPVM_STRING_BUFFER_add_int(string_buffer, line);
+        SPVM_STRING_BUFFER_add(string_buffer, ";\n"
+                                              "    int32_t method_id = env->api->runtime->get_method_id_by_name(env->runtime, CURRENT_CLASS_NAME, CURRENT_METHOD_NAME);\n"
+                                              "    env->set_exception(env, stack, env->new_stack_trace_raw(env, stack, env->get_exception(env, stack), method_id, line));\n"
+                                              "    goto L");
+        SPVM_STRING_BUFFER_add_int(string_buffer, opcode->operand0);
+        SPVM_STRING_BUFFER_add(string_buffer, ";\n"
+                                              "  }\n");
+        break;
+      }
       case SPVM_OPCODE_C_ID_ISA:
       {
         int32_t dist_basic_type = opcode->operand2;
@@ -3928,7 +3928,6 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_PRECOMPILE* precompile, SP
       {
         int32_t var_id = opcode->operand0;
         int32_t decl_method_id = opcode->operand1;
-        int32_t is_call_super = opcode->operand2 & 0xFFFF;
         int32_t call_method_args_stack_length = opcode->operand2 >> 16;
         
         int32_t decl_method_name_id = SPVM_API_RUNTIME_get_method_name_id(runtime, decl_method_id);
@@ -3977,12 +3976,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_PRECOMPILE* precompile, SP
           }
           case SPVM_OPCODE_C_ID_CALL_INSTANCE_METHOD_BY_NAME: {
             SPVM_STRING_BUFFER_add(string_buffer, "    void* object = stack[0].oval;\n");
-            if (is_call_super) {
-              SPVM_STRING_BUFFER_add(string_buffer, "    int32_t call_method_id = env->get_instance_method_id_super(env, object, \"");
-            }
-            else {
-              SPVM_STRING_BUFFER_add(string_buffer, "    int32_t call_method_id = env->get_instance_method_id(env, object, \"");
-            }
+            SPVM_STRING_BUFFER_add(string_buffer, "    int32_t call_method_id = env->get_instance_method_id(env, object, \"");
             SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_name);
             SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
             

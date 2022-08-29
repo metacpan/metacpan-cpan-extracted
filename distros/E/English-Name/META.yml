@@ -1,0 +1,31 @@
+---
+abstract: '${^ENGLISH_NAME} for magic variables'
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.036'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: English-Name
+provides:
+  English::Name:
+    file: lib/English/Name.pm
+    version: '0.002'
+requires:
+  XSLoader: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Leont/english-name/issues
+  repository: git://github.com/Leont/english-name.git
+version: '0.002'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

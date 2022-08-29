@@ -4,7 +4,9 @@ use warnings;
 
 package Dist::Zilla::Plugin::DistManifestTests;
 # ABSTRACT: (DEPRECATED) Release tests for the manifest
-our $VERSION = '2.000005'; # VERSION
+
+our $VERSION = '2.000006';
+
 use Moose;
 extends 'Dist::Zilla::Plugin::Test::DistManifest';
 
@@ -28,7 +30,7 @@ Dist::Zilla::Plugin::DistManifestTests - (DEPRECATED) Release tests for the mani
 
 =head1 VERSION
 
-version 2.000005
+version 2.000006
 
 =head1 SYNOPSIS
 
@@ -41,23 +43,18 @@ In C<dist.ini>:
 =for test_synopsis 1;
 __END__
 
-=head1 AVAILABILITY
+=head1 SUPPORT
 
-The project homepage is L<http://metacpan.org/release/Dist-Zilla-Plugin-Test-DistManifest/>.
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-DistManifest>
+(or L<bug-Dist-Zilla-Plugin-Test-DistManifest@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-Test-DistManifest@rt.cpan.org>).
 
-The latest version of this module is available from the Comprehensive Perl
-Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
-site near you, or see L<https://metacpan.org/module/Dist::Zilla::Plugin::Test::DistManifest/>.
+There is also a mailing list available for users of this distribution, at
+L<http://dzil.org/#mailing-list>.
 
-=head1 SOURCE
+There is also an irc channel available for users of this distribution, at
+L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-The development version is on github at L<http://github.com/doherty/Dist-Zilla-Plugin-Test-DistManifest>
-and may be cloned from L<git://github.com/doherty/Dist-Zilla-Plugin-Test-DistManifest.git>
-
-=head1 BUGS AND LIMITATIONS
-
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://github.com/doherty/Dist-Zilla-Plugin-Test-DistManifest/issues>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHORS
 
@@ -73,9 +70,9 @@ Mike Doherty <doherty@cpan.org>
 
 =back
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2010 by Mike Doherty.
+This software is copyright (c) 2010 by Karen Etheridge.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

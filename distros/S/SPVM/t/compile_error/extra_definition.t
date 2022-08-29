@@ -14,7 +14,7 @@ use Test::More;
 
 # Class
 {
-  # Class descriptor
+  # Class attribute
   {
     {
       my $source = 'class MyClass : pointer_t { has x : int; }';
@@ -65,7 +65,7 @@ use Test::More;
       }
       {
         my $source = ['class MyClass extends MyParentClass { has x : int; }', 'class MyParentClass { has x : int; }'];
-        compile_not_ok($source);
+        compile_ok($source);
       }
     }
   }

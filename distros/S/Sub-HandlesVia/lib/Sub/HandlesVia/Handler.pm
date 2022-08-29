@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::Handler;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.035';
+our $VERSION   = '0.036';
 
 use Sub::HandlesVia::Mite -all;
 
@@ -273,7 +273,7 @@ sub _generate_handler {
 package Sub::HandlesVia::Handler::Traditional;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.035';
+our $VERSION   = '0.036';
 
 use Sub::HandlesVia::Mite -all;
 extends 'Sub::HandlesVia::Handler';
@@ -294,7 +294,7 @@ sub template {
 package Sub::HandlesVia::Handler::CodeRef;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.035';
+our $VERSION   = '0.036';
 
 use Sub::HandlesVia::Mite -all;
 extends 'Sub::HandlesVia::Handler';

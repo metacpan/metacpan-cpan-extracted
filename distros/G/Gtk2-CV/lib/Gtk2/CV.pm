@@ -9,15 +9,14 @@ use IO::AIO;
 BEGIN {
    use XSLoader;
 
-   our $VERSION = '1.71';
+   our $VERSION = '2.0';
 
    XSLoader::load "Gtk2::CV", $VERSION;
 }
 
 magic_buffer ""; # preload magic tables
 
-our $MPLAYER = $ENV{CV_MPLAYER} || "mpv";
-our $MPLAYER_IS_MPV = $MPLAYER =~ /mpv/; # sorry if this fails for you
+our $MPV = $ENV{CV_MPV} || $ENV{CV_MPLAYER} || "mpv";
 
 our $FAST_TMP = -w "/run/shm" ? "/run/shm"
               : -w "/dev/shm" ? "/dev/shm"
@@ -90,6 +89,16 @@ sub load_webp($;$$$) {
    IO::AIO::mmap my $data, -s $fh, IO::AIO::PROT_READ, IO::AIO::MAP_SHARED, $fh
       or die "$path: $!\n";
    decode_webp $data, $thumbnail, $iw, $ih
+}
+
+sub load_jxl($;$$$) {
+   my ($path, $thumbnail, $iw, $ih) = @_;
+
+   open my $fh, "<:raw", $path
+      or die "$path: $!\n";
+   IO::AIO::mmap my $data, -s $fh, IO::AIO::PROT_READ, IO::AIO::MAP_SHARED, $fh
+      or die "$path: $!\n";
+   decode_jxl $data, $thumbnail, $iw, $ih
 }
 
 sub load_jpeg($;$$$) {

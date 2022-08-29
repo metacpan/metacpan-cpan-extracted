@@ -1,5 +1,7 @@
+use 5.020;
 use lib 't/lib';
 use Test2::V0 -no_srand => 1;
+use experimental qw( signatures );
 use Test2::Plugin::FauxHomeDir;
 use Test2::Plugin::HTTPTinyFile;
 use File::Glob qw( bsd_glob );
@@ -9,8 +11,7 @@ use File::chdir;
 use URI::file;
 use Path::Class qw( file dir );
 
-$App::cpangitify::_run_cb = sub {
-  my($git, @command) = @_;
+$App::cpangitify::_run_cb = sub ($git, @command) {
   note "+ git @command";
 };
 

@@ -5,16 +5,16 @@ use warnings;
 package Sub::HandlesVia::HandlerLibrary::Hash;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.035';
+our $VERSION   = '0.036';
 
 use Sub::HandlesVia::HandlerLibrary;
 our @ISA = 'Sub::HandlesVia::HandlerLibrary';
 
 use Sub::HandlesVia::Handler qw( handler );
-use Types::Standard qw( HashRef ArrayRef Optional Str CodeRef Item Any Ref Defined );
+use Types::Standard qw( HashRef ArrayRef Optional Str CodeRef Item Any Ref Defined RegexpRef );
 
 our @METHODS = qw( all accessor clear count defined delete elements exists get
-	is_empty keys kv set shallow_clone values sorted_keys reset
+	is_empty keys kv set shallow_clone values sorted_keys reset delete_where
 	for_each_key for_each_value for_each_pair );
 
 sub _type_inspector {
@@ -262,6 +262,29 @@ sub delete {
 				"  my \$object = $class\->new( $attr => { foo => 0, bar => 1 } );\n",
 				"  \$object->$method( 'foo' );\n",
 				"  say exists \$object->$attr\->{foo}; ## ==> false\n",
+				"\n";
+		},
+}
+
+sub delete_where {
+	handler
+		name      => 'Hash:delete_where',
+		min_args  => 1,
+		usage     => '$match',
+		signature => [ CodeRef | RegexpRef ],
+		template  => 'my %shv_tmp = %{$GET}; my $shv_match = $ARG; my @shv_keys = ("CODE" eq ref $shv_match) ? grep($shv_match->($_), keys %shv_tmp) : grep(/$shv_match/, keys %shv_tmp); my @shv_return = delete @shv_tmp{@shv_keys}; «\%shv_tmp»; wantarray ? @shv_return : $shv_return[-1]',
+		prefer_shift_self => 1,
+		documentation => 'Removes values from the hashref by matching keys against a coderef or regexp.',
+		_examples => sub {
+			my ( $class, $attr, $method ) = @_;
+			return join "",
+				"  my \$object = $class\->new( $attr => { foo => 0, bar => 1, baz => 2 } );\n",
+				"  \$object->$method( sub { \$_ eq 'foo' or \$_ eq 'bar' } );\n",
+				"  say Dumper( \$object->$attr ); ## ==> { baz => 2 }\n",
+				"  \n",
+				"  my \$object2 = $class\->new( $attr => { foo => 0, bar => 1, baz => 2 } );\n",
+				"  \$object2->$method( qr/^b/ );\n",
+				"  say Dumper( \$object2->$attr ); ## ==> { foo => 0 }\n",
 				"\n";
 		},
 }

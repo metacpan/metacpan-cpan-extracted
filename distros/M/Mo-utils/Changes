@@ -1,3 +1,7 @@
+0.11 2022-08-25T17:56:53+02:00
+ - Regen README file.
+ - Rename files in examples/ directory to better names.
+
 0.10 2022-07-28T12:15:19+02:00
  - Add examples for check_bool() to doc.
  - Fix doc in ERRORS section.

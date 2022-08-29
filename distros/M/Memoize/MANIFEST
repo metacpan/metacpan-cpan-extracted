@@ -1,5 +1,6 @@
 article.html
 Changes
+inc/boilerplate.pl
 Makefile.PL
 MANIFEST
 Memoize.pm
@@ -8,32 +9,26 @@ Memoize/Expire.pm
 Memoize/NDBM_File.pm
 Memoize/SDBM_File.pm
 Memoize/Storable.pm
-t/array.t
-t/array_confusion.t
+t/basic.t
+t/cache.t
 t/correctness.t
-t/errors.t
-t/expfile.t
-t/expire.t
 t/expmod.t
-t/expmod_n.t
 t/expmod_t.t
 t/flush.t
-t/lib/ExpireFile.pm
-t/lib/ExpireTest.pm
-t/merge.t
+t/lib/DBMTest.pm
 t/normalize.t
-t/prototype.t
-t/rememoize.t
-t/speed.t
 t/st_concurrency
 t/threadsafe.t
 t/tie.t
-t/tiefeatures.t
+t/tie_db.t
 t/tie_gdbm.t
 t/tie_ndbm.t
+t/tie_odbm.t
 t/tie_sdbm.t
 t/tie_storable.t
 t/unmemoize.t
 TODO
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+LICENSE
+README

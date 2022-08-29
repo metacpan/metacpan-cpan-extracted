@@ -1,6 +1,6 @@
 package Lab::Connection::Socket;
 #ABSTRACT: IP socket connection
-$Lab::Connection::Socket::VERSION = '3.821';
+$Lab::Connection::Socket::VERSION = '3.822';
 use v5.20;
 
 use Lab::Bus::Socket;
@@ -60,7 +60,7 @@ Lab::Connection::Socket - IP socket connection
 
 =head1 VERSION
 
-version 3.821
+version 3.822
 
 =head1 COPYRIGHT AND LICENSE
 

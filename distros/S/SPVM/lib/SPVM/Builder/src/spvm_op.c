@@ -22,7 +22,7 @@
 #include "spvm_opcode_builder.h"
 #include "spvm_op_checker.h"
 #include "spvm_switch_info.h"
-#include "spvm_descriptor.h"
+#include "spvm_attribute.h"
 #include "spvm_allocator.h"
 #include "spvm_use.h"
 #include "spvm_class_var.h"
@@ -102,7 +102,7 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "pushmark",
     "do_nothing",
     "name",
-    "descriptor",
+    "attribute",
     "current_class",
     "class",
     "extends",
@@ -252,13 +252,13 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
   return id_names;
 }
 
-int32_t SPVM_OP_is_allowed(SPVM_COMPILER* compiler, SPVM_OP* op_class_current, SPVM_OP* op_class_dist) {
+int32_t SPVM_OP_is_allowed(SPVM_COMPILER* compiler, SPVM_CLASS* class_current, SPVM_CLASS* class_dist) {
   (void)compiler;
   
-  SPVM_LIST* allows = op_class_dist->uv.class->allows;
+  SPVM_LIST* allows = class_dist->allows;
   
-  const char* current_class_name = op_class_current->uv.class->name;
-  const char* dist_class_name = op_class_dist->uv.class->name;
+  const char* current_class_name = class_current->name;
+  const char* dist_class_name = class_dist->name;
   
   int32_t is_allowed = 0;
   if (strcmp(current_class_name, dist_class_name) == 0) {
@@ -378,14 +378,14 @@ SPVM_OP* SPVM_OP_build_extends(SPVM_COMPILER* compiler, SPVM_OP* op_extends, SPV
   return op_extends;
 }
 
-SPVM_OP* SPVM_OP_new_op_descriptor(SPVM_COMPILER* compiler, int32_t id, const char* file, int32_t line) {
-  SPVM_OP* op_descriptor = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_DESCRIPTOR, file, line);
+SPVM_OP* SPVM_OP_new_op_attribute(SPVM_COMPILER* compiler, int32_t id, const char* file, int32_t line) {
+  SPVM_OP* op_attribute = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ATTRIBUTE, file, line);
   
-  SPVM_DESCRIPTOR* descriptor = SPVM_DESCRIPTOR_new(compiler);
-  descriptor->id = id;
-  op_descriptor->uv.descriptor = descriptor;
+  SPVM_ATTRIBUTE* attribute = SPVM_ATTRIBUTE_new(compiler);
+  attribute->id = id;
+  op_attribute->uv.attribute = attribute;
   
-  return op_descriptor;
+  return op_attribute;
 }
 
 SPVM_OP* SPVM_OP_new_op_undef(SPVM_COMPILER* compiler, const char* file, int32_t line) {
@@ -1783,7 +1783,7 @@ SPVM_OP* SPVM_OP_build_field_access(SPVM_COMPILER* compiler, SPVM_OP* op_field_a
   return op_field_access;
 }
 
-SPVM_OP* SPVM_OP_build_has_impl(SPVM_COMPILER* compiler, SPVM_OP* op_has_impl, SPVM_OP* op_var, SPVM_OP* op_name) {
+SPVM_OP* SPVM_OP_build_field_impl(SPVM_COMPILER* compiler, SPVM_OP* op_has_impl, SPVM_OP* op_var, SPVM_OP* op_name) {
   
   if (!op_name) {
     op_name = SPVM_OP_new_op_name(compiler, "", op_var->file, op_var->line);
@@ -1847,7 +1847,7 @@ SPVM_OP* SPVM_OP_build_isweak_field(SPVM_COMPILER* compiler, SPVM_OP* op_isweak,
   return op_assign;
 }
 
-SPVM_OP* SPVM_OP_build_convert(SPVM_COMPILER* compiler, SPVM_OP* op_convert, SPVM_OP* op_type, SPVM_OP* op_operand, SPVM_OP* op_descriptors) {
+SPVM_OP* SPVM_OP_build_convert(SPVM_COMPILER* compiler, SPVM_OP* op_convert, SPVM_OP* op_type, SPVM_OP* op_operand, SPVM_OP* op_attributes) {
   
   SPVM_OP_insert_child(compiler, op_convert, op_convert->last, op_operand);
   SPVM_OP_insert_child(compiler, op_convert, op_convert->last, op_type);
@@ -1858,7 +1858,7 @@ SPVM_OP* SPVM_OP_build_convert(SPVM_COMPILER* compiler, SPVM_OP* op_convert, SPV
   return op_convert;
 }
 
-SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP* op_type, SPVM_OP* op_block, SPVM_OP* op_list_descriptors, SPVM_OP* op_extends) {
+SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP* op_type, SPVM_OP* op_block, SPVM_OP* op_list_attributes, SPVM_OP* op_extends) {
   
   // Class
   SPVM_CLASS* class = SPVM_CLASS_new(compiler);
@@ -1952,58 +1952,65 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
   
   class->name = op_name_class->uv.name;
 
-  // Default is private
-  class->access_control_type = SPVM_DESCRIPTOR_C_ID_PRIVATE;
-
-  // Class descriptors
-  int32_t class_descriptors_count = 0;
-  int32_t access_control_descriptors_count = 0;
-  if (op_list_descriptors) {
-    SPVM_OP* op_descriptor = op_list_descriptors->first;
-    while ((op_descriptor = SPVM_OP_sibling(compiler, op_descriptor))) {
-      SPVM_DESCRIPTOR* descriptor = op_descriptor->uv.descriptor;
-      switch (descriptor->id) {
-        case SPVM_DESCRIPTOR_C_ID_POINTER_T: {
+  // Class attributes
+  int32_t class_attributes_count = 0;
+  int32_t access_control_attributes_count = 0;
+  if (op_list_attributes) {
+    SPVM_OP* op_attribute = op_list_attributes->first;
+    while ((op_attribute = SPVM_OP_sibling(compiler, op_attribute))) {
+      SPVM_ATTRIBUTE* attribute = op_attribute->uv.attribute;
+      switch (attribute->id) {
+        case SPVM_ATTRIBUTE_C_ID_POINTER_T: {
           class->category = SPVM_CLASS_C_CATEGORY_CLASS;
           class->is_pointer = 1;
-          class_descriptors_count++;
+          class_attributes_count++;
           break;
         }
-        case SPVM_DESCRIPTOR_C_ID_MULNUM_T: {
+        case SPVM_ATTRIBUTE_C_ID_MULNUM_T: {
           class->category = SPVM_CLASS_C_CATEGORY_MULNUM;
-          class_descriptors_count++;
+          class_attributes_count++;
           break;
         }
-        case SPVM_DESCRIPTOR_C_ID_PRIVATE: {
-          // Default
-          access_control_descriptors_count++;
+        case SPVM_ATTRIBUTE_C_ID_PRIVATE: {
+          class->access_control_type = SPVM_ATTRIBUTE_C_ID_PRIVATE;
+          access_control_attributes_count++;
           break;
         }
-        case SPVM_DESCRIPTOR_C_ID_PUBLIC: {
-          class->access_control_type = SPVM_DESCRIPTOR_C_ID_PUBLIC;
-          access_control_descriptors_count++;
+        case SPVM_ATTRIBUTE_C_ID_PROTECTED: {
+          class->access_control_type = SPVM_ATTRIBUTE_C_ID_PROTECTED;
+          access_control_attributes_count++;
           break;
         }
-        case SPVM_DESCRIPTOR_C_ID_PRECOMPILE: {
+        case SPVM_ATTRIBUTE_C_ID_PUBLIC: {
+          class->access_control_type = SPVM_ATTRIBUTE_C_ID_PUBLIC;
+          access_control_attributes_count++;
+          break;
+        }
+        case SPVM_ATTRIBUTE_C_ID_PRECOMPILE: {
           class->is_precompile = 1;
           break;
         }
-        case SPVM_DESCRIPTOR_C_ID_INTERFACE_T: {
+        case SPVM_ATTRIBUTE_C_ID_INTERFACE_T: {
           class->category = SPVM_CLASS_C_CATEGORY_INTERFACE;
-          class_descriptors_count++;
+          class_attributes_count++;
           break;
         }
         default: {
-          SPVM_COMPILER_error(compiler, "Invalid class descriptor \"%s\" at %s line %d", SPVM_DESCRIPTOR_get_name(compiler, descriptor->id), op_class->file, op_class->line);
+          SPVM_COMPILER_error(compiler, "Invalid class attribute \"%s\" at %s line %d", SPVM_ATTRIBUTE_get_name(compiler, attribute->id), op_class->file, op_class->line);
         }
       }
     }
-    if (class_descriptors_count > 1) {
-      SPVM_COMPILER_error(compiler, "Only one of class descriptors \"mulnum_t\", \"pointer_t\" or \"interface_t\" can be specified at %s line %d", op_list_descriptors->file, op_list_descriptors->line);
+    if (class_attributes_count > 1) {
+      SPVM_COMPILER_error(compiler, "Only one of class attributes \"mulnum_t\", \"pointer_t\" or \"interface_t\" can be specified at %s line %d", op_list_attributes->file, op_list_attributes->line);
     }
-    if (access_control_descriptors_count > 1) {
-      SPVM_COMPILER_error(compiler, "Only one of class descriptors \"private\" or \"public\" can be specified at %s line %d", op_list_descriptors->file, op_list_descriptors->line);
+    if (access_control_attributes_count > 1) {
+      SPVM_COMPILER_error(compiler, "Only one of class attributes \"private\", \"protected\" or \"public\" can be specified at %s line %d", op_list_attributes->file, op_list_attributes->line);
     }
+  }
+  
+  // The default of the access controll is private
+  if (class->access_control_type == SPVM_ATTRIBUTE_C_ID_UNKNOWN) {
+    class->access_control_type = SPVM_ATTRIBUTE_C_ID_PRIVATE;
   }
   
   // Declarations
@@ -2086,11 +2093,11 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           SPVM_OP_insert_child(compiler, op_statements, op_statements->last, op_return);
           SPVM_OP_insert_child(compiler, op_block, op_block->last, op_statements);
 
-          SPVM_OP* op_list_descriptors = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
-          SPVM_OP* op_descriptor_static = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_STATIC, compiler->cur_file, compiler->cur_line);
-          SPVM_OP_insert_child(compiler, op_list_descriptors, op_list_descriptors->first, op_descriptor_static);
+          SPVM_OP* op_list_attributes = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
+          SPVM_OP* op_attribute_static = SPVM_OP_new_op_attribute(compiler, SPVM_ATTRIBUTE_C_ID_STATIC, compiler->cur_file, compiler->cur_line);
+          SPVM_OP_insert_child(compiler, op_list_attributes, op_list_attributes->first, op_attribute_static);
           
-          SPVM_OP_build_method(compiler, op_method, op_name_method, op_return_type, op_args, op_list_descriptors, op_block, NULL, NULL, 0, 0);
+          SPVM_OP_build_method(compiler, op_method, op_name_method, op_return_type, op_args, op_list_attributes, op_block, NULL, NULL, 0, 0);
 
           op_method->uv.method->is_class_var_getter = 1;
           op_method->uv.method->field_method_original_name = class_var->name;
@@ -2138,11 +2145,11 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           SPVM_OP_insert_child(compiler, op_statements, op_statements->last, op_assign);
           SPVM_OP_insert_child(compiler, op_block, op_block->last, op_statements);
 
-          SPVM_OP* op_list_descriptors = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
-          SPVM_OP* op_descriptor_static = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_STATIC, compiler->cur_file, compiler->cur_line);
-          SPVM_OP_insert_child(compiler, op_list_descriptors, op_list_descriptors->first, op_descriptor_static);
+          SPVM_OP* op_list_attributes = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
+          SPVM_OP* op_attribute_static = SPVM_OP_new_op_attribute(compiler, SPVM_ATTRIBUTE_C_ID_STATIC, compiler->cur_file, compiler->cur_line);
+          SPVM_OP_insert_child(compiler, op_list_attributes, op_list_attributes->first, op_attribute_static);
           
-          SPVM_OP_build_method(compiler, op_method, op_name_method, op_return_type, op_args, op_list_descriptors, op_block, NULL, NULL, 0, 0);
+          SPVM_OP_build_method(compiler, op_method, op_name_method, op_return_type, op_args, op_list_attributes, op_block, NULL, NULL, 0, 0);
           
           op_method->uv.method->is_class_var_setter = 1;
           op_method->uv.method->field_method_original_name = class_var->name;
@@ -2268,7 +2275,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           
           SPVM_TYPE* type_new_capture_var_decl = SPVM_TYPE_new(compiler, capture_var_decl->type->basic_type->id, capture_var_decl->type->dimension, capture_var_decl->type->flag);
           SPVM_OP* op_type_new_capture_var_decl = SPVM_OP_new_op_type(compiler, type_new_capture_var_decl, capture_var_decl->op_var_decl->file, capture_var_decl->op_var_decl->line);
-          SPVM_OP_build_has(compiler, op_field, op_name_field, NULL, op_type_new_capture_var_decl);
+          SPVM_OP_build_field(compiler, op_field, op_name_field, NULL, op_type_new_capture_var_decl);
           SPVM_LIST_push(class->fields, op_field->uv.field);
           op_field->uv.field->is_captured = 1;
         }
@@ -2286,6 +2293,22 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
     // Field declarations
     for (int32_t i = 0; i < class->fields->length; i++) {
       SPVM_FIELD* field = SPVM_LIST_get(class->fields, i);
+
+      // The default of the access controll of the field is private.
+      if (field->access_control_type == SPVM_ATTRIBUTE_C_ID_UNKNOWN) {
+        // If anon method, field is public
+        if (class->is_anon) {
+          field->access_control_type = SPVM_ATTRIBUTE_C_ID_PUBLIC;
+        }
+        // If multi-numeric type, field is public
+        else if (class->category == SPVM_CLASS_C_CATEGORY_MULNUM) {
+          field->access_control_type = SPVM_ATTRIBUTE_C_ID_PUBLIC;
+        }
+        // Default is private
+        else {
+          field->access_control_type = SPVM_ATTRIBUTE_C_ID_PRIVATE;
+        }
+      }
 
       if (class->is_pointer) {
         SPVM_COMPILER_error(compiler, "The pointer class can't have fields at %s line %d", field->op_field->file, field->op_field->line);
@@ -2375,14 +2398,14 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
       }
 
       if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
-        // Method having interface_t descriptor must be method
+        // Method having interface_t attribute must be method
         if (method->is_class_method) {
           SPVM_COMPILER_error(compiler, "The method defined in the interface must be an instance method at %s line %d", method->op_method->file, method->op_method->line);
         }
       }
       else if (class->category == SPVM_CLASS_C_CATEGORY_CLASS) {
         if (method->is_required) {
-          SPVM_COMPILER_error(compiler, "The method defined in the class can't have the method descriptor \"required\" at %s line %d", method->op_method->file, method->op_method->line);
+          SPVM_COMPILER_error(compiler, "The method defined in the class can't have the method attribute \"required\" at %s line %d", method->op_method->file, method->op_method->line);
         }
       }
       
@@ -2520,7 +2543,7 @@ SPVM_OP* SPVM_OP_build_implement(SPVM_COMPILER* compiler, SPVM_OP* op_interface,
   return op_interface;
 }
 
-SPVM_OP* SPVM_OP_build_our(SPVM_COMPILER* compiler, SPVM_OP* op_class_var, SPVM_OP* op_name, SPVM_OP* op_descriptors, SPVM_OP* op_type) {
+SPVM_OP* SPVM_OP_build_our(SPVM_COMPILER* compiler, SPVM_OP* op_class_var, SPVM_OP* op_name, SPVM_OP* op_attributes, SPVM_OP* op_type) {
   
   SPVM_CLASS_VAR* class_var = SPVM_CLASS_VAR_new(compiler);
   
@@ -2537,60 +2560,68 @@ SPVM_OP* SPVM_OP_build_our(SPVM_COMPILER* compiler, SPVM_OP* op_class_var, SPVM_
 
   op_class_var->uv.class_var = class_var;
 
-  class_var->access_control_type = SPVM_DESCRIPTOR_C_ID_PRIVATE;
-
-  // Class variable descriptors
-  if (op_descriptors) {
-    int32_t field_method_descriptors_count = 0;
-    int32_t access_control_descriptors_count = 0;
-    SPVM_OP* op_descriptor = op_descriptors->first;
-    while ((op_descriptor = SPVM_OP_sibling(compiler, op_descriptor))) {
-      SPVM_DESCRIPTOR* descriptor = op_descriptor->uv.descriptor;
+  // Class variable attributes
+  if (op_attributes) {
+    int32_t field_method_attributes_count = 0;
+    int32_t access_control_attributes_count = 0;
+    SPVM_OP* op_attribute = op_attributes->first;
+    while ((op_attribute = SPVM_OP_sibling(compiler, op_attribute))) {
+      SPVM_ATTRIBUTE* attribute = op_attribute->uv.attribute;
       
-      switch (descriptor->id) {
-        case SPVM_DESCRIPTOR_C_ID_PRIVATE: {
-          // Default is private
-          access_control_descriptors_count++;
+      switch (attribute->id) {
+        case SPVM_ATTRIBUTE_C_ID_PRIVATE: {
+          class_var->access_control_type = SPVM_ATTRIBUTE_C_ID_PRIVATE;
+          access_control_attributes_count++;
           break;
         }
-        case SPVM_DESCRIPTOR_C_ID_PUBLIC: {
-          class_var->access_control_type = SPVM_DESCRIPTOR_C_ID_PUBLIC;
-          access_control_descriptors_count++;
+        case SPVM_ATTRIBUTE_C_ID_PROTECTED: {
+          class_var->access_control_type = SPVM_ATTRIBUTE_C_ID_PROTECTED;
+          access_control_attributes_count++;
           break;
         }
-        case SPVM_DESCRIPTOR_C_ID_RW: {
+        case SPVM_ATTRIBUTE_C_ID_PUBLIC: {
+          class_var->access_control_type = SPVM_ATTRIBUTE_C_ID_PUBLIC;
+          access_control_attributes_count++;
+          break;
+        }
+        case SPVM_ATTRIBUTE_C_ID_RW: {
           class_var->has_setter = 1;
           class_var->has_getter = 1;
-          field_method_descriptors_count++;
+          field_method_attributes_count++;
           break;
         }
-        case SPVM_DESCRIPTOR_C_ID_RO: {
+        case SPVM_ATTRIBUTE_C_ID_RO: {
           class_var->has_getter = 1;
-          field_method_descriptors_count++;
+          field_method_attributes_count++;
           break;
         }
-        case SPVM_DESCRIPTOR_C_ID_WO: {
+        case SPVM_ATTRIBUTE_C_ID_WO: {
           class_var->has_setter = 1;
-          field_method_descriptors_count++;
+          field_method_attributes_count++;
           break;
         }
         default: {
-          SPVM_COMPILER_error(compiler, "Invalid class variable descriptor \"%s\" at %s line %d", SPVM_DESCRIPTOR_get_name(compiler, descriptor->id), op_descriptors->file, op_descriptors->line);
+          SPVM_COMPILER_error(compiler, "Invalid class variable attribute \"%s\" at %s line %d", SPVM_ATTRIBUTE_get_name(compiler, attribute->id), op_attributes->file, op_attributes->line);
         }
       }
-      if (field_method_descriptors_count > 1) {
-        SPVM_COMPILER_error(compiler, "Only one of class variable descriptors \"rw\", \"ro\", \"wo\" can be specifed at %s line %d", op_class_var->file, op_class_var->line);
+      if (field_method_attributes_count > 1) {
+        SPVM_COMPILER_error(compiler, "Only one of class variable attributes \"rw\", \"ro\", \"wo\" can be specifed at %s line %d", op_class_var->file, op_class_var->line);
       }
-      if (access_control_descriptors_count > 1) {
-        SPVM_COMPILER_error(compiler, "Only one of class variable descriptors \"private\" or \"public\" can be specified at %s line %d", op_class_var->file, op_class_var->line);
+      if (access_control_attributes_count > 1) {
+        SPVM_COMPILER_error(compiler, "Only one of class variable attributes \"private\", \"protected\" or \"public\" can be specified at %s line %d", op_class_var->file, op_class_var->line);
       }
     }
+  }
+  
+  // The default of the access controll of the class variable is private.
+  if (class_var->access_control_type == SPVM_ATTRIBUTE_C_ID_UNKNOWN) {
+    class_var->access_control_type = SPVM_ATTRIBUTE_C_ID_PRIVATE;
   }
   
   return op_class_var;
 }
 
-SPVM_OP* SPVM_OP_build_has(SPVM_COMPILER* compiler, SPVM_OP* op_field, SPVM_OP* op_name_field, SPVM_OP* op_descriptors, SPVM_OP* op_type) {
+SPVM_OP* SPVM_OP_build_field(SPVM_COMPILER* compiler, SPVM_OP* op_field, SPVM_OP* op_name_field, SPVM_OP* op_attributes, SPVM_OP* op_type) {
 
   // Create field information
   SPVM_FIELD* field = SPVM_FIELD_new(compiler);
@@ -2609,53 +2640,56 @@ SPVM_OP* SPVM_OP_build_has(SPVM_COMPILER* compiler, SPVM_OP* op_field, SPVM_OP* 
   // Set field informaiton
   op_field->uv.field = field;
 
-  field->access_control_type = SPVM_DESCRIPTOR_C_ID_PRIVATE;
-  
-  // Field descriptors
-  if (op_descriptors) {
-    SPVM_OP* op_descriptor = op_descriptors->first;
-    int32_t field_method_descriptors_count = 0;
-    int32_t access_control_descriptors_count = 0;
-    while ((op_descriptor = SPVM_OP_sibling(compiler, op_descriptor))) {
-      SPVM_DESCRIPTOR* descriptor = op_descriptor->uv.descriptor;
+  // Field attributes
+  if (op_attributes) {
+    SPVM_OP* op_attribute = op_attributes->first;
+    int32_t field_method_attributes_count = 0;
+    int32_t access_control_attributes_count = 0;
+    while ((op_attribute = SPVM_OP_sibling(compiler, op_attribute))) {
+      SPVM_ATTRIBUTE* attribute = op_attribute->uv.attribute;
       
-      switch (descriptor->id) {
-        case SPVM_DESCRIPTOR_C_ID_PRIVATE: {
-          // Default is private
-          access_control_descriptors_count++;
+      switch (attribute->id) {
+        case SPVM_ATTRIBUTE_C_ID_PRIVATE: {
+          field->access_control_type = SPVM_ATTRIBUTE_C_ID_PRIVATE;
+          access_control_attributes_count++;
           break;
         }
-        case SPVM_DESCRIPTOR_C_ID_PUBLIC: {
-          field->access_control_type = SPVM_DESCRIPTOR_C_ID_PUBLIC;
-          access_control_descriptors_count++;
+        case SPVM_ATTRIBUTE_C_ID_PROTECTED: {
+          field->access_control_type = SPVM_ATTRIBUTE_C_ID_PROTECTED;
+          access_control_attributes_count++;
           break;
         }
-        case SPVM_DESCRIPTOR_C_ID_RW: {
+        case SPVM_ATTRIBUTE_C_ID_PUBLIC: {
+          field->access_control_type = SPVM_ATTRIBUTE_C_ID_PUBLIC;
+          access_control_attributes_count++;
+          break;
+        }
+        case SPVM_ATTRIBUTE_C_ID_RW: {
           field->has_setter = 1;
           field->has_getter = 1;
-          field_method_descriptors_count++;
+          field_method_attributes_count++;
           break;
         }
-        case SPVM_DESCRIPTOR_C_ID_RO: {
+        case SPVM_ATTRIBUTE_C_ID_RO: {
           field->has_getter = 1;
-          field_method_descriptors_count++;
+          field_method_attributes_count++;
           break;
         }
-        case SPVM_DESCRIPTOR_C_ID_WO: {
+        case SPVM_ATTRIBUTE_C_ID_WO: {
           field->has_setter = 1;
-          field_method_descriptors_count++;
+          field_method_attributes_count++;
           break;
         }
         default: {
-          SPVM_COMPILER_error(compiler, "Invalid field descriptor \"%s\" at %s line %d", SPVM_DESCRIPTOR_get_name(compiler, descriptor->id), op_descriptors->file, op_descriptors->line);
+          SPVM_COMPILER_error(compiler, "Invalid field attribute \"%s\" at %s line %d", SPVM_ATTRIBUTE_get_name(compiler, attribute->id), op_attributes->file, op_attributes->line);
         }
       }
       
-      if (field_method_descriptors_count > 1) {
-        SPVM_COMPILER_error(compiler, "Only one of field descriptors \"rw\", \"ro\" or \"wo\" can be specifed at %s line %d", op_field->file, op_field->line);
+      if (field_method_attributes_count > 1) {
+        SPVM_COMPILER_error(compiler, "Only one of field attributes \"rw\", \"ro\" or \"wo\" can be specifed at %s line %d", op_field->file, op_field->line);
       }
-      if (access_control_descriptors_count > 1) {
-        SPVM_COMPILER_error(compiler, "Only one of field descriptors \"private\" or \"public\" can be specified at %s line %d", op_field->file, op_field->line);
+      if (access_control_attributes_count > 1) {
+        SPVM_COMPILER_error(compiler, "Only one of field attributes \"private\", \"protected\" or \"public\" can be specified at %s line %d", op_field->file, op_field->line);
       }
     }
   }
@@ -2665,7 +2699,7 @@ SPVM_OP* SPVM_OP_build_has(SPVM_COMPILER* compiler, SPVM_OP* op_field, SPVM_OP* 
   return op_field;
 }
 
-SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_OP* op_name_method, SPVM_OP* op_return_type, SPVM_OP* op_args, SPVM_OP* op_descriptors, SPVM_OP* op_block, SPVM_OP* op_captures, SPVM_OP* op_dot3, int32_t is_init, int32_t is_anon) {
+SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_OP* op_name_method, SPVM_OP* op_return_type, SPVM_OP* op_args, SPVM_OP* op_attributes, SPVM_OP* op_block, SPVM_OP* op_captures, SPVM_OP* op_dot3, int32_t is_init, int32_t is_anon) {
   SPVM_METHOD* method = SPVM_METHOD_new(compiler);
   
   // Is anon method
@@ -2702,56 +2736,64 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
     SPVM_COMPILER_error(compiler, "\"INIT\" can't be used as a method name at %s line %d", op_name_method->file, op_name_method->line);
   }
 
-  method->access_control_type = SPVM_DESCRIPTOR_C_ID_PUBLIC;
-
-  // Method descriptors
-  int32_t access_control_descriptors_count = 0;
-  if (op_descriptors) {
-    SPVM_OP* op_descriptor = op_descriptors->first;
-    while ((op_descriptor = SPVM_OP_sibling(compiler, op_descriptor))) {
-      SPVM_DESCRIPTOR* descriptor = op_descriptor->uv.descriptor;
+  // Method attributes
+  int32_t access_control_attributes_count = 0;
+  if (op_attributes) {
+    SPVM_OP* op_attribute = op_attributes->first;
+    while ((op_attribute = SPVM_OP_sibling(compiler, op_attribute))) {
+      SPVM_ATTRIBUTE* attribute = op_attribute->uv.attribute;
       
-      switch (descriptor->id) {
-        case SPVM_DESCRIPTOR_C_ID_PRIVATE: {
-          method->access_control_type = SPVM_DESCRIPTOR_C_ID_PRIVATE;
-          access_control_descriptors_count++;
+      switch (attribute->id) {
+        case SPVM_ATTRIBUTE_C_ID_PRIVATE: {
+          method->access_control_type = SPVM_ATTRIBUTE_C_ID_PRIVATE;
+          access_control_attributes_count++;
           break;
         }
-        case SPVM_DESCRIPTOR_C_ID_PUBLIC: {
-          // Default is public
-          access_control_descriptors_count++;
+        case SPVM_ATTRIBUTE_C_ID_PROTECTED: {
+          method->access_control_type = SPVM_ATTRIBUTE_C_ID_PROTECTED;
+          access_control_attributes_count++;
           break;
         }
-        case SPVM_DESCRIPTOR_C_ID_PRECOMPILE: {
+        case SPVM_ATTRIBUTE_C_ID_PUBLIC: {
+          method->access_control_type = SPVM_ATTRIBUTE_C_ID_PUBLIC;
+          access_control_attributes_count++;
+          break;
+        }
+        case SPVM_ATTRIBUTE_C_ID_PRECOMPILE: {
           method->is_precompile = 1;
           break;
         }
-        case SPVM_DESCRIPTOR_C_ID_REQUIRED: {
+        case SPVM_ATTRIBUTE_C_ID_REQUIRED: {
           method->is_required = 1;
           break;
         }
-        case SPVM_DESCRIPTOR_C_ID_NATIVE: {
+        case SPVM_ATTRIBUTE_C_ID_NATIVE: {
           method->is_native = 1;
           break;
         }
-        case SPVM_DESCRIPTOR_C_ID_STATIC: {
+        case SPVM_ATTRIBUTE_C_ID_STATIC: {
           method->is_class_method = 1;
           break;
         }
         default: {
-          SPVM_COMPILER_error(compiler, "Invalid method descriptor \"%s\" at %s line %d", SPVM_DESCRIPTOR_get_name(compiler, descriptor->id), op_descriptors->file, op_descriptors->line);
+          SPVM_COMPILER_error(compiler, "Invalid method attribute \"%s\" at %s line %d", SPVM_ATTRIBUTE_get_name(compiler, attribute->id), op_attributes->file, op_attributes->line);
         }
       }
     }
     
     if (method->is_native && method->is_precompile) {
-      SPVM_COMPILER_error(compiler, "Only one of method descriptors \"native\" and \"precompile\" can be specified at %s line %d", op_descriptors->file, op_descriptors->line);
+      SPVM_COMPILER_error(compiler, "Only one of method attributes \"native\" and \"precompile\" can be specified at %s line %d", op_attributes->file, op_attributes->line);
     }
-    if (access_control_descriptors_count > 1) {
-      SPVM_COMPILER_error(compiler, "Only one of method descriptors \"private\" or \"public\" can be specified at %s line %d", op_method->file, op_method->line);
+    if (access_control_attributes_count > 1) {
+      SPVM_COMPILER_error(compiler, "Only one of method attributes \"private\", \"protected\" or \"public\" can be specified at %s line %d", op_method->file, op_method->line);
     }
   }
-
+  
+  // The default of the access controll of the method is publice.
+  if (method->access_control_type == SPVM_ATTRIBUTE_C_ID_UNKNOWN) {
+    method->access_control_type = SPVM_ATTRIBUTE_C_ID_PUBLIC;
+  }
+  
   // Native method can't have block
   if ((method->is_native) && op_block) {
     SPVM_COMPILER_error(compiler, "The native method can't have the block at %s line %d", op_block->file, op_block->line);
@@ -2933,12 +2975,12 @@ SPVM_OP* SPVM_OP_build_enumeration_value(SPVM_COMPILER* compiler, SPVM_OP* op_na
   // Type
   SPVM_OP* op_return_type = SPVM_OP_new_op_type(compiler, op_constant->uv.constant->type, op_name->file, op_name->line);
 
-  SPVM_OP* op_list_descriptors = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
-  SPVM_OP* op_descriptor_static = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_STATIC, compiler->cur_file, compiler->cur_line);
-  SPVM_OP_insert_child(compiler, op_list_descriptors, op_list_descriptors->first, op_descriptor_static);
+  SPVM_OP* op_list_attributes = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
+  SPVM_OP* op_attribute_static = SPVM_OP_new_op_attribute(compiler, SPVM_ATTRIBUTE_C_ID_STATIC, compiler->cur_file, compiler->cur_line);
+  SPVM_OP_insert_child(compiler, op_list_attributes, op_list_attributes->first, op_attribute_static);
   
   // Build method
-  op_method = SPVM_OP_build_method(compiler, op_method, op_name, op_return_type, NULL, op_list_descriptors, op_block, NULL, NULL, 0, 0);
+  op_method = SPVM_OP_build_method(compiler, op_method, op_name, op_return_type, NULL, op_list_attributes, op_block, NULL, NULL, 0, 0);
   
   // Set constant
   op_method->uv.method->op_inline = op_constant;
@@ -2949,7 +2991,7 @@ SPVM_OP* SPVM_OP_build_enumeration_value(SPVM_COMPILER* compiler, SPVM_OP* op_na
   return op_method;
 }
 
-SPVM_OP* SPVM_OP_build_enumeration(SPVM_COMPILER* compiler, SPVM_OP* op_enumeration, SPVM_OP* op_enumeration_block, SPVM_OP* op_descriptors) {
+SPVM_OP* SPVM_OP_build_enumeration(SPVM_COMPILER* compiler, SPVM_OP* op_enumeration, SPVM_OP* op_enumeration_block, SPVM_OP* op_attributes) {
   
   SPVM_OP_insert_child(compiler, op_enumeration, op_enumeration->last, op_enumeration_block);
   
@@ -2958,34 +3000,42 @@ SPVM_OP* SPVM_OP_build_enumeration(SPVM_COMPILER* compiler, SPVM_OP* op_enumerat
   while ((op_method = SPVM_OP_sibling(compiler, op_method))) {
     SPVM_METHOD* method = op_method->uv.method;
 
-    method->access_control_type = SPVM_DESCRIPTOR_C_ID_PUBLIC;
-
-    // Enumeration descriptors
-    int32_t access_control_descriptors_count = 0;
-    if (op_descriptors) {
-      SPVM_OP* op_descriptor = op_descriptors->first;
-      while ((op_descriptor = SPVM_OP_sibling(compiler, op_descriptor))) {
-        SPVM_DESCRIPTOR* descriptor = op_descriptor->uv.descriptor;
+    // Enumeration attributes
+    int32_t access_control_attributes_count = 0;
+    if (op_attributes) {
+      SPVM_OP* op_attribute = op_attributes->first;
+      while ((op_attribute = SPVM_OP_sibling(compiler, op_attribute))) {
+        SPVM_ATTRIBUTE* attribute = op_attribute->uv.attribute;
         
-        switch (descriptor->id) {
-          case SPVM_DESCRIPTOR_C_ID_PRIVATE: {
-            method->access_control_type = SPVM_DESCRIPTOR_C_ID_PRIVATE;
-            access_control_descriptors_count++;
+        switch (attribute->id) {
+          case SPVM_ATTRIBUTE_C_ID_PRIVATE: {
+            method->access_control_type = SPVM_ATTRIBUTE_C_ID_PRIVATE;
+            access_control_attributes_count++;
             break;
           }
-          case SPVM_DESCRIPTOR_C_ID_PUBLIC: {
-            // Default is public
-            access_control_descriptors_count++;
+          case SPVM_ATTRIBUTE_C_ID_PROTECTED: {
+            method->access_control_type = SPVM_ATTRIBUTE_C_ID_PROTECTED;
+            access_control_attributes_count++;
+            break;
+          }
+          case SPVM_ATTRIBUTE_C_ID_PUBLIC: {
+            method->access_control_type = SPVM_ATTRIBUTE_C_ID_PUBLIC;
+            access_control_attributes_count++;
             break;
           }
           default: {
-            SPVM_COMPILER_error(compiler, "Invalid enumeration descriptor \"%s\" at %s line %d", SPVM_DESCRIPTOR_get_name(compiler, descriptor->id), op_descriptors->file, op_descriptors->line);
+            SPVM_COMPILER_error(compiler, "Invalid enumeration attribute \"%s\" at %s line %d", SPVM_ATTRIBUTE_get_name(compiler, attribute->id), op_attributes->file, op_attributes->line);
           }
         }
       }
-      if (access_control_descriptors_count > 1) {
-        SPVM_COMPILER_error(compiler, "Only one of enumeration descriptors \"private\" or \"public\" can be specified at %s line %d", op_method->file, op_method->line);
+      if (access_control_attributes_count > 1) {
+        SPVM_COMPILER_error(compiler, "Only one of enumeration attributes \"private\", \"protected\" or \"public\" can be specified at %s line %d", op_method->file, op_method->line);
       }
+    }
+    
+    // The default of the access controll of the enumeration is public.
+    if (method->access_control_type == SPVM_ATTRIBUTE_C_ID_UNKNOWN) {
+      method->access_control_type = SPVM_ATTRIBUTE_C_ID_PUBLIC;
     }
   }
   
@@ -2995,7 +3045,7 @@ SPVM_OP* SPVM_OP_build_enumeration(SPVM_COMPILER* compiler, SPVM_OP* op_enumerat
   return op_enumeration;
 }
 
-SPVM_OP* SPVM_OP_build_arg(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op_type, SPVM_OP* op_descriptors, SPVM_OP* op_optional_arg_default) {
+SPVM_OP* SPVM_OP_build_arg(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op_type, SPVM_OP* op_attributes, SPVM_OP* op_optional_arg_default) {
   
   SPVM_OP* op_var_decl = SPVM_OP_new_op_var_decl_eternal(compiler, op_var->file, op_var->line);
 
@@ -3003,12 +3053,12 @@ SPVM_OP* SPVM_OP_build_arg(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op
   
   op_var_decl->uv.var_decl->op_optional_arg_default = op_optional_arg_default;
   
-  op_var = SPVM_OP_build_var_decl(compiler, op_var_decl, op_var, op_type, op_descriptors);
+  op_var = SPVM_OP_build_var_decl(compiler, op_var_decl, op_var, op_type, op_attributes);
   
   return op_var;
 }
 
-SPVM_OP* SPVM_OP_build_var_decl(SPVM_COMPILER* compiler, SPVM_OP* op_var_decl, SPVM_OP* op_var, SPVM_OP* op_type, SPVM_OP* op_descriptors) {
+SPVM_OP* SPVM_OP_build_var_decl(SPVM_COMPILER* compiler, SPVM_OP* op_var_decl, SPVM_OP* op_var, SPVM_OP* op_type, SPVM_OP* op_attributes) {
   
   // Declaration
   op_var->uv.var->is_declaration = 1;

@@ -1,0 +1,13 @@
+package Glitches;
+
+use Glitch (
+	glitch_logger => sub {
+		print $_[0] . "\n";
+	},
+	glitch_logger_format => 'json',
+	one => {
+		message => 'this is a test'
+	}
+);
+
+1;

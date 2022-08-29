@@ -63,6 +63,7 @@ Files: Changes
  t/40mite/lib/MyTest.pm.mite.pm
  t/40mite/lib/MyTest/Class1.pm
  t/40mite/lib/MyTest/Class1.pm.mite.pm
+ t/40mite/lib/MyTest/Mite.pm
  t/40mite/lib/MyTest/Role1.pm
  t/40mite/lib/MyTest/Role1.pm.mite.pm
  t/40mite/lib/MyTest/Role2.pm
@@ -181,11 +182,6 @@ License: public-domain
 
 Files: t/01basic.t
 Copyright: This software is copyright (c) 2020 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/40mite/lib/MyTest/Mite.pm
-Copyright: This software is copyright (c) 2011-2014 by Michael G Schwern.
- This software is copyright (c) 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

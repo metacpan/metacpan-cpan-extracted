@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMem.pm
-## Version v0.3.3
+## Version v0.3.4
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2022/08/05
+## Modified 2022/08/28
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -42,7 +42,10 @@ BEGIN
         $^O !~ /^(?:Android|dos|MSWin32|os2|VMS|riscos)/i &&
         # we need semaphore and messages
         $Config{d_sem} eq 'define' &&
-        $Config{d_msg} eq 'define'
+        $Config{d_msg} eq 'define' &&
+        $Config{d_semctl} eq 'define' &&
+        $Config{d_semget} eq 'define' &&
+        $Config{d_semop} eq 'define'
         )
     {
         require IPC::SysV;
@@ -109,7 +112,7 @@ EOT
             lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
             'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.3.3';
+    our $VERSION = 'v0.3.4';
 };
 
 # use strict;
@@ -752,7 +755,7 @@ sub unlock
     $type ^= LOCK_NB if( $type & LOCK_NB );
     if( defined( $self->op( @{$SEMOP_ARGS->{ $type }} ) ) )
     {
-        $self->locked( 0 );
+        $self->locked(0);
     }
     return( $self );
 }

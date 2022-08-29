@@ -19,6 +19,7 @@ Sub::HandlesVia::HandlerLibrary::Hash - library of hash-related methods
         'my_count' => 'count',
         'my_defined' => 'defined',
         'my_delete' => 'delete',
+        'my_delete_where' => 'delete_where',
         'my_elements' => 'elements',
         'my_exists' => 'exists',
         'my_for_each_key' => 'for_each_key',
@@ -88,6 +89,20 @@ Removes a value from the hashref by its key.
   my $object = My::Class->new( attr => { foo => 0, bar => 1 } );
   $object->my_delete( 'foo' );
   say exists $object->attr->{foo}; ## ==> false
+
+=head2 C<< delete_where( $match ) >>
+
+Arguments: B<< CodeRef|RegexpRef >>.
+
+Removes values from the hashref by matching keys against a coderef or regexp.
+
+  my $object = My::Class->new( attr => { foo => 0, bar => 1, baz => 2 } );
+  $object->my_delete_where( sub { $_ eq 'foo' or $_ eq 'bar' } );
+  say Dumper( $object->attr ); ## ==> { baz => 2 }
+  
+  my $object2 = My::Class->new( attr => { foo => 0, bar => 1, baz => 2 } );
+  $object2->my_delete_where( qr/^b/ );
+  say Dumper( $object2->attr ); ## ==> { foo => 0 }
 
 =head2 C<< elements() >>
 

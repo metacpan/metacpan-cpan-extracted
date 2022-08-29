@@ -1,5 +1,5 @@
 package Lab::Generic::CLOptions;
-$Lab::Generic::CLOptions::VERSION = '3.821';
+$Lab::Generic::CLOptions::VERSION = '3.822';
 #ABSTRACT: Global command line option processing
 
 use v5.20;
@@ -28,7 +28,7 @@ Lab::Generic::CLOptions - Global command line option processing
 
 =head1 VERSION
 
-version 3.821
+version 3.822
 
 =head1 COPYRIGHT AND LICENSE
 

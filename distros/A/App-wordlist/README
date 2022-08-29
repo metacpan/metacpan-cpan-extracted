@@ -2,8 +2,8 @@ NAME
     App::wordlist - Grep words from (or test them against) WordList::*
 
 VERSION
-    This document describes version 0.290 of App::wordlist (from Perl
-    distribution App-wordlist), released on 2022-08-20.
+    This document describes version 0.291 of App::wordlist (from Perl
+    distribution App-wordlist), released on 2022-08-28.
 
 SYNOPSIS
     See the included script wordlist.
@@ -219,7 +219,8 @@ FUNCTIONS
 
     *   or => *bool*
 
-        Match any word in query instead of the default "all".
+        Instead of printing words that must match all queries (the default),
+        print words that match any query.
 
     *   random => *bool*
 
@@ -336,7 +337,8 @@ FUNCTIONS
 
     *   or => *bool*
 
-        Match any word in query instead of the default "all".
+        Instead of printing words that must match all queries (the default),
+        print words that match any query.
 
     *   random => *bool*
 

@@ -1,5 +1,8 @@
 Revision history for Business-cXML
 
+v0.6.10 2022-08-24
+		Bugfix: remove explicit encoding attribute from XML tag
+
 v0.6.9  2022-07-26
 		Bugfix: work around double UTF-8 encoding issue
 

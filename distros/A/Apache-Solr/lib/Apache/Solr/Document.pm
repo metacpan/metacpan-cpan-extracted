@@ -8,7 +8,7 @@
 
 package Apache::Solr::Document;
 use vars '$VERSION';
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 
 use warnings;
@@ -88,8 +88,12 @@ sub content($)
 
 our $AUTOLOAD;
 sub AUTOLOAD
-{   (my $fn = $AUTOLOAD) =~ s/.*\:\:_//;
-    shift->content($fn);
+{   my $self = shift;
+    my $fn = $AUTOLOAD =~ s/.*\:\://r;
+
+      $fn =~ /^_(.*)/    ? $self->content($1)
+    : $fn eq 'DESTROY'   ? undef
+    : panic "Unknown method $AUTOLOAD (hint: fields start with '_')";
 }
 
 

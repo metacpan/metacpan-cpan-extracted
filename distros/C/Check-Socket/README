@@ -33,10 +33,10 @@ ERRORS
                      IO extension unavailable.
                      $^O: AF_UNIX unavailable or disabled.
                      $^O: Compiled without TCP/IP stack v4.
-                     $^O: Skip sockets on CI
+                     $^O: Skip sockets on CI.
                      $^O: UNIX domain sockets not implemented.
 
-EXAMPLE
+EXAMPLE1
      use strict;
      use warnings;
 
@@ -51,6 +51,26 @@ EXAMPLE
 
      # Output on Unix:
      # We could use socket communication.
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Check::Fork qw(check_fork);
+     use Check::Socket qw(check_socket);
+
+     if (! check_fork()) {
+             print "We couldn't fork.\n";
+             print "Error message: $Check::Fork::ERROR_MESSAGE\n";
+     } elsif (! check_socket()) {
+             print "We couldn't use socket communication.\n";
+             print "Error message: $Check::Socket::ERROR_MESSAGE\n";
+     } else {
+             print "We could use fork and socket communication.\n";
+     }
+
+     # Output on Unix:
+     # We could use fork and socket communication.
 
 DEPENDENCIES
     Config, Exporter, IO::Socket, Readonly.

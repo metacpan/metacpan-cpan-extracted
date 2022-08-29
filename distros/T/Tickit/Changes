@@ -1,5 +1,11 @@
 Revision history for Changes
 
+0.73    2022-08-26
+        [CHANGES]
+         * Use libtickit 0.4.3
+         * Use `eval {}` instead of `$SIG{__DIE__}` for exception trapping
+         * Use core perl's `mPUSHpvs()` where available
+
 0.72    2021-08-18
         [CHANGES]
          * Use libtickit 0.4.2

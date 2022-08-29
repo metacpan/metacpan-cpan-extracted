@@ -1,11 +1,15 @@
-use 5.014;
+package main;
+
+use 5.018;
 
 use strict;
 use warnings;
-use routines;
 
-use Test::Auto;
 use Test::More;
+use Venus::Test;
+
+my $test = test(__FILE__);
+my $seed = 42;
 
 =name
 
@@ -13,88 +17,162 @@ Faker::Plugin::AddressLatitude
 
 =cut
 
-=abstract
+$test->for('name');
 
-Address Latitude Plugin for Faker
+=tagline
+
+Address Latitude
 
 =cut
 
+$test->for('tagline');
+
+=abstract
+
+Address Latitude for Faker
+
+=cut
+
+$test->for('abstract');
+
 =includes
 
+method: new
 method: execute
 
 =cut
 
-=libraries
-
-Types::Standard
-
-=cut
+$test->for('includes');
 
 =synopsis
 
   package main;
 
-  use Faker;
   use Faker::Plugin::AddressLatitude;
 
-  my $f = Faker->new;
-  my $p = Faker::Plugin::AddressLatitude->new(faker => $f);
+  my $plugin = Faker::Plugin::AddressLatitude->new;
 
-  my $plugin = $p;
-
-=cut
-
-=inherits
-
-Data::Object::Plugin
+  # bless(..., "Faker::Plugin::AddressLatitude")
 
 =cut
 
-=attributes
+$test->for('synopsis', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Faker::Plugin::AddressLatitude');
 
-faker: ro, req, ConsumerOf["Faker::Maker"]
-
-=cut
+  $result
+});
 
 =description
 
-This package provides methods for generating fake address latitude data.
+This package provides methods for generating fake data for address latitude.
+
++=encoding utf8
 
 =cut
+
+$test->for('description');
+
+=inherits
+
+Faker::Plugin
+
+=cut
+
+$test->for('inherits');
 
 =method execute
 
-The execute method returns a random fake address latitude.
+The execute method returns a returns a random fake address latitude.
 
 =signature execute
 
-execute() : Str
+  execute(HashRef $data) (Str)
+
+=metadata execute
+
+{
+  since => '1.10',
+}
 
 =example-1 execute
 
-  # given: synopsis
+  package main;
 
-  $p->execute;
+  use Faker::Plugin::AddressLatitude;
+
+  my $plugin = Faker::Plugin::AddressLatitude->new;
+
+  # bless(..., "Faker::Plugin::AddressLatitude")
+
+  # my $result = $plugin->execute;
+
+  # 30.843133;
+
+  # my $result = $plugin->execute;
+
+  # 77.079663;
+
+  # my $result = $plugin->execute;
+
+  # -41.660985;
 
 =cut
 
-package main;
-
-my $test = testauto(__FILE__);
-
-my $subs = $test->standard;
-
-$subs->synopsis(fun($tryable) {
+$test->for('example', 1, 'execute', sub {
+  my ($tryable) = @_;
   ok my $result = $tryable->result;
+  ok $result->isa('Faker::Plugin::AddressLatitude');
+  ok $result->faker;
+  ok $result->faker->random->reseed($seed);
+  ok $result->faker->random->make; # reset randomizer
+  is $result->execute, 30.843133;
+  ok $result->faker->random->make; # reset randomizer
+  is $result->execute, 77.079663;
+  ok $result->faker->random->make; # reset randomizer
+  is $result->execute, -41.660985;
 
   $result
 });
 
-$subs->example(-1, 'execute', 'method', fun($tryable) {
+=method new
+
+The new method returns a new instance of the class.
+
+=signature new
+
+  new(HashRef $data) (Plugin)
+
+=metadata new
+
+{
+  since => '1.10',
+}
+
+=example-1 new
+
+  package main;
+
+  use Faker::Plugin::AddressLatitude;
+
+  my $plugin = Faker::Plugin::AddressLatitude->new;
+
+  # bless(..., "Faker::Plugin::AddressLatitude")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
   ok my $result = $tryable->result;
+  ok $result->isa('Faker::Plugin::AddressLatitude');
+  ok $result->faker;
 
   $result
 });
+
+# END
+
+$test->render('lib/Faker/Plugin/AddressLatitude.pod') if $ENV{RENDER};
 
 ok 1 and done_testing;

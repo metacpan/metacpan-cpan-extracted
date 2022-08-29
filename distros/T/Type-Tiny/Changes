@@ -7,6 +7,15 @@ Home page:    <https://metacpan.org/release/Type-Tiny>
 Bug tracker:  <https://github.com/tobyink/p5-type-tiny/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+1.016009	2022-08-27
+
+ [ Bug Fixes ]
+ - Parameterizable type constraints have a name generator, which is a
+   coderef that generates the names of their parameterized child type
+   constraints. The default name generator now strips ASCII control
+   characters (such as null, tab, and new line) from names it generates.
+   sbuggles++
+
 1.016008	2022-08-14
 
  - Added: Type::Params now has a `goto_next` option, which if set to a

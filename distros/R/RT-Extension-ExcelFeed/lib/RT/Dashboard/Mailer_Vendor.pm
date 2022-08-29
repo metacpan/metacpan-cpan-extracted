@@ -179,7 +179,15 @@ SUMMARY
     );
 }
 
-sub BuildEmail {
+
+my $original_build_email = \&RT::Dashboard::Mailer::BuildEmail;
+
+*BuildEmail = sub {
+
+    # First process normally
+    my $entity = &$original_build_email( @_ );
+
+    # Now add an excel attachment, if we have one
     my $self = shift;
     my %args = (
         Content => undef,
@@ -189,73 +197,6 @@ sub BuildEmail {
         Attachments => undef,
         @_,
     );
-
-    my @parts;
-    my %cid_of;
-
-    my $content = HTML::RewriteAttributes::Resources->rewrite($args{Content}, sub {
-            my $uri = shift;
-
-            # already attached this object
-            return "cid:$cid_of{$uri}" if $cid_of{$uri};
-
-            my ($data, $filename, $mimetype, $encoding) = GetResource($uri);
-            return $uri unless defined $data;
-
-            $cid_of{$uri} = time() . $$ . int(rand(1e6));
-
-            # Encode textual data in UTF-8, and downgrade (treat
-            # codepoints as codepoints, and ensure the UTF-8 flag is
-            # off) everything else.
-            my @extra;
-            if ( $mimetype =~ m{text/} ) {
-                $data = Encode::encode( "UTF-8", $data );
-                @extra = ( Charset => "UTF-8" );
-            } else {
-                utf8::downgrade( $data, 1 ) or $RT::Logger->warning("downgrade $data failed");
-            }
-
-            push @parts, MIME::Entity->build(
-                Top          => 0,
-                Data         => $data,
-                Type         => $mimetype,
-                Encoding     => $encoding,
-                Disposition  => 'inline',
-                Name         => RT::Interface::Email::EncodeToMIME( String => $filename ),
-                'Content-Id' => $cid_of{$uri},
-                @extra,
-            );
-
-            return "cid:$cid_of{$uri}";
-        },
-        inline_css => sub {
-            my $uri = shift;
-            my ($content) = GetResource($uri);
-            return defined $content ? $content : "";
-        },
-        inline_imports => 1,
-    );
-
-    my $entity = MIME::Entity->build(
-        From    => Encode::encode("UTF-8", $args{From}),
-        To      => Encode::encode("UTF-8", $args{To}),
-        Subject => RT::Interface::Email::EncodeToMIME( String => $args{Subject} ),
-        Type    => "multipart/mixed",
-    );
-
-    $entity->attach(
-        Type        => 'text/html',
-        Charset     => 'UTF-8',
-        Data        => Encode::encode("UTF-8", $content),
-        Disposition => 'inline',
-        Encoding    => "base64",
-    );
-
-    for my $part (@parts) {
-        $entity->add_part($part);
-    }
-
-    $entity->make_singlepart;
 
     if ( defined $args{'Attachments'} and @{$args{'Attachments'}} ){
         foreach my $attachment (@{$args{'Attachments'}}){
@@ -269,7 +210,8 @@ sub BuildEmail {
     }
 
     return $entity;
-}
+};
+
 
 1;
 

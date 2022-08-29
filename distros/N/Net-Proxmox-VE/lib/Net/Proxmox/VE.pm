@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE;
-$Net::Proxmox::VE::VERSION = '0.35';
+$Net::Proxmox::VE::VERSION = '0.36';
 
 use Carp qw( croak );
 use HTTP::Headers;
@@ -76,12 +76,8 @@ sub action {
             'CSRFPreventionToken' => $self->{ticket}->{CSRFPreventionToken} );
     }
 
-# Not sure why but the php api for proxmox ve uses PUT instead of post for
-# most things, the api doc only lists GET|POST|DELETE and the api returns 'PUT' as
-# an unrecognised method
-# so we'll just force POST from PUT
     if ( $params{method} =~ m/^(PUT|POST)$/ ) {
-        $request->method( $params{method} );    # Patch removed
+        $request->method( $params{method} );
         my $content = join '&', map { $_ . '=' . $params{post_data}->{$_} }
           sort keys %{ $params{post_data} };
         $request->content($content);
@@ -324,7 +320,7 @@ Net::Proxmox::VE - Pure perl API for Proxmox virtualisation
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 SYNOPSIS
 
@@ -503,14 +499,15 @@ http://pve.proxmox.com/pve2-api-doc
 
 =head1 AUTHOR
 
-Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@bytefoundry.com.au>
+Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Dean Hamstad.
+This software is Copyright (c) 2022 by Dean Hamstad.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut
 

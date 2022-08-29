@@ -7,14 +7,17 @@ use Math::DifferenceSet::Planar;
 
 $| = 1;
 
-my $terse = 0;
-my $full = 0;
+my $full      = 0;
+my $max_elems = 0;
 while (@ARGV && $ARGV[0] =~ /^-(.+)\z/s) {
     my $opt = $1;
     shift @ARGV;
-    last            if '-' eq $opt;
-    $full = 1, next if 'f' eq $opt;
-    die "usage: pds_linear_maps [-f] [file]...\n";
+    last                           if '-' eq $opt;
+    $full = 1,                next if 'f' eq $opt;
+    $max_elems = $1,          next if $opt =~ /^E(0|[1-9][0-9]*)\z/;
+    $max_elems = shift @ARGV, next
+        if 'E' eq $opt && @ARGV && $ARGV[0] =~ /^(0|[1-9][0-9]*)\z/;
+    die "usage: pds_linear_maps [-E max_elems] [-f] [file]...\n";
 }
 
 my @sets    = ();
@@ -52,8 +55,8 @@ foreach my $s2 (@sets) {
 sub fmt_set {
     my ($set) = @_;
     my @e = $set->elements_sorted;
-    if (@e > 5) {
-        splice @e, 4, @e - 4, '...';
+    if ($max_elems && @e > $max_elems) {
+        splice @e, $max_elems, @e - $max_elems, '...';
     }
     return '{' . join(',', @e) . '}';
 }
@@ -65,7 +68,7 @@ pds_linear_maps - find linear map functions between planar difference sets
 
 =head1 SYNOPSIS
 
-  pds_linear_maps [-f] [file]...
+  pds_linear_maps [-E max_elems] [-f] [file]...
 
 =head1 DESCRIPTION
 
@@ -76,16 +79,21 @@ them prints linear functions mapping one of them to the other.
 With option B<-f>, all such mappings are displayed.  Otherwise, a single
 mapping for each combination of two different input lines is displayed.
 
+With option B<-E> and a parameter I<max_elements>, sets with more
+than I<max_elements> elements will be abbreviated.  A zero value of
+I<max_elements> means no limitation.
+
+Sets in the input must be equally long.
+
 =head1 BUGS AND LIMITATIONS
 
 The existence and frequency of linear mappings between planar difference
 sets, as well as our algorithms, depend partly on conjectures.  This tool
 thus may fail to find some solutions.
 
-This tool will be most practical for small sets.  Mapping sets with
-hundreds of thousands of elements could take hours.  Another limitation
-depends on the database of sample sets on your platform.  It will always
-support orders up to 2**12 but rarely much more than 2**17.
+This tool has a size limitation depending on the database of sample sets
+on your platform.  It will always support orders up to 2**12 but rarely
+much more than 2**17.
 
 =head1 AUTHOR
 

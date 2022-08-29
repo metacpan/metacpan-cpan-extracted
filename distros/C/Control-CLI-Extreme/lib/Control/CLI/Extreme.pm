@@ -7,7 +7,7 @@ use Carp;
 use Control::CLI qw( :all );
 
 my $Package = __PACKAGE__;
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 our @ISA = qw(Control::CLI);
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
@@ -212,7 +212,7 @@ my $LastPromptClense = '^(?:\x0d? *\x0d|\x10\x00)'; # When capturing lastprompt,
 my %MorePrompt = ( # Regular expression character like ()[]. need to be backslashed
 	$Prm{bstk}		=>	'----More \(q=Quit, space/return=Continue\)----',
 	"$Prm{pers}_cli"	=>	'\n\x0d?--More-- \(q = quit\) ',
-	"$Prm{pers}_nncli"	=>	'\n\x0d?--More-- \(q = quit\) |--More--',
+	"$Prm{pers}_nncli"	=>	'\n\x0d?--More-- ?\(q = quit\) ?|--More--', # More prompt on command syntax does not have the spaces..
 	$Prm{xlr}		=>	'--More-- \(q = quit\) ',
 	$Prm{sr}		=>	'Press any key to continue \(q : quit\) :\x00|Press any key to continue \(q : quit \| enter : next line\) :\x00',
 	$Prm{trpz}		=>	'press any key to continue, q to quit\.',
@@ -2655,8 +2655,8 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 		($attrib->{attribute} eq 'sw_version' || $attrib->{attribute} eq 'fw_version') && do {
 			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show version']);
 			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
-			$$outref =~ /Image   : ExtremeXOS version (.+) by /g && $self->_setAttrib('sw_version', $1);
-			$$outref =~ /BootROM : (.+)/g && $self->_setAttrib('fw_version', $1);
+			$$outref =~ /Image   : Extreme(?:XOS| Networks Switch Engine) version (.+) by /g && $self->_setAttrib('sw_version', $1);
+			$$outref =~ /BootROM : (?:Default )?(\S+)/g && $self->_setAttrib('fw_version', $1);
 			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
 			return $self->poll_return(1);
 		};
@@ -3623,21 +3623,28 @@ sub cmdPrivExec { # If nncli send command in PrivExec mode and restore mode on e
 
 	if ($self->{$Package}{ATTRIB}{'is_nncli'}) {
 		if ($cmdPrivExec->{stage} < 1) { # 1st stage
-			if ($cmdPrivExec->{userExec} = $self->last_prompt =~ />\s?$/) {
-				$ok = $self->poll_enable($pkgsub);
+			if ($self->{WRITEFLAG}) { # Directs writes were performed, need a new prompt to be sure about last_prompt
+				$ok = $self->poll_cmd($pkgsub, '');	# Send just carriage return
 				return $ok unless $ok;
 			}
 			$cmdPrivExec->{stage}++; # Move to 2nd stage
 		}
 		if ($cmdPrivExec->{stage} < 2) { # 2nd stage
+			if ($cmdPrivExec->{userExec} = $self->last_prompt =~ />\s?$/) {
+				$ok = $self->poll_enable($pkgsub);
+				return $ok unless $ok;
+			}
+			$cmdPrivExec->{stage}++; # Move to 3rd stage
+		}
+		if ($cmdPrivExec->{stage} < 3) { # 3rd stage
 			($ok, $outref, $resref) = $self->poll_cmd($pkgsub, Command => $cmdnncli, More_pages => $morePages);
 			return $ok unless $ok;
 			$cmdPrivExec->{outref} = $outref;
 			$cmdPrivExec->{resref} = $resref;
-			$cmdPrivExec->{stage}++; # Move to 3rd stage
+			$cmdPrivExec->{stage}++; # Move to 4th stage
 		}
-		if ($cmdPrivExec->{stage} < 3) { # 3rd stage
-			$cmdPrivExec->{stage}++; # Move to 4th stage - we only spend one cycle here
+		if ($cmdPrivExec->{stage} < 4) { # 4th stage
+			$cmdPrivExec->{stage}++; # Move to 5th stage - we only spend one cycle here
 			if ($cmdPrivExec->{userExec}) {
 				my $disableCmd;
 				if (defined $ExitPrivExec{$familyType}) {
@@ -3651,11 +3658,11 @@ sub cmdPrivExec { # If nncli send command in PrivExec mode and restore mode on e
 				$self->debugMsg(8,"\ncmdPrivExec() Sending command:>", \$disableCmd, "<\n");
 			}
 		}
-		if ($cmdPrivExec->{stage} < 4) { # 4th stage
+		if ($cmdPrivExec->{stage} < 5) { # 5th stage
 			if ($cmdPrivExec->{userExec}) {
-				($ok, undef, $resref) = $self->poll_cmd($pkgsub);
+				$ok = $self->poll_cmd($pkgsub); # We don't bother getting $resref here...
 				return $ok unless $ok;
-				return ($ok, undef, $resref) unless $$resref;
+				# ... because even if $$resref was false, we want to fall through
 			}
 			($outref, $resref) = ($cmdPrivExec->{outref}, $cmdPrivExec->{resref});
 			$self->{POLL}{$pollsub} = undef;	# Undef once completed
@@ -3690,38 +3697,45 @@ sub cmdConfig { # If nncli send command in Config mode and restore mode on exit;
 
 	if ($self->{$Package}{ATTRIB}{'is_nncli'}) {
 		if ($cmdConfig->{stage} < 1) { # 1st stage
-			if ($cmdConfig->{userExec} = $self->last_prompt =~ />\s?$/) {
-				$ok = $self->poll_enable($pkgsub);
+			if ($self->{WRITEFLAG}) { # Directs writes were performed, need a new prompt to be sure about last_prompt
+				$ok = $self->poll_cmd($pkgsub, '');	# Send just carriage return
 				return $ok unless $ok;
 			}
 			$cmdConfig->{stage}++; # Move to 2nd stage
 		}
 		if ($cmdConfig->{stage} < 2) { # 2nd stage
-			if ($cmdConfig->{privExec} = !$self->config_context) { # This needs to match '(config[-if])' or SecureRouter '/configure' or '(conf-if..)' SLX
-				my $configCmd = $familyType eq 'WLAN9100' || $familyType eq 'Series200' ? 'config' : 'config term';
-				($ok, undef, $resref) = $self->poll_cmd($pkgsub, $configCmd);
+			if ($cmdConfig->{userExec} = $self->last_prompt =~ />\s?$/) {
+				$ok = $self->poll_enable($pkgsub);
 				return $ok unless $ok;
-				return ($ok, undef, $resref) unless $$resref;
 			}
 			$cmdConfig->{stage}++; # Move to 3rd stage
 		}
 		if ($cmdConfig->{stage} < 3) { # 3rd stage
+			if ($cmdConfig->{privExec} = !$self->config_context) { # This needs to match '(config[-if])' or SecureRouter '/configure' or '(conf-if..)' SLX
+				my $configCmd = $familyType eq 'WLAN9100' || $familyType eq 'Series200' ? 'config' : 'config term';
+				($ok, undef, $resref) = $self->poll_cmd($pkgsub, $configCmd);
+				return $ok unless $ok;
+				return ($ok, '', $resref) unless $$resref; # Never return undef output with true $ok
+			}
+			$cmdConfig->{stage}++; # Move to 4th stage
+		}
+		if ($cmdConfig->{stage} < 4) { # 4th stage
 			($ok, $outref, $resref) = $self->poll_cmd($pkgsub, $cmdnncli);
 			return $ok unless $ok;
 			$cmdConfig->{outref} = $outref;
 			$cmdConfig->{resref} = $resref;
-			$cmdConfig->{stage}++; # Move to 4th stage
-		}
-		if ($cmdConfig->{stage} < 4) { # 4th stage
-			if ($cmdConfig->{privExec}) {
-				($ok, undef, $resref) = $self->poll_cmd($pkgsub, 'end');
-				return $ok unless $ok;
-				return ($ok, undef, $resref) unless $$resref;
-			}
 			$cmdConfig->{stage}++; # Move to 5th stage
 		}
 		if ($cmdConfig->{stage} < 5) { # 5th stage
-			$cmdConfig->{stage}++; # Move to 6th stage - we only spend one cycle here
+			if ($cmdConfig->{privExec}) {
+				$ok = $self->poll_cmd($pkgsub, 'end'); # We don't bother getting $resref here...
+				return $ok unless $ok;
+				# ... because even if $$resref was false, we want to fall through
+			}
+			$cmdConfig->{stage}++; # Move to 6th stage
+		}
+		if ($cmdConfig->{stage} < 6) { # 6th stage
+			$cmdConfig->{stage}++; # Move to 7th stage - we only spend one cycle here
 			if ($cmdConfig->{userExec}) {
 				my $disableCmd;
 				if (defined $ExitPrivExec{$familyType}) {
@@ -3735,11 +3749,11 @@ sub cmdConfig { # If nncli send command in Config mode and restore mode on exit;
 				$self->debugMsg(8,"\cmdConfig() Sending command:>", \$disableCmd, "<\n");
 			}
 		}
-		if ($cmdConfig->{stage} < 6) { # 6th stage
+		if ($cmdConfig->{stage} < 7) { # 7th stage
 			if ($cmdConfig->{userExec}) {
-				($ok, undef, $resref) = $self->poll_cmd($pkgsub);
+				$ok = $self->poll_cmd($pkgsub); # We don't bother getting $resref here...
 				return $ok unless $ok;
-				return ($ok, undef, $resref) unless $$resref;
+				# ... because even if $$resref was false, we want to fall through
 			}
 			($outref, $resref) = ($cmdConfig->{outref}, $cmdConfig->{resref});
 			$self->{POLL}{$pollsub} = undef;	# Undef once completed
@@ -3827,10 +3841,10 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 	}
 	if ($discDevice->{stage} < 6) { # Next stage
 		# ExtremeXOS detection command
-		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show version | include XOS');
+		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show version | include "by release-manager"');
 		return $ok unless $ok;
 		$discDevice->{stage}++; # Move to next stage on next cycle
-		if ($$outref =~ /^Image   : ExtremeXOS version (.+) by /m) {
+		if ($$outref =~ /^Image   : Extreme(?:XOS| Networks Switch Engine) version (.+) by /m) {
 			$self->_setFamilyTypeAttrib($Prm{xos}, is_nncli => 0, is_xos => 1, sw_version => $1);
 			$self->_setAttrib('fw_version', $1) if $$outref =~ /^BootROM :(.+)$/m;
 			$self->{LASTPROMPT} =~ /$InitPrompt{$Prm{xos}}/;
@@ -4038,6 +4052,7 @@ sub _setLastPromptAndConfigContext { # Sets the LASTPROMPT and package CONFIGCON
 		$self->{$Package}{CONFIGCONTEXT} = '' unless $match;
 	}
 	$self->debugMsg(4,"_setLastPromptAndConfigContext() CONFIGCONTEXT = >$self->{$Package}{CONFIGCONTEXT}<\n");
+	$self->{WRITEFLAG} = 0;
 }
 
 
@@ -4067,7 +4082,8 @@ sub _setSlotPortAttrib { # Set the Slot & Port attributes
 	# Get current attribute if partly stored
 	@slots = @{$self->{$Package}{ATTRIB}{'slots'}} if $self->{$Package}{ATTRIBFLAG}{'slots'};
 	@ports = @{$self->{$Package}{ATTRIB}{'ports'}} if $self->{$Package}{ATTRIBFLAG}{'ports'};
-	while ($$outref =~ /^(?:\s*|interface\s+ethernet|Eth )?(?:(\d{1,3})[\/:])?((?:\d{1,3}|(?:gig|ge|fe)\d|s\d)(?:\/\d{1,2})?)/mg) {
+	my $slotRegex = '\d{1,3}';
+	while ($$outref =~ /^(?:\s*|interface\s+ethernet|Eth )?(?:($slotRegex)[\/:])?((?:\d{1,3}|(?:gig|ge|fe)\d|s\d)(?:[\/:]\d{1,2})?)/mg) {
 		if (defined $1 && (!defined $currentSlot || $1 != $currentSlot)) { # New slot
 			$currentSlot = $1;
 			push(@slots, $currentSlot) unless grep {$_ eq $currentSlot} @slots;
@@ -4078,6 +4094,7 @@ sub _setSlotPortAttrib { # Set the Slot & Port attributes
 		else {
 			push(@ports, $2) unless grep {$_ eq $2} @ports;
 		}
+		$slotRegex = '' unless defined $1; # Exos 5720 new channelized port format on standalone unit
 	}
 	@slots = sort {$a <=> $b} @slots; # Slots might need re-arranging on older swithes with fastEther & gigEther ports 
 	$self->_setAttrib('slots', \@slots);
@@ -4153,7 +4170,7 @@ sub _setModelAttrib { # Set & re-format the Model attribute
 	# VOSS is a PassportERS with a VSP model name
 	if ($self->{$Package}{ATTRIB}{'family_type'} eq $Prm{pers}) {
 		# Requires is_apls to always be set before is_voss
-		if ($self->{$Package}{ATTRIB}{'is_apls'} || $model =~ /^(?:VSP|XA)/ || $model =~ /VOSS$/) {
+		if ($self->{$Package}{ATTRIB}{'is_apls'} || $model =~ /^(?:VSP|XA)/ || $model =~ /(?:VOSS|FabricEngine)$/) {
 			$self->_setAttrib('is_voss', 1);
 		}
 		else {
@@ -4429,7 +4446,7 @@ XOS Summit switches
 
 =item *
 
-Unified Hardware 5520
+Universal Hardware (FabricEngine & SwitchEngine) 5520, 5420, 5320, 5720
 
 =item *
 
@@ -6752,7 +6769,7 @@ L<http://search.cpan.org/dist/Control-CLI-Extreme/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021 Ludovico Stevens.
+Copyright 2022 Ludovico Stevens.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::PPPort;
-$Dist::Zilla::Plugin::PPPort::VERSION = '0.009';
+$Dist::Zilla::Plugin::PPPort::VERSION = '0.010';
 # vi:noet:sts=2:sw=2:ts=2
 use Moose;
 with qw/Dist::Zilla::Role::FileGatherer Dist::Zilla::Role::PrereqSource Dist::Zilla::Role::AfterBuild Dist::Zilla::Role::FilePruner/;
@@ -96,10 +96,7 @@ sub prune_files {
 	my @files = @{ $self->zilla->files };
 	my $filename = $self->filename;
 	for my $file (@files) {
-		if ($file->name eq $filename) {
-			$self->zilla->prune_file($file);
-			last;
-		}
+		$self->zilla->prune_file($file) if $file->name eq $filename and $file->added_by !~ __PACKAGE__;
 	}
 }
 
@@ -123,7 +120,7 @@ Dist::Zilla::Plugin::PPPort - PPPort for Dist::Zilla
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+#XXX !!! DO NOT EDIT t/21json.t, because it is a symlink to t/20xml.t
 
 use warnings;
 use strict;
@@ -15,8 +16,6 @@ $Data::Dumper::Quotekeys = 0;
 BEGIN {
     $server = $ENV{SOLR_TEST_SERVER}
         or plan skip_all => "no SOLR_TEST_SERVER provided";
-
-    plan tests => 42;
 }
 
 require_ok('Apache::Solr');
@@ -32,26 +31,27 @@ isa_ok($solr, 'Apache::Solr::'.$FORMAT);
 
 my $result = eval { $solr->commit };
 ok(!$@, 'try commit:'.$@);
+cmp_ok($result->solrStatus, '==', 0, 'Commit status success');
 
 isa_ok($result, 'Apache::Solr::Result');
 is($result->endpoint, "$result");
 
-$result->showTimings(\*STDERR);
+#$result->showTimings(\*STDERR);
 ok($result->success, 'successful');
 
 # reset the database
-my $r0 = $solr->delete(id => [1,2,3]);
+my $r0 = $solr->delete(id => [ qw/A B C/ ]);
 ok($r0->success, 'delete succeeded');
 #warn Dumper $r0;
 
 ### test $solr->addDocument()
 my $d1a = Apache::Solr::Document->new
-  ( fields => [ id => 1, subject => '1 2 3', content => "<html>tic tac"
+  ( fields => [ id => 'A', subject => '1 2 3', content => "<html>tic tac"
               , content_type => 'text/html' ]
   );
 
 my $d1b = Apache::Solr::Document->new
-  ( fields => [ id => 2, content => "<body>tac too"
+  ( fields => [ id => 'B', content => "<body>tac too"
               , content_type => 'text/html' ]
   , boost  => '5'
   );
@@ -96,14 +96,13 @@ is($d2->_subject, '1 2 3');
 ### test $solr->select with two results
 
 my $t3 = $solr->select(q => 'text:tac', rows => 1, hl => {fl => 'content'});
-#warn Dumper $t3->decoded;
 ok($t3, 'select was successful');
 isa_ok($t3, 'Apache::Solr::Result');
 is($t3->endpoint, "$server/select?wt=$format&q=text%3Atac&rows=1&hl=true&hl.fl=content");
 
 cmp_ok($t3->nrSelected, '==', 2, '2 items selected');
 
-cmp_ok($t3->selectedPageSize, '==', 1, 'page size 1');
+cmp_ok($t3->fullPageSize, '==', 1, 'page size 1');
 cmp_ok($t3->selectedPageNr(0), '==', 0, 'item 0 on page 0');
 cmp_ok($t3->selectedPageNr(1), '==', 1, 'item 1 on page 1');
 
@@ -113,16 +112,16 @@ is($d3a->rank, 0, 'rank 0');
 my %id3 = ($d3a->uniqueId => $d3a);
 isa_ok($d3a, 'Apache::Solr::Document', 'got 1 doc answer');
 
-my $d3b = $t3->selected(1, $solr);
+my $d3b = $t3->selected(1);
 is($d3b->rank, 1, 'rank 1');
 #warn Dumper $d3b;
 isa_ok($d3b, 'Apache::Solr::Document', 'got 2 answer');
 $id3{$d3b->uniqueId} = $d3b;
 cmp_ok(keys %id3, '==', 2, 'both documents found');
-ok($id3{1}, 'found id=1');
-ok($id3{2}, 'found id=2');
+ok($id3{A}, 'found id=A');
+ok($id3{B}, 'found id=B');
 
-my $h3a = $t3->highlighted($id3{1});
+my $h3a = $t3->highlighted($id3{A});
 isa_ok($h3a, 'Apache::Solr::Document', 'got 1 hl answer');
 is($h3a->_content, '<html>tic <em>tac</em>', 'test hl content');
 
@@ -131,7 +130,7 @@ is($h3a->_content, '<html>tic <em>tac</em>', 'test hl content');
 #my $t4 = $solr->extractDocument( #overwrite => 1, commit => 1
 #   extractOnly => 1, file => 't/a.pdf');
 my $t4 = $solr->extractDocument(overwrite => 1, commit => 1,
-   literal_id => 3, file => 't/a.pdf');
-ok($t4, 'uploaded document 3, an pdf')
+   literal_id => 'C', file => 't/a.pdf');
+ok($t4, 'uploaded document 3, an pdf');
 
-
+done_testing;

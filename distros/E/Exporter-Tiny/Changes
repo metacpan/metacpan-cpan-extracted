@@ -3,8 +3,33 @@ Exporter-Tiny
 
 Created:      2013-09-05
 Home page:    <https://metacpan.org/release/Exporter-Tiny>
-Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Exporter-Tiny>
+Bug tracker:  <https://github.com/tobyink/p5-exporter-tiny/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+1.004000	2022-08-26
+
+ [ Documentation ]
+ - Document that the `-lexical` export option is experimental.
+
+ [ Packaging ]
+ - No functional changes; repackage as stable.
+
+1.003_002	2022-08-18
+
+ [ Bug Fixes ]
+ - Quote $1 when passing it as a parameter to a function
+   Eugen Konkov++
+   <https://github.com/tobyink/p5-exporter-tiny/issues/7>
+
+1.003_001	2022-07-21
+
+ [ Bug Fixes ]
+ - Correctly check Perl version is at least 5.37.2+ before supporting
+   -lexical option.
+
+1.003_000	2022-07-21
+
+ - Updated: Provide a `-lexical` export option on Perl 5.37.2+.
 
 1.002002	2020-04-24
 

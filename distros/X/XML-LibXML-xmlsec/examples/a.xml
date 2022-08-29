@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<Keys xmlns="http://www.aleksey.com/xmlsec/2002">
+<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+<KeyValue>
+<RSAKeyValue>
+<Modulus>
+shsF7sQ/geqW9cv/8ArtK9umdP7oV5B3i2lRxGPTgFExb7auTyhwKQv71ZVZ4pXa
+UOTFtqPubfPvipP++WhMMi9PmaIO8bUmU4YYpZLrLGFbFBwJeJd4f3KISJpz4xz0
+/wGQPtvUiEjQZfNAX41rAhy7EYeflkMlKlA4M3WDc3U=
+</Modulus>
+<Exponent>
+AQAB
+</Exponent>
+<PrivateExponent xmlns="http://www.aleksey.com/xmlsec/2002">
+H+yOFK0igQPuiSJGvt0Gg/z8Ci6CsOdZNijrmhsWlwJ2rQJ+nfuulvzp5++8S8v2
+dNd8xO7/VsAJqLo8UrIqLewWOmv09la1eH2NvqGqc2Kdd6xpT/0WQ7FjixLMy0jC
+Q17MJFoKHEc5T2UTuJg8n4KEsnXqrYkfJywAevL38WU=
+</PrivateExponent>
+</RSAKeyValue>
+</KeyValue>
+</KeyInfo>
+</Keys>

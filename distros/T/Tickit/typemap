@@ -39,17 +39,6 @@ T_PTROBJ_OR_NULL
                         ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
                         \"$var\", \"$ntype\")
 
-INPUT
-T_PTRSTRUCT
-        if (SvROK($arg) && sv_derived_from($arg, \"${\do { local $_ = $ntype; s/^struct\s+//; s/Ptr$//; $_ }}\")) {
-            IV tmp = SvIV((SV*)SvRV($arg));
-            $var = INT2PTR($type,tmp);
-        }
-        else
-            Perl_croak(aTHX_ \"%s: %s is not of type %s\",
-                        ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-                        \"$var\", \"${\do { local $_ = $ntype; s/^struct\s+//; s/Ptr$//; $_ }}\");
-
 OUTPUT
 T_PTROBJ_OR_NULL
         if ($var)

@@ -1,5 +1,13 @@
 Revision history for Music-Chord-Progression
 
+0.0604 2022-08-28 09:17:45
+    - Improve documentation again.
+
+0.0603 2022-08-28 08:53:16
+    - Improve documentation.
+    - Use subtests.
+    - Improve the eg/ code.
+
 0.0602 2022-01-05 22:33:08
     - Appease Win32 by declaring Set::Object as a prereq, because it barfs.
 

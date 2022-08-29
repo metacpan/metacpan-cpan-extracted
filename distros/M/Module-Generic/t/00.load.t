@@ -2,13 +2,15 @@
 BEGIN
 {
     use strict;
+    use warnings;
     use lib './lib';
+    use vars qw( $DEBUG @modules );
     use Test::More qw( no_plan );
     use File::Find;
     our @modules;
     File::Find::find(sub
     {
-        next unless( /\.pm$/ );
+        return unless( /\.pm$/ );
         # print( "Checking file '$_' ($File::Find::name)\n" );
         $_ = $File::Find::name;
         s,^./lib/,,;
@@ -19,8 +21,13 @@ BEGIN
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
+use strict;
+use warnings;
+
 BEGIN
 {
+    use strict;
+    use warnings;
     diag( "Checking module $_" ) if( $DEBUG );
     use_ok( $_ ) for( sort( @modules ) );
 };

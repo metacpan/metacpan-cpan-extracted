@@ -28,11 +28,7 @@ lib/Tickit/Test.pm
 lib/Tickit/Test/MockTerm.pm
 lib/Tickit/Utils.pm
 lib/Tickit/Window.pm
-LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01rect.t
 t/02rectset.t
@@ -69,3 +65,7 @@ t/89tickit-test.t
 t/90rt101716.t
 t/99pod.t
 typemap
+README
+LICENSE
+META.yml
+META.json

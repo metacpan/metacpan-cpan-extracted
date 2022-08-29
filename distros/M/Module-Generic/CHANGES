@@ -1,6 +1,11 @@
 Revision history for Perl module Module::Generic
 
-v0.27.2 2022-08-07T17:36:42+0900
+v0.28.0 2022-08-29T17:13:47+0900
+    - Added support in serialise() and deserialise() for CBOR::Free
+    - Improved support check in Module::Generic::SharedMem
+    - Improved unit tests
+
+v0.27.2 2022-08-07T17:36:42Z +0900
     - Corrected deserialiser(9 in Module::Generic, which wrongly was requiring Crypt::Misc (a leftover from previous modifications made).
 
 v0.27.1 2022-08-05T07:38:11Z +0900

@@ -19,7 +19,7 @@ name: App-wordlist
 provides:
   App::wordlist:
     file: lib/App/wordlist.pm
-    version: '0.290'
+    version: '0.291'
 recommends:
   App::lcpan::Call: '0.11'
   MetaCPAN::Client: '0'
@@ -46,7 +46,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-wordlist
   homepage: https://metacpan.org/release/App-wordlist
   repository: git://github.com/perlancar/perl-App-wordlist.git
-version: '0.290'
+version: '0.291'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

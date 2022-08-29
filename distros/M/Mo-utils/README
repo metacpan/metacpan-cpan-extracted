@@ -211,6 +211,44 @@ EXAMPLE5
      use strict;
      use warnings;
 
+     use Mo::utils qw(check_bool);
+     use Test::MockObject;
+
+     my $self = {
+             'key' => 1,
+     };
+     check_bool($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE6
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils qw(check_bool);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'bad',
+     };
+     check_bool($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [..utils.pm:?] Parameter 'key' must be a bool (0/1).
+
+EXAMPLE7
+     use strict;
+     use warnings;
+
      use Mo::utils qw(check_isa);
      use Test::MockObject;
 
@@ -225,7 +263,7 @@ EXAMPLE5
      # Output:
      # ok
 
-EXAMPLE6
+EXAMPLE8
      use strict;
      use warnings;
 
@@ -244,7 +282,7 @@ EXAMPLE6
      # Output like:
      # #Error [...utils.pm:?] Parameter 'key' must be a 'Test::MockObject' object.
 
-EXAMPLE7
+EXAMPLE9
      use strict;
      use warnings;
 
@@ -263,7 +301,7 @@ EXAMPLE7
      # Output like:
      # ok
 
-EXAMPLE8
+EXAMPLE10
      use strict;
      use warnings;
 
@@ -282,7 +320,7 @@ EXAMPLE8
      # Output like:
      # #Error [...utils.pm:?] Parameter 'key' has length greater than '2'.
 
-EXAMPLE9
+EXAMPLE11
      use strict;
      use warnings;
 
@@ -299,7 +337,7 @@ EXAMPLE9
      # Output:
      # ok
 
-EXAMPLE10
+EXAMPLE12
      use strict;
      use warnings;
 
@@ -318,7 +356,7 @@ EXAMPLE10
      # Output like:
      # #Error [...utils.pm:?] Parameter 'key' must be a number.
 
-EXAMPLE11
+EXAMPLE13
      use strict;
      use warnings;
 
@@ -360,7 +398,7 @@ EXAMPLE11
      # Output like:
      # ok
 
-EXAMPLE12
+EXAMPLE14
      use strict;
      use warnings;
 
@@ -402,7 +440,7 @@ EXAMPLE12
      # Output like:
      # #Error [...utils.pm:?] Test for Item 'value1' has multiple values.
 
-EXAMPLE13
+EXAMPLE15
      use strict;
      use warnings;
 
@@ -419,7 +457,7 @@ EXAMPLE13
      # Output:
      # ok
 
-EXAMPLE14
+EXAMPLE16
      use strict;
      use warnings;
 
@@ -459,5 +497,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.10
+    0.11
 

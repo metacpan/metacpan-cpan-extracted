@@ -4,13 +4,24 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-29'; # DATE
+our $DATE = '2022-08-26'; # DATE
 our $DIST = 'Sah-Schemas-JSON'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our $schema = [array => {
     summary => 'Array, coercible from JSON string',
     'prefilters' => ['JSON::decode_str'],
+    description => <<'_',
+
+You can use this schema if you want to accept an array, but if user supplies a
+string e.g. in a command-line script as command-line argument or option, the
+string will be coerced into array if the string contains a JSON-encoded array.
+Data will not be valid if the string does not contain valid JSON.
+
+Note that array data is accepted, unlike the `json_str::array` schema which only
+accepts JSON-encoded array in string form.
+
+_
     examples => [
         {value=>'', valid=>0, summary=>'Empty string is not a valid JSON'},
         {value=>'1', valid=>0, summary=>'Valid JSON but not an array'},
@@ -40,9 +51,31 @@ Sah::Schema::array_from_json - Array, coercible from JSON string
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schema::array_from_json (from Perl distribution Sah-Schemas-JSON), released on 2021-09-29.
+This document describes version 0.006 of Sah::Schema::array_from_json (from Perl distribution Sah-Schemas-JSON), released on 2022-08-26.
 
 =head1 SYNOPSIS
+
+=head2 Sample data and validation results against this schema
+
+ ""  # INVALID (Empty string is not a valid JSON)
+
+ 1  # INVALID (Valid JSON but not an array)
+
+ "{}"  # INVALID (Valid JSON but not an array)
+
+ []  # valid (Already an array)
+
+ {}  # INVALID (Not an array)
+
+ "foo"  # INVALID (Not a valid JSON literal)
+
+ "[1,2,3,{}]"  # valid, becomes [1,2,3,{}]
+
+ "[1,2"  # INVALID (Missing closing square bracket)
+
+ "[1,2,]"  # INVALID (Dangling comma)
+
+=head2 Using with Data::Sah
 
 To check data against this schema (requires L<Data::Sah>):
 
@@ -50,10 +83,44 @@ To check data against this schema (requires L<Data::Sah>):
  my $validator = gen_validator("array_from_json*");
  say $validator->($data) ? "valid" : "INVALID!";
 
- # Data::Sah can also create validator that returns nice error message string
- # and/or coerced value. Data::Sah can even create validator that targets other
- # language, like JavaScript. All from the same schema. See its documentation
- # for more details.
+The above schema returns a boolean result (true if data is valid, false if
+otherwise). To return an error message string instead (empty string if data is
+valid, a non-empty error message otherwise):
+
+ my $validator = gen_validator("array_from_json", {return_type=>'str_errmsg'});
+ my $errmsg = $validator->($data);
+ 
+ # a sample valid data
+ $data = [];
+ my $errmsg = $validator->($data); # => ""
+ 
+ # a sample invalid data
+ $data = "[1,2";
+ my $errmsg = $validator->($data); # => "String is not a valid JSON: , or ] expected while parsing array, at character offset 4 (before \"(end of string)\") at (eval 2394) line 13.\n"
+
+Often a schema has coercion rule or default value, so after validation the
+validated value is different. To return the validated (set-as-default, coerced,
+prefiltered) value:
+
+ my $validator = gen_validator("array_from_json", {return_type=>'str_errmsg+val'});
+ my $res = $validator->($data); # [$errmsg, $validated_val]
+ 
+ # a sample valid data
+ $data = [];
+ my $res = $validator->($data); # => ["",[]]
+ 
+ # a sample invalid data
+ $data = "[1,2";
+ my $res = $validator->($data); # => ["String is not a valid JSON: , or ] expected while parsing array, at character offset 4 (before \"(end of string)\") at (eval 2400) line 13.\n","[1,2"]
+
+Data::Sah can also create validator that returns a hash of detailed error
+message. Data::Sah can even create validator that targets other language, like
+JavaScript, from the same schema. Other things Data::Sah can do: show source
+code for validator, generate a validator code with debug comments and/or log
+statements, generate human text from schema. See its documentation for more
+details.
+
+=head2 Using with Params::Sah
 
 To validate function parameters against this schema (requires L<Params::Sah>):
 
@@ -66,11 +133,14 @@ To validate function parameters against this schema (requires L<Params::Sah>):
      ...
  }
 
+=head2 Using with Perinci::CmdLine::Lite
+
 To specify schema in L<Rinci> function metadata and use the metadata with
-L<Perinci::CmdLine> to create a CLI:
+L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
 
  # in lib/MyApp.pm
- package MyApp;
+ package
+   MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
      v => 1.1,
@@ -90,9 +160,10 @@ L<Perinci::CmdLine> to create a CLI:
  1;
 
  # in myapp.pl
- package main;
+ package
+   main;
  use Perinci::CmdLine::Any;
- Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+ Perinci::CmdLine::Any->new(url=>'/MyApp/myfunc')->run;
 
  # in command-line
  % ./myapp.pl --help
@@ -103,25 +174,15 @@ L<Perinci::CmdLine> to create a CLI:
 
  % ./myapp.pl --arg1 ...
 
-Sample data:
+=head1 DESCRIPTION
 
- ""  # INVALID (Empty string is not a valid JSON)
+You can use this schema if you want to accept an array, but if user supplies a
+string e.g. in a command-line script as command-line argument or option, the
+string will be coerced into array if the string contains a JSON-encoded array.
+Data will not be valid if the string does not contain valid JSON.
 
- 1  # INVALID (Valid JSON but not an array)
-
- "{}"  # INVALID (Valid JSON but not an array)
-
- []  # valid
-
- {}  # INVALID (Not an array)
-
- "foo"  # INVALID (Not a valid JSON literal)
-
- "[1,2,3,{}]"  # valid, becomes [1,2,3,{}]
-
- "[1,2"  # INVALID (Missing closing square bracket)
-
- "[1,2,]"  # INVALID (Dangling comma)
+Note that array data is accepted, unlike the C<json_str::array> schema which only
+accepts JSON-encoded array in string form.
 
 =head1 HOMEPAGE
 
@@ -148,13 +209,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

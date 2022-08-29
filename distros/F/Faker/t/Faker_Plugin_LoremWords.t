@@ -1,11 +1,15 @@
-use 5.014;
+package main;
+
+use 5.018;
 
 use strict;
 use warnings;
-use routines;
 
-use Test::Auto;
 use Test::More;
+use Venus::Test;
+
+my $test = test(__FILE__);
+my $seed = 42;
 
 =name
 
@@ -13,88 +17,162 @@ Faker::Plugin::LoremWords
 
 =cut
 
-=abstract
+$test->for('name');
 
-Lorem Words Plugin for Faker
+=tagline
+
+Lorem Words
 
 =cut
 
+$test->for('tagline');
+
+=abstract
+
+Lorem Words for Faker
+
+=cut
+
+$test->for('abstract');
+
 =includes
 
+method: new
 method: execute
 
 =cut
 
-=libraries
-
-Types::Standard
-
-=cut
+$test->for('includes');
 
 =synopsis
 
   package main;
 
-  use Faker;
   use Faker::Plugin::LoremWords;
 
-  my $f = Faker->new;
-  my $p = Faker::Plugin::LoremWords->new(faker => $f);
+  my $plugin = Faker::Plugin::LoremWords->new;
 
-  my $plugin = $p;
-
-=cut
-
-=inherits
-
-Data::Object::Plugin
+  # bless(..., "Faker::Plugin::LoremWords")
 
 =cut
 
-=attributes
+$test->for('synopsis', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Faker::Plugin::LoremWords');
 
-faker: ro, req, ConsumerOf["Faker::Maker"]
-
-=cut
+  $result
+});
 
 =description
 
-This package provides methods for generating fake lorem words data.
+This package provides methods for generating fake data for lorem words.
+
++=encoding utf8
 
 =cut
+
+$test->for('description');
+
+=inherits
+
+Faker::Plugin
+
+=cut
+
+$test->for('inherits');
 
 =method execute
 
-The execute method returns a random fake lorem words.
+The execute method returns a returns a random fake lorem words.
 
 =signature execute
 
-execute() : Str
+  execute(HashRef $data) (Str)
+
+=metadata execute
+
+{
+  since => '1.10',
+}
 
 =example-1 execute
 
-  # given: synopsis
+  package main;
 
-  $p->execute;
+  use Faker::Plugin::LoremWords;
+
+  my $plugin = Faker::Plugin::LoremWords->new;
+
+  # bless(..., "Faker::Plugin::LoremWords")
+
+  # my $result = $plugin->execute;
+
+  # "aut vitae et eligendi laudantium";
+
+  # my $result = $plugin->execute;
+
+  # "accusantium animi corrupti dolores aliquid";
+
+  # my $result = $plugin->execute;
+
+  # "eos pariatur quia corporis illo";
 
 =cut
 
-package main;
-
-my $test = testauto(__FILE__);
-
-my $subs = $test->standard;
-
-$subs->synopsis(fun($tryable) {
+$test->for('example', 1, 'execute', sub {
+  my ($tryable) = @_;
   ok my $result = $tryable->result;
+  ok $result->isa('Faker::Plugin::LoremWords');
+  ok $result->faker;
+  ok $result->faker->random->reseed($seed);
+  ok $result->faker->random->make; # reset randomizer
+  is $result->execute, "aut vitae et eligendi laudantium";
+  ok $result->faker->random->make; # reset randomizer
+  is $result->execute, "accusantium animi corrupti dolores aliquid";
+  ok $result->faker->random->make; # reset randomizer
+  is $result->execute, "eos pariatur quia corporis illo";
 
   $result
 });
 
-$subs->example(-1, 'execute', 'method', fun($tryable) {
+=method new
+
+The new method returns a new instance of the class.
+
+=signature new
+
+  new(HashRef $data) (Plugin)
+
+=metadata new
+
+{
+  since => '1.10',
+}
+
+=example-1 new
+
+  package main;
+
+  use Faker::Plugin::LoremWords;
+
+  my $plugin = Faker::Plugin::LoremWords->new;
+
+  # bless(..., "Faker::Plugin::LoremWords")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
   ok my $result = $tryable->result;
+  ok $result->isa('Faker::Plugin::LoremWords');
+  ok $result->faker;
 
   $result
 });
+
+# END
+
+$test->render('lib/Faker/Plugin/LoremWords.pod') if $ENV{RENDER};
 
 ok 1 and done_testing;

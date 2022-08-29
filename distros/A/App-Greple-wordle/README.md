@@ -46,9 +46,9 @@ Rule is almost same as the original game but answer is different.  Use
 
     Generate random index every time.
 
-- **--try**=#, **-x**=#
+- **--trial**=#, **-x**=#
 
-    Set try count.  Default 6.
+    Set trial count.  Default 6.
 
 # COMMANDS
 

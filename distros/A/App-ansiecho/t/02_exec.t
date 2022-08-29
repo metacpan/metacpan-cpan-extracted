@@ -9,7 +9,7 @@ use Data::Dumper;
 use lib '.';
 use t::Util;
 
-use Getopt::EX::Colormap ':all';
+use Term::ANSIColor::Concise qw(ansi_color ansi_code);
 
 is(ansiecho(qw(a b c))->{stdout}, "a b c\n", 'a b c');
 is(ansiecho(qw(-n a b c))->{stdout}, "a b c", '-n a b c');
@@ -45,9 +45,9 @@ is(ansiecho('--escape', '\N{WHITE SMILING FACE}')->{stdout},
 
 for my $fg ('RGBCMYKW' =~ /./g) {
     no strict 'refs';
-    *{$fg} = sub { colorize($fg, @_) };
+    *{$fg} = sub { ansi_color($fg, @_) };
     for my $bg ('RGBCMYKW' =~ /./g) {
-	*{"${fg}on${bg}"} = sub { colorize("${fg}/${bg}", @_) };
+	*{"${fg}on${bg}"} = sub { ansi_color("${fg}/${bg}", @_) };
     }
 }
 

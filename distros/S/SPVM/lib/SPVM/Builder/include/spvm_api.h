@@ -22,7 +22,6 @@ int32_t SPVM_API_get_class_id(SPVM_ENV* env, const char* class_name);
 int32_t SPVM_API_get_basic_type_id(SPVM_ENV* env, const char* name);
 int32_t SPVM_API_get_class_method_id(SPVM_ENV* env, const char* class_name, const char* method_name);
 int32_t SPVM_API_get_instance_method_id(SPVM_ENV* env, SPVM_OBJECT* object, const char* method_name);
-int32_t SPVM_API_get_instance_method_id_super(SPVM_ENV* env, SPVM_OBJECT* object, const char* method_name);
 int32_t SPVM_API_get_instance_method_id_common(SPVM_ENV* env, SPVM_OBJECT* object, const char* method_name, int32_t is_parent);
 int32_t SPVM_API_get_class_var_id(SPVM_ENV* env, const char* class_name, const char* class_var_name);
 int32_t SPVM_API_get_field_id(SPVM_ENV* env, const char* class_name, const char* field_name);
@@ -218,6 +217,7 @@ void SPVM_API_print_stderr(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* string
 // New object
 SPVM_OBJECT* SPVM_API_new_object(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_id);
 SPVM_OBJECT* SPVM_API_new_pointer(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, void* ptr);
+SPVM_OBJECT* SPVM_API_new_pointer_with_fields(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, void* pointer, int32_t fields_length);
 SPVM_OBJECT* SPVM_API_new_byte_array(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
 SPVM_OBJECT* SPVM_API_new_short_array(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
 SPVM_OBJECT* SPVM_API_new_int_array(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
@@ -235,6 +235,7 @@ SPVM_OBJECT* SPVM_API_new_array_proto(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJ
 // New object raw
 SPVM_OBJECT* SPVM_API_new_object_raw(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_id);
 SPVM_OBJECT* SPVM_API_new_pointer_raw(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, void* ptr);
+SPVM_OBJECT* SPVM_API_new_pointer_with_fields_raw(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, void* pointer, int32_t fields_length);
 SPVM_OBJECT* SPVM_API_new_byte_array_raw(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
 SPVM_OBJECT* SPVM_API_new_short_array_raw(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
 SPVM_OBJECT* SPVM_API_new_int_array_raw(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
@@ -251,10 +252,24 @@ SPVM_OBJECT* SPVM_API_new_array_proto_raw(SPVM_ENV* env, SPVM_VALUE* stack, SPVM
 // New object by name
 void* SPVM_API_new_object_by_name(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, int32_t* error, const char* file, int32_t line);
 SPVM_OBJECT* SPVM_API_new_pointer_by_name(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, void* pointer, int32_t* error, const char* file, int32_t line);
-int32_t SPVM_API_get_pointer_length(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object);
-void SPVM_API_set_pointer_length(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t length);
-void* SPVM_API_get_pointer_any_info(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object);
-void SPVM_API_set_pointer_any_info(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, void* any_info);
+SPVM_OBJECT* SPVM_API_new_pointer_with_fields_by_name(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, void* pointer, int32_t fields_length, int32_t* error, const char* file, int32_t line);
+
+// Pointer fields
+int32_t SPVM_API_get_pointer_fields_length(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object);
+int8_t SPVM_API_get_pointer_field_byte(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index);
+int16_t SPVM_API_get_pointer_field_short(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index);
+int32_t SPVM_API_get_pointer_field_int(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index);
+int64_t SPVM_API_get_pointer_field_long(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index);
+float SPVM_API_get_pointer_field_float(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index);
+double SPVM_API_get_pointer_field_double(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index);
+void* SPVM_API_get_pointer_field_pointer(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index);
+void SPVM_API_set_pointer_field_byte(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index, int8_t value);
+void SPVM_API_set_pointer_field_short(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index, int16_t value);
+void SPVM_API_set_pointer_field_int(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index, int32_t value);
+void SPVM_API_set_pointer_field_long(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index, int64_t value);
+void SPVM_API_set_pointer_field_float(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index, float value);
+void SPVM_API_set_pointer_field_double(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index, double value);
+void SPVM_API_set_pointer_field_pointer(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t field_index, void* value);
 
 // Exception
 int32_t SPVM_API_set_exception(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* exception);
@@ -296,11 +311,6 @@ int32_t SPVM_API_elem_isa(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* array, 
 
 // Error
 const char* SPVM_API_strerror(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value, int32_t length);
-
-// Object flag
-int32_t SPVM_API_check_flag_pointer_dont_free(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object);
-void SPVM_API_enable_flag_pointer_dont_free(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object);
-void SPVM_API_disable_flag_pointer_dont_free(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object);
 
 //  "& ~(intptr_t)1" means dropping weaken flag
 #define SPVM_API_GET_OBJECT_NO_WEAKEN_ADDRESS(env, stack, object) ((void*)((intptr_t)object & ~(intptr_t)1))

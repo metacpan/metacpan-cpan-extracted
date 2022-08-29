@@ -1,0 +1,96 @@
+#!/usr/bin/env perl
+
+use 5.022;
+use strict;
+use warnings;
+use Math::DifferenceSet::Planar;
+
+$| = 1;
+
+my @KEYS = qw(
+    order order_base order_exponent modulus n_planes
+    start_element peak_elements min_element max_element
+    largest_gap eta zeta
+);
+my %keys = map {($_ => 1)} @KEYS;
+
+my @cols = ();
+my $head = 0;
+while (@ARGV && $ARGV[0] =~ /^-(.+)/) {
+    my $opt = $1;
+    shift @ARGV;
+    last                     if '-' eq $opt;
+    $head = 1,          next if 'h' eq $opt;
+    push(@cols, $1   ), next if $opt =~ /^-(\w+)\z/ && exists $keys{$1};
+    push(@cols, @KEYS), next if '-all' eq $opt;
+    die "usage: pds_info [-h] [--key]... [file]...\n";
+}
+@cols = @KEYS[0..4] if !@cols;
+
+print "@cols\n" if $head;
+while (<<>>) {
+    s/^\s+//;
+    my @e = split /\s+/;
+    next if !@e;
+
+    die "integer numbers separated by whitespace expected\n"
+        if grep { !/^(?:0|[1-9][0-9]*)\z/ } @e;
+
+    my $s = eval { Math::DifferenceSet::Planar->from_elements(@e) };
+    if (!$s) {
+        print "unknown\n";
+        next;
+    }
+    my @res = map { $s->$_ } @cols;
+    print "@res\n";
+}
+
+__END__
+=head1 NAME
+
+pds_info - display information about planar difference sets
+
+=head1 SYNOPSIS
+
+  pds_info [-h] [--key]... [file]...
+
+=head1 DESCRIPTION
+
+This example program reads planar difference sets, one per line, as
+integer numbers separated by whitespace, and writes information about
+these sets to standard output.
+
+The program will write the word "unknown" for each input line not
+recognized as a planar difference set.  This may occur for incorrect input
+as well as for sets exceeding the implementation-specific size limit.
+
+By default, these attributes will be printed, separated by spaces:
+order, order_base, order_exponent, modulus, n_planes.
+
+Attributes of interest can also be specified explicitly by enumerating
+attribute names preceded by two dashes.  In addition to the default
+attributes, these are: start_element, peak_elements (yielding two output
+columns), min_element, max_element, largest_gap (yielding three output
+colums of two elements and their difference), eta, zeta, all (yielding
+all 15 items).
+
+With option B<-h>, the data is preceded by a header line.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2022 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::NanonisTramea;
-$Lab::Moose::Instrument::NanonisTramea::VERSION = '3.821';
+$Lab::Moose::Instrument::NanonisTramea::VERSION = '3.822';
 #ABSTRACT: Nanonis Tramea
 
 use v5.20;
@@ -8,13 +8,13 @@ use Moose;
 use Moose::Util::TypeConstraints;
 use MooseX::Params::Validate;
 use Carp;
-use namespace::autoclean;
-
+use PDL::Core;
+use PDL::IO::CSV ":all";
 use Lab::Moose::Instrument qw/
-    validated_getter validated_setter setter_params /;
-
+    validated_getter validated_setter/;
 extends 'Lab::Moose::Instrument';
 
+use namespace::autoclean;
 
 sub nt_string {
   my $s = shift;
@@ -47,27 +47,11 @@ sub nt_float64 {
   return pack "d>", $f;
 }
 
-sub returnFormatter {
-    my $expBody= shift;
-    my $body= shift;
-    my $diff = $expBody - (length($body)-40);
-    my $padding;
-    if ($diff!=0){
-        $padding = "\0"x $diff;
-      }
-    $body=$body.$padding;
-    return $body;
-}
-
 sub  nt_header {
     my ($self,$command,$b_size,$response) =@_;
-    
     $command = lc($command);
-
-    my ($pad_len) = 32 - length($command);
-   
+    my ($pad_len) = 32 - length($command);  
     my($template)="A".length($command);
-
     for (1..$pad_len){
 
         $template=$template."x"
@@ -78,18 +62,29 @@ sub  nt_header {
     return $cmd.$bodysize.$rsp.nt_uint16(0);
 }
 
+sub _end_of_com
+{
+  my $self = shift;
+  my $response = $self->binary_read();
+  my $response_bodysize = unpack("N!",substr($response,36,4));
+  if($response_bodysize>0)
+  {
+    print(substr($response,40,$response_bodysize)."\n");
+  }
+}
+
 sub strArrayUnpacker {
     my ($self, $elementNum, $strArray) = @_;
     my $position = 0;
     my %unpckStrArray;
-  for(0..$elementNum-1){
+    for(0..$elementNum-1){
       my $strlen = unpack("N!",substr $strArray,$position,4);
       $position+=4;
       my $string =  substr $strArray,$position,$strlen;
       $position+=$strlen;
       $unpckStrArray{$_}=$string;
-  }
-  return %unpckStrArray;
+    }
+     return %unpckStrArray;
 }
 
 sub intArrayUnpacker {
@@ -161,15 +156,16 @@ sub oneDSwp_SwpSignalSet {
     my $command_name="1dswp.swpsignalset";
     my $bodysize = $strlen+4;
     $strlen=nt_int($strlen);
-    my $head= $self->nt_header($command_name,$bodysize,0);
+    my $head= $self->nt_header($command_name,$bodysize,1);
     $self->write(command=>$head.$strlen.$channelName);
-    sleep(1);
 }
 
 sub oneDSwp_SwpSignalGet {
     my $self = shift;
     my $option= "select";
-    $option = shift if (scalar(@_)>0);
+    if (scalar(@_)>0){
+      $option = shift;
+    }
     my $command_name="1dswp.swpsignalget";
     my $head= $self->nt_header($command_name,0,1);
     $self->write(command=>$head);
@@ -189,10 +185,6 @@ sub oneDSwp_SwpSignalGet {
     else{
       return "Invalid Options!"
     }
-
-
-     
-
 }
 
 sub oneDSwp_LimitsSet {
@@ -214,13 +206,12 @@ sub oneDSwp_LimitsGet {
   my $head= $self->nt_header($command_name,$bodysize,1);
   $self->write(command=>$head);
   my $return = $self->binary_read();
-  $return= returnFormatter($rbodysize,$return);
+  $return = $self->binary_read();
   my $Lower_limit= substr $return,40,4;
   $Lower_limit= unpack("f>",$Lower_limit);
   my $Upper_limit= substr $return,44,4;
   $Upper_limit= unpack("f>",$Upper_limit);
-  return($Lower_limit,$Upper_limit);
-  
+  return($Lower_limit,$Upper_limit); 
 }
 
 sub oneDSwp_PropsSet {
@@ -247,8 +238,6 @@ sub oneDSwp_PropsGet {
   $self->write(command=>$head);
 
   my $return = $self->binary_read(); 
-  my $rbodysize = 26;
-  $return= returnFormatter($rbodysize,$return);
   my $Initial_Settling_time_ms= substr $return,40,4;
   $Initial_Settling_time_ms= unpack("f>",$Initial_Settling_time_ms);
   my $s= substr $return,44,4;
@@ -267,54 +256,55 @@ sub oneDSwp_PropsGet {
 }
 
 sub oneDSwp_Start {
-     my ($self,$get,$direction,$name,$reset,$timeout) = @_;
-     my $command_name= "1dswp.start";
-     my $name_len= length($name);
-     my $bodysize = 16 +$name_len;
-     
-     $get = 1 if $get != 0;
-     $direction = 1 if $direction != 0;
-     $reset = 1 if $reset != 0;
-     my $head= $self->nt_header($command_name,$bodysize,$get);
-     my $body = nt_uint32($get);
-     $body = $body.nt_uint32($direction);
-     $body = $body.nt_int($name_len);
-     $body = $body.$name;
-     $body = $body.nt_uint32($reset);
-     $self->write(command=>$head.$body);
+  my ($self,$get,$direction,$name,$reset,$timeout) = @_;
+  my $command_name= "1dswp.start";
+  my $name_len= length($name);
+  my $bodysize = 16 +$name_len;
+  
+  if($get!= 0){
+   $get = 1;
+  }
+  if($direction!= 0){
+   $direction = 1; 
+  }
+  if($reset!= 0){
+   $reset = 1; 
+  }
+  my $head= $self->nt_header($command_name,$bodysize,$get);
+  my $body = nt_uint32($get);
+  $body = $body.nt_uint32($direction);
+  $body = $body.nt_int($name_len);
+  $body = $body.$name;
+  $body = $body.nt_uint32($reset);
+  $self->write(command=>$head.$body);
 
-    if($get==1){
-        my $return = $self->binary_read(timeout=>$timeout);
-        my $channelSize = unpack("N!",substr($return,40,4));
-        my $channelNum =unpack("N!",substr($return,44,4));
-        my %channels = $self->strArrayUnpacker($channelNum,substr($return,48,$channelSize));
-        $channels{0}=$channels{0}."*";
-        my $newPos = 48 +$channelSize;
-        my $rowNum = unpack("N!",substr($return,$newPos,4));
-        my $colNum = unpack("N!",substr($return,$newPos+4,4));
-        my $rawData = substr($return,$newPos+8,$rowNum*$colNum*4);
-        my %data;
-        my $pos = 0;
-        for(my $row = 0;$row<$rowNum;$row++){
-          my @rowBuffer;
-          for(my $col = 0;$col<$colNum;$col++){
-            push  @rowBuffer , unpack("f>",substr($rawData,$pos,4));
-            $pos +=4;
-          }
-          #print("$channels{$row}:".join(",",@rowBuffer)."\n");
-          $data{$channels{$row}} = [@rowBuffer];
-        }
-        return %data;
+  if($get==1){
+    my $return = $self->binary_read(timeout=>$timeout);
+    my $channelSize = unpack("N!",substr($return,40,4));
+    my $channelNum =unpack("N!",substr($return,44,4));
+    my %channels = $self->strArrayUnpacker($channelNum,substr($return,48,$channelSize));
+    $channels{0}=$channels{0}."*";
+    my $newPos = 48 +$channelSize;
+    my $rowNum = unpack("N!",substr($return,$newPos,4));
+    my $colNum = unpack("N!",substr($return,$newPos+4,4));
+    my $rawData = substr($return,$newPos+8,$rowNum*$colNum*4);
+    my %data;
+    my $pos = 0;
+    for(my $row = 0;$row<$rowNum;$row++)
+    {
+      my @rowBuffer;
+      for(my $col = 0;$col<$colNum;$col++)
+      {
+        push  @rowBuffer , unpack("f>",substr($rawData,$pos,4));
+        $pos +=4;
+      }
+      $data{$channels{$row}} = [@rowBuffer];
+    }
+    return %data;
     }
     else{
-      print("Sweep Started.");
       return 0;
     }
-
-
-
-
-
 
 }
 
@@ -348,12 +338,14 @@ sub threeDSwp_AcqChsSet {
   my $Number_of_Channels= shift;
   my $command_name = "3dswp.acqchsset";
   my $bodysize = 4*($Number_of_Channels+1);
-  my $header = $self->nt_header($command_name,$bodysize,0);
+  my $header = $self->nt_header($command_name,$bodysize,1);
   my $body = nt_int($Number_of_Channels);
   while(scalar(@_)!=0){
     $body =$body.nt_int(shift);
   }
   $self->write(command=>$header.$body);
+  $self->_end_of_com();
+
 }
 
 sub threeDSwp_AcqChsGet {
@@ -379,25 +371,58 @@ sub threeDSwp_AcqChsGet {
 }
 
 sub threeDSwp_SaveOptionsSet {
-    my $self = shift ;
-    my $command_name = "3dswp.saveoptionsset";
-    my $Series_Name = shift;
-    my $DT_Folder_opt = shift;
-    my $Comment = shift;
-    my @Module_Names = @_ ;
-    my $bodysize = 4*(5+length($Series_Name)+length($Comment));
-    my $Module_Name_Size = 0;
-    $Module_Name_Size+=4*length($_) foreach(@Module_Names);
-    $bodysize+= $Module_Name_Size ;
-    my $head = $self->nt_header($command_name,$bodysize,0);
-    my $body = nt_int(length($Series_Name)).$Series_Name;
-    $body=$body.nt_int($DT_Folder_opt);
-    $body=$body.nt_int(length($Comment)).$Comment;
-    $body=$body.nt_int($Module_Name_Size);
-    $body=$body.nt_int(scalar(@Module_Names));
-    $body=$body.nt_int(length($_)).$_ foreach(@Module_Names);
-
-    $self->write(command=>$head.$body);
+  my $self = shift;
+  my $Series_Name= shift;
+  my $Create_Date_Time =shift;
+  my $Comment = shift;
+  my @Modules_Names = @_;
+  my $command_name = "3dswp.saveoptionsset";
+  my $bodysize = 8;
+  my $body = nt_int(0);
+  if(length($Series_Name)!=0)
+  {
+    $body=nt_int(length($Series_Name));
+    $body=$body.$Series_Name;
+    $bodysize= 4*(1+length($Series_Name));
+  }
+  if($Create_Date_Time >0)
+  {
+    $Create_Date_Time =1;
+  }
+  elsif ($Create_Date_Time<0)
+  {
+    $Create_Date_Time = -1;
+  }
+  $body= $body.nt_int($Create_Date_Time);
+  if(length($Comment)!=0)
+  {
+    $body = $body.nt_int(length($Comment)).$Comment;
+    $bodysize+= 4*(1+length($Comment));
+  }
+  else
+  {
+    $body=$body.nt_int(0);
+  }
+  if (scalar(@Modules_Names) != 0)
+  {
+    my $buffer_size = 0; 
+    my $buffer_body = "";
+    foreach(@Modules_Names)
+    {
+      $buffer_body = $buffer_body.nt_int(length($_)).$_;
+      $buffer_size+= 4*(1+length($_));
+    }
+    $body = $body.nt_int($buffer_size).nt_int(scalar(@Modules_Names)).$buffer_body;
+    $bodysize += 8 + $buffer_size;
+  }
+  else
+  {
+    $body= $body.nt_int(0).nt_int(0);
+    $bodysize+=8;
+  }
+  
+  $self->write(command=>$self->nt_header($command_name,$bodysize,1).$body);
+  $self->_end_of_com();
 }
 
 sub threeDSwp_SaveOptionsGet {
@@ -411,34 +436,24 @@ sub threeDSwp_SaveOptionsGet {
     $pos+=44;
     my $DT_Folder_opt = unpack("N",substr($return,$pos,4));
     $pos += 12 + unpack("N!",substr($return,$pos+4,4));
-    
-    # my %Fixed_Parameter = $self->strArrayUnpacker(unpack("N!",substr($return,$pos+8,4)),substr($return,$pos+12,$strArray_size));
-    # @Fix_Parameters = values %Fixed_Parameter;
-    #print($_." :".$Fixed_Parameter{$_}."\n") foreach(keys %Fixed_Parameter);
     my $strLen = unpack("N!",substr($return,$pos,4));
     my $Comment = substr($return,$pos+4,$strLen);
     $pos+=4+$strLen;
     my $MP_size = unpack("N!",substr($return,$pos,4));
     my $MP_number = unpack("N!",substr($return,$pos+4,4));
     my %Modules_parameters = $self->strArrayUnpacker($MP_number,substr($return,$pos+8,$MP_size));
-    #print($_." :".$Modules_parameters{$_}."\n") foreach(keys %Modules_parameters);
     my @Modules_param = @Modules_parameters{0...(scalar(keys %Modules_parameters)-1)};
     return($Series_Name,$DT_Folder_opt,$Comment,@Modules_param);
 
-
-
-
-
-
-   
 }
 
 sub threeDSwp_Start {
   my $self = shift;
   my $command_name= "3dswp.start";
   my $bodysize = 0;
-  my $head= $self->nt_header($command_name,$bodysize,0);
+  my $head= $self->nt_header($command_name,$bodysize,1);
   $self->write(command=>$head);
+  $self->_end_of_com();
 }
 
 sub threeDSwp_Stop {
@@ -475,8 +490,9 @@ sub threeDSwp_SwpChSignalSet {
   my $Sweep_channel_index = shift;
   my $command_name= "3dswp.swpchsignalset";
   my $bodysize = 4;
-  my $head= $self->nt_header($command_name,$bodysize,0);
+  my $head= $self->nt_header($command_name,$bodysize,1);
   $self->write(command=>$head.nt_int($Sweep_channel_index));
+  $self->_end_of_com();
 }
 
 sub threeDSwp_SwpChLimitsSet {
@@ -484,10 +500,11 @@ sub threeDSwp_SwpChLimitsSet {
   my ($Start,$Stop)= @_;
   my $command_name= "3dswp.swpchlimitsset";
   my $bodysize = 8;
-  my $head= $self->nt_header($command_name,$bodysize,0);
+  my $head= $self->nt_header($command_name,$bodysize,1);
   my $body=nt_float32($Start);
   $body=$body.nt_float32($Stop);
   $self->write(command=>$head.$body);
+  $self->_end_of_com();
 }
 
 sub threeDSwp_SwpChLimitsGet {
@@ -509,7 +526,7 @@ sub threeDSwp_SwpChPropsSet {
   my ($Number_of_points,$Number_of_sweeps,$Backward_sweep,$End_of_sweep_action,$End_of_sweep_arbitrary_value,$Save_all)= @_;
   my $command_name= "3dswp.swpchpropsset";
   my $bodysize = 24;
-  my $head= $self->nt_header($command_name,$bodysize,0);
+  my $head= $self->nt_header($command_name,$bodysize,1);
   my $body=nt_int($Number_of_points);
   $body=$body.nt_int($Number_of_sweeps);
   $body=$body.nt_int($Backward_sweep);
@@ -517,6 +534,7 @@ sub threeDSwp_SwpChPropsSet {
   $body=$body.nt_float32($End_of_sweep_arbitrary_value);
   $body=$body.nt_int($Save_all);
   $self->write(command=>$head.$body);
+  $self->_end_of_com();
 }
 
 sub threeDSwp_SwpChPropsGet {
@@ -600,8 +618,9 @@ sub threeDSwp_StpCh1SignalSet {
   my $Step_channel_1_index = shift;
   my $command_name= "3dswp.stpch1signalset";
   my $bodysize = 4;
-  my $head= $self->nt_header($command_name,$bodysize,0);
+  my $head= $self->nt_header($command_name,$bodysize,1);
   $self->write(command=>$head.nt_int($Step_channel_1_index));
+  $self->_end_of_com();
 }
 
 sub threeDSwp_StpCh1LimitsSet {
@@ -695,8 +714,9 @@ sub threeDSwp_StpCh2SignalSet {
   my $name_len = length($Channel_name);
   my $bodysize = 4*($name_len+1);
   my $command_name = "3dswp.stpch2signalset";
-  my $head= $self->nt_header($command_name,$bodysize,0);
+  my $head= $self->nt_header($command_name,$bodysize,1);
   $self->write(command=>$head.nt_int($name_len).$Channel_name);
+  $self->_end_of_com();
 }
 
 sub threeDSwp_StpCh2SignalGet {
@@ -875,8 +895,6 @@ sub threeDSwp_TimingRowValsSet {
   $body=$body.nt_float64($UR_value);
   $body=$body.nt_float64($AR_value);
   $self->write(command=>$head.$body);
-  # my $return = $self->binary_read();
-  # print($return."\n");
 }
 
 sub threeDSwp_TimingRowValsGet {
@@ -945,7 +963,6 @@ sub Signals_InSlotSet {
 }
 
 sub Signals_InSlotsGet {
-  #Discuss output format 
   my $self = shift;
   my $command_name= "signals.inslotsget";
   my $head = $self->nt_header($command_name,0,1);
@@ -1278,6 +1295,7 @@ sub UserOut_SlewRateSet {
   $body=$body.nt_float64($Slew_Rate);
   $self->write(command=>$head.$body);
 }
+
 sub UserOut_SlewRateGet {
   my $self = shift;
   my ($Output_index)= @_;
@@ -1335,24 +1353,23 @@ sub DigLines_TTLValGet {
 }
 
 sub DigLines_Pulse {
-   #Changing different order of args here, we pass the lines array as last argument
-   my $self = shift;
-   my $port = shift;
-   my $Pulse_width = shift;
-   my $Pulse_pause = shift; 
-   my $Pulse_number = shift;
-   my $Wait_param = shift; 
-   my @lines = @_;
-   my $command_name = "diglines.pulse";
-   my $head = $self->nt_header($command_name,22 + scalar(@lines),0);
-   my $body = nt_uint16($port).nt_int(scalar(@lines));
-   foreach(@lines){
-    $body = $body.pack("c",$_);
-   }
-   $body = $body.nt_float32($Pulse_width).nt_float32($Pulse_pause);
-   $body = $body.nt_int($Pulse_number).nt_uint32($Wait_param);
-
-   $self->write(command=>$head.$body);
+  #Changing different order of args here, we pass the lines array as last argument
+  my $self = shift;
+  my $port = shift;
+  my $Pulse_width = shift;
+  my $Pulse_pause = shift; 
+  my $Pulse_number = shift;
+  my $Wait_param = shift; 
+  my @lines = @_;
+  my $command_name = "diglines.pulse";
+  my $head = $self->nt_header($command_name,22 + scalar(@lines),0);
+  my $body = nt_uint16($port).nt_int(scalar(@lines));
+  foreach(@lines){
+   $body = $body.pack("c",$_);
+  }
+  $body = $body.nt_float32($Pulse_width).nt_float32($Pulse_pause);
+  $body = $body.nt_int($Pulse_number).nt_uint32($Wait_param);
+  $self->write(command=>$head.$body);
 }
 
 
@@ -1371,8 +1388,12 @@ sub Util_SettingsLoad {
   my $self = shift;
   my ($path,$Automatic_Load) = @_;
   my $command_name = "util.settingsload";
-  $Automatic_Load = 1 if($Automatic_Load > 0);
-  $Automatic_Load = 0 if ($Automatic_Load <=0);
+  if($Automatic_Load> 0){
+    $Automatic_Load = 1;
+  }
+  else{
+    $Automatic_Load = 0;
+  }
   my $bodysize = 8 + 4*length($path);
   my $head = $self->nt_header($command_name,$bodysize,0);
   my $body = pack("N!",length($path)).$path.pack("N",$Automatic_Load);
@@ -1384,8 +1405,14 @@ sub Util_SettingsSave {
   my $self = shift;
   my ($path,$Automatic_save) = @_;
   my $command_name = "util.settingssave";
-  $Automatic_save = 1 if($Automatic_save > 0);
-  $Automatic_save = 0 if ($Automatic_save <=0);
+
+  if($Automatic_save> 0){
+    $Automatic_save= 1;
+  }
+  else{
+    $Automatic_save = 0;
+  }
+
   my $bodysize = 8 + 4*length($path);
   my $head = $self->nt_header($command_name,$bodysize,1);
   my $body = pack("N!",length($path)).$path.pack("N",$Automatic_save);
@@ -1398,8 +1425,12 @@ sub Util_LayoutLoad {
   my $self = shift;
   my ($path,$Automatic_Load) = @_;
   my $command_name = "util.layoutload";
-  $Automatic_Load = 1 if($Automatic_Load > 0);
-  $Automatic_Load = 0 if ($Automatic_Load <=0);
+  if($Automatic_Load> 0){
+    $Automatic_Load= 1;
+  }
+  else{
+    $Automatic_Load = 0;
+  }
   my $bodysize = 8 + 4*length($path);
   my $head = $self->nt_header($command_name,$bodysize,0);
   my $body = pack("N!",length($path)).$path.pack("N",$Automatic_Load);
@@ -1411,8 +1442,12 @@ sub Util_LayoutSave {
   my $self = shift;
   my ($path,$Automatic_save) = @_;
   my $command_name = "util.layoutsave";
-  $Automatic_save = 1 if($Automatic_save > 0);
-  $Automatic_save = 0 if ($Automatic_save <=0);
+  if($Automatic_save> 0){
+    $Automatic_save= 1;
+  }
+  else{
+    $Automatic_save = 0;
+  }
   my $bodysize = 8 + 4*length($path);
   my $head = $self->nt_header($command_name,$bodysize,1);
   my $body = pack("N!",length($path)).$path.pack("N",$Automatic_save);
@@ -1501,8 +1536,315 @@ sub Util_RTOversamplGet {
   $RT_oversampling= unpack("N!",$RT_oversampling);
   return($RT_oversampling);
 }
-
 #Some modules are missing
+
+
+
+has _Session_Path => (
+    is => 'rw',
+    isa => 'Str',
+    reader => 'Session_Path',
+    writer => '_Session_Path',
+    default => ''
+);
+
+has _Host_Data_Path => (
+    is => 'rw',
+    isa => 'Str',
+    reader => 'Host_Data_Path',
+    writer =>  '_Host_Data_Path'
+);
+
+has sweep_prop_configuration => (
+    is=>'rw',
+    isa => 'HashRef',
+    reader => 'sweep_prop_configuration',
+    writer => '_sweep_prop_configuration',
+    builder => '_build_sweep_prop_configuration',
+);
+
+sub _build_sweep_prop_configuration {
+  my $self = shift;
+  my %hash;
+  $hash{point_number}=0;
+  $hash{number_of_sweeps}=0;
+  $hash{backwards}=-1;
+  $hash{at_end}=-1;
+  $hash{at_end_val}=0;
+  $hash{save_all}=-1;
+  return \%hash;
+}
+
+has sweep_save_configuration => (
+    is=>'rw',
+    isa => 'HashRef',
+    reader => 'sweep_save_configuration',
+    writer => '_sweep_save_configuration',
+    builder => '_build_sweep_save_configuration',
+);
+
+sub _build_sweep_save_configuration {
+  my $self = shift;
+  my %hash;
+  $hash{series_name}="";
+  $hash{create_datetime}=-1;
+  $hash{comment}="";
+  return \%hash;
+}
+
+
+sub set_Session_Path {
+  my($self,$value,%args) = validated_setter(
+    \@_,
+    value => {isa => 'Str'}
+    );
+  if($value =~ /(\/[\s\S]+?(?:$|\n))/){
+    if(-s $value."/Nanonis-Session.ini"){
+        $self->_Session_Path($value);
+    }
+    else {
+      die "No Nanonis-Session.ini detected at Path";
+    } 
+  }
+  else
+  {
+    die "Invalid path in set_Session_Path: Path is not Unix Path";
+  }
+}
+
+#Prototype for a file cat
+
+sub get_filenames {
+  my($self,%params)= validated_hash(
+    \@_,
+    series_name=> {isa=>"Str", optional=>1},
+    session_path => {isa=>"Str",optional=>1}, 
+    );
+  	if(exists($params{session_path}))
+    {
+      $self->set_Session_Path(value=>$params{session_path});
+    } 
+    if($self->Session_Path() ne '')
+    {
+      opendir my $filedir, $self->Session_Path or die "Can not open directory";
+      my @files = readdir $filedir;
+      my @selected_files;
+      if(exists($params{series_name}))
+      {
+        foreach(@files)
+        {
+          if($_ =~ /^($params{series_name})\d{5}(.dat)/)
+           {
+            push  @selected_files, $_;
+           }
+        }
+        return @selected_files; 
+      }
+      else
+      {
+        foreach(@files)
+        {
+          if($_ =~ /[\w\d]\d{5}(.dat)/)
+           {
+            push  @selected_files, $_;
+           }
+        }
+        return @selected_files;
+      }
+  }
+  else
+  {
+    die "Error: Session_Path is not set";
+  }
+}
+
+sub sweep_save_configure {
+  my ($self, %params) =  validated_hash(
+  \@_,
+  series_name=>{isa=>"Str",optional =>1},
+  create_datetime =>{isa =>"Int",optional =>1}, 
+  comment =>{isa=>"Str",optional =>1}
+  );
+  if(!exists($params{series_name})){
+    $params{series_name}=$self->sweep_save_configuration()->{series_name};
+  }
+  if(!exists($params{create_datetime})){
+    $params{create_datetime}=$self->sweep_save_configuration()->{create_datetime};
+  }
+  if(!exists($params{comment})){
+    $params{comment}=$self->sweep_save_configuration()->{comment};
+  }
+  if($params{create_datetime}!=-1 && $params{create_datetime}!=0 && $params{create_datetime}!=1)
+  {
+    die "Invalid create_date value in sweep_save_configure: value must be -1,0 or 1!"
+  }
+
+  $self->_sweep_save_configuration(\%params); 
+  $self->threeDSwp_SaveOptionsSet($params{series_name},
+                                  $params{create_datetime},
+                                  $params{comment})
+}
+
+sub sweep_prop_configure {
+  my $self= shift;
+  my %params =  validated_hash(
+  \@_,
+  point_number =>{isa=>"Int", optional=>1},
+  number_of_sweeps =>{isa =>"Int", optional =>1}, 
+  backwards =>{isa=>"Int", optional =>1},
+  at_end=> {isa => "Int", optional =>1}, 
+  at_end_val =>{isa =>"Num", optional =>1},
+  save_all =>{isa=>"Num",optional =>1}
+  );
+
+  if(!exists($params{point_number})){
+    $params{point_number}=$self->sweep_prop_configuration()->{point_number};
+  }
+  if(!exists($params{number_of_sweeps})){
+    $params{number_of_sweeps}=$self->sweep_prop_configuration()->{number_of_sweeps};
+  }
+  if(!exists($params{backwards})){
+    $params{backwards}=$self->sweep_prop_configuration()->{backwards};
+  }
+  if(!exists($params{at_end})){
+    $params{at_end}=$self->sweep_prop_configuration()->{at_end};
+  }
+  if(!exists($params{at_end_val})){
+    $params{at_end_val}=$self->sweep_prop_configuration()->{at_end_val};
+  }
+  if(!exists($params{save_all})){
+    $params{save_all}=$self->sweep_prop_configuration()->{save_all};
+  }
+
+  if($params{point_number}<0){
+    die "Invalid point_number value in sweep_prop_configure: value must be greater or equal to 0!";
+  }
+  if($params{number_of_sweeps}<0){
+    die "Invalid sweep_number value  in sweep_prop_configure: value must be greater or equal to 0!";
+  }
+  if($params{backwards}!=-1 && $params{backwards}!=0 && $params{backwards}!=1){
+    die "Invalid backwards value in sweep_prop_configure: value -1,0 or 1";
+  }
+  if($params{at_end}!=-1 && $params{at_end}!=0 && $params{at_end}!=1 && $params{at_end}!=2){
+    die "Invalid backwards value in sweep_prop_configure: value -1,0,1 or 2";
+  }
+  if($params{save_all}!=-1 && $params{save_all}!=0 && $params{save_all}!=1){
+    die "Invalid backwards value in sweep_prop_configure: value -1,0 or 1";
+  }
+  $self->_sweep_prop_configuration(\%params);
+  $self->threeDSwp_SwpChPropsSet($params{point_number},
+                                 $params{number_of_sweeps},
+                                 $params{backwards},
+                                 $params{at_end},
+                                 $params{at_end_val},
+                                 $params{save_all});  
+}
+
+sub sweep1D {
+  my ($self, %params) = validated_hash(
+    \@_,
+    sweep_channel => {isa => "Int"},
+    aquisition_channels => {isa=>"ArrayRef[Int]"},
+    lower_limit =>{isa=>"Num"},
+    upper_limit =>{isa=>"Num"},
+    point_number =>{isa=>"Int", optional=>1},
+    series_name => {isa=> "Str", optional=>1},
+    comment => {isa=>"Str", optional =>1}
+  );
+
+  if(exists($params{point_number}) && $params{point_number}!= $self->sweep_prop_configuration()->{point_number}){
+    $self->sweep_prop_configure(point_number=>$params{point_number});
+  }
+  if(exists($params{series_name})&& $params{series_name} ne $self->sweep_save_configuration()->{series_name}){
+    $self->sweep_save_configure(series_name=>$params{series_name});
+  }
+  if(exists($params{comment})&& ($params{comment} ne $self->sweep_save_configuration()->{comment})){
+    $self->sweep_save_configure(comment=>$params{comment});
+  }
+
+  $self->threeDSwp_SwpChSignalSet($params{sweep_channel});
+  $self->threeDSwp_StpCh1SignalSet(-1);
+  $self->threeDSwp_StpCh2SignalSet(-1);
+
+  $self->threeDSwp_SwpChLimitsSet($params{lower_limit},$params{upper_limit});
+  $self->threeDSwp_AcqChsSet(scalar(@{$params{aquisition_channels}}),@{$params{aquisition_channels}});
+  $self->threeDSwp_Start();
+
+  #Not sure whats the best approach here.
+  while($self->threeDSwp_StatusGet()!=0 && $self->threeDSwp_StatusGet()!=2)
+  {
+    sleep(0.5);
+  }
+  #Note: Delay Between response and successfull file creation,may be due to VM setup
+}
+#Prototype: Function to parse into pdl from .dat Nanonis file
+
+sub to_pdl_1D{
+    my ($self,%params) =  validated_hash(
+      \@_,
+      file_name=>{isa => "Str"},
+      session_path=>{isa => "Str", optional =>1},
+    );
+
+    #check for file existence
+    if(exists($params{session_path}))
+    {
+      $self->set_Session_Path(value=>$params{session_path});
+    } 
+    if($self->Session_Path() ne '')
+    {
+      if(-s $self->Session_Path().'/'.$params{file_name})
+      {
+        my $startdata = 0;
+        my @x_col = ();
+        my @y_col  = ();
+        my $EOF=1; 
+        my $buffer_line;
+        my @col_names;
+        my @cols;
+        open(my $fa,'<',$self->Session_Path().'/'.$params{file_name});
+        while($EOF)
+        {
+          $buffer_line=<$fa>;
+          if($buffer_line)
+          {
+              if ($buffer_line =~ /(\[DATA])/){
+                  $buffer_line = <$fa>;
+                  @col_names = (split "\t",$buffer_line);
+                  $buffer_line=<$fa>;
+                  $startdata = 1;
+              }
+              if ($startdata==1){ 
+                  my @buffer = split(" ",$buffer_line);
+
+                  for(my $index=0;$index<scalar(@buffer);$index++)
+                  {
+                    push(@{$cols[$index]},$buffer[$index]);
+                  }
+              }
+          }
+          else
+          {
+              $EOF=0;
+          }
+        }
+        close($fa);
+        #my $new_pdl = pdl(pdl(@x_col),pdl(@y_col));
+        my $new_pdl = pdl(@cols);
+        return $new_pdl,@col_names; 
+      }
+      else
+      {
+        die "File not found at ".$self->Session_Path()."/".$params{file_name};
+      }
+    }
+    else
+    {
+      die "Error: Session_Path is not set";
+    }
+  return 0;
+  }
+ 
 __PACKAGE__->meta()->make_immutable();
 
 1;
@@ -1519,7 +1861,7 @@ Lab::Moose::Instrument::NanonisTramea - Nanonis Tramea
 
 =head1 VERSION
 
-version 3.821
+version 3.822
 
 =head1 SYNOPSIS
 
@@ -1546,6 +1888,12 @@ version 3.821
 =head1 Digita Lines 
 
 =head1 Utilities
+
+=head1 High Level COM
+
+=head2 Class Variables
+
+=head2 Class Methods
 
 =head1 COPYRIGHT AND LICENSE
 

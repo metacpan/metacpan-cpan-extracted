@@ -71,6 +71,7 @@ lib/SPVM/Builder/include/spvm_api_runtime.h
 lib/SPVM/Builder/include/spvm_api_string_buffer.h
 lib/SPVM/Builder/include/spvm_api_vm.h
 lib/SPVM/Builder/include/spvm_array_field_access.h
+lib/SPVM/Builder/include/spvm_attribute.h
 lib/SPVM/Builder/include/spvm_basic_type.h
 lib/SPVM/Builder/include/spvm_block.h
 lib/SPVM/Builder/include/spvm_call_method.h
@@ -82,7 +83,6 @@ lib/SPVM/Builder/include/spvm_class_var_access.h
 lib/SPVM/Builder/include/spvm_compiler.h
 lib/SPVM/Builder/include/spvm_constant.h
 lib/SPVM/Builder/include/spvm_constant_string.h
-lib/SPVM/Builder/include/spvm_descriptor.h
 lib/SPVM/Builder/include/spvm_dumper.h
 lib/SPVM/Builder/include/spvm_field.h
 lib/SPVM/Builder/include/spvm_field_access.h
@@ -133,6 +133,7 @@ lib/SPVM/Builder/src/spvm_api_runtime.c
 lib/SPVM/Builder/src/spvm_api_string_buffer.c
 lib/SPVM/Builder/src/spvm_api_vm.c
 lib/SPVM/Builder/src/spvm_array_field_access.c
+lib/SPVM/Builder/src/spvm_attribute.c
 lib/SPVM/Builder/src/spvm_basic_type.c
 lib/SPVM/Builder/src/spvm_block.c
 lib/SPVM/Builder/src/spvm_call_method.c
@@ -143,7 +144,6 @@ lib/SPVM/Builder/src/spvm_class_var_access.c
 lib/SPVM/Builder/src/spvm_compiler.c
 lib/SPVM/Builder/src/spvm_constant.c
 lib/SPVM/Builder/src/spvm_constant_string.c
-lib/SPVM/Builder/src/spvm_descriptor.c
 lib/SPVM/Builder/src/spvm_dumper.c
 lib/SPVM/Builder/src/spvm_field.c
 lib/SPVM/Builder/src/spvm_field_access.c
@@ -486,6 +486,7 @@ t/default/comment.t
 t/default/comparison_operator.t
 t/default/compile_native_api.pl
 t/default/concat.t
+t/default/conditional_branch.t
 t/default/constant.t
 t/default/copy.t
 t/default/default_loaded_modules.t
@@ -500,7 +501,6 @@ t/default/exchange_api_call_method.t
 t/default/fat_camma.t
 t/default/field.t
 t/default/for.t
-t/default/if.t
 t/default/increment.t
 t/default/inline.t
 t/default/interface.t
@@ -537,6 +537,7 @@ t/default/lib/SPVM/TestCase/Comment/CRLF.spvm
 t/default/lib/SPVM/TestCase/Comment/LF.spvm
 t/default/lib/SPVM/TestCase/ComparisonOperator.spvm
 t/default/lib/SPVM/TestCase/Concat.spvm
+t/default/lib/SPVM/TestCase/ConditionalBranch.spvm
 t/default/lib/SPVM/TestCase/Constant.spvm
 t/default/lib/SPVM/TestCase/Copy.spvm
 t/default/lib/SPVM/TestCase/Data/Weaken.spvm
@@ -555,7 +556,6 @@ t/default/lib/SPVM/TestCase/FatCamma.spvm
 t/default/lib/SPVM/TestCase/Field.spvm
 t/default/lib/SPVM/TestCase/FILE.spvm
 t/default/lib/SPVM/TestCase/For.spvm
-t/default/lib/SPVM/TestCase/If.spvm
 t/default/lib/SPVM/TestCase/IfRequire.spvm
 t/default/lib/SPVM/TestCase/Increment.spvm
 t/default/lib/SPVM/TestCase/Inline.spvm
@@ -644,9 +644,7 @@ t/default/lib/SPVM/TestCase/Pointable.spvm
 t/default/lib/SPVM/TestCase/Pointer.c
 t/default/lib/SPVM/TestCase/Pointer.config
 t/default/lib/SPVM/TestCase/Pointer.spvm
-t/default/lib/SPVM/TestCase/PointerDontFree.c
-t/default/lib/SPVM/TestCase/PointerDontFree.config
-t/default/lib/SPVM/TestCase/PointerDontFree.spvm
+t/default/lib/SPVM/TestCase/PointerChild.spvm
 t/default/lib/SPVM/TestCase/PointerEmpty.spvm
 t/default/lib/SPVM/TestCase/PointForTest.spvm
 t/default/lib/SPVM/TestCase/Precedence.spvm
@@ -680,7 +678,6 @@ t/default/lib/SPVM/TestCase/TypeComment.spvm
 t/default/lib/SPVM/TestCase/TypeConversion.spvm
 t/default/lib/SPVM/TestCase/UnaryMinus.spvm
 t/default/lib/SPVM/TestCase/UnaryPlus.spvm
-t/default/lib/SPVM/TestCase/Unless.spvm
 t/default/lib/SPVM/TestCase/UseResource.spvm
 t/default/lib/SPVM/TestCase/UseResource/Basic.c
 t/default/lib/SPVM/TestCase/UseResource/Basic.config
@@ -757,7 +754,6 @@ t/default/type_comment.t
 t/default/type_conversion.t
 t/default/unary_minus.t
 t/default/unary_plus.t
-t/default/unless.t
 t/default/warn.t
 t/default/weaken.t
 t/default/while.t

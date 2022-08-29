@@ -1,7 +1,7 @@
 [![Actions Status](https://github.com/kaz-utashiro/App-week/workflows/test/badge.svg)](https://github.com/kaz-utashiro/App-week/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-week.svg)](https://metacpan.org/release/App-week)
 # NAME
 
-week - colorful calendar command for the ANSI terminal
+week - colorful calendar command for ANSI terminal
 
 # SYNOPSIS
 
@@ -18,21 +18,21 @@ Options:
     -c #    number of columns (default 3)
     -p #    print year on month-# (default current, 0 for none)
     -P      print year on all months
-    -l      I18N options (See below)
+    -W      print week number
 
     --theme theme
-            Apply color theme
+            apply color theme
 
 Color options:
 
-    --colormap  Specify colormap
-    --rgb24     Use 24bit RGB color ANSI sequence
+    --colormap  specify colormap
+    --rgb24     use 24bit RGB color ANSI sequence
 
-I18N options:
+i18n options:
 
-    -l          Display I18N options
-    --i18n      Enable I18n options
-    --i18n-v    Display with Territory/Lange information
+    -l          list i18n options
+    --i18n      enable i18n options
+    --i18n-v    display with Territory/Lange information
 
 Color modules:
 
@@ -42,7 +42,7 @@ Color modules:
 
 # VERSION
 
-Version 1.0205
+Version 1.0301
 
 # DESCRIPTION
 
@@ -110,6 +110,18 @@ By default, chronological year is shown on current month and every
 January.  When used in Japanese locale environment, right side year is
 displayed in Japanese era (wareki: 和暦) format.
 
+# WEEK NUMBER
+
+Using option **-W** or **--weeknumber**, week number is printed at the
+end of every week line.  Week number 1 is a week which include January
+1st and count up on every Sunday.
+
+Experimentally **-W2** print _standard week number_ which start with
+first Sunday of the year, and **-W3** print ISO 8601 style week number.
+Because ISO week start on Monday, and the command shows a number for
+Sunday, the result is not intuitive and therefore, I guess, useless.
+This option requires [gcal(1)](http://man.he.net/man1/gcal) command installed.
+
 # COLORMAP
 
 Each field is labeled by names.
@@ -135,21 +147,23 @@ option with **LABEL**=_colorspec_ syntax.  Default color is:
     --colormap  THISWEEK=L05/445 \
     --colormap THISMONTH=555/113
 
-Besides above, color for day-of-week names can be specified
-individually by following labels.  No color is assigned to these
-labels by default.
+Besides above, color for day-of-week names (and week number) can be
+specified individually by following labels.  No color is assigned to
+these labels by default.
 
-    DOW_SU
-    DOW_MO
-    DOW_TU
-    DOW_WE
-    DOW_TH
-    DOW_FR
-    DOW_SA
+    DOW_SU  Sunday
+    DOW_MO  Monday
+    DOW_TU  Tuesday
+    DOW_WE  Wednesday
+    DOW_TH  Thursday
+    DOW_FR  Friday
+    DOW_SA  Saturday
+    DOW_CW  Week Number
 
-Three digit means 216 RGB values from 000 to 555, and Lxx means 24
-gray scales.  Colormap is handled by [Getopt::EX::Colormap](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AColormap) module;
-use \`perldoc Getopt::EX::Colormap\` for detail.
+Three digit means 216 RGB values from `000` to `555`, and `L01`
+.. `L24` mean 24 gray scales.  Colormap is handled by
+[Getopt::EX::Colormap](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AColormap) module; use \`perldoc Getopt::EX::Colormap\` for
+detail.
 
 You can add special effect afterward.  For example, put next line in
 your `~/.weekrc` to blink today.  `$<move>` indicates to move

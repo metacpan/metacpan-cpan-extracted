@@ -1,4 +1,5 @@
 Changes
+examples/check_fork_and_socket.pl
 examples/check_socket.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
@@ -18,6 +19,7 @@ META.yml
 README
 SIGNATURE
 Socket.pm
+Socket/HardcodedUsage.pod
 t/Check-Socket/01-use.t
 t/Check-Socket/02-version.t
 t/Check-Socket/03-check_socket-fake-true.t

@@ -1,0 +1,147 @@
+=pod
+
+=encoding utf8
+
+=head1 Hardcoded usage of this functionality
+
+This document is about hardcoded functionality which L<Check::Fork> brings in
+other Perl distributions.
+
+=head1 Distributions
+
+=over
+
+=item L<FCGI>
+
+Version checked: 0.82
+
+File: t/02-unix_domain_socket.t
+
+ # ...
+ my $can_fork = $Config{d_fork}
+     || (
+         ($^O eq 'MSWin32' || $^O eq 'NetWare')
+         and $Config{useithreads}
+         and $Config{ccflags} =~ /-DPERL_IMPLICIT_SYS/
+     );
+ # ...
+ } elsif (! $can_fork) {
+     plan skip_all => 'no fork';
+ }
+ # ...
+
+=item L<IO>
+
+Version checked: 1.48
+
+File: t/cachepropagate-unix.t, t/cachepropagate-tcp.t
+
+ # ...
+     skip "fork not available", 4
+         unless $Config{d_fork} || $Config{d_pseudofork};
+ # ...
+
+File: t/io_multihomed.t, t/io_unix.t, t/io_sock.t, t/io_pipe.t
+
+ # ...
+     my $can_fork = $Config{d_fork} ||
+                     (($^O eq 'MSWin32' || $^O eq 'NetWare') and
+                      $Config{useithreads} and
+                      $Config{ccflags} =~ /-DPERL_IMPLICIT_SYS/
+                     );
+ # ...
+     elsif (!$can_fork) {
+        $reason = 'no fork';
+    }
+ # ...
+     skip_all($reason) if $reason;
+ # ...
+
+=item L<IO::Socket::INET6>
+
+Version checked: 2.72
+
+File: t/io_multihomed6.t, t/io_sock6.t, t/host6.t
+
+ # ...
+         if (! $Config{'d_fork'}) {
+             $reason = 'no fork';
+         }
+ # ...
+
+=item L<IO::Socket::SSL>
+
+Version checked: 2.071
+
+File: t/testlib.pl
+
+ # ...
+ unless ( $Config::Config{d_fork} || $Config::Config{d_pseudofork} ||
+         (($^O eq 'MSWin32' || $^O eq 'NetWare') and
+          $Config::Config{useithreads} and
+          $Config::Config{ccflags} =~ /-DPERL_IMPLICIT_SYS/) ) {
+     print "1..0 # Skipped: fork not implemented on this platform\n";
+     exit
+ }
+ # ...
+
+=item L<Test::Simple>
+
+Version checked: 1.302190
+
+File: lib/Test2/Util.pm
+
+ # ...
+ BEGIN {
+     *IS_WIN32 = ($^O eq 'MSWin32') ? sub() { 1 } : sub() { 0 };
+ }
+ 
+ sub _can_thread {
+     return 0 unless $] >= 5.008001;
+     return 0 unless $Config{'useithreads'};
+ 
+     # Threads are broken on perl 5.10.0 built with gcc 4.8+
+     if ($] == 5.010000 && $Config{'ccname'} eq 'gcc' && $Config{'gccversion'}) {
+         return 0 unless $Config{'gccversion'} =~ m/^(\d+)\.(\d+)/;
+         my @parts = split /[\.\s]+/, $Config{'gccversion'};
+         return 0 if $parts[0] > 4 || ($parts[0] == 4 && $parts[1] >= 8);
+     }
+ 
+     # Change to a version check if this ever changes
+     return 0 if $INC{'Devel/Cover.pm'};
+     return 1;
+ }
+ 
+ sub _can_fork {
+     return 1 if $Config{d_fork};
+     return 0 unless IS_WIN32 || $^O eq 'NetWare';
+     return 0 unless $Config{useithreads};
+     return 0 unless $Config{ccflags} =~ /-DPERL_IMPLICIT_SYS/;
+ 
+     return _can_thread();
+ }
+ # ...
+
+=back
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/Check-Fork>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2021-2022 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.02
+
+=cut

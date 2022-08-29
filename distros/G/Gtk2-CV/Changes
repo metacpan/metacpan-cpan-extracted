@@ -5,13 +5,105 @@ TODO: with manual placement, initial contents aren't displayed
 TODO: update a file that has been removed etc.
 TODO: note to self, the reason mplayer hangs during long copies is that execve hangs, because it closes an fd to the target file.
 
-TODO: metacluster
 TODO: "mädhcne" utf-8 bug move to ERROR is a directory
 TODO: up == select dir
-TODO: turbojpeg
 TODO: CV_THUMBNAIL_SCALE
 TODO: Pango-WARNING **: Invalid UTF-8 string passed to pango_layout_set_text() at /opt/bin/cv line 224.
 TODO: dir_is_movie in load_image bluray: ffmpeg etc.
+TODO: cv 5/ 6/ (hla) bad icon label in schnauzere
+
+2.0  Fri 26 Aug 2022 23:56:45 CEST
+	- support jpeg-xl files.
+	- mpv: do no autoload files, as this is very slow on large directories.
+	- work around bugs with newer gtk2 and/or xft
+          versions that cause the schnauzer window to shrink randomly.
+	- implement (mostly hiden) --sort argument that forces filename sort
+          even when cv normally wouldn't.
+        - implement animated gif detection using netscape app block,
+          whose presence will be assume to indicate an animated gif. this is not
+          foolproof, bit greatly reduces the number of mpv invocations for gifs.
+	- fix video/gif rotation, used mplayer metpod, switched to mpv's
+          --video-rotate.
+        - take Display matrix/rotation side data type into account
+          when calculating video size from ffprobe.
+        - mpv renamed the input file option once more, to input-ipc-client.
+          tedious. would be nice if they instead worked on being able to pass
+          filenames over the APIS, or some other real problem. oh yeah,
+          --list-options format was also changed. sigh.
+	- up version sort width to 8 digits, from 6.
+        - t/T now rotate video during playback.
+        - when thumbnailing, do not open archives, follow playlists, open
+          subtitles and so on.
+        - update mpv switches to mdoern format.
+        - set whole toplevel window to insensitive insteads of just the schnauzer,
+          to avoid gtk default signal handling to mess up navigation.
+        - preliminary and limited support to play bluray/dvd "directories".
+        - use mpv commands (as opposed to mplayer) for subtitle/audio track cycling.
+        - fix keysym for '#', which at some point seems to have been replaced
+          by 'numbersign' in gtk.
+        - implement hack to detect some iso files as bluray movies and play them.
+        - do not pass filenames directly to ffprobe, instead prefix them with
+          file:, to ensure they are not misinterpreted as urls.
+        - implement '#' (switch audio tracks) and "j" (switch subtitle tracks)
+          keybindings.
+
+1.9  Sun May  9 13:04:09 CEST 2021
+        - INCOMPATIBLE CHANGE: .cvrc is now sourced much earlier, before loading
+          modules. cvrc_boot and cvrc_start functions are called later.
+        - INCOMPATIBLE CHANGE: mplayer support has been completely removed.
+        - INCOMPATIBLE CHANGE: viewer now defaults to "maxpect" (shift-M) mode.
+        - "invisible" cursor does not act weirdly when it is in position zero
+          (ctrl-u, space did not advance if cursor was on first item in schnauzer).
+        - support heif/avif now via pixbufloader (which seesm to not have
+          working autodetection, so we do our own).
+        - cv now uses mpv to generate video thumbnails - maybe slower, maybe overall
+          worse, but at least there is no dependency on mplayer anymore.
+        - cv now expects mpv to be in the CV_MPV, not CV_MPALYER, env variable.
+        - the Schnauzer now autoscales everything according to the first monitor's
+          DPI when the dpi is >= 110. This can be disabled by adding this to your .cvrc:
+          $Gtk2::CV::Schnauzer::DISPLAYSCALE = 1;
+        - redid "splash" image to be 16:9 (and also super-ugly, but nobody cares).
+        - support mpv's --input-ipc-file option, in addition to --input-file
+          (untested).
+	- rather brutally remove LC_ALL and override LC_NUMERIC, as perl and gtk2
+          sometimes fail to format numbers correctly and fall back to the
+          locale-specific format (which perl should never do).
+	- added a "Subdir view", showing only subdirectories in the cluster view and
+          immediately entering them.
+        - add .cvrc changable variable $Gtk2::CV::Schnauzer::DISPLAYSCALE,
+          defaults to 1 - for use with hidpi displays.
+        - add .cvrc changable variable $Gtk2::CV::Schnauzer::ICONSCALE,
+          defaults to 1 - modifies actual icon file size.
+        - add .cvrc changable variable $Gtk2::CV::Schnauzer::FONTSCALE,
+          defaults to icon scale - modified icon font height.
+        - while CV is effectively single-threaded, it might need thread support
+          to be initialized in Gtk2/xcb.
+        - remove hyper scaling mode.
+        - "," is now the opposite (modulo rounding) from ".".
+        - do not duplicate filetype detection in schnauzer and CV.xs, always use
+          the xs code.
+
+1.8  Mon Apr 29 15:10:44 CEST 2019
+	- work around newer versions of mpv no longer having a pause command.
+	- always use mpv to display gif images, because it's hard to detect whether a gif
+          is animated or not.
+	- use a better(?), more "sharp" method to detect keyboard accelerators and to decide
+          which keys to pass to the schnauzer from the image window.
+	- new selection method. Alt-A / select files i same directory, can be repeated.
+        - rename select by prefix to select by adjacent name.
+        - increase search range for adjacent name to 10000.
+	- change meta-mask to mod1-mask, as gtk+ has silently changed the meaning of meta
+          over the years (so much for api stability...).
+	- newer perl versions somehow manage to leak the prefetch file handle somehow,
+          try tro work aorund.
+        - implement (undocumented) filename_display_name hook in Gt2k::CV::Schnauer.
+        - use symbolic names for entry indices in Schnauzer, for sanity, as the design
+          is now stable enough.
+        - use loop-file=inf for mpv instead of -loop 0, which only works for mplayer.
+        - add metadata clustering plugin.
+        - use ffprobe also if libmagic cannot detect anything, to decide whether the
+          file is (maybe) an image or (maybe) a video.
+        - namecluster now respects default modifier mask.
 
 1.71 Tue Jul 31 00:57:03 CEST 2018
 	- fix 'o' key osd level switching in mpv (similar to old mplayer mode).

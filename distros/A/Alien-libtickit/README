@@ -12,7 +12,7 @@ DESCRIPTION
     process of installing it will install a locally-bundled copy of the
     library into perl's arch-specific library directory.
 
-    This module bundles libtickit version 0.4.2a.
+    This module bundles libtickit version 0.4.3.
 
 METHODS
 

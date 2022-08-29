@@ -11,7 +11,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Exporter-Tiny",
    "no_index" : {
@@ -48,17 +48,17 @@
    "provides" : {
       "Exporter::Shiny" : {
          "file" : "lib/Exporter/Shiny.pm",
-         "version" : "1.002002"
+         "version" : "1.004000"
       },
       "Exporter::Tiny" : {
          "file" : "lib/Exporter/Tiny.pm",
-         "version" : "1.002002"
+         "version" : "1.004000"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Exporter-Tiny"
+         "web" : "https://github.com/tobyink/p5-exporter-tiny/issues"
       },
       "homepage" : "https://metacpan.org/release/Exporter-Tiny",
       "license" : [
@@ -72,6 +72,6 @@
       "x_IRC" : "irc://irc.perl.org/#moops",
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/project"
    },
-   "version" : "1.002002",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.004000",
+   "x_serialization_backend" : "JSON::PP version 4.09"
 }

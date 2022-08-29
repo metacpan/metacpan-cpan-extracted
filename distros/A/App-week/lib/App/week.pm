@@ -1,5 +1,5 @@
 package App::week;
-our $VERSION = "1.0205";
+our $VERSION = "1.0301";
 
 use v5.14;
 use warnings;
@@ -25,6 +25,7 @@ my @DOW_LABELS = qw(
     DOW_TH
     DOW_FR
     DOW_SA
+    DOW_CW
     );
 
 my %DEFAULT_COLORMAP = (
@@ -41,64 +42,77 @@ my %DEFAULT_COLORMAP = (
 
 use Getopt::EX::Hashed; {
 
-    Getopt::EX::Hashed->configure(DEFAULT => [ is => 'ro' ]);
+    Getopt::EX::Hashed->configure(DEFAULT => [ is => 'rw' ]);
 
     has ARGV     => default => [];
-    has COLORMAP => is => 'rw';
-    has CM       => is => 'rw';
+    has COLORMAP => ;
+    has CM       => ;
 
     my($sec, $min, $hour, $mday, $mon, $year) = CORE::localtime(time);
     has year => default => $year + 1900;
     has mday => default => $mday;
     has mon  => default => $mon + 1;
 
-    has cell_width   => default => 22;
+    has cell_width   => default => undef;
     has frame        => default => '  ';
     has frame_height => default => 1;
 
     # option params
-    has help        => spec => ' h        ' ;
-    has version     => spec => ' v        ' ;
-    has months      => spec => ' m =i     ' , default => 0;
-    has after       => spec => ' A :1     ' , min => 0;
-    has before      => spec => ' B :1     ' , min => 0, default => 1;
-    has center      => spec => ' C :4     ' , min => 0;
-    has column      => spec => ' c =i     ' , min => 1, default => 3;
-    has colordump   => spec => '          ' ;
-    has colormap    => spec => '   =s@ cm ' , default => [];
-    has show_year   => spec => ' y        ' ;
-    has years       => spec => ' Y :1     ' , max => 100;
-    has rgb24       => spec => '   !      ' ;
-    has year_on_all => spec => ' P        ' ;
-    has year_on     => spec => ' p =i     ' , min => 0, max => 12;
-    has config      => spec => '   =s%    ' , default => {};
+    has help        => ' h        ' ;
+    has version     => ' v        ' ;
+    has months      => ' m =i     ' , default => 0;
+    has after       => ' A :1     ' , min => 0;
+    has before      => ' B :1     ' , min => 0, default => 1;
+    has center      => ' C :4     ' , min => 0;
+    has column      => ' c =i     ' , min => 1, default => 3;
+    has colordump   => '          ' ;
+    has colormap    => '   =s@ cm ' , default => [];
+    has show_year   => ' y        ' ;
+    has years       => ' Y :1     ' , max => 100;
+    has rgb24       => '   !      ' ;
+    has year_on_all => ' P        ' ;
+    has year_on     => ' p =i     ' , min => 0, max => 12;
+    has config      => '   =s%    ' , default => {};
+    has weeknumber  => ' W :1     ' ;
 
-    has '+center' =>
-	action => sub { $_->{after} = $_->{before} = $_[1] };
+    has '+center' => sub {
+	$_->after = $_->before = $_[1];
+    };
 
-    has '+help' => action => sub {
+    has '+weeknumber' => sub {
+	${$_->config}{$_[0]} = $_[1];
+    };
+
+    has '+rgb24' => sub {
+	$Getopt::EX::Colormap::RGB24 = !!$_[1];
+    };
+
+    has '+config' => sub {
+	App::week::CalYear::Configure $_[1] => $_[2];
+    };
+
+    has '+help' => sub {
 	pod2usage
 	    -verbose  => 99,
 	    -sections => [ qw(SYNOPSIS VERSION) ];
     };
 
-    has '+version' => action  => sub {
+    has '+version' => sub {
 	print "Version: $VERSION\n";
 	exit;
     };
 
-    has "<>" =>
-	action => sub {
-	    my $obj = $_;
-	    local $_ = $_[0];
-	    if (/^-+([0-9]+)$/) {
-		$obj->{months} = $1;
-	    } elsif (/^-/) {
-		die "$_: Unknown option\n";
-	    } else {
-		push @{$obj->ARGV}, $_;
-	    }
-	};
+    has "<>" => sub {
+	my $obj = $_;
+	local $_ = $_[0];
+	if (/^-+([0-9]+)$/) {
+	    $obj->months = $1;
+	} elsif (/^-/) {
+	    die "$_: Option error\n";
+	} else {
+	    push @{$obj->ARGV}, $_;
+	}
+    };
 
 } no Getopt::EX::Hashed;
 
@@ -138,7 +152,7 @@ sub argv {
     my $app = shift;
     for (@{$app->ARGV}) {
 	call \&guess_date,
-	    for => $app,
+	    for  => $app,
 	    with => [ qw(year mon mday show_year) ];
     }
     return $app;
@@ -161,19 +175,8 @@ sub deal_option {
 	exit;
     }
 
-    # --rgb24
-    if (defined $app->rgb24) {
-	no warnings 'once';
-	$Getopt::EX::Colormap::RGB24 = $app->rgb24;
-    }
-
-    # --config
-    if (%{$app->config}) {
-	App::week::CalYear::Configure %{$app->config};
-    }
-
     # -p, -P
-    $app->{year_on} //= $app->mon if $app->mday;
+    $app->year_on //= $app->mon if $app->mday;
     if ($app->year_on_all) {
 	App::week::CalYear::Configure show_year => [ 1..12 ];
     }
@@ -188,7 +191,7 @@ sub deal_option {
     }
 
     # -y, -Y
-    $app->{years} //= 1 if $app->show_year;
+    $app->years //= 1 if $app->show_year;
 
     return $app;
 }
@@ -290,6 +293,9 @@ sub cell {
 
     my @cal = @{$calyear[$y][$m]};
 
+    # XXX this is not the best place to initialize...
+    $obj->cell_width //= length $cal[2];
+
     my %label;
     @label{qw(month week days)} = $d
 	? qw(THISMONTH THISWEEK THISDAYS)
@@ -298,9 +304,9 @@ sub cell {
     $cal[0] = $obj->color($label{month}, $cal[0]);
     $cal[1] = $obj->color($label{week},
 			  state $week = $obj->week_line($cal[1]));
-    my $day_re = $d ? qr/${\(sprintf '%2d', $d)}\b/ : undef;
+    my $day_re = $d ? qr/^(?: [ \d]{2}){0,6} \K(${\(sprintf '%2d', $d)})\b/ : undef;
     for (@cal[ 2 .. $#cal ]) {
-	s/($day_re)/$obj->color("THISDAY", $1)/e if $day_re;
+	s/$day_re/$obj->color("THISDAY", $1)/e if $day_re;
 	$_ = $obj->color($label{days}, $_);
     }
 
@@ -311,9 +317,10 @@ sub week_line {
     my $obj = shift;
     my $week = shift;
     my @week = split_week $week;
-    for (0..6) {
+    for (0..7) {
 	if (my $color = $obj->COLORMAP->{$DOW_LABELS[$_]}) {
 	    my $i = $_ * 2 + 1;
+	    $i > $#week and last;
 	    $week[$i] = $obj->color($color, $week[$i]);
 	}
     }
@@ -328,11 +335,15 @@ __END__
 
 =head1 NAME
 
-week - colorful calendar command
+week - colorful calendar command for ANSI terminal
 
 =head1 SYNOPSIS
 
 B<week> [ -MI<module> ] [ option ] [ date ]
+
+=head1 VERSION
+
+Version 1.0301
 
 =head1 DESCRIPTION
 

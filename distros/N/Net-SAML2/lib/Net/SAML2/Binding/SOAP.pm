@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::Binding::SOAP;
-our $VERSION = '0.57'; # VERSION
+our $VERSION = '0.59'; # VERSION
 
 use Moose;
 use MooseX::Types::URI qw/ Uri /;
@@ -19,9 +19,14 @@ use HTTP::Request::Common;
 has 'ua' => (
     isa      => 'Object',
     is       => 'ro',
-    required => 1,
-    default  => sub { LWP::UserAgent->new }
+    lazy     => 1,
+    builder  => 'build_user_agent',
 );
+
+
+sub build_user_agent {
+    return LWP::UserAgent->new();
+}
 
 has 'url'      => (isa => Uri, is => 'ro', required => 1, coerce => 1);
 has 'key'      => (isa => 'Str', is => 'ro', required => 1);
@@ -36,16 +41,26 @@ sub request {
 
     my $soap_action = 'http://www.oasis-open.org/committees/security';
 
-    my $req = POST $self->url;
-    $req->header('SOAPAction' => $soap_action);
-    $req->header('Content-Type' => 'text/xml');
+    my $req = POST $self->url, Content => $request;
+    # SOAP actions should be wrapped in double quotes:
+    # https://www.w3.org/TR/2000/NOTE-SOAP-20000508/#_Toc478383528
+    $req->header('SOAPAction'     => sprintf('"%s"', $soap_action));
+    $req->header('Content-Type'   => 'text/xml');
     $req->header('Content-Length' => length $request);
-    $req->content($request);
 
-    my $ua = $self->ua;
-    my $res = $ua->request($req);
+    my $res = $self->ua->request($req);
 
-    return $self->handle_response($res->content);
+    if (!$res->is_success) {
+        croak(
+            sprintf(
+                "Unable to perform request: %s (%s)",
+                $res->message, $res->code
+            )
+        );
+    }
+
+    return $self->handle_response($res->decoded_content);
+
 }
 
 
@@ -172,7 +187,7 @@ Net::SAML2::Binding::SOAP - Net::SAML2::Binding::Artifact - SOAP binding for SAM
 
 =head1 VERSION
 
-version 0.57
+version 0.59
 
 =head1 SYNOPSIS
 
@@ -203,6 +218,8 @@ Arguments:
 =item B<ua>
 
 (optional) a LWP::UserAgent-compatible UA
+You can build the user agent to your liking when extending this class by
+overriding C<build_user_agent>
 
 =item B<url>
 
@@ -225,6 +242,10 @@ the idp's signing certificate
 the CA for the SAML CoT
 
 =back
+
+=head2 build_user_agent
+
+Builder for the user agent
 
 =head2 request( $message )
 

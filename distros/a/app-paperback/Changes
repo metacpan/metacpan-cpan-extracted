@@ -1,7 +1,37 @@
 Revision history for Perl module and script App::paperback.
 
+1.09  Mon Aug 29 09:00:00 2022
+	- Simplify syntax in several subroutines
+
+1.08  Sun Aug 28 21:00:00 2022
+	- Fix typo in error message
+
+1.07  Sun Aug 27 09:00:00 2022
+	- Check all m'' and s'' options, fix example for App::paperback (library use)
+
+1.06  Sat Aug 27 23:00:00 2022
+	- Syntax revision
+
+1.05  Sat Aug 27 21:00:00 2022
+	- Simplify logical page rotation
+
+1.04  Sat Aug 27 12:00:00 2022
+	- Change version schema, delete one global variable, delete Exporter
+
+1.03  Fri Aug 26 15:00:00 2022
+	- Improve documentation. Add schemas explanation
+
+1.02  Thu Aug 25 21:00:00 2022
+	- Fix bug in signature reduction math
+
+1.01  Wed Aug 24 13:00:00 2022
+	- Fuller META.json for MetaCPAN
+
+1.00  Wed Aug 24 12:00:00 2022
+	- Use fewer signatures if input PDF has fewer than 13 pages
+
 0.42  Mon Aug 22 12:00:00 2022
-	-  Drop o switch in matches (William Lindley) and some useless variables
+	- Drop o switch in matches (William Lindley) and some useless variables
 
 0.41  Mon Aug 22 07:00:00 2022
 	- Typo fixed (thanks go to William Lindley)

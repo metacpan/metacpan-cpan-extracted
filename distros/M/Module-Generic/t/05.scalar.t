@@ -4,6 +4,7 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
+    use vars qw( $DEBUG );
     use open ':std' => ':utf8';
     use Config;
     use JSON;
@@ -12,6 +13,9 @@ BEGIN
     use Nice::Try;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
+
+use strict;
+use warnings;
 
 use utf8;
 my $str = "Hello world";
@@ -260,7 +264,7 @@ EOT
     # diag( "I am here: ", substr( "$io", $pos - 10, 10 ), "[", substr( "$io", $pos, 1 ), "]" ) if( $DEBUG );
     # diag( "I am here: ", substr( $text, $pos - 10, 10 ), "[", substr( $text, $pos, 1 ), "]", substr( $text, $pos + 1 ) );
     # diag( "$io" );
-    my $n = $io->write( ', Les Odes', 10 );
+    $n = $io->write( ', Les Odes', 10 );
     # $io->printf( "%s", ', Les Odes' );
     is( $n, 10, 'write' );
     substr( $text, -1, 0, ', Les Odes' );
@@ -406,7 +410,7 @@ subtest 'callback' => sub
     {
         my $this = shift( @_ );
         my( $old, $new ) = @$this{qw( removed added )};
-        diag( "Removing data from ", length( $$old ), " bytes to ", length( $$new ), " bytes: '", $$old, "' -> '", $$mew, "'" ) if( $DEBUG );
+        diag( "Removing data from ", length( $$old ), " bytes to ", length( $$new ), " bytes: '", $$old, "' -> '", $$new, "'" ) if( $DEBUG );
         is( length( $$old ), 62, 'undef' );
         is( length( $$new ), 0, 'undef (1)' );
         return(1);

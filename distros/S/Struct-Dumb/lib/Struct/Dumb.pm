@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2022 -- leonerd@leonerd.org.uk
 
 package Struct::Dumb;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Carp;
 
@@ -18,46 +18,48 @@ use Scalar::Util qw( refaddr );
 # Before that we can't easily implement forbidding of @{} overload, so lets not
 use constant HAVE_OVERLOADING => eval { require overloading };
 
+use constant HAVE_FEATURE_CLASS => defined eval { require feature; $feature::feature{class} };
+
 =head1 NAME
 
 C<Struct::Dumb> - make simple lightweight record-like structures
 
 =head1 SYNOPSIS
 
- use Struct::Dumb;
+   use Struct::Dumb;
 
- struct Point => [qw( x y )];
+   struct Point => [qw( x y )];
 
- my $point = Point(10, 20);
+   my $point = Point(10, 20);
 
- printf "Point is at (%d, %d)\n", $point->x, $point->y;
+   printf "Point is at (%d, %d)\n", $point->x, $point->y;
 
- $point->y = 30;
- printf "Point is now at (%d, %d)\n", $point->x, $point->y;
-
-Z<>
-
- struct Point3D => [qw( x y z )], named_constructor => 1;
-
- my $point3d = Point3D( z => 12, x => 100, y => 50 );
-
- printf "Point3d's height is %d\n", $point3d->z;
+   $point->y = 30;
+   printf "Point is now at (%d, %d)\n", $point->x, $point->y;
 
 Z<>
 
- struct Point3D => [qw( x y z )], predicate => "is_Point3D";
+   struct Point3D => [qw( x y z )], named_constructor => 1;
 
- my $point3d = Point3D( 1, 2, 3 );
+   my $point3d = Point3D( z => 12, x => 100, y => 50 );
 
- printf "This is a Point3D\n" if is_Point3D( $point3d );
+   printf "Point3d's height is %d\n", $point3d->z;
 
 Z<>
 
- use Struct::Dumb qw( -named_constructors )
+   struct Point3D => [qw( x y z )], predicate => "is_Point3D";
 
- struct Point3D => [qw( x y z )];
+   my $point3d = Point3D( 1, 2, 3 );
 
- my $point3d = Point3D( x => 100, z => 12, y => 50 );
+   printf "This is a Point3D\n" if is_Point3D( $point3d );
+
+Z<>
+
+   use Struct::Dumb qw( -named_constructors )
+
+   struct Point3D => [qw( x y z )];
+
+   my $point3d = Point3D( x => 100, z => 12, y => 50 );
 
 =head1 DESCRIPTION
 
@@ -82,19 +84,23 @@ if invoked with arguments. (This helps detect likely bugs such as accidentally
 passing in the new value as an argument, or attempting to invoke a stored
 C<CODE> reference by passing argument values directly to the accessor.)
 
- $ perl -E 'use Struct::Dumb; struct Point => [qw( x y )]; Point(30)'
- usage: main::Point($x, $y) at -e line 1
+   $ perl -E 'use Struct::Dumb; struct Point => [qw( x y )]; Point(30)'
+   usage: main::Point($x, $y) at -e line 1
 
- $ perl -E 'use Struct::Dumb; struct Point => [qw( x y )]; Point(10,20)->z'
- main::Point does not have a 'z' field at -e line 1
+   $ perl -E 'use Struct::Dumb; struct Point => [qw( x y )]; Point(10,20)->z'
+   main::Point does not have a 'z' field at -e line 1
 
- $ perl -E 'use Struct::Dumb; struct Point => [qw( x y )]; Point(1,2)->x(3)'
- main::Point->x invoked with arguments at -e line 1.
+   $ perl -E 'use Struct::Dumb; struct Point => [qw( x y )]; Point(1,2)->x(3)'
+   main::Point->x invoked with arguments at -e line 1.
 
 Objects in this class are (currently) backed by an ARRAY reference store,
 though this is an internal implementation detail and should not be relied on
 by using code. Attempting to dereference the object as an ARRAY will throw an
 exception.
+
+I<Note>: That on development perls that support C<use feature 'class'>, this
+is used instead of a blessed ARRAY reference. This implementation choice
+should be transparent to the end-user, as all the same features are supported.
 
 =head2 CONSTRUCTOR FORMS
 
@@ -184,52 +190,22 @@ sub _struct
    my %optional;
    s/^\?// and $optional{$_}++ for @fields;
 
-   my $constructor;
-   if( $named ) {
-      $constructor = sub {
-         my %values = @_;
-         my @values;
-         foreach ( @fields ) {
-            exists $values{$_} or $optional{$_} or
-               croak "usage: $pkg requires '$_'";
-            push @values, delete $values{$_};
-         }
-         if( my ( $extrakey ) = keys %values ) {
-            croak "usage: $pkg does not recognise '$extrakey'";
-         }
-         bless \@values, $pkg;
-      };
-   }
-   else {
-      my $fieldcount = @fields;
-      my $argnames = join ", ", map "\$$_", @fields;
-      $constructor = sub {
-         @_ == $fieldcount or croak "usage: $pkg($argnames)";
-         bless [ @_ ], $pkg;
-      };
-   }
-
    my %subs;
-   foreach ( 0 .. $#fields ) {
-      my $idx = $_;
-      my $field = $fields[$idx];
-
-      BEGIN {
-         overloading->unimport if HAVE_OVERLOADING;
-      }
-
-      $subs{$field} = $lvalue
-         ? sub :lvalue { @_ > 1 and croak "$pkg->$field invoked with arguments";
-                         shift->[$idx] }
-         : sub         { @_ > 1 and croak "$pkg->$field invoked with arguments";
-                         shift->[$idx] };
-   }
    $subs{DESTROY} = sub {};
    $subs{AUTOLOAD} = sub :lvalue {
       my ( $field ) = our $AUTOLOAD =~ m/::([^:]+)$/;
       croak "$pkg does not have a '$field' field";
       my $dummy; ## croak can't be last because it isn't lvalue, so this line is required
    };
+
+   my $constructor;
+
+   if( HAVE_FEATURE_CLASS ) {
+      _build_class_for_feature_class( $pkg, \@fields, \%optional, $named, $lvalue, \$constructor );
+   }
+   else {
+      _build_class_for_classical( $pkg, \@fields, \%optional, $named, $lvalue, \$constructor );
+   }
 
    no strict 'refs';
    *{"${pkg}::$_"} = $subs{$_} for keys %subs;
@@ -257,6 +233,107 @@ sub _struct
       named  => $named,
       fields => \@fields,
    }
+}
+
+sub _build_class_for_classical
+{
+   my ( $pkg, $fields, $optional, $named, $lvalue, $constructorvar ) = @_;
+   my @fields = @$fields;
+
+   if( $named ) {
+      $$constructorvar = sub {
+         my %values = @_;
+         my @values;
+         foreach ( @fields ) {
+            exists $values{$_} or $optional->{$_} or
+               croak "usage: $pkg requires '$_'";
+            push @values, delete $values{$_};
+         }
+         if( my ( $extrakey ) = keys %values ) {
+            croak "usage: $pkg does not recognise '$extrakey'";
+         }
+         bless \@values, $pkg;
+      };
+   }
+   else {
+      my $fieldcount = @fields;
+      my $argnames = join ", ", map "\$$_", @fields;
+      $$constructorvar = sub {
+         @_ == $fieldcount or croak "usage: $pkg($argnames)";
+         bless [ @_ ], $pkg;
+      };
+   }
+
+   my %subs;
+   foreach ( 0 .. $#fields ) {
+      my $idx = $_;
+      my $field = $fields[$idx];
+
+      BEGIN {
+         overloading->unimport if HAVE_OVERLOADING;
+      }
+
+      $subs{$field} = $lvalue
+         ? sub :lvalue { @_ > 1 and croak "$pkg->$field invoked with arguments";
+                         shift->[$idx] }
+         : sub         { @_ > 1 and croak "$pkg->$field invoked with arguments";
+                         shift->[$idx] };
+   }
+
+   no strict 'refs';
+   *{"${pkg}::$_"} = $subs{$_} for keys %subs;
+}
+
+sub _build_class_for_feature_class
+{
+   my ( $pkg, $fields, $optional, $named, $lvalue, $constructorvar ) = @_;
+   my @fields = @$fields;
+   my %optional = %$optional;
+
+   if( $named ) {
+      my %fieldnames = map { $_ => 1 } @fields;
+
+      $$constructorvar = sub {
+         my %values = @_;
+         foreach ( @fields ) {
+            exists $values{$_} or $optional{$_} or
+               croak "usage: $pkg requires '$_'";
+         }
+         $fieldnames{$_} or croak "usage: $pkg does not recognise '$_'" for keys %values;
+         return $pkg->new( %values );
+      };
+   }
+   else {
+      my $fieldcount = @fields;
+      my $argnames = join ", ", map "\$$_", @fields;
+      $$constructorvar = sub {
+         @_ == $fieldcount or croak "usage: $pkg($argnames)";
+         my %values; @values{@fields} = @_;
+         return $pkg->new( %values );
+      };
+   }
+
+   $lvalue = $lvalue ? " :lvalue" : "";
+
+   my @fieldcode = map {
+      my $name = $_;
+      my $var = "\$$name";
+
+      "  field $var;",
+      "  ADJUST {",
+      "    $var = delete \$_[0]->{$name};",
+      "  }",
+      "  method $name$lvalue { \@_ and croak \"$pkg->$name invoked with arguments\"; $var }",
+   } @$fields;
+
+   my $code = join( "\n",
+      "use experimental 'class';",
+      "class $pkg {",
+      "  use Carp;",
+      @fieldcode,
+      "}", "" );
+
+   eval "$code; 1" or die $@;
 }
 
 =head2 struct
@@ -333,14 +410,14 @@ limited by a C<local> override.
 For example, L<Devel::Cycle> needs to access the instances as plain ARRAY
 references so it can walk the data structure looking for reference cycles.
 
- use Devel::Cycle;
+   use Devel::Cycle;
 
- {
-    no warnings 'redefine';
-    local *Point::_forbid_arrayification = sub {};
+   {
+      no warnings 'redefine';
+      local *Point::_forbid_arrayification = sub {};
 
-    memory_cycle_ok( $point );
- }
+      memory_cycle_ok( $point );
+   }
 
 =head1 TODO
 
@@ -369,16 +446,14 @@ sub maybe_apply_datadump_filter
       my ( $ctx, $obj ) = @_;
       return undef unless my $meta = $_STRUCT_PACKAGES{ $ctx->class };
 
-      BEGIN {
-         overloading->unimport if HAVE_OVERLOADING;
-      }
-
       my $fields = $meta->{fields};
       return {
          dump => sprintf "%s(%s)", $ctx->class,
             join ", ", map {
-               ( $meta->{named} ? "$fields->[$_] => " : "" ) .
-               Data::Dump::dump($obj->[$_])
+               my $field = $fields->[$_];
+
+               ( $meta->{named} ? "$field => " : "" ) .
+               Data::Dump::dump($obj->$field)
             } 0 .. $#$fields
       };
    });

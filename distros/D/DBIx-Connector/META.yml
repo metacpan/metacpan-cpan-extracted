@@ -1,11 +1,11 @@
 ---
 abstract: 'Fast, safe DBI connection and transaction management'
 author:
-  - unknown
+  - 'David E. Wheeler'
 build_requires:
   Test::More: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,6 +23,9 @@ requires:
 resources:
   bugtracker: https://github.com/ap/DBIx-Connector/issues
   license: http://dev.perl.org/licenses/
-  repository: git://github.com/ap/DBIx-Connector.git
-version: '0.57'
+  repository: https://github.com/ap/DBIx-Connector.git
+version: '0.58'
+x_copyright:
+  holder: 'David E. Wheeler'
+  year: 2016
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

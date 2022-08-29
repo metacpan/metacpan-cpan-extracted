@@ -2,15 +2,51 @@ use 5.008;
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::Test::DistManifest;
+package Dist::Zilla::Plugin::Test::DistManifest; # git description: v2.000005-6-g278719c
 # ABSTRACT: Release tests for the manifest
-our $VERSION = '2.000005'; # VERSION
+
+our $VERSION = '2.000006';
+
 use Moose;
 extends 'Dist::Zilla::Plugin::InlineFiles';
+with 'Dist::Zilla::Role::PrereqSource';
+
+sub register_prereqs
+{
+    my $self = shift;
+    $self->zilla->register_prereqs(
+        {
+            type  => 'requires',
+            phase => 'develop',
+        },
+        'Test::DistManifest' => 0,
+    );
+}
 
 __PACKAGE__->meta->make_immutable;
 no Moose;
 1;
+
+#pod =head1 SYNOPSIS
+#pod
+#pod In C<dist.ini>:
+#pod
+#pod     [Test::DistManifest]
+#pod
+#pod =for test_synopsis
+#pod 1;
+#pod __END__
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This is an extension of L<Dist::Zilla::Plugin::InlineFiles>, providing the
+#pod following file:
+#pod
+#pod   xt/release/dist-manifest.t - a standard Test::DistManifest test
+#pod
+#pod =for Pod::Coverage register_prereqs
+#pod
+#pod =cut
 
 =pod
 
@@ -22,7 +58,7 @@ Dist::Zilla::Plugin::Test::DistManifest - Release tests for the manifest
 
 =head1 VERSION
 
-version 2.000005
+version 2.000006
 
 =head1 SYNOPSIS
 
@@ -40,23 +76,20 @@ following file:
 =for test_synopsis 1;
 __END__
 
-=head1 AVAILABILITY
+=for Pod::Coverage register_prereqs
 
-The project homepage is L<http://metacpan.org/release/Dist-Zilla-Plugin-Test-DistManifest/>.
+=head1 SUPPORT
 
-The latest version of this module is available from the Comprehensive Perl
-Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
-site near you, or see L<https://metacpan.org/module/Dist::Zilla::Plugin::Test::DistManifest/>.
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-DistManifest>
+(or L<bug-Dist-Zilla-Plugin-Test-DistManifest@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-Test-DistManifest@rt.cpan.org>).
 
-=head1 SOURCE
+There is also a mailing list available for users of this distribution, at
+L<http://dzil.org/#mailing-list>.
 
-The development version is on github at L<http://github.com/doherty/Dist-Zilla-Plugin-Test-DistManifest>
-and may be cloned from L<git://github.com/doherty/Dist-Zilla-Plugin-Test-DistManifest.git>
+There is also an irc channel available for users of this distribution, at
+L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-=head1 BUGS AND LIMITATIONS
-
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://github.com/doherty/Dist-Zilla-Plugin-Test-DistManifest/issues>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHORS
 
@@ -72,9 +105,41 @@ Mike Doherty <doherty@cpan.org>
 
 =back
 
-=head1 COPYRIGHT AND LICENSE
+=head1 CONTRIBUTORS
 
-This software is copyright (c) 2010 by Mike Doherty.
+=for stopwords Marcel Gruenauer Mike Doherty Karen Etheridge Graham Knop Kent Fredric
+
+=over 4
+
+=item *
+
+Marcel Gruenauer <hanekomu@gmail.com>
+
+=item *
+
+Mike Doherty <doherty@cs.dal.ca>
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Mike Doherty <mike@mikedoherty.ca>
+
+=item *
+
+Graham Knop <haarg@haarg.org>
+
+=item *
+
+Kent Fredric <kentfredric@gmail.com>
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2010 by Karen Etheridge.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -83,11 +148,9 @@ the same terms as the Perl 5 programming language system itself.
 
 __DATA__
 ___[ xt/release/dist-manifest.t ]___
-#!perl
-
+use strict;
+use warnings;
 use Test::More;
 
-eval "use Test::DistManifest";
-plan skip_all => "Test::DistManifest required for testing the manifest"
-  if $@;
+use Test::DistManifest;
 manifest_ok();

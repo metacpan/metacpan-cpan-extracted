@@ -5,19 +5,22 @@ Getopt::EX::Hashed - Hash store object automation for Getopt::Long
 
 # VERSION
 
-Version 1.0501
+Version 1.0503
 
 # SYNOPSIS
 
+    # script/foo
     use App::foo;
     App::foo->new->run();
 
+    # lib/App/foo.pm
     package App::foo;
 
     use Getopt::EX::Hashed; {
+        Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
         has start    => ' =i  s begin ' , default => 1;
         has end      => ' =i  e       ' ;
-        has file     => ' =s@ f       ' , is => 'rw', any => qr/^(?!\.)/;
+        has file     => ' =s@ f       ' , any => qr/^(?!\.)/;
         has score    => ' =i          ' , min => 0, max => 100;
         has answer   => ' =i          ' , must => sub { $_[1] == 42 };
         has mouse    => ' =s          ' , any => [ 'Frankie', 'Benjy' ];
@@ -28,23 +31,25 @@ Version 1.0501
         my $app = shift;
         use Getopt::Long;
         $app->getopt or pod2usage();
-        if ($app->{start}) {
+        if ($app->answer == 42) {
+            $app->question //= 'life';
             ...
 
 # DESCRIPTION
 
 **Getopt::EX::Hashed** is a module to automate a hash object to store
 command line option values for **Getopt::Long** and compatible modules
-including **Getopt::EX::Long**.
+including **Getopt::EX::Long**.  Module name shares **Getopt::EX**, but
+it works independently from other modules in **Getopt::EX**, so far.
 
 Major objective of this module is integrating initialization and
-specification into single place.
+specification into single place.  It also provides simple validation
+interface.
 
-Module name shares **Getopt::EX**, but it works independently from
-other modules in **Getopt::EX**, so far.
-
-Accessor methods are automatically generated when appropriate parameter
-is given.
+Accessor methods are automatically generated when `is` parameter is
+given.  If the same function is already defined, the program causes
+fatal error.  Accessors are removed when the object is destroyed.
+Problems may occur when multiple objects are present at the same time.
 
 # FUNCTION
 
@@ -99,7 +104,7 @@ Following parameters are available.
 
     will be compiled into:
 
-        a_to_z|a-to-z:s
+        a_to_z|a-to-z=s
 
     If nothing special is necessary, give empty (or white space only)
     string as a value.  Otherwise, it is not considered as an option.
@@ -116,8 +121,8 @@ Following parameters are available.
     To produce accessor method, `is` parameter is necessary.  Set the
     value `ro` for read-only, `rw` for read-write.
 
-    Read-write accessor has lvalue attribute, so it can be assigned.  You
-    can use like this:
+    Read-write accessor has lvalue attribute, so it can be assigned to.
+    You can use like this:
 
         $app->foo //= 1;
 

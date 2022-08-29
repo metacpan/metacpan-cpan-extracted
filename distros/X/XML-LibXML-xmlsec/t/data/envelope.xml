@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Envelope xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<Data ID="hello">
+     <content>Hello world</content>
+</Data>
+<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+<SignedInfo>
+<CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+<SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+<Reference URI="#hello">
+<Transforms>
+<Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+</Transforms>
+<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+<DigestValue/>
+</Reference>
+</SignedInfo>
+<SignatureValue/>
+<KeyInfo>
+<KeyName/>
+</KeyInfo>
+</Signature></Envelope>
+

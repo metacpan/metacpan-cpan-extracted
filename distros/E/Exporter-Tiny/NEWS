@@ -1,0 +1,11 @@
+1.000000  2017-01-30
+
+ - First stable release.
+
+1.002000  2018-07-17
+
+ - Added support for exporting non-code symbols.
+
+1.004000  2022?
+
+ - Added support for lexical exports if your Perl version is new enough.

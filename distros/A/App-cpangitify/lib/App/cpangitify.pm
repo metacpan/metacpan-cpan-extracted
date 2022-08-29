@@ -3,7 +3,8 @@ package App::cpangitify;
 use strict;
 use warnings;
 use autodie qw( :system );
-use 5.010001;
+use 5.020;
+use experimental qw( signatures );
 use Getopt::Long qw( GetOptions );
 use Pod::Usage qw( pod2usage );
 use Path::Class qw( file dir );
@@ -15,22 +16,19 @@ use URI;
 use PerlX::Maybe qw( maybe );
 use File::Copy::Recursive qw( rcopy );
 use File::Basename qw( basename );
-use Archive::Extract;
-use File::Spec;
+use Archive::Libarchive::Extract;
 use CPAN::ReleaseHistory;
 use HTTP::Tiny;
 
 # ABSTRACT: Convert cpan distribution from BackPAN to a git repository
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 
 our $ua  = HTTP::Tiny->new;
 our $opt_metacpan_url;
 
-sub _rm_rf
+sub _rm_rf ($file)
 {
-  my($file) = @_;
-
   if($file->is_dir && ! -l $file)
   {
     _rm_rf($_) for $file->children;
@@ -41,12 +39,10 @@ sub _rm_rf
 
 our $_run_cb = sub {};
 our $original_run = \&Git::Wrapper::RUN;
-our $ignore_error = 0;
 our $trace = 0;
 
-sub _run_wrapper
+sub _run_wrapper ($self, @command)
 {
-  my($self,@command) = @_;
   my @display;
   foreach my $arg (@command)
   {
@@ -70,11 +66,9 @@ sub _run_wrapper
   $original_run->($self, @command);
 }
 
-sub author($)
+sub author ($cpanid)
 {
   state $cache = {};
-
-  my $cpanid = shift;
 
   unless(defined $cache->{$cpanid})
   {
@@ -94,10 +88,9 @@ sub author($)
   sprintf "%s <%s>", $cache->{$cpanid}->{name}, $email;
 }
 
-sub main
+sub main ($, @args)
 {
-  my $class = shift;
-  local @ARGV = @_;
+  local @ARGV = @args;
   no warnings 'redefine';
   local *Git::Wrapper::RUN = \&_run_wrapper;
   use warnings;
@@ -116,7 +109,7 @@ sub main
     'backpan_url=s'       => \$opt_backpan_url,
     'metacpan_url=s'      => \$opt_metacpan_url,
     'trace'               => \$opt_trace,
-    'skip=s'              => sub { $skip{$_} = 1 for split /,/, $_[1] },
+    'skip=s'              => sub ($version) { $skip{$_} = 1 for split /,/, $version },
     'resume'              => \$opt_resume,
     'output|o=s'          => \$opt_output,
     'help|h'              => sub { pod2usage({ -verbose => 2}) },
@@ -214,23 +207,15 @@ sub main
       return 2;
     }
 
-    do {
-      my $fn = basename $uri->path;
-
-      open my $fh, '>', $fn;
-      binmode $fh;
-      print $fh $res->{content};
-      close $fh;
-
-      say "unpack... $fn";
-      my $archive = Archive::Extract->new( archive => $fn );
-      $archive->extract( to => File::Spec->curdir ) || die $archive->error;
-      unlink $fn;
-      if($trace)
-      {
-        say "- extract $fn $_" for @{ $archive->files };
-      }
-    };
+    say "unpack... @{[ basename $uri->path ]}";
+    my $extract = Archive::Libarchive::Extract->new(
+      memory => \$res->{content},
+      entry => sub ($e) {
+        say "- extract @{[ $e->pathname ]}" if $trace;
+        1;
+      },
+    );
+    $extract->extract( to => $CWD );
 
     my $source = do {
       my @children = map { $_->absolute } dir()->children;
@@ -270,10 +255,10 @@ sub main
     $git->commit({
       message       => "version $version",
       date          => "$time +0000",
-      author        => author $cpanid,
+      author        => author($cpanid),
       'allow-empty' => 1,
     });
-    eval { local $ignore_error = 1; $git->tag($version) };
+    eval { $git->tag($version) };
     warn $@ if $@;
   }
 
@@ -294,7 +279,7 @@ App::cpangitify - Convert cpan distribution from BackPAN to a git repository
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 DESCRIPTION
 
@@ -314,7 +299,7 @@ Mohammad S Anwar (MANWAR)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Graham Ollis.
+This software is copyright (c) 2013-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

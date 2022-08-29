@@ -2,19 +2,32 @@
 package MyTest::Role2;
 use strict;
 use warnings;
+no warnings qw( once void );
 
 our $USES_MITE = "Mite::Role";
 our $MITE_SHIM = "MyTest::Mite";
-our $MITE_VERSION = "0.009000";
+our $MITE_VERSION = "0.010008";
+# Mite keywords
 BEGIN {
-    require MyTest::Role1;
-    our %DOES = ( "MyTest::Role2" => 1, "MyTest::Role1" => 1 );
-}
+    my ( $SHIM, $CALLER ) = ( "MyTest::Mite", "MyTest::Role2" );
+    ( *after, *around, *before, *has, *requires, *signature_for, *with ) = do {
+        package MyTest::Mite;
+        no warnings 'redefine';
+        (
+            sub { $SHIM->HANDLE_after( $CALLER, "role", @_ ) },
+            sub { $SHIM->HANDLE_around( $CALLER, "role", @_ ) },
+            sub { $SHIM->HANDLE_before( $CALLER, "role", @_ ) },
+            sub { $SHIM->HANDLE_has( $CALLER, has => @_ ) },
+            sub {},
+            sub { $SHIM->HANDLE_signature_for( $CALLER, "role", @_ ) },
+            sub { $SHIM->HANDLE_with( $CALLER, @_ ) },
+        );
+    };
+};
 
 # Gather metadata for constructor and destructor
 sub __META__ {
     no strict 'refs';
-    no warnings 'once';
     my $class      = shift; $class = ref($class) || $class;
     my $linear_isa = mro::get_linear_isa( $class );
     return {
@@ -31,12 +44,21 @@ sub __META__ {
     };
 }
 
+BEGIN {
+    require MyTest::Role1;
+    
+    our %DOES = ( "MyTest::Role2" => 1, "MyTest::Role1" => 1 );
+}
+
 # See UNIVERSAL
 sub DOES {
     my ( $self, $role ) = @_;
     our %DOES;
     return $DOES{$role} if exists $DOES{$role};
     return 1 if $role eq __PACKAGE__;
+    if ( $INC{'Moose/Util.pm'} and my $meta = Moose::Util::find_meta( ref $self or $self ) ) {
+        $meta->can( 'does_role' ) and $meta->does_role( $role ) and return 1;
+    }
     return $self->SUPER::DOES( $role );
 }
 
@@ -74,7 +96,8 @@ sub __FINALIZE_APPLICATION__ {
     my $shim = "MyTest::Mite";
     for my $modifier_rule ( @METHOD_MODIFIERS ) {
         my ( $modification, $names, $coderef ) = @$modifier_rule;
-        $shim->$modification( $target, $names, $coderef );
+        my $handler = "HANDLE_$modification";
+        $shim->$handler( $target, "class", $names, $coderef );
     }
 
     return;

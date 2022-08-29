@@ -5,7 +5,7 @@ use strict;
 use warnings; no warnings qw(void once uninitialized numeric redefine);
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.002002';
+our $VERSION   = '1.004000';
 our @EXPORT_OK = qw< mkopt mkopt_hash _croak _carp >;
 
 sub _croak ($;@) { require Carp; my $fmt = shift; @_ = sprintf($fmt, @_); goto \&Carp::croak }
@@ -23,13 +23,13 @@ my $_process_optlist = sub
 		
 		($name =~ m{\A\!(/.+/[msixpodual]*)\z}) ?
 			do {
-				my @not = $class->_exporter_expand_regexp($1, $value, $global_opts);
+				my @not = $class->_exporter_expand_regexp("$1", $value, $global_opts);
 				++$not_want->{$_->[0]} for @not;
 			} :
 		($name =~ m{\A\!(.+)\z}) ?
 			(++$not_want->{$1}) :
 		($name =~ m{\A[:-](.+)\z}) ?
-			push(@$opts, $class->_exporter_expand_tag($1, $value, $global_opts)) :
+			push(@$opts, $class->_exporter_expand_tag("$1", $value, $global_opts)) :
 		($name =~ m{\A/.+/[msixpodual]*\z}) ?
 			push(@$opts, $class->_exporter_expand_regexp($name, $value, $global_opts)) :
 		# else ?
@@ -261,7 +261,17 @@ sub _exporter_install_sub
 	
 	my $into      = $globals->{into};
 	my $installer = $globals->{installer} || $globals->{exporter};
-	
+
+	if ( $into eq '-lexical' or $globals->{lexical} ) {
+		$] ge '5.037002'
+			or _croak( 'Lexical export requires Perl 5.37.2 or above' );
+		$installer ||= sub {
+			my ( $sigilname, $sym ) = @{ $_[1] };
+			no warnings ( $] ge '5.037002' ? 'experimental::builtin' : () );
+			builtin::export_lexically( $sigilname, $sym );
+		};
+	}
+
 	$name =
 		ref    $globals->{as} ? $globals->{as}->($name) :
 		ref    $value->{-as}  ? $value->{-as}->($name) :
@@ -476,7 +486,7 @@ L<Exporter::Tiny::Manual::Importing>
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=Exporter-Tiny>.
+L<https://github.com/tobyink/p5-exporter-tiny/issues>.
 
 =head1 SUPPORT
 
@@ -495,7 +505,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017, 2022 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

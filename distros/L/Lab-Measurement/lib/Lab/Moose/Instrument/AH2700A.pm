@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::AH2700A;
-$Lab::Moose::Instrument::AH2700A::VERSION = '3.821';
+$Lab::Moose::Instrument::AH2700A::VERSION = '3.822';
 #ABSTRACT: Andeen-Hagerling AH2700A ultra-precision capacitance bridge
 
 use v5.20;
@@ -242,7 +242,7 @@ Lab::Moose::Instrument::AH2700A - Andeen-Hagerling AH2700A ultra-precision capac
 
 =head1 VERSION
 
-version 3.821
+version 3.822
 
 =head1 SYNOPSIS
 

@@ -11,7 +11,7 @@ use IO::Socket::INET;
 use Errno qw( EINPROGRESS EWOULDBLOCK );
 
 my $Package = __PACKAGE__;
-our $VERSION = '2.10';
+our $VERSION = '2.11';
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
 		prompt	=> [qw(promptClear promptHide promptCredential)],
@@ -337,6 +337,7 @@ sub new {
 		POLL			=>	undef,	# Storage hash for poll-capable methods
 		POLLING			=>	0,	# Flag to track if in polling-capable method or not
 		POLLREPORTED		=>	0,	# Flag used by poll() to track already reported objects
+		WRITEFLAG		=>	0,	# Flag to keep track of when a write was last performed
 		timeout			=>	$Default{timeout},
 		connection_timeout	=>	$Default{connection_timeout},
 		blocking		=>	$Default{blocking},
@@ -2405,6 +2406,7 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 		}
 	}} until ($self->{POLL}{local_buffer} =~ /($login->{prompt})/);
 	$self->{LASTPROMPT} = $1;
+	$self->{WRITEFLAG} = 0;
 	($self->{USERNAME}, $self->{PASSWORD}) = ($login->{username}, $login->{password}) if $login->{login_attempted};
 	return $self->poll_return(1);
 }
@@ -2542,6 +2544,7 @@ sub poll_cmd { # Method to handle cmd for poll methods (used for both blocking &
 		}
 	} until $self->{POLL}{local_buffer} =~ s/($cmd->{prompt})//;
 	$self->{LASTPROMPT} = $1;
+	$self->{WRITEFLAG} = 0;
 	return $self->poll_return(1);
 }
 
@@ -2837,6 +2840,7 @@ sub _put { # Internal write method
 	else {
 		return $self->error("$pkgsub: Invalid connection mode");
 	}
+	$self->{WRITEFLAG} = 1;
 	return 1;
 }
 
@@ -5118,7 +5122,7 @@ A lot of the methods and functionality of this class, as well as some code, is d
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021 Ludovico Stevens.
+Copyright 2022 Ludovico Stevens.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

@@ -1,5 +1,11 @@
 Revision history for Perl extension Math::DifferenceSet::Planar.
 
+0.018   Sun, 28 Aug 2022 12:29:16 +0200
+        - new methods min_element and max_element
+        - new example scripts pds_info and A353077.pl
+        - bug fix for peak_elements memoization
+        - roadmap section in pod
+
 0.017   Thu, 18 Aug 2022 21:29:14 +0200
         - bug fix: eta() could give wrong results
         - improved tests and documentation

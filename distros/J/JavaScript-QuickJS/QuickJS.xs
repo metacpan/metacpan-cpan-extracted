@@ -698,7 +698,7 @@ std (SV* self_sv)
                 break;
 
             default:
-                croak("%s: Bad XS alias: %d\n", __func__, ix);
+                croak("%s: Bad XS alias: %d\n", __func__, (int) ix);
         }
 
         RETVAL = SvREFCNT_inc(self_sv);

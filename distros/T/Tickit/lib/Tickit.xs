@@ -34,6 +34,10 @@ static SV *S_newSVivpv(pTHX_ int iv, const char *pv)
 }
 #endif
 
+#ifndef mPUSHpvs
+#  define mPUSHpvs(s)  mPUSHp("" s "", sizeof(s)-1)
+#endif
+
 // A handy helper for setting PL_curcop
 #define SET_PL_curcop                          \
   do {                                         \
@@ -237,13 +241,13 @@ static int pen_parse_attrname(const char *name)
   TickitPenAttr ret;
 
   if(!end)
-    return tickit_pen_lookup_attr(name);
+    return tickit_penattr_lookup(name);
 
   if(!strEQ(end+1, "rgb8"))
     return -1;
 
   name = strndup(name, end - name);
-  ret = tickit_pen_lookup_attr(name);
+  ret = tickit_penattr_lookup(name);
   free((void *)name);
 
   switch(ret) {
@@ -266,7 +270,7 @@ static SV *S_pen_get_attr(pTHX_ TickitPen *pen, int attr)
     }
   }
 
-  switch(tickit_pen_attrtype(attr)) {
+  switch(tickit_penattr_type(attr)) {
   case TICKIT_PENTYPE_BOOL:
     return tickit_pen_get_bool_attr(pen, attr) ? &PL_sv_yes : &PL_sv_no;
   case TICKIT_PENTYPE_INT:
@@ -293,7 +297,7 @@ static void S_pen_set_attr(pTHX_ TickitPen *pen, int attr, SV *val)
     }
   }
 
-  switch(tickit_pen_attrtype(attr)) {
+  switch(tickit_penattr_type(attr)) {
   case TICKIT_PENTYPE_INT:
     tickit_pen_set_int_attr(pen, attr, SvOK(val) ? SvIV(val) : -1);
     break;
@@ -321,7 +325,7 @@ static TickitPen *S_pen_from_args(pTHX_ SV **args, int argcount)
     const char *name  = SvPV_nolen(args[i]);
     SV         *value = args[i+1];
 
-    TickitPenAttr attr = tickit_pen_lookup_attr(name);
+    TickitPenAttr attr = tickit_penattr_lookup(name);
     if(attr != -1)
       pen_set_attr(pen, attr, value);
   }
@@ -336,7 +340,7 @@ static void S_pen_set_attrs(pTHX_ TickitPen *pen, HV *attrs)
   SV *val;
 
   for(a = 1; a < TICKIT_N_PEN_ATTRS; a++) {
-    const char *name = tickit_pen_attrname(a);
+    const char *name = tickit_penattr_name(a);
     val = hv_delete(attrs, name, strlen(name), 0);
     if(!val)
       continue;
@@ -1797,17 +1801,17 @@ getattrs(self)
       EXTEND(SP, 2); count += 2;
 
       /* Because mPUSHp(str,0) creates a 0-length string */
-      mPUSHs(newSVpv(tickit_pen_attrname(a), 0));
+      mPUSHs(newSVpv(tickit_penattr_name(a), 0));
       mPUSHs(pen_get_attr(self, a));
     }
     if(tickit_pen_has_colour_attr_rgb8(self, TICKIT_PEN_FG)) {
       EXTEND(SP, 2); count += 2;
-      mPUSHs(newSVpv("fg:rgb8", 7));
+      mPUSHpvs("fg:rgb8");
       mPUSHs(pen_get_attr(self, TICKIT_PEN_FG_RGB8));
     }
     if(tickit_pen_has_colour_attr_rgb8(self, TICKIT_PEN_BG)) {
       EXTEND(SP, 2); count += 2;
-      mPUSHs(newSVpv("bg:rgb8", 7));
+      mPUSHpvs("bg:rgb8");
       mPUSHs(pen_get_attr(self, TICKIT_PEN_BG_RGB8));
     }
     XSRETURN(count);
@@ -1820,7 +1824,7 @@ equiv_attr(self,other,attr)
   INIT:
     TickitPenAttr a;
   CODE:
-    if((a = tickit_pen_lookup_attr(attr)) == -1)
+    if((a = tickit_penattr_lookup(attr)) == -1)
       XSRETURN_UNDEF;
     RETVAL = tickit_pen_equiv_attr(self, other, a);
   OUTPUT:
@@ -1874,7 +1878,7 @@ delattr(self,attr)
   INIT:
     TickitPenAttr a;
   CODE:
-    if((a = tickit_pen_lookup_attr(attr)) == -1)
+    if((a = tickit_penattr_lookup(attr)) == -1)
       XSRETURN_UNDEF;
     tickit_pen_clear_attr(self, a);
 
@@ -2987,7 +2991,7 @@ getctl_int(self,ctl)
     TickitTermCtl ctl_e;
   CODE:
     if(SvPOK(ctl)) {
-      ctl_e = tickit_term_lookup_ctl(SvPV_nolen(ctl));
+      ctl_e = tickit_termctl_lookup(SvPV_nolen(ctl));
       if(ctl_e == -1)
         croak("Unrecognised 'ctl' name '%s'", SvPV_nolen(ctl));
     }
@@ -3010,7 +3014,7 @@ setctl_int(self,ctl,value)
     TickitTermCtl ctl_e;
   PPCODE:
     if(SvPOK(ctl)) {
-      ctl_e = tickit_term_lookup_ctl(SvPV_nolen(ctl));
+      ctl_e = tickit_termctl_lookup(SvPV_nolen(ctl));
       if(ctl_e == -1)
         croak("Unrecognised 'ctl' name '%s'", SvPV_nolen(ctl));
     }
@@ -3033,7 +3037,7 @@ setctl_str(self,ctl,value)
     TickitTermCtl ctl_e;
   CODE:
     if(SvPOK(ctl)) {
-      ctl_e = tickit_term_lookup_ctl(SvPV_nolen(ctl));
+      ctl_e = tickit_termctl_lookup(SvPV_nolen(ctl));
       if(ctl_e == -1)
         croak("Unrecognised 'ctl' name '%s'", SvPV_nolen(ctl));
     }
@@ -3053,7 +3057,7 @@ getctl(self,ctl)
     TickitTermCtl ctl_e;
   CODE:
     if(SvPOK(ctl)) {
-      ctl_e = tickit_term_lookup_ctl(SvPV_nolen(ctl));
+      ctl_e = tickit_termctl_lookup(SvPV_nolen(ctl));
       if(ctl_e == -1)
         croak("Unrecognised 'ctl' name '%s'", SvPV_nolen(ctl));
     }
@@ -3062,7 +3066,7 @@ getctl(self,ctl)
     else
       croak("Expected 'ctl' to be an integer or string");
 
-    switch(tickit_term_ctltype(ctl_e)) {
+    switch(tickit_termctl_type(ctl_e)) {
       case TICKIT_TYPE_BOOL: {
         int value;
         if(!tickit_term_getctl_int(self, ctl_e, &value))
@@ -3095,7 +3099,7 @@ setctl(self,ctl,value)
     TickitTermCtl ctl_e;
   CODE:
     if(SvPOK(ctl)) {
-      ctl_e = tickit_term_lookup_ctl(SvPV_nolen(ctl));
+      ctl_e = tickit_termctl_lookup(SvPV_nolen(ctl));
       if(ctl_e == -1)
         croak("Unrecognised 'ctl' name '%s'", SvPV_nolen(ctl));
     }
@@ -3105,7 +3109,7 @@ setctl(self,ctl,value)
       croak("Expected 'ctl' to be an integer or string");
 
     RETVAL = 0;
-    switch(tickit_term_ctltype(ctl_e)) {
+    switch(tickit_termctl_type(ctl_e)) {
       case TICKIT_TYPE_BOOL:
       case TICKIT_TYPE_INT:
         RETVAL = tickit_term_setctl_int(self, ctl_e, SvIV(value));
@@ -3198,12 +3202,12 @@ get_methodlog(self)
           TickitPenAttr attr;
 
           for(attr = 1; attr < TICKIT_N_PEN_ATTRS; attr++) {
-            const char *attrname = tickit_pen_attrname(attr);
+            const char *attrname = tickit_penattr_name(attr);
             int value;
             if(!tickit_pen_nondefault_attr(entry->pen, attr))
               continue;
 
-            switch(tickit_pen_attrtype(attr)) {
+            switch(tickit_penattr_type(attr)) {
             case TICKIT_PENTYPE_BOOL:
               value = tickit_pen_get_bool_attr(entry->pen, attr); break;
             case TICKIT_PENTYPE_INT:
@@ -3268,7 +3272,7 @@ get_display_pen(self,line,col)
       if(!tickit_pen_nondefault_attr(pen, attr))
         continue;
 
-      attrname = tickit_pen_attrname(attr);
+      attrname = tickit_penattr_name(attr);
       hv_store(penattrs, attrname, strlen(attrname), pen_get_attr(pen, attr), 0);
     }
 
@@ -3815,7 +3819,7 @@ getctl(self,ctl)
     TickitWindowCtl ctl_e;
   CODE:
     if(SvPOK(ctl)) {
-      ctl_e = tickit_window_lookup_ctl(SvPV_nolen(ctl));
+      ctl_e = tickit_windowctl_lookup(SvPV_nolen(ctl));
       if(ctl_e == -1)
         croak("Unrecognised 'ctl' name '%s'", SvPV_nolen(ctl));
     }
@@ -3824,7 +3828,7 @@ getctl(self,ctl)
     else
       croak("Expected 'ctl' to be an integer or string");
 
-    switch(tickit_window_ctltype(ctl_e)) {
+    switch(tickit_windowctl_type(ctl_e)) {
       case TICKIT_TYPE_BOOL: {
         int value;
         if(!tickit_window_getctl_int(self->win, ctl_e, &value))
@@ -3858,7 +3862,7 @@ setctl(self,ctl,value)
     TickitWindowCtl ctl_e;
   CODE:
     if(SvPOK(ctl)) {
-      ctl_e = tickit_window_lookup_ctl(SvPV_nolen(ctl));
+      ctl_e = tickit_windowctl_lookup(SvPV_nolen(ctl));
       if(ctl_e == -1)
         croak("Unrecognised 'ctl' name '%s'", SvPV_nolen(ctl));
     }
@@ -3868,7 +3872,7 @@ setctl(self,ctl,value)
       croak("Expected 'ctl' to be an integer or string");
 
     RETVAL = 0;
-    switch(tickit_window_ctltype(ctl_e)) {
+    switch(tickit_windowctl_type(ctl_e)) {
       case TICKIT_TYPE_BOOL:
       case TICKIT_TYPE_INT:
         RETVAL = tickit_window_setctl_int(self->win, ctl_e, SvIV(value));
@@ -4058,7 +4062,7 @@ setctl(self, ctl, value)
     TickitCtl ctl_e;
   CODE:
     if(SvPOK(ctl)) {
-      ctl_e = tickit_lookup_ctl(SvPV_nolen(ctl));
+      ctl_e = tickit_ctl_lookup(SvPV_nolen(ctl));
       if(ctl_e == -1)
         croak("Unrecognised 'ctl' name '%s'", SvPV_nolen(ctl));
     }
@@ -4068,7 +4072,7 @@ setctl(self, ctl, value)
       croak("Expected 'ctl' to be an integer or string");
 
     RETVAL = 0;
-    switch(tickit_ctltype(ctl_e)) {
+    switch(tickit_ctl_type(ctl_e)) {
       case TICKIT_TYPE_BOOL:
       case TICKIT_TYPE_INT:
         RETVAL = tickit_setctl_int(self, ctl_e, SvIV(value));

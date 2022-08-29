@@ -1,4 +1,4 @@
-package Gtk2::CV::Plugin::PetRenamer;
+package Gtk2::CV::Plugin::PatRenamer;
 
 use common::sense;
 use IO::AIO;
@@ -235,7 +235,7 @@ use Gtk2::CV::Plugin;
 sub new_renamer {
    my ($schnauzer) = @_;
 
-   my $renamer = new Gtk2::CV::Plugin::PetRenamer
+   my $renamer = new Gtk2::CV::Plugin::PatRenamer
       schnauzer => $schnauzer,
       modal => 1,
       default_width => 1500, default_height => 1100,

@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '1.0501';
+our $VERSION = '1.0503';
 
 =head1 NAME
 
@@ -8,19 +8,22 @@ Getopt::EX::Hashed - Hash store object automation for Getopt::Long
 
 =head1 VERSION
 
-Version 1.0501
+Version 1.0503
 
 =head1 SYNOPSIS
 
+  # script/foo
   use App::foo;
   App::foo->new->run();
 
+  # lib/App/foo.pm
   package App::foo;
 
   use Getopt::EX::Hashed; {
+      Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
       has start    => ' =i  s begin ' , default => 1;
       has end      => ' =i  e       ' ;
-      has file     => ' =s@ f       ' , is => 'rw', any => qr/^(?!\.)/;
+      has file     => ' =s@ f       ' , any => qr/^(?!\.)/;
       has score    => ' =i          ' , min => 0, max => 100;
       has answer   => ' =i          ' , must => sub { $_[1] == 42 };
       has mouse    => ' =s          ' , any => [ 'Frankie', 'Benjy' ];
@@ -31,7 +34,8 @@ Version 1.0501
       my $app = shift;
       use Getopt::Long;
       $app->getopt or pod2usage();
-      if ($app->{start}) {
+      if ($app->answer == 42) {
+          $app->question //= 'life';
           ...
 
 =cut
@@ -46,14 +50,13 @@ use List::Util qw(first);
 # store metadata in caller context
 my  %__DB__;
 sub  __DB__ {
-    $__DB__{$_[0]} //= do {
-	no strict 'refs';
-	state $sub = __PACKAGE__ =~ s/::/_/gr;
-	\%{"$_[0]\::$sub\::__DB__"};
-    };
+    my $caller = shift;
+    state $pkg = __PACKAGE__ =~ s/::/_/gr;
+    no strict 'refs';
+    $__DB__{$caller} //= \%{"$caller\::$pkg\::__DB__"};
 }
-sub __Member__ { __DB__(@_)->{Member} //= [] }
-sub __Config__ { __DB__(@_)->{Config} //= {} }
+sub __Member__ { __DB__($_[0])->{Member} //= [] }
+sub __Config__ { __DB__($_[0])->{Config} //= {} }
 
 my %DefaultConfig = (
     DEBUG_PRINT        => 0,
@@ -152,13 +155,15 @@ sub new {
     for my $m (@$master) {
 	my($name, %param) = @$m;
 	push @$member, [ $name => \%param ];
+	next if $name eq '<>';
 	if (my $is = $param{is}) {
 	    no strict 'refs';
-	    my $access = $config->{ACCESSOR_PREFIX} . $name;
-	    unless (${"$class\::"}{$access}) {
-		$is = 'lv' if $config->{ACCESSOR_LVALUE} && $is eq 'rw';
-		*{"$class\::$access"} = _accessor($is, $name);
+	    my $sub = "$class\::" . $config->{ACCESSOR_PREFIX} . $name;
+	    if (defined &$sub) {
+		croak "&$sub already exists.\n";
 	    }
+	    $is = 'lv' if $is eq 'rw' && $config->{ACCESSOR_LVALUE};
+	    *$sub = _accessor($is, $name);
 	}
 	$obj->{$name} = do {
 	    local $_ = $param{default};
@@ -170,6 +175,18 @@ sub new {
     }
     lock_keys %$obj if $config->{LOCK_KEYS};
     $obj;
+}
+
+sub DESTROY {
+    my $obj = shift;
+    my $pkg = ref $obj;
+    my $hash = do { no strict 'refs'; \%{"$pkg\::"} };
+    my $prefix = $obj->_conf->{ACCESSOR_PREFIX};
+    for (@{ $obj->_member }) {
+	next unless $_->[1]->{is};
+	my $name = $prefix . $_->[0];
+	delete $hash->{$name} if exists $hash->{$name};
+    }
 }
 
 sub optspec {
@@ -208,15 +225,15 @@ sub _accessor {
     my($is, $name) = @_;
     {
 	ro => sub {
-	    $#_ and die "$name is readonly\n";
+	    @_ > 1 and die "$name is readonly\n";
 	    $_[0]->{$name};
 	},
 	rw => sub {
-	    $#_ and do { $_[0]->{$name} = $_[1]; return $_[0] };
+	    @_ > 1 and do { $_[0]->{$name} = $_[1]; return $_[0] };
 	    $_[0]->{$name};
 	},
 	lv => sub :lvalue {
-	    $#_ and do { $_[0]->{$name} = $_[1]; return $_[0] };
+	    @_ > 1 and do { $_[0]->{$name} = $_[1]; return $_[0] };
 	    $_[0]->{$name};
 	},
     }->{$is} or die "$name has invalid 'is' parameter.\n";
@@ -356,16 +373,17 @@ __END__
 
 B<Getopt::EX::Hashed> is a module to automate a hash object to store
 command line option values for B<Getopt::Long> and compatible modules
-including B<Getopt::EX::Long>.
+including B<Getopt::EX::Long>.  Module name shares B<Getopt::EX>, but
+it works independently from other modules in B<Getopt::EX>, so far.
 
 Major objective of this module is integrating initialization and
-specification into single place.
+specification into single place.  It also provides simple validation
+interface.
 
-Module name shares B<Getopt::EX>, but it works independently from
-other modules in B<Getopt::EX>, so far.
-
-Accessor methods are automatically generated when appropriate parameter
-is given.
+Accessor methods are automatically generated when C<is> parameter is
+given.  If the same function is already defined, the program causes
+fatal error.  Accessors are removed when the object is destroyed.
+Problems may occur when multiple objects are present at the same time.
 
 =head1 FUNCTION
 
@@ -422,7 +440,7 @@ is defined with dash (C<->) in place of underscores.  So
 
 will be compiled into:
 
-    a_to_z|a-to-z:s
+    a_to_z|a-to-z=s
 
 If nothing special is necessary, give empty (or white space only)
 string as a value.  Otherwise, it is not considered as an option.
@@ -439,8 +457,8 @@ There is no difference with ones in C<spec> parameter.
 To produce accessor method, C<is> parameter is necessary.  Set the
 value C<ro> for read-only, C<rw> for read-write.
 
-Read-write accessor has lvalue attribute, so it can be assigned.  You
-can use like this:
+Read-write accessor has lvalue attribute, so it can be assigned to.
+You can use like this:
 
     $app->foo //= 1;
 

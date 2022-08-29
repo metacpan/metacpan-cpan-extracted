@@ -13,7 +13,7 @@ has attr => (
     'my_reset' => 'reset',
     'my_set' => 'set',
   },
-  default => \ '0',
+  default => sub { 0 },
 );
 
 1;

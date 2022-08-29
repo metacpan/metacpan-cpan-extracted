@@ -3,6 +3,7 @@ BEGIN
 {
     use Test::More qw( no_plan );
     use lib './lib';
+    use vars qw( $DEBUG $IS_WINDOWS_OS );
     use_ok( 'Module::Generic::Finfo', ':all' ) || BAIL_OUT( "Unable to load Module::Generic::Finfo" );
     use constant FINFO_DEV => 0;
     use constant FINFO_INODE => 1;
@@ -20,6 +21,9 @@ BEGIN
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
     our $IS_WINDOWS_OS = ( $^O =~ /^(dos|mswin32|NetWare|symbian|win32)$/i );
 };
+
+use strict;
+use warnings;
 
 my $file;
 if( $IS_WINDOWS_OS )

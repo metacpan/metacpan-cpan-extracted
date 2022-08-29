@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Envelope xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+  <Data ID="hello">
+     <content>Hello world</content>
+  </Data>
+  <ds:Signature>
+    <ds:SignedInfo>
+      <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+      <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+      <ds:Reference URI="#hello">
+        <ds:Transforms>
+          <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+        </ds:Transforms>
+        <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+        <ds:DigestValue/>
+      </ds:Reference>
+    </ds:SignedInfo>
+    <ds:SignatureValue/>
+    <ds:KeyInfo>
+      <ds:KeyName>key.pem</ds:KeyName>
+      <ds:KeyValue/>
+      <ds:X509Data>
+         <ds:X509Certificate/>
+      </ds:X509Data>
+    </ds:KeyInfo>
+  </ds:Signature>
+</Envelope>

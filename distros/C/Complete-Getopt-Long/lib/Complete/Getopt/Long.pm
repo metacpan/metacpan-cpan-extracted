@@ -1,17 +1,17 @@
 package Complete::Getopt::Long;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-09'; # DATE
-our $DIST = 'Complete-Getopt-Long'; # DIST
-our $VERSION = '0.480'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 
-require Exporter;
-our @ISA = qw(Exporter);
+use Exporter 'import';
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-08-28'; # DATE
+our $DIST = 'Complete-Getopt-Long'; # DIST
+our $VERSION = '0.481'; # VERSION
+
 our @EXPORT_OK = qw(
                        complete_cli_arg
                );
@@ -357,10 +357,9 @@ sub complete_cli_arg {
         return unless $extras;
         my $ggls_res = $extras->{ggls_res};
         return unless $ggls_res;
-        my $cmdline = $extras->{cmdline};
-        return unless $cmdline;
         my $r = $extras->{r};
         return unless $r;
+        my $cmdline = $extras->{cmdline};
 
         my $optname = shift;
         my $ospec  = $opts{$optname}{ospec};
@@ -379,7 +378,8 @@ sub complete_cli_arg {
 
         if (defined(my $coptname = $ospecmeta->{common_opt})) {
             # it's a common Perinci::CmdLine option
-            my $coptspec = $cmdline->{common_opts}{$coptname};
+            my $coptspec = $cmdline ? $cmdline->{common_opts}{$coptname} :
+                $r->{common_opts} ? $r->{common_opts}{$coptname} : undef;
             #use DD; dd $coptspec;
             return unless $coptspec;
 
@@ -773,7 +773,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.480 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2020-09-09.
+This document describes version 0.481 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2022-08-28.
 
 =head1 SYNOPSIS
 
@@ -949,14 +949,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Complete-G
 
 Source repository is at L<https://github.com/perlancar/perl-Complete-Getopt-Long>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Getopt-Long>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Getopt::Long::Complete>
@@ -975,11 +967,53 @@ applications with completion feature.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTORS
+
+=for stopwords Mary Ehlers Steven Haryanto
+
+=over 4
+
+=item *
+
+Mary Ehlers <regina.verb.ae@gmail.com>
+
+=item *
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=back
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Getopt-Long>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

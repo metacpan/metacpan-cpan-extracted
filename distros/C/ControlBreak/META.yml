@@ -1,0 +1,48 @@
+---
+abstract: 'Compare values during iteration to detect changes'
+author:
+  - 'Gary Puckering <jgpuckering@rogers.com>'
+build_requires:
+  Capture::Tiny: '0'
+  Data::Table: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  Getopt::Long: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ControlBreak
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  ControlBreak:
+    file: lib/ControlBreak.pm
+    version: '1.00'
+requires:
+  Carp: '0'
+  Object::Pad: '0.66'
+  perl: v5.18.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=ControlBreak
+  repository: git://github.com/jgpuckering/ControlBreak.git
+version: '1.00'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

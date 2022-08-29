@@ -1,0 +1,142 @@
+package Faker::Plugin::EnUs::PersonName;
+
+use 5.018;
+
+use strict;
+use warnings;
+
+use Venus::Class 'base';
+
+base 'Faker::Plugin::EnUs';
+
+# METHODS
+
+sub execute {
+  my ($self, $data) = @_;
+
+  return $self->process_format($self->faker->random->select(format_for_name()));
+}
+
+sub format_for_name {
+  state $name = [
+    map([
+      '{{person_first_name}}',
+      '{{person_last_name}}'
+    ], 1..3),
+    [
+      '{{person_first_name}}',
+      '{{person_first_name}}',
+      '{{person_last_name}}'
+    ],
+  ]
+}
+
+1;
+
+
+
+=head1 NAME
+
+Faker::Plugin::EnUs::PersonName - Person Name
+
+=cut
+
+=head1 ABSTRACT
+
+Person Name for Faker
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Faker::Plugin::EnUs::PersonName;
+
+  my $plugin = Faker::Plugin::EnUs::PersonName->new;
+
+  # bless(..., "Faker::Plugin::EnUs::PersonName")
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides methods for generating fake data for person name.
+
+=encoding utf8
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Faker::Plugin::EnUs>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 execute
+
+  execute(HashRef $data) (Str)
+
+The execute method returns a returns a random fake person name.
+
+I<Since C<1.10>>
+
+=over 4
+
+=item execute example 1
+
+  package main;
+
+  use Faker::Plugin::EnUs::PersonName;
+
+  my $plugin = Faker::Plugin::EnUs::PersonName->new;
+
+  # bless(..., "Faker::Plugin::EnUs::PersonName")
+
+  # my $result = $plugin->execute;
+
+  # "Russel Krajcik";
+
+  # my $result = $plugin->execute;
+
+  # "Alayna Josephine Kunde";
+
+  # my $result = $plugin->execute;
+
+  # "Viviane Fritsch";
+
+=back
+
+=cut
+
+=head2 new
+
+  new(HashRef $data) (Plugin)
+
+The new method returns a new instance of the class.
+
+I<Since C<1.10>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Faker::Plugin::EnUs::PersonName;
+
+  my $plugin = Faker::Plugin::EnUs::PersonName->new;
+
+  # bless(..., "Faker::Plugin::EnUs::PersonName")
+
+=back
+
+=cut

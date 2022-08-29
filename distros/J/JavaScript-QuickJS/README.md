@@ -216,6 +216,19 @@ QuickJS supports Linux & macOS natively, so these work without issue.
 FreeBSD, OpenBSD, & Cygwin work after a few patches that we apply when
 building this library. (Hopefully these will eventually merge into QuickJS.)
 
+# LIBATOMIC
+
+QuickJS uses C11 atomics. Most platforms implement that functionality in
+hardware, but others (e.g., arm32) don’t. To fill that void, we need to link
+to libatomic.
+
+This library’s build logic detects whether libatomic is necessary and will
+only link to it if needed. If, for some reason, you need manual control over
+that linking, set `JS_QUICKJS_LINK_LIBATOMIC` in the environment to 1 or a
+falsy value.
+
+If you don’t know what any of that means, you can probably ignore it.
+
 # SEE ALSO
 
 Other JavaScript modules on CPAN include:

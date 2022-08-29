@@ -1,9 +1,13 @@
 name = "App-week"
 readme_from = "script/week"
+abstract_from = "script/week"
 badges = [ 'github-actions/test', 'metacpan' ]
 authority = "cpan:UTASHIRO"
 
 module_maker = "ModuleBuildTiny"
+
+[release]
+branch = "master"
 
 [unsupported]
 os = [

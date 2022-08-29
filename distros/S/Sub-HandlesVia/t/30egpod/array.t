@@ -107,6 +107,7 @@ subtest 'Testing my_all' => sub {
   my $e = exception {
     my $object = My::Class->new( attr => [ 'foo', 'bar' ] );
     my @list = $object->my_all;
+    is_deeply( \@list, [ 'foo', 'bar' ], q{\@list deep match} );
   };
   is( $e, undef, 'no exception thrown running all example' );
 };
@@ -118,6 +119,15 @@ can_ok( 'My::Class', 'my_all_true' );
 ## any
 
 can_ok( 'My::Class', 'my_any' );
+
+subtest 'Testing my_any' => sub {
+  my $e = exception {
+    my $object = My::Class->new( attr => [ 'foo', 'bar', 'baz' ] );
+    my $truth  = $object->my_any( sub { /a/ } );
+    ok( $truth, q{$truth is true} );
+  };
+  is( $e, undef, 'no exception thrown running any example' );
+};
 
 ## apply
 
@@ -160,6 +170,7 @@ subtest 'Testing my_elements' => sub {
   my $e = exception {
     my $object = My::Class->new( attr => [ 'foo', 'bar' ] );
     my @list = $object->my_elements;
+    is_deeply( \@list, [ 'foo', 'bar' ], q{\@list deep match} );
   };
   is( $e, undef, 'no exception thrown running elements example' );
 };
@@ -168,17 +179,55 @@ subtest 'Testing my_elements' => sub {
 
 can_ok( 'My::Class', 'my_first' );
 
+subtest 'Testing my_first' => sub {
+  my $e = exception {
+    my $object = My::Class->new( attr => [ 'foo', 'bar', 'baz' ] );
+    my $found  = $object->my_first( sub { /a/ } );
+    is( $found, 'bar', q{$found is 'bar'} );
+  };
+  is( $e, undef, 'no exception thrown running first example' );
+};
+
 ## first_index
 
 can_ok( 'My::Class', 'my_first_index' );
+
+subtest 'Testing my_first_index' => sub {
+  my $e = exception {
+    my $object = My::Class->new( attr => [ 'foo', 'bar', 'baz' ] );
+    my $found  = $object->my_first_index( sub { /z$/ } );
+    is( $found, 2, q{$found is 2} );
+  };
+  is( $e, undef, 'no exception thrown running first_index example' );
+};
 
 ## flatten
 
 can_ok( 'My::Class', 'my_flatten' );
 
+subtest 'Testing my_flatten' => sub {
+  my $e = exception {
+    my $object = My::Class->new( attr => [ 'foo', 'bar' ] );
+    my @list = $object->my_flatten;
+    is_deeply( \@list, [ 'foo', 'bar' ], q{\@list deep match} );
+  };
+  is( $e, undef, 'no exception thrown running flatten example' );
+};
+
 ## flatten_deep
 
 can_ok( 'My::Class', 'my_flatten_deep' );
+
+subtest 'Testing my_flatten_deep' => sub {
+  my $e = exception {
+    my $object = My::Class->new( attr => [ 'foo', [ 'bar', [ 'baz' ] ] ] );
+    is_deeply( [ $object->my_flatten_deep ], [ 'foo', 'bar', 'baz' ], q{[ $object->my_flatten_deep ] deep match} );
+  
+    my $object2 = My::Class->new( attr => [ 'foo', [ 'bar', [ 'baz' ] ] ] );
+    is_deeply( [ $object->my_flatten_deep(1) ], [ 'foo', 'bar', [ 'baz' ] ], q{[ $object->my_flatten_deep(1) ] deep match} );
+  };
+  is( $e, undef, 'no exception thrown running flatten_deep example' );
+};
 
 ## for_each
 
@@ -281,6 +330,16 @@ can_ok( 'My::Class', 'my_minstr' );
 ## natatime
 
 can_ok( 'My::Class', 'my_natatime' );
+
+subtest 'Testing my_natatime' => sub {
+  my $e = exception {
+    my $object = My::Class->new( attr => [ 'foo', 'bar', 'baz' ] );
+    my $iter   = $object->my_natatime( 2 );
+    is_deeply( [ $iter->() ], [ 'foo', 'bar' ], q{[ $iter->() ] deep match} );
+    is_deeply( [ $iter->() ], [ 'baz' ], q{[ $iter->() ] deep match} );
+  };
+  is( $e, undef, 'no exception thrown running natatime example' );
+};
 
 ## not_all_true
 

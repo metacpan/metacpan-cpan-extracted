@@ -1,5 +1,9 @@
 Revision history for App-cpangitify
 
+0.19      2022-08-23 19:28:42 -0600
+  - Use Archive::Libarchive::Extract instead of Archive::Extract (gh#17)
+  - Drop support for Perls older than 5.20 (gh#17)
+
 0.18      2021-04-22 02:29:50 -0600
   - Added --branch | -b option (gh#12)
   - New repositories are now created with the default branch of main (gh#12)

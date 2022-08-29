@@ -1,0 +1,10 @@
+0.03 2022-08-27T09:21:22+02:00
+ - Fix test dependencies.
+
+0.02 2022-08-27T00:51:56+02:00
+ - Add tests.
+ - Regen README file.
+ - Regen META.yml file.
+
+0.01 2022-08-25T18:24:11+02:00
+ - First version.

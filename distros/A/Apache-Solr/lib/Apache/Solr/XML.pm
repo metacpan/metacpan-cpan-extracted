@@ -8,7 +8,7 @@
 
 package Apache::Solr::XML;
 use vars '$VERSION';
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 use base 'Apache::Solr';
 
@@ -164,8 +164,10 @@ sub request($$;$$)
 #warn $resp->as_string;
     $ct =~ m/xml/i or return $result;
 
-    my $dec = $self->xmlsimple
-       ->XMLin($resp->decoded_content || $resp->content);
+    my $dec = $self->xmlsimple->XMLin(
+        $resp->decoded_content || $resp->content,
+        parseropts => {huge => 1},
+    );
 
 #warn Dumper $dec;
     $result->decoded(_cleanup_parsed $dec);

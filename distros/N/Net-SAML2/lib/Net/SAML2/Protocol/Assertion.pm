@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::Protocol::Assertion;
-our $VERSION = '0.57'; # VERSION
+our $VERSION = '0.59'; # VERSION
 
 use Moose;
 use MooseX::Types::DateTime qw/ DateTime /;
@@ -19,15 +19,20 @@ with 'Net::SAML2::Role::ProtocolMessage';
 # ABSTRACT: Net::SAML2::Protocol::Assertion - SAML2 assertion object
 
 
-has 'attributes'        => (isa => 'HashRef[ArrayRef]', is => 'ro', required => 1);
-has 'session'           => (isa => 'Str',               is => 'ro', required => 1);
-has 'nameid'            => (isa => 'Str',               is => 'ro', required => 1);
-has 'not_before'        => (isa => DateTime,            is => 'ro', required => 1);
-has 'not_after'         => (isa => DateTime,            is => 'ro', required => 1);
-has 'audience'          => (isa => NonEmptySimpleStr,   is => 'ro', required => 1);
-has 'xpath'             => (isa => 'XML::LibXML::XPathContext',        is => 'ro', required => 1);
-has 'in_response_to'    => (isa => 'Str',               is => 'ro', required => 1);
-has 'response_status'   => (isa => 'Str',               is => 'ro', required => 1);
+has 'attributes' => (isa => 'HashRef[ArrayRef]', is => 'ro', required => 1);
+has 'audience'   => (isa => NonEmptySimpleStr, is => 'ro', required => 1);
+has 'not_after'  => (isa => DateTime,          is => 'ro', required => 1);
+has 'not_before' => (isa => DateTime,          is => 'ro', required => 1);
+has 'session'         => (isa => 'Str', is => 'ro', required => 1);
+has 'in_response_to'  => (isa => 'Str', is => 'ro', required => 1);
+has 'response_status' => (isa => 'Str', is => 'ro', required => 1);
+has 'xpath' => (isa => 'XML::LibXML::XPathContext', is => 'ro', required => 1);
+has 'nameid_object' => (
+    isa      => 'XML::LibXML::Element',
+    is       => 'ro',
+    required => 1,
+    init_arg => 'nameid'
+);
 
 
 
@@ -114,7 +119,7 @@ sub new_from_xml {
         destination    => $xpath->findvalue('/samlp:Response/@Destination'),
         attributes     => $attributes,
         session        => $xpath->findvalue('//saml:AuthnStatement/@SessionIndex'),
-        nameid         => $xpath->findvalue('//saml:Subject/saml:NameID'),
+        nameid         => $xpath->findnodes('//saml:Subject/saml:NameID')->get_node(1),
         audience       => $xpath->findvalue('//saml:Conditions/saml:AudienceRestriction/saml:Audience'),
         not_before     => $not_before,
         not_after      => $not_after,
@@ -130,6 +135,18 @@ sub new_from_xml {
 sub name {
     my($self) = @_;
     return $self->attributes->{CN}->[0];
+}
+
+
+sub nameid {
+    my $self = shift;
+    return $self->nameid_object->textContent;
+}
+
+
+sub nameid_format {
+    my $self = shift;
+    return $self->nameid_object->getAttribute('Format');
 }
 
 
@@ -166,7 +183,7 @@ Net::SAML2::Protocol::Assertion - Net::SAML2::Protocol::Assertion - SAML2 assert
 
 =head1 VERSION
 
-version 0.57
+version 0.59
 
 =head1 SYNOPSIS
 
@@ -214,6 +231,14 @@ EncryptedAssertion is properly validated.
 =head2 name( )
 
 Returns the CN attribute, if provided.
+
+=head2 nameid
+
+Returns the NameID
+
+=head2 nameid_format
+
+Returns the NameID Format
 
 =head2 valid( $audience, $in_response_to )
 

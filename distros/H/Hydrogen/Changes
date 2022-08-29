@@ -1,0 +1,100 @@
+Hydrogen
+========
+
+Created:      2022-08-23
+Home page:    <https://metacpan.org/release/Hydrogen>
+Bug tracker:  <https://github.com/tobyink/p5-hydrogen/issues>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.015	2022-08-27
+
+ [ Documentation ]
+ - Remove SYNOPSIS example that didn't work.
+
+0.014	2022-08-27
+
+ [ Documentation ]
+ - Add a RATIONALE section.
+ - Improve SYNOPSIS.
+
+ [ Other ]
+ - Generate some slightly more efficient mutator functions for strings,
+   arrays, and hashes.
+
+0.013	2022-08-27
+
+ - Updated: Use Exporter::Shiny 1.004000 so that Hydrogen can do lexical
+   exports on Perl 5.37.2+.
+
+0.012	2022-08-26
+
+ - Updated: Rebuild with latest Sub::HandlesVia.
+
+0.011	2022-08-26
+
+ [ Bug Fixes ]
+ - Perl 5.8.x doesn't support re::is_regexp(), so provide a polyfill for a
+   few functions in Hydrogen::String and Hydrogen::Topic::String which
+   require it.
+
+ [ Documentation ]
+ - Document distribution dependencies.
+
+ [ Test Suite ]
+ - Rewrite test suite to use Test2::V0.
+
+ [ Other ]
+ - Support Perl as old as 5.8.1.
+
+0.010	2022-08-26
+
+ [ Documentation ]
+ - Fix missing linebreak before '=head1 BUGS' in pod.
+
+0.009	2022-08-26
+
+ [ Documentation ]
+ - Minor pod improvements.
+
+ [ Test Suite ]
+ - Minor improvements.
+
+ [ Other ]
+ - Minor formatting changes.
+
+0.008	2022-08-25
+
+ [ Documentation ]
+ - Document Hydrogen.pm's own exported functions.
+ - Give an example of topicalized function usage in Hydrogen.pm SYNOPSIS.
+ - Improve the module listing in Hydrogen.pm.
+
+0.007	2022-08-25
+
+ - Added: Hydrogen::Topic::* modules.
+ - Some improved error messages.
+
+0.006	2022-08-25
+
+ [ Documentation ]
+ - Better variable names in usage descriptions.
+
+0.005	2022-08-24
+
+ - Simplified generated code.
+
+0.004	2022-08-24
+
+ [ Documentation ]
+ - Improved SYNOPSIS and SEE ALSO sections.
+
+0.003	2022-08-24
+
+ [ Documentation ]
+ - Don't fully qualify function names in pod headings.
+
+0.002	2022-08-24
+
+ - Added: Hydrogen::Curry::* modules.
+
+0.001	2022-08-24	Initial release

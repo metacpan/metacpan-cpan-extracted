@@ -1,6 +1,6 @@
 package Lab::Instrument::WR640;
 #ABSTRACT: LeCroy WaveRunner 640 digital oscilloscope
-$Lab::Instrument::WR640::VERSION = '3.821';
+$Lab::Instrument::WR640::VERSION = '3.822';
 use v5.20;
 
 use strict;
@@ -646,7 +646,7 @@ Lab::Instrument::WR640 - LeCroy WaveRunner 640 digital oscilloscope
 
 =head1 VERSION
 
-version 3.821
+version 3.822
 
 =head1 SYNOPSIS
 

@@ -278,7 +278,7 @@ C<undef>) and the XML string.
 
 sub _valid_string {
 	my ($self) = @_;
-	my $head = qq(<?xml version="1.0" encoding="UTF-8"?>\n)
+	my $head = qq(<?xml version="1.0"?>\n)
 		. qq(<!DOCTYPE cXML SYSTEM "http://xml.cxml.org/schemas/cXML/)
 		. $Business::cXML::CXML_VERSION
 		. qq(/cXML.dtd">\n);

@@ -20,7 +20,7 @@ t/10_nospec.t
 t/11_DEFALT_ERROR_1.t
 t/12_DEFALT_ERROR_2.t
 t/13_fromarray.t
-t/14_lvalue.t
+t/14_accessor.t
 t/15_nolvalue.t
 t/App/Foo.pm
 META.yml

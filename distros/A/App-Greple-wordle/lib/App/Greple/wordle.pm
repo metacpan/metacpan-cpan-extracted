@@ -3,7 +3,7 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "0.11";
+our $VERSION = "0.12";
 
 use Data::Dumper;
 use List::Util qw(shuffle max);
@@ -16,13 +16,14 @@ use App::Greple::wordle::game;
 use App::Greple::wordle::util qw();
 
 use Getopt::EX::Hashed; {
+    Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
     has answer  => '   =s ' , default => $ENV{WORDLE_ANSWER} ;
     has index   => ' n =i ' , default => $ENV{WORDLE_INDEX} ;
-    has try     => ' x =i ' , default => 6 ;
+    has trial   => ' x =i ' , default => 6 ;
     has total   => '   =i ' , default => 30 ;
     has random  => '   !  ' , default => 0 ;
     has series  => ' s =i ' , default => 1 ;
-    has compat  => '      ' , action  => sub { $_->{series} = 0 } ;
+    has compat  => '      ' , action  => sub { $_->series = 0 } ;
     has keymap  => '   !  ' , default => 1 ;
     has result  => '   !  ' , default => 1 ;
     has correct => '   =s ' , default => "\N{U+1F389}" ; # PARTY POPPER
@@ -48,26 +49,26 @@ sub _days {
 
 sub setup {
     my $app = shift;
-    for ($app->{index}) {
-	$_   = int rand @word_hidden if $app->{random};
+    for ($app->index) {
+	$_   = int rand @word_hidden if $app->random;
 	$_ //= _days;
 	$_  += _days if /^[-+]/;
     }
-    if (my $answer = $app->{answer}) {
-	$app->{index} = undef;
+    if (my $answer = $app->answer) {
+	$app->index = undef;
 	$word_all{$answer} or die "$answer: wrong word\n";
     } else {
-	if ($app->{series} > 0) {
-	    srand($app->{series});
+	if ($app->series > 0) {
+	    srand($app->series);
 	    @word_hidden = shuffle @word_hidden;
 	}
-	$app->{answer} = $word_hidden[ $app->{index} ];
+	$app->answer = $word_hidden[ $app->index ];
     }
 }
 
 sub patterns {
     my $app = shift;
-    my $answer = $app->{answer};
+    my $answer = $app->answer;
     my @re = map
 	    { sprintf "(?<=^.{%d})%s", $_, substr($answer, $_, 1) }
 	    0 .. length($answer) - 1;
@@ -80,11 +81,11 @@ sub patterns {
 sub title {
     my $app = shift;
     my $label = 'Greple::wordle';
-    return $label if not defined $app->{index};
+    return $label if not defined $app->index;
     sprintf('%s %s%s',
 	    $label,
-	    $app->{series} == 0 ? '' : sprintf("%d-", $app->{series}),
-	    $app->{index});
+	    $app->series == 0 ? '' : sprintf("%d-", $app->series),
+	    $app->index);
 }
 
 ######################################################################
@@ -100,10 +101,10 @@ sub prompt {
 sub initialize {
     my($mod, $argv) = @_;
     $app->parseopt($argv)->setup;
-    $game = App::Greple::wordle::game->new(answer => $app->{answer});
+    $game = App::Greple::wordle::game->new(answer => $app->answer);
     push @$argv, $app->patterns;
     if ($interactive = -t STDIN) {
-	push @$argv, '--interactive', ('/dev/stdin') x $app->{total};
+	push @$argv, '--interactive', ('/dev/stdin') x $app->total;
 	select->autoflush;
 	say $app->title;
 	print prompt();
@@ -124,14 +125,14 @@ sub show_answer {
 }
 
 sub show_result {
-    printf "\n%s %d/%d\n\n", $app->title, $game->attempt, $app->{try};
+    printf "\n%s %d/%d\n\n", $app->title, $game->attempt, $app->trial;
     say $game->result;
 }
 
 sub check {
     my $word = lc s/\n//r;
     if (not $word_all{$word}) {
-	command($word) or respond $app->{wrong};
+	command($word) or respond $app->wrong;
 	$_ = '';
     } else {
 	$game->try($word);
@@ -150,8 +151,8 @@ sub command {
 	try {
 	    if    ($_ eq '|')   {}
 	    elsif (/^d$/)       {
-		$app->{debug} ^= 1;
-		printf 'Debug %s', $app->{debug} ? 'on' : 'off';
+		$app->debug ^= 1;
+		printf 'Debug %s', $app->debug ? 'on' : 'off';
 		return;
 	    }
 	    elsif (/^\?$/)      { help(); return }
@@ -164,7 +165,7 @@ sub command {
 	    else  { return }
 	    1;
 	} or do {
-	    warn "ERROR: $_" if $app->{debug};
+	    warn "ERROR: $_" if $app->debug;
 	    return /^[a-z]+$/i ? 0 : 1;
 	};
     }
@@ -200,22 +201,22 @@ sub includes {
 sub choose {
     my $p = shift;
     $p =~ s/([A-Z])/[^$1]/g;
-    warn "> $p\n" if $app->{debug};
+    warn "> $p\n" if $app->debug;
     grep /$p/, @_;
 }
 
 sub inspect {
     if ($game->solved) {
-	respond $app->{correct} x ($app->{try} - $game->attempt + 1);
-	show_result if $app->{result};
+	respond $app->correct x ($app->trial - $game->attempt + 1);
+	show_result if $app->result;
 	exit 0;
     }
     if (length) {
-	if ($game->attempt >= $app->{try}) {
+	if ($game->attempt >= $app->trial) {
 	    show_answer;
 	    exit 1;
 	}
-	$app->{keymap} and respond $game->keymap;
+	$app->keymap and respond $game->keymap;
     }
     print prompt();
 }

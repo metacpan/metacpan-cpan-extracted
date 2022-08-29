@@ -25,14 +25,12 @@ my $meta = {
                         },
                       },
   "provides"       => {
-                        "Exporter::Shiny" => { file => "lib/Exporter/Shiny.pm", version => 1.002002 },
-                        "Exporter::Tiny"  => { file => "lib/Exporter/Tiny.pm", version => 1.002002 },
+                        "Exporter::Shiny" => { file => "lib/Exporter/Shiny.pm", version => "1.004000" },
+                        "Exporter::Tiny"  => { file => "lib/Exporter/Tiny.pm", version => "1.004000" },
                       },
   "release_status" => "stable",
   "resources"      => {
-                        bugtracker   => {
-                                          web => "http://rt.cpan.org/Dist/Display.html?Queue=Exporter-Tiny",
-                                        },
+                        bugtracker   => { web => "https://github.com/tobyink/p5-exporter-tiny/issues" },
                         homepage     => "https://metacpan.org/release/Exporter-Tiny",
                         license      => ["http://dev.perl.org/licenses/"],
                         repository   => {
@@ -43,7 +41,7 @@ my $meta = {
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/project",
                         x_IRC        => "irc://irc.perl.org/#moops",
                       },
-  "version"        => 1.002002,
+  "version"        => "1.004000",
 };
 
 my %dynamic_config;
@@ -123,6 +121,9 @@ else
 	}
 }
 
+
+my $mm = WriteMakefile(%WriteMakefileArgs);
+
 sub FixMakefile
 {
 	return unless -d 'inc';
@@ -144,7 +145,7 @@ sub FixMakefile
 	close MAKEFILE or die $!;
 }
 
-my $mm = WriteMakefile(%WriteMakefileArgs);
 FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

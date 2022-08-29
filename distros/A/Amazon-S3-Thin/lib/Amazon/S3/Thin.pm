@@ -9,7 +9,7 @@ use Encode;
 use Amazon::S3::Thin::Resource;
 use Amazon::S3::Thin::Credentials;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 my $METADATA_PREFIX      = 'x-amz-meta-';
 my $MAIN_HOST = 's3.amazonaws.com';
@@ -25,6 +25,9 @@ sub new {
     }
     elsif ($self->{credential_provider} and $self->{credential_provider} eq 'metadata') {
         $self->{credentials} = Amazon::S3::Thin::Credentials->from_metadata($self);
+    }
+    elsif ($self->{credential_provider} and $self->{credential_provider} eq 'ecs_container') {
+        $self->{credentials} = Amazon::S3::Thin::Credentials->from_ecs_container($self);
     }
     else {
         # check existence of credentials
@@ -395,6 +398,12 @@ Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
       role                => 'my-role', # optional
     });
 
+  # Get credentials from ECS task role
+  my $s3client = Amazon::S3::Thin->new({
+      region              => $region,
+      credential_provider => 'ecs_container',
+    });
+
   my $bucket = "mybucket";
   my $key = "dir/file.txt";
   my $response;
@@ -486,6 +495,8 @@ It can receive the following arguments:
 =item * C<env> - fetch credentials from environment variables
 
 =item * C<metadata> - fetch credentials from EC2 instance metadata service
+
+=item * C<ecs_container> - fetch credentials from ECS task role
 
 =back
 

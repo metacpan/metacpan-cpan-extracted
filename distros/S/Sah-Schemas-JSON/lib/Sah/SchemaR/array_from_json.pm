@@ -1,10 +1,10 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::array_from_json;
 
-our $DATE = '2021-09-29'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2022-08-26'; # DATE
+our $VERSION = '0.006'; # VERSION
 
-our $rschema = do{my$var={base=>"array",clsets_after_base=>[{examples=>[{summary=>"Empty string is not a valid JSON",valid=>0,value=>""},{summary=>"Valid JSON but not an array",valid=>0,value=>1},{summary=>"Valid JSON but not an array",valid=>0,value=>"{}"},{summary=>"Already an array",valid=>1,value=>[]},{summary=>"Not an array",valid=>0,value=>{}},{summary=>"Not a valid JSON literal",valid=>0,value=>"foo"},{valid=>1,validated_value=>[1,2,3,{}],value=>"[1,2,3,{}]"},{summary=>"Missing closing square bracket",valid=>0,value=>"[1,2"},{summary=>"Dangling comma",valid=>0,value=>"[1,2,]"}],prefilters=>["JSON::decode_str"],summary=>"Array, coercible from JSON string"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["array"],type=>"array",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"array",clsets_after_base=>[{description=>"\nYou can use this schema if you want to accept an array, but if user supplies a\nstring e.g. in a command-line script as command-line argument or option, the\nstring will be coerced into array if the string contains a JSON-encoded array.\nData will not be valid if the string does not contain valid JSON.\n\nNote that array data is accepted, unlike the `json_str::array` schema which only\naccepts JSON-encoded array in string form.\n\n",examples=>[{summary=>"Empty string is not a valid JSON",valid=>0,value=>""},{summary=>"Valid JSON but not an array",valid=>0,value=>1},{summary=>"Valid JSON but not an array",valid=>0,value=>"{}"},{summary=>"Already an array",valid=>1,value=>[]},{summary=>"Not an array",valid=>0,value=>{}},{summary=>"Not a valid JSON literal",valid=>0,value=>"foo"},{valid=>1,validated_value=>[1,2,3,{}],value=>"[1,2,3,{}]"},{summary=>"Missing closing square bracket",valid=>0,value=>"[1,2"},{summary=>"Dangling comma",valid=>0,value=>"[1,2,]"}],prefilters=>["JSON::decode_str"],summary=>"Array, coercible from JSON string"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["array"],type=>"array",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: Array, coercible from JSON string
@@ -21,7 +21,7 @@ Sah::SchemaR::array_from_json - Array, coercible from JSON string
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::SchemaR::array_from_json (from Perl distribution Sah-Schemas-JSON), released on 2021-09-29.
+This document describes version 0.006 of Sah::SchemaR::array_from_json (from Perl distribution Sah-Schemas-JSON), released on 2022-08-26.
 
 =head1 DESCRIPTION
 
@@ -54,13 +54,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -6,20 +6,28 @@ use warnings;
 
 use Test::More;
 
-plan tests => 12 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 20 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Filter/perl/JSON/check_decode.pm',
+    'Data/Sah/Filter/perl/JSON/check_decode_array.pm',
+    'Data/Sah/Filter/perl/JSON/check_decode_hash.pm',
     'Data/Sah/Filter/perl/JSON/decode.pm',
     'Data/Sah/Filter/perl/JSON/decode_str.pm',
     'Sah/Schema/any_from_json.pm',
     'Sah/Schema/array_from_json.pm',
     'Sah/Schema/hash_from_json.pm',
+    'Sah/Schema/json_or_str.pm',
     'Sah/Schema/json_str.pm',
+    'Sah/Schema/json_str/array.pm',
+    'Sah/Schema/json_str/hash.pm',
     'Sah/SchemaR/any_from_json.pm',
     'Sah/SchemaR/array_from_json.pm',
     'Sah/SchemaR/hash_from_json.pm',
+    'Sah/SchemaR/json_or_str.pm',
     'Sah/SchemaR/json_str.pm',
+    'Sah/SchemaR/json_str/array.pm',
+    'Sah/SchemaR/json_str/hash.pm',
     'Sah/Schemas/JSON.pm'
 );
 

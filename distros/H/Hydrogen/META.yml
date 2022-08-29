@@ -1,0 +1,125 @@
+---
+abstract: 'utilities for the simplest elements of Perl'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Hydrogen
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Hydrogen:
+    file: lib/Hydrogen.pm
+    version: '0.015'
+  Hydrogen::Array:
+    file: lib/Hydrogen/Array.pm
+    version: '0.015'
+  Hydrogen::ArrayRef:
+    file: lib/Hydrogen/ArrayRef.pm
+    version: '0.015'
+  Hydrogen::Bool:
+    file: lib/Hydrogen/Bool.pm
+    version: '0.015'
+  Hydrogen::Code:
+    file: lib/Hydrogen/Code.pm
+    version: '0.015'
+  Hydrogen::CodeRef:
+    file: lib/Hydrogen/CodeRef.pm
+    version: '0.015'
+  Hydrogen::Counter:
+    file: lib/Hydrogen/Counter.pm
+    version: '0.015'
+  Hydrogen::Curry::ArrayRef:
+    file: lib/Hydrogen/Curry/ArrayRef.pm
+    version: '0.015'
+  Hydrogen::Curry::Bool:
+    file: lib/Hydrogen/Curry/Bool.pm
+    version: '0.015'
+  Hydrogen::Curry::CodeRef:
+    file: lib/Hydrogen/Curry/CodeRef.pm
+    version: '0.015'
+  Hydrogen::Curry::Counter:
+    file: lib/Hydrogen/Curry/Counter.pm
+    version: '0.015'
+  Hydrogen::Curry::HashRef:
+    file: lib/Hydrogen/Curry/HashRef.pm
+    version: '0.015'
+  Hydrogen::Curry::Number:
+    file: lib/Hydrogen/Curry/Number.pm
+    version: '0.015'
+  Hydrogen::Curry::Scalar:
+    file: lib/Hydrogen/Curry/Scalar.pm
+    version: '0.015'
+  Hydrogen::Curry::String:
+    file: lib/Hydrogen/Curry/String.pm
+    version: '0.015'
+  Hydrogen::Hash:
+    file: lib/Hydrogen/Hash.pm
+    version: '0.015'
+  Hydrogen::HashRef:
+    file: lib/Hydrogen/HashRef.pm
+    version: '0.015'
+  Hydrogen::Number:
+    file: lib/Hydrogen/Number.pm
+    version: '0.015'
+  Hydrogen::Scalar:
+    file: lib/Hydrogen/Scalar.pm
+    version: '0.015'
+  Hydrogen::String:
+    file: lib/Hydrogen/String.pm
+    version: '0.015'
+  Hydrogen::Topic::ArrayRef:
+    file: lib/Hydrogen/Topic/ArrayRef.pm
+    version: '0.015'
+  Hydrogen::Topic::Bool:
+    file: lib/Hydrogen/Topic/Bool.pm
+    version: '0.015'
+  Hydrogen::Topic::CodeRef:
+    file: lib/Hydrogen/Topic/CodeRef.pm
+    version: '0.015'
+  Hydrogen::Topic::Counter:
+    file: lib/Hydrogen/Topic/Counter.pm
+    version: '0.015'
+  Hydrogen::Topic::HashRef:
+    file: lib/Hydrogen/Topic/HashRef.pm
+    version: '0.015'
+  Hydrogen::Topic::Number:
+    file: lib/Hydrogen/Topic/Number.pm
+    version: '0.015'
+  Hydrogen::Topic::Scalar:
+    file: lib/Hydrogen/Topic/Scalar.pm
+    version: '0.015'
+  Hydrogen::Topic::String:
+    file: lib/Hydrogen/Topic/String.pm
+    version: '0.015'
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Exporter::Shiny: '1.004000'
+  List::Util: '1.54'
+  Scalar::Util: '0'
+  perl: '5.008001'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Hydrogen/project
+  bugtracker: https://github.com/tobyink/p5-hydrogen/issues
+  homepage: https://metacpan.org/release/Hydrogen
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-hydrogen.git
+version: '0.015'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

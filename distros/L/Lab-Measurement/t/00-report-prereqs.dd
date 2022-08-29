@@ -53,6 +53,7 @@ do { my $x = {
                                       'Net::RFC3161::Timestamp' => '0',
                                       'PDL' => '2.007',
                                       'PDL::Core' => '0',
+                                      'PDL::IO::CSV' => '0',
                                       'PDL::NiceSlice' => '0',
                                       'POSIX' => '0',
                                       'Role::Tiny' => '1.003004',

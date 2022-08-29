@@ -85,8 +85,9 @@ sub type {
 
     return 1 if grep { $self->check_type($instance, $_) } @types;
 
+    my $actual_type = detect_type($instance);
     push @{$data->{errors}}, error(
-        message => "type mismatch",
+        message => "type mismatch (expecting any of (@types), found: $actual_type)",
         instance_path => $instance_path,
         schema_path => $schema_path
     );
@@ -706,7 +707,7 @@ JSONSchema::Validator::Constraints::Draft4 - JSON Schema Draft4 specification co
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 AUTHORS
 

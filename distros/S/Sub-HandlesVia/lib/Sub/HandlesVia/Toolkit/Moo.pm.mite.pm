@@ -7,7 +7,7 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Sub::HandlesVia::Mite";
-    our $MITE_VERSION = "0.010002";
+    our $MITE_VERSION = "0.010005";
 
     # Mite keywords
     BEGIN {

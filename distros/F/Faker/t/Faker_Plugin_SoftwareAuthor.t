@@ -1,11 +1,15 @@
-use 5.014;
+package main;
+
+use 5.018;
 
 use strict;
 use warnings;
-use routines;
 
-use Test::Auto;
 use Test::More;
+use Venus::Test;
+
+my $test = test(__FILE__);
+my $seed = 42;
 
 =name
 
@@ -13,82 +17,164 @@ Faker::Plugin::SoftwareAuthor
 
 =cut
 
-=abstract
+$test->for('name');
 
-Software Author Plugin for Faker
+=tagline
+
+Software Author
 
 =cut
+
+$test->for('tagline');
+
+=abstract
+
+Software Author for Faker
+
+=cut
+
+$test->for('abstract');
 
 =includes
 
+method: new
 method: execute
 
 =cut
+
+$test->for('includes');
 
 =synopsis
 
   package main;
 
-  use Faker;
   use Faker::Plugin::SoftwareAuthor;
 
-  my $f = Faker->new;
-  my $p = Faker::Plugin::SoftwareAuthor->new(faker => $f);
+  my $plugin = Faker::Plugin::SoftwareAuthor->new;
 
-  my $plugin = $p;
-
-=cut
-
-=inherits
-
-Data::Object::Plugin
+  # bless(..., "Faker::Plugin::SoftwareAuthor")
 
 =cut
 
-=attributes
+$test->for('synopsis', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Faker::Plugin::SoftwareAuthor');
 
-faker: ro, req, ConsumerOf["Faker::Maker"]
-
-=cut
+  $result
+});
 
 =description
 
-This package provides methods for generating fake software author data.
+This package provides methods for generating fake data for software author.
+
++=encoding utf8
 
 =cut
+
+$test->for('description');
+
+=inherits
+
+Faker::Plugin
+
+=cut
+
+$test->for('inherits');
 
 =method execute
 
-The execute method returns a random fake software author.
+The execute method returns a returns a random fake software author.
 
 =signature execute
 
-execute() : Str
+  execute(HashRef $data) (Str)
+
+=metadata execute
+
+{
+  since => '1.10',
+}
 
 =example-1 execute
 
-  # given: synopsis
+  package main;
 
-  $p->execute
+  use Faker::Plugin::SoftwareAuthor;
+
+  my $plugin = Faker::Plugin::SoftwareAuthor->new(
+    faker => {locales => ['en-us']},
+  );
+
+  # bless(..., "Faker::Plugin::SoftwareAuthor")
+
+  # my $result = $plugin->execute;
+
+  # "Jamison Skiles";
+
+  # my $result = $plugin->execute;
+
+  # "Josephine Kunde";
+
+  # my $result = $plugin->execute;
+
+  # "Darby Boyer";
 
 =cut
 
-package main;
-
-my $test = testauto(__FILE__);
-
-my $subs = $test->standard;
-
-$subs->synopsis(fun($tryable) {
+$test->for('example', 1, 'execute', sub {
+  my ($tryable) = @_;
   ok my $result = $tryable->result;
+  ok $result->isa('Faker::Plugin::SoftwareAuthor');
+  ok $result->faker;
+  ok $result->faker->random->reseed($seed);
+  ok $result->faker->random->make; # reset randomizer
+  is $result->execute, "Jamison Skiles";
+  ok $result->faker->random->make; # reset randomizer
+  is $result->execute, "Josephine Kunde";
+  ok $result->faker->random->make; # reset randomizer
+  is $result->execute, "Darby Boyer";
 
   $result
 });
 
-$subs->example(-1, 'execute', 'method', fun($tryable) {
+=method new
+
+The new method returns a new instance of the class.
+
+=signature new
+
+  new(HashRef $data) (Plugin)
+
+=metadata new
+
+{
+  since => '1.10',
+}
+
+=example-1 new
+
+  package main;
+
+  use Faker::Plugin::SoftwareAuthor;
+
+  my $plugin = Faker::Plugin::SoftwareAuthor->new;
+
+  # bless(..., "Faker::Plugin::SoftwareAuthor")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
   ok my $result = $tryable->result;
+  ok $result->isa('Faker::Plugin::SoftwareAuthor');
+  ok $result->faker;
 
   $result
 });
+
+# END
+
+$test->render('lib/Faker/Plugin/SoftwareAuthor.pod') if $ENV{RENDER};
 
 ok 1 and done_testing;

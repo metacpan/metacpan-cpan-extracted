@@ -116,17 +116,15 @@ ok($valid, "Assertion is valid");
 # Using the Assertion Results
 ##############################
 my $attributes = $assertion->attributes;
-ok($assertion->{nameid} eq 'timlegge@cpan.org', "$assertion->{nameid} would login sucessfully");
-ok($assertion->{issuer} eq $idp_issuer, "IdP Issuer is: $assertion->{issuer}");
-ok($assertion->{audience} eq $idp_audience, "Audience found in response: $assertion->{audience}");
-if (defined $assertion->{provider}) {
-        ok($assertion->{provider} eq $provider, "$assertion->{provider}");
-}
-ok($assertion->{nameid} eq 'timlegge@cpan.org', "$assertion->{nameid} would login sucessfully");
-ok($attributes->{fname}[0] eq 'Timothy', "First Name: $attributes->{fname}[0]");
-ok($attributes->{lname}[0] eq 'Legge', "Last Name: $attributes->{lname}[0]");
-ok($attributes->{Email}[0] eq 'timlegge@cpan.org', "Email Address: $attributes->{Email}[0]");
-ok($attributes->{title}[0] eq 'Developer', "Title: $attributes->{title}[0]");
-ok($attributes->{phone}[0] eq '4408675309', "Phone 1: $attributes->{phone}[0]");
-ok($attributes->{phone}[1] eq '4408675310', "Phone 2: $attributes->{phone}[1]");
+is($assertion->nameid, 'timlegge@cpan.org', "$assertion->nameid would login sucessfully");
+is($assertion->issuer, $idp_issuer, "IdP Issuer is: $assertion->issuer");
+is($assertion->audience, $idp_audience, "Audience found in response: $assertion->audience");
+
+is($assertion->nameid, 'timlegge@cpan.org', "$assertion->nameid would login sucessfully");
+is($attributes->{fname}[0], 'Timothy', "First Name: $attributes->{fname}[0]");
+is($attributes->{lname}[0], 'Legge', "Last Name: $attributes->{lname}[0]");
+is($attributes->{Email}[0], 'timlegge@cpan.org', "Email Address: $attributes->{Email}[0]");
+is($attributes->{title}[0], 'Developer', "Title: $attributes->{title}[0]");
+is($attributes->{phone}[0], '4408675309', "Phone 1: $attributes->{phone}[0]");
+is($attributes->{phone}[1], '4408675310', "Phone 2: $attributes->{phone}[1]");
 done_testing();

@@ -1,3 +1,10 @@
+0.481   2022-08-28  Released-By: PERLANCAR; Urgency: medium
+
+        - Don't require 'cmdline' in 'extras' argument to get summary; also
+          search for summaries for common options in 'r' (in key
+          'common_opts').
+
+
 0.480   2020-09-09  Released-By: PERLANCAR; Urgency: medium
 
 	- Use alias summary provided in func.specmeta (produced by
@@ -25,7 +32,7 @@
 	  storage in first argument of Getopt::Long specification.
 
 
-0.476   2020-04-10  Released-By: PERLANCAR; Urgency: medium
+0.476   2020-04-10  Released-By: PERLANCAR; Urgency: high
 
 	- Better compliance with Getopt::Long: options specification is now an
 	  array instead of a hash. Not every option spec needs to be followed by

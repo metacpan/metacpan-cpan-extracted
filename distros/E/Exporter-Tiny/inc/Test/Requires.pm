@@ -36,7 +36,7 @@ sub test_requires {
     }
     $ver ||= '';
 
-    eval qq{package $caller; use $mod $ver}; ## no critic.
+    eval qq{package $caller; no warnings; use $mod $ver}; ## no critic.
     if (my $e = $@) {
         my $skip_all = sub {
             my $builder = __PACKAGE__->builder;
@@ -61,6 +61,12 @@ sub test_requires {
         };
         if ( $e =~ /^Can't locate/ ) {
             $skip_all->("requires $mod");
+        }
+        elsif ( $e =~ /^Perl (\S+) required/ ) {
+            $skip_all->("requires Perl $1");
+        }
+        elsif ( $e =~ /^\Q$mod\E version (\S+) required/ ) {
+            $skip_all->("requires $mod $1");
         }
         else {
             $skip_all->("$e");

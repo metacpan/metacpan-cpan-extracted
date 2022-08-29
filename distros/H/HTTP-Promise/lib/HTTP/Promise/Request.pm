@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Request.pm
-## Version v0.1.0_2
+## Version v0.1.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/21
 ## Modified 2022/03/21
-## All rights reserved
+## All rights reserved.
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -49,7 +50,7 @@ BEGIN
     our $GROSS_URI_RE  = qr{(?<scheme>(?:https?:)?)//(?<host>[^/?\#]*)(?<rest>.*)};
     # [\x00-\x7f]
     our $INTL_URI_RE  = qr{(?<scheme>(?:https?:)?)//(?<host>[^\x00-\x7f]+\.[^/?\#]*)(?<rest>.*)};
-    our $VERSION = 'v0.1.0_2';
+    our $VERSION = 'v0.1.0';
 };
 
 use strict;
@@ -399,7 +400,7 @@ HTTP::Promise::Request - HTTP Request Class
 
 =head1 VERSION
 
-    v0.1.0_2
+    v0.1.0
 
 =head1 DESCRIPTION
 

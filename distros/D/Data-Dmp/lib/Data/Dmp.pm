@@ -3,9 +3,9 @@
 package Data::Dmp;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-24'; # DATE
+our $DATE = '2022-08-28'; # DATE
 our $DIST = 'Data-Dmp'; # DIST
-our $VERSION = '0.241'; # VERSION
+our $VERSION = '0.242'; # VERSION
 
 use 5.010001;
 use strict;
@@ -167,7 +167,11 @@ sub _dump {
         }
         $res .= "}";
     } elsif ($ref eq 'SCALAR') {
-        $res = "\\"._dump($$val, $subscript);
+        if (defined $class) {
+            $res = "do{my\$o="._dump($$val, $subscript).";\\\$o}";
+        } else {
+            $res = "\\"._dump($$val, $subscript);
+        }
     } elsif ($ref eq 'REF') {
         $res = "\\"._dump($$val, $subscript);
     } elsif ($ref eq 'CODE') {
@@ -231,7 +235,7 @@ Data::Dmp - Dump Perl data structures as Perl code
 
 =head1 VERSION
 
-This document describes version 0.241 of Data::Dmp (from Perl distribution Data-Dmp), released on 2021-06-24.
+This document describes version 0.242 of Data::Dmp (from Perl distribution Data-Dmp), released on 2022-08-28.
 
 =head1 SYNOPSIS
 
@@ -324,21 +328,21 @@ Used by L</dd_ellipsis> and L</dmp_ellipsis>.
 
  [1..10]:
               Rate/s Precision/s  Data::Dump Data::Dumper Data::Dmp
- Data::Dump    25040         100          --       -64.4%    -75.4%
- Data::Dumper  70280         130 180.6+-1.2%           --    -30.9%
- Data::Dmp    101744          34 306.3+-1.6% 44.78+-0.28%        --
+ Data::Dump    24404          95          --       -61.6%    -75.6%
+ Data::Dumper  63580         210 160.5+-1.3%           --    -36.4%
+ Data::Dmp     99940         130 309.5+-1.7% 57.18+-0.55%        --
  
  [1..100]:
-              Rate/s Precision/s    Data::Dump Data::Dumper Data::Dmp
- Data::Dump   3141.2         4.7            --       -74.5%    -75.1%
- Data::Dumper  12308          81   291.8+-2.6%           --     -2.3%
- Data::Dmp     12597          13 301.04+-0.73%  2.35+-0.68%        --
+               Rate/s Precision/s  Data::Dump Data::Dumper Data::Dmp
+ Data::Dump    2934.3         7.8          --       -75.3%    -76.2%
+ Data::Dumper   11873          32 304.6+-1.5%           --     -3.7%
+ Data::Dmp    12323.4           4   320+-1.1%   3.8+-0.28%        --
  
  Some mixed structure:
-               Rate/s Precision/s  Data::Dump    Data::Dmp Data::Dumper
- Data::Dump      7619          24          --       -68.8%       -77.9%
- Data::Dmp    24427.8           8   220.6+-1%           --       -29.0%
- Data::Dumper   34410          53 351.6+-1.6% 40.86+-0.22%           --
+              Rate/s Precision/s   Data::Dump   Data::Dmp Data::Dumper
+ Data::Dump     7161          12           --      -69.3%       -78.7%
+ Data::Dmp     23303          29 225.43+-0.7%          --       -30.6%
+ Data::Dumper  33573          56  368.8+-1.1% 44.07+-0.3%           --
 
 =head1 FUNCTIONS
 
@@ -426,14 +430,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-Dmp>.
 
 Source repository is at L<https://github.com/perlancar/perl-Data-Dmp>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dmp>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Data::Dump> and other variations/derivate works in Data::Dump::*.
@@ -448,11 +444,37 @@ L<YAML>, L<JSON>, L<Storable>, L<Sereal>, and other serialization formats.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2020, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dmp>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

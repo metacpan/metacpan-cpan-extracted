@@ -14,7 +14,7 @@ use JSONSchema::Validator::Draft7;
 use JSONSchema::Validator::OAS30;
 use JSONSchema::Validator::Util qw(get_resource decode_content read_file);
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 my $SPECIFICATIONS = {
     JSONSchema::Validator::OAS30::ID => JSONSchema::Validator::OAS30::SPECIFICATION,
@@ -149,7 +149,7 @@ JSONSchema::Validator - Validator for JSON Schema Draft4/Draft6/Draft7 and OpenA
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -208,31 +208,33 @@ Creates one of the following validators: JSONSchema::Validator::Draft4, JSONSche
 if parameter C<specification> is not specified then type of validator will be determined by C<$schema> key
 for JSON Schema Draft4/Draft6/Draft7 and by C<openapi> key for OpenAPI Specification 3.0 in C<schema> parameter.
 
-=head3 Parameters
+Parameters:
 
-=head4 resources
+=over 1
+
+=item resources
 
 To get schema by uri
 
-=head4 schema
+=item schema
 
 To get explicitly specified schema
 
-=head4 specification
+=item specification
 
 To specify specification of schema
 
-=head4 validate_schema
+=item validate_schema
 
 Do not validate specified schema
 
-=head4 base_uri
+=item base_uri
 
 To specify base uri of schema.
 This parameter used to build absolute path by relative reference in schema.
 By default C<base_uri> is equal to the resource path if the resource parameter is specified otherwise the C<$id> key in the schema.
 
-=head3 Additional parameters
+=back
 
 Additional parameters need to be looked at in a specific validator class.
 Currently there are validators: JSONSchema::Validator::Draft4, JSONSchema::Validator::Draft6, JSONSchema::Validator::Draft7, JSONSchema::Validator::OAS30.
@@ -249,6 +251,54 @@ Validates all files specified by path globs.
 =head2 validate_resource
 
 =head2 validate_resource_schema
+
+=head1 CAVEATS
+
+=head2 YAML & booleans
+
+When reading schema definitions from YAML, please note that the standard
+behaviour of L<YAML::PP> and L<YAML::XS> is to read values which evaluate
+to C<true> or C<false> in a perl context. These values have no recognizable
+'boolean type'. This is insufficient for JSON schema validation.
+
+To make the YAML readers and booleans work with C<JSONSchema::Validator>,
+you need to use the C<JSON::PP> (included in Perl's standard library) module
+as follows:
+
+  # for YAML::PP
+  use YAML::PP;
+
+  my $reader = YAML::PP->new( boolean => 'JSON::PP' );
+  # from here, you can freely use the reader to
+  # read & write booleans as 'true' and 'false'
+
+
+  # for YAML::XS
+  use YAML::XS;
+
+  my $reader = YAML::XS->new;
+
+  # and whenever you read YAML with this reader, do:
+  my $yaml = do {
+    local $YAML::XS::Boolean = 'JSON::PP';
+    $reader->Load($string); # or $reader->LoadFile('filename');
+  };
+
+This isn't a problem when you use the C<resource> argument to the
+C<JSONSchema::Validator::new> constructor, but if you read your own
+schema and use the C<schema> argument, this is something to be aware of.
+
+=head2 allow_bignum => 1
+
+The C<allow_bignum => 1> setting (available on L<JSON::XS> and
+L<Cpanel::JSON::XS>) on deserializers is not supported.
+
+When deserializing a request body with a JSON parser configured with
+C<allow_bignum => 1>, floats - even ones which fit into the regular
+float ranges - will be deserialized as C<Math::BigFloat>. Similarly,
+integers outside of the internal integer range are deserialized as
+C<Math::BigInt>. Numbers represented as C<Math::Big*> objects are not
+recognized as actual numbers and will fail validation.
 
 =head1 AUTHORS
 
@@ -278,7 +328,7 @@ Andrey Khozov <andrey@rydlab.ru>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Erik Huelsmann James Waters uid66
+=for stopwords Erik Huelsmann James Waters
 
 =over 4
 
@@ -289,10 +339,6 @@ Erik Huelsmann <ehuels@gmail.com>
 =item *
 
 James Waters <james@jcwaters.co.uk>
-
-=item *
-
-uid66 <19481514+uid66@users.noreply.github.com>
 
 =back
 

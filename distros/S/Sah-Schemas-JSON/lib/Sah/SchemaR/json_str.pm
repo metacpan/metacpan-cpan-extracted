@@ -1,10 +1,10 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::json_str;
 
-our $DATE = '2021-09-29'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2022-08-26'; # DATE
+our $VERSION = '0.006'; # VERSION
 
-our $rschema = do{my$var={base=>"str",clsets_after_base=>[{examples=>[{summary=>"Empty string",valid=>0,value=>""},{valid=>1,value=>1},{valid=>1,value=>"true"},{summary=>"Not a valid JSON literal",valid=>0,value=>"foo"},{valid=>1,value=>"[1,2,3,{}]"},{summary=>"Missing closing square bracket",valid=>0,value=>"[1,2"},{summary=>"Dangling comma",valid=>0,value=>"[1,2,]"}],prefilters=>["JSON::check_decode"],summary=>"A string that contains valid JSON"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nThis schema can be used if you want to accept a string that contains valid JSON.\nThe JSON string will not be decoded (e.g. a JSON-encoded array will not beome an\narray) but you know that the string contains a valid JSON. Data will not be\nvalid if the string does not contain valid JSON.\n\n",examples=>[{summary=>"Empty string is not a valid JSON",valid=>0,value=>""},{valid=>1,value=>1},{valid=>1,value=>"true"},{summary=>"Not a valid JSON literal",valid=>0,value=>"foo"},{summary=>"A JSON-encoded string",valid=>1,value=>"\"foo\""},{valid=>1,value=>"[1,2,3,{}]"},{summary=>"Missing closing square bracket",valid=>0,value=>"[1,2"},{summary=>"Dangling comma",valid=>0,value=>"[1,2,]"}],prefilters=>["JSON::check_decode"],summary=>"A string that contains valid JSON"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: A string that contains valid JSON
@@ -21,7 +21,7 @@ Sah::SchemaR::json_str - A string that contains valid JSON
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::SchemaR::json_str (from Perl distribution Sah-Schemas-JSON), released on 2021-09-29.
+This document describes version 0.006 of Sah::SchemaR::json_str (from Perl distribution Sah-Schemas-JSON), released on 2022-08-26.
 
 =head1 DESCRIPTION
 
@@ -54,13 +54,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

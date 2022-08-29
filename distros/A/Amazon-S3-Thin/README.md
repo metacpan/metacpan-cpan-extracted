@@ -26,6 +26,12 @@ Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
         role                => 'my-role', # optional
       });
 
+    # Get credentials from ECS task role
+    my $s3client = Amazon::S3::Thin->new({
+        region              => $region,
+        credential_provider => 'ecs_container',
+      });
+
     my $bucket = "mybucket";
     my $key = "dir/file.txt";
     my $response;
@@ -106,6 +112,7 @@ It can receive the following arguments:
     - `credentials` - existing behaviour, pass in credentials via `aws_access_key_id` and `aws_secret_access_key`
     - `env` - fetch credentials from environment variables
     - `metadata` - fetch credentials from EC2 instance metadata service
+    - `ecs_container` - fetch credentials from ECS task role
 - `region` - (**REQUIRED**) region of your buckets you access- (currently used only when signature version is 4)
 - `aws_access_key_id` (**REQUIRED \[provider: credentials\]**) - an access key id
 of your credentials.

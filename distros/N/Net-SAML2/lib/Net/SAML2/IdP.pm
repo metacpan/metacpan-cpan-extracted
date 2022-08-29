@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::IdP;
-our $VERSION = '0.57'; # VERSION
+our $VERSION = '0.59'; # VERSION
 
 use Moose;
 use MooseX::Types::URI qw/ Uri /;
@@ -23,37 +23,49 @@ has 'sso_urls' => (isa => 'HashRef[Str]', is => 'ro', required => 1);
 has 'slo_urls' => (isa => 'Maybe[HashRef[Str]]', is => 'ro');
 has 'art_urls' => (isa => 'Maybe[HashRef[Str]]', is => 'ro');
 has 'certs'    => (isa => 'HashRef[Str]',        is => 'ro', required => 1);
-has 'formats'  => (isa => 'HashRef[Str]',        is => 'ro', required => 1);
 has 'sls_force_lcase_url_encoding'    => (isa => 'Bool', is => 'ro', required => 0);
 has 'sls_double_encoded_response' => (isa => 'Bool', is => 'ro', required => 0);
-has 'default_format'          => (isa => 'Str',  is => 'ro', required => 1);
+
+has 'formats' => (
+    isa      => 'HashRef[Str]',
+    is       => 'ro',
+    required => 0,
+    default  => sub { {} }
+);
+has 'default_format' => (isa => 'Str', is => 'ro', required => 0);
 
 
 sub new_from_url {
-    my($class, %args) = @_;
+    my ($class, %args) = @_;
 
     my $req = GET $args{url};
-    my $ua  = LWP::UserAgent->new;
-
-    if ( defined $args{ssl_opts} ) {
-        require LWP::Protocol::https;
-        $ua->ssl_opts( %{$args{ssl_opts}} );
+    my $ua = $args{ua};
+    if (!$ua) {
+        $ua = LWP::UserAgent->new;
+        if (defined $args{ssl_opts}) {
+            require LWP::Protocol::https;
+            $ua->ssl_opts(%{ $args{ssl_opts} });
+        }
     }
 
     my $res = $ua->request($req);
-    if (! $res->is_success ) {
-        my $msg = "no metadata: " . $res->code . ": " . $res->message . "\n";
-        die $msg;
+    if (!$res->is_success) {
+        die(
+            sprintf(
+                "Error retrieving metadata: %s (%s)\n",
+                $res->message, $res->code
+            )
+        );
     }
 
-    my $xml = $res->content;
+    my $xml = $res->decoded_content;
 
     return $class->new_from_xml(
-                    xml => $xml,
-                    cacert => $args{cacert},
-                    sls_force_lcase_url_encoding => $args{sls_force_lcase_url_encoding},
-                    sls_double_encoded_response => $args{sls_double_encoded_response},
-                    );
+        xml                          => $xml,
+        cacert                       => $args{cacert},
+        sls_force_lcase_url_encoding => $args{sls_force_lcase_url_encoding},
+        sls_double_encoded_response  => $args{sls_double_encoded_response},
+    );
 }
 
 
@@ -99,20 +111,16 @@ sub new_from_xml {
         $xpath->findnodes('//md:EntityDescriptor/md:IDPSSODescriptor/md:NameIDFormat'))
     {
         $format = $format->string_value;
-        $format =~ s/^\s+|\s+$//g;
+        $format =~ s/^\s+//g;
+        $format =~ s/\s+$//g;
+
         my($short_format)
             = $format =~ /urn:oasis:names:tc:SAML:(?:2.0|1.1):nameid-format:(.*)$/;
+
         if(defined $short_format) {
-            $data->{NameIDFormat}->{$short_format} = $format;
+            $data->{NameIDFormat}{$short_format} = $format;
             $data->{DefaultFormat} = $short_format unless exists $data->{DefaultFormat};
         }
-    }
-
-    # NameIDFormat is an optional field and not provided in all metadata xml
-    # Microsoft in particular does not provide this field
-    if(!defined($data->{NameIDFormat})){
-        $data->{NameIDFormat}->{unspecified} = 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified';
-        $data->{DefaultFormat} = 'unspecified' unless exists $data->{DefaultFormat};
     }
 
     for my $key (
@@ -145,16 +153,20 @@ sub new_from_xml {
     }
 
     my $self = $class->new(
-        entityid       => $xpath->findvalue('//md:EntityDescriptor/@entityID'),
-        sso_urls       => $data->{SSO},
-        slo_urls       => $data->{SLO} || {},
-        art_urls       => $data->{Art} || {},
-        certs          => $data->{Cert},
-        formats        => $data->{NameIDFormat},
-        default_format => $data->{DefaultFormat},
-        cacert         => $args{cacert},
+        entityid => $xpath->findvalue('//md:EntityDescriptor/@entityID'),
+        sso_urls => $data->{SSO},
+        slo_urls => $data->{SLO} || {},
+        art_urls => $data->{Art} || {},
+        certs                        => $data->{Cert},
+        cacert                       => $args{cacert},
         sls_force_lcase_url_encoding => $args{sls_force_lcase_url_encoding},
-        sls_double_encoded_response => $args{sls_double_encoded_response},
+        sls_double_encoded_response  => $args{sls_double_encoded_response},
+        $data->{DefaultFormat}
+        ? (
+            default_format => $data->{DefaultFormat},
+            formats        => $data->{NameIDFormat},
+            )
+        : (),
     );
 
     return $self;
@@ -246,7 +258,7 @@ Net::SAML2::IdP - Net::SAML2::IdP - SAML Identity Provider object
 
 =head1 VERSION
 
-version 0.57
+version 0.59
 
 =head1 SYNOPSIS
 

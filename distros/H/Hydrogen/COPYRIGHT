@@ -1,0 +1,105 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Hydrogen
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/Hydrogen
+
+Files: README
+ lib/Hydrogen.pm
+ lib/Hydrogen/Array.pm
+ lib/Hydrogen/ArrayRef.pm
+ lib/Hydrogen/Bool.pm
+ lib/Hydrogen/Code.pm
+ lib/Hydrogen/CodeRef.pm
+ lib/Hydrogen/Counter.pm
+ lib/Hydrogen/Curry/ArrayRef.pm
+ lib/Hydrogen/Curry/Bool.pm
+ lib/Hydrogen/Curry/CodeRef.pm
+ lib/Hydrogen/Curry/Counter.pm
+ lib/Hydrogen/Curry/HashRef.pm
+ lib/Hydrogen/Curry/Number.pm
+ lib/Hydrogen/Curry/Scalar.pm
+ lib/Hydrogen/Curry/String.pm
+ lib/Hydrogen/Hash.pm
+ lib/Hydrogen/HashRef.pm
+ lib/Hydrogen/Number.pm
+ lib/Hydrogen/Scalar.pm
+ lib/Hydrogen/String.pm
+ lib/Hydrogen/Topic/ArrayRef.pm
+ lib/Hydrogen/Topic/Bool.pm
+ lib/Hydrogen/Topic/CodeRef.pm
+ lib/Hydrogen/Topic/Counter.pm
+ lib/Hydrogen/Topic/HashRef.pm
+ lib/Hydrogen/Topic/Number.pm
+ lib/Hydrogen/Topic/Scalar.pm
+ lib/Hydrogen/Topic/String.pm
+ t/00versions.t
+ t/01basic.t
+ t/40curry.t
+ t/41topic.t
+ t/70lexical.t
+ t/unit/hydrogen-array.t
+ t/unit/hydrogen-arrayref.t
+ t/unit/hydrogen-bool.t
+ t/unit/hydrogen-code.t
+ t/unit/hydrogen-coderef.t
+ t/unit/hydrogen-counter.t
+ t/unit/hydrogen-curry-arrayref.t
+ t/unit/hydrogen-curry-bool.t
+ t/unit/hydrogen-curry-coderef.t
+ t/unit/hydrogen-curry-counter.t
+ t/unit/hydrogen-curry-hashref.t
+ t/unit/hydrogen-curry-number.t
+ t/unit/hydrogen-curry-scalar.t
+ t/unit/hydrogen-curry-string.t
+ t/unit/hydrogen-hash.t
+ t/unit/hydrogen-hashref.t
+ t/unit/hydrogen-number.t
+ t/unit/hydrogen-scalar.t
+ t/unit/hydrogen-string.t
+ t/unit/hydrogen-topic-arrayref.t
+ t/unit/hydrogen-topic-bool.t
+ t/unit/hydrogen-topic-coderef.t
+ t/unit/hydrogen-topic-counter.t
+ t/unit/hydrogen-topic-hashref.t
+ t/unit/hydrogen-topic-number.t
+ t/unit/hydrogen-topic-scalar.t
+ t/unit/hydrogen-topic-string.t
+Copyright: This software is copyright (c) 2022 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+Copyright: Copyright 2022 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: INSTALL
+ LICENSE
+Copyright: Unknown
+License: Unknown
+
+Files: Makefile.PL
+Copyright: Copyright 2020 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2022 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2022 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

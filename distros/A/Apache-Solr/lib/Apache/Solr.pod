@@ -177,9 +177,10 @@ the uri of the http query to the solr server.  See L<expandSelect()|Apache::Solr
 all the simplifications offered here.  Sets of there parameters
 may need configuration help in the server as well.
 
-[1.06] You may pass some options to process the selected results.  For
-backwards compatability reasons, they have to be passed in a HASH as
-optional first parameter.
+[1.06] You may pass some options to process the selected results (the
+L<Apache::Solr::Result|Apache::Solr::Result> object initiation).  For instance, C<sequential>.
+For backwards compatability reasons, they have to be passed in a HASH
+as optional first parameter.
 
 =back
 
@@ -491,13 +492,17 @@ by the backend abbreviation.
 
 =over 4
 
+=item * expand
+
 =item * facet -> F<http://wiki.apache.org/solr/SimpleFacetParameters>
 
 =item * hl (highlight) -> F<http://wiki.apache.org/solr/HighlightingParameters>
 
-=item * mtl -> F<http://wiki.apache.org/solr/MoreLikeThis>
+=item * mtl -> F<https://solr.apache.org/guide/8_11/morelikethis.html>
 
 =item * stats -> F<http://wiki.apache.org/solr/StatsComponent>
+
+=item * suggest -> F<https://solr.apache.org/guide/8_11/suggester.html>
 
 =item * group -> F<http://wiki.apache.org/solr/FieldCollapsing>
 
@@ -608,8 +613,8 @@ differences is that C<Apache::Solr> has much more abstraction.
 
 =head1 SEE ALSO
 
-This module is part of Apache-Solr distribution version 1.06,
-built on July 08, 2022. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Apache-Solr distribution version 1.07,
+built on August 26, 2022. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

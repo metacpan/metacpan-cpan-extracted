@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Test and measure with Perl",
-  "AUTHOR" => "Andreas K. H\x{fc}ttel <mail\@akhuettel.de>, Simon Reinhardt <simon.reinhardt\@physik.uni-r.de>, Fabian Weinelt <fabian.weinelt\@gmx.de>",
+  "AUTHOR" => "Andreas K. H\x{fc}ttel <mail\@akhuettel.de>, Simon Reinhardt <simon.reinhardt\@physik.uni-r.de>, Erik Fabrizzi <erik.fabrizzi\@stud.uni-regensburg.de>, Mia Schambeck <mia.schambeck\@mailbox.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -53,6 +53,7 @@ my %WriteMakefileArgs = (
     "Net::RFC3161::Timestamp" => 0,
     "PDL" => "2.007",
     "PDL::Core" => 0,
+    "PDL::IO::CSV" => 0,
     "PDL::NiceSlice" => 0,
     "POSIX" => 0,
     "Role::Tiny" => "1.003004",
@@ -102,7 +103,7 @@ my %WriteMakefileArgs = (
     "aliased" => 0,
     "lib" => 0
   },
-  "VERSION" => "3.821",
+  "VERSION" => "3.822",
   "test" => {
     "TESTS" => "t/*.t t/Analysis/*.t t/Instrument/*.t t/Lab/Test/*.t t/Moose/*.t t/Moose/Connection/*.t t/Moose/DataFile/*.t t/Moose/DataFile/Gnuplot/*.t t/Moose/Instrument/*.t t/Moose/Instrument/OI_Mercury/*.t t/SCPI/*.t t/XPRESS/*.t"
   }
@@ -154,6 +155,7 @@ my %FallbackPrereqs = (
   "Net::RFC3161::Timestamp" => 0,
   "PDL" => "2.007",
   "PDL::Core" => 0,
+  "PDL::IO::CSV" => 0,
   "PDL::NiceSlice" => 0,
   "PDL::Ufunc" => 0,
   "POSIX" => 0,

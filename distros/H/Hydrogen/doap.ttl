@@ -1,0 +1,278 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Hydrogen/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:develop-requirement [ doap-deps:on "Path::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "Sub::HandlesVia"^^doap-deps:CpanId ], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [ doap-deps:on "Mite"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008001"^^doap-deps:CpanId ], [ doap-deps:on "Carp"^^doap-deps:CpanId ], [ doap-deps:on "Data::Dumper"^^doap-deps:CpanId ], [
+		doap-deps:on "Exporter::Shiny 1.004000"^^doap-deps:CpanId;
+	], [ doap-deps:on "List::Util 1.54"^^doap-deps:CpanId ], [ doap-deps:on "Scalar::Util"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test2::V0"^^doap-deps:CpanId ];
+	doap:bug-database    <https://github.com/tobyink/p5-hydrogen/issues>;
+	doap:created         "2022-08-23"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Hydrogen>;
+	doap:homepage        <https://metacpan.org/release/Hydrogen>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Hydrogen";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-015>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-hydrogen>;
+	];
+	doap:shortdesc       "utilities for the simplest elements of Perl".
+
+<http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Hydrogen-0.001"^^xsd:string;
+	dc:issued            "2022-08-24"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Hydrogen-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Hydrogen-0.002"^^xsd:string;
+	dc:issued            "2022-08-24"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Hydrogen::Curry::* modules.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Hydrogen-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Hydrogen-0.003"^^xsd:string;
+	dc:issued            "2022-08-24"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Don't fully qualify function names in pod headings.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Hydrogen-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Hydrogen-0.004"^^xsd:string;
+	dc:issued            "2022-08-24"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Improved SYNOPSIS and SEE ALSO sections.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Hydrogen-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "Hydrogen-0.005"^^xsd:string;
+	dc:issued            "2022-08-24"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Simplified generated code.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Hydrogen-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "Hydrogen-0.006"^^xsd:string;
+	dc:issued            "2022-08-25"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Better variable names in usage descriptions.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Hydrogen-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "Hydrogen-0.007"^^xsd:string;
+	dc:issued            "2022-08-25"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Some improved error messages.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Hydrogen::Topic::* modules.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Hydrogen-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "Hydrogen-0.008"^^xsd:string;
+	dc:issued            "2022-08-25"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Improve the module listing in Hydrogen.pm.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Give an example of topicalized function usage in Hydrogen.pm SYNOPSIS.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document Hydrogen.pm's own exported functions.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Hydrogen-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-009>
+	a                    doap:Version;
+	dc:identifier        "Hydrogen-0.009"^^xsd:string;
+	dc:issued            "2022-08-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Minor pod improvements.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Minor improvements.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Minor formatting changes.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Hydrogen-0.009.tar.gz>;
+	doap:revision        "0.009"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-010>
+	a                    doap:Version;
+	dc:identifier        "Hydrogen-0.010"^^xsd:string;
+	dc:issued            "2022-08-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Fix missing linebreak before '=head1 BUGS' in pod.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Hydrogen-0.010.tar.gz>;
+	doap:revision        "0.010"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-011>
+	a                    doap:Version;
+	dc:identifier        "Hydrogen-0.011"^^xsd:string;
+	dc:issued            "2022-08-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Perl 5.8.x doesn't support re::is_regexp(), so provide a polyfill for a few functions in Hydrogen::String and Hydrogen::Topic::String which require it.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Support Perl as old as 5.8.1.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Rewrite test suite to use Test2::V0.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document distribution dependencies.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Hydrogen-0.011.tar.gz>;
+	doap:revision        "0.011"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-012>
+	a                    doap:Version;
+	dc:identifier        "Hydrogen-0.012"^^xsd:string;
+	dc:issued            "2022-08-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Rebuild with latest Sub::HandlesVia.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Hydrogen-0.012.tar.gz>;
+	doap:revision        "0.012"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-013>
+	a                    doap:Version;
+	dc:identifier        "Hydrogen-0.013"^^xsd:string;
+	dc:issued            "2022-08-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Use Exporter::Shiny 1.004000 so that Hydrogen can do lexical exports on Perl 5.37.2+.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Hydrogen-0.013.tar.gz>;
+	doap:revision        "0.013"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-014>
+	a                    doap:Version;
+	dc:identifier        "Hydrogen-0.014"^^xsd:string;
+	dc:issued            "2022-08-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Improve SYNOPSIS.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Add a RATIONALE section.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Generate some slightly more efficient mutator functions for strings, arrays, and hashes.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Hydrogen-0.014.tar.gz>;
+	doap:revision        "0.014"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Hydrogen/v_0-015>
+	a                    doap:Version;
+	dc:identifier        "Hydrogen-0.015"^^xsd:string;
+	dc:issued            "2022-08-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Remove SYNOPSIS example that didn't work.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Hydrogen-0.015.tar.gz>;
+	doap:revision        "0.015"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

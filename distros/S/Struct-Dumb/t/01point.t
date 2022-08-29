@@ -38,13 +38,17 @@ like( exception { @{ Point(0, 0) } },
       qr/^Cannot use main::Point as an ARRAY reference at \S+ line \d+\.?\n/,
       'Array deref throws exception' );
 
-ok( !( local $@ = exception {
-      no warnings 'redefine';
-      local *Point::_forbid_arrayification = sub {};
-      @{ Point(2, 2) };
-   } ),
-   'Array deref succeeds with locally-overridden forbid function' ) or
-   diag( "Exception was $@" );
+SKIP: {
+   skip "Instances are not ARRAYs", 1 unless Scalar::Util::reftype( Point(1, 1) ) eq "ARRAY";
+
+   ok( !( local $@ = exception {
+         no warnings 'redefine';
+         local *Point::_forbid_arrayification = sub {};
+         @{ Point(2, 2) };
+      } ),
+      'Array deref succeeds with locally-overridden forbid function' ) or
+      diag( "Exception was $@" );
+}
 
 like( exception { $point->x(50) },
       qr/^main::Point->x invoked with arguments at \S+ line \d+\.?\n/,

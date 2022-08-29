@@ -1,5 +1,21 @@
 Revision history for Perl script App-ansiecho
 
+1.02 2022-08-24T08:47:24Z
+
+    - Release 1.02
+
+1.01_03 2022-08-22T10:03:57Z
+
+    - require Getopt::EX::Hashed@1.05
+
+1.01_02 2022-08-22T00:11:58Z
+
+    - Use new Getopt::EX::Hashed interfaces.
+
+1.01_01 2022-08-20T17:51:22Z
+
+    - use Term::ANSIColor::Concise
+
 1.01 2022-08-08T09:31:41Z
 
     - Release 1.01

@@ -101,6 +101,7 @@ All elements in the array, in list context.
 
   my $object = My::Class->new( attr => [ 'foo', 'bar' ] );
   my @list = $object->my_all;
+  say Dumper( \@list ); ## ==> [ 'foo', 'bar' ]
 
 =head2 C<< all_true( $coderef ) >>
 
@@ -113,6 +114,10 @@ Like C<< List::Util::all() >>.
 Arguments: B<< CodeRef >>.
 
 Like C<< List::Util::any() >>.
+
+  my $object = My::Class->new( attr => [ 'foo', 'bar', 'baz' ] );
+  my $truth  = $object->my_any( sub { /a/ } );
+  say $truth; ## ==> true
 
 =head2 C<< apply( $coderef ) >>
 
@@ -143,10 +148,11 @@ Removes the indexed element from the array and returns it. Elements after it wil
 
 =head2 C<< elements() >>
 
-All elements in the array, in list context.
+All elements in the array, in list context. (Essentially the same as C<all>.)
 
   my $object = My::Class->new( attr => [ 'foo', 'bar' ] );
   my @list = $object->my_elements;
+  say Dumper( \@list ); ## ==> [ 'foo', 'bar' ]
 
 =head2 C<< first( $coderef ) >>
 
@@ -154,21 +160,39 @@ Arguments: B<< CodeRef >>.
 
 Like C<< List::Util::first() >>.
 
+  my $object = My::Class->new( attr => [ 'foo', 'bar', 'baz' ] );
+  my $found  = $object->my_first( sub { /a/ } );
+  say $found; ## ==> 'bar'
+
 =head2 C<< first_index( $coderef ) >>
 
 Arguments: B<< CodeRef >>.
 
 Like C<< List::MoreUtils::first_index() >>.
 
+  my $object = My::Class->new( attr => [ 'foo', 'bar', 'baz' ] );
+  my $found  = $object->my_first_index( sub { /z$/ } );
+  say $found; ## ==> 2
+
 =head2 C<< flatten() >>
 
-All elements in the array, in list context.
+All elements in the array, in list context. (Essentially the same as C<all>.)
+
+  my $object = My::Class->new( attr => [ 'foo', 'bar' ] );
+  my @list = $object->my_flatten;
+  say Dumper( \@list ); ## ==> [ 'foo', 'bar' ]
 
 =head2 C<< flatten_deep( $depth? ) >>
 
 Arguments: B<< Optional[Int] >>.
 
-Flattens the arrayref into a list, including any nested arrayrefs.
+Flattens the arrayref into a list, including any nested arrayrefs. (Has the potential to loop infinitely.)
+
+  my $object = My::Class->new( attr => [ 'foo', [ 'bar', [ 'baz' ] ] ] );
+  say Dumper( [ $object->my_flatten_deep ] ); ## ==> [ 'foo', 'bar', 'baz' ]
+
+  my $object2 = My::Class->new( attr => [ 'foo', [ 'bar', [ 'baz' ] ] ] );
+  say Dumper( [ $object->my_flatten_deep(1) ] ); ## ==> [ 'foo', 'bar', [ 'baz' ] ]
 
 =head2 C<< for_each( $coderef ) >>
 
@@ -264,6 +288,11 @@ Like C<< List::Util::minstr() >>.
 Arguments: B<< Int >>, B<< Optional[CodeRef] >>.
 
 Given just a number, returns an iterator which reads that many elements from the array at a time. If also given a callback, calls the callback repeatedly with those values.
+
+  my $object = My::Class->new( attr => [ 'foo', 'bar', 'baz' ] );
+  my $iter   = $object->my_natatime( 2 );
+  say Dumper( [ $iter->() ] ); ## ==> [ 'foo', 'bar' ]
+  say Dumper( [ $iter->() ] ); ## ==> [ 'baz' ]
 
 =head2 C<< not_all_true( $coderef ) >>
 

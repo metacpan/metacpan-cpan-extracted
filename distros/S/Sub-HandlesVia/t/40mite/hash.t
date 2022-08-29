@@ -77,6 +77,23 @@ subtest 'Testing my_delete' => sub {
   is( $e, undef, 'no exception thrown running delete example' );
 };
 
+## delete_where
+
+can_ok( $CLASS, 'my_delete_where' );
+
+subtest 'Testing my_delete_where' => sub {
+  my $e = exception {
+    my $object = $CLASS->new( attr => { foo => 0, bar => 1, baz => 2 } );
+    $object->my_delete_where( sub { $_ eq 'foo' or $_ eq 'bar' } );
+    is_deeply( $object->attr, { baz => 2 }, q{$object->attr deep match} );
+    
+    my $object2 = $CLASS->new( attr => { foo => 0, bar => 1, baz => 2 } );
+    $object2->my_delete_where( qr/^b/ );
+    is_deeply( $object2->attr, { foo => 0 }, q{$object2->attr deep match} );
+  };
+  is( $e, undef, 'no exception thrown running delete_where example' );
+};
+
 ## elements
 
 can_ok( $CLASS, 'my_elements' );

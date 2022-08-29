@@ -11,7 +11,7 @@ use Readonly;
 our $ERROR_MESSAGE;
 Readonly::Array our @EXPORT_OK => qw(check_socket $ERROR_MESSAGE);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 sub check_socket {
 	my ($config_hr, $os, $env_hr) = @_;
@@ -111,7 +111,7 @@ Returns 0/1.
                  $^O: Skip sockets on CI.
                  $^O: UNIX domain sockets not implemented.
 
-=head1 EXAMPLE
+=head1 EXAMPLE1
 
 =for comment filename=check_socket.pl
 
@@ -129,6 +129,29 @@ Returns 0/1.
 
  # Output on Unix:
  # We could use socket communication.
+
+=head1 EXAMPLE2
+
+=for comment filename=check_fork_and_socket.pl
+
+ use strict;
+ use warnings;
+
+ use Check::Fork qw(check_fork);
+ use Check::Socket qw(check_socket);
+
+ if (! check_fork()) {
+         print "We couldn't fork.\n";
+         print "Error message: $Check::Fork::ERROR_MESSAGE\n";
+ } elsif (! check_socket()) {
+         print "We couldn't use socket communication.\n";
+         print "Error message: $Check::Socket::ERROR_MESSAGE\n";
+ } else {
+         print "We could use fork and socket communication.\n";
+ }
+
+ # Output on Unix:
+ # We could use fork and socket communication.
 
 =head1 DEPENDENCIES
 

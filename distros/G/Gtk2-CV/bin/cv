@@ -1,5 +1,18 @@
 #!/opt/bin/perl
 
+BEGIN {
+   # work around libraries (and perl) outputting numbers in weird formats
+   # when they shouldn't. this is somewhat brutal - better suggestions
+   # appreciated.
+   $ENV{LC_NUMERIC} = "C";
+   $ENV{LANG} = delete $ENV{LC_ALL} if exists $ENV{LC_ALL};
+}
+
+BEGIN {
+   require Gtk2::CV::Plugin;
+   require "$ENV{HOME}/.cvrc" if -r "$ENV{HOME}/.cvrc";
+}
+
 use common::sense;
 
 use Cwd ();
@@ -7,7 +20,7 @@ use Encode ();
 use File::Glob ();
 use Scalar::Util ();
 
-use Gtk2;
+use Gtk2; qw(-init -threads-init); BEGIN { Gtk2::Gdk::Threads->enter };
 use Gtk2::Gdk::Keysyms;
 
 use Gtk2::CV;
@@ -15,16 +28,12 @@ use Gtk2::CV;
 use Gtk2::CV::ImageWindow;
 use Gtk2::CV::Schnauzer;
 
-BEGIN {
-   require Gtk2::CV::Plugin;
-   require "$ENV{HOME}/.cvrc" if -r "$ENV{HOME}/.cvrc";
-}
-
-use Carp (); $Carp::MaxArgLen = 256;#d#
+use Carp (); $Carp::MaxArgLen = 256;
 
 use Gtk2::CV::Plugin::NameCluster;
 use Gtk2::CV::Plugin::RCluster;
 use Gtk2::CV::Plugin::PatRenamer;
+use Gtk2::CV::Plugin::MetaCluster;
 
 use AnyEvent::Fork::Template;
 
@@ -166,6 +175,8 @@ sub std_keys {
    1
 }
 
+&cvrc_boot if defined &cvrc_boot;
+
 {
    $viewer = new_viewer;
    $::cur_viewer = $viewer;
@@ -204,9 +215,11 @@ if (@ARGV) {
       $viewer->show_all;
    };
 
+   my $force_sort = $ARGV[0] eq "--sort" ? shift @ARGV : 0;
+
    if (@ARGV == 1 && $ARGV[0] eq "-0r") {
       local $/;
-      $schnauzer->set_paths ([split /\x00/, <STDIN>], 1, $show_first);
+      $schnauzer->set_paths ([split /\x00/, <STDIN>], !$force_sort, $show_first);
    } elsif (@ARGV == 1 && -d $ARGV[0]) {
       $schnauzer->set_dir (shift, $show_first);
    } else {
@@ -214,7 +227,7 @@ if (@ARGV) {
          shift @ARGV;
          @ARGV = map +(File::Glob::bsd_glob $_, File::Glob::GLOB_BRACE | File::Glob::GLOB_QUOTE), @ARGV;
       }
-      $schnauzer->set_paths ([@ARGV], 1, $show_first);
+      $schnauzer->set_paths ([@ARGV], !$force_sort, $show_first);
    }
 } else {
    $schnauzer->set_dir (File::Spec->curdir, sub {
@@ -222,6 +235,8 @@ if (@ARGV) {
       $viewer->show_all;
    });
 }
+
+&cvrc_start if defined &cvrc_start;
 
 main Gtk2;
 
@@ -246,6 +261,8 @@ cv - a fast gtk+ image viewer loosely modeled after XV
    cv -g <glob expression...>
 
    find .. -print0 | cv -0r
+
+   cv --sort ...
 
 =head1 FEATURES
 
@@ -347,7 +364,7 @@ You can use the following keys in the image window:
  q            quit the program
  <            half the image size
  >            double the image size
- ,            shrink the image by 10%
+ ,            shrink the image by ~9% (opposite of .)
  .            enlarge the image by 10%
  n            reset to normal size
  m            maximize to screensize
@@ -357,7 +374,6 @@ You can use the following keys in the image window:
  u            uncrop
  r            set scaling mode to 'nearest' (fastest)
  s            set scaling mode to 'bilinear' (default)
- shift-s      set scaling mode to 'hyper' (slowest)
  t            rotate clockwise 90°
  T            rotate counterclockwise°
  a            apply all rotations loslessly to a jpeg file (using exiftran)
@@ -498,12 +514,8 @@ Will be called like C<< $CV_AUDIO_PLAYER -- <path> >>.
 =item CV_MPLAYER
 
 Program used to play all sorts of video files. Unlike C<CV_AUDIO_PLAYER>,
-this really must be one of the C<mplayer>, C<mplayer2> or C<mpv> programs,
-or something that is very command-line compatible to them.
-
-Currently, if this string contains the substring C<mpv>, then it
-is assumed to be mpv-compatible, otherwise it is assumed to be
-mplayer-compatible.
+this really must be some version of the C<mpv> programs, or something that
+is very command-line compatible to them.
 
 Note: for video-thumbnailing, mplayer is still used (and hardcoded).
 

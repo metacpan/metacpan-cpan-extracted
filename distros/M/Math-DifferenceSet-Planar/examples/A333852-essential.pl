@@ -32,7 +32,7 @@ while ($n < $MAX_TERMS && (my $s0 = $sets->())) {
     if (!$HAVE_LEX) {
         my $planes = $s0->iterate_planes;
         while (my $s = $planes->()) {
-            $first = $s if $s0->compare($s) > 0;
+            $first = $s if $first->compare($s) > 0;
         }
     }
     print "# order $order\n";

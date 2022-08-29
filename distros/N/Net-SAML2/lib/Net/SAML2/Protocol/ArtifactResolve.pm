@@ -1,10 +1,9 @@
-use strict;
-use warnings;
 package Net::SAML2::Protocol::ArtifactResolve;
-our $VERSION = '0.57'; # VERSION
-
 use Moose;
+our $VERSION = '0.59'; # VERSION
+
 use MooseX::Types::URI qw/ Uri /;
+use URN::OASIS::SAML2 qw(:urn);
 
 with 'Net::SAML2::Role::ProtocolMessage';
 
@@ -15,15 +14,20 @@ with 'Net::SAML2::Role::ProtocolMessage';
 has 'issuer'      => (isa => 'Str', is => 'ro', required => 1);
 has 'destination' => (isa => 'Str', is => 'ro', required => 1);
 has 'artifact'    => (isa => 'Str', is => 'ro', required => 1);
-has 'provider'    => (isa => 'Str', is => 'ro', required => 0);
+has 'provider' => (
+    isa       => 'Str',
+    is        => 'ro',
+    required  => 0,
+    predicate => 'has_provider',
+);
 
 
 sub as_xml {
     my ($self) = @_;
 
     my $x = XML::Generator->new(':pretty');
-    my $saml  = ['saml' => 'urn:oasis:names:tc:SAML:2.0:assertion'];
-    my $samlp = ['samlp' => 'urn:oasis:names:tc:SAML:2.0:protocol'];
+    my $saml  = ['saml' => URN_ASSERTION ];
+    my $samlp = ['samlp' => URN_PROTOCOL ];
 
     $x->xml(
         $x->ArtifactResolve(
@@ -31,7 +35,9 @@ sub as_xml {
             { ID => $self->id,
               IssueInstant => $self->issue_instant,
               Destination => $self->destination,
-              ProviderName => $self->provider || "My SP's human readable name.",
+              $self->has_provider ? (
+                  ProviderName => $self->provider,
+              ) : (),
               Version => '2.0' },
             $x->Issuer(
                 $saml,
@@ -59,7 +65,7 @@ Net::SAML2::Protocol::ArtifactResolve - Net::SAML2::Protocol::ArtifactResolve - 
 
 =head1 VERSION
 
-version 0.57
+version 0.59
 
 =head1 SYNOPSIS
 

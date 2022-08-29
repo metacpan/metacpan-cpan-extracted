@@ -5,6 +5,7 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
+    use vars qw( $DEBUG );
     use_ok( 'Module::Generic::File', qw( file cwd stdin stderr stdout tempfile tempdir ) );
     use Config;
     use Cwd ();
@@ -18,6 +19,9 @@ BEGIN
     # use Sereal ();
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
+
+use strict;
+use warnings;
 
 CORE::chdir( File::Spec->tmpdir );
 

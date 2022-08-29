@@ -54,8 +54,7 @@ sub init
     my $args = {};
     if( @_ )
     {
-        if( ( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'Module::Generic::Exception' ) ) ||
-            Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'Module::Generic::Exception' ) )
+        if( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'Module::Generic::Exception' ) )
         {
             $args->{object} = shift( @_ );
         }

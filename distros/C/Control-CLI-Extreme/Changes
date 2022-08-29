@@ -80,3 +80,19 @@ Revision history for Control-CLI-Extreme
 	* Was not correctly detecting the SLX9740
 	* Changed the generic prompt regex to accomodate some Linux distributions where the prompt is coloured
 	  using ANSI escape sequences
+
+1.07	2022-08-28
+	* Changes to correctly detect FabricEngine Universal Hardware VOSS 8.6.0.0 and set "is_voss" attribute
+	* Changes to correctly detect SwitchEngine Universal Hardware EXOS 31.7 and set "sw_version" attribute
+	* Fix to correctly set "fw_version" attribute on EXOS when both a Default and Alternate version are
+	  reported
+	* Methods cmdPrivExec() and cmdConfig() in some cases would return $ok true and an undefined $outputref
+	  which goes against what was documented: Arguments after $ok will only be defined if $ok is true(1)
+	* Methods cmdPrivExec() and cmdConfig() now have logic (using Control::CLI internal WRITEFLAG) to detect
+	  if the last_prompt & config_context values might be stale, in which case a fresh prompt is collected
+	  before proceeding. WRITEFLAG is introduced in Control::CLI version 2.11 and this functionality change
+	  will only work with that version of Control::CLI or later, but does not otherwise make this module
+	  incompatible with older versions of Control::CLI
+	* Slot/Port detection changed to cater for new EXOS 5720 channelized ports on standalone units
+	* PassportERS NNCLI more prompt adjusted, as the more prompt used by VOSS on command syntax is slightly
+	  different, without the space characters

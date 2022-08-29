@@ -6,6 +6,22 @@ Home page:    <https://metacpan.org/release/Sub-HandlesVia>
 Bug tracker:  <https://github.com/tobyink/p5-sub-handlesvia/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.036	2022-08-26
+
+ [ Bug Fixes ]
+ - Fix integration issues with newer versions of Mite.
+
+ [ Documentation ]
+ - Examples for a few methods.
+ - More tests for a few methods.
+
+ [ Other ]
+ - Added: Add a delete_where method for hashes.
+ - Added: Add execute_list, execute_scalar, execute_void, and corresponding
+   _method variants for coderefs.
+ - Added: The flatten_deep, natatime, and first_index methods for arrayrefs
+   no longer use callbacks.
+
 0.035	2022-08-12
 
  - Sub::HandlesVia::CodeGenerator method_installer is now a rw attribute as

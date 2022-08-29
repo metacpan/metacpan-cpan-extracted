@@ -6,7 +6,7 @@ build_requires:
   Test::More: '0'
 dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -19,6 +19,10 @@ requires:
   perl: '5.006'
 resources:
   bugtracker: https://rt.cpan.org/Dist/Display.html?Name=Memoize
+  license: http://dev.perl.org/licenses/
   repository: https://github.com/ap/Memoize.git
-version: '1.10'
+version: '1.12'
+x_copyright:
+  holder: 'Mark Jason Dominus'
+  year: 2012
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

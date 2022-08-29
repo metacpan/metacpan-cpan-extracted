@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise.pm
-## Version v0.1.6
+## Version v0.2.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2022/08/06
+## Modified 2022/08/20
 ## All rights reserved.
 ## 
 ## 
@@ -22,7 +22,7 @@ BEGIN
                  $DEFAULT_PROTOCOL $EXCEPTION_CLASS $EXTENSION_VARY
                  $IS_WIN32 $HTTP_TOKEN $HTTP_QUOTED_STRING $BUFFER_SIZE 
                  $MAX_HEADERS_SIZE $MAX_BODY_IN_MEMORY_SIZE $EXPECT_THRESHOLD $DEFAULT_MIME_TYPE 
-                 $SERIALISER );
+                 $SERIALISER @EXPORT_OK );
     use Cookie;
     use Cookie::Jar;
     use Errno qw( EAGAIN ECONNRESET EINPROGRESS EINTR EWOULDBLOCK ECONNABORTED EISCONN );
@@ -42,6 +42,7 @@ BEGIN
         ERROR_EINTR => ( abs( Errno::EINTR ) * -1 ),
         TYPE_URL_ENCODED => 'application/x-www-form-urlencoded',
     };
+    our @EXPORT_OK = qw( fetch );
     # "\r\n" is not portable
     our $CRLF = "\015\012";
     our $DEFAULT_PROTOCOL = 'HTTP/1.1';
@@ -58,7 +59,7 @@ BEGIN
     our $EXTENSION_VARY = 1;
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
     our $SERIALISER = $Promise::Me::SERIALISER;
-    our $VERSION = 'v0.1.6';
+    our $VERSION = 'v0.2.0';
 };
 
 use strict;
@@ -80,7 +81,8 @@ sub init
     $self->{ext_vary}               = $EXTENSION_VARY;
     $self->{from}                   = undef;
     $self->{inactivity_timeout}     = 600;
-    $self->{local_address}          = undef;
+    $self->{local_host}             = undef;
+    $self->{local_port}             = undef;
     $self->{max_body_in_memory_size} = $MAX_BODY_IN_MEMORY_SIZE;
     $self->{max_headers_size}       = $MAX_HEADERS_SIZE;
     $self->{max_redirect}           = 7;
@@ -159,6 +161,33 @@ sub expect_threshold { return( shift->_set_get_number( 'expect_threshold', @_ ) 
 
 sub ext_vary { return( shift->_set_get_boolean( 'ext_vary', @_ ) ); }
 
+sub fetch
+{
+    my $self;
+    if( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( __PACKAGE__ ) )
+    {
+        $self = shift( @_ );
+    }
+    else
+    {
+        $self = __PACKAGE__->new;
+    }
+    my $meth = 'get';
+    for( my $i = 0; $i < scalar( @_ ); $i += 2 )
+    {
+        if( $_[$i] eq 'method' )
+        {
+            $meth = $_[$i + 1];
+            splice( @_, $i, 2 );
+            last;
+        }
+    }
+    return( $self->error( "Unknown HTTP method \"${meth}\"." ) ) if( $meth !~ /^$HTTP::Promise::Request::KNOWN_METHODS_I$/i );
+    my $code = $self->can( $meth ) ||
+        return( $self->error( "Somehow the HTTP method \"${meth}\" is not supported by ", ref( $self ) ) );
+    return( $code->( $self, @_ ) );
+}
+
 sub file { return( shift->_set_get_object_without_init( 'file', 'Module::Generic::File', @_ ) ); }
 
 # NOTE: request parameter
@@ -216,7 +245,11 @@ sub is_protocol_supported
 sub languages { return( shift->_set_get_array_as_object( 'accept_language', @_ ) ); }
 
 # NOTE: request parameter
-sub local_address { return( shift->_set_get_scalar( 'local_address', @_ ) ); }
+sub local_address { return( shift->_set_get_scalar( 'local_host', @_ ) ); }
+
+sub local_host { return( shift->_set_get_scalar( 'local_host', @_ ) ); }
+
+sub local_port { return( shift->_set_get_scalar( 'local_port', @_ ) ); }
 
 sub max_body_in_memory_size { return( shift->_set_get_number( 'max_body_in_memory_size', @_ ) ); }
 
@@ -549,6 +582,15 @@ sub send
     $p->{host} = $uri->host ||
         return( $self->error( "No host set for request uri \"$uri\"." ) );
     
+    if( my $local_host = $self->local_host )
+    {
+        $p->{local_host} = $local_host;
+    }
+    if( my $local_port = $self->local_port )
+    {
+        $p->{local_port} = $local_port;
+    }
+    
     my $proxy = $self->proxy;
     my $no_proxy = $self->no_proxy;
     if( $proxy && $no_proxy )
@@ -601,6 +643,8 @@ sub send
                     stop_if => $self->stop_if,
                     timeout => $timeout,
                     debug   => $self->debug,
+                    ( defined( $p->{local_host} ) ? ( local_host => $p->{local_host} ) : () ),
+                    ( defined( $p->{local_port} ) ? ( local_port => $p->{local_port} ) : () ),
                 ) || return( HTTP::Promise::IO->pass_error );
                 if( defined( $proxy_authorization ) )
                 {
@@ -618,6 +662,8 @@ sub send
                     timeout     => $timeout,
                     proxy_authorization => $proxy_authorization,
                     debug       => $self->debug,
+                    ( defined( $p->{local_host} ) ? ( local_host => $p->{local_host} ) : () ),
+                    ( defined( $p->{local_port} ) ? ( local_port => $p->{local_port} ) : () ),
                 ) || return( HTTP::Promise::IO->pass_error );
             }
         }
@@ -631,6 +677,8 @@ sub send
                     stop_if => $self->stop_if,
                     timeout => $timeout,
                     debug   => $self->debug,
+                    ( defined( $p->{local_host} ) ? ( local_host => $p->{local_host} ) : () ),
+                    ( defined( $p->{local_port} ) ? ( local_port => $p->{local_port} ) : () ),
                 ) || return( HTTP::Promise::IO->pass_error );
             }
             else
@@ -641,6 +689,8 @@ sub send
                     stop_if => $self->stop_if,
                     timeout => $timeout,
                     debug   => $self->debug,
+                    ( defined( $p->{local_host} ) ? ( local_host => $p->{local_host} ) : () ),
+                    ( defined( $p->{local_port} ) ? ( local_port => $p->{local_port} ) : () ),
                 ) || return( HTTP::Promise::IO->pass_error );
             }
         }
@@ -1751,18 +1801,17 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
         max_headers_size => 8192,
         max_redirect => 3,
         proxy => 'https://proxy.example.org:8080',
-        # Can also be cbor or storable
+        # The serialiser to use for the promise in Promise::Me
+        # Defaults to storable, but can also be cbor and sereal
         serialiser => 'sereal',
         # You can also use decimals with Time::HiRes
         timeout => 15,
         # force the use of files to store the response content
         use_content_file => 1,
-        # The serialiser to use for the promise in Promise::Me
-        # Defaults to storable, but can also be cbor and sereal
-        serialiser => 'sereal',
     );
     my $prom = $p->get( 'https://www.example.org', $hash_of_query_params )->then(sub
     {
+        # Nota bene: the last value in this sub will be passed as the argument to the next 'then'
         my $resp = shift( @_ ); # get the HTTP::Promise::Response object
     })->catch(sub
     {
@@ -1776,7 +1825,7 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
 
 =head1 VERSION
 
-    v0.1.6
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -1867,7 +1916,7 @@ See L<Promise::Me> for more information.
 
 It calls L<resolve|Promise::Me/resolve> when the request has been completed and sends a L<HTTP::Promise::Response> object whose API is similar to that of L<HTTP::Response>.
 
-When an error occurs, it is caught and sent by calling L<Promise::XS/reject> with an L<HTTP::Promise::Exception> object.
+When an error occurs, it is caught and sent by calling L<Promise::Me/reject> with an L<HTTP::Promise::Exception> object.
 
 Cookies are automatically and transparently managed with L<Cookie::Jar> which can load and store cookies to a json file you specify. You can create a L<cookie object|Cookie::Jar> and pass it to the constructor with the C<cookie_jar> option.
 
@@ -1895,7 +1944,15 @@ L<HTTP::Promise::Headers>, or L<HTTP::Headers> Object. Sets the headers object c
 
 =item * C<local_address>
 
-String. An IP address or local host name to use when establishing TCP/IP connections.
+String. A local IP address or local host name to use when establishing TCP/IP connections.
+
+=item * C<local_host>
+
+String. Same as C<local_address>
+
+=item * C<local_port>
+
+Integer. A local port to use when establishing TCP/IP connections.
 
 =item * C<max_redirect>
 
@@ -1979,7 +2036,7 @@ Boolean. Enables the use of a temporary local file to store the response content
 
 =head1 METHODS
 
-The following methods are available. You can also access the same methods implemented in L<LWP::UserAgent> even if they are not listed here.
+The following methods are available. This interface provides similar interface as L<LWP::UserAgent> while providing more granular control.
 
 =head2 accept_language
 
@@ -2121,7 +2178,7 @@ If a temporary file has been set, the response content file can be retrieved wit
 
 =head2 from
 
-"the email address for the human user who controls the requesting user agent. The address should be machine-usable, as defined in L<RFC2822|https://tools.ietf.org/html/rfc2822>. The C<from> value is sent as the C<From> header in the requests" (Excerpt taken from LWP::UserAgent documentation)
+Get or set the email address for the human user who controls the requesting user agent. The address should be machine-usable, as defined in L<RFC2822|https://tools.ietf.org/html/rfc2822>. The C<from> value is sent as the C<From> header in the requests
 
 The default value is C<undef>, so no C<From> field is set by default.
 
@@ -2184,12 +2241,20 @@ This is an alias for L</accept_language>
 
 =head2 local_address
 
-"Get/set the local interface to bind to for network connections. The interface can be specified as a hostname or an IP address.  This value is passed as the C<LocalAddr> argument to L<IO::Socket::INET>." (Excerpt taken from LWP::UserAgent documentation)
+Get or set the local interface to bind to for network connections. The interface can be specified as a hostname or an IP address. This value is passed as the C<LocalHost> argument to L<IO::Socket>.
 
 The default value is C<undef>.
 
     my $p = HTTP::Promise->new( local_address => 'localhost' );
     $p->local_address( '127.0.0.1' );
+
+=head2 local_host
+
+This is the same as L</local_address>. You can use either interchangeably.
+
+=head2 local_port
+
+Get or set the local port to use to bind to for network connections. This value is passed as the C<LocalPort> argument to L<IO::Socket>
 
 =head2 max_body_in_memory_size
 
@@ -2209,7 +2274,7 @@ An integer. Sets or gets the maximum number of allowed redirection possible. Def
 
 =head2 max_size
 
-"Get/set the size limit for response content. The default is C<undef>, which means that there is no limit. If the returned response content is only partial, because the size limit was exceeded, then a C<Client-Aborted> header will be added to the response. The content might end up longer than C<max_size> as we abort once appending a chunk of data makes the length exceed the limit. The C<Content-Length> header, if present, will indicate the length of the full content and will normally not be the same as C<< length( $resp->content ) >>" (Excerpt taken from LWP::UserAgent documentation)
+Get or set the size limit for response content. The default is C<undef>, which means that there is no limit. If the returned response content is only partial, because the size limit was exceeded, then a C<Client-Aborted> header will be added to the response. The content might end up longer than C<max_size> as we abort once appending a chunk of data makes the length exceed the limit. The C<Content-Length> header, if present, will indicate the length of the full content and will normally not be the same as C<< length( $resp->content ) >>
 
     my $p = HTTP::Promise->max_size(512000); # 512kb
     $p->max_size(512000);
@@ -2606,6 +2671,37 @@ URI-unescape the given string using L<URI::Escape::XS/uri_unescape>
 Boolean. Enables or disables the use of a temporary file to store the response content. Defaults to false.
 
 When true, the response content will be stored into a temporary file, whose object is a L<Module::Generic::File> object and can be retrieved with L</file>.
+
+=head1 CLASS FUNCTIONS
+
+=head2 fetch
+
+This method can be exported, such as:
+
+    use HTTP::Promise qw( fetch );
+    my $prom = fetch( 'http://example.com/something.json' );
+    # or
+    fetch( 'http://example.com/something.json' )->then(sub
+    {
+        my( $resolve, $reject ) = @$_;
+        my $resp = shift( @_ );
+        my $data = $resp->decoded_content;
+    })->then(sub
+    {
+        my $json = shift( @_ );
+        print( STDOUT "JSON data:\n$json\n" );
+    });
+
+You can also call it with an object, such as:
+
+    my $http = HTTP::Promise->new;
+    my $prom = $http->fetch( 'http://example.com/something.json' );
+
+C<fetch> performs the same way as L</get>, by default, and accepts the same possible parameters. It sets an error and returns C<undef> upon error, or return a L<promise|Promise::Me>
+
+You can, however, specify, another method by providing the C<method> option with value being an HTTP method, i.e. C<DELETE>, C<GET>, C<HEAD>, C<OPTIONS>, C<PATCH>, C<POST>, C<PUT>.
+
+See also L<Mozilla documentation on fetch|https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch>
 
 =head1 AUTHOR
 

@@ -77,19 +77,19 @@
    "provides" : {
       "Google::Ads::GoogleAds::BaseEntity" : {
          "file" : "lib/Google/Ads/GoogleAds/BaseEntity.pm",
-         "version" : "v13.0.0"
+         "version" : "v13.1.0"
       },
       "Google::Ads::GoogleAds::BaseService" : {
          "file" : "lib/Google/Ads/GoogleAds/BaseService.pm",
-         "version" : "v13.0.0"
+         "version" : "v13.1.0"
       },
       "Google::Ads::GoogleAds::Client" : {
          "file" : "lib/Google/Ads/GoogleAds/Client.pm",
-         "version" : "v13.0.0"
+         "version" : "v13.1.0"
       },
       "Google::Ads::GoogleAds::Common::AuthError" : {
          "file" : "lib/Google/Ads/GoogleAds/Common/AuthError.pm",
-         "version" : "v13.0.0"
+         "version" : "v13.1.0"
       },
       "Google::Ads::GoogleAds::Common::AuthHandlerInterface" : {
          "file" : "lib/Google/Ads/GoogleAds/Common/AuthHandlerInterface.pm"
@@ -99,30 +99,30 @@
       },
       "Google::Ads::GoogleAds::Common::OAuth2BaseHandler" : {
          "file" : "lib/Google/Ads/GoogleAds/Common/OAuth2BaseHandler.pm",
-         "version" : "v13.0.0"
+         "version" : "v13.1.0"
       },
       "Google::Ads::GoogleAds::Common::OAuthApplicationsHandlerInterface" : {
          "file" : "lib/Google/Ads/GoogleAds/Common/OAuthApplicationsHandlerInterface.pm"
       },
       "Google::Ads::GoogleAds::Constants" : {
          "file" : "lib/Google/Ads/GoogleAds/Constants.pm",
-         "version" : "v13.0.0"
+         "version" : "v13.1.0"
       },
       "Google::Ads::GoogleAds::GoogleAdsException" : {
          "file" : "lib/Google/Ads/GoogleAds/GoogleAdsException.pm",
-         "version" : "v13.0.0"
+         "version" : "v13.1.0"
       },
       "Google::Ads::GoogleAds::Logging::DetailStats" : {
          "file" : "lib/Google/Ads/GoogleAds/Logging/DetailStats.pm",
-         "version" : "v13.0.0"
+         "version" : "v13.1.0"
       },
       "Google::Ads::GoogleAds::Logging::GoogleAdsLogger" : {
          "file" : "lib/Google/Ads/GoogleAds/Logging/GoogleAdsLogger.pm",
-         "version" : "v13.0.0"
+         "version" : "v13.1.0"
       },
       "Google::Ads::GoogleAds::Logging::SummaryStats" : {
          "file" : "lib/Google/Ads/GoogleAds/Logging/SummaryStats.pm",
-         "version" : "v13.0.0"
+         "version" : "v13.1.0"
       },
       "Google::Ads::GoogleAds::LongRunning::CancelOperationRequest" : {
          "file" : "lib/Google/Ads/GoogleAds/LongRunning/CancelOperationRequest.pm"
@@ -144,35 +144,35 @@
       },
       "Google::Ads::GoogleAds::OAuth2ApplicationsHandler" : {
          "file" : "lib/Google/Ads/GoogleAds/OAuth2ApplicationsHandler.pm",
-         "version" : "v13.0.0"
+         "version" : "v13.1.0"
       },
       "Google::Ads::GoogleAds::OAuth2ServiceAccountsHandler" : {
          "file" : "lib/Google/Ads/GoogleAds/OAuth2ServiceAccountsHandler.pm",
-         "version" : "v13.0.0"
+         "version" : "v13.1.0"
       },
       "Google::Ads::GoogleAds::Utils::FieldMasks" : {
          "file" : "lib/Google/Ads/GoogleAds/Utils/FieldMasks.pm",
-         "version" : "v13.0.0"
+         "version" : "v13.1.0"
       },
       "Google::Ads::GoogleAds::Utils::GoogleAdsHelper" : {
          "file" : "lib/Google/Ads/GoogleAds/Utils/GoogleAdsHelper.pm",
-         "version" : "v13.0.0"
+         "version" : "v13.1.0"
       },
       "Google::Ads::GoogleAds::Utils::MediaUtils" : {
          "file" : "lib/Google/Ads/GoogleAds/Utils/MediaUtils.pm",
-         "version" : "v13.0.0"
+         "version" : "v13.1.0"
       },
       "Google::Ads::GoogleAds::Utils::PartialFailureUtils" : {
          "file" : "lib/Google/Ads/GoogleAds/Utils/PartialFailureUtils.pm",
-         "version" : "v13.0.0"
+         "version" : "v13.1.0"
       },
       "Google::Ads::GoogleAds::Utils::SearchGoogleAdsIterator" : {
          "file" : "lib/Google/Ads/GoogleAds/Utils/SearchGoogleAdsIterator.pm",
-         "version" : "v13.0.0"
+         "version" : "v13.1.0"
       },
       "Google::Ads::GoogleAds::Utils::SearchStreamHandler" : {
          "file" : "lib/Google/Ads/GoogleAds/Utils/SearchStreamHandler.pm",
-         "version" : "v13.0.0"
+         "version" : "v13.1.0"
       },
       "Google::Ads::GoogleAds::V10::Common::AdAssetPolicySummary" : {
          "file" : "lib/Google/Ads/GoogleAds/V10/Common/AdAssetPolicySummary.pm"
@@ -4818,6 +4818,12 @@
       "Google::Ads::GoogleAds::V11::Common::EnhancedCpc" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Common/EnhancedCpc.pm"
       },
+      "Google::Ads::GoogleAds::V11::Common::EventAttribute" : {
+         "file" : "lib/Google/Ads/GoogleAds/V11/Common/EventAttribute.pm"
+      },
+      "Google::Ads::GoogleAds::V11::Common::EventItemAttribute" : {
+         "file" : "lib/Google/Ads/GoogleAds/V11/Common/EventItemAttribute.pm"
+      },
       "Google::Ads::GoogleAds::V11::Common::ExclusionSegment" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Common/ExclusionSegment.pm"
       },
@@ -4838,6 +4844,12 @@
       },
       "Google::Ads::GoogleAds::V11::Common::FinalAppUrl" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Common/FinalAppUrl.pm"
+      },
+      "Google::Ads::GoogleAds::V11::Common::FlexibleRuleOperandInfo" : {
+         "file" : "lib/Google/Ads/GoogleAds/V11/Common/FlexibleRuleOperandInfo.pm"
+      },
+      "Google::Ads::GoogleAds::V11::Common::FlexibleRuleUserListInfo" : {
+         "file" : "lib/Google/Ads/GoogleAds/V11/Common/FlexibleRuleUserListInfo.pm"
       },
       "Google::Ads::GoogleAds::V11::Common::FrequencyCapEntry" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Common/FrequencyCapEntry.pm"
@@ -5556,6 +5568,9 @@
       "Google::Ads::GoogleAds::V11::Enums::BiddingStrategyStatusEnum" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Enums/BiddingStrategyStatusEnum.pm"
       },
+      "Google::Ads::GoogleAds::V11::Enums::BiddingStrategySystemStatusEnum" : {
+         "file" : "lib/Google/Ads/GoogleAds/V11/Enums/BiddingStrategySystemStatusEnum.pm"
+      },
       "Google::Ads::GoogleAds::V11::Enums::BiddingStrategyTypeEnum" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Enums/BiddingStrategyTypeEnum.pm"
       },
@@ -6252,6 +6267,9 @@
       "Google::Ads::GoogleAds::V11::Enums::UserListDateRuleItemOperatorEnum" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Enums/UserListDateRuleItemOperatorEnum.pm"
       },
+      "Google::Ads::GoogleAds::V11::Enums::UserListFlexibleRuleOperatorEnum" : {
+         "file" : "lib/Google/Ads/GoogleAds/V11/Enums/UserListFlexibleRuleOperatorEnum.pm"
+      },
       "Google::Ads::GoogleAds::V11::Enums::UserListLogicalRuleOperatorEnum" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Enums/UserListLogicalRuleOperatorEnum.pm"
       },
@@ -6672,6 +6690,9 @@
       "Google::Ads::GoogleAds::V11::Resources::DetailedDemographic" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Resources/DetailedDemographic.pm"
       },
+      "Google::Ads::GoogleAds::V11::Resources::DisplayExpansionOptInRecommendation" : {
+         "file" : "lib/Google/Ads/GoogleAds/V11/Resources/DisplayExpansionOptInRecommendation.pm"
+      },
       "Google::Ads::GoogleAds::V11::Resources::DisplayKeywordView" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Resources/DisplayKeywordView.pm"
       },
@@ -7064,6 +7085,9 @@
       },
       "Google::Ads::GoogleAds::V11::Resources::TrackingSetting" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Resources/TrackingSetting.pm"
+      },
+      "Google::Ads::GoogleAds::V11::Resources::UpgradeLocalCampaignToPerformanceMaxRecommendation" : {
+         "file" : "lib/Google/Ads/GoogleAds/V11/Resources/UpgradeLocalCampaignToPerformanceMaxRecommendation.pm"
       },
       "Google::Ads::GoogleAds::V11::Resources::UpgradeSmartShoppingCampaignToPerformanceMaxRecommendation" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Resources/UpgradeSmartShoppingCampaignToPerformanceMaxRecommendation.pm"
@@ -7461,6 +7485,18 @@
       "Google::Ads::GoogleAds::V11::Services::AudienceInsightsService" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService.pm"
       },
+      "Google::Ads::GoogleAds::V11::Services::AudienceInsightsService::AudienceCompositionAttribute" : {
+         "file" : "lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/AudienceCompositionAttribute.pm"
+      },
+      "Google::Ads::GoogleAds::V11::Services::AudienceInsightsService::AudienceCompositionAttributeCluster" : {
+         "file" : "lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/AudienceCompositionAttributeCluster.pm"
+      },
+      "Google::Ads::GoogleAds::V11::Services::AudienceInsightsService::AudienceCompositionMetrics" : {
+         "file" : "lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/AudienceCompositionMetrics.pm"
+      },
+      "Google::Ads::GoogleAds::V11::Services::AudienceInsightsService::AudienceCompositionSection" : {
+         "file" : "lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/AudienceCompositionSection.pm"
+      },
       "Google::Ads::GoogleAds::V11::Services::AudienceInsightsService::AudienceInsightsAttribute" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/AudienceInsightsAttribute.pm"
       },
@@ -7469,6 +7505,9 @@
       },
       "Google::Ads::GoogleAds::V11::Services::AudienceInsightsService::AudienceInsightsCategory" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/AudienceInsightsCategory.pm"
+      },
+      "Google::Ads::GoogleAds::V11::Services::AudienceInsightsService::AudienceInsightsDynamicLineup" : {
+         "file" : "lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/AudienceInsightsDynamicLineup.pm"
       },
       "Google::Ads::GoogleAds::V11::Services::AudienceInsightsService::AudienceInsightsEntity" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/AudienceInsightsEntity.pm"
@@ -7479,17 +7518,35 @@
       "Google::Ads::GoogleAds::V11::Services::AudienceInsightsService::BasicInsightsAudience" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/BasicInsightsAudience.pm"
       },
+      "Google::Ads::GoogleAds::V11::Services::AudienceInsightsService::DynamicLineupAttributeMetadata" : {
+         "file" : "lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/DynamicLineupAttributeMetadata.pm"
+      },
+      "Google::Ads::GoogleAds::V11::Services::AudienceInsightsService::GenerateAudienceCompositionInsightsRequest" : {
+         "file" : "lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/GenerateAudienceCompositionInsightsRequest.pm"
+      },
+      "Google::Ads::GoogleAds::V11::Services::AudienceInsightsService::GenerateAudienceCompositionInsightsResponse" : {
+         "file" : "lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/GenerateAudienceCompositionInsightsResponse.pm"
+      },
       "Google::Ads::GoogleAds::V11::Services::AudienceInsightsService::GenerateInsightsFinderReportRequest" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/GenerateInsightsFinderReportRequest.pm"
       },
       "Google::Ads::GoogleAds::V11::Services::AudienceInsightsService::GenerateInsightsFinderReportResponse" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/GenerateInsightsFinderReportResponse.pm"
       },
+      "Google::Ads::GoogleAds::V11::Services::AudienceInsightsService::InsightsAudience" : {
+         "file" : "lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/InsightsAudience.pm"
+      },
+      "Google::Ads::GoogleAds::V11::Services::AudienceInsightsService::InsightsAudienceAttributeGroup" : {
+         "file" : "lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/InsightsAudienceAttributeGroup.pm"
+      },
       "Google::Ads::GoogleAds::V11::Services::AudienceInsightsService::ListAudienceInsightsAttributesRequest" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/ListAudienceInsightsAttributesRequest.pm"
       },
       "Google::Ads::GoogleAds::V11::Services::AudienceInsightsService::ListAudienceInsightsAttributesResponse" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/ListAudienceInsightsAttributesResponse.pm"
+      },
+      "Google::Ads::GoogleAds::V11::Services::AudienceInsightsService::YouTubeChannelAttributeMetadata" : {
+         "file" : "lib/Google/Ads/GoogleAds/V11/Services/AudienceInsightsService/YouTubeChannelAttributeMetadata.pm"
       },
       "Google::Ads::GoogleAds::V11::Services::AudienceService" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Services/AudienceService.pm"
@@ -8751,6 +8808,12 @@
       "Google::Ads::GoogleAds::V11::Services::ReachPlanService" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Services/ReachPlanService.pm"
       },
+      "Google::Ads::GoogleAds::V11::Services::ReachPlanService::AdvancedProductTargeting" : {
+         "file" : "lib/Google/Ads/GoogleAds/V11/Services/ReachPlanService/AdvancedProductTargeting.pm"
+      },
+      "Google::Ads::GoogleAds::V11::Services::ReachPlanService::AudienceTargeting" : {
+         "file" : "lib/Google/Ads/GoogleAds/V11/Services/ReachPlanService/AudienceTargeting.pm"
+      },
       "Google::Ads::GoogleAds::V11::Services::ReachPlanService::CampaignDuration" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Services/ReachPlanService/CampaignDuration.pm"
       },
@@ -8828,6 +8891,12 @@
       },
       "Google::Ads::GoogleAds::V11::Services::ReachPlanService::Targeting" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Services/ReachPlanService/Targeting.pm"
+      },
+      "Google::Ads::GoogleAds::V11::Services::ReachPlanService::YouTubeSelectLineUp" : {
+         "file" : "lib/Google/Ads/GoogleAds/V11/Services/ReachPlanService/YouTubeSelectLineUp.pm"
+      },
+      "Google::Ads::GoogleAds::V11::Services::ReachPlanService::YouTubeSelectSettings" : {
+         "file" : "lib/Google/Ads/GoogleAds/V11/Services/ReachPlanService/YouTubeSelectSettings.pm"
       },
       "Google::Ads::GoogleAds::V11::Services::RecommendationService" : {
          "file" : "lib/Google/Ads/GoogleAds/V11/Services/RecommendationService.pm"
@@ -9043,6 +9112,6 @@
          "url" : "https://github.com/googleads/google-ads-perl"
       }
    },
-   "version" : "v13.0.0",
+   "version" : "v13.1.0",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

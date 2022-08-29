@@ -1,11 +1,7 @@
 Build.PL
 Changes
 lib/Struct/Dumb.pm
-LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01point.t
 t/02scope.t
@@ -15,3 +11,7 @@ t/05predicate.t
 t/10data-dump.t
 t/11data-dump-late.t
 t/99pod.t
+README
+LICENSE
+META.yml
+META.json

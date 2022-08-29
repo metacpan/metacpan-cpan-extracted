@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.27.2
+## Version v0.28.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2022/08/07
+## Modified 2022/08/12
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -42,7 +42,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.27.2';
+    our $VERSION     = 'v0.28.0';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -472,6 +472,55 @@ sub deserialise
                 else
                 {
                     ( $ref, my $bytes ) = $cbor->decode_prefix( $opts->{data} );
+                }
+                return( $ref );
+            }
+            else
+            {
+                return( $self->error( "No file and no data was provided to deserialise with $class." ) );
+            }
+        }
+        catch( $e )
+        {
+            return( $self->error( "Error trying to deserialise data with $class: $e" ) );
+        }
+    }
+    elsif( $class eq 'CBOR::Free' )
+    {
+        try
+        {
+            if( exists( $opts->{file} ) && $opts->{file} )
+            {
+                my $f = $self->new_file( $opts->{file} ) || return( $self->pass_error );
+                return( $self->error( "File provided \"$opts->{file}\" does not exist." ) ) if( !$f->exists );
+                return( $self->error( "File provided \"$opts->{file}\" is actually a directory." ) ) if( $f->is_directory );
+                return( $self->error( "File provided \"$opts->{file}\" to deserialise is empty." ) ) if( $f->is_empty );
+                my $data = $f->load( binmode => 'raw' );
+                return( $self->pass_error( $f->error ) ) if( !defined( $data ) );
+                my $ref;
+                if( defined( $base64 ) )
+                {
+                    my $decoded = $base64->[1]->( $data );
+                    $ref = CBOR::Free::decode( $decoded );
+                }
+                else
+                {
+                    $ref = CBOR::Free::decode( $data );
+                }
+                return( $ref );
+            }
+            elsif( exists( $opts->{data} ) )
+            {
+                return( $self->error( "Data provided to deserialise with $class is empty." ) ) if( !defined( $opts->{data} ) || !length( $opts->{data} ) );
+                my $ref;
+                if( defined( $base64 ) )
+                {
+                    my $decoded = $base64->[1]->( $opts->{data} );
+                    $ref = CBOR::Free::decode( $decoded );
+                }
+                else
+                {
+                    $ref = CBOR::Free::decode( $opts->{data} );
                 }
                 return( $ref );
             }
@@ -1818,6 +1867,38 @@ sub serialise
             }
             
             my $serialised = $cbor->encode( $data );
+            if( defined( $base64 ) )
+            {
+                $serialised = $base64->[0]->( $serialised );
+            }
+            
+            if( exists( $opts->{file} ) && $opts->{file} )
+            {
+                my $f = $self->new_file( $opts->{file} ) || return( $self->pass_error );
+                $f->unload( $serialised, { binmode => 'raw' } ) || return( $self->pass_error( $f->error ) );
+            }
+            return( $serialised );
+        }
+        catch( $e )
+        {
+            return( $self->error( "Error trying to serialise data with $class: $e" ) );
+        }
+    }
+    if( $class eq 'CBOR::Free' )
+    {
+        my @options = qw(
+            canonical string_encode_mode preserve_references scalar_references
+        );
+        try
+        {
+            my $params = {};
+            for( @options )
+            {
+                next unless( CORE::exists( $opts->{ $_ } ) );
+                $params->{ $_ } = $opts->{ $_ };
+            }
+            
+            my $serialised = CBOR::Free::encode( $data, ( scalar( keys( %$params ) ) ? %$params : () ) );
             if( defined( $base64 ) )
             {
                 $serialised = $base64->[0]->( $serialised );
@@ -5248,7 +5329,7 @@ EOT
             my $type = lc( $info->{type} );
             if( !CORE::exists( $type2func->{ $type } ) )
             {
-                warn( "Warning only: _set_get_class was called from package $pack at line $line in file $file, but the type provided \"$type\" is unknown to us, so we are skipping this field \"$f\" in the creation of our virtual class.\n" );
+                warn( "Warning only: _set_get_class was called from package $pack at line $line in file $file, but the type provided \"$type\" is unknown to us, so we are skipping this field \"$f\" in the creation of our virtual class.\n" . ( $type eq 'url' ? qq{Maybe you meant to use "uri" instead of "url" ?\n} : '' ) );
                 next;
             }
             my $func = $type2func->{ $type };
@@ -5267,8 +5348,8 @@ EOT
             }
             elsif( $type eq 'class' || $type eq 'class_array' )
             {
-                my $this_def = $info->{definition};
-                if( !CORE::exists( $info->{definition} ) )
+                my $this_def = $info->{definition} // $info->{def};
+                if( !CORE::exists( $info->{definition} ) && !CORE::exists( $info->{def} ) )
                 {
                     warn( "Warning only: No dynamic class fields definition was provided for this field \"$f\". Skipping this field.\n" );
                     next;
@@ -6595,7 +6676,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.27.2
+    v0.28.0
 
 =head1 DESCRIPTION
 
@@ -6825,7 +6906,7 @@ If the debug value is switched to 1, the message will be silenced.
 
 This method use a specified serialiser class and deserialise the given data either directly from a specified file or being provided, and returns the perl data.
 
-The 2 serialisers currently supported are: L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>). They are not required by L<Module::Generic>, so you must install them yourself. If the serialiser chosen is not installed, this will set an L<errr|Module::Generic/error> and return C<undef>.
+The serialisers currently supported are: L<CBOR::Free>, L<CBOR::XS>, L<JSON>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>). They are not required by L<Module::Generic>, so you must install them yourself. If the serialiser chosen is not installed, this will set an L<errr|Module::Generic/error> and return C<undef>.
 
 This method takes some parameters as an hash or hash reference. It can then:
 
@@ -6868,6 +6949,8 @@ A string being the class of the serialiser to use. This can be only either L<Ser
 Additionally the following options are supported and passed through directly to each serialiser:
 
 =over 4
+
+=item * L<CBOR::Free>: no option for deserialisation.
 
 =item * L<CBOR|CBOR::XS>: C<max_depth>, C<max_size>, C<allow_unknown>, C<allow_sharing>, C<allow_cycles>, C<forbid_objects>, C<pack_strings>, C<text_keys>, C<text_strings>, C<validate_utf8>, C<filter>
 
@@ -7455,7 +7538,7 @@ If it cannot open the file in write mode, or cannot print to it, this will set a
 
 This method use a specified serialiser class and serialise the given data either by returning it or by saving it directly to a given file.
 
-The 3 serialisers currently supported are: L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy version L<Storable>). They are not required by L<Module::Generic>, so you must install them yourself. If the serialiser chosen is not installed, this will set an L<errr|Module::Generic/error> and return C<undef>.
+The serialisers currently supported are: L<CBOR::Free>, L<CBOR::XS>, L<JSON>, L<Sereal> and L<Storable::Improved> (or the legacy version L<Storable>). They are not required by L<Module::Generic>, so you must install them yourself. If the serialiser chosen is not installed, this will set an L<errr|Module::Generic/error> and return C<undef>.
 
 This method takes some data and an optional hash or hash reference of parameters. It can then:
 
@@ -7506,6 +7589,8 @@ A string being the class of the serialiser to use. This can be only either L<Ser
 Additionally the following options are supported and passed through directly for each serialiser:
 
 =over 4
+
+=item * L<CBOR::Free>: C<canonical>, C<string_encode_mode>, C<preserve_references>, C<scalar_references>
 
 =item * L<CBOR|CBOR::XS>: C<max_depth>, C<max_size>, C<allow_unknown>, C<allow_sharing>, C<allow_cycles>, C<forbid_objects>, C<pack_strings>, C<text_keys>, C<text_strings>, C<validate_utf8>, C<filter>
 

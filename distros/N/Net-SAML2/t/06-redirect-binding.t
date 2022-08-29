@@ -4,6 +4,7 @@ use Test::Lib;
 use Test::Net::SAML2;
 
 use Net::SAML2::IdP;
+use Net::SAML2::Binding::Redirect;
 
 my $sp = net_saml2_sp();
 
@@ -50,5 +51,38 @@ test_xml_attribute_ok($xp, '/saml2p:AuthnRequest/@ID', qr/^NETSAML2_/,
     "Found a requestID");
 
 is($relaystate, 'http://return/url', "Relay state shows correct uri");
+
+lives_ok(
+    sub {
+        my $binding = Net::SAML2::Binding::Redirect->new(
+            cert  => $sp->cert,
+            param => 'SAMLResponse',
+        );
+        isa_ok($binding, "Net::SAML2::Binding::Redirect");
+    },
+    "We can create a binding redirect without key/url for verification purposes"
+);
+
+throws_ok(
+    sub {
+        Net::SAML2::Binding::Redirect->new(
+            cert  => $sp->cert,
+            key   => $sp->key,
+        );
+    },
+    qr/Need to have an URL specified/,
+    "Need an URL for SAMLRequest"
+);
+
+throws_ok(
+    sub {
+        Net::SAML2::Binding::Redirect->new(
+            cert  => $sp->cert,
+            url   => 'https://foo.example.com',
+        );
+    },
+    qr/Need to have a key specified/,
+    "Need a key for SAMLRequest"
+);
 
 done_testing;

@@ -2,7 +2,7 @@ package DBIx::QuickDB::Pool;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use Carp qw/croak/;
 use Fcntl qw/:flock/;
@@ -15,6 +15,7 @@ use DBIx::QuickDB;
 
 use DBIx::QuickDB::Util::HashBase qw{
     +cache_dir
+    +instance_dir
 
     <library
 
@@ -44,6 +45,9 @@ sub init {
 
     croak "'cache_dir' must point to an existing directory"
         unless -d $self->{+CACHE_DIR};
+
+    croak "'$self->{+INSTANCE_DIR}' must be an existing directory"
+        if $self->{+INSTANCE_DIR} && !-d $self->{+INSTANCE_DIR};
 
     $self->{+LIBRARY} //= caller(1);
 
@@ -223,7 +227,13 @@ sub fetch_db {
 
     my $from = $self->vivify_db($spec);
 
-    return $from->clone(autostart => 1, autostop => 1, cleanup => 1, %{$spec->{clone_args} || {}}, %params);
+    my %add_args;
+    if (my $dir = $self->{+INSTANCE_DIR}) {
+        require File::Temp;
+        $add_args{dir} = File::Temp::tempdir("$ENV{USER}-XXXXXX", CLEANUP => 0, DIR => $dir);
+    }
+
+    return $from->clone(autostart => 1, autostop => 1, cleanup => 1, %add_args, %{$spec->{clone_args} || {}}, %params);
 }
 
 sub vivify_db {
@@ -836,6 +846,11 @@ Required.
 Can only be specified at import or construction.
 
 No accessors.
+
+=item instance_dir => "path/to/instances"
+
+Normally db's are spun up in the system temp dir. This allows you to provide an
+alternate temporary database location.
 
 =item library => $PACKAGE
 

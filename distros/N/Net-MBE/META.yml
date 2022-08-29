@@ -1,0 +1,25 @@
+---
+abstract: 'Perl library to access Mailboxes Etc (MBE) online webservices'
+author:
+  - 'Michele Beltrame <mb@italpro.net>'
+build_requires:
+  Test::Exception: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-MBE
+requires:
+  Arthas::Defaults: v5.0.2
+  Moo: '2'
+  SOAP::Lite: '1.27'
+  perl: v5.20.0
+  version: '0.77'
+version: 0.2.2
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: MPL-2.0
